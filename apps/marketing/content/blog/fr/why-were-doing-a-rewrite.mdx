@@ -1,0 +1,113 @@
+---
+title: Pourquoi nous faisons une refonte
+description: Alors que nous dépassons la phase MVP et nous dirigeons vers la création de l'infrastructure de signature ouverte que nous méritons tous, nous devons faire une courte pause.
+authorName: 'Lucas Smith'
+authorImage: '/blog/blog-author-lucas.png'
+authorRole: 'Co-fondateur'
+date: 2023-08-05
+tags:
+  - Communauté
+  - Développement
+---
+
+<figure>
+  <MdxNextImage
+    src="/blog/blog-banner-rewrite.png"
+    width="1260"
+    height="630"
+    alt="Prochaine génération de Documenso"
+  />
+
+  <figcaption className="text-center">
+    La prochaine génération de Documenso et son infrastructure de signature.
+  </figcaption>
+</figure>
+
+> TLDR; Nous refaisons Documenso pour dépasser les fondations de notre MVP et créer une base encore meilleure pour le projet. Cette refonte nous donne l'opportunité de corriger quelques éléments du projet tout en accélérant le processus de développement à l'avenir.
+
+# Introduction
+
+Chez Documenso, nous construisons la prochaine génération d'infrastructure de signature en mettant l'accent sur l'inclusion et l'accessibilité pour tous. Pour ce faire, nous devons nous assurer que le logiciel que nous écrivons est également inclusif et accessible. C'est pourquoi nous avons décidé de faire une pause et d'effectuer une refonte rapide.
+
+Bien que nous ayons atteint le statut MVP validé et acquis des clients payants, nous sommes encore loin de notre objectif de créer une expérience de signature ouverte et fiable. Pour nous rapprocher de cet avenir, nous devons revoir les fondations du projet pour nous assurer de pouvoir résoudre tous les points que nous avons définis sur notre page d'accueil actuelle.
+
+Heureusement, ce n'est pas quelqu'un qui a rejoint l'équipe et a proposé une refonte par manque de compréhension du code et du contexte qui l'entoure. Avant de rejoindre Documenso en tant que co-fondateur, j'ai passé beaucoup de temps dans la base de code de Documenso et j'avais une compréhension assez intime de ce qui se passait pour la plupart. Cette connaissance m'a permis de prendre la décision juste mais difficile de faire une petite pause pour reconstruire nos bases actuelles afin de permettre l'accessibilité et un processus de livraison plus rapide à l'avenir.
+
+# Raisons : TypeScript
+
+Notre raison principale pour la refonte est d'exploiter au mieux les outils et technologies que nous avons déjà choisis, notamment TypeScript. Bien que Documenso utilise actuellement TypeScript, nous n'exploitons pas pleinement ses fonctionnalités de sécurité, telles que les génériques et les gardes de type.
+
+La base de code contient actuellement plusieurs instances de types `any`, ce qui est attendu lorsque l'on travaille dans un domaine inconnu où les modèles d'objets ne sont pas entièrement compris avant l'exploration et l'expérimentation. Ces `any` ont initialement accéléré le développement, mais sont depuis devenus un obstacle en raison du manque d'informations sur les types, combiné au prop drilling. Par conséquent, il est nécessaire de parcourir beaucoup de contextes pour comprendre la source de tout problème donné.
+
+La refonte utilise TypeScript à son plein potentiel, en veillant à ce que chaque interaction soit fortement typée, à la fois grâce aux outils généraux de TypeScript et à l'introduction de [Zod](https://github.com/colinhacks/zod), une bibliothèque de validation avec un excellent support TypeScript. Avec ces choix, nous pouvons garantir que la base de code est robuste face à diverses entrées et états, la plupart des problèmes étant détectés lors de la compilation et signalés dans l'IDE du développeur.
+
+# Raisons : Contrats API solides
+
+En ligne avec notre modèle de création de contrats fortement typés, nous avons décidé d'utiliser [tRPC](https://github.com/trpc/trpc) pour notre API interne. Cela nous permet de partager des types entre notre frontend et notre backend et d'établir un contrat solide pour les interactions entre les deux. Cela contraste avec les endpoints API non typés actuels dans Documenso, qui sont accessibles via l'API `fetch` qui elle-même est non typée.
+
+L'utilisation de tRPC réduit considérablement le risque d'échecs dus à des changements banals comme les modifications de forme des arguments ou des réponses lors de mises à jour. Nous avons pris cette décision facilement car tRPC est une technologie mature qui ne montre aucun signe de ralentissement à court terme.
+
+De plus, beaucoup de nos amis en open source ont fait le même choix pour des raisons similaires.
+
+# Raisons : Choix de technologies excitantes
+
+Bien que nous travaillions déjà avec ce que je considère comme un ensemble technologique amusant incluant Next.js, Prisma, Tailwind, et plus encore, il n'est pas un secret que les contributeurs apprécient travailler avec de nouvelles technologies qui les bénéficient dans leurs carrières et projets personnels.
+
+Pour en profiter, nous avons décidé d'utiliser Next.js 13 et l'architecture de nouveaux composants et actions de React côté serveur. Les composants côté serveur sont actuellement populaires parmi les développeurs, avec beaucoup les aimant et les détestant en même temps.
+
+J'ai personnellement travaillé avec les composants et actions côté serveur depuis leur première publication en octobre 2022 et j'ai géré la plupart des hoquets et limitations en cours de route. Maintenant, en juillet 2023, je crois qu'ils sont dans un état beaucoup plus stable et sont prêts à être adoptés, avec leurs avantages étant reconnus par beaucoup.
+
+En choisissant d'utiliser les composants et actions côté serveur, nous espérons encourager la communauté à participer plus que ce qu'elle ferait autrement. Cependant, nous ne choisissons cela que parce que c'est devenu plus mature et stable. Nous n'opterons pas pour des solutions moins susceptibles de devenir la solution de facto à l'avenir, car nous ne souhaitons pas hériter d'une dette technologique plus tard.
+
+# Raisons : Permettre un travail concurrent
+
+Une autre raison convaincante pour la refonte était de modulariser efficacement le code afin de pouvoir travailler sur les fonctionnalités de manière concurrente et sans problème. Cela signifie extraire autant que possible des composants, des gestionnaires d'API, etc., dans un ensemble de méthodes et de fonctions qui tentent de se concentrer sur une seule chose.
+
+En effectuant ce travail, nous devrions être en mesure de faire facilement des refontes et d'autres changements à diverses parties du code sans nous marcher sur les pieds, ce qui nous permet également de mettre à niveau ou d'abandonner des éléments selon les besoins tout en respectant le contrat de la méthode précédente.
+
+De plus, cela rend le test beaucoup plus facile car nous pouvons nous concentrer davantage sur les unités de travail plutôt que sur des tests de bout en bout extensifs, bien que nous visons à avoir les deux, mais pas immédiatement.
+
+# Raisons : Licence du travail
+
+Une autre raison majeure de la refonte est de garantir que tout le travail effectué sur le projet par notre équipe interne et les contributeurs externes est sous licence de manière à bénéficier à long terme au projet. Avant la refonte, les contributeurs soumettaient des pull requests qui étaient fusionnées sans aucun processus supplémentaire en dehors des cycles habituels de révision de code et de test.
+
+C'était assez bien pour la plupart du temps puisque nous travaillions simplement sur le MVP, mais maintenant que nous nous dirigeons vers une focalisation sur l'infrastructure, nous avons l'intention de prendre en charge des clients entreprise qui auront besoin d'une licence non-GPLv3 étant donné que les interprétations peuvent être assez nuisibles pour l'hébergement privé. Pour faciliter cela, nous demanderons aux contributeurs de signer un accord de licence de contributeur (CLA) avant que leurs modifications ne soient fusionnées, ce qui leur accordera une licence perpétuelle pour que nous puissions utiliser leur code et le re-licencier selon les besoins, comme pour le cas d'utilisation mentionné ci-dessus.
+
+Bien que certains puissent hésiter à l'idée de signer un CLA, nous voulons offrir une offre entreprise convaincante grâce à la double licence. L'adoption par les entreprises est l'une des pierres angulaires de notre stratégie et sera essentielle au financement du développement communautaire et du produit à long terme.
+
+_Notez que ce qui précède ne signifie pas que nous deviendrons jamais fermés. C'est un point de nos accords d'investisseurs que [https://github.com/documenso/documenso](https://github.com/documenso/documenso) restera toujours disponible et open-source._
+
+# Objectifs et non-objectifs
+
+Refondre une application est une tâche monumentale que j'ai acceptée et rejetée maintes fois au cours de ma carrière. En vieillissant, je deviens plus hésitant à effectuer ces refontes parce que je comprends que les systèmes portent beaucoup de contexte et d'histoire. Cela les rend plus adaptés aux refontes partielles, qui évitent d'apprendre à nouveau les leçons du passé lors du lancement de la refonte.
+
+Pour nous assurer que nous ne sautons pas dans le grand bain sans réfléchir, j'ai établi une liste d'objectifs et de non-objectifs pour garder cette refonte légère et abordable.
+
+### Objectifs
+
+- Fournir un design et une interface propres pour l'application réécrite qui inspirent confiance et sécurité au premier coup d'œil.
+- Créer une base et une architecture stables qui permettront de répondre à nos futurs éléments de feuille de route (équipes, automatisation, workflows, etc.).
+- Créer un système robuste nécessitant un minimum de contexte grâce à des contrats solides et à la typographie.
+
+### Non-objectifs
+
+- Changer le schéma de la base de données (nous ne voulons pas rendre les migrations plus difficiles qu'elles ne le doivent, donc tous les changements doivent être additifs).
+- Ajouter trop de fonctionnalités qui n'étaient pas présentes dans le système avant la refonte.
+- Supprimer des fonctionnalités qui étaient dans la version précédente de Documenso, telles que les signatures gratuites (signatures sans champ correspondant).
+
+# Plan de déploiement
+
+Grâce aux contraintes énumérées ci-dessus, notre déploiement devrait être assez indolore. Cependant, pour être prudents, nous prévoyons de faire ce qui suit.
+
+1. Dans l'environnement de [test actuel](https://test.documenso.com), créer et signer plusieurs documents en laissant beaucoup dans différents états d'achèvement.
+2. Déployer la refonte dans l'environnement de test et vérifier que tous les documents et informations existants sont récupérables et modifiables sans aucun problème.
+3. Créer un autre ensemble de documents à l'aide de la nouvelle refonte et vérifier que toutes les interactions entre la création et la signature fonctionnent comme prévu.
+4. Répéter cela jusqu'à ce que nous atteignions un niveau de confiance général (attente de deux semaines).
+
+Une fois que nous aurons atteint le niveau de confiance souhaité avec notre environnement de test, nous envisagerons de déployer la refonte dans l'environnement de production en nous assurant d'avoir effectué toutes les sauvegardes nécessaires en cas de défaillance catastrophique.
+
+# Vous voulez aider ?
+
+Nous travaillons actuellement sur la branche **[feat/refresh](https://github.com/documenso/documenso/tree/feat/refresh)** sur GitHub, nous prévoyons d'avoir un CLA disponible à signer dans les prochains jours afin de pouvoir commencer à accepter les contributions externes dès que possible. Alors que nous approchons de la phase finale de la refonte, nous lancerons bientôt quelques primes pour des éléments comme [Husky](https://github.com/typicode/husky) et [Changesets](https://github.com/changesets/changesets).
+
+Gardez un œil sur nos [problèmes GitHub](https://github.com/documenso/documenso/issues) pour rester à jour !

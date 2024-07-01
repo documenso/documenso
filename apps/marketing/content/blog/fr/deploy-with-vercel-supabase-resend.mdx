@@ -1,0 +1,200 @@
+---
+title: 'Déploiement de Documenso avec Vercel, Supabase et Resend'
+description: C'est la première partie de la nouvelle série Building Documenso, où je décris les défis et les choix de conception que nous faisons en construisant la plateforme de signature ouverte la plus ouverte au monde.
+authorName: 'Ephraim Atta-Duncan'
+authorImage: '/blog/blog-author-duncan.jpeg'
+authorRole: 'Stagiaire Ingénieur Logiciel'
+date: 2023-09-08
+tags:
+  - Open Source
+  - Auto-hébergement
+  - Tutoriel
+---
+
+Dans cet article, nous vous guiderons à travers le déploiement et l'auto-hébergement de Documenso en utilisant Vercel, Supabase et Resend.
+
+Vous apprendrez :
+
+- Comment configurer une base de données Postgres avec Supabase,
+- Comment installer SMTP avec Resend,
+- Comment déployer votre projet avec Vercel.
+
+Si vous ne savez pas ce qu'est [Documenso](https://documenso.com/), il s'agit d'une alternative open-source à DocuSign, avec pour mission de créer une infrastructure de signature ouverte tout en favorisant l'ouverture, la coopération et la transparence.
+
+## Prérequis
+
+Avant de commencer, assurez-vous d'avoir un compte [GitHub](https://github.com/signup). Vous devez également avoir [Node.js](https://nodejs.org/en) et [npm](https://www.npmjs.com/) installés sur votre machine locale (note : vous avez également la possibilité de l'héberger sur un environnement cloud en utilisant Gitpod, par exemple ; ce serait un autre post). Si vous avez besoin de comptes sur Vercel, Supabase et Resend, créez-les en visitant les sites web de [Vercel](https://vercel.com/), [Supabase](https://supabase.com/) et [Resend](https://resend.com/).
+
+Checklist :
+
+- [ ] Avoir un compte GitHub
+- [ ] Installer Node.js
+- [ ] Installer npm
+- [ ] Avoir un compte Vercel
+- [ ] Avoir un compte Supabase
+- [ ] Avoir un compte Resend
+
+## Guide étape par étape pour déployer Documenso avec Vercel, Supabase et Resend
+
+Pour déployer Documenso, nous suivrons les étapes suivantes :
+
+1. Forkez le dépôt Documenso
+2. Clonez le dépôt forkez et installez les dépendances
+3. Créez un nouveau projet sur Supabase
+4. Copiez l'URL de connexion à la base de données Postgres de Supabase
+5. Créez un fichier `.env`
+6. Exécutez la migration sur la base de données Postgres de Supabase
+7. Obtenez vos clés SMTP sur Resend
+8. Créez un nouveau projet sur Vercel
+9. Ajoutez les variables d'environnement à votre projet Vercel
+
+Êtes-vous prêt ? C'est parti !
+
+### Étape 1 : Forkez le dépôt Documenso
+
+Commencez par créer un fork de Documenso sur GitHub. Vous pouvez le faire en visitant le [dépôt Documenso](https://github.com/documenso/documenso) et en cliquant sur le bouton 'Fork' (et étoilez le repo !).
+
+![Documenso](https://dev-to-uploads.s3.amazonaws.com/uploads/articles/wkcujctpf86p56bju3mq.png)
+
+Choisissez votre profil GitHub comme propriétaire et cliquez sur 'Create fork' pour créer un fork du repo.
+
+![Forkez le dépôt Documenso sur GitHub](https://dev-to-uploads.s3.amazonaws.com/uploads/articles/xf49r2byu9nnd1465niy.png)
+
+### Étape 2 : Clonez le dépôt forkez et installez les dépendances
+
+Clonez le dépôt forkez sur votre machine locale dans n'importe quel répertoire de votre choix. Ouvrez votre terminal et entrez les commandes suivantes :
+
+```bash
+# Clonez le repo en utilisant GitHub CLI
+gh repo clone [votre_nom_utilisateur_github]/documenso
+
+# Clonez le repo en utilisant Git
+git clone <https://github.com/[votre_nom_utilisateur_github]/documenso.git>
+```
+
+Naviguez maintenant dans le répertoire et installez les dépendances du projet :
+
+```bash
+cd documenso
+npm install
+```
+
+### Étape 3 : Créez un nouveau projet sur Supabase
+
+Maintenant, configurons la base de données.
+
+Si ce n'est pas déjà fait, créez un nouveau projet sur Supabase. Cela créera automatiquement une nouvelle base de données Postgres pour vous.
+
+Sur votre tableau de bord Supabase, cliquez sur le bouton '**Nouveau projet**' et choisissez votre organisation.
+
+Sur la page '**Créer un nouveau projet**', définissez un nom de base de données **documenso** et un mot de passe sécurisé pour votre base de données. Choisissez une région proche de vous, un plan de tarification, puis cliquez sur '**Créer un nouveau projet**' pour créer votre projet.
+
+![Créez un nouveau projet sur Supabase](https://dev-to-uploads.s3.amazonaws.com/uploads/articles/w5lqz771iupjyi1ekfdz.png)
+
+### Étape 4 : Copiez l'URL de connexion à la base de données Postgres de Supabase
+
+Dans votre projet, cliquez sur l'icône '**Paramètres**' en bas à gauche.
+
+Sous la section '**Paramètres du projet**', cliquez sur '**Base de données**' et faites défiler jusqu'à la section '**Chaîne de connexion**'. Copiez l'URL '**URI**' et mettez à jour avec le mot de passe que vous avez choisi à l'étape précédente.
+
+![Copiez l'URL de connexion à la base de données Postgres de Supabase](https://dev-to-uploads.s3.amazonaws.com/uploads/articles/y1ldu3qrg9moednbzjij.png)
+
+### Étape 5 : Créez un fichier `.env`
+
+Créez un fichier `.env` à la racine de votre projet en copiant le contenu du fichier `.env.example`.
+
+Ajoutez la chaîne de connexion que vous avez copiée depuis votre tableau de bord Supabase à la variable `DATABASE_URL` dans le fichier `.env`.
+
+Le `.env` devrait ressembler à ceci :
+
+```bash
+DATABASE_URL="postgres://postgres:[VOTRE-MOT-DE-PASSE]@db.[VOTRE-REFERENCE-DE-PROJET].supabase.co:5432/postgres"
+```
+
+### Étape 6 : Exécutez la migration sur la base de données Postgres de Supabase
+
+Exécutez la migration sur la base de données Postgres de Supabase en utilisant la commande suivante :
+
+```bash
+npx prisma migrate deploy
+```
+
+### Étape 7 : Obtenez vos clés SMTP sur Resend
+
+Alors, vous venez de cloner Documenso, d'installer les dépendances sur votre machine locale et de configurer votre base de données avec Supabase. Maintenant, SMTP manque. Les e-mails ne partiront pas ! Réglons cela avec Resend.
+
+Dans le tableau de bord de **[Resend](https://resend.com/)**, cliquez sur 'Ajouter une clé API' pour créer une clé pour SMTP Resend.
+
+![Créez une clé pour SMTP Resend](https://dev-to-uploads.s3.amazonaws.com/uploads/articles/uh2rztgn09mlvecl34i5.png)
+
+Ensuite, ajoutez et vérifiez votre domaine dans la section '**Domaines**' dans la barre latérale. Cela vous permettra d'envoyer des e-mails depuis n'importe quelle adresse associée à votre domaine.
+
+![Vérifiez votre domaine sur Resend](https://dev-to-uploads.s3.amazonaws.com/uploads/articles/nxgie0esz530vq5a494o.png)
+
+Vous pouvez mettre à jour votre fichier `.env` avec ce qui suit :
+
+```bash
+SMTP_MAIL_HOST = 'smtp.resend.com';
+SMTP_MAIL_PORT = '25';
+SMTP_MAIL_USER = 'resend';
+SMTP_MAIL_PASSWORD = 'VOTRE_RESEND_API_KEY';
+MAIL_FROM = 'noreply@[VOTRE_DOMAINE]';
+```
+
+### Étape 8 : Créez un nouveau projet sur Vercel
+
+Vous avez configuré la base de données avec Supabase et êtes prêt avec SMTP avec Resend. Presque là ! La prochaine étape consiste à déployer le projet. Nous utiliserons Vercel pour cela.
+
+Sur votre tableau de bord Vercel, créez un nouveau projet en utilisant le projet forké depuis vos dépôts GitHub. Sélectionnez le projet parmi les options et cliquez sur '**Importer**' pour commencer
+
+à exécuter Documenso.
+
+![Créez un nouveau projet sur Vercel](https://dev-to-uploads.s3.amazonaws.com/uploads/articles/gdy97tltpnu7vf4fc11f.png)
+
+### Étape 9 : Ajoutez les variables d'environnement à votre projet Vercel
+
+Dans la page '**Configurer le projet**', ajouter les variables d'environnement requises est essentiel pour garantir que l'application se déploie sans erreur.
+
+Spécifiquement pour les variables `NEXT_PUBLIC_WEBAPP_URL` et `NEXTAUTH_URL`, vous devez ajouter `.vercel.app` à votre nom de projet. Cela formera l'URL de déploiement, qui sera au format : `https://[nom_du_projet].vercel.app`.
+
+Par exemple, dans mon cas, l'URL de déploiement est `https://documenso-supabase-web.vercel.app`.
+
+![Ajoutez les variables d'environnement à votre projet Vercel](https://dev-to-uploads.s3.amazonaws.com/uploads/articles/aru33fk1i19h0valffow.png)
+
+Voici un exemple de `.env` à déployer. Copiez-collez pour pré-remplir automatiquement les champs et cliquez sur '**Déployer**'. Il ne vous reste plus qu'à attendre que votre projet se déploie. Vous êtes en direct — profitez-en !
+
+```bash
+DATABASE_URL='postgresql://postgres:typeinastrongpassword@db.njuigobjlbteahssqbtw.supabase.co:5432/postgres'
+
+NEXT_PUBLIC_WEBAPP_URL='https://documenso-supabase-web.vercel.app'
+NEXTAUTH_SECRET='quelque chose d'obscur pour chiffrer vos jetons jwt'
+NEXTAUTH_URL='https://documenso-supabase-web.vercel.app'
+
+# Obtenir une clé Sendgrid Api ici : <https://signup.sendgrid.com>
+SENDGRID_API_KEY=''
+
+# Définissez les identifiants SMTP pour utiliser SMTP au lieu de l'API Sendgrid.
+SMTP_MAIL_HOST='smtp.resend.com'
+SMTP_MAIL_PORT='25'
+SMTP_MAIL_USER='resend'
+SMTP_MAIL_PASSWORD='VOTRE_RESEND_API_KEY'
+MAIL_FROM='noreply@[VOTRE_DOMAINE]'
+
+NEXT_PUBLIC_ALLOW_SIGNUP=true
+```
+
+## Conclusion
+
+![Déploiement de Documenso](https://dev-to-uploads.s3.amazonaws.com/uploads/articles/secg29j9j40o4u2oa8o8.png)
+
+Félicitations ! 🎉 Vous avez déployé avec succès Documenso en utilisant Vercel, Supabase et Resend. Vous êtes maintenant prêt à créer et signer vos propres documents avec votre propre Documenso auto-hébergé !
+
+Dans ce guide étape par étape, vous avez appris à :
+
+- configurer une base de données Postgres avec Supabase,
+- installer SMTP avec Resend,
+- déployer votre projet avec Vercel.
+
+À vous de jouer ! Comment avez-vous trouvé le tutoriel ? Si vous l'avez apprécié, [n'hésitez pas à partager](https://twitter.com/documenso/status/1700141802693480482) ! Et si vous avez des questions ou des commentaires, n'hésitez pas à me contacter sur [Twitter / X](https://twitter.com/EphraimDuncan_) (DM ouvert) ou [Discord](https://documen.so/discord).
+
+Nous construisons une alternative open-source à DocuSign et nous accueillons chaque contribution. Rendez-vous sur le dépôt GitHub et [laissez-nous une étoile](https://github.com/documenso/documenso) !

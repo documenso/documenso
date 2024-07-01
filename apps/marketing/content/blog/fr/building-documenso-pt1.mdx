@@ -1,0 +1,98 @@
+---
+title: 'Construction de Documenso — Partie 1 : Certificats'
+description: Découvrons pourquoi vous avez besoin d'un certificat de signature et comment Documenso s'en occupe.
+authorName: 'Timur Ercan'
+authorImage: '/blog/blog-author-timur.jpeg'
+authorRole: 'Co-Fondateur'
+date: 2023-06-23
+tags:
+  - Open Source
+  - Signature de Document
+  - Certificats
+  - Signature
+---
+
+<figure>
+  <MdxNextImage
+    src="/blog/blog-banner-building-documenso.webp"
+    width="1200"
+    height="675"
+    alt="Bannière du blog Building Documenso"
+  />
+
+  <figcaption className="text-center">
+    Qu'est-ce qu'une signature en réalité ?
+  </figcaption>
+</figure>
+
+> Avertissement : Je ne suis pas avocat et ceci ne constitue pas un conseil juridique. Nous prévoyons de publier un cadre beaucoup plus spécifique sur le sujet de la validité des signatures.
+
+Voici le premier volet de la nouvelle série Building Documenso, où je décris les défis et les choix de conception que nous faisons en construisant la plateforme de signature la plus ouverte au monde.
+
+Comme vous l'avez peut-être entendu, nous avons récemment lancé la version 0.9 de Documenso, examinée par la communauté, sur <a href="https://github.com/documenso/documenso" target="_blank">GitHub</a> et elle est maintenant disponible via le plan des premiers adoptants. L'un des choix les plus fondamentaux que nous avons dû faire pour cette première version était le choix du certificat. Bien qu'il soit intéressant de savoir ce que nous avons choisi, cela servira également de guide pour tous ceux qui envisagent d'auto-héberger Documenso.
+
+> Question : Pourquoi ai-je besoin d'un certificat de signature de document pour l'auto-hébergement ?
+>
+> Réponse courte : Insérer les images d'une signature dans le document est seulement une partie du processus de signature.
+
+Pour avoir un document réellement signé numériquement, vous avez besoin d'un certificat de signature de document qui est utilisé pour créer la signature numérique qui est insérée dans le document, en plus de celle visible¹.
+
+Lorsque vous hébergez un service de signature vous-même, comme nous le faisons, il existe quatre choix principaux pour gérer le certificat : ne pas utiliser de certificat, créer le vôtre, acheter un certificat de confiance, et devenir un fournisseur de services de confiance pour émettre votre propre certificat de confiance.
+
+## 1\. Aucun certificat
+
+Beaucoup de services de signature n'utilisent pas en réalité de signatures numériques en plus de l'image insérée. Ils insèrent simplement une image des signatures dans le document que vous signez. Cela peut être fait et est juridiquement acceptable dans de nombreux cas. Cette option n'est pas directement prise en charge par Documenso sans modifier le code.
+
+## 2\. Créer le vôtre
+
+Puisque la cryptographie derrière les certificats est librement disponible en open source, vous pourriez générer le vôtre en utilisant OpenSSL, par exemple. Comme cela demande à peine plus de travail que l'option 1 (du moins avec Documenso), ce serait ma recommandation minimale d'effort. Avoir un certificat auto-créé (« auto-signé ») ne ajoute pas grand-chose en termes de régulation, mais il garantit l'intégrité du document, ce qui signifie qu'aucune modification n'a été apportée après la signature². Ce que cela ne vous donne pas, c'est le célèbre coche vert dans Adobe Acrobat. Pourquoi ? Parce que vous n'êtes pas sur la liste des fournisseurs que Adobe « fait confiance ».³
+
+## 3\. Acheter un certificat « de confiance »
+
+Il existe des Autorités de Certification (CA) qui peuvent vous vendre un certificat⁴. Le service qu'elles fournissent est de valider votre nom (certificats personnels) ou le nom de votre organisation (certificat d'entreprise) avant de créer votre certificat pour vous, tout comme vous l'avez fait dans l'option 2. La différence est qu'elles sont répertoriées sur les listes de confiance mentionnées précédemment (par exemple, celle d'Adobe) et donc les signatures résultantes obtiennent un joli coche vert dans Adobe Reader⁵.
+
+## 4\. Devenir une Autorité de Certification (CA) de confiance et créer votre propre certificat
+
+Cette option est une entreprise incroyablement complexe, exigeant beaucoup d'efforts et de compétences. Cela peut être fait, car il existe plusieurs CA dans le monde. En vaut-il la peine ? Cela dépend beaucoup de ce que vous essayez d'accomplir.
+
+<center>.&nbsp;&nbsp;.&nbsp;&nbsp;.</center>
+
+## Ce que nous avons fait
+
+Après avoir brièvement introduit les options, voici ce que nous avons fait : Comme nous visons à élever la barre de la prolifération des signatures numériques et de la confiance, nous avons choisi d'acheter des « Certificats Personnels Avancés pour Entreprises/Organisations » auprès de WiseKey. Ainsi, les documents signés avec la version hébergée de Documenso ressemblent à ceci :
+
+<figure>
+  <MdxNextImage
+    src="/blog/blog-fig-building-documenso.webp"
+    width="1262"
+    height="481"
+    alt="Figure 1"
+  />
+
+  <figcaption className="text-center">Le célèbre coche vert : Signé par Documenso hébergé</figcaption>
+</figure>
+
+Il n'y avait pas de raisons plus profondes pour lesquelles nous avons choisi WiseKey, si ce n'est qu'ils offraient ce dont nous avions besoin et qu'il n'y avait aucune raison de chercher plus loin. Bien que je n'aie pas encore cartographié l'offre complète du marché des certificats, je suis assez sûr que quelque chose de similaire pourrait être trouvé ailleurs. Alors que nous avons opté pour l'option 3, choisir l'option 2 pourrait être tout à fait raisonnable selon votre cas d'utilisation⁶.
+
+> Bien que ce soit notre configuration actuelle, nous avons de grands projets pour ce sujet. Alors que les Certificats SSL mondialement reconnus sont disponibles gratuitement depuis un certain temps déjà, grâce à Let's Encrypt, il n'existe pas encore de telle chose pour la signature de documents. Et il devrait y en avoir une. Ne pas disposer d'une infrastructure de signature gratuite et de confiance bloque la création d'une toute nouvelle génération de produits de signature. C'est pourquoi nous commencerons à travailler sur l'option 4 lorsque le moment sera venu.
+
+Avez-vous des questions ou des réflexions à ce sujet ? Comme toujours, faites-le moi savoir dans les commentaires, sur <a href="http://twitter.com/eltimuro" target="_blank">twitter.com/eltimuro</a>
+ou directement : <a href="https://documen.so/timur" target="_blank">documen.so/timur</a>
+
+Rejoignez la communauté d'auto-hébergeurs ici : <a href="https://documen.so/discord" target="_blank">https://documen.so/discord</a>
+
+Meilleures salutations depuis Hambourg,
+
+Timur
+
+\[1\] Il existe différentes approches pour signer un document. Pour simplifier, nous parlons ici d'un document avec X images de signature insérées, qui est ensuite signé une fois par le service de signature, c'est-à-dire Documenso. Si chaque signature visuelle doit avoir sa propre signature numérique (par exemple, QES — Niveau 3 eIDAS), le cas est un peu plus complexe.
+
+\[2\] Bien sûr, le fournisseur de services de signature peut techniquement changer et resigner le document, en particulier dans le cas mentionné au point \[1\]. Cela peut être contré en exigeant de véritables signatures numériques de chaque signataire, liées à leur identité/compte. Créer un système complètement sans confiance dans ce contexte est cependant extrêmement difficile à faire et n'est pas le besoin le plus pressant de l'industrie à ce stade, à mon avis. Cependant, cela serait souhaitable.
+
+\[3\] Adobe, comme l'UE, dispose d'une liste d'organisations en qui ils ont confiance. Le coche vert Adobe est alimenté par la liste de confiance d'Adobe. Pour être reconnu comme digne de confiance selon les normes de l'UE, consultez : <a href="https://ec.europa.eu/digital-building-blocks/DSS/webapp-demo/validation" target="_blank">https://ec.europa.eu/digital-building-blocks/DSS/webapp-demo/validation</a>, vous devez être sur la liste de confiance de l'UE. Être sur chaque liste est possible, bien que la seconde option nécessite beaucoup plus de travail.
+
+\[4\] Techniquement, ils signent votre demande de création de certificat (créée par vous), contenant vos informations avec leur certificat (qui est digne de confiance), rendant votre certificat digne de confiance. De cette manière, tout ce que vous signez avec votre certificat est considéré comme digne de confiance. Ils ont créé leur certificat tout comme vous, la différence est qu'ils sont sur les listes mentionnées au point \[3\].
+
+\[5\] Pourquoi Adobe décide-t-il de ce qui est digne de confiance ? Ils possèdent tout simplement le lecteur PDF le plus utilisé. Et puisque tout le monde vérifie là-bas, celui qu'ils considèrent digne de confiance porte du poids. Si cela devrait être ainsi, c'est une autre question.
+
+\[6\] Les signatures auto-signées, même purement visuelles, sont tout à fait juridiquement contraignantes. Le choix de l'utilisation modifie principalement votre confiance dans la signature et la charge de la preuve. De plus, certaines industries exigent un certain niveau de signatures, par exemple les prêts au détail (QES / niveau 3 eIDAS dans l'UE).

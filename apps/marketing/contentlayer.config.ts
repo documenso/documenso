@@ -15,6 +15,10 @@ export const BlogPost = defineDocumentType(() => ({
     cta: { type: 'boolean', required: false, default: true },
   },
   computedFields: {
+    lang: {
+      type: 'string',
+      resolve: (doc) => doc._raw.flattenedPath.split('/')[1],
+    },
     href: { type: 'string', resolve: (post) => `/${post._raw.flattenedPath}` },
   },
 }));
@@ -27,6 +31,10 @@ export const GenericPage = defineDocumentType(() => ({
     title: { type: 'string', required: true },
   },
   computedFields: {
+    lang: {
+      type: 'string',
+      resolve: (doc) => doc._raw.flattenedPath.split('/')[0],
+    },
     href: { type: 'string', resolve: (post) => `/${post._raw.flattenedPath}` },
   },
 }));

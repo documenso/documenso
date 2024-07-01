@@ -1,0 +1,115 @@
+---
+title: 'Construction de Documenso — Partie 2 : Validité des signatures'
+description: Une signature est-elle valide ? Et que cela signifie-t-il ? C'est une question étonnamment complexe ; examinons-la de plus près.
+authorName: 'Timur Ercan'
+authorImage: '/blog/blog-author-timur.jpeg'
+authorRole: 'Co-Fondateur'
+date: 2024-04-05
+tags:
+  - Signature de document
+  - Certificats
+  - Signature
+---
+
+<figure>
+  <MdxNextImage
+    src="/blog/eu-validate-1.png"
+    width= "650"
+    height= "650"
+    alt= "Un bulletin de notes pour la validité des signatures."
+  />
+
+  <figcaption className="text-center">
+    Si un arbre ne figure pas sur la liste de confiance de l'UE, fait-il du bruit lors de la validation ?
+  </figcaption>
+</figure>
+
+> TLDR ; Les signatures peuvent être valides et conformes à différents niveaux de signature, même si certains validateurs affichent des erreurs de niveau supérieur. Toutes les mesures de sécurité utiles ne sont pas obligatoires par la loi.
+
+# Une question valide
+
+Il y a quelques jours, un early adopter a soulevé cette question dans notre [Discord](https://documen.so/discord) :
+
+<figure>
+  <MdxNextImage
+    src="/blog/eu-validate-2.png"
+    width= "650"
+    height= "650"
+    alt= "Un bulletin de notes pour la validité des signatures."
+  />
+
+  <figcaption className="text-center">
+    Vous pouvez vérifier le validateur ici : [https://documen.so/eu-validator](https://documen.so/eu-validator)
+  </figcaption>
+</figure>
+
+Pour ceux qui ne sont pas familiers avec l'outil, il a utilisé l'outil de validation du Cadre de services de signature numérique (DSS) de l'UE pour vérifier la signature d'un document signé avec Documenso. L'UE fournit cet outil pour aider les utilisateurs et les fournisseurs à vérifier le niveau de validité de leurs signatures.
+
+Un bref rappel de [Construction de Documenso — Partie 1 : Certificats](https://documen.so/certs) :
+
+> Documenso insère toutes les signatures visuelles dans le document, puis le scelle à l'aide du certificat d'entreprise "Documenso Inc.". Cela rend le document PDF résultant inviolable et garantit qu'il n'a pas changé depuis la signature.
+
+Avant de répondre si le document a été correctement signé, nous devons comprendre quel était l'objectif.
+
+Il existe trois niveaux de signature dans le règlement européen eIDAS :
+
+1. **Signatures électroniques simples (Niveau 1/ SES)** : Il s'agit simplement d'une signature visuelle ou même d'une case à cocher sur un document.
+
+2. **Signatures électroniques avancées (Niveau 2/ AES)** : Une signature cryptographique réelle (pas seulement un sceau sur l'ensemble du document, mais une signature spécifique), utilisant un certificat lié aux données d'identification du signataire.
+
+3. **Signatures électroniques qualifiées (Niveau 3/ QES)** : Identique au niveau 2, mais réalisé par une entité certifiée QES sur du matériel certifié par le gouvernement, après identification du signataire avec un document d'identité officiel (par exemple, un passeport).
+
+> 💡 Note : Le numéro 2 (AES) est la manière dont la plupart des gens imaginent les signatures numériques. Mais la plupart du marché utilise le niveau 1 plus un sceau sur l'ensemble du document au nom du fournisseur de signature (par exemple, Documenso). Les données du signataire ne sont insérées que visuellement, pas dans la signature réelle. Pourquoi ? Une des raisons est que c'est beaucoup plus facile, et sans un framework open source facilement disponible à utiliser, il est assez difficile de le construire. C'est quelque chose que nous visons à construire (comme beaucoup l'ont fait) et à rendre open source (comme personne ne l'a fait).
+
+Du point de vue de eIDAS, Documenso offre des signatures de niveau 1/ SES car elles ne respectent pas toutes les exigences du niveau 2/ AES. Cela signifie qu'il n'y a techniquement pas besoin légal de sceller le document pour atteindre ce niveau de validité (du moins dans eIDAS). Nous le faisons quand même car cela améliore le niveau de confiance que les utilisateurs peuvent avoir dans le document signé. Sceller le document, même s'il n'est pas légalement requis, est un excellent exemple de l'approche de Documenso vis-à-vis des signatures. Tout d'abord, nous visons à fournir toutes les exigences légales pour un cas d'utilisation donné. Ensuite, nous ajoutons toute protection qui peut être ajoutée sans causer de friction indue à la création de la signature.
+
+## Pas si valide, mais comment valide
+
+**Q : Alors, la signature dans l'image est-elle valide ?**
+
+R : Oui, en tant que SES de eIDAS de niveau 1.
+
+**Q : Alors pourquoi dit-il "Impossible de construire une chaîne de certificats jusqu'à une liste de confiance" ?**
+
+R : Le certificat que nous utilisons pour sceller le document après avoir inséré les signatures n'est pas sur la liste de confiance de l'UE.
+
+**Q : Cela signifie-t-il qu'il est moins sécurisé ?**
+
+R : Non, cela signifie que le fournisseur (Wisekey) n'est pas sur une liste maintenue par l'UE. La signature cryptographique est tout aussi solide que toute autre.
+
+Pour quelqu'un qui ne traite pas cela quotidiennement, cela peut être difficile à comprendre. Que vous utilisiez un certificat que vous avez généré vous-même, un certificat généré par une autorité de certification (AC) comme Wisekey, ou un autre sur la liste de confiance de l'UE (par exemple, Bundesdruckerei), la sécurité cryptographique garantissant que le document n'a pas été altéré est toujours la même. De nombreux fournisseurs comme Documenso, DocuSign, PandaDoc et Digisigner utilisent tous cette méthode pour leurs plans réguliers. Cela signifie que si vous deviez soumettre un document signé par eux au validateur ci-dessus, le résultat serait le même[1]. La question intéressante est pourquoi ? Pourquoi faire cela ?
+
+## L'infrastructure des certificats est brisée
+
+Bien qu'il y ait des dépenses réelles associées à la fourniture de AES et de QES, la réalité brute est qu'il est juste bon pour les affaires de les facturer par signature, ce qui les rend inadaptés aux "offres standard" ; presque personne n'a les ressources nécessaires pour les configurer eux-mêmes. Bien que ce processus initial de devenir une entité certifiée QES soit très coûteux, vendre ensuite des certificats est très lucratif. Cela conduit à moins d'innovation dans l'espace et seuls les grands acteurs fournissent ces services de haute conformité. Même les certificats utilisés uniquement pour sceller des documents sans être certifiés QES sont vendus à des prix très élevés, alors qu'ils coûtent presque rien à produire.
+
+## Mais pourquoi ?
+
+**Q : Pourquoi les gens achètent-ils un certificat pour de l'argent au lieu d'en générer un eux-mêmes ? La sécurité cryptographique n'est-elle pas la même ?**
+
+R : Les certificats auto-générés ne sont pas reconnus pour les signatures de conformité de niveau supérieur comme QES.
+
+**Q : Donc, si vous n'avez pas besoin de signatures de niveau supérieur, vous pourriez juste en générer un vous-même ?**
+
+R : Oui, vous pourriez le faire. Puisque eIDAS de niveau 1 ne nécessite pas de certificat, vous pourriez utiliser le vôtre.
+
+**Q : Pourquoi plus de gens ne le font-ils pas ?**
+
+R : Une raison est que, en dehors de la liste de confiance de l'UE, il y en a d'autres, comme la liste de confiance d'Adobe. Bien que cela ne soit pas légalement requis, y figurer (comme Wisekey) vous donne un coche vert dans Adobe PDF, qui est la façon dont la plupart des gens vérifient la validité des signatures.
+
+**Q : Pas une question, mais tout cela semble étrange**
+
+R : C'est le cas. C'est l'une des raisons pour lesquelles Documenso existe. Nous prévoyons de simplifier cela.
+
+**Q : Comment ?**
+
+R : En expliquant et en fournissant des outils faciles à utiliser, et éventuellement des certificats de signature hautement conformes et gratuits pour tout le monde.
+
+N'hésitez pas à me contacter sur [Twitter / X](https://twitter.com/eltimuro) (DM ouverts) ou sur [Discord](https://documen.so/discord) si vous avez des questions ou des commentaires.
+
+Meilleures salutations depuis Hambourg,\
+Timur
+\
+\
+\
+[1] Le format de la signature (par exemple PKCS7-B) peut varier. C'est le format dans lequel la signature insérée dans le document ressemble. eIDAS lui-même ne spécifie pas un format donné, mais le PAdES défini par l'UE est principalement utilisé par les fournisseurs européens.

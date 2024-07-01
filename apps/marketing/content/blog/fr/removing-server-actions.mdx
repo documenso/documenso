@@ -1,0 +1,56 @@
+---
+title: "Adopter l'avenir et faire marche arrière : De Server Actions à tRPC"
+description: "Cet article parle de la nécessité de l'API publique et du processus de sa construction. Il aborde également les exigences, les contraintes, les défis et les leçons apprises lors de sa création."
+authorName: 'Lucas Smith'
+authorImage: '/blog/blog-author-lucas.png'
+authorRole: 'Co-fondateur'
+date: 2024-03-07
+tags:
+  - Développement
+---
+
+Le 26 octobre 2022, lors de la conférence Next.js, Vercel a dévoilé Next.js 13, introduisant de nombreuses nouvelles fonctionnalités et un changement complet de paradigme pour la création d'applications Next.js.
+
+Les React Server Components (RSCs) étaient connus depuis un certain temps mais n'avaient pas encore été implémentés dans un méta-framework React. Avec l'ajout par Next.js, le monde du rendu côté serveur des applications React s'apprêtait à changer.
+
+## La promesse des React Server Components
+
+Décrits par Vercel comme un outil pour écrire des interfaces utilisateur rendues ou optionnellement mises en cache sur le serveur, les RSC promettaient une intégration directe avec les bases de données et des capacités spécifiques au serveur, se démarquant des modèles React et SSR habituels.
+
+Cette fonctionnalité semblait à l'origine révolutionnaire, promettant un fetch de données et un routage simplifiés grâce aux composants serveur asynchrones et à un support de mise en page imbriquée supplémentaire.
+
+Après l'avoir expérimenté pendant environ six mois sur d'autres projets, j'en suis venu à la conclusion que bien que ce soit un peu rugueux aux bords, c'était effectivement une innovation majeure et quelque chose qui devrait être adopté dans les projets Next.js à l'avenir.
+
+## Un nouveau paradigme : Server Actions
+
+Vercel ne s'est pas arrêté à l'ajout des Server Components. Peu de temps après la sortie initiale de Next.js 13, ils ont introduit les "Server Actions". Les Server Actions permettent d'appeler des fonctions côté serveur sans passer par des routes API, réduisant la cérémonie nécessaire pour ajouter une nouvelle mutation ou un nouvel événement à votre application.
+
+## Miser sur une nouvelle technologie
+
+À la suite de la sortie des Server Components et Server Actions, nous, chez Documenso, avons entrepris une refonte de l'application. Nous avions accumulé un peu de dette technique depuis le MVP initial, qu'il valait mieux abandonner tout en améliorant également le design avec l'aide de notre nouveau designer.
+
+Ayant rencontré beaucoup de succès avec les Server Components sur d'autres projets, j'ai choisi de m'investir complètement dans les Server Components et Server Actions pour la nouvelle version de l'application. J'étais enthousiaste à l'idée de voir à quel point l'application serait plus simple et plus efficace avec ces nouvelles technologies.
+
+Après notre relance, nous étions assez satisfaits de notre choix des Server Actions, qui nous ont même permis de regrouper certaines logiques côté client et serveur dans un seul composant sans nécessiter beaucoup d'efforts de notre part.
+
+## Naviguer à travers les défis avec les Server Actions
+
+Bien que initialement couronnées de succès, nous avons rapidement rencontré des problèmes avec les Server Actions, notamment en ce qui concerne la surveillance de l'application. Malheureusement, les Server Actions rendent beaucoup plus difficile le suivi des requêtes réseau et l'identification des échecs des Server Actions, car elles utilisent la route sur laquelle elles se trouvent actuellement.
+
+Malgré ce problème, les choses étaient gérables ; cependant, un problème critique est survenu lorsque l'utilisation des Server Actions a entraîné une corruption des bundles, ce qui a provoqué l'insertion d'un await de niveau supérieur qui faisait échouer les builds et les tests.
+
+Ce dernier problème a été rédhibitoire car il a mis en lumière à quel point nous nous appuyions sur de la magie avec les Server Actions. J'aime éviter d'ajouter plus de magie quand c'est possible, car avec les emballeurs et les méta-frameworks, nous déléguons déjà beaucoup de travail intensif et obtenons beaucoup de magie en retour.
+
+## Miser pleinement sur tRPC
+
+Ma solution rapide et définitive aux problèmes auxquels nous étions confrontés a été d'adopter pleinement [tRPC](https://trpc.io/), que nous utilisions déjà dans d'autres parties de l'application. La migration a pris moins d'une journée et a résolu tous nos problèmes tout en ajoutant beaucoup plus de visibilité aux actions en échec, car elles disposaient désormais d'une route API dédiée.
+
+Pour ceux qui ne connaissent pas tRPC, il s'agit d'un framework permettant de construire des APIs entièrement sécurisées avec TypeScript et Next.js. C'est une bibliothèque impressionnante qui vous permet d'appeler votre API définie en toute sécurité depuis le client, provoquant des erreurs de compilation lorsque les choses dévient inévitablement.
+
+Je suis un grand fan de tRPC depuis un certain temps maintenant, donc la décision d'abandonner les Server Actions et d'utiliser davantage tRPC a été facile pour moi.
+
+## Leçons apprises et avenir
+
+Bien que je crois que les Server Actions sont une excellente idée et je suis sûr qu'elles s'amélioreront à l'avenir, j'ai réappris la leçon qu'il vaut mieux éviter la magie quand c'est possible.
+
+Cela ne signifie pas que nous ne considérerons pas de ramener certaines choses aux Server Actions à l'avenir. Mais pour l'instant, nous attendrons de voir comment les autres les utilisent et comment elles évoluent.

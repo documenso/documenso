@@ -93,6 +93,7 @@ export const Header = ({ className, ...props }: HeaderProps) => {
       <MobileNavigation
         isMenuOpen={isHamburgerMenuOpen}
         onMenuOpenChange={setIsHamburgerMenuOpen}
+        dictionary={{ footer: dictionary.footer, header: dictionary.header }}
       />
     </header>
   );

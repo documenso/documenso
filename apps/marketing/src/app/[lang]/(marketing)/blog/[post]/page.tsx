@@ -3,6 +3,7 @@ import Link from 'next/link';
 import { notFound } from 'next/navigation';
 
 import { allBlogPosts } from 'contentlayer/generated';
+import type { Locale } from 'i18n-config';
 import { ChevronLeft } from 'lucide-react';
 import type { MDXComponents } from 'mdx/types';
 import { useMDXComponent } from 'next-contentlayer/hooks';
@@ -11,8 +12,11 @@ import { CallToAction } from '~/components/(marketing)/call-to-action';
 
 export const dynamic = 'force-dynamic';
 
-export const generateMetadata = ({ params }: { params: { post: string } }) => {
-  const blogPost = allBlogPosts.find((post) => post._raw.flattenedPath === `blog/${params.post}`);
+export const generateMetadata = ({ params }: { params: { post: string; lang: Locale } }) => {
+  const blogPost = allBlogPosts.find(
+    (post) =>
+      post._raw.flattenedPath === `blog/${params.lang}/${params.post}` && post.lang === params.lang,
+  );
 
   if (!blogPost) {
     return {
@@ -46,8 +50,11 @@ const mdxComponents: MDXComponents = {
   ),
 };
 
-export default function BlogPostPage({ params }: { params: { post: string } }) {
-  const post = allBlogPosts.find((post) => post._raw.flattenedPath === `blog/${params.post}`);
+export default function BlogPostPage({ params }: { params: { post: string; lang: Locale } }) {
+  const post = allBlogPosts.find(
+    (post) =>
+      post._raw.flattenedPath === `blog/${params.lang}/${params.post}` && post.lang === params.lang,
+  );
 
   if (!post) {
     notFound();
@@ -106,7 +113,9 @@ export default function BlogPostPage({ params }: { params: { post: string } }) {
         </Link>
       </article>
 
-      {post.cta && <CallToAction className="mt-8" utmSource={`blog_${params.post}`} />}
+      {post.cta && (
+        <CallToAction className="mt-8" utmSource={`blog_${params.post}`} lang={params.lang} />
+      )}
     </div>
   );
 }

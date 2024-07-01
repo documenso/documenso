@@ -1,0 +1,137 @@
+---
+title: Passage à Discord
+description: La communauté Documenso grandit et nous ressentons le besoin d'avoir un environnement plus convivial pour la communauté et les développeurs. Nous passons à Discord.
+authorName: 'Flo Merian'
+authorImage: '/blog/blog-author-flo.jpeg'
+authorRole: 'Go-to-market'
+date: 2023-08-02
+tags:
+  - Annonce
+  - Communauté
+---
+
+Nous passons à Discord.
+
+Documenso est une alternative open-source à DocuSign, construite avec la communauté et la transparence à l'esprit.
+
+Lorsque nous avons commencé à travailler sur le projet, nous avons rapidement mis en place un espace de travail Slack pour commencer à interagir avec les membres de la communauté.
+
+À mesure que la communauté grandit (nous avons atteint 2K étoiles sur GitHub et 100 membres sur Slack), nous avons ressenti le besoin de mettre en place un environnement plus convivial pour la communauté.
+
+L'équipe Documenso grandit également. [Lucas a rejoint Timur](https://twitter.com/ElTimuro/status/1648608988391514112), puis [Ephraim](https://twitter.com/documenso/status/1662418374243041280) et [David](https://github.com/dguyen) ont récemment rejoint l'aventure. Nous voulons rester en contact avec la communauté autant que possible et éviter les interruptions pour nous concentrer sur le travail, le support et le plaisir.
+
+Nous sommes un projet open-source et nous nous concentrons sur la création d'une excellente expérience pour les développeurs. Ainsi, lorsque nous avons envisagé un remplacement pour Slack, convivial pour la communauté et les développeurs, Discord était un choix évident — sans oublier qu'il nous aiderait à rester connectés avec [nos amis du logiciel open-source](https://documen.so/oss).
+
+Par conséquent, nous déplaçons toutes les conversations, tant internes que communautaires, vers Discord.
+
+Dans ce post, nous ne débattrons pas du _pourquoi_ de notre passage — Slack vs Discord est un débat de longue date avec ses avantages et inconvénients, et des partisans des deux côtés. Il existe de superbes [histoires](https://blog.meilisearch.com/from-slack-to-discord-our-migration/) et [threads](https://twitter.com/McPizza0/status/1655519558600470528) sur ce sujet. Nous ne voulons tout simplement pas écrire une autre histoire à ce sujet ici.
+
+Au lieu de cela, nous nous concentrerons sur le _comment_ nous prévoyons de faire la transition.
+
+## Pour qui est cette histoire ?
+
+Tout d'abord, nous avons écrit ce post pour l'équipe afin que nous soyons prêts pour le changement. Ensuite, nous le publions en ligne car nous attachons de l'importance à la transparence et nous pensons que cela pourrait aider la communauté.
+
+Pour les membres de la communauté, cette histoire vous aidera à comprendre comment nous prévoyons de faire la transition et vous donnera les conseils nécessaires pour adopter pleinement cette nouvelle expérience.
+
+Pour les fondateurs et créateurs qui souhaiteraient également effectuer une transition, d'une manière ou d'une autre, cette histoire vous aidera à gérer le changement grâce à un guide détaillé.
+
+## Passage à Discord
+
+Nous passons à Discord, étape par étape. Tout d'abord, nous déplaçons les conversations d'équipe, puis nous transférons la communauté avec un délai tampon de 15 jours.
+
+Le plan détaillé se déroule comme suit :
+
+- 2023-07-25 `t=0` : Timur commence à configurer le serveur Discord et envoie des invitations à l'équipe.
+- 2023-07-26 `t+1` : L'équipe passe à Discord. L'objectif est de s'habituer au produit et de le personnaliser pour se sentir chez soi, et lorsque nous serons prêts à accueillir la communauté, de faire en sorte que les nouveaux membres se sentent également à l'aise.
+- 2023-08-02 `t+8` : Nous annonçons à la communauté les changements à venir dans différents canaux — GitHub, Twitter et Slack.
+
+  - **GitHub**
+
+    - Créer une nouvelle pull request
+      - Ajouter l'article au blog
+      - Mettre à jour le lien vers la communauté
+      ```
+      https://documen.so/discord
+      ```
+    - Démarrer une nouvelle discussion
+
+      ```markdown
+      Bon mercredi !
+
+      TL,DR : Nous passons à Discord. [Rejoignez-nous !](https://documen.so/discord)
+
+      Nous voulons construire une belle alternative open-source à DocuSign. Comme nous grandissons (2.3K étoiles), nous ressentons le besoin d'avoir un environnement plus convivial pour la communauté et les développeurs afin de partager des idées, du support et des memes.
+
+      Assurez-vous de rejoindre le serveur pour rester à jour sur tout ce qui concerne Documenso.
+
+      Oh, et, spoiler, il pourrait y avoir des goodies là-bas 👀
+
+      À bientôt !
+      Flo
+      ```
+
+  - **Twitter**
+
+    - [Tweeter l'annonce](https://twitter.com/documenso/status/1686719482096766977)
+    - Épingler le tweet
+    - Mettre à jour le lien dans la bio
+
+      ```
+      L'alternative open-source à DocuSign.
+
+      http://documen.so/github
+      http://documen.so/discord
+      http://documen.so/manifest
+      ㅤ
+      ```
+
+  - **Slack**
+
+    - Poster un message dans `#general`
+
+      ```markdown
+      Bon mercredi !
+
+      TL,DR : Nous passons à Discord. [Rejoignez-nous !](https://documen.so/discord)
+
+      Nous voulons construire une belle alternative open-source à DocuSign. Comme nous grandissons (2.3K étoiles), nous ressentons le besoin d'avoir un environnement plus convivial pour la communauté et les développeurs afin de partager des idées, du support et des memes.
+
+      Assurez-vous de [rejoindre le serveur](https://documen.so/discord) pour rester à jour sur tout ce qui concerne Documenso.
+
+      Oh, et, spoiler, il pourrait y avoir des goodies là-bas 👀
+
+      À bientôt !
+      Flo
+      ```
+
+    - Épingler le message
+    - Définir le sujet et la description
+      ```
+      Nous passons à Discord. Rejoignez-nous : https://documen.so/discord
+      ```
+    - Archiver les chaînes : `#code-review`, `#how-to`, `#meet-and-greet`, `#random-memes`, `#self-hosting`, `#support`
+
+- 2023-08-09 `t+15` : 7 jours plus tard, nous envoyons un rappel sur Slack.
+
+  - **Slack**
+
+    - Programmer un rappel dans `#general`
+
+      ```
+      Rappel amical : nous passons à Discord et allons bientôt fermer cet espace de travail Slack.
+
+      Rejoignez-nous ! https://documen.so/discord
+      ```
+
+- 2023-08-16 `t+22` : 15 jours plus tard, nous apportons les dernières modifications à l'espace de travail Slack.
+
+  - **Slack**
+    - [Modifier les permissions de publication](https://app.slack.com/slackhelp/en-US/360004635551) dans `#general`
+    - Déconnecter Slack
+
+## Dernières réflexions
+
+- Nous en sommes au tout début de notre parcours vers la construction d'une belle alternative open-source à DocuSign. Nous voulons offrir une excellente expérience aux développeurs avec la communauté open-source, et en passant à Discord, nous voulons établir les bases d'un lieu ouvert et sûr où les membres de la communauté peuvent entrer en contact, échanger des idées et s'amuser.
+- Cela ne signifie pas que nous ne reviendrons jamais à Slack. Les outils d'aujourd'hui ne sont pas ceux de demain. Nous n'effaçons pas l'espace de travail Slack, nous l'archivons et conservons le nom `documenso`. Ce ne serait qu'un simple _au revoir?_
+- Pour l'instant, nous avançons et sommes impatients de vous accueillir sur Discord. Assurez-vous de [rejoindre le serveur](https://documen.so/discord) pour rester à jour sur tout ce qui concerne Documenso. À bientôt !

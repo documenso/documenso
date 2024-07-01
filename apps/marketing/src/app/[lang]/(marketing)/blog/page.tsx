@@ -9,7 +9,13 @@ export const metadata: Metadata = {
 };
 
 export default async function BlogPage({ params: { lang } }: { params: { lang: Locale } }) {
-  const blogPosts = allBlogPosts.sort((a, b) => {
+  const posts = allBlogPosts
+    .filter((post) => post.lang === lang)
+    .map((post) => ({
+      ...post,
+      href: [...post.href.split('/').slice(1, 2), ...post.href.split('/').slice(3)].join('/'),
+    }));
+  const blogPosts = posts.sort((a, b) => {
     const dateA = new Date(a.date);
     const dateB = new Date(b.date);
 

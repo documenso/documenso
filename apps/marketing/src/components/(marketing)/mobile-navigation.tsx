@@ -1,9 +1,12 @@
 'use client';
 
+import { useMemo } from 'react';
+
 import Image from 'next/image';
 import Link from 'next/link';
 
 import { motion, useReducedMotion } from 'framer-motion';
+import type { getDictionary } from 'get-dictionary';
 import { FaXTwitter } from 'react-icons/fa6';
 import { LiaDiscord } from 'react-icons/lia';
 import { LuGithub } from 'react-icons/lu';
@@ -14,50 +17,59 @@ import { Sheet, SheetContent } from '@documenso/ui/primitives/sheet';
 export type MobileNavigationProps = {
   isMenuOpen: boolean;
   onMenuOpenChange?: (_value: boolean) => void;
+  dictionary: {
+    footer: Awaited<ReturnType<typeof getDictionary>>['footer'];
+    header: Awaited<ReturnType<typeof getDictionary>>['header'];
+  };
 };
 
-export const MENU_NAVIGATION_LINKS = [
+export const MENU_NAVIGATION_LINKS = (dictionary: MobileNavigationProps['dictionary']) => [
   {
     href: '/singleplayer',
-    text: 'Singleplayer',
+    text: dictionary.footer.singleplayer,
   },
   {
     href: '/blog',
-    text: 'Blog',
+    text: dictionary.footer.blog,
   },
   {
     href: '/pricing',
-    text: 'Pricing',
+    text: dictionary.footer.pricing,
   },
   {
     href: '/open',
-    text: 'Open Startup',
+    text: dictionary.footer.open_startup,
   },
   {
     href: 'https://status.documenso.com',
-    text: 'Status',
+    text: dictionary.footer.status,
   },
   {
     href: 'mailto:support@documenso.com',
-    text: 'Support',
+    text: dictionary.footer.status,
     target: '_blank',
   },
   {
     href: '/privacy',
-    text: 'Privacy',
+    text: dictionary.footer.privacy,
   },
   {
     href: 'https://app.documenso.com/signin?utm_source=marketing-header',
-    text: 'Sign in',
+    text: dictionary.header.signin,
   },
   {
     href: 'https://app.documenso.com/signup?utm_source=marketing-header',
-    text: 'Sign up',
+    text: dictionary.header.signup,
   },
 ];
 
-export const MobileNavigation = ({ isMenuOpen, onMenuOpenChange }: MobileNavigationProps) => {
+export const MobileNavigation = ({
+  isMenuOpen,
+  onMenuOpenChange,
+  dictionary,
+}: MobileNavigationProps) => {
   const shouldReduceMotion = useReducedMotion();
+  const menu_navigation_links = useMemo(() => MENU_NAVIGATION_LINKS(dictionary), []);
 
   const handleMenuItemClick = () => {
     onMenuOpenChange?.(false);
@@ -84,7 +96,7 @@ export const MobileNavigation = ({ isMenuOpen, onMenuOpenChange }: MobileNavigat
             staggerChildren: 0.03,
           }}
         >
-          {MENU_NAVIGATION_LINKS.map(({ href, text, target }) => (
+          {menu_navigation_links.map(({ href, text, target }) => (
             <motion.div
               key={href}
               variants={{

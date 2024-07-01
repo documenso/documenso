@@ -1,0 +1,55 @@
+---
+title: Journal des modifications - Documenso
+---
+
+# Journal des modifications
+
+Découvrez les nouveautés de la dernière version majeure et lisez ce que nous en pensons. Vous pouvez trouver nos versions sur GitHub pour plus de détails techniques [ici](https://github.com/documenso/documenso/releases). Vous pouvez trouver nos [candidats à la version ici](https://github.com/documenso/documenso/tags).
+
+---
+
+## v1.5.5 (dernière)
+
+### <small>Publié le 6 mai 2024</small>
+
+> Cette version contient [20 corrections](https://github.com/documenso/documenso/releases/tag/v1.5.5)
+
+### ✅ Afficher les champs complétés
+
+Les champs complétés par d'autres destinataires sont maintenant visibles par tous afin de mieux communiquer l'état du document et permettre aux utilisateurs de prendre une décision éclairée sur ce qu'ils signent.
+
+### ⬇️ Télécharger les documents complétés via l'API
+
+Les documents complétés peuvent désormais être téléchargés via l'API en utilisant ce nouvel endpoint :
+
+**GET /API/V1/DOCUMENTS/\{ID\}/DOWNLOAD**
+
+Consultez la documentation complète de l'API ouverte ici : [https://documen.so/openapi](https://documen.so/openapi)
+
+### ➕ S'ajouter en tant que signataire
+
+S'ajouter en tant que signataire est maintenant à un clic.
+
+---
+
+## v1.5.4
+
+### <small>Publié le 11 avril 2024</small>
+
+> Cette version contient [21 corrections](https://github.com/documenso/documenso/releases/tag/v1.5.4)
+
+#### 🔑 Clés d'accès
+
+Pour améliorer la sécurité et la convivialité des configurations à haute sécurité, nous avons ajouté des clés d'accès avec cette version. Les clés d'accès peuvent maintenant être utilisées pour se connecter ou se réauthentifier pour chaque signature dans les cas de haute conformité.
+
+#### 📄 Certificat de signature & journal d'audit
+
+Du côté de la sécurité et de la conformité, nous avons également ajouté des certificats de signature et des journaux d'audit. Chaque document signé a maintenant un certificat attaché, montrant les détails techniques de la signature pour améliorer la transparence et la sécurité. De plus, chaque action sur un document, de la création à la finalisation, est désormais enregistrée dans le journal d'audit pour garantir l'intégrité du processus.
+
+#### 🔏🦀 @documenso/pdf-sign
+
+Nous sommes très enthousiastes à ce sujet : depuis la version 0.9, nous utilisions https://github.com/vbuch/node-signpdf pour ajouter les signatures numériques à nos documents. Étant donné que la signature est au cœur de Documenso, nous avons créé notre propre bibliothèque basée sur Rust pour la signature. À partir de la version 1.5.4, la signature de Documenso fonctionne avec @documenso/pdf-sign. La bibliothèque offre une meilleure architecture pour permettre la signature avec des clés privées qui ne sont pas stockées localement (par exemple via HSM). Nous sommes en train de nettoyer la bibliothèque pour l'open source comme le reste de Documenso 🌱 La bibliothèque nous aidera également à offrir bientôt la Validation à Long Terme (LTV) pour les signatures. Alors que nous sommes actuellement limités à la signature avec PKCS7-B, nous prévoyons finalement de prendre en charge toutes les normes de signature courantes comme PAdES, CAdES et XAdES.
+
+---
+
+´

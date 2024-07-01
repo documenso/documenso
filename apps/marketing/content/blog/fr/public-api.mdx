@@ -1,0 +1,295 @@
+---
+title: "Construction de l'API publique de Documenso - Pourquoi et Comment"
+description: "Cet article aborde la nécessité de l'API publique et le processus de sa construction. Il discute également des exigences que nous avons dû respecter et des contraintes dans lesquelles nous avons dû travailler."
+authorName: 'Catalin'
+authorImage: '/blog/blog-author-catalin.webp'
+authorRole: "J'aime coder et écrire"
+date: 2024-03-08
+tags:
+  - Développement
+  - API
+---
+
+Cet article couvre le processus de construction de l'API publique pour Documenso. Il commence par expliquer pourquoi l'API était nécessaire pour une entreprise de signature de documents numériques. Ensuite, il plonge dans les étapes que nous avons suivies pour la construire. Enfin, il présente les exigences que nous devions respecter et les contraintes dans lesquelles nous avons dû travailler.
+
+## Pourquoi l'API publique
+
+Nous avons décidé de construire l'API publique pour ouvrir une nouvelle voie d'interaction avec Documenso. Bien que l'application web fasse bien le travail, il existe des cas d'utilisation où ce n'est pas suffisant. Dans ces cas, les utilisateurs peuvent vouloir interagir avec la plateforme de manière programmatique. Habituellement, c'est pour intégrer Documenso avec d'autres applications.
+
+Avec la nouvelle API publique, cela est désormais possible. Vous pouvez intégrer les fonctionnalités de Documenso dans d'autres applications pour automatiser des tâches, créer des solutions personnalisées et construire des flux de travail sur mesure, pour n'en citer que quelques-unes.
+
+L'API propose 12 points de terminaison à l'heure où j'écris cet article :
+
+- (GET) `/api/v1/documents` - récupérer tous les documents
+- (POST) `/api/v1/documents` - télécharger un nouveau document et obtenir une URL pré-signée
+- (GET) `/api/v1/documents/{id}` - récupérer un document spécifique
+- (DELETE) `/api/v1/documents/{id}` - supprimer un document spécifique
+- (POST) `/api/v1/templates/{templateId}/create-document` - créer un nouveau document à partir d'un modèle existant
+- (POST) `/api/v1/documents/{id}/send` - envoyer un document à signer
+- (POST) `/api/v1/documents/{id}/recipients` - créer un destinataire de document
+- (PATCH) `/api/v1/documents/{id}/recipients/{recipientId}` - mettre à jour les détails d'un destinataire de document
+- (DELETE) `/api/v1/documents/{id}/recipients/{recipientId}` - supprimer un destinataire spécifique d'un document
+- (POST) `/api/v1/documents/{id}/fields` - créer un champ pour un document
+- (PATCH) `/api/v1/documents/{id}/fields` - mettre à jour les détails d'un champ de document
+- (DELETE) `/api/v1/documents/{id}/fields` - supprimer un champ d'un document
+
+> Consultez la [documentation de l'API](https://app.documenso.com/api/v1/openapi).
+
+De plus, cela nous permet d'améliorer la plateforme en intégrant d'autres solutions à Documenso, telles que Zapier.
+
+En conclusion, la nouvelle API publique étend les capacités de Documenso, offre plus de flexibilité aux utilisateurs et ouvre un monde de possibilités plus large.
+
+## Choisir la bonne approche et technologie
+
+Une fois que nous avons décidé de construire l'API, nous avons dû choisir l'approche et les technologies à utiliser. Il y avait 2 options :
+
+1. Construire une application supplémentaire
+2. Lancer l'API dans le codebase existant
+
+### 1. Construire une application supplémentaire
+
+Cela signifierait créer un nouveau codebase et construire l'API à partir de zéro. Avoir une application distincte pour l'API aurait des avantages tels que :
+
+- des réponses à latence réduite
+- la prise en charge de téléchargements de fichiers plus importants
+- séparation entre les applications (Documenso et l'API)
+- personnalisation et flexibilité
+- tests et débogage plus faciles
+
+Cette approche présente des avantages significatifs. Cependant, un inconvénient majeur est qu'elle nécessite des ressources supplémentaires.
+
+Nous aurions dû consacrer beaucoup de temps aux tâches essentielles, telles que la construction et la configuration du serveur de base. Ensuite, nous aurions passé du temps à implémenter les points de terminaison et l'authentification, entre autres choses. Une fois la construction terminée, il y aurait une autre application à déployer et à gérer. Tout cela aurait mis à rude épreuve nos ressources déjà limitées.
+
+Nous nous sommes donc demandé s'il y avait une autre façon de le faire sans sacrifier la qualité de l'API et l'expérience des développeurs.
+
+### 2. Lancer l'API dans le codebase existant
+
+L'autre option était de lancer l'API dans le codebase existant. Plutôt que d'écrire tout depuis zéro, nous pourrions utiliser la plupart de notre code existant.
+
+Comme nous utilisons tRPC pour notre API interne (backend), nous avons cherché des solutions qui fonctionnent bien avec tRPC. Nous avons réduit nos choix à :
+
+- [trpc-openapi](https://github.com/jlalmes/trpc-openapi)
+- [ts-rest](https://ts-rest.com/)
+
+Les deux technologies permettent de construire des APIs publiques. La technologie `trpc-openapi` permet de transformer facilement les procédures tRPC en points de terminaison REST. C'est plutôt comme un plugin pour tRPC.
+
+D'un autre côté, `ts-rest` est plus une solution autonome. `ts-rest` permet de créer un contrat pour l'API, qui peut être utilisé à la fois côté client et serveur. Vous pouvez consommer et implémenter le contrat dans votre application, assurant ainsi une sécurité de type bout-en-bout et un client de type RPC.
+
+> Vous pouvez consulter une [comparaison entre trpc-openapi et ts-rest](https://catalins.tech/public-api-trpc/) ici.
+
+La principale différence entre les deux est que `trpc-openapi` est comme un plugin qui étend les capacités de tRPC, tandis que `ts-rest` fournit les outils pour construire une API autonome.
+
+### Notre choix
+
+Après avoir analysé et comparé les deux options, nous avons décidé d'opter pour `ts-rest` en raison de ses avantages. Voici un paragraphe de la documentation de `ts-rest` qui résume bien la situation :
+
+> tRPC dispose de nombreux plugins pour résoudre ce problème en mappant la mise en œuvre de l'API sur une API de type REST, cependant, ces approches sont souvent un peu lourdes et réduisent la sécurité globale du système, ts-rest fait ce gros travail dans les implémentations client et serveur plutôt que d'exiger une deuxième couche d'abstraction et des points de terminaison d'API à définir.
+
+## Exigences de l'API
+
+Nous avons défini les exigences suivantes pour l'API :
+
+- L'API doit utiliser une version basée sur le chemin (par exemple `/v1`)
+- Le système doit utiliser des jetons d'authentification Bearer pour l'authentification de l'API
+  - Le jeton d'API doit être une chaîne aléatoire de 32 à 40 caractères
+- Le système doit hasher le jeton et stocker la valeur hachée
+- Le système ne doit afficher le jeton d'API que lorsqu'il est créé
+- L'API doit disposer d'une documentation auto-générée comme Swagger
+- Les utilisateurs doivent pouvoir créer une clé API
+  - Les utilisateurs doivent pouvoir choisir un nom de jeton
+  - Les utilisateurs doivent pouvoir choisir une date d'expiration pour le jeton
+    - Les utilisateurs doivent pouvoir choisir entre 7 jours, 1 mois, 3 mois, 6 mois, 12 mois, jamais
+- Le système doit afficher toutes les clés de l'utilisateur sur la page des paramètres
+  - Le système doit afficher le nom du jeton, la date de création, la date d'expiration et un bouton de suppression
+- Les utilisateurs doivent pouvoir supprimer une clé API
+- Les utilisateurs doivent pouvoir récupérer tous les documents de leur compte
+- Les utilisateurs doivent pouvoir télécharger un nouveau document
+  - Les utilisateurs doivent recevoir une URL pré-signée S3 après un téléchargement réussi
+- Les utilisateurs doivent pouvoir récupérer un document spécifique de leur compte par son identifiant
+- Les utilis
+
+ateurs doivent pouvoir supprimer un document spécifique de leur compte par son identifiant
+
+- Les utilisateurs doivent pouvoir créer un nouveau document à partir d'un modèle de document existant
+- Les utilisateurs doivent pouvoir envoyer un document à signer à un ou plusieurs destinataires
+- Les utilisateurs doivent pouvoir créer un destinataire pour un document
+- Les utilisateurs doivent pouvoir mettre à jour les détails d'un destinataire
+- Les utilisateurs doivent pouvoir supprimer un destinataire d'un document
+- Les utilisateurs doivent pouvoir créer un champ (par exemple, signature, e-mail, nom, date) pour un document
+- Les utilisateurs doivent pouvoir mettre à jour un champ pour un document
+- Les utilisateurs doivent pouvoir supprimer un champ d'un document
+
+## Contraintes
+
+Nous avons également rencontré les contraintes suivantes lors du développement de l'API :
+
+**1. Ressources**
+
+Les ressources limitées étaient l'une des principales contraintes. Nous sommes une nouvelle startup avec une équipe relativement petite. Construire et maintenir une application supplémentaire aurait tendu nos ressources limitées.
+
+**2. Stack technologique**
+
+Une autre contrainte était la stack technologique. Notre stack tech inclut TypeScript, Prisma et tRPC, entre autres. Nous utilisons également Vercel pour l'hébergement.
+
+Par conséquent, nous voulions utiliser des technologies avec lesquelles nous sommes à l'aise. Cela nous a permis de tirer parti de nos connaissances existantes et a assuré la cohérence à travers nos applications.
+
+Utiliser des technologies familières signifiait également que nous pouvions développer l'API plus rapidement, car nous n'avions pas à passer du temps à apprendre de nouvelles technologies. Nous avons également pu utiliser du code et des outils existants utilisés dans notre application principale.
+
+Il est important de mentionner que ce n'est pas une décision permanente. Nous sommes ouverts à déplacer l'API vers une autre stack technologique lorsque cela aura du sens (par exemple, l'API est fortement utilisée et nécessite de meilleures performances).
+
+**3. Téléchargements de fichiers**
+
+En raison de notre architecture actuelle, nous prenons en charge le téléchargement de fichiers avec une taille maximale de 50 Mo. Pour contourner cela, nous avons créé une étape supplémentaire pour télécharger des documents.
+
+Les utilisateurs font une requête POST vers l'endpoint `/api/v1/documents` et l'API répond avec une URL pré-signée S3. Les utilisateurs font ensuite une deuxième requête vers l'URL pré-signée avec leur document.
+
+## Comment nous avons construit l'API
+
+![Diagramme du package API](api-package.webp)
+
+Notre codebase est un monorepo, nous avons donc créé un nouveau package API dans le répertoire `packages`. Il contient à la fois l'implémentation de l'API et sa documentation. Les 2 principaux blocs de l'implémentation consistent en le contrat de l'API et le code des points de terminaison de l'API.
+
+![Diagramme de l'implémentation de l'API](api-implementation.webp)
+
+En quelques mots, le contrat de l'API définit la structure de l'API, le format des requêtes et des réponses, la façon d'authentifier les appels API, les points de terminaison disponibles et leurs verbes HTTP associés. Vous pouvez explorer le [contrat de l'API](https://github.com/documenso/documenso/blob/main/packages/api/v1/contract.ts) sur GitHub.
+
+Ensuite, il y a la partie implémentation, qui est le code réel pour chaque point de terminaison défini dans le contrat de l'API. L'implémentation est là où le contrat de l'API prend vie et devient fonctionnel.
+
+Prenons l'exemple de l'endpoint `/api/v1/documents`.
+
+```ts
+export const ApiContractV1 = c.router(
+  {
+    getDocuments: {
+      method: 'GET',
+      path: '/api/v1/documents',
+      query: ZGetDocumentsQuerySchema,
+      responses: {
+        200: ZSuccessfulResponseSchema,
+        401: ZUnsuccessfulResponseSchema,
+        404: ZUnsuccessfulResponseSchema,
+      },
+      summary: 'Obtenir tous les documents',
+    },
+    ...
+  }
+);
+```
+
+Le contrat de l'API spécifie les éléments suivants pour `getDocuments` :
+
+- la méthode de requête HTTP autorisée est GET, donc essayer de faire une requête POST, par exemple, entraîne une erreur
+- le chemin est `/api/v1/documents`
+- les paramètres de requête que l'utilisateur peut passer avec la requête
+  - dans ce cas - `page` et `perPage`
+- les réponses autorisées et leur schéma
+  - `200` retourne un objet contenant un tableau de tous les documents et un champ `totalPages`, qui est auto-explicatif
+  - `401` retourne un objet avec un message tel que "Non autorisé"
+  - `404` retourne un objet avec un message tel que "Non trouvé"
+
+L'implémentation de cet endpoint doit correspondre exactement au contrat ; sinon, `ts-rest` se plaindra et votre API pourrait ne pas fonctionner comme prévu.
+
+La fonction `getDocuments` du fichier `implementation.ts` s'exécute lorsque l'utilisateur atteint l'endpoint.
+
+```ts
+export const ApiContractV1Implementation = createNextRoute(ApiContractV1, {
+  getDocuments: authenticatedMiddleware(async (args, user, team) => {
+    const page = Number(args.query.page) || 1;
+    const perPage = Number(args.query.perPage) || 10;
+
+    const { data: documents, totalPages } = await findDocuments({
+      page,
+      perPage,
+      userId: user.id,
+      teamId: team?.id,
+    });
+
+    return {
+      status: 200,
+      body: {
+        documents,
+        totalPages,
+      },
+    };
+  }),
+  ...
+});
+```
+
+Il existe également un middleware, `authenticatedMiddleware`, qui gère l'authentification des requêtes API. Il garantit que le jeton d'API existe et que le jeton utilisé a les privilèges appropriés pour la ressource qu'il accède.
+
+C'est ainsi que fonctionnent également les autres points de terminaison. Le code diffère, mais les principes sont les mêmes. Vous pouvez explorer l'[implémentation de l'API](https://github.com/documenso/documenso/blob/main/packages/api/v1/implementation.ts) et le [code middleware](https://github.com/documenso/documenso/blob/main/packages/api/v1/middleware/authenticated.ts) sur GitHub.
+
+### Documentation
+
+Pour la documentation, nous avons décidé d'utiliser Swagger UI, qui génère automatiquement la documentation à partir de la spécification OpenAPI.
+
+La spécification OpenAPI décrit une API contenant les points de terminaison disponibles et leurs méthodes de requête HTTP, méthodes d'authentification, etc. Son but est d'aider aussi bien les machines que les humains à comprendre l'API sans avoir à regarder le code.
+La spécification OpenAPI de Documenso est disponible [ici](https://documenso.com/api/v1/openapi.json).
+
+Heureusement, `ts-rest` rend transparente la génération de la spécification OpenAPI.
+
+```ts
+import { generateOpenApi } from '@ts-rest/open-api';
+
+import { ApiContractV1 } from './contract';
+
+export const OpenAPIV1 = generateOpenApi(
+  ApiContractV1,
+  {
+    info: {
+      title: 'Documenso API',
+      version: '1.0.0',
+      description: 'L''API Documenso pour récupérer, créer, mettre à jour et supprimer des documents.',
+    },
+  },
+  {
+    setOperationId: true,
+  },
+);
+```
+
+Ensuite, Swagger UI prend la spécification OpenAPI comme propriété et génère la documentation. Le code ci-dessous montre le composant responsable de la génération de la documentation.
+
+```ts
+'use client';
+
+import SwaggerUI from 'swagger-ui-react';
+import 'swagger-ui-react/swagger-ui.css';
+
+import { OpenAPIV1 } from '@documenso/api/v1/openapi';
+
+export const OpenApiDocsPage = () => {
+  return <SwaggerUI spec={OpenAPIV1} displayOperationId={true} />;
+};
+
+export default OpenApiDocsPage;
+```
+
+Enfin, nous créons un endpoint API pour afficher la documentation Swagger. Le code ci-dessous importe dynamiquement le composant `OpenApiDocsPage` et l'affiche.
+
+```ts
+'use client';
+
+import dynamic from 'next/dynamic';
+
+const Docs = dynamic(async () => import('@documenso/api/v1/api-documentation'), {
+  ssr: false,
+});
+
+export default function OpenApiDocsPage() {
+  return <Docs />;
+}
+```
+
+Vous pouvez accéder et interagir avec la documentation sur [documenso.com/api/v1/openapi](https://documenso.com/api/v1/openapi). Vous devriez voir une page comme celle affichée dans la capture d'écran ci-dessous.
+
+![La documentation de l'API Documenso](docs.webp)
+
+> Cet article montre comment [générer la documentation Swagger pour une API Next.js](https://catalins.tech/generate-swagger-documentation-next-js-api/).
+
+C'est ainsi que nous avons procédé pour construire la première itération de l'API publique après avoir pris en compte toutes les contraintes et les besoins actuels. Le [pull request GitHub pour l'API](https://github.com/documenso/documenso/pull/674) est publiquement disponible sur GitHub. Vous pouvez le parcourir à votre rythme.
+
+## Conclusion
+
+L'architecture et l'approche actuelles fonctionnent bien pour notre étape et nos besoins actuels. Cependant, à mesure que nous continuons à croître et à évoluer, notre architecture et notre approche devront probablement s'adapter. Nous surveillons régulièrement l'utilisation et les performances de l'API et recueillons les commentaires des utilisateurs. Cela nous permet de trouver des domaines d'amélioration, de comprendre les besoins de nos utilisateurs et de prendre des décisions éclairées sur les prochaines étapes.
