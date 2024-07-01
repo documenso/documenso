@@ -5,6 +5,7 @@ import Link from 'next/link';
 
 import type { Variants } from 'framer-motion';
 import { motion } from 'framer-motion';
+import type { getDictionary } from 'get-dictionary';
 import { usePlausible } from 'next-plausible';
 import { LuGithub } from 'react-icons/lu';
 import { match } from 'ts-pattern';
@@ -18,6 +19,7 @@ import { Carousel } from './carousel';
 
 export type HeroProps = {
   className?: string;
+  dictionary: Awaited<ReturnType<typeof getDictionary>>['hero'];
   [key: string]: unknown;
 };
 
@@ -96,8 +98,8 @@ export const Hero = ({ className, ...props }: HeroProps) => {
           animate="animate"
           className="text-center text-4xl font-bold leading-tight tracking-tight md:text-[48px] lg:text-[64px]"
         >
-          Document signing,
-          <span className="block" /> finally open source.
+          {props.dictionary.document_signin}
+          <span className="block" /> {props.dictionary.finally_os}
         </motion.h2>
 
         <motion.div
@@ -112,16 +114,16 @@ export const Hero = ({ className, ...props }: HeroProps) => {
               variant="outline"
               className="rounded-full bg-transparent backdrop-blur-sm"
             >
-              Try our Free Plan
+              {props.dictionary.try_freeplan}
               <span className="bg-primary dark:text-background -mr-2.5 ml-2.5 rounded-full px-2 py-1.5 text-xs font-medium">
-                No Credit Card required
+                {props.dictionary.no_creditcard}
               </span>
             </Button>
           </Link>
           <Link href="https://github.com/documenso/documenso" onClick={() => event('view-github')}>
             <Button variant="outline" className="rounded-full bg-transparent backdrop-blur-sm">
               <LuGithub className="mr-2 h-5 w-5" />
-              Star on GitHub
+              {props.dictionary.star_github}
             </Button>
           </Link>
         </motion.div>

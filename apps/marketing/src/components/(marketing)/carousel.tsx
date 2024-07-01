@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 import Autoplay from 'embla-carousel-autoplay';
 import useEmblaCarousel from 'embla-carousel-react';
@@ -9,47 +9,50 @@ import { useTheme } from 'next-themes';
 import { Card } from '@documenso/ui/primitives/card';
 import { Progress } from '@documenso/ui/primitives/progress';
 
+import type { Dictionary } from '~/providers/dictionary-provider';
+import { useDictionary } from '~/providers/dictionary-provider';
+
 import { Slide } from './slide';
 
-const SLIDES = [
+const SLIDES = (dictionary: Dictionary['carousel']) => [
   {
-    label: 'Signing Process',
+    label: dictionary.signing_process,
     type: 'video',
     srcLight: 'https://github.com/documenso/design/raw/main/marketing/signing.webm',
     srcDark: 'https://github.com/documenso/design/raw/main/marketing/dark/signing.webm',
   },
   {
-    label: 'Teams',
+    label: dictionary.teams,
     type: 'video',
     srcLight: 'https://github.com/documenso/design/raw/main/marketing/teams.webm',
     srcDark: 'https://github.com/documenso/design/raw/main/marketing/dark/teams.webm',
   },
   {
-    label: 'Zapier',
+    label: dictionary.zapier,
     type: 'video',
     srcLight: 'https://github.com/documenso/design/raw/main/marketing/zapier.webm',
     srcDark: 'https://github.com/documenso/design/raw/main/marketing/dark/zapier.webm',
   },
   {
-    label: 'Direct Link',
+    label: dictionary.direct_link,
     type: 'video',
     srcLight: 'https://github.com/documenso/design/raw/main/marketing/direct-links.webm',
     srcDark: 'https://github.com/documenso/design/raw/main/marketing/dark/direct-links.webm',
   },
   {
-    label: 'Webhooks',
+    label: dictionary.webhooks,
     type: 'video',
     srcLight: 'https://github.com/documenso/design/raw/main/marketing/webhooks.webm',
     srcDark: 'https://github.com/documenso/design/raw/main/marketing/dark/webhooks.webm',
   },
   {
-    label: 'API',
+    label: dictionary.api,
     type: 'video',
     srcLight: 'https://github.com/documenso/design/raw/main/marketing/api.webm',
     srcDark: 'https://github.com/documenso/design/raw/main/marketing/dark/api.webm',
   },
   {
-    label: 'Profile',
+    label: dictionary.profile,
     type: 'video',
     srcLight: 'https://github.com/documenso/design/raw/main/marketing/profile_teaser.webm',
     srcDark: 'https://github.com/documenso/design/raw/main/marketing/dark/profile_teaser.webm',
@@ -57,7 +60,8 @@ const SLIDES = [
 ];
 
 export const Carousel = () => {
-  const slides = SLIDES;
+  const dictionary = useDictionary();
+  const slides = useMemo(() => SLIDES(dictionary.carousel), []);
   const [_isPlaying, setIsPlaying] = useState(false);
   const [selectedIndex, setSelectedIndex] = useState(0);
   const [progress, setProgress] = useState(0);

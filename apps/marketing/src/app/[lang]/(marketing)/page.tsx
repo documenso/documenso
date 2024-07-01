@@ -2,6 +2,9 @@
 import type { Metadata } from 'next';
 import { Caveat } from 'next/font/google';
 
+import { getDictionary } from 'get-dictionary';
+import type { Locale } from 'i18n-config';
+
 import { cn } from '@documenso/ui/lib/utils';
 
 import { Callout } from '~/components/(marketing)/callout';
@@ -24,7 +27,7 @@ const fontCaveat = Caveat({
   variable: '--font-caveat',
 });
 
-export default async function IndexPage() {
+export default async function IndexPage({ params: { lang } }: { params: { lang: Locale } }) {
   const starCount = await fetch('https://api.github.com/repos/documenso/documenso', {
     headers: {
       accept: 'application/vnd.github.v3+json',
@@ -33,16 +36,23 @@ export default async function IndexPage() {
     .then(async (res) => res.json())
     .then((res) => (typeof res.stargazers_count === 'number' ? res.stargazers_count : undefined))
     .catch(() => undefined);
+  const dictionary = await getDictionary(lang);
 
   return (
     <div className={cn('mt-12', fontCaveat.variable)}>
-      <Hero starCount={starCount} />
+      <Hero starCount={starCount} dictionary={dictionary.hero} />
 
-      <FasterSmarterBeautifulBento className="my-48" />
-      <ShareConnectPaidWidgetBento className="my-48" />
-      <OpenBuildTemplateBento className="my-48" />
+      <FasterSmarterBeautifulBento
+        className="my-48"
+        dictionary={dictionary.bento.faster_smarter_beautiful}
+      />
+      <ShareConnectPaidWidgetBento
+        className="my-48"
+        dictionary={dictionary.bento.share_connect_paid_widget}
+      />
+      <OpenBuildTemplateBento className="my-48" dictionary={dictionary.bento.open_build_template} />
 
-      <Callout starCount={starCount} />
+      <Callout starCount={starCount} dictionary={dictionary.hero} />
     </div>
   );
 }

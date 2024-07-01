@@ -33,10 +33,12 @@
     "@react-email/render": "0.0.9",
     "@react-email/row": "0.0.6",
     "@react-email/section": "0.0.10",
-    "@react-email/tailwind": "0.0.9",
+    "@react-email/tailwind": "^0.0.9",
     "@react-email/text": "0.0.6",
     "nodemailer": "^6.9.9",
+    "pdfjs-dist": "4.3.136",
     "react-email": "^1.9.5",
+    "react-pdf": "9.0.0",
     "resend": "^2.0.0"
   },
   "devDependencies": {

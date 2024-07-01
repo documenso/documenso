@@ -2,6 +2,8 @@ import type { HTMLAttributes } from 'react';
 
 import Image from 'next/image';
 
+import type { getDictionary } from 'get-dictionary';
+
 import backgroundPattern from '@documenso/assets/images/background-pattern.png';
 import cardConnectionsFigure from '@documenso/assets/images/card-connections-figure.png';
 import cardPaidFigure from '@documenso/assets/images/card-paid-figure.png';
@@ -10,7 +12,9 @@ import cardWidgetFigure from '@documenso/assets/images/card-widget-figure.png';
 import { cn } from '@documenso/ui/lib/utils';
 import { Card, CardContent } from '@documenso/ui/primitives/card';
 
-export type ShareConnectPaidWidgetBentoProps = HTMLAttributes<HTMLDivElement>;
+export type ShareConnectPaidWidgetBentoProps = HTMLAttributes<HTMLDivElement> & {
+  dictionary: Awaited<ReturnType<typeof getDictionary>>['bento']['share_connect_paid_widget'];
+};
 
 export const ShareConnectPaidWidgetBento = ({
   className,
@@ -26,16 +30,16 @@ export const ShareConnectPaidWidgetBento = ({
         />
       </div>
       <h2 className="px-0 text-[22px] font-semibold md:px-12 md:text-4xl lg:px-24">
-        Integrates with all your favourite tools.
-        <span className="block md:mt-0">Send, connect, receive and embed everywhere.</span>
+        {props.dictionary.integrate}
+        <span className="block md:mt-0">{props.dictionary.everywhere}</span>
       </h2>
 
       <div className="mt-6 grid grid-cols-2 gap-8 md:mt-8">
         <Card className="col-span-2 lg:col-span-1" degrees={120} gradient>
           <CardContent className="grid grid-cols-1 gap-8 p-6">
             <p className="text-foreground/80 leading-relaxed">
-              <strong className="block">Easy Sharing (Soon).</strong>
-              Receive your personal link to share with everyone you care about.
+              <strong className="block">{props.dictionary.sharing}</strong>
+              {props.dictionary.personal_link}
             </p>
 
             <div className="flex items-center justify-center p-8">
@@ -51,9 +55,8 @@ export const ShareConnectPaidWidgetBento = ({
         <Card className="col-span-2 lg:col-span-1" spotlight>
           <CardContent className="grid grid-cols-1 gap-8 p-6">
             <p className="text-foreground/80 leading-relaxed">
-              <strong className="block">Connections</strong>
-              Create connections and automations with Zapier and more to integrate with your
-              favorite tools.
+              <strong className="block">{props.dictionary.connections}</strong>
+              {props.dictionary.create_connections}
             </p>
 
             <div className="flex items-center justify-center p-8">
@@ -69,8 +72,8 @@ export const ShareConnectPaidWidgetBento = ({
         <Card className="col-span-2 lg:col-span-1" spotlight>
           <CardContent className="grid grid-cols-1 gap-8 p-6">
             <p className="text-foreground/80 leading-relaxed">
-              <strong className="block">Get paid (Soon).</strong>
-              Integrated payments with Stripe so you don’t have to worry about getting paid.
+              <strong className="block">{props.dictionary.paid}</strong>
+              {props.dictionary.integrated_payments}
             </p>
 
             <div className="flex items-center justify-center p-8">
@@ -86,9 +89,8 @@ export const ShareConnectPaidWidgetBento = ({
         <Card className="col-span-2 lg:col-span-1" spotlight>
           <CardContent className="grid grid-cols-1 gap-8 p-6">
             <p className="text-foreground/80 leading-relaxed">
-              <strong className="block">React Widget (Soon).</strong>
-              Easily embed Documenso into your product. Simply copy and paste our react widget into
-              your application.
+              <strong className="block">{props.dictionary.react_widget}</strong>
+              {props.dictionary.embed}
             </p>
 
             <div className="flex items-center justify-center p-8">

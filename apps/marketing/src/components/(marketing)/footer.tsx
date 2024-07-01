@@ -1,6 +1,6 @@
 'use client';
 
-import type { HTMLAttributes } from 'react';
+import { type HTMLAttributes, useMemo } from 'react';
 
 import Image from 'next/image';
 import Link from 'next/link';
@@ -13,6 +13,9 @@ import LogoImage from '@documenso/assets/logo.png';
 import { cn } from '@documenso/ui/lib/utils';
 import { ThemeSwitcher } from '@documenso/ui/primitives/theme-switcher';
 
+import type { Dictionary } from '~/providers/dictionary-provider';
+import { useDictionary } from '~/providers/dictionary-provider';
+
 // import { StatusWidgetContainer } from './status-widget-container';
 
 export type FooterProps = HTMLAttributes<HTMLDivElement>;
@@ -23,22 +26,24 @@ const SOCIAL_LINKS = [
   { href: 'https://documen.so/discord', icon: <LiaDiscord className="h-7 w-7" /> },
 ];
 
-const FOOTER_LINKS = [
-  { href: '/pricing', text: 'Pricing' },
-  { href: '/singleplayer', text: 'Singleplayer' },
-  { href: '/blog', text: 'Blog' },
-  { href: '/design-system', text: 'Design' },
-  { href: '/open', text: 'Open Startup' },
-  { href: 'https://shop.documenso.com', text: 'Shop', target: '_blank' },
-  { href: 'https://status.documenso.com', text: 'Status', target: '_blank' },
-  { href: 'mailto:support@documenso.com', text: 'Support', target: '_blank' },
-  { href: '/oss-friends', text: 'OSS Friends' },
-  { href: '/careers', text: 'Careers' },
-  { href: '/privacy', text: 'Privacy' },
-  { href: '/changelog', text: 'Changelog' },
+const FOOTER_LINKS = (dictionary: Dictionary['footer']) => [
+  { href: '/pricing', text: dictionary.pricing },
+  { href: '/singleplayer', text: dictionary.singleplayer },
+  { href: '/blog', text: dictionary.blog },
+  { href: '/design-system', text: dictionary.design },
+  { href: '/open', text: dictionary.open_startup },
+  { href: 'https://shop.documenso.com', text: dictionary.shop, target: '_blank' },
+  { href: 'https://status.documenso.com', text: dictionary.status, target: '_blank' },
+  { href: 'mailto:support@documenso.com', text: dictionary.support, target: '_blank' },
+  { href: '/oss-friends', text: dictionary.oss_friends },
+  { href: '/careers', text: dictionary.careers },
+  { href: '/privacy', text: dictionary.privacy },
+  { href: '/changelog', text: dictionary.changelog },
 ];
 
 export const Footer = ({ className, ...props }: FooterProps) => {
+  const dictionary = useDictionary();
+  const footer_links = useMemo(() => FOOTER_LINKS(dictionary.footer), []);
   return (
     <div className={cn('border-t py-12', className)} {...props}>
       <div className="mx-auto flex w-full max-w-screen-xl flex-wrap items-start justify-between gap-8 px-8">
@@ -72,7 +77,7 @@ export const Footer = ({ className, ...props }: FooterProps) => {
         </div>
 
         <div className="grid w-full max-w-sm grid-cols-2 gap-x-4 gap-y-2 md:w-auto md:gap-x-8">
-          {FOOTER_LINKS.map((link, index) => (
+          {footer_links.map((link, index) => (
             <Link
               key={index}
               href={link.href}
@@ -86,7 +91,7 @@ export const Footer = ({ className, ...props }: FooterProps) => {
       </div>
       <div className="mx-auto mt-4 flex w-full max-w-screen-xl flex-wrap items-center justify-between gap-4 px-8 md:mt-12 lg:mt-24">
         <p className="text-muted-foreground text-sm">
-          © {new Date().getFullYear()} Documenso, Inc. All rights reserved.
+          © {new Date().getFullYear()} Documenso, Inc. {dictionary.footer.rights}
         </p>
 
         <div className="flex flex-wrap">

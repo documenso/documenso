@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 
+import type { getDictionary } from 'get-dictionary';
 import { usePlausible } from 'next-plausible';
 import { LuGithub } from 'react-icons/lu';
 
@@ -9,10 +10,11 @@ import { Button } from '@documenso/ui/primitives/button';
 
 export type CalloutProps = {
   starCount?: number;
+  dictionary: Awaited<ReturnType<typeof getDictionary>>['hero'];
   [key: string]: unknown;
 };
 
-export const Callout = ({ starCount }: CalloutProps) => {
+export const Callout = ({ starCount, dictionary }: CalloutProps) => {
   const event = usePlausible();
 
   const onSignUpClick = () => {
@@ -40,9 +42,9 @@ export const Callout = ({ starCount }: CalloutProps) => {
           variant="outline"
           className="rounded-full bg-transparent backdrop-blur-sm"
         >
-          Try our Free Plan
+          {dictionary.try_freeplan}
           <span className="bg-primary dark:text-background -mr-2.5 ml-2.5 rounded-full px-2 py-1.5 text-xs font-medium">
-            No Credit Card required
+            {dictionary.no_creditcard}
           </span>
         </Button>
       </Link>
@@ -54,7 +56,7 @@ export const Callout = ({ starCount }: CalloutProps) => {
       >
         <Button variant="outline" className="rounded-full bg-transparent backdrop-blur-sm">
           <LuGithub className="mr-2 h-5 w-5" />
-          Star on GitHub
+          {dictionary.star_github}
           {starCount && starCount > 0 && (
             <span className="bg-primary dark:text-background -mr-2.5 ml-2.5 rounded-full px-2 py-1.5 text-xs">
               {starCount.toLocaleString('en-US')}
