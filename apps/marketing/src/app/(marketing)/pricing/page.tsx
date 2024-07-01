@@ -9,6 +9,7 @@ import {
 } from '@documenso/ui/primitives/accordion';
 import { Button } from '@documenso/ui/primitives/button';
 
+import { Enterprise } from '~/components/(marketing)/enterprise';
 import { PricingTable } from '~/components/(marketing)/pricing-table';
 
 export const metadata: Metadata = {
@@ -40,6 +41,10 @@ export default function PricingPage() {
 
       <div className="mt-12">
         <PricingTable />
+      </div>
+
+      <div className="mt-12">
+        <Enterprise />
       </div>
 
       <div className="mx-auto mt-36 max-w-2xl">

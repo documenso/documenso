@@ -480,7 +480,10 @@ export const createDocumentFromDirectTemplate = async ({
     // Send email to template owner.
     const emailTemplate = createElement(DocumentCreatedFromDirectTemplateEmailTemplate, {
       recipientName: directRecipientEmail,
-      documentLink: `${formatDocumentsPath(document.team?.url)}/${document.id}`,
+      recipientRole: directTemplateRecipient.role,
+      documentLink: `${NEXT_PUBLIC_WEBAPP_URL()}${formatDocumentsPath(document.team?.url)}/${
+        document.id
+      }`,
       documentName: document.title,
       assetBaseUrl: NEXT_PUBLIC_WEBAPP_URL() || 'http://localhost:3000',
     });

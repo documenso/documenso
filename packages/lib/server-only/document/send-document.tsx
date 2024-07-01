@@ -1,31 +1,14 @@
-import { createElement } from 'react';
-
-import { mailer } from '@documenso/email/mailer';
-import { render } from '@documenso/email/render';
-import { DocumentInviteEmailTemplate } from '@documenso/email/templates/document-invite';
-import { FROM_ADDRESS, FROM_NAME } from '@documenso/lib/constants/email';
 import { sealDocument } from '@documenso/lib/server-only/document/seal-document';
 import { updateDocument } from '@documenso/lib/server-only/document/update-document';
 import { DOCUMENT_AUDIT_LOG_TYPE } from '@documenso/lib/types/document-audit-logs';
 import type { RequestMetadata } from '@documenso/lib/universal/extract-request-metadata';
 import { putPdfFile } from '@documenso/lib/universal/upload/put-file';
 import { createDocumentAuditLogData } from '@documenso/lib/utils/document-audit-logs';
-import { renderCustomEmailTemplate } from '@documenso/lib/utils/render-custom-email-template';
 import { prisma } from '@documenso/prisma';
-import {
-  DocumentSource,
-  DocumentStatus,
-  RecipientRole,
-  SendStatus,
-  SigningStatus,
-} from '@documenso/prisma/client';
+import { DocumentStatus, RecipientRole, SendStatus, SigningStatus } from '@documenso/prisma/client';
 import { WebhookTriggerEvents } from '@documenso/prisma/client';
 
-import { NEXT_PUBLIC_WEBAPP_URL } from '../../constants/app';
-import {
-  RECIPIENT_ROLES_DESCRIPTION,
-  RECIPIENT_ROLE_TO_EMAIL_TYPE,
-} from '../../constants/recipient-roles';
+import { jobsClient } from '../../jobs/client';
 import { getFile } from '../../universal/upload/get-file';
 import { insertFormValuesInPdf } from '../pdf/insert-form-values-in-pdf';
 import { triggerWebhook } from '../webhooks/trigger/trigger-webhook';
@@ -82,8 +65,6 @@ export const sendDocument = async ({
     },
   });
 
-  const customEmail = document?.documentMeta;
-
   if (!document) {
     throw new Error('Document not found');
   }
@@ -98,8 +79,6 @@ export const sendDocument = async ({
 
   const { documentData } = document;
 
-  const isDirectTemplate = document.source === DocumentSource.TEMPLATE_DIRECT_LINK;
-
   if (!documentData.data) {
     throw new Error('Document data not found');
   }
@@ -109,6 +88,7 @@ export const sendDocument = async ({
 
     const prefilled = await insertFormValuesInPdf({
       pdf: Buffer.from(file),
+      // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
       formValues: document.formValues as Record<string, string | number | boolean>,
     });
 
@@ -130,6 +110,31 @@ export const sendDocument = async ({
     Object.assign(document, result);
   }
 
+  // Commented out server side checks for minimum 1 signature per signer now since we need to
+  // decide if we want to enforce this for API & templates.
+  // const fields = await getFieldsForDocument({
+  //   documentId: documentId,
+  //   userId: userId,
+  // });
+
+  // const fieldsWithSignerEmail = fields.map((field) => ({
+  //   ...field,
+  //   signerEmail:
+  //     document.Recipient.find((recipient) => recipient.id === field.recipientId)?.email ?? '',
+  // }));
+
+  // const everySignerHasSignature = document?.Recipient.every(
+  //   (recipient) =>
+  //     recipient.role !== RecipientRole.SIGNER ||
+  //     fieldsWithSignerEmail.some(
+  //       (field) => field.type === 'SIGNATURE' && field.signerEmail === recipient.email,
+  //     ),
+  // );
+
+  // if (!everySignerHasSignature) {
+  //   throw new Error('Some signers have not been assigned a signature field.');
+  // }
+
   if (sendEmail) {
     await Promise.all(
       document.Recipient.map(async (recipient) => {
@@ -137,92 +142,15 @@ export const sendDocument = async ({
           return;
         }
 
-        const recipientEmailType = RECIPIENT_ROLE_TO_EMAIL_TYPE[recipient.role];
-
-        const { email, name } = recipient;
-        const selfSigner = email === user.email;
-        const { actionVerb } = RECIPIENT_ROLES_DESCRIPTION[recipient.role];
-        const recipientActionVerb = actionVerb.toLowerCase();
-
-        let emailMessage = customEmail?.message || '';
-        let emailSubject = `Please ${recipientActionVerb} this document`;
-
-        if (selfSigner) {
-          emailMessage = `You have initiated the document ${`"${document.title}"`} that requires you to ${recipientActionVerb} it.`;
-          emailSubject = `Please ${recipientActionVerb} your document`;
-        }
-
-        if (isDirectTemplate) {
-          emailMessage = `A document was created by your direct template that requires you to ${recipientActionVerb} it.`;
-          emailSubject = `Please ${recipientActionVerb} this document created by your direct template`;
-        }
-
-        const customEmailTemplate = {
-          'signer.name': name,
-          'signer.email': email,
-          'document.name': document.title,
-        };
-
-        const assetBaseUrl = NEXT_PUBLIC_WEBAPP_URL() || 'http://localhost:3000';
-        const signDocumentLink = `${NEXT_PUBLIC_WEBAPP_URL()}/sign/${recipient.token}`;
-
-        const template = createElement(DocumentInviteEmailTemplate, {
-          documentName: document.title,
-          inviterName: user.name || undefined,
-          inviterEmail: user.email,
-          assetBaseUrl,
-          signDocumentLink,
-          customBody: renderCustomEmailTemplate(emailMessage, customEmailTemplate),
-          role: recipient.role,
-          selfSigner,
-        });
-
-        await prisma.$transaction(
-          async (tx) => {
-            await mailer.sendMail({
-              to: {
-                address: email,
-                name,
-              },
-              from: {
-                name: FROM_NAME,
-                address: FROM_ADDRESS,
-              },
-              subject: customEmail?.subject
-                ? renderCustomEmailTemplate(customEmail.subject, customEmailTemplate)
-                : emailSubject,
-              html: render(template),
-              text: render(template, { plainText: true }),
-            });
-
-            await tx.recipient.update({
-              where: {
-                id: recipient.id,
-              },
-              data: {
-                sendStatus: SendStatus.SENT,
-              },
-            });
-
-            await tx.documentAuditLog.create({
-              data: createDocumentAuditLogData({
-                type: DOCUMENT_AUDIT_LOG_TYPE.EMAIL_SENT,
-                documentId: document.id,
-                user,
-                requestMetadata,
-                data: {
-                  emailType: recipientEmailType,
-                  recipientEmail: recipient.email,
-                  recipientName: recipient.name,
-                  recipientRole: recipient.role,
-                  recipientId: recipient.id,
-                  isResending: false,
-                },
-              }),
-            });
+        await jobsClient.triggerJob({
+          name: 'send.signing.requested.email',
+          payload: {
+            userId,
+            documentId,
+            recipientId: recipient.id,
+            requestMetadata,
           },
-          { timeout: 30_000 },
-        );
+        });
       }),
     );
   }

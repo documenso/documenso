@@ -1,3 +1,4 @@
+import { RECIPIENT_ROLES_DESCRIPTION } from '@documenso/lib/constants/recipient-roles';
 import config from '@documenso/tailwind-config';
 
 import {
@@ -14,9 +15,11 @@ import {
 } from '../components';
 import TemplateDocumentImage from '../template-components/template-document-image';
 import { TemplateFooter } from '../template-components/template-footer';
+import { RecipientRole } from '.prisma/client';
 
 export type DocumentCompletedEmailTemplateProps = {
   recipientName?: string;
+  recipientRole?: RecipientRole;
   documentLink?: string;
   documentName?: string;
   assetBaseUrl?: string;
@@ -24,11 +27,14 @@ export type DocumentCompletedEmailTemplateProps = {
 
 export const DocumentCreatedFromDirectTemplateEmailTemplate = ({
   recipientName = 'John Doe',
+  recipientRole = RecipientRole.SIGNER,
   documentLink = 'http://localhost:3000',
   documentName = 'Open Source Pledge.pdf',
   assetBaseUrl = 'http://localhost:3002',
 }: DocumentCompletedEmailTemplateProps) => {
-  const previewText = `Completed Document`;
+  const action = RECIPIENT_ROLES_DESCRIPTION[recipientRole].actioned.toLowerCase();
+
+  const previewText = `Document created from direct template`;
 
   const getAssetUrl = (path: string) => {
     return new URL(path, assetBaseUrl).toString();
@@ -61,7 +67,7 @@ export const DocumentCreatedFromDirectTemplateEmailTemplate = ({
 
                 <Section>
                   <Text className="text-primary mb-0 text-center text-lg font-semibold">
-                    {recipientName} signed a document by using one of your direct links
+                    {recipientName} {action} a document by using one of your direct links
                   </Text>
 
                   <div className="mx-auto my-2 w-fit rounded-lg bg-gray-50 px-4 py-2 text-sm text-slate-600">
