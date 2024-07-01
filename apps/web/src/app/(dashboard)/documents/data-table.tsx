@@ -92,7 +92,13 @@ export const DocumentsDataTable = ({
           {
             header: 'Status',
             accessorKey: 'status',
-            cell: ({ row }) => <DocumentStatus status={row.getValue('status')} />,
+            cell: ({ row }) => {
+              const status = row.original.deletedAt
+                ? ExtendedDocumentStatus.BIN
+                : (row.getValue('status') as ExtendedDocumentStatus);
+
+              return <DocumentStatus status={status} />;
+            },
             size: 140,
           },
           {

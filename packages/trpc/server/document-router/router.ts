@@ -15,6 +15,7 @@ import { getDocumentById } from '@documenso/lib/server-only/document/get-documen
 import { getDocumentAndSenderByToken } from '@documenso/lib/server-only/document/get-document-by-token';
 import { getDocumentWithDetailsById } from '@documenso/lib/server-only/document/get-document-with-details-by-id';
 import { resendDocument } from '@documenso/lib/server-only/document/resend-document';
+import { restoreDocument } from '@documenso/lib/server-only/document/restore-document';
 import { searchDocumentsWithKeyword } from '@documenso/lib/server-only/document/search-documents-with-keyword';
 import { sendDocument } from '@documenso/lib/server-only/document/send-document';
 import { updateDocumentSettings } from '@documenso/lib/server-only/document/update-document-settings';
@@ -33,6 +34,7 @@ import {
   ZGetDocumentByTokenQuerySchema,
   ZGetDocumentWithDetailsByIdQuerySchema,
   ZResendDocumentMutationSchema,
+  ZRestoreDocumentMutationSchema,
   ZSearchDocumentsMutationSchema,
   ZSendDocumentMutationSchema,
   ZSetPasswordForDocumentMutationSchema,
@@ -154,6 +156,34 @@ export const documentRouter = router({
         throw new TRPCError({
           code: 'BAD_REQUEST',
           message: 'We were unable to delete this document. Please try again later.',
+        });
+      }
+    }),
+
+  restoreDocument: authenticatedProcedure
+    .input(ZRestoreDocumentMutationSchema)
+    .mutation(async ({ input, ctx }) => {
+      try {
+        const { id, teamId } = input;
+
+        const userId = ctx.user.id;
+
+        const restoredDocument = await restoreDocument({
+          id,
+          userId,
+          teamId,
+          requestMetadata: extractNextApiRequestMetadata(ctx.req),
+        });
+
+        console.log(restoredDocument);
+
+        return restoredDocument;
+      } catch (err) {
+        console.error(err);
+
+        throw new TRPCError({
+          code: 'BAD_REQUEST',
+          message: 'We were unable to restore this document. Please try again later.',
         });
       }
     }),

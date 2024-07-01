@@ -304,6 +304,10 @@ export const formatDocumentAuditLogAction = (auditLog: TDocumentAuditLog, userId
       anonymous: 'Document deleted',
       identified: 'deleted the document',
     }))
+    .with({ type: DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_RESTORED }, () => ({
+      anonymous: 'Document restored',
+      identified: 'restored the document',
+    }))
     .with({ type: DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_FIELD_INSERTED }, () => ({
       anonymous: 'Field signed',
       identified: 'signed a field',

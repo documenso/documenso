@@ -111,6 +111,7 @@ export const DocumentsPageView = async ({ searchParams = {}, team }: DocumentsPa
                 ExtendedDocumentStatus.PENDING,
                 ExtendedDocumentStatus.COMPLETED,
                 ExtendedDocumentStatus.DRAFT,
+                ExtendedDocumentStatus.BIN,
                 ExtendedDocumentStatus.ALL,
               ].map((value) => (
                 <TabsTrigger

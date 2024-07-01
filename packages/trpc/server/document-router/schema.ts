@@ -158,6 +158,11 @@ export const ZDeleteDraftDocumentMutationSchema = z.object({
   teamId: z.number().min(1).optional(),
 });
 
+export const ZRestoreDocumentMutationSchema = z.object({
+  id: z.number().min(1),
+  teamId: z.number().min(1).optional(),
+});
+
 export type TDeleteDraftDocumentMutationSchema = z.infer<typeof ZDeleteDraftDocumentMutationSchema>;
 
 export const ZSearchDocumentsMutationSchema = z.object({
