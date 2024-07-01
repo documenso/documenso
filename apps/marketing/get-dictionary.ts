@@ -1,6 +1,6 @@
 import 'server-only';
 
-import type { Locale } from './i18n-config';
+import type { Locale } from '@documenso/lib/internationalization/i18n-config';
 
 // We enumerate all dictionaries here for better linting and typescript support
 // We also get the default import for cleaner types
@@ -14,4 +14,4 @@ export const getDictionary = async (locale: Locale) => {
     console.warn(`Locale ${locale} not supported, defaulting to English.`);
   }
   return dictionaries[locale]?.() ?? dictionaries.en();
-}
+};

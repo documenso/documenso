@@ -2,7 +2,8 @@ import type { Metadata } from 'next';
 
 import { allBlogPosts } from 'contentlayer/generated';
 import { getDictionary } from 'get-dictionary';
-import type { Locale } from 'i18n-config';
+
+import type { Locale } from '@documenso/lib/internationalization/i18n-config';
 
 export const metadata: Metadata = {
   title: 'Blog',

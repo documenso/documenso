@@ -3,6 +3,6 @@
   "compilerOptions": {
     "types": ["@documenso/tsconfig/process-env.d.ts"]
   },
-  "include": ["**/*.ts", "**/*.tsx", "**/*.d.ts"],
+  "include": ["**/*.ts", "**/*.tsx", "**/*.d.ts", "../../apps/marketing/get-dictionary.ts"],
   "exclude": ["dist", "build", "node_modules"]
 }

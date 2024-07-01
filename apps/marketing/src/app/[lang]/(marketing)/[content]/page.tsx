@@ -2,9 +2,10 @@ import Image from 'next/image';
 import { notFound } from 'next/navigation';
 
 import { allDocuments } from 'contentlayer/generated';
-import type { Locale } from 'i18n-config';
 import type { MDXComponents } from 'mdx/types';
 import { useMDXComponent } from 'next-contentlayer/hooks';
+
+import type { Locale } from '@documenso/lib/internationalization/i18n-config';
 
 export const dynamic = 'force-dynamic';
 

@@ -3,8 +3,8 @@ import type { Metadata } from 'next';
 import { Caveat } from 'next/font/google';
 
 import { getDictionary } from 'get-dictionary';
-import type { Locale } from 'i18n-config';
 
+import type { Locale } from '@documenso/lib/internationalization/i18n-config';
 import { cn } from '@documenso/ui/lib/utils';
 
 import { Callout } from '~/components/(marketing)/callout';

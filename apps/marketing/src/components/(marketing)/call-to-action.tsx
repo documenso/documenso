@@ -1,9 +1,9 @@
 import Link from 'next/link';
 
 import { getDictionary } from 'get-dictionary';
-import type { Locale } from 'i18n-config';
 
 import { NEXT_PUBLIC_WEBAPP_URL } from '@documenso/lib/constants/app';
+import type { Locale } from '@documenso/lib/internationalization/i18n-config';
 import { Button } from '@documenso/ui/primitives/button';
 import { Card, CardContent } from '@documenso/ui/primitives/card';
 

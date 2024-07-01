@@ -1,8 +1,11 @@
 import { getDictionary } from 'get-dictionary';
-import type { Locale } from 'i18n-config';
-import { getStringLocales, i18n } from 'i18n-config';
 import { z } from 'zod';
 
+import {
+  type Locale,
+  getStringLocales,
+  i18n,
+} from '@documenso/lib/internationalization/i18n-config';
 import { getCompletedDocumentsMonthly } from '@documenso/lib/server-only/user/get-monthly-completed-document';
 import { getUserMonthlyGrowth } from '@documenso/lib/server-only/user/get-user-monthly-growth';
 

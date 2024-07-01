@@ -3,12 +3,12 @@ import { Suspense } from 'react';
 import { Caveat, Inter } from 'next/font/google';
 
 import { getDictionary } from 'get-dictionary';
-import { type Locale, i18n } from 'i18n-config';
 import { AxiomWebVitals } from 'next-axiom';
 import { PublicEnvScript } from 'next-runtime-env';
 
 import { FeatureFlagProvider } from '@documenso/lib/client-only/providers/feature-flag';
 import { NEXT_PUBLIC_MARKETING_URL } from '@documenso/lib/constants/app';
+import { type Locale, i18n } from '@documenso/lib/internationalization/i18n-config';
 import { getAllAnonymousFlags } from '@documenso/lib/universal/get-feature-flag';
 import { TrpcProvider } from '@documenso/trpc/react';
 import { cn } from '@documenso/ui/lib/utils';

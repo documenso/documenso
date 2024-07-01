@@ -2,8 +2,8 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 
 import { getDictionary } from 'get-dictionary';
-import type { Locale } from 'i18n-config';
 
+import type { Locale } from '@documenso/lib/internationalization/i18n-config';
 import {
   Accordion,
   AccordionContent,
