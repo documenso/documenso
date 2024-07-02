@@ -5,6 +5,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Caveat } from 'next/font/google';
 
 import { Check, ChevronsUpDown, Info } from 'lucide-react';
+import type { FieldArrayWithId } from 'react-hook-form';
 import { useFieldArray, useForm } from 'react-hook-form';
 
 import { getBoundingClientRect } from '@documenso/lib/client-only/get-bounding-client-rect';
@@ -110,6 +111,8 @@ export const AddFieldsFormPartial = ({
   const [selectedField, setSelectedField] = useState<FieldType | null>(null);
   const [selectedSigner, setSelectedSigner] = useState<Recipient | null>(null);
   const [showRecipientsSelector, setShowRecipientsSelector] = useState(false);
+  const [lastActiveField, setLastActiveField] =
+    useState<FieldArrayWithId<TAddFieldsFormSchema> | null>(null);
 
   const hasSelectedSignerBeenSent = selectedSigner?.sendStatus === SendStatus.SENT;
 
@@ -186,7 +189,7 @@ export const AddFieldsFormPartial = ({
       pageX -= fieldPageWidth / 2;
       pageY -= fieldPageHeight / 2;
 
-      append({
+      const field = {
         formId: nanoid(12),
         type: selectedField,
         pageNumber,
@@ -195,7 +198,10 @@ export const AddFieldsFormPartial = ({
         pageWidth: fieldPageWidth,
         pageHeight: fieldPageHeight,
         signerEmail: selectedSigner.email,
-      });
+      };
+
+      append(field);
+      setLastActiveField({ ...field, id: field.formId });
 
       setIsFieldWithinBounds(false);
       setSelectedField(null);
@@ -229,6 +235,8 @@ export const AddFieldsFormPartial = ({
         pageWidth,
         pageHeight,
       });
+
+      setLastActiveField(field);
     },
     [getFieldPosition, localFields, update],
   );
@@ -252,9 +260,42 @@ export const AddFieldsFormPartial = ({
         pageX,
         pageY,
       });
+
+      setLastActiveField(field);
     },
     [getFieldPosition, localFields, update],
   );
+
+  const onFieldCopy = useCallback(
+    ({ duplicate }: { duplicate: boolean }) => {
+      if (lastActiveField) {
+        localStorage.setItem('copied-field', JSON.stringify(lastActiveField));
+
+        if (duplicate) {
+          append({
+            ...lastActiveField,
+            formId: nanoid(12),
+            pageX: lastActiveField.pageX + 2,
+            pageY: lastActiveField.pageY + 2,
+          });
+        }
+      }
+    },
+    [lastActiveField, append],
+  );
+
+  const onFieldPaste = useCallback(() => {
+    const copiedFieldString = localStorage.getItem('copied-field');
+    if (copiedFieldString) {
+      const copiedField = JSON.parse(copiedFieldString);
+      append({
+        ...copiedField,
+        formId: nanoid(12),
+        pageX: copiedField.pageX + 2,
+        pageY: copiedField.pageY + 2,
+      });
+    }
+  }, [append]);
 
   useEffect(() => {
     if (selectedField) {
@@ -297,6 +338,27 @@ export const AddFieldsFormPartial = ({
   useEffect(() => {
     setSelectedSigner(recipients.find((r) => r.sendStatus !== SendStatus.SENT) ?? recipients[0]);
   }, [recipients]);
+
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.ctrlKey || event.metaKey) {
+        if (event.key === 'c') {
+          onFieldCopy({ duplicate: false });
+        } else if (event.key === 'v') {
+          onFieldPaste();
+        } else if (event.key === 'd') {
+          event.preventDefault();
+          onFieldCopy({ duplicate: true });
+        }
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [onFieldCopy, onFieldPaste]);
 
   const recipientsByRole = useMemo(() => {
     const recipientsByRole: Record<RecipientRole, Recipient[]> = {
