@@ -1,2 +1,10 @@
-export const URL_REGEX =
-  /^(https?):\/\/(?:www\.)?(?:[a-zA-Z0-9-]+\.)*[a-zA-Z0-9-]+\.[a-zA-Z0-9()]{2,}(?:\/[a-zA-Z0-9-._?&=/]*)?$/i;
+export const URL_REGEX = {
+  test: function (value: string): boolean {
+    try {
+      new URL(value);
+      return true;
+    } catch {
+      return false;
+    }
+  },
+};
