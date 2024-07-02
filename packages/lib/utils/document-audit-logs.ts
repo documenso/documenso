@@ -336,6 +336,10 @@ export const formatDocumentAuditLogAction = (auditLog: TDocumentAuditLog, userId
       anonymous: 'Document sent',
       identified: 'sent the document',
     }))
+    .with({ type: DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_MOVED_TO_TEAM }, () => ({
+      anonymous: 'Document moved to team',
+      identified: 'moved the document to team',
+    }))
     .with({ type: DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_RECIPIENT_COMPLETED }, ({ data }) => {
       // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
       const action = RECIPIENT_ROLES_DESCRIPTION[data.recipientRole as RecipientRole]?.actioned;
