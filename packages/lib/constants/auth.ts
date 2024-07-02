@@ -18,6 +18,8 @@ export const IS_OIDC_SSO_ENABLED = Boolean(
     process.env.NEXT_PRIVATE_OIDC_CLIENT_SECRET,
 );
 
+export const OIDC_PROVIDER_LABEL = process.env.NEXT_PRIVATE_OIDC_PROVIDER_LABEL;
+
 export const USER_SECURITY_AUDIT_LOG_MAP: { [key in UserSecurityAuditLogType]: string } = {
   [UserSecurityAuditLogType.ACCOUNT_SSO_LINK]: 'Linked account to SSO',
   [UserSecurityAuditLogType.ACCOUNT_PROFILE_UPDATE]: 'Profile updated',
