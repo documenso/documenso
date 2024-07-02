@@ -98,6 +98,7 @@ export const SinglePlayerClient = () => {
         height: new Prisma.Decimal(field.pageHeight),
         customText: '',
         inserted: false,
+        fieldMeta: field.fieldMeta ?? {},
       })),
     );
 
@@ -131,7 +132,9 @@ export const SinglePlayerClient = () => {
           positionY: field.positionY.toNumber(),
           width: field.width.toNumber(),
           height: field.height.toNumber(),
+          fieldMeta: field.fieldMeta,
         })),
+        fieldMeta: { type: undefined },
       });
 
       analytics.capture('Marketing: SPM - Document signed', {

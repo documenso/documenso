@@ -59,7 +59,6 @@ export const AddSignatureFormPartial = ({
   requireSignature = true,
 }: AddSignatureFormProps) => {
   const { currentStep, totalSteps } = useStep();
-
   const [validateUninsertedFields, setValidateUninsertedFields] = useState(false);
 
   // Refined schema which takes into account whether to allow an empty name or signature.
@@ -147,6 +146,26 @@ export const AddSignatureFormPartial = ({
       return !form.formState.errors.customText;
     }
 
+    if (fieldType === FieldType.NUMBER) {
+      await form.trigger('number');
+      return !form.formState.errors.number;
+    }
+
+    if (fieldType === FieldType.RADIO) {
+      await form.trigger('radio');
+      return !form.formState.errors.radio;
+    }
+
+    if (fieldType === FieldType.CHECKBOX) {
+      await form.trigger('checkbox');
+      return !form.formState.errors.checkbox;
+    }
+
+    if (fieldType === FieldType.DROPDOWN) {
+      await form.trigger('dropdown');
+      return !form.formState.errors.dropdown;
+    }
+
     return true;
   };
 
@@ -170,7 +189,7 @@ export const AddSignatureFormPartial = ({
         customText: form.getValues('name'),
         inserted: true,
       }))
-      .with(FieldType.TEXT, () => ({
+      .with(FieldType.TEXT, FieldType.NUMBER, FieldType.RADIO, FieldType.CHECKBOX, () => ({
         ...field,
         customText: form.getValues('customText'),
         inserted: true,
@@ -374,15 +393,25 @@ export const AddSignatureFormPartial = ({
         <ElementVisible target={PDF_VIEWER_PAGE_SELECTOR}>
           {localFields.map((field) =>
             match(field.type)
-              .with(FieldType.DATE, FieldType.TEXT, FieldType.EMAIL, FieldType.NAME, () => {
-                return (
-                  <SinglePlayerModeCustomTextField
-                    onClick={insertField(field)}
-                    key={field.id}
-                    field={field}
-                  />
-                );
-              })
+              .with(
+                FieldType.DATE,
+                FieldType.TEXT,
+                FieldType.EMAIL,
+                FieldType.NAME,
+                FieldType.NUMBER,
+                FieldType.CHECKBOX,
+                FieldType.RADIO,
+                FieldType.DROPDOWN,
+                () => {
+                  return (
+                    <SinglePlayerModeCustomTextField
+                      onClick={insertField(field)}
+                      key={field.id}
+                      field={field}
+                    />
+                  );
+                },
+              )
               .with(FieldType.SIGNATURE, () => (
                 <SinglePlayerModeSignatureField
                   onClick={insertField(field)}

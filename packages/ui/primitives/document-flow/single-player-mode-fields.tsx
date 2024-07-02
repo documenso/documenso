@@ -2,7 +2,10 @@
 
 import React, { useRef } from 'react';
 
+import { Caveat } from 'next/font/google';
+
 import { AnimatePresence, motion } from 'framer-motion';
+import { CalendarDays, CheckSquare, ChevronDown, Disc, Hash, Mail, Type, User } from 'lucide-react';
 import { match } from 'ts-pattern';
 
 import { useElementScaleSize } from '@documenso/lib/client-only/hooks/use-element-scale-size';
@@ -18,6 +21,14 @@ import { FieldType } from '@documenso/prisma/client';
 import type { FieldWithSignature } from '@documenso/prisma/types/field-with-signature';
 
 import { FieldRootContainer } from '../../components/field/field';
+import { cn } from '../../lib/utils';
+
+const fontCaveat = Caveat({
+  weight: ['500'],
+  subsets: ['latin'],
+  display: 'swap',
+  variable: '--font-caveat',
+});
 
 export type SinglePlayerModeFieldContainerProps = {
   field: FieldWithSignature;
@@ -110,9 +121,11 @@ export function SinglePlayerModeSignatureField({
       ) : (
         <button
           onClick={() => onClick?.()}
-          className="group-hover:text-primary text-muted-foreground absolute inset-0 h-full w-full duration-200"
+          className={
+            cn('group-hover:text-primary absolute inset-0 h-full w-full duration-200', fontCaveat.className)
+          }
         >
-          Signature
+          <span className="text-muted-foreground truncate text-3xl font-medium ">Signature</span>
         </button>
       )}
     </SinglePlayerModeFieldCardContainer>
@@ -152,32 +165,82 @@ export function SinglePlayerModeCustomTextField({
   const fontSize = maxFontSize * scalingFactor;
 
   return (
-    <SinglePlayerModeFieldCardContainer field={field}>
-      {field.inserted ? (
-        <p
-          ref={$paragraphEl}
-          style={{
-            fontSize: `clamp(${minFontSize}px, ${fontSize}px, ${maxFontSize}px)`,
-            fontFamily: `var(${fontVariable})`,
-          }}
-        >
-          {field.customText}
-        </p>
-      ) : (
-        <button
-          onClick={() => onClick?.()}
-          className="group-hover:text-primary text-muted-foreground absolute inset-0 h-full w-full text-lg duration-200"
-        >
-          {match(field.type)
-            .with(FieldType.DATE, () => 'Date')
-            .with(FieldType.NAME, () => 'Name')
-            .with(FieldType.EMAIL, () => 'Email')
-            .with(FieldType.TEXT, () => 'Text')
-            .with(FieldType.SIGNATURE, FieldType.FREE_SIGNATURE, () => 'Signature')
-            .otherwise(() => '')}
-        </button>
-      )}
-    </SinglePlayerModeFieldCardContainer>
+    <>
+      <SinglePlayerModeFieldCardContainer field={field}>
+        {field.inserted ? (
+          <p
+            ref={$paragraphEl}
+            style={{
+              fontSize: `clamp(${minFontSize}px, ${fontSize}px, ${maxFontSize}px)`,
+              fontFamily: `var(${fontVariable})`,
+            }}
+          >
+            {field.customText ??
+              (field.fieldMeta && typeof field.fieldMeta === 'object' && 'label' in field.fieldMeta
+                ? field.fieldMeta.label
+                : '')}
+          </p>
+        ) : (
+          <button
+            onClick={() => onClick?.()}
+            className="group-hover:text-primary text-muted-foreground absolute inset-0 h-full w-full text-lg duration-200"
+          >
+            {match(field.type)
+              .with(FieldType.DATE, () => (
+                <div className="text-field-card-foreground flex items-center justify-center gap-x-1 text-xl font-light">
+                  <CalendarDays /> Date
+                </div>
+              ))
+              .with(FieldType.NAME, () => (
+                <div className="text-field-card-foreground flex items-center justify-center gap-x-1 text-xl font-light">
+                  <User /> Name
+                </div>
+              ))
+              .with(FieldType.EMAIL, () => (
+                <div className="text-field-card-foreground flex items-center justify-center gap-x-1 text-xl font-light">
+                  <Mail /> Email
+                </div>
+              ))
+              .with(FieldType.TEXT, () => (
+                <div className="text-field-card-foreground flex items-center justify-center gap-x-1 text-xl font-light">
+                  <Type /> Text
+                </div>
+              ))
+              .with(FieldType.SIGNATURE, FieldType.FREE_SIGNATURE, () => (
+                <div
+                  className={cn(
+                    'text-muted-foreground w-full truncate text-3xl font-medium',
+                    fontCaveat.className,
+                  )}
+                >
+                  Signature
+                </div>
+              ))
+              .with(FieldType.NUMBER, () => (
+                <div className="text-field-card-foreground flex items-center justify-center gap-x-1 text-xl font-light">
+                  <Hash /> Number
+                </div>
+              ))
+              .with(FieldType.CHECKBOX, () => (
+                <div className="text-field-card-foreground flex items-center justify-center gap-x-1 text-xl font-light">
+                  <CheckSquare /> Checkbox
+                </div>
+              ))
+              .with(FieldType.RADIO, () => (
+                <div className="text-field-card-foreground flex items-center justify-center gap-x-1 text-xl font-light">
+                  <Disc /> Radio
+                </div>
+              ))
+              .with(FieldType.DROPDOWN, () => (
+                <div className="text-field-card-foreground flex items-center justify-center gap-x-1 text-xl font-light">
+                  <ChevronDown /> Dropdown
+                </div>
+              ))
+              .otherwise(() => '')}
+          </button>
+        )}
+      </SinglePlayerModeFieldCardContainer>
+    </>
   );
 }
 

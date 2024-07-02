@@ -1,5 +1,6 @@
 // https://github.com/Hopding/pdf-lib/issues/20#issuecomment-412852821
 import fontkit from '@pdf-lib/fontkit';
+import type { PDFFont, PDFPage } from 'pdf-lib';
 import { PDFDocument, RotationTypes, degrees, radiansToDegrees } from 'pdf-lib';
 import { match } from 'ts-pattern';
 
@@ -12,6 +13,75 @@ import {
 import { FieldType } from '@documenso/prisma/client';
 import { isSignatureFieldType } from '@documenso/prisma/guards/is-signature-field';
 import type { FieldWithSignature } from '@documenso/prisma/types/field-with-signature';
+
+const CHECKBOX_MARK = 'X';
+const RADIO_MARK = 'O';
+const MARK_FONT_SIZE = 20;
+const MARK_OFFSET = 40;
+
+const handleCheckboxField = (
+  page: PDFPage,
+  fieldX: number,
+  fieldY: number,
+  fieldWidth: number,
+  fieldHeight: number,
+  pageHeight: number,
+  font: PDFFont,
+  checkboxValues: string[],
+) => {
+  const lineHeight = font.heightAtSize(MARK_FONT_SIZE);
+  let currentY = fieldY;
+  const spaceBetweenMarkAndText = 10;
+
+  for (const value of checkboxValues) {
+    const checkboxMarkX = fieldX;
+    const markWidth = font.widthOfTextAtSize(CHECKBOX_MARK, MARK_FONT_SIZE);
+    const textX = checkboxMarkX + markWidth + spaceBetweenMarkAndText;
+    let markY = currentY + lineHeight / 2;
+
+    markY = pageHeight - markY - lineHeight / 2;
+
+    page.drawText(CHECKBOX_MARK, {
+      x: checkboxMarkX,
+      y: markY,
+      size: MARK_FONT_SIZE,
+      font,
+    });
+
+    page.drawText(value, {
+      x: textX,
+      y: markY,
+      size: MARK_FONT_SIZE,
+      font,
+    });
+
+    currentY -= lineHeight;
+  }
+};
+
+const handleRadioField = (
+  page: PDFPage,
+  fieldX: number,
+  fieldY: number,
+  fieldWidth: number,
+  fieldHeight: number,
+  pageHeight: number,
+  textWidth: number,
+  font: PDFFont,
+  mark: string,
+) => {
+  const textX = fieldX + (fieldWidth - textWidth) / 2;
+  let markY = fieldY + fieldHeight / 2;
+
+  markY = pageHeight - markY - MARK_FONT_SIZE / 2;
+
+  page.drawText(mark, {
+    x: textX + MARK_FONT_SIZE - MARK_OFFSET,
+    y: markY,
+    size: MARK_FONT_SIZE,
+    font,
+  });
+};
 
 export const insertFieldInPDF = async (pdf: PDFDocument, field: FieldWithSignature) => {
   const fontCaveat = await fetch(process.env.FONT_CAVEAT_URI).then(async (res) =>
@@ -136,6 +206,38 @@ export const insertFieldInPDF = async (pdf: PDFDocument, field: FieldWithSignatu
     // Invert the Y axis since PDFs use a bottom-left coordinate system
     textY = pageHeight - textY - textHeight;
 
+    if (field.type === FieldType.CHECKBOX) {
+      const checkboxValues = field.customText.split(',').map((value) => value.trim());
+      const formattedCheckboxValues = checkboxValues.map((value) =>
+        value.includes('empty-value-') ? '' : value,
+      );
+
+      handleCheckboxField(
+        page,
+        fieldX,
+        fieldY,
+        fieldWidth,
+        fieldHeight,
+        pageHeight,
+        font,
+        formattedCheckboxValues,
+      );
+    }
+
+    if (field.type === FieldType.RADIO) {
+      handleRadioField(
+        page,
+        fieldX,
+        fieldY,
+        fieldWidth,
+        fieldHeight,
+        pageHeight,
+        textWidth,
+        font,
+        RADIO_MARK,
+      );
+    }
+
     if (pageRotationInDegrees !== 0) {
       const adjustedPosition = adjustPositionForRotation(
         pageWidth,
@@ -149,13 +251,18 @@ export const insertFieldInPDF = async (pdf: PDFDocument, field: FieldWithSignatu
       textY = adjustedPosition.yPos;
     }
 
-    page.drawText(field.customText, {
-      x: textX,
-      y: textY,
-      size: fontSize,
-      font,
-      rotate: degrees(pageRotationInDegrees),
-    });
+    if (field.type !== 'CHECKBOX') {
+      const customText =
+        field.type === 'RADIO' && field.customText.includes('empty-value-') ? '' : field.customText;
+
+      page.drawText(customText, {
+        x: textX,
+        y: textY,
+        size: fontSize,
+        font,
+        rotate: degrees(pageRotationInDegrees),
+      });
+    }
   }
 
   return pdf;

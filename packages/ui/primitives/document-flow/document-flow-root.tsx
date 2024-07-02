@@ -126,6 +126,7 @@ export type DocumentFlowFormContainerActionsProps = {
   onGoNextClick?: () => void;
   loading?: boolean;
   disabled?: boolean;
+  disableNextStep?: boolean;
 };
 
 export const DocumentFlowFormContainerActions = ({
@@ -137,6 +138,7 @@ export const DocumentFlowFormContainerActions = ({
   onGoNextClick,
   loading,
   disabled,
+  disableNextStep = false,
 }: DocumentFlowFormContainerActionsProps) => {
   return (
     <div className="mt-4 flex gap-x-4">
@@ -155,7 +157,7 @@ export const DocumentFlowFormContainerActions = ({
         type="button"
         className="bg-documenso flex-1"
         size="lg"
-        disabled={disabled || loading || !canGoNext}
+        disabled={disabled || disableNextStep || loading || !canGoNext}
         loading={loading}
         onClick={onGoNextClick}
       >

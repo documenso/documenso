@@ -150,7 +150,7 @@ export const ResendDocumentActionItem = ({
 
                       <FormControl>
                         <Checkbox
-                          className="h-5 w-5 rounded-full data-[state=checked]:border-black data-[state=checked]:bg-black "
+                          className="h-5 w-5 rounded-full data-[state=checked]:border-black data-[state=checked]:bg-black"
                           checkClassName="text-white"
                           value={recipient.id}
                           checked={value.includes(recipient.id)}
