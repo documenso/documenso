@@ -56,7 +56,7 @@ export const RecipientActionAuthSelect = (props: RecipientActionAuthSelectProps)
                 via their settings
               </li>
               <li>
-                <strong>None</strong> - No authentication required
+                <strong>No Restrictions</strong> - No authentication required
               </li>
             </ul>
           </TooltipContent>

@@ -31,7 +31,7 @@ export const DocumentGlobalAuthAccessSelect = forwardRef<HTMLButtonElement, Sele
         ))}
 
         {/* Note: -1 is remapped in the Zod schema to the required value. */}
-        <SelectItem value={'-1'}>None</SelectItem>
+        <SelectItem value={'-1'}>No Restrictions</SelectItem>
       </SelectContent>
     </Select>
   ),
@@ -57,8 +57,8 @@ export const DocumentGlobalAuthAccessTooltip = () => (
           <strong>Require account</strong> - The recipient must be signed in to view the document
         </li>
         <li>
-          <strong>None</strong> - The document can be accessed directly by the URL sent to the
-          recipient
+          <strong>No Restrictions</strong> - The document can be accessed directly by the URL sent
+          to the recipient
         </li>
       </ul>
     </TooltipContent>
