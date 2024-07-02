@@ -128,8 +128,6 @@ export const sendCompletedEmail = async ({ documentId, requestMetadata }: SendDo
             : '',
       });
 
-      console.log('subgjeccttt', document.documentMeta?.subject);
-
       await mailer.sendMail({
         to: [
           {
