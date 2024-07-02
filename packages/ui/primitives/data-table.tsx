@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useMemo } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 
 import type {
   ColumnDef,
@@ -52,6 +52,17 @@ export function DataTable<TData, TValue>({
   onPaginationChange,
   children,
 }: DataTableProps<TData, TValue>) {
+  const [stableColumns, setStableColumns] = useState(columns);
+
+  useEffect(() => {
+    if (JSON.stringify(columns) === JSON.stringify(stableColumns)) {
+      return;
+    }
+
+    setStableColumns(columns);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [columns]);
+
   const pagination = useMemo<PaginationState>(() => {
     if (currentPage !== undefined && perPage !== undefined) {
       return {
@@ -80,7 +91,7 @@ export function DataTable<TData, TValue>({
 
   const table = useReactTable({
     data,
-    columns,
+    columns: stableColumns,
     getCoreRowModel: getCoreRowModel(),
     state: {
       pagination: manualPagination ? pagination : undefined,
