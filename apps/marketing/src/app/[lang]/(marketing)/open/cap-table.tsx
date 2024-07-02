@@ -1,8 +1,9 @@
 'use client';
 
 import type { HTMLAttributes } from 'react';
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 
+import type { getDictionary } from 'get-dictionary';
 import { Cell, Legend, Pie, PieChart, Tooltip } from 'recharts';
 
 import { CAP_TABLE } from './data';
@@ -38,10 +39,13 @@ const renderCustomizedLabel = ({
   );
 };
 
-export type CapTableProps = HTMLAttributes<HTMLDivElement>;
+export type CapTableProps = HTMLAttributes<HTMLDivElement> & {
+  dictionary: Awaited<ReturnType<typeof getDictionary>>['open_startup'];
+};
 
-export const CapTable = ({ className, ...props }: CapTableProps) => {
+export const CapTable = ({ className, dictionary, ...props }: CapTableProps) => {
   const [isSSR, setIsSSR] = useState(true);
+  const cap_table = useMemo(() => CAP_TABLE(dictionary), []);
 
   useEffect(() => {
     setIsSSR(false);
@@ -50,13 +54,13 @@ export const CapTable = ({ className, ...props }: CapTableProps) => {
     <div className={className} {...props}>
       <div className="border-border flex flex-col justify-center rounded-2xl border p-6 pl-2 shadow-sm hover:shadow">
         <div className="mb-6 flex px-4">
-          <h3 className="text-lg font-semibold">Cap Table</h3>
+          <h3 className="text-lg font-semibold">{dictionary.cap_table}</h3>
         </div>
 
         {!isSSR && (
           <PieChart width={400} height={400}>
             <Pie
-              data={CAP_TABLE}
+              data={cap_table}
               cx="50%"
               cy="50%"
               labelLine={false}
@@ -66,7 +70,7 @@ export const CapTable = ({ className, ...props }: CapTableProps) => {
               fill="#8884d8"
               dataKey="percentage"
             >
-              {CAP_TABLE.map((entry, index) => (
+              {cap_table.map((entry, index) => (
                 <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
               ))}
             </Pie>

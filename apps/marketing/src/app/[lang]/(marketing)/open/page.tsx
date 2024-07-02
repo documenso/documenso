@@ -202,16 +202,29 @@ export default async function OpenPage({ params }: { params: { lang: Locale } })
             />
           </div>
 
-          <TeamMembers className="col-span-12" dictionary={dictionary.open_startup} />
+          <TeamMembers
+            className="col-span-12"
+            dictionary={{
+              open_startup: dictionary.open_startup,
+              team_members: dictionary.team_members,
+              stringLocale: stringLocale!,
+            }}
+          />
 
           <SalaryBands className="col-span-12" />
         </div>
 
         <h2 className="px-4 text-2xl font-semibold">{dictionary.open_startup.finances}</h2>
         <div className="mb-12 mt-4 grid grid-cols-12 gap-8">
-          <FundingRaised data={FUNDING_RAISED} className="col-span-12 lg:col-span-6" />
-
-          <CapTable className="col-span-12 lg:col-span-6" />
+          <FundingRaised
+            data={FUNDING_RAISED}
+            className="col-span-12 lg:col-span-6"
+            dictionary={{
+              open_startup: dictionary.open_startup,
+              stringLocale: stringLocale!,
+            }}
+          />
+          <CapTable className="col-span-12 lg:col-span-6" dictionary={dictionary.open_startup} />
         </div>
 
         <h2 className="px-4 text-2xl font-semibold">{dictionary.open_startup.community}</h2>
@@ -219,16 +232,18 @@ export default async function OpenPage({ params }: { params: { lang: Locale } })
           <BarMetric<StargazersType>
             data={STARGAZERS_DATA}
             metricKey="stars"
-            title="GitHub: Total Stars"
-            label="Stars"
+            title={dictionary.open_startup.github_total_stars}
+            label={dictionary.open_startup.stars}
+            stringLocale={stringLocale!}
             className="col-span-12 lg:col-span-6"
           />
 
           <BarMetric<StargazersType>
             data={STARGAZERS_DATA}
             metricKey="mergedPRs"
-            title="GitHub: Total Merged PRs"
-            label="Merged PRs"
+            title={dictionary.open_startup.github_total_merged}
+            label={dictionary.open_startup.github_merged_pr}
+            stringLocale={stringLocale!}
             chartHeight={400}
             className="col-span-12 lg:col-span-6"
           />
@@ -236,18 +251,20 @@ export default async function OpenPage({ params }: { params: { lang: Locale } })
           <BarMetric<StargazersType>
             data={STARGAZERS_DATA}
             metricKey="forks"
-            title="GitHub: Total Forks"
-            label="Forks"
+            title={dictionary.open_startup.github_total_forks}
+            label={dictionary.open_startup.forks}
             chartHeight={400}
+            stringLocale={stringLocale!}
             className="col-span-12 lg:col-span-6"
           />
 
           <BarMetric<StargazersType>
             data={STARGAZERS_DATA}
             metricKey="openIssues"
-            title="GitHub: Total Open Issues"
-            label="Open Issues"
+            title={dictionary.open_startup.github_open_issues}
+            label={dictionary.open_startup.open_issues}
             chartHeight={400}
+            stringLocale={stringLocale!}
             className="col-span-12 lg:col-span-6"
           />
 
@@ -259,22 +276,33 @@ export default async function OpenPage({ params }: { params: { lang: Locale } })
           <BarMetric<EarlyAdoptersType>
             data={EARLY_ADOPTERS_DATA}
             metricKey="earlyAdopters"
-            title="Total Customers"
-            label="Total Customers"
+            title={dictionary.open_startup.total_customers}
+            label={dictionary.open_startup.total_customers}
+            stringLocale={stringLocale!}
             className="col-span-12 lg:col-span-6"
-            extraInfo={<OpenPageTooltip />}
+            extraInfo={<OpenPageTooltip lang={params.lang} />}
           />
 
-          <MonthlyTotalUsersChart data={MONTHLY_USERS} className="col-span-12 lg:col-span-6" />
-          <MonthlyNewUsersChart data={MONTHLY_USERS} className="col-span-12 lg:col-span-6" />
+          <MonthlyTotalUsersChart
+            data={MONTHLY_USERS}
+            className="col-span-12 lg:col-span-6"
+            stringLocale={stringLocale!}
+          />
+          <MonthlyNewUsersChart
+            data={MONTHLY_USERS}
+            className="col-span-12 lg:col-span-6"
+            stringLocale={stringLocale!}
+          />
 
           <MonthlyCompletedDocumentsChart
             data={MONTHLY_COMPLETED_DOCUMENTS}
             className="col-span-12 lg:col-span-6"
+            stringLocale={stringLocale!}
           />
           <TotalSignedDocumentsChart
             data={MONTHLY_COMPLETED_DOCUMENTS}
             className="col-span-12 lg:col-span-6"
+            stringLocale={stringLocale!}
           />
         </div>
       </div>

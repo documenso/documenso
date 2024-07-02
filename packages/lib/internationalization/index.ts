@@ -57,3 +57,6 @@ export const withInternationalization = (
     return middleware(request);
   };
 };
+
+export { dateFormatter, currencyFormatter } from './utils';
+export type { Locale, stringLocales } from './i18n-config';

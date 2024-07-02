@@ -1,18 +1,7 @@
-export const formatMonth = (monthStr: string) => {
-  const [year, month] = monthStr.split('-');
-  const monthNames = [
-    'January',
-    'February',
-    'March',
-    'April',
-    'May',
-    'June',
-    'July',
-    'August',
-    'September',
-    'October',
-    'November',
-    'December',
-  ];
-  return `${monthNames[parseInt(month, 10) - 1]} ${year}`;
-};
+import type { stringLocales } from '../internationalization/i18n-config';
+
+export const formatMonth = (monthStr: string, stringLocale: stringLocales = 'en-US') =>
+  new Intl.DateTimeFormat(stringLocale, {
+    year: 'numeric',
+    month: 'long',
+  }).format(new Date(monthStr));

@@ -1,5 +1,8 @@
 import React from 'react';
 
+import { getDictionary } from 'get-dictionary';
+
+import type { Locale } from '@documenso/lib/internationalization';
 import {
   Tooltip,
   TooltipContent,
@@ -7,7 +10,8 @@ import {
   TooltipTrigger,
 } from '@documenso/ui/primitives/tooltip';
 
-export function OpenPageTooltip() {
+export async function OpenPageTooltip({ lang }: { lang: Locale }) {
+  const dictionary = await getDictionary(lang);
   return (
     <TooltipProvider>
       <Tooltip>
@@ -29,7 +33,7 @@ export function OpenPageTooltip() {
           </svg>
         </TooltipTrigger>
         <TooltipContent>
-          <p>Customers with an Active Subscriptions.</p>
+          <p>{dictionary.open_startup.active_subscriptions}</p>
         </TooltipContent>
       </Tooltip>
     </TooltipProvider>

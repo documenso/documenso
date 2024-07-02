@@ -1,28 +1,35 @@
 'use client';
 
-import { DateTime } from 'luxon';
 import { Bar, BarChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
 
+import type { stringLocales } from '@documenso/lib/internationalization';
 import type { GetUserMonthlyGrowthResult } from '@documenso/lib/server-only/user/get-user-monthly-growth';
+
+import { useDictionary } from '~/providers/dictionary-provider';
 
 export type MonthlyNewUsersChartProps = {
   className?: string;
   data: GetUserMonthlyGrowthResult;
+  stringLocale: stringLocales;
 };
 
-export const MonthlyNewUsersChart = ({ className, data }: MonthlyNewUsersChartProps) => {
+export const MonthlyNewUsersChart = ({
+  className,
+  data,
+  stringLocale,
+}: MonthlyNewUsersChartProps) => {
   const formattedData = [...data].reverse().map(({ month, count }) => {
     return {
-      month: DateTime.fromFormat(month, 'yyyy-MM').toFormat('LLLL'),
+      month: new Intl.DateTimeFormat(stringLocale, { month: 'long' }).format(new Date(month)),
       count: Number(count),
     };
   });
-
+  const dictionary = useDictionary();
   return (
     <div className={className}>
       <div className="border-border flex flex-col justify-center rounded-2xl border p-6 pl-2 shadow-sm hover:shadow">
         <div className="mb-6 flex px-4">
-          <h3 className="text-lg font-semibold">New Users</h3>
+          <h3 className="text-lg font-semibold">{dictionary.open_startup.new_users}</h3>
         </div>
 
         <ResponsiveContainer width="100%" height={400}>
@@ -34,7 +41,10 @@ export const MonthlyNewUsersChart = ({ className, data }: MonthlyNewUsersChartPr
               labelStyle={{
                 color: 'hsl(var(--primary-foreground))',
               }}
-              formatter={(value) => [Number(value).toLocaleString('en-US'), 'New Users']}
+              formatter={(value) => [
+                Number(value).toLocaleString(stringLocale),
+                dictionary.open_startup.new_users,
+              ]}
               cursor={{ fill: 'hsl(var(--primary) / 10%)' }}
             />
 
@@ -43,7 +53,7 @@ export const MonthlyNewUsersChart = ({ className, data }: MonthlyNewUsersChartPr
               fill="hsl(var(--primary))"
               radius={[4, 4, 0, 0]}
               maxBarSize={60}
-              label="New Users"
+              label={dictionary.open_startup.new_users}
             />
           </BarChart>
         </ResponsiveContainer>

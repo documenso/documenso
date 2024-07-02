@@ -5,12 +5,14 @@ import type { HTMLAttributes } from 'react';
 import { Bar, BarChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
 
 import { formatMonth } from '@documenso/lib/client-only/format-month';
+import type { stringLocales } from '@documenso/lib/internationalization';
 
 export type BarMetricProps<T extends Record<string, unknown>> = HTMLAttributes<HTMLDivElement> & {
   data: T;
   metricKey: keyof T[string];
   title: string;
   label: string;
+  stringLocale: stringLocales;
   chartHeight?: number;
   extraInfo?: JSX.Element;
 };
@@ -21,13 +23,14 @@ export const BarMetric = <T extends Record<string, Record<keyof T[string], unkno
   metricKey,
   title,
   label,
+  stringLocale,
   chartHeight = 400,
   extraInfo,
   ...props
 }: BarMetricProps<T>) => {
   const formattedData = Object.keys(data)
     .map((key) => ({
-      month: formatMonth(key),
+      month: formatMonth(key, stringLocale),
       [metricKey]: data[key][metricKey],
     }))
     .reverse();
