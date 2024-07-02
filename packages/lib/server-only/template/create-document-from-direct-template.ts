@@ -39,6 +39,7 @@ import { sendDocument } from '../document/send-document';
 import { validateFieldAuth } from '../document/validate-field-auth';
 
 export type CreateDocumentFromDirectTemplateOptions = {
+  directRecipientName?: string;
   directRecipientEmail: string;
   directTemplateToken: string;
   signedFieldValues: TSignFieldWithTokenMutationSchema[];
@@ -57,6 +58,7 @@ type CreatedDirectRecipientField = {
 };
 
 export const createDocumentFromDirectTemplate = async ({
+  directRecipientName: initialDirectRecipientName,
   directRecipientEmail,
   directTemplateToken,
   signedFieldValues,
@@ -110,7 +112,7 @@ export const createDocumentFromDirectTemplate = async ({
       documentAuth: template.authOptions,
     });
 
-  const directRecipientName = user?.name;
+  const directRecipientName = user?.name || initialDirectRecipientName;
 
   // Ensure typesafety when we add more options.
   const isAccessAuthValid = match(derivedRecipientAccessAuth)

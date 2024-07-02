@@ -17,6 +17,7 @@ export const ZCreateTemplateMutationSchema = z.object({
 });
 
 export const ZCreateDocumentFromDirectTemplateMutationSchema = z.object({
+  directRecipientName: z.string().optional(),
   directRecipientEmail: z.string().email(),
   directTemplateToken: z.string().min(1),
   signedFieldValues: z.array(ZSignFieldWithTokenMutationSchema),
