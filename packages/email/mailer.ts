@@ -46,10 +46,13 @@ const getTransport = () => {
     host: process.env.NEXT_PRIVATE_SMTP_HOST ?? 'localhost:2500',
     port: Number(process.env.NEXT_PRIVATE_SMTP_PORT) || 587,
     secure: process.env.NEXT_PRIVATE_SMTP_SECURE === 'true',
-    auth: {
-      user: process.env.NEXT_PRIVATE_SMTP_USERNAME ?? '',
-      pass: process.env.NEXT_PRIVATE_SMTP_PASSWORD ?? '',
-    },
+    ignoreTLS: process.env.NEXT_PRIVATE_SMTP_UNSAFE_IGNORE_TLS === 'true',
+    auth: process.env.NEXT_PRIVATE_SMTP_USERNAME
+      ? {
+          user: process.env.NEXT_PRIVATE_SMTP_USERNAME,
+          pass: process.env.NEXT_PRIVATE_SMTP_PASSWORD ?? '',
+        }
+      : undefined,
   });
 };
 
