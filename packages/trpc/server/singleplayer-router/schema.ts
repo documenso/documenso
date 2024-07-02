@@ -1,6 +1,6 @@
 import { z } from 'zod';
 
-import { ZFieldMetaSchema } from '@documenso/lib/types/field-field-meta';
+import { ZFieldMetaSchema } from '@documenso/lib/types/field-meta';
 import { DocumentDataType, FieldType } from '@documenso/prisma/client';
 
 export const ZCreateSinglePlayerDocumentMutationSchema = z.object({

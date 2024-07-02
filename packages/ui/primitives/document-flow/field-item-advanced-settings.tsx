@@ -16,7 +16,7 @@ import {
   type TRadioFieldMeta as RadioFieldMeta,
   type TTextFieldMeta as TextFieldMeta,
   ZFieldMetaSchema,
-} from '@documenso/lib/types/field-field-meta';
+} from '@documenso/lib/types/field-meta';
 import { FieldType } from '@documenso/prisma/client';
 import { trpc } from '@documenso/trpc/react';
 import { useToast } from '@documenso/ui/primitives/use-toast';

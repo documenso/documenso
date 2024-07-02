@@ -11,8 +11,8 @@ import { match } from 'ts-pattern';
 
 import { useFieldItemStyles } from '@documenso/lib/client-only/hooks/use-field-item-styles';
 import { PDF_VIEWER_PAGE_SELECTOR } from '@documenso/lib/constants/pdf-viewer';
-import type { TFieldMetaSchema } from '@documenso/lib/types/field-field-meta';
-import { ZCheckboxFieldMeta, ZRadioFieldMeta } from '@documenso/lib/types/field-field-meta';
+import type { TFieldMetaSchema } from '@documenso/lib/types/field-meta';
+import { ZCheckboxFieldMeta, ZRadioFieldMeta } from '@documenso/lib/types/field-meta';
 
 import { cn } from '../../lib/utils';
 import { Card, CardContent } from '../card';
@@ -22,7 +22,7 @@ import { RadioField } from './advanced-fields/radio';
 import { FieldIcon } from './field-icon';
 import type { TDocumentFlowFormSchema } from './types';
 
-/* 
+/*
   I hate this, but due to TailwindCSS JIT, I couldnn't find a better way to do this for now.
 
   TODO: Try to find a better way to do this.

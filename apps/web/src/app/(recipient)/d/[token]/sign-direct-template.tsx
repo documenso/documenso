@@ -12,7 +12,7 @@ import {
   ZNumberFieldMeta,
   ZRadioFieldMeta,
   ZTextFieldMeta,
-} from '@documenso/lib/types/field-field-meta';
+} from '@documenso/lib/types/field-meta';
 import { sortFieldsByPosition, validateFieldsInserted } from '@documenso/lib/utils/fields';
 import type { Field, Recipient, Signature } from '@documenso/prisma/client';
 import { FieldType } from '@documenso/prisma/client';

@@ -5,7 +5,7 @@ import { useEffect, useState } from 'react';
 import { ChevronDown, ChevronUp, Trash } from 'lucide-react';
 
 import { validateRadioField } from '@documenso/lib/advanced-fields-validation/validate-radio';
-import { type TRadioFieldMeta as RadioFieldMeta } from '@documenso/lib/types/field-field-meta';
+import { type TRadioFieldMeta as RadioFieldMeta } from '@documenso/lib/types/field-meta';
 import { Button } from '@documenso/ui/primitives/button';
 import { Checkbox } from '@documenso/ui/primitives/checkbox';
 import { Input } from '@documenso/ui/primitives/input';

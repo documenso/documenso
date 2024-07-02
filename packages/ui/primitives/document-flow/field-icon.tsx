@@ -1,6 +1,6 @@
 import { CalendarDays, CheckSquare, ChevronDown, Disc, Hash, Mail, Type, User } from 'lucide-react';
 
-import type { TFieldMetaSchema as FieldMetaType } from '@documenso/lib/types/field-field-meta';
+import type { TFieldMetaSchema as FieldMetaType } from '@documenso/lib/types/field-meta';
 import { FieldType } from '@documenso/prisma/client';
 
 import { cn } from '../../lib/utils';

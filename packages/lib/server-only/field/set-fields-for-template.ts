@@ -11,7 +11,7 @@ import {
   ZNumberFieldMeta,
   ZRadioFieldMeta,
   ZTextFieldMeta,
-} from '@documenso/lib/types/field-field-meta';
+} from '@documenso/lib/types/field-meta';
 import { prisma } from '@documenso/prisma';
 import { FieldType } from '@documenso/prisma/client';
 

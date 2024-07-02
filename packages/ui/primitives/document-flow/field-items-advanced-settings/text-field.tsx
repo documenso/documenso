@@ -1,5 +1,5 @@
 import { validateTextField } from '@documenso/lib/advanced-fields-validation/validate-text';
-import { type TTextFieldMeta as TextFieldMeta } from '@documenso/lib/types/field-field-meta';
+import { type TTextFieldMeta as TextFieldMeta } from '@documenso/lib/types/field-meta';
 import { Input } from '@documenso/ui/primitives/input';
 import { Label } from '@documenso/ui/primitives/label';
 import { Switch } from '@documenso/ui/primitives/switch';

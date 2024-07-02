@@ -5,8 +5,8 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { createPortal } from 'react-dom';
 
 import { useFieldPageCoords } from '@documenso/lib/client-only/hooks/use-field-page-coords';
-import type { TFieldMetaSchema } from '@documenso/lib/types/field-field-meta';
-import { ZFieldMetaSchema } from '@documenso/lib/types/field-field-meta';
+import type { TFieldMetaSchema } from '@documenso/lib/types/field-meta';
+import { ZFieldMetaSchema } from '@documenso/lib/types/field-meta';
 import type { Field } from '@documenso/prisma/client';
 
 import { cn } from '../../lib/utils';

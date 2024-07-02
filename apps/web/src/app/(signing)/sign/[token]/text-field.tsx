@@ -10,7 +10,7 @@ import { validateTextField } from '@documenso/lib/advanced-fields-validation/val
 import { DO_NOT_INVALIDATE_QUERY_ON_MUTATION } from '@documenso/lib/constants/trpc';
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import type { TRecipientActionAuth } from '@documenso/lib/types/document-auth';
-import { ZTextFieldMeta } from '@documenso/lib/types/field-field-meta';
+import { ZTextFieldMeta } from '@documenso/lib/types/field-meta';
 import type { Recipient } from '@documenso/prisma/client';
 import type { FieldWithSignatureAndFieldMeta } from '@documenso/prisma/types/field-with-signature-and-fieldmeta';
 import { trpc } from '@documenso/trpc/react';

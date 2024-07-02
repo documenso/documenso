@@ -1,5 +1,5 @@
-import { ZCheckboxFieldMeta } from '@documenso/lib/types/field-field-meta';
-import type { TCheckboxFieldMeta } from '@documenso/lib/types/field-field-meta';
+import { ZCheckboxFieldMeta } from '@documenso/lib/types/field-meta';
+import type { TCheckboxFieldMeta } from '@documenso/lib/types/field-meta';
 import { cn } from '@documenso/ui/lib/utils';
 import { Card, CardContent } from '@documenso/ui/primitives/card';
 import { Checkbox } from '@documenso/ui/primitives/checkbox';

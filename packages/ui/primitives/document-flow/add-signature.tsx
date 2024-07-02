@@ -189,27 +189,7 @@ export const AddSignatureFormPartial = ({
         customText: form.getValues('name'),
         inserted: true,
       }))
-      .with(FieldType.TEXT, () => ({
-        ...field,
-        customText: form.getValues('customText'),
-        inserted: true,
-      }))
-      .with(FieldType.NUMBER, () => ({
-        ...field,
-        customText: form.getValues('customText'),
-        inserted: true,
-      }))
-      .with(FieldType.RADIO, () => ({
-        ...field,
-        customText: form.getValues('customText'),
-        inserted: true,
-      }))
-      .with(FieldType.CHECKBOX, () => ({
-        ...field,
-        customText: form.getValues('customText'),
-        inserted: true,
-      }))
-      .with(FieldType.DROPDOWN, () => ({
+      .with(FieldType.TEXT, FieldType.NUMBER, FieldType.RADIO, FieldType.CHECKBOX, () => ({
         ...field,
         customText: form.getValues('customText'),
         inserted: true,

@@ -25,8 +25,8 @@ import { useRecipientColorClasses } from '@documenso/lib/client-only/hooks/use-r
 import { useSelectedSignerStyles } from '@documenso/lib/client-only/hooks/use-selected-signer-styles';
 import { PDF_VIEWER_PAGE_SELECTOR } from '@documenso/lib/constants/pdf-viewer';
 import { RECIPIENT_ROLES_DESCRIPTION } from '@documenso/lib/constants/recipient-roles';
-import { ZFieldMetaSchema } from '@documenso/lib/types/field-field-meta';
-import { type TFieldMetaSchema as FieldMeta } from '@documenso/lib/types/field-field-meta';
+import { ZFieldMetaSchema } from '@documenso/lib/types/field-meta';
+import { type TFieldMetaSchema as FieldMeta } from '@documenso/lib/types/field-meta';
 import { nanoid } from '@documenso/lib/universal/id';
 import type { Field, Recipient } from '@documenso/prisma/client';
 import { RecipientRole } from '@documenso/prisma/client';

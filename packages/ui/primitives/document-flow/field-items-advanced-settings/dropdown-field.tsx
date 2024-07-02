@@ -5,7 +5,7 @@ import { useEffect, useState } from 'react';
 import { ChevronDown, ChevronUp, Trash } from 'lucide-react';
 
 import { validateDropdownField } from '@documenso/lib/advanced-fields-validation/validate-dropdown';
-import { type TDropdownFieldMeta as DropdownFieldMeta } from '@documenso/lib/types/field-field-meta';
+import { type TDropdownFieldMeta as DropdownFieldMeta } from '@documenso/lib/types/field-meta';
 import { Button } from '@documenso/ui/primitives/button';
 import { Input } from '@documenso/ui/primitives/input';
 import { Label } from '@documenso/ui/primitives/label';

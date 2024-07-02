@@ -1,4 +1,4 @@
-import { type TFieldMetaSchema as FieldMeta } from '@documenso/lib/types/field-field-meta';
+import { type TFieldMetaSchema as FieldMeta } from '@documenso/lib/types/field-meta';
 import { prisma } from '@documenso/prisma';
 import type { FieldType, Team } from '@documenso/prisma/client';
 

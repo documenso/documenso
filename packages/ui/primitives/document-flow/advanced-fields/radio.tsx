@@ -1,5 +1,5 @@
-import { ZRadioFieldMeta } from '@documenso/lib/types/field-field-meta';
-import type { TRadioFieldMeta } from '@documenso/lib/types/field-field-meta';
+import { ZRadioFieldMeta } from '@documenso/lib/types/field-meta';
+import type { TRadioFieldMeta } from '@documenso/lib/types/field-meta';
 import { cn } from '@documenso/ui/lib/utils';
 import { Card, CardContent } from '@documenso/ui/primitives/card';
 import { Label } from '@documenso/ui/primitives/label';
