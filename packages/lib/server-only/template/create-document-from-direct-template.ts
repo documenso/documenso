@@ -132,6 +132,8 @@ export const createDocumentFromDirectTemplate = async ({
 
   const metaTimezone = template.templateMeta?.timezone || DEFAULT_DOCUMENT_TIME_ZONE;
   const metaDateFormat = template.templateMeta?.dateFormat || DEFAULT_DOCUMENT_DATE_FORMAT;
+  const metaEmailMessage = template.templateMeta?.message || '';
+  const metaEmailSubject = template.templateMeta?.subject || '';
 
   // Associate, validate and map to a query every direct template recipient field with the provided fields.
   const createDirectRecipientFieldArgs = await Promise.all(
@@ -248,6 +250,14 @@ export const createDocumentFromDirectTemplate = async ({
                 token: nanoid(),
               };
             }),
+          },
+        },
+        documentMeta: {
+          create: {
+            timezone: metaTimezone,
+            dateFormat: metaDateFormat,
+            message: metaEmailMessage,
+            subject: metaEmailSubject,
           },
         },
       },
