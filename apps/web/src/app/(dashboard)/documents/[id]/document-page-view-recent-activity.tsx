@@ -133,7 +133,12 @@ export const DocumentPageViewRecentActivity = ({
                     ))}
                 </div>
 
-                <p className="text-muted-foreground dark:text-muted-foreground/70 flex-auto py-0.5 text-xs leading-5">
+                <p
+                  className="text-muted-foreground dark:text-muted-foreground/70 flex-auto truncate py-0.5 text-xs leading-5"
+                  title={`${formatDocumentAuditLogAction(auditLog, userId).prefix} ${
+                    formatDocumentAuditLogAction(auditLog, userId).description
+                  }`}
+                >
                   <span className="text-foreground font-medium">
                     {formatDocumentAuditLogAction(auditLog, userId).prefix}
                   </span>{' '}

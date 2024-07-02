@@ -110,7 +110,7 @@ export const DocumentPageView = async ({ params, team }: DocumentPageViewProps) 
         Documents
       </Link>
 
-      <div className="flex flex-row justify-between">
+      <div className="flex flex-row justify-between truncate">
         <div>
           <h1 className="mt-4 truncate text-2xl font-semibold md:text-3xl" title={document.title}>
             {document.title}
