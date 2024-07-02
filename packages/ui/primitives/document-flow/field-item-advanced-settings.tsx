@@ -36,6 +36,7 @@ import { RadioFieldAdvancedSettings } from './field-items-advanced-settings/radi
 import { TextFieldAdvancedSettings } from './field-items-advanced-settings/text-field';
 
 export type FieldAdvancedSettingsProps = {
+  teamId?: number;
   title: string;
   description: string;
   field: FieldFormType;
@@ -108,7 +109,16 @@ const getDefaultState = (fieldType: FieldType): FieldMeta => {
 
 export const FieldAdvancedSettings = forwardRef<HTMLDivElement, FieldAdvancedSettingsProps>(
   (
-    { title, description, field, fields, onAdvancedSettings, isDocumentPdfLoaded = true, onSave },
+    {
+      title,
+      description,
+      field,
+      fields,
+      onAdvancedSettings,
+      isDocumentPdfLoaded = true,
+      onSave,
+      teamId,
+    },
     ref,
   ) => {
     const { toast } = useToast();
@@ -131,6 +141,7 @@ export const FieldAdvancedSettings = forwardRef<HTMLDivElement, FieldAdvancedSet
     const { data: document } = trpc.document.getDocumentById.useQuery(
       {
         id: Number(id),
+        teamId,
       },
       {
         enabled: isDocumentPage,
@@ -142,8 +153,7 @@ export const FieldAdvancedSettings = forwardRef<HTMLDivElement, FieldAdvancedSet
     const { data: fieldData } = trpc.field.getField.useQuery(
       {
         fieldId: Number(field.nativeId),
-        documentId: document?.id ?? undefined,
-        templateId: template?.id ?? undefined,
+        teamId,
       },
       {
         enabled: doesFieldExist,
@@ -170,6 +180,7 @@ export const FieldAdvancedSettings = forwardRef<HTMLDivElement, FieldAdvancedSet
           ...parsedFieldMeta,
         });
       }
+      // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [fieldMeta]);
 
     const handleFieldChange = (

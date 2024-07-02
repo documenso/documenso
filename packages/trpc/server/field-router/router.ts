@@ -6,7 +6,6 @@ import { removeSignedFieldWithToken } from '@documenso/lib/server-only/field/rem
 import { setFieldsForDocument } from '@documenso/lib/server-only/field/set-fields-for-document';
 import { setFieldsForTemplate } from '@documenso/lib/server-only/field/set-fields-for-template';
 import { signFieldWithToken } from '@documenso/lib/server-only/field/sign-field-with-token';
-import { updateField } from '@documenso/lib/server-only/field/update-field';
 import { extractNextApiRequestMetadata } from '@documenso/lib/universal/extract-request-metadata';
 
 import { authenticatedProcedure, procedure, router } from '../trpc';
@@ -16,7 +15,6 @@ import {
   ZGetFieldQuerySchema,
   ZRemovedSignedFieldWithTokenMutationSchema,
   ZSignFieldWithTokenMutationSchema,
-  ZUpdateFieldMutationSchema,
 } from './schema';
 
 export const fieldRouter = router({
@@ -123,19 +121,18 @@ export const fieldRouter = router({
       }
     }),
 
-  getField: authenticatedProcedure.input(ZGetFieldQuerySchema).query(async ({ input }) => {
+  getField: authenticatedProcedure.input(ZGetFieldQuerySchema).query(async ({ input, ctx }) => {
     try {
-      const { fieldId, documentId, templateId } = input;
+      const { fieldId, teamId } = input;
 
-      let field;
-      if (documentId) {
-        field = await getFieldById({ fieldId, documentId });
-      } else if (templateId) {
-        field = await getFieldById({ fieldId, templateId });
-      }
-
-      return field;
+      return await getFieldById({
+        userId: ctx.user.id,
+        teamId,
+        fieldId,
+      });
     } catch (err) {
+      console.error(err);
+
       throw new TRPCError({
         code: 'BAD_REQUEST',
         message: 'We were unable to find this field. Please try again.',
@@ -143,26 +140,29 @@ export const fieldRouter = router({
     }
   }),
 
-  updateField: authenticatedProcedure
-    .input(ZUpdateFieldMutationSchema)
-    .mutation(async ({ input, ctx }) => {
-      try {
-        const { documentId, fieldId, fieldMeta } = input;
+  // This doesn't appear to be used anywhere, and it doesn't seem to support updating template fields
+  // so commenting this out for now.
+  // updateField: authenticatedProcedure
+  //   .input(ZUpdateFieldMutationSchema)
+  //   .mutation(async ({ input, ctx }) => {
+  //     try {
+  //       const { documentId, fieldId, fieldMeta, teamId } = input;
 
-        return await updateField({
-          fieldId,
-          documentId,
-          userId: ctx.user.id,
-          requestMetadata: extractNextApiRequestMetadata(ctx.req),
-          fieldMeta: fieldMeta,
-        });
-      } catch (err) {
-        console.error(err);
+  //       return await updateField({
+  //         userId: ctx.user.id,
+  //         teamId,
+  //         fieldId,
+  //         documentId,
+  //         requestMetadata: extractNextApiRequestMetadata(ctx.req),
+  //         fieldMeta: fieldMeta,
+  //       });
+  //     } catch (err) {
+  //       console.error(err);
 
-        throw new TRPCError({
-          code: 'BAD_REQUEST',
-          message: 'We were unable to set this field. Please try again later.',
-        });
-      }
-    }),
+  //       throw new TRPCError({
+  //         code: 'BAD_REQUEST',
+  //         message: 'We were unable to set this field. Please try again later.',
+  //       });
+  //     }
+  //   }),
 });

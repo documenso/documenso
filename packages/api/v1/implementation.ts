@@ -1001,6 +1001,8 @@ export const ApiContractV1Implementation = createNextRoute(ApiContractV1, {
     }
 
     const field = await getFieldById({
+      userId: user.id,
+      teamId: team?.id,
       fieldId: Number(fieldId),
       documentId: Number(documentId),
     }).catch(() => null);

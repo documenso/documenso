@@ -88,9 +88,10 @@ export type AddFieldsFormProps = {
   onSubmit: (_data: TAddFieldsFormSchema) => void;
   canGoBack?: boolean;
   isDocumentPdfLoaded: boolean;
+  teamId?: number;
 };
 
-/* 
+/*
   I hate this, but due to TailwindCSS JIT, I couldnn't find a better way to do this for now.
 
   TODO: Try to find a better way to do this.
@@ -229,6 +230,7 @@ export const AddFieldsFormPartial = ({
   onSubmit,
   canGoBack = false,
   isDocumentPdfLoaded,
+  teamId,
 }: AddFieldsFormProps) => {
   const [isMissingSignatureDialogVisible, setIsMissingSignatureDialogVisible] = useState(false);
 
@@ -314,16 +316,19 @@ export const AddFieldsFormPartial = ({
 
   const emptyCheckboxFields = useMemo(
     () => filterFieldsWithEmptyValues(localFields, FieldType.CHECKBOX),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [localFields],
   );
 
   const emptyRadioFields = useMemo(
     () => filterFieldsWithEmptyValues(localFields, FieldType.RADIO),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [localFields],
   );
 
   const emptySelectFields = useMemo(
     () => filterFieldsWithEmptyValues(localFields, FieldType.DROPDOWN),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [localFields],
   );
 
@@ -569,6 +574,7 @@ export const AddFieldsFormPartial = ({
           onAdvancedSettings={handleAdvancedSettings}
           isDocumentPdfLoaded={isDocumentPdfLoaded}
           onSave={handleSavedFieldSettings}
+          teamId={teamId}
         />
       ) : (
         <>

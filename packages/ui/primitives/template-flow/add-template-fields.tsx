@@ -68,7 +68,7 @@ const DEFAULT_WIDTH_PERCENT = 15;
 const MIN_HEIGHT_PX = 60;
 const MIN_WIDTH_PX = 200;
 
-/* 
+/*
   I hate this, but due to TailwindCSS JIT, I couldnn't find a better way to do this for now.
 
   TODO: Try to find a better way to do this.
@@ -205,6 +205,7 @@ export type AddTemplateFieldsFormProps = {
   recipients: Recipient[];
   fields: Field[];
   onSubmit: (_data: TAddTemplateFieldsFormSchema) => void;
+  teamId?: number;
 };
 
 export const AddTemplateFieldsFormPartial = ({
@@ -213,6 +214,7 @@ export const AddTemplateFieldsFormPartial = ({
   recipients,
   fields,
   onSubmit,
+  teamId,
 }: AddTemplateFieldsFormProps) => {
   const { isWithinPageBounds, getFieldPosition, getPage } = useDocumentElement();
   const { currentStep, totalSteps, previousStep } = useStep();
@@ -501,6 +503,7 @@ export const AddTemplateFieldsFormPartial = ({
           fields={localFields}
           onAdvancedSettings={handleAdvancedSettings}
           onSave={handleSavedFieldSettings}
+          teamId={teamId}
         />
       ) : (
         <>

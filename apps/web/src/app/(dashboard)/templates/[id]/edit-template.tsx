@@ -268,6 +268,7 @@ export const EditTemplateForm = ({
               recipients={recipients}
               fields={fields}
               onSubmit={onAddFieldsFormSubmit}
+              teamId={team?.id}
             />
           </Stepper>
         </DocumentFlowFormContainer>
