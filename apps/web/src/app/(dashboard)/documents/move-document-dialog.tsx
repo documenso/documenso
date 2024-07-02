@@ -2,7 +2,9 @@ import { useState } from 'react';
 
 import { useRouter } from 'next/navigation';
 
+import { NEXT_PUBLIC_WEBAPP_URL } from '@documenso/lib/constants/app';
 import { trpc } from '@documenso/trpc/react';
+import { Avatar, AvatarFallback, AvatarImage } from '@documenso/ui/primitives/avatar';
 import { Button } from '@documenso/ui/primitives/button';
 import {
   Dialog,
@@ -80,7 +82,21 @@ export const MoveDocumentDialog = ({ documentId, open, onOpenChange }: MoveDocum
             ) : (
               teams?.map((team) => (
                 <SelectItem key={team.id} value={team.id.toString()}>
-                  {team.name}
+                  <div className="flex items-center gap-4">
+                    <Avatar className="h-8 w-8">
+                      {team.avatarImageId && (
+                        <AvatarImage
+                          src={`${NEXT_PUBLIC_WEBAPP_URL()}/api/avatar/${team.avatarImageId}`}
+                        />
+                      )}
+
+                      <AvatarFallback className="text-sm text-gray-400">
+                        {team.name.slice(0, 1).toUpperCase()}
+                      </AvatarFallback>
+                    </Avatar>
+
+                    <span>{team.name}</span>
+                  </div>
                 </SelectItem>
               ))
             )}
