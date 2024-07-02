@@ -1,10 +1,11 @@
 import { getSiteSettings } from '@documenso/lib/server-only/site-settings/get-site-settings';
+import type { TSiteSettingSchema } from '@documenso/lib/server-only/site-settings/schema';
 import { SITE_SETTINGS_BANNER_ID } from '@documenso/lib/server-only/site-settings/schemas/banner';
 
 export const Banner = async () => {
-  const banner = await getSiteSettings().then((settings) =>
+  const banner = (await getSiteSettings().then((settings) =>
     settings.find((setting) => setting.id === SITE_SETTINGS_BANNER_ID),
-  );
+  )) as Extract<TSiteSettingSchema, { id: 'site.banner' }>;
 
   return (
     <>
@@ -23,7 +24,3 @@ export const Banner = async () => {
     </>
   );
 };
-
-// Banner
-// Custom Text
-// Custom Text with Custom Icon
