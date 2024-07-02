@@ -36,7 +36,7 @@ export const UploadDocument = ({ className, team }: UploadDocumentProps) => {
 
   const { toast } = useToast();
 
-  const { quota, remaining } = useLimits();
+  const { quota, remaining, refreshLimits } = useLimits();
 
   const [isLoading, setIsLoading] = useState(false);
 
@@ -70,6 +70,8 @@ export const UploadDocument = ({ className, team }: UploadDocumentProps) => {
         documentDataId,
         teamId: team?.id,
       });
+
+      void refreshLimits();
 
       toast({
         title: 'Document uploaded',
