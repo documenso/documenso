@@ -24,15 +24,19 @@
     "prisma:studio": "npm run with:env -- npm run prisma:studio -w @documenso/prisma",
     "with:env": "dotenv -e .env -e .env.local --",
     "reset:hard": "npm run clean && npm i && npm run prisma:generate",
-    "precommit": "npm install && git add package.json package-lock.json"
+    "precommit": "npm install && git add package.json package-lock.json",
+    "trigger:dev": "npm run with:env -- npx trigger-cli dev --handler-path=\"/api/jobs\"",
+    "inngest:dev": "inngest dev -u http://localhost:3000/api/jobs"
   },
+  "packageManager": "npm@10.7.0",
   "engines": {
-    "npm": ">=8.6.0",
+    "npm": ">=10.7.0",
     "node": ">=18.0.0"
   },
   "devDependencies": {
     "@commitlint/cli": "^17.7.1",
     "@commitlint/config-conventional": "^17.7.0",
+    "@trigger.dev/cli": "^2.3.18",
     "dotenv": "^16.3.1",
     "dotenv-cli": "^7.3.0",
     "eslint": "^8.40.0",
@@ -51,7 +55,9 @@
   ],
   "dependencies": {
     "@documenso/pdf-sign": "^0.1.0",
-    "next-runtime-env": "^3.2.0"
+    "inngest-cli": "^0.29.1",
+    "next-runtime-env": "^3.2.0",
+    "react": "18.2.0"
   },
   "overrides": {
     "next-auth": {
@@ -59,6 +65,10 @@
     },
     "next-contentlayer": {
       "next": "14.0.3"
-    }
+    },
+    "react": "18.2.0"
+  },
+  "trigger.dev": {
+    "endpointId": "documenso-app"
   }
 }

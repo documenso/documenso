@@ -31,7 +31,7 @@ export const findDocumentAuditLogs = async ({
   const orderByColumn = orderBy?.column ?? 'createdAt';
   const orderByDirection = orderBy?.direction ?? 'desc';
 
-  await prisma.document.findFirstOrThrow({
+  const documentFilter = await prisma.document.findFirstOrThrow({
     where: {
       id: documentId,
       OR: [
@@ -67,6 +67,7 @@ export const findDocumentAuditLogs = async ({
             DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_OPENED,
             DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_RECIPIENT_COMPLETED,
             DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_SENT,
+            DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_MOVED_TO_TEAM,
           ],
         },
       },

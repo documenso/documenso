@@ -354,6 +354,9 @@ export const seedPendingDocumentWithFullFields = async ({
       ...updateDocumentOptions,
       status: DocumentStatus.PENDING,
     },
+    include: {
+      documentMeta: true,
+    },
   });
 
   return {

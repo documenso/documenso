@@ -58,7 +58,7 @@ export const PricingTable = ({ className, ...props }: PricingTableProps) => {
           >
             Yearly
             <div className="bg-muted text-foreground block rounded-full px-2 py-0.5 text-xs">
-              Save $60 or $100
+              Save $60 or $120
             </div>
             {period === 'YEARLY' && (
               <motion.div
@@ -143,7 +143,7 @@ export const PricingTable = ({ className, ...props }: PricingTableProps) => {
           <div className="text-primary mt-2.5 text-xl font-medium">
             <AnimatePresence mode="wait">
               {period === 'MONTHLY' && <motion.div layoutId="pricingTeams">$50</motion.div>}
-              {period === 'YEARLY' && <motion.div layoutId="pricingTeams">$500</motion.div>}
+              {period === 'YEARLY' && <motion.div layoutId="pricingTeams">$480</motion.div>}
             </AnimatePresence>
           </div>
 
@@ -166,7 +166,9 @@ export const PricingTable = ({ className, ...props }: PricingTableProps) => {
             <p className="text-foreground py-4">Email and Discord Support</p>
             <p className="text-foreground py-4 font-medium">Team Inbox</p>
             <p className="text-foreground py-4">5 Users Included</p>
-            <p className="text-foreground py-4">Add More Users for $10/ mo.</p>
+            <p className="text-foreground py-4">
+              Add More Users for {period === 'MONTHLY' ? '$10/ mo.' : '$96/ yr.'}
+            </p>
           </div>
         </div>
       </div>

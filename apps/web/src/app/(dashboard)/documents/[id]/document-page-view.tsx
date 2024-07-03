@@ -8,7 +8,7 @@ import { DOCUMENSO_ENCRYPTION_KEY } from '@documenso/lib/constants/crypto';
 import { getRequiredServerComponentSession } from '@documenso/lib/next-auth/get-server-component-session';
 import { getDocumentById } from '@documenso/lib/server-only/document/get-document-by-id';
 import { getServerComponentFlag } from '@documenso/lib/server-only/feature-flags/get-server-component-feature-flag';
-import { getCompletedFieldsForDocument } from '@documenso/lib/server-only/field/get-completed-fields-for-document';
+import { getFieldsForDocument } from '@documenso/lib/server-only/field/get-fields-for-document';
 import { getRecipientsForDocument } from '@documenso/lib/server-only/recipient/get-recipients-for-document';
 import { symmetricDecrypt } from '@documenso/lib/universal/crypto';
 import { formatDocumentsPath } from '@documenso/lib/utils/teams';
@@ -86,14 +86,15 @@ export const DocumentPageView = async ({ params, team }: DocumentPageViewProps) 
     documentMeta.password = securePassword;
   }
 
-  const [recipients, completedFields] = await Promise.all([
+  const [recipients, fields] = await Promise.all([
     getRecipientsForDocument({
       documentId,
       teamId: team?.id,
       userId: user.id,
     }),
-    getCompletedFieldsForDocument({
+    getFieldsForDocument({
       documentId,
+      userId: user.id,
     }),
   ]);
 
@@ -163,10 +164,7 @@ export const DocumentPageView = async ({ params, team }: DocumentPageViewProps) 
         </Card>
 
         {document.status === DocumentStatus.PENDING && (
-          <DocumentReadOnlyFields
-            fields={completedFields}
-            documentMeta={document.documentMeta || undefined}
-          />
+          <DocumentReadOnlyFields fields={fields} documentMeta={documentMeta || undefined} />
         )}
 
         <div className="col-span-12 lg:col-span-6 xl:col-span-5">

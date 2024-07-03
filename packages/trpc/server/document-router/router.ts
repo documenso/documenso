@@ -14,6 +14,7 @@ import { findDocumentAuditLogs } from '@documenso/lib/server-only/document/find-
 import { getDocumentById } from '@documenso/lib/server-only/document/get-document-by-id';
 import { getDocumentAndSenderByToken } from '@documenso/lib/server-only/document/get-document-by-token';
 import { getDocumentWithDetailsById } from '@documenso/lib/server-only/document/get-document-with-details-by-id';
+import { moveDocumentToTeam } from '@documenso/lib/server-only/document/move-document-to-team';
 import { resendDocument } from '@documenso/lib/server-only/document/resend-document';
 import { searchDocumentsWithKeyword } from '@documenso/lib/server-only/document/search-documents-with-keyword';
 import { sendDocument } from '@documenso/lib/server-only/document/send-document';
@@ -32,6 +33,7 @@ import {
   ZGetDocumentByIdQuerySchema,
   ZGetDocumentByTokenQuerySchema,
   ZGetDocumentWithDetailsByIdQuerySchema,
+  ZMoveDocumentsToTeamSchema,
   ZResendDocumentMutationSchema,
   ZSearchDocumentsMutationSchema,
   ZSendDocumentMutationSchema,
@@ -154,6 +156,33 @@ export const documentRouter = router({
         throw new TRPCError({
           code: 'BAD_REQUEST',
           message: 'We were unable to delete this document. Please try again later.',
+        });
+      }
+    }),
+
+  moveDocumentToTeam: authenticatedProcedure
+    .input(ZMoveDocumentsToTeamSchema)
+    .mutation(async ({ input, ctx }) => {
+      try {
+        const { documentId, teamId } = input;
+        const userId = ctx.user.id;
+
+        return await moveDocumentToTeam({
+          documentId,
+          teamId,
+          userId,
+          requestMetadata: extractNextApiRequestMetadata(ctx.req),
+        });
+      } catch (err) {
+        console.error(err);
+
+        if (err instanceof TRPCError) {
+          throw err;
+        }
+
+        throw new TRPCError({
+          code: 'BAD_REQUEST',
+          message: 'We were unable to move this document. Please try again later.',
         });
       }
     }),

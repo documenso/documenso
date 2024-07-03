@@ -4,6 +4,7 @@ module.exports = {
   extends: ['@documenso/eslint-config'],
   rules: {
     '@next/next/no-img-element': 'off',
+    'no-unreachable': 'error',
   },
   settings: {
     next: {
