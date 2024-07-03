@@ -1,5 +1,5 @@
 {
   "index": "First Steps",
-  "create": "Create your Account",
-  "setup": "Configure Security"
+  "account-creation": "Account Creation",
+  "account-security": "Account Security"
 }
