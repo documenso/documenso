@@ -1,5 +1,3 @@
-import { DateTime } from 'luxon';
-
 import { kyselyPrisma, sql } from '@documenso/prisma';
 
 export const getSignerConversionMonthly = async () => {
