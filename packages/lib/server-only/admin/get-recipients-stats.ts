@@ -1,18 +1,14 @@
 import { prisma } from '@documenso/prisma';
 import { ReadStatus, SendStatus, SigningStatus } from '@documenso/prisma/client';
 
-import { getSignerConversion } from '../user/get-signer-conversion';
-
 export const getRecipientsStats = async () => {
   const results = await prisma.recipient.groupBy({
     by: ['readStatus', 'signingStatus', 'sendStatus'],
     _count: true,
   });
-  const { count: convertedRecipientsCount } = await getSignerConversion();
 
   const stats = {
     TOTAL_RECIPIENTS: 0,
-    CONVERTED_RECIPIENTS: 0,
     [ReadStatus.OPENED]: 0,
     [ReadStatus.NOT_OPENED]: 0,
     [SigningStatus.SIGNED]: 0,
@@ -30,7 +26,6 @@ export const getRecipientsStats = async () => {
 
     stats.TOTAL_RECIPIENTS += _count;
   });
-  stats.CONVERTED_RECIPIENTS = convertedRecipientsCount;
 
   return stats;
 };
