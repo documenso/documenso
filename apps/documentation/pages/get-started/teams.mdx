@@ -1,5 +1,52 @@
-# lorem
+import Image from 'next/image';
 
-working with other? create a team
+import { Callout, Steps } from 'nextra/components';
 
-create
+# Teams
+
+If you are not working alone, you can invite your team to colloborate on creating and signing Documents.
+
+<Steps>
+
+### Create a New Team
+
+<Callout>You can transfer the ownership of the team to someone else at any time.</Callout>
+Create a team from your personal account. Each team will have it's own members, documents and templates.
+Each team your create is billed seperatly.
+<br />
+<img class="item" src="/get-started-images/add-team.webp" width="50%" />
+
+### Name and URL
+
+Enter your team name and desired team url. The url is the teams identifier and will be used in links to the teams page and settings. You can select a different name and url for your teams main page, but we reccomend using the same or a similar name.
+
+<img class="item" src="/get-started-images/add-team-2.webp" width="50%" />
+### Invite your Team
+<Callout>
+  The basic team plan includes 5 members. You can invite as many memebers as you like, by upgrading
+  your teams seats on the team's billing page.
+</Callout>
+After creating your team click "Manage" in your teams overview or switch to your team via the account
+dropdown and select "Team Settings". Note that "Teams Settings" always refers to the currently selected
+team.
+
+#### Roles
+
+Team members can be assigned different permissions, depending on their role. The owner of a team is the account that created it. The ownership can be transfered using the "transfer" feature in the team settings.
+|Role|Create, Edit, Send Documents|Manage Users| Manage Admins | Settings| Billing | Delete/ Transfer|
+|:---:|:---:|:---:|:---:|:---:|:---:|:---:|
+|Member | ✅ | ❌ | ❌ | ❌ | ❌ | ❌ |
+|Manager | ✅ | ✅ | ❌ | ✅ | ✅ | ❌ |
+|Admin | ✅ | ✅ | ✅ | ✅ | ✅ | ❌ |  
+|Owner | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
+
+### Set a Team Email
+
+You can add a team email to make signing and sending documents easier. Adding a team email let's you
+
+- See a signing requests send to this email (Team Inbox)
+- See all documents sent on behalf of the team
+
+### [Send your First Document](/documents)
+
+</Steps>
