@@ -1,0 +1,102 @@
+import { Callout, Steps } from 'nextra/components';
+
+# Self Hosting
+
+We support various deployment methods and are actively working on adding more. Please let us know if you have a specific deployment method in mind!
+
+<Steps>
+### Clone the Repository
+
+The first step is to clone the repository:
+
+```bash
+git clone https://github.com/documenso/documenso.git
+```
+
+### Configure the Environment Variables
+
+Navigate to the `documenso` folder and create a `.env` file from the example `.env.example` file:
+
+```bash
+cp .env.example .env
+```
+
+Open the `.env` file and fill in the following variables:
+
+```bash
+- NEXTAUTH_URL
+- NEXTAUTH_SECRET
+- NEXT_PUBLIC_WEBAPP_URL
+- NEXT_PUBLIC_MARKETING_URL
+- NEXT_PRIVATE_DATABASE_URL
+- NEXT_PRIVATE_DIRECT_DATABASE_URL
+- NEXT_PRIVATE_SMTP_FROM_NAME
+- NEXT_PRIVATE_SMTP_FROM_ADDRESS
+```
+
+<Callout type="info">
+  If you use a reverse proxy in front of Documenso, don't forget to provide the public URL for both
+  the `NEXTAUTH_URL` and `NEXT_PUBLIC_WEBAPP_URL` variables!
+</Callout>
+
+### Install the Dependencies
+
+Install the project dependencies as follows:
+
+```bash
+npm i
+npm run build:web
+npm run prisma:migrate-deploy
+```
+
+### Start the Application
+
+Finally, start the application:
+
+```bash
+npm run start
+```
+
+This will start the server on `localhost:3000`. For now, any reverse proxy can handle the front end and SSL termination.
+
+<Callout type="info">
+  If you want to run with another port than `3000`, you can start the application with `next -p <ANY PORT>` from the `apps/web` folder.
+</Callout>
+
+</Steps>
+
+### Run as a service
+
+You can run the application using a `systemd.service` file. Here is a simple example of the service running on port `3500` (using `3000` by default):
+
+```bash
+[Unit]
+Description=documenso
+After=network.target
+
+[Service]
+Environment=PATH=/path/to/your/node/binaries
+Type=simple
+User=www-data
+WorkingDirectory=/var/www/documenso/apps/web
+ExecStart=/usr/bin/next start -p 3500
+TimeoutSec=15
+Restart=always
+
+[Install]
+WantedBy=multi-user.target
+```
+
+We offer several alternative deployment methods for Documenso if you need more options.
+
+## Railway
+
+[![Deploy on Railway](https://railway.app/button.svg)](https://railway.app/template/bG6D4p)
+
+## Render
+
+[![Deploy to Render](https://render.com/images/deploy-to-render-button.svg)](https://render.com/deploy?repo=https://github.com/documenso/documenso)
+
+## Koyeb
+
+[![Deploy to Koyeb](https://www.koyeb.com/static/images/deploy/button.svg)](https://app.koyeb.com/deploy?type=git&repository=github.com/documenso/documenso&branch=main&name=documenso-app&builder=dockerfile&dockerfile=/docker/Dockerfile)
