@@ -56,7 +56,10 @@ export const MoveTemplateDialog = ({ templateId, open, onOpenChange }: MoveTempl
   });
 
   const onMove = async () => {
-    if (!selectedTeamId) return;
+    if (!selectedTeamId) {
+      return;
+    }
+
     await moveTemplate({ templateId, teamId: selectedTeamId });
   };
 
