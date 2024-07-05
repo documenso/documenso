@@ -4,7 +4,7 @@ import { useState } from 'react';
 
 import Link from 'next/link';
 
-import { Copy, Edit, MoreHorizontal, Share2Icon, Trash2 } from 'lucide-react';
+import { Copy, Edit, MoreHorizontal, MoveRight, Share2Icon, Trash2 } from 'lucide-react';
 import { useSession } from 'next-auth/react';
 
 import { type FindTemplateRow } from '@documenso/lib/server-only/template/find-templates';
@@ -18,6 +18,7 @@ import {
 
 import { DeleteTemplateDialog } from './delete-template-dialog';
 import { DuplicateTemplateDialog } from './duplicate-template-dialog';
+import { MoveTemplateDialog } from './move-template-dialog';
 import { TemplateDirectLinkDialog } from './template-direct-link-dialog';
 
 export type DataTableActionDropdownProps = {
@@ -36,6 +37,7 @@ export const DataTableActionDropdown = ({
   const [isDeleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [isTemplateDirectLinkDialogOpen, setTemplateDirectLinkDialogOpen] = useState(false);
   const [isDuplicateDialogOpen, setDuplicateDialogOpen] = useState(false);
+  const [isMoveDialogOpen, setMoveDialogOpen] = useState(false);
 
   if (!session) {
     return null;
@@ -73,6 +75,13 @@ export const DataTableActionDropdown = ({
           Direct link
         </DropdownMenuItem>
 
+        {!teamId && (
+          <DropdownMenuItem onClick={() => setMoveDialogOpen(true)}>
+            <MoveRight className="mr-2 h-4 w-4" />
+            Move to Team
+          </DropdownMenuItem>
+        )}
+
         <DropdownMenuItem
           disabled={!isOwner && !isTeamTemplate}
           onClick={() => setDeleteDialogOpen(true)}
@@ -93,6 +102,12 @@ export const DataTableActionDropdown = ({
         template={row}
         open={isTemplateDirectLinkDialogOpen}
         onOpenChange={setTemplateDirectLinkDialogOpen}
+      />
+
+      <MoveTemplateDialog
+        templateId={row.id}
+        open={isMoveDialogOpen}
+        onOpenChange={setMoveDialogOpen}
       />
 
       <DeleteTemplateDialog

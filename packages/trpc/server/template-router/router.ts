@@ -12,6 +12,7 @@ import { deleteTemplateDirectLink } from '@documenso/lib/server-only/template/de
 import { duplicateTemplate } from '@documenso/lib/server-only/template/duplicate-template';
 import { findTemplates } from '@documenso/lib/server-only/template/find-templates';
 import { getTemplateWithDetailsById } from '@documenso/lib/server-only/template/get-template-with-details-by-id';
+import { moveTemplateToTeam } from '@documenso/lib/server-only/template/move-template-to-team';
 import { toggleTemplateDirectLink } from '@documenso/lib/server-only/template/toggle-template-direct-link';
 import { updateTemplateSettings } from '@documenso/lib/server-only/template/update-template-settings';
 import { extractNextApiRequestMetadata } from '@documenso/lib/universal/extract-request-metadata';
@@ -28,6 +29,7 @@ import {
   ZDuplicateTemplateMutationSchema,
   ZFindTemplatesQuerySchema,
   ZGetTemplateWithDetailsByIdQuerySchema,
+  ZMoveTemplatesToTeamSchema,
   ZToggleTemplateDirectLinkMutationSchema,
   ZUpdateTemplateSettingsMutationSchema,
 } from './schema';
@@ -294,6 +296,32 @@ export const templateRouter = router({
 
         const error = AppError.parseError(err);
         throw AppError.parseErrorToTRPCError(error);
+      }
+    }),
+
+  moveTemplateToTeam: authenticatedProcedure
+    .input(ZMoveTemplatesToTeamSchema)
+    .mutation(async ({ input, ctx }) => {
+      try {
+        const { templateId, teamId } = input;
+        const userId = ctx.user.id;
+
+        return await moveTemplateToTeam({
+          templateId,
+          teamId,
+          userId,
+        });
+      } catch (err) {
+        console.error(err);
+
+        if (err instanceof TRPCError) {
+          throw err;
+        }
+
+        throw new TRPCError({
+          code: 'BAD_REQUEST',
+          message: 'We were unable to move this template. Please try again later.',
+        });
       }
     }),
 });
