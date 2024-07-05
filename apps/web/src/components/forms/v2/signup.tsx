@@ -10,6 +10,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { AnimatePresence, motion } from 'framer-motion';
 import { signIn } from 'next-auth/react';
 import { useForm } from 'react-hook-form';
+import { FaIdCardClip } from 'react-icons/fa6';
 import { FcGoogle } from 'react-icons/fc';
 import { z } from 'zod';
 
@@ -73,12 +74,14 @@ export type SignUpFormV2Props = {
   className?: string;
   initialEmail?: string;
   isGoogleSSOEnabled?: boolean;
+  isOIDCSSOEnabled?: boolean;
 };
 
 export const SignUpFormV2 = ({
   className,
   initialEmail,
   isGoogleSSOEnabled,
+  isOIDCSSOEnabled,
 }: SignUpFormV2Props) => {
   const { toast } = useToast();
   const analytics = useAnalytics();
@@ -179,6 +182,19 @@ export const SignUpFormV2 = ({
     }
   };
 
+  const onSignUpWithOIDCClick = async () => {
+    try {
+      await signIn('oidc', { callbackUrl: SIGN_UP_REDIRECT_PATH });
+    } catch (err) {
+      toast({
+        title: 'An unknown error occurred',
+        description:
+          'We encountered an unknown error while attempting to sign you Up. Please try again later.',
+        variant: 'destructive',
+      });
+    }
+  };
+
   return (
     <div className={cn('flex justify-center gap-x-12', className)}>
       <div className="border-border relative hidden flex-1 overflow-hidden rounded-xl border xl:flex">
@@ -255,7 +271,7 @@ export const SignUpFormV2 = ({
               <fieldset
                 className={cn(
                   'flex h-[550px] w-full flex-col gap-y-4',
-                  isGoogleSSOEnabled && 'h-[650px]',
+                  (isGoogleSSOEnabled || isOIDCSSOEnabled) && 'h-[650px]',
                 )}
                 disabled={isSubmitting}
               >
@@ -323,14 +339,18 @@ export const SignUpFormV2 = ({
                   )}
                 />
 
-                {isGoogleSSOEnabled && (
+                {(isGoogleSSOEnabled || isOIDCSSOEnabled) && (
                   <>
                     <div className="relative flex items-center justify-center gap-x-4 py-2 text-xs uppercase">
                       <div className="bg-border h-px flex-1" />
                       <span className="text-muted-foreground bg-transparent">Or</span>
                       <div className="bg-border h-px flex-1" />
                     </div>
+                  </>
+                )}
 
+                {isGoogleSSOEnabled && (
+                  <>
                     <Button
                       type="button"
                       size="lg"
@@ -341,6 +361,22 @@ export const SignUpFormV2 = ({
                     >
                       <FcGoogle className="mr-2 h-5 w-5" />
                       Sign Up with Google
+                    </Button>
+                  </>
+                )}
+
+                {isOIDCSSOEnabled && (
+                  <>
+                    <Button
+                      type="button"
+                      size="lg"
+                      variant={'outline'}
+                      className="bg-background text-muted-foreground border"
+                      disabled={isSubmitting}
+                      onClick={onSignUpWithOIDCClick}
+                    >
+                      <FaIdCardClip className="mr-2 h-5 w-5" />
+                      Sign Up with OIDC
                     </Button>
                   </>
                 )}

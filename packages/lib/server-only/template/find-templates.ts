@@ -1,22 +1,28 @@
 import { prisma } from '@documenso/prisma';
-import type { Prisma } from '@documenso/prisma/client';
+import type { Prisma, Template } from '@documenso/prisma/client';
 
 export type FindTemplatesOptions = {
   userId: number;
   teamId?: number;
-  page: number;
-  perPage: number;
+  type?: Template['type'];
+  page?: number;
+  perPage?: number;
 };
+
+export type FindTemplatesResponse = Awaited<ReturnType<typeof findTemplates>>;
+export type FindTemplateRow = FindTemplatesResponse['templates'][number];
 
 export const findTemplates = async ({
   userId,
   teamId,
+  type,
   page = 1,
   perPage = 10,
 }: FindTemplatesOptions) => {
   let whereFilter: Prisma.TemplateWhereInput = {
     userId,
     teamId: null,
+    type,
   };
 
   if (teamId !== undefined) {
@@ -45,6 +51,12 @@ export const findTemplates = async ({
         },
         Field: true,
         Recipient: true,
+        directLink: {
+          select: {
+            token: true,
+            enabled: true,
+          },
+        },
       },
       skip: Math.max(page - 1, 0) * perPage,
       orderBy: {

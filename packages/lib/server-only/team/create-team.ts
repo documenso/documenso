@@ -76,21 +76,36 @@ export const createTeam = async ({
   try {
     // Create the team directly if no payment is required.
     if (!isPaymentRequired) {
-      await prisma.team.create({
-        data: {
-          name: teamName,
-          url: teamUrl,
-          ownerUserId: user.id,
-          customerId,
-          members: {
-            create: [
-              {
-                userId,
-                role: TeamMemberRole.ADMIN,
-              },
-            ],
+      await prisma.$transaction(async (tx) => {
+        const existingUserProfileWithUrl = await tx.user.findUnique({
+          where: {
+            url: teamUrl,
           },
-        },
+          select: {
+            id: true,
+          },
+        });
+
+        if (existingUserProfileWithUrl) {
+          throw new AppError(AppErrorCode.ALREADY_EXISTS, 'URL already taken.');
+        }
+
+        await tx.team.create({
+          data: {
+            name: teamName,
+            url: teamUrl,
+            ownerUserId: user.id,
+            customerId,
+            members: {
+              create: [
+                {
+                  userId,
+                  role: TeamMemberRole.ADMIN,
+                },
+              ],
+            },
+          },
+        });
       });
 
       return {
@@ -105,6 +120,19 @@ export const createTeam = async ({
           url: teamUrl,
         },
       });
+
+      const existingUserProfileWithUrl = await tx.user.findUnique({
+        where: {
+          url: teamUrl,
+        },
+        select: {
+          id: true,
+        },
+      });
+
+      if (existingUserProfileWithUrl) {
+        throw new AppError(AppErrorCode.ALREADY_EXISTS, 'URL already taken.');
+      }
 
       if (existingTeamWithUrl) {
         throw new AppError(AppErrorCode.ALREADY_EXISTS, 'Team URL already exists.');

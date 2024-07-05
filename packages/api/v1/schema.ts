@@ -2,12 +2,16 @@ import { z } from 'zod';
 
 import { ZUrlSchema } from '@documenso/lib/schemas/common';
 import {
+  DocumentDataType,
   FieldType,
   ReadStatus,
   RecipientRole,
   SendStatus,
   SigningStatus,
+  TemplateType,
 } from '@documenso/prisma/client';
+
+export const ZNoBodyMutationSchema = null;
 
 /**
  * Documents
@@ -315,3 +319,106 @@ export const ZUnsuccessfulResponseSchema = z.object({
 });
 
 export type TUnsuccessfulResponseSchema = z.infer<typeof ZUnsuccessfulResponseSchema>;
+
+export const ZTemplateMetaSchema = z.object({
+  id: z.string(),
+  subject: z.string().nullish(),
+  message: z.string().nullish(),
+  timezone: z.string().nullish(),
+  dateFormat: z.string().nullish(),
+  templateId: z.number(),
+  redirectUrl: z.string().nullish(),
+});
+
+export const ZTemplateSchema = z.object({
+  id: z.number(),
+  type: z.nativeEnum(TemplateType),
+  title: z.string(),
+  userId: z.number(),
+  teamId: z.number().nullish(),
+  templateDocumentDataId: z.string(),
+  createdAt: z.date(),
+  updatedAt: z.date(),
+});
+
+export const ZRecipientSchema = z.object({
+  id: z.number(),
+  documentId: z.number().nullish(),
+  templateId: z.number().nullish(),
+  email: z.string().email().min(1),
+  name: z.string(),
+  token: z.string(),
+  documentDeletedAt: z.date().nullish(),
+  expired: z.date().nullish(),
+  signedAt: z.date().nullish(),
+  authOptions: z.unknown(),
+  role: z.nativeEnum(RecipientRole),
+  readStatus: z.nativeEnum(ReadStatus),
+  signingStatus: z.nativeEnum(SigningStatus),
+  sendStatus: z.nativeEnum(SendStatus),
+});
+
+export const ZFieldSchema = z.object({
+  id: z.number(),
+  secondaryId: z.string(),
+  documentId: z.number().nullish(),
+  templateId: z.number().nullish(),
+  recipientId: z.number(),
+  type: z.nativeEnum(FieldType),
+  page: z.number(),
+  positionX: z.unknown(),
+  positionY: z.unknown(),
+  width: z.unknown(),
+  height: z.unknown(),
+  customText: z.string(),
+  inserted: z.boolean(),
+});
+
+export const ZTemplateWithDataSchema = ZTemplateSchema.extend({
+  templateMeta: ZTemplateMetaSchema.nullish(),
+  directLink: z
+    .object({
+      token: z.string(),
+      enabled: z.boolean(),
+    })
+    .nullable(),
+  templateDocumentData: z.object({
+    id: z.string(),
+    type: z.nativeEnum(DocumentDataType),
+    data: z.string(),
+  }),
+  Field: ZFieldSchema.pick({
+    id: true,
+    recipientId: true,
+    type: true,
+    page: true,
+    positionX: true,
+    positionY: true,
+    width: true,
+    height: true,
+  }).array(),
+  Recipient: ZRecipientSchema.pick({
+    id: true,
+    email: true,
+    name: true,
+    authOptions: true,
+    role: true,
+  }).array(),
+});
+
+export const ZSuccessfulGetTemplateResponseSchema = ZTemplateWithDataSchema;
+
+export const ZSuccessfulDeleteTemplateResponseSchema = ZTemplateSchema;
+
+export const ZSuccessfulGetTemplatesResponseSchema = z.object({
+  templates: ZTemplateWithDataSchema.omit({
+    templateDocumentData: true,
+    templateMeta: true,
+  }).array(),
+  totalPages: z.number(),
+});
+
+export const ZGetTemplatesQuerySchema = z.object({
+  page: z.coerce.number().min(1).optional().default(1),
+  perPage: z.coerce.number().min(1).optional().default(1),
+});

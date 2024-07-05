@@ -34,9 +34,9 @@ type PasskeyData = {
 
 export type DocumentAuthContextValue = {
   executeActionAuthProcedure: (_value: ExecuteActionAuthProcedureOptions) => Promise<void>;
-  document: Document;
+  documentAuthOptions: Document['authOptions'];
   documentAuthOption: TDocumentAuthOptions;
-  setDocument: (_value: Document) => void;
+  setDocumentAuthOptions: (_value: Document['authOptions']) => void;
   recipient: Recipient;
   recipientAuthOption: TRecipientAuthOptions;
   setRecipient: (_value: Recipient) => void;
@@ -69,19 +69,19 @@ export const useRequiredDocumentAuthContext = () => {
 };
 
 export interface DocumentAuthProviderProps {
-  document: Document;
+  documentAuthOptions: Document['authOptions'];
   recipient: Recipient;
   user?: User | null;
   children: React.ReactNode;
 }
 
 export const DocumentAuthProvider = ({
-  document: initialDocument,
+  documentAuthOptions: initialDocumentAuthOptions,
   recipient: initialRecipient,
   user,
   children,
 }: DocumentAuthProviderProps) => {
-  const [document, setDocument] = useState(initialDocument);
+  const [documentAuthOptions, setDocumentAuthOptions] = useState(initialDocumentAuthOptions);
   const [recipient, setRecipient] = useState(initialRecipient);
 
   const [isCurrentlyAuthenticating, setIsCurrentlyAuthenticating] = useState(false);
@@ -95,10 +95,10 @@ export const DocumentAuthProvider = ({
   } = useMemo(
     () =>
       extractDocumentAuthMethods({
-        documentAuth: document.authOptions,
+        documentAuth: documentAuthOptions,
         recipientAuth: recipient.authOptions,
       }),
-    [document, recipient],
+    [documentAuthOptions, recipient],
   );
 
   const passkeyQuery = trpc.auth.findPasskeys.useQuery(
@@ -189,8 +189,8 @@ export const DocumentAuthProvider = ({
     <DocumentAuthContext.Provider
       value={{
         user,
-        document,
-        setDocument,
+        documentAuthOptions,
+        setDocumentAuthOptions,
         executeActionAuthProcedure,
         recipient,
         setRecipient,

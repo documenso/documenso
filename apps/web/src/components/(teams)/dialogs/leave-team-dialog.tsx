@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 
+import { NEXT_PUBLIC_WEBAPP_URL } from '@documenso/lib/constants/app';
 import { TEAM_MEMBER_ROLE_MAP } from '@documenso/lib/constants/teams';
 import type { TeamMemberRole } from '@documenso/prisma/client';
 import { trpc } from '@documenso/trpc/react';
@@ -22,11 +23,18 @@ import { useToast } from '@documenso/ui/primitives/use-toast';
 export type LeaveTeamDialogProps = {
   teamId: number;
   teamName: string;
+  teamAvatarImageId?: string | null;
   role: TeamMemberRole;
   trigger?: React.ReactNode;
 };
 
-export const LeaveTeamDialog = ({ trigger, teamId, teamName, role }: LeaveTeamDialogProps) => {
+export const LeaveTeamDialog = ({
+  trigger,
+  teamId,
+  teamName,
+  teamAvatarImageId,
+  role,
+}: LeaveTeamDialogProps) => {
   const [open, setOpen] = useState(false);
 
   const { toast } = useToast();
@@ -70,6 +78,7 @@ export const LeaveTeamDialog = ({ trigger, teamId, teamName, role }: LeaveTeamDi
         <Alert variant="neutral" padding="tight">
           <AvatarWithText
             avatarClass="h-12 w-12"
+            avatarSrc={`${NEXT_PUBLIC_WEBAPP_URL()}/api/avatar/${teamAvatarImageId}`}
             avatarFallback={teamName.slice(0, 1).toUpperCase()}
             primaryText={teamName}
             secondaryText={TEAM_MEMBER_ROLE_MAP[role]}

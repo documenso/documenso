@@ -2,6 +2,7 @@
   "extends": "./base.json",
   "compilerOptions": {
     "noEmit": true,
+    "allowUnreachableCode": true
   },
   "include": ["**/*.ts", "**/*.tsx", "**/*.d.ts", "**/*.json"],
   "exclude": ["dist", "build", "node_modules"]

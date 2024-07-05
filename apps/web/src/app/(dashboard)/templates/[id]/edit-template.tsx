@@ -256,6 +256,7 @@ export const EditTemplateForm = ({
               documentFlow={documentFlow.signers}
               recipients={recipients}
               fields={fields}
+              templateDirectLink={template.directLink}
               onSubmit={onAddTemplatePlaceholderFormSubmit}
               isEnterprise={isEnterprise}
               isDocumentPdfLoaded={isDocumentPdfLoaded}

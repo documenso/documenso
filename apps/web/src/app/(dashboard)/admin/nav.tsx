@@ -5,7 +5,7 @@ import type { HTMLAttributes } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 
-import { BarChart3, FileStack, Settings, User2, Wallet2 } from 'lucide-react';
+import { BarChart3, FileStack, Settings, Users, Wallet2 } from 'lucide-react';
 
 import { cn } from '@documenso/ui/lib/utils';
 import { Button } from '@documenso/ui/primitives/button';
@@ -46,7 +46,7 @@ export const AdminNav = ({ className, ...props }: AdminNavProps) => {
         asChild
       >
         <Link href="/admin/users">
-          <User2 className="mr-2 h-5 w-5" />
+          <Users className="mr-2 h-5 w-5" />
           Users
         </Link>
       </Button>

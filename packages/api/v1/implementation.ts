@@ -24,6 +24,9 @@ import { updateRecipient } from '@documenso/lib/server-only/recipient/update-rec
 import type { CreateDocumentFromTemplateResponse } from '@documenso/lib/server-only/template/create-document-from-template';
 import { createDocumentFromTemplate } from '@documenso/lib/server-only/template/create-document-from-template';
 import { createDocumentFromTemplateLegacy } from '@documenso/lib/server-only/template/create-document-from-template-legacy';
+import { deleteTemplate } from '@documenso/lib/server-only/template/delete-template';
+import { findTemplates } from '@documenso/lib/server-only/template/find-templates';
+import { getTemplateById } from '@documenso/lib/server-only/template/get-template-by-id';
 import { extractNextApiRequestMetadata } from '@documenso/lib/universal/extract-request-metadata';
 import { getFile } from '@documenso/lib/universal/upload/get-file';
 import { putPdfFile } from '@documenso/lib/universal/upload/put-file';
@@ -274,6 +277,73 @@ export const ApiContractV1Implementation = createNextRoute(ApiContractV1, {
           message: 'An error has occured while uploading the file',
         },
       };
+    }
+  }),
+
+  deleteTemplate: authenticatedMiddleware(async (args, user, team) => {
+    const { id: templateId } = args.params;
+
+    try {
+      const deletedTemplate = await deleteTemplate({
+        id: Number(templateId),
+        userId: user.id,
+        teamId: team?.id,
+      });
+
+      return {
+        status: 200,
+        body: deletedTemplate,
+      };
+    } catch (err) {
+      return {
+        status: 404,
+        body: {
+          message: 'Template not found',
+        },
+      };
+    }
+  }),
+
+  getTemplate: authenticatedMiddleware(async (args, user, team) => {
+    const { id: templateId } = args.params;
+
+    try {
+      const template = await getTemplateById({
+        id: Number(templateId),
+        userId: user.id,
+        teamId: team?.id,
+      });
+
+      return {
+        status: 200,
+        body: template,
+      };
+    } catch (err) {
+      return AppError.toRestAPIError(err);
+    }
+  }),
+
+  getTemplates: authenticatedMiddleware(async (args, user, team) => {
+    const page = Number(args.query.page) || 1;
+    const perPage = Number(args.query.perPage) || 10;
+
+    try {
+      const { templates, totalPages } = await findTemplates({
+        page,
+        perPage,
+        userId: user.id,
+        teamId: team?.id,
+      });
+
+      return {
+        status: 200,
+        body: {
+          templates,
+          totalPages,
+        },
+      };
+    } catch (err) {
+      return AppError.toRestAPIError(err);
     }
   }),
 

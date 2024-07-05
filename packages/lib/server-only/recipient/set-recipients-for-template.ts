@@ -3,6 +3,10 @@ import { prisma } from '@documenso/prisma';
 import type { Recipient } from '@documenso/prisma/client';
 import { RecipientRole } from '@documenso/prisma/client';
 
+import {
+  DIRECT_TEMPLATE_RECIPIENT_EMAIL,
+  DIRECT_TEMPLATE_RECIPIENT_NAME,
+} from '../../constants/template';
 import { AppError, AppErrorCode } from '../../errors/app-error';
 import {
   type TRecipientActionAuthTypes,
@@ -48,6 +52,9 @@ export const setRecipientsForTemplate = async ({
         },
       ],
     },
+    include: {
+      directLink: true,
+    },
   });
 
   if (!template) {
@@ -71,10 +78,21 @@ export const setRecipientsForTemplate = async ({
     }
   }
 
-  const normalizedRecipients = recipients.map((recipient) => ({
-    ...recipient,
-    email: recipient.email.toLowerCase(),
-  }));
+  const normalizedRecipients = recipients.map((recipient) => {
+    // Force replace any changes to the name or email of the direct recipient.
+    if (template.directLink && recipient.id === template.directLink.directTemplateRecipientId) {
+      return {
+        ...recipient,
+        email: DIRECT_TEMPLATE_RECIPIENT_EMAIL,
+        name: DIRECT_TEMPLATE_RECIPIENT_NAME,
+      };
+    }
+
+    return {
+      ...recipient,
+      email: recipient.email.toLowerCase(),
+    };
+  });
 
   const existingRecipients = await prisma.recipient.findMany({
     where: {
@@ -89,6 +107,27 @@ export const setRecipientsForTemplate = async ({
           recipient.id === existingRecipient.id || recipient.email === existingRecipient.email,
       ),
   );
+
+  if (template.directLink !== null) {
+    const updatedDirectRecipient = recipients.find(
+      (recipient) => recipient.id === template.directLink?.directTemplateRecipientId,
+    );
+
+    const deletedDirectRecipient = removedRecipients.find(
+      (recipient) => recipient.id === template.directLink?.directTemplateRecipientId,
+    );
+
+    if (updatedDirectRecipient?.role === RecipientRole.CC) {
+      throw new AppError(AppErrorCode.INVALID_BODY, 'Cannot set direct recipient as CC');
+    }
+
+    if (deletedDirectRecipient) {
+      throw new AppError(
+        AppErrorCode.INVALID_BODY,
+        'Cannot delete direct recipient while direct template exists',
+      );
+    }
+  }
 
   const linkedRecipients = normalizedRecipients.map((recipient) => {
     const existing = existingRecipients.find(
