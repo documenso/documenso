@@ -87,8 +87,6 @@ export const DocumentsPageView = async ({ searchParams = {}, team }: DocumentsPa
     return `${formatDocumentsPath(team?.url)}?${params.toString()}`;
   };
 
-  console.log(team?.avatarImageId);
-
   return (
     <div className="mx-auto w-full max-w-screen-xl px-4 md:px-8">
       <UploadDocument team={currentTeam} />
