@@ -12,6 +12,7 @@ import {
   EyeIcon,
   Loader,
   MoreHorizontal,
+  MoveRight,
   Pencil,
   Share,
   Trash2,
@@ -37,6 +38,7 @@ import { useToast } from '@documenso/ui/primitives/use-toast';
 import { ResendDocumentActionItem } from './_action-items/resend-document';
 import { DeleteDocumentDialog } from './delete-document-dialog';
 import { DuplicateDocumentDialog } from './duplicate-document-dialog';
+import { MoveDocumentDialog } from './move-document-dialog';
 
 export type DataTableActionDropdownProps = {
   row: Document & {
@@ -53,6 +55,7 @@ export const DataTableActionDropdown = ({ row, team }: DataTableActionDropdownPr
 
   const [isDeleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [isDuplicateDialogOpen, setDuplicateDialogOpen] = useState(false);
+  const [isMoveDialogOpen, setMoveDialogOpen] = useState(false);
 
   if (!session) {
     return null;
@@ -157,6 +160,14 @@ export const DataTableActionDropdown = ({ row, team }: DataTableActionDropdownPr
           Duplicate
         </DropdownMenuItem>
 
+        {/* We don't want to allow teams moving documents across at the moment. */}
+        {!team && (
+          <DropdownMenuItem onClick={() => setMoveDialogOpen(true)}>
+            <MoveRight className="mr-2 h-4 w-4" />
+            Move to Team
+          </DropdownMenuItem>
+        )}
+
         {/* No point displaying this if there's no functionality. */}
         {/* <DropdownMenuItem disabled>
           <XCircle className="mr-2 h-4 w-4" />
@@ -197,6 +208,12 @@ export const DataTableActionDropdown = ({ row, team }: DataTableActionDropdownPr
         onOpenChange={setDeleteDialogOpen}
         teamId={team?.id}
         canManageDocument={canManageDocument}
+      />
+
+      <MoveDocumentDialog
+        documentId={row.id}
+        open={isMoveDialogOpen}
+        onOpenChange={setMoveDialogOpen}
       />
 
       {isDuplicateDialogOpen && (
