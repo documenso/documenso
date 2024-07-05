@@ -59,12 +59,18 @@ export const templateRouter = router({
     .input(ZCreateDocumentFromDirectTemplateMutationSchema)
     .mutation(async ({ input, ctx }) => {
       try {
-        const { directRecipientEmail, directTemplateToken, signedFieldValues, templateUpdatedAt } =
-          input;
+        const {
+          directRecipientName,
+          directRecipientEmail,
+          directTemplateToken,
+          signedFieldValues,
+          templateUpdatedAt,
+        } = input;
 
         const requestMetadata = extractNextApiRequestMetadata(ctx.req);
 
         return await createDocumentFromDirectTemplate({
+          directRecipientName,
           directRecipientEmail,
           directTemplateToken,
           signedFieldValues,
