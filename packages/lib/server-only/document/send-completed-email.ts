@@ -42,6 +42,7 @@ export const sendCompletedEmail = async ({ documentId, requestMetadata }: SendDo
   }
 
   const isDirectTemplate = document?.source === DocumentSource.TEMPLATE_DIRECT_LINK;
+
   if (document.Recipient.length === 0) {
     throw new Error('Document has no recipients');
   }
@@ -125,7 +126,7 @@ export const sendCompletedEmail = async ({ documentId, requestMetadata }: SendDo
         customBody:
           isDirectTemplate && document.documentMeta?.message
             ? renderCustomEmailTemplate(document.documentMeta.message, customEmailTemplate)
-            : '',
+            : undefined,
       });
 
       await mailer.sendMail({
@@ -139,12 +140,10 @@ export const sendCompletedEmail = async ({ documentId, requestMetadata }: SendDo
           name: process.env.NEXT_PRIVATE_SMTP_FROM_NAME || 'Documenso',
           address: process.env.NEXT_PRIVATE_SMTP_FROM_ADDRESS || 'noreply@documenso.com',
         },
-        subject: isDirectTemplate
-          ? renderCustomEmailTemplate(
-              document.documentMeta?.subject || 'Signing Complete!',
-              customEmailTemplate,
-            )
-          : 'Signing Complete!',
+        subject:
+          isDirectTemplate && document.documentMeta?.subject
+            ? renderCustomEmailTemplate(document.documentMeta.subject, customEmailTemplate)
+            : 'Signing Complete!',
         html: render(template),
         text: render(template, { plainText: true }),
         attachments: [
