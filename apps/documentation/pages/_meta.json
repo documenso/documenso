@@ -43,13 +43,23 @@
     "type": "page",
     "display": "hidden"
   },
-  "documents": {
+  "signing-documents": {
     "title": "Documents",
     "type": "page",
     "display": "hidden"
   },
   "templates": {
     "title": "Templates",
+    "type": "page",
+    "display": "hidden"
+  },
+  "direct-links": {
+    "title": "Direct Links",
+    "type": "page",
+    "display": "hidden"
+  },
+  "profile": {
+    "title": "Documenso Profile",
     "type": "page",
     "display": "hidden"
   },
@@ -66,9 +76,9 @@
         "title": "First Steps",
         "href": "/get-started"
       },
-      "documents": {
+      "signing-documents": {
         "title": "Signing Documents",
-        "href": "/documents"
+        "href": "/signing-documents"
       },
       "templates": {
         "title": "Creating Templates",
@@ -77,6 +87,10 @@
       "direct-links": {
         "title": "Using Direct Links",
         "href": "/direct-links"
+      },
+      "profile": {
+        "title": "Discover your Profile",
+        "href": "/profile"
       },
       "signing-levels": {
         "title": "Signing Levels",
