@@ -68,7 +68,7 @@ export const UserWithDocumentChart = ({
         </div>
 
         <ResponsiveContainer width="100%" height={400}>
-          <BarChart className="bg-white" data={formattedData(data, completed)}>
+          <BarChart data={formattedData(data, completed)}>
             <XAxis dataKey="month" />
             <YAxis />
 

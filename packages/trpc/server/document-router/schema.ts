@@ -168,3 +168,8 @@ export const ZDownloadAuditLogsMutationSchema = z.object({
   documentId: z.number(),
   teamId: z.number().optional(),
 });
+
+export const ZMoveDocumentsToTeamSchema = z.object({
+  documentId: z.number(),
+  teamId: z.number(),
+});

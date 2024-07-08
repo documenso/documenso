@@ -35,6 +35,7 @@ export const ZDocumentAuditLogTypeSchema = z.enum([
   'DOCUMENT_RECIPIENT_COMPLETED', // When a recipient completes all their required tasks for the document.
   'DOCUMENT_SENT', // When the document transitions from DRAFT to PENDING.
   'DOCUMENT_TITLE_UPDATED', // When the document title is updated.
+  'DOCUMENT_MOVED_TO_TEAM', // When the document is moved to a team.
 ]);
 
 export const ZDocumentAuditLogEmailTypeSchema = z.enum([
@@ -410,6 +411,18 @@ export const ZDocumentAuditLogEventRecipientRemovedSchema = z.object({
   data: ZBaseRecipientDataSchema,
 });
 
+/**
+ * Event: Document moved to team.
+ */
+export const ZDocumentAuditLogEventDocumentMovedToTeamSchema = z.object({
+  type: z.literal(DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_MOVED_TO_TEAM),
+  data: z.object({
+    movedByUserId: z.number(),
+    fromPersonalAccount: z.boolean(),
+    toTeamId: z.number(),
+  }),
+});
+
 export const ZDocumentAuditLogBaseSchema = z.object({
   id: z.string(),
   createdAt: z.date(),
@@ -427,6 +440,7 @@ export const ZDocumentAuditLogSchema = ZDocumentAuditLogBaseSchema.and(
     ZDocumentAuditLogEventDocumentCompletedSchema,
     ZDocumentAuditLogEventDocumentCreatedSchema,
     ZDocumentAuditLogEventDocumentDeletedSchema,
+    ZDocumentAuditLogEventDocumentMovedToTeamSchema,
     ZDocumentAuditLogEventDocumentFieldInsertedSchema,
     ZDocumentAuditLogEventDocumentFieldUninsertedSchema,
     ZDocumentAuditLogEventDocumentGlobalAuthAccessUpdatedSchema,

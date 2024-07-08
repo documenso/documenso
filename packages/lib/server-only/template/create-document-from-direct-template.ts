@@ -39,6 +39,7 @@ import { sendDocument } from '../document/send-document';
 import { validateFieldAuth } from '../document/validate-field-auth';
 
 export type CreateDocumentFromDirectTemplateOptions = {
+  directRecipientName?: string;
   directRecipientEmail: string;
   directTemplateToken: string;
   signedFieldValues: TSignFieldWithTokenMutationSchema[];
@@ -57,6 +58,7 @@ type CreatedDirectRecipientField = {
 };
 
 export const createDocumentFromDirectTemplate = async ({
+  directRecipientName: initialDirectRecipientName,
   directRecipientEmail,
   directTemplateToken,
   signedFieldValues,
@@ -110,7 +112,7 @@ export const createDocumentFromDirectTemplate = async ({
       documentAuth: template.authOptions,
     });
 
-  const directRecipientName = user?.name;
+  const directRecipientName = user?.name || initialDirectRecipientName;
 
   // Ensure typesafety when we add more options.
   const isAccessAuthValid = match(derivedRecipientAccessAuth)
@@ -132,6 +134,8 @@ export const createDocumentFromDirectTemplate = async ({
 
   const metaTimezone = template.templateMeta?.timezone || DEFAULT_DOCUMENT_TIME_ZONE;
   const metaDateFormat = template.templateMeta?.dateFormat || DEFAULT_DOCUMENT_DATE_FORMAT;
+  const metaEmailMessage = template.templateMeta?.message || '';
+  const metaEmailSubject = template.templateMeta?.subject || '';
 
   // Associate, validate and map to a query every direct template recipient field with the provided fields.
   const createDirectRecipientFieldArgs = await Promise.all(
@@ -248,6 +252,14 @@ export const createDocumentFromDirectTemplate = async ({
                 token: nanoid(),
               };
             }),
+          },
+        },
+        documentMeta: {
+          create: {
+            timezone: metaTimezone,
+            dateFormat: metaDateFormat,
+            message: metaEmailMessage,
+            subject: metaEmailSubject,
           },
         },
       },
