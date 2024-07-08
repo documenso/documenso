@@ -76,8 +76,6 @@ export const moveDocumentToTeam = async ({
       }),
     });
 
-    console.log(log);
-
     return updatedDocument;
   });
 };
