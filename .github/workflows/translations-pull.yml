@@ -3,11 +3,10 @@
 name: 'Pull translations'
 
 on:
+  schedule:
+    - cron: '0 */2 * * *' # Every two hours.
   workflow_dispatch:
   workflow_call:
-  # Cron disabled until i18n PR is landed.
-  # schedule:
-  #   - cron: '0 */2 * * *' # Every two hours.
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.head_ref || github.run_id }}

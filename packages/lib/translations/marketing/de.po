@@ -1,0 +1,227 @@
+msgid ""
+msgstr ""
+"POT-Creation-Date: 2024-07-17 16:41+1000\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: @lingui/cli\n"
+"Language: de\n"
+"Project-Id-Version: \n"
+"Report-Msgid-Bugs-To: \n"
+"PO-Revision-Date: \n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"Plural-Forms: \n"
+
+#: apps/marketing/src/components/(marketing)/faster-smarter-beautiful-bento.tsx:30
+msgid "A 10x better signing experience."
+msgstr ""
+
+#: apps/marketing/src/components/(marketing)/faster-smarter-beautiful-bento.tsx:63
+msgid "Beautiful."
+msgstr ""
+
+#: apps/marketing/src/components/(marketing)/faster-smarter-beautiful-bento.tsx:65
+msgid "Because signing should be celebrated. That’s why we care about the smallest detail in our product."
+msgstr ""
+
+#: apps/marketing/src/components/(marketing)/footer.tsx:33
+#: apps/marketing/src/components/(marketing)/header.tsx:49
+#: apps/marketing/src/components/(marketing)/mobile-navigation.tsx:28
+msgid "Blog"
+msgstr ""
+
+#: apps/marketing/src/components/(marketing)/open-build-template-bento.tsx:60
+msgid "Build on top."
+msgstr ""
+
+#: apps/marketing/src/components/(marketing)/footer.tsx:40
+msgid "Careers"
+msgstr ""
+
+#: apps/marketing/src/components/(marketing)/footer.tsx:42
+msgid "Changelog"
+msgstr ""
+
+#: apps/marketing/src/components/(marketing)/open-build-template-bento.tsx:81
+msgid "Choose a template from the community app store. Or submit your own template for others to use."
+msgstr ""
+
+#: apps/marketing/src/components/(marketing)/share-connect-paid-widget-bento.tsx:61
+msgid "Connections"
+msgstr ""
+
+#: apps/marketing/src/components/(marketing)/share-connect-paid-widget-bento.tsx:63
+msgid "Create connections and automations with Zapier and more to integrate with your favorite tools."
+msgstr ""
+
+#: apps/marketing/src/components/(marketing)/open-build-template-bento.tsx:29
+msgid "Customise and expand."
+msgstr ""
+
+#: apps/marketing/src/components/(marketing)/footer.tsx:34
+msgid "Design"
+msgstr ""
+
+#: apps/marketing/src/components/(marketing)/carousel.tsx:37
+msgid "Direct Link"
+msgstr ""
+
+#: apps/marketing/src/components/(marketing)/hero.tsx:100
+msgid "Document signing,"
+msgstr ""
+
+#: apps/marketing/src/components/(marketing)/share-connect-paid-widget-bento.tsx:106
+msgid "Easily embed Documenso into your product. Simply copy and paste our react widget into your application."
+msgstr ""
+
+#: apps/marketing/src/components/(marketing)/share-connect-paid-widget-bento.tsx:42
+msgid "Easy Sharing (Soon)."
+msgstr ""
+
+#: apps/marketing/src/components/(marketing)/faster-smarter-beautiful-bento.tsx:41
+msgid "Fast."
+msgstr ""
+
+#: apps/marketing/src/components/(marketing)/faster-smarter-beautiful-bento.tsx:32
+msgid "Faster, smarter and more beautiful."
+msgstr ""
+
+#: apps/marketing/src/components/(marketing)/hero.tsx:102
+msgid "finally open source."
+msgstr ""
+
+#: apps/marketing/src/components/(marketing)/share-connect-paid-widget-bento.tsx:83
+msgid "Get paid (Soon)."
+msgstr ""
+
+#: apps/marketing/src/components/(marketing)/share-connect-paid-widget-bento.tsx:85
+msgid "Integrated payments with Stripe so you don’t have to worry about getting paid."
+msgstr ""
+
+#: apps/marketing/src/components/(marketing)/share-connect-paid-widget-bento.tsx:31
+msgid "Integrates with all your favourite tools."
+msgstr ""
+
+#: apps/marketing/src/components/(marketing)/open-build-template-bento.tsx:40
+msgid "It’s up to you. Either clone our repository or rely on our easy to use hosting solution."
+msgstr ""
+
+#: apps/marketing/src/components/(marketing)/open-build-template-bento.tsx:62
+msgid "Make it your own through advanced customization and adjustability."
+msgstr ""
+
+#: apps/marketing/src/components/(marketing)/callout.tsx:29
+#: apps/marketing/src/components/(marketing)/hero.tsx:119
+msgid "No Credit Card required"
+msgstr ""
+
+#: apps/marketing/src/components/(marketing)/open-build-template-bento.tsx:38
+msgid "Open Source or Hosted."
+msgstr ""
+
+#: apps/marketing/src/components/(marketing)/footer.tsx:35
+#: apps/marketing/src/components/(marketing)/header.tsx:56
+#: apps/marketing/src/components/(marketing)/mobile-navigation.tsx:36
+msgid "Open Startup"
+msgstr ""
+
+#: apps/marketing/src/components/(marketing)/footer.tsx:39
+msgid "OSS Friends"
+msgstr ""
+
+#: apps/marketing/src/components/(marketing)/faster-smarter-beautiful-bento.tsx:87
+msgid "Our custom templates come with smart rules that can help you save time and energy."
+msgstr ""
+
+#: apps/marketing/src/components/(marketing)/footer.tsx:31
+#: apps/marketing/src/components/(marketing)/header.tsx:42
+#: apps/marketing/src/components/(marketing)/mobile-navigation.tsx:32
+msgid "Pricing"
+msgstr ""
+
+#: apps/marketing/src/components/(marketing)/footer.tsx:41
+#: apps/marketing/src/components/(marketing)/mobile-navigation.tsx:49
+msgid "Privacy"
+msgstr ""
+
+#: apps/marketing/src/components/(marketing)/carousel.tsx:55
+msgid "Profile"
+msgstr ""
+
+#: apps/marketing/src/components/(marketing)/share-connect-paid-widget-bento.tsx:104
+msgid "React Widget (Soon)."
+msgstr ""
+
+#: apps/marketing/src/components/(marketing)/share-connect-paid-widget-bento.tsx:44
+msgid "Receive your personal link to share with everyone you care about."
+msgstr ""
+
+#: apps/marketing/src/components/(marketing)/i18n-switcher.tsx:47
+msgid "Search languages..."
+msgstr ""
+
+#: apps/marketing/src/components/(marketing)/share-connect-paid-widget-bento.tsx:33
+msgid "Send, connect, receive and embed everywhere."
+msgstr ""
+
+#: apps/marketing/src/components/(marketing)/footer.tsx:36
+msgid "Shop"
+msgstr ""
+
+#: apps/marketing/src/components/(marketing)/header.tsx:64
+#: apps/marketing/src/components/(marketing)/mobile-navigation.tsx:53
+msgid "Sign in"
+msgstr ""
+
+#: apps/marketing/src/components/(marketing)/header.tsx:69
+#: apps/marketing/src/components/(marketing)/mobile-navigation.tsx:57
+msgid "Sign up"
+msgstr ""
+
+#: apps/marketing/src/components/(marketing)/carousel.tsx:19
+msgid "Signing Process"
+msgstr ""
+
+#: apps/marketing/src/components/(marketing)/faster-smarter-beautiful-bento.tsx:85
+msgid "Smart."
+msgstr ""
+
+#: apps/marketing/src/components/(marketing)/hero.tsx:126
+msgid "Star on GitHub"
+msgstr ""
+
+#: apps/marketing/src/components/(marketing)/footer.tsx:37
+#: apps/marketing/src/components/(marketing)/mobile-navigation.tsx:40
+msgid "Status"
+msgstr ""
+
+#: apps/marketing/src/components/(marketing)/footer.tsx:38
+#: apps/marketing/src/components/(marketing)/mobile-navigation.tsx:44
+msgid "Support"
+msgstr ""
+
+#: apps/marketing/src/components/(marketing)/carousel.tsx:25
+msgid "Teams"
+msgstr ""
+
+#: apps/marketing/src/components/(marketing)/open-build-template-bento.tsx:79
+msgid "Template Store (Soon)."
+msgstr ""
+
+#: apps/marketing/src/components/(marketing)/open-build-template-bento.tsx:27
+msgid "Truly your own."
+msgstr ""
+
+#: apps/marketing/src/components/(marketing)/callout.tsx:27
+#: apps/marketing/src/components/(marketing)/hero.tsx:117
+msgid "Try our Free Plan"
+msgstr ""
+
+#: apps/marketing/src/components/(marketing)/faster-smarter-beautiful-bento.tsx:43
+msgid "When it comes to sending or receiving a contract, you can count on lightning-fast speeds."
+msgstr ""
+
+#: apps/marketing/src/components/(marketing)/carousel.tsx:258
+msgid "Your browser does not support the video tag."
+msgstr ""

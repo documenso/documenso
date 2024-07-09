@@ -45,6 +45,9 @@
         "^build"
       ],
       "cache": false
+    },
+    "translate:compile": {
+      "cache": false
     }
   },
   "globalDependencies": [
