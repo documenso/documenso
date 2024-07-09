@@ -2,6 +2,7 @@
 
 import React from 'react';
 
+import { Trans } from '@lingui/macro';
 import type { SelectProps } from '@radix-ui/react-select';
 import { InfoIcon } from 'lucide-react';
 
@@ -31,12 +32,18 @@ export const RecipientActionAuthSelect = (props: RecipientActionAuthSelectProps)
 
           <TooltipContent className="text-foreground max-w-md p-4">
             <h2>
-              <strong>Recipient action authentication</strong>
+              <strong>
+                <Trans>Recipient action authentication</Trans>
+              </strong>
             </h2>
 
-            <p>The authentication required for recipients to sign fields</p>
+            <p>
+              <Trans>The authentication required for recipients to sign fields</Trans>
+            </p>
 
-            <p className="mt-2">This will override any global settings.</p>
+            <p className="mt-2">
+              <Trans>This will override any global settings.</Trans>
+            </p>
 
             <ul className="ml-3.5 list-outside list-disc space-y-0.5 py-2">
               <li>

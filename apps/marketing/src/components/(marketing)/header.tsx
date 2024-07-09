@@ -6,8 +6,9 @@ import { useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 
+import { Trans } from '@lingui/macro';
+
 import LogoImage from '@documenso/assets/logo.png';
-import { useFeatureFlags } from '@documenso/lib/client-only/providers/feature-flag';
 import { cn } from '@documenso/ui/lib/utils';
 import { Button } from '@documenso/ui/primitives/button';
 
@@ -18,10 +19,6 @@ export type HeaderProps = HTMLAttributes<HTMLElement>;
 
 export const Header = ({ className, ...props }: HeaderProps) => {
   const [isHamburgerMenuOpen, setIsHamburgerMenuOpen] = useState(false);
-
-  const { getFlag } = useFeatureFlags();
-
-  const isSinglePlayerModeMarketingEnabled = getFlag('marketing_header_single_player_mode');
 
   return (
     <header className={cn('flex items-center justify-between', className)} {...props}>
@@ -35,15 +32,6 @@ export const Header = ({ className, ...props }: HeaderProps) => {
             height={25}
           />
         </Link>
-
-        {isSinglePlayerModeMarketingEnabled && (
-          <Link
-            href="/singleplayer"
-            className="bg-primary dark:text-background rounded-full px-2 py-1 text-xs font-semibold sm:px-3"
-          >
-            Try now!
-          </Link>
-        )}
       </div>
 
       <div className="hidden items-center gap-x-6 md:flex">
@@ -51,7 +39,7 @@ export const Header = ({ className, ...props }: HeaderProps) => {
           href="/pricing"
           className="text-muted-foreground hover:text-muted-foreground/80 text-sm font-semibold"
         >
-          Pricing
+          <Trans>Pricing</Trans>
         </Link>
 
         <Link
@@ -66,14 +54,14 @@ export const Header = ({ className, ...props }: HeaderProps) => {
           href="/blog"
           className="text-muted-foreground hover:text-muted-foreground/80 text-sm font-semibold"
         >
-          Blog
+          <Trans>Blog</Trans>
         </Link>
 
         <Link
           href="/open"
           className="text-muted-foreground hover:text-muted-foreground/80 text-sm font-semibold"
         >
-          Open Startup
+          <Trans>Open Startup</Trans>
         </Link>
 
         <Link
@@ -81,12 +69,12 @@ export const Header = ({ className, ...props }: HeaderProps) => {
           target="_blank"
           className="text-muted-foreground hover:text-muted-foreground/80 text-sm font-semibold"
         >
-          Sign in
+          <Trans>Sign in</Trans>
         </Link>
 
         <Button className="rounded-full" size="sm" asChild>
           <Link href="https://app.documenso.com/signup?utm_source=marketing-header" target="_blank">
-            Sign up
+            <Trans>Sign up</Trans>
           </Link>
         </Button>
       </div>

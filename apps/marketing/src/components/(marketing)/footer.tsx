@@ -5,6 +5,8 @@ import type { HTMLAttributes } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 
+import { msg } from '@lingui/macro';
+import { useLingui } from '@lingui/react';
 import { FaXTwitter } from 'react-icons/fa6';
 import { LiaDiscord } from 'react-icons/lia';
 import { LuGithub } from 'react-icons/lu';
@@ -12,6 +14,8 @@ import { LuGithub } from 'react-icons/lu';
 import LogoImage from '@documenso/assets/logo.png';
 import { cn } from '@documenso/ui/lib/utils';
 import { ThemeSwitcher } from '@documenso/ui/primitives/theme-switcher';
+
+import { I18nSwitcher } from '~/components/(marketing)/i18n-switcher';
 
 // import { StatusWidgetContainer } from './status-widget-container';
 
@@ -24,22 +28,24 @@ const SOCIAL_LINKS = [
 ];
 
 const FOOTER_LINKS = [
-  { href: '/pricing', text: 'Pricing' },
+  { href: '/pricing', text: msg`Pricing` },
   { href: '/singleplayer', text: 'Singleplayer' },
-  { href: 'https://docs.documenso.com', text: 'Documentation', target: '_blank' },
-  { href: 'mailto:support@documenso.com', text: 'Support', target: '_blank' },
-  { href: '/blog', text: 'Blog' },
-  { href: '/changelog', text: 'Changelog' },
-  { href: '/open', text: 'Open Startup' },
-  { href: '/design-system', text: 'Design' },
-  { href: 'https://shop.documenso.com', text: 'Shop', target: '_blank' },
-  { href: 'https://status.documenso.com', text: 'Status', target: '_blank' },
-  { href: '/oss-friends', text: 'OSS Friends' },
-  { href: '/careers', text: 'Careers' },
-  { href: '/privacy', text: 'Privacy' },
+  { href: 'https://docs.documenso.com', text: msg`Documentation`, target: '_blank' },
+  { href: 'mailto:support@documenso.com', text: msg`Support`, target: '_blank' },
+  { href: '/blog', text: msg`Blog` },
+  { href: '/changelog', text: msg`Changelog` },
+  { href: '/open', text: msg`Open Startup` },
+  { href: '/design-system', text: msg`Design` },
+  { href: 'https://shop.documenso.com', text: msg`Shop`, target: '_blank' },
+  { href: 'https://status.documenso.com', text: msg`Status`, target: '_blank' },
+  { href: '/oss-friends', text: msg`OSS Friends` },
+  { href: '/careers', text: msg`Careers` },
+  { href: '/privacy', text: msg`Privacy` },
 ];
 
 export const Footer = ({ className, ...props }: FooterProps) => {
+  const { _ } = useLingui();
+
   return (
     <div className={cn('border-t py-12', className)} {...props}>
       <div className="mx-auto flex w-full max-w-screen-xl flex-wrap items-start justify-between gap-8 px-8">
@@ -80,7 +86,7 @@ export const Footer = ({ className, ...props }: FooterProps) => {
               target={link.target}
               className="text-muted-foreground hover:text-muted-foreground/80 flex-shrink-0 break-words text-sm"
             >
-              {link.text}
+              {typeof link.text === 'string' ? link.text : _(link.text)}
             </Link>
           ))}
         </div>
@@ -90,8 +96,12 @@ export const Footer = ({ className, ...props }: FooterProps) => {
           © {new Date().getFullYear()} Documenso, Inc. All rights reserved.
         </p>
 
-        <div className="flex flex-wrap">
-          <ThemeSwitcher />
+        <div className="flex flex-row-reverse items-center sm:flex-row">
+          <I18nSwitcher className="text-muted-foreground ml-2 rounded-full font-normal sm:mr-2" />
+
+          <div className="flex flex-wrap">
+            <ThemeSwitcher />
+          </div>
         </div>
       </div>
     </div>

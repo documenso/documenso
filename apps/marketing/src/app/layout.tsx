@@ -6,6 +6,8 @@ import { AxiomWebVitals } from 'next-axiom';
 import { PublicEnvScript } from 'next-runtime-env';
 
 import { FeatureFlagProvider } from '@documenso/lib/client-only/providers/feature-flag';
+import { I18nClientProvider } from '@documenso/lib/client-only/providers/i18n.client';
+import { setupI18nSSR } from '@documenso/lib/client-only/providers/i18n.server';
 import { NEXT_PUBLIC_MARKETING_URL } from '@documenso/lib/constants/app';
 import { getAllAnonymousFlags } from '@documenso/lib/universal/get-feature-flag';
 import { TrpcProvider } from '@documenso/trpc/react';
@@ -54,9 +56,11 @@ export function generateMetadata() {
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
   const flags = await getAllAnonymousFlags();
 
+  const { lang, i18n } = setupI18nSSR();
+
   return (
     <html
-      lang="en"
+      lang={lang}
       className={cn(fontInter.variable, fontCaveat.variable)}
       suppressHydrationWarning
     >
@@ -65,6 +69,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
         <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
         <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
         <link rel="manifest" href="/site.webmanifest" />
+        <meta name="google" content="notranslate" />
         <PublicEnvScript />
       </head>
 
@@ -78,7 +83,11 @@ export default async function RootLayout({ children }: { children: React.ReactNo
         <FeatureFlagProvider initialFlags={flags}>
           <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
             <PlausibleProvider>
-              <TrpcProvider>{children}</TrpcProvider>
+              <TrpcProvider>
+                <I18nClientProvider initialLocale={lang} initialMessages={i18n.messages}>
+                  {children}
+                </I18nClientProvider>
+              </TrpcProvider>
             </PlausibleProvider>
           </ThemeProvider>
         </FeatureFlagProvider>

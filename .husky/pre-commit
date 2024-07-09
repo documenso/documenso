@@ -13,4 +13,9 @@ node "$MONOREPO_ROOT/scripts/copy-wellknown.cjs"
 git add "$MONOREPO_ROOT/apps/web/public/"
 git add "$MONOREPO_ROOT/apps/marketing/public/"
 
+echo "Extract and compile translations"
+npm run translate:extract
+npm run translate:compile
+git add "$MONOREPO_ROOT/packages/lib/translations/"
+
 npx lint-staged
