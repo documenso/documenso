@@ -59,6 +59,7 @@ declare namespace NodeJS {
     NEXT_PRIVATE_SMTP_APIKEY?: string;
 
     NEXT_PRIVATE_SMTP_SECURE?: string;
+    NEXT_PRIVATE_SMTP_UNSAFE_IGNORE_TLS?: string;
 
     NEXT_PRIVATE_SMTP_FROM_NAME?: string;
     NEXT_PRIVATE_SMTP_FROM_ADDRESS?: string;
