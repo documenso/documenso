@@ -2,7 +2,6 @@
   "index": "Get Started",
   "quickstart": "Developer Quickstart",
   "manual": "Manual Setup",
-  "docker": "Docker",
   "gitpod": "Gitpod",
   "signing-certificate": "Signing Certificate"
 }
