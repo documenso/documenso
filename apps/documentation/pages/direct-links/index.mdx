@@ -1,17 +1,49 @@
+---
+title: Direct Link Signing
+description: Create a shareable link for document signing
+---
+
 import { Callout, Steps } from 'nextra/components';
 
-If you send the same type of document often, reusable templates can help you save time and nerves.
+### Direct Link Signing
+
+Direct Link Signing allows you to create a shareable link for document signing, where recipients can fill in their information and sign directly. Once the recipients sign the document, they will get it in their email. Also, if they have an account, the document gets saved in their account.
 
 <Steps>
-### Select a Document
-#### Enable Diret Links
-#### Select the Recipient
-or create one
-### Add other recipients or roles based on your workflow
-### Add fields
-### Optional: [Add to your Profile](/profile)
 
-<Callout type="info">
-You can add templates with direct links to your public Documenso Profile to make them signable at any time.
-</Callout>
+### Select a Document
+
+Identify the template you want to share and make signable with a direct link. Then click on the 3 dots on the right side of the template and select `Direct link`.
+
+![Template page in the Documenso dashboard](/direct-links/document-direct-link-documenso.webp)
+
+### Enable Direct Links
+
+Once you click on `Direct link`, you will be greeted with a modal where you can learn how direct links work. After reading the information, click `Enable direct link` to proceed.
+
+![Enable the document direct link in the Documenso dashboard](/direct-links/enable-document-direct-link-modal.webp)
+
+### Select the Recipient
+
+The next step is to select the recipient for the direct link. You can select an existing recipient or click the "Create one automatically" button to create a new direct link recipient.
+
+![Choose the Direct Link recipient](/direct-links/choose-direct-link-recipient-documenso.webp)
+
+### Send the Link
+
+After selecting the recipient, you will get a direct link to share with the recipient. The format of the link is as follows:
+
+```bash
+https://app.documenso.com/d/<random-generated-string>
+
+# Example
+https://app.documenso.com/d/5f7b1b7bPU2paXG0Ka981
+```
+
+### Optional: Add Templates to Your Profile
+
+You can add templates with direct links to your public [Documenso profile](/profile) to make them signable anytime.
+
+![Choose the Direct Link recipient](/direct-links/documenso-profile.webp)
+
 </Steps>
