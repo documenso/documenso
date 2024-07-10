@@ -3,7 +3,7 @@
 import { isUserEnterprise } from '@documenso/ee/server-only/util/is-document-enterprise';
 import type { RequestMetadata } from '@documenso/lib/universal/extract-request-metadata';
 import { prisma } from '@documenso/prisma';
-import type { TemplateMeta } from '@documenso/prisma/client';
+import type { Template, TemplateMeta } from '@documenso/prisma/client';
 
 import { AppError, AppErrorCode } from '../../errors/app-error';
 import type { TDocumentAccessAuthTypes, TDocumentActionAuthTypes } from '../../types/document-auth';
@@ -17,6 +17,9 @@ export type UpdateTemplateSettingsOptions = {
     title?: string;
     globalAccessAuth?: TDocumentAccessAuthTypes | null;
     globalActionAuth?: TDocumentActionAuthTypes | null;
+    publicTitle?: string;
+    publicDescription?: string;
+    type?: Template['type'];
   };
   meta?: Partial<Omit<TemplateMeta, 'id' | 'templateId'>>;
   requestMetadata?: RequestMetadata;
@@ -29,7 +32,7 @@ export const updateTemplateSettings = async ({
   meta,
   data,
 }: UpdateTemplateSettingsOptions) => {
-  if (!data.title && !data.globalAccessAuth && !data.globalActionAuth) {
+  if (Object.values(data).length === 0) {
     throw new AppError(AppErrorCode.INVALID_BODY, 'Missing data to update');
   }
 
@@ -60,30 +63,6 @@ export const updateTemplateSettings = async ({
   const { documentAuthOption } = extractDocumentAuthMethods({
     documentAuth: template.authOptions,
   });
-
-  const { templateMeta } = template;
-
-  const isDateSame = (templateMeta?.dateFormat || null) === (meta?.dateFormat || null);
-  const isMessageSame = (templateMeta?.message || null) === (meta?.message || null);
-  const isPasswordSame = (templateMeta?.password || null) === (meta?.password || null);
-  const isSubjectSame = (templateMeta?.subject || null) === (meta?.subject || null);
-  const isRedirectUrlSame = (templateMeta?.redirectUrl || null) === (meta?.redirectUrl || null);
-  const isTimezoneSame = (templateMeta?.timezone || null) === (meta?.timezone || null);
-
-  // Early return to avoid unnecessary updates.
-  if (
-    template.title === data.title &&
-    data.globalAccessAuth === documentAuthOption.globalAccessAuth &&
-    data.globalActionAuth === documentAuthOption.globalActionAuth &&
-    isDateSame &&
-    isMessageSame &&
-    isPasswordSame &&
-    isSubjectSame &&
-    isRedirectUrlSame &&
-    isTimezoneSame
-  ) {
-    return template;
-  }
 
   const documentGlobalAccessAuth = documentAuthOption?.globalAccessAuth ?? null;
   const documentGlobalActionAuth = documentAuthOption?.globalActionAuth ?? null;
@@ -120,6 +99,9 @@ export const updateTemplateSettings = async ({
     },
     data: {
       title: data.title,
+      type: data.type,
+      publicDescription: data.publicDescription,
+      publicTitle: data.publicTitle,
       authOptions,
       templateMeta: {
         upsert: {

@@ -1,0 +1,75 @@
+---
+title: Changelog - Documenso
+---
+
+# Changelog
+
+Check out what's new in the latest version and read our thoughts on it. For more technical details, you can find our releases on GitHub [here](https://github.com/documenso/documenso/releases). You can find our [release candidates here](https://github.com/documenso/documenso/tags).
+
+---
+
+## v1.5.6 (latest)
+
+### <small>Released 28th June 2024</small>
+
+> This release contains [11 fixes](https://github.com/documenso/documenso/releases/tag/v1.5.6)
+
+### 🕗 Show Creation Time
+
+We are now displaying the document creation time in the documents view. This allows for easier identification of multiple documents created on the same day.
+
+### 🔗 Direct Template Links
+
+With this release, we are introducing direct link templates. This allows you to statically link to any template and let anyone with the link sign it at any time. A new document is created in your account when a template is signed. Templates with direct links still support all other template features, allowing you to create intricate workflows triggered by the signers.
+
+Learn more about Direct Links [on our blog](https://documenso.com/blog/announcing-direct-links) or try them by signing the [Documenso Supporters Pledge](https://documen.so/pledge).
+
+### 🛂 OpenID Connect (OIDC) Support
+
+Thanks to [Matt Kilgore](https://github.com/tankerkiller125), Documenso now supports OIDC as an authentication provider. This allows self-hosted users to define whatever identity provider they want as long as it supports the OIDC. Azure, Zitadel, Authentik, KeyCloak, and Google all support OIDC.
+
+---
+
+## v1.5.5
+
+### <small>Released 6th May 2024</small>
+
+> This release contains [20 fixes](https://github.com/documenso/documenso/releases/tag/v1.5.5)
+
+### ✅ Show Completed Fields
+
+Fields completed by other recipients are now visible to everyone to communicate the state of the document better and allow users an informed decision on what they are signing.
+
+### ⬇️ Download Completed Documents via API
+
+Completed documents can now be downloaded via the API using this new endpoint:
+
+**GET /API/V1//DOCUMENTS/\{ID\}/DOWNLOAD**
+
+Check out the full Open API docs here: [https://documen.so/openapi](https://documen.so/openapi)
+
+### ➕ Adding Yourself as a Signer
+
+Adding yourself as a signer is now just one click away.
+
+---
+
+## v1.5.4
+
+### <small>Released 11th April 2024</small>
+
+> This release contains [21 fixes](https://github.com/documenso/documenso/releases/tag/v1.5.4)
+
+#### 🔑 Passkeys
+
+To improve security and usability for high-security setups, we added passkeys with this release. Passkeys can now be used to log in or re-authenticate each signature for high-compliance cases.
+
+#### 📄 Signing Certificate & Audit Log
+
+On the security/ compliance side, we also added Signing Certificates and Audit Logs. Every signed document now has a certificate attached, showing technical details of the signature to improve transparency and security. Further, every action on a document from creation to completion is now logged in the audit log to guarantee the integrity of the process.
+
+#### 🔏🦀 @documenso/pdf-sign
+
+We are pretty hyped about this one: Since version 0.9, we relied on https://github.com/vbuch/node-signpdf to add the digital signatures to our documents. Since signing is at the heart of Documenso, we created our own rust-based library for signing. As of 1.5.4, Documenso's signing runs on @documenso/pdf-sign. The library offers a better architecture to enable signing with private keys that are not stored locally (e.g. via HSM). We are in the process of cleaning up the library to open source it like the rest of Documenso 🌱 The library will also help us to offer Long Term Validation (LTV) for signatures soon. While we are currently limited to signing with PKCS7-B, eventually, we plan to support all common signing standards like PAdES, CAdES, and XAdES.
+
+---
