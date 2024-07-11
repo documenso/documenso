@@ -10,7 +10,7 @@ import { cn } from '@documenso/ui/lib/utils';
 import { Card, CardContent, CardTitle } from '@documenso/ui/primitives/card';
 
 export const Wrapper = ({ children }) => {
-  return <div className="p-20">{children}</div>;
+  return <div className="mt-20">{children}</div>;
 };
 
 <Wrapper>
@@ -21,48 +21,44 @@ export const Wrapper = ({ children }) => {
   <span className="-mt-1 text-lg">Document signing, finally open source</span>
 </div>
 
-<div className="mt-6 grid grid-cols-2 gap-8 md:mt-8">
-<Link href="/get-started">
-        <Card className="col-span-2 lg:col-span-1 border border-border">
-          <CardContent className="grid grid-cols-1 gap-8 p-6 max-h-[460px]">
-            <span className="text-foreground/80 leading-relaxed">
-              <strong className="block">Learn</strong>
-              Learn how to get started with your account and leverage our advanced features to level up your productivity.
-            </span>
+<div className="mt-6 grid grid-cols-1 md:grid-cols-2 gap-8 md:mt-8">
+  <Link href="/users">
+    <Card className="col-span-2 lg:col-span-1 border border-border h-full">
+      <CardContent className="grid grid-cols-1 gap-8 p-6 max-h-[460px]">
+        <span className="text-foreground/80 leading-relaxed">
+          <strong className="block">Learn</strong>
+          Learn how to get started with your account and leverage our advanced features to level up your productivity.
+        </span>
+        <div className="flex items-center justify-center p-8 flex-grow">
+          <Image
+            src={cardBeautifulFigure}
+            alt="its fast"
+            className="w-full max-w-xs dark:contrast-[70%] dark:hue-rotate-180 dark:invert"
+          />
+        </div>
+      </CardContent>
+    </Card>
+  </Link>
 
-            <div className="flex items-center justify-center p-8">
-              <Image
-                src={cardBeautifulFigure}
-                alt="its fast"
-                className="w-full max-w-xs dark:contrast-[70%] dark:hue-rotate-180 dark:invert"
-              />
-            </div>
-          </CardContent>
-        </Card>
-
-</Link>
-
-<Link href='/local-development'>
-        <Card className="col-span-2 lg:col-span-1 border border-border">
-          <CardContent className="grid grid-cols-1 gap-8 p-6 max-h-[460px]">
-            <span className="text-foreground/80 leading-relaxed">
-              <strong className="block">Build</strong>
-              Everything you need to set up your local development environment.
-              Use our API and utilize webhooks for seamless integration.
-            </span>
-
-            <div className="flex items-center justify-center p-8">
-              <Image
-                src={cardConnectionsFigure}
-                alt="its fast"
-                className="w-full max-w-sm dark:contrast-[70%] dark:hue-rotate-180 dark:invert"
-              />
-            </div>
-          </CardContent>
-        </Card>
-
-</Link>
-      </div>
+  <Link href='/developers'>
+    <Card className="col-span-2 lg:col-span-1 border border-border h-full">
+      <CardContent className="grid grid-cols-1 gap-8 p-6 max-h-[460px]">
+        <span className="text-foreground/80 leading-relaxed">
+          <strong className="block">Build</strong>
+          Everything you need to set up your local development environment.
+          Use our API and utilize webhooks for seamless integration.
+        </span>
+        <div className="flex items-center justify-center p-8 flex-grow">
+          <Image
+            src={cardConnectionsFigure}
+            alt="its fast"
+            className="w-full max-w-sm dark:contrast-[70%] dark:hue-rotate-180 dark:invert"
+          />
+        </div>
+      </CardContent>
+    </Card>
+  </Link>
+</div>
 
 ## About Documenso
 

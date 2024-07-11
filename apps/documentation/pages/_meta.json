@@ -1,142 +1,17 @@
 {
   "index": {
+    "type": "page",
     "title": "Home",
+    "display": "hidden",
+    "layout": "full"
+  },
+  "developers": {
     "type": "page",
-    "theme": {
-      "layout": "full",
-      "sidebar": false
-    },
-    "display": "hidden"
+    "title": "Developers"
   },
-  "get-started": {
-    "title": "Get Started",
+  "users": {
     "type": "page",
-    "display": "hidden"
-  },
-  "public-api": {
-    "title": "API",
-    "type": "page",
-    "display": "hidden"
-  },
-  "webhooks": {
-    "title": "Webhooks",
-    "type": "page",
-    "display": "hidden"
-  },
-  "local-development": {
-    "title": "Local Development",
-    "type": "page",
-    "display": "hidden"
-  },
-  "release-notes": {
-    "title": "Release Notes",
-    "type": "page",
-    "display": "hidden"
-  },
-  "licenses": {
-    "title": "Licenses",
-    "type": "page",
-    "display": "hidden"
-  },
-  "self-hosting": {
-    "title": "Self Hosting",
-    "type": "page",
-    "display": "hidden"
-  },
-  "signing-documents": {
-    "title": "Documents",
-    "type": "page",
-    "display": "hidden"
-  },
-  "templates": {
-    "title": "Templates",
-    "type": "page",
-    "display": "hidden"
-  },
-  "direct-links": {
-    "title": "Direct Links",
-    "type": "page",
-    "display": "hidden"
-  },
-  "profile": {
-    "title": "Documenso Profile",
-    "type": "page",
-    "display": "hidden"
-  },
-  "contributing": {
-    "title": "Contributing Guide",
-    "type": "page",
-    "display": "hidden"
-  },
-  "user": {
-    "title": "Learn",
-    "type": "menu",
-    "items": {
-      "first-steps": {
-        "title": "First Steps",
-        "href": "/get-started"
-      },
-      "signing-documents": {
-        "title": "Signing Documents",
-        "href": "/signing-documents"
-      },
-      "templates": {
-        "title": "Creating Templates",
-        "href": "/templates"
-      },
-      "direct-links": {
-        "title": "Using Direct Links",
-        "href": "/direct-links"
-      },
-      "profile": {
-        "title": "Discover your Profile",
-        "href": "/profile"
-      },
-      "signing-levels": {
-        "title": "Signing Levels",
-        "href": "/signing-levels"
-      },
-      "compliance": {
-        "title": "Compliance",
-        "href": "/compliance"
-      }
-    }
-  },
-  "developer": {
-    "title": "Build",
-    "type": "menu",
-    "items": {
-      "local-development": {
-        "title": "Local Development",
-        "href": "/local-development"
-      },
-      "contributing": {
-        "title": "Contributing Guide",
-        "href": "/contributing"
-      },
-      "public-api": {
-        "title": "API",
-        "href": "/public-api"
-      },
-      "webhooks": {
-        "title": "Webhooks",
-        "href": "/webhooks"
-      }
-    }
-  },
-  "host": {
-    "title": "Host",
-    "type": "menu",
-    "items": {
-      "local-development": {
-        "title": "Licenses",
-        "href": "/licenses"
-      },
-      "self-hosting": {
-        "title": "Self Hosting",
-        "href": "/self-hosting"
-      }
-    }
+    "title": "Users"
   },
   "updates": {
     "title": "What's New",
@@ -153,13 +28,5 @@
         "newWindow": true
       }
     }
-  },
-  "---": {
-    "type": "separator"
-  },
-  "GitHub": {
-    "title": "View on GitHub",
-    "href": "https://documen.so/github",
-    "newWindow": true
   }
 }
