@@ -77,6 +77,22 @@ export default async function auth(req: NextApiRequest, res: NextApiResponse) {
           });
         }
 
+        // auto set public profile name
+        if (account.provider === 'oidc' && user.name && 'url' in user && !user.url) {
+          let sanitizedPublicUrl = user.name?.replace(' ', '');
+          let counter = 1;
+          while (await prisma.user.findFirst({ where: { url: sanitizedPublicUrl } })) {
+            sanitizedPublicUrl = `${sanitizedPublicUrl}${counter}`;
+            counter++;
+          }
+          await prisma.user.update({
+            where: { id: userId },
+            data: {
+              url: sanitizedPublicUrl,
+            },
+          });
+        }
+
         await prisma.userSecurityAuditLog.create({
           data: {
             userId,
