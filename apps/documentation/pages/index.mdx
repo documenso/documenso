@@ -14,57 +14,59 @@ export const Wrapper = ({ children }) => {
 };
 
 <Wrapper>
+  <div
+    className="fixed inset-0 -z-10 bg-center -mt-[15vh] h-full scale-125 object-cover dark:contrast-[70%] dark:invert dark:sepia md:scale-150 lg:scale-[175%] opacity-40 dark:opacity-20"
+    style={{
+      backgroundImage: `url('${backgroundPattern.src}')`,
+    }}
+  />
+  <div className="flex flex-col items-center mb-16">
+    <span className="text-center text-4xl font-bold leading-tight tracking-tight md:text-[48px] lg:text-[64px]">Document signing, finally open source</span>
+    {/* <span className="-mt-1 text-lg">Document signing, finally open source</span> */}
+    <span className="text-muted-foreground mx-auto mt-4 max-w-2xl text-center leading-normal tracking-tight">Documenso aims to be the world's most trusted document-signing tool. Join us in creating the next generation of open trust infrastructure.</span>
 
-<div className="flex flex-col items-center mb-16">
-  # <span className="text-center text-4xl font-bold leading-tight tracking-tight md:text-[48px] lg:text-[64px]">Documenso Docs</span>
+  </div>
 
-  <span className="-mt-1 text-lg">Document signing, finally open source</span>
-</div>
+  <div className="mt-6 grid grid-cols-1 md:grid-cols-2 gap-8 md:mt-8">
+    <Link href="/users">
+      <Card className="col-span-2 lg:col-span-1 h-full dark:bg-stone-900/70 dark:border dark:border-stone-700">
+        <CardContent className="grid grid-cols-1 gap-8 p-6 max-h-[460px]">
+          <span className="text-foreground/80 leading-relaxed">
+            <strong className="block">Learn</strong>
+            Learn how to get started with your account and leverage our advanced features to level up your productivity.
+          </span>
+          <div className="flex items-center justify-center p-8 flex-grow">
+            <Image
+              src={cardBeautifulFigure}
+              alt="its fast"
+              className="w-full max-w-xs dark:contrast-[70%] dark:hue-rotate-180 dark:invert"
+            />
+          </div>
+        </CardContent>
+      </Card>
+    </Link>
 
-<div className="mt-6 grid grid-cols-1 md:grid-cols-2 gap-8 md:mt-8">
-  <Link href="/users">
-    <Card className="col-span-2 lg:col-span-1 border border-border h-full">
-      <CardContent className="grid grid-cols-1 gap-8 p-6 max-h-[460px]">
-        <span className="text-foreground/80 leading-relaxed">
-          <strong className="block">Learn</strong>
-          Learn how to get started with your account and leverage our advanced features to level up your productivity.
-        </span>
-        <div className="flex items-center justify-center p-8 flex-grow">
-          <Image
-            src={cardBeautifulFigure}
-            alt="its fast"
-            className="w-full max-w-xs dark:contrast-[70%] dark:hue-rotate-180 dark:invert"
-          />
-        </div>
-      </CardContent>
-    </Card>
-  </Link>
+    <Link href='/developers'>
+      <Card className="col-span-2 lg:col-span-1 h-full dark:bg-stone-900/70 dark:border dark:border-stone-700">
+        <CardContent className="grid grid-cols-1 gap-8 p-6 max-h-[460px]">
+          <span className="text-foreground/80 leading-relaxed">
+            <strong className="block">Build</strong>
+            Everything you need to set up your local development environment.
+            Use our API and utilize webhooks for seamless integration.
+          </span>
+          <div className="flex items-center justify-center p-8 flex-grow">
+            <Image
+              src={cardConnectionsFigure}
+              alt="its fast"
+              className="w-full max-w-sm dark:contrast-[70%] dark:hue-rotate-180 dark:invert"
+            />
+          </div>
+        </CardContent>
+      </Card>
+    </Link>
 
-  <Link href='/developers'>
-    <Card className="col-span-2 lg:col-span-1 border border-border h-full">
-      <CardContent className="grid grid-cols-1 gap-8 p-6 max-h-[460px]">
-        <span className="text-foreground/80 leading-relaxed">
-          <strong className="block">Build</strong>
-          Everything you need to set up your local development environment.
-          Use our API and utilize webhooks for seamless integration.
-        </span>
-        <div className="flex items-center justify-center p-8 flex-grow">
-          <Image
-            src={cardConnectionsFigure}
-            alt="its fast"
-            className="w-full max-w-sm dark:contrast-[70%] dark:hue-rotate-180 dark:invert"
-          />
-        </div>
-      </CardContent>
-    </Card>
-  </Link>
-</div>
-
-## About Documenso
-
-Signing documents digitally should be fast and easy and should be the best practice for every document signed worldwide. This is technically quite easy today, but it also introduces a new party to every signature: The signing tool providers. While this is not a problem in itself, it should make us think about how we want these providers of trust to work. Documenso aims to be the world's most trusted document-signing tool. This trust is built by empowering you to self-host Documenso and review how it works under the hood.
-
-Join us in creating the next generation of open trust infrastructure.
+  </div>
+</Wrapper>
 
 ## Tech Stack
 
@@ -114,5 +116,3 @@ Join us in creating the next generation of open trust infrastructure.
     />
   </a>
 </div>
-
-</Wrapper>
