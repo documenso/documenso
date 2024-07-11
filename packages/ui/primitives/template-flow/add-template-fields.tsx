@@ -190,7 +190,7 @@ export const combinedStyles = {
 };
 
 export const colorClasses: CombinedStylesKey[] = [
-  'orange-500',
+  'green',
   'green-500',
   'cyan-500',
   'blue-500',

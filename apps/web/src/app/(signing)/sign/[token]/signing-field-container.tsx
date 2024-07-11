@@ -129,8 +129,8 @@ export const SigningFieldContainer = ({
         )}
 
         {readOnlyField && (
-          <button className="bg-background/40 absolute inset-0 z-10 flex h-full w-full items-center justify-center rounded-md text-sm opacity-0 backdrop-blur-sm duration-200 group-hover:opacity-100">
-            <span className="bg-foreground/50 dark:bg-background/50 text-background dark:text-foreground rounded-xl p-2 backdrop-blur-3xl">
+          <button className="bg-background/40 absolute inset-0 z-10 flex h-full w-full items-center justify-center rounded-md text-sm opacity-0 duration-200 group-hover:opacity-100">
+            <span className="bg-foreground/50 dark:bg-background/50 text-background dark:text-foreground rounded-xl p-2">
               Read only field
             </span>
           </button>
@@ -140,7 +140,7 @@ export const SigningFieldContainer = ({
           <Tooltip delayDuration={0}>
             <TooltipTrigger asChild>
               <button
-                className="text-destructive bg-background/40 absolute inset-0 z-10 flex h-full w-full items-center justify-center rounded-md text-sm opacity-0 backdrop-blur-sm duration-200 group-hover:opacity-100"
+                className="text-destructive bg-background/40 absolute inset-0 z-10 flex h-full w-full items-center justify-center rounded-md text-sm opacity-0 duration-200 group-hover:opacity-100"
                 onClick={onRemoveSignedFieldClick}
               >
                 Remove
@@ -164,7 +164,7 @@ export const SigningFieldContainer = ({
 
         {type !== 'Date' && type !== 'Checkbox' && field.inserted && !loading && !readOnlyField && (
           <button
-            className="text-destructive bg-background/50 absolute inset-0 z-10 flex h-full w-full items-center justify-center rounded-md text-sm opacity-0 backdrop-blur-sm duration-200 group-hover:opacity-100"
+            className="text-destructive bg-background/50 absolute inset-0 z-10 flex h-full w-full items-center justify-center rounded-md text-sm opacity-0 duration-200 group-hover:opacity-100"
             onClick={onRemoveSignedFieldClick}
           >
             Remove

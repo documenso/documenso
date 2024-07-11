@@ -1,7 +1,5 @@
 import { ZRadioFieldMeta } from '@documenso/lib/types/field-meta';
 import type { TRadioFieldMeta } from '@documenso/lib/types/field-meta';
-import { cn } from '@documenso/ui/lib/utils';
-import { Card, CardContent } from '@documenso/ui/primitives/card';
 import { Label } from '@documenso/ui/primitives/label';
 import { RadioGroup, RadioGroupItem } from '@documenso/ui/primitives/radio-group';
 
@@ -28,37 +26,21 @@ export const RadioField = ({ field }: RadioFieldProps) => {
   }
 
   return (
-    <div>
+    <div className='flex flex-col gap-y-2'>
       {!parsedFieldMeta?.values ? (
         <FieldIcon fieldMeta={field.fieldMeta} type={field.type} signerEmail={field.signerEmail} />
       ) : (
         <RadioGroup>
           {parsedFieldMeta.values?.map((item, index) => (
-            <Card
-              id={String(index)}
-              key={index}
-              className={cn('m-1 flex items-center justify-center p-2', {
-                'border-documenso ring-documenso-200 ring-offset-documenso-200 bg-documenso/20 ring-2 ring-offset-2':
-                  item.checked,
-              })}
-            >
-              <CardContent
-                className={cn(
-                  'text-muted-foreground hover:shadow-primary-foreground group flex h-full w-full flex-row items-center space-x-2 p-2',
-                  {
-                    'hover:text-foreground/80 dark:text-background/70': item.checked,
-                  },
-                )}
-              >
-                <RadioGroupItem
-                  className="data-[state=checked]:bg-documenso border-foreground/30 data-[state=checked]:ring-documenso h-5 w-5 rounded-full data-[state=checked]:ring-1 data-[state=checked]:ring-offset-2 data-[state=checked]:ring-offset-white dark:data-[state=checked]:ring-offset-white"
-                  value={item.value}
-                  id={`option-${index}`}
-                  checked={item.checked}
-                />
-                <Label htmlFor={`option-${index}`}>{item.value}</Label>
-              </CardContent>
-            </Card>
+            <div key={index} className="flex items-center gap-x-1.5">
+              <RadioGroupItem
+                className="pointer-events-none"
+                value={item.value}
+                id={`option-${index}`}
+                checked={item.checked}
+              />
+              <Label htmlFor={`option-${index}`}>{item.value}</Label>
+            </div>
           ))}
         </RadioGroup>
       )}

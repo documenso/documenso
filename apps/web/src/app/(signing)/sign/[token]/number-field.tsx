@@ -213,9 +213,11 @@ export const NumberField = ({ field, recipient, onSignField, onUnsignField }: Nu
     }
   }, []);
 
-  const fieldDisplayName = parsedFieldMeta?.label
-    ? parsedFieldMeta.label.substring(0, 20) + '...'
-    : 'Add number';
+  let fieldDisplayName = 'Number';
+
+  if (parsedFieldMeta?.label) {
+    fieldDisplayName = parsedFieldMeta.label.length > 10 ? parsedFieldMeta.label.substring(0, 10) + '...' : parsedFieldMeta.label;
+  }
 
   const userInputHasErrors = Object.values(errors).some((error) => error.length > 0);
 
@@ -243,8 +245,8 @@ export const NumberField = ({ field, recipient, onSignField, onUnsignField }: Nu
             },
           )}
         >
-          <span className="flex items-center justify-center gap-x-1">
-            <Hash /> {fieldDisplayName}
+          <span className="flex items-center justify-center gap-x-1 text-sm">
+            <Hash className='h-4 w-4' /> {fieldDisplayName}
           </span>
         </p>
       )}

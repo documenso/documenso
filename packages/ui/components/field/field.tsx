@@ -82,7 +82,9 @@ export function FieldContainerPortal({
   const style = {
     top: `${coords.y}px`,
     left: `${coords.x}px`,
-    ...((!isCheckboxOrRadioField || isFieldSigned) && {
+    // height: `${coords.height}px`,
+    // width: `${coords.width}px`,
+    ...((!isCheckboxOrRadioField) && {
       height: `${coords.height}px`,
       width: `${coords.width}px`,
     }),

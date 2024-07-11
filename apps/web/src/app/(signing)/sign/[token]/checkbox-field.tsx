@@ -18,8 +18,6 @@ import type {
   TSignFieldWithTokenMutationSchema,
 } from '@documenso/trpc/server/field-router/schema';
 import { FieldToolTip } from '@documenso/ui/components/field/field-tooltip';
-import { cn } from '@documenso/ui/lib/utils';
-import { Card, CardContent } from '@documenso/ui/primitives/card';
 import { Checkbox } from '@documenso/ui/primitives/checkbox';
 import { checkboxValidationSigns } from '@documenso/ui/primitives/document-flow/field-items-advanced-settings/constants';
 import { Label } from '@documenso/ui/primitives/label';
@@ -241,62 +239,23 @@ export const CheckboxField = ({
               {validationSign?.label} {checkboxValidationLength}
             </FieldToolTip>
           )}
-          <div className="z-50 space-y-4">
+          <div className="z-50 flex flex-col gap-y-2">
             {values?.map((item: { id: number; value: string; checked: boolean }, index: number) => {
               const itemValue = item.value || `empty-value-${item.id}`;
 
               return (
-                <Card
-                  id={String(index)}
-                  key={index}
-                  className={cn(
-                    'm-1 p-2',
-                    {
-                      'border-yellow-300 ring-2 ring-yellow-100 ring-offset-2 ring-offset-yellow-100':
-                        !field.inserted && !checkedValues.includes(itemValue),
-                    },
-                    {
-                      'border-red-500 ring-2 ring-red-200 ring-offset-2 ring-offset-red-200':
-                        !field.inserted &&
-                        parsedFieldMeta.required &&
-                        !checkedValues.includes(itemValue),
-                    },
-                    {
-                      'border-documenso ring-documenso-200 ring-offset-documenso-200 bg-documenso/20 ring-2 ring-offset-2':
-                        checkedValues.includes(itemValue),
-                    },
-                  )}
-                >
-                  <CardContent
-                    className={cn(
-                      'text-muted-foreground hover:shadow-primary-foreground group flex h-full w-full flex-row items-center space-x-2 p-2',
-                      {
-                        'hover:text-red-300':
-                          !field.inserted &&
-                          parsedFieldMeta.required &&
-                          !checkedValues.includes(itemValue),
-                      },
-                      {
-                        'hover:text-yellow-400': !field.inserted && !parsedFieldMeta.required,
-                      },
-                      {
-                        'hover:text-foreground/80':
-                          !field.inserted && checkedValues.includes(itemValue),
-                      },
-                    )}
-                  >
-                    <Checkbox
-                      className="data-[state=checked]:bg-documenso h-5 w-5"
-                      checkClassName="text-white"
-                      id={`checkbox-${index}`}
-                      checked={checkedValues.includes(itemValue)}
-                      onCheckedChange={() => handleCheckboxChange(item.value, item.id)}
-                    />
-                    <Label htmlFor={`checkbox-${index}`}>
-                      {item.value.includes('empty-value-') ? '' : item.value}
-                    </Label>
-                  </CardContent>
-                </Card>
+                <div key={index} className="flex items-center gap-x-1.5">
+                  <Checkbox
+                    className="h-4 w-4"
+                    checkClassName="text-white"
+                    id={`checkbox-${index}`}
+                    checked={checkedValues.includes(itemValue)}
+                    onCheckedChange={() => handleCheckboxChange(item.value, item.id)}
+                  />
+                  <Label htmlFor={`checkbox-${index}`}>
+                    {item.value.includes('empty-value-') ? '' : item.value}
+                  </Label>
+                </div>
               );
             })}
           </div>
@@ -309,38 +268,21 @@ export const CheckboxField = ({
             const itemValue = item.value || `empty-value-${item.id}`;
 
             return (
-              <Card
-                key={index}
-                onClick={() => void handleCheckboxOptionClick(item)}
-                className={cn(
-                  'text-muted-foreground m-1 flex items-center justify-center p-2',
-                  {
-                    'border-documenso ring-documenso-200 ring-offset-documenso-200 dark:text-foreground/80 ring-2 ring-offset-2':
-                      field.inserted,
-                  },
-                  {
-                    'bg-documenso/20 border-documenso ring-documenso-200 ring-offset-documenso-200 dark:text-background/80 ring-2 ring-offset-2':
-                      field.inserted &&
-                      field.customText.split(',').some((customValue) => customValue === itemValue),
-                  },
-                )}
-              >
-                <CardContent className="flex h-full w-full flex-row items-center space-x-2 p-2">
-                  <Checkbox
-                    className="data-[state=checked]:bg-documenso h-5 w-5"
-                    checkClassName="text-white"
-                    id={`checkbox-${index}`}
-                    checked={field.customText
-                      .split(',')
-                      .some((customValue) => customValue === itemValue)}
-                    disabled={isLoading}
-                    onCheckedChange={() => handleCheckboxChange(item.value, index)}
-                  />
-                  <Label htmlFor={`checkbox-${index}`}>
-                    {item.value.includes('empty-value-') ? '' : item.value}
-                  </Label>
-                </CardContent>
-              </Card>
+              <div key={index} className="flex items-center gap-x-1.5">
+                <Checkbox
+                  className="h-4 w-4"
+                  checkClassName="text-white"
+                  id={`checkbox-${index}`}
+                  checked={field.customText
+                    .split(',')
+                    .some((customValue) => customValue === itemValue)}
+                  disabled={isLoading}
+                  onCheckedChange={() => void handleCheckboxOptionClick(item)}
+                />
+                <Label htmlFor={`checkbox-${index}`}>
+                  {item.value.includes('empty-value-') ? '' : item.value}
+                </Label>
+              </div>
             );
           })}
         </div>

@@ -42,7 +42,7 @@ import { DateField } from '~/app/(signing)/sign/[token]/date-field';
 import { DropdownField } from '~/app/(signing)/sign/[token]/dropdown-field';
 import { EmailField } from '~/app/(signing)/sign/[token]/email-field';
 import { NameField } from '~/app/(signing)/sign/[token]/name-field';
-import { NumberField } from '~/app/(signing)/sign/[token]/number';
+import { NumberField } from '~/app/(signing)/sign/[token]/number-field';
 import { useRequiredSigningContext } from '~/app/(signing)/sign/[token]/provider';
 import { RadioField } from '~/app/(signing)/sign/[token]/radio-field';
 import { SignDialog } from '~/app/(signing)/sign/[token]/sign-dialog';

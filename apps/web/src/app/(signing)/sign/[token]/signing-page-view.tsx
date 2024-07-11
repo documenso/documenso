@@ -28,7 +28,7 @@ import { DropdownField } from './dropdown-field';
 import { EmailField } from './email-field';
 import { SigningForm } from './form';
 import { NameField } from './name-field';
-import { NumberField } from './number';
+import { NumberField } from './number-field';
 import { RadioField } from './radio-field';
 import { SignatureField } from './signature-field';
 import { TextField } from './text-field';

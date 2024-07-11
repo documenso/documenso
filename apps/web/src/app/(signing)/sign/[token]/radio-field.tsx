@@ -17,8 +17,6 @@ import type {
   TRemovedSignedFieldWithTokenMutationSchema,
   TSignFieldWithTokenMutationSchema,
 } from '@documenso/trpc/server/field-router/schema';
-import { cn } from '@documenso/ui/lib/utils';
-import { Card, CardContent } from '@documenso/ui/primitives/card';
 import { Label } from '@documenso/ui/primitives/label';
 import { RadioGroup, RadioGroupItem } from '@documenso/ui/primitives/radio-group';
 import { useToast } from '@documenso/ui/primitives/use-toast';
@@ -154,43 +152,18 @@ export const RadioField = ({ field, recipient, onSignField, onUnsignField }: Rad
       {!field.inserted && (
         <RadioGroup onValueChange={(value) => handleSelectItem(value)} className="z-10">
           {values?.map((item, index) => (
-            <Card
-              id={String(index)}
-              key={index}
-              className={cn(
-                'm-1 p-2',
-                {
-                  'border-yellow-300 ring-2 ring-yellow-100 ring-offset-2 ring-offset-yellow-100':
-                    !field.inserted,
-                },
-                {
-                  'border-red-500 ring-2 ring-red-200 ring-offset-2 ring-offset-red-200 hover:text-red-500':
-                    !field.inserted && parsedFieldMeta.required,
-                },
-              )}
-            >
-              <CardContent
-                className={cn(
-                  'text-muted-foreground dark:text-foreground/80 hover:shadow-primary-foreground group flex h-full w-full flex-row items-center space-x-2 p-2',
-                  {
-                    'hover:text-red-300': !field.inserted && parsedFieldMeta.required,
-                  },
-                  {
-                    'hover:text-yellow-300': !field.inserted && !parsedFieldMeta.required,
-                  },
-                )}
-              >
-                <RadioGroupItem
-                  className="data-[state=checked]:ring-documenso data-[state=checked]:bg-documenso h-5 w-5 shrink-0 data-[state=checked]:ring-1 data-[state=checked]:ring-offset-2"
-                  value={item.value}
-                  id={`option-${index}`}
-                  checked={item.checked}
-                />
-                <Label htmlFor={`option-${index}`}>
-                  {item.value.includes('empty-value-') ? '' : item.value}
-                </Label>
-              </CardContent>
-            </Card>
+            <div key={index} className="flex items-center gap-x-1.5">
+              <RadioGroupItem
+                className="h-4 w-4 shrink-0"
+                value={item.value}
+                id={`option-${index}`}
+                checked={item.checked}
+              />
+
+              <Label htmlFor={`option-${index}`}>
+                {item.value.includes('empty-value-') ? '' : item.value}
+              </Label>
+            </div>
           ))}
         </RadioGroup>
       )}
@@ -198,24 +171,9 @@ export const RadioField = ({ field, recipient, onSignField, onUnsignField }: Rad
       {field.inserted && (
         <RadioGroup>
           {values?.map((item, index) => (
-            <Card
-              id={String(index)}
-              key={index}
-              className={cn(
-                'text-muted-foreground m-1 flex items-center justify-center p-2',
-                {
-                  'border-documenso ring-documenso-200 ring-offset-documenso-200 dark:text-foreground/80 ring-2 ring-offset-2':
-                    field.inserted,
-                },
-                {
-                  'bg-documenso/20 border-documenso dark:text-background/80':
-                    field.inserted && item.value === field.customText,
-                },
-              )}
-            >
-              <CardContent className="flex h-full w-full flex-row items-center space-x-2 p-2">
+            <div key={index} className="flex items-center gap-x-1.5">
                 <RadioGroupItem
-                  className="data-[state=checked]:ring-documenso data-[state=checked]:bg-documenso dark:data-[state=checked]:border-documenso h-5 w-5 shrink-0 data-[state=checked]:ring-1 data-[state=checked]:ring-offset-2 dark:data-[state=checked]:ring-offset-white"
+                  className=""
                   value={item.value}
                   id={`option-${index}`}
                   checked={item.value === field.customText}
@@ -223,8 +181,7 @@ export const RadioField = ({ field, recipient, onSignField, onUnsignField }: Rad
                 <Label htmlFor={`option-${index}`}>
                   {item.value.includes('empty-value-') ? '' : item.value}
                 </Label>
-              </CardContent>
-            </Card>
+            </div>
           ))}
         </RadioGroup>
       )}

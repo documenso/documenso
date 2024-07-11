@@ -33,11 +33,11 @@ export const FieldIcon = ({
     return (
       <div
         className={cn(
-          'text-field-card-foreground flex items-center justify-center gap-x-1 text-xl font-light',
+          'text-field-card-foreground flex items-center justify-center gap-x-1 text-xl',
           fontCaveatClassName,
         )}
       >
-        {signerEmail}
+        Signature
       </div>
     );
   } else {
@@ -46,9 +46,9 @@ export const FieldIcon = ({
 
     if (fieldMeta && (type === 'TEXT' || type === 'NUMBER')) {
       if (type === 'TEXT' && 'text' in fieldMeta && fieldMeta.text && !fieldMeta.label) {
-        label = fieldMeta.text.substring(0, 10) + '...';
+        label = fieldMeta.text.length > 10 ? fieldMeta.text.substring(0, 10) + '...' : fieldMeta.text;
       } else if (fieldMeta.label) {
-        label = fieldMeta.label.substring(0, 10) + '...';
+        label = fieldMeta.label.length > 10 ? fieldMeta.label.substring(0, 10) + '...' : fieldMeta.label;
       } else {
         label = fieldIcons[type]?.label;
       }
@@ -57,8 +57,8 @@ export const FieldIcon = ({
     }
 
     return (
-      <div className="text-field-card-foreground flex items-center justify-center gap-x-1 text-lg font-light">
-        <Icon /> {label}
+      <div className="text-field-card-foreground flex items-center justify-center gap-x-1.5 text-sm">
+        <Icon className='h-4 w-4' /> {label}
       </div>
     );
   }
