@@ -46,6 +46,88 @@
     --warning: 54 96% 45%;
 
     --gold: 47.9 95.8% 53.1%;
+
+    /* Base - Neutral */
+    --new-neutral-50: #fafafa;
+    --new-neutral-100: #f7f7f7;
+    --new-neutral-200: #f2f2f2;
+    --new-neutral-300: #e0e0e0;
+    --new-neutral-400: #b8b8b8;
+    --new-neutral-500: #909090;
+    --new-neutral-600: #5d5d5d;
+    --new-neutral-700: #4f4f4f;
+    --new-neutral-800: #454545;
+    --new-neutral-900: #303030;
+    --new-neutral-950: #171717;
+
+    /* Base - White */
+    --new-white-50: #ffffff;
+    --new-white-60: #f9f9f9;
+    --new-white-100: #f2f2f2;
+    --new-white-200: #e6e6e6;
+    --new-white-300: #cccccc;
+    --new-white-400: #b3b3b3;
+    --new-white-500: #999999;
+    --new-white-600: #808080;
+    --new-white-700: #666666;
+    --new-white-800: #4d4d4d;
+    --new-white-900: #333333;
+
+    /* Primary - Green */
+    --new-primary-50: #f2f9f2;
+    --new-primary-100: #e6f6e5;
+    --new-primary-200: #d4f2cc;
+    --new-primary-300: #c2f1ac;
+    --new-primary-400: #a5ec8e;
+    --new-primary-500: #82e771;
+    --new-primary-600: #4cd038;
+    --new-primary-700: #35c81e;
+    --new-primary-800: #307814;
+    --new-primary-900: #23400a;
+    --new-primary-950: #171f05;
+
+    /* Secondary - Info */
+    --new-info-50: #f2f9fa;
+    --new-info-100: #e7f5f4;
+    --new-info-200: #d5eaf3;
+    --new-info-300: #98bcd0;
+    --new-info-400: #6095d2;
+    --new-info-500: #3978c5;
+    --new-info-600: #2959bf;
+    --new-info-700: #224a77;
+    --new-info-800: #17315f;
+    --new-info-900: #091928;
+    --new-info-950: #060d14;
+
+    /* Secondary - Error */
+    --new-error-50: #fcf2f8;
+    --new-error-100: #fad5d5;
+    --new-error-200: #f989ad;
+    --new-error-300: #f99385;
+    --new-error-400: #fa7057;
+    --new-error-500: #f54d27;
+    --new-error-600: #f33519;
+    --new-error-700: #d12712;
+    --new-error-800: #b4180c;
+    --new-error-900: #930006;
+    --new-error-950: #590003;
+
+    /* Secondary - Warning */
+    --new-warning-50: #fff9f2;
+    --new-warning-100: #fff3d8;
+    --new-warning-200: #ffe8b3;
+    --new-warning-300: #ffd564;
+    --new-warning-400: #ffc638;
+    --new-warning-500: #ffb237;
+    --new-warning-600: #ff9224;
+    --new-warning-700: #ff8f00;
+    --new-warning-800: #b46000;
+    --new-warning-900: #723d00;
+    --new-warning-950: #451700;
+
+    /* Surface */
+    --new-surface-black: #000000;
+    --new-surface-white: #ffffff;
   }
 
   .dark {
