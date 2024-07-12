@@ -117,7 +117,7 @@ export const seedDatabase = async () => {
         {
           teamId: team.id,
           userId: createdUsers[1].id,
-          role: TeamMemberRole.MEMBER,
+          role: TeamMemberRole.ADMIN,
         },
         {
           teamId: team.id,
