@@ -3,7 +3,10 @@
     "type": "page",
     "title": "Home",
     "display": "hidden",
-    "layout": "full"
+    "layout": "full",
+    "theme": {
+      "timestamp": false
+    }
   },
   "developers": {
     "type": "page",
