@@ -57,6 +57,20 @@ export const ZSendDocumentForSigningMutationSchema = z
 
 export type TSendDocumentForSigningMutationSchema = typeof ZSendDocumentForSigningMutationSchema;
 
+export const ZResendDocumentForSigningMutationSchema = z.object({
+  recipients: z.array(z.number()),
+});
+
+export type TResendDocumentForSigningMutationSchema = z.infer<
+  typeof ZResendDocumentForSigningMutationSchema
+>;
+
+export const ZSuccessfulResendDocumentResponseSchema = z.object({
+  message: z.string(),
+});
+
+export type TResendDocumentResponseSchema = z.infer<typeof ZSuccessfulResendDocumentResponseSchema>;
+
 export const ZUploadDocumentSuccessfulSchema = z.object({
   url: z.string(),
   key: z.string(),
