@@ -15,6 +15,7 @@ export type UpdateTemplateSettingsOptions = {
   templateId: number;
   data: {
     title?: string;
+    externalId?: string | null;
     globalAccessAuth?: TDocumentAccessAuthTypes | null;
     globalActionAuth?: TDocumentActionAuthTypes | null;
     publicTitle?: string;
@@ -99,6 +100,7 @@ export const updateTemplateSettings = async ({
     },
     data: {
       title: data.title,
+      externalId: data.externalId || null,
       type: data.type,
       publicDescription: data.publicDescription,
       publicTitle: data.publicTitle,

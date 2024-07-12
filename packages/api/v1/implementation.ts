@@ -232,6 +232,7 @@ export const ApiContractV1Implementation = createNextRoute(ApiContractV1, {
 
       const document = await createDocument({
         title: body.title,
+        externalId: body.externalId || null,
         userId: user.id,
         teamId: team?.id,
         formValues: body.formValues,
@@ -397,6 +398,7 @@ export const ApiContractV1Implementation = createNextRoute(ApiContractV1, {
       teamId: team?.id,
       data: {
         title: fileName,
+        externalId: body.externalId || null,
         formValues: body.formValues,
         documentData: {
           connect: {
@@ -453,6 +455,7 @@ export const ApiContractV1Implementation = createNextRoute(ApiContractV1, {
     try {
       document = await createDocumentFromTemplate({
         templateId,
+        externalId: body.externalId || null,
         userId: user.id,
         teamId: team?.id,
         recipients: body.recipients,

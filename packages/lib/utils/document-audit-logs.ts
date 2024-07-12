@@ -332,6 +332,10 @@ export const formatDocumentAuditLogAction = (auditLog: TDocumentAuditLog, userId
       anonymous: 'Document title updated',
       identified: 'updated the document title',
     }))
+    .with({ type: DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_EXTERNAL_ID_UPDATED }, () => ({
+      anonymous: 'Document external ID updated',
+      identified: 'updated the document external ID',
+    }))
     .with({ type: DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_SENT }, () => ({
       anonymous: 'Document sent',
       identified: 'sent the document',
