@@ -58,10 +58,17 @@ export const resendDocument = async ({
         },
       },
       documentMeta: true,
+      team: {
+        select: {
+          teamEmail: true,
+          name: true,
+        },
+      },
     },
   });
 
   const customEmail = document?.documentMeta;
+  const isTeamDocument = document?.team !== null;
 
   if (!document) {
     throw new Error('Document not found');
@@ -90,9 +97,21 @@ export const resendDocument = async ({
       const { email, name } = recipient;
       const selfSigner = email === user.email;
 
-      const selfSignerCustomEmail = `You have initiated the document ${`"${document.title}"`} that requires you to ${RECIPIENT_ROLES_DESCRIPTION[
-        recipient.role
-      ].actionVerb.toLowerCase()} it.`;
+      const { actionVerb } = RECIPIENT_ROLES_DESCRIPTION[recipient.role];
+      const recipientActionVerb = actionVerb.toLowerCase();
+
+      let emailMessage = customEmail?.message || '';
+      let emailSubject = `Reminder: Please ${recipientActionVerb} this document`;
+
+      if (selfSigner) {
+        emailMessage = `You have initiated the document ${`"${document.title}"`} that requires you to ${recipientActionVerb} it.`;
+        emailSubject = `Reminder: Please ${recipientActionVerb} your document`;
+      }
+
+      if (isTeamDocument && document.team) {
+        emailSubject = `Reminder: ${document.team.name} invited you to ${recipientActionVerb} a document`;
+        emailMessage = `${user.name} on behalf of ${document.team.name} has invited you to ${recipientActionVerb} the document "${document.title}".`;
+      }
 
       const customEmailTemplate = {
         'signer.name': name,
@@ -106,22 +125,15 @@ export const resendDocument = async ({
       const template = createElement(DocumentInviteEmailTemplate, {
         documentName: document.title,
         inviterName: user.name || undefined,
-        inviterEmail: user.email,
+        inviterEmail: isTeamDocument ? document.team?.teamEmail?.email || user.email : user.email,
         assetBaseUrl,
         signDocumentLink,
-        customBody: renderCustomEmailTemplate(
-          selfSigner && !customEmail?.message ? selfSignerCustomEmail : customEmail?.message || '',
-          customEmailTemplate,
-        ),
+        customBody: renderCustomEmailTemplate(emailMessage, customEmailTemplate),
         role: recipient.role,
         selfSigner,
+        isTeamInvite: isTeamDocument,
+        teamName: document.team?.name,
       });
-
-      const { actionVerb } = RECIPIENT_ROLES_DESCRIPTION[recipient.role];
-
-      const emailSubject = selfSigner
-        ? `Reminder: Please ${actionVerb.toLowerCase()} your document`
-        : `Reminder: Please ${actionVerb.toLowerCase()} this document`;
 
       await prisma.$transaction(
         async (tx) => {
