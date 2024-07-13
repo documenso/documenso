@@ -21,14 +21,13 @@ export const declineTeamInvitation = async ({ userId, teamId }: DeclineTeamInvit
         },
       });
 
-      // Delete the invitation
       await tx.teamMemberInvite.delete({
         where: {
           id: teamMemberInvite.id,
         },
       });
 
-      // TODO: notify the team owner/sender
+      // TODO: notify the team owner
     },
     { timeout: 30_000 },
   );
