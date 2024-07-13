@@ -132,6 +132,7 @@ export const EditTemplateForm = ({
         teamId: team?.id,
         data: {
           title: data.title,
+          externalId: data.externalId || null,
           globalAccessAuth: data.globalAccessAuth ?? null,
           globalActionAuth: data.globalActionAuth ?? null,
         },

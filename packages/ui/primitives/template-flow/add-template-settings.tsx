@@ -79,6 +79,7 @@ export const AddTemplateSettingsFormPartial = ({
     resolver: zodResolver(ZAddTemplateSettingsFormSchema),
     defaultValues: {
       title: template.title,
+      externalId: template.externalId || undefined,
       globalAccessAuth: documentAuthOption?.globalAccessAuth || undefined,
       globalActionAuth: documentAuthOption?.globalActionAuth || undefined,
       meta: {
@@ -223,6 +224,34 @@ export const AddTemplateSettingsFormPartial = ({
 
                 <AccordionContent className="text-muted-foreground -mx-1 px-1 pt-4 text-sm leading-relaxed">
                   <div className="flex flex-col space-y-6">
+                    <FormField
+                      control={form.control}
+                      name="externalId"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel className="flex flex-row items-center">
+                            External ID{' '}
+                            <Tooltip>
+                              <TooltipTrigger>
+                                <InfoIcon className="mx-2 h-4 w-4" />
+                              </TooltipTrigger>
+
+                              <TooltipContent className="text-muted-foreground max-w-xs">
+                                Add an external ID to the template. This can be used to identify in
+                                external systems.
+                              </TooltipContent>
+                            </Tooltip>
+                          </FormLabel>
+
+                          <FormControl>
+                            <Input className="bg-background" {...field} />
+                          </FormControl>
+
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
                     <FormField
                       control={form.control}
                       name="meta.dateFormat"
