@@ -12,9 +12,12 @@
       ]
     },
     "prebuild": {
-      "cache": false,
       "dependsOn": [
         "^prebuild"
+      ],
+      "outputs": [
+        ".next/**",
+        "!.next/cache/**"
       ]
     },
     "lint": {
@@ -109,6 +112,7 @@
     "NEXT_PRIVATE_SMTP_APIKEY_USER",
     "NEXT_PRIVATE_SMTP_APIKEY",
     "NEXT_PRIVATE_SMTP_SECURE",
+    "NEXT_PRIVATE_SMTP_UNSAFE_IGNORE_TLS",
     "NEXT_PRIVATE_SMTP_FROM_NAME",
     "NEXT_PRIVATE_SMTP_FROM_ADDRESS",
     "NEXT_PRIVATE_STRIPE_API_KEY",
