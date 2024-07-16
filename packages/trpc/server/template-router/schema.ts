@@ -74,6 +74,7 @@ export const ZUpdateTemplateSettingsMutationSchema = z.object({
   teamId: z.number().min(1).optional(),
   data: z.object({
     title: z.string().min(1).optional(),
+    externalId: z.string().nullish(),
     globalAccessAuth: ZDocumentAccessAuthTypesSchema.nullable().optional(),
     globalActionAuth: ZDocumentActionAuthTypesSchema.nullable().optional(),
     publicTitle: z.string().trim().min(1).max(MAX_TEMPLATE_PUBLIC_TITLE_LENGTH).optional(),

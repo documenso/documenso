@@ -283,6 +283,7 @@ enum DocumentSource {
 
 model Document {
   id             Int                 @id @default(autoincrement())
+  externalId     String?
   userId         Int
   User           User                @relation(fields: [userId], references: [id], onDelete: Cascade)
   authOptions    Json?
@@ -589,6 +590,7 @@ model TemplateMeta {
 
 model Template {
   id                     Int           @id @default(autoincrement())
+  externalId             String?
   type                   TemplateType  @default(PRIVATE)
   title                  String
   userId                 Int
