@@ -3,7 +3,6 @@
     "type": "page",
     "title": "Home",
     "display": "hidden",
-    "layout": "full",
     "theme": {
       "timestamp": false
     }
