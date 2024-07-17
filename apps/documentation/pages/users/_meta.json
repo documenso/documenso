@@ -6,8 +6,8 @@
   },
   "get-started": "Get Started",
   "profile": "User Profile",
-  "templates": "Templates",
   "signing-documents": "Signing Documents",
+  "templates": "Templates",
   "direct-links": "Direct Signing Links",
   "-- Legal Overview": {
     "type": "separator",
