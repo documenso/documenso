@@ -15,11 +15,6 @@ import type { FieldWithSignature } from '@documenso/prisma/types/field-with-sign
 
 import { ZCheckboxFieldMeta, ZRadioFieldMeta } from '../../types/field-meta';
 
-const CHECKBOX_MARK = 'X';
-const RADIO_MARK = 'O';
-const MARK_FONT_SIZE = 20;
-const MARK_OFFSET = 40;
-
 export const insertFieldInPDF = async (pdf: PDFDocument, field: FieldWithSignature) => {
   const fontCaveat = await fetch(process.env.FONT_CAVEAT_URI).then(async (res) =>
     res.arrayBuffer(),
@@ -84,9 +79,6 @@ export const insertFieldInPDF = async (pdf: PDFDocument, field: FieldWithSignatu
     await pdf.embedFont(fontCaveat);
   }
 
-  const isInsertingImage =
-    isSignatureField && typeof field.Signature?.signatureImageAsBase64 === 'string';
-
   await match(field)
     .with(
       {
@@ -132,7 +124,7 @@ export const insertFieldInPDF = async (pdf: PDFDocument, field: FieldWithSignatu
         });
       },
     )
-    .with({ type: FieldType.CHECKBOX }, async (field) => {
+    .with({ type: FieldType.CHECKBOX }, (field) => {
       const meta = ZCheckboxFieldMeta.safeParse(field.fieldMeta);
 
       if (!meta.success) {
@@ -152,7 +144,7 @@ export const insertFieldInPDF = async (pdf: PDFDocument, field: FieldWithSignatu
           checkbox.check();
         }
 
-        await page.drawText(item.value, {
+        page.drawText(item.value.includes('empty-value-') ? '' : item.value, {
           x: fieldX + 16,
           y: pageHeight - (fieldY + offsetY),
           size: 12,
@@ -168,7 +160,7 @@ export const insertFieldInPDF = async (pdf: PDFDocument, field: FieldWithSignatu
         });
       }
     })
-    .with({ type: FieldType.RADIO }, async (field) => {
+    .with({ type: FieldType.RADIO }, (field) => {
       const meta = ZRadioFieldMeta.safeParse(field.fieldMeta);
 
       if (!meta.success) {
@@ -184,7 +176,7 @@ export const insertFieldInPDF = async (pdf: PDFDocument, field: FieldWithSignatu
 
         const radio = pdf.getForm().createRadioGroup(`radio.${field.secondaryId}.${index}`);
 
-        await page.drawText(item.value, {
+        page.drawText(item.value.includes('empty-value-') ? '' : item.value, {
           x: fieldX + 16,
           y: pageHeight - (fieldY + offsetY),
           size: 12,
@@ -204,7 +196,7 @@ export const insertFieldInPDF = async (pdf: PDFDocument, field: FieldWithSignatu
         }
       }
     })
-    .otherwise(async (field) => {
+    .otherwise((field) => {
       const longestLineInTextForWidth = field.customText
         .split('\n')
         .sort((a, b) => b.length - a.length)[0];
@@ -236,7 +228,7 @@ export const insertFieldInPDF = async (pdf: PDFDocument, field: FieldWithSignatu
         textY = adjustedPosition.yPos;
       }
 
-      await page.drawText(field.customText, {
+      page.drawText(field.customText, {
         x: textX,
         y: textY,
         size: fontSize,
