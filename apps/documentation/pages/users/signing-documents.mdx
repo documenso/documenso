@@ -20,7 +20,7 @@ Navigate to the [Documenso dashboard](https://app.documenso.com/documents) and c
 
 ![Documenso dashboard](public/document-signing/documenso-documents-dashboard.webp)
 
-After the upload is complete, you will be redirected to the document's page. Here, you can configure the document's settings and add recipients and fields.
+After the upload is complete, you will be redirected to the document's page. You can configure the document's settings and add recipients and fields here.
 
 ![Documenso document overview](public/document-signing/documenso-uploaded-document.webp)
 
@@ -114,19 +114,19 @@ All fields can be placed anywhere on the document and resized as needed.
 
 #### Signature Field
 
-The signature field is used for collecting the signer's signature. It's required for each recipient with the "Signer" role.
+The signature field collects the signer's signature. It's required for each recipient with the "Signer" role.
 
 ##### Document Editor View
 
-The field doesn't have any additional settings. You just need to place it on the document where you want the signer to sign.
+The field doesn't have any additional settings. You need to place it on the document where you want the signer to sign.
 
 ![The signature field in the Documenso document editor](public/document-signing/signature-field-document-editor-view.webp)
 
 ##### Document Signing View
 
-When the recipient opens the document to sign, they will see the signature field.
+The recipient will see the signature field when they open the document to sign.
 
-The recipient needs to click on the signature field to open the signing view, where they can sign using their mouse, touchpad, or touchscreen.
+The recipient must click on the signature field to open the signing view, where they can sign using their mouse, touchpad, or touchscreen.
 
 ![The signature field in the Documenso document signing view](public/document-signing/signature-field-document-signing-view.webp)
 
@@ -138,11 +138,11 @@ After signing, the recipient can click the "Complete" button to complete the sig
 
 #### Email Field
 
-The email field is used for collecting the signer's email address.
+The email field is used to collect the signer's email address.
 
 ##### Document Editor View
 
-The field doesn't have any additional settings. You just need to place it on the document where you want the signer to sign.
+The field doesn't have any additional settings. You need to place it on the document where you want the signer to sign.
 
 ![The email field in the Documenso document editor](public/document-signing/email-field-document-editor-view.webp)
 
@@ -150,7 +150,7 @@ The field doesn't have any additional settings. You just need to place it on the
 
 When the recipient opens the document to sign, they will see the email field.
 
-The recipient needs to click on the email field to automatically sign the field with the email associated with their account.
+The recipient must click on the email field to automatically sign the field with the email associated with their account.
 
 ![The email field in the Documenso document signing view](public/document-signing/email-field-document-signing-view.webp)
 
@@ -162,7 +162,7 @@ After entering their email address, the recipient can click the "Complete" butto
 
 #### Name Field
 
-The name field is used for collecting the signer's name.
+The name field is used to collect the signer's name.
 
 ##### Document Editor View
 
@@ -174,7 +174,7 @@ The field doesn't have any additional settings. You just need to place it on the
 
 When the recipient opens the document to sign, they will see the name field.
 
-The recipient needs to click on the name field and it will automatically sign the field with the name associated with their account.
+The recipient must click on the name field, which will automatically sign the field with the name associated with their account.
 
 ![The name field in the Documenso document signing view](public/document-signing/name-field-document-signing-view.webp)
 
@@ -186,7 +186,7 @@ After entering their name, the recipient can click the "Complete" button to comp
 
 #### Date Field
 
-The date field is used for collecting the date of the signature.
+The date field is used to collect the date of the signature.
 
 ##### Document Editor View
 
@@ -198,7 +198,7 @@ The field doesn't have any additional settings. You just need to place it on the
 
 When the recipient opens the document to sign, they will see the date field.
 
-The recipient needs to click on the date field to automatically sign the field with the current date and time.
+The recipient must click on the date field to automatically sign the field with the current date and time.
 
 ![The date field in the Documenso document signing view](public/document-signing/date-field-document-signing-view.webp)
 
@@ -210,9 +210,76 @@ After entering the date, the recipient can click the "Complete" button to comple
 
 #### Text Field
 
+The text field is used to collect text input from the signer.
+
 ##### Document Editor View
 
+Place the text field on the document where you want the signer to enter text. The text field comes with additional settings that can be configured.
+
+![The text field in the Documenso document editor](public/document-signing/text-field-document-editor-view.webp)
+
+To open the settings, click on the text field and then on the "Sliders" icon. That opens the settings panel on the right side of the screen.
+
+![The text field settings in the Documenso document editor](public/document-signing/text-field-advanced-settings-document-editor-view.webp)
+
+The text field settings include:
+
+- Label - The label displayed on the field
+- Placeholder - The placeholder text displayed in the field
+- Text - The default text displayed in the field
+- Character limit - The maximum number of characters allowed in the field
+- Required - Whether the field is required or not
+- Read only - Whether the field is read-only or not
+
+It also comes with a couple of rules:
+
+- The field can't be required and read-only at the same time.
+- A read-only field can't have an empty text field. It must have a default text value.
+- The signer must fill out a required field.
+- The text field count can't be higher than the character limit.
+- The signer can't modify a read-only field.
+- The field auto-signs if there is a default text value.
+
+Let's look at the following example.
+
+![A text field with the settings configured by the user in the Documenso document editor](public/document-signing/text-field-with-filled-advanced-settings.webp)
+
+The field is configured as follows:
+
+- Label: "Address"
+- Placeholder: "Your office address"
+- Default Text: "Signing Street 1, 241245"
+- Character Limit: 35
+- Required: False
+- Read Only: False
+
+Since the field has a label set, the label is displayed instead of the default text field value - "Add text".
+
 ##### Document Signing View
+
+What the recipient sees when they open the document to sign depends on the settings configured by the sender.
+
+In this case, the recipient sees the text field signed with the default value.
+
+![Text field with the default value signed by the user in the Documenso document signing view](public/document-signing/text-field-autosigned.webp)
+
+The recipient can modify the text field value since the field is not read-only. To change the value, the recipient must click the field to un-sign it.
+
+Once it's unsigned, the field uses the label set by the sender.
+
+![Unsigned text field in the Documenso document signing view](public/document-signing/text-field-unsigned.webp)
+
+To sign the field with a different value, the recipient needs to click on the field and enter the new value.
+
+![Text field with the text input in the Documenso document signing view](public/document-signing/text-field-input-modal.webp)
+
+Since the text field has a character limit, the recipient must enter a value that doesn't exceed the limit. Otherwise, an error message will appear, and the field will not be signed.
+
+The image below illustrates the text field signed with a new value.
+
+![Text field signed with a new value](public/document-signing/text-field-new-value-signed.webp)
+
+After signing the field, the recipient can click the "Complete" button to complete the signing process.
 
 #### Number Field
 
