@@ -13,6 +13,7 @@ import {
 import { AppError, AppErrorCode } from '../../errors/app-error';
 import { DOCUMENT_AUDIT_LOG_TYPE } from '../../types/document-audit-logs';
 import { ZRecipientAuthOptionsSchema } from '../../types/document-auth';
+import { ZFieldMetaSchema } from '../../types/field-meta';
 import type { RequestMetadata } from '../../universal/extract-request-metadata';
 import { createDocumentAuditLogData } from '../../utils/document-audit-logs';
 import {
@@ -225,12 +226,16 @@ export const createDocumentFromTemplate = async ({
           height: field.height,
           customText: '',
           inserted: false,
+          fieldMeta: field.fieldMeta,
         })),
       );
     });
 
     await tx.field.createMany({
-      data: fieldsToCreate,
+      data: fieldsToCreate.map((field) => ({
+        ...field,
+        fieldMeta: field.fieldMeta ? ZFieldMetaSchema.parse(field.fieldMeta) : undefined,
+      })),
     });
 
     await tx.documentAuditLog.create({

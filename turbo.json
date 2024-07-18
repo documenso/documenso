@@ -12,12 +12,9 @@
       ]
     },
     "prebuild": {
+      "cache": false,
       "dependsOn": [
         "^prebuild"
-      ],
-      "outputs": [
-        ".next/**",
-        "!.next/cache/**"
       ]
     },
     "lint": {

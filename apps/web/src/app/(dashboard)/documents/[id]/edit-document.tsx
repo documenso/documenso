@@ -232,6 +232,14 @@ export const EditDocumentForm = ({
         fields: data.fields,
       });
 
+      // Clear all field data from localStorage
+      for (let i = 0; i < localStorage.length; i++) {
+        const key = localStorage.key(i);
+        if (key && key.startsWith('field_')) {
+          localStorage.removeItem(key);
+        }
+      }
+
       // Router refresh is here to clear the router cache for when navigating to /documents.
       router.refresh();
 
@@ -241,7 +249,7 @@ export const EditDocumentForm = ({
 
       toast({
         title: 'Error',
-        description: 'An error occurred while adding signers.',
+        description: 'An error occurred while adding the fields.',
         variant: 'destructive',
       });
     }
@@ -351,6 +359,7 @@ export const EditDocumentForm = ({
               fields={fields}
               onSubmit={onAddFieldsFormSubmit}
               isDocumentPdfLoaded={isDocumentPdfLoaded}
+              teamId={team?.id}
             />
 
             <AddSubjectFormPartial

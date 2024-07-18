@@ -139,11 +139,15 @@ export const DateField = ({
       )}
 
       {!field.inserted && (
-        <p className="group-hover:text-primary text-muted-foreground text-lg duration-200">Date</p>
+        <p className="group-hover:text-primary text-muted-foreground duration-200 group-hover:text-yellow-300">
+          Date
+        </p>
       )}
 
       {field.inserted && (
-        <p className="text-muted-foreground text-sm duration-200">{localDateString}</p>
+        <p className="text-muted-foreground dark:text-background/80 text-sm duration-200">
+          {localDateString}
+        </p>
       )}
     </SigningFieldContainer>
   );

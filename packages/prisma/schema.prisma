@@ -413,6 +413,10 @@ enum FieldType {
   EMAIL
   DATE
   TEXT
+  NUMBER
+  RADIO
+  CHECKBOX
+  DROPDOWN
 }
 
 model Field {
@@ -433,6 +437,7 @@ model Field {
   Template    Template?  @relation(fields: [templateId], references: [id], onDelete: Cascade)
   Recipient   Recipient  @relation(fields: [recipientId], references: [id], onDelete: Cascade)
   Signature   Signature?
+  fieldMeta   Json?
 
   @@index([documentId])
   @@index([templateId])
