@@ -12,7 +12,8 @@ export const SIGNER_COLOR_STYLES = {
         'group/field-item p-2 border-none ring-none hover:bg-gradient-to-r hover:from-[hsl(var(--signer-green))]/10 hover:to-[hsl(var(--signer-green))]/10',
       fieldItemInitials:
         'opacity-0 transition duration-200 group-hover/field-item:opacity-100 group-hover/field-item:bg-[hsl(var(--signer-green))]',
-      comboxBoxItem: 'hover:bg-[hsl(var(--signer-green)/15%)] active:bg-[hsl(var(--signer-green)/15%)]',
+      comboxBoxItem:
+        'hover:bg-[hsl(var(--signer-green)/15%)] active:bg-[hsl(var(--signer-green)/15%)]',
     },
   },
 
@@ -24,7 +25,8 @@ export const SIGNER_COLOR_STYLES = {
         'group/field-item p-2 border-none ring-none hover:bg-gradient-to-r hover:from-[hsl(var(--signer-blue))]/10 hover:to-[hsl(var(--signer-blue))]/10',
       fieldItemInitials:
         'opacity-0 transition duration-200 group-hover/field-item:opacity-100 group-hover/field-item:bg-[hsl(var(--signer-blue))]',
-      comboxBoxItem: 'hover:bg-[hsl(var(--signer-blue)/15%)] active:bg-[hsl(var(--signer-blue)/15%)]',
+      comboxBoxItem:
+        'hover:bg-[hsl(var(--signer-blue)/15%)] active:bg-[hsl(var(--signer-blue)/15%)]',
     },
   },
 
@@ -36,7 +38,8 @@ export const SIGNER_COLOR_STYLES = {
         'group/field-item p-2 border-none ring-none hover:bg-gradient-to-r hover:from-[hsl(var(--signer-purple))]/10 hover:to-[hsl(var(--signer-purple))]/10',
       fieldItemInitials:
         'opacity-0 transition duration-200 group-hover/field-item:opacity-100 group-hover/field-item:bg-[hsl(var(--signer-purple))]',
-      comboxBoxItem: 'hover:bg-[hsl(var(--signer-purple)/15%)] active:bg-[hsl(var(--signer-purple)/15%)]',
+      comboxBoxItem:
+        'hover:bg-[hsl(var(--signer-purple)/15%)] active:bg-[hsl(var(--signer-purple)/15%)]',
     },
   },
 
@@ -48,7 +51,8 @@ export const SIGNER_COLOR_STYLES = {
         'group/field-item p-2 border-none ring-none hover:bg-gradient-to-r hover:from-[hsl(var(--signer-orange))]/10 hover:to-[hsl(var(--signer-orange))]/10',
       fieldItemInitials:
         'opacity-0 transition duration-200 group-hover/field-item:opacity-100 group-hover/field-item:bg-[hsl(var(--signer-orange))]',
-      comboxBoxItem: 'hover:bg-[hsl(var(--signer-orange)/15%)] active:bg-[hsl(var(--signer-orange)/15%)]',
+      comboxBoxItem:
+        'hover:bg-[hsl(var(--signer-orange)/15%)] active:bg-[hsl(var(--signer-orange)/15%)]',
     },
   },
 
@@ -60,7 +64,8 @@ export const SIGNER_COLOR_STYLES = {
         'group/field-item p-2 border-none ring-none hover:bg-gradient-to-r hover:from-[hsl(var(--signer-yellow))]/10 hover:to-[hsl(var(--signer-yellow))]/10',
       fieldItemInitials:
         'opacity-0 transition duration-200 group-hover/field-item:opacity-100 group-hover/field-item:bg-[hsl(var(--signer-yellow))]',
-      comboxBoxItem: 'hover:bg-[hsl(var(--signer-yellow)/15%)] active:bg-[hsl(var(--signer-yellow)/15%)]',
+      comboxBoxItem:
+        'hover:bg-[hsl(var(--signer-yellow)/15%)] active:bg-[hsl(var(--signer-yellow)/15%)]',
     },
   },
 
@@ -72,7 +77,8 @@ export const SIGNER_COLOR_STYLES = {
         'group/field-item p-2 border-none ring-none hover:bg-gradient-to-r hover:from-[hsl(var(--signer-pink))]/10 hover:to-[hsl(var(--signer-pink))]/10',
       fieldItemInitials:
         'opacity-0 transition duration-200 group-hover/field-item:opacity-100 group-hover/field-item:bg-[hsl(var(--signer-pink))]',
-      comboxBoxItem: 'hover:bg-[hsl(var(--signer-pink)/15%)] active:bg-[hsl(var(--signer-pink)/15%)]',
+      comboxBoxItem:
+        'hover:bg-[hsl(var(--signer-pink)/15%)] active:bg-[hsl(var(--signer-pink)/15%)]',
     },
   },
 };
@@ -86,7 +92,7 @@ export const AVAILABLE_SIGNER_COLORS = [
   'orange',
   'yellow',
   'pink',
-] as const satisfies CombinedStylesKey[];
+] satisfies CombinedStylesKey[];
 
 export const useSignerColors = (index: number) => {
   const key = AVAILABLE_SIGNER_COLORS[index % AVAILABLE_SIGNER_COLORS.length];

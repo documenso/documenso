@@ -371,8 +371,6 @@ export const AddFieldsFormPartial = ({
         return;
       }
 
-      const { height, width } = $page.getBoundingClientRect();
-
       fieldBounds.current = {
         height: Math.max(MIN_HEIGHT_PX),
         width: Math.max(MIN_WIDTH_PX),

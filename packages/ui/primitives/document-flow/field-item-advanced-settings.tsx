@@ -232,7 +232,7 @@ export const FieldAdvancedSettings = forwardRef<HTMLDivElement, FieldAdvancedSet
           {isDocumentPdfLoaded &&
             fields.map((field, index) => (
               <span key={index} className="opacity-75 active:pointer-events-none">
-                <FieldItem key={index} field={field} disabled={true} color={'gray-500'} />
+                <FieldItem key={index} field={field} disabled={true} />
               </span>
             ))}
 

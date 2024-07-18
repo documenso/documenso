@@ -13,6 +13,7 @@ import {
   DocumentSource,
   DocumentStatus,
   FieldType,
+  Prisma,
   RecipientRole,
   SendStatus,
   SigningStatus,
@@ -336,6 +337,7 @@ export const createDocumentFromDirectTemplate = async ({
               height: templateField.height,
               customText,
               inserted: true,
+              fieldMeta: templateField.fieldMeta || Prisma.JsonNull,
             })),
           },
         },
@@ -366,6 +368,7 @@ export const createDocumentFromDirectTemplate = async ({
               height: templateField.height,
               customText: '',
               inserted: true,
+              fieldMeta: templateField.fieldMeta || Prisma.JsonNull,
               Signature: {
                 create: {
                   recipientId: createdDirectRecipient.id,
