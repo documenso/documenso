@@ -71,6 +71,8 @@ export const TextFieldAdvancedSettings = ({
         <Label>Character Limit</Label>
         <Input
           id="characterLimit"
+          type="number"
+          min={0}
           className="bg-background mt-2"
           placeholder="Field character limit"
           value={fieldState.characterLimit}
