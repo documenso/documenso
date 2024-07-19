@@ -253,6 +253,22 @@ export const ZDocumentAuditLogEventDocumentFieldInsertedSchema = z.object({
         type: z.union([z.literal(FieldType.SIGNATURE), z.literal(FieldType.FREE_SIGNATURE)]),
         data: z.string(),
       }),
+      z.object({
+        type: z.literal(FieldType.RADIO),
+        data: z.string(),
+      }),
+      z.object({
+        type: z.literal(FieldType.CHECKBOX),
+        data: z.string(),
+      }),
+      z.object({
+        type: z.literal(FieldType.DROPDOWN),
+        data: z.string(),
+      }),
+      z.object({
+        type: z.literal(FieldType.NUMBER),
+        data: z.string(),
+      }),
     ]),
     fieldSecurity: z.preprocess(
       (input) => {

@@ -1,6 +1,7 @@
 import { TRPCError } from '@trpc/server';
 
 import { AppError } from '@documenso/lib/errors/app-error';
+import { getFieldById } from '@documenso/lib/server-only/field/get-field-by-id';
 import { removeSignedFieldWithToken } from '@documenso/lib/server-only/field/remove-signed-field-with-token';
 import { setFieldsForDocument } from '@documenso/lib/server-only/field/set-fields-for-document';
 import { setFieldsForTemplate } from '@documenso/lib/server-only/field/set-fields-for-template';
@@ -11,6 +12,7 @@ import { authenticatedProcedure, procedure, router } from '../trpc';
 import {
   ZAddFieldsMutationSchema,
   ZAddTemplateFieldsMutationSchema,
+  ZGetFieldQuerySchema,
   ZRemovedSignedFieldWithTokenMutationSchema,
   ZSignFieldWithTokenMutationSchema,
 } from './schema';
@@ -34,6 +36,7 @@ export const fieldRouter = router({
             pageY: field.pageY,
             pageWidth: field.pageWidth,
             pageHeight: field.pageHeight,
+            fieldMeta: field.fieldMeta,
           })),
           requestMetadata: extractNextApiRequestMetadata(ctx.req),
         });
@@ -65,6 +68,7 @@ export const fieldRouter = router({
             pageY: field.pageY,
             pageWidth: field.pageWidth,
             pageHeight: field.pageHeight,
+            fieldMeta: field.fieldMeta,
           })),
         });
       } catch (err) {
@@ -116,4 +120,49 @@ export const fieldRouter = router({
         });
       }
     }),
+
+  getField: authenticatedProcedure.input(ZGetFieldQuerySchema).query(async ({ input, ctx }) => {
+    try {
+      const { fieldId, teamId } = input;
+
+      return await getFieldById({
+        userId: ctx.user.id,
+        teamId,
+        fieldId,
+      });
+    } catch (err) {
+      console.error(err);
+
+      throw new TRPCError({
+        code: 'BAD_REQUEST',
+        message: 'We were unable to find this field. Please try again.',
+      });
+    }
+  }),
+
+  // This doesn't appear to be used anywhere, and it doesn't seem to support updating template fields
+  // so commenting this out for now.
+  // updateField: authenticatedProcedure
+  //   .input(ZUpdateFieldMutationSchema)
+  //   .mutation(async ({ input, ctx }) => {
+  //     try {
+  //       const { documentId, fieldId, fieldMeta, teamId } = input;
+
+  //       return await updateField({
+  //         userId: ctx.user.id,
+  //         teamId,
+  //         fieldId,
+  //         documentId,
+  //         requestMetadata: extractNextApiRequestMetadata(ctx.req),
+  //         fieldMeta: fieldMeta,
+  //       });
+  //     } catch (err) {
+  //       console.error(err);
+
+  //       throw new TRPCError({
+  //         code: 'BAD_REQUEST',
+  //         message: 'We were unable to set this field. Please try again later.',
+  //       });
+  //     }
+  //   }),
 });

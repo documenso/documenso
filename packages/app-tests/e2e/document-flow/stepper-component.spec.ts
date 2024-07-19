@@ -81,7 +81,7 @@ test('[DOCUMENT_FLOW]: should be able to create a document', async ({ page }) =>
   // Add fields
   await expect(page.getByRole('heading', { name: 'Add Fields' })).toBeVisible();
 
-  await page.getByRole('button', { name: 'User 1 Signature' }).click();
+  await page.getByRole('button', { name: 'Signature' }).click();
   await page.locator('canvas').click({
     position: {
       x: 100,
@@ -89,7 +89,7 @@ test('[DOCUMENT_FLOW]: should be able to create a document', async ({ page }) =>
     },
   });
 
-  await page.getByRole('button', { name: 'Email Email' }).click();
+  await page.getByRole('button', { name: 'Email' }).click();
   await page.locator('canvas').click({
     position: {
       x: 100,
@@ -147,7 +147,7 @@ test('[DOCUMENT_FLOW]: should be able to create a document with multiple recipie
   // Add fields
   await expect(page.getByRole('heading', { name: 'Add Fields' })).toBeVisible();
 
-  await page.getByRole('button', { name: 'User 1 Signature' }).click();
+  await page.getByRole('button', { name: 'Signature' }).click();
   await page.locator('canvas').click({
     position: {
       x: 100,
@@ -155,7 +155,7 @@ test('[DOCUMENT_FLOW]: should be able to create a document with multiple recipie
     },
   });
 
-  await page.getByRole('button', { name: 'Email Email' }).click();
+  await page.getByRole('button', { name: 'Email' }).click();
   await page.locator('canvas').click({
     position: {
       x: 100,
@@ -166,7 +166,7 @@ test('[DOCUMENT_FLOW]: should be able to create a document with multiple recipie
   await page.getByText('User 1 (user1@example.com)').click();
   await page.getByText('User 2 (user2@example.com)').click();
 
-  await page.getByRole('button', { name: 'User 2 Signature' }).click();
+  await page.getByRole('button', { name: 'Signature' }).click();
   await page.locator('canvas').click({
     position: {
       x: 500,
@@ -174,7 +174,7 @@ test('[DOCUMENT_FLOW]: should be able to create a document with multiple recipie
     },
   });
 
-  await page.getByRole('button', { name: 'Email Email' }).click();
+  await page.getByRole('button', { name: 'Email' }).click();
   await page.locator('canvas').click({
     position: {
       x: 500,
@@ -243,7 +243,10 @@ test('[DOCUMENT_FLOW]: should be able to create a document with multiple recipie
   // Add fields
   await expect(page.getByRole('heading', { name: 'Add Fields' })).toBeVisible();
 
-  await page.getByRole('button', { name: 'User 1 Signature' }).click();
+  await page.locator('button[role="combobox"]').nth(0).click();
+  await page.getByTitle('User 1 (user1@example.com)').click();
+
+  await page.getByRole('button', { name: 'Signature' }).click();
   await page.locator('canvas').click({
     position: {
       x: 100,
@@ -251,7 +254,7 @@ test('[DOCUMENT_FLOW]: should be able to create a document with multiple recipie
     },
   });
 
-  await page.getByRole('button', { name: 'Email Email' }).click();
+  await page.getByRole('button', { name: 'Email' }).click();
   await page.locator('canvas').click({
     position: {
       x: 100,
@@ -259,10 +262,10 @@ test('[DOCUMENT_FLOW]: should be able to create a document with multiple recipie
     },
   });
 
-  await page.getByText('User 1 (user1@example.com)').click();
-  await page.getByText('User 3 (user3@example.com)').click();
+  await page.locator('button[role="combobox"]').nth(0).click();
+  await page.getByTitle('User 3 (user3@example.com)').click();
 
-  await page.getByRole('button', { name: 'User 3 Signature' }).click();
+  await page.getByRole('button', { name: 'Signature' }).click();
   await page.locator('canvas').click({
     position: {
       x: 500,
@@ -270,7 +273,7 @@ test('[DOCUMENT_FLOW]: should be able to create a document with multiple recipie
     },
   });
 
-  await page.getByRole('button', { name: 'Email Email' }).click();
+  await page.getByRole('button', { name: 'Email' }).click();
   await page.locator('canvas').click({
     position: {
       x: 500,
@@ -465,7 +468,7 @@ test('[DOCUMENT_FLOW]: should be able to create, send with redirect url, sign a 
 
 test('[DOCUMENT_FLOW]: should be able to sign a document with custom date', async ({ page }) => {
   const user = await seedUser();
-  const customDate = DateTime.local().toFormat('yyyy-MM-dd hh:mm a');
+  const customDate = DateTime.utc().toFormat('yyyy-MM-dd hh:mm a');
 
   const { document, recipients } = await seedPendingDocumentWithFullFields({
     owner: user,
