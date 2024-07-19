@@ -131,7 +131,7 @@ It also comes with a couple of rules:
 - The field can't be required and read-only at the same time.
 - A read-only field can't have an empty text field. It must have a default text value.
 - The signer must fill out a required field.
-- The text field characters count can't be higher than the character limit.
+- The text field characters count can't exceed the character limit.
 - The signer can't modify a read-only field.
 - The field auto-signs if there is a default text value.
 
@@ -208,7 +208,7 @@ It also comes with a couple of rules:
 - The signer must fill out a required field.
 - If the default number and a max value are set, the default number must be less than the max value.
 - If the default number and a min value are set, the default number must be greater than the min value.
-- If a number format is set, the value must match the number format.
+- The value must match the number format if a number format is set.
 
 In this example, the number field is configured as follows:
 
@@ -233,7 +233,7 @@ The recipient sees the number field signed with the default value in this case.
 
 ![Number field with the default value signed by the user in the Documenso document signing view](public/document-signing/number-field-autosigned.webp)
 
-The recipient can modify the number field value since the field is not read-only. To change the value, the recipient must click the field to un-sign it.
+Since the number field is not read-only, the recipient can modify its value. To change the value, the recipient must click the field to un-sign it.
 
 Once it's unsigned, the field uses the label set by the sender.
 
@@ -243,7 +243,7 @@ To sign the field with a different value, the recipient needs to click on the fi
 
 ![Number field with the number input in the Documenso document signing view](public/document-signing/number-field-input-modal.webp)
 
-Since the number field has a validation rule set, the recipient needs to enter a value that meets the rules. In this example, the value needs to be between 5 and 50. Otherwise, an error message will appear, and the field will not be signed.
+Since the number field has a validation rule set, the recipient must enter a value that meets the rules. In this example, the value needs to be between 5 and 50. Otherwise, an error message will appear, and the field will not be signed.
 
 The image below illustrates the text field signed with a new value.
 
@@ -287,11 +287,11 @@ In this example, the radio field is configured as follows:
 - Required: False
 - Read Only: False
 - Options:
-  - Option 1
-  - Option 2
-  - Empty value
-  - Empty value
-  - Option 3
+- Option 1
+- Option 2
+- Empty value
+- Empty value
+- Option 3
 
 ![The radio field with the settings configured by the user in the Documenso document editor](public/document-signing/radio-field-options-document-editor-view.webp)
 

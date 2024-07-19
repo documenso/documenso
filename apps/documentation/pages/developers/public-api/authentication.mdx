@@ -20,9 +20,9 @@ Once you're on the user settings page, navigate to the "**[API Tokens](https://a
 To create a new API key, you must:
 
 - Choose a name (e.g. "zapier-key")
-- we recommend using a descriptive name that helps you quickly identify the key and its purpose
+  - We recommend using a descriptive name that helps you quickly identify the key and its purpose.
 - Choose an expiration date
-- you can set the key to never expire or choose when to become invalid: 7 days, 1 month, 3 months, 6 months, or 1 year
+  - You can set the key never to expire or choose when to become invalid: 7 days, 1 month, 3 months, 6 months, or 1 year.
 
 After providing the required information, click the "Create token" button to generate the API key.
 
@@ -32,7 +32,7 @@ Once you've created the token, Documenso will display the key on the screen. Mak
 
 ## Using the API Key
 
-To authenticate your API requests, you must include the API key in the `Authorization` request header. The format is `Authorization: api_xxxxxxxxxxxxxxxx`.
+You must include the API key in the `Authorization` request header to authenticate your API requests. The format is `Authorization: api_xxxxxxxxxxxxxxxx`.
 
 Here's a sample API request using cURL:
 
@@ -64,4 +64,4 @@ Here's a sample response from the API based on the above cURL request:
 
 ![A screenshot of a cURL request to the Documenso public API with the API key in the Authorization header](/public-api-images/documenso-api-authorization.webp)
 
-The API key has access to your account and all its resources. Please keep it secure and do not share it with others. If you suspect that your key has been compromised, you can revoke it from the API Tokens page in your user settings.
+The API key has access to your account and all its resources. Please keep it secure and do not share it with others. If you suspect your key has been compromised, you can revoke it from the "API Tokens" page in your user settings.
