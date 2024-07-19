@@ -47,6 +47,13 @@
 
     --gold: 47.9 95.8% 53.1%;
 
+    --signer-green: 100 48% 55%;
+    --signer-blue: 212 56% 50%;
+    --signer-purple: 266 100% 64%;
+    --signer-orange: 36 92% 54%;
+    --signer-yellow: 51 100% 43%;
+    --signer-pink: 313 65% 57%;
+
     /* Base - Neutral */
     --new-neutral-50: 0, 0%, 96%;
     --new-neutral-100: 0, 0%, 91%;
@@ -128,6 +135,7 @@
     /* Surface */
     --new-surface-black: 0, 0%, 0%;
     --new-surface-white: 0, 0%, 91%;
+
   }
 
   .dark {

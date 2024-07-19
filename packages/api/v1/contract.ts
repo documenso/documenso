@@ -17,6 +17,7 @@ import {
   ZGetDocumentsQuerySchema,
   ZGetTemplatesQuerySchema,
   ZNoBodyMutationSchema,
+  ZResendDocumentForSigningMutationSchema,
   ZSendDocumentForSigningMutationSchema,
   ZSuccessfulDeleteTemplateResponseSchema,
   ZSuccessfulDocumentResponseSchema,
@@ -25,6 +26,7 @@ import {
   ZSuccessfulGetTemplateResponseSchema,
   ZSuccessfulGetTemplatesResponseSchema,
   ZSuccessfulRecipientResponseSchema,
+  ZSuccessfulResendDocumentResponseSchema,
   ZSuccessfulResponseSchema,
   ZSuccessfulSigningResponseSchema,
   ZUnsuccessfulResponseSchema,
@@ -159,6 +161,20 @@ export const ApiContractV1 = c.router(
         500: ZUnsuccessfulResponseSchema,
       },
       summary: 'Send a document for signing',
+    },
+
+    resendDocument: {
+      method: 'POST',
+      path: '/api/v1/documents/:id/resend',
+      body: ZResendDocumentForSigningMutationSchema,
+      responses: {
+        200: ZSuccessfulResendDocumentResponseSchema,
+        400: ZUnsuccessfulResponseSchema,
+        401: ZUnsuccessfulResponseSchema,
+        404: ZUnsuccessfulResponseSchema,
+        500: ZUnsuccessfulResponseSchema,
+      },
+      summary: 'Re-send a document for signing',
     },
 
     deleteDocument: {

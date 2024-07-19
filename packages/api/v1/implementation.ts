@@ -9,6 +9,7 @@ import { createDocument } from '@documenso/lib/server-only/document/create-docum
 import { deleteDocument } from '@documenso/lib/server-only/document/delete-document';
 import { findDocuments } from '@documenso/lib/server-only/document/find-documents';
 import { getDocumentById } from '@documenso/lib/server-only/document/get-document-by-id';
+import { resendDocument } from '@documenso/lib/server-only/document/resend-document';
 import { sendDocument } from '@documenso/lib/server-only/document/send-document';
 import { updateDocument } from '@documenso/lib/server-only/document/update-document';
 import { createField } from '@documenso/lib/server-only/field/create-field';
@@ -232,6 +233,7 @@ export const ApiContractV1Implementation = createNextRoute(ApiContractV1, {
 
       const document = await createDocument({
         title: body.title,
+        externalId: body.externalId || null,
         userId: user.id,
         teamId: team?.id,
         formValues: body.formValues,
@@ -397,6 +399,7 @@ export const ApiContractV1Implementation = createNextRoute(ApiContractV1, {
       teamId: team?.id,
       data: {
         title: fileName,
+        externalId: body.externalId || null,
         formValues: body.formValues,
         documentData: {
           connect: {
@@ -453,6 +456,7 @@ export const ApiContractV1Implementation = createNextRoute(ApiContractV1, {
     try {
       document = await createDocumentFromTemplate({
         templateId,
+        externalId: body.externalId || null,
         userId: user.id,
         teamId: team?.id,
         recipients: body.recipients,
@@ -595,6 +599,35 @@ export const ApiContractV1Implementation = createNextRoute(ApiContractV1, {
         status: 500,
         body: {
           message: 'An error has occured while sending the document for signing',
+        },
+      };
+    }
+  }),
+
+  resendDocument: authenticatedMiddleware(async (args, user, team) => {
+    const { id: documentId } = args.params;
+    const { recipients } = args.body;
+
+    try {
+      await resendDocument({
+        userId: user.id,
+        documentId: Number(documentId),
+        recipients,
+        teamId: team?.id,
+        requestMetadata: extractNextApiRequestMetadata(args.req),
+      });
+
+      return {
+        status: 200,
+        body: {
+          message: 'Document resend successfully initiated',
+        },
+      };
+    } catch (err) {
+      return {
+        status: 500,
+        body: {
+          message: 'An error has occured while resending the document',
         },
       };
     }
@@ -1001,6 +1034,8 @@ export const ApiContractV1Implementation = createNextRoute(ApiContractV1, {
     }
 
     const field = await getFieldById({
+      userId: user.id,
+      teamId: team?.id,
       fieldId: Number(fieldId),
       documentId: Number(documentId),
     }).catch(() => null);
