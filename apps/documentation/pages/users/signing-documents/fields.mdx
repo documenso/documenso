@@ -131,7 +131,7 @@ It also comes with a couple of rules:
 - The field can't be required and read-only at the same time.
 - A read-only field can't have an empty text field. It must have a default text value.
 - The signer must fill out a required field.
-- The text field count can't be higher than the character limit.
+- The text field characters count can't be higher than the character limit.
 - The signer can't modify a read-only field.
 - The field auto-signs if there is a default text value.
 
@@ -208,7 +208,7 @@ It also comes with a couple of rules:
 - The signer must fill out a required field.
 - If the default number and a max value are set, the default number must be less than the max value.
 - If the default number and a min value are set, the default number must be greater than the min value.
-- The value must match the number format.
+- If a number format is set, the value must match the number format.
 
 In this example, the number field is configured as follows:
 
@@ -287,11 +287,11 @@ In this example, the radio field is configured as follows:
 - Required: False
 - Read Only: False
 - Options:
-- Option 1
-- Option 2
-- Empty value
-- Empty value
-- Option 3
+  - Option 1
+  - Option 2
+  - Empty value
+  - Empty value
+  - Option 3
 
 ![The radio field with the settings configured by the user in the Documenso document editor](public/document-signing/radio-field-options-document-editor-view.webp)
 
@@ -328,12 +328,11 @@ To open the settings, click on the checkbox field and then on the "Sliders" icon
 The checkbox field settings include the following:
 
 - **Validation** - The validation rules for the field.
-- **Rule** - The rule specifies "At least", "At most", and "Exactly".
-- **Number** - The number of choices that must be selected.
-
-* **Required** - Whether the field is required or not.
-* **Read only** - Whether the field is read-only or not.
-* **Options** - The list of choices for the field.
+  - **Rule** - The rule specifies "At least", "At most", and "Exactly".
+  - **Number** - The number of choices that must be selected.
+- **Required** - Whether the field is required or not.
+- **Read only** - Whether the field is read-only or not.
+- **Options** - The list of choices for the field.
 
 It also comes with a couple of rules:
 
@@ -351,11 +350,11 @@ In this example, the checkbox field is configured as follows:
 - Required: True
 - Read Only: False
 - Options:
-- Option 1
-- Empty value (checked)
-- Option 2
-- Option 3 (checked)
-- Empty value
+  - Option 1
+  - Empty value (checked)
+  - Option 2
+  - Option 3 (checked)
+  - Empty value
 
 ![The checkbox field with the settings configured by the user in the Documenso document editor](public/document-signing/checkbox-advanced-settings-document-editor-view.webp)
 
@@ -424,9 +423,9 @@ In this example, the dropdown/select field is configured as follows:
 - Read Only: False
 - Default Value: None
 - Options:
-- Document
-- Template
-- Other
+  - Document
+  - Template
+  - Other
 
 ### Document Signing View
 

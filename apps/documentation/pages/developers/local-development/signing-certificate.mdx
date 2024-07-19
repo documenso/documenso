@@ -41,6 +41,11 @@ Combine the private key and the self-signed certificate to create a `.p12` certi
 openssl pkcs12 -export -out certificate.p12 -inkey private.key -in certificate.crt
 ```
 
+<Callout type="warning">
+  If you get the error "Error: Failed to get private key bags", add the `-legacy` flag to the command `openssl pkcs12 -export -out certificate.p12 -inkey private.key -in certificate.crt -legacy`.
+
+</Callout>
+
 ### `p12` Certificate Password
 
 When you create the `.p12` certificate, you will be prompted to enter a password. Enter a strong password and keep it secure. Remember this password, as it will be required when using the certificate.
