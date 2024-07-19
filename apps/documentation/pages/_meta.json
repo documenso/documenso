@@ -7,13 +7,13 @@
       "timestamp": false
     }
   },
-  "developers": {
-    "type": "page",
-    "title": "Developers"
-  },
   "users": {
     "type": "page",
     "title": "Users"
+  },
+  "developers": {
+    "type": "page",
+    "title": "Developers"
   },
   "updates": {
     "title": "What's New",
