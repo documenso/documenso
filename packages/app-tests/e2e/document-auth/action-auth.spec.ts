@@ -49,8 +49,8 @@ test('[DOCUMENT_AUTH]: should allow signing when no auth setup', async ({ page }
       await page.locator(`#field-${field.id}`).getByRole('button').click();
 
       if (field.type === FieldType.TEXT) {
-        await page.getByLabel('Custom Text').fill('TEXT');
-        await page.getByRole('button', { name: 'Save Text' }).click();
+        await page.locator('#custom-text').fill('TEXT');
+        await page.getByRole('button', { name: 'Save' }).click();
       }
 
       await expect(page.locator(`#field-${field.id}`)).toHaveAttribute('data-inserted', 'true');
@@ -109,8 +109,8 @@ test('[DOCUMENT_AUTH]: should allow signing with valid global auth', async ({ pa
     await page.locator(`#field-${field.id}`).getByRole('button').click();
 
     if (field.type === FieldType.TEXT) {
-      await page.getByLabel('Custom Text').fill('TEXT');
-      await page.getByRole('button', { name: 'Save Text' }).click();
+      await page.locator('#custom-text').fill('TEXT');
+      await page.getByRole('button', { name: 'Save' }).click();
     }
 
     await expect(page.locator(`#field-${field.id}`)).toHaveAttribute('data-inserted', 'true');
@@ -287,8 +287,8 @@ test('[DOCUMENT_AUTH]: should allow field signing when required for recipient au
       await page.locator(`#field-${field.id}`).getByRole('button').click();
 
       if (field.type === FieldType.TEXT) {
-        await page.getByLabel('Custom Text').fill('TEXT');
-        await page.getByRole('button', { name: 'Save Text' }).click();
+        await page.locator('#custom-text').fill('TEXT');
+        await page.getByRole('button', { name: 'Save' }).click();
       }
 
       await expect(page.locator(`#field-${field.id}`)).toHaveAttribute('data-inserted', 'true', {
@@ -398,8 +398,8 @@ test('[DOCUMENT_AUTH]: should allow field signing when required for recipient an
       await page.locator(`#field-${field.id}`).getByRole('button').click();
 
       if (field.type === FieldType.TEXT) {
-        await page.getByLabel('Custom Text').fill('TEXT');
-        await page.getByRole('button', { name: 'Save Text' }).click();
+        await page.locator('#custom-text').fill('TEXT');
+        await page.getByRole('button', { name: 'Save' }).click();
       }
 
       await expect(page.locator(`#field-${field.id}`)).toHaveAttribute('data-inserted', 'true', {
