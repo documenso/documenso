@@ -1,6 +1,10 @@
 import { updateSubscriptionItemQuantity } from '@documenso/ee/server-only/stripe/update-subscription-item-quantity';
-import { IS_BILLING_ENABLED } from '@documenso/lib/constants/app';
+import { mailer } from '@documenso/email/mailer';
+import { render } from '@documenso/email/render';
+import { TeamLeaveEmailTemplate } from '@documenso/email/templates/team-leave';
+import { IS_BILLING_ENABLED, WEBAPP_BASE_URL } from '@documenso/lib/constants/app';
 import { prisma } from '@documenso/prisma';
+import { TeamMemberRole } from '@documenso/prisma/client';
 
 export type LeaveTeamOptions = {
   /**
@@ -26,7 +30,16 @@ export const leaveTeam = async ({ userId, teamId }: LeaveTeamOptions) => {
         },
         include: {
           subscription: true,
+          members: {
+            include: {
+              user: true,
+            },
+          },
         },
+      });
+
+      const leavingUser = await tx.user.findUniqueOrThrow({
+        where: { id: userId },
       });
 
       await tx.teamMember.delete({
@@ -54,6 +67,29 @@ export const leaveTeam = async ({ userId, teamId }: LeaveTeamOptions) => {
           priceId: team.subscription.priceId,
           subscriptionId: team.subscription.planId,
           quantity: numberOfSeats,
+        });
+      }
+
+      const teamAdminAndManagers = team.members.filter(
+        (member) => member.role === TeamMemberRole.ADMIN || member.role === TeamMemberRole.MANAGER,
+      );
+
+      for (const recipient of teamAdminAndManagers) {
+        const emailContent = TeamLeaveEmailTemplate({
+          assetBaseUrl: WEBAPP_BASE_URL,
+          baseUrl: WEBAPP_BASE_URL,
+          memberName: leavingUser.name ?? '',
+          memberEmail: leavingUser.email,
+          teamName: team.name,
+          teamUrl: team.url,
+        });
+
+        await mailer.sendMail({
+          to: recipient.user.email,
+          from: 'noreply@documenso.com',
+          subject: `A team member has left ${team.name}`,
+          html: render(emailContent),
+          text: render(emailContent, { plainText: true }),
         });
       }
     },
