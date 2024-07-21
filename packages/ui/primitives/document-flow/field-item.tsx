@@ -1,19 +1,33 @@
 'use client';
 
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
-import { Trash } from 'lucide-react';
+import { Caveat } from 'next/font/google';
+
+import { Settings2, Trash } from 'lucide-react';
 import { createPortal } from 'react-dom';
 import { Rnd } from 'react-rnd';
+import { match } from 'ts-pattern';
 
 import { PDF_VIEWER_PAGE_SELECTOR } from '@documenso/lib/constants/pdf-viewer';
+import type { TFieldMetaSchema } from '@documenso/lib/types/field-meta';
+import { ZCheckboxFieldMeta, ZRadioFieldMeta } from '@documenso/lib/types/field-meta';
 
+import { useSignerColors } from '../../lib/signer-colors';
 import { cn } from '../../lib/utils';
-import { Card, CardContent } from '../card';
+import { CheckboxField } from './advanced-fields/checkbox';
+import { RadioField } from './advanced-fields/radio';
+import { FieldIcon } from './field-icon';
 import type { TDocumentFlowFormSchema } from './types';
-import { FRIENDLY_FIELD_TYPE } from './types';
 
 type Field = TDocumentFlowFormSchema['fields'][0];
+
+const fontCaveat = Caveat({
+  weight: ['500'],
+  subsets: ['latin'],
+  display: 'swap',
+  variable: '--font-caveat',
+});
 
 export type FieldItemProps = {
   field: Field;
@@ -24,17 +38,23 @@ export type FieldItemProps = {
   onResize?: (_node: HTMLElement) => void;
   onMove?: (_node: HTMLElement) => void;
   onRemove?: () => void;
+  onAdvancedSettings?: () => void;
+  recipientIndex?: number;
+  hideRecipients?: boolean;
 };
 
 export const FieldItem = ({
   field,
   passive,
   disabled,
-  minHeight: _minHeight,
-  minWidth: _minWidth,
+  minHeight,
+  minWidth,
   onResize,
   onMove,
   onRemove,
+  onAdvancedSettings,
+  recipientIndex = 0,
+  hideRecipients = false,
 }: FieldItemProps) => {
   const [active, setActive] = useState(false);
   const [coords, setCoords] = useState({
@@ -43,6 +63,12 @@ export const FieldItem = ({
     pageHeight: 0,
     pageWidth: 0,
   });
+  const [settingsActive, setSettingsActive] = useState(false);
+  const $el = useRef(null);
+
+  const signerStyles = useSignerColors(recipientIndex);
+
+  const advancedField = ['NUMBER', 'RADIO', 'CHECKBOX', 'DROPDOWN', 'TEXT'].includes(field.type);
 
   const calculateCoords = useCallback(() => {
     const $page = document.querySelector<HTMLElement>(
@@ -89,25 +115,63 @@ export const FieldItem = ({
     };
   }, [calculateCoords]);
 
+  const handleClickOutsideField = (event: MouseEvent) => {
+    if (settingsActive && $el.current && !event.composedPath().includes($el.current)) {
+      setSettingsActive(false);
+    }
+  };
+
+  useEffect(() => {
+    document.body.addEventListener('click', handleClickOutsideField);
+    return () => {
+      document.body.removeEventListener('click', handleClickOutsideField);
+    };
+  }, [settingsActive]);
+
+  const hasFieldMetaValues = (
+    fieldType: string,
+    fieldMeta: TFieldMetaSchema,
+    parser: typeof ZCheckboxFieldMeta | typeof ZRadioFieldMeta,
+  ) => {
+    if (field.type !== fieldType || !fieldMeta) {
+      return false;
+    }
+
+    const parsedMeta = parser?.parse(fieldMeta);
+    return parsedMeta && parsedMeta.values && parsedMeta.values.length > 0;
+  };
+
+  const checkBoxHasValues = useMemo(
+    () => hasFieldMetaValues('CHECKBOX', field.fieldMeta, ZCheckboxFieldMeta),
+    [field.fieldMeta],
+  );
+  const radioHasValues = useMemo(
+    () => hasFieldMetaValues('RADIO', field.fieldMeta, ZRadioFieldMeta),
+    [field.fieldMeta],
+  );
+
+  const fixedSize = checkBoxHasValues || radioHasValues;
+
   return createPortal(
     <Rnd
       key={coords.pageX + coords.pageY + coords.pageHeight + coords.pageWidth}
-      className={cn('z-20', {
+      className={cn('group z-20', {
         'pointer-events-none': passive,
-        'pointer-events-none opacity-75': disabled,
+        'pointer-events-none cursor-not-allowed opacity-75': disabled,
         'z-10': !active || disabled,
       })}
-      // minHeight={minHeight}
-      // minWidth={minWidth}
+      minHeight={fixedSize ? '' : minHeight || 'auto'}
+      minWidth={fixedSize ? '' : minWidth || 'auto'}
       default={{
         x: coords.pageX,
         y: coords.pageY,
-        height: coords.pageHeight,
-        width: coords.pageWidth,
+        height: fixedSize ? '' : coords.pageHeight,
+        width: fixedSize ? '' : coords.pageWidth,
       }}
       bounds={`${PDF_VIEWER_PAGE_SELECTOR}[data-page-number="${field.pageNumber}"]`}
       onDragStart={() => setActive(true)}
       onResizeStart={() => setActive(true)}
+      enableResizing={!fixedSize}
       onResizeStop={(_e, _d, ref) => {
         setActive(false);
         onResize?.(ref);
@@ -117,35 +181,69 @@ export const FieldItem = ({
         onMove?.(d.node);
       }}
     >
-      {!disabled && (
-        <button
-          className="text-muted-foreground/50 hover:text-muted-foreground/80 bg-background absolute -right-2 -top-2 z-20 flex h-8 w-8 items-center justify-center rounded-full border"
-          onClick={() => onRemove?.()}
-          onTouchEnd={() => onRemove?.()}
-        >
-          <Trash className="h-4 w-4" />
-        </button>
-      )}
-
-      <Card
-        className={cn('bg-field-card/80 h-full w-full backdrop-blur-[1px]', {
-          'border-field-card-border': !disabled,
-          'border-field-card-border/80': active,
-        })}
+      <div
+        className={cn(
+          'relative flex h-full w-full items-center justify-center bg-white',
+          signerStyles.default.base,
+          signerStyles.default.fieldItem,
+        )}
+        onClick={() => {
+          setSettingsActive((prev) => !prev);
+        }}
+        ref={$el}
       >
-        <CardContent
-          className={cn(
-            'text-field-card-foreground flex h-full w-full flex-col items-center justify-center p-2',
-            {
-              'text-field-card-foreground/50': disabled,
-            },
-          )}
-        >
-          {FRIENDLY_FIELD_TYPE[field.type]}
+        {match(field.type)
+          .with('CHECKBOX', () => <CheckboxField field={field} />)
+          .with('RADIO', () => <RadioField field={field} />)
+          .otherwise(() => (
+            <FieldIcon
+              fieldMeta={field.fieldMeta}
+              type={field.type}
+              signerEmail={field.signerEmail}
+              fontCaveatClassName={fontCaveat.className}
+            />
+          ))}
 
-          <p className="w-full truncate text-center text-xs">{field.signerEmail}</p>
-        </CardContent>
-      </Card>
+        {!hideRecipients && (
+          <div className="absolute -right-6 top-0 z-20 hidden h-full w-6 items-center justify-center group-hover:flex">
+            <div
+              className={cn(
+                'flex h-7 w-6 flex-col items-center justify-center rounded-r-lg text-[0.625rem] font-bold text-white',
+                signerStyles.default.fieldItemInitials,
+                {
+                  '!opacity-50': disabled || passive,
+                },
+              )}
+            >
+              {(field.signerEmail?.charAt(0)?.toUpperCase() ?? '') +
+                (field.signerEmail?.charAt(1)?.toUpperCase() ?? '')}
+            </div>
+          </div>
+        )}
+      </div>
+
+      {!disabled && settingsActive && (
+        <div className="mt-1 flex justify-center">
+          <div className="dark:bg-background group flex items-center justify-evenly rounded-md border gap-x-1 bg-gray-900 p-0.5">
+            {advancedField && (
+              <button
+                className="dark:text-muted-foreground/50 dark:hover:text-muted-foreground dark:hover:bg-foreground/10 rounded-sm p-1.5 text-gray-400 transition-colors hover:bg-white/10 hover:text-gray-100"
+                onClick={onAdvancedSettings}
+                onTouchEnd={onAdvancedSettings}
+              >
+                <Settings2 className="h-3 w-3" />
+              </button>
+            )}
+            <button
+              className="dark:text-muted-foreground/50 dark:hover:text-muted-foreground dark:hover:bg-foreground/10 rounded-sm p-1.5 text-gray-400 transition-colors hover:bg-white/10 hover:text-gray-100"
+              onClick={onRemove}
+              onTouchEnd={onRemove}
+            >
+              <Trash className="h-3 w-3" />
+            </button>
+          </div>
+        </div>
+      )}
     </Rnd>,
     document.body,
   );

@@ -29,6 +29,7 @@ export type TDeleteDocumentMutationSchema = typeof ZDeleteDocumentMutationSchema
 
 export const ZSuccessfulDocumentResponseSchema = z.object({
   id: z.number(),
+  externalId: z.string().nullish(),
   userId: z.number(),
   teamId: z.number().nullish(),
   title: z.string(),
@@ -84,6 +85,7 @@ export type TUploadDocumentSuccessfulSchema = z.infer<typeof ZUploadDocumentSucc
 
 export const ZCreateDocumentMutationSchema = z.object({
   title: z.string().min(1),
+  externalId: z.string().nullish(),
   recipients: z.array(
     z.object({
       name: z.string().min(1),
@@ -108,6 +110,7 @@ export type TCreateDocumentMutationSchema = z.infer<typeof ZCreateDocumentMutati
 export const ZCreateDocumentMutationResponseSchema = z.object({
   uploadUrl: z.string().min(1),
   documentId: z.number(),
+  externalId: z.string().nullish(),
   recipients: z.array(
     z.object({
       recipientId: z.number(),
@@ -127,6 +130,7 @@ export type TCreateDocumentMutationResponseSchema = z.infer<
 
 export const ZCreateDocumentFromTemplateMutationSchema = z.object({
   title: z.string().min(1),
+  externalId: z.string().nullish(),
   recipients: z.array(
     z.object({
       name: z.string().min(1),
@@ -153,6 +157,7 @@ export type TCreateDocumentFromTemplateMutationSchema = z.infer<
 
 export const ZCreateDocumentFromTemplateMutationResponseSchema = z.object({
   documentId: z.number(),
+  externalId: z.string().nullish(),
   recipients: z.array(
     z.object({
       recipientId: z.number(),
@@ -172,6 +177,7 @@ export type TCreateDocumentFromTemplateMutationResponseSchema = z.infer<
 
 export const ZGenerateDocumentFromTemplateMutationSchema = z.object({
   title: z.string().optional(),
+  externalId: z.string().nullish(),
   recipients: z
     .array(
       z.object({
@@ -208,6 +214,7 @@ export type TGenerateDocumentFromTemplateMutationSchema = z.infer<
 
 export const ZGenerateDocumentFromTemplateMutationResponseSchema = z.object({
   documentId: z.number(),
+  externalId: z.string().nullish(),
   recipients: z.array(
     z.object({
       recipientId: z.number(),
@@ -346,6 +353,7 @@ export const ZTemplateMetaSchema = z.object({
 
 export const ZTemplateSchema = z.object({
   id: z.number(),
+  externalId: z.string().nullish(),
   type: z.nativeEnum(TemplateType),
   title: z.string(),
   userId: z.number(),
