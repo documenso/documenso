@@ -3,6 +3,7 @@
 import { AnimatePresence } from 'framer-motion';
 import { BellIcon } from 'lucide-react';
 
+import { NEXT_PUBLIC_WEBAPP_URL } from '@documenso/lib/constants/app';
 import { formatTeamUrl } from '@documenso/lib/utils/teams';
 import { trpc } from '@documenso/trpc/react';
 import { AnimateGenericFadeInOut } from '@documenso/ui/components/animate/animate-generic-fade-in-out';
@@ -55,6 +56,9 @@ export const TeamInvitations = () => {
                     {data.map((invitation) => (
                       <li key={invitation.teamId}>
                         <AvatarWithText
+                          avatarSrc={`${NEXT_PUBLIC_WEBAPP_URL()}/api/avatar/${
+                            invitation.team.avatarImageId
+                          }`}
                           className="w-full max-w-none py-4"
                           avatarFallback={invitation.team.name.slice(0, 1)}
                           primaryText={

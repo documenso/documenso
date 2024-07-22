@@ -11,6 +11,7 @@ import { triggerWebhook } from '../webhooks/trigger/trigger-webhook';
 
 export type CreateDocumentOptions = {
   title: string;
+  externalId?: string | null;
   userId: number;
   teamId?: number;
   documentDataId: string;
@@ -21,6 +22,7 @@ export type CreateDocumentOptions = {
 export const createDocument = async ({
   userId,
   title,
+  externalId,
   documentDataId,
   teamId,
   formValues,
@@ -50,6 +52,7 @@ export const createDocument = async ({
     const document = await tx.document.create({
       data: {
         title,
+        externalId,
         documentDataId,
         userId,
         teamId,

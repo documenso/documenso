@@ -14,11 +14,17 @@ import { useToast } from '@documenso/ui/primitives/use-toast';
 
 type DeleteTemplateDialogProps = {
   id: number;
+  teamId?: number;
   open: boolean;
   onOpenChange: (_open: boolean) => void;
 };
 
-export const DeleteTemplateDialog = ({ id, open, onOpenChange }: DeleteTemplateDialogProps) => {
+export const DeleteTemplateDialog = ({
+  id,
+  teamId,
+  open,
+  onOpenChange,
+}: DeleteTemplateDialogProps) => {
   const router = useRouter();
 
   const { toast } = useToast();
@@ -67,7 +73,12 @@ export const DeleteTemplateDialog = ({ id, open, onOpenChange }: DeleteTemplateD
             Cancel
           </Button>
 
-          <Button type="button" loading={isLoading} onClick={async () => deleteTemplate({ id })}>
+          <Button
+            type="button"
+            variant="destructive"
+            loading={isLoading}
+            onClick={async () => deleteTemplate({ id, teamId })}
+          >
             Delete
           </Button>
         </DialogFooter>

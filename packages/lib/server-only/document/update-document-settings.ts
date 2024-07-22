@@ -18,6 +18,7 @@ export type UpdateDocumentSettingsOptions = {
   documentId: number;
   data: {
     title?: string;
+    externalId?: string | null;
     globalAccessAuth?: TDocumentAccessAuthTypes | null;
     globalActionAuth?: TDocumentActionAuthTypes | null;
   };
@@ -91,6 +92,7 @@ export const updateDocumentSettings = async ({
   }
 
   const isTitleSame = data.title === document.title;
+  const isExternalIdSame = data.externalId === document.externalId;
   const isGlobalAccessSame = documentGlobalAccessAuth === newGlobalAccessAuth;
   const isGlobalActionSame = documentGlobalActionAuth === newGlobalActionAuth;
 
@@ -113,6 +115,21 @@ export const updateDocumentSettings = async ({
         data: {
           from: document.title,
           to: data.title || '',
+        },
+      }),
+    );
+  }
+
+  if (!isExternalIdSame) {
+    auditLogs.push(
+      createDocumentAuditLogData({
+        type: DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_EXTERNAL_ID_UPDATED,
+        documentId,
+        user,
+        requestMetadata,
+        data: {
+          from: document.externalId,
+          to: data.externalId || '',
         },
       }),
     );
@@ -165,6 +182,7 @@ export const updateDocumentSettings = async ({
       },
       data: {
         title: data.title,
+        externalId: data.externalId || null,
         authOptions,
       },
     });
