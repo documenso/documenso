@@ -34,6 +34,7 @@ export type TAddSignersMutationSchema = z.infer<typeof ZAddSignersMutationSchema
 
 export const ZAddTemplateSignersMutationSchema = z
   .object({
+    teamId: z.number().optional(),
     templateId: z.number(),
     signers: z.array(
       z.object({
@@ -41,6 +42,7 @@ export const ZAddTemplateSignersMutationSchema = z
         email: z.string().email().min(1),
         name: z.string(),
         role: z.nativeEnum(RecipientRole),
+        actionAuth: ZRecipientActionAuthTypesSchema.optional().nullable(),
       }),
     ),
   })

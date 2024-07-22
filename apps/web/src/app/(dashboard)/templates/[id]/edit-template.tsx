@@ -1,17 +1,18 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 import { useRouter } from 'next/navigation';
 
-import type { DocumentData, Field, Recipient, Template, User } from '@documenso/prisma/client';
+import {
+  DO_NOT_INVALIDATE_QUERY_ON_MUTATION,
+  SKIP_QUERY_BATCH_META,
+} from '@documenso/lib/constants/trpc';
+import type { TemplateWithDetails } from '@documenso/prisma/types/template';
 import { trpc } from '@documenso/trpc/react';
 import { cn } from '@documenso/ui/lib/utils';
 import { Card, CardContent } from '@documenso/ui/primitives/card';
-import {
-  DocumentFlowFormContainer,
-  DocumentFlowFormContainerHeader,
-} from '@documenso/ui/primitives/document-flow/document-flow-root';
+import { DocumentFlowFormContainer } from '@documenso/ui/primitives/document-flow/document-flow-root';
 import type { DocumentFlowStep } from '@documenso/ui/primitives/document-flow/types';
 import { LazyPDFViewer } from '@documenso/ui/primitives/lazy-pdf-viewer';
 import { Stepper } from '@documenso/ui/primitives/stepper';
@@ -19,52 +20,136 @@ import { AddTemplateFieldsFormPartial } from '@documenso/ui/primitives/template-
 import type { TAddTemplateFieldsFormSchema } from '@documenso/ui/primitives/template-flow/add-template-fields.types';
 import { AddTemplatePlaceholderRecipientsFormPartial } from '@documenso/ui/primitives/template-flow/add-template-placeholder-recipients';
 import type { TAddTemplatePlacholderRecipientsFormSchema } from '@documenso/ui/primitives/template-flow/add-template-placeholder-recipients.types';
+import { AddTemplateSettingsFormPartial } from '@documenso/ui/primitives/template-flow/add-template-settings';
+import type { TAddTemplateSettingsFormSchema } from '@documenso/ui/primitives/template-flow/add-template-settings.types';
 import { useToast } from '@documenso/ui/primitives/use-toast';
+
+import { useOptionalCurrentTeam } from '~/providers/team';
 
 export type EditTemplateFormProps = {
   className?: string;
-  user: User;
-  template: Template;
-  recipients: Recipient[];
-  fields: Field[];
-  documentData: DocumentData;
+  initialTemplate: TemplateWithDetails;
+  isEnterprise: boolean;
   templateRootPath: string;
 };
 
-type EditTemplateStep = 'signers' | 'fields';
-const EditTemplateSteps: EditTemplateStep[] = ['signers', 'fields'];
+type EditTemplateStep = 'settings' | 'signers' | 'fields';
+const EditTemplateSteps: EditTemplateStep[] = ['settings', 'signers', 'fields'];
 
 export const EditTemplateForm = ({
+  initialTemplate,
   className,
-  template,
-  recipients,
-  fields,
-  user: _user,
-  documentData,
+  isEnterprise,
   templateRootPath,
 }: EditTemplateFormProps) => {
   const { toast } = useToast();
   const router = useRouter();
 
-  const [step, setStep] = useState<EditTemplateStep>('signers');
+  const team = useOptionalCurrentTeam();
+
+  const [step, setStep] = useState<EditTemplateStep>('settings');
+
+  const [isDocumentPdfLoaded, setIsDocumentPdfLoaded] = useState(false);
+
+  const utils = trpc.useUtils();
+
+  const { data: template, refetch: refetchTemplate } =
+    trpc.template.getTemplateWithDetailsById.useQuery(
+      {
+        id: initialTemplate.id,
+      },
+      {
+        initialData: initialTemplate,
+        ...SKIP_QUERY_BATCH_META,
+      },
+    );
+
+  const { Recipient: recipients, Field: fields, templateDocumentData } = template;
 
   const documentFlow: Record<EditTemplateStep, DocumentFlowStep> = {
+    settings: {
+      title: 'General',
+      description: 'Configure general settings for the template.',
+      stepIndex: 1,
+    },
     signers: {
       title: 'Add Placeholders',
       description: 'Add all relevant placeholders for each recipient.',
-      stepIndex: 1,
+      stepIndex: 2,
     },
     fields: {
       title: 'Add Fields',
       description: 'Add all relevant fields for each recipient.',
-      stepIndex: 2,
+      stepIndex: 3,
     },
   };
 
   const currentDocumentFlow = documentFlow[step];
 
-  const { mutateAsync: addTemplateFields } = trpc.field.addTemplateFields.useMutation();
-  const { mutateAsync: addTemplateSigners } = trpc.recipient.addTemplateSigners.useMutation();
+  const { mutateAsync: updateTemplateSettings } = trpc.template.updateTemplateSettings.useMutation({
+    ...DO_NOT_INVALIDATE_QUERY_ON_MUTATION,
+    onSuccess: (newData) => {
+      utils.template.getTemplateWithDetailsById.setData(
+        {
+          id: initialTemplate.id,
+        },
+        (oldData) => ({ ...(oldData || initialTemplate), ...newData }),
+      );
+    },
+  });
+
+  const { mutateAsync: addTemplateFields } = trpc.field.addTemplateFields.useMutation({
+    ...DO_NOT_INVALIDATE_QUERY_ON_MUTATION,
+    onSuccess: (newData) => {
+      utils.template.getTemplateWithDetailsById.setData(
+        {
+          id: initialTemplate.id,
+        },
+        (oldData) => ({ ...(oldData || initialTemplate), ...newData }),
+      );
+    },
+  });
+
+  const { mutateAsync: addTemplateSigners } = trpc.recipient.addTemplateSigners.useMutation({
+    ...DO_NOT_INVALIDATE_QUERY_ON_MUTATION,
+    onSuccess: (newData) => {
+      utils.template.getTemplateWithDetailsById.setData(
+        {
+          id: initialTemplate.id,
+        },
+        (oldData) => ({ ...(oldData || initialTemplate), ...newData }),
+      );
+    },
+  });
+
+  const onAddSettingsFormSubmit = async (data: TAddTemplateSettingsFormSchema) => {
+    try {
+      await updateTemplateSettings({
+        templateId: template.id,
+        teamId: team?.id,
+        data: {
+          title: data.title,
+          externalId: data.externalId || null,
+          globalAccessAuth: data.globalAccessAuth ?? null,
+          globalActionAuth: data.globalActionAuth ?? null,
+        },
+        meta: data.meta,
+      });
+
+      // Router refresh is here to clear the router cache for when navigating to /documents.
+      router.refresh();
+
+      setStep('signers');
+    } catch (err) {
+      console.error(err);
+
+      toast({
+        title: 'Error',
+        description: 'An error occurred while updating the document settings.',
+        variant: 'destructive',
+      });
+    }
+  };
 
   const onAddTemplatePlaceholderFormSubmit = async (
     data: TAddTemplatePlacholderRecipientsFormSchema,
@@ -72,9 +157,11 @@ export const EditTemplateForm = ({
     try {
       await addTemplateSigners({
         templateId: template.id,
+        teamId: team?.id,
         signers: data.signers,
       });
 
+      // Router refresh is here to clear the router cache for when navigating to /documents.
       router.refresh();
 
       setStep('fields');
@@ -94,11 +181,22 @@ export const EditTemplateForm = ({
         fields: data.fields,
       });
 
+      // Clear all field data from localStorage
+      for (let i = 0; i < localStorage.length; i++) {
+        const key = localStorage.key(i);
+        if (key && key.startsWith('field_')) {
+          localStorage.removeItem(key);
+        }
+      }
+
       toast({
         title: 'Template saved',
         description: 'Your templates has been saved successfully.',
         duration: 5000,
       });
+
+      // Router refresh is here to clear the router cache for when navigating to /documents.
+      router.refresh();
 
       router.push(templateRootPath);
     } catch (err) {
@@ -110,6 +208,15 @@ export const EditTemplateForm = ({
     }
   };
 
+  /**
+   * Refresh the data in the background when steps change.
+   */
+  useEffect(() => {
+    void refetchTemplate();
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [step]);
+
   return (
     <div className={cn('grid w-full grid-cols-12 gap-8', className)}>
       <Card
@@ -117,7 +224,11 @@ export const EditTemplateForm = ({
         gradient
       >
         <CardContent className="p-2">
-          <LazyPDFViewer key={documentData.id} documentData={documentData} />
+          <LazyPDFViewer
+            key={templateDocumentData.id}
+            documentData={templateDocumentData}
+            onDocumentLoad={() => setIsDocumentPdfLoaded(true)}
+          />
         </CardContent>
       </Card>
 
@@ -126,21 +237,30 @@ export const EditTemplateForm = ({
           className="lg:h-[calc(100vh-6rem)]"
           onSubmit={(e) => e.preventDefault()}
         >
-          <DocumentFlowFormContainerHeader
-            title={currentDocumentFlow.title}
-            description={currentDocumentFlow.description}
-          />
-
           <Stepper
             currentStep={currentDocumentFlow.stepIndex}
             setCurrentStep={(step) => setStep(EditTemplateSteps[step - 1])}
           >
+            <AddTemplateSettingsFormPartial
+              key={recipients.length}
+              template={template}
+              documentFlow={documentFlow.settings}
+              recipients={recipients}
+              fields={fields}
+              onSubmit={onAddSettingsFormSubmit}
+              isEnterprise={isEnterprise}
+              isDocumentPdfLoaded={isDocumentPdfLoaded}
+            />
+
             <AddTemplatePlaceholderRecipientsFormPartial
               key={recipients.length}
               documentFlow={documentFlow.signers}
               recipients={recipients}
               fields={fields}
+              templateDirectLink={template.directLink}
               onSubmit={onAddTemplatePlaceholderFormSubmit}
+              isEnterprise={isEnterprise}
+              isDocumentPdfLoaded={isDocumentPdfLoaded}
             />
 
             <AddTemplateFieldsFormPartial
@@ -149,6 +269,7 @@ export const EditTemplateForm = ({
               recipients={recipients}
               fields={fields}
               onSubmit={onAddFieldsFormSubmit}
+              teamId={team?.id}
             />
           </Stepper>
         </DocumentFlowFormContainer>

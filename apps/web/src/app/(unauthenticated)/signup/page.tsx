@@ -3,7 +3,7 @@ import { redirect } from 'next/navigation';
 
 import { env } from 'next-runtime-env';
 
-import { IS_GOOGLE_SSO_ENABLED } from '@documenso/lib/constants/auth';
+import { IS_GOOGLE_SSO_ENABLED, IS_OIDC_SSO_ENABLED } from '@documenso/lib/constants/auth';
 import { decryptSecondaryData } from '@documenso/lib/server-only/crypto/decrypt';
 
 import { SignUpFormV2 } from '~/components/forms/v2/signup';
@@ -37,6 +37,7 @@ export default function SignUpPage({ searchParams }: SignUpPageProps) {
       className="w-screen max-w-screen-2xl px-4 md:px-16 lg:-my-16"
       initialEmail={email || undefined}
       isGoogleSSOEnabled={IS_GOOGLE_SSO_ENABLED}
+      isOIDCSSOEnabled={IS_OIDC_SSO_ENABLED}
     />
   );
 }

@@ -247,8 +247,8 @@ export default async function OpenPage() {
           <BarMetric<EarlyAdoptersType>
             data={EARLY_ADOPTERS_DATA}
             metricKey="earlyAdopters"
-            title="Early Adopters"
-            label="Early Adopters"
+            title="Total Customers"
+            label="Total Customers"
             className="col-span-12 lg:col-span-6"
             extraInfo={<OpenPageTooltip />}
           />

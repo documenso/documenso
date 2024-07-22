@@ -34,17 +34,18 @@ export const Callout = ({ starCount }: CalloutProps) => {
 
   return (
     <div className="mt-8 flex flex-wrap items-center justify-center gap-x-6 gap-y-4">
-      <Button
-        type="button"
-        variant="outline"
-        className="rounded-full bg-transparent backdrop-blur-sm"
-        onClick={onSignUpClick}
-      >
-        Claim Early Adopter Plan
-        <span className="bg-primary dark:text-background -mr-2.5 ml-2.5 rounded-full px-2 py-1.5 text-xs font-medium">
-          $30/mo
-        </span>
-      </Button>
+      <Link href="https://app.documenso.com/signup?utm_source=marketing-callout">
+        <Button
+          type="button"
+          variant="outline"
+          className="rounded-full bg-transparent backdrop-blur-sm"
+        >
+          Try our Free Plan
+          <span className="bg-primary dark:text-background -mr-2.5 ml-2.5 rounded-full px-2 py-1.5 text-xs font-medium">
+            No Credit Card required
+          </span>
+        </Button>
+      </Link>
 
       <Link
         href="https://github.com/documenso/documenso"

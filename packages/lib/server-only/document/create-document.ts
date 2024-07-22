@@ -5,12 +5,13 @@ import { DOCUMENT_AUDIT_LOG_TYPE } from '@documenso/lib/types/document-audit-log
 import type { RequestMetadata } from '@documenso/lib/universal/extract-request-metadata';
 import { createDocumentAuditLogData } from '@documenso/lib/utils/document-audit-logs';
 import { prisma } from '@documenso/prisma';
-import { WebhookTriggerEvents } from '@documenso/prisma/client';
+import { DocumentSource, WebhookTriggerEvents } from '@documenso/prisma/client';
 
 import { triggerWebhook } from '../webhooks/trigger/trigger-webhook';
 
 export type CreateDocumentOptions = {
   title: string;
+  externalId?: string | null;
   userId: number;
   teamId?: number;
   documentDataId: string;
@@ -21,6 +22,7 @@ export type CreateDocumentOptions = {
 export const createDocument = async ({
   userId,
   title,
+  externalId,
   documentDataId,
   teamId,
   formValues,
@@ -50,10 +52,12 @@ export const createDocument = async ({
     const document = await tx.document.create({
       data: {
         title,
+        externalId,
         documentDataId,
         userId,
         teamId,
         formValues,
+        source: DocumentSource.DOCUMENT,
       },
     });
 
@@ -65,6 +69,9 @@ export const createDocument = async ({
         requestMetadata,
         data: {
           title,
+          source: {
+            type: DocumentSource.DOCUMENT,
+          },
         },
       }),
     });

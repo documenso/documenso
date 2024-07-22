@@ -1,5 +1,5 @@
 import { prisma } from '@documenso/prisma';
-import type { Prisma } from '@documenso/prisma/client';
+import { DocumentSource, type Prisma } from '@documenso/prisma/client';
 
 import { getDocumentWhereInput } from './get-document-by-id';
 
@@ -64,6 +64,7 @@ export const duplicateDocumentById = async ({
           ...document.documentMeta,
         },
       },
+      source: DocumentSource.DOCUMENT,
     },
   };
 

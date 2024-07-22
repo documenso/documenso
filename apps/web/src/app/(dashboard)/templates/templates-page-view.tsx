@@ -1,10 +1,11 @@
 import React from 'react';
 
+import { NEXT_PUBLIC_WEBAPP_URL } from '@documenso/lib/constants/app';
 import { getRequiredServerComponentSession } from '@documenso/lib/next-auth/get-server-component-session';
 import { findTemplates } from '@documenso/lib/server-only/template/find-templates';
 import { formatDocumentsPath, formatTemplatesPath } from '@documenso/lib/utils/teams';
 import type { Team } from '@documenso/prisma/client';
-import { Avatar, AvatarFallback } from '@documenso/ui/primitives/avatar';
+import { Avatar, AvatarFallback, AvatarImage } from '@documenso/ui/primitives/avatar';
 
 import { TemplatesDataTable } from './data-table-templates';
 import { EmptyTemplateState } from './empty-state';
@@ -39,6 +40,9 @@ export const TemplatesPageView = async ({ searchParams = {}, team }: TemplatesPa
         <div className="flex flex-row items-center">
           {team && (
             <Avatar className="dark:border-border mr-3 h-12 w-12 border-2 border-solid border-white">
+              {team.avatarImageId && (
+                <AvatarImage src={`${NEXT_PUBLIC_WEBAPP_URL()}/api/avatar/${team.avatarImageId}`} />
+              )}
               <AvatarFallback className="text-xs text-gray-400">
                 {team.name.slice(0, 1)}
               </AvatarFallback>

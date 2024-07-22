@@ -1,6 +1,7 @@
 import { CheckCircle2, Clock } from 'lucide-react';
 import { P, match } from 'ts-pattern';
 
+import { NEXT_PUBLIC_WEBAPP_URL } from '@documenso/lib/constants/app';
 import { getRequiredServerComponentSession } from '@documenso/lib/next-auth/get-server-component-session';
 import { getTeamByUrl } from '@documenso/lib/server-only/team/get-team';
 import { extractInitials } from '@documenso/lib/utils/recipient-formatter';
@@ -13,6 +14,7 @@ import { AddTeamEmailDialog } from '~/components/(teams)/dialogs/add-team-email-
 import { DeleteTeamDialog } from '~/components/(teams)/dialogs/delete-team-dialog';
 import { TransferTeamDialog } from '~/components/(teams)/dialogs/transfer-team-dialog';
 import { UpdateTeamForm } from '~/components/(teams)/forms/update-team-form';
+import { AvatarImageForm } from '~/components/forms/avatar-image';
 
 import { TeamEmailDropdown } from './team-email-dropdown';
 import { TeamTransferStatus } from './team-transfer-status';
@@ -35,7 +37,7 @@ export default async function TeamsSettingsPage({ params }: TeamsSettingsPagePro
 
   return (
     <div>
-      <SettingsHeader title="Team Profile" subtitle="Here you can edit your team's details." />
+      <SettingsHeader title="General settings" subtitle="Here you can edit your team's details." />
 
       <TeamTransferStatus
         className="mb-4"
@@ -43,6 +45,8 @@ export default async function TeamsSettingsPage({ params }: TeamsSettingsPagePro
         teamId={team.id}
         transferVerification={team.transferVerification}
       />
+
+      <AvatarImageForm className="mb-8" team={team} user={session.user} />
 
       <UpdateTeamForm teamId={team.id} teamName={team.name} teamUrl={team.url} />
 
@@ -61,6 +65,7 @@ export default async function TeamsSettingsPage({ params }: TeamsSettingsPagePro
             <div className="flex flex-row items-center justify-between pt-4">
               <AvatarWithText
                 avatarClass="h-12 w-12"
+                avatarSrc={`${NEXT_PUBLIC_WEBAPP_URL()}/api/avatar/${team.avatarImageId}`}
                 avatarFallback={extractInitials(
                   (team.teamEmail?.name || team.emailVerification?.name) ?? '',
                 )}

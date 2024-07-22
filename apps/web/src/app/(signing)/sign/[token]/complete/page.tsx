@@ -67,7 +67,7 @@ export default async function CompletedSigningPage({
 
   const isDocumentAccessValid = await isRecipientAuthorized({
     type: 'ACCESS',
-    document,
+    documentAuthOptions: document.authOptions,
     recipient,
     userId: user?.id,
   });

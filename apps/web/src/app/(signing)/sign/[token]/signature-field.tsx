@@ -12,6 +12,10 @@ import type { TRecipientActionAuth } from '@documenso/lib/types/document-auth';
 import { type Recipient } from '@documenso/prisma/client';
 import type { FieldWithSignature } from '@documenso/prisma/types/field-with-signature';
 import { trpc } from '@documenso/trpc/react';
+import type {
+  TRemovedSignedFieldWithTokenMutationSchema,
+  TSignFieldWithTokenMutationSchema,
+} from '@documenso/trpc/server/field-router/schema';
 import { Button } from '@documenso/ui/primitives/button';
 import { Dialog, DialogContent, DialogFooter, DialogTitle } from '@documenso/ui/primitives/dialog';
 import { Label } from '@documenso/ui/primitives/label';
@@ -29,9 +33,16 @@ type SignatureFieldState = 'empty' | 'signed-image' | 'signed-text';
 export type SignatureFieldProps = {
   field: FieldWithSignature;
   recipient: Recipient;
+  onSignField?: (value: TSignFieldWithTokenMutationSchema) => Promise<void> | void;
+  onUnsignField?: (value: TRemovedSignedFieldWithTokenMutationSchema) => Promise<void> | void;
 };
 
-export const SignatureField = ({ field, recipient }: SignatureFieldProps) => {
+export const SignatureField = ({
+  field,
+  recipient,
+  onSignField,
+  onUnsignField,
+}: SignatureFieldProps) => {
   const router = useRouter();
 
   const { toast } = useToast();
@@ -105,13 +116,20 @@ export const SignatureField = ({ field, recipient }: SignatureFieldProps) => {
         return;
       }
 
-      await signFieldWithToken({
+      const payload: TSignFieldWithTokenMutationSchema = {
         token: recipient.token,
         fieldId: field.id,
         value,
         isBase64: true,
         authOptions,
-      });
+      };
+
+      if (onSignField) {
+        await onSignField(payload);
+        return;
+      }
+
+      await signFieldWithToken(payload);
 
       startTransition(() => router.refresh());
     } catch (err) {
@@ -133,10 +151,17 @@ export const SignatureField = ({ field, recipient }: SignatureFieldProps) => {
 
   const onRemove = async () => {
     try {
-      await removeSignedFieldWithToken({
+      const payload: TRemovedSignedFieldWithTokenMutationSchema = {
         token: recipient.token,
         fieldId: field.id,
-      });
+      };
+
+      if (onUnsignField) {
+        await onUnsignField(payload);
+        return;
+      }
+
+      await removeSignedFieldWithToken(payload);
 
       startTransition(() => router.refresh());
     } catch (err) {
@@ -165,7 +190,7 @@ export const SignatureField = ({ field, recipient }: SignatureFieldProps) => {
       )}
 
       {state === 'empty' && (
-        <p className="group-hover:text-primary font-signature text-muted-foreground text-lg duration-200 sm:text-xl md:text-2xl lg:text-3xl">
+        <p className="group-hover:text-primary font-signature text-muted-foreground duration-200 group-hover:text-yellow-300 text-xl">
           Signature
         </p>
       )}
@@ -174,12 +199,12 @@ export const SignatureField = ({ field, recipient }: SignatureFieldProps) => {
         <img
           src={signature.signatureImageAsBase64}
           alt={`Signature for ${recipient.name}`}
-          className="h-full w-full object-contain dark:invert"
+          className="h-full w-full object-contain"
         />
       )}
 
       {state === 'signed-text' && (
-        <p className="font-signature text-muted-foreground text-lg duration-200 sm:text-xl md:text-2xl lg:text-3xl">
+        <p className="font-signature text-muted-foreground dark:text-background text-lg duration-200 sm:text-xl md:text-2xl lg:text-3xl">
           {/* This optional chaining is intentional, we don't want to move the check into the condition above */}
           {signature?.typedSignature}
         </p>

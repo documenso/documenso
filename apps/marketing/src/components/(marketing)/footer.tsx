@@ -35,6 +35,7 @@ const FOOTER_LINKS = [
   { href: '/oss-friends', text: 'OSS Friends' },
   { href: '/careers', text: 'Careers' },
   { href: '/privacy', text: 'Privacy' },
+  { href: '/changelog', text: 'Changelog' },
 ];
 
 export const Footer = ({ className, ...props }: FooterProps) => {

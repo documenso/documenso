@@ -33,7 +33,7 @@ jobs:
       - name: Run Playwright tests
         run: npm run ci
 
-      - uses: actions/upload-artifact@v3
+      - uses: actions/upload-artifact@v4
         if: always()
         with:
           name: test-results
