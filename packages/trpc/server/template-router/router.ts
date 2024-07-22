@@ -244,11 +244,11 @@ export const templateRouter = router({
     .input(ZCreateTemplateDirectLinkMutationSchema)
     .mutation(async ({ input, ctx }) => {
       try {
-        const { templateId, directRecipientId } = input;
+        const { templateId, teamId, directRecipientId } = input;
 
         const userId = ctx.user.id;
 
-        const template = await getTemplateById({ id: templateId, userId: ctx.user.id });
+        const template = await getTemplateById({ id: templateId, teamId, userId: ctx.user.id });
 
         const limits = await getServerLimits({ email: ctx.user.email, teamId: template.teamId });
 
