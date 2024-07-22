@@ -1,5 +1,11 @@
+import { PlausibleProvider } from '~/providers/plausible';
+
 import '../styles.css';
 
 export default function App({ Component, pageProps }) {
-  return <Component {...pageProps} />;
+  return (
+    <PlausibleProvider>
+      <Component {...pageProps} />;
+    </PlausibleProvider>
+  );
 }
