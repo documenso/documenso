@@ -49,6 +49,7 @@ export const ZDuplicateTemplateMutationSchema = z.object({
 
 export const ZCreateTemplateDirectLinkMutationSchema = z.object({
   templateId: z.number().min(1),
+  teamId: z.number().optional(),
   directRecipientId: z.number().min(1).optional(),
 });
 
