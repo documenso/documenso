@@ -18,16 +18,20 @@ export type MobileNavigationProps = {
 
 export const MENU_NAVIGATION_LINKS = [
   {
+    href: '/pricing',
+    text: 'Pricing',
+  },
+  {
+    href: 'https://documen.so/docs-nav',
+    text: 'Documentation',
+  },
+  {
     href: '/singleplayer',
     text: 'Singleplayer',
   },
   {
     href: '/blog',
     text: 'Blog',
-  },
-  {
-    href: '/pricing',
-    text: 'Pricing',
   },
   {
     href: '/open',
@@ -47,12 +51,12 @@ export const MENU_NAVIGATION_LINKS = [
     text: 'Privacy',
   },
   {
-    href: 'https://app.documenso.com/signin?utm_source=marketing-header',
-    text: 'Sign in',
-  },
-  {
     href: 'https://app.documenso.com/signup?utm_source=marketing-header',
     text: 'Sign up',
+  },
+  {
+    href: 'https://app.documenso.com/signin?utm_source=marketing-header',
+    text: 'Sign in',
   },
 ];
 
