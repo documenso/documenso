@@ -1,5 +1,7 @@
 'use client';
 
+import { Trans, msg } from '@lingui/macro';
+import { useLingui } from '@lingui/react';
 import { DateTime } from 'luxon';
 import { Bar, BarChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
 
@@ -11,6 +13,8 @@ export type TotalSignedDocumentsChartProps = {
 };
 
 export const TotalSignedDocumentsChart = ({ className, data }: TotalSignedDocumentsChartProps) => {
+  const { _ } = useLingui();
+
   const formattedData = [...data].reverse().map(({ month, cume_count: count }) => {
     return {
       month: DateTime.fromFormat(month, 'yyyy-MM').toFormat('LLLL'),
@@ -22,7 +26,9 @@ export const TotalSignedDocumentsChart = ({ className, data }: TotalSignedDocume
     <div className={className}>
       <div className="border-border flex flex-col justify-center rounded-2xl border p-6 pl-2 shadow-sm hover:shadow">
         <div className="mb-6 flex px-4">
-          <h3 className="text-lg font-semibold">Total Completed Documents</h3>
+          <h3 className="text-lg font-semibold">
+            <Trans>Total Completed Documents</Trans>
+          </h3>
         </div>
 
         <ResponsiveContainer width="100%" height={400}>
@@ -46,7 +52,7 @@ export const TotalSignedDocumentsChart = ({ className, data }: TotalSignedDocume
               fill="hsl(var(--primary))"
               radius={[4, 4, 0, 0]}
               maxBarSize={60}
-              label="Total Completed Documents"
+              label={_(msg`Total Completed Documents`)}
             />
           </BarChart>
         </ResponsiveContainer>
