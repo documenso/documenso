@@ -2,6 +2,7 @@ import { createNextRoute } from '@ts-rest/next';
 
 import { getServerLimits } from '@documenso/ee/server-only/limits/server';
 import { NEXT_PUBLIC_WEBAPP_URL } from '@documenso/lib/constants/app';
+import { DATE_FORMATS } from '@documenso/lib/constants/date-formats';
 import { AppError } from '@documenso/lib/errors/app-error';
 import { createDocumentData } from '@documenso/lib/server-only/document-data/create-document-data';
 import { upsertDocumentMeta } from '@documenso/lib/server-only/document-meta/upsert-document-meta';
@@ -218,6 +219,17 @@ export const ApiContractV1Implementation = createNextRoute(ApiContractV1, {
           status: 400,
           body: {
             message: 'You have reached the maximum number of documents allowed for this month',
+          },
+        };
+      }
+
+      const dateFormatExists = DATE_FORMATS.find((format) => format.label === body.meta.dateFormat);
+
+      if (!dateFormatExists) {
+        return {
+          status: 400,
+          body: {
+            message: 'Invalid date format. Please provide a valid date format',
           },
         };
       }
