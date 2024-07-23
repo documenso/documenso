@@ -128,7 +128,7 @@ export const PricingTable = ({ className, ...props }: PricingTableProps) => {
 
           <div className="mt-8 flex w-full flex-col divide-y">
             <p className="text-foreground py-4">Unlimited Documents per Month</p>
-            <p className="text-foreground py-4">API Accesss</p>
+            <p className="text-foreground py-4">API Access</p>
             <p className="text-foreground py-4">Email and Discord Support</p>
             <p className="text-foreground py-4">Premium Profile Name</p>
           </div>
@@ -162,7 +162,7 @@ export const PricingTable = ({ className, ...props }: PricingTableProps) => {
 
           <div className="mt-8 flex w-full flex-col divide-y">
             <p className="text-foreground py-4">Unlimited Documents per Month</p>
-            <p className="text-foreground py-4">API Accesss</p>
+            <p className="text-foreground py-4">API Access</p>
             <p className="text-foreground py-4">Email and Discord Support</p>
             <p className="text-foreground py-4 font-medium">Team Inbox</p>
             <p className="text-foreground py-4">5 Users Included</p>
