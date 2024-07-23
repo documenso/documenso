@@ -55,6 +55,14 @@ export const Header = ({ className, ...props }: HeaderProps) => {
         </Link>
 
         <Link
+          href="https://documen.so/docs-header"
+          className="text-muted-foreground hover:text-muted-foreground/80 text-sm font-semibold"
+          target="_blank"
+        >
+          Documentation
+        </Link>
+
+        <Link
           href="/blog"
           className="text-muted-foreground hover:text-muted-foreground/80 text-sm font-semibold"
         >

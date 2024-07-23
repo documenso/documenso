@@ -1,0 +1,99 @@
+---
+title: Teams
+description: Learn how to create and manage teams in Documenso.
+---
+
+import Image from 'next/image';
+
+import { Callout, Steps } from 'nextra/components';
+
+# Teams
+
+Documenso allows you to create teams to collaborate with others on creating and signing documents.
+
+<Steps>
+
+### Create a New Team
+
+Anyone can create a team from their account by clicking on the "+" (plus) button in the "Teams" section from the account dropdown.
+
+![Documenso account dropdown menu](/get-started-images/add-team.webp)
+
+Each team is a separate entity with its members, documents, and templates. You can create as many teams as you like but remember that each team is billed separately.
+
+<Callout type="info">You can transfer the ownership of the team at any time.</Callout>
+
+### Name and URL
+
+Clicking the "+" button will open a modal where you must pick your team's name and URL. The URL is the team's identifier and will link to the team's page and settings. An example URL would be:
+
+```bash
+https://app.documenso.com/t/<your-team-name>
+```
+
+![Documenso create team modal](/get-started-images/add-team-2.webp)
+
+You can select a different name and URL for your team, but we recommend using the same or similar name.
+
+### Invite Team Members
+
+After creating the team, you can invite team members by navigating to the "Members" tab in the team settings and clicking the "Invite member" button.
+
+To access the team settings, click on the team's name in the account dropdown and select the appropriate team. Lastly, click again on the avatar and then "Team Settings".
+
+Or you can copy this URL:
+
+```bash
+https://app.documenso.com/t/<your-team-name>/settings/members
+```
+
+Once you click on the "Invite member" button, you will be prompted to enter the email address of the person you want to invite. You can also select the role of the person you are inviting.
+
+![Invite team members in Documenso dashboard](/get-started-images/add-team-members-documenso.webp)
+
+You can also bulk-invite members by uploading a CSV file with the email addresses and roles of the people you want to invite.
+
+The table below shows how the CSV file should be structured:
+
+| Email address              | Role    |
+| -------------------------- | ------- |
+| team-admin@documenso.com   | Admin   |
+| team-manager@documenso.com | Manager |
+| team-member@documenso.com  | Member  |
+
+<Callout type="info">
+  The basic team plan includes 5 members. You can invite as many members as you like by upgrading
+  your team's seats on the team's billing page.
+</Callout>
+
+#### Roles
+
+You can assign different permissions to team members based on their roles. The roles available are:
+
+|  Role   | Create, Edit, Send Documents | Manage Users | Manage Admins | Settings | Billing | Delete/ Transfer |
+| :-----: | :--------------------------: | :----------: | :-----------: | :------: | :-----: | :--------------: |
+| Member  |              ✅              |      ❌      |      ❌       |    ❌    |   ❌    |        ❌        |
+| Manager |              ✅              |      ✅      |      ❌       |    ✅    |   ✅    |        ❌        |
+|  Admin  |              ✅              |      ✅      |      ✅       |    ✅    |   ✅    |        ❌        |
+|  Owner  |              ✅              |      ✅      |      ✅       |    ✅    |   ✅    |        ✅        |
+
+### Set a Team Email
+
+You can add a team email to make signing and sending documents easier. Adding a team email allows you to:
+
+- See a signing request sent to this email (Team Inbox)
+- See all documents sent on behalf of the team
+
+### (Optional) Transfer Team Ownership
+
+You can transfer the team's ownership at any time. To do this, navigate to the "General" tab in the team settings and click the "Transfer team" button.
+
+Use this URL to get to the team settings:
+
+```bash
+https://app.documenso.com/t/<your-team-name>/settings
+```
+
+### [Send your First Document](https://app.documenso.com/)
+
+</Steps>

@@ -1,5 +1,4 @@
 import { sealDocument } from '@documenso/lib/server-only/document/seal-document';
-import { updateDocument } from '@documenso/lib/server-only/document/update-document';
 import { DOCUMENT_AUDIT_LOG_TYPE } from '@documenso/lib/types/document-audit-logs';
 import type { RequestMetadata } from '@documenso/lib/universal/extract-request-metadata';
 import { putPdfFile } from '@documenso/lib/universal/upload/put-file';
@@ -161,14 +160,7 @@ export const sendDocument = async ({
   );
 
   if (allRecipientsHaveNoActionToTake) {
-    const updatedDocument = await updateDocument({
-      documentId,
-      userId,
-      teamId,
-      data: { status: DocumentStatus.COMPLETED },
-    });
-
-    await sealDocument({ documentId: updatedDocument.id, requestMetadata });
+    await sealDocument({ documentId, requestMetadata });
 
     // Keep the return type the same for the `sendDocument` method
     return await prisma.document.findFirstOrThrow({

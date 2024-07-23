@@ -1,0 +1,350 @@
+---
+title: Webhooks
+description: Learn how to use webhooks to receive real-time notifications about your documents.
+---
+
+# Webhooks
+
+Webhooks are HTTP callbacks triggered by specific events. When the user subscribes to a specific event, and that event occurs, the webhook makes an HTTP request to the URL provided by the user. The request can be a simple notification or carry a payload with more information about the event.
+
+Some of the common use cases for webhooks include:
+
+1. **Real-time Data Syncing**: Webhooks provide a way to keep data in sync across different platforms. For example, you can keep your system up-to-date with your Documenso documents by subscribing to events like document creation or signing.
+2. **Automating Workflows**: They can trigger automated workflows that start when an event occurs. For example, the webhook could trigger an email when a document is signed.
+3. **Integrating Third-Party Services**: Webhooks can be used to integrate Documenso with third-party services. For example, you could use a webhook to send data to a CRM system when a document is signed.
+
+Documenso supports Webhooks and allows you to subscribe to the following events:
+
+- `document.created`
+- `document.sent`
+- `document.opened`
+- `document.signed`
+- `document.completed`
+
+## Create a webhook subscription
+
+You can create a webhook subscription from the user settings page. Click on your avatar in the top right corner of the dashboard and select "**[User settings](https://app.documenso.com/settings)**" from the dropdown menu.
+
+![A screenshot of the Documenso's dashboard that shows the dropdown menu when you click on your user avatar](/webhook-images/dashboard-user-dropdown-menu.webp)
+
+Then, navigate to the "**[Webhooks](https://app.documenso.com/settings/webhooks)**" tab, where you can see a list of your existing webhooks and create new ones.
+
+![A screenshot of the Documenso's user settings page that shows the Webhooks tab and the Create Webhook button](/webhook-images/webhooks-settings-page.webp)
+
+Clicking on the "**Create Webhook**" button opens a modal to create a new webhook subscription.
+
+To create a new webhook subscription, you need to provide the following information:
+
+- Enter the webhook URL that will receive the event payload.
+- Select the event(s) you want to subscribe to: `document.created`, `document.sent`, `document.opened`, `document.signed`, `document.completed`.
+- Optionally, you can provide a secret key that will be used to sign the payload. This key will be included in the `X-Documenso-Signature` header of the request.
+
+![A screenshot of the Create Webhook modal that shows the URL input field and the event checkboxes](/webhook-images/webhooks-page-create-webhook-modal.webp)
+
+After you have filled in the required information, click on the "**Create Webhook**" button to save your subscription.
+
+The screenshot below illustrates a newly created webhook subscription.
+
+![A screenshot of the Documenso's user settings page that shows the newly created webhook subscription](/webhook-images/webhooks-page.webp)
+
+You can edit or delete your webhook subscriptions by clicking the "**Edit**" or "**Delete**" buttons next to the webhook.
+
+## Webhook fields
+
+The payload sent to the webhook URL contains the following fields:
+
+| Field                                        | Type      | Description                                          |
+| -------------------------------------------- | --------- | ---------------------------------------------------- |
+| `event`                                      | string    | The type of event that triggered the webhook.        |
+| `payload.id`                                 | number    | The id of the document.                              |
+| `payload.userId`                             | number    | The id of the user who owns the document.            |
+| `payload.authOptions`                        | json?     | Authentication options for the document.             |
+| `payload.formValues`                         | json?     | Form values for the document.                        |
+| `payload.title`                              | string    | The name of the document.                            |
+| `payload.status`                             | string    | The current status of the document.                  |
+| `payload.documentDataId`                     | string    | The identifier for the document data.                |
+| `payload.createdAt`                          | datetime  | The creation date and time of the document.          |
+| `payload.updatedAt`                          | datetime  | The last update date and time of the document.       |
+| `payload.completedAt`                        | datetime? | The completion date and time of the document.        |
+| `payload.deletedAt`                          | datetime? | The deletion date and time of the document.          |
+| `payload.teamId`                             | number?   | The id of the team.                                  |
+| `payload.documentData.id`                    | string    | The id of the document data.                         |
+| `payload.documentData.type`                  | string    | The type of the document data.                       |
+| `payload.documentData.data`                  | string    | The data of the document.                            |
+| `payload.documentData.initialData`           | string    | The initial data of the document.                    |
+| `payload.Recipient[].id`                     | number    | The id of the recipient.                             |
+| `payload.Recipient[].documentId`             | number?   | The id the document associated with the recipient.   |
+| `payload.Recipient[].templateId`             | number?   | The template identifier for the recipient.           |
+| `payload.Recipient[].email`                  | string    | The email address of the recipient.                  |
+| `payload.Recipient[].name`                   | string    | The name of the recipient.                           |
+| `payload.Recipient[].token`                  | string    | The token associated with the recipient.             |
+| `payload.Recipient[].expired`                | datetime? | The expiration status of the recipient.              |
+| `payload.Recipient[].signedAt`               | datetime? | The date and time the recipient signed the document. |
+| `payload.Recipient[].authOptions.accessAuth` | json?     | Access authentication options.                       |
+| `payload.Recipient[].authOptions.actionAuth` | json?     | Action authentication options.                       |
+| `payload.Recipient[].role`                   | string    | The role of the recipient.                           |
+| `payload.Recipient[].readStatus`             | string    | The read status of the document by the recipient.    |
+| `payload.Recipient[].signingStatus`          | string    | The signing status of the recipient.                 |
+| `payload.Recipient[].sendStatus`             | string    | The send status of the document to the recipient.    |
+| `createdAt`                                  | datetime  | The creation date and time of the webhook event.     |
+| `webhookEndpoint`                            | string    | The endpoint URL where the webhook is sent.          |
+
+## Webhook event payload example
+
+When an event that you have subscribed to occurs, Documenso will send a POST request to the specified webhook URL with a payload containing information about the event.
+
+## Example payloads
+
+Below are examples of the payloads that are sent for each of the supported events. The payloads are sent as JSON data in the body of the POST request.
+
+Example payload for the `document.created` event:
+
+```json
+{
+  "event": "DOCUMENT_CREATED",
+  "payload": {
+    "id": 10,
+    "userId": 1,
+    "authOptions": null,
+    "formValues": null,
+    "title": "documenso.pdf",
+    "status": "DRAFT",
+    "documentDataId": "hs8qz1ktr9204jn7mg6c5dxy0",
+    "createdAt": "2024-04-22T11:44:43.341Z",
+    "updatedAt": "2024-04-22T11:44:43.341Z",
+    "completedAt": null,
+    "deletedAt": null,
+    "teamId": null
+  },
+  "createdAt": "2024-04-22T11:44:44.779Z",
+  "webhookEndpoint": "https://mywebhooksite.com/mywebhook"
+}
+```
+
+Example payload for the `document.sent` event:
+
+```json
+{
+  "event": "DOCUMENT_SENT",
+  "payload": {
+    "id": 10,
+    "userId": 1,
+    "authOptions": null,
+    "formValues": null,
+    "title": "documenso.pdf",
+    "status": "PENDING",
+    "documentDataId": "hs8qz1ktr9204jn7mg6c5dxy0",
+    "createdAt": "2024-04-22T11:44:43.341Z",
+    "updatedAt": "2024-04-22T11:48:07.569Z",
+    "completedAt": null,
+    "deletedAt": null,
+    "teamId": null,
+    "Recipient": [
+      {
+        "id": 52,
+        "documentId": 10,
+        "templateId": null,
+        "email": "signer2@documenso.com",
+        "name": "Signer 2",
+        "token": "vbT8hi3jKQmrFP_LN1WcS",
+        "expired": null,
+        "signedAt": null,
+        "authOptions": {
+          "accessAuth": null,
+          "actionAuth": null
+        },
+        "role": "VIEWER",
+        "readStatus": "NOT_OPENED",
+        "signingStatus": "NOT_SIGNED",
+        "sendStatus": "SENT"
+      },
+      {
+        "id": 53,
+        "documentId": 10,
+        "templateId": null,
+        "email": "signer1@documenso.com",
+        "name": "Signer 1",
+        "token": "HkrptwS42ZBXdRKj1TyUo",
+        "expired": null,
+        "signedAt": null,
+        "authOptions": {
+          "accessAuth": null,
+          "actionAuth": null
+        },
+        "role": "SIGNER",
+        "readStatus": "NOT_OPENED",
+        "signingStatus": "NOT_SIGNED",
+        "sendStatus": "SENT"
+      }
+    ]
+  },
+  "createdAt": "2024-04-22T11:48:07.945Z",
+  "webhookEndpoint": "https://mywebhooksite.com/mywebhook"
+}
+```
+
+Example payload for the `document.opened` event:
+
+```json
+{
+  "event": "DOCUMENT_OPENED",
+  "payload": {
+    "id": 10,
+    "userId": 1,
+    "authOptions": null,
+    "formValues": null,
+    "title": "documenso.pdf",
+    "status": "PENDING",
+    "documentDataId": "hs8qz1ktr9204jn7mg6c5dxy0",
+    "createdAt": "2024-04-22T11:44:43.341Z",
+    "updatedAt": "2024-04-22T11:48:07.569Z",
+    "completedAt": null,
+    "deletedAt": null,
+    "teamId": null,
+    "Recipient": [
+      {
+        "id": 52,
+        "documentId": 10,
+        "templateId": null,
+        "email": "signer2@documenso.com",
+        "name": "Signer 2",
+        "token": "vbT8hi3jKQmrFP_LN1WcS",
+        "expired": null,
+        "signedAt": null,
+        "authOptions": {
+          "accessAuth": null,
+          "actionAuth": null
+        },
+        "role": "VIEWER",
+        "readStatus": "OPENED",
+        "signingStatus": "NOT_SIGNED",
+        "sendStatus": "SENT"
+      }
+    ],
+    "documentData": {
+      "id": "hs8qz1ktr9204jn7mg6c5dxy0",
+      "type": "S3_PATH",
+      "data": "9753/xzqrshtlpokm/documenso.pdf",
+      "initialData": "9753/xzqrshtlpokm/documenso.pdf"
+    }
+  },
+  "createdAt": "2024-04-22T11:50:26.174Z",
+  "webhookEndpoint": "https://mywebhooksite.com/mywebhook"
+}
+```
+
+Example payload for the `document.signed` event:
+
+```json
+{
+  "event": "DOCUMENT_SIGNED",
+  "payload": {
+    "id": 10,
+    "userId": 1,
+    "authOptions": null,
+    "formValues": null,
+    "title": "documenso.pdf",
+    "status": "COMPLETED",
+    "documentDataId": "hs8qz1ktr9204jn7mg6c5dxy0",
+    "createdAt": "2024-04-22T11:44:43.341Z",
+    "updatedAt": "2024-04-22T11:52:05.708Z",
+    "completedAt": "2024-04-22T11:52:05.707Z",
+    "deletedAt": null,
+    "teamId": null,
+    "Recipient": [
+      {
+        "id": 51,
+        "documentId": 10,
+        "templateId": null,
+        "email": "signer1@documenso.com",
+        "name": "Signer 1",
+        "token": "HkrptwS42ZBXdRKj1TyUo",
+        "expired": null,
+        "signedAt": "2024-04-22T11:52:05.688Z",
+        "authOptions": {
+          "accessAuth": null,
+          "actionAuth": null
+        },
+        "role": "SIGNER",
+        "readStatus": "OPENED",
+        "signingStatus": "SIGNED",
+        "sendStatus": "SENT"
+      }
+    ]
+  },
+  "createdAt": "2024-04-22T11:52:18.577Z",
+  "webhookEndpoint": "https://mywebhooksite.com/mywebhook"
+}
+```
+
+Example payload for the `document.completed` event:
+
+```json
+{
+  "event": "DOCUMENT_COMPLETED",
+  "payload": {
+    "id": 10,
+    "userId": 1,
+    "authOptions": null,
+    "formValues": null,
+    "title": "documenso.pdf",
+    "status": "COMPLETED",
+    "documentDataId": "hs8qz1ktr9204jn7mg6c5dxy0",
+    "createdAt": "2024-04-22T11:44:43.341Z",
+    "updatedAt": "2024-04-22T11:52:05.708Z",
+    "completedAt": "2024-04-22T11:52:05.707Z",
+    "deletedAt": null,
+    "teamId": null,
+    "documentData": {
+      "id": "hs8qz1ktr9204jn7mg6c5dxy0",
+      "type": "S3_PATH",
+      "data": "bk9p1h7x0s3m/documenso-signed.pdf",
+      "initialData": "9753/xzqrshtlpokm/documenso.pdf"
+    },
+    "Recipient": [
+      {
+        "id": 50,
+        "documentId": 10,
+        "templateId": null,
+        "email": "signer2@documenso.com",
+        "name": "Signer 2",
+        "token": "vbT8hi3jKQmrFP_LN1WcS",
+        "expired": null,
+        "signedAt": "2024-04-22T11:51:10.055Z",
+        "authOptions": {
+          "accessAuth": null,
+          "actionAuth": null
+        },
+        "role": "VIEWER",
+        "readStatus": "OPENED",
+        "signingStatus": "SIGNED",
+        "sendStatus": "SENT"
+      },
+      {
+        "id": 51,
+        "documentId": 10,
+        "templateId": null,
+        "email": "signer1@documenso.com",
+        "name": "Signer 1",
+        "token": "HkrptwS42ZBXdRKj1TyUo",
+        "expired": null,
+        "signedAt": "2024-04-22T11:52:05.688Z",
+        "authOptions": {
+          "accessAuth": null,
+          "actionAuth": null
+        },
+        "role": "SIGNER",
+        "readStatus": "OPENED",
+        "signingStatus": "SIGNED",
+        "sendStatus": "SENT"
+      }
+    ]
+  },
+  "createdAt": "2024-04-22T11:52:18.277Z",
+  "webhookEndpoint": "https://mywebhooksite.com/mywebhook"
+}
+```
+
+## Availability
+
+Webhooks are available to individual users and teams.

@@ -1,0 +1,73 @@
+---
+title: Home
+description: Documenso aims to be the world's most trusted document-signing tool. Join us in creating the next generation of open trust infrastructure.
+---
+
+import Image from 'next/image';
+import Link from 'next/link';
+
+import backgroundPattern from '@documenso/assets/images/background-pattern.png';
+import cardBeautifulFigure from '@documenso/assets/images/card-beautiful-figure.png';
+import cardConnectionsFigure from '@documenso/assets/images/card-connections-figure.png';
+import cardPaidFigure from '@documenso/assets/images/card-paid-figure.png';
+import cardSharingFigure from '@documenso/assets/images/card-sharing-figure.png';
+import { cn } from '@documenso/ui/lib/utils';
+import { Card, CardContent, CardTitle } from '@documenso/ui/primitives/card';
+
+export const Wrapper = ({ children }) => {
+  return <div className="mt-20">{children}</div>;
+};
+
+<Wrapper>
+  <div
+    className="fixed inset-0 -z-10 bg-center -mt-[15vh] h-full scale-125 object-cover dark:contrast-[70%] dark:invert dark:sepia md:scale-150 lg:scale-[175%] opacity-40 dark:opacity-20"
+    style={{
+      backgroundImage: `url('${backgroundPattern.src}')`,
+    }}
+  />
+  <div className="flex flex-col items-center mb-16">
+    <span className="text-center text-4xl font-bold leading-tight tracking-tight md:text-[48px] lg:text-[64px]">Document signing, finally open source</span>
+    <span className="text-muted-foreground mx-auto mt-4 max-w-2xl text-center leading-normal tracking-tight">Documenso aims to be the world's most trusted document-signing tool. Join us in creating the next generation of open trust infrastructure.</span>
+
+  </div>
+
+  <div className="mt-6 grid grid-cols-1 md:grid-cols-2 gap-8 md:mt-8">
+    <Link href="/users">
+      <Card className="col-span-2 lg:col-span-1 h-full dark:bg-black/10 dark:border dark:border-stone-800">
+        <CardContent className="grid grid-cols-1 gap-8 p-6 max-h-[460px]">
+          <span className="text-foreground/80 leading-relaxed">
+            <strong className="block text-2xl font-normal mb-2 tracking-tight">Learn</strong>
+            Learn how to get started with your account and leverage our advanced features to level up your productivity.
+          </span>
+          <div className="flex items-center justify-center p-8 flex-grow">
+            <Image
+              src={cardBeautifulFigure}
+              alt="its fast"
+              className="w-full max-w-xs dark:contrast-[70%] dark:hue-rotate-180 dark:invert"
+            />
+          </div>
+        </CardContent>
+      </Card>
+    </Link>
+
+    <Link href='/developers'>
+      <Card className="col-span-2 lg:col-span-1 h-full dark:bg-black/10 dark:border dark:border-stone-800">
+        <CardContent className="grid grid-cols-1 gap-8 p-6 max-h-[460px]">
+          <span className="text-foreground/80 leading-relaxed">
+            <strong className="block text-2xl font-normal mb-2 tracking-tight">Build</strong>
+            Everything you need to set up your local development environment.
+            Use our API and utilize webhooks for seamless integration.
+          </span>
+          <div className="flex items-center justify-center p-8 flex-grow">
+            <Image
+              src={cardConnectionsFigure}
+              alt="its fast"
+              className="w-full max-w-sm dark:contrast-[70%] dark:hue-rotate-180 dark:invert"
+            />
+          </div>
+        </CardContent>
+      </Card>
+    </Link>
+
+  </div>
+</Wrapper>

@@ -1,0 +1,67 @@
+---
+title: API Authentication
+description: Learn how to create a Documenso API key and authenticate your API requests.
+---
+
+# API Authentication
+
+Documenso uses API keys for authentication. An API key is a unique token that is generated for each client. The client must provide the key whenever it makes an API call. This way, Documenso can identify the clients making the requests and authorize their access to the API.
+
+## Creating an API Key
+
+To create an API key, navigate to the user settings page. Click on your avatar in the top right corner of the dashboard and select "**[User settings](https://app.documenso.com/settings)**" from the dropdown menu.
+
+![A screenshot of the Documenso's dashboard that shows the dropdown menu when you click on your user avatar](/public-api-images/documenso-user-dropdown-menu.webp)
+
+Once you're on the user settings page, navigate to the "**[API Tokens](https://app.documenso.com/settings/tokens)**" tab. The "API Token" page lists your existing keys and enables you to create new ones.
+
+![A screenshot of the Documenso's user settings page that shows the API Tokens page](/public-api-images/api-tokens-page-documenso.webp)
+
+To create a new API key, you must:
+
+- Choose a name (e.g. "zapier-key")
+  - We recommend using a descriptive name that helps you quickly identify the key and its purpose.
+- Choose an expiration date
+  - You can set the key never to expire or choose when to become invalid: 7 days, 1 month, 3 months, 6 months, or 1 year.
+
+After providing the required information, click the "Create token" button to generate the API key.
+
+![A screenshot of the newly created API token in the Documenso dashboard](/public-api-images/documenso-api-key-blurred.webp)
+
+Once you've created the token, Documenso will display the key on the screen. Make sure to copy the key and store it securely. You won't be able to see the key again once you refresh/leave the page.
+
+## Using the API Key
+
+You must include the API key in the `Authorization` request header to authenticate your API requests. The format is `Authorization: api_xxxxxxxxxxxxxxxx`.
+
+Here's a sample API request using cURL:
+
+```bash
+curl --location 'https://app.documenso.com/api/v1/documents?page=1&perPage=1' \
+--header 'Authorization: api_xxxxxxxxxxxxxxxx'
+```
+
+Here's a sample response from the API based on the above cURL request:
+
+```json
+{
+  "documents": [
+    {
+      "id": 11,
+      "userId": 2,
+      "teamId": null,
+      "title": "documenso",
+      "status": "PENDING",
+      "documentDataId": "ab2ecm1npk11rt5sp398waf7h",
+      "createdAt": "2024-04-25T11:05:18.420Z",
+      "updatedAt": "2024-04-25T11:05:36.328Z",
+      "completedAt": null
+    }
+  ],
+  "totalPages": 1
+}
+```
+
+![A screenshot of a cURL request to the Documenso public API with the API key in the Authorization header](/public-api-images/documenso-api-authorization.webp)
+
+The API key has access to your account and all its resources. Please keep it secure and do not share it with others. If you suspect your key has been compromised, you can revoke it from the "API Tokens" page in your user settings.
