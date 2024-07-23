@@ -16,6 +16,7 @@ jobs:
   pull_translations:
     name: Pull translations
     runs-on: ubuntu-latest
+    environment: Translations
     permissions:
       contents: write
       pull-requests: write
