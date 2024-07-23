@@ -14,6 +14,7 @@ jobs:
   extract_translations:
     name: Extract and upload translations
     runs-on: ubuntu-latest
+    environment: Translations
     permissions:
       contents: write
     steps:
