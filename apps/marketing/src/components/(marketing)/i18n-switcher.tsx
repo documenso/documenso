@@ -1,6 +1,6 @@
 import { useState } from 'react';
 
-import { t } from '@lingui/macro';
+import { msg } from '@lingui/macro';
 import { useLingui } from '@lingui/react';
 import { CheckIcon } from 'lucide-react';
 import { LuLanguages } from 'react-icons/lu';
@@ -44,7 +44,7 @@ export const I18nSwitcher = ({ className }: I18nSwitcherProps) => {
       </Button>
 
       <CommandDialog open={open} onOpenChange={setOpen}>
-        <CommandInput placeholder={t`Search languages...`} />
+        <CommandInput placeholder={_(msg`Search languages...`)} />
 
         <CommandList>
           <CommandGroup>
