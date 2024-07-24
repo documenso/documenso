@@ -17,4 +17,3 @@ msgstr ""
 "X-Crowdin-Language: de\n"
 "X-Crowdin-File: web.po\n"
 "X-Crowdin-File-ID: 8\n"
-
