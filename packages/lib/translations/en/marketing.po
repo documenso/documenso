@@ -143,8 +143,12 @@ msgid "Documenso on X"
 msgstr "Documenso on X"
 
 #: apps/marketing/src/components/(marketing)/hero.tsx:100
-msgid "Document signing,"
-msgstr "Document signing,"
+#~ msgid "Document signing,"
+#~ msgstr "Document signing,"
+
+#: apps/marketing/src/components/(marketing)/hero.tsx:100
+msgid "Document signing,<0/>finally open source."
+msgstr "Document signing,<0/>finally open source."
 
 #: apps/marketing/src/components/(marketing)/footer.tsx:33
 #: apps/marketing/src/components/(marketing)/mobile-navigation.tsx:28
@@ -185,8 +189,8 @@ msgid "Faster, smarter and more beautiful."
 msgstr "Faster, smarter and more beautiful."
 
 #: apps/marketing/src/components/(marketing)/hero.tsx:102
-msgid "finally open source."
-msgstr "finally open source."
+#~ msgid "finally open source."
+#~ msgstr "finally open source."
 
 #: apps/marketing/src/app/(marketing)/open/page.tsx:210
 msgid "Finances"
@@ -331,7 +335,7 @@ msgid "No credit card required"
 msgstr "No credit card required"
 
 #: apps/marketing/src/components/(marketing)/callout.tsx:29
-#: apps/marketing/src/components/(marketing)/hero.tsx:119
+#: apps/marketing/src/components/(marketing)/hero.tsx:121
 msgid "No Credit Card required"
 msgstr "No Credit Card required"
 
@@ -460,7 +464,7 @@ msgstr "Signup Now"
 msgid "Smart."
 msgstr "Smart."
 
-#: apps/marketing/src/components/(marketing)/hero.tsx:126
+#: apps/marketing/src/components/(marketing)/hero.tsx:128
 msgid "Star on GitHub"
 msgstr "Star on GitHub"
 
@@ -532,7 +536,7 @@ msgid "Truly your own."
 msgstr "Truly your own."
 
 #: apps/marketing/src/components/(marketing)/callout.tsx:27
-#: apps/marketing/src/components/(marketing)/hero.tsx:117
+#: apps/marketing/src/components/(marketing)/hero.tsx:119
 msgid "Try our Free Plan"
 msgstr "Try our Free Plan"
 

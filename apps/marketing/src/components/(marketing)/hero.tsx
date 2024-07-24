@@ -97,9 +97,11 @@ export const Hero = ({ className, ...props }: HeroProps) => {
           animate="animate"
           className="text-center text-4xl font-bold leading-tight tracking-tight md:text-[48px] lg:text-[64px]"
         >
-          <Trans>Document signing,</Trans>
-          <span className="block" />
-          <Trans>finally open source.</Trans>
+          <Trans>
+            Document signing,
+            <span className="block" />
+            finally open source.
+          </Trans>
         </motion.h2>
 
         <motion.div
