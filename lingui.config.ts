@@ -3,8 +3,8 @@ import type { LinguiConfig } from '@lingui/conf';
 import { APP_I18N_OPTIONS } from '@documenso/lib/constants/i18n';
 
 const config: LinguiConfig = {
-  sourceLocale: APP_I18N_OPTIONS.sourceLng,
-  locales: APP_I18N_OPTIONS.supportedLngs as unknown as string[],
+  sourceLocale: APP_I18N_OPTIONS.sourceLang,
+  locales: APP_I18N_OPTIONS.supportedLangs as unknown as string[],
   // Any changes to these catalogue paths should be reflected in crowdin.yml
   catalogs: [
     {

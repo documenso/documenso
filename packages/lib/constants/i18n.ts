@@ -3,8 +3,8 @@ export const SUPPORTED_LANGUAGE_CODES = ['de', 'en'] as const;
 export type SupportedLanguageCodes = (typeof SUPPORTED_LANGUAGE_CODES)[number];
 
 export const APP_I18N_OPTIONS = {
-  supportedLngs: SUPPORTED_LANGUAGE_CODES,
-  sourceLng: 'en',
+  supportedLangs: SUPPORTED_LANGUAGE_CODES,
+  sourceLang: 'en',
 } as const;
 
 type SupportedLanguage = {

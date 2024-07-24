@@ -29,4 +29,3 @@ msgstr "Die für die Empfänger erforderliche Authentifizierung zum Signieren vo
 #: packages/ui/components/recipient/recipient-action-auth-select.tsx:45
 msgid "This will override any global settings."
 msgstr "Dies wird alle globalen Einstellungen überschreiben."
-

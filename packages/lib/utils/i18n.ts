@@ -24,8 +24,8 @@ export const extractSupportedLanguageFromCookies = (
 ): SupportedLanguageCodes | null => {
   const preferredLanguage = cookies.get('i18n');
 
-  const foundSupportedLanguage = APP_I18N_OPTIONS.supportedLngs.find(
-    (lng): lng is SupportedLanguageCodes => lng === preferredLanguage?.value,
+  const foundSupportedLanguage = APP_I18N_OPTIONS.supportedLangs.find(
+    (lang): lang is SupportedLanguageCodes => lang === preferredLanguage?.value,
   );
 
   return foundSupportedLanguage || null;
@@ -46,8 +46,8 @@ export const extractSupportedLanguageFromHeaders = (
   // Convert locale to language.
   const [language] = locale.split('-');
 
-  const foundSupportedLanguage = APP_I18N_OPTIONS.supportedLngs.find(
-    (lng): lng is SupportedLanguageCodes => lng === language,
+  const foundSupportedLanguage = APP_I18N_OPTIONS.supportedLangs.find(
+    (lang): lang is SupportedLanguageCodes => lang === language,
   );
 
   return foundSupportedLanguage || null;
@@ -83,5 +83,5 @@ export const extractSupportedLanguage = ({
     }
   }
 
-  return APP_I18N_OPTIONS.sourceLng;
+  return APP_I18N_OPTIONS.sourceLang;
 };
