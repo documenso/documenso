@@ -47,11 +47,6 @@ msgstr "Amount Raised"
 msgid "API Access"
 msgstr "API Access"
 
-#: apps/marketing/src/components/(marketing)/pricing-table.tsx:145
-#: apps/marketing/src/components/(marketing)/pricing-table.tsx:189
-#~ msgid "API Accesss"
-#~ msgstr "API Accesss"
-
 #: apps/marketing/src/components/(marketing)/faster-smarter-beautiful-bento.tsx:63
 msgid "Beautiful."
 msgstr "Beautiful."
@@ -143,10 +138,6 @@ msgid "Documenso on X"
 msgstr "Documenso on X"
 
 #: apps/marketing/src/components/(marketing)/hero.tsx:100
-#~ msgid "Document signing,"
-#~ msgstr "Document signing,"
-
-#: apps/marketing/src/components/(marketing)/hero.tsx:100
 msgid "Document signing,<0/>finally open source."
 msgstr "Document signing,<0/>finally open source."
 
@@ -187,10 +178,6 @@ msgstr "Fast."
 #: apps/marketing/src/components/(marketing)/faster-smarter-beautiful-bento.tsx:32
 msgid "Faster, smarter and more beautiful."
 msgstr "Faster, smarter and more beautiful."
-
-#: apps/marketing/src/components/(marketing)/hero.tsx:102
-#~ msgid "finally open source."
-#~ msgstr "finally open source."
 
 #: apps/marketing/src/app/(marketing)/open/page.tsx:210
 msgid "Finances"
