@@ -1,11 +1,11 @@
 msgid ""
 msgstr ""
-"POT-Creation-Date: 2024-07-17 16:41+1000\n"
+"POT-Creation-Date: 2024-07-24 13:01+1000\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "X-Generator: @lingui/cli\n"
-"Language: de\n"
+"Language: en\n"
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
 "PO-Revision-Date: \n"
@@ -15,12 +15,12 @@ msgstr ""
 
 #: packages/ui/components/recipient/recipient-action-auth-select.tsx:36
 msgid "Recipient action authentication"
-msgstr ""
+msgstr "Recipient action authentication"
 
 #: packages/ui/components/recipient/recipient-action-auth-select.tsx:41
 msgid "The authentication required for recipients to sign fields"
-msgstr ""
+msgstr "The authentication required for recipients to sign fields"
 
 #: packages/ui/components/recipient/recipient-action-auth-select.tsx:45
 msgid "This will override any global settings."
-msgstr ""
+msgstr "This will override any global settings."

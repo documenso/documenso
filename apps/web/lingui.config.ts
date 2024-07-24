@@ -9,14 +9,14 @@ const config: LinguiConfig = {
   catalogs: [
     {
       path: '<rootDir>/../../packages/lib/translations/web/{locale}',
-      include: ['<rootDir>/../../packages/lib/translations/web'],
+      include: ['<rootDir>/apps/web/src'],
     },
     {
-      path: '<rootDir>/../../packages/lib/translations/common/{locale}',
-      include: ['<rootDir>/../../packages/lib/translations/common'],
+      path: '<rootDir>/../../packages/lib/translations/{locale}/common',
+      include: ['<rootDir>/packages/ui', '<rootDir>/packages/lib'],
     },
   ],
-  catalogsMergePath: '<rootDir>/../../packages/lib/translations/web/compiled/{locale}',
+  catalogsMergePath: '<rootDir>/../../packages/lib/translations/{locale}/web',
 };
 
 export default config;
