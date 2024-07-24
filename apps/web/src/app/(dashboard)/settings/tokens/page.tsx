@@ -1,6 +1,5 @@
 import { DateTime } from 'luxon';
 
-import { NEXT_PUBLIC_WEBAPP_URL } from '@documenso/lib/constants/app';
 import { getRequiredServerComponentSession } from '@documenso/lib/next-auth/get-server-component-session';
 import { getUserTokens } from '@documenso/lib/server-only/public-api/get-all-user-tokens';
 import { Button } from '@documenso/ui/primitives/button';
@@ -20,14 +19,15 @@ export default async function ApiTokensPage() {
 
       <p className="text-muted-foreground mt-2 text-sm">
         On this page, you can create new API tokens and manage the existing ones. <br />
-        You can view our swagger docs{' '}
+        Also see our{' '}
         <a
           className="text-primary underline"
-          href={`${NEXT_PUBLIC_WEBAPP_URL()}/api/v1/openapi`}
+          href={'https://docs.documenso.com/developers/public-api'}
           target="_blank"
         >
-          here
+          Documentation
         </a>
+        .
       </p>
 
       <hr className="my-4" />

@@ -26,16 +26,17 @@ const SOCIAL_LINKS = [
 const FOOTER_LINKS = [
   { href: '/pricing', text: 'Pricing' },
   { href: '/singleplayer', text: 'Singleplayer' },
+  { href: 'https://docs.documenso.com', text: 'Documentation', target: '_blank' },
+  { href: 'mailto:support@documenso.com', text: 'Support', target: '_blank' },
   { href: '/blog', text: 'Blog' },
-  { href: '/design-system', text: 'Design' },
+  { href: '/changelog', text: 'Changelog' },
   { href: '/open', text: 'Open Startup' },
+  { href: '/design-system', text: 'Design' },
   { href: 'https://shop.documenso.com', text: 'Shop', target: '_blank' },
   { href: 'https://status.documenso.com', text: 'Status', target: '_blank' },
-  { href: 'mailto:support@documenso.com', text: 'Support', target: '_blank' },
   { href: '/oss-friends', text: 'OSS Friends' },
   { href: '/careers', text: 'Careers' },
   { href: '/privacy', text: 'Privacy' },
-  { href: '/changelog', text: 'Changelog' },
 ];
 
 export const Footer = ({ className, ...props }: FooterProps) => {
