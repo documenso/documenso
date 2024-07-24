@@ -4,7 +4,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 import { Caveat } from 'next/font/google';
 
-import { Settings2, Trash } from 'lucide-react';
+import { CopyPlus, Settings2, Trash } from 'lucide-react';
 import { createPortal } from 'react-dom';
 import { Rnd } from 'react-rnd';
 import { match } from 'ts-pattern';
@@ -38,6 +38,7 @@ export type FieldItemProps = {
   onResize?: (_node: HTMLElement) => void;
   onMove?: (_node: HTMLElement) => void;
   onRemove?: () => void;
+  onDuplicate?: () => void;
   onAdvancedSettings?: () => void;
   recipientIndex?: number;
   hideRecipients?: boolean;
@@ -52,6 +53,7 @@ export const FieldItem = ({
   onResize,
   onMove,
   onRemove,
+  onDuplicate,
   onAdvancedSettings,
   recipientIndex = 0,
   hideRecipients = false,
@@ -234,6 +236,15 @@ export const FieldItem = ({
                 <Settings2 className="h-3 w-3" />
               </button>
             )}
+
+            <button
+              className="dark:text-muted-foreground/50 dark:hover:text-muted-foreground dark:hover:bg-foreground/10 rounded-sm p-1.5 text-gray-400 transition-colors hover:bg-white/10 hover:text-gray-100"
+              onClick={onDuplicate}
+              onTouchEnd={onDuplicate}
+            >
+              <CopyPlus className="h-3 w-3" />
+            </button>
+
             <button
               className="dark:text-muted-foreground/50 dark:hover:text-muted-foreground dark:hover:bg-foreground/10 rounded-sm p-1.5 text-gray-400 transition-colors hover:bg-white/10 hover:text-gray-100"
               onClick={onRemove}

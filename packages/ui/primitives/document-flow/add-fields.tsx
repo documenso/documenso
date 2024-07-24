@@ -525,6 +525,7 @@ export const AddFieldsFormPartial = ({
                     {
                       '-rotate-6 scale-90 opacity-50': !isFieldWithinBounds,
                     },
+                    selectedField === FieldType.SIGNATURE && fontCaveat.className,
                   )}
                   style={{
                     top: coords.y,
@@ -555,6 +556,7 @@ export const AddFieldsFormPartial = ({
                       onResize={(options) => onFieldResize(options, index)}
                       onMove={(options) => onFieldMove(options, index)}
                       onRemove={() => remove(index)}
+                      onDuplicate={() => onFieldCopy({ duplicate: true })}
                       onAdvancedSettings={() => {
                         setCurrentField(field);
                         handleAdvancedSettings();
