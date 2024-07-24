@@ -1,1 +1,1 @@
-/*eslint-disable*/module.exports={messages:JSON.parse("{\"ZIuo5V\":\"Authentifizierung der Empfängeraktion\",\"imClgr\":\"Die für die Empfänger erforderliche Authentifizierung zum Signieren von Feldern\",\"6iFh5a\":\"Dies wird alle globalen Einstellungen überschreiben.\"}")};
+/*eslint-disable*/module.exports={messages:JSON.parse("{}")};

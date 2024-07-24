@@ -48,9 +48,7 @@ export const DocumentGlobalAuthActionTooltip = () => (
     </TooltipTrigger>
 
     <TooltipContent className="text-foreground max-w-md space-y-2 p-4">
-      <h2>
-        <strong>Global recipient action authentication</strong>
-      </h2>
+      <h2>Global recipient action authentication</h2>
 
       <p>The authentication required for recipients to sign the signature field.</p>
 

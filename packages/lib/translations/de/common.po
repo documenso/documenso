@@ -17,15 +17,3 @@ msgstr ""
 "X-Crowdin-Language: de\n"
 "X-Crowdin-File: common.po\n"
 "X-Crowdin-File-ID: 4\n"
-
-#: packages/ui/components/recipient/recipient-action-auth-select.tsx:36
-msgid "Recipient action authentication"
-msgstr "Authentifizierung der Empfängeraktion"
-
-#: packages/ui/components/recipient/recipient-action-auth-select.tsx:41
-msgid "The authentication required for recipients to sign fields"
-msgstr "Die für die Empfänger erforderliche Authentifizierung zum Signieren von Feldern"
-
-#: packages/ui/components/recipient/recipient-action-auth-select.tsx:45
-msgid "This will override any global settings."
-msgstr "Dies wird alle globalen Einstellungen überschreiben."
