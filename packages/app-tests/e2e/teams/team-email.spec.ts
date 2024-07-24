@@ -66,6 +66,7 @@ test('[TEAMS]: delete team email', async ({ page }) => {
   await page.locator('section div').filter({ hasText: 'Team email' }).getByRole('button').click();
 
   await page.getByRole('menuitem', { name: 'Remove' }).click();
+  await page.getByRole('button', { name: 'Remove' }).click();
 
   await expect(page.getByText('Team email has been removed').first()).toBeVisible();
 
