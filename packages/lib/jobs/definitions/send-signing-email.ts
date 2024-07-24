@@ -58,6 +58,12 @@ export const SEND_SIGNING_EMAIL_JOB_DEFINITION = {
         },
         include: {
           documentMeta: true,
+          team: {
+            select: {
+              teamEmail: true,
+              name: true,
+            },
+          },
         },
       }),
       prisma.recipient.findFirstOrThrow({
@@ -67,7 +73,7 @@ export const SEND_SIGNING_EMAIL_JOB_DEFINITION = {
       }),
     ]);
 
-    const { documentMeta } = document;
+    const { documentMeta, team } = document;
 
     if (recipient.role === RecipientRole.CC) {
       return;
@@ -75,6 +81,7 @@ export const SEND_SIGNING_EMAIL_JOB_DEFINITION = {
 
     const customEmail = document?.documentMeta;
     const isDirectTemplate = document.source === DocumentSource.TEMPLATE_DIRECT_LINK;
+    const isTeamDocument = document.teamId !== null;
 
     const recipientEmailType = RECIPIENT_ROLE_TO_EMAIL_TYPE[recipient.role];
 
@@ -96,6 +103,11 @@ export const SEND_SIGNING_EMAIL_JOB_DEFINITION = {
       emailSubject = `Please ${recipientActionVerb} this document created by your direct template`;
     }
 
+    if (isTeamDocument && team) {
+      emailSubject = `${team.name} invited you to ${recipientActionVerb} a document`;
+      emailMessage = `${user.name} on behalf of ${team.name} has invited you to ${recipientActionVerb} the document "${document.title}".`;
+    }
+
     const customEmailTemplate = {
       'signer.name': name,
       'signer.email': email,
@@ -108,12 +120,15 @@ export const SEND_SIGNING_EMAIL_JOB_DEFINITION = {
     const template = createElement(DocumentInviteEmailTemplate, {
       documentName: document.title,
       inviterName: user.name || undefined,
-      inviterEmail: user.email,
+      inviterEmail: isTeamDocument ? team?.teamEmail?.email || user.email : user.email,
       assetBaseUrl,
       signDocumentLink,
       customBody: renderCustomEmailTemplate(emailMessage, customEmailTemplate),
       role: recipient.role,
       selfSigner,
+      isTeamInvite: isTeamDocument,
+      teamName: team?.name,
+      teamEmail: team?.teamEmail?.email,
     });
 
     await io.runTask('send-signing-email', async () => {

@@ -91,6 +91,9 @@ export const ConfirmTeamEmailTemplate = ({
                     <li className="mt-1 text-sm">
                       Allow document recipients to reply directly to this email address
                     </li>
+                    <li className="mt-1 text-sm">
+                      Send documents on behalf of the team using the email address
+                    </li>
                   </ul>
 
                   <Text className="mt-2 text-sm">

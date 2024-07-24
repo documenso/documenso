@@ -196,6 +196,7 @@ export const MenuSwitcher = ({ user, teams: initialTeamsData }: MenuSwitcherProp
                       }
                       avatarFallback={formatAvatarFallback(team.name)}
                       primaryText={team.name}
+                      textSectionClassName="w-[200px]"
                       secondaryText={
                         <div className="relative w-full">
                           <motion.span

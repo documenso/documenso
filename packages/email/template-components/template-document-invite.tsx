@@ -12,6 +12,8 @@ export interface TemplateDocumentInviteProps {
   assetBaseUrl: string;
   role: RecipientRole;
   selfSigner: boolean;
+  isTeamInvite: boolean;
+  teamName?: string;
 }
 
 export const TemplateDocumentInvite = ({
@@ -21,6 +23,8 @@ export const TemplateDocumentInvite = ({
   assetBaseUrl,
   role,
   selfSigner,
+  isTeamInvite,
+  teamName,
 }: TemplateDocumentInviteProps) => {
   const { actionVerb, progressiveVerb } = RECIPIENT_ROLES_DESCRIPTION[role];
 
@@ -33,6 +37,12 @@ export const TemplateDocumentInvite = ({
           {selfSigner ? (
             <>
               {`Please ${actionVerb.toLowerCase()} your document`}
+              <br />
+              {`"${documentName}"`}
+            </>
+          ) : isTeamInvite ? (
+            <>
+              {`${inviterName} on behalf of ${teamName} has invited you to ${actionVerb.toLowerCase()}`}
               <br />
               {`"${documentName}"`}
             </>
