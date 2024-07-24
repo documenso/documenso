@@ -33,7 +33,7 @@ jobs:
         continue-on-error: true
 
       - name: Pull translations from Crowdin
-        if: steps.compile_translations.outcome == 'failure'
+        # if: steps.compile_translations.outcome == 'failure'
         uses: crowdin/github-action@v2
         with:
           upload_sources: false
