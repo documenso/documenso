@@ -49,8 +49,13 @@ msgstr "Erhobener Betrag"
 
 #: apps/marketing/src/components/(marketing)/pricing-table.tsx:145
 #: apps/marketing/src/components/(marketing)/pricing-table.tsx:189
-msgid "API Accesss"
-msgstr "API-Zugriff"
+msgid "API Access"
+msgstr ""
+
+#: apps/marketing/src/components/(marketing)/pricing-table.tsx:145
+#: apps/marketing/src/components/(marketing)/pricing-table.tsx:189
+#~ msgid "API Accesss"
+#~ msgstr "API-Zugriff"
 
 #: apps/marketing/src/components/(marketing)/faster-smarter-beautiful-bento.tsx:63
 msgid "Beautiful."
