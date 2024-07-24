@@ -54,7 +54,7 @@ type NewlyCreatedToken = {
 export type ApiTokenFormProps = {
   className?: string;
   teamId?: number;
-  tokens?: ApiToken[];
+  tokens?: Pick<ApiToken, 'id'>[];
 };
 
 export const ApiTokenForm = ({ className, teamId, tokens }: ApiTokenFormProps) => {

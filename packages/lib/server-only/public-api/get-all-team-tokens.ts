@@ -28,6 +28,13 @@ export const getTeamTokens = async ({ userId, teamId }: GetUserTokensOptions) =>
     where: {
       teamId,
     },
+    select: {
+      id: true,
+      name: true,
+      algorithm: true,
+      createdAt: true,
+      expires: true,
+    },
     orderBy: {
       createdAt: 'desc',
     },
