@@ -370,8 +370,8 @@ export const AddFieldsFormPartial = ({
           const newField: TAddFieldsFormSchema['fields'][0] = {
             ...lastActiveField,
             formId: nanoid(12),
-            pageX: lastActiveField.pageX + 2,
-            pageY: lastActiveField.pageY + 2,
+            pageX: lastActiveField.pageX + 3,
+            pageY: lastActiveField.pageY + 3,
           };
           append(newField);
         }
@@ -387,8 +387,8 @@ export const AddFieldsFormPartial = ({
       append({
         ...copiedField,
         formId: nanoid(12),
-        pageX: copiedField.pageX + 2,
-        pageY: copiedField.pageY + 2,
+        pageX: copiedField.pageX + 3,
+        pageY: copiedField.pageY + 3,
       });
     }
   }, [append]);
