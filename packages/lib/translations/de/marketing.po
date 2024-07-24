@@ -8,7 +8,7 @@ msgstr ""
 "Language: de\n"
 "Project-Id-Version: documenso-app\n"
 "Report-Msgid-Bugs-To: \n"
-"PO-Revision-Date: 2024-07-24 13:34\n"
+"PO-Revision-Date: 2024-07-24 13:56\n"
 "Last-Translator: \n"
 "Language-Team: German\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
@@ -144,7 +144,7 @@ msgstr "Documenso auf X"
 
 #: apps/marketing/src/components/(marketing)/hero.tsx:100
 msgid "Document signing,<0/>finally open source."
-msgstr "Dokumentensignatur,<0/>endlich Open Source."
+msgstr "Unterschriften,<0/>endlich Open Source."
 
 #: apps/marketing/src/components/(marketing)/footer.tsx:33
 #: apps/marketing/src/components/(marketing)/mobile-navigation.tsx:28
@@ -592,3 +592,4 @@ msgstr "Sie können Documenso kostenlos selbst hosten oder unsere sofort einsatz
 #: apps/marketing/src/components/(marketing)/carousel.tsx:258
 msgid "Your browser does not support the video tag."
 msgstr "Ihr Browser unterstützt das Video-Tag nicht."
+
