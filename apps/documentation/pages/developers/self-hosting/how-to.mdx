@@ -103,12 +103,16 @@ Once downloaded, navigate to the directory containing the `compose.yml` file.
 
 ### Set Up Environment Variables
 
-Create a `.env` file in the same directory as the `compose.yml` file.
+Create a `.env` file from the [`.env.example` file](https://github.com/documenso/documenso/blob/main/.env.example) and place it in the same directory as the `compose.yml` file.
 
-Then add your SMTP details as well as the following environment variables:
+Make sure to set up the required environment variables:
 
 ```bash
+POSTGRES_USER=<user>
+POSTGRES_PASSWORD=<password>
+POSTGRES_DB=<db-name>
 NEXTAUTH_SECRET="<your-secret>"
+NEXT_PRIVATE_DATABASE_URL="postgres://<user>:<password>@<docker-network-or-ip:5432>/<db-name>"
 NEXT_PRIVATE_ENCRYPTION_KEY="<your-key>"
 NEXT_PRIVATE_ENCRYPTION_SECONDARY_KEY="<your-secondary-key>"
 NEXT_PUBLIC_WEBAPP_URL="<your-url>"
