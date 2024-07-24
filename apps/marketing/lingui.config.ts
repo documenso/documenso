@@ -8,15 +8,15 @@ const config: LinguiConfig = {
   locales: APP_I18N_OPTIONS.supportedLngs as unknown as string[],
   catalogs: [
     {
-      path: '<rootDir>/../../packages/lib/translations/marketing/{locale}',
-      include: ['<rootDir>/../../packages/lib/translations/marketing'],
+      path: '<rootDir>/../../packages/lib/translations/{locale}/marketing',
+      include: ['<rootDir>/apps/marketing/src'],
     },
     {
-      path: '<rootDir>/../../packages/lib/translations/common/{locale}',
-      include: ['<rootDir>/../../packages/lib/translations/common'],
+      path: '<rootDir>/../../packages/lib/translations/{locale}/common',
+      include: ['<rootDir>/packages/ui', '<rootDir>/packages/lib'],
     },
   ],
-  catalogsMergePath: '<rootDir>/../../packages/lib/translations/marketing/compiled/{locale}',
+  catalogsMergePath: '<rootDir>/../../packages/lib/translations/{locale}/marketing',
 };
 
 export default config;

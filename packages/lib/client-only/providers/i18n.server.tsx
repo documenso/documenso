@@ -16,7 +16,7 @@ async function loadCatalog(locale: SupportedLocales): Promise<{
   [k: string]: Messages;
 }> {
   const { messages } = await import(
-    `../../translations/${IS_APP_WEB ? 'web' : 'marketing'}/compiled/${locale}.js`
+    `../../translations/${locale}/${IS_APP_WEB ? 'web' : 'marketing'}.js`
   );
 
   return {
