@@ -144,7 +144,7 @@ msgstr "Documenso pe X"
 
 #: apps/marketing/src/components/(marketing)/hero.tsx:100
 msgid "Document signing,<0/>finally open source."
-msgstr "Semnare de documente,<0 />în sfârșit open source."
+msgstr "Semnare de documente,<0/>în sfârșit open source."
 
 #: apps/marketing/src/components/(marketing)/footer.tsx:33
 #: apps/marketing/src/components/(marketing)/mobile-navigation.tsx:28
