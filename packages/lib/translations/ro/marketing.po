@@ -592,4 +592,3 @@ msgstr "Poți găzdui Documenso pe cont propriu gratuit sau să folosești versi
 #: apps/marketing/src/components/(marketing)/carousel.tsx:258
 msgid "Your browser does not support the video tag."
 msgstr "Browserul tău nu suportă eticheta video."
-
