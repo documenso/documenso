@@ -1,10 +1,8 @@
 import { updateSubscriptionItemQuantity } from '@documenso/ee/server-only/stripe/update-subscription-item-quantity';
-import { mailer } from '@documenso/email/mailer';
-import { render } from '@documenso/email/render';
-import { TeamLeaveEmailTemplate } from '@documenso/email/templates/team-leave';
-import { IS_BILLING_ENABLED, WEBAPP_BASE_URL } from '@documenso/lib/constants/app';
+import { IS_BILLING_ENABLED } from '@documenso/lib/constants/app';
 import { prisma } from '@documenso/prisma';
-import { TeamMemberRole } from '@documenso/prisma/client';
+
+import { jobs } from '../../jobs/client';
 
 export type LeaveTeamOptions = {
   /**
@@ -27,14 +25,14 @@ export const leaveTeam = async ({ userId, teamId }: LeaveTeamOptions) => {
           ownerUserId: {
             not: userId,
           },
+          members: {
+            some: {
+              userId,
+            },
+          },
         },
         include: {
           subscription: true,
-          members: {
-            include: {
-              user: true,
-            },
-          },
         },
       });
 
@@ -70,28 +68,13 @@ export const leaveTeam = async ({ userId, teamId }: LeaveTeamOptions) => {
         });
       }
 
-      const teamAdminAndManagers = team.members.filter(
-        (member) => member.role === TeamMemberRole.ADMIN || member.role === TeamMemberRole.MANAGER,
-      );
-
-      for (const recipient of teamAdminAndManagers) {
-        const emailContent = TeamLeaveEmailTemplate({
-          assetBaseUrl: WEBAPP_BASE_URL,
-          baseUrl: WEBAPP_BASE_URL,
-          memberName: leavingUser.name ?? '',
-          memberEmail: leavingUser.email,
-          teamName: team.name,
-          teamUrl: team.url,
-        });
-
-        await mailer.sendMail({
-          to: recipient.user.email,
-          from: 'noreply@documenso.com',
-          subject: `A team member has left ${team.name}`,
-          html: render(emailContent),
-          text: render(emailContent, { plainText: true }),
-        });
-      }
+      await jobs.triggerJob({
+        name: 'send.team-member-left.email',
+        payload: {
+          teamId,
+          memberUserId: leavingUser.id,
+        },
+      });
     },
     { timeout: 30_000 },
   );

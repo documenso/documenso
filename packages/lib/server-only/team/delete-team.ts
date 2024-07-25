@@ -9,7 +9,8 @@ import { FROM_ADDRESS, FROM_NAME } from '@documenso/lib/constants/email';
 import { AppError } from '@documenso/lib/errors/app-error';
 import { stripe } from '@documenso/lib/server-only/stripe';
 import { prisma } from '@documenso/prisma';
-import { TeamMemberRole } from '@documenso/prisma/client';
+
+import { jobs } from '../../jobs/client';
 
 export type DeleteTeamOptions = {
   userId: number;
@@ -31,6 +32,7 @@ export const deleteTeam = async ({ userId, teamId }: DeleteTeamOptions) => {
               user: {
                 select: {
                   id: true,
+                  name: true,
                   email: true,
                 },
               },
@@ -51,47 +53,21 @@ export const deleteTeam = async ({ userId, teamId }: DeleteTeamOptions) => {
           });
       }
 
-      const teamOwners = team.members.filter((member) => member.role === TeamMemberRole.ADMIN);
-      const teamMembers = team.members.filter(
-        (member) => member.role === TeamMemberRole.MANAGER || member.role === TeamMemberRole.MEMBER,
-      );
-
-      const ownerSendEmailResults = await Promise.allSettled(
-        teamOwners.map(async (owner) =>
-          sendTeamDeleteEmail({
-            email: owner.user.email,
-            teamName: team.name,
-            teamUrl: team.url,
-            isOwner: true,
-          }),
-        ),
-      );
-
-      const memberSendEmailResults = await Promise.allSettled(
-        teamMembers.map(async (member) =>
-          sendTeamDeleteEmail({
+      await jobs.triggerJob({
+        name: 'send.team-deleted.email',
+        payload: {
+          team: {
+            name: team.name,
+            url: team.url,
+            ownerUserId: team.ownerUserId,
+          },
+          members: team.members.map((member) => ({
+            id: member.user.id,
+            name: member.user.name || '',
             email: member.user.email,
-            teamName: team.name,
-            teamUrl: team.url,
-            isOwner: false,
-          }),
-        ),
-      );
-
-      const sendEmailResult = [...ownerSendEmailResults, ...memberSendEmailResults];
-      const sendEmailResultErrorList = sendEmailResult.filter(
-        (result): result is PromiseRejectedResult => result.status === 'rejected',
-      );
-
-      if (sendEmailResultErrorList.length > 0) {
-        console.error(JSON.stringify(sendEmailResultErrorList));
-
-        throw new AppError(
-          'EmailDeliveryFailed',
-          'Failed to send invite emails to one or more users.',
-          `Failed to send invites to ${sendEmailResultErrorList.length}/${team.members.length} users.`,
-        );
-      }
+          })),
+        },
+      });
 
       await tx.team.delete({
         where: {

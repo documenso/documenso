@@ -1,10 +1,8 @@
 import { updateSubscriptionItemQuantity } from '@documenso/ee/server-only/stripe/update-subscription-item-quantity';
-import { mailer } from '@documenso/email/mailer';
-import { render } from '@documenso/email/render';
-import { TeamJoinEmailTemplate } from '@documenso/email/templates/team-join';
-import { IS_BILLING_ENABLED, WEBAPP_BASE_URL } from '@documenso/lib/constants/app';
+import { IS_BILLING_ENABLED } from '@documenso/lib/constants/app';
 import { prisma } from '@documenso/prisma';
-import { TeamMemberRole } from '@documenso/prisma/client';
+
+import { jobs } from '../../jobs/client';
 
 export type AcceptTeamInvitationOptions = {
   userId: number;
@@ -41,7 +39,7 @@ export const acceptTeamInvitation = async ({ userId, teamId }: AcceptTeamInvitat
 
       const { team } = teamMemberInvite;
 
-      await tx.teamMember.create({
+      const teamMember = await tx.teamMember.create({
         data: {
           teamId: teamMemberInvite.teamId,
           userId: user.id,
@@ -69,28 +67,13 @@ export const acceptTeamInvitation = async ({ userId, teamId }: AcceptTeamInvitat
         });
       }
 
-      const teamAdminAndManagers = team.members.filter(
-        (member) => member.role === TeamMemberRole.ADMIN || member.role === TeamMemberRole.MANAGER,
-      );
-
-      for (const admin of teamAdminAndManagers) {
-        const emailContent = TeamJoinEmailTemplate({
-          assetBaseUrl: WEBAPP_BASE_URL,
-          baseUrl: WEBAPP_BASE_URL,
-          memberName: user.name || '',
-          memberEmail: user.email,
-          teamName: team.name,
-          teamUrl: team.url,
-        });
-
-        await mailer.sendMail({
-          to: admin.user.email,
-          from: 'noreply@documenso.com',
-          subject: 'A new member has joined your team',
-          html: render(emailContent),
-          text: render(emailContent, { plainText: true }),
-        });
-      }
+      await jobs.triggerJob({
+        name: 'send.team-member-joined.email',
+        payload: {
+          teamId: team.id,
+          memberId: teamMember.id,
+        },
+      });
     },
     { timeout: 30_000 },
   );
