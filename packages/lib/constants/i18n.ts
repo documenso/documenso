@@ -1,4 +1,4 @@
-export const SUPPORTED_LANGUAGE_CODES = ['de', 'en'] as const;
+export const SUPPORTED_LANGUAGE_CODES = ['de', 'en', 'ro'] as const;
 
 export type SupportedLanguageCodes = (typeof SUPPORTED_LANGUAGE_CODES)[number];
 
@@ -20,5 +20,9 @@ export const SUPPORTED_LANGUAGES: Record<string, SupportedLanguage> = {
   en: {
     full: 'English',
     short: 'en',
+  },
+  ro: {
+    full: 'Romanian',
+    short: 'ro',
   },
 } satisfies Record<SupportedLanguageCodes, SupportedLanguage>;
