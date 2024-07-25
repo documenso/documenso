@@ -6,8 +6,8 @@ import {
   seedPendingDocument,
 } from '@documenso/prisma/seed/documents';
 import { seedUserSubscription } from '@documenso/prisma/seed/subscriptions';
-import { seedTeam, unseedTeam } from '@documenso/prisma/seed/teams';
-import { seedUser, unseedUser } from '@documenso/prisma/seed/users';
+import { seedTeam } from '@documenso/prisma/seed/teams';
+import { seedUser } from '@documenso/prisma/seed/users';
 
 import { apiSignin } from '../fixtures/authentication';
 
@@ -53,8 +53,6 @@ test.describe('[EE_ONLY]', () => {
     await expect(page.getByRole('heading', { name: 'General' })).toBeVisible();
 
     await expect(page.getByTestId('documentActionSelectValue')).toContainText('Require passkey');
-
-    await unseedUser(user.id);
   });
 
   test('[DOCUMENT_FLOW] enterprise team member can add action auth settings', async ({ page }) => {
@@ -94,8 +92,6 @@ test.describe('[EE_ONLY]', () => {
 
     // Advanced settings should be visible.
     await expect(page.getByLabel('Show advanced settings')).toBeVisible();
-
-    await unseedTeam(team.url);
   });
 
   test('[DOCUMENT_FLOW] enterprise team member should not have access to enterprise on personal account', async ({
@@ -130,8 +126,6 @@ test.describe('[EE_ONLY]', () => {
 
     // Advanced settings should not be visible.
     await expect(page.getByLabel('Show advanced settings')).not.toBeVisible();
-
-    await unseedTeam(team.url);
   });
 });
 
@@ -166,8 +160,6 @@ test('[DOCUMENT_FLOW]: add settings', async ({ page }) => {
 
   await expect(page.getByLabel('Title')).toHaveValue('New Title');
   await expect(page.getByTestId('documentAccessSelectValue')).toContainText('Require account');
-
-  await unseedUser(user.id);
 });
 
 test('[DOCUMENT_FLOW]: title should be disabled depending on document status', async ({ page }) => {
@@ -188,6 +180,4 @@ test('[DOCUMENT_FLOW]: title should be disabled depending on document status', a
   // Should be enabled for draft documents.
   await page.goto(`/documents/${draftDocument.id}/edit`);
   await expect(page.getByLabel('Title')).toBeEnabled();
-
-  await unseedUser(user.id);
 });

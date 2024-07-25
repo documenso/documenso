@@ -4,8 +4,6 @@ import {
   extractUserVerificationToken,
   seedTestEmail,
   seedUser,
-  unseedUser,
-  unseedUserByEmail,
 } from '@documenso/prisma/seed/users';
 
 test.use({ storageState: { cookies: [], origins: [] } });
@@ -48,7 +46,6 @@ test('[USER] can sign up with email and password', async ({ page }: { page: Page
   await page.waitForURL('/documents');
 
   await expect(page).toHaveURL('/documents');
-  await unseedUserByEmail(email);
 });
 
 test('[USER] can sign in using email and password', async ({ page }: { page: Page }) => {
@@ -61,6 +58,4 @@ test('[USER] can sign in using email and password', async ({ page }: { page: Pag
 
   await page.waitForURL('/documents');
   await expect(page).toHaveURL('/documents');
-
-  await unseedUser(user.id);
 });
