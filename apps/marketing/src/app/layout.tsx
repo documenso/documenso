@@ -63,7 +63,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
 
   // Should be safe to remove when we upgrade NextJS.
   // https://github.com/vercel/next.js/pull/65008
-  // Currently if the middleware sets the cookie, it's not accessible in the headers.
+  // Currently if the middleware sets the cookie, it's not accessible in the cookies.
   // So we go the roundabout way of checking the header for the set-cookie value.
   if (!cookies().get('i18n')) {
     const setCookieValue = headers().get('set-cookie');
