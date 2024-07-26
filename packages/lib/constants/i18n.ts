@@ -25,8 +25,4 @@ export const SUPPORTED_LANGUAGES: Record<string, SupportedLanguage> = {
     full: 'English',
     short: 'en',
   },
-  ro: {
-    full: 'Romanian',
-    short: 'ro',
-  },
 } satisfies Record<SupportedLanguageCodes, SupportedLanguage>;
