@@ -3,7 +3,7 @@ import { expect, test } from '@playwright/test';
 import { createDocumentAuthOptions } from '@documenso/lib/utils/document-auth';
 import { prisma } from '@documenso/prisma';
 import { seedPendingDocument } from '@documenso/prisma/seed/documents';
-import { seedUser, unseedUser } from '@documenso/prisma/seed/users';
+import { seedUser } from '@documenso/prisma/seed/users';
 
 import { apiSignin } from '../fixtures/authentication';
 
@@ -31,8 +31,6 @@ test('[DOCUMENT_AUTH]: should grant access when not required', async ({ page }) 
     await page.goto(`/sign/${token}`);
     await expect(page.getByRole('heading', { name: 'Sign Document' })).toBeVisible();
   }
-
-  await unseedUser(user.id);
 });
 
 test('[DOCUMENT_AUTH]: should allow or deny access when required', async ({ page }) => {
@@ -90,7 +88,4 @@ test('[DOCUMENT_AUTH]: should allow or deny access when required', async ({ page
       await expect(page.getByRole('paragraph')).toContainText(email);
     }
   }
-
-  await unseedUser(user.id);
-  await unseedUser(recipientWithAccount.id);
 });

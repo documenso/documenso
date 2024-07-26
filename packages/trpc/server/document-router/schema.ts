@@ -55,6 +55,7 @@ export const ZSetSettingsForDocumentMutationSchema = z.object({
   teamId: z.number().min(1).optional(),
   data: z.object({
     title: z.string().min(1).optional(),
+    externalId: z.string().nullish(),
     globalAccessAuth: ZDocumentAccessAuthTypesSchema.nullable().optional(),
     globalActionAuth: ZDocumentActionAuthTypesSchema.nullable().optional(),
   }),
@@ -167,4 +168,9 @@ export const ZSearchDocumentsMutationSchema = z.object({
 export const ZDownloadAuditLogsMutationSchema = z.object({
   documentId: z.number(),
   teamId: z.number().optional(),
+});
+
+export const ZMoveDocumentsToTeamSchema = z.object({
+  documentId: z.number(),
+  teamId: z.number(),
 });

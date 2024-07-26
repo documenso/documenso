@@ -4,10 +4,12 @@ module.exports = {
   extends: ['@documenso/eslint-config'],
   rules: {
     '@next/next/no-img-element': 'off',
+    'no-unreachable': 'error',
   },
   settings: {
     next: {
       rootDir: ['apps/*/'],
     },
   },
+  ignorePatterns: ['lingui.config.ts', 'packages/lib/translations/**/*.js'],
 };

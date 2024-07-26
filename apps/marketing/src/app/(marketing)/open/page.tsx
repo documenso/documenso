@@ -1,7 +1,10 @@
 import type { Metadata } from 'next';
 
+import { Trans, msg } from '@lingui/macro';
+import { useLingui } from '@lingui/react';
 import { z } from 'zod';
 
+import { setupI18nSSR } from '@documenso/lib/client-only/providers/i18n.server';
 import { getCompletedDocumentsMonthly } from '@documenso/lib/server-only/user/get-monthly-completed-document';
 import { getUserMonthlyGrowth } from '@documenso/lib/server-only/user/get-user-monthly-growth';
 
@@ -128,6 +131,10 @@ const fetchEarlyAdopters = async () => {
 };
 
 export default async function OpenPage() {
+  setupI18nSSR();
+
+  const { _ } = useLingui();
+
   const [
     { forks_count: forksCount, stargazers_count: stargazersCount },
     { total_count: openIssues },
@@ -150,19 +157,23 @@ export default async function OpenPage() {
     <div>
       <div className="mx-auto mt-6 max-w-screen-lg sm:mt-12">
         <div className="flex flex-col items-center justify-center">
-          <h1 className="text-3xl font-bold lg:text-5xl">Open Startup</h1>
+          <h1 className="text-3xl font-bold lg:text-5xl">
+            <Trans>Open Startup</Trans>
+          </h1>
 
           <p className="text-muted-foreground mt-4 max-w-[60ch] text-center text-lg leading-normal">
-            All our metrics, finances, and learnings are public. We believe in transparency and want
-            to share our journey with you. You can read more about why here:{' '}
-            <a
-              className="font-bold"
-              href="https://documenso.com/blog/pre-seed"
-              target="_blank"
-              rel="noreferrer"
-            >
-              Announcing Open Metrics
-            </a>
+            <Trans>
+              All our metrics, finances, and learnings are public. We believe in transparency and
+              want to share our journey with you. You can read more about why here:{' '}
+              <a
+                className="font-bold"
+                href="https://documenso.com/blog/pre-seed"
+                target="_blank"
+                rel="noreferrer"
+              >
+                Announcing Open Metrics
+              </a>
+            </Trans>
           </p>
         </div>
 
@@ -180,12 +191,12 @@ export default async function OpenPage() {
             />
             <MetricCard
               className="col-span-2 lg:col-span-1"
-              title="Open Issues"
+              title={_(msg`Open Issues`)}
               value={openIssues.toLocaleString('en-US')}
             />
             <MetricCard
               className="col-span-2 lg:col-span-1"
-              title="Merged PR's"
+              title={_(msg`Merged PR's`)}
               value={mergedPullRequests.toLocaleString('en-US')}
             />
           </div>
@@ -195,28 +206,32 @@ export default async function OpenPage() {
           <SalaryBands className="col-span-12" />
         </div>
 
-        <h2 className="px-4 text-2xl font-semibold">Finances</h2>
+        <h2 className="px-4 text-2xl font-semibold">
+          <Trans>Finances</Trans>
+        </h2>
         <div className="mb-12 mt-4 grid grid-cols-12 gap-8">
           <FundingRaised data={FUNDING_RAISED} className="col-span-12 lg:col-span-6" />
 
           <CapTable className="col-span-12 lg:col-span-6" />
         </div>
 
-        <h2 className="px-4 text-2xl font-semibold">Community</h2>
+        <h2 className="px-4 text-2xl font-semibold">
+          <Trans>Community</Trans>
+        </h2>
         <div className="mb-12 mt-4 grid grid-cols-12 gap-8">
           <BarMetric<StargazersType>
             data={STARGAZERS_DATA}
             metricKey="stars"
-            title="GitHub: Total Stars"
-            label="Stars"
+            title={_(msg`GitHub: Total Stars`)}
+            label={_(msg`Stars`)}
             className="col-span-12 lg:col-span-6"
           />
 
           <BarMetric<StargazersType>
             data={STARGAZERS_DATA}
             metricKey="mergedPRs"
-            title="GitHub: Total Merged PRs"
-            label="Merged PRs"
+            title={_(msg`GitHub: Total Merged PRs`)}
+            label={_(msg`Merged PRs`)}
             chartHeight={400}
             className="col-span-12 lg:col-span-6"
           />
@@ -233,8 +248,8 @@ export default async function OpenPage() {
           <BarMetric<StargazersType>
             data={STARGAZERS_DATA}
             metricKey="openIssues"
-            title="GitHub: Total Open Issues"
-            label="Open Issues"
+            title={_(msg`GitHub: Total Open Issues`)}
+            label={_(msg`Open Issues`)}
             chartHeight={400}
             className="col-span-12 lg:col-span-6"
           />
@@ -242,13 +257,15 @@ export default async function OpenPage() {
           <Typefully className="col-span-12 lg:col-span-6" />
         </div>
 
-        <h2 className="px-4 text-2xl font-semibold">Growth</h2>
+        <h2 className="px-4 text-2xl font-semibold">
+          <Trans>Growth</Trans>
+        </h2>
         <div className="mb-12 mt-4 grid grid-cols-12 gap-8">
           <BarMetric<EarlyAdoptersType>
             data={EARLY_ADOPTERS_DATA}
             metricKey="earlyAdopters"
-            title="Total Customers"
-            label="Total Customers"
+            title={_(msg`Total Customers`)}
+            label={_(msg`Total Customers`)}
             className="col-span-12 lg:col-span-6"
             extraInfo={<OpenPageTooltip />}
           />
@@ -268,11 +285,15 @@ export default async function OpenPage() {
       </div>
 
       <div className="col-span-12 mt-12 flex flex-col items-center justify-center">
-        <h2 className="text-2xl font-bold">Is there more?</h2>
+        <h2 className="text-2xl font-bold">
+          <Trans>Is there more?</Trans>
+        </h2>
 
         <p className="text-muted-foreground mt-4 max-w-[55ch] text-center text-lg leading-normal">
-          This page is evolving as we learn what makes a great signing company. We'll update it when
-          we have more to share.
+          <Trans>
+            This page is evolving as we learn what makes a great signing company. We'll update it
+            when we have more to share.
+          </Trans>
         </p>
       </div>
 

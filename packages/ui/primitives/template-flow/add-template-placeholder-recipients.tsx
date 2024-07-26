@@ -26,6 +26,7 @@ import {
   DocumentFlowFormContainerActions,
   DocumentFlowFormContainerContent,
   DocumentFlowFormContainerFooter,
+  DocumentFlowFormContainerHeader,
   DocumentFlowFormContainerStep,
 } from '../document-flow/document-flow-root';
 import { ShowFieldItem } from '../document-flow/show-field-item';
@@ -168,6 +169,10 @@ export const AddTemplatePlaceholderRecipientsFormPartial = ({
 
   return (
     <>
+      <DocumentFlowFormContainerHeader
+        title={documentFlow.title}
+        description={documentFlow.description}
+      />
       <DocumentFlowFormContainerContent>
         {isDocumentPdfLoaded &&
           fields.map((field, index) => (

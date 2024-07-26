@@ -1,6 +1,6 @@
 {
   "name": "@documenso/web",
-  "version": "1.2.3",
+  "version": "1.6.0",
   "private": true,
   "license": "AGPL-3.0",
   "scripts": {
@@ -11,7 +11,8 @@
     "e2e:prepare": "next build && next start",
     "lint:fix": "next lint --fix",
     "clean": "rimraf .next && rimraf node_modules",
-    "copy:pdfjs": "node ../../scripts/copy-pdfjs.cjs"
+    "copy:pdfjs": "node ../../scripts/copy-pdfjs.cjs",
+    "translate:compile": "lingui compile --typescript"
   },
   "dependencies": {
     "@documenso/api": "*",
@@ -22,6 +23,8 @@
     "@documenso/trpc": "*",
     "@documenso/ui": "*",
     "@hookform/resolvers": "^3.1.0",
+    "@lingui/macro": "^4.11.1",
+    "@lingui/react": "^4.11.1",
     "@simplewebauthn/browser": "^9.0.1",
     "@simplewebauthn/server": "^9.0.3",
     "@tanstack/react-query": "^4.29.5",
@@ -48,14 +51,17 @@
     "react-hotkeys-hook": "^4.4.1",
     "react-icons": "^4.11.0",
     "react-rnd": "^10.4.1",
+    "recharts": "^2.7.2",
     "remeda": "^1.27.1",
-    "sharp": "^0.33.1",
+    "sharp": "0.32.6",
     "ts-pattern": "^5.0.5",
     "ua-parser-js": "^1.0.37",
     "uqr": "^0.1.2",
     "zod": "^3.22.4"
   },
   "devDependencies": {
+    "@lingui/loader": "^4.11.1",
+    "@lingui/swc-plugin": "4.0.6",
     "@documenso/tailwind-config": "*",
     "@simplewebauthn/types": "^9.0.1",
     "@types/formidable": "^2.0.6",

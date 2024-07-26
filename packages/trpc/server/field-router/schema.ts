@@ -1,6 +1,7 @@
 import { z } from 'zod';
 
 import { ZRecipientActionAuthSchema } from '@documenso/lib/types/document-auth';
+import { ZFieldMetaSchema } from '@documenso/lib/types/field-meta';
 import { FieldType } from '@documenso/prisma/client';
 
 export const ZAddFieldsMutationSchema = z.object({
@@ -16,6 +17,7 @@ export const ZAddFieldsMutationSchema = z.object({
       pageY: z.number().min(0),
       pageWidth: z.number().min(0),
       pageHeight: z.number().min(0),
+      fieldMeta: ZFieldMetaSchema,
     }),
   ),
 });
@@ -35,6 +37,7 @@ export const ZAddTemplateFieldsMutationSchema = z.object({
       pageY: z.number().min(0),
       pageWidth: z.number().min(0),
       pageHeight: z.number().min(0),
+      fieldMeta: ZFieldMetaSchema,
     }),
   ),
 });
@@ -59,3 +62,17 @@ export const ZRemovedSignedFieldWithTokenMutationSchema = z.object({
 export type TRemovedSignedFieldWithTokenMutationSchema = z.infer<
   typeof ZRemovedSignedFieldWithTokenMutationSchema
 >;
+
+export const ZGetFieldQuerySchema = z.object({
+  fieldId: z.number(),
+  teamId: z.number().optional(),
+});
+
+export type TGetFieldQuerySchema = z.infer<typeof ZGetFieldQuerySchema>;
+
+export const ZUpdateFieldMutationSchema = z.object({
+  fieldId: z.number(),
+  documentId: z.number(),
+  fieldMeta: ZFieldMetaSchema,
+  teamId: z.number().optional(),
+});

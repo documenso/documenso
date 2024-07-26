@@ -211,7 +211,7 @@ export const SignUpFormV2 = ({
 
         <div className="relative flex h-full w-full flex-col items-center justify-evenly">
           <div className="bg-background rounded-2xl border px-4 py-1 text-sm font-medium">
-            User profiles are coming soon!
+            User profiles are here!
           </div>
 
           <AnimatePresence>

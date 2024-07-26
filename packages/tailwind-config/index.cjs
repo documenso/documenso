@@ -7,9 +7,6 @@ module.exports = {
   content: ['src/**/*.{ts,tsx}'],
   theme: {
     extend: {
-      screens: {
-        print: { raw: 'print' },
-      },
       fontFamily: {
         sans: ['var(--font-sans)', ...fontFamily.sans],
         signature: ['var(--font-signature)'],
@@ -138,6 +135,7 @@ module.exports = {
         '3xl': '1920px',
         '4xl': '2560px',
         '5xl': '3840px',
+        print: { raw: 'print' },
       },
     },
   },
