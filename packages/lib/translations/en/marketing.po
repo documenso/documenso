@@ -97,7 +97,7 @@ msgstr "Completed Documents"
 msgid "Completed Documents per Month"
 msgstr "Completed Documents per Month"
 
-#: apps/marketing/src/components/(marketing)/share-connect-paid-widget-bento.tsx:61
+#: apps/marketing/src/components/(marketing)/share-connect-paid-widget-bento.tsx:63
 msgid "Connections"
 msgstr "Connections"
 
@@ -105,7 +105,7 @@ msgstr "Connections"
 msgid "Contact Us"
 msgstr "Contact Us"
 
-#: apps/marketing/src/components/(marketing)/share-connect-paid-widget-bento.tsx:63
+#: apps/marketing/src/components/(marketing)/share-connect-paid-widget-bento.tsx:65
 msgid "Create connections and automations with Zapier and more to integrate with your favorite tools."
 msgstr "Create connections and automations with Zapier and more to integrate with your favorite tools."
 
@@ -150,7 +150,7 @@ msgstr "Document signing,<0/>finally open source."
 msgid "Documentation"
 msgstr "Documentation"
 
-#: apps/marketing/src/components/(marketing)/share-connect-paid-widget-bento.tsx:106
+#: apps/marketing/src/components/(marketing)/share-connect-paid-widget-bento.tsx:108
 msgid "Easily embed Documenso into your product. Simply copy and paste our react widget into your application."
 msgstr "Easily embed Documenso into your product. Simply copy and paste our react widget into your application."
 
@@ -219,7 +219,7 @@ msgstr "From the blog"
 msgid "Full-Time"
 msgstr "Full-Time"
 
-#: apps/marketing/src/components/(marketing)/share-connect-paid-widget-bento.tsx:83
+#: apps/marketing/src/components/(marketing)/share-connect-paid-widget-bento.tsx:85
 msgid "Get paid (Soon)."
 msgstr "Get paid (Soon)."
 
@@ -271,7 +271,7 @@ msgstr "How do you handle my data?"
 msgid "Individual"
 msgstr "Individual"
 
-#: apps/marketing/src/components/(marketing)/share-connect-paid-widget-bento.tsx:85
+#: apps/marketing/src/components/(marketing)/share-connect-paid-widget-bento.tsx:87
 msgid "Integrated payments with Stripe so you don’t have to worry about getting paid."
 msgstr "Integrated payments with Stripe so you don’t have to worry about getting paid."
 
@@ -406,7 +406,7 @@ msgstr "Profile"
 msgid "Questions?"
 msgstr "Questions?"
 
-#: apps/marketing/src/components/(marketing)/share-connect-paid-widget-bento.tsx:104
+#: apps/marketing/src/components/(marketing)/share-connect-paid-widget-bento.tsx:106
 msgid "React Widget (Soon)."
 msgstr "React Widget (Soon)."
 

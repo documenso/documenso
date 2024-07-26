@@ -102,7 +102,7 @@ msgstr "Fertige Dokumente"
 msgid "Completed Documents per Month"
 msgstr "Fertige Dokumente pro Monat"
 
-#: apps/marketing/src/components/(marketing)/share-connect-paid-widget-bento.tsx:61
+#: apps/marketing/src/components/(marketing)/share-connect-paid-widget-bento.tsx:63
 msgid "Connections"
 msgstr "Verbindungen"
 
@@ -110,7 +110,7 @@ msgstr "Verbindungen"
 msgid "Contact Us"
 msgstr "Kontaktiere uns"
 
-#: apps/marketing/src/components/(marketing)/share-connect-paid-widget-bento.tsx:63
+#: apps/marketing/src/components/(marketing)/share-connect-paid-widget-bento.tsx:65
 msgid "Create connections and automations with Zapier and more to integrate with your favorite tools."
 msgstr "Erstellen Sie Verbindungen und Automatisierungen mit Zapier und mehr, um sich mit Ihren Lieblingstools zu integrieren."
 
@@ -155,7 +155,7 @@ msgstr "Unterschriften,<0/>endlich Open Source."
 msgid "Documentation"
 msgstr "Dokumentation"
 
-#: apps/marketing/src/components/(marketing)/share-connect-paid-widget-bento.tsx:106
+#: apps/marketing/src/components/(marketing)/share-connect-paid-widget-bento.tsx:108
 msgid "Easily embed Documenso into your product. Simply copy and paste our react widget into your application."
 msgstr "Betten Sie Documenso ganz einfach in Ihr Produkt ein. Kopieren und fügen Sie einfach unser React-Widget in Ihre Anwendung ein."
 
@@ -224,7 +224,7 @@ msgstr "Aus dem Blog"
 msgid "Full-Time"
 msgstr "Vollzeit"
 
-#: apps/marketing/src/components/(marketing)/share-connect-paid-widget-bento.tsx:83
+#: apps/marketing/src/components/(marketing)/share-connect-paid-widget-bento.tsx:85
 msgid "Get paid (Soon)."
 msgstr "Lassen Sie sich bezahlen (Bald)."
 
@@ -276,7 +276,7 @@ msgstr "Wie gehen Sie mit meinen Daten um?"
 msgid "Individual"
 msgstr "Einzelperson"
 
-#: apps/marketing/src/components/(marketing)/share-connect-paid-widget-bento.tsx:85
+#: apps/marketing/src/components/(marketing)/share-connect-paid-widget-bento.tsx:87
 msgid "Integrated payments with Stripe so you don’t have to worry about getting paid."
 msgstr "Integrierte Zahlungen mit Stripe, sodass Sie sich keine Sorgen ums Bezahlen machen müssen."
 
@@ -411,7 +411,7 @@ msgstr "Profil"
 msgid "Questions?"
 msgstr ""
 
-#: apps/marketing/src/components/(marketing)/share-connect-paid-widget-bento.tsx:104
+#: apps/marketing/src/components/(marketing)/share-connect-paid-widget-bento.tsx:106
 msgid "React Widget (Soon)."
 msgstr "React Widget (Demnächst)."
 
