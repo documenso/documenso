@@ -1,5 +1,7 @@
 'use client';
 
+import { Trans, msg } from '@lingui/macro';
+import { useLingui } from '@lingui/react';
 import { DateTime } from 'luxon';
 import { Bar, BarChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
 
@@ -11,6 +13,8 @@ export type MonthlyTotalUsersChartProps = {
 };
 
 export const MonthlyTotalUsersChart = ({ className, data }: MonthlyTotalUsersChartProps) => {
+  const { _ } = useLingui();
+
   const formattedData = [...data].reverse().map(({ month, cume_count: count }) => {
     return {
       month: DateTime.fromFormat(month, 'yyyy-MM').toFormat('LLLL'),
@@ -22,7 +26,9 @@ export const MonthlyTotalUsersChart = ({ className, data }: MonthlyTotalUsersCha
     <div className={className}>
       <div className="border-border flex flex-1 flex-col justify-center rounded-2xl border p-6 pl-2 shadow-sm hover:shadow">
         <div className="mb-6 flex px-4">
-          <h3 className="text-lg font-semibold">Total Users</h3>
+          <h3 className="text-lg font-semibold">
+            <Trans>Total Users</Trans>
+          </h3>
         </div>
 
         <ResponsiveContainer width="100%" height={400}>
@@ -34,7 +40,7 @@ export const MonthlyTotalUsersChart = ({ className, data }: MonthlyTotalUsersCha
               labelStyle={{
                 color: 'hsl(var(--primary-foreground))',
               }}
-              formatter={(value) => [Number(value).toLocaleString('en-US'), 'Total Users']}
+              formatter={(value) => [Number(value).toLocaleString('en-US'), _(msg`Total Users`)]}
               cursor={{ fill: 'hsl(var(--primary) / 10%)' }}
             />
 
@@ -43,7 +49,7 @@ export const MonthlyTotalUsersChart = ({ className, data }: MonthlyTotalUsersCha
               fill="hsl(var(--primary))"
               radius={[4, 4, 0, 0]}
               maxBarSize={60}
-              label="Total Users"
+              label={_(msg`Total Users`)}
             />
           </BarChart>
         </ResponsiveContainer>

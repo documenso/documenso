@@ -11,4 +11,5 @@ module.exports = {
       rootDir: ['apps/*/'],
     },
   },
+  ignorePatterns: ['lingui.config.ts', 'packages/lib/translations/**/*.js'],
 };

@@ -3,6 +3,7 @@
 import Image from 'next/image';
 import Link from 'next/link';
 
+import { Trans } from '@lingui/macro';
 import type { Variants } from 'framer-motion';
 import { motion } from 'framer-motion';
 import { usePlausible } from 'next-plausible';
@@ -96,8 +97,11 @@ export const Hero = ({ className, ...props }: HeroProps) => {
           animate="animate"
           className="text-center text-4xl font-bold leading-tight tracking-tight md:text-[48px] lg:text-[64px]"
         >
-          Document signing,
-          <span className="block" /> finally open source.
+          <Trans>
+            Document signing,
+            <span className="block" />
+            finally open source.
+          </Trans>
         </motion.h2>
 
         <motion.div
@@ -112,39 +116,21 @@ export const Hero = ({ className, ...props }: HeroProps) => {
               variant="outline"
               className="rounded-full bg-transparent backdrop-blur-sm"
             >
-              Try our Free Plan
+              <Trans>Try our Free Plan</Trans>
               <span className="bg-primary dark:text-background -mr-2.5 ml-2.5 rounded-full px-2 py-1.5 text-xs font-medium">
-                No Credit Card required
+                <Trans>No Credit Card required</Trans>
               </span>
             </Button>
           </Link>
           <Link href="https://github.com/documenso/documenso" onClick={() => event('view-github')}>
             <Button variant="outline" className="rounded-full bg-transparent backdrop-blur-sm">
               <LuGithub className="mr-2 h-5 w-5" />
-              Star on GitHub
+              <Trans>Star on GitHub</Trans>
             </Button>
           </Link>
         </motion.div>
 
         {match(heroMarketingCTA)
-          .with('spm', () => (
-            <motion.div
-              variants={HeroTitleVariants}
-              initial="initial"
-              animate="animate"
-              className="border-primary bg-background hover:bg-muted mx-auto mt-8 w-60 rounded-xl border transition-colors duration-300"
-            >
-              <Link href="/singleplayer" className="block px-4 py-2 text-center">
-                <h2 className="text-muted-foreground text-xs font-semibold">
-                  Introducing Single Player Mode
-                </h2>
-
-                <h1 className="text-foreground mt-1.5 font-medium leading-5">
-                  Self sign for free!
-                </h1>
-              </Link>
-            </motion.div>
-          ))
           .with('productHunt', () => (
             <motion.div
               variants={HeroTitleVariants}

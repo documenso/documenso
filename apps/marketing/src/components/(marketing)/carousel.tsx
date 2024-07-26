@@ -2,6 +2,9 @@
 
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 
+import { Trans, msg } from '@lingui/macro';
+import { useLingui } from '@lingui/react';
+import type { AutoplayType } from 'embla-carousel-autoplay';
 import Autoplay from 'embla-carousel-autoplay';
 import useEmblaCarousel from 'embla-carousel-react';
 import { useTheme } from 'next-themes';
@@ -13,13 +16,13 @@ import { Slide } from './slide';
 
 const SLIDES = [
   {
-    label: 'Signing Process',
+    label: msg`Signing Process`,
     type: 'video',
     srcLight: 'https://github.com/documenso/design/raw/main/marketing/signing.webm',
     srcDark: 'https://github.com/documenso/design/raw/main/marketing/dark/signing.webm',
   },
   {
-    label: 'Teams',
+    label: msg`Teams`,
     type: 'video',
     srcLight: 'https://github.com/documenso/design/raw/main/marketing/teams.webm',
     srcDark: 'https://github.com/documenso/design/raw/main/marketing/dark/teams.webm',
@@ -31,7 +34,7 @@ const SLIDES = [
     srcDark: 'https://github.com/documenso/design/raw/main/marketing/dark/zapier.webm',
   },
   {
-    label: 'Direct Link',
+    label: msg`Direct Link`,
     type: 'video',
     srcLight: 'https://github.com/documenso/design/raw/main/marketing/direct-links.webm',
     srcDark: 'https://github.com/documenso/design/raw/main/marketing/dark/direct-links.webm',
@@ -49,7 +52,7 @@ const SLIDES = [
     srcDark: 'https://github.com/documenso/design/raw/main/marketing/dark/api.webm',
   },
   {
-    label: 'Profile',
+    label: msg`Profile`,
     type: 'video',
     srcLight: 'https://github.com/documenso/design/raw/main/marketing/profile_teaser.webm',
     srcDark: 'https://github.com/documenso/design/raw/main/marketing/dark/profile_teaser.webm',
@@ -57,6 +60,8 @@ const SLIDES = [
 ];
 
 export const Carousel = () => {
+  const { _ } = useLingui();
+
   const slides = SLIDES;
   const [_isPlaying, setIsPlaying] = useState(false);
   const [selectedIndex, setSelectedIndex] = useState(0);
@@ -73,6 +78,7 @@ export const Carousel = () => {
   const [emblaRef, emblaApi] = useEmblaCarousel({ loop: true }, [
     Autoplay({ playOnInit: true, delay: autoplayDelay[selectedIndex] || 5000 }),
   ]);
+
   const [emblaThumbsRef, emblaThumbsApi] = useEmblaCarousel(
     {
       loop: true,
@@ -84,19 +90,28 @@ export const Carousel = () => {
 
   const onThumbClick = useCallback(
     (index: number) => {
-      if (!emblaApi || !emblaThumbsApi) return;
+      if (!emblaApi || !emblaThumbsApi) {
+        return;
+      }
+
       emblaApi.scrollTo(index);
     },
     [emblaApi, emblaThumbsApi],
   );
 
   const onSelect = useCallback(() => {
-    if (!emblaApi || !emblaThumbsApi) return;
+    if (!emblaApi || !emblaThumbsApi) {
+      return;
+    }
+
     setSelectedIndex(emblaApi.selectedScrollSnap());
     emblaThumbsApi.scrollTo(emblaApi.selectedScrollSnap());
 
     resetProgress();
-    const autoplay = emblaApi.plugins()?.autoplay;
+
+    // moduleResolution: bundler breaks this type
+    // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
+    const autoplay = emblaApi.plugins()?.autoplay as unknown as AutoplayType | undefined;
 
     if (autoplay) {
       autoplay.reset();
@@ -167,11 +182,18 @@ export const Carousel = () => {
   }, [emblaApi, onSelect, mounted, resolvedTheme]);
 
   useEffect(() => {
-    const autoplay = emblaApi?.plugins()?.autoplay;
-    if (!autoplay) return;
+    // moduleResolution: bundler breaks this type
+    // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
+    const autoplay = emblaApi?.plugins()?.autoplay as unknown as AutoplayType | undefined;
+
+    if (!autoplay || !emblaApi) {
+      return;
+    }
 
     setIsPlaying(autoplay.isPlaying());
-    emblaApi
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    (emblaApi as unknown as any)
       .on('autoplay:play', () => setIsPlaying(true))
       .on('autoplay:stop', () => setIsPlaying(false))
       .on('reInit', () => setIsPlaying(autoplay.isPlaying()));
@@ -233,7 +255,7 @@ export const Carousel = () => {
                       src={resolvedTheme === 'dark' ? slide.srcDark : slide.srcLight}
                       type="video/webm"
                     />
-                    Your browser does not support the video tag.
+                    <Trans>Your browser does not support the video tag.</Trans>
                   </video>
                 )}
               </div>
@@ -257,7 +279,7 @@ export const Carousel = () => {
               onClick={() => onThumbClick(index)}
               selected={index === selectedIndex}
               index={index}
-              label={slide.label}
+              label={typeof slide.label === 'string' ? slide.label : _(slide.label)}
             />
           ))}
         </div>
