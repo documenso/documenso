@@ -8,7 +8,7 @@ msgstr ""
 "Language: de\n"
 "Project-Id-Version: documenso-app\n"
 "Report-Msgid-Bugs-To: \n"
-"PO-Revision-Date: 2024-07-24 13:56\n"
+"PO-Revision-Date: 2024-07-26 06:04\n"
 "Last-Translator: \n"
 "Language-Team: German\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
@@ -361,11 +361,11 @@ msgstr "Unsere benutzerdefinierten Vorlagen verfügen über intelligente Regeln,
 
 #: apps/marketing/src/components/(marketing)/enterprise.tsx:20
 msgid "Our Enterprise License is great for large organizations looking to switch to Documenso for all their signing needs. It's available for our cloud offering as well as self-hosted setups and offers a wide range of compliance and Adminstration Features."
-msgstr ""
+msgstr "Unsere Enterprise-Lizenz ist ideal für große Organisationen, die auf Documenso für all ihre Signaturanforderungen umsteigen möchten. Sie ist sowohl für unser Cloud-Angebot als auch für selbstgehostete Setups verfügbar und bietet eine breite Palette an Compliance- und Verwaltungsfunktionen."
 
 #: apps/marketing/src/components/(marketing)/enterprise.tsx:20
 #~ msgid "Our Enterprise License is great large organizations looking to switch to Documenso for all their signing needs. It's availible for our cloud offering as well as self-hosted setups and offer a wide range of compliance and Adminstration Features."
-#~ msgstr "Unsere Enterprise-Lizenz ist ideal für große Organisationen, die zu Documenso für all ihre Unterzeichnungsbedürfnisse wechseln möchten. Sie ist für unser Cloud-Angebot sowie für selbstgehostete Setups verfügbar und bietet eine breite Palette regulatorischer und administrativer Funktionen."
+#~ msgstr "Our Enterprise License is great large organizations looking to switch to Documenso for all their signing needs. It's availible for our cloud offering as well as self-hosted setups and offer a wide range of compliance and Adminstration Features."
 
 #: apps/marketing/src/app/(marketing)/pricing/page.tsx:65
 msgid "Our self-hosted option is great for small teams and individuals who need a simple solution. You can use our docker based setup to get started in minutes. Take control with full customizability and data ownership."

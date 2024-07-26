@@ -8,7 +8,7 @@ msgstr ""
 "Language: ro\n"
 "Project-Id-Version: documenso-app\n"
 "Report-Msgid-Bugs-To: \n"
-"PO-Revision-Date: 2024-07-25 01:27\n"
+"PO-Revision-Date: 2024-07-26 06:04\n"
 "Last-Translator: \n"
 "Language-Team: Romanian\n"
 "Plural-Forms: nplurals=3; plural=(n==1 ? 0 : (n==0 || (n%100>0 && n%100<20)) ? 1 : 2);\n"
@@ -360,8 +360,12 @@ msgid "Our custom templates come with smart rules that can help you save time an
 msgstr "Șabloanele noastre personalizate vin cu reguli inteligente care te pot ajuta să economisești timp și energie."
 
 #: apps/marketing/src/components/(marketing)/enterprise.tsx:20
-msgid "Our Enterprise License is great large organizations looking to switch to Documenso for all their signing needs. It's availible for our cloud offering as well as self-hosted setups and offer a wide range of compliance and Adminstration Features."
-msgstr "Licența noastră Enterprise este excelentă pentru organizațiile mari care doresc să treacă la Documenso pentru toate nevoile lor de semnare. Este disponibilă pentru oferta noastră în cloud, precum și pentru configurațiile auto-găzduite și oferă o gamă largă de caracteristici de conformitate și administrare."
+msgid "Our Enterprise License is great for large organizations looking to switch to Documenso for all their signing needs. It's available for our cloud offering as well as self-hosted setups and offers a wide range of compliance and Adminstration Features."
+msgstr "Licența Enterprise este ideală pentru organizațiile mari care doresc să treacă la Documenso pentru toate nevoile lor de semnare. Este disponibilă atât pentru oferta noastră de cloud, cât și pentru configurații auto-găzduite și oferă o gamă largă de funcții de conformitate și administrare."
+
+#: apps/marketing/src/components/(marketing)/enterprise.tsx:20
+#~ msgid "Our Enterprise License is great large organizations looking to switch to Documenso for all their signing needs. It's availible for our cloud offering as well as self-hosted setups and offer a wide range of compliance and Adminstration Features."
+#~ msgstr "Our Enterprise License is great large organizations looking to switch to Documenso for all their signing needs. It's availible for our cloud offering as well as self-hosted setups and offer a wide range of compliance and Adminstration Features."
 
 #: apps/marketing/src/app/(marketing)/pricing/page.tsx:65
 msgid "Our self-hosted option is great for small teams and individuals who need a simple solution. You can use our docker based setup to get started in minutes. Take control with full customizability and data ownership."
@@ -592,3 +596,4 @@ msgstr "Poți găzdui Documenso pe cont propriu gratuit sau să folosești versi
 #: apps/marketing/src/components/(marketing)/carousel.tsx:258
 msgid "Your browser does not support the video tag."
 msgstr "Browserul tău nu suportă eticheta video."
+
