@@ -89,7 +89,7 @@ Please note that you must provide environment variables for connecting to the da
 
 ### Option 1: Production Docker Compose Setup
 
-This setup includes a PostgreSQL database and the Documenso application. You will need to provide your own SMTP details using environment variables.
+This setup includes a PostgreSQL database and the Documenso application.
 
 <Steps>
 
@@ -103,14 +103,12 @@ Once downloaded, navigate to the directory containing the `compose.yml` file.
 
 ### Set Up Environment Variables
 
-Create a `.env` file from the [`.env.example` file](https://github.com/documenso/documenso/blob/main/.env.example) and place it in the same directory as the `compose.yml` file.
-
-Make sure to set up the required environment variables:
+Create a `.env` file directory as the `compose.yml` file and fill in the following environment variables:
 
 ```bash
-POSTGRES_USER=<user>
-POSTGRES_PASSWORD=<password>
-POSTGRES_DB=<db-name>
+POSTGRES_USER="user"
+POSTGRES_PASSWORD="changeme"
+POSTGRES_DB=documenso
 NEXTAUTH_SECRET="<your-secret>"
 NEXT_PRIVATE_DATABASE_URL="postgres://<user>:<password>@<docker-network-or-ip:5432>/<db-name>"
 NEXT_PRIVATE_ENCRYPTION_KEY="<your-key>"
@@ -130,12 +128,21 @@ The `cert.p12` file is required to sign and encrypt documents, so you must provi
 ```yaml
 volumes:
   - /path/to/your/keyfile.p12:/opt/documenso/cert.p12
+
+# example
+volumes:
+  - ../../apps/web/example/cert.p12:/opt/documenso/cert.p12
 ```
+
+<Callout type="info">
+  Follow the instructions from the ["Signing Certificate"
+  section](developers/local-development/signing-certificate) to generate the `cert.p12` file.
+</Callout>
 
 After updating the volume binding, save the `compose.yml` file and run the following command to start the containers:
 
 ```bash
-docker-compose --env-file ./.env -d up
+docker-compose up -d
 ```
 
 The command will start the PostgreSQL database and the Documenso application containers.
