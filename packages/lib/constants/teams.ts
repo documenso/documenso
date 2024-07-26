@@ -54,7 +54,6 @@ export const PROTECTED_TEAM_URLS = [
   'criminal',
   'dashboard',
   'docs',
-  'documenso',
   'documentation',
   'document',
   'documents',
