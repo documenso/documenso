@@ -16,9 +16,9 @@ export const Enterprise = () => {
       </h2>
 
       <p className="text-muted-foreground mt-4 text-center leading-relaxed">
-        Our Enterprise License is great large organizations looking to switch to Documenso for all
+        Our Enterprise License is great for large organizations looking to switch to Documenso for all
         their signing needs. It's availible for our cloud offering as well as self-hosted setups and
-        offer a wide range of compliance and Adminstration Features.
+        offers a wide range of compliance and Adminstration Features.
       </p>
 
       <div className="mt-4 flex justify-center">
