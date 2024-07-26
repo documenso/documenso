@@ -39,9 +39,11 @@ export const ShareConnectPaidWidgetBento = ({
           <CardContent className="grid grid-cols-1 gap-8 p-6">
             <p className="text-foreground/80 leading-relaxed">
               <strong className="block">
-                <Trans>Easy Sharing (Soon).</Trans>
+                <Trans>Easy Sharing.</Trans>
               </strong>
-              <Trans>Receive your personal link to share with everyone you care about.</Trans>
+              <Trans>
+                Receive your personal profile link to share with everyone you care about.
+              </Trans>
             </p>
 
             <div className="flex items-center justify-center p-8">

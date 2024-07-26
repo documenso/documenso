@@ -61,11 +61,15 @@ msgstr "Because signing should be celebrated. That’s why we care about the sma
 msgid "Blog"
 msgstr "Blog"
 
+#: apps/marketing/src/components/(marketing)/learn-more-callout.tsx:32
+msgid "Book a Sales Call"
+msgstr "Book a Sales Call"
+
 #: apps/marketing/src/components/(marketing)/open-build-template-bento.tsx:60
 msgid "Build on top."
 msgstr "Build on top."
 
-#: apps/marketing/src/app/(marketing)/pricing/page.tsx:163
+#: apps/marketing/src/app/(marketing)/pricing/page.tsx:167
 msgid "Can I use Documenso commercially?"
 msgstr "Can I use Documenso commercially?"
 
@@ -129,7 +133,7 @@ msgstr "Designed for every stage of your journey."
 msgid "Direct Link"
 msgstr "Direct Link"
 
-#: apps/marketing/src/app/(marketing)/pricing/page.tsx:181
+#: apps/marketing/src/app/(marketing)/pricing/page.tsx:185
 msgid "Documenso is a community effort to create an open and vibrant ecosystem around a tool, everybody is free to use and adapt. By being truly open we want to create trusted infrastructure for the future of the internet."
 msgstr "Documenso is a community effort to create an open and vibrant ecosystem around a tool, everybody is free to use and adapt. By being truly open we want to create trusted infrastructure for the future of the internet."
 
@@ -151,8 +155,12 @@ msgid "Easily embed Documenso into your product. Simply copy and paste our react
 msgstr "Easily embed Documenso into your product. Simply copy and paste our react widget into your application."
 
 #: apps/marketing/src/components/(marketing)/share-connect-paid-widget-bento.tsx:42
-msgid "Easy Sharing (Soon)."
-msgstr "Easy Sharing (Soon)."
+#~ msgid "Easy Sharing (Soon)."
+#~ msgstr "Easy Sharing (Soon)."
+
+#: apps/marketing/src/components/(marketing)/share-connect-paid-widget-bento.tsx:42
+msgid "Easy Sharing."
+msgstr "Easy Sharing."
 
 #: apps/marketing/src/components/(marketing)/pricing-table.tsx:148
 #: apps/marketing/src/components/(marketing)/pricing-table.tsx:192
@@ -219,7 +227,7 @@ msgstr "Get paid (Soon)."
 msgid "Get started"
 msgstr "Get started"
 
-#: apps/marketing/src/app/(marketing)/pricing/page.tsx:75
+#: apps/marketing/src/app/(marketing)/pricing/page.tsx:79
 msgid "Get Started"
 msgstr "Get Started"
 
@@ -251,11 +259,11 @@ msgstr "Global Salary Bands"
 msgid "Growth"
 msgstr "Growth"
 
-#: apps/marketing/src/app/(marketing)/pricing/page.tsx:134
+#: apps/marketing/src/app/(marketing)/pricing/page.tsx:138
 msgid "How can I contribute?"
 msgstr "How can I contribute?"
 
-#: apps/marketing/src/app/(marketing)/pricing/page.tsx:105
+#: apps/marketing/src/app/(marketing)/pricing/page.tsx:109
 msgid "How do you handle my data?"
 msgstr "How do you handle my data?"
 
@@ -286,6 +294,10 @@ msgstr "Join Date"
 #: apps/marketing/src/components/(marketing)/call-to-action.tsx:19
 msgid "Join the Open Signing Movement"
 msgstr "Join the Open Signing Movement"
+
+#: apps/marketing/src/components/(marketing)/learn-more-callout.tsx:44
+msgid "Learn More"
+msgstr "Learn More"
 
 #: apps/marketing/src/app/(marketing)/open/team-members.tsx:46
 msgid "Location"
@@ -390,13 +402,21 @@ msgstr "Privacy"
 msgid "Profile"
 msgstr "Profile"
 
+#: apps/marketing/src/components/(marketing)/learn-more-callout.tsx:30
+msgid "Questions?"
+msgstr "Questions?"
+
 #: apps/marketing/src/components/(marketing)/share-connect-paid-widget-bento.tsx:104
 msgid "React Widget (Soon)."
 msgstr "React Widget (Soon)."
 
 #: apps/marketing/src/components/(marketing)/share-connect-paid-widget-bento.tsx:44
-msgid "Receive your personal link to share with everyone you care about."
-msgstr "Receive your personal link to share with everyone you care about."
+#~ msgid "Receive your personal link to share with everyone you care about."
+#~ msgstr "Receive your personal link to share with everyone you care about."
+
+#: apps/marketing/src/components/(marketing)/share-connect-paid-widget-bento.tsx:44
+msgid "Receive your personal profile link to share with everyone you care about."
+msgstr "Receive your personal profile link to share with everyone you care about."
 
 #: apps/marketing/src/app/(marketing)/open/team-members.tsx:37
 msgid "Role"
@@ -415,7 +435,7 @@ msgstr "Save $60 or $120"
 msgid "Search languages..."
 msgstr "Search languages..."
 
-#: apps/marketing/src/app/(marketing)/pricing/page.tsx:109
+#: apps/marketing/src/app/(marketing)/pricing/page.tsx:113
 msgid "Securely. Our data centers are located in Frankfurt (Germany), giving us the best local privacy laws. We are very aware of the sensitive nature of our data and follow best practices to ensure the security and integrity of the data entrusted to us."
 msgstr "Securely. Our data centers are located in Frankfurt (Germany), giving us the best local privacy laws. We are very aware of the sensitive nature of our data and follow best practices to ensure the security and integrity of the data entrusted to us."
 
@@ -490,7 +510,7 @@ msgstr "Teams"
 msgid "Template Store (Soon)."
 msgstr "Template Store (Soon)."
 
-#: apps/marketing/src/app/(marketing)/pricing/page.tsx:138
+#: apps/marketing/src/app/(marketing)/pricing/page.tsx:142
 msgid "That's awesome. You can take a look at the current <0>Issues</0> and join our <1>Discord Community</1> to keep up to date, on what the current priorities are. In any case, we are an open community and welcome all input, technical and non-technical ❤️"
 msgstr "That's awesome. You can take a look at the current <0>Issues</0> and join our <1>Discord Community</1> to keep up to date, on what the current priorities are. In any case, we are an open community and welcome all input, technical and non-technical ❤️"
 
@@ -544,7 +564,7 @@ msgstr "Unlimited Documents per Month"
 msgid "Up to 10 recipients per document"
 msgstr "Up to 10 recipients per document"
 
-#: apps/marketing/src/app/(marketing)/pricing/page.tsx:123
+#: apps/marketing/src/app/(marketing)/pricing/page.tsx:127
 msgid "Using our hosted version is the easiest way to get started, you can simply subscribe and start signing your documents. We take care of the infrastructure, so you can focus on your business. Additionally, when using our hosted version you benefit from our trusted signing certificates which helps you to build trust with your customers."
 msgstr "Using our hosted version is the easiest way to get started, you can simply subscribe and start signing your documents. We take care of the infrastructure, so you can focus on your business. Additionally, when using our hosted version you benefit from our trusted signing certificates which helps you to build trust with your customers."
 
@@ -552,11 +572,11 @@ msgstr "Using our hosted version is the easiest way to get started, you can simp
 msgid "View all stats"
 msgstr "View all stats"
 
-#: apps/marketing/src/app/(marketing)/pricing/page.tsx:195
+#: apps/marketing/src/app/(marketing)/pricing/page.tsx:199
 msgid "We are happy to assist you at <0>support@documenso.com</0> or <1>in our Discord-Support-Channel</1> please message either Lucas or Timur to get added to the channel if you are not already a member."
 msgstr "We are happy to assist you at <0>support@documenso.com</0> or <1>in our Discord-Support-Channel</1> please message either Lucas or Timur to get added to the channel if you are not already a member."
 
-#: apps/marketing/src/app/(marketing)/pricing/page.tsx:89
+#: apps/marketing/src/app/(marketing)/pricing/page.tsx:93
 msgid "What is the difference between the plans?"
 msgstr "What is the difference between the plans?"
 
@@ -564,15 +584,15 @@ msgstr "What is the difference between the plans?"
 msgid "When it comes to sending or receiving a contract, you can count on lightning-fast speeds."
 msgstr "When it comes to sending or receiving a contract, you can count on lightning-fast speeds."
 
-#: apps/marketing/src/app/(marketing)/pricing/page.tsx:191
+#: apps/marketing/src/app/(marketing)/pricing/page.tsx:195
 msgid "Where can I get support?"
 msgstr "Where can I get support?"
 
-#: apps/marketing/src/app/(marketing)/pricing/page.tsx:177
+#: apps/marketing/src/app/(marketing)/pricing/page.tsx:181
 msgid "Why should I prefer Documenso over DocuSign or some other signing tool?"
 msgstr "Why should I prefer Documenso over DocuSign or some other signing tool?"
 
-#: apps/marketing/src/app/(marketing)/pricing/page.tsx:119
+#: apps/marketing/src/app/(marketing)/pricing/page.tsx:123
 msgid "Why should I use your hosting service?"
 msgstr "Why should I use your hosting service?"
 
@@ -580,11 +600,11 @@ msgstr "Why should I use your hosting service?"
 msgid "Yearly"
 msgstr "Yearly"
 
-#: apps/marketing/src/app/(marketing)/pricing/page.tsx:167
+#: apps/marketing/src/app/(marketing)/pricing/page.tsx:171
 msgid "Yes! Documenso is offered under the GNU AGPL V3 open source license. This means you can use it for free and even modify it to fit your needs, as long as you publish your changes under the same license."
 msgstr "Yes! Documenso is offered under the GNU AGPL V3 open source license. This means you can use it for free and even modify it to fit your needs, as long as you publish your changes under the same license."
 
-#: apps/marketing/src/app/(marketing)/pricing/page.tsx:93
+#: apps/marketing/src/app/(marketing)/pricing/page.tsx:97
 msgid "You can self-host Documenso for free or use our ready-to-use hosted version. The hosted version comes with additional support, painless scalability and more. Early adopters will get access to all features we build this year, for no additional cost! Forever! Yes, that includes multiple users per account later. If you want Documenso for your enterprise, we are happy to talk about your needs."
 msgstr "You can self-host Documenso for free or use our ready-to-use hosted version. The hosted version comes with additional support, painless scalability and more. Early adopters will get access to all features we build this year, for no additional cost! Forever! Yes, that includes multiple users per account later. If you want Documenso for your enterprise, we are happy to talk about your needs."
 
