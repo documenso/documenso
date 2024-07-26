@@ -480,6 +480,7 @@ enum TeamMemberRole {
 enum TeamMemberInviteStatus {
   ACCEPTED
   PENDING
+  DECLINED
 }
 
 model Team {

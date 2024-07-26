@@ -355,8 +355,12 @@ msgid "Our custom templates come with smart rules that can help you save time an
 msgstr "Our custom templates come with smart rules that can help you save time and energy."
 
 #: apps/marketing/src/components/(marketing)/enterprise.tsx:20
-msgid "Our Enterprise License is great large organizations looking to switch to Documenso for all their signing needs. It's availible for our cloud offering as well as self-hosted setups and offer a wide range of compliance and Adminstration Features."
-msgstr "Our Enterprise License is great large organizations looking to switch to Documenso for all their signing needs. It's availible for our cloud offering as well as self-hosted setups and offer a wide range of compliance and Adminstration Features."
+msgid "Our Enterprise License is great for large organizations looking to switch to Documenso for all their signing needs. It's available for our cloud offering as well as self-hosted setups and offers a wide range of compliance and Adminstration Features."
+msgstr "Our Enterprise License is great for large organizations looking to switch to Documenso for all their signing needs. It's available for our cloud offering as well as self-hosted setups and offers a wide range of compliance and Adminstration Features."
+
+#: apps/marketing/src/components/(marketing)/enterprise.tsx:20
+#~ msgid "Our Enterprise License is great large organizations looking to switch to Documenso for all their signing needs. It's availible for our cloud offering as well as self-hosted setups and offer a wide range of compliance and Adminstration Features."
+#~ msgstr "Our Enterprise License is great large organizations looking to switch to Documenso for all their signing needs. It's availible for our cloud offering as well as self-hosted setups and offer a wide range of compliance and Adminstration Features."
 
 #: apps/marketing/src/app/(marketing)/pricing/page.tsx:65
 msgid "Our self-hosted option is great for small teams and individuals who need a simple solution. You can use our docker based setup to get started in minutes. Take control with full customizability and data ownership."
