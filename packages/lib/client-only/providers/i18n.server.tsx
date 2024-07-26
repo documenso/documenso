@@ -50,10 +50,12 @@ export const allI18nInstances = SUPPORTED_LANGUAGE_CODES.reduce((acc, locale) =>
  *
  * https://lingui.dev/tutorials/react-rsc#pages-layouts-and-lingui
  */
-export const setupI18nSSR = () => {
-  const lang = extractSupportedLanguage({
-    cookies: cookies(),
-  });
+export const setupI18nSSR = (overrideLang?: SupportedLocales) => {
+  const lang =
+    overrideLang ||
+    extractSupportedLanguage({
+      cookies: cookies(),
+    });
 
   // Get and set a ready-made i18n instance for the given language.
   const i18n = allI18nInstances[lang];

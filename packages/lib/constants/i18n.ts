@@ -1,4 +1,8 @@
-export const SUPPORTED_LANGUAGE_CODES = ['de', 'en', 'ro'] as const;
+import { z } from 'zod';
+
+export const SUPPORTED_LANGUAGE_CODES = ['de', 'en'] as const;
+
+export const ZSupportedLanguageCodeSchema = z.enum(SUPPORTED_LANGUAGE_CODES).catch('en');
 
 export type SupportedLanguageCodes = (typeof SUPPORTED_LANGUAGE_CODES)[number];
 

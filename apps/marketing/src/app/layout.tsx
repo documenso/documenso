@@ -1,6 +1,7 @@
 import { Suspense } from 'react';
 
 import { Caveat, Inter } from 'next/font/google';
+import { cookies, headers } from 'next/headers';
 
 import { AxiomWebVitals } from 'next-axiom';
 import { PublicEnvScript } from 'next-runtime-env';
@@ -9,6 +10,8 @@ import { FeatureFlagProvider } from '@documenso/lib/client-only/providers/featur
 import { I18nClientProvider } from '@documenso/lib/client-only/providers/i18n.client';
 import { setupI18nSSR } from '@documenso/lib/client-only/providers/i18n.server';
 import { NEXT_PUBLIC_MARKETING_URL } from '@documenso/lib/constants/app';
+import type { SUPPORTED_LANGUAGE_CODES } from '@documenso/lib/constants/i18n';
+import { ZSupportedLanguageCodeSchema } from '@documenso/lib/constants/i18n';
 import { getAllAnonymousFlags } from '@documenso/lib/universal/get-feature-flag';
 import { TrpcProvider } from '@documenso/trpc/react';
 import { cn } from '@documenso/ui/lib/utils';
@@ -56,7 +59,24 @@ export function generateMetadata() {
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
   const flags = await getAllAnonymousFlags();
 
-  const { lang, i18n } = setupI18nSSR();
+  let overrideLang: (typeof SUPPORTED_LANGUAGE_CODES)[number] | undefined;
+
+  // Should be safe to remove when we upgrade NextJS.
+  // https://github.com/vercel/next.js/pull/65008
+  // Currently if the middleware sets the cookie, it's not accessible in the headers.
+  // So we go the roundabout way of checking the header for the set-cookie value.
+  if (!cookies().get('i18n')) {
+    const setCookieValue = headers().get('set-cookie');
+    const i18nCookie = setCookieValue?.split(';').find((cookie) => cookie.startsWith('i18n='));
+
+    if (i18nCookie) {
+      const i18n = i18nCookie.split('=')[1];
+
+      overrideLang = ZSupportedLanguageCodeSchema.parse(i18n);
+    }
+  }
+
+  const { lang, i18n } = setupI18nSSR(overrideLang);
 
   return (
     <html
