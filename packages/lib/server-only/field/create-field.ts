@@ -1,6 +1,7 @@
 import { prisma } from '@documenso/prisma';
 import type { FieldType, Team } from '@documenso/prisma/client';
 
+import type { TFieldMetaSchema as FieldMeta } from '../../types/field-meta';
 import type { RequestMetadata } from '../../universal/extract-request-metadata';
 import { createDocumentAuditLogData } from '../../utils/document-audit-logs';
 
@@ -15,6 +16,7 @@ export type CreateFieldOptions = {
   pageY: number;
   pageWidth: number;
   pageHeight: number;
+  fieldMeta?: FieldMeta;
   requestMetadata?: RequestMetadata;
 };
 
@@ -29,6 +31,7 @@ export const createField = async ({
   pageY,
   pageWidth,
   pageHeight,
+  fieldMeta,
   requestMetadata,
 }: CreateFieldOptions) => {
   const document = await prisma.document.findFirst({

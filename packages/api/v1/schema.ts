@@ -1,6 +1,7 @@
 import { z } from 'zod';
 
 import { ZUrlSchema } from '@documenso/lib/schemas/common';
+import { ZFieldMetaSchema } from '@documenso/lib/types/field-meta';
 import {
   DocumentDataType,
   FieldType,
@@ -283,6 +284,7 @@ export const ZCreateFieldMutationSchema = z.object({
   pageY: z.number(),
   pageWidth: z.number(),
   pageHeight: z.number(),
+  fieldMeta: ZFieldMetaSchema,
 });
 
 export type TCreateFieldMutationSchema = z.infer<typeof ZCreateFieldMutationSchema>;

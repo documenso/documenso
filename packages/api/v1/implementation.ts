@@ -832,7 +832,17 @@ export const ApiContractV1Implementation = createNextRoute(ApiContractV1, {
 
   createField: authenticatedMiddleware(async (args, user, team) => {
     const { id: documentId } = args.params;
-    const { recipientId, type, pageNumber, pageWidth, pageHeight, pageX, pageY } = args.body;
+    const { recipientId, type, pageNumber, pageWidth, pageHeight, pageX, pageY, fieldMeta } =
+      args.body;
+
+    if (pageNumber <= 0) {
+      return {
+        status: 400,
+        body: {
+          message: 'Invalid page number',
+        },
+      };
+    }
 
     const document = await getDocumentById({
       id: Number(documentId),
