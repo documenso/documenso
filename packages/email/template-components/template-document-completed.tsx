@@ -5,12 +5,14 @@ export interface TemplateDocumentCompletedProps {
   downloadLink: string;
   documentName: string;
   assetBaseUrl: string;
+  customBody?: string;
 }
 
 export const TemplateDocumentCompleted = ({
   downloadLink,
   documentName,
   assetBaseUrl,
+  customBody,
 }: TemplateDocumentCompletedProps) => {
   const getAssetUrl = (path: string) => {
     return new URL(path, assetBaseUrl).toString();
@@ -34,7 +36,7 @@ export const TemplateDocumentCompleted = ({
         </Section>
 
         <Text className="text-primary mb-0 text-center text-lg font-semibold">
-          “{documentName}” was signed by all signers
+          {customBody ?? `“${documentName}” was signed by all signers`}
         </Text>
 
         <Text className="my-1 text-center text-base text-slate-400">

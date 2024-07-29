@@ -1,9 +1,9 @@
 import { expect, test } from '@playwright/test';
 
 import { seedUserSubscription } from '@documenso/prisma/seed/subscriptions';
-import { seedTeam, unseedTeam } from '@documenso/prisma/seed/teams';
+import { seedTeam } from '@documenso/prisma/seed/teams';
 import { seedBlankTemplate } from '@documenso/prisma/seed/templates';
-import { seedUser, unseedUser } from '@documenso/prisma/seed/users';
+import { seedUser } from '@documenso/prisma/seed/users';
 
 import { apiSignin } from '../fixtures/authentication';
 
@@ -49,8 +49,6 @@ test.describe('[EE_ONLY]', () => {
     await expect(page.getByRole('heading', { name: 'General' })).toBeVisible();
 
     await expect(page.getByTestId('documentActionSelectValue')).toContainText('Require passkey');
-
-    await unseedUser(user.id);
   });
 
   test('[TEMPLATE_FLOW] enterprise team member can add action auth settings', async ({ page }) => {
@@ -90,8 +88,6 @@ test.describe('[EE_ONLY]', () => {
 
     // Advanced settings should be visible.
     await expect(page.getByLabel('Show advanced settings')).toBeVisible();
-
-    await unseedTeam(team.url);
   });
 
   test('[TEMPLATE_FLOW] enterprise team member should not have access to enterprise on personal account', async ({
@@ -126,8 +122,6 @@ test.describe('[EE_ONLY]', () => {
 
     // Advanced settings should not be visible.
     await expect(page.getByLabel('Show advanced settings')).not.toBeVisible();
-
-    await unseedTeam(team.url);
   });
 });
 
@@ -162,6 +156,4 @@ test('[TEMPLATE_FLOW]: add settings', async ({ page }) => {
 
   await expect(page.getByLabel('Title')).toHaveValue('New Title');
   await expect(page.getByTestId('documentAccessSelectValue')).toContainText('Require account');
-
-  await unseedUser(user.id);
 });

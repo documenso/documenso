@@ -12,6 +12,7 @@ import { ZMapNegativeOneToUndefinedSchema } from '../document-flow/add-settings.
 
 export const ZAddTemplateSettingsFormSchema = z.object({
   title: z.string().trim().min(1, { message: "Title can't be empty" }),
+  externalId: z.string().optional(),
   globalAccessAuth: ZMapNegativeOneToUndefinedSchema.pipe(
     ZDocumentAccessAuthTypesSchema.optional(),
   ),

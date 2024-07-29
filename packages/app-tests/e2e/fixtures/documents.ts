@@ -13,5 +13,5 @@ export const checkDocumentTabCount = async (page: Page, tabName: string, count: 
     return;
   }
 
-  await expect(page.getByRole('main')).toContainText(`Showing ${count}`);
+  await expect(page.getByTestId('data-table-count')).toContainText(`Showing ${count}`);
 };

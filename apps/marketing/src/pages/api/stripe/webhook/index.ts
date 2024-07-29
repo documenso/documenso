@@ -13,6 +13,7 @@ import { updateFile } from '@documenso/lib/universal/upload/update-file';
 import { prisma } from '@documenso/prisma';
 import {
   DocumentDataType,
+  DocumentSource,
   DocumentStatus,
   FieldType,
   ReadStatus,
@@ -104,6 +105,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
       const document = await prisma.document.create({
         data: {
+          source: DocumentSource.DOCUMENT,
           title: 'Documenso Supporter Pledge.pdf',
           status: DocumentStatus.COMPLETED,
           userId: user.id,

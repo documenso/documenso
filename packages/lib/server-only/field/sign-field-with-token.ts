@@ -3,18 +3,28 @@
 import { DateTime } from 'luxon';
 import { match } from 'ts-pattern';
 
+import { validateCheckboxField } from '@documenso/lib/advanced-fields-validation/validate-checkbox';
+import { validateDropdownField } from '@documenso/lib/advanced-fields-validation/validate-dropdown';
+import { validateNumberField } from '@documenso/lib/advanced-fields-validation/validate-number';
+import { validateRadioField } from '@documenso/lib/advanced-fields-validation/validate-radio';
+import { validateTextField } from '@documenso/lib/advanced-fields-validation/validate-text';
 import { prisma } from '@documenso/prisma';
 import { DocumentStatus, FieldType, SigningStatus } from '@documenso/prisma/client';
 
 import { DEFAULT_DOCUMENT_DATE_FORMAT } from '../../constants/date-formats';
 import { DEFAULT_DOCUMENT_TIME_ZONE } from '../../constants/time-zones';
-import { AppError, AppErrorCode } from '../../errors/app-error';
 import { DOCUMENT_AUDIT_LOG_TYPE } from '../../types/document-audit-logs';
 import type { TRecipientActionAuth } from '../../types/document-auth';
+import {
+  ZCheckboxFieldMeta,
+  ZDropdownFieldMeta,
+  ZNumberFieldMeta,
+  ZRadioFieldMeta,
+  ZTextFieldMeta,
+} from '../../types/field-meta';
 import type { RequestMetadata } from '../../universal/extract-request-metadata';
 import { createDocumentAuditLogData } from '../../utils/document-audit-logs';
-import { extractDocumentAuthMethods } from '../../utils/document-auth';
-import { isRecipientAuthorized } from '../document/is-recipient-authorized';
+import { validateFieldAuth } from '../document/validate-field-auth';
 
 export type SignFieldWithTokenOptions = {
   token: string;
@@ -26,6 +36,16 @@ export type SignFieldWithTokenOptions = {
   requestMetadata?: RequestMetadata;
 };
 
+/**
+ * Please read.
+ *
+ * Content within this function has been duplicated in the
+ * createDocumentFromDirectTemplate file.
+ *
+ * Any update to this should be reflected in the other file if required.
+ *
+ * Todo: Extract common logic.
+ */
 export const signFieldWithToken = async ({
   token,
   fieldId,
@@ -79,32 +99,59 @@ export const signFieldWithToken = async ({
     throw new Error(`Field ${fieldId} has no recipientId`);
   }
 
-  let { derivedRecipientActionAuth } = extractDocumentAuthMethods({
-    documentAuth: document.authOptions,
-    recipientAuth: recipient.authOptions,
+  if (field.type === FieldType.NUMBER && field.fieldMeta) {
+    const numberFieldParsedMeta = ZNumberFieldMeta.parse(field.fieldMeta);
+    const errors = validateNumberField(value, numberFieldParsedMeta, true);
+
+    if (errors.length > 0) {
+      throw new Error(errors.join(', '));
+    }
+  }
+
+  if (field.type === FieldType.TEXT && field.fieldMeta) {
+    const textFieldParsedMeta = ZTextFieldMeta.parse(field.fieldMeta);
+    const errors = validateTextField(value, textFieldParsedMeta, true);
+
+    if (errors.length > 0) {
+      throw new Error(errors.join(', '));
+    }
+  }
+
+  if (field.type === FieldType.CHECKBOX && field.fieldMeta) {
+    const checkboxFieldParsedMeta = ZCheckboxFieldMeta.parse(field.fieldMeta);
+    const checkboxFieldValues = value.split(',');
+    const errors = validateCheckboxField(checkboxFieldValues, checkboxFieldParsedMeta, true);
+
+    if (errors.length > 0) {
+      throw new Error(errors.join(', '));
+    }
+  }
+
+  if (field.type === FieldType.RADIO && field.fieldMeta) {
+    const radioFieldParsedMeta = ZRadioFieldMeta.parse(field.fieldMeta);
+    const errors = validateRadioField(value, radioFieldParsedMeta, true);
+
+    if (errors.length > 0) {
+      throw new Error(errors.join(', '));
+    }
+  }
+
+  if (field.type === FieldType.DROPDOWN && field.fieldMeta) {
+    const dropdownFieldParsedMeta = ZDropdownFieldMeta.parse(field.fieldMeta);
+    const errors = validateDropdownField(value, dropdownFieldParsedMeta, true);
+
+    if (errors.length > 0) {
+      throw new Error(errors.join(', '));
+    }
+  }
+
+  const derivedRecipientActionAuth = await validateFieldAuth({
+    documentAuthOptions: document.authOptions,
+    recipient,
+    field,
+    userId,
+    authOptions,
   });
-
-  // Override all non-signature fields to not require any auth.
-  if (field.type !== FieldType.SIGNATURE) {
-    derivedRecipientActionAuth = null;
-  }
-
-  let isValid = true;
-
-  // Only require auth on signature fields for now.
-  if (field.type === FieldType.SIGNATURE) {
-    isValid = await isRecipientAuthorized({
-      type: 'ACTION',
-      document: document,
-      recipient: recipient,
-      userId,
-      authOptions,
-    });
-  }
-
-  if (!isValid) {
-    throw new AppError(AppErrorCode.UNAUTHORIZED, 'Invalid authentication values');
-  }
 
   const documentMeta = await prisma.documentMeta.findFirst({
     where: {
@@ -142,10 +189,6 @@ export const signFieldWithToken = async ({
     });
 
     if (isSignatureField) {
-      if (!field.recipientId) {
-        throw new Error('Field has no recipientId');
-      }
-
       const signature = await tx.signature.upsert({
         where: {
           fieldId: field.id,
@@ -192,6 +235,16 @@ export const signFieldWithToken = async ({
               type,
               data: updatedField.customText,
             }))
+            .with(
+              FieldType.NUMBER,
+              FieldType.RADIO,
+              FieldType.CHECKBOX,
+              FieldType.DROPDOWN,
+              (type) => ({
+                type,
+                data: updatedField.customText,
+              }),
+            )
             .exhaustive(),
           fieldSecurity: derivedRecipientActionAuth
             ? {

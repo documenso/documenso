@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 
+import { Trans } from '@lingui/macro';
 import { usePlausible } from 'next-plausible';
 import { LuGithub } from 'react-icons/lu';
 
@@ -15,36 +16,20 @@ export type CalloutProps = {
 export const Callout = ({ starCount }: CalloutProps) => {
   const event = usePlausible();
 
-  const onSignUpClick = () => {
-    const el = document.getElementById('email');
-
-    if (el) {
-      const { top } = el.getBoundingClientRect();
-
-      window.scrollTo({
-        top: top - 120,
-        behavior: 'smooth',
-      });
-
-      setTimeout(() => {
-        el.focus();
-      }, 500);
-    }
-  };
-
   return (
     <div className="mt-8 flex flex-wrap items-center justify-center gap-x-6 gap-y-4">
-      <Button
-        type="button"
-        variant="outline"
-        className="rounded-full bg-transparent backdrop-blur-sm"
-        onClick={onSignUpClick}
-      >
-        Claim Early Adopter Plan
-        <span className="bg-primary dark:text-background -mr-2.5 ml-2.5 rounded-full px-2 py-1.5 text-xs font-medium">
-          $30/mo
-        </span>
-      </Button>
+      <Link href="https://app.documenso.com/signup?utm_source=marketing-callout">
+        <Button
+          type="button"
+          variant="outline"
+          className="rounded-full bg-transparent backdrop-blur-sm"
+        >
+          <Trans>Try our Free Plan</Trans>
+          <span className="bg-primary dark:text-background -mr-2.5 ml-2.5 rounded-full px-2 py-1.5 text-xs font-medium">
+            <Trans>No Credit Card required</Trans>
+          </span>
+        </Button>
+      </Link>
 
       <Link
         href="https://github.com/documenso/documenso"

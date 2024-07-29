@@ -15,6 +15,7 @@ export const getTeamInvitations = async ({ email }: GetTeamInvitationsOptions) =
           id: true,
           name: true,
           url: true,
+          avatarImageId: true,
         },
       },
     },

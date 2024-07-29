@@ -2,7 +2,8 @@
 
 import Link from 'next/link';
 
-import { type Document, DocumentStatus } from '@documenso/prisma/client';
+import type { Recipient } from '@documenso/prisma/client';
+import { type Document, SigningStatus } from '@documenso/prisma/client';
 import { trpc } from '@documenso/trpc/react';
 import { cn } from '@documenso/ui/lib/utils';
 import { Button } from '@documenso/ui/primitives/button';
@@ -17,9 +18,10 @@ import { useToast } from '@documenso/ui/primitives/use-toast';
 export type AdminActionsProps = {
   className?: string;
   document: Document;
+  recipients: Recipient[];
 };
 
-export const AdminActions = ({ className, document }: AdminActionsProps) => {
+export const AdminActions = ({ className, document, recipients }: AdminActionsProps) => {
   const { toast } = useToast();
 
   const { mutate: resealDocument, isLoading: isResealDocumentLoading } =
@@ -47,7 +49,9 @@ export const AdminActions = ({ className, document }: AdminActionsProps) => {
             <Button
               variant="outline"
               loading={isResealDocumentLoading}
-              disabled={document.status !== DocumentStatus.COMPLETED}
+              disabled={recipients.some(
+                (recipient) => recipient.signingStatus !== SigningStatus.SIGNED,
+              )}
               onClick={() => resealDocument({ id: document.id })}
             >
               Reseal document

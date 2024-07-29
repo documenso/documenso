@@ -1,6 +1,7 @@
 import { createNextRoute } from '@ts-rest/next';
 
 import { getServerLimits } from '@documenso/ee/server-only/limits/server';
+import { NEXT_PUBLIC_WEBAPP_URL } from '@documenso/lib/constants/app';
 import { AppError } from '@documenso/lib/errors/app-error';
 import { createDocumentData } from '@documenso/lib/server-only/document-data/create-document-data';
 import { upsertDocumentMeta } from '@documenso/lib/server-only/document-meta/upsert-document-meta';
@@ -8,6 +9,7 @@ import { createDocument } from '@documenso/lib/server-only/document/create-docum
 import { deleteDocument } from '@documenso/lib/server-only/document/delete-document';
 import { findDocuments } from '@documenso/lib/server-only/document/find-documents';
 import { getDocumentById } from '@documenso/lib/server-only/document/get-document-by-id';
+import { resendDocument } from '@documenso/lib/server-only/document/resend-document';
 import { sendDocument } from '@documenso/lib/server-only/document/send-document';
 import { updateDocument } from '@documenso/lib/server-only/document/update-document';
 import { createField } from '@documenso/lib/server-only/field/create-field';
@@ -23,6 +25,9 @@ import { updateRecipient } from '@documenso/lib/server-only/recipient/update-rec
 import type { CreateDocumentFromTemplateResponse } from '@documenso/lib/server-only/template/create-document-from-template';
 import { createDocumentFromTemplate } from '@documenso/lib/server-only/template/create-document-from-template';
 import { createDocumentFromTemplateLegacy } from '@documenso/lib/server-only/template/create-document-from-template-legacy';
+import { deleteTemplate } from '@documenso/lib/server-only/template/delete-template';
+import { findTemplates } from '@documenso/lib/server-only/template/find-templates';
+import { getTemplateById } from '@documenso/lib/server-only/template/get-template-by-id';
 import { extractNextApiRequestMetadata } from '@documenso/lib/universal/extract-request-metadata';
 import { getFile } from '@documenso/lib/universal/upload/get-file';
 import { putPdfFile } from '@documenso/lib/universal/upload/put-file';
@@ -76,7 +81,10 @@ export const ApiContractV1Implementation = createNextRoute(ApiContractV1, {
         status: 200,
         body: {
           ...document,
-          recipients,
+          recipients: recipients.map((recipient) => ({
+            ...recipient,
+            signingUrl: `${NEXT_PUBLIC_WEBAPP_URL()}/sign/${recipient.token}`,
+          })),
         },
       };
     } catch (err) {
@@ -225,6 +233,7 @@ export const ApiContractV1Implementation = createNextRoute(ApiContractV1, {
 
       const document = await createDocument({
         title: body.title,
+        externalId: body.externalId || null,
         userId: user.id,
         teamId: team?.id,
         formValues: body.formValues,
@@ -258,6 +267,8 @@ export const ApiContractV1Implementation = createNextRoute(ApiContractV1, {
             email: recipient.email,
             token: recipient.token,
             role: recipient.role,
+
+            signingUrl: `${NEXT_PUBLIC_WEBAPP_URL()}/sign/${recipient.token}`,
           })),
         },
       };
@@ -268,6 +279,73 @@ export const ApiContractV1Implementation = createNextRoute(ApiContractV1, {
           message: 'An error has occured while uploading the file',
         },
       };
+    }
+  }),
+
+  deleteTemplate: authenticatedMiddleware(async (args, user, team) => {
+    const { id: templateId } = args.params;
+
+    try {
+      const deletedTemplate = await deleteTemplate({
+        id: Number(templateId),
+        userId: user.id,
+        teamId: team?.id,
+      });
+
+      return {
+        status: 200,
+        body: deletedTemplate,
+      };
+    } catch (err) {
+      return {
+        status: 404,
+        body: {
+          message: 'Template not found',
+        },
+      };
+    }
+  }),
+
+  getTemplate: authenticatedMiddleware(async (args, user, team) => {
+    const { id: templateId } = args.params;
+
+    try {
+      const template = await getTemplateById({
+        id: Number(templateId),
+        userId: user.id,
+        teamId: team?.id,
+      });
+
+      return {
+        status: 200,
+        body: template,
+      };
+    } catch (err) {
+      return AppError.toRestAPIError(err);
+    }
+  }),
+
+  getTemplates: authenticatedMiddleware(async (args, user, team) => {
+    const page = Number(args.query.page) || 1;
+    const perPage = Number(args.query.perPage) || 10;
+
+    try {
+      const { templates, totalPages } = await findTemplates({
+        page,
+        perPage,
+        userId: user.id,
+        teamId: team?.id,
+      });
+
+      return {
+        status: 200,
+        body: {
+          templates,
+          totalPages,
+        },
+      };
+    } catch (err) {
+      return AppError.toRestAPIError(err);
     }
   }),
 
@@ -321,6 +399,7 @@ export const ApiContractV1Implementation = createNextRoute(ApiContractV1, {
       teamId: team?.id,
       data: {
         title: fileName,
+        externalId: body.externalId || null,
         formValues: body.formValues,
         documentData: {
           connect: {
@@ -349,6 +428,8 @@ export const ApiContractV1Implementation = createNextRoute(ApiContractV1, {
           email: recipient.email,
           token: recipient.token,
           role: recipient.role,
+
+          signingUrl: `${NEXT_PUBLIC_WEBAPP_URL()}/sign/${recipient.token}`,
         })),
       },
     };
@@ -375,6 +456,7 @@ export const ApiContractV1Implementation = createNextRoute(ApiContractV1, {
     try {
       document = await createDocumentFromTemplate({
         templateId,
+        externalId: body.externalId || null,
         userId: user.id,
         teamId: team?.id,
         recipients: body.recipients,
@@ -428,6 +510,8 @@ export const ApiContractV1Implementation = createNextRoute(ApiContractV1, {
           email: recipient.email,
           token: recipient.token,
           role: recipient.role,
+
+          signingUrl: `${NEXT_PUBLIC_WEBAPP_URL()}/sign/${recipient.token}`,
         })),
       },
     };
@@ -435,6 +519,7 @@ export const ApiContractV1Implementation = createNextRoute(ApiContractV1, {
 
   sendDocument: authenticatedMiddleware(async (args, user, team) => {
     const { id } = args.params;
+    const { sendEmail = true } = args.body ?? {};
 
     const document = await getDocumentById({ id: Number(id), userId: user.id, teamId: team?.id });
 
@@ -490,10 +575,11 @@ export const ApiContractV1Implementation = createNextRoute(ApiContractV1, {
       //     });
       //   }
 
-      await sendDocument({
+      const { Recipient: recipients, ...sentDocument } = await sendDocument({
         documentId: Number(id),
         userId: user.id,
         teamId: team?.id,
+        sendEmail,
         requestMetadata: extractNextApiRequestMetadata(args.req),
       });
 
@@ -501,6 +587,11 @@ export const ApiContractV1Implementation = createNextRoute(ApiContractV1, {
         status: 200,
         body: {
           message: 'Document sent for signing successfully',
+          ...sentDocument,
+          recipients: recipients.map((recipient) => ({
+            ...recipient,
+            signingUrl: `${NEXT_PUBLIC_WEBAPP_URL()}/sign/${recipient.token}`,
+          })),
         },
       };
     } catch (err) {
@@ -508,6 +599,35 @@ export const ApiContractV1Implementation = createNextRoute(ApiContractV1, {
         status: 500,
         body: {
           message: 'An error has occured while sending the document for signing',
+        },
+      };
+    }
+  }),
+
+  resendDocument: authenticatedMiddleware(async (args, user, team) => {
+    const { id: documentId } = args.params;
+    const { recipients } = args.body;
+
+    try {
+      await resendDocument({
+        userId: user.id,
+        documentId: Number(documentId),
+        recipients,
+        teamId: team?.id,
+        requestMetadata: extractNextApiRequestMetadata(args.req),
+      });
+
+      return {
+        status: 200,
+        body: {
+          message: 'Document resend successfully initiated',
+        },
+      };
+    } catch (err) {
+      return {
+        status: 500,
+        body: {
+          message: 'An error has occured while resending the document',
         },
       };
     }
@@ -585,6 +705,7 @@ export const ApiContractV1Implementation = createNextRoute(ApiContractV1, {
         body: {
           ...newRecipient,
           documentId: Number(documentId),
+          signingUrl: `${NEXT_PUBLIC_WEBAPP_URL()}/sign/${newRecipient.token}`,
         },
       };
     } catch (err) {
@@ -650,6 +771,7 @@ export const ApiContractV1Implementation = createNextRoute(ApiContractV1, {
       body: {
         ...updatedRecipient,
         documentId: Number(documentId),
+        signingUrl: `${NEXT_PUBLIC_WEBAPP_URL()}/sign/${updatedRecipient.token}`,
       },
     };
   }),
@@ -703,6 +825,7 @@ export const ApiContractV1Implementation = createNextRoute(ApiContractV1, {
       body: {
         ...deletedRecipient,
         documentId: Number(documentId),
+        signingUrl: '',
       },
     };
   }),
@@ -911,6 +1034,8 @@ export const ApiContractV1Implementation = createNextRoute(ApiContractV1, {
     }
 
     const field = await getFieldById({
+      userId: user.id,
+      teamId: team?.id,
       fieldId: Number(fieldId),
       documentId: Number(documentId),
     }).catch(() => null);

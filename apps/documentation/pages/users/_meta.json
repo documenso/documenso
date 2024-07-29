@@ -1,0 +1,18 @@
+{
+  "index": "Introduction",
+  "-- How To Use": {
+    "type": "separator",
+    "title": "How To Use"
+  },
+  "get-started": "Get Started",
+  "profile": "User Profile",
+  "signing-documents": "Signing Documents",
+  "templates": "Templates",
+  "direct-links": "Direct Signing Links",
+  "-- Legal Overview": {
+    "type": "separator",
+    "title": "Legal Overview"
+  },
+  "licenses": "Licenses",
+  "compliance": "Compliance"
+}

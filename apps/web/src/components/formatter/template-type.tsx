@@ -1,6 +1,6 @@
 import type { HTMLAttributes } from 'react';
 
-import { Globe, Lock } from 'lucide-react';
+import { Globe2, Lock } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react/dist/lucide-react';
 
 import type { TemplateType as TemplateTypePrisma } from '@documenso/prisma/client';
@@ -22,7 +22,7 @@ const TEMPLATE_TYPES: Record<TemplateTypes, TemplateTypeIcon> = {
   },
   PUBLIC: {
     label: 'Public',
-    icon: Globe,
+    icon: Globe2,
     color: 'text-green-500 dark:text-green-300',
   },
 };

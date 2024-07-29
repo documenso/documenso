@@ -7,9 +7,6 @@ module.exports = {
   content: ['src/**/*.{ts,tsx}'],
   theme: {
     extend: {
-      screens: {
-        print: { raw: 'print' },
-      },
       fontFamily: {
         sans: ['var(--font-sans)', ...fontFamily.sans],
         signature: ['var(--font-signature)'],
@@ -124,15 +121,21 @@ module.exports = {
           from: { height: 'var(--radix-accordion-content-height)' },
           to: { height: 0 },
         },
+        'caret-blink': {
+          '0%,70%,100%': { opacity: '1' },
+          '20%,50%': { opacity: '0' },
+        },
       },
       animation: {
         'accordion-down': 'accordion-down 0.2s ease-out',
         'accordion-up': 'accordion-up 0.2s ease-out',
+        'caret-blink': 'caret-blink 1.25s ease-out infinite',
       },
       screens: {
         '3xl': '1920px',
         '4xl': '2560px',
         '5xl': '3840px',
+        print: { raw: 'print' },
       },
     },
   },
