@@ -113,10 +113,11 @@ export const DeleteTeamDialog = ({ trigger, teamId, teamName }: DeleteTeamDialog
 
       <DialogContent position="center">
         <DialogHeader>
-          <DialogTitle>Delete team</DialogTitle>
+          <DialogTitle>Are you sure you wish to delete this team?</DialogTitle>
 
           <DialogDescription className="mt-4">
-            Are you sure? This is irreversable.
+            Please note that you will lose access to all documents associated with this team & all
+            the members will be removed and notified
           </DialogDescription>
         </DialogHeader>
 

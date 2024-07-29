@@ -1,14 +1,16 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useTransition } from 'react';
 
 import { useRouter } from 'next/navigation';
 
 import { zodResolver } from '@hookform/resolvers/zod';
+import { AnimatePresence, motion } from 'framer-motion';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 
 import { useCopyToClipboard } from '@documenso/lib/client-only/hooks/use-copy-to-clipboard';
+import type { ApiToken } from '@documenso/prisma/client';
 import { TRPCClientError } from '@documenso/trpc/client';
 import { trpc } from '@documenso/trpc/react';
 import type { TCreateTokenMutationSchema } from '@documenso/trpc/server/api-token-router/schema';
@@ -44,23 +46,37 @@ const ZCreateTokenFormSchema = ZCreateTokenMutationSchema.extend({
 
 type TCreateTokenFormSchema = z.infer<typeof ZCreateTokenFormSchema>;
 
+type NewlyCreatedToken = {
+  id: number;
+  token: string;
+};
+
 export type ApiTokenFormProps = {
   className?: string;
   teamId?: number;
+  tokens?: Pick<ApiToken, 'id'>[];
 };
 
-export const ApiTokenForm = ({ className, teamId }: ApiTokenFormProps) => {
+export const ApiTokenForm = ({ className, teamId, tokens }: ApiTokenFormProps) => {
   const router = useRouter();
+  const [isTransitionPending, startTransition] = useTransition();
 
   const [, copy] = useCopyToClipboard();
   const { toast } = useToast();
 
-  const [newlyCreatedToken, setNewlyCreatedToken] = useState('');
+  const [newlyCreatedToken, setNewlyCreatedToken] = useState<NewlyCreatedToken | null>();
   const [noExpirationDate, setNoExpirationDate] = useState(false);
+
+  // This lets us hide the token from being copied if it has been deleted without
+  // resorting to a useEffect or any other fanciness. This comes at the cost of it
+  // taking slighly longer to appear since it will need to wait for the router.refresh()
+  // to finish updating.
+  const hasNewlyCreatedToken =
+    tokens?.find((token) => token.id === newlyCreatedToken?.id) !== undefined;
 
   const { mutateAsync: createTokenMutation } = trpc.apiToken.createToken.useMutation({
     onSuccess(data) {
-      setNewlyCreatedToken(data.token);
+      setNewlyCreatedToken(data);
     },
   });
 
@@ -110,7 +126,7 @@ export const ApiTokenForm = ({ className, teamId }: ApiTokenFormProps) => {
 
       form.reset();
 
-      router.refresh();
+      startTransition(() => router.refresh());
     } catch (error) {
       if (error instanceof TRPCClientError && error.data?.code === 'BAD_REQUEST') {
         toast({
@@ -216,7 +232,7 @@ export const ApiTokenForm = ({ className, teamId }: ApiTokenFormProps) => {
               type="submit"
               className="hidden md:inline-flex"
               disabled={!form.formState.isDirty}
-              loading={form.formState.isSubmitting}
+              loading={form.formState.isSubmitting || isTransitionPending}
             >
               Create token
             </Button>
@@ -225,7 +241,7 @@ export const ApiTokenForm = ({ className, teamId }: ApiTokenFormProps) => {
               <Button
                 type="submit"
                 disabled={!form.formState.isDirty}
-                loading={form.formState.isSubmitting}
+                loading={form.formState.isSubmitting || isTransitionPending}
               >
                 Create token
               </Button>
@@ -234,24 +250,33 @@ export const ApiTokenForm = ({ className, teamId }: ApiTokenFormProps) => {
         </form>
       </Form>
 
-      {newlyCreatedToken && (
-        <Card className="mt-8" gradient>
-          <CardContent className="p-4">
-            <p className="text-muted-foreground mt-2 text-sm">
-              Your token was created successfully! Make sure to copy it because you won't be able to
-              see it again!
-            </p>
+      <AnimatePresence initial={!hasNewlyCreatedToken}>
+        {newlyCreatedToken && hasNewlyCreatedToken && (
+          <motion.div
+            className="mt-8"
+            initial={{ opacity: 0, y: -40 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 40 }}
+          >
+            <Card gradient>
+              <CardContent className="p-4">
+                <p className="text-muted-foreground mt-2 text-sm">
+                  Your token was created successfully! Make sure to copy it because you won't be
+                  able to see it again!
+                </p>
 
-            <p className="bg-muted-foreground/10 my-4 rounded-md px-2.5 py-1 font-mono text-sm">
-              {newlyCreatedToken}
-            </p>
+                <p className="bg-muted-foreground/10 my-4 rounded-md px-2.5 py-1 font-mono text-sm">
+                  {newlyCreatedToken.token}
+                </p>
 
-            <Button variant="outline" onClick={() => void copyToken(newlyCreatedToken)}>
-              Copy token
-            </Button>
-          </CardContent>
-        </Card>
-      )}
+                <Button variant="outline" onClick={() => void copyToken(newlyCreatedToken.token)}>
+                  Copy token
+                </Button>
+              </CardContent>
+            </Card>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 };

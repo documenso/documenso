@@ -9,9 +9,9 @@ import {
 import { createDocumentAuthOptions } from '@documenso/lib/utils/document-auth';
 import { formatDocumentsPath, formatTemplatesPath } from '@documenso/lib/utils/teams';
 import { formatDirectTemplatePath } from '@documenso/lib/utils/templates';
-import { seedTeam, unseedTeam } from '@documenso/prisma/seed/teams';
+import { seedTeam } from '@documenso/prisma/seed/teams';
 import { seedDirectTemplate, seedTemplate } from '@documenso/prisma/seed/templates';
-import { seedTestEmail, seedUser, unseedUser } from '@documenso/prisma/seed/users';
+import { seedTestEmail, seedUser } from '@documenso/prisma/seed/users';
 
 import { apiSignin } from '../fixtures/authentication';
 import { checkDocumentTabCount } from '../fixtures/documents';
@@ -67,8 +67,6 @@ test('[DIRECT_TEMPLATES]: create direct link for template', async ({ page }) => 
     // Expect badge to appear.
     await expect(page.getByRole('button', { name: 'direct link' })).toHaveCount(2);
   }
-
-  await unseedTeam(team.url);
 });
 
 test('[DIRECT_TEMPLATES]: toggle direct template link', async ({ page }) => {
@@ -115,8 +113,6 @@ test('[DIRECT_TEMPLATES]: toggle direct template link', async ({ page }) => {
     await page.goto(formatDirectTemplatePath(template.directLink?.token || ''));
     await expect(page.getByText('Template not found')).toBeVisible();
   }
-
-  await unseedTeam(team.url);
 });
 
 test('[DIRECT_TEMPLATES]: delete direct template link', async ({ page }) => {
@@ -162,8 +158,6 @@ test('[DIRECT_TEMPLATES]: delete direct template link', async ({ page }) => {
     await page.goto(formatDirectTemplatePath(template.directLink?.token || ''));
     await expect(page.getByText('Template not found')).toBeVisible();
   }
-
-  await unseedTeam(team.url);
 });
 
 test('[DIRECT_TEMPLATES]: direct template link auth access', async ({ page }) => {
@@ -197,8 +191,6 @@ test('[DIRECT_TEMPLATES]: direct template link auth access', async ({ page }) =>
 
   await expect(page.getByRole('heading', { name: 'General' })).toBeVisible();
   await expect(page.getByLabel('Email')).toBeDisabled();
-
-  await unseedUser(user.id);
 });
 
 test('[DIRECT_TEMPLATES]: use direct template link with 1 recipient', async ({ page }) => {
@@ -248,8 +240,6 @@ test('[DIRECT_TEMPLATES]: use direct template link with 1 recipient', async ({ p
     // Check that the document is in the 'All' tab.
     await checkDocumentTabCount(page, 'Completed', 1);
   }
-
-  await unseedTeam(team.url);
 });
 
 test('[DIRECT_TEMPLATES]: use direct template link with 2 recipients', async ({ page }) => {
@@ -333,7 +323,4 @@ test('[DIRECT_TEMPLATES]: use direct template link with 2 recipients', async ({ 
 
   await checkDocumentTabCount(page, 'All', 2);
   await checkDocumentTabCount(page, 'Inbox', 2);
-
-  await unseedTeam(team.url);
-  await unseedUser(secondRecipient.id);
 });

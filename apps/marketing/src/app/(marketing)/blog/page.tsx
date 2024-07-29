@@ -1,12 +1,17 @@
 import type { Metadata } from 'next';
 
+import { Trans } from '@lingui/macro';
 import { allBlogPosts } from 'contentlayer/generated';
+
+import { setupI18nSSR } from '@documenso/lib/client-only/providers/i18n.server';
 
 export const metadata: Metadata = {
   title: 'Blog',
 };
 
 export default function BlogPage() {
+  const { i18n } = setupI18nSSR();
+
   const blogPosts = allBlogPosts.sort((a, b) => {
     const dateA = new Date(a.date);
     const dateB = new Date(b.date);
@@ -17,11 +22,15 @@ export default function BlogPage() {
   return (
     <div className="mt-6 sm:mt-12">
       <div className="text-center">
-        <h1 className="text-3xl font-bold lg:text-5xl">From the blog</h1>
+        <h1 className="text-3xl font-bold lg:text-5xl">
+          <Trans>From the blog</Trans>
+        </h1>
 
         <p className="text-muted-foreground mx-auto mt-4 max-w-xl text-center text-lg leading-normal">
-          Get the latest news from Documenso, including product updates, team announcements and
-          more!
+          <Trans>
+            Get the latest news from Documenso, including product updates, team announcements and
+            more!
+          </Trans>
         </p>
       </div>
 
@@ -33,7 +42,7 @@ export default function BlogPage() {
           >
             <div className="flex items-center gap-x-4 text-xs">
               <time dateTime={post.date} className="text-muted-foreground">
-                {new Date(post.date).toLocaleDateString()}
+                <Trans>{i18n.date(new Date(), { dateStyle: 'short' })}</Trans>
               </time>
 
               {post.tags.length > 0 && (
