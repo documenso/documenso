@@ -103,8 +103,8 @@ export const ZCreateDocumentMutationSchema = z.object({
       message: z.string(),
       timezone: z.string(),
       dateFormat: z.string().openapi({
-        description: 'The format of the date. Must be one of the above.',
-        example: DATE_FORMATS.map((format) => format.label),
+        description: 'The format of the date. Must be one of the options listed in the list below.',
+        enum: DATE_FORMATS.map((format) => format.value),
       }),
       redirectUrl: z.string(),
     })
