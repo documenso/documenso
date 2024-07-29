@@ -142,6 +142,7 @@ msgid "Document signing,<0/>finally open source."
 msgstr "Document signing,<0/>finally open source."
 
 #: apps/marketing/src/components/(marketing)/footer.tsx:33
+#: apps/marketing/src/components/(marketing)/header.tsx:50
 #: apps/marketing/src/components/(marketing)/mobile-navigation.tsx:28
 msgid "Documentation"
 msgstr "Documentation"
