@@ -1,5 +1,7 @@
+import { extendZodWithOpenApi } from '@anatine/zod-openapi';
 import { z } from 'zod';
 
+import { DATE_FORMATS } from '@documenso/lib/constants/date-formats';
 import { ZUrlSchema } from '@documenso/lib/schemas/common';
 import {
   DocumentDataType,
@@ -10,6 +12,8 @@ import {
   SigningStatus,
   TemplateType,
 } from '@documenso/prisma/client';
+
+extendZodWithOpenApi(z);
 
 export const ZNoBodyMutationSchema = null;
 
@@ -98,7 +102,10 @@ export const ZCreateDocumentMutationSchema = z.object({
       subject: z.string(),
       message: z.string(),
       timezone: z.string(),
-      dateFormat: z.string(),
+      dateFormat: z.string().openapi({
+        description: 'The format of the date. Must be one of the above.',
+        example: DATE_FORMATS.map((format) => format.label),
+      }),
       redirectUrl: z.string(),
     })
     .partial(),
