@@ -1,6 +1,15 @@
+import { match } from 'ts-pattern';
+
 import { prisma } from '@documenso/prisma';
 import type { FieldType, Team } from '@documenso/prisma/client';
 
+import {
+  ZCheckboxFieldMeta,
+  ZDropdownFieldMeta,
+  ZNumberFieldMeta,
+  ZRadioFieldMeta,
+  ZTextFieldMeta,
+} from '../../types/field-meta';
 import type { TFieldMetaSchema as FieldMeta } from '../../types/field-meta';
 import type { RequestMetadata } from '../../universal/extract-request-metadata';
 import { createDocumentAuditLogData } from '../../utils/document-audit-logs';
@@ -88,6 +97,42 @@ export const createField = async ({
     });
   }
 
+  const advancedField = ['NUMBER', 'RADIO', 'CHECKBOX', 'DROPDOWN', 'TEXT'].includes(type);
+
+  if (advancedField && !fieldMeta) {
+    throw new Error(
+      'Field meta is required for this type of field. Please provide the appropriate field meta object.',
+    );
+  }
+
+  if (fieldMeta && fieldMeta.type.toLowerCase() !== String(type).toLowerCase()) {
+    throw new Error('Field meta type does not match the field type');
+  }
+
+  const result = match(type)
+    .with('RADIO', () => {
+      return ZRadioFieldMeta.safeParse(fieldMeta);
+    })
+    .with('CHECKBOX', () => {
+      return ZCheckboxFieldMeta.safeParse(fieldMeta);
+    })
+    .with('DROPDOWN', () => {
+      return ZDropdownFieldMeta.safeParse(fieldMeta);
+    })
+    .with('NUMBER', () => {
+      return ZNumberFieldMeta.safeParse(fieldMeta);
+    })
+    .with('TEXT', () => {
+      return ZTextFieldMeta.safeParse(fieldMeta);
+    })
+    .otherwise(() => {
+      return { success: false, data: {} };
+    });
+
+  if (!result.success) {
+    throw new Error('Field meta parsing failed');
+  }
+
   const field = await prisma.field.create({
     data: {
       documentId,
@@ -100,6 +145,7 @@ export const createField = async ({
       height: pageHeight,
       customText: '',
       inserted: false,
+      fieldMeta: advancedField ? result.data : undefined,
     },
     include: {
       Recipient: true,

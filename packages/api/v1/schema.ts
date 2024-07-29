@@ -308,6 +308,7 @@ export const ZSuccessfulFieldResponseSchema = z.object({
   pageWidth: z.number(),
   pageHeight: z.number(),
   customText: z.string(),
+  fieldMeta: ZFieldMetaSchema,
   inserted: z.boolean(),
 });
 
