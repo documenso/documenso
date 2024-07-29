@@ -32,7 +32,7 @@ export default async function ApiTokensPage() {
 
       <hr className="my-4" />
 
-      <ApiTokenForm className="max-w-xl" />
+      <ApiTokenForm className="max-w-xl" tokens={tokens} />
 
       <hr className="mb-4 mt-8" />
 

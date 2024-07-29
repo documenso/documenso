@@ -3,11 +3,10 @@
 name: 'Pull translations'
 
 on:
+  schedule:
+    - cron: '0 */2 * * *' # Every two hours.
   workflow_dispatch:
   workflow_call:
-  # Cron disabled until i18n PR is landed.
-  # schedule:
-  #   - cron: '0 */2 * * *' # Every two hours.
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.head_ref || github.run_id }}
@@ -17,6 +16,7 @@ jobs:
   pull_translations:
     name: Pull translations
     runs-on: ubuntu-latest
+    environment: Translations
     permissions:
       contents: write
       pull-requests: write
@@ -46,7 +46,7 @@ jobs:
 
         env:
           # A classic GitHub Personal Access Token with the 'repo' scope selected (the user should have write access to the repository).
-          GITHUB_TOKEN: ${{ secrets.GITHUB_CROWDIN_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GH_PAT }}
 
           # A numeric ID, found at https://crowdin.com/project/<projectName>/tools/api
           CROWDIN_PROJECT_ID: ${{ secrets.CROWDIN_PROJECT_ID }}

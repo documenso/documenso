@@ -3,9 +3,8 @@ name: 'Extract and upload translations'
 on:
   workflow_dispatch:
   workflow_call:
-  # Disabled until i18n PR is landed.
-  # push:
-  #   branches: ['main']
+  push:
+    branches: ['main']
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.head_ref || github.run_id }}
@@ -15,6 +14,7 @@ jobs:
   extract_translations:
     name: Extract and upload translations
     runs-on: ubuntu-latest
+    environment: Translations
     permissions:
       contents: write
     steps:

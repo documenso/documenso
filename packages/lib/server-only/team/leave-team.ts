@@ -2,6 +2,8 @@ import { updateSubscriptionItemQuantity } from '@documenso/ee/server-only/stripe
 import { IS_BILLING_ENABLED } from '@documenso/lib/constants/app';
 import { prisma } from '@documenso/prisma';
 
+import { jobs } from '../../jobs/client';
+
 export type LeaveTeamOptions = {
   /**
    * The ID of the user who is leaving the team.
@@ -23,10 +25,19 @@ export const leaveTeam = async ({ userId, teamId }: LeaveTeamOptions) => {
           ownerUserId: {
             not: userId,
           },
+          members: {
+            some: {
+              userId,
+            },
+          },
         },
         include: {
           subscription: true,
         },
+      });
+
+      const leavingUser = await tx.user.findUniqueOrThrow({
+        where: { id: userId },
       });
 
       await tx.teamMember.delete({
@@ -56,6 +67,14 @@ export const leaveTeam = async ({ userId, teamId }: LeaveTeamOptions) => {
           quantity: numberOfSeats,
         });
       }
+
+      await jobs.triggerJob({
+        name: 'send.team-member-left.email',
+        payload: {
+          teamId,
+          memberUserId: leavingUser.id,
+        },
+      });
     },
     { timeout: 30_000 },
   );

@@ -9,7 +9,7 @@ import {
   seedBlankDocument,
   seedPendingDocumentWithFullFields,
 } from '@documenso/prisma/seed/documents';
-import { seedUser, unseedUser } from '@documenso/prisma/seed/users';
+import { seedUser } from '@documenso/prisma/seed/users';
 
 import { apiSignin } from '../fixtures/authentication';
 
@@ -107,8 +107,6 @@ test('[DOCUMENT_FLOW]: should be able to create a document', async ({ page }) =>
 
   // Assert document was created
   await expect(page.getByRole('link', { name: documentTitle })).toBeVisible();
-
-  await unseedUser(user.id);
 });
 
 test('[DOCUMENT_FLOW]: should be able to create a document with multiple recipients', async ({
@@ -192,8 +190,6 @@ test('[DOCUMENT_FLOW]: should be able to create a document with multiple recipie
 
   // Assert document was created
   await expect(page.getByRole('link', { name: documentTitle })).toBeVisible();
-
-  await unseedUser(user.id);
 });
 
 test('[DOCUMENT_FLOW]: should be able to create a document with multiple recipients with different roles', async ({
@@ -291,8 +287,6 @@ test('[DOCUMENT_FLOW]: should be able to create a document with multiple recipie
 
   // Assert document was created
   await expect(page.getByRole('link', { name: 'Test Title' })).toBeVisible();
-
-  await unseedUser(user.id);
 });
 
 test('[DOCUMENT_FLOW]: should not be able to create a document without signatures', async ({
@@ -331,8 +325,6 @@ test('[DOCUMENT_FLOW]: should not be able to create a document without signature
   await expect(
     page.getByRole('dialog').getByText('No signature field found').first(),
   ).toBeVisible();
-
-  await unseedUser(user.id);
 });
 
 test('[DOCUMENT_FLOW]: should be able to approve a document', async ({ page }) => {
@@ -388,8 +380,6 @@ test('[DOCUMENT_FLOW]: should be able to approve a document', async ({ page }) =
       .click();
     await page.waitForURL(`${signUrl}/complete`);
   }
-
-  await unseedUser(user.id);
 });
 
 test('[DOCUMENT_FLOW]: should be able to create, send with redirect url, sign a document and redirect to redirect url', async ({
@@ -462,8 +452,6 @@ test('[DOCUMENT_FLOW]: should be able to create, send with redirect url, sign a 
   // Check if document has been signed
   const { status: completedStatus } = await getDocumentByToken(token);
   expect(completedStatus).toBe(DocumentStatus.COMPLETED);
-
-  await unseedUser(user.id);
 });
 
 test('[DOCUMENT_FLOW]: should be able to sign a document with custom date', async ({ page }) => {
@@ -505,6 +493,4 @@ test('[DOCUMENT_FLOW]: should be able to sign a document with custom date', asyn
   // Check if document has been signed
   const { status: completedStatus } = await getDocumentByToken(token);
   expect(completedStatus).toBe(DocumentStatus.COMPLETED);
-
-  await unseedUser(user.id);
 });

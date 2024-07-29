@@ -8,6 +8,7 @@ import { createTeamBillingPortal } from '@documenso/lib/server-only/team/create-
 import { createTeamPendingCheckoutSession } from '@documenso/lib/server-only/team/create-team-checkout-session';
 import { createTeamEmailVerification } from '@documenso/lib/server-only/team/create-team-email-verification';
 import { createTeamMemberInvites } from '@documenso/lib/server-only/team/create-team-member-invites';
+import { declineTeamInvitation } from '@documenso/lib/server-only/team/decline-team-invitation';
 import { deleteTeam } from '@documenso/lib/server-only/team/delete-team';
 import { deleteTeamEmail } from '@documenso/lib/server-only/team/delete-team-email';
 import { deleteTeamEmailVerification } from '@documenso/lib/server-only/team/delete-team-email-verification';
@@ -42,6 +43,7 @@ import {
   ZCreateTeamMemberInvitesMutationSchema,
   ZCreateTeamMutationSchema,
   ZCreateTeamPendingCheckoutMutationSchema,
+  ZDeclineTeamInvitationMutationSchema,
   ZDeleteTeamEmailMutationSchema,
   ZDeleteTeamEmailVerificationMutationSchema,
   ZDeleteTeamMemberInvitationsMutationSchema,
@@ -72,6 +74,21 @@ export const teamRouter = router({
     .mutation(async ({ input, ctx }) => {
       try {
         return await acceptTeamInvitation({
+          teamId: input.teamId,
+          userId: ctx.user.id,
+        });
+      } catch (err) {
+        console.error(err);
+
+        throw AppError.parseErrorToTRPCError(err);
+      }
+    }),
+
+  declineTeamInvitation: authenticatedProcedure
+    .input(ZDeclineTeamInvitationMutationSchema)
+    .mutation(async ({ input, ctx }) => {
+      try {
+        return await declineTeamInvitation({
           teamId: input.teamId,
           userId: ctx.user.id,
         });
