@@ -2,6 +2,7 @@ import { extendZodWithOpenApi } from '@anatine/zod-openapi';
 import { z } from 'zod';
 
 import { DATE_FORMATS } from '@documenso/lib/constants/date-formats';
+import { TIME_ZONES } from '@documenso/lib/constants/time-zones';
 import { ZUrlSchema } from '@documenso/lib/schemas/common';
 import {
   DocumentDataType,
@@ -101,7 +102,11 @@ export const ZCreateDocumentMutationSchema = z.object({
     .object({
       subject: z.string(),
       message: z.string(),
-      timezone: z.string(),
+      timezone: z.string().openapi({
+        description:
+          'The timezone of the date. Must be one of the options listed in the list below.',
+        enum: TIME_ZONES,
+      }),
       dateFormat: z.string().openapi({
         description: 'The format of the date. Must be one of the options listed in the list below.',
         enum: DATE_FORMATS.map((format) => format.value),
