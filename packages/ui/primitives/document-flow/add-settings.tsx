@@ -82,7 +82,9 @@ export const AddSettingsFormPartial = ({
       globalAccessAuth: documentAuthOption?.globalAccessAuth || undefined,
       globalActionAuth: documentAuthOption?.globalActionAuth || undefined,
       meta: {
-        timezone: document.documentMeta?.timezone ?? DEFAULT_DOCUMENT_TIME_ZONE,
+        timezone:
+          TIME_ZONES.find((timezone) => timezone === document.documentMeta?.timezone) ??
+          DEFAULT_DOCUMENT_TIME_ZONE,
         dateFormat:
           DATE_FORMATS.find((format) => format.label === document.documentMeta?.dateFormat)
             ?.value ?? DEFAULT_DOCUMENT_DATE_FORMAT,
