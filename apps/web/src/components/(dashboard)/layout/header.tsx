@@ -4,6 +4,7 @@ import { type HTMLAttributes, useEffect, useState } from 'react';
 
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
+import { usePathname } from 'next/navigation';
 
 import { MenuIcon, SearchIcon } from 'lucide-react';
 
@@ -41,6 +42,18 @@ export const Header = ({ className, user, teams, ...props }: HeaderProps) => {
     return () => window.removeEventListener('scroll', onScroll);
   }, []);
 
+  const pathname = usePathname();
+
+  const isPathTeamUrl = (teamUrl: string) => {
+    if (!pathname || !pathname.startsWith(`/t/`)) {
+      return false;
+    }
+
+    return pathname.split('/')[2] === teamUrl;
+  };
+
+  const selectedTeam = teams?.find((team) => isPathTeamUrl(team.url));
+
   return (
     <header
       className={cn(
@@ -60,7 +73,10 @@ export const Header = ({ className, user, teams, ...props }: HeaderProps) => {
 
         <DesktopNav setIsCommandMenuOpen={setIsCommandMenuOpen} />
 
-        <div className="flex gap-x-4 md:ml-8">
+        <div
+          className="flex gap-x-4 md:ml-8"
+          title={selectedTeam ? selectedTeam.name : user.name ?? ''}
+        >
           <MenuSwitcher user={user} teams={teams} />
         </div>
 
