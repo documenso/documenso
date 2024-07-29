@@ -102,10 +102,20 @@ export const AddSettingsFormPartial = ({
   // We almost always want to set the timezone to the user's local timezone to avoid confusion
   // when the document is signed.
   useEffect(() => {
-    if (!form.formState.touchedFields.meta?.timezone && !documentHasBeenSent) {
+    if (
+      !form.formState.touchedFields.meta?.timezone &&
+      !documentHasBeenSent &&
+      !document.documentMeta?.timezone
+    ) {
       form.setValue('meta.timezone', Intl.DateTimeFormat().resolvedOptions().timeZone);
     }
-  }, [documentHasBeenSent, form, form.setValue, form.formState.touchedFields.meta?.timezone]);
+  }, [
+    documentHasBeenSent,
+    form,
+    form.setValue,
+    form.formState.touchedFields.meta?.timezone,
+    document.documentMeta?.timezone,
+  ]);
 
   return (
     <>
