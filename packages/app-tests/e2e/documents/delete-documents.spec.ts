@@ -265,6 +265,8 @@ test('[DOCUMENTS]: deleting documents as a recipient should only hide it for the
   await page.getByRole('menuitem', { name: 'Hide' }).click();
   await page.getByRole('button', { name: 'Hide' }).click();
 
+  await page.waitForTimeout(1000);
+
   // Open document action menu.
   await page
     .locator('tr', { hasText: 'Document 1 - Pending' })

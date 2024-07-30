@@ -10,7 +10,7 @@ import {
   seedPendingDocumentNoFields,
   seedPendingDocumentWithFullFields,
 } from '@documenso/prisma/seed/documents';
-import { seedTestEmail, seedUser, unseedUser } from '@documenso/prisma/seed/users';
+import { seedTestEmail, seedUser } from '@documenso/prisma/seed/users';
 
 import { apiSignin, apiSignout } from '../fixtures/authentication';
 
@@ -49,8 +49,8 @@ test('[DOCUMENT_AUTH]: should allow signing when no auth setup', async ({ page }
       await page.locator(`#field-${field.id}`).getByRole('button').click();
 
       if (field.type === FieldType.TEXT) {
-        await page.getByLabel('Custom Text').fill('TEXT');
-        await page.getByRole('button', { name: 'Save Text' }).click();
+        await page.locator('#custom-text').fill('TEXT');
+        await page.getByRole('button', { name: 'Save' }).click();
       }
 
       await expect(page.locator(`#field-${field.id}`)).toHaveAttribute('data-inserted', 'true');
@@ -60,9 +60,6 @@ test('[DOCUMENT_AUTH]: should allow signing when no auth setup', async ({ page }
     await page.getByRole('button', { name: 'Sign' }).click();
     await page.waitForURL(`${signUrl}/complete`);
   }
-
-  await unseedUser(user.id);
-  await unseedUser(recipientWithAccount.id);
 });
 
 test('[DOCUMENT_AUTH]: should allow signing with valid global auth', async ({ page }) => {
@@ -109,8 +106,8 @@ test('[DOCUMENT_AUTH]: should allow signing with valid global auth', async ({ pa
     await page.locator(`#field-${field.id}`).getByRole('button').click();
 
     if (field.type === FieldType.TEXT) {
-      await page.getByLabel('Custom Text').fill('TEXT');
-      await page.getByRole('button', { name: 'Save Text' }).click();
+      await page.locator('#custom-text').fill('TEXT');
+      await page.getByRole('button', { name: 'Save' }).click();
     }
 
     await expect(page.locator(`#field-${field.id}`)).toHaveAttribute('data-inserted', 'true');
@@ -119,9 +116,6 @@ test('[DOCUMENT_AUTH]: should allow signing with valid global auth', async ({ pa
   await page.getByRole('button', { name: 'Complete' }).click();
   await page.getByRole('button', { name: 'Sign' }).click();
   await page.waitForURL(`${signUrl}/complete`);
-
-  await unseedUser(user.id);
-  await unseedUser(recipientWithAccount.id);
 });
 
 // Currently document auth for signing/approving/viewing is not required.
@@ -154,9 +148,6 @@ test.skip('[DOCUMENT_AUTH]: should deny signing document when required for globa
   await expect(page.getByRole('paragraph')).toContainText(
     'Reauthentication is required to sign the document',
   );
-
-  await unseedUser(user.id);
-  await unseedUser(recipientWithAccount.id);
 });
 
 test('[DOCUMENT_AUTH]: should deny signing fields when required for global auth', async ({
@@ -196,9 +187,6 @@ test('[DOCUMENT_AUTH]: should deny signing fields when required for global auth'
       await page.getByRole('button', { name: 'Cancel' }).click();
     }
   }
-
-  await unseedUser(user.id);
-  await unseedUser(recipientWithAccount.id);
 });
 
 test('[DOCUMENT_AUTH]: should allow field signing when required for recipient auth', async ({
@@ -287,8 +275,8 @@ test('[DOCUMENT_AUTH]: should allow field signing when required for recipient au
       await page.locator(`#field-${field.id}`).getByRole('button').click();
 
       if (field.type === FieldType.TEXT) {
-        await page.getByLabel('Custom Text').fill('TEXT');
-        await page.getByRole('button', { name: 'Save Text' }).click();
+        await page.locator('#custom-text').fill('TEXT');
+        await page.getByRole('button', { name: 'Save' }).click();
       }
 
       await expect(page.locator(`#field-${field.id}`)).toHaveAttribute('data-inserted', 'true', {
@@ -398,8 +386,8 @@ test('[DOCUMENT_AUTH]: should allow field signing when required for recipient an
       await page.locator(`#field-${field.id}`).getByRole('button').click();
 
       if (field.type === FieldType.TEXT) {
-        await page.getByLabel('Custom Text').fill('TEXT');
-        await page.getByRole('button', { name: 'Save Text' }).click();
+        await page.locator('#custom-text').fill('TEXT');
+        await page.getByRole('button', { name: 'Save' }).click();
       }
 
       await expect(page.locator(`#field-${field.id}`)).toHaveAttribute('data-inserted', 'true', {

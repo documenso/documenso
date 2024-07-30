@@ -19,6 +19,7 @@ import {
 } from '@documenso/ui/primitives/dialog';
 
 import { AcceptTeamInvitationButton } from './accept-team-invitation-button';
+import { DeclineTeamInvitationButton } from './decline-team-invitation-button';
 
 export const TeamInvitations = () => {
   const { data, isInitialLoading } = trpc.team.getTeamInvitations.useQuery();
@@ -68,7 +69,8 @@ export const TeamInvitations = () => {
                           }
                           secondaryText={formatTeamUrl(invitation.team.url)}
                           rightSideComponent={
-                            <div className="ml-auto">
+                            <div className="ml-auto space-x-2">
+                              <DeclineTeamInvitationButton teamId={invitation.team.id} />
                               <AcceptTeamInvitationButton teamId={invitation.team.id} />
                             </div>
                           }

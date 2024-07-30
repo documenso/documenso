@@ -1,0 +1,8 @@
+# Any changes to these paths should be reflected in the root lingui.config.ts
+files:
+  - source: packages/lib/translations/en/common.po
+    translation: packages/lib/translations/%two_letters_code%/%original_file_name%
+  - source: packages/lib/translations/en/marketing.po
+    translation: packages/lib/translations/%two_letters_code%/%original_file_name%
+  - source: packages/lib/translations/en/web.po
+    translation: packages/lib/translations/%two_letters_code%/%original_file_name%

@@ -78,11 +78,16 @@ export const AddSettingsFormPartial = ({
     resolver: zodResolver(ZAddSettingsFormSchema),
     defaultValues: {
       title: document.title,
+      externalId: document.externalId || '',
       globalAccessAuth: documentAuthOption?.globalAccessAuth || undefined,
       globalActionAuth: documentAuthOption?.globalActionAuth || undefined,
       meta: {
-        timezone: document.documentMeta?.timezone ?? DEFAULT_DOCUMENT_TIME_ZONE,
-        dateFormat: document.documentMeta?.dateFormat ?? DEFAULT_DOCUMENT_DATE_FORMAT,
+        timezone:
+          TIME_ZONES.find((timezone) => timezone === document.documentMeta?.timezone) ??
+          DEFAULT_DOCUMENT_TIME_ZONE,
+        dateFormat:
+          DATE_FORMATS.find((format) => format.label === document.documentMeta?.dateFormat)
+            ?.value ?? DEFAULT_DOCUMENT_DATE_FORMAT,
         redirectUrl: document.documentMeta?.redirectUrl ?? '',
       },
     },
@@ -97,10 +102,20 @@ export const AddSettingsFormPartial = ({
   // We almost always want to set the timezone to the user's local timezone to avoid confusion
   // when the document is signed.
   useEffect(() => {
-    if (!form.formState.touchedFields.meta?.timezone && !documentHasBeenSent) {
+    if (
+      !form.formState.touchedFields.meta?.timezone &&
+      !documentHasBeenSent &&
+      !document.documentMeta?.timezone
+    ) {
       form.setValue('meta.timezone', Intl.DateTimeFormat().resolvedOptions().timeZone);
     }
-  }, [documentHasBeenSent, form, form.setValue, form.formState.touchedFields.meta?.timezone]);
+  }, [
+    documentHasBeenSent,
+    form,
+    form.setValue,
+    form.formState.touchedFields.meta?.timezone,
+    document.documentMeta?.timezone,
+  ]);
 
   return (
     <>
@@ -183,6 +198,34 @@ export const AddSettingsFormPartial = ({
 
                 <AccordionContent className="text-muted-foreground -mx-1 px-1 pt-2 text-sm leading-relaxed">
                   <div className="flex flex-col space-y-6 ">
+                    <FormField
+                      control={form.control}
+                      name="externalId"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel className="flex flex-row items-center">
+                            External ID{' '}
+                            <Tooltip>
+                              <TooltipTrigger>
+                                <InfoIcon className="mx-2 h-4 w-4" />
+                              </TooltipTrigger>
+
+                              <TooltipContent className="text-muted-foreground max-w-xs">
+                                Add an external ID to the document. This can be used to identify the
+                                document in external systems.
+                              </TooltipContent>
+                            </Tooltip>
+                          </FormLabel>
+
+                          <FormControl>
+                            <Input className="bg-background" {...field} />
+                          </FormControl>
+
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
                     <FormField
                       control={form.control}
                       name="meta.dateFormat"

@@ -31,6 +31,7 @@ const config = {
     serverActions: {
       bodySizeLimit: '50mb',
     },
+    swcPlugins: [['@lingui/swc-plugin', {}]],
   },
   reactStrictMode: true,
   transpilePackages: [
@@ -58,6 +59,13 @@ const config = {
     if (isServer) {
       config.resolve.alias.canvas = false;
     }
+
+    config.module.rules.push({
+      test: /\.po$/,
+      use: {
+        loader: '@lingui/loader',
+      },
+    });
 
     return config;
   },

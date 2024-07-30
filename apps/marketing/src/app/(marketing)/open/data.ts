@@ -1,10 +1,12 @@
+import { msg } from '@lingui/macro';
+
 export const TEAM_MEMBERS = [
   {
     name: 'Timur Ercan',
     role: 'Co-Founder, CEO',
     salary: 95_000,
     location: 'Germany',
-    engagement: 'Full-Time',
+    engagement: msg`Full-Time`,
     joinDate: 'November 14th, 2022',
   },
   {
@@ -12,7 +14,7 @@ export const TEAM_MEMBERS = [
     role: 'Co-Founder, CTO',
     salary: 95_000,
     location: 'Australia',
-    engagement: 'Full-Time',
+    engagement: msg`Full-Time`,
     joinDate: 'April 19th, 2023',
   },
   {
@@ -20,7 +22,7 @@ export const TEAM_MEMBERS = [
     role: 'Software Engineer - Intern',
     salary: 15_000,
     location: 'Ghana',
-    engagement: 'Part-Time',
+    engagement: msg`Part-Time`,
     joinDate: 'June 6th, 2023',
   },
   {
@@ -28,7 +30,7 @@ export const TEAM_MEMBERS = [
     role: 'Software Engineer - III',
     salary: 100_000,
     location: 'Australia',
-    engagement: 'Full-Time',
+    engagement: msg`Full-Time`,
     joinDate: 'July 26th, 2023',
   },
   {
@@ -36,7 +38,7 @@ export const TEAM_MEMBERS = [
     role: 'Software Engineer - II',
     salary: 80_000,
     location: 'Romania',
-    engagement: 'Full-Time',
+    engagement: msg`Full-Time`,
     joinDate: 'September 4th, 2023',
   },
   {
@@ -44,7 +46,7 @@ export const TEAM_MEMBERS = [
     role: 'Designer - III',
     salary: 100_000,
     location: 'India',
-    engagement: 'Full-Time',
+    engagement: msg`Full-Time`,
     joinDate: 'October 9th, 2023',
   },
 ];

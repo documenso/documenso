@@ -271,6 +271,23 @@ export const DocumentHistorySheet = ({
                       ]}
                     />
                   ))
+                  .with(
+                    { type: DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_EXTERNAL_ID_UPDATED },
+                    ({ data }) => (
+                      <DocumentHistorySheetChanges
+                        values={[
+                          {
+                            key: 'Old',
+                            value: data.from,
+                          },
+                          {
+                            key: 'New',
+                            value: data.to,
+                          },
+                        ]}
+                      />
+                    ),
+                  )
                   .with({ type: DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_FIELD_INSERTED }, ({ data }) => (
                     <DocumentHistorySheetChanges
                       values={[
