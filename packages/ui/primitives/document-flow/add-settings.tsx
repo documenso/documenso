@@ -88,7 +88,7 @@ export const AddSettingsFormPartial = ({
     defaultValues: {
       title: document.title,
       externalId: document.externalId || '',
-      documentVisibility: '',
+      visibility: document.visibility || '',
       globalAccessAuth: documentAuthOption?.globalAccessAuth || undefined,
       globalActionAuth: documentAuthOption?.globalActionAuth || undefined,
       meta: {
@@ -186,7 +186,7 @@ export const AddSettingsFormPartial = ({
             {isTeam && (
               <FormField
                 control={form.control}
-                name="documentVisibility"
+                name="visibility"
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel className="flex flex-row items-center">

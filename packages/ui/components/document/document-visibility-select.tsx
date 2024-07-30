@@ -15,7 +15,7 @@ import { Tooltip, TooltipContent, TooltipTrigger } from '@documenso/ui/primitive
 export const DocumentVisibilitySelect = forwardRef<HTMLButtonElement, SelectProps>((props, ref) => (
   <Select {...props}>
     <SelectTrigger ref={ref} className="bg-background text-muted-foreground">
-      <SelectValue data-testid="documentVisibilitySelectValue" placeholder="Visible" />
+      <SelectValue data-testid="documentVisibilitySelectValue" placeholder="Everyone" />
     </SelectTrigger>
 
     <SelectContent position="popper">

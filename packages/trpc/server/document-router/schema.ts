@@ -56,6 +56,7 @@ export const ZSetSettingsForDocumentMutationSchema = z.object({
   data: z.object({
     title: z.string().min(1).optional(),
     externalId: z.string().nullish(),
+    visibility: z.string().optional(),
     globalAccessAuth: ZDocumentAccessAuthTypesSchema.nullable().optional(),
     globalActionAuth: ZDocumentActionAuthTypesSchema.nullable().optional(),
   }),
