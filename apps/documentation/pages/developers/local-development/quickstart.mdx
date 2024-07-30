@@ -1,0 +1,66 @@
+---
+title: Developer Quickstart
+description: Quickly set up Documenso on your machine for local development with Docker and Docker Compose.
+---
+
+import { Callout, Steps } from 'nextra/components';
+
+# Developer Quickstart
+
+<Callout type="info">
+  **Note**: This guide assumes that you have both [docker](https://docs.docker.com/get-docker/) and
+  [docker-compose](https://docs.docker.com/compose/) installed on your machine.
+</Callout>
+
+Want to get up and running quickly? Follow these steps:
+
+<Steps>
+
+### Fork Documenso
+
+Fork the [Documenso repository](https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/working-with-forks/about-forks) to your GitHub account.
+
+### Clone Repository
+
+After forking the repository, clone it to your local device by using the following command:
+
+```bash
+git clone https://github.com/<your-username>/documenso
+```
+
+### Set Up Environment Variables
+
+Set up your environment variables in the `.env` file using the `.env.example` file as a reference.
+
+Alternatively, you can run `cp .env.example .env` to get started with our handpicked defaults.
+
+### Start Database and Mail Server
+
+Run `npm run dx` in the root directory.
+
+This will spin up a Postgres database and inbucket mailserver in a docker container.
+
+### Start the Application
+
+Run `npm run dev` in the root directory to start the application.
+
+### (Optional) Fasten the Process
+
+Want it even faster? Just use:
+
+```sh
+npm run d
+```
+
+</Steps>
+
+### Access Points for the Project
+
+You can access the following services:
+
+- Main application - http://localhost:3000
+- Incoming Mail Access - http://localhost:9000
+- Database Connection Details:
+- Port: 54320
+- Connection: Use your favourite database client to connect to the database.
+- S3 Storage Dashboard - http://localhost:9001

@@ -5,12 +5,15 @@ import type { TemplateDocumentCompletedProps } from '../template-components/temp
 import { TemplateDocumentCompleted } from '../template-components/template-document-completed';
 import { TemplateFooter } from '../template-components/template-footer';
 
-export type DocumentCompletedEmailTemplateProps = Partial<TemplateDocumentCompletedProps>;
+export type DocumentCompletedEmailTemplateProps = Partial<TemplateDocumentCompletedProps> & {
+  customBody?: string;
+};
 
 export const DocumentCompletedEmailTemplate = ({
   downloadLink = 'https://documenso.com',
   documentName = 'Open Source Pledge.pdf',
   assetBaseUrl = 'http://localhost:3002',
+  customBody,
 }: DocumentCompletedEmailTemplateProps) => {
   const previewText = `Completed Document`;
 
@@ -45,6 +48,7 @@ export const DocumentCompletedEmailTemplate = ({
                   downloadLink={downloadLink}
                   documentName={documentName}
                   assetBaseUrl={assetBaseUrl}
+                  customBody={customBody}
                 />
               </Section>
             </Container>

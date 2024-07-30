@@ -1,0 +1,105 @@
+import { Callout } from 'nextra/components';
+
+# Signature Levels
+
+This page outlines our adherence to key regulations across various jurisdictions, including:
+
+- U.S. ESIGN Act
+- Uniform Electronic Transactions Act (UETA)
+- European Union's eIDAS regulation
+- Switzerland's ZertES
+
+Whether you require simple electronic signatures or advanced cryptographic sealing, Documenso guarantees that all documents are securely sealed and compliant with the highest standards. Explore our compliance details below to understand how we maintain the integrity and enforceability of your electronic transactions.
+
+<Callout emoji="🔏">
+  Documenso seals all signed documents cryptographically, regardless of signature level, to prevent
+  any alterations after signing.
+</Callout>
+
+## 🇺🇸 ESIGN (Electronic Signatures in Global and National Commerce) Act
+
+<Callout type="info" emoji="✅">
+  Status: Compliant
+</Callout>
+The Electronic Signatures in Global and National Commerce Act (ESIGN Act) is a U.S. federal law that
+ensures the legal validity and enforceability of electronic signatures and records in commerce.
+
+### Main Requirements
+
+- [x] Intent to Sign: "Parties must demonstrate their intent to sign [..]"
+- [x] Consent: "The ESIGN Act requires that all parties involved in a transaction consent to the use of electronic signatures and records [..]"
+- [x] Consumer Disclosures: Before obtaining their consent, financial institutions must provide the consumer a clear and conspicuous statement informing the consumer [..]
+- [x] Record Retention: Electronic Records must be maintained for later access by signers.
+- [x] Security: The ESIGN Act does not mandate specific security measures, but it does require that parties take reasonable steps to ensure the security and integrity of electronic signatures and records. This may include implementing encryption, access controls, and authentication measures.
+
+## UETA (Uniform Electronic Transactions Act)
+
+<Callout type="info" emoji="✅">
+  Status: Compliant
+</Callout>
+The Uniform Electronic Transactions Act is a law that provides a legal framework for the use of electronic
+signatures and records in electronic transactions, ensuring they have the same validity and enforceability
+as paper documents and handwritten signatures.
+
+### Main Requirements
+
+_See [ESIGN](/users/compliance/signature-levels#-esign-electronic-signatures-in-global-and-national-commerce-act)_
+
+## 🇪🇺 eIDAS
+
+<Callout type="info" emoji="✅">
+  Status: Compliant for Level 1 - SES (Simple Electronic Signatures)
+</Callout>
+eIDAS (Electronic Identification, Authentication and Trust Services) is an EU regulation that standardizes
+electronic identification and trust services for secure and seamless electronic transactions across European
+member states.
+
+### Level 1 - SES (Simple Electronic Signatures)
+
+eIDAS SES (Simple Electronic Signature) is a basic electronic signature with minimal security features.
+
+### Main Requirements
+
+- [x] Visual Signature
+- [x] Clear Intent to Sign
+
+### Level 2 - AES (Advanced Electronic Signatures)
+
+<Callout type="warning" emoji="⏳">
+  Status: [Planned](https://github.com/documenso/backlog/issues/9) via third party until [Let's
+  Sign](https://github.com/documenso/backlog/issues/21) is realized.
+</Callout>
+eIDAS AES (Advanced Electronic Signature) provides a higher level of security with unique identification
+of the signer and data integrity.
+
+### Main Requirements
+
+- [x] Cryptographic Signature Sealing the Document against tampering
+- [x] Signing Using Dedicated Hardware (Hardware Security Module)
+- [ ] Embedding Signer Identity in the Cryptographic Signature
+- [ ] Being a Government Audited Trusted Qualified Services Provider
+
+### Level 3 - QES (Qualified Electronic Signatures)
+
+<Callout type="warning" emoji="⏳">
+  Status: [Planned](https://github.com/documenso/backlog/issues/32) via third party until [Let's
+  Sign](https://github.com/documenso/backlog/issues/21) is realized.
+</Callout>
+eIDAS QES (Qualified Electronic Signature) is the highest security level, legally equivalent to a handwritten
+signature within the EU.
+
+### Main Requirements
+
+- [x] Cryptographic Signature Sealing the Document against tampering
+- [x] Signing using dedicated hardware (Hardware Security Module)
+- [ ] Embedding Signer Identity in the Cryptographic Signature
+- [ ] Being a government-trusted qualified services provider
+- [ ] eIDAS-compliant identification before signing using local passports or similar
+
+## 🇨🇭 ZertES
+
+<Callout type="warning" emoji="⏳">
+  Status: [Planned](https://github.com/documenso/backlog/issues/34)
+</Callout>
+
+ZertES is a Swiss Federal law that regulates electronic signature compliance.

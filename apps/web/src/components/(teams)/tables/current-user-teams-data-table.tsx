@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 
 import { useUpdateSearchParams } from '@documenso/lib/client-only/hooks/use-update-search-params';
-import { WEBAPP_BASE_URL } from '@documenso/lib/constants/app';
+import { NEXT_PUBLIC_WEBAPP_URL, WEBAPP_BASE_URL } from '@documenso/lib/constants/app';
 import { TEAM_MEMBER_ROLE_MAP } from '@documenso/lib/constants/teams';
 import { ZBaseTableSearchParamsSchema } from '@documenso/lib/types/search-params';
 import { canExecuteTeamAction } from '@documenso/lib/utils/teams';
@@ -62,6 +62,7 @@ export const CurrentUserTeamsDataTable = () => {
           cell: ({ row }) => (
             <Link href={`/t/${row.original.url}`} scroll={false}>
               <AvatarWithText
+                avatarSrc={`${NEXT_PUBLIC_WEBAPP_URL()}/api/avatar/${row.original.avatarImageId}`}
                 avatarClass="h-12 w-12"
                 avatarFallback={row.original.name.slice(0, 1).toUpperCase()}
                 primaryText={
@@ -98,6 +99,7 @@ export const CurrentUserTeamsDataTable = () => {
               <LeaveTeamDialog
                 teamId={row.original.id}
                 teamName={row.original.name}
+                teamAvatarImageId={row.original.avatarImageId}
                 role={row.original.currentTeamMember.role}
                 trigger={
                   <Button

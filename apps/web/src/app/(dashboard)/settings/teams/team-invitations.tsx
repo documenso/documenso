@@ -3,6 +3,7 @@
 import { AnimatePresence } from 'framer-motion';
 import { BellIcon } from 'lucide-react';
 
+import { NEXT_PUBLIC_WEBAPP_URL } from '@documenso/lib/constants/app';
 import { formatTeamUrl } from '@documenso/lib/utils/teams';
 import { trpc } from '@documenso/trpc/react';
 import { AnimateGenericFadeInOut } from '@documenso/ui/components/animate/animate-generic-fade-in-out';
@@ -18,6 +19,7 @@ import {
 } from '@documenso/ui/primitives/dialog';
 
 import { AcceptTeamInvitationButton } from './accept-team-invitation-button';
+import { DeclineTeamInvitationButton } from './decline-team-invitation-button';
 
 export const TeamInvitations = () => {
   const { data, isInitialLoading } = trpc.team.getTeamInvitations.useQuery();
@@ -55,6 +57,9 @@ export const TeamInvitations = () => {
                     {data.map((invitation) => (
                       <li key={invitation.teamId}>
                         <AvatarWithText
+                          avatarSrc={`${NEXT_PUBLIC_WEBAPP_URL()}/api/avatar/${
+                            invitation.team.avatarImageId
+                          }`}
                           className="w-full max-w-none py-4"
                           avatarFallback={invitation.team.name.slice(0, 1)}
                           primaryText={
@@ -64,7 +69,8 @@ export const TeamInvitations = () => {
                           }
                           secondaryText={formatTeamUrl(invitation.team.url)}
                           rightSideComponent={
-                            <div className="ml-auto">
+                            <div className="ml-auto space-x-2">
+                              <DeclineTeamInvitationButton teamId={invitation.team.id} />
                               <AcceptTeamInvitationButton teamId={invitation.team.id} />
                             </div>
                           }
