@@ -2,6 +2,9 @@ import { createNextRoute } from '@ts-rest/next';
 
 import { getServerLimits } from '@documenso/ee/server-only/limits/server';
 import { NEXT_PUBLIC_WEBAPP_URL } from '@documenso/lib/constants/app';
+import { DATE_FORMATS, DEFAULT_DOCUMENT_DATE_FORMAT } from '@documenso/lib/constants/date-formats';
+import '@documenso/lib/constants/time-zones';
+import { DEFAULT_DOCUMENT_TIME_ZONE, TIME_ZONES } from '@documenso/lib/constants/time-zones';
 import { AppError } from '@documenso/lib/errors/app-error';
 import { createDocumentData } from '@documenso/lib/server-only/document-data/create-document-data';
 import { upsertDocumentMeta } from '@documenso/lib/server-only/document-meta/upsert-document-meta';
@@ -222,6 +225,36 @@ export const ApiContractV1Implementation = createNextRoute(ApiContractV1, {
         };
       }
 
+      const dateFormat = body.meta.dateFormat
+        ? DATE_FORMATS.find((format) => format.label === body.meta.dateFormat)
+        : DATE_FORMATS.find((format) => format.value === DEFAULT_DOCUMENT_DATE_FORMAT);
+      const timezone = body.meta.timezone
+        ? TIME_ZONES.find((tz) => tz === body.meta.timezone)
+        : DEFAULT_DOCUMENT_TIME_ZONE;
+
+      const isDateFormatValid = body.meta.dateFormat
+        ? DATE_FORMATS.some((format) => format.label === dateFormat?.label)
+        : true;
+      const isTimeZoneValid = body.meta.timezone ? TIME_ZONES.includes(String(timezone)) : true;
+
+      if (!isDateFormatValid) {
+        return {
+          status: 400,
+          body: {
+            message: 'Invalid date format. Please provide a valid date format',
+          },
+        };
+      }
+
+      if (!isTimeZoneValid) {
+        return {
+          status: 400,
+          body: {
+            message: 'Invalid timezone. Please provide a valid timezone',
+          },
+        };
+      }
+
       const fileName = body.title.endsWith('.pdf') ? body.title : `${body.title}.pdf`;
 
       const { url, key } = await getPresignPostUrl(fileName, 'application/pdf');
@@ -244,7 +277,11 @@ export const ApiContractV1Implementation = createNextRoute(ApiContractV1, {
       await upsertDocumentMeta({
         documentId: document.id,
         userId: user.id,
-        ...body.meta,
+        subject: body.meta.subject,
+        message: body.meta.message,
+        timezone,
+        dateFormat: dateFormat?.value,
+        redirectUrl: body.meta.redirectUrl,
         requestMetadata: extractNextApiRequestMetadata(args.req),
       });
 
