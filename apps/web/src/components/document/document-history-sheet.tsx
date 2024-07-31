@@ -157,6 +157,7 @@ export const DocumentHistorySheet = ({
                     { type: DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_OPENED },
                     { type: DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_RECIPIENT_COMPLETED },
                     { type: DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_SENT },
+                    { type: DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_MOVED_TO_TEAM },
                     () => null,
                   )
                   .with(
@@ -270,6 +271,23 @@ export const DocumentHistorySheet = ({
                       ]}
                     />
                   ))
+                  .with(
+                    { type: DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_EXTERNAL_ID_UPDATED },
+                    ({ data }) => (
+                      <DocumentHistorySheetChanges
+                        values={[
+                          {
+                            key: 'Old',
+                            value: data.from,
+                          },
+                          {
+                            key: 'New',
+                            value: data.to,
+                          },
+                        ]}
+                      />
+                    ),
+                  )
                   .with({ type: DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_FIELD_INSERTED }, ({ data }) => (
                     <DocumentHistorySheetChanges
                       values={[
@@ -304,7 +322,6 @@ export const DocumentHistorySheet = ({
                       ]}
                     />
                   ))
-
                   .exhaustive()}
 
                 {isUserDetailsVisible && (

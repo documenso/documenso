@@ -4,12 +4,14 @@ import { mailer } from '@documenso/email/mailer';
 import { render } from '@documenso/email/render';
 import { DocumentCompletedEmailTemplate } from '@documenso/email/templates/document-completed';
 import { prisma } from '@documenso/prisma';
+import { DocumentSource } from '@documenso/prisma/client';
 
 import { NEXT_PUBLIC_WEBAPP_URL } from '../../constants/app';
 import { DOCUMENT_AUDIT_LOG_TYPE } from '../../types/document-audit-logs';
 import type { RequestMetadata } from '../../universal/extract-request-metadata';
 import { getFile } from '../../universal/upload/get-file';
 import { createDocumentAuditLogData } from '../../utils/document-audit-logs';
+import { renderCustomEmailTemplate } from '../../utils/render-custom-email-template';
 
 export interface SendDocumentOptions {
   documentId: number;
@@ -23,6 +25,7 @@ export const sendCompletedEmail = async ({ documentId, requestMetadata }: SendDo
     },
     include: {
       documentData: true,
+      documentMeta: true,
       Recipient: true,
       User: true,
       team: {
@@ -37,6 +40,8 @@ export const sendCompletedEmail = async ({ documentId, requestMetadata }: SendDo
   if (!document) {
     throw new Error('Document not found');
   }
+
+  const isDirectTemplate = document?.source === DocumentSource.TEMPLATE_DIRECT_LINK;
 
   if (document.Recipient.length === 0) {
     throw new Error('Document has no recipients');
@@ -106,12 +111,22 @@ export const sendCompletedEmail = async ({ documentId, requestMetadata }: SendDo
 
   await Promise.all(
     document.Recipient.map(async (recipient) => {
+      const customEmailTemplate = {
+        'signer.name': recipient.name,
+        'signer.email': recipient.email,
+        'document.name': document.title,
+      };
+
       const downloadLink = `${NEXT_PUBLIC_WEBAPP_URL()}/sign/${recipient.token}/complete`;
 
       const template = createElement(DocumentCompletedEmailTemplate, {
         documentName: document.title,
         assetBaseUrl,
         downloadLink: recipient.email === owner.email ? documentOwnerDownloadLink : downloadLink,
+        customBody:
+          isDirectTemplate && document.documentMeta?.message
+            ? renderCustomEmailTemplate(document.documentMeta.message, customEmailTemplate)
+            : undefined,
       });
 
       await mailer.sendMail({
@@ -125,7 +140,10 @@ export const sendCompletedEmail = async ({ documentId, requestMetadata }: SendDo
           name: process.env.NEXT_PRIVATE_SMTP_FROM_NAME || 'Documenso',
           address: process.env.NEXT_PRIVATE_SMTP_FROM_ADDRESS || 'noreply@documenso.com',
         },
-        subject: 'Signing Complete!',
+        subject:
+          isDirectTemplate && document.documentMeta?.subject
+            ? renderCustomEmailTemplate(document.documentMeta.subject, customEmailTemplate)
+            : 'Signing Complete!',
         html: render(template),
         text: render(template, { plainText: true }),
         attachments: [

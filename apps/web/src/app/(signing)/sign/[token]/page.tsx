@@ -10,6 +10,7 @@ import { getCompletedFieldsForToken } from '@documenso/lib/server-only/field/get
 import { getFieldsForToken } from '@documenso/lib/server-only/field/get-fields-for-token';
 import { getRecipientByToken } from '@documenso/lib/server-only/recipient/get-recipient-by-token';
 import { getRecipientSignatures } from '@documenso/lib/server-only/recipient/get-recipient-signatures';
+import { getUserByEmail } from '@documenso/lib/server-only/user/get-user-by-email';
 import { symmetricDecrypt } from '@documenso/lib/universal/crypto';
 import { extractNextHeaderRequestMetadata } from '@documenso/lib/universal/extract-request-metadata';
 import { extractDocumentAuthMethods } from '@documenso/lib/utils/document-auth';
@@ -70,8 +71,14 @@ export default async function SigningPage({ params: { token } }: SigningPageProp
     userId: user?.id,
   });
 
+  let recipientHasAccount: boolean | null = null;
+
   if (!isDocumentAccessValid) {
-    return <SigningAuthPageView email={recipient.email} />;
+    recipientHasAccount = await getUserByEmail({ email: recipient?.email })
+      .then((user) => !!user)
+      .catch(() => false);
+
+    return <SigningAuthPageView email={recipient.email} emailHasAccount={!!recipientHasAccount} />;
   }
 
   await viewedDocument({

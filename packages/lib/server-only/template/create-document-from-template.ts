@@ -13,6 +13,7 @@ import {
 import { AppError, AppErrorCode } from '../../errors/app-error';
 import { DOCUMENT_AUDIT_LOG_TYPE } from '../../types/document-audit-logs';
 import { ZRecipientAuthOptionsSchema } from '../../types/document-auth';
+import { ZFieldMetaSchema } from '../../types/field-meta';
 import type { RequestMetadata } from '../../universal/extract-request-metadata';
 import { createDocumentAuditLogData } from '../../utils/document-audit-logs';
 import {
@@ -33,6 +34,7 @@ export type CreateDocumentFromTemplateResponse = Awaited<
 
 export type CreateDocumentFromTemplateOptions = {
   templateId: number;
+  externalId?: string | null;
   userId: number;
   teamId?: number;
   recipients: {
@@ -58,6 +60,7 @@ export type CreateDocumentFromTemplateOptions = {
 
 export const createDocumentFromTemplate = async ({
   templateId,
+  externalId,
   userId,
   teamId,
   recipients,
@@ -147,6 +150,7 @@ export const createDocumentFromTemplate = async ({
     const document = await tx.document.create({
       data: {
         source: DocumentSource.TEMPLATE,
+        externalId,
         templateId: template.id,
         userId,
         teamId: template.teamId,
@@ -222,12 +226,16 @@ export const createDocumentFromTemplate = async ({
           height: field.height,
           customText: '',
           inserted: false,
+          fieldMeta: field.fieldMeta,
         })),
       );
     });
 
     await tx.field.createMany({
-      data: fieldsToCreate,
+      data: fieldsToCreate.map((field) => ({
+        ...field,
+        fieldMeta: field.fieldMeta ? ZFieldMetaSchema.parse(field.fieldMeta) : undefined,
+      })),
     });
 
     await tx.documentAuditLog.create({

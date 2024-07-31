@@ -2,16 +2,17 @@ import { z } from 'zod';
 
 import { DEFAULT_DOCUMENT_DATE_FORMAT } from '@documenso/lib/constants/date-formats';
 import { DEFAULT_DOCUMENT_TIME_ZONE } from '@documenso/lib/constants/time-zones';
-import { URL_REGEX } from '@documenso/lib/constants/url-regex';
 import {
   ZDocumentAccessAuthTypesSchema,
   ZDocumentActionAuthTypesSchema,
 } from '@documenso/lib/types/document-auth';
+import { isValidRedirectUrl } from '@documenso/lib/utils/is-valid-redirect-url';
 
 import { ZMapNegativeOneToUndefinedSchema } from '../document-flow/add-settings.types';
 
 export const ZAddTemplateSettingsFormSchema = z.object({
   title: z.string().trim().min(1, { message: "Title can't be empty" }),
+  externalId: z.string().optional(),
   globalAccessAuth: ZMapNegativeOneToUndefinedSchema.pipe(
     ZDocumentAccessAuthTypesSchema.optional(),
   ),
@@ -26,8 +27,9 @@ export const ZAddTemplateSettingsFormSchema = z.object({
     redirectUrl: z
       .string()
       .optional()
-      .refine((value) => value === undefined || value === '' || URL_REGEX.test(value), {
-        message: 'Please enter a valid URL',
+      .refine((value) => value === undefined || value === '' || isValidRedirectUrl(value), {
+        message:
+          'Please enter a valid URL, make sure you include http:// or https:// part of the url.',
       }),
   }),
 });

@@ -23,6 +23,10 @@ export const mapField = (
     .with(FieldType.EMAIL, () => signer.email)
     .with(FieldType.NAME, () => signer.name)
     .with(FieldType.TEXT, () => signer.customText)
+    .with(FieldType.NUMBER, () => signer.customText)
+    .with(FieldType.RADIO, () => signer.customText)
+    .with(FieldType.CHECKBOX, () => signer.customText)
+    .with(FieldType.DROPDOWN, () => signer.customText)
     .otherwise(() => '');
 
   return {

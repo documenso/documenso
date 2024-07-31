@@ -1,5 +1,8 @@
 import type { HTMLAttributes } from 'react';
 
+import { Trans } from '@lingui/macro';
+import { useLingui } from '@lingui/react';
+
 import { cn } from '@documenso/ui/lib/utils';
 import {
   Table,
@@ -15,20 +18,36 @@ import { TEAM_MEMBERS } from './data';
 export type TeamMembersProps = HTMLAttributes<HTMLDivElement>;
 
 export const TeamMembers = ({ className, ...props }: TeamMembersProps) => {
+  const { _ } = useLingui();
+
   return (
     <div className={cn('flex flex-col', className)} {...props}>
-      <h2 className="px-4 text-2xl font-semibold">Team</h2>
+      <h2 className="px-4 text-2xl font-semibold">
+        <Trans>Team</Trans>
+      </h2>
 
       <div className="border-border mt-2.5 flex-1 rounded-2xl border shadow-sm hover:shadow">
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead className="">Name</TableHead>
-              <TableHead>Role</TableHead>
-              <TableHead>Salary</TableHead>
-              <TableHead>Engagement</TableHead>
-              <TableHead>Location</TableHead>
-              <TableHead className="w-[100px] text-right">Join Date</TableHead>
+              <TableHead>
+                <Trans>Name</Trans>
+              </TableHead>
+              <TableHead>
+                <Trans>Role</Trans>
+              </TableHead>
+              <TableHead>
+                <Trans>Salary</Trans>
+              </TableHead>
+              <TableHead>
+                <Trans>Engagement</Trans>
+              </TableHead>
+              <TableHead>
+                <Trans>Location</Trans>
+              </TableHead>
+              <TableHead className="w-[100px] text-right">
+                <Trans>Join Date</Trans>
+              </TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -44,7 +63,7 @@ export const TeamMembers = ({ className, ...props }: TeamMembersProps) => {
                     maximumFractionDigits: 0,
                   })}
                 </TableCell>
-                <TableCell>{member.engagement}</TableCell>
+                <TableCell>{_(member.engagement)}</TableCell>
                 <TableCell>{member.location}</TableCell>
                 <TableCell className="text-right">{member.joinDate}</TableCell>
               </TableRow>

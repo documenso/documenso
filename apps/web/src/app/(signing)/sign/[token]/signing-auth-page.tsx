@@ -11,9 +11,10 @@ import { useToast } from '@documenso/ui/primitives/use-toast';
 
 export type SigningAuthPageViewProps = {
   email: string;
+  emailHasAccount?: boolean;
 };
 
-export const SigningAuthPageView = ({ email }: SigningAuthPageViewProps) => {
+export const SigningAuthPageView = ({ email, emailHasAccount }: SigningAuthPageViewProps) => {
   const { toast } = useToast();
 
   const [isSigningOut, setIsSigningOut] = useState(false);
@@ -30,7 +31,9 @@ export const SigningAuthPageView = ({ email }: SigningAuthPageViewProps) => {
       });
 
       await signOut({
-        callbackUrl: `/signin?email=${encodeURIComponent(encryptedEmail)}`,
+        callbackUrl: emailHasAccount
+          ? `/signin?email=${encodeURIComponent(encryptedEmail)}`
+          : `/signup?email=${encodeURIComponent(encryptedEmail)}`,
       });
     } catch {
       toast({
@@ -59,7 +62,7 @@ export const SigningAuthPageView = ({ email }: SigningAuthPageViewProps) => {
           onClick={async () => handleChangeAccount(email)}
           loading={isSigningOut}
         >
-          Login
+          {emailHasAccount ? 'Login' : 'Sign up'}
         </Button>
       </div>
     </div>

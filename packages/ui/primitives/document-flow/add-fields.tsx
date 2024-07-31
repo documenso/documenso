@@ -4,18 +4,34 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 import { Caveat } from 'next/font/google';
 
-import { Check, ChevronsUpDown, Info } from 'lucide-react';
+import {
+  CalendarDays,
+  Check,
+  CheckSquare,
+  ChevronDown,
+  ChevronsUpDown,
+  Disc,
+  Hash,
+  Info,
+  Mail,
+  Type,
+  User,
+} from 'lucide-react';
 import { useFieldArray, useForm } from 'react-hook-form';
 
 import { getBoundingClientRect } from '@documenso/lib/client-only/get-bounding-client-rect';
 import { useDocumentElement } from '@documenso/lib/client-only/hooks/use-document-element';
 import { PDF_VIEWER_PAGE_SELECTOR } from '@documenso/lib/constants/pdf-viewer';
 import { RECIPIENT_ROLES_DESCRIPTION } from '@documenso/lib/constants/recipient-roles';
+import {
+  type TFieldMetaSchema as FieldMeta,
+  ZFieldMetaSchema,
+} from '@documenso/lib/types/field-meta';
 import { nanoid } from '@documenso/lib/universal/id';
 import type { Field, Recipient } from '@documenso/prisma/client';
-import { RecipientRole } from '@documenso/prisma/client';
-import { FieldType, SendStatus } from '@documenso/prisma/client';
+import { FieldType, RecipientRole, SendStatus } from '@documenso/prisma/client';
 
+import { getSignerColorStyles, useSignerColors } from '../../lib/signer-colors';
 import { cn } from '../../lib/utils';
 import { Button } from '../button';
 import { Card, CardContent } from '../card';
@@ -32,6 +48,7 @@ import {
   DocumentFlowFormContainerStep,
 } from './document-flow-root';
 import { FieldItem } from './field-item';
+import { FieldAdvancedSettings } from './field-item-advanced-settings';
 import { MissingSignatureFieldDialog } from './missing-signature-field-dialog';
 import { type DocumentFlowStep, FRIENDLY_FIELD_TYPE } from './types';
 
@@ -42,11 +59,21 @@ const fontCaveat = Caveat({
   variable: '--font-caveat',
 });
 
-const DEFAULT_HEIGHT_PERCENT = 5;
-const DEFAULT_WIDTH_PERCENT = 15;
+const MIN_HEIGHT_PX = 40;
+const MIN_WIDTH_PX = 140;
 
-const MIN_HEIGHT_PX = 60;
-const MIN_WIDTH_PX = 200;
+export type FieldFormType = {
+  nativeId?: number;
+  formId: string;
+  pageNumber: number;
+  type: FieldType;
+  pageX: number;
+  pageY: number;
+  pageWidth: number;
+  pageHeight: number;
+  signerEmail: string;
+  fieldMeta?: FieldMeta;
+};
 
 export type AddFieldsFormProps = {
   documentFlow: DocumentFlowStep;
@@ -56,7 +83,14 @@ export type AddFieldsFormProps = {
   onSubmit: (_data: TAddFieldsFormSchema) => void;
   canGoBack?: boolean;
   isDocumentPdfLoaded: boolean;
+  teamId?: number;
 };
+
+/*
+  I hate this, but due to TailwindCSS JIT, I couldnn't find a better way to do this for now.
+
+  TODO: Try to find a better way to do this.
+*/
 
 export const AddFieldsFormPartial = ({
   documentFlow,
@@ -66,6 +100,7 @@ export const AddFieldsFormPartial = ({
   onSubmit,
   canGoBack = false,
   isDocumentPdfLoaded,
+  teamId,
 }: AddFieldsFormProps) => {
   const [isMissingSignatureDialogVisible, setIsMissingSignatureDialogVisible] = useState(false);
 
@@ -73,11 +108,15 @@ export const AddFieldsFormPartial = ({
   const { currentStep, totalSteps, previousStep } = useStep();
   const canRenderBackButtonAsRemove =
     currentStep === 1 && typeof documentFlow.onBackStep === 'function' && canGoBack;
+  const [showAdvancedSettings, setShowAdvancedSettings] = useState(false);
+  const [currentField, setCurrentField] = useState<FieldFormType>();
 
   const {
     control,
     handleSubmit,
     formState: { isSubmitting },
+    setValue,
+    getValues,
   } = useForm<TAddFieldsFormSchema>({
     defaultValues: {
       fields: fields.map((field) => ({
@@ -91,11 +130,30 @@ export const AddFieldsFormPartial = ({
         pageHeight: Number(field.height),
         signerEmail:
           recipients.find((recipient) => recipient.id === field.recipientId)?.email ?? '',
+        fieldMeta: field.fieldMeta ? ZFieldMetaSchema.parse(field.fieldMeta) : undefined,
       })),
     },
   });
 
   const onFormSubmit = handleSubmit(onSubmit);
+  const handleSavedFieldSettings = (fieldState: FieldMeta) => {
+    const initialValues = getValues();
+
+    const updatedFields = initialValues.fields.map((field) => {
+      if (field.formId === currentField?.formId) {
+        const parsedFieldMeta = ZFieldMetaSchema.parse(fieldState);
+
+        return {
+          ...field,
+          fieldMeta: parsedFieldMeta,
+        };
+      }
+
+      return field;
+    });
+
+    setValue('fields', updatedFields);
+  };
 
   const {
     append,
@@ -110,8 +168,44 @@ export const AddFieldsFormPartial = ({
   const [selectedField, setSelectedField] = useState<FieldType | null>(null);
   const [selectedSigner, setSelectedSigner] = useState<Recipient | null>(null);
   const [showRecipientsSelector, setShowRecipientsSelector] = useState(false);
+  const selectedSignerIndex = recipients.findIndex((r) => r.id === selectedSigner?.id);
+  const selectedSignerStyles = useSignerColors(
+    selectedSignerIndex === -1 ? 0 : selectedSignerIndex,
+  );
 
   const hasSelectedSignerBeenSent = selectedSigner?.sendStatus === SendStatus.SENT;
+
+  const filterFieldsWithEmptyValues = (fields: typeof localFields, fieldType: string) =>
+    fields
+      .filter((field) => field.type === fieldType)
+      .filter((field) => {
+        if (field.fieldMeta && 'values' in field.fieldMeta) {
+          return field.fieldMeta.values?.length === 0;
+        }
+
+        return true;
+      });
+
+  const emptyCheckboxFields = useMemo(
+    () => filterFieldsWithEmptyValues(localFields, FieldType.CHECKBOX),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [localFields],
+  );
+
+  const emptyRadioFields = useMemo(
+    () => filterFieldsWithEmptyValues(localFields, FieldType.RADIO),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [localFields],
+  );
+
+  const emptySelectFields = useMemo(
+    () => filterFieldsWithEmptyValues(localFields, FieldType.DROPDOWN),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [localFields],
+  );
+
+  const hasErrors =
+    emptyCheckboxFields.length > 0 || emptyRadioFields.length > 0 || emptySelectFields.length > 0;
 
   const isFieldsDisabled =
     !selectedSigner ||
@@ -195,6 +289,7 @@ export const AddFieldsFormPartial = ({
         pageWidth: fieldPageWidth,
         pageHeight: fieldPageHeight,
         signerEmail: selectedSigner.email,
+        fieldMeta: undefined,
       });
 
       setIsFieldWithinBounds(false);
@@ -276,11 +371,9 @@ export const AddFieldsFormPartial = ({
         return;
       }
 
-      const { height, width } = $page.getBoundingClientRect();
-
       fieldBounds.current = {
-        height: Math.max(height * (DEFAULT_HEIGHT_PERCENT / 100), MIN_HEIGHT_PX),
-        width: Math.max(width * (DEFAULT_WIDTH_PERCENT / 100), MIN_WIDTH_PX),
+        height: Math.max(MIN_HEIGHT_PX),
+        width: Math.max(MIN_WIDTH_PX),
       };
     });
 
@@ -320,6 +413,10 @@ export const AddFieldsFormPartial = ({
     );
   }, [recipientsByRole]);
 
+  const handleAdvancedSettings = () => {
+    setShowAdvancedSettings((prev) => !prev);
+  };
+
   const handleGoNextClick = () => {
     const everySignerHasSignature = recipientsByRole.SIGNER.every((signer) =>
       localFields.some(
@@ -338,297 +435,473 @@ export const AddFieldsFormPartial = ({
 
   return (
     <>
-      <DocumentFlowFormContainerHeader
-        title={documentFlow.title}
-        description={documentFlow.description}
-      />
-
-      <DocumentFlowFormContainerContent>
-        <div className="flex flex-col">
-          {selectedField && (
-            <Card
-              className={cn(
-                'bg-field-card/80 pointer-events-none fixed z-50 cursor-pointer border-2 backdrop-blur-[1px]',
-                {
-                  'border-field-card-border': isFieldWithinBounds,
-                  'opacity-50': !isFieldWithinBounds,
-                },
-              )}
-              style={{
-                top: coords.y,
-                left: coords.x,
-                height: fieldBounds.current.height,
-                width: fieldBounds.current.width,
-              }}
-            >
-              <CardContent className="text-field-card-foreground flex h-full w-full items-center justify-center p-2">
-                {FRIENDLY_FIELD_TYPE[selectedField]}
-              </CardContent>
-            </Card>
-          )}
-
-          {isDocumentPdfLoaded &&
-            localFields.map((field, index) => (
-              <FieldItem
-                key={index}
-                field={field}
-                disabled={selectedSigner?.email !== field.signerEmail || hasSelectedSignerBeenSent}
-                minHeight={fieldBounds.current.height}
-                minWidth={fieldBounds.current.width}
-                passive={isFieldWithinBounds && !!selectedField}
-                onResize={(options) => onFieldResize(options, index)}
-                onMove={(options) => onFieldMove(options, index)}
-                onRemove={() => remove(index)}
-              />
-            ))}
-
-          {!hideRecipients && (
-            <Popover open={showRecipientsSelector} onOpenChange={setShowRecipientsSelector}>
-              <PopoverTrigger asChild>
-                <Button
-                  type="button"
-                  variant="outline"
-                  role="combobox"
-                  className="bg-background text-muted-foreground mb-12 justify-between font-normal"
+      {showAdvancedSettings && currentField ? (
+        <FieldAdvancedSettings
+          title="Advanced settings"
+          description={`Configure the ${FRIENDLY_FIELD_TYPE[currentField.type]} field`}
+          field={currentField}
+          fields={localFields}
+          onAdvancedSettings={handleAdvancedSettings}
+          isDocumentPdfLoaded={isDocumentPdfLoaded}
+          onSave={handleSavedFieldSettings}
+          teamId={teamId}
+        />
+      ) : (
+        <>
+          <DocumentFlowFormContainerHeader
+            title={documentFlow.title}
+            description={documentFlow.description}
+          />
+          <DocumentFlowFormContainerContent>
+            <div className="flex flex-col">
+              {selectedField && (
+                <div
+                  className={cn(
+                    'pointer-events-none fixed z-50 flex cursor-pointer flex-col items-center justify-center bg-white transition duration-200',
+                    selectedSignerStyles.default.base,
+                    {
+                      '-rotate-6 scale-90 opacity-50': !isFieldWithinBounds,
+                    },
+                  )}
+                  style={{
+                    top: coords.y,
+                    left: coords.x,
+                    height: fieldBounds.current.height,
+                    width: fieldBounds.current.width,
+                  }}
                 >
-                  {selectedSigner?.email && (
-                    <span className="flex-1 truncate text-left">
-                      {selectedSigner?.name} ({selectedSigner?.email})
-                    </span>
-                  )}
+                  {FRIENDLY_FIELD_TYPE[selectedField]}
+                </div>
+              )}
 
-                  {!selectedSigner?.email && (
-                    <span className="flex-1 truncate text-left">{selectedSigner?.email}</span>
-                  )}
+              {isDocumentPdfLoaded &&
+                localFields.map((field, index) => {
+                  const recipientIndex = recipients.findIndex((r) => r.email === field.signerEmail);
 
-                  <ChevronsUpDown className="ml-2 h-4 w-4" />
-                </Button>
-              </PopoverTrigger>
+                  return (
+                    <FieldItem
+                      key={index}
+                      recipientIndex={recipientIndex === -1 ? 0 : recipientIndex}
+                      field={field}
+                      disabled={
+                        selectedSigner?.email !== field.signerEmail || hasSelectedSignerBeenSent
+                      }
+                      minHeight={fieldBounds.current.height}
+                      minWidth={fieldBounds.current.width}
+                      passive={isFieldWithinBounds && !!selectedField}
+                      onResize={(options) => onFieldResize(options, index)}
+                      onMove={(options) => onFieldMove(options, index)}
+                      onRemove={() => remove(index)}
+                      onAdvancedSettings={() => {
+                        setCurrentField(field);
+                        handleAdvancedSettings();
+                      }}
+                      hideRecipients={hideRecipients}
+                    />
+                  );
+                })}
 
-              <PopoverContent className="p-0" align="start">
-                <Command value={selectedSigner?.email}>
-                  <CommandInput />
-
-                  <CommandEmpty>
-                    <span className="text-muted-foreground inline-block px-4">
-                      No recipient matching this description was found.
-                    </span>
-                  </CommandEmpty>
-
-                  {recipientsByRoleToDisplay.map(([role, recipients], roleIndex) => (
-                    <CommandGroup key={roleIndex}>
-                      <div className="text-muted-foreground mb-1 ml-2 mt-2 text-xs font-medium">
-                        {`${RECIPIENT_ROLES_DESCRIPTION[role].roleName}s`}
-                      </div>
-
-                      {recipients.length === 0 && (
-                        <div
-                          key={`${role}-empty`}
-                          className="text-muted-foreground/80 px-4 pb-4 pt-2.5 text-center text-xs"
-                        >
-                          No recipients with this role
-                        </div>
+              {!hideRecipients && (
+                <Popover open={showRecipientsSelector} onOpenChange={setShowRecipientsSelector}>
+                  <PopoverTrigger asChild>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      role="combobox"
+                      className={cn(
+                        'bg-background text-muted-foreground hover:text-foreground mb-12 mt-2 justify-between font-normal',
+                        selectedSignerStyles.default.base,
+                      )}
+                    >
+                      {selectedSigner?.email && (
+                        <span className="flex-1 truncate text-left">
+                          {selectedSigner?.name} ({selectedSigner?.email})
+                        </span>
                       )}
 
-                      {recipients.map((recipient) => (
-                        <CommandItem
-                          key={recipient.id}
-                          className={cn('px-2 last:mb-1 [&:not(:first-child)]:mt-1', {
-                            'text-muted-foreground': recipient.sendStatus === SendStatus.SENT,
-                          })}
-                          onSelect={() => {
-                            setSelectedSigner(recipient);
-                            setShowRecipientsSelector(false);
-                          }}
-                        >
-                          <span
-                            className={cn('text-foreground/70 truncate', {
-                              'text-foreground/80': recipient === selectedSigner,
-                            })}
-                          >
-                            {recipient.name && (
-                              <span title={`${recipient.name} (${recipient.email})`}>
-                                {recipient.name} ({recipient.email})
-                              </span>
-                            )}
+                      {!selectedSigner?.email && (
+                        <span className="gradie flex-1 truncate text-left">
+                          {selectedSigner?.email}
+                        </span>
+                      )}
 
-                            {!recipient.name && (
-                              <span title={recipient.email}>{recipient.email}</span>
-                            )}
-                          </span>
+                      <ChevronsUpDown className="ml-2 h-4 w-4" />
+                    </Button>
+                  </PopoverTrigger>
 
-                          <div className="ml-auto flex items-center justify-center">
-                            {recipient.sendStatus !== SendStatus.SENT ? (
-                              <Check
-                                aria-hidden={recipient !== selectedSigner}
-                                className={cn('h-4 w-4 flex-shrink-0', {
-                                  'opacity-0': recipient !== selectedSigner,
-                                  'opacity-100': recipient === selectedSigner,
-                                })}
-                              />
-                            ) : (
-                              <Tooltip>
-                                <TooltipTrigger>
-                                  <Info className="ml-2 h-4 w-4" />
-                                </TooltipTrigger>
+                  <PopoverContent className="p-0" align="start">
+                    <Command value={selectedSigner?.email}>
+                      <CommandInput />
 
-                                <TooltipContent className="text-muted-foreground max-w-xs">
-                                  This document has already been sent to this recipient. You can no
-                                  longer edit this recipient.
-                                </TooltipContent>
-                              </Tooltip>
-                            )}
+                      <CommandEmpty>
+                        <span className="text-muted-foreground inline-block px-4">
+                          No recipient matching this description was found.
+                        </span>
+                      </CommandEmpty>
+
+                      {recipientsByRoleToDisplay.map(([role, roleRecipients], roleIndex) => (
+                        <CommandGroup key={roleIndex}>
+                          <div className="text-muted-foreground mb-1 ml-2 mt-2 text-xs font-medium">
+                            {`${RECIPIENT_ROLES_DESCRIPTION[role].roleName}s`}
                           </div>
-                        </CommandItem>
+
+                          {roleRecipients.length === 0 && (
+                            <div
+                              key={`${role}-empty`}
+                              className="text-muted-foreground/80 px-4 pb-4 pt-2.5 text-center text-xs"
+                            >
+                              No recipients with this role
+                            </div>
+                          )}
+
+                          {roleRecipients.map((recipient) => (
+                            <CommandItem
+                              key={recipient.id}
+                              className={cn(
+                                'px-2 last:mb-1 [&:not(:first-child)]:mt-1',
+                                getSignerColorStyles(
+                                  Math.max(
+                                    recipients.findIndex((r) => r.id === recipient.id),
+                                    0,
+                                  ),
+                                ).default.comboxBoxItem,
+                                {
+                                  'text-muted-foreground': recipient.sendStatus === SendStatus.SENT,
+                                },
+                              )}
+                              onSelect={() => {
+                                setSelectedSigner(recipient);
+                                setShowRecipientsSelector(false);
+                              }}
+                            >
+                              <span
+                                className={cn('text-foreground/70 truncate', {
+                                  'text-foreground/80': recipient === selectedSigner,
+                                })}
+                              >
+                                {recipient.name && (
+                                  <span title={`${recipient.name} (${recipient.email})`}>
+                                    {recipient.name} ({recipient.email})
+                                  </span>
+                                )}
+
+                                {!recipient.name && (
+                                  <span title={recipient.email}>{recipient.email}</span>
+                                )}
+                              </span>
+
+                              <div className="ml-auto flex items-center justify-center">
+                                {recipient.sendStatus !== SendStatus.SENT ? (
+                                  <Check
+                                    aria-hidden={recipient !== selectedSigner}
+                                    className={cn('h-4 w-4 flex-shrink-0', {
+                                      'opacity-0': recipient !== selectedSigner,
+                                      'opacity-100': recipient === selectedSigner,
+                                    })}
+                                  />
+                                ) : (
+                                  <Tooltip>
+                                    <TooltipTrigger>
+                                      <Info className="ml-2 h-4 w-4" />
+                                    </TooltipTrigger>
+
+                                    <TooltipContent className="text-muted-foreground max-w-xs">
+                                      This document has already been sent to this recipient. You can
+                                      no longer edit this recipient.
+                                    </TooltipContent>
+                                  </Tooltip>
+                                )}
+                              </div>
+                            </CommandItem>
+                          ))}
+                        </CommandGroup>
                       ))}
-                    </CommandGroup>
-                  ))}
-                </Command>
-              </PopoverContent>
-            </Popover>
+                    </Command>
+                  </PopoverContent>
+                </Popover>
+              )}
+
+              <div className="-mx-2 flex-1 overflow-y-auto px-2">
+                <fieldset disabled={isFieldsDisabled} className="my-2 grid grid-cols-3 gap-4">
+                  <button
+                    type="button"
+                    className="group h-full w-full"
+                    onClick={() => setSelectedField(FieldType.SIGNATURE)}
+                    onMouseDown={() => setSelectedField(FieldType.SIGNATURE)}
+                    data-selected={selectedField === FieldType.SIGNATURE ? true : undefined}
+                  >
+                    <Card
+                      className={cn(
+                        'flex h-full w-full cursor-pointer items-center justify-center group-disabled:opacity-50',
+                        // selectedSignerStyles.borderClass,
+                      )}
+                    >
+                      <CardContent className="flex flex-col items-center justify-center px-6 py-4">
+                        <p
+                          className={cn(
+                            'text-muted-foreground group-data-[selected]:text-foreground flex items-center justify-center gap-x-1.5 text-lg font-normal',
+                            fontCaveat.className,
+                          )}
+                        >
+                          Signature
+                        </p>
+                      </CardContent>
+                    </Card>
+                  </button>
+
+                  <button
+                    type="button"
+                    className="group h-full w-full"
+                    onClick={() => setSelectedField(FieldType.EMAIL)}
+                    onMouseDown={() => setSelectedField(FieldType.EMAIL)}
+                    data-selected={selectedField === FieldType.EMAIL ? true : undefined}
+                  >
+                    <Card
+                      className={cn(
+                        'flex h-full w-full cursor-pointer items-center justify-center group-disabled:opacity-50',
+                        // selectedSignerStyles.borderClass,
+                      )}
+                    >
+                      <CardContent className="p-4">
+                        <p
+                          className={cn(
+                            'text-muted-foreground group-data-[selected]:text-foreground flex items-center justify-center gap-x-1.5 text-sm font-normal',
+                          )}
+                        >
+                          <Mail className="h-4 w-4" />
+                          Email
+                        </p>
+                      </CardContent>
+                    </Card>
+                  </button>
+
+                  <button
+                    type="button"
+                    className="group h-full w-full"
+                    onClick={() => setSelectedField(FieldType.NAME)}
+                    onMouseDown={() => setSelectedField(FieldType.NAME)}
+                    data-selected={selectedField === FieldType.NAME ? true : undefined}
+                  >
+                    <Card
+                      className={cn(
+                        'flex h-full w-full cursor-pointer items-center justify-center group-disabled:opacity-50',
+                        // selectedSignerStyles.borderClass,
+                      )}
+                    >
+                      <CardContent className="p-4">
+                        <p
+                          className={cn(
+                            'text-muted-foreground group-data-[selected]:text-foreground flex items-center justify-center gap-x-1.5 text-sm font-normal',
+                          )}
+                        >
+                          <User className="h-4 w-4" />
+                          Name
+                        </p>
+                      </CardContent>
+                    </Card>
+                  </button>
+
+                  <button
+                    type="button"
+                    className="group h-full w-full"
+                    onClick={() => setSelectedField(FieldType.DATE)}
+                    onMouseDown={() => setSelectedField(FieldType.DATE)}
+                    data-selected={selectedField === FieldType.DATE ? true : undefined}
+                  >
+                    <Card
+                      className={cn(
+                        'flex h-full w-full cursor-pointer items-center justify-center group-disabled:opacity-50',
+                        // selectedSignerStyles.borderClass,
+                      )}
+                    >
+                      <CardContent className="p-4">
+                        <p
+                          className={cn(
+                            'text-muted-foreground group-data-[selected]:text-foreground flex items-center justify-center gap-x-1.5 text-sm font-normal',
+                          )}
+                        >
+                          <CalendarDays className="h-4 w-4" />
+                          Date
+                        </p>
+                      </CardContent>
+                    </Card>
+                  </button>
+
+                  <button
+                    type="button"
+                    className="group h-full w-full"
+                    onClick={() => setSelectedField(FieldType.TEXT)}
+                    onMouseDown={() => setSelectedField(FieldType.TEXT)}
+                    data-selected={selectedField === FieldType.TEXT ? true : undefined}
+                  >
+                    <Card
+                      className={cn(
+                        'flex h-full w-full cursor-pointer items-center justify-center group-disabled:opacity-50',
+                        // selectedSignerStyles.borderClass,
+                      )}
+                    >
+                      <CardContent className="p-4">
+                        <p
+                          className={cn(
+                            'text-muted-foreground group-data-[selected]:text-foreground flex items-center justify-center gap-x-1.5 text-sm font-normal',
+                          )}
+                        >
+                          <Type className="h-4 w-4" />
+                          Text
+                        </p>
+                      </CardContent>
+                    </Card>
+                  </button>
+
+                  <button
+                    type="button"
+                    className="group h-full w-full"
+                    onClick={() => setSelectedField(FieldType.NUMBER)}
+                    onMouseDown={() => setSelectedField(FieldType.NUMBER)}
+                    data-selected={selectedField === FieldType.NUMBER ? true : undefined}
+                  >
+                    <Card
+                      className={cn(
+                        'flex h-full w-full cursor-pointer items-center justify-center group-disabled:opacity-50',
+                        // selectedSignerStyles.borderClass,
+                      )}
+                    >
+                      <CardContent className="p-4">
+                        <p
+                          className={cn(
+                            'text-muted-foreground group-data-[selected]:text-foreground flex items-center justify-center gap-x-1.5 text-sm font-normal',
+                          )}
+                        >
+                          <Hash className="h-4 w-4" />
+                          Number
+                        </p>
+                      </CardContent>
+                    </Card>
+                  </button>
+
+                  <button
+                    type="button"
+                    className="group h-full w-full"
+                    onClick={() => setSelectedField(FieldType.RADIO)}
+                    onMouseDown={() => setSelectedField(FieldType.RADIO)}
+                    data-selected={selectedField === FieldType.RADIO ? true : undefined}
+                  >
+                    <Card
+                      className={cn(
+                        'flex h-full w-full cursor-pointer items-center justify-center group-disabled:opacity-50',
+                        // selectedSignerStyles.borderClass,
+                      )}
+                    >
+                      <CardContent className="p-4">
+                        <p
+                          className={cn(
+                            'text-muted-foreground group-data-[selected]:text-foreground flex items-center justify-center gap-x-1.5 text-sm font-normal',
+                          )}
+                        >
+                          <Disc className="h-4 w-4" />
+                          Radio
+                        </p>
+                      </CardContent>
+                    </Card>
+                  </button>
+
+                  <button
+                    type="button"
+                    className="group h-full w-full"
+                    onClick={() => setSelectedField(FieldType.CHECKBOX)}
+                    onMouseDown={() => setSelectedField(FieldType.CHECKBOX)}
+                    data-selected={selectedField === FieldType.CHECKBOX ? true : undefined}
+                  >
+                    <Card
+                      className={cn(
+                        'flex h-full w-full cursor-pointer items-center justify-center group-disabled:opacity-50',
+                        // selectedSignerStyles.borderClass,
+                      )}
+                    >
+                      <CardContent className="p-4">
+                        <p
+                          className={cn(
+                            'text-muted-foreground group-data-[selected]:text-foreground flex items-center justify-center gap-x-1.5 text-sm font-normal',
+                          )}
+                        >
+                          <CheckSquare className="h-4 w-4" />
+                          Checkbox
+                        </p>
+                      </CardContent>
+                    </Card>
+                  </button>
+
+                  <button
+                    type="button"
+                    className="group h-full w-full"
+                    onClick={() => setSelectedField(FieldType.DROPDOWN)}
+                    onMouseDown={() => setSelectedField(FieldType.DROPDOWN)}
+                    data-selected={selectedField === FieldType.DROPDOWN ? true : undefined}
+                  >
+                    <Card
+                      className={cn(
+                        'flex h-full w-full cursor-pointer items-center justify-center group-disabled:opacity-50',
+                        // selectedSignerStyles.borderClass,
+                      )}
+                    >
+                      <CardContent className="p-4">
+                        <p
+                          className={cn(
+                            'text-muted-foreground group-data-[selected]:text-foreground flex items-center justify-center gap-x-1.5 text-sm font-normal',
+                          )}
+                        >
+                          <ChevronDown className="h-4 w-4" />
+                          Dropdown
+                        </p>
+                      </CardContent>
+                    </Card>
+                  </button>
+                </fieldset>
+              </div>
+            </div>
+          </DocumentFlowFormContainerContent>
+          {hasErrors && (
+            <div className="mt-4">
+              <ul>
+                <li className="text-sm text-red-500">
+                  To proceed further, please set at least one value for the{' '}
+                  {emptyCheckboxFields.length > 0
+                    ? 'Checkbox'
+                    : emptyRadioFields.length > 0
+                    ? 'Radio'
+                    : 'Select'}{' '}
+                  field.
+                </li>
+              </ul>
+            </div>
           )}
+          <DocumentFlowFormContainerFooter>
+            <DocumentFlowFormContainerStep
+              title={documentFlow.title}
+              step={currentStep}
+              maxStep={totalSteps}
+            />
 
-          <div className="-mx-2 flex-1 overflow-y-auto px-2">
-            <fieldset disabled={isFieldsDisabled} className="grid grid-cols-2 gap-x-4 gap-y-8">
-              <button
-                type="button"
-                className="group h-full w-full"
-                onClick={() => setSelectedField(FieldType.SIGNATURE)}
-                onMouseDown={() => setSelectedField(FieldType.SIGNATURE)}
-                data-selected={selectedField === FieldType.SIGNATURE ? true : undefined}
-              >
-                <Card className="group-data-[selected]:border-documenso h-full w-full cursor-pointer group-disabled:opacity-50">
-                  <CardContent className="flex flex-col items-center justify-center px-6 py-4">
-                    <p
-                      className={cn(
-                        'text-muted-foreground group-data-[selected]:text-foreground w-full truncate text-3xl font-medium',
-                        fontCaveat.className,
-                      )}
-                    >
-                      {selectedSigner?.name || 'Signature'}
-                    </p>
+            <DocumentFlowFormContainerActions
+              loading={isSubmitting}
+              disabled={isSubmitting}
+              disableNextStep={hasErrors}
+              onGoBackClick={() => {
+                previousStep();
+                remove();
+                documentFlow.onBackStep?.();
+              }}
+              goBackLabel={canRenderBackButtonAsRemove ? 'Remove' : undefined}
+              onGoNextClick={handleGoNextClick}
+            />
+          </DocumentFlowFormContainerFooter>
 
-                    <p className="text-muted-foreground mt-2 text-center text-xs">Signature</p>
-                  </CardContent>
-                </Card>
-              </button>
-
-              <button
-                type="button"
-                className="group h-full w-full"
-                onClick={() => setSelectedField(FieldType.EMAIL)}
-                onMouseDown={() => setSelectedField(FieldType.EMAIL)}
-                data-selected={selectedField === FieldType.EMAIL ? true : undefined}
-              >
-                <Card className="group-data-[selected]:border-documenso h-full w-full cursor-pointer group-disabled:opacity-50">
-                  <CardContent className="flex flex-col items-center justify-center px-6 py-4">
-                    <p
-                      className={cn(
-                        'text-muted-foreground group-data-[selected]:text-foreground text-xl font-medium',
-                      )}
-                    >
-                      {'Email'}
-                    </p>
-
-                    <p className="text-muted-foreground mt-2 text-xs">Email</p>
-                  </CardContent>
-                </Card>
-              </button>
-
-              <button
-                type="button"
-                className="group h-full w-full"
-                onClick={() => setSelectedField(FieldType.NAME)}
-                onMouseDown={() => setSelectedField(FieldType.NAME)}
-                data-selected={selectedField === FieldType.NAME ? true : undefined}
-              >
-                <Card className="group-data-[selected]:border-documenso h-full w-full cursor-pointer group-disabled:opacity-50">
-                  <CardContent className="flex flex-col items-center justify-center px-6 py-4">
-                    <p
-                      className={cn(
-                        'text-muted-foreground group-data-[selected]:text-foreground text-xl font-medium',
-                      )}
-                    >
-                      {'Name'}
-                    </p>
-
-                    <p className="text-muted-foreground mt-2 text-xs">Name</p>
-                  </CardContent>
-                </Card>
-              </button>
-
-              <button
-                type="button"
-                className="group h-full w-full"
-                onClick={() => setSelectedField(FieldType.DATE)}
-                onMouseDown={() => setSelectedField(FieldType.DATE)}
-                data-selected={selectedField === FieldType.DATE ? true : undefined}
-              >
-                <Card className="group-data-[selected]:border-documenso h-full w-full cursor-pointer group-disabled:opacity-50">
-                  <CardContent className="flex flex-col items-center justify-center px-6 py-4">
-                    <p
-                      className={cn(
-                        'text-muted-foreground group-data-[selected]:text-foreground text-xl font-medium',
-                      )}
-                    >
-                      {'Date'}
-                    </p>
-
-                    <p className="text-muted-foreground mt-2 text-xs">Date</p>
-                  </CardContent>
-                </Card>
-              </button>
-
-              <button
-                type="button"
-                className="group h-full w-full"
-                onClick={() => setSelectedField(FieldType.TEXT)}
-                onMouseDown={() => setSelectedField(FieldType.TEXT)}
-                data-selected={selectedField === FieldType.TEXT ? true : undefined}
-              >
-                <Card className="group-data-[selected]:border-documenso h-full w-full cursor-pointer group-disabled:opacity-50">
-                  <CardContent className="flex flex-col items-center justify-center px-6 py-4">
-                    <p
-                      className={cn(
-                        'text-muted-foreground group-data-[selected]:text-foreground text-xl font-medium',
-                      )}
-                    >
-                      {'Text'}
-                    </p>
-
-                    <p className="text-muted-foreground mt-2 text-xs">Custom Text</p>
-                  </CardContent>
-                </Card>
-              </button>
-            </fieldset>
-          </div>
-        </div>
-      </DocumentFlowFormContainerContent>
-
-      <DocumentFlowFormContainerFooter>
-        <DocumentFlowFormContainerStep
-          title={documentFlow.title}
-          step={currentStep}
-          maxStep={totalSteps}
-        />
-
-        <DocumentFlowFormContainerActions
-          loading={isSubmitting}
-          disabled={isSubmitting}
-          onGoBackClick={() => {
-            previousStep();
-            remove();
-            documentFlow.onBackStep?.();
-          }}
-          goBackLabel={canRenderBackButtonAsRemove ? 'Remove' : undefined}
-          onGoNextClick={handleGoNextClick}
-        />
-      </DocumentFlowFormContainerFooter>
-
-      <MissingSignatureFieldDialog
-        isOpen={isMissingSignatureDialogVisible}
-        onOpenChange={(value) => setIsMissingSignatureDialogVisible(value)}
-      />
+          <MissingSignatureFieldDialog
+            isOpen={isMissingSignatureDialogVisible}
+            onOpenChange={(value) => setIsMissingSignatureDialogVisible(value)}
+          />
+        </>
+      )}
     </>
   );
 };

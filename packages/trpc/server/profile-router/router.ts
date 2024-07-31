@@ -3,6 +3,7 @@ import { TRPCError } from '@trpc/server';
 import { IS_BILLING_ENABLED } from '@documenso/lib/constants/app';
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import { jobsClient } from '@documenso/lib/jobs/client';
+import { setAvatarImage } from '@documenso/lib/server-only/profile/set-avatar-image';
 import { getSubscriptionsByUserId } from '@documenso/lib/server-only/subscription/get-subscriptions-by-user-id';
 import { deleteUser } from '@documenso/lib/server-only/user/delete-user';
 import { findUserSecurityAuditLogs } from '@documenso/lib/server-only/user/find-user-security-audit-logs';
@@ -22,6 +23,7 @@ import {
   ZForgotPasswordFormSchema,
   ZResetPasswordFormSchema,
   ZRetrieveUserByIdQuerySchema,
+  ZSetProfileImageMutationSchema,
   ZUpdatePasswordMutationSchema,
   ZUpdateProfileMutationSchema,
   ZUpdatePublicProfileMutationSchema,
@@ -88,9 +90,9 @@ export const profileRouter = router({
     .input(ZUpdatePublicProfileMutationSchema)
     .mutation(async ({ input, ctx }) => {
       try {
-        const { url } = input;
+        const { url, bio, enabled } = input;
 
-        if (IS_BILLING_ENABLED() && url.length < 6) {
+        if (IS_BILLING_ENABLED() && url !== undefined && url.length < 6) {
           const subscriptions = await getSubscriptionsByUserId({
             userId: ctx.user.id,
           }).then((subscriptions) =>
@@ -107,7 +109,11 @@ export const profileRouter = router({
 
         const user = await updatePublicProfile({
           userId: ctx.user.id,
-          url,
+          data: {
+            url,
+            bio,
+            enabled,
+          },
         });
 
         return { success: true, url: user.url };
@@ -242,4 +248,32 @@ export const profileRouter = router({
       });
     }
   }),
+
+  setProfileImage: authenticatedProcedure
+    .input(ZSetProfileImageMutationSchema)
+    .mutation(async ({ input, ctx }) => {
+      try {
+        const { bytes, teamId } = input;
+
+        return await setAvatarImage({
+          userId: ctx.user.id,
+          teamId,
+          bytes,
+          requestMetadata: extractNextApiRequestMetadata(ctx.req),
+        });
+      } catch (err) {
+        console.error(err);
+
+        let message = 'We were unable to update your profile image. Please try again.';
+
+        if (err instanceof Error) {
+          message = err.message;
+        }
+
+        throw new TRPCError({
+          code: 'BAD_REQUEST',
+          message,
+        });
+      }
+    }),
 });

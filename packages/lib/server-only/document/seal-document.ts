@@ -117,6 +117,9 @@ export const sealDocument = async ({
     await insertFieldInPDF(doc, field);
   }
 
+  // Re-flatten post-insertion to handle fields that create arcoFields
+  flattenForm(doc);
+
   const pdfBytes = await doc.save();
 
   const pdfBuffer = await signPdf({ pdf: Buffer.from(pdfBytes) });

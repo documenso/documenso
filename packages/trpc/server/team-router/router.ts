@@ -1,11 +1,14 @@
+import { TRPCError } from '@trpc/server';
+
 import { getTeamPrices } from '@documenso/ee/server-only/stripe/get-team-prices';
-import { AppError } from '@documenso/lib/errors/app-error';
+import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import { acceptTeamInvitation } from '@documenso/lib/server-only/team/accept-team-invitation';
 import { createTeam } from '@documenso/lib/server-only/team/create-team';
 import { createTeamBillingPortal } from '@documenso/lib/server-only/team/create-team-billing-portal';
 import { createTeamPendingCheckoutSession } from '@documenso/lib/server-only/team/create-team-checkout-session';
 import { createTeamEmailVerification } from '@documenso/lib/server-only/team/create-team-email-verification';
 import { createTeamMemberInvites } from '@documenso/lib/server-only/team/create-team-member-invites';
+import { declineTeamInvitation } from '@documenso/lib/server-only/team/decline-team-invitation';
 import { deleteTeam } from '@documenso/lib/server-only/team/delete-team';
 import { deleteTeamEmail } from '@documenso/lib/server-only/team/delete-team-email';
 import { deleteTeamEmailVerification } from '@documenso/lib/server-only/team/delete-team-email-verification';
@@ -30,6 +33,7 @@ import { resendTeamMemberInvitation } from '@documenso/lib/server-only/team/rese
 import { updateTeam } from '@documenso/lib/server-only/team/update-team';
 import { updateTeamEmail } from '@documenso/lib/server-only/team/update-team-email';
 import { updateTeamMember } from '@documenso/lib/server-only/team/update-team-member';
+import { updateTeamPublicProfile } from '@documenso/lib/server-only/team/update-team-public-profile';
 
 import { authenticatedProcedure, router } from '../trpc';
 import {
@@ -39,6 +43,7 @@ import {
   ZCreateTeamMemberInvitesMutationSchema,
   ZCreateTeamMutationSchema,
   ZCreateTeamPendingCheckoutMutationSchema,
+  ZDeclineTeamInvitationMutationSchema,
   ZDeleteTeamEmailMutationSchema,
   ZDeleteTeamEmailVerificationMutationSchema,
   ZDeleteTeamMemberInvitationsMutationSchema,
@@ -60,6 +65,7 @@ import {
   ZUpdateTeamEmailMutationSchema,
   ZUpdateTeamMemberMutationSchema,
   ZUpdateTeamMutationSchema,
+  ZUpdateTeamPublicProfileMutationSchema,
 } from './schema';
 
 export const teamRouter = router({
@@ -68,6 +74,21 @@ export const teamRouter = router({
     .mutation(async ({ input, ctx }) => {
       try {
         return await acceptTeamInvitation({
+          teamId: input.teamId,
+          userId: ctx.user.id,
+        });
+      } catch (err) {
+        console.error(err);
+
+        throw AppError.parseErrorToTRPCError(err);
+      }
+    }),
+
+  declineTeamInvitation: authenticatedProcedure
+    .input(ZDeclineTeamInvitationMutationSchema)
+    .mutation(async ({ input, ctx }) => {
+      try {
+        return await declineTeamInvitation({
           teamId: input.teamId,
           userId: ctx.user.id,
         });
@@ -456,6 +477,39 @@ export const teamRouter = router({
         console.error(err);
 
         throw AppError.parseErrorToTRPCError(err);
+      }
+    }),
+
+  updateTeamPublicProfile: authenticatedProcedure
+    .input(ZUpdateTeamPublicProfileMutationSchema)
+    .mutation(async ({ input, ctx }) => {
+      try {
+        const { teamId, bio, enabled } = input;
+
+        const team = await updateTeamPublicProfile({
+          userId: ctx.user.id,
+          teamId,
+          data: {
+            bio,
+            enabled,
+          },
+        });
+
+        return { success: true, url: team.url };
+      } catch (err) {
+        console.error(err);
+
+        const error = AppError.parseError(err);
+
+        if (error.code !== AppErrorCode.UNKNOWN_ERROR) {
+          throw AppError.parseErrorToTRPCError(error);
+        }
+
+        throw new TRPCError({
+          code: 'BAD_REQUEST',
+          message:
+            'We were unable to update your public profile. Please review the information you provided and try again.',
+        });
       }
     }),
 

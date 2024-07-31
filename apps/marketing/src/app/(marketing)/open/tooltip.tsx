@@ -1,5 +1,7 @@
 import React from 'react';
 
+import { Trans } from '@lingui/macro';
+
 import {
   Tooltip,
   TooltipContent,
@@ -29,7 +31,9 @@ export function OpenPageTooltip() {
           </svg>
         </TooltipTrigger>
         <TooltipContent>
-          <p>Customers with an Active Subscriptions.</p>
+          <p>
+            <Trans>Customers with an Active Subscriptions.</Trans>
+          </p>
         </TooltipContent>
       </Tooltip>
     </TooltipProvider>

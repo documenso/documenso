@@ -2,6 +2,7 @@
 import type { Metadata } from 'next';
 import { Caveat } from 'next/font/google';
 
+import { setupI18nSSR } from '@documenso/lib/client-only/providers/i18n.server';
 import { cn } from '@documenso/ui/lib/utils';
 
 import { Callout } from '~/components/(marketing)/callout';
@@ -25,6 +26,8 @@ const fontCaveat = Caveat({
 });
 
 export default async function IndexPage() {
+  setupI18nSSR();
+
   const starCount = await fetch('https://api.github.com/repos/documenso/documenso', {
     headers: {
       accept: 'application/vnd.github.v3+json',

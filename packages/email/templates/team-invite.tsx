@@ -89,6 +89,12 @@ export const TeamInviteEmailTemplate = ({
                   >
                     Accept
                   </Button>
+                  <Button
+                    className="ml-4 inline-flex items-center justify-center rounded-lg bg-gray-50 px-6 py-3 text-center text-sm font-medium text-slate-600 no-underline"
+                    href={`${baseUrl}/team/decline/${token}`}
+                  >
+                    Decline
+                  </Button>
                 </Section>
               </Section>
             </Container>
