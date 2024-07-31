@@ -2,20 +2,12 @@
   "$schema": "https://turbo.build/schema.json",
   "pipeline": {
     "build": {
-      "dependsOn": [
-        "prebuild",
-        "^build"
-      ],
-      "outputs": [
-        ".next/**",
-        "!.next/cache/**"
-      ]
+      "dependsOn": ["prebuild", "^build"],
+      "outputs": [".next/**", "!.next/cache/**"]
     },
     "prebuild": {
       "cache": false,
-      "dependsOn": [
-        "^prebuild"
-      ]
+      "dependsOn": ["^prebuild"]
     },
     "lint": {
       "cache": false
@@ -31,9 +23,7 @@
       "persistent": true
     },
     "start": {
-      "dependsOn": [
-        "^build"
-      ],
+      "dependsOn": ["^build"],
       "cache": false,
       "persistent": true
     },
@@ -41,18 +31,14 @@
       "cache": false
     },
     "test:e2e": {
-      "dependsOn": [
-        "^build"
-      ],
+      "dependsOn": ["^build"],
       "cache": false
     },
     "translate:compile": {
       "cache": false
     }
   },
-  "globalDependencies": [
-    "**/.env.*local"
-  ],
+  "globalDependencies": ["**/.env.*local"],
   "globalEnv": [
     "APP_VERSION",
     "NEXT_PRIVATE_ENCRYPTION_KEY",
@@ -83,6 +69,8 @@
     "NEXT_PRIVATE_OIDC_WELL_KNOWN",
     "NEXT_PRIVATE_OIDC_CLIENT_ID",
     "NEXT_PRIVATE_OIDC_CLIENT_SECRET",
+    "NEXT_PRIVATE_OIDC_ALLOW_SIGNUP",
+    "NEXT_PRIVATE_OIDC_SKIP_VERIFY",
     "NEXT_PUBLIC_UPLOAD_TRANSPORT",
     "NEXT_PRIVATE_UPLOAD_ENDPOINT",
     "NEXT_PRIVATE_UPLOAD_FORCE_PATH_STYLE",
