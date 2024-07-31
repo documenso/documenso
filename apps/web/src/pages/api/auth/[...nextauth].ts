@@ -60,11 +60,37 @@ export default async function auth(req: NextApiRequest, res: NextApiResponse) {
           },
         });
       },
-      linkAccount: async ({ user }) => {
+      linkAccount: async ({ user, account, profile }) => {
         const userId = typeof user.id === 'string' ? parseInt(user.id) : user.id;
 
-        if (isNaN(userId)) {
+        if (Number.isNaN(userId)) {
           return;
+        }
+
+        // If the user is linking an OIDC account and the email verified date is set then update it in the db.
+        if (account.provider === 'oidc' && profile.emailVerified !== null) {
+          await prisma.user.update({
+            where: { id: userId },
+            data: {
+              emailVerified: profile.emailVerified,
+            },
+          });
+        }
+
+        // auto set public profile name
+        if (account.provider === 'oidc' && user.name && 'url' in user && !user.url) {
+          let sanitizedPublicUrl = user.name?.replace(' ', '');
+          let counter = 1;
+          while (await prisma.user.findFirst({ where: { url: sanitizedPublicUrl } })) {
+            sanitizedPublicUrl = `${sanitizedPublicUrl}${counter}`;
+            counter++;
+          }
+          await prisma.user.update({
+            where: { id: userId },
+            data: {
+              url: sanitizedPublicUrl,
+            },
+          });
         }
 
         await prisma.userSecurityAuditLog.create({

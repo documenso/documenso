@@ -161,7 +161,10 @@ export const NEXT_AUTH_OPTIONS: AuthOptions = {
           id: profile.sub,
           email: profile.email || profile.preferred_username,
           name: profile.name || `${profile.given_name} ${profile.family_name}`.trim(),
-          emailVerified: profile.email_verified ? new Date().toISOString() : null,
+          emailVerified:
+            process.env.NEXT_PRIVATE_OIDC_TRUST_EMAILADDRESSES === 'true' || profile.email_verified
+              ? new Date().toISOString()
+              : null,
         };
       },
     },
@@ -363,6 +366,8 @@ export const NEXT_AUTH_OPTIONS: AuthOptions = {
     async signIn({ user }) {
       // We do this to stop OAuth providers from creating an account
       // when signups are disabled
+
+      if (env('NEXT_PRIVATE_OIDC_ALLOW_SIGNUP') === 'true') return true;
       if (env('NEXT_PUBLIC_DISABLE_SIGNUP') === 'true') {
         const userData = await getUserByEmail({ email: user.email! });
 
