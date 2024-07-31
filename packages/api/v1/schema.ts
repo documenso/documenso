@@ -1,5 +1,9 @@
+import { extendZodWithOpenApi } from '@anatine/zod-openapi';
 import { z } from 'zod';
 
+import { DATE_FORMATS, DEFAULT_DOCUMENT_DATE_FORMAT } from '@documenso/lib/constants/date-formats';
+import '@documenso/lib/constants/time-zones';
+import { DEFAULT_DOCUMENT_TIME_ZONE, TIME_ZONES } from '@documenso/lib/constants/time-zones';
 import { ZUrlSchema } from '@documenso/lib/schemas/common';
 import {
   DocumentDataType,
@@ -10,6 +14,8 @@ import {
   SigningStatus,
   TemplateType,
 } from '@documenso/prisma/client';
+
+extendZodWithOpenApi(z);
 
 export const ZNoBodyMutationSchema = null;
 
@@ -29,6 +35,7 @@ export type TDeleteDocumentMutationSchema = typeof ZDeleteDocumentMutationSchema
 
 export const ZSuccessfulDocumentResponseSchema = z.object({
   id: z.number(),
+  externalId: z.string().nullish(),
   userId: z.number(),
   teamId: z.number().nullish(),
   title: z.string(),
@@ -57,6 +64,20 @@ export const ZSendDocumentForSigningMutationSchema = z
 
 export type TSendDocumentForSigningMutationSchema = typeof ZSendDocumentForSigningMutationSchema;
 
+export const ZResendDocumentForSigningMutationSchema = z.object({
+  recipients: z.array(z.number()),
+});
+
+export type TResendDocumentForSigningMutationSchema = z.infer<
+  typeof ZResendDocumentForSigningMutationSchema
+>;
+
+export const ZSuccessfulResendDocumentResponseSchema = z.object({
+  message: z.string(),
+});
+
+export type TResendDocumentResponseSchema = z.infer<typeof ZSuccessfulResendDocumentResponseSchema>;
+
 export const ZUploadDocumentSuccessfulSchema = z.object({
   url: z.string(),
   key: z.string(),
@@ -70,6 +91,7 @@ export type TUploadDocumentSuccessfulSchema = z.infer<typeof ZUploadDocumentSucc
 
 export const ZCreateDocumentMutationSchema = z.object({
   title: z.string().min(1),
+  externalId: z.string().nullish(),
   recipients: z.array(
     z.object({
       name: z.string().min(1),
@@ -81,8 +103,19 @@ export const ZCreateDocumentMutationSchema = z.object({
     .object({
       subject: z.string(),
       message: z.string(),
-      timezone: z.string(),
-      dateFormat: z.string(),
+      timezone: z.string().default(DEFAULT_DOCUMENT_TIME_ZONE).openapi({
+        description:
+          'The timezone of the date. Must be one of the options listed in the list below.',
+        enum: TIME_ZONES,
+      }),
+      dateFormat: z
+        .string()
+        .default(DEFAULT_DOCUMENT_DATE_FORMAT)
+        .openapi({
+          description:
+            'The format of the date. Must be one of the options listed in the list below.',
+          enum: DATE_FORMATS.map((format) => format.value),
+        }),
       redirectUrl: z.string(),
     })
     .partial(),
@@ -94,6 +127,7 @@ export type TCreateDocumentMutationSchema = z.infer<typeof ZCreateDocumentMutati
 export const ZCreateDocumentMutationResponseSchema = z.object({
   uploadUrl: z.string().min(1),
   documentId: z.number(),
+  externalId: z.string().nullish(),
   recipients: z.array(
     z.object({
       recipientId: z.number(),
@@ -113,6 +147,7 @@ export type TCreateDocumentMutationResponseSchema = z.infer<
 
 export const ZCreateDocumentFromTemplateMutationSchema = z.object({
   title: z.string().min(1),
+  externalId: z.string().nullish(),
   recipients: z.array(
     z.object({
       name: z.string().min(1),
@@ -139,6 +174,7 @@ export type TCreateDocumentFromTemplateMutationSchema = z.infer<
 
 export const ZCreateDocumentFromTemplateMutationResponseSchema = z.object({
   documentId: z.number(),
+  externalId: z.string().nullish(),
   recipients: z.array(
     z.object({
       recipientId: z.number(),
@@ -158,6 +194,7 @@ export type TCreateDocumentFromTemplateMutationResponseSchema = z.infer<
 
 export const ZGenerateDocumentFromTemplateMutationSchema = z.object({
   title: z.string().optional(),
+  externalId: z.string().nullish(),
   recipients: z
     .array(
       z.object({
@@ -194,6 +231,7 @@ export type TGenerateDocumentFromTemplateMutationSchema = z.infer<
 
 export const ZGenerateDocumentFromTemplateMutationResponseSchema = z.object({
   documentId: z.number(),
+  externalId: z.string().nullish(),
   recipients: z.array(
     z.object({
       recipientId: z.number(),
@@ -332,6 +370,7 @@ export const ZTemplateMetaSchema = z.object({
 
 export const ZTemplateSchema = z.object({
   id: z.number(),
+  externalId: z.string().nullish(),
   type: z.nativeEnum(TemplateType),
   title: z.string(),
   userId: z.number(),

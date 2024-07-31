@@ -1,0 +1,100 @@
+import { Callout, Steps } from 'nextra/components';
+
+# Document Templates
+
+Documenso allows you to create templates, which are reusable documents. Templates are helpful if you often send the same type of document, such as contracts, agreements, or invoices, as they help you save time.
+
+<Steps>
+
+### Create New Template
+
+To create a new template, navigate to the ["Templates" page](https://app.documenso.com/templates) and click on the "New Template" button.
+
+![Documenso template page](public/templates/documenso-template-page.webp)
+
+Clicking on the "New Template" button opens a new modal to upload the document you want to use as a template. Select the document and wait for Documenso to upload it to your account.
+
+![Upload a new template document in the Documenso dashboard](public/templates/documenso-template-page-upload-document.webp)
+
+Once the upload is complete, Documenso opens the template configuration page.
+
+![A successfuly uploaded document in the Documenso dashboard](public/templates/documenso-template-page-uploaded-document.webp)
+
+You can then configure the template by adding recipients, fields, and other options.
+
+### (Optional) Email options
+
+When you send a document for signing, Documenso emails the recipients with a link to the document. The email contains a subject, message, and the document.
+
+Documenso uses a generic subject and message but also allows you to customize them for each document and template.
+
+![Configuring the email options for the Documenso template](public/templates/documenso-template-page-uploaded-document-email-options.webp)
+
+To configure the email options, click the "Email Options" tab and fill in the subject and message fields. Every time you use this template for signing, Documenso will use the custom subject and message you provided. They can also be overridden before sending the document.
+
+### (Optional) Advanced Options
+
+The template also has advanced options that you can configure. These options include settings such as the external ID, date format, time zone and the redirect URL.
+
+![Configuring the advanced options for the Documenso template](public/templates/documenso-template-page-uploaded-document-advanced-options.webp)
+
+The external ID allows you to set a custom ID for the document that can be used to identify the document in your external system(s).
+
+The date format and time zone settings allow you to customize how the date and time are displayed in the document.
+
+The redirect URL allows you to specify a URL where the signer will be redirected after signing the document.
+
+### Add Placeholders or Recipients
+
+You can add placeholders for the template recipients. Placeholders specify where the recipient's name, email, and other information should be in the document.
+
+You can also add recipients directly to the template. Recipients are the people who will receive the document for signing.
+
+![Adding placeholder recipients for the Documenso template](public/templates/documenso-template-recipients.webp)
+
+If you add placeholders to the template, you must replace them with actual recipients when creating a document from it. See the modal from the ["Use a Template"](#use-a-template) section.
+
+### Add Fields
+
+The last step involves adding fields to the document. These fields collect information from the recipients when they sign the document.
+
+Documenso provides the following field types:
+
+- **Signature** - Collects the signer's signature
+- **Email** - Collects the signer's email address
+- **Name** - Collects the signer's name
+- **Date** - Collects the date of the signature
+- **Text** - Collects text input from the signer
+- **Number** - Collects a number input from the signer
+- **Radio** - Collects a single choice from the signer
+- **Checkbox** - Collects multiple choices from the signer
+- **Dropdown/Select** - Collects a single choice from a list of choices
+
+![Adding fields for the Documenso template](public/templates/documenso-template-page-fields.webp)
+
+After adding the fields, press the "Save Template" button to save the template.
+
+<Callout type="info">
+  Learn more about the available field types and how to use them on the [Fields
+  page](signing-documents/fields).
+</Callout>
+
+### Use a Template
+
+Click on the "Use Template" button to create a new document from the template. Before creating the document, you are asked to fill in the recipients for the placeholders you added to the template.
+
+After filling in the recipients, click the "Create Document" button to create the document in your account.
+
+![Use an available Documenso template](public/templates/documenso-use-template.webp)
+
+You can also send the document straight to the recipients for signing by checking the "Send document" checkbox.
+
+### (Optional) Create A Direct Signing Link
+
+A direct signing link allows you to create a shareable link for document signing, where recipients can fill in their information and sign the document. See the "Create Direct Link" button in the image from [step 4](#add-placeholders-or-recipients).
+
+<Callout type="info">
+  Check out the [Direct Signing Links](/users/direct-links) section for more information.
+</Callout>
+
+</Steps>

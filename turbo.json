@@ -33,6 +33,9 @@
     "test:e2e": {
       "dependsOn": ["^build"],
       "cache": false
+    },
+    "translate:compile": {
+      "cache": false
     }
   },
   "globalDependencies": ["**/.env.*local"],
@@ -97,6 +100,7 @@
     "NEXT_PRIVATE_SMTP_APIKEY_USER",
     "NEXT_PRIVATE_SMTP_APIKEY",
     "NEXT_PRIVATE_SMTP_SECURE",
+    "NEXT_PRIVATE_SMTP_UNSAFE_IGNORE_TLS",
     "NEXT_PRIVATE_SMTP_FROM_NAME",
     "NEXT_PRIVATE_SMTP_FROM_ADDRESS",
     "NEXT_PRIVATE_STRIPE_API_KEY",

@@ -2,6 +2,9 @@ import { createNextRoute } from '@ts-rest/next';
 
 import { getServerLimits } from '@documenso/ee/server-only/limits/server';
 import { NEXT_PUBLIC_WEBAPP_URL } from '@documenso/lib/constants/app';
+import { DATE_FORMATS, DEFAULT_DOCUMENT_DATE_FORMAT } from '@documenso/lib/constants/date-formats';
+import '@documenso/lib/constants/time-zones';
+import { DEFAULT_DOCUMENT_TIME_ZONE, TIME_ZONES } from '@documenso/lib/constants/time-zones';
 import { AppError } from '@documenso/lib/errors/app-error';
 import { createDocumentData } from '@documenso/lib/server-only/document-data/create-document-data';
 import { upsertDocumentMeta } from '@documenso/lib/server-only/document-meta/upsert-document-meta';
@@ -9,6 +12,7 @@ import { createDocument } from '@documenso/lib/server-only/document/create-docum
 import { deleteDocument } from '@documenso/lib/server-only/document/delete-document';
 import { findDocuments } from '@documenso/lib/server-only/document/find-documents';
 import { getDocumentById } from '@documenso/lib/server-only/document/get-document-by-id';
+import { resendDocument } from '@documenso/lib/server-only/document/resend-document';
 import { sendDocument } from '@documenso/lib/server-only/document/send-document';
 import { updateDocument } from '@documenso/lib/server-only/document/update-document';
 import { createField } from '@documenso/lib/server-only/field/create-field';
@@ -221,6 +225,36 @@ export const ApiContractV1Implementation = createNextRoute(ApiContractV1, {
         };
       }
 
+      const dateFormat = body.meta.dateFormat
+        ? DATE_FORMATS.find((format) => format.label === body.meta.dateFormat)
+        : DATE_FORMATS.find((format) => format.value === DEFAULT_DOCUMENT_DATE_FORMAT);
+      const timezone = body.meta.timezone
+        ? TIME_ZONES.find((tz) => tz === body.meta.timezone)
+        : DEFAULT_DOCUMENT_TIME_ZONE;
+
+      const isDateFormatValid = body.meta.dateFormat
+        ? DATE_FORMATS.some((format) => format.label === dateFormat?.label)
+        : true;
+      const isTimeZoneValid = body.meta.timezone ? TIME_ZONES.includes(String(timezone)) : true;
+
+      if (!isDateFormatValid) {
+        return {
+          status: 400,
+          body: {
+            message: 'Invalid date format. Please provide a valid date format',
+          },
+        };
+      }
+
+      if (!isTimeZoneValid) {
+        return {
+          status: 400,
+          body: {
+            message: 'Invalid timezone. Please provide a valid timezone',
+          },
+        };
+      }
+
       const fileName = body.title.endsWith('.pdf') ? body.title : `${body.title}.pdf`;
 
       const { url, key } = await getPresignPostUrl(fileName, 'application/pdf');
@@ -232,6 +266,7 @@ export const ApiContractV1Implementation = createNextRoute(ApiContractV1, {
 
       const document = await createDocument({
         title: body.title,
+        externalId: body.externalId || null,
         userId: user.id,
         teamId: team?.id,
         formValues: body.formValues,
@@ -242,7 +277,11 @@ export const ApiContractV1Implementation = createNextRoute(ApiContractV1, {
       await upsertDocumentMeta({
         documentId: document.id,
         userId: user.id,
-        ...body.meta,
+        subject: body.meta.subject,
+        message: body.meta.message,
+        timezone,
+        dateFormat: dateFormat?.value,
+        redirectUrl: body.meta.redirectUrl,
         requestMetadata: extractNextApiRequestMetadata(args.req),
       });
 
@@ -397,6 +436,7 @@ export const ApiContractV1Implementation = createNextRoute(ApiContractV1, {
       teamId: team?.id,
       data: {
         title: fileName,
+        externalId: body.externalId || null,
         formValues: body.formValues,
         documentData: {
           connect: {
@@ -453,6 +493,7 @@ export const ApiContractV1Implementation = createNextRoute(ApiContractV1, {
     try {
       document = await createDocumentFromTemplate({
         templateId,
+        externalId: body.externalId || null,
         userId: user.id,
         teamId: team?.id,
         recipients: body.recipients,
@@ -595,6 +636,35 @@ export const ApiContractV1Implementation = createNextRoute(ApiContractV1, {
         status: 500,
         body: {
           message: 'An error has occured while sending the document for signing',
+        },
+      };
+    }
+  }),
+
+  resendDocument: authenticatedMiddleware(async (args, user, team) => {
+    const { id: documentId } = args.params;
+    const { recipients } = args.body;
+
+    try {
+      await resendDocument({
+        userId: user.id,
+        documentId: Number(documentId),
+        recipients,
+        teamId: team?.id,
+        requestMetadata: extractNextApiRequestMetadata(args.req),
+      });
+
+      return {
+        status: 200,
+        body: {
+          message: 'Document resend successfully initiated',
+        },
+      };
+    } catch (err) {
+      return {
+        status: 500,
+        body: {
+          message: 'An error has occured while resending the document',
         },
       };
     }
@@ -1001,6 +1071,8 @@ export const ApiContractV1Implementation = createNextRoute(ApiContractV1, {
     }
 
     const field = await getFieldById({
+      userId: user.id,
+      teamId: team?.id,
       fieldId: Number(fieldId),
       documentId: Number(documentId),
     }).catch(() => null);

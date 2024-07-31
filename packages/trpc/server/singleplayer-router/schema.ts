@@ -1,5 +1,6 @@
 import { z } from 'zod';
 
+import { ZFieldMetaSchema } from '@documenso/lib/types/field-meta';
 import { DocumentDataType, FieldType } from '@documenso/prisma/client';
 
 export const ZCreateSinglePlayerDocumentMutationSchema = z.object({
@@ -24,6 +25,7 @@ export const ZCreateSinglePlayerDocumentMutationSchema = z.object({
       height: z.number(),
     }),
   ),
+  fieldMeta: ZFieldMetaSchema,
 });
 
 export type TCreateSinglePlayerDocumentMutationSchema = z.infer<

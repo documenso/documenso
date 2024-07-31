@@ -1,7 +1,8 @@
 import { updateSubscriptionItemQuantity } from '@documenso/ee/server-only/stripe/update-subscription-item-quantity';
+import { IS_BILLING_ENABLED } from '@documenso/lib/constants/app';
 import { prisma } from '@documenso/prisma';
 
-import { IS_BILLING_ENABLED } from '../../constants/app';
+import { jobs } from '../../jobs/client';
 
 export type AcceptTeamInvitationOptions = {
   userId: number;
@@ -26,6 +27,11 @@ export const acceptTeamInvitation = async ({ userId, teamId }: AcceptTeamInvitat
           team: {
             include: {
               subscription: true,
+              members: {
+                include: {
+                  user: true,
+                },
+              },
             },
           },
         },
@@ -33,7 +39,7 @@ export const acceptTeamInvitation = async ({ userId, teamId }: AcceptTeamInvitat
 
       const { team } = teamMemberInvite;
 
-      await tx.teamMember.create({
+      const teamMember = await tx.teamMember.create({
         data: {
           teamId: teamMemberInvite.teamId,
           userId: user.id,
@@ -60,6 +66,14 @@ export const acceptTeamInvitation = async ({ userId, teamId }: AcceptTeamInvitat
           quantity: numberOfSeats,
         });
       }
+
+      await jobs.triggerJob({
+        name: 'send.team-member-joined.email',
+        payload: {
+          teamId: team.id,
+          memberId: teamMember.id,
+        },
+      });
     },
     { timeout: 30_000 },
   );

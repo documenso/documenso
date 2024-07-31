@@ -1,7 +1,7 @@
 import { z } from 'zod';
 
-import { sendConfirmationToken } from '../../server-only/user/send-confirmation-token';
-import type { JobDefinition } from '../client/_internal/job';
+import { sendConfirmationToken } from '../../../server-only/user/send-confirmation-token';
+import type { JobDefinition } from '../../client/_internal/job';
 
 const SEND_CONFIRMATION_EMAIL_JOB_DEFINITION_ID = 'send.signup.confirmation.email';
 

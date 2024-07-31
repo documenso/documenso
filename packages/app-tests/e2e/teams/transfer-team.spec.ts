@@ -1,7 +1,7 @@
 import { expect, test } from '@playwright/test';
 
 import { WEBAPP_BASE_URL } from '@documenso/lib/constants/app';
-import { seedTeam, seedTeamTransfer, unseedTeam } from '@documenso/prisma/seed/teams';
+import { seedTeam, seedTeamTransfer } from '@documenso/prisma/seed/teams';
 
 import { apiSignin } from '../fixtures/authentication';
 
@@ -43,8 +43,6 @@ test('[TEAMS]: initiate and cancel team transfer', async ({ page }) => {
   await expect(page.getByRole('status').first()).toContainText(
     'The team transfer invitation has been successfully deleted.',
   );
-
-  await unseedTeam(team.url);
 });
 
 /**
@@ -64,6 +62,4 @@ test.skip('[TEAMS]: accept team transfer', async ({ page }) => {
 
   await page.goto(`${WEBAPP_BASE_URL}/team/verify/transfer/${teamTransferRequest.token}`);
   await expect(page.getByRole('heading')).toContainText('Team ownership transferred!');
-
-  await unseedTeam(team.url);
 });

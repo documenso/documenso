@@ -17,6 +17,7 @@ export const ZCreateTemplateMutationSchema = z.object({
 });
 
 export const ZCreateDocumentFromDirectTemplateMutationSchema = z.object({
+  directRecipientName: z.string().optional(),
   directRecipientEmail: z.string().email(),
   directTemplateToken: z.string().min(1),
   signedFieldValues: z.array(ZSignFieldWithTokenMutationSchema),
@@ -48,6 +49,7 @@ export const ZDuplicateTemplateMutationSchema = z.object({
 
 export const ZCreateTemplateDirectLinkMutationSchema = z.object({
   templateId: z.number().min(1),
+  teamId: z.number().optional(),
   directRecipientId: z.number().min(1).optional(),
 });
 
@@ -73,6 +75,7 @@ export const ZUpdateTemplateSettingsMutationSchema = z.object({
   teamId: z.number().min(1).optional(),
   data: z.object({
     title: z.string().min(1).optional(),
+    externalId: z.string().nullish(),
     globalAccessAuth: ZDocumentAccessAuthTypesSchema.nullable().optional(),
     globalActionAuth: ZDocumentActionAuthTypesSchema.nullable().optional(),
     publicTitle: z.string().trim().min(1).max(MAX_TEMPLATE_PUBLIC_TITLE_LENGTH).optional(),
@@ -109,6 +112,11 @@ export const ZGetTemplateWithDetailsByIdQuerySchema = z.object({
   id: z.number().min(1),
 });
 
+export const ZMoveTemplatesToTeamSchema = z.object({
+  templateId: z.number(),
+  teamId: z.number(),
+});
+
 export type TCreateTemplateMutationSchema = z.infer<typeof ZCreateTemplateMutationSchema>;
 export type TCreateDocumentFromTemplateMutationSchema = z.infer<
   typeof ZCreateDocumentFromTemplateMutationSchema
@@ -118,3 +126,4 @@ export type TDeleteTemplateMutationSchema = z.infer<typeof ZDeleteTemplateMutati
 export type TGetTemplateWithDetailsByIdQuerySchema = z.infer<
   typeof ZGetTemplateWithDetailsByIdQuerySchema
 >;
+export type TMoveTemplatesToSchema = z.infer<typeof ZMoveTemplatesToTeamSchema>;

@@ -1,7 +1,7 @@
 // https://github.com/Hopding/pdf-lib/issues/20#issuecomment-412852821
 import fontkit from '@pdf-lib/fontkit';
 import { PDFDocument, RotationTypes, degrees, radiansToDegrees } from 'pdf-lib';
-import { match } from 'ts-pattern';
+import { P, match } from 'ts-pattern';
 
 import {
   DEFAULT_HANDWRITING_FONT_SIZE,
@@ -12,6 +12,8 @@ import {
 import { FieldType } from '@documenso/prisma/client';
 import { isSignatureFieldType } from '@documenso/prisma/guards/is-signature-field';
 import type { FieldWithSignature } from '@documenso/prisma/types/field-with-signature';
+
+import { ZCheckboxFieldMeta, ZRadioFieldMeta } from '../../types/field-meta';
 
 export const insertFieldInPDF = async (pdf: PDFDocument, field: FieldWithSignature) => {
   const fontCaveat = await fetch(process.env.FONT_CAVEAT_URI).then(async (res) =>
@@ -77,86 +79,163 @@ export const insertFieldInPDF = async (pdf: PDFDocument, field: FieldWithSignatu
     await pdf.embedFont(fontCaveat);
   }
 
-  const isInsertingImage =
-    isSignatureField && typeof field.Signature?.signatureImageAsBase64 === 'string';
+  await match(field)
+    .with(
+      {
+        type: P.union(FieldType.SIGNATURE, FieldType.FREE_SIGNATURE),
+        Signature: { signatureImageAsBase64: P.string },
+      },
+      async (field) => {
+        const image = await pdf.embedPng(field.Signature?.signatureImageAsBase64 ?? '');
 
-  if (isSignatureField && isInsertingImage) {
-    const image = await pdf.embedPng(field.Signature?.signatureImageAsBase64 ?? '');
+        let imageWidth = image.width;
+        let imageHeight = image.height;
 
-    let imageWidth = image.width;
-    let imageHeight = image.height;
+        const scalingFactor = Math.min(fieldWidth / imageWidth, fieldHeight / imageHeight, 1);
 
-    const scalingFactor = Math.min(fieldWidth / imageWidth, fieldHeight / imageHeight, 1);
+        imageWidth = imageWidth * scalingFactor;
+        imageHeight = imageHeight * scalingFactor;
 
-    imageWidth = imageWidth * scalingFactor;
-    imageHeight = imageHeight * scalingFactor;
+        let imageX = fieldX + (fieldWidth - imageWidth) / 2;
+        let imageY = fieldY + (fieldHeight - imageHeight) / 2;
 
-    let imageX = fieldX + (fieldWidth - imageWidth) / 2;
-    let imageY = fieldY + (fieldHeight - imageHeight) / 2;
+        // Invert the Y axis since PDFs use a bottom-left coordinate system
+        imageY = pageHeight - imageY - imageHeight;
 
-    // Invert the Y axis since PDFs use a bottom-left coordinate system
-    imageY = pageHeight - imageY - imageHeight;
+        if (pageRotationInDegrees !== 0) {
+          const adjustedPosition = adjustPositionForRotation(
+            pageWidth,
+            pageHeight,
+            imageX,
+            imageY,
+            pageRotationInDegrees,
+          );
 
-    if (pageRotationInDegrees !== 0) {
-      const adjustedPosition = adjustPositionForRotation(
-        pageWidth,
-        pageHeight,
-        imageX,
-        imageY,
-        pageRotationInDegrees,
-      );
+          imageX = adjustedPosition.xPos;
+          imageY = adjustedPosition.yPos;
+        }
 
-      imageX = adjustedPosition.xPos;
-      imageY = adjustedPosition.yPos;
-    }
+        page.drawImage(image, {
+          x: imageX,
+          y: imageY,
+          width: imageWidth,
+          height: imageHeight,
+          rotate: degrees(pageRotationInDegrees),
+        });
+      },
+    )
+    .with({ type: FieldType.CHECKBOX }, (field) => {
+      const meta = ZCheckboxFieldMeta.safeParse(field.fieldMeta);
 
-    page.drawImage(image, {
-      x: imageX,
-      y: imageY,
-      width: imageWidth,
-      height: imageHeight,
-      rotate: degrees(pageRotationInDegrees),
+      if (!meta.success) {
+        console.error(meta.error);
+
+        throw new Error('Invalid checkbox field meta');
+      }
+
+      const selected = field.customText.split(',');
+
+      for (const [index, item] of (meta.data.values ?? []).entries()) {
+        const offsetY = index * 16;
+
+        const checkbox = pdf.getForm().createCheckBox(`checkbox.${field.secondaryId}.${index}`);
+
+        if (selected.includes(item.value)) {
+          checkbox.check();
+        }
+
+        page.drawText(item.value.includes('empty-value-') ? '' : item.value, {
+          x: fieldX + 16,
+          y: pageHeight - (fieldY + offsetY),
+          size: 12,
+          font,
+          rotate: degrees(pageRotationInDegrees),
+        });
+
+        checkbox.addToPage(page, {
+          x: fieldX,
+          y: pageHeight - (fieldY + offsetY),
+          height: 8,
+          width: 8,
+        });
+      }
+    })
+    .with({ type: FieldType.RADIO }, (field) => {
+      const meta = ZRadioFieldMeta.safeParse(field.fieldMeta);
+
+      if (!meta.success) {
+        console.error(meta.error);
+
+        throw new Error('Invalid radio field meta');
+      }
+
+      const selected = field.customText.split(',');
+
+      for (const [index, item] of (meta.data.values ?? []).entries()) {
+        const offsetY = index * 16;
+
+        const radio = pdf.getForm().createRadioGroup(`radio.${field.secondaryId}.${index}`);
+
+        page.drawText(item.value.includes('empty-value-') ? '' : item.value, {
+          x: fieldX + 16,
+          y: pageHeight - (fieldY + offsetY),
+          size: 12,
+          font,
+          rotate: degrees(pageRotationInDegrees),
+        });
+
+        radio.addOptionToPage(item.value, page, {
+          x: fieldX,
+          y: pageHeight - (fieldY + offsetY),
+          height: 8,
+          width: 8,
+        });
+
+        if (selected.includes(item.value)) {
+          radio.select(item.value);
+        }
+      }
+    })
+    .otherwise((field) => {
+      const longestLineInTextForWidth = field.customText
+        .split('\n')
+        .sort((a, b) => b.length - a.length)[0];
+
+      let textWidth = font.widthOfTextAtSize(longestLineInTextForWidth, fontSize);
+      const textHeight = font.heightAtSize(fontSize);
+
+      const scalingFactor = Math.min(fieldWidth / textWidth, fieldHeight / textHeight, 1);
+
+      fontSize = Math.max(Math.min(fontSize * scalingFactor, maxFontSize), minFontSize);
+      textWidth = font.widthOfTextAtSize(longestLineInTextForWidth, fontSize);
+
+      let textX = fieldX + (fieldWidth - textWidth) / 2;
+      let textY = fieldY + (fieldHeight - textHeight) / 2;
+
+      // Invert the Y axis since PDFs use a bottom-left coordinate system
+      textY = pageHeight - textY - textHeight;
+
+      if (pageRotationInDegrees !== 0) {
+        const adjustedPosition = adjustPositionForRotation(
+          pageWidth,
+          pageHeight,
+          textX,
+          textY,
+          pageRotationInDegrees,
+        );
+
+        textX = adjustedPosition.xPos;
+        textY = adjustedPosition.yPos;
+      }
+
+      page.drawText(field.customText, {
+        x: textX,
+        y: textY,
+        size: fontSize,
+        font,
+        rotate: degrees(pageRotationInDegrees),
+      });
     });
-  } else {
-    const longestLineInTextForWidth = field.customText
-      .split('\n')
-      .sort((a, b) => b.length - a.length)[0];
-
-    let textWidth = font.widthOfTextAtSize(longestLineInTextForWidth, fontSize);
-    const textHeight = font.heightAtSize(fontSize);
-
-    const scalingFactor = Math.min(fieldWidth / textWidth, fieldHeight / textHeight, 1);
-
-    fontSize = Math.max(Math.min(fontSize * scalingFactor, maxFontSize), minFontSize);
-    textWidth = font.widthOfTextAtSize(longestLineInTextForWidth, fontSize);
-
-    let textX = fieldX + (fieldWidth - textWidth) / 2;
-    let textY = fieldY + (fieldHeight - textHeight) / 2;
-
-    // Invert the Y axis since PDFs use a bottom-left coordinate system
-    textY = pageHeight - textY - textHeight;
-
-    if (pageRotationInDegrees !== 0) {
-      const adjustedPosition = adjustPositionForRotation(
-        pageWidth,
-        pageHeight,
-        textX,
-        textY,
-        pageRotationInDegrees,
-      );
-
-      textX = adjustedPosition.xPos;
-      textY = adjustedPosition.yPos;
-    }
-
-    page.drawText(field.customText, {
-      x: textX,
-      y: textY,
-      size: fontSize,
-      font,
-      rotate: degrees(pageRotationInDegrees),
-    });
-  }
 
   return pdf;
 };

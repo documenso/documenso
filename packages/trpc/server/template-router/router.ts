@@ -11,7 +11,9 @@ import { deleteTemplate } from '@documenso/lib/server-only/template/delete-templ
 import { deleteTemplateDirectLink } from '@documenso/lib/server-only/template/delete-template-direct-link';
 import { duplicateTemplate } from '@documenso/lib/server-only/template/duplicate-template';
 import { findTemplates } from '@documenso/lib/server-only/template/find-templates';
+import { getTemplateById } from '@documenso/lib/server-only/template/get-template-by-id';
 import { getTemplateWithDetailsById } from '@documenso/lib/server-only/template/get-template-with-details-by-id';
+import { moveTemplateToTeam } from '@documenso/lib/server-only/template/move-template-to-team';
 import { toggleTemplateDirectLink } from '@documenso/lib/server-only/template/toggle-template-direct-link';
 import { updateTemplateSettings } from '@documenso/lib/server-only/template/update-template-settings';
 import { extractNextApiRequestMetadata } from '@documenso/lib/universal/extract-request-metadata';
@@ -28,6 +30,7 @@ import {
   ZDuplicateTemplateMutationSchema,
   ZFindTemplatesQuerySchema,
   ZGetTemplateWithDetailsByIdQuerySchema,
+  ZMoveTemplatesToTeamSchema,
   ZToggleTemplateDirectLinkMutationSchema,
   ZUpdateTemplateSettingsMutationSchema,
 } from './schema';
@@ -59,12 +62,18 @@ export const templateRouter = router({
     .input(ZCreateDocumentFromDirectTemplateMutationSchema)
     .mutation(async ({ input, ctx }) => {
       try {
-        const { directRecipientEmail, directTemplateToken, signedFieldValues, templateUpdatedAt } =
-          input;
+        const {
+          directRecipientName,
+          directRecipientEmail,
+          directTemplateToken,
+          signedFieldValues,
+          templateUpdatedAt,
+        } = input;
 
         const requestMetadata = extractNextApiRequestMetadata(ctx.req);
 
         return await createDocumentFromDirectTemplate({
+          directRecipientName,
           directRecipientEmail,
           directTemplateToken,
           signedFieldValues,
@@ -91,7 +100,7 @@ export const templateRouter = router({
       try {
         const { templateId, teamId } = input;
 
-        const limits = await getServerLimits({ email: ctx.user.email });
+        const limits = await getServerLimits({ email: ctx.user.email, teamId });
 
         if (limits.remaining.documents === 0) {
           throw new Error('You have reached your document limit.');
@@ -235,11 +244,13 @@ export const templateRouter = router({
     .input(ZCreateTemplateDirectLinkMutationSchema)
     .mutation(async ({ input, ctx }) => {
       try {
-        const { templateId, directRecipientId } = input;
+        const { templateId, teamId, directRecipientId } = input;
 
         const userId = ctx.user.id;
 
-        const limits = await getServerLimits({ email: ctx.user.email });
+        const template = await getTemplateById({ id: templateId, teamId, userId: ctx.user.id });
+
+        const limits = await getServerLimits({ email: ctx.user.email, teamId: template.teamId });
 
         if (limits.remaining.directTemplates === 0) {
           throw new AppError(
@@ -288,6 +299,32 @@ export const templateRouter = router({
 
         const error = AppError.parseError(err);
         throw AppError.parseErrorToTRPCError(error);
+      }
+    }),
+
+  moveTemplateToTeam: authenticatedProcedure
+    .input(ZMoveTemplatesToTeamSchema)
+    .mutation(async ({ input, ctx }) => {
+      try {
+        const { templateId, teamId } = input;
+        const userId = ctx.user.id;
+
+        return await moveTemplateToTeam({
+          templateId,
+          teamId,
+          userId,
+        });
+      } catch (err) {
+        console.error(err);
+
+        if (err instanceof TRPCError) {
+          throw err;
+        }
+
+        throw new TRPCError({
+          code: 'BAD_REQUEST',
+          message: 'We were unable to move this template. Please try again later.',
+        });
       }
     }),
 });
