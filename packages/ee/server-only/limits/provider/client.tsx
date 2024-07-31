@@ -19,7 +19,7 @@ export const useLimits = () => {
     throw new Error('useLimits must be used within a LimitsProvider');
   }
 
-  return { ...limits };
+  return limits;
 };
 
 export type LimitsProviderProps = {
