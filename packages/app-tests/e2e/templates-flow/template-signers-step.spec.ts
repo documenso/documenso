@@ -2,7 +2,7 @@ import { expect, test } from '@playwright/test';
 
 import { seedUserSubscription } from '@documenso/prisma/seed/subscriptions';
 import { seedBlankTemplate } from '@documenso/prisma/seed/templates';
-import { seedUser, unseedUser } from '@documenso/prisma/seed/users';
+import { seedUser } from '@documenso/prisma/seed/users';
 
 import { apiSignin } from '../fixtures/authentication';
 
@@ -73,8 +73,6 @@ test.describe('[EE_ONLY]', () => {
     // Expect that the advanced settings is visible, and the checkbox is hidden. Since advanced
     // settings were applied.
     await expect(page.getByLabel('Show advanced settings')).toBeHidden();
-
-    await unseedUser(user.id);
   });
 });
 
@@ -101,6 +99,4 @@ test('[TEMPLATE_FLOW]: add placeholder', async ({ page }) => {
 
   // Advanced settings should not be visible for non EE users.
   await expect(page.getByLabel('Show advanced settings')).toBeHidden();
-
-  await unseedUser(user.id);
 });

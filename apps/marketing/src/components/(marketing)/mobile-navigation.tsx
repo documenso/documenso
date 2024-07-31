@@ -3,6 +3,8 @@
 import Image from 'next/image';
 import Link from 'next/link';
 
+import { msg } from '@lingui/macro';
+import { useLingui } from '@lingui/react';
 import { motion, useReducedMotion } from 'framer-motion';
 import { FaXTwitter } from 'react-icons/fa6';
 import { LiaDiscord } from 'react-icons/lia';
@@ -18,45 +20,51 @@ export type MobileNavigationProps = {
 
 export const MENU_NAVIGATION_LINKS = [
   {
+    href: '/pricing',
+    text: msg`Pricing`,
+  },
+  {
+    href: 'https://documen.so/docs-nav',
+    text: msg`Documentation`,
+  },
+  {
     href: '/singleplayer',
     text: 'Singleplayer',
   },
   {
     href: '/blog',
-    text: 'Blog',
-  },
-  {
-    href: '/pricing',
-    text: 'Pricing',
+    text: msg`Blog`,
   },
   {
     href: '/open',
-    text: 'Open Startup',
+    text: msg`Open Startup`,
   },
   {
     href: 'https://status.documenso.com',
-    text: 'Status',
+    text: msg`Status`,
   },
   {
     href: 'mailto:support@documenso.com',
-    text: 'Support',
+    text: msg`Support`,
     target: '_blank',
   },
   {
     href: '/privacy',
-    text: 'Privacy',
-  },
-  {
-    href: 'https://app.documenso.com/signin?utm_source=marketing-header',
-    text: 'Sign in',
+    text: msg`Privacy`,
   },
   {
     href: 'https://app.documenso.com/signup?utm_source=marketing-header',
-    text: 'Sign up',
+    text: msg`Sign up`,
+  },
+  {
+    href: 'https://app.documenso.com/signin?utm_source=marketing-header',
+    text: msg`Sign in`,
   },
 ];
 
 export const MobileNavigation = ({ isMenuOpen, onMenuOpenChange }: MobileNavigationProps) => {
+  const { _ } = useLingui();
+
   const shouldReduceMotion = useReducedMotion();
 
   const handleMenuItemClick = () => {
@@ -108,7 +116,7 @@ export const MobileNavigation = ({ isMenuOpen, onMenuOpenChange }: MobileNavigat
                 onClick={() => handleMenuItemClick()}
                 target={target}
               >
-                {text}
+                {typeof text === 'string' ? text : _(text)}
               </Link>
             </motion.div>
           ))}

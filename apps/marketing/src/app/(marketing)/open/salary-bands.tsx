@@ -1,5 +1,7 @@
 import type { HTMLAttributes } from 'react';
 
+import { Trans } from '@lingui/macro';
+
 import { cn } from '@documenso/ui/lib/utils';
 import {
   Table,
@@ -17,15 +19,23 @@ export type SalaryBandsProps = HTMLAttributes<HTMLDivElement>;
 export const SalaryBands = ({ className, ...props }: SalaryBandsProps) => {
   return (
     <div className={cn('flex flex-col', className)} {...props}>
-      <h3 className="px-4 text-lg font-semibold">Global Salary Bands</h3>
+      <h3 className="px-4 text-lg font-semibold">
+        <Trans>Global Salary Bands</Trans>
+      </h3>
 
       <div className="border-border mt-2.5 flex-1 rounded-2xl border shadow-sm hover:shadow">
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead className="w-[200px]">Title</TableHead>
-              <TableHead>Seniority</TableHead>
-              <TableHead className="w-[100px] text-right">Salary</TableHead>
+              <TableHead className="w-[200px]">
+                <Trans>Title</Trans>
+              </TableHead>
+              <TableHead>
+                <Trans>Seniority</Trans>
+              </TableHead>
+              <TableHead className="w-[100px] text-right">
+                <Trans>Salary</Trans>
+              </TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>

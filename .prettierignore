@@ -4,6 +4,7 @@ public
 **/**/node_modules
 **/**/.next
 **/**/public
+packages/lib/translations/**/*.js
 
 *.lock
 *.log

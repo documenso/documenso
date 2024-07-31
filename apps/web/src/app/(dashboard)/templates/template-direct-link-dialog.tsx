@@ -46,6 +46,8 @@ import {
 import { Tooltip, TooltipContent, TooltipTrigger } from '@documenso/ui/primitives/tooltip';
 import { useToast } from '@documenso/ui/primitives/use-toast';
 
+import { useOptionalCurrentTeam } from '~/providers/team';
+
 type TemplateDirectLinkDialogProps = {
   template: Template & {
     directLink?: Pick<TemplateDirectLink, 'token' | 'enabled'> | null;
@@ -64,6 +66,8 @@ export const TemplateDirectLinkDialog = ({
 }: TemplateDirectLinkDialogProps) => {
   const { toast } = useToast();
   const { quota, remaining } = useLimits();
+
+  const team = useOptionalCurrentTeam();
 
   const [, copy] = useCopyToClipboard();
   const router = useRouter();
@@ -164,6 +168,7 @@ export const TemplateDirectLinkDialog = ({
 
     await createTemplateDirectLink({
       templateId: template.id,
+      teamId: team?.id,
       directRecipientId: recipientId,
     });
   };
@@ -316,6 +321,7 @@ export const TemplateDirectLinkDialog = ({
                         onClick={async () =>
                           createTemplateDirectLink({
                             templateId: template.id,
+                            teamId: team?.id,
                           })
                         }
                       >

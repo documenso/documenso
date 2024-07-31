@@ -1,0 +1,275 @@
+---
+title: How to Self-Host Documenso
+description: Learn how to self-host Documenso on your server or cloud infrastructure using Docker or other deployment methods.
+---
+
+import { Callout, Steps } from 'nextra/components';
+
+# Self Hosting
+
+We support various deployment methods and are actively working on adding more. Please let us know if you have a specific deployment method in mind!
+
+## Manual Deployment
+
+The following guide will walk you through setting up Documenso manually on your server or cloud infrastructure.
+
+<Steps>
+### Clone the Repository
+
+The first step is to clone the repository:
+
+```bash
+git clone https://github.com/documenso/documenso.git
+```
+
+### Configure the Environment Variables
+
+Navigate to the `documenso` folder and create a `.env` file from the example `.env.example` file:
+
+```bash
+cp .env.example .env
+```
+
+Open the `.env` file and fill in the following variables:
+
+```bash
+- NEXTAUTH_URL
+- NEXTAUTH_SECRET
+- NEXT_PUBLIC_WEBAPP_URL
+- NEXT_PUBLIC_MARKETING_URL
+- NEXT_PRIVATE_DATABASE_URL
+- NEXT_PRIVATE_DIRECT_DATABASE_URL
+- NEXT_PRIVATE_SMTP_FROM_NAME
+- NEXT_PRIVATE_SMTP_FROM_ADDRESS
+```
+
+<Callout type="info">
+  If you use a reverse proxy in front of Documenso, don't forget to provide the public URL for both
+  the `NEXTAUTH_URL` and `NEXT_PUBLIC_WEBAPP_URL` variables!
+</Callout>
+
+### Install the Dependencies
+
+Install the project dependencies as follows:
+
+```bash
+npm i
+npm run build:web
+npm run prisma:migrate-deploy
+```
+
+### Start the Application
+
+Finally, start the application:
+
+```bash
+npm run start
+```
+
+This will start the server on `localhost:3000`. Any reverse proxy can handle the front end and SSL termination.
+
+<Callout type="info">
+ If you want to run with another port than `3000`, you can start the application with `next -p <ANY PORT>` from the `apps/web` folder.
+</Callout>
+
+</Steps>
+
+## Docker
+
+The following guide will walk you through setting up Documenso using Docker. You can choose between a Docker Compose production setup or a standalone container.
+
+We provide a Docker container for Documenso, published on both DockerHub and GitHub Container Registry.
+
+- [DockerHub](https://hub.docker.com/r/documenso/documenso)
+- [GitHub Container Registry](https://ghcr.io/documenso/documenso)
+
+You can pull the Docker image from either of these registries and run it with your preferred container hosting provider.
+
+Please note that you must provide environment variables for connecting to the database, mail server, and other services.
+
+### Option 1: Production Docker Compose Setup
+
+This setup includes a PostgreSQL database and the Documenso application. You will need to provide your own SMTP details using environment variables.
+
+<Steps>
+
+### Download the Docker Compose File
+
+Download the Docker Compose file from the Documenso repository - [compose.yml](https://raw.githubusercontent.com/documenso/documenso/release/docker/production/compose.yml).
+
+### Navigate to the `compose.yml` File
+
+Once downloaded, navigate to the directory containing the `compose.yml` file.
+
+### Set Up Environment Variables
+
+Create a `.env` file in the same directory as the `compose.yml` file.
+
+Then add your SMTP details as well as the following environment variables:
+
+```bash
+NEXTAUTH_SECRET="<your-secret>"
+NEXT_PRIVATE_ENCRYPTION_KEY="<your-key>"
+NEXT_PRIVATE_ENCRYPTION_SECONDARY_KEY="<your-secondary-key>"
+NEXT_PUBLIC_WEBAPP_URL="<your-url>"
+NEXT_PRIVATE_SMTP_TRANSPORT="smtp-auth"
+NEXT_PRIVATE_SMTP_HOST="<your-host>"
+NEXT_PRIVATE_SMTP_PORT=<your-port>
+NEXT_PRIVATE_SMTP_USERNAME="<your-username>"
+NEXT_PRIVATE_SMTP_PASSWORD="<your-password>"
+```
+
+### Update the Volume Binding
+
+The `cert.p12` file is required to sign and encrypt documents, so you must provide your key file. Update the volume binding in the `compose.yml` file to point to your key file:
+
+```yaml
+volumes:
+  - /path/to/your/keyfile.p12:/opt/documenso/cert.p12
+```
+
+After updating the volume binding, save the `compose.yml` file and run the following command to start the containers:
+
+```bash
+docker-compose --env-file ./.env -d up
+```
+
+The command will start the PostgreSQL database and the Documenso application containers.
+
+### Access the Application
+
+Access the Documenso application by visiting `http://localhost:3000` in your web browser.
+
+</Steps>
+
+### Option 2: Standalone Docker Container
+
+If you prefer to host the Documenso application on a specific container provider, use the pre-built Docker image from DockerHub or GitHub's Package Registry. You will need to provide your own database and SMTP host.
+
+<Steps>
+
+### Pull the Docker Image
+
+Pull the Documenso Docker image from DockerHub:
+
+```bash
+docker pull documenso/documenso
+```
+
+Or, pull the image from GitHub Container Registry:
+
+```bash
+docker pull ghcr.io/documenso/documenso
+```
+
+### Run the Docker Container
+
+Run the Docker container with the required environment variables:
+
+```bash
+docker run -d \
+ -p 3000:3000 \
+ -e NEXTAUTH_URL="<your-nextauth-url>"
+ -e NEXTAUTH_SECRET="<your-nextauth-secret>"
+ -e NEXT_PRIVATE_ENCRYPTION_KEY="<your-next-private-encryption-key>"
+ -e NEXT_PRIVATE_ENCRYPTION_SECONDARY_KEY="<your-next-private-encryption-secondary-key>"
+ -e NEXT_PUBLIC_WEBAPP_URL="<your-next-public-webapp-url>"
+ -e NEXT_PRIVATE_DATABASE_URL="<your-next-private-database-url>"
+ -e NEXT_PRIVATE_DIRECT_DATABASE_URL="<your-next-private-database-url>"
+ -e NEXT_PRIVATE_SMTP_TRANSPORT="<your-next-private-smtp-transport>"
+ -e NEXT_PRIVATE_SMTP_FROM_NAME="<your-next-private-smtp-from-name>"
+ -e NEXT_PRIVATE_SMTP_FROM_ADDRESS="<your-next-private-smtp-from-address>"
+ -v /path/to/your/keyfile.p12:/opt/documenso/cert.p12
+ documenso/documenso
+```
+
+Replace the placeholders with the actual values.
+
+### Access the Application
+
+You can access the Documenso application by visiting the URL you provided for the `NEXT_PUBLIC_WEBAPP_URL` environment variable in your web browser.
+
+</Steps>
+
+### Advanced Configuration
+
+The environment variables listed above are a subset of those available for configuring Documenso. The table below provides a complete list of environment variables and their descriptions.
+
+| Variable                                     | Description                                                                                         |
+| -------------------------------------------- | --------------------------------------------------------------------------------------------------- |
+| `PORT`                                       | The port on which the Documenso application runs. It defaults to `3000`.                            |
+| `NEXTAUTH_URL`                               | The URL for the NextAuth.js authentication service.                                                 |
+| `NEXTAUTH_SECRET`                            | The secret key used by NextAuth.js for encryption and signing.                                      |
+| `NEXT_PRIVATE_ENCRYPTION_KEY`                | The primary encryption key for symmetric encryption and decryption (at least 32 characters).        |
+| `NEXT_PRIVATE_ENCRYPTION_SECONDARY_KEY`      | The secondary encryption key for symmetric encryption and decryption (at least 32 characters).      |
+| `NEXT_PRIVATE_GOOGLE_CLIENT_ID`              | The Google client ID for Google authentication (optional).                                          |
+| `NEXT_PRIVATE_GOOGLE_CLIENT_SECRET`          | The Google client secret for Google authentication (optional).                                      |
+| `NEXT_PUBLIC_WEBAPP_URL`                     | The URL for the web application.                                                                    |
+| `NEXT_PRIVATE_DATABASE_URL`                  | The URL for the primary database connection (with connection pooling).                              |
+| `NEXT_PRIVATE_DIRECT_DATABASE_URL`           | The URL for the direct database connection (without connection pooling).                            |
+| `NEXT_PRIVATE_SIGNING_TRANSPORT`             | The signing transport to use. Available options: local (default)                                    |
+| `NEXT_PRIVATE_SIGNING_PASSPHRASE`            | The passphrase for the key file.                                                                    |
+| `NEXT_PRIVATE_SIGNING_LOCAL_FILE_CONTENTS`   | The base64-encoded contents of the key file will be used instead of the file path.                  |
+| `NEXT_PRIVATE_SIGNING_LOCAL_FILE_PATH`       | The path to the key file, default `/opt/documenso/cert.p12`.                                        |
+| `NEXT_PUBLIC_UPLOAD_TRANSPORT`               | The transport for file uploads (database or s3).                                                    |
+| `NEXT_PRIVATE_UPLOAD_ENDPOINT`               | The endpoint for the S3 storage transport (for third-party S3-compatible providers).                |
+| `NEXT_PRIVATE_UPLOAD_FORCE_PATH_STYLE`       | Whether to force path-style URLs for the S3 storage transport.                                      |
+| `NEXT_PRIVATE_UPLOAD_REGION`                 | The region for the S3 storage transport (defaults to us-east-1).                                    |
+| `NEXT_PRIVATE_UPLOAD_BUCKET`                 | The bucket to use for the S3 storage transport.                                                     |
+| `NEXT_PRIVATE_UPLOAD_ACCESS_KEY_ID`          | The access key ID for the S3 storage transport.                                                     |
+| `NEXT_PRIVATE_UPLOAD_SECRET_ACCESS_KEY`      | The secret access key for the S3 storage transport.                                                 |
+| `NEXT_PRIVATE_SMTP_TRANSPORT`                | The transport to send emails (smtp-auth, smtp-api, resend, or mailchannels).                        |
+| `NEXT_PRIVATE_SMTP_HOST`                     | The host for the SMTP server for SMTP transports.                                                   |
+| `NEXT_PRIVATE_SMTP_PORT`                     | The port for the SMTP server for SMTP transports.                                                   |
+| `NEXT_PRIVATE_SMTP_USERNAME`                 | The username for the SMTP server for the `smtp-auth` transport.                                     |
+| `NEXT_PRIVATE_SMTP_PASSWORD`                 | The password for the SMTP server for the `smtp-auth` transport.                                     |
+| `NEXT_PRIVATE_SMTP_APIKEY_USER`              | The API key user for the SMTP server for the `smtp-api` transport.                                  |
+| `NEXT_PRIVATE_SMTP_APIKEY`                   | The API key for the SMTP server for the `smtp-api` transport.                                       |
+| `NEXT_PRIVATE_SMTP_SECURE`                   | Whether to force the use of TLS for the SMTP server for SMTP transports.                            |
+| `NEXT_PRIVATE_SMTP_FROM_ADDRESS`             | The email address for the "from" address.                                                           |
+| `NEXT_PRIVATE_SMTP_FROM_NAME`                | The sender name for the "from" address.                                                             |
+| `NEXT_PRIVATE_RESEND_API_KEY`                | The API key for Resend.com for the `resend` transport.                                              |
+| `NEXT_PRIVATE_MAILCHANNELS_API_KEY`          | The optional API key for MailChannels (if using a proxy) for the `mailchannels` transport.          |
+| `NEXT_PRIVATE_MAILCHANNELS_ENDPOINT`         | The optional endpoint for the MailChannels API (if using a proxy) for the `mailchannels` transport. |
+| `NEXT_PRIVATE_MAILCHANNELS_DKIM_DOMAIN`      | The domain for DKIM signing with MailChannels for the `mailchannels` transport.                     |
+| `NEXT_PRIVATE_MAILCHANNELS_DKIM_SELECTOR`    | The selector for DKIM signing with MailChannels for the `mailchannels` transport.                   |
+| `NEXT_PRIVATE_MAILCHANNELS_DKIM_PRIVATE_KEY` | The private key for DKIM signing with MailChannels for the `mailchannels` transport.                |
+| `NEXT_PUBLIC_DOCUMENT_SIZE_UPLOAD_LIMIT`     | The maximum document upload limit displayed to the user (in MB).                                    |
+| `NEXT_PUBLIC_POSTHOG_KEY`                    | The optional PostHog key for analytics and feature flags.                                           |
+| `NEXT_PUBLIC_DISABLE_SIGNUP`                 | Whether to disable user signups through the /signup page.                                           |
+
+## Run as a Service
+
+You can run the application using a `systemd.service` file. Here is a simple example of the service running on port `3500` (using `3000` by default):
+
+```bash
+[Unit]
+Description=documenso
+After=network.target
+
+[Service]
+Environment=PATH=/path/to/your/node/binaries
+Type=simple
+User=www-data
+WorkingDirectory=/var/www/documenso/apps/web
+ExecStart=/usr/bin/next start -p 3500
+TimeoutSec=15
+Restart=always
+
+[Install]
+WantedBy=multi-user.target
+```
+
+We offer several alternative deployment methods for Documenso if you need more options.
+
+## Railway
+
+[![Deploy on Railway](https://railway.app/button.svg)](https://railway.app/template/bG6D4p)
+
+## Render
+
+[![Deploy to Render](https://render.com/images/deploy-to-render-button.svg)](https://render.com/deploy?repo=https://github.com/documenso/documenso)
+
+## Koyeb
+
+[![Deploy to Koyeb](https://www.koyeb.com/static/images/deploy/button.svg)](https://app.koyeb.com/deploy?type=git&repository=github.com/documenso/documenso&branch=main&name=documenso-app&builder=dockerfile&dockerfile=/docker/Dockerfile)

@@ -42,7 +42,7 @@ export const DirectTemplatePageView = ({
 
   const { toast } = useToast();
 
-  const { email, setEmail } = useRequiredSigningContext();
+  const { email, fullName, setEmail } = useRequiredSigningContext();
   const { recipient, setRecipient } = useRequiredDocumentAuthContext();
 
   const [step, setStep] = useState<DirectTemplateStep>('configure');
@@ -84,6 +84,7 @@ export const DirectTemplatePageView = ({
     try {
       const token = await createDocumentFromDirectTemplate({
         directTemplateToken,
+        directRecipientName: fullName,
         directRecipientEmail: recipient.email,
         templateUpdatedAt: template.updatedAt,
         signedFieldValues: fields.map((field) => {

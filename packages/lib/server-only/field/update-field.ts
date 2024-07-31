@@ -1,3 +1,4 @@
+import { type TFieldMetaSchema as FieldMeta } from '@documenso/lib/types/field-meta';
 import { prisma } from '@documenso/prisma';
 import type { FieldType, Team } from '@documenso/prisma/client';
 
@@ -18,6 +19,7 @@ export type UpdateFieldOptions = {
   pageWidth?: number;
   pageHeight?: number;
   requestMetadata?: RequestMetadata;
+  fieldMeta?: FieldMeta;
 };
 
 export const updateField = async ({
@@ -33,6 +35,7 @@ export const updateField = async ({
   pageWidth,
   pageHeight,
   requestMetadata,
+  fieldMeta,
 }: UpdateFieldOptions) => {
   const oldField = await prisma.field.findFirstOrThrow({
     where: {
@@ -71,6 +74,7 @@ export const updateField = async ({
         positionY: pageY,
         width: pageWidth,
         height: pageHeight,
+        fieldMeta,
       },
       include: {
         Recipient: true,

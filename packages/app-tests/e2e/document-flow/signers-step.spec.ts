@@ -2,7 +2,7 @@ import { expect, test } from '@playwright/test';
 
 import { seedBlankDocument } from '@documenso/prisma/seed/documents';
 import { seedUserSubscription } from '@documenso/prisma/seed/subscriptions';
-import { seedUser, unseedUser } from '@documenso/prisma/seed/users';
+import { seedUser } from '@documenso/prisma/seed/users';
 
 import { apiSignin } from '../fixtures/authentication';
 
@@ -57,8 +57,6 @@ test.describe('[EE_ONLY]', () => {
     await expect(page.getByRole('heading', { name: 'Add Signers' })).toBeVisible();
 
     // Todo: Fix stepper component back issue before finishing test.
-
-    await unseedUser(user.id);
   });
 });
 
@@ -91,6 +89,4 @@ test('[DOCUMENT_FLOW]: add signers', async ({ page }) => {
   await expect(page.getByRole('heading', { name: 'Add Fields' })).toBeVisible();
   await page.getByRole('button', { name: 'Go Back' }).click();
   await expect(page.getByRole('heading', { name: 'Add Signers' })).toBeVisible();
-
-  await unseedUser(user.id);
 });
