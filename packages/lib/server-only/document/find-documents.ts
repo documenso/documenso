@@ -2,7 +2,7 @@ import { DateTime } from 'luxon';
 import { P, match } from 'ts-pattern';
 
 import { prisma } from '@documenso/prisma';
-import { RecipientRole, SigningStatus } from '@documenso/prisma/client';
+import { RecipientRole, SigningStatus, TeamMemberRole } from '@documenso/prisma/client';
 import type { Document, Prisma, Team, TeamEmail, User } from '@documenso/prisma/client';
 import { ExtendedDocumentStatus } from '@documenso/prisma/types/extended-document-status';
 
@@ -58,6 +58,14 @@ export const findDocuments = async ({
         },
         include: {
           teamEmail: true,
+          members: {
+            where: {
+              userId,
+            },
+            select: {
+              role: true,
+            },
+          },
         },
       });
     }
@@ -70,6 +78,7 @@ export const findDocuments = async ({
 
   const orderByColumn = orderBy?.column ?? 'createdAt';
   const orderByDirection = orderBy?.direction ?? 'desc';
+  const teamMemberRole = team?.members[0].role ?? null;
 
   const termFilters = match(term)
     .with(P.string.minLength(1), () => {
@@ -82,7 +91,19 @@ export const findDocuments = async ({
     })
     .otherwise(() => undefined);
 
-  const filters = team ? findTeamDocumentsFilter(status, team) : findDocumentsFilter(status, user);
+  const filters = team
+    ? {
+        ...findTeamDocumentsFilter(status, team),
+        visibility: match(teamMemberRole)
+          .with(TeamMemberRole.ADMIN, () => undefined)
+          .with(TeamMemberRole.MANAGER, () => {
+            return {
+              in: ['everyone', 'managerandabove'],
+            };
+          })
+          .otherwise(() => 'everyone'),
+      }
+    : findDocumentsFilter(status, user);
 
   if (filters === null) {
     return {

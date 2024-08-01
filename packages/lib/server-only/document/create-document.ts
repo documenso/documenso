@@ -54,6 +54,7 @@ export const createDocument = async ({
         title,
         externalId,
         documentDataId,
+        visibility: teamId ? 'everyone' : undefined,
         userId,
         teamId,
         formValues,

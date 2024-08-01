@@ -312,6 +312,11 @@ export const ZDocumentAuditLogEventDocumentFieldUninsertedSchema = z.object({
   }),
 });
 
+export const ZDocumentAuditLogEventDocumentVisibilitySchema = z.object({
+  type: z.literal(DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_VISIBILITY_UPDATED),
+  data: ZGenericFromToSchema,
+});
+
 /**
  * Event: Document global authentication access updated.
  */
@@ -476,6 +481,7 @@ export const ZDocumentAuditLogSchema = ZDocumentAuditLogBaseSchema.and(
     ZDocumentAuditLogEventDocumentMovedToTeamSchema,
     ZDocumentAuditLogEventDocumentFieldInsertedSchema,
     ZDocumentAuditLogEventDocumentFieldUninsertedSchema,
+    ZDocumentAuditLogEventDocumentVisibilitySchema,
     ZDocumentAuditLogEventDocumentGlobalAuthAccessUpdatedSchema,
     ZDocumentAuditLogEventDocumentGlobalAuthActionUpdatedSchema,
     ZDocumentAuditLogEventDocumentMetaUpdatedSchema,

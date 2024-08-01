@@ -62,12 +62,61 @@ export const DocumentPageView = async ({ params, team }: DocumentPageViewProps) 
     teamId: team?.id,
   }).catch(() => null);
 
+  const documentVisibility = document?.visibility?.toLowerCase();
+  const currentTeamMemberRole = team?.currentTeamMember?.role.toLowerCase();
+  let canAccessDocument;
+
+  match([documentVisibility, currentTeamMemberRole])
+    .with(['everyone', 'admin'], () => {
+      canAccessDocument = true;
+    })
+    .with(['everyone', 'manager'], () => {
+      canAccessDocument = true;
+    })
+    .with(['everyone', 'member'], () => {
+      canAccessDocument = true;
+    })
+    .with(['managerandabove', 'admin'], () => {
+      canAccessDocument = true;
+    })
+    .with(['managerandabove', 'manager'], () => {
+      canAccessDocument = true;
+    })
+    .with(['admin', 'admin'], () => {
+      canAccessDocument = true;
+    })
+    .otherwise(() => {
+      canAccessDocument = false;
+    });
+
   const isDocumentHistoryEnabled = await getServerComponentFlag(
     'app_document_page_view_history_sheet',
   );
 
   if (!document || !document.documentData) {
     redirect(documentRootPath);
+  }
+
+  if (!canAccessDocument && team) {
+    return (
+      <div className="container mx-auto flex items-center justify-center px-6 py-64">
+        <div>
+          <p className="text-muted-foreground font-semibold">Access Denied</p>
+
+          <h1 className="mt-3 text-2xl font-bold md:text-3xl">Oops! Something went wrong.</h1>
+
+          <p className="text-muted-foreground mt-4 text-sm">
+            It looks like you do not have the necessary permissions to access this document.
+          </p>
+
+          <div className="mt-6">
+            <Button className="w-32" asChild>
+              <Link href={`/t/${team.url}/documents`}>Dashboard</Link>
+            </Button>
+          </div>
+        </div>
+      </div>
+    );
   }
 
   const { documentData, documentMeta } = document;
