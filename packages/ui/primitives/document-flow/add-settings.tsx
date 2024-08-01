@@ -195,7 +195,11 @@ export const AddSettingsFormPartial = ({
                     </FormLabel>
 
                     <FormControl>
-                      <DocumentVisibilitySelect {...field} onValueChange={field.onChange} />
+                      <DocumentVisibilitySelect
+                        currentMemberRole={isTeam?.currentTeamMember?.role}
+                        {...field}
+                        onValueChange={field.onChange}
+                      />
                     </FormControl>
                   </FormItem>
                 )}

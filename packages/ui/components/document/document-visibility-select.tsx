@@ -2,6 +2,7 @@ import React, { forwardRef } from 'react';
 
 import type { SelectProps } from '@radix-ui/react-select';
 import { InfoIcon } from 'lucide-react';
+import { match } from 'ts-pattern';
 
 import {
   Select,
@@ -12,19 +13,40 @@ import {
 } from '@documenso/ui/primitives/select';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@documenso/ui/primitives/tooltip';
 
-export const DocumentVisibilitySelect = forwardRef<HTMLButtonElement, SelectProps>((props, ref) => (
-  <Select {...props}>
-    <SelectTrigger ref={ref} className="bg-background text-muted-foreground">
-      <SelectValue data-testid="documentVisibilitySelectValue" placeholder="Everyone" />
-    </SelectTrigger>
+export type DocumentVisibilitySelectType = SelectProps & {
+  currentMemberRole?: string;
+};
 
-    <SelectContent position="popper">
-      <SelectItem value="everyone">Everyone</SelectItem>
-      <SelectItem value="managersAndAbove">Managers and above</SelectItem>
-      <SelectItem value="admin">Admins only</SelectItem>
-    </SelectContent>
-  </Select>
-));
+export const DocumentVisibilitySelect = forwardRef<HTMLButtonElement, DocumentVisibilitySelectType>(
+  ({ currentMemberRole, ...props }, ref) => {
+    return (
+      <Select {...props}>
+        <SelectTrigger ref={ref} className="bg-background text-muted-foreground">
+          <SelectValue data-testid="documentVisibilitySelectValue" placeholder="Everyone" />
+        </SelectTrigger>
+
+        <SelectContent position="popper">
+          {match(currentMemberRole)
+            .with('ADMIN', () => (
+              <>
+                <SelectItem value="everyone">Everyone</SelectItem>
+                <SelectItem value="managerandabove">Managers and above</SelectItem>
+                <SelectItem value="admin">Admins only</SelectItem>
+              </>
+            ))
+            .with('MANAGER', () => (
+              <>
+                <SelectItem value="everyone">Everyone</SelectItem>
+                <SelectItem value="managerandabove">Managers and above</SelectItem>
+              </>
+            ))
+            .with('MEMBER', () => <SelectItem value="everyone">Everyone</SelectItem>)
+            .otherwise(() => null)}
+        </SelectContent>
+      </Select>
+    );
+  },
+);
 
 DocumentVisibilitySelect.displayName = 'DocumentVisibilitySelect';
 
