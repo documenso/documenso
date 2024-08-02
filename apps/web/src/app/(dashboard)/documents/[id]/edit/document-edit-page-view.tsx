@@ -11,7 +11,7 @@ import { getRequiredServerComponentSession } from '@documenso/lib/next-auth/get-
 import { getDocumentWithDetailsById } from '@documenso/lib/server-only/document/get-document-with-details-by-id';
 import { symmetricDecrypt } from '@documenso/lib/universal/crypto';
 import { formatDocumentsPath } from '@documenso/lib/utils/teams';
-import type { Team } from '@documenso/prisma/client';
+import type { Team, TeamMemberRole } from '@documenso/prisma/client';
 import { DocumentStatus as InternalDocumentStatus } from '@documenso/prisma/client';
 import { Button } from '@documenso/ui/primitives/button';
 
@@ -23,7 +23,7 @@ export type DocumentEditPageViewProps = {
   params: {
     id: string;
   };
-  team?: Team;
+  team?: Team & { currentTeamMember: { role: TeamMemberRole } };
 };
 
 export const DocumentEditPageView = async ({ params, team }: DocumentEditPageViewProps) => {
@@ -47,30 +47,19 @@ export const DocumentEditPageView = async ({ params, team }: DocumentEditPageVie
 
   const documentVisibility = document?.visibility?.toLowerCase();
   const currentTeamMemberRole = team?.currentTeamMember?.role.toLowerCase();
-  let canAccessDocument;
+  const isRecipient = document?.Recipient.find((recipient) => recipient.email === user.email);
+  let canAccessDocument = true;
 
-  match([documentVisibility, currentTeamMemberRole])
-    .with(['everyone', 'admin'], () => {
-      canAccessDocument = true;
-    })
-    .with(['everyone', 'manager'], () => {
-      canAccessDocument = true;
-    })
-    .with(['everyone', 'member'], () => {
-      canAccessDocument = true;
-    })
-    .with(['managerandabove', 'admin'], () => {
-      canAccessDocument = true;
-    })
-    .with(['managerandabove', 'manager'], () => {
-      canAccessDocument = true;
-    })
-    .with(['admin', 'admin'], () => {
-      canAccessDocument = true;
-    })
-    .otherwise(() => {
-      canAccessDocument = false;
-    });
+  if (!isRecipient) {
+    canAccessDocument = match([documentVisibility, currentTeamMemberRole])
+      .with(['everyone', 'admin'], () => true)
+      .with(['everyone', 'manager'], () => true)
+      .with(['everyone', 'member'], () => true)
+      .with(['managerandabove', 'admin'], () => true)
+      .with(['managerandabove', 'manager'], () => true)
+      .with(['admin', 'admin'], () => true)
+      .otherwise(() => false);
+  }
 
   if (!document) {
     redirect(documentRootPath);

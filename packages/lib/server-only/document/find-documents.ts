@@ -91,17 +91,31 @@ export const findDocuments = async ({
     })
     .otherwise(() => undefined);
 
+  const visibilityFilters = [
+    ...match(teamMemberRole)
+      .with(TeamMemberRole.ADMIN, () => [
+        { visibility: 'everyone' },
+        { visibility: 'managerandabove' },
+        { visibility: 'admin' },
+      ])
+      .with(TeamMemberRole.MANAGER, () => [
+        { visibility: 'everyone' },
+        { visibility: 'managerandabove' },
+      ])
+      .otherwise(() => [{ visibility: 'everyone' }]),
+    {
+      Recipient: {
+        some: {
+          email: user.email,
+        },
+      },
+    },
+  ];
+
   const filters = team
     ? {
         ...findTeamDocumentsFilter(status, team),
-        visibility: match(teamMemberRole)
-          .with(TeamMemberRole.ADMIN, () => undefined)
-          .with(TeamMemberRole.MANAGER, () => {
-            return {
-              in: ['everyone', 'managerandabove'],
-            };
-          })
-          .otherwise(() => 'everyone'),
+        OR: visibilityFilters,
       }
     : findDocumentsFilter(status, user);
 

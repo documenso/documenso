@@ -15,7 +15,7 @@ import { getRecipientsForDocument } from '@documenso/lib/server-only/recipient/g
 import { symmetricDecrypt } from '@documenso/lib/universal/crypto';
 import { formatDocumentsPath } from '@documenso/lib/utils/teams';
 import { DocumentStatus } from '@documenso/prisma/client';
-import type { Team, TeamEmail } from '@documenso/prisma/client';
+import type { Team, TeamEmail, TeamMemberRole } from '@documenso/prisma/client';
 import { Badge } from '@documenso/ui/primitives/badge';
 import { Button } from '@documenso/ui/primitives/button';
 import { Card, CardContent } from '@documenso/ui/primitives/card';
@@ -39,7 +39,7 @@ export type DocumentPageViewProps = {
   params: {
     id: string;
   };
-  team?: Team & { teamEmail: TeamEmail | null };
+  team?: Team & { teamEmail: TeamEmail | null } & { currentTeamMember: { role: TeamMemberRole } };
 };
 
 export const DocumentPageView = async ({ params, team }: DocumentPageViewProps) => {
@@ -64,30 +64,19 @@ export const DocumentPageView = async ({ params, team }: DocumentPageViewProps) 
 
   const documentVisibility = document?.visibility?.toLowerCase();
   const currentTeamMemberRole = team?.currentTeamMember?.role.toLowerCase();
-  let canAccessDocument;
+  const isRecipient = document?.Recipient.find((recipient) => recipient.email === user.email);
+  let canAccessDocument = true;
 
-  match([documentVisibility, currentTeamMemberRole])
-    .with(['everyone', 'admin'], () => {
-      canAccessDocument = true;
-    })
-    .with(['everyone', 'manager'], () => {
-      canAccessDocument = true;
-    })
-    .with(['everyone', 'member'], () => {
-      canAccessDocument = true;
-    })
-    .with(['managerandabove', 'admin'], () => {
-      canAccessDocument = true;
-    })
-    .with(['managerandabove', 'manager'], () => {
-      canAccessDocument = true;
-    })
-    .with(['admin', 'admin'], () => {
-      canAccessDocument = true;
-    })
-    .otherwise(() => {
-      canAccessDocument = false;
-    });
+  if (!isRecipient) {
+    canAccessDocument = match([documentVisibility, currentTeamMemberRole])
+      .with(['everyone', 'admin'], () => true)
+      .with(['everyone', 'manager'], () => true)
+      .with(['everyone', 'member'], () => true)
+      .with(['managerandabove', 'admin'], () => true)
+      .with(['managerandabove', 'manager'], () => true)
+      .with(['admin', 'admin'], () => true)
+      .otherwise(() => false);
+  }
 
   const isDocumentHistoryEnabled = await getServerComponentFlag(
     'app_document_page_view_history_sheet',
