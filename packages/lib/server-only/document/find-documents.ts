@@ -6,6 +6,7 @@ import { RecipientRole, SigningStatus, TeamMemberRole } from '@documenso/prisma/
 import type { Document, Prisma, Team, TeamEmail, User } from '@documenso/prisma/client';
 import { ExtendedDocumentStatus } from '@documenso/prisma/types/extended-document-status';
 
+import { DocumentVisibility } from '../../types/document-visibility';
 import type { FindResultSet } from '../../types/find-result-set';
 import { maskRecipientTokensForDocument } from '../../utils/mask-recipient-tokens-for-document';
 
@@ -94,15 +95,15 @@ export const findDocuments = async ({
   const visibilityFilters = [
     ...match(teamMemberRole)
       .with(TeamMemberRole.ADMIN, () => [
-        { visibility: 'everyone' },
-        { visibility: 'managerandabove' },
-        { visibility: 'admin' },
+        { visibility: DocumentVisibility.EVERYONE },
+        { visibility: DocumentVisibility.MANAGERANDABOVE },
+        { visibility: DocumentVisibility.ADMIN },
       ])
       .with(TeamMemberRole.MANAGER, () => [
-        { visibility: 'everyone' },
-        { visibility: 'managerandabove' },
+        { visibility: DocumentVisibility.EVERYONE },
+        { visibility: DocumentVisibility.MANAGERANDABOVE },
       ])
-      .otherwise(() => [{ visibility: 'everyone' }]),
+      .otherwise(() => [{ visibility: DocumentVisibility.EVERYONE }]),
     {
       Recipient: {
         some: {

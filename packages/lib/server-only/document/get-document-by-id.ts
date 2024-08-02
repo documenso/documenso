@@ -4,6 +4,7 @@ import { prisma } from '@documenso/prisma';
 import type { Prisma } from '@documenso/prisma/client';
 import { TeamMemberRole } from '@documenso/prisma/client';
 
+import { DocumentVisibility } from '../../types/document-visibility';
 import { getTeamById } from '../team/get-team';
 
 export type GetDocumentByIdOptions = {
@@ -132,15 +133,15 @@ export const getDocumentWhereInput = async ({
   const visibilityFilters = [
     ...match(team.currentTeamMember?.role)
       .with(TeamMemberRole.ADMIN, () => [
-        { visibility: 'everyone' },
-        { visibility: 'managerandabove' },
-        { visibility: 'admin' },
+        { visibility: DocumentVisibility.EVERYONE },
+        { visibility: DocumentVisibility.MANAGERANDABOVE },
+        { visibility: DocumentVisibility.ADMIN },
       ])
       .with(TeamMemberRole.MANAGER, () => [
-        { visibility: 'everyone' },
-        { visibility: 'managerandabove' },
+        { visibility: DocumentVisibility.EVERYONE },
+        { visibility: DocumentVisibility.MANAGERANDABOVE },
       ])
-      .otherwise(() => [{ visibility: 'everyone' }]),
+      .otherwise(() => [{ visibility: DocumentVisibility.EVERYONE }]),
     {
       Recipient: {
         some: {

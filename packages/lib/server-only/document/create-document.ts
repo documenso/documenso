@@ -7,6 +7,7 @@ import { createDocumentAuditLogData } from '@documenso/lib/utils/document-audit-
 import { prisma } from '@documenso/prisma';
 import { DocumentSource, WebhookTriggerEvents } from '@documenso/prisma/client';
 
+import { DocumentVisibility } from '../../types/document-visibility';
 import { triggerWebhook } from '../webhooks/trigger/trigger-webhook';
 
 export type CreateDocumentOptions = {
@@ -54,7 +55,7 @@ export const createDocument = async ({
         title,
         externalId,
         documentDataId,
-        visibility: teamId ? 'everyone' : undefined,
+        visibility: teamId ? DocumentVisibility.EVERYONE : undefined,
         userId,
         teamId,
         formValues,

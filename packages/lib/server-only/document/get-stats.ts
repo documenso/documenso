@@ -9,6 +9,8 @@ import { SigningStatus } from '@documenso/prisma/client';
 import { isExtendedDocumentStatus } from '@documenso/prisma/guards/is-extended-document-status';
 import { ExtendedDocumentStatus } from '@documenso/prisma/types/extended-document-status';
 
+import { DocumentVisibility } from '../../types/document-visibility';
+
 export type GetStatsInput = {
   user: User;
   team?: Omit<GetTeamCountsOption, 'createdAt'>;
@@ -180,15 +182,15 @@ const getTeamCounts = async (options: GetTeamCountsOption) => {
   const visibilityFilters = [
     ...match(options.currentTeamMemberRole)
       .with(TeamMemberRole.ADMIN, () => [
-        { visibility: 'everyone' },
-        { visibility: 'managerandabove' },
-        { visibility: 'admin' },
+        { visibility: DocumentVisibility.EVERYONE },
+        { visibility: DocumentVisibility.MANAGERANDABOVE },
+        { visibility: DocumentVisibility.ADMIN },
       ])
       .with(TeamMemberRole.MANAGER, () => [
-        { visibility: 'everyone' },
-        { visibility: 'managerandabove' },
+        { visibility: DocumentVisibility.EVERYONE },
+        { visibility: DocumentVisibility.MANAGERANDABOVE },
       ])
-      .otherwise(() => [{ visibility: 'everyone' }]),
+      .otherwise(() => [{ visibility: DocumentVisibility.EVERYONE }]),
   ];
 
   ownerCountsWhereInput = {

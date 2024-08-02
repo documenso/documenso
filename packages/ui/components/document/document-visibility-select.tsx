@@ -2,8 +2,9 @@ import React, { forwardRef } from 'react';
 
 import type { SelectProps } from '@radix-ui/react-select';
 import { InfoIcon } from 'lucide-react';
-import { match } from 'ts-pattern';
 
+import { DOCUMENT_VISIBILITY } from '@documenso/lib/constants/document-visibility';
+import { DocumentVisibility } from '@documenso/lib/types/document-visibility';
 import {
   Select,
   SelectContent,
@@ -19,29 +20,34 @@ export type DocumentVisibilitySelectType = SelectProps & {
 
 export const DocumentVisibilitySelect = forwardRef<HTMLButtonElement, DocumentVisibilitySelectType>(
   ({ currentMemberRole, ...props }, ref) => {
+    const canUpdateVisibility = currentMemberRole === 'ADMIN' || currentMemberRole === 'MANAGER';
+
     return (
-      <Select {...props}>
+      <Select {...props} disabled={!canUpdateVisibility}>
         <SelectTrigger ref={ref} className="bg-background text-muted-foreground">
           <SelectValue data-testid="documentVisibilitySelectValue" placeholder="Everyone" />
         </SelectTrigger>
 
         <SelectContent position="popper">
-          {match(currentMemberRole)
-            .with('ADMIN', () => (
-              <>
-                <SelectItem value="everyone">Everyone</SelectItem>
-                <SelectItem value="managerandabove">Managers and above</SelectItem>
-                <SelectItem value="admin">Admins only</SelectItem>
-              </>
-            ))
-            .with('MANAGER', () => (
-              <>
-                <SelectItem value="everyone">Everyone</SelectItem>
-                <SelectItem value="managerandabove">Managers and above</SelectItem>
-              </>
-            ))
-            .with('MEMBER', () => <SelectItem value="everyone">Everyone</SelectItem>)
-            .otherwise(() => null)}
+          {Object.keys(DocumentVisibility)
+            .filter((key) => {
+              if (props.value?.toString() === key) return true;
+              switch (currentMemberRole) {
+                case 'ADMIN':
+                  return true;
+                case 'MANAGER':
+                  return key !== DocumentVisibility.ADMIN;
+                case 'MEMBER':
+                  return key === DocumentVisibility.EVERYONE;
+                default:
+                  return false;
+              }
+            })
+            .map((key) => (
+              <SelectItem key={key} value={key}>
+                {DOCUMENT_VISIBILITY[key].value}
+              </SelectItem>
+            ))}
         </SelectContent>
       </Select>
     );

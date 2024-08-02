@@ -12,10 +12,12 @@ import { getDocumentById } from '@documenso/lib/server-only/document/get-documen
 import { getServerComponentFlag } from '@documenso/lib/server-only/feature-flags/get-server-component-feature-flag';
 import { getFieldsForDocument } from '@documenso/lib/server-only/field/get-fields-for-document';
 import { getRecipientsForDocument } from '@documenso/lib/server-only/recipient/get-recipients-for-document';
+import { DocumentVisibility } from '@documenso/lib/types/document-visibility';
 import { symmetricDecrypt } from '@documenso/lib/universal/crypto';
 import { formatDocumentsPath } from '@documenso/lib/utils/teams';
 import { DocumentStatus } from '@documenso/prisma/client';
-import type { Team, TeamEmail, TeamMemberRole } from '@documenso/prisma/client';
+import type { Team, TeamEmail } from '@documenso/prisma/client';
+import { TeamMemberRole } from '@documenso/prisma/client';
 import { Badge } from '@documenso/ui/primitives/badge';
 import { Button } from '@documenso/ui/primitives/button';
 import { Card, CardContent } from '@documenso/ui/primitives/card';
@@ -62,19 +64,19 @@ export const DocumentPageView = async ({ params, team }: DocumentPageViewProps) 
     teamId: team?.id,
   }).catch(() => null);
 
-  const documentVisibility = document?.visibility?.toLowerCase();
-  const currentTeamMemberRole = team?.currentTeamMember?.role.toLowerCase();
+  const documentVisibility = document?.visibility;
+  const currentTeamMemberRole = team?.currentTeamMember?.role;
   const isRecipient = document?.Recipient.find((recipient) => recipient.email === user.email);
   let canAccessDocument = true;
 
   if (!isRecipient) {
     canAccessDocument = match([documentVisibility, currentTeamMemberRole])
-      .with(['everyone', 'admin'], () => true)
-      .with(['everyone', 'manager'], () => true)
-      .with(['everyone', 'member'], () => true)
-      .with(['managerandabove', 'admin'], () => true)
-      .with(['managerandabove', 'manager'], () => true)
-      .with(['admin', 'admin'], () => true)
+      .with([DocumentVisibility.EVERYONE, TeamMemberRole.ADMIN], () => true)
+      .with([DocumentVisibility.EVERYONE, TeamMemberRole.MANAGER], () => true)
+      .with([DocumentVisibility.EVERYONE, TeamMemberRole.MEMBER], () => true)
+      .with([DocumentVisibility.MANAGERANDABOVE, TeamMemberRole.ADMIN], () => true)
+      .with([DocumentVisibility.MANAGERANDABOVE, TeamMemberRole.MANAGER], () => true)
+      .with([DocumentVisibility.ADMIN, TeamMemberRole.ADMIN], () => true)
       .otherwise(() => false);
   }
 

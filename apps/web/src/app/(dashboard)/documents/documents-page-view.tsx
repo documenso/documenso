@@ -60,6 +60,8 @@ export const DocumentsPageView = async ({ searchParams = {}, team }: DocumentsPa
       teamEmail: team.teamEmail?.email,
       senderIds,
       currentTeamMemberRole,
+      currentUserEmail: user.email,
+      userId: user.id,
     };
   }
 
