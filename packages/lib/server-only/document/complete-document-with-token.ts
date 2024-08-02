@@ -4,9 +4,16 @@ import { DOCUMENT_AUDIT_LOG_TYPE } from '@documenso/lib/types/document-audit-log
 import type { RequestMetadata } from '@documenso/lib/universal/extract-request-metadata';
 import { createDocumentAuditLogData } from '@documenso/lib/utils/document-audit-logs';
 import { prisma } from '@documenso/prisma';
-import { DocumentStatus, SigningStatus } from '@documenso/prisma/client';
+import {
+  DocumentSigningOrder,
+  DocumentStatus,
+  RecipientRole,
+  SendStatus,
+  SigningStatus,
+} from '@documenso/prisma/client';
 import { WebhookTriggerEvents } from '@documenso/prisma/client';
 
+import { jobsClient } from '../../jobs/client';
 import type { TRecipientActionAuth } from '../../types/document-auth';
 import { triggerWebhook } from '../webhooks/trigger/trigger-webhook';
 import { sealDocument } from './seal-document';
@@ -31,6 +38,7 @@ const getDocument = async ({ token, documentId }: CompleteDocumentWithTokenOptio
       },
     },
     include: {
+      documentMeta: true,
       Recipient: {
         where: {
           token,
@@ -61,6 +69,37 @@ export const completeDocumentWithToken = async ({
 
   if (recipient.signingStatus === SigningStatus.SIGNED) {
     throw new Error(`Recipient ${recipient.id} has already signed`);
+  }
+
+  if (document.documentMeta?.signingOrder === DocumentSigningOrder.SEQUENTIAL) {
+    if (recipient.signingOrder != null) {
+      const nextRecipient = await prisma.recipient.findFirst({
+        where: {
+          documentId: document.id,
+          signingStatus: SigningStatus.NOT_SIGNED,
+          signingOrder: recipient.signingOrder + 1,
+        },
+      });
+
+      if (nextRecipient) {
+        await prisma.recipient.update({
+          where: { id: nextRecipient.id },
+          data: { sendStatus: SendStatus.SENT },
+        });
+
+        await jobsClient.triggerJob({
+          name: 'send.signing.requested.email',
+          payload: {
+            userId: document.userId,
+            documentId: document.id,
+            recipientId: nextRecipient.id,
+            requestMetadata,
+          },
+        });
+      }
+    } else {
+      throw new Error(`Recipient ${recipient.id} has a null signing order`);
+    }
   }
 
   const fields = await prisma.field.findMany({
@@ -142,7 +181,7 @@ export const completeDocumentWithToken = async ({
       id: document.id,
       Recipient: {
         every: {
-          signingStatus: SigningStatus.SIGNED,
+          OR: [{ signingStatus: SigningStatus.SIGNED }, { role: RecipientRole.CC }],
         },
       },
     },

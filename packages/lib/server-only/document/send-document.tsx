@@ -4,7 +4,13 @@ import type { RequestMetadata } from '@documenso/lib/universal/extract-request-m
 import { putPdfFile } from '@documenso/lib/universal/upload/put-file';
 import { createDocumentAuditLogData } from '@documenso/lib/utils/document-audit-logs';
 import { prisma } from '@documenso/prisma';
-import { DocumentStatus, RecipientRole, SendStatus, SigningStatus } from '@documenso/prisma/client';
+import {
+  DocumentSigningOrder,
+  DocumentStatus,
+  RecipientRole,
+  SendStatus,
+  SigningStatus,
+} from '@documenso/prisma/client';
 import { WebhookTriggerEvents } from '@documenso/prisma/client';
 
 import { jobsClient } from '../../jobs/client';
@@ -58,7 +64,11 @@ export const sendDocument = async ({
           }),
     },
     include: {
-      Recipient: true,
+      Recipient: {
+        orderBy: {
+          signingOrder: 'asc',
+        },
+      },
       documentMeta: true,
       documentData: true,
     },
@@ -75,6 +85,12 @@ export const sendDocument = async ({
   if (document.status === DocumentStatus.COMPLETED) {
     throw new Error('Can not send completed document');
   }
+
+  const signingOrder = document.documentMeta?.signingOrder || DocumentSigningOrder.PARALLEL;
+  const recipientsToNotify =
+    signingOrder === DocumentSigningOrder.SEQUENTIAL
+      ? document.Recipient.filter((r) => r.signingOrder === 1)
+      : document.Recipient;
 
   const { documentData } = document;
 
@@ -136,7 +152,7 @@ export const sendDocument = async ({
 
   if (sendEmail) {
     await Promise.all(
-      document.Recipient.map(async (recipient) => {
+      recipientsToNotify.map(async (recipient) => {
         if (recipient.sendStatus === SendStatus.SENT || recipient.role === RecipientRole.CC) {
           return;
         }
