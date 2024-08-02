@@ -4,7 +4,7 @@ import React, { useId, useMemo, useState } from 'react';
 
 import { zodResolver } from '@hookform/resolvers/zod';
 import { motion } from 'framer-motion';
-import { Plus, Trash } from 'lucide-react';
+import { GripVerticalIcon, Plus, Trash } from 'lucide-react';
 import { useSession } from 'next-auth/react';
 import { useFieldArray, useForm } from 'react-hook-form';
 
@@ -12,7 +12,7 @@ import { useLimits } from '@documenso/ee/server-only/limits/provider/client';
 import { ZRecipientAuthOptionsSchema } from '@documenso/lib/types/document-auth';
 import { nanoid } from '@documenso/lib/universal/id';
 import type { Field, Recipient } from '@documenso/prisma/client';
-import { RecipientRole, SendStatus } from '@documenso/prisma/client';
+import { DocumentSigningOrder, RecipientRole, SendStatus } from '@documenso/prisma/client';
 import { AnimateGenericFadeInOut } from '@documenso/ui/components/animate/animate-generic-fade-in-out';
 import { RecipientActionAuthSelect } from '@documenso/ui/components/recipient/recipient-action-auth-select';
 import { RecipientRoleSelect } from '@documenso/ui/components/recipient/recipient-role-select';
@@ -86,6 +86,8 @@ export const AddSignersFormPartial = ({
                 actionAuth: undefined,
               },
             ],
+      // TODO: Persist signing order in the database
+      signingOrder: DocumentSigningOrder.PARALLEL,
     },
   });
 
@@ -112,6 +114,7 @@ export const AddSignersFormPartial = ({
   } = form;
 
   const watchedSigners = watch('signers');
+  const watchedSigningOrder = watch('signingOrder');
 
   const onFormSubmit = form.handleSubmit(onSubmit);
 
@@ -203,29 +206,78 @@ export const AddSignersFormPartial = ({
 
         <AnimateGenericFadeInOut motionKey={showAdvancedSettings ? 'Show' : 'Hide'}>
           <Form {...form}>
+            <FormField
+              control={form.control}
+              name="signingOrder"
+              render={({ field }) => (
+                <FormItem className="mb-5 flex flex-row items-center space-x-2 space-y-0">
+                  <FormControl>
+                    <Checkbox
+                      checkClassName="text-white"
+                      checked={field.value === DocumentSigningOrder.SEQUENTIAL}
+                      onCheckedChange={(checked) =>
+                        checked
+                          ? field.onChange(DocumentSigningOrder.SEQUENTIAL)
+                          : field.onChange(DocumentSigningOrder.PARALLEL)
+                      }
+                    />
+                  </FormControl>
+
+                  <FormLabel
+                    htmlFor="signingOrder"
+                    className="text-sm leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                  >
+                    Enable signing order
+                  </FormLabel>
+                </FormItem>
+              )}
+            />
+
             <div className="flex w-full flex-col gap-y-2">
               {signers.map((signer, index) => (
                 <motion.fieldset
                   key={signer.id}
                   data-native-id={signer.nativeId}
                   disabled={isSubmitting || hasBeenSentToRecipientId(signer.nativeId)}
-                  className={cn('grid grid-cols-8 gap-4 pb-4', {
+                  className={cn('grid grid-cols-12 items-end gap-2 pb-4', {
                     'border-b pt-2': showAdvancedSettings,
                   })}
                 >
+                  <FormField
+                    control={form.control}
+                    // TODO: change to signing order
+                    name={`signers.${index}.email`}
+                    render={({ field }) => (
+                      <FormItem
+                        className={cn('col-span-2 mt-auto flex items-center gap-x-2 space-y-0')}
+                      >
+                        <GripVerticalIcon className="h-5 w-5 flex-shrink-0" />
+                        <FormControl>
+                          <Input
+                            type="text"
+                            // className="text-center lg:w-1/2"
+                            className="w-full p-2 text-center"
+                            // TODO: change to signing order
+                            value={index + 1}
+                            disabled={isSubmitting || hasBeenSentToRecipientId(signer.nativeId)}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
                   <FormField
                     control={form.control}
                     name={`signers.${index}.email`}
                     render={({ field }) => (
                       <FormItem
                         className={cn('relative', {
-                          'col-span-3': !showAdvancedSettings,
-                          'col-span-4': showAdvancedSettings,
+                          'col-span-4': !showAdvancedSettings,
+                          'col-span-5': showAdvancedSettings,
                         })}
                       >
-                        {!showAdvancedSettings && index === 0 && (
-                          <FormLabel required>Email</FormLabel>
-                        )}
+                        {!showAdvancedSettings && <FormLabel required>Email</FormLabel>}
 
                         <FormControl>
                           <Input
@@ -248,11 +300,11 @@ export const AddSignersFormPartial = ({
                     render={({ field }) => (
                       <FormItem
                         className={cn({
-                          'col-span-3': !showAdvancedSettings,
-                          'col-span-4': showAdvancedSettings,
+                          'col-span-4': !showAdvancedSettings,
+                          'col-span-5': showAdvancedSettings,
                         })}
                       >
-                        {!showAdvancedSettings && index === 0 && <FormLabel>Name</FormLabel>}
+                        {!showAdvancedSettings && <FormLabel>Name</FormLabel>}
 
                         <FormControl>
                           <Input
@@ -288,35 +340,37 @@ export const AddSignersFormPartial = ({
                     />
                   )}
 
-                  <FormField
-                    name={`signers.${index}.role`}
-                    render={({ field }) => (
-                      <FormItem className="col-span-1 mt-auto">
-                        <FormControl>
-                          <RecipientRoleSelect
-                            {...field}
-                            onValueChange={field.onChange}
-                            disabled={isSubmitting || hasBeenSentToRecipientId(signer.nativeId)}
-                          />
-                        </FormControl>
+                  <div className="col-span-2 flex gap-x-2">
+                    <FormField
+                      name={`signers.${index}.role`}
+                      render={({ field }) => (
+                        <FormItem className="mt-auto">
+                          <FormControl>
+                            <RecipientRoleSelect
+                              {...field}
+                              onValueChange={field.onChange}
+                              disabled={isSubmitting || hasBeenSentToRecipientId(signer.nativeId)}
+                            />
+                          </FormControl>
 
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
 
-                  <button
-                    type="button"
-                    className="col-span-1 mt-auto inline-flex h-10 w-10 items-center justify-center text-slate-500 hover:opacity-80 disabled:cursor-not-allowed disabled:opacity-50"
-                    disabled={
-                      isSubmitting ||
-                      hasBeenSentToRecipientId(signer.nativeId) ||
-                      signers.length === 1
-                    }
-                    onClick={() => onRemoveSigner(index)}
-                  >
-                    <Trash className="h-5 w-5" />
-                  </button>
+                    <button
+                      type="button"
+                      className="mt-auto inline-flex h-10 w-10 items-center justify-center text-slate-500 hover:opacity-80 disabled:cursor-not-allowed disabled:opacity-50"
+                      disabled={
+                        isSubmitting ||
+                        hasBeenSentToRecipientId(signer.nativeId) ||
+                        signers.length === 1
+                      }
+                      onClick={() => onRemoveSigner(index)}
+                    >
+                      <Trash className="h-4 w-4" />
+                    </button>
+                  </div>
                 </motion.fieldset>
               ))}
             </div>

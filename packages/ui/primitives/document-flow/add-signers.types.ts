@@ -3,7 +3,7 @@ import { z } from 'zod';
 import { ZRecipientActionAuthTypesSchema } from '@documenso/lib/types/document-auth';
 
 import { ZMapNegativeOneToUndefinedSchema } from './add-settings.types';
-import { RecipientRole } from '.prisma/client';
+import { DocumentSigningOrder, RecipientRole } from '.prisma/client';
 
 export const ZAddSignersFormSchema = z
   .object({
@@ -19,6 +19,7 @@ export const ZAddSignersFormSchema = z
         ),
       }),
     ),
+    signingOrder: z.nativeEnum(DocumentSigningOrder),
   })
   .refine(
     (schema) => {

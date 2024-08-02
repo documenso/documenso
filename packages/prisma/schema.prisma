@@ -336,6 +336,11 @@ enum DocumentDataType {
   BYTES_64
 }
 
+enum DocumentSigningOrder {
+  PARALLEL
+  SEQUENTIAL
+}
+
 model DocumentData {
   id          String           @id @default(cuid())
   type        DocumentDataType
@@ -346,15 +351,16 @@ model DocumentData {
 }
 
 model DocumentMeta {
-  id          String   @id @default(cuid())
-  subject     String?
-  message     String?
-  timezone    String?  @default("Etc/UTC") @db.Text
-  password    String?
-  dateFormat  String?  @default("yyyy-MM-dd hh:mm a") @db.Text
-  documentId  Int      @unique
-  document    Document @relation(fields: [documentId], references: [id], onDelete: Cascade)
-  redirectUrl String?
+  id           String               @id @default(cuid())
+  subject      String?
+  message      String?
+  timezone     String?              @default("Etc/UTC") @db.Text
+  password     String?
+  dateFormat   String?              @default("yyyy-MM-dd hh:mm a") @db.Text
+  documentId   Int                  @unique
+  document     Document             @relation(fields: [documentId], references: [id], onDelete: Cascade)
+  redirectUrl  String?
+  signingOrder DocumentSigningOrder @default(PARALLEL)
 }
 
 enum ReadStatus {
