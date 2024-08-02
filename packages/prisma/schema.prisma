@@ -396,6 +396,7 @@ model Recipient {
   expired           DateTime?
   signedAt          DateTime?
   authOptions       Json?
+  signingOrder      Int?
   role              RecipientRole @default(SIGNER)
   readStatus        ReadStatus    @default(NOT_OPENED)
   signingStatus     SigningStatus @default(NOT_SIGNED)

@@ -14,6 +14,7 @@ export const ZAddSignersFormSchema = z
         email: z.string().email().min(1),
         name: z.string(),
         role: z.nativeEnum(RecipientRole),
+        signingOrder: z.number().optional(),
         actionAuth: ZMapNegativeOneToUndefinedSchema.pipe(
           ZRecipientActionAuthTypesSchema.optional(),
         ),

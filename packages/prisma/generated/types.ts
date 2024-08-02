@@ -311,6 +311,7 @@ export type Recipient = {
   expired: Timestamp | null;
   signedAt: Timestamp | null;
   authOptions: unknown | null;
+  signingOrder: number | null;
   role: Generated<RecipientRole>;
   readStatus: Generated<ReadStatus>;
   signingStatus: Generated<SigningStatus>;
