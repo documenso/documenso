@@ -27,6 +27,7 @@
   },
   "dependencies": {
     "@documenso/lib": "*",
+    "@hello-pangea/dnd": "^16.6.0",
     "@hookform/resolvers": "^3.3.0",
     "@lingui/macro": "^4.11.1",
     "@lingui/react": "^4.11.1",
