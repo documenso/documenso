@@ -28,9 +28,16 @@ export type SigningFormProps = {
   recipient: Recipient;
   fields: Field[];
   redirectUrl?: string | null;
+  isRecipientsTurn: boolean;
 };
 
-export const SigningForm = ({ document, recipient, fields, redirectUrl }: SigningFormProps) => {
+export const SigningForm = ({
+  document,
+  recipient,
+  fields,
+  redirectUrl,
+  isRecipientsTurn,
+}: SigningFormProps) => {
   const router = useRouter();
   const analytics = useAnalytics();
   const { data: session } = useSession();
@@ -149,6 +156,7 @@ export const SigningForm = ({ document, recipient, fields, redirectUrl }: Signin
                     fields={fields}
                     fieldsValidated={fieldsValidated}
                     role={recipient.role}
+                    disabled={!isRecipientsTurn}
                   />
                 </div>
               </div>
@@ -212,6 +220,7 @@ export const SigningForm = ({ document, recipient, fields, redirectUrl }: Signin
                     fields={fields}
                     fieldsValidated={fieldsValidated}
                     role={recipient.role}
+                    disabled={!isRecipientsTurn}
                   />
                 </div>
               </div>

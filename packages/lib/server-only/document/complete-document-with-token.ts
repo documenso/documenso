@@ -72,17 +72,35 @@ export const completeDocumentWithToken = async ({
   }
 
   if (document.documentMeta?.signingOrder === DocumentSigningOrder.SEQUENTIAL) {
-    if (recipient.signingOrder != null) {
-      const nextRecipient = await prisma.recipient.findFirst({
-        where: {
-          documentId: document.id,
-          signingStatus: SigningStatus.NOT_SIGNED,
-          signingOrder: recipient.signingOrder + 1,
-        },
-      });
+    if (recipient.signingOrder == null) {
+      throw new Error(`Recipient ${recipient.id} has a null signing order`);
+    }
 
-      if (nextRecipient) {
-        await prisma.recipient.update({
+    const allRecipients = await prisma.recipient.findMany({
+      where: {
+        documentId: document.id,
+        role: RecipientRole.SIGNER,
+      },
+      orderBy: {
+        signingOrder: 'asc',
+      },
+    });
+
+    const recipientIndex = allRecipients.findIndex((r) => r.id === recipient.id);
+    const previousRecipients = allRecipients.slice(0, recipientIndex);
+    const allPreviousRecipientsSigned = previousRecipients.every(
+      (r) => r.signingStatus === SigningStatus.SIGNED,
+    );
+
+    if (!allPreviousRecipientsSigned) {
+      throw new Error(`It's not yet this recipient's turn to sign.`);
+    }
+
+    const nextRecipient = allRecipients[recipientIndex + 1];
+
+    if (nextRecipient) {
+      await prisma.$transaction(async (tx) => {
+        await tx.recipient.update({
           where: { id: nextRecipient.id },
           data: { sendStatus: SendStatus.SENT },
         });
@@ -96,9 +114,7 @@ export const completeDocumentWithToken = async ({
             requestMetadata,
           },
         });
-      }
-    } else {
-      throw new Error(`Recipient ${recipient.id} has a null signing order`);
+      });
     }
   }
 

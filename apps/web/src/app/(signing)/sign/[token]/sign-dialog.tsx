@@ -21,6 +21,7 @@ export type SignDialogProps = {
   fieldsValidated: () => void | Promise<void>;
   onSignatureComplete: () => void | Promise<void>;
   role: RecipientRole;
+  disabled: boolean;
 };
 
 export const SignDialog = ({
@@ -30,6 +31,7 @@ export const SignDialog = ({
   fieldsValidated,
   onSignatureComplete,
   role,
+  disabled = false,
 }: SignDialogProps) => {
   const [showDialog, setShowDialog] = useState(false);
   const truncatedTitle = truncateTitle(documentTitle);
@@ -52,6 +54,7 @@ export const SignDialog = ({
           size="lg"
           onClick={fieldsValidated}
           loading={isSubmitting}
+          disabled={disabled}
         >
           {isComplete ? 'Complete' : 'Next field'}
         </Button>
