@@ -1,6 +1,6 @@
 import { DateTime } from 'luxon';
 
-import { prisma } from '@documenso/prisma';
+import { SQL, prisma } from '@documenso/prisma';
 import { DocumentStatus, SubscriptionStatus } from '@documenso/prisma/client';
 
 export const getUsersCount = async () => {
@@ -56,23 +56,8 @@ export type GetUserWithDocumentMonthlyGrowth = Array<{
   signed_count: number;
 }>;
 
-type GetUserWithDocumentMonthlyGrowthQueryResult = Array<{
-  month: Date;
-  count: bigint;
-  signed_count: bigint;
-}>;
-
 export const getUserWithSignedDocumentMonthlyGrowth = async () => {
-  const result = await prisma.$queryRaw<GetUserWithDocumentMonthlyGrowthQueryResult>`
-      SELECT
-        DATE_TRUNC('month', "Document"."createdAt") AS "month",
-        COUNT(DISTINCT "Document"."userId") as "count",
-        COUNT(DISTINCT CASE WHEN "Document"."status" = 'COMPLETED' THEN "Document"."userId" END) as "signed_count"
-      FROM "Document"
-      GROUP BY "month"
-      ORDER BY "month" DESC
-      LIMIT 12
-`;
+  const result = await prisma.$queryRawTyped(SQL.userWithSignedDocumentMonthlyGrowth());
 
   return result.map((row) => ({
     month: DateTime.fromJSDate(row.month).toFormat('yyyy-MM'),

@@ -16,7 +16,6 @@
     "clean": "rimraf node_modules"
   },
   "dependencies": {
-    "@auth/kysely-adapter": "^0.6.0",
     "@aws-sdk/client-s3": "^3.410.0",
     "@aws-sdk/cloudfront-signer": "^3.410.0",
     "@aws-sdk/s3-request-presigner": "^3.410.0",
@@ -37,7 +36,6 @@
     "@upstash/redis": "^1.20.6",
     "@vvo/tzdb": "^6.117.0",
     "inngest": "^3.19.13",
-    "kysely": "^0.26.3",
     "luxon": "^3.4.0",
     "micro": "^10.0.1",
     "nanoid": "^4.0.2",
