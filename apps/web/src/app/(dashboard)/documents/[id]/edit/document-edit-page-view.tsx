@@ -47,6 +47,10 @@ export const DocumentEditPageView = async ({ params, team }: DocumentEditPageVie
     teamId: team?.id,
   }).catch(() => null);
 
+  if (document?.teamId && !team?.url) {
+    redirect(documentRootPath);
+  }
+
   const documentVisibility = document?.visibility;
   const currentTeamMemberRole = team?.currentTeamMember?.role;
   const isRecipient = document?.Recipient.find((recipient) => recipient.email === user.email);
