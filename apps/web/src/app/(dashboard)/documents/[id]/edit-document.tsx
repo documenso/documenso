@@ -361,6 +361,7 @@ export const EditDocumentForm = ({
               key={recipients.length}
               documentFlow={documentFlow.settings}
               document={document}
+              currentTeamMemberRole={team?.currentTeamMember?.role}
               recipients={recipients}
               fields={fields}
               isDocumentEnterprise={isDocumentEnterprise}
