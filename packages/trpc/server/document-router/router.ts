@@ -20,6 +20,7 @@ import { searchDocumentsWithKeyword } from '@documenso/lib/server-only/document/
 import { sendDocument } from '@documenso/lib/server-only/document/send-document';
 import { updateDocumentSettings } from '@documenso/lib/server-only/document/update-document-settings';
 import { updateTitle } from '@documenso/lib/server-only/document/update-title';
+import { findTeamMembers } from '@documenso/lib/server-only/team/find-team-members';
 import { symmetricEncrypt } from '@documenso/lib/universal/crypto';
 import { extractNextApiRequestMetadata } from '@documenso/lib/universal/extract-request-metadata';
 import { DocumentStatus } from '@documenso/prisma/client';
@@ -413,6 +414,27 @@ export const documentRouter = router({
           userId: teamId ? Number(documentUploaderId) : ctx.user.id,
           teamId,
         });
+
+        if (teamId) {
+          if (document.teamId !== teamId) {
+            throw new TRPCError({
+              code: 'FORBIDDEN',
+              message: 'fgmYou do not have access to this document.',
+            });
+          }
+
+          const teamMembers = await findTeamMembers({
+            userId: ctx.user.id,
+            teamId: Number(teamId),
+          });
+
+          if (!teamMembers.data.some((member) => member.userId === ctx.user.id)) {
+            throw new TRPCError({
+              code: 'FORBIDDEN',
+              message: 'You do not have access to this document.',
+            });
+          }
+        }
 
         const encrypted = encryptSecondaryData({
           data: document.id.toString(),
