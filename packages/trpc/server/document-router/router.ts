@@ -410,7 +410,7 @@ export const documentRouter = router({
 
         const document = await getDocumentById({
           id: documentId,
-          userId: teamId ? documentUploaderId : ctx.user.id,
+          userId: teamId ? Number(documentUploaderId) : ctx.user.id,
           teamId,
         });
 
