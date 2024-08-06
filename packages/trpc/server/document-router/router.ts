@@ -419,7 +419,7 @@ export const documentRouter = router({
           if (document.teamId !== teamId) {
             throw new TRPCError({
               code: 'FORBIDDEN',
-              message: 'fgmYou do not have access to this document.',
+              message: 'You do not have access to this document.',
             });
           }
 
