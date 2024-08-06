@@ -404,13 +404,13 @@ export const documentRouter = router({
 
   downloadAuditLogs: authenticatedProcedure
     .input(ZDownloadAuditLogsMutationSchema)
-    .mutation(async ({ input }) => {
+    .mutation(async ({ input, ctx }) => {
       try {
         const { documentId, teamId, documentUploaderId } = input;
 
         const document = await getDocumentById({
           id: documentId,
-          userId: documentUploaderId,
+          userId: teamId ? documentUploaderId : ctx.user.id,
           teamId,
         });
 
