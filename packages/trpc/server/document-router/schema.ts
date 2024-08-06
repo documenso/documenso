@@ -170,6 +170,12 @@ export const ZSearchDocumentsMutationSchema = z.object({
 export const ZDownloadAuditLogsMutationSchema = z.object({
   documentId: z.number(),
   teamId: z.number().optional(),
+  documentUploaderId: z.number(),
+});
+
+export const ZDownloadCertificateMutationSchema = z.object({
+  documentId: z.number(),
+  teamId: z.number().optional(),
 });
 
 export const ZMoveDocumentsToTeamSchema = z.object({

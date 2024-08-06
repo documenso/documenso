@@ -29,6 +29,7 @@ import {
   ZCreateDocumentMutationSchema,
   ZDeleteDraftDocumentMutationSchema as ZDeleteDocumentMutationSchema,
   ZDownloadAuditLogsMutationSchema,
+  ZDownloadCertificateMutationSchema,
   ZFindDocumentAuditLogsQuerySchema,
   ZGetDocumentByIdQuerySchema,
   ZGetDocumentByTokenQuerySchema,
@@ -403,13 +404,13 @@ export const documentRouter = router({
 
   downloadAuditLogs: authenticatedProcedure
     .input(ZDownloadAuditLogsMutationSchema)
-    .mutation(async ({ input, ctx }) => {
+    .mutation(async ({ input }) => {
       try {
-        const { documentId, teamId } = input;
+        const { documentId, teamId, documentUploaderId } = input;
 
         const document = await getDocumentById({
           id: documentId,
-          userId: ctx.user.id,
+          userId: documentUploaderId,
           teamId,
         });
 
@@ -433,7 +434,7 @@ export const documentRouter = router({
     }),
 
   downloadCertificate: authenticatedProcedure
-    .input(ZDownloadAuditLogsMutationSchema)
+    .input(ZDownloadCertificateMutationSchema)
     .mutation(async ({ input, ctx }) => {
       try {
         const { documentId, teamId } = input;
