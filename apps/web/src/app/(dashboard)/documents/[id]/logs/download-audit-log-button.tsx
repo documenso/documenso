@@ -11,7 +11,7 @@ export type DownloadAuditLogButtonProps = {
   className?: string;
   teamId?: number;
   documentId: number;
-  documentUploaderId: number;
+  documentUploaderId?: number;
 };
 
 export const DownloadAuditLogButton = ({
