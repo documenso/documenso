@@ -457,10 +457,11 @@ export const AddFieldsFormPartial = ({
               {selectedField && (
                 <div
                   className={cn(
-                    'pointer-events-none fixed z-50 flex cursor-pointer flex-col items-center justify-center bg-white transition duration-200',
+                    'text-muted-foreground dark:text-muted-background pointer-events-none fixed z-50 flex cursor-pointer flex-col items-center justify-center bg-white transition duration-200',
                     selectedSignerStyles.default.base,
                     {
-                      '-rotate-6 scale-90 opacity-50': !isFieldWithinBounds,
+                      '-rotate-6 scale-90 opacity-50 dark:bg-black/20': !isFieldWithinBounds,
+                      'dark:text-black/60': isFieldWithinBounds,
                     },
                   )}
                   style={{
