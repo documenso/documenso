@@ -1,6 +1,6 @@
 ---
 title: 'Enhancing Document Signing: Introducing 5 New Advanced Fields'
-description: 'Explore Documenso's new advanced signing fields, including improved text fields, numbers, radio buttons, checkboxes, and dropdowns. Learn about the development challenges we overcame and how these additions provide greater flexibility for document signing.'
+description: "Explore Documenso's new advanced signing fields, including improved text fields, numbers, radio buttons, checkboxes, and dropdowns. Learn about the development challenges we overcame and how these additions provide greater flexibility for document signing."
 authorName: 'Catalin Pit'
 authorImage: '/blog/blog-author-catalin.webp'
 authorRole: 'I like to code and write'
@@ -362,7 +362,7 @@ We also keep track of the checked values in the state, which allows us to displa
 ...
 ```
 
-Then, we retrieve the validation rule and length from the database and find the corresponding validation sign (e.g., ">=", "=", "<=") based on the rule label. The `checkboxValidationSigns` array contains the objects that map the rule labels to the signs.
+Then, we retrieve the validation rule and length from the database and find the corresponding validation sign (e.g., ">=", "=", "\<=") based on the rule label. The `checkboxValidationSigns` array contains the objects that map the rule labels to the signs.
 
 ```ts
 export const checkboxValidationSigns = [
