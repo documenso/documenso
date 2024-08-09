@@ -44,6 +44,7 @@ export type CreateDocumentFromDirectTemplateOptions = {
   directRecipientName?: string;
   directRecipientEmail: string;
   directTemplateToken: string;
+  directTemplateExternalId?: string;
   signedFieldValues: TSignFieldWithTokenMutationSchema[];
   templateUpdatedAt: Date;
   requestMetadata: RequestMetadata;
@@ -63,6 +64,7 @@ export const createDocumentFromDirectTemplate = async ({
   directRecipientName: initialDirectRecipientName,
   directRecipientEmail,
   directTemplateToken,
+  directTemplateExternalId,
   signedFieldValues,
   templateUpdatedAt,
   requestMetadata,
@@ -227,6 +229,7 @@ export const createDocumentFromDirectTemplate = async ({
         title: template.title,
         createdAt: initialRequestTime,
         status: DocumentStatus.PENDING,
+        externalId: directTemplateExternalId,
         documentDataId: documentData.id,
         authOptions: createDocumentAuthOptions({
           globalAccessAuth: templateAuthOptions.globalAccessAuth,
