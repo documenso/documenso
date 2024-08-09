@@ -29,7 +29,9 @@ export const signWithLocalCert = async ({ pdf }: SignWithLocalCertOptions) => {
 
   if (!cert) {
     cert = Buffer.from(
-      fs.readFileSync(process.env.NEXT_PRIVATE_SIGNING_LOCAL_FILE_PATH || './example/cert.p12'),
+      fs.readFileSync(
+        process.env.NEXT_PRIVATE_SIGNING_LOCAL_FILE_PATH || '/opt/documenso/cert.p12',
+      ),
     );
   }
 
