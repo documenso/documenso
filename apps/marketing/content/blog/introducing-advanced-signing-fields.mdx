@@ -32,7 +32,7 @@ While the text field was available previously, it lacked the ability to configur
 
 The image illustrates the old text field in the document editor.
 
-![Old text signing field in the Documenso document editor](/blog/advanced-fields/old-text-field.webp)
+![Old text signing field in the Documenso document editor](/blog/advanced-fields/old-text-field.jpeg)
 
 The revamped text field now offers a range of configuration options, allowing document owners to:
 
@@ -64,7 +64,7 @@ Since there is a default value, the field auto-signs with that value. However, t
 
 The third field has the same configurations as the second one, with one addition - the `required` option is checked. Apart from that, it works like the second field.
 
-![The third text field input](/blog/advanced-fields/third-text-field.input.webp)
+![The third text field input](/blog/advanced-fields/third-text-field-input.webp)
 
 The fourth field has the same configurations as the second one, with one addition—`read-only` is checked. As a result, the field auto-signs with the default value, and the signer cannot modify it.
 
@@ -89,11 +89,11 @@ Before sending the document for signing, the document owner must add at least on
 
 When it comes to field configuration, the document owner can mark the field as _required_ or _read-only_.
 
-![The advanced settings tab for the radio field in the Documenso document editor](/blog/advanced-settings/radio-field-advanced-settings.webp)
+![The advanced settings tab for the radio field in the Documenso document editor](/blog/advanced-fields/radio-field-advanced-settings.webp)
 
 The image below shows what the signer sees after the document is sent for signing.
 
-![The radio signing field on the Documenso signing page](/blog/advanced-settings/radio-field-sign-page.webp)
+![The radio signing field on the Documenso signing page](/blog/advanced-fields/radio-field-sign-page.webp)
 
 It's important to mention that the image is slightly modified so you can see both states of the field—signed and unsigned. Since the field has a checked value (option 2 - `radio-val-2-checked`), it will automatically sign with that value and appear like the field marked with the number 1.
 
@@ -109,7 +109,7 @@ When configuring the "Dropdown/Select" field, the document owners can:
 - Mark the field as _required_ or _read-only_
 - Pick a default option from the list of choices
 
-![The advanced settings tab for the select field in the Documenso document editor](/blog/advanced-settings/select-field-advanced-settings.webp)
+![The advanced settings tab for the select field in the Documenso document editor](/blog/advanced-fields/select-field-advanced-settings.webp)
 
 The image below illustrates the field on the signing page.
 
@@ -431,7 +431,7 @@ In the first image, the "Signature" field on the right-hand side is in the activ
 
 On the other hand, the second image shows the "Signature" field on the right-hand side in the normal state (not clicked, not active). The signature field placed on the document, shown on the left-hand side, is in the active state.
 
-![Screenshot illustrating the active state for a field on the Documenso document editor page](/blog/advanced-fields/field-active-state)
+![Screenshot illustrating the active state for a field on the Documenso document editor page](/blog/advanced-fields/field-active-state.webp)
 
 The document editor consists of various components, including those representing the fields, recipients, and other elements. That means the same colours and code are re-used across multiple components.
 
@@ -478,7 +478,7 @@ The code snippet above shows the naive solution to re-using the colours across m
 
 Then, the components would use custom hooks to apply the appropriate styles based on the selected recipient. For example, if recipient 1 is selected, the component would use the `green-500` styles from the `combinedStyles` object. All the elements related to recipient 1, such as the dropdown menu and the fields, would have a green colour.
 
-![Screenshot illustrating the recipient colour on the Documenso document editor page](/blog/advanced-fields/recipient-colour-example)
+![Screenshot illustrating the recipient colour on the Documenso document editor page](/blog/advanced-fields/recipient-colour-example.webp)
 
 The problem with this approach is that we can't import the `combinedStyles` object into other components because TailwindCSS will remove the unused classes. That means we had to copy and paste the same object into multiple files. As a result, it pollutes the codebase with duplicated code, which makes it harder to maintain and scale the code. As the application grows, the `combinedStyles` object will become larger and more complex. Moreover, it's not very flexible, as it doesn't allow for easy customization of the colours.
 
