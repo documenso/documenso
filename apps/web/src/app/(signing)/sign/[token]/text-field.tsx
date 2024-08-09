@@ -279,11 +279,13 @@ export const TextField = ({ field, recipient, onSignField, onUnsignField }: Text
             />
           </div>
 
-          {parsedFieldMeta?.characterLimit !== undefined && parsedFieldMeta?.characterLimit > 0 && !userInputHasErrors && (
-            <div className="text-muted-foreground text-sm">
-              {charactersRemaining} characters remaining
-            </div>
-          )}
+          {parsedFieldMeta?.characterLimit !== undefined &&
+            parsedFieldMeta?.characterLimit > 0 &&
+            !userInputHasErrors && (
+              <div className="text-muted-foreground text-sm">
+                {charactersRemaining} characters remaining
+              </div>
+            )}
 
           {userInputHasErrors && (
             <div className="text-sm">

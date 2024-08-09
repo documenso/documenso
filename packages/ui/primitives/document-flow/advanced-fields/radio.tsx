@@ -26,7 +26,7 @@ export const RadioField = ({ field }: RadioFieldProps) => {
   }
 
   return (
-    <div className='flex flex-col gap-y-2'>
+    <div className="flex flex-col gap-y-2">
       {!parsedFieldMeta?.values ? (
         <FieldIcon fieldMeta={field.fieldMeta} type={field.type} signerEmail={field.signerEmail} />
       ) : (

@@ -84,7 +84,7 @@ export function FieldContainerPortal({
     left: `${coords.x}px`,
     // height: `${coords.height}px`,
     // width: `${coords.width}px`,
-    ...((!isCheckboxOrRadioField) && {
+    ...(!isCheckboxOrRadioField && {
       height: `${coords.height}px`,
       width: `${coords.width}px`,
     }),

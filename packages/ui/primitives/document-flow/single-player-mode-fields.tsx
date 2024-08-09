@@ -121,9 +121,10 @@ export function SinglePlayerModeSignatureField({
       ) : (
         <button
           onClick={() => onClick?.()}
-          className={
-            cn('group-hover:text-primary absolute inset-0 h-full w-full duration-200', fontCaveat.className)
-          }
+          className={cn(
+            'group-hover:text-primary absolute inset-0 h-full w-full duration-200',
+            fontCaveat.className,
+          )}
         >
           <span className="text-muted-foreground truncate text-3xl font-medium ">Signature</span>
         </button>
