@@ -29,6 +29,7 @@ import {
   ZCreateDocumentMutationSchema,
   ZDeleteDraftDocumentMutationSchema as ZDeleteDocumentMutationSchema,
   ZDownloadAuditLogsMutationSchema,
+  ZDownloadCertificateMutationSchema,
   ZFindDocumentAuditLogsQuerySchema,
   ZGetDocumentByIdQuerySchema,
   ZGetDocumentByTokenQuerySchema,
@@ -411,7 +412,14 @@ export const documentRouter = router({
           id: documentId,
           userId: ctx.user.id,
           teamId,
-        });
+        }).catch(() => null);
+
+        if (!document || document.teamId !== teamId) {
+          throw new TRPCError({
+            code: 'FORBIDDEN',
+            message: 'You do not have access to this document.',
+          });
+        }
 
         const encrypted = encryptSecondaryData({
           data: document.id.toString(),
@@ -433,7 +441,7 @@ export const documentRouter = router({
     }),
 
   downloadCertificate: authenticatedProcedure
-    .input(ZDownloadAuditLogsMutationSchema)
+    .input(ZDownloadCertificateMutationSchema)
     .mutation(async ({ input, ctx }) => {
       try {
         const { documentId, teamId } = input;
