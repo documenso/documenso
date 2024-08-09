@@ -154,6 +154,7 @@ export const DocumentHistorySheet = ({
                     { type: DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_CREATED },
                     { type: DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_COMPLETED },
                     { type: DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_DELETED },
+                    { type: DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_RESTORED },
                     { type: DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_OPENED },
                     { type: DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_RECIPIENT_COMPLETED },
                     { type: DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_SENT },

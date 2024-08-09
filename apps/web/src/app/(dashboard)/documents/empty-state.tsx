@@ -1,4 +1,4 @@
-import { Bird, CheckCircle2 } from 'lucide-react';
+import { Bird, CheckCircle2, Trash } from 'lucide-react';
 import { match } from 'ts-pattern';
 
 import { ExtendedDocumentStatus } from '@documenso/prisma/types/extended-document-status';
@@ -28,6 +28,11 @@ export const EmptyDocumentState = ({ status }: EmptyDocumentProps) => {
       message:
         'You have not yet created or received any documents. To create a document please upload one.',
       icon: Bird,
+    }))
+    .with(ExtendedDocumentStatus.BIN, () => ({
+      title: 'No documents in the bin',
+      message: "There are no documents in the bin. You can't restore any documents.",
+      icon: Trash,
     }))
     .otherwise(() => ({
       title: 'Nothing to do',
