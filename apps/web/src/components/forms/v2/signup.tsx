@@ -20,7 +20,7 @@ import { NEXT_PUBLIC_WEBAPP_URL } from '@documenso/lib/constants/app';
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import { TRPCClientError } from '@documenso/trpc/client';
 import { trpc } from '@documenso/trpc/react';
-import { ZPasswordSchema } from '@documenso/trpc/server/auth-router/schema';
+import { ZHintedPasswordSchema } from '@documenso/trpc/server/auth-router/schema';
 import { cn } from '@documenso/ui/lib/utils';
 import { Button } from '@documenso/ui/primitives/button';
 import {
@@ -31,8 +31,8 @@ import {
   FormLabel,
   FormMessage,
 } from '@documenso/ui/primitives/form/form';
+import { HintedPasswordInput } from '@documenso/ui/primitives/hinted-password-input';
 import { Input } from '@documenso/ui/primitives/input';
-import { PasswordInput } from '@documenso/ui/primitives/password-input';
 import { SignaturePad } from '@documenso/ui/primitives/signature-pad';
 import { useToast } from '@documenso/ui/primitives/use-toast';
 
@@ -47,7 +47,7 @@ export const ZSignUpFormV2Schema = z
   .object({
     name: z.string().trim().min(1, { message: 'Please enter a valid name.' }),
     email: z.string().email().min(1),
-    password: ZPasswordSchema,
+    password: ZHintedPasswordSchema,
     signature: z.string().min(1, { message: 'We need your signature to sign documents' }),
     url: z
       .string()
@@ -311,7 +311,7 @@ export const SignUpFormV2 = ({
                       <FormLabel>Password</FormLabel>
 
                       <FormControl>
-                        <PasswordInput {...field} />
+                        <HintedPasswordInput {...field} />
                       </FormControl>
 
                       <FormMessage />
