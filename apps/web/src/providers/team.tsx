@@ -3,14 +3,14 @@
 import { createContext, useContext } from 'react';
 import React from 'react';
 
-import type { Team } from '@documenso/prisma/client';
+import type { GetTeamResponse } from '@documenso/lib/server-only/team/get-team';
 
 interface TeamProviderProps {
   children: React.ReactNode;
-  team: Team;
+  team: GetTeamResponse;
 }
 
-const TeamContext = createContext<Team | null>(null);
+const TeamContext = createContext<GetTeamResponse | null>(null);
 
 export const useCurrentTeam = () => {
   const context = useContext(TeamContext);

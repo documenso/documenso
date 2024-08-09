@@ -10,10 +10,12 @@ import { getDocumentById } from '@documenso/lib/server-only/document/get-documen
 import { getServerComponentFlag } from '@documenso/lib/server-only/feature-flags/get-server-component-feature-flag';
 import { getFieldsForDocument } from '@documenso/lib/server-only/field/get-fields-for-document';
 import { getRecipientsForDocument } from '@documenso/lib/server-only/recipient/get-recipients-for-document';
+import { DocumentVisibility } from '@documenso/lib/types/document-visibility';
 import { symmetricDecrypt } from '@documenso/lib/universal/crypto';
 import { formatDocumentsPath } from '@documenso/lib/utils/teams';
 import { DocumentStatus } from '@documenso/prisma/client';
 import type { Team, TeamEmail } from '@documenso/prisma/client';
+import { TeamMemberRole } from '@documenso/prisma/client';
 import { Badge } from '@documenso/ui/primitives/badge';
 import { Button } from '@documenso/ui/primitives/button';
 import { Card, CardContent } from '@documenso/ui/primitives/card';
@@ -37,7 +39,7 @@ export type DocumentPageViewProps = {
   params: {
     id: string;
   };
-  team?: Team & { teamEmail: TeamEmail | null };
+  team?: Team & { teamEmail: TeamEmail | null } & { currentTeamMember: { role: TeamMemberRole } };
 };
 
 export const DocumentPageView = async ({ params, team }: DocumentPageViewProps) => {
@@ -59,12 +61,54 @@ export const DocumentPageView = async ({ params, team }: DocumentPageViewProps) 
     teamId: team?.id,
   }).catch(() => null);
 
+  if (document?.teamId && !team?.url) {
+    redirect(documentRootPath);
+  }
+
+  const documentVisibility = document?.visibility;
+  const currentTeamMemberRole = team?.currentTeamMember?.role;
+  const isRecipient = document?.Recipient.find((recipient) => recipient.email === user.email);
+  let canAccessDocument = true;
+
+  if (!isRecipient) {
+    canAccessDocument = match([documentVisibility, currentTeamMemberRole])
+      .with([DocumentVisibility.EVERYONE, TeamMemberRole.ADMIN], () => true)
+      .with([DocumentVisibility.EVERYONE, TeamMemberRole.MANAGER], () => true)
+      .with([DocumentVisibility.EVERYONE, TeamMemberRole.MEMBER], () => true)
+      .with([DocumentVisibility.MANAGERANDABOVE, TeamMemberRole.ADMIN], () => true)
+      .with([DocumentVisibility.MANAGERANDABOVE, TeamMemberRole.MANAGER], () => true)
+      .with([DocumentVisibility.ADMIN, TeamMemberRole.ADMIN], () => true)
+      .otherwise(() => false);
+  }
+
   const isDocumentHistoryEnabled = await getServerComponentFlag(
     'app_document_page_view_history_sheet',
   );
 
   if (!document || !document.documentData) {
     redirect(documentRootPath);
+  }
+
+  if (!canAccessDocument && team) {
+    return (
+      <div className="container mx-auto flex items-center justify-center px-6 py-64">
+        <div>
+          <p className="text-muted-foreground font-semibold">Access Denied</p>
+
+          <h1 className="mt-3 text-2xl font-bold md:text-3xl">Oops! Something went wrong.</h1>
+
+          <p className="text-muted-foreground mt-4 text-sm">
+            It looks like you do not have the necessary permissions to access this document.
+          </p>
+
+          <div className="mt-6">
+            <Button className="w-32" asChild>
+              <Link href={`/t/${team.url}/documents`}>Dashboard</Link>
+            </Button>
+          </div>
+        </div>
+      </div>
+    );
   }
 
   const { documentData, documentMeta } = document;
