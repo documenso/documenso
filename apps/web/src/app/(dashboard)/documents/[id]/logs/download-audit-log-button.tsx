@@ -11,14 +11,12 @@ export type DownloadAuditLogButtonProps = {
   className?: string;
   teamId?: number;
   documentId: number;
-  documentUploaderId?: number;
 };
 
 export const DownloadAuditLogButton = ({
   className,
   teamId,
   documentId,
-  documentUploaderId,
 }: DownloadAuditLogButtonProps) => {
   const { toast } = useToast();
 
@@ -27,7 +25,7 @@ export const DownloadAuditLogButton = ({
 
   const onDownloadAuditLogsClick = async () => {
     try {
-      const { url } = await downloadAuditLogs({ teamId, documentId, documentUploaderId });
+      const { url } = await downloadAuditLogs({ teamId, documentId });
 
       const iframe = Object.assign(document.createElement('iframe'), {
         src: url,

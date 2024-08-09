@@ -139,11 +139,7 @@ export const DocumentLogsPageView = async ({ params, team }: DocumentLogsPageVie
             documentStatus={document.status}
           />
 
-          <DownloadAuditLogButton
-            teamId={team?.id}
-            documentId={document.id}
-            documentUploaderId={document.userId}
-          />
+          <DownloadAuditLogButton teamId={team?.id} documentId={document.id} />
         </div>
       </div>
 
