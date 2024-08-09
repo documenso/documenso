@@ -53,6 +53,10 @@ export const ZAcceptTeamInvitationMutationSchema = z.object({
   teamId: z.number(),
 });
 
+export const ZDeclineTeamInvitationMutationSchema = z.object({
+  teamId: z.number(),
+});
+
 export const ZCreateTeamBillingPortalMutationSchema = z.object({
   teamId: z.number(),
 });

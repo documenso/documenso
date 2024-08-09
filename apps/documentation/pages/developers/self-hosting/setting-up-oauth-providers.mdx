@@ -1,0 +1,29 @@
+---
+title: Setting up OAuth Providers
+description: Learn how to set up OAuth providers for your own instance of Documenso.
+---
+
+## Google OAuth (Gmail)
+
+To use Google OAuth, you will need to create a Google Cloud Platform project and enable the Google Identity and Access Management (IAM) API. You will also need to create a new OAuth client ID and download the client secret.
+
+### Create and configure a new OAuth client ID
+
+1. Go to the [Google Cloud Platform Console](https://console.cloud.google.com/)
+2. From the projects list, select a project or create a new one
+3. If the APIs & services page isn't already open, open the console left side menu and select APIs & services
+4. On the left, click Credentials
+5. Click New Credentials, then select OAuth client ID
+6. When prompted to select an application type, select Web application
+7. Enter a name for your client ID, and click Create
+8. Click the download button to download the client secret
+9. Set the authorized javascript origins to `https://<documenso-domain>`
+10. Set the authorized redirect URIs to `https://<documenso-domain>/api/auth/callback/google`
+11. In the Documenso environment variables, set the following:
+
+```
+NEXT_PRIVATE_GOOGLE_CLIENT_ID=<your-client-id>
+NEXT_PRIVATE_GOOGLE_CLIENT_SECRET=<your-client-secret>
+```
+
+Finally verify the signing in with Google works by signing in with your Google account and checking the email address in your profile.

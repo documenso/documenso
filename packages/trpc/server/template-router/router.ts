@@ -66,6 +66,7 @@ export const templateRouter = router({
           directRecipientName,
           directRecipientEmail,
           directTemplateToken,
+          directTemplateExternalId,
           signedFieldValues,
           templateUpdatedAt,
         } = input;
@@ -76,6 +77,7 @@ export const templateRouter = router({
           directRecipientName,
           directRecipientEmail,
           directTemplateToken,
+          directTemplateExternalId,
           signedFieldValues,
           templateUpdatedAt,
           user: ctx.user
