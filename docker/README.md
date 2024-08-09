@@ -1,91 +1,107 @@
 # Docker Setup for Documenso
 
-The following guide will walk you through setting up Documenso using Docker. You can choose between a production setup using Docker Compose or a standalone container.
+The following guide will walk you through setting up Documenso using Docker. The default compose file contains the Documenso app and PostgreSQL DB container.
 
 ## Prerequisites
 
-Before you begin, ensure that you have the following installed:
+- Docker and Docker Compose installed and enabled on the host system
+- A valid SMTP account or API details for a hosted MTA service
 
-- Docker
-- Docker Compose (if using the Docker Compose setup)
+## Steps
 
-## Option 1: Production Docker Compose Setup
+1. Generate a p12 signing key
+2. Configure your .env file
+3. Modify your compose.yml file
+4. Launch the container stack
+5. Access the web app using a browser
 
-This setup includes a PostgreSQL database and the Documenso application. You will need to provide your own SMTP details via environment variables.
+### 1. Generate a p12 signing key
 
-1. Download the Docker Compose file from the Documenso repository: [compose.yml](https://raw.githubusercontent.com/documenso/documenso/release/docker/production/compose.yml)
-2. Navigate to the directory containing the `compose.yml` file.
-3. Create a `.env` file in the same directory and add your SMTP details as well as a few extra environment variables, following the example below:
+> [!NOTE]  
+> Due to changes in upstream libraries, it is necessary to append ``-legacy`` when generating the p12 certificate. The below instructions reflect this change.
+
+The follow generates a self-signed ``cert.p12`` file from a generated RSA 2048 key pair. This is is required to validate signatures within the app and will be bind mounted as specified in the compose.yml file:
+
+```bash
+openssl genrsa -out private.key 2048
+openssl req -new -x509 -key private.key -out certificate.crt -days 365
+openssl pkcs12 -export -out certificate.p12 -inkey private.key -in certificate.crt -legacy.
+```
+
+### 2. Modify compose.yml
+
+- Copy the ``compose.yml`` file from this repo: [compose.yml](https://raw.githubusercontent.com/documenso/documenso/release/docker/production/compose.yml) into the base directory containing your ``cert.p12``
+- Modify the ``compose.yml`` file to reflect your use case. A fairly comprehensive set of environment variables are declared by default. These can be removed as necessary, but the following variables must be declared in your ``compose.yml`` file, with values expressed in the accompanying ``.env`` file:
+
+Under the database service node:
+```
+POSTGRES_USER
+POSTGRES_PASSWORD
+POSTGRES_DB
+```
+Under the documenso service node:
+```
+PORT
+NEXTAUTH_URL
+NEXTAUTH_SECRET
+NEXT_PRIVATE_ENCRYPTION_KEY
+NEXT_PRIVATE_ENCRYPTION_SECONDARY_KEY
+NEXT_PRIVATE_SMTP_TRANSPORT
+NEXT_PRIVATE_SMTP_HOST
+NEXT_PRIVATE_SMTP_PORT
+NEXT_PRIVATE_SMTP_USERNAME
+NEXT_PRIVATE_SMTP_PASSWORD
+NEXT_PRIVATE_SMTP_FROM_NAME
+NEXT_PRIVATE_SMTP_FROM_ADDRESS
+NEXT_PUBLIC_WEBAPP_URL
+NEXT_PUBLIC_MARKETING_URL
+NEXT_PRIVATE_DATABASE_URL
+NEXT_PRIVATE_DIRECT_DATABASE_URL
+```
+It is recommended that you leave the values for optional env vars you choose to keep and the required vars as they are in the ``compose.yml`` file and instead modify the values as necessary in the ``.env`` file.
+
+- Ensure that the path to your p12 under the documenso service node is correct.
+
+### 3. Create .env
+
+Create a `.env` file in the same directory as you ``compose.yml`` file.  This file should contain values for all of the environment variables declared in your ``compose.yml`` file.
+
+> [!NOTE]  
+> Secrets and keys should be at least 40 characters long and Postgres passwords 16 characters long. You can use Linux's ``pwgen`` tool to generate random strings using the command ``pwgen 40 3 && pwgen 16 1``.
+
+> [!NOTE]  
+> Although several popular MTAs are supported, you can use any valid SMTP credentials with Documenso, provided your email provider allows external SMTP connections.
 
 ```
-NEXTAUTH_SECRET="<your-secret>"
-NEXT_PRIVATE_ENCRYPTION_KEY="<your-key>"
-NEXT_PRIVATE_ENCRYPTION_SECONDARY_KEY="<your-secondary-key>"
-NEXT_PUBLIC_WEBAPP_URL="<your-url>"
-NEXT_PRIVATE_SMTP_TRANSPORT="smtp-auth"
-NEXT_PRIVATE_SMTP_HOST="<your-host>"
+POSTGRES_USER=postgres
+POSTGRES_PASSWORD=<random-password>
+POSTGRES_DB=documenso
+NEXTAUTH_SECRET=<your-secret>
+NEXT_PRIVATE_ENCRYPTION_KEY=<your-key>
+NEXT_PRIVATE_ENCRYPTION_SECONDARY_KEY=<your-secondary-key>
+NEXT_PUBLIC_WEBAPP_URL=<your-url>
+NEXT_PRIVATE_SMTP_TRANSPORT=smtp-auth
+NEXT_PRIVATE_SMTP_HOST=<your-host>
 NEXT_PRIVATE_SMTP_PORT=<your-port>
-NEXT_PRIVATE_SMTP_USERNAME="<your-username>"
-NEXT_PRIVATE_SMTP_PASSWORD="<your-password>"
+NEXT_PRIVATE_SMTP_USERNAME=<your-username>
+NEXT_PRIVATE_SMTP_PASSWORD=<your-password>
+NEXT_PRIVATE_SMTP_FROM_NAME=name <name@email>
+NEXT_PRIVATE_SMTP_FROM_ADDRESS=
+NEXT_PRIVATE_DATABASE_URL=postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@database/${POSTGRES_DB}
+NEXT_PRIVATE_DIRECT_DATABASE_URL=${NEXT_PRIVATE_DATABASE_URL}
 ```
 
-4. Update the volume binding for the cert file in the `compose.yml` file to point to your own key file:
-
-Since the `cert.p12` file is required for signing and encrypting documents, you will need to provide your own key file. Update the volume binding in the `compose.yml` file to point to your key file:
-
-```yaml
-volumes:
-  - /path/to/your/keyfile.p12:/opt/documenso/cert.p12
-```
-
-1. Run the following command to start the containers:
+### 4. Run the following command to start the containers:
 
 ```
-docker-compose --env-file ./.env up -d
+docker compose up -d
 ```
 
-This will start the PostgreSQL database and the Documenso application containers.
+Omit ``-d`` to view the stdout whilst the containers start. This can be useful for debugging.
 
-5. Access the Documenso application by visiting `http://localhost:3000` in your web browser.
+### 5. Access the application
 
-## Option 2: Standalone Docker Container
-
-If you prefer to host the Documenso application on your container provider of choice, you can use the pre-built Docker image from DockerHub or GitHub's Package Registry. Note that you will need to provide your own database and SMTP host.
-
-1. Pull the Documenso Docker image:
-
-```
-docker pull documenso/documenso
-```
-
-Or, if using GitHub's Package Registry:
-
-```
-docker pull ghcr.io/documenso/documenso
-```
-
-2. Run the Docker container, providing the necessary environment variables for your database and SMTP host:
-
-```
-docker run -d \
-  -p 3000:3000 \
-  -e NEXTAUTH_URL="<your-nextauth-url>"
-  -e NEXTAUTH_SECRET="<your-nextauth-secret>"
-  -e NEXT_PRIVATE_ENCRYPTION_KEY="<your-next-private-encryption-key>"
-  -e NEXT_PRIVATE_ENCRYPTION_SECONDARY_KEY="<your-next-private-encryption-secondary-key>"
-  -e NEXT_PUBLIC_WEBAPP_URL="<your-next-public-webapp-url>"
-  -e NEXT_PRIVATE_DATABASE_URL="<your-next-private-database-url>"
-  -e NEXT_PRIVATE_DIRECT_DATABASE_URL="<your-next-private-database-url>"
-  -e NEXT_PRIVATE_SMTP_TRANSPORT="<your-next-private-smtp-transport>"
-  -e NEXT_PRIVATE_SMTP_FROM_NAME="<your-next-private-smtp-from-name>"
-  -e NEXT_PRIVATE_SMTP_FROM_ADDRESS="<your-next-private-smtp-from-address>"
-  -v /path/to/your/keyfile.p12:/opt/documenso/cert.p12
-  documenso/documenso
-```
-
-Replace the placeholders with your actual database and SMTP details.
-
-1. Access the Documenso application by visiting the URL you provided in the `NEXT_PUBLIC_WEBAPP_URL` environment variable in your web browser.
+Access the Documenso application using the value specified in `NEXT_PUBLIC_WEBAPP_URL`, eg. `https://signing.example.com`
 
 ## Success
 
