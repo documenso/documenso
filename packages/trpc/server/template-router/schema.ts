@@ -20,6 +20,7 @@ export const ZCreateDocumentFromDirectTemplateMutationSchema = z.object({
   directRecipientName: z.string().optional(),
   directRecipientEmail: z.string().email(),
   directTemplateToken: z.string().min(1),
+  directTemplateExternalId: z.string().optional(),
   signedFieldValues: z.array(ZSignFieldWithTokenMutationSchema),
   templateUpdatedAt: z.date(),
 });
