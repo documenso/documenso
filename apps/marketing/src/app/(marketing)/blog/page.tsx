@@ -42,7 +42,7 @@ export default function BlogPage() {
           >
             <div className="flex items-center gap-x-4 text-xs">
               <time dateTime={post.date} className="text-muted-foreground">
-                <Trans>{i18n.date(new Date(), { dateStyle: 'short' })}</Trans>
+                <Trans>{i18n.date(new Date(post.date), { dateStyle: 'short' })}</Trans>
               </time>
 
               {post.tags.length > 0 && (
