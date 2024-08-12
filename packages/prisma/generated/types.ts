@@ -100,6 +100,7 @@ export type RecipientRole = (typeof RecipientRole)[keyof typeof RecipientRole];
 export const FieldType = {
   SIGNATURE: 'SIGNATURE',
   FREE_SIGNATURE: 'FREE_SIGNATURE',
+  INITIALS: 'INITIALS',
   NAME: 'NAME',
   EMAIL: 'EMAIL',
   DATE: 'DATE',
@@ -119,6 +120,7 @@ export type TeamMemberRole = (typeof TeamMemberRole)[keyof typeof TeamMemberRole
 export const TeamMemberInviteStatus = {
   ACCEPTED: 'ACCEPTED',
   PENDING: 'PENDING',
+  DECLINED: 'DECLINED',
 } as const;
 export type TeamMemberInviteStatus =
   (typeof TeamMemberInviteStatus)[keyof typeof TeamMemberInviteStatus];
@@ -127,6 +129,20 @@ export const TemplateType = {
   PRIVATE: 'PRIVATE',
 } as const;
 export type TemplateType = (typeof TemplateType)[keyof typeof TemplateType];
+export const BackgroundJobStatus = {
+  PENDING: 'PENDING',
+  PROCESSING: 'PROCESSING',
+  COMPLETED: 'COMPLETED',
+  FAILED: 'FAILED',
+} as const;
+export type BackgroundJobStatus = (typeof BackgroundJobStatus)[keyof typeof BackgroundJobStatus];
+export const BackgroundJobTaskStatus = {
+  PENDING: 'PENDING',
+  COMPLETED: 'COMPLETED',
+  FAILED: 'FAILED',
+} as const;
+export type BackgroundJobTaskStatus =
+  (typeof BackgroundJobTaskStatus)[keyof typeof BackgroundJobTaskStatus];
 export type Account = {
   id: string;
   userId: number;
@@ -159,8 +175,39 @@ export type ApiToken = {
   userId: number | null;
   teamId: number | null;
 };
+export type AvatarImage = {
+  id: string;
+  bytes: string;
+};
+export type BackgroundJob = {
+  id: string;
+  status: Generated<BackgroundJobStatus>;
+  payload: unknown | null;
+  retried: Generated<number>;
+  maxRetries: Generated<number>;
+  jobId: string;
+  name: string;
+  version: string;
+  submittedAt: Generated<Timestamp>;
+  updatedAt: Timestamp;
+  completedAt: Timestamp | null;
+  lastRetriedAt: Timestamp | null;
+};
+export type BackgroundJobTask = {
+  id: string;
+  name: string;
+  status: Generated<BackgroundJobTaskStatus>;
+  result: unknown | null;
+  retried: Generated<number>;
+  maxRetries: Generated<number>;
+  createdAt: Generated<Timestamp>;
+  updatedAt: Timestamp;
+  completedAt: Timestamp | null;
+  jobId: string;
+};
 export type Document = {
   id: Generated<number>;
+  externalId: string | null;
   userId: number;
   authOptions: unknown | null;
   formValues: unknown | null;
@@ -302,6 +349,7 @@ export type Team = {
   name: string;
   url: string;
   createdAt: Generated<Timestamp>;
+  avatarImageId: string | null;
   customerId: string | null;
   ownerUserId: number;
 };
@@ -343,6 +391,12 @@ export type TeamPending = {
   customerId: string;
   ownerUserId: number;
 };
+export type TeamProfile = {
+  id: string;
+  enabled: Generated<boolean>;
+  teamId: number;
+  bio: string | null;
+};
 export type TeamTransferVerification = {
   teamId: number;
   userId: number;
@@ -355,6 +409,7 @@ export type TeamTransferVerification = {
 };
 export type Template = {
   id: Generated<number>;
+  externalId: string | null;
   type: Generated<TemplateType>;
   title: string;
   userId: number;
@@ -363,6 +418,8 @@ export type Template = {
   templateDocumentDataId: string;
   createdAt: Generated<Timestamp>;
   updatedAt: Generated<Timestamp>;
+  publicTitle: Generated<string>;
+  publicDescription: Generated<string>;
 };
 export type TemplateDirectLink = {
   id: string;
@@ -396,13 +453,16 @@ export type User = {
   lastSignedIn: Generated<Timestamp>;
   roles: Generated<Role[]>;
   identityProvider: Generated<IdentityProvider>;
+  avatarImageId: string | null;
   twoFactorSecret: string | null;
   twoFactorEnabled: Generated<boolean>;
   twoFactorBackupCodes: string | null;
   url: string | null;
 };
 export type UserProfile = {
-  id: number;
+  id: string;
+  enabled: Generated<boolean>;
+  userId: number;
   bio: string | null;
 };
 export type UserSecurityAuditLog = {
@@ -449,6 +509,9 @@ export type DB = {
   Account: Account;
   AnonymousVerificationToken: AnonymousVerificationToken;
   ApiToken: ApiToken;
+  AvatarImage: AvatarImage;
+  BackgroundJob: BackgroundJob;
+  BackgroundJobTask: BackgroundJobTask;
   Document: Document;
   DocumentAuditLog: DocumentAuditLog;
   DocumentData: DocumentData;
@@ -468,6 +531,7 @@ export type DB = {
   TeamMember: TeamMember;
   TeamMemberInvite: TeamMemberInvite;
   TeamPending: TeamPending;
+  TeamProfile: TeamProfile;
   TeamTransferVerification: TeamTransferVerification;
   Template: Template;
   TemplateDirectLink: TemplateDirectLink;

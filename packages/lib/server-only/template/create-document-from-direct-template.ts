@@ -468,6 +468,7 @@ export const createDocumentFromDirectTemplate = async ({
               .with(
                 FieldType.DATE,
                 FieldType.EMAIL,
+                FieldType.INITIALS,
                 FieldType.NAME,
                 FieldType.TEXT,
                 FieldType.NUMBER,
