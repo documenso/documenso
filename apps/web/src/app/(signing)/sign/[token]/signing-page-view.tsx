@@ -26,6 +26,7 @@ import { DateField } from './date-field';
 import { DropdownField } from './dropdown-field';
 import { EmailField } from './email-field';
 import { SigningForm } from './form';
+import { InitialsField } from './initials-field';
 import { NameField } from './name-field';
 import { NumberField } from './number-field';
 import { RadioField } from './radio-field';
@@ -100,6 +101,9 @@ export const SigningPageView = ({
           match(field.type)
             .with(FieldType.SIGNATURE, () => (
               <SignatureField key={field.id} field={field} recipient={recipient} />
+            ))
+            .with(FieldType.INITIALS, () => (
+              <InitialsField key={field.id} field={field} recipient={recipient} />
             ))
             .with(FieldType.NAME, () => (
               <NameField key={field.id} field={field} recipient={recipient} />

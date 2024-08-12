@@ -234,6 +234,10 @@ export const ZDocumentAuditLogEventDocumentFieldInsertedSchema = z.object({
     // Organised into union to allow us to extend each field if required.
     field: z.union([
       z.object({
+        type: z.literal(FieldType.INITIALS),
+        data: z.string(),
+      }),
+      z.object({
         type: z.literal(FieldType.EMAIL),
         data: z.string(),
       }),

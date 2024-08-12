@@ -414,7 +414,7 @@ export const documentRouter = router({
           teamId,
         }).catch(() => null);
 
-        if (!document || document.teamId !== teamId) {
+        if (!document || (teamId && document.teamId !== teamId)) {
           throw new TRPCError({
             code: 'FORBIDDEN',
             message: 'You do not have access to this document.',

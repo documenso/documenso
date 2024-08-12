@@ -10,6 +10,7 @@ import {
   CheckSquare,
   ChevronDown,
   ChevronsUpDown,
+  Contact,
   Disc,
   Hash,
   Info,
@@ -653,6 +654,32 @@ export const AddFieldsFormPartial = ({
                   <button
                     type="button"
                     className="group h-full w-full"
+                    onClick={() => setSelectedField(FieldType.INITIALS)}
+                    onMouseDown={() => setSelectedField(FieldType.INITIALS)}
+                    data-selected={selectedField === FieldType.INITIALS ? true : undefined}
+                  >
+                    <Card
+                      className={cn(
+                        'flex h-full w-full cursor-pointer items-center justify-center group-disabled:opacity-50',
+                        // selectedSignerStyles.borderClass,
+                      )}
+                    >
+                      <CardContent className="flex flex-col items-center justify-center px-6 py-4">
+                        <p
+                          className={cn(
+                            'text-muted-foreground group-data-[selected]:text-foreground flex items-center justify-center gap-x-1.5 text-sm font-normal',
+                          )}
+                        >
+                          <Contact className="h-4 w-4" />
+                          Initials
+                        </p>
+                      </CardContent>
+                    </Card>
+                  </button>
+
+                  <button
+                    type="button"
+                    className="group h-full w-full"
                     onClick={() => setSelectedField(FieldType.EMAIL)}
                     onMouseDown={() => setSelectedField(FieldType.EMAIL)}
                     data-selected={selectedField === FieldType.EMAIL ? true : undefined}
@@ -663,7 +690,7 @@ export const AddFieldsFormPartial = ({
                         // selectedSignerStyles.borderClass,
                       )}
                     >
-                      <CardContent className="p-4">
+                      <CardContent className="flex flex-col items-center justify-center px-6 py-4">
                         <p
                           className={cn(
                             'text-muted-foreground group-data-[selected]:text-foreground flex items-center justify-center gap-x-1.5 text-sm font-normal',
