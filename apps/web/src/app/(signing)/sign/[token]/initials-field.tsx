@@ -116,8 +116,6 @@ export const InitialsField = ({
     }
   };
 
-  console.log('recipient', recipient);
-  console.log('extractInitials', initials);
   return (
     <SigningFieldContainer field={field} onSign={onSign} onRemove={onRemove} type="Initials">
       {isLoading && (
