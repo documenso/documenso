@@ -41,6 +41,7 @@ import { CheckboxField } from '~/app/(signing)/sign/[token]/checkbox-field';
 import { DateField } from '~/app/(signing)/sign/[token]/date-field';
 import { DropdownField } from '~/app/(signing)/sign/[token]/dropdown-field';
 import { EmailField } from '~/app/(signing)/sign/[token]/email-field';
+import { InitialsField } from '~/app/(signing)/sign/[token]/initials-field';
 import { NameField } from '~/app/(signing)/sign/[token]/name-field';
 import { NumberField } from '~/app/(signing)/sign/[token]/number-field';
 import { useRequiredSigningContext } from '~/app/(signing)/sign/[token]/provider';
@@ -175,6 +176,15 @@ export const SignDirectTemplateForm = ({
             match(field.type)
               .with(FieldType.SIGNATURE, () => (
                 <SignatureField
+                  key={field.id}
+                  field={field}
+                  recipient={directRecipient}
+                  onSignField={onSignField}
+                  onUnsignField={onUnsignField}
+                />
+              ))
+              .with(FieldType.INITIALS, () => (
+                <InitialsField
                   key={field.id}
                   field={field}
                   recipient={directRecipient}
