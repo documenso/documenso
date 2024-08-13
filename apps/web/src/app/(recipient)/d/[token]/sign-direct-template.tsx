@@ -79,6 +79,7 @@ export const SignDirectTemplateForm = ({
   const { currentStep, totalSteps, previousStep } = useStep();
 
   const onSignField = (value: TSignFieldWithTokenMutationSchema) => {
+    console.log('onSignField value:', value.value);
     setLocalFields(
       localFields.map((field) => {
         if (field.id !== value.fieldId) {
@@ -207,7 +208,6 @@ export const SignDirectTemplateForm = ({
                   dateFormat={template.templateMeta?.dateFormat ?? DEFAULT_DOCUMENT_DATE_FORMAT}
                   timezone={template.templateMeta?.timezone ?? DEFAULT_DOCUMENT_TIME_ZONE}
                   onSignField={onSignField}
-                  onUnsignField={onUnsignField}
                 />
               ))
               .with(FieldType.EMAIL, () => (
