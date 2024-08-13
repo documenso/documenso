@@ -135,7 +135,6 @@ export const AddSignersFormPartial = ({
   const {
     append: appendSigner,
     fields: signers,
-    update,
     remove: removeSigner,
   } = useFieldArray({
     control,
@@ -216,28 +215,56 @@ export const AddSignersFormPartial = ({
     }
   };
 
-  const onDragEnd = (result: DropResult) => {
+  const onDragEnd = async (result: DropResult) => {
     if (!result.destination) return;
 
-    const items = Array.from(signers);
-    const [reorderedItem] = items.splice(result.source.index, 1);
+    const items = Array.from(watchedSigners);
+    const [reorderedSigner] = items.splice(result.source.index, 1);
 
-    // Find the correct insertion index, skipping over sent signers
     let insertIndex = result.destination.index;
     while (insertIndex < items.length && hasBeenSentToRecipientId(items[insertIndex].nativeId)) {
       insertIndex++;
     }
 
-    items.splice(insertIndex, 0, reorderedItem);
+    items.splice(insertIndex, 0, reorderedSigner);
 
-    const updatedItems = items.map((item, index) => ({
+    const updatedSigners = items.map((item, index) => ({
       ...item,
       signingOrder: hasBeenSentToRecipientId(item.nativeId) ? item.signingOrder : index + 1,
     }));
 
-    console.log('updatedItems', updatedItems);
+    updatedSigners.forEach((item, index) => {
+      const keys: (keyof typeof item)[] = [
+        'formId',
+        'nativeId',
+        'email',
+        'name',
+        'role',
+        'signingOrder',
+        'actionAuth',
+      ];
+      keys.forEach((key) => {
+        form.setValue(`signers.${index}.${key}` as const, item[key]);
+      });
+    });
 
-    form.setValue('signers', updatedItems);
+    // updatedSigners.forEach((signer, index) => {
+    //   Object.keys(signer).forEach((key) => {
+    //     form.setValue(
+    //       `signers.${index}.${key as keyof typeof signer}`,
+    //       signer[key as keyof typeof signer],
+    //     );
+    //   });
+    // });
+
+    const currentLength = form.getValues('signers').length;
+    if (currentLength > updatedSigners.length) {
+      for (let i = updatedSigners.length; i < currentLength; i++) {
+        form.unregister(`signers.${i}`);
+      }
+    }
+
+    await form.trigger('signers');
   };
 
   return (
