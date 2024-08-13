@@ -43,8 +43,6 @@ export const completeDocumentWithToken = async ({
   documentId,
   requestMetadata,
 }: CompleteDocumentWithTokenOptions) => {
-  'use server';
-
   const document = await getDocument({ token, documentId });
 
   if (document.status !== DocumentStatus.PENDING) {

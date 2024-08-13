@@ -1,6 +1,5 @@
 import { DateTime } from 'luxon';
 import type { Browser } from 'playwright';
-import { chromium } from 'playwright';
 
 import { NEXT_PUBLIC_WEBAPP_URL } from '../../constants/app';
 import { encryptSecondaryData } from '../crypto/encrypt';
@@ -10,6 +9,8 @@ export type GetCertificatePdfOptions = {
 };
 
 export const getCertificatePdf = async ({ documentId }: GetCertificatePdfOptions) => {
+  const { chromium } = await import('playwright');
+
   const encryptedId = encryptSecondaryData({
     data: documentId.toString(),
     expiresAt: DateTime.now().plus({ minutes: 5 }).toJSDate().valueOf(),

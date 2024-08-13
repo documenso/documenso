@@ -6,7 +6,7 @@ import { prisma } from '@documenso/prisma';
 import { DocumentStatus, RecipientRole, SendStatus, SigningStatus } from '@documenso/prisma/client';
 import { WebhookTriggerEvents } from '@documenso/prisma/client';
 
-import { jobs, jobsClient } from '../../jobs/client';
+import { jobs } from '../../jobs/client';
 import { getFile } from '../../universal/upload/get-file';
 import { insertFormValuesInPdf } from '../pdf/insert-form-values-in-pdf';
 import { triggerWebhook } from '../webhooks/trigger/trigger-webhook';
@@ -140,7 +140,7 @@ export const sendDocument = async ({
           return;
         }
 
-        await jobsClient.triggerJob({
+        await jobs.triggerJob({
           name: 'send.signing.requested.email',
           payload: {
             userId,
