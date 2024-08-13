@@ -1,4 +1,3 @@
-import { sealDocument } from '@documenso/lib/server-only/document/seal-document';
 import { DOCUMENT_AUDIT_LOG_TYPE } from '@documenso/lib/types/document-audit-logs';
 import type { RequestMetadata } from '@documenso/lib/universal/extract-request-metadata';
 import { putPdfFile } from '@documenso/lib/universal/upload/put-file';
@@ -7,7 +6,7 @@ import { prisma } from '@documenso/prisma';
 import { DocumentStatus, RecipientRole, SendStatus, SigningStatus } from '@documenso/prisma/client';
 import { WebhookTriggerEvents } from '@documenso/prisma/client';
 
-import { jobsClient } from '../../jobs/client';
+import { jobs, jobsClient } from '../../jobs/client';
 import { getFile } from '../../universal/upload/get-file';
 import { insertFormValuesInPdf } from '../pdf/insert-form-values-in-pdf';
 import { triggerWebhook } from '../webhooks/trigger/trigger-webhook';
@@ -160,7 +159,13 @@ export const sendDocument = async ({
   );
 
   if (allRecipientsHaveNoActionToTake) {
-    await sealDocument({ documentId, requestMetadata });
+    await jobs.triggerJob({
+      name: 'internal.seal-document',
+      payload: {
+        documentId,
+        requestMetadata,
+      },
+    });
 
     // Keep the return type the same for the `sendDocument` method
     return await prisma.document.findFirstOrThrow({
