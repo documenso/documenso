@@ -1,6 +1,6 @@
 'use client';
 
-import { useTransition } from 'react';
+import { useEffect, useTransition } from 'react';
 
 import { useRouter } from 'next/navigation';
 
@@ -23,6 +23,7 @@ import type {
 } from '@documenso/trpc/server/field-router/schema';
 import { useToast } from '@documenso/ui/primitives/use-toast';
 
+import { useRequiredDocumentAuthContext } from './document-auth-provider';
 import { SigningFieldContainer } from './signing-field-container';
 
 export type DateFieldProps = {
@@ -40,7 +41,6 @@ export const DateField = ({
   dateFormat = DEFAULT_DOCUMENT_DATE_FORMAT,
   timezone = DEFAULT_DOCUMENT_TIME_ZONE,
   onSignField,
-  onUnsignField,
 }: DateFieldProps) => {
   const router = useRouter();
 
@@ -51,12 +51,12 @@ export const DateField = ({
   const { mutateAsync: signFieldWithToken, isLoading: isSignFieldWithTokenLoading } =
     trpc.field.signFieldWithToken.useMutation(DO_NOT_INVALIDATE_QUERY_ON_MUTATION);
 
-  const {
-    mutateAsync: removeSignedFieldWithToken,
-    isLoading: isRemoveSignedFieldWithTokenLoading,
-  } = trpc.field.removeSignedFieldWithToken.useMutation(DO_NOT_INVALIDATE_QUERY_ON_MUTATION);
+  const { isLoading: isRemoveSignedFieldWithTokenLoading } =
+    trpc.field.removeSignedFieldWithToken.useMutation(DO_NOT_INVALIDATE_QUERY_ON_MUTATION);
 
   const isLoading = isSignFieldWithTokenLoading || isRemoveSignedFieldWithTokenLoading || isPending;
+
+  const { executeActionAuthProcedure } = useRequiredDocumentAuthContext();
 
   const localDateString = convertToLocalSystemFormat(field.customText, dateFormat, timezone);
 
@@ -98,37 +98,18 @@ export const DateField = ({
     }
   };
 
-  const onRemove = async () => {
-    try {
-      const payload: TRemovedSignedFieldWithTokenMutationSchema = {
-        token: recipient.token,
-        fieldId: field.id,
-      };
-
-      if (onUnsignField) {
-        await onUnsignField(payload);
-        return;
-      }
-
-      await removeSignedFieldWithToken(payload);
-
-      startTransition(() => router.refresh());
-    } catch (err) {
-      console.error(err);
-
-      toast({
-        title: 'Error',
-        description: 'An error occurred while removing the signature.',
-        variant: 'destructive',
+  useEffect(() => {
+    if (!field.inserted) {
+      void executeActionAuthProcedure({
+        onReauthFormSubmit: async (authOptions) => await onSign(authOptions),
+        actionTarget: field.type,
       });
     }
-  };
+  }, [field]);
 
   return (
     <SigningFieldContainer
       field={field}
-      onSign={onSign}
-      onRemove={onRemove}
       type="Date"
       tooltipText={isDifferentTime ? tooltipText : undefined}
     >

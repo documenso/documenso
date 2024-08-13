@@ -189,7 +189,6 @@ export const SignDirectTemplateForm = ({
                   field={field}
                   recipient={directRecipient}
                   onSignField={onSignField}
-                  onUnsignField={onUnsignField}
                 />
               ))
               .with(FieldType.NAME, () => (
@@ -198,7 +197,6 @@ export const SignDirectTemplateForm = ({
                   field={field}
                   recipient={directRecipient}
                   onSignField={onSignField}
-                  onUnsignField={onUnsignField}
                 />
               ))
               .with(FieldType.DATE, () => (
@@ -218,7 +216,6 @@ export const SignDirectTemplateForm = ({
                   field={field}
                   recipient={directRecipient}
                   onSignField={onSignField}
-                  onUnsignField={onUnsignField}
                 />
               ))
               .with(FieldType.TEXT, () => {

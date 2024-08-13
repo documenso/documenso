@@ -1,6 +1,6 @@
 'use client';
 
-import { useTransition } from 'react';
+import { useEffect, useTransition } from 'react';
 
 import { useRouter } from 'next/navigation';
 
@@ -12,12 +12,10 @@ import type { TRecipientActionAuth } from '@documenso/lib/types/document-auth';
 import type { Recipient } from '@documenso/prisma/client';
 import type { FieldWithSignature } from '@documenso/prisma/types/field-with-signature';
 import { trpc } from '@documenso/trpc/react';
-import type {
-  TRemovedSignedFieldWithTokenMutationSchema,
-  TSignFieldWithTokenMutationSchema,
-} from '@documenso/trpc/server/field-router/schema';
+import type { TSignFieldWithTokenMutationSchema } from '@documenso/trpc/server/field-router/schema';
 import { useToast } from '@documenso/ui/primitives/use-toast';
 
+import { useRequiredDocumentAuthContext } from './document-auth-provider';
 import { useRequiredSigningContext } from './provider';
 import { SigningFieldContainer } from './signing-field-container';
 
@@ -25,10 +23,9 @@ export type EmailFieldProps = {
   field: FieldWithSignature;
   recipient: Recipient;
   onSignField?: (value: TSignFieldWithTokenMutationSchema) => Promise<void> | void;
-  onUnsignField?: (value: TRemovedSignedFieldWithTokenMutationSchema) => Promise<void> | void;
 };
 
-export const EmailField = ({ field, recipient, onSignField, onUnsignField }: EmailFieldProps) => {
+export const EmailField = ({ field, recipient, onSignField }: EmailFieldProps) => {
   const router = useRouter();
 
   const { toast } = useToast();
@@ -40,12 +37,12 @@ export const EmailField = ({ field, recipient, onSignField, onUnsignField }: Ema
   const { mutateAsync: signFieldWithToken, isLoading: isSignFieldWithTokenLoading } =
     trpc.field.signFieldWithToken.useMutation(DO_NOT_INVALIDATE_QUERY_ON_MUTATION);
 
-  const {
-    mutateAsync: removeSignedFieldWithToken,
-    isLoading: isRemoveSignedFieldWithTokenLoading,
-  } = trpc.field.removeSignedFieldWithToken.useMutation(DO_NOT_INVALIDATE_QUERY_ON_MUTATION);
+  const { isLoading: isRemoveSignedFieldWithTokenLoading } =
+    trpc.field.removeSignedFieldWithToken.useMutation(DO_NOT_INVALIDATE_QUERY_ON_MUTATION);
 
   const isLoading = isSignFieldWithTokenLoading || isRemoveSignedFieldWithTokenLoading || isPending;
+
+  const { executeActionAuthProcedure } = useRequiredDocumentAuthContext();
 
   const onSign = async (authOptions?: TRecipientActionAuth) => {
     try {
@@ -84,34 +81,17 @@ export const EmailField = ({ field, recipient, onSignField, onUnsignField }: Ema
     }
   };
 
-  const onRemove = async () => {
-    try {
-      const payload: TRemovedSignedFieldWithTokenMutationSchema = {
-        token: recipient.token,
-        fieldId: field.id,
-      };
-
-      if (onUnsignField) {
-        await onUnsignField(payload);
-        return;
-      }
-
-      await removeSignedFieldWithToken(payload);
-
-      startTransition(() => router.refresh());
-    } catch (err) {
-      console.error(err);
-
-      toast({
-        title: 'Error',
-        description: 'An error occurred while removing the signature.',
-        variant: 'destructive',
+  useEffect(() => {
+    if (!field.inserted) {
+      void executeActionAuthProcedure({
+        onReauthFormSubmit: async (authOptions) => await onSign(authOptions),
+        actionTarget: field.type,
       });
     }
-  };
+  }, [field]);
 
   return (
-    <SigningFieldContainer field={field} onSign={onSign} onRemove={onRemove} type="Email">
+    <SigningFieldContainer field={field} type="Email">
       {isLoading && (
         <div className="bg-background absolute inset-0 flex items-center justify-center rounded-md">
           <Loader className="text-primary h-5 w-5 animate-spin md:h-8 md:w-8" />

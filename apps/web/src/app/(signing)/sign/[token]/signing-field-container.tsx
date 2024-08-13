@@ -67,6 +67,8 @@ export const SigningFieldContainer = ({
   const parsedFieldMeta = field.fieldMeta ? ZFieldMetaSchema.parse(field.fieldMeta) : undefined;
   const readOnlyField = parsedFieldMeta?.readOnly || false;
 
+  const automatedFields = ['Initials', 'Email', 'Name', 'Date'].includes(type ?? '');
+
   const handleInsertField = async () => {
     if (field.inserted || !onSign) {
       return;
@@ -171,14 +173,18 @@ export const SigningFieldContainer = ({
           </button>
         )}
 
-        {type !== 'Date' && type !== 'Checkbox' && field.inserted && !loading && !readOnlyField && (
-          <button
-            className="text-destructive bg-background/50 absolute inset-0 z-10 flex h-full w-full items-center justify-center rounded-md text-sm opacity-0 duration-200 group-hover:opacity-100"
-            onClick={onRemoveSignedFieldClick}
-          >
-            Remove
-          </button>
-        )}
+        {type !== 'Checkbox' &&
+          !automatedFields &&
+          field.inserted &&
+          !loading &&
+          !readOnlyField && (
+            <button
+              className="text-destructive bg-background/50 absolute inset-0 z-10 flex h-full w-full items-center justify-center rounded-md text-sm opacity-0 duration-200 group-hover:opacity-100"
+              onClick={onRemoveSignedFieldClick}
+            >
+              Remove
+            </button>
+          )}
 
         {children}
       </FieldRootContainer>
