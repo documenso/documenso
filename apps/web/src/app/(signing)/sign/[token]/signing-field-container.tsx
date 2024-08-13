@@ -173,18 +173,14 @@ export const SigningFieldContainer = ({
           </button>
         )}
 
-        {type !== 'Checkbox' &&
-          !automatedFields &&
-          field.inserted &&
-          !loading &&
-          !readOnlyField && (
-            <button
-              className="text-destructive bg-background/50 absolute inset-0 z-10 flex h-full w-full items-center justify-center rounded-md text-sm opacity-0 duration-200 group-hover:opacity-100"
-              onClick={onRemoveSignedFieldClick}
-            >
-              Remove
-            </button>
-          )}
+        {type !== 'Checkbox' && field.inserted && !loading && !readOnlyField && (
+          <button
+            className="text-destructive bg-background/50 absolute inset-0 z-10 flex h-full w-full items-center justify-center rounded-md text-sm opacity-0 duration-200 group-hover:opacity-100"
+            onClick={onRemoveSignedFieldClick}
+          >
+            Remove
+          </button>
+        )}
 
         {children}
       </FieldRootContainer>

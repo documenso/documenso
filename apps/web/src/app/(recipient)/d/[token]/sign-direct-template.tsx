@@ -79,7 +79,6 @@ export const SignDirectTemplateForm = ({
   const { currentStep, totalSteps, previousStep } = useStep();
 
   const onSignField = (value: TSignFieldWithTokenMutationSchema) => {
-    console.log('onSignField value:', value.value);
     setLocalFields(
       localFields.map((field) => {
         if (field.id !== value.fieldId) {
