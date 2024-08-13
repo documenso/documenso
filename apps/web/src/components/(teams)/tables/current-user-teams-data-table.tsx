@@ -3,6 +3,9 @@
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 
+import { Trans, msg } from '@lingui/macro';
+import { useLingui } from '@lingui/react';
+
 import { useUpdateSearchParams } from '@documenso/lib/client-only/hooks/use-update-search-params';
 import { NEXT_PUBLIC_WEBAPP_URL, WEBAPP_BASE_URL } from '@documenso/lib/constants/app';
 import { TEAM_MEMBER_ROLE_MAP } from '@documenso/lib/constants/teams';
@@ -21,6 +24,8 @@ import { LocaleDate } from '~/components/formatter/locale-date';
 import { LeaveTeamDialog } from '../dialogs/leave-team-dialog';
 
 export const CurrentUserTeamsDataTable = () => {
+  const { _ } = useLingui();
+
   const searchParams = useSearchParams();
   const updateSearchParams = useUpdateSearchParams();
 
@@ -57,7 +62,7 @@ export const CurrentUserTeamsDataTable = () => {
     <DataTable
       columns={[
         {
-          header: 'Team',
+          header: _(msg`Team`),
           accessorKey: 'name',
           cell: ({ row }) => (
             <Link href={`/t/${row.original.url}`} scroll={false}>
@@ -74,15 +79,15 @@ export const CurrentUserTeamsDataTable = () => {
           ),
         },
         {
-          header: 'Role',
+          header: _(msg`Role`),
           accessorKey: 'role',
           cell: ({ row }) =>
             row.original.ownerUserId === row.original.currentTeamMember.userId
               ? 'Owner'
-              : TEAM_MEMBER_ROLE_MAP[row.original.currentTeamMember.role],
+              : _(TEAM_MEMBER_ROLE_MAP[row.original.currentTeamMember.role]),
         },
         {
-          header: 'Member Since',
+          header: _(msg`Member Since`),
           accessorKey: 'createdAt',
           cell: ({ row }) => <LocaleDate date={row.original.createdAt} />,
         },
@@ -92,7 +97,9 @@ export const CurrentUserTeamsDataTable = () => {
             <div className="flex justify-end space-x-2">
               {canExecuteTeamAction('MANAGE_TEAM', row.original.currentTeamMember.role) && (
                 <Button variant="outline" asChild>
-                  <Link href={`/t/${row.original.url}/settings`}>Manage</Link>
+                  <Link href={`/t/${row.original.url}/settings`}>
+                    <Trans>Manage</Trans>
+                  </Link>
                 </Button>
               )}
 
@@ -107,7 +114,7 @@ export const CurrentUserTeamsDataTable = () => {
                     disabled={row.original.ownerUserId === row.original.currentTeamMember.userId}
                     onSelect={(e) => e.preventDefault()}
                   >
-                    Leave
+                    <Trans>Leave</Trans>
                   </Button>
                 }
               />

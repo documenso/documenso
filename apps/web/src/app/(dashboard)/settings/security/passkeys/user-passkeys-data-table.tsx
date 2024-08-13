@@ -2,6 +2,8 @@
 
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 
+import { msg } from '@lingui/macro';
+import { useLingui } from '@lingui/react';
 import { DateTime } from 'luxon';
 
 import { useUpdateSearchParams } from '@documenso/lib/client-only/hooks/use-update-search-params';
@@ -15,6 +17,8 @@ import { TableCell } from '@documenso/ui/primitives/table';
 import { UserPasskeysDataTableActions } from './user-passkeys-data-table-actions';
 
 export const UserPasskeysDataTable = () => {
+  const { _ } = useLingui();
+
   const pathname = usePathname();
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -52,22 +56,22 @@ export const UserPasskeysDataTable = () => {
     <DataTable
       columns={[
         {
-          header: 'Name',
+          header: _(msg`Name`),
           accessorKey: 'name',
         },
         {
-          header: 'Created',
+          header: _(msg`Created`),
           accessorKey: 'createdAt',
           cell: ({ row }) => DateTime.fromJSDate(row.original.createdAt).toRelative(),
         },
 
         {
-          header: 'Last used',
+          header: _(msg`Last used`),
           accessorKey: 'updatedAt',
           cell: ({ row }) =>
             row.original.lastUsedAt
               ? DateTime.fromJSDate(row.original.lastUsedAt).toRelative()
-              : 'Never',
+              : msg`Never`,
         },
         {
           id: 'actions',

@@ -5,6 +5,8 @@ import React, { useState } from 'react';
 import Image from 'next/image';
 
 import { zodResolver } from '@hookform/resolvers/zod';
+import { msg } from '@lingui/macro';
+import { useLingui } from '@lingui/react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 
@@ -61,6 +63,7 @@ export const ClaimPublicProfileDialogForm = ({
   onClaimed,
   user,
 }: ClaimPublicProfileDialogFormProps) => {
+  const { _ } = useLingui();
   const { toast } = useToast();
 
   const [claimed, setClaimed] = useState(false);
@@ -92,7 +95,7 @@ export const ClaimPublicProfileDialogForm = ({
       if (error.code === AppErrorCode.PROFILE_URL_TAKEN) {
         form.setError('url', {
           type: 'manual',
-          message: 'This username is already taken',
+          message: _(msg`This username is already taken`),
         });
       } else if (error.code === AppErrorCode.PREMIUM_PROFILE_URL) {
         form.setError('url', {
@@ -107,10 +110,11 @@ export const ClaimPublicProfileDialogForm = ({
         });
       } else {
         toast({
-          title: 'An unknown error occurred',
+          title: _(msg`An unknown error occurred`),
+          description: _(
+            msg`We encountered an unknown error while attempting to save your details. Please try again later.`,
+          ),
           variant: 'destructive',
-          description:
-            'We encountered an unknown error while attempting to save your details. Please try again later.',
         });
       }
     }

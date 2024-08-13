@@ -3,6 +3,7 @@
 import { useState } from 'react';
 
 import { zodResolver } from '@hookform/resolvers/zod';
+import { Trans } from '@lingui/macro';
 import { useForm } from 'react-hook-form';
 import { match } from 'ts-pattern';
 import { z } from 'zod';
@@ -73,17 +74,23 @@ export const ViewRecoveryCodesDialog = () => {
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
-        <Button className="flex-shrink-0">View Codes</Button>
+        <Button className="flex-shrink-0">
+          <Trans>View Codes</Trans>
+        </Button>
       </DialogTrigger>
 
       <DialogContent className="w-full max-w-xl md:max-w-xl lg:max-w-xl">
         {recoveryCodes ? (
           <div>
             <DialogHeader className="mb-4">
-              <DialogTitle>View Recovery Codes</DialogTitle>
+              <DialogTitle>
+                <Trans>View Recovery Codes</Trans>
+              </DialogTitle>
 
               <DialogDescription>
-                Your recovery codes are listed below. Please store them in a safe place.
+                <Trans>
+                  Your recovery codes are listed below. Please store them in a safe place.
+                </Trans>
               </DialogDescription>
             </DialogHeader>
 
@@ -91,20 +98,26 @@ export const ViewRecoveryCodesDialog = () => {
 
             <DialogFooter className="mt-4">
               <DialogClose asChild>
-                <Button variant="secondary">Close</Button>
+                <Button variant="secondary">
+                  <Trans>Close</Trans>
+                </Button>
               </DialogClose>
 
-              <Button onClick={downloadRecoveryCodes}>Download</Button>
+              <Button onClick={downloadRecoveryCodes}>
+                <Trans>Download</Trans>
+              </Button>
             </DialogFooter>
           </div>
         ) : (
           <Form {...viewRecoveryCodesForm}>
             <form onSubmit={viewRecoveryCodesForm.handleSubmit((value) => mutate(value))}>
               <DialogHeader className="mb-4">
-                <DialogTitle>View Recovery Codes</DialogTitle>
+                <DialogTitle>
+                  <Trans>View Recovery Codes</Trans>
+                </DialogTitle>
 
                 <DialogDescription>
-                  Please provide a token from your authenticator, or a backup code.
+                  <Trans>Please provide a token from your authenticator, or a backup code.</Trans>
                 </DialogDescription>
               </DialogHeader>
 
@@ -134,13 +147,12 @@ export const ViewRecoveryCodesDialog = () => {
                   <Alert variant="destructive">
                     <AlertDescription>
                       {match(AppError.parseError(error).message)
-                        .with(
-                          ErrorCode.INCORRECT_TWO_FACTOR_CODE,
-                          () => 'Invalid code. Please try again.',
-                        )
-                        .otherwise(
-                          () => 'Something went wrong. Please try again or contact support.',
-                        )}
+                        .with(ErrorCode.INCORRECT_TWO_FACTOR_CODE, () => (
+                          <Trans>Invalid code. Please try again.</Trans>
+                        ))
+                        .otherwise(() => (
+                          <Trans>Something went wrong. Please try again or contact support.</Trans>
+                        ))}
                     </AlertDescription>
                   </Alert>
                 )}
@@ -148,12 +160,12 @@ export const ViewRecoveryCodesDialog = () => {
                 <DialogFooter>
                   <DialogClose asChild>
                     <Button type="button" variant="secondary">
-                      Cancel
+                      <Trans>Cancel</Trans>
                     </Button>
                   </DialogClose>
 
                   <Button type="submit" loading={isLoading}>
-                    View
+                    <Trans>View</Trans>
                   </Button>
                 </DialogFooter>
               </fieldset>

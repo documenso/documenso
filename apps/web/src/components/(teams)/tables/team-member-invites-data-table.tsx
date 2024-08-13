@@ -2,6 +2,8 @@
 
 import { useSearchParams } from 'next/navigation';
 
+import { Trans, msg } from '@lingui/macro';
+import { useLingui } from '@lingui/react';
 import { History, MoreHorizontal, Trash2 } from 'lucide-react';
 
 import { useUpdateSearchParams } from '@documenso/lib/client-only/hooks/use-update-search-params';
@@ -32,6 +34,7 @@ export const TeamMemberInvitesDataTable = ({ teamId }: TeamMemberInvitesDataTabl
   const searchParams = useSearchParams();
   const updateSearchParams = useUpdateSearchParams();
 
+  const { _ } = useLingui();
   const { toast } = useToast();
 
   const parsedSearchParams = ZBaseTableSearchParamsSchema.parse(
@@ -55,14 +58,14 @@ export const TeamMemberInvitesDataTable = ({ teamId }: TeamMemberInvitesDataTabl
     trpc.team.resendTeamMemberInvitation.useMutation({
       onSuccess: () => {
         toast({
-          title: 'Success',
-          description: 'Invitation has been resent',
+          title: _(msg`Success`),
+          description: _(msg`Invitation has been resent`),
         });
       },
       onError: () => {
         toast({
-          title: 'Something went wrong',
-          description: 'Unable to resend invitation. Please try again.',
+          title: _(msg`Something went wrong`),
+          description: _(msg`Unable to resend invitation. Please try again.`),
           variant: 'destructive',
         });
       },
@@ -72,14 +75,14 @@ export const TeamMemberInvitesDataTable = ({ teamId }: TeamMemberInvitesDataTabl
     trpc.team.deleteTeamMemberInvitations.useMutation({
       onSuccess: () => {
         toast({
-          title: 'Success',
-          description: 'Invitation has been deleted',
+          title: _(msg`Success`),
+          description: _(msg`Invitation has been deleted`),
         });
       },
       onError: () => {
         toast({
-          title: 'Something went wrong',
-          description: 'Unable to delete invitation. Please try again.',
+          title: _(msg`Something went wrong`),
+          description: _(msg`Unable to delete invitation. Please try again.`),
           variant: 'destructive',
         });
       },
@@ -103,7 +106,7 @@ export const TeamMemberInvitesDataTable = ({ teamId }: TeamMemberInvitesDataTabl
     <DataTable
       columns={[
         {
-          header: 'Team Member',
+          header: _(msg`Team Member`),
           cell: ({ row }) => {
             return (
               <AvatarWithText
@@ -117,17 +120,17 @@ export const TeamMemberInvitesDataTable = ({ teamId }: TeamMemberInvitesDataTabl
           },
         },
         {
-          header: 'Role',
+          header: _(msg`Role`),
           accessorKey: 'role',
-          cell: ({ row }) => TEAM_MEMBER_ROLE_MAP[row.original.role] ?? row.original.role,
+          cell: ({ row }) => _(TEAM_MEMBER_ROLE_MAP[row.original.role]) ?? row.original.role,
         },
         {
-          header: 'Invited At',
+          header: _(msg`Invited At`),
           accessorKey: 'createdAt',
           cell: ({ row }) => <LocaleDate date={row.original.createdAt} />,
         },
         {
-          header: 'Actions',
+          header: _(msg`Actions`),
           cell: ({ row }) => (
             <DropdownMenu>
               <DropdownMenuTrigger>
@@ -135,7 +138,9 @@ export const TeamMemberInvitesDataTable = ({ teamId }: TeamMemberInvitesDataTabl
               </DropdownMenuTrigger>
 
               <DropdownMenuContent className="w-52" align="start" forceMount>
-                <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                <DropdownMenuLabel>
+                  <Trans>Actions</Trans>
+                </DropdownMenuLabel>
 
                 <DropdownMenuItem
                   onClick={async () =>
@@ -146,7 +151,7 @@ export const TeamMemberInvitesDataTable = ({ teamId }: TeamMemberInvitesDataTabl
                   }
                 >
                   <History className="mr-2 h-4 w-4" />
-                  Resend
+                  <Trans>Resend</Trans>
                 </DropdownMenuItem>
 
                 <DropdownMenuItem
@@ -158,7 +163,7 @@ export const TeamMemberInvitesDataTable = ({ teamId }: TeamMemberInvitesDataTabl
                   }
                 >
                   <Trash2 className="mr-2 h-4 w-4" />
-                  Remove
+                  <Trans>Remove</Trans>
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>

@@ -3,6 +3,7 @@
 import { useMemo, useState } from 'react';
 
 import { zodResolver } from '@hookform/resolvers/zod';
+import { Trans } from '@lingui/macro';
 import { DateTime } from 'luxon';
 import { useForm } from 'react-hook-form';
 import { match } from 'ts-pattern';
@@ -267,7 +268,9 @@ export const AddSignatureFormPartial = ({
                 name="email"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel required>Email</FormLabel>
+                    <FormLabel required>
+                      <Trans>Email</Trans>
+                    </FormLabel>
                     <FormControl>
                       <Input
                         className="bg-background"
@@ -291,7 +294,9 @@ export const AddSignatureFormPartial = ({
                   name="name"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel required={requireName}>Name</FormLabel>
+                      <FormLabel required={requireName}>
+                        <Trans>Name</Trans>
+                      </FormLabel>
                       <FormControl>
                         <Input
                           className="bg-background"
@@ -314,7 +319,9 @@ export const AddSignatureFormPartial = ({
                   name="signature"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel required={requireSignature}>Signature</FormLabel>
+                      <FormLabel required={requireSignature}>
+                        <Trans>Signature</Trans>
+                      </FormLabel>
                       <FormControl>
                         <Card
                           className={cn('mt-2', {
@@ -349,7 +356,9 @@ export const AddSignatureFormPartial = ({
                   name="customText"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel required={requireCustomText}>Custom Text</FormLabel>
+                      <FormLabel required={requireCustomText}>
+                        <Trans>Custom Text</Trans>
+                      </FormLabel>
                       <FormControl>
                         <Input
                           className="bg-background"
@@ -369,11 +378,7 @@ export const AddSignatureFormPartial = ({
           </DocumentFlowFormContainerContent>
 
           <DocumentFlowFormContainerFooter>
-            <DocumentFlowFormContainerStep
-              title={documentFlow.title}
-              step={currentStep}
-              maxStep={totalSteps}
-            />
+            <DocumentFlowFormContainerStep step={currentStep} maxStep={totalSteps} />
 
             <DocumentFlowFormContainerActions
               loading={form.formState.isSubmitting}
@@ -386,7 +391,7 @@ export const AddSignatureFormPartial = ({
 
         {validateUninsertedFields && uninsertedFields[0] && (
           <FieldToolTip key={uninsertedFields[0].id} field={uninsertedFields[0]} color="warning">
-            Click to insert field
+            <Trans>Click to insert field</Trans>
           </FieldToolTip>
         )}
 

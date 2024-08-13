@@ -2,6 +2,9 @@
 
 import { useState } from 'react';
 
+import type { MessageDescriptor } from '@lingui/core';
+import { Trans, msg } from '@lingui/macro';
+import { useLingui } from '@lingui/react';
 import { AnimatePresence, motion } from 'framer-motion';
 
 import type { PriceIntervals } from '@documenso/ee/server-only/stripe/get-prices-by-interval';
@@ -21,11 +24,11 @@ const INTERVALS: Interval[] = ['day', 'week', 'month', 'year'];
 // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
 const isInterval = (value: unknown): value is Interval => INTERVALS.includes(value as Interval);
 
-const FRIENDLY_INTERVALS: Record<Interval, string> = {
-  day: 'Daily',
-  week: 'Weekly',
-  month: 'Monthly',
-  year: 'Yearly',
+const FRIENDLY_INTERVALS: Record<Interval, MessageDescriptor> = {
+  day: msg`Daily`,
+  week: msg`Weekly`,
+  month: msg`Monthly`,
+  year: msg`Yearly`,
 };
 
 const MotionCard = motion(Card);
@@ -35,6 +38,7 @@ export type BillingPlansProps = {
 };
 
 export const BillingPlans = ({ prices }: BillingPlansProps) => {
+  const { _ } = useLingui();
   const { toast } = useToast();
 
   const isMounted = useIsMounted();
@@ -55,8 +59,8 @@ export const BillingPlans = ({ prices }: BillingPlansProps) => {
       window.open(url);
     } catch (_err) {
       toast({
-        title: 'Something went wrong',
-        description: 'An error occurred while trying to create a checkout session.',
+        title: _(msg`Something went wrong`),
+        description: _(msg`An error occurred while trying to create a checkout session.`),
         variant: 'destructive',
       });
     } finally {
@@ -72,7 +76,7 @@ export const BillingPlans = ({ prices }: BillingPlansProps) => {
             (interval) =>
               prices[interval].length > 0 && (
                 <TabsTrigger key={interval} className="min-w-[150px]" value={interval}>
-                  {FRIENDLY_INTERVALS[interval]}
+                  {_(FRIENDLY_INTERVALS[interval])}
                 </TabsTrigger>
               ),
           )}
@@ -121,7 +125,7 @@ export const BillingPlans = ({ prices }: BillingPlansProps) => {
                   loading={isFetchingCheckoutSession}
                   onClick={() => void onSubscribeClick(price.id)}
                 >
-                  Subscribe
+                  <Trans>Subscribe</Trans>
                 </Button>
               </CardContent>
             </MotionCard>

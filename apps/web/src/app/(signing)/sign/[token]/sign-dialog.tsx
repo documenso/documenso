@@ -1,5 +1,7 @@
 import { useState } from 'react';
 
+import { Trans } from '@lingui/macro';
+
 import type { Field } from '@documenso/prisma/client';
 import { RecipientRole } from '@documenso/prisma/client';
 import { Button } from '@documenso/ui/primitives/button';
@@ -53,36 +55,42 @@ export const SignDialog = ({
           onClick={fieldsValidated}
           loading={isSubmitting}
         >
-          {isComplete ? 'Complete' : 'Next field'}
+          {isComplete ? <Trans>Complete</Trans> : <Trans>Next field</Trans>}
         </Button>
       </DialogTrigger>
 
       <DialogContent>
         <DialogTitle>
           <div className="text-foreground text-xl font-semibold">
-            {role === RecipientRole.VIEWER && 'Complete Viewing'}
-            {role === RecipientRole.SIGNER && 'Complete Signing'}
-            {role === RecipientRole.APPROVER && 'Complete Approval'}
+            {role === RecipientRole.VIEWER && <Trans>Complete Viewing</Trans>}
+            {role === RecipientRole.SIGNER && <Trans>Complete Signing</Trans>}
+            {role === RecipientRole.APPROVER && <Trans>Complete Approval</Trans>}
           </div>
         </DialogTitle>
 
         <div className="text-muted-foreground max-w-[50ch]">
           {role === RecipientRole.VIEWER && (
             <span>
-              You are about to complete viewing "{truncatedTitle}".
-              <br /> Are you sure?
+              <Trans>
+                You are about to complete viewing "{truncatedTitle}".
+                <br /> Are you sure?
+              </Trans>
             </span>
           )}
           {role === RecipientRole.SIGNER && (
             <span>
-              You are about to complete signing "{truncatedTitle}".
-              <br /> Are you sure?
+              <Trans>
+                You are about to complete signing "{truncatedTitle}".
+                <br /> Are you sure?
+              </Trans>
             </span>
           )}
           {role === RecipientRole.APPROVER && (
             <span>
-              You are about to complete approving "{truncatedTitle}".
-              <br /> Are you sure?
+              <Trans>
+                You are about to complete approving "{truncatedTitle}".
+                <br /> Are you sure?
+              </Trans>
             </span>
           )}
         </div>
@@ -93,13 +101,13 @@ export const SignDialog = ({
           <div className="flex w-full flex-1 flex-nowrap gap-4">
             <Button
               type="button"
-              className="dark:bg-muted dark:hover:bg-muted/80 flex-1  bg-black/5 hover:bg-black/10"
+              className="dark:bg-muted dark:hover:bg-muted/80 flex-1 bg-black/5 hover:bg-black/10"
               variant="secondary"
               onClick={() => {
                 setShowDialog(false);
               }}
             >
-              Cancel
+              <Trans>Cancel</Trans>
             </Button>
 
             <Button
@@ -109,9 +117,9 @@ export const SignDialog = ({
               loading={isSubmitting}
               onClick={onSignatureComplete}
             >
-              {role === RecipientRole.VIEWER && 'Mark as Viewed'}
-              {role === RecipientRole.SIGNER && 'Sign'}
-              {role === RecipientRole.APPROVER && 'Approve'}
+              {role === RecipientRole.VIEWER && <Trans>Mark as Viewed</Trans>}
+              {role === RecipientRole.SIGNER && <Trans>Sign</Trans>}
+              {role === RecipientRole.APPROVER && <Trans>Approve</Trans>}
             </Button>
           </div>
         </DialogFooter>

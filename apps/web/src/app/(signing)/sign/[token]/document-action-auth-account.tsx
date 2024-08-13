@@ -1,5 +1,6 @@
 import { useState } from 'react';
 
+import { Trans } from '@lingui/macro';
 import { DateTime } from 'luxon';
 import { signOut } from 'next-auth/react';
 
@@ -53,11 +54,14 @@ export const DocumentActionAuthAccount = ({
         <AlertDescription>
           {actionTarget === 'DOCUMENT' && recipient.role === RecipientRole.VIEWER ? (
             <span>
-              To mark this document as viewed, you need to be logged in as{' '}
-              <strong>{recipient.email}</strong>
+              <Trans>
+                To mark this document as viewed, you need to be logged in as{' '}
+                <strong>{recipient.email}</strong>
+              </Trans>
             </span>
           ) : (
             <span>
+              {/* Todo: Translate */}
               To {actionVerb.toLowerCase()} this {actionTarget.toLowerCase()}, you need to be logged
               in as <strong>{recipient.email}</strong>
             </span>
@@ -67,11 +71,11 @@ export const DocumentActionAuthAccount = ({
 
       <DialogFooter>
         <Button type="button" variant="secondary" onClick={() => onOpenChange(false)}>
-          Cancel
+          <Trans>Cancel</Trans>
         </Button>
 
         <Button onClick={async () => handleChangeAccount(recipient.email)} loading={isSigningOut}>
-          Login
+          <Trans>Login</Trans>
         </Button>
       </DialogFooter>
     </fieldset>

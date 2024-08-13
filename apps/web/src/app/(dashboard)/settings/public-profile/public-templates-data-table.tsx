@@ -2,6 +2,8 @@
 
 import { useMemo, useState } from 'react';
 
+import { Trans, msg } from '@lingui/macro';
+import { useLingui } from '@lingui/react';
 import { EditIcon, FileIcon, LinkIcon, MoreHorizontalIcon, Trash2Icon } from 'lucide-react';
 
 import { useCopyToClipboard } from '@documenso/lib/client-only/hooks/use-copy-to-clipboard';
@@ -30,6 +32,7 @@ type DirectTemplate = FindTemplateRow & {
 export const PublicTemplatesDataTable = () => {
   const team = useOptionalCurrentTeam();
 
+  const { _ } = useLingui();
   const { toast } = useToast();
 
   const [, copy] = useCopyToClipboard();
@@ -71,8 +74,8 @@ export const PublicTemplatesDataTable = () => {
   const onCopyClick = async (token: string) =>
     copy(formatDirectTemplatePath(token)).then(() => {
       toast({
-        title: 'Copied to clipboard',
-        description: 'The direct link has been copied to your clipboard',
+        title: _(msg`Copied to clipboard`),
+        description: _(msg`The direct link has been copied to your clipboard`),
       });
     });
 
@@ -105,26 +108,26 @@ export const PublicTemplatesDataTable = () => {
 
             {isLoadingError && (
               <div className="text-muted-foreground flex h-32 flex-col items-center justify-center text-sm">
-                Unable to load your public profile templates at this time
+                <Trans>Unable to load your public profile templates at this time</Trans>
                 <button
                   onClick={(e) => {
                     e.preventDefault();
                     void refetch();
                   }}
                 >
-                  Click here to retry
+                  <Trans>Click here to retry</Trans>
                 </button>
               </div>
             )}
 
             {!isInitialLoading && (
               <div className="text-muted-foreground flex h-32 flex-col items-center justify-center text-sm">
-                No public profile templates found
+                <Trans>No public profile templates found</Trans>
                 <ManagePublicTemplateDialog
                   directTemplates={privateDirectTemplates}
                   trigger={
                     <button className="hover:text-muted-foreground/80 mt-1 text-xs">
-                      Click here to get started
+                      <Trans>Click here to get started</Trans>
                     </button>
                   }
                 />
@@ -157,11 +160,13 @@ export const PublicTemplatesDataTable = () => {
               </DropdownMenuTrigger>
 
               <DropdownMenuContent className="w-52" align="center" side="left">
-                <DropdownMenuLabel>Action</DropdownMenuLabel>
+                <DropdownMenuLabel>
+                  <Trans>Action</Trans>
+                </DropdownMenuLabel>
 
                 <DropdownMenuItem onClick={() => void onCopyClick(template.directLink.token)}>
                   <LinkIcon className="mr-2 h-4 w-4" />
-                  Copy sharable link
+                  <Trans>Copy sharable link</Trans>
                 </DropdownMenuItem>
 
                 <DropdownMenuItem
@@ -173,7 +178,7 @@ export const PublicTemplatesDataTable = () => {
                   }}
                 >
                   <EditIcon className="mr-2 h-4 w-4" />
-                  Update
+                  <Trans>Update</Trans>
                 </DropdownMenuItem>
 
                 <DropdownMenuItem
@@ -185,7 +190,7 @@ export const PublicTemplatesDataTable = () => {
                   }
                 >
                   <Trash2Icon className="mr-2 h-4 w-4" />
-                  Remove
+                  <Trans>Remove</Trans>
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>

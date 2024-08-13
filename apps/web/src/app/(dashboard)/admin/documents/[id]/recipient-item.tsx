@@ -2,6 +2,8 @@
 
 import { useRouter } from 'next/navigation';
 
+import { Trans, msg } from '@lingui/macro';
+import { useLingui } from '@lingui/react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 
@@ -43,7 +45,9 @@ export type RecipientItemProps = {
 };
 
 export const RecipientItem = ({ recipient }: RecipientItemProps) => {
+  const { _ } = useLingui();
   const { toast } = useToast();
+
   const router = useRouter();
 
   const form = useForm<TAdminUpdateRecipientFormSchema>({
@@ -64,14 +68,14 @@ export const RecipientItem = ({ recipient }: RecipientItemProps) => {
       });
 
       toast({
-        title: 'Recipient updated',
-        description: 'The recipient has been updated successfully',
+        title: _(msg`Recipient updated`),
+        description: _(msg`The recipient has been updated successfully`),
       });
 
       router.refresh();
     } catch (error) {
       toast({
-        title: 'Failed to update recipient',
+        title: _(msg`Failed to update recipient`),
         description: error.message,
         variant: 'destructive',
       });
@@ -93,7 +97,9 @@ export const RecipientItem = ({ recipient }: RecipientItemProps) => {
               name="name"
               render={({ field }) => (
                 <FormItem className="flex-1">
-                  <FormLabel required>Name</FormLabel>
+                  <FormLabel required>
+                    <Trans>Name</Trans>
+                  </FormLabel>
 
                   <FormControl>
                     <Input {...field} />
@@ -109,7 +115,9 @@ export const RecipientItem = ({ recipient }: RecipientItemProps) => {
               name="email"
               render={({ field }) => (
                 <FormItem className="flex-1">
-                  <FormLabel required>Email</FormLabel>
+                  <FormLabel required>
+                    <Trans>Email</Trans>
+                  </FormLabel>
 
                   <FormControl>
                     <Input type="email" {...field} />
@@ -122,7 +130,7 @@ export const RecipientItem = ({ recipient }: RecipientItemProps) => {
 
             <div>
               <Button type="submit" loading={form.formState.isSubmitting}>
-                Update Recipient
+                <Trans>Update Recipient</Trans>
               </Button>
             </div>
           </fieldset>
@@ -131,7 +139,9 @@ export const RecipientItem = ({ recipient }: RecipientItemProps) => {
 
       <hr className="my-4" />
 
-      <h2 className="mb-4 text-lg font-semibold">Fields</h2>
+      <h2 className="mb-4 text-lg font-semibold">
+        <Trans>Fields</Trans>
+      </h2>
 
       <DataTable
         data={recipient.Field}
@@ -142,22 +152,22 @@ export const RecipientItem = ({ recipient }: RecipientItemProps) => {
             cell: ({ row }) => <div>{row.original.id}</div>,
           },
           {
-            header: 'Type',
+            header: _(msg`Type`),
             accessorKey: 'type',
             cell: ({ row }) => <div>{row.original.type}</div>,
           },
           {
-            header: 'Inserted',
+            header: _(msg`Inserted`),
             accessorKey: 'inserted',
             cell: ({ row }) => <div>{row.original.inserted ? 'True' : 'False'}</div>,
           },
           {
-            header: 'Value',
+            header: _(msg`Value`),
             accessorKey: 'customText',
             cell: ({ row }) => <div>{row.original.customText}</div>,
           },
           {
-            header: 'Signature',
+            header: _(msg`Signature`),
             accessorKey: 'signature',
             cell: ({ row }) => (
               <div>

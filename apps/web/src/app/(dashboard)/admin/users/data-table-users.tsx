@@ -4,6 +4,8 @@ import { useEffect, useState, useTransition } from 'react';
 
 import Link from 'next/link';
 
+import { msg } from '@lingui/macro';
+import { useLingui } from '@lingui/react';
 import { Edit, Loader } from 'lucide-react';
 
 import { useDebouncedValue } from '@documenso/lib/client-only/hooks/use-debounced-value';
@@ -45,6 +47,8 @@ export const UsersDataTable = ({
   page,
   individualPriceIds,
 }: UsersDataTableProps) => {
+  const { _ } = useLingui();
+
   const [isPending, startTransition] = useTransition();
   const updateSearchParams = useUpdateSearchParams();
   const [searchString, setSearchString] = useState('');
@@ -79,7 +83,7 @@ export const UsersDataTable = ({
       <Input
         className="my-6 flex flex-row gap-4"
         type="text"
-        placeholder="Search by name or email"
+        placeholder={_(msg`Search by name or email`)}
         value={searchString}
         onChange={handleChange}
       />
@@ -91,22 +95,22 @@ export const UsersDataTable = ({
             cell: ({ row }) => <div>{row.original.id}</div>,
           },
           {
-            header: 'Name',
+            header: _(msg`Name`),
             accessorKey: 'name',
             cell: ({ row }) => <div>{row.original.name}</div>,
           },
           {
-            header: 'Email',
+            header: _(msg`Email`),
             accessorKey: 'email',
             cell: ({ row }) => <div>{row.original.email}</div>,
           },
           {
-            header: 'Roles',
+            header: _(msg`Roles`),
             accessorKey: 'roles',
             cell: ({ row }) => row.original.roles.join(', '),
           },
           {
-            header: 'Subscription',
+            header: _(msg`Subscription`),
             accessorKey: 'subscription',
             cell: ({ row }) => {
               const foundIndividualSubscription = (row.original.Subscription ?? []).find((sub) =>
@@ -117,7 +121,7 @@ export const UsersDataTable = ({
             },
           },
           {
-            header: 'Documents',
+            header: _(msg`Documents`),
             accessorKey: 'documents',
             cell: ({ row }) => {
               return <div>{row.original.Document.length}</div>;

@@ -2,6 +2,8 @@
 
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 
+import { msg } from '@lingui/macro';
+import { useLingui } from '@lingui/react';
 import type { DateTimeFormatOptions } from 'luxon';
 import { DateTime } from 'luxon';
 import { UAParser } from 'ua-parser-js';
@@ -23,6 +25,8 @@ const dateFormat: DateTimeFormatOptions = {
 };
 
 export const UserSecurityActivityDataTable = () => {
+  const { _ } = useLingui();
+
   const parser = new UAParser();
 
   const pathname = usePathname();
@@ -63,12 +67,12 @@ export const UserSecurityActivityDataTable = () => {
     <DataTable
       columns={[
         {
-          header: 'Date',
+          header: _(msg`Date`),
           accessorKey: 'createdAt',
           cell: ({ row }) => <LocaleDate format={dateFormat} date={row.original.createdAt} />,
         },
         {
-          header: 'Device',
+          header: _(msg`Device`),
           cell: ({ row }) => {
             if (!row.original.userAgent) {
               return 'N/A';
@@ -92,7 +96,7 @@ export const UserSecurityActivityDataTable = () => {
           },
         },
         {
-          header: 'Browser',
+          header: _(msg`Browser`),
           cell: ({ row }) => {
             if (!row.original.userAgent) {
               return 'N/A';
@@ -111,7 +115,7 @@ export const UserSecurityActivityDataTable = () => {
           cell: ({ row }) => row.original.ipAddress ?? 'N/A',
         },
         {
-          header: 'Action',
+          header: _(msg`Action`),
           accessorKey: 'type',
           cell: ({ row }) => USER_SECURITY_AUDIT_LOG_MAP[row.original.type],
         },

@@ -3,6 +3,8 @@
 import { useState } from 'react';
 
 import { zodResolver } from '@hookform/resolvers/zod';
+import { Trans, msg } from '@lingui/macro';
+import { useLingui } from '@lingui/react';
 import { History } from 'lucide-react';
 import { useSession } from 'next-auth/react';
 import { useForm } from 'react-hook-form';
@@ -62,6 +64,7 @@ export const ResendDocumentActionItem = ({
 }: ResendDocumentActionItemProps) => {
   const { data: session } = useSession();
   const { toast } = useToast();
+  const { _ } = useLingui();
 
   const [isOpen, setIsOpen] = useState(false);
   const isOwner = document.userId === session?.user?.id;
@@ -91,16 +94,16 @@ export const ResendDocumentActionItem = ({
       await resendDocument({ documentId: document.id, recipients, teamId: team?.id });
 
       toast({
-        title: 'Document re-sent',
-        description: 'Your document has been re-sent successfully.',
+        title: _(msg`Document re-sent`),
+        description: _(msg`Your document has been re-sent successfully.`),
         duration: 5000,
       });
 
       setIsOpen(false);
     } catch (err) {
       toast({
-        title: 'Something went wrong',
-        description: 'This document could not be re-sent at this time. Please try again.',
+        title: _(msg`Something went wrong`),
+        description: _(msg`This document could not be re-sent at this time. Please try again.`),
         variant: 'destructive',
         duration: 7500,
       });
@@ -112,14 +115,16 @@ export const ResendDocumentActionItem = ({
       <DialogTrigger asChild>
         <DropdownMenuItem disabled={isDisabled} onSelect={(e) => e.preventDefault()}>
           <History className="mr-2 h-4 w-4" />
-          Resend
+          <Trans>Resend</Trans>
         </DropdownMenuItem>
       </DialogTrigger>
 
       <DialogContent className="sm:max-w-sm" hideClose>
         <DialogHeader>
           <DialogTitle asChild>
-            <h1 className="text-center text-xl">Who do you want to remind?</h1>
+            <h1 className="text-center text-xl">
+              <Trans>Who do you want to remind?</Trans>
+            </h1>
           </DialogTitle>
         </DialogHeader>
 
@@ -178,12 +183,12 @@ export const ResendDocumentActionItem = ({
                 variant="secondary"
                 disabled={isSubmitting}
               >
-                Cancel
+                <Trans>Cancel</Trans>
               </Button>
             </DialogClose>
 
             <Button className="flex-1" loading={isSubmitting} type="submit" form={FORM_ID}>
-              Send reminder
+              <Trans>Send reminder</Trans>
             </Button>
           </div>
         </DialogFooter>

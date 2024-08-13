@@ -4,6 +4,9 @@ import { useEffect, useState } from 'react';
 
 import { useSearchParams } from 'next/navigation';
 
+import { msg } from '@lingui/macro';
+import { useLingui } from '@lingui/react';
+
 import { useUpdateSearchParams } from '@documenso/lib/client-only/hooks/use-update-search-params';
 import { WEBAPP_BASE_URL } from '@documenso/lib/constants/app';
 import { ZBaseTableSearchParamsSchema } from '@documenso/lib/types/search-params';
@@ -20,6 +23,8 @@ import { CreateTeamCheckoutDialog } from '../dialogs/create-team-checkout-dialog
 import { PendingUserTeamsDataTableActions } from './pending-user-teams-data-table-actions';
 
 export const PendingUserTeamsDataTable = () => {
+  const { _ } = useLingui();
+
   const searchParams = useSearchParams();
   const updateSearchParams = useUpdateSearchParams();
 
@@ -68,7 +73,7 @@ export const PendingUserTeamsDataTable = () => {
       <DataTable
         columns={[
           {
-            header: 'Team',
+            header: _(msg`Team`),
             accessorKey: 'name',
             cell: ({ row }) => (
               <AvatarWithText
@@ -82,7 +87,7 @@ export const PendingUserTeamsDataTable = () => {
             ),
           },
           {
-            header: 'Created on',
+            header: _(msg`Created on`),
             accessorKey: 'createdAt',
             cell: ({ row }) => <LocaleDate date={row.original.createdAt} />,
           },

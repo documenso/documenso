@@ -5,6 +5,8 @@ import { useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 
 import { zodResolver } from '@hookform/resolvers/zod';
+import { Trans, msg } from '@lingui/macro';
+import { useLingui } from '@lingui/react';
 import { ErrorCode, useDropzone } from 'react-dropzone';
 import { useForm } from 'react-hook-form';
 import { match } from 'ts-pattern';
@@ -42,7 +44,9 @@ export type AvatarImageFormProps = {
 };
 
 export const AvatarImageForm = ({ className, user, team }: AvatarImageFormProps) => {
+  const { _ } = useLingui();
   const { toast } = useToast();
+
   const router = useRouter();
 
   const { mutateAsync: setProfileImage } = trpc.profile.setProfileImage.useMutation();
@@ -84,10 +88,10 @@ export const AvatarImageForm = ({ className, user, team }: AvatarImageFormProps)
       form.setError('bytes', {
         type: 'onChange',
         message: match(file.errors[0].code)
-          .with(ErrorCode.FileTooLarge, () => 'Uploaded file is too large')
-          .with(ErrorCode.FileTooSmall, () => 'Uploaded file is too small')
-          .with(ErrorCode.FileInvalidType, () => 'Uploaded file not an allowed file type')
-          .otherwise(() => 'An unknown error occurred'),
+          .with(ErrorCode.FileTooLarge, () => _(msg`Uploaded file is too large`))
+          .with(ErrorCode.FileTooSmall, () => _(msg`Uploaded file is too small`))
+          .with(ErrorCode.FileInvalidType, () => _(msg`Uploaded file not an allowed file type`))
+          .otherwise(() => _(msg`An unknown error occurred`)),
       });
     },
   });
@@ -100,8 +104,8 @@ export const AvatarImageForm = ({ className, user, team }: AvatarImageFormProps)
       });
 
       toast({
-        title: 'Avatar Updated',
-        description: 'Your avatar has been updated successfully.',
+        title: _(msg`Avatar Updated`),
+        description: _(msg`Your avatar has been updated successfully.`),
         duration: 5000,
       });
 
@@ -109,16 +113,17 @@ export const AvatarImageForm = ({ className, user, team }: AvatarImageFormProps)
     } catch (err) {
       if (err instanceof TRPCClientError && err.data?.code === 'BAD_REQUEST') {
         toast({
-          title: 'An error occurred',
+          title: _(msg`An error occurred`),
           description: err.message,
           variant: 'destructive',
         });
       } else {
         toast({
-          title: 'An unknown error occurred',
+          title: _(msg`An unknown error occurred`),
+          description: _(
+            msg`We encountered an unknown error while attempting to update the avatar. Please try again later.`,
+          ),
           variant: 'destructive',
-          description:
-            'We encountered an unknown error while attempting to update the avatar. Please try again later.',
         });
       }
     }
@@ -136,7 +141,9 @@ export const AvatarImageForm = ({ className, user, team }: AvatarImageFormProps)
             name="bytes"
             render={() => (
               <FormItem>
-                <FormLabel>Avatar</FormLabel>
+                <FormLabel>
+                  <Trans>Avatar</Trans>
+                </FormLabel>
 
                 <FormControl>
                   <div className="flex items-center gap-8">
@@ -159,7 +166,7 @@ export const AvatarImageForm = ({ className, user, team }: AvatarImageFormProps)
                           disabled={form.formState.isSubmitting}
                           onClick={() => void onFormSubmit({ bytes: null })}
                         >
-                          Remove
+                          <Trans>Remove</Trans>
                         </button>
                       )}
                     </div>
@@ -172,7 +179,7 @@ export const AvatarImageForm = ({ className, user, team }: AvatarImageFormProps)
                       loading={form.formState.isSubmitting}
                       disabled={form.formState.isSubmitting}
                     >
-                      Upload Avatar
+                      <Trans>Upload Avatar</Trans>
                       <input {...getInputProps()} />
                     </Button>
                   </div>

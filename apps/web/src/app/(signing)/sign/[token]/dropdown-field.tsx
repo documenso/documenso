@@ -4,6 +4,8 @@ import { useEffect, useState, useTransition } from 'react';
 
 import { useRouter } from 'next/navigation';
 
+import { msg } from '@lingui/macro';
+import { useLingui } from '@lingui/react';
 import { Loader } from 'lucide-react';
 
 import { DO_NOT_INVALIDATE_QUERY_ON_MUTATION } from '@documenso/lib/constants/trpc';
@@ -43,8 +45,10 @@ export const DropdownField = ({
   onSignField,
   onUnsignField,
 }: DropdownFieldProps) => {
-  const router = useRouter();
+  const { _ } = useLingui();
   const { toast } = useToast();
+
+  const router = useRouter();
   const [isPending, startTransition] = useTransition();
 
   const { executeActionAuthProcedure } = useRequiredDocumentAuthContext();
@@ -98,8 +102,8 @@ export const DropdownField = ({
       console.error(err);
 
       toast({
-        title: 'Error',
-        description: 'An error occurred while signing the document.',
+        title: _(msg`Error`),
+        description: _(msg`An error occurred while signing the document.`),
         variant: 'destructive',
       });
     }
@@ -129,8 +133,8 @@ export const DropdownField = ({
       console.error(err);
 
       toast({
-        title: 'Error',
-        description: 'An error occurred while removing the signature.',
+        title: _(msg`Error`),
+        description: _(msg`An error occurred while removing the signature.`),
         variant: 'destructive',
       });
     }
@@ -185,7 +189,7 @@ export const DropdownField = ({
                   },
                 )}
               >
-                <SelectValue placeholder={'-- Select --'} />
+                <SelectValue placeholder={`-- ${_(msg`Select`)} --`} />
               </SelectTrigger>
               <SelectContent className="w-full ring-0 focus:ring-0" position="popper">
                 {parsedFieldMeta?.values?.map((item, index) => (

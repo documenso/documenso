@@ -3,6 +3,8 @@
 import React, { useEffect, useId, useMemo, useState } from 'react';
 
 import { zodResolver } from '@hookform/resolvers/zod';
+import { Trans, msg } from '@lingui/macro';
+import { useLingui } from '@lingui/react';
 import { motion } from 'framer-motion';
 import { Link2Icon, Plus, Trash } from 'lucide-react';
 import { useSession } from 'next-auth/react';
@@ -57,6 +59,8 @@ export const AddTemplatePlaceholderRecipientsFormPartial = ({
   onSubmit,
 }: AddTemplatePlaceholderRecipientsFormProps) => {
   const initialId = useId();
+
+  const { _ } = useLingui();
   const { data: session } = useSession();
 
   const user = session?.user;
@@ -202,13 +206,15 @@ export const AddTemplatePlaceholderRecipientsFormPartial = ({
                         })}
                       >
                         {!showAdvancedSettings && index === 0 && (
-                          <FormLabel required>Email</FormLabel>
+                          <FormLabel required>
+                            <Trans>Email</Trans>
+                          </FormLabel>
                         )}
 
                         <FormControl>
                           <Input
                             type="email"
-                            placeholder="Email"
+                            placeholder={_(msg`Email`)}
                             {...field}
                             disabled={
                               field.disabled ||
@@ -234,11 +240,15 @@ export const AddTemplatePlaceholderRecipientsFormPartial = ({
                           'col-span-4': showAdvancedSettings,
                         })}
                       >
-                        {!showAdvancedSettings && index === 0 && <FormLabel>Name</FormLabel>}
+                        {!showAdvancedSettings && index === 0 && (
+                          <FormLabel>
+                            <Trans>Name</Trans>
+                          </FormLabel>
+                        )}
 
                         <FormControl>
                           <Input
-                            placeholder="Name"
+                            placeholder={_(msg`Name`)}
                             {...field}
                             disabled={
                               field.disabled ||
@@ -299,12 +309,14 @@ export const AddTemplatePlaceholderRecipientsFormPartial = ({
                       </TooltipTrigger>
                       <TooltipContent className="text-foreground z-9999 max-w-md p-4">
                         <h3 className="text-foreground text-lg font-semibold">
-                          Direct link receiver
+                          <Trans>Direct link receiver</Trans>
                         </h3>
                         <p className="text-muted-foreground mt-1">
-                          This field cannot be modified or deleted. When you share this template's
-                          direct link or add it to your public profile, anyone who accesses it can
-                          input their name and email, and fill in the fields assigned to them.
+                          <Trans>
+                            This field cannot be modified or deleted. When you share this template's
+                            direct link or add it to your public profile, anyone who accesses it can
+                            input their name and email, and fill in the fields assigned to them.
+                          </Trans>
                         </p>
                       </TooltipContent>
                     </Tooltip>
@@ -340,7 +352,7 @@ export const AddTemplatePlaceholderRecipientsFormPartial = ({
                 onClick={() => onAddPlaceholderRecipient()}
               >
                 <Plus className="-ml-1 mr-2 h-5 w-5" />
-                Add Placeholder Recipient
+                <Trans>Add Placeholder Recipient</Trans>
               </Button>
 
               <Button
@@ -354,7 +366,7 @@ export const AddTemplatePlaceholderRecipientsFormPartial = ({
                 onClick={() => onAddPlaceholderSelfRecipient()}
               >
                 <Plus className="-ml-1 mr-2 h-5 w-5" />
-                Add Myself
+                <Trans>Add Myself</Trans>
               </Button>
             </div>
 
@@ -372,7 +384,7 @@ export const AddTemplatePlaceholderRecipientsFormPartial = ({
                   className="text-muted-foreground ml-2 text-sm"
                   htmlFor="showAdvancedRecipientSettings"
                 >
-                  Show advanced settings
+                  <Trans>Show advanced settings</Trans>
                 </label>
               </div>
             )}
@@ -381,11 +393,7 @@ export const AddTemplatePlaceholderRecipientsFormPartial = ({
       </DocumentFlowFormContainerContent>
 
       <DocumentFlowFormContainerFooter>
-        <DocumentFlowFormContainerStep
-          title={documentFlow.title}
-          step={currentStep}
-          maxStep={totalSteps}
-        />
+        <DocumentFlowFormContainerStep step={currentStep} maxStep={totalSteps} />
 
         <DocumentFlowFormContainerActions
           loading={isSubmitting}

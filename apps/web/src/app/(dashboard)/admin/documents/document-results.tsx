@@ -5,6 +5,8 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 
+import { msg } from '@lingui/macro';
+import { useLingui } from '@lingui/react';
 import { Loader } from 'lucide-react';
 
 import { useDebouncedValue } from '@documenso/lib/client-only/hooks/use-debounced-value';
@@ -23,6 +25,8 @@ import { LocaleDate } from '~/components/formatter/locale-date';
 // export type AdminDocumentResultsProps = {};
 
 export const AdminDocumentResults = () => {
+  const { _ } = useLingui();
+
   const searchParams = useSearchParams();
 
   const updateSearchParams = useUpdateSearchParams();
@@ -56,7 +60,7 @@ export const AdminDocumentResults = () => {
     <div>
       <Input
         type="search"
-        placeholder="Search by document title"
+        placeholder={_(msg`Search by document title`)}
         value={term}
         onChange={(e) => setTerm(e.target.value)}
       />
@@ -65,12 +69,12 @@ export const AdminDocumentResults = () => {
         <DataTable
           columns={[
             {
-              header: 'Created',
+              header: _(msg`Created`),
               accessorKey: 'createdAt',
               cell: ({ row }) => <LocaleDate date={row.original.createdAt} />,
             },
             {
-              header: 'Title',
+              header: _(msg`Title`),
               accessorKey: 'title',
               cell: ({ row }) => {
                 return (
@@ -84,12 +88,12 @@ export const AdminDocumentResults = () => {
               },
             },
             {
-              header: 'Status',
+              header: _(msg`Status`),
               accessorKey: 'status',
               cell: ({ row }) => <DocumentStatus status={row.original.status} />,
             },
             {
-              header: 'Owner',
+              header: _(msg`Owner`),
               accessorKey: 'owner',
               cell: ({ row }) => {
                 const avatarFallbackText = row.original.User.name
