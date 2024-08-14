@@ -26,7 +26,7 @@ export class InngestJobProvider extends BaseJobProvider {
   static getInstance() {
     if (!this._instance) {
       const client = new InngestClient({
-        id: 'documenso-app',
+        id: process.env.NEXT_PRIVATE_INNGEST_APP_ID || 'documenso-app',
         eventKey: process.env.INNGEST_EVENT_KEY || process.env.NEXT_PRIVATE_INNGEST_EVENT_KEY,
       });
 

@@ -85,6 +85,7 @@ declare namespace NodeJS {
      */
     INNGEST_EVENT_KEY?: string;
     INNGEST_SIGNING_KEY?: string;
+    NEXT_PRIVATE_INNGEST_APP_ID?: string;
     NEXT_PRIVATE_INNGEST_EVENT_KEY?: string;
 
     /**
