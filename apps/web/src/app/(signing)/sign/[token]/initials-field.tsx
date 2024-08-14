@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation';
 
 import { Loader } from 'lucide-react';
 
+import { useDebouncedValue } from '@documenso/lib/client-only/hooks/use-debounced-value';
 import { DO_NOT_INVALIDATE_QUERY_ON_MUTATION } from '@documenso/lib/constants/trpc';
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import type { TRecipientActionAuth } from '@documenso/lib/types/document-auth';
@@ -42,6 +43,8 @@ export const InitialsField = ({
   const { fullName } = useRequiredSigningContext();
   const initials = extractInitials(fullName);
 
+  const debouncedTerm = useDebouncedValue(initials, 5000);
+
   const [isPending, startTransition] = useTransition();
 
   const { executeActionAuthProcedure } = useRequiredDocumentAuthContext();
@@ -58,7 +61,7 @@ export const InitialsField = ({
 
   const onSign = async (authOptions?: TRecipientActionAuth) => {
     try {
-      const value = initials ?? '';
+      const value = debouncedTerm ?? '';
 
       const payload: TSignFieldWithTokenMutationSchema = {
         token: recipient.token,
@@ -126,7 +129,7 @@ export const InitialsField = ({
         actionTarget: field.type,
       });
     }
-  }, [field]);
+  }, [field, debouncedTerm]);
 
   return (
     <SigningFieldContainer field={field} onSign={onSign} onRemove={onRemove} type="Initials">
