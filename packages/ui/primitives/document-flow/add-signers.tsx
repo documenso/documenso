@@ -1,8 +1,8 @@
 'use client';
 
-import React, { useId, useMemo, useState } from 'react';
+import React, { useCallback, useId, useMemo, useRef, useState } from 'react';
 
-import type { DropResult } from '@hello-pangea/dnd';
+import type { DropResult, SensorAPI } from '@hello-pangea/dnd';
 import { DragDropContext, Draggable, Droppable } from '@hello-pangea/dnd';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { motion } from 'framer-motion';
@@ -113,6 +113,7 @@ export const AddSignersFormPartial = ({
   }, [recipients, form]);
 
   const [showAdvancedSettings, setShowAdvancedSettings] = useState(alwaysShowAdvancedSettings);
+  const sensorApiRef = useRef<SensorAPI | null>(null);
 
   const {
     setValue,
@@ -150,18 +151,21 @@ export const AddSignersFormPartial = ({
     (recipient) => recipient.sendStatus === SendStatus.SENT,
   );
 
-  const hasBeenSentToRecipientId = (id?: number) => {
-    if (!id) {
-      return false;
-    }
+  const hasBeenSentToRecipientId = useCallback(
+    (id?: number) => {
+      if (!id) {
+        return false;
+      }
 
-    return recipients.some(
-      (recipient) =>
-        recipient.id === id &&
-        recipient.sendStatus === SendStatus.SENT &&
-        recipient.role !== RecipientRole.CC,
-    );
-  };
+      return recipients.some(
+        (recipient) =>
+          recipient.id === id &&
+          recipient.sendStatus === SendStatus.SENT &&
+          recipient.role !== RecipientRole.CC,
+      );
+    },
+    [recipients],
+  );
 
   const onAddSigner = () => {
     appendSigner({
@@ -215,57 +219,114 @@ export const AddSignersFormPartial = ({
     }
   };
 
-  const onDragEnd = async (result: DropResult) => {
-    if (!result.destination) return;
+  const onDragEnd = useCallback(
+    async (result: DropResult) => {
+      if (!result.destination) return;
 
-    const items = Array.from(watchedSigners);
-    const [reorderedSigner] = items.splice(result.source.index, 1);
+      const items = Array.from(watchedSigners);
+      const [reorderedSigner] = items.splice(result.source.index, 1);
 
-    let insertIndex = result.destination.index;
-    while (insertIndex < items.length && hasBeenSentToRecipientId(items[insertIndex].nativeId)) {
-      insertIndex++;
-    }
-
-    items.splice(insertIndex, 0, reorderedSigner);
-
-    const updatedSigners = items.map((item, index) => ({
-      ...item,
-      signingOrder: hasBeenSentToRecipientId(item.nativeId) ? item.signingOrder : index + 1,
-    }));
-
-    updatedSigners.forEach((item, index) => {
-      const keys: (keyof typeof item)[] = [
-        'formId',
-        'nativeId',
-        'email',
-        'name',
-        'role',
-        'signingOrder',
-        'actionAuth',
-      ];
-      keys.forEach((key) => {
-        form.setValue(`signers.${index}.${key}` as const, item[key]);
-      });
-    });
-
-    // updatedSigners.forEach((signer, index) => {
-    //   Object.keys(signer).forEach((key) => {
-    //     form.setValue(
-    //       `signers.${index}.${key as keyof typeof signer}`,
-    //       signer[key as keyof typeof signer],
-    //     );
-    //   });
-    // });
-
-    const currentLength = form.getValues('signers').length;
-    if (currentLength > updatedSigners.length) {
-      for (let i = updatedSigners.length; i < currentLength; i++) {
-        form.unregister(`signers.${i}`);
+      let insertIndex = result.destination.index;
+      while (insertIndex < items.length && hasBeenSentToRecipientId(items[insertIndex].nativeId)) {
+        insertIndex++;
       }
-    }
 
-    await form.trigger('signers');
-  };
+      items.splice(insertIndex, 0, reorderedSigner);
+
+      const updatedSigners = items.map((item, index) => ({
+        ...item,
+        signingOrder: hasBeenSentToRecipientId(item.nativeId) ? item.signingOrder : index + 1,
+      }));
+
+      updatedSigners.forEach((item, index) => {
+        const keys: (keyof typeof item)[] = [
+          'formId',
+          'nativeId',
+          'email',
+          'name',
+          'role',
+          'signingOrder',
+          'actionAuth',
+        ];
+        keys.forEach((key) => {
+          form.setValue(`signers.${index}.${key}` as const, item[key]);
+        });
+      });
+
+      // updatedSigners.forEach((signer, index) => {
+      //   Object.keys(signer).forEach((key) => {
+      //     form.setValue(
+      //       `signers.${index}.${key as keyof typeof signer}`,
+      //       signer[key as keyof typeof signer],
+      //     );
+      //   });
+      // });
+
+      const currentLength = form.getValues('signers').length;
+      if (currentLength > updatedSigners.length) {
+        for (let i = updatedSigners.length; i < currentLength; i++) {
+          form.unregister(`signers.${i}`);
+        }
+      }
+
+      await form.trigger('signers');
+    },
+    [form, hasBeenSentToRecipientId, watchedSigners],
+  );
+
+  const triggerDragAndDrop = useCallback(
+    (fromIndex: number, toIndex: number) => {
+      if (!sensorApiRef.current) return;
+
+      const draggableId = signers[fromIndex].id;
+      const preDrag = sensorApiRef.current.tryGetLock(draggableId);
+      if (!preDrag) return;
+
+      const drag = preDrag.snapLift();
+
+      setTimeout(() => {
+        // Move directly to the target index
+        if (fromIndex < toIndex) {
+          for (let i = fromIndex; i < toIndex; i++) {
+            drag.moveDown();
+          }
+        } else {
+          for (let i = fromIndex; i > toIndex; i--) {
+            drag.moveUp();
+          }
+        }
+
+        setTimeout(() => {
+          drag.drop();
+        }, 500);
+      }, 0);
+    },
+    [signers],
+  );
+
+  const handleSigningOrderChange = useCallback(
+    (index: number, newOrderString: string) => {
+      const currentSigners = form.getValues('signers');
+      const newOrder = parseInt(newOrderString, 10);
+
+      if (!newOrderString.trim() || isNaN(newOrder)) {
+        form.setValue(`signers.${index}.signingOrder`, index + 1);
+        return;
+      }
+
+      if (newOrder < 1 || newOrder > currentSigners.length) {
+        console.error('Invalid signing order');
+        form.setValue(`signers.${index}.signingOrder`, index + 1);
+        return;
+      }
+
+      const newIndex = newOrder - 1;
+      if (index !== newIndex) {
+        triggerDragAndDrop(index, newIndex);
+      }
+    },
+    [form, triggerDragAndDrop],
+  );
 
   return (
     <>
@@ -310,7 +371,14 @@ export const AddSignersFormPartial = ({
                 </FormItem>
               )}
             />
-            <DragDropContext onDragEnd={onDragEnd}>
+            <DragDropContext
+              onDragEnd={onDragEnd}
+              sensors={[
+                (api: SensorAPI) => {
+                  sensorApiRef.current = api;
+                },
+              ]}
+            >
               <Droppable droppableId="signers">
                 {(provided) => (
                   <div
@@ -352,17 +420,26 @@ export const AddSignersFormPartial = ({
                                   control={form.control}
                                   name={`signers.${index}.signingOrder`}
                                   render={({ field }) => (
-                                    <FormItem
-                                      className={cn(
-                                        'col-span-2 mt-auto flex items-center gap-x-1 space-y-0',
-                                      )}
-                                    >
+                                    <FormItem className="col-span-2 mt-auto flex items-center gap-x-1 space-y-0">
                                       <GripVerticalIcon className="h-5 w-5 flex-shrink-0 opacity-40" />
                                       <FormControl>
                                         <Input
-                                          type="text"
-                                          className="w-full text-center"
-                                          value={field.value}
+                                          type="number"
+                                          min={1}
+                                          max={signers.length}
+                                          className={cn(
+                                            'w-full text-center',
+                                            '[appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none',
+                                          )}
+                                          {...field}
+                                          onChange={(e) => {
+                                            field.onChange(e);
+                                            handleSigningOrderChange(index, e.target.value);
+                                          }}
+                                          onBlur={(e) => {
+                                            field.onBlur();
+                                            handleSigningOrderChange(index, e.target.value);
+                                          }}
                                           disabled={
                                             snapshot.isDragging ||
                                             isSubmitting ||
