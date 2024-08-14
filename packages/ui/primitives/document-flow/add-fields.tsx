@@ -408,9 +408,23 @@ export const AddFieldsFormPartial = ({
 
   const recipientsByRoleToDisplay = useMemo(() => {
     // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
-    return (Object.entries(recipientsByRole) as [RecipientRole, Recipient[]][]).filter(
-      ([role]) => role !== RecipientRole.CC && role !== RecipientRole.VIEWER,
-    );
+    return (Object.entries(recipientsByRole) as [RecipientRole, Recipient[]][])
+      .filter(([role]) => role !== RecipientRole.CC && role !== RecipientRole.VIEWER)
+      .map(
+        ([role, roleRecipients]) =>
+          // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
+          [
+            role,
+            roleRecipients.sort((a, b) => {
+              if (a.signingOrder !== null && b.signingOrder !== null) {
+                return a.signingOrder - b.signingOrder;
+              }
+              if (a.signingOrder !== null) return -1;
+              if (b.signingOrder !== null) return 1;
+              return 0;
+            }),
+          ] as [RecipientRole, Recipient[]],
+      );
   }, [recipientsByRole]);
 
   const handleAdvancedSettings = () => {
