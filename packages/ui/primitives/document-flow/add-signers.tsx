@@ -306,15 +306,13 @@ export const AddSignersFormPartial = ({
 
   const handleSigningOrderChange = useCallback(
     (index: number, newOrderString: string) => {
-      const currentSigners = form.getValues('signers');
       const newOrder = parseInt(newOrderString, 10);
 
       if (!newOrderString.trim()) {
         return;
       }
 
-      if (isNaN(newOrder) || newOrder < 1 || newOrder > currentSigners.length) {
-        console.error('Invalid signing order');
+      if (isNaN(newOrder)) {
         form.setValue(`signers.${index}.signingOrder`, index + 1);
         return;
       }
@@ -425,7 +423,7 @@ export const AddSignersFormPartial = ({
                                       <FormControl>
                                         <Input
                                           type="number"
-                                          // max={signers.length}
+                                          max={signers.length}
                                           className={cn(
                                             'w-full text-center',
                                             '[appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none',
