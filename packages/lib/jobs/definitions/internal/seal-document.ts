@@ -57,7 +57,6 @@ export const SEAL_DOCUMENT_JOB_DEFINITION = {
         },
       },
       include: {
-        documentData: true,
         Recipient: true,
       },
     });
@@ -69,7 +68,17 @@ export const SEAL_DOCUMENT_JOB_DEFINITION = {
       return document.status;
     });
 
-    const { documentData } = document;
+    // This is the same case as above.
+    // eslint-disable-next-line @typescript-eslint/require-await
+    const documentDataId = await io.runTask('get-document-data-id', async () => {
+      return document.documentDataId;
+    });
+
+    const documentData = await prisma.documentData.findFirst({
+      where: {
+        id: documentDataId,
+      },
+    });
 
     if (!documentData) {
       throw new Error(`Document ${document.id} has no document data`);
@@ -107,24 +116,11 @@ export const SEAL_DOCUMENT_JOB_DEFINITION = {
       documentData.data = documentData.initialData;
     }
 
-    const pdfData = await io.runTask('get-document-data', async () => {
-      const data = await getFile(documentData);
+    const pdfData = await getFile(documentData);
+    const certificateData = await getCertificatePdf({ documentId }).catch(() => null);
 
-      return Buffer.from(data).toString('base64');
-    });
-
-    const certificateData = await io.runTask('get-certificate-data', async () => {
-      const data = await getCertificatePdf({ documentId }).catch(() => null);
-
-      if (!data) {
-        return null;
-      }
-
-      return Buffer.from(data).toString('base64');
-    });
-
-    const pdfBuffer = await io.runTask('decorate-and-sign-pdf', async () => {
-      const pdfDoc = await PDFDocument.load(Buffer.from(pdfData, 'base64'));
+    const newDataId = await io.runTask('decorate-and-sign-pdf', async () => {
+      const pdfDoc = await PDFDocument.load(pdfData);
 
       // Normalize and flatten layers that could cause issues with the signature
       normalizeSignatureAppearances(pdfDoc);
@@ -132,7 +128,7 @@ export const SEAL_DOCUMENT_JOB_DEFINITION = {
       flattenAnnotations(pdfDoc);
 
       if (certificateData) {
-        const certificateDoc = await PDFDocument.load(Buffer.from(certificateData, 'base64'));
+        const certificateDoc = await PDFDocument.load(certificateData);
 
         const certificatePages = await pdfDoc.copyPages(
           certificateDoc,
@@ -153,22 +149,17 @@ export const SEAL_DOCUMENT_JOB_DEFINITION = {
       flattenForm(pdfDoc);
 
       const pdfBytes = await pdfDoc.save();
+      const pdfBuffer = await signPdf({ pdf: Buffer.from(pdfBytes) });
 
-      const buffer = await signPdf({ pdf: Buffer.from(pdfBytes) });
-
-      return buffer.toString('base64');
-    });
-
-    const newData = await io.runTask('store-signed-document', async () => {
       const { name, ext } = path.parse(document.title);
 
-      const { data } = await putPdfFile({
+      const documentData = await putPdfFile({
         name: `${name}_signed${ext}`,
         type: 'application/pdf',
-        arrayBuffer: async () => Promise.resolve(Buffer.from(pdfBuffer, 'base64')),
+        arrayBuffer: async () => Promise.resolve(pdfBuffer),
       });
 
-      return data;
+      return documentData.id;
     });
 
     const postHog = PostHogServerClient();
@@ -185,6 +176,12 @@ export const SEAL_DOCUMENT_JOB_DEFINITION = {
 
     await io.runTask('update-document', async () => {
       await prisma.$transaction(async (tx) => {
+        const newData = await tx.documentData.findFirstOrThrow({
+          where: {
+            id: newDataId,
+          },
+        });
+
         await tx.document.update({
           where: {
             id: document.id,
@@ -200,7 +197,7 @@ export const SEAL_DOCUMENT_JOB_DEFINITION = {
             id: documentData.id,
           },
           data: {
-            data: newData,
+            data: newData.data,
           },
         });
 
