@@ -2,7 +2,7 @@ import { expect, test } from '@playwright/test';
 
 import { DocumentStatus } from '@documenso/prisma/client';
 import { seedDocuments, seedTeamDocuments } from '@documenso/prisma/seed/documents';
-import { seedTeamEmail, unseedTeam, unseedTeamEmail } from '@documenso/prisma/seed/teams';
+import { seedTeamEmail } from '@documenso/prisma/seed/teams';
 import { seedUser } from '@documenso/prisma/seed/users';
 
 import { apiSignin, apiSignout } from '../fixtures/authentication';
@@ -42,8 +42,6 @@ test('[TEAMS]: check team documents count', async ({ page }) => {
 
     await apiSignout({ page });
   }
-
-  await unseedTeam(team.url);
 });
 
 test('[TEAMS]: check team documents count with internal team email', async ({ page }) => {
@@ -138,9 +136,6 @@ test('[TEAMS]: check team documents count with internal team email', async ({ pa
 
     await apiSignout({ page });
   }
-
-  await unseedTeamEmail({ teamId: team.id });
-  await unseedTeam(team.url);
 });
 
 test('[TEAMS]: check team documents count with external team email', async ({ page }) => {
@@ -225,9 +220,6 @@ test('[TEAMS]: check team documents count with external team email', async ({ pa
   await checkDocumentTabCount(page, 'Completed', 0);
   await checkDocumentTabCount(page, 'Draft', 1);
   await checkDocumentTabCount(page, 'All', 3);
-
-  await unseedTeamEmail({ teamId: team.id });
-  await unseedTeam(team.url);
 });
 
 test('[TEAMS]: resend pending team document', async ({ page }) => {
@@ -284,8 +276,6 @@ test('[TEAMS]: delete draft team document', async ({ page }) => {
 
     await apiSignout({ page });
   }
-
-  await unseedTeam(team.url);
 });
 
 test('[TEAMS]: delete pending team document', async ({ page }) => {
@@ -325,8 +315,6 @@ test('[TEAMS]: delete pending team document', async ({ page }) => {
 
     await apiSignout({ page });
   }
-
-  await unseedTeam(team.url);
 });
 
 test('[TEAMS]: delete completed team document', async ({ page }) => {
@@ -366,6 +354,4 @@ test('[TEAMS]: delete completed team document', async ({ page }) => {
 
     await apiSignout({ page });
   }
-
-  await unseedTeam(team.url);
 });

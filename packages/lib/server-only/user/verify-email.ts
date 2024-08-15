@@ -2,7 +2,7 @@ import { DateTime } from 'luxon';
 
 import { prisma } from '@documenso/prisma';
 
-import { sendConfirmationToken } from './send-confirmation-token';
+import { jobsClient } from '../../jobs/client';
 
 export type VerifyEmailProps = {
   token: string;
@@ -40,7 +40,12 @@ export const verifyEmail = async ({ token }: VerifyEmailProps) => {
       !mostRecentToken ||
       DateTime.now().minus({ hours: 1 }).toJSDate() > mostRecentToken.createdAt
     ) {
-      await sendConfirmationToken({ email: verificationToken.user.email });
+      await jobsClient.triggerJob({
+        name: 'send.signup.confirmation.email',
+        payload: {
+          email: verificationToken.user.email,
+        },
+      });
     }
 
     return valid;

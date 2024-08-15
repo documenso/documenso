@@ -150,7 +150,7 @@ export const SigningForm = ({ document, recipient, fields, redirectUrl }: Signin
                   <SignDialog
                     isSubmitting={isSubmitting}
                     onSignatureComplete={handleSubmit(onFormSubmit)}
-                    document={document}
+                    documentTitle={document.title}
                     fields={fields}
                     fieldsValidated={fieldsValidated}
                     role={recipient.role}
@@ -213,7 +213,7 @@ export const SigningForm = ({ document, recipient, fields, redirectUrl }: Signin
                   <SignDialog
                     isSubmitting={isSubmitting}
                     onSignatureComplete={handleSubmit(onFormSubmit)}
-                    document={document}
+                    documentTitle={document.title}
                     fields={fields}
                     fieldsValidated={fieldsValidated}
                     role={recipient.role}

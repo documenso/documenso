@@ -12,7 +12,6 @@ import { match } from 'ts-pattern';
 import { PDF_VIEWER_PAGE_SELECTOR } from '@documenso/lib/constants/pdf-viewer';
 import { getFile } from '@documenso/lib/universal/upload/get-file';
 import type { DocumentData } from '@documenso/prisma/client';
-import type { DocumentWithData } from '@documenso/prisma/types/document-with-data';
 
 import { cn } from '../lib/utils';
 import { PasswordDialog } from './document-password-dialog';
@@ -46,7 +45,6 @@ const PDFLoader = () => (
 export type PDFViewerProps = {
   className?: string;
   documentData: DocumentData;
-  document?: DocumentWithData;
   password?: string | null;
   onPasswordSubmit?: (password: string) => void | Promise<void>;
   onDocumentLoad?: (_doc: LoadedPDFDocument) => void;

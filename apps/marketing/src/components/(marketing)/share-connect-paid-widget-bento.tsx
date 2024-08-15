@@ -2,6 +2,8 @@ import type { HTMLAttributes } from 'react';
 
 import Image from 'next/image';
 
+import { Trans } from '@lingui/macro';
+
 import backgroundPattern from '@documenso/assets/images/background-pattern.png';
 import cardConnectionsFigure from '@documenso/assets/images/card-connections-figure.png';
 import cardPaidFigure from '@documenso/assets/images/card-paid-figure.png';
@@ -53,9 +55,13 @@ export const ShareConnectPaidWidgetBento = ({
         <Card className="col-span-2 lg:col-span-1" spotlight>
           <CardContent className="grid grid-cols-1 gap-8 p-6">
             <p className="text-foreground/80 leading-relaxed">
-              <strong className="block">Connections</strong>
-              Create connections and automations with Zapier and more to integrate with your
-              favorite tools.
+              <strong className="block">
+                <Trans>Connections</Trans>
+              </strong>
+              <Trans>
+                Create connections and automations with Zapier and more to integrate with your
+                favorite tools.
+              </Trans>
             </p>
 
             <div className="flex items-center justify-center p-8">

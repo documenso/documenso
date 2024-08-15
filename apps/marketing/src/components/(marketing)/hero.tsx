@@ -4,13 +4,12 @@ import Image from 'next/image';
 
 import type { Variants } from 'framer-motion';
 import { motion } from 'framer-motion';
-import { usePlausible } from 'next-plausible';
 
 import backgroundPattern from '@documenso/assets/images/background-pattern.png';
-import { useFeatureFlags } from '@documenso/lib/client-only/providers/feature-flag';
 import { cn } from '@documenso/ui/lib/utils';
 import { Button } from '@documenso/ui/primitives/button';
 
+import { Carousel } from './carousel';
 import { Widget } from './widget';
 
 export type HeroProps = {
@@ -47,12 +46,27 @@ const HeroTitleVariants: Variants = {
   },
 };
 
+const HeroCarouselVariants: Variants = {
+  initial: {
+    opacity: 0,
+    y: 60,
+  },
+  animate: {
+    opacity: 1,
+    y: 0,
+    transition: {
+      delay: 0.5,
+      duration: 0.8,
+    },
+  },
+};
+
 export const Hero = ({ className, ...props }: HeroProps) => {
-  const event = usePlausible();
+  // const event = usePlausible();
 
-  const { getFlag } = useFeatureFlags();
+  // const { getFlag } = useFeatureFlags();
 
-  const heroMarketingCTA = getFlag('marketing_landing_hero_cta');
+  // const heroMarketingCTA = getFlag('marketing_landing_hero_cta');
 
   const onSignUpClick = () => {
     const el = document.getElementById('email');
@@ -122,7 +136,7 @@ export const Hero = ({ className, ...props }: HeroProps) => {
           {/* <Link href="https://github.com/documenso/documenso" onClick={() => event('view-github')}>
             <Button variant="outline" className="rounded-full bg-transparent backdrop-blur-sm">
               <LuGithub className="mr-2 h-5 w-5" />
-              Star on GitHub
+              <Trans>Star on GitHub</Trans>
             </Button>
           </Link> */}
         </motion.div>
@@ -169,24 +183,12 @@ export const Hero = ({ className, ...props }: HeroProps) => {
 
         <motion.div
           className="mt-12"
-          variants={{
-            initial: {
-              scale: 0.2,
-              opacity: 0,
-            },
-            animate: {
-              scale: 1,
-              opacity: 1,
-              transition: {
-                ease: 'easeInOut',
-                delay: 0.5,
-                duration: 0.8,
-              },
-            },
-          }}
+          variants={HeroCarouselVariants}
           initial="initial"
           animate="animate"
         >
+          <Carousel />
+
           <Widget className="mt-12 text-sm">
             <strong>SignStream მხარდამჭერი პირობა</strong>
             <p className="w-full lg:max-w-[70ch]">

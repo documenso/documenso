@@ -8,7 +8,7 @@ import { AlertTriangle, Loader } from 'lucide-react';
 
 import { useLimits } from '@documenso/ee/server-only/limits/provider/client';
 import { useUpdateSearchParams } from '@documenso/lib/client-only/hooks/use-update-search-params';
-import type { Recipient, Template } from '@documenso/prisma/client';
+import type { FindTemplateRow } from '@documenso/lib/server-only/template/find-templates';
 import { Alert, AlertDescription, AlertTitle } from '@documenso/ui/primitives/alert';
 import { DataTable } from '@documenso/ui/primitives/data-table';
 import { DataTablePagination } from '@documenso/ui/primitives/data-table-pagination';
@@ -18,18 +18,11 @@ import { TemplateType } from '~/components/formatter/template-type';
 
 import { DataTableActionDropdown } from './data-table-action-dropdown';
 import { DataTableTitle } from './data-table-title';
+import { TemplateDirectLinkBadge } from './template-direct-link-badge';
 import { UseTemplateDialog } from './use-template-dialog';
 
-type TemplateWithRecipient = Template & {
-  Recipient: Recipient[];
-};
-
 type TemplatesDataTableProps = {
-  templates: Array<
-    TemplateWithRecipient & {
-      team: { id: number; url: string } | null;
-    }
-  >;
+  templates: FindTemplateRow[];
   perPage: number;
   page: number;
   totalPages: number;
@@ -48,6 +41,7 @@ export const TemplatesDataTable = ({
   teamId,
 }: TemplatesDataTableProps) => {
   const [isPending, startTransition] = useTransition();
+
   const updateSearchParams = useUpdateSearchParams();
 
   const { remaining } = useLimits();
@@ -90,7 +84,19 @@ export const TemplatesDataTable = ({
           {
             header: 'ტიპი',
             accessorKey: 'type',
-            cell: ({ row }) => <TemplateType type={row.original.type} />,
+            cell: ({ row }) => (
+              <div className="flex flex-row items-center">
+                <TemplateType type="PRIVATE" />
+
+                {row.original.directLink?.token && (
+                  <TemplateDirectLinkBadge
+                    className="ml-2"
+                    token={row.original.directLink.token}
+                    enabled={row.original.directLink.enabled}
+                  />
+                )}
+              </div>
+            ),
           },
           {
             header: 'პარამეტრები',

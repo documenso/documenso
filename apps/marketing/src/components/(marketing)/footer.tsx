@@ -14,6 +14,8 @@ import LogoImage from '@documenso/assets/IPOGRAFI.svg';
 import { cn } from '@documenso/ui/lib/utils';
 import { ThemeSwitcher } from '@documenso/ui/primitives/theme-switcher';
 
+import { I18nSwitcher } from '~/components/(marketing)/i18n-switcher';
+
 // import { StatusWidgetContainer } from './status-widget-container';
 
 export type FooterProps = HTMLAttributes<HTMLDivElement>;
@@ -73,7 +75,7 @@ export const Footer = ({ className, ...props }: FooterProps) => {
               target={link.target}
               className="text-muted-foreground hover:text-muted-foreground/80 flex-shrink-0 break-words text-sm"
             >
-              {link.text}
+              {typeof link.text === 'string' ? link.text : _(link.text)}
             </Link>
           ))}
         </div>
@@ -83,8 +85,12 @@ export const Footer = ({ className, ...props }: FooterProps) => {
           © {new Date().getFullYear()} შპს Ipografi. ყველა უფლება დაცულია
         </p>
 
-        <div className="flex flex-wrap">
-          <ThemeSwitcher />
+        <div className="flex flex-row-reverse items-center sm:flex-row">
+          <I18nSwitcher className="text-muted-foreground ml-2 rounded-full font-normal sm:mr-2" />
+
+          <div className="flex flex-wrap">
+            <ThemeSwitcher />
+          </div>
         </div>
       </div>
     </div>

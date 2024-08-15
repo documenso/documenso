@@ -1,16 +1,20 @@
 'use client';
 
+import { msg } from '@lingui/macro';
+import { useLingui } from '@lingui/react';
 import { DateTime } from 'luxon';
 import { Bar, BarChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
 
-import type { GetUserMonthlyGrowthResult } from '@documenso/lib/server-only/user/get-user-monthly-growth';
+import type { GetCompletedDocumentsMonthlyResult } from '@documenso/lib/server-only/user/get-monthly-completed-document';
 
 export type TotalSignedDocumentsChartProps = {
   className?: string;
-  data: GetUserMonthlyGrowthResult;
+  data: GetCompletedDocumentsMonthlyResult;
 };
 
 export const TotalSignedDocumentsChart = ({ className, data }: TotalSignedDocumentsChartProps) => {
+  const { _ } = useLingui();
+
   const formattedData = [...data].reverse().map(({ month, cume_count: count }) => {
     return {
       month: DateTime.fromFormat(month, 'yyyy-MM').toFormat('LLLL'),
@@ -47,7 +51,7 @@ export const TotalSignedDocumentsChart = ({ className, data }: TotalSignedDocume
               fill="hsl(var(--primary))"
               radius={[4, 4, 0, 0]}
               maxBarSize={60}
-              label="Total Completed Documents"
+              label={_(msg`Total Completed Documents`)}
             />
           </BarChart>
         </ResponsiveContainer>

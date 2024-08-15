@@ -4,6 +4,13 @@ services:
   database:
     image: postgres:15
     container_name: database
+    volumes:
+      - documenso_database:/var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U ${POSTGRES_USER}']
+      interval: 10s
+      timeout: 5s
+      retries: 5
     environment:
       - POSTGRES_USER=documenso
       - POSTGRES_PASSWORD=password
@@ -33,5 +40,43 @@ services:
     entrypoint: sh
     command: -c 'mkdir -p /data/documenso && minio server /data --console-address ":9001" --address ":9002"'
 
+  triggerdotdev:
+    image: ghcr.io/triggerdotdev/trigger.dev:latest
+    container_name: triggerdotdev
+    environment:
+      - LOGIN_ORIGIN=http://localhost:3030
+      - APP_ORIGIN=http://localhost:3030
+      - PORT=3030
+      - REMIX_APP_PORT=3030
+      - MAGIC_LINK_SECRET=secret
+      - SESSION_SECRET=secret
+      - ENCRYPTION_KEY=deadbeefcafefeed
+      - DATABASE_URL=postgresql://trigger:password@triggerdotdev_database:5432/trigger
+      - DIRECT_URL=postgresql://trigger:password@triggerdotdev_database:5432/trigger
+      - RUNTIME_PLATFORM=docker-compose
+    ports:
+      - 3030:3030
+    depends_on:
+      - triggerdotdev_database
+
+  triggerdotdev_database:
+    container_name: triggerdotdev_database
+    image: postgres:15
+    volumes:
+      - triggerdotdev_database:/var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U ${POSTGRES_USER}']
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    environment:
+      - POSTGRES_USER=trigger
+      - POSTGRES_PASSWORD=password
+      - POSTGRES_DB=trigger
+    ports:
+      - 54321:5432
+
 volumes:
   minio:
+  documenso_database:
+  triggerdotdev_database:

@@ -10,6 +10,7 @@ import { browserSupportsWebAuthn, startAuthentication } from '@simplewebauthn/br
 import { KeyRoundIcon } from 'lucide-react';
 import { signIn } from 'next-auth/react';
 import { useForm } from 'react-hook-form';
+import { FaIdCardClip } from 'react-icons/fa6';
 import { FcGoogle } from 'react-icons/fc';
 import { match } from 'ts-pattern';
 import { z } from 'zod';
@@ -38,6 +39,7 @@ import {
 } from '@documenso/ui/primitives/form/form';
 import { Input } from '@documenso/ui/primitives/input';
 import { PasswordInput } from '@documenso/ui/primitives/password-input';
+import { PinInput, PinInputGroup, PinInputSlot } from '@documenso/ui/primitives/pin-input';
 import { useToast } from '@documenso/ui/primitives/use-toast';
 
 const ERROR_MESSAGES: Partial<Record<keyof typeof ErrorCode, string>> = {
@@ -68,9 +70,17 @@ export type SignInFormProps = {
   className?: string;
   initialEmail?: string;
   isGoogleSSOEnabled?: boolean;
+  isOIDCSSOEnabled?: boolean;
+  oidcProviderLabel?: string;
 };
 
-export const SignInForm = ({ className, initialEmail, isGoogleSSOEnabled }: SignInFormProps) => {
+export const SignInForm = ({
+  className,
+  initialEmail,
+  isGoogleSSOEnabled,
+  isOIDCSSOEnabled,
+  oidcProviderLabel,
+}: SignInFormProps) => {
   const { toast } = useToast();
   const { getFlag } = useFeatureFlags();
 
@@ -260,6 +270,19 @@ export const SignInForm = ({ className, initialEmail, isGoogleSSOEnabled }: Sign
     }
   };
 
+  const onSignInWithOIDCClick = async () => {
+    try {
+      await signIn('oidc', { callbackUrl: LOGIN_REDIRECT_PATH });
+    } catch (err) {
+      toast({
+        title: 'დაფიქსირდა ხარვეზი',
+        description:
+          'თქვენი ავტორიზაციისას დაფიქსირდა ხარვეზი. გთხოვთ თავიდან სცადოთ ან დაგვიკავშირდეთ.',
+        variant: 'destructive',
+      });
+    }
+  };
+
   return (
     <Form {...form}>
       <form
@@ -320,7 +343,7 @@ export const SignInForm = ({ className, initialEmail, isGoogleSSOEnabled }: Sign
             {isSubmitting ? 'ავტორიზაცია...' : 'ავტორიზაცია'}
           </Button>
 
-          {(isGoogleSSOEnabled || isPasskeyEnabled) && (
+          {(isGoogleSSOEnabled || isPasskeyEnabled || isOIDCSSOEnabled) && (
             <div className="relative flex items-center justify-center gap-x-4 py-2 text-xs uppercase">
               <div className="bg-border h-px flex-1" />
               <span className="text-muted-foreground bg-transparent">ან განაგრძეთ</span>
@@ -339,6 +362,20 @@ export const SignInForm = ({ className, initialEmail, isGoogleSSOEnabled }: Sign
             >
               <FcGoogle className="mr-2 h-5 w-5" />
               Google
+            </Button>
+          )}
+
+          {isOIDCSSOEnabled && (
+            <Button
+              type="button"
+              size="lg"
+              variant="outline"
+              className="bg-background text-muted-foreground border"
+              disabled={isSubmitting}
+              onClick={onSignInWithOIDCClick}
+            >
+              <FaIdCardClip className="mr-2 h-5 w-5" />
+              {oidcProviderLabel || 'OIDC'}
             </Button>
           )}
 
@@ -378,7 +415,15 @@ export const SignInForm = ({ className, initialEmail, isGoogleSSOEnabled }: Sign
                     <FormItem>
                       <FormLabel>ავთენტიფიკაციის ტოკენი</FormLabel>
                       <FormControl>
-                        <Input type="text" {...field} />
+                        <PinInput {...field} value={field.value ?? ''} maxLength={6}>
+                          {Array(6)
+                            .fill(null)
+                            .map((_, i) => (
+                              <PinInputGroup key={i}>
+                                <PinInputSlot index={i} />
+                              </PinInputGroup>
+                            ))}
+                        </PinInput>
                       </FormControl>
                       <FormMessage />
                     </FormItem>

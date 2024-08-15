@@ -18,6 +18,10 @@ const FONT_CAVEAT_BYTES = fs.readFileSync(
   path.join(__dirname, '../../packages/assets/fonts/caveat.ttf'),
 );
 
+const FONT_NOTO_SANS_BYTES = fs.readFileSync(
+  path.join(__dirname, '../../packages/assets/fonts/noto-sans.ttf'),
+);
+
 /** @type {import('next').NextConfig} */
 const config = {
   output: process.env.DOCKER_OUTPUT ? 'standalone' : undefined,
@@ -27,6 +31,7 @@ const config = {
     serverActions: {
       bodySizeLimit: '50mb',
     },
+    swcPlugins: [['@lingui/swc-plugin', {}]],
   },
   reactStrictMode: true,
   transpilePackages: [
@@ -42,6 +47,7 @@ const config = {
     APP_VERSION: version,
     NEXT_PUBLIC_PROJECT: 'web',
     FONT_CAVEAT_URI: `data:font/ttf;base64,${FONT_CAVEAT_BYTES.toString('base64')}`,
+    FONT_NOTO_SANS_URI: `data:font/ttf;base64,${FONT_NOTO_SANS_BYTES.toString('base64')}`,
   },
   modularizeImports: {
     'lucide-react': {
@@ -53,6 +59,13 @@ const config = {
     if (isServer) {
       config.resolve.alias.canvas = false;
     }
+
+    config.module.rules.push({
+      test: /\.po$/,
+      use: {
+        loader: '@lingui/loader',
+      },
+    });
 
     return config;
   },

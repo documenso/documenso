@@ -14,8 +14,8 @@ import { extractDocumentAuthMethods } from '../../utils/document-auth';
 
 type IsRecipientAuthorizedOptions = {
   type: 'ACCESS' | 'ACTION';
-  document: Document;
-  recipient: Recipient;
+  documentAuthOptions: Document['authOptions'];
+  recipient: Pick<Recipient, 'authOptions' | 'email'>;
 
   /**
    * The ID of the user who initiated the request.
@@ -50,13 +50,13 @@ const getUserByEmail = async (email: string) => {
  */
 export const isRecipientAuthorized = async ({
   type,
-  document,
+  documentAuthOptions,
   recipient,
   userId,
   authOptions,
 }: IsRecipientAuthorizedOptions): Promise<boolean> => {
   const { derivedRecipientAccessAuth, derivedRecipientActionAuth } = extractDocumentAuthMethods({
-    documentAuth: document.authOptions,
+    documentAuth: documentAuthOptions,
     recipientAuth: recipient.authOptions,
   });
 

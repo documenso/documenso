@@ -2,6 +2,8 @@
 
 import type { HTMLAttributes } from 'react';
 
+import { msg } from '@lingui/macro';
+import { useLingui } from '@lingui/react';
 import { Bar, BarChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
 
 import { formatMonth } from '@documenso/lib/client-only/format-month';
@@ -11,6 +13,8 @@ export type FundingRaisedProps = HTMLAttributes<HTMLDivElement> & {
 };
 
 export const FundingRaised = ({ className, data, ...props }: FundingRaisedProps) => {
+  const { _ } = useLingui();
+
   const formattedData = data.map((item) => ({
     amount: Number(item.amount),
     // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
@@ -49,14 +53,14 @@ export const FundingRaised = ({ className, data, ...props }: FundingRaisedProps)
                   currency: 'USD',
                   maximumFractionDigits: 0,
                 }),
-                'Amount Raised',
+                _(msg`Amount Raised`),
               ]}
               cursor={{ fill: 'hsl(var(--primary) / 10%)' }}
             />
             <Bar
               dataKey="amount"
               fill="hsl(var(--primary))"
-              label="Amount Raised"
+              label={_(msg`Amount Raised`)}
               maxBarSize={60}
               radius={[4, 4, 0, 0]}
             />

@@ -14,6 +14,7 @@ import { useToast } from '@documenso/ui/primitives/use-toast';
 
 type DeleteTemplateDialogProps = {
   id: number;
+  teamId?: number;
   open: boolean;
   onOpenChange: (_open: boolean) => void;
 };

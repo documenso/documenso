@@ -1,6 +1,6 @@
 import type { HTMLAttributes } from 'react';
 
-import { Globe, Lock } from 'lucide-react';
+import { Lock } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react/dist/lucide-react';
 
 import type { TemplateType as TemplateTypePrisma } from '@documenso/prisma/client';

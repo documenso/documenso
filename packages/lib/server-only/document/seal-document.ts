@@ -1,5 +1,3 @@
-'use server';
-
 import { nanoid } from 'nanoid';
 import path from 'node:path';
 import { PDFDocument } from 'pdf-lib';
@@ -17,6 +15,7 @@ import { getFile } from '../../universal/upload/get-file';
 import { putPdfFile } from '../../universal/upload/put-file';
 import { getCertificatePdf } from '../htmltopdf/get-certificate-pdf';
 import { flattenAnnotations } from '../pdf/flatten-annotations';
+import { flattenForm } from '../pdf/flatten-form';
 import { insertFieldInPDF } from '../pdf/insert-field-in-pdf';
 import { normalizeSignatureAppearances } from '../pdf/normalize-signature-appearances';
 import { triggerWebhook } from '../webhooks/trigger/trigger-webhook';
@@ -35,8 +34,6 @@ export const sealDocument = async ({
   isResealing = false,
   requestMetadata,
 }: SealDocumentOptions) => {
-  'use server';
-
   const document = await prisma.document.findFirstOrThrow({
     where: {
       id: documentId,
@@ -101,7 +98,7 @@ export const sealDocument = async ({
 
   // Normalize and flatten layers that could cause issues with the signature
   normalizeSignatureAppearances(doc);
-  doc.getForm().flatten();
+  flattenForm(doc);
   flattenAnnotations(doc);
 
   if (certificate) {
@@ -115,6 +112,9 @@ export const sealDocument = async ({
   for (const field of fields) {
     await insertFieldInPDF(doc, field);
   }
+
+  // Re-flatten post-insertion to handle fields that create arcoFields
+  flattenForm(doc);
 
   const pdfBytes = await doc.save();
 

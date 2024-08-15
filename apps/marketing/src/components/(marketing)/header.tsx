@@ -8,7 +8,6 @@ import Link from 'next/link';
 
 import LogoImage from '@documenso/assets/IPOGRAFI.svg';
 // import LogoImage from '@documenso/assets/logo.png';
-import { useFeatureFlags } from '@documenso/lib/client-only/providers/feature-flag';
 import { cn } from '@documenso/ui/lib/utils';
 import { Button } from '@documenso/ui/primitives/button';
 
@@ -19,10 +18,6 @@ export type HeaderProps = HTMLAttributes<HTMLElement>;
 
 export const Header = ({ className, ...props }: HeaderProps) => {
   const [isHamburgerMenuOpen, setIsHamburgerMenuOpen] = useState(false);
-
-  const { getFlag } = useFeatureFlags();
-
-  const isSinglePlayerModeMarketingEnabled = getFlag('marketing_header_single_player_mode');
 
   return (
     <header className={cn('flex items-center justify-between', className)} {...props}>

@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 
+import { setupI18nSSR } from '@documenso/lib/client-only/providers/i18n.server';
 import {
   Accordion,
   AccordionContent,
@@ -8,6 +9,7 @@ import {
   AccordionTrigger,
 } from '@documenso/ui/primitives/accordion';
 
+import { Enterprise } from '~/components/(marketing)/enterprise';
 import { PricingTable } from '~/components/(marketing)/pricing-table';
 
 export const metadata: Metadata = {
@@ -26,6 +28,8 @@ export type PricingPageProps = {
 };
 
 export default function PricingPage() {
+  setupI18nSSR();
+
   return (
     <div className="mt-6 sm:mt-12">
       <div className="text-center">
@@ -41,15 +45,25 @@ export default function PricingPage() {
         <PricingTable />
       </div>
 
+      <div className="mt-12">
+        <Enterprise />
+      </div>
+
+      <div className="mt-12">
+        <Enterprise />
+      </div>
+
       {/* <div className="mx-auto mt-36 max-w-2xl">
         <h2 className="text-center text-2xl font-semibold">
           არცერთი მათგანი არ მუშაობს თქვენთვის? სცადეთ თვითჰოსტინგი!
         </h2>
 
         <p className="text-muted-foreground mt-4 text-center leading-relaxed">
-          Our self-hosted option is great for small teams and individuals who need a simple
-          solution. You can use our docker based setup to get started in minutes. Take control with
-          full customizability and data ownership.
+          <Trans>
+            Our self-hosted option is great for small teams and individuals who need a simple
+            solution. You can use our docker based setup to get started in minutes. Take control
+            with full customizability and data ownership.
+          </Trans>
         </p>
 
         <div className="mt-4 flex justify-center">
@@ -115,24 +129,26 @@ export default function PricingPage() {
             </AccordionTrigger>
 
             <AccordionContent className="text-muted-foreground max-w-prose text-sm leading-relaxed">
-              That's awesome. You can take a look at the current{' '}
-              <Link
-                className="text-documenso-700 font-bold"
-                href="https://github.com/documenso/documenso/milestones"
-                target="_blank"
-              >
-                Issues
-              </Link>{' '}
-              and join our{' '}
-              <Link
-                className="text-documenso-700 font-bold"
-                href="https://documen.so/discord"
-                target="_blank"
-              >
-                Discord Community
-              </Link>{' '}
-              to keep up to date, on what the current priorities are. In any case, we are an open
-              community and welcome all input, technical and non-technical ❤️
+              <Trans>
+                That's awesome. You can take a look at the current{' '}
+                <Link
+                  className="text-documenso-700 font-bold"
+                  href="https://github.com/documenso/documenso/milestones"
+                  target="_blank"
+                >
+                  Issues
+                </Link>{' '}
+                and join our{' '}
+                <Link
+                  className="text-documenso-700 font-bold"
+                  href="https://documen.so/discord"
+                  target="_blank"
+                >
+                  Discord Community
+                </Link>{' '}
+                to keep up to date, on what the current priorities are. In any case, we are an open
+                community and welcome all input, technical and non-technical ❤️
+              </Trans>
             </AccordionContent>
           </AccordionItem> */}
 

@@ -20,7 +20,11 @@ export const DocumentGlobalAuthActionSelect = forwardRef<HTMLButtonElement, Sele
   (props, ref) => (
     <Select {...props}>
       <SelectTrigger className="bg-background text-muted-foreground">
-        <SelectValue ref={ref} data-testid="documentActionSelectValue" placeholder="None" />
+        <SelectValue
+          ref={ref}
+          data-testid="documentActionSelectValue"
+          placeholder="No restrictions"
+        />
       </SelectTrigger>
 
       <SelectContent position="popper">

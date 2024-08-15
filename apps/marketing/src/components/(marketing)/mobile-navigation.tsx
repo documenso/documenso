@@ -3,6 +3,7 @@
 import Image from 'next/image';
 import Link from 'next/link';
 
+import { useLingui } from '@lingui/react';
 import { motion, useReducedMotion } from 'framer-motion';
 import { FaXTwitter } from 'react-icons/fa6';
 import { LiaDiscord } from 'react-icons/lia';
@@ -58,6 +59,8 @@ export const MENU_NAVIGATION_LINKS = [
 ];
 
 export const MobileNavigation = ({ isMenuOpen, onMenuOpenChange }: MobileNavigationProps) => {
+  const { _ } = useLingui();
+
   const shouldReduceMotion = useReducedMotion();
 
   const handleMenuItemClick = () => {
@@ -109,7 +112,7 @@ export const MobileNavigation = ({ isMenuOpen, onMenuOpenChange }: MobileNavigat
                 onClick={() => handleMenuItemClick()}
                 target={target}
               >
-                {text}
+                {typeof text === 'string' ? text : _(text)}
               </Link>
             </motion.div>
           ))}

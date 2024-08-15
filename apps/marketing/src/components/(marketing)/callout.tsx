@@ -1,16 +1,14 @@
 'use client';
 
-import { usePlausible } from 'next-plausible';
-
 import { Button } from '@documenso/ui/primitives/button';
 
-export type CalloutProps = {
-  starCount?: number;
-  [key: string]: unknown;
-};
+// export type CalloutProps = {
+//   starCount?: number;
+//   [key: string]: unknown;
+// };
 
-export const Callout = ({ starCount }: CalloutProps) => {
-  const event = usePlausible();
+export const Callout = () => {
+  // const event = usePlausible();
 
   const onSignUpClick = () => {
     const el = document.getElementById('email');

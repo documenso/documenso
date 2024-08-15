@@ -34,13 +34,9 @@
   <img src="https://github.com/documenso/documenso/assets/13398220/d96ed533-6f34-4a97-be9b-442bdb189c69" style="width: 80%;" />
 </div>
 
-## About this project
+## About Documenso
 
-Signing documents digitally should be fast and easy and should be the best practice for every document signed worldwide.
-
-This is technically quite easy today, but it also introduces a new party to every signature: The signing tool providers. While this is not a problem in itself, it should make us think about how we want these providers of trust to work.
-
-Documenso aims to be the world's most trusted document-signing tool. This trust is built by empowering you to self-host Documenso and review how it works under the hood.
+Signing documents digitally should be fast and easy and should be the best practice for every document signed worldwide. This is technically quite easy today, but it also introduces a new party to every signature: The signing tool providers. While this is not a problem in itself, it should make us think about how we want these providers of trust to work. Documenso aims to be the world's most trusted document-signing tool. This trust is built by empowering you to self-host Documenso and review how it works under the hood.
 
 Join us in creating the next generation of open trust infrastructure.
 
@@ -73,16 +69,28 @@ Contact us if you are interested in our Enterprise plan for large organizations 
 <a href="https://cal.com/timurercan/enterprise-customers?utm_source=banner&utm_campaign=oss"><img alt="Book us with Cal.com" src="https://cal.com/book-with-cal-dark.svg" /></a>
 
 ## Tech Stack
+<p align="left">
+  <a href="https://www.typescriptlang.org"><img src="https://shields.io/badge/TypeScript-3178C6?logo=TypeScript&logoColor=FFF&style=flat-square" alt="TypeScript"></a>
+  <a href="https://nextjs.org/"><img src="https://img.shields.io/badge/next.js-000000?style=flat-square&logo=nextdotjs&logoColor=white" alt="NextJS"></a>
+  <a href="https://prisma.io"><img width="122" height="20" src="http://made-with.prisma.io/indigo.svg" alt="Made with Prisma" /></a>
+  <a href="https://tailwindcss.com/"><img src="https://img.shields.io/badge/tailwindcss-0F172A?&logo=tailwindcss" alt="Tailwind CSS"></a>
+  <a href=""><img src="" alt=""></a>
+  <a href=""><img src="" alt=""></a>
+  <a href=""><img src="" alt=""></a>
+  <a href=""><img src="" alt=""></a>
+  <a href=""><img src="" alt=""></a>
+</p>
+
 
 - [Typescript](https://www.typescriptlang.org/) - Language
 - [Next.js](https://nextjs.org/) - Framework
-- [Prisma](https://www.prisma.io/) - ORM
+- [Prisma](https://www.prisma.io/)  - ORM
 - [Tailwind](https://tailwindcss.com/) - CSS
 - [shadcn/ui](https://ui.shadcn.com/) - Component Library
 - [NextAuth.js](https://next-auth.js.org/) - Authentication
 - [react-email](https://react.email/) - Email Templates
 - [tRPC](https://trpc.io/) - API
-- [@documenso/pdf-sign](https://www.npmjs.com/package/@documenso/pdf-sign) - PDF Signatures
+- [@documenso/pdf-sign](https://www.npmjs.com/package/@documenso/pdf-sign) - PDF Signatures (launching soon)
 - [React-PDF](https://github.com/wojtekmaj/react-pdf) - Viewing PDFs
 - [PDF-Lib](https://github.com/Hopding/pdf-lib) - PDF manipulation
 - [Stripe](https://stripe.com/) - Payments
@@ -231,14 +239,14 @@ cp .env.example .env
 
 The following environment variables must be set:
 
-* `NEXTAUTH_URL`
-* `NEXTAUTH_SECRET`
-* `NEXT_PUBLIC_WEBAPP_URL`
-* `NEXT_PUBLIC_MARKETING_URL`
-* `NEXT_PRIVATE_DATABASE_URL`
-* `NEXT_PRIVATE_DIRECT_DATABASE_URL`
-* `NEXT_PRIVATE_SMTP_FROM_NAME`
-* `NEXT_PRIVATE_SMTP_FROM_ADDRESS`
+- `NEXTAUTH_URL`
+- `NEXTAUTH_SECRET`
+- `NEXT_PUBLIC_WEBAPP_URL`
+- `NEXT_PUBLIC_MARKETING_URL`
+- `NEXT_PRIVATE_DATABASE_URL`
+- `NEXT_PRIVATE_DIRECT_DATABASE_URL`
+- `NEXT_PRIVATE_SMTP_FROM_NAME`
+- `NEXT_PRIVATE_SMTP_FROM_ADDRESS`
 
 > If you are using a reverse proxy in front of Documenso, don't forget to provide the public URL for both `NEXTAUTH_URL` and `NEXT_PUBLIC_WEBAPP_URL` variables!
 

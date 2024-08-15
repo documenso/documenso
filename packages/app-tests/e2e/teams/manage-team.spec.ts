@@ -1,7 +1,7 @@
 import { test } from '@playwright/test';
 
 import { WEBAPP_BASE_URL } from '@documenso/lib/constants/app';
-import { seedTeam, unseedTeam } from '@documenso/prisma/seed/teams';
+import { seedTeam } from '@documenso/prisma/seed/teams';
 import { seedUser } from '@documenso/prisma/seed/users';
 
 import { apiSignin } from '../fixtures/authentication';
@@ -33,8 +33,6 @@ test('[TEAMS]: create team', async ({ page }) => {
 
   // Goto new team settings page.
   await page.getByRole('row').filter({ hasText: teamId }).getByRole('link').nth(1).click();
-
-  await unseedTeam(teamId);
 });
 
 test('[TEAMS]: delete team', async ({ page }) => {
@@ -84,6 +82,4 @@ test('[TEAMS]: update team', async ({ page }) => {
 
   // Check we have been redirected to the new team URL and the name is updated.
   await page.waitForURL(`${WEBAPP_BASE_URL}/t/${updatedTeamId}/settings`);
-
-  await unseedTeam(updatedTeamId);
 });

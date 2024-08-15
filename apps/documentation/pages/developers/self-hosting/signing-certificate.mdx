@@ -1,0 +1,67 @@
+---
+title: Signing Certificate
+description: Learn how to generate or buy a signing certificate for your Documenso instance.
+---
+
+import { Callout, Steps } from 'nextra/components';
+
+# Generate or Buy
+
+Self-hosting your Documenso instance requires your own certificate to sign documents. [This article](https://documenso.com/blog/building-documenso-pt1) explains why.
+
+When it comes to certificates, you have two options:
+
+- generate your certificate
+- buy one from the Certificate Authority (CA)
+
+<Callout type="info" emoji="ℹ️">
+  A self-signed certificate should suffice if your industry has no special signing regulation. For
+  example, Deel.com makes hundreds of millions in revenue based on a platform without any signing
+  certificate, making your self-signed instance technically more secure. Of course, this is not
+  legal advice.
+</Callout>
+
+## Generating A Certificate
+
+If you don't have special requirements for the signature of your signed documents, you can use a self-generated (self-signed) certificate.
+
+The main drawback is that mainstream PDF readers like Adobe won't recognize the signature as a trusted source or show a green checkmark. The certificate will still include your company/personal data to prove your Documenso instance signed the document. It also guarantees that the document wasn't altered after signing.
+
+You can generate your signing certificate by following [this guide](/developers/local-development/signing-certificate).
+
+## Buying a Certificate
+
+If you want more "officially backed" _(for lack of a better word)_ signatures, you will need to buy a certificate from a CA (Certificate Authority). If you want a green checkmark in Adobe PDF, you will need a vendor trusted by Adobe. Check out all Adobe vendors with a green checkmark for the signature on the [Adobe Trust List](https://helpx.adobe.com/acrobat/kb/approved-trust-list1.html).
+
+If you are based in Europe, it might make sense to go with a European one, though there is no hard requirement. While the pricing can vary from vendor to vendor, the certificate's properties don't. The usual case would be a corporate certificate detailing the company's name to which it was issued.
+
+### Technical Process
+
+Receiving your signing certificate is similar to receiving an SSL certificate. Since you need the actual certificate as part of the Documenso config, you must generate a secret private key and a CSR (Certificate Signing Request).
+
+<Steps>
+
+### Generate a private key
+
+Generate a private key (on a secure machine or in an HSM, depending on your security needs and the provider's requirements).
+
+### Create a CSR
+
+Have the Certificate Authority sign the Certificate Signing Request.
+
+### Configure Documenso to use the certificate
+
+Configure your instance to use the new certificate by configuring the following environment variables in your `.env` file:
+
+| Environment Variable                                            | Description                                                                                                                               |
+| :-------------------------------------------------------------- | :---------------------------------------------------------------------------------------------------------------------------------------- |
+| `NEXT_PRIVATE_SIGNING_TRANSPORT`                                | The transport used for document signing. Available options: local (default), gcloud-hsm                                                   |
+| `NEXT_PRIVATE_SIGNING_PASSPHRASE`                               | The passphrase for the local file-based signing transport. This field is optional.                                                        |
+| `NEXT_PRIVATE_SIGNING_LOCAL_FILE_PATH`                          | The local file path to the .p12 file to use for the local signing transport. This field is optional.                                      |
+| `NEXT_PRIVATE_SIGNING_LOCAL_FILE_CONTENTS`                      | The base64-encoded contents of the .p12 file to use for the local signing transport. This field is optional.                              |
+| `NEXT_PRIVATE_SIGNING_GCLOUD_HSM_KEY_PATH`                      | The Google Cloud HSM key path for the gcloud-hsm signing transport. This field is optional.                                               |
+| `NEXT_PRIVATE_SIGNING_GCLOUD_HSM _PUBLIC_CRT_FILE_PATH`         | The path to the Google Cloud HSM public certificate file to use for the gcloud-hsm signing transport. This field is optional.             |
+| `NEXT_PRIVATE_SIGNING_GCLOUD_HSM _PUBLIC_CRT_FILE_CONTENTS`     | The base64-encoded contents of the Google Cloud HSM public certificate file for the gcloud-hsm signing transport. This field is optional. |
+| `NEXT_PRIVATE_SIGNING_GCLOUD_ APPLICATION_CREDENTIALS_CONTENTS` | The Google Cloud Credentials file path for the gcloud-hsm signing transport. This field is optional.                                      |
+
+</Steps>

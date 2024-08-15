@@ -1,12 +1,26 @@
+import { validateCheckboxField } from '@documenso/lib/advanced-fields-validation/validate-checkbox';
+import { validateDropdownField } from '@documenso/lib/advanced-fields-validation/validate-dropdown';
+import { validateNumberField } from '@documenso/lib/advanced-fields-validation/validate-number';
+import { validateRadioField } from '@documenso/lib/advanced-fields-validation/validate-radio';
+import { validateTextField } from '@documenso/lib/advanced-fields-validation/validate-text';
 import { DOCUMENT_AUDIT_LOG_TYPE } from '@documenso/lib/types/document-audit-logs';
+import {
+  type TFieldMetaSchema as FieldMeta,
+  ZCheckboxFieldMeta,
+  ZDropdownFieldMeta,
+  ZFieldMetaSchema,
+  ZNumberFieldMeta,
+  ZRadioFieldMeta,
+  ZTextFieldMeta,
+} from '@documenso/lib/types/field-meta';
 import type { RequestMetadata } from '@documenso/lib/universal/extract-request-metadata';
 import {
   createDocumentAuditLogData,
   diffFieldChanges,
 } from '@documenso/lib/utils/document-audit-logs';
 import { prisma } from '@documenso/prisma';
-import type { Field, FieldType } from '@documenso/prisma/client';
-import { SendStatus, SigningStatus } from '@documenso/prisma/client';
+import type { Field } from '@documenso/prisma/client';
+import { FieldType, SendStatus, SigningStatus } from '@documenso/prisma/client';
 
 export interface SetFieldsForDocumentOptions {
   userId: number;
@@ -20,6 +34,7 @@ export interface SetFieldsForDocumentOptions {
     pageY: number;
     pageWidth: number;
     pageHeight: number;
+    fieldMeta?: FieldMeta;
   }[];
   requestMetadata?: RequestMetadata;
 }
@@ -103,6 +118,83 @@ export const setFieldsForDocument = async ({
       linkedFields.map(async (field) => {
         const fieldSignerEmail = field.signerEmail.toLowerCase();
 
+        const parsedFieldMeta = field.fieldMeta
+          ? ZFieldMetaSchema.parse(field.fieldMeta)
+          : undefined;
+
+        if (field.type === FieldType.TEXT && field.fieldMeta) {
+          const textFieldParsedMeta = ZTextFieldMeta.parse(field.fieldMeta);
+          const errors = validateTextField(textFieldParsedMeta.text || '', textFieldParsedMeta);
+
+          if (errors.length > 0) {
+            throw new Error(errors.join(', '));
+          }
+        }
+
+        if (field.type === FieldType.NUMBER && field.fieldMeta) {
+          const numberFieldParsedMeta = ZNumberFieldMeta.parse(field.fieldMeta);
+          const errors = validateNumberField(
+            String(numberFieldParsedMeta.value),
+            numberFieldParsedMeta,
+          );
+
+          if (errors.length > 0) {
+            throw new Error(errors.join(', '));
+          }
+        }
+
+        if (field.type === FieldType.CHECKBOX) {
+          if (field.fieldMeta) {
+            const checkboxFieldParsedMeta = ZCheckboxFieldMeta.parse(field.fieldMeta);
+            const errors = validateCheckboxField(
+              checkboxFieldParsedMeta?.values?.map((item) => item.value) ?? [],
+              checkboxFieldParsedMeta,
+            );
+
+            if (errors.length > 0) {
+              throw new Error(errors.join(', '));
+            }
+          } else {
+            throw new Error(
+              'To proceed further, please set at least one value for the Checkbox field',
+            );
+          }
+        }
+
+        if (field.type === FieldType.RADIO) {
+          if (field.fieldMeta) {
+            const radioFieldParsedMeta = ZRadioFieldMeta.parse(field.fieldMeta);
+            const checkedRadioFieldValue = radioFieldParsedMeta.values?.find(
+              (option) => option.checked,
+            )?.value;
+
+            const errors = validateRadioField(checkedRadioFieldValue, radioFieldParsedMeta);
+
+            if (errors.length > 0) {
+              throw new Error(errors.join('. '));
+            }
+          } else {
+            throw new Error(
+              'To proceed further, please set at least one value for the Radio field',
+            );
+          }
+        }
+
+        if (field.type === FieldType.DROPDOWN) {
+          if (field.fieldMeta) {
+            const dropdownFieldParsedMeta = ZDropdownFieldMeta.parse(field.fieldMeta);
+            const errors = validateDropdownField(undefined, dropdownFieldParsedMeta);
+
+            if (errors.length > 0) {
+              throw new Error(errors.join('. '));
+            }
+          } else {
+            throw new Error(
+              'To proceed further, please set at least one value for the Dropdown field',
+            );
+          }
+        }
+
         const upsertedField = await tx.field.upsert({
           where: {
             id: field._persisted?.id ?? -1,
@@ -114,6 +206,7 @@ export const setFieldsForDocument = async ({
             positionY: field.pageY,
             width: field.pageWidth,
             height: field.pageHeight,
+            fieldMeta: parsedFieldMeta,
           },
           create: {
             type: field.type,
@@ -124,6 +217,7 @@ export const setFieldsForDocument = async ({
             height: field.pageHeight,
             customText: '',
             inserted: false,
+            fieldMeta: parsedFieldMeta,
             Document: {
               connect: {
                 id: documentId,

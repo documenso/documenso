@@ -1,5 +1,7 @@
 'use client';
 
+import { msg } from '@lingui/macro';
+import { useLingui } from '@lingui/react';
 import { DateTime } from 'luxon';
 import { Bar, BarChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
 
@@ -11,6 +13,8 @@ export type MonthlyNewUsersChartProps = {
 };
 
 export const MonthlyNewUsersChart = ({ className, data }: MonthlyNewUsersChartProps) => {
+  const { _ } = useLingui();
+
   const formattedData = [...data].reverse().map(({ month, count }) => {
     return {
       month: DateTime.fromFormat(month, 'yyyy-MM').toFormat('LLLL'),
@@ -35,7 +39,7 @@ export const MonthlyNewUsersChart = ({ className, data }: MonthlyNewUsersChartPr
               labelStyle={{
                 color: 'hsl(var(--primary-foreground))',
               }}
-              formatter={(value) => [Number(value).toLocaleString('en-US'), 'New Users']}
+              formatter={(value) => [Number(value).toLocaleString('en-US'), _(msg`New Users`)]}
               cursor={{ fill: 'hsl(var(--primary) / 10%)' }}
             />
 
@@ -44,7 +48,7 @@ export const MonthlyNewUsersChart = ({ className, data }: MonthlyNewUsersChartPr
               fill="hsl(var(--primary))"
               radius={[4, 4, 0, 0]}
               maxBarSize={60}
-              label="New Users"
+              label={_(msg`New Users`)}
             />
           </BarChart>
         </ResponsiveContainer>

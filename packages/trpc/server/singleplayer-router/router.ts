@@ -13,6 +13,7 @@ import { getFile } from '@documenso/lib/universal/upload/get-file';
 import { putPdfFile } from '@documenso/lib/universal/upload/put-file';
 import { prisma } from '@documenso/prisma';
 import {
+  DocumentSource,
   DocumentStatus,
   FieldType,
   ReadStatus,
@@ -30,7 +31,7 @@ export const singleplayerRouter = router({
     .input(ZCreateSinglePlayerDocumentMutationSchema)
     .mutation(async ({ input }) => {
       try {
-        const { signer, fields, documentData, documentName } = input;
+        const { signer, fields, documentData, documentName, fieldMeta } = input;
 
         const document = await getFile({
           data: documentData.data,
@@ -68,6 +69,7 @@ export const singleplayerRouter = router({
             documentId: -1,
             templateId: null,
             recipientId: -1,
+            fieldMeta: fieldMeta || null,
           });
         }
 
@@ -95,6 +97,7 @@ export const singleplayerRouter = router({
             // Create document.
             const document = await tx.document.create({
               data: {
+                source: DocumentSource.DOCUMENT,
                 title: documentName,
                 status: DocumentStatus.COMPLETED,
                 documentDataId,

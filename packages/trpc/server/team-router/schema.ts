@@ -3,6 +3,8 @@ import { z } from 'zod';
 import { PROTECTED_TEAM_URLS } from '@documenso/lib/constants/teams';
 import { TeamMemberRole } from '@documenso/prisma/client';
 
+import { ZUpdatePublicProfileMutationSchema } from '../profile-router/schema';
+
 // Consider refactoring to use ZBaseTableSearchParamsSchema.
 const GenericFindQuerySchema = z.object({
   term: z.string().optional(),
@@ -59,6 +61,10 @@ export const ZTeamNameSchema = z
 // .max(30, { message: 'Team name must not exceed 30 characters.' });
 
 export const ZAcceptTeamInvitationMutationSchema = z.object({
+  teamId: z.number(),
+});
+
+export const ZDeclineTeamInvitationMutationSchema = z.object({
   teamId: z.number(),
 });
 
@@ -173,6 +179,13 @@ export const ZUpdateTeamMemberMutationSchema = z.object({
   data: z.object({
     role: z.nativeEnum(TeamMemberRole),
   }),
+});
+
+export const ZUpdateTeamPublicProfileMutationSchema = ZUpdatePublicProfileMutationSchema.pick({
+  bio: true,
+  enabled: true,
+}).extend({
+  teamId: z.number(),
 });
 
 export const ZRequestTeamOwnerhsipTransferMutationSchema = z.object({

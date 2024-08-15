@@ -1,13 +1,23 @@
+import { extendZodWithOpenApi } from '@anatine/zod-openapi';
 import { z } from 'zod';
 
+import { DATE_FORMATS, DEFAULT_DOCUMENT_DATE_FORMAT } from '@documenso/lib/constants/date-formats';
+import '@documenso/lib/constants/time-zones';
+import { DEFAULT_DOCUMENT_TIME_ZONE, TIME_ZONES } from '@documenso/lib/constants/time-zones';
 import { ZUrlSchema } from '@documenso/lib/schemas/common';
 import {
+  DocumentDataType,
   FieldType,
   ReadStatus,
   RecipientRole,
   SendStatus,
   SigningStatus,
+  TemplateType,
 } from '@documenso/prisma/client';
+
+extendZodWithOpenApi(z);
+
+export const ZNoBodyMutationSchema = null;
 
 /**
  * Documents
@@ -25,6 +35,7 @@ export type TDeleteDocumentMutationSchema = typeof ZDeleteDocumentMutationSchema
 
 export const ZSuccessfulDocumentResponseSchema = z.object({
   id: z.number(),
+  externalId: z.string().nullish(),
   userId: z.number(),
   teamId: z.number().nullish(),
   title: z.string(),
@@ -45,9 +56,27 @@ export type TSuccessfulGetDocumentResponseSchema = z.infer<
 
 export type TSuccessfulDocumentResponseSchema = z.infer<typeof ZSuccessfulDocumentResponseSchema>;
 
-export const ZSendDocumentForSigningMutationSchema = null;
+export const ZSendDocumentForSigningMutationSchema = z
+  .object({
+    sendEmail: z.boolean().optional().default(true),
+  })
+  .or(z.literal('').transform(() => ({ sendEmail: true })));
 
 export type TSendDocumentForSigningMutationSchema = typeof ZSendDocumentForSigningMutationSchema;
+
+export const ZResendDocumentForSigningMutationSchema = z.object({
+  recipients: z.array(z.number()),
+});
+
+export type TResendDocumentForSigningMutationSchema = z.infer<
+  typeof ZResendDocumentForSigningMutationSchema
+>;
+
+export const ZSuccessfulResendDocumentResponseSchema = z.object({
+  message: z.string(),
+});
+
+export type TResendDocumentResponseSchema = z.infer<typeof ZSuccessfulResendDocumentResponseSchema>;
 
 export const ZUploadDocumentSuccessfulSchema = z.object({
   url: z.string(),
@@ -62,6 +91,7 @@ export type TUploadDocumentSuccessfulSchema = z.infer<typeof ZUploadDocumentSucc
 
 export const ZCreateDocumentMutationSchema = z.object({
   title: z.string().min(1),
+  externalId: z.string().nullish(),
   recipients: z.array(
     z.object({
       name: z.string().min(1),
@@ -73,8 +103,19 @@ export const ZCreateDocumentMutationSchema = z.object({
     .object({
       subject: z.string(),
       message: z.string(),
-      timezone: z.string(),
-      dateFormat: z.string(),
+      timezone: z.string().default(DEFAULT_DOCUMENT_TIME_ZONE).openapi({
+        description:
+          'The timezone of the date. Must be one of the options listed in the list below.',
+        enum: TIME_ZONES,
+      }),
+      dateFormat: z
+        .string()
+        .default(DEFAULT_DOCUMENT_DATE_FORMAT)
+        .openapi({
+          description:
+            'The format of the date. Must be one of the options listed in the list below.',
+          enum: DATE_FORMATS.map((format) => format.value),
+        }),
       redirectUrl: z.string(),
     })
     .partial(),
@@ -86,11 +127,16 @@ export type TCreateDocumentMutationSchema = z.infer<typeof ZCreateDocumentMutati
 export const ZCreateDocumentMutationResponseSchema = z.object({
   uploadUrl: z.string().min(1),
   documentId: z.number(),
+  externalId: z.string().nullish(),
   recipients: z.array(
     z.object({
       recipientId: z.number(),
+      name: z.string(),
+      email: z.string().email().min(1),
       token: z.string(),
       role: z.nativeEnum(RecipientRole),
+
+      signingUrl: z.string(),
     }),
   ),
 });
@@ -101,6 +147,7 @@ export type TCreateDocumentMutationResponseSchema = z.infer<
 
 export const ZCreateDocumentFromTemplateMutationSchema = z.object({
   title: z.string().min(1),
+  externalId: z.string().nullish(),
   recipients: z.array(
     z.object({
       name: z.string().min(1),
@@ -127,6 +174,7 @@ export type TCreateDocumentFromTemplateMutationSchema = z.infer<
 
 export const ZCreateDocumentFromTemplateMutationResponseSchema = z.object({
   documentId: z.number(),
+  externalId: z.string().nullish(),
   recipients: z.array(
     z.object({
       recipientId: z.number(),
@@ -134,6 +182,8 @@ export const ZCreateDocumentFromTemplateMutationResponseSchema = z.object({
       email: z.string().email().min(1),
       token: z.string(),
       role: z.nativeEnum(RecipientRole).optional().default(RecipientRole.SIGNER),
+
+      signingUrl: z.string(),
     }),
   ),
 });
@@ -144,6 +194,7 @@ export type TCreateDocumentFromTemplateMutationResponseSchema = z.infer<
 
 export const ZGenerateDocumentFromTemplateMutationSchema = z.object({
   title: z.string().optional(),
+  externalId: z.string().nullish(),
   recipients: z
     .array(
       z.object({
@@ -180,6 +231,7 @@ export type TGenerateDocumentFromTemplateMutationSchema = z.infer<
 
 export const ZGenerateDocumentFromTemplateMutationResponseSchema = z.object({
   documentId: z.number(),
+  externalId: z.string().nullish(),
   recipients: z.array(
     z.object({
       recipientId: z.number(),
@@ -187,6 +239,8 @@ export const ZGenerateDocumentFromTemplateMutationResponseSchema = z.object({
       email: z.string().email().min(1),
       token: z.string(),
       role: z.nativeEnum(RecipientRole),
+
+      signingUrl: z.string(),
     }),
   ),
 });
@@ -229,6 +283,8 @@ export const ZSuccessfulRecipientResponseSchema = z.object({
   readStatus: z.nativeEnum(ReadStatus),
   signingStatus: z.nativeEnum(SigningStatus),
   sendStatus: z.nativeEnum(SendStatus),
+
+  signingUrl: z.string(),
 });
 
 export type TSuccessfulRecipientResponseSchema = z.infer<typeof ZSuccessfulRecipientResponseSchema>;
@@ -279,9 +335,11 @@ export const ZSuccessfulResponseSchema = z.object({
 
 export type TSuccessfulResponseSchema = z.infer<typeof ZSuccessfulResponseSchema>;
 
-export const ZSuccessfulSigningResponseSchema = z.object({
-  message: z.string(),
-});
+export const ZSuccessfulSigningResponseSchema = z
+  .object({
+    message: z.string(),
+  })
+  .and(ZSuccessfulGetDocumentResponseSchema);
 
 export type TSuccessfulSigningResponseSchema = z.infer<typeof ZSuccessfulSigningResponseSchema>;
 
@@ -299,3 +357,107 @@ export const ZUnsuccessfulResponseSchema = z.object({
 });
 
 export type TUnsuccessfulResponseSchema = z.infer<typeof ZUnsuccessfulResponseSchema>;
+
+export const ZTemplateMetaSchema = z.object({
+  id: z.string(),
+  subject: z.string().nullish(),
+  message: z.string().nullish(),
+  timezone: z.string().nullish(),
+  dateFormat: z.string().nullish(),
+  templateId: z.number(),
+  redirectUrl: z.string().nullish(),
+});
+
+export const ZTemplateSchema = z.object({
+  id: z.number(),
+  externalId: z.string().nullish(),
+  type: z.nativeEnum(TemplateType),
+  title: z.string(),
+  userId: z.number(),
+  teamId: z.number().nullish(),
+  templateDocumentDataId: z.string(),
+  createdAt: z.date(),
+  updatedAt: z.date(),
+});
+
+export const ZRecipientSchema = z.object({
+  id: z.number(),
+  documentId: z.number().nullish(),
+  templateId: z.number().nullish(),
+  email: z.string().email().min(1),
+  name: z.string(),
+  token: z.string(),
+  documentDeletedAt: z.date().nullish(),
+  expired: z.date().nullish(),
+  signedAt: z.date().nullish(),
+  authOptions: z.unknown(),
+  role: z.nativeEnum(RecipientRole),
+  readStatus: z.nativeEnum(ReadStatus),
+  signingStatus: z.nativeEnum(SigningStatus),
+  sendStatus: z.nativeEnum(SendStatus),
+});
+
+export const ZFieldSchema = z.object({
+  id: z.number(),
+  secondaryId: z.string(),
+  documentId: z.number().nullish(),
+  templateId: z.number().nullish(),
+  recipientId: z.number(),
+  type: z.nativeEnum(FieldType),
+  page: z.number(),
+  positionX: z.unknown(),
+  positionY: z.unknown(),
+  width: z.unknown(),
+  height: z.unknown(),
+  customText: z.string(),
+  inserted: z.boolean(),
+});
+
+export const ZTemplateWithDataSchema = ZTemplateSchema.extend({
+  templateMeta: ZTemplateMetaSchema.nullish(),
+  directLink: z
+    .object({
+      token: z.string(),
+      enabled: z.boolean(),
+    })
+    .nullable(),
+  templateDocumentData: z.object({
+    id: z.string(),
+    type: z.nativeEnum(DocumentDataType),
+    data: z.string(),
+  }),
+  Field: ZFieldSchema.pick({
+    id: true,
+    recipientId: true,
+    type: true,
+    page: true,
+    positionX: true,
+    positionY: true,
+    width: true,
+    height: true,
+  }).array(),
+  Recipient: ZRecipientSchema.pick({
+    id: true,
+    email: true,
+    name: true,
+    authOptions: true,
+    role: true,
+  }).array(),
+});
+
+export const ZSuccessfulGetTemplateResponseSchema = ZTemplateWithDataSchema;
+
+export const ZSuccessfulDeleteTemplateResponseSchema = ZTemplateSchema;
+
+export const ZSuccessfulGetTemplatesResponseSchema = z.object({
+  templates: ZTemplateWithDataSchema.omit({
+    templateDocumentData: true,
+    templateMeta: true,
+  }).array(),
+  totalPages: z.number(),
+});
+
+export const ZGetTemplatesQuerySchema = z.object({
+  page: z.coerce.number().min(1).optional().default(1),
+  perPage: z.coerce.number().min(1).optional().default(1),
+});

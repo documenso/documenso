@@ -12,10 +12,7 @@ import type { TemplateWithDetails } from '@documenso/prisma/types/template';
 import { trpc } from '@documenso/trpc/react';
 import { cn } from '@documenso/ui/lib/utils';
 import { Card, CardContent } from '@documenso/ui/primitives/card';
-import {
-  DocumentFlowFormContainer,
-  DocumentFlowFormContainerHeader,
-} from '@documenso/ui/primitives/document-flow/document-flow-root';
+import { DocumentFlowFormContainer } from '@documenso/ui/primitives/document-flow/document-flow-root';
 import type { DocumentFlowStep } from '@documenso/ui/primitives/document-flow/types';
 import { LazyPDFViewer } from '@documenso/ui/primitives/lazy-pdf-viewer';
 import { Stepper } from '@documenso/ui/primitives/stepper';
@@ -133,6 +130,7 @@ export const EditTemplateForm = ({
         teamId: team?.id,
         data: {
           title: data.title,
+          externalId: data.externalId || null,
           globalAccessAuth: data.globalAccessAuth ?? null,
           globalActionAuth: data.globalActionAuth ?? null,
         },
@@ -184,6 +182,14 @@ export const EditTemplateForm = ({
         fields: data.fields,
       });
 
+      // Clear all field data from localStorage
+      for (let i = 0; i < localStorage.length; i++) {
+        const key = localStorage.key(i);
+        if (key && key.startsWith('field_')) {
+          localStorage.removeItem(key);
+        }
+      }
+
       toast({
         title: 'შაბლონი შენახულია',
         description: 'თქვენი შაბლონები წარმატებით იქნა შენახული!',
@@ -232,11 +238,6 @@ export const EditTemplateForm = ({
           className="lg:h-[calc(100vh-6rem)]"
           onSubmit={(e) => e.preventDefault()}
         >
-          <DocumentFlowFormContainerHeader
-            title={currentDocumentFlow.title}
-            description={currentDocumentFlow.description}
-          />
-
           <Stepper
             currentStep={currentDocumentFlow.stepIndex}
             setCurrentStep={(step) => setStep(EditTemplateSteps[step - 1])}
@@ -257,6 +258,7 @@ export const EditTemplateForm = ({
               documentFlow={documentFlow.signers}
               recipients={recipients}
               fields={fields}
+              templateDirectLink={template.directLink}
               onSubmit={onAddTemplatePlaceholderFormSubmit}
               isEnterprise={isEnterprise}
               isDocumentPdfLoaded={isDocumentPdfLoaded}
@@ -268,6 +270,7 @@ export const EditTemplateForm = ({
               recipients={recipients}
               fields={fields}
               onSubmit={onAddFieldsFormSubmit}
+              teamId={team?.id}
             />
           </Stepper>
         </DocumentFlowFormContainer>

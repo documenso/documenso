@@ -9,10 +9,15 @@ import { useToast } from '@documenso/ui/primitives/use-toast';
 
 export type DownloadAuditLogButtonProps = {
   className?: string;
+  teamId?: number;
   documentId: number;
 };
 
-export const DownloadAuditLogButton = ({ className, documentId }: DownloadAuditLogButtonProps) => {
+export const DownloadAuditLogButton = ({
+  className,
+  teamId,
+  documentId,
+}: DownloadAuditLogButtonProps) => {
   const { toast } = useToast();
 
   const { mutateAsync: downloadAuditLogs, isLoading } =
@@ -20,7 +25,7 @@ export const DownloadAuditLogButton = ({ className, documentId }: DownloadAuditL
 
   const onDownloadAuditLogsClick = async () => {
     try {
-      const { url } = await downloadAuditLogs({ documentId });
+      const { url } = await downloadAuditLogs({ teamId, documentId });
 
       const iframe = Object.assign(document.createElement('iframe'), {
         src: url,

@@ -163,12 +163,12 @@ export default function OpenPage() {
             />
             <MetricCard
               className="col-span-2 lg:col-span-1"
-              title="Open Issues"
+              title={_(msg`Open Issues`)}
               value={openIssues.toLocaleString('en-US')}
             />
             <MetricCard
               className="col-span-2 lg:col-span-1"
-              title="Merged PR's"
+              title={_(msg`Merged PR's`)}
               value={mergedPullRequests.toLocaleString('en-US')}
             />
           </div>
@@ -178,28 +178,32 @@ export default function OpenPage() {
           <SalaryBands className="col-span-12" />
         </div>
 
-        <h2 className="px-4 text-2xl font-semibold">Finances</h2>
+        <h2 className="px-4 text-2xl font-semibold">
+          <Trans>Finances</Trans>
+        </h2>
         <div className="mb-12 mt-4 grid grid-cols-12 gap-8">
           <FundingRaised data={FUNDING_RAISED} className="col-span-12 lg:col-span-6" />
 
           <CapTable className="col-span-12 lg:col-span-6" />
         </div>
 
-        <h2 className="px-4 text-2xl font-semibold">Community</h2>
+        <h2 className="px-4 text-2xl font-semibold">
+          <Trans>Community</Trans>
+        </h2>
         <div className="mb-12 mt-4 grid grid-cols-12 gap-8">
           <BarMetric<StargazersType>
             data={STARGAZERS_DATA}
             metricKey="stars"
-            title="GitHub: Total Stars"
-            label="Stars"
+            title={_(msg`GitHub: Total Stars`)}
+            label={_(msg`Stars`)}
             className="col-span-12 lg:col-span-6"
           />
 
           <BarMetric<StargazersType>
             data={STARGAZERS_DATA}
             metricKey="mergedPRs"
-            title="GitHub: Total Merged PRs"
-            label="Merged PRs"
+            title={_(msg`GitHub: Total Merged PRs`)}
+            label={_(msg`Merged PRs`)}
             chartHeight={400}
             className="col-span-12 lg:col-span-6"
           />
@@ -216,8 +220,8 @@ export default function OpenPage() {
           <BarMetric<StargazersType>
             data={STARGAZERS_DATA}
             metricKey="openIssues"
-            title="GitHub: Total Open Issues"
-            label="Open Issues"
+            title={_(msg`GitHub: Total Open Issues`)}
+            label={_(msg`Open Issues`)}
             chartHeight={400}
             className="col-span-12 lg:col-span-6"
           />
@@ -225,13 +229,15 @@ export default function OpenPage() {
           <Typefully className="col-span-12 lg:col-span-6" />
         </div>
 
-        <h2 className="px-4 text-2xl font-semibold">Growth</h2>
+        <h2 className="px-4 text-2xl font-semibold">
+          <Trans>Growth</Trans>
+        </h2>
         <div className="mb-12 mt-4 grid grid-cols-12 gap-8">
           <BarMetric<EarlyAdoptersType>
             data={EARLY_ADOPTERS_DATA}
             metricKey="earlyAdopters"
-            title="Early Adopters"
-            label="Early Adopters"
+            title={_(msg`Total Customers`)}
+            label={_(msg`Total Customers`)}
             className="col-span-12 lg:col-span-6"
             extraInfo={<OpenPageTooltip />}
           />

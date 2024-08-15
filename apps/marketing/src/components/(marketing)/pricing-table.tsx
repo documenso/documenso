@@ -100,8 +100,8 @@ export const PricingTable = ({ className, ...props }: PricingTableProps) => {
         </div>
 
         <div
-          data-plan="early-adopter"
-          className="border-primary bg-background shadow-foreground/5 flex flex-col items-center justify-center rounded-lg border-2 px-8 py-12 shadow-[0px_0px_0px_4px_#E3E3E380]"
+          data-plan="individual"
+          className="bg-background shadow-foreground/5 flex flex-col items-center justify-center rounded-lg border-2 px-8 py-12 shadow-[0px_0px_0px_4px_#E3E3E380]"
         >
           <p className="text-foreground text-4xl font-medium">ბიზნეს პაკეტი</p>
           <div className="text-primary mt-2.5 text-xl font-medium">
@@ -115,7 +115,7 @@ export const PricingTable = ({ className, ...props }: PricingTableProps) => {
 
           <Button className="mt-6 rounded-full text-base" asChild>
             <Link
-              href={`${NEXT_PUBLIC_WEBAPP_URL()}/signup?utm_source=pricing-early-adopter`}
+              href={`${NEXT_PUBLIC_WEBAPP_URL()}/signup?utm_source=pricing-individual-plan`}
               target="_blank"
             >
               დაიწყეთ ახლავე
@@ -143,8 +143,8 @@ export const PricingTable = ({ className, ...props }: PricingTableProps) => {
         </div>
 
         <div
-          data-plan="enterprise"
-          className="bg-background shadow-foreground/5 flex flex-col items-center justify-center rounded-lg border px-8 py-12 shadow-lg"
+          data-plan="teams"
+          className="border-primary bg-background shadow-foreground/5 flex flex-col items-center justify-center rounded-lg border px-8 py-12 shadow-lg"
         >
           <p className="text-foreground text-4xl font-medium">ენტერპრაიზი</p>
           <p className="text-primary mt-2.5 text-xl font-medium">დაგვიკავშირდით</p>

@@ -2,7 +2,6 @@ import { z } from 'zod';
 
 import { DEFAULT_DOCUMENT_DATE_FORMAT } from '@documenso/lib/constants/date-formats';
 import { DEFAULT_DOCUMENT_TIME_ZONE } from '@documenso/lib/constants/time-zones';
-import { URL_REGEX } from '@documenso/lib/constants/url-regex';
 import {
   ZDocumentAccessAuthTypesSchema,
   ZDocumentActionAuthTypesSchema,
@@ -21,6 +20,7 @@ export const ZMapNegativeOneToUndefinedSchema = z
 
 export const ZAddSettingsFormSchema = z.object({
   title: z.string().trim().min(1, { message: "Title can't be empty" }),
+  externalId: z.string().optional(),
   globalAccessAuth: ZMapNegativeOneToUndefinedSchema.pipe(
     ZDocumentAccessAuthTypesSchema.optional(),
   ),

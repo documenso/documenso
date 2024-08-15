@@ -1,6 +1,6 @@
 import { nanoid } from '@documenso/lib/universal/id';
 import { prisma } from '@documenso/prisma';
-import type { RecipientRole } from '@documenso/prisma/client';
+import { DocumentSource, type RecipientRole } from '@documenso/prisma/client';
 
 export type CreateDocumentFromTemplateLegacyOptions = {
   templateId: number;
@@ -62,6 +62,8 @@ export const createDocumentFromTemplateLegacy = async ({
 
   const document = await prisma.document.create({
     data: {
+      source: DocumentSource.TEMPLATE,
+      templateId: template.id,
       userId,
       teamId: template.teamId,
       title: template.title,

@@ -1,7 +1,5 @@
 'use client';
 
-import { useRouter } from 'next/navigation';
-
 import { Edit, Loader, Mail, MoreHorizontal, X } from 'lucide-react';
 
 import type { getTeamByUrl } from '@documenso/lib/server-only/team/get-team';
@@ -14,6 +12,7 @@ import {
 } from '@documenso/ui/primitives/dropdown-menu';
 import { useToast } from '@documenso/ui/primitives/use-toast';
 
+import { RemoveTeamEmailDialog } from '~/components/(teams)/dialogs/remove-team-email-dialog';
 import { UpdateTeamEmailDialog } from '~/components/(teams)/dialogs/update-team-email-dialog';
 
 export type TeamsSettingsPageProps = {
@@ -21,8 +20,6 @@ export type TeamsSettingsPageProps = {
 };
 
 export const TeamEmailDropdown = ({ team }: TeamsSettingsPageProps) => {
-  const router = useRouter();
-
   const { toast } = useToast();
 
   const { mutateAsync: resendEmailVerification, isLoading: isResendingEmailVerification } =
@@ -83,18 +80,6 @@ export const TeamEmailDropdown = ({ team }: TeamsSettingsPageProps) => {
       },
     });
 
-  const onRemove = async () => {
-    if (team.teamEmail) {
-      await deleteTeamEmail({ teamId: team.id });
-    }
-
-    if (team.emailVerification) {
-      await deleteTeamEmailVerification({ teamId: team.id });
-    }
-
-    router.refresh();
-  };
-
   return (
     <DropdownMenu>
       <DropdownMenuTrigger>
@@ -131,14 +116,16 @@ export const TeamEmailDropdown = ({ team }: TeamsSettingsPageProps) => {
           />
         )}
 
-        <DropdownMenuItem
-          disabled={isDeletingTeamEmail || isDeletingTeamEmailVerification}
-          onClick={async () => onRemove()}
-        >
-          <X className="mr-2 h-4 w-4" />
-          {/* Remove */}
-          წაშლა
-        </DropdownMenuItem>
+        <RemoveTeamEmailDialog
+          team={team}
+          teamName={team.name}
+          trigger={
+            <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
+              <X className="mr-2 h-4 w-4" />
+              Remove
+            </DropdownMenuItem>
+          }
+        />
       </DropdownMenuContent>
     </DropdownMenu>
   );

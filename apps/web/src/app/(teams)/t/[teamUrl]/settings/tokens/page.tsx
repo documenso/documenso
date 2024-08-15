@@ -26,7 +26,7 @@ export default async function ApiTokensPage({ params }: ApiTokensPageProps) {
 
   const team = await getTeamByUrl({ userId: user.id, teamUrl });
 
-  let tokens: GetTeamTokensResponse | null = null;
+  let tokens: GetTeamTokensResponse | undefined = undefined;
 
   try {
     tokens = await getTeamTokens({ userId: user.id, teamId: team.id });
@@ -63,7 +63,7 @@ export default async function ApiTokensPage({ params }: ApiTokensPageProps) {
 
       <hr className="my-4" />
 
-      <ApiTokenForm className="max-w-xl" teamId={team.id} />
+      <ApiTokenForm className="max-w-xl" teamId={team.id} tokens={tokens} />
 
       <hr className="mb-4 mt-8" />
 

@@ -173,7 +173,7 @@ export function UseTemplateDialog({
   return (
     <Dialog open={open} onOpenChange={(value) => !form.formState.isSubmitting && setOpen(value)}>
       <DialogTrigger asChild>
-        <Button className="cursor-pointer">
+        <Button variant="outline" className="bg-background">
           <Plus className="-ml-1 mr-2 h-4 w-4" />
           შაბლონის გამოყენება
         </Button>

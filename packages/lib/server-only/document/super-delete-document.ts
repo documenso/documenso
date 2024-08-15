@@ -6,7 +6,7 @@ import { mailer } from '@documenso/email/mailer';
 import { render } from '@documenso/email/render';
 import DocumentCancelTemplate from '@documenso/email/templates/document-cancel';
 import { prisma } from '@documenso/prisma';
-import { DocumentStatus } from '@documenso/prisma/client';
+import { DocumentStatus, SendStatus } from '@documenso/prisma/client';
 
 import { NEXT_PUBLIC_WEBAPP_URL } from '../../constants/app';
 import { FROM_ADDRESS, FROM_NAME } from '../../constants/email';
@@ -41,6 +41,10 @@ export const superDeleteDocument = async ({ id, requestMetadata }: SuperDeleteDo
   if (status === DocumentStatus.PENDING && document.Recipient.length > 0) {
     await Promise.all(
       document.Recipient.map(async (recipient) => {
+        if (recipient.sendStatus !== SendStatus.SENT) {
+          return;
+        }
+
         const assetBaseUrl = NEXT_PUBLIC_WEBAPP_URL() || 'http://localhost:3000';
         const template = createElement(DocumentCancelTemplate, {
           documentName: document.title,
