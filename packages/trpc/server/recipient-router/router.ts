@@ -19,8 +19,6 @@ export const recipientRouter = router({
       try {
         const { documentId, teamId, signers } = input;
 
-        console.log('signers', JSON.stringify(signers, null, 2));
-
         return await setRecipientsForDocument({
           userId: ctx.user.id,
           documentId,

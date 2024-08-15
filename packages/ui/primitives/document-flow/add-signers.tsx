@@ -309,12 +309,11 @@ export const AddSignersFormPartial = ({
       const currentSigners = form.getValues('signers');
       const newOrder = parseInt(newOrderString, 10);
 
-      if (!newOrderString.trim() || isNaN(newOrder)) {
-        form.setValue(`signers.${index}.signingOrder`, index + 1);
+      if (!newOrderString.trim()) {
         return;
       }
 
-      if (newOrder < 1 || newOrder > currentSigners.length) {
+      if (isNaN(newOrder) || newOrder < 1 || newOrder > currentSigners.length) {
         console.error('Invalid signing order');
         form.setValue(`signers.${index}.signingOrder`, index + 1);
         return;
@@ -394,7 +393,8 @@ export const AddSignersFormPartial = ({
                         isDragDisabled={
                           !isSigningOrderSequential ||
                           isSubmitting ||
-                          hasBeenSentToRecipientId(signer.nativeId)
+                          hasBeenSentToRecipientId(signer.nativeId) ||
+                          !signer.signingOrder
                         }
                       >
                         {(provided, snapshot) => (
@@ -425,8 +425,7 @@ export const AddSignersFormPartial = ({
                                       <FormControl>
                                         <Input
                                           type="number"
-                                          min={1}
-                                          max={signers.length}
+                                          // max={signers.length}
                                           className={cn(
                                             'w-full text-center',
                                             '[appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none',
