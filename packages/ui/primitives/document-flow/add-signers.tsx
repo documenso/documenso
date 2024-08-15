@@ -304,6 +304,26 @@ export const AddSignersFormPartial = ({
     [signers],
   );
 
+  const updateSigningOrders = useCallback(
+    (newIndex: number, oldIndex: number) => {
+      const updatedSigners = form.getValues('signers').map((signer, index) => {
+        if (index === oldIndex) {
+          return { ...signer, signingOrder: newIndex + 1 };
+        } else if (index >= newIndex && index < oldIndex) {
+          return { ...signer, signingOrder: (signer.signingOrder ?? index + 1) + 1 };
+        } else if (index <= newIndex && index > oldIndex) {
+          return { ...signer, signingOrder: Math.max(1, (signer.signingOrder ?? index + 1) - 1) };
+        }
+        return signer;
+      });
+
+      updatedSigners.forEach((signer, index) => {
+        form.setValue(`signers.${index}.signingOrder`, signer.signingOrder);
+      });
+    },
+    [form],
+  );
+
   const handleSigningOrderChange = useCallback(
     (index: number, newOrderString: string) => {
       const newOrder = parseInt(newOrderString, 10);
@@ -319,10 +339,11 @@ export const AddSignersFormPartial = ({
 
       const newIndex = newOrder - 1;
       if (index !== newIndex) {
+        updateSigningOrders(newIndex, index);
         triggerDragAndDrop(index, newIndex);
       }
     },
-    [form, triggerDragAndDrop],
+    [form, triggerDragAndDrop, updateSigningOrders],
   );
 
   return (
