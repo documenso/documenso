@@ -49,9 +49,9 @@ The image below illustrates four different text fields with various configuratio
 
 The first text field has no configuration. The signer can sign the field by entering any text.
 
-![The first text field input](/blog/advanced-fields/text-field-signing.webp)
+![The first text field input](/blog/advanced-fields/first-text-field-input.webp)
 
-The second text field has the following configurations:
+The second text field, "label-1"/"text-1", has the following configurations:
 
 - Label
 - Placeholder
@@ -62,11 +62,19 @@ Since there is a default value, the field auto-signs with that value. However, t
 
 ![The second text field input](/blog/advanced-fields/second-text-field-input.webp)
 
-The third field has the same configurations as the second one, with one addition - the `required` option is checked. Apart from that, it works like the second field.
+The third field, "label-2"/"text-2", has the same configurations as the second one, with one addition - the `required` option is checked. Apart from that, it works like the second field.
 
 ![The third text field input](/blog/advanced-fields/third-text-field-input.webp)
 
-The fourth field has the same configurations as the second one, with one addition—`read-only` is checked. As a result, the field auto-signs with the default value, and the signer cannot modify it.
+The fourth field, "text-3", has the same configurations as the second one, with one addition—`read-only` is checked. As a result, the field auto-signs with the default value, and the signer cannot modify it.
+
+#### Unsigned Fields
+
+You can also unsign the fields to change the value and sign them again. The image below shows the unsigned state of the text fields.
+
+![A screenshot illustrating the various text fields unsigned](/blog/advanced-fields/unsigned-text-fields.webp)
+
+The only exception is the fourth field, which is a read-only field, and cannot be unsigned or modified by the signer.
 
 ### Number Field
 
@@ -80,6 +88,8 @@ The "Number" field offers a range of configuration options, allowing document ow
 - Specify the number format
 - Mark the field as _required_ or _read-only_
 - Specify minimum and maximum values
+
+The Number field is similar to the Text field in the way it looks and works. The differences are that it accepts only numeric values and has 2 additional configurations - the number format and the minimum and maximum values.
 
 ### Radio Field
 
