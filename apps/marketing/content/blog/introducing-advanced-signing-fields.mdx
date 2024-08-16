@@ -20,7 +20,7 @@ As a result, we've decided to introduce several additional fields, such as:
 - Checkbox field
 - Dropdown/Select field
 
-The introduction of these new fields brings more flexibility and variety to Documenso. They enable document owners to gather more specific or extra information from the signers.
+The introduction of these new fields brings more flexibility and variety to Documenso. As the document owner, they enable you to gather more specific or extra information from the signers.
 
 ## New Fields Introduction
 
@@ -34,20 +34,20 @@ The image illustrates the old text field in the document editor.
 
 ![Old text signing field in the Documenso document editor](/blog/advanced-fields/old-text-field.jpeg)
 
-The revamped text field now offers a range of configuration options, allowing document owners to:
+The revamped text field now offers a range of configuration options, allowing you to:
 
 - Add a label, placeholder, default text, and character limit
 - Set the field as required or read-only
 
 ![The advanced settings tab for the text field in the Documenso document editor](/blog/advanced-fields/text-field-advanced-settings.webp)
 
-On the signing side, the field remained mostly the same visually. The only thing that changed is the functionality, which needs to consider the validation rules. For example, if the field is required, the user must enter a value to sign it. Or, if the field has a character limit, the value entered by the user shouldn't exceed the limit.
+On the signing side, the field remained mostly the same visually. The only thing that changed is the functionality, which needs to take into consideration the validation rules. For example, if the field is required, the signer must enter a value to sign it. Or, if the field has a character limit, the value entered by the signer shouldn't exceed the limit.
 
 The image below illustrates four different text fields with various configurations.
 
 ![The text signing field on the Documenso signing page](/blog/advanced-fields/text-field-signing.webp)
 
-The first text field has no configuration. The signer can sign the field by entering any text.
+The first text field has no default value ("Add text") or configuration. You can sign the field by entering any text.
 
 ![The first text field input](/blog/advanced-fields/first-text-field-input.webp)
 
@@ -58,23 +58,31 @@ The second text field, "label-1"/"text-1", has the following configurations:
 - Default text
 - Character limit
 
-Since there is a default value, the field auto-signs with that value. However, the user can re-sign the field with a new value that doesn't exceed the character limit.
+Since there is a default value, the field auto-signs with that value. However, you can re-sign the field with a new value that doesn't exceed the character limit.
 
 ![The second text field input](/blog/advanced-fields/second-text-field-input.webp)
 
-The third field, "label-2"/"text-2", has the same configurations as the second one, with one addition - the `required` option is checked. Apart from that, it works like the second field.
+The third field, "label-2"/"text-2", has the same configurations as the second one, with one addition - the `required` option is checked. When the field is marked as `required`, you must sign it before completing the document.
+
+Apart from that, it works like the second field.
 
 ![The third text field input](/blog/advanced-fields/third-text-field-input.webp)
 
-The fourth field, "text-3", has the same configurations as the second one, with one addition—`read-only` is checked. As a result, the field auto-signs with the default value, and the signer cannot modify it.
+The fourth field, "text-3", has the same configurations as the second one, with one addition—`read-only` is checked. That means the field auto-signs with the default value, and you cannot modify it.
 
 #### Unsigned Fields
 
-You can also unsign the fields to change the value and sign them again. The image below shows the unsigned state of the text fields.
+You can unsign a field to change the value and sign it again. The unsigned state of the field varies depending on its configuration:
+
+- If the field has a label, it displays it instead of "Add text" when unsigned.
+- If the field has a default value, the default value will be shown when unsigned.
+- If the field has both a label and a default value, the label will take precedence and be displayed when unsigned.
+
+The image below shows the unsigned state of the text fields.
 
 ![A screenshot illustrating the various text fields unsigned](/blog/advanced-fields/unsigned-text-fields.webp)
 
-The only exception is the fourth field, which is a read-only field, and cannot be unsigned or modified by the signer.
+The only exception is the fourth field, a read-only field, which cannot be unsigned or modified.
 
 ### Number Field
 
@@ -82,22 +90,22 @@ We also introduced a new "Number" field for inserting and signing documents with
 
 ![The advanced settings tab for the number field on the Documenso document editor page](/blog/advanced-fields/number-field-advanced-settings.webp)
 
-The "Number" field offers a range of configuration options, allowing document owners to:
+The "Number" field offers a range of configuration options, which allows you to:
 
 - Set a label, placeholder and default value
 - Specify the number format
 - Mark the field as _required_ or _read-only_
 - Specify minimum and maximum values
 
-The Number field is similar to the Text field in the way it looks and works. The differences are that it accepts only numeric values and has 2 additional configurations - the number format and the minimum and maximum values.
+The Number field looks and works similarly to the Text field. The difference is that it accepts only numeric values and has 2 additional configurations: the number format and the minimum and maximum values.
 
 ### Radio Field
 
 Radio buttons allow signers to select a single option from a pre-defined list the document owner sets.
 
-Before sending the document for signing, the document owner must add at least one radio option, which can contain a string or an empty value and can be checked or unchecked. However, it's important to note that only one option can be checked at a time.
+Before sending the document for signing, you must add at least one radio option, which can contain a string or an empty value and can be checked or unchecked. However, it's important to note that only one option can be checked at a time.
 
-When it comes to field configuration, the document owner can mark the field as _required_ or _read-only_.
+When it comes to field configuration, you can mark the field as _required_ or _read-only_.
 
 ![The advanced settings tab for the radio field in the Documenso document editor](/blog/advanced-fields/radio-field-advanced-settings.webp)
 
@@ -105,15 +113,15 @@ The image below shows what the signer sees after the document is sent for signin
 
 ![The radio signing field on the Documenso signing page](/blog/advanced-fields/radio-field-sign-page.webp)
 
-It's important to mention that the image is slightly modified so you can see both states of the field—signed and unsigned. Since the field has a checked value (option 2 - `radio-val-2-checked`), it will automatically sign with that value and appear like the field marked with the number 1.
+It's important to mention that the image is slightly modified so you can see both states of the field — unsigned and signed. Since the field has a checked value (option `radio-val-2-checked`), it will automatically sign with that value and appear like the field marked with the number 1.
 
-If the field is not marked as read-only, the signer can un-sign it and choose another option by clicking on it. Alternatively, the signer can re-sign with the default value by refreshing the page.
+If the field is not marked as read-only, the signer can unsign it and choose another option by clicking on it. Alternatively, you can re-sign with the default value by refreshing the page when the field is unsigned.
 
 ### Dropdown/Select Field
 
 We have also introduced a new "Dropdown/Select" field that allows signers to pick an option from a pre-defined list of choices. This field type is useful for scenarios such as selecting a country, state, or category where a limited number of valid options exist.
 
-When configuring the "Dropdown/Select" field, the document owners can:
+When configuring the "Dropdown/Select" field, you can:
 
 - Add multiple options
 - Mark the field as _required_ or _read-only_
@@ -125,17 +133,17 @@ The image below illustrates the field on the signing page.
 
 ![The select field on the Documenso document signing page](/blog/advanced-fields/select-field-sign-page.webp)
 
-If the document owner does not set a default value, the "Dropdown/Select" field will not auto-sign. The signer must click on the field and select an option from the dropdown list to sign it. After signing, the field will display the selected value, similar to a signed text field.
+The "Dropdown/Select" field will not auto-sign if you don't set a default value. The signer must click on the field and select an option from the dropdown list to sign it. After signing, the field will display the selected value, similar to a signed text field.
 
-When the field is marked as required, signers must select a value before completing the signing process. However, if the document owner marks the field as read-only, signers can view the selected value but cannot modify it.
+When the field is marked as required, signers must select a value before completing the signing process. However, if you mark the field as read-only, signers can view the selected value but not modify it.
 
 ### Checkbox Field
 
 The last field introduced is the "Checkbox" field, which allows signers to select multiple options from a pre-defined list. Such a field is helpful for scenarios where signers need to choose multiple items or agree to several terms and conditions, for example.
 
-Before sending the document for signing, the document owner must add at least one checkbox option. This option can contain a string or an empty value and can be checked or unchecked. Unlike the "Radio" field, the "Checkbox" field can have multiple checked options.
+Before sending the document for signing, you must add at least one checkbox option. This option can contain a string or an empty value and can be checked or unchecked. Unlike the "Radio" field, the "Checkbox" field can have multiple checked options.
 
-Like other fields, the document owner can mark the "Checkbox" as _required_ or _read-only_. In addition to that, it also has a validation field. The document owner can specify how many checkboxes the signer should sign:
+Like other fields, you can mark the "Checkbox" as _required_ or _read-only_. In addition to that, it also has a validation field, and you can specify how many checkboxes the signer should sign:
 
 - Select at least X _(a number from 1 to 10)_
 - Select at most X _(a number from 1 to 10)_
@@ -151,7 +159,7 @@ The image illustrates both field states - signed and un-signed.
 
 In this example, the 'Checkbox' field has two options checked by default, so it auto-signs. The field marked '1' appears when the signer visits the page for the first time or when the user refreshes the page and no option is selected. The field marked '2' displays the cleared state, where all choices have been deselected. This shows how the field looks when a user clears all selections.
 
-In this example, no validation rule has been set, allowing the signer to select any options. However, if a validation rule were applied, the signer's choices would need to meet the validation criteria.
+No validation rule has been set in this example, allowing the signer to select any options. However, if a validation rule were applied, the signer's choices would need to meet the validation criteria.
 
 ## Development Challenges
 
@@ -189,7 +197,7 @@ model Field {
 }
 ```
 
-Initially, we considered creating a new model called `FieldMeta` to store the information for the new advanced fields, with each property represented as a separate column in the model. However, this approach has 2 issues.
+Initially, we considered creating a new database table called `FieldMeta` to store the information for the new advanced fields, with each property represented as a separate column in the table. However, this approach has 2 issues.
 
 First, the advanced fields only share two common properties: `required` and `read-only`. Other than these, the fields have unique properties, which would result in many nullable columns in the `FieldMeta` model.
 
@@ -228,16 +236,16 @@ model Field {
 }
 ```
 
-This field can store any JSON object, allowing us to store each field's different settings. However, this introduces a potential issue—we lose the benefit of type checks that come with using specific database field types.
+This field can store any JSON object, allowing us to store each field's settings. However, this introduces a potential issue — we lose the benefit of type checks that come with using specific database field types.
 
-To ensure the integrity of the data, we use Zod schemas to parse and validate the field metadata. When we retrieve the data from the database, we parse it with Zod to ensure that it matches the expected format. We also use Zod to parse the data before saving it to the database, which helps us avoid inserting invalid data.
+To ensure the integrity of the data, we use Zod schemas to parse and validate the field metadata. When we retrieve the data from the database, we parse it with Zod to ensure it matches the expected format. We also use Zod to parse the data before saving it to the database, which helps us avoid inserting invalid data.
 
 This approach has several benefits:
 
 - **Consistency**: The application uses the same Zod schema to retrieve and insert data into the database. That means the data is consistent throughout the app.
 - **Type safety**: By parsing the data with Zod, we can guarantee that the data matches the expected types and structure. We can also use Zod's `infer` utility to enable strong typing and autocompletion.
 - **Better error handling**: Zod provides thorough error messages indicating which part of the data is invalid. That makes it easier & faster to debug and fix issues.
-- **Maintainability**: Re-using the same Zod schema for retrieving and inserting data into the database makes it easier to maintain the data structure.
+- **Maintainability**: Reusing the same Zod schema for retrieving and inserting data into the database makes the data structure easier to maintain.
 
 It's important to note that the `JSONB` type also comes with drawbacks, such as data querying. Since the data is stored as JSON (more specifically, in binary format), complex queries can be less efficient compared to querying normalized relational data. On top of that, querying data requires specific operators and functions, such as `->`, `->>`, `@>`, and `?`. This makes the querying more verbose and less intuitive, and hence, it requires more finesse.
 
@@ -245,13 +253,13 @@ Another drawback is the storage overhead. `JSONB` data is stored in a binary for
 
 Considering all that, `JSONB` makes sense for our use case because the field meta information is relatively small and doesn't require complex querying. The flexibility of the `JSONB` type suits the dynamic nature of the `fieldMeta` field.
 
-> Postgres provides 2 fields for storing JSON data—`json` and `jsonb`—the latter being more performant. For more information, you can [check out the documentation](https://www.postgresql.org/docs/current/datatype-json.html).
+> Postgres provides 2 fields for storing JSON data — `json` and `jsonb`. For more information, you can [check out the documentation](https://www.postgresql.org/docs/current/datatype-json.html).
 
 ### 2nd Challenge: Storing Fields' Advanced Settings on Frontend
 
 The next challenge was determining the optimal solution for storing the advanced field settings entered by the users.
 
-Currently, the app saves the fields and associated settings to the database when the user advances to the next step.
+Currently, the app saves the fields and their associated settings to the database when the user advances to the next step.
 
 ![Documenso advanced field signing](/blog/advanced-fields/documenso-advanced-fields-signing.webp)
 
@@ -261,7 +269,7 @@ In the future, we plan to improve this flow and save the fields on blur. This wa
 
 ### Solution: Local Storage
 
-The solution in this case is to use the local storage for the temporary storage of the advanced settings. The reason for this approach is because the fields are available only locally. If the fields were saved in the database, we could save the advanced settings along with them.
+In this case, the solution is to temporarily store the advanced settings in local storage. This is because the fields are available only locally. If the fields were saved in the database, we could also save the advanced settings along with them.
 
 ![Documenso field advanced settings](/blog/advanced-fields/documenso-field-advanced-settings.webp)
 
@@ -269,13 +277,13 @@ Since the fields are not stored in the database, we need to persist the data unt
 
 When the user proceeds to the next step, the fields and their advanced settings are saved into the database, and the local storage is cleared.
 
-We also recognized the dangers of saving data to local storage, as users could potentially modify it and break the application. As a result, we have implemented extensive checks on both the backend and frontend, in addition to parsing and validating data with Zod.
+We also recognized the dangers of saving data to local storage, as users could modify it and break the application. As a result, we have implemented extensive checks on both the backend and frontend, in addition to parsing and validating data with Zod.
 
 However, this solution has limitations. The data is still lost when the user refreshes the page, navigates to the previous step, or closes the browser, as the fields are wiped out from the document. A future improvement to save the fields to the database on blur will help eliminate this issue.
 
 ### 3rd Challenge: Radio and Checkbox Fields
 
-The Radio and Checkbox field implementations were challenging from both logical and design standpoints. That is mainly because they can contain both empty and non-empty values. Moreover, the Checkbox field allows the user to select multiple values.
+The Radio and Checkbox field implementations were challenging from both the logical and design standpoints. The Radio field can contain empty and non-empty values, and the Checkbox field allows the user to select multiple values.
 
 ![The radio and checkbox signing fields on the Documenso document signing page](/blog/advanced-fields/radio-and-checkbox-fields.webp)
 
@@ -287,7 +295,7 @@ However, the Checkbox field was more challenging because users can select multip
 
 ### Solution
 
-In contrast to the other challenges, I'm going to discuss the general implementation rather than a specific solution. We'll focus on the particularities and the most challenging parts of the implementation rather than going over the entire implementation. I'll include a link to the complete implementation for each field so you can check it out if you're interested.
+In contrast to the other challenges, I will discuss the general implementation rather than a specific solution. We'll focus on the particularities and the most challenging parts of the implementation rather than going over the entire implementation. I'll include a link to the complete implementation for each field so you can check it out if you're interested.
 
 **Radio Field**
 
@@ -320,7 +328,7 @@ The way signing works for the Radio field is to pull the data from the database 
 
 If the field is not read-only and the user clicks on another option, the field un-signs and re-signs with the new value. If the field is read-only, the user can't change the value and hence modify the field.
 
-Whenever the field is signed, whether by auto-signing or by the user, the value is saved in the database. Similarly, when the field is unsigned, the value is removed from the database.
+The value is saved in the database whenever the field is signed, whether by auto-signing or by the user. Similarly, the value is removed from the database when the field is unsigned.
 
 Also, since the Radio field can contain empty values, we map over the values and replace the empty ones with a unique string `empty-value-${item.id}`. This is because the empty string is not a valid value for the field, and we need to differentiate between empty and non-empty values.
 
@@ -425,13 +433,15 @@ Next, we check whether the length condition is met based on the validation rule,
 ...
 ```
 
-The implementation is more complex, but here, we look at the most challenging parts of it. The user can select multiple options; the field auto-signs with the selected values. The user can also un-sign the field by unchecking the options. The validation rules are enforced, and the user needs to select the correct number of options to sign the field.
+While the implementation is more complex, we'll focus on its most challenging aspects.
+
+At its core, the app allows signers to select multiple options, with the field automatically signing based on these selections. The signers can un-sign the field by deselecting options or clearing all the selections. Throughout this process, the system enforces validation rules, ensuring that the signers select the required number of options to sign the field successfully.
 
 > You can see the complete implementation of the checkbox field in the [checkbox-field.tsx](<https://github.com/documenso/documenso/blob/main/apps/web/src/app/(signing)/sign/%5Btoken%5D/checkbox-field.tsx>) file.
 
 ### 4th Challenge: Recipients' Colors
 
-Another challenge we faced was using colours to differentiate recipients. The issue was that we needed to dynamically generate and re-use the same Tailwind classes across several components. However, TailwindCSS only generates the CSS classes used in the project and discards the unused ones from the final build. This resulted in the colours not being applied to the components, as the classes were not used in the code.
+Another challenge we faced was using colours to differentiate recipients. The issue was that we needed to dynamically generate and reuse the same Tailwind classes across several components. However, TailwindCSS only generates the CSS classes used in the project and discards the unused ones from the final build. This resulted in the colours not being applied to the components, as the classes were not used in the code.
 
 The images below illustrate the recipients' colours in 2 different states.
 
@@ -443,7 +453,7 @@ On the other hand, the second image shows the "Signature" field on the right-han
 
 ![Screenshot illustrating the active state for a field on the Documenso document editor page](/blog/advanced-fields/field-active-state.webp)
 
-The document editor consists of various components, including those representing the fields, recipients, and other elements. That means the same colours and code are re-used across multiple components.
+The document editor consists of various components, including those representing the fields, recipients, and other elements. That means the same colours and code are reused across multiple components.
 
 ```ts
 export const combinedStyles = {
@@ -484,7 +494,7 @@ export const MyComponent = () => {
 };
 ```
 
-The code snippet above shows the naive solution to re-using the colours across multiple components. The `combinedStyles` object contains various properties for the different parts of the components, such as the ring colour, border colour, and hover colour, to name a few. All these object properties contain the TailwindCSS classes for the respective colours.
+The code snippet above shows the naive solution to reusing the colours across multiple components. The `combinedStyles` object contains various properties for the different parts of the components, such as the ring colour, border colour, and hover colour, to name a few. All these object properties contain the TailwindCSS classes for the respective colours.
 
 Then, the components would use custom hooks to apply the appropriate styles based on the selected recipient. For example, if recipient 1 is selected, the component would use the `green-500` styles from the `combinedStyles` object. All the elements related to recipient 1, such as the dropdown menu and the fields, would have a green colour.
 
@@ -494,9 +504,9 @@ The problem with this approach is that we can't import the `combinedStyles` obje
 
 While this approach works as intended, more efficient and scalable solutions exist. To overcome this challenge, we decided to pick a different approach.
 
-### Solution: Modularise the Logic
+### Solution: Modularise the Logic and Use CSS Variables
 
-We moved the colours and associated hooks to a separate file to address the challenge of re-using colours across multiple components. The styles would only be defined in this file and accessed from the components through custom hooks.
+We moved the colours and associated hooks to a separate file to address the challenge of reusing colours across multiple components. The styles would only be defined in this file and accessed from the components through custom hooks.
 
 ```ts
 export const SIGNER_COLOR_STYLES = {
@@ -547,12 +557,12 @@ Now, the components can access the colours and styles using custom hooks. For ex
 const signerStyles = useSignerColors(recipientIndex);
 ```
 
-The hook will return the styles for that signer, which can then be applied to the component. For example, you can access the signer's background colour by using `signerStyles.default.background`.
+The hook will return the styles for that signer, which can then be applied to the component. For example, you can access the signer's background colour using `signerStyles.default.background`.
 
-This approach makes managing the colours and styles easier, as they are defined in a single file. We can do so in a single place if we need to change or add new colours. This approach also makes the code more modular and reusable, as the styles are decoupled from the components.
+This approach makes managing the colours and styles easier, as they are defined in a single file. If we need to change or add new colours, we can do so in a single place. This approach also makes the code more modular and reusable, as the styles are decoupled from the components.
 
-However, this will later be replaced with a more efficient solution that uses CSS variables to define the colours.
+Moreover, we opted for CSS variables to define the colours as they allow for more flexibility and consistency in styling. This way, we define a single CSS variable for each colour that can cover a wide range of states without relying on the multitude of TailwindCSS classes. For example, you can easily set the opacity and lightness of a colour without having to use multiple classes. The CSS variables help align the colours with our brand guidelines while simplifying the overall styling process.
 
 ## The End
 
-We're happy to see the new advanced fields released because they offer our users more flexibility, variety, and customization options. Implementing the new fields came with its challenges, but we were able to overcome them and learn from them. We're excited to continue enhancing Documenso and providing our users with the best document signing experience.
+We're happy to see the new advanced fields released because they offer our users more flexibility, variety, and customization options. Implementing the new fields came with its challenges, but we overcame them and learned from them. We're excited to continue enhancing Documenso and providing our users with the best document signing experience.
