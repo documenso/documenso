@@ -26,6 +26,7 @@ import { truncateTitle } from '~/helpers/truncate-title';
 import { SigningAuthPageView } from '../signing-auth-page';
 import { ClaimAccount } from './claim-account';
 import { DocumentPreviewButton } from './document-preview-button';
+import { PollUntilDocumentCompleted } from './poll-until-document-completed';
 
 export type CompletedSigningPageProps = {
   params: {
@@ -205,6 +206,8 @@ export default async function CompletedSigningPage({
           </Link>
         )}
       </div>
+
+      <PollUntilDocumentCompleted document={document} />
     </div>
   );
 }
