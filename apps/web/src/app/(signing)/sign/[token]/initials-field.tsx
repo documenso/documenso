@@ -43,7 +43,7 @@ export const InitialsField = ({
   const { fullName } = useRequiredSigningContext();
   const initials = extractInitials(fullName);
 
-  const debouncedTerm = useDebouncedValue(initials, 2000);
+  const debouncedInitials = useDebouncedValue(initials, 2000);
 
   const [isPending, startTransition] = useTransition();
 
@@ -61,7 +61,7 @@ export const InitialsField = ({
 
   const onSign = async (authOptions?: TRecipientActionAuth) => {
     try {
-      const value = debouncedTerm ?? '';
+      const value = debouncedInitials ?? '';
 
       const payload: TSignFieldWithTokenMutationSchema = {
         token: recipient.token,
@@ -123,13 +123,13 @@ export const InitialsField = ({
   };
 
   useEffect(() => {
-    if (!field.inserted && debouncedTerm) {
+    if (!field.inserted && debouncedInitials) {
       void executeActionAuthProcedure({
         onReauthFormSubmit: async (authOptions) => await onSign(authOptions),
         actionTarget: field.type,
       });
     }
-  }, [field, debouncedTerm, field.inserted]);
+  }, [field, debouncedInitials, field.inserted]);
 
   return (
     <SigningFieldContainer field={field} onSign={onSign} onRemove={onRemove} type="Initials">
