@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation';
 
 import { Loader } from 'lucide-react';
 
+import { useDebouncedValue } from '@documenso/lib/client-only/hooks/use-debounced-value';
 import { DO_NOT_INVALIDATE_QUERY_ON_MUTATION } from '@documenso/lib/constants/trpc';
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import type { TRecipientActionAuth } from '@documenso/lib/types/document-auth';
@@ -40,6 +41,8 @@ export const NameField = ({ field, recipient, onSignField, onUnsignField }: Name
 
   const { fullName: providedFullName, setFullName: setProvidedFullName } =
     useRequiredSigningContext();
+
+  const debouncedProvidedFullName = useDebouncedValue(providedFullName, 2000);
 
   const { executeActionAuthProcedure } = useRequiredDocumentAuthContext();
 
@@ -155,7 +158,7 @@ export const NameField = ({ field, recipient, onSignField, onUnsignField }: Name
         actionTarget: field.type,
       });
     }
-  }, [field]);
+  }, [field, debouncedProvidedFullName]);
 
   return (
     <SigningFieldContainer

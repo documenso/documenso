@@ -43,7 +43,7 @@ export const InitialsField = ({
   const { fullName } = useRequiredSigningContext();
   const initials = extractInitials(fullName);
 
-  const debouncedTerm = useDebouncedValue(initials, 5000);
+  const debouncedTerm = useDebouncedValue(initials, 2000);
 
   const [isPending, startTransition] = useTransition();
 
@@ -123,13 +123,13 @@ export const InitialsField = ({
   };
 
   useEffect(() => {
-    if (!field.inserted && fullName) {
+    if (!field.inserted && debouncedTerm) {
       void executeActionAuthProcedure({
         onReauthFormSubmit: async (authOptions) => await onSign(authOptions),
         actionTarget: field.type,
       });
     }
-  }, [field, debouncedTerm]);
+  }, [field, debouncedTerm, field.inserted]);
 
   return (
     <SigningFieldContainer field={field} onSign={onSign} onRemove={onRemove} type="Initials">
