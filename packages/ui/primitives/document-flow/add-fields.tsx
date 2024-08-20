@@ -19,6 +19,7 @@ import {
   User,
 } from 'lucide-react';
 import { useFieldArray, useForm } from 'react-hook-form';
+import { useHotkeys } from 'react-hotkeys-hook';
 
 import { getBoundingClientRect } from '@documenso/lib/client-only/get-bounding-client-rect';
 import { useDocumentElement } from '@documenso/lib/client-only/hooks/use-document-element';
@@ -40,6 +41,7 @@ import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem } from '
 import { Popover, PopoverContent, PopoverTrigger } from '../popover';
 import { useStep } from '../stepper';
 import { Tooltip, TooltipContent, TooltipTrigger } from '../tooltip';
+import { useToast } from '../use-toast';
 import type { TAddFieldsFormSchema } from './add-fields.types';
 import {
   DocumentFlowFormContainerActions,
@@ -103,6 +105,8 @@ export const AddFieldsFormPartial = ({
   isDocumentPdfLoaded,
   teamId,
 }: AddFieldsFormProps) => {
+  const { toast } = useToast();
+
   const [isMissingSignatureDialogVisible, setIsMissingSignatureDialogVisible] = useState(false);
 
   const { isWithinPageBounds, getFieldPosition, getPage } = useDocumentElement();
@@ -136,7 +140,12 @@ export const AddFieldsFormPartial = ({
     },
   });
 
+  useHotkeys(['ctrl+c', 'meta+c'], (evt) => onFieldCopy(evt));
+  useHotkeys(['ctrl+v', 'meta+v'], (evt) => onFieldPaste(evt));
+  useHotkeys(['ctrl+d', 'meta+d'], (evt) => onFieldCopy(evt, { duplicate: true }));
+
   const onFormSubmit = handleSubmit(onSubmit);
+
   const handleSavedFieldSettings = (fieldState: FieldMeta) => {
     const initialValues = getValues();
 
@@ -170,6 +179,9 @@ export const AddFieldsFormPartial = ({
   const [selectedSigner, setSelectedSigner] = useState<Recipient | null>(null);
   const [showRecipientsSelector, setShowRecipientsSelector] = useState(false);
   const [lastActiveField, setLastActiveField] = useState<TAddFieldsFormSchema['fields'][0] | null>(
+    null,
+  );
+  const [fieldClipboard, setFieldClipboard] = useState<TAddFieldsFormSchema['fields'][0] | null>(
     null,
   );
   const selectedSignerIndex = recipients.findIndex((r) => r.id === selectedSigner?.id);
@@ -297,7 +309,6 @@ export const AddFieldsFormPartial = ({
       };
 
       append(field);
-      setLastActiveField({ ...field });
 
       setIsFieldWithinBounds(false);
       setSelectedField(null);
@@ -331,8 +342,6 @@ export const AddFieldsFormPartial = ({
         pageWidth,
         pageHeight,
       });
-
-      setLastActiveField(field);
     },
     [getFieldPosition, localFields, update],
   );
@@ -356,43 +365,60 @@ export const AddFieldsFormPartial = ({
         pageX,
         pageY,
       });
-
-      setLastActiveField(field);
     },
     [getFieldPosition, localFields, update],
   );
 
   const onFieldCopy = useCallback(
-    ({ duplicate }: { duplicate: boolean }) => {
-      if (lastActiveField) {
-        localStorage.setItem('copied-field', JSON.stringify(lastActiveField));
+    (event?: KeyboardEvent | null, options?: { duplicate?: boolean }) => {
+      const { duplicate = false } = options ?? {};
 
-        if (duplicate) {
-          const newField: TAddFieldsFormSchema['fields'][0] = {
-            ...lastActiveField,
-            formId: nanoid(12),
-            pageX: lastActiveField.pageX + 3,
-            pageY: lastActiveField.pageY + 3,
-          };
-          append(newField);
+      if (lastActiveField) {
+        event?.preventDefault();
+
+        if (!duplicate) {
+          setFieldClipboard(lastActiveField);
+
+          toast({
+            title: 'Copied field',
+            description: 'Copied field to clipboard',
+          });
+
+          return;
         }
+
+        const newField: TAddFieldsFormSchema['fields'][0] = {
+          ...structuredClone(lastActiveField),
+          formId: nanoid(12),
+          signerEmail: selectedSigner?.email ?? lastActiveField.signerEmail,
+          pageX: lastActiveField.pageX + 3,
+          pageY: lastActiveField.pageY + 3,
+        };
+
+        append(newField);
       }
     },
-    [lastActiveField, append],
+    [append, lastActiveField, selectedSigner?.email, toast],
   );
 
-  const onFieldPaste = useCallback(() => {
-    const copiedFieldString = localStorage.getItem('copied-field');
-    if (copiedFieldString) {
-      const copiedField = JSON.parse(copiedFieldString);
-      append({
-        ...copiedField,
-        formId: nanoid(12),
-        pageX: copiedField.pageX + 3,
-        pageY: copiedField.pageY + 3,
-      });
-    }
-  }, [append]);
+  const onFieldPaste = useCallback(
+    (event: KeyboardEvent) => {
+      if (fieldClipboard) {
+        event.preventDefault();
+
+        const copiedField = structuredClone(fieldClipboard);
+
+        append({
+          ...copiedField,
+          formId: nanoid(12),
+          signerEmail: selectedSigner?.email ?? copiedField.signerEmail,
+          pageX: copiedField.pageX + 3,
+          pageY: copiedField.pageY + 3,
+        });
+      }
+    },
+    [append, fieldClipboard, selectedSigner?.email],
+  );
 
   useEffect(() => {
     if (selectedField) {
@@ -433,27 +459,6 @@ export const AddFieldsFormPartial = ({
   useEffect(() => {
     setSelectedSigner(recipients.find((r) => r.sendStatus !== SendStatus.SENT) ?? recipients[0]);
   }, [recipients]);
-
-  useEffect(() => {
-    const handleKeyDown = (event: KeyboardEvent) => {
-      if (event.ctrlKey || event.metaKey) {
-        if (event.key === 'c') {
-          onFieldCopy({ duplicate: false });
-        } else if (event.key === 'v') {
-          onFieldPaste();
-        } else if (event.key === 'd') {
-          event.preventDefault();
-          onFieldCopy({ duplicate: true });
-        }
-      }
-    };
-
-    window.addEventListener('keydown', handleKeyDown);
-
-    return () => {
-      window.removeEventListener('keydown', handleKeyDown);
-    };
-  }, [onFieldCopy, onFieldPaste]);
 
   const recipientsByRole = useMemo(() => {
     const recipientsByRole: Record<RecipientRole, Recipient[]> = {
@@ -555,10 +560,12 @@ export const AddFieldsFormPartial = ({
                       minHeight={fieldBounds.current.height}
                       minWidth={fieldBounds.current.width}
                       passive={isFieldWithinBounds && !!selectedField}
+                      onFocus={() => setLastActiveField(field)}
+                      onBlur={() => setLastActiveField(null)}
                       onResize={(options) => onFieldResize(options, index)}
                       onMove={(options) => onFieldMove(options, index)}
                       onRemove={() => remove(index)}
-                      onDuplicate={() => onFieldCopy({ duplicate: true })}
+                      onDuplicate={() => onFieldCopy(null, { duplicate: true })}
                       onAdvancedSettings={() => {
                         setCurrentField(field);
                         handleAdvancedSettings();

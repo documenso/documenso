@@ -40,6 +40,8 @@ export type FieldItemProps = {
   onRemove?: () => void;
   onDuplicate?: () => void;
   onAdvancedSettings?: () => void;
+  onFocus?: () => void;
+  onBlur?: () => void;
   recipientIndex?: number;
   hideRecipients?: boolean;
 };
@@ -54,6 +56,8 @@ export const FieldItem = ({
   onMove,
   onRemove,
   onDuplicate,
+  onFocus,
+  onBlur,
   onAdvancedSettings,
   recipientIndex = 0,
   hideRecipients = false,
@@ -117,18 +121,29 @@ export const FieldItem = ({
     };
   }, [calculateCoords]);
 
-  const handleClickOutsideField = (event: MouseEvent) => {
-    if (settingsActive && $el.current && !event.composedPath().includes($el.current)) {
-      setSettingsActive(false);
-    }
-  };
-
   useEffect(() => {
-    document.body.addEventListener('click', handleClickOutsideField);
-    return () => {
-      document.body.removeEventListener('click', handleClickOutsideField);
+    const onClickOutsideOfField = (event: MouseEvent) => {
+      const isOutsideOfField = $el.current && !event.composedPath().includes($el.current);
+
+      setSettingsActive((active) => {
+        if (active && isOutsideOfField) {
+          return false;
+        }
+
+        return active;
+      });
+
+      if (isOutsideOfField) {
+        onBlur?.();
+      }
     };
-  }, [settingsActive]);
+
+    document.body.addEventListener('click', onClickOutsideOfField);
+
+    return () => {
+      document.body.removeEventListener('click', onClickOutsideOfField);
+    };
+  }, [onBlur]);
 
   const hasFieldMetaValues = (
     fieldType: string,
@@ -191,6 +206,7 @@ export const FieldItem = ({
         )}
         onClick={() => {
           setSettingsActive((prev) => !prev);
+          onFocus?.();
         }}
         ref={$el}
       >
