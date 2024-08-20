@@ -372,6 +372,7 @@ export const SignDirectTemplateForm = ({
             fields={localFields}
             fieldsValidated={fieldsValidated}
             role={directRecipient.role}
+            disabled={false}
           />
         </div>
       </DocumentFlowFormContainerFooter>

@@ -721,7 +721,11 @@ export const ApiContractV1Implementation = createNextRoute(ApiContractV1, {
         userId: user.id,
         teamId: team?.id,
         recipients: [
-          ...recipients,
+          ...recipients.map(({ email, name }) => ({
+            email,
+            name,
+            role,
+          })),
           {
             email,
             name,
