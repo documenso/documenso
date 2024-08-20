@@ -1,4 +1,14 @@
-import { CalendarDays, CheckSquare, ChevronDown, Disc, Hash, Mail, Type, User } from 'lucide-react';
+import {
+  CalendarDays,
+  CheckSquare,
+  ChevronDown,
+  Contact,
+  Disc,
+  Hash,
+  Mail,
+  Type,
+  User,
+} from 'lucide-react';
 
 import type { TFieldMetaSchema as FieldMetaType } from '@documenso/lib/types/field-meta';
 import { FieldType } from '@documenso/prisma/client';
@@ -13,6 +23,7 @@ type FieldIconProps = {
 };
 
 const fieldIcons = {
+  [FieldType.INITIALS]: { icon: Contact, label: 'Initials' },
   [FieldType.EMAIL]: { icon: Mail, label: 'Email' },
   [FieldType.NAME]: { icon: User, label: 'Name' },
   [FieldType.DATE]: { icon: CalendarDays, label: 'Date' },
