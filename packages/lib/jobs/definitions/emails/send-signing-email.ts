@@ -120,7 +120,7 @@ export const SEND_SIGNING_EMAIL_JOB_DEFINITION = {
     const template = createElement(DocumentInviteEmailTemplate, {
       documentName: document.title,
       inviterName: user.name || undefined,
-      inviterEmail: isTeamDocument ? team?.teamEmail?.email || user.email : user.email,
+      inviterEmail: user.email,
       assetBaseUrl,
       signDocumentLink,
       customBody: renderCustomEmailTemplate(emailMessage, customEmailTemplate),

@@ -39,13 +39,16 @@ export const DocumentInviteEmailTemplate = ({
   selfSigner = false,
   isTeamInvite = false,
   teamName,
+  teamEmail,
 }: DocumentInviteEmailTemplateProps) => {
   const action = RECIPIENT_ROLES_DESCRIPTION[role].actionVerb.toLowerCase();
 
   const previewText = selfSigner
     ? `Please ${action} your document ${documentName}`
     : isTeamInvite
-    ? `${inviterName} on behalf of ${teamName} has invited you to ${action} ${documentName}`
+    ? `${inviterName} on behalf of ${teamName}${
+        teamEmail ? ` (${teamEmail})` : ''
+      } has invited you to ${action} ${documentName}`
     : `${inviterName} has invited you to ${action} ${documentName}`;
 
   const getAssetUrl = (path: string) => {
@@ -92,9 +95,14 @@ export const DocumentInviteEmailTemplate = ({
             <Container className="mx-auto mt-12 max-w-xl">
               <Section>
                 <Text className="my-4 text-base font-semibold">
-                  {inviterName}{' '}
-                  <Link className="font-normal text-slate-400" href="mailto:{inviterEmail}">
-                    ({inviterEmail})
+                  {isTeamInvite && teamName
+                    ? `${inviterName} on behalf of ${teamName}`
+                    : inviterName}{' '}
+                  <Link
+                    className="font-normal text-slate-400"
+                    href={`mailto:${teamEmail || inviterEmail}`}
+                  >
+                    ({teamEmail || inviterEmail})
                   </Link>
                 </Text>
 
@@ -102,7 +110,9 @@ export const DocumentInviteEmailTemplate = ({
                   {customBody ? (
                     <pre className="font-sans text-base text-slate-400">{customBody}</pre>
                   ) : (
-                    `${inviterName} has invited you to ${action} the document "${documentName}".`
+                    `${inviterName} ${
+                      isTeamInvite ? `on behalf of ${teamName}` : ''
+                    } has invited you to ${action} the document "${documentName}".`
                   )}
                 </Text>
               </Section>

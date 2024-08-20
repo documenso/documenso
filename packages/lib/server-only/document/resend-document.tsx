@@ -125,7 +125,7 @@ export const resendDocument = async ({
       const template = createElement(DocumentInviteEmailTemplate, {
         documentName: document.title,
         inviterName: user.name || undefined,
-        inviterEmail: isTeamDocument ? document.team?.teamEmail?.email || user.email : user.email,
+        inviterEmail: user.email,
         assetBaseUrl,
         signDocumentLink,
         customBody: renderCustomEmailTemplate(emailMessage, customEmailTemplate),
@@ -133,6 +133,7 @@ export const resendDocument = async ({
         selfSigner,
         isTeamInvite: isTeamDocument,
         teamName: document.team?.name,
+        teamEmail: document.team?.teamEmail?.email,
       });
 
       await prisma.$transaction(
