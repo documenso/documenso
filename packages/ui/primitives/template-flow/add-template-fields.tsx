@@ -9,6 +9,7 @@ import {
   CheckSquare,
   ChevronDown,
   ChevronsUpDown,
+  Contact,
   Disc,
   Hash,
   Mail,
@@ -383,10 +384,11 @@ export const AddTemplateFieldsFormPartial = ({
               {selectedField && (
                 <div
                   className={cn(
-                    'pointer-events-none fixed z-50 flex cursor-pointer flex-col items-center justify-center bg-white transition duration-200',
+                    'text-muted-foreground dark:text-muted-background pointer-events-none fixed z-50 flex cursor-pointer flex-col items-center justify-center bg-white transition duration-200',
                     selectedSignerStyles.default.base,
                     {
-                      '-rotate-6 scale-90 opacity-50': !isFieldWithinBounds,
+                      '-rotate-6 scale-90 opacity-50 dark:bg-black/20': !isFieldWithinBounds,
+                      'dark:text-black/60': isFieldWithinBounds,
                     },
                   )}
                   style={{
@@ -541,6 +543,32 @@ export const AddTemplateFieldsFormPartial = ({
                           )}
                         >
                           Signature
+                        </p>
+                      </CardContent>
+                    </Card>
+                  </button>
+
+                  <button
+                    type="button"
+                    className="group h-full w-full"
+                    onClick={() => setSelectedField(FieldType.INITIALS)}
+                    onMouseDown={() => setSelectedField(FieldType.INITIALS)}
+                    data-selected={selectedField === FieldType.INITIALS ? true : undefined}
+                  >
+                    <Card
+                      className={cn(
+                        'flex h-full w-full cursor-pointer items-center justify-center group-disabled:opacity-50',
+                        // selectedSignerStyles.borderClass,
+                      )}
+                    >
+                      <CardContent className="flex flex-col items-center justify-center px-6 py-4">
+                        <p
+                          className={cn(
+                            'text-muted-foreground group-data-[selected]:text-foreground flex items-center justify-center gap-x-1.5 text-sm font-normal',
+                          )}
+                        >
+                          <Contact className="h-4 w-4" />
+                          Initials
                         </p>
                       </CardContent>
                     </Card>

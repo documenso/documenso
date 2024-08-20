@@ -231,10 +231,17 @@ export const signFieldWithToken = async ({
               type,
               data: signatureImageAsBase64 || typedSignature || '',
             }))
-            .with(FieldType.DATE, FieldType.EMAIL, FieldType.NAME, FieldType.TEXT, (type) => ({
-              type,
-              data: updatedField.customText,
-            }))
+            .with(
+              FieldType.DATE,
+              FieldType.EMAIL,
+              FieldType.NAME,
+              FieldType.TEXT,
+              FieldType.INITIALS,
+              (type) => ({
+                type,
+                data: updatedField.customText,
+              }),
+            )
             .with(
               FieldType.NUMBER,
               FieldType.RADIO,

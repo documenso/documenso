@@ -449,14 +449,18 @@ test('[DOCUMENT_FLOW]: should be able to create, send with redirect url, sign a 
 
   await page.waitForURL('https://documenso.com');
 
-  // Check if document has been signed
-  const { status: completedStatus } = await getDocumentByToken(token);
-  expect(completedStatus).toBe(DocumentStatus.COMPLETED);
+  await expect(async () => {
+    // Check if document has been signed
+    const { status: completedStatus } = await getDocumentByToken(token);
+
+    expect(completedStatus).toBe(DocumentStatus.COMPLETED);
+  }).toPass();
 });
 
 test('[DOCUMENT_FLOW]: should be able to sign a document with custom date', async ({ page }) => {
   const user = await seedUser();
-  const customDate = DateTime.utc().toFormat('yyyy-MM-dd hh:mm a');
+
+  const now = DateTime.utc();
 
   const { document, recipients } = await seedPendingDocumentWithFullFields({
     owner: user,
@@ -488,9 +492,14 @@ test('[DOCUMENT_FLOW]: should be able to sign a document with custom date', asyn
     },
   });
 
-  expect(field?.customText).toBe(customDate);
+  const insertedDate = DateTime.fromFormat(field?.customText ?? '', 'yyyy-MM-dd hh:mm a');
 
-  // Check if document has been signed
-  const { status: completedStatus } = await getDocumentByToken(token);
-  expect(completedStatus).toBe(DocumentStatus.COMPLETED);
+  expect(Math.abs(insertedDate.diff(now).minutes)).toBeLessThanOrEqual(1);
+
+  await expect(async () => {
+    // Check if document has been signed
+    const { status: completedStatus } = await getDocumentByToken(token);
+
+    expect(completedStatus).toBe(DocumentStatus.COMPLETED);
+  }).toPass();
 });

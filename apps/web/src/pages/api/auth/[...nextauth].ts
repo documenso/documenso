@@ -6,6 +6,7 @@ import { getStripeCustomerByUser } from '@documenso/ee/server-only/stripe/get-cu
 import { IS_BILLING_ENABLED } from '@documenso/lib/constants/app';
 import { NEXT_AUTH_OPTIONS } from '@documenso/lib/next-auth/auth-options';
 import { extractNextApiRequestMetadata } from '@documenso/lib/universal/extract-request-metadata';
+import { slugify } from '@documenso/lib/utils/slugify';
 import { prisma } from '@documenso/prisma';
 import { UserSecurityAuditLogType } from '@documenso/prisma/client';
 
@@ -73,6 +74,24 @@ export default async function auth(req: NextApiRequest, res: NextApiResponse) {
             where: { id: userId },
             data: {
               emailVerified: profile.emailVerified,
+            },
+          });
+        }
+
+        // auto set public profile name
+        if (account.provider === 'oidc' && user.name && 'url' in user && !user.url) {
+          let counter = 1;
+          let url = slugify(user.name);
+
+          while (await prisma.user.findFirst({ where: { url } })) {
+            url = `${slugify(user.name)}-${counter}`;
+            counter++;
+          }
+
+          await prisma.user.update({
+            where: { id: userId },
+            data: {
+              url,
             },
           });
         }

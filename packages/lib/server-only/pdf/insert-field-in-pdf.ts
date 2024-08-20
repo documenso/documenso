@@ -133,9 +133,14 @@ export const insertFieldInPDF = async (pdf: PDFDocument, field: FieldWithSignatu
         throw new Error('Invalid checkbox field meta');
       }
 
+      const values = meta.data.values?.map((item) => ({
+        ...item,
+        value: item.value.length > 0 ? item.value : `empty-value-${item.id}`,
+      }));
+
       const selected = field.customText.split(',');
 
-      for (const [index, item] of (meta.data.values ?? []).entries()) {
+      for (const [index, item] of (values ?? []).entries()) {
         const offsetY = index * 16;
 
         const checkbox = pdf.getForm().createCheckBox(`checkbox.${field.secondaryId}.${index}`);
@@ -169,9 +174,14 @@ export const insertFieldInPDF = async (pdf: PDFDocument, field: FieldWithSignatu
         throw new Error('Invalid radio field meta');
       }
 
+      const values = meta?.data.values?.map((item) => ({
+        ...item,
+        value: item.value.length > 0 ? item.value : `empty-value-${item.id}`,
+      }));
+
       const selected = field.customText.split(',');
 
-      for (const [index, item] of (meta.data.values ?? []).entries()) {
+      for (const [index, item] of (values ?? []).entries()) {
         const offsetY = index * 16;
 
         const radio = pdf.getForm().createRadioGroup(`radio.${field.secondaryId}.${index}`);
