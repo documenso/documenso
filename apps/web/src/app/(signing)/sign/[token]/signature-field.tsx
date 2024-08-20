@@ -190,7 +190,7 @@ export const SignatureField = ({
       )}
 
       {state === 'empty' && (
-        <p className="group-hover:text-primary font-signature text-muted-foreground duration-200 group-hover:text-yellow-300 text-xl">
+        <p className="group-hover:text-primary font-signature text-muted-foreground text-xl duration-200 group-hover:text-yellow-300">
           Signature
         </p>
       )}
