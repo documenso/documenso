@@ -38,6 +38,7 @@ import {
   ZResendDocumentMutationSchema,
   ZSearchDocumentsMutationSchema,
   ZSendDocumentMutationSchema,
+  ZSetDocumentEmailSettingsMutationSchema,
   ZSetPasswordForDocumentMutationSchema,
   ZSetSettingsForDocumentMutationSchema,
   ZSetTitleForDocumentMutationSchema,
@@ -272,6 +273,32 @@ export const documentRouter = router({
         console.error(err);
 
         throw err;
+      }
+    }),
+
+  setDocumentEmailSettings: authenticatedProcedure
+    .input(ZSetDocumentEmailSettingsMutationSchema)
+    .mutation(async ({ input, ctx }) => {
+      try {
+        const { documentId, subject, message } = input;
+
+        const userId = ctx.user.id;
+
+        return await upsertDocumentMeta({
+          documentId,
+          userId,
+          subject,
+          message,
+          requestMetadata: extractNextApiRequestMetadata(ctx.req),
+        });
+      } catch (err) {
+        console.error(err);
+
+        throw new TRPCError({
+          code: 'BAD_REQUEST',
+          message:
+            'We were unable to update the email settings for this document. Please try again later.',
+        });
       }
     }),
 

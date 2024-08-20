@@ -139,6 +139,12 @@ export const ZSendDocumentMutationSchema = z.object({
   }),
 });
 
+export const ZSetDocumentEmailSettingsMutationSchema = z.object({
+  documentId: z.number(),
+  subject: z.string().optional(),
+  message: z.string().optional(),
+});
+
 export const ZSetPasswordForDocumentMutationSchema = z.object({
   documentId: z.number(),
   password: z.string(),
