@@ -30,7 +30,7 @@ msgstr "5 Standarddokumente pro Monat"
 msgid "5 Users Included"
 msgstr "5 Benutzer inbegriffen"
 
-#: apps/marketing/src/components/(marketing)/faster-smarter-beautiful-bento.tsx:30
+#: apps/marketing/src/components/(marketing)/faster-smarter-beautiful-bento.tsx:34
 msgid "A 10x better signing experience."
 msgstr "Eine 10x bessere Signaturerfahrung."
 
@@ -52,11 +52,11 @@ msgstr "Erhobener Betrag"
 msgid "API Access"
 msgstr "API-Zugriff"
 
-#: apps/marketing/src/components/(marketing)/faster-smarter-beautiful-bento.tsx:63
+#: apps/marketing/src/components/(marketing)/faster-smarter-beautiful-bento.tsx:67
 msgid "Beautiful."
 msgstr "Schön."
 
-#: apps/marketing/src/components/(marketing)/faster-smarter-beautiful-bento.tsx:65
+#: apps/marketing/src/components/(marketing)/faster-smarter-beautiful-bento.tsx:69
 msgid "Because signing should be celebrated. That’s why we care about the smallest detail in our product."
 msgstr "Weil Unterschriften gefeiert werden sollten. Deshalb kümmern wir uns um jedes kleinste Detail in unserem Produkt."
 
@@ -66,7 +66,7 @@ msgstr "Weil Unterschriften gefeiert werden sollten. Deshalb kümmern wir uns um
 msgid "Blog"
 msgstr "Blog"
 
-#: apps/marketing/src/components/(marketing)/open-build-template-bento.tsx:60
+#: apps/marketing/src/components/(marketing)/open-build-template-bento.tsx:64
 msgid "Build on top."
 msgstr "Aufbauen oben drauf."
 
@@ -82,7 +82,7 @@ msgstr "Karrieren"
 msgid "Changelog"
 msgstr "Änderungsprotokoll"
 
-#: apps/marketing/src/components/(marketing)/open-build-template-bento.tsx:81
+#: apps/marketing/src/components/(marketing)/open-build-template-bento.tsx:85
 msgid "Choose a template from the community app store. Or submit your own template for others to use."
 msgstr "Wählen Sie eine Vorlage aus dem Community-App-Store. Oder reichen Sie Ihre eigene Vorlage ein, damit andere sie benutzen können."
 
@@ -98,7 +98,7 @@ msgstr "Fertige Dokumente"
 msgid "Completed Documents per Month"
 msgstr "Fertige Dokumente pro Monat"
 
-#: apps/marketing/src/components/(marketing)/share-connect-paid-widget-bento.tsx:61
+#: apps/marketing/src/components/(marketing)/share-connect-paid-widget-bento.tsx:65
 msgid "Connections"
 msgstr "Verbindungen"
 
@@ -106,7 +106,7 @@ msgstr "Verbindungen"
 msgid "Contact Us"
 msgstr "Kontaktiere uns"
 
-#: apps/marketing/src/components/(marketing)/share-connect-paid-widget-bento.tsx:63
+#: apps/marketing/src/components/(marketing)/share-connect-paid-widget-bento.tsx:67
 msgid "Create connections and automations with Zapier and more to integrate with your favorite tools."
 msgstr "Erstellen Sie Verbindungen und Automatisierungen mit Zapier und mehr, um sich mit Ihren Lieblingstools zu integrieren."
 
@@ -118,7 +118,7 @@ msgstr "Erstellen Sie Ihr Konto und beginnen Sie mit der Nutzung modernster Doku
 msgid "Customers with an Active Subscriptions."
 msgstr "Kunden mit einer aktiven Abonnements."
 
-#: apps/marketing/src/components/(marketing)/open-build-template-bento.tsx:29
+#: apps/marketing/src/components/(marketing)/open-build-template-bento.tsx:33
 msgid "Customise and expand."
 msgstr "Anpassen und erweitern."
 
@@ -130,7 +130,7 @@ msgstr "Design"
 msgid "Designed for every stage of your journey."
 msgstr "Entwickelt für jede Phase Ihrer Reise."
 
-#: apps/marketing/src/components/(marketing)/carousel.tsx:37
+#: apps/marketing/src/components/(marketing)/carousel.tsx:40
 msgid "Direct Link"
 msgstr "Direktlink"
 
@@ -142,7 +142,7 @@ msgstr "Documenso ist eine Gemeinschaftsanstrengung, um ein offenes und lebendig
 msgid "Documenso on X"
 msgstr "Documenso auf X"
 
-#: apps/marketing/src/components/(marketing)/hero.tsx:100
+#: apps/marketing/src/components/(marketing)/hero.tsx:104
 msgid "Document signing,<0/>finally open source."
 msgstr "Unterschriften,<0/>endlich Open Source."
 
@@ -152,13 +152,17 @@ msgstr "Unterschriften,<0/>endlich Open Source."
 msgid "Documentation"
 msgstr "Dokumentation"
 
-#: apps/marketing/src/components/(marketing)/share-connect-paid-widget-bento.tsx:106
+#: apps/marketing/src/components/(marketing)/share-connect-paid-widget-bento.tsx:110
 msgid "Easily embed Documenso into your product. Simply copy and paste our react widget into your application."
 msgstr "Betten Sie Documenso ganz einfach in Ihr Produkt ein. Kopieren und fügen Sie einfach unser React-Widget in Ihre Anwendung ein."
 
 #: apps/marketing/src/components/(marketing)/share-connect-paid-widget-bento.tsx:42
-msgid "Easy Sharing (Soon)."
-msgstr "Einfaches Teilen (Bald)."
+#~ msgid "Easy Sharing (Soon)."
+#~ msgstr "Einfaches Teilen (Bald)."
+
+#: apps/marketing/src/components/(marketing)/share-connect-paid-widget-bento.tsx:46
+msgid "Easy Sharing."
+msgstr ""
 
 #: apps/marketing/src/components/(marketing)/pricing-table.tsx:148
 #: apps/marketing/src/components/(marketing)/pricing-table.tsx:192
@@ -177,11 +181,11 @@ msgstr "Enterprise-Konformität, Lizenz- oder technische Bedürfnisse?"
 msgid "Everything you need for a great signing experience."
 msgstr "Alles, was Sie für ein großartiges Signaturerlebnis benötigen."
 
-#: apps/marketing/src/components/(marketing)/faster-smarter-beautiful-bento.tsx:41
+#: apps/marketing/src/components/(marketing)/faster-smarter-beautiful-bento.tsx:45
 msgid "Fast."
 msgstr "Schnell."
 
-#: apps/marketing/src/components/(marketing)/faster-smarter-beautiful-bento.tsx:32
+#: apps/marketing/src/components/(marketing)/faster-smarter-beautiful-bento.tsx:36
 msgid "Faster, smarter and more beautiful."
 msgstr "Schneller, intelligenter und schöner."
 
@@ -217,7 +221,7 @@ msgstr "Aus dem Blog"
 msgid "Full-Time"
 msgstr "Vollzeit"
 
-#: apps/marketing/src/components/(marketing)/share-connect-paid-widget-bento.tsx:83
+#: apps/marketing/src/components/(marketing)/share-connect-paid-widget-bento.tsx:87
 msgid "Get paid (Soon)."
 msgstr "Lassen Sie sich bezahlen (Bald)."
 
@@ -269,11 +273,11 @@ msgstr "Wie gehen Sie mit meinen Daten um?"
 msgid "Individual"
 msgstr "Einzelperson"
 
-#: apps/marketing/src/components/(marketing)/share-connect-paid-widget-bento.tsx:85
+#: apps/marketing/src/components/(marketing)/share-connect-paid-widget-bento.tsx:89
 msgid "Integrated payments with Stripe so you don’t have to worry about getting paid."
 msgstr "Integrierte Zahlungen mit Stripe, sodass Sie sich keine Sorgen ums Bezahlen machen müssen."
 
-#: apps/marketing/src/components/(marketing)/share-connect-paid-widget-bento.tsx:31
+#: apps/marketing/src/components/(marketing)/share-connect-paid-widget-bento.tsx:35
 msgid "Integrates with all your favourite tools."
 msgstr "Integriert sich mit all Ihren Lieblingstools."
 
@@ -281,7 +285,7 @@ msgstr "Integriert sich mit all Ihren Lieblingstools."
 msgid "Is there more?"
 msgstr "Gibt es mehr?"
 
-#: apps/marketing/src/components/(marketing)/open-build-template-bento.tsx:40
+#: apps/marketing/src/components/(marketing)/open-build-template-bento.tsx:44
 msgid "It’s up to you. Either clone our repository or rely on our easy to use hosting solution."
 msgstr "Es liegt an Ihnen. Entweder klonen Sie unser Repository oder nutzen unsere einfach zu bedienende Hosting-Lösung."
 
@@ -297,7 +301,7 @@ msgstr "Treten Sie der Open Signing-Bewegung bei"
 msgid "Location"
 msgstr "Standort"
 
-#: apps/marketing/src/components/(marketing)/open-build-template-bento.tsx:62
+#: apps/marketing/src/components/(marketing)/open-build-template-bento.tsx:66
 msgid "Make it your own through advanced customization and adjustability."
 msgstr "Machen Sie es zu Ihrem eigenen durch erweiterte Anpassung und Einstellbarkeit."
 
@@ -328,7 +332,7 @@ msgid "No credit card required"
 msgstr "Keine Kreditkarte erforderlich"
 
 #: apps/marketing/src/components/(marketing)/callout.tsx:29
-#: apps/marketing/src/components/(marketing)/hero.tsx:121
+#: apps/marketing/src/components/(marketing)/hero.tsx:125
 msgid "No Credit Card required"
 msgstr "Keine Kreditkarte erforderlich"
 
@@ -341,7 +345,7 @@ msgstr "Keines dieser Angebote passt zu Ihnen? Versuchen Sie das Selbst-Hosting!
 msgid "Open Issues"
 msgstr "Offene Issues"
 
-#: apps/marketing/src/components/(marketing)/open-build-template-bento.tsx:38
+#: apps/marketing/src/components/(marketing)/open-build-template-bento.tsx:42
 msgid "Open Source or Hosted."
 msgstr "Open Source oder Hosted."
 
@@ -356,7 +360,7 @@ msgstr "Offenes Startup"
 msgid "OSS Friends"
 msgstr "OSS-Freunde"
 
-#: apps/marketing/src/components/(marketing)/faster-smarter-beautiful-bento.tsx:87
+#: apps/marketing/src/components/(marketing)/faster-smarter-beautiful-bento.tsx:91
 msgid "Our custom templates come with smart rules that can help you save time and energy."
 msgstr "Unsere benutzerdefinierten Vorlagen verfügen über intelligente Regeln, die Ihnen Zeit und Energie sparen können."
 
@@ -392,15 +396,15 @@ msgstr "Preise"
 msgid "Privacy"
 msgstr "Datenschutz"
 
-#: apps/marketing/src/components/(marketing)/carousel.tsx:55
+#: apps/marketing/src/components/(marketing)/carousel.tsx:58
 msgid "Profile"
 msgstr "Profil"
 
-#: apps/marketing/src/components/(marketing)/share-connect-paid-widget-bento.tsx:104
+#: apps/marketing/src/components/(marketing)/share-connect-paid-widget-bento.tsx:108
 msgid "React Widget (Soon)."
 msgstr "React Widget (Demnächst)."
 
-#: apps/marketing/src/components/(marketing)/share-connect-paid-widget-bento.tsx:44
+#: apps/marketing/src/components/(marketing)/share-connect-paid-widget-bento.tsx:48
 msgid "Receive your personal link to share with everyone you care about."
 msgstr "Erhalten Sie Ihren persönlichen Link zum Teilen mit allen, die Ihnen wichtig sind."
 
@@ -425,7 +429,7 @@ msgstr "Sprachen suchen..."
 msgid "Securely. Our data centers are located in Frankfurt (Germany), giving us the best local privacy laws. We are very aware of the sensitive nature of our data and follow best practices to ensure the security and integrity of the data entrusted to us."
 msgstr "Sicher. Unsere Rechenzentren befinden sich in Frankfurt (Deutschland) und bieten uns die besten lokalen Datenschutzgesetze. Uns ist die sensible Natur unserer Daten sehr bewusst und wir folgen bewährten Praktiken, um die Sicherheit und Integrität der uns anvertrauten Daten zu gewährleisten."
 
-#: apps/marketing/src/components/(marketing)/share-connect-paid-widget-bento.tsx:33
+#: apps/marketing/src/components/(marketing)/share-connect-paid-widget-bento.tsx:37
 msgid "Send, connect, receive and embed everywhere."
 msgstr "Überall senden, verbinden, empfangen und einbetten."
 
@@ -447,7 +451,7 @@ msgstr "Anmelden"
 msgid "Sign up"
 msgstr "Registrieren"
 
-#: apps/marketing/src/components/(marketing)/carousel.tsx:19
+#: apps/marketing/src/components/(marketing)/carousel.tsx:22
 msgid "Signing Process"
 msgstr "Signaturprozess"
 
@@ -457,11 +461,11 @@ msgstr "Signaturprozess"
 msgid "Signup Now"
 msgstr "Jetzt registrieren"
 
-#: apps/marketing/src/components/(marketing)/faster-smarter-beautiful-bento.tsx:85
+#: apps/marketing/src/components/(marketing)/faster-smarter-beautiful-bento.tsx:89
 msgid "Smart."
 msgstr "Intelligent."
 
-#: apps/marketing/src/components/(marketing)/hero.tsx:128
+#: apps/marketing/src/components/(marketing)/hero.tsx:132
 msgid "Star on GitHub"
 msgstr "Auf GitHub favorisieren"
 
@@ -487,12 +491,12 @@ msgstr "Team"
 msgid "Team Inbox"
 msgstr "Team-Posteingang"
 
-#: apps/marketing/src/components/(marketing)/carousel.tsx:25
+#: apps/marketing/src/components/(marketing)/carousel.tsx:28
 #: apps/marketing/src/components/(marketing)/pricing-table.tsx:162
 msgid "Teams"
 msgstr "Teams"
 
-#: apps/marketing/src/components/(marketing)/open-build-template-bento.tsx:79
+#: apps/marketing/src/components/(marketing)/open-build-template-bento.tsx:83
 msgid "Template Store (Soon)."
 msgstr "Vorlagen-Shop (Demnächst)."
 
@@ -528,12 +532,12 @@ msgstr "Insgesamt Finanzierungsvolumen"
 msgid "Total Users"
 msgstr "Gesamtanzahl der Benutzer"
 
-#: apps/marketing/src/components/(marketing)/open-build-template-bento.tsx:27
+#: apps/marketing/src/components/(marketing)/open-build-template-bento.tsx:31
 msgid "Truly your own."
 msgstr "Wirklich Ihr Eigenes."
 
 #: apps/marketing/src/components/(marketing)/callout.tsx:27
-#: apps/marketing/src/components/(marketing)/hero.tsx:119
+#: apps/marketing/src/components/(marketing)/hero.tsx:123
 msgid "Try our Free Plan"
 msgstr "Probieren Sie unseren Gratisplan aus"
 
@@ -566,7 +570,7 @@ msgstr "Wir helfen Ihnen gerne unter <0>support@documenso.com</0> oder <1>in uns
 msgid "What is the difference between the plans?"
 msgstr "Was ist der Unterschied zwischen den Plänen?"
 
-#: apps/marketing/src/components/(marketing)/faster-smarter-beautiful-bento.tsx:43
+#: apps/marketing/src/components/(marketing)/faster-smarter-beautiful-bento.tsx:47
 msgid "When it comes to sending or receiving a contract, you can count on lightning-fast speeds."
 msgstr "Wenn es um das Senden oder Empfangen eines Vertrags geht, können Sie auf blitzschnelle Geschwindigkeiten zählen."
 
@@ -594,6 +598,6 @@ msgstr "Ja! Documenso wird unter der GNU AGPL V3 Open-Source-Lizenz angeboten. D
 msgid "You can self-host Documenso for free or use our ready-to-use hosted version. The hosted version comes with additional support, painless scalability and more. Early adopters will get access to all features we build this year, for no additional cost! Forever! Yes, that includes multiple users per account later. If you want Documenso for your enterprise, we are happy to talk about your needs."
 msgstr "Sie können Documenso kostenlos selbst hosten oder unsere sofort einsatzbereite gehostete Version nutzen. Die gehostete Version bietet zusätzlichen Support, schmerzfreie Skalierbarkeit und mehr. Frühzeitige Anwender erhalten in diesem Jahr Zugriff auf alle Funktionen, die wir entwickeln, ohne zusätzliche Kosten! Für immer! Ja, das beinhaltet später mehrere Benutzer pro Konto. Wenn Sie Documenso für Ihr Unternehmen möchten, sprechen wir gerne über Ihre Bedürfnisse."
 
-#: apps/marketing/src/components/(marketing)/carousel.tsx:258
+#: apps/marketing/src/components/(marketing)/carousel.tsx:265
 msgid "Your browser does not support the video tag."
 msgstr "Ihr Browser unterstützt das Video-Tag nicht."

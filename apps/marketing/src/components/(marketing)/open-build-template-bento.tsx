@@ -21,6 +21,10 @@ export const OpenBuildTemplateBento = ({ className, ...props }: OpenBuildTemplat
           src={backgroundPattern}
           alt="background pattern"
           className="h-full scale-125 object-cover dark:contrast-[70%] dark:invert dark:sepia md:scale-150 lg:scale-[175%]"
+          style={{
+            mask: 'radial-gradient(rgba(255, 255, 255, 1) 0%, transparent 80%)',
+            WebkitMask: 'radial-gradient(rgba(255, 255, 255, 1) 0%, transparent 80%)',
+          }}
         />
       </div>
       <h2 className="px-0 text-[22px] font-semibold md:px-12 md:text-4xl lg:px-24">
