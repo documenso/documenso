@@ -4,6 +4,7 @@ import { SEND_SIGNING_EMAIL_JOB_DEFINITION } from './definitions/emails/send-sig
 import { SEND_TEAM_DELETED_EMAIL_JOB_DEFINITION } from './definitions/emails/send-team-deleted-email';
 import { SEND_TEAM_MEMBER_JOINED_EMAIL_JOB_DEFINITION } from './definitions/emails/send-team-member-joined-email';
 import { SEND_TEAM_MEMBER_LEFT_EMAIL_JOB_DEFINITION } from './definitions/emails/send-team-member-left-email';
+import { SEAL_DOCUMENT_JOB_DEFINITION } from './definitions/internal/seal-document';
 
 /**
  * The `as const` assertion is load bearing as it provides the correct level of type inference for
@@ -15,6 +16,7 @@ export const jobsClient = new JobClient([
   SEND_TEAM_MEMBER_JOINED_EMAIL_JOB_DEFINITION,
   SEND_TEAM_MEMBER_LEFT_EMAIL_JOB_DEFINITION,
   SEND_TEAM_DELETED_EMAIL_JOB_DEFINITION,
+  SEAL_DOCUMENT_JOB_DEFINITION,
 ] as const);
 
 export const jobs = jobsClient;

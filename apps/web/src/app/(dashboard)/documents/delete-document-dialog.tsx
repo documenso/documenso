@@ -4,6 +4,7 @@ import { useRouter } from 'next/navigation';
 
 import { match } from 'ts-pattern';
 
+import { useLimits } from '@documenso/ee/server-only/limits/provider/client';
 import { DocumentStatus } from '@documenso/prisma/client';
 import { trpc as trpcReact } from '@documenso/trpc/react';
 import { Alert, AlertDescription } from '@documenso/ui/primitives/alert';
@@ -41,6 +42,7 @@ export const DeleteDocumentDialog = ({
   const router = useRouter();
 
   const { toast } = useToast();
+  const { refreshLimits } = useLimits();
 
   const [inputValue, setInputValue] = useState('');
   const [isDeleteEnabled, setIsDeleteEnabled] = useState(status === DocumentStatus.DRAFT);
@@ -48,6 +50,7 @@ export const DeleteDocumentDialog = ({
   const { mutateAsync: deleteDocument, isLoading } = trpcReact.document.deleteDocument.useMutation({
     onSuccess: () => {
       router.refresh();
+      void refreshLimits();
 
       toast({
         title: 'Document deleted',

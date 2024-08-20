@@ -10,6 +10,7 @@ import {
   CheckSquare,
   ChevronDown,
   ChevronsUpDown,
+  Contact,
   Disc,
   Hash,
   Info,
@@ -18,6 +19,7 @@ import {
   User,
 } from 'lucide-react';
 import { useFieldArray, useForm } from 'react-hook-form';
+import { useHotkeys } from 'react-hotkeys-hook';
 
 import { getBoundingClientRect } from '@documenso/lib/client-only/get-bounding-client-rect';
 import { useDocumentElement } from '@documenso/lib/client-only/hooks/use-document-element';
@@ -39,6 +41,7 @@ import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem } from '
 import { Popover, PopoverContent, PopoverTrigger } from '../popover';
 import { useStep } from '../stepper';
 import { Tooltip, TooltipContent, TooltipTrigger } from '../tooltip';
+import { useToast } from '../use-toast';
 import type { TAddFieldsFormSchema } from './add-fields.types';
 import {
   DocumentFlowFormContainerActions,
@@ -102,6 +105,8 @@ export const AddFieldsFormPartial = ({
   isDocumentPdfLoaded,
   teamId,
 }: AddFieldsFormProps) => {
+  const { toast } = useToast();
+
   const [isMissingSignatureDialogVisible, setIsMissingSignatureDialogVisible] = useState(false);
 
   const { isWithinPageBounds, getFieldPosition, getPage } = useDocumentElement();
@@ -135,7 +140,12 @@ export const AddFieldsFormPartial = ({
     },
   });
 
+  useHotkeys(['ctrl+c', 'meta+c'], (evt) => onFieldCopy(evt));
+  useHotkeys(['ctrl+v', 'meta+v'], (evt) => onFieldPaste(evt));
+  useHotkeys(['ctrl+d', 'meta+d'], (evt) => onFieldCopy(evt, { duplicate: true }));
+
   const onFormSubmit = handleSubmit(onSubmit);
+
   const handleSavedFieldSettings = (fieldState: FieldMeta) => {
     const initialValues = getValues();
 
@@ -168,6 +178,12 @@ export const AddFieldsFormPartial = ({
   const [selectedField, setSelectedField] = useState<FieldType | null>(null);
   const [selectedSigner, setSelectedSigner] = useState<Recipient | null>(null);
   const [showRecipientsSelector, setShowRecipientsSelector] = useState(false);
+  const [lastActiveField, setLastActiveField] = useState<TAddFieldsFormSchema['fields'][0] | null>(
+    null,
+  );
+  const [fieldClipboard, setFieldClipboard] = useState<TAddFieldsFormSchema['fields'][0] | null>(
+    null,
+  );
   const selectedSignerIndex = recipients.findIndex((r) => r.id === selectedSigner?.id);
   const selectedSignerStyles = useSignerColors(
     selectedSignerIndex === -1 ? 0 : selectedSignerIndex,
@@ -280,7 +296,7 @@ export const AddFieldsFormPartial = ({
       pageX -= fieldPageWidth / 2;
       pageY -= fieldPageHeight / 2;
 
-      append({
+      const field = {
         formId: nanoid(12),
         type: selectedField,
         pageNumber,
@@ -290,7 +306,9 @@ export const AddFieldsFormPartial = ({
         pageHeight: fieldPageHeight,
         signerEmail: selectedSigner.email,
         fieldMeta: undefined,
-      });
+      };
+
+      append(field);
 
       setIsFieldWithinBounds(false);
       setSelectedField(null);
@@ -349,6 +367,57 @@ export const AddFieldsFormPartial = ({
       });
     },
     [getFieldPosition, localFields, update],
+  );
+
+  const onFieldCopy = useCallback(
+    (event?: KeyboardEvent | null, options?: { duplicate?: boolean }) => {
+      const { duplicate = false } = options ?? {};
+
+      if (lastActiveField) {
+        event?.preventDefault();
+
+        if (!duplicate) {
+          setFieldClipboard(lastActiveField);
+
+          toast({
+            title: 'Copied field',
+            description: 'Copied field to clipboard',
+          });
+
+          return;
+        }
+
+        const newField: TAddFieldsFormSchema['fields'][0] = {
+          ...structuredClone(lastActiveField),
+          formId: nanoid(12),
+          signerEmail: selectedSigner?.email ?? lastActiveField.signerEmail,
+          pageX: lastActiveField.pageX + 3,
+          pageY: lastActiveField.pageY + 3,
+        };
+
+        append(newField);
+      }
+    },
+    [append, lastActiveField, selectedSigner?.email, toast],
+  );
+
+  const onFieldPaste = useCallback(
+    (event: KeyboardEvent) => {
+      if (fieldClipboard) {
+        event.preventDefault();
+
+        const copiedField = structuredClone(fieldClipboard);
+
+        append({
+          ...copiedField,
+          formId: nanoid(12),
+          signerEmail: selectedSigner?.email ?? copiedField.signerEmail,
+          pageX: copiedField.pageX + 3,
+          pageY: copiedField.pageY + 3,
+        });
+      }
+    },
+    [append, fieldClipboard, selectedSigner?.email],
   );
 
   useEffect(() => {
@@ -471,11 +540,13 @@ export const AddFieldsFormPartial = ({
               {selectedField && (
                 <div
                   className={cn(
-                    'pointer-events-none fixed z-50 flex cursor-pointer flex-col items-center justify-center bg-white transition duration-200',
+                    'text-muted-foreground dark:text-muted-background pointer-events-none fixed z-50 flex cursor-pointer flex-col items-center justify-center bg-white transition duration-200',
                     selectedSignerStyles.default.base,
                     {
-                      '-rotate-6 scale-90 opacity-50': !isFieldWithinBounds,
+                      '-rotate-6 scale-90 opacity-50 dark:bg-black/20': !isFieldWithinBounds,
+                      'dark:text-black/60': isFieldWithinBounds,
                     },
+                    selectedField === FieldType.SIGNATURE && fontCaveat.className,
                   )}
                   style={{
                     top: coords.y,
@@ -503,9 +574,12 @@ export const AddFieldsFormPartial = ({
                       minHeight={fieldBounds.current.height}
                       minWidth={fieldBounds.current.width}
                       passive={isFieldWithinBounds && !!selectedField}
+                      onFocus={() => setLastActiveField(field)}
+                      onBlur={() => setLastActiveField(null)}
                       onResize={(options) => onFieldResize(options, index)}
                       onMove={(options) => onFieldMove(options, index)}
                       onRemove={() => remove(index)}
+                      onDuplicate={() => onFieldCopy(null, { duplicate: true })}
                       onAdvancedSettings={() => {
                         setCurrentField(field);
                         handleAdvancedSettings();
@@ -666,6 +740,32 @@ export const AddFieldsFormPartial = ({
                   <button
                     type="button"
                     className="group h-full w-full"
+                    onClick={() => setSelectedField(FieldType.INITIALS)}
+                    onMouseDown={() => setSelectedField(FieldType.INITIALS)}
+                    data-selected={selectedField === FieldType.INITIALS ? true : undefined}
+                  >
+                    <Card
+                      className={cn(
+                        'flex h-full w-full cursor-pointer items-center justify-center group-disabled:opacity-50',
+                        // selectedSignerStyles.borderClass,
+                      )}
+                    >
+                      <CardContent className="flex flex-col items-center justify-center px-6 py-4">
+                        <p
+                          className={cn(
+                            'text-muted-foreground group-data-[selected]:text-foreground flex items-center justify-center gap-x-1.5 text-sm font-normal',
+                          )}
+                        >
+                          <Contact className="h-4 w-4" />
+                          Initials
+                        </p>
+                      </CardContent>
+                    </Card>
+                  </button>
+
+                  <button
+                    type="button"
+                    className="group h-full w-full"
                     onClick={() => setSelectedField(FieldType.EMAIL)}
                     onMouseDown={() => setSelectedField(FieldType.EMAIL)}
                     data-selected={selectedField === FieldType.EMAIL ? true : undefined}
@@ -676,7 +776,7 @@ export const AddFieldsFormPartial = ({
                         // selectedSignerStyles.borderClass,
                       )}
                     >
-                      <CardContent className="p-4">
+                      <CardContent className="flex flex-col items-center justify-center px-6 py-4">
                         <p
                           className={cn(
                             'text-muted-foreground group-data-[selected]:text-foreground flex items-center justify-center gap-x-1.5 text-sm font-normal',

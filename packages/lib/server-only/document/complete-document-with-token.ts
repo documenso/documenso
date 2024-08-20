@@ -1,5 +1,3 @@
-'use server';
-
 import { DOCUMENT_AUDIT_LOG_TYPE } from '@documenso/lib/types/document-audit-logs';
 import type { RequestMetadata } from '@documenso/lib/universal/extract-request-metadata';
 import { createDocumentAuditLogData } from '@documenso/lib/utils/document-audit-logs';
@@ -13,10 +11,9 @@ import {
 } from '@documenso/prisma/client';
 import { WebhookTriggerEvents } from '@documenso/prisma/client';
 
-import { jobsClient } from '../../jobs/client';
+import { jobs } from '../../jobs/client';
 import type { TRecipientActionAuth } from '../../types/document-auth';
 import { triggerWebhook } from '../webhooks/trigger/trigger-webhook';
-import { sealDocument } from './seal-document';
 import { sendPendingEmail } from './send-pending-email';
 
 export type CompleteDocumentWithTokenOptions = {
@@ -53,8 +50,6 @@ export const completeDocumentWithToken = async ({
   documentId,
   requestMetadata,
 }: CompleteDocumentWithTokenOptions) => {
-  'use server';
-
   const document = await getDocument({ token, documentId });
 
   if (document.status !== DocumentStatus.PENDING) {
@@ -105,7 +100,7 @@ export const completeDocumentWithToken = async ({
           data: { sendStatus: SendStatus.SENT },
         });
 
-        await jobsClient.triggerJob({
+        await jobs.triggerJob({
           name: 'send.signing.requested.email',
           payload: {
             userId: document.userId,
@@ -204,7 +199,13 @@ export const completeDocumentWithToken = async ({
   });
 
   if (haveAllRecipientsSigned) {
-    await sealDocument({ documentId: document.id, requestMetadata });
+    await jobs.triggerJob({
+      name: 'internal.seal-document',
+      payload: {
+        documentId: document.id,
+        requestMetadata,
+      },
+    });
   }
 
   const updatedDocument = await getDocument({ token, documentId });

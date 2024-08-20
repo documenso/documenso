@@ -71,6 +71,7 @@ export type SignInFormProps = {
   initialEmail?: string;
   isGoogleSSOEnabled?: boolean;
   isOIDCSSOEnabled?: boolean;
+  oidcProviderLabel?: string;
 };
 
 export const SignInForm = ({
@@ -78,6 +79,7 @@ export const SignInForm = ({
   initialEmail,
   isGoogleSSOEnabled,
   isOIDCSSOEnabled,
+  oidcProviderLabel,
 }: SignInFormProps) => {
   const { toast } = useToast();
   const { getFlag } = useFeatureFlags();
@@ -369,7 +371,7 @@ export const SignInForm = ({
               onClick={onSignInWithOIDCClick}
             >
               <FaIdCardClip className="mr-2 h-5 w-5" />
-              OIDC
+              {oidcProviderLabel || 'OIDC'}
             </Button>
           )}
 

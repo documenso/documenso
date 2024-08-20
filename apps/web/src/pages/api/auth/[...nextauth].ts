@@ -6,6 +6,7 @@ import { getStripeCustomerByUser } from '@documenso/ee/server-only/stripe/get-cu
 import { IS_BILLING_ENABLED } from '@documenso/lib/constants/app';
 import { NEXT_AUTH_OPTIONS } from '@documenso/lib/next-auth/auth-options';
 import { extractNextApiRequestMetadata } from '@documenso/lib/universal/extract-request-metadata';
+import { slugify } from '@documenso/lib/utils/slugify';
 import { prisma } from '@documenso/prisma';
 import { UserSecurityAuditLogType } from '@documenso/prisma/client';
 
@@ -60,11 +61,39 @@ export default async function auth(req: NextApiRequest, res: NextApiResponse) {
           },
         });
       },
-      linkAccount: async ({ user }) => {
+      linkAccount: async ({ user, account, profile }) => {
         const userId = typeof user.id === 'string' ? parseInt(user.id) : user.id;
 
-        if (isNaN(userId)) {
+        if (Number.isNaN(userId)) {
           return;
+        }
+
+        // If the user is linking an OIDC account and the email verified date is set then update it in the db.
+        if (account.provider === 'oidc' && profile.emailVerified !== null) {
+          await prisma.user.update({
+            where: { id: userId },
+            data: {
+              emailVerified: profile.emailVerified,
+            },
+          });
+        }
+
+        // auto set public profile name
+        if (account.provider === 'oidc' && user.name && 'url' in user && !user.url) {
+          let counter = 1;
+          let url = slugify(user.name);
+
+          while (await prisma.user.findFirst({ where: { url } })) {
+            url = `${slugify(user.name)}-${counter}`;
+            counter++;
+          }
+
+          await prisma.user.update({
+            where: { id: userId },
+            data: {
+              url,
+            },
+          });
         }
 
         await prisma.userSecurityAuditLog.create({
