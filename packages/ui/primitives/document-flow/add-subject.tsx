@@ -66,13 +66,12 @@ export const AddSubjectFormPartial = ({
   });
 
   const [oldEmailData, setOldEmailData] = useState<{ subject: string; message: string } | null>(
-    () =>
-      document.documentMeta
-        ? {
-            subject: document.documentMeta.subject ?? '',
-            message: document.documentMeta.message ?? '',
-          }
-        : null,
+    document.documentMeta
+      ? {
+          subject: document.documentMeta.subject ?? '',
+          message: document.documentMeta.message ?? '',
+        }
+      : null,
   );
 
   const [changedFields, setChangedFields] = useState<{ subject: boolean; message: boolean }>({
