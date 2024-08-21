@@ -8,7 +8,7 @@ msgstr ""
 "Language: de\n"
 "Project-Id-Version: documenso-app\n"
 "Report-Msgid-Bugs-To: \n"
-"PO-Revision-Date: 2024-07-26 06:04\n"
+"PO-Revision-Date: 2024-08-20 14:03\n"
 "Last-Translator: \n"
 "Language-Team: German\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
@@ -158,11 +158,11 @@ msgstr "Betten Sie Documenso ganz einfach in Ihr Produkt ein. Kopieren und füge
 
 #: apps/marketing/src/components/(marketing)/share-connect-paid-widget-bento.tsx:42
 #~ msgid "Easy Sharing (Soon)."
-#~ msgstr "Einfaches Teilen (Bald)."
+#~ msgstr "Easy Sharing (Soon)."
 
 #: apps/marketing/src/components/(marketing)/share-connect-paid-widget-bento.tsx:46
 msgid "Easy Sharing."
-msgstr ""
+msgstr "Einfaches Teilen."
 
 #: apps/marketing/src/components/(marketing)/pricing-table.tsx:148
 #: apps/marketing/src/components/(marketing)/pricing-table.tsx:192
@@ -601,3 +601,4 @@ msgstr "Sie können Documenso kostenlos selbst hosten oder unsere sofort einsatz
 #: apps/marketing/src/components/(marketing)/carousel.tsx:265
 msgid "Your browser does not support the video tag."
 msgstr "Ihr Browser unterstützt das Video-Tag nicht."
+
