@@ -25,6 +25,10 @@ export const ShareConnectPaidWidgetBento = ({
           src={backgroundPattern}
           alt="background pattern"
           className="h-full scale-125 object-cover dark:contrast-[70%] dark:invert dark:sepia md:scale-150 lg:scale-[175%]"
+          style={{
+            mask: 'radial-gradient(rgba(255, 255, 255, 1) 0%, transparent 80%)',
+            WebkitMask: 'radial-gradient(rgba(255, 255, 255, 1) 0%, transparent 80%)',
+          }}
         />
       </div>
       <h2 className="px-0 text-[22px] font-semibold md:px-12 md:text-4xl lg:px-24">
@@ -39,7 +43,7 @@ export const ShareConnectPaidWidgetBento = ({
           <CardContent className="grid grid-cols-1 gap-8 p-6">
             <p className="text-foreground/80 leading-relaxed">
               <strong className="block">
-                <Trans>Easy Sharing (Soon).</Trans>
+                <Trans>Easy Sharing.</Trans>
               </strong>
               <Trans>Receive your personal link to share with everyone you care about.</Trans>
             </p>
