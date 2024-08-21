@@ -5,6 +5,7 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 
 import { zodResolver } from '@hookform/resolvers/zod';
+import { Loader } from 'lucide-react';
 import { useForm } from 'react-hook-form';
 
 import { DO_NOT_INVALIDATE_QUERY_ON_MUTATION } from '@documenso/lib/constants/trpc';
@@ -73,7 +74,11 @@ export const AddSubjectFormPartial = ({
           }
         : null,
   );
-  const [showUndoButton, setShowUndoButton] = useState(false);
+
+  const [changedFields, setChangedFields] = useState<{ subject: boolean; message: boolean }>({
+    subject: false,
+    message: false,
+  });
 
   const { toast } = useToast();
   const router = useRouter();
@@ -95,75 +100,75 @@ export const AddSubjectFormPartial = ({
     });
 
   const handleOnBlur = async (field: 'subject' | 'message', value: string) => {
-    if (value !== oldEmailData?.[field]) {
-      try {
-        await setEmailSettingsForDocument({
-          documentId: document.id,
-          [field]: value,
-        });
+    if (value == oldEmailData?.[field]) return;
 
-        router.refresh();
+    try {
+      await setEmailSettingsForDocument({
+        documentId: document.id,
+        [field]: value,
+      });
 
-        toast({
-          title: 'Email settings updated',
-          description: 'The email settings for the document have been updated.',
-          duration: 5000,
-        });
-      } catch (e) {
-        console.error(e);
+      setChangedFields((prev) => ({ ...prev, [field]: true }));
+      router.refresh();
 
-        toast({
-          title: 'Error',
-          description: 'An error occurred while updating the email settings.',
-          duration: 5000,
-        });
-      }
+      toast({
+        title: 'Email settings updated',
+        description: 'The email settings for the document have been updated.',
+        duration: 5000,
+      });
+    } catch (e) {
+      console.error(e);
+
+      toast({
+        title: 'Error',
+        description: 'An error occurred while updating the email settings.',
+        duration: 5000,
+      });
     }
   };
 
-  const handleUndoButton = async () => {
+  const handleUndoButton = async (field: 'subject' | 'message') => {
+    if (!oldEmailData) return;
+
     try {
-      if (oldEmailData) {
-        await setEmailSettingsForDocument({
-          documentId: document.id,
-          subject: oldEmailData.subject,
-          message: oldEmailData.message,
-        });
+      await setEmailSettingsForDocument({
+        documentId: document.id,
+        [field]: oldEmailData[field],
+      });
 
-        setValue('meta.subject', oldEmailData.subject);
-        setValue('meta.message', oldEmailData.message);
+      setValue(`meta.${field}`, oldEmailData[field]);
 
+      setOldEmailData((prev) => (prev ? { ...prev, [field]: undefined } : null));
+      setChangedFields((prev) => ({ ...prev, [field]: false }));
+      router.refresh();
+
+      toast({
+        title: 'Change reverted',
+        description: `The latest change to the ${field} has been reverted.`,
+        duration: 5000,
+      });
+
+      if (oldEmailData.subject === undefined && oldEmailData.message === undefined) {
         setOldEmailData(null);
-        router.refresh();
-
-        toast({
-          title: 'Changes reverted',
-          description: 'The latest change has been reverted to the original value.',
-          duration: 5000,
-        });
       }
     } catch (e) {
       console.error(e);
       toast({
         title: 'Error',
-        description: 'An error occurred while undoing the latest change.',
+        description: `An error occurred while undoing the latest change to the ${field}.`,
         duration: 5000,
       });
     }
   };
 
   useEffect(() => {
-    if (oldEmailData) {
-      const timeout = setTimeout(() => {
-        setShowUndoButton(false);
-      }, 5000);
+    const timeout = setTimeout(() => {
+      setChangedFields({ subject: false, message: false });
+    }, 5000);
 
-      setShowUndoButton(true);
-
-      return () => {
-        clearTimeout(timeout);
-      };
-    }
+    return () => {
+      clearTimeout(timeout);
+    };
   }, [oldEmailData]);
 
   const onFormSubmit = handleSubmit(onSubmit);
@@ -200,6 +205,20 @@ export const AddSubjectFormPartial = ({
                 })}
               />
 
+              {changedFields.subject && oldEmailData && (
+                <div className="mt-2 flex items-center">
+                  <Button
+                    className="-ml-2"
+                    size="sm"
+                    variant="link"
+                    onClick={() => void handleUndoButton('subject')}
+                  >
+                    <span className="text-xs">Undo change</span>
+                    <Loader className="ml-1 h-4 w-4 animate-spin text-gray-500" />
+                  </Button>
+                </div>
+              )}
+
               <FormErrorMessage className="mt-2" error={errors.meta?.subject} />
             </div>
 
@@ -219,16 +238,25 @@ export const AddSubjectFormPartial = ({
                 })}
               />
 
+              {changedFields.message && oldEmailData && (
+                <div className="mt-2 flex items-center">
+                  <Button
+                    className="-ml-2"
+                    size="sm"
+                    variant="link"
+                    onClick={() => void handleUndoButton('message')}
+                  >
+                    <span className="text-xs">Undo change</span>
+                    <Loader className="ml-1 h-4 w-4 animate-spin text-gray-500" />
+                  </Button>
+                </div>
+              )}
+
               <FormErrorMessage
                 className="mt-2"
                 error={typeof errors.meta?.message !== 'string' ? errors.meta?.message : undefined}
               />
             </div>
-
-            {showUndoButton && oldEmailData && (
-              <Button onClick={() => void handleUndoButton()}>Undo latest change</Button>
-            )}
-
             <DocumentSendEmailMessageHelper />
           </div>
         </div>
