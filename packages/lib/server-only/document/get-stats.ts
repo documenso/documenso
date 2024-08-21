@@ -197,9 +197,7 @@ type GetTeamCountsOption = {
 };
 
 const getTeamCounts = async (options: GetTeamCountsOption) => {
-  const { createdAt, teamId, teamEmail } = options;
-
-  const senderIds = options.senderIds ?? [];
+  const { createdAt, teamId, teamEmail, senderIds = [] } = options;
 
   const userIdWhereClause: Prisma.DocumentWhereInput['userId'] =
     senderIds.length > 0
@@ -298,9 +296,13 @@ const getTeamCounts = async (options: GetTeamCountsOption) => {
         _all: true,
       },
       where: {
-        userId: userIdWhereClause,
-        createdAt,
         OR: [
+          {
+            teamId,
+            deletedAt: {
+              gte: DateTime.now().minus({ days: 30 }).startOf('day').toJSDate(),
+            },
+          },
           {
             status: ExtendedDocumentStatus.PENDING,
             Recipient: {

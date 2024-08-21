@@ -26,115 +26,6 @@ export type FindDocumentsOptions = {
   senderIds?: number[];
 };
 
-const getDeletedFilter = (
-  status: ExtendedDocumentStatus,
-  user: User,
-  team?: (Team & { teamEmail: TeamEmail | null }) | null,
-) => {
-  if (status === ExtendedDocumentStatus.BIN) {
-    return {
-      OR: [
-        {
-          userId: user.id,
-          deletedAt: {
-            gte: DateTime.now().minus({ days: 30 }).startOf('day').toJSDate(),
-          },
-        },
-        {
-          Recipient: {
-            some: {
-              email: user.email,
-              documentDeletedAt: {
-                gte: DateTime.now().minus({ days: 30 }).startOf('day').toJSDate(),
-              },
-            },
-          },
-        },
-        ...(team
-          ? [
-              {
-                teamId: team.id,
-                deletedAt: {
-                  gte: DateTime.now().minus({ days: 30 }).startOf('day').toJSDate(),
-                },
-              },
-              ...(team.teamEmail
-                ? [
-                    {
-                      User: {
-                        email: team.teamEmail.email,
-                      },
-                      deletedAt: {
-                        gte: DateTime.now().minus({ days: 30 }).startOf('day').toJSDate(),
-                      },
-                    },
-                    {
-                      Recipient: {
-                        some: {
-                          email: team.teamEmail.email,
-                          documentDeletedAt: {
-                            gte: DateTime.now().minus({ days: 30 }).startOf('day').toJSDate(),
-                          },
-                        },
-                      },
-                    },
-                  ]
-                : []),
-            ]
-          : []),
-      ],
-    };
-  }
-
-  return {
-    AND: {
-      OR: [
-        {
-          userId: user.id,
-          deletedAt: null,
-        },
-        {
-          Recipient: {
-            some: {
-              email: user.email,
-              documentDeletedAt: null,
-            },
-          },
-        },
-        ...(team
-          ? team.teamEmail
-            ? [
-                {
-                  teamId: team.id,
-                  deletedAt: null,
-                },
-                {
-                  User: {
-                    email: team.teamEmail.email,
-                  },
-                  deletedAt: null,
-                },
-                {
-                  Recipient: {
-                    some: {
-                      email: team.teamEmail.email,
-                      documentDeletedAt: null,
-                    },
-                  },
-                },
-              ]
-            : [
-                {
-                  teamId: team.id,
-                  deletedAt: null,
-                },
-              ]
-          : []),
-      ],
-    },
-  };
-};
-
 export const findDocuments = async ({
   userId,
   teamId,
@@ -190,12 +81,9 @@ export const findDocuments = async ({
     };
   }
 
-  const deletedFilter = getDeletedFilter(status, user, team);
-
   const whereClause: Prisma.DocumentWhereInput = {
     ...termFilters,
     ...filters,
-    ...deletedFilter,
   };
 
   if (period) {
@@ -356,7 +244,6 @@ const findDocumentsFilter = (status: ExtendedDocumentStatus, user: User) => {
         {
           userId: user.id,
           teamId: null,
-          status: ExtendedDocumentStatus.COMPLETED,
           deletedAt: {
             gte: DateTime.now().minus({ days: 30 }).startOf('day').toJSDate(),
           },
@@ -554,19 +441,17 @@ const findTeamDocumentsFilter = (
       return filter;
     })
     .with(ExtendedDocumentStatus.BIN, () => {
-      const filter: Prisma.DocumentWhereInput = {
-        OR: [
-          {
-            teamId: team.id,
-            deletedAt: {
-              gte: DateTime.now().minus({ days: 30 }).startOf('day').toJSDate(),
-            },
+      const filters: Prisma.DocumentWhereInput[] = [
+        {
+          teamId: team.id,
+          deletedAt: {
+            gte: DateTime.now().minus({ days: 30 }).startOf('day').toJSDate(),
           },
-        ],
-      };
+        },
+      ];
 
-      if (teamEmail && filter.OR) {
-        filter.OR.push(
+      if (teamEmail) {
+        filters.push(
           {
             User: {
               email: teamEmail,
@@ -588,7 +473,9 @@ const findTeamDocumentsFilter = (
         );
       }
 
-      return filter;
+      return {
+        OR: filters,
+      };
     })
 
     .exhaustive();

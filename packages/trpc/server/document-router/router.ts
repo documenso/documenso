@@ -205,8 +205,6 @@ export const documentRouter = router({
           requestMetadata: extractNextApiRequestMetadata(ctx.req),
         });
 
-        console.log(restoredDocument);
-
         return restoredDocument;
       } catch (err) {
         console.error(err);
