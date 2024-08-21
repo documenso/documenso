@@ -154,7 +154,7 @@ export const AddSubjectFormPartial = ({
       console.error(e);
       toast({
         title: 'Error',
-        description: `An error occurred while undoing the latest change to the ${field}.`,
+        description: 'An error occurred while undoing the latest change',
         duration: 5000,
       });
     }
