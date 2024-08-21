@@ -237,8 +237,10 @@ test('[DIRECT_TEMPLATES]: use direct template link with 1 recipient', async ({ p
   for (const template of [personalDirectTemplate, teamDirectTemplate]) {
     await page.goto(`${WEBAPP_BASE_URL}${formatDocumentsPath(template.team?.url)}`);
 
-    // Check that the document is in the 'All' tab.
-    await checkDocumentTabCount(page, 'Completed', 1);
+    await expect(async () => {
+      // Check that the document is in the 'All' tab.
+      await checkDocumentTabCount(page, 'Completed', 1);
+    }).toPass();
   }
 });
 

@@ -20,7 +20,7 @@ export const DocumentGlobalAuthActionSelect = forwardRef<HTMLButtonElement, Sele
   (props, ref) => (
     <Select {...props}>
       <SelectTrigger className="bg-background text-muted-foreground">
-        <SelectValue ref={ref} data-testid="documentActionSelectValue" placeholder="None" />
+        <SelectValue ref={ref} data-testid="documentActionSelectValue" placeholder="No restrictions" />
       </SelectTrigger>
 
       <SelectContent position="popper">
@@ -33,7 +33,7 @@ export const DocumentGlobalAuthActionSelect = forwardRef<HTMLButtonElement, Sele
           ))}
 
         {/* Note: -1 is remapped in the Zod schema to the required value. */}
-        <SelectItem value={'-1'}>None</SelectItem>
+        <SelectItem value={'-1'}>No restrictions</SelectItem>
       </SelectContent>
     </Select>
   ),
@@ -70,7 +70,7 @@ export const DocumentGlobalAuthActionTooltip = () => (
           their settings
         </li>
         <li>
-          <strong>None</strong> - No authentication required
+          <strong>No restrictions</strong> - No authentication required
         </li>
       </ul>
     </TooltipContent>

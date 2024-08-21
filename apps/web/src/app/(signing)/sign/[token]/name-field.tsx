@@ -178,7 +178,7 @@ export const NameField = ({ field, recipient, onSignField, onUnsignField }: Name
         <DialogContent>
           <DialogTitle>
             Sign as {recipient.name}{' '}
-            <span className="text-muted-foreground">({recipient.email})</span>
+            <div className="text-muted-foreground">({recipient.email})</div>
           </DialogTitle>
 
           <div>

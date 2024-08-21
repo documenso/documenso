@@ -261,6 +261,7 @@ npm run prisma:migrate-deploy
 Finally, you can start it with:
 
 ```
+cd apps/web
 npm run start
 ```
 

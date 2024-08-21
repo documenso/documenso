@@ -190,7 +190,7 @@ export const SignatureField = ({
       )}
 
       {state === 'empty' && (
-        <p className="group-hover:text-primary font-signature text-muted-foreground duration-200 group-hover:text-yellow-300 text-xl">
+        <p className="group-hover:text-primary font-signature text-muted-foreground text-xl duration-200 group-hover:text-yellow-300">
           Signature
         </p>
       )}
@@ -214,7 +214,7 @@ export const SignatureField = ({
         <DialogContent>
           <DialogTitle>
             Sign as {recipient.name}{' '}
-            <span className="text-muted-foreground">({recipient.email})</span>
+            <div className="text-muted-foreground h-5">({recipient.email})</div>
           </DialogTitle>
 
           <div className="">
