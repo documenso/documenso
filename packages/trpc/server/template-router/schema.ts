@@ -1,11 +1,11 @@
 import { z } from 'zod';
 
-import { URL_REGEX } from '@documenso/lib/constants/url-regex';
 import {
   ZDocumentAccessAuthTypesSchema,
   ZDocumentActionAuthTypesSchema,
 } from '@documenso/lib/types/document-auth';
 import { ZBaseTableSearchParamsSchema } from '@documenso/lib/types/search-params';
+import { isValidRedirectUrl } from '@documenso/lib/utils/is-valid-redirect-url';
 import { TemplateType } from '@documenso/prisma/client';
 
 import { ZSignFieldWithTokenMutationSchema } from '../field-router/schema';
@@ -20,6 +20,7 @@ export const ZCreateDocumentFromDirectTemplateMutationSchema = z.object({
   directRecipientName: z.string().optional(),
   directRecipientEmail: z.string().email(),
   directTemplateToken: z.string().min(1),
+  directTemplateExternalId: z.string().optional(),
   signedFieldValues: z.array(ZSignFieldWithTokenMutationSchema),
   templateUpdatedAt: z.date(),
 });
@@ -96,8 +97,9 @@ export const ZUpdateTemplateSettingsMutationSchema = z.object({
       redirectUrl: z
         .string()
         .optional()
-        .refine((value) => value === undefined || value === '' || URL_REGEX.test(value), {
-          message: 'Please enter a valid URL',
+        .refine((value) => value === undefined || value === '' || isValidRedirectUrl(value), {
+          message:
+            'Please enter a valid URL, make sure you include http:// or https:// part of the url.',
         }),
     })
     .optional(),

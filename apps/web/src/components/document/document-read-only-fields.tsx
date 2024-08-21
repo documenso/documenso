@@ -98,6 +98,7 @@ export const DocumentReadOnlyFields = ({ documentMeta, fields }: DocumentReadOnl
                       {
                         type: P.union(
                           FieldType.NAME,
+                          FieldType.INITIALS,
                           FieldType.EMAIL,
                           FieldType.NUMBER,
                           FieldType.RADIO,

@@ -13,6 +13,7 @@ import { isRecipientAuthorized } from '@documenso/lib/server-only/document/is-re
 import { getFieldsForToken } from '@documenso/lib/server-only/field/get-fields-for-token';
 import { getRecipientByToken } from '@documenso/lib/server-only/recipient/get-recipient-by-token';
 import { getRecipientSignatures } from '@documenso/lib/server-only/recipient/get-recipient-signatures';
+import { getUserByEmail } from '@documenso/lib/server-only/user/get-user-by-email';
 import { DocumentStatus, FieldType, RecipientRole } from '@documenso/prisma/client';
 import { DocumentDownloadButton } from '@documenso/ui/components/document/document-download-button';
 import { DocumentShareButton } from '@documenso/ui/components/document/document-share-button';
@@ -25,6 +26,7 @@ import { truncateTitle } from '~/helpers/truncate-title';
 import { SigningAuthPageView } from '../signing-auth-page';
 import { ClaimAccount } from './claim-account';
 import { DocumentPreviewButton } from './document-preview-button';
+import { PollUntilDocumentCompleted } from './poll-until-document-completed';
 
 export type CompletedSigningPageProps = {
   params: {
@@ -77,6 +79,9 @@ export default async function CompletedSigningPage({
   }
 
   const signatures = await getRecipientSignatures({ recipientId: recipient.id });
+  const isExistingUser = await getUserByEmail({ email: recipient.email })
+    .then((u) => !!u)
+    .catch(() => false);
 
   const recipientName =
     recipient.name ||
@@ -85,7 +90,7 @@ export default async function CompletedSigningPage({
 
   const sessionData = await getServerSession();
   const isLoggedIn = !!sessionData?.user;
-  const canSignUp = !isLoggedIn && NEXT_PUBLIC_DISABLE_SIGNUP !== 'true';
+  const canSignUp = !isExistingUser && NEXT_PUBLIC_DISABLE_SIGNUP !== 'true';
 
   return (
     <div
@@ -201,6 +206,8 @@ export default async function CompletedSigningPage({
           </Link>
         )}
       </div>
+
+      <PollUntilDocumentCompleted document={document} />
     </div>
   );
 }

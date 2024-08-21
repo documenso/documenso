@@ -82,8 +82,12 @@ export const AddSettingsFormPartial = ({
       globalAccessAuth: documentAuthOption?.globalAccessAuth || undefined,
       globalActionAuth: documentAuthOption?.globalActionAuth || undefined,
       meta: {
-        timezone: document.documentMeta?.timezone ?? DEFAULT_DOCUMENT_TIME_ZONE,
-        dateFormat: document.documentMeta?.dateFormat ?? DEFAULT_DOCUMENT_DATE_FORMAT,
+        timezone:
+          TIME_ZONES.find((timezone) => timezone === document.documentMeta?.timezone) ??
+          DEFAULT_DOCUMENT_TIME_ZONE,
+        dateFormat:
+          DATE_FORMATS.find((format) => format.label === document.documentMeta?.dateFormat)
+            ?.value ?? DEFAULT_DOCUMENT_DATE_FORMAT,
         redirectUrl: document.documentMeta?.redirectUrl ?? '',
       },
     },
@@ -98,10 +102,20 @@ export const AddSettingsFormPartial = ({
   // We almost always want to set the timezone to the user's local timezone to avoid confusion
   // when the document is signed.
   useEffect(() => {
-    if (!form.formState.touchedFields.meta?.timezone && !documentHasBeenSent) {
+    if (
+      !form.formState.touchedFields.meta?.timezone &&
+      !documentHasBeenSent &&
+      !document.documentMeta?.timezone
+    ) {
       form.setValue('meta.timezone', Intl.DateTimeFormat().resolvedOptions().timeZone);
     }
-  }, [documentHasBeenSent, form, form.setValue, form.formState.touchedFields.meta?.timezone]);
+  }, [
+    documentHasBeenSent,
+    form,
+    form.setValue,
+    form.formState.touchedFields.meta?.timezone,
+    document.documentMeta?.timezone,
+  ]);
 
   return (
     <>

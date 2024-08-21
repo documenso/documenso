@@ -1,5 +1,3 @@
-'use server';
-
 import { nanoid } from 'nanoid';
 import path from 'node:path';
 import { PDFDocument } from 'pdf-lib';
@@ -36,8 +34,6 @@ export const sealDocument = async ({
   isResealing = false,
   requestMetadata,
 }: SealDocumentOptions) => {
-  'use server';
-
   const document = await prisma.document.findFirstOrThrow({
     where: {
       id: documentId,

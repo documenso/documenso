@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 
 import { RECIPIENT_ROLES_DESCRIPTION } from '@documenso/lib/constants/recipient-roles';
 import type { Field } from '@documenso/prisma/client';
@@ -39,6 +39,7 @@ export const DirectTemplatePageView = ({
   directTemplateToken,
 }: TemplatesDirectPageViewProps) => {
   const router = useRouter();
+  const searchParams = useSearchParams();
 
   const { toast } = useToast();
 
@@ -82,8 +83,15 @@ export const DirectTemplatePageView = ({
 
   const onSignDirectTemplateSubmit = async (fields: DirectTemplateLocalField[]) => {
     try {
+      let directTemplateExternalId = searchParams?.get('externalId') || undefined;
+
+      if (directTemplateExternalId) {
+        directTemplateExternalId = decodeURIComponent(directTemplateExternalId);
+      }
+
       const token = await createDocumentFromDirectTemplate({
         directTemplateToken,
+        directTemplateExternalId,
         directRecipientName: fullName,
         directRecipientEmail: recipient.email,
         templateUpdatedAt: template.updatedAt,

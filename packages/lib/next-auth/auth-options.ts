@@ -161,7 +161,10 @@ export const NEXT_AUTH_OPTIONS: AuthOptions = {
           id: profile.sub,
           email: profile.email || profile.preferred_username,
           name: profile.name || `${profile.given_name} ${profile.family_name}`.trim(),
-          emailVerified: profile.email_verified ? new Date().toISOString() : null,
+          emailVerified:
+            process.env.NEXT_PRIVATE_OIDC_SKIP_VERIFY === 'true' || profile.email_verified
+              ? new Date().toISOString()
+              : null,
         };
       },
     },
@@ -361,6 +364,12 @@ export const NEXT_AUTH_OPTIONS: AuthOptions = {
     },
 
     async signIn({ user }) {
+      // This statement appears above so we can stil allow `oidc` connections
+      // while other signups are disabled.
+      if (env('NEXT_PRIVATE_OIDC_ALLOW_SIGNUP') === 'true') {
+        return true;
+      }
+
       // We do this to stop OAuth providers from creating an account
       // when signups are disabled
       if (env('NEXT_PUBLIC_DISABLE_SIGNUP') === 'true') {

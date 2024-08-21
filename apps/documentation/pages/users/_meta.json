@@ -1,5 +1,6 @@
 {
   "index": "Introduction",
+  "support": "Support",
   "-- How To Use": {
     "type": "separator",
     "title": "How To Use"
@@ -13,6 +14,7 @@
     "type": "separator",
     "title": "Legal Overview"
   },
+  "fair-use": "Fair Use Policy",
   "licenses": "Licenses",
   "compliance": "Compliance"
 }
