@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 import { useRouter } from 'next/navigation';
 
@@ -73,6 +73,7 @@ export const AddSubjectFormPartial = ({
           }
         : null,
   );
+  const [showUndoButton, setShowUndoButton] = useState(false);
 
   const { toast } = useToast();
   const router = useRouter();
@@ -94,25 +95,29 @@ export const AddSubjectFormPartial = ({
     });
 
   const handleOnBlur = async (field: 'subject' | 'message', value: string) => {
-    try {
-      await setEmailSettingsForDocument({
-        documentId: document.id,
-        [field]: value,
-      });
+    if (value !== oldEmailData?.[field]) {
+      try {
+        await setEmailSettingsForDocument({
+          documentId: document.id,
+          [field]: value,
+        });
 
-      router.refresh();
+        router.refresh();
 
-      toast({
-        title: 'Email settings updated',
-        description: `The email settings for the document have been updated.`,
-      });
-    } catch (e) {
-      console.error(e);
+        toast({
+          title: 'Email settings updated',
+          description: 'The email settings for the document have been updated.',
+          duration: 5000,
+        });
+      } catch (e) {
+        console.error(e);
 
-      toast({
-        title: 'Error',
-        description: 'An error occurred while updating the email settings.',
-      });
+        toast({
+          title: 'Error',
+          description: 'An error occurred while updating the email settings.',
+          duration: 5000,
+        });
+      }
     }
   };
 
@@ -134,6 +139,7 @@ export const AddSubjectFormPartial = ({
         toast({
           title: 'Changes reverted',
           description: 'The latest change has been reverted to the original value.',
+          duration: 5000,
         });
       }
     } catch (e) {
@@ -141,9 +147,24 @@ export const AddSubjectFormPartial = ({
       toast({
         title: 'Error',
         description: 'An error occurred while undoing the latest change.',
+        duration: 5000,
       });
     }
   };
+
+  useEffect(() => {
+    if (oldEmailData) {
+      const timeout = setTimeout(() => {
+        setShowUndoButton(false);
+      }, 5000);
+
+      setShowUndoButton(true);
+
+      return () => {
+        clearTimeout(timeout);
+      };
+    }
+  }, [oldEmailData]);
 
   const onFormSubmit = handleSubmit(onSubmit);
   const { currentStep, totalSteps, previousStep } = useStep();
@@ -204,8 +225,7 @@ export const AddSubjectFormPartial = ({
               />
             </div>
 
-            {/* Hide the button after 5 seconds */}
-            {oldEmailData && (
+            {showUndoButton && oldEmailData && (
               <Button onClick={() => void handleUndoButton()}>Undo latest change</Button>
             )}
 
