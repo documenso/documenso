@@ -2,6 +2,8 @@
 
 import React, { useId, useMemo, useState } from 'react';
 
+import { useRouter } from 'next/navigation';
+
 import { zodResolver } from '@hookform/resolvers/zod';
 import { motion } from 'framer-motion';
 import { Plus, Trash } from 'lucide-react';
@@ -9,10 +11,13 @@ import { useSession } from 'next-auth/react';
 import { useFieldArray, useForm } from 'react-hook-form';
 
 import { useLimits } from '@documenso/ee/server-only/limits/provider/client';
+import { DO_NOT_INVALIDATE_QUERY_ON_MUTATION } from '@documenso/lib/constants/trpc';
 import { ZRecipientAuthOptionsSchema } from '@documenso/lib/types/document-auth';
 import { nanoid } from '@documenso/lib/universal/id';
 import type { Field, Recipient } from '@documenso/prisma/client';
 import { RecipientRole, SendStatus } from '@documenso/prisma/client';
+import type { DocumentWithData } from '@documenso/prisma/types/document-with-data';
+import { trpc } from '@documenso/trpc/react';
 import { AnimateGenericFadeInOut } from '@documenso/ui/components/animate/animate-generic-fade-in-out';
 import { RecipientActionAuthSelect } from '@documenso/ui/components/recipient/recipient-action-auth-select';
 import { RecipientRoleSelect } from '@documenso/ui/components/recipient/recipient-role-select';
@@ -39,29 +44,57 @@ import type { DocumentFlowStep } from './types';
 
 export type AddSignersFormProps = {
   documentFlow: DocumentFlowStep;
+  document: DocumentWithData;
   recipients: Recipient[];
   fields: Field[];
   isDocumentEnterprise: boolean;
   onSubmit: (_data: TAddSignersFormSchema) => void;
   isDocumentPdfLoaded: boolean;
+  teamId?: number;
 };
 
 export const AddSignersFormPartial = ({
   documentFlow,
+  document,
   recipients,
   fields,
   isDocumentEnterprise,
   onSubmit,
   isDocumentPdfLoaded,
+  teamId,
 }: AddSignersFormProps) => {
   const { toast } = useToast();
   const { remaining } = useLimits();
   const { data: session } = useSession();
+  const router = useRouter();
   const user = session?.user;
 
   const initialId = useId();
+  const utils = trpc.useUtils();
 
   const { currentStep, totalSteps, previousStep } = useStep();
+
+  const { mutateAsync: addSigners } = trpc.recipient.addSigners.useMutation({
+    ...DO_NOT_INVALIDATE_QUERY_ON_MUTATION,
+    onSuccess: (newRecipients) => {
+      utils.document.getDocumentWithDetailsById.setData(
+        {
+          id: document.id,
+          teamId,
+        },
+        /* TODO: Fix TS error */
+        (oldData) => ({ ...(oldData || document), Recipient: newRecipients }),
+      );
+    },
+  });
+
+  const { mutateAsync: deleteSigner } = trpc.recipient.removeSigner.useMutation({
+    ...DO_NOT_INVALIDATE_QUERY_ON_MUTATION,
+    onSuccess: (data) => {
+      /* TODO: Add optimistic update */
+      console.log('removeSigner onSuccess', data);
+    },
+  });
 
   const form = useForm<TAddSignersFormSchema>({
     resolver: zodResolver(ZAddSignersFormSchema),
@@ -152,22 +185,7 @@ export const AddSignersFormPartial = ({
     });
   };
 
-  const onRemoveSigner = (index: number) => {
-    const signer = signers[index];
-
-    if (hasBeenSentToRecipientId(signer.nativeId)) {
-      toast({
-        title: 'Cannot remove signer',
-        description: 'This signer has already received the document.',
-        variant: 'destructive',
-      });
-
-      return;
-    }
-
-    removeSigner(index);
-  };
-
+  /* TODO: Add self-signer to db on blur */
   const onAddSelfSigner = () => {
     if (emptySignerIndex !== -1) {
       setValue(`signers.${emptySignerIndex}.name`, user?.name ?? '');
@@ -186,6 +204,72 @@ export const AddSignersFormPartial = ({
   const onKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
     if (event.key === 'Enter' && event.target instanceof HTMLInputElement) {
       onAddSigner();
+    }
+  };
+
+  const handleOnBlur = async (index: number) => {
+    try {
+      const currentSigner = form.getValues(`signers.${index}`);
+
+      if (!currentSigner.email) {
+        return;
+      }
+
+      await addSigners({
+        documentId: document.id,
+        teamId: teamId,
+        signers: form.getValues('signers').map((signer) => ({
+          ...signer,
+          actionAuth: signer.actionAuth || null,
+        })),
+      });
+
+      const isNewSigner = !currentSigner.nativeId;
+
+      toast({
+        title: isNewSigner ? 'Signer added' : 'Signer updated',
+        description: isNewSigner
+          ? 'The signer has been added to the document.'
+          : 'The signer information has been updated.',
+      });
+
+      router.refresh();
+    } catch (e) {
+      console.error(e);
+      toast({
+        title: 'Error',
+        description: 'An error occurred while updating the document settings.',
+        variant: 'destructive',
+      });
+    }
+  };
+
+  const handleRemoveSigner = async (index: number) => {
+    const signer = signers[index];
+
+    if (hasBeenSentToRecipientId(signer.nativeId)) {
+      toast({
+        title: 'Cannot remove signer',
+        description: 'This signer has already received the document.',
+        variant: 'destructive',
+      });
+
+      return;
+    }
+
+    removeSigner(index);
+
+    if (signer.nativeId) {
+      await deleteSigner({
+        documentId: document.id,
+        teamId: teamId,
+        recipientId: signer.nativeId,
+      });
+
+      toast({
+        title: 'Signer removed',
+        description: 'The signer has been removed from the document.',
+      });
     }
   };
 
@@ -234,6 +318,7 @@ export const AddSignersFormPartial = ({
                             {...field}
                             disabled={isSubmitting || hasBeenSentToRecipientId(signer.nativeId)}
                             onKeyDown={onKeyDown}
+                            onBlur={() => void handleOnBlur(index)}
                           />
                         </FormControl>
 
@@ -260,6 +345,7 @@ export const AddSignersFormPartial = ({
                             {...field}
                             disabled={isSubmitting || hasBeenSentToRecipientId(signer.nativeId)}
                             onKeyDown={onKeyDown}
+                            onBlur={() => void handleOnBlur(index)}
                           />
                         </FormControl>
 
@@ -313,7 +399,7 @@ export const AddSignersFormPartial = ({
                       hasBeenSentToRecipientId(signer.nativeId) ||
                       signers.length === 1
                     }
-                    onClick={() => onRemoveSigner(index)}
+                    onClick={() => void handleRemoveSigner(index)}
                   >
                     <Trash className="h-5 w-5" />
                   </button>

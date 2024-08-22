@@ -345,11 +345,13 @@ export const EditDocumentForm = ({
             <AddSignersFormPartial
               key={recipients.length}
               documentFlow={documentFlow.signers}
+              document={document}
               recipients={recipients}
               fields={fields}
               isDocumentEnterprise={isDocumentEnterprise}
               onSubmit={onAddSignersFormSubmit}
               isDocumentPdfLoaded={isDocumentPdfLoaded}
+              teamId={team?.id}
             />
 
             <AddFieldsFormPartial

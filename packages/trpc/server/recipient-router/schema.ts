@@ -58,6 +58,14 @@ export const ZAddTemplateSignersMutationSchema = z
 
 export type TAddTemplateSignersMutationSchema = z.infer<typeof ZAddTemplateSignersMutationSchema>;
 
+export const ZRemoveSignerMutationSchema = z.object({
+  documentId: z.number(),
+  teamId: z.number().optional(),
+  recipientId: z.number(),
+});
+
+export type TRemoveSignerMutationSchema = z.infer<typeof ZRemoveSignerMutationSchema>;
+
 export const ZCompleteDocumentWithTokenMutationSchema = z.object({
   token: z.string(),
   documentId: z.number(),
