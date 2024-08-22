@@ -2,6 +2,7 @@ declare namespace NodeJS {
   export interface ProcessEnv {
     NEXT_PUBLIC_WEBAPP_URL?: string;
     NEXT_PUBLIC_MARKETING_URL?: string;
+    NEXT_PRIVATE_INTERNAL_WEBAPP_URL?:string;
 
     NEXT_PRIVATE_DATABASE_URL: string;
 
