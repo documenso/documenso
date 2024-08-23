@@ -12,6 +12,7 @@ import {
   ZAddTemplateSignersMutationSchema,
   ZCompleteDocumentWithTokenMutationSchema,
   ZRemoveSignerMutationSchema,
+  ZRemoveTemplateSignerMutationSchema,
 } from './schema';
 
 export const recipientRouter = router({
@@ -70,6 +71,12 @@ export const recipientRouter = router({
           message: 'We were unable to set this field. Please try again later.',
         });
       }
+    }),
+
+  removeTemplateSigner: authenticatedProcedure
+    .input(ZRemoveTemplateSignerMutationSchema)
+    .mutation(async ({ input, ctx }) => {
+      // TODO: Implement
     }),
 
   removeSigner: authenticatedProcedure

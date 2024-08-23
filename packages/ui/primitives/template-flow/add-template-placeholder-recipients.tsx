@@ -2,17 +2,22 @@
 
 import React, { useEffect, useId, useMemo, useState } from 'react';
 
+import { useRouter } from 'next/navigation';
+
 import { zodResolver } from '@hookform/resolvers/zod';
 import { motion } from 'framer-motion';
 import { Link2Icon, Plus, Trash } from 'lucide-react';
 import { useSession } from 'next-auth/react';
 import { useFieldArray, useForm } from 'react-hook-form';
 
+import { DO_NOT_INVALIDATE_QUERY_ON_MUTATION } from '@documenso/lib/constants/trpc';
 import { ZRecipientAuthOptionsSchema } from '@documenso/lib/types/document-auth';
 import { nanoid } from '@documenso/lib/universal/id';
 import { generateRecipientPlaceholder } from '@documenso/lib/utils/templates';
 import type { TemplateDirectLink } from '@documenso/prisma/client';
 import { type Field, type Recipient, RecipientRole } from '@documenso/prisma/client';
+import type { TemplateWithDetails } from '@documenso/prisma/types/template';
+import { trpc } from '@documenso/trpc/react';
 import { AnimateGenericFadeInOut } from '@documenso/ui/components/animate/animate-generic-fade-in-out';
 import { RecipientActionAuthSelect } from '@documenso/ui/components/recipient/recipient-action-auth-select';
 import { RecipientRoleSelect } from '@documenso/ui/components/recipient/recipient-role-select';
@@ -20,6 +25,7 @@ import { cn } from '@documenso/ui/lib/utils';
 import { Button } from '@documenso/ui/primitives/button';
 import { FormErrorMessage } from '@documenso/ui/primitives/form/form-error-message';
 import { Input } from '@documenso/ui/primitives/input';
+import { useToast } from '@documenso/ui/primitives/use-toast';
 
 import { Checkbox } from '../checkbox';
 import {
@@ -44,6 +50,7 @@ export type AddTemplatePlaceholderRecipientsFormProps = {
   templateDirectLink: TemplateDirectLink | null;
   isEnterprise: boolean;
   isDocumentPdfLoaded: boolean;
+  template: TemplateWithDetails;
   onSubmit: (_data: TAddTemplatePlacholderRecipientsFormSchema) => void;
 };
 
@@ -55,7 +62,10 @@ export const AddTemplatePlaceholderRecipientsFormPartial = ({
   fields,
   isDocumentPdfLoaded,
   onSubmit,
+  template,
 }: AddTemplatePlaceholderRecipientsFormProps) => {
+  const { toast } = useToast();
+  const router = useRouter();
   const initialId = useId();
   const { data: session } = useSession();
 
@@ -66,6 +76,39 @@ export const AddTemplatePlaceholderRecipientsFormPartial = ({
   );
 
   const { currentStep, totalSteps, previousStep } = useStep();
+
+  const utils = trpc.useUtils();
+
+  const { mutateAsync: addTemplateSigners } = trpc.recipient.addTemplateSigners.useMutation({
+    ...DO_NOT_INVALIDATE_QUERY_ON_MUTATION,
+    onSuccess: (newData) => {
+      utils.template.getTemplateWithDetailsById.setData(
+        {
+          id: template.id,
+        },
+        (oldData) => ({ ...(oldData || template), ...newData }),
+      );
+    },
+  });
+
+  const { mutateAsync: removeTemplateSigner } = trpc.recipient.removeTemplateSigner.useMutation({
+    ...DO_NOT_INVALIDATE_QUERY_ON_MUTATION,
+    onSuccess: (deletedRecipient) => {
+      console.log('deletedRecipient', deletedRecipient);
+      utils.template.getTemplateWithDetailsById.setData(
+        {
+          id: template.id,
+        },
+        (oldData) => {
+          if (!oldData) return template;
+          return {
+            ...oldData,
+            recipients: oldData.recipients.filter((r) => r.id !== deletedRecipient.id),
+          };
+        },
+      );
+    },
+  });
 
   const generateDefaultFormSigners = () => {
     if (recipients.length === 0) {
@@ -154,10 +197,6 @@ export const AddTemplatePlaceholderRecipientsFormPartial = ({
     setPlaceholderRecipientCount((count) => count + 1);
   };
 
-  const onRemoveSigner = (index: number) => {
-    removeSigner(index);
-  };
-
   const isSignerDirectRecipient = (
     signer: TAddTemplatePlacholderRecipientsFormSchema['signers'][number],
   ): boolean => {
@@ -165,6 +204,58 @@ export const AddTemplatePlaceholderRecipientsFormPartial = ({
       templateDirectLink !== null &&
       signer.nativeId === templateDirectLink?.directTemplateRecipientId
     );
+  };
+
+  const handleOnBlur = async (index: number) => {
+    try {
+      const currentSigner = form.getValues(`signers.${index}`);
+
+      if (!currentSigner.email) {
+        return;
+      }
+
+      console.log('Updating signer', currentSigner);
+
+      await addTemplateSigners({
+        templateId: template.id,
+        teamId: template.teamId ?? undefined,
+        signers: form.getValues('signers'),
+      });
+
+      router.refresh();
+    } catch (e) {
+      console.error(e);
+      toast({
+        title: 'Error',
+        description: 'An error occurred while updating the template recipient.',
+        variant: 'destructive',
+      });
+    }
+  };
+
+  const handleRemoveSigner = async (index: number) => {
+    const signer = signers[index];
+
+    console.log('signer', signer);
+
+    if (!signer) {
+      return;
+    }
+
+    removeSigner(index);
+
+    if (signer.nativeId) {
+      await removeTemplateSigner({
+        templateId: template.id,
+        teamId: template.teamId ?? undefined,
+        recipientId: signer.nativeId,
+      });
+
+      toast({
+        title: 'Signer removed',
+        description: 'The signer has been removed from the document.',
+      });
+    }
   };
 
   return (
@@ -216,6 +307,7 @@ export const AddTemplatePlaceholderRecipientsFormPartial = ({
                               signers[index].email === user?.email ||
                               isSignerDirectRecipient(signer)
                             }
+                            onBlur={() => void handleOnBlur(index)}
                           />
                         </FormControl>
 
@@ -246,6 +338,7 @@ export const AddTemplatePlaceholderRecipientsFormPartial = ({
                               signers[index].email === user?.email ||
                               isSignerDirectRecipient(signer)
                             }
+                            onBlur={() => void handleOnBlur(index)}
                           />
                         </FormControl>
 
@@ -281,7 +374,10 @@ export const AddTemplatePlaceholderRecipientsFormPartial = ({
                         <FormControl>
                           <RecipientRoleSelect
                             {...field}
-                            onValueChange={field.onChange}
+                            onValueChange={(value) => {
+                              field.onChange(value);
+                              void handleOnBlur(index);
+                            }}
                             disabled={isSubmitting}
                             hideCCRecipients={isSignerDirectRecipient(signer)}
                           />
@@ -313,7 +409,7 @@ export const AddTemplatePlaceholderRecipientsFormPartial = ({
                       type="button"
                       className="col-span-1 mt-auto inline-flex h-10 w-10 items-center justify-center text-slate-500 hover:opacity-80 disabled:cursor-not-allowed disabled:opacity-50"
                       disabled={isSubmitting || signers.length === 1}
-                      onClick={() => onRemoveSigner(index)}
+                      onClick={() => void handleRemoveSigner(index)}
                     >
                       <Trash className="h-5 w-5" />
                     </button>

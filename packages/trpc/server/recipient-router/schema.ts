@@ -75,3 +75,13 @@ export const ZCompleteDocumentWithTokenMutationSchema = z.object({
 export type TCompleteDocumentWithTokenMutationSchema = z.infer<
   typeof ZCompleteDocumentWithTokenMutationSchema
 >;
+
+export const ZRemoveTemplateSignerMutationSchema = z.object({
+  templateId: z.number(),
+  teamId: z.number().optional(),
+  recipientId: z.number(),
+});
+
+export type TRemoveTemplateSignerMutationSchema = z.infer<
+  typeof ZRemoveTemplateSignerMutationSchema
+>;

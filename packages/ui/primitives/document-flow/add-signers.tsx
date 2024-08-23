@@ -250,7 +250,7 @@ export const AddSignersFormPartial = ({
       console.error(e);
       toast({
         title: 'Error',
-        description: 'An error occurred while updating the document settings.',
+        description: 'An error occurred while updating the document recipient.',
         variant: 'destructive',
       });
     }
