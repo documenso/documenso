@@ -16,7 +16,7 @@ import { ZRecipientAuthOptionsSchema } from '@documenso/lib/types/document-auth'
 import { nanoid } from '@documenso/lib/universal/id';
 import type { Field, Recipient } from '@documenso/prisma/client';
 import { RecipientRole, SendStatus } from '@documenso/prisma/client';
-import type { DocumentWithData } from '@documenso/prisma/types/document-with-data';
+import type { DocumentWithDetails } from '@documenso/prisma/types/document';
 import { trpc } from '@documenso/trpc/react';
 import { AnimateGenericFadeInOut } from '@documenso/ui/components/animate/animate-generic-fade-in-out';
 import { RecipientActionAuthSelect } from '@documenso/ui/components/recipient/recipient-action-auth-select';
@@ -44,7 +44,7 @@ import type { DocumentFlowStep } from './types';
 
 export type AddSignersFormProps = {
   documentFlow: DocumentFlowStep;
-  document: DocumentWithData;
+  document: DocumentWithDetails;
   recipients: Recipient[];
   fields: Field[];
   isDocumentEnterprise: boolean;
@@ -77,12 +77,12 @@ export const AddSignersFormPartial = ({
   const { mutateAsync: addSigners } = trpc.recipient.addSigners.useMutation({
     ...DO_NOT_INVALIDATE_QUERY_ON_MUTATION,
     onSuccess: (newRecipients) => {
+      console.log('add signer mutation', newRecipients);
       utils.document.getDocumentWithDetailsById.setData(
         {
           id: document.id,
           teamId,
         },
-        /* TODO: Fix TS error */
         (oldData) => ({ ...(oldData || document), Recipient: newRecipients }),
       );
     },
@@ -90,9 +90,21 @@ export const AddSignersFormPartial = ({
 
   const { mutateAsync: deleteSigner } = trpc.recipient.removeSigner.useMutation({
     ...DO_NOT_INVALIDATE_QUERY_ON_MUTATION,
-    onSuccess: (data) => {
-      /* TODO: Add optimistic update */
-      console.log('removeSigner onSuccess', data);
+    onSuccess: (deletedRecipient) => {
+      console.log('delete signer mutation', deletedRecipient);
+      utils.document.getDocumentWithDetailsById.setData(
+        {
+          id: document.id,
+          teamId,
+        },
+        (oldData) => {
+          if (!oldData) return document;
+          return {
+            ...oldData,
+            Recipient: oldData.Recipient.filter((r) => r.id !== deletedRecipient.id),
+          };
+        },
+      );
     },
   });
 
