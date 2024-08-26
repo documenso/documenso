@@ -77,7 +77,6 @@ export const AddSignersFormPartial = ({
   const { mutateAsync: addSigners } = trpc.recipient.addSigners.useMutation({
     ...DO_NOT_INVALIDATE_QUERY_ON_MUTATION,
     onSuccess: (newRecipients) => {
-      console.log('add signer mutation', newRecipients);
       utils.document.getDocumentWithDetailsById.setData(
         {
           id: document.id,
@@ -91,7 +90,6 @@ export const AddSignersFormPartial = ({
   const { mutateAsync: deleteSigner } = trpc.recipient.removeSigner.useMutation({
     ...DO_NOT_INVALIDATE_QUERY_ON_MUTATION,
     onSuccess: (deletedRecipient) => {
-      console.log('delete signer mutation', deletedRecipient);
       utils.document.getDocumentWithDetailsById.setData(
         {
           id: document.id,

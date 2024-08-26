@@ -209,6 +209,8 @@ export const AddTemplatePlaceholderRecipientsFormPartial = ({
     try {
       const currentSigner = form.getValues(`signers.${index}`);
 
+      console.log('currentSigner', currentSigner);
+
       if (!currentSigner.email) {
         return;
       }
@@ -296,12 +298,7 @@ export const AddTemplatePlaceholderRecipientsFormPartial = ({
                             type="email"
                             placeholder="Email"
                             {...field}
-                            disabled={
-                              field.disabled ||
-                              isSubmitting ||
-                              signers[index].email === user?.email ||
-                              isSignerDirectRecipient(signer)
-                            }
+                            disabled={field.disabled || isSubmitting}
                             onBlur={() => void handleOnBlur(index)}
                           />
                         </FormControl>
@@ -327,12 +324,7 @@ export const AddTemplatePlaceholderRecipientsFormPartial = ({
                           <Input
                             placeholder="Name"
                             {...field}
-                            disabled={
-                              field.disabled ||
-                              isSubmitting ||
-                              signers[index].email === user?.email ||
-                              isSignerDirectRecipient(signer)
-                            }
+                            disabled={field.disabled || isSubmitting}
                             onBlur={() => void handleOnBlur(index)}
                           />
                         </FormControl>
