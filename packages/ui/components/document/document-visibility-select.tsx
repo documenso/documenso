@@ -29,25 +29,21 @@ export const DocumentVisibilitySelect = forwardRef<HTMLButtonElement, DocumentVi
         </SelectTrigger>
 
         <SelectContent position="popper">
-          {Object.keys(DocumentVisibility)
-            .filter((key) => {
-              if (props.value?.toString() === key) return true;
-              switch (currentMemberRole) {
-                case 'ADMIN':
-                  return true;
-                case 'MANAGER':
-                  return key !== DocumentVisibility.ADMIN;
-                case 'MEMBER':
-                  return key === DocumentVisibility.EVERYONE;
-                default:
-                  return false;
-              }
-            })
-            .map((key) => (
-              <SelectItem key={key} value={key}>
-                {DOCUMENT_VISIBILITY[key].value}
-              </SelectItem>
-            ))}
+          <SelectItem value={DocumentVisibility.EVERYONE}>
+            {DOCUMENT_VISIBILITY.EVERYONE.value}
+          </SelectItem>
+
+          {(currentMemberRole === 'ADMIN' || currentMemberRole === 'MANAGER') && (
+            <SelectItem value={DocumentVisibility.MANAGER_AND_ABOVE}>
+              {DOCUMENT_VISIBILITY.MANAGER_AND_ABOVE.value}
+            </SelectItem>
+          )}
+
+          {currentMemberRole === 'ADMIN' && (
+            <SelectItem value={DocumentVisibility.ADMIN}>
+              {DOCUMENT_VISIBILITY.ADMIN.value}
+            </SelectItem>
+          )}
         </SelectContent>
       </Select>
     );

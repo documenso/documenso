@@ -73,13 +73,13 @@ export const DocumentPageView = async ({ params, team }: DocumentPageViewProps) 
   const isRecipient = document?.Recipient.find((recipient) => recipient.email === user.email);
   let canAccessDocument = true;
 
-  if (!isRecipient) {
+  if (team && !isRecipient) {
     canAccessDocument = match([documentVisibility, currentTeamMemberRole])
       .with([DocumentVisibility.EVERYONE, TeamMemberRole.ADMIN], () => true)
       .with([DocumentVisibility.EVERYONE, TeamMemberRole.MANAGER], () => true)
       .with([DocumentVisibility.EVERYONE, TeamMemberRole.MEMBER], () => true)
-      .with([DocumentVisibility.MANAGERANDABOVE, TeamMemberRole.ADMIN], () => true)
-      .with([DocumentVisibility.MANAGERANDABOVE, TeamMemberRole.MANAGER], () => true)
+      .with([DocumentVisibility.MANAGER_AND_ABOVE, TeamMemberRole.ADMIN], () => true)
+      .with([DocumentVisibility.MANAGER_AND_ABOVE, TeamMemberRole.MANAGER], () => true)
       .with([DocumentVisibility.ADMIN, TeamMemberRole.ADMIN], () => true)
       .otherwise(() => false);
   }
@@ -88,30 +88,12 @@ export const DocumentPageView = async ({ params, team }: DocumentPageViewProps) 
     'app_document_page_view_history_sheet',
   );
 
-  if (!document || !document.documentData) {
+  if (!document || !document.documentData || (team && !canAccessDocument)) {
     redirect(documentRootPath);
   }
 
-  if (!canAccessDocument && team) {
-    return (
-      <div className="container mx-auto flex items-center justify-center px-6 py-64">
-        <div>
-          <p className="text-muted-foreground font-semibold">Access Denied</p>
-
-          <h1 className="mt-3 text-2xl font-bold md:text-3xl">Oops! Something went wrong.</h1>
-
-          <p className="text-muted-foreground mt-4 text-sm">
-            It looks like you do not have the necessary permissions to access this document.
-          </p>
-
-          <div className="mt-6">
-            <Button className="w-32" asChild>
-              <Link href={`/t/${team.url}/documents`}>Dashboard</Link>
-            </Button>
-          </div>
-        </div>
-      </div>
-    );
+  if (team && !canAccessDocument) {
+    redirect(documentRootPath);
   }
 
   const { documentData, documentMeta } = document;

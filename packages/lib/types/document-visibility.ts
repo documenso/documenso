@@ -1,7 +1,7 @@
 import { z } from 'zod';
 
-export const ZDocumentVisibilitySchema = z.enum(['EVERYONE', 'ADMIN', 'MANAGERANDABOVE']);
+import { DocumentVisibility as DocumentVisibilityEnum } from '@documenso/prisma/client';
 
-export const DocumentVisibility = ZDocumentVisibilitySchema.Enum;
-
+export const ZDocumentVisibilitySchema = z.nativeEnum(DocumentVisibilityEnum);
+export const DocumentVisibility = ZDocumentVisibilitySchema.enum;
 export type TDocumentVisibility = z.infer<typeof ZDocumentVisibilitySchema>;

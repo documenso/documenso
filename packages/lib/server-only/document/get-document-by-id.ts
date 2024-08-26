@@ -134,12 +134,12 @@ export const getDocumentWhereInput = async ({
     ...match(team.currentTeamMember?.role)
       .with(TeamMemberRole.ADMIN, () => [
         { visibility: DocumentVisibility.EVERYONE },
-        { visibility: DocumentVisibility.MANAGERANDABOVE },
+        { visibility: DocumentVisibility.MANAGER_AND_ABOVE },
         { visibility: DocumentVisibility.ADMIN },
       ])
       .with(TeamMemberRole.MANAGER, () => [
         { visibility: DocumentVisibility.EVERYONE },
-        { visibility: DocumentVisibility.MANAGERANDABOVE },
+        { visibility: DocumentVisibility.MANAGER_AND_ABOVE },
       ])
       .otherwise(() => [{ visibility: DocumentVisibility.EVERYONE }]),
     {

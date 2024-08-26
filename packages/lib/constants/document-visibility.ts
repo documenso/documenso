@@ -1,5 +1,6 @@
+import { DocumentVisibility } from '@documenso/lib/types/document-visibility';
+
 import type { TDocumentVisibility } from '../types/document-visibility';
-import { DocumentVisibility } from '../types/document-visibility';
 
 type DocumentVisibilityTypeData = {
   key: TDocumentVisibility;
@@ -15,8 +16,8 @@ export const DOCUMENT_VISIBILITY: Record<string, DocumentVisibilityTypeData> = {
     key: DocumentVisibility.EVERYONE,
     value: 'Everyone',
   },
-  [DocumentVisibility.MANAGERANDABOVE]: {
-    key: DocumentVisibility.MANAGERANDABOVE,
+  [DocumentVisibility.MANAGER_AND_ABOVE]: {
+    key: DocumentVisibility.MANAGER_AND_ABOVE,
     value: 'Managers and above',
   },
 } satisfies Record<TDocumentVisibility, DocumentVisibilityTypeData>;
