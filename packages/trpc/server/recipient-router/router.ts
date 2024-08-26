@@ -2,6 +2,7 @@ import { TRPCError } from '@trpc/server';
 
 import { completeDocumentWithToken } from '@documenso/lib/server-only/document/complete-document-with-token';
 import { deleteRecipient } from '@documenso/lib/server-only/recipient/delete-recipient';
+import { deleteRecipientFromTemplate } from '@documenso/lib/server-only/recipient/delete-recipient-from-template';
 import { setRecipientsForDocument } from '@documenso/lib/server-only/recipient/set-recipients-for-document';
 import { setRecipientsForTemplate } from '@documenso/lib/server-only/recipient/set-recipients-for-template';
 import { extractNextApiRequestMetadata } from '@documenso/lib/universal/extract-request-metadata';
@@ -76,7 +77,23 @@ export const recipientRouter = router({
   removeTemplateSigner: authenticatedProcedure
     .input(ZRemoveTemplateSignerMutationSchema)
     .mutation(async ({ input, ctx }) => {
-      // TODO: Implement
+      try {
+        const { templateId, recipientId, teamId } = input;
+        const userId = ctx.user.id;
+
+        return await deleteRecipientFromTemplate({
+          userId,
+          templateId,
+          teamId,
+          recipientId,
+        });
+      } catch (e) {
+        console.error(e);
+        throw new TRPCError({
+          code: 'BAD_REQUEST',
+          message: 'We were unable to remove the recipient. Please try again later.',
+        });
+      }
     }),
 
   removeSigner: authenticatedProcedure

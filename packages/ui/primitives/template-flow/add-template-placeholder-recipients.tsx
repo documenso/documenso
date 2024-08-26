@@ -94,7 +94,6 @@ export const AddTemplatePlaceholderRecipientsFormPartial = ({
   const { mutateAsync: removeTemplateSigner } = trpc.recipient.removeTemplateSigner.useMutation({
     ...DO_NOT_INVALIDATE_QUERY_ON_MUTATION,
     onSuccess: (deletedRecipient) => {
-      console.log('deletedRecipient', deletedRecipient);
       utils.template.getTemplateWithDetailsById.setData(
         {
           id: template.id,
@@ -103,7 +102,7 @@ export const AddTemplatePlaceholderRecipientsFormPartial = ({
           if (!oldData) return template;
           return {
             ...oldData,
-            recipients: oldData.recipients.filter((r) => r.id !== deletedRecipient.id),
+            recipients: oldData.Recipient.filter((r) => r.id !== deletedRecipient.id),
           };
         },
       );
@@ -214,8 +213,6 @@ export const AddTemplatePlaceholderRecipientsFormPartial = ({
         return;
       }
 
-      console.log('Updating signer', currentSigner);
-
       await addTemplateSigners({
         templateId: template.id,
         teamId: template.teamId ?? undefined,
@@ -235,8 +232,6 @@ export const AddTemplatePlaceholderRecipientsFormPartial = ({
 
   const handleRemoveSigner = async (index: number) => {
     const signer = signers[index];
-
-    console.log('signer', signer);
 
     if (!signer) {
       return;
