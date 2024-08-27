@@ -1,9 +1,6 @@
-generator kysely {
-  provider = "prisma-kysely"
-}
-
 generator client {
-  provider = "prisma-client-js"
+  provider        = "prisma-client-js"
+  previewFeatures = ["typedSql"]
 }
 
 datasource db {
