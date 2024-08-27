@@ -8,7 +8,7 @@ msgstr ""
 "Language: de\n"
 "Project-Id-Version: documenso-app\n"
 "Report-Msgid-Bugs-To: \n"
-"PO-Revision-Date: 2024-08-27 12:05\n"
+"PO-Revision-Date: 2024-08-27 16:03\n"
 "Last-Translator: \n"
 "Language-Team: German\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
@@ -326,11 +326,11 @@ msgstr "Ich bin ein Genehmiger dieses Dokuments"
 
 #: packages/lib/constants/recipient-roles.ts:74
 msgid "I am required to receive a copy of this document"
-msgstr ""
+msgstr "Ich bin verpflichtet, eine Kopie dieses Dokuments zu erhalten"
 
 #: packages/lib/constants/recipient-roles.ts:74
 #~ msgid "I am required to recieve a copy of this document"
-#~ msgstr "Ich muss eine Kopie dieses Dokuments erhalten"
+#~ msgstr "I am required to recieve a copy of this document"
 
 #: packages/ui/components/recipient/recipient-action-auth-select.tsx:29
 #: packages/ui/components/recipient/recipient-action-auth-select.tsx:87
@@ -748,3 +748,4 @@ msgstr "Sie können derzeit keine Dokumente hochladen."
 #: packages/ui/primitives/document-dropzone.tsx:69
 msgid "You have reached your document limit."
 msgstr "Sie haben Ihr Dokumentenlimit erreicht."
+
