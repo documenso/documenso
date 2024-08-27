@@ -20,7 +20,6 @@
     "@documenso/trpc": "*",
     "@documenso/ui": "*",
     "@hookform/resolvers": "^3.1.0",
-    "@lingui/macro": "^4.11.1",
     "@lingui/react": "^4.11.1",
     "@openstatus/react": "^0.0.3",
     "cmdk": "^0.2.1",

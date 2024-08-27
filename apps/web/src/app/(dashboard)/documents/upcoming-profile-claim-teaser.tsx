@@ -2,6 +2,9 @@
 
 import { useCallback, useEffect, useState } from 'react';
 
+import { msg } from '@lingui/macro';
+import { useLingui } from '@lingui/react';
+
 import type { User } from '@documenso/prisma/client';
 import { useToast } from '@documenso/ui/primitives/use-toast';
 
@@ -12,6 +15,7 @@ export type UpcomingProfileClaimTeaserProps = {
 };
 
 export const UpcomingProfileClaimTeaser = ({ user }: UpcomingProfileClaimTeaserProps) => {
+  const { _ } = useLingui();
   const { toast } = useToast();
 
   const [open, setOpen] = useState(false);
@@ -21,14 +25,17 @@ export const UpcomingProfileClaimTeaser = ({ user }: UpcomingProfileClaimTeaserP
     (open: boolean) => {
       if (!open && !claimed) {
         toast({
-          title: 'Claim your profile later',
-          description: 'You can claim your profile later on by going to your profile settings!',
+          title: _(msg`Claim your profile later`),
+          description: _(
+            msg`You can claim your profile later on by going to your profile settings!`,
+          ),
         });
       }
 
       setOpen(open);
       localStorage.setItem('app.hasShownProfileClaimDialog', 'true');
     },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [claimed, toast],
   );
 

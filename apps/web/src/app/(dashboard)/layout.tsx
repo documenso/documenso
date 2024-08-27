@@ -5,6 +5,7 @@ import { redirect } from 'next/navigation';
 import { getServerSession } from 'next-auth';
 
 import { LimitsProvider } from '@documenso/ee/server-only/limits/provider/server';
+import { setupI18nSSR } from '@documenso/lib/client-only/providers/i18n.server';
 import { NEXT_AUTH_OPTIONS } from '@documenso/lib/next-auth/auth-options';
 import { getRequiredServerComponentSession } from '@documenso/lib/next-auth/get-server-component-session';
 import { getTeams } from '@documenso/lib/server-only/team/get-teams';
@@ -22,6 +23,8 @@ export type AuthenticatedDashboardLayoutProps = {
 export default async function AuthenticatedDashboardLayout({
   children,
 }: AuthenticatedDashboardLayoutProps) {
+  setupI18nSSR();
+
   const session = await getServerSession(NEXT_AUTH_OPTIONS);
 
   if (!session) {

@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 
+import { Trans } from '@lingui/macro';
 import { FileSearch } from 'lucide-react';
 
 import type { DocumentData } from '@documenso/prisma/client';
@@ -30,7 +31,7 @@ export const DocumentPreviewButton = ({
         {...props}
       >
         <FileSearch className="mr-2 h-5 w-5" strokeWidth={1.7} />
-        View Original Document
+        <Trans>View Original Document</Trans>
       </Button>
 
       <DocumentDialog documentData={documentData} open={showDialog} onOpenChange={setShowDialog} />

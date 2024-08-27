@@ -1,8 +1,10 @@
 import { notFound, redirect } from 'next/navigation';
 
+import { Plural } from '@lingui/macro';
 import { UsersIcon } from 'lucide-react';
 import { match } from 'ts-pattern';
 
+import { setupI18nSSR } from '@documenso/lib/client-only/providers/i18n.server';
 import { getServerComponentSession } from '@documenso/lib/next-auth/get-server-component-session';
 import { getTemplateByDirectLinkToken } from '@documenso/lib/server-only/template/get-template-by-direct-link-token';
 import { DocumentAccessAuth } from '@documenso/lib/types/document-auth';
@@ -22,6 +24,8 @@ export type TemplatesDirectPageProps = {
 };
 
 export default async function TemplatesDirectPage({ params }: TemplatesDirectPageProps) {
+  setupI18nSSR();
+
   const { token } = params;
 
   if (!token) {
@@ -75,8 +79,7 @@ export default async function TemplatesDirectPage({ params }: TemplatesDirectPag
           <div className="text-muted-foreground mb-8 mt-2.5 flex items-center gap-x-2">
             <UsersIcon className="h-4 w-4" />
             <p className="text-muted-foreground/80">
-              {template.Recipient.length}{' '}
-              {template.Recipient.length > 1 ? 'recipients' : 'recipient'}
+              <Plural value={template.Recipient.length} one="# recipient" other="# recipients" />
             </p>
           </div>
 

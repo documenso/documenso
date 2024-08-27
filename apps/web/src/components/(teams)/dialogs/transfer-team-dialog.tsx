@@ -5,6 +5,8 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 
 import { zodResolver } from '@hookform/resolvers/zod';
+import { Trans, msg } from '@lingui/macro';
+import { useLingui } from '@lingui/react';
 import { Loader } from 'lucide-react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
@@ -56,6 +58,7 @@ export const TransferTeamDialog = ({
   const router = useRouter();
   const [open, setOpen] = useState(false);
 
+  const { _ } = useLingui();
   const { toast } = useToast();
 
   const { mutateAsync: requestTeamOwnershipTransfer } =
@@ -102,19 +105,20 @@ export const TransferTeamDialog = ({
       router.refresh();
 
       toast({
-        title: 'Success',
-        description: 'An email requesting the transfer of this team has been sent.',
+        title: _(msg`Success`),
+        description: _(msg`An email requesting the transfer of this team has been sent.`),
         duration: 5000,
       });
 
       setOpen(false);
     } catch (err) {
       toast({
-        title: 'An unknown error occurred',
+        title: _(msg`An unknown error occurred`),
+        description: _(
+          msg`We encountered an unknown error while attempting to request a transfer of this team. Please try again later.`,
+        ),
         variant: 'destructive',
         duration: 10000,
-        description:
-          'We encountered an unknown error while attempting to request a transfer of this team. Please try again later.',
       });
     }
   };
@@ -140,7 +144,7 @@ export const TransferTeamDialog = ({
       <DialogTrigger asChild>
         {trigger ?? (
           <Button variant="outline" className="bg-background">
-            Transfer team
+            <Trans>Transfer team</Trans>
           </Button>
         )}
       </DialogTrigger>
@@ -148,10 +152,12 @@ export const TransferTeamDialog = ({
       {teamMembers && teamMembers.length > 0 ? (
         <DialogContent position="center">
           <DialogHeader>
-            <DialogTitle>Transfer team</DialogTitle>
+            <DialogTitle>
+              <Trans>Transfer team</Trans>
+            </DialogTitle>
 
             <DialogDescription className="mt-4">
-              Transfer ownership of this team to a selected team member.
+              <Trans>Transfer ownership of this team to a selected team member.</Trans>
             </DialogDescription>
           </DialogHeader>
 
@@ -166,7 +172,9 @@ export const TransferTeamDialog = ({
                   name="newOwnerUserId"
                   render={({ field }) => (
                     <FormItem className="w-full">
-                      <FormLabel required>New team owner</FormLabel>
+                      <FormLabel required>
+                        <Trans>New team owner</Trans>
+                      </FormLabel>
                       <FormControl>
                         <Select {...field} onValueChange={field.onChange}>
                           <SelectTrigger className="text-muted-foreground">
@@ -196,8 +204,10 @@ export const TransferTeamDialog = ({
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>
-                        Confirm by typing{' '}
-                        <span className="text-destructive">{confirmTransferMessage}</span>
+                        <Trans>
+                          Confirm by typing{' '}
+                          <span className="text-destructive">{confirmTransferMessage}</span>
+                        </Trans>
                       </FormLabel>
                       <FormControl>
                         <Input className="bg-background" {...field} />
@@ -247,13 +257,17 @@ export const TransferTeamDialog = ({
                         // </li>
 
                         <li>
-                          Any payment methods attached to this team will remain attached to this
-                          team. Please contact us if you need to update this information.
+                          <Trans>
+                            Any payment methods attached to this team will remain attached to this
+                            team. Please contact us if you need to update this information.
+                          </Trans>
                         </li>
                       )}
                       <li>
-                        The selected team member will receive an email which they must accept before
-                        the team is transferred
+                        <Trans>
+                          The selected team member will receive an email which they must accept
+                          before the team is transferred
+                        </Trans>
                       </li>
                     </ul>
                   </AlertDescription>
@@ -261,11 +275,11 @@ export const TransferTeamDialog = ({
 
                 <DialogFooter>
                   <Button type="button" variant="secondary" onClick={() => setOpen(false)}>
-                    Cancel
+                    <Trans>Cancel</Trans>
                   </Button>
 
                   <Button type="submit" variant="destructive" loading={form.formState.isSubmitting}>
-                    Request transfer
+                    <Trans>Request transfer</Trans>
                   </Button>
                 </DialogFooter>
               </fieldset>
@@ -281,9 +295,11 @@ export const TransferTeamDialog = ({
             <Loader className="text-muted-foreground h-6 w-6 animate-spin" />
           ) : (
             <p className="text-center text-sm">
-              {loadingTeamMembersError
-                ? 'An error occurred while loading team members. Please try again later.'
-                : 'You must have at least one other team member to transfer ownership.'}
+              {loadingTeamMembersError ? (
+                <Trans>An error occurred while loading team members. Please try again later.</Trans>
+              ) : (
+                <Trans>You must have at least one other team member to transfer ownership.</Trans>
+              )}
             </p>
           )}
         </DialogContent>

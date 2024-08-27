@@ -2,6 +2,8 @@
 
 import { useSearchParams } from 'next/navigation';
 
+import { msg } from '@lingui/macro';
+import { useLingui } from '@lingui/react';
 import { DateTime } from 'luxon';
 import type { DateTimeFormatOptions } from 'luxon';
 import { UAParser } from 'ua-parser-js';
@@ -27,6 +29,8 @@ const dateFormat: DateTimeFormatOptions = {
 };
 
 export const DocumentLogsDataTable = ({ documentId }: DocumentLogsDataTableProps) => {
+  const { _ } = useLingui();
+
   const parser = new UAParser();
 
   const searchParams = useSearchParams();
@@ -70,12 +74,12 @@ export const DocumentLogsDataTable = ({ documentId }: DocumentLogsDataTableProps
     <DataTable
       columns={[
         {
-          header: 'Time',
+          header: _(msg`Time`),
           accessorKey: 'createdAt',
           cell: ({ row }) => <LocaleDate format={dateFormat} date={row.original.createdAt} />,
         },
         {
-          header: 'User',
+          header: _(msg`User`),
           accessorKey: 'name',
           cell: ({ row }) =>
             row.original.name || row.original.email ? (
@@ -97,7 +101,7 @@ export const DocumentLogsDataTable = ({ documentId }: DocumentLogsDataTableProps
             ),
         },
         {
-          header: 'Action',
+          header: _(msg`Action`),
           accessorKey: 'type',
           cell: ({ row }) => (
             <span>

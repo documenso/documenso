@@ -2,6 +2,8 @@
 
 import Link from 'next/link';
 
+import { Plural, Trans, msg } from '@lingui/macro';
+import { useLingui } from '@lingui/react';
 import { File } from 'lucide-react';
 import { DateTime } from 'luxon';
 
@@ -17,6 +19,8 @@ export type TeamBillingInvoicesDataTableProps = {
 };
 
 export const TeamBillingInvoicesDataTable = ({ teamId }: TeamBillingInvoicesDataTableProps) => {
+  const { _ } = useLingui();
+
   const { data, isLoading, isInitialLoading, isLoadingError } = trpc.team.findTeamInvoices.useQuery(
     {
       teamId,
@@ -46,7 +50,7 @@ export const TeamBillingInvoicesDataTable = ({ teamId }: TeamBillingInvoicesData
     <DataTable
       columns={[
         {
-          header: 'Invoice',
+          header: _(msg`Invoice`),
           accessorKey: 'created',
           cell: ({ row }) => (
             <div className="flex max-w-xs items-center gap-2">
@@ -57,27 +61,27 @@ export const TeamBillingInvoicesDataTable = ({ teamId }: TeamBillingInvoicesData
                   {DateTime.fromSeconds(row.original.created).toFormat('MMMM yyyy')}
                 </span>
                 <span className="text-muted-foreground">
-                  {row.original.quantity} {row.original.quantity > 1 ? 'Seats' : 'Seat'}
+                  <Plural value={row.original.quantity} one="# Seat" other="# Seats" />
                 </span>
               </div>
             </div>
           ),
         },
         {
-          header: 'Status',
+          header: _(msg`Status`),
           accessorKey: 'status',
           cell: ({ row }) => {
             const { status, paid } = row.original;
 
             if (!status) {
-              return paid ? 'Paid' : 'Unpaid';
+              return paid ? <Trans>Paid</Trans> : <Trans>Unpaid</Trans>;
             }
 
             return status.charAt(0).toUpperCase() + status.slice(1);
           },
         },
         {
-          header: 'Amount',
+          header: _(msg`Amount`),
           accessorKey: 'total',
           cell: ({ row }) => formatCurrency(row.original.currency, row.original.total / 100),
         },
@@ -91,7 +95,7 @@ export const TeamBillingInvoicesDataTable = ({ teamId }: TeamBillingInvoicesData
                 disabled={typeof row.original.hostedInvoicePdf !== 'string'}
               >
                 <Link href={row.original.hostedInvoicePdf ?? ''} target="_blank">
-                  View
+                  <Trans>View</Trans>
                 </Link>
               </Button>
 
@@ -101,7 +105,7 @@ export const TeamBillingInvoicesDataTable = ({ teamId }: TeamBillingInvoicesData
                 disabled={typeof row.original.hostedInvoicePdf !== 'string'}
               >
                 <Link href={row.original.invoicePdf ?? ''} target="_blank">
-                  Download
+                  <Trans>Download</Trans>
                 </Link>
               </Button>
             </div>

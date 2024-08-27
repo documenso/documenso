@@ -1,7 +1,9 @@
 import Link from 'next/link';
 
+import { Trans } from '@lingui/macro';
 import { AlertTriangle, CheckCircle2, XCircle, XOctagon } from 'lucide-react';
 
+import { setupI18nSSR } from '@documenso/lib/client-only/providers/i18n.server';
 import { verifyEmail } from '@documenso/lib/server-only/user/verify-email';
 import { Button } from '@documenso/ui/primitives/button';
 
@@ -12,6 +14,8 @@ export type PageProps = {
 };
 
 export default async function VerifyEmailPage({ params: { token } }: PageProps) {
+  setupI18nSSR();
+
   if (!token) {
     return (
       <div className="w-screen max-w-lg px-4">
@@ -20,9 +24,13 @@ export default async function VerifyEmailPage({ params: { token } }: PageProps) 
             <XOctagon />
           </div>
 
-          <h2 className="text-4xl font-semibold">No token provided</h2>
+          <h2 className="text-4xl font-semibold">
+            <Trans>No token provided</Trans>
+          </h2>
           <p className="text-muted-foreground mt-2 text-base">
-            It seems that there is no token provided. Please check your email and try again.
+            <Trans>
+              It seems that there is no token provided. Please check your email and try again.
+            </Trans>
           </p>
         </div>
       </div>
@@ -40,15 +48,21 @@ export default async function VerifyEmailPage({ params: { token } }: PageProps) 
           </div>
 
           <div>
-            <h2 className="text-2xl font-bold md:text-4xl">Something went wrong</h2>
+            <h2 className="text-2xl font-bold md:text-4xl">
+              <Trans>Something went wrong</Trans>
+            </h2>
 
             <p className="text-muted-foreground mt-4">
-              We were unable to verify your email. If your email is not verified already, please try
-              again.
+              <Trans>
+                We were unable to verify your email. If your email is not verified already, please
+                try again.
+              </Trans>
             </p>
 
             <Button className="mt-4" asChild>
-              <Link href="/">Go back home</Link>
+              <Link href="/">
+                <Trans>Go back home</Trans>
+              </Link>
             </Button>
           </div>
         </div>
@@ -65,15 +79,21 @@ export default async function VerifyEmailPage({ params: { token } }: PageProps) 
           </div>
 
           <div>
-            <h2 className="text-2xl font-bold md:text-4xl">Your token has expired!</h2>
+            <h2 className="text-2xl font-bold md:text-4xl">
+              <Trans>Your token has expired!</Trans>
+            </h2>
 
             <p className="text-muted-foreground mt-4">
-              It seems that the provided token has expired. We've just sent you another token,
-              please check your email and try again.
+              <Trans>
+                It seems that the provided token has expired. We've just sent you another token,
+                please check your email and try again.
+              </Trans>
             </p>
 
             <Button className="mt-4" asChild>
-              <Link href="/">Go back home</Link>
+              <Link href="/">
+                <Trans>Go back home</Trans>
+              </Link>
             </Button>
           </div>
         </div>
@@ -89,14 +109,20 @@ export default async function VerifyEmailPage({ params: { token } }: PageProps) 
         </div>
 
         <div>
-          <h2 className="text-2xl font-bold md:text-4xl">Email Confirmed!</h2>
+          <h2 className="text-2xl font-bold md:text-4xl">
+            <Trans>Email Confirmed!</Trans>
+          </h2>
 
           <p className="text-muted-foreground mt-4">
-            Your email has been successfully confirmed! You can now use all features of Documenso.
+            <Trans>
+              Your email has been successfully confirmed! You can now use all features of Documenso.
+            </Trans>
           </p>
 
           <Button className="mt-4" asChild>
-            <Link href="/">Go back home</Link>
+            <Link href="/">
+              <Trans>Go back home</Trans>
+            </Link>
           </Button>
         </div>
       </div>

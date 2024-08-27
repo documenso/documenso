@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 
+import { setupI18nSSR } from '@documenso/lib/client-only/providers/i18n.server';
 import { getRequiredServerComponentSession } from '@documenso/lib/next-auth/get-server-component-session';
 
 import type { DocumentsPageViewProps } from './documents-page-view';
@@ -15,7 +16,10 @@ export const metadata: Metadata = {
 };
 
 export default async function DocumentsPage({ searchParams = {} }: DocumentsPageProps) {
+  setupI18nSSR();
+
   const { user } = await getRequiredServerComponentSession();
+
   return (
     <>
       <UpcomingProfileClaimTeaser user={user} />

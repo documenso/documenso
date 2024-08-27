@@ -5,6 +5,9 @@ import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 
+import { Trans, msg } from '@lingui/macro';
+import { useLingui } from '@lingui/react';
+
 import { useDebouncedValue } from '@documenso/lib/client-only/hooks/use-debounced-value';
 import type { TeamMemberRole } from '@documenso/prisma/client';
 import { Input } from '@documenso/ui/primitives/input';
@@ -26,6 +29,8 @@ export const TeamsMemberPageDataTable = ({
   teamName,
   teamOwnerUserId,
 }: TeamsMemberPageDataTableProps) => {
+  const { _ } = useLingui();
+
   const searchParams = useSearchParams();
   const router = useRouter();
   const pathname = usePathname();
@@ -61,17 +66,21 @@ export const TeamsMemberPageDataTable = ({
         <Input
           defaultValue={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
-          placeholder="Search"
+          placeholder={_(msg`Search`)}
         />
 
         <Tabs value={currentTab} className="flex-shrink-0 overflow-x-auto">
           <TabsList>
             <TabsTrigger className="min-w-[60px]" value="members" asChild>
-              <Link href={pathname ?? '/'}>Active</Link>
+              <Link href={pathname ?? '/'}>
+                <Trans>Active</Trans>
+              </Link>
             </TabsTrigger>
 
             <TabsTrigger className="min-w-[60px]" value="invites" asChild>
-              <Link href={`${pathname}?tab=invites`}>Pending</Link>
+              <Link href={`${pathname}?tab=invites`}>
+                <Trans>Pending</Trans>
+              </Link>
             </TabsTrigger>
           </TabsList>
         </Tabs>

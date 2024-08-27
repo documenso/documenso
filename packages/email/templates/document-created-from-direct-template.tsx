@@ -1,4 +1,4 @@
-import { RECIPIENT_ROLES_DESCRIPTION } from '@documenso/lib/constants/recipient-roles';
+import { RECIPIENT_ROLES_DESCRIPTION_ENG } from '@documenso/lib/constants/recipient-roles';
 import config from '@documenso/tailwind-config';
 
 import {
@@ -32,7 +32,7 @@ export const DocumentCreatedFromDirectTemplateEmailTemplate = ({
   documentName = 'Open Source Pledge.pdf',
   assetBaseUrl = 'http://localhost:3002',
 }: DocumentCompletedEmailTemplateProps) => {
-  const action = RECIPIENT_ROLES_DESCRIPTION[recipientRole].actioned.toLowerCase();
+  const action = RECIPIENT_ROLES_DESCRIPTION_ENG[recipientRole].actioned.toLowerCase();
 
   const previewText = `Document created from direct template`;
 

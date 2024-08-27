@@ -1,12 +1,15 @@
+import type { MessageDescriptor } from '@lingui/core';
+import { msg } from '@lingui/macro';
+
 import { TeamMemberRole } from '@documenso/prisma/client';
 
 export const TEAM_URL_ROOT_REGEX = new RegExp('^/t/[^/]+$');
 export const TEAM_URL_REGEX = new RegExp('^/t/[^/]+');
 
-export const TEAM_MEMBER_ROLE_MAP: Record<keyof typeof TeamMemberRole, string> = {
-  ADMIN: 'Admin',
-  MANAGER: 'Manager',
-  MEMBER: 'Member',
+export const TEAM_MEMBER_ROLE_MAP: Record<keyof typeof TeamMemberRole, MessageDescriptor> = {
+  ADMIN: msg`Admin`,
+  MANAGER: msg`Manager`,
+  MEMBER: msg`Member`,
 };
 
 export const TEAM_MEMBER_ROLE_PERMISSIONS_MAP = {

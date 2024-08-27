@@ -2,6 +2,8 @@
 
 import { useState } from 'react';
 
+import { Trans, msg } from '@lingui/macro';
+import { useLingui } from '@lingui/react';
 import { AlertTriangle } from 'lucide-react';
 import { match } from 'ts-pattern';
 
@@ -31,6 +33,7 @@ export const LayoutBillingBanner = ({
   teamId,
   userRole,
 }: LayoutBillingBannerProps) => {
+  const { _ } = useLingui();
   const { toast } = useToast();
 
   const [isOpen, setIsOpen] = useState(false);
@@ -47,9 +50,10 @@ export const LayoutBillingBanner = ({
       setIsOpen(false);
     } catch (err) {
       toast({
-        title: 'Something went wrong',
-        description:
-          'We are unable to proceed to the billing portal at this time. Please try again, or contact support.',
+        title: _(msg`Something went wrong`),
+        description: _(
+          msg`We are unable to proceed to the billing portal at this time. Please try again, or contact support.`,
+        ),
         variant: 'destructive',
         duration: 10000,
       });
@@ -75,8 +79,8 @@ export const LayoutBillingBanner = ({
             <AlertTriangle className="mr-2.5 h-5 w-5" />
 
             {match(subscription.status)
-              .with(SubscriptionStatus.PAST_DUE, () => 'Payment overdue')
-              .with(SubscriptionStatus.INACTIVE, () => 'Teams restricted')
+              .with(SubscriptionStatus.PAST_DUE, () => <Trans>Payment overdue</Trans>)
+              .with(SubscriptionStatus.INACTIVE, () => <Trans>Teams restricted</Trans>)
               .exhaustive()}
           </div>
 
@@ -92,26 +96,32 @@ export const LayoutBillingBanner = ({
             onClick={() => setIsOpen(true)}
             size="sm"
           >
-            Resolve
+            <Trans>Resolve</Trans>
           </Button>
         </div>
       </div>
 
       <Dialog open={isOpen} onOpenChange={(value) => !isLoading && setIsOpen(value)}>
         <DialogContent>
-          <DialogTitle>Payment overdue</DialogTitle>
+          <DialogTitle>
+            <Trans>Payment overdue</Trans>
+          </DialogTitle>
 
           {match(subscription.status)
             .with(SubscriptionStatus.PAST_DUE, () => (
               <DialogDescription>
-                Your payment for teams is overdue. Please settle the payment to avoid any service
-                disruptions.
+                <Trans>
+                  Your payment for teams is overdue. Please settle the payment to avoid any service
+                  disruptions.
+                </Trans>
               </DialogDescription>
             ))
             .with(SubscriptionStatus.INACTIVE, () => (
               <DialogDescription>
-                Due to an unpaid invoice, your team has been restricted. Please settle the payment
-                to restore full access to your team.
+                <Trans>
+                  Due to an unpaid invoice, your team has been restricted. Please settle the payment
+                  to restore full access to your team.
+                </Trans>
               </DialogDescription>
             ))
             .otherwise(() => null)}
@@ -119,7 +129,7 @@ export const LayoutBillingBanner = ({
           {canExecuteTeamAction('MANAGE_BILLING', userRole) && (
             <DialogFooter>
               <Button loading={isLoading} onClick={handleCreatePortal}>
-                Resolve payment
+                <Trans>Resolve payment</Trans>
               </Button>
             </DialogFooter>
           )}

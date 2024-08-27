@@ -5,6 +5,8 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 
 import { zodResolver } from '@hookform/resolvers/zod';
+import { Trans, msg } from '@lingui/macro';
+import { useLingui } from '@lingui/react';
 import type * as DialogPrimitive from '@radix-ui/react-dialog';
 import { useForm } from 'react-hook-form';
 import type { z } from 'zod';
@@ -48,8 +50,10 @@ export type CreateWebhookDialogProps = {
 } & Omit<DialogPrimitive.DialogProps, 'children'>;
 
 export const CreateWebhookDialog = ({ trigger, ...props }: CreateWebhookDialogProps) => {
-  const router = useRouter();
+  const { _ } = useLingui();
   const { toast } = useToast();
+
+  const router = useRouter();
 
   const team = useOptionalCurrentTeam();
 
@@ -85,8 +89,8 @@ export const CreateWebhookDialog = ({ trigger, ...props }: CreateWebhookDialogPr
       setOpen(false);
 
       toast({
-        title: 'Webhook created',
-        description: 'The webhook was successfully created.',
+        title: _(msg`Webhook created`),
+        description: _(msg`The webhook was successfully created.`),
       });
 
       form.reset();
@@ -94,8 +98,8 @@ export const CreateWebhookDialog = ({ trigger, ...props }: CreateWebhookDialogPr
       router.refresh();
     } catch (err) {
       toast({
-        title: 'Error',
-        description: 'An error occurred while creating the webhook. Please try again.',
+        title: _(msg`Error`),
+        description: _(msg`An error occurred while creating the webhook. Please try again.`),
         variant: 'destructive',
       });
     }
@@ -108,13 +112,21 @@ export const CreateWebhookDialog = ({ trigger, ...props }: CreateWebhookDialogPr
       {...props}
     >
       <DialogTrigger onClick={(e) => e.stopPropagation()} asChild>
-        {trigger ?? <Button className="flex-shrink-0">Create Webhook</Button>}
+        {trigger ?? (
+          <Button className="flex-shrink-0">
+            <Trans>Create Webhook</Trans>
+          </Button>
+        )}
       </DialogTrigger>
 
       <DialogContent className="max-w-lg" position="center">
         <DialogHeader>
-          <DialogTitle>Create webhook</DialogTitle>
-          <DialogDescription>On this page, you can create a new webhook.</DialogDescription>
+          <DialogTitle>
+            <Trans>Create webhook</Trans>
+          </DialogTitle>
+          <DialogDescription>
+            <Trans>On this page, you can create a new webhook.</Trans>
+          </DialogDescription>
         </DialogHeader>
 
         <Form {...form}>
@@ -129,13 +141,15 @@ export const CreateWebhookDialog = ({ trigger, ...props }: CreateWebhookDialogPr
                   name="webhookUrl"
                   render={({ field }) => (
                     <FormItem className="flex-1">
-                      <FormLabel required>Webhook URL</FormLabel>
+                      <FormLabel required>
+                        <Trans>Webhook URL</Trans>
+                      </FormLabel>
                       <FormControl>
                         <Input className="bg-background" {...field} />
                       </FormControl>
 
                       <FormDescription>
-                        The URL for Documenso to send webhook events to.
+                        <Trans>The URL for Documenso to send webhook events to.</Trans>
                       </FormDescription>
 
                       <FormMessage />
@@ -148,7 +162,9 @@ export const CreateWebhookDialog = ({ trigger, ...props }: CreateWebhookDialogPr
                   name="enabled"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Enabled</FormLabel>
+                      <FormLabel>
+                        <Trans>Enabled</Trans>
+                      </FormLabel>
 
                       <div>
                         <FormControl>
@@ -171,7 +187,9 @@ export const CreateWebhookDialog = ({ trigger, ...props }: CreateWebhookDialogPr
                 name="eventTriggers"
                 render={({ field: { onChange, value } }) => (
                   <FormItem className="flex flex-col gap-2">
-                    <FormLabel required>Triggers</FormLabel>
+                    <FormLabel required>
+                      <Trans>Triggers</Trans>
+                    </FormLabel>
                     <FormControl>
                       <TriggerMultiSelectCombobox
                         listValues={value}
@@ -182,7 +200,7 @@ export const CreateWebhookDialog = ({ trigger, ...props }: CreateWebhookDialogPr
                     </FormControl>
 
                     <FormDescription>
-                      The events that will trigger a webhook to be sent to your URL.
+                      <Trans>The events that will trigger a webhook to be sent to your URL.</Trans>
                     </FormDescription>
 
                     <FormMessage />
@@ -195,7 +213,9 @@ export const CreateWebhookDialog = ({ trigger, ...props }: CreateWebhookDialogPr
                 name="secret"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Secret</FormLabel>
+                    <FormLabel>
+                      <Trans>Secret</Trans>
+                    </FormLabel>
                     <FormControl>
                       <PasswordInput
                         className="bg-background"
@@ -205,8 +225,11 @@ export const CreateWebhookDialog = ({ trigger, ...props }: CreateWebhookDialogPr
                     </FormControl>
 
                     <FormDescription>
-                      A secret that will be sent to your URL so you can verify that the request has
-                      been sent by Documenso.
+                      <Trans>
+                        A secret that will be sent to your URL so you can verify that the request
+                        has been sent by Documenso
+                      </Trans>
+                      .
                     </FormDescription>
                     <FormMessage />
                   </FormItem>
@@ -216,10 +239,10 @@ export const CreateWebhookDialog = ({ trigger, ...props }: CreateWebhookDialogPr
               <DialogFooter>
                 <div className="flex w-full flex-nowrap gap-4">
                   <Button type="button" variant="secondary" onClick={() => setOpen(false)}>
-                    Cancel
+                    <Trans>Cancel</Trans>
                   </Button>
                   <Button type="submit" loading={form.formState.isSubmitting}>
-                    Create
+                    <Trans>Create</Trans>
                   </Button>
                 </div>
               </DialogFooter>

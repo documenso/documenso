@@ -2,6 +2,8 @@
 
 import { useSearchParams } from 'next/navigation';
 
+import { Trans, msg } from '@lingui/macro';
+import { useLingui } from '@lingui/react';
 import { Edit, MoreHorizontal, Trash2 } from 'lucide-react';
 
 import { useUpdateSearchParams } from '@documenso/lib/client-only/hooks/use-update-search-params';
@@ -42,6 +44,8 @@ export const TeamMembersDataTable = ({
   teamId,
   teamName,
 }: TeamMembersDataTableProps) => {
+  const { _ } = useLingui();
+
   const searchParams = useSearchParams();
   const updateSearchParams = useUpdateSearchParams();
 
@@ -79,7 +83,7 @@ export const TeamMembersDataTable = ({
     <DataTable
       columns={[
         {
-          header: 'Team Member',
+          header: _(msg`Team Member`),
           cell: ({ row }) => {
             const avatarFallbackText = row.original.user.name
               ? extractInitials(row.original.user.name)
@@ -98,20 +102,20 @@ export const TeamMembersDataTable = ({
           },
         },
         {
-          header: 'Role',
+          header: _(msg`Role`),
           accessorKey: 'role',
           cell: ({ row }) =>
             teamOwnerUserId === row.original.userId
               ? 'Owner'
-              : TEAM_MEMBER_ROLE_MAP[row.original.role],
+              : _(TEAM_MEMBER_ROLE_MAP[row.original.role]),
         },
         {
-          header: 'Member Since',
+          header: _(msg`Member Since`),
           accessorKey: 'createdAt',
           cell: ({ row }) => <LocaleDate date={row.original.createdAt} />,
         },
         {
-          header: 'Actions',
+          header: _(msg`Actions`),
           cell: ({ row }) => (
             <DropdownMenu>
               <DropdownMenuTrigger>
@@ -119,7 +123,9 @@ export const TeamMembersDataTable = ({
               </DropdownMenuTrigger>
 
               <DropdownMenuContent className="w-52" align="start" forceMount>
-                <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                <DropdownMenuLabel>
+                  <Trans>Actions</Trans>
+                </DropdownMenuLabel>
 
                 <UpdateTeamMemberDialog
                   currentUserTeamRole={currentUserTeamRole}
@@ -137,7 +143,7 @@ export const TeamMembersDataTable = ({
                       title="Update team member role"
                     >
                       <Edit className="mr-2 h-4 w-4" />
-                      Update role
+                      <Trans>Update role</Trans>
                     </DropdownMenuItem>
                   }
                 />
@@ -155,10 +161,10 @@ export const TeamMembersDataTable = ({
                         teamOwnerUserId === row.original.userId ||
                         !isTeamRoleWithinUserHierarchy(currentUserTeamRole, row.original.role)
                       }
-                      title="Remove team member"
+                      title={_(msg`Remove team member`)}
                     >
                       <Trash2 className="mr-2 h-4 w-4" />
-                      Remove
+                      <Trans>Remove</Trans>
                     </DropdownMenuItem>
                   }
                 />

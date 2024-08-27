@@ -2,6 +2,7 @@ import React from 'react';
 
 import { redirect } from 'next/navigation';
 
+import { setupI18nSSR } from '@documenso/lib/client-only/providers/i18n.server';
 import { getRequiredServerComponentSession } from '@documenso/lib/next-auth/get-server-component-session';
 import { isAdmin } from '@documenso/lib/next-auth/guards/is-admin';
 
@@ -12,6 +13,8 @@ export type AdminSectionLayoutProps = {
 };
 
 export default async function AdminSectionLayout({ children }: AdminSectionLayoutProps) {
+  setupI18nSSR();
+
   const { user } = await getRequiredServerComponentSession();
 
   if (!isAdmin(user)) {

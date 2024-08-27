@@ -1,12 +1,14 @@
 import type { Metadata } from 'next';
 import { redirect } from 'next/navigation';
 
+import { Trans } from '@lingui/macro';
 import { match } from 'ts-pattern';
 
 import { getStripeCustomerByUser } from '@documenso/ee/server-only/stripe/get-customer';
 import { getPricesByInterval } from '@documenso/ee/server-only/stripe/get-prices-by-interval';
 import { getPrimaryAccountPlanPrices } from '@documenso/ee/server-only/stripe/get-primary-account-plan-prices';
 import { getProductByPriceId } from '@documenso/ee/server-only/stripe/get-product-by-price-id';
+import { setupI18nSSR } from '@documenso/lib/client-only/providers/i18n.server';
 import { STRIPE_PLAN_TYPE } from '@documenso/lib/constants/billing';
 import { getRequiredServerComponentSession } from '@documenso/lib/next-auth/get-server-component-session';
 import { getServerComponentFlag } from '@documenso/lib/server-only/feature-flags/get-server-component-feature-flag';
@@ -24,6 +26,8 @@ export const metadata: Metadata = {
 };
 
 export default async function BillingSettingsPage() {
+  setupI18nSSR();
+
   let { user } = await getRequiredServerComponentSession();
 
   const isBillingEnabled = await getServerComponentFlag('app_billing');
@@ -66,15 +70,20 @@ export default async function BillingSettingsPage() {
 
   return (
     <div>
-      <h3 className="text-2xl font-semibold">Billing</h3>
+      <h3 className="text-2xl font-semibold">
+        <Trans>Billing</Trans>
+      </h3>
 
       <div className="text-muted-foreground mt-2 text-sm">
         {isMissingOrInactiveOrFreePlan && (
           <p>
-            You are currently on the <span className="font-semibold">Free Plan</span>.
+            <Trans>
+              You are currently on the <span className="font-semibold">Free Plan</span>.
+            </Trans>
           </p>
         )}
 
+        {/* Todo: Translation */}
         {!isMissingOrInactiveOrFreePlan &&
           match(subscription.status)
             .with('ACTIVE', () => (
@@ -108,7 +117,11 @@ export default async function BillingSettingsPage() {
               </p>
             ))
             .with('PAST_DUE', () => (
-              <p>Your current plan is past due. Please update your payment information.</p>
+              <p>
+                <Trans>
+                  Your current plan is past due. Please update your payment information.
+                </Trans>
+              </p>
             ))
             .otherwise(() => null)}
       </div>
