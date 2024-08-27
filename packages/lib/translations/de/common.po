@@ -325,8 +325,12 @@ msgid "I am an approver of this document"
 msgstr "Ich bin ein Genehmiger dieses Dokuments"
 
 #: packages/lib/constants/recipient-roles.ts:74
-msgid "I am required to recieve a copy of this document"
-msgstr "Ich muss eine Kopie dieses Dokuments erhalten"
+msgid "I am required to receive a copy of this document"
+msgstr ""
+
+#: packages/lib/constants/recipient-roles.ts:74
+#~ msgid "I am required to recieve a copy of this document"
+#~ msgstr "Ich muss eine Kopie dieses Dokuments erhalten"
 
 #: packages/ui/components/recipient/recipient-action-auth-select.tsx:29
 #: packages/ui/components/recipient/recipient-action-auth-select.tsx:87
