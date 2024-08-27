@@ -175,7 +175,7 @@ msgstr ""
 msgid "Checkbox values"
 msgstr ""
 
-#: packages/ui/primitives/data-table.tsx:154
+#: packages/ui/primitives/data-table.tsx:156
 msgid "Clear filters"
 msgstr ""
 
@@ -398,7 +398,7 @@ msgstr ""
 msgid "No restrictions"
 msgstr ""
 
-#: packages/ui/primitives/data-table.tsx:146
+#: packages/ui/primitives/data-table.tsx:148
 msgid "No results found"
 msgstr ""
 
@@ -572,7 +572,7 @@ msgstr ""
 msgid "Something went wrong"
 msgstr ""
 
-#: packages/ui/primitives/data-table.tsx:134
+#: packages/ui/primitives/data-table.tsx:136
 msgid "Something went wrong."
 msgstr ""
 

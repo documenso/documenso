@@ -51,7 +51,7 @@ msgstr ""
 msgid "{0, plural, one {# recipient} other {# recipients}}"
 msgstr ""
 
-#: apps/web/src/components/(teams)/tables/team-billing-invoices-data-table.tsx:64
+#: apps/web/src/components/(teams)/tables/team-billing-invoices-data-table.tsx:66
 msgid "{0, plural, one {# Seat} other {# Seats}}"
 msgstr ""
 
@@ -190,19 +190,19 @@ msgid "Account deleted"
 msgstr ""
 
 #: apps/web/src/app/(dashboard)/documents/[id]/document-page-view-dropdown.tsx:105
-#: apps/web/src/app/(dashboard)/documents/[id]/logs/document-logs-data-table.tsx:104
+#: apps/web/src/app/(dashboard)/documents/[id]/logs/document-logs-data-table.tsx:106
 #: apps/web/src/app/(dashboard)/documents/data-table-action-dropdown.tsx:121
 #: apps/web/src/app/(dashboard)/settings/public-profile/public-templates-data-table.tsx:164
-#: apps/web/src/app/(dashboard)/settings/security/activity/user-security-activity-data-table.tsx:118
+#: apps/web/src/app/(dashboard)/settings/security/activity/user-security-activity-data-table.tsx:120
 msgid "Action"
 msgstr ""
 
-#: apps/web/src/app/(dashboard)/documents/data-table.tsx:103
-#: apps/web/src/app/(dashboard)/templates/data-table-templates.tsx:168
-#: apps/web/src/components/(teams)/tables/team-member-invites-data-table.tsx:133
-#: apps/web/src/components/(teams)/tables/team-member-invites-data-table.tsx:142
-#: apps/web/src/components/(teams)/tables/team-members-data-table.tsx:118
-#: apps/web/src/components/(teams)/tables/team-members-data-table.tsx:127
+#: apps/web/src/app/(dashboard)/documents/data-table.tsx:89
+#: apps/web/src/app/(dashboard)/templates/data-table-templates.tsx:141
+#: apps/web/src/components/(teams)/tables/team-member-invites-data-table.tsx:135
+#: apps/web/src/components/(teams)/tables/team-member-invites-data-table.tsx:144
+#: apps/web/src/components/(teams)/tables/team-members-data-table.tsx:120
+#: apps/web/src/components/(teams)/tables/team-members-data-table.tsx:129
 msgid "Actions"
 msgstr ""
 
@@ -343,7 +343,7 @@ msgstr ""
 msgid "Already have an account? <0>Sign in instead</0>"
 msgstr ""
 
-#: apps/web/src/components/(teams)/tables/team-billing-invoices-data-table.tsx:84
+#: apps/web/src/components/(teams)/tables/team-billing-invoices-data-table.tsx:86
 msgid "Amount"
 msgstr ""
 
@@ -632,7 +632,7 @@ msgstr ""
 msgid "Billing"
 msgstr ""
 
-#: apps/web/src/app/(dashboard)/settings/security/activity/user-security-activity-data-table.tsx:99
+#: apps/web/src/app/(dashboard)/settings/security/activity/user-security-activity-data-table.tsx:101
 msgid "Browser"
 msgstr ""
 
@@ -953,11 +953,11 @@ msgstr ""
 msgid "Create your account and start using state-of-the-art document signing. Open and beautiful signing is within your grasp."
 msgstr ""
 
-#: apps/web/src/app/(dashboard)/admin/documents/document-results.tsx:72
+#: apps/web/src/app/(dashboard)/admin/documents/document-results.tsx:63
 #: apps/web/src/app/(dashboard)/documents/[id]/document-page-view-information.tsx:48
-#: apps/web/src/app/(dashboard)/documents/data-table.tsx:68
-#: apps/web/src/app/(dashboard)/settings/security/passkeys/user-passkeys-data-table.tsx:63
-#: apps/web/src/app/(dashboard)/templates/data-table-templates.tsx:84
+#: apps/web/src/app/(dashboard)/documents/data-table.tsx:54
+#: apps/web/src/app/(dashboard)/settings/security/passkeys/user-passkeys-data-table.tsx:65
+#: apps/web/src/app/(dashboard)/templates/data-table-templates.tsx:57
 #: apps/web/src/components/templates/manage-public-template-dialog.tsx:276
 msgid "Created"
 msgstr ""
@@ -971,7 +971,7 @@ msgid "Created by"
 msgstr ""
 
 #: apps/web/src/app/(dashboard)/admin/documents/[id]/page.tsx:49
-#: apps/web/src/components/(teams)/tables/pending-user-teams-data-table.tsx:90
+#: apps/web/src/components/(teams)/tables/pending-user-teams-data-table.tsx:80
 msgid "Created on"
 msgstr ""
 
@@ -998,7 +998,7 @@ msgstr ""
 msgid "Dark Mode"
 msgstr ""
 
-#: apps/web/src/app/(dashboard)/settings/security/activity/user-security-activity-data-table.tsx:70
+#: apps/web/src/app/(dashboard)/settings/security/activity/user-security-activity-data-table.tsx:72
 #: apps/web/src/app/(signing)/sign/[token]/date-field.tsx:148
 msgid "Date"
 msgstr ""
@@ -1096,11 +1096,11 @@ msgstr ""
 #~ msgid "Deleting document"
 #~ msgstr ""
 
-#: apps/web/src/app/(dashboard)/settings/security/activity/user-security-activity-data-table.tsx:75
+#: apps/web/src/app/(dashboard)/settings/security/activity/user-security-activity-data-table.tsx:77
 msgid "Device"
 msgstr ""
 
-#: apps/web/src/app/(dashboard)/templates/data-table-templates.tsx:119
+#: apps/web/src/app/(dashboard)/templates/data-table-templates.tsx:92
 #: apps/web/src/app/(dashboard)/templates/template-direct-link-badge.tsx:46
 msgid "direct link"
 msgstr ""
@@ -1125,7 +1125,7 @@ msgstr ""
 msgid "Direct link signing has been enabled"
 msgstr ""
 
-#: apps/web/src/app/(dashboard)/templates/data-table-templates.tsx:123
+#: apps/web/src/app/(dashboard)/templates/data-table-templates.tsx:96
 msgid "Direct link templates contain one dynamic recipient placeholder. Anyone with access to this link can sign the document, and it will then appear on your documents page."
 msgstr ""
 
@@ -1227,7 +1227,7 @@ msgstr ""
 msgid "Document inbox"
 msgstr ""
 
-#: apps/web/src/app/(dashboard)/templates/data-table-templates.tsx:68
+#: apps/web/src/app/(dashboard)/templates/data-table-templates.tsx:179
 msgid "Document Limit Exceeded!"
 msgstr ""
 
@@ -1292,7 +1292,7 @@ msgid "Document will be permanently deleted"
 msgstr ""
 
 #: apps/web/src/app/(dashboard)/admin/nav.tsx:65
-#: apps/web/src/app/(dashboard)/admin/users/data-table-users.tsx:124
+#: apps/web/src/app/(dashboard)/admin/users/data-table-users.tsx:92
 #: apps/web/src/app/(dashboard)/documents/[id]/document-page-view.tsx:113
 #: apps/web/src/app/(dashboard)/documents/[id]/edit/document-edit-page-view.tsx:82
 #: apps/web/src/app/(dashboard)/documents/[id]/loading.tsx:16
@@ -1324,7 +1324,7 @@ msgstr ""
 #: apps/web/src/app/(dashboard)/documents/[id]/document-page-view-dropdown.tsx:120
 #: apps/web/src/app/(dashboard)/documents/data-table-action-button.tsx:141
 #: apps/web/src/app/(dashboard)/documents/data-table-action-dropdown.tsx:160
-#: apps/web/src/components/(teams)/tables/team-billing-invoices-data-table.tsx:108
+#: apps/web/src/components/(teams)/tables/team-billing-invoices-data-table.tsx:110
 #: apps/web/src/components/forms/2fa/enable-authenticator-app-dialog.tsx:185
 #: apps/web/src/components/forms/2fa/view-recovery-codes-dialog.tsx:107
 msgid "Download"
@@ -1380,9 +1380,9 @@ msgstr ""
 msgid "Edit webhook"
 msgstr ""
 
-#: apps/web/src/app/(dashboard)/admin/documents/[id]/recipient-item.tsx:119
+#: apps/web/src/app/(dashboard)/admin/documents/[id]/recipient-item.tsx:166
 #: apps/web/src/app/(dashboard)/admin/users/[id]/page.tsx:114
-#: apps/web/src/app/(dashboard)/admin/users/data-table-users.tsx:103
+#: apps/web/src/app/(dashboard)/admin/users/data-table-users.tsx:71
 #: apps/web/src/app/(dashboard)/templates/use-template-dialog.tsx:213
 #: apps/web/src/app/(dashboard)/templates/use-template-dialog.tsx:220
 #: apps/web/src/app/(recipient)/d/[token]/configure-direct-template.tsx:118
@@ -1532,7 +1532,7 @@ msgstr ""
 msgid "Failed to reseal document"
 msgstr ""
 
-#: apps/web/src/app/(dashboard)/admin/documents/[id]/recipient-item.tsx:78
+#: apps/web/src/app/(dashboard)/admin/documents/[id]/recipient-item.tsx:125
 msgid "Failed to update recipient"
 msgstr ""
 
@@ -1541,7 +1541,7 @@ msgstr ""
 msgid "Failed to update webhook"
 msgstr ""
 
-#: apps/web/src/app/(dashboard)/admin/documents/[id]/recipient-item.tsx:143
+#: apps/web/src/app/(dashboard)/admin/documents/[id]/recipient-item.tsx:190
 msgid "Fields"
 msgstr ""
 
@@ -1660,7 +1660,7 @@ msgstr ""
 msgid "Information"
 msgstr ""
 
-#: apps/web/src/app/(dashboard)/admin/documents/[id]/recipient-item.tsx:160
+#: apps/web/src/app/(dashboard)/admin/documents/[id]/recipient-item.tsx:78
 msgid "Inserted"
 msgstr ""
 
@@ -1694,11 +1694,11 @@ msgstr ""
 msgid "Invitation declined"
 msgstr ""
 
-#: apps/web/src/components/(teams)/tables/team-member-invites-data-table.tsx:79
+#: apps/web/src/components/(teams)/tables/team-member-invites-data-table.tsx:82
 msgid "Invitation has been deleted"
 msgstr ""
 
-#: apps/web/src/components/(teams)/tables/team-member-invites-data-table.tsx:62
+#: apps/web/src/components/(teams)/tables/team-member-invites-data-table.tsx:65
 msgid "Invitation has been resent"
 msgstr ""
 
@@ -1718,11 +1718,11 @@ msgstr ""
 msgid "Invite team members"
 msgstr ""
 
-#: apps/web/src/components/(teams)/tables/team-member-invites-data-table.tsx:128
+#: apps/web/src/components/(teams)/tables/team-member-invites-data-table.tsx:130
 msgid "Invited At"
 msgstr ""
 
-#: apps/web/src/components/(teams)/tables/team-billing-invoices-data-table.tsx:53
+#: apps/web/src/components/(teams)/tables/team-billing-invoices-data-table.tsx:55
 msgid "Invoice"
 msgstr ""
 
@@ -1766,12 +1766,12 @@ msgstr ""
 msgid "Last updated at"
 msgstr ""
 
-#: apps/web/src/app/(dashboard)/settings/security/passkeys/user-passkeys-data-table.tsx:69
+#: apps/web/src/app/(dashboard)/settings/security/passkeys/user-passkeys-data-table.tsx:71
 msgid "Last used"
 msgstr ""
 
 #: apps/web/src/components/(teams)/dialogs/leave-team-dialog.tsx:111
-#: apps/web/src/components/(teams)/tables/current-user-teams-data-table.tsx:117
+#: apps/web/src/components/(teams)/tables/current-user-teams-data-table.tsx:119
 msgid "Leave"
 msgstr ""
 
@@ -1825,7 +1825,7 @@ msgstr ""
 msgid "Login"
 msgstr ""
 
-#: apps/web/src/components/(teams)/tables/current-user-teams-data-table.tsx:101
+#: apps/web/src/components/(teams)/tables/current-user-teams-data-table.tsx:103
 msgid "Manage"
 msgstr ""
 
@@ -1905,8 +1905,8 @@ msgstr ""
 msgid "MAU (had document completed)"
 msgstr ""
 
-#: apps/web/src/components/(teams)/tables/current-user-teams-data-table.tsx:90
-#: apps/web/src/components/(teams)/tables/team-members-data-table.tsx:113
+#: apps/web/src/components/(teams)/tables/current-user-teams-data-table.tsx:92
+#: apps/web/src/components/(teams)/tables/team-members-data-table.tsx:115
 msgid "Member Since"
 msgstr ""
 
@@ -1957,11 +1957,11 @@ msgstr ""
 msgid "My templates"
 msgstr ""
 
-#: apps/web/src/app/(dashboard)/admin/documents/[id]/recipient-item.tsx:101
+#: apps/web/src/app/(dashboard)/admin/documents/[id]/recipient-item.tsx:148
 #: apps/web/src/app/(dashboard)/admin/users/[id]/page.tsx:99
-#: apps/web/src/app/(dashboard)/admin/users/data-table-users.tsx:98
+#: apps/web/src/app/(dashboard)/admin/users/data-table-users.tsx:66
 #: apps/web/src/app/(dashboard)/settings/security/passkeys/user-passkeys-data-table-actions.tsx:144
-#: apps/web/src/app/(dashboard)/settings/security/passkeys/user-passkeys-data-table.tsx:59
+#: apps/web/src/app/(dashboard)/settings/security/passkeys/user-passkeys-data-table.tsx:61
 #: apps/web/src/app/(dashboard)/templates/use-template-dialog.tsx:235
 #: apps/web/src/app/(dashboard)/templates/use-template-dialog.tsx:242
 #: apps/web/src/app/(signing)/sign/[token]/complete/claim-account.tsx:119
@@ -1976,7 +1976,7 @@ msgstr ""
 msgid "Need to sign documents?"
 msgstr ""
 
-#: apps/web/src/app/(dashboard)/settings/security/passkeys/user-passkeys-data-table.tsx:74
+#: apps/web/src/app/(dashboard)/settings/security/passkeys/user-passkeys-data-table.tsx:76
 msgid "Never"
 msgstr ""
 
@@ -2112,12 +2112,12 @@ msgstr ""
 msgid "Otherwise, the document will be created as a draft."
 msgstr ""
 
-#: apps/web/src/app/(dashboard)/admin/documents/document-results.tsx:96
+#: apps/web/src/app/(dashboard)/admin/documents/document-results.tsx:87
 #: apps/web/src/components/(dashboard)/layout/menu-switcher.tsx:76
 msgid "Owner"
 msgstr ""
 
-#: apps/web/src/components/(teams)/tables/team-billing-invoices-data-table.tsx:77
+#: apps/web/src/components/(teams)/tables/team-billing-invoices-data-table.tsx:79
 msgid "Paid"
 msgstr ""
 
@@ -2304,12 +2304,12 @@ msgstr ""
 msgid "Preview and configure template."
 msgstr ""
 
-#: apps/web/src/app/(dashboard)/templates/data-table-templates.tsx:133
+#: apps/web/src/app/(dashboard)/templates/data-table-templates.tsx:106
 #: apps/web/src/components/formatter/template-type.tsx:22
 msgid "Private"
 msgstr ""
 
-#: apps/web/src/app/(dashboard)/templates/data-table-templates.tsx:143
+#: apps/web/src/app/(dashboard)/templates/data-table-templates.tsx:116
 msgid "Private templates can only be modified and viewed by you."
 msgstr ""
 
@@ -2333,7 +2333,7 @@ msgstr ""
 msgid "Profile updated"
 msgstr ""
 
-#: apps/web/src/app/(dashboard)/templates/data-table-templates.tsx:106
+#: apps/web/src/app/(dashboard)/templates/data-table-templates.tsx:79
 #: apps/web/src/components/formatter/template-type.tsx:27
 msgid "Public"
 msgstr ""
@@ -2354,7 +2354,7 @@ msgstr ""
 msgid "Public profile username"
 msgstr ""
 
-#: apps/web/src/app/(dashboard)/templates/data-table-templates.tsx:110
+#: apps/web/src/app/(dashboard)/templates/data-table-templates.tsx:83
 msgid "Public templates are connected to your public profile. Any modifications to public templates will also appear in your public profile."
 msgstr ""
 
@@ -2375,12 +2375,12 @@ msgstr ""
 msgid "Recent activity"
 msgstr ""
 
-#: apps/web/src/app/(dashboard)/documents/data-table.tsx:87
+#: apps/web/src/app/(dashboard)/documents/data-table.tsx:73
 #: apps/web/src/app/(dashboard)/templates/template-direct-link-dialog.tsx:280
 msgid "Recipient"
 msgstr ""
 
-#: apps/web/src/app/(dashboard)/admin/documents/[id]/recipient-item.tsx:71
+#: apps/web/src/app/(dashboard)/admin/documents/[id]/recipient-item.tsx:118
 msgid "Recipient updated"
 msgstr ""
 
@@ -2422,8 +2422,8 @@ msgstr ""
 #: apps/web/src/app/(teams)/t/[teamUrl]/settings/team-email-dropdown.tsx:89
 #: apps/web/src/components/(teams)/dialogs/remove-team-email-dialog.tsx:159
 #: apps/web/src/components/(teams)/tables/pending-user-teams-data-table-actions.tsx:54
-#: apps/web/src/components/(teams)/tables/team-member-invites-data-table.tsx:166
-#: apps/web/src/components/(teams)/tables/team-members-data-table.tsx:167
+#: apps/web/src/components/(teams)/tables/team-member-invites-data-table.tsx:168
+#: apps/web/src/components/(teams)/tables/team-members-data-table.tsx:169
 #: apps/web/src/components/forms/avatar-image.tsx:169
 msgid "Remove"
 msgstr ""
@@ -2432,7 +2432,7 @@ msgstr ""
 msgid "Remove team email"
 msgstr ""
 
-#: apps/web/src/components/(teams)/tables/team-members-data-table.tsx:164
+#: apps/web/src/components/(teams)/tables/team-members-data-table.tsx:166
 msgid "Remove team member"
 msgstr ""
 
@@ -2450,7 +2450,7 @@ msgid "Reseal document"
 msgstr ""
 
 #: apps/web/src/app/(dashboard)/documents/_action-items/resend-document.tsx:118
-#: apps/web/src/components/(teams)/tables/team-member-invites-data-table.tsx:154
+#: apps/web/src/components/(teams)/tables/team-member-invites-data-table.tsx:156
 msgid "Resend"
 msgstr ""
 
@@ -2524,14 +2524,14 @@ msgstr ""
 #: apps/web/src/app/(dashboard)/templates/template-direct-link-dialog.tsx:283
 #: apps/web/src/components/(teams)/dialogs/invite-team-member-dialog.tsx:318
 #: apps/web/src/components/(teams)/dialogs/update-team-member-dialog.tsx:163
-#: apps/web/src/components/(teams)/tables/current-user-teams-data-table.tsx:82
-#: apps/web/src/components/(teams)/tables/team-member-invites-data-table.tsx:123
-#: apps/web/src/components/(teams)/tables/team-members-data-table.tsx:105
+#: apps/web/src/components/(teams)/tables/current-user-teams-data-table.tsx:84
+#: apps/web/src/components/(teams)/tables/team-member-invites-data-table.tsx:125
+#: apps/web/src/components/(teams)/tables/team-members-data-table.tsx:107
 msgid "Role"
 msgstr ""
 
 #: apps/web/src/app/(dashboard)/admin/users/[id]/page.tsx:131
-#: apps/web/src/app/(dashboard)/admin/users/data-table-users.tsx:108
+#: apps/web/src/app/(dashboard)/admin/users/data-table-users.tsx:76
 msgid "Roles"
 msgstr ""
 
@@ -2548,11 +2548,11 @@ msgstr ""
 msgid "Search"
 msgstr ""
 
-#: apps/web/src/app/(dashboard)/admin/documents/document-results.tsx:63
+#: apps/web/src/app/(dashboard)/admin/documents/document-results.tsx:141
 msgid "Search by document title"
 msgstr ""
 
-#: apps/web/src/app/(dashboard)/admin/users/data-table-users.tsx:86
+#: apps/web/src/app/(dashboard)/admin/users/data-table-users.tsx:144
 msgid "Search by name or email"
 msgstr ""
 
@@ -2612,7 +2612,7 @@ msgstr ""
 msgid "Send reminder"
 msgstr ""
 
-#: apps/web/src/app/(dashboard)/documents/data-table.tsx:83
+#: apps/web/src/app/(dashboard)/documents/data-table.tsx:69
 msgid "Sender"
 msgstr ""
 
@@ -2736,7 +2736,7 @@ msgstr ""
 msgid "Sign Up with OIDC"
 msgstr ""
 
-#: apps/web/src/app/(dashboard)/admin/documents/[id]/recipient-item.tsx:170
+#: apps/web/src/app/(dashboard)/admin/documents/[id]/recipient-item.tsx:88
 #: apps/web/src/app/(recipient)/d/[token]/sign-direct-template.tsx:338
 #: apps/web/src/app/(signing)/sign/[token]/signature-field.tsx:197
 #: apps/web/src/app/(signing)/sign/[token]/signature-field.tsx:227
@@ -2812,8 +2812,8 @@ msgstr ""
 #: apps/web/src/components/(teams)/dialogs/remove-team-email-dialog.tsx:64
 #: apps/web/src/components/(teams)/dialogs/remove-team-email-dialog.tsx:83
 #: apps/web/src/components/(teams)/tables/pending-user-teams-data-table-actions.tsx:33
-#: apps/web/src/components/(teams)/tables/team-member-invites-data-table.tsx:67
-#: apps/web/src/components/(teams)/tables/team-member-invites-data-table.tsx:84
+#: apps/web/src/components/(teams)/tables/team-member-invites-data-table.tsx:70
+#: apps/web/src/components/(teams)/tables/team-member-invites-data-table.tsx:87
 #: apps/web/src/components/(teams)/team-billing-portal-button.tsx:29
 msgid "Something went wrong"
 msgstr ""
@@ -2855,10 +2855,10 @@ msgstr ""
 msgid "Stats"
 msgstr ""
 
-#: apps/web/src/app/(dashboard)/admin/documents/document-results.tsx:91
+#: apps/web/src/app/(dashboard)/admin/documents/document-results.tsx:82
 #: apps/web/src/app/(dashboard)/admin/subscriptions/page.tsx:32
-#: apps/web/src/app/(dashboard)/documents/data-table.tsx:97
-#: apps/web/src/components/(teams)/tables/team-billing-invoices-data-table.tsx:71
+#: apps/web/src/app/(dashboard)/documents/data-table.tsx:83
+#: apps/web/src/components/(teams)/tables/team-billing-invoices-data-table.tsx:73
 msgid "Status"
 msgstr ""
 
@@ -2866,7 +2866,7 @@ msgstr ""
 msgid "Subscribe"
 msgstr ""
 
-#: apps/web/src/app/(dashboard)/admin/users/data-table-users.tsx:113
+#: apps/web/src/app/(dashboard)/admin/users/data-table-users.tsx:81
 msgid "Subscription"
 msgstr ""
 
@@ -2898,8 +2898,8 @@ msgstr ""
 #: apps/web/src/components/(teams)/dialogs/update-team-member-dialog.tsx:92
 #: apps/web/src/components/(teams)/forms/update-team-form.tsx:68
 #: apps/web/src/components/(teams)/tables/pending-user-teams-data-table-actions.tsx:27
-#: apps/web/src/components/(teams)/tables/team-member-invites-data-table.tsx:61
-#: apps/web/src/components/(teams)/tables/team-member-invites-data-table.tsx:78
+#: apps/web/src/components/(teams)/tables/team-member-invites-data-table.tsx:64
+#: apps/web/src/components/(teams)/tables/team-member-invites-data-table.tsx:81
 #: apps/web/src/components/forms/public-profile-form.tsx:80
 #: apps/web/src/components/templates/manage-public-template-dialog.tsx:135
 #: apps/web/src/components/templates/manage-public-template-dialog.tsx:172
@@ -2914,8 +2914,8 @@ msgstr ""
 msgid "System Theme"
 msgstr ""
 
-#: apps/web/src/components/(teams)/tables/current-user-teams-data-table.tsx:65
-#: apps/web/src/components/(teams)/tables/pending-user-teams-data-table.tsx:76
+#: apps/web/src/components/(teams)/tables/current-user-teams-data-table.tsx:67
+#: apps/web/src/components/(teams)/tables/pending-user-teams-data-table.tsx:66
 msgid "Team"
 msgstr ""
 
@@ -2957,8 +2957,8 @@ msgstr ""
 msgid "Team invitations have been sent."
 msgstr ""
 
-#: apps/web/src/components/(teams)/tables/team-member-invites-data-table.tsx:109
-#: apps/web/src/components/(teams)/tables/team-members-data-table.tsx:86
+#: apps/web/src/components/(teams)/tables/team-member-invites-data-table.tsx:111
+#: apps/web/src/components/(teams)/tables/team-members-data-table.tsx:88
 msgid "Team Member"
 msgstr ""
 
@@ -2967,11 +2967,11 @@ msgstr ""
 msgid "Team Name"
 msgstr ""
 
-#: apps/web/src/app/(dashboard)/templates/data-table-templates.tsx:133
+#: apps/web/src/app/(dashboard)/templates/data-table-templates.tsx:106
 msgid "Team Only"
 msgstr ""
 
-#: apps/web/src/app/(dashboard)/templates/data-table-templates.tsx:138
+#: apps/web/src/app/(dashboard)/templates/data-table-templates.tsx:111
 msgid "Team only templates are not linked anywhere and are visible only to your team."
 msgstr ""
 
@@ -3133,7 +3133,7 @@ msgstr ""
 msgid "The public name for your template"
 msgstr ""
 
-#: apps/web/src/app/(dashboard)/admin/documents/[id]/recipient-item.tsx:72
+#: apps/web/src/app/(dashboard)/admin/documents/[id]/recipient-item.tsx:119
 msgid "The recipient has been updated successfully"
 msgstr ""
 
@@ -3307,7 +3307,7 @@ msgstr ""
 msgid "This username is already taken"
 msgstr ""
 
-#: apps/web/src/app/(dashboard)/documents/[id]/logs/document-logs-data-table.tsx:77
+#: apps/web/src/app/(dashboard)/documents/[id]/logs/document-logs-data-table.tsx:79
 msgid "Time"
 msgstr ""
 
@@ -3315,9 +3315,9 @@ msgstr ""
 msgid "Time zone"
 msgstr ""
 
-#: apps/web/src/app/(dashboard)/admin/documents/document-results.tsx:77
-#: apps/web/src/app/(dashboard)/documents/data-table.tsx:78
-#: apps/web/src/app/(dashboard)/templates/data-table-templates.tsx:89
+#: apps/web/src/app/(dashboard)/admin/documents/document-results.tsx:68
+#: apps/web/src/app/(dashboard)/documents/data-table.tsx:64
+#: apps/web/src/app/(dashboard)/templates/data-table-templates.tsx:62
 msgid "Title"
 msgstr ""
 
@@ -3450,8 +3450,8 @@ msgstr ""
 msgid "Two-factor authentication has been disabled for your account. You will no longer be required to enter a code from your authenticator app when signing in."
 msgstr ""
 
-#: apps/web/src/app/(dashboard)/admin/documents/[id]/recipient-item.tsx:155
-#: apps/web/src/app/(dashboard)/templates/data-table-templates.tsx:95
+#: apps/web/src/app/(dashboard)/admin/documents/[id]/recipient-item.tsx:73
+#: apps/web/src/app/(dashboard)/templates/data-table-templates.tsx:68
 msgid "Type"
 msgstr ""
 
@@ -3483,7 +3483,7 @@ msgstr ""
 msgid "Unable to decline this team invitation at this time."
 msgstr ""
 
-#: apps/web/src/components/(teams)/tables/team-member-invites-data-table.tsx:85
+#: apps/web/src/components/(teams)/tables/team-member-invites-data-table.tsx:88
 msgid "Unable to delete invitation. Please try again."
 msgstr ""
 
@@ -3516,7 +3516,7 @@ msgstr ""
 msgid "Unable to remove team email at this time. Please try again."
 msgstr ""
 
-#: apps/web/src/components/(teams)/tables/team-member-invites-data-table.tsx:68
+#: apps/web/src/components/(teams)/tables/team-member-invites-data-table.tsx:71
 msgid "Unable to resend invitation. Please try again."
 msgstr ""
 
@@ -3551,7 +3551,7 @@ msgstr ""
 msgid "Unknown error"
 msgstr ""
 
-#: apps/web/src/components/(teams)/tables/team-billing-invoices-data-table.tsx:77
+#: apps/web/src/components/(teams)/tables/team-billing-invoices-data-table.tsx:79
 msgid "Unpaid"
 msgstr ""
 
@@ -3580,11 +3580,11 @@ msgstr ""
 msgid "Update profile"
 msgstr ""
 
-#: apps/web/src/app/(dashboard)/admin/documents/[id]/recipient-item.tsx:133
+#: apps/web/src/app/(dashboard)/admin/documents/[id]/recipient-item.tsx:180
 msgid "Update Recipient"
 msgstr ""
 
-#: apps/web/src/components/(teams)/tables/team-members-data-table.tsx:146
+#: apps/web/src/components/(teams)/tables/team-members-data-table.tsx:148
 msgid "Update role"
 msgstr ""
 
@@ -3651,7 +3651,7 @@ msgstr ""
 msgid "Use Template"
 msgstr ""
 
-#: apps/web/src/app/(dashboard)/documents/[id]/logs/document-logs-data-table.tsx:82
+#: apps/web/src/app/(dashboard)/documents/[id]/logs/document-logs-data-table.tsx:84
 msgid "User"
 msgstr ""
 
@@ -3671,7 +3671,7 @@ msgstr ""
 msgid "Users"
 msgstr ""
 
-#: apps/web/src/app/(dashboard)/admin/documents/[id]/recipient-item.tsx:165
+#: apps/web/src/app/(dashboard)/admin/documents/[id]/recipient-item.tsx:83
 msgid "Value"
 msgstr ""
 
@@ -3703,7 +3703,7 @@ msgstr ""
 #: apps/web/src/app/(dashboard)/documents/data-table-action-button.tsx:126
 #: apps/web/src/app/(dashboard)/documents/data-table-action-button.tsx:135
 #: apps/web/src/app/(dashboard)/documents/data-table-action-dropdown.tsx:130
-#: apps/web/src/components/(teams)/tables/team-billing-invoices-data-table.tsx:98
+#: apps/web/src/components/(teams)/tables/team-billing-invoices-data-table.tsx:100
 #: apps/web/src/components/forms/2fa/view-recovery-codes-dialog.tsx:168
 msgid "View"
 msgstr ""
@@ -4161,7 +4161,7 @@ msgstr ""
 msgid "You have reached your document limit."
 msgstr ""
 
-#: apps/web/src/app/(dashboard)/templates/data-table-templates.tsx:71
+#: apps/web/src/app/(dashboard)/templates/data-table-templates.tsx:182
 msgid "You have reached your document limit. <0>Upgrade your account to continue!</0>"
 msgstr ""
 
