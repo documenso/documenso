@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useMemo } from 'react';
 
 import { Trans } from '@lingui/macro';
 import type {
@@ -16,6 +16,8 @@ import { Skeleton } from './skeleton';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from './table';
 
 export type DataTableChildren<TData> = (_table: TTable<TData>) => React.ReactNode;
+
+export type { ColumnDef as DataTableColumnDef } from '@tanstack/react-table';
 
 export interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
@@ -53,17 +55,6 @@ export function DataTable<TData, TValue>({
   onPaginationChange,
   children,
 }: DataTableProps<TData, TValue>) {
-  const [stableColumns, setStableColumns] = useState(columns);
-
-  useEffect(() => {
-    if (JSON.stringify(columns) === JSON.stringify(stableColumns)) {
-      return;
-    }
-
-    setStableColumns(columns);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [columns]);
-
   const pagination = useMemo<PaginationState>(() => {
     if (currentPage !== undefined && perPage !== undefined) {
       return {
@@ -92,7 +83,7 @@ export function DataTable<TData, TValue>({
 
   const table = useReactTable({
     data,
-    columns: stableColumns,
+    columns,
     getCoreRowModel: getCoreRowModel(),
     state: {
       pagination: manualPagination ? pagination : undefined,

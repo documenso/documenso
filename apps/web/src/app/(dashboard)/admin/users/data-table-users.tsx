@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState, useTransition } from 'react';
+import { useEffect, useMemo, useState, useTransition } from 'react';
 
 import Link from 'next/link';
 
@@ -12,6 +12,7 @@ import { useDebouncedValue } from '@documenso/lib/client-only/hooks/use-debounce
 import { useUpdateSearchParams } from '@documenso/lib/client-only/hooks/use-update-search-params';
 import type { Document, Role, Subscription } from '@documenso/prisma/client';
 import { Button } from '@documenso/ui/primitives/button';
+import type { DataTableColumnDef } from '@documenso/ui/primitives/data-table';
 import { DataTable } from '@documenso/ui/primitives/data-table';
 import { DataTablePagination } from '@documenso/ui/primitives/data-table-pagination';
 import { Input } from '@documenso/ui/primitives/input';
@@ -54,6 +55,63 @@ export const UsersDataTable = ({
   const [searchString, setSearchString] = useState('');
   const debouncedSearchString = useDebouncedValue(searchString, 1000);
 
+  const columns = useMemo(() => {
+    return [
+      {
+        header: 'ID',
+        accessorKey: 'id',
+        cell: ({ row }) => <div>{row.original.id}</div>,
+      },
+      {
+        header: _(msg`Name`),
+        accessorKey: 'name',
+        cell: ({ row }) => <div>{row.original.name}</div>,
+      },
+      {
+        header: _(msg`Email`),
+        accessorKey: 'email',
+        cell: ({ row }) => <div>{row.original.email}</div>,
+      },
+      {
+        header: _(msg`Roles`),
+        accessorKey: 'roles',
+        cell: ({ row }) => row.original.roles.join(', '),
+      },
+      {
+        header: _(msg`Subscription`),
+        accessorKey: 'subscription',
+        cell: ({ row }) => {
+          const foundIndividualSubscription = (row.original.Subscription ?? []).find((sub) =>
+            individualPriceIds.includes(sub.priceId),
+          );
+
+          return foundIndividualSubscription?.status ?? 'NONE';
+        },
+      },
+      {
+        header: _(msg`Documents`),
+        accessorKey: 'documents',
+        cell: ({ row }) => {
+          return <div>{row.original.Document.length}</div>;
+        },
+      },
+      {
+        header: '',
+        accessorKey: 'edit',
+        cell: ({ row }) => {
+          return (
+            <Button className="w-24" asChild>
+              <Link href={`/admin/users/${row.original.id}`}>
+                <Edit className="-ml-1 mr-2 h-4 w-4" />
+                Edit
+              </Link>
+            </Button>
+          );
+        },
+      },
+    ] satisfies DataTableColumnDef<(typeof users)[number]>[];
+  }, [individualPriceIds]);
+
   useEffect(() => {
     startTransition(() => {
       updateSearchParams({
@@ -88,60 +146,7 @@ export const UsersDataTable = ({
         onChange={handleChange}
       />
       <DataTable
-        columns={[
-          {
-            header: 'ID',
-            accessorKey: 'id',
-            cell: ({ row }) => <div>{row.original.id}</div>,
-          },
-          {
-            header: _(msg`Name`),
-            accessorKey: 'name',
-            cell: ({ row }) => <div>{row.original.name}</div>,
-          },
-          {
-            header: _(msg`Email`),
-            accessorKey: 'email',
-            cell: ({ row }) => <div>{row.original.email}</div>,
-          },
-          {
-            header: _(msg`Roles`),
-            accessorKey: 'roles',
-            cell: ({ row }) => row.original.roles.join(', '),
-          },
-          {
-            header: _(msg`Subscription`),
-            accessorKey: 'subscription',
-            cell: ({ row }) => {
-              const foundIndividualSubscription = (row.original.Subscription ?? []).find((sub) =>
-                individualPriceIds.includes(sub.priceId),
-              );
-
-              return foundIndividualSubscription?.status ?? 'NONE';
-            },
-          },
-          {
-            header: _(msg`Documents`),
-            accessorKey: 'documents',
-            cell: ({ row }) => {
-              return <div>{row.original.Document.length}</div>;
-            },
-          },
-          {
-            header: '',
-            accessorKey: 'edit',
-            cell: ({ row }) => {
-              return (
-                <Button className="w-24" asChild>
-                  <Link href={`/admin/users/${row.original.id}`}>
-                    <Edit className="-ml-1 mr-2 h-4 w-4" />
-                    Edit
-                  </Link>
-                </Button>
-              );
-            },
-          },
-        ]}
+        columns={columns}
         data={users}
         perPage={perPage}
         currentPage={page}

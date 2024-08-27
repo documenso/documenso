@@ -1,5 +1,7 @@
 'use client';
 
+import { useMemo } from 'react';
+
 import Link from 'next/link';
 
 import { Plural, Trans, msg } from '@lingui/macro';
@@ -9,6 +11,7 @@ import { DateTime } from 'luxon';
 
 import { trpc } from '@documenso/trpc/react';
 import { Button } from '@documenso/ui/primitives/button';
+import type { DataTableColumnDef } from '@documenso/ui/primitives/data-table';
 import { DataTable } from '@documenso/ui/primitives/data-table';
 import { DataTablePagination } from '@documenso/ui/primitives/data-table-pagination';
 import { Skeleton } from '@documenso/ui/primitives/skeleton';
@@ -46,72 +49,76 @@ export const TeamBillingInvoicesDataTable = ({ teamId }: TeamBillingInvoicesData
     totalPages: 1,
   };
 
+  const columns = useMemo(() => {
+    return [
+      {
+        header: _(msg`Invoice`),
+        accessorKey: 'created',
+        cell: ({ row }) => (
+          <div className="flex max-w-xs items-center gap-2">
+            <File className="h-6 w-6" />
+
+            <div className="flex flex-col text-sm">
+              <span className="text-foreground/80 font-semibold">
+                {DateTime.fromSeconds(row.original.created).toFormat('MMMM yyyy')}
+              </span>
+              <span className="text-muted-foreground">
+                <Plural value={row.original.quantity} one="# Seat" other="# Seats" />
+              </span>
+            </div>
+          </div>
+        ),
+      },
+      {
+        header: _(msg`Status`),
+        accessorKey: 'status',
+        cell: ({ row }) => {
+          const { status, paid } = row.original;
+
+          if (!status) {
+            return paid ? <Trans>Paid</Trans> : <Trans>Unpaid</Trans>;
+          }
+
+          return status.charAt(0).toUpperCase() + status.slice(1);
+        },
+      },
+      {
+        header: _(msg`Amount`),
+        accessorKey: 'total',
+        cell: ({ row }) => formatCurrency(row.original.currency, row.original.total / 100),
+      },
+      {
+        id: 'actions',
+        cell: ({ row }) => (
+          <div className="flex justify-end space-x-2">
+            <Button
+              variant="outline"
+              asChild
+              disabled={typeof row.original.hostedInvoicePdf !== 'string'}
+            >
+              <Link href={row.original.hostedInvoicePdf ?? ''} target="_blank">
+                <Trans>View</Trans>
+              </Link>
+            </Button>
+
+            <Button
+              variant="outline"
+              asChild
+              disabled={typeof row.original.hostedInvoicePdf !== 'string'}
+            >
+              <Link href={row.original.invoicePdf ?? ''} target="_blank">
+                <Trans>Download</Trans>
+              </Link>
+            </Button>
+          </div>
+        ),
+      },
+    ] satisfies DataTableColumnDef<(typeof results)['data'][number]>[];
+  }, []);
+
   return (
     <DataTable
-      columns={[
-        {
-          header: _(msg`Invoice`),
-          accessorKey: 'created',
-          cell: ({ row }) => (
-            <div className="flex max-w-xs items-center gap-2">
-              <File className="h-6 w-6" />
-
-              <div className="flex flex-col text-sm">
-                <span className="text-foreground/80 font-semibold">
-                  {DateTime.fromSeconds(row.original.created).toFormat('MMMM yyyy')}
-                </span>
-                <span className="text-muted-foreground">
-                  <Plural value={row.original.quantity} one="# Seat" other="# Seats" />
-                </span>
-              </div>
-            </div>
-          ),
-        },
-        {
-          header: _(msg`Status`),
-          accessorKey: 'status',
-          cell: ({ row }) => {
-            const { status, paid } = row.original;
-
-            if (!status) {
-              return paid ? <Trans>Paid</Trans> : <Trans>Unpaid</Trans>;
-            }
-
-            return status.charAt(0).toUpperCase() + status.slice(1);
-          },
-        },
-        {
-          header: _(msg`Amount`),
-          accessorKey: 'total',
-          cell: ({ row }) => formatCurrency(row.original.currency, row.original.total / 100),
-        },
-        {
-          id: 'actions',
-          cell: ({ row }) => (
-            <div className="flex justify-end space-x-2">
-              <Button
-                variant="outline"
-                asChild
-                disabled={typeof row.original.hostedInvoicePdf !== 'string'}
-              >
-                <Link href={row.original.hostedInvoicePdf ?? ''} target="_blank">
-                  <Trans>View</Trans>
-                </Link>
-              </Button>
-
-              <Button
-                variant="outline"
-                asChild
-                disabled={typeof row.original.hostedInvoicePdf !== 'string'}
-              >
-                <Link href={row.original.invoicePdf ?? ''} target="_blank">
-                  <Trans>Download</Trans>
-                </Link>
-              </Button>
-            </div>
-          ),
-        },
-      ]}
+      columns={columns}
       data={results.data}
       perPage={results.perPage}
       currentPage={results.currentPage}
