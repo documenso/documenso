@@ -170,7 +170,7 @@ msgstr "Checkbox"
 msgid "Checkbox values"
 msgstr "Checkbox values"
 
-#: packages/ui/primitives/data-table.tsx:154
+#: packages/ui/primitives/data-table.tsx:156
 msgid "Clear filters"
 msgstr "Clear filters"
 
@@ -393,7 +393,7 @@ msgstr "No recipients with this role"
 msgid "No restrictions"
 msgstr "No restrictions"
 
-#: packages/ui/primitives/data-table.tsx:146
+#: packages/ui/primitives/data-table.tsx:148
 msgid "No results found"
 msgstr "No results found"
 
@@ -567,7 +567,7 @@ msgstr "Some signers have not been assigned a signature field. Please assign at 
 msgid "Something went wrong"
 msgstr "Something went wrong"
 
-#: packages/ui/primitives/data-table.tsx:134
+#: packages/ui/primitives/data-table.tsx:136
 msgid "Something went wrong."
 msgstr "Something went wrong."
 
