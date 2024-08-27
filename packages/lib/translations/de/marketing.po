@@ -8,7 +8,7 @@ msgstr ""
 "Language: de\n"
 "Project-Id-Version: documenso-app\n"
 "Report-Msgid-Bugs-To: \n"
-"PO-Revision-Date: 2024-08-20 14:03\n"
+"PO-Revision-Date: 2024-08-27 12:05\n"
 "Last-Translator: \n"
 "Language-Team: German\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
@@ -36,7 +36,7 @@ msgstr "Eine 10x bessere Signaturerfahrung."
 
 #: apps/marketing/src/app/(marketing)/singleplayer/client.tsx:51
 msgid "Add document"
-msgstr ""
+msgstr "Dokument hinzufügen"
 
 #: apps/marketing/src/components/(marketing)/pricing-table.tsx:201
 msgid "Add More Users for {0}"
@@ -179,7 +179,7 @@ msgstr "Beteiligung"
 
 #: apps/marketing/src/app/(marketing)/singleplayer/client.tsx:64
 msgid "Enter your details."
-msgstr ""
+msgstr "Geben Sie Ihre Details ein."
 
 #: apps/marketing/src/components/(marketing)/enterprise.tsx:16
 msgid "Enterprise Compliance, License or Technical Needs?"
@@ -451,7 +451,7 @@ msgstr "Shop"
 
 #: apps/marketing/src/app/(marketing)/singleplayer/client.tsx:63
 msgid "Sign"
-msgstr ""
+msgstr "Signieren"
 
 #: apps/marketing/src/components/(marketing)/header.tsx:72
 #: apps/marketing/src/components/(marketing)/mobile-navigation.tsx:61
@@ -568,7 +568,7 @@ msgstr "Bis zu 10 Empfänger pro Dokument"
 
 #: apps/marketing/src/app/(marketing)/singleplayer/client.tsx:52
 msgid "Upload a document and add fields."
-msgstr ""
+msgstr "Laden Sie ein Dokument hoch und fügen Sie Felder hinzu."
 
 #: apps/marketing/src/app/(marketing)/pricing/page.tsx:123
 msgid "Using our hosted version is the easiest way to get started, you can simply subscribe and start signing your documents. We take care of the infrastructure, so you can focus on your business. Additionally, when using our hosted version you benefit from our trusted signing certificates which helps you to build trust with your customers."

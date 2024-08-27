@@ -8,7 +8,7 @@ msgstr ""
 "Language: de\n"
 "Project-Id-Version: documenso-app\n"
 "Report-Msgid-Bugs-To: \n"
-"PO-Revision-Date: 2024-08-20 14:03\n"
+"PO-Revision-Date: 2024-08-27 12:05\n"
 "Last-Translator: \n"
 "Language-Team: German\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
@@ -1094,7 +1094,7 @@ msgstr ""
 
 #: apps/web/src/app/(dashboard)/admin/documents/[id]/super-delete-document-dialog.tsx:135
 #~ msgid "Deleting document"
-#~ msgstr ""
+#~ msgstr "Deleting document"
 
 #: apps/web/src/app/(dashboard)/settings/security/activity/user-security-activity-data-table.tsx:77
 msgid "Device"
@@ -1625,7 +1625,7 @@ msgstr ""
 
 #: apps/web/src/app/(internal)/%5F%5Fhtmltopdf/certificate/page.tsx:40
 #~ msgid "I am the owner of this document"
-#~ msgstr ""
+#~ msgstr "I am the owner of this document"
 
 #: apps/web/src/components/(dashboard)/settings/token/delete-token-dialog.tsx:186
 #: apps/web/src/components/(dashboard)/settings/webhooks/delete-webhook-dialog.tsx:173
@@ -2688,7 +2688,7 @@ msgstr ""
 
 #: apps/web/src/app/(signing)/sign/[token]/signature-field.tsx:219
 #~ msgid "Sign as <0>{0} <1>({1})</1></0>"
-#~ msgstr ""
+#~ msgstr "Sign as <0>{0} <1>({1})</1></0>"
 
 #: apps/web/src/app/(signing)/sign/[token]/name-field.tsx:183
 msgid "Sign as<0>{0} <1>({1})</1></0>"
@@ -4073,7 +4073,7 @@ msgstr ""
 
 #: apps/web/src/app/(dashboard)/settings/billing/page.tsx:92
 #~ msgid "You are currently subscribed to <0>{0}</0>"
-#~ msgstr ""
+#~ msgstr "You are currently subscribed to <0>{0}</0>"
 
 #: apps/web/src/components/(teams)/dialogs/update-team-member-dialog.tsx:148
 msgid "You are currently updating <0>{teamMemberName}.</0>"
@@ -4121,7 +4121,7 @@ msgstr ""
 
 #: apps/web/src/app/(dashboard)/settings/billing/page.tsx:97
 #~ msgid "You currently have an active plan"
-#~ msgstr ""
+#~ msgstr "You currently have an active plan"
 
 #: apps/web/src/app/(dashboard)/settings/billing/billing-portal-button.tsx:45
 msgid "You do not currently have a customer record, this should not happen. Please contact support for assistance."
@@ -4197,7 +4197,7 @@ msgstr ""
 
 #: apps/web/src/components/(teams)/dialogs/transfer-team-dialog.tsx:80
 #~ msgid "You must enter '{confirmTransferMessage}' to proceed"
-#~ msgstr ""
+#~ msgstr "You must enter '{confirmTransferMessage}' to proceed"
 
 #: apps/web/src/components/(dashboard)/settings/token/delete-token-dialog.tsx:60
 #: apps/web/src/components/(dashboard)/settings/webhooks/delete-webhook-dialog.tsx:58
