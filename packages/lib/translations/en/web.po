@@ -662,7 +662,7 @@ msgstr "By enabling 2FA, you will be required to enter a code from your authenti
 #: apps/web/src/app/(signing)/sign/[token]/name-field.tsx:215
 #: apps/web/src/app/(signing)/sign/[token]/number-field.tsx:327
 #: apps/web/src/app/(signing)/sign/[token]/sign-dialog.tsx:110
-#: apps/web/src/app/(signing)/sign/[token]/signature-field.tsx:253
+#: apps/web/src/app/(signing)/sign/[token]/signature-field.tsx:250
 #: apps/web/src/app/(signing)/sign/[token]/text-field.tsx:333
 #: apps/web/src/app/(teams)/t/[teamUrl]/settings/team-transfer-status.tsx:121
 #: apps/web/src/components/(dashboard)/settings/token/delete-token-dialog.tsx:176
@@ -2671,15 +2671,19 @@ msgstr "Show templates in your team public profile for your audience to sign and
 #: apps/web/src/app/(signing)/sign/[token]/document-action-auth-2fa.tsx:182
 #: apps/web/src/app/(signing)/sign/[token]/name-field.tsx:224
 #: apps/web/src/app/(signing)/sign/[token]/sign-dialog.tsx:121
-#: apps/web/src/app/(signing)/sign/[token]/signature-field.tsx:262
+#: apps/web/src/app/(signing)/sign/[token]/signature-field.tsx:259
 #: apps/web/src/components/ui/user-profile-skeleton.tsx:75
 #: apps/web/src/components/ui/user-profile-timur.tsx:81
 msgid "Sign"
 msgstr "Sign"
 
 #: apps/web/src/app/(signing)/sign/[token]/signature-field.tsx:219
-msgid "Sign as <0>{0} <1>({1})</1></0>"
-msgstr "Sign as <0>{0} <1>({1})</1></0>"
+msgid "Sign as {0} <0>({1})</0>"
+msgstr "Sign as {0} <0>({1})</0>"
+
+#: apps/web/src/app/(signing)/sign/[token]/signature-field.tsx:219
+#~ msgid "Sign as <0>{0} <1>({1})</1></0>"
+#~ msgstr "Sign as <0>{0} <1>({1})</1></0>"
 
 #: apps/web/src/app/(signing)/sign/[token]/name-field.tsx:183
 msgid "Sign as<0>{0} <1>({1})</1></0>"
@@ -2730,7 +2734,7 @@ msgstr "Sign Up with OIDC"
 #: apps/web/src/app/(dashboard)/admin/documents/[id]/recipient-item.tsx:170
 #: apps/web/src/app/(recipient)/d/[token]/sign-direct-template.tsx:338
 #: apps/web/src/app/(signing)/sign/[token]/signature-field.tsx:197
-#: apps/web/src/app/(signing)/sign/[token]/signature-field.tsx:230
+#: apps/web/src/app/(signing)/sign/[token]/signature-field.tsx:227
 #: apps/web/src/components/forms/profile.tsx:132
 msgid "Signature"
 msgstr "Signature"
