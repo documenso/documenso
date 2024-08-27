@@ -4376,4 +4376,3 @@ msgstr ""
 #: apps/web/src/app/(teams)/t/[teamUrl]/settings/tokens/page.tsx:87
 msgid "Your tokens will be shown here once you create them."
 msgstr ""
-
