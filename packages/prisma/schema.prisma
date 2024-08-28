@@ -149,6 +149,7 @@ model VerificationToken {
   secondaryId String   @unique @default(cuid())
   identifier  String
   token       String   @unique
+  completed   Boolean  @default(false)
   expires     DateTime
   createdAt   DateTime @default(now())
   userId      Int
@@ -546,6 +547,7 @@ model TeamEmailVerification {
   name      String
   email     String
   token     String   @unique
+  completed Boolean  @default(false)
   expiresAt DateTime
   createdAt DateTime @default(now())
 
@@ -558,6 +560,7 @@ model TeamTransferVerification {
   name                String
   email               String
   token               String   @unique
+  completed           Boolean  @default(false)
   expiresAt           DateTime
   createdAt           DateTime @default(now())
   clearPaymentMethods Boolean  @default(false)

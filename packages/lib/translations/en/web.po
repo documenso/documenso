@@ -840,8 +840,10 @@ msgstr "Content"
 
 #: apps/web/src/app/(dashboard)/settings/security/passkeys/create-passkey-dialog.tsx:252
 #: apps/web/src/app/(unauthenticated)/team/invite/[token]/page.tsx:135
-#: apps/web/src/app/(unauthenticated)/team/verify/email/[token]/page.tsx:108
-#: apps/web/src/app/(unauthenticated)/team/verify/transfer/[token]/page.tsx:99
+#: apps/web/src/app/(unauthenticated)/team/verify/email/[token]/page.tsx:69
+#: apps/web/src/app/(unauthenticated)/team/verify/email/[token]/page.tsx:143
+#: apps/web/src/app/(unauthenticated)/team/verify/transfer/[token]/page.tsx:72
+#: apps/web/src/app/(unauthenticated)/team/verify/transfer/[token]/page.tsx:122
 #: apps/web/src/components/templates/manage-public-template-dialog.tsx:330
 msgid "Continue"
 msgstr "Continue"
@@ -1401,7 +1403,7 @@ msgstr "Email address"
 msgid "Email Address"
 msgstr "Email Address"
 
-#: apps/web/src/app/(unauthenticated)/verify-email/[token]/page.tsx:113
+#: apps/web/src/app/(unauthenticated)/verify-email/[token]/client.tsx:36
 msgid "Email Confirmed!"
 msgstr "Email Confirmed!"
 
@@ -1572,9 +1574,9 @@ msgstr "General"
 msgid "Go Back"
 msgstr "Go Back"
 
-#: apps/web/src/app/(unauthenticated)/verify-email/[token]/page.tsx:64
-#: apps/web/src/app/(unauthenticated)/verify-email/[token]/page.tsx:95
-#: apps/web/src/app/(unauthenticated)/verify-email/[token]/page.tsx:124
+#: apps/web/src/app/(unauthenticated)/verify-email/[token]/client.tsx:48
+#: apps/web/src/app/(unauthenticated)/verify-email/[token]/page.tsx:73
+#: apps/web/src/app/(unauthenticated)/verify-email/[token]/page.tsx:101
 #: apps/web/src/app/(unauthenticated)/verify-email/page.tsx:38
 msgid "Go back home"
 msgstr "Go back home"
@@ -1725,7 +1727,7 @@ msgstr "Invoice"
 msgid "It looks like {0} hasn't added any documents to their profile yet."
 msgstr "It looks like {0} hasn't added any documents to their profile yet."
 
-#: apps/web/src/app/(unauthenticated)/verify-email/[token]/page.tsx:87
+#: apps/web/src/app/(unauthenticated)/verify-email/[token]/page.tsx:93
 msgid "It seems that the provided token has expired. We've just sent you another token, please check your email and try again."
 msgstr "It seems that the provided token has expired. We've just sent you another token, please check your email and try again."
 
@@ -1733,7 +1735,7 @@ msgstr "It seems that the provided token has expired. We've just sent you anothe
 msgid "It seems that there is no token provided, if you are trying to verify your email please follow the link in your email."
 msgstr "It seems that there is no token provided, if you are trying to verify your email please follow the link in your email."
 
-#: apps/web/src/app/(unauthenticated)/verify-email/[token]/page.tsx:31
+#: apps/web/src/app/(unauthenticated)/verify-email/[token]/page.tsx:40
 msgid "It seems that there is no token provided. Please check your email and try again."
 msgstr "It seems that there is no token provided. Please check your email and try again."
 
@@ -2020,7 +2022,7 @@ msgstr "No recipients"
 msgid "No results found."
 msgstr "No results found."
 
-#: apps/web/src/app/(unauthenticated)/verify-email/[token]/page.tsx:28
+#: apps/web/src/app/(unauthenticated)/verify-email/[token]/page.tsx:37
 msgid "No token provided"
 msgstr "No token provided"
 
@@ -2800,7 +2802,7 @@ msgstr "Site Settings"
 #: apps/web/src/app/(signing)/sign/[token]/signing-auth-page.tsx:43
 #: apps/web/src/app/(teams)/t/[teamUrl]/layout-billing-banner.tsx:53
 #: apps/web/src/app/(teams)/t/[teamUrl]/settings/team-email-dropdown.tsx:39
-#: apps/web/src/app/(unauthenticated)/verify-email/[token]/page.tsx:52
+#: apps/web/src/app/(unauthenticated)/verify-email/[token]/page.tsx:61
 #: apps/web/src/components/(teams)/dialogs/create-team-checkout-dialog.tsx:50
 #: apps/web/src/components/(teams)/dialogs/create-team-checkout-dialog.tsx:99
 #: apps/web/src/components/(teams)/dialogs/invite-team-member-dialog.tsx:210
@@ -2813,11 +2815,11 @@ msgstr "Site Settings"
 msgid "Something went wrong"
 msgstr "Something went wrong"
 
-#: apps/web/src/app/(unauthenticated)/team/verify/transfer/[token]/page.tsx:75
+#: apps/web/src/app/(unauthenticated)/team/verify/transfer/[token]/page.tsx:98
 msgid "Something went wrong while attempting to transfer the ownership of team <0>{0}</0> to your. Please try again later or contact support."
 msgstr "Something went wrong while attempting to transfer the ownership of team <0>{0}</0> to your. Please try again later or contact support."
 
-#: apps/web/src/app/(unauthenticated)/team/verify/email/[token]/page.tsx:85
+#: apps/web/src/app/(unauthenticated)/team/verify/email/[token]/page.tsx:120
 msgid "Something went wrong while attempting to verify your email address for <0>{0}</0>. Please try again later."
 msgstr "Something went wrong while attempting to verify your email address for <0>{0}</0>. Please try again later."
 
@@ -2927,15 +2929,19 @@ msgstr "Team email"
 msgid "Team Email"
 msgstr "Team Email"
 
+#: apps/web/src/app/(unauthenticated)/team/verify/email/[token]/page.tsx:57
+msgid "Team email already verified!"
+msgstr "Team email already verified!"
+
 #: apps/web/src/components/(teams)/dialogs/remove-team-email-dialog.tsx:58
 msgid "Team email has been removed"
 msgstr "Team email has been removed"
 
-#: apps/web/src/app/(unauthenticated)/team/verify/email/[token]/page.tsx:81
+#: apps/web/src/app/(unauthenticated)/team/verify/email/[token]/page.tsx:116
 msgid "Team email verification"
 msgstr "Team email verification"
 
-#: apps/web/src/app/(unauthenticated)/team/verify/email/[token]/page.tsx:97
+#: apps/web/src/app/(unauthenticated)/team/verify/email/[token]/page.tsx:132
 msgid "Team email verified!"
 msgstr "Team email verified!"
 
@@ -2970,11 +2976,15 @@ msgstr "Team Only"
 msgid "Team only templates are not linked anywhere and are visible only to your team."
 msgstr "Team only templates are not linked anywhere and are visible only to your team."
 
-#: apps/web/src/app/(unauthenticated)/team/verify/transfer/[token]/page.tsx:71
+#: apps/web/src/app/(unauthenticated)/team/verify/transfer/[token]/page.tsx:94
 msgid "Team ownership transfer"
 msgstr "Team ownership transfer"
 
-#: apps/web/src/app/(unauthenticated)/team/verify/transfer/[token]/page.tsx:87
+#: apps/web/src/app/(unauthenticated)/team/verify/transfer/[token]/page.tsx:60
+msgid "Team ownership transfer already completed!"
+msgstr "Team ownership transfer already completed!"
+
+#: apps/web/src/app/(unauthenticated)/team/verify/transfer/[token]/page.tsx:110
 msgid "Team ownership transferred!"
 msgstr "Team ownership transferred!"
 
@@ -3104,7 +3114,7 @@ msgstr "The document will be immediately sent to recipients if this is checked."
 msgid "The events that will trigger a webhook to be sent to your URL."
 msgstr "The events that will trigger a webhook to be sent to your URL."
 
-#: apps/web/src/app/(unauthenticated)/team/verify/transfer/[token]/page.tsx:91
+#: apps/web/src/app/(unauthenticated)/team/verify/transfer/[token]/page.tsx:114
 msgid "The ownership of team <0>{0}</0> has been successfully transferred to you."
 msgstr "The ownership of team <0>{0}</0> has been successfully transferred to you."
 
@@ -3950,7 +3960,7 @@ msgstr "We were unable to submit this document at this time. Please try again la
 msgid "We were unable to verify your details. Please try again or contact support"
 msgstr "We were unable to verify your details. Please try again or contact support"
 
-#: apps/web/src/app/(unauthenticated)/verify-email/[token]/page.tsx:56
+#: apps/web/src/app/(unauthenticated)/verify-email/[token]/page.tsx:65
 msgid "We were unable to verify your email. If your email is not verified already, please try again."
 msgstr "We were unable to verify your email. If your email is not verified already, please try again."
 
@@ -4126,6 +4136,14 @@ msgstr "You do not currently have a customer record, this should not happen. Ple
 msgid "You have accepted an invitation from <0>{0}</0> to join their team."
 msgstr "You have accepted an invitation from <0>{0}</0> to join their team."
 
+#: apps/web/src/app/(unauthenticated)/team/verify/transfer/[token]/page.tsx:64
+msgid "You have already completed the ownership transfer for <0>{0}</0>."
+msgstr "You have already completed the ownership transfer for <0>{0}</0>."
+
+#: apps/web/src/app/(unauthenticated)/team/verify/email/[token]/page.tsx:61
+msgid "You have already verified your email address for <0>{0}</0>."
+msgstr "You have already verified your email address for <0>{0}</0>."
+
 #: apps/web/src/app/(unauthenticated)/team/decline/[token]/page.tsx:95
 #: apps/web/src/app/(unauthenticated)/team/invite/[token]/page.tsx:100
 msgid "You have been invited by <0>{0}</0> to join their team."
@@ -4182,7 +4200,7 @@ msgstr "You have successfully revoked access."
 msgid "You have updated {teamMemberName}."
 msgstr "You have updated {teamMemberName}."
 
-#: apps/web/src/app/(unauthenticated)/team/verify/email/[token]/page.tsx:101
+#: apps/web/src/app/(unauthenticated)/team/verify/email/[token]/page.tsx:136
 msgid "You have verified your email address for <0>{0}</0>."
 msgstr "You have verified your email address for <0>{0}</0>."
 
@@ -4284,7 +4302,7 @@ msgstr "Your document has been uploaded successfully. You will be redirected to 
 msgid "Your documents"
 msgstr "Your documents"
 
-#: apps/web/src/app/(unauthenticated)/verify-email/[token]/page.tsx:117
+#: apps/web/src/app/(unauthenticated)/verify-email/[token]/client.tsx:40
 msgid "Your email has been successfully confirmed! You can now use all features of Documenso."
 msgstr "Your email has been successfully confirmed! You can now use all features of Documenso."
 
@@ -4359,7 +4377,7 @@ msgstr "Your template will be duplicated."
 msgid "Your templates has been saved successfully."
 msgstr "Your templates has been saved successfully."
 
-#: apps/web/src/app/(unauthenticated)/verify-email/[token]/page.tsx:83
+#: apps/web/src/app/(unauthenticated)/verify-email/[token]/page.tsx:89
 msgid "Your token has expired!"
 msgstr "Your token has expired!"
 

@@ -50,15 +50,50 @@ export default async function VerifyTeamEmailPage({ params: { token } }: VerifyT
     );
   }
 
+  if (teamEmailVerification.completed) {
+    return (
+      <div>
+        <h1 className="text-4xl font-semibold">
+          <Trans>Team email already verified!</Trans>
+        </h1>
+
+        <p className="text-muted-foreground mb-4 mt-2 text-sm">
+          <Trans>
+            You have already verified your email address for{' '}
+            <strong>{teamEmailVerification.team.name}</strong>.
+          </Trans>
+        </p>
+
+        <Button asChild>
+          <Link href="/">
+            <Trans>Continue</Trans>
+          </Link>
+        </Button>
+      </div>
+    );
+  }
+
   const { team } = teamEmailVerification;
 
   let isTeamEmailVerificationError = false;
 
   try {
     await prisma.$transaction([
+      prisma.teamEmailVerification.updateMany({
+        where: {
+          teamId: team.id,
+          email: teamEmailVerification.email,
+        },
+        data: {
+          completed: true,
+        },
+      }),
       prisma.teamEmailVerification.deleteMany({
         where: {
           teamId: team.id,
+          expiresAt: {
+            lt: new Date(),
+          },
         },
       }),
       prisma.teamEmail.create({
