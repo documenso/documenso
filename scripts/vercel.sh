@@ -16,7 +16,7 @@ function build_webapp() {
   remap_webapp_env
   remap_database_integration
 
-  npm run prisma:generate --workspace=@documenso/prisma
+  npm run prisma:generate-sql --workspace=@documenso/prisma
   npm run prisma:migrate-deploy --workspace=@documenso/prisma
 
   if [[ "$VERCEL_ENV" != "production" ]]; then
@@ -43,7 +43,7 @@ function build_marketing() {
   remap_marketing_env
   remap_database_integration
 
-  npm run prisma:generate --workspace=@documenso/prisma
+  npm run prisma:generate-sql --workspace=@documenso/prisma
   npm run build -- --filter @documenso/marketing
 }
 

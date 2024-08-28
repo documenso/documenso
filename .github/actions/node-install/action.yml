@@ -34,6 +34,6 @@ runs:
       shell: bash
       run: |
         npm ci --no-audit
-        npm run prisma:generate
+        npm run prisma:generate-sql
       env:
         HUSKY: '0'
