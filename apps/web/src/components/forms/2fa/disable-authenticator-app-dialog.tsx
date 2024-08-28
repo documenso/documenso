@@ -35,8 +35,8 @@ import { PinInput, PinInputGroup, PinInputSlot } from '@documenso/ui/primitives/
 import { useToast } from '@documenso/ui/primitives/use-toast';
 
 export const ZDisable2FAForm = z.object({
-  backupCode: z.string(),
-  totpCode: z.string(),
+  totpCode: z.string().trim().optional(),
+  backupCode: z.string().trim().optional(),
 });
 
 export type TDisable2FAForm = z.infer<typeof ZDisable2FAForm>;
@@ -78,7 +78,7 @@ export const DisableAuthenticatorAppDialog = () => {
 
   const onDisable2FAFormSubmit = async ({ totpCode, backupCode }: TDisable2FAForm) => {
     try {
-      await disable2FA({ token: totpCode });
+      await disable2FA({ totpCode, backupCode });
 
       toast({
         title: _(msg`Two-factor authentication disabled`),

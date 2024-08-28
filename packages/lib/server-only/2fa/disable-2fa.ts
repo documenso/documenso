@@ -8,19 +8,25 @@ import { validateTwoFactorAuthentication } from './validate-2fa';
 
 type DisableTwoFactorAuthenticationOptions = {
   user: User;
-  token: string;
+  totpCode?: string;
+  backupCode?: string;
   requestMetadata?: RequestMetadata;
 };
 
 export const disableTwoFactorAuthentication = async ({
-  token,
+  totpCode,
+  backupCode,
   user,
   requestMetadata,
 }: DisableTwoFactorAuthenticationOptions) => {
-  let isValid = await validateTwoFactorAuthentication({ totpCode: token, user });
+  let isValid = false;
 
-  if (!isValid) {
-    isValid = await validateTwoFactorAuthentication({ backupCode: token, user });
+  if (totpCode) {
+    isValid = await validateTwoFactorAuthentication({ totpCode, user });
+  }
+
+  if (backupCode) {
+    isValid = await validateTwoFactorAuthentication({ backupCode, user });
   }
 
   if (!isValid) {

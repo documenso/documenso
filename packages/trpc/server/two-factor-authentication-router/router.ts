@@ -65,7 +65,8 @@ export const twoFactorAuthenticationRouter = router({
 
         return await disableTwoFactorAuthentication({
           user,
-          token: input.token,
+          totpCode: input.totpCode,
+          backupCode: input.backupCode,
           requestMetadata: extractNextApiRequestMetadata(ctx.req),
         });
       } catch (err) {
