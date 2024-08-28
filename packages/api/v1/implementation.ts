@@ -899,16 +899,8 @@ export const ApiContractV1Implementation = createNextRoute(ApiContractV1, {
     try {
       const createdFields = await Promise.all(
         fields.map(async (fieldData) => {
-          const {
-            recipientId = -1,
-            type,
-            pageNumber,
-            pageWidth,
-            pageHeight,
-            pageX,
-            pageY,
-            fieldMeta,
-          } = fieldData;
+          const { recipientId, type, pageNumber, pageWidth, pageHeight, pageX, pageY, fieldMeta } =
+            fieldData;
 
           if (pageNumber <= 0) {
             throw new Error('Invalid page number');
