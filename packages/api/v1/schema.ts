@@ -293,7 +293,7 @@ export type TSuccessfulRecipientResponseSchema = z.infer<typeof ZSuccessfulRecip
 /**
  * Fields
  */
-export const ZCreateFieldMutationSchema = z.object({
+const ZCreateFieldSchema = z.object({
   recipientId: z.number(),
   type: z.nativeEnum(FieldType),
   pageNumber: z.number(),
@@ -301,12 +301,20 @@ export const ZCreateFieldMutationSchema = z.object({
   pageY: z.number(),
   pageWidth: z.number(),
   pageHeight: z.number(),
-  fieldMeta: ZFieldMetaSchema,
+  fieldMeta: ZFieldMetaSchema.openapi({}),
 });
+
+export const ZCreateFieldMutationSchema = z.union([
+  ZCreateFieldSchema,
+  z.array(ZCreateFieldSchema),
+]);
 
 export type TCreateFieldMutationSchema = z.infer<typeof ZCreateFieldMutationSchema>;
 
-export const ZUpdateFieldMutationSchema = ZCreateFieldMutationSchema.partial();
+export const ZUpdateFieldMutationSchema = z.union([
+  ZCreateFieldSchema.partial(),
+  z.array(ZCreateFieldSchema.partial()),
+]);
 
 export type TUpdateFieldMutationSchema = z.infer<typeof ZUpdateFieldMutationSchema>;
 
@@ -314,7 +322,7 @@ export const ZDeleteFieldMutationSchema = null;
 
 export type TDeleteFieldMutationSchema = typeof ZDeleteFieldMutationSchema;
 
-export const ZSuccessfulFieldResponseSchema = z.object({
+const ZSuccessfulFieldSchema = z.object({
   id: z.number(),
   documentId: z.number(),
   recipientId: z.number(),
@@ -328,6 +336,11 @@ export const ZSuccessfulFieldResponseSchema = z.object({
   fieldMeta: ZFieldMetaSchema,
   inserted: z.boolean(),
 });
+
+export const ZSuccessfulFieldResponseSchema = z.union([
+  ZSuccessfulFieldSchema,
+  z.array(ZSuccessfulFieldSchema),
+]);
 
 export type TSuccessfulFieldResponseSchema = z.infer<typeof ZSuccessfulFieldResponseSchema>;
 

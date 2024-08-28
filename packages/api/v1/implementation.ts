@@ -870,17 +870,7 @@ export const ApiContractV1Implementation = createNextRoute(ApiContractV1, {
 
   createField: authenticatedMiddleware(async (args, user, team) => {
     const { id: documentId } = args.params;
-    const { recipientId, type, pageNumber, pageWidth, pageHeight, pageX, pageY, fieldMeta } =
-      args.body;
-
-    if (pageNumber <= 0) {
-      return {
-        status: 400,
-        body: {
-          message: 'Invalid page number',
-        },
-      };
-    }
+    const fields = Array.isArray(args.body) ? args.body : [args.body];
 
     const document = await getDocumentById({
       id: Number(documentId),
@@ -906,66 +896,72 @@ export const ApiContractV1Implementation = createNextRoute(ApiContractV1, {
       };
     }
 
-    const recipient = await getRecipientById({
-      id: Number(recipientId),
-      documentId: Number(documentId),
-    }).catch(() => null);
-
-    if (!recipient) {
-      return {
-        status: 404,
-        body: {
-          message: 'Recipient not found',
-        },
-      };
-    }
-
-    if (recipient.signingStatus === SigningStatus.SIGNED) {
-      return {
-        status: 400,
-        body: {
-          message: 'Recipient has already signed the document',
-        },
-      };
-    }
-
     try {
-      const field = await createField({
-        documentId: Number(documentId),
-        recipientId: Number(recipientId),
-        userId: user.id,
-        teamId: team?.id,
-        type,
-        pageNumber,
-        pageX,
-        pageY,
-        pageWidth,
-        pageHeight,
-        fieldMeta,
-        requestMetadata: extractNextApiRequestMetadata(args.req),
-      });
+      const createdFields = await Promise.all(
+        fields.map(async (fieldData) => {
+          const {
+            recipientId = -1,
+            type,
+            pageNumber,
+            pageWidth,
+            pageHeight,
+            pageX,
+            pageY,
+            fieldMeta,
+          } = fieldData;
 
-      const remappedField = {
-        id: field.id,
-        documentId: field.documentId,
-        recipientId: field.recipientId ?? -1,
-        type: field.type,
-        pageNumber: field.page,
-        pageX: Number(field.positionX),
-        pageY: Number(field.positionY),
-        pageWidth: Number(field.width),
-        pageHeight: Number(field.height),
-        customText: field.customText,
-        fieldMeta: ZFieldMetaSchema.parse(field.fieldMeta),
-        inserted: field.inserted,
-      };
+          if (pageNumber <= 0) {
+            throw new Error('Invalid page number');
+          }
+
+          const recipient = await getRecipientById({
+            id: Number(recipientId),
+            documentId: Number(documentId),
+          }).catch(() => null);
+
+          if (!recipient) {
+            throw new Error('Recipient not found');
+          }
+
+          if (recipient.signingStatus === SigningStatus.SIGNED) {
+            throw new Error('Recipient has already signed the document');
+          }
+
+          const field = await createField({
+            documentId: Number(documentId),
+            recipientId: Number(recipientId),
+            userId: user.id,
+            teamId: team?.id,
+            type,
+            pageNumber,
+            pageX,
+            pageY,
+            pageWidth,
+            pageHeight,
+            fieldMeta,
+            requestMetadata: extractNextApiRequestMetadata(args.req),
+          });
+
+          return {
+            id: field.id,
+            documentId: Number(field.documentId),
+            recipientId: field.recipientId ?? -1,
+            type: field.type,
+            pageNumber: field.page,
+            pageX: Number(field.positionX),
+            pageY: Number(field.positionY),
+            pageWidth: Number(field.width),
+            pageHeight: Number(field.height),
+            customText: field.customText,
+            fieldMeta: ZFieldMetaSchema.parse(field.fieldMeta),
+            inserted: field.inserted,
+          };
+        }),
+      );
 
       return {
         status: 200,
-        body: {
-          ...remappedField,
-          documentId: Number(documentId),
-        },
+        body: createdFields,
       };
     } catch (err) {
       return AppError.toRestAPIError(err);

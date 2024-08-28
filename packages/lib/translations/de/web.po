@@ -975,7 +975,6 @@ msgstr ""
 msgid "Created on"
 msgstr ""
 
-#: apps/web/src/app/(dashboard)/settings/tokens/page.tsx:68
 #: apps/web/src/app/(dashboard)/settings/webhooks/page.tsx:89
 #: apps/web/src/app/(teams)/t/[teamUrl]/settings/tokens/page.tsx:101
 #: apps/web/src/app/(teams)/t/[teamUrl]/settings/webhooks/page.tsx:94
@@ -1020,7 +1019,7 @@ msgstr ""
 #: apps/web/src/app/(dashboard)/documents/delete-document-dialog.tsx:200
 #: apps/web/src/app/(dashboard)/settings/security/passkeys/user-passkeys-data-table-actions.tsx:177
 #: apps/web/src/app/(dashboard)/settings/security/passkeys/user-passkeys-data-table-actions.tsx:211
-#: apps/web/src/app/(dashboard)/settings/tokens/page.tsx:90
+#: apps/web/src/app/(dashboard)/settings/tokens/page.tsx:84
 #: apps/web/src/app/(dashboard)/settings/webhooks/page.tsx:104
 #: apps/web/src/app/(dashboard)/templates/data-table-action-dropdown.tsx:91
 #: apps/web/src/app/(dashboard)/templates/delete-template-dialog.tsx:90
@@ -1523,7 +1522,6 @@ msgstr ""
 msgid "Expired"
 msgstr ""
 
-#: apps/web/src/app/(dashboard)/settings/tokens/page.tsx:75
 #: apps/web/src/app/(teams)/t/[teamUrl]/settings/tokens/page.tsx:108
 msgid "Expires on <0/>"
 msgstr ""
@@ -3377,7 +3375,7 @@ msgstr ""
 msgid "Token deleted"
 msgstr ""
 
-#: apps/web/src/app/(dashboard)/settings/tokens/page.tsx:82
+#: apps/web/src/app/(dashboard)/settings/tokens/page.tsx:76
 #: apps/web/src/app/(teams)/t/[teamUrl]/settings/tokens/page.tsx:115
 msgid "Token doesn't have an expiration date"
 msgstr ""
