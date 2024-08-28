@@ -60,6 +60,13 @@ export const DisableAuthenticatorAppDialog = () => {
     resolver: zodResolver(ZDisable2FAForm),
   });
 
+  const onCloseTwoFactorDisableDialog = () => {
+    disable2FAForm.setValue('totpCode', '');
+    disable2FAForm.setValue('backupCode', '');
+
+    setIsOpen(!isOpen);
+  };
+
   const onToggleTwoFactorDisableMethodClick = () => {
     const method = twoFactorDisableMethod === 'totp' ? 'backup' : 'totp';
 
@@ -88,7 +95,7 @@ export const DisableAuthenticatorAppDialog = () => {
       });
 
       flushSync(() => {
-        setIsOpen(false);
+        onCloseTwoFactorDisableDialog();
       });
 
       router.refresh();
@@ -104,7 +111,7 @@ export const DisableAuthenticatorAppDialog = () => {
   };
 
   return (
-    <Dialog open={isOpen} onOpenChange={setIsOpen}>
+    <Dialog open={isOpen} onOpenChange={onCloseTwoFactorDisableDialog}>
       <DialogTrigger asChild={true}>
         <Button className="flex-shrink-0" variant="destructive">
           <Trans>Disable 2FA</Trans>
