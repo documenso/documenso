@@ -1,3 +1,5 @@
+import { Trans, msg } from '@lingui/macro';
+import { useLingui } from '@lingui/react';
 import {
   File,
   FileCheck,
@@ -12,6 +14,7 @@ import {
   Users,
 } from 'lucide-react';
 
+import { setupI18nSSR } from '@documenso/lib/client-only/providers/i18n.server';
 import { getDocumentStats } from '@documenso/lib/server-only/admin/get-documents-stats';
 import { getRecipientsStats } from '@documenso/lib/server-only/admin/get-recipients-stats';
 import {
@@ -27,6 +30,10 @@ import { SignerConversionChart } from './signer-conversion-chart';
 import { UserWithDocumentChart } from './user-with-document';
 
 export default async function AdminStatsPage() {
+  setupI18nSSR();
+
+  const { _ } = useLingui();
+
   const [
     usersCount,
     usersWithSubscriptionsCount,
@@ -49,64 +56,98 @@ export default async function AdminStatsPage() {
 
   return (
     <div>
-      <h2 className="text-4xl font-semibold">Instance Stats</h2>
+      <h2 className="text-4xl font-semibold">
+        <Trans>Instance Stats</Trans>
+      </h2>
 
       <div className="mt-8 grid flex-1 grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4">
-        <CardMetric icon={Users} title="Total Users" value={usersCount} />
-        <CardMetric icon={File} title="Total Documents" value={docStats.ALL} />
+        <CardMetric icon={Users} title={_(msg`Total Users`)} value={usersCount} />
+        <CardMetric icon={File} title={_(msg`Total Documents`)} value={docStats.ALL} />
         <CardMetric
           icon={UserPlus}
-          title="Active Subscriptions"
+          title={_(msg`Active Subscriptions`)}
           value={usersWithSubscriptionsCount}
         />
 
-        <CardMetric icon={FileCog} title="App Version" value={`v${process.env.APP_VERSION}`} />
+        <CardMetric
+          icon={FileCog}
+          title={_(msg`App Version`)}
+          value={`v${process.env.APP_VERSION}`}
+        />
       </div>
 
       <div className="mt-16 gap-8">
         <div>
-          <h3 className="text-3xl font-semibold">Document metrics</h3>
+          <h3 className="text-3xl font-semibold">
+            <Trans>Document metrics</Trans>
+          </h3>
 
           <div className="mb-8 mt-4 grid flex-1 grid-cols-1 gap-4 md:grid-cols-2">
-            <CardMetric icon={FileEdit} title="Drafted Documents" value={docStats.DRAFT} />
-            <CardMetric icon={FileClock} title="Pending Documents" value={docStats.PENDING} />
-            <CardMetric icon={FileCheck} title="Completed Documents" value={docStats.COMPLETED} />
+            <CardMetric icon={FileEdit} title={_(msg`Drafted Documents`)} value={docStats.DRAFT} />
+            <CardMetric
+              icon={FileClock}
+              title={_(msg`Pending Documents`)}
+              value={docStats.PENDING}
+            />
+            <CardMetric
+              icon={FileCheck}
+              title={_(msg`Completed Documents`)}
+              value={docStats.COMPLETED}
+            />
           </div>
         </div>
 
         <div>
-          <h3 className="text-3xl font-semibold">Recipients metrics</h3>
+          <h3 className="text-3xl font-semibold">
+            <Trans>Recipients metrics</Trans>
+          </h3>
 
           <div className="mb-8 mt-4 grid flex-1 grid-cols-1 gap-4 md:grid-cols-2">
             <CardMetric
               icon={UserSquare2}
-              title="Total Recipients"
+              title={_(msg`Total Recipients`)}
               value={recipientStats.TOTAL_RECIPIENTS}
             />
-            <CardMetric icon={Mail} title="Documents Received" value={recipientStats.SENT} />
-            <CardMetric icon={MailOpen} title="Documents Viewed" value={recipientStats.OPENED} />
-            <CardMetric icon={PenTool} title="Signatures Collected" value={recipientStats.SIGNED} />
+            <CardMetric
+              icon={Mail}
+              title={_(msg`Documents Received`)}
+              value={recipientStats.SENT}
+            />
+            <CardMetric
+              icon={MailOpen}
+              title={_(msg`Documents Viewed`)}
+              value={recipientStats.OPENED}
+            />
+            <CardMetric
+              icon={PenTool}
+              title={_(msg`Signatures Collected`)}
+              value={recipientStats.SIGNED}
+            />
           </div>
         </div>
       </div>
 
       <div className="mt-16">
-        <h3 className="text-3xl font-semibold">Charts</h3>
+        <h3 className="text-3xl font-semibold">
+          <Trans>Charts</Trans>
+        </h3>
         <div className="mt-5 grid grid-cols-2 gap-8">
           <UserWithDocumentChart
             data={MONTHLY_USERS_SIGNED}
-            title="MAU (created document)"
-            tooltip="Monthly Active Users: Users that created at least one Document"
+            title={_(msg`MAU (created document)`)}
+            tooltip={_(msg`Monthly Active Users: Users that created at least one Document`)}
           />
           <UserWithDocumentChart
             data={MONTHLY_USERS_SIGNED}
             completed
-            title="MAU (had document completed)"
-            tooltip="Monthly Active Users: Users that had at least one of their documents completed"
+            title={_(msg`MAU (had document completed)`)}
+            tooltip={_(
+              msg`Monthly Active Users: Users that had at least one of their documents completed`,
+            )}
           />
           <SignerConversionChart title="Signers that Signed Up" data={signerConversionMonthly} />
           <SignerConversionChart
-            title="Total Signers that Signed Up"
+            title={_(msg`Total Signers that Signed Up`)}
             data={signerConversionMonthly}
             cummulative
           />

@@ -1,3 +1,4 @@
+import type { MessageDescriptor } from '@lingui/core';
 import { z } from 'zod';
 
 import { ZFieldMetaSchema } from '@documenso/lib/types/field-meta';
@@ -58,8 +59,8 @@ export const FRIENDLY_FIELD_TYPE: Record<FieldType, string> = {
 };
 
 export interface DocumentFlowStep {
-  title: string;
-  description: string;
+  title: MessageDescriptor;
+  description: MessageDescriptor;
   stepIndex?: number;
   onBackStep?: () => unknown;
   onNextStep?: () => unknown;

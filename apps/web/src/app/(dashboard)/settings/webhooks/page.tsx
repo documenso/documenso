@@ -2,6 +2,8 @@
 
 import Link from 'next/link';
 
+import { Trans, msg } from '@lingui/macro';
+import { useLingui } from '@lingui/react';
 import { Loader } from 'lucide-react';
 import { DateTime } from 'luxon';
 
@@ -17,13 +19,15 @@ import { DeleteWebhookDialog } from '~/components/(dashboard)/settings/webhooks/
 import { LocaleDate } from '~/components/formatter/locale-date';
 
 export default function WebhookPage() {
+  const { _ } = useLingui();
+
   const { data: webhooks, isLoading } = trpc.webhook.getWebhooks.useQuery();
 
   return (
     <div>
       <SettingsHeader
-        title="Webhooks"
-        subtitle="On this page, you can create new Webhooks and manage the existing ones."
+        title={_(msg`Webhooks`)}
+        subtitle={_(msg`On this page, you can create new Webhooks and manage the existing ones.`)}
       >
         <CreateWebhookDialog />
       </SettingsHeader>
@@ -38,7 +42,9 @@ export default function WebhookPage() {
         // TODO: Perhaps add some illustrations here to make the page more engaging
         <div className="mb-4">
           <p className="text-muted-foreground mt-2 text-sm italic">
-            You have no webhooks yet. Your webhooks will be shown here once you create them.
+            <Trans>
+              You have no webhooks yet. Your webhooks will be shown here once you create them.
+            </Trans>
           </p>
         </div>
       )}
@@ -66,29 +72,37 @@ export default function WebhookPage() {
                     </h5>
 
                     <Badge variant={webhook.enabled ? 'neutral' : 'warning'} size="small">
-                      {webhook.enabled ? 'Enabled' : 'Disabled'}
+                      {webhook.enabled ? <Trans>Enabled</Trans> : <Trans>Disabled</Trans>}
                     </Badge>
                   </div>
 
                   <p className="text-muted-foreground mt-2 text-xs">
-                    Listening to{' '}
-                    {webhook.eventTriggers
-                      .map((trigger) => toFriendlyWebhookEventName(trigger))
-                      .join(', ')}
+                    <Trans>
+                      Listening to{' '}
+                      {webhook.eventTriggers
+                        .map((trigger) => toFriendlyWebhookEventName(trigger))
+                        .join(', ')}
+                    </Trans>
                   </p>
 
                   <p className="text-muted-foreground mt-2 text-xs">
-                    Created on{' '}
-                    <LocaleDate date={webhook.createdAt} format={DateTime.DATETIME_FULL} />
+                    <Trans>
+                      Created on{' '}
+                      <LocaleDate date={webhook.createdAt} format={DateTime.DATETIME_FULL} />
+                    </Trans>
                   </p>
                 </div>
 
                 <div className="mt-4 flex flex-shrink-0 gap-4 sm:mt-0">
                   <Button asChild variant="outline">
-                    <Link href={`/settings/webhooks/${webhook.id}`}>Edit</Link>
+                    <Link href={`/settings/webhooks/${webhook.id}`}>
+                      <Trans>Edit</Trans>
+                    </Link>
                   </Button>
                   <DeleteWebhookDialog webhook={webhook}>
-                    <Button variant="destructive">Delete</Button>
+                    <Button variant="destructive">
+                      <Trans>Delete</Trans>
+                    </Button>
                   </DeleteWebhookDialog>
                 </div>
               </div>

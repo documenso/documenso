@@ -1,6 +1,7 @@
 import { headers } from 'next/headers';
 import { notFound, redirect } from 'next/navigation';
 
+import { setupI18nSSR } from '@documenso/lib/client-only/providers/i18n.server';
 import { DOCUMENSO_ENCRYPTION_KEY } from '@documenso/lib/constants/crypto';
 import { getServerComponentSession } from '@documenso/lib/next-auth/get-server-component-session';
 import { getDocumentAndSenderByToken } from '@documenso/lib/server-only/document/get-document-by-token';
@@ -29,6 +30,8 @@ export type SigningPageProps = {
 };
 
 export default async function SigningPage({ params: { token } }: SigningPageProps) {
+  setupI18nSSR();
+
   if (!token) {
     return notFound();
   }

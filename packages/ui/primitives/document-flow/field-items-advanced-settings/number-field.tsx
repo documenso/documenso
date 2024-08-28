@@ -2,6 +2,8 @@
 
 import { useState } from 'react';
 
+import { Trans, msg } from '@lingui/macro';
+import { useLingui } from '@lingui/react';
 import { ChevronDown, ChevronUp } from 'lucide-react';
 
 import { validateNumberField } from '@documenso/lib/advanced-fields-validation/validate-number';
@@ -31,6 +33,8 @@ export const NumberFieldAdvancedSettings = ({
   handleFieldChange,
   handleErrors,
 }: NumberFieldAdvancedSettingsProps) => {
+  const { _ } = useLingui();
+
   const [showValidation, setShowValidation] = useState(false);
 
   const handleInput = (field: keyof NumberFieldMeta, value: string | boolean) => {
@@ -56,43 +60,51 @@ export const NumberFieldAdvancedSettings = ({
   return (
     <div className="flex flex-col gap-4">
       <div>
-        <Label>Label</Label>
+        <Label>
+          <Trans>Label</Trans>
+        </Label>
         <Input
           id="label"
           className="bg-background mt-2"
-          placeholder="Label"
+          placeholder={_(msg`Label`)}
           value={fieldState.label}
           onChange={(e) => handleFieldChange('label', e.target.value)}
         />
       </div>
       <div>
-        <Label className="mt-4">Placeholder</Label>
+        <Label className="mt-4">
+          <Trans>Placeholder</Trans>
+        </Label>
         <Input
           id="placeholder"
           className="bg-background mt-2"
-          placeholder="Placeholder"
+          placeholder={_(msg`Placeholder`)}
           value={fieldState.placeholder}
           onChange={(e) => handleFieldChange('placeholder', e.target.value)}
         />
       </div>
       <div>
-        <Label className="mt-4">Value</Label>
+        <Label className="mt-4">
+          <Trans>Value</Trans>
+        </Label>
         <Input
           id="value"
           className="bg-background mt-2"
-          placeholder="Value"
+          placeholder={_(msg`Value`)}
           value={fieldState.value}
           onChange={(e) => handleInput('value', e.target.value)}
         />
       </div>
       <div>
-        <Label>Number format</Label>
+        <Label>
+          <Trans>Number format</Trans>
+        </Label>
         <Select
           value={fieldState.numberFormat}
           onValueChange={(val) => handleInput('numberFormat', val)}
         >
           <SelectTrigger className="text-muted-foreground bg-background mt-2 w-full">
-            <SelectValue placeholder="Field format" />
+            <SelectValue placeholder={_(msg`Field format`)} />
           </SelectTrigger>
           <SelectContent position="popper">
             {numberFormatValues.map((item, index) => (
@@ -110,7 +122,9 @@ export const NumberFieldAdvancedSettings = ({
             checked={fieldState.required}
             onCheckedChange={(checked) => handleInput('required', checked)}
           />
-          <Label>Required field</Label>
+          <Label>
+            <Trans>Required field</Trans>
+          </Label>
         </div>
         <div className="flex flex-row items-center gap-2">
           <Switch
@@ -118,7 +132,9 @@ export const NumberFieldAdvancedSettings = ({
             checked={fieldState.readOnly}
             onCheckedChange={(checked) => handleInput('readOnly', checked)}
           />
-          <Label>Read only</Label>
+          <Label>
+            <Trans>Read only</Trans>
+          </Label>
         </div>
       </div>
       <Button
@@ -127,14 +143,18 @@ export const NumberFieldAdvancedSettings = ({
         onClick={() => setShowValidation((prev) => !prev)}
       >
         <span className="flex w-full flex-row justify-between">
-          <span className="flex items-center">Validation</span>
+          <span className="flex items-center">
+            <Trans>Validation</Trans>
+          </span>
           {showValidation ? <ChevronUp /> : <ChevronDown />}
         </span>
       </Button>
       {showValidation && (
         <div className="mb-4 flex flex-row gap-x-4">
           <div className="flex flex-col">
-            <Label className="mt-4">Min</Label>
+            <Label className="mt-4">
+              <Trans>Min</Trans>
+            </Label>
             <Input
               id="minValue"
               className="bg-background mt-2"
@@ -144,7 +164,9 @@ export const NumberFieldAdvancedSettings = ({
             />
           </div>
           <div className="flex flex-col">
-            <Label className="mt-4">Max</Label>
+            <Label className="mt-4">
+              <Trans>Max</Trans>
+            </Label>
             <Input
               id="maxValue"
               className="bg-background mt-2"

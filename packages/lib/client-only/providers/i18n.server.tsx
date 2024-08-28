@@ -6,7 +6,7 @@ import type { I18n, Messages } from '@lingui/core';
 import { setupI18n } from '@lingui/core';
 import { setI18n } from '@lingui/react/server';
 
-import { IS_APP_WEB } from '../../constants/app';
+import { IS_APP_WEB, IS_APP_WEB_I18N_ENABLED } from '../../constants/app';
 import { SUPPORTED_LANGUAGE_CODES } from '../../constants/i18n';
 import { extractSupportedLanguage } from '../../utils/i18n';
 
@@ -51,11 +51,16 @@ export const allI18nInstances = SUPPORTED_LANGUAGE_CODES.reduce((acc, locale) =>
  * https://lingui.dev/tutorials/react-rsc#pages-layouts-and-lingui
  */
 export const setupI18nSSR = (overrideLang?: SupportedLocales) => {
-  const lang =
+  let lang =
     overrideLang ||
     extractSupportedLanguage({
       cookies: cookies(),
     });
+
+  // Override web app to be English.
+  if (!IS_APP_WEB_I18N_ENABLED && IS_APP_WEB) {
+    lang = 'en';
+  }
 
   // Get and set a ready-made i18n instance for the given language.
   const i18n = allI18nInstances[lang];

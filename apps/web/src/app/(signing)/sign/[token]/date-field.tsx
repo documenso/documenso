@@ -4,6 +4,8 @@ import { useTransition } from 'react';
 
 import { useRouter } from 'next/navigation';
 
+import { Trans, msg } from '@lingui/macro';
+import { useLingui } from '@lingui/react';
 import { Loader } from 'lucide-react';
 
 import {
@@ -44,6 +46,7 @@ export const DateField = ({
 }: DateFieldProps) => {
   const router = useRouter();
 
+  const { _ } = useLingui();
   const { toast } = useToast();
 
   const [isPending, startTransition] = useTransition();
@@ -62,7 +65,9 @@ export const DateField = ({
 
   const isDifferentTime = field.inserted && localDateString !== field.customText;
 
-  const tooltipText = `"${field.customText}" will appear on the document as it has a timezone of "${timezone}".`;
+  const tooltipText = _(
+    msg`"${field.customText}" will appear on the document as it has a timezone of "${timezone}".`,
+  );
 
   const onSign = async (authOptions?: TRecipientActionAuth) => {
     try {
@@ -91,8 +96,8 @@ export const DateField = ({
       console.error(err);
 
       toast({
-        title: 'Error',
-        description: 'An error occurred while signing the document.',
+        title: _(msg`Error`),
+        description: _(msg`An error occurred while signing the document.`),
         variant: 'destructive',
       });
     }
@@ -117,8 +122,8 @@ export const DateField = ({
       console.error(err);
 
       toast({
-        title: 'Error',
-        description: 'An error occurred while removing the signature.',
+        title: _(msg`Error`),
+        description: _(msg`An error occurred while removing the signature.`),
         variant: 'destructive',
       });
     }
@@ -140,7 +145,7 @@ export const DateField = ({
 
       {!field.inserted && (
         <p className="group-hover:text-primary text-muted-foreground duration-200 group-hover:text-yellow-300">
-          Date
+          <Trans>Date</Trans>
         </p>
       )}
 

@@ -1,7 +1,11 @@
 'use client';
 
+import { useMemo } from 'react';
+
 import { useSearchParams } from 'next/navigation';
 
+import { msg } from '@lingui/macro';
+import { useLingui } from '@lingui/react';
 import { DateTime } from 'luxon';
 import type { DateTimeFormatOptions } from 'luxon';
 import { UAParser } from 'ua-parser-js';
@@ -10,6 +14,7 @@ import { useUpdateSearchParams } from '@documenso/lib/client-only/hooks/use-upda
 import { ZBaseTableSearchParamsSchema } from '@documenso/lib/types/search-params';
 import { formatDocumentAuditLogAction } from '@documenso/lib/utils/document-audit-logs';
 import { trpc } from '@documenso/trpc/react';
+import type { DataTableColumnDef } from '@documenso/ui/primitives/data-table';
 import { DataTable } from '@documenso/ui/primitives/data-table';
 import { DataTablePagination } from '@documenso/ui/primitives/data-table-pagination';
 import { Skeleton } from '@documenso/ui/primitives/skeleton';
@@ -27,7 +32,7 @@ const dateFormat: DateTimeFormatOptions = {
 };
 
 export const DocumentLogsDataTable = ({ documentId }: DocumentLogsDataTableProps) => {
-  const parser = new UAParser();
+  const { _ } = useLingui();
 
   const searchParams = useSearchParams();
   const updateSearchParams = useUpdateSearchParams();
@@ -66,64 +71,70 @@ export const DocumentLogsDataTable = ({ documentId }: DocumentLogsDataTableProps
     totalPages: 1,
   };
 
+  const columns = useMemo(() => {
+    const parser = new UAParser();
+
+    return [
+      {
+        header: _(msg`Time`),
+        accessorKey: 'createdAt',
+        cell: ({ row }) => <LocaleDate format={dateFormat} date={row.original.createdAt} />,
+      },
+      {
+        header: _(msg`User`),
+        accessorKey: 'name',
+        cell: ({ row }) =>
+          row.original.name || row.original.email ? (
+            <div>
+              {row.original.name && (
+                <p className="truncate" title={row.original.name}>
+                  {row.original.name}
+                </p>
+              )}
+
+              {row.original.email && (
+                <p className="truncate" title={row.original.email}>
+                  {row.original.email}
+                </p>
+              )}
+            </div>
+          ) : (
+            <p>N/A</p>
+          ),
+      },
+      {
+        header: _(msg`Action`),
+        accessorKey: 'type',
+        cell: ({ row }) => (
+          <span>
+            {uppercaseFistLetter(formatDocumentAuditLogAction(row.original).description)}
+          </span>
+        ),
+      },
+      {
+        header: 'IP Address',
+        accessorKey: 'ipAddress',
+      },
+      {
+        header: 'Browser',
+        cell: ({ row }) => {
+          if (!row.original.userAgent) {
+            return 'N/A';
+          }
+
+          parser.setUA(row.original.userAgent);
+
+          const result = parser.getResult();
+
+          return result.browser.name ?? 'N/A';
+        },
+      },
+    ] satisfies DataTableColumnDef<(typeof results)['data'][number]>[];
+  }, []);
+
   return (
     <DataTable
-      columns={[
-        {
-          header: 'Time',
-          accessorKey: 'createdAt',
-          cell: ({ row }) => <LocaleDate format={dateFormat} date={row.original.createdAt} />,
-        },
-        {
-          header: 'User',
-          accessorKey: 'name',
-          cell: ({ row }) =>
-            row.original.name || row.original.email ? (
-              <div>
-                {row.original.name && (
-                  <p className="truncate" title={row.original.name}>
-                    {row.original.name}
-                  </p>
-                )}
-
-                {row.original.email && (
-                  <p className="truncate" title={row.original.email}>
-                    {row.original.email}
-                  </p>
-                )}
-              </div>
-            ) : (
-              <p>N/A</p>
-            ),
-        },
-        {
-          header: 'Action',
-          accessorKey: 'type',
-          cell: ({ row }) => (
-            <span>
-              {uppercaseFistLetter(formatDocumentAuditLogAction(row.original).description)}
-            </span>
-          ),
-        },
-        {
-          header: 'IP Address',
-          accessorKey: 'ipAddress',
-        },
-        {
-          header: 'Browser',
-          cell: ({ row }) => {
-            if (!row.original.userAgent) {
-              return 'N/A';
-            }
-
-            parser.setUA(row.original.userAgent);
-
-            const result = parser.getResult();
-
-            return result.browser.name ?? 'N/A';
-          },
-        },
-      ]}
+      columns={columns}
       data={results.data}
       perPage={results.perPage}
       currentPage={results.currentPage}

@@ -5,6 +5,8 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 
 import { zodResolver } from '@hookform/resolvers/zod';
+import { Trans, msg } from '@lingui/macro';
+import { useLingui } from '@lingui/react';
 import { flushSync } from 'react-dom';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
@@ -40,6 +42,7 @@ export type TDisable2FAForm = z.infer<typeof ZDisable2FAForm>;
 export const DisableAuthenticatorAppDialog = () => {
   const router = useRouter();
 
+  const { _ } = useLingui();
   const { toast } = useToast();
 
   const [isOpen, setIsOpen] = useState(false);
@@ -60,9 +63,10 @@ export const DisableAuthenticatorAppDialog = () => {
       await disable2FA({ token });
 
       toast({
-        title: 'Two-factor authentication disabled',
-        description:
-          'Two-factor authentication has been disabled for your account. You will no longer be required to enter a code from your authenticator app when signing in.',
+        title: _(msg`Two-factor authentication disabled`),
+        description: _(
+          msg`Two-factor authentication has been disabled for your account. You will no longer be required to enter a code from your authenticator app when signing in.`,
+        ),
       });
 
       flushSync(() => {
@@ -72,9 +76,10 @@ export const DisableAuthenticatorAppDialog = () => {
       router.refresh();
     } catch (_err) {
       toast({
-        title: 'Unable to disable two-factor authentication',
-        description:
-          'We were unable to disable two-factor authentication for your account. Please ensure that you have entered your password and backup code correctly and try again.',
+        title: _(msg`Unable to disable two-factor authentication`),
+        description: _(
+          msg`We were unable to disable two-factor authentication for your account. Please ensure that you have entered your password and backup code correctly and try again.`,
+        ),
         variant: 'destructive',
       });
     }
@@ -84,17 +89,21 @@ export const DisableAuthenticatorAppDialog = () => {
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild={true}>
         <Button className="flex-shrink-0" variant="destructive">
-          Disable 2FA
+          <Trans>Disable 2FA</Trans>
         </Button>
       </DialogTrigger>
 
       <DialogContent position="center">
         <DialogHeader>
-          <DialogTitle>Disable 2FA</DialogTitle>
+          <DialogTitle>
+            <Trans>Disable 2FA</Trans>
+          </DialogTitle>
 
           <DialogDescription>
-            Please provide a token from the authenticator, or a backup code. If you do not have a
-            backup code available, please contact support.
+            <Trans>
+              Please provide a token from the authenticator, or a backup code. If you do not have a
+              backup code available, please contact support.
+            </Trans>
           </DialogDescription>
         </DialogHeader>
 
@@ -125,12 +134,12 @@ export const DisableAuthenticatorAppDialog = () => {
               <DialogFooter>
                 <DialogClose asChild>
                   <Button type="button" variant="secondary">
-                    Cancel
+                    <Trans>Cancel</Trans>
                   </Button>
                 </DialogClose>
 
                 <Button type="submit" variant="destructive" loading={isDisable2FASubmitting}>
-                  Disable 2FA
+                  <Trans>Disable 2FA</Trans>
                 </Button>
               </DialogFooter>
             </fieldset>

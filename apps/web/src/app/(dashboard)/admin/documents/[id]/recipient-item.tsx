@@ -1,7 +1,11 @@
 'use client';
 
+import { useMemo } from 'react';
+
 import { useRouter } from 'next/navigation';
 
+import { Trans, msg } from '@lingui/macro';
+import { useLingui } from '@lingui/react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 
@@ -13,6 +17,7 @@ import {
 } from '@documenso/prisma/client';
 import { trpc } from '@documenso/trpc/react';
 import { Button } from '@documenso/ui/primitives/button';
+import type { DataTableColumnDef } from '@documenso/ui/primitives/data-table';
 import { DataTable } from '@documenso/ui/primitives/data-table';
 import {
   Form,
@@ -43,7 +48,9 @@ export type RecipientItemProps = {
 };
 
 export const RecipientItem = ({ recipient }: RecipientItemProps) => {
+  const { _ } = useLingui();
   const { toast } = useToast();
+
   const router = useRouter();
 
   const form = useForm<TAdminUpdateRecipientFormSchema>({
@@ -55,6 +62,50 @@ export const RecipientItem = ({ recipient }: RecipientItemProps) => {
 
   const { mutateAsync: updateRecipient } = trpc.admin.updateRecipient.useMutation();
 
+  const columns = useMemo(() => {
+    return [
+      {
+        header: 'ID',
+        accessorKey: 'id',
+        cell: ({ row }) => <div>{row.original.id}</div>,
+      },
+      {
+        header: _(msg`Type`),
+        accessorKey: 'type',
+        cell: ({ row }) => <div>{row.original.type}</div>,
+      },
+      {
+        header: _(msg`Inserted`),
+        accessorKey: 'inserted',
+        cell: ({ row }) => <div>{row.original.inserted ? 'True' : 'False'}</div>,
+      },
+      {
+        header: _(msg`Value`),
+        accessorKey: 'customText',
+        cell: ({ row }) => <div>{row.original.customText}</div>,
+      },
+      {
+        header: _(msg`Signature`),
+        accessorKey: 'signature',
+        cell: ({ row }) => (
+          <div>
+            {row.original.Signature?.typedSignature && (
+              <span>{row.original.Signature.typedSignature}</span>
+            )}
+
+            {row.original.Signature?.signatureImageAsBase64 && (
+              <img
+                src={row.original.Signature.signatureImageAsBase64}
+                alt="Signature"
+                className="h-12 w-full dark:invert"
+              />
+            )}
+          </div>
+        ),
+      },
+    ] satisfies DataTableColumnDef<(typeof recipient)['Field'][number]>[];
+  }, []);
+
   const onUpdateRecipientFormSubmit = async ({ name, email }: TAdminUpdateRecipientFormSchema) => {
     try {
       await updateRecipient({
@@ -64,14 +115,14 @@ export const RecipientItem = ({ recipient }: RecipientItemProps) => {
       });
 
       toast({
-        title: 'Recipient updated',
-        description: 'The recipient has been updated successfully',
+        title: _(msg`Recipient updated`),
+        description: _(msg`The recipient has been updated successfully`),
       });
 
       router.refresh();
     } catch (error) {
       toast({
-        title: 'Failed to update recipient',
+        title: _(msg`Failed to update recipient`),
         description: error.message,
         variant: 'destructive',
       });
@@ -93,7 +144,9 @@ export const RecipientItem = ({ recipient }: RecipientItemProps) => {
               name="name"
               render={({ field }) => (
                 <FormItem className="flex-1">
-                  <FormLabel required>Name</FormLabel>
+                  <FormLabel required>
+                    <Trans>Name</Trans>
+                  </FormLabel>
 
                   <FormControl>
                     <Input {...field} />
@@ -109,7 +162,9 @@ export const RecipientItem = ({ recipient }: RecipientItemProps) => {
               name="email"
               render={({ field }) => (
                 <FormItem className="flex-1">
-                  <FormLabel required>Email</FormLabel>
+                  <FormLabel required>
+                    <Trans>Email</Trans>
+                  </FormLabel>
 
                   <FormControl>
                     <Input type="email" {...field} />
@@ -122,7 +177,7 @@ export const RecipientItem = ({ recipient }: RecipientItemProps) => {
 
             <div>
               <Button type="submit" loading={form.formState.isSubmitting}>
-                Update Recipient
+                <Trans>Update Recipient</Trans>
               </Button>
             </div>
           </fieldset>
@@ -131,52 +186,11 @@ export const RecipientItem = ({ recipient }: RecipientItemProps) => {
 
       <hr className="my-4" />
 
-      <h2 className="mb-4 text-lg font-semibold">Fields</h2>
+      <h2 className="mb-4 text-lg font-semibold">
+        <Trans>Fields</Trans>
+      </h2>
 
-      <DataTable
-        data={recipient.Field}
-        columns={[
-          {
-            header: 'ID',
-            accessorKey: 'id',
-            cell: ({ row }) => <div>{row.original.id}</div>,
-          },
-          {
-            header: 'Type',
-            accessorKey: 'type',
-            cell: ({ row }) => <div>{row.original.type}</div>,
-          },
-          {
-            header: 'Inserted',
-            accessorKey: 'inserted',
-            cell: ({ row }) => <div>{row.original.inserted ? 'True' : 'False'}</div>,
-          },
-          {
-            header: 'Value',
-            accessorKey: 'customText',
-            cell: ({ row }) => <div>{row.original.customText}</div>,
-          },
-          {
-            header: 'Signature',
-            accessorKey: 'signature',
-            cell: ({ row }) => (
-              <div>
-                {row.original.Signature?.typedSignature && (
-                  <span>{row.original.Signature.typedSignature}</span>
-                )}
-
-                {row.original.Signature?.signatureImageAsBase64 && (
-                  <img
-                    src={row.original.Signature.signatureImageAsBase64}
-                    alt="Signature"
-                    className="h-12 w-full dark:invert"
-                  />
-                )}
-              </div>
-            ),
-          },
-        ]}
-      />
+      <DataTable columns={columns} data={recipient.Field} />
     </div>
   );
 };

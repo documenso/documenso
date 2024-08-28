@@ -1,5 +1,6 @@
 import React from 'react';
 
+import { setupI18nSSR } from '@documenso/lib/client-only/providers/i18n.server';
 import { getRequiredServerComponentSession } from '@documenso/lib/next-auth/get-server-component-session';
 import { getTeamByUrl } from '@documenso/lib/server-only/team/get-team';
 
@@ -13,6 +14,8 @@ type TeamTemplatePageProps = {
 };
 
 export default async function TeamTemplatePage({ params }: TeamTemplatePageProps) {
+  setupI18nSSR();
+
   const { teamUrl } = params;
 
   const { user } = await getRequiredServerComponentSession();

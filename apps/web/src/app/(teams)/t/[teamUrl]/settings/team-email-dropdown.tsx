@@ -1,5 +1,7 @@
 'use client';
 
+import { Trans, msg } from '@lingui/macro';
+import { useLingui } from '@lingui/react';
 import { Edit, Loader, Mail, MoreHorizontal, X } from 'lucide-react';
 
 import type { getTeamByUrl } from '@documenso/lib/server-only/team/get-team';
@@ -20,23 +22,24 @@ export type TeamsSettingsPageProps = {
 };
 
 export const TeamEmailDropdown = ({ team }: TeamsSettingsPageProps) => {
+  const { _ } = useLingui();
   const { toast } = useToast();
 
   const { mutateAsync: resendEmailVerification, isLoading: isResendingEmailVerification } =
     trpc.team.resendTeamEmailVerification.useMutation({
       onSuccess: () => {
         toast({
-          title: 'Success',
-          description: 'Email verification has been resent',
+          title: _(msg`Success`),
+          description: _(msg`Email verification has been resent`),
           duration: 5000,
         });
       },
       onError: () => {
         toast({
-          title: 'Something went wrong',
+          title: _(msg`Something went wrong`),
+          description: _(msg`Unable to resend verification at this time. Please try again.`),
           variant: 'destructive',
           duration: 10000,
-          description: 'Unable to resend verification at this time. Please try again.',
         });
       },
     });
@@ -61,7 +64,7 @@ export const TeamEmailDropdown = ({ team }: TeamsSettingsPageProps) => {
             ) : (
               <Mail className="mr-2 h-4 w-4" />
             )}
-            Resend verification
+            <Trans>Resend verification</Trans>
           </DropdownMenuItem>
         )}
 
@@ -71,7 +74,7 @@ export const TeamEmailDropdown = ({ team }: TeamsSettingsPageProps) => {
             trigger={
               <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
                 <Edit className="mr-2 h-4 w-4" />
-                Edit
+                <Trans>Edit</Trans>
               </DropdownMenuItem>
             }
           />
@@ -83,7 +86,7 @@ export const TeamEmailDropdown = ({ team }: TeamsSettingsPageProps) => {
           trigger={
             <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
               <X className="mr-2 h-4 w-4" />
-              Remove
+              <Trans>Remove</Trans>
             </DropdownMenuItem>
           }
         />

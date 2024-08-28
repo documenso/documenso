@@ -1,5 +1,6 @@
 import * as React from 'react';
 
+import { Trans } from '@lingui/macro';
 import { Check, ChevronsUpDown } from 'lucide-react';
 
 import { Role } from '@documenso/prisma/client';
@@ -59,7 +60,9 @@ const MultiSelectRoleCombobox = ({ listValues, onChange }: ComboboxProps) => {
       <PopoverContent className="w-[200px] p-0">
         <Command>
           <CommandInput placeholder={selectedValues.join(', ')} />
-          <CommandEmpty>No value found.</CommandEmpty>
+          <CommandEmpty>
+            <Trans>No value found.</Trans>
+          </CommandEmpty>
           <CommandGroup>
             {allRoles.map((value: string, i: number) => (
               <CommandItem key={i} onSelect={() => handleSelect(value)}>

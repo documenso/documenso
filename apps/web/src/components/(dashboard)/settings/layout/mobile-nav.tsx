@@ -5,6 +5,7 @@ import type { HTMLAttributes } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 
+import { Trans } from '@lingui/macro';
 import { Braces, CreditCard, Globe2Icon, Lock, User, Users, Webhook } from 'lucide-react';
 
 import { useFeatureFlags } from '@documenso/lib/client-only/providers/feature-flag';
@@ -35,7 +36,7 @@ export const MobileNav = ({ className, ...props }: MobileNavProps) => {
           )}
         >
           <User className="mr-2 h-5 w-5" />
-          Profile
+          <Trans>Profile</Trans>
         </Button>
       </Link>
 
@@ -49,7 +50,7 @@ export const MobileNav = ({ className, ...props }: MobileNavProps) => {
             )}
           >
             <Globe2Icon className="mr-2 h-5 w-5" />
-            Public Profile
+            <Trans>Public Profile</Trans>
           </Button>
         </Link>
       )}
@@ -63,7 +64,7 @@ export const MobileNav = ({ className, ...props }: MobileNavProps) => {
           )}
         >
           <Users className="mr-2 h-5 w-5" />
-          Teams
+          <Trans>Teams</Trans>
         </Button>
       </Link>
 
@@ -76,7 +77,7 @@ export const MobileNav = ({ className, ...props }: MobileNavProps) => {
           )}
         >
           <Lock className="mr-2 h-5 w-5" />
-          Security
+          <Trans>Security</Trans>
         </Button>
       </Link>
 
@@ -89,7 +90,7 @@ export const MobileNav = ({ className, ...props }: MobileNavProps) => {
           )}
         >
           <Braces className="mr-2 h-5 w-5" />
-          API Tokens
+          <Trans>API Tokens</Trans>
         </Button>
       </Link>
 
@@ -102,7 +103,7 @@ export const MobileNav = ({ className, ...props }: MobileNavProps) => {
           )}
         >
           <Webhook className="mr-2 h-5 w-5" />
-          Webhooks
+          <Trans>Webhooks</Trans>
         </Button>
       </Link>
 
@@ -116,7 +117,7 @@ export const MobileNav = ({ className, ...props }: MobileNavProps) => {
             )}
           >
             <CreditCard className="mr-2 h-5 w-5" />
-            Billing
+            <Trans>Billing</Trans>
           </Button>
         </Link>
       )}

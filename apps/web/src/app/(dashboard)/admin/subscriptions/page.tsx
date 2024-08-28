@@ -1,5 +1,8 @@
 import Link from 'next/link';
 
+import { Trans } from '@lingui/macro';
+
+import { setupI18nSSR } from '@documenso/lib/client-only/providers/i18n.server';
 import { findSubscriptions } from '@documenso/lib/server-only/admin/get-all-subscriptions';
 import {
   Table,
@@ -11,20 +14,32 @@ import {
 } from '@documenso/ui/primitives/table';
 
 export default async function Subscriptions() {
+  setupI18nSSR();
+
   const subscriptions = await findSubscriptions();
 
   return (
     <div>
-      <h2 className="text-4xl font-semibold">Manage subscriptions</h2>
+      <h2 className="text-4xl font-semibold">
+        <Trans>Manage subscriptions</Trans>
+      </h2>
       <div className="mt-8">
         <Table>
           <TableHeader>
             <TableRow>
               <TableHead>ID</TableHead>
-              <TableHead>Status</TableHead>
-              <TableHead>Created At</TableHead>
-              <TableHead>Ends On</TableHead>
-              <TableHead>User ID</TableHead>
+              <TableHead>
+                <Trans>Status</Trans>
+              </TableHead>
+              <TableHead>
+                <Trans>Created At</Trans>
+              </TableHead>
+              <TableHead>
+                <Trans>Ends On</Trans>
+              </TableHead>
+              <TableHead>
+                <Trans>User ID</Trans>
+              </TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>

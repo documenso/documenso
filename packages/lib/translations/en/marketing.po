@@ -29,6 +29,10 @@ msgstr "5 Users Included"
 msgid "A 10x better signing experience."
 msgstr "A 10x better signing experience."
 
+#: apps/marketing/src/app/(marketing)/singleplayer/client.tsx:51
+msgid "Add document"
+msgstr "Add document"
+
 #: apps/marketing/src/components/(marketing)/pricing-table.tsx:201
 msgid "Add More Users for {0}"
 msgstr "Add More Users for {0}"
@@ -167,6 +171,10 @@ msgstr "Email and Discord Support"
 #: apps/marketing/src/app/(marketing)/open/team-members.tsx:43
 msgid "Engagement"
 msgstr "Engagement"
+
+#: apps/marketing/src/app/(marketing)/singleplayer/client.tsx:64
+msgid "Enter your details."
+msgstr "Enter your details."
 
 #: apps/marketing/src/components/(marketing)/enterprise.tsx:16
 msgid "Enterprise Compliance, License or Technical Needs?"
@@ -436,6 +444,10 @@ msgstr "Seniority"
 msgid "Shop"
 msgstr "Shop"
 
+#: apps/marketing/src/app/(marketing)/singleplayer/client.tsx:63
+msgid "Sign"
+msgstr "Sign"
+
 #: apps/marketing/src/components/(marketing)/header.tsx:72
 #: apps/marketing/src/components/(marketing)/mobile-navigation.tsx:61
 msgid "Sign in"
@@ -548,6 +560,10 @@ msgstr "Unlimited Documents per Month"
 #: apps/marketing/src/components/(marketing)/pricing-table.tsx:103
 msgid "Up to 10 recipients per document"
 msgstr "Up to 10 recipients per document"
+
+#: apps/marketing/src/app/(marketing)/singleplayer/client.tsx:52
+msgid "Upload a document and add fields."
+msgstr "Upload a document and add fields."
 
 #: apps/marketing/src/app/(marketing)/pricing/page.tsx:123
 msgid "Using our hosted version is the easiest way to get started, you can simply subscribe and start signing your documents. We take care of the infrastructure, so you can focus on your business. Additionally, when using our hosted version you benefit from our trusted signing certificates which helps you to build trust with your customers."

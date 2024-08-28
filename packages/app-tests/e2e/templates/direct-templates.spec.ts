@@ -5,9 +5,8 @@ import { WEBAPP_BASE_URL } from '@documenso/lib/constants/app';
 import {
   DIRECT_TEMPLATE_RECIPIENT_EMAIL,
   DIRECT_TEMPLATE_RECIPIENT_NAME,
-} from '@documenso/lib/constants/template';
+} from '@documenso/lib/constants/direct-templates';
 import { createDocumentAuthOptions } from '@documenso/lib/utils/document-auth';
-import { formatDocumentsPath, formatTemplatesPath } from '@documenso/lib/utils/teams';
 import { formatDirectTemplatePath } from '@documenso/lib/utils/templates';
 import { seedTeam } from '@documenso/prisma/seed/teams';
 import { seedDirectTemplate, seedTemplate } from '@documenso/prisma/seed/templates';
@@ -15,6 +14,12 @@ import { seedTestEmail, seedUser } from '@documenso/prisma/seed/users';
 
 import { apiSignin } from '../fixtures/authentication';
 import { checkDocumentTabCount } from '../fixtures/documents';
+
+// Duped from `packages/lib/utils/teams.ts` due to errors when importing that file.
+const formatDocumentsPath = (teamUrl?: string) =>
+  teamUrl ? `/t/${teamUrl}/documents` : '/documents';
+const formatTemplatesPath = (teamUrl?: string) =>
+  teamUrl ? `/t/${teamUrl}/templates` : '/templates';
 
 const nanoid = customAlphabet('1234567890abcdef', 10);
 
