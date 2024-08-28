@@ -968,13 +968,13 @@ msgid "Created by"
 msgstr "Created by"
 
 #: apps/web/src/app/(dashboard)/admin/documents/[id]/page.tsx:49
+#: apps/web/src/app/(dashboard)/settings/tokens/page.tsx:68
+#: apps/web/src/app/(teams)/t/[teamUrl]/settings/tokens/page.tsx:101
 #: apps/web/src/components/(teams)/tables/pending-user-teams-data-table.tsx:80
 msgid "Created on"
 msgstr "Created on"
 
-#: apps/web/src/app/(dashboard)/settings/tokens/page.tsx:68
 #: apps/web/src/app/(dashboard)/settings/webhooks/page.tsx:89
-#: apps/web/src/app/(teams)/t/[teamUrl]/settings/tokens/page.tsx:101
 #: apps/web/src/app/(teams)/t/[teamUrl]/settings/webhooks/page.tsx:94
 msgid "Created on <0/>"
 msgstr "Created on <0/>"
@@ -1017,11 +1017,11 @@ msgstr "Declined team invitation"
 #: apps/web/src/app/(dashboard)/documents/delete-document-dialog.tsx:200
 #: apps/web/src/app/(dashboard)/settings/security/passkeys/user-passkeys-data-table-actions.tsx:177
 #: apps/web/src/app/(dashboard)/settings/security/passkeys/user-passkeys-data-table-actions.tsx:211
-#: apps/web/src/app/(dashboard)/settings/tokens/page.tsx:90
+#: apps/web/src/app/(dashboard)/settings/tokens/page.tsx:86
 #: apps/web/src/app/(dashboard)/settings/webhooks/page.tsx:104
 #: apps/web/src/app/(dashboard)/templates/data-table-action-dropdown.tsx:91
 #: apps/web/src/app/(dashboard)/templates/delete-template-dialog.tsx:90
-#: apps/web/src/app/(teams)/t/[teamUrl]/settings/tokens/page.tsx:123
+#: apps/web/src/app/(teams)/t/[teamUrl]/settings/tokens/page.tsx:119
 #: apps/web/src/app/(teams)/t/[teamUrl]/settings/webhooks/page.tsx:109
 #: apps/web/src/components/(dashboard)/settings/token/delete-token-dialog.tsx:121
 #: apps/web/src/components/(dashboard)/settings/webhooks/delete-webhook-dialog.tsx:109
@@ -1520,10 +1520,15 @@ msgstr "Exceeded timeout"
 msgid "Expired"
 msgstr "Expired"
 
+#: apps/web/src/app/(dashboard)/settings/tokens/page.tsx:73
+#: apps/web/src/app/(teams)/t/[teamUrl]/settings/tokens/page.tsx:106
+msgid "Expires on"
+msgstr "Expires on"
+
 #: apps/web/src/app/(dashboard)/settings/tokens/page.tsx:75
 #: apps/web/src/app/(teams)/t/[teamUrl]/settings/tokens/page.tsx:108
-msgid "Expires on <0/>"
-msgstr "Expires on <0/>"
+#~ msgid "Expires on <0/>"
+#~ msgstr "Expires on <0/>"
 
 #: apps/web/src/app/(dashboard)/admin/documents/[id]/admin-actions.tsx:42
 msgid "Failed to reseal document"
@@ -3382,8 +3387,8 @@ msgstr "Token created"
 msgid "Token deleted"
 msgstr "Token deleted"
 
-#: apps/web/src/app/(dashboard)/settings/tokens/page.tsx:82
-#: apps/web/src/app/(teams)/t/[teamUrl]/settings/tokens/page.tsx:115
+#: apps/web/src/app/(dashboard)/settings/tokens/page.tsx:78
+#: apps/web/src/app/(teams)/t/[teamUrl]/settings/tokens/page.tsx:111
 msgid "Token doesn't have an expiration date"
 msgstr "Token doesn't have an expiration date"
 
