@@ -961,7 +961,10 @@ export const ApiContractV1Implementation = createNextRoute(ApiContractV1, {
 
       return {
         status: 200,
-        body: createdFields,
+        body: {
+          fields: createdFields,
+          documentId: Number(documentId),
+        },
       };
     } catch (err) {
       return AppError.toRestAPIError(err);

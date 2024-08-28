@@ -311,10 +311,7 @@ export const ZCreateFieldMutationSchema = z.union([
 
 export type TCreateFieldMutationSchema = z.infer<typeof ZCreateFieldMutationSchema>;
 
-export const ZUpdateFieldMutationSchema = z.union([
-  ZCreateFieldSchema.partial(),
-  z.array(ZCreateFieldSchema.partial()),
-]);
+export const ZUpdateFieldMutationSchema = ZCreateFieldSchema.partial();
 
 export type TUpdateFieldMutationSchema = z.infer<typeof ZUpdateFieldMutationSchema>;
 
@@ -337,10 +334,10 @@ const ZSuccessfulFieldSchema = z.object({
   inserted: z.boolean(),
 });
 
-export const ZSuccessfulFieldResponseSchema = z.union([
-  ZSuccessfulFieldSchema,
-  z.array(ZSuccessfulFieldSchema),
-]);
+export const ZSuccessfulFieldResponseSchema = z.object({
+  fields: z.union([ZSuccessfulFieldSchema, z.array(ZSuccessfulFieldSchema)]),
+  documentId: z.number(),
+});
 
 export type TSuccessfulFieldResponseSchema = z.infer<typeof ZSuccessfulFieldResponseSchema>;
 
