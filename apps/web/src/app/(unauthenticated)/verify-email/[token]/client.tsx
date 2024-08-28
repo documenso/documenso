@@ -11,7 +11,7 @@ import { signIn } from 'next-auth/react';
 import { Button } from '@documenso/ui/primitives/button';
 
 export type VerifyEmailPageClientProps = {
-  signInData: string;
+  signInData?: string;
 };
 
 export const VerifyEmailPageClient = ({ signInData }: VerifyEmailPageClientProps) => {
