@@ -53,6 +53,29 @@ export default async function VerifyTeamTransferPage({
     );
   }
 
+  if (teamTransferVerification.completed) {
+    return (
+      <div>
+        <h1 className="text-4xl font-semibold">
+          <Trans>Team ownership transfer already completed!</Trans>
+        </h1>
+
+        <p className="text-muted-foreground mb-4 mt-2 text-sm">
+          <Trans>
+            You have already completed the ownership transfer for{' '}
+            <strong>{teamTransferVerification.team.name}</strong>.
+          </Trans>
+        </p>
+
+        <Button asChild>
+          <Link href="/">
+            <Trans>Continue</Trans>
+          </Link>
+        </Button>
+      </div>
+    );
+  }
+
   const { team } = teamTransferVerification;
 
   let isTransferError = false;

@@ -1,11 +1,20 @@
 import Link from 'next/link';
 
 import { Trans } from '@lingui/macro';
-import { AlertTriangle, CheckCircle2, XCircle, XOctagon } from 'lucide-react';
+import { AlertTriangle, XCircle, XOctagon } from 'lucide-react';
+import { DateTime } from 'luxon';
+import { match } from 'ts-pattern';
 
 import { setupI18nSSR } from '@documenso/lib/client-only/providers/i18n.server';
-import { verifyEmail } from '@documenso/lib/server-only/user/verify-email';
+import { encryptSecondaryData } from '@documenso/lib/server-only/crypto/encrypt';
+import {
+  EMAIL_VERIFICATION_STATE,
+  verifyEmail,
+} from '@documenso/lib/server-only/user/verify-email';
+import { prisma } from '@documenso/prisma';
 import { Button } from '@documenso/ui/primitives/button';
+
+import { VerifyEmailPageClient } from './client';
 
 export type PageProps = {
   params: {
@@ -39,8 +48,8 @@ export default async function VerifyEmailPage({ params: { token } }: PageProps) 
 
   const verified = await verifyEmail({ token });
 
-  if (verified === null) {
-    return (
+  return await match(verified)
+    .with(EMAIL_VERIFICATION_STATE.NOT_FOUND, () => (
       <div className="w-screen max-w-lg px-4">
         <div className="flex w-full items-start">
           <div className="mr-4 mt-1 hidden md:block">
@@ -67,11 +76,8 @@ export default async function VerifyEmailPage({ params: { token } }: PageProps) 
           </div>
         </div>
       </div>
-    );
-  }
-
-  if (!verified) {
-    return (
+    ))
+    .with(EMAIL_VERIFICATION_STATE.EXPIRED, () => (
       <div className="w-screen max-w-lg px-4">
         <div className="flex w-full items-start">
           <div className="mr-4 mt-1 hidden md:block">
@@ -98,34 +104,27 @@ export default async function VerifyEmailPage({ params: { token } }: PageProps) 
           </div>
         </div>
       </div>
-    );
-  }
+    ))
+    .with(EMAIL_VERIFICATION_STATE.VERIFIED, async () => {
+      const { user } = await prisma.verificationToken.findFirstOrThrow({
+        where: {
+          token,
+        },
+        include: {
+          user: true,
+        },
+      });
 
-  return (
-    <div className="w-screen max-w-lg px-4">
-      <div className="flex w-full items-start">
-        <div className="mr-4 mt-1 hidden md:block">
-          <CheckCircle2 className="h-10 w-10 text-green-500" strokeWidth={2} />
-        </div>
+      const data = encryptSecondaryData({
+        data: JSON.stringify({
+          userId: user.id,
+          email: user.email,
+        }),
+        expiresAt: DateTime.now().plus({ minutes: 5 }).toMillis(),
+      });
 
-        <div>
-          <h2 className="text-2xl font-bold md:text-4xl">
-            <Trans>Email Confirmed!</Trans>
-          </h2>
-
-          <p className="text-muted-foreground mt-4">
-            <Trans>
-              Your email has been successfully confirmed! You can now use all features of Documenso.
-            </Trans>
-          </p>
-
-          <Button className="mt-4" asChild>
-            <Link href="/">
-              <Trans>Go back home</Trans>
-            </Link>
-          </Button>
-        </div>
-      </div>
-    </div>
-  );
+      return <VerifyEmailPageClient signInData={data} />;
+    })
+    .with(EMAIL_VERIFICATION_STATE.ALREADY_VERIFIED, () => <VerifyEmailPageClient />)
+    .exhaustive();
 }
