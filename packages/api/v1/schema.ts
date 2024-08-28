@@ -334,9 +334,24 @@ const ZSuccessfulFieldSchema = z.object({
   inserted: z.boolean(),
 });
 
-export const ZSuccessfulFieldResponseSchema = z.object({
+export const ZSuccessfulFieldCreationResponseSchema = z.object({
   fields: z.union([ZSuccessfulFieldSchema, z.array(ZSuccessfulFieldSchema)]),
   documentId: z.number(),
+});
+
+export const ZSuccessfulFieldResponseSchema = z.object({
+  id: z.number(),
+  documentId: z.number(),
+  recipientId: z.number(),
+  type: z.nativeEnum(FieldType),
+  pageNumber: z.number(),
+  pageX: z.number(),
+  pageY: z.number(),
+  pageWidth: z.number(),
+  pageHeight: z.number(),
+  customText: z.string(),
+  fieldMeta: ZFieldMetaSchema,
+  inserted: z.boolean(),
 });
 
 export type TSuccessfulFieldResponseSchema = z.infer<typeof ZSuccessfulFieldResponseSchema>;
