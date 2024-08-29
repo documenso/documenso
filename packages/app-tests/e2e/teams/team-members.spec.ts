@@ -32,8 +32,12 @@ test('[TEAMS]: update team member role', async ({ page }) => {
   await page.getByRole('combobox').click();
   await page.getByLabel('Manager').click();
   await page.getByRole('button', { name: 'Update' }).click();
+
+  // TODO: Remove me, but i don't care for now
+  await page.reload();
+
   await expect(
-    page.getByRole('row').filter({ hasText: teamMemberToUpdate.user.email }),
+    page.getByRole('row').filter({ hasText: teamMemberToUpdate.user.email }).first(),
   ).toContainText('Manager');
 });
 

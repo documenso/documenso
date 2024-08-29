@@ -41,7 +41,8 @@ test('[USER] can sign up with email and password', async ({ page }: { page: Page
 
   await expect(page.getByRole('heading')).toContainText('Email Confirmed!');
 
-  await page.getByRole('link', { name: 'Go back home' }).click();
+  // We now automatically redirect to the home page
+  // await page.getByRole('link', { name: 'Go back home' }).click();
 
   await page.waitForURL('/documents');
 

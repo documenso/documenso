@@ -3,12 +3,15 @@ import React from 'react';
 import Image from 'next/image';
 
 import backgroundPattern from '@documenso/assets/images/background-pattern.png';
+import { setupI18nSSR } from '@documenso/lib/client-only/providers/i18n.server';
 
 type UnauthenticatedLayoutProps = {
   children: React.ReactNode;
 };
 
 export default function UnauthenticatedLayout({ children }: UnauthenticatedLayoutProps) {
+  setupI18nSSR();
+
   return (
     <main className="relative flex min-h-screen flex-col items-center justify-center overflow-hidden px-4 py-12 md:p-12 lg:p-24">
       <div>
@@ -17,6 +20,10 @@ export default function UnauthenticatedLayout({ children }: UnauthenticatedLayou
             src={backgroundPattern}
             alt="background pattern"
             className="dark:brightness-95 dark:contrast-[70%] dark:invert dark:sepia"
+            style={{
+              mask: 'radial-gradient(rgba(255, 255, 255, 1) 0%, transparent 80%)',
+              WebkitMask: 'radial-gradient(rgba(255, 255, 255, 1) 0%, transparent 80%)',
+            }}
           />
         </div>
 

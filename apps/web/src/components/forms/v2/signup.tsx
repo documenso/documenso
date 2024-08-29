@@ -7,6 +7,8 @@ import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 
 import { zodResolver } from '@hookform/resolvers/zod';
+import { Trans, msg } from '@lingui/macro';
+import { useLingui } from '@lingui/react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { signIn } from 'next-auth/react';
 import { useForm } from 'react-hook-form';
@@ -83,7 +85,9 @@ export const SignUpFormV2 = ({
   isGoogleSSOEnabled,
   isOIDCSSOEnabled,
 }: SignUpFormV2Props) => {
+  const { _ } = useLingui();
   const { toast } = useToast();
+
   const analytics = useAnalytics();
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -120,9 +124,10 @@ export const SignUpFormV2 = ({
       router.push(`/unverified-account`);
 
       toast({
-        title: 'Registration Successful',
-        description:
-          'You have successfully registered. Please verify your account by clicking on the link you received in the email.',
+        title: _(msg`Registration Successful`),
+        description: _(
+          msg`You have successfully registered. Please verify your account by clicking on the link you received in the email.`,
+        ),
         duration: 5000,
       });
 
@@ -137,7 +142,7 @@ export const SignUpFormV2 = ({
       if (error.code === AppErrorCode.PROFILE_URL_TAKEN) {
         form.setError('url', {
           type: 'manual',
-          message: 'This username has already been taken',
+          message: _(msg`This username has already been taken`),
         });
       } else if (error.code === AppErrorCode.PREMIUM_PROFILE_URL) {
         form.setError('url', {
@@ -146,15 +151,16 @@ export const SignUpFormV2 = ({
         });
       } else if (err instanceof TRPCClientError && err.data?.code === 'BAD_REQUEST') {
         toast({
-          title: 'An error occurred',
+          title: _(msg`An error occurred`),
           description: err.message,
           variant: 'destructive',
         });
       } else {
         toast({
-          title: 'An unknown error occurred',
-          description:
-            'We encountered an unknown error while attempting to sign you up. Please try again later.',
+          title: _(msg`An unknown error occurred`),
+          description: _(
+            msg`We encountered an unknown error while attempting to sign you up. Please try again later.`,
+          ),
           variant: 'destructive',
         });
       }
@@ -174,9 +180,10 @@ export const SignUpFormV2 = ({
       await signIn('google', { callbackUrl: SIGN_UP_REDIRECT_PATH });
     } catch (err) {
       toast({
-        title: 'An unknown error occurred',
-        description:
-          'We encountered an unknown error while attempting to sign you Up. Please try again later.',
+        title: _(msg`An unknown error occurred`),
+        description: _(
+          msg`We encountered an unknown error while attempting to sign you Up. Please try again later.`,
+        ),
         variant: 'destructive',
       });
     }
@@ -187,9 +194,10 @@ export const SignUpFormV2 = ({
       await signIn('oidc', { callbackUrl: SIGN_UP_REDIRECT_PATH });
     } catch (err) {
       toast({
-        title: 'An unknown error occurred',
-        description:
-          'We encountered an unknown error while attempting to sign you Up. Please try again later.',
+        title: _(msg`An unknown error occurred`),
+        description: _(
+          msg`We encountered an unknown error while attempting to sign you Up. Please try again later.`,
+        ),
         variant: 'destructive',
       });
     }
@@ -211,7 +219,7 @@ export const SignUpFormV2 = ({
 
         <div className="relative flex h-full w-full flex-col items-center justify-evenly">
           <div className="bg-background rounded-2xl border px-4 py-1 text-sm font-medium">
-            User profiles are here!
+            <Trans>User profiles are here!</Trans>
           </div>
 
           <AnimatePresence>
@@ -240,22 +248,30 @@ export const SignUpFormV2 = ({
       <div className="border-border dark:bg-background relative z-10 flex min-h-[min(850px,80vh)] w-full max-w-lg flex-col rounded-xl border bg-neutral-100 p-6">
         {step === 'BASIC_DETAILS' && (
           <div className="h-20">
-            <h1 className="text-xl font-semibold md:text-2xl">Create a new account</h1>
+            <h1 className="text-xl font-semibold md:text-2xl">
+              <Trans>Create a new account</Trans>
+            </h1>
 
             <p className="text-muted-foreground mt-2 text-xs md:text-sm">
-              Create your account and start using state-of-the-art document signing. Open and
-              beautiful signing is within your grasp.
+              <Trans>
+                Create your account and start using state-of-the-art document signing. Open and
+                beautiful signing is within your grasp.
+              </Trans>
             </p>
           </div>
         )}
 
         {step === 'CLAIM_USERNAME' && (
           <div className="h-20">
-            <h1 className="text-xl font-semibold md:text-2xl">Claim your username now</h1>
+            <h1 className="text-xl font-semibold md:text-2xl">
+              <Trans>Claim your username now</Trans>
+            </h1>
 
             <p className="text-muted-foreground mt-2 text-xs md:text-sm">
-              You will get notified & be able to set up your documenso public profile when we launch
-              the feature.
+              <Trans>
+                You will get notified & be able to set up your documenso public profile when we
+                launch the feature.
+              </Trans>
             </p>
           </div>
         )}
@@ -280,7 +296,9 @@ export const SignUpFormV2 = ({
                   name="name"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Full Name</FormLabel>
+                      <FormLabel>
+                        <Trans>Full Name</Trans>
+                      </FormLabel>
                       <FormControl>
                         <Input type="text" {...field} />
                       </FormControl>
@@ -294,7 +312,9 @@ export const SignUpFormV2 = ({
                   name="email"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Email Address</FormLabel>
+                      <FormLabel>
+                        <Trans>Email Address</Trans>
+                      </FormLabel>
                       <FormControl>
                         <Input type="email" {...field} />
                       </FormControl>
@@ -308,7 +328,9 @@ export const SignUpFormV2 = ({
                   name="password"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Password</FormLabel>
+                      <FormLabel>
+                        <Trans>Password</Trans>
+                      </FormLabel>
 
                       <FormControl>
                         <PasswordInput {...field} />
@@ -324,7 +346,9 @@ export const SignUpFormV2 = ({
                   name="signature"
                   render={({ field: { onChange } }) => (
                     <FormItem>
-                      <FormLabel>Sign Here</FormLabel>
+                      <FormLabel>
+                        <Trans>Sign Here</Trans>
+                      </FormLabel>
                       <FormControl>
                         <SignaturePad
                           className="h-36 w-full"
@@ -343,7 +367,9 @@ export const SignUpFormV2 = ({
                   <>
                     <div className="relative flex items-center justify-center gap-x-4 py-2 text-xs uppercase">
                       <div className="bg-border h-px flex-1" />
-                      <span className="text-muted-foreground bg-transparent">Or</span>
+                      <span className="text-muted-foreground bg-transparent">
+                        <Trans>Or</Trans>
+                      </span>
                       <div className="bg-border h-px flex-1" />
                     </div>
                   </>
@@ -360,7 +386,7 @@ export const SignUpFormV2 = ({
                       onClick={onSignUpWithGoogleClick}
                     >
                       <FcGoogle className="mr-2 h-5 w-5" />
-                      Sign Up with Google
+                      <Trans>Sign Up with Google</Trans>
                     </Button>
                   </>
                 )}
@@ -376,16 +402,21 @@ export const SignUpFormV2 = ({
                       onClick={onSignUpWithOIDCClick}
                     >
                       <FaIdCardClip className="mr-2 h-5 w-5" />
-                      Sign Up with OIDC
+                      <Trans>Sign Up with OIDC</Trans>
                     </Button>
                   </>
                 )}
 
                 <p className="text-muted-foreground mt-4 text-sm">
-                  Already have an account?{' '}
-                  <Link href="/signin" className="text-documenso-700 duration-200 hover:opacity-70">
-                    Sign in instead
-                  </Link>
+                  <Trans>
+                    Already have an account?{' '}
+                    <Link
+                      href="/signin"
+                      className="text-documenso-700 duration-200 hover:opacity-70"
+                    >
+                      Sign in instead
+                    </Link>
+                  </Trans>
                 </p>
               </fieldset>
             )}
@@ -403,7 +434,9 @@ export const SignUpFormV2 = ({
                   name="url"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Public profile username</FormLabel>
+                      <FormLabel>
+                        <Trans>Public profile username</Trans>
+                      </FormLabel>
 
                       <FormControl>
                         <Input type="text" className="mb-2 mt-2 lowercase" {...field} />
@@ -423,13 +456,19 @@ export const SignUpFormV2 = ({
             <div className="mt-6">
               {step === 'BASIC_DETAILS' && (
                 <p className="text-muted-foreground text-sm">
-                  <span className="font-medium">Basic details</span> 1/2
+                  <span className="font-medium">
+                    <Trans>Basic details</Trans>
+                  </span>{' '}
+                  1/2
                 </p>
               )}
 
               {step === 'CLAIM_USERNAME' && (
                 <p className="text-muted-foreground text-sm">
-                  <span className="font-medium">Claim username</span> 2/2
+                  <span className="font-medium">
+                    <Trans>Claim username</Trans>
+                  </span>{' '}
+                  2/2
                 </p>
               )}
 
@@ -455,7 +494,7 @@ export const SignUpFormV2 = ({
                 disabled={step === 'BASIC_DETAILS' || form.formState.isSubmitting}
                 onClick={() => setStep('BASIC_DETAILS')}
               >
-                Back
+                <Trans>Back</Trans>
               </Button>
 
               {/* Continue button */}
@@ -467,7 +506,7 @@ export const SignUpFormV2 = ({
                   loading={form.formState.isSubmitting}
                   onClick={onNextClick}
                 >
-                  Next
+                  <Trans>Next</Trans>
                 </Button>
               )}
 
@@ -480,7 +519,7 @@ export const SignUpFormV2 = ({
                   size="lg"
                   className="flex-1"
                 >
-                  Complete
+                  <Trans>Complete</Trans>
                 </Button>
               )}
             </div>

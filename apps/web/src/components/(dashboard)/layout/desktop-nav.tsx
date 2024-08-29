@@ -4,6 +4,8 @@ import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useParams, usePathname } from 'next/navigation';
 
+import { Trans, msg } from '@lingui/macro';
+import { useLingui } from '@lingui/react';
 import { Search } from 'lucide-react';
 
 import { getRootHref } from '@documenso/lib/utils/params';
@@ -13,11 +15,11 @@ import { Button } from '@documenso/ui/primitives/button';
 const navigationLinks = [
   {
     href: '/documents',
-    label: 'Documents',
+    label: msg`Documents`,
   },
   {
     href: '/templates',
-    label: 'Templates',
+    label: msg`Templates`,
   },
 ];
 
@@ -26,6 +28,8 @@ export type DesktopNavProps = HTMLAttributes<HTMLDivElement> & {
 };
 
 export const DesktopNav = ({ className, setIsCommandMenuOpen, ...props }: DesktopNavProps) => {
+  const { _ } = useLingui();
+
   const pathname = usePathname();
   const params = useParams();
 
@@ -62,7 +66,7 @@ export const DesktopNav = ({ className, setIsCommandMenuOpen, ...props }: Deskto
               },
             )}
           >
-            {label}
+            {_(label)}
           </Link>
         ))}
       </div>
@@ -74,7 +78,7 @@ export const DesktopNav = ({ className, setIsCommandMenuOpen, ...props }: Deskto
       >
         <div className="flex items-center">
           <Search className="mr-2 h-5 w-5" />
-          Search
+          <Trans>Search</Trans>
         </div>
 
         <div>

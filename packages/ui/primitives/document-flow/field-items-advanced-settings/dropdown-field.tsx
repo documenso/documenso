@@ -2,6 +2,8 @@
 
 import { useEffect, useState } from 'react';
 
+import { Trans, msg } from '@lingui/macro';
+import { useLingui } from '@lingui/react';
 import { ChevronDown, ChevronUp, Trash } from 'lucide-react';
 
 import { validateDropdownField } from '@documenso/lib/advanced-fields-validation/validate-dropdown';
@@ -32,6 +34,8 @@ export const DropdownFieldAdvancedSettings = ({
   handleFieldChange,
   handleErrors,
 }: DropdownFieldAdvancedSettingsProps) => {
+  const { _ } = useLingui();
+
   const [showValidation, setShowValidation] = useState(false);
   const [values, setValues] = useState(fieldState.values ?? [{ value: 'Option 1' }]);
   const [readOnly, setReadOnly] = useState(fieldState.readOnly ?? false);
@@ -87,7 +91,9 @@ export const DropdownFieldAdvancedSettings = ({
   return (
     <div className="text-dark flex flex-col gap-4">
       <div>
-        <Label>Select default option</Label>
+        <Label>
+          <Trans>Select default option</Trans>
+        </Label>
         <Select
           defaultValue={defaultValue}
           onValueChange={(val) => {
@@ -96,7 +102,7 @@ export const DropdownFieldAdvancedSettings = ({
           }}
         >
           <SelectTrigger className="text-muted-foreground bg-background mt-2 w-full">
-            <SelectValue defaultValue={defaultValue} placeholder="-- Select --" />
+            <SelectValue defaultValue={defaultValue} placeholder={`-- ${_(msg`Select`)} --`} />
           </SelectTrigger>
           <SelectContent position="popper">
             {values.map((item, index) => (
@@ -117,7 +123,9 @@ export const DropdownFieldAdvancedSettings = ({
             checked={fieldState.required}
             onCheckedChange={(checked) => handleToggleChange('required', checked)}
           />
-          <Label>Required field</Label>
+          <Label>
+            <Trans>Required field</Trans>
+          </Label>
         </div>
         <div className="flex flex-row items-center gap-2">
           <Switch
@@ -125,7 +133,9 @@ export const DropdownFieldAdvancedSettings = ({
             checked={fieldState.readOnly}
             onCheckedChange={(checked) => handleToggleChange('readOnly', checked)}
           />
-          <Label>Read only</Label>
+          <Label>
+            <Trans>Read only</Trans>
+          </Label>
         </div>
       </div>
       <Button
@@ -134,7 +144,9 @@ export const DropdownFieldAdvancedSettings = ({
         onClick={() => setShowValidation((prev) => !prev)}
       >
         <span className="flex w-full flex-row justify-between">
-          <span className="flex items-center">Dropdown options</span>
+          <span className="flex items-center">
+            <Trans>Dropdown options</Trans>
+          </span>
           {showValidation ? <ChevronUp /> : <ChevronDown />}
         </span>
       </Button>
@@ -162,7 +174,7 @@ export const DropdownFieldAdvancedSettings = ({
             variant="outline"
             onClick={addValue}
           >
-            Add another option
+            <Trans>Add another option</Trans>
           </Button>
         </div>
       )}

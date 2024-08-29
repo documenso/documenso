@@ -5,6 +5,7 @@ import { DATE_FORMATS, DEFAULT_DOCUMENT_DATE_FORMAT } from '@documenso/lib/const
 import '@documenso/lib/constants/time-zones';
 import { DEFAULT_DOCUMENT_TIME_ZONE, TIME_ZONES } from '@documenso/lib/constants/time-zones';
 import { ZUrlSchema } from '@documenso/lib/schemas/common';
+import { ZFieldMetaSchema } from '@documenso/lib/types/field-meta';
 import {
   DocumentDataType,
   FieldType,
@@ -300,6 +301,7 @@ export const ZCreateFieldMutationSchema = z.object({
   pageY: z.number(),
   pageWidth: z.number(),
   pageHeight: z.number(),
+  fieldMeta: ZFieldMetaSchema,
 });
 
 export type TCreateFieldMutationSchema = z.infer<typeof ZCreateFieldMutationSchema>;
@@ -323,6 +325,7 @@ export const ZSuccessfulFieldResponseSchema = z.object({
   pageWidth: z.number(),
   pageHeight: z.number(),
   customText: z.string(),
+  fieldMeta: ZFieldMetaSchema,
   inserted: z.boolean(),
 });
 

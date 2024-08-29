@@ -1,6 +1,10 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 
+import { Trans, msg } from '@lingui/macro';
+import { useLingui } from '@lingui/react';
+
+import { setupI18nSSR } from '@documenso/lib/client-only/providers/i18n.server';
 import { getRequiredServerComponentSession } from '@documenso/lib/next-auth/get-server-component-session';
 import { getServerComponentFlag } from '@documenso/lib/server-only/feature-flags/get-server-component-feature-flag';
 import { Alert, AlertDescription, AlertTitle } from '@documenso/ui/primitives/alert';
@@ -17,6 +21,9 @@ export const metadata: Metadata = {
 };
 
 export default async function SecuritySettingsPage() {
+  setupI18nSSR();
+
+  const { _ } = useLingui();
   const { user } = await getRequiredServerComponentSession();
 
   const isPasskeyEnabled = await getServerComponentFlag('app_passkey');
@@ -24,8 +31,8 @@ export default async function SecuritySettingsPage() {
   return (
     <div>
       <SettingsHeader
-        title="Security"
-        subtitle="Here you can manage your password and security settings."
+        title={_(msg`Security`)}
+        subtitle={_(msg`Here you can manage your password and security settings.`)}
       />
 
       {user.identityProvider === 'DOCUMENSO' && (
@@ -41,13 +48,22 @@ export default async function SecuritySettingsPage() {
         variant="neutral"
       >
         <div className="mb-4 sm:mb-0">
-          <AlertTitle>Two factor authentication</AlertTitle>
+          <AlertTitle>
+            <Trans>Two factor authentication</Trans>
+          </AlertTitle>
 
           <AlertDescription className="mr-4">
-            Add an authenticator to serve as a secondary authentication method{' '}
-            {user.identityProvider === 'DOCUMENSO'
-              ? 'when signing in, or when signing documents.'
-              : 'for signing documents.'}
+            {user.identityProvider === 'DOCUMENSO' ? (
+              <Trans>
+                Add an authenticator to serve as a secondary authentication method when signing in,
+                or when signing documents.
+              </Trans>
+            ) : (
+              <Trans>
+                Add an authenticator to serve as a secondary authentication method for signing
+                documents.
+              </Trans>
+            )}
           </AlertDescription>
         </div>
 
@@ -64,11 +80,15 @@ export default async function SecuritySettingsPage() {
           variant="neutral"
         >
           <div className="mb-4 sm:mb-0">
-            <AlertTitle>Recovery codes</AlertTitle>
+            <AlertTitle>
+              <Trans>Recovery codes</Trans>
+            </AlertTitle>
 
             <AlertDescription className="mr-4">
-              Two factor authentication recovery codes are used to access your account in the event
-              that you lose access to your authenticator app.
+              <Trans>
+                Two factor authentication recovery codes are used to access your account in the
+                event that you lose access to your authenticator app.
+              </Trans>
             </AlertDescription>
           </div>
 
@@ -82,15 +102,21 @@ export default async function SecuritySettingsPage() {
           variant="neutral"
         >
           <div className="mb-4 sm:mb-0">
-            <AlertTitle>Passkeys</AlertTitle>
+            <AlertTitle>
+              <Trans>Passkeys</Trans>
+            </AlertTitle>
 
             <AlertDescription className="mr-4">
-              Allows authenticating using biometrics, password managers, hardware keys, etc.
+              <Trans>
+                Allows authenticating using biometrics, password managers, hardware keys, etc.
+              </Trans>
             </AlertDescription>
           </div>
 
           <Button asChild variant="outline" className="bg-background">
-            <Link href="/settings/security/passkeys">Manage passkeys</Link>
+            <Link href="/settings/security/passkeys">
+              <Trans>Manage passkeys</Trans>
+            </Link>
           </Button>
         </Alert>
       )}
@@ -100,15 +126,19 @@ export default async function SecuritySettingsPage() {
         variant="neutral"
       >
         <div className="mb-4 mr-4 sm:mb-0">
-          <AlertTitle>Recent activity</AlertTitle>
+          <AlertTitle>
+            <Trans>Recent activity</Trans>
+          </AlertTitle>
 
           <AlertDescription className="mr-2">
-            View all recent security activity related to your account.
+            <Trans>View all recent security activity related to your account.</Trans>
           </AlertDescription>
         </div>
 
         <Button asChild variant="outline" className="bg-background">
-          <Link href="/settings/security/activity">View activity</Link>
+          <Link href="/settings/security/activity">
+            <Trans>View activity</Trans>
+          </Link>
         </Button>
       </Alert>
     </div>

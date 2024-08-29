@@ -3,6 +3,8 @@
 import React, { useId, useMemo, useState } from 'react';
 
 import { zodResolver } from '@hookform/resolvers/zod';
+import { Trans, msg } from '@lingui/macro';
+import { useLingui } from '@lingui/react';
 import { motion } from 'framer-motion';
 import { Plus, Trash } from 'lucide-react';
 import { useSession } from 'next-auth/react';
@@ -54,9 +56,11 @@ export const AddSignersFormPartial = ({
   onSubmit,
   isDocumentPdfLoaded,
 }: AddSignersFormProps) => {
+  const { _ } = useLingui();
   const { toast } = useToast();
   const { remaining } = useLimits();
   const { data: session } = useSession();
+
   const user = session?.user;
 
   const initialId = useId();
@@ -157,8 +161,8 @@ export const AddSignersFormPartial = ({
 
     if (hasBeenSentToRecipientId(signer.nativeId)) {
       toast({
-        title: 'Cannot remove signer',
-        description: 'This signer has already received the document.',
+        title: _(msg`Cannot remove signer`),
+        description: _(msg`This signer has already received the document.`),
         variant: 'destructive',
       });
 
@@ -224,13 +228,15 @@ export const AddSignersFormPartial = ({
                         })}
                       >
                         {!showAdvancedSettings && index === 0 && (
-                          <FormLabel required>Email</FormLabel>
+                          <FormLabel required>
+                            <Trans>Email</Trans>
+                          </FormLabel>
                         )}
 
                         <FormControl>
                           <Input
                             type="email"
-                            placeholder="Email"
+                            placeholder={_(msg`Email`)}
                             {...field}
                             disabled={isSubmitting || hasBeenSentToRecipientId(signer.nativeId)}
                             onKeyDown={onKeyDown}
@@ -256,7 +262,7 @@ export const AddSignersFormPartial = ({
 
                         <FormControl>
                           <Input
-                            placeholder="Name"
+                            placeholder={_(msg`Name`)}
                             {...field}
                             disabled={isSubmitting || hasBeenSentToRecipientId(signer.nativeId)}
                             onKeyDown={onKeyDown}
@@ -339,7 +345,7 @@ export const AddSignersFormPartial = ({
                 onClick={() => onAddSigner()}
               >
                 <Plus className="-ml-1 mr-2 h-5 w-5" />
-                Add Signer
+                <Trans>Add Signer</Trans>
               </Button>
 
               <Button
@@ -350,7 +356,7 @@ export const AddSignersFormPartial = ({
                 onClick={() => onAddSelfSigner()}
               >
                 <Plus className="-ml-1 mr-2 h-5 w-5" />
-                Add myself
+                <Trans>Add myself</Trans>
               </Button>
             </div>
 
@@ -368,7 +374,7 @@ export const AddSignersFormPartial = ({
                   className="text-muted-foreground ml-2 text-sm"
                   htmlFor="showAdvancedRecipientSettings"
                 >
-                  Show advanced settings
+                  <Trans>Show advanced settings</Trans>
                 </label>
               </div>
             )}
@@ -377,11 +383,7 @@ export const AddSignersFormPartial = ({
       </DocumentFlowFormContainerContent>
 
       <DocumentFlowFormContainerFooter>
-        <DocumentFlowFormContainerStep
-          title={documentFlow.title}
-          step={currentStep}
-          maxStep={totalSteps}
-        />
+        <DocumentFlowFormContainerStep step={currentStep} maxStep={totalSteps} />
 
         <DocumentFlowFormContainerActions
           loading={isSubmitting}

@@ -4,6 +4,8 @@ import { useMemo, useState } from 'react';
 
 import { useRouter } from 'next/navigation';
 
+import { Trans, msg } from '@lingui/macro';
+import { useLingui } from '@lingui/react';
 import { Loader } from 'lucide-react';
 import { useSession } from 'next-auth/react';
 
@@ -34,6 +36,7 @@ export const UploadDocument = ({ className, team }: UploadDocumentProps) => {
 
   const { data: session } = useSession();
 
+  const { _ } = useLingui();
   const { toast } = useToast();
 
   const { quota, remaining, refreshLimits } = useLimits();
@@ -45,13 +48,14 @@ export const UploadDocument = ({ className, team }: UploadDocumentProps) => {
   const disabledMessage = useMemo(() => {
     if (remaining.documents === 0) {
       return team
-        ? 'Document upload disabled due to unpaid invoices'
-        : 'You have reached your document limit.';
+        ? msg`Document upload disabled due to unpaid invoices`
+        : msg`You have reached your document limit.`;
     }
 
     if (!session?.user.emailVerified) {
-      return 'Verify your email to upload documents.';
+      return msg`Verify your email to upload documents.`;
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [remaining.documents, session?.user.emailVerified, team]);
 
   const onFileDrop = async (file: File) => {
@@ -74,8 +78,8 @@ export const UploadDocument = ({ className, team }: UploadDocumentProps) => {
       void refreshLimits();
 
       toast({
-        title: 'Document uploaded',
-        description: 'Your document has been uploaded successfully.',
+        title: _(msg`Document uploaded`),
+        description: _(msg`Your document has been uploaded successfully.`),
         duration: 5000,
       });
 
@@ -93,20 +97,20 @@ export const UploadDocument = ({ className, team }: UploadDocumentProps) => {
 
       if (error.code === 'INVALID_DOCUMENT_FILE') {
         toast({
-          title: 'Invalid file',
-          description: 'You cannot upload encrypted PDFs',
+          title: _(msg`Invalid file`),
+          description: _(msg`You cannot upload encrypted PDFs`),
           variant: 'destructive',
         });
       } else if (err instanceof TRPCClientError) {
         toast({
-          title: 'Error',
+          title: _(msg`Error`),
           description: err.message,
           variant: 'destructive',
         });
       } else {
         toast({
-          title: 'Error',
-          description: 'An error occurred while uploading your document.',
+          title: _(msg`Error`),
+          description: _(msg`An error occurred while uploading your document.`),
           variant: 'destructive',
         });
       }
@@ -117,8 +121,8 @@ export const UploadDocument = ({ className, team }: UploadDocumentProps) => {
 
   const onFileDropRejected = () => {
     toast({
-      title: 'Your document failed to upload.',
-      description: `File cannot be larger than ${APP_DOCUMENT_UPLOAD_SIZE_LIMIT}MB`,
+      title: _(msg`Your document failed to upload.`),
+      description: _(msg`File cannot be larger than ${APP_DOCUMENT_UPLOAD_SIZE_LIMIT}MB`),
       duration: 5000,
       variant: 'destructive',
     });
@@ -139,7 +143,9 @@ export const UploadDocument = ({ className, team }: UploadDocumentProps) => {
           remaining.documents > 0 &&
           Number.isFinite(remaining.documents) && (
             <p className="text-muted-foreground/60 text-xs">
-              {remaining.documents} of {quota.documents} documents remaining this month.
+              <Trans>
+                {remaining.documents} of {quota.documents} documents remaining this month.
+              </Trans>
             </p>
           )}
       </div>

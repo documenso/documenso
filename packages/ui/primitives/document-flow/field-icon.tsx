@@ -1,3 +1,4 @@
+import { Trans } from '@lingui/macro';
 import {
   CalendarDays,
   CheckSquare,
@@ -48,7 +49,7 @@ export const FieldIcon = ({
           fontCaveatClassName,
         )}
       >
-        Signature
+        <Trans>Signature</Trans>
       </div>
     );
   } else {

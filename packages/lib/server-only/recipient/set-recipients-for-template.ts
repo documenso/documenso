@@ -1,12 +1,12 @@
 import { isUserEnterprise } from '@documenso/ee/server-only/util/is-document-enterprise';
+import {
+  DIRECT_TEMPLATE_RECIPIENT_EMAIL,
+  DIRECT_TEMPLATE_RECIPIENT_NAME,
+} from '@documenso/lib/constants/direct-templates';
 import { prisma } from '@documenso/prisma';
 import type { Recipient } from '@documenso/prisma/client';
 import { RecipientRole } from '@documenso/prisma/client';
 
-import {
-  DIRECT_TEMPLATE_RECIPIENT_EMAIL,
-  DIRECT_TEMPLATE_RECIPIENT_NAME,
-} from '../../constants/template';
 import { AppError, AppErrorCode } from '../../errors/app-error';
 import {
   type TRecipientActionAuthTypes,

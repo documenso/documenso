@@ -1,7 +1,11 @@
 'use client';
 
+import { useMemo } from 'react';
+
 import { useSearchParams } from 'next/navigation';
 
+import { Trans, msg } from '@lingui/macro';
+import { useLingui } from '@lingui/react';
 import { History, MoreHorizontal, Trash2 } from 'lucide-react';
 
 import { useUpdateSearchParams } from '@documenso/lib/client-only/hooks/use-update-search-params';
@@ -9,6 +13,7 @@ import { TEAM_MEMBER_ROLE_MAP } from '@documenso/lib/constants/teams';
 import { ZBaseTableSearchParamsSchema } from '@documenso/lib/types/search-params';
 import { trpc } from '@documenso/trpc/react';
 import { AvatarWithText } from '@documenso/ui/primitives/avatar';
+import type { DataTableColumnDef } from '@documenso/ui/primitives/data-table';
 import { DataTable } from '@documenso/ui/primitives/data-table';
 import { DataTablePagination } from '@documenso/ui/primitives/data-table-pagination';
 import {
@@ -32,6 +37,7 @@ export const TeamMemberInvitesDataTable = ({ teamId }: TeamMemberInvitesDataTabl
   const searchParams = useSearchParams();
   const updateSearchParams = useUpdateSearchParams();
 
+  const { _ } = useLingui();
   const { toast } = useToast();
 
   const parsedSearchParams = ZBaseTableSearchParamsSchema.parse(
@@ -55,14 +61,14 @@ export const TeamMemberInvitesDataTable = ({ teamId }: TeamMemberInvitesDataTabl
     trpc.team.resendTeamMemberInvitation.useMutation({
       onSuccess: () => {
         toast({
-          title: 'Success',
-          description: 'Invitation has been resent',
+          title: _(msg`Success`),
+          description: _(msg`Invitation has been resent`),
         });
       },
       onError: () => {
         toast({
-          title: 'Something went wrong',
-          description: 'Unable to resend invitation. Please try again.',
+          title: _(msg`Something went wrong`),
+          description: _(msg`Unable to resend invitation. Please try again.`),
           variant: 'destructive',
         });
       },
@@ -72,14 +78,14 @@ export const TeamMemberInvitesDataTable = ({ teamId }: TeamMemberInvitesDataTabl
     trpc.team.deleteTeamMemberInvitations.useMutation({
       onSuccess: () => {
         toast({
-          title: 'Success',
-          description: 'Invitation has been deleted',
+          title: _(msg`Success`),
+          description: _(msg`Invitation has been deleted`),
         });
       },
       onError: () => {
         toast({
-          title: 'Something went wrong',
-          description: 'Unable to delete invitation. Please try again.',
+          title: _(msg`Something went wrong`),
+          description: _(msg`Unable to delete invitation. Please try again.`),
           variant: 'destructive',
         });
       },
@@ -99,72 +105,78 @@ export const TeamMemberInvitesDataTable = ({ teamId }: TeamMemberInvitesDataTabl
     totalPages: 1,
   };
 
+  const columns = useMemo(() => {
+    return [
+      {
+        header: _(msg`Team Member`),
+        cell: ({ row }) => {
+          return (
+            <AvatarWithText
+              avatarClass="h-12 w-12"
+              avatarFallback={row.original.email.slice(0, 1).toUpperCase()}
+              primaryText={
+                <span className="text-foreground/80 font-semibold">{row.original.email}</span>
+              }
+            />
+          );
+        },
+      },
+      {
+        header: _(msg`Role`),
+        accessorKey: 'role',
+        cell: ({ row }) => _(TEAM_MEMBER_ROLE_MAP[row.original.role]) ?? row.original.role,
+      },
+      {
+        header: _(msg`Invited At`),
+        accessorKey: 'createdAt',
+        cell: ({ row }) => <LocaleDate date={row.original.createdAt} />,
+      },
+      {
+        header: _(msg`Actions`),
+        cell: ({ row }) => (
+          <DropdownMenu>
+            <DropdownMenuTrigger>
+              <MoreHorizontal className="text-muted-foreground h-5 w-5" />
+            </DropdownMenuTrigger>
+
+            <DropdownMenuContent className="w-52" align="start" forceMount>
+              <DropdownMenuLabel>
+                <Trans>Actions</Trans>
+              </DropdownMenuLabel>
+
+              <DropdownMenuItem
+                onClick={async () =>
+                  resendTeamMemberInvitation({
+                    teamId,
+                    invitationId: row.original.id,
+                  })
+                }
+              >
+                <History className="mr-2 h-4 w-4" />
+                <Trans>Resend</Trans>
+              </DropdownMenuItem>
+
+              <DropdownMenuItem
+                onClick={async () =>
+                  deleteTeamMemberInvitations({
+                    teamId,
+                    invitationIds: [row.original.id],
+                  })
+                }
+              >
+                <Trash2 className="mr-2 h-4 w-4" />
+                <Trans>Remove</Trans>
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        ),
+      },
+    ] satisfies DataTableColumnDef<(typeof results)['data'][number]>[];
+  }, []);
+
   return (
     <DataTable
-      columns={[
-        {
-          header: 'Team Member',
-          cell: ({ row }) => {
-            return (
-              <AvatarWithText
-                avatarClass="h-12 w-12"
-                avatarFallback={row.original.email.slice(0, 1).toUpperCase()}
-                primaryText={
-                  <span className="text-foreground/80 font-semibold">{row.original.email}</span>
-                }
-              />
-            );
-          },
-        },
-        {
-          header: 'Role',
-          accessorKey: 'role',
-          cell: ({ row }) => TEAM_MEMBER_ROLE_MAP[row.original.role] ?? row.original.role,
-        },
-        {
-          header: 'Invited At',
-          accessorKey: 'createdAt',
-          cell: ({ row }) => <LocaleDate date={row.original.createdAt} />,
-        },
-        {
-          header: 'Actions',
-          cell: ({ row }) => (
-            <DropdownMenu>
-              <DropdownMenuTrigger>
-                <MoreHorizontal className="text-muted-foreground h-5 w-5" />
-              </DropdownMenuTrigger>
-
-              <DropdownMenuContent className="w-52" align="start" forceMount>
-                <DropdownMenuLabel>Actions</DropdownMenuLabel>
-
-                <DropdownMenuItem
-                  onClick={async () =>
-                    resendTeamMemberInvitation({
-                      teamId,
-                      invitationId: row.original.id,
-                    })
-                  }
-                >
-                  <History className="mr-2 h-4 w-4" />
-                  Resend
-                </DropdownMenuItem>
-
-                <DropdownMenuItem
-                  onClick={async () =>
-                    deleteTeamMemberInvitations({
-                      teamId,
-                      invitationIds: [row.original.id],
-                    })
-                  }
-                >
-                  <Trash2 className="mr-2 h-4 w-4" />
-                  Remove
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-          ),
-        },
-      ]}
+      columns={columns}
       data={results.data}
       perPage={results.perPage}
       currentPage={results.currentPage}

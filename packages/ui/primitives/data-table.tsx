@@ -2,6 +2,7 @@
 
 import React, { useMemo } from 'react';
 
+import { Trans } from '@lingui/macro';
 import type {
   ColumnDef,
   PaginationState,
@@ -15,6 +16,8 @@ import { Skeleton } from './skeleton';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from './table';
 
 export type DataTableChildren<TData> = (_table: TTable<TData>) => React.ReactNode;
+
+export type { ColumnDef as DataTableColumnDef } from '@tanstack/react-table';
 
 export interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
@@ -130,7 +133,7 @@ export function DataTable<TData, TValue>({
               <TableRow>
                 {error.component ?? (
                   <TableCell colSpan={columns.length} className="h-32 text-center">
-                    Something went wrong.
+                    <Trans>Something went wrong.</Trans>
                   </TableCell>
                 )}
               </TableRow>
@@ -141,14 +144,16 @@ export function DataTable<TData, TValue>({
             ) : (
               <TableRow>
                 <TableCell colSpan={columns.length} className="h-32 text-center">
-                  <p>No results found</p>
+                  <p>
+                    <Trans>No results found</Trans>
+                  </p>
 
                   {hasFilters && onClearFilters !== undefined && (
                     <button
                       onClick={() => onClearFilters()}
                       className="text-foreground mt-1 text-sm"
                     >
-                      Clear filters
+                      <Trans>Clear filters</Trans>
                     </button>
                   )}
                 </TableCell>

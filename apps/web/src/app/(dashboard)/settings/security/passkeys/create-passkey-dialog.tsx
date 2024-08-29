@@ -3,6 +3,8 @@
 import { useEffect, useState } from 'react';
 
 import { zodResolver } from '@hookform/resolvers/zod';
+import { Trans, msg } from '@lingui/macro';
+import { useLingui } from '@lingui/react';
 import type * as DialogPrimitive from '@radix-ui/react-dialog';
 import { startRegistration } from '@simplewebauthn/browser';
 import { KeyRoundIcon } from 'lucide-react';
@@ -53,6 +55,7 @@ export const CreatePasskeyDialog = ({ trigger, onSuccess, ...props }: CreatePass
   const [open, setOpen] = useState(false);
   const [formError, setFormError] = useState<string | null>(null);
 
+  const { _ } = useLingui();
   const { toast } = useToast();
 
   const form = useForm<TCreatePasskeyFormSchema>({
@@ -81,7 +84,7 @@ export const CreatePasskeyDialog = ({ trigger, onSuccess, ...props }: CreatePass
       });
 
       toast({
-        description: 'Successfully created passkey',
+        description: _(msg`Successfully created passkey`),
         duration: 5000,
       });
 
@@ -140,17 +143,22 @@ export const CreatePasskeyDialog = ({ trigger, onSuccess, ...props }: CreatePass
         {trigger ?? (
           <Button variant="secondary" loading={isLoading}>
             <KeyRoundIcon className="-ml-1 mr-1 h-5 w-5" />
-            Add passkey
+            <Trans>Add passkey</Trans>
           </Button>
         )}
       </DialogTrigger>
 
       <DialogContent position="center">
         <DialogHeader>
-          <DialogTitle>Add passkey</DialogTitle>
+          <DialogTitle>
+            <Trans>Add passkey</Trans>
+          </DialogTitle>
 
           <DialogDescription className="mt-4">
-            Passkeys allow you to sign in and authenticate using biometrics, password managers, etc.
+            <Trans>
+              Passkeys allow you to sign in and authenticate using biometrics, password managers,
+              etc.
+            </Trans>
           </DialogDescription>
         </DialogHeader>
 
@@ -165,7 +173,9 @@ export const CreatePasskeyDialog = ({ trigger, onSuccess, ...props }: CreatePass
                 name="passkeyName"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel required>Passkey name</FormLabel>
+                    <FormLabel required>
+                      <Trans>Passkey name</Trans>
+                    </FormLabel>
                     <FormControl>
                       <Input className="bg-background" placeholder="eg. Mac" {...field} />
                     </FormControl>
@@ -176,13 +186,17 @@ export const CreatePasskeyDialog = ({ trigger, onSuccess, ...props }: CreatePass
 
               <Alert variant="neutral">
                 <AlertDescription>
-                  When you click continue, you will be prompted to add the first available
-                  authenticator on your system.
+                  <Trans>
+                    When you click continue, you will be prompted to add the first available
+                    authenticator on your system.
+                  </Trans>
                 </AlertDescription>
 
                 <AlertDescription className="mt-2">
-                  If you do not want to use the authenticator prompted, you can close it, which will
-                  then display the next available authenticator.
+                  <Trans>
+                    If you do not want to use the authenticator prompted, you can close it, which
+                    will then display the next available authenticator.
+                  </Trans>
                 </AlertDescription>
               </Alert>
 
@@ -190,30 +204,40 @@ export const CreatePasskeyDialog = ({ trigger, onSuccess, ...props }: CreatePass
                 <Alert variant="destructive">
                   {match(formError)
                     .with('ERROR_AUTHENTICATOR_PREVIOUSLY_REGISTERED', () => (
-                      <AlertDescription>This passkey has already been registered.</AlertDescription>
+                      <AlertDescription>
+                        <Trans>This passkey has already been registered.</Trans>
+                      </AlertDescription>
                     ))
                     .with('TOO_MANY_PASSKEYS', () => (
                       <AlertDescription>
-                        You cannot have more than {MAXIMUM_PASSKEYS} passkeys.
+                        <Trans>You cannot have more than {MAXIMUM_PASSKEYS} passkeys.</Trans>
                       </AlertDescription>
                     ))
                     .with('InvalidStateError', () => (
                       <>
                         <AlertTitle className="text-sm">
-                          Passkey creation cancelled due to one of the following reasons:
+                          <Trans>
+                            Passkey creation cancelled due to one of the following reasons:
+                          </Trans>
                         </AlertTitle>
                         <AlertDescription>
                           <ul className="mt-1 list-inside list-disc">
-                            <li>Cancelled by user</li>
-                            <li>Passkey already exists for the provided authenticator</li>
-                            <li>Exceeded timeout</li>
+                            <li>
+                              <Trans>Cancelled by user</Trans>
+                            </li>
+                            <li>
+                              <Trans>Passkey already exists for the provided authenticator</Trans>
+                            </li>
+                            <li>
+                              <Trans>Exceeded timeout</Trans>
+                            </li>
                           </ul>
                         </AlertDescription>
                       </>
                     ))
                     .otherwise(() => (
                       <AlertDescription>
-                        Something went wrong. Please try again or contact support.
+                        <Trans>Something went wrong. Please try again or contact support.</Trans>
                       </AlertDescription>
                     ))}
                 </Alert>
@@ -221,11 +245,11 @@ export const CreatePasskeyDialog = ({ trigger, onSuccess, ...props }: CreatePass
 
               <DialogFooter>
                 <Button type="button" variant="secondary" onClick={() => setOpen(false)}>
-                  Cancel
+                  <Trans>Cancel</Trans>
                 </Button>
 
                 <Button type="submit" loading={form.formState.isSubmitting}>
-                  Continue
+                  <Trans>Continue</Trans>
                 </Button>
               </DialogFooter>
             </fieldset>

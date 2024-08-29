@@ -5,6 +5,8 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 
 import { zodResolver } from '@hookform/resolvers/zod';
+import { Trans, msg } from '@lingui/macro';
+import { useLingui } from '@lingui/react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 
@@ -42,13 +44,14 @@ export const DeleteTeamDialog = ({ trigger, teamId, teamName }: DeleteTeamDialog
   const router = useRouter();
   const [open, setOpen] = useState(false);
 
+  const { _ } = useLingui();
   const { toast } = useToast();
 
   const deleteMessage = `delete ${teamName}`;
 
   const ZDeleteTeamFormSchema = z.object({
     teamName: z.literal(deleteMessage, {
-      errorMap: () => ({ message: `You must enter '${deleteMessage}' to proceed` }),
+      errorMap: () => ({ message: _(msg`You must enter '${deleteMessage}' to proceed`) }),
     }),
   });
 
@@ -66,8 +69,8 @@ export const DeleteTeamDialog = ({ trigger, teamId, teamName }: DeleteTeamDialog
       await deleteTeam({ teamId });
 
       toast({
-        title: 'Success',
-        description: 'Your team has been successfully deleted.',
+        title: _(msg`Success`),
+        description: _(msg`Your team has been successfully deleted.`),
         duration: 5000,
       });
 
@@ -78,20 +81,22 @@ export const DeleteTeamDialog = ({ trigger, teamId, teamName }: DeleteTeamDialog
       const error = AppError.parseError(err);
 
       let toastError: Toast = {
-        title: 'An unknown error occurred',
+        title: _(msg`An unknown error occurred`),
+        description: _(
+          msg`We encountered an unknown error while attempting to delete this team. Please try again later.`,
+        ),
         variant: 'destructive',
         duration: 10000,
-        description:
-          'We encountered an unknown error while attempting to delete this team. Please try again later.',
       };
 
       if (error.code === 'resource_missing') {
         toastError = {
-          title: 'Unable to delete team',
+          title: _(msg`Unable to delete team`),
+          description: _(
+            msg`Something went wrong while updating the team billing subscription, please contact support.`,
+          ),
           variant: 'destructive',
           duration: 15000,
-          description:
-            'Something went wrong while updating the team billing subscription, please contact support.',
         };
       }
 
@@ -108,16 +113,24 @@ export const DeleteTeamDialog = ({ trigger, teamId, teamName }: DeleteTeamDialog
   return (
     <Dialog open={open} onOpenChange={(value) => !form.formState.isSubmitting && setOpen(value)}>
       <DialogTrigger asChild>
-        {trigger ?? <Button variant="destructive">Delete team</Button>}
+        {trigger ?? (
+          <Button variant="destructive">
+            <Trans>Delete team</Trans>
+          </Button>
+        )}
       </DialogTrigger>
 
       <DialogContent position="center">
         <DialogHeader>
-          <DialogTitle>Are you sure you wish to delete this team?</DialogTitle>
+          <DialogTitle>
+            <Trans>Are you sure you wish to delete this team?</Trans>
+          </DialogTitle>
 
           <DialogDescription className="mt-4">
-            Please note that you will lose access to all documents associated with this team & all
-            the members will be removed and notified
+            <Trans>
+              Please note that you will lose access to all documents associated with this team & all
+              the members will be removed and notified
+            </Trans>
           </DialogDescription>
         </DialogHeader>
 
@@ -133,7 +146,9 @@ export const DeleteTeamDialog = ({ trigger, teamId, teamName }: DeleteTeamDialog
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>
-                      Confirm by typing <span className="text-destructive">{deleteMessage}</span>
+                      <Trans>
+                        Confirm by typing <span className="text-destructive">{deleteMessage}</span>
+                      </Trans>
                     </FormLabel>
                     <FormControl>
                       <Input className="bg-background" {...field} />
@@ -145,11 +160,11 @@ export const DeleteTeamDialog = ({ trigger, teamId, teamName }: DeleteTeamDialog
 
               <DialogFooter>
                 <Button type="button" variant="secondary" onClick={() => setOpen(false)}>
-                  Cancel
+                  <Trans>Cancel</Trans>
                 </Button>
 
                 <Button type="submit" variant="destructive" loading={form.formState.isSubmitting}>
-                  Delete
+                  <Trans>Delete</Trans>
                 </Button>
               </DialogFooter>
             </fieldset>

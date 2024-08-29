@@ -2,6 +2,9 @@
 
 import React from 'react';
 
+import { msg } from '@lingui/macro';
+import { useLingui } from '@lingui/react';
+
 import { useCopyToClipboard } from '@documenso/lib/client-only/hooks/use-copy-to-clipboard';
 import { getRecipientType } from '@documenso/lib/client-only/recipient-type';
 import { NEXT_PUBLIC_WEBAPP_URL } from '@documenso/lib/constants/app';
@@ -21,6 +24,8 @@ export type AvatarWithRecipientProps = {
 
 export function AvatarWithRecipient({ recipient, documentStatus }: AvatarWithRecipientProps) {
   const [, copy] = useCopyToClipboard();
+
+  const { _ } = useLingui();
   const { toast } = useToast();
 
   const signingToken = documentStatus === DocumentStatus.PENDING ? recipient.token : null;
@@ -32,8 +37,8 @@ export function AvatarWithRecipient({ recipient, documentStatus }: AvatarWithRec
 
     void copy(`${NEXT_PUBLIC_WEBAPP_URL()}/sign/${signingToken}`).then(() => {
       toast({
-        title: 'Copied to clipboard',
-        description: 'The signing link has been copied to your clipboard.',
+        title: _(msg`Copied to clipboard`),
+        description: _(msg`The signing link has been copied to your clipboard.`),
       });
     });
   };
@@ -44,7 +49,7 @@ export function AvatarWithRecipient({ recipient, documentStatus }: AvatarWithRec
         'cursor-pointer hover:underline': signingToken,
       })}
       role={signingToken ? 'button' : undefined}
-      title={signingToken ? 'Click to copy signing link for sending to recipient' : undefined}
+      title={signingToken ? _(msg`Click to copy signing link for sending to recipient`) : undefined}
       onClick={onRecipientClick}
     >
       <StackAvatar
@@ -56,11 +61,13 @@ export function AvatarWithRecipient({ recipient, documentStatus }: AvatarWithRec
 
       <div
         className="text-muted-foreground text-sm"
-        title={signingToken ? 'Click to copy signing link for sending to recipient' : undefined}
+        title={
+          signingToken ? _(msg`Click to copy signing link for sending to recipient`) : undefined
+        }
       >
         <p>{recipient.email}</p>
         <p className="text-muted-foreground/70 text-xs">
-          {RECIPIENT_ROLES_DESCRIPTION[recipient.role].roleName}
+          {_(RECIPIENT_ROLES_DESCRIPTION[recipient.role].roleName)}
         </p>
       </div>
     </div>

@@ -5,6 +5,7 @@ import type { HTMLAttributes } from 'react';
 import Link from 'next/link';
 import { useParams, usePathname } from 'next/navigation';
 
+import { Trans } from '@lingui/macro';
 import { Braces, CreditCard, Globe2Icon, Settings, Users, Webhook } from 'lucide-react';
 
 import { useFeatureFlags } from '@documenso/lib/client-only/providers/feature-flag';
@@ -39,7 +40,7 @@ export const DesktopNav = ({ className, ...props }: DesktopNavProps) => {
           className={cn('w-full justify-start', pathname === settingsPath && 'bg-secondary')}
         >
           <Settings className="mr-2 h-5 w-5" />
-          General
+          <Trans>General</Trans>
         </Button>
       </Link>
 
@@ -53,7 +54,7 @@ export const DesktopNav = ({ className, ...props }: DesktopNavProps) => {
             )}
           >
             <Globe2Icon className="mr-2 h-5 w-5" />
-            Public Profile
+            <Trans>Public Profile</Trans>
           </Button>
         </Link>
       )}
@@ -67,7 +68,7 @@ export const DesktopNav = ({ className, ...props }: DesktopNavProps) => {
           )}
         >
           <Users className="mr-2 h-5 w-5" />
-          Members
+          <Trans>Members</Trans>
         </Button>
       </Link>
 
@@ -77,7 +78,7 @@ export const DesktopNav = ({ className, ...props }: DesktopNavProps) => {
           className={cn('w-full justify-start', pathname?.startsWith(tokensPath) && 'bg-secondary')}
         >
           <Braces className="mr-2 h-5 w-5" />
-          API Tokens
+          <Trans>API Tokens</Trans>
         </Button>
       </Link>
 
@@ -90,7 +91,7 @@ export const DesktopNav = ({ className, ...props }: DesktopNavProps) => {
           )}
         >
           <Webhook className="mr-2 h-5 w-5" />
-          Webhooks
+          <Trans>Webhooks</Trans>
         </Button>
       </Link>
 
@@ -104,7 +105,7 @@ export const DesktopNav = ({ className, ...props }: DesktopNavProps) => {
             )}
           >
             <CreditCard className="mr-2 h-5 w-5" />
-            Billing
+            <Trans>Billing</Trans>
           </Button>
         </Link>
       )}

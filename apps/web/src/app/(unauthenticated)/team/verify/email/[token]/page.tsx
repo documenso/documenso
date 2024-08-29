@@ -1,5 +1,8 @@
 import Link from 'next/link';
 
+import { Trans } from '@lingui/macro';
+
+import { setupI18nSSR } from '@documenso/lib/client-only/providers/i18n.server';
 import { isTokenExpired } from '@documenso/lib/utils/token-verification';
 import { prisma } from '@documenso/prisma';
 import { Button } from '@documenso/ui/primitives/button';
@@ -11,6 +14,8 @@ type VerifyTeamEmailPageProps = {
 };
 
 export default async function VerifyTeamEmailPage({ params: { token } }: VerifyTeamEmailPageProps) {
+  setupI18nSSR();
+
   const teamEmailVerification = await prisma.teamEmailVerification.findUnique({
     where: {
       token,
@@ -24,16 +29,46 @@ export default async function VerifyTeamEmailPage({ params: { token } }: VerifyT
     return (
       <div className="w-screen max-w-lg px-4">
         <div className="w-full">
-          <h1 className="text-4xl font-semibold">Invalid link</h1>
+          <h1 className="text-4xl font-semibold">
+            <Trans>Invalid link</Trans>
+          </h1>
 
           <p className="text-muted-foreground mb-4 mt-2 text-sm">
-            This link is invalid or has expired. Please contact your team to resend a verification.
+            <Trans>
+              This link is invalid or has expired. Please contact your team to resend a
+              verification.
+            </Trans>
           </p>
 
           <Button asChild>
-            <Link href="/">Return</Link>
+            <Link href="/">
+              <Trans>Return</Trans>
+            </Link>
           </Button>
         </div>
+      </div>
+    );
+  }
+
+  if (teamEmailVerification.completed) {
+    return (
+      <div>
+        <h1 className="text-4xl font-semibold">
+          <Trans>Team email already verified!</Trans>
+        </h1>
+
+        <p className="text-muted-foreground mb-4 mt-2 text-sm">
+          <Trans>
+            You have already verified your email address for{' '}
+            <strong>{teamEmailVerification.team.name}</strong>.
+          </Trans>
+        </p>
+
+        <Button asChild>
+          <Link href="/">
+            <Trans>Continue</Trans>
+          </Link>
+        </Button>
       </div>
     );
   }
@@ -44,9 +79,21 @@ export default async function VerifyTeamEmailPage({ params: { token } }: VerifyT
 
   try {
     await prisma.$transaction([
+      prisma.teamEmailVerification.updateMany({
+        where: {
+          teamId: team.id,
+          email: teamEmailVerification.email,
+        },
+        data: {
+          completed: true,
+        },
+      }),
       prisma.teamEmailVerification.deleteMany({
         where: {
           teamId: team.id,
+          expiresAt: {
+            lt: new Date(),
+          },
         },
       }),
       prisma.teamEmail.create({
@@ -65,11 +112,15 @@ export default async function VerifyTeamEmailPage({ params: { token } }: VerifyT
   if (isTeamEmailVerificationError) {
     return (
       <div>
-        <h1 className="text-4xl font-semibold">Team email verification</h1>
+        <h1 className="text-4xl font-semibold">
+          <Trans>Team email verification</Trans>
+        </h1>
 
         <p className="text-muted-foreground mt-2 text-sm">
-          Something went wrong while attempting to verify your email address for{' '}
-          <strong>{team.name}</strong>. Please try again later.
+          <Trans>
+            Something went wrong while attempting to verify your email address for{' '}
+            <strong>{team.name}</strong>. Please try again later.
+          </Trans>
         </p>
       </div>
     );
@@ -77,14 +128,20 @@ export default async function VerifyTeamEmailPage({ params: { token } }: VerifyT
 
   return (
     <div>
-      <h1 className="text-4xl font-semibold">Team email verified!</h1>
+      <h1 className="text-4xl font-semibold">
+        <Trans>Team email verified!</Trans>
+      </h1>
 
       <p className="text-muted-foreground mb-4 mt-2 text-sm">
-        You have verified your email address for <strong>{team.name}</strong>.
+        <Trans>
+          You have verified your email address for <strong>{team.name}</strong>.
+        </Trans>
       </p>
 
       <Button asChild>
-        <Link href="/">Continue</Link>
+        <Link href="/">
+          <Trans>Continue</Trans>
+        </Link>
       </Button>
     </div>
   );

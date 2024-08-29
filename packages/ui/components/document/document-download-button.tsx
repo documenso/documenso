@@ -3,6 +3,8 @@
 import type { HTMLAttributes } from 'react';
 import { useState } from 'react';
 
+import { Trans } from '@lingui/macro';
+import { useLingui } from '@lingui/react';
 import { Download } from 'lucide-react';
 
 import { downloadPDF } from '@documenso/lib/client-only/download-pdf';
@@ -24,8 +26,10 @@ export const DocumentDownloadButton = ({
   disabled,
   ...props
 }: DownloadButtonProps) => {
-  const [isLoading, setIsLoading] = useState(false);
+  const { _ } = useLingui();
   const { toast } = useToast();
+
+  const [isLoading, setIsLoading] = useState(false);
 
   const onDownloadClick = async () => {
     try {
@@ -43,8 +47,8 @@ export const DocumentDownloadButton = ({
       setIsLoading(false);
 
       toast({
-        title: 'Something went wrong',
-        description: 'An error occurred while downloading your document.',
+        title: _('Something went wrong'),
+        description: _('An error occurred while downloading your document.'),
         variant: 'destructive',
       });
     }
@@ -61,7 +65,7 @@ export const DocumentDownloadButton = ({
       {...props}
     >
       {!isLoading && <Download className="mr-2 h-5 w-5" />}
-      Download
+      <Trans>Download</Trans>
     </Button>
   );
 };

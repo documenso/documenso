@@ -3,6 +3,8 @@
 import { useRouter } from 'next/navigation';
 
 import { zodResolver } from '@hookform/resolvers/zod';
+import { Trans, msg } from '@lingui/macro';
+import { useLingui } from '@lingui/react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { useForm } from 'react-hook-form';
 import type { z } from 'zod';
@@ -39,6 +41,7 @@ type TUpdateTeamFormSchema = z.infer<typeof ZUpdateTeamFormSchema>;
 export const UpdateTeamForm = ({ teamId, teamName, teamUrl }: UpdateTeamDialogProps) => {
   const router = useRouter();
 
+  const { _ } = useLingui();
   const { toast } = useToast();
 
   const form = useForm({
@@ -62,8 +65,8 @@ export const UpdateTeamForm = ({ teamId, teamName, teamUrl }: UpdateTeamDialogPr
       });
 
       toast({
-        title: 'Success',
-        description: 'Your team has been successfully updated.',
+        title: _(msg`Success`),
+        description: _(msg`Your team has been successfully updated.`),
         duration: 5000,
       });
 
@@ -81,17 +84,18 @@ export const UpdateTeamForm = ({ teamId, teamName, teamUrl }: UpdateTeamDialogPr
       if (error.code === AppErrorCode.ALREADY_EXISTS) {
         form.setError('url', {
           type: 'manual',
-          message: 'This URL is already in use.',
+          message: _(msg`This URL is already in use.`),
         });
 
         return;
       }
 
       toast({
-        title: 'An unknown error occurred',
+        title: _(msg`An unknown error occurred`),
+        description: _(
+          msg`We encountered an unknown error while attempting to update your team. Please try again later.`,
+        ),
         variant: 'destructive',
-        description:
-          'We encountered an unknown error while attempting to update your team. Please try again later.',
       });
     }
   };
@@ -105,7 +109,9 @@ export const UpdateTeamForm = ({ teamId, teamName, teamUrl }: UpdateTeamDialogPr
             name="name"
             render={({ field }) => (
               <FormItem>
-                <FormLabel required>Team Name</FormLabel>
+                <FormLabel required>
+                  <Trans>Team Name</Trans>
+                </FormLabel>
                 <FormControl>
                   <Input className="bg-background" {...field} />
                 </FormControl>
@@ -119,15 +125,19 @@ export const UpdateTeamForm = ({ teamId, teamName, teamUrl }: UpdateTeamDialogPr
             name="url"
             render={({ field }) => (
               <FormItem className="mt-4">
-                <FormLabel required>Team URL</FormLabel>
+                <FormLabel required>
+                  <Trans>Team URL</Trans>
+                </FormLabel>
                 <FormControl>
                   <Input className="bg-background" {...field} />
                 </FormControl>
                 {!form.formState.errors.url && (
                   <span className="text-foreground/50 text-xs font-normal">
-                    {field.value
-                      ? `${WEBAPP_BASE_URL}/t/${field.value}`
-                      : 'A unique URL to identify your team'}
+                    {field.value ? (
+                      `${WEBAPP_BASE_URL}/t/${field.value}`
+                    ) : (
+                      <Trans>A unique URL to identify your team</Trans>
+                    )}
                   </span>
                 )}
 
@@ -151,7 +161,7 @@ export const UpdateTeamForm = ({ teamId, teamName, teamUrl }: UpdateTeamDialogPr
                   }}
                 >
                   <Button type="button" variant="secondary" onClick={() => form.reset()}>
-                    Reset
+                    <Trans>Reset</Trans>
                   </Button>
                 </motion.div>
               )}
@@ -163,7 +173,7 @@ export const UpdateTeamForm = ({ teamId, teamName, teamUrl }: UpdateTeamDialogPr
               disabled={!form.formState.isDirty}
               loading={form.formState.isSubmitting}
             >
-              Update team
+              <Trans>Update team</Trans>
             </Button>
           </div>
         </fieldset>
