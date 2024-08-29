@@ -607,6 +607,7 @@ msgstr ""
 msgid "Background Color"
 msgstr ""
 
+#: apps/web/src/components/forms/2fa/disable-authenticator-app-dialog.tsx:167
 #: apps/web/src/components/forms/signin.tsx:451
 msgid "Backup Code"
 msgstr ""
@@ -684,7 +685,6 @@ msgstr ""
 #: apps/web/src/components/(teams)/dialogs/transfer-team-dialog.tsx:278
 #: apps/web/src/components/(teams)/dialogs/update-team-email-dialog.tsx:162
 #: apps/web/src/components/(teams)/dialogs/update-team-member-dialog.tsx:187
-#: apps/web/src/components/forms/2fa/disable-authenticator-app-dialog.tsx:137
 #: apps/web/src/components/forms/2fa/enable-authenticator-app-dialog.tsx:257
 #: apps/web/src/components/forms/2fa/view-recovery-codes-dialog.tsx:163
 #: apps/web/src/components/templates/manage-public-template-dialog.tsx:452
@@ -1143,9 +1143,9 @@ msgstr ""
 msgid "Disable"
 msgstr ""
 
-#: apps/web/src/components/forms/2fa/disable-authenticator-app-dialog.tsx:92
-#: apps/web/src/components/forms/2fa/disable-authenticator-app-dialog.tsx:99
-#: apps/web/src/components/forms/2fa/disable-authenticator-app-dialog.tsx:142
+#: apps/web/src/components/forms/2fa/disable-authenticator-app-dialog.tsx:116
+#: apps/web/src/components/forms/2fa/disable-authenticator-app-dialog.tsx:123
+#: apps/web/src/components/forms/2fa/disable-authenticator-app-dialog.tsx:192
 msgid "Disable 2FA"
 msgstr ""
 
@@ -2279,7 +2279,7 @@ msgstr ""
 msgid "Please note that you will lose access to all documents associated with this team & all the members will be removed and notified"
 msgstr ""
 
-#: apps/web/src/components/forms/2fa/disable-authenticator-app-dialog.tsx:103
+#: apps/web/src/components/forms/2fa/disable-authenticator-app-dialog.tsx:127
 msgid "Please provide a token from the authenticator, or a backup code. If you do not have a backup code available, please contact support."
 msgstr ""
 
@@ -3453,7 +3453,7 @@ msgstr ""
 msgid "Two-Factor Authentication"
 msgstr ""
 
-#: apps/web/src/components/forms/2fa/disable-authenticator-app-dialog.tsx:66
+#: apps/web/src/components/forms/2fa/disable-authenticator-app-dialog.tsx:90
 msgid "Two-factor authentication disabled"
 msgstr ""
 
@@ -3461,7 +3461,7 @@ msgstr ""
 msgid "Two-factor authentication enabled"
 msgstr ""
 
-#: apps/web/src/components/forms/2fa/disable-authenticator-app-dialog.tsx:68
+#: apps/web/src/components/forms/2fa/disable-authenticator-app-dialog.tsx:92
 msgid "Two-factor authentication has been disabled for your account. You will no longer be required to enter a code from your authenticator app when signing in."
 msgstr ""
 
@@ -3506,7 +3506,7 @@ msgstr ""
 msgid "Unable to delete team"
 msgstr ""
 
-#: apps/web/src/components/forms/2fa/disable-authenticator-app-dialog.tsx:79
+#: apps/web/src/components/forms/2fa/disable-authenticator-app-dialog.tsx:103
 msgid "Unable to disable two-factor authentication"
 msgstr ""
 
@@ -3654,10 +3654,12 @@ msgstr ""
 msgid "Uploaded file not an allowed file type"
 msgstr ""
 
+#: apps/web/src/components/forms/2fa/disable-authenticator-app-dialog.tsx:187
 #: apps/web/src/components/forms/signin.tsx:471
 msgid "Use Authenticator"
 msgstr ""
 
+#: apps/web/src/components/forms/2fa/disable-authenticator-app-dialog.tsx:185
 #: apps/web/src/components/forms/signin.tsx:469
 msgid "Use Backup Code"
 msgstr ""
@@ -3944,7 +3946,7 @@ msgstr ""
 msgid "We were unable to create a checkout session. Please try again, or contact support"
 msgstr ""
 
-#: apps/web/src/components/forms/2fa/disable-authenticator-app-dialog.tsx:81
+#: apps/web/src/components/forms/2fa/disable-authenticator-app-dialog.tsx:105
 msgid "We were unable to disable two-factor authentication for your account. Please ensure that you have entered your password and backup code correctly and try again."
 msgstr ""
 

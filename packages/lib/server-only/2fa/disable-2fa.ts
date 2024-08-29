@@ -2,25 +2,33 @@ import { prisma } from '@documenso/prisma';
 import type { User } from '@documenso/prisma/client';
 import { UserSecurityAuditLogType } from '@documenso/prisma/client';
 
-import { AppError } from '../../errors/app-error';
+import { AppError, AppErrorCode } from '../../errors/app-error';
 import type { RequestMetadata } from '../../universal/extract-request-metadata';
 import { validateTwoFactorAuthentication } from './validate-2fa';
 
 type DisableTwoFactorAuthenticationOptions = {
   user: User;
-  token: string;
+  totpCode?: string;
+  backupCode?: string;
   requestMetadata?: RequestMetadata;
 };
 
 export const disableTwoFactorAuthentication = async ({
-  token,
+  totpCode,
+  backupCode,
   user,
   requestMetadata,
 }: DisableTwoFactorAuthenticationOptions) => {
-  let isValid = await validateTwoFactorAuthentication({ totpCode: token, user });
+  let isValid = false;
 
-  if (!isValid) {
-    isValid = await validateTwoFactorAuthentication({ backupCode: token, user });
+  if (!totpCode && !backupCode) {
+    throw new AppError(AppErrorCode.INVALID_REQUEST);
+  }
+
+  if (totpCode) {
+    isValid = await validateTwoFactorAuthentication({ totpCode, user });
+  } else if (backupCode) {
+    isValid = await validateTwoFactorAuthentication({ backupCode, user });
   }
 
   if (!isValid) {
