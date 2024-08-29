@@ -98,17 +98,13 @@ export default async function ApiTokensPage({ params }: ApiTokensPageProps) {
                   <h5 className="text-base">{token.name}</h5>
 
                   <p className="text-muted-foreground mt-2 text-xs">
-                    <Trans>
-                      Created on{' '}
-                      <LocaleDate date={token.createdAt} format={DateTime.DATETIME_FULL} />
-                    </Trans>
+                    <Trans>Created on</Trans>{' '}
+                    <LocaleDate date={token.createdAt} format={DateTime.DATETIME_FULL} />
                   </p>
                   {token.expires ? (
                     <p className="text-muted-foreground mt-1 text-xs">
-                      <Trans>
-                        Expires on{' '}
-                        <LocaleDate date={token.expires} format={DateTime.DATETIME_FULL} />
-                      </Trans>
+                      <Trans>Expires on</Trans>{' '}
+                      <LocaleDate date={token.expires} format={DateTime.DATETIME_FULL} />
                     </p>
                   ) : (
                     <p className="text-muted-foreground mt-1 text-xs">

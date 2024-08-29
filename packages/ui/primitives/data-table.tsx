@@ -17,6 +17,8 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '.
 
 export type DataTableChildren<TData> = (_table: TTable<TData>) => React.ReactNode;
 
+export type { ColumnDef as DataTableColumnDef } from '@tanstack/react-table';
+
 export interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
   columnVisibility?: VisibilityState;

@@ -1,5 +1,7 @@
 'use client';
 
+import { useMemo } from 'react';
+
 import { useRouter } from 'next/navigation';
 
 import { Trans, msg } from '@lingui/macro';
@@ -15,6 +17,7 @@ import {
 } from '@documenso/prisma/client';
 import { trpc } from '@documenso/trpc/react';
 import { Button } from '@documenso/ui/primitives/button';
+import type { DataTableColumnDef } from '@documenso/ui/primitives/data-table';
 import { DataTable } from '@documenso/ui/primitives/data-table';
 import {
   Form,
@@ -58,6 +61,50 @@ export const RecipientItem = ({ recipient }: RecipientItemProps) => {
   });
 
   const { mutateAsync: updateRecipient } = trpc.admin.updateRecipient.useMutation();
+
+  const columns = useMemo(() => {
+    return [
+      {
+        header: 'ID',
+        accessorKey: 'id',
+        cell: ({ row }) => <div>{row.original.id}</div>,
+      },
+      {
+        header: _(msg`Type`),
+        accessorKey: 'type',
+        cell: ({ row }) => <div>{row.original.type}</div>,
+      },
+      {
+        header: _(msg`Inserted`),
+        accessorKey: 'inserted',
+        cell: ({ row }) => <div>{row.original.inserted ? 'True' : 'False'}</div>,
+      },
+      {
+        header: _(msg`Value`),
+        accessorKey: 'customText',
+        cell: ({ row }) => <div>{row.original.customText}</div>,
+      },
+      {
+        header: _(msg`Signature`),
+        accessorKey: 'signature',
+        cell: ({ row }) => (
+          <div>
+            {row.original.Signature?.typedSignature && (
+              <span>{row.original.Signature.typedSignature}</span>
+            )}
+
+            {row.original.Signature?.signatureImageAsBase64 && (
+              <img
+                src={row.original.Signature.signatureImageAsBase64}
+                alt="Signature"
+                className="h-12 w-full dark:invert"
+              />
+            )}
+          </div>
+        ),
+      },
+    ] satisfies DataTableColumnDef<(typeof recipient)['Field'][number]>[];
+  }, []);
 
   const onUpdateRecipientFormSubmit = async ({ name, email }: TAdminUpdateRecipientFormSchema) => {
     try {
@@ -143,50 +190,7 @@ export const RecipientItem = ({ recipient }: RecipientItemProps) => {
         <Trans>Fields</Trans>
       </h2>
 
-      <DataTable
-        data={recipient.Field}
-        columns={[
-          {
-            header: 'ID',
-            accessorKey: 'id',
-            cell: ({ row }) => <div>{row.original.id}</div>,
-          },
-          {
-            header: _(msg`Type`),
-            accessorKey: 'type',
-            cell: ({ row }) => <div>{row.original.type}</div>,
-          },
-          {
-            header: _(msg`Inserted`),
-            accessorKey: 'inserted',
-            cell: ({ row }) => <div>{row.original.inserted ? 'True' : 'False'}</div>,
-          },
-          {
-            header: _(msg`Value`),
-            accessorKey: 'customText',
-            cell: ({ row }) => <div>{row.original.customText}</div>,
-          },
-          {
-            header: _(msg`Signature`),
-            accessorKey: 'signature',
-            cell: ({ row }) => (
-              <div>
-                {row.original.Signature?.typedSignature && (
-                  <span>{row.original.Signature.typedSignature}</span>
-                )}
-
-                {row.original.Signature?.signatureImageAsBase64 && (
-                  <img
-                    src={row.original.Signature.signatureImageAsBase64}
-                    alt="Signature"
-                    className="h-12 w-full dark:invert"
-                  />
-                )}
-              </div>
-            ),
-          },
-        ]}
-      />
+      <DataTable columns={columns} data={recipient.Field} />
     </div>
   );
 };

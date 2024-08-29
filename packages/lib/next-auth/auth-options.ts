@@ -17,6 +17,7 @@ import { AppError, AppErrorCode } from '../errors/app-error';
 import { jobsClient } from '../jobs/client';
 import { isTwoFactorAuthenticationEnabled } from '../server-only/2fa/is-2fa-availble';
 import { validateTwoFactorAuthentication } from '../server-only/2fa/validate-2fa';
+import { decryptSecondaryData } from '../server-only/crypto/decrypt';
 import { getMostRecentVerificationTokenByUserId } from '../server-only/user/get-most-recent-verification-token-by-user-id';
 import { getUserByEmail } from '../server-only/user/get-user-by-email';
 import type { TAuthenticationResponseJSONSchema } from '../types/webauthn';
@@ -266,6 +267,55 @@ export const NEXT_AUTH_OPTIONS: AuthOptions = {
             counter: verification.authenticationInfo.newCounter,
           },
         });
+
+        return {
+          id: Number(user.id),
+          email: user.email,
+          name: user.name,
+          emailVerified: user.emailVerified?.toISOString() ?? null,
+        } satisfies User;
+      },
+    }),
+    CredentialsProvider({
+      id: 'manual',
+      name: 'Manual',
+      credentials: {
+        credential: { label: 'Credential', type: 'credential' },
+      },
+      async authorize(credentials, req) {
+        const credential = credentials?.credential;
+
+        if (typeof credential !== 'string' || credential.length === 0) {
+          throw new AppError(AppErrorCode.INVALID_REQUEST);
+        }
+
+        const decryptedCredential = decryptSecondaryData(credential);
+
+        if (!decryptedCredential) {
+          throw new AppError(AppErrorCode.INVALID_REQUEST);
+        }
+
+        const parsedCredential = JSON.parse(decryptedCredential);
+
+        if (typeof parsedCredential !== 'object' || parsedCredential === null) {
+          throw new AppError(AppErrorCode.INVALID_REQUEST);
+        }
+
+        const { userId, email } = parsedCredential;
+
+        if (typeof userId !== 'number' || typeof email !== 'string') {
+          throw new AppError(AppErrorCode.INVALID_REQUEST);
+        }
+
+        const user = await prisma.user.findFirst({
+          where: {
+            id: userId,
+          },
+        });
+
+        if (!user) {
+          throw new AppError(AppErrorCode.INVALID_REQUEST);
+        }
 
         return {
           id: Number(user.id),

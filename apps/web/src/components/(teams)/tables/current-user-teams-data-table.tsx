@@ -1,5 +1,7 @@
 'use client';
 
+import { useMemo } from 'react';
+
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 
@@ -14,6 +16,7 @@ import { canExecuteTeamAction } from '@documenso/lib/utils/teams';
 import { trpc } from '@documenso/trpc/react';
 import { AvatarWithText } from '@documenso/ui/primitives/avatar';
 import { Button } from '@documenso/ui/primitives/button';
+import type { DataTableColumnDef } from '@documenso/ui/primitives/data-table';
 import { DataTable } from '@documenso/ui/primitives/data-table';
 import { DataTablePagination } from '@documenso/ui/primitives/data-table-pagination';
 import { Skeleton } from '@documenso/ui/primitives/skeleton';
@@ -58,70 +61,74 @@ export const CurrentUserTeamsDataTable = () => {
     totalPages: 1,
   };
 
+  const columns = useMemo(() => {
+    return [
+      {
+        header: _(msg`Team`),
+        accessorKey: 'name',
+        cell: ({ row }) => (
+          <Link href={`/t/${row.original.url}`} scroll={false}>
+            <AvatarWithText
+              avatarSrc={`${NEXT_PUBLIC_WEBAPP_URL()}/api/avatar/${row.original.avatarImageId}`}
+              avatarClass="h-12 w-12"
+              avatarFallback={row.original.name.slice(0, 1).toUpperCase()}
+              primaryText={
+                <span className="text-foreground/80 font-semibold">{row.original.name}</span>
+              }
+              secondaryText={`${WEBAPP_BASE_URL}/t/${row.original.url}`}
+            />
+          </Link>
+        ),
+      },
+      {
+        header: _(msg`Role`),
+        accessorKey: 'role',
+        cell: ({ row }) =>
+          row.original.ownerUserId === row.original.currentTeamMember.userId
+            ? 'Owner'
+            : _(TEAM_MEMBER_ROLE_MAP[row.original.currentTeamMember.role]),
+      },
+      {
+        header: _(msg`Member Since`),
+        accessorKey: 'createdAt',
+        cell: ({ row }) => <LocaleDate date={row.original.createdAt} />,
+      },
+      {
+        id: 'actions',
+        cell: ({ row }) => (
+          <div className="flex justify-end space-x-2">
+            {canExecuteTeamAction('MANAGE_TEAM', row.original.currentTeamMember.role) && (
+              <Button variant="outline" asChild>
+                <Link href={`/t/${row.original.url}/settings`}>
+                  <Trans>Manage</Trans>
+                </Link>
+              </Button>
+            )}
+
+            <LeaveTeamDialog
+              teamId={row.original.id}
+              teamName={row.original.name}
+              teamAvatarImageId={row.original.avatarImageId}
+              role={row.original.currentTeamMember.role}
+              trigger={
+                <Button
+                  variant="destructive"
+                  disabled={row.original.ownerUserId === row.original.currentTeamMember.userId}
+                  onSelect={(e) => e.preventDefault()}
+                >
+                  <Trans>Leave</Trans>
+                </Button>
+              }
+            />
+          </div>
+        ),
+      },
+    ] satisfies DataTableColumnDef<(typeof results)['data'][number]>[];
+  }, []);
+
   return (
     <DataTable
-      columns={[
-        {
-          header: _(msg`Team`),
-          accessorKey: 'name',
-          cell: ({ row }) => (
-            <Link href={`/t/${row.original.url}`} scroll={false}>
-              <AvatarWithText
-                avatarSrc={`${NEXT_PUBLIC_WEBAPP_URL()}/api/avatar/${row.original.avatarImageId}`}
-                avatarClass="h-12 w-12"
-                avatarFallback={row.original.name.slice(0, 1).toUpperCase()}
-                primaryText={
-                  <span className="text-foreground/80 font-semibold">{row.original.name}</span>
-                }
-                secondaryText={`${WEBAPP_BASE_URL}/t/${row.original.url}`}
-              />
-            </Link>
-          ),
-        },
-        {
-          header: _(msg`Role`),
-          accessorKey: 'role',
-          cell: ({ row }) =>
-            row.original.ownerUserId === row.original.currentTeamMember.userId
-              ? 'Owner'
-              : _(TEAM_MEMBER_ROLE_MAP[row.original.currentTeamMember.role]),
-        },
-        {
-          header: _(msg`Member Since`),
-          accessorKey: 'createdAt',
-          cell: ({ row }) => <LocaleDate date={row.original.createdAt} />,
-        },
-        {
-          id: 'actions',
-          cell: ({ row }) => (
-            <div className="flex justify-end space-x-2">
-              {canExecuteTeamAction('MANAGE_TEAM', row.original.currentTeamMember.role) && (
-                <Button variant="outline" asChild>
-                  <Link href={`/t/${row.original.url}/settings`}>
-                    <Trans>Manage</Trans>
-                  </Link>
-                </Button>
-              )}
-
-              <LeaveTeamDialog
-                teamId={row.original.id}
-                teamName={row.original.name}
-                teamAvatarImageId={row.original.avatarImageId}
-                role={row.original.currentTeamMember.role}
-                trigger={
-                  <Button
-                    variant="destructive"
-                    disabled={row.original.ownerUserId === row.original.currentTeamMember.userId}
-                    onSelect={(e) => e.preventDefault()}
-                  >
-                    <Trans>Leave</Trans>
-                  </Button>
-                }
-              />
-            </div>
-          ),
-        },
-      ]}
+      columns={columns}
       data={results.data}
       perPage={results.perPage}
       currentPage={results.currentPage}
