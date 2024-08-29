@@ -602,6 +602,7 @@ msgstr "Back to Documents"
 msgid "Background Color"
 msgstr "Background Color"
 
+#: apps/web/src/components/forms/2fa/disable-authenticator-app-dialog.tsx:167
 #: apps/web/src/components/forms/signin.tsx:451
 msgid "Backup Code"
 msgstr "Backup Code"
@@ -679,7 +680,6 @@ msgstr "By enabling 2FA, you will be required to enter a code from your authenti
 #: apps/web/src/components/(teams)/dialogs/transfer-team-dialog.tsx:278
 #: apps/web/src/components/(teams)/dialogs/update-team-email-dialog.tsx:162
 #: apps/web/src/components/(teams)/dialogs/update-team-member-dialog.tsx:187
-#: apps/web/src/components/forms/2fa/disable-authenticator-app-dialog.tsx:137
 #: apps/web/src/components/forms/2fa/enable-authenticator-app-dialog.tsx:257
 #: apps/web/src/components/forms/2fa/view-recovery-codes-dialog.tsx:163
 #: apps/web/src/components/templates/manage-public-template-dialog.tsx:452
@@ -1138,9 +1138,9 @@ msgstr "Direct template link usage exceeded ({0}/{1})"
 msgid "Disable"
 msgstr "Disable"
 
-#: apps/web/src/components/forms/2fa/disable-authenticator-app-dialog.tsx:92
-#: apps/web/src/components/forms/2fa/disable-authenticator-app-dialog.tsx:99
-#: apps/web/src/components/forms/2fa/disable-authenticator-app-dialog.tsx:142
+#: apps/web/src/components/forms/2fa/disable-authenticator-app-dialog.tsx:116
+#: apps/web/src/components/forms/2fa/disable-authenticator-app-dialog.tsx:123
+#: apps/web/src/components/forms/2fa/disable-authenticator-app-dialog.tsx:192
 msgid "Disable 2FA"
 msgstr "Disable 2FA"
 
@@ -2274,7 +2274,7 @@ msgstr "Please note that this action is irreversible. Once confirmed, your webho
 msgid "Please note that you will lose access to all documents associated with this team & all the members will be removed and notified"
 msgstr "Please note that you will lose access to all documents associated with this team & all the members will be removed and notified"
 
-#: apps/web/src/components/forms/2fa/disable-authenticator-app-dialog.tsx:103
+#: apps/web/src/components/forms/2fa/disable-authenticator-app-dialog.tsx:127
 msgid "Please provide a token from the authenticator, or a backup code. If you do not have a backup code available, please contact support."
 msgstr "Please provide a token from the authenticator, or a backup code. If you do not have a backup code available, please contact support."
 
@@ -3448,7 +3448,7 @@ msgstr "Two factor authentication recovery codes are used to access your account
 msgid "Two-Factor Authentication"
 msgstr "Two-Factor Authentication"
 
-#: apps/web/src/components/forms/2fa/disable-authenticator-app-dialog.tsx:66
+#: apps/web/src/components/forms/2fa/disable-authenticator-app-dialog.tsx:90
 msgid "Two-factor authentication disabled"
 msgstr "Two-factor authentication disabled"
 
@@ -3456,7 +3456,7 @@ msgstr "Two-factor authentication disabled"
 msgid "Two-factor authentication enabled"
 msgstr "Two-factor authentication enabled"
 
-#: apps/web/src/components/forms/2fa/disable-authenticator-app-dialog.tsx:68
+#: apps/web/src/components/forms/2fa/disable-authenticator-app-dialog.tsx:92
 msgid "Two-factor authentication has been disabled for your account. You will no longer be required to enter a code from your authenticator app when signing in."
 msgstr "Two-factor authentication has been disabled for your account. You will no longer be required to enter a code from your authenticator app when signing in."
 
@@ -3501,7 +3501,7 @@ msgstr "Unable to delete invitation. Please try again."
 msgid "Unable to delete team"
 msgstr "Unable to delete team"
 
-#: apps/web/src/components/forms/2fa/disable-authenticator-app-dialog.tsx:79
+#: apps/web/src/components/forms/2fa/disable-authenticator-app-dialog.tsx:103
 msgid "Unable to disable two-factor authentication"
 msgstr "Unable to disable two-factor authentication"
 
@@ -3649,10 +3649,12 @@ msgstr "Uploaded file is too small"
 msgid "Uploaded file not an allowed file type"
 msgstr "Uploaded file not an allowed file type"
 
+#: apps/web/src/components/forms/2fa/disable-authenticator-app-dialog.tsx:187
 #: apps/web/src/components/forms/signin.tsx:471
 msgid "Use Authenticator"
 msgstr "Use Authenticator"
 
+#: apps/web/src/components/forms/2fa/disable-authenticator-app-dialog.tsx:185
 #: apps/web/src/components/forms/signin.tsx:469
 msgid "Use Backup Code"
 msgstr "Use Backup Code"
@@ -3939,7 +3941,7 @@ msgstr "We were unable to copy your recovery code to your clipboard. Please try 
 msgid "We were unable to create a checkout session. Please try again, or contact support"
 msgstr "We were unable to create a checkout session. Please try again, or contact support"
 
-#: apps/web/src/components/forms/2fa/disable-authenticator-app-dialog.tsx:81
+#: apps/web/src/components/forms/2fa/disable-authenticator-app-dialog.tsx:105
 msgid "We were unable to disable two-factor authentication for your account. Please ensure that you have entered your password and backup code correctly and try again."
 msgstr "We were unable to disable two-factor authentication for your account. Please ensure that you have entered your password and backup code correctly and try again."
 

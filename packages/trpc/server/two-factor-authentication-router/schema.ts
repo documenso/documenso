@@ -9,7 +9,8 @@ export type TEnableTwoFactorAuthenticationMutationSchema = z.infer<
 >;
 
 export const ZDisableTwoFactorAuthenticationMutationSchema = z.object({
-  token: z.string().trim().min(1),
+  totpCode: z.string().trim().optional(),
+  backupCode: z.string().trim().optional(),
 });
 
 export type TDisableTwoFactorAuthenticationMutationSchema = z.infer<
