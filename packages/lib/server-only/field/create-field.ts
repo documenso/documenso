@@ -115,7 +115,10 @@ export const createField = async ({
     .with('DROPDOWN', () => ZDropdownFieldMeta.safeParse(fieldMeta))
     .with('NUMBER', () => ZNumberFieldMeta.safeParse(fieldMeta))
     .with('TEXT', () => ZTextFieldMeta.safeParse(fieldMeta))
-    .with('SIGNATURE', 'INITIALS', 'DATE', 'EMAIL', 'NAME', () => ({ success: true, data: {} }))
+    .with('SIGNATURE', 'FREE_SIGNATURE', 'INITIALS', 'DATE', 'EMAIL', 'NAME', () => ({
+      success: true,
+      data: {},
+    }))
     .otherwise(() => ({ success: false, data: {} }));
 
   if (!result.success) {
