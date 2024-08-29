@@ -6,6 +6,7 @@ import type { RequestMetadata } from '@documenso/lib/universal/extract-request-m
 import type { CreateDocumentAuditLogDataResponse } from '@documenso/lib/utils/document-audit-logs';
 import { createDocumentAuditLogData } from '@documenso/lib/utils/document-audit-logs';
 import { prisma } from '@documenso/prisma';
+import type { DocumentVisibility } from '@documenso/prisma/client';
 import { DocumentStatus } from '@documenso/prisma/client';
 
 import { AppError, AppErrorCode } from '../../errors/app-error';
@@ -200,7 +201,7 @@ export const updateDocumentSettings = async ({
       data: {
         title: data.title,
         externalId: data.externalId || null,
-        visibility: data.visibility,
+        visibility: data.visibility as DocumentVisibility,
         authOptions,
       },
     });
