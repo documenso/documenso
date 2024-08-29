@@ -1,4 +1,4 @@
-import { RECIPIENT_ROLES_DESCRIPTION } from '@documenso/lib/constants/recipient-roles';
+import { RECIPIENT_ROLES_DESCRIPTION_ENG } from '@documenso/lib/constants/recipient-roles';
 import type { RecipientRole } from '@documenso/prisma/client';
 
 import { Button, Section, Text } from '../components';
@@ -26,7 +26,7 @@ export const TemplateDocumentInvite = ({
   isTeamInvite,
   teamName,
 }: TemplateDocumentInviteProps) => {
-  const { actionVerb, progressiveVerb } = RECIPIENT_ROLES_DESCRIPTION[role];
+  const { actionVerb, progressiveVerb } = RECIPIENT_ROLES_DESCRIPTION_ENG[role];
 
   return (
     <>

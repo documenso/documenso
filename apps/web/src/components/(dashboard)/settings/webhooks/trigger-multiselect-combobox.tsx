@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 
+import { Plural, Trans } from '@lingui/macro';
 import { WebhookTriggerEvents } from '@prisma/client/';
 import { Check, ChevronsUpDown } from 'lucide-react';
 
@@ -60,7 +61,7 @@ export const TriggerMultiSelectCombobox = ({
           aria-expanded={isOpen}
           className="w-[200px] justify-between"
         >
-          {selectedValues.length > 0 ? selectedValues.length + ' selected...' : 'Select values...'}
+          <Plural value={selectedValues.length} zero="Select values" other="# selected..." />
           <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
         </Button>
       </PopoverTrigger>
@@ -72,7 +73,9 @@ export const TriggerMultiSelectCombobox = ({
               15,
             )}
           />
-          <CommandEmpty>No value found.</CommandEmpty>
+          <CommandEmpty>
+            <Trans>No value found.</Trans>
+          </CommandEmpty>
           <CommandGroup>
             {allEvents.map((value: string, i: number) => (
               <CommandItem key={i} onSelect={() => handleSelect(value)}>

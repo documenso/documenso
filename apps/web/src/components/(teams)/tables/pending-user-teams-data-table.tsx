@@ -1,14 +1,18 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 
 import { useSearchParams } from 'next/navigation';
+
+import { msg } from '@lingui/macro';
+import { useLingui } from '@lingui/react';
 
 import { useUpdateSearchParams } from '@documenso/lib/client-only/hooks/use-update-search-params';
 import { WEBAPP_BASE_URL } from '@documenso/lib/constants/app';
 import { ZBaseTableSearchParamsSchema } from '@documenso/lib/types/search-params';
 import { trpc } from '@documenso/trpc/react';
 import { AvatarWithText } from '@documenso/ui/primitives/avatar';
+import type { DataTableColumnDef } from '@documenso/ui/primitives/data-table';
 import { DataTable } from '@documenso/ui/primitives/data-table';
 import { DataTablePagination } from '@documenso/ui/primitives/data-table-pagination';
 import { Skeleton } from '@documenso/ui/primitives/skeleton';
@@ -20,6 +24,8 @@ import { CreateTeamCheckoutDialog } from '../dialogs/create-team-checkout-dialog
 import { PendingUserTeamsDataTableActions } from './pending-user-teams-data-table-actions';
 
 export const PendingUserTeamsDataTable = () => {
+  const { _ } = useLingui();
+
   const searchParams = useSearchParams();
   const updateSearchParams = useUpdateSearchParams();
 
@@ -54,6 +60,40 @@ export const PendingUserTeamsDataTable = () => {
     totalPages: 1,
   };
 
+  const columns = useMemo(() => {
+    return [
+      {
+        header: _(msg`Team`),
+        accessorKey: 'name',
+        cell: ({ row }) => (
+          <AvatarWithText
+            avatarClass="h-12 w-12"
+            avatarFallback={row.original.name.slice(0, 1).toUpperCase()}
+            primaryText={
+              <span className="text-foreground/80 font-semibold">{row.original.name}</span>
+            }
+            secondaryText={`${WEBAPP_BASE_URL}/t/${row.original.url}`}
+          />
+        ),
+      },
+      {
+        header: _(msg`Created on`),
+        accessorKey: 'createdAt',
+        cell: ({ row }) => <LocaleDate date={row.original.createdAt} />,
+      },
+      {
+        id: 'actions',
+        cell: ({ row }) => (
+          <PendingUserTeamsDataTableActions
+            className="justify-end"
+            pendingTeamId={row.original.id}
+            onPayClick={setCheckoutPendingTeamId}
+          />
+        ),
+      },
+    ] satisfies DataTableColumnDef<(typeof results)['data'][number]>[];
+  }, []);
+
   useEffect(() => {
     const searchParamCheckout = searchParams?.get('checkout');
 
@@ -66,37 +106,7 @@ export const PendingUserTeamsDataTable = () => {
   return (
     <>
       <DataTable
-        columns={[
-          {
-            header: 'Team',
-            accessorKey: 'name',
-            cell: ({ row }) => (
-              <AvatarWithText
-                avatarClass="h-12 w-12"
-                avatarFallback={row.original.name.slice(0, 1).toUpperCase()}
-                primaryText={
-                  <span className="text-foreground/80 font-semibold">{row.original.name}</span>
-                }
-                secondaryText={`${WEBAPP_BASE_URL}/t/${row.original.url}`}
-              />
-            ),
-          },
-          {
-            header: 'Created on',
-            accessorKey: 'createdAt',
-            cell: ({ row }) => <LocaleDate date={row.original.createdAt} />,
-          },
-          {
-            id: 'actions',
-            cell: ({ row }) => (
-              <PendingUserTeamsDataTableActions
-                className="justify-end"
-                pendingTeamId={row.original.id}
-                onPayClick={setCheckoutPendingTeamId}
-              />
-            ),
-          },
-        ]}
+        columns={columns}
         data={results.data}
         perPage={results.perPage}
         currentPage={results.currentPage}

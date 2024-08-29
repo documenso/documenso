@@ -4,6 +4,8 @@ import { useEffect, useState, useTransition } from 'react';
 
 import { useRouter } from 'next/navigation';
 
+import { msg } from '@lingui/macro';
+import { useLingui } from '@lingui/react';
 import { Loader } from 'lucide-react';
 
 import { DO_NOT_INVALIDATE_QUERY_ON_MUTATION } from '@documenso/lib/constants/trpc';
@@ -32,8 +34,10 @@ export type RadioFieldProps = {
 };
 
 export const RadioField = ({ field, recipient, onSignField, onUnsignField }: RadioFieldProps) => {
-  const router = useRouter();
+  const { _ } = useLingui();
   const { toast } = useToast();
+
+  const router = useRouter();
   const [isPending, startTransition] = useTransition();
 
   const parsedFieldMeta = ZRadioFieldMeta.parse(field.fieldMeta);
@@ -94,8 +98,8 @@ export const RadioField = ({ field, recipient, onSignField, onUnsignField }: Rad
       console.error(err);
 
       toast({
-        title: 'Error',
-        description: 'An error occurred while signing the document.',
+        title: _(msg`Error`),
+        description: _(msg`An error occurred while signing the document.`),
         variant: 'destructive',
       });
     }
@@ -121,8 +125,8 @@ export const RadioField = ({ field, recipient, onSignField, onUnsignField }: Rad
       console.error(err);
 
       toast({
-        title: 'Error',
-        description: 'An error occurred while removing the signature.',
+        title: _(msg`Error`),
+        description: _(msg`An error occurred while removing the signature.`),
         variant: 'destructive',
       });
     }

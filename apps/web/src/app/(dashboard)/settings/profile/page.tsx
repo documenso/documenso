@@ -1,5 +1,9 @@
 import type { Metadata } from 'next';
 
+import { msg } from '@lingui/macro';
+import { useLingui } from '@lingui/react';
+
+import { setupI18nSSR } from '@documenso/lib/client-only/providers/i18n.server';
 import { getRequiredServerComponentSession } from '@documenso/lib/next-auth/get-server-component-session';
 
 import { SettingsHeader } from '~/components/(dashboard)/settings/layout/header';
@@ -13,11 +17,17 @@ export const metadata: Metadata = {
 };
 
 export default async function ProfileSettingsPage() {
+  setupI18nSSR();
+
+  const { _ } = useLingui();
   const { user } = await getRequiredServerComponentSession();
 
   return (
     <div>
-      <SettingsHeader title="Profile" subtitle="Here you can edit your personal details." />
+      <SettingsHeader
+        title={_(msg`Profile`)}
+        subtitle={_(msg`Here you can edit your personal details.`)}
+      />
 
       <AvatarImageForm className="mb-8 max-w-xl" user={user} />
       <ProfileForm className="mb-8 max-w-xl" user={user} />

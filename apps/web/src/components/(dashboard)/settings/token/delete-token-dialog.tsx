@@ -5,6 +5,8 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 
 import { zodResolver } from '@hookform/resolvers/zod';
+import { Trans, msg } from '@lingui/macro';
+import { useLingui } from '@lingui/react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 
@@ -44,8 +46,10 @@ export default function DeleteTokenDialog({
   onDelete,
   children,
 }: DeleteTokenDialogProps) {
-  const router = useRouter();
+  const { _ } = useLingui();
   const { toast } = useToast();
+
+  const router = useRouter();
 
   const [isOpen, setIsOpen] = useState(false);
 
@@ -53,7 +57,7 @@ export default function DeleteTokenDialog({
 
   const ZDeleteTokenDialogSchema = z.object({
     tokenName: z.literal(deleteMessage, {
-      errorMap: () => ({ message: `You must enter '${deleteMessage}' to proceed` }),
+      errorMap: () => ({ message: _(msg`You must enter '${deleteMessage}' to proceed`) }),
     }),
   });
 
@@ -80,8 +84,8 @@ export default function DeleteTokenDialog({
       });
 
       toast({
-        title: 'Token deleted',
-        description: 'The token was deleted successfully.',
+        title: _(msg`Token deleted`),
+        description: _(msg`The token was deleted successfully.`),
         duration: 5000,
       });
 
@@ -90,11 +94,12 @@ export default function DeleteTokenDialog({
       router.refresh();
     } catch (error) {
       toast({
-        title: 'An unknown error occurred',
+        title: _(msg`An unknown error occurred`),
+        description: _(
+          msg`We encountered an unknown error while attempting to delete this token. Please try again later.`,
+        ),
         variant: 'destructive',
         duration: 5000,
-        description:
-          'We encountered an unknown error while attempting to delete this token. Please try again later.',
       });
     }
   };
@@ -113,18 +118,22 @@ export default function DeleteTokenDialog({
       <DialogTrigger asChild={true}>
         {children ?? (
           <Button className="mr-4" variant="destructive">
-            Delete
+            <Trans>Delete</Trans>
           </Button>
         )}
       </DialogTrigger>
 
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Are you sure you want to delete this token?</DialogTitle>
+          <DialogTitle>
+            <Trans>Are you sure you want to delete this token?</Trans>
+          </DialogTitle>
 
           <DialogDescription>
-            Please note that this action is irreversible. Once confirmed, your token will be
-            permanently deleted.
+            <Trans>
+              Please note that this action is irreversible. Once confirmed, your token will be
+              permanently deleted.
+            </Trans>
           </DialogDescription>
         </DialogHeader>
 
@@ -140,10 +149,12 @@ export default function DeleteTokenDialog({
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>
-                      Confirm by typing:{' '}
-                      <span className="font-sm text-destructive font-semibold">
-                        {deleteMessage}
-                      </span>
+                      <Trans>
+                        Confirm by typing:{' '}
+                        <span className="font-sm text-destructive font-semibold">
+                          {deleteMessage}
+                        </span>
+                      </Trans>
                     </FormLabel>
 
                     <FormControl>
@@ -162,7 +173,7 @@ export default function DeleteTokenDialog({
                     className="flex-1"
                     onClick={() => setIsOpen(false)}
                   >
-                    Cancel
+                    <Trans>Cancel</Trans>
                   </Button>
 
                   <Button
@@ -172,7 +183,7 @@ export default function DeleteTokenDialog({
                     disabled={!form.formState.isValid}
                     loading={form.formState.isSubmitting}
                   >
-                    I'm sure! Delete it
+                    <Trans>I'm sure! Delete it</Trans>
                   </Button>
                 </div>
               </DialogFooter>

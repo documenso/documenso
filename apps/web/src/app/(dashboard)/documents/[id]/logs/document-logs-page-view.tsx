@@ -1,6 +1,9 @@
 import Link from 'next/link';
 import { redirect } from 'next/navigation';
 
+import type { MessageDescriptor } from '@lingui/core';
+import { Trans, msg } from '@lingui/macro';
+import { useLingui } from '@lingui/react';
 import { ChevronLeft } from 'lucide-react';
 import { DateTime } from 'luxon';
 
@@ -29,6 +32,8 @@ export type DocumentLogsPageViewProps = {
 };
 
 export const DocumentLogsPageView = async ({ params, team }: DocumentLogsPageViewProps) => {
+  const { _ } = useLingui();
+
   const locale = getLocale();
 
   const { id } = params;
@@ -60,39 +65,39 @@ export const DocumentLogsPageView = async ({ params, team }: DocumentLogsPageVie
     redirect(documentRootPath);
   }
 
-  const documentInformation: { description: string; value: string }[] = [
+  const documentInformation: { description: MessageDescriptor; value: string }[] = [
     {
-      description: 'Document title',
+      description: msg`Document title`,
       value: document.title,
     },
     {
-      description: 'Document ID',
+      description: msg`Document ID`,
       value: document.id.toString(),
     },
     {
-      description: 'Document status',
-      value: FRIENDLY_STATUS_MAP[document.status].label,
+      description: msg`Document status`,
+      value: _(FRIENDLY_STATUS_MAP[document.status].label),
     },
     {
-      description: 'Created by',
+      description: msg`Created by`,
       value: document.User.name
         ? `${document.User.name} (${document.User.email})`
         : document.User.email,
     },
     {
-      description: 'Date created',
+      description: msg`Date created`,
       value: DateTime.fromJSDate(document.createdAt)
         .setLocale(locale)
         .toLocaleString(DateTime.DATETIME_MED_WITH_SECONDS),
     },
     {
-      description: 'Last updated',
+      description: msg`Last updated`,
       value: DateTime.fromJSDate(document.updatedAt)
         .setLocale(locale)
         .toLocaleString(DateTime.DATETIME_MED_WITH_SECONDS),
     },
     {
-      description: 'Time zone',
+      description: msg`Time zone`,
       value: document.documentMeta?.timezone ?? 'N/A',
     },
   ];
@@ -114,7 +119,7 @@ export const DocumentLogsPageView = async ({ params, team }: DocumentLogsPageVie
         className="flex items-center text-[#7AC455] hover:opacity-80"
       >
         <ChevronLeft className="mr-2 inline-block h-5 w-5" />
-        Document
+        <Trans>Document</Trans>
       </Link>
 
       <div className="flex flex-col justify-between truncate sm:flex-row">
@@ -147,7 +152,7 @@ export const DocumentLogsPageView = async ({ params, team }: DocumentLogsPageVie
         <Card className="grid grid-cols-1 gap-4 p-4 sm:grid-cols-2" degrees={45} gradient>
           {documentInformation.map((info, i) => (
             <div className="text-foreground text-sm" key={i}>
-              <h3 className="font-semibold">{info.description}</h3>
+              <h3 className="font-semibold">{_(info.description)}</h3>
               <p className="text-muted-foreground">{info.value}</p>
             </div>
           ))}

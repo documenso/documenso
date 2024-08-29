@@ -1,5 +1,7 @@
 import { useMemo, useState } from 'react';
 
+import { Trans, msg } from '@lingui/macro';
+import { useLingui } from '@lingui/react';
 import type * as DialogPrimitive from '@radix-ui/react-dialog';
 import { AnimatePresence, motion } from 'framer-motion';
 import { Loader, TagIcon } from 'lucide-react';
@@ -30,6 +32,7 @@ export const CreateTeamCheckoutDialog = ({
   onClose,
   ...props
 }: CreateTeamCheckoutDialogProps) => {
+  const { _ } = useLingui();
   const { toast } = useToast();
 
   const [interval, setInterval] = useState<'monthly' | 'yearly'>('monthly');
@@ -44,9 +47,10 @@ export const CreateTeamCheckoutDialog = ({
       },
       onError: () =>
         toast({
-          title: 'Something went wrong',
-          description:
-            'We were unable to create a checkout session. Please try again, or contact support',
+          title: _(msg`Something went wrong`),
+          description: _(
+            msg`We were unable to create a checkout session. Please try again, or contact support`,
+          ),
           variant: 'destructive',
         }),
     });
@@ -77,10 +81,12 @@ export const CreateTeamCheckoutDialog = ({
     <Dialog {...props} open={pendingTeamId !== null} onOpenChange={handleOnOpenChange}>
       <DialogContent position="center">
         <DialogHeader>
-          <DialogTitle>Team checkout</DialogTitle>
+          <DialogTitle>
+            <Trans>Team checkout</Trans>
+          </DialogTitle>
 
           <DialogDescription className="mt-4">
-            Payment is required to finalise the creation of your team.
+            <Trans>Payment is required to finalise the creation of your team.</Trans>
           </DialogDescription>
         </DialogHeader>
 
@@ -89,7 +95,9 @@ export const CreateTeamCheckoutDialog = ({
             {isLoading ? (
               <Loader className="text-documenso h-6 w-6 animate-spin" />
             ) : (
-              <p>Something went wrong</p>
+              <p>
+                <Trans>Something went wrong</Trans>
+              </p>
             )}
           </div>
         )}
@@ -136,10 +144,12 @@ export const CreateTeamCheckoutDialog = ({
                   )}
 
                   <div className="text-muted-foreground mt-1.5 text-sm">
-                    <p>This price includes minimum 5 seats.</p>
+                    <p>
+                      <Trans>This price includes minimum 5 seats.</Trans>
+                    </p>
 
                     <p className="mt-1">
-                      Adding and removing seats will adjust your invoice accordingly.
+                      <Trans>Adding and removing seats will adjust your invoice accordingly.</Trans>
                     </p>
                   </div>
                 </CardContent>
@@ -153,7 +163,7 @@ export const CreateTeamCheckoutDialog = ({
                 disabled={isCreatingCheckout}
                 onClick={() => onClose()}
               >
-                Cancel
+                <Trans>Cancel</Trans>
               </Button>
 
               <Button
@@ -166,7 +176,7 @@ export const CreateTeamCheckoutDialog = ({
                   })
                 }
               >
-                Checkout
+                <Trans>Checkout</Trans>
               </Button>
             </DialogFooter>
           </div>

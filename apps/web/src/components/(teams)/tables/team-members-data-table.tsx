@@ -1,7 +1,11 @@
 'use client';
 
+import { useMemo } from 'react';
+
 import { useSearchParams } from 'next/navigation';
 
+import { Trans, msg } from '@lingui/macro';
+import { useLingui } from '@lingui/react';
 import { Edit, MoreHorizontal, Trash2 } from 'lucide-react';
 
 import { useUpdateSearchParams } from '@documenso/lib/client-only/hooks/use-update-search-params';
@@ -12,6 +16,7 @@ import { isTeamRoleWithinUserHierarchy } from '@documenso/lib/utils/teams';
 import type { TeamMemberRole } from '@documenso/prisma/client';
 import { trpc } from '@documenso/trpc/react';
 import { AvatarWithText } from '@documenso/ui/primitives/avatar';
+import type { DataTableColumnDef } from '@documenso/ui/primitives/data-table';
 import { DataTable } from '@documenso/ui/primitives/data-table';
 import { DataTablePagination } from '@documenso/ui/primitives/data-table-pagination';
 import {
@@ -42,6 +47,8 @@ export const TeamMembersDataTable = ({
   teamId,
   teamName,
 }: TeamMembersDataTableProps) => {
+  const { _ } = useLingui();
+
   const searchParams = useSearchParams();
   const updateSearchParams = useUpdateSearchParams();
 
@@ -75,98 +82,104 @@ export const TeamMembersDataTable = ({
     totalPages: 1,
   };
 
+  const columns = useMemo(() => {
+    return [
+      {
+        header: _(msg`Team Member`),
+        cell: ({ row }) => {
+          const avatarFallbackText = row.original.user.name
+            ? extractInitials(row.original.user.name)
+            : row.original.user.email.slice(0, 1).toUpperCase();
+
+          return (
+            <AvatarWithText
+              avatarClass="h-12 w-12"
+              avatarFallback={avatarFallbackText}
+              primaryText={
+                <span className="text-foreground/80 font-semibold">{row.original.user.name}</span>
+              }
+              secondaryText={row.original.user.email}
+            />
+          );
+        },
+      },
+      {
+        header: _(msg`Role`),
+        accessorKey: 'role',
+        cell: ({ row }) =>
+          teamOwnerUserId === row.original.userId
+            ? 'Owner'
+            : _(TEAM_MEMBER_ROLE_MAP[row.original.role]),
+      },
+      {
+        header: _(msg`Member Since`),
+        accessorKey: 'createdAt',
+        cell: ({ row }) => <LocaleDate date={row.original.createdAt} />,
+      },
+      {
+        header: _(msg`Actions`),
+        cell: ({ row }) => (
+          <DropdownMenu>
+            <DropdownMenuTrigger>
+              <MoreHorizontal className="text-muted-foreground h-5 w-5" />
+            </DropdownMenuTrigger>
+
+            <DropdownMenuContent className="w-52" align="start" forceMount>
+              <DropdownMenuLabel>
+                <Trans>Actions</Trans>
+              </DropdownMenuLabel>
+
+              <UpdateTeamMemberDialog
+                currentUserTeamRole={currentUserTeamRole}
+                teamId={row.original.teamId}
+                teamMemberId={row.original.id}
+                teamMemberName={row.original.user.name ?? ''}
+                teamMemberRole={row.original.role}
+                trigger={
+                  <DropdownMenuItem
+                    disabled={
+                      teamOwnerUserId === row.original.userId ||
+                      !isTeamRoleWithinUserHierarchy(currentUserTeamRole, row.original.role)
+                    }
+                    onSelect={(e) => e.preventDefault()}
+                    title="Update team member role"
+                  >
+                    <Edit className="mr-2 h-4 w-4" />
+                    <Trans>Update role</Trans>
+                  </DropdownMenuItem>
+                }
+              />
+
+              <DeleteTeamMemberDialog
+                teamId={teamId}
+                teamName={teamName}
+                teamMemberId={row.original.id}
+                teamMemberName={row.original.user.name ?? ''}
+                teamMemberEmail={row.original.user.email}
+                trigger={
+                  <DropdownMenuItem
+                    onSelect={(e) => e.preventDefault()}
+                    disabled={
+                      teamOwnerUserId === row.original.userId ||
+                      !isTeamRoleWithinUserHierarchy(currentUserTeamRole, row.original.role)
+                    }
+                    title={_(msg`Remove team member`)}
+                  >
+                    <Trash2 className="mr-2 h-4 w-4" />
+                    <Trans>Remove</Trans>
+                  </DropdownMenuItem>
+                }
+              />
+            </DropdownMenuContent>
+          </DropdownMenu>
+        ),
+      },
+    ] satisfies DataTableColumnDef<(typeof results)['data'][number]>[];
+  }, []);
+
   return (
     <DataTable
-      columns={[
-        {
-          header: 'Team Member',
-          cell: ({ row }) => {
-            const avatarFallbackText = row.original.user.name
-              ? extractInitials(row.original.user.name)
-              : row.original.user.email.slice(0, 1).toUpperCase();
-
-            return (
-              <AvatarWithText
-                avatarClass="h-12 w-12"
-                avatarFallback={avatarFallbackText}
-                primaryText={
-                  <span className="text-foreground/80 font-semibold">{row.original.user.name}</span>
-                }
-                secondaryText={row.original.user.email}
-              />
-            );
-          },
-        },
-        {
-          header: 'Role',
-          accessorKey: 'role',
-          cell: ({ row }) =>
-            teamOwnerUserId === row.original.userId
-              ? 'Owner'
-              : TEAM_MEMBER_ROLE_MAP[row.original.role],
-        },
-        {
-          header: 'Member Since',
-          accessorKey: 'createdAt',
-          cell: ({ row }) => <LocaleDate date={row.original.createdAt} />,
-        },
-        {
-          header: 'Actions',
-          cell: ({ row }) => (
-            <DropdownMenu>
-              <DropdownMenuTrigger>
-                <MoreHorizontal className="text-muted-foreground h-5 w-5" />
-              </DropdownMenuTrigger>
-
-              <DropdownMenuContent className="w-52" align="start" forceMount>
-                <DropdownMenuLabel>Actions</DropdownMenuLabel>
-
-                <UpdateTeamMemberDialog
-                  currentUserTeamRole={currentUserTeamRole}
-                  teamId={row.original.teamId}
-                  teamMemberId={row.original.id}
-                  teamMemberName={row.original.user.name ?? ''}
-                  teamMemberRole={row.original.role}
-                  trigger={
-                    <DropdownMenuItem
-                      disabled={
-                        teamOwnerUserId === row.original.userId ||
-                        !isTeamRoleWithinUserHierarchy(currentUserTeamRole, row.original.role)
-                      }
-                      onSelect={(e) => e.preventDefault()}
-                      title="Update team member role"
-                    >
-                      <Edit className="mr-2 h-4 w-4" />
-                      Update role
-                    </DropdownMenuItem>
-                  }
-                />
-
-                <DeleteTeamMemberDialog
-                  teamId={teamId}
-                  teamName={teamName}
-                  teamMemberId={row.original.id}
-                  teamMemberName={row.original.user.name ?? ''}
-                  teamMemberEmail={row.original.user.email}
-                  trigger={
-                    <DropdownMenuItem
-                      onSelect={(e) => e.preventDefault()}
-                      disabled={
-                        teamOwnerUserId === row.original.userId ||
-                        !isTeamRoleWithinUserHierarchy(currentUserTeamRole, row.original.role)
-                      }
-                      title="Remove team member"
-                    >
-                      <Trash2 className="mr-2 h-4 w-4" />
-                      Remove
-                    </DropdownMenuItem>
-                  }
-                />
-              </DropdownMenuContent>
-            </DropdownMenu>
-          ),
-        },
-      ]}
+      columns={columns}
       data={results.data}
       perPage={results.perPage}
       currentPage={results.currentPage}

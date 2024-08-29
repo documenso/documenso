@@ -1,4 +1,4 @@
-import { RECIPIENT_ROLES_DESCRIPTION } from '@documenso/lib/constants/recipient-roles';
+import { RECIPIENT_ROLES_DESCRIPTION_ENG } from '@documenso/lib/constants/recipient-roles';
 import type { RecipientRole } from '@documenso/prisma/client';
 import config from '@documenso/tailwind-config';
 
@@ -40,7 +40,7 @@ export const DocumentInviteEmailTemplate = ({
   isTeamInvite = false,
   teamName,
 }: DocumentInviteEmailTemplateProps) => {
-  const action = RECIPIENT_ROLES_DESCRIPTION[role].actionVerb.toLowerCase();
+  const action = RECIPIENT_ROLES_DESCRIPTION_ENG[role].actionVerb.toLowerCase();
 
   const previewText = selfSigner
     ? `Please ${action} your document ${documentName}`

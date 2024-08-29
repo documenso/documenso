@@ -1,5 +1,6 @@
 import React from 'react';
 
+import { setupI18nSSR } from '@documenso/lib/client-only/providers/i18n.server';
 import { getServerComponentSession } from '@documenso/lib/next-auth/get-server-component-session';
 import type { GetTeamsResponse } from '@documenso/lib/server-only/team/get-teams';
 import { getTeams } from '@documenso/lib/server-only/team/get-teams';
@@ -12,6 +13,8 @@ export type SigningLayoutProps = {
 };
 
 export default async function SigningLayout({ children }: SigningLayoutProps) {
+  setupI18nSSR();
+
   const { user, session } = await getServerComponentSession();
 
   let teams: GetTeamsResponse = [];

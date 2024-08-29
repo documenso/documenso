@@ -3,6 +3,8 @@
 import { useRouter } from 'next/navigation';
 
 import { zodResolver } from '@hookform/resolvers/zod';
+import { Trans, msg } from '@lingui/macro';
+import { useLingui } from '@lingui/react';
 import { useForm } from 'react-hook-form';
 import type { z } from 'zod';
 
@@ -37,8 +39,10 @@ export type BannerFormProps = {
 };
 
 export function BannerForm({ banner }: BannerFormProps) {
-  const router = useRouter();
   const { toast } = useToast();
+  const { _ } = useLingui();
+
+  const router = useRouter();
 
   const form = useForm<TBannerFormSchema>({
     resolver: zodResolver(ZBannerFormSchema),
@@ -67,8 +71,8 @@ export function BannerForm({ banner }: BannerFormProps) {
       });
 
       toast({
-        title: 'Banner Updated',
-        description: 'Your banner has been updated successfully.',
+        title: _(msg`Banner Updated`),
+        description: _(msg`Your banner has been updated successfully.`),
         duration: 5000,
       });
 
@@ -76,16 +80,17 @@ export function BannerForm({ banner }: BannerFormProps) {
     } catch (err) {
       if (err instanceof TRPCClientError && err.data?.code === 'BAD_REQUEST') {
         toast({
-          title: 'An error occurred',
+          title: _(msg`An error occurred`),
           description: err.message,
           variant: 'destructive',
         });
       } else {
         toast({
-          title: 'An unknown error occurred',
+          title: _(msg`An unknown error occurred`),
           variant: 'destructive',
-          description:
-            'We encountered an unknown error while attempting to update the banner. Please try again later.',
+          description: _(
+            msg`We encountered an unknown error while attempting to update the banner. Please try again later.`,
+          ),
         });
       }
     }
@@ -93,10 +98,14 @@ export function BannerForm({ banner }: BannerFormProps) {
 
   return (
     <div>
-      <h2 className="font-semibold">Site Banner</h2>
+      <h2 className="font-semibold">
+        <Trans>Site Banner</Trans>
+      </h2>
       <p className="text-muted-foreground mt-2 text-sm">
-        The site banner is a message that is shown at the top of the site. It can be used to display
-        important information to your users.
+        <Trans>
+          The site banner is a message that is shown at the top of the site. It can be used to
+          display important information to your users.
+        </Trans>
       </p>
 
       <Form {...form}>
@@ -110,7 +119,9 @@ export function BannerForm({ banner }: BannerFormProps) {
               name="enabled"
               render={({ field }) => (
                 <FormItem className="flex-1">
-                  <FormLabel>Enabled</FormLabel>
+                  <FormLabel>
+                    <Trans>Enabled</Trans>
+                  </FormLabel>
 
                   <FormControl>
                     <div>
@@ -131,7 +142,9 @@ export function BannerForm({ banner }: BannerFormProps) {
                 name="data.bgColor"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Background Color</FormLabel>
+                    <FormLabel>
+                      <Trans>Background Color</Trans>
+                    </FormLabel>
 
                     <FormControl>
                       <div>
@@ -149,7 +162,9 @@ export function BannerForm({ banner }: BannerFormProps) {
                 name="data.textColor"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Text Color</FormLabel>
+                    <FormLabel>
+                      <Trans>Text Color</Trans>
+                    </FormLabel>
 
                     <FormControl>
                       <div>
@@ -170,14 +185,16 @@ export function BannerForm({ banner }: BannerFormProps) {
               name="data.content"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Content</FormLabel>
+                  <FormLabel>
+                    <Trans>Content</Trans>
+                  </FormLabel>
 
                   <FormControl>
                     <Textarea className="h-32 resize-none" {...field} />
                   </FormControl>
 
                   <FormDescription>
-                    The content to show in the banner, HTML is allowed
+                    <Trans>The content to show in the banner, HTML is allowed</Trans>
                   </FormDescription>
 
                   <FormMessage />
@@ -191,7 +208,7 @@ export function BannerForm({ banner }: BannerFormProps) {
             loading={isUpdateSiteSettingLoading}
             className="mt-4 justify-end self-end"
           >
-            Update Banner
+            <Trans>Update Banner</Trans>
           </Button>
         </form>
       </Form>

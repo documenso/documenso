@@ -5,6 +5,9 @@ import { forwardRef, useEffect, useState } from 'react';
 import { useParams } from 'next/navigation';
 import { usePathname } from 'next/navigation';
 
+import type { MessageDescriptor } from '@lingui/core';
+import { msg } from '@lingui/macro';
+import { useLingui } from '@lingui/react';
 import { match } from 'ts-pattern';
 
 import {
@@ -37,8 +40,8 @@ import { TextFieldAdvancedSettings } from './field-items-advanced-settings/text-
 
 export type FieldAdvancedSettingsProps = {
   teamId?: number;
-  title: string;
-  description: string;
+  title: MessageDescriptor;
+  description: MessageDescriptor;
   field: FieldFormType;
   fields: FieldFormType[];
   onAdvancedSettings?: () => void;
@@ -121,7 +124,9 @@ export const FieldAdvancedSettings = forwardRef<HTMLDivElement, FieldAdvancedSet
     },
     ref,
   ) => {
+    const { _ } = useLingui();
     const { toast } = useToast();
+
     const params = useParams();
     const pathname = usePathname();
     const id = params?.id;
@@ -218,8 +223,8 @@ export const FieldAdvancedSettings = forwardRef<HTMLDivElement, FieldAdvancedSet
         console.error('Failed to save to localStorage:', error);
 
         toast({
-          title: 'Error',
-          description: 'Failed to save settings.',
+          title: _(msg`Error`),
+          description: _(msg`Failed to save settings.`),
           variant: 'destructive',
         });
       }
@@ -288,8 +293,8 @@ export const FieldAdvancedSettings = forwardRef<HTMLDivElement, FieldAdvancedSet
         </DocumentFlowFormContainerContent>
         <DocumentFlowFormContainerFooter className="mt-auto">
           <DocumentFlowFormContainerActions
-            goNextLabel="Save"
-            goBackLabel="Cancel"
+            goNextLabel={msg`Save`}
+            goBackLabel={msg`Cancel`}
             onGoBackClick={onAdvancedSettings}
             onGoNextClick={handleOnGoNextClick}
             disableNextStep={errors.length > 0}

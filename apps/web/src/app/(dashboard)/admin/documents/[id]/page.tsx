@@ -1,5 +1,7 @@
+import { Trans } from '@lingui/macro';
 import { DateTime } from 'luxon';
 
+import { setupI18nSSR } from '@documenso/lib/client-only/providers/i18n.server';
 import { getEntireDocument } from '@documenso/lib/server-only/admin/get-entire-document';
 import {
   Accordion,
@@ -23,6 +25,8 @@ type AdminDocumentDetailsPageProps = {
 };
 
 export default async function AdminDocumentDetailsPage({ params }: AdminDocumentDetailsPageProps) {
+  setupI18nSSR();
+
   const document = await getEntireDocument({ id: Number(params.id) });
 
   return (
@@ -35,28 +39,34 @@ export default async function AdminDocumentDetailsPage({ params }: AdminDocument
 
         {document.deletedAt && (
           <Badge size="large" variant="destructive">
-            Deleted
+            <Trans>Deleted</Trans>
           </Badge>
         )}
       </div>
 
       <div className="text-muted-foreground mt-4 text-sm">
         <div>
-          Created on: <LocaleDate date={document.createdAt} format={DateTime.DATETIME_MED} />
+          <Trans>Created on</Trans>:{' '}
+          <LocaleDate date={document.createdAt} format={DateTime.DATETIME_MED} />
         </div>
         <div>
-          Last updated at: <LocaleDate date={document.updatedAt} format={DateTime.DATETIME_MED} />
+          <Trans>Last updated at</Trans>:{' '}
+          <LocaleDate date={document.updatedAt} format={DateTime.DATETIME_MED} />
         </div>
       </div>
 
       <hr className="my-4" />
 
-      <h2 className="text-lg font-semibold">Admin Actions</h2>
+      <h2 className="text-lg font-semibold">
+        <Trans>Admin Actions</Trans>
+      </h2>
 
       <AdminActions className="mt-2" document={document} recipients={document.Recipient} />
 
       <hr className="my-4" />
-      <h2 className="text-lg font-semibold">Recipients</h2>
+      <h2 className="text-lg font-semibold">
+        <Trans>Recipients</Trans>
+      </h2>
 
       <div className="mt-4">
         <Accordion type="multiple" className="space-y-4">

@@ -2,6 +2,9 @@
 
 import * as React from 'react';
 
+import type { MessageDescriptor } from '@lingui/core';
+import { Trans } from '@lingui/macro';
+import { useLingui } from '@lingui/react';
 import { AnimatePresence } from 'framer-motion';
 import { Check, ChevronsUpDown, Loader, XIcon } from 'lucide-react';
 
@@ -24,7 +27,7 @@ type MultiSelectComboboxProps<T = OptionValue> = {
   emptySelectionPlaceholder?: React.ReactNode | string;
   enableClearAllButton?: boolean;
   loading?: boolean;
-  inputPlaceholder?: string;
+  inputPlaceholder?: MessageDescriptor;
   onChange: (_values: T[]) => void;
   options: ComboBoxOption<T>[];
   selectedValues: T[];
@@ -46,6 +49,8 @@ export function MultiSelectCombobox<T = OptionValue>({
   options,
   selectedValues,
 }: MultiSelectComboboxProps<T>) {
+  const { _ } = useLingui();
+
   const [open, setOpen] = React.useState(false);
 
   const handleSelect = (selectedOption: T) => {
@@ -143,8 +148,10 @@ export function MultiSelectCombobox<T = OptionValue>({
 
       <PopoverContent className="w-[200px] p-0">
         <Command>
-          <CommandInput placeholder={inputPlaceholder} />
-          <CommandEmpty>No value found.</CommandEmpty>
+          <CommandInput placeholder={inputPlaceholder && _(inputPlaceholder)} />
+          <CommandEmpty>
+            <Trans>No value found.</Trans>
+          </CommandEmpty>
           <CommandGroup>
             {options.map((option, i) => (
               <CommandItem key={i} onSelect={() => handleSelect(option.value)}>

@@ -5,6 +5,7 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 
 import { zodResolver } from '@hookform/resolvers/zod';
+import { Trans, msg } from '@lingui/macro';
 import { Loader } from 'lucide-react';
 import { useForm } from 'react-hook-form';
 
@@ -190,7 +191,9 @@ export const AddSubjectFormPartial = ({
           <div className="flex flex-col gap-y-4">
             <div>
               <Label htmlFor="subject">
-                Subject <span className="text-muted-foreground">(Optional)</span>
+                <Trans>
+                  Subject <span className="text-muted-foreground">(Optional)</span>
+                </Trans>
               </Label>
 
               <Input
@@ -223,7 +226,9 @@ export const AddSubjectFormPartial = ({
 
             <div>
               <Label htmlFor="message">
-                Message <span className="text-muted-foreground">(Optional)</span>
+                <Trans>
+                  Message <span className="text-muted-foreground">(Optional)</span>
+                </Trans>
               </Label>
 
               <Textarea
@@ -262,16 +267,12 @@ export const AddSubjectFormPartial = ({
       </DocumentFlowFormContainerContent>
 
       <DocumentFlowFormContainerFooter>
-        <DocumentFlowFormContainerStep
-          title={documentFlow.title}
-          step={currentStep}
-          maxStep={totalSteps}
-        />
+        <DocumentFlowFormContainerStep step={currentStep} maxStep={totalSteps} />
 
         <DocumentFlowFormContainerActions
           loading={isSubmitting}
           disabled={isSubmitting}
-          goNextLabel={document.status === DocumentStatus.DRAFT ? 'Send' : 'Update'}
+          goNextLabel={document.status === DocumentStatus.DRAFT ? msg`Send` : msg`Update`}
           onGoBackClick={previousStep}
           onGoNextClick={() => void onFormSubmit()}
         />

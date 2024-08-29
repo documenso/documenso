@@ -2,6 +2,7 @@
 
 import React, { forwardRef } from 'react';
 
+import { Trans } from '@lingui/macro';
 import type { SelectProps } from '@radix-ui/react-select';
 import { InfoIcon } from 'lucide-react';
 
@@ -27,14 +28,18 @@ export const RecipientRoleSelect = forwardRef<HTMLButtonElement, RecipientRoleSe
           <div className="flex items-center">
             <div className="flex w-[150px] items-center">
               <span className="mr-2">{ROLE_ICONS[RecipientRole.SIGNER]}</span>
-              Needs to sign
+              <Trans>Needs to sign</Trans>
             </div>
             <Tooltip>
               <TooltipTrigger>
                 <InfoIcon className="h-4 w-4" />
               </TooltipTrigger>
               <TooltipContent className="text-foreground z-9999 max-w-md p-4">
-                <p>The recipient is required to sign the document for it to be completed.</p>
+                <p>
+                  <Trans>
+                    The recipient is required to sign the document for it to be completed.
+                  </Trans>
+                </p>
               </TooltipContent>
             </Tooltip>
           </div>
@@ -44,14 +49,18 @@ export const RecipientRoleSelect = forwardRef<HTMLButtonElement, RecipientRoleSe
           <div className="flex items-center">
             <div className="flex w-[150px] items-center">
               <span className="mr-2">{ROLE_ICONS[RecipientRole.APPROVER]}</span>
-              Needs to approve
+              <Trans>Needs to approve</Trans>
             </div>
             <Tooltip>
               <TooltipTrigger>
                 <InfoIcon className="h-4 w-4" />
               </TooltipTrigger>
               <TooltipContent className="text-foreground z-9999 max-w-md p-4">
-                <p>The recipient is required to approve the document for it to be completed.</p>
+                <p>
+                  <Trans>
+                    The recipient is required to approve the document for it to be completed.
+                  </Trans>
+                </p>
               </TooltipContent>
             </Tooltip>
           </div>
@@ -61,14 +70,18 @@ export const RecipientRoleSelect = forwardRef<HTMLButtonElement, RecipientRoleSe
           <div className="flex items-center">
             <div className="flex w-[150px] items-center">
               <span className="mr-2">{ROLE_ICONS[RecipientRole.VIEWER]}</span>
-              Needs to view
+              <Trans>Needs to view</Trans>
             </div>
             <Tooltip>
               <TooltipTrigger>
                 <InfoIcon className="h-4 w-4" />
               </TooltipTrigger>
               <TooltipContent className="text-foreground z-9999 max-w-md p-4">
-                <p>The recipient is required to view the document for it to be completed.</p>
+                <p>
+                  <Trans>
+                    The recipient is required to view the document for it to be completed.
+                  </Trans>
+                </p>
               </TooltipContent>
             </Tooltip>
           </div>
@@ -79,7 +92,7 @@ export const RecipientRoleSelect = forwardRef<HTMLButtonElement, RecipientRoleSe
             <div className="flex items-center">
               <div className="flex w-[150px] items-center">
                 <span className="mr-2">{ROLE_ICONS[RecipientRole.CC]}</span>
-                Receives copy
+                <Trans>Receives copy</Trans>
               </div>
               <Tooltip>
                 <TooltipTrigger>
@@ -87,8 +100,10 @@ export const RecipientRoleSelect = forwardRef<HTMLButtonElement, RecipientRoleSe
                 </TooltipTrigger>
                 <TooltipContent className="text-foreground z-9999 max-w-md p-4">
                   <p>
-                    The recipient is not required to take any action and receives a copy of the
-                    document after it is completed.
+                    <Trans>
+                      The recipient is not required to take any action and receives a copy of the
+                      document after it is completed.
+                    </Trans>
                   </p>
                 </TooltipContent>
               </Tooltip>

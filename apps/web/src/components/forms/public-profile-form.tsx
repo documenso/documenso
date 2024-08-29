@@ -3,6 +3,8 @@
 import { useState } from 'react';
 
 import { zodResolver } from '@hookform/resolvers/zod';
+import { Plural, Trans, msg } from '@lingui/macro';
+import { useLingui } from '@lingui/react';
 import { motion } from 'framer-motion';
 import { AnimatePresence } from 'framer-motion';
 import { CheckSquareIcon, CopyIcon } from 'lucide-react';
@@ -53,6 +55,7 @@ export const PublicProfileForm = ({
   teamUrl,
   onProfileUpdate,
 }: PublicProfileFormProps) => {
+  const { _ } = useLingui();
   const { toast } = useToast();
 
   const [, copy] = useCopyToClipboard();
@@ -74,8 +77,8 @@ export const PublicProfileForm = ({
       await onProfileUpdate(data);
 
       toast({
-        title: 'Success',
-        description: 'Your public profile has been updated.',
+        title: _(msg`Success`),
+        description: _(msg`Your public profile has been updated.`),
         duration: 5000,
       });
 
@@ -98,10 +101,11 @@ export const PublicProfileForm = ({
 
         default:
           toast({
-            title: 'An unknown error occurred',
+            title: _(msg`An unknown error occurred`),
+            description: _(
+              msg`We encountered an unknown error while attempting to update your public profile. Please try again later.`,
+            ),
             variant: 'destructive',
-            description:
-              'We encountered an unknown error while attempting to update your public profile. Please try again later.',
           });
       }
     }
@@ -110,8 +114,8 @@ export const PublicProfileForm = ({
   const onCopy = async () => {
     await copy(formatUserProfilePath(form.getValues('url') ?? '')).then(() => {
       toast({
-        title: 'Copied to clipboard',
-        description: 'The profile link has been copied to your clipboard',
+        title: _(msg`Copied to clipboard`),
+        description: _(msg`The profile link has been copied to your clipboard`),
       });
     });
 
@@ -138,15 +142,19 @@ export const PublicProfileForm = ({
             name="url"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Public profile URL</FormLabel>
+                <FormLabel>
+                  <Trans>Public profile URL</Trans>
+                </FormLabel>
                 <FormControl>
                   <Input {...field} disabled={field.disabled || teamUrl !== undefined} />
                 </FormControl>
 
                 {teamUrl && (
                   <p className="text-muted-foreground text-xs">
-                    You can update the profile URL by updating the team URL in the general settings
-                    page.
+                    <Trans>
+                      You can update the profile URL by updating the team URL in the general
+                      settings page.
+                    </Trans>
                   </p>
                 )}
 
@@ -186,7 +194,9 @@ export const PublicProfileForm = ({
                           </Button>
                         </div>
                       ) : (
-                        <p>A unique URL to access your profile</p>
+                        <p>
+                          <Trans>A unique URL to access your profile</Trans>
+                        </p>
                       )}
                     </div>
                   )}
@@ -202,7 +212,6 @@ export const PublicProfileForm = ({
             name="bio"
             render={({ field }) => {
               const remaningLength = MAX_PROFILE_BIO_LENGTH - (field.value || '').length;
-              const pluralWord = Math.abs(remaningLength) === 1 ? 'character' : 'characters';
 
               return (
                 <FormItem>
@@ -210,15 +219,27 @@ export const PublicProfileForm = ({
                   <FormControl>
                     <Textarea
                       {...field}
-                      placeholder={teamUrl ? 'Write about the team' : 'Write about yourself'}
+                      placeholder={
+                        teamUrl ? _(msg`Write about the team`) : _(msg`Write about yourself`)
+                      }
                     />
                   </FormControl>
 
                   {!form.formState.errors.bio && (
                     <p className="text-muted-foreground text-sm">
-                      {remaningLength >= 0
-                        ? `${remaningLength} ${pluralWord} remaining`
-                        : `${Math.abs(remaningLength)} ${pluralWord} over the limit`}
+                      {remaningLength >= 0 ? (
+                        <Plural
+                          value={remaningLength}
+                          one={<Trans># character remaining</Trans>}
+                          other={<Trans># characters remaining</Trans>}
+                        />
+                      ) : (
+                        <Plural
+                          value={Math.abs(remaningLength)}
+                          one={<Trans># character over the limit</Trans>}
+                          other={<Trans># characters over the limit</Trans>}
+                        />
+                      )}
                     </p>
                   )}
 
@@ -243,7 +264,7 @@ export const PublicProfileForm = ({
                   }}
                 >
                   <Button type="button" variant="secondary" onClick={() => form.reset()}>
-                    Reset
+                    <Trans>Reset</Trans>
                   </Button>
                 </motion.div>
               )}
@@ -255,7 +276,7 @@ export const PublicProfileForm = ({
               disabled={!form.formState.isDirty}
               loading={form.formState.isSubmitting}
             >
-              Update
+              <Trans>Update</Trans>
             </Button>
           </div>
         </fieldset>

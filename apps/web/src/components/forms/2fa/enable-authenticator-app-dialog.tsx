@@ -5,6 +5,8 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 
 import { zodResolver } from '@hookform/resolvers/zod';
+import { Trans, msg } from '@lingui/macro';
+import { useLingui } from '@lingui/react';
 import { useForm } from 'react-hook-form';
 import { renderSVG } from 'uqr';
 import { z } from 'zod';
@@ -46,6 +48,7 @@ export type EnableAuthenticatorAppDialogProps = {
 };
 
 export const EnableAuthenticatorAppDialog = ({ onSuccess }: EnableAuthenticatorAppDialogProps) => {
+  const { _ } = useLingui();
   const { toast } = useToast();
 
   const router = useRouter();
@@ -62,9 +65,10 @@ export const EnableAuthenticatorAppDialog = ({ onSuccess }: EnableAuthenticatorA
   } = trpc.twoFactorAuthentication.setup.useMutation({
     onError: () => {
       toast({
-        title: 'Unable to setup two-factor authentication',
-        description:
-          'We were unable to setup two-factor authentication for your account. Please ensure that you have entered your code correctly and try again.',
+        title: _(msg`Unable to setup two-factor authentication`),
+        description: _(
+          msg`We were unable to setup two-factor authentication for your account. Please ensure that you have entered your code correctly and try again.`,
+        ),
         variant: 'destructive',
       });
     },
@@ -87,15 +91,17 @@ export const EnableAuthenticatorAppDialog = ({ onSuccess }: EnableAuthenticatorA
       onSuccess?.();
 
       toast({
-        title: 'Two-factor authentication enabled',
-        description:
-          'You will now be required to enter a code from your authenticator app when signing in.',
+        title: _(msg`Two-factor authentication enabled`),
+        description: _(
+          msg`You will now be required to enter a code from your authenticator app when signing in.`,
+        ),
       });
     } catch (_err) {
       toast({
-        title: 'Unable to setup two-factor authentication',
-        description:
-          'We were unable to setup two-factor authentication for your account. Please ensure that you have entered your code correctly and try again.',
+        title: _(msg`Unable to setup two-factor authentication`),
+        description: _(
+          msg`We were unable to setup two-factor authentication for your account. Please ensure that you have entered your code correctly and try again.`,
+        ),
         variant: 'destructive',
       });
     }
@@ -144,7 +150,7 @@ export const EnableAuthenticatorAppDialog = ({ onSuccess }: EnableAuthenticatorA
             void handleEnable2FA();
           }}
         >
-          Enable 2FA
+          <Trans>Enable 2FA</Trans>
         </Button>
       </DialogTrigger>
 
@@ -154,9 +160,13 @@ export const EnableAuthenticatorAppDialog = ({ onSuccess }: EnableAuthenticatorA
             {recoveryCodes ? (
               <div>
                 <DialogHeader>
-                  <DialogTitle>Backup codes</DialogTitle>
+                  <DialogTitle>
+                    <Trans>Backup codes</Trans>
+                  </DialogTitle>
                   <DialogDescription>
-                    Your recovery codes are listed below. Please store them in a safe place.
+                    <Trans>
+                      Your recovery codes are listed below. Please store them in a safe place.
+                    </Trans>
                   </DialogDescription>
                 </DialogHeader>
 
@@ -166,20 +176,28 @@ export const EnableAuthenticatorAppDialog = ({ onSuccess }: EnableAuthenticatorA
 
                 <DialogFooter className="mt-4">
                   <DialogClose asChild>
-                    <Button variant="secondary">Close</Button>
+                    <Button variant="secondary">
+                      <Trans>Close</Trans>
+                    </Button>
                   </DialogClose>
 
-                  <Button onClick={downloadRecoveryCodes}>Download</Button>
+                  <Button onClick={downloadRecoveryCodes}>
+                    <Trans>Download</Trans>
+                  </Button>
                 </DialogFooter>
               </div>
             ) : (
               <Form {...enable2FAForm}>
                 <form onSubmit={enable2FAForm.handleSubmit(onEnable2FAFormSubmit)}>
                   <DialogHeader>
-                    <DialogTitle>Enable Authenticator App</DialogTitle>
+                    <DialogTitle>
+                      <Trans>Enable Authenticator App</Trans>
+                    </DialogTitle>
                     <DialogDescription>
-                      To enable two-factor authentication, scan the following QR code using your
-                      authenticator app.
+                      <Trans>
+                        To enable two-factor authentication, scan the following QR code using your
+                        authenticator app.
+                      </Trans>
                     </DialogDescription>
                   </DialogHeader>
 
@@ -192,8 +210,10 @@ export const EnableAuthenticatorAppDialog = ({ onSuccess }: EnableAuthenticatorA
                     />
 
                     <p className="text-muted-foreground text-sm">
-                      If your authenticator app does not support QR codes, you can use the following
-                      code instead:
+                      <Trans>
+                        If your authenticator app does not support QR codes, you can use the
+                        following code instead:
+                      </Trans>
                     </p>
 
                     <p className="bg-muted/60 text-muted-foreground rounded-lg p-2 text-center font-mono tracking-widest">
@@ -201,8 +221,10 @@ export const EnableAuthenticatorAppDialog = ({ onSuccess }: EnableAuthenticatorA
                     </p>
 
                     <p className="text-muted-foreground text-sm">
-                      Once you have scanned the QR code or entered the code manually, enter the code
-                      provided by your authenticator app below.
+                      <Trans>
+                        Once you have scanned the QR code or entered the code manually, enter the
+                        code provided by your authenticator app below.
+                      </Trans>
                     </p>
 
                     <FormField
@@ -210,7 +232,9 @@ export const EnableAuthenticatorAppDialog = ({ onSuccess }: EnableAuthenticatorA
                       control={enable2FAForm.control}
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel className="text-muted-foreground">Token</FormLabel>
+                          <FormLabel className="text-muted-foreground">
+                            <Trans>Token</Trans>
+                          </FormLabel>
                           <FormControl>
                             <PinInput {...field} value={field.value ?? ''} maxLength={6}>
                               {Array(6)
@@ -229,11 +253,13 @@ export const EnableAuthenticatorAppDialog = ({ onSuccess }: EnableAuthenticatorA
 
                     <DialogFooter>
                       <DialogClose asChild>
-                        <Button variant="secondary">Cancel</Button>
+                        <Button variant="secondary">
+                          <Trans>Cancel</Trans>
+                        </Button>
                       </DialogClose>
 
                       <Button type="submit" loading={isEnabling2FA}>
-                        Enable 2FA
+                        <Trans>Enable 2FA</Trans>
                       </Button>
                     </DialogFooter>
                   </fieldset>

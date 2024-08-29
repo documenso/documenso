@@ -5,7 +5,7 @@ import { render } from '@documenso/email/render';
 import { DocumentInviteEmailTemplate } from '@documenso/email/templates/document-invite';
 import { FROM_ADDRESS, FROM_NAME } from '@documenso/lib/constants/email';
 import {
-  RECIPIENT_ROLES_DESCRIPTION,
+  RECIPIENT_ROLES_DESCRIPTION_ENG,
   RECIPIENT_ROLE_TO_EMAIL_TYPE,
 } from '@documenso/lib/constants/recipient-roles';
 import { DOCUMENT_AUDIT_LOG_TYPE } from '@documenso/lib/types/document-audit-logs';
@@ -97,8 +97,8 @@ export const resendDocument = async ({
       const { email, name } = recipient;
       const selfSigner = email === user.email;
 
-      const { actionVerb } = RECIPIENT_ROLES_DESCRIPTION[recipient.role];
-      const recipientActionVerb = actionVerb.toLowerCase();
+      const recipientActionVerb =
+        RECIPIENT_ROLES_DESCRIPTION_ENG[recipient.role].actionVerb.toLowerCase();
 
       let emailMessage = customEmail?.message || '';
       let emailSubject = `Reminder: Please ${recipientActionVerb} this document`;

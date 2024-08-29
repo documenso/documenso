@@ -2,6 +2,9 @@
 
 import { useEffect, useMemo, useState } from 'react';
 
+import { Trans, msg } from '@lingui/macro';
+import { useLingui } from '@lingui/react';
+
 import type { FindTemplateRow } from '@documenso/lib/server-only/template/find-templates';
 import type {
   Team,
@@ -36,22 +39,21 @@ type DirectTemplate = FindTemplateRow & {
 };
 
 const userProfileText = {
-  settingsTitle: 'Public Profile',
-  settingsSubtitle: 'You can choose to enable or disable your profile for public view.',
-  templatesTitle: 'My templates',
-  templatesSubtitle:
-    'Show templates in your public profile for your audience to sign and get started quickly',
+  settingsTitle: msg`Public Profile`,
+  settingsSubtitle: msg`You can choose to enable or disable your profile for public view.`,
+  templatesTitle: msg`My templates`,
+  templatesSubtitle: msg`Show templates in your public profile for your audience to sign and get started quickly`,
 };
 
 const teamProfileText = {
-  settingsTitle: 'Team Public Profile',
-  settingsSubtitle: 'You can choose to enable or disable your team profile for public view.',
-  templatesTitle: 'Team templates',
-  templatesSubtitle:
-    'Show templates in your team public profile for your audience to sign and get started quickly',
+  settingsTitle: msg`Team Public Profile`,
+  settingsSubtitle: msg`You can choose to enable or disable your team profile for public view.`,
+  templatesTitle: msg`Team templates`,
+  templatesSubtitle: msg`Show templates in your team public profile for your audience to sign and get started quickly`,
 };
 
 export const PublicProfilePageView = ({ user, team, profile }: PublicProfilePageViewOptions) => {
+  const { _ } = useLingui();
   const { toast } = useToast();
 
   const [isPublicProfileVisible, setIsPublicProfileVisible] = useState(profile.enabled);
@@ -104,7 +106,7 @@ export const PublicProfilePageView = ({ user, team, profile }: PublicProfilePage
 
     if (isVisible && !user.url) {
       toast({
-        title: 'You must set a profile URL before enabling your public profile.',
+        title: _(msg`You must set a profile URL before enabling your public profile.`),
         variant: 'destructive',
       });
 
@@ -119,8 +121,8 @@ export const PublicProfilePageView = ({ user, team, profile }: PublicProfilePage
       });
     } catch {
       toast({
-        title: 'Something went wrong',
-        description: 'We were unable to set your public profile to public. Please try again.',
+        title: _(msg`Something went wrong`),
+        description: _(msg`We were unable to set your public profile to public. Please try again.`),
         variant: 'destructive',
       });
 
@@ -134,7 +136,10 @@ export const PublicProfilePageView = ({ user, team, profile }: PublicProfilePage
 
   return (
     <div className="max-w-2xl">
-      <SettingsHeader title={profileText.settingsTitle} subtitle={profileText.settingsSubtitle}>
+      <SettingsHeader
+        title={_(profileText.settingsTitle)}
+        subtitle={_(profileText.settingsSubtitle)}
+      >
         <Tooltip open={isTooltipOpen} onOpenChange={setIsTooltipOpen}>
           <TooltipTrigger asChild>
             <div
@@ -146,13 +151,17 @@ export const PublicProfilePageView = ({ user, team, profile }: PublicProfilePage
                 },
               )}
             >
-              <span>Hide</span>
+              <span>
+                <Trans>Hide</Trans>
+              </span>
               <Switch
                 disabled={isUpdating}
                 checked={isPublicProfileVisible}
                 onCheckedChange={togglePublicProfileVisibility}
               />
-              <span>Show</span>
+              <span>
+                <Trans>Show</Trans>
+              </span>
             </div>
           </TooltipTrigger>
 
@@ -160,18 +169,26 @@ export const PublicProfilePageView = ({ user, team, profile }: PublicProfilePage
             {isPublicProfileVisible ? (
               <>
                 <p>
-                  Profile is currently <strong>visible</strong>.
+                  <Trans>
+                    Profile is currently <strong>visible</strong>.
+                  </Trans>
                 </p>
 
-                <p>Toggle the switch to hide your profile from the public.</p>
+                <p>
+                  <Trans>Toggle the switch to hide your profile from the public.</Trans>
+                </p>
               </>
             ) : (
               <>
                 <p>
-                  Profile is currently <strong>hidden</strong>.
+                  <Trans>
+                    Profile is currently <strong>hidden</strong>.
+                  </Trans>
                 </p>
 
-                <p>Toggle the switch to show your profile to the public.</p>
+                <p>
+                  <Trans>Toggle the switch to show your profile to the public.</Trans>
+                </p>
               </>
             )}
           </TooltipContent>
@@ -187,14 +204,18 @@ export const PublicProfilePageView = ({ user, team, profile }: PublicProfilePage
 
       <div className="mt-4">
         <SettingsHeader
-          title={profileText.templatesTitle}
-          subtitle={profileText.templatesSubtitle}
+          title={_(profileText.templatesTitle)}
+          subtitle={_(profileText.templatesSubtitle)}
           hideDivider={true}
           className="mt-8 [&>*>h3]:text-base"
         >
           <ManagePublicTemplateDialog
             directTemplates={enabledPrivateDirectTemplates}
-            trigger={<Button variant="outline">Link template</Button>}
+            trigger={
+              <Button variant="outline">
+                <Trans>Link template</Trans>
+              </Button>
+            }
           />
         </SettingsHeader>
 

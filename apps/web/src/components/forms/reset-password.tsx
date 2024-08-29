@@ -3,6 +3,8 @@
 import { useRouter } from 'next/navigation';
 
 import { zodResolver } from '@hookform/resolvers/zod';
+import { Trans, msg } from '@lingui/macro';
+import { useLingui } from '@lingui/react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 
@@ -42,6 +44,7 @@ export type ResetPasswordFormProps = {
 export const ResetPasswordForm = ({ className, token }: ResetPasswordFormProps) => {
   const router = useRouter();
 
+  const { _ } = useLingui();
   const { toast } = useToast();
 
   const form = useForm<TResetPasswordFormSchema>({
@@ -66,8 +69,8 @@ export const ResetPasswordForm = ({ className, token }: ResetPasswordFormProps) 
       form.reset();
 
       toast({
-        title: 'Password updated',
-        description: 'Your password has been updated successfully.',
+        title: _(msg`Password updated`),
+        description: _(msg`Your password has been updated successfully.`),
         duration: 5000,
       });
 
@@ -75,16 +78,17 @@ export const ResetPasswordForm = ({ className, token }: ResetPasswordFormProps) 
     } catch (err) {
       if (err instanceof TRPCClientError && err.data?.code === 'BAD_REQUEST') {
         toast({
-          title: 'An error occurred',
+          title: _(msg`An error occurred`),
           description: err.message,
           variant: 'destructive',
         });
       } else {
         toast({
-          title: 'An unknown error occurred',
+          title: _(msg`An unknown error occurred`),
+          description: _(
+            msg`We encountered an unknown error while attempting to reset your password. Please try again later.`,
+          ),
           variant: 'destructive',
-          description:
-            'We encountered an unknown error while attempting to reset your password. Please try again later.',
         });
       }
     }
@@ -102,7 +106,9 @@ export const ResetPasswordForm = ({ className, token }: ResetPasswordFormProps) 
             name="password"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Password</FormLabel>
+                <FormLabel>
+                  <Trans>Password</Trans>
+                </FormLabel>
                 <FormControl>
                   <PasswordInput {...field} />
                 </FormControl>
@@ -116,7 +122,9 @@ export const ResetPasswordForm = ({ className, token }: ResetPasswordFormProps) 
             name="repeatedPassword"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Repeat Password</FormLabel>
+                <FormLabel>
+                  <Trans>Repeat Password</Trans>
+                </FormLabel>
                 <FormControl>
                   <PasswordInput {...field} />
                 </FormControl>
@@ -127,7 +135,7 @@ export const ResetPasswordForm = ({ className, token }: ResetPasswordFormProps) 
         </fieldset>
 
         <Button type="submit" size="lg" loading={isSubmitting}>
-          {isSubmitting ? 'Resetting Password...' : 'Reset Password'}
+          {isSubmitting ? <Trans>Resetting Password...</Trans> : <Trans>Reset Password</Trans>}
         </Button>
       </form>
     </Form>

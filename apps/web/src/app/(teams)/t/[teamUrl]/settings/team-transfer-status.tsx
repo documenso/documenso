@@ -2,6 +2,8 @@
 
 import { useRouter } from 'next/navigation';
 
+import { Trans, msg } from '@lingui/macro';
+import { useLingui } from '@lingui/react';
 import { AnimatePresence } from 'framer-motion';
 
 import { canExecuteTeamAction } from '@documenso/lib/utils/teams';
@@ -29,6 +31,7 @@ export const TeamTransferStatus = ({
 }: TeamTransferStatusProps) => {
   const router = useRouter();
 
+  const { _ } = useLingui();
   const { toast } = useToast();
 
   const isExpired = transferVerification && isTokenExpired(transferVerification.expiresAt);
@@ -38,8 +41,8 @@ export const TeamTransferStatus = ({
       onSuccess: () => {
         if (!isExpired) {
           toast({
-            title: 'Success',
-            description: 'The team transfer invitation has been successfully deleted.',
+            title: _(msg`Success`),
+            description: _(msg`The team transfer invitation has been successfully deleted.`),
             duration: 5000,
           });
         }
@@ -48,10 +51,11 @@ export const TeamTransferStatus = ({
       },
       onError: () => {
         toast({
-          title: 'An unknown error occurred',
+          title: _(msg`An unknown error occurred`),
+          description: _(
+            msg`We encountered an unknown error while attempting to remove this transfer. Please try again or contact support.`,
+          ),
           variant: 'destructive',
-          description:
-            'We encountered an unknown error while attempting to remove this transfer. Please try again or contact support.',
         });
       },
     });
@@ -69,26 +73,36 @@ export const TeamTransferStatus = ({
           >
             <div>
               <AlertTitle>
-                {isExpired ? 'Team transfer request expired' : 'Team transfer in progress'}
+                {isExpired ? (
+                  <Trans>Team transfer request expired</Trans>
+                ) : (
+                  <Trans>Team transfer in progress</Trans>
+                )}
               </AlertTitle>
 
               <AlertDescription>
                 {isExpired ? (
                   <p className="text-sm">
-                    The team transfer request to <strong>{transferVerification.name}</strong> has
-                    expired.
+                    <Trans>
+                      The team transfer request to <strong>{transferVerification.name}</strong> has
+                      expired.
+                    </Trans>
                   </p>
                 ) : (
                   <section className="text-sm">
                     <p>
-                      A request to transfer the ownership of this team has been sent to{' '}
-                      <strong>
-                        {transferVerification.name} ({transferVerification.email})
-                      </strong>
+                      <Trans>
+                        A request to transfer the ownership of this team has been sent to{' '}
+                        <strong>
+                          {transferVerification.name} ({transferVerification.email})
+                        </strong>
+                      </Trans>
                     </p>
 
                     <p>
-                      If they accept this request, the team will be transferred to their account.
+                      <Trans>
+                        If they accept this request, the team will be transferred to their account.
+                      </Trans>
                     </p>
                   </section>
                 )}
@@ -104,7 +118,7 @@ export const TeamTransferStatus = ({
                   'hover:bg-transparent hover:text-blue-800': !isExpired,
                 })}
               >
-                {isExpired ? 'Close' : 'Cancel'}
+                {isExpired ? <Trans>Close</Trans> : <Trans>Cancel</Trans>}
               </Button>
             )}
           </Alert>

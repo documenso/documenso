@@ -2,6 +2,8 @@
 
 import React, { forwardRef } from 'react';
 
+import { Trans, msg } from '@lingui/macro';
+import { useLingui } from '@lingui/react';
 import type { SelectProps } from '@radix-ui/react-select';
 import { InfoIcon } from 'lucide-react';
 
@@ -17,24 +19,33 @@ import {
 import { Tooltip, TooltipContent, TooltipTrigger } from '@documenso/ui/primitives/tooltip';
 
 export const DocumentGlobalAuthAccessSelect = forwardRef<HTMLButtonElement, SelectProps>(
-  (props, ref) => (
-    <Select {...props}>
-      <SelectTrigger ref={ref} className="bg-background text-muted-foreground">
-        <SelectValue data-testid="documentAccessSelectValue" placeholder="No restrictions" />
-      </SelectTrigger>
+  (props, ref) => {
+    const { _ } = useLingui();
 
-      <SelectContent position="popper">
-        {Object.values(DocumentAccessAuth).map((authType) => (
-          <SelectItem key={authType} value={authType}>
-            {DOCUMENT_AUTH_TYPES[authType].value}
+    return (
+      <Select {...props}>
+        <SelectTrigger ref={ref} className="bg-background text-muted-foreground">
+          <SelectValue
+            data-testid="documentAccessSelectValue"
+            placeholder={_(msg`No restrictions`)}
+          />
+        </SelectTrigger>
+
+        <SelectContent position="popper">
+          {Object.values(DocumentAccessAuth).map((authType) => (
+            <SelectItem key={authType} value={authType}>
+              {DOCUMENT_AUTH_TYPES[authType].value}
+            </SelectItem>
+          ))}
+
+          {/* Note: -1 is remapped in the Zod schema to the required value. */}
+          <SelectItem value={'-1'}>
+            <Trans>No restrictions</Trans>
           </SelectItem>
-        ))}
-
-        {/* Note: -1 is remapped in the Zod schema to the required value. */}
-        <SelectItem value={'-1'}>No restrictions</SelectItem>
-      </SelectContent>
-    </Select>
-  ),
+        </SelectContent>
+      </Select>
+    );
+  },
 );
 
 DocumentGlobalAuthAccessSelect.displayName = 'DocumentGlobalAuthAccessSelect';
@@ -47,18 +58,26 @@ export const DocumentGlobalAuthAccessTooltip = () => (
 
     <TooltipContent className="text-foreground max-w-md space-y-2 p-4">
       <h2>
-        <strong>Document access</strong>
+        <strong>
+          <Trans>Document access</Trans>
+        </strong>
       </h2>
 
-      <p>The authentication required for recipients to view the document.</p>
+      <p>
+        <Trans>The authentication required for recipients to view the document.</Trans>
+      </p>
 
       <ul className="ml-3.5 list-outside list-disc space-y-0.5 py-2">
         <li>
-          <strong>Require account</strong> - The recipient must be signed in to view the document
+          <Trans>
+            <strong>Require account</strong> - The recipient must be signed in to view the document
+          </Trans>
         </li>
         <li>
-          <strong>No restrictions</strong> - The document can be accessed directly by the URL sent
-          to the recipient
+          <Trans>
+            <strong>No restrictions</strong> - The document can be accessed directly by the URL sent
+            to the recipient
+          </Trans>
         </li>
       </ul>
     </TooltipContent>
