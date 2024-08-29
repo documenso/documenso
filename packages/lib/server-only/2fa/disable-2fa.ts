@@ -2,7 +2,7 @@ import { prisma } from '@documenso/prisma';
 import type { User } from '@documenso/prisma/client';
 import { UserSecurityAuditLogType } from '@documenso/prisma/client';
 
-import { AppError } from '../../errors/app-error';
+import { AppError, AppErrorCode } from '../../errors/app-error';
 import type { RequestMetadata } from '../../universal/extract-request-metadata';
 import { validateTwoFactorAuthentication } from './validate-2fa';
 
@@ -21,11 +21,13 @@ export const disableTwoFactorAuthentication = async ({
 }: DisableTwoFactorAuthenticationOptions) => {
   let isValid = false;
 
-  if (totpCode) {
-    isValid = await validateTwoFactorAuthentication({ totpCode, user });
+  if (!totpCode && !backupCode) {
+    throw new AppError(AppErrorCode.INVALID_REQUEST);
   }
 
-  if (backupCode) {
+  if (totpCode) {
+    isValid = await validateTwoFactorAuthentication({ totpCode, user });
+  } else if (backupCode) {
     isValid = await validateTwoFactorAuthentication({ backupCode, user });
   }
 

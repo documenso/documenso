@@ -61,8 +61,7 @@ export const DisableAuthenticatorAppDialog = () => {
   });
 
   const onCloseTwoFactorDisableDialog = () => {
-    disable2FAForm.setValue('totpCode', '');
-    disable2FAForm.setValue('backupCode', '');
+    disable2FAForm.reset();
 
     setIsOpen(!isOpen);
   };
