@@ -881,27 +881,35 @@ export const ApiContractV1Implementation = createNextRoute(ApiContractV1, {
     const { id: documentId } = args.params;
     const fields = Array.isArray(args.body) ? args.body : [args.body];
 
-    const document = await getDocumentById({
-      id: Number(documentId),
-      userId: user.id,
-      teamId: team?.id,
+    const document = await prisma.document.findFirst({
+      select: { id: true, status: true },
+      where: {
+        id: Number(documentId),
+        ...(team?.id
+          ? {
+              team: {
+                id: team.id,
+                members: { some: { userId: user.id } },
+              },
+            }
+          : {
+              userId: user.id,
+              teamId: null,
+            }),
+      },
     });
 
     if (!document) {
       return {
         status: 404,
-        body: {
-          message: 'Document not found',
-        },
+        body: { message: 'Document not found' },
       };
     }
 
     if (document.status === DocumentStatus.COMPLETED) {
       return {
         status: 400,
-        body: {
-          message: 'Document is already completed',
-        },
+        body: { message: 'Document is already completed' },
       };
     }
 
@@ -935,28 +943,6 @@ export const ApiContractV1Implementation = createNextRoute(ApiContractV1, {
 
             if (recipient.signingStatus === SigningStatus.SIGNED) {
               throw new Error('Recipient has already signed the document');
-            }
-
-            const document = await tx.document.findFirst({
-              select: { id: true },
-              where: {
-                id: Number(documentId),
-                ...(team?.id
-                  ? {
-                      team: {
-                        id: team.id,
-                        members: { some: { userId: user.id } },
-                      },
-                    }
-                  : {
-                      userId: user.id,
-                      teamId: null,
-                    }),
-              },
-            });
-
-            if (!document) {
-              throw new Error('Document not found');
             }
 
             const advancedField = ['NUMBER', 'RADIO', 'CHECKBOX', 'DROPDOWN', 'TEXT'].includes(

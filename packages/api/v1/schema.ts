@@ -306,7 +306,7 @@ const ZCreateFieldSchema = z.object({
 
 export const ZCreateFieldMutationSchema = z.union([
   ZCreateFieldSchema,
-  z.array(ZCreateFieldSchema),
+  z.array(ZCreateFieldSchema).min(1),
 ]);
 
 export type TCreateFieldMutationSchema = z.infer<typeof ZCreateFieldMutationSchema>;
