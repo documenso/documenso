@@ -119,7 +119,7 @@ export const createField = async ({
       success: true,
       data: {},
     }))
-    .otherwise(() => ({ success: false, data: {} }));
+    .exhaustive();
 
   if (!result.success) {
     throw new Error('Field meta parsing failed');
