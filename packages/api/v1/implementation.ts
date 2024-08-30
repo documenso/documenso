@@ -965,8 +965,13 @@ export const ApiContractV1Implementation = createNextRoute(ApiContractV1, {
               .with('DROPDOWN', () => ZDropdownFieldMeta.safeParse(fieldMeta))
               .with('NUMBER', () => ZNumberFieldMeta.safeParse(fieldMeta))
               .with('TEXT', () => ZTextFieldMeta.safeParse(fieldMeta))
-              .with('SIGNATURE', 'FREE_SIGNATURE', 'INITIALS', 'DATE', 'EMAIL', 'NAME', () => ({
+              .with('SIGNATURE', 'INITIALS', 'DATE', 'EMAIL', 'NAME', () => ({
                 success: true,
+                data: {},
+              }))
+              .with('FREE_SIGNATURE', () => ({
+                success: false,
+                error: 'FREE_SIGNATURE is not supported',
                 data: {},
               }))
               .exhaustive();
