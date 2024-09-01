@@ -142,8 +142,8 @@ export const DocumentShareButton = ({
           <DialogTitle>Share your signing experience!</DialogTitle>
 
           <DialogDescription className="mt-4">
-            Don't worry, the document you signed or sent wont be shared; only your signing
-            experience is. Share your signing card and showcase your signature!
+            Don't worry, the document you signed or sent won't be shared; only your signing
+            experience will be. Share your signing card and showcase your signature!
           </DialogDescription>
         </DialogHeader>
 
