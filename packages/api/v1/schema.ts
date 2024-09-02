@@ -34,6 +34,22 @@ export const ZDeleteDocumentMutationSchema = null;
 
 export type TDeleteDocumentMutationSchema = typeof ZDeleteDocumentMutationSchema;
 
+export const ZFieldSchema = z.object({
+  id: z.number(),
+  secondaryId: z.string(),
+  documentId: z.number().nullish(),
+  templateId: z.number().nullish(),
+  recipientId: z.number(),
+  type: z.nativeEnum(FieldType),
+  page: z.number(),
+  positionX: z.unknown(),
+  positionY: z.unknown(),
+  width: z.unknown(),
+  height: z.unknown(),
+  customText: z.string(),
+  inserted: z.boolean(),
+});
+
 export const ZSuccessfulDocumentResponseSchema = z.object({
   id: z.number(),
   externalId: z.string().nullish(),
@@ -45,6 +61,16 @@ export const ZSuccessfulDocumentResponseSchema = z.object({
   createdAt: z.date(),
   updatedAt: z.date(),
   completedAt: z.date().nullable(),
+  fields: ZFieldSchema.pick({
+    id: true,
+    recipientId: true,
+    type: true,
+    page: true,
+    positionX: true,
+    positionY: true,
+    width: true,
+    height: true,
+  }).array(),
 });
 
 export const ZSuccessfulGetDocumentResponseSchema = ZSuccessfulDocumentResponseSchema.extend({
@@ -423,22 +449,6 @@ export const ZRecipientSchema = z.object({
   readStatus: z.nativeEnum(ReadStatus),
   signingStatus: z.nativeEnum(SigningStatus),
   sendStatus: z.nativeEnum(SendStatus),
-});
-
-export const ZFieldSchema = z.object({
-  id: z.number(),
-  secondaryId: z.string(),
-  documentId: z.number().nullish(),
-  templateId: z.number().nullish(),
-  recipientId: z.number(),
-  type: z.nativeEnum(FieldType),
-  page: z.number(),
-  positionX: z.unknown(),
-  positionY: z.unknown(),
-  width: z.unknown(),
-  height: z.unknown(),
-  customText: z.string(),
-  inserted: z.boolean(),
 });
 
 export const ZTemplateWithDataSchema = ZTemplateSchema.extend({

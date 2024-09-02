@@ -18,6 +18,7 @@ import { sendDocument } from '@documenso/lib/server-only/document/send-document'
 import { updateDocument } from '@documenso/lib/server-only/document/update-document';
 import { deleteField } from '@documenso/lib/server-only/field/delete-field';
 import { getFieldById } from '@documenso/lib/server-only/field/get-field-by-id';
+import { getFieldsForDocument } from '@documenso/lib/server-only/field/get-fields-for-document';
 import { updateField } from '@documenso/lib/server-only/field/update-field';
 import { insertFormValuesInPdf } from '@documenso/lib/server-only/pdf/insert-form-values-in-pdf';
 import { deleteRecipient } from '@documenso/lib/server-only/recipient/delete-recipient';
@@ -90,6 +91,11 @@ export const ApiContractV1Implementation = createNextRoute(ApiContractV1, {
         userId: user.id,
       });
 
+      const fields = await getFieldsForDocument({
+        documentId: Number(documentId),
+        userId: user.id,
+      });
+
       return {
         status: 200,
         body: {
@@ -98,6 +104,7 @@ export const ApiContractV1Implementation = createNextRoute(ApiContractV1, {
             ...recipient,
             signingUrl: `${NEXT_PUBLIC_WEBAPP_URL()}/sign/${recipient.token}`,
           })),
+          fields,
         },
       };
     } catch (err) {
