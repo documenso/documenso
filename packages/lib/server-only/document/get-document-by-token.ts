@@ -147,7 +147,7 @@ export const getDocumentAndRecipientByToken = async ({
     },
   });
 
-  const recipient = result.Recipient[0];
+  const [recipient] = result.Recipient;
 
   // Sanity check, should not be possible.
   if (!recipient) {
