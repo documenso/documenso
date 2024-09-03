@@ -37,6 +37,10 @@ export const updateField = async ({
   requestMetadata,
   fieldMeta,
 }: UpdateFieldOptions) => {
+  if (type === 'FREE_SIGNATURE') {
+    throw new Error('Cannot update a FREE_SIGNATURE field');
+  }
+
   const oldField = await prisma.field.findFirstOrThrow({
     where: {
       id: fieldId,
