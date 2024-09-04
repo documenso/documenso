@@ -7,10 +7,11 @@ import { useRouter } from 'next/navigation';
 import type { MessageDescriptor } from '@lingui/core';
 import { Trans, msg } from '@lingui/macro';
 import { useLingui } from '@lingui/react';
-import { Loader, Monitor, Moon, Sun } from 'lucide-react';
+import { CheckIcon, Loader, Monitor, Moon, Sun } from 'lucide-react';
 import { useTheme } from 'next-themes';
 import { useHotkeys } from 'react-hotkeys-hook';
 
+import { SUPPORTED_LANGUAGES } from '@documenso/lib/constants/i18n';
 import {
   DOCUMENTS_PAGE_SHORTCUT,
   SETTINGS_PAGE_SHORTCUT,
@@ -20,7 +21,10 @@ import {
   DO_NOT_INVALIDATE_QUERY_ON_MUTATION,
   SKIP_QUERY_BATCH_META,
 } from '@documenso/lib/constants/trpc';
+import { switchI18NLanguage } from '@documenso/lib/server-only/i18n/switch-i18n-language';
+import { dynamicActivate } from '@documenso/lib/utils/i18n';
 import { trpc as trpcReact } from '@documenso/trpc/react';
+import { cn } from '@documenso/ui/lib/utils';
 import {
   CommandDialog,
   CommandEmpty,
@@ -31,6 +35,7 @@ import {
   CommandShortcut,
 } from '@documenso/ui/primitives/command';
 import { THEMES_TYPE } from '@documenso/ui/primitives/constants';
+import { useToast } from '@documenso/ui/primitives/use-toast';
 
 const DOCUMENTS_PAGES = [
   {
@@ -207,6 +212,9 @@ export function CommandMenu({ open, onOpenChange }: CommandMenuProps) {
               <Commands push={push} pages={SETTINGS_PAGES} />
             </CommandGroup>
             <CommandGroup className="mx-2 p-0 pb-2" heading={_(msg`Preferences`)}>
+              <CommandItem className="-mx-2 -my-1 rounded-lg" onSelect={() => addPage('language')}>
+                Change language
+              </CommandItem>
               <CommandItem className="-mx-2 -my-1 rounded-lg" onSelect={() => addPage('theme')}>
                 Change theme
               </CommandItem>
@@ -218,7 +226,9 @@ export function CommandMenu({ open, onOpenChange }: CommandMenuProps) {
             )}
           </>
         )}
+
         {currentPage === 'theme' && <ThemeCommands setTheme={setTheme} />}
+        {currentPage === 'language' && <LanguageCommands />}
       </CommandList>
     </CommandDialog>
   );
@@ -266,6 +276,49 @@ const ThemeCommands = ({ setTheme }: { setTheme: (_theme: string) => void }) => 
     >
       <theme.icon className="mr-2" />
       {_(theme.label)}
+    </CommandItem>
+  ));
+};
+
+const LanguageCommands = () => {
+  const { i18n, _ } = useLingui();
+  const { toast } = useToast();
+
+  const [isLoading, setIsLoading] = useState(false);
+
+  const setLanguage = async (lang: string) => {
+    if (isLoading || lang === i18n.locale) {
+      return;
+    }
+
+    setIsLoading(true);
+
+    try {
+      await dynamicActivate(i18n, lang);
+      await switchI18NLanguage(lang);
+    } catch (err) {
+      toast({
+        title: _(msg`An unknown error occurred`),
+        variant: 'destructive',
+        description: _(msg`Unable to change the language at this time. Please try again later.`),
+      });
+    }
+
+    setIsLoading(false);
+  };
+
+  return Object.values(SUPPORTED_LANGUAGES).map((language) => (
+    <CommandItem
+      disabled={isLoading}
+      key={language.full}
+      onSelect={async () => setLanguage(language.short)}
+      className="-my-1 mx-2 rounded-lg first:mt-2 last:mb-2"
+    >
+      <CheckIcon
+        className={cn('mr-2 h-4 w-4', i18n.locale === language.short ? 'opacity-100' : 'opacity-0')}
+      />
+
+      {language.full}
     </CommandItem>
   ));
 };

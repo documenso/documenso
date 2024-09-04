@@ -517,6 +517,10 @@ msgstr "Save"
 msgid "Save Template"
 msgstr "Save Template"
 
+#: packages/ui/components/common/language-switcher-dialog.tsx:34
+msgid "Search languages..."
+msgstr "Search languages..."
+
 #: packages/ui/primitives/document-flow/field-items-advanced-settings/dropdown-field.tsx:105
 msgid "Select"
 msgstr "Select"
