@@ -2,7 +2,9 @@ import React from 'react';
 
 import { redirect } from 'next/navigation';
 
-import { setupI18nSSR } from '@documenso/lib/client-only/providers/i18n.server';
+import { DateTime } from 'luxon';
+
+import { APP_I18N_OPTIONS } from '@documenso/lib/constants/i18n';
 import { RECIPIENT_ROLES_DESCRIPTION_ENG } from '@documenso/lib/constants/recipient-roles';
 import { getEntireDocument } from '@documenso/lib/server-only/admin/get-entire-document';
 import { decryptSecondaryData } from '@documenso/lib/server-only/crypto/decrypt';
@@ -10,7 +12,6 @@ import { findDocumentAuditLogs } from '@documenso/lib/server-only/document/find-
 import { Card, CardContent } from '@documenso/ui/primitives/card';
 
 import { Logo } from '~/components/branding/logo';
-import { LocaleDate } from '~/components/formatter/locale-date';
 
 import { AuditLogDataTable } from './data-table';
 
@@ -21,8 +22,6 @@ type AuditLogProps = {
 };
 
 export default async function AuditLog({ searchParams }: AuditLogProps) {
-  setupI18nSSR();
-
   const { d } = searchParams;
 
   if (typeof d !== 'string' || !d) {
@@ -89,7 +88,9 @@ export default async function AuditLog({ searchParams }: AuditLogProps) {
             <span className="font-medium">Created At</span>
 
             <span className="mt-1 block">
-              <LocaleDate date={document.createdAt} format="yyyy-mm-dd hh:mm:ss a (ZZZZ)" />
+              {DateTime.fromJSDate(document.createdAt)
+                .setLocale(APP_I18N_OPTIONS.defaultLocale)
+                .toFormat('yyyy-mm-dd hh:mm:ss a (ZZZZ)')}
             </span>
           </p>
 
@@ -97,7 +98,9 @@ export default async function AuditLog({ searchParams }: AuditLogProps) {
             <span className="font-medium">Last Updated</span>
 
             <span className="mt-1 block">
-              <LocaleDate date={document.updatedAt} format="yyyy-mm-dd hh:mm:ss a (ZZZZ)" />
+              {DateTime.fromJSDate(document.updatedAt)
+                .setLocale(APP_I18N_OPTIONS.defaultLocale)
+                .toFormat('yyyy-mm-dd hh:mm:ss a (ZZZZ)')}
             </span>
           </p>
 

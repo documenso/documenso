@@ -18,7 +18,6 @@ import { DataTablePagination } from '@documenso/ui/primitives/data-table-paginat
 
 import { StackAvatarsWithTooltip } from '~/components/(dashboard)/avatar/stack-avatars-with-tooltip';
 import { DocumentStatus } from '~/components/formatter/document-status';
-import { LocaleDate } from '~/components/formatter/locale-date';
 
 import { DataTableActionButton } from './data-table-action-button';
 import { DataTableActionDropdown } from './data-table-action-dropdown';
@@ -41,8 +40,9 @@ export const DocumentsDataTable = ({
   showSenderColumn,
   team,
 }: DocumentsDataTableProps) => {
+  const { _, i18n } = useLingui();
+
   const { data: session } = useSession();
-  const { _ } = useLingui();
 
   const [isPending, startTransition] = useTransition();
 
@@ -53,12 +53,8 @@ export const DocumentsDataTable = ({
       {
         header: _(msg`Created`),
         accessorKey: 'createdAt',
-        cell: ({ row }) => (
-          <LocaleDate
-            date={row.original.createdAt}
-            format={{ ...DateTime.DATETIME_SHORT, hourCycle: 'h12' }}
-          />
-        ),
+        cell: ({ row }) =>
+          i18n.date(row.original.createdAt, { ...DateTime.DATETIME_SHORT, hourCycle: 'h12' }),
       },
       {
         header: _(msg`Title`),
@@ -88,8 +84,7 @@ export const DocumentsDataTable = ({
       {
         header: _(msg`Actions`),
         cell: ({ row }) =>
-          (!row.original.deletedAt ||
-            row.original.status === ExtendedDocumentStatus.COMPLETED) && (
+          (!row.original.deletedAt || row.original.status === ExtendedDocumentStatus.COMPLETED) && (
             <div className="flex items-center gap-x-4">
               <DataTableActionButton team={team} row={row.original} />
               <DataTableActionDropdown team={team} row={row.original} />

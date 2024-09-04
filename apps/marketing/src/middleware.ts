@@ -2,10 +2,10 @@ import { cookies } from 'next/headers';
 import type { NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
 
-import { extractSupportedLanguage } from '@documenso/lib/utils/i18n';
+import { extractLocaleData } from '@documenso/lib/utils/i18n';
 
 export default function middleware(req: NextRequest) {
-  const lang = extractSupportedLanguage({
+  const { lang } = extractLocaleData({
     headers: req.headers,
     cookies: cookies(),
   });

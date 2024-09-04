@@ -20,15 +20,13 @@ import { DataTablePagination } from '@documenso/ui/primitives/data-table-paginat
 import { Skeleton } from '@documenso/ui/primitives/skeleton';
 import { TableCell } from '@documenso/ui/primitives/table';
 
-import { LocaleDate } from '~/components/formatter/locale-date';
-
 const dateFormat: DateTimeFormatOptions = {
   ...DateTime.DATETIME_SHORT,
   hourCycle: 'h12',
 };
 
 export const UserSecurityActivityDataTable = () => {
-  const { _ } = useLingui();
+  const { _, i18n } = useLingui();
 
   const pathname = usePathname();
   const router = useRouter();
@@ -71,7 +69,7 @@ export const UserSecurityActivityDataTable = () => {
       {
         header: _(msg`Date`),
         accessorKey: 'createdAt',
-        cell: ({ row }) => <LocaleDate format={dateFormat} date={row.original.createdAt} />,
+        cell: ({ row }) => i18n.date(row.original.createdAt, dateFormat),
       },
       {
         header: _(msg`Device`),

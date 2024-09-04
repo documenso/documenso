@@ -22,12 +22,10 @@ import { DataTablePagination } from '@documenso/ui/primitives/data-table-paginat
 import { Skeleton } from '@documenso/ui/primitives/skeleton';
 import { TableCell } from '@documenso/ui/primitives/table';
 
-import { LocaleDate } from '~/components/formatter/locale-date';
-
 import { LeaveTeamDialog } from '../dialogs/leave-team-dialog';
 
 export const CurrentUserTeamsDataTable = () => {
-  const { _ } = useLingui();
+  const { _, i18n } = useLingui();
 
   const searchParams = useSearchParams();
   const updateSearchParams = useUpdateSearchParams();
@@ -91,7 +89,7 @@ export const CurrentUserTeamsDataTable = () => {
       {
         header: _(msg`Member Since`),
         accessorKey: 'createdAt',
-        cell: ({ row }) => <LocaleDate date={row.original.createdAt} />,
+        cell: ({ row }) => i18n.date(row.original.createdAt),
       },
       {
         id: 'actions',

@@ -2,8 +2,8 @@ import type { ReadonlyRequestCookies } from 'next/dist/server/web/spec-extension
 
 import type { I18n } from '@lingui/core';
 
-import { IS_APP_WEB } from '../constants/app';
-import type { SupportedLanguageCodes } from '../constants/i18n';
+import { IS_APP_WEB, IS_APP_WEB_I18N_ENABLED } from '../constants/app';
+import type { I18nLocaleData, SupportedLanguageCodes } from '../constants/i18n';
 import { APP_I18N_OPTIONS } from '../constants/i18n';
 
 export async function dynamicActivate(i18nInstance: I18n, locale: string) {
@@ -14,48 +14,58 @@ export async function dynamicActivate(i18nInstance: I18n, locale: string) {
   i18nInstance.loadAndActivate({ locale, messages });
 }
 
-/**
- * Extract the language if supported from the cookies header.
- *
- * Returns `null` if not supported or not found.
- */
-export const extractSupportedLanguageFromCookies = (
-  cookies: ReadonlyRequestCookies,
-): SupportedLanguageCodes | null => {
-  const preferredLanguage = cookies.get('i18n');
-
-  const foundSupportedLanguage = APP_I18N_OPTIONS.supportedLangs.find(
-    (lang): lang is SupportedLanguageCodes => lang === preferredLanguage?.value,
-  );
-
-  return foundSupportedLanguage || null;
-};
-
-/**
- * Extracts the language from the `accept-language` header.
- *
- * Returns `null` if not supported or not found.
- */
-export const extractSupportedLanguageFromHeaders = (
-  headers: Headers,
-): SupportedLanguageCodes | null => {
-  const locales = headers.get('accept-language') ?? '';
-
-  const [locale] = locales.split(',');
-
-  // Convert locale to language.
-  const [language] = locale.split('-');
+const parseLanguageFromLocale = (locale: string): SupportedLanguageCodes | null => {
+  const [language, _country] = locale.split('-');
 
   const foundSupportedLanguage = APP_I18N_OPTIONS.supportedLangs.find(
     (lang): lang is SupportedLanguageCodes => lang === language,
   );
 
-  return foundSupportedLanguage || null;
+  if (!foundSupportedLanguage) {
+    return null;
+  }
+
+  return foundSupportedLanguage;
 };
 
-type ExtractSupportedLanguageOptions = {
-  headers?: Headers;
-  cookies?: ReadonlyRequestCookies;
+/**
+ * Extract the language if supported from the cookies header.
+ *
+ * Returns `null` if not supported or not found.
+ */
+export const extractLocaleDataFromCookies = (
+  cookies: ReadonlyRequestCookies,
+): SupportedLanguageCodes | null => {
+  const preferredLocale = cookies.get('i18n')?.value || '';
+
+  const language = parseLanguageFromLocale(preferredLocale || '');
+
+  if (!language) {
+    return null;
+  }
+
+  return language;
+};
+
+/**
+ * Extracts the language from the `accept-language` header.
+ */
+export const extractLocaleDataFromHeaders = (
+  headers: Headers,
+): { lang: SupportedLanguageCodes | null; locales: string[] } => {
+  const headerLocales = (headers.get('accept-language') ?? '').split(',');
+
+  const language = parseLanguageFromLocale(headerLocales[0]);
+
+  return {
+    lang: language,
+    locales: [headerLocales[0]],
+  };
+};
+
+type ExtractLocaleDataOptions = {
+  headers: Headers;
+  cookies: ReadonlyRequestCookies;
 };
 
 /**
@@ -63,25 +73,25 @@ type ExtractSupportedLanguageOptions = {
  *
  * Will return the default fallback language if not found.
  */
-export const extractSupportedLanguage = ({
+export const extractLocaleData = ({
   headers,
   cookies,
-}: ExtractSupportedLanguageOptions): SupportedLanguageCodes => {
-  if (cookies) {
-    const langCookie = extractSupportedLanguageFromCookies(cookies);
+}: ExtractLocaleDataOptions): I18nLocaleData => {
+  let lang: SupportedLanguageCodes | null = extractLocaleDataFromCookies(cookies);
 
-    if (langCookie) {
-      return langCookie;
-    }
+  const langHeader = extractLocaleDataFromHeaders(headers);
+
+  if (!lang && langHeader?.lang) {
+    lang = langHeader.lang;
   }
 
-  if (headers) {
-    const langHeader = extractSupportedLanguageFromHeaders(headers);
-
-    if (langHeader) {
-      return langHeader;
-    }
+  // Override web app to be English.
+  if (!IS_APP_WEB_I18N_ENABLED && IS_APP_WEB) {
+    lang = 'en';
   }
 
-  return APP_I18N_OPTIONS.sourceLang;
+  return {
+    lang: lang || APP_I18N_OPTIONS.sourceLang,
+    locales: langHeader.locales,
+  };
 };
