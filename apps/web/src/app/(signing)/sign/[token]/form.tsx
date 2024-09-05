@@ -4,6 +4,7 @@ import { useMemo, useState } from 'react';
 
 import { useRouter } from 'next/navigation';
 
+import { Trans } from '@lingui/macro';
 import { useSession } from 'next-auth/react';
 import { useForm } from 'react-hook-form';
 
@@ -110,7 +111,7 @@ export const SigningForm = ({
     >
       {validateUninsertedFields && uninsertedFields[0] && (
         <FieldToolTip key={uninsertedFields[0].id} field={uninsertedFields[0]} color="warning">
-          Click to insert field
+          <Trans>Click to insert field</Trans>
         </FieldToolTip>
       )}
 
@@ -130,7 +131,7 @@ export const SigningForm = ({
           {recipient.role === RecipientRole.VIEWER ? (
             <>
               <p className="text-muted-foreground mt-2 text-sm">
-                Please mark as viewed to complete
+                <Trans>Please mark as viewed to complete</Trans>
               </p>
 
               <hr className="border-border mb-8 mt-4" />
@@ -146,7 +147,7 @@ export const SigningForm = ({
                     disabled={typeof window !== 'undefined' && window.history.length <= 1}
                     onClick={() => router.back()}
                   >
-                    Cancel
+                    <Trans>Cancel</Trans>
                   </Button>
 
                   <SignDialog

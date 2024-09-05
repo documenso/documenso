@@ -5,6 +5,8 @@ import React, { useCallback, useId, useMemo, useRef, useState } from 'react';
 import type { DropResult, SensorAPI } from '@hello-pangea/dnd';
 import { DragDropContext, Draggable, Droppable } from '@hello-pangea/dnd';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { Trans, msg } from '@lingui/macro';
+import { useLingui } from '@lingui/react';
 import { motion } from 'framer-motion';
 import { GripVerticalIcon, Plus, Trash } from 'lucide-react';
 import { useSession } from 'next-auth/react';
@@ -59,9 +61,11 @@ export const AddSignersFormPartial = ({
   onSubmit,
   isDocumentPdfLoaded,
 }: AddSignersFormProps) => {
+  const { _ } = useLingui();
   const { toast } = useToast();
   const { remaining } = useLimits();
   const { data: session } = useSession();
+
   const user = session?.user;
 
   const initialId = useId();
@@ -183,8 +187,8 @@ export const AddSignersFormPartial = ({
 
     if (hasBeenSentToRecipientId(signer.nativeId)) {
       toast({
-        title: 'Cannot remove signer',
-        description: 'This signer has already received the document.',
+        title: _(msg`Cannot remove signer`),
+        description: _(msg`This signer has already received the document.`),
         variant: 'destructive',
       });
 
@@ -360,6 +364,7 @@ export const AddSignersFormPartial = ({
 
         <AnimateGenericFadeInOut motionKey={showAdvancedSettings ? 'Show' : 'Hide'}>
           <Form {...form}>
+            {/* fix from here.... */}
             <FormField
               control={form.control}
               name="signingOrder"
@@ -384,7 +389,7 @@ export const AddSignersFormPartial = ({
                     htmlFor="signingOrder"
                     className="text-sm leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
                   >
-                    Enable signing order
+                    <Trans>Enable signing order</Trans>
                   </FormLabel>
                 </FormItem>
               )}
@@ -481,7 +486,11 @@ export const AddSignersFormPartial = ({
                                       'col-span-5': showAdvancedSettings,
                                     })}
                                   >
-                                    {!showAdvancedSettings && <FormLabel required>Email</FormLabel>}
+                                    {!showAdvancedSettings && (
+                                      <FormLabel required>
+                                        <Trans>Email</Trans>
+                                      </FormLabel>
+                                    )}
 
                                     <FormControl>
                                       <Input
@@ -512,11 +521,15 @@ export const AddSignersFormPartial = ({
                                       'col-span-5': showAdvancedSettings,
                                     })}
                                   >
-                                    {!showAdvancedSettings && <FormLabel>Name</FormLabel>}
+                                    {!showAdvancedSettings && (
+                                      <FormLabel>
+                                        <Trans>Name</Trans>
+                                      </FormLabel>
+                                    )}
 
                                     <FormControl>
                                       <Input
-                                        placeholder="Name"
+                                        placeholder={_(msg`Name`)}
                                         {...field}
                                         disabled={
                                           snapshot.isDragging ||
@@ -626,7 +639,7 @@ export const AddSignersFormPartial = ({
                 onClick={() => onAddSigner()}
               >
                 <Plus className="-ml-1 mr-2 h-5 w-5" />
-                Add Signer
+                <Trans>Add Signer</Trans>
               </Button>
 
               <Button
@@ -637,7 +650,7 @@ export const AddSignersFormPartial = ({
                 onClick={() => onAddSelfSigner()}
               >
                 <Plus className="-ml-1 mr-2 h-5 w-5" />
-                Add myself
+                <Trans>Add myself</Trans>
               </Button>
             </div>
 
@@ -655,7 +668,7 @@ export const AddSignersFormPartial = ({
                   className="text-muted-foreground ml-2 text-sm"
                   htmlFor="showAdvancedRecipientSettings"
                 >
-                  Show advanced settings
+                  <Trans>Show advanced settings</Trans>
                 </label>
               </div>
             )}
@@ -664,11 +677,7 @@ export const AddSignersFormPartial = ({
       </DocumentFlowFormContainerContent>
 
       <DocumentFlowFormContainerFooter>
-        <DocumentFlowFormContainerStep
-          title={documentFlow.title}
-          step={currentStep}
-          maxStep={totalSteps}
-        />
+        <DocumentFlowFormContainerStep step={currentStep} maxStep={totalSteps} />
 
         <DocumentFlowFormContainerActions
           loading={isSubmitting}

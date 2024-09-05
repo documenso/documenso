@@ -1,5 +1,8 @@
 import type { HTMLAttributes } from 'react';
 
+import type { MessageDescriptor } from '@lingui/core';
+import { msg } from '@lingui/macro';
+import { useLingui } from '@lingui/react';
 import { CheckCircle2, Clock, File } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react/dist/lucide-react';
 
@@ -8,34 +11,40 @@ import { SignatureIcon } from '@documenso/ui/icons/signature';
 import { cn } from '@documenso/ui/lib/utils';
 
 type FriendlyStatus = {
-  label: string;
+  label: MessageDescriptor;
+  labelExtended: MessageDescriptor;
   icon?: LucideIcon;
   color: string;
 };
 
 export const FRIENDLY_STATUS_MAP: Record<ExtendedDocumentStatus, FriendlyStatus> = {
   PENDING: {
-    label: 'Pending',
+    label: msg`Pending`,
+    labelExtended: msg`Document pending`,
     icon: Clock,
     color: 'text-blue-600 dark:text-blue-300',
   },
   COMPLETED: {
-    label: 'Completed',
+    label: msg`Completed`,
+    labelExtended: msg`Document completed`,
     icon: CheckCircle2,
     color: 'text-green-500 dark:text-green-300',
   },
   DRAFT: {
-    label: 'Draft',
+    label: msg`Draft`,
+    labelExtended: msg`Document draft`,
     icon: File,
     color: 'text-yellow-500 dark:text-yellow-200',
   },
   INBOX: {
-    label: 'Inbox',
+    label: msg`Inbox`,
+    labelExtended: msg`Document inbox`,
     icon: SignatureIcon,
     color: 'text-muted-foreground',
   },
   ALL: {
-    label: 'All',
+    label: msg`All`,
+    labelExtended: msg`Document All`,
     color: 'text-muted-foreground',
   },
 };
@@ -51,6 +60,8 @@ export const DocumentStatus = ({
   inheritColor,
   ...props
 }: DocumentStatusProps) => {
+  const { _ } = useLingui();
+
   const { label, icon: Icon, color } = FRIENDLY_STATUS_MAP[status];
 
   return (
@@ -62,7 +73,7 @@ export const DocumentStatus = ({
           })}
         />
       )}
-      {label}
+      {_(label)}
     </span>
   );
 };

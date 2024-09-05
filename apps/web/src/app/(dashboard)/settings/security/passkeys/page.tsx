@@ -1,6 +1,10 @@
 import type { Metadata } from 'next';
 import { redirect } from 'next/navigation';
 
+import { msg } from '@lingui/macro';
+import { useLingui } from '@lingui/react';
+
+import { setupI18nSSR } from '@documenso/lib/client-only/providers/i18n.server';
 import { getServerComponentFlag } from '@documenso/lib/server-only/feature-flags/get-server-component-feature-flag';
 
 import { SettingsHeader } from '~/components/(dashboard)/settings/layout/header';
@@ -13,6 +17,9 @@ export const metadata: Metadata = {
 };
 
 export default async function SettingsManagePasskeysPage() {
+  setupI18nSSR();
+
+  const { _ } = useLingui();
   const isPasskeyEnabled = await getServerComponentFlag('app_passkey');
 
   if (!isPasskeyEnabled) {
@@ -21,7 +28,11 @@ export default async function SettingsManagePasskeysPage() {
 
   return (
     <div>
-      <SettingsHeader title="Passkeys" subtitle="Manage your passkeys." hideDivider={true}>
+      <SettingsHeader
+        title={_(msg`Passkeys`)}
+        subtitle={_(msg`Manage your passkeys.`)}
+        hideDivider={true}
+      >
         <CreatePasskeyDialog />
       </SettingsHeader>
 

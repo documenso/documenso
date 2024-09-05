@@ -2,6 +2,9 @@ import { useState } from 'react';
 
 import { useRouter } from 'next/navigation';
 
+import { Trans, msg } from '@lingui/macro';
+import { useLingui } from '@lingui/react';
+
 import { NEXT_PUBLIC_WEBAPP_URL } from '@documenso/lib/constants/app';
 import { trpc } from '@documenso/trpc/react';
 import { Avatar, AvatarFallback, AvatarImage } from '@documenso/ui/primitives/avatar';
@@ -31,7 +34,10 @@ type MoveTemplateDialogProps = {
 
 export const MoveTemplateDialog = ({ templateId, open, onOpenChange }: MoveTemplateDialogProps) => {
   const router = useRouter();
+
   const { toast } = useToast();
+  const { _ } = useLingui();
+
   const [selectedTeamId, setSelectedTeamId] = useState<number | null>(null);
 
   const { data: teams, isLoading: isLoadingTeams } = trpc.team.getTeams.useQuery();
@@ -39,16 +45,16 @@ export const MoveTemplateDialog = ({ templateId, open, onOpenChange }: MoveTempl
     onSuccess: () => {
       router.refresh();
       toast({
-        title: 'Template moved',
-        description: 'The template has been successfully moved to the selected team.',
+        title: _(msg`Template moved`),
+        description: _(msg`The template has been successfully moved to the selected team.`),
         duration: 5000,
       });
       onOpenChange(false);
     },
     onError: (error) => {
       toast({
-        title: 'Error',
-        description: error.message || 'An error occurred while moving the template.',
+        title: _(msg`Error`),
+        description: error.message || _(msg`An error occurred while moving the template.`),
         variant: 'destructive',
         duration: 7500,
       });
@@ -67,20 +73,22 @@ export const MoveTemplateDialog = ({ templateId, open, onOpenChange }: MoveTempl
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Move Template to Team</DialogTitle>
+          <DialogTitle>
+            <Trans>Move Template to Team</Trans>
+          </DialogTitle>
           <DialogDescription>
-            Select a team to move this template to. This action cannot be undone.
+            <Trans>Select a team to move this template to. This action cannot be undone.</Trans>
           </DialogDescription>
         </DialogHeader>
 
         <Select onValueChange={(value) => setSelectedTeamId(Number(value))}>
           <SelectTrigger>
-            <SelectValue placeholder="Select a team" />
+            <SelectValue placeholder={_(msg`Select a team`)} />
           </SelectTrigger>
           <SelectContent>
             {isLoadingTeams ? (
               <SelectItem value="loading" disabled>
-                Loading teams...
+                <Trans>Loading teams...</Trans>
               </SelectItem>
             ) : (
               teams?.map((team) => (
@@ -108,10 +116,10 @@ export const MoveTemplateDialog = ({ templateId, open, onOpenChange }: MoveTempl
 
         <DialogFooter>
           <Button variant="secondary" onClick={() => onOpenChange(false)}>
-            Cancel
+            <Trans>Cancel</Trans>
           </Button>
           <Button onClick={onMove} loading={isLoading} disabled={!selectedTeamId || isLoading}>
-            {isLoading ? 'Moving...' : 'Move'}
+            {isLoading ? <Trans>Moving...</Trans> : <Trans>Move</Trans>}
           </Button>
         </DialogFooter>
       </DialogContent>

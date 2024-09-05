@@ -1,6 +1,8 @@
 import { useEffect } from 'react';
 
 import { zodResolver } from '@hookform/resolvers/zod';
+import { Trans, msg } from '@lingui/macro';
+import { useLingui } from '@lingui/react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 
@@ -30,6 +32,8 @@ export const PasswordDialog = ({
   onPasswordSubmit,
   isError,
 }: PasswordDialogProps) => {
+  const { _ } = useLingui();
+
   const form = useForm<TPasswordDialogFormSchema>({
     defaultValues: {
       password: defaultPassword ?? '',
@@ -45,7 +49,7 @@ export const PasswordDialog = ({
     if (isError) {
       form.setError('password', {
         type: 'manual',
-        message: 'The password you have entered is incorrect. Please try again.',
+        message: _(msg`The password you have entered is incorrect. Please try again.`),
       });
     }
   }, [form, isError]);
@@ -54,10 +58,14 @@ export const PasswordDialog = ({
     <Dialog open={open}>
       <DialogContent className="w-full max-w-md">
         <DialogHeader>
-          <DialogTitle>Password Required</DialogTitle>
+          <DialogTitle>
+            <Trans>Password Required</Trans>
+          </DialogTitle>
 
           <DialogDescription className="text-muted-foreground">
-            This document is password protected. Please enter the password to view the document.
+            <Trans>
+              This document is password protected. Please enter the password to view the document.
+            </Trans>
           </DialogDescription>
         </DialogHeader>
 
@@ -73,7 +81,7 @@ export const PasswordDialog = ({
                       <Input
                         type="password"
                         className="bg-background"
-                        placeholder="Enter password"
+                        placeholder={_(msg`Enter password`)}
                         autoComplete="off"
                         {...field}
                       />
@@ -85,7 +93,9 @@ export const PasswordDialog = ({
               />
 
               <div>
-                <Button>Submit</Button>
+                <Button>
+                  <Trans>Submit</Trans>
+                </Button>
               </div>
             </fieldset>
           </form>

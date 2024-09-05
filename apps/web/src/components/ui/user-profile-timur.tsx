@@ -2,6 +2,7 @@
 
 import Image from 'next/image';
 
+import { Trans } from '@lingui/macro';
 import { File } from 'lucide-react';
 
 import timurImage from '@documenso/assets/images/timur.png';
@@ -44,17 +45,19 @@ export const UserProfileTimur = ({ className, rows = 2 }: UserProfileTimurProps)
           <VerifiedIcon className="text-primary h-8 w-8" />
         </div>
 
-        <p className="text-muted-foreground mt-4 max-w-[40ch] text-center text-sm">Hey I’m Timur</p>
+        <p className="text-muted-foreground mt-4 max-w-[40ch] text-center text-sm">
+          <Trans>Hey I’m Timur</Trans>
+        </p>
 
         <p className="text-muted-foreground mt-1 max-w-[40ch] text-center text-sm">
-          Pick any of the following agreements below and start signing to get started
+          <Trans>Pick any of the following agreements below and start signing to get started</Trans>
         </p>
       </div>
 
       <div className="mt-8 w-full">
         <div className="dark:divide-foreground/30 dark:border-foreground/30 divide-y-2 divide-neutral-200 overflow-hidden rounded-lg border-2 border-neutral-200">
           <div className="text-muted-foreground dark:bg-foreground/20 bg-neutral-50 p-4 font-medium">
-            Documents
+            <Trans>Documents</Trans>
           </div>
 
           {Array(rows)
@@ -75,7 +78,7 @@ export const UserProfileTimur = ({ className, rows = 2 }: UserProfileTimurProps)
 
                 <div className="flex-shrink-0">
                   <Button type="button" size="sm" className="pointer-events-none w-32">
-                    Sign
+                    <Trans>Sign</Trans>
                   </Button>
                 </div>
               </div>

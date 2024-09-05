@@ -4,6 +4,8 @@ import { useEffect, useState, useTransition } from 'react';
 
 import { useRouter } from 'next/navigation';
 
+import { Plural, Trans, msg } from '@lingui/macro';
+import { useLingui } from '@lingui/react';
 import { Loader, Type } from 'lucide-react';
 
 import { validateTextField } from '@documenso/lib/advanced-fields-validation/validate-text';
@@ -35,8 +37,10 @@ export type TextFieldProps = {
 };
 
 export const TextField = ({ field, recipient, onSignField, onUnsignField }: TextFieldProps) => {
-  const router = useRouter();
+  const { _ } = useLingui();
   const { toast } = useToast();
+
+  const router = useRouter();
 
   const initialErrors: Record<string, string[]> = {
     required: [],
@@ -160,8 +164,8 @@ export const TextField = ({ field, recipient, onSignField, onUnsignField }: Text
       console.error(err);
 
       toast({
-        title: 'Error',
-        description: 'An error occurred while signing the document.',
+        title: _(msg`Error`),
+        description: _(msg`An error occurred while signing the document.`),
         variant: 'destructive',
       });
     }
@@ -188,8 +192,8 @@ export const TextField = ({ field, recipient, onSignField, onUnsignField }: Text
       console.error(err);
 
       toast({
-        title: 'Error',
-        description: 'An error occurred while removing the text.',
+        title: _(msg`Error`),
+        description: _(msg`An error occurred while removing the text.`),
         variant: 'destructive',
       });
     }
@@ -220,7 +224,7 @@ export const TextField = ({ field, recipient, onSignField, onUnsignField }: Text
       ? parsedField?.text.substring(0, 20) + '...'
       : undefined;
 
-  const fieldDisplayName = labelDisplay ? labelDisplay : textDisplay ? textDisplay : 'Add text';
+  const fieldDisplayName = labelDisplay ? labelDisplay : textDisplay;
   const charactersRemaining = (parsedFieldMeta?.characterLimit ?? 0) - (localText.length ?? 0);
 
   return (
@@ -249,7 +253,7 @@ export const TextField = ({ field, recipient, onSignField, onUnsignField }: Text
         >
           <span className="flex items-center justify-center gap-x-1">
             <Type />
-            {fieldDisplayName}
+            {fieldDisplayName || <Trans>Add text</Trans>}
           </span>
         </p>
       )}
@@ -264,12 +268,14 @@ export const TextField = ({ field, recipient, onSignField, onUnsignField }: Text
 
       <Dialog open={showCustomTextModal} onOpenChange={setShowCustomTextModal}>
         <DialogContent>
-          <DialogTitle>{parsedFieldMeta?.label ? parsedFieldMeta?.label : 'Add Text'}</DialogTitle>
+          <DialogTitle>
+            {parsedFieldMeta?.label ? parsedFieldMeta?.label : <Trans>Add Text</Trans>}
+          </DialogTitle>
 
           <div>
             <Textarea
               id="custom-text"
-              placeholder={parsedFieldMeta?.placeholder ?? 'Enter your text here'}
+              placeholder={parsedFieldMeta?.placeholder ?? _(msg`Enter your text here`)}
               className={cn('mt-2 w-full rounded-md', {
                 'border-2 border-red-300 ring-2 ring-red-200 ring-offset-2 ring-offset-red-200 focus-visible:border-red-400 focus-visible:ring-4 focus-visible:ring-red-200 focus-visible:ring-offset-2 focus-visible:ring-offset-red-200':
                   userInputHasErrors,
@@ -283,7 +289,11 @@ export const TextField = ({ field, recipient, onSignField, onUnsignField }: Text
             parsedFieldMeta?.characterLimit > 0 &&
             !userInputHasErrors && (
               <div className="text-muted-foreground text-sm">
-                {charactersRemaining} characters remaining
+                <Plural
+                  value={charactersRemaining}
+                  one="1 character remaining"
+                  other={`${charactersRemaining} characters remaining`}
+                />
               </div>
             )}
 
@@ -297,7 +307,13 @@ export const TextField = ({ field, recipient, onSignField, onUnsignField }: Text
               {errors.characterLimit.map((error, index) => (
                 <p key={index} className="text-red-500">
                   {error}{' '}
-                  {charactersRemaining < 0 && `(${Math.abs(charactersRemaining)} characters over)`}
+                  {charactersRemaining < 0 && (
+                    <Plural
+                      value={Math.abs(charactersRemaining)}
+                      one="(1 character over)"
+                      other="(# characters over)"
+                    />
+                  )}
                 </p>
               ))}
             </div>
@@ -314,7 +330,7 @@ export const TextField = ({ field, recipient, onSignField, onUnsignField }: Text
                   setLocalCustomText('');
                 }}
               >
-                Cancel
+                <Trans>Cancel</Trans>
               </Button>
 
               <Button
@@ -323,7 +339,7 @@ export const TextField = ({ field, recipient, onSignField, onUnsignField }: Text
                 disabled={!localText || userInputHasErrors}
                 onClick={() => onDialogSignClick()}
               >
-                Save
+                <Trans>Save</Trans>
               </Button>
             </div>
           </DialogFooter>

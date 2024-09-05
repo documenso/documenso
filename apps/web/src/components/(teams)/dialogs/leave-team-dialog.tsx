@@ -2,6 +2,9 @@
 
 import { useState } from 'react';
 
+import { Trans, msg } from '@lingui/macro';
+import { useLingui } from '@lingui/react';
+
 import { NEXT_PUBLIC_WEBAPP_URL } from '@documenso/lib/constants/app';
 import { TEAM_MEMBER_ROLE_MAP } from '@documenso/lib/constants/teams';
 import type { TeamMemberRole } from '@documenso/prisma/client';
@@ -37,13 +40,14 @@ export const LeaveTeamDialog = ({
 }: LeaveTeamDialogProps) => {
   const [open, setOpen] = useState(false);
 
+  const { _ } = useLingui();
   const { toast } = useToast();
 
   const { mutateAsync: leaveTeam, isLoading: isLeavingTeam } = trpc.team.leaveTeam.useMutation({
     onSuccess: () => {
       toast({
-        title: 'Success',
-        description: 'You have successfully left this team.',
+        title: _(msg`Success`),
+        description: _(msg`You have successfully left this team.`),
         duration: 5000,
       });
 
@@ -51,11 +55,12 @@ export const LeaveTeamDialog = ({
     },
     onError: () => {
       toast({
-        title: 'An unknown error occurred',
+        title: _(msg`An unknown error occurred`),
+        description: _(
+          msg`We encountered an unknown error while attempting to leave this team. Please try again later.`,
+        ),
         variant: 'destructive',
         duration: 10000,
-        description:
-          'We encountered an unknown error while attempting to leave this team. Please try again later.',
       });
     },
   });
@@ -63,15 +68,21 @@ export const LeaveTeamDialog = ({
   return (
     <Dialog open={open} onOpenChange={(value) => !isLeavingTeam && setOpen(value)}>
       <DialogTrigger asChild>
-        {trigger ?? <Button variant="destructive">Leave team</Button>}
+        {trigger ?? (
+          <Button variant="destructive">
+            <Trans>Leave team</Trans>
+          </Button>
+        )}
       </DialogTrigger>
 
       <DialogContent position="center">
         <DialogHeader>
-          <DialogTitle>Are you sure?</DialogTitle>
+          <DialogTitle>
+            <Trans>Are you sure?</Trans>
+          </DialogTitle>
 
           <DialogDescription className="mt-4">
-            You are about to leave the following team.
+            <Trans>You are about to leave the following team.</Trans>
           </DialogDescription>
         </DialogHeader>
 
@@ -81,14 +92,14 @@ export const LeaveTeamDialog = ({
             avatarSrc={`${NEXT_PUBLIC_WEBAPP_URL()}/api/avatar/${teamAvatarImageId}`}
             avatarFallback={teamName.slice(0, 1).toUpperCase()}
             primaryText={teamName}
-            secondaryText={TEAM_MEMBER_ROLE_MAP[role]}
+            secondaryText={_(TEAM_MEMBER_ROLE_MAP[role])}
           />
         </Alert>
 
         <fieldset disabled={isLeavingTeam}>
           <DialogFooter>
             <Button type="button" variant="secondary" onClick={() => setOpen(false)}>
-              Cancel
+              <Trans>Cancel</Trans>
             </Button>
 
             <Button
@@ -97,7 +108,7 @@ export const LeaveTeamDialog = ({
               loading={isLeavingTeam}
               onClick={async () => leaveTeam({ teamId })}
             >
-              Leave
+              <Trans>Leave</Trans>
             </Button>
           </DialogFooter>
         </fieldset>

@@ -2,6 +2,7 @@
 
 import React from 'react';
 
+import { Trans } from '@lingui/macro';
 import { X } from 'lucide-react';
 
 import { type TRecipientActionAuth } from '@documenso/lib/types/document-auth';
@@ -140,7 +141,7 @@ export const SigningFieldContainer = ({
         {readOnlyField && (
           <button className="bg-background/40 absolute inset-0 z-10 flex h-full w-full items-center justify-center rounded-md text-sm opacity-0 duration-200 group-hover:opacity-100">
             <span className="bg-foreground/50 dark:bg-background/50 text-background dark:text-foreground rounded-xl p-2">
-              Read only field
+              <Trans>Read only field</Trans>
             </span>
           </button>
         )}
@@ -152,7 +153,7 @@ export const SigningFieldContainer = ({
                 className="text-destructive bg-background/40 absolute inset-0 z-10 flex h-full w-full items-center justify-center rounded-md text-sm opacity-0 duration-200 group-hover:opacity-100"
                 onClick={onRemoveSignedFieldClick}
               >
-                Remove
+                <Trans>Remove</Trans>
               </button>
             </TooltipTrigger>
 
@@ -176,7 +177,7 @@ export const SigningFieldContainer = ({
             className="text-destructive bg-background/50 absolute inset-0 z-10 flex h-full w-full items-center justify-center rounded-md text-sm opacity-0 duration-200 group-hover:opacity-100"
             onClick={onRemoveSignedFieldClick}
           >
-            Remove
+            <Trans>Remove</Trans>
           </button>
         )}
 

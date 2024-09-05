@@ -3,6 +3,7 @@
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 
+import { Trans } from '@lingui/macro';
 import { motion } from 'framer-motion';
 import { ChevronLeft } from 'lucide-react';
 
@@ -29,6 +30,10 @@ export default function NotFoundPartial({ children }: NotFoundPartialProps) {
             src={backgroundPattern}
             alt="background pattern"
             className="-mr-[50vw] -mt-[15vh] h-full scale-100 object-cover dark:contrast-[70%] dark:invert dark:sepia md:scale-100 lg:scale-[100%]"
+            style={{
+              mask: 'radial-gradient(rgba(255, 255, 255, 1) 0%, transparent 80%)',
+              WebkitMask: 'radial-gradient(rgba(255, 255, 255, 1) 0%, transparent 80%)',
+            }}
             priority
           />
         </motion.div>
@@ -36,12 +41,18 @@ export default function NotFoundPartial({ children }: NotFoundPartialProps) {
 
       <div className="container mx-auto flex h-full min-h-screen items-center px-6 py-32">
         <div>
-          <p className="text-muted-foreground font-semibold">404 Page not found</p>
+          <p className="text-muted-foreground font-semibold">
+            <Trans>404 Page not found</Trans>
+          </p>
 
-          <h1 className="mt-3 text-2xl font-bold md:text-3xl">Oops! Something went wrong.</h1>
+          <h1 className="mt-3 text-2xl font-bold md:text-3xl">
+            <Trans>Oops! Something went wrong.</Trans>
+          </h1>
 
           <p className="text-muted-foreground mt-4 text-sm">
-            The page you are looking for was moved, removed, renamed or might never have existed.
+            <Trans>
+              The page you are looking for was moved, removed, renamed or might never have existed.
+            </Trans>
           </p>
 
           <div className="mt-6 flex gap-x-2.5 gap-y-4 md:items-center">
@@ -53,7 +64,7 @@ export default function NotFoundPartial({ children }: NotFoundPartialProps) {
               }}
             >
               <ChevronLeft className="mr-2 h-4 w-4" />
-              Go Back
+              <Trans>Go Back</Trans>
             </Button>
 
             {children}

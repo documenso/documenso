@@ -5,6 +5,7 @@ import { DATE_FORMATS, DEFAULT_DOCUMENT_DATE_FORMAT } from '@documenso/lib/const
 import '@documenso/lib/constants/time-zones';
 import { DEFAULT_DOCUMENT_TIME_ZONE, TIME_ZONES } from '@documenso/lib/constants/time-zones';
 import { ZUrlSchema } from '@documenso/lib/schemas/common';
+import { ZFieldMetaSchema } from '@documenso/lib/types/field-meta';
 import {
   DocumentDataType,
   FieldType,
@@ -292,7 +293,7 @@ export type TSuccessfulRecipientResponseSchema = z.infer<typeof ZSuccessfulRecip
 /**
  * Fields
  */
-export const ZCreateFieldMutationSchema = z.object({
+const ZCreateFieldSchema = z.object({
   recipientId: z.number(),
   type: z.nativeEnum(FieldType),
   pageNumber: z.number(),
@@ -300,17 +301,43 @@ export const ZCreateFieldMutationSchema = z.object({
   pageY: z.number(),
   pageWidth: z.number(),
   pageHeight: z.number(),
+  fieldMeta: ZFieldMetaSchema.openapi({}),
 });
+
+export const ZCreateFieldMutationSchema = z.union([
+  ZCreateFieldSchema,
+  z.array(ZCreateFieldSchema).min(1),
+]);
 
 export type TCreateFieldMutationSchema = z.infer<typeof ZCreateFieldMutationSchema>;
 
-export const ZUpdateFieldMutationSchema = ZCreateFieldMutationSchema.partial();
+export const ZUpdateFieldMutationSchema = ZCreateFieldSchema.partial();
 
 export type TUpdateFieldMutationSchema = z.infer<typeof ZUpdateFieldMutationSchema>;
 
 export const ZDeleteFieldMutationSchema = null;
 
 export type TDeleteFieldMutationSchema = typeof ZDeleteFieldMutationSchema;
+
+const ZSuccessfulFieldSchema = z.object({
+  id: z.number(),
+  documentId: z.number(),
+  recipientId: z.number(),
+  type: z.nativeEnum(FieldType),
+  pageNumber: z.number(),
+  pageX: z.number(),
+  pageY: z.number(),
+  pageWidth: z.number(),
+  pageHeight: z.number(),
+  customText: z.string(),
+  fieldMeta: ZFieldMetaSchema,
+  inserted: z.boolean(),
+});
+
+export const ZSuccessfulFieldCreationResponseSchema = z.object({
+  fields: z.union([ZSuccessfulFieldSchema, z.array(ZSuccessfulFieldSchema)]),
+  documentId: z.number(),
+});
 
 export const ZSuccessfulFieldResponseSchema = z.object({
   id: z.number(),
@@ -323,6 +350,7 @@ export const ZSuccessfulFieldResponseSchema = z.object({
   pageWidth: z.number(),
   pageHeight: z.number(),
   customText: z.string(),
+  fieldMeta: ZFieldMetaSchema,
   inserted: z.boolean(),
 });
 

@@ -3,6 +3,7 @@
 import type { HTMLAttributes, MouseEvent, PointerEvent, TouchEvent } from 'react';
 import { useEffect, useMemo, useRef, useState } from 'react';
 
+import { Trans } from '@lingui/macro';
 import { Undo2 } from 'lucide-react';
 import type { StrokeOptions } from 'perfect-freehand';
 import { getStroke } from 'perfect-freehand';
@@ -252,7 +253,7 @@ export const SignaturePad = ({
           className="focus-visible:ring-ring ring-offset-background text-muted-foreground/60 hover:text-muted-foreground rounded-full p-0 text-xs focus-visible:outline-none focus-visible:ring-2"
           onClick={() => onClearClick()}
         >
-          Clear Signature
+          <Trans>Clear Signature</Trans>
         </button>
       </div>
 

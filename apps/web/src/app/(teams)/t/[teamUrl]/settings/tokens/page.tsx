@@ -1,6 +1,8 @@
+import { Trans } from '@lingui/macro';
 import { DateTime } from 'luxon';
 import { match } from 'ts-pattern';
 
+import { setupI18nSSR } from '@documenso/lib/client-only/providers/i18n.server';
 import { NEXT_PUBLIC_WEBAPP_URL } from '@documenso/lib/constants/app';
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import { getRequiredServerComponentSession } from '@documenso/lib/next-auth/get-server-component-session';
@@ -20,6 +22,8 @@ type ApiTokensPageProps = {
 };
 
 export default async function ApiTokensPage({ params }: ApiTokensPageProps) {
+  setupI18nSSR();
+
   const { teamUrl } = params;
 
   const { user } = await getRequiredServerComponentSession();
@@ -35,7 +39,9 @@ export default async function ApiTokensPage({ params }: ApiTokensPageProps) {
 
     return (
       <div>
-        <h3 className="text-2xl font-semibold">API Tokens</h3>
+        <h3 className="text-2xl font-semibold">
+          <Trans>API Tokens</Trans>
+        </h3>
         <p className="text-muted-foreground mt-2 text-sm">
           {match(error.code)
             .with(AppErrorCode.UNAUTHORIZED, () => error.message)
@@ -47,18 +53,22 @@ export default async function ApiTokensPage({ params }: ApiTokensPageProps) {
 
   return (
     <div>
-      <h3 className="text-2xl font-semibold">API Tokens</h3>
+      <h3 className="text-2xl font-semibold">
+        <Trans>API Tokens</Trans>
+      </h3>
 
       <p className="text-muted-foreground mt-2 text-sm">
-        On this page, you can create new API tokens and manage the existing ones. <br />
-        You can view our swagger docs{' '}
-        <a
-          className="text-primary underline"
-          href={`${NEXT_PUBLIC_WEBAPP_URL()}/api/v1/openapi`}
-          target="_blank"
-        >
-          here
-        </a>
+        <Trans>
+          On this page, you can create new API tokens and manage the existing ones. <br />
+          You can view our swagger docs{' '}
+          <a
+            className="text-primary underline"
+            href={`${NEXT_PUBLIC_WEBAPP_URL()}/api/v1/openapi`}
+            target="_blank"
+          >
+            here
+          </a>
+        </Trans>
       </p>
 
       <hr className="my-4" />
@@ -67,12 +77,14 @@ export default async function ApiTokensPage({ params }: ApiTokensPageProps) {
 
       <hr className="mb-4 mt-8" />
 
-      <h4 className="text-xl font-medium">Your existing tokens</h4>
+      <h4 className="text-xl font-medium">
+        <Trans>Your existing tokens</Trans>
+      </h4>
 
       {tokens.length === 0 && (
         <div className="mb-4">
           <p className="text-muted-foreground mt-2 text-sm italic">
-            Your tokens will be shown here once you create them.
+            <Trans>Your tokens will be shown here once you create them.</Trans>
           </p>
         </div>
       )}
@@ -86,22 +98,26 @@ export default async function ApiTokensPage({ params }: ApiTokensPageProps) {
                   <h5 className="text-base">{token.name}</h5>
 
                   <p className="text-muted-foreground mt-2 text-xs">
-                    Created on <LocaleDate date={token.createdAt} format={DateTime.DATETIME_FULL} />
+                    <Trans>Created on</Trans>{' '}
+                    <LocaleDate date={token.createdAt} format={DateTime.DATETIME_FULL} />
                   </p>
                   {token.expires ? (
                     <p className="text-muted-foreground mt-1 text-xs">
-                      Expires on <LocaleDate date={token.expires} format={DateTime.DATETIME_FULL} />
+                      <Trans>Expires on</Trans>{' '}
+                      <LocaleDate date={token.expires} format={DateTime.DATETIME_FULL} />
                     </p>
                   ) : (
                     <p className="text-muted-foreground mt-1 text-xs">
-                      Token doesn't have an expiration date
+                      <Trans>Token doesn't have an expiration date</Trans>
                     </p>
                   )}
                 </div>
 
                 <div>
                   <DeleteTokenDialog token={token} teamId={team.id}>
-                    <Button variant="destructive">Delete</Button>
+                    <Button variant="destructive">
+                      <Trans>Delete</Trans>
+                    </Button>
                   </DeleteTokenDialog>
                 </div>
               </div>

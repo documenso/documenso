@@ -1,6 +1,6 @@
 {
   "name": "@documenso/marketing",
-  "version": "1.6.1-rc.1",
+  "version": "1.7.0-rc.4",
   "private": true,
   "license": "AGPL-3.0",
   "scripts": {
@@ -20,8 +20,8 @@
     "@documenso/trpc": "*",
     "@documenso/ui": "*",
     "@hookform/resolvers": "^3.1.0",
-    "@lingui/macro": "^4.11.1",
-    "@lingui/react": "^4.11.1",
+    "@lingui/macro": "^4.11.3",
+    "@lingui/react": "^4.11.3",
     "@openstatus/react": "^0.0.3",
     "cmdk": "^0.2.1",
     "contentlayer": "^0.3.4",
@@ -32,16 +32,16 @@
     "lucide-react": "^0.279.0",
     "luxon": "^3.4.0",
     "micro": "^10.0.1",
-    "next": "14.0.3",
+    "next": "14.2.6",
     "next-auth": "4.24.5",
     "next-axiom": "^1.1.1",
     "next-contentlayer": "^0.3.4",
     "next-plausible": "^3.10.1",
     "perfect-freehand": "^1.2.0",
     "posthog-js": "^1.77.3",
-    "react": "18.2.0",
+    "react": "^18",
     "react-confetti": "^6.1.0",
-    "react-dom": "18.2.0",
+    "react-dom": "^18",
     "react-hook-form": "^7.43.9",
     "react-icons": "^4.11.0",
     "recharts": "^2.7.2",
@@ -50,18 +50,10 @@
     "zod": "^3.22.4"
   },
   "devDependencies": {
-    "@lingui/loader": "^4.11.1",
-    "@lingui/swc-plugin": "4.0.6",
+    "@lingui/loader": "^4.11.3",
+    "@lingui/swc-plugin": "4.0.8",
     "@types/node": "20.1.0",
-    "@types/react": "18.2.18",
-    "@types/react-dom": "18.2.7"
-  },
-  "overrides": {
-    "next-auth": {
-      "next": "$next"
-    },
-    "next-contentlayer": {
-      "next": "$next"
-    }
+    "@types/react": "^18",
+    "@types/react-dom": "^18"
   }
 }

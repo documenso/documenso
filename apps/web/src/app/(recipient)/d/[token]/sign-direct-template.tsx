@@ -1,5 +1,7 @@
 import { useMemo, useState } from 'react';
 
+import { Trans } from '@lingui/macro';
+import { useLingui } from '@lingui/react';
 import { DateTime } from 'luxon';
 import { match } from 'ts-pattern';
 
@@ -70,6 +72,8 @@ export const SignDirectTemplateForm = ({
   template,
   onSubmit,
 }: SignDirectTemplateFormProps) => {
+  const { _ } = useLingui();
+
   const { fullName, signature, setFullName, setSignature } = useRequiredSigningContext();
 
   const [localFields, setLocalFields] = useState<DirectTemplateLocalField[]>(directRecipientFields);
@@ -168,7 +172,7 @@ export const SignDirectTemplateForm = ({
         <ElementVisible target={PDF_VIEWER_PAGE_SELECTOR}>
           {validateUninsertedFields && uninsertedFields[0] && (
             <FieldToolTip key={uninsertedFields[0].id} field={uninsertedFields[0]} color="warning">
-              Click to insert field
+              <Trans>Click to insert field</Trans>
             </FieldToolTip>
           )}
 
@@ -318,7 +322,9 @@ export const SignDirectTemplateForm = ({
         <div className="-mx-2 flex flex-1 flex-col gap-4 overflow-y-auto px-2">
           <div className="flex flex-1 flex-col gap-y-4">
             <div>
-              <Label htmlFor="full-name">Full Name</Label>
+              <Label htmlFor="full-name">
+                <Trans>Full Name</Trans>
+              </Label>
 
               <Input
                 id="full-name"
@@ -328,7 +334,9 @@ export const SignDirectTemplateForm = ({
             </div>
 
             <div>
-              <Label htmlFor="Signature">Signature</Label>
+              <Label htmlFor="Signature">
+                <Trans>Signature</Trans>
+              </Label>
 
               <Card className="mt-2" gradient degrees={-120}>
                 <CardContent className="p-0">
@@ -348,11 +356,7 @@ export const SignDirectTemplateForm = ({
       </DocumentFlowFormContainerContent>
 
       <DocumentFlowFormContainerFooter>
-        <DocumentFlowFormContainerStep
-          title={flowStep.title}
-          step={currentStep}
-          maxStep={totalSteps}
-        />
+        <DocumentFlowFormContainerStep step={currentStep} maxStep={totalSteps} />
 
         <div className="mt-4 flex gap-x-4">
           <Button
@@ -362,7 +366,7 @@ export const SignDirectTemplateForm = ({
             disabled={isSubmitting}
             onClick={previousStep}
           >
-            Back
+            <Trans>Back</Trans>
           </Button>
 
           <SignDialog

@@ -2,6 +2,8 @@
 
 import { useRouter } from 'next/navigation';
 
+import { Trans } from '@lingui/macro';
+
 import { Button } from '@documenso/ui/primitives/button';
 
 export default function ActivityPageBackButton() {
@@ -15,7 +17,7 @@ export default function ActivityPageBackButton() {
           void router.back();
         }}
       >
-        Back
+        <Trans>Back</Trans>
       </Button>
     </div>
   );

@@ -1,5 +1,7 @@
 'use client';
 
+import { Trans, msg } from '@lingui/macro';
+import { useLingui } from '@lingui/react';
 import { Link2Icon } from 'lucide-react';
 
 import { useCopyToClipboard } from '@documenso/lib/client-only/hooks/use-copy-to-clipboard';
@@ -19,13 +21,15 @@ export const TemplateDirectLinkBadge = ({
   className,
 }: TemplateDirectLinkBadgeProps) => {
   const [, copy] = useCopyToClipboard();
+
+  const { _ } = useLingui();
   const { toast } = useToast();
 
   const onCopyClick = async (token: string) =>
     copy(formatDirectTemplatePath(token)).then(() => {
       toast({
-        title: 'Copied to clipboard',
-        description: 'The direct link has been copied to your clipboard',
+        title: _(msg`Copied to clipboard`),
+        description: _(msg`The direct link has been copied to your clipboard`),
       });
     });
 
@@ -39,7 +43,7 @@ export const TemplateDirectLinkBadge = ({
       onClick={async () => onCopyClick(token)}
     >
       <Link2Icon className="mr-1 h-3 w-3" />
-      direct link {!enabled && 'disabled'}
+      {enabled ? <Trans>direct link</Trans> : <Trans>direct link disabled</Trans>}
     </button>
   );
 };

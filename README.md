@@ -261,6 +261,7 @@ npm run prisma:migrate-deploy
 Finally, you can start it with:
 
 ```
+cd apps/web
 npm run start
 ```
 
@@ -301,6 +302,10 @@ WantedBy=multi-user.target
 ### Koyeb
 
 [![Deploy to Koyeb](https://www.koyeb.com/static/images/deploy/button.svg)](https://app.koyeb.com/deploy?type=git&repository=github.com/documenso/documenso&branch=main&name=documenso-app&builder=dockerfile&dockerfile=/docker/Dockerfile)
+
+## Elestio
+
+[![Deploy on Elestio](https://elest.io/images/logos/deploy-to-elestio-btn.png)](https://elest.io/open-source/documenso)
 
 ## Troubleshooting
 

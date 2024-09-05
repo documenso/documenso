@@ -1,8 +1,10 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 
+import { Trans } from '@lingui/macro';
 import { XCircle } from 'lucide-react';
 
+import { setupI18nSSR } from '@documenso/lib/client-only/providers/i18n.server';
 import { Button } from '@documenso/ui/primitives/button';
 
 export const metadata: Metadata = {
@@ -10,6 +12,8 @@ export const metadata: Metadata = {
 };
 
 export default function EmailVerificationWithoutTokenPage() {
+  setupI18nSSR();
+
   return (
     <div className="w-screen max-w-lg px-4">
       <div className="flex w-full items-start">
@@ -19,16 +23,20 @@ export default function EmailVerificationWithoutTokenPage() {
 
         <div>
           <h2 className="text-2xl font-bold md:text-4xl">
-            Uh oh! Looks like you're missing a token
+            <Trans>Uh oh! Looks like you're missing a token</Trans>
           </h2>
 
           <p className="text-muted-foreground mt-4">
-            It seems that there is no token provided, if you are trying to verify your email please
-            follow the link in your email.
+            <Trans>
+              It seems that there is no token provided, if you are trying to verify your email
+              please follow the link in your email.
+            </Trans>
           </p>
 
           <Button className="mt-4" asChild>
-            <Link href="/">Go back home</Link>
+            <Link href="/">
+              <Trans>Go back home</Trans>
+            </Link>
           </Button>
         </div>
       </div>

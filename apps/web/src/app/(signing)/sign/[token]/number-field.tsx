@@ -4,6 +4,8 @@ import { useEffect, useState, useTransition } from 'react';
 
 import { useRouter } from 'next/navigation';
 
+import { Trans, msg } from '@lingui/macro';
+import { useLingui } from '@lingui/react';
 import { Hash, Loader } from 'lucide-react';
 
 import { validateNumberField } from '@documenso/lib/advanced-fields-validation/validate-number';
@@ -43,8 +45,10 @@ export type NumberFieldProps = {
 };
 
 export const NumberField = ({ field, recipient, onSignField, onUnsignField }: NumberFieldProps) => {
-  const router = useRouter();
+  const { _ } = useLingui();
   const { toast } = useToast();
+
+  const router = useRouter();
   const [isPending, startTransition] = useTransition();
   const [showRadioModal, setShowRadioModal] = useState(false);
 
@@ -142,8 +146,8 @@ export const NumberField = ({ field, recipient, onSignField, onUnsignField }: Nu
       console.error(err);
 
       toast({
-        title: 'Error',
-        description: 'An error occurred while signing the document.',
+        title: _(msg`Error`),
+        description: _(msg`An error occurred while signing the document.`),
         variant: 'destructive',
       });
     }
@@ -187,8 +191,8 @@ export const NumberField = ({ field, recipient, onSignField, onUnsignField }: Nu
       console.error(err);
 
       toast({
-        title: 'Error',
-        description: 'An error occurred while removing the signature.',
+        title: _(msg`Error`),
+        description: _(msg`An error occurred while removing the signature.`),
         variant: 'destructive',
       });
     }
@@ -263,7 +267,7 @@ export const NumberField = ({ field, recipient, onSignField, onUnsignField }: Nu
       <Dialog open={showRadioModal} onOpenChange={setShowRadioModal}>
         <DialogContent>
           <DialogTitle>
-            {parsedFieldMeta?.label ? parsedFieldMeta?.label : 'Add number'}
+            {parsedFieldMeta?.label ? parsedFieldMeta?.label : <Trans>Add number</Trans>}
           </DialogTitle>
 
           <div>
@@ -320,7 +324,7 @@ export const NumberField = ({ field, recipient, onSignField, onUnsignField }: Nu
                   setLocalNumber('');
                 }}
               >
-                Cancel
+                <Trans>Cancel</Trans>
               </Button>
 
               <Button
@@ -329,7 +333,7 @@ export const NumberField = ({ field, recipient, onSignField, onUnsignField }: Nu
                 disabled={!localNumber || userInputHasErrors}
                 onClick={() => onDialogSignClick()}
               >
-                Save
+                <Trans>Save</Trans>
               </Button>
             </div>
           </DialogFooter>
