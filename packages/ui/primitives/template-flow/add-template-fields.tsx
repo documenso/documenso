@@ -112,6 +112,7 @@ export const AddTemplateFieldsFormPartial = ({
           recipients.find((recipient) => recipient.id === field.recipientId)?.email ?? '',
         signerToken:
           recipients.find((recipient) => recipient.id === field.recipientId)?.token ?? '',
+        fieldMeta: field.fieldMeta ? ZFieldMetaSchema.parse(field.fieldMeta) : undefined,
       })),
     },
   });
