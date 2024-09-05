@@ -336,7 +336,7 @@ export const AddSignersFormPartial = ({
         return;
       }
 
-      if (isNaN(newOrder)) {
+      if (Number.isNaN(newOrder)) {
         form.setValue(`signers.${index}.signingOrder`, index + 1);
         return;
       }

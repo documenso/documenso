@@ -91,9 +91,9 @@ export const completeDocumentWithToken = async ({
       throw new Error(`It's not yet this recipient's turn to sign.`);
     }
 
-    const nextRecipient = allRecipients[recipientIndex + 1];
+    const nextRecipient = allRecipients[recipientIndex + 1] || null;
 
-    if (nextRecipient) {
+    if (nextRecipient !== null) {
       await prisma.$transaction(async (tx) => {
         await tx.recipient.update({
           where: { id: nextRecipient.id },
