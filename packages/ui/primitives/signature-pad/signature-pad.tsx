@@ -9,6 +9,13 @@ import type { StrokeOptions } from 'perfect-freehand';
 import { getStroke } from 'perfect-freehand';
 
 import { unsafe_useEffectOnce } from '@documenso/lib/client-only/hooks/use-effect-once';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@documenso/ui/primitives/select';
 
 import { cn } from '../../lib/utils';
 import { getSvgPathFromStroke } from './helper';
@@ -36,6 +43,7 @@ export const SignaturePad = ({
   const [isPressed, setIsPressed] = useState(false);
   const [lines, setLines] = useState<Point[][]>([]);
   const [currentLine, setCurrentLine] = useState<Point[]>([]);
+  const [selectedColor, setSelectedColor] = useState('black');
 
   const perfectFreehandOptions = useMemo(() => {
     const size = $el.current ? Math.min($el.current.height, $el.current.width) * 0.03 : 10;
@@ -85,6 +93,7 @@ export const SignaturePad = ({
           ctx.restore();
           ctx.imageSmoothingEnabled = true;
           ctx.imageSmoothingQuality = 'high';
+          ctx.fillStyle = selectedColor;
 
           lines.forEach((line) => {
             const pathData = new Path2D(
@@ -129,6 +138,7 @@ export const SignaturePad = ({
 
         ctx.imageSmoothingEnabled = true;
         ctx.imageSmoothingQuality = 'high';
+        ctx.fillStyle = selectedColor;
 
         newLines.forEach((line) => {
           const pathData = new Path2D(
@@ -237,7 +247,7 @@ export const SignaturePad = ({
     >
       <canvas
         ref={$el}
-        className={cn('relative block dark:invert', className)}
+        className={cn('relative block', className)}
         style={{ touchAction: 'none' }}
         onPointerMove={(event) => onMouseMove(event)}
         onPointerDown={(event) => onMouseDown(event)}
@@ -246,6 +256,61 @@ export const SignaturePad = ({
         onPointerEnter={(event) => onMouseEnter(event)}
         {...props}
       />
+
+      <div className="absolute right-2 top-2">
+        <Select onValueChange={(value) => setSelectedColor(value)}>
+          <SelectTrigger className="bg-background w-[90px]">
+            <SelectValue placeholder="Color" />
+          </SelectTrigger>
+
+          <SelectContent align="end">
+            <SelectItem value="black">
+              <div className="flex items-center">
+                <div className="flex w-[150px] items-center">
+                  <div className="mr-2 h-5 w-5 rounded-full border-2 bg-black shadow-sm"></div>
+                  <Trans>Black</Trans>
+                </div>
+              </div>
+            </SelectItem>
+
+            <SelectItem value="white">
+              <div className="flex items-center">
+                <div className="flex w-[150px] items-center">
+                  <div className="mr-2 h-5 w-5 rounded-full border-2 shadow-sm"></div>
+                  <Trans>White</Trans>
+                </div>
+              </div>
+            </SelectItem>
+
+            <SelectItem value="red">
+              <div className="flex items-center">
+                <div className="flex w-[150px] items-center">
+                  <div className="mr-2 h-5 w-5 rounded-full border-2 bg-red-500 shadow-sm"></div>
+                  <Trans>Red</Trans>
+                </div>
+              </div>
+            </SelectItem>
+
+            <SelectItem value="blue">
+              <div className="flex items-center">
+                <div className="flex w-[150px] items-center">
+                  <div className="mr-2 h-5 w-5 rounded-full border-2 bg-blue-500 shadow-sm"></div>
+                  <Trans>Blue</Trans>
+                </div>
+              </div>
+            </SelectItem>
+
+            <SelectItem value="green">
+              <div className="flex items-center">
+                <div className="flex w-[150px] items-center">
+                  <div className="mr-2 h-5 w-5 rounded-full border-2 bg-green-500 shadow-sm"></div>
+                  <Trans>Green</Trans>
+                </div>
+              </div>
+            </SelectItem>
+          </SelectContent>
+        </Select>
+      </div>
 
       <div className="absolute bottom-4 right-4 flex gap-2">
         <button
