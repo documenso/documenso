@@ -142,9 +142,8 @@ export const DocumentShareButton = ({
           <DialogTitle>Share your signing experience!</DialogTitle>
 
           <DialogDescription className="mt-4">
-            Rest assured, your document is strictly confidential and will never be shared. Only your
-            signing experience will be highlighted. Share your personalized signing card to showcase
-            your signature!
+            Don't worry, the document you signed or sent wont be shared; only your signing
+            experience is. Share your signing card and showcase your signature!
           </DialogDescription>
         </DialogHeader>
 

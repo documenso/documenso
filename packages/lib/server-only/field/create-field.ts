@@ -110,21 +110,24 @@ export const createField = async ({
   }
 
   const result = match(type)
-    .with('RADIO', () => ZRadioFieldMeta.safeParse(fieldMeta))
-    .with('CHECKBOX', () => ZCheckboxFieldMeta.safeParse(fieldMeta))
-    .with('DROPDOWN', () => ZDropdownFieldMeta.safeParse(fieldMeta))
-    .with('NUMBER', () => ZNumberFieldMeta.safeParse(fieldMeta))
-    .with('TEXT', () => ZTextFieldMeta.safeParse(fieldMeta))
-    .with('SIGNATURE', 'INITIALS', 'DATE', 'EMAIL', 'NAME', () => ({
-      success: true,
-      data: {},
-    }))
-    .with('FREE_SIGNATURE', () => ({
-      success: false,
-      error: 'FREE_SIGNATURE is not supported',
-      data: {},
-    }))
-    .exhaustive();
+    .with('RADIO', () => {
+      return ZRadioFieldMeta.safeParse(fieldMeta);
+    })
+    .with('CHECKBOX', () => {
+      return ZCheckboxFieldMeta.safeParse(fieldMeta);
+    })
+    .with('DROPDOWN', () => {
+      return ZDropdownFieldMeta.safeParse(fieldMeta);
+    })
+    .with('NUMBER', () => {
+      return ZNumberFieldMeta.safeParse(fieldMeta);
+    })
+    .with('TEXT', () => {
+      return ZTextFieldMeta.safeParse(fieldMeta);
+    })
+    .otherwise(() => {
+      return { success: false, data: {} };
+    });
 
   if (!result.success) {
     throw new Error('Field meta parsing failed');
@@ -142,7 +145,7 @@ export const createField = async ({
       height: pageHeight,
       customText: '',
       inserted: false,
-      fieldMeta: result.data,
+      fieldMeta: advancedField ? result.data : undefined,
     },
     include: {
       Recipient: true,

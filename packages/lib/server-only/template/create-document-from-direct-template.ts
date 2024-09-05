@@ -210,7 +210,7 @@ export const createDocumentFromDirectTemplate = async ({
 
   const initialRequestTime = new Date();
 
-  const { documentId, recipientId, token } = await prisma.$transaction(async (tx) => {
+  const { documentId, directRecipientToken } = await prisma.$transaction(async (tx) => {
     const documentData = await tx.documentData.create({
       data: {
         type: template.templateDocumentData.type,
@@ -539,9 +539,8 @@ export const createDocumentFromDirectTemplate = async ({
     });
 
     return {
-      token: createdDirectRecipient.token,
       documentId: document.id,
-      recipientId: createdDirectRecipient.id,
+      directRecipientToken: createdDirectRecipient.token,
     };
   });
 
@@ -560,9 +559,5 @@ export const createDocumentFromDirectTemplate = async ({
     // Log and reseal as required until we configure middleware.
   }
 
-  return {
-    token,
-    documentId,
-    recipientId,
-  };
+  return directRecipientToken;
 };

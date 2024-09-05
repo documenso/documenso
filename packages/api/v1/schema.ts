@@ -293,7 +293,7 @@ export type TSuccessfulRecipientResponseSchema = z.infer<typeof ZSuccessfulRecip
 /**
  * Fields
  */
-const ZCreateFieldSchema = z.object({
+export const ZCreateFieldMutationSchema = z.object({
   recipientId: z.number(),
   type: z.nativeEnum(FieldType),
   pageNumber: z.number(),
@@ -301,43 +301,18 @@ const ZCreateFieldSchema = z.object({
   pageY: z.number(),
   pageWidth: z.number(),
   pageHeight: z.number(),
-  fieldMeta: ZFieldMetaSchema.openapi({}),
+  fieldMeta: ZFieldMetaSchema,
 });
-
-export const ZCreateFieldMutationSchema = z.union([
-  ZCreateFieldSchema,
-  z.array(ZCreateFieldSchema).min(1),
-]);
 
 export type TCreateFieldMutationSchema = z.infer<typeof ZCreateFieldMutationSchema>;
 
-export const ZUpdateFieldMutationSchema = ZCreateFieldSchema.partial();
+export const ZUpdateFieldMutationSchema = ZCreateFieldMutationSchema.partial();
 
 export type TUpdateFieldMutationSchema = z.infer<typeof ZUpdateFieldMutationSchema>;
 
 export const ZDeleteFieldMutationSchema = null;
 
 export type TDeleteFieldMutationSchema = typeof ZDeleteFieldMutationSchema;
-
-const ZSuccessfulFieldSchema = z.object({
-  id: z.number(),
-  documentId: z.number(),
-  recipientId: z.number(),
-  type: z.nativeEnum(FieldType),
-  pageNumber: z.number(),
-  pageX: z.number(),
-  pageY: z.number(),
-  pageWidth: z.number(),
-  pageHeight: z.number(),
-  customText: z.string(),
-  fieldMeta: ZFieldMetaSchema,
-  inserted: z.boolean(),
-});
-
-export const ZSuccessfulFieldCreationResponseSchema = z.object({
-  fields: z.union([ZSuccessfulFieldSchema, z.array(ZSuccessfulFieldSchema)]),
-  documentId: z.number(),
-});
 
 export const ZSuccessfulFieldResponseSchema = z.object({
   id: z.number(),

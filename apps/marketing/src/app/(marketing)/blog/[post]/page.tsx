@@ -7,8 +7,6 @@ import { ChevronLeft } from 'lucide-react';
 import type { MDXComponents } from 'mdx/types';
 import { useMDXComponent } from 'next-contentlayer/hooks';
 
-import { setupI18nSSR } from '@documenso/lib/client-only/providers/i18n.server';
-
 import { CallToAction } from '~/components/(marketing)/call-to-action';
 
 export const dynamic = 'force-dynamic';
@@ -49,8 +47,6 @@ const mdxComponents: MDXComponents = {
 };
 
 export default function BlogPostPage({ params }: { params: { post: string } }) {
-  setupI18nSSR();
-
   const post = allBlogPosts.find((post) => post._raw.flattenedPath === `blog/${params.post}`);
 
   if (!post) {

@@ -63,7 +63,6 @@ export const SigningPageView = ({
           {document.User.name}
         </p>
       </div>
-
       <p className="text-muted-foreground">
         {match(recipient.role)
           .with(RecipientRole.VIEWER, () => (
