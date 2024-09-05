@@ -259,7 +259,7 @@ export const SignaturePad = ({
 
       <div className="absolute right-2 top-2">
         <Select onValueChange={(value) => setSelectedColor(value)}>
-          <SelectTrigger className="bg-background w-[60px]">
+          <SelectTrigger className="bg-background w-[90px]">
             <SelectValue placeholder="Color" />
           </SelectTrigger>
 
