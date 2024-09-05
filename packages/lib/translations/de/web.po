@@ -26,15 +26,15 @@ msgstr ""
 msgid "\"{documentTitle}\" has been successfully deleted"
 msgstr ""
 
-#: apps/web/src/app/(signing)/sign/[token]/signing-page-view.tsx:75
+#: apps/web/src/app/(signing)/sign/[token]/signing-page-view.tsx:76
 msgid "({0}) has invited you to approve this document"
 msgstr ""
 
-#: apps/web/src/app/(signing)/sign/[token]/signing-page-view.tsx:72
+#: apps/web/src/app/(signing)/sign/[token]/signing-page-view.tsx:73
 msgid "({0}) has invited you to sign this document"
 msgstr ""
 
-#: apps/web/src/app/(signing)/sign/[token]/signing-page-view.tsx:69
+#: apps/web/src/app/(signing)/sign/[token]/signing-page-view.tsx:70
 msgid "({0}) has invited you to view this document"
 msgstr ""
 
@@ -500,11 +500,11 @@ msgstr ""
 #: apps/web/src/components/forms/public-profile-claim-dialog.tsx:113
 #: apps/web/src/components/forms/public-profile-form.tsx:104
 #: apps/web/src/components/forms/reset-password.tsx:87
-#: apps/web/src/components/forms/signin.tsx:230
-#: apps/web/src/components/forms/signin.tsx:238
-#: apps/web/src/components/forms/signin.tsx:252
-#: apps/web/src/components/forms/signin.tsx:265
-#: apps/web/src/components/forms/signin.tsx:279
+#: apps/web/src/components/forms/signin.tsx:248
+#: apps/web/src/components/forms/signin.tsx:256
+#: apps/web/src/components/forms/signin.tsx:270
+#: apps/web/src/components/forms/signin.tsx:285
+#: apps/web/src/components/forms/signin.tsx:301
 #: apps/web/src/components/forms/signup.tsx:113
 #: apps/web/src/components/forms/signup.tsx:128
 #: apps/web/src/components/forms/signup.tsx:142
@@ -608,7 +608,7 @@ msgid "Background Color"
 msgstr ""
 
 #: apps/web/src/components/forms/2fa/disable-authenticator-app-dialog.tsx:167
-#: apps/web/src/components/forms/signin.tsx:451
+#: apps/web/src/components/forms/signin.tsx:473
 msgid "Backup Code"
 msgstr ""
 
@@ -752,6 +752,8 @@ msgstr ""
 
 #: apps/web/src/app/(recipient)/d/[token]/sign-direct-template.tsx:175
 #: apps/web/src/app/(signing)/sign/[token]/form.tsx:107
+#: apps/web/src/app/embed/direct/[[...url]]/client.tsx:435
+#: apps/web/src/app/embed/sign/[[...url]]/client.tsx:312
 msgid "Click to insert field"
 msgstr ""
 
@@ -768,6 +770,8 @@ msgid "Close"
 msgstr ""
 
 #: apps/web/src/app/(signing)/sign/[token]/sign-dialog.tsx:58
+#: apps/web/src/app/embed/direct/[[...url]]/client.tsx:425
+#: apps/web/src/app/embed/sign/[[...url]]/client.tsx:302
 #: apps/web/src/components/forms/v2/signup.tsx:522
 msgid "Complete"
 msgstr ""
@@ -1198,6 +1202,10 @@ msgstr ""
 msgid "Document completed"
 msgstr ""
 
+#: apps/web/src/app/embed/completed.tsx:16
+msgid "Document Completed!"
+msgstr ""
+
 #: apps/web/src/app/(dashboard)/templates/use-template-dialog.tsx:142
 msgid "Document created"
 msgstr ""
@@ -1389,11 +1397,13 @@ msgstr ""
 #: apps/web/src/app/(dashboard)/templates/use-template-dialog.tsx:220
 #: apps/web/src/app/(recipient)/d/[token]/configure-direct-template.tsx:118
 #: apps/web/src/app/(signing)/sign/[token]/email-field.tsx:126
+#: apps/web/src/app/embed/direct/[[...url]]/client.tsx:376
+#: apps/web/src/app/embed/sign/[[...url]]/client.tsx:254
 #: apps/web/src/components/(teams)/dialogs/add-team-email-dialog.tsx:169
 #: apps/web/src/components/(teams)/dialogs/update-team-email-dialog.tsx:153
 #: apps/web/src/components/forms/forgot-password.tsx:81
 #: apps/web/src/components/forms/profile.tsx:122
-#: apps/web/src/components/forms/signin.tsx:304
+#: apps/web/src/components/forms/signin.tsx:326
 #: apps/web/src/components/forms/signup.tsx:180
 msgid "Email"
 msgstr ""
@@ -1557,12 +1567,14 @@ msgid "File cannot be larger than {APP_DOCUMENT_UPLOAD_SIZE_LIMIT}MB"
 msgstr ""
 
 #: apps/web/src/app/(unauthenticated)/forgot-password/page.tsx:21
-#: apps/web/src/components/forms/signin.tsx:336
+#: apps/web/src/components/forms/signin.tsx:358
 msgid "Forgot your password?"
 msgstr ""
 
 #: apps/web/src/app/(recipient)/d/[token]/sign-direct-template.tsx:326
 #: apps/web/src/app/(signing)/sign/[token]/name-field.tsx:193
+#: apps/web/src/app/embed/direct/[[...url]]/client.tsx:361
+#: apps/web/src/app/embed/sign/[[...url]]/client.tsx:239
 #: apps/web/src/components/forms/profile.tsx:110
 #: apps/web/src/components/forms/v2/signup.tsx:300
 msgid "Full Name"
@@ -2000,6 +2012,8 @@ msgstr ""
 msgid "New Template"
 msgstr ""
 
+#: apps/web/src/app/embed/direct/[[...url]]/client.tsx:416
+#: apps/web/src/app/embed/sign/[[...url]]/client.tsx:293
 #: apps/web/src/components/forms/v2/signup.tsx:509
 msgid "Next"
 msgstr ""
@@ -2053,7 +2067,7 @@ msgstr ""
 msgid "No worries, it happens! Enter your email and we'll email you a special link to reset your password."
 msgstr ""
 
-#: apps/web/src/components/forms/signin.tsx:142
+#: apps/web/src/components/forms/signin.tsx:160
 msgid "Not supported"
 msgstr ""
 
@@ -2111,7 +2125,7 @@ msgstr ""
 msgid "Or"
 msgstr ""
 
-#: apps/web/src/components/forms/signin.tsx:356
+#: apps/web/src/components/forms/signin.tsx:378
 msgid "Or continue with"
 msgstr ""
 
@@ -2128,7 +2142,7 @@ msgstr ""
 msgid "Paid"
 msgstr ""
 
-#: apps/web/src/components/forms/signin.tsx:401
+#: apps/web/src/components/forms/signin.tsx:423
 msgid "Passkey"
 msgstr ""
 
@@ -2161,14 +2175,14 @@ msgstr ""
 msgid "Passkeys allow you to sign in and authenticate using biometrics, password managers, etc."
 msgstr ""
 
-#: apps/web/src/components/forms/signin.tsx:143
+#: apps/web/src/components/forms/signin.tsx:161
 msgid "Passkeys are not supported on this browser"
 msgstr ""
 
 #: apps/web/src/components/(dashboard)/common/command-menu.tsx:65
 #: apps/web/src/components/forms/password.tsx:123
 #: apps/web/src/components/forms/reset-password.tsx:110
-#: apps/web/src/components/forms/signin.tsx:322
+#: apps/web/src/components/forms/signin.tsx:344
 #: apps/web/src/components/forms/signup.tsx:196
 #: apps/web/src/components/forms/v2/signup.tsx:332
 msgid "Password"
@@ -2291,7 +2305,7 @@ msgstr ""
 msgid "Please try again and make sure you enter the correct email address."
 msgstr ""
 
-#: apps/web/src/components/forms/signin.tsx:185
+#: apps/web/src/components/forms/signin.tsx:203
 msgid "Please try again later or login using your normal details"
 msgstr ""
 
@@ -2701,6 +2715,11 @@ msgstr ""
 msgid "Sign as<0>{0} <1>({1})</1></0>"
 msgstr ""
 
+#: apps/web/src/app/embed/direct/[[...url]]/client.tsx:329
+#: apps/web/src/app/embed/sign/[[...url]]/client.tsx:207
+msgid "Sign document"
+msgstr ""
+
 #: apps/web/src/app/(signing)/sign/[token]/document-action-auth-dialog.tsx:59
 msgid "Sign field"
 msgstr ""
@@ -2711,8 +2730,8 @@ msgid "Sign Here"
 msgstr ""
 
 #: apps/web/src/app/not-found.tsx:29
-#: apps/web/src/components/forms/signin.tsx:349
-#: apps/web/src/components/forms/signin.tsx:476
+#: apps/web/src/components/forms/signin.tsx:371
+#: apps/web/src/components/forms/signin.tsx:498
 msgid "Sign In"
 msgstr ""
 
@@ -2723,6 +2742,11 @@ msgstr ""
 #: apps/web/src/components/(dashboard)/layout/menu-switcher.tsx:285
 #: apps/web/src/components/(dashboard)/layout/mobile-navigation.tsx:84
 msgid "Sign Out"
+msgstr ""
+
+#: apps/web/src/app/embed/direct/[[...url]]/client.tsx:350
+#: apps/web/src/app/embed/sign/[[...url]]/client.tsx:228
+msgid "Sign the document to complete the process."
 msgstr ""
 
 #: apps/web/src/app/(signing)/sign/[token]/signing-auth-page.tsx:72
@@ -2747,6 +2771,8 @@ msgstr ""
 #: apps/web/src/app/(recipient)/d/[token]/sign-direct-template.tsx:338
 #: apps/web/src/app/(signing)/sign/[token]/signature-field.tsx:197
 #: apps/web/src/app/(signing)/sign/[token]/signature-field.tsx:227
+#: apps/web/src/app/embed/direct/[[...url]]/client.tsx:391
+#: apps/web/src/app/embed/sign/[[...url]]/client.tsx:268
 #: apps/web/src/components/forms/profile.tsx:132
 msgid "Signature"
 msgstr ""
@@ -2763,8 +2789,8 @@ msgstr ""
 msgid "Signed"
 msgstr ""
 
-#: apps/web/src/components/forms/signin.tsx:349
-#: apps/web/src/components/forms/signin.tsx:476
+#: apps/web/src/components/forms/signin.tsx:371
+#: apps/web/src/components/forms/signin.tsx:498
 msgid "Signing in..."
 msgstr ""
 
@@ -2813,6 +2839,8 @@ msgstr ""
 #: apps/web/src/app/(teams)/t/[teamUrl]/layout-billing-banner.tsx:53
 #: apps/web/src/app/(teams)/t/[teamUrl]/settings/team-email-dropdown.tsx:39
 #: apps/web/src/app/(unauthenticated)/verify-email/[token]/page.tsx:61
+#: apps/web/src/app/embed/direct/[[...url]]/client.tsx:243
+#: apps/web/src/app/embed/sign/[[...url]]/client.tsx:123
 #: apps/web/src/components/(teams)/dialogs/create-team-checkout-dialog.tsx:50
 #: apps/web/src/components/(teams)/dialogs/create-team-checkout-dialog.tsx:99
 #: apps/web/src/components/(teams)/dialogs/invite-team-member-dialog.tsx:210
@@ -3106,6 +3134,10 @@ msgstr ""
 msgid "The document has been successfully moved to the selected team."
 msgstr ""
 
+#: apps/web/src/app/embed/completed.tsx:29
+msgid "The document is now completed, please follow any instructions provided within the parent application."
+msgstr ""
+
 #: apps/web/src/app/(dashboard)/templates/use-template-dialog.tsx:159
 msgid "The document was created but could not be sent to recipients."
 msgstr ""
@@ -3281,7 +3313,7 @@ msgstr ""
 msgid "This passkey has already been registered."
 msgstr ""
 
-#: apps/web/src/components/forms/signin.tsx:182
+#: apps/web/src/components/forms/signin.tsx:200
 msgid "This passkey is not configured for this application. Please login and add one in the user settings."
 msgstr ""
 
@@ -3289,7 +3321,7 @@ msgstr ""
 msgid "This price includes minimum 5 seats."
 msgstr ""
 
-#: apps/web/src/components/forms/signin.tsx:184
+#: apps/web/src/components/forms/signin.tsx:202
 msgid "This session has expired. Please try again."
 msgstr ""
 
@@ -3366,6 +3398,10 @@ msgstr ""
 
 #: apps/web/src/app/(signing)/sign/[token]/document-action-auth-account.tsx:57
 msgid "To mark this document as viewed, you need to be logged in as <0>{0}</0>"
+msgstr ""
+
+#: apps/web/src/app/embed/authenticate.tsx:21
+msgid "To view this document you need to be signed into your account, please sign in to continue."
 msgstr ""
 
 #: apps/web/src/app/(dashboard)/settings/public-profile/public-profile-page-view.tsx:178
@@ -3449,7 +3485,7 @@ msgstr ""
 msgid "Two factor authentication recovery codes are used to access your account in the event that you lose access to your authenticator app."
 msgstr ""
 
-#: apps/web/src/components/forms/signin.tsx:414
+#: apps/web/src/components/forms/signin.tsx:436
 msgid "Two-Factor Authentication"
 msgstr ""
 
@@ -3548,8 +3584,8 @@ msgstr ""
 msgid "Unable to setup two-factor authentication"
 msgstr ""
 
-#: apps/web/src/components/forms/signin.tsx:229
-#: apps/web/src/components/forms/signin.tsx:237
+#: apps/web/src/components/forms/signin.tsx:247
+#: apps/web/src/components/forms/signin.tsx:255
 msgid "Unable to sign in"
 msgstr ""
 
@@ -3655,12 +3691,12 @@ msgid "Uploaded file not an allowed file type"
 msgstr ""
 
 #: apps/web/src/components/forms/2fa/disable-authenticator-app-dialog.tsx:187
-#: apps/web/src/components/forms/signin.tsx:471
+#: apps/web/src/components/forms/signin.tsx:493
 msgid "Use Authenticator"
 msgstr ""
 
 #: apps/web/src/components/forms/2fa/disable-authenticator-app-dialog.tsx:185
-#: apps/web/src/components/forms/signin.tsx:469
+#: apps/web/src/components/forms/signin.tsx:491
 msgid "Use Backup Code"
 msgstr ""
 
@@ -3879,9 +3915,9 @@ msgid "We encountered an unknown error while attempting to save your details. Pl
 msgstr ""
 
 #: apps/web/src/components/forms/profile.tsx:89
-#: apps/web/src/components/forms/signin.tsx:254
-#: apps/web/src/components/forms/signin.tsx:267
-#: apps/web/src/components/forms/signin.tsx:281
+#: apps/web/src/components/forms/signin.tsx:272
+#: apps/web/src/components/forms/signin.tsx:287
+#: apps/web/src/components/forms/signin.tsx:303
 msgid "We encountered an unknown error while attempting to sign you In. Please try again later."
 msgstr ""
 
@@ -3965,6 +4001,8 @@ msgid "We were unable to setup two-factor authentication for your account. Pleas
 msgstr ""
 
 #: apps/web/src/app/(recipient)/d/[token]/direct-template.tsx:119
+#: apps/web/src/app/embed/direct/[[...url]]/client.tsx:245
+#: apps/web/src/app/embed/sign/[[...url]]/client.tsx:125
 msgid "We were unable to submit this document at this time. Please try again later."
 msgstr ""
 

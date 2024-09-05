@@ -2,7 +2,7 @@ name: 'Setup node and cache node_modules'
 inputs:
   node_version:
     required: false
-    default: v18.x
+    default: v20.x
 
 runs:
   using: 'composite'
