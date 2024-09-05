@@ -2,11 +2,14 @@
 
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 
+import Link from 'next/link';
+
 import { Trans, msg } from '@lingui/macro';
 import { useLingui } from '@lingui/react';
 import type { AutoplayType } from 'embla-carousel-autoplay';
 import Autoplay from 'embla-carousel-autoplay';
 import useEmblaCarousel from 'embla-carousel-react';
+import { usePlausible } from 'next-plausible';
 import { useTheme } from 'next-themes';
 
 import { Card } from '@documenso/ui/primitives/card';
@@ -61,6 +64,7 @@ const SLIDES = [
 
 export const Carousel = () => {
   const { _ } = useLingui();
+  const event = usePlausible();
 
   const slides = SLIDES;
   const [_isPlaying, setIsPlaying] = useState(false);
@@ -238,7 +242,10 @@ export const Carousel = () => {
   if (!mounted) return null;
   return (
     <>
-      <Card className="mx-auto mt-12 w-full max-w-4xl rounded-2xl p-1 before:rounded-2xl" gradient>
+      <Card
+        className="relative mx-auto mt-12 w-full max-w-4xl rounded-2xl p-1 before:rounded-2xl"
+        gradient
+      >
         <div className="overflow-hidden rounded-xl" ref={emblaRef}>
           <div className="flex touch-pan-y rounded-xl">
             {slides.map((slide, index) => (
@@ -269,6 +276,19 @@ export const Carousel = () => {
           </span>
           <Progress value={progress} className="h-1" />
         </div>
+
+        <Link
+          href="https://documen.so/book-a-demo"
+          className="bg-foreground/70 dark:bg-foreground/80 absolute inset-0 hidden flex-col items-center justify-center gap-y-2 rounded-xl opacity-0 backdrop-blur-[2px] transition-opacity group-hover:opacity-100 md:flex"
+          onClick={() => event('view-demo')}
+        >
+          <span className="text-background max-w-[60ch] text-2xl font-semibold">Book a Demo</span>
+          <span className="text-background max-w-[60ch] text-center text-sm">
+            Want to learn more about Documenso and how it works? Book a demo today! Our founders
+            will walk you through the application and answer any questions you may have regarding
+            usage, integration, and more.
+          </span>
+        </Link>
       </Card>
 
       <div className="mx-auto mt-6 w-full max-w-4xl px-2 sm:mt-12">

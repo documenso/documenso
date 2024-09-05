@@ -2,7 +2,8 @@ import React from 'react';
 
 import { redirect } from 'next/navigation';
 
-import { RECIPIENT_ROLES_DESCRIPTION } from '@documenso/lib/constants/recipient-roles';
+import { setupI18nSSR } from '@documenso/lib/client-only/providers/i18n.server';
+import { RECIPIENT_ROLES_DESCRIPTION_ENG } from '@documenso/lib/constants/recipient-roles';
 import { getEntireDocument } from '@documenso/lib/server-only/admin/get-entire-document';
 import { decryptSecondaryData } from '@documenso/lib/server-only/crypto/decrypt';
 import { findDocumentAuditLogs } from '@documenso/lib/server-only/document/find-document-audit-logs';
@@ -20,6 +21,8 @@ type AuditLogProps = {
 };
 
 export default async function AuditLog({ searchParams }: AuditLogProps) {
+  setupI18nSSR();
+
   const { d } = searchParams;
 
   if (typeof d !== 'string' || !d) {
@@ -113,7 +116,7 @@ export default async function AuditLog({ searchParams }: AuditLogProps) {
               {document.Recipient.map((recipient) => (
                 <li key={recipient.id}>
                   <span className="text-muted-foreground">
-                    [{RECIPIENT_ROLES_DESCRIPTION[recipient.role].roleName}]
+                    [{RECIPIENT_ROLES_DESCRIPTION_ENG[recipient.role].roleName}]
                   </span>{' '}
                   {recipient.name} ({recipient.email})
                 </li>

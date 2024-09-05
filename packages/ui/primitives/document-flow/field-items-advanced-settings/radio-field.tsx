@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 
+import { Trans } from '@lingui/macro';
 import { ChevronDown, ChevronUp, Trash } from 'lucide-react';
 
 import { validateRadioField } from '@documenso/lib/advanced-fields-validation/validate-radio';
@@ -107,7 +108,9 @@ export const RadioFieldAdvancedSettings = ({
             checked={fieldState.required}
             onCheckedChange={(checked) => handleToggleChange('required', checked)}
           />
-          <Label>Required field</Label>
+          <Label>
+            <Trans>Required field</Trans>
+          </Label>
         </div>
         <div className="flex flex-row items-center gap-2">
           <Switch
@@ -115,7 +118,9 @@ export const RadioFieldAdvancedSettings = ({
             checked={fieldState.readOnly}
             onCheckedChange={(checked) => handleToggleChange('readOnly', checked)}
           />
-          <Label>Read only</Label>
+          <Label>
+            <Trans>Read only</Trans>
+          </Label>
         </div>
       </div>
       <Button
@@ -124,7 +129,9 @@ export const RadioFieldAdvancedSettings = ({
         onClick={() => setShowValidation((prev) => !prev)}
       >
         <span className="flex w-full flex-row justify-between">
-          <span className="flex items-center">Radio values</span>
+          <span className="flex items-center">
+            <Trans>Radio values</Trans>
+          </span>
           {showValidation ? <ChevronUp /> : <ChevronDown />}
         </span>
       </Button>
@@ -157,7 +164,7 @@ export const RadioFieldAdvancedSettings = ({
             variant="outline"
             onClick={addValue}
           >
-            Add another value
+            <Trans>Add another value</Trans>
           </Button>
         </div>
       )}

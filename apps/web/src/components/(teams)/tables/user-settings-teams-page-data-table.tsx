@@ -5,6 +5,9 @@ import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 
+import { Trans, msg } from '@lingui/macro';
+import { useLingui } from '@lingui/react';
+
 import { useDebouncedValue } from '@documenso/lib/client-only/hooks/use-debounced-value';
 import { trpc } from '@documenso/trpc/react';
 import { Input } from '@documenso/ui/primitives/input';
@@ -14,6 +17,8 @@ import { CurrentUserTeamsDataTable } from './current-user-teams-data-table';
 import { PendingUserTeamsDataTable } from './pending-user-teams-data-table';
 
 export const UserSettingsTeamsPageDataTable = () => {
+  const { _ } = useLingui();
+
   const searchParams = useSearchParams();
   const router = useRouter();
   const pathname = usePathname();
@@ -56,18 +61,20 @@ export const UserSettingsTeamsPageDataTable = () => {
         <Input
           defaultValue={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
-          placeholder="Search"
+          placeholder={_(msg`Search`)}
         />
 
         <Tabs value={currentTab} className="flex-shrink-0 overflow-x-auto">
           <TabsList>
             <TabsTrigger className="min-w-[60px]" value="active" asChild>
-              <Link href={pathname ?? '/'}>Active</Link>
+              <Link href={pathname ?? '/'}>
+                <Trans>Active</Trans>
+              </Link>
             </TabsTrigger>
 
             <TabsTrigger className="min-w-[60px]" value="pending" asChild>
               <Link href={`${pathname}?tab=pending`}>
-                Pending
+                <Trans>Pending</Trans>
                 {data && data.count > 0 && (
                   <span className="ml-1 hidden opacity-50 md:inline-block">{data.count}</span>
                 )}

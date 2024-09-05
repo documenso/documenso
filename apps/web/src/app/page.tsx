@@ -1,3 +1,7 @@
+import { setupI18nSSR } from '@documenso/lib/client-only/providers/i18n.server';
+
 export default function DashboardPage() {
-  return <div>hello world</div>;
+  setupI18nSSR();
+
+  return <div>Documenso</div>;
 }

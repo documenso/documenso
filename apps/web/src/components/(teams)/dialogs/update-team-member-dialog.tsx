@@ -3,6 +3,8 @@
 import { useEffect, useState } from 'react';
 
 import { zodResolver } from '@hookform/resolvers/zod';
+import { Trans, msg } from '@lingui/macro';
+import { useLingui } from '@lingui/react';
 import type * as DialogPrimitive from '@radix-ui/react-dialog';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
@@ -64,6 +66,7 @@ export const UpdateTeamMemberDialog = ({
 }: UpdateTeamMemberDialogProps) => {
   const [open, setOpen] = useState(false);
 
+  const { _ } = useLingui();
   const { toast } = useToast();
 
   const form = useForm<ZUpdateTeamMemberSchema>({
@@ -86,18 +89,19 @@ export const UpdateTeamMemberDialog = ({
       });
 
       toast({
-        title: 'Success',
-        description: `You have updated ${teamMemberName}.`,
+        title: _(msg`Success`),
+        description: _(msg`You have updated ${teamMemberName}.`),
         duration: 5000,
       });
 
       setOpen(false);
     } catch {
       toast({
-        title: 'An unknown error occurred',
+        title: _(msg`An unknown error occurred`),
+        description: _(
+          msg`We encountered an unknown error while attempting to update this team member. Please try again later.`,
+        ),
         variant: 'destructive',
-        description:
-          'We encountered an unknown error while attempting to update this team member. Please try again later.',
       });
     }
   };
@@ -113,10 +117,11 @@ export const UpdateTeamMemberDialog = ({
       setOpen(false);
 
       toast({
-        title: 'You cannot modify a team member who has a higher role than you.',
+        title: _(msg`You cannot modify a team member who has a higher role than you.`),
         variant: 'destructive',
       });
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open, currentUserTeamRole, teamMemberRole, form, toast]);
 
   return (
@@ -126,15 +131,23 @@ export const UpdateTeamMemberDialog = ({
       onOpenChange={(value) => !form.formState.isSubmitting && setOpen(value)}
     >
       <DialogTrigger onClick={(e) => e.stopPropagation()} asChild>
-        {trigger ?? <Button variant="secondary">Update team member</Button>}
+        {trigger ?? (
+          <Button variant="secondary">
+            <Trans>Update team member</Trans>
+          </Button>
+        )}
       </DialogTrigger>
 
       <DialogContent position="center">
         <DialogHeader>
-          <DialogTitle>Update team member</DialogTitle>
+          <DialogTitle>
+            <Trans>Update team member</Trans>
+          </DialogTitle>
 
           <DialogDescription className="mt-4">
-            You are currently updating <span className="font-bold">{teamMemberName}.</span>
+            <Trans>
+              You are currently updating <span className="font-bold">{teamMemberName}.</span>
+            </Trans>
           </DialogDescription>
         </DialogHeader>
 
@@ -146,7 +159,9 @@ export const UpdateTeamMemberDialog = ({
                 name="role"
                 render={({ field }) => (
                   <FormItem className="w-full">
-                    <FormLabel required>Role</FormLabel>
+                    <FormLabel required>
+                      <Trans>Role</Trans>
+                    </FormLabel>
                     <FormControl>
                       <Select {...field} onValueChange={field.onChange}>
                         <SelectTrigger className="text-muted-foreground">
@@ -156,7 +171,7 @@ export const UpdateTeamMemberDialog = ({
                         <SelectContent className="w-full" position="popper">
                           {TEAM_MEMBER_ROLE_HIERARCHY[currentUserTeamRole].map((role) => (
                             <SelectItem key={role} value={role}>
-                              {TEAM_MEMBER_ROLE_MAP[role] ?? role}
+                              {_(TEAM_MEMBER_ROLE_MAP[role]) ?? role}
                             </SelectItem>
                           ))}
                         </SelectContent>
@@ -169,11 +184,11 @@ export const UpdateTeamMemberDialog = ({
 
               <DialogFooter className="mt-4">
                 <Button type="button" variant="secondary" onClick={() => setOpen(false)}>
-                  Cancel
+                  <Trans>Cancel</Trans>
                 </Button>
 
                 <Button type="submit" loading={form.formState.isSubmitting}>
-                  Update
+                  <Trans>Update</Trans>
                 </Button>
               </DialogFooter>
             </fieldset>

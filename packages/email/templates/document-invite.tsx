@@ -1,4 +1,4 @@
-import { RECIPIENT_ROLES_DESCRIPTION } from '@documenso/lib/constants/recipient-roles';
+import { RECIPIENT_ROLES_DESCRIPTION_ENG } from '@documenso/lib/constants/recipient-roles';
 import type { RecipientRole } from '@documenso/prisma/client';
 import config from '@documenso/tailwind-config';
 
@@ -23,6 +23,9 @@ export type DocumentInviteEmailTemplateProps = Partial<TemplateDocumentInvitePro
   customBody?: string;
   role: RecipientRole;
   selfSigner?: boolean;
+  isTeamInvite?: boolean;
+  teamName?: string;
+  teamEmail?: string;
 };
 
 export const DocumentInviteEmailTemplate = ({
@@ -34,11 +37,15 @@ export const DocumentInviteEmailTemplate = ({
   customBody,
   role,
   selfSigner = false,
+  isTeamInvite = false,
+  teamName,
 }: DocumentInviteEmailTemplateProps) => {
-  const action = RECIPIENT_ROLES_DESCRIPTION[role].actionVerb.toLowerCase();
+  const action = RECIPIENT_ROLES_DESCRIPTION_ENG[role].actionVerb.toLowerCase();
 
   const previewText = selfSigner
     ? `Please ${action} your document ${documentName}`
+    : isTeamInvite
+    ? `${inviterName} on behalf of ${teamName} has invited you to ${action} ${documentName}`
     : `${inviterName} has invited you to ${action} ${documentName}`;
 
   const getAssetUrl = (path: string) => {
@@ -76,6 +83,8 @@ export const DocumentInviteEmailTemplate = ({
                   assetBaseUrl={assetBaseUrl}
                   role={role}
                   selfSigner={selfSigner}
+                  isTeamInvite={isTeamInvite}
+                  teamName={teamName}
                 />
               </Section>
             </Container>

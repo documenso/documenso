@@ -2,6 +2,8 @@
 
 import { useState } from 'react';
 
+import { Trans, msg } from '@lingui/macro';
+import { useLingui } from '@lingui/react';
 import { signOut } from 'next-auth/react';
 
 import type { User } from '@documenso/prisma/client';
@@ -28,6 +30,7 @@ export type DeleteAccountDialogProps = {
 };
 
 export const DeleteAccountDialog = ({ className, user }: DeleteAccountDialogProps) => {
+  const { _ } = useLingui();
   const { toast } = useToast();
 
   const hasTwoFactorAuthentication = user.twoFactorEnabled;
@@ -42,8 +45,8 @@ export const DeleteAccountDialog = ({ className, user }: DeleteAccountDialogProp
       await deleteAccount();
 
       toast({
-        title: 'Account deleted',
-        description: 'Your account has been deleted successfully.',
+        title: _(msg`Account deleted`),
+        description: _(msg`Your account has been deleted successfully.`),
         duration: 5000,
       });
 
@@ -51,17 +54,19 @@ export const DeleteAccountDialog = ({ className, user }: DeleteAccountDialogProp
     } catch (err) {
       if (err instanceof TRPCClientError && err.data?.code === 'BAD_REQUEST') {
         toast({
-          title: 'An error occurred',
+          title: _(msg`An error occurred`),
           description: err.message,
           variant: 'destructive',
         });
       } else {
         toast({
-          title: 'An unknown error occurred',
+          title: _(msg`An unknown error occurred`),
           variant: 'destructive',
           description:
             err.message ??
-            'We encountered an unknown error while attempting to delete your account. Please try again later.',
+            _(
+              msg`We encountered an unknown error while attempting to delete your account. Please try again later.`,
+            ),
         });
       }
     }
@@ -74,50 +79,63 @@ export const DeleteAccountDialog = ({ className, user }: DeleteAccountDialogProp
         variant="neutral"
       >
         <div>
-          <AlertTitle>Delete Account</AlertTitle>
+          <AlertTitle>
+            <Trans>Delete Account</Trans>
+          </AlertTitle>
           <AlertDescription className="mr-2">
-            Delete your account and all its contents, including completed documents. This action is
-            irreversible and will cancel your subscription, so proceed with caution.
+            <Trans>
+              Delete your account and all its contents, including completed documents. This action
+              is irreversible and will cancel your subscription, so proceed with caution.
+            </Trans>
           </AlertDescription>
         </div>
 
         <div className="flex-shrink-0">
           <Dialog onOpenChange={() => setEnteredEmail('')}>
             <DialogTrigger asChild>
-              <Button variant="destructive">Delete Account</Button>
+              <Button variant="destructive">
+                <Trans>Delete Account</Trans>
+              </Button>
             </DialogTrigger>
 
             <DialogContent>
               <DialogHeader className="space-y-4">
-                <DialogTitle>Delete Account</DialogTitle>
+                <DialogTitle>
+                  <Trans>Delete Account</Trans>
+                </DialogTitle>
 
                 <Alert variant="destructive">
                   <AlertDescription className="selection:bg-red-100">
-                    This action is not reversible. Please be certain.
+                    <Trans>This action is not reversible. Please be certain.</Trans>
                   </AlertDescription>
                 </Alert>
 
                 {hasTwoFactorAuthentication && (
                   <Alert variant="destructive">
                     <AlertDescription className="selection:bg-red-100">
-                      Disable Two Factor Authentication before deleting your account.
+                      <Trans>Disable Two Factor Authentication before deleting your account.</Trans>
                     </AlertDescription>
                   </Alert>
                 )}
 
                 <DialogDescription>
-                  Documenso will delete <span className="font-semibold">all of your documents</span>
-                  , along with all of your completed documents, signatures, and all other resources
-                  belonging to your Account.
+                  <Trans>
+                    Documenso will delete{' '}
+                    <span className="font-semibold">all of your documents</span>, along with all of
+                    your completed documents, signatures, and all other resources belonging to your
+                    Account.
+                  </Trans>
                 </DialogDescription>
               </DialogHeader>
 
               {!hasTwoFactorAuthentication && (
                 <div className="mt-4">
                   <Label>
-                    Please type{' '}
-                    <span className="text-muted-foreground font-semibold">{user.email}</span> to
-                    confirm.
+                    <Trans>
+                      Please type{' '}
+                      <span className="text-muted-foreground font-semibold">{user.email}</span> to
+                      confirm.
+                    </Trans>
                   </Label>
 
                   <Input
@@ -136,7 +154,7 @@ export const DeleteAccountDialog = ({ className, user }: DeleteAccountDialogProp
                   variant="destructive"
                   disabled={hasTwoFactorAuthentication || enteredEmail !== user.email}
                 >
-                  {isDeletingAccount ? 'Deleting account...' : 'Confirm Deletion'}
+                  {isDeletingAccount ? _(msg`Deleting account...`) : _(msg`Confirm Deletion`)}
                 </Button>
               </DialogFooter>
             </DialogContent>

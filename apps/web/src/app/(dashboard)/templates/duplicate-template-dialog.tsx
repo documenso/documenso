@@ -1,5 +1,8 @@
 import { useRouter } from 'next/navigation';
 
+import { Trans, msg } from '@lingui/macro';
+import { useLingui } from '@lingui/react';
+
 import { trpc as trpcReact } from '@documenso/trpc/react';
 import { Button } from '@documenso/ui/primitives/button';
 import {
@@ -27,6 +30,7 @@ export const DuplicateTemplateDialog = ({
 }: DuplicateTemplateDialogProps) => {
   const router = useRouter();
 
+  const { _ } = useLingui();
   const { toast } = useToast();
 
   const { mutateAsync: duplicateTemplate, isLoading } =
@@ -35,8 +39,8 @@ export const DuplicateTemplateDialog = ({
         router.refresh();
 
         toast({
-          title: 'Template duplicated',
-          description: 'Your template has been duplicated successfully.',
+          title: _(msg`Template duplicated`),
+          description: _(msg`Your template has been duplicated successfully.`),
           duration: 5000,
         });
 
@@ -44,8 +48,8 @@ export const DuplicateTemplateDialog = ({
       },
       onError: () => {
         toast({
-          title: 'Error',
-          description: 'An error occurred while duplicating template.',
+          title: _(msg`Error`),
+          description: _(msg`An error occurred while duplicating template.`),
           variant: 'destructive',
         });
       },
@@ -55,9 +59,13 @@ export const DuplicateTemplateDialog = ({
     <Dialog open={open} onOpenChange={(value) => !isLoading && onOpenChange(value)}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Do you want to duplicate this template?</DialogTitle>
+          <DialogTitle>
+            <Trans>Do you want to duplicate this template?</Trans>
+          </DialogTitle>
 
-          <DialogDescription className="pt-2">Your template will be duplicated.</DialogDescription>
+          <DialogDescription className="pt-2">
+            <Trans>Your template will be duplicated.</Trans>
+          </DialogDescription>
         </DialogHeader>
 
         <DialogFooter>
@@ -67,7 +75,7 @@ export const DuplicateTemplateDialog = ({
             variant="secondary"
             onClick={() => onOpenChange(false)}
           >
-            Cancel
+            <Trans>Cancel</Trans>
           </Button>
 
           <Button
@@ -80,7 +88,7 @@ export const DuplicateTemplateDialog = ({
               })
             }
           >
-            Duplicate
+            <Trans>Duplicate</Trans>
           </Button>
         </DialogFooter>
       </DialogContent>

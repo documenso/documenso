@@ -3,6 +3,8 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 
 import { zodResolver } from '@hookform/resolvers/zod';
+import { Trans, msg } from '@lingui/macro';
+import { useLingui } from '@lingui/react';
 import { InfoIcon, Plus } from 'lucide-react';
 import { useFieldArray, useForm } from 'react-hook-form';
 import * as z from 'zod';
@@ -94,7 +96,9 @@ export function UseTemplateDialog({
   templateId,
 }: UseTemplateDialogProps) {
   const router = useRouter();
+
   const { toast } = useToast();
+  const { _ } = useLingui();
 
   const [open, setOpen] = useState(false);
 
@@ -135,8 +139,8 @@ export function UseTemplateDialog({
       });
 
       toast({
-        title: 'Document created',
-        description: 'Your document has been created from the template successfully.',
+        title: _(msg`Document created`),
+        description: _(msg`Your document has been created from the template successfully.`),
         duration: 5000,
       });
 
@@ -145,13 +149,15 @@ export function UseTemplateDialog({
       const error = AppError.parseError(err);
 
       const toastPayload: Toast = {
-        title: 'Error',
-        description: 'An error occurred while creating document from template.',
+        title: _(msg`Error`),
+        description: _(msg`An error occurred while creating document from template.`),
         variant: 'destructive',
       };
 
       if (error.code === 'DOCUMENT_SEND_FAILED') {
-        toastPayload.description = 'The document was created but could not be sent to recipients.';
+        toastPayload.description = _(
+          msg`The document was created but could not be sent to recipients.`,
+        );
       }
 
       toast(toastPayload);
@@ -174,16 +180,20 @@ export function UseTemplateDialog({
       <DialogTrigger asChild>
         <Button variant="outline" className="bg-background">
           <Plus className="-ml-1 mr-2 h-4 w-4" />
-          Use Template
+          <Trans>Use Template</Trans>
         </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-lg">
         <DialogHeader>
-          <DialogTitle>Create document from template</DialogTitle>
+          <DialogTitle>
+            <Trans>Create document from template</Trans>
+          </DialogTitle>
           <DialogDescription>
-            {recipients.length === 0
-              ? 'A draft document will be created'
-              : 'Add the recipients to create the document with'}
+            {recipients.length === 0 ? (
+              <Trans>A draft document will be created</Trans>
+            ) : (
+              <Trans>Add the recipients to create the document with</Trans>
+            )}
           </DialogDescription>
         </DialogHeader>
 
@@ -198,10 +208,17 @@ export function UseTemplateDialog({
                       name={`recipients.${index}.email`}
                       render={({ field }) => (
                         <FormItem className="w-full">
-                          {index === 0 && <FormLabel required>Email</FormLabel>}
+                          {index === 0 && (
+                            <FormLabel required>
+                              <Trans>Email</Trans>
+                            </FormLabel>
+                          )}
 
                           <FormControl>
-                            <Input {...field} placeholder={recipients[index].email || 'Email'} />
+                            <Input
+                              {...field}
+                              placeholder={recipients[index].email || _(msg`Email`)}
+                            />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -213,10 +230,17 @@ export function UseTemplateDialog({
                       name={`recipients.${index}.name`}
                       render={({ field }) => (
                         <FormItem className="w-full">
-                          {index === 0 && <FormLabel>Name</FormLabel>}
+                          {index === 0 && (
+                            <FormLabel>
+                              <Trans>Name</Trans>
+                            </FormLabel>
+                          )}
 
                           <FormControl>
-                            <Input {...field} placeholder={recipients[index].name || 'Name'} />
+                            <Input
+                              {...field}
+                              placeholder={recipients[index].name || _(msg`Name`)}
+                            />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -246,7 +270,7 @@ export function UseTemplateDialog({
                             className="text-muted-foreground ml-2 flex items-center text-sm"
                             htmlFor="sendDocument"
                           >
-                            Send document
+                            <Trans>Send document</Trans>
                             <Tooltip>
                               <TooltipTrigger type="button">
                                 <InfoIcon className="mx-1 h-4 w-4" />
@@ -254,11 +278,16 @@ export function UseTemplateDialog({
 
                               <TooltipContent className="text-muted-foreground z-[99999] max-w-md space-y-2 p-4">
                                 <p>
-                                  The document will be immediately sent to recipients if this is
-                                  checked.
+                                  <Trans>
+                                    {' '}
+                                    The document will be immediately sent to recipients if this is
+                                    checked.
+                                  </Trans>
                                 </p>
 
-                                <p>Otherwise, the document will be created as a draft.</p>
+                                <p>
+                                  <Trans>Otherwise, the document will be created as a draft.</Trans>
+                                </p>
                               </TooltipContent>
                             </Tooltip>
                           </label>
@@ -272,12 +301,16 @@ export function UseTemplateDialog({
               <DialogFooter>
                 <DialogClose asChild>
                   <Button type="button" variant="secondary">
-                    Close
+                    <Trans>Close</Trans>
                   </Button>
                 </DialogClose>
 
                 <Button type="submit" loading={form.formState.isSubmitting}>
-                  {form.getValues('sendDocument') ? 'Create and send' : 'Create as draft'}
+                  {form.getValues('sendDocument') ? (
+                    <Trans>Create and send</Trans>
+                  ) : (
+                    <Trans>Create as draft</Trans>
+                  )}
                 </Button>
               </DialogFooter>
             </fieldset>

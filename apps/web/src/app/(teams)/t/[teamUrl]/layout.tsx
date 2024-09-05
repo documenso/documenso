@@ -3,6 +3,7 @@ import React from 'react';
 import { RedirectType, redirect } from 'next/navigation';
 
 import { LimitsProvider } from '@documenso/ee/server-only/limits/provider/server';
+import { setupI18nSSR } from '@documenso/lib/client-only/providers/i18n.server';
 import { getServerComponentSession } from '@documenso/lib/next-auth/get-server-component-session';
 import { getTeamByUrl } from '@documenso/lib/server-only/team/get-team';
 import { getTeams } from '@documenso/lib/server-only/team/get-teams';
@@ -26,6 +27,8 @@ export default async function AuthenticatedTeamsLayout({
   children,
   params,
 }: AuthenticatedTeamsLayoutProps) {
+  setupI18nSSR();
+
   const { session, user } = await getServerComponentSession();
 
   if (!session || !user) {

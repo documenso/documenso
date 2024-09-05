@@ -4,6 +4,8 @@ import { useEffect, useMemo, useState, useTransition } from 'react';
 
 import { useRouter } from 'next/navigation';
 
+import { msg } from '@lingui/macro';
+import { useLingui } from '@lingui/react';
 import { Loader } from 'lucide-react';
 
 import { DO_NOT_INVALIDATE_QUERY_ON_MUTATION } from '@documenso/lib/constants/trpc';
@@ -39,8 +41,10 @@ export const CheckboxField = ({
   onSignField,
   onUnsignField,
 }: CheckboxFieldProps) => {
-  const router = useRouter();
+  const { _ } = useLingui();
   const { toast } = useToast();
+
+  const router = useRouter();
   const [isPending, startTransition] = useTransition();
   const { executeActionAuthProcedure } = useRequiredDocumentAuthContext();
 
@@ -115,8 +119,8 @@ export const CheckboxField = ({
       console.error(err);
 
       toast({
-        title: 'Error',
-        description: 'An error occurred while signing the document.',
+        title: _(msg`Error`),
+        description: _(msg`An error occurred while signing the document.`),
         variant: 'destructive',
       });
     }
@@ -144,8 +148,8 @@ export const CheckboxField = ({
       console.error(err);
 
       toast({
-        title: 'Error',
-        description: 'An error occurred while removing the signature.',
+        title: _(msg`Error`),
+        description: _(msg`An error occurred while removing the signature.`),
         variant: 'destructive',
       });
     }
@@ -205,8 +209,8 @@ export const CheckboxField = ({
       console.error(err);
 
       toast({
-        title: 'Error',
-        description: 'An error occurred while updating the signature.',
+        title: _(msg`Error`),
+        description: _(msg`An error occurred while updating the signature.`),
         variant: 'destructive',
       });
     } finally {

@@ -3,6 +3,8 @@
 import { useRouter } from 'next/navigation';
 
 import { zodResolver } from '@hookform/resolvers/zod';
+import { Trans, msg } from '@lingui/macro';
+import { useLingui } from '@lingui/react';
 import { Loader } from 'lucide-react';
 import { useForm } from 'react-hook-form';
 import type { z } from 'zod';
@@ -38,6 +40,7 @@ export type WebhookPageOptions = {
 };
 
 export default function WebhookPage({ params }: WebhookPageOptions) {
+  const { _ } = useLingui();
   const { toast } = useToast();
   const router = useRouter();
 
@@ -68,16 +71,18 @@ export default function WebhookPage({ params }: WebhookPageOptions) {
       });
 
       toast({
-        title: 'Webhook updated',
-        description: 'The webhook has been updated successfully.',
+        title: _(msg`Webhook updated`),
+        description: _(msg`The webhook has been updated successfully.`),
         duration: 5000,
       });
 
       router.refresh();
     } catch (err) {
       toast({
-        title: 'Failed to update webhook',
-        description: 'We encountered an error while updating the webhook. Please try again later.',
+        title: _(msg`Failed to update webhook`),
+        description: _(
+          msg`We encountered an error while updating the webhook. Please try again later.`,
+        ),
         variant: 'destructive',
       });
     }
@@ -86,8 +91,8 @@ export default function WebhookPage({ params }: WebhookPageOptions) {
   return (
     <div>
       <SettingsHeader
-        title="Edit webhook"
-        subtitle="On this page, you can edit the webhook and its settings."
+        title={_(msg`Edit webhook`)}
+        subtitle={_(msg`On this page, you can edit the webhook and its settings.`)}
       />
 
       {isLoading && (
@@ -108,13 +113,15 @@ export default function WebhookPage({ params }: WebhookPageOptions) {
                 name="webhookUrl"
                 render={({ field }) => (
                   <FormItem className="flex-1">
-                    <FormLabel required>Webhook URL</FormLabel>
+                    <FormLabel required>
+                      <Trans>Webhook URL</Trans>
+                    </FormLabel>
                     <FormControl>
                       <Input className="bg-background" {...field} />
                     </FormControl>
 
                     <FormDescription>
-                      The URL for Documenso to send webhook events to.
+                      <Trans>The URL for Documenso to send webhook events to.</Trans>
                     </FormDescription>
 
                     <FormMessage />
@@ -127,7 +134,9 @@ export default function WebhookPage({ params }: WebhookPageOptions) {
                 name="enabled"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Enabled</FormLabel>
+                    <FormLabel>
+                      <Trans>Enabled</Trans>
+                    </FormLabel>
 
                     <div>
                       <FormControl>
@@ -150,7 +159,9 @@ export default function WebhookPage({ params }: WebhookPageOptions) {
               name="eventTriggers"
               render={({ field: { onChange, value } }) => (
                 <FormItem className="flex flex-col gap-2">
-                  <FormLabel required>Triggers</FormLabel>
+                  <FormLabel required>
+                    <Trans>Triggers</Trans>
+                  </FormLabel>
                   <FormControl>
                     <TriggerMultiSelectCombobox
                       listValues={value}
@@ -161,7 +172,7 @@ export default function WebhookPage({ params }: WebhookPageOptions) {
                   </FormControl>
 
                   <FormDescription>
-                    The events that will trigger a webhook to be sent to your URL.
+                    <Trans> The events that will trigger a webhook to be sent to your URL.</Trans>
                   </FormDescription>
 
                   <FormMessage />
@@ -174,14 +185,18 @@ export default function WebhookPage({ params }: WebhookPageOptions) {
               name="secret"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Secret</FormLabel>
+                  <FormLabel>
+                    <Trans>Secret</Trans>
+                  </FormLabel>
                   <FormControl>
                     <PasswordInput className="bg-background" {...field} value={field.value ?? ''} />
                   </FormControl>
 
                   <FormDescription>
-                    A secret that will be sent to your URL so you can verify that the request has
-                    been sent by Documenso.
+                    <Trans>
+                      A secret that will be sent to your URL so you can verify that the request has
+                      been sent by Documenso.
+                    </Trans>
                   </FormDescription>
                   <FormMessage />
                 </FormItem>
@@ -190,7 +205,7 @@ export default function WebhookPage({ params }: WebhookPageOptions) {
 
             <div className="mt-4">
               <Button type="submit" loading={form.formState.isSubmitting}>
-                Update webhook
+                <Trans>Update webhook</Trans>
               </Button>
             </div>
           </fieldset>

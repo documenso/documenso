@@ -86,6 +86,10 @@ export const Hero = ({ className, ...props }: HeroProps) => {
             src={backgroundPattern}
             alt="background pattern"
             className="-mr-[50vw] -mt-[15vh] h-full scale-125 object-cover dark:contrast-[70%] dark:invert dark:sepia md:scale-150 lg:scale-[175%]"
+            style={{
+              mask: 'radial-gradient(rgba(255, 255, 255, 1) 0%, transparent 80%)',
+              WebkitMask: 'radial-gradient(rgba(255, 255, 255, 1) 0%, transparent 80%)',
+            }}
           />
         </motion.div>
       </div>

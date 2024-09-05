@@ -1,4 +1,5 @@
 import { createNextRoute } from '@ts-rest/next';
+import { match } from 'ts-pattern';
 
 import { getServerLimits } from '@documenso/ee/server-only/limits/server';
 import { NEXT_PUBLIC_WEBAPP_URL } from '@documenso/lib/constants/app';
@@ -15,7 +16,6 @@ import { getDocumentById } from '@documenso/lib/server-only/document/get-documen
 import { resendDocument } from '@documenso/lib/server-only/document/resend-document';
 import { sendDocument } from '@documenso/lib/server-only/document/send-document';
 import { updateDocument } from '@documenso/lib/server-only/document/update-document';
-import { createField } from '@documenso/lib/server-only/field/create-field';
 import { deleteField } from '@documenso/lib/server-only/field/delete-field';
 import { getFieldById } from '@documenso/lib/server-only/field/get-field-by-id';
 import { updateField } from '@documenso/lib/server-only/field/update-field';
@@ -31,6 +31,14 @@ import { createDocumentFromTemplateLegacy } from '@documenso/lib/server-only/tem
 import { deleteTemplate } from '@documenso/lib/server-only/template/delete-template';
 import { findTemplates } from '@documenso/lib/server-only/template/find-templates';
 import { getTemplateById } from '@documenso/lib/server-only/template/get-template-by-id';
+import { ZFieldMetaSchema } from '@documenso/lib/types/field-meta';
+import {
+  ZCheckboxFieldMeta,
+  ZDropdownFieldMeta,
+  ZNumberFieldMeta,
+  ZRadioFieldMeta,
+  ZTextFieldMeta,
+} from '@documenso/lib/types/field-meta';
 import { extractNextApiRequestMetadata } from '@documenso/lib/universal/extract-request-metadata';
 import { getFile } from '@documenso/lib/universal/upload/get-file';
 import { putPdfFile } from '@documenso/lib/universal/upload/put-file';
@@ -38,6 +46,8 @@ import {
   getPresignGetUrl,
   getPresignPostUrl,
 } from '@documenso/lib/universal/upload/server-actions';
+import { createDocumentAuditLogData } from '@documenso/lib/utils/document-audit-logs';
+import { prisma } from '@documenso/prisma';
 import { DocumentDataType, DocumentStatus, SigningStatus } from '@documenso/prisma/client';
 
 import { ApiContractV1 } from './contract';
@@ -869,95 +879,179 @@ export const ApiContractV1Implementation = createNextRoute(ApiContractV1, {
 
   createField: authenticatedMiddleware(async (args, user, team) => {
     const { id: documentId } = args.params;
-    const { recipientId, type, pageNumber, pageWidth, pageHeight, pageX, pageY } = args.body;
+    const fields = Array.isArray(args.body) ? args.body : [args.body];
 
-    const document = await getDocumentById({
-      id: Number(documentId),
-      userId: user.id,
-      teamId: team?.id,
+    const document = await prisma.document.findFirst({
+      select: { id: true, status: true },
+      where: {
+        id: Number(documentId),
+        ...(team?.id
+          ? {
+              team: {
+                id: team.id,
+                members: { some: { userId: user.id } },
+              },
+            }
+          : {
+              userId: user.id,
+              teamId: null,
+            }),
+      },
     });
 
     if (!document) {
       return {
         status: 404,
-        body: {
-          message: 'Document not found',
-        },
+        body: { message: 'Document not found' },
       };
     }
 
     if (document.status === DocumentStatus.COMPLETED) {
       return {
         status: 400,
-        body: {
-          message: 'Document is already completed',
-        },
+        body: { message: 'Document is already completed' },
       };
     }
 
-    const recipient = await getRecipientById({
-      id: Number(recipientId),
-      documentId: Number(documentId),
-    }).catch(() => null);
+    try {
+      const createdFields = await prisma.$transaction(async (tx) => {
+        return Promise.all(
+          fields.map(async (fieldData) => {
+            const {
+              recipientId,
+              type,
+              pageNumber,
+              pageWidth,
+              pageHeight,
+              pageX,
+              pageY,
+              fieldMeta,
+            } = fieldData;
 
-    if (!recipient) {
+            if (pageNumber <= 0) {
+              throw new Error('Invalid page number');
+            }
+
+            const recipient = await getRecipientById({
+              id: Number(recipientId),
+              documentId: Number(documentId),
+            }).catch(() => null);
+
+            if (!recipient) {
+              throw new Error('Recipient not found');
+            }
+
+            if (recipient.signingStatus === SigningStatus.SIGNED) {
+              throw new Error('Recipient has already signed the document');
+            }
+
+            const advancedField = ['NUMBER', 'RADIO', 'CHECKBOX', 'DROPDOWN', 'TEXT'].includes(
+              type,
+            );
+
+            if (advancedField && !fieldMeta) {
+              throw new Error(
+                'Field meta is required for this type of field. Please provide the appropriate field meta object.',
+              );
+            }
+
+            if (fieldMeta && fieldMeta.type.toLowerCase() !== String(type).toLowerCase()) {
+              throw new Error('Field meta type does not match the field type');
+            }
+
+            const result = match(type)
+              .with('RADIO', () => ZRadioFieldMeta.safeParse(fieldMeta))
+              .with('CHECKBOX', () => ZCheckboxFieldMeta.safeParse(fieldMeta))
+              .with('DROPDOWN', () => ZDropdownFieldMeta.safeParse(fieldMeta))
+              .with('NUMBER', () => ZNumberFieldMeta.safeParse(fieldMeta))
+              .with('TEXT', () => ZTextFieldMeta.safeParse(fieldMeta))
+              .with('SIGNATURE', 'INITIALS', 'DATE', 'EMAIL', 'NAME', () => ({
+                success: true,
+                data: {},
+              }))
+              .with('FREE_SIGNATURE', () => ({
+                success: false,
+                error: 'FREE_SIGNATURE is not supported',
+                data: {},
+              }))
+              .exhaustive();
+
+            if (!result.success) {
+              throw new Error('Field meta parsing failed');
+            }
+
+            const field = await tx.field.create({
+              data: {
+                documentId: Number(documentId),
+                recipientId: Number(recipientId),
+                type,
+                page: pageNumber,
+                positionX: pageX,
+                positionY: pageY,
+                width: pageWidth,
+                height: pageHeight,
+                customText: '',
+                inserted: false,
+                fieldMeta: result.data,
+              },
+              include: {
+                Recipient: true,
+              },
+            });
+
+            await tx.documentAuditLog.create({
+              data: createDocumentAuditLogData({
+                type: 'FIELD_CREATED',
+                documentId: Number(documentId),
+                user: {
+                  id: team?.id ?? user.id,
+                  email: team?.name ?? user.email,
+                  name: team ? '' : user.name,
+                },
+                data: {
+                  fieldId: field.secondaryId,
+                  fieldRecipientEmail: field.Recipient?.email ?? '',
+                  fieldRecipientId: recipientId,
+                  fieldType: field.type,
+                },
+                requestMetadata: extractNextApiRequestMetadata(args.req),
+              }),
+            });
+
+            return {
+              id: field.id,
+              documentId: Number(field.documentId),
+              recipientId: field.recipientId ?? -1,
+              type: field.type,
+              pageNumber: field.page,
+              pageX: Number(field.positionX),
+              pageY: Number(field.positionY),
+              pageWidth: Number(field.width),
+              pageHeight: Number(field.height),
+              customText: field.customText,
+              fieldMeta: ZFieldMetaSchema.parse(field.fieldMeta),
+              inserted: field.inserted,
+            };
+          }),
+        );
+      });
+
       return {
-        status: 404,
+        status: 200,
         body: {
-          message: 'Recipient not found',
+          fields: createdFields,
+          documentId: Number(documentId),
         },
       };
+    } catch (err) {
+      return AppError.toRestAPIError(err);
     }
-
-    if (recipient.signingStatus === SigningStatus.SIGNED) {
-      return {
-        status: 400,
-        body: {
-          message: 'Recipient has already signed the document',
-        },
-      };
-    }
-
-    const field = await createField({
-      documentId: Number(documentId),
-      recipientId: Number(recipientId),
-      userId: user.id,
-      teamId: team?.id,
-      type,
-      pageNumber,
-      pageX,
-      pageY,
-      pageWidth,
-      pageHeight,
-      requestMetadata: extractNextApiRequestMetadata(args.req),
-    });
-
-    const remappedField = {
-      id: field.id,
-      documentId: field.documentId,
-      recipientId: field.recipientId ?? -1,
-      type: field.type,
-      pageNumber: field.page,
-      pageX: Number(field.positionX),
-      pageY: Number(field.positionY),
-      pageWidth: Number(field.width),
-      pageHeight: Number(field.height),
-      customText: field.customText,
-      inserted: field.inserted,
-    };
-
-    return {
-      status: 200,
-      body: {
-        ...remappedField,
-        documentId: Number(documentId),
-      },
-    };
   }),
 
   updateField: authenticatedMiddleware(async (args, user, team) => {
     const { id: documentId, fieldId } = args.params;
-    const { recipientId, type, pageNumber, pageWidth, pageHeight, pageX, pageY } = args.body;
+    const { recipientId, type, pageNumber, pageWidth, pageHeight, pageX, pageY, fieldMeta } =
+      args.body;
 
     const document = await getDocumentById({
       id: Number(documentId),
@@ -1019,6 +1113,7 @@ export const ApiContractV1Implementation = createNextRoute(ApiContractV1, {
       pageWidth,
       pageHeight,
       requestMetadata: extractNextApiRequestMetadata(args.req),
+      fieldMeta: fieldMeta ? ZFieldMetaSchema.parse(fieldMeta) : undefined,
     });
 
     const remappedField = {

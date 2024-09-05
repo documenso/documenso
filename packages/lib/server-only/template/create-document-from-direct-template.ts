@@ -44,6 +44,7 @@ export type CreateDocumentFromDirectTemplateOptions = {
   directRecipientName?: string;
   directRecipientEmail: string;
   directTemplateToken: string;
+  directTemplateExternalId?: string;
   signedFieldValues: TSignFieldWithTokenMutationSchema[];
   templateUpdatedAt: Date;
   requestMetadata: RequestMetadata;
@@ -63,6 +64,7 @@ export const createDocumentFromDirectTemplate = async ({
   directRecipientName: initialDirectRecipientName,
   directRecipientEmail,
   directTemplateToken,
+  directTemplateExternalId,
   signedFieldValues,
   templateUpdatedAt,
   requestMetadata,
@@ -208,7 +210,7 @@ export const createDocumentFromDirectTemplate = async ({
 
   const initialRequestTime = new Date();
 
-  const { documentId, directRecipientToken } = await prisma.$transaction(async (tx) => {
+  const { documentId, recipientId, token } = await prisma.$transaction(async (tx) => {
     const documentData = await tx.documentData.create({
       data: {
         type: template.templateDocumentData.type,
@@ -227,6 +229,7 @@ export const createDocumentFromDirectTemplate = async ({
         title: template.title,
         createdAt: initialRequestTime,
         status: DocumentStatus.PENDING,
+        externalId: directTemplateExternalId,
         documentDataId: documentData.id,
         authOptions: createDocumentAuthOptions({
           globalAccessAuth: templateAuthOptions.globalAccessAuth,
@@ -465,6 +468,7 @@ export const createDocumentFromDirectTemplate = async ({
               .with(
                 FieldType.DATE,
                 FieldType.EMAIL,
+                FieldType.INITIALS,
                 FieldType.NAME,
                 FieldType.TEXT,
                 FieldType.NUMBER,
@@ -535,8 +539,9 @@ export const createDocumentFromDirectTemplate = async ({
     });
 
     return {
+      token: createdDirectRecipient.token,
       documentId: document.id,
-      directRecipientToken: createdDirectRecipient.token,
+      recipientId: createdDirectRecipient.id,
     };
   });
 
@@ -555,5 +560,9 @@ export const createDocumentFromDirectTemplate = async ({
     // Log and reseal as required until we configure middleware.
   }
 
-  return directRecipientToken;
+  return {
+    token,
+    documentId,
+    recipientId,
+  };
 };

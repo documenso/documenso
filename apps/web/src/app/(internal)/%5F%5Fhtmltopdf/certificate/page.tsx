@@ -5,9 +5,10 @@ import { redirect } from 'next/navigation';
 import { match } from 'ts-pattern';
 import { UAParser } from 'ua-parser-js';
 
+import { setupI18nSSR } from '@documenso/lib/client-only/providers/i18n.server';
 import {
-  RECIPIENT_ROLES_DESCRIPTION,
-  RECIPIENT_ROLE_SIGNING_REASONS,
+  RECIPIENT_ROLES_DESCRIPTION_ENG,
+  RECIPIENT_ROLE_SIGNING_REASONS_ENG,
 } from '@documenso/lib/constants/recipient-roles';
 import { getEntireDocument } from '@documenso/lib/server-only/admin/get-entire-document';
 import { decryptSecondaryData } from '@documenso/lib/server-only/crypto/decrypt';
@@ -35,11 +36,13 @@ type SigningCertificateProps = {
 };
 
 const FRIENDLY_SIGNING_REASONS = {
-  ['__OWNER__']: 'I am the owner of this document',
-  ...RECIPIENT_ROLE_SIGNING_REASONS,
+  ['__OWNER__']: `I am the owner of this document`,
+  ...RECIPIENT_ROLE_SIGNING_REASONS_ENG,
 };
 
 export default async function SigningCertificate({ searchParams }: SigningCertificateProps) {
+  setupI18nSSR();
+
   const { d } = searchParams;
 
   if (typeof d !== 'string' || !d) {
@@ -172,7 +175,7 @@ export default async function SigningCertificate({ searchParams }: SigningCertif
                       <div className="hyphens-auto break-words font-medium">{recipient.name}</div>
                       <div className="break-all">{recipient.email}</div>
                       <p className="text-muted-foreground mt-2 text-sm print:text-xs">
-                        {RECIPIENT_ROLES_DESCRIPTION[recipient.role].roleName}
+                        {RECIPIENT_ROLES_DESCRIPTION_ENG[recipient.role].roleName}
                       </p>
 
                       <p className="text-muted-foreground mt-2 text-sm print:text-xs">

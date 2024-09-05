@@ -2,6 +2,9 @@
 
 import Link from 'next/link';
 
+import { Trans, msg } from '@lingui/macro';
+import { useLingui } from '@lingui/react';
+
 import type { Recipient } from '@documenso/prisma/client';
 import { type Document, SigningStatus } from '@documenso/prisma/client';
 import { trpc } from '@documenso/trpc/react';
@@ -22,20 +25,21 @@ export type AdminActionsProps = {
 };
 
 export const AdminActions = ({ className, document, recipients }: AdminActionsProps) => {
+  const { _ } = useLingui();
   const { toast } = useToast();
 
   const { mutate: resealDocument, isLoading: isResealDocumentLoading } =
     trpc.admin.resealDocument.useMutation({
       onSuccess: () => {
         toast({
-          title: 'Success',
-          description: 'Document resealed',
+          title: _(msg`Success`),
+          description: _(msg`Document resealed`),
         });
       },
       onError: () => {
         toast({
-          title: 'Error',
-          description: 'Failed to reseal document',
+          title: _(msg`Error`),
+          description: _(msg`Failed to reseal document`),
           variant: 'destructive',
         });
       },
@@ -54,19 +58,23 @@ export const AdminActions = ({ className, document, recipients }: AdminActionsPr
               )}
               onClick={() => resealDocument({ id: document.id })}
             >
-              Reseal document
+              <Trans>Reseal document</Trans>
             </Button>
           </TooltipTrigger>
 
           <TooltipContent className="max-w-[40ch]">
-            Attempts sealing the document again, useful for after a code change has occurred to
-            resolve an erroneous document.
+            <Trans>
+              Attempts sealing the document again, useful for after a code change has occurred to
+              resolve an erroneous document.
+            </Trans>
           </TooltipContent>
         </Tooltip>
       </TooltipProvider>
 
       <Button variant="outline" asChild>
-        <Link href={`/admin/users/${document.userId}`}>Go to owner</Link>
+        <Link href={`/admin/users/${document.userId}`}>
+          <Trans>Go to owner</Trans>
+        </Link>
       </Button>
     </div>
   );

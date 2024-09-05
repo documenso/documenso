@@ -37,7 +37,7 @@ To create a new webhook subscription, you need to provide the following informat
 
 - Enter the webhook URL that will receive the event payload.
 - Select the event(s) you want to subscribe to: `document.created`, `document.sent`, `document.opened`, `document.signed`, `document.completed`.
-- Optionally, you can provide a secret key that will be used to sign the payload. This key will be included in the `X-Documenso-Signature` header of the request.
+- Optionally, you can provide a secret key that will be used to sign the payload. This key will be included in the `X-Documenso-Secret` header of the request.
 
 ![A screenshot of the Create Webhook modal that shows the URL input field and the event checkboxes](/webhook-images/webhooks-page-create-webhook-modal.webp)
 

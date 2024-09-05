@@ -1,5 +1,8 @@
 'use client';
 
+import { Trans, msg } from '@lingui/macro';
+import { useLingui } from '@lingui/react';
+
 import { trpc } from '@documenso/trpc/react';
 import { Button } from '@documenso/ui/primitives/button';
 import { useToast } from '@documenso/ui/primitives/use-toast';
@@ -9,6 +12,7 @@ export type DeclineTeamInvitationButtonProps = {
 };
 
 export const DeclineTeamInvitationButton = ({ teamId }: DeclineTeamInvitationButtonProps) => {
+  const { _ } = useLingui();
   const { toast } = useToast();
 
   const {
@@ -18,17 +22,17 @@ export const DeclineTeamInvitationButton = ({ teamId }: DeclineTeamInvitationBut
   } = trpc.team.declineTeamInvitation.useMutation({
     onSuccess: () => {
       toast({
-        title: 'Success',
-        description: 'Declined team invitation',
+        title: _(msg`Success`),
+        description: _(msg`Declined team invitation`),
         duration: 5000,
       });
     },
     onError: () => {
       toast({
-        title: 'Something went wrong',
+        title: _(msg`Something went wrong`),
+        description: _(msg`Unable to decline this team invitation at this time.`),
         variant: 'destructive',
         duration: 10000,
-        description: 'Unable to decline this team invitation at this time.',
       });
     },
   });
@@ -40,7 +44,7 @@ export const DeclineTeamInvitationButton = ({ teamId }: DeclineTeamInvitationBut
       disabled={isLoading || isSuccess}
       variant="ghost"
     >
-      Decline
+      <Trans>Decline</Trans>
     </Button>
   );
 };

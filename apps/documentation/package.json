@@ -16,7 +16,7 @@
     "@documenso/tailwind-config": "*",
     "@documenso/trpc": "*",
     "@documenso/ui": "*",
-    "next": "14.0.3",
+    "next": "14.2.6",
     "next-plausible": "^3.12.0",
     "nextra": "^2.13.4",
     "nextra-theme-docs": "^2.13.4",

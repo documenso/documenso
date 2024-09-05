@@ -1,5 +1,7 @@
 'use client';
 
+import { Trans, msg } from '@lingui/macro';
+import { useLingui } from '@lingui/react';
 import { DownloadIcon } from 'lucide-react';
 
 import { trpc } from '@documenso/trpc/react';
@@ -9,18 +11,24 @@ import { useToast } from '@documenso/ui/primitives/use-toast';
 
 export type DownloadAuditLogButtonProps = {
   className?: string;
+  teamId?: number;
   documentId: number;
 };
 
-export const DownloadAuditLogButton = ({ className, documentId }: DownloadAuditLogButtonProps) => {
+export const DownloadAuditLogButton = ({
+  className,
+  teamId,
+  documentId,
+}: DownloadAuditLogButtonProps) => {
   const { toast } = useToast();
+  const { _ } = useLingui();
 
   const { mutateAsync: downloadAuditLogs, isLoading } =
     trpc.document.downloadAuditLogs.useMutation();
 
   const onDownloadAuditLogsClick = async () => {
     try {
-      const { url } = await downloadAuditLogs({ documentId });
+      const { url } = await downloadAuditLogs({ teamId, documentId });
 
       const iframe = Object.assign(document.createElement('iframe'), {
         src: url,
@@ -54,8 +62,10 @@ export const DownloadAuditLogButton = ({ className, documentId }: DownloadAuditL
       console.error(error);
 
       toast({
-        title: 'Something went wrong',
-        description: 'Sorry, we were unable to download the audit logs. Please try again later.',
+        title: _(msg`Something went wrong`),
+        description: _(
+          msg`Sorry, we were unable to download the audit logs. Please try again later.`,
+        ),
         variant: 'destructive',
       });
     }
@@ -68,7 +78,7 @@ export const DownloadAuditLogButton = ({ className, documentId }: DownloadAuditL
       onClick={() => void onDownloadAuditLogsClick()}
     >
       {!isLoading && <DownloadIcon className="mr-1.5 h-4 w-4" />}
-      Download Audit Logs
+      <Trans>Download Audit Logs</Trans>
     </Button>
   );
 };

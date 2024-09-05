@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from 'react';
 
+import { Trans } from '@lingui/macro';
 import { ArrowRightIcon, Loader } from 'lucide-react';
 import { match } from 'ts-pattern';
 import { UAParser } from 'ua-parser-js';
@@ -97,12 +98,18 @@ export const DocumentHistorySheet = ({
         className="flex w-full max-w-[500px] flex-col overflow-y-auto p-0"
       >
         <div className="text-foreground px-6 pt-6">
-          <h1 className="text-lg font-medium">Document history</h1>
+          <h1 className="text-lg font-medium">
+            <Trans>Document history</Trans>
+          </h1>
           <button
             className="text-muted-foreground text-sm"
             onClick={() => setIsUserDetailsVisible(!isUserDetailsVisible)}
           >
-            {isUserDetailsVisible ? 'Hide' : 'Show'} additional information
+            {isUserDetailsVisible ? (
+              <Trans>Hide additional information</Trans>
+            ) : (
+              <Trans>Show additional information</Trans>
+            )}
           </button>
         </div>
 
@@ -114,12 +121,14 @@ export const DocumentHistorySheet = ({
 
         {isLoadingError && (
           <div className="flex h-full flex-col items-center justify-center">
-            <p className="text-foreground/80 text-sm">Unable to load document history</p>
+            <p className="text-foreground/80 text-sm">
+              <Trans>Unable to load document history</Trans>
+            </p>
             <button
               onClick={async () => refetch()}
               className="text-foreground/70 hover:text-muted-foreground mt-2 text-sm"
             >
-              Click here to retry
+              <Trans>Click here to retry</Trans>
             </button>
           </div>
         )}
