@@ -1395,7 +1395,6 @@ msgstr ""
 #: apps/web/src/app/(dashboard)/templates/use-template-dialog.tsx:220
 #: apps/web/src/app/(recipient)/d/[token]/configure-direct-template.tsx:118
 #: apps/web/src/app/(signing)/sign/[token]/email-field.tsx:106
-#: apps/web/src/app/(signing)/sign/[token]/email-field.tsx:126
 #: apps/web/src/app/embed/direct/[[...url]]/client.tsx:376
 #: apps/web/src/app/embed/sign/[[...url]]/client.tsx:254
 #: apps/web/src/components/(teams)/dialogs/add-team-email-dialog.tsx:169
@@ -1570,8 +1569,6 @@ msgstr ""
 
 #: apps/web/src/app/(recipient)/d/[token]/sign-direct-template.tsx:322
 #: apps/web/src/app/(signing)/sign/[token]/name-field.tsx:205
-#: apps/web/src/app/(recipient)/d/[token]/sign-direct-template.tsx:326
-#: apps/web/src/app/(signing)/sign/[token]/name-field.tsx:193
 #: apps/web/src/app/embed/direct/[[...url]]/client.tsx:361
 #: apps/web/src/app/embed/sign/[[...url]]/client.tsx:239
 #: apps/web/src/components/forms/profile.tsx:110
