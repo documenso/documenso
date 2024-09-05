@@ -753,7 +753,7 @@ msgstr ""
 #: apps/web/src/app/(recipient)/d/[token]/sign-direct-template.tsx:175
 #: apps/web/src/app/(signing)/sign/[token]/form.tsx:114
 #: apps/web/src/app/embed/direct/[[...url]]/client.tsx:435
-#: apps/web/src/app/embed/sign/[[...url]]/client.tsx:312
+#: apps/web/src/app/embed/sign/[[...url]]/client.tsx:314
 msgid "Click to insert field"
 msgstr ""
 
@@ -771,7 +771,7 @@ msgstr ""
 
 #: apps/web/src/app/(signing)/sign/[token]/sign-dialog.tsx:61
 #: apps/web/src/app/embed/direct/[[...url]]/client.tsx:425
-#: apps/web/src/app/embed/sign/[[...url]]/client.tsx:302
+#: apps/web/src/app/embed/sign/[[...url]]/client.tsx:304
 #: apps/web/src/components/forms/v2/signup.tsx:522
 msgid "Complete"
 msgstr ""
@@ -1398,7 +1398,7 @@ msgstr ""
 #: apps/web/src/app/(recipient)/d/[token]/configure-direct-template.tsx:118
 #: apps/web/src/app/(signing)/sign/[token]/email-field.tsx:126
 #: apps/web/src/app/embed/direct/[[...url]]/client.tsx:376
-#: apps/web/src/app/embed/sign/[[...url]]/client.tsx:254
+#: apps/web/src/app/embed/sign/[[...url]]/client.tsx:256
 #: apps/web/src/components/(teams)/dialogs/add-team-email-dialog.tsx:169
 #: apps/web/src/components/(teams)/dialogs/update-team-email-dialog.tsx:153
 #: apps/web/src/components/forms/forgot-password.tsx:81
@@ -1574,7 +1574,7 @@ msgstr ""
 #: apps/web/src/app/(recipient)/d/[token]/sign-direct-template.tsx:326
 #: apps/web/src/app/(signing)/sign/[token]/name-field.tsx:193
 #: apps/web/src/app/embed/direct/[[...url]]/client.tsx:361
-#: apps/web/src/app/embed/sign/[[...url]]/client.tsx:239
+#: apps/web/src/app/embed/sign/[[...url]]/client.tsx:241
 #: apps/web/src/components/forms/profile.tsx:110
 #: apps/web/src/components/forms/v2/signup.tsx:300
 msgid "Full Name"
@@ -2013,7 +2013,7 @@ msgid "New Template"
 msgstr ""
 
 #: apps/web/src/app/embed/direct/[[...url]]/client.tsx:416
-#: apps/web/src/app/embed/sign/[[...url]]/client.tsx:293
+#: apps/web/src/app/embed/sign/[[...url]]/client.tsx:295
 #: apps/web/src/components/forms/v2/signup.tsx:509
 msgid "Next"
 msgstr ""
@@ -2716,7 +2716,7 @@ msgid "Sign as<0>{0} <1>({1})</1></0>"
 msgstr ""
 
 #: apps/web/src/app/embed/direct/[[...url]]/client.tsx:329
-#: apps/web/src/app/embed/sign/[[...url]]/client.tsx:207
+#: apps/web/src/app/embed/sign/[[...url]]/client.tsx:209
 msgid "Sign document"
 msgstr ""
 
@@ -2745,7 +2745,7 @@ msgid "Sign Out"
 msgstr ""
 
 #: apps/web/src/app/embed/direct/[[...url]]/client.tsx:350
-#: apps/web/src/app/embed/sign/[[...url]]/client.tsx:228
+#: apps/web/src/app/embed/sign/[[...url]]/client.tsx:230
 msgid "Sign the document to complete the process."
 msgstr ""
 
@@ -2772,7 +2772,7 @@ msgstr ""
 #: apps/web/src/app/(signing)/sign/[token]/signature-field.tsx:197
 #: apps/web/src/app/(signing)/sign/[token]/signature-field.tsx:227
 #: apps/web/src/app/embed/direct/[[...url]]/client.tsx:391
-#: apps/web/src/app/embed/sign/[[...url]]/client.tsx:268
+#: apps/web/src/app/embed/sign/[[...url]]/client.tsx:270
 #: apps/web/src/components/forms/profile.tsx:132
 msgid "Signature"
 msgstr ""
@@ -2840,7 +2840,7 @@ msgstr ""
 #: apps/web/src/app/(teams)/t/[teamUrl]/settings/team-email-dropdown.tsx:39
 #: apps/web/src/app/(unauthenticated)/verify-email/[token]/page.tsx:61
 #: apps/web/src/app/embed/direct/[[...url]]/client.tsx:243
-#: apps/web/src/app/embed/sign/[[...url]]/client.tsx:123
+#: apps/web/src/app/embed/sign/[[...url]]/client.tsx:125
 #: apps/web/src/components/(teams)/dialogs/create-team-checkout-dialog.tsx:50
 #: apps/web/src/components/(teams)/dialogs/create-team-checkout-dialog.tsx:99
 #: apps/web/src/components/(teams)/dialogs/invite-team-member-dialog.tsx:210
@@ -4002,7 +4002,7 @@ msgstr ""
 
 #: apps/web/src/app/(recipient)/d/[token]/direct-template.tsx:119
 #: apps/web/src/app/embed/direct/[[...url]]/client.tsx:245
-#: apps/web/src/app/embed/sign/[[...url]]/client.tsx:125
+#: apps/web/src/app/embed/sign/[[...url]]/client.tsx:127
 msgid "We were unable to submit this document at this time. Please try again later."
 msgstr ""
 
