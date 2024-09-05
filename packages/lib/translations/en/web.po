@@ -629,12 +629,12 @@ msgid "Billing"
 msgstr "Billing"
 
 #: apps/web/src/app/(signing)/sign/[token]/form.tsx:207
-msgid "Black"
-msgstr "Black"
+#~ msgid "Black"
+#~ msgstr "Black"
 
 #: apps/web/src/app/(signing)/sign/[token]/form.tsx:223
-msgid "Blue"
-msgstr "Blue"
+#~ msgid "Blue"
+#~ msgstr "Blue"
 
 #: apps/web/src/app/(dashboard)/settings/security/activity/user-security-activity-data-table.tsx:101
 msgid "Browser"
@@ -667,7 +667,7 @@ msgstr "By enabling 2FA, you will be required to enter a code from your authenti
 #: apps/web/src/app/(signing)/sign/[token]/document-action-auth-account.tsx:74
 #: apps/web/src/app/(signing)/sign/[token]/document-action-auth-passkey.tsx:164
 #: apps/web/src/app/(signing)/sign/[token]/document-action-auth-passkey.tsx:189
-#: apps/web/src/app/(signing)/sign/[token]/form.tsx:144
+#: apps/web/src/app/(signing)/sign/[token]/form.tsx:143
 #: apps/web/src/app/(signing)/sign/[token]/name-field.tsx:215
 #: apps/web/src/app/(signing)/sign/[token]/number-field.tsx:327
 #: apps/web/src/app/(signing)/sign/[token]/sign-dialog.tsx:110
@@ -754,7 +754,7 @@ msgid "Click to copy signing link for sending to recipient"
 msgstr "Click to copy signing link for sending to recipient"
 
 #: apps/web/src/app/(recipient)/d/[token]/sign-direct-template.tsx:175
-#: apps/web/src/app/(signing)/sign/[token]/form.tsx:108
+#: apps/web/src/app/(signing)/sign/[token]/form.tsx:107
 msgid "Click to insert field"
 msgstr "Click to insert field"
 
@@ -1608,8 +1608,8 @@ msgid "Go to your <0>public profile settings</0> to add documents."
 msgstr "Go to your <0>public profile settings</0> to add documents."
 
 #: apps/web/src/app/(signing)/sign/[token]/form.tsx:231
-msgid "Green"
-msgstr "Green"
+#~ msgid "Green"
+#~ msgstr "Green"
 
 #: apps/web/src/app/(dashboard)/settings/profile/page.tsx:29
 msgid "Here you can edit your personal details."
@@ -2254,7 +2254,7 @@ msgstr "Please contact support if you would like to revert this action."
 msgid "Please enter a meaningful name for your token. This will help you identify it later."
 msgstr "Please enter a meaningful name for your token. This will help you identify it later."
 
-#: apps/web/src/app/(signing)/sign/[token]/form.tsx:128
+#: apps/web/src/app/(signing)/sign/[token]/form.tsx:127
 msgid "Please mark as viewed to complete"
 msgstr "Please mark as viewed to complete"
 
@@ -2420,8 +2420,8 @@ msgid "Recovery codes"
 msgstr "Recovery codes"
 
 #: apps/web/src/app/(signing)/sign/[token]/form.tsx:215
-msgid "Red"
-msgstr "Red"
+#~ msgid "Red"
+#~ msgstr "Red"
 
 #: apps/web/src/app/(signing)/sign/[token]/complete/claim-account.tsx:78
 #: apps/web/src/components/forms/signup.tsx:93

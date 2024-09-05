@@ -634,12 +634,12 @@ msgid "Billing"
 msgstr ""
 
 #: apps/web/src/app/(signing)/sign/[token]/form.tsx:207
-msgid "Black"
-msgstr ""
+#~ msgid "Black"
+#~ msgstr ""
 
 #: apps/web/src/app/(signing)/sign/[token]/form.tsx:223
-msgid "Blue"
-msgstr ""
+#~ msgid "Blue"
+#~ msgstr ""
 
 #: apps/web/src/app/(dashboard)/settings/security/activity/user-security-activity-data-table.tsx:101
 msgid "Browser"
@@ -672,7 +672,7 @@ msgstr ""
 #: apps/web/src/app/(signing)/sign/[token]/document-action-auth-account.tsx:74
 #: apps/web/src/app/(signing)/sign/[token]/document-action-auth-passkey.tsx:164
 #: apps/web/src/app/(signing)/sign/[token]/document-action-auth-passkey.tsx:189
-#: apps/web/src/app/(signing)/sign/[token]/form.tsx:144
+#: apps/web/src/app/(signing)/sign/[token]/form.tsx:143
 #: apps/web/src/app/(signing)/sign/[token]/name-field.tsx:215
 #: apps/web/src/app/(signing)/sign/[token]/number-field.tsx:327
 #: apps/web/src/app/(signing)/sign/[token]/sign-dialog.tsx:110
@@ -759,7 +759,7 @@ msgid "Click to copy signing link for sending to recipient"
 msgstr ""
 
 #: apps/web/src/app/(recipient)/d/[token]/sign-direct-template.tsx:175
-#: apps/web/src/app/(signing)/sign/[token]/form.tsx:108
+#: apps/web/src/app/(signing)/sign/[token]/form.tsx:107
 msgid "Click to insert field"
 msgstr ""
 
@@ -1613,8 +1613,8 @@ msgid "Go to your <0>public profile settings</0> to add documents."
 msgstr ""
 
 #: apps/web/src/app/(signing)/sign/[token]/form.tsx:231
-msgid "Green"
-msgstr ""
+#~ msgid "Green"
+#~ msgstr ""
 
 #: apps/web/src/app/(dashboard)/settings/profile/page.tsx:29
 msgid "Here you can edit your personal details."
@@ -2259,7 +2259,7 @@ msgstr ""
 msgid "Please enter a meaningful name for your token. This will help you identify it later."
 msgstr ""
 
-#: apps/web/src/app/(signing)/sign/[token]/form.tsx:128
+#: apps/web/src/app/(signing)/sign/[token]/form.tsx:127
 msgid "Please mark as viewed to complete"
 msgstr ""
 
@@ -2425,8 +2425,8 @@ msgid "Recovery codes"
 msgstr ""
 
 #: apps/web/src/app/(signing)/sign/[token]/form.tsx:215
-msgid "Red"
-msgstr ""
+#~ msgid "Red"
+#~ msgstr ""
 
 #: apps/web/src/app/(signing)/sign/[token]/complete/claim-account.tsx:78
 #: apps/web/src/components/forms/signup.tsx:93

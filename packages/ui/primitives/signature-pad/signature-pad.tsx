@@ -267,7 +267,17 @@ export const SignaturePad = ({
             <SelectItem value="black">
               <div className="flex items-center">
                 <div className="flex w-[150px] items-center">
+                  <div className="mr-2 h-5 w-5 rounded-full border-2 bg-black shadow-sm"></div>
                   <Trans>Black</Trans>
+                </div>
+              </div>
+            </SelectItem>
+
+            <SelectItem value="white">
+              <div className="flex items-center">
+                <div className="flex w-[150px] items-center">
+                  <div className="mr-2 h-5 w-5 rounded-full border-2 shadow-sm"></div>
+                  <Trans>White</Trans>
                 </div>
               </div>
             </SelectItem>
@@ -275,6 +285,7 @@ export const SignaturePad = ({
             <SelectItem value="red">
               <div className="flex items-center">
                 <div className="flex w-[150px] items-center">
+                  <div className="mr-2 h-5 w-5 rounded-full border-2 bg-red-500 shadow-sm"></div>
                   <Trans>Red</Trans>
                 </div>
               </div>
@@ -283,6 +294,7 @@ export const SignaturePad = ({
             <SelectItem value="blue">
               <div className="flex items-center">
                 <div className="flex w-[150px] items-center">
+                  <div className="mr-2 h-5 w-5 rounded-full border-2 bg-blue-500 shadow-sm"></div>
                   <Trans>Blue</Trans>
                 </div>
               </div>
@@ -291,6 +303,7 @@ export const SignaturePad = ({
             <SelectItem value="green">
               <div className="flex items-center">
                 <div className="flex w-[150px] items-center">
+                  <div className="mr-2 h-5 w-5 rounded-full border-2 bg-green-500 shadow-sm"></div>
                   <Trans>Green</Trans>
                 </div>
               </div>
