@@ -4,7 +4,13 @@ import path from 'node:path';
 
 import { getRecipientByEmail } from '@documenso/lib/server-only/recipient/get-recipient-by-email';
 import { prisma } from '@documenso/prisma';
-import { DocumentStatus, FieldType, RecipientRole, SigningStatus } from '@documenso/prisma/client';
+import {
+  DocumentSigningOrder,
+  DocumentStatus,
+  FieldType,
+  RecipientRole,
+  SigningStatus,
+} from '@documenso/prisma/client';
 import {
   seedBlankDocument,
   seedPendingDocumentWithFullFields,
@@ -629,4 +635,47 @@ test('[DOCUMENT_FLOW]: should be able to create and sign a document with 3 recip
   });
 
   expect(finalDocument?.status).toBe(DocumentStatus.COMPLETED);
+});
+
+test('[DOCUMENT_FLOW]: should prevent out-of-order signing in sequential mode', async ({
+  page,
+}) => {
+  const user = await seedUser();
+
+  const { document, recipients } = await seedPendingDocumentWithFullFields({
+    owner: user,
+    recipients: ['user1@example.com', 'user2@example.com', 'user3@example.com'],
+    fields: [FieldType.SIGNATURE],
+    recipientsCreateOptions: [{ signingOrder: 1 }, { signingOrder: 2 }, { signingOrder: 3 }],
+    updateDocumentOptions: {
+      documentMeta: {
+        create: {
+          signingOrder: DocumentSigningOrder.SEQUENTIAL,
+        },
+      },
+    },
+  });
+
+  const recipient = recipients.find((r) => r.signingOrder === 2);
+  await page.goto(`/sign/${recipient?.token}`);
+
+  await page.locator(`#field-${recipient?.Field[0].id}`).getByRole('button').click();
+
+  const canvas = page.locator('canvas#signature');
+  const box = await canvas.boundingBox();
+  if (box) {
+    await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2);
+    await page.mouse.down();
+    await page.mouse.move(box.x + box.width / 4, box.y + box.height / 4);
+    await page.mouse.up();
+  }
+
+  await page.getByRole('button', { name: 'Sign', exact: true }).click();
+  await expect(page.getByRole('button', { name: 'Complete' })).toBeDisabled();
+
+  const documentAfterAttempt = await prisma.document.findFirst({
+    where: { id: document.id },
+  });
+  expect(documentAfterAttempt?.status).toBe(DocumentStatus.PENDING);
+  expect(recipient?.signingStatus).toBe(SigningStatus.NOT_SIGNED);
 });
