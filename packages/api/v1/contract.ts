@@ -21,6 +21,7 @@ import {
   ZSendDocumentForSigningMutationSchema,
   ZSuccessfulDeleteTemplateResponseSchema,
   ZSuccessfulDocumentResponseSchema,
+  ZSuccessfulFieldCreationResponseSchema,
   ZSuccessfulFieldResponseSchema,
   ZSuccessfulGetDocumentResponseSchema,
   ZSuccessfulGetTemplateResponseSchema,
@@ -236,7 +237,7 @@ export const ApiContractV1 = c.router(
       path: '/api/v1/documents/:id/fields',
       body: ZCreateFieldMutationSchema,
       responses: {
-        200: ZSuccessfulFieldResponseSchema,
+        200: ZSuccessfulFieldCreationResponseSchema,
         400: ZUnsuccessfulResponseSchema,
         401: ZUnsuccessfulResponseSchema,
         404: ZUnsuccessfulResponseSchema,

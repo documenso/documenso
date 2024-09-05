@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
@@ -74,6 +74,7 @@ export type SignInFormProps = {
   isGoogleSSOEnabled?: boolean;
   isOIDCSSOEnabled?: boolean;
   oidcProviderLabel?: string;
+  returnTo?: string;
 };
 
 export const SignInForm = ({
@@ -82,6 +83,7 @@ export const SignInForm = ({
   isGoogleSSOEnabled,
   isOIDCSSOEnabled,
   oidcProviderLabel,
+  returnTo,
 }: SignInFormProps) => {
   const { _ } = useLingui();
   const { toast } = useToast();
@@ -99,6 +101,22 @@ export const SignInForm = ({
   const [isPasskeyLoading, setIsPasskeyLoading] = useState(false);
 
   const isPasskeyEnabled = getFlag('app_passkey');
+
+  const callbackUrl = useMemo(() => {
+    // Handle SSR
+    if (typeof window === 'undefined') {
+      return LOGIN_REDIRECT_PATH;
+    }
+
+    let url = new URL(returnTo || LOGIN_REDIRECT_PATH, window.location.origin);
+
+    // Don't allow different origins
+    if (url.origin !== window.location.origin) {
+      url = new URL(LOGIN_REDIRECT_PATH, window.location.origin);
+    }
+
+    return url.toString();
+  }, [returnTo]);
 
   const { mutateAsync: createPasskeySigninOptions } =
     trpc.auth.createPasskeySigninOptions.useMutation();
@@ -157,7 +175,7 @@ export const SignInForm = ({
 
       const result = await signIn('webauthn', {
         credential: JSON.stringify(credential),
-        callbackUrl: LOGIN_REDIRECT_PATH,
+        callbackUrl,
         redirect: false,
       });
 
@@ -210,7 +228,7 @@ export const SignInForm = ({
 
       const result = await signIn('credentials', {
         ...credentials,
-        callbackUrl: LOGIN_REDIRECT_PATH,
+        callbackUrl,
         redirect: false,
       });
 
@@ -259,7 +277,9 @@ export const SignInForm = ({
 
   const onSignInWithGoogleClick = async () => {
     try {
-      await signIn('google', { callbackUrl: LOGIN_REDIRECT_PATH });
+      await signIn('google', {
+        callbackUrl,
+      });
     } catch (err) {
       toast({
         title: _(msg`An unknown error occurred`),
@@ -273,7 +293,9 @@ export const SignInForm = ({
 
   const onSignInWithOIDCClick = async () => {
     try {
-      await signIn('oidc', { callbackUrl: LOGIN_REDIRECT_PATH });
+      await signIn('oidc', {
+        callbackUrl,
+      });
     } catch (err) {
       toast({
         title: _(msg`An unknown error occurred`),

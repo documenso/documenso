@@ -3,7 +3,7 @@ description: 'Cache or restore if necessary'
 inputs:
   node_version:
     required: false
-    default: v18.x
+    default: v20.x
 runs:
   using: 'composite'
   steps:
@@ -17,7 +17,7 @@ runs:
           **/.turbo/**
           **/dist/**
 
-        key: prod-build-${{ github.run_id }}
+        key: prod-build-${{ github.run_id }}-${{ hashFiles('package-lock.json') }}
         restore-keys: prod-build-
 
     - run: npm run build
