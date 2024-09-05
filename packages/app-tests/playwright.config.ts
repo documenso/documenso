@@ -33,13 +33,9 @@ export default defineConfig({
     trace: 'on-first-retry',
 
     video: 'retain-on-failure',
-
-    launchOptions: {
-      slowMo: 200,
-    },
   },
 
-  timeout: 120_000,
+  timeout: 30_000,
 
   /* Configure projects for major browsers */
   projects: [
