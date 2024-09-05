@@ -1050,7 +1050,8 @@ export const ApiContractV1Implementation = createNextRoute(ApiContractV1, {
 
   updateField: authenticatedMiddleware(async (args, user, team) => {
     const { id: documentId, fieldId } = args.params;
-    const { recipientId, type, pageNumber, pageWidth, pageHeight, pageX, pageY } = args.body;
+    const { recipientId, type, pageNumber, pageWidth, pageHeight, pageX, pageY, fieldMeta } =
+      args.body;
 
     const document = await getDocumentById({
       id: Number(documentId),
@@ -1112,6 +1113,7 @@ export const ApiContractV1Implementation = createNextRoute(ApiContractV1, {
       pageWidth,
       pageHeight,
       requestMetadata: extractNextApiRequestMetadata(args.req),
+      fieldMeta: fieldMeta ? ZFieldMetaSchema.parse(fieldMeta) : undefined,
     });
 
     const remappedField = {
