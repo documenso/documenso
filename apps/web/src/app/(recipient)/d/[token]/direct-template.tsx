@@ -94,7 +94,7 @@ export const DirectTemplatePageView = ({
         directTemplateExternalId = decodeURIComponent(directTemplateExternalId);
       }
 
-      const token = await createDocumentFromDirectTemplate({
+      const { token } = await createDocumentFromDirectTemplate({
         directTemplateToken,
         directTemplateExternalId,
         directRecipientName: fullName,

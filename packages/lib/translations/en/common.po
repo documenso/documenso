@@ -111,7 +111,7 @@ msgid "Advanced Options"
 msgstr "Advanced Options"
 
 #: packages/ui/primitives/document-flow/add-fields.tsx:510
-#: packages/ui/primitives/template-flow/add-template-fields.tsx:369
+#: packages/ui/primitives/template-flow/add-template-fields.tsx:370
 msgid "Advanced settings"
 msgstr "Advanced settings"
 
@@ -162,7 +162,7 @@ msgid "Character Limit"
 msgstr "Character Limit"
 
 #: packages/ui/primitives/document-flow/add-fields.tsx:932
-#: packages/ui/primitives/template-flow/add-template-fields.tsx:755
+#: packages/ui/primitives/template-flow/add-template-fields.tsx:756
 msgid "Checkbox"
 msgstr "Checkbox"
 
@@ -191,7 +191,7 @@ msgid "Configure Direct Recipient"
 msgstr "Configure Direct Recipient"
 
 #: packages/ui/primitives/document-flow/add-fields.tsx:511
-#: packages/ui/primitives/template-flow/add-template-fields.tsx:370
+#: packages/ui/primitives/template-flow/add-template-fields.tsx:371
 msgid "Configure the {0} field"
 msgstr "Configure the {0} field"
 
@@ -208,7 +208,7 @@ msgid "Custom Text"
 msgstr "Custom Text"
 
 #: packages/ui/primitives/document-flow/add-fields.tsx:828
-#: packages/ui/primitives/template-flow/add-template-fields.tsx:651
+#: packages/ui/primitives/template-flow/add-template-fields.tsx:652
 msgid "Date"
 msgstr "Date"
 
@@ -240,7 +240,7 @@ msgid "Drag & drop your PDF here."
 msgstr "Drag & drop your PDF here."
 
 #: packages/ui/primitives/document-flow/add-fields.tsx:958
-#: packages/ui/primitives/template-flow/add-template-fields.tsx:781
+#: packages/ui/primitives/template-flow/add-template-fields.tsx:782
 msgid "Dropdown"
 msgstr "Dropdown"
 
@@ -252,7 +252,7 @@ msgstr "Dropdown options"
 #: packages/ui/primitives/document-flow/add-signature.tsx:272
 #: packages/ui/primitives/document-flow/add-signers.tsx:232
 #: packages/ui/primitives/document-flow/add-signers.tsx:239
-#: packages/ui/primitives/template-flow/add-template-fields.tsx:599
+#: packages/ui/primitives/template-flow/add-template-fields.tsx:600
 #: packages/ui/primitives/template-flow/add-template-placeholder-recipients.tsx:210
 #: packages/ui/primitives/template-flow/add-template-placeholder-recipients.tsx:217
 msgid "Email"
@@ -362,7 +362,7 @@ msgstr "Min"
 #: packages/ui/primitives/document-flow/add-fields.tsx:802
 #: packages/ui/primitives/document-flow/add-signature.tsx:298
 #: packages/ui/primitives/document-flow/add-signers.tsx:265
-#: packages/ui/primitives/template-flow/add-template-fields.tsx:625
+#: packages/ui/primitives/template-flow/add-template-fields.tsx:626
 #: packages/ui/primitives/template-flow/add-template-placeholder-recipients.tsx:245
 #: packages/ui/primitives/template-flow/add-template-placeholder-recipients.tsx:251
 msgid "Name"
@@ -381,12 +381,12 @@ msgid "Needs to view"
 msgstr "Needs to view"
 
 #: packages/ui/primitives/document-flow/add-fields.tsx:613
-#: packages/ui/primitives/template-flow/add-template-fields.tsx:464
+#: packages/ui/primitives/template-flow/add-template-fields.tsx:465
 msgid "No recipient matching this description was found."
 msgstr "No recipient matching this description was found."
 
 #: packages/ui/primitives/document-flow/add-fields.tsx:629
-#: packages/ui/primitives/template-flow/add-template-fields.tsx:480
+#: packages/ui/primitives/template-flow/add-template-fields.tsx:481
 msgid "No recipients with this role"
 msgstr "No recipients with this role"
 
@@ -411,7 +411,7 @@ msgid "No value found."
 msgstr "No value found."
 
 #: packages/ui/primitives/document-flow/add-fields.tsx:880
-#: packages/ui/primitives/template-flow/add-template-fields.tsx:703
+#: packages/ui/primitives/template-flow/add-template-fields.tsx:704
 msgid "Number"
 msgstr "Number"
 
@@ -446,7 +446,7 @@ msgid "Placeholder"
 msgstr "Placeholder"
 
 #: packages/ui/primitives/document-flow/add-fields.tsx:906
-#: packages/ui/primitives/template-flow/add-template-fields.tsx:729
+#: packages/ui/primitives/template-flow/add-template-fields.tsx:730
 msgid "Radio"
 msgstr "Radio"
 
@@ -497,7 +497,7 @@ msgstr "Rows per page"
 msgid "Save"
 msgstr "Save"
 
-#: packages/ui/primitives/template-flow/add-template-fields.tsx:797
+#: packages/ui/primitives/template-flow/add-template-fields.tsx:798
 msgid "Save Template"
 msgstr "Save Template"
 
@@ -547,7 +547,7 @@ msgstr "Sign"
 #: packages/ui/primitives/document-flow/add-fields.tsx:724
 #: packages/ui/primitives/document-flow/add-signature.tsx:323
 #: packages/ui/primitives/document-flow/field-icon.tsx:52
-#: packages/ui/primitives/template-flow/add-template-fields.tsx:547
+#: packages/ui/primitives/template-flow/add-template-fields.tsx:548
 msgid "Signature"
 msgstr "Signature"
 
@@ -593,7 +593,7 @@ msgid "Template title"
 msgstr "Template title"
 
 #: packages/ui/primitives/document-flow/add-fields.tsx:854
-#: packages/ui/primitives/template-flow/add-template-fields.tsx:677
+#: packages/ui/primitives/template-flow/add-template-fields.tsx:678
 msgid "Text"
 msgstr "Text"
 
