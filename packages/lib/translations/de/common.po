@@ -140,6 +140,14 @@ msgstr "Genehmiger"
 msgid "Approving"
 msgstr "Genehmigung"
 
+#: packages/ui/primitives/signature-pad/signature-pad.tsx:276
+msgid "Black"
+msgstr ""
+
+#: packages/ui/primitives/signature-pad/signature-pad.tsx:290
+msgid "Blue"
+msgstr ""
+
 #: packages/ui/primitives/document-flow/field-item-advanced-settings.tsx:297
 #: packages/ui/primitives/document-flow/send-document-action-dialog.tsx:58
 msgid "Cancel"
@@ -179,7 +187,7 @@ msgstr "Checkbox-Werte"
 msgid "Clear filters"
 msgstr "Filter löschen"
 
-#: packages/ui/primitives/signature-pad/signature-pad.tsx:256
+#: packages/ui/primitives/signature-pad/signature-pad.tsx:310
 msgid "Clear Signature"
 msgstr "Unterschrift löschen"
 
@@ -311,6 +319,10 @@ msgstr "Globale Empfängerauthentifizierung"
 #: packages/ui/primitives/document-flow/document-flow-root.tsx:142
 msgid "Go Back"
 msgstr "Zurück"
+
+#: packages/ui/primitives/signature-pad/signature-pad.tsx:297
+msgid "Green"
+msgstr ""
 
 #: packages/lib/constants/recipient-roles.ts:72
 msgid "I am a signer of this document"
@@ -476,6 +488,10 @@ msgstr "Erhält Kopie"
 #: packages/ui/primitives/template-flow/add-template-settings.tsx:169
 msgid "Recipient action authentication"
 msgstr "Empfängeraktion Authentifizierung"
+
+#: packages/ui/primitives/signature-pad/signature-pad.tsx:283
+msgid "Red"
+msgstr ""
 
 #: packages/ui/primitives/document-flow/add-settings.tsx:298
 #: packages/ui/primitives/template-flow/add-template-settings.tsx:332
@@ -732,6 +748,10 @@ msgstr "Viewer"
 #: packages/lib/constants/recipient-roles.ts:28
 msgid "Viewing"
 msgstr "Viewing"
+
+#: packages/ui/primitives/signature-pad/signature-pad.tsx:280
+#~ msgid "White"
+#~ msgstr ""
 
 #: packages/ui/primitives/document-flow/send-document-action-dialog.tsx:44
 msgid "You are about to send this document to the recipients. Are you sure you want to continue?"
