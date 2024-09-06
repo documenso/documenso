@@ -6,6 +6,7 @@ export const APP_DOCUMENT_UPLOAD_SIZE_LIMIT =
 
 export const NEXT_PUBLIC_WEBAPP_URL = () => env('NEXT_PUBLIC_WEBAPP_URL');
 export const NEXT_PUBLIC_MARKETING_URL = () => env('NEXT_PUBLIC_MARKETING_URL');
+export const NEXT_PRIVATE_INTERNAL_WEBAPP_URL = process.env.NEXT_PRIVATE_INTERNAL_WEBAPP_URL ?? NEXT_PUBLIC_WEBAPP_URL();
 
 export const IS_APP_MARKETING = process.env.NEXT_PUBLIC_PROJECT === 'marketing';
 export const IS_APP_WEB = process.env.NEXT_PUBLIC_PROJECT === 'web';

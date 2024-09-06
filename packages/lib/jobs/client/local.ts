@@ -6,7 +6,7 @@ import { json } from 'micro';
 import { prisma } from '@documenso/prisma';
 import { BackgroundJobStatus, Prisma } from '@documenso/prisma/client';
 
-import { NEXT_PUBLIC_WEBAPP_URL } from '../../constants/app';
+import { NEXT_PRIVATE_INTERNAL_WEBAPP_URL } from '../../constants/app';
 import { sign } from '../../server-only/crypto/sign';
 import { verify } from '../../server-only/crypto/verify';
 import {
@@ -229,7 +229,7 @@ export class LocalJobProvider extends BaseJobProvider {
   }) {
     const { jobId, jobDefinitionId, data, isRetry } = options;
 
-    const endpoint = `${NEXT_PUBLIC_WEBAPP_URL()}/api/jobs/${jobDefinitionId}/${jobId}`;
+    const endpoint = `${NEXT_PRIVATE_INTERNAL_WEBAPP_URL}/api/jobs/${jobDefinitionId}/${jobId}`;
     const signature = sign(data);
 
     const headers: Record<string, string> = {
