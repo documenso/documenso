@@ -96,6 +96,25 @@ export const ApiContractV1Implementation = createNextRoute(ApiContractV1, {
         userId: user.id,
       });
 
+      const parsedMetaFields = fields.map((field) => {
+        let parsedMetaOrNull = null;
+
+        if (field.fieldMeta) {
+          const result = ZFieldMetaSchema.safeParse(field.fieldMeta);
+
+          if (!result.success) {
+            throw new Error('Field meta parsing failed for field ' + field.id);
+          }
+
+          parsedMetaOrNull = result.data;
+        }
+
+        return {
+          ...field,
+          fieldMeta: parsedMetaOrNull,
+        };
+      });
+
       return {
         status: 200,
         body: {
@@ -104,7 +123,7 @@ export const ApiContractV1Implementation = createNextRoute(ApiContractV1, {
             ...recipient,
             signingUrl: `${NEXT_PUBLIC_WEBAPP_URL()}/sign/${recipient.token}`,
           })),
-          fields,
+          fields: parsedMetaFields,
         },
       };
     } catch (err) {

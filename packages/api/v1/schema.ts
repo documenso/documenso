@@ -34,22 +34,6 @@ export const ZDeleteDocumentMutationSchema = null;
 
 export type TDeleteDocumentMutationSchema = typeof ZDeleteDocumentMutationSchema;
 
-export const ZFieldSchema = z.object({
-  id: z.number(),
-  secondaryId: z.string(),
-  documentId: z.number().nullish(),
-  templateId: z.number().nullish(),
-  recipientId: z.number(),
-  type: z.nativeEnum(FieldType),
-  page: z.number(),
-  positionX: z.unknown(),
-  positionY: z.unknown(),
-  width: z.unknown(),
-  height: z.unknown(),
-  customText: z.string(),
-  inserted: z.boolean(),
-});
-
 export const ZSuccessfulDocumentResponseSchema = z.object({
   id: z.number(),
   externalId: z.string().nullish(),
@@ -75,7 +59,11 @@ export const ZSuccessfulGetDocumentResponseSchema = ZSuccessfulDocumentResponseS
       positionY: true,
       width: true,
       height: true,
-    }).array(),
+    })
+      .extend({
+        fieldMeta: ZFieldMetaSchema.nullish(),
+      })
+      .array(),
   ),
 });
 
@@ -451,6 +439,22 @@ export const ZRecipientSchema = z.object({
   readStatus: z.nativeEnum(ReadStatus),
   signingStatus: z.nativeEnum(SigningStatus),
   sendStatus: z.nativeEnum(SendStatus),
+});
+
+export const ZFieldSchema = z.object({
+  id: z.number(),
+  secondaryId: z.string(),
+  documentId: z.number().nullish(),
+  templateId: z.number().nullish(),
+  recipientId: z.number(),
+  type: z.nativeEnum(FieldType),
+  page: z.number(),
+  positionX: z.unknown(),
+  positionY: z.unknown(),
+  width: z.unknown(),
+  height: z.unknown(),
+  customText: z.string(),
+  inserted: z.boolean(),
 });
 
 export const ZTemplateWithDataSchema = ZTemplateSchema.extend({
