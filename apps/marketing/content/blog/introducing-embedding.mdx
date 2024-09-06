@@ -9,11 +9,13 @@ tags:
   - Development
 ---
 
-When we first launched Documenso, one of the most requested features was embedding. We knew it was important and aligned with our desire to not just be a e-signing application but to instead provide the e-signature infrastructure for applications.
+When we first launched Documenso, one of the most requested features was embedding. We knew it was important and aligned with our desire to not just be a e-signing application but to instead provide the e-signature infrastructure for the web and beyond.
 
-With that said, we decided to hold off initially so we could focus on building a solid, full-featured core application. Looking back, this was definitely the right call. Embedding is only as good as the features behind it, and we didn't want to release something that wasn't ready to meet user and developer expectations.
+With that said, we decided to hold off initially so we could focus on building a solid, well-featured core application. Looking back, this was definitely the right call. Embedding is only as good as the features behind it, and we didn't want to release something that wasn't ready to meet user and developer expectations.
 
-Over the past year, we've been busy adding tons of new features and reaching new levels of compliance, like 21 CFR Part 11. We've also introduced new fields, built out an API, added webhooks, integrations with Zapier, and a lot more. Now that we've laid a solid foundation, it's finally time to focus on embedding, the top-requested feature from both our users and those self-hosting our platform.
+Over the past year, we've been busy adding tons of new features and reaching new levels of compliance, like 21 CFR Part 11. We've also introduced [new fields](/blog/introducing-advanced-signing-fields), [built out an API](/blog/public-api), [added webhooks, integrations with Zapier](/blog/launch-week-2-day-4), and a lot more.
+
+Now that we've laid a solid foundation, it's finally time to focus on embedding, the top-requested feature from both our users and those self-hosting our platform.
 
 ## Why Embedding Took Time
 
@@ -31,13 +33,13 @@ Additionally, props are passed into the iframe via the [fragment identifier](htt
 
 ### Building the Embeds with Mitosis
 
-Given that our iframe solution is quite lightweight, we saw this as a great opportunity to experiment with [Mitosis](https://mitosis.builder.io/) which would let us do something truly special. For those unfamiliar, Mitosis is a project by [Builder.io](https://builder.io/) that lets you write components once and then transpile them into a variety of frameworks like [React](https://react.dev), [Vue](https://vuejs.org), and [Svelte](https://svelte.dev).
+Given that our iframe solution is quite lightweight, we saw this as a great opportunity to experiment with [Mitosis](https://mitosis.builder.io/) which would let us do something truly special. For those unfamiliar, Mitosis is a project by Builder.io that lets you write components once and then transpile them into a variety of frameworks like React, Vue, and Svelte.
 
 We used Mitosis to build two key components: a direct template embed and a document signing embed. The direct template allows users to use a template as if it were an evergreen document—meaning that, when someone completes the template, a new document is automatically generated. This is the use case we expect most users to adopt for embedding. For more advanced workflows, we also offer a document signing embed, which can handle multi-recipient workflows and other complex scenarios intended for use in deeper, rich integrations.
 
 Mitosis allowed us to quickly target several popular frameworks, including [React](https://www.npmjs.com/package/@documenso/embed-react), [Preact](https://www.npmjs.com/package/@documenso/embed-preact), [Vue](https://www.npmjs.com/package/@documenso/embed-vue), [Svelte](https://www.npmjs.com/package/@documenso/embed-svelte), and [SolidJS](https://www.npmjs.com/package/@documenso/embed-solid).
 
-I had also hoped to include Angular, but while Mitosis makes it really easy to transpile component, we still have to take care of bundling and packaging the resulting component ourselves. While the above frameworks can all be bundled using [Vite.js](https://vitejs.dev/), Angular still has it's own set of tooling that we would need to learn and use. Given this constraint we opted to put Angular on hold for now while we wait for the newer Vite.js support to mature.
+I had also hoped to include Angular, but while Mitosis makes it really easy to transpile component, we still have to take care of bundling and packaging the resulting component ourselves. While the above frameworks can all be bundled using Vite.js, Angular still has it's own set of tooling that we would need to learn and use. Given this constraint we opted to put Angular on hold for now while we wait for the newer Vite.js support to mature.
 
 ### Challenges and Lessons with Mitosis and more
 
@@ -56,6 +58,14 @@ Over the coming months, we'll be working on enhancing our API, strengthening int
 ### Ready to Get Started?
 
 If you're ready to embed document signing into your own app or website, check out our [Embedding Documentation](https://docs.documenso.com/developers/embedding?utm_source=blog&utm_campaign=introducing-embedding) to see how easy it is to get started. You'll find everything you need to get started today!
+
+<video
+  src="/blog/introducing-embedding/embedding-demo.mp4"
+  className="aspect-video w-full"
+  autoPlay
+  loop
+  controls
+/>
 
 We're always here to help! If you have questions or need support, join our [Discord](https://documen.so/discord) or [book a demo](https://documen.so/book-a-demo). We'd love to hear how you're using Documenso or wanting to use Documenso to enhance your workflow.
 
