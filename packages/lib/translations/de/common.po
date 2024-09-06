@@ -174,7 +174,7 @@ msgstr "CC'd"
 msgid "Character Limit"
 msgstr "Zeichenbeschränkung"
 
-#: packages/ui/primitives/document-flow/add-fields.tsx:932
+#: packages/ui/primitives/document-flow/add-fields.tsx:933
 #: packages/ui/primitives/template-flow/add-template-fields.tsx:756
 msgid "Checkbox"
 msgstr "Checkbox"
@@ -220,7 +220,7 @@ msgstr "In die Zwischenablage kopiert"
 msgid "Custom Text"
 msgstr "Benutzerdefinierter Text"
 
-#: packages/ui/primitives/document-flow/add-fields.tsx:828
+#: packages/ui/primitives/document-flow/add-fields.tsx:829
 #: packages/ui/primitives/template-flow/add-template-fields.tsx:652
 msgid "Date"
 msgstr "Datum"
@@ -252,7 +252,7 @@ msgstr "Herunterladen"
 msgid "Drag & drop your PDF here."
 msgstr "Ziehen Sie Ihr PDF hierher."
 
-#: packages/ui/primitives/document-flow/add-fields.tsx:958
+#: packages/ui/primitives/document-flow/add-fields.tsx:959
 #: packages/ui/primitives/template-flow/add-template-fields.tsx:782
 msgid "Dropdown"
 msgstr "Dropdown"
@@ -261,7 +261,7 @@ msgstr "Dropdown"
 msgid "Dropdown options"
 msgstr "Dropdown-Optionen"
 
-#: packages/ui/primitives/document-flow/add-fields.tsx:776
+#: packages/ui/primitives/document-flow/add-fields.tsx:777
 #: packages/ui/primitives/document-flow/add-signature.tsx:272
 #: packages/ui/primitives/document-flow/add-signers.tsx:232
 #: packages/ui/primitives/document-flow/add-signers.tsx:239
@@ -376,7 +376,7 @@ msgstr "Nachricht <0>(Optional)</0>"
 msgid "Min"
 msgstr "Min"
 
-#: packages/ui/primitives/document-flow/add-fields.tsx:802
+#: packages/ui/primitives/document-flow/add-fields.tsx:803
 #: packages/ui/primitives/document-flow/add-signature.tsx:298
 #: packages/ui/primitives/document-flow/add-signers.tsx:265
 #: packages/ui/primitives/template-flow/add-template-fields.tsx:626
@@ -397,12 +397,12 @@ msgstr "Muss unterzeichnen"
 msgid "Needs to view"
 msgstr "Muss sehen"
 
-#: packages/ui/primitives/document-flow/add-fields.tsx:613
+#: packages/ui/primitives/document-flow/add-fields.tsx:614
 #: packages/ui/primitives/template-flow/add-template-fields.tsx:465
 msgid "No recipient matching this description was found."
 msgstr "Kein passender Empfänger mit dieser Beschreibung gefunden."
 
-#: packages/ui/primitives/document-flow/add-fields.tsx:629
+#: packages/ui/primitives/document-flow/add-fields.tsx:630
 #: packages/ui/primitives/template-flow/add-template-fields.tsx:481
 msgid "No recipients with this role"
 msgstr "Keine Empfänger mit dieser Rolle"
@@ -427,7 +427,7 @@ msgstr "Kein Unterschriftsfeld gefunden"
 msgid "No value found."
 msgstr "Kein Wert gefunden."
 
-#: packages/ui/primitives/document-flow/add-fields.tsx:880
+#: packages/ui/primitives/document-flow/add-fields.tsx:881
 #: packages/ui/primitives/template-flow/add-template-fields.tsx:704
 msgid "Number"
 msgstr "Nummer"
@@ -462,7 +462,7 @@ msgstr "Wählen Sie eine Zahl"
 msgid "Placeholder"
 msgstr "Platzhalter"
 
-#: packages/ui/primitives/document-flow/add-fields.tsx:906
+#: packages/ui/primitives/document-flow/add-fields.tsx:907
 #: packages/ui/primitives/template-flow/add-template-fields.tsx:730
 msgid "Radio"
 msgstr "Radio"
@@ -498,7 +498,7 @@ msgstr ""
 msgid "Redirect URL"
 msgstr "Weiterleitungs-URL"
 
-#: packages/ui/primitives/document-flow/add-fields.tsx:996
+#: packages/ui/primitives/document-flow/add-fields.tsx:997
 msgid "Remove"
 msgstr "Entfernen"
 
@@ -565,7 +565,7 @@ msgstr "Erweiterte Einstellungen anzeigen"
 msgid "Sign"
 msgstr "Unterschreiben"
 
-#: packages/ui/primitives/document-flow/add-fields.tsx:724
+#: packages/ui/primitives/document-flow/add-fields.tsx:725
 #: packages/ui/primitives/document-flow/add-signature.tsx:323
 #: packages/ui/primitives/document-flow/field-icon.tsx:52
 #: packages/ui/primitives/template-flow/add-template-fields.tsx:548
@@ -613,7 +613,7 @@ msgstr "Einreichen"
 msgid "Template title"
 msgstr "Vorlagentitel"
 
-#: packages/ui/primitives/document-flow/add-fields.tsx:854
+#: packages/ui/primitives/document-flow/add-fields.tsx:855
 #: packages/ui/primitives/template-flow/add-template-fields.tsx:678
 msgid "Text"
 msgstr "Text"
@@ -674,7 +674,7 @@ msgstr "Der Name des Unterzeichners"
 msgid "This can be overriden by setting the authentication requirements directly on each recipient in the next step."
 msgstr "Dies kann überschrieben werden, indem die Authentifizierungsanforderungen im nächsten Schritt direkt für jeden Empfänger festgelegt werden."
 
-#: packages/ui/primitives/document-flow/add-fields.tsx:685
+#: packages/ui/primitives/document-flow/add-fields.tsx:686
 msgid "This document has already been sent to this recipient. You can no longer edit this recipient."
 msgstr "Dieses Dokument wurde bereits an diesen Empfänger gesendet. Sie können diesen Empfänger nicht mehr bearbeiten."
 
@@ -703,7 +703,7 @@ msgstr "Zeitzone"
 msgid "Title"
 msgstr "Titel"
 
-#: packages/ui/primitives/document-flow/add-fields.tsx:971
+#: packages/ui/primitives/document-flow/add-fields.tsx:972
 msgid "To proceed further, please set at least one value for the {0} field."
 msgstr "Um fortzufahren, legen Sie bitte mindestens einen Wert für das Feld {0} fest."
 

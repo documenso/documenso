@@ -572,6 +572,7 @@ export const AddFieldsFormPartial = ({
                         handleAdvancedSettings();
                       }}
                       hideRecipients={hideRecipients}
+                      hasErrors={hasErrors}
                     />
                   );
                 })}
