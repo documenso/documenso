@@ -247,7 +247,13 @@ export const SignaturePad = ({
     >
       <canvas
         ref={$el}
-        className={cn('relative block', className)}
+        className={cn(
+          'relative block',
+          {
+            'dark:hue-rotate-180 dark:invert': selectedColor === 'black',
+          },
+          className,
+        )}
         style={{ touchAction: 'none' }}
         onPointerMove={(event) => onMouseMove(event)}
         onPointerDown={(event) => onMouseDown(event)}
@@ -257,55 +263,38 @@ export const SignaturePad = ({
         {...props}
       />
 
-      <div className="absolute right-2 top-2">
-        <Select onValueChange={(value) => setSelectedColor(value)}>
-          <SelectTrigger className="bg-background w-[90px]">
-            <SelectValue placeholder="Color" />
+      <div className="text-foreground absolute right-2 top-2 filter">
+        <Select defaultValue={selectedColor} onValueChange={(value) => setSelectedColor(value)}>
+          <SelectTrigger className="h-auto w-auto border-none p-1">
+            <SelectValue placeholder="" />
           </SelectTrigger>
 
-          <SelectContent align="end">
+          <SelectContent className="w-[150px]" align="end">
             <SelectItem value="black">
-              <div className="flex items-center">
-                <div className="flex w-[150px] items-center">
-                  <div className="mr-2 h-5 w-5 rounded-full border-2 bg-black shadow-sm"></div>
-                  <Trans>Black</Trans>
-                </div>
-              </div>
-            </SelectItem>
-
-            <SelectItem value="white">
-              <div className="flex items-center">
-                <div className="flex w-[150px] items-center">
-                  <div className="mr-2 h-5 w-5 rounded-full border-2 shadow-sm"></div>
-                  <Trans>White</Trans>
-                </div>
+              <div className="text-muted-foreground flex items-center px-1 text-sm">
+                <div className="border-border mr-2 h-5 w-5 rounded-full border-2 bg-black shadow-sm" />
+                <Trans>Black</Trans>
               </div>
             </SelectItem>
 
             <SelectItem value="red">
-              <div className="flex items-center">
-                <div className="flex w-[150px] items-center">
-                  <div className="mr-2 h-5 w-5 rounded-full border-2 bg-red-500 shadow-sm"></div>
-                  <Trans>Red</Trans>
-                </div>
+              <div className="text-muted-foreground flex items-center px-1 text-sm">
+                <div className="border-border mr-2 h-5 w-5 rounded-full border-2 bg-[red] shadow-sm" />
+                <Trans>Red</Trans>
               </div>
             </SelectItem>
 
             <SelectItem value="blue">
-              <div className="flex items-center">
-                <div className="flex w-[150px] items-center">
-                  <div className="mr-2 h-5 w-5 rounded-full border-2 bg-blue-500 shadow-sm"></div>
-                  <Trans>Blue</Trans>
-                </div>
+              <div className="text-muted-foreground flex items-center px-1 text-sm">
+                <div className="border-border mr-2 h-5 w-5 rounded-full border-2 bg-[blue] shadow-sm" />
+                <Trans>Blue</Trans>
               </div>
             </SelectItem>
 
             <SelectItem value="green">
-              <div className="flex items-center">
-                <div className="flex w-[150px] items-center">
-                  <div className="mr-2 h-5 w-5 rounded-full border-2 bg-green-500 shadow-sm"></div>
-                  <Trans>Green</Trans>
-                </div>
+              <div className="text-muted-foreground flex items-center px-1 text-sm">
+                <div className="border-border mr-2 h-5 w-5 rounded-full border-2 bg-[green] shadow-sm" />
+                <Trans>Green</Trans>
               </div>
             </SelectItem>
           </SelectContent>
