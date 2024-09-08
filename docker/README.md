@@ -74,6 +74,7 @@ docker run -d \
   -e NEXT_PRIVATE_ENCRYPTION_KEY="<your-next-private-encryption-key>"
   -e NEXT_PRIVATE_ENCRYPTION_SECONDARY_KEY="<your-next-private-encryption-secondary-key>"
   -e NEXT_PUBLIC_WEBAPP_URL="<your-next-public-webapp-url>"
+  -e NEXT_PRIVATE_INTERNAL_WEBAPP_URL="http://localhost:3000"
   -e NEXT_PRIVATE_DATABASE_URL="<your-next-private-database-url>"
   -e NEXT_PRIVATE_DIRECT_DATABASE_URL="<your-next-private-database-url>"
   -e NEXT_PRIVATE_SMTP_TRANSPORT="<your-next-private-smtp-transport>"

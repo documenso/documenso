@@ -1,0 +1,72 @@
+---
+title: 'Introducing Embedding Support for Documenso'
+description: 'Embedding is now here! Learn how we built it and how it can be used to bring e-signing to your own applications.'
+authorName: 'Lucas Smith'
+authorImage: '/blog/blog-author-lucas.png'
+authorRole: 'Co-Founder'
+date: 2024-09-06
+tags:
+  - Development
+---
+
+When we first launched Documenso, one of the most requested features was embedding. We knew it was important and aligned with our desire to not just be a e-signing application but to instead provide the e-signature infrastructure for the web and beyond.
+
+With that said, we decided to hold off initially so we could focus on building a solid, well-featured core application. Looking back, this was definitely the right call. Embedding is only as good as the features behind it, and we didn't want to release something that wasn't ready to meet user and developer expectations.
+
+Over the past year, we've been busy adding tons of new features and reaching new levels of compliance, like 21 CFR Part 11. We've also introduced [new fields](/blog/introducing-advanced-signing-fields), [built out an API](/blog/public-api), [added webhooks, integrations with Zapier](/blog/launch-week-2-day-4), and a lot more.
+
+Now that we've laid a solid foundation, it's finally time to focus on embedding, the top-requested feature from both our users and those self-hosting our platform.
+
+## Why Embedding Took Time
+
+In previous projects, I’ve often seen embedding built by bundling components for use in a client’s website or app. This method gives users maximum flexibility for styling and behavior, while avoiding certain cross-origin issues. However, it can also introduce problems like code conflicts or performance bottlenecks. For example, third-party tools such as Google Tag Manager (GTM) or other marketing scripts can interfere with your SDK. Additionally, the SDK must remain lightweight to avoid slowing down the client’s page.
+
+For Documenso, we decided to explore a different approach. After carefully researching our options, we opted for an iframe-based solution. While iframes are typically less flexible—especially when it comes to theming or passing pre-filled data containing personally identifiable information (PII)—we identified ways to mitigate these concerns.
+
+One of the biggest challenges was ensuring that we could pass sensitive data, like emails for pre-filling forms, without exposing PII to our server. To solve this, we used [fragment identifiers](https://developer.mozilla.org/en-US/docs/Web/API/URL/hash) in the URL, which are processed client-side and never sent in network requests. This method ensures that PII is protected and not logged by our server or any intermediate web services.
+
+### Using the PostMessage API for Communication
+
+To maintain a high level of interactivity, our iframes communicate with the parent window using the [postMessage API](https://developer.mozilla.org/en-US/docs/Web/API/Window/postMessage). This allows us to notify the parent app when specific events occur inside the iframe, creating a more dynamic user experience and bridging the gap between our iframe-based solution and typical fat SDKs.
+
+Additionally, props are passed into the iframe via the [fragment identifier](https://developer.mozilla.org/en-US/docs/Web/API/URL/hash) of the URL. This avoids the need for complex two-way data synchronization between the parent and child frames, making the system stable and more reliable.
+
+### Building the Embeds with Mitosis
+
+Given that our iframe solution is quite lightweight, we saw this as a great opportunity to experiment with [Mitosis](https://mitosis.builder.io/) which would let us do something truly special. For those unfamiliar, Mitosis is a project by Builder.io that lets you write components once and then transpile them into a variety of frameworks like React, Vue, and Svelte.
+
+We used Mitosis to build two key components: a direct template embed and a document signing embed. The direct template allows users to use a template as if it were an evergreen document—meaning that, when someone completes the template, a new document is automatically generated. This is the use case we expect most users to adopt for embedding. For more advanced workflows, we also offer a document signing embed, which can handle multi-recipient workflows and other complex scenarios intended for use in deeper, rich integrations.
+
+Mitosis allowed us to quickly target several popular frameworks, including [React](https://www.npmjs.com/package/@documenso/embed-react), [Preact](https://www.npmjs.com/package/@documenso/embed-preact), [Vue](https://www.npmjs.com/package/@documenso/embed-vue), [Svelte](https://www.npmjs.com/package/@documenso/embed-svelte), and [SolidJS](https://www.npmjs.com/package/@documenso/embed-solid).
+
+I had also hoped to include Angular, but while Mitosis makes it really easy to transpile component, we still have to take care of bundling and packaging the resulting component ourselves. While the above frameworks can all be bundled using Vite.js, Angular still has it's own set of tooling that we would need to learn and use. Given this constraint we opted to put Angular on hold for now while we wait for the newer Vite.js support to mature.
+
+### Challenges and Lessons with Mitosis and more
+
+While our experience with Mitosis was largely positive, there were some challenges along the way. For instance, certain state properties with the same names as props caused issues during the transpilation process, leading to type errors and unexpected transpilation results with some targets.
+
+This was also a challenge since our initial implementation of the two components had some minor separation of concerns which also resulted in some transpilation issues with some targets. We addressed this by removing the separation of concerns for now since it was mostly for show rather than out of necessity.
+
+On top of that, packaging and publishing the embeds posed its own set of challenges, particularly given the growing complexity of JavaScript package management. Tools like [Publint](https://www.npmjs.com/package/publint) helped streamline the process by ensuring we followed best practices for both CommonJS and ESM formats.
+
+### To the Future, The Documenso Platform
+
+With the embedding feature now in place, we're excited to continue expanding Documenso's capabilities. Embeds are just the beginning of what we're calling the Documenso platform. Through our user research, we've learned that while many businesses appreciate having a flexible e-signature solution, they're even more interested in using our tools to build signing functionality directly into their own apps—without worrying about the technical complexities of compliance and security that come with e-signing.
+
+Over the coming months, we'll be working on enhancing our API, strengthening integrations with tools like Zapier, and improving our webhook system. Our goal is to give users the ability to embed e-signatures and document management wherever they need it, whether that's through self-hosting or by using Documenso as a platform. We can't wait to see how our users and self-hosters leverage these new capabilities!
+
+### Ready to Get Started?
+
+If you're ready to embed document signing into your own app or website, check out our [Embedding Documentation](https://docs.documenso.com/developers/embedding?utm_source=blog&utm_campaign=introducing-embedding) to see how easy it is to get started. You'll find everything you need to get started today!
+
+<video
+  src="/blog/introducing-embedding/embedding-demo.mp4"
+  className="aspect-video w-full"
+  autoPlay
+  loop
+  controls
+/>
+
+We're always here to help! If you have questions or need support, join our [Discord](https://documen.so/discord) or [book a demo](https://documen.so/book-a-demo). We'd love to hear how you're using Documenso or wanting to use Documenso to enhance your workflow.
+
+Stay tuned for more updates as we continue to evolve the Documenso platform and make it even easier to bring document signing into your workflows.
