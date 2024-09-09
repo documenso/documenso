@@ -1,6 +1,6 @@
 {
   "name": "@documenso/marketing",
-  "version": "1.7.0-rc.5",
+  "version": "1.7.0",
   "private": true,
   "license": "AGPL-3.0",
   "scripts": {

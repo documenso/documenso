@@ -8,6 +8,80 @@ Check out what's new in the latest version and read our thoughts on it. For more
 
 ---
 
+# Documenso v1.7.0: Embedded Signing, Copy and Paste, and More
+
+We're thrilled to announce the release of Documenso v1.7.0, packed with exciting new features and improvements that enhance document signing flexibility, user experience, and global accessibility.
+
+We're excited to see what you'll create with this release and we'd love to hear your feedback. Let's dive into the highlights:
+
+## 🌟 Key Features
+
+### Embedded Signing Experience
+
+Take your document signing to the next level with our new embedded signing feature. Now you can seamlessly integrate Documenso's signing process directly into your own website or application, providing a smooth, branded experience for your users.
+
+<video
+  src="/blog/introducing-embedding/embedding-demo.mp4"
+  className="aspect-video w-full"
+  controls
+/>
+
+Check out our [Embedding documentation](https://docs.documenso.com/developers/embedding) to learn more about how to get started.
+
+### Copy and Paste Fields
+
+Streamline your document preparation with our new copy and paste functionality for fields. This feature allows you to quickly duplicate fields across your document, saving time and ensuring consistency in your templates.
+
+### Customizable Signature Colors
+
+Recipients can now select a signature color from our list of available colors, supporting workflows where specific colors are required for each recipient, location, or document.
+
+### Enhanced Internationalization (i18n)
+
+Following on from our last release we've now expanded our i18n support to the main web application. We haven't yet added support for any additional languages but that will be coming quickly now that we have completed the hard work of wrapping all of our content in our new i18n system.
+
+These enhancements make Documenso more accessible to users worldwide.
+
+## 🔧 Other Improvements
+
+- **API Enhancements**:
+
+  - New endpoint to prefill fields via API
+  - Updated createFields API endpoint for more flexibility
+  - Automatically set public profile URL for OIDC users
+
+- **Security and Performance**:
+
+  - Document sealing moved to a background job for improved performance
+  - Disable 2FA with backup codes for enhanced account recovery options
+  - Extended lifespan for invites and confirmations
+
+- **User Experience**:
+
+  - Updated email templates to reflect team-specific information
+  - Fixed issues with dialog closing on page refresh
+  - Improved field editing in document templates
+
+- **Other Items**:
+  - Added Elestio as a one-click deploy option
+  - Updated README for manual self-hosting
+  - New environment variable for internal webapp URL configuration
+
+## 📚 New Content
+
+- [Advanced fields article to help you make the most of Documenso's capabilities](/blog/introducing-advanced-signing-fields)
+- [Embedding blog post to guide you through how we implemented embedding](/blog/introducing-embedding)
+
+## 👏 Community Contributions
+
+A big thank you to our vibrant community! This release includes contributions from several new contributors, further enriching Documenso's capabilities.
+
+We're excited to see how you'll use these new features to streamline your document workflows. As always, we appreciate your feedback and support in making Documenso the best open-source document signing solution available.
+
+Enjoy exploring v1.7.0!
+
+---
+
 # Documenso v1.6.1: Internationalization, Enhanced OIDC, and More
 
 We're excited to announce the release of Documenso v1.6.1, which brings several improvements to enhance your document signing experience. Here are the key updates:
