@@ -179,7 +179,7 @@ export const DropdownField = ({
 
         {!field.inserted && (
           <p className="group-hover:text-primary text-muted-foreground flex flex-col items-center justify-center duration-200">
-            <Select value={parsedFieldMeta.defaultValue} onValueChange={handleSelectItem}>
+            <Select value={localChoice} onValueChange={handleSelectItem}>
               <SelectTrigger
                 className={cn(
                   'text-muted-foreground z-10 h-full w-full border-none ring-0 focus:ring-0',
