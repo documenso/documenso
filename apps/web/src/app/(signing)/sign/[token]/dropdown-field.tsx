@@ -127,7 +127,7 @@ export const DropdownField = ({
         await removeSignedFieldWithToken(payload);
       }
 
-      setLocalChoice(parsedFieldMeta.defaultValue ?? '');
+      setLocalChoice('');
       startTransition(() => router.refresh());
     } catch (err) {
       console.error(err);
@@ -189,7 +189,7 @@ export const DropdownField = ({
                   },
                 )}
               >
-                <SelectValue placeholder={`-- ${_(msg`Select`)} --`} />
+                <SelectValue placeholder={`${_(msg`Select`)}`} />
               </SelectTrigger>
               <SelectContent className="w-full ring-0 focus:ring-0" position="popper">
                 {parsedFieldMeta?.values?.map((item, index) => (
