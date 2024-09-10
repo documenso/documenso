@@ -143,7 +143,7 @@ msgstr "Black"
 msgid "Blue"
 msgstr "Blue"
 
-#: packages/ui/primitives/document-flow/field-item-advanced-settings.tsx:297
+#: packages/ui/primitives/document-flow/field-item-advanced-settings.tsx:287
 #: packages/ui/primitives/document-flow/send-document-action-dialog.tsx:58
 msgid "Cancel"
 msgstr "Cancel"
@@ -278,7 +278,7 @@ msgstr "Enable Direct Link Signing"
 msgid "Enter password"
 msgstr "Enter password"
 
-#: packages/ui/primitives/document-flow/field-item-advanced-settings.tsx:226
+#: packages/ui/primitives/document-flow/field-item-advanced-settings.tsx:216
 msgid "Error"
 msgstr "Error"
 
@@ -287,7 +287,7 @@ msgstr "Error"
 msgid "External ID"
 msgstr "External ID"
 
-#: packages/ui/primitives/document-flow/field-item-advanced-settings.tsx:227
+#: packages/ui/primitives/document-flow/field-item-advanced-settings.tsx:217
 msgid "Failed to save settings."
 msgstr "Failed to save settings."
 
@@ -509,7 +509,7 @@ msgstr "Required field"
 msgid "Rows per page"
 msgstr "Rows per page"
 
-#: packages/ui/primitives/document-flow/field-item-advanced-settings.tsx:296
+#: packages/ui/primitives/document-flow/field-item-advanced-settings.tsx:286
 msgid "Save"
 msgstr "Save"
 
