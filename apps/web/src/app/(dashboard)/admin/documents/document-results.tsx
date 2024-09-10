@@ -21,12 +21,11 @@ import { Input } from '@documenso/ui/primitives/input';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@documenso/ui/primitives/tooltip';
 
 import { DocumentStatus } from '~/components/formatter/document-status';
-import { LocaleDate } from '~/components/formatter/locale-date';
 
 // export type AdminDocumentResultsProps = {};
 
 export const AdminDocumentResults = () => {
-  const { _ } = useLingui();
+  const { _, i18n } = useLingui();
 
   const searchParams = useSearchParams();
 
@@ -62,7 +61,7 @@ export const AdminDocumentResults = () => {
       {
         header: _(msg`Created`),
         accessorKey: 'createdAt',
-        cell: ({ row }) => <LocaleDate date={row.original.createdAt} />,
+        cell: ({ row }) => i18n.date(row.original.createdAt),
       },
       {
         header: _(msg`Title`),
@@ -122,7 +121,7 @@ export const AdminDocumentResults = () => {
       {
         header: 'Last updated',
         accessorKey: 'updatedAt',
-        cell: ({ row }) => <LocaleDate date={row.original.updatedAt} />,
+        cell: ({ row }) => i18n.date(row.original.updatedAt),
       },
     ] satisfies DataTableColumnDef<(typeof results)['data'][number]>[];
   }, []);
