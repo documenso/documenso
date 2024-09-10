@@ -127,7 +127,7 @@ export const DropdownField = ({
         await removeSignedFieldWithToken(payload);
       }
 
-      setLocalChoice(parsedFieldMeta.defaultValue ?? '');
+      setLocalChoice('');
       startTransition(() => router.refresh());
     } catch (err) {
       console.error(err);
@@ -179,7 +179,7 @@ export const DropdownField = ({
 
         {!field.inserted && (
           <p className="group-hover:text-primary text-muted-foreground flex flex-col items-center justify-center duration-200">
-            <Select value={parsedFieldMeta.defaultValue} onValueChange={handleSelectItem}>
+            <Select value={localChoice} onValueChange={handleSelectItem}>
               <SelectTrigger
                 className={cn(
                   'text-muted-foreground z-10 h-full w-full border-none ring-0 focus:ring-0',
@@ -189,7 +189,7 @@ export const DropdownField = ({
                   },
                 )}
               >
-                <SelectValue placeholder={`-- ${_(msg`Select`)} --`} />
+                <SelectValue placeholder={`${_(msg`Select`)}`} />
               </SelectTrigger>
               <SelectContent className="w-full ring-0 focus:ring-0" position="popper">
                 {parsedFieldMeta?.values?.map((item, index) => (
