@@ -155,17 +155,7 @@ export const FieldAdvancedSettings = forwardRef<HTMLDivElement, FieldAdvancedSet
 
     const doesFieldExist = (!!document || !!template) && field.nativeId !== undefined;
 
-    const { data: fieldData } = trpc.field.getField.useQuery(
-      {
-        fieldId: Number(field.nativeId),
-        teamId,
-      },
-      {
-        enabled: doesFieldExist,
-      },
-    );
-
-    const fieldMeta = fieldData?.fieldMeta;
+    const fieldMeta = field?.fieldMeta;
 
     const localStorageKey = `field_${field.formId}_${field.type}`;
 
