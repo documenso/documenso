@@ -1,9 +1,16 @@
+import { isUserEnterprise } from '@documenso/ee/server-only/util/is-document-enterprise';
 import { prisma } from '@documenso/prisma';
 import type { RecipientRole, Team } from '@documenso/prisma/client';
 
+import { AppError, AppErrorCode } from '../../errors/app-error';
 import { DOCUMENT_AUDIT_LOG_TYPE } from '../../types/document-audit-logs';
+import {
+  type TRecipientActionAuthTypes,
+  ZRecipientAuthOptionsSchema,
+} from '../../types/document-auth';
 import type { RequestMetadata } from '../../universal/extract-request-metadata';
 import { createDocumentAuditLogData, diffRecipientChanges } from '../../utils/document-audit-logs';
+import { createRecipientAuthOptions } from '../../utils/document-auth';
 
 export type UpdateRecipientOptions = {
   documentId: number;
@@ -11,6 +18,7 @@ export type UpdateRecipientOptions = {
   email?: string;
   name?: string;
   role?: RecipientRole;
+  actionAuth?: TRecipientActionAuthTypes | null;
   userId: number;
   teamId?: number;
   requestMetadata?: RequestMetadata;
@@ -22,6 +30,7 @@ export const updateRecipient = async ({
   email,
   name,
   role,
+  actionAuth,
   userId,
   teamId,
   requestMetadata,
@@ -47,6 +56,9 @@ export const updateRecipient = async ({
               teamId: null,
             }),
       },
+    },
+    include: {
+      Document: true,
     },
   });
 
@@ -75,6 +87,22 @@ export const updateRecipient = async ({
     throw new Error('Recipient not found');
   }
 
+  if (actionAuth) {
+    const isDocumentEnterprise = await isUserEnterprise({
+      userId,
+      teamId,
+    });
+
+    if (!isDocumentEnterprise) {
+      throw new AppError(
+        AppErrorCode.UNAUTHORIZED,
+        'You do not have permission to set the action auth',
+      );
+    }
+  }
+
+  const recipientAuthOptions = ZRecipientAuthOptionsSchema.parse(recipient.authOptions);
+
   const updatedRecipient = await prisma.$transaction(async (tx) => {
     const persisted = await prisma.recipient.update({
       where: {
@@ -84,6 +112,10 @@ export const updateRecipient = async ({
         email: email?.toLowerCase() ?? recipient.email,
         name: name ?? recipient.name,
         role: role ?? recipient.role,
+        authOptions: createRecipientAuthOptions({
+          accessAuth: recipientAuthOptions.accessAuth,
+          actionAuth: actionAuth ?? null,
+        }),
       },
     });
 
