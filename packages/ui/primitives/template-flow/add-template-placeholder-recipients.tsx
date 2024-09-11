@@ -213,8 +213,6 @@ export const AddTemplatePlaceholderRecipientsFormPartial = ({
     try {
       const currentSigner = form.getValues(`signers.${index}`);
 
-      console.log('currentSigner', currentSigner);
-
       if (!currentSigner.email) {
         return;
       }

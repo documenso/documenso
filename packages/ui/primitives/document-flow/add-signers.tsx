@@ -199,7 +199,11 @@ export const AddSignersFormPartial = ({
     });
   };
 
-  /* TODO: Add self-signer to db on blur */
+  /*
+    The self-signer is automatically saved on blur
+    since the email input is focused after adding the self-signer.
+    When the user clicks outside the input, the self-signer is saved in the db.
+  */
   const onAddSelfSigner = () => {
     if (emptySignerIndex !== -1) {
       setValue(`signers.${emptySignerIndex}.name`, user?.name ?? '');

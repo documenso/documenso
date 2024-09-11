@@ -77,19 +77,19 @@ msgstr "Add another option"
 msgid "Add another value"
 msgstr "Add another value"
 
-#: packages/ui/primitives/document-flow/add-signers.tsx:455
+#: packages/ui/primitives/document-flow/add-signers.tsx:459
 msgid "Add myself"
 msgstr "Add myself"
 
-#: packages/ui/primitives/template-flow/add-template-placeholder-recipients.tsx:452
+#: packages/ui/primitives/template-flow/add-template-placeholder-recipients.tsx:450
 msgid "Add Myself"
 msgstr "Add Myself"
 
-#: packages/ui/primitives/template-flow/add-template-placeholder-recipients.tsx:438
+#: packages/ui/primitives/template-flow/add-template-placeholder-recipients.tsx:436
 msgid "Add Placeholder Recipient"
 msgstr "Add Placeholder Recipient"
 
-#: packages/ui/primitives/document-flow/add-signers.tsx:444
+#: packages/ui/primitives/document-flow/add-signers.tsx:448
 msgid "Add Signer"
 msgstr "Add Signer"
 
@@ -225,7 +225,7 @@ msgstr "Date"
 msgid "Date Format"
 msgstr "Date Format"
 
-#: packages/ui/primitives/template-flow/add-template-placeholder-recipients.tsx:395
+#: packages/ui/primitives/template-flow/add-template-placeholder-recipients.tsx:393
 msgid "Direct link receiver"
 msgstr "Direct link receiver"
 
@@ -258,11 +258,11 @@ msgstr "Dropdown options"
 
 #: packages/ui/primitives/document-flow/add-fields.tsx:776
 #: packages/ui/primitives/document-flow/add-signature.tsx:272
-#: packages/ui/primitives/document-flow/add-signers.tsx:326
-#: packages/ui/primitives/document-flow/add-signers.tsx:333
+#: packages/ui/primitives/document-flow/add-signers.tsx:330
+#: packages/ui/primitives/document-flow/add-signers.tsx:337
 #: packages/ui/primitives/template-flow/add-template-fields.tsx:632
-#: packages/ui/primitives/template-flow/add-template-placeholder-recipients.tsx:298
-#: packages/ui/primitives/template-flow/add-template-placeholder-recipients.tsx:305
+#: packages/ui/primitives/template-flow/add-template-placeholder-recipients.tsx:296
+#: packages/ui/primitives/template-flow/add-template-placeholder-recipients.tsx:303
 msgid "Email"
 msgstr "Email"
 
@@ -373,10 +373,10 @@ msgstr "Min"
 
 #: packages/ui/primitives/document-flow/add-fields.tsx:802
 #: packages/ui/primitives/document-flow/add-signature.tsx:298
-#: packages/ui/primitives/document-flow/add-signers.tsx:360
+#: packages/ui/primitives/document-flow/add-signers.tsx:364
 #: packages/ui/primitives/template-flow/add-template-fields.tsx:658
-#: packages/ui/primitives/template-flow/add-template-placeholder-recipients.tsx:329
-#: packages/ui/primitives/template-flow/add-template-placeholder-recipients.tsx:335
+#: packages/ui/primitives/template-flow/add-template-placeholder-recipients.tsx:327
+#: packages/ui/primitives/template-flow/add-template-placeholder-recipients.tsx:333
 msgid "Name"
 msgstr "Name"
 
@@ -555,8 +555,8 @@ msgstr "Share Signature Card"
 msgid "Share the Link"
 msgstr "Share the Link"
 
-#: packages/ui/primitives/document-flow/add-signers.tsx:473
-#: packages/ui/primitives/template-flow/add-template-placeholder-recipients.tsx:470
+#: packages/ui/primitives/document-flow/add-signers.tsx:477
+#: packages/ui/primitives/template-flow/add-template-placeholder-recipients.tsx:468
 msgid "Show advanced settings"
 msgstr "Show advanced settings"
 
@@ -681,7 +681,7 @@ msgstr "This document has already been sent to this recipient. You can no longer
 msgid "This document is password protected. Please enter the password to view the document."
 msgstr "This document is password protected. Please enter the password to view the document."
 
-#: packages/ui/primitives/template-flow/add-template-placeholder-recipients.tsx:398
+#: packages/ui/primitives/template-flow/add-template-placeholder-recipients.tsx:396
 msgid "This field cannot be modified or deleted. When you share this template's direct link or add it to your public profile, anyone who accesses it can input their name and email, and fill in the fields assigned to them."
 msgstr "This field cannot be modified or deleted. When you share this template's direct link or add it to your public profile, anyone who accesses it can input their name and email, and fill in the fields assigned to them."
 
