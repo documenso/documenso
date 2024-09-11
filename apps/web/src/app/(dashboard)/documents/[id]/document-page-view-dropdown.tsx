@@ -4,6 +4,8 @@ import { useState } from 'react';
 
 import Link from 'next/link';
 
+import { Trans, msg } from '@lingui/macro';
+import { useLingui } from '@lingui/react';
 import {
   Copy,
   Download,
@@ -47,6 +49,7 @@ export type DocumentPageViewDropdownProps = {
 export const DocumentPageViewDropdown = ({ document, team }: DocumentPageViewDropdownProps) => {
   const { data: session } = useSession();
   const { toast } = useToast();
+  const { _ } = useLingui();
 
   const [isDeleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [isDuplicateDialogOpen, setDuplicateDialogOpen] = useState(false);
@@ -82,8 +85,8 @@ export const DocumentPageViewDropdown = ({ document, team }: DocumentPageViewDro
       await downloadPDF({ documentData, fileName: document.title });
     } catch (err) {
       toast({
-        title: 'Something went wrong',
-        description: 'An error occurred while downloading your document.',
+        title: _(msg`Something went wrong`),
+        description: _(msg`An error occurred while downloading your document.`),
         variant: 'destructive',
       });
     }
@@ -98,13 +101,15 @@ export const DocumentPageViewDropdown = ({ document, team }: DocumentPageViewDro
       </DropdownMenuTrigger>
 
       <DropdownMenuContent className="w-52" align="end" forceMount>
-        <DropdownMenuLabel>Action</DropdownMenuLabel>
+        <DropdownMenuLabel>
+          <Trans>Action</Trans>
+        </DropdownMenuLabel>
 
         {(isOwner || isCurrentTeamDocument) && !isComplete && (
           <DropdownMenuItem asChild>
             <Link href={`${documentsPath}/${document.id}/edit`}>
               <Edit className="mr-2 h-4 w-4" />
-              Edit
+              <Trans>Edit</Trans>
             </Link>
           </DropdownMenuItem>
         )}
@@ -112,20 +117,20 @@ export const DocumentPageViewDropdown = ({ document, team }: DocumentPageViewDro
         {isComplete && (
           <DropdownMenuItem onClick={onDownloadClick}>
             <Download className="mr-2 h-4 w-4" />
-            Download
+            <Trans>Download</Trans>
           </DropdownMenuItem>
         )}
 
         <DropdownMenuItem asChild>
           <Link href={`${documentsPath}/${document.id}/logs`}>
             <ScrollTextIcon className="mr-2 h-4 w-4" />
-            Audit Log
+            <Trans>Audit Log</Trans>
           </Link>
         </DropdownMenuItem>
 
         <DropdownMenuItem onClick={() => setDuplicateDialogOpen(true)}>
           <Copy className="mr-2 h-4 w-4" />
-          Duplicate
+          <Trans>Duplicate</Trans>
         </DropdownMenuItem>
 
         <DropdownMenuItem
@@ -133,10 +138,12 @@ export const DocumentPageViewDropdown = ({ document, team }: DocumentPageViewDro
           disabled={Boolean(!canManageDocument && team?.teamEmail) || isDeleted}
         >
           <Trash2 className="mr-2 h-4 w-4" />
-          Delete
+          <Trans>Delete</Trans>
         </DropdownMenuItem>
 
-        <DropdownMenuLabel>Share</DropdownMenuLabel>
+        <DropdownMenuLabel>
+          <Trans>Share</Trans>
+        </DropdownMenuLabel>
 
         <ResendDocumentActionItem
           document={document}
@@ -151,7 +158,7 @@ export const DocumentPageViewDropdown = ({ document, team }: DocumentPageViewDro
             <DropdownMenuItem disabled={disabled || isDraft} onSelect={(e) => e.preventDefault()}>
               <div className="flex items-center">
                 {loading ? <Loader className="mr-2 h-4 w-4" /> : <Share className="mr-2 h-4 w-4" />}
-                Share Signing Card
+                <Trans>Share Signing Card</Trans>
               </div>
             </DropdownMenuItem>
           )}

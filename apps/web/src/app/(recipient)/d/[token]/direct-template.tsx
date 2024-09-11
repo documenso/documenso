@@ -4,7 +4,10 @@ import { useState } from 'react';
 
 import { useRouter, useSearchParams } from 'next/navigation';
 
-import { RECIPIENT_ROLES_DESCRIPTION } from '@documenso/lib/constants/recipient-roles';
+import { msg } from '@lingui/macro';
+import { useLingui } from '@lingui/react';
+
+import { RECIPIENT_ROLES_DESCRIPTION_ENG } from '@documenso/lib/constants/recipient-roles';
 import type { Field } from '@documenso/prisma/client';
 import { type Recipient } from '@documenso/prisma/client';
 import type { TemplateWithDetails } from '@documenso/prisma/types/template';
@@ -41,6 +44,7 @@ export const DirectTemplatePageView = ({
   const router = useRouter();
   const searchParams = useSearchParams();
 
+  const { _ } = useLingui();
   const { toast } = useToast();
 
   const { email, fullName, setEmail } = useRequiredSigningContext();
@@ -49,17 +53,18 @@ export const DirectTemplatePageView = ({
   const [step, setStep] = useState<DirectTemplateStep>('configure');
   const [isDocumentPdfLoaded, setIsDocumentPdfLoaded] = useState(false);
 
-  const recipientRoleDescription = RECIPIENT_ROLES_DESCRIPTION[directTemplateRecipient.role];
+  const recipientRoleDescription = RECIPIENT_ROLES_DESCRIPTION_ENG[directTemplateRecipient.role];
 
   const directTemplateFlow: Record<DirectTemplateStep, DocumentFlowStep> = {
     configure: {
-      title: 'General',
-      description: 'Preview and configure template.',
+      title: msg`General`,
+      description: msg`Preview and configure template.`,
       stepIndex: 1,
     },
     sign: {
-      title: `${recipientRoleDescription.actionVerb} document`,
-      description: `${recipientRoleDescription.actionVerb} the document to complete the process.`,
+      // Todo: Translations
+      title: msg`${recipientRoleDescription.actionVerb} document`,
+      description: msg`${recipientRoleDescription.actionVerb} the document to complete the process.`,
       stepIndex: 2,
     },
   };
@@ -89,7 +94,7 @@ export const DirectTemplatePageView = ({
         directTemplateExternalId = decodeURIComponent(directTemplateExternalId);
       }
 
-      const token = await createDocumentFromDirectTemplate({
+      const { token } = await createDocumentFromDirectTemplate({
         directTemplateToken,
         directTemplateExternalId,
         directRecipientName: fullName,
@@ -109,8 +114,10 @@ export const DirectTemplatePageView = ({
       redirectUrl ? router.push(redirectUrl) : router.push(`/sign/${token}/complete`);
     } catch (err) {
       toast({
-        title: 'Something went wrong',
-        description: 'We were unable to submit this document at this time. Please try again later.',
+        title: _(msg`Something went wrong`),
+        description: _(
+          msg`We were unable to submit this document at this time. Please try again later.`,
+        ),
         variant: 'destructive',
       });
 

@@ -4,6 +4,9 @@ import { useEffect, useState } from 'react';
 
 import { useRouter, useSearchParams } from 'next/navigation';
 
+import { msg } from '@lingui/macro';
+import { useLingui } from '@lingui/react';
+
 import {
   DO_NOT_INVALIDATE_QUERY_ON_MUTATION,
   SKIP_QUERY_BATCH_META,
@@ -45,6 +48,7 @@ export const EditDocumentForm = ({
   isDocumentEnterprise,
 }: EditDocumentFormProps) => {
   const { toast } = useToast();
+  const { _ } = useLingui();
 
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -125,23 +129,23 @@ export const EditDocumentForm = ({
 
   const documentFlow: Record<EditDocumentStep, DocumentFlowStep> = {
     settings: {
-      title: 'General',
-      description: 'Configure general settings for the document.',
+      title: msg`General`,
+      description: msg`Configure general settings for the document.`,
       stepIndex: 1,
     },
     signers: {
-      title: 'Add Signers',
-      description: 'Add the people who will sign the document.',
+      title: msg`Add Signers`,
+      description: msg`Add the people who will sign the document.`,
       stepIndex: 2,
     },
     fields: {
-      title: 'Add Fields',
-      description: 'Add all relevant fields for each recipient.',
+      title: msg`Add Fields`,
+      description: msg`Add all relevant fields for each recipient.`,
       stepIndex: 3,
     },
     subject: {
-      title: 'Add Subject',
-      description: 'Add the subject and message you wish to send to signers.',
+      title: msg`Add Subject`,
+      description: msg`Add the subject and message you wish to send to signers.`,
       stepIndex: 4,
     },
   };
@@ -191,8 +195,8 @@ export const EditDocumentForm = ({
       console.error(err);
 
       toast({
-        title: 'Error',
-        description: 'An error occurred while updating the document settings.',
+        title: _(msg`Error`),
+        description: _(msg`An error occurred while updating the document settings.`),
         variant: 'destructive',
       });
     }
@@ -218,8 +222,8 @@ export const EditDocumentForm = ({
       console.error(err);
 
       toast({
-        title: 'Error',
-        description: 'An error occurred while adding signers.',
+        title: _(msg`Error`),
+        description: _(msg`An error occurred while adding signers.`),
         variant: 'destructive',
       });
     }
@@ -248,8 +252,8 @@ export const EditDocumentForm = ({
       console.error(err);
 
       toast({
-        title: 'Error',
-        description: 'An error occurred while adding the fields.',
+        title: _(msg`Error`),
+        description: _(msg`An error occurred while adding the fields.`),
         variant: 'destructive',
       });
     }
@@ -269,8 +273,8 @@ export const EditDocumentForm = ({
       });
 
       toast({
-        title: 'Document sent',
-        description: 'Your document has been sent successfully.',
+        title: _(msg`Document sent`),
+        description: _(msg`Your document has been sent successfully.`),
         duration: 5000,
       });
 
@@ -279,8 +283,8 @@ export const EditDocumentForm = ({
       console.error(err);
 
       toast({
-        title: 'Error',
-        description: 'An error occurred while sending the document.',
+        title: _(msg`Error`),
+        description: _(msg`An error occurred while sending the document.`),
         variant: 'destructive',
       });
     }

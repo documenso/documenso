@@ -1,6 +1,6 @@
 import type { WebhookTriggerEvents } from '@documenso/prisma/client';
 
-import { NEXT_PUBLIC_WEBAPP_URL } from '../../../constants/app';
+import { NEXT_PRIVATE_INTERNAL_WEBAPP_URL } from '../../../constants/app';
 import { sign } from '../../crypto/sign';
 import { getAllWebhooksByEventTrigger } from '../get-all-webhooks-by-event-trigger';
 
@@ -29,7 +29,7 @@ export const triggerWebhook = async ({ event, data, userId, teamId }: TriggerWeb
     const signature = sign(body);
 
     await Promise.race([
-      fetch(`${NEXT_PUBLIC_WEBAPP_URL()}/api/webhook/trigger`, {
+      fetch(`${NEXT_PRIVATE_INTERNAL_WEBAPP_URL}/api/webhook/trigger`, {
         method: 'POST',
         headers: {
           'content-type': 'application/json',

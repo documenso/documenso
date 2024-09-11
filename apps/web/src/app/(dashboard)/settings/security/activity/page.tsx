@@ -1,5 +1,10 @@
 import type { Metadata } from 'next';
 
+import { msg } from '@lingui/macro';
+import { useLingui } from '@lingui/react';
+
+import { setupI18nSSR } from '@documenso/lib/client-only/providers/i18n.server';
+
 import { SettingsHeader } from '~/components/(dashboard)/settings/layout/header';
 
 import ActivityPageBackButton from '../../../../../components/(dashboard)/settings/layout/activity-back';
@@ -10,11 +15,15 @@ export const metadata: Metadata = {
 };
 
 export default function SettingsSecurityActivityPage() {
+  setupI18nSSR();
+
+  const { _ } = useLingui();
+
   return (
     <div>
       <SettingsHeader
-        title="Security activity"
-        subtitle="View all recent security activity related to your account."
+        title={_(msg`Security activity`)}
+        subtitle={_(msg`View all security activity related to your account.`)}
         hideDivider={true}
       >
         <ActivityPageBackButton />

@@ -2,6 +2,9 @@ import { useState } from 'react';
 
 import { useRouter } from 'next/navigation';
 
+import { Trans, msg } from '@lingui/macro';
+import { useLingui } from '@lingui/react';
+
 import { NEXT_PUBLIC_WEBAPP_URL } from '@documenso/lib/constants/app';
 import { trpc } from '@documenso/trpc/react';
 import { Avatar, AvatarFallback, AvatarImage } from '@documenso/ui/primitives/avatar';
@@ -30,25 +33,29 @@ type MoveDocumentDialogProps = {
 };
 
 export const MoveDocumentDialog = ({ documentId, open, onOpenChange }: MoveDocumentDialogProps) => {
-  const router = useRouter();
+  const { _ } = useLingui();
   const { toast } = useToast();
+
+  const router = useRouter();
+
   const [selectedTeamId, setSelectedTeamId] = useState<number | null>(null);
 
   const { data: teams, isLoading: isLoadingTeams } = trpc.team.getTeams.useQuery();
+
   const { mutateAsync: moveDocument, isLoading } = trpc.document.moveDocumentToTeam.useMutation({
     onSuccess: () => {
       router.refresh();
       toast({
-        title: 'Document moved',
-        description: 'The document has been successfully moved to the selected team.',
+        title: _(msg`Document moved`),
+        description: _(msg`The document has been successfully moved to the selected team.`),
         duration: 5000,
       });
       onOpenChange(false);
     },
     onError: (error) => {
       toast({
-        title: 'Error',
-        description: error.message || 'An error occurred while moving the document.',
+        title: _(msg`Error`),
+        description: error.message || _(msg`An error occurred while moving the document.`),
         variant: 'destructive',
         duration: 7500,
       });
@@ -56,7 +63,10 @@ export const MoveDocumentDialog = ({ documentId, open, onOpenChange }: MoveDocum
   });
 
   const onMove = async () => {
-    if (!selectedTeamId) return;
+    if (!selectedTeamId) {
+      return;
+    }
+
     await moveDocument({ documentId, teamId: selectedTeamId });
   };
 
@@ -64,20 +74,22 @@ export const MoveDocumentDialog = ({ documentId, open, onOpenChange }: MoveDocum
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Move Document to Team</DialogTitle>
+          <DialogTitle>
+            <Trans>Move Document to Team</Trans>
+          </DialogTitle>
           <DialogDescription>
-            Select a team to move this document to. This action cannot be undone.
+            <Trans>Select a team to move this document to. This action cannot be undone.</Trans>
           </DialogDescription>
         </DialogHeader>
 
         <Select onValueChange={(value) => setSelectedTeamId(Number(value))}>
           <SelectTrigger>
-            <SelectValue placeholder="Select a team" />
+            <SelectValue placeholder={_(msg`Select a team`)} />
           </SelectTrigger>
           <SelectContent>
             {isLoadingTeams ? (
               <SelectItem value="loading" disabled>
-                Loading teams...
+                <Trans>Loading teams...</Trans>
               </SelectItem>
             ) : (
               teams?.map((team) => (

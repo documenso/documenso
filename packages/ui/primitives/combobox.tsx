@@ -1,5 +1,7 @@
 import * as React from 'react';
 
+import { Trans, msg } from '@lingui/macro';
+import { useLingui } from '@lingui/react';
 import { Check, ChevronDown } from 'lucide-react';
 
 import { cn } from '../lib/utils';
@@ -24,6 +26,8 @@ const Combobox = ({
   disabled = false,
   placeholder,
 }: ComboboxProps) => {
+  const { _ } = useLingui();
+
   const [open, setOpen] = React.useState(false);
 
   const onOptionSelected = (newValue: string) => {
@@ -31,7 +35,7 @@ const Combobox = ({
     setOpen(false);
   };
 
-  const placeholderValue = placeholder ?? 'Select an option';
+  const placeholderValue = placeholder ?? _(msg`Select an option`);
 
   return (
     <Popover open={open} onOpenChange={setOpen}>
@@ -52,7 +56,9 @@ const Combobox = ({
         <Command>
           <CommandInput placeholder={value || placeholderValue} />
 
-          <CommandEmpty>No value found.</CommandEmpty>
+          <CommandEmpty>
+            <Trans>No value found.</Trans>
+          </CommandEmpty>
 
           <CommandGroup className="max-h-[250px] overflow-y-auto">
             {options.map((option, index) => (

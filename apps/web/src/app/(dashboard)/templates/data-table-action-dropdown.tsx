@@ -4,6 +4,7 @@ import { useState } from 'react';
 
 import Link from 'next/link';
 
+import { Trans } from '@lingui/macro';
 import { Copy, Edit, MoreHorizontal, MoveRight, Share2Icon, Trash2 } from 'lucide-react';
 import { useSession } from 'next-auth/react';
 
@@ -58,7 +59,7 @@ export const DataTableActionDropdown = ({
         <DropdownMenuItem disabled={!isOwner && !isTeamTemplate} asChild>
           <Link href={`${templateRootPath}/${row.id}`}>
             <Edit className="mr-2 h-4 w-4" />
-            Edit
+            <Trans>Edit</Trans>
           </Link>
         </DropdownMenuItem>
 
@@ -67,18 +68,18 @@ export const DataTableActionDropdown = ({
           onClick={() => setDuplicateDialogOpen(true)}
         >
           <Copy className="mr-2 h-4 w-4" />
-          Duplicate
+          <Trans>Duplicate</Trans>
         </DropdownMenuItem>
 
         <DropdownMenuItem onClick={() => setTemplateDirectLinkDialogOpen(true)}>
           <Share2Icon className="mr-2 h-4 w-4" />
-          Direct link
+          <Trans>Direct link</Trans>
         </DropdownMenuItem>
 
         {!teamId && (
           <DropdownMenuItem onClick={() => setMoveDialogOpen(true)}>
             <MoveRight className="mr-2 h-4 w-4" />
-            Move to Team
+            <Trans>Move to Team</Trans>
           </DropdownMenuItem>
         )}
 
@@ -87,7 +88,7 @@ export const DataTableActionDropdown = ({
           onClick={() => setDeleteDialogOpen(true)}
         >
           <Trash2 className="mr-2 h-4 w-4" />
-          Delete
+          <Trans>Delete</Trans>
         </DropdownMenuItem>
       </DropdownMenuContent>
 

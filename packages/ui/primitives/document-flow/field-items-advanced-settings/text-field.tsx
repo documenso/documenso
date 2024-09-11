@@ -1,3 +1,6 @@
+import { Trans, msg } from '@lingui/macro';
+import { useLingui } from '@lingui/react';
+
 import { validateTextField } from '@documenso/lib/advanced-fields-validation/validate-text';
 import { type TTextFieldMeta as TextFieldMeta } from '@documenso/lib/types/field-meta';
 import { Input } from '@documenso/ui/primitives/input';
@@ -16,6 +19,8 @@ export const TextFieldAdvancedSettings = ({
   handleFieldChange,
   handleErrors,
 }: TextFieldAdvancedSettingsProps) => {
+  const { _ } = useLingui();
+
   const handleInput = (field: keyof TextFieldMeta, value: string | boolean) => {
     const text = field === 'text' ? String(value) : fieldState.text || '';
     const limit =
@@ -36,45 +41,53 @@ export const TextFieldAdvancedSettings = ({
   return (
     <div className="flex flex-col gap-4">
       <div>
-        <Label>Label</Label>
+        <Label>
+          <Trans>Label</Trans>
+        </Label>
         <Input
           id="label"
           className="bg-background mt-2"
-          placeholder="Field label"
+          placeholder={_(msg`Field label`)}
           value={fieldState.label}
           onChange={(e) => handleFieldChange('label', e.target.value)}
         />
       </div>
       <div>
-        <Label className="mt-4">Placeholder</Label>
+        <Label className="mt-4">
+          <Trans>Placeholder</Trans>
+        </Label>
         <Input
           id="placeholder"
           className="bg-background mt-2"
-          placeholder="Field placeholder"
+          placeholder={_(msg`Field placeholder`)}
           value={fieldState.placeholder}
           onChange={(e) => handleFieldChange('placeholder', e.target.value)}
         />
       </div>
 
       <div>
-        <Label className="mt-4">Add text</Label>
+        <Label className="mt-4">
+          <Trans>Add text</Trans>
+        </Label>
         <Textarea
           id="text"
           className="bg-background mt-2"
-          placeholder="Add text to the field"
+          placeholder={_(msg`Add text to the field`)}
           value={fieldState.text}
           onChange={(e) => handleInput('text', e.target.value)}
         />
       </div>
 
       <div>
-        <Label>Character Limit</Label>
+        <Label>
+          <Trans>Character Limit</Trans>
+        </Label>
         <Input
           id="characterLimit"
           type="number"
           min={0}
           className="bg-background mt-2"
-          placeholder="Field character limit"
+          placeholder={_(msg`Field character limit`)}
           value={fieldState.characterLimit}
           onChange={(e) => handleInput('characterLimit', e.target.value)}
         />
@@ -87,7 +100,9 @@ export const TextFieldAdvancedSettings = ({
             checked={fieldState.required}
             onCheckedChange={(checked) => handleInput('required', checked)}
           />
-          <Label>Required field</Label>
+          <Label>
+            <Trans>Required field</Trans>
+          </Label>
         </div>
         <div className="flex flex-row items-center gap-2">
           <Switch
@@ -95,7 +110,9 @@ export const TextFieldAdvancedSettings = ({
             checked={fieldState.readOnly}
             onCheckedChange={(checked) => handleInput('readOnly', checked)}
           />
-          <Label>Read only</Label>
+          <Label>
+            <Trans>Read only</Trans>
+          </Label>
         </div>
       </div>
     </div>

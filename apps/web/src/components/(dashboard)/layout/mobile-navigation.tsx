@@ -4,6 +4,8 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
 
+import { Trans, msg } from '@lingui/macro';
+import { useLingui } from '@lingui/react';
 import { signOut } from 'next-auth/react';
 
 import LogoImage from '@documenso/assets/logo.png';
@@ -17,6 +19,8 @@ export type MobileNavigationProps = {
 };
 
 export const MobileNavigation = ({ isMenuOpen, onMenuOpenChange }: MobileNavigationProps) => {
+  const { _ } = useLingui();
+
   const params = useParams();
 
   const handleMenuItemClick = () => {
@@ -28,19 +32,19 @@ export const MobileNavigation = ({ isMenuOpen, onMenuOpenChange }: MobileNavigat
   const menuNavigationLinks = [
     {
       href: `${rootHref}/documents`,
-      text: 'Documents',
+      text: msg`Documents`,
     },
     {
       href: `${rootHref}/templates`,
-      text: 'Templates',
+      text: msg`Templates`,
     },
     {
       href: '/settings/teams',
-      text: 'Teams',
+      text: msg`Teams`,
     },
     {
       href: '/settings/profile',
-      text: 'Settings',
+      text: msg`Settings`,
     },
   ];
 
@@ -65,7 +69,7 @@ export const MobileNavigation = ({ isMenuOpen, onMenuOpenChange }: MobileNavigat
               href={href}
               onClick={() => handleMenuItemClick()}
             >
-              {text}
+              {_(text)}
             </Link>
           ))}
 
@@ -77,7 +81,7 @@ export const MobileNavigation = ({ isMenuOpen, onMenuOpenChange }: MobileNavigat
               })
             }
           >
-            Sign Out
+            <Trans>Sign Out</Trans>
           </button>
         </div>
 

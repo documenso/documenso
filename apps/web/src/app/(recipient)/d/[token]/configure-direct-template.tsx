@@ -1,6 +1,8 @@
 'use client';
 
 import { zodResolver } from '@hookform/resolvers/zod';
+import { Trans } from '@lingui/macro';
+import { useLingui } from '@lingui/react';
 import { useSession } from 'next-auth/react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
@@ -52,9 +54,11 @@ export const ConfigureDirectTemplateFormPartial = ({
   initialEmail,
   onSubmit,
 }: ConfigureDirectTemplateFormProps) => {
+  const { _ } = useLingui();
+  const { data: session } = useSession();
+
   const { Recipient } = template;
   const { derivedRecipientAccessAuth } = useRequiredDocumentAuthContext();
-  const { data: session } = useSession();
 
   const recipientsWithBlankDirectRecipientEmail = Recipient.map((recipient) => {
     if (recipient.id === directTemplateRecipient.id) {
@@ -110,7 +114,9 @@ export const ConfigureDirectTemplateFormPartial = ({
               name="email"
               render={({ field, fieldState }) => (
                 <FormItem>
-                  <FormLabel required>Email</FormLabel>
+                  <FormLabel required>
+                    <Trans>Email</Trans>
+                  </FormLabel>
 
                   <FormControl>
                     <Input
@@ -126,7 +132,7 @@ export const ConfigureDirectTemplateFormPartial = ({
 
                   {!fieldState.error && (
                     <p className="text-muted-foreground text-xs">
-                      Enter your email address to receive the completed document.
+                      <Trans>Enter your email address to receive the completed document.</Trans>
                     </p>
                   )}
 
@@ -139,11 +145,7 @@ export const ConfigureDirectTemplateFormPartial = ({
       </DocumentFlowFormContainerContent>
 
       <DocumentFlowFormContainerFooter>
-        <DocumentFlowFormContainerStep
-          title={flowStep.title}
-          step={currentStep}
-          maxStep={totalSteps}
-        />
+        <DocumentFlowFormContainerStep step={currentStep} maxStep={totalSteps} />
 
         <DocumentFlowFormContainerActions
           loading={form.formState.isSubmitting}

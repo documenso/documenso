@@ -3,11 +3,19 @@
 import type { HTMLAttributes, MouseEvent, PointerEvent, TouchEvent } from 'react';
 import { useEffect, useMemo, useRef, useState } from 'react';
 
+import { Trans } from '@lingui/macro';
 import { Undo2 } from 'lucide-react';
 import type { StrokeOptions } from 'perfect-freehand';
 import { getStroke } from 'perfect-freehand';
 
 import { unsafe_useEffectOnce } from '@documenso/lib/client-only/hooks/use-effect-once';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@documenso/ui/primitives/select';
 
 import { cn } from '../../lib/utils';
 import { getSvgPathFromStroke } from './helper';
@@ -35,6 +43,7 @@ export const SignaturePad = ({
   const [isPressed, setIsPressed] = useState(false);
   const [lines, setLines] = useState<Point[][]>([]);
   const [currentLine, setCurrentLine] = useState<Point[]>([]);
+  const [selectedColor, setSelectedColor] = useState('black');
 
   const perfectFreehandOptions = useMemo(() => {
     const size = $el.current ? Math.min($el.current.height, $el.current.width) * 0.03 : 10;
@@ -84,6 +93,7 @@ export const SignaturePad = ({
           ctx.restore();
           ctx.imageSmoothingEnabled = true;
           ctx.imageSmoothingQuality = 'high';
+          ctx.fillStyle = selectedColor;
 
           lines.forEach((line) => {
             const pathData = new Path2D(
@@ -128,6 +138,7 @@ export const SignaturePad = ({
 
         ctx.imageSmoothingEnabled = true;
         ctx.imageSmoothingQuality = 'high';
+        ctx.fillStyle = selectedColor;
 
         newLines.forEach((line) => {
           const pathData = new Path2D(
@@ -236,7 +247,13 @@ export const SignaturePad = ({
     >
       <canvas
         ref={$el}
-        className={cn('relative block dark:invert', className)}
+        className={cn(
+          'relative block',
+          {
+            'dark:hue-rotate-180 dark:invert': selectedColor === 'black',
+          },
+          className,
+        )}
         style={{ touchAction: 'none' }}
         onPointerMove={(event) => onMouseMove(event)}
         onPointerDown={(event) => onMouseDown(event)}
@@ -246,13 +263,51 @@ export const SignaturePad = ({
         {...props}
       />
 
+      <div className="text-foreground absolute right-2 top-2 filter">
+        <Select defaultValue={selectedColor} onValueChange={(value) => setSelectedColor(value)}>
+          <SelectTrigger className="h-auto w-auto border-none p-1">
+            <SelectValue placeholder="" />
+          </SelectTrigger>
+
+          <SelectContent className="w-[150px]" align="end">
+            <SelectItem value="black">
+              <div className="text-muted-foreground flex items-center px-1 text-sm">
+                <div className="border-border mr-2 h-5 w-5 rounded-full border-2 bg-black shadow-sm" />
+                <Trans>Black</Trans>
+              </div>
+            </SelectItem>
+
+            <SelectItem value="red">
+              <div className="text-muted-foreground flex items-center px-1 text-sm">
+                <div className="border-border mr-2 h-5 w-5 rounded-full border-2 bg-[red] shadow-sm" />
+                <Trans>Red</Trans>
+              </div>
+            </SelectItem>
+
+            <SelectItem value="blue">
+              <div className="text-muted-foreground flex items-center px-1 text-sm">
+                <div className="border-border mr-2 h-5 w-5 rounded-full border-2 bg-[blue] shadow-sm" />
+                <Trans>Blue</Trans>
+              </div>
+            </SelectItem>
+
+            <SelectItem value="green">
+              <div className="text-muted-foreground flex items-center px-1 text-sm">
+                <div className="border-border mr-2 h-5 w-5 rounded-full border-2 bg-[green] shadow-sm" />
+                <Trans>Green</Trans>
+              </div>
+            </SelectItem>
+          </SelectContent>
+        </Select>
+      </div>
+
       <div className="absolute bottom-4 right-4 flex gap-2">
         <button
           type="button"
           className="focus-visible:ring-ring ring-offset-background text-muted-foreground/60 hover:text-muted-foreground rounded-full p-0 text-xs focus-visible:outline-none focus-visible:ring-2"
           onClick={() => onClearClick()}
         >
-          Clear Signature
+          <Trans>Clear Signature</Trans>
         </button>
       </div>
 

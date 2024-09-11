@@ -241,6 +241,7 @@ const SigningCardImage = ({ signingCelebrationImage }: SigningCardImageProps) =>
           mask: 'radial-gradient(rgba(255, 255, 255, 1) 0%, transparent 67%)',
           WebkitMask: 'radial-gradient(rgba(255, 255, 255, 1) 0%, transparent 67%)',
         }}
+        priority
       />
     </motion.div>
   );

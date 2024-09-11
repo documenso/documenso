@@ -3,6 +3,8 @@
 import { useEffect, useRef, useState } from 'react';
 
 import { zodResolver } from '@hookform/resolvers/zod';
+import { Trans, msg } from '@lingui/macro';
+import { useLingui } from '@lingui/react';
 import type * as DialogPrimitive from '@radix-ui/react-dialog';
 import { Download, Mail, MailIcon, PlusCircle, Trash, Upload, UsersIcon } from 'lucide-react';
 import Papa, { type ParseResult } from 'papaparse';
@@ -104,6 +106,7 @@ export const InviteTeamMembersDialog = ({
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [invitationType, setInvitationType] = useState<TabTypes>('INDIVIDUAL');
 
+  const { _ } = useLingui();
   const { toast } = useToast();
 
   const form = useForm<TInviteTeamMembersFormSchema>({
@@ -144,18 +147,19 @@ export const InviteTeamMembersDialog = ({
       });
 
       toast({
-        title: 'Success',
-        description: 'Team invitations have been sent.',
+        title: _(msg`Success`),
+        description: _(msg`Team invitations have been sent.`),
         duration: 5000,
       });
 
       setOpen(false);
     } catch {
       toast({
-        title: 'An unknown error occurred',
+        title: _(msg`An unknown error occurred`),
+        description: _(
+          msg`We encountered an unknown error while attempting to invite team members. Please try again later.`,
+        ),
         variant: 'destructive',
-        description:
-          'We encountered an unknown error while attempting to invite team members. Please try again later.',
       });
     }
   };
@@ -203,9 +207,11 @@ export const InviteTeamMembersDialog = ({
           console.error(err.message);
 
           toast({
+            title: _(msg`Something went wrong`),
+            description: _(
+              msg`Please check the CSV file and make sure it is according to our format`,
+            ),
             variant: 'destructive',
-            title: 'Something went wrong',
-            description: 'Please check the CSV file and make sure it is according to our format',
           });
         }
       },
@@ -239,15 +245,21 @@ export const InviteTeamMembersDialog = ({
       onOpenChange={(value) => !form.formState.isSubmitting && setOpen(value)}
     >
       <DialogTrigger onClick={(e) => e.stopPropagation()} asChild>
-        {trigger ?? <Button variant="secondary">Invite member</Button>}
+        {trigger ?? (
+          <Button variant="secondary">
+            <Trans>Invite member</Trans>
+          </Button>
+        )}
       </DialogTrigger>
 
       <DialogContent position="center">
         <DialogHeader>
-          <DialogTitle>Invite team members</DialogTitle>
+          <DialogTitle>
+            <Trans>Invite team members</Trans>
+          </DialogTitle>
 
           <DialogDescription className="mt-4">
-            An email containing an invitation will be sent to each member.
+            <Trans>An email containing an invitation will be sent to each member.</Trans>
           </DialogDescription>
         </DialogHeader>
 
@@ -260,11 +272,11 @@ export const InviteTeamMembersDialog = ({
           <TabsList className="w-full">
             <TabsTrigger value="INDIVIDUAL" className="hover:text-foreground w-full">
               <MailIcon size={20} className="mr-2" />
-              Invite Members
+              <Trans>Invite Members</Trans>
             </TabsTrigger>
 
             <TabsTrigger value="BULK" className="hover:text-foreground w-full">
-              <UsersIcon size={20} className="mr-2" /> Bulk Import
+              <UsersIcon size={20} className="mr-2" /> <Trans>Bulk Import</Trans>
             </TabsTrigger>
           </TabsList>
 
@@ -283,7 +295,11 @@ export const InviteTeamMembersDialog = ({
                           name={`invitations.${index}.email`}
                           render={({ field }) => (
                             <FormItem className="w-full">
-                              {index === 0 && <FormLabel required>Email address</FormLabel>}
+                              {index === 0 && (
+                                <FormLabel required>
+                                  <Trans>Email address</Trans>
+                                </FormLabel>
+                              )}
                               <FormControl>
                                 <Input className="bg-background" {...field} />
                               </FormControl>
@@ -297,7 +313,11 @@ export const InviteTeamMembersDialog = ({
                           name={`invitations.${index}.role`}
                           render={({ field }) => (
                             <FormItem className="w-full">
-                              {index === 0 && <FormLabel required>Role</FormLabel>}
+                              {index === 0 && (
+                                <FormLabel required>
+                                  <Trans>Role</Trans>
+                                </FormLabel>
+                              )}
                               <FormControl>
                                 <Select {...field} onValueChange={field.onChange}>
                                   <SelectTrigger className="text-muted-foreground max-w-[200px]">
@@ -307,7 +327,7 @@ export const InviteTeamMembersDialog = ({
                                   <SelectContent position="popper">
                                     {TEAM_MEMBER_ROLE_HIERARCHY[currentUserTeamRole].map((role) => (
                                       <SelectItem key={role} value={role}>
-                                        {TEAM_MEMBER_ROLE_MAP[role] ?? role}
+                                        {_(TEAM_MEMBER_ROLE_MAP[role]) ?? role}
                                       </SelectItem>
                                     ))}
                                   </SelectContent>
@@ -341,17 +361,17 @@ export const InviteTeamMembersDialog = ({
                     onClick={() => onAddTeamMemberInvite()}
                   >
                     <PlusCircle className="mr-2 h-4 w-4" />
-                    Add more
+                    <Trans>Add more</Trans>
                   </Button>
 
                   <DialogFooter>
                     <Button type="button" variant="secondary" onClick={() => setOpen(false)}>
-                      Cancel
+                      <Trans>Cancel</Trans>
                     </Button>
 
                     <Button type="submit" loading={form.formState.isSubmitting}>
                       {!form.formState.isSubmitting && <Mail className="mr-2 h-4 w-4" />}
-                      Invite
+                      <Trans>Invite</Trans>
                     </Button>
                   </DialogFooter>
                 </fieldset>
@@ -368,7 +388,9 @@ export const InviteTeamMembersDialog = ({
                 >
                   <Upload className="h-5 w-5" />
 
-                  <p className="mt-1 text-sm">Click here to upload</p>
+                  <p className="mt-1 text-sm">
+                    <Trans>Click here to upload</Trans>
+                  </p>
 
                   <input
                     onChange={onFileInputChange}
@@ -383,7 +405,7 @@ export const InviteTeamMembersDialog = ({
               <DialogFooter>
                 <Button type="button" variant="secondary" onClick={downloadTemplate}>
                   <Download className="mr-2 h-4 w-4" />
-                  Template
+                  <Trans>Template</Trans>
                 </Button>
               </DialogFooter>
             </div>

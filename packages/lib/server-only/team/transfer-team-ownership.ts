@@ -28,11 +28,24 @@ export const transferTeamOwnership = async ({ token }: TransferTeamOwnershipOpti
 
       const { team, userId: newOwnerUserId } = teamTransferVerification;
 
-      await tx.teamTransferVerification.delete({
-        where: {
-          teamId: team.id,
-        },
-      });
+      await Promise.all([
+        tx.teamTransferVerification.updateMany({
+          where: {
+            teamId: team.id,
+          },
+          data: {
+            completed: true,
+          },
+        }),
+        tx.teamTransferVerification.deleteMany({
+          where: {
+            teamId: team.id,
+            expiresAt: {
+              lt: new Date(),
+            },
+          },
+        }),
+      ]);
 
       const newOwnerUser = await tx.user.findFirstOrThrow({
         where: {

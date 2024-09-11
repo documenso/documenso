@@ -4,6 +4,8 @@ import { useEffect, useState, useTransition } from 'react';
 
 import { useRouter } from 'next/navigation';
 
+import { msg } from '@lingui/macro';
+import { useLingui } from '@lingui/react';
 import { Loader } from 'lucide-react';
 
 import { DO_NOT_INVALIDATE_QUERY_ON_MUTATION } from '@documenso/lib/constants/trpc';
@@ -43,8 +45,10 @@ export const DropdownField = ({
   onSignField,
   onUnsignField,
 }: DropdownFieldProps) => {
-  const router = useRouter();
+  const { _ } = useLingui();
   const { toast } = useToast();
+
+  const router = useRouter();
   const [isPending, startTransition] = useTransition();
 
   const { executeActionAuthProcedure } = useRequiredDocumentAuthContext();
@@ -98,8 +102,8 @@ export const DropdownField = ({
       console.error(err);
 
       toast({
-        title: 'Error',
-        description: 'An error occurred while signing the document.',
+        title: _(msg`Error`),
+        description: _(msg`An error occurred while signing the document.`),
         variant: 'destructive',
       });
     }
@@ -123,14 +127,14 @@ export const DropdownField = ({
         await removeSignedFieldWithToken(payload);
       }
 
-      setLocalChoice(parsedFieldMeta.defaultValue ?? '');
+      setLocalChoice('');
       startTransition(() => router.refresh());
     } catch (err) {
       console.error(err);
 
       toast({
-        title: 'Error',
-        description: 'An error occurred while removing the signature.',
+        title: _(msg`Error`),
+        description: _(msg`An error occurred while removing the signature.`),
         variant: 'destructive',
       });
     }
@@ -175,7 +179,7 @@ export const DropdownField = ({
 
         {!field.inserted && (
           <p className="group-hover:text-primary text-muted-foreground flex flex-col items-center justify-center duration-200">
-            <Select value={parsedFieldMeta.defaultValue} onValueChange={handleSelectItem}>
+            <Select value={localChoice} onValueChange={handleSelectItem}>
               <SelectTrigger
                 className={cn(
                   'text-muted-foreground z-10 h-full w-full border-none ring-0 focus:ring-0',
@@ -185,7 +189,7 @@ export const DropdownField = ({
                   },
                 )}
               >
-                <SelectValue placeholder={'-- Select --'} />
+                <SelectValue placeholder={`${_(msg`Select`)}`} />
               </SelectTrigger>
               <SelectContent className="w-full ring-0 focus:ring-0" position="popper">
                 {parsedFieldMeta?.values?.map((item, index) => (

@@ -8,7 +8,7 @@ const config: LinguiConfig = {
   locales: APP_I18N_OPTIONS.supportedLangs as unknown as string[],
   catalogs: [
     {
-      path: '<rootDir>/../../packages/lib/translations/web/{locale}',
+      path: '<rootDir>/../../packages/lib/translations/{locale}/web',
       include: ['<rootDir>/apps/web/src'],
     },
     {

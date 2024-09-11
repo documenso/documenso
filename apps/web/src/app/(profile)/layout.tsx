@@ -1,5 +1,6 @@
 import React from 'react';
 
+import { setupI18nSSR } from '@documenso/lib/client-only/providers/i18n.server';
 import { getServerComponentSession } from '@documenso/lib/next-auth/get-server-component-session';
 import { getTeams } from '@documenso/lib/server-only/team/get-teams';
 
@@ -13,6 +14,8 @@ type PublicProfileLayoutProps = {
 };
 
 export default async function PublicProfileLayout({ children }: PublicProfileLayoutProps) {
+  setupI18nSSR();
+
   const { user, session } = await getServerComponentSession();
 
   // I wouldn't typically do this but it's better than the `let` statement

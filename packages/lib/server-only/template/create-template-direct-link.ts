@@ -2,13 +2,13 @@
 
 import { nanoid } from 'nanoid';
 
-import { prisma } from '@documenso/prisma';
-import type { Recipient, TemplateDirectLink } from '@documenso/prisma/client';
-
 import {
   DIRECT_TEMPLATE_RECIPIENT_EMAIL,
   DIRECT_TEMPLATE_RECIPIENT_NAME,
-} from '../../constants/template';
+} from '@documenso/lib/constants/direct-templates';
+import { prisma } from '@documenso/prisma';
+import type { Recipient, TemplateDirectLink } from '@documenso/prisma/client';
+
 import { AppError, AppErrorCode } from '../../errors/app-error';
 
 export type CreateTemplateDirectLinkOptions = {

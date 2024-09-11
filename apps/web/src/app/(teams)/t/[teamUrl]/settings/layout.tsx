@@ -2,6 +2,9 @@ import React from 'react';
 
 import { notFound } from 'next/navigation';
 
+import { Trans } from '@lingui/macro';
+
+import { setupI18nSSR } from '@documenso/lib/client-only/providers/i18n.server';
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import { getRequiredServerComponentSession } from '@documenso/lib/next-auth/get-server-component-session';
 import { getTeamByUrl } from '@documenso/lib/server-only/team/get-team';
@@ -21,6 +24,8 @@ export default async function TeamsSettingsLayout({
   children,
   params: { teamUrl },
 }: TeamSettingsLayoutProps) {
+  setupI18nSSR();
+
   const session = await getRequiredServerComponentSession();
 
   try {
@@ -41,7 +46,9 @@ export default async function TeamsSettingsLayout({
 
   return (
     <div className="mx-auto w-full max-w-screen-xl px-4 md:px-8">
-      <h1 className="text-4xl font-semibold">Team Settings</h1>
+      <h1 className="text-4xl font-semibold">
+        <Trans>Team Settings</Trans>
+      </h1>
 
       <div className="mt-4 grid grid-cols-12 gap-x-8 md:mt-8">
         <DesktopNav className="hidden md:col-span-3 md:flex" />

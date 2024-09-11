@@ -4,6 +4,8 @@ import { useMemo, useState, useTransition } from 'react';
 
 import { useRouter } from 'next/navigation';
 
+import { Trans, msg } from '@lingui/macro';
+import { useLingui } from '@lingui/react';
 import { Loader } from 'lucide-react';
 
 import { DO_NOT_INVALIDATE_QUERY_ON_MUTATION } from '@documenso/lib/constants/trpc';
@@ -45,6 +47,7 @@ export const SignatureField = ({
 }: SignatureFieldProps) => {
   const router = useRouter();
 
+  const { _ } = useLingui();
   const { toast } = useToast();
 
   const { signature: providedSignature, setSignature: setProvidedSignature } =
@@ -142,8 +145,8 @@ export const SignatureField = ({
       console.error(err);
 
       toast({
-        title: 'Error',
-        description: 'An error occurred while signing the document.',
+        title: _(msg`Error`),
+        description: _(msg`An error occurred while signing the document.`),
         variant: 'destructive',
       });
     }
@@ -168,8 +171,8 @@ export const SignatureField = ({
       console.error(err);
 
       toast({
-        title: 'Error',
-        description: 'An error occurred while removing the signature.',
+        title: _(msg`Error`),
+        description: _(msg`An error occurred while removing the signature.`),
         variant: 'destructive',
       });
     }
@@ -191,7 +194,7 @@ export const SignatureField = ({
 
       {state === 'empty' && (
         <p className="group-hover:text-primary font-signature text-muted-foreground text-xl duration-200 group-hover:text-yellow-300">
-          Signature
+          <Trans>Signature</Trans>
         </p>
       )}
 
@@ -213,12 +216,16 @@ export const SignatureField = ({
       <Dialog open={showSignatureModal} onOpenChange={setShowSignatureModal}>
         <DialogContent>
           <DialogTitle>
-            Sign as {recipient.name}{' '}
-            <div className="text-muted-foreground h-5">({recipient.email})</div>
+            <Trans>
+              Sign as {recipient.name}{' '}
+              <div className="text-muted-foreground h-5">({recipient.email})</div>
+            </Trans>
           </DialogTitle>
 
           <div className="">
-            <Label htmlFor="signature">Signature</Label>
+            <Label htmlFor="signature">
+              <Trans>Signature</Trans>
+            </Label>
 
             <SignaturePad
               id="signature"
@@ -233,14 +240,14 @@ export const SignatureField = ({
             <div className="flex w-full flex-1 flex-nowrap gap-4">
               <Button
                 type="button"
-                className="dark:bg-muted dark:hover:bg-muted/80 flex-1  bg-black/5 hover:bg-black/10"
+                className="dark:bg-muted dark:hover:bg-muted/80 flex-1 bg-black/5 hover:bg-black/10"
                 variant="secondary"
                 onClick={() => {
                   setShowSignatureModal(false);
                   setLocalSignature(null);
                 }}
               >
-                Cancel
+                <Trans>Cancel</Trans>
               </Button>
 
               <Button
@@ -249,7 +256,7 @@ export const SignatureField = ({
                 disabled={!localSignature}
                 onClick={() => onDialogSignClick()}
               >
-                Sign
+                <Trans>Sign</Trans>
               </Button>
             </div>
           </DialogFooter>

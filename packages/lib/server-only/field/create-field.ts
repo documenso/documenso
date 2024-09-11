@@ -1,6 +1,16 @@
+import { match } from 'ts-pattern';
+
 import { prisma } from '@documenso/prisma';
 import type { FieldType, Team } from '@documenso/prisma/client';
 
+import {
+  ZCheckboxFieldMeta,
+  ZDropdownFieldMeta,
+  ZNumberFieldMeta,
+  ZRadioFieldMeta,
+  ZTextFieldMeta,
+} from '../../types/field-meta';
+import type { TFieldMetaSchema as FieldMeta } from '../../types/field-meta';
 import type { RequestMetadata } from '../../universal/extract-request-metadata';
 import { createDocumentAuditLogData } from '../../utils/document-audit-logs';
 
@@ -15,6 +25,7 @@ export type CreateFieldOptions = {
   pageY: number;
   pageWidth: number;
   pageHeight: number;
+  fieldMeta?: FieldMeta;
   requestMetadata?: RequestMetadata;
 };
 
@@ -29,6 +40,7 @@ export const createField = async ({
   pageY,
   pageWidth,
   pageHeight,
+  fieldMeta,
   requestMetadata,
 }: CreateFieldOptions) => {
   const document = await prisma.document.findFirst({
@@ -85,6 +97,39 @@ export const createField = async ({
     });
   }
 
+  const advancedField = ['NUMBER', 'RADIO', 'CHECKBOX', 'DROPDOWN', 'TEXT'].includes(type);
+
+  if (advancedField && !fieldMeta) {
+    throw new Error(
+      'Field meta is required for this type of field. Please provide the appropriate field meta object.',
+    );
+  }
+
+  if (fieldMeta && fieldMeta.type.toLowerCase() !== String(type).toLowerCase()) {
+    throw new Error('Field meta type does not match the field type');
+  }
+
+  const result = match(type)
+    .with('RADIO', () => ZRadioFieldMeta.safeParse(fieldMeta))
+    .with('CHECKBOX', () => ZCheckboxFieldMeta.safeParse(fieldMeta))
+    .with('DROPDOWN', () => ZDropdownFieldMeta.safeParse(fieldMeta))
+    .with('NUMBER', () => ZNumberFieldMeta.safeParse(fieldMeta))
+    .with('TEXT', () => ZTextFieldMeta.safeParse(fieldMeta))
+    .with('SIGNATURE', 'INITIALS', 'DATE', 'EMAIL', 'NAME', () => ({
+      success: true,
+      data: {},
+    }))
+    .with('FREE_SIGNATURE', () => ({
+      success: false,
+      error: 'FREE_SIGNATURE is not supported',
+      data: {},
+    }))
+    .exhaustive();
+
+  if (!result.success) {
+    throw new Error('Field meta parsing failed');
+  }
+
   const field = await prisma.field.create({
     data: {
       documentId,
@@ -97,6 +142,7 @@ export const createField = async ({
       height: pageHeight,
       customText: '',
       inserted: false,
+      fieldMeta: result.data,
     },
     include: {
       Recipient: true,

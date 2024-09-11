@@ -4,6 +4,8 @@ import { useState, useTransition } from 'react';
 
 import { useRouter } from 'next/navigation';
 
+import { Trans, msg } from '@lingui/macro';
+import { useLingui } from '@lingui/react';
 import { Loader } from 'lucide-react';
 
 import { DO_NOT_INVALIDATE_QUERY_ON_MUTATION } from '@documenso/lib/constants/trpc';
@@ -36,6 +38,7 @@ export type NameFieldProps = {
 export const NameField = ({ field, recipient, onSignField, onUnsignField }: NameFieldProps) => {
   const router = useRouter();
 
+  const { _ } = useLingui();
   const { toast } = useToast();
 
   const { fullName: providedFullName, setFullName: setProvidedFullName } =
@@ -115,8 +118,8 @@ export const NameField = ({ field, recipient, onSignField, onUnsignField }: Name
       console.error(err);
 
       toast({
-        title: 'Error',
-        description: 'An error occurred while signing the document.',
+        title: _(msg`Error`),
+        description: _(msg`An error occurred while signing the document.`),
         variant: 'destructive',
       });
     }
@@ -141,8 +144,8 @@ export const NameField = ({ field, recipient, onSignField, onUnsignField }: Name
       console.error(err);
 
       toast({
-        title: 'Error',
-        description: 'An error occurred while removing the signature.',
+        title: _(msg`Error`),
+        description: _(msg`An error occurred while removing the signature.`),
         variant: 'destructive',
       });
     }
@@ -164,7 +167,7 @@ export const NameField = ({ field, recipient, onSignField, onUnsignField }: Name
 
       {!field.inserted && (
         <p className="group-hover:text-primary text-muted-foreground duration-200 group-hover:text-yellow-300">
-          Name
+          <Trans>Name</Trans>
         </p>
       )}
 
@@ -177,12 +180,18 @@ export const NameField = ({ field, recipient, onSignField, onUnsignField }: Name
       <Dialog open={showFullNameModal} onOpenChange={setShowFullNameModal}>
         <DialogContent>
           <DialogTitle>
-            Sign as {recipient.name}{' '}
-            <div className="text-muted-foreground">({recipient.email})</div>
+            <Trans>
+              Sign as
+              <div>
+                {recipient.name} <div className="text-muted-foreground">({recipient.email})</div>
+              </div>
+            </Trans>
           </DialogTitle>
 
           <div>
-            <Label htmlFor="signature">Full Name</Label>
+            <Label htmlFor="signature">
+              <Trans>Full Name</Trans>
+            </Label>
 
             <Input
               type="text"
@@ -203,7 +212,7 @@ export const NameField = ({ field, recipient, onSignField, onUnsignField }: Name
                   setLocalFullName('');
                 }}
               >
-                Cancel
+                <Trans>Cancel</Trans>
               </Button>
 
               <Button
@@ -212,7 +221,7 @@ export const NameField = ({ field, recipient, onSignField, onUnsignField }: Name
                 disabled={!localFullName}
                 onClick={() => onDialogSignClick()}
               >
-                Sign
+                <Trans>Sign</Trans>
               </Button>
             </div>
           </DialogFooter>

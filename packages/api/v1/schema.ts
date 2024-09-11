@@ -6,6 +6,12 @@ import '@documenso/lib/constants/time-zones';
 import { DEFAULT_DOCUMENT_TIME_ZONE, TIME_ZONES } from '@documenso/lib/constants/time-zones';
 import { ZUrlSchema } from '@documenso/lib/schemas/common';
 import {
+  ZDocumentAccessAuthTypesSchema,
+  ZDocumentActionAuthTypesSchema,
+  ZRecipientActionAuthTypesSchema,
+} from '@documenso/lib/types/document-auth';
+import { ZFieldMetaSchema } from '@documenso/lib/types/field-meta';
+import {
   DocumentDataType,
   FieldType,
   ReadStatus,
@@ -119,6 +125,12 @@ export const ZCreateDocumentMutationSchema = z.object({
       redirectUrl: z.string(),
     })
     .partial(),
+  authOptions: z
+    .object({
+      globalAccessAuth: ZDocumentAccessAuthTypesSchema.optional(),
+      globalActionAuth: ZDocumentActionAuthTypesSchema.optional(),
+    })
+    .optional(),
   formValues: z.record(z.string(), z.union([z.string(), z.boolean(), z.number()])).optional(),
 });
 
@@ -164,6 +176,12 @@ export const ZCreateDocumentFromTemplateMutationSchema = z.object({
       redirectUrl: z.string(),
     })
     .partial()
+    .optional(),
+  authOptions: z
+    .object({
+      globalAccessAuth: ZDocumentAccessAuthTypesSchema.optional(),
+      globalActionAuth: ZDocumentActionAuthTypesSchema.optional(),
+    })
     .optional(),
   formValues: z.record(z.string(), z.union([z.string(), z.boolean(), z.number()])).optional(),
 });
@@ -222,6 +240,12 @@ export const ZGenerateDocumentFromTemplateMutationSchema = z.object({
     })
     .partial()
     .optional(),
+  authOptions: z
+    .object({
+      globalAccessAuth: ZDocumentAccessAuthTypesSchema.optional(),
+      globalActionAuth: ZDocumentActionAuthTypesSchema.optional(),
+    })
+    .optional(),
   formValues: z.record(z.string(), z.union([z.string(), z.boolean(), z.number()])).optional(),
 });
 
@@ -253,6 +277,11 @@ export const ZCreateRecipientMutationSchema = z.object({
   name: z.string().min(1),
   email: z.string().email().min(1),
   role: z.nativeEnum(RecipientRole).optional().default(RecipientRole.SIGNER),
+  authOptions: z
+    .object({
+      actionAuth: ZRecipientActionAuthTypesSchema.optional(),
+    })
+    .optional(),
 });
 
 /**
@@ -292,7 +321,7 @@ export type TSuccessfulRecipientResponseSchema = z.infer<typeof ZSuccessfulRecip
 /**
  * Fields
  */
-export const ZCreateFieldMutationSchema = z.object({
+const ZCreateFieldSchema = z.object({
   recipientId: z.number(),
   type: z.nativeEnum(FieldType),
   pageNumber: z.number(),
@@ -300,17 +329,43 @@ export const ZCreateFieldMutationSchema = z.object({
   pageY: z.number(),
   pageWidth: z.number(),
   pageHeight: z.number(),
+  fieldMeta: ZFieldMetaSchema.openapi({}),
 });
+
+export const ZCreateFieldMutationSchema = z.union([
+  ZCreateFieldSchema,
+  z.array(ZCreateFieldSchema).min(1),
+]);
 
 export type TCreateFieldMutationSchema = z.infer<typeof ZCreateFieldMutationSchema>;
 
-export const ZUpdateFieldMutationSchema = ZCreateFieldMutationSchema.partial();
+export const ZUpdateFieldMutationSchema = ZCreateFieldSchema.partial();
 
 export type TUpdateFieldMutationSchema = z.infer<typeof ZUpdateFieldMutationSchema>;
 
 export const ZDeleteFieldMutationSchema = null;
 
 export type TDeleteFieldMutationSchema = typeof ZDeleteFieldMutationSchema;
+
+const ZSuccessfulFieldSchema = z.object({
+  id: z.number(),
+  documentId: z.number(),
+  recipientId: z.number(),
+  type: z.nativeEnum(FieldType),
+  pageNumber: z.number(),
+  pageX: z.number(),
+  pageY: z.number(),
+  pageWidth: z.number(),
+  pageHeight: z.number(),
+  customText: z.string(),
+  fieldMeta: ZFieldMetaSchema,
+  inserted: z.boolean(),
+});
+
+export const ZSuccessfulFieldCreationResponseSchema = z.object({
+  fields: z.union([ZSuccessfulFieldSchema, z.array(ZSuccessfulFieldSchema)]),
+  documentId: z.number(),
+});
 
 export const ZSuccessfulFieldResponseSchema = z.object({
   id: z.number(),
@@ -323,6 +378,7 @@ export const ZSuccessfulFieldResponseSchema = z.object({
   pageWidth: z.number(),
   pageHeight: z.number(),
   customText: z.string(),
+  fieldMeta: ZFieldMetaSchema,
   inserted: z.boolean(),
 });
 
