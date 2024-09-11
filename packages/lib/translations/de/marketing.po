@@ -421,9 +421,6 @@ msgstr ""
 msgid "Save $60 or $120"
 msgstr ""
 
-#: apps/marketing/src/components/(marketing)/i18n-switcher.tsx:47
-msgid "Search languages..."
-msgstr ""
 #~ msgid "Search languages..."
 #~ msgstr "Sprachen suchen..."
 
