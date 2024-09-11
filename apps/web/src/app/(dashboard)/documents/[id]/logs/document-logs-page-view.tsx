@@ -9,7 +9,6 @@ import { DateTime } from 'luxon';
 
 import { getRequiredServerComponentSession } from '@documenso/lib/next-auth/get-server-component-session';
 import { getDocumentById } from '@documenso/lib/server-only/document/get-document-by-id';
-import { getLocale } from '@documenso/lib/server-only/headers/get-locale';
 import { getRecipientsForDocument } from '@documenso/lib/server-only/recipient/get-recipients-for-document';
 import { formatDocumentsPath } from '@documenso/lib/utils/teams';
 import type { Recipient, Team } from '@documenso/prisma/client';
@@ -32,9 +31,7 @@ export type DocumentLogsPageViewProps = {
 };
 
 export const DocumentLogsPageView = async ({ params, team }: DocumentLogsPageViewProps) => {
-  const { _ } = useLingui();
-
-  const locale = getLocale();
+  const { _, i18n } = useLingui();
 
   const { id } = params;
 
@@ -87,13 +84,13 @@ export const DocumentLogsPageView = async ({ params, team }: DocumentLogsPageVie
     {
       description: msg`Date created`,
       value: DateTime.fromJSDate(document.createdAt)
-        .setLocale(locale)
+        .setLocale(i18n.locales?.[0] || i18n.locale)
         .toLocaleString(DateTime.DATETIME_MED_WITH_SECONDS),
     },
     {
       description: msg`Last updated`,
       value: DateTime.fromJSDate(document.updatedAt)
-        .setLocale(locale)
+        .setLocale(i18n.locales?.[0] || i18n.locale)
         .toLocaleString(DateTime.DATETIME_MED_WITH_SECONDS),
     },
     {

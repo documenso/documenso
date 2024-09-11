@@ -16,11 +16,10 @@ import { Button } from '@documenso/ui/primitives/button';
 import { SettingsHeader } from '~/components/(dashboard)/settings/layout/header';
 import { CreateWebhookDialog } from '~/components/(dashboard)/settings/webhooks/create-webhook-dialog';
 import { DeleteWebhookDialog } from '~/components/(dashboard)/settings/webhooks/delete-webhook-dialog';
-import { LocaleDate } from '~/components/formatter/locale-date';
 import { useCurrentTeam } from '~/providers/team';
 
 export default function WebhookPage() {
-  const { _ } = useLingui();
+  const { _, i18n } = useLingui();
 
   const team = useCurrentTeam();
 
@@ -91,10 +90,7 @@ export default function WebhookPage() {
                   </p>
 
                   <p className="text-muted-foreground mt-2 text-xs">
-                    <Trans>
-                      Created on{' '}
-                      <LocaleDate date={webhook.createdAt} format={DateTime.DATETIME_FULL} />
-                    </Trans>
+                    <Trans>Created on {i18n.date(webhook.createdAt, DateTime.DATETIME_FULL)}</Trans>
                   </p>
                 </div>
 

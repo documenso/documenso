@@ -17,7 +17,6 @@ import { DataTable } from '@documenso/ui/primitives/data-table';
 import { DataTablePagination } from '@documenso/ui/primitives/data-table-pagination';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@documenso/ui/primitives/tooltip';
 
-import { LocaleDate } from '~/components/formatter/locale-date';
 import { TemplateType } from '~/components/formatter/template-type';
 
 import { DataTableActionDropdown } from './data-table-action-dropdown';
@@ -48,7 +47,7 @@ export const TemplatesDataTable = ({
 
   const updateSearchParams = useUpdateSearchParams();
 
-  const { _ } = useLingui();
+  const { _, i18n } = useLingui();
   const { remaining } = useLimits();
 
   const columns = useMemo(() => {
@@ -56,7 +55,7 @@ export const TemplatesDataTable = ({
       {
         header: _(msg`Created`),
         accessorKey: 'createdAt',
-        cell: ({ row }) => <LocaleDate date={row.original.createdAt} />,
+        cell: ({ row }) => i18n.date(row.original.createdAt),
       },
       {
         header: _(msg`Title`),

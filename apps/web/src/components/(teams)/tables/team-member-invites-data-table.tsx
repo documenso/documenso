@@ -27,8 +27,6 @@ import { Skeleton } from '@documenso/ui/primitives/skeleton';
 import { TableCell } from '@documenso/ui/primitives/table';
 import { useToast } from '@documenso/ui/primitives/use-toast';
 
-import { LocaleDate } from '~/components/formatter/locale-date';
-
 export type TeamMemberInvitesDataTableProps = {
   teamId: number;
 };
@@ -37,7 +35,7 @@ export const TeamMemberInvitesDataTable = ({ teamId }: TeamMemberInvitesDataTabl
   const searchParams = useSearchParams();
   const updateSearchParams = useUpdateSearchParams();
 
-  const { _ } = useLingui();
+  const { _, i18n } = useLingui();
   const { toast } = useToast();
 
   const parsedSearchParams = ZBaseTableSearchParamsSchema.parse(
@@ -129,7 +127,7 @@ export const TeamMemberInvitesDataTable = ({ teamId }: TeamMemberInvitesDataTabl
       {
         header: _(msg`Invited At`),
         accessorKey: 'createdAt',
-        cell: ({ row }) => <LocaleDate date={row.original.createdAt} />,
+        cell: ({ row }) => i18n.date(row.original.createdAt),
       },
       {
         header: _(msg`Actions`),

@@ -1,5 +1,7 @@
 'use client';
 
+import { useState } from 'react';
+
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 
@@ -17,6 +19,7 @@ import { extractInitials } from '@documenso/lib/utils/recipient-formatter';
 import { canExecuteTeamAction } from '@documenso/lib/utils/teams';
 import type { User } from '@documenso/prisma/client';
 import { trpc } from '@documenso/trpc/react';
+import { LanguageSwitcherDialog } from '@documenso/ui/components/common/language-switcher-dialog';
 import { cn } from '@documenso/ui/lib/utils';
 import { AvatarWithText } from '@documenso/ui/primitives/avatar';
 import { Button } from '@documenso/ui/primitives/button';
@@ -40,6 +43,8 @@ export const MenuSwitcher = ({ user, teams: initialTeamsData }: MenuSwitcherProp
   const { _ } = useLingui();
 
   const pathname = usePathname();
+
+  const [languageSwitcherOpen, setLanguageSwitcherOpen] = useState(false);
 
   const isUserAdmin = isAdmin(user);
 
@@ -275,6 +280,13 @@ export const MenuSwitcher = ({ user, teams: initialTeamsData }: MenuSwitcherProp
           )}
 
         <DropdownMenuItem
+          className="text-muted-foreground px-4 py-2"
+          onClick={() => setLanguageSwitcherOpen(true)}
+        >
+          <Trans>Language</Trans>
+        </DropdownMenuItem>
+
+        <DropdownMenuItem
           className="text-destructive/90 hover:!text-destructive px-4 py-2"
           onSelect={async () =>
             signOut({
@@ -285,6 +297,8 @@ export const MenuSwitcher = ({ user, teams: initialTeamsData }: MenuSwitcherProp
           <Trans>Sign Out</Trans>
         </DropdownMenuItem>
       </DropdownMenuContent>
+
+      <LanguageSwitcherDialog open={languageSwitcherOpen} setOpen={setLanguageSwitcherOpen} />
     </DropdownMenu>
   );
 };

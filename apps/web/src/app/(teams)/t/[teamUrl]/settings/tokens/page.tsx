@@ -12,7 +12,6 @@ import { getTeamByUrl } from '@documenso/lib/server-only/team/get-team';
 import { Button } from '@documenso/ui/primitives/button';
 
 import DeleteTokenDialog from '~/components/(dashboard)/settings/token/delete-token-dialog';
-import { LocaleDate } from '~/components/formatter/locale-date';
 import { ApiTokenForm } from '~/components/forms/token';
 
 type ApiTokensPageProps = {
@@ -22,7 +21,7 @@ type ApiTokensPageProps = {
 };
 
 export default async function ApiTokensPage({ params }: ApiTokensPageProps) {
-  setupI18nSSR();
+  const { i18n } = setupI18nSSR();
 
   const { teamUrl } = params;
 
@@ -98,13 +97,17 @@ export default async function ApiTokensPage({ params }: ApiTokensPageProps) {
                   <h5 className="text-base">{token.name}</h5>
 
                   <p className="text-muted-foreground mt-2 text-xs">
-                    <Trans>Created on</Trans>{' '}
-                    <LocaleDate date={token.createdAt} format={DateTime.DATETIME_FULL} />
+                    <Trans>
+                      Created on
+                      {i18n.date(token.createdAt, DateTime.DATETIME_FULL)}
+                    </Trans>
                   </p>
                   {token.expires ? (
                     <p className="text-muted-foreground mt-1 text-xs">
-                      <Trans>Expires on</Trans>{' '}
-                      <LocaleDate date={token.expires} format={DateTime.DATETIME_FULL} />
+                      <Trans>
+                        Expires on
+                        {i18n.date(token.expires, DateTime.DATETIME_FULL)}
+                      </Trans>
                     </p>
                   ) : (
                     <p className="text-muted-foreground mt-1 text-xs">

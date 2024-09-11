@@ -3,7 +3,9 @@
 import { useMemo, useState } from 'react';
 
 import { Trans } from '@lingui/macro';
+import { useLingui } from '@lingui/react';
 import { ArrowRightIcon, Loader } from 'lucide-react';
+import { DateTime } from 'luxon';
 import { match } from 'ts-pattern';
 import { UAParser } from 'ua-parser-js';
 
@@ -17,8 +19,6 @@ import { Avatar, AvatarFallback } from '@documenso/ui/primitives/avatar';
 import { Badge } from '@documenso/ui/primitives/badge';
 import { Button } from '@documenso/ui/primitives/button';
 import { Sheet, SheetContent, SheetTrigger } from '@documenso/ui/primitives/sheet';
-
-import { LocaleDate } from '~/components/formatter/locale-date';
 
 import { DocumentHistorySheetChanges } from './document-history-sheet-changes';
 
@@ -37,6 +37,8 @@ export const DocumentHistorySheet = ({
   onMenuOpenChange,
   children,
 }: DocumentHistorySheetProps) => {
+  const { i18n } = useLingui();
+
   const [isUserDetailsVisible, setIsUserDetailsVisible] = useState(false);
 
   const {
@@ -153,7 +155,9 @@ export const DocumentHistorySheet = ({
                       {formatDocumentAuditLogActionString(auditLog, userId)}
                     </p>
                     <p className="text-foreground/50 text-xs">
-                      <LocaleDate date={auditLog.createdAt} format="d MMM, yyyy HH:MM a" />
+                      {DateTime.fromJSDate(auditLog.createdAt)
+                        .setLocale(i18n.locales?.[0] || i18n.locale)
+                        .toFormat('d MMM, yyyy HH:MM a')}
                     </p>
                   </div>
                 </div>
