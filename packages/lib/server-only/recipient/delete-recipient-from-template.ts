@@ -38,15 +38,6 @@ export const deleteRecipientFromTemplate = async ({
     },
   });
 
-  console.log('deleteRecipientFromTemplate function pure', recipient);
-
-  console.log('deleteRecipientFromTemplate function pure', {
-    templateId,
-    recipientId,
-    userId,
-    teamId,
-  });
-
   if (!recipient) {
     throw new Error('Recipient not found');
   }
