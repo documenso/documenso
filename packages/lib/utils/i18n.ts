@@ -36,7 +36,7 @@ const parseLanguageFromLocale = (locale: string): SupportedLanguageCodes | null 
 export const extractLocaleDataFromCookies = (
   cookies: ReadonlyRequestCookies,
 ): SupportedLanguageCodes | null => {
-  const preferredLocale = cookies.get('i18n')?.value || '';
+  const preferredLocale = cookies.get('language')?.value || '';
 
   const language = parseLanguageFromLocale(preferredLocale || '');
 

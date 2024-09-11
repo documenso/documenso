@@ -1,6 +1,6 @@
 'use client';
 
-import type { HTMLAttributes } from 'react';
+import { type HTMLAttributes, useState } from 'react';
 
 import Image from 'next/image';
 import Link from 'next/link';
@@ -9,15 +9,15 @@ import { msg } from '@lingui/macro';
 import { useLingui } from '@lingui/react';
 import { FaXTwitter } from 'react-icons/fa6';
 import { LiaDiscord } from 'react-icons/lia';
-import { LuGithub } from 'react-icons/lu';
+import { LuGithub, LuLanguages } from 'react-icons/lu';
 
 import LogoImage from '@documenso/assets/logo.png';
-import { cn } from '@documenso/ui/lib/utils';
-import { ThemeSwitcher } from '@documenso/ui/primitives/theme-switcher';
-
-import { I18nSwitcher } from '~/components/(marketing)/i18n-switcher';
-
+import { SUPPORTED_LANGUAGES } from '@documenso/lib/constants/i18n';
 // import { StatusWidgetContainer } from './status-widget-container';
+import { LanguageSwitcherDialog } from '@documenso/ui/components/common/language-switcher-dialog';
+import { cn } from '@documenso/ui/lib/utils';
+import { Button } from '@documenso/ui/primitives/button';
+import { ThemeSwitcher } from '@documenso/ui/primitives/theme-switcher';
 
 export type FooterProps = HTMLAttributes<HTMLDivElement>;
 
@@ -44,7 +44,9 @@ const FOOTER_LINKS = [
 ];
 
 export const Footer = ({ className, ...props }: FooterProps) => {
-  const { _ } = useLingui();
+  const { _, i18n } = useLingui();
+
+  const [languageSwitcherOpen, setLanguageSwitcherOpen] = useState(false);
 
   return (
     <div className={cn('border-t py-12', className)} {...props}>
@@ -97,13 +99,22 @@ export const Footer = ({ className, ...props }: FooterProps) => {
         </p>
 
         <div className="flex flex-row-reverse items-center sm:flex-row">
-          <I18nSwitcher className="text-muted-foreground ml-2 rounded-full font-normal sm:mr-2" />
+          <Button
+            className="text-muted-foreground ml-2 rounded-full font-normal sm:mr-2"
+            variant="ghost"
+            onClick={() => setLanguageSwitcherOpen(true)}
+          >
+            <LuLanguages className="mr-1.5 h-4 w-4" />
+            {SUPPORTED_LANGUAGES[i18n.locale]?.full || i18n.locale}
+          </Button>
 
           <div className="flex flex-wrap">
             <ThemeSwitcher />
           </div>
         </div>
       </div>
+
+      <LanguageSwitcherDialog open={languageSwitcherOpen} setOpen={setLanguageSwitcherOpen} />
     </div>
   );
 };

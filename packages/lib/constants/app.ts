@@ -10,7 +10,7 @@ export const NEXT_PRIVATE_INTERNAL_WEBAPP_URL = process.env.NEXT_PRIVATE_INTERNA
 export const IS_APP_MARKETING = process.env.NEXT_PUBLIC_PROJECT === 'marketing';
 export const IS_APP_WEB = process.env.NEXT_PUBLIC_PROJECT === 'web';
 export const IS_BILLING_ENABLED = () => env('NEXT_PUBLIC_FEATURE_BILLING_ENABLED') === 'true';
-export const IS_APP_WEB_I18N_ENABLED = false;
+export const IS_APP_WEB_I18N_ENABLED = true;
 
 export const APP_FOLDER = () => (IS_APP_MARKETING ? 'marketing' : 'web');
 

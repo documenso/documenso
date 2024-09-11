@@ -303,7 +303,7 @@ msgstr "Das Hinzufügen und Entfernen von Sitzplätzen wird Ihre Rechnung entspr
 msgid "Admin Actions"
 msgstr "Admin-Aktionen"
 
-#: apps/web/src/components/(dashboard)/layout/menu-switcher.tsx:257
+#: apps/web/src/components/(dashboard)/layout/menu-switcher.tsx:262
 msgid "Admin panel"
 msgstr "Admin-Panel"
 
@@ -311,7 +311,7 @@ msgstr "Admin-Panel"
 msgid "All"
 msgstr "Alle"
 
-#: apps/web/src/components/(dashboard)/common/command-menu.tsx:37
+#: apps/web/src/components/(dashboard)/common/command-menu.tsx:42
 msgid "All documents"
 msgstr "Alle Dokumente"
 
@@ -327,7 +327,7 @@ msgstr "Alle eingefügten Unterschriften werden annulliert"
 msgid "All recipients will be notified"
 msgstr "Alle Empfänger werden benachrichtigt"
 
-#: apps/web/src/components/(dashboard)/common/command-menu.tsx:52
+#: apps/web/src/components/(dashboard)/common/command-menu.tsx:57
 msgid "All templates"
 msgstr "Alle Vorlagen"
 
@@ -481,6 +481,7 @@ msgstr "Ein Fehler ist aufgetreten, während dein Dokument hochgeladen wurde."
 #: apps/web/src/app/(dashboard)/settings/profile/delete-account-dialog.tsx:63
 #: apps/web/src/app/(signing)/sign/[token]/complete/claim-account.tsx:98
 #: apps/web/src/app/(teams)/t/[teamUrl]/settings/team-transfer-status.tsx:54
+#: apps/web/src/components/(dashboard)/common/command-menu.tsx:301
 #: apps/web/src/components/(dashboard)/settings/token/delete-token-dialog.tsx:97
 #: apps/web/src/components/(dashboard)/settings/webhooks/delete-webhook-dialog.tsx:88
 #: apps/web/src/components/(teams)/dialogs/add-team-email-dialog.tsx:100
@@ -793,7 +794,7 @@ msgstr "Betrachten abschließen"
 msgid "Completed"
 msgstr "Abgeschlossen"
 
-#: apps/web/src/components/(dashboard)/common/command-menu.tsx:43
+#: apps/web/src/components/(dashboard)/common/command-menu.tsx:48
 msgid "Completed documents"
 msgstr "Abgeschlossene Dokumente"
 
@@ -927,8 +928,8 @@ msgstr "Jetzt erstellen"
 msgid "Create one automatically"
 msgstr "Einen automatisch erstellen"
 
-#: apps/web/src/components/(dashboard)/layout/menu-switcher.tsx:176
-#: apps/web/src/components/(dashboard)/layout/menu-switcher.tsx:246
+#: apps/web/src/components/(dashboard)/layout/menu-switcher.tsx:181
+#: apps/web/src/components/(dashboard)/layout/menu-switcher.tsx:251
 #: apps/web/src/components/(teams)/dialogs/create-team-dialog.tsx:138
 #: apps/web/src/components/(teams)/dialogs/create-team-dialog.tsx:146
 msgid "Create team"
@@ -1006,7 +1007,7 @@ msgstr "Aktueller Plan: {0}"
 msgid "Daily"
 msgstr "Täglich"
 
-#: apps/web/src/components/(dashboard)/common/command-menu.tsx:255
+#: apps/web/src/components/(dashboard)/common/command-menu.tsx:265
 msgid "Dark Mode"
 msgstr "Dunkelmodus"
 
@@ -1316,7 +1317,7 @@ msgstr "Dokument wird dauerhaft gelöscht"
 #: apps/web/src/app/(dashboard)/documents/documents-page-view.tsx:110
 #: apps/web/src/app/(profile)/p/[url]/page.tsx:166
 #: apps/web/src/app/not-found.tsx:21
-#: apps/web/src/components/(dashboard)/common/command-menu.tsx:200
+#: apps/web/src/components/(dashboard)/common/command-menu.tsx:205
 #: apps/web/src/components/(dashboard)/layout/desktop-nav.tsx:18
 #: apps/web/src/components/(dashboard)/layout/mobile-navigation.tsx:35
 #: apps/web/src/components/ui/user-profile-timur.tsx:60
@@ -1358,7 +1359,7 @@ msgstr "Zertifikat herunterladen"
 msgid "Draft"
 msgstr "Entwurf"
 
-#: apps/web/src/components/(dashboard)/common/command-menu.tsx:41
+#: apps/web/src/components/(dashboard)/common/command-menu.tsx:46
 msgid "Draft documents"
 msgstr "Entwurfdokumente"
 
@@ -1683,7 +1684,7 @@ msgstr "Wenn Ihre Authenticator-App keine QR-Codes unterstützt, können Sie sta
 msgid "Inbox"
 msgstr "Posteingang"
 
-#: apps/web/src/components/(dashboard)/common/command-menu.tsx:47
+#: apps/web/src/components/(dashboard)/common/command-menu.tsx:52
 msgid "Inbox documents"
 msgstr "Posteingang Dokumente"
 
@@ -1773,6 +1774,10 @@ msgstr "Es scheint, dass kein Token bereitgestellt wurde. Wenn Sie versuchen, Ih
 msgid "It seems that there is no token provided. Please check your email and try again."
 msgstr "Es scheint, dass kein Token bereitgestellt wurde. Bitte überprüfen Sie Ihre E-Mail und versuchen Sie es erneut."
 
+#: apps/web/src/components/(dashboard)/layout/menu-switcher.tsx:286
+msgid "Language"
+msgstr ""
+
 #: apps/web/src/components/(dashboard)/period-selector/period-selector.tsx:61
 msgid "Last 14 days"
 msgstr "Die letzten 14 Tage"
@@ -1810,7 +1815,7 @@ msgstr "Verlassen"
 msgid "Leave team"
 msgstr "Team verlassen"
 
-#: apps/web/src/components/(dashboard)/common/command-menu.tsx:254
+#: apps/web/src/components/(dashboard)/common/command-menu.tsx:264
 msgid "Light Mode"
 msgstr "Lichtmodus"
 
@@ -1900,7 +1905,7 @@ msgstr "Abonnements verwalten"
 msgid "Manage team subscription."
 msgstr "Teamabonnement verwalten."
 
-#: apps/web/src/components/(dashboard)/layout/menu-switcher.tsx:163
+#: apps/web/src/components/(dashboard)/layout/menu-switcher.tsx:168
 msgid "Manage teams"
 msgstr "Teams verwalten"
 
@@ -2054,7 +2059,7 @@ msgstr "Keine aktuellen Aktivitäten"
 msgid "No recipients"
 msgstr "Keine Empfänger"
 
-#: apps/web/src/components/(dashboard)/common/command-menu.tsx:195
+#: apps/web/src/components/(dashboard)/common/command-menu.tsx:200
 msgid "No results found."
 msgstr "Keine Ergebnisse gefunden."
 
@@ -2146,7 +2151,7 @@ msgid "Otherwise, the document will be created as a draft."
 msgstr "Andernfalls wird das Dokument als Entwurf erstellt."
 
 #: apps/web/src/app/(dashboard)/admin/documents/document-results.tsx:86
-#: apps/web/src/components/(dashboard)/layout/menu-switcher.tsx:76
+#: apps/web/src/components/(dashboard)/layout/menu-switcher.tsx:81
 msgid "Owner"
 msgstr "Besitzer"
 
@@ -2191,7 +2196,7 @@ msgstr "Passkeys ermöglichen das Anmelden und die Authentifizierung mit biometr
 msgid "Passkeys are not supported on this browser"
 msgstr "Passkeys werden von diesem Browser nicht unterstützt"
 
-#: apps/web/src/components/(dashboard)/common/command-menu.tsx:65
+#: apps/web/src/components/(dashboard)/common/command-menu.tsx:70
 #: apps/web/src/components/forms/password.tsx:123
 #: apps/web/src/components/forms/reset-password.tsx:110
 #: apps/web/src/components/forms/signin.tsx:344
@@ -2225,7 +2230,7 @@ msgstr "Zahlung überfällig"
 msgid "Pending"
 msgstr "Ausstehend"
 
-#: apps/web/src/components/(dashboard)/common/command-menu.tsx:46
+#: apps/web/src/components/(dashboard)/common/command-menu.tsx:51
 msgid "Pending documents"
 msgstr "Ausstehende Dokumente"
 
@@ -2241,11 +2246,11 @@ msgstr "Ausstehende Einladungen"
 msgid "Pending team deleted."
 msgstr "Ausstehendes Team gelöscht."
 
-#: apps/web/src/components/(dashboard)/layout/menu-switcher.tsx:129
+#: apps/web/src/components/(dashboard)/layout/menu-switcher.tsx:134
 msgid "Personal"
 msgstr "Persönlich"
 
-#: apps/web/src/components/(dashboard)/layout/menu-switcher.tsx:72
+#: apps/web/src/components/(dashboard)/layout/menu-switcher.tsx:77
 msgid "Personal Account"
 msgstr "Persönliches Konto"
 
@@ -2329,7 +2334,7 @@ msgstr "Bitte versuchen Sie es später noch einmal."
 msgid "Please type <0>{0}</0> to confirm."
 msgstr "Bitte geben Sie <0>{0}</0> ein, um zu bestätigen."
 
-#: apps/web/src/components/(dashboard)/common/command-menu.tsx:209
+#: apps/web/src/components/(dashboard)/common/command-menu.tsx:214
 msgid "Preferences"
 msgstr "Einstellungen"
 
@@ -2347,7 +2352,7 @@ msgid "Private templates can only be modified and viewed by you."
 msgstr "Private Vorlagen können nur von Ihnen bearbeitet und angezeigt werden."
 
 #: apps/web/src/app/(dashboard)/settings/profile/page.tsx:28
-#: apps/web/src/components/(dashboard)/common/command-menu.tsx:64
+#: apps/web/src/components/(dashboard)/common/command-menu.tsx:69
 #: apps/web/src/components/(dashboard)/settings/layout/desktop-nav.tsx:36
 #: apps/web/src/components/(dashboard)/settings/layout/mobile-nav.tsx:39
 msgid "Profile"
@@ -2666,8 +2671,8 @@ msgid "Set a password"
 msgstr "Ein Passwort festlegen"
 
 #: apps/web/src/app/(dashboard)/settings/layout.tsx:20
-#: apps/web/src/components/(dashboard)/common/command-menu.tsx:60
-#: apps/web/src/components/(dashboard)/common/command-menu.tsx:206
+#: apps/web/src/components/(dashboard)/common/command-menu.tsx:65
+#: apps/web/src/components/(dashboard)/common/command-menu.tsx:211
 #: apps/web/src/components/(dashboard)/layout/mobile-navigation.tsx:47
 msgid "Settings"
 msgstr "Einstellungen"
@@ -2751,7 +2756,7 @@ msgstr "Einloggen"
 msgid "Sign in to your account"
 msgstr "Melden Sie sich bei Ihrem Konto an"
 
-#: apps/web/src/components/(dashboard)/layout/menu-switcher.tsx:285
+#: apps/web/src/components/(dashboard)/layout/menu-switcher.tsx:297
 #: apps/web/src/components/(dashboard)/layout/mobile-navigation.tsx:84
 msgid "Sign Out"
 msgstr "Ausloggen"
@@ -2957,7 +2962,7 @@ msgstr "Erfolg"
 msgid "Successfully created passkey"
 msgstr "Passkey erfolgreich erstellt"
 
-#: apps/web/src/components/(dashboard)/common/command-menu.tsx:256
+#: apps/web/src/components/(dashboard)/common/command-menu.tsx:266
 msgid "System Theme"
 msgstr "Systemthema"
 
@@ -3042,7 +3047,7 @@ msgstr "Team-Eigentum übertragen!"
 msgid "Team Public Profile"
 msgstr "Öffentliches Profil des Teams"
 
-#: apps/web/src/components/(dashboard)/layout/menu-switcher.tsx:272
+#: apps/web/src/components/(dashboard)/layout/menu-switcher.tsx:277
 msgid "Team settings"
 msgstr "Teameinstellungen"
 
@@ -3068,7 +3073,7 @@ msgid "Team URL"
 msgstr "Team-URL"
 
 #: apps/web/src/app/(dashboard)/settings/teams/page.tsx:25
-#: apps/web/src/components/(dashboard)/layout/menu-switcher.tsx:157
+#: apps/web/src/components/(dashboard)/layout/menu-switcher.tsx:162
 #: apps/web/src/components/(dashboard)/layout/mobile-navigation.tsx:43
 #: apps/web/src/components/(dashboard)/settings/layout/desktop-nav.tsx:64
 #: apps/web/src/components/(dashboard)/settings/layout/mobile-nav.tsx:67
@@ -3114,7 +3119,7 @@ msgstr "Template saved"
 
 #: apps/web/src/app/(dashboard)/templates/[id]/template-page-view.tsx:60
 #: apps/web/src/app/(dashboard)/templates/templates-page-view.tsx:55
-#: apps/web/src/components/(dashboard)/common/command-menu.tsx:203
+#: apps/web/src/components/(dashboard)/common/command-menu.tsx:208
 #: apps/web/src/components/(dashboard)/layout/desktop-nav.tsx:22
 #: apps/web/src/components/(dashboard)/layout/mobile-navigation.tsx:39
 msgid "Templates"
@@ -3522,13 +3527,17 @@ msgstr "Type"
 msgid "Type 'delete' to confirm"
 msgstr "Type 'delete' to confirm"
 
-#: apps/web/src/components/(dashboard)/common/command-menu.tsx:181
+#: apps/web/src/components/(dashboard)/common/command-menu.tsx:186
 msgid "Type a command or search..."
 msgstr "Type a command or search..."
 
 #: apps/web/src/app/(unauthenticated)/verify-email/page.tsx:26
 msgid "Uh oh! Looks like you're missing a token"
 msgstr "Uh oh! Looks like you're missing a token"
+
+#: apps/web/src/components/(dashboard)/common/command-menu.tsx:303
+msgid "Unable to change the language at this time. Please try again later."
+msgstr ""
 
 #: apps/web/src/components/forms/2fa/recovery-code-list.tsx:31
 msgid "Unable to copy recovery code"
@@ -3728,7 +3737,7 @@ msgstr "Benutzer-ID"
 msgid "User profiles are here!"
 msgstr "Benutzerprofile sind hier!"
 
-#: apps/web/src/components/(dashboard)/layout/menu-switcher.tsx:264
+#: apps/web/src/components/(dashboard)/layout/menu-switcher.tsx:269
 msgid "User settings"
 msgstr "Benutzereinstellungen"
 
@@ -4360,7 +4369,7 @@ msgstr "Ihr Dokument wurde erfolgreich hochgeladen."
 msgid "Your document has been uploaded successfully. You will be redirected to the template page."
 msgstr "Ihr Dokument wurde erfolgreich hochgeladen. Sie werden zur Vorlagenseite weitergeleitet."
 
-#: apps/web/src/components/(dashboard)/common/command-menu.tsx:215
+#: apps/web/src/components/(dashboard)/common/command-menu.tsx:223
 msgid "Your documents"
 msgstr "Ihre Dokumente"
 
