@@ -206,7 +206,7 @@ export const FieldItem = ({
           !hasErrors && signerStyles.default.base,
           !hasErrors && signerStyles.default.fieldItem,
           {
-            'rounded-lg border-2 border-red-400 bg-red-400/20 shadow-[0_0_0_5px_theme(colors.red.500/10%),0_0_0_2px_theme(colors.red.500/40%),0_0_0_0.5px_theme(colors.red.500)]':
+            'rounded-lg border border-red-400 bg-red-400/20 shadow-[0_0_0_5px_theme(colors.red.500/10%),0_0_0_2px_theme(colors.red.500/40%),0_0_0_0.5px_theme(colors.red.500)]':
               hasErrors,
           },
         )}

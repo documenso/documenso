@@ -549,6 +549,10 @@ export const AddFieldsFormPartial = ({
               {isDocumentPdfLoaded &&
                 localFields.map((field, index) => {
                   const recipientIndex = recipients.findIndex((r) => r.email === field.signerEmail);
+                  const hasFieldError =
+                    emptyCheckboxFields.find((f) => f.formId === field.formId) ||
+                    emptyRadioFields.find((f) => f.formId === field.formId) ||
+                    emptySelectFields.find((f) => f.formId === field.formId);
 
                   return (
                     <FieldItem
@@ -572,7 +576,7 @@ export const AddFieldsFormPartial = ({
                         handleAdvancedSettings();
                       }}
                       hideRecipients={hideRecipients}
-                      hasErrors={hasErrors}
+                      hasErrors={hasFieldError}
                     />
                   );
                 })}
