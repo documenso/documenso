@@ -26,19 +26,21 @@ export const CheckboxField = ({ field }: CheckboxFieldProps) => {
   }
 
   return (
-    <div className="flex flex-col gap-y-2">
+    <div className="flex flex-col gap-y-1">
       {!parsedFieldMeta?.values ? (
         <FieldIcon fieldMeta={field.fieldMeta} type={field.type} signerEmail={field.signerEmail} />
       ) : (
         parsedFieldMeta.values.map((item: { value: string; checked: boolean }, index: number) => (
           <div key={index} className="flex items-center gap-x-1.5">
             <Checkbox
-              className="h-4 w-4"
+              className="h-3 w-3"
               checkClassName="text-white"
               id={`checkbox-${index}`}
               checked={item.checked}
             />
-            <Label htmlFor={`checkbox-${index}`}>{item.value}</Label>
+            <Label htmlFor={`checkbox-${index}`} className="text-xs">
+              {item.value}
+            </Label>
           </div>
         ))
       )}

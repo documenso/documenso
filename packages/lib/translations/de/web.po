@@ -251,8 +251,8 @@ msgid "Add more"
 msgstr ""
 
 #: apps/web/src/app/(signing)/sign/[token]/number-field.tsx:270
-msgid "Add number"
-msgstr ""
+#~ msgid "Add number"
+#~ msgstr "Nummer hinzufügen"
 
 #: apps/web/src/app/(dashboard)/settings/security/passkeys/create-passkey-dialog.tsx:146
 #: apps/web/src/app/(dashboard)/settings/security/passkeys/create-passkey-dialog.tsx:154
@@ -276,12 +276,12 @@ msgid "Add team email"
 msgstr ""
 
 #: apps/web/src/app/(signing)/sign/[token]/text-field.tsx:256
-msgid "Add text"
-msgstr ""
+#~ msgid "Add text"
+#~ msgstr "Text hinzufügen"
 
 #: apps/web/src/app/(signing)/sign/[token]/text-field.tsx:272
-msgid "Add Text"
-msgstr ""
+#~ msgid "Add Text"
+#~ msgstr "Text hinzufügen"
 
 #: apps/web/src/app/(dashboard)/documents/[id]/edit-document.tsx:152
 msgid "Add the people who will sign the document."
@@ -2078,6 +2078,10 @@ msgstr ""
 msgid "Nothing to do"
 msgstr ""
 
+#: apps/web/src/app/(signing)/sign/[token]/number-field.tsx:270
+msgid "Number"
+msgstr ""
+
 #: apps/web/src/components/(dashboard)/settings/webhooks/create-webhook-dialog.tsx:128
 msgid "On this page, you can create a new webhook."
 msgstr ""
@@ -2598,7 +2602,7 @@ msgstr ""
 msgid "Security activity"
 msgstr ""
 
-#: apps/web/src/app/(signing)/sign/[token]/dropdown-field.tsx:192
+#: apps/web/src/app/(signing)/sign/[token]/dropdown-field.tsx:194
 msgid "Select"
 msgstr ""
 
@@ -3112,6 +3116,11 @@ msgstr ""
 
 #: apps/web/src/app/(dashboard)/templates/new-template-dialog.tsx:106
 msgid "Templates allow you to quickly generate documents with pre-filled recipients and fields."
+msgstr ""
+
+#: apps/web/src/app/(signing)/sign/[token]/text-field.tsx:256
+#: apps/web/src/app/(signing)/sign/[token]/text-field.tsx:272
+msgid "Text"
 msgstr ""
 
 #: apps/web/src/app/(dashboard)/admin/site-settings/banner-form.tsx:166

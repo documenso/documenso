@@ -253,7 +253,7 @@ export const TextField = ({ field, recipient, onSignField, onUnsignField }: Text
         >
           <span className="flex items-center justify-center gap-x-1">
             <Type />
-            {fieldDisplayName || <Trans>Add text</Trans>}
+            {fieldDisplayName || <Trans>Text</Trans>}
           </span>
         </p>
       )}
@@ -269,7 +269,7 @@ export const TextField = ({ field, recipient, onSignField, onUnsignField }: Text
       <Dialog open={showCustomTextModal} onOpenChange={setShowCustomTextModal}>
         <DialogContent>
           <DialogTitle>
-            {parsedFieldMeta?.label ? parsedFieldMeta?.label : <Trans>Add Text</Trans>}
+            {parsedFieldMeta?.label ? parsedFieldMeta?.label : <Trans>Text</Trans>}
           </DialogTitle>
 
           <div>

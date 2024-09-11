@@ -28,8 +28,8 @@ const fieldIcons = {
   [FieldType.EMAIL]: { icon: Mail, label: 'Email' },
   [FieldType.NAME]: { icon: User, label: 'Name' },
   [FieldType.DATE]: { icon: CalendarDays, label: 'Date' },
-  [FieldType.TEXT]: { icon: Type, label: 'Add text' },
-  [FieldType.NUMBER]: { icon: Hash, label: 'Add number' },
+  [FieldType.TEXT]: { icon: Type, label: 'Text' },
+  [FieldType.NUMBER]: { icon: Hash, label: 'Number' },
   [FieldType.RADIO]: { icon: Disc, label: 'Radio' },
   [FieldType.CHECKBOX]: { icon: CheckSquare, label: 'Checkbox' },
   [FieldType.DROPDOWN]: { icon: ChevronDown, label: 'Select' },
@@ -45,7 +45,7 @@ export const FieldIcon = ({
     return (
       <div
         className={cn(
-          'text-field-card-foreground flex items-center justify-center gap-x-1 text-xl',
+          'text-field-card-foreground flex items-center justify-center gap-x-1 text-[clamp(0.875rem,1.8cqw,1.2rem)]',
           fontCaveatClassName,
         )}
       >
@@ -71,7 +71,7 @@ export const FieldIcon = ({
     }
 
     return (
-      <div className="text-field-card-foreground flex items-center justify-center gap-x-1.5 text-sm">
+      <div className="text-field-card-foreground flex items-center justify-center gap-x-1.5 text-[clamp(0.625rem,1cqw,0.825rem)]">
         <Icon className="h-4 w-4" /> {label}
       </div>
     );
