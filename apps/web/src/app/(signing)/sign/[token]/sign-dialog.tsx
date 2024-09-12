@@ -23,7 +23,7 @@ export type SignDialogProps = {
   fieldsValidated: () => void | Promise<void>;
   onSignatureComplete: () => void | Promise<void>;
   role: RecipientRole;
-  disabled: boolean;
+  disabled?: boolean;
 };
 
 export const SignDialog = ({

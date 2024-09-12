@@ -1773,6 +1773,10 @@ msgstr "Es scheint, dass kein Token bereitgestellt wurde. Wenn Sie versuchen, Ih
 msgid "It seems that there is no token provided. Please check your email and try again."
 msgstr "Es scheint, dass kein Token bereitgestellt wurde. Bitte überprüfen Sie Ihre E-Mail und versuchen Sie es erneut."
 
+#: apps/web/src/app/(signing)/sign/[token]/waiting/page.tsx:73
+msgid "It's currently not your turn to sign. You will receive an email with instructions once it's your turn to sign the document."
+msgstr ""
+
 #: apps/web/src/components/(dashboard)/period-selector/period-selector.tsx:61
 msgid "Last 14 days"
 msgstr "Die letzten 14 Tage"
@@ -2260,6 +2264,10 @@ msgstr "Wählen Sie eine der folgenden Vereinbarungen aus und beginnen Sie das S
 #: apps/web/src/components/(teams)/dialogs/invite-team-member-dialog.tsx:212
 msgid "Please check the CSV file and make sure it is according to our format"
 msgstr "Bitte prüfen Sie die CSV-Datei und stellen Sie sicher, dass sie unserem Format entspricht"
+
+#: apps/web/src/app/(signing)/sign/[token]/waiting/page.tsx:80
+msgid "Please check your email for updates."
+msgstr ""
 
 #: apps/web/src/app/(unauthenticated)/reset-password/[token]/page.tsx:34
 msgid "Please choose your new password"
@@ -3826,6 +3834,10 @@ msgstr "Warten"
 msgid "Waiting for others to sign"
 msgstr "Warten auf andere, um zu unterschreiben"
 
+#: apps/web/src/app/(signing)/sign/[token]/waiting/page.tsx:69
+msgid "Waiting for Your Turn"
+msgstr ""
+
 #: apps/web/src/app/(signing)/sign/[token]/no-longer-available.tsx:61
 msgid "Want to send slick signing links like this one? <0>Check out Documenso.</0>"
 msgstr "Möchten Sie auffällige Signatur-Links wie diesen senden? <0>Überprüfen Sie Documenso.</0>"
@@ -4069,6 +4081,10 @@ msgstr "Wöchentlich"
 #: apps/web/src/app/(unauthenticated)/signin/page.tsx:48
 msgid "Welcome back, we are lucky to have you."
 msgstr "Willkommen zurück, wir freuen uns, Sie zu haben."
+
+#: apps/web/src/app/(signing)/sign/[token]/waiting/page.tsx:87
+msgid "Were you trying to edit this document instead?"
+msgstr ""
 
 #: apps/web/src/app/(dashboard)/settings/security/passkeys/create-passkey-dialog.tsx:189
 msgid "When you click continue, you will be prompted to add the first available authenticator on your system."

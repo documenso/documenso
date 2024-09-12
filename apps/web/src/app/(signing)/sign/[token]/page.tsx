@@ -43,7 +43,13 @@ export default async function SigningPage({ params: { token } }: SigningPageProp
 
   const requestMetadata = extractNextHeaderRequestMetadata(requestHeaders);
 
-  const [document, fields, recipient, completedFields, isRecipientsTurn] = await Promise.all([
+  const isRecipientsTurn = await getIsRecipientsTurnToSign({ token });
+
+  if (!isRecipientsTurn) {
+    return redirect(`/sign/${token}/waiting`);
+  }
+
+  const [document, fields, recipient, completedFields] = await Promise.all([
     getDocumentAndSenderByToken({
       token,
       userId: user?.id,
@@ -52,7 +58,6 @@ export default async function SigningPage({ params: { token } }: SigningPageProp
     getFieldsForToken({ token }),
     getRecipientByToken({ token }).catch(() => null),
     getCompletedFieldsForToken({ token }),
-    getIsRecipientsTurnToSign({ token }),
   ]);
 
   if (
