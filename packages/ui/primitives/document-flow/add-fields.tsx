@@ -21,6 +21,7 @@ import {
 } from 'lucide-react';
 import { useFieldArray, useForm } from 'react-hook-form';
 import { useHotkeys } from 'react-hotkeys-hook';
+import { prop, sortBy } from 'remeda';
 
 import { getBoundingClientRect } from '@documenso/lib/client-only/get-bounding-client-rect';
 import { useDocumentElement } from '@documenso/lib/client-only/hooks/use-document-element';
@@ -485,14 +486,11 @@ export const AddFieldsFormPartial = ({
           // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
           [
             role,
-            roleRecipients.sort((a, b) => {
-              if (a.signingOrder !== null && b.signingOrder !== null) {
-                return a.signingOrder - b.signingOrder;
-              }
-              if (a.signingOrder !== null) return -1;
-              if (b.signingOrder !== null) return 1;
-              return 0;
-            }),
+            sortBy(
+              roleRecipients,
+              [(r) => r.signingOrder || Number.MAX_SAFE_INTEGER, 'asc'],
+              [prop('id'), 'asc'],
+            ),
           ] as [RecipientRole, Recipient[]],
       );
   }, [recipientsByRole]);

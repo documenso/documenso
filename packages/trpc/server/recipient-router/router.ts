@@ -58,6 +58,7 @@ export const recipientRouter = router({
             email: signer.email,
             name: signer.name,
             role: signer.role,
+            signingOrder: signer.signingOrder,
             actionAuth: signer.actionAuth,
           })),
         });

@@ -366,8 +366,8 @@ msgid "An error occurred"
 msgstr "An error occurred"
 
 #: apps/web/src/app/(dashboard)/documents/[id]/edit-document.tsx:247
-#: apps/web/src/app/(dashboard)/templates/[id]/edit-template.tsx:176
-#: apps/web/src/app/(dashboard)/templates/[id]/edit-template.tsx:210
+#: apps/web/src/app/(dashboard)/templates/[id]/edit-template.tsx:197
+#: apps/web/src/app/(dashboard)/templates/[id]/edit-template.tsx:231
 msgid "An error occurred while adding signers."
 msgstr "An error occurred while adding signers."
 
@@ -454,7 +454,7 @@ msgid "An error occurred while trying to create a checkout session."
 msgstr "An error occurred while trying to create a checkout session."
 
 #: apps/web/src/app/(dashboard)/documents/[id]/edit-document.tsx:213
-#: apps/web/src/app/(dashboard)/templates/[id]/edit-template.tsx:153
+#: apps/web/src/app/(dashboard)/templates/[id]/edit-template.tsx:166
 msgid "An error occurred while updating the document settings."
 msgstr "An error occurred while updating the document settings."
 
@@ -1492,9 +1492,9 @@ msgstr "Enter your text here"
 #: apps/web/src/app/(dashboard)/documents/move-document-dialog.tsx:57
 #: apps/web/src/app/(dashboard)/documents/upload-document.tsx:106
 #: apps/web/src/app/(dashboard)/documents/upload-document.tsx:112
-#: apps/web/src/app/(dashboard)/templates/[id]/edit-template.tsx:152
-#: apps/web/src/app/(dashboard)/templates/[id]/edit-template.tsx:175
-#: apps/web/src/app/(dashboard)/templates/[id]/edit-template.tsx:209
+#: apps/web/src/app/(dashboard)/templates/[id]/edit-template.tsx:165
+#: apps/web/src/app/(dashboard)/templates/[id]/edit-template.tsx:196
+#: apps/web/src/app/(dashboard)/templates/[id]/edit-template.tsx:230
 #: apps/web/src/app/(dashboard)/templates/duplicate-template-dialog.tsx:51
 #: apps/web/src/app/(dashboard)/templates/move-template-dialog.tsx:56
 #: apps/web/src/app/(dashboard)/templates/use-template-dialog.tsx:152
@@ -1772,7 +1772,7 @@ msgstr "It seems that there is no token provided, if you are trying to verify yo
 msgid "It seems that there is no token provided. Please check your email and try again."
 msgstr "It seems that there is no token provided. Please check your email and try again."
 
-#: apps/web/src/app/(signing)/sign/[token]/waiting/page.tsx:73
+#: apps/web/src/app/(signing)/sign/[token]/waiting/page.tsx:74
 msgid "It's currently not your turn to sign. You will receive an email with instructions once it's your turn to sign the document."
 msgstr "It's currently not your turn to sign. You will receive an email with instructions once it's your turn to sign the document."
 
@@ -2264,7 +2264,7 @@ msgstr "Pick any of the following agreements below and start signing to get star
 msgid "Please check the CSV file and make sure it is according to our format"
 msgstr "Please check the CSV file and make sure it is according to our format"
 
-#: apps/web/src/app/(signing)/sign/[token]/waiting/page.tsx:80
+#: apps/web/src/app/(signing)/sign/[token]/waiting/page.tsx:81
 msgid "Please check your email for updates."
 msgstr "Please check your email for updates."
 
@@ -3115,7 +3115,7 @@ msgstr "Template has been updated."
 msgid "Template moved"
 msgstr "Template moved"
 
-#: apps/web/src/app/(dashboard)/templates/[id]/edit-template.tsx:198
+#: apps/web/src/app/(dashboard)/templates/[id]/edit-template.tsx:219
 msgid "Template saved"
 msgstr "Template saved"
 
@@ -3833,7 +3833,7 @@ msgstr "Waiting"
 msgid "Waiting for others to sign"
 msgstr "Waiting for others to sign"
 
-#: apps/web/src/app/(signing)/sign/[token]/waiting/page.tsx:69
+#: apps/web/src/app/(signing)/sign/[token]/waiting/page.tsx:70
 msgid "Waiting for Your Turn"
 msgstr "Waiting for Your Turn"
 
@@ -4081,7 +4081,7 @@ msgstr "Weekly"
 msgid "Welcome back, we are lucky to have you."
 msgstr "Welcome back, we are lucky to have you."
 
-#: apps/web/src/app/(signing)/sign/[token]/waiting/page.tsx:87
+#: apps/web/src/app/(signing)/sign/[token]/waiting/page.tsx:88
 msgid "Were you trying to edit this document instead?"
 msgstr "Were you trying to edit this document instead?"
 
@@ -4450,7 +4450,7 @@ msgstr "Your template has been successfully deleted."
 msgid "Your template will be duplicated."
 msgstr "Your template will be duplicated."
 
-#: apps/web/src/app/(dashboard)/templates/[id]/edit-template.tsx:199
+#: apps/web/src/app/(dashboard)/templates/[id]/edit-template.tsx:220
 msgid "Your templates has been saved successfully."
 msgstr "Your templates has been saved successfully."
 

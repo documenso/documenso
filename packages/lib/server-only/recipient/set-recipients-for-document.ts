@@ -27,7 +27,7 @@ export interface SetRecipientsForDocumentOptions {
     email: string;
     name: string;
     role: RecipientRole;
-    signingOrder?: number;
+    signingOrder?: number | null;
     actionAuth?: TRecipientActionAuthTypes | null;
   }[];
   requestMetadata?: RequestMetadata;

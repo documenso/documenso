@@ -10,6 +10,7 @@ export type CreateDocumentFromTemplateLegacyOptions = {
     name?: string;
     email: string;
     role?: RecipientRole;
+    signingOrder?: number | null;
   }[];
 };
 
@@ -73,6 +74,7 @@ export const createDocumentFromTemplateLegacy = async ({
           email: recipient.email,
           name: recipient.name,
           role: recipient.role,
+          signingOrder: recipient.signingOrder,
           token: nanoid(),
         })),
       },
@@ -129,12 +131,14 @@ export const createDocumentFromTemplateLegacy = async ({
             name: recipient.name,
             email: recipient.email,
             role: recipient.role,
+            signingOrder: recipient.signingOrder,
           },
           create: {
             documentId: document.id,
             email: recipient.email,
             name: recipient.name,
             role: recipient.role,
+            signingOrder: recipient.signingOrder,
             token: nanoid(),
           },
         });

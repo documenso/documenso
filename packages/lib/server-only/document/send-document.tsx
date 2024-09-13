@@ -64,9 +64,7 @@ export const sendDocument = async ({
     },
     include: {
       Recipient: {
-        orderBy: {
-          signingOrder: 'asc',
-        },
+        orderBy: [{ signingOrder: { sort: 'asc', nulls: 'last' } }, { id: 'asc' }],
       },
       documentMeta: true,
       documentData: true,
@@ -86,10 +84,19 @@ export const sendDocument = async ({
   }
 
   const signingOrder = document.documentMeta?.signingOrder || DocumentSigningOrder.PARALLEL;
-  const recipientsToNotify =
-    signingOrder === DocumentSigningOrder.SEQUENTIAL
-      ? document.Recipient.filter((r) => r.signingOrder === 1)
-      : document.Recipient;
+
+  let recipientsToNotify = document.Recipient;
+
+  if (signingOrder === DocumentSigningOrder.SEQUENTIAL) {
+    // Get the currently active recipient.
+    recipientsToNotify = document.Recipient.filter(
+      (r) => r.signingStatus === SigningStatus.NOT_SIGNED && r.role !== RecipientRole.CC,
+    ).slice(0, 1);
+
+    // Secondary filter so we aren't resending if the current active recipient has already
+    // received the document.
+    recipientsToNotify.filter((r) => r.sendStatus !== SendStatus.SENT);
+  }
 
   const { documentData } = document;
 

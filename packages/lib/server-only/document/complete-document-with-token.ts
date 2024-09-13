@@ -13,6 +13,7 @@ import { WebhookTriggerEvents } from '@documenso/prisma/client';
 
 import { jobs } from '../../jobs/client';
 import type { TRecipientActionAuth } from '../../types/document-auth';
+import { getIsRecipientsTurnToSign } from '../recipient/get-is-recipient-turn';
 import { triggerWebhook } from '../webhooks/trigger/trigger-webhook';
 import { sendPendingEmail } from './send-pending-email';
 
@@ -67,49 +68,12 @@ export const completeDocumentWithToken = async ({
   }
 
   if (document.documentMeta?.signingOrder === DocumentSigningOrder.SEQUENTIAL) {
-    if (recipient.signingOrder == null) {
-      throw new Error(`Recipient ${recipient.id} has a null signing order`);
-    }
+    const isRecipientsTurn = await getIsRecipientsTurnToSign({ token: recipient.token });
 
-    const allRecipients = await prisma.recipient.findMany({
-      where: {
-        documentId: document.id,
-        role: RecipientRole.SIGNER,
-      },
-      orderBy: {
-        signingOrder: 'asc',
-      },
-    });
-
-    const recipientIndex = allRecipients.findIndex((r) => r.id === recipient.id);
-    const previousRecipients = allRecipients.slice(0, recipientIndex);
-    const allPreviousRecipientsSigned = previousRecipients.every(
-      (r) => r.signingStatus === SigningStatus.SIGNED,
-    );
-
-    if (!allPreviousRecipientsSigned) {
-      throw new Error(`It's not yet this recipient's turn to sign.`);
-    }
-
-    const nextRecipient = allRecipients[recipientIndex + 1] || null;
-
-    if (nextRecipient !== null) {
-      await prisma.$transaction(async (tx) => {
-        await tx.recipient.update({
-          where: { id: nextRecipient.id },
-          data: { sendStatus: SendStatus.SENT },
-        });
-
-        await jobs.triggerJob({
-          name: 'send.signing.requested.email',
-          payload: {
-            userId: document.userId,
-            documentId: document.id,
-            recipientId: nextRecipient.id,
-            requestMetadata,
-          },
-        });
-      });
+    if (!isRecipientsTurn) {
+      throw new Error(
+        `Recipient ${recipient.id} attempted to complete the document before it was their turn`,
+      );
     }
   }
 
@@ -174,17 +138,48 @@ export const completeDocumentWithToken = async ({
     });
   });
 
-  const pendingRecipients = await prisma.recipient.count({
+  const pendingRecipients = await prisma.recipient.findMany({
+    select: {
+      id: true,
+      signingOrder: true,
+    },
     where: {
       documentId: document.id,
       signingStatus: {
         not: SigningStatus.SIGNED,
       },
+      role: {
+        not: RecipientRole.CC,
+      },
     },
+    // Composite sort so our next recipient is always the one with the lowest signing order or id
+    // if there is a tie.
+    orderBy: [{ signingOrder: { sort: 'asc', nulls: 'last' } }, { id: 'asc' }],
   });
 
-  if (pendingRecipients > 0) {
+  if (pendingRecipients.length > 0) {
     await sendPendingEmail({ documentId, recipientId: recipient.id });
+
+    if (document.documentMeta?.signingOrder === DocumentSigningOrder.SEQUENTIAL) {
+      const [nextRecipient] = pendingRecipients;
+
+      await prisma.$transaction(async (tx) => {
+        await tx.recipient.update({
+          where: { id: nextRecipient.id },
+          data: { sendStatus: SendStatus.SENT },
+        });
+
+        await jobs.triggerJob({
+          name: 'send.signing.requested.email',
+          payload: {
+            userId: document.userId,
+            documentId: document.id,
+            recipientId: nextRecipient.id,
+            requestMetadata,
+          },
+        });
+      });
+    }
   }
 
   const haveAllRecipientsSigned = await prisma.document.findFirst({

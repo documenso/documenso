@@ -11,13 +11,13 @@ import { motion } from 'framer-motion';
 import { GripVerticalIcon, Plus, Trash } from 'lucide-react';
 import { useSession } from 'next-auth/react';
 import { useFieldArray, useForm } from 'react-hook-form';
+import { prop, sortBy } from 'remeda';
 
 import { useLimits } from '@documenso/ee/server-only/limits/provider/client';
 import { ZRecipientAuthOptionsSchema } from '@documenso/lib/types/document-auth';
 import { nanoid } from '@documenso/lib/universal/id';
 import type { Field, Recipient } from '@documenso/prisma/client';
 import { DocumentSigningOrder, RecipientRole, SendStatus } from '@documenso/prisma/client';
-import type { DocumentWithData } from '@documenso/prisma/types/document-with-data';
 import { AnimateGenericFadeInOut } from '@documenso/ui/components/animate/animate-generic-fade-in-out';
 import { RecipientActionAuthSelect } from '@documenso/ui/components/recipient/recipient-action-auth-select';
 import { RecipientRoleSelect } from '@documenso/ui/components/recipient/recipient-role-select';
@@ -46,7 +46,7 @@ export type AddSignersFormProps = {
   documentFlow: DocumentFlowStep;
   recipients: Recipient[];
   fields: Field[];
-  document: DocumentWithData;
+  signingOrder?: DocumentSigningOrder | null;
   isDocumentEnterprise: boolean;
   onSubmit: (_data: TAddSignersFormSchema) => void;
   isDocumentPdfLoaded: boolean;
@@ -56,7 +56,7 @@ export const AddSignersFormPartial = ({
   documentFlow,
   recipients,
   fields,
-  document,
+  signingOrder,
   isDocumentEnterprise,
   onSubmit,
   isDocumentPdfLoaded,
@@ -69,16 +69,28 @@ export const AddSignersFormPartial = ({
   const user = session?.user;
 
   const initialId = useId();
+  const $sensorApi = useRef<SensorAPI | null>(null);
 
   const { currentStep, totalSteps, previousStep } = useStep();
+
+  const defaultRecipients = [
+    {
+      formId: initialId,
+      name: '',
+      email: '',
+      role: RecipientRole.SIGNER,
+      signingOrder: 1,
+      actionAuth: undefined,
+    },
+  ];
 
   const form = useForm<TAddSignersFormSchema>({
     resolver: zodResolver(ZAddSignersFormSchema),
     defaultValues: {
       signers:
         recipients.length > 0
-          ? recipients
-              .map((recipient, index) => ({
+          ? sortBy(
+              recipients.map((recipient, index) => ({
                 nativeId: recipient.id,
                 formId: String(recipient.id),
                 name: recipient.name,
@@ -87,19 +99,12 @@ export const AddSignersFormPartial = ({
                 signingOrder: recipient.signingOrder ?? index + 1,
                 actionAuth:
                   ZRecipientAuthOptionsSchema.parse(recipient.authOptions)?.actionAuth ?? undefined,
-              }))
-              .sort((a, b) => a.signingOrder - b.signingOrder)
-          : [
-              {
-                formId: initialId,
-                name: '',
-                email: '',
-                role: RecipientRole.SIGNER,
-                signingOrder: 1,
-                actionAuth: undefined,
-              },
-            ],
-      signingOrder: document.documentMeta?.signingOrder || DocumentSigningOrder.PARALLEL,
+              })),
+              [prop('signingOrder'), 'asc'],
+              [prop('nativeId'), 'asc'],
+            )
+          : defaultRecipients,
+      signingOrder: signingOrder || DocumentSigningOrder.PARALLEL,
     },
   });
 
@@ -117,7 +122,6 @@ export const AddSignersFormPartial = ({
   }, [recipients, form]);
 
   const [showAdvancedSettings, setShowAdvancedSettings] = useState(alwaysShowAdvancedSettings);
-  const sensorApiRef = useRef<SensorAPI | null>(null);
 
   const {
     setValue,
@@ -280,11 +284,17 @@ export const AddSignersFormPartial = ({
 
   const triggerDragAndDrop = useCallback(
     (fromIndex: number, toIndex: number) => {
-      if (!sensorApiRef.current) return;
+      if (!$sensorApi.current) {
+        return;
+      }
 
       const draggableId = signers[fromIndex].id;
-      const preDrag = sensorApiRef.current.tryGetLock(draggableId);
-      if (!preDrag) return;
+
+      const preDrag = $sensorApi.current.tryGetLock(draggableId);
+
+      if (!preDrag) {
+        return;
+      }
 
       const drag = preDrag.snapLift();
 
@@ -398,7 +408,7 @@ export const AddSignersFormPartial = ({
               onDragEnd={onDragEnd}
               sensors={[
                 (api: SensorAPI) => {
-                  sensorApiRef.current = api;
+                  $sensorApi.current = api;
                 },
               ]}
             >

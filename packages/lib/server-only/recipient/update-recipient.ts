@@ -11,6 +11,7 @@ export type UpdateRecipientOptions = {
   email?: string;
   name?: string;
   role?: RecipientRole;
+  signingOrder?: number | null;
   userId: number;
   teamId?: number;
   requestMetadata?: RequestMetadata;
@@ -22,6 +23,7 @@ export const updateRecipient = async ({
   email,
   name,
   role,
+  signingOrder,
   userId,
   teamId,
   requestMetadata,
@@ -84,6 +86,7 @@ export const updateRecipient = async ({
         email: email?.toLowerCase() ?? recipient.email,
         name: name ?? recipient.name,
         role: role ?? recipient.role,
+        signingOrder,
       },
     });
 

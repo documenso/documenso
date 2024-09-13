@@ -292,6 +292,7 @@ export const ApiContractV1Implementation = createNextRoute(ApiContractV1, {
         timezone,
         dateFormat: dateFormat?.value,
         redirectUrl: body.meta.redirectUrl,
+        signingOrder: body.meta.signingOrder,
         requestMetadata: extractNextApiRequestMetadata(args.req),
       });
 
@@ -314,6 +315,7 @@ export const ApiContractV1Implementation = createNextRoute(ApiContractV1, {
             email: recipient.email,
             token: recipient.token,
             role: recipient.role,
+            signingOrder: recipient.signingOrder,
 
             signingUrl: `${NEXT_PUBLIC_WEBAPP_URL()}/sign/${recipient.token}`,
           })),
@@ -475,6 +477,7 @@ export const ApiContractV1Implementation = createNextRoute(ApiContractV1, {
           email: recipient.email,
           token: recipient.token,
           role: recipient.role,
+          signingOrder: recipient.signingOrder,
 
           signingUrl: `${NEXT_PUBLIC_WEBAPP_URL()}/sign/${recipient.token}`,
         })),
@@ -557,6 +560,7 @@ export const ApiContractV1Implementation = createNextRoute(ApiContractV1, {
           email: recipient.email,
           token: recipient.token,
           role: recipient.role,
+          signingOrder: recipient.signingOrder,
 
           signingUrl: `${NEXT_PUBLIC_WEBAPP_URL()}/sign/${recipient.token}`,
         })),
@@ -682,7 +686,7 @@ export const ApiContractV1Implementation = createNextRoute(ApiContractV1, {
 
   createRecipient: authenticatedMiddleware(async (args, user, team) => {
     const { id: documentId } = args.params;
-    const { name, email, role } = args.body;
+    const { name, email, role, signingOrder } = args.body;
 
     const document = await getDocumentById({
       id: Number(documentId),
@@ -740,6 +744,7 @@ export const ApiContractV1Implementation = createNextRoute(ApiContractV1, {
             email,
             name,
             role,
+            signingOrder,
           },
         ],
         requestMetadata: extractNextApiRequestMetadata(args.req),
@@ -771,7 +776,7 @@ export const ApiContractV1Implementation = createNextRoute(ApiContractV1, {
 
   updateRecipient: authenticatedMiddleware(async (args, user, team) => {
     const { id: documentId, recipientId } = args.params;
-    const { name, email, role } = args.body;
+    const { name, email, role, signingOrder } = args.body;
 
     const document = await getDocumentById({
       id: Number(documentId),
@@ -805,6 +810,7 @@ export const ApiContractV1Implementation = createNextRoute(ApiContractV1, {
       email,
       name,
       role,
+      signingOrder,
       requestMetadata: extractNextApiRequestMetadata(args.req),
     }).catch(() => null);
 
