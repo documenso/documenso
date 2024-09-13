@@ -656,26 +656,16 @@ test('[DOCUMENT_FLOW]: should prevent out-of-order signing in sequential mode', 
     },
   });
 
-  const recipient = recipients.find((r) => r.signingOrder === 2);
-  await page.goto(`/sign/${recipient?.token}`);
+  const pendingRecipient = recipients.find((r) => r.signingOrder === 2);
 
-  await page.locator(`#field-${recipient?.Field[0].id}`).getByRole('button').click();
+  await page.goto(`/sign/${pendingRecipient?.token}`);
 
-  const canvas = page.locator('canvas#signature');
-  const box = await canvas.boundingBox();
-  if (box) {
-    await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2);
-    await page.mouse.down();
-    await page.mouse.move(box.x + box.width / 4, box.y + box.height / 4);
-    await page.mouse.up();
-  }
+  await expect(page).toHaveURL(`/sign/${pendingRecipient?.token}/waiting`);
 
-  await page.getByRole('button', { name: 'Sign', exact: true }).click();
-  await expect(page.getByRole('button', { name: 'Complete' })).toBeDisabled();
+  const activeRecipient = recipients.find((r) => r.signingOrder === 1);
 
-  const documentAfterAttempt = await prisma.document.findFirst({
-    where: { id: document.id },
-  });
-  expect(documentAfterAttempt?.status).toBe(DocumentStatus.PENDING);
-  expect(recipient?.signingStatus).toBe(SigningStatus.NOT_SIGNED);
+  await page.goto(`/sign/${activeRecipient?.token}`);
+
+  await expect(page).not.toHaveURL(`/sign/${activeRecipient?.token}/waiting`);
+  await expect(page.getByRole('heading', { name: 'Sign Document' })).toBeVisible();
 });
