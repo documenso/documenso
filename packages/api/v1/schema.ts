@@ -5,6 +5,11 @@ import { DATE_FORMATS, DEFAULT_DOCUMENT_DATE_FORMAT } from '@documenso/lib/const
 import '@documenso/lib/constants/time-zones';
 import { DEFAULT_DOCUMENT_TIME_ZONE, TIME_ZONES } from '@documenso/lib/constants/time-zones';
 import { ZUrlSchema } from '@documenso/lib/schemas/common';
+import {
+  ZDocumentAccessAuthTypesSchema,
+  ZDocumentActionAuthTypesSchema,
+  ZRecipientActionAuthTypesSchema,
+} from '@documenso/lib/types/document-auth';
 import { ZFieldMetaSchema } from '@documenso/lib/types/field-meta';
 import {
   DocumentDataType,
@@ -123,6 +128,12 @@ export const ZCreateDocumentMutationSchema = z.object({
       signingOrder: z.nativeEnum(DocumentSigningOrder).optional(),
     })
     .partial(),
+  authOptions: z
+    .object({
+      globalAccessAuth: ZDocumentAccessAuthTypesSchema.optional(),
+      globalActionAuth: ZDocumentActionAuthTypesSchema.optional(),
+    })
+    .optional(),
   formValues: z.record(z.string(), z.union([z.string(), z.boolean(), z.number()])).optional(),
 });
 
@@ -171,6 +182,12 @@ export const ZCreateDocumentFromTemplateMutationSchema = z.object({
       signingOrder: z.nativeEnum(DocumentSigningOrder).optional(),
     })
     .partial()
+    .optional(),
+  authOptions: z
+    .object({
+      globalAccessAuth: ZDocumentAccessAuthTypesSchema.optional(),
+      globalActionAuth: ZDocumentActionAuthTypesSchema.optional(),
+    })
     .optional(),
   formValues: z.record(z.string(), z.union([z.string(), z.boolean(), z.number()])).optional(),
 });
@@ -232,6 +249,12 @@ export const ZGenerateDocumentFromTemplateMutationSchema = z.object({
     })
     .partial()
     .optional(),
+  authOptions: z
+    .object({
+      globalAccessAuth: ZDocumentAccessAuthTypesSchema.optional(),
+      globalActionAuth: ZDocumentActionAuthTypesSchema.optional(),
+    })
+    .optional(),
   formValues: z.record(z.string(), z.union([z.string(), z.boolean(), z.number()])).optional(),
 });
 
@@ -265,6 +288,11 @@ export const ZCreateRecipientMutationSchema = z.object({
   email: z.string().email().min(1),
   role: z.nativeEnum(RecipientRole).optional().default(RecipientRole.SIGNER),
   signingOrder: z.number().nullish(),
+  authOptions: z
+    .object({
+      actionAuth: ZRecipientActionAuthTypesSchema.optional(),
+    })
+    .optional(),
 });
 
 /**

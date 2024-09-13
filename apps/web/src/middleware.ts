@@ -5,7 +5,6 @@ import { NextResponse } from 'next/server';
 import { getToken } from 'next-auth/jwt';
 
 import { TEAM_URL_ROOT_REGEX } from '@documenso/lib/constants/teams';
-import { extractLocaleData } from '@documenso/lib/utils/i18n';
 import { formatDocumentsPath } from '@documenso/lib/utils/teams';
 
 async function middleware(req: NextRequest): Promise<NextResponse> {
@@ -96,12 +95,7 @@ async function middleware(req: NextRequest): Promise<NextResponse> {
 export default async function middlewareWrapper(req: NextRequest) {
   const response = await middleware(req);
 
-  const { lang } = extractLocaleData({
-    headers: req.headers,
-    cookies: cookies(),
-  });
-
-  response.cookies.set('i18n', lang);
+  // Can place anything that needs to be set on the response here.
 
   return response;
 }

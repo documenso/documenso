@@ -16,6 +16,7 @@ import { getDocumentById } from '@documenso/lib/server-only/document/get-documen
 import { resendDocument } from '@documenso/lib/server-only/document/resend-document';
 import { sendDocument } from '@documenso/lib/server-only/document/send-document';
 import { updateDocument } from '@documenso/lib/server-only/document/update-document';
+import { updateDocumentSettings } from '@documenso/lib/server-only/document/update-document-settings';
 import { deleteField } from '@documenso/lib/server-only/field/delete-field';
 import { getFieldById } from '@documenso/lib/server-only/field/get-field-by-id';
 import { updateField } from '@documenso/lib/server-only/field/update-field';
@@ -296,6 +297,16 @@ export const ApiContractV1Implementation = createNextRoute(ApiContractV1, {
         requestMetadata: extractNextApiRequestMetadata(args.req),
       });
 
+      if (body.authOptions) {
+        await updateDocumentSettings({
+          documentId: document.id,
+          userId: user.id,
+          teamId: team?.id,
+          data: body.authOptions,
+          requestMetadata: extractNextApiRequestMetadata(args.req),
+        });
+      }
+
       const recipients = await setRecipientsForDocument({
         userId: user.id,
         teamId: team?.id,
@@ -467,6 +478,16 @@ export const ApiContractV1Implementation = createNextRoute(ApiContractV1, {
       });
     }
 
+    if (body.authOptions) {
+      await updateDocumentSettings({
+        documentId: document.id,
+        userId: user.id,
+        teamId: team?.id,
+        data: body.authOptions,
+        requestMetadata: extractNextApiRequestMetadata(args.req),
+      });
+    }
+
     return {
       status: 200,
       body: {
@@ -547,6 +568,16 @@ export const ApiContractV1Implementation = createNextRoute(ApiContractV1, {
             },
           },
         },
+      });
+    }
+
+    if (body.authOptions) {
+      await updateDocumentSettings({
+        documentId: document.id,
+        userId: user.id,
+        teamId: team?.id,
+        data: body.authOptions,
+        requestMetadata: extractNextApiRequestMetadata(args.req),
       });
     }
 
@@ -686,7 +717,7 @@ export const ApiContractV1Implementation = createNextRoute(ApiContractV1, {
 
   createRecipient: authenticatedMiddleware(async (args, user, team) => {
     const { id: documentId } = args.params;
-    const { name, email, role, signingOrder } = args.body;
+    const { name, email, role, authOptions, signingOrder } = args.body;
 
     const document = await getDocumentById({
       id: Number(documentId),
@@ -745,6 +776,7 @@ export const ApiContractV1Implementation = createNextRoute(ApiContractV1, {
             name,
             role,
             signingOrder,
+            actionAuth: authOptions?.actionAuth ?? null,
           },
         ],
         requestMetadata: extractNextApiRequestMetadata(args.req),
@@ -776,7 +808,7 @@ export const ApiContractV1Implementation = createNextRoute(ApiContractV1, {
 
   updateRecipient: authenticatedMiddleware(async (args, user, team) => {
     const { id: documentId, recipientId } = args.params;
-    const { name, email, role, signingOrder } = args.body;
+    const { name, email, role, authOptions, signingOrder } = args.body;
 
     const document = await getDocumentById({
       id: Number(documentId),
@@ -811,6 +843,7 @@ export const ApiContractV1Implementation = createNextRoute(ApiContractV1, {
       name,
       role,
       signingOrder,
+      actionAuth: authOptions?.actionAuth,
       requestMetadata: extractNextApiRequestMetadata(args.req),
     }).catch(() => null);
 
