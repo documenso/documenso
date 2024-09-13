@@ -93,17 +93,22 @@ export const findDocuments = async ({
     .otherwise(() => undefined);
 
   const visibilityFilters = [
-    ...match(teamMemberRole)
-      .with(TeamMemberRole.ADMIN, () => [
-        { visibility: DocumentVisibility.EVERYONE },
-        { visibility: DocumentVisibility.MANAGER_AND_ABOVE },
-        { visibility: DocumentVisibility.ADMIN },
-      ])
-      .with(TeamMemberRole.MANAGER, () => [
-        { visibility: DocumentVisibility.EVERYONE },
-        { visibility: DocumentVisibility.MANAGER_AND_ABOVE },
-      ])
-      .otherwise(() => [{ visibility: DocumentVisibility.EVERYONE }]),
+    match(teamMemberRole)
+      .with(TeamMemberRole.ADMIN, () => ({
+        visibility: {
+          in: [
+            DocumentVisibility.EVERYONE,
+            DocumentVisibility.MANAGER_AND_ABOVE,
+            DocumentVisibility.ADMIN,
+          ],
+        },
+      }))
+      .with(TeamMemberRole.MANAGER, () => ({
+        visibility: {
+          in: [DocumentVisibility.EVERYONE, DocumentVisibility.MANAGER_AND_ABOVE],
+        },
+      }))
+      .otherwise(() => ({ visibility: DocumentVisibility.EVERYONE })),
     {
       Recipient: {
         some: {
@@ -113,12 +118,11 @@ export const findDocuments = async ({
     },
   ];
 
-  const filters = team
-    ? {
-        ...findTeamDocumentsFilter(status, team),
-        OR: visibilityFilters,
-      }
-    : findDocumentsFilter(status, user);
+  let filters: Prisma.DocumentWhereInput | null = findDocumentsFilter(status, user);
+
+  if (team) {
+    filters = findTeamDocumentsFilter(status, team, visibilityFilters);
+  }
 
   if (filters === null) {
     return {
@@ -184,9 +188,7 @@ export const findDocuments = async ({
   }
 
   const whereClause: Prisma.DocumentWhereInput = {
-    ...termFilters,
-    ...filters,
-    ...deletedFilter,
+    AND: [{ ...termFilters }, { ...filters }, { ...deletedFilter }],
   };
 
   if (period) {
@@ -369,6 +371,7 @@ const findDocumentsFilter = (status: ExtendedDocumentStatus, user: User) => {
 const findTeamDocumentsFilter = (
   status: ExtendedDocumentStatus,
   team: Team & { teamEmail: TeamEmail | null },
+  visibilityFilters: Prisma.DocumentWhereInput[],
 ) => {
   const teamEmail = team.teamEmail?.email ?? null;
 
@@ -379,6 +382,7 @@ const findTeamDocumentsFilter = (
         OR: [
           {
             teamId: team.id,
+            OR: visibilityFilters,
           },
         ],
       };
@@ -394,6 +398,7 @@ const findTeamDocumentsFilter = (
               email: teamEmail,
             },
           },
+          OR: visibilityFilters,
         });
 
         // Filter to display all documents that have been sent by the team email.
@@ -401,6 +406,7 @@ const findTeamDocumentsFilter = (
           User: {
             email: teamEmail,
           },
+          OR: visibilityFilters,
         });
       }
 
@@ -425,6 +431,7 @@ const findTeamDocumentsFilter = (
             },
           },
         },
+        OR: visibilityFilters,
       };
     })
     .with(ExtendedDocumentStatus.DRAFT, () => {
@@ -433,6 +440,7 @@ const findTeamDocumentsFilter = (
           {
             teamId: team.id,
             status: ExtendedDocumentStatus.DRAFT,
+            OR: visibilityFilters,
           },
         ],
       };
@@ -443,6 +451,7 @@ const findTeamDocumentsFilter = (
           User: {
             email: teamEmail,
           },
+          OR: visibilityFilters,
         });
       }
 
@@ -454,6 +463,7 @@ const findTeamDocumentsFilter = (
           {
             teamId: team.id,
             status: ExtendedDocumentStatus.PENDING,
+            OR: visibilityFilters,
           },
         ],
       };
@@ -472,11 +482,13 @@ const findTeamDocumentsFilter = (
                   },
                 },
               },
+              OR: visibilityFilters,
             },
             {
               User: {
                 email: teamEmail,
               },
+              OR: visibilityFilters,
             },
           ],
         });
@@ -490,6 +502,7 @@ const findTeamDocumentsFilter = (
         OR: [
           {
             teamId: team.id,
+            OR: visibilityFilters,
           },
         ],
       };
@@ -502,11 +515,13 @@ const findTeamDocumentsFilter = (
                 email: teamEmail,
               },
             },
+            OR: visibilityFilters,
           },
           {
             User: {
               email: teamEmail,
             },
+            OR: visibilityFilters,
           },
         );
       }
