@@ -31,9 +31,11 @@ import {
   ZFieldMetaSchema,
 } from '@documenso/lib/types/field-meta';
 import { nanoid } from '@documenso/lib/universal/id';
+import { validateFieldsUninserted } from '@documenso/lib/utils/fields';
 import type { Field, Recipient } from '@documenso/prisma/client';
 import { FieldType, RecipientRole, SendStatus } from '@documenso/prisma/client';
 
+import { FieldToolTip } from '../../components/field/field-tooltip';
 import { getSignerColorStyles, useSignerColors } from '../../lib/signer-colors';
 import { cn } from '../../lib/utils';
 import { Button } from '../button';
@@ -189,6 +191,7 @@ export const AddFieldsFormPartial = ({
   const selectedSignerStyles = useSignerColors(
     selectedSignerIndex === -1 ? 0 : selectedSignerIndex,
   );
+  const [validateUninsertedFields, setValidateUninsertedFields] = useState(false);
 
   const hasSelectedSignerBeenSent = selectedSigner?.sendStatus === SendStatus.SENT;
 
@@ -498,6 +501,14 @@ export const AddFieldsFormPartial = ({
 
     if (!everySignerHasSignature) {
       setIsMissingSignatureDialogVisible(true);
+      return;
+    }
+
+    setValidateUninsertedFields(true);
+    const isFieldsValid = validateFieldsUninserted();
+
+    if (!isFieldsValid) {
+      return;
     } else {
       void onFormSubmit();
     }
@@ -576,7 +587,7 @@ export const AddFieldsFormPartial = ({
                         handleAdvancedSettings();
                       }}
                       hideRecipients={hideRecipients}
-                      hasErrors={hasFieldError}
+                      hasErrors={!!hasFieldError}
                     />
                   );
                 })}
@@ -1008,6 +1019,15 @@ export const AddFieldsFormPartial = ({
             onOpenChange={(value) => setIsMissingSignatureDialogVisible(value)}
           />
         </>
+      )}
+      {validateUninsertedFields && fieldsWithError[0] && (
+        <FieldToolTip
+          key={fieldsWithError[0].id}
+          field={convertToFieldType(fieldsWithError[0])}
+          color="warning"
+        >
+          <Trans>Empty field</Trans>
+        </FieldToolTip>
       )}
     </>
   );

@@ -210,6 +210,7 @@ export const FieldItem = ({
               hasErrors,
           },
         )}
+        data-error={hasErrors ? 'true' : undefined}
         onClick={() => {
           setSettingsActive((prev) => !prev);
           onFocus?.();
