@@ -261,15 +261,6 @@ export const AddSignersFormPartial = ({
         });
       });
 
-      // updatedSigners.forEach((signer, index) => {
-      //   Object.keys(signer).forEach((key) => {
-      //     form.setValue(
-      //       `signers.${index}.${key as keyof typeof signer}`,
-      //       signer[key as keyof typeof signer],
-      //     );
-      //   });
-      // });
-
       const currentLength = form.getValues('signers').length;
       if (currentLength > updatedSigners.length) {
         for (let i = updatedSigners.length; i < currentLength; i++) {
@@ -374,7 +365,6 @@ export const AddSignersFormPartial = ({
 
         <AnimateGenericFadeInOut motionKey={showAdvancedSettings ? 'Show' : 'Hide'}>
           <Form {...form}>
-            {/* fix from here.... */}
             <FormField
               control={form.control}
               name="signingOrder"
