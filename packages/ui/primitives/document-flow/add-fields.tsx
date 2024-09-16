@@ -92,11 +92,15 @@ export type AddFieldsFormProps = {
   teamId?: number;
 };
 
-/*
-  I hate this, but due to TailwindCSS JIT, I couldnn't find a better way to do this for now.
-
-  TODO: Try to find a better way to do this.
-*/
+const convertToFieldType = (field): Field => ({
+  ...field,
+  positionX: new Prisma.Decimal(field.positionX),
+  positionY: new Prisma.Decimal(field.positionY),
+  width: new Prisma.Decimal(field.width),
+  height: new Prisma.Decimal(field.height),
+  documentId: field.documentId ?? undefined,
+  templateId: field.templateId ?? undefined,
+});
 
 export const AddFieldsFormPartial = ({
   documentFlow,
@@ -227,8 +231,39 @@ export const AddFieldsFormPartial = ({
   const hasErrors =
     emptyCheckboxFields.length > 0 || emptyRadioFields.length > 0 || emptySelectFields.length > 0;
 
-  const isFieldsDisabled =
-    !selectedSigner ||
+  const fieldsWithError = useMemo(() => {
+    const fields = localFields.filter((field) => {
+      const hasError =
+        ((field.type === FieldType.CHECKBOX ||
+          field.type === FieldType.RADIO ||
+          field.type === FieldType.DROPDOWN) &&
+          field.fieldMeta === undefined) ||
+        ('values' in field.fieldMeta && field.fieldMeta.values?.length === 0);
+
+      return hasError;
+    });
+
+    const mappedFields = fields.map((field) => ({
+      id: field.nativeId ?? 0,
+      secondaryId: field.formId,
+      documentId: null,
+      templateId: null,
+      recipientId: 0,
+      type: field.type,
+      page: field.pageNumber,
+      positionX: field.pageX,
+      positionY: field.pageY,
+      width: field.pageWidth,
+      height: field.pageHeight,
+      customText: '',
+      inserted: true,
+      fieldMeta: field.fieldMeta ?? null,
+    }));
+
+    return mappedFields;
+  }, [localFields]);
+
+  !selectedSigner ||
     hasSelectedSignerBeenSent ||
     selectedSigner?.role === RecipientRole.VIEWER ||
     selectedSigner?.role === RecipientRole.CC;

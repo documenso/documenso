@@ -45,7 +45,7 @@ export const validateFieldsUninserted = (): boolean => {
 
   const errorElements: HTMLElement[] = [];
 
-  Array.from(fieldCardElements).forEach((element, index) => {
+  Array.from(fieldCardElements).forEach((element) => {
     const innerDiv = element.querySelector('div');
     const hasError = innerDiv?.getAttribute('data-error') === 'true';
 
@@ -55,8 +55,6 @@ export const validateFieldsUninserted = (): boolean => {
       element.removeAttribute('data-error');
     }
   });
-
-  console.log('Number of errorElements:', errorElements.length);
 
   if (errorElements.length > 0) {
     errorElements[0].scrollIntoView({ behavior: 'smooth', block: 'center' });
