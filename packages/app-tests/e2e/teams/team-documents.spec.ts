@@ -609,3 +609,100 @@ test('[TEAMS]: check that admin can see MANAGER_AND_ABOVE documents', async ({ p
 
   await apiSignout({ page });
 });
+
+test('[TEAMS]: users cannot see documents from other teams', async ({ page }) => {
+  // Seed two teams with documents
+  const { team: teamA, teamMember2: teamAMember } = await seedTeamDocuments();
+  const { team: teamB, teamMember2: teamBMember } = await seedTeamDocuments();
+
+  // Seed a document in team B
+  await seedDocuments([
+    {
+      sender: teamB.owner,
+      recipients: [],
+      type: DocumentStatus.COMPLETED,
+      documentOptions: {
+        teamId: teamB.id,
+        visibility: 'EVERYONE',
+        title: 'Team B Document',
+      },
+    },
+  ]);
+
+  // Sign in as a member of team A
+  await apiSignin({
+    page,
+    email: teamAMember.email,
+    redirectPath: `/t/${teamA.url}/documents?status=COMPLETED`,
+  });
+
+  // Verify that the user cannot see the document from team B
+  await expect(page.getByRole('link', { name: 'Team B Document', exact: true })).not.toBeVisible();
+
+  await apiSignout({ page });
+});
+
+test('[TEAMS]: personal documents are not visible in team context', async ({ page }) => {
+  // Seed a team and a user with personal documents
+  const { team, teamMember2 } = await seedTeamDocuments();
+  const personalUser = await seedUser();
+
+  // Seed a personal document for teamMember2
+  await seedDocuments([
+    {
+      sender: teamMember2,
+      recipients: [],
+      type: DocumentStatus.COMPLETED,
+      documentOptions: {
+        teamId: null, // Indicates a personal document
+        visibility: 'EVERYONE',
+        title: 'Personal Document',
+      },
+    },
+  ]);
+
+  // Sign in as teamMember2 in the team context
+  await apiSignin({
+    page,
+    email: teamMember2.email,
+    redirectPath: `/t/${team.url}/documents?status=COMPLETED`,
+  });
+
+  // Verify that the personal document is not visible in the team context
+  await expect(
+    page.getByRole('link', { name: 'Personal Document', exact: true }),
+  ).not.toBeVisible();
+
+  await apiSignout({ page });
+});
+
+test('[PERSONAL]: team documents are not visible in personal account', async ({ page }) => {
+  // Seed a team and a user with personal documents
+  const { team, teamMember2 } = await seedTeamDocuments();
+
+  // Seed a team document
+  await seedDocuments([
+    {
+      sender: teamMember2,
+      recipients: [],
+      type: DocumentStatus.COMPLETED,
+      documentOptions: {
+        teamId: team.id,
+        visibility: 'EVERYONE',
+        title: 'Team Document',
+      },
+    },
+  ]);
+
+  // Sign in as teamMember2 in the personal context
+  await apiSignin({
+    page,
+    email: teamMember2.email,
+    redirectPath: `/documents?status=COMPLETED`,
+  });
+
+  // Verify that the team document is not visible in the personal context
+  await expect(page.getByRole('link', { name: 'Team Document', exact: true })).not.toBeVisible();
+
+  await apiSignout({ page });
+});
