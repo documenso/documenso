@@ -263,7 +263,8 @@ export const AddFieldsFormPartial = ({
     return mappedFields;
   }, [localFields]);
 
-  !selectedSigner ||
+  const isFieldsDisabled =
+    !selectedSigner ||
     hasSelectedSignerBeenSent ||
     selectedSigner?.role === RecipientRole.VIEWER ||
     selectedSigner?.role === RecipientRole.CC;
