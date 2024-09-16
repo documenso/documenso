@@ -24,7 +24,7 @@ export async function getIsRecipientsTurnToSign({ token }: GetIsRecipientTurnOpt
     },
   });
 
-  if (document.documentMeta?.signingOrder === DocumentSigningOrder.PARALLEL) {
+  if (document.documentMeta?.signingOrder !== DocumentSigningOrder.SEQUENTIAL) {
     return true;
   }
 

@@ -143,8 +143,9 @@ test('[DOCUMENT_FLOW]: should be able to create a document with multiple recipie
   await page.getByPlaceholder('Email').fill('user1@example.com');
   await page.getByPlaceholder('Name').fill('User 1');
   await page.getByRole('button', { name: 'Add Signer' }).click();
-  await page.getByRole('textbox', { name: 'Email', exact: true }).fill('user2@example.com');
-  await page.getByRole('textbox', { name: 'Name', exact: true }).nth(1).fill('User 2');
+
+  await page.getByLabel('Email').nth(1).fill('user2@example.com');
+  await page.getByLabel('Name').nth(1).fill('User 2');
 
   await page.getByRole('button', { name: 'Continue' }).click();
 
@@ -223,20 +224,20 @@ test('[DOCUMENT_FLOW]: should be able to create a document with multiple recipie
   await page.getByPlaceholder('Name').fill('User 1');
   await page.getByRole('button', { name: 'Add Signer' }).click();
 
-  await page.getByRole('textbox', { name: 'Email', exact: true }).fill('user2@example.com');
-  await page.getByRole('textbox', { name: 'Name', exact: true }).nth(1).fill('User 2');
+  await page.getByLabel('Email').nth(1).fill('user2@example.com');
+  await page.getByLabel('Name').nth(1).fill('User 2');
   await page.locator('button[role="combobox"]').nth(1).click();
   await page.getByLabel('Receives copy').click();
   await page.getByRole('button', { name: 'Add Signer' }).click();
 
-  await page.getByRole('textbox', { name: 'Email', exact: true }).nth(1).fill('user3@example.com');
-  await page.getByRole('textbox', { name: 'Name', exact: true }).nth(2).fill('User 3');
+  await page.getByLabel('Email').nth(2).fill('user3@example.com');
+  await page.getByLabel('Name').nth(2).fill('User 3');
   await page.locator('button[role="combobox"]').nth(2).click();
   await page.getByLabel('Needs to approve').click();
   await page.getByRole('button', { name: 'Add Signer' }).click();
 
-  await page.getByRole('textbox', { name: 'Email', exact: true }).nth(2).fill('user4@example.com');
-  await page.getByRole('textbox', { name: 'Name', exact: true }).nth(3).fill('User 4');
+  await page.getByLabel('Email').nth(3).fill('user4@example.com');
+  await page.getByLabel('Name').nth(3).fill('User 4');
   await page.locator('button[role="combobox"]').nth(3).click();
   await page.getByLabel('Needs to view').click();
 
