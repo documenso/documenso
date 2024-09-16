@@ -31,6 +31,7 @@ import {
   ZFindTemplatesQuerySchema,
   ZGetTemplateWithDetailsByIdQuerySchema,
   ZMoveTemplatesToTeamSchema,
+  ZSetSigningOrderForTemplateMutationSchema,
   ZToggleTemplateDirectLinkMutationSchema,
   ZUpdateTemplateSettingsMutationSchema,
 } from './schema';
@@ -223,6 +224,31 @@ export const templateRouter = router({
           code: 'BAD_REQUEST',
           message:
             'We were unable to update the settings for this template. Please try again later.',
+        });
+      }
+    }),
+
+  setSigningOrderForTemplate: authenticatedProcedure
+    .input(ZSetSigningOrderForTemplateMutationSchema)
+    .mutation(async ({ input, ctx }) => {
+      try {
+        const { templateId, teamId, signingOrder } = input;
+
+        return await updateTemplateSettings({
+          templateId,
+          teamId,
+          data: {},
+          meta: { signingOrder },
+          userId: ctx.user.id,
+          requestMetadata: extractNextApiRequestMetadata(ctx.req),
+        });
+      } catch (err) {
+        console.error(err);
+
+        throw new TRPCError({
+          code: 'BAD_REQUEST',
+          message:
+            'We were unable to update the settings for this document. Please try again later.',
         });
       }
     }),

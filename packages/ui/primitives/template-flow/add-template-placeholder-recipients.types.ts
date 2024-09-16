@@ -1,9 +1,9 @@
 import { z } from 'zod';
 
 import { ZRecipientActionAuthTypesSchema } from '@documenso/lib/types/document-auth';
+import { DocumentSigningOrder, RecipientRole } from '@documenso/prisma/client';
 
 import { ZMapNegativeOneToUndefinedSchema } from '../document-flow/add-settings.types';
-import { RecipientRole } from '.prisma/client';
 
 export const ZAddTemplatePlacholderRecipientsFormSchema = z
   .object({
@@ -14,11 +14,13 @@ export const ZAddTemplatePlacholderRecipientsFormSchema = z
         email: z.string().min(1).email(),
         name: z.string(),
         role: z.nativeEnum(RecipientRole),
+        signingOrder: z.number().optional(),
         actionAuth: ZMapNegativeOneToUndefinedSchema.pipe(
           ZRecipientActionAuthTypesSchema.optional(),
         ),
       }),
     ),
+    signingOrder: z.nativeEnum(DocumentSigningOrder),
   })
   .refine(
     (schema) => {

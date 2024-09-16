@@ -24,6 +24,7 @@ export type SetRecipientsForTemplateOptions = {
     email: string;
     name: string;
     role: RecipientRole;
+    signingOrder?: number | null;
     actionAuth?: TRecipientActionAuthTypes | null;
   }[];
 };
@@ -162,6 +163,7 @@ export const setRecipientsForTemplate = async ({
             name: recipient.name,
             email: recipient.email,
             role: recipient.role,
+            signingOrder: recipient.signingOrder,
             templateId,
             authOptions,
           },
@@ -169,6 +171,7 @@ export const setRecipientsForTemplate = async ({
             name: recipient.name,
             email: recipient.email,
             role: recipient.role,
+            signingOrder: recipient.signingOrder,
             token: nanoid(),
             templateId,
             authOptions,

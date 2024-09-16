@@ -73,11 +73,7 @@ export default async function EmbedDirectTemplatePage({ params }: EmbedDirectTem
   const fields = template.Field.filter((field) => field.recipientId === directTemplateRecipientId);
 
   return (
-    <SigningProvider
-      email={user?.email}
-      fullName={user?.name}
-      signature={user?.signature}
-    >
+    <SigningProvider email={user?.email} fullName={user?.name} signature={user?.signature}>
       <DocumentAuthProvider
         documentAuthOptions={template.authOptions}
         recipient={recipient}

@@ -41,11 +41,10 @@ test.describe('[EE_ONLY]', () => {
     // Add 2 signers.
     await page.getByPlaceholder('Email').fill('recipient1@documenso.com');
     await page.getByPlaceholder('Name').fill('Recipient 1');
+
     await page.getByRole('button', { name: 'Add Signer' }).click();
-    await page
-      .getByRole('textbox', { name: 'Email', exact: true })
-      .fill('recipient2@documenso.com');
-    await page.getByRole('textbox', { name: 'Name', exact: true }).nth(1).fill('Recipient 2');
+    await page.getByLabel('Email').nth(1).fill('recipient2@documenso.com');
+    await page.getByLabel('Name').nth(1).fill('Recipient 2');
 
     // Display advanced settings.
     await page.getByLabel('Show advanced settings').check();
@@ -77,9 +76,11 @@ test('[DOCUMENT_FLOW]: add signers', async ({ page }) => {
   // Add 2 signers.
   await page.getByPlaceholder('Email').fill('recipient1@documenso.com');
   await page.getByPlaceholder('Name').fill('Recipient 1');
+
   await page.getByRole('button', { name: 'Add Signer' }).click();
-  await page.getByRole('textbox', { name: 'Email', exact: true }).fill('recipient2@documenso.com');
-  await page.getByRole('textbox', { name: 'Name', exact: true }).nth(1).fill('Recipient 2');
+
+  await page.getByLabel('Email').nth(1).fill('recipient2@documenso.com');
+  await page.getByLabel('Name').nth(1).fill('Recipient 2');
 
   // Advanced settings should not be visible for non EE users.
   await expect(page.getByLabel('Show advanced settings')).toBeHidden();

@@ -18,6 +18,7 @@ export type UpdateRecipientOptions = {
   email?: string;
   name?: string;
   role?: RecipientRole;
+  signingOrder?: number | null;
   actionAuth?: TRecipientActionAuthTypes | null;
   userId: number;
   teamId?: number;
@@ -30,6 +31,7 @@ export const updateRecipient = async ({
   email,
   name,
   role,
+  signingOrder,
   actionAuth,
   userId,
   teamId,
@@ -112,6 +114,7 @@ export const updateRecipient = async ({
         email: email?.toLowerCase() ?? recipient.email,
         name: name ?? recipient.name,
         role: role ?? recipient.role,
+        signingOrder,
         authOptions: createRecipientAuthOptions({
           accessAuth: recipientAuthOptions.accessAuth,
           actionAuth: actionAuth ?? null,

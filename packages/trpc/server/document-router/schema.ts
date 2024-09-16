@@ -6,7 +6,7 @@ import {
 } from '@documenso/lib/types/document-auth';
 import { ZBaseTableSearchParamsSchema } from '@documenso/lib/types/search-params';
 import { isValidRedirectUrl } from '@documenso/lib/utils/is-valid-redirect-url';
-import { FieldType, RecipientRole } from '@documenso/prisma/client';
+import { DocumentSigningOrder, FieldType, RecipientRole } from '@documenso/prisma/client';
 
 export const ZFindDocumentAuditLogsQuerySchema = ZBaseTableSearchParamsSchema.extend({
   documentId: z.number().min(1),
@@ -146,6 +146,15 @@ export const ZSetPasswordForDocumentMutationSchema = z.object({
 
 export type TSetPasswordForDocumentMutationSchema = z.infer<
   typeof ZSetPasswordForDocumentMutationSchema
+>;
+
+export const ZSetSigningOrderForDocumentMutationSchema = z.object({
+  documentId: z.number(),
+  signingOrder: z.nativeEnum(DocumentSigningOrder),
+});
+
+export type TSetSigningOrderForDocumentMutationSchema = z.infer<
+  typeof ZSetSigningOrderForDocumentMutationSchema
 >;
 
 export const ZResendDocumentMutationSchema = z.object({

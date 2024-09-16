@@ -85,6 +85,20 @@ export const EditDocumentForm = ({
     },
   });
 
+  const { mutateAsync: setSigningOrderForDocument } =
+    trpc.document.setSigningOrderForDocument.useMutation({
+      ...DO_NOT_INVALIDATE_QUERY_ON_MUTATION,
+      onSuccess: (newData) => {
+        utils.document.getDocumentWithDetailsById.setData(
+          {
+            id: initialDocument.id,
+            teamId: team?.id,
+          },
+          (oldData) => ({ ...(oldData || initialDocument), ...newData, id: Number(newData.id) }),
+        );
+      },
+    });
+
   const { mutateAsync: addFields } = trpc.field.addFields.useMutation({
     ...DO_NOT_INVALIDATE_QUERY_ON_MUTATION,
     onSuccess: (newFields) => {
@@ -204,15 +218,22 @@ export const EditDocumentForm = ({
 
   const onAddSignersFormSubmit = async (data: TAddSignersFormSchema) => {
     try {
-      await addSigners({
-        documentId: document.id,
-        teamId: team?.id,
-        signers: data.signers.map((signer) => ({
-          ...signer,
-          // Explicitly set to null to indicate we want to remove auth if required.
-          actionAuth: signer.actionAuth || null,
-        })),
-      });
+      await Promise.all([
+        setSigningOrderForDocument({
+          documentId: document.id,
+          signingOrder: data.signingOrder,
+        }),
+
+        addSigners({
+          documentId: document.id,
+          teamId: team?.id,
+          signers: data.signers.map((signer) => ({
+            ...signer,
+            // Explicitly set to null to indicate we want to remove auth if required.
+            actionAuth: signer.actionAuth || null,
+          })),
+        }),
+      ]);
 
       // Router refresh is here to clear the router cache for when navigating to /documents.
       router.refresh();
@@ -350,6 +371,7 @@ export const EditDocumentForm = ({
               key={recipients.length}
               documentFlow={documentFlow.signers}
               recipients={recipients}
+              signingOrder={document.documentMeta?.signingOrder}
               fields={fields}
               isDocumentEnterprise={isDocumentEnterprise}
               onSubmit={onAddSignersFormSubmit}

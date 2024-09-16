@@ -27,6 +27,7 @@
   },
   "dependencies": {
     "@documenso/lib": "*",
+    "@hello-pangea/dnd": "^16.6.0",
     "@hookform/resolvers": "^3.3.0",
     "@lingui/macro": "^4.11.3",
     "@lingui/react": "^4.11.3",
@@ -73,6 +74,7 @@
     "react-hook-form": "^7.45.4",
     "react-pdf": "7.7.3",
     "react-rnd": "^10.4.1",
+    "remeda": "^1.27.1",
     "tailwind-merge": "^1.12.0",
     "tailwindcss-animate": "^1.0.5",
     "ts-pattern": "^5.0.5",
