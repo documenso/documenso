@@ -313,6 +313,10 @@ export const formatDocumentAuditLogAction = (auditLog: TDocumentAuditLog, userId
       anonymous: 'Field unsigned',
       identified: 'unsigned a field',
     }))
+    .with({ type: DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_VISIBILITY_UPDATED }, () => ({
+      anonymous: 'Document visibility updated',
+      identified: 'updated the document visibility',
+    }))
     .with({ type: DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_GLOBAL_AUTH_ACCESS_UPDATED }, () => ({
       anonymous: 'Document access auth updated',
       identified: 'updated the document access auth requirements',

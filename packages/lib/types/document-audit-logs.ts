@@ -28,6 +28,7 @@ export const ZDocumentAuditLogTypeSchema = z.enum([
   'DOCUMENT_DELETED', // When the document is soft deleted.
   'DOCUMENT_FIELD_INSERTED', // When a field is inserted (signed/approved/etc) by a recipient.
   'DOCUMENT_FIELD_UNINSERTED', // When a field is uninserted by a recipient.
+  'DOCUMENT_VISIBILITY_UPDATED', // When the document visibility scope is updated
   'DOCUMENT_GLOBAL_AUTH_ACCESS_UPDATED', // When the global access authentication is updated.
   'DOCUMENT_GLOBAL_AUTH_ACTION_UPDATED', // When the global action authentication is updated.
   'DOCUMENT_META_UPDATED', // When the document meta data is updated.
@@ -311,6 +312,11 @@ export const ZDocumentAuditLogEventDocumentFieldUninsertedSchema = z.object({
   }),
 });
 
+export const ZDocumentAuditLogEventDocumentVisibilitySchema = z.object({
+  type: z.literal(DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_VISIBILITY_UPDATED),
+  data: ZGenericFromToSchema,
+});
+
 /**
  * Event: Document global authentication access updated.
  */
@@ -475,6 +481,7 @@ export const ZDocumentAuditLogSchema = ZDocumentAuditLogBaseSchema.and(
     ZDocumentAuditLogEventDocumentMovedToTeamSchema,
     ZDocumentAuditLogEventDocumentFieldInsertedSchema,
     ZDocumentAuditLogEventDocumentFieldUninsertedSchema,
+    ZDocumentAuditLogEventDocumentVisibilitySchema,
     ZDocumentAuditLogEventDocumentGlobalAuthAccessUpdatedSchema,
     ZDocumentAuditLogEventDocumentGlobalAuthActionUpdatedSchema,
     ZDocumentAuditLogEventDocumentMetaUpdatedSchema,

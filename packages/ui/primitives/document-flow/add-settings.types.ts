@@ -22,6 +22,7 @@ export const ZMapNegativeOneToUndefinedSchema = z
 export const ZAddSettingsFormSchema = z.object({
   title: z.string().trim().min(1, { message: "Title can't be empty" }),
   externalId: z.string().optional(),
+  visibility: z.string().optional(),
   globalAccessAuth: ZMapNegativeOneToUndefinedSchema.pipe(
     ZDocumentAccessAuthTypesSchema.optional(),
   ),

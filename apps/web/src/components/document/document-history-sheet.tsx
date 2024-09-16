@@ -335,6 +335,23 @@ export const DocumentHistorySheet = ({
                       ]}
                     />
                   ))
+                  .with(
+                    { type: DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_VISIBILITY_UPDATED },
+                    ({ data }) => (
+                      <DocumentHistorySheetChanges
+                        values={[
+                          {
+                            key: 'Old',
+                            value: data.from,
+                          },
+                          {
+                            key: 'New',
+                            value: data.to,
+                          },
+                        ]}
+                      />
+                    ),
+                  )
                   .exhaustive()}
 
                 {isUserDetailsVisible && (

@@ -102,6 +102,44 @@ export const unseedTeam = async (teamUrl: string) => {
   });
 };
 
+type SeedTeamMemberOptions = {
+  teamId: number;
+  role?: TeamMemberRole;
+};
+
+export const seedTeamMember = async ({
+  teamId,
+  role = TeamMemberRole.ADMIN,
+}: SeedTeamMemberOptions) => {
+  const user = await seedUser();
+
+  await prisma.teamMember.create({
+    data: {
+      teamId,
+      role,
+      userId: user.id,
+    },
+  });
+
+  return user;
+};
+
+type UnseedTeamMemberOptions = {
+  teamId: number;
+  userId: number;
+};
+
+export const unseedTeamMember = async ({ teamId, userId }: UnseedTeamMemberOptions) => {
+  await prisma.teamMember.delete({
+    where: {
+      userId_teamId: {
+        userId,
+        teamId,
+      },
+    },
+  });
+};
+
 export const seedTeamTransfer = async (options: { newOwnerUserId: number; teamId: number }) => {
   return await prisma.teamTransferVerification.create({
     data: {

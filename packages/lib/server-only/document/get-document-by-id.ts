@@ -1,6 +1,10 @@
+import { match } from 'ts-pattern';
+
 import { prisma } from '@documenso/prisma';
 import type { Prisma } from '@documenso/prisma/client';
+import { TeamMemberRole } from '@documenso/prisma/client';
 
+import { DocumentVisibility } from '../../types/document-visibility';
 import { getTeamById } from '../team/get-team';
 
 export type GetDocumentByIdOptions = {
@@ -25,6 +29,11 @@ export const getDocumentById = async ({ id, userId, teamId }: GetDocumentByIdOpt
         select: {
           id: true,
           name: true,
+          email: true,
+        },
+      },
+      Recipient: {
+        select: {
           email: true,
         },
       },
@@ -115,5 +124,35 @@ export const getDocumentWhereInput = async ({
     );
   }
 
-  return documentWhereInput;
+  const user = await prisma.user.findFirstOrThrow({
+    where: {
+      id: userId,
+    },
+  });
+
+  const visibilityFilters = [
+    ...match(team.currentTeamMember?.role)
+      .with(TeamMemberRole.ADMIN, () => [
+        { visibility: DocumentVisibility.EVERYONE },
+        { visibility: DocumentVisibility.MANAGER_AND_ABOVE },
+        { visibility: DocumentVisibility.ADMIN },
+      ])
+      .with(TeamMemberRole.MANAGER, () => [
+        { visibility: DocumentVisibility.EVERYONE },
+        { visibility: DocumentVisibility.MANAGER_AND_ABOVE },
+      ])
+      .otherwise(() => [{ visibility: DocumentVisibility.EVERYONE }]),
+    {
+      Recipient: {
+        some: {
+          email: user.email,
+        },
+      },
+    },
+  ];
+
+  return {
+    ...documentWhereInput,
+    OR: [...visibilityFilters],
+  };
 };

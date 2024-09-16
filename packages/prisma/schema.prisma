@@ -282,6 +282,12 @@ enum DocumentSource {
   TEMPLATE_DIRECT_LINK
 }
 
+enum DocumentVisibility {
+  EVERYONE
+  MANAGER_AND_ABOVE
+  ADMIN
+}
+
 model Document {
   id             Int                 @id @default(autoincrement())
   externalId     String?
@@ -289,6 +295,7 @@ model Document {
   User           User                @relation(fields: [userId], references: [id], onDelete: Cascade)
   authOptions    Json?
   formValues     Json?
+  visibility     DocumentVisibility  @default(EVERYONE)
   title          String
   status         DocumentStatus      @default(DRAFT)
   Recipient      Recipient[]

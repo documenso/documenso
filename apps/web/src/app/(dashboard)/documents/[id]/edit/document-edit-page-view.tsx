@@ -3,14 +3,17 @@ import { redirect } from 'next/navigation';
 
 import { Plural, Trans } from '@lingui/macro';
 import { ChevronLeft, Users2 } from 'lucide-react';
+import { match } from 'ts-pattern';
 
 import { isUserEnterprise } from '@documenso/ee/server-only/util/is-document-enterprise';
 import { DOCUMENSO_ENCRYPTION_KEY } from '@documenso/lib/constants/crypto';
 import { getRequiredServerComponentSession } from '@documenso/lib/next-auth/get-server-component-session';
 import { getDocumentWithDetailsById } from '@documenso/lib/server-only/document/get-document-with-details-by-id';
+import { DocumentVisibility } from '@documenso/lib/types/document-visibility';
 import { symmetricDecrypt } from '@documenso/lib/universal/crypto';
 import { formatDocumentsPath } from '@documenso/lib/utils/teams';
 import type { Team } from '@documenso/prisma/client';
+import { TeamMemberRole } from '@documenso/prisma/client';
 import { DocumentStatus as InternalDocumentStatus } from '@documenso/prisma/client';
 
 import { EditDocumentForm } from '~/app/(dashboard)/documents/[id]/edit-document';
@@ -21,7 +24,7 @@ export type DocumentEditPageViewProps = {
   params: {
     id: string;
   };
-  team?: Team;
+  team?: Team & { currentTeamMember: { role: TeamMemberRole } };
 };
 
 export const DocumentEditPageView = async ({ params, team }: DocumentEditPageViewProps) => {
@@ -43,7 +46,31 @@ export const DocumentEditPageView = async ({ params, team }: DocumentEditPageVie
     teamId: team?.id,
   }).catch(() => null);
 
+  if (document?.teamId && !team?.url) {
+    redirect(documentRootPath);
+  }
+
+  const documentVisibility = document?.visibility;
+  const currentTeamMemberRole = team?.currentTeamMember?.role;
+  const isRecipient = document?.Recipient.find((recipient) => recipient.email === user.email);
+  let canAccessDocument = true;
+
+  if (!isRecipient) {
+    canAccessDocument = match([documentVisibility, currentTeamMemberRole])
+      .with([DocumentVisibility.EVERYONE, TeamMemberRole.ADMIN], () => true)
+      .with([DocumentVisibility.EVERYONE, TeamMemberRole.MANAGER], () => true)
+      .with([DocumentVisibility.EVERYONE, TeamMemberRole.MEMBER], () => true)
+      .with([DocumentVisibility.MANAGER_AND_ABOVE, TeamMemberRole.ADMIN], () => true)
+      .with([DocumentVisibility.MANAGER_AND_ABOVE, TeamMemberRole.MANAGER], () => true)
+      .with([DocumentVisibility.ADMIN, TeamMemberRole.ADMIN], () => true)
+      .otherwise(() => false);
+  }
+
   if (!document) {
+    redirect(documentRootPath);
+  }
+
+  if (team && !canAccessDocument) {
     redirect(documentRootPath);
   }
 
