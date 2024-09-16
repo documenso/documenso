@@ -5,6 +5,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Caveat } from 'next/font/google';
 
 import { Trans, msg } from '@lingui/macro';
+import { Prisma } from '@prisma/client';
 import {
   CalendarDays,
   Check,
@@ -91,16 +92,6 @@ export type AddFieldsFormProps = {
   isDocumentPdfLoaded: boolean;
   teamId?: number;
 };
-
-const convertToFieldType = (field): Field => ({
-  ...field,
-  positionX: new Prisma.Decimal(field.positionX),
-  positionY: new Prisma.Decimal(field.positionY),
-  width: new Prisma.Decimal(field.width),
-  height: new Prisma.Decimal(field.height),
-  documentId: field.documentId ?? undefined,
-  templateId: field.templateId ?? undefined,
-});
 
 export const AddFieldsFormPartial = ({
   documentFlow,
@@ -238,7 +229,7 @@ export const AddFieldsFormPartial = ({
           field.type === FieldType.RADIO ||
           field.type === FieldType.DROPDOWN) &&
           field.fieldMeta === undefined) ||
-        ('values' in field.fieldMeta && field.fieldMeta.values?.length === 0);
+        (field.fieldMeta && 'values' in field.fieldMeta && field?.fieldMeta?.values?.length === 0);
 
       return hasError;
     });
@@ -251,10 +242,10 @@ export const AddFieldsFormPartial = ({
       recipientId: 0,
       type: field.type,
       page: field.pageNumber,
-      positionX: field.pageX,
-      positionY: field.pageY,
-      width: field.pageWidth,
-      height: field.pageHeight,
+      positionX: new Prisma.Decimal(field.pageX),
+      positionY: new Prisma.Decimal(field.pageY),
+      width: new Prisma.Decimal(field.pageWidth),
+      height: new Prisma.Decimal(field.pageHeight),
       customText: '',
       inserted: true,
       fieldMeta: field.fieldMeta ?? null,
@@ -1057,11 +1048,7 @@ export const AddFieldsFormPartial = ({
         </>
       )}
       {validateUninsertedFields && fieldsWithError[0] && (
-        <FieldToolTip
-          key={fieldsWithError[0].id}
-          field={convertToFieldType(fieldsWithError[0])}
-          color="warning"
-        >
+        <FieldToolTip key={fieldsWithError[0].id} field={fieldsWithError[0]} color="warning">
           <Trans>Empty field</Trans>
         </FieldToolTip>
       )}
