@@ -271,28 +271,28 @@ export const SignaturePad = ({
 
           <SelectContent className="w-[100px]" align="end">
             <SelectItem value="black">
-              <div className="text-muted-foreground flex items-center text-[11px]">
+              <div className="text-muted-foreground flex items-center text-[0.688rem]">
                 <div className="border-border mr-1 h-4 w-4 rounded-full border-2 bg-black shadow-sm" />
                 <Trans>Black</Trans>
               </div>
             </SelectItem>
 
             <SelectItem value="red">
-              <div className="text-muted-foreground flex items-center text-[11px]">
+              <div className="text-muted-foreground flex items-center text-[0.688rem]">
                 <div className="border-border mr-1 h-4 w-4 rounded-full border-2 bg-[red] shadow-sm" />
                 <Trans>Red</Trans>
               </div>
             </SelectItem>
 
             <SelectItem value="blue">
-              <div className="text-muted-foreground flex items-center text-[11px]">
+              <div className="text-muted-foreground flex items-center text-[0.688rem]">
                 <div className="border-border mr-1 h-4 w-4 rounded-full border-2 bg-[blue] shadow-sm" />
                 <Trans>Blue</Trans>
               </div>
             </SelectItem>
 
             <SelectItem value="green">
-              <div className="text-muted-foreground flex items-center text-[11px]">
+              <div className="text-muted-foreground flex items-center text-[0.688rem]">
                 <div className="border-border mr-1 h-4 w-4 rounded-full border-2 bg-[green] shadow-sm" />
                 <Trans>Green</Trans>
               </div>
@@ -304,7 +304,7 @@ export const SignaturePad = ({
       <div className="absolute bottom-3 right-3 flex gap-2">
         <button
           type="button"
-          className="focus-visible:ring-ring ring-offset-background text-muted-foreground/60 hover:text-muted-foreground rounded-full p-0 text-[11px] focus-visible:outline-none focus-visible:ring-2"
+          className="focus-visible:ring-ring ring-offset-background text-muted-foreground/60 hover:text-muted-foreground rounded-full p-0 text-[0.688rem] focus-visible:outline-none focus-visible:ring-2"
           onClick={() => onClearClick()}
         >
           <Trans>Clear Signature</Trans>
@@ -316,7 +316,7 @@ export const SignaturePad = ({
           <button
             type="button"
             title="undo"
-            className="focus-visible:ring-ring ring-offset-background text-muted-foreground/60 hover:text-muted-foreground rounded-full p-0 text-[11px] focus-visible:outline-none focus-visible:ring-2"
+            className="focus-visible:ring-ring ring-offset-background text-muted-foreground/60 hover:text-muted-foreground rounded-full p-0 text-[0.688rem] focus-visible:outline-none focus-visible:ring-2"
             onClick={() => onUndoClick()}
           >
             <Undo2 className="h-4 w-4" />
