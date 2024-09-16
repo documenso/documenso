@@ -65,8 +65,8 @@ const fontCaveat = Caveat({
   variable: '--font-caveat',
 });
 
-const MIN_HEIGHT_PX = 40;
-const MIN_WIDTH_PX = 140;
+const MIN_HEIGHT_PX = 20;
+const MIN_WIDTH_PX = 80;
 
 export type AddTemplateFieldsFormProps = {
   documentFlow: DocumentFlowStep;

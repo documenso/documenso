@@ -267,14 +267,14 @@ export const CheckboxField = ({
       )}
 
       {field.inserted && (
-        <div className="flex flex-col gap-y-2">
+        <div className="flex flex-col gap-y-1">
           {values?.map((item: { id: number; value: string; checked: boolean }, index: number) => {
             const itemValue = item.value || `empty-value-${item.id}`;
 
             return (
               <div key={index} className="flex items-center gap-x-1.5">
                 <Checkbox
-                  className="h-4 w-4"
+                  className="h-3 w-3"
                   checkClassName="text-white"
                   id={`checkbox-${index}`}
                   checked={field.customText
@@ -283,7 +283,7 @@ export const CheckboxField = ({
                   disabled={isLoading}
                   onCheckedChange={() => void handleCheckboxOptionClick(item)}
                 />
-                <Label htmlFor={`checkbox-${index}`}>
+                <Label htmlFor={`checkbox-${index}`} className="text-xs">
                   {item.value.includes('empty-value-') ? '' : item.value}
                 </Label>
               </div>

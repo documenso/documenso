@@ -246,8 +246,8 @@ msgid "Add more"
 msgstr "Add more"
 
 #: apps/web/src/app/(signing)/sign/[token]/number-field.tsx:270
-msgid "Add number"
-msgstr "Add number"
+#~ msgid "Add number"
+#~ msgstr "Add number"
 
 #: apps/web/src/app/(dashboard)/settings/security/passkeys/create-passkey-dialog.tsx:146
 #: apps/web/src/app/(dashboard)/settings/security/passkeys/create-passkey-dialog.tsx:154
@@ -271,12 +271,12 @@ msgid "Add team email"
 msgstr "Add team email"
 
 #: apps/web/src/app/(signing)/sign/[token]/text-field.tsx:256
-msgid "Add text"
-msgstr "Add text"
+#~ msgid "Add text"
+#~ msgstr "Add text"
 
 #: apps/web/src/app/(signing)/sign/[token]/text-field.tsx:272
-msgid "Add Text"
-msgstr "Add Text"
+#~ msgid "Add Text"
+#~ msgstr "Add Text"
 
 #: apps/web/src/app/(dashboard)/documents/[id]/edit-document.tsx:152
 msgid "Add the people who will sign the document."
@@ -2096,6 +2096,10 @@ msgstr "Not supported"
 msgid "Nothing to do"
 msgstr "Nothing to do"
 
+#: apps/web/src/app/(signing)/sign/[token]/number-field.tsx:270
+msgid "Number"
+msgstr "Number"
+
 #: apps/web/src/components/(dashboard)/settings/webhooks/create-webhook-dialog.tsx:128
 msgid "On this page, you can create a new webhook."
 msgstr "On this page, you can create a new webhook."
@@ -2616,7 +2620,7 @@ msgstr "Security"
 msgid "Security activity"
 msgstr "Security activity"
 
-#: apps/web/src/app/(signing)/sign/[token]/dropdown-field.tsx:192
+#: apps/web/src/app/(signing)/sign/[token]/dropdown-field.tsx:194
 msgid "Select"
 msgstr "Select"
 
@@ -3135,6 +3139,11 @@ msgstr "Templates"
 #: apps/web/src/app/(dashboard)/templates/new-template-dialog.tsx:106
 msgid "Templates allow you to quickly generate documents with pre-filled recipients and fields."
 msgstr "Templates allow you to quickly generate documents with pre-filled recipients and fields."
+
+#: apps/web/src/app/(signing)/sign/[token]/text-field.tsx:256
+#: apps/web/src/app/(signing)/sign/[token]/text-field.tsx:272
+msgid "Text"
+msgstr "Text"
 
 #: apps/web/src/app/(dashboard)/admin/site-settings/banner-form.tsx:166
 msgid "Text Color"

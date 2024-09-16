@@ -150,7 +150,7 @@ export const DateField = ({
       )}
 
       {field.inserted && (
-        <p className="text-muted-foreground dark:text-background/80 text-sm duration-200">
+        <p className="text-muted-foreground dark:text-background/80 text-[clamp(0.625rem,1cqw,0.825rem)] duration-200">
           {localDateString}
         </p>
       )}
