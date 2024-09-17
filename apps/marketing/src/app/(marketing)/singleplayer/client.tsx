@@ -168,6 +168,7 @@ export const SinglePlayerClient = () => {
     sendStatus: 'NOT_SENT',
     role: 'SIGNER',
     authOptions: null,
+    signingOrder: null,
   };
 
   const onFileDrop = async (file: File) => {

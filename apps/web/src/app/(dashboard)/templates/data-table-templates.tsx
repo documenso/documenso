@@ -17,7 +17,6 @@ import { DataTable } from '@documenso/ui/primitives/data-table';
 import { DataTablePagination } from '@documenso/ui/primitives/data-table-pagination';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@documenso/ui/primitives/tooltip';
 
-import { LocaleDate } from '~/components/formatter/locale-date';
 import { TemplateType } from '~/components/formatter/template-type';
 
 import { DataTableActionDropdown } from './data-table-action-dropdown';
@@ -48,7 +47,7 @@ export const TemplatesDataTable = ({
 
   const updateSearchParams = useUpdateSearchParams();
 
-  const { _ } = useLingui();
+  const { _, i18n } = useLingui();
   const { remaining } = useLimits();
 
   const columns = useMemo(() => {
@@ -56,7 +55,7 @@ export const TemplatesDataTable = ({
       {
         header: _(msg`Created`),
         accessorKey: 'createdAt',
-        cell: ({ row }) => <LocaleDate date={row.original.createdAt} />,
+        cell: ({ row }) => i18n.date(row.original.createdAt),
       },
       {
         header: _(msg`Title`),
@@ -81,8 +80,8 @@ export const TemplatesDataTable = ({
 
                     <p>
                       <Trans>
-                        Public templates are connected to your public profile. Any modifications
-                        to public templates will also appear in your public profile.
+                        Public templates are connected to your public profile. Any modifications to
+                        public templates will also appear in your public profile.
                       </Trans>
                     </p>
                   </li>
@@ -94,9 +93,9 @@ export const TemplatesDataTable = ({
 
                     <p>
                       <Trans>
-                        Direct link templates contain one dynamic recipient placeholder. Anyone
-                        with access to this link can sign the document, and it will then appear
-                        on your documents page.
+                        Direct link templates contain one dynamic recipient placeholder. Anyone with
+                        access to this link can sign the document, and it will then appear on your
+                        documents page.
                       </Trans>
                     </p>
                   </li>
@@ -109,8 +108,8 @@ export const TemplatesDataTable = ({
                     <p>
                       {teamId ? (
                         <Trans>
-                          Team only templates are not linked anywhere and are visible only to
-                          your team.
+                          Team only templates are not linked anywhere and are visible only to your
+                          team.
                         </Trans>
                       ) : (
                         <Trans>Private templates can only be modified and viewed by you.</Trans>

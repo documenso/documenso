@@ -103,6 +103,19 @@ export const EditTemplateForm = ({
     },
   });
 
+  const { mutateAsync: setSigningOrderForTemplate } =
+    trpc.template.setSigningOrderForTemplate.useMutation({
+      ...DO_NOT_INVALIDATE_QUERY_ON_MUTATION,
+      onSuccess: (newData) => {
+        utils.template.getTemplateWithDetailsById.setData(
+          {
+            id: initialTemplate.id,
+          },
+          (oldData) => ({ ...(oldData || initialTemplate), ...newData }),
+        );
+      },
+    });
+
   const { mutateAsync: addTemplateFields } = trpc.field.addTemplateFields.useMutation({
     ...DO_NOT_INVALIDATE_QUERY_ON_MUTATION,
     onSuccess: (newData) => {
@@ -160,11 +173,19 @@ export const EditTemplateForm = ({
     data: TAddTemplatePlacholderRecipientsFormSchema,
   ) => {
     try {
-      await addTemplateSigners({
-        templateId: template.id,
-        teamId: team?.id,
-        signers: data.signers,
-      });
+      await Promise.all([
+        setSigningOrderForTemplate({
+          templateId: template.id,
+          teamId: team?.id,
+          signingOrder: data.signingOrder,
+        }),
+
+        addTemplateSigners({
+          templateId: template.id,
+          teamId: team?.id,
+          signers: data.signers,
+        }),
+      ]);
 
       // Router refresh is here to clear the router cache for when navigating to /documents.
       router.refresh();
@@ -262,6 +283,7 @@ export const EditTemplateForm = ({
               documentFlow={documentFlow.signers}
               recipients={recipients}
               fields={fields}
+              signingOrder={template.templateMeta?.signingOrder}
               templateDirectLink={template.directLink}
               onSubmit={onAddTemplatePlaceholderFormSubmit}
               isEnterprise={isEnterprise}

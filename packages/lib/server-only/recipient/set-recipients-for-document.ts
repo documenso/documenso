@@ -27,6 +27,7 @@ export interface SetRecipientsForDocumentOptions {
     email: string;
     name: string;
     role: RecipientRole;
+    signingOrder?: number | null;
     actionAuth?: TRecipientActionAuthTypes | null;
   }[];
   requestMetadata?: RequestMetadata;
@@ -156,6 +157,7 @@ export const setRecipientsForDocument = async ({
             name: recipient.name,
             email: recipient.email,
             role: recipient.role,
+            signingOrder: recipient.signingOrder,
             documentId,
             sendStatus: recipient.role === RecipientRole.CC ? SendStatus.SENT : SendStatus.NOT_SENT,
             signingStatus:
@@ -166,6 +168,7 @@ export const setRecipientsForDocument = async ({
             name: recipient.name,
             email: recipient.email,
             role: recipient.role,
+            signingOrder: recipient.signingOrder,
             token: nanoid(),
             documentId,
             sendStatus: recipient.role === RecipientRole.CC ? SendStatus.SENT : SendStatus.NOT_SENT,

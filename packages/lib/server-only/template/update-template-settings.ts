@@ -33,7 +33,7 @@ export const updateTemplateSettings = async ({
   meta,
   data,
 }: UpdateTemplateSettingsOptions) => {
-  if (Object.values(data).length === 0) {
+  if (Object.values(data).length === 0 && Object.keys(meta ?? {}).length === 0) {
     throw new AppError(AppErrorCode.INVALID_BODY, 'Missing data to update');
   }
 

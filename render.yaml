@@ -43,6 +43,8 @@ services:
           envVarKey: RENDER_EXTERNAL_URL
       - key: NEXT_PUBLIC_MARKETING_URL
         value: 'http://localhost:3001'
+      - key: NEXT_PRIVATE_INTERNAL_WEBAPP_URL
+        value: 'http://localhost:10000'
 
       # SMTP
       - key: NEXT_PRIVATE_SMTP_TRANSPORT
