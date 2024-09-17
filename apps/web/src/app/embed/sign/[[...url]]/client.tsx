@@ -1,15 +1,17 @@
 'use client';
 
+import { useEffect, useState } from 'react';
+
+import { Trans, msg } from '@lingui/macro';
+import { useLingui } from '@lingui/react';
+import { LucideChevronDown, LucideChevronUp } from 'lucide-react';
+
 import { useThrottleFn } from '@documenso/lib/client-only/hooks/use-throttle-fn';
 import { PDF_VIEWER_PAGE_SELECTOR } from '@documenso/lib/constants/pdf-viewer';
 import { validateFieldsInserted } from '@documenso/lib/utils/fields';
 import type { DocumentMeta, Recipient, TemplateMeta } from '@documenso/prisma/client';
 import { type DocumentData, type Field } from '@documenso/prisma/client';
 import { trpc } from '@documenso/trpc/react';
-import { Trans, msg } from '@lingui/macro';
-import { useLingui } from '@lingui/react';
-import { useEffect, useState } from 'react';
-
 import { FieldToolTip } from '@documenso/ui/components/field/field-tooltip';
 import { Button } from '@documenso/ui/primitives/button';
 import { Card, CardContent } from '@documenso/ui/primitives/card';
@@ -20,9 +22,9 @@ import { LazyPDFViewer } from '@documenso/ui/primitives/lazy-pdf-viewer';
 import { SignaturePad } from '@documenso/ui/primitives/signature-pad';
 import { useToast } from '@documenso/ui/primitives/use-toast';
 
-import { LucideChevronDown, LucideChevronUp } from 'lucide-react';
 import { useRequiredSigningContext } from '~/app/(signing)/sign/[token]/provider';
 import { Logo } from '~/components/branding/logo';
+
 import { EmbedClientLoading } from '../../client-loading';
 import { EmbedDocumentCompleted } from '../../completed';
 import { EmbedDocumentFields } from '../../document-fields';
@@ -185,7 +187,7 @@ export const EmbedSignDocumentClientPage = ({
     <div className="relative mx-auto flex min-h-[100dvh] max-w-screen-lg flex-col items-center justify-center p-6">
       {(!hasFinishedInit || !hasDocumentLoaded) && <EmbedClientLoading />}
 
-      <div className="relative flex flex-col md:flex-row w-full gap-x-6 gap-y-12">
+      <div className="relative flex w-full flex-col gap-x-6 gap-y-12 md:flex-row">
         {/* Viewer */}
         <div className="flex-1">
           <LazyPDFViewer
@@ -196,26 +198,26 @@ export const EmbedSignDocumentClientPage = ({
 
         {/* Widget */}
         <div
-          className="group/document-widget fixed md:sticky md:top-4 left-0 w-full bottom-8 px-6 md:px-0 z-50 md:z-auto md:w-[350px] flex-shrink-0 h-fit"
+          className="group/document-widget fixed bottom-8 left-0 z-50 h-fit w-full flex-shrink-0 px-6 md:sticky md:top-4 md:z-auto md:w-[350px] md:px-0"
           data-expanded={isExpanded || undefined}
         >
-          <div className="w-full border-border bg-widget flex  flex-col rounded-xl border px-4 py-4 md:py-6">
+          <div className="border-border bg-widget flex w-full  flex-col rounded-xl border px-4 py-4 md:py-6">
             {/* Header */}
             <div>
               <div className="flex items-center justify-between gap-x-2">
-                <h3 className="text-foreground text-xl md:text-2xl font-semibold">
+                <h3 className="text-foreground text-xl font-semibold md:text-2xl">
                   <Trans>Sign document</Trans>
                 </h3>
 
                 <Button variant="outline" className="h-8 w-8 p-0 md:hidden">
                   {isExpanded ? (
                     <LucideChevronDown
-                      className="h-5 w-5 text-muted-foreground"
+                      className="text-muted-foreground h-5 w-5"
                       onClick={() => setIsExpanded(false)}
                     />
                   ) : (
                     <LucideChevronUp
-                      className="h-5 w-5 text-muted-foreground"
+                      className="text-muted-foreground h-5 w-5"
                       onClick={() => setIsExpanded(true)}
                     />
                   )}
@@ -232,7 +234,7 @@ export const EmbedSignDocumentClientPage = ({
             </div>
 
             {/* Form */}
-            <div className="-mx-2 px-2 hidden group-data-[expanded]/document-widget:block md:block">
+            <div className="-mx-2 hidden px-2 group-data-[expanded]/document-widget:block md:block">
               <div className="flex flex-1 flex-col gap-y-4">
                 <div>
                   <Label htmlFor="full-name">
@@ -285,9 +287,9 @@ export const EmbedSignDocumentClientPage = ({
               </div>
             </div>
 
-            <div className="flex-1 hidden group-data-[expanded]/document-widget:block md:block" />
+            <div className="hidden flex-1 group-data-[expanded]/document-widget:block md:block" />
 
-            <div className="w-full grid-cols-2 items-center mt-4 hidden group-data-[expanded]/document-widget:grid md:grid">
+            <div className="mt-4 hidden w-full grid-cols-2 items-center group-data-[expanded]/document-widget:grid md:grid">
               {pendingFields.length > 0 ? (
                 <Button className="col-start-2" onClick={() => onNextFieldClick()}>
                   <Trans>Next</Trans>

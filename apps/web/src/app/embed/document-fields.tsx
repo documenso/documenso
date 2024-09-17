@@ -13,7 +13,7 @@ import {
   ZTextFieldMeta,
 } from '@documenso/lib/types/field-meta';
 import type { DocumentMeta, Recipient, TemplateMeta } from '@documenso/prisma/client';
-import { FieldType, type Field } from '@documenso/prisma/client';
+import { type Field, FieldType } from '@documenso/prisma/client';
 import type { FieldWithSignatureAndFieldMeta } from '@documenso/prisma/types/field-with-signature-and-fieldmeta';
 import type {
   TRemovedSignedFieldWithTokenMutationSchema,

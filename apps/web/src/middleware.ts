@@ -81,7 +81,7 @@ async function middleware(req: NextRequest): Promise<NextResponse> {
     // Allow third parties to iframe the document.
     res.headers.set('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
     res.headers.set('Access-Control-Allow-Origin', '*');
-    res.headers.set('Content-Security-Policy', "frame-ancestors *");
+    res.headers.set('Content-Security-Policy', 'frame-ancestors *');
     res.headers.set('Referrer-Policy', 'strict-origin-when-cross-origin');
     res.headers.set('X-Content-Type-Options', 'nosniff');
     res.headers.set('X-Frame-Options', 'ALLOW-ALL');
