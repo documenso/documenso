@@ -7,7 +7,6 @@ import { useLingui } from '@lingui/react';
 import { DateTime } from 'luxon';
 
 import { useIsMounted } from '@documenso/lib/client-only/hooks/use-is-mounted';
-import { useLocale } from '@documenso/lib/client-only/providers/locale';
 import type { Document, Recipient, User } from '@documenso/prisma/client';
 
 export type DocumentPageViewInformationProps = {
@@ -24,21 +23,9 @@ export const DocumentPageViewInformation = ({
 }: DocumentPageViewInformationProps) => {
   const isMounted = useIsMounted();
 
-  const { locale } = useLocale();
-  const { _ } = useLingui();
+  const { _, i18n } = useLingui();
 
   const documentInformation = useMemo(() => {
-    let createdValue = DateTime.fromJSDate(document.createdAt).toFormat('MMMM d, yyyy');
-    let lastModifiedValue = DateTime.fromJSDate(document.updatedAt).toRelative();
-
-    if (!isMounted) {
-      createdValue = DateTime.fromJSDate(document.createdAt)
-        .setLocale(locale)
-        .toFormat('MMMM d, yyyy');
-
-      lastModifiedValue = DateTime.fromJSDate(document.updatedAt).setLocale(locale).toRelative();
-    }
-
     return [
       {
         description: msg`Uploaded by`,
@@ -46,15 +33,19 @@ export const DocumentPageViewInformation = ({
       },
       {
         description: msg`Created`,
-        value: createdValue,
+        value: DateTime.fromJSDate(document.createdAt)
+          .setLocale(i18n.locales?.[0] || i18n.locale)
+          .toFormat('MMMM d, yyyy'),
       },
       {
         description: msg`Last modified`,
-        value: lastModifiedValue,
+        value: DateTime.fromJSDate(document.updatedAt)
+          .setLocale(i18n.locales?.[0] || i18n.locale)
+          .toRelative(),
       },
     ];
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isMounted, document, locale, userId]);
+  }, [isMounted, document, userId]);
 
   return (
     <section className="dark:bg-background text-foreground border-border bg-widget flex flex-col rounded-xl border">

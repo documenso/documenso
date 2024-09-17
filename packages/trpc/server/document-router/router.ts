@@ -40,6 +40,7 @@ import {
   ZSendDocumentMutationSchema,
   ZSetPasswordForDocumentMutationSchema,
   ZSetSettingsForDocumentMutationSchema,
+  ZSetSigningOrderForDocumentMutationSchema,
   ZSetTitleForDocumentMutationSchema,
 } from './schema';
 
@@ -304,6 +305,29 @@ export const documentRouter = router({
         throw new TRPCError({
           code: 'BAD_REQUEST',
           message: 'We were unable to set the password for this document. Please try again later.',
+        });
+      }
+    }),
+
+  setSigningOrderForDocument: authenticatedProcedure
+    .input(ZSetSigningOrderForDocumentMutationSchema)
+    .mutation(async ({ input, ctx }) => {
+      try {
+        const { documentId, signingOrder } = input;
+
+        return await upsertDocumentMeta({
+          documentId,
+          signingOrder,
+          userId: ctx.user.id,
+          requestMetadata: extractNextApiRequestMetadata(ctx.req),
+        });
+      } catch (err) {
+        console.error(err);
+
+        throw new TRPCError({
+          code: 'BAD_REQUEST',
+          message:
+            'We were unable to update the settings for this document. Please try again later.',
         });
       }
     }),

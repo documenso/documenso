@@ -5,9 +5,15 @@ import { DATE_FORMATS, DEFAULT_DOCUMENT_DATE_FORMAT } from '@documenso/lib/const
 import '@documenso/lib/constants/time-zones';
 import { DEFAULT_DOCUMENT_TIME_ZONE, TIME_ZONES } from '@documenso/lib/constants/time-zones';
 import { ZUrlSchema } from '@documenso/lib/schemas/common';
+import {
+  ZDocumentAccessAuthTypesSchema,
+  ZDocumentActionAuthTypesSchema,
+  ZRecipientActionAuthTypesSchema,
+} from '@documenso/lib/types/document-auth';
 import { ZFieldMetaSchema } from '@documenso/lib/types/field-meta';
 import {
   DocumentDataType,
+  DocumentSigningOrder,
   FieldType,
   ReadStatus,
   RecipientRole,
@@ -98,6 +104,7 @@ export const ZCreateDocumentMutationSchema = z.object({
       name: z.string().min(1),
       email: z.string().email().min(1),
       role: z.nativeEnum(RecipientRole).optional().default(RecipientRole.SIGNER),
+      signingOrder: z.number().nullish(),
     }),
   ),
   meta: z
@@ -118,8 +125,15 @@ export const ZCreateDocumentMutationSchema = z.object({
           enum: DATE_FORMATS.map((format) => format.value),
         }),
       redirectUrl: z.string(),
+      signingOrder: z.nativeEnum(DocumentSigningOrder).optional(),
     })
     .partial(),
+  authOptions: z
+    .object({
+      globalAccessAuth: ZDocumentAccessAuthTypesSchema.optional(),
+      globalActionAuth: ZDocumentActionAuthTypesSchema.optional(),
+    })
+    .optional(),
   formValues: z.record(z.string(), z.union([z.string(), z.boolean(), z.number()])).optional(),
 });
 
@@ -136,6 +150,7 @@ export const ZCreateDocumentMutationResponseSchema = z.object({
       email: z.string().email().min(1),
       token: z.string(),
       role: z.nativeEnum(RecipientRole),
+      signingOrder: z.number().nullish(),
 
       signingUrl: z.string(),
     }),
@@ -154,6 +169,7 @@ export const ZCreateDocumentFromTemplateMutationSchema = z.object({
       name: z.string().min(1),
       email: z.string().email().min(1),
       role: z.nativeEnum(RecipientRole).optional().default(RecipientRole.SIGNER),
+      signingOrder: z.number().nullish(),
     }),
   ),
   meta: z
@@ -163,8 +179,15 @@ export const ZCreateDocumentFromTemplateMutationSchema = z.object({
       timezone: z.string(),
       dateFormat: z.string(),
       redirectUrl: z.string(),
+      signingOrder: z.nativeEnum(DocumentSigningOrder).optional(),
     })
     .partial()
+    .optional(),
+  authOptions: z
+    .object({
+      globalAccessAuth: ZDocumentAccessAuthTypesSchema.optional(),
+      globalActionAuth: ZDocumentActionAuthTypesSchema.optional(),
+    })
     .optional(),
   formValues: z.record(z.string(), z.union([z.string(), z.boolean(), z.number()])).optional(),
 });
@@ -183,6 +206,7 @@ export const ZCreateDocumentFromTemplateMutationResponseSchema = z.object({
       email: z.string().email().min(1),
       token: z.string(),
       role: z.nativeEnum(RecipientRole).optional().default(RecipientRole.SIGNER),
+      signingOrder: z.number().nullish(),
 
       signingUrl: z.string(),
     }),
@@ -202,6 +226,7 @@ export const ZGenerateDocumentFromTemplateMutationSchema = z.object({
         id: z.number(),
         name: z.string().optional(),
         email: z.string().email().min(1),
+        signingOrder: z.number().nullish(),
       }),
     )
     .refine(
@@ -220,8 +245,15 @@ export const ZGenerateDocumentFromTemplateMutationSchema = z.object({
       timezone: z.string(),
       dateFormat: z.string(),
       redirectUrl: ZUrlSchema,
+      signingOrder: z.nativeEnum(DocumentSigningOrder).optional(),
     })
     .partial()
+    .optional(),
+  authOptions: z
+    .object({
+      globalAccessAuth: ZDocumentAccessAuthTypesSchema.optional(),
+      globalActionAuth: ZDocumentActionAuthTypesSchema.optional(),
+    })
     .optional(),
   formValues: z.record(z.string(), z.union([z.string(), z.boolean(), z.number()])).optional(),
 });
@@ -240,6 +272,7 @@ export const ZGenerateDocumentFromTemplateMutationResponseSchema = z.object({
       email: z.string().email().min(1),
       token: z.string(),
       role: z.nativeEnum(RecipientRole),
+      signingOrder: z.number().nullish(),
 
       signingUrl: z.string(),
     }),
@@ -254,6 +287,12 @@ export const ZCreateRecipientMutationSchema = z.object({
   name: z.string().min(1),
   email: z.string().email().min(1),
   role: z.nativeEnum(RecipientRole).optional().default(RecipientRole.SIGNER),
+  signingOrder: z.number().nullish(),
+  authOptions: z
+    .object({
+      actionAuth: ZRecipientActionAuthTypesSchema.optional(),
+    })
+    .optional(),
 });
 
 /**
@@ -277,6 +316,7 @@ export const ZSuccessfulRecipientResponseSchema = z.object({
   email: z.string().email().min(1),
   name: z.string(),
   role: z.nativeEnum(RecipientRole),
+  signingOrder: z.number().nullish(),
   token: z.string(),
   // !: Not used for now
   // expired: z.string(),
@@ -394,6 +434,7 @@ export const ZTemplateMetaSchema = z.object({
   dateFormat: z.string().nullish(),
   templateId: z.number(),
   redirectUrl: z.string().nullish(),
+  signingOrder: z.nativeEnum(DocumentSigningOrder).nullish().default(DocumentSigningOrder.PARALLEL),
 });
 
 export const ZTemplateSchema = z.object({
@@ -415,6 +456,7 @@ export const ZRecipientSchema = z.object({
   email: z.string().email().min(1),
   name: z.string(),
   token: z.string(),
+  signingOrder: z.number().nullish(),
   documentDeletedAt: z.date().nullish(),
   expired: z.date().nullish(),
   signedAt: z.date().nullish(),
@@ -468,6 +510,7 @@ export const ZTemplateWithDataSchema = ZTemplateSchema.extend({
     id: true,
     email: true,
     name: true,
+    signingOrder: true,
     authOptions: true,
     role: true,
   }).array(),

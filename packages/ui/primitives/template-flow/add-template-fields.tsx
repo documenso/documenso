@@ -65,8 +65,8 @@ const fontCaveat = Caveat({
   variable: '--font-caveat',
 });
 
-const MIN_HEIGHT_PX = 40;
-const MIN_WIDTH_PX = 140;
+const MIN_HEIGHT_PX = 20;
+const MIN_WIDTH_PX = 80;
 
 export type AddTemplateFieldsFormProps = {
   documentFlow: DocumentFlowStep;
@@ -156,6 +156,38 @@ export const AddTemplateFieldsFormPartial = ({
   const selectedSignerStyles = useSignerColors(
     selectedSignerIndex === -1 ? 0 : selectedSignerIndex,
   );
+
+  const filterFieldsWithEmptyValues = (fields: typeof localFields, fieldType: string) =>
+    fields
+      .filter((field) => field.type === fieldType)
+      .filter((field) => {
+        if (field.fieldMeta && 'values' in field.fieldMeta) {
+          return field.fieldMeta.values?.length === 0;
+        }
+
+        return true;
+      });
+
+  const emptyCheckboxFields = useMemo(
+    () => filterFieldsWithEmptyValues(localFields, FieldType.CHECKBOX),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [localFields],
+  );
+
+  const emptyRadioFields = useMemo(
+    () => filterFieldsWithEmptyValues(localFields, FieldType.RADIO),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [localFields],
+  );
+
+  const emptySelectFields = useMemo(
+    () => filterFieldsWithEmptyValues(localFields, FieldType.DROPDOWN),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [localFields],
+  );
+
+  const hasErrors =
+    emptyCheckboxFields.length > 0 || emptyRadioFields.length > 0 || emptySelectFields.length > 0;
 
   const [isFieldWithinBounds, setIsFieldWithinBounds] = useState(false);
   const [coords, setCoords] = useState({
@@ -789,6 +821,24 @@ export const AddTemplateFieldsFormPartial = ({
             </div>
           </DocumentFlowFormContainerContent>
 
+          {hasErrors && (
+            <div className="mt-4">
+              <ul>
+                <li className="text-sm text-red-500">
+                  <Trans>
+                    To proceed further, please set at least one value for the{' '}
+                    {emptyCheckboxFields.length > 0
+                      ? 'Checkbox'
+                      : emptyRadioFields.length > 0
+                      ? 'Radio'
+                      : 'Select'}{' '}
+                    field.
+                  </Trans>
+                </li>
+              </ul>
+            </div>
+          )}
+
           <DocumentFlowFormContainerFooter>
             <DocumentFlowFormContainerStep step={currentStep} maxStep={totalSteps} />
 
@@ -796,6 +846,7 @@ export const AddTemplateFieldsFormPartial = ({
               loading={isSubmitting}
               disabled={isSubmitting}
               goNextLabel={msg`Save Template`}
+              disableNextStep={hasErrors}
               onGoBackClick={() => {
                 previousStep();
                 remove();

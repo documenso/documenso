@@ -4,8 +4,12 @@ import { match } from 'ts-pattern';
 
 import { IS_BILLING_ENABLED } from '@documenso/lib/constants/app';
 import { getServerComponentSession } from '@documenso/lib/next-auth/get-server-component-session';
+import { getDocumentAndSenderByToken } from '@documenso/lib/server-only/document/get-document-by-token';
+import { getFieldsForToken } from '@documenso/lib/server-only/field/get-fields-for-token';
+import { getRecipientByToken } from '@documenso/lib/server-only/recipient/get-recipient-by-token';
 import { DocumentAccessAuth } from '@documenso/lib/types/document-auth';
 import { extractDocumentAuthMethods } from '@documenso/lib/utils/document-auth';
+import { DocumentStatus } from '@documenso/prisma/client';
 
 import { DocumentAuthProvider } from '~/app/(signing)/sign/[token]/document-auth-provider';
 import { SigningProvider } from '~/app/(signing)/sign/[token]/provider';
@@ -13,10 +17,6 @@ import { SigningProvider } from '~/app/(signing)/sign/[token]/provider';
 import { EmbedAuthenticateView } from '../../authenticate';
 import { EmbedPaywall } from '../../paywall';
 import { EmbedSignDocumentClientPage } from './client';
-import { getFieldsForToken } from '@documenso/lib/server-only/field/get-fields-for-token';
-import { getRecipientByToken } from '@documenso/lib/server-only/recipient/get-recipient-by-token';
-import { getDocumentAndSenderByToken } from '@documenso/lib/server-only/document/get-document-by-token';
-import { DocumentStatus } from '@documenso/prisma/client';
 
 export type EmbedSignDocumentPageProps = {
   params: {
@@ -66,7 +66,12 @@ export default async function EmbedSignDocumentPage({ params }: EmbedSignDocumen
     .exhaustive();
 
   if (!isAccessAuthValid) {
-    return <EmbedAuthenticateView email={user?.email || recipient.email} returnTo={`/embed/direct/${token}`} />;
+    return (
+      <EmbedAuthenticateView
+        email={user?.email || recipient.email}
+        returnTo={`/embed/direct/${token}`}
+      />
+    );
   }
 
   return (

@@ -20,8 +20,6 @@ import { DataTablePagination } from '@documenso/ui/primitives/data-table-paginat
 import { Skeleton } from '@documenso/ui/primitives/skeleton';
 import { TableCell } from '@documenso/ui/primitives/table';
 
-import { LocaleDate } from '~/components/formatter/locale-date';
-
 export type DocumentLogsDataTableProps = {
   documentId: number;
 };
@@ -32,7 +30,7 @@ const dateFormat: DateTimeFormatOptions = {
 };
 
 export const DocumentLogsDataTable = ({ documentId }: DocumentLogsDataTableProps) => {
-  const { _ } = useLingui();
+  const { _, i18n } = useLingui();
 
   const searchParams = useSearchParams();
   const updateSearchParams = useUpdateSearchParams();
@@ -78,7 +76,7 @@ export const DocumentLogsDataTable = ({ documentId }: DocumentLogsDataTableProps
       {
         header: _(msg`Time`),
         accessorKey: 'createdAt',
-        cell: ({ row }) => <LocaleDate format={dateFormat} date={row.original.createdAt} />,
+        cell: ({ row }) => i18n.date(row.original.createdAt, dateFormat),
       },
       {
         header: _(msg`User`),
@@ -106,9 +104,7 @@ export const DocumentLogsDataTable = ({ documentId }: DocumentLogsDataTableProps
         header: _(msg`Action`),
         accessorKey: 'type',
         cell: ({ row }) => (
-          <span>
-            {uppercaseFistLetter(formatDocumentAuditLogAction(row.original).description)}
-          </span>
+          <span>{uppercaseFistLetter(formatDocumentAuditLogAction(row.original).description)}</span>
         ),
       },
       {

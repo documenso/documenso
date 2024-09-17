@@ -5,7 +5,6 @@ import { NextResponse } from 'next/server';
 import { getToken } from 'next-auth/jwt';
 
 import { TEAM_URL_ROOT_REGEX } from '@documenso/lib/constants/teams';
-import { extractSupportedLanguage } from '@documenso/lib/utils/i18n';
 import { formatDocumentsPath } from '@documenso/lib/utils/teams';
 
 async function middleware(req: NextRequest): Promise<NextResponse> {
@@ -82,7 +81,7 @@ async function middleware(req: NextRequest): Promise<NextResponse> {
     // Allow third parties to iframe the document.
     res.headers.set('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
     res.headers.set('Access-Control-Allow-Origin', '*');
-    res.headers.set('Content-Security-Policy', "frame-ancestors *");
+    res.headers.set('Content-Security-Policy', 'frame-ancestors *');
     res.headers.set('Referrer-Policy', 'strict-origin-when-cross-origin');
     res.headers.set('X-Content-Type-Options', 'nosniff');
     res.headers.set('X-Frame-Options', 'ALLOW-ALL');
@@ -96,12 +95,7 @@ async function middleware(req: NextRequest): Promise<NextResponse> {
 export default async function middlewareWrapper(req: NextRequest) {
   const response = await middleware(req);
 
-  const lang = extractSupportedLanguage({
-    headers: req.headers,
-    cookies: cookies(),
-  });
-
-  response.cookies.set('i18n', lang);
+  // Can place anything that needs to be set on the response here.
 
   return response;
 }

@@ -2,10 +2,11 @@ import React from 'react';
 
 import { redirect } from 'next/navigation';
 
+import { DateTime } from 'luxon';
 import { match } from 'ts-pattern';
 import { UAParser } from 'ua-parser-js';
 
-import { setupI18nSSR } from '@documenso/lib/client-only/providers/i18n.server';
+import { APP_I18N_OPTIONS } from '@documenso/lib/constants/i18n';
 import {
   RECIPIENT_ROLES_DESCRIPTION_ENG,
   RECIPIENT_ROLE_SIGNING_REASONS_ENG,
@@ -27,7 +28,6 @@ import {
 } from '@documenso/ui/primitives/table';
 
 import { Logo } from '~/components/branding/logo';
-import { LocaleDate } from '~/components/formatter/locale-date';
 
 type SigningCertificateProps = {
   searchParams: {
@@ -41,8 +41,6 @@ const FRIENDLY_SIGNING_REASONS = {
 };
 
 export default async function SigningCertificate({ searchParams }: SigningCertificateProps) {
-  setupI18nSSR();
-
   const { d } = searchParams;
 
   if (typeof d !== 'string' || !d) {
@@ -231,42 +229,33 @@ export default async function SigningCertificate({ searchParams }: SigningCertif
                         <p className="text-muted-foreground text-sm print:text-xs">
                           <span className="font-medium">Sent:</span>{' '}
                           <span className="inline-block">
-                            {logs.EMAIL_SENT[0] ? (
-                              <LocaleDate
-                                date={logs.EMAIL_SENT[0].createdAt}
-                                format="yyyy-MM-dd hh:mm:ss a (ZZZZ)"
-                              />
-                            ) : (
-                              'Unknown'
-                            )}
+                            {logs.EMAIL_SENT[0]
+                              ? DateTime.fromJSDate(logs.EMAIL_SENT[0].createdAt)
+                                  .setLocale(APP_I18N_OPTIONS.defaultLocale)
+                                  .toFormat('yyyy-MM-dd hh:mm:ss a (ZZZZ)')
+                              : 'Unknown'}
                           </span>
                         </p>
 
                         <p className="text-muted-foreground text-sm print:text-xs">
                           <span className="font-medium">Viewed:</span>{' '}
                           <span className="inline-block">
-                            {logs.DOCUMENT_OPENED[0] ? (
-                              <LocaleDate
-                                date={logs.DOCUMENT_OPENED[0].createdAt}
-                                format="yyyy-MM-dd hh:mm:ss a (ZZZZ)"
-                              />
-                            ) : (
-                              'Unknown'
-                            )}
+                            {logs.DOCUMENT_OPENED[0]
+                              ? DateTime.fromJSDate(logs.DOCUMENT_OPENED[0].createdAt)
+                                  .setLocale(APP_I18N_OPTIONS.defaultLocale)
+                                  .toFormat('yyyy-MM-dd hh:mm:ss a (ZZZZ)')
+                              : 'Unknown'}
                           </span>
                         </p>
 
                         <p className="text-muted-foreground text-sm print:text-xs">
                           <span className="font-medium">Signed:</span>{' '}
                           <span className="inline-block">
-                            {logs.DOCUMENT_RECIPIENT_COMPLETED[0] ? (
-                              <LocaleDate
-                                date={logs.DOCUMENT_RECIPIENT_COMPLETED[0].createdAt}
-                                format="yyyy-MM-dd hh:mm:ss a (ZZZZ)"
-                              />
-                            ) : (
-                              'Unknown'
-                            )}
+                            {logs.DOCUMENT_RECIPIENT_COMPLETED[0]
+                              ? DateTime.fromJSDate(logs.DOCUMENT_RECIPIENT_COMPLETED[0].createdAt)
+                                  .setLocale(APP_I18N_OPTIONS.defaultLocale)
+                                  .toFormat('yyyy-MM-dd hh:mm:ss a (ZZZZ)')
+                              : 'Unknown'}
                           </span>
                         </p>
 

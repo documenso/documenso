@@ -6,6 +6,8 @@ export type GetTeamByIdOptions = {
   teamId: number;
 };
 
+export type GetTeamResponse = Awaited<ReturnType<typeof getTeamById>>;
+
 /**
  * Get a team given a teamId.
  *

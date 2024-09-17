@@ -52,8 +52,6 @@ import { useToast } from '@documenso/ui/primitives/use-toast';
 
 import { useOptionalCurrentTeam } from '~/providers/team';
 
-import { LocaleDate } from '../formatter/locale-date';
-
 export type ManagePublicTemplateDialogProps = {
   directTemplates: (Template & {
     directLink: Pick<TemplateDirectLink, 'token' | 'enabled'>;
@@ -93,7 +91,7 @@ export const ManagePublicTemplateDialog = ({
   onIsOpenChange,
   ...props
 }: ManagePublicTemplateDialogProps) => {
-  const { _ } = useLingui();
+  const { _, i18n } = useLingui();
   const { toast } = useToast();
 
   const [open, onOpenChange] = useState(isOpen);
@@ -300,7 +298,7 @@ export const ManagePublicTemplateDialog = ({
                           </TableCell>
 
                           <TableCell className="text-muted-foreground text-sm">
-                            <LocaleDate date={row.createdAt} />
+                            {i18n.date(row.createdAt)}
                           </TableCell>
 
                           <TableCell>

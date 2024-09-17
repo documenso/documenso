@@ -16,8 +16,6 @@ import { type Stripe } from '@documenso/lib/server-only/stripe';
 import { getSubscriptionsByUserId } from '@documenso/lib/server-only/subscription/get-subscriptions-by-user-id';
 import { SubscriptionStatus } from '@documenso/prisma/client';
 
-import { LocaleDate } from '~/components/formatter/locale-date';
-
 import { BillingPlans } from './billing-plans';
 import { BillingPortalButton } from './billing-portal-button';
 
@@ -26,7 +24,7 @@ export const metadata: Metadata = {
 };
 
 export default async function BillingSettingsPage() {
-  setupI18nSSR();
+  const { i18n } = setupI18nSSR();
 
   let { user } = await getRequiredServerComponentSession();
 
@@ -104,12 +102,12 @@ export default async function BillingSettingsPage() {
                     {subscription.cancelAtPeriodEnd ? (
                       <span>
                         end on{' '}
-                        <LocaleDate className="font-semibold" date={subscription.periodEnd} />.
+                        <span className="font-semibold">{i18n.date(subscription.periodEnd)}.</span>
                       </span>
                     ) : (
                       <span>
                         automatically renew on{' '}
-                        <LocaleDate className="font-semibold" date={subscription.periodEnd} />.
+                        <span className="font-semibold">{i18n.date(subscription.periodEnd)}.</span>
                       </span>
                     )}
                   </span>

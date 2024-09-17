@@ -12,7 +12,6 @@ import {
 import { Badge } from '@documenso/ui/primitives/badge';
 
 import { DocumentStatus } from '~/components/formatter/document-status';
-import { LocaleDate } from '~/components/formatter/locale-date';
 
 import { AdminActions } from './admin-actions';
 import { RecipientItem } from './recipient-item';
@@ -25,7 +24,7 @@ type AdminDocumentDetailsPageProps = {
 };
 
 export default async function AdminDocumentDetailsPage({ params }: AdminDocumentDetailsPageProps) {
-  setupI18nSSR();
+  const { i18n } = setupI18nSSR();
 
   const document = await getEntireDocument({ id: Number(params.id) });
 
@@ -46,12 +45,11 @@ export default async function AdminDocumentDetailsPage({ params }: AdminDocument
 
       <div className="text-muted-foreground mt-4 text-sm">
         <div>
-          <Trans>Created on</Trans>:{' '}
-          <LocaleDate date={document.createdAt} format={DateTime.DATETIME_MED} />
+          <Trans>Created on</Trans>: {i18n.date(document.createdAt, DateTime.DATETIME_MED)}
         </div>
+
         <div>
-          <Trans>Last updated at</Trans>:{' '}
-          <LocaleDate date={document.updatedAt} format={DateTime.DATETIME_MED} />
+          <Trans>Last updated at</Trans>: {i18n.date(document.updatedAt, DateTime.DATETIME_MED)}
         </div>
       </div>
 

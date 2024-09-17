@@ -10,6 +10,7 @@ import { useForm } from 'react-hook-form';
 import { DATE_FORMATS, DEFAULT_DOCUMENT_DATE_FORMAT } from '@documenso/lib/constants/date-formats';
 import { DEFAULT_DOCUMENT_TIME_ZONE, TIME_ZONES } from '@documenso/lib/constants/time-zones';
 import { extractDocumentAuthMethods } from '@documenso/lib/utils/document-auth';
+import type { TeamMemberRole } from '@documenso/prisma/client';
 import { DocumentStatus, type Field, type Recipient, SendStatus } from '@documenso/prisma/client';
 import type { DocumentWithData } from '@documenso/prisma/types/document-with-data';
 import {
@@ -20,6 +21,10 @@ import {
   DocumentGlobalAuthActionSelect,
   DocumentGlobalAuthActionTooltip,
 } from '@documenso/ui/components/document/document-global-auth-action-select';
+import {
+  DocumentVisibilitySelect,
+  DocumentVisibilityTooltip,
+} from '@documenso/ui/components/document/document-visibility-select';
 import {
   Accordion,
   AccordionContent,
@@ -59,6 +64,7 @@ export type AddSettingsFormProps = {
   isDocumentEnterprise: boolean;
   isDocumentPdfLoaded: boolean;
   document: DocumentWithData;
+  currentTeamMemberRole?: TeamMemberRole;
   onSubmit: (_data: TAddSettingsFormSchema) => void;
 };
 
@@ -69,6 +75,7 @@ export const AddSettingsFormPartial = ({
   isDocumentEnterprise,
   isDocumentPdfLoaded,
   document,
+  currentTeamMemberRole,
   onSubmit,
 }: AddSettingsFormProps) => {
   const { documentAuthOption } = extractDocumentAuthMethods({
@@ -80,6 +87,7 @@ export const AddSettingsFormPartial = ({
     defaultValues: {
       title: document.title,
       externalId: document.externalId || '',
+      visibility: document.visibility || '',
       globalAccessAuth: documentAuthOption?.globalAccessAuth || undefined,
       globalActionAuth: documentAuthOption?.globalActionAuth || undefined,
       meta: {
@@ -173,6 +181,29 @@ export const AddSettingsFormPartial = ({
                 </FormItem>
               )}
             />
+
+            {currentTeamMemberRole && (
+              <FormField
+                control={form.control}
+                name="visibility"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="flex flex-row items-center">
+                      Document visibility
+                      <DocumentVisibilityTooltip />
+                    </FormLabel>
+
+                    <FormControl>
+                      <DocumentVisibilitySelect
+                        currentMemberRole={currentTeamMemberRole}
+                        {...field}
+                        onValueChange={field.onChange}
+                      />
+                    </FormControl>
+                  </FormItem>
+                )}
+              />
+            )}
 
             {isDocumentEnterprise && (
               <FormField
