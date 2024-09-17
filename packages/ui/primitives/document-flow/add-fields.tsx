@@ -1030,7 +1030,6 @@ export const AddFieldsFormPartial = ({
             <DocumentFlowFormContainerActions
               loading={isSubmitting}
               disabled={isSubmitting}
-              disableNextStep={hasErrors}
               onGoBackClick={() => {
                 previousStep();
                 remove();
