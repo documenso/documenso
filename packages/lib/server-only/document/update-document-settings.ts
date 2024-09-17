@@ -6,6 +6,7 @@ import type { RequestMetadata } from '@documenso/lib/universal/extract-request-m
 import type { CreateDocumentAuditLogDataResponse } from '@documenso/lib/utils/document-audit-logs';
 import { createDocumentAuditLogData } from '@documenso/lib/utils/document-audit-logs';
 import { prisma } from '@documenso/prisma';
+import type { DocumentVisibility } from '@documenso/prisma/client';
 import { DocumentStatus } from '@documenso/prisma/client';
 
 import { AppError, AppErrorCode } from '../../errors/app-error';
@@ -19,6 +20,7 @@ export type UpdateDocumentSettingsOptions = {
   data: {
     title?: string;
     externalId?: string | null;
+    visibility?: string | null;
     globalAccessAuth?: TDocumentAccessAuthTypes | null;
     globalActionAuth?: TDocumentActionAuthTypes | null;
   };
@@ -95,6 +97,7 @@ export const updateDocumentSettings = async ({
   const isExternalIdSame = data.externalId === document.externalId;
   const isGlobalAccessSame = documentGlobalAccessAuth === newGlobalAccessAuth;
   const isGlobalActionSame = documentGlobalActionAuth === newGlobalActionAuth;
+  const isDocumentVisibilitySame = data.visibility === document.visibility;
 
   const auditLogs: CreateDocumentAuditLogDataResponse[] = [];
 
@@ -165,6 +168,21 @@ export const updateDocumentSettings = async ({
     );
   }
 
+  if (!isDocumentVisibilitySame) {
+    auditLogs.push(
+      createDocumentAuditLogData({
+        type: DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_VISIBILITY_UPDATED,
+        documentId,
+        user,
+        requestMetadata,
+        data: {
+          from: document.visibility,
+          to: data.visibility || '',
+        },
+      }),
+    );
+  }
+
   // Early return if nothing is required.
   if (auditLogs.length === 0) {
     return document;
@@ -183,6 +201,7 @@ export const updateDocumentSettings = async ({
       data: {
         title: data.title,
         externalId: data.externalId || null,
+        visibility: data.visibility as DocumentVisibility,
         authOptions,
       },
     });

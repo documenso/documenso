@@ -1,11 +1,15 @@
 import { DateTime } from 'luxon';
+import { match } from 'ts-pattern';
 
 import type { PeriodSelectorValue } from '@documenso/lib/server-only/document/find-documents';
 import { prisma } from '@documenso/prisma';
+import { TeamMemberRole } from '@documenso/prisma/client';
 import type { Prisma, User } from '@documenso/prisma/client';
 import { SigningStatus } from '@documenso/prisma/client';
 import { isExtendedDocumentStatus } from '@documenso/prisma/guards/is-extended-document-status';
 import { ExtendedDocumentStatus } from '@documenso/prisma/types/extended-document-status';
+
+import { DocumentVisibility } from '../../types/document-visibility';
 
 export type GetStatsInput = {
   user: User;
@@ -27,7 +31,7 @@ export const getStats = async ({ user, period, ...options }: GetStatsInput) => {
   }
 
   const [ownerCounts, notSignedCounts, hasSignedCounts] = await (options.team
-    ? getTeamCounts({ ...options.team, createdAt })
+    ? getTeamCounts({ ...options.team, createdAt, currentUserEmail: user.email, userId: user.id })
     : getCounts({ user, createdAt }));
 
   const stats: Record<ExtendedDocumentStatus, number> = {
@@ -147,7 +151,10 @@ type GetTeamCountsOption = {
   teamId: number;
   teamEmail?: string;
   senderIds?: number[];
+  currentUserEmail: string;
+  userId: number;
   createdAt: Prisma.DocumentWhereInput['createdAt'];
+  currentTeamMemberRole?: TeamMemberRole;
 };
 
 const getTeamCounts = async (options: GetTeamCountsOption) => {
@@ -171,6 +178,49 @@ const getTeamCounts = async (options: GetTeamCountsOption) => {
 
   let notSignedCountsGroupByArgs = null;
   let hasSignedCountsGroupByArgs = null;
+
+  const visibilityFilters = [
+    ...match(options.currentTeamMemberRole)
+      .with(TeamMemberRole.ADMIN, () => [
+        { visibility: DocumentVisibility.EVERYONE },
+        { visibility: DocumentVisibility.MANAGER_AND_ABOVE },
+        { visibility: DocumentVisibility.ADMIN },
+      ])
+      .with(TeamMemberRole.MANAGER, () => [
+        { visibility: DocumentVisibility.EVERYONE },
+        { visibility: DocumentVisibility.MANAGER_AND_ABOVE },
+      ])
+      .otherwise(() => [{ visibility: DocumentVisibility.EVERYONE }]),
+  ];
+
+  ownerCountsWhereInput = {
+    ...ownerCountsWhereInput,
+    OR: [
+      {
+        AND: [
+          {
+            visibility: {
+              in: visibilityFilters.map((filter) => filter.visibility),
+            },
+          },
+          {
+            Recipient: {
+              none: {
+                email: options.currentUserEmail,
+              },
+            },
+          },
+        ],
+      },
+      {
+        Recipient: {
+          some: {
+            email: options.currentUserEmail,
+          },
+        },
+      },
+    ],
+  };
 
   if (teamEmail) {
     ownerCountsWhereInput = {

@@ -128,7 +128,7 @@ export const SigningFieldContainer = ({
   };
 
   return (
-    <div className={cn(type === 'Checkbox' ? 'group' : '')}>
+    <div className={cn('[container-type:size]', type === 'Checkbox' ? 'group' : '')}>
       <FieldRootContainer field={field}>
         {!field.inserted && !loading && !readOnlyField && (
           <button

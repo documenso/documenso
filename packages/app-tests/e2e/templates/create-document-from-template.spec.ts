@@ -76,8 +76,8 @@ test('[TEMPLATE]: should create a document from a template', async ({ page }) =>
   await page.getByPlaceholder('Email').fill('recipient1@documenso.com');
   await page.getByPlaceholder('Name').fill('Recipient 1');
   await page.getByRole('button', { name: 'Add Placeholder Recipient' }).click();
-  await page.getByRole('textbox', { name: 'Email', exact: true }).fill('recipient2@documenso.com');
-  await page.getByRole('textbox', { name: 'Name', exact: true }).nth(1).fill('Recipient 2');
+  await page.getByPlaceholder('Email').nth(1).fill('recipient2@documenso.com');
+  await page.getByPlaceholder('Name').nth(1).fill('Recipient 2');
 
   // Apply require passkey for Recipient 1.
   if (isBillingEnabled) {
@@ -211,8 +211,8 @@ test('[TEMPLATE]: should create a team document from a team template', async ({ 
   await page.getByPlaceholder('Email').fill('recipient1@documenso.com');
   await page.getByPlaceholder('Name').fill('Recipient 1');
   await page.getByRole('button', { name: 'Add Placeholder Recipient' }).click();
-  await page.getByRole('textbox', { name: 'Email', exact: true }).fill('recipient2@documenso.com');
-  await page.getByRole('textbox', { name: 'Name', exact: true }).nth(1).fill('Recipient 2');
+  await page.getByPlaceholder('Email').nth(1).fill('recipient2@documenso.com');
+  await page.getByPlaceholder('Name').nth(1).fill('Recipient 2');
 
   // Apply require passkey for Recipient 1.
   if (isBillingEnabled) {

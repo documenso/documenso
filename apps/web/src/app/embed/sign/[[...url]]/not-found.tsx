@@ -1,3 +1,3 @@
 export default function EmbedDirectTemplateNotFound() {
-  return <div>Not Found</div>
+  return <div>Not Found</div>;
 }
