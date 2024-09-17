@@ -1791,6 +1791,10 @@ msgstr ""
 msgid "Last used"
 msgstr ""
 
+#: apps/web/src/app/(dashboard)/admin/nav.tsx:93
+msgid "Leaderboard"
+msgstr ""
+
 #: apps/web/src/components/(teams)/dialogs/leave-team-dialog.tsx:111
 #: apps/web/src/components/(teams)/tables/current-user-teams-data-table.tsx:117
 msgid "Leave"
@@ -2804,6 +2808,10 @@ msgstr ""
 msgid "Signing up..."
 msgstr ""
 
+#: apps/web/src/app/(dashboard)/admin/leaderboard/page.tsx:18
+msgid "Signing Volume"
+msgstr ""
+
 #: apps/web/src/app/(profile)/p/[url]/page.tsx:109
 msgid "Since {0}"
 msgstr ""
@@ -2812,7 +2820,7 @@ msgstr ""
 msgid "Site Banner"
 msgstr ""
 
-#: apps/web/src/app/(dashboard)/admin/nav.tsx:93
+#: apps/web/src/app/(dashboard)/admin/nav.tsx:107
 #: apps/web/src/app/(dashboard)/admin/site-settings/page.tsx:26
 msgid "Site Settings"
 msgstr ""
