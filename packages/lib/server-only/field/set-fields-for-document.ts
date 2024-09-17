@@ -1,4 +1,4 @@
-import { isEqual } from 'lodash-es';
+import { isDeepEqual } from 'remeda';
 
 import { validateCheckboxField } from '@documenso/lib/advanced-fields-validation/validate-checkbox';
 import { validateDropdownField } from '@documenso/lib/advanced-fields-validation/validate-dropdown';
@@ -362,6 +362,6 @@ const hasFieldBeenChanged = (field: Field, newFieldData: FieldData) => {
     field.positionY.toNumber() !== newFieldData.pageY ||
     field.width.toNumber() !== newFieldData.pageWidth ||
     field.height.toNumber() !== newFieldData.pageHeight ||
-    !isEqual(currentFieldMeta, newFieldMeta)
+    !isDeepEqual(currentFieldMeta, newFieldMeta)
   );
 };

@@ -210,6 +210,7 @@ export const FieldItem = ({
           onFocus?.();
         }}
         ref={$el}
+        data-field-id={field.nativeId}
       >
         {match(field.type)
           .with('CHECKBOX', () => <CheckboxField field={field} />)

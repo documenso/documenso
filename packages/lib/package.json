@@ -38,7 +38,6 @@
     "@vvo/tzdb": "^6.117.0",
     "inngest": "^3.19.13",
     "kysely": "^0.26.3",
-    "lodash-es": "^4.17.21",
     "luxon": "^3.4.0",
     "micro": "^10.0.1",
     "nanoid": "^4.0.2",
@@ -49,7 +48,7 @@
     "pg": "^8.11.3",
     "playwright": "1.43.0",
     "react": "^18",
-    "remeda": "^1.27.1",
+    "remeda": "^2.12.1",
     "sharp": "0.32.6",
     "stripe": "^12.7.0",
     "ts-pattern": "^5.0.5",
@@ -57,7 +56,6 @@
   },
   "devDependencies": {
     "@playwright/browser-chromium": "1.43.0",
-    "@types/lodash-es": "^4.17.12",
     "@types/luxon": "^3.3.1",
     "@types/pg": "^8.11.4"
   }
