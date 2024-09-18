@@ -947,7 +947,7 @@ msgstr "Create webhook"
 msgid "Create Webhook"
 msgstr "Create Webhook"
 
-#: apps/web/src/app/(signing)/sign/[token]/complete/page.tsx:214
+#: apps/web/src/app/(signing)/sign/[token]/complete/page.tsx:215
 msgid "Create your account and start using state-of-the-art document signing."
 msgstr "Create your account and start using state-of-the-art document signing."
 
@@ -1615,7 +1615,7 @@ msgstr "Go Back"
 msgid "Go back home"
 msgstr "Go back home"
 
-#: apps/web/src/app/(signing)/sign/[token]/complete/page.tsx:223
+#: apps/web/src/app/(signing)/sign/[token]/complete/page.tsx:226
 #: apps/web/src/app/(signing)/sign/[token]/no-longer-available.tsx:57
 msgid "Go Back Home"
 msgstr "Go Back Home"
@@ -2011,7 +2011,7 @@ msgstr "My templates"
 msgid "Name"
 msgstr "Name"
 
-#: apps/web/src/app/(signing)/sign/[token]/complete/page.tsx:210
+#: apps/web/src/app/(signing)/sign/[token]/complete/page.tsx:211
 msgid "Need to sign documents?"
 msgstr "Need to sign documents?"
 

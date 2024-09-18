@@ -93,11 +93,14 @@ export const updateDocumentSettings = async ({
     }
   }
 
-  const isTitleSame = data.title === document.title;
-  const isExternalIdSame = data.externalId === document.externalId;
-  const isGlobalAccessSame = documentGlobalAccessAuth === newGlobalAccessAuth;
-  const isGlobalActionSame = documentGlobalActionAuth === newGlobalActionAuth;
-  const isDocumentVisibilitySame = data.visibility === document.visibility;
+  const isTitleSame = data.title === undefined || data.title === document.title;
+  const isExternalIdSame = data.externalId === undefined || data.externalId === document.externalId;
+  const isGlobalAccessSame =
+    documentGlobalAccessAuth === undefined || documentGlobalAccessAuth === newGlobalAccessAuth;
+  const isGlobalActionSame =
+    documentGlobalActionAuth === undefined || documentGlobalActionAuth === newGlobalActionAuth;
+  const isDocumentVisibilitySame =
+    data.visibility === undefined || data.visibility === document.visibility;
 
   const auditLogs: CreateDocumentAuditLogDataResponse[] = [];
 
@@ -200,7 +203,7 @@ export const updateDocumentSettings = async ({
       },
       data: {
         title: data.title,
-        externalId: data.externalId || null,
+        externalId: data.externalId,
         visibility: data.visibility as DocumentVisibility,
         authOptions,
       },

@@ -265,35 +265,35 @@ export const SignaturePad = ({
 
       <div className="text-foreground absolute right-2 top-2 filter">
         <Select defaultValue={selectedColor} onValueChange={(value) => setSelectedColor(value)}>
-          <SelectTrigger className="h-auto w-auto border-none p-1">
+          <SelectTrigger className="h-auto w-auto border-none p-0.5">
             <SelectValue placeholder="" />
           </SelectTrigger>
 
-          <SelectContent className="w-[150px]" align="end">
+          <SelectContent className="w-[100px]" align="end">
             <SelectItem value="black">
-              <div className="text-muted-foreground flex items-center px-1 text-sm">
-                <div className="border-border mr-2 h-5 w-5 rounded-full border-2 bg-black shadow-sm" />
+              <div className="text-muted-foreground flex items-center text-[0.688rem]">
+                <div className="border-border mr-1 h-4 w-4 rounded-full border-2 bg-black shadow-sm" />
                 <Trans>Black</Trans>
               </div>
             </SelectItem>
 
             <SelectItem value="red">
-              <div className="text-muted-foreground flex items-center px-1 text-sm">
-                <div className="border-border mr-2 h-5 w-5 rounded-full border-2 bg-[red] shadow-sm" />
+              <div className="text-muted-foreground flex items-center text-[0.688rem]">
+                <div className="border-border mr-1 h-4 w-4 rounded-full border-2 bg-[red] shadow-sm" />
                 <Trans>Red</Trans>
               </div>
             </SelectItem>
 
             <SelectItem value="blue">
-              <div className="text-muted-foreground flex items-center px-1 text-sm">
-                <div className="border-border mr-2 h-5 w-5 rounded-full border-2 bg-[blue] shadow-sm" />
+              <div className="text-muted-foreground flex items-center text-[0.688rem]">
+                <div className="border-border mr-1 h-4 w-4 rounded-full border-2 bg-[blue] shadow-sm" />
                 <Trans>Blue</Trans>
               </div>
             </SelectItem>
 
             <SelectItem value="green">
-              <div className="text-muted-foreground flex items-center px-1 text-sm">
-                <div className="border-border mr-2 h-5 w-5 rounded-full border-2 bg-[green] shadow-sm" />
+              <div className="text-muted-foreground flex items-center text-[0.688rem]">
+                <div className="border-border mr-1 h-4 w-4 rounded-full border-2 bg-[green] shadow-sm" />
                 <Trans>Green</Trans>
               </div>
             </SelectItem>
@@ -301,10 +301,10 @@ export const SignaturePad = ({
         </Select>
       </div>
 
-      <div className="absolute bottom-4 right-4 flex gap-2">
+      <div className="absolute bottom-3 right-3 flex gap-2">
         <button
           type="button"
-          className="focus-visible:ring-ring ring-offset-background text-muted-foreground/60 hover:text-muted-foreground rounded-full p-0 text-xs focus-visible:outline-none focus-visible:ring-2"
+          className="focus-visible:ring-ring ring-offset-background text-muted-foreground/60 hover:text-muted-foreground rounded-full p-0 text-[0.688rem] focus-visible:outline-none focus-visible:ring-2"
           onClick={() => onClearClick()}
         >
           <Trans>Clear Signature</Trans>
@@ -316,7 +316,7 @@ export const SignaturePad = ({
           <button
             type="button"
             title="undo"
-            className="focus-visible:ring-ring ring-offset-background text-muted-foreground/60 hover:text-muted-foreground rounded-full p-0 text-xs focus-visible:outline-none focus-visible:ring-2"
+            className="focus-visible:ring-ring ring-offset-background text-muted-foreground/60 hover:text-muted-foreground rounded-full p-0 text-[0.688rem] focus-visible:outline-none focus-visible:ring-2"
             onClick={() => onUndoClick()}
           >
             <Undo2 className="h-4 w-4" />
