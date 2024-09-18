@@ -617,4 +617,3 @@ msgstr "Sie können Documenso kostenlos selbst hosten oder unsere sofort einsatz
 #: apps/marketing/src/components/(marketing)/carousel.tsx:265
 msgid "Your browser does not support the video tag."
 msgstr "Ihr Browser unterstützt das Video-Tag nicht."
-
