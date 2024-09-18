@@ -8,7 +8,7 @@ msgstr ""
 "Language: de\n"
 "Project-Id-Version: documenso-app\n"
 "Report-Msgid-Bugs-To: \n"
-"PO-Revision-Date: 2024-09-05 06:04\n"
+"PO-Revision-Date: 2024-09-16 14:04\n"
 "Last-Translator: \n"
 "Language-Team: German\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
@@ -431,7 +431,7 @@ msgstr "Sparen Sie $60 oder $120"
 
 #: apps/marketing/src/components/(marketing)/i18n-switcher.tsx:47
 #~ msgid "Search languages..."
-#~ msgstr "Sprachen suchen..."
+#~ msgstr "Search languages..."
 
 #: apps/marketing/src/app/(marketing)/pricing/page.tsx:109
 msgid "Securely. Our data centers are located in Frankfurt (Germany), giving us the best local privacy laws. We are very aware of the sensitive nature of our data and follow best practices to ensure the security and integrity of the data entrusted to us."
@@ -617,3 +617,4 @@ msgstr "Sie können Documenso kostenlos selbst hosten oder unsere sofort einsatz
 #: apps/marketing/src/components/(marketing)/carousel.tsx:265
 msgid "Your browser does not support the video tag."
 msgstr "Ihr Browser unterstützt das Video-Tag nicht."
+
