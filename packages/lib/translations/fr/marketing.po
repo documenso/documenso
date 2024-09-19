@@ -8,7 +8,7 @@ msgstr ""
 "Language: fr\n"
 "Project-Id-Version: documenso-app\n"
 "Report-Msgid-Bugs-To: \n"
-"PO-Revision-Date: 2024-09-19 06:13\n"
+"PO-Revision-Date: 2024-09-19 09:18\n"
 "Last-Translator: \n"
 "Language-Team: French\n"
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
@@ -617,4 +617,3 @@ msgstr "Vous pouvez auto-héberger Documenso gratuitement ou utiliser notre vers
 #: apps/marketing/src/components/(marketing)/carousel.tsx:265
 msgid "Your browser does not support the video tag."
 msgstr "Votre navigateur ne prend pas en charge la balise vidéo."
-
