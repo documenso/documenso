@@ -25,6 +25,8 @@ type LeaderboardTableProps = {
   totalPages: number;
   perPage: number;
   page: number;
+  sortBy: 'name' | 'createdAt' | 'signingVolume';
+  sortOrder: 'asc' | 'desc';
 };
 
 export const LeaderboardTable = ({
@@ -32,6 +34,8 @@ export const LeaderboardTable = ({
   totalPages,
   perPage,
   page,
+  sortBy,
+  sortOrder,
 }: LeaderboardTableProps) => {
   const { _ } = useLingui();
 
@@ -49,10 +53,10 @@ export const LeaderboardTable = ({
         size: 10,
       },
       {
-        header: ({ column }) => (
+        header: () => (
           <div
             className="flex cursor-pointer items-center"
-            onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
+            onClick={() => handleColumnSort('name', sortOrder)}
           >
             {_(msg`Name`)}
             <CaretSortIcon className="ml-2 h-4 w-4" />
@@ -63,10 +67,10 @@ export const LeaderboardTable = ({
         size: 250,
       },
       {
-        header: ({ column }) => (
+        header: () => (
           <div
             className="flex cursor-pointer items-center"
-            onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
+            onClick={() => handleColumnSort('signingVolume', sortOrder)}
           >
             {_(msg`Signing Volume`)}
             <CaretSortIcon className="ml-2 h-4 w-4" />
@@ -76,11 +80,11 @@ export const LeaderboardTable = ({
         cell: ({ row }) => <div>{Number(row.getValue('signingVolume'))}</div>,
       },
       {
-        header: ({ column }) => {
+        header: () => {
           return (
             <div
               className="flex cursor-pointer items-center"
-              onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
+              onClick={() => handleColumnSort('createdAt', sortOrder)}
             >
               {_(msg`Created`)}
               <CaretSortIcon className="ml-2 h-4 w-4" />
@@ -91,7 +95,7 @@ export const LeaderboardTable = ({
         cell: ({ row }) => <div>{row.original.createdAt.toLocaleDateString()}</div>,
       },
     ] satisfies DataTableColumnDef<SigningVolume>[];
-  }, []);
+  }, [sortOrder]);
 
   useEffect(() => {
     startTransition(() => {
@@ -115,6 +119,18 @@ export const LeaderboardTable = ({
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchString(e.target.value);
+  };
+
+  const handleColumnSort = (
+    column: 'name' | 'createdAt' | 'signingVolume',
+    sortOrder: 'asc' | 'desc',
+  ) => {
+    startTransition(() => {
+      updateSearchParams({
+        sortBy: sortBy === column,
+        sortOrder: sortOrder === 'asc' ? 'desc' : 'asc',
+      });
+    });
   };
 
   return (

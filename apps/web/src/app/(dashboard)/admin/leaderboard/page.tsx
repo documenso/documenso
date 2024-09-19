@@ -12,6 +12,8 @@ type AdminLeaderboardProps = {
     search?: string;
     page?: number;
     perPage?: number;
+    sortBy?: 'name' | 'createdAt' | 'signingVolume';
+    sortOrder?: 'asc' | 'desc';
   };
 };
 
@@ -27,9 +29,16 @@ export default async function Leaderboard({ searchParams = {} }: AdminLeaderboar
   const page = Number(searchParams.page) || 1;
   const perPage = Number(searchParams.perPage) || 10;
   const searchString = searchParams.search || '';
+  const sortBy = searchParams.sortBy || 'signingVolume';
+  const sortOrder = searchParams.sortOrder || 'desc';
 
-  // todo: change the name
-  const { leaderboard: signingVolume, totalPages } = await search(searchString, page, perPage);
+  const { leaderboard: signingVolume, totalPages } = await search({
+    search: searchString,
+    page,
+    perPage,
+    sortBy,
+    sortOrder,
+  });
 
   return (
     <div>
@@ -42,6 +51,8 @@ export default async function Leaderboard({ searchParams = {} }: AdminLeaderboar
           totalPages={totalPages}
           page={page}
           perPage={perPage}
+          sortBy={sortBy}
+          sortOrder={sortOrder}
         />
       </div>
     </div>

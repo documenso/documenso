@@ -12,12 +12,16 @@ export type GetSigningVolumeOptions = {
   search?: string;
   page?: number;
   perPage?: number;
+  sortBy?: 'name' | 'createdAt' | 'signingVolume';
+  sortOrder?: 'asc' | 'desc';
 };
 
 export async function getSigningVolume({
   search = '',
   page = 1,
   perPage = 10,
+  sortBy = 'signingVolume',
+  sortOrder = 'desc',
 }: GetSigningVolumeOptions) {
   const whereClause = Prisma.validator<Prisma.SubscriptionWhereInput>()({
     status: 'ACTIVE',
@@ -37,6 +41,8 @@ export async function getSigningVolume({
       },
     ],
   });
+
+  const orderBy = getOrderByClause({ sortBy, sortOrder });
 
   const [subscriptions, totalCount] = await Promise.all([
     prisma.subscription.findMany({
@@ -76,15 +82,7 @@ export async function getSigningVolume({
           },
         },
       },
-      orderBy: [
-        {
-          User: {
-            Document: {
-              _count: 'desc',
-            },
-          },
-        },
-      ],
+      orderBy,
       skip: Math.max(page - 1, 0) * perPage,
       take: perPage,
     }),
@@ -112,3 +110,34 @@ export async function getSigningVolume({
     totalPages: Math.ceil(totalCount / perPage),
   };
 }
+
+type GetOrderByClauseOptions = {
+  sortBy: string;
+  sortOrder: 'asc' | 'desc';
+};
+
+const getOrderByClause = ({ sortBy, sortOrder }: GetOrderByClauseOptions) => {
+  switch (sortBy) {
+    case 'name':
+      return [{ User: { name: sortOrder } }, { team: { name: sortOrder } }];
+    case 'createdAt':
+      return { createdAt: sortOrder };
+    default:
+      return [
+        {
+          User: {
+            Document: {
+              _count: sortOrder,
+            },
+          },
+        },
+        {
+          team: {
+            document: {
+              _count: sortOrder,
+            },
+          },
+        },
+      ];
+  }
+};
