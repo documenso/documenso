@@ -8,20 +8,16 @@ import { ChevronDownIcon as CaretSortIcon, Loader } from 'lucide-react';
 
 import { useDebouncedValue } from '@documenso/lib/client-only/hooks/use-debounced-value';
 import { useUpdateSearchParams } from '@documenso/lib/client-only/hooks/use-update-search-params';
-import { Button } from '@documenso/ui/primitives/button';
 import type { DataTableColumnDef } from '@documenso/ui/primitives/data-table';
 import { DataTable } from '@documenso/ui/primitives/data-table';
 import { DataTablePagination } from '@documenso/ui/primitives/data-table-pagination';
 import { Input } from '@documenso/ui/primitives/input';
 
 export type SigningVolume = {
-  customer_id: number;
-  customer_type: 'User' | 'Team';
-  customer_created_at: Date;
-  total_documents: bigint;
-  completed_documents: bigint;
-  customer_email: string;
-  customer_name: string;
+  id: number;
+  name: string;
+  signingVolume: number;
+  createdAt: Date;
 };
 
 type LeaderboardTableProps = {
@@ -47,56 +43,52 @@ export const LeaderboardTable = ({
   const columns = useMemo(() => {
     return [
       {
+        header: 'ID',
+        accessorKey: 'id',
+        cell: ({ row }) => <div>{row.original.id}</div>,
+        size: 10,
+      },
+      {
         header: ({ column }) => (
-          <Button
-            variant="ghost"
+          <div
+            className="flex cursor-pointer items-center"
             onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
           >
             {_(msg`Name`)}
             <CaretSortIcon className="ml-2 h-4 w-4" />
-          </Button>
+          </div>
         ),
-        accessorKey: 'customer_name',
-        cell: ({ row }) => <div>{row.getValue('customer_name')}</div>,
+        accessorKey: 'name',
+        cell: ({ row }) => <div>{row.getValue('name')}</div>,
+        size: 250,
       },
       {
         header: ({ column }) => (
-          <Button
-            variant="ghost"
-            onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
-          >
-            {_(msg`Email`)}
-            <CaretSortIcon className="ml-2 h-4 w-4" />
-          </Button>
-        ),
-        accessorKey: 'customer_email',
-        cell: ({ row }) => <div>{row.getValue('customer_email')}</div>,
-      },
-      {
-        header: ({ column }) => (
-          <Button
-            variant="ghost"
+          <div
+            className="flex cursor-pointer items-center"
             onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
           >
             {_(msg`Signing Volume`)}
             <CaretSortIcon className="ml-2 h-4 w-4" />
-          </Button>
+          </div>
         ),
-        accessorKey: 'completed_documents',
-        cell: ({ row }) => <div>{Number(row.getValue('completed_documents'))}</div>,
+        accessorKey: 'signingVolume',
+        cell: ({ row }) => <div>{Number(row.getValue('signingVolume'))}</div>,
       },
       {
-        header: ({ column }) => (
-          <Button
-            variant="ghost"
-            onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
-          >
-            {_(msg`Customer Type`)}
-            <CaretSortIcon className="ml-2 h-4 w-4" />
-          </Button>
-        ),
-        accessorKey: 'customer_type',
-        cell: ({ row }) => <div>{row.getValue('customer_type')}</div>,
+        header: ({ column }) => {
+          return (
+            <div
+              className="flex cursor-pointer items-center"
+              onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
+            >
+              {_(msg`Created`)}
+              <CaretSortIcon className="ml-2 h-4 w-4" />
+            </div>
+          );
+        },
+        accessorKey: 'createdAt',
+        cell: ({ row }) => <div>{row.original.createdAt.toLocaleDateString()}</div>,
       },
     ] satisfies DataTableColumnDef<SigningVolume>[];
   }, []);

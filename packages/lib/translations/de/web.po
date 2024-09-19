@@ -961,6 +961,7 @@ msgid "Create your account and start using state-of-the-art document signing. Op
 msgstr ""
 
 #: apps/web/src/app/(dashboard)/admin/documents/document-results.tsx:62
+#: apps/web/src/app/(dashboard)/admin/leaderboard/data-table-leaderboard.tsx:85
 #: apps/web/src/app/(dashboard)/documents/[id]/document-page-view-information.tsx:35
 #: apps/web/src/app/(dashboard)/documents/data-table.tsx:54
 #: apps/web/src/app/(dashboard)/settings/security/passkeys/user-passkeys-data-table.tsx:65
@@ -1002,8 +1003,8 @@ msgstr ""
 
 #: apps/web/src/app/(dashboard)/admin/leaderboard/data-table-leaderboard.tsx:94
 #: apps/web/src/app/(dashboard)/admin/leaderboard/leaderboard-table.tsx:94
-msgid "Customer Type"
-msgstr ""
+#~ msgid "Customer Type"
+#~ msgstr ""
 
 #: apps/web/src/app/(dashboard)/settings/billing/billing-plans.tsx:28
 msgid "Daily"
@@ -1396,8 +1397,6 @@ msgid "Edit webhook"
 msgstr ""
 
 #: apps/web/src/app/(dashboard)/admin/documents/[id]/recipient-item.tsx:166
-#: apps/web/src/app/(dashboard)/admin/leaderboard/data-table-leaderboard.tsx:68
-#: apps/web/src/app/(dashboard)/admin/leaderboard/leaderboard-table.tsx:68
 #: apps/web/src/app/(dashboard)/admin/users/[id]/page.tsx:114
 #: apps/web/src/app/(dashboard)/admin/users/data-table-users.tsx:71
 #: apps/web/src/app/(dashboard)/templates/use-template-dialog.tsx:213
@@ -1990,8 +1989,7 @@ msgid "My templates"
 msgstr ""
 
 #: apps/web/src/app/(dashboard)/admin/documents/[id]/recipient-item.tsx:148
-#: apps/web/src/app/(dashboard)/admin/leaderboard/data-table-leaderboard.tsx:55
-#: apps/web/src/app/(dashboard)/admin/leaderboard/leaderboard-table.tsx:55
+#: apps/web/src/app/(dashboard)/admin/leaderboard/data-table-leaderboard.tsx:57
 #: apps/web/src/app/(dashboard)/admin/users/[id]/page.tsx:99
 #: apps/web/src/app/(dashboard)/admin/users/data-table-users.tsx:66
 #: apps/web/src/app/(dashboard)/settings/security/passkeys/user-passkeys-data-table-actions.tsx:144
@@ -2596,8 +2594,7 @@ msgstr ""
 msgid "Search by document title"
 msgstr ""
 
-#: apps/web/src/app/(dashboard)/admin/leaderboard/data-table-leaderboard.tsx:133
-#: apps/web/src/app/(dashboard)/admin/leaderboard/leaderboard-table.tsx:133
+#: apps/web/src/app/(dashboard)/admin/leaderboard/data-table-leaderboard.tsx:125
 #: apps/web/src/app/(dashboard)/admin/users/data-table-users.tsx:144
 msgid "Search by name or email"
 msgstr ""
@@ -2819,9 +2816,8 @@ msgstr ""
 msgid "Signing up..."
 msgstr ""
 
-#: apps/web/src/app/(dashboard)/admin/leaderboard/data-table-leaderboard.tsx:81
-#: apps/web/src/app/(dashboard)/admin/leaderboard/leaderboard-table.tsx:81
-#: apps/web/src/app/(dashboard)/admin/leaderboard/page.tsx:36
+#: apps/web/src/app/(dashboard)/admin/leaderboard/data-table-leaderboard.tsx:71
+#: apps/web/src/app/(dashboard)/admin/leaderboard/page.tsx:37
 msgid "Signing Volume"
 msgstr ""
 

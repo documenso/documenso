@@ -28,7 +28,8 @@ export default async function Leaderboard({ searchParams = {} }: AdminLeaderboar
   const perPage = Number(searchParams.perPage) || 10;
   const searchString = searchParams.search || '';
 
-  const { signingVolume, totalPages } = await search(searchString, page, perPage);
+  // todo: change the name
+  const { leaderboard: signingVolume, totalPages } = await search(searchString, page, perPage);
 
   return (
     <div>
