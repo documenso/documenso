@@ -1,0 +1,781 @@
+msgid ""
+msgstr ""
+"POT-Creation-Date: 2024-07-24 13:01+1000\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: @lingui/cli\n"
+"Language: fr\n"
+"Project-Id-Version: documenso-app\n"
+"Report-Msgid-Bugs-To: \n"
+"PO-Revision-Date: 2024-09-19 06:13\n"
+"Last-Translator: \n"
+"Language-Team: French\n"
+"Plural-Forms: nplurals=2; plural=(n > 1);\n"
+"X-Crowdin-Project: documenso-app\n"
+"X-Crowdin-Project-ID: 694691\n"
+"X-Crowdin-Language: fr\n"
+"X-Crowdin-File: common.po\n"
+"X-Crowdin-File-ID: 4\n"
+
+#: packages/ui/primitives/data-table-pagination.tsx:30
+msgid "{0} of {1} row(s) selected."
+msgstr "{0} sur {1} ligne(s) sélectionnée(s)."
+
+#: packages/ui/primitives/data-table-pagination.tsx:41
+msgid "{visibleRows, plural, one {Showing # result.} other {Showing # results.}}"
+msgstr "{visibleRows, plural, one {Affichage de # résultat.} other {Affichage de # résultats.}}"
+
+#: packages/ui/components/recipient/recipient-action-auth-select.tsx:53
+msgid "<0>Inherit authentication method</0> - Use the global action signing authentication method configured in the \"General Settings\" step"
+msgstr "<0>Hériter du méthode d'authentification</0> - Utiliser la méthode d'authentification de signature d'action globale configurée dans l'étape \"Paramètres Générales\""
+
+#: packages/ui/components/document/document-global-auth-action-select.tsx:95
+msgid "<0>No restrictions</0> - No authentication required"
+msgstr "<0>Aucune restriction</0> - Aucune authentification requise"
+
+#: packages/ui/components/document/document-global-auth-access-select.tsx:77
+msgid "<0>No restrictions</0> - The document can be accessed directly by the URL sent to the recipient"
+msgstr "<0>Aucune restriction</0> - Le document peut être accédé directement par l'URL envoyée au destinataire"
+
+#: packages/ui/components/recipient/recipient-action-auth-select.tsx:75
+msgid "<0>None</0> - No authentication required"
+msgstr "<0>Aucun</0> - Aucune authentification requise"
+
+#: packages/ui/components/document/document-global-auth-action-select.tsx:89
+#: packages/ui/components/recipient/recipient-action-auth-select.tsx:69
+msgid "<0>Require 2FA</0> - The recipient must have an account and 2FA enabled via their settings"
+msgstr "<0>Exiger 2FA</0> - Le destinataire doit avoir un compte et 2FA activé via ses paramètres"
+
+#: packages/ui/components/document/document-global-auth-access-select.tsx:72
+msgid "<0>Require account</0> - The recipient must be signed in to view the document"
+msgstr "<0>Exiger un compte</0> - Le destinataire doit être connecté pour voir le document"
+
+#: packages/ui/components/document/document-global-auth-action-select.tsx:83
+#: packages/ui/components/recipient/recipient-action-auth-select.tsx:63
+msgid "<0>Require passkey</0> - The recipient must have an account and passkey configured via their settings"
+msgstr "<0>Exiger une clé d'accès</0> - Le destinataire doit avoir un compte et une clé d'accès configurée via ses paramètres"
+
+#: packages/ui/primitives/document-dropzone.tsx:69
+msgid "Add a document"
+msgstr "Ajouter un document"
+
+#: packages/ui/primitives/document-flow/add-settings.tsx:336
+#: packages/ui/primitives/template-flow/add-template-settings.tsx:339
+msgid "Add a URL to redirect the user to once the document is signed"
+msgstr "Ajouter une URL pour rediriger l'utilisateur une fois le document signé"
+
+#: packages/ui/primitives/document-flow/add-settings.tsx:248
+msgid "Add an external ID to the document. This can be used to identify the document in external systems."
+msgstr "Ajouter un ID externe au document. Cela peut être utilisé pour identifier le document dans des systèmes externes."
+
+#: packages/ui/primitives/template-flow/add-template-settings.tsx:256
+msgid "Add an external ID to the template. This can be used to identify in external systems."
+msgstr "Ajouter un ID externe au modèle. Cela peut être utilisé pour identifier dans des systèmes externes."
+
+#: packages/ui/primitives/document-flow/field-items-advanced-settings/dropdown-field.tsx:177
+msgid "Add another option"
+msgstr "Ajouter une autre option"
+
+#: packages/ui/primitives/document-flow/field-items-advanced-settings/checkbox-field.tsx:230
+#: packages/ui/primitives/document-flow/field-items-advanced-settings/radio-field.tsx:167
+msgid "Add another value"
+msgstr "Ajouter une autre valeur"
+
+#: packages/ui/primitives/document-flow/add-signers.tsx:653
+msgid "Add myself"
+msgstr "Ajoutez-moi"
+
+#: packages/ui/primitives/template-flow/add-template-placeholder-recipients.tsx:637
+msgid "Add Myself"
+msgstr "Ajoutez-moi"
+
+#: packages/ui/primitives/template-flow/add-template-placeholder-recipients.tsx:623
+msgid "Add Placeholder Recipient"
+msgstr "Ajouter un destinataire de substitution"
+
+#: packages/ui/primitives/document-flow/add-signers.tsx:642
+msgid "Add Signer"
+msgstr "Ajouter un signataire"
+
+#: packages/ui/primitives/document-flow/field-items-advanced-settings/text-field.tsx:70
+msgid "Add text"
+msgstr "Ajouter du texte"
+
+#: packages/ui/primitives/document-flow/field-items-advanced-settings/text-field.tsx:75
+msgid "Add text to the field"
+msgstr "Ajouter du texte au champ"
+
+#: packages/lib/constants/teams.ts:10
+msgid "Admin"
+msgstr "Administrateur"
+
+#: packages/ui/primitives/document-flow/add-settings.tsx:230
+#: packages/ui/primitives/template-flow/add-template-settings.tsx:238
+msgid "Advanced Options"
+msgstr "Options avancées"
+
+#: packages/ui/primitives/document-flow/add-fields.tsx:522
+#: packages/ui/primitives/template-flow/add-template-fields.tsx:402
+msgid "Advanced settings"
+msgstr "Paramètres avancés"
+
+#: packages/lib/constants/template.ts:21
+msgid "After submission, a document will be automatically generated and added to your documents page. You will also receive a notification via email."
+msgstr "Après soumission, un document sera automatiquement généré et ajouté à votre page de documents. Vous recevrez également une notification par email."
+
+#: packages/lib/constants/recipient-roles.ts:8
+msgid "Approve"
+msgstr "Approuver"
+
+#: packages/lib/constants/recipient-roles.ts:9
+msgid "Approved"
+msgstr "Approuvé"
+
+#: packages/lib/constants/recipient-roles.ts:11
+msgid "Approver"
+msgstr "Approuveur"
+
+#: packages/lib/constants/recipient-roles.ts:10
+msgid "Approving"
+msgstr "En attente d'approbation"
+
+#: packages/ui/primitives/signature-pad/signature-pad.tsx:276
+msgid "Black"
+msgstr "Noir"
+
+#: packages/ui/primitives/signature-pad/signature-pad.tsx:290
+msgid "Blue"
+msgstr "Bleu"
+
+#: packages/ui/primitives/document-flow/field-item-advanced-settings.tsx:287
+#: packages/ui/primitives/document-flow/send-document-action-dialog.tsx:58
+msgid "Cancel"
+msgstr "Annuler"
+
+#: packages/ui/primitives/document-flow/add-signers.tsx:194
+msgid "Cannot remove signer"
+msgstr "Impossible de retirer le signataire"
+
+#: packages/lib/constants/recipient-roles.ts:17
+msgid "Cc"
+msgstr "Cc"
+
+#: packages/lib/constants/recipient-roles.ts:14
+#: packages/lib/constants/recipient-roles.ts:16
+msgid "CC"
+msgstr "CC"
+
+#: packages/lib/constants/recipient-roles.ts:15
+msgid "CC'd"
+msgstr "CC'd"
+
+#: packages/ui/primitives/document-flow/field-items-advanced-settings/text-field.tsx:83
+msgid "Character Limit"
+msgstr "Limite de caractères"
+
+#: packages/ui/primitives/document-flow/add-fields.tsx:944
+#: packages/ui/primitives/template-flow/add-template-fields.tsx:788
+msgid "Checkbox"
+msgstr "Case à cocher"
+
+#: packages/ui/primitives/document-flow/field-items-advanced-settings/checkbox-field.tsx:195
+msgid "Checkbox values"
+msgstr "Valeurs de case à cocher"
+
+#: packages/ui/primitives/data-table.tsx:156
+msgid "Clear filters"
+msgstr "Effacer les filtres"
+
+#: packages/ui/primitives/signature-pad/signature-pad.tsx:310
+msgid "Clear Signature"
+msgstr "Effacer la signature"
+
+#: packages/ui/primitives/document-flow/add-signature.tsx:394
+msgid "Click to insert field"
+msgstr "Cliquez pour insérer un champ"
+
+#: packages/ui/primitives/document-flow/missing-signature-field-dialog.tsx:44
+msgid "Close"
+msgstr "Fermer"
+
+#: packages/lib/constants/template.ts:12
+msgid "Configure Direct Recipient"
+msgstr "Configurer le destinataire direct"
+
+#: packages/ui/primitives/document-flow/add-fields.tsx:523
+#: packages/ui/primitives/template-flow/add-template-fields.tsx:403
+msgid "Configure the {0} field"
+msgstr "Configurer le champ {0}"
+
+#: packages/ui/primitives/document-flow/document-flow-root.tsx:141
+msgid "Continue"
+msgstr "Continuer"
+
+#: packages/ui/components/document/document-share-button.tsx:46
+msgid "Copied to clipboard"
+msgstr "Copié dans le presse-papiers"
+
+#: packages/ui/primitives/document-flow/add-signature.tsx:360
+msgid "Custom Text"
+msgstr "Texte personnalisé"
+
+#: packages/ui/primitives/document-flow/add-fields.tsx:840
+#: packages/ui/primitives/template-flow/add-template-fields.tsx:684
+msgid "Date"
+msgstr "Date"
+
+#: packages/ui/primitives/document-flow/add-settings.tsx:271
+#: packages/ui/primitives/template-flow/add-template-settings.tsx:279
+msgid "Date Format"
+msgstr "Format de date"
+
+#: packages/ui/primitives/template-flow/add-template-placeholder-recipients.tsx:570
+msgid "Direct link receiver"
+msgstr "Receveur de lien direct"
+
+#: packages/ui/components/document/document-global-auth-access-select.tsx:62
+#: packages/ui/primitives/document-flow/add-settings.tsx:174
+#: packages/ui/primitives/template-flow/add-template-settings.tsx:151
+msgid "Document access"
+msgstr "Accès au document"
+
+#: packages/lib/constants/template.ts:20
+msgid "Document Creation"
+msgstr "Création de document"
+
+#: packages/ui/components/document/document-download-button.tsx:68
+msgid "Download"
+msgstr "Télécharger"
+
+#: packages/ui/primitives/document-dropzone.tsx:162
+msgid "Drag & drop your PDF here."
+msgstr "Faites glisser et déposez votre PDF ici."
+
+#: packages/ui/primitives/document-flow/add-fields.tsx:970
+#: packages/ui/primitives/template-flow/add-template-fields.tsx:814
+msgid "Dropdown"
+msgstr "Liste déroulante"
+
+#: packages/ui/primitives/document-flow/field-items-advanced-settings/dropdown-field.tsx:148
+msgid "Dropdown options"
+msgstr "Options de liste déroulante"
+
+#: packages/ui/primitives/document-flow/add-fields.tsx:788
+#: packages/ui/primitives/document-flow/add-signature.tsx:272
+#: packages/ui/primitives/document-flow/add-signers.tsx:491
+#: packages/ui/primitives/template-flow/add-template-fields.tsx:632
+#: packages/ui/primitives/template-flow/add-template-placeholder-recipients.tsx:463
+#: packages/ui/primitives/template-flow/add-template-placeholder-recipients.tsx:470
+msgid "Email"
+msgstr "Email"
+
+#: packages/ui/primitives/template-flow/add-template-settings.tsx:184
+msgid "Email Options"
+msgstr "Options d'email"
+
+#: packages/lib/constants/template.ts:8
+msgid "Enable Direct Link Signing"
+msgstr "Activer la signature de lien direct"
+
+#: packages/ui/primitives/document-flow/add-signers.tsx:392
+#: packages/ui/primitives/template-flow/add-template-placeholder-recipients.tsx:362
+msgid "Enable signing order"
+msgstr "Activer l'ordre de signature"
+
+#: packages/ui/primitives/document-password-dialog.tsx:84
+msgid "Enter password"
+msgstr "Entrez le mot de passe"
+
+#: packages/ui/primitives/document-flow/field-item-advanced-settings.tsx:216
+msgid "Error"
+msgstr "Erreur"
+
+#: packages/ui/primitives/document-flow/add-settings.tsx:241
+#: packages/ui/primitives/template-flow/add-template-settings.tsx:249
+msgid "External ID"
+msgstr "ID externe"
+
+#: packages/ui/primitives/document-flow/field-item-advanced-settings.tsx:217
+msgid "Failed to save settings."
+msgstr "Échec de l'enregistrement des paramètres."
+
+#: packages/ui/primitives/document-flow/field-items-advanced-settings/text-field.tsx:90
+msgid "Field character limit"
+msgstr "Limite de caractères du champ"
+
+#: packages/ui/primitives/document-flow/field-items-advanced-settings/number-field.tsx:107
+msgid "Field format"
+msgstr "Format du champ"
+
+#: packages/ui/primitives/document-flow/field-items-advanced-settings/text-field.tsx:50
+msgid "Field label"
+msgstr "Étiquette du champ"
+
+#: packages/ui/primitives/document-flow/field-items-advanced-settings/text-field.tsx:62
+msgid "Field placeholder"
+msgstr "Espace réservé du champ"
+
+#: packages/ui/components/document/document-global-auth-action-select.tsx:64
+msgid "Global recipient action authentication"
+msgstr "Authentification d'action de destinataire globale"
+
+#: packages/ui/primitives/document-flow/document-flow-root.tsx:142
+msgid "Go Back"
+msgstr "Retourner"
+
+#: packages/ui/primitives/signature-pad/signature-pad.tsx:297
+msgid "Green"
+msgstr "Vert"
+
+#: packages/lib/constants/recipient-roles.ts:72
+msgid "I am a signer of this document"
+msgstr "Je suis un signataire de ce document"
+
+#: packages/lib/constants/recipient-roles.ts:75
+msgid "I am a viewer of this document"
+msgstr "Je suis un visualiseur de ce document"
+
+#: packages/lib/constants/recipient-roles.ts:73
+msgid "I am an approver of this document"
+msgstr "Je suis un approuveur de ce document"
+
+#: packages/lib/constants/recipient-roles.ts:74
+msgid "I am required to receive a copy of this document"
+msgstr "Je dois recevoir une copie de ce document"
+
+#: packages/lib/constants/recipient-roles.ts:74
+#~ msgid "I am required to recieve a copy of this document"
+#~ msgstr "I am required to recieve a copy of this document"
+
+#: packages/ui/components/recipient/recipient-action-auth-select.tsx:29
+#: packages/ui/components/recipient/recipient-action-auth-select.tsx:87
+msgid "Inherit authentication method"
+msgstr "Hériter de la méthode d'authentification"
+
+#: packages/ui/primitives/document-flow/field-items-advanced-settings/number-field.tsx:64
+#: packages/ui/primitives/document-flow/field-items-advanced-settings/number-field.tsx:69
+#: packages/ui/primitives/document-flow/field-items-advanced-settings/text-field.tsx:45
+msgid "Label"
+msgstr "Étiquette"
+
+#: packages/lib/constants/teams.ts:11
+msgid "Manager"
+msgstr "Gestionnaire"
+
+#: packages/ui/primitives/document-flow/field-items-advanced-settings/number-field.tsx:168
+msgid "Max"
+msgstr "Max"
+
+#: packages/lib/constants/teams.ts:12
+msgid "Member"
+msgstr "Membre"
+
+#: packages/ui/primitives/document-flow/add-subject.tsx:95
+#: packages/ui/primitives/template-flow/add-template-settings.tsx:215
+msgid "Message <0>(Optional)</0>"
+msgstr "Message <0>(Optionnel)</0>"
+
+#: packages/ui/primitives/document-flow/field-items-advanced-settings/number-field.tsx:156
+msgid "Min"
+msgstr "Min"
+
+#: packages/ui/primitives/document-flow/add-fields.tsx:814
+#: packages/ui/primitives/document-flow/add-signature.tsx:298
+#: packages/ui/primitives/document-flow/add-signers.tsx:526
+#: packages/ui/primitives/document-flow/add-signers.tsx:532
+#: packages/ui/primitives/template-flow/add-template-fields.tsx:658
+#: packages/ui/primitives/template-flow/add-template-placeholder-recipients.tsx:498
+#: packages/ui/primitives/template-flow/add-template-placeholder-recipients.tsx:504
+msgid "Name"
+msgstr "Nom"
+
+#: packages/ui/components/recipient/recipient-role-select.tsx:52
+msgid "Needs to approve"
+msgstr "Nécessite une approbation"
+
+#: packages/ui/components/recipient/recipient-role-select.tsx:31
+msgid "Needs to sign"
+msgstr "Nécessite une signature"
+
+#: packages/ui/components/recipient/recipient-role-select.tsx:73
+msgid "Needs to view"
+msgstr "Nécessite une visualisation"
+
+#: packages/ui/primitives/document-flow/add-fields.tsx:625
+#: packages/ui/primitives/template-flow/add-template-fields.tsx:497
+msgid "No recipient matching this description was found."
+msgstr "Aucun destinataire correspondant à cette description n'a été trouvé."
+
+#: packages/ui/primitives/document-flow/add-fields.tsx:641
+#: packages/ui/primitives/template-flow/add-template-fields.tsx:513
+msgid "No recipients with this role"
+msgstr "Aucun destinataire avec ce rôle"
+
+#: packages/ui/components/document/document-global-auth-access-select.tsx:30
+#: packages/ui/components/document/document-global-auth-access-select.tsx:43
+#: packages/ui/components/document/document-global-auth-action-select.tsx:31
+#: packages/ui/components/document/document-global-auth-action-select.tsx:46
+msgid "No restrictions"
+msgstr "Aucune restriction"
+
+#: packages/ui/primitives/data-table.tsx:148
+msgid "No results found"
+msgstr "Aucun résultat trouvé"
+
+#: packages/ui/primitives/document-flow/missing-signature-field-dialog.tsx:30
+msgid "No signature field found"
+msgstr "Aucun champ de signature trouvé"
+
+#: packages/ui/primitives/combobox.tsx:60
+#: packages/ui/primitives/multi-select-combobox.tsx:153
+msgid "No value found."
+msgstr "Aucune valeur trouvée."
+
+#: packages/ui/primitives/document-flow/add-fields.tsx:892
+#: packages/ui/primitives/template-flow/add-template-fields.tsx:736
+msgid "Number"
+msgstr "Numéro"
+
+#: packages/ui/primitives/document-flow/field-items-advanced-settings/number-field.tsx:100
+msgid "Number format"
+msgstr "Format de numéro"
+
+#: packages/lib/constants/template.ts:9
+msgid "Once enabled, you can select any active recipient to be a direct link signing recipient, or create a new one. This recipient type cannot be edited or deleted."
+msgstr "Une fois activé, vous pouvez sélectionner n'importe quel destinataire actif pour être un destinataire de signature de lien direct ou en créer un nouveau. Ce type de destinataire ne peut pas être modifié ou supprimé."
+
+#: packages/lib/constants/template.ts:17
+msgid "Once your template is set up, share the link anywhere you want. The person who opens the link will be able to enter their information in the direct link recipient field and complete any other fields assigned to them."
+msgstr "Une fois votre modèle configuré, partagez le lien où vous le souhaitez. La personne qui ouvre le lien pourra saisir ses informations dans le champ de destinataire de lien direct et remplir tout autre champ qui lui est attribué."
+
+#: packages/ui/primitives/data-table-pagination.tsx:77
+msgid "Page {0} of {1}"
+msgstr "Page {0} sur {1}"
+
+#: packages/ui/primitives/document-password-dialog.tsx:62
+msgid "Password Required"
+msgstr "Mot de passe requis"
+
+#: packages/ui/primitives/document-flow/field-items-advanced-settings/checkbox-field.tsx:154
+msgid "Pick a number"
+msgstr "Choisissez un numéro"
+
+#: packages/ui/primitives/document-flow/field-items-advanced-settings/number-field.tsx:76
+#: packages/ui/primitives/document-flow/field-items-advanced-settings/number-field.tsx:81
+#: packages/ui/primitives/document-flow/field-items-advanced-settings/text-field.tsx:57
+msgid "Placeholder"
+msgstr "Espace réservé"
+
+#: packages/ui/primitives/document-flow/add-fields.tsx:918
+#: packages/ui/primitives/template-flow/add-template-fields.tsx:762
+msgid "Radio"
+msgstr "Radio"
+
+#: packages/ui/primitives/document-flow/field-items-advanced-settings/radio-field.tsx:133
+msgid "Radio values"
+msgstr "Valeurs radio"
+
+#: packages/ui/primitives/document-flow/field-items-advanced-settings/checkbox-field.tsx:184
+#: packages/ui/primitives/document-flow/field-items-advanced-settings/dropdown-field.tsx:137
+#: packages/ui/primitives/document-flow/field-items-advanced-settings/number-field.tsx:136
+#: packages/ui/primitives/document-flow/field-items-advanced-settings/radio-field.tsx:122
+#: packages/ui/primitives/document-flow/field-items-advanced-settings/text-field.tsx:114
+msgid "Read only"
+msgstr "Lecture seule"
+
+#: packages/ui/components/recipient/recipient-role-select.tsx:95
+msgid "Receives copy"
+msgstr "Recevoir une copie"
+
+#: packages/ui/components/recipient/recipient-action-auth-select.tsx:39
+#: packages/ui/primitives/document-flow/add-settings.tsx:215
+#: packages/ui/primitives/template-flow/add-template-settings.tsx:169
+msgid "Recipient action authentication"
+msgstr "Authentification d'action de destinataire"
+
+#: packages/ui/primitives/signature-pad/signature-pad.tsx:283
+msgid "Red"
+msgstr "Rouge"
+
+#: packages/ui/primitives/document-flow/add-settings.tsx:329
+#: packages/ui/primitives/template-flow/add-template-settings.tsx:332
+msgid "Redirect URL"
+msgstr "URL de redirection"
+
+#: packages/ui/primitives/document-flow/add-fields.tsx:1008
+msgid "Remove"
+msgstr "Retirer"
+
+#: packages/ui/primitives/document-flow/field-items-advanced-settings/checkbox-field.tsx:174
+#: packages/ui/primitives/document-flow/field-items-advanced-settings/dropdown-field.tsx:127
+#: packages/ui/primitives/document-flow/field-items-advanced-settings/number-field.tsx:126
+#: packages/ui/primitives/document-flow/field-items-advanced-settings/radio-field.tsx:112
+#: packages/ui/primitives/document-flow/field-items-advanced-settings/text-field.tsx:104
+msgid "Required field"
+msgstr "Champ requis"
+
+#: packages/ui/primitives/data-table-pagination.tsx:55
+msgid "Rows per page"
+msgstr "Lignes par page"
+
+#: packages/ui/primitives/document-flow/field-item-advanced-settings.tsx:286
+msgid "Save"
+msgstr "Sauvegarder"
+
+#: packages/ui/primitives/template-flow/add-template-fields.tsx:848
+msgid "Save Template"
+msgstr "Sauvegarder le modèle"
+
+#: packages/ui/components/common/language-switcher-dialog.tsx:34
+msgid "Search languages..."
+msgstr "Rechercher des langues..."
+
+#: packages/ui/primitives/document-flow/field-items-advanced-settings/dropdown-field.tsx:105
+msgid "Select"
+msgstr "Sélectionner"
+
+#: packages/ui/primitives/combobox.tsx:38
+msgid "Select an option"
+msgstr "Sélectionner une option"
+
+#: packages/ui/primitives/document-flow/field-items-advanced-settings/checkbox-field.tsx:137
+msgid "Select at least"
+msgstr "Sélectionnez au moins"
+
+#: packages/ui/primitives/document-flow/field-items-advanced-settings/dropdown-field.tsx:95
+msgid "Select default option"
+msgstr "Sélectionner l'option par défaut"
+
+#: packages/ui/primitives/document-flow/add-subject.tsx:124
+#: packages/ui/primitives/document-flow/send-document-action-dialog.tsx:34
+#: packages/ui/primitives/document-flow/send-document-action-dialog.tsx:64
+msgid "Send"
+msgstr "Envoyer"
+
+#: packages/ui/primitives/document-flow/send-document-action-dialog.tsx:41
+msgid "Send Document"
+msgstr "Envoyer le document"
+
+#: packages/ui/components/document/document-share-button.tsx:135
+msgid "Share Signature Card"
+msgstr "Partager la carte de signature"
+
+#: packages/lib/constants/template.ts:16
+msgid "Share the Link"
+msgstr "Partager le lien"
+
+#: packages/ui/primitives/document-flow/add-signers.tsx:671
+#: packages/ui/primitives/template-flow/add-template-placeholder-recipients.tsx:655
+msgid "Show advanced settings"
+msgstr "Afficher les paramètres avancés"
+
+#: packages/lib/constants/recipient-roles.ts:20
+msgid "Sign"
+msgstr "Signer"
+
+#: packages/ui/primitives/document-flow/add-fields.tsx:736
+#: packages/ui/primitives/document-flow/add-signature.tsx:323
+#: packages/ui/primitives/document-flow/field-icon.tsx:52
+#: packages/ui/primitives/template-flow/add-template-fields.tsx:580
+msgid "Signature"
+msgstr "Signature"
+
+#: packages/lib/constants/recipient-roles.ts:21
+msgid "Signed"
+msgstr "Signé"
+
+#: packages/lib/constants/recipient-roles.ts:23
+msgid "Signer"
+msgstr "Signataire"
+
+#: packages/lib/constants/recipient-roles.ts:22
+msgid "Signing"
+msgstr "Signature en cours"
+
+#: packages/ui/primitives/document-flow/missing-signature-field-dialog.tsx:34
+msgid "Some signers have not been assigned a signature field. Please assign at least 1 signature field to each signer before proceeding."
+msgstr "Certains signataires n'ont pas été assignés à un champ de signature. Veuillez assigner au moins 1 champ de signature à chaque signataire avant de continuer."
+
+#: packages/ui/components/document/document-share-button.tsx:51
+msgid "Something went wrong"
+msgstr "Quelque chose a mal tourné"
+
+#: packages/ui/primitives/data-table.tsx:136
+msgid "Something went wrong."
+msgstr "Quelque chose a mal tourné."
+
+#: packages/ui/primitives/document-flow/document-flow-root.tsx:107
+msgid "Step <0>{step} of {maxStep}</0>"
+msgstr "Étape <0>{step} sur {maxStep}</0>"
+
+#: packages/ui/primitives/document-flow/add-subject.tsx:78
+#: packages/ui/primitives/template-flow/add-template-settings.tsx:195
+msgid "Subject <0>(Optional)</0>"
+msgstr "Objet <0>(Optionnel)</0>"
+
+#: packages/ui/primitives/document-password-dialog.tsx:97
+msgid "Submit"
+msgstr "Soumettre"
+
+#: packages/ui/primitives/template-flow/add-template-settings.tsx:134
+msgid "Template title"
+msgstr "Titre du modèle"
+
+#: packages/ui/primitives/document-flow/add-fields.tsx:866
+#: packages/ui/primitives/template-flow/add-template-fields.tsx:710
+msgid "Text"
+msgstr "Texte"
+
+#: packages/ui/components/recipient/recipient-action-auth-select.tsx:44
+msgid "The authentication required for recipients to sign fields"
+msgstr "L'authentification requise pour que les destinataires signent des champs"
+
+#: packages/ui/components/document/document-global-auth-action-select.tsx:68
+msgid "The authentication required for recipients to sign the signature field."
+msgstr "L'authentification requise pour que les destinataires signent le champ de signature."
+
+#: packages/ui/components/document/document-global-auth-access-select.tsx:67
+msgid "The authentication required for recipients to view the document."
+msgstr "L'authentification requise pour que les destinataires visualisent le document."
+
+#: packages/ui/components/document/document-send-email-message-helper.tsx:31
+msgid "The document's name"
+msgstr "Le nom du document"
+
+#: packages/ui/primitives/document-password-dialog.tsx:52
+msgid "The password you have entered is incorrect. Please try again."
+msgstr "Le mot de passe que vous avez entré est incorrect. Veuillez réessayer."
+
+#: packages/ui/components/recipient/recipient-role-select.tsx:103
+msgid "The recipient is not required to take any action and receives a copy of the document after it is completed."
+msgstr "Le destinataire n'est pas tenu de prendre des mesures et reçoit une copie du document après son achèvement."
+
+#: packages/ui/components/recipient/recipient-role-select.tsx:60
+msgid "The recipient is required to approve the document for it to be completed."
+msgstr "Le destinataire doit approuver le document pour qu'il soit complété."
+
+#: packages/ui/components/recipient/recipient-role-select.tsx:39
+msgid "The recipient is required to sign the document for it to be completed."
+msgstr "Le destinataire doit signer le document pour qu'il soit complété."
+
+#: packages/ui/components/recipient/recipient-role-select.tsx:81
+msgid "The recipient is required to view the document for it to be completed."
+msgstr "Le destinataire doit visualiser le document pour qu'il soit complété."
+
+#: packages/ui/components/document/document-share-button.tsx:52
+msgid "The sharing link could not be created at this time. Please try again."
+msgstr "Le lien de partage n'a pas pu être créé pour le moment. Veuillez réessayer."
+
+#: packages/ui/components/document/document-share-button.tsx:47
+msgid "The sharing link has been copied to your clipboard."
+msgstr "Le lien de partage a été copié dans votre presse-papiers."
+
+#: packages/ui/components/document/document-send-email-message-helper.tsx:25
+msgid "The signer's email"
+msgstr "L'email du signataire"
+
+#: packages/ui/components/document/document-send-email-message-helper.tsx:19
+msgid "The signer's name"
+msgstr "Le nom du signataire"
+
+#: packages/ui/components/document/document-global-auth-action-select.tsx:72
+msgid "This can be overriden by setting the authentication requirements directly on each recipient in the next step."
+msgstr "Cela peut être remplacé par le paramétrage direct des exigences d'authentification pour chaque destinataire à l'étape suivante."
+
+#: packages/ui/primitives/document-flow/add-fields.tsx:697
+msgid "This document has already been sent to this recipient. You can no longer edit this recipient."
+msgstr "Ce document a déjà été envoyé à ce destinataire. Vous ne pouvez plus modifier ce destinataire."
+
+#: packages/ui/primitives/document-password-dialog.tsx:66
+msgid "This document is password protected. Please enter the password to view the document."
+msgstr "Ce document est protégé par mot de passe. Veuillez entrer le mot de passe pour visualiser le document."
+
+#: packages/ui/primitives/template-flow/add-template-placeholder-recipients.tsx:573
+msgid "This field cannot be modified or deleted. When you share this template's direct link or add it to your public profile, anyone who accesses it can input their name and email, and fill in the fields assigned to them."
+msgstr "Ce champ ne peut pas être modifié ou supprimé. Lorsque vous partagez le lien direct de ce modèle ou l'ajoutez à votre profil public, toute personne qui y accède peut saisir son nom et son email, et remplir les champs qui lui sont attribués."
+
+#: packages/ui/primitives/document-flow/add-signers.tsx:195
+msgid "This signer has already received the document."
+msgstr "Ce signataire a déjà reçu le document."
+
+#: packages/ui/components/recipient/recipient-action-auth-select.tsx:48
+msgid "This will override any global settings."
+msgstr "Cela remplacera tous les paramètres globaux."
+
+#: packages/ui/primitives/document-flow/add-settings.tsx:305
+#: packages/ui/primitives/template-flow/add-template-settings.tsx:309
+msgid "Time Zone"
+msgstr "Fuseau horaire"
+
+#: packages/ui/primitives/document-flow/add-settings.tsx:153
+msgid "Title"
+msgstr "Titre"
+
+#: packages/ui/primitives/document-flow/add-fields.tsx:983
+#: packages/ui/primitives/template-flow/add-template-fields.tsx:828
+msgid "To proceed further, please set at least one value for the {0} field."
+msgstr "Pour continuer, veuillez définir au moins une valeur pour le champ {0}."
+
+#: packages/ui/primitives/document-flow/add-subject.tsx:124
+msgid "Update"
+msgstr "Mettre à jour"
+
+#: packages/lib/constants/template.ts:13
+msgid "Update the role and add fields as required for the direct recipient. The individual who uses the direct link will sign the document as the direct recipient."
+msgstr "Mettez à jour le rôle et ajoutez des champs selon les besoins pour le destinataire direct. L'individu qui utilise le lien direct signera le document en tant que destinataire direct."
+
+#: packages/ui/primitives/document-dropzone.tsx:168
+msgid "Upgrade"
+msgstr "Améliorer"
+
+#: packages/ui/primitives/document-dropzone.tsx:70
+msgid "Upload Template Document"
+msgstr "Télécharger le document modèle"
+
+#: packages/ui/primitives/document-flow/field-items-advanced-settings/checkbox-field.tsx:130
+#: packages/ui/primitives/document-flow/field-items-advanced-settings/number-field.tsx:147
+msgid "Validation"
+msgstr "Validation"
+
+#: packages/ui/primitives/document-flow/field-items-advanced-settings/number-field.tsx:88
+#: packages/ui/primitives/document-flow/field-items-advanced-settings/number-field.tsx:93
+msgid "Value"
+msgstr "Valeur"
+
+#: packages/lib/constants/recipient-roles.ts:26
+msgid "View"
+msgstr "Vue"
+
+#: packages/lib/constants/recipient-roles.ts:27
+msgid "Viewed"
+msgstr "Vu"
+
+#: packages/lib/constants/recipient-roles.ts:29
+msgid "Viewer"
+msgstr "Visiteur"
+
+#: packages/lib/constants/recipient-roles.ts:28
+msgid "Viewing"
+msgstr "Visionnage"
+
+#: packages/ui/primitives/signature-pad/signature-pad.tsx:280
+#~ msgid "White"
+#~ msgstr "White"
+
+#: packages/ui/primitives/document-flow/send-document-action-dialog.tsx:44
+msgid "You are about to send this document to the recipients. Are you sure you want to continue?"
+msgstr "Vous êtes sur le point d'envoyer ce document aux destinataires. Êtes-vous sûr de vouloir continuer ?"
+
+#: packages/ui/components/document/document-send-email-message-helper.tsx:11
+msgid "You can use the following variables in your message:"
+msgstr "Vous pouvez utiliser les variables suivantes dans votre message :"
+
+#: packages/ui/primitives/document-dropzone.tsx:43
+msgid "You cannot upload documents at this time."
+msgstr "Vous ne pouvez pas télécharger de documents pour le moment."
+
+#: packages/ui/primitives/document-dropzone.tsx:69
+msgid "You have reached your document limit."
+msgstr "Vous avez atteint votre limite de documents."
+
