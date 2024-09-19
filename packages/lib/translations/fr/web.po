@@ -339,7 +339,7 @@ msgstr "Tout le temps"
 msgid "Allows authenticating using biometrics, password managers, hardware keys, etc."
 msgstr "Permet d'authentifier en utilisant des biométries, des gestionnaires de mots de passe, des clés matérielles, etc."
 
-#: apps/web/src/components/forms/v2/signup.tsx:411
+#: apps/web/src/components/forms/v2/signup.tsx:423
 msgid "Already have an account? <0>Sign in instead</0>"
 msgstr "Vous avez déjà un compte ? <0>Connectez-vous plutôt</0>"
 
@@ -578,7 +578,7 @@ msgid "Audit Log"
 msgstr "Journal d'audit"
 
 #: apps/web/src/app/(recipient)/d/[token]/signing-auth-page.tsx:41
-#: apps/web/src/app/(signing)/sign/[token]/signing-auth-page.tsx:57
+#: apps/web/src/app/(signing)/sign/[token]/signing-auth-page.tsx:52
 msgid "Authentication required"
 msgstr "Authentification requise"
 
@@ -596,7 +596,7 @@ msgstr "En attente de confirmation par e-mail"
 
 #: apps/web/src/app/(recipient)/d/[token]/sign-direct-template.tsx:369
 #: apps/web/src/components/(dashboard)/settings/layout/activity-back.tsx:20
-#: apps/web/src/components/forms/v2/signup.tsx:497
+#: apps/web/src/components/forms/v2/signup.tsx:509
 msgid "Back"
 msgstr "Retour"
 
@@ -609,7 +609,7 @@ msgid "Background Color"
 msgstr "Couleur d'arrière-plan"
 
 #: apps/web/src/components/forms/2fa/disable-authenticator-app-dialog.tsx:167
-#: apps/web/src/components/forms/signin.tsx:473
+#: apps/web/src/components/forms/signin.tsx:485
 msgid "Backup Code"
 msgstr "Code de sauvegarde"
 
@@ -621,7 +621,7 @@ msgstr "Codes de sauvegarde"
 msgid "Banner Updated"
 msgstr "Bannière mise à jour"
 
-#: apps/web/src/components/forms/v2/signup.tsx:460
+#: apps/web/src/components/forms/v2/signup.tsx:472
 msgid "Basic details"
 msgstr "Détails de base"
 
@@ -662,7 +662,7 @@ msgstr "En activant l'authentification à deux facteurs (2FA), vous devrez entre
 #: apps/web/src/app/(dashboard)/templates/move-template-dialog.tsx:119
 #: apps/web/src/app/(dashboard)/templates/template-direct-link-dialog.tsx:470
 #: apps/web/src/app/(signing)/sign/[token]/document-action-auth-2fa.tsx:178
-#: apps/web/src/app/(signing)/sign/[token]/document-action-auth-account.tsx:74
+#: apps/web/src/app/(signing)/sign/[token]/document-action-auth-account.tsx:71
 #: apps/web/src/app/(signing)/sign/[token]/document-action-auth-passkey.tsx:164
 #: apps/web/src/app/(signing)/sign/[token]/document-action-auth-passkey.tsx:189
 #: apps/web/src/app/(signing)/sign/[token]/form.tsx:150
@@ -720,7 +720,7 @@ msgstr "Choisissez..."
 msgid "Claim account"
 msgstr "Revendiquer le compte"
 
-#: apps/web/src/components/forms/v2/signup.tsx:469
+#: apps/web/src/components/forms/v2/signup.tsx:481
 msgid "Claim username"
 msgstr "Revendiquer le nom d'utilisateur"
 
@@ -728,7 +728,7 @@ msgstr "Revendiquer le nom d'utilisateur"
 msgid "Claim your profile later"
 msgstr "Revendiquer votre profil plus tard"
 
-#: apps/web/src/components/forms/v2/signup.tsx:267
+#: apps/web/src/components/forms/v2/signup.tsx:279
 msgid "Claim your username now"
 msgstr "Revendiquer votre nom d'utilisateur maintenant"
 
@@ -773,7 +773,7 @@ msgstr "Fermer"
 #: apps/web/src/app/(signing)/sign/[token]/sign-dialog.tsx:61
 #: apps/web/src/app/embed/direct/[[...url]]/client.tsx:425
 #: apps/web/src/app/embed/sign/[[...url]]/client.tsx:304
-#: apps/web/src/components/forms/v2/signup.tsx:522
+#: apps/web/src/components/forms/v2/signup.tsx:534
 msgid "Complete"
 msgstr "Compléter"
 
@@ -887,7 +887,7 @@ msgstr "Copier le jeton"
 msgid "Create"
 msgstr "Créer"
 
-#: apps/web/src/components/forms/v2/signup.tsx:252
+#: apps/web/src/components/forms/v2/signup.tsx:264
 msgid "Create a new account"
 msgstr "Créer un nouveau compte"
 
@@ -952,11 +952,11 @@ msgstr "Créer un webhook"
 msgid "Create Webhook"
 msgstr "Créer un Webhook"
 
-#: apps/web/src/app/(signing)/sign/[token]/complete/page.tsx:214
+#: apps/web/src/app/(signing)/sign/[token]/complete/page.tsx:215
 msgid "Create your account and start using state-of-the-art document signing."
 msgstr "Créez votre compte et commencez à utiliser la signature de documents à la pointe de la technologie."
 
-#: apps/web/src/components/forms/v2/signup.tsx:256
+#: apps/web/src/components/forms/v2/signup.tsx:268
 msgid "Create your account and start using state-of-the-art document signing. Open and beautiful signing is within your grasp."
 msgstr "Créez votre compte et commencez à utiliser la signature de documents à la pointe de la technologie. Une signature ouverte et magnifique est à votre portée."
 
@@ -1335,7 +1335,7 @@ msgid "Documents Viewed"
 msgstr "Documents consultés"
 
 #: apps/web/src/app/(unauthenticated)/reset-password/[token]/page.tsx:40
-#: apps/web/src/app/(unauthenticated)/signin/page.tsx:61
+#: apps/web/src/app/(unauthenticated)/signin/page.tsx:45
 msgid "Don't have an account? <0>Sign up</0>"
 msgstr "Vous n'avez pas de compte? <0>Inscrivez-vous</0>"
 
@@ -1412,7 +1412,7 @@ msgstr "Modifier le webhook"
 #: apps/web/src/components/(teams)/dialogs/update-team-email-dialog.tsx:153
 #: apps/web/src/components/forms/forgot-password.tsx:81
 #: apps/web/src/components/forms/profile.tsx:122
-#: apps/web/src/components/forms/signin.tsx:326
+#: apps/web/src/components/forms/signin.tsx:338
 #: apps/web/src/components/forms/signup.tsx:180
 msgid "Email"
 msgstr "Email"
@@ -1423,7 +1423,7 @@ msgstr "Email"
 msgid "Email address"
 msgstr "Adresse email"
 
-#: apps/web/src/components/forms/v2/signup.tsx:316
+#: apps/web/src/components/forms/v2/signup.tsx:328
 msgid "Email Address"
 msgstr "Adresse e-mail"
 
@@ -1584,7 +1584,7 @@ msgid "File cannot be larger than {APP_DOCUMENT_UPLOAD_SIZE_LIMIT}MB"
 msgstr "Le fichier ne peut pas dépasser {APP_DOCUMENT_UPLOAD_SIZE_LIMIT} Mo"
 
 #: apps/web/src/app/(unauthenticated)/forgot-password/page.tsx:21
-#: apps/web/src/components/forms/signin.tsx:358
+#: apps/web/src/components/forms/signin.tsx:370
 msgid "Forgot your password?"
 msgstr "Mot de passe oublié ?"
 
@@ -1593,7 +1593,7 @@ msgstr "Mot de passe oublié ?"
 #: apps/web/src/app/embed/direct/[[...url]]/client.tsx:361
 #: apps/web/src/app/embed/sign/[[...url]]/client.tsx:241
 #: apps/web/src/components/forms/profile.tsx:110
-#: apps/web/src/components/forms/v2/signup.tsx:300
+#: apps/web/src/components/forms/v2/signup.tsx:312
 msgid "Full Name"
 msgstr "Nom complet"
 
@@ -1620,7 +1620,7 @@ msgstr "Retourner"
 msgid "Go back home"
 msgstr "Retourner à la maison"
 
-#: apps/web/src/app/(signing)/sign/[token]/complete/page.tsx:223
+#: apps/web/src/app/(signing)/sign/[token]/complete/page.tsx:226
 #: apps/web/src/app/(signing)/sign/[token]/no-longer-available.tsx:57
 msgid "Go Back Home"
 msgstr "Retourner à la maison"
@@ -1864,8 +1864,8 @@ msgid "Loading..."
 msgstr "Chargement..."
 
 #: apps/web/src/app/(recipient)/d/[token]/signing-auth-page.tsx:54
-#: apps/web/src/app/(signing)/sign/[token]/document-action-auth-account.tsx:78
-#: apps/web/src/app/(signing)/sign/[token]/signing-auth-page.tsx:72
+#: apps/web/src/app/(signing)/sign/[token]/document-action-auth-account.tsx:75
+#: apps/web/src/app/(signing)/sign/[token]/signing-auth-page.tsx:67
 msgid "Login"
 msgstr "Connexion"
 
@@ -2016,7 +2016,7 @@ msgstr "Mes modèles"
 msgid "Name"
 msgstr "Nom"
 
-#: apps/web/src/app/(signing)/sign/[token]/complete/page.tsx:210
+#: apps/web/src/app/(signing)/sign/[token]/complete/page.tsx:211
 msgid "Need to sign documents?"
 msgstr "Besoin de signer des documents ?"
 
@@ -2039,7 +2039,7 @@ msgstr "Nouveau modèle"
 
 #: apps/web/src/app/embed/direct/[[...url]]/client.tsx:416
 #: apps/web/src/app/embed/sign/[[...url]]/client.tsx:295
-#: apps/web/src/components/forms/v2/signup.tsx:509
+#: apps/web/src/components/forms/v2/signup.tsx:521
 msgid "Next"
 msgstr "Suivant"
 
@@ -2150,11 +2150,11 @@ msgstr "Ouvert"
 #: apps/web/src/app/(dashboard)/templates/template-direct-link-dialog.tsx:337
 #: apps/web/src/components/forms/signup.tsx:243
 #: apps/web/src/components/forms/signup.tsx:267
-#: apps/web/src/components/forms/v2/signup.tsx:371
+#: apps/web/src/components/forms/v2/signup.tsx:383
 msgid "Or"
 msgstr "Ou"
 
-#: apps/web/src/components/forms/signin.tsx:378
+#: apps/web/src/components/forms/signin.tsx:390
 msgid "Or continue with"
 msgstr "Ou continuez avec"
 
@@ -2171,7 +2171,7 @@ msgstr "Propriétaire"
 msgid "Paid"
 msgstr "Payé"
 
-#: apps/web/src/components/forms/signin.tsx:423
+#: apps/web/src/components/forms/signin.tsx:435
 msgid "Passkey"
 msgstr "Clé d'accès"
 
@@ -2211,9 +2211,9 @@ msgstr "Les clés d'accès ne sont pas prises en charge sur ce navigateur"
 #: apps/web/src/components/(dashboard)/common/command-menu.tsx:70
 #: apps/web/src/components/forms/password.tsx:123
 #: apps/web/src/components/forms/reset-password.tsx:110
-#: apps/web/src/components/forms/signin.tsx:344
+#: apps/web/src/components/forms/signin.tsx:356
 #: apps/web/src/components/forms/signup.tsx:196
-#: apps/web/src/components/forms/v2/signup.tsx:332
+#: apps/web/src/components/forms/v2/signup.tsx:344
 msgid "Password"
 msgstr "Mot de passe"
 
@@ -2404,7 +2404,7 @@ msgstr "Profil public"
 msgid "Public profile URL"
 msgstr "URL du profil public"
 
-#: apps/web/src/components/forms/v2/signup.tsx:438
+#: apps/web/src/components/forms/v2/signup.tsx:450
 msgid "Public profile username"
 msgstr "Nom d'utilisateur du profil public"
 
@@ -2758,17 +2758,17 @@ msgid "Sign field"
 msgstr "Champ de signature"
 
 #: apps/web/src/components/forms/signup.tsx:212
-#: apps/web/src/components/forms/v2/signup.tsx:350
+#: apps/web/src/components/forms/v2/signup.tsx:362
 msgid "Sign Here"
 msgstr "Signer ici"
 
 #: apps/web/src/app/not-found.tsx:29
-#: apps/web/src/components/forms/signin.tsx:371
-#: apps/web/src/components/forms/signin.tsx:498
+#: apps/web/src/components/forms/signin.tsx:383
+#: apps/web/src/components/forms/signin.tsx:510
 msgid "Sign In"
 msgstr "Se connecter"
 
-#: apps/web/src/app/(unauthenticated)/signin/page.tsx:44
+#: apps/web/src/app/(unauthenticated)/signin/page.tsx:29
 msgid "Sign in to your account"
 msgstr "Connectez-vous à votre compte"
 
@@ -2782,7 +2782,7 @@ msgstr "Déconnexion"
 msgid "Sign the document to complete the process."
 msgstr "Signez le document pour terminer le processus."
 
-#: apps/web/src/app/(signing)/sign/[token]/signing-auth-page.tsx:72
+#: apps/web/src/app/(signing)/sign/[token]/signing-auth-page.tsx:67
 msgid "Sign up"
 msgstr "S'inscrire"
 
@@ -2791,12 +2791,12 @@ msgid "Sign Up"
 msgstr "S'inscrire"
 
 #: apps/web/src/components/forms/signup.tsx:257
-#: apps/web/src/components/forms/v2/signup.tsx:389
+#: apps/web/src/components/forms/v2/signup.tsx:401
 msgid "Sign Up with Google"
 msgstr "S'inscrire avec Google"
 
 #: apps/web/src/components/forms/signup.tsx:281
-#: apps/web/src/components/forms/v2/signup.tsx:405
+#: apps/web/src/components/forms/v2/signup.tsx:417
 msgid "Sign Up with OIDC"
 msgstr "S'inscrire avec OIDC"
 
@@ -2822,8 +2822,8 @@ msgstr "Les signatures apparaîtront une fois le document complété"
 msgid "Signed"
 msgstr "Signé"
 
-#: apps/web/src/components/forms/signin.tsx:371
-#: apps/web/src/components/forms/signin.tsx:498
+#: apps/web/src/components/forms/signin.tsx:383
+#: apps/web/src/components/forms/signin.tsx:510
 msgid "Signing in..."
 msgstr "Connexion en cours..."
 
@@ -2868,7 +2868,7 @@ msgstr "Paramètres du site"
 #: apps/web/src/app/(dashboard)/templates/template-direct-link-dialog.tsx:151
 #: apps/web/src/app/(recipient)/d/[token]/direct-template.tsx:117
 #: apps/web/src/app/(recipient)/d/[token]/signing-auth-page.tsx:27
-#: apps/web/src/app/(signing)/sign/[token]/signing-auth-page.tsx:43
+#: apps/web/src/app/(signing)/sign/[token]/signing-auth-page.tsx:38
 #: apps/web/src/app/(teams)/t/[teamUrl]/layout-billing-banner.tsx:53
 #: apps/web/src/app/(teams)/t/[teamUrl]/settings/team-email-dropdown.tsx:39
 #: apps/web/src/app/(unauthenticated)/verify-email/[token]/page.tsx:61
@@ -3434,7 +3434,7 @@ msgstr "Pour activer l'authentification à deux facteurs, scannez le code QR sui
 msgid "To gain access to your account, please confirm your email address by clicking on the confirmation link from your inbox."
 msgstr "Pour accéder à votre compte, veuillez confirmer votre adresse e-mail en cliquant sur le lien de confirmation dans votre boîte de réception."
 
-#: apps/web/src/app/(signing)/sign/[token]/document-action-auth-account.tsx:57
+#: apps/web/src/app/(signing)/sign/[token]/document-action-auth-account.tsx:54
 msgid "To mark this document as viewed, you need to be logged in as <0>{0}</0>"
 msgstr "Pour marquer ce document comme consulté, vous devez être connecté en tant que <0>{0}</0>"
 
@@ -3523,7 +3523,7 @@ msgstr "Authentification à deux facteurs"
 msgid "Two factor authentication recovery codes are used to access your account in the event that you lose access to your authenticator app."
 msgstr "Les codes de récupération de l'authentification à deux facteurs sont utilisés pour accéder à votre compte dans le cas où vous perdez l'accès à votre application d'authentification."
 
-#: apps/web/src/components/forms/signin.tsx:436
+#: apps/web/src/components/forms/signin.tsx:448
 msgid "Two-Factor Authentication"
 msgstr "Authentification à deux facteurs"
 
@@ -3733,12 +3733,12 @@ msgid "Uploaded file not an allowed file type"
 msgstr "Le fichier téléchargé n'est pas un type de fichier autorisé"
 
 #: apps/web/src/components/forms/2fa/disable-authenticator-app-dialog.tsx:187
-#: apps/web/src/components/forms/signin.tsx:493
+#: apps/web/src/components/forms/signin.tsx:505
 msgid "Use Authenticator"
 msgstr "Utiliser l'authentificateur"
 
 #: apps/web/src/components/forms/2fa/disable-authenticator-app-dialog.tsx:185
-#: apps/web/src/components/forms/signin.tsx:491
+#: apps/web/src/components/forms/signin.tsx:503
 msgid "Use Backup Code"
 msgstr "Utiliser le code de secours"
 
@@ -3754,7 +3754,7 @@ msgstr "Utilisateur"
 msgid "User ID"
 msgstr "ID utilisateur"
 
-#: apps/web/src/components/forms/v2/signup.tsx:222
+#: apps/web/src/components/forms/v2/signup.tsx:234
 msgid "User profiles are here!"
 msgstr "Les profils des utilisateurs sont ici !"
 
@@ -4033,7 +4033,7 @@ msgid "We were unable to disable two-factor authentication for your account. Ple
 msgstr "Nous n'avons pas pu désactiver l'authentification à deux facteurs pour votre compte. Veuillez vous assurer que vous avez correctement entré votre mot de passe et votre code de secours, puis réessayez."
 
 #: apps/web/src/app/(recipient)/d/[token]/signing-auth-page.tsx:28
-#: apps/web/src/app/(signing)/sign/[token]/signing-auth-page.tsx:44
+#: apps/web/src/app/(signing)/sign/[token]/signing-auth-page.tsx:39
 msgid "We were unable to log you out at this time."
 msgstr "Nous n'avons pas pu vous déconnecter pour le moment."
 
@@ -4100,7 +4100,7 @@ msgstr "Webhooks"
 msgid "Weekly"
 msgstr "Hebdomadaire"
 
-#: apps/web/src/app/(unauthenticated)/signin/page.tsx:48
+#: apps/web/src/app/(unauthenticated)/signin/page.tsx:33
 msgid "Welcome back, we are lucky to have you."
 msgstr "Contentieux, nous avons de la chance de vous avoir."
 
@@ -4326,7 +4326,7 @@ msgstr "Vous devez avoir au moins un autre membre de l'équipe pour transférer 
 msgid "You must set a profile URL before enabling your public profile."
 msgstr "Vous devez définir une URL de profil avant d'activer votre profil public."
 
-#: apps/web/src/app/(signing)/sign/[token]/signing-auth-page.tsx:61
+#: apps/web/src/app/(signing)/sign/[token]/signing-auth-page.tsx:56
 msgid "You need to be logged in as <0>{email}</0> to view this page."
 msgstr "Vous devez être connecté en tant que <0>{email}</0> pour voir cette page."
 
@@ -4338,7 +4338,7 @@ msgstr "Vous devez être connecté pour voir cette page."
 msgid "You need to setup 2FA to mark this document as viewed."
 msgstr "Vous devez configurer 2FA pour marquer ce document comme vu."
 
-#: apps/web/src/components/forms/v2/signup.tsx:271
+#: apps/web/src/components/forms/v2/signup.tsx:283
 msgid "You will get notified & be able to set up your documenso public profile when we launch the feature."
 msgstr "Vous serez notifié et pourrez configurer votre profil public Documenso lorsque nous lancerons la fonctionnalité."
 
@@ -4489,4 +4489,3 @@ msgstr "Votre jeton a été créé avec succès ! Assurez-vous de le copier car 
 #: apps/web/src/app/(teams)/t/[teamUrl]/settings/tokens/page.tsx:86
 msgid "Your tokens will be shown here once you create them."
 msgstr "Vos jetons seront affichés ici une fois que vous les aurez créés."
-
