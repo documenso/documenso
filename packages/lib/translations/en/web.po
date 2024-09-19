@@ -2612,7 +2612,7 @@ msgstr "Search"
 msgid "Search by document title"
 msgstr "Search by document title"
 
-#: apps/web/src/app/(dashboard)/admin/leaderboard/data-table-leaderboard.tsx:141
+#: apps/web/src/app/(dashboard)/admin/leaderboard/data-table-leaderboard.tsx:140
 #: apps/web/src/app/(dashboard)/admin/users/data-table-users.tsx:144
 msgid "Search by name or email"
 msgstr "Search by name or email"

@@ -37,7 +37,7 @@ export const LeaderboardTable = ({
   sortBy,
   sortOrder,
 }: LeaderboardTableProps) => {
-  const { _ } = useLingui();
+  const { _, i18n } = useLingui();
 
   const [isPending, startTransition] = useTransition();
   const updateSearchParams = useUpdateSearchParams();
@@ -50,13 +50,13 @@ export const LeaderboardTable = ({
         header: 'ID',
         accessorKey: 'id',
         cell: ({ row }) => <div>{row.original.id}</div>,
-        size: 10,
+        size: 60,
       },
       {
         header: () => (
           <div
             className="flex cursor-pointer items-center"
-            onClick={() => handleColumnSort('name', sortOrder)}
+            onClick={() => handleColumnSort('name')}
           >
             {_(msg`Name`)}
             <CaretSortIcon className="ml-2 h-4 w-4" />
@@ -70,7 +70,7 @@ export const LeaderboardTable = ({
         header: () => (
           <div
             className="flex cursor-pointer items-center"
-            onClick={() => handleColumnSort('signingVolume', sortOrder)}
+            onClick={() => handleColumnSort('signingVolume')}
           >
             {_(msg`Signing Volume`)}
             <CaretSortIcon className="ml-2 h-4 w-4" />
@@ -84,7 +84,7 @@ export const LeaderboardTable = ({
           return (
             <div
               className="flex cursor-pointer items-center"
-              onClick={() => handleColumnSort('createdAt', sortOrder)}
+              onClick={() => handleColumnSort('createdAt')}
             >
               {_(msg`Created`)}
               <CaretSortIcon className="ml-2 h-4 w-4" />
@@ -92,7 +92,7 @@ export const LeaderboardTable = ({
           );
         },
         accessorKey: 'createdAt',
-        cell: ({ row }) => <div>{row.original.createdAt.toLocaleDateString()}</div>,
+        cell: ({ row }) => i18n.date(row.original.createdAt),
       },
     ] satisfies DataTableColumnDef<SigningVolume>[];
   }, [sortOrder]);
@@ -103,6 +103,8 @@ export const LeaderboardTable = ({
         search: debouncedSearchString,
         page: 1,
         perPage,
+        sortBy,
+        sortOrder,
       });
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -121,13 +123,10 @@ export const LeaderboardTable = ({
     setSearchString(e.target.value);
   };
 
-  const handleColumnSort = (
-    column: 'name' | 'createdAt' | 'signingVolume',
-    sortOrder: 'asc' | 'desc',
-  ) => {
+  const handleColumnSort = (column: 'name' | 'createdAt' | 'signingVolume') => {
     startTransition(() => {
       updateSearchParams({
-        sortBy: sortBy === column,
+        sortBy: column,
         sortOrder: sortOrder === 'asc' ? 'desc' : 'asc',
       });
     });
