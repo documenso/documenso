@@ -423,6 +423,7 @@ model Recipient {
 
 enum FieldType {
   SIGNATURE
+  TYPED_SIGNATURE
   FREE_SIGNATURE
   INITIALS
   NAME
