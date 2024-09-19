@@ -778,4 +778,3 @@ msgstr "Sie können derzeit keine Dokumente hochladen."
 #: packages/ui/primitives/document-dropzone.tsx:69
 msgid "You have reached your document limit."
 msgstr "Sie haben Ihr Dokumentenlimit erreicht."
-
