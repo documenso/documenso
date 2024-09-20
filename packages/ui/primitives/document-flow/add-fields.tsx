@@ -121,10 +121,13 @@ export const AddFieldsFormPartial = ({
   const [showAdvancedSettings, setShowAdvancedSettings] = useState(false);
   const [currentField, setCurrentField] = useState<FieldFormType>();
 
+  const [isTypedSignatureEnabled, setIsTypedSignatureEnabled] = useState(false);
+
   const {
     control,
     handleSubmit,
     formState: { isSubmitting },
+    watch,
     setValue,
     getValues,
   } = useForm<TAddFieldsFormSchema>({
@@ -234,6 +237,10 @@ export const AddFieldsFormPartial = ({
     hasSelectedSignerBeenSent ||
     selectedSigner?.role === RecipientRole.VIEWER ||
     selectedSigner?.role === RecipientRole.CC;
+
+  const showTypedSignatureCheckbox = useMemo(() => {
+    return localFields.some((field) => field.type === FieldType.SIGNATURE);
+  }, [localFields]);
 
   const [isFieldWithinBounds, setIsFieldWithinBounds] = useState(false);
   const [coords, setCoords] = useState({
@@ -499,6 +506,16 @@ export const AddFieldsFormPartial = ({
       );
   }, [recipientsByRole]);
 
+  const watchedEnabledTypedSignature = watch('enabledTypedSignature');
+
+  useEffect(() => {
+    setIsTypedSignatureEnabled(watchedEnabledTypedSignature);
+  }, [watchedEnabledTypedSignature]);
+
+  const handleTypedSignatureChange = (value: boolean) => {
+    setValue('enabledTypedSignature', value, { shouldDirty: true });
+  };
+
   const handleAdvancedSettings = () => {
     setShowAdvancedSettings((prev) => !prev);
   };
@@ -716,15 +733,17 @@ export const AddFieldsFormPartial = ({
                 </Popover>
               )}
 
-              <div className="mb-4 flex flex-row items-center space-x-2 space-y-0">
-                <Checkbox
-                  className="mr-2"
-                  checked={enabledTypedSignature}
-                  onCheckedChange={(value) => setValue('enabledTypedSignature', Boolean(value))}
-                  checkClassName="text-white"
-                />
-                Enforce handwritting signature
-              </div>
+              {showTypedSignatureCheckbox && (
+                <div className="mb-4 flex flex-row items-center space-x-2 space-y-0">
+                  <Checkbox
+                    className="mr-2"
+                    checked={isTypedSignatureEnabled}
+                    onCheckedChange={handleTypedSignatureChange}
+                    checkClassName="text-white"
+                  />
+                  Enforce handwritting signature
+                </div>
+              )}
 
               <div className="-mx-2 flex-1 overflow-y-auto px-2">
                 <fieldset disabled={isFieldsDisabled} className="my-2 grid grid-cols-3 gap-4">
