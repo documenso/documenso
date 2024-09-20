@@ -90,8 +90,18 @@ export const extractLocaleData = ({
     lang = 'en';
   }
 
+  // Filter out locales that are not valid.
+  const locales = (langHeader?.locales ?? []).filter((locale) => {
+    try {
+      new Intl.Locale(locale);
+      return true;
+    } catch {
+      return false;
+    }
+  });
+
   return {
     lang: lang || APP_I18N_OPTIONS.sourceLang,
-    locales: langHeader.locales,
+    locales,
   };
 };

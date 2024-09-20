@@ -2,12 +2,12 @@
 
 import { useState } from 'react';
 
+import { useRouter } from 'next/navigation';
+
 import { Trans, msg } from '@lingui/macro';
 import { useLingui } from '@lingui/react';
-import { DateTime } from 'luxon';
 import { signOut } from 'next-auth/react';
 
-import { trpc } from '@documenso/trpc/react';
 import { Button } from '@documenso/ui/primitives/button';
 import { useToast } from '@documenso/ui/primitives/use-toast';
 
@@ -20,24 +20,19 @@ export const SigningAuthPageView = ({ email, emailHasAccount }: SigningAuthPageV
   const { _ } = useLingui();
   const { toast } = useToast();
 
-  const [isSigningOut, setIsSigningOut] = useState(false);
+  const router = useRouter();
 
-  const { mutateAsync: encryptSecondaryData } = trpc.crypto.encryptSecondaryData.useMutation();
+  const [isSigningOut, setIsSigningOut] = useState(false);
 
   const handleChangeAccount = async (email: string) => {
     try {
       setIsSigningOut(true);
 
-      const encryptedEmail = await encryptSecondaryData({
-        data: email,
-        expiresAt: DateTime.now().plus({ days: 1 }).toMillis(),
+      await signOut({
+        redirect: false,
       });
 
-      await signOut({
-        callbackUrl: emailHasAccount
-          ? `/signin?email=${encodeURIComponent(encryptedEmail)}`
-          : `/signup?email=${encodeURIComponent(encryptedEmail)}`,
-      });
+      router.push(emailHasAccount ? `/signin#email=${email}` : `/signup#email=${email}`);
     } catch {
       toast({
         title: _(msg`Something went wrong`),
