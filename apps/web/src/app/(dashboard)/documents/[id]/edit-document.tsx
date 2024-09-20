@@ -387,6 +387,7 @@ export const EditDocumentForm = ({
               fields={fields}
               onSubmit={onAddFieldsFormSubmit}
               isDocumentPdfLoaded={isDocumentPdfLoaded}
+              enabledTypedSignature={document.documentMeta?.enabledTypedSignature}
               teamId={team?.id}
             />
 

@@ -42,6 +42,7 @@ import {
   ZSetSettingsForDocumentMutationSchema,
   ZSetSigningOrderForDocumentMutationSchema,
   ZSetTitleForDocumentMutationSchema,
+  ZUpdateTypedSignatureSettingsMutationSchema,
 } from './schema';
 
 export const documentRouter = router({
@@ -318,6 +319,29 @@ export const documentRouter = router({
         return await upsertDocumentMeta({
           documentId,
           signingOrder,
+          userId: ctx.user.id,
+          requestMetadata: extractNextApiRequestMetadata(ctx.req),
+        });
+      } catch (err) {
+        console.error(err);
+
+        throw new TRPCError({
+          code: 'BAD_REQUEST',
+          message:
+            'We were unable to update the settings for this document. Please try again later.',
+        });
+      }
+    }),
+
+  updateTypedSignatureSettings: authenticatedProcedure
+    .input(ZUpdateTypedSignatureSettingsMutationSchema)
+    .mutation(async ({ input, ctx }) => {
+      try {
+        const { documentId, typedSignatureSettings } = input;
+
+        return await upsertDocumentMeta({
+          documentId,
+          typedSignatureSettings,
           userId: ctx.user.id,
           requestMetadata: extractNextApiRequestMetadata(ctx.req),
         });

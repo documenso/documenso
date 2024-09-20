@@ -39,6 +39,7 @@ import { getSignerColorStyles, useSignerColors } from '../../lib/signer-colors';
 import { cn } from '../../lib/utils';
 import { Button } from '../button';
 import { Card, CardContent } from '../card';
+import { Checkbox } from '../checkbox';
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem } from '../command';
 import { Popover, PopoverContent, PopoverTrigger } from '../popover';
 import { useStep } from '../stepper';
@@ -88,6 +89,7 @@ export type AddFieldsFormProps = {
   onSubmit: (_data: TAddFieldsFormSchema) => void;
   canGoBack?: boolean;
   isDocumentPdfLoaded: boolean;
+  enabledTypedSignature?: boolean;
   teamId?: number;
 };
 
@@ -105,6 +107,7 @@ export const AddFieldsFormPartial = ({
   onSubmit,
   canGoBack = false,
   isDocumentPdfLoaded,
+  enabledTypedSignature,
   teamId,
 }: AddFieldsFormProps) => {
   const { toast } = useToast();
@@ -139,6 +142,7 @@ export const AddFieldsFormPartial = ({
           recipients.find((recipient) => recipient.id === field.recipientId)?.email ?? '',
         fieldMeta: field.fieldMeta ? ZFieldMetaSchema.parse(field.fieldMeta) : undefined,
       })),
+      enabledTypedSignature: enabledTypedSignature ?? false,
     },
   });
 
@@ -534,6 +538,7 @@ export const AddFieldsFormPartial = ({
             title={documentFlow.title}
             description={documentFlow.description}
           />
+
           <DocumentFlowFormContainerContent>
             <div className="flex flex-col">
               {selectedField && (
@@ -710,6 +715,16 @@ export const AddFieldsFormPartial = ({
                   </PopoverContent>
                 </Popover>
               )}
+
+              <div className="mb-4 flex flex-row items-center space-x-2 space-y-0">
+                <Checkbox
+                  className="mr-2"
+                  checked={enabledTypedSignature}
+                  onCheckedChange={(value) => setValue('enabledTypedSignature', Boolean(value))}
+                  checkClassName="text-white"
+                />
+                Enforce handwritting signature
+              </div>
 
               <div className="-mx-2 flex-1 overflow-y-auto px-2">
                 <fieldset disabled={isFieldsDisabled} className="my-2 grid grid-cols-3 gap-4">
