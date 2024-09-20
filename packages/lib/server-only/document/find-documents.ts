@@ -302,16 +302,15 @@ const findTeamDocumentsFilter = (
   return match<ExtendedDocumentStatus, Prisma.DocumentWhereInput | null>(status)
     .with(ExtendedDocumentStatus.ALL, () => {
       const filter: Prisma.DocumentWhereInput = {
-        // Filter to display all documents that belong to the team.
         OR: [
           {
             teamId: team.id,
+            deletedAt: null,
           },
         ],
       };
 
       if (teamEmail && filter.OR) {
-        // Filter to display all documents received by the team email that are not draft.
         filter.OR.push({
           status: {
             not: ExtendedDocumentStatus.DRAFT,
@@ -321,20 +320,20 @@ const findTeamDocumentsFilter = (
               email: teamEmail,
             },
           },
+          deletedAt: null,
         });
 
-        // Filter to display all documents that have been sent by the team email.
         filter.OR.push({
           User: {
             email: teamEmail,
           },
+          deletedAt: null,
         });
       }
 
       return filter;
     })
     .with(ExtendedDocumentStatus.INBOX, () => {
-      // Return a filter that will return nothing.
       if (!teamEmail) {
         return null;
       }
@@ -352,6 +351,7 @@ const findTeamDocumentsFilter = (
             },
           },
         },
+        deletedAt: null,
       };
     })
     .with(ExtendedDocumentStatus.DRAFT, () => {
@@ -360,6 +360,7 @@ const findTeamDocumentsFilter = (
           {
             teamId: team.id,
             status: ExtendedDocumentStatus.DRAFT,
+            deletedAt: null,
           },
         ],
       };
@@ -370,6 +371,7 @@ const findTeamDocumentsFilter = (
           User: {
             email: teamEmail,
           },
+          deletedAt: null,
         });
       }
 
@@ -381,6 +383,7 @@ const findTeamDocumentsFilter = (
           {
             teamId: team.id,
             status: ExtendedDocumentStatus.PENDING,
+            deletedAt: null,
           },
         ],
       };
@@ -406,6 +409,7 @@ const findTeamDocumentsFilter = (
               },
             },
           ],
+          deletedAt: null,
         });
       }
 
@@ -414,6 +418,7 @@ const findTeamDocumentsFilter = (
     .with(ExtendedDocumentStatus.COMPLETED, () => {
       const filter: Prisma.DocumentWhereInput = {
         status: ExtendedDocumentStatus.COMPLETED,
+        deletedAt: null,
         OR: [
           {
             teamId: team.id,
@@ -477,6 +482,5 @@ const findTeamDocumentsFilter = (
         OR: filters,
       };
     })
-
     .exhaustive();
 };
