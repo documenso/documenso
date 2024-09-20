@@ -337,11 +337,11 @@ export const documentRouter = router({
     .input(ZUpdateTypedSignatureSettingsMutationSchema)
     .mutation(async ({ input, ctx }) => {
       try {
-        const { documentId, typedSignatureSettings } = input;
+        const { documentId, enabledTypedSignature } = input;
 
         return await upsertDocumentMeta({
           documentId,
-          typedSignatureSettings,
+          enabledTypedSignature,
           userId: ctx.user.id,
           requestMetadata: extractNextApiRequestMetadata(ctx.req),
         });

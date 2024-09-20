@@ -112,6 +112,14 @@ export const EditDocumentForm = ({
     },
   });
 
+  const { mutateAsync: updateTypedSignature } =
+    trpc.document.updateTypedSignatureSettings.useMutation({
+      ...DO_NOT_INVALIDATE_QUERY_ON_MUTATION,
+      onSuccess: (newData) => {
+        console.log('newData', newData);
+      },
+    });
+
   const { mutateAsync: addSigners } = trpc.recipient.addSigners.useMutation({
     ...DO_NOT_INVALIDATE_QUERY_ON_MUTATION,
     onSuccess: (newRecipients) => {
@@ -252,10 +260,16 @@ export const EditDocumentForm = ({
   };
 
   const onAddFieldsFormSubmit = async (data: TAddFieldsFormSchema) => {
+    console.log('data', data);
     try {
       await addFields({
         documentId: document.id,
         fields: data.fields,
+      });
+
+      await updateTypedSignature({
+        documentId: document.id,
+        enabledTypedSignature: data.enabledTypedSignature,
       });
 
       // Clear all field data from localStorage
