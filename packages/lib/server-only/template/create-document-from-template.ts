@@ -1,8 +1,9 @@
 import { nanoid } from '@documenso/lib/universal/id';
 import { prisma } from '@documenso/prisma';
-import type { DocumentSigningOrder, Field } from '@documenso/prisma/client';
 import {
+  DocumentSigningOrder,
   DocumentSource,
+  type Field,
   type Recipient,
   RecipientRole,
   SendStatus,
@@ -34,7 +35,6 @@ export type CreateDocumentFromTemplateResponse = Awaited<
 
 export type CreateDocumentFromTemplateOptions = {
   templateId: number;
-  externalId?: string | null;
   userId: number;
   teamId?: number;
   recipients: {
@@ -62,7 +62,6 @@ export type CreateDocumentFromTemplateOptions = {
 
 export const createDocumentFromTemplate = async ({
   templateId,
-  externalId,
   userId,
   teamId,
   recipients,
@@ -153,7 +152,7 @@ export const createDocumentFromTemplate = async ({
     const document = await tx.document.create({
       data: {
         source: DocumentSource.TEMPLATE,
-        externalId,
+        externalId: template.externalId,
         templateId: template.id,
         userId,
         teamId: template.teamId,
@@ -172,7 +171,9 @@ export const createDocumentFromTemplate = async ({
             dateFormat: override?.dateFormat || template.templateMeta?.dateFormat,
             redirectUrl: override?.redirectUrl || template.templateMeta?.redirectUrl,
             signingOrder:
-              override?.signingOrder || template.templateMeta?.signingOrder || undefined,
+              override?.signingOrder ||
+              template.templateMeta?.signingOrder ||
+              DocumentSigningOrder.PARALLEL,
           },
         },
         Recipient: {

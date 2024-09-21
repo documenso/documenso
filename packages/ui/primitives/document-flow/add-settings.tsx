@@ -95,7 +95,7 @@ export const AddSettingsFormPartial = ({
           TIME_ZONES.find((timezone) => timezone === document.documentMeta?.timezone) ??
           DEFAULT_DOCUMENT_TIME_ZONE,
         dateFormat:
-          DATE_FORMATS.find((format) => format.label === document.documentMeta?.dateFormat)
+          DATE_FORMATS.find((format) => format.value === document.documentMeta?.dateFormat)
             ?.value ?? DEFAULT_DOCUMENT_DATE_FORMAT,
         redirectUrl: document.documentMeta?.redirectUrl ?? '',
       },
