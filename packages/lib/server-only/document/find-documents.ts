@@ -249,10 +249,23 @@ const findDocumentsFilter = (status: ExtendedDocumentStatus, user: User) => {
           },
         },
         {
+          status: ExtendedDocumentStatus.PENDING,
+          Recipient: {
+            some: {
+              email: user.email,
+              signingStatus: SigningStatus.SIGNED,
+              documentDeletedAt: {
+                gte: DateTime.now().minus({ days: 30 }).startOf('day').toJSDate(),
+              },
+            },
+          },
+        },
+        {
           status: ExtendedDocumentStatus.COMPLETED,
           Recipient: {
             some: {
               email: user.email,
+              signingStatus: SigningStatus.SIGNED,
               documentDeletedAt: {
                 gte: DateTime.now().minus({ days: 30 }).startOf('day').toJSDate(),
               },

@@ -155,6 +155,7 @@ const getCounts = async ({ user, createdAt }: GetCountsOption) => {
         OR: [
           {
             userId: user.id,
+            teamId: null,
             deletedAt: {
               gte: DateTime.now().minus({ days: 30 }).startOf('day').toJSDate(),
             },
