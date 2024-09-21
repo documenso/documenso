@@ -2,12 +2,14 @@ import React from 'react';
 
 import { redirect } from 'next/navigation';
 
+import { DateTime } from 'luxon';
 import { match } from 'ts-pattern';
 import { UAParser } from 'ua-parser-js';
 
+import { APP_I18N_OPTIONS } from '@documenso/lib/constants/i18n';
 import {
-  RECIPIENT_ROLES_DESCRIPTION,
-  RECIPIENT_ROLE_SIGNING_REASONS,
+  RECIPIENT_ROLES_DESCRIPTION_ENG,
+  RECIPIENT_ROLE_SIGNING_REASONS_ENG,
 } from '@documenso/lib/constants/recipient-roles';
 import { getEntireDocument } from '@documenso/lib/server-only/admin/get-entire-document';
 import { decryptSecondaryData } from '@documenso/lib/server-only/crypto/decrypt';
@@ -26,7 +28,6 @@ import {
 } from '@documenso/ui/primitives/table';
 
 import { Logo } from '~/components/branding/logo';
-import { LocaleDate } from '~/components/formatter/locale-date';
 
 type SigningCertificateProps = {
   searchParams: {
@@ -35,8 +36,8 @@ type SigningCertificateProps = {
 };
 
 const FRIENDLY_SIGNING_REASONS = {
-  ['__OWNER__']: 'I am the owner of this document',
-  ...RECIPIENT_ROLE_SIGNING_REASONS,
+  ['__OWNER__']: `I am the owner of this document`,
+  ...RECIPIENT_ROLE_SIGNING_REASONS_ENG,
 };
 
 export default async function SigningCertificate({ searchParams }: SigningCertificateProps) {
@@ -172,7 +173,7 @@ export default async function SigningCertificate({ searchParams }: SigningCertif
                       <div className="hyphens-auto break-words font-medium">{recipient.name}</div>
                       <div className="break-all">{recipient.email}</div>
                       <p className="text-muted-foreground mt-2 text-sm print:text-xs">
-                        {RECIPIENT_ROLES_DESCRIPTION[recipient.role].roleName}
+                        {RECIPIENT_ROLES_DESCRIPTION_ENG[recipient.role].roleName}
                       </p>
 
                       <p className="text-muted-foreground mt-2 text-sm print:text-xs">
@@ -228,42 +229,33 @@ export default async function SigningCertificate({ searchParams }: SigningCertif
                         <p className="text-muted-foreground text-sm print:text-xs">
                           <span className="font-medium">Sent:</span>{' '}
                           <span className="inline-block">
-                            {logs.EMAIL_SENT[0] ? (
-                              <LocaleDate
-                                date={logs.EMAIL_SENT[0].createdAt}
-                                format="yyyy-MM-dd hh:mm:ss a (ZZZZ)"
-                              />
-                            ) : (
-                              'Unknown'
-                            )}
+                            {logs.EMAIL_SENT[0]
+                              ? DateTime.fromJSDate(logs.EMAIL_SENT[0].createdAt)
+                                  .setLocale(APP_I18N_OPTIONS.defaultLocale)
+                                  .toFormat('yyyy-MM-dd hh:mm:ss a (ZZZZ)')
+                              : 'Unknown'}
                           </span>
                         </p>
 
                         <p className="text-muted-foreground text-sm print:text-xs">
                           <span className="font-medium">Viewed:</span>{' '}
                           <span className="inline-block">
-                            {logs.DOCUMENT_OPENED[0] ? (
-                              <LocaleDate
-                                date={logs.DOCUMENT_OPENED[0].createdAt}
-                                format="yyyy-MM-dd hh:mm:ss a (ZZZZ)"
-                              />
-                            ) : (
-                              'Unknown'
-                            )}
+                            {logs.DOCUMENT_OPENED[0]
+                              ? DateTime.fromJSDate(logs.DOCUMENT_OPENED[0].createdAt)
+                                  .setLocale(APP_I18N_OPTIONS.defaultLocale)
+                                  .toFormat('yyyy-MM-dd hh:mm:ss a (ZZZZ)')
+                              : 'Unknown'}
                           </span>
                         </p>
 
                         <p className="text-muted-foreground text-sm print:text-xs">
                           <span className="font-medium">Signed:</span>{' '}
                           <span className="inline-block">
-                            {logs.DOCUMENT_RECIPIENT_COMPLETED[0] ? (
-                              <LocaleDate
-                                date={logs.DOCUMENT_RECIPIENT_COMPLETED[0].createdAt}
-                                format="yyyy-MM-dd hh:mm:ss a (ZZZZ)"
-                              />
-                            ) : (
-                              'Unknown'
-                            )}
+                            {logs.DOCUMENT_RECIPIENT_COMPLETED[0]
+                              ? DateTime.fromJSDate(logs.DOCUMENT_RECIPIENT_COMPLETED[0].createdAt)
+                                  .setLocale(APP_I18N_OPTIONS.defaultLocale)
+                                  .toFormat('yyyy-MM-dd hh:mm:ss a (ZZZZ)')
+                              : 'Unknown'}
                           </span>
                         </p>
 

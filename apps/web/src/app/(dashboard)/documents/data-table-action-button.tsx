@@ -2,6 +2,8 @@
 
 import Link from 'next/link';
 
+import { Trans, msg } from '@lingui/macro';
+import { useLingui } from '@lingui/react';
 import { CheckCircle, Download, Edit, EyeIcon, Pencil } from 'lucide-react';
 import { useSession } from 'next-auth/react';
 import { match } from 'ts-pattern';
@@ -27,6 +29,7 @@ export type DataTableActionButtonProps = {
 export const DataTableActionButton = ({ row, team }: DataTableActionButtonProps) => {
   const { data: session } = useSession();
   const { toast } = useToast();
+  const { _ } = useLingui();
 
   if (!session) {
     return null;
@@ -69,8 +72,8 @@ export const DataTableActionButton = ({ row, team }: DataTableActionButtonProps)
       await downloadPDF({ documentData, fileName: row.title });
     } catch (err) {
       toast({
-        title: 'Something went wrong',
-        description: 'An error occurred while downloading your document.',
+        title: _(msg`Something went wrong`),
+        description: _(msg`An error occurred while downloading your document.`),
         variant: 'destructive',
       });
     }
@@ -96,7 +99,7 @@ export const DataTableActionButton = ({ row, team }: DataTableActionButtonProps)
         <Button className="w-32" asChild>
           <Link href={`${documentsPath}/${row.id}/edit`}>
             <Edit className="-ml-1 mr-2 h-4 w-4" />
-            Edit
+            <Trans>Edit</Trans>
           </Link>
         </Button>
       ),
@@ -108,19 +111,19 @@ export const DataTableActionButton = ({ row, team }: DataTableActionButtonProps)
             .with(RecipientRole.SIGNER, () => (
               <>
                 <Pencil className="-ml-1 mr-2 h-4 w-4" />
-                Sign
+                <Trans>Sign</Trans>
               </>
             ))
             .with(RecipientRole.APPROVER, () => (
               <>
                 <CheckCircle className="-ml-1 mr-2 h-4 w-4" />
-                Approve
+                <Trans>Approve</Trans>
               </>
             ))
             .otherwise(() => (
               <>
                 <EyeIcon className="-ml-1 mr-2 h-4 w-4" />
-                View
+                <Trans>View</Trans>
               </>
             ))}
         </Link>
@@ -129,13 +132,13 @@ export const DataTableActionButton = ({ row, team }: DataTableActionButtonProps)
     .with({ isPending: true, isSigned: true }, () => (
       <Button className="w-32" disabled={true}>
         <EyeIcon className="-ml-1 mr-2 h-4 w-4" />
-        View
+        <Trans>View</Trans>
       </Button>
     ))
     .with({ isComplete: true }, () => (
       <Button className="w-32" onClick={onDownloadClick}>
         <Download className="-ml-1 mr-2 inline h-4 w-4" />
-        Download
+        <Trans>Download</Trans>
       </Button>
     ))
     .otherwise(() => <div></div>);

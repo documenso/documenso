@@ -1,3 +1,4 @@
+import { Trans } from '@lingui/macro';
 import { P, match } from 'ts-pattern';
 
 import {
@@ -55,10 +56,10 @@ export const DocumentActionAuthDialog = ({
     <Dialog open={open} onOpenChange={handleOnOpenChange}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>{title || 'Sign field'}</DialogTitle>
+          <DialogTitle>{title || <Trans>Sign field</Trans>}</DialogTitle>
 
           <DialogDescription>
-            {description || 'Reauthentication is required to sign this field'}
+            {description || <Trans>Reauthentication is required to sign this field</Trans>}
           </DialogDescription>
         </DialogHeader>
 

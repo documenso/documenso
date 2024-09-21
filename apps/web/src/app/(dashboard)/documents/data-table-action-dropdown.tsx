@@ -4,6 +4,8 @@ import { useState } from 'react';
 
 import Link from 'next/link';
 
+import { Trans, msg } from '@lingui/macro';
+import { useLingui } from '@lingui/react';
 import {
   ArchiveRestore,
   CheckCircle,
@@ -54,6 +56,7 @@ export type DataTableActionDropdownProps = {
 export const DataTableActionDropdown = ({ row, team }: DataTableActionDropdownProps) => {
   const { data: session } = useSession();
   const { toast } = useToast();
+  const { _ } = useLingui();
 
   const [isDeleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [isDuplicateDialogOpen, setDuplicateDialogOpen] = useState(false);
@@ -102,8 +105,8 @@ export const DataTableActionDropdown = ({ row, team }: DataTableActionDropdownPr
       await downloadPDF({ documentData, fileName: row.title });
     } catch (err) {
       toast({
-        title: 'Something went wrong',
-        description: 'An error occurred while downloading your document.',
+        title: _(msg`Something went wrong`),
+        description: _(msg`An error occurred while downloading your document.`),
         variant: 'destructive',
       });
     }
@@ -118,7 +121,9 @@ export const DataTableActionDropdown = ({ row, team }: DataTableActionDropdownPr
       </DropdownMenuTrigger>
 
       <DropdownMenuContent className="w-52" align="start" forceMount>
-        <DropdownMenuLabel>Action</DropdownMenuLabel>
+        <DropdownMenuLabel>
+          <Trans>Action</Trans>
+        </DropdownMenuLabel>
 
         {!isDraft && recipient && recipient?.role !== RecipientRole.CC && (
           <DropdownMenuItem disabled={!recipient || isComplete} asChild>
@@ -126,21 +131,21 @@ export const DataTableActionDropdown = ({ row, team }: DataTableActionDropdownPr
               {recipient?.role === RecipientRole.VIEWER && (
                 <>
                   <EyeIcon className="mr-2 h-4 w-4" />
-                  View
+                  <Trans>View</Trans>
                 </>
               )}
 
               {recipient?.role === RecipientRole.SIGNER && (
                 <>
                   <Pencil className="mr-2 h-4 w-4" />
-                  Sign
+                  <Trans>Sign</Trans>
                 </>
               )}
 
               {recipient?.role === RecipientRole.APPROVER && (
                 <>
                   <CheckCircle className="mr-2 h-4 w-4" />
-                  Approve
+                  <Trans>Approve</Trans>
                 </>
               )}
             </Link>
@@ -150,25 +155,25 @@ export const DataTableActionDropdown = ({ row, team }: DataTableActionDropdownPr
         <DropdownMenuItem disabled={!canManageDocument || isComplete} asChild>
           <Link href={`${documentsPath}/${row.id}/edit`}>
             <Edit className="mr-2 h-4 w-4" />
-            Edit
+            <Trans>Edit</Trans>
           </Link>
         </DropdownMenuItem>
 
         <DropdownMenuItem disabled={!isComplete} onClick={onDownloadClick}>
           <Download className="mr-2 h-4 w-4" />
-          Download
+          <Trans>Download</Trans>
         </DropdownMenuItem>
 
         <DropdownMenuItem onClick={() => setDuplicateDialogOpen(true)}>
           <Copy className="mr-2 h-4 w-4" />
-          Duplicate
+          <Trans>Duplicate</Trans>
         </DropdownMenuItem>
 
         {/* We don't want to allow teams moving documents across at the moment. */}
         {!team && (
           <DropdownMenuItem onClick={() => setMoveDialogOpen(true)}>
             <MoveRight className="mr-2 h-4 w-4" />
-            Move to Team
+            <Trans>Move to Team</Trans>
           </DropdownMenuItem>
         )}
 
@@ -195,8 +200,17 @@ export const DataTableActionDropdown = ({ row, team }: DataTableActionDropdownPr
             {canManageDocument ? 'Delete' : 'Hide'}
           </DropdownMenuItem>
         )}
+        <DropdownMenuItem
+          onClick={() => setDeleteDialogOpen(true)}
+          disabled={Boolean(!canManageDocument && team?.teamEmail)}
+        >
+          <Trash2 className="mr-2 h-4 w-4" />
+          {canManageDocument ? _(msg`Delete`) : _(msg`Hide`)}
+        </DropdownMenuItem>
 
-        <DropdownMenuLabel>Share</DropdownMenuLabel>
+        <DropdownMenuLabel>
+          <Trans>Share</Trans>
+        </DropdownMenuLabel>
 
         <ResendDocumentActionItem document={row} recipients={nonSignedRecipients} team={team} />
 
@@ -207,7 +221,7 @@ export const DataTableActionDropdown = ({ row, team }: DataTableActionDropdownPr
             <DropdownMenuItem disabled={disabled || isDraft} onSelect={(e) => e.preventDefault()}>
               <div className="flex items-center">
                 {loading ? <Loader className="mr-2 h-4 w-4" /> : <Share className="mr-2 h-4 w-4" />}
-                Share Signing Card
+                <Trans>Share Signing Card</Trans>
               </div>
             </DropdownMenuItem>
           )}

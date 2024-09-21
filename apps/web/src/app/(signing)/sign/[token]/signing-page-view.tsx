@@ -1,3 +1,4 @@
+import { Trans } from '@lingui/macro';
 import { match } from 'ts-pattern';
 
 import { DEFAULT_DOCUMENT_DATE_FORMAT } from '@documenso/lib/constants/date-formats';
@@ -38,6 +39,7 @@ export type SigningPageViewProps = {
   recipient: Recipient;
   fields: Field[];
   completedFields: CompletedField[];
+  isRecipientsTurn: boolean;
 };
 
 export const SigningPageView = ({
@@ -45,6 +47,7 @@ export const SigningPageView = ({
   recipient,
   fields,
   completedFields,
+  isRecipientsTurn,
 }: SigningPageViewProps) => {
   const { documentData, documentMeta } = document;
 
@@ -62,11 +65,19 @@ export const SigningPageView = ({
           {document.User.name}
         </p>
       </div>
+
       <p className="text-muted-foreground">
-        ({document.User.email}) has invited you to{' '}
-        {recipient.role === RecipientRole.VIEWER && 'view'}
-        {recipient.role === RecipientRole.SIGNER && 'sign'}
-        {recipient.role === RecipientRole.APPROVER && 'approve'} this document.
+        {match(recipient.role)
+          .with(RecipientRole.VIEWER, () => (
+            <Trans>({document.User.email}) has invited you to view this document</Trans>
+          ))
+          .with(RecipientRole.SIGNER, () => (
+            <Trans>({document.User.email}) has invited you to sign this document</Trans>
+          ))
+          .with(RecipientRole.APPROVER, () => (
+            <Trans>({document.User.email}) has invited you to approve this document</Trans>
+          ))
+          .otherwise(() => null)}
       </p>
 
       <div className="mt-8 grid grid-cols-12 gap-y-8 lg:gap-x-8 lg:gap-y-0">
@@ -90,6 +101,7 @@ export const SigningPageView = ({
             recipient={recipient}
             fields={fields}
             redirectUrl={documentMeta?.redirectUrl}
+            isRecipientsTurn={isRecipientsTurn}
           />
         </div>
       </div>

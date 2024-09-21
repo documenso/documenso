@@ -2,6 +2,8 @@ import React from 'react';
 
 import type { Metadata } from 'next';
 
+import { setupI18nSSR } from '@documenso/lib/client-only/providers/i18n.server';
+
 import { TemplatesPageView } from './templates-page-view';
 import type { TemplatesPageViewProps } from './templates-page-view';
 
@@ -14,5 +16,7 @@ export const metadata: Metadata = {
 };
 
 export default function TemplatesPage({ searchParams = {} }: TemplatesPageProps) {
+  setupI18nSSR();
+
   return <TemplatesPageView searchParams={searchParams} />;
 }

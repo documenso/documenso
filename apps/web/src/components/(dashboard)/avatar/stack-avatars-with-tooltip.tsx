@@ -1,5 +1,8 @@
 'use client';
 
+import { Trans } from '@lingui/macro';
+import { useLingui } from '@lingui/react';
+
 import { getRecipientType } from '@documenso/lib/client-only/recipient-type';
 import { RECIPIENT_ROLES_DESCRIPTION } from '@documenso/lib/constants/recipient-roles';
 import { recipientAbbreviation } from '@documenso/lib/utils/recipient-formatter';
@@ -23,6 +26,8 @@ export const StackAvatarsWithTooltip = ({
   position,
   children,
 }: StackAvatarsWithTooltipProps) => {
+  const { _ } = useLingui();
+
   const waitingRecipients = recipients.filter(
     (recipient) => getRecipientType(recipient) === 'waiting',
   );
@@ -49,7 +54,9 @@ export const StackAvatarsWithTooltip = ({
     >
       {completedRecipients.length > 0 && (
         <div>
-          <h1 className="text-base font-medium">Completed</h1>
+          <h1 className="text-base font-medium">
+            <Trans>Completed</Trans>
+          </h1>
           {completedRecipients.map((recipient: Recipient) => (
             <div key={recipient.id} className="my-1 flex items-center gap-2">
               <StackAvatar
@@ -61,7 +68,7 @@ export const StackAvatarsWithTooltip = ({
               <div className="">
                 <p className="text-muted-foreground text-sm">{recipient.email}</p>
                 <p className="text-muted-foreground/70 text-xs">
-                  {RECIPIENT_ROLES_DESCRIPTION[recipient.role].roleName}
+                  {_(RECIPIENT_ROLES_DESCRIPTION[recipient.role].roleName)}
                 </p>
               </div>
             </div>
@@ -71,7 +78,9 @@ export const StackAvatarsWithTooltip = ({
 
       {waitingRecipients.length > 0 && (
         <div>
-          <h1 className="text-base font-medium">Waiting</h1>
+          <h1 className="text-base font-medium">
+            <Trans>Waiting</Trans>
+          </h1>
           {waitingRecipients.map((recipient: Recipient) => (
             <AvatarWithRecipient
               key={recipient.id}
@@ -84,7 +93,9 @@ export const StackAvatarsWithTooltip = ({
 
       {openedRecipients.length > 0 && (
         <div>
-          <h1 className="text-base font-medium">Opened</h1>
+          <h1 className="text-base font-medium">
+            <Trans>Opened</Trans>
+          </h1>
           {openedRecipients.map((recipient: Recipient) => (
             <AvatarWithRecipient
               key={recipient.id}
@@ -97,7 +108,9 @@ export const StackAvatarsWithTooltip = ({
 
       {uncompletedRecipients.length > 0 && (
         <div>
-          <h1 className="text-base font-medium">Uncompleted</h1>
+          <h1 className="text-base font-medium">
+            <Trans>Uncompleted</Trans>
+          </h1>
           {uncompletedRecipients.map((recipient: Recipient) => (
             <AvatarWithRecipient
               key={recipient.id}

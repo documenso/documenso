@@ -1,7 +1,9 @@
 'use client';
 
-import { useTransition } from 'react';
+import { useMemo, useTransition } from 'react';
 
+import { msg } from '@lingui/macro';
+import { useLingui } from '@lingui/react';
 import { Loader } from 'lucide-react';
 import { DateTime } from 'luxon';
 import { useSession } from 'next-auth/react';
@@ -10,12 +12,12 @@ import { useUpdateSearchParams } from '@documenso/lib/client-only/hooks/use-upda
 import type { FindResultSet } from '@documenso/lib/types/find-result-set';
 import type { Document, Recipient, Team, User } from '@documenso/prisma/client';
 import { ExtendedDocumentStatus } from '@documenso/prisma/types/extended-document-status';
+import type { DataTableColumnDef } from '@documenso/ui/primitives/data-table';
 import { DataTable } from '@documenso/ui/primitives/data-table';
 import { DataTablePagination } from '@documenso/ui/primitives/data-table-pagination';
 
 import { StackAvatarsWithTooltip } from '~/components/(dashboard)/avatar/stack-avatars-with-tooltip';
 import { DocumentStatus } from '~/components/formatter/document-status';
-import { LocaleDate } from '~/components/formatter/locale-date';
 
 import { DataTableActionButton } from './data-table-action-button';
 import { DataTableActionDropdown } from './data-table-action-dropdown';
@@ -38,10 +40,59 @@ export const DocumentsDataTable = ({
   showSenderColumn,
   team,
 }: DocumentsDataTableProps) => {
+  const { _, i18n } = useLingui();
+
   const { data: session } = useSession();
+
   const [isPending, startTransition] = useTransition();
 
   const updateSearchParams = useUpdateSearchParams();
+
+  const columns = useMemo(() => {
+    return [
+      {
+        header: _(msg`Created`),
+        accessorKey: 'createdAt',
+        cell: ({ row }) =>
+          i18n.date(row.original.createdAt, { ...DateTime.DATETIME_SHORT, hourCycle: 'h12' }),
+      },
+      {
+        header: _(msg`Title`),
+        cell: ({ row }) => <DataTableTitle row={row.original} teamUrl={team?.url} />,
+      },
+      {
+        id: 'sender',
+        header: _(msg`Sender`),
+        cell: ({ row }) => row.original.User.name ?? row.original.User.email,
+      },
+      {
+        header: _(msg`Recipient`),
+        accessorKey: 'recipient',
+        cell: ({ row }) => (
+          <StackAvatarsWithTooltip
+            recipients={row.original.Recipient}
+            documentStatus={row.original.status}
+          />
+        ),
+      },
+      {
+        header: _(msg`Status`),
+        accessorKey: 'status',
+        cell: ({ row }) => <DocumentStatus status={row.original.status} />,
+        size: 140,
+      },
+      {
+        header: _(msg`Actions`),
+        cell: ({ row }) =>
+          (!row.original.deletedAt || row.original.status === ExtendedDocumentStatus.COMPLETED) && (
+            <div className="flex items-center gap-x-4">
+              <DataTableActionButton team={team} row={row.original} />
+              <DataTableActionDropdown team={team} row={row.original} />
+            </div>
+          ),
+      },
+    ] satisfies DataTableColumnDef<(typeof results)['data'][number]>[];
+  }, [team]);
 
   const onPaginationChange = (page: number, perPage: number) => {
     startTransition(() => {
@@ -59,60 +110,7 @@ export const DocumentsDataTable = ({
   return (
     <div className="relative">
       <DataTable
-        columns={[
-          {
-            header: 'Created',
-            accessorKey: 'createdAt',
-            cell: ({ row }) => (
-              <LocaleDate
-                date={row.original.createdAt}
-                format={{ ...DateTime.DATETIME_SHORT, hourCycle: 'h12' }}
-              />
-            ),
-          },
-          {
-            header: 'Title',
-            cell: ({ row }) => <DataTableTitle row={row.original} teamUrl={team?.url} />,
-          },
-          {
-            id: 'sender',
-            header: 'Sender',
-            cell: ({ row }) => row.original.User.name ?? row.original.User.email,
-          },
-          {
-            header: 'Recipient',
-            accessorKey: 'recipient',
-            cell: ({ row }) => (
-              <StackAvatarsWithTooltip
-                recipients={row.original.Recipient}
-                documentStatus={row.original.status}
-              />
-            ),
-          },
-          {
-            header: 'Status',
-            accessorKey: 'status',
-            cell: ({ row }) => {
-              const status = row.original.deletedAt
-                ? ExtendedDocumentStatus.BIN
-                : (row.getValue('status') as ExtendedDocumentStatus);
-
-              return <DocumentStatus status={status} />;
-            },
-            size: 140,
-          },
-          {
-            header: 'Actions',
-            cell: ({ row }) =>
-              (!row.original.deletedAt ||
-                row.original.status === ExtendedDocumentStatus.COMPLETED) && (
-                <div className="flex items-center gap-x-4">
-                  <DataTableActionButton team={team} row={row.original} />
-                  <DataTableActionDropdown team={team} row={row.original} />
-                </div>
-              ),
-          },
-        ]}
+        columns={columns}
         data={results.data}
         perPage={results.perPage}
         currentPage={results.currentPage}

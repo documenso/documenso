@@ -4,6 +4,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 import { Caveat } from 'next/font/google';
 
+import { Trans, msg } from '@lingui/macro';
 import {
   CalendarDays,
   CheckSquare,
@@ -21,7 +22,7 @@ import { useFieldArray, useForm } from 'react-hook-form';
 import { getBoundingClientRect } from '@documenso/lib/client-only/get-bounding-client-rect';
 import { useDocumentElement } from '@documenso/lib/client-only/hooks/use-document-element';
 import { PDF_VIEWER_PAGE_SELECTOR } from '@documenso/lib/constants/pdf-viewer';
-import { RECIPIENT_ROLES_DESCRIPTION } from '@documenso/lib/constants/recipient-roles';
+import { RECIPIENT_ROLES_DESCRIPTION_ENG } from '@documenso/lib/constants/recipient-roles';
 import {
   type TFieldMetaSchema as FieldMeta,
   ZFieldMetaSchema,
@@ -64,8 +65,8 @@ const fontCaveat = Caveat({
   variable: '--font-caveat',
 });
 
-const MIN_HEIGHT_PX = 40;
-const MIN_WIDTH_PX = 140;
+const MIN_HEIGHT_PX = 20;
+const MIN_WIDTH_PX = 80;
 
 export type AddTemplateFieldsFormProps = {
   documentFlow: DocumentFlowStep;
@@ -111,6 +112,7 @@ export const AddTemplateFieldsFormPartial = ({
           recipients.find((recipient) => recipient.id === field.recipientId)?.email ?? '',
         signerToken:
           recipients.find((recipient) => recipient.id === field.recipientId)?.token ?? '',
+        fieldMeta: field.fieldMeta ? ZFieldMetaSchema.parse(field.fieldMeta) : undefined,
       })),
     },
   });
@@ -154,6 +156,38 @@ export const AddTemplateFieldsFormPartial = ({
   const selectedSignerStyles = useSignerColors(
     selectedSignerIndex === -1 ? 0 : selectedSignerIndex,
   );
+
+  const filterFieldsWithEmptyValues = (fields: typeof localFields, fieldType: string) =>
+    fields
+      .filter((field) => field.type === fieldType)
+      .filter((field) => {
+        if (field.fieldMeta && 'values' in field.fieldMeta) {
+          return field.fieldMeta.values?.length === 0;
+        }
+
+        return true;
+      });
+
+  const emptyCheckboxFields = useMemo(
+    () => filterFieldsWithEmptyValues(localFields, FieldType.CHECKBOX),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [localFields],
+  );
+
+  const emptyRadioFields = useMemo(
+    () => filterFieldsWithEmptyValues(localFields, FieldType.RADIO),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [localFields],
+  );
+
+  const emptySelectFields = useMemo(
+    () => filterFieldsWithEmptyValues(localFields, FieldType.DROPDOWN),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [localFields],
+  );
+
+  const hasErrors =
+    emptyCheckboxFields.length > 0 || emptyRadioFields.length > 0 || emptySelectFields.length > 0;
 
   const [isFieldWithinBounds, setIsFieldWithinBounds] = useState(false);
   const [coords, setCoords] = useState({
@@ -365,8 +399,8 @@ export const AddTemplateFieldsFormPartial = ({
     <>
       {showAdvancedSettings && currentField ? (
         <FieldAdvancedSettings
-          title="Advanced settings"
-          description={`Configure the ${FRIENDLY_FIELD_TYPE[currentField.type]} field`}
+          title={msg`Advanced settings`}
+          description={msg`Configure the ${FRIENDLY_FIELD_TYPE[currentField.type]} field`}
           field={currentField}
           fields={localFields}
           onAdvancedSettings={handleAdvancedSettings}
@@ -460,14 +494,15 @@ export const AddTemplateFieldsFormPartial = ({
 
                       <CommandEmpty>
                         <span className="text-muted-foreground inline-block px-4">
-                          No recipient matching this description was found.
+                          <Trans>No recipient matching this description was found.</Trans>
                         </span>
                       </CommandEmpty>
 
                       {recipientsByRoleToDisplay.map(([role, roleRecipients], roleIndex) => (
                         <CommandGroup key={roleIndex}>
                           <div className="text-muted-foreground mb-1 ml-2 mt-2 text-xs font-medium">
-                            {`${RECIPIENT_ROLES_DESCRIPTION[role].roleName}s`}
+                            {/* Todo: Translations - Add plural translations. */}
+                            {`${RECIPIENT_ROLES_DESCRIPTION_ENG[role].roleName}s`}
                           </div>
 
                           {roleRecipients.length === 0 && (
@@ -475,7 +510,7 @@ export const AddTemplateFieldsFormPartial = ({
                               key={`${role}-empty`}
                               className="text-muted-foreground/80 px-4 pb-4 pt-2.5 text-center text-xs"
                             >
-                              No recipients with this role
+                              <Trans>No recipients with this role</Trans>
                             </div>
                           )}
 
@@ -542,7 +577,7 @@ export const AddTemplateFieldsFormPartial = ({
                             fontCaveat.className,
                           )}
                         >
-                          Signature
+                          <Trans>Signature</Trans>
                         </p>
                       </CardContent>
                     </Card>
@@ -594,7 +629,7 @@ export const AddTemplateFieldsFormPartial = ({
                           )}
                         >
                           <Mail className="h-4 w-4" />
-                          Email
+                          <Trans>Email</Trans>
                         </p>
                       </CardContent>
                     </Card>
@@ -620,7 +655,7 @@ export const AddTemplateFieldsFormPartial = ({
                           )}
                         >
                           <User className="h-4 w-4" />
-                          Name
+                          <Trans>Name</Trans>
                         </p>
                       </CardContent>
                     </Card>
@@ -646,7 +681,7 @@ export const AddTemplateFieldsFormPartial = ({
                           )}
                         >
                           <CalendarDays className="h-4 w-4" />
-                          Date
+                          <Trans>Date</Trans>
                         </p>
                       </CardContent>
                     </Card>
@@ -672,7 +707,7 @@ export const AddTemplateFieldsFormPartial = ({
                           )}
                         >
                           <Type className="h-4 w-4" />
-                          Text
+                          <Trans>Text</Trans>
                         </p>
                       </CardContent>
                     </Card>
@@ -698,7 +733,7 @@ export const AddTemplateFieldsFormPartial = ({
                           )}
                         >
                           <Hash className="h-4 w-4" />
-                          Number
+                          <Trans>Number</Trans>
                         </p>
                       </CardContent>
                     </Card>
@@ -724,7 +759,7 @@ export const AddTemplateFieldsFormPartial = ({
                           )}
                         >
                           <Disc className="h-4 w-4" />
-                          Radio
+                          <Trans>Radio</Trans>
                         </p>
                       </CardContent>
                     </Card>
@@ -750,7 +785,7 @@ export const AddTemplateFieldsFormPartial = ({
                           )}
                         >
                           <CheckSquare className="h-4 w-4" />
-                          Checkbox
+                          <Trans>Checkbox</Trans>
                         </p>
                       </CardContent>
                     </Card>
@@ -776,7 +811,7 @@ export const AddTemplateFieldsFormPartial = ({
                           )}
                         >
                           <ChevronDown className="h-4 w-4" />
-                          Dropdown
+                          <Trans>Dropdown</Trans>
                         </p>
                       </CardContent>
                     </Card>
@@ -786,17 +821,32 @@ export const AddTemplateFieldsFormPartial = ({
             </div>
           </DocumentFlowFormContainerContent>
 
+          {hasErrors && (
+            <div className="mt-4">
+              <ul>
+                <li className="text-sm text-red-500">
+                  <Trans>
+                    To proceed further, please set at least one value for the{' '}
+                    {emptyCheckboxFields.length > 0
+                      ? 'Checkbox'
+                      : emptyRadioFields.length > 0
+                      ? 'Radio'
+                      : 'Select'}{' '}
+                    field.
+                  </Trans>
+                </li>
+              </ul>
+            </div>
+          )}
+
           <DocumentFlowFormContainerFooter>
-            <DocumentFlowFormContainerStep
-              title={documentFlow.title}
-              step={currentStep}
-              maxStep={totalSteps}
-            />
+            <DocumentFlowFormContainerStep step={currentStep} maxStep={totalSteps} />
 
             <DocumentFlowFormContainerActions
               loading={isSubmitting}
               disabled={isSubmitting}
-              goNextLabel="Save Template"
+              goNextLabel={msg`Save Template`}
+              disableNextStep={hasErrors}
               onGoBackClick={() => {
                 previousStep();
                 remove();

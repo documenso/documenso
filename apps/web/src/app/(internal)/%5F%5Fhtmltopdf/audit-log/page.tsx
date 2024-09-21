@@ -2,14 +2,16 @@ import React from 'react';
 
 import { redirect } from 'next/navigation';
 
-import { RECIPIENT_ROLES_DESCRIPTION } from '@documenso/lib/constants/recipient-roles';
+import { DateTime } from 'luxon';
+
+import { APP_I18N_OPTIONS } from '@documenso/lib/constants/i18n';
+import { RECIPIENT_ROLES_DESCRIPTION_ENG } from '@documenso/lib/constants/recipient-roles';
 import { getEntireDocument } from '@documenso/lib/server-only/admin/get-entire-document';
 import { decryptSecondaryData } from '@documenso/lib/server-only/crypto/decrypt';
 import { findDocumentAuditLogs } from '@documenso/lib/server-only/document/find-document-audit-logs';
 import { Card, CardContent } from '@documenso/ui/primitives/card';
 
 import { Logo } from '~/components/branding/logo';
-import { LocaleDate } from '~/components/formatter/locale-date';
 
 import { AuditLogDataTable } from './data-table';
 
@@ -86,7 +88,9 @@ export default async function AuditLog({ searchParams }: AuditLogProps) {
             <span className="font-medium">Created At</span>
 
             <span className="mt-1 block">
-              <LocaleDate date={document.createdAt} format="yyyy-mm-dd hh:mm:ss a (ZZZZ)" />
+              {DateTime.fromJSDate(document.createdAt)
+                .setLocale(APP_I18N_OPTIONS.defaultLocale)
+                .toFormat('yyyy-mm-dd hh:mm:ss a (ZZZZ)')}
             </span>
           </p>
 
@@ -94,7 +98,9 @@ export default async function AuditLog({ searchParams }: AuditLogProps) {
             <span className="font-medium">Last Updated</span>
 
             <span className="mt-1 block">
-              <LocaleDate date={document.updatedAt} format="yyyy-mm-dd hh:mm:ss a (ZZZZ)" />
+              {DateTime.fromJSDate(document.updatedAt)
+                .setLocale(APP_I18N_OPTIONS.defaultLocale)
+                .toFormat('yyyy-mm-dd hh:mm:ss a (ZZZZ)')}
             </span>
           </p>
 
@@ -113,7 +119,7 @@ export default async function AuditLog({ searchParams }: AuditLogProps) {
               {document.Recipient.map((recipient) => (
                 <li key={recipient.id}>
                   <span className="text-muted-foreground">
-                    [{RECIPIENT_ROLES_DESCRIPTION[recipient.role].roleName}]
+                    [{RECIPIENT_ROLES_DESCRIPTION_ENG[recipient.role].roleName}]
                   </span>{' '}
                   {recipient.name} ({recipient.email})
                 </li>

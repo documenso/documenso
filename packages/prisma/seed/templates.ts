@@ -4,7 +4,7 @@ import path from 'node:path';
 import {
   DIRECT_TEMPLATE_RECIPIENT_EMAIL,
   DIRECT_TEMPLATE_RECIPIENT_NAME,
-} from '@documenso/lib/constants/template';
+} from '@documenso/lib/constants/direct-templates';
 
 import { prisma } from '..';
 import type { Prisma, User } from '../client';

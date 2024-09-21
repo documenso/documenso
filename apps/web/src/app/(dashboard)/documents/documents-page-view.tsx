@@ -1,5 +1,7 @@
 import Link from 'next/link';
 
+import { Trans } from '@lingui/macro';
+
 import { NEXT_PUBLIC_WEBAPP_URL } from '@documenso/lib/constants/app';
 import { getRequiredServerComponentSession } from '@documenso/lib/next-auth/get-server-component-session';
 import { findDocuments } from '@documenso/lib/server-only/document/find-documents';
@@ -8,7 +10,7 @@ import type { GetStatsInput } from '@documenso/lib/server-only/document/get-stat
 import { getStats } from '@documenso/lib/server-only/document/get-stats';
 import { parseToIntegerArray } from '@documenso/lib/utils/params';
 import { formatDocumentsPath } from '@documenso/lib/utils/teams';
-import type { Team, TeamEmail } from '@documenso/prisma/client';
+import type { Team, TeamEmail, TeamMemberRole } from '@documenso/prisma/client';
 import { isExtendedDocumentStatus } from '@documenso/prisma/guards/is-extended-document-status';
 import { ExtendedDocumentStatus } from '@documenso/prisma/types/extended-document-status';
 import { Avatar, AvatarFallback, AvatarImage } from '@documenso/ui/primitives/avatar';
@@ -31,7 +33,7 @@ export type DocumentsPageViewProps = {
     perPage?: string;
     senderIds?: string;
   };
-  team?: Team & { teamEmail?: TeamEmail | null };
+  team?: Team & { teamEmail?: TeamEmail | null } & { currentTeamMember?: { role: TeamMemberRole } };
 };
 
 export const DocumentsPageView = async ({ searchParams = {}, team }: DocumentsPageViewProps) => {
@@ -45,6 +47,7 @@ export const DocumentsPageView = async ({ searchParams = {}, team }: DocumentsPa
   const currentTeam = team
     ? { id: team.id, url: team.url, teamEmail: team.teamEmail?.email }
     : undefined;
+  const currentTeamMemberRole = team?.currentTeamMember?.role;
 
   const getStatOptions: GetStatsInput = {
     user,
@@ -56,6 +59,9 @@ export const DocumentsPageView = async ({ searchParams = {}, team }: DocumentsPa
       teamId: team.id,
       teamEmail: team.teamEmail?.email,
       senderIds,
+      currentTeamMemberRole,
+      currentUserEmail: user.email,
+      userId: user.id,
     };
   }
 
@@ -104,7 +110,9 @@ export const DocumentsPageView = async ({ searchParams = {}, team }: DocumentsPa
             </Avatar>
           )}
 
-          <h1 className="text-4xl font-semibold">Documents</h1>
+          <h1 className="text-4xl font-semibold">
+            <Trans>Documents</Trans>
+          </h1>
         </div>
 
         <div className="-m-1 flex flex-wrap gap-x-4 gap-y-6 overflow-hidden p-1">

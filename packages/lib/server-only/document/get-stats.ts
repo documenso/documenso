@@ -1,11 +1,15 @@
 import { DateTime } from 'luxon';
+import { match } from 'ts-pattern';
 
 import type { PeriodSelectorValue } from '@documenso/lib/server-only/document/find-documents';
 import { prisma } from '@documenso/prisma';
+import { TeamMemberRole } from '@documenso/prisma/client';
 import type { Prisma, User } from '@documenso/prisma/client';
 import { SigningStatus } from '@documenso/prisma/client';
 import { isExtendedDocumentStatus } from '@documenso/prisma/guards/is-extended-document-status';
 import { ExtendedDocumentStatus } from '@documenso/prisma/types/extended-document-status';
+
+import { DocumentVisibility } from '../../types/document-visibility';
 
 export type GetStatsInput = {
   user: User;
@@ -27,7 +31,7 @@ export const getStats = async ({ user, period, ...options }: GetStatsInput) => {
   }
 
   const [ownerCounts, notSignedCounts, hasSignedCounts, deletedCounts] = await (options.team
-    ? getTeamCounts({ ...options.team, createdAt })
+    ? getTeamCounts({ ...options.team, createdAt, currentUserEmail: user.email, userId: user.id })
     : getCounts({ user, createdAt }));
 
   const stats: Record<ExtendedDocumentStatus, number> = {
@@ -194,11 +198,21 @@ type GetTeamCountsOption = {
   teamId: number;
   teamEmail?: string;
   senderIds?: number[];
+  currentUserEmail: string;
+  userId: number;
   createdAt: Prisma.DocumentWhereInput['createdAt'];
+  currentTeamMemberRole?: TeamMemberRole;
 };
 
 const getTeamCounts = async (options: GetTeamCountsOption) => {
-  const { createdAt, teamId, teamEmail, senderIds = [] } = options;
+  const {
+    createdAt,
+    teamId,
+    teamEmail,
+    senderIds = [],
+    currentUserEmail,
+    currentTeamMemberRole,
+  } = options;
 
   const userIdWhereClause: Prisma.DocumentWhereInput['userId'] =
     senderIds.length > 0
@@ -207,10 +221,50 @@ const getTeamCounts = async (options: GetTeamCountsOption) => {
         }
       : undefined;
 
+  const visibilityFilters = [
+    ...match(currentTeamMemberRole)
+      .with(TeamMemberRole.ADMIN, () => [
+        { visibility: DocumentVisibility.EVERYONE },
+        { visibility: DocumentVisibility.MANAGER_AND_ABOVE },
+        { visibility: DocumentVisibility.ADMIN },
+      ])
+      .with(TeamMemberRole.MANAGER, () => [
+        { visibility: DocumentVisibility.EVERYONE },
+        { visibility: DocumentVisibility.MANAGER_AND_ABOVE },
+      ])
+      .otherwise(() => [{ visibility: DocumentVisibility.EVERYONE }]),
+  ];
+
   const ownerCountsWhereInput: Prisma.DocumentWhereInput = {
     userId: userIdWhereClause,
     createdAt,
-    OR: [{ teamId }, ...(teamEmail ? [{ User: { email: teamEmail } }] : [])],
+    OR: [
+      { teamId },
+      ...(teamEmail ? [{ User: { email: teamEmail } }] : []),
+      {
+        AND: [
+          {
+            visibility: {
+              in: visibilityFilters.map((filter) => filter.visibility),
+            },
+          },
+          {
+            Recipient: {
+              none: {
+                email: currentUserEmail,
+              },
+            },
+          },
+        ],
+      },
+      {
+        Recipient: {
+          some: {
+            email: currentUserEmail,
+          },
+        },
+      },
+    ],
     deletedAt: null,
   };
 
@@ -246,9 +300,6 @@ const getTeamCounts = async (options: GetTeamCountsOption) => {
         status: {
           in: [ExtendedDocumentStatus.PENDING, ExtendedDocumentStatus.COMPLETED],
         },
-        deletedAt: {
-          gte: DateTime.now().minus({ days: 30 }).startOf('day').toJSDate(),
-        },
       },
       ...(teamEmail
         ? [
@@ -257,16 +308,11 @@ const getTeamCounts = async (options: GetTeamCountsOption) => {
                 some: {
                   email: teamEmail,
                   signingStatus: SigningStatus.SIGNED,
-                  documentDeletedAt: {
-                    gte: DateTime.now().minus({ days: 30 }).startOf('day').toJSDate(),
-                  },
+                  documentDeletedAt: null,
                 },
               },
               status: {
                 in: [ExtendedDocumentStatus.PENDING, ExtendedDocumentStatus.COMPLETED],
-              },
-              deletedAt: {
-                gte: DateTime.now().minus({ days: 30 }).startOf('day').toJSDate(),
               },
             },
           ]

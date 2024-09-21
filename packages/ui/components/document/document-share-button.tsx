@@ -3,15 +3,13 @@
 import type { HTMLAttributes } from 'react';
 import React, { useState } from 'react';
 
+import { Trans, msg } from '@lingui/macro';
+import { useLingui } from '@lingui/react';
 import { Copy, Sparkles } from 'lucide-react';
 import { FaXTwitter } from 'react-icons/fa6';
 
 import { useCopyShareLink } from '@documenso/lib/client-only/hooks/use-copy-share-link';
 import { NEXT_PUBLIC_WEBAPP_URL } from '@documenso/lib/constants/app';
-import {
-  TOAST_DOCUMENT_SHARE_ERROR,
-  TOAST_DOCUMENT_SHARE_SUCCESS,
-} from '@documenso/lib/constants/toast';
 import { generateTwitterIntent } from '@documenso/lib/universal/generate-twitter-intent';
 import { trpc } from '@documenso/trpc/react';
 
@@ -39,11 +37,22 @@ export const DocumentShareButton = ({
   className,
   trigger,
 }: DocumentShareButtonProps) => {
+  const { _ } = useLingui();
   const { toast } = useToast();
 
   const { copyShareLink, createAndCopyShareLink, isCopyingShareLink } = useCopyShareLink({
-    onSuccess: () => toast(TOAST_DOCUMENT_SHARE_SUCCESS),
-    onError: () => toast(TOAST_DOCUMENT_SHARE_ERROR),
+    onSuccess: () =>
+      toast({
+        title: _(msg`Copied to clipboard`),
+        description: _(msg`The sharing link has been copied to your clipboard.`),
+      }),
+    onError: () =>
+      toast({
+        title: _(msg`Something went wrong`),
+        description: _(msg`The sharing link could not be created at this time. Please try again.`),
+        variant: 'destructive',
+        duration: 5000,
+      }),
   });
 
   const [isOpen, setIsOpen] = useState(false);
@@ -123,7 +132,7 @@ export const DocumentShareButton = ({
             loading={isLoading}
           >
             {!isLoading && <Sparkles className="mr-2 h-5 w-5" />}
-            Share Signature Card
+            <Trans>Share Signature Card</Trans>
           </Button>
         )}
       </DialogTrigger>
@@ -133,8 +142,9 @@ export const DocumentShareButton = ({
           <DialogTitle>Share your signing experience!</DialogTitle>
 
           <DialogDescription className="mt-4">
-            Don't worry, the document you signed or sent wont be shared; only your signing
-            experience is. Share your signing card and showcase your signature!
+            Rest assured, your document is strictly confidential and will never be shared. Only your
+            signing experience will be highlighted. Share your personalized signing card to showcase
+            your signature!
           </DialogDescription>
         </DialogHeader>
 

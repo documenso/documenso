@@ -1,5 +1,7 @@
 'use client';
 
+import { msg } from '@lingui/macro';
+import { useLingui } from '@lingui/react';
 import { AnimatePresence } from 'framer-motion';
 
 import { trpc } from '@documenso/trpc/react';
@@ -13,11 +15,16 @@ import { TeamEmailUsage } from './team-email-usage';
 import { TeamInvitations } from './team-invitations';
 
 export default function TeamsSettingsPage() {
+  const { _ } = useLingui();
+
   const { data: teamEmail } = trpc.team.getTeamEmailByEmail.useQuery();
 
   return (
     <div>
-      <SettingsHeader title="Teams" subtitle="Manage all teams you are currently associated with.">
+      <SettingsHeader
+        title={_(msg`Teams`)}
+        subtitle={_(msg`Manage all teams you are currently associated with.`)}
+      >
         <CreateTeamDialog />
       </SettingsHeader>
 

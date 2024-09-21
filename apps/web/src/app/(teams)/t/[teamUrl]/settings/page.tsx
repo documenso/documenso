@@ -1,6 +1,8 @@
+import { Trans } from '@lingui/macro';
 import { CheckCircle2, Clock } from 'lucide-react';
 import { P, match } from 'ts-pattern';
 
+import { setupI18nSSR } from '@documenso/lib/client-only/providers/i18n.server';
 import { NEXT_PUBLIC_WEBAPP_URL } from '@documenso/lib/constants/app';
 import { getRequiredServerComponentSession } from '@documenso/lib/next-auth/get-server-component-session';
 import { getTeamByUrl } from '@documenso/lib/server-only/team/get-team';
@@ -26,6 +28,8 @@ export type TeamsSettingsPageProps = {
 };
 
 export default async function TeamsSettingsPage({ params }: TeamsSettingsPageProps) {
+  setupI18nSSR();
+
   const { teamUrl } = params;
 
   const session = await getRequiredServerComponentSession();
@@ -53,11 +57,15 @@ export default async function TeamsSettingsPage({ params }: TeamsSettingsPagePro
       <section className="mt-6 space-y-6">
         {(team.teamEmail || team.emailVerification) && (
           <Alert className="p-6" variant="neutral">
-            <AlertTitle>Team email</AlertTitle>
+            <AlertTitle>
+              <Trans>Team email</Trans>
+            </AlertTitle>
 
             <AlertDescription className="mr-2">
-              You can view documents associated with this email and use this identity when sending
-              documents.
+              <Trans>
+                You can view documents associated with this email and use this identity when sending
+                documents.
+              </Trans>
             </AlertDescription>
 
             <hr className="border-border/50 mt-2" />
@@ -90,7 +98,7 @@ export default async function TeamsSettingsPage({ params }: TeamsSettingsPagePro
                     .with({ teamEmail: P.not(null) }, () => (
                       <>
                         <CheckCircle2 className="mr-1.5 text-green-500 dark:text-green-300" />
-                        Active
+                        <Trans>Active</Trans>
                       </>
                     ))
                     .with(
@@ -103,14 +111,14 @@ export default async function TeamsSettingsPage({ params }: TeamsSettingsPagePro
                       () => (
                         <>
                           <Clock className="mr-1.5 text-yellow-500 dark:text-yellow-200" />
-                          Expired
+                          <Trans>Expired</Trans>
                         </>
                       ),
                     )
                     .with({ emailVerification: P.not(null) }, () => (
                       <>
                         <Clock className="mr-1.5 text-blue-600 dark:text-blue-300" />
-                        Awaiting email confirmation
+                        <Trans>Awaiting email confirmation</Trans>
                       </>
                     ))
                     .otherwise(() => null)}
@@ -128,7 +136,9 @@ export default async function TeamsSettingsPage({ params }: TeamsSettingsPagePro
             variant="neutral"
           >
             <div className="mb-4 sm:mb-0">
-              <AlertTitle>Team email</AlertTitle>
+              <AlertTitle>
+                <Trans>Team email</Trans>
+              </AlertTitle>
 
               <AlertDescription className="mr-2">
                 <ul className="text-muted-foreground mt-0.5 list-inside list-disc text-sm">
@@ -136,7 +146,9 @@ export default async function TeamsSettingsPage({ params }: TeamsSettingsPagePro
                   {/* <li>Display this name and email when sending documents</li> */}
                   {/* <li>View documents associated with this email</li> */}
 
-                  <span>View documents associated with this email</span>
+                  <span>
+                    <Trans>View documents associated with this email</Trans>
+                  </span>
                 </ul>
               </AlertDescription>
             </div>
@@ -153,10 +165,12 @@ export default async function TeamsSettingsPage({ params }: TeamsSettingsPagePro
                 variant="neutral"
               >
                 <div className="mb-4 sm:mb-0">
-                  <AlertTitle>Transfer team</AlertTitle>
+                  <AlertTitle>
+                    <Trans>Transfer team</Trans>
+                  </AlertTitle>
 
                   <AlertDescription className="mr-2">
-                    Transfer the ownership of the team to another team member.
+                    <Trans>Transfer the ownership of the team to another team member.</Trans>
                   </AlertDescription>
                 </div>
 
@@ -173,11 +187,15 @@ export default async function TeamsSettingsPage({ params }: TeamsSettingsPagePro
               variant="neutral"
             >
               <div className="mb-4 sm:mb-0">
-                <AlertTitle>Delete team</AlertTitle>
+                <AlertTitle>
+                  <Trans>Delete team</Trans>
+                </AlertTitle>
 
                 <AlertDescription className="mr-2">
-                  This team, and any associated data excluding billing invoices will be permanently
-                  deleted.
+                  <Trans>
+                    This team, and any associated data excluding billing invoices will be
+                    permanently deleted.
+                  </Trans>
                 </AlertDescription>
               </div>
 

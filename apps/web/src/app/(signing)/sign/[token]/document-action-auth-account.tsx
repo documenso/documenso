@@ -1,10 +1,11 @@
 import { useState } from 'react';
 
-import { DateTime } from 'luxon';
+import { useRouter } from 'next/navigation';
+
+import { Trans } from '@lingui/macro';
 import { signOut } from 'next-auth/react';
 
 import { RecipientRole } from '@documenso/prisma/client';
-import { trpc } from '@documenso/trpc/react';
 import { Alert, AlertDescription } from '@documenso/ui/primitives/alert';
 import { Button } from '@documenso/ui/primitives/button';
 import { DialogFooter } from '@documenso/ui/primitives/dialog';
@@ -24,22 +25,19 @@ export const DocumentActionAuthAccount = ({
 }: DocumentActionAuthAccountProps) => {
   const { recipient } = useRequiredDocumentAuthContext();
 
-  const [isSigningOut, setIsSigningOut] = useState(false);
+  const router = useRouter();
 
-  const { mutateAsync: encryptSecondaryData } = trpc.crypto.encryptSecondaryData.useMutation();
+  const [isSigningOut, setIsSigningOut] = useState(false);
 
   const handleChangeAccount = async (email: string) => {
     try {
       setIsSigningOut(true);
 
-      const encryptedEmail = await encryptSecondaryData({
-        data: email,
-        expiresAt: DateTime.now().plus({ days: 1 }).toMillis(),
+      await signOut({
+        redirect: false,
       });
 
-      await signOut({
-        callbackUrl: `/signin?email=${encodeURIComponent(encryptedEmail)}`,
-      });
+      router.push(`/signin#email=${email}`);
     } catch {
       setIsSigningOut(false);
 
@@ -53,11 +51,14 @@ export const DocumentActionAuthAccount = ({
         <AlertDescription>
           {actionTarget === 'DOCUMENT' && recipient.role === RecipientRole.VIEWER ? (
             <span>
-              To mark this document as viewed, you need to be logged in as{' '}
-              <strong>{recipient.email}</strong>
+              <Trans>
+                To mark this document as viewed, you need to be logged in as{' '}
+                <strong>{recipient.email}</strong>
+              </Trans>
             </span>
           ) : (
             <span>
+              {/* Todo: Translate */}
               To {actionVerb.toLowerCase()} this {actionTarget.toLowerCase()}, you need to be logged
               in as <strong>{recipient.email}</strong>
             </span>
@@ -67,11 +68,11 @@ export const DocumentActionAuthAccount = ({
 
       <DialogFooter>
         <Button type="button" variant="secondary" onClick={() => onOpenChange(false)}>
-          Cancel
+          <Trans>Cancel</Trans>
         </Button>
 
         <Button onClick={async () => handleChangeAccount(recipient.email)} loading={isSigningOut}>
-          Login
+          <Trans>Login</Trans>
         </Button>
       </DialogFooter>
     </fieldset>

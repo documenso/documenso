@@ -2,6 +2,8 @@
 
 import React, { forwardRef } from 'react';
 
+import { Trans, msg } from '@lingui/macro';
+import { useLingui } from '@lingui/react';
 import type { SelectProps } from '@radix-ui/react-select';
 import { InfoIcon } from 'lucide-react';
 
@@ -17,26 +19,36 @@ import {
 import { Tooltip, TooltipContent, TooltipTrigger } from '@documenso/ui/primitives/tooltip';
 
 export const DocumentGlobalAuthActionSelect = forwardRef<HTMLButtonElement, SelectProps>(
-  (props, ref) => (
-    <Select {...props}>
-      <SelectTrigger className="bg-background text-muted-foreground">
-        <SelectValue ref={ref} data-testid="documentActionSelectValue" placeholder="No restrictions" />
-      </SelectTrigger>
+  (props, ref) => {
+    const { _ } = useLingui();
 
-      <SelectContent position="popper">
-        {Object.values(DocumentActionAuth)
-          .filter((auth) => auth !== DocumentAuth.ACCOUNT)
-          .map((authType) => (
-            <SelectItem key={authType} value={authType}>
-              {DOCUMENT_AUTH_TYPES[authType].value}
-            </SelectItem>
-          ))}
+    return (
+      <Select {...props}>
+        <SelectTrigger className="bg-background text-muted-foreground">
+          <SelectValue
+            ref={ref}
+            data-testid="documentActionSelectValue"
+            placeholder={_(msg`No restrictions`)}
+          />
+        </SelectTrigger>
 
-        {/* Note: -1 is remapped in the Zod schema to the required value. */}
-        <SelectItem value={'-1'}>No restrictions</SelectItem>
-      </SelectContent>
-    </Select>
-  ),
+        <SelectContent position="popper">
+          {Object.values(DocumentActionAuth)
+            .filter((auth) => auth !== DocumentAuth.ACCOUNT)
+            .map((authType) => (
+              <SelectItem key={authType} value={authType}>
+                {DOCUMENT_AUTH_TYPES[authType].value}
+              </SelectItem>
+            ))}
+
+          {/* Note: -1 is remapped in the Zod schema to the required value. */}
+          <SelectItem value={'-1'}>
+            <Trans>No restrictions</Trans>
+          </SelectItem>
+        </SelectContent>
+      </Select>
+    );
+  },
 );
 
 DocumentGlobalAuthActionSelect.displayName = 'DocumentGlobalAuthActionSelect';
@@ -48,13 +60,19 @@ export const DocumentGlobalAuthActionTooltip = () => (
     </TooltipTrigger>
 
     <TooltipContent className="text-foreground max-w-md space-y-2 p-4">
-      <h2>Global recipient action authentication</h2>
-
-      <p>The authentication required for recipients to sign the signature field.</p>
+      <h2>
+        <Trans>Global recipient action authentication</Trans>
+      </h2>
 
       <p>
-        This can be overriden by setting the authentication requirements directly on each recipient
-        in the next step.
+        <Trans>The authentication required for recipients to sign the signature field.</Trans>
+      </p>
+
+      <p>
+        <Trans>
+          This can be overriden by setting the authentication requirements directly on each
+          recipient in the next step.
+        </Trans>
       </p>
 
       <ul className="ml-3.5 list-outside list-disc space-y-0.5 py-2">
@@ -62,15 +80,21 @@ export const DocumentGlobalAuthActionTooltip = () => (
           <strong>Require account</strong> - The recipient must be signed in
         </li> */}
         <li>
-          <strong>Require passkey</strong> - The recipient must have an account and passkey
-          configured via their settings
+          <Trans>
+            <strong>Require passkey</strong> - The recipient must have an account and passkey
+            configured via their settings
+          </Trans>
         </li>
         <li>
-          <strong>Require 2FA</strong> - The recipient must have an account and 2FA enabled via
-          their settings
+          <Trans>
+            <strong>Require 2FA</strong> - The recipient must have an account and 2FA enabled via
+            their settings
+          </Trans>
         </li>
         <li>
-          <strong>No restrictions</strong> - No authentication required
+          <Trans>
+            <strong>No restrictions</strong> - No authentication required
+          </Trans>
         </li>
       </ul>
     </TooltipContent>

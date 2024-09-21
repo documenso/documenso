@@ -1,5 +1,7 @@
 import React from 'react';
 
+import { Trans } from '@lingui/macro';
+
 import { NEXT_PUBLIC_WEBAPP_URL } from '@documenso/lib/constants/app';
 import { getRequiredServerComponentSession } from '@documenso/lib/next-auth/get-server-component-session';
 import { findTemplates } from '@documenso/lib/server-only/template/find-templates';
@@ -49,7 +51,9 @@ export const TemplatesPageView = async ({ searchParams = {}, team }: TemplatesPa
             </Avatar>
           )}
 
-          <h1 className="truncate text-2xl font-semibold md:text-3xl">Templates</h1>
+          <h1 className="truncate text-2xl font-semibold md:text-3xl">
+            <Trans>Templates</Trans>
+          </h1>
         </div>
 
         <div>

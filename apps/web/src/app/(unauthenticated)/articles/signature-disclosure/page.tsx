@@ -1,8 +1,13 @@
 import Link from 'next/link';
 
+import { Trans } from '@lingui/macro';
+
+import { setupI18nSSR } from '@documenso/lib/client-only/providers/i18n.server';
 import { Button } from '@documenso/ui/primitives/button';
 
 export default function SignatureDisclosure() {
+  setupI18nSSR();
+
   return (
     <div>
       <article className="prose dark:prose-invert">
@@ -100,7 +105,9 @@ export default function SignatureDisclosure() {
 
       <div className="mt-8">
         <Button asChild>
-          <Link href="/documents">Back to Documents</Link>
+          <Link href="/documents">
+            <Trans>Back to Documents</Trans>
+          </Link>
         </Button>
       </div>
     </div>

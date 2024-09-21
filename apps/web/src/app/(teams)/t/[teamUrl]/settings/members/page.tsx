@@ -1,3 +1,7 @@
+import { msg } from '@lingui/macro';
+import { useLingui } from '@lingui/react';
+
+import { setupI18nSSR } from '@documenso/lib/client-only/providers/i18n.server';
 import { getRequiredServerComponentSession } from '@documenso/lib/next-auth/get-server-component-session';
 import { getTeamByUrl } from '@documenso/lib/server-only/team/get-team';
 
@@ -12,6 +16,9 @@ export type TeamsSettingsMembersPageProps = {
 };
 
 export default async function TeamsSettingsMembersPage({ params }: TeamsSettingsMembersPageProps) {
+  setupI18nSSR();
+
+  const { _ } = useLingui();
   const { teamUrl } = params;
 
   const session = await getRequiredServerComponentSession();
@@ -20,7 +27,10 @@ export default async function TeamsSettingsMembersPage({ params }: TeamsSettings
 
   return (
     <div>
-      <SettingsHeader title="Members" subtitle="Manage the members or invite new members.">
+      <SettingsHeader
+        title={_(msg`Members`)}
+        subtitle={_(msg`Manage the members or invite new members.`)}
+      >
         <InviteTeamMembersDialog
           teamId={team.id}
           currentUserTeamRole={team.currentTeamMember.role}

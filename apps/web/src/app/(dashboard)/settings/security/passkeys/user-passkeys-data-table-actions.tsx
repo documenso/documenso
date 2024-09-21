@@ -1,6 +1,8 @@
 import { useState } from 'react';
 
 import { zodResolver } from '@hookform/resolvers/zod';
+import { Trans, msg } from '@lingui/macro';
+import { useLingui } from '@lingui/react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 
@@ -45,6 +47,7 @@ export const UserPasskeysDataTableActions = ({
   passkeyId,
   passkeyName,
 }: UserPasskeysDataTableActionsProps) => {
+  const { _ } = useLingui();
   const { toast } = useToast();
 
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
@@ -61,15 +64,16 @@ export const UserPasskeysDataTableActions = ({
     trpc.auth.updatePasskey.useMutation({
       onSuccess: () => {
         toast({
-          title: 'Success',
-          description: 'Passkey has been updated',
+          title: _(msg`Success`),
+          description: _(msg`Passkey has been updated`),
         });
       },
       onError: () => {
         toast({
-          title: 'Something went wrong',
-          description:
-            'We are unable to update this passkey at the moment. Please try again later.',
+          title: _(msg`Something went wrong`),
+          description: _(
+            msg`We are unable to update this passkey at the moment. Please try again later.`,
+          ),
           duration: 10000,
           variant: 'destructive',
         });
@@ -80,15 +84,16 @@ export const UserPasskeysDataTableActions = ({
     trpc.auth.deletePasskey.useMutation({
       onSuccess: () => {
         toast({
-          title: 'Success',
-          description: 'Passkey has been removed',
+          title: _(msg`Success`),
+          description: _(msg`Passkey has been removed`),
         });
       },
       onError: () => {
         toast({
-          title: 'Something went wrong',
-          description:
-            'We are unable to remove this passkey at the moment. Please try again later.',
+          title: _(msg`Something went wrong`),
+          description: _(
+            msg`We are unable to remove this passkey at the moment. Please try again later.`,
+          ),
           duration: 10000,
           variant: 'destructive',
         });
@@ -102,15 +107,21 @@ export const UserPasskeysDataTableActions = ({
         onOpenChange={(value) => !isUpdatingPasskey && setIsUpdateDialogOpen(value)}
       >
         <DialogTrigger onClick={(e) => e.stopPropagation()} asChild>
-          <Button variant="outline">Edit</Button>
+          <Button variant="outline">
+            <Trans>Edit</Trans>
+          </Button>
         </DialogTrigger>
 
         <DialogContent position="center">
           <DialogHeader>
-            <DialogTitle>Update passkey</DialogTitle>
+            <DialogTitle>
+              <Trans>Update passkey</Trans>
+            </DialogTitle>
 
             <DialogDescription className="mt-4">
-              You are currently updating the <strong>{passkeyName}</strong> passkey.
+              <Trans>
+                You are currently updating the <strong>{passkeyName}</strong> passkey.
+              </Trans>
             </DialogDescription>
           </DialogHeader>
 
@@ -129,7 +140,9 @@ export const UserPasskeysDataTableActions = ({
                   name="name"
                   render={({ field }) => (
                     <FormItem className="w-full">
-                      <FormLabel required>Name</FormLabel>
+                      <FormLabel required>
+                        <Trans>Name</Trans>
+                      </FormLabel>
                       <FormControl>
                         <Input {...field} />
                       </FormControl>
@@ -141,12 +154,12 @@ export const UserPasskeysDataTableActions = ({
                 <DialogFooter className="mt-4">
                   <DialogClose asChild>
                     <Button type="button" variant="secondary">
-                      Cancel
+                      <Trans>Cancel</Trans>
                     </Button>
                   </DialogClose>
 
                   <Button type="submit" loading={isUpdatingPasskey}>
-                    Update
+                    <Trans>Update</Trans>
                   </Button>
                 </DialogFooter>
               </fieldset>
@@ -160,15 +173,21 @@ export const UserPasskeysDataTableActions = ({
         onOpenChange={(value) => !isDeletingPasskey && setIsDeleteDialogOpen(value)}
       >
         <DialogTrigger onClick={(e) => e.stopPropagation()} asChild={true}>
-          <Button variant="destructive">Delete</Button>
+          <Button variant="destructive">
+            <Trans>Delete</Trans>
+          </Button>
         </DialogTrigger>
 
         <DialogContent position="center">
           <DialogHeader>
-            <DialogTitle>Delete passkey</DialogTitle>
+            <DialogTitle>
+              <Trans>Delete passkey</Trans>
+            </DialogTitle>
 
             <DialogDescription className="mt-4">
-              Are you sure you want to remove the <strong>{passkeyName}</strong> passkey.
+              <Trans>
+                Are you sure you want to remove the <strong>{passkeyName}</strong> passkey.
+              </Trans>
             </DialogDescription>
           </DialogHeader>
 
@@ -176,7 +195,7 @@ export const UserPasskeysDataTableActions = ({
             <DialogFooter>
               <DialogClose asChild>
                 <Button type="button" variant="secondary">
-                  Cancel
+                  <Trans>Cancel</Trans>
                 </Button>
               </DialogClose>
 
@@ -189,7 +208,7 @@ export const UserPasskeysDataTableActions = ({
                 variant="destructive"
                 loading={isDeletingPasskey}
               >
-                Delete
+                <Trans>Delete</Trans>
               </Button>
             </DialogFooter>
           </fieldset>

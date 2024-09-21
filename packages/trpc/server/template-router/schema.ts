@@ -6,7 +6,7 @@ import {
 } from '@documenso/lib/types/document-auth';
 import { ZBaseTableSearchParamsSchema } from '@documenso/lib/types/search-params';
 import { isValidRedirectUrl } from '@documenso/lib/utils/is-valid-redirect-url';
-import { TemplateType } from '@documenso/prisma/client';
+import { DocumentSigningOrder, TemplateType } from '@documenso/prisma/client';
 
 import { ZSignFieldWithTokenMutationSchema } from '../field-router/schema';
 
@@ -103,6 +103,12 @@ export const ZUpdateTemplateSettingsMutationSchema = z.object({
         }),
     })
     .optional(),
+});
+
+export const ZSetSigningOrderForTemplateMutationSchema = z.object({
+  templateId: z.number(),
+  teamId: z.number().optional(),
+  signingOrder: z.nativeEnum(DocumentSigningOrder),
 });
 
 export const ZFindTemplatesQuerySchema = ZBaseTableSearchParamsSchema.extend({

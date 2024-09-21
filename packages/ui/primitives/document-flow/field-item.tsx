@@ -201,6 +201,7 @@ export const FieldItem = ({
       <div
         className={cn(
           'relative flex h-full w-full items-center justify-center bg-white',
+          !fixedSize && '[container-type:size]',
           signerStyles.default.base,
           signerStyles.default.fieldItem,
         )}
@@ -209,6 +210,7 @@ export const FieldItem = ({
           onFocus?.();
         }}
         ref={$el}
+        data-field-id={field.nativeId}
       >
         {match(field.type)
           .with('CHECKBOX', () => <CheckboxField field={field} />)
@@ -223,10 +225,10 @@ export const FieldItem = ({
           ))}
 
         {!hideRecipients && (
-          <div className="absolute -right-6 top-0 z-20 hidden h-full w-6 items-center justify-center group-hover:flex">
+          <div className="absolute -right-5 top-0 z-20 hidden h-full w-5 items-center justify-center group-hover:flex">
             <div
               className={cn(
-                'flex h-7 w-6 flex-col items-center justify-center rounded-r-lg text-[0.625rem] font-bold text-white',
+                'flex h-5 w-5 flex-col items-center justify-center rounded-r-md text-[0.5rem] font-bold text-white',
                 signerStyles.default.fieldItemInitials,
                 {
                   '!opacity-50': disabled || passive,

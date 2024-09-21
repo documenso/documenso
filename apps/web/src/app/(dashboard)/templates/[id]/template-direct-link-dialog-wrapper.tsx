@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react';
 
+import { Trans } from '@lingui/macro';
 import { LinkIcon } from 'lucide-react';
 
 import type { Recipient, Template, TemplateDirectLink } from '@documenso/prisma/client';
@@ -27,7 +28,12 @@ export const TemplateDirectLinkDialogWrapper = ({ template }: TemplatePageViewPr
         }}
       >
         <LinkIcon className="mr-1.5 h-3.5 w-3.5" />
-        {template.directLink ? 'Manage' : 'Create'} Direct Link
+
+        {template.directLink ? (
+          <Trans>Manage Direct Link</Trans>
+        ) : (
+          <Trans>Create Direct Link</Trans>
+        )}
       </Button>
 
       <TemplateDirectLinkDialog
