@@ -17,9 +17,30 @@ export const getRecipientType = (recipient: Recipient) => {
     return 'opened';
   }
 
-  if (recipient.sendStatus === 'SENT' && recipient.signingStatus === 'NOT_SIGNED') {
+  if (
+    recipient.sendStatus === SendStatus.SENT &&
+    recipient.signingStatus === SigningStatus.NOT_SIGNED
+  ) {
     return 'waiting';
   }
 
   return 'unsigned';
+};
+
+export const getExtraRecipientsType = (extraRecipients: Recipient[]) => {
+  const types = extraRecipients.map((r) => getRecipientType(r));
+
+  if (types.includes('unsigned')) {
+    return 'unsigned';
+  }
+
+  if (types.includes('opened')) {
+    return 'opened';
+  }
+
+  if (types.includes('waiting')) {
+    return 'waiting';
+  }
+
+  return 'completed';
 };

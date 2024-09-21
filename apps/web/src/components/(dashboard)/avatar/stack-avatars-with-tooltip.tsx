@@ -46,7 +46,7 @@ export const StackAvatarsWithTooltip = ({
 
   return (
     <PopoverHover
-      trigger={children || <StackAvatars recipients={recipients} />}
+      trigger={children || <StackAvatars recipients={recipients.sort((a, b) => a.id - b.id)} />}
       contentProps={{
         className: 'flex flex-col gap-y-5 py-2',
         side: position,
@@ -65,7 +65,7 @@ export const StackAvatarsWithTooltip = ({
                 type={getRecipientType(recipient)}
                 fallbackText={recipientAbbreviation(recipient)}
               />
-              <div className="">
+              <div>
                 <p className="text-muted-foreground text-sm">{recipient.email}</p>
                 <p className="text-muted-foreground/70 text-xs">
                   {_(RECIPIENT_ROLES_DESCRIPTION[recipient.role].roleName)}
