@@ -365,6 +365,8 @@ export const AddFieldsFormPartial = ({
         return;
       }
 
+      setSelectedSigner(recipients.find((r) => r.email === field.signerEmail) ?? null);
+
       const { x: pageX, y: pageY } = getFieldPosition($page, node);
 
       update(index, {
@@ -373,7 +375,7 @@ export const AddFieldsFormPartial = ({
         pageY,
       });
     },
-    [getFieldPosition, localFields, update],
+    [getFieldPosition, localFields, recipients, update],
   );
 
   const onFieldCopy = useCallback(
@@ -572,10 +574,7 @@ export const AddFieldsFormPartial = ({
                       key={index}
                       recipientIndex={recipientIndex === -1 ? 0 : recipientIndex}
                       field={field}
-                      disabled={
-                        selectedSigner?.email !== field.signerEmail ||
-                        !canRecipientBeModified(selectedSigner, fields)
-                      }
+                      disabled={!selectedSigner || !canRecipientBeModified(selectedSigner, fields)}
                       minHeight={fieldBounds.current.height}
                       minWidth={fieldBounds.current.width}
                       passive={isFieldWithinBounds && !!selectedField}
@@ -664,7 +663,7 @@ export const AddFieldsFormPartial = ({
                                 },
                               )}
                               onSelect={() => {
-                                setSelectedSigner(recipient);
+                                setSelectedSigner(recipient); // here
                                 setShowRecipientsSelector(false);
                               }}
                             >
