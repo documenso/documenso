@@ -614,6 +614,6 @@ msgstr "Oui ! Documenso est proposé sous la licence open source GNU AGPL V3. Ce
 msgid "You can self-host Documenso for free or use our ready-to-use hosted version. The hosted version comes with additional support, painless scalability and more. Early adopters will get access to all features we build this year, for no additional cost! Forever! Yes, that includes multiple users per account later. If you want Documenso for your enterprise, we are happy to talk about your needs."
 msgstr "Vous pouvez auto-héberger Documenso gratuitement ou utiliser notre version hébergée prête à l'emploi. La version hébergée est accompagnée d'une assistance supplémentaire, d'une montée en charge sans effort et d'autres avantages. Les premiers adoptants auront accès à toutes les fonctionnalités que nous construirons cette année, sans coût supplémentaire ! Pour toujours ! Oui, cela inclut plusieurs utilisateurs par compte à l'avenir. Si vous souhaitez Documenso pour votre entreprise, nous serons heureux de discuter de vos besoins."
 
-#: apps/marketing/src/components/(marketing)/carousel.tsx:265
+#: apps/marketing/src/components/(marketing)/carousel.tsx:272
 msgid "Your browser does not support the video tag."
 msgstr "Votre navigateur ne prend pas en charge la balise vidéo."
