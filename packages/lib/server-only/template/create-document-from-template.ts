@@ -35,6 +35,7 @@ export type CreateDocumentFromTemplateResponse = Awaited<
 
 export type CreateDocumentFromTemplateOptions = {
   templateId: number;
+  externalId?: string | null;
   userId: number;
   teamId?: number;
   recipients: {
@@ -62,6 +63,7 @@ export type CreateDocumentFromTemplateOptions = {
 
 export const createDocumentFromTemplate = async ({
   templateId,
+  externalId,
   userId,
   teamId,
   recipients,
@@ -152,7 +154,7 @@ export const createDocumentFromTemplate = async ({
     const document = await tx.document.create({
       data: {
         source: DocumentSource.TEMPLATE,
-        externalId: template.externalId,
+        externalId: externalId || template.externalId,
         templateId: template.id,
         userId,
         teamId: template.teamId,
