@@ -44,6 +44,7 @@ export type SignatureFieldProps = {
   recipient: Recipient;
   onSignField?: (value: TSignFieldWithTokenMutationSchema) => Promise<void> | void;
   onUnsignField?: (value: TRemovedSignedFieldWithTokenMutationSchema) => Promise<void> | void;
+  enabledTypedSignature: boolean;
 };
 
 export const SignatureField = ({
@@ -51,6 +52,7 @@ export const SignatureField = ({
   recipient,
   onSignField,
   onUnsignField,
+  enabledTypedSignature,
 }: SignatureFieldProps) => {
   const router = useRouter();
 
@@ -230,7 +232,11 @@ export const SignatureField = ({
           </DialogTitle>
 
           <div>
-            <Accordion type="single" collapsible>
+            <Accordion
+              type="single"
+              collapsible
+              defaultValue={enabledTypedSignature ? undefined : 'signature'}
+            >
               <AccordionItem value="signature" className="border-none py-2">
                 <AccordionTrigger className="text-foreground rounded border px-3 py-2 text-left hover:bg-neutral-200/30 hover:no-underline">
                   <Trans>Draw</Trans>
@@ -253,27 +259,29 @@ export const SignatureField = ({
                 </AccordionContent>
               </AccordionItem>
 
-              <AccordionItem value="typed-signature" className="border-none py-2">
-                <AccordionTrigger className="text-foreground rounded border px-3 py-2 text-left hover:bg-neutral-200/30 hover:no-underline">
-                  <Trans>Type</Trans>
-                </AccordionTrigger>
+              {enabledTypedSignature && (
+                <AccordionItem value="typed-signature" className="border-none py-2">
+                  <AccordionTrigger className="text-foreground rounded border px-3 py-2 text-left hover:bg-neutral-200/30 hover:no-underline">
+                    <Trans>Type</Trans>
+                  </AccordionTrigger>
 
-                <AccordionContent className="text-muted-foreground -mx-1 px-1 pt-4 text-sm leading-relaxed [&>div]:pb-0">
-                  <div className="flex flex-col space-y-6">
-                    <div className="">
-                      <Label htmlFor="typed-signature">
-                        <Trans>Typed Signature</Trans>
-                      </Label>
+                  <AccordionContent className="text-muted-foreground -mx-1 px-1 pt-4 text-sm leading-relaxed [&>div]:pb-0">
+                    <div className="flex flex-col space-y-6">
+                      <div className="">
+                        <Label htmlFor="typed-signature">
+                          <Trans>Typed Signature</Trans>
+                        </Label>
 
-                      <Input
-                        id="typed-signature"
-                        className="my-2"
-                        onChange={(value) => setLocalSignature(value)}
-                      />
+                        <Input
+                          id="typed-signature"
+                          className="my-2"
+                          onChange={(value) => setLocalSignature(value)}
+                        />
+                      </div>
                     </div>
-                  </div>
-                </AccordionContent>
-              </AccordionItem>
+                  </AccordionContent>
+                </AccordionItem>
+              )}
             </Accordion>
           </div>
 
