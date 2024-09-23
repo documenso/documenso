@@ -421,7 +421,7 @@ msgstr "An error occurred while moving the template."
 #: apps/web/src/app/(signing)/sign/[token]/name-field.tsx:148
 #: apps/web/src/app/(signing)/sign/[token]/number-field.tsx:195
 #: apps/web/src/app/(signing)/sign/[token]/radio-field.tsx:129
-#: apps/web/src/app/(signing)/sign/[token]/signature-field.tsx:175
+#: apps/web/src/app/(signing)/sign/[token]/signature-field.tsx:185
 msgid "An error occurred while removing the signature."
 msgstr "An error occurred while removing the signature."
 
@@ -444,7 +444,7 @@ msgstr "An error occurred while sending your confirmation email"
 #: apps/web/src/app/(signing)/sign/[token]/name-field.tsx:122
 #: apps/web/src/app/(signing)/sign/[token]/number-field.tsx:150
 #: apps/web/src/app/(signing)/sign/[token]/radio-field.tsx:102
-#: apps/web/src/app/(signing)/sign/[token]/signature-field.tsx:149
+#: apps/web/src/app/(signing)/sign/[token]/signature-field.tsx:159
 #: apps/web/src/app/(signing)/sign/[token]/text-field.tsx:168
 msgid "An error occurred while signing the document."
 msgstr "An error occurred while signing the document."
@@ -664,7 +664,7 @@ msgstr "By enabling 2FA, you will be required to enter a code from your authenti
 #: apps/web/src/app/(signing)/sign/[token]/name-field.tsx:215
 #: apps/web/src/app/(signing)/sign/[token]/number-field.tsx:327
 #: apps/web/src/app/(signing)/sign/[token]/sign-dialog.tsx:113
-#: apps/web/src/app/(signing)/sign/[token]/signature-field.tsx:250
+#: apps/web/src/app/(signing)/sign/[token]/signature-field.tsx:296
 #: apps/web/src/app/(signing)/sign/[token]/text-field.tsx:333
 #: apps/web/src/app/(teams)/t/[teamUrl]/settings/team-transfer-status.tsx:121
 #: apps/web/src/components/(dashboard)/settings/token/delete-token-dialog.tsx:176
@@ -1364,6 +1364,10 @@ msgstr "Draft documents"
 msgid "Drafted Documents"
 msgstr "Drafted Documents"
 
+#: apps/web/src/app/(signing)/sign/[token]/signature-field.tsx:239
+msgid "Draw"
+msgstr "Draw"
+
 #: apps/web/src/app/(teams)/t/[teamUrl]/layout-billing-banner.tsx:121
 msgid "Due to an unpaid invoice, your team has been restricted. Please settle the payment to restore full access to your team."
 msgstr "Due to an unpaid invoice, your team has been restricted. Please settle the payment to restore full access to your team."
@@ -1514,8 +1518,8 @@ msgstr "Enter your text here"
 #: apps/web/src/app/(signing)/sign/[token]/number-field.tsx:194
 #: apps/web/src/app/(signing)/sign/[token]/radio-field.tsx:101
 #: apps/web/src/app/(signing)/sign/[token]/radio-field.tsx:128
-#: apps/web/src/app/(signing)/sign/[token]/signature-field.tsx:148
-#: apps/web/src/app/(signing)/sign/[token]/signature-field.tsx:174
+#: apps/web/src/app/(signing)/sign/[token]/signature-field.tsx:158
+#: apps/web/src/app/(signing)/sign/[token]/signature-field.tsx:184
 #: apps/web/src/app/(signing)/sign/[token]/text-field.tsx:167
 #: apps/web/src/app/(signing)/sign/[token]/text-field.tsx:195
 #: apps/web/src/components/(dashboard)/layout/verify-email-banner.tsx:54
@@ -2725,13 +2729,13 @@ msgstr "Show templates in your team public profile for your audience to sign and
 #: apps/web/src/app/(signing)/sign/[token]/document-action-auth-2fa.tsx:182
 #: apps/web/src/app/(signing)/sign/[token]/name-field.tsx:224
 #: apps/web/src/app/(signing)/sign/[token]/sign-dialog.tsx:124
-#: apps/web/src/app/(signing)/sign/[token]/signature-field.tsx:259
+#: apps/web/src/app/(signing)/sign/[token]/signature-field.tsx:305
 #: apps/web/src/components/ui/user-profile-skeleton.tsx:75
 #: apps/web/src/components/ui/user-profile-timur.tsx:81
 msgid "Sign"
 msgstr "Sign"
 
-#: apps/web/src/app/(signing)/sign/[token]/signature-field.tsx:219
+#: apps/web/src/app/(signing)/sign/[token]/signature-field.tsx:229
 msgid "Sign as {0} <0>({1})</0>"
 msgstr "Sign as {0} <0>({1})</0>"
 
@@ -2797,8 +2801,8 @@ msgstr "Sign Up with OIDC"
 
 #: apps/web/src/app/(dashboard)/admin/documents/[id]/recipient-item.tsx:88
 #: apps/web/src/app/(recipient)/d/[token]/sign-direct-template.tsx:338
-#: apps/web/src/app/(signing)/sign/[token]/signature-field.tsx:197
-#: apps/web/src/app/(signing)/sign/[token]/signature-field.tsx:227
+#: apps/web/src/app/(signing)/sign/[token]/signature-field.tsx:207
+#: apps/web/src/app/(signing)/sign/[token]/signature-field.tsx:246
 #: apps/web/src/app/embed/direct/[[...url]]/client.tsx:391
 #: apps/web/src/app/embed/sign/[[...url]]/client.tsx:270
 #: apps/web/src/components/forms/profile.tsx:132
@@ -3536,6 +3540,7 @@ msgstr "Two-factor authentication has been disabled for your account. You will n
 
 #: apps/web/src/app/(dashboard)/admin/documents/[id]/recipient-item.tsx:73
 #: apps/web/src/app/(dashboard)/templates/data-table-templates.tsx:67
+#: apps/web/src/app/(signing)/sign/[token]/signature-field.tsx:261
 msgid "Type"
 msgstr "Type"
 
@@ -3546,6 +3551,10 @@ msgstr "Type 'delete' to confirm"
 #: apps/web/src/components/(dashboard)/common/command-menu.tsx:186
 msgid "Type a command or search..."
 msgstr "Type a command or search..."
+
+#: apps/web/src/app/(signing)/sign/[token]/signature-field.tsx:268
+msgid "Typed Signature"
+msgstr "Typed Signature"
 
 #: apps/web/src/app/(unauthenticated)/verify-email/page.tsx:26
 msgid "Uh oh! Looks like you're missing a token"

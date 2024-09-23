@@ -18,8 +18,15 @@ import type {
   TRemovedSignedFieldWithTokenMutationSchema,
   TSignFieldWithTokenMutationSchema,
 } from '@documenso/trpc/server/field-router/schema';
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from '@documenso/ui/primitives/accordion';
 import { Button } from '@documenso/ui/primitives/button';
 import { Dialog, DialogContent, DialogFooter, DialogTitle } from '@documenso/ui/primitives/dialog';
+import { Input } from '@documenso/ui/primitives/input';
 import { Label } from '@documenso/ui/primitives/label';
 import { SignaturePad } from '@documenso/ui/primitives/signature-pad';
 import { useToast } from '@documenso/ui/primitives/use-toast';
@@ -222,16 +229,52 @@ export const SignatureField = ({
             </Trans>
           </DialogTitle>
 
-          <div className="">
-            <Label htmlFor="signature">
-              <Trans>Signature</Trans>
-            </Label>
+          <div>
+            <Accordion type="single" collapsible>
+              <AccordionItem value="signature" className="border-none py-2">
+                <AccordionTrigger className="text-foreground rounded border px-3 py-2 text-left hover:bg-neutral-200/30 hover:no-underline">
+                  <Trans>Draw</Trans>
+                </AccordionTrigger>
 
-            <SignaturePad
-              id="signature"
-              className="border-border mt-2 h-44 w-full rounded-md border"
-              onChange={(value) => setLocalSignature(value)}
-            />
+                <AccordionContent className="text-muted-foreground -mx-1 px-1 pt-4 text-sm leading-relaxed [&>div]:pb-0">
+                  <div className="flex flex-col space-y-6">
+                    <div className="">
+                      <Label htmlFor="signature">
+                        <Trans>Signature</Trans>
+                      </Label>
+
+                      <SignaturePad
+                        id="signature"
+                        className="border-border my-2 h-44 w-full rounded-md border"
+                        onChange={(value) => setLocalSignature(value)}
+                      />
+                    </div>
+                  </div>
+                </AccordionContent>
+              </AccordionItem>
+
+              <AccordionItem value="typed-signature" className="border-none py-2">
+                <AccordionTrigger className="text-foreground rounded border px-3 py-2 text-left hover:bg-neutral-200/30 hover:no-underline">
+                  <Trans>Type</Trans>
+                </AccordionTrigger>
+
+                <AccordionContent className="text-muted-foreground -mx-1 px-1 pt-4 text-sm leading-relaxed [&>div]:pb-0">
+                  <div className="flex flex-col space-y-6">
+                    <div className="">
+                      <Label htmlFor="typed-signature">
+                        <Trans>Typed Signature</Trans>
+                      </Label>
+
+                      <Input
+                        id="typed-signature"
+                        className="my-2"
+                        onChange={(value) => setLocalSignature(value)}
+                      />
+                    </div>
+                  </div>
+                </AccordionContent>
+              </AccordionItem>
+            </Accordion>
           </div>
 
           <SigningDisclosure />
