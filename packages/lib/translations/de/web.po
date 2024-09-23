@@ -789,7 +789,7 @@ msgstr "Unterzeichnung abschließen"
 msgid "Complete Viewing"
 msgstr "Betrachten abschließen"
 
-#: apps/web/src/components/(dashboard)/avatar/stack-avatars-with-tooltip.tsx:58
+#: apps/web/src/components/(dashboard)/avatar/stack-avatars-with-tooltip.tsx:62
 #: apps/web/src/components/formatter/document-status.tsx:28
 msgid "Completed"
 msgstr "Abgeschlossen"
@@ -2143,7 +2143,7 @@ msgstr "Sobald Sie den QR-Code gescannt oder den Code manuell eingegeben haben, 
 msgid "Oops! Something went wrong."
 msgstr "Hoppla! Etwas ist schief gelaufen."
 
-#: apps/web/src/components/(dashboard)/avatar/stack-avatars-with-tooltip.tsx:97
+#: apps/web/src/components/(dashboard)/avatar/stack-avatars-with-tooltip.tsx:101
 msgid "Opened"
 msgstr "Geöffnet"
 
@@ -3636,7 +3636,7 @@ msgstr "Unable to sign in"
 msgid "Unauthorized"
 msgstr "Unauthorized"
 
-#: apps/web/src/components/(dashboard)/avatar/stack-avatars-with-tooltip.tsx:112
+#: apps/web/src/components/(dashboard)/avatar/stack-avatars-with-tooltip.tsx:116
 msgid "Uncompleted"
 msgstr "Uncompleted"
 
@@ -3848,7 +3848,7 @@ msgstr "Teams ansehen"
 msgid "Viewed"
 msgstr "Angesehen"
 
-#: apps/web/src/components/(dashboard)/avatar/stack-avatars-with-tooltip.tsx:82
+#: apps/web/src/components/(dashboard)/avatar/stack-avatars-with-tooltip.tsx:86
 msgid "Waiting"
 msgstr "Warten"
 

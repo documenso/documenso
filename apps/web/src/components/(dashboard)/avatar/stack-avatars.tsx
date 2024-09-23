@@ -21,7 +21,7 @@ export function StackAvatars({ recipients }: { recipients: Recipient[] }) {
       if (index === 4 && remainingItems > 0) {
         return (
           <StackAvatar
-            key={`extra-${recipient.id}`}
+            key="extra-recipient"
             first={first}
             zIndex={String(zIndex - index * 10)}
             type={getExtraRecipientsType(recipients.slice(4))}
