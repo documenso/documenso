@@ -17,9 +17,9 @@
     "@documenso/prisma": "*",
     "luxon": "^3.4.0",
     "micro": "^10.0.1",
-    "next": "14.2.6",
+    "next": "15.0.0-canary.165",
     "next-auth": "4.24.5",
-    "react": "^18",
+    "react": "19.0.0-rc-e740d4b1-20240919",
     "ts-pattern": "^5.0.5",
     "zod": "^3.22.4"
   }

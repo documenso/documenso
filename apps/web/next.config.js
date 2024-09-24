@@ -25,13 +25,20 @@ const FONT_NOTO_SANS_BYTES = fs.readFileSync(
 /** @type {import('next').NextConfig} */
 const config = {
   output: process.env.DOCKER_OUTPUT ? 'standalone' : undefined,
+  outputFileTracingRoot: path.join(__dirname, '../../'),
+  serverExternalPackages: ['@node-rs/bcrypt', '@documenso/pdf-sign', 'playwright'],
   experimental: {
-    outputFileTracingRoot: path.join(__dirname, '../../'),
-    serverComponentsExternalPackages: ['@node-rs/bcrypt', '@documenso/pdf-sign', 'playwright'],
     serverActions: {
       bodySizeLimit: '50mb',
     },
     swcPlugins: [['@lingui/swc-plugin', {}]],
+    turbo: {
+      rules: {
+        '*.po': {
+          loaders: ['@lingui/loader'],
+        },
+      },
+    },
   },
   reactStrictMode: true,
   transpilePackages: [
@@ -49,26 +56,11 @@ const config = {
     FONT_CAVEAT_URI: `data:font/ttf;base64,${FONT_CAVEAT_BYTES.toString('base64')}`,
     FONT_NOTO_SANS_URI: `data:font/ttf;base64,${FONT_NOTO_SANS_BYTES.toString('base64')}`,
   },
-  modularizeImports: {
-    'lucide-react': {
-      transform: 'lucide-react/dist/esm/icons/{{ kebabCase member }}',
-    },
-  },
-  webpack: (config, { isServer }) => {
-    // fixes: Module not found: Can’t resolve ‘../build/Release/canvas.node’
-    if (isServer) {
-      config.resolve.alias.canvas = false;
-    }
-
-    config.module.rules.push({
-      test: /\.po$/,
-      use: {
-        loader: '@lingui/loader',
-      },
-    });
-
-    return config;
-  },
+  // modularizeImports: {
+  //   'lucide-react': {
+  //     transform: 'lucide-react/dist/esm/icons/{{ kebabCase member }}',
+  //   },
+  // },
   async rewrites() {
     return [
       {

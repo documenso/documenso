@@ -16,12 +16,12 @@
     "@documenso/tailwind-config": "*",
     "@documenso/trpc": "*",
     "@documenso/ui": "*",
-    "next": "14.2.6",
+    "next": "15.0.0-canary.165",
     "next-plausible": "^3.12.0",
     "nextra": "^2.13.4",
     "nextra-theme-docs": "^2.13.4",
-    "react": "^18",
-    "react-dom": "^18"
+    "react": "19.0.0-rc-e740d4b1-20240919",
+    "react-dom": "19.0.0-rc-e740d4b1-20240919"
   },
   "devDependencies": {
     "@types/node": "^20",
