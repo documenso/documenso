@@ -64,6 +64,11 @@ export async function getSigningVolume({
                 id: true,
               },
             },
+            Subscription: {
+              select: {
+                planId: true,
+              },
+            },
           },
         },
         team: {
@@ -77,6 +82,11 @@ export async function getSigningVolume({
               },
               select: {
                 id: true,
+              },
+            },
+            subscription: {
+              select: {
+                planId: true,
               },
             },
           },
@@ -102,6 +112,8 @@ export async function getSigningVolume({
       name,
       signingVolume,
       createdAt: subscription.createdAt,
+      planId:
+        subscription.User?.Subscription?.[0]?.planId || subscription.team?.subscription?.planId,
     };
   });
 

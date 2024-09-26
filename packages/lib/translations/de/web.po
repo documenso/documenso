@@ -961,7 +961,7 @@ msgid "Create your account and start using state-of-the-art document signing. Op
 msgstr ""
 
 #: apps/web/src/app/(dashboard)/admin/documents/document-results.tsx:62
-#: apps/web/src/app/(dashboard)/admin/leaderboard/data-table-leaderboard.tsx:89
+#: apps/web/src/app/(dashboard)/admin/leaderboard/data-table-leaderboard.tsx:98
 #: apps/web/src/app/(dashboard)/documents/[id]/document-page-view-information.tsx:35
 #: apps/web/src/app/(dashboard)/documents/data-table.tsx:54
 #: apps/web/src/app/(dashboard)/settings/security/passkeys/user-passkeys-data-table.tsx:65
@@ -1989,7 +1989,7 @@ msgid "My templates"
 msgstr ""
 
 #: apps/web/src/app/(dashboard)/admin/documents/[id]/recipient-item.tsx:148
-#: apps/web/src/app/(dashboard)/admin/leaderboard/data-table-leaderboard.tsx:61
+#: apps/web/src/app/(dashboard)/admin/leaderboard/data-table-leaderboard.tsx:56
 #: apps/web/src/app/(dashboard)/admin/users/[id]/page.tsx:99
 #: apps/web/src/app/(dashboard)/admin/users/data-table-users.tsx:66
 #: apps/web/src/app/(dashboard)/settings/security/passkeys/user-passkeys-data-table-actions.tsx:144
@@ -2594,7 +2594,7 @@ msgstr ""
 msgid "Search by document title"
 msgstr ""
 
-#: apps/web/src/app/(dashboard)/admin/leaderboard/data-table-leaderboard.tsx:140
+#: apps/web/src/app/(dashboard)/admin/leaderboard/data-table-leaderboard.tsx:149
 #: apps/web/src/app/(dashboard)/admin/users/data-table-users.tsx:144
 msgid "Search by name or email"
 msgstr ""
@@ -2816,7 +2816,7 @@ msgstr ""
 msgid "Signing up..."
 msgstr ""
 
-#: apps/web/src/app/(dashboard)/admin/leaderboard/data-table-leaderboard.tsx:75
+#: apps/web/src/app/(dashboard)/admin/leaderboard/data-table-leaderboard.tsx:84
 #: apps/web/src/app/(dashboard)/admin/leaderboard/page.tsx:46
 msgid "Signing Volume"
 msgstr ""

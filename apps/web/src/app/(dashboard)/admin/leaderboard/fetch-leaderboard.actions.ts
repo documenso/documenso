@@ -21,5 +21,7 @@ export async function search({ search, page, perPage, sortBy, sortOrder }: Searc
 
   const results = await getSigningVolume({ search, page, perPage, sortBy, sortOrder });
 
+  console.log('results', results);
+
   return results;
 }

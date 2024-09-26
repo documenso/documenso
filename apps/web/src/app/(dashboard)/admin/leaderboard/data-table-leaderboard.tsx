@@ -18,6 +18,7 @@ export type SigningVolume = {
   name: string;
   signingVolume: number;
   createdAt: Date;
+  planId: string;
 };
 
 type LeaderboardTableProps = {
@@ -47,12 +48,6 @@ export const LeaderboardTable = ({
   const columns = useMemo(() => {
     return [
       {
-        header: 'ID',
-        accessorKey: 'id',
-        cell: ({ row }) => <div>{row.original.id}</div>,
-        size: 60,
-      },
-      {
         header: () => (
           <div
             className="flex cursor-pointer items-center"
@@ -63,7 +58,21 @@ export const LeaderboardTable = ({
           </div>
         ),
         accessorKey: 'name',
-        cell: ({ row }) => <div>{row.getValue('name')}</div>,
+        cell: ({ row }) => {
+          console.log('row.original', row.original);
+
+          return (
+            <div>
+              <a
+                className="text-primary underline"
+                href={`https://dashboard.stripe.com/subscriptions/${row.original.planId}`}
+                target="_blank"
+              >
+                {row.getValue('name')}
+              </a>
+            </div>
+          );
+        },
         size: 250,
       },
       {
