@@ -185,34 +185,70 @@ export const SignaturePad = ({
 
     onChange?.(null);
 
+    if (typedSignature) {
+      setTypedSignature('');
+    }
+
     setLines([]);
     setCurrentLine([]);
   };
 
+  const renderTypedSignature = () => {
+    if ($el.current && typedSignature) {
+      const ctx = $el.current.getContext('2d');
+      if (ctx) {
+        ctx.clearRect(0, 0, $el.current.width, $el.current.height);
+        ctx.font = '48px Caveat';
+        ctx.fillStyle = selectedColor;
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText(typedSignature, $el.current.width / 2, $el.current.height / 2);
+      }
+    }
+  };
+
+  const handleTypedSignatureChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setTypedSignature(event.target.value);
+    onChange?.($el.current?.toDataURL() || null);
+  };
+
+  useEffect(() => {
+    renderTypedSignature();
+  }, [typedSignature, selectedColor]);
+
   const onUndoClick = () => {
-    if (lines.length === 0) {
+    if (lines.length === 0 && typedSignature.length === 0) {
       return;
     }
 
-    const newLines = lines.slice(0, -1);
-    setLines(newLines);
+    if (typedSignature.length > 0) {
+      const newTypedSignature = typedSignature.slice(0, -1);
+      setTypedSignature(newTypedSignature);
+      // You might want to call onChange here as well
+      // onChange?.(newTypedSignature);
+    } else {
+      const newLines = lines.slice(0, -1);
+      setLines(newLines);
 
-    // Clear the canvas
-    if ($el.current) {
-      const ctx = $el.current.getContext('2d');
-      const { width, height } = $el.current;
-      ctx?.clearRect(0, 0, width, height);
+      // Clear and redraw the canvas
+      if ($el.current) {
+        const ctx = $el.current.getContext('2d');
+        const { width, height } = $el.current;
+        ctx?.clearRect(0, 0, width, height);
 
-      if (typeof defaultValue === 'string' && $imageData.current) {
-        ctx?.putImageData($imageData.current, 0, 0);
+        if (typeof defaultValue === 'string' && $imageData.current) {
+          ctx?.putImageData($imageData.current, 0, 0);
+        }
+
+        newLines.forEach((line) => {
+          const pathData = new Path2D(
+            getSvgPathFromStroke(getStroke(line, perfectFreehandOptions)),
+          );
+          ctx?.fill(pathData);
+        });
+
+        onChange?.($el.current.toDataURL());
       }
-
-      newLines.forEach((line) => {
-        const pathData = new Path2D(getSvgPathFromStroke(getStroke(line, perfectFreehandOptions)));
-        ctx?.fill(pathData);
-      });
-
-      onChange?.($el.current.toDataURL());
     }
   };
 
@@ -270,12 +306,14 @@ export const SignaturePad = ({
       {enabledTypedSignature && (
         <div
           className={cn('ml-4 pb-1', {
-            'ml-10': lines.length > 0,
+            'ml-10': lines.length > 0 || typedSignature.length > 0,
           })}
         >
           <Input
             placeholder="Type your signature"
             className="w-1/2 border-none p-0 focus-visible:outline-none focus-visible:ring-0 focus-visible:ring-offset-0"
+            value={typedSignature}
+            onChange={handleTypedSignatureChange}
           />
         </div>
       )}
@@ -328,13 +366,13 @@ export const SignaturePad = ({
         </button>
       </div>
 
-      {lines.length > 0 && (
+      {(lines.length > 0 || typedSignature.length > 0) && (
         <div className="absolute bottom-4 left-4 flex gap-2">
           <button
             type="button"
             title="undo"
             className="focus-visible:ring-ring ring-offset-background text-muted-foreground/60 hover:text-muted-foreground rounded-full p-0 text-[0.688rem] focus-visible:outline-none focus-visible:ring-2"
-            onClick={() => onUndoClick()}
+            onClick={onUndoClick}
           >
             <Undo2 className="h-4 w-4" />
             <span className="sr-only">Undo</span>
