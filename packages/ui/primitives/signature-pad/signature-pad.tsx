@@ -9,6 +9,7 @@ import type { StrokeOptions } from 'perfect-freehand';
 import { getStroke } from 'perfect-freehand';
 
 import { unsafe_useEffectOnce } from '@documenso/lib/client-only/hooks/use-effect-once';
+import { Input } from '@documenso/ui/primitives/input';
 import {
   Select,
   SelectContent,
@@ -27,6 +28,7 @@ export type SignaturePadProps = Omit<HTMLAttributes<HTMLCanvasElement>, 'onChang
   onChange?: (_signatureDataUrl: string | null) => void;
   containerClassName?: string;
   disabled?: boolean;
+  enabledTypedSignature?: boolean;
 };
 
 export const SignaturePad = ({
@@ -35,6 +37,7 @@ export const SignaturePad = ({
   defaultValue,
   onChange,
   disabled = false,
+  enabledTypedSignature = true,
   ...props
 }: SignaturePadProps) => {
   const $el = useRef<HTMLCanvasElement>(null);
@@ -44,6 +47,7 @@ export const SignaturePad = ({
   const [lines, setLines] = useState<Point[][]>([]);
   const [currentLine, setCurrentLine] = useState<Point[]>([]);
   const [selectedColor, setSelectedColor] = useState('black');
+  const [typedSignature, setTypedSignature] = useState('');
 
   const perfectFreehandOptions = useMemo(() => {
     const size = $el.current ? Math.min($el.current.height, $el.current.width) * 0.03 : 10;
@@ -262,6 +266,19 @@ export const SignaturePad = ({
         onPointerEnter={(event) => onMouseEnter(event)}
         {...props}
       />
+
+      {enabledTypedSignature && (
+        <div
+          className={cn('ml-4 pb-1', {
+            'ml-10': lines.length > 0,
+          })}
+        >
+          <Input
+            placeholder="Type your signature"
+            className="w-1/2 border-none p-0 focus-visible:outline-none focus-visible:ring-0 focus-visible:ring-offset-0"
+          />
+        </div>
+      )}
 
       <div className="text-foreground absolute right-2 top-2 filter">
         <Select defaultValue={selectedColor} onValueChange={(value) => setSelectedColor(value)}>

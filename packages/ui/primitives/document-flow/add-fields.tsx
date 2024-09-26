@@ -741,7 +741,7 @@ export const AddFieldsFormPartial = ({
                     onCheckedChange={handleTypedSignatureChange}
                     checkClassName="text-white"
                   />
-                  Enforce handwritting signature
+                  Allow typed signature
                 </div>
               )}
 
