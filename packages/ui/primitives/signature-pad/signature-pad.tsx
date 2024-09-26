@@ -214,6 +214,7 @@ export const SignaturePad = ({
 
   useEffect(() => {
     renderTypedSignature();
+    onChange?.($el.current?.toDataURL() || null);
   }, [typedSignature, selectedColor]);
 
   const onUndoClick = () => {
