@@ -4,7 +4,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 import { Caveat } from 'next/font/google';
 
-import { Settings2, Trash } from 'lucide-react';
+import { CopyPlus, Settings2, Trash } from 'lucide-react';
 import { createPortal } from 'react-dom';
 import { Rnd } from 'react-rnd';
 import { match } from 'ts-pattern';
@@ -38,7 +38,10 @@ export type FieldItemProps = {
   onResize?: (_node: HTMLElement) => void;
   onMove?: (_node: HTMLElement) => void;
   onRemove?: () => void;
+  onDuplicate?: () => void;
   onAdvancedSettings?: () => void;
+  onFocus?: () => void;
+  onBlur?: () => void;
   recipientIndex?: number;
   hideRecipients?: boolean;
 };
@@ -52,6 +55,9 @@ export const FieldItem = ({
   onResize,
   onMove,
   onRemove,
+  onDuplicate,
+  onFocus,
+  onBlur,
   onAdvancedSettings,
   recipientIndex = 0,
   hideRecipients = false,
@@ -115,18 +121,29 @@ export const FieldItem = ({
     };
   }, [calculateCoords]);
 
-  const handleClickOutsideField = (event: MouseEvent) => {
-    if (settingsActive && $el.current && !event.composedPath().includes($el.current)) {
-      setSettingsActive(false);
-    }
-  };
-
   useEffect(() => {
-    document.body.addEventListener('click', handleClickOutsideField);
-    return () => {
-      document.body.removeEventListener('click', handleClickOutsideField);
+    const onClickOutsideOfField = (event: MouseEvent) => {
+      const isOutsideOfField = $el.current && !event.composedPath().includes($el.current);
+
+      setSettingsActive((active) => {
+        if (active && isOutsideOfField) {
+          return false;
+        }
+
+        return active;
+      });
+
+      if (isOutsideOfField) {
+        onBlur?.();
+      }
     };
-  }, [settingsActive]);
+
+    document.body.addEventListener('click', onClickOutsideOfField);
+
+    return () => {
+      document.body.removeEventListener('click', onClickOutsideOfField);
+    };
+  }, [onBlur]);
 
   const hasFieldMetaValues = (
     fieldType: string,
@@ -184,13 +201,16 @@ export const FieldItem = ({
       <div
         className={cn(
           'relative flex h-full w-full items-center justify-center bg-white',
+          !fixedSize && '[container-type:size]',
           signerStyles.default.base,
           signerStyles.default.fieldItem,
         )}
         onClick={() => {
           setSettingsActive((prev) => !prev);
+          onFocus?.();
         }}
         ref={$el}
+        data-field-id={field.nativeId}
       >
         {match(field.type)
           .with('CHECKBOX', () => <CheckboxField field={field} />)
@@ -205,10 +225,10 @@ export const FieldItem = ({
           ))}
 
         {!hideRecipients && (
-          <div className="absolute -right-6 top-0 z-20 hidden h-full w-6 items-center justify-center group-hover:flex">
+          <div className="absolute -right-5 top-0 z-20 hidden h-full w-5 items-center justify-center group-hover:flex">
             <div
               className={cn(
-                'flex h-7 w-6 flex-col items-center justify-center rounded-r-lg text-[0.625rem] font-bold text-white',
+                'flex h-5 w-5 flex-col items-center justify-center rounded-r-md text-[0.5rem] font-bold text-white',
                 signerStyles.default.fieldItemInitials,
                 {
                   '!opacity-50': disabled || passive,
@@ -224,7 +244,7 @@ export const FieldItem = ({
 
       {!disabled && settingsActive && (
         <div className="mt-1 flex justify-center">
-          <div className="dark:bg-background group flex items-center justify-evenly rounded-md border gap-x-1 bg-gray-900 p-0.5">
+          <div className="dark:bg-background group flex items-center justify-evenly gap-x-1 rounded-md border bg-gray-900 p-0.5">
             {advancedField && (
               <button
                 className="dark:text-muted-foreground/50 dark:hover:text-muted-foreground dark:hover:bg-foreground/10 rounded-sm p-1.5 text-gray-400 transition-colors hover:bg-white/10 hover:text-gray-100"
@@ -234,6 +254,15 @@ export const FieldItem = ({
                 <Settings2 className="h-3 w-3" />
               </button>
             )}
+
+            <button
+              className="dark:text-muted-foreground/50 dark:hover:text-muted-foreground dark:hover:bg-foreground/10 rounded-sm p-1.5 text-gray-400 transition-colors hover:bg-white/10 hover:text-gray-100"
+              onClick={onDuplicate}
+              onTouchEnd={onDuplicate}
+            >
+              <CopyPlus className="h-3 w-3" />
+            </button>
+
             <button
               className="dark:text-muted-foreground/50 dark:hover:text-muted-foreground dark:hover:bg-foreground/10 rounded-sm p-1.5 text-gray-400 transition-colors hover:bg-white/10 hover:text-gray-100"
               onClick={onRemove}

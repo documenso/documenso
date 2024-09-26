@@ -1,3 +1,4 @@
+import type { MessageDescriptor } from '@lingui/core';
 import { z } from 'zod';
 
 import { ZFieldMetaSchema } from '@documenso/lib/types/field-meta';
@@ -46,6 +47,7 @@ export type TDocumentFlowFormSchema = z.infer<typeof ZDocumentFlowFormSchema>;
 export const FRIENDLY_FIELD_TYPE: Record<FieldType, string> = {
   [FieldType.SIGNATURE]: 'Signature',
   [FieldType.FREE_SIGNATURE]: 'Free Signature',
+  [FieldType.INITIALS]: 'Initials',
   [FieldType.TEXT]: 'Text',
   [FieldType.DATE]: 'Date',
   [FieldType.EMAIL]: 'Email',
@@ -57,8 +59,8 @@ export const FRIENDLY_FIELD_TYPE: Record<FieldType, string> = {
 };
 
 export interface DocumentFlowStep {
-  title: string;
-  description: string;
+  title: MessageDescriptor;
+  description: MessageDescriptor;
   stepIndex?: number;
   onBackStep?: () => unknown;
   onNextStep?: () => unknown;

@@ -1,5 +1,8 @@
 'use client';
 
+import { Trans, msg } from '@lingui/macro';
+import { useLingui } from '@lingui/react';
+
 import { trpc } from '@documenso/trpc/react';
 import { Button } from '@documenso/ui/primitives/button';
 import { useToast } from '@documenso/ui/primitives/use-toast';
@@ -9,6 +12,7 @@ export type AcceptTeamInvitationButtonProps = {
 };
 
 export const AcceptTeamInvitationButton = ({ teamId }: AcceptTeamInvitationButtonProps) => {
+  const { _ } = useLingui();
   const { toast } = useToast();
 
   const {
@@ -18,17 +22,17 @@ export const AcceptTeamInvitationButton = ({ teamId }: AcceptTeamInvitationButto
   } = trpc.team.acceptTeamInvitation.useMutation({
     onSuccess: () => {
       toast({
-        title: 'Success',
-        description: 'Accepted team invitation',
+        title: _(msg`Success`),
+        description: _(msg`Accepted team invitation`),
         duration: 5000,
       });
     },
     onError: () => {
       toast({
-        title: 'Something went wrong',
+        title: _(msg`Something went wrong`),
+        description: _(msg`Unable to join this team at this time.`),
         variant: 'destructive',
         duration: 10000,
-        description: 'Unable to join this team at this time.',
       });
     },
   });
@@ -39,7 +43,7 @@ export const AcceptTeamInvitationButton = ({ teamId }: AcceptTeamInvitationButto
       loading={isLoading}
       disabled={isLoading || isSuccess}
     >
-      Accept
+      <Trans>Accept</Trans>
     </Button>
   );
 };

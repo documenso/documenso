@@ -5,6 +5,7 @@ import { useEffect, useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 
+import { Trans } from '@lingui/macro';
 import { PlusIcon } from 'lucide-react';
 
 import LogoIcon from '@documenso/assets/logo_icon.png';
@@ -63,9 +64,11 @@ export const ProfileHeader = ({ user, teams = [] }: ProfileHeaderProps) => {
 
         <div className="flex flex-row items-center justify-center">
           <p className="text-muted-foreground mr-4">
-            <span className="text-sm sm:hidden">Want your own public profile?</span>
+            <span className="text-sm sm:hidden">
+              <Trans>Want your own public profile?</Trans>
+            </span>
             <span className="hidden text-sm sm:block">
-              Like to have your own public profile with agreements?
+              <Trans>Like to have your own public profile with agreements?</Trans>
             </span>
           </p>
 
@@ -73,10 +76,12 @@ export const ProfileHeader = ({ user, teams = [] }: ProfileHeaderProps) => {
             <Link href="/signup">
               <div className="hidden flex-row items-center sm:flex">
                 <PlusIcon className="mr-1 h-5 w-5" />
-                Create now
+                <Trans>Create now</Trans>
               </div>
 
-              <span className="sm:hidden">Create</span>
+              <span className="sm:hidden">
+                <Trans>Create</Trans>
+              </span>
             </Link>
           </Button>
         </div>

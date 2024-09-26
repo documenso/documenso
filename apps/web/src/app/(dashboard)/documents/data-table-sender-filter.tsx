@@ -2,6 +2,9 @@
 
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 
+import { Trans, msg } from '@lingui/macro';
+import { useLingui } from '@lingui/react';
+
 import { useIsMounted } from '@documenso/lib/client-only/hooks/use-is-mounted';
 import { parseToIntegerArray } from '@documenso/lib/utils/params';
 import { trpc } from '@documenso/trpc/react';
@@ -12,6 +15,8 @@ type DataTableSenderFilterProps = {
 };
 
 export const DataTableSenderFilter = ({ teamId }: DataTableSenderFilterProps) => {
+  const { _ } = useLingui();
+
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const router = useRouter();
@@ -49,11 +54,13 @@ export const DataTableSenderFilter = ({ teamId }: DataTableSenderFilterProps) =>
     <MultiSelectCombobox
       emptySelectionPlaceholder={
         <p className="text-muted-foreground font-normal">
-          <span className="text-muted-foreground/70">Sender:</span> All
+          <Trans>
+            <span className="text-muted-foreground/70">Sender:</span> All
+          </Trans>
         </p>
       }
       enableClearAllButton={true}
-      inputPlaceholder="Search"
+      inputPlaceholder={msg`Search`}
       loading={!isMounted || isInitialLoading}
       options={comboBoxOptions}
       selectedValues={senderIds}

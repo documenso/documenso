@@ -7,7 +7,7 @@ import { getToken } from 'next-auth/jwt';
 import { TEAM_URL_ROOT_REGEX } from '@documenso/lib/constants/teams';
 import { formatDocumentsPath } from '@documenso/lib/utils/teams';
 
-export default async function middleware(req: NextRequest) {
+async function middleware(req: NextRequest): Promise<NextResponse> {
   const preferredTeamUrl = cookies().get('preferred-team-url');
 
   const referrer = req.headers.get('referer');
@@ -75,7 +75,29 @@ export default async function middleware(req: NextRequest) {
     return response;
   }
 
+  if (req.nextUrl.pathname.startsWith('/embed')) {
+    const res = NextResponse.next();
+
+    // Allow third parties to iframe the document.
+    res.headers.set('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+    res.headers.set('Access-Control-Allow-Origin', '*');
+    res.headers.set('Content-Security-Policy', 'frame-ancestors *');
+    res.headers.set('Referrer-Policy', 'strict-origin-when-cross-origin');
+    res.headers.set('X-Content-Type-Options', 'nosniff');
+    res.headers.set('X-Frame-Options', 'ALLOW-ALL');
+
+    return res;
+  }
+
   return NextResponse.next();
+}
+
+export default async function middlewareWrapper(req: NextRequest) {
+  const response = await middleware(req);
+
+  // Can place anything that needs to be set on the response here.
+
+  return response;
 }
 
 export const config = {

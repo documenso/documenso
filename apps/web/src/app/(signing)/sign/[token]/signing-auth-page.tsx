@@ -2,10 +2,12 @@
 
 import { useState } from 'react';
 
-import { DateTime } from 'luxon';
+import { useRouter } from 'next/navigation';
+
+import { Trans, msg } from '@lingui/macro';
+import { useLingui } from '@lingui/react';
 import { signOut } from 'next-auth/react';
 
-import { trpc } from '@documenso/trpc/react';
 import { Button } from '@documenso/ui/primitives/button';
 import { useToast } from '@documenso/ui/primitives/use-toast';
 
@@ -15,30 +17,26 @@ export type SigningAuthPageViewProps = {
 };
 
 export const SigningAuthPageView = ({ email, emailHasAccount }: SigningAuthPageViewProps) => {
+  const { _ } = useLingui();
   const { toast } = useToast();
 
-  const [isSigningOut, setIsSigningOut] = useState(false);
+  const router = useRouter();
 
-  const { mutateAsync: encryptSecondaryData } = trpc.crypto.encryptSecondaryData.useMutation();
+  const [isSigningOut, setIsSigningOut] = useState(false);
 
   const handleChangeAccount = async (email: string) => {
     try {
       setIsSigningOut(true);
 
-      const encryptedEmail = await encryptSecondaryData({
-        data: email,
-        expiresAt: DateTime.now().plus({ days: 1 }).toMillis(),
+      await signOut({
+        redirect: false,
       });
 
-      await signOut({
-        callbackUrl: emailHasAccount
-          ? `/signin?email=${encodeURIComponent(encryptedEmail)}`
-          : `/signup?email=${encodeURIComponent(encryptedEmail)}`,
-      });
+      router.push(emailHasAccount ? `/signin#email=${email}` : `/signup#email=${email}`);
     } catch {
       toast({
-        title: 'Something went wrong',
-        description: 'We were unable to log you out at this time.',
+        title: _(msg`Something went wrong`),
+        description: _(msg`We were unable to log you out at this time.`),
         duration: 10000,
         variant: 'destructive',
       });
@@ -50,10 +48,14 @@ export const SigningAuthPageView = ({ email, emailHasAccount }: SigningAuthPageV
   return (
     <div className="mx-auto flex h-[70vh] w-full max-w-md flex-col items-center justify-center">
       <div>
-        <h1 className="text-3xl font-semibold">Authentication required</h1>
+        <h1 className="text-3xl font-semibold">
+          <Trans>Authentication required</Trans>
+        </h1>
 
         <p className="text-muted-foreground mt-2 text-sm">
-          You need to be logged in as <strong>{email}</strong> to view this page.
+          <Trans>
+            You need to be logged in as <strong>{email}</strong> to view this page.
+          </Trans>
         </p>
 
         <Button
@@ -62,7 +64,7 @@ export const SigningAuthPageView = ({ email, emailHasAccount }: SigningAuthPageV
           onClick={async () => handleChangeAccount(email)}
           loading={isSigningOut}
         >
-          {emailHasAccount ? 'Login' : 'Sign up'}
+          {emailHasAccount ? <Trans>Login</Trans> : <Trans>Sign up</Trans>}
         </Button>
       </div>
     </div>

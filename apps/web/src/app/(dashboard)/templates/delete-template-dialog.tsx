@@ -1,5 +1,8 @@
 import { useRouter } from 'next/navigation';
 
+import { Trans, msg } from '@lingui/macro';
+import { useLingui } from '@lingui/react';
+
 import { trpc as trpcReact } from '@documenso/trpc/react';
 import { Button } from '@documenso/ui/primitives/button';
 import {
@@ -27,6 +30,7 @@ export const DeleteTemplateDialog = ({
 }: DeleteTemplateDialogProps) => {
   const router = useRouter();
 
+  const { _ } = useLingui();
   const { toast } = useToast();
 
   const { mutateAsync: deleteTemplate, isLoading } = trpcReact.template.deleteTemplate.useMutation({
@@ -34,8 +38,8 @@ export const DeleteTemplateDialog = ({
       router.refresh();
 
       toast({
-        title: 'Template deleted',
-        description: 'Your template has been successfully deleted.',
+        title: _(msg`Template deleted`),
+        description: _(msg`Your template has been successfully deleted.`),
         duration: 5000,
       });
 
@@ -43,8 +47,8 @@ export const DeleteTemplateDialog = ({
     },
     onError: () => {
       toast({
-        title: 'Something went wrong',
-        description: 'This template could not be deleted at this time. Please try again.',
+        title: _(msg`Something went wrong`),
+        description: _(msg`This template could not be deleted at this time. Please try again.`),
         variant: 'destructive',
         duration: 7500,
       });
@@ -55,11 +59,15 @@ export const DeleteTemplateDialog = ({
     <Dialog open={open} onOpenChange={(value) => !isLoading && onOpenChange(value)}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Do you want to delete this template?</DialogTitle>
+          <DialogTitle>
+            <Trans>Do you want to delete this template?</Trans>
+          </DialogTitle>
 
           <DialogDescription>
-            Please note that this action is irreversible. Once confirmed, your template will be
-            permanently deleted.
+            <Trans>
+              Please note that this action is irreversible. Once confirmed, your template will be
+              permanently deleted.
+            </Trans>
           </DialogDescription>
         </DialogHeader>
 
@@ -70,7 +78,7 @@ export const DeleteTemplateDialog = ({
             disabled={isLoading}
             onClick={() => onOpenChange(false)}
           >
-            Cancel
+            <Trans>Cancel</Trans>
           </Button>
 
           <Button
@@ -79,7 +87,7 @@ export const DeleteTemplateDialog = ({
             loading={isLoading}
             onClick={async () => deleteTemplate({ id, teamId })}
           >
-            Delete
+            <Trans>Delete</Trans>
           </Button>
         </DialogFooter>
       </DialogContent>

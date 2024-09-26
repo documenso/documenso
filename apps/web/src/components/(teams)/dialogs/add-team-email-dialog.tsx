@@ -5,6 +5,8 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 
 import { zodResolver } from '@hookform/resolvers/zod';
+import { Trans, msg } from '@lingui/macro';
+import { useLingui } from '@lingui/react';
 import type * as DialogPrimitive from '@radix-ui/react-dialog';
 import { Plus } from 'lucide-react';
 import { useForm } from 'react-hook-form';
@@ -51,6 +53,7 @@ export const AddTeamEmailDialog = ({ teamId, trigger, ...props }: AddTeamEmailDi
 
   const [open, setOpen] = useState(false);
 
+  const { _ } = useLingui();
   const { toast } = useToast();
 
   const form = useForm<TCreateTeamEmailFormSchema>({
@@ -73,8 +76,8 @@ export const AddTeamEmailDialog = ({ teamId, trigger, ...props }: AddTeamEmailDi
       });
 
       toast({
-        title: 'Success',
-        description: 'We have sent a confirmation email for verification.',
+        title: _(msg`Success`),
+        description: _(msg`We have sent a confirmation email for verification.`),
         duration: 5000,
       });
 
@@ -87,17 +90,18 @@ export const AddTeamEmailDialog = ({ teamId, trigger, ...props }: AddTeamEmailDi
       if (error.code === AppErrorCode.ALREADY_EXISTS) {
         form.setError('email', {
           type: 'manual',
-          message: 'This email is already being used by another team.',
+          message: _(msg`This email is already being used by another team.`),
         });
 
         return;
       }
 
       toast({
-        title: 'An unknown error occurred',
+        title: _(msg`An unknown error occurred`),
+        description: _(
+          msg`We encountered an unknown error while attempting to add this email. Please try again later.`,
+        ),
         variant: 'destructive',
-        description:
-          'We encountered an unknown error while attempting to add this email. Please try again later.',
       });
     }
   };
@@ -118,17 +122,19 @@ export const AddTeamEmailDialog = ({ teamId, trigger, ...props }: AddTeamEmailDi
         {trigger ?? (
           <Button variant="outline" loading={isLoading} className="bg-background">
             <Plus className="-ml-1 mr-1 h-5 w-5" />
-            Add email
+            <Trans>Add email</Trans>
           </Button>
         )}
       </DialogTrigger>
 
       <DialogContent position="center">
         <DialogHeader>
-          <DialogTitle>Add team email</DialogTitle>
+          <DialogTitle>
+            <Trans>Add team email</Trans>
+          </DialogTitle>
 
           <DialogDescription className="mt-4">
-            A verification email will be sent to the provided email.
+            <Trans>A verification email will be sent to the provided email.</Trans>
           </DialogDescription>
         </DialogHeader>
 
@@ -143,7 +149,9 @@ export const AddTeamEmailDialog = ({ teamId, trigger, ...props }: AddTeamEmailDi
                 name="name"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel required>Name</FormLabel>
+                    <FormLabel required>
+                      <Trans>Name</Trans>
+                    </FormLabel>
                     <FormControl>
                       <Input className="bg-background" placeholder="eg. Legal" {...field} />
                     </FormControl>
@@ -157,7 +165,9 @@ export const AddTeamEmailDialog = ({ teamId, trigger, ...props }: AddTeamEmailDi
                 name="email"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel required>Email</FormLabel>
+                    <FormLabel required>
+                      <Trans>Email</Trans>
+                    </FormLabel>
                     <FormControl>
                       <Input
                         className="bg-background"
@@ -172,11 +182,11 @@ export const AddTeamEmailDialog = ({ teamId, trigger, ...props }: AddTeamEmailDi
 
               <DialogFooter>
                 <Button type="button" variant="secondary" onClick={() => setOpen(false)}>
-                  Cancel
+                  <Trans>Cancel</Trans>
                 </Button>
 
                 <Button type="submit" loading={form.formState.isSubmitting}>
-                  Add
+                  <Trans>Add</Trans>
                 </Button>
               </DialogFooter>
             </fieldset>

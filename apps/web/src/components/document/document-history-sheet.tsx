@@ -2,7 +2,10 @@
 
 import { useMemo, useState } from 'react';
 
+import { Trans } from '@lingui/macro';
+import { useLingui } from '@lingui/react';
 import { ArrowRightIcon, Loader } from 'lucide-react';
+import { DateTime } from 'luxon';
 import { match } from 'ts-pattern';
 import { UAParser } from 'ua-parser-js';
 
@@ -16,8 +19,6 @@ import { Avatar, AvatarFallback } from '@documenso/ui/primitives/avatar';
 import { Badge } from '@documenso/ui/primitives/badge';
 import { Button } from '@documenso/ui/primitives/button';
 import { Sheet, SheetContent, SheetTrigger } from '@documenso/ui/primitives/sheet';
-
-import { LocaleDate } from '~/components/formatter/locale-date';
 
 import { DocumentHistorySheetChanges } from './document-history-sheet-changes';
 
@@ -36,6 +37,8 @@ export const DocumentHistorySheet = ({
   onMenuOpenChange,
   children,
 }: DocumentHistorySheetProps) => {
+  const { i18n } = useLingui();
+
   const [isUserDetailsVisible, setIsUserDetailsVisible] = useState(false);
 
   const {
@@ -97,12 +100,18 @@ export const DocumentHistorySheet = ({
         className="flex w-full max-w-[500px] flex-col overflow-y-auto p-0"
       >
         <div className="text-foreground px-6 pt-6">
-          <h1 className="text-lg font-medium">Document history</h1>
+          <h1 className="text-lg font-medium">
+            <Trans>Document history</Trans>
+          </h1>
           <button
             className="text-muted-foreground text-sm"
             onClick={() => setIsUserDetailsVisible(!isUserDetailsVisible)}
           >
-            {isUserDetailsVisible ? 'Hide' : 'Show'} additional information
+            {isUserDetailsVisible ? (
+              <Trans>Hide additional information</Trans>
+            ) : (
+              <Trans>Show additional information</Trans>
+            )}
           </button>
         </div>
 
@@ -114,12 +123,14 @@ export const DocumentHistorySheet = ({
 
         {isLoadingError && (
           <div className="flex h-full flex-col items-center justify-center">
-            <p className="text-foreground/80 text-sm">Unable to load document history</p>
+            <p className="text-foreground/80 text-sm">
+              <Trans>Unable to load document history</Trans>
+            </p>
             <button
               onClick={async () => refetch()}
               className="text-foreground/70 hover:text-muted-foreground mt-2 text-sm"
             >
-              Click here to retry
+              <Trans>Click here to retry</Trans>
             </button>
           </div>
         )}
@@ -144,7 +155,9 @@ export const DocumentHistorySheet = ({
                       {formatDocumentAuditLogActionString(auditLog, userId)}
                     </p>
                     <p className="text-foreground/50 text-xs">
-                      <LocaleDate date={auditLog.createdAt} format="d MMM, yyyy HH:MM a" />
+                      {DateTime.fromJSDate(auditLog.createdAt)
+                        .setLocale(i18n.locales?.[0] || i18n.locale)
+                        .toFormat('d MMM, yyyy HH:MM a')}
                     </p>
                   </div>
                 </div>
@@ -322,6 +335,23 @@ export const DocumentHistorySheet = ({
                       ]}
                     />
                   ))
+                  .with(
+                    { type: DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_VISIBILITY_UPDATED },
+                    ({ data }) => (
+                      <DocumentHistorySheetChanges
+                        values={[
+                          {
+                            key: 'Old',
+                            value: data.from,
+                          },
+                          {
+                            key: 'New',
+                            value: data.to,
+                          },
+                        ]}
+                      />
+                    ),
+                  )
                   .exhaustive()}
 
                 {isUserDetailsVisible && (

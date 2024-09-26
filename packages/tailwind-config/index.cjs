@@ -58,7 +58,7 @@ module.exports = {
         },
         widget: {
           DEFAULT: 'hsl(var(--widget))',
-          // foreground: 'hsl(var(--widget-foreground))',
+          foreground: 'hsl(var(--widget-foreground))',
         },
         documenso: {
           DEFAULT: '#A2E771',

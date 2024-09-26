@@ -44,6 +44,10 @@ export default async function OSSFriendsPage() {
           src={backgroundPattern}
           alt="background pattern"
           className="-mr-[15vw] -mt-[15vh] h-full max-h-[150vh] scale-125 object-cover dark:contrast-[70%] dark:invert dark:sepia md:-mr-[50vw] md:scale-150 lg:scale-[175%]"
+          style={{
+            mask: 'radial-gradient(rgba(255, 255, 255, 1) 0%, transparent 67%)',
+            WebkitMask: 'radial-gradient(rgba(255, 255, 255, 1) 0%, transparent 67%)',
+          }}
         />
       </div>
     </div>

@@ -7,6 +7,7 @@ import {
   diffDocumentMetaChanges,
 } from '@documenso/lib/utils/document-audit-logs';
 import { prisma } from '@documenso/prisma';
+import type { DocumentSigningOrder } from '@documenso/prisma/client';
 
 export type CreateDocumentMetaOptions = {
   documentId: number;
@@ -16,6 +17,7 @@ export type CreateDocumentMetaOptions = {
   password?: string;
   dateFormat?: string;
   redirectUrl?: string;
+  signingOrder?: DocumentSigningOrder;
   userId: number;
   requestMetadata: RequestMetadata;
 };
@@ -29,6 +31,7 @@ export const upsertDocumentMeta = async ({
   password,
   userId,
   redirectUrl,
+  signingOrder,
   requestMetadata,
 }: CreateDocumentMetaOptions) => {
   const user = await prisma.user.findFirstOrThrow({
@@ -78,6 +81,7 @@ export const upsertDocumentMeta = async ({
         timezone,
         documentId,
         redirectUrl,
+        signingOrder,
       },
       update: {
         subject,
@@ -86,6 +90,7 @@ export const upsertDocumentMeta = async ({
         dateFormat,
         timezone,
         redirectUrl,
+        signingOrder,
       },
     });
 

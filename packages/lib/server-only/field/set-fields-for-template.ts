@@ -107,7 +107,10 @@ export const setFieldsForTemplate = async ({
         }
       }
 
-      if (field.type === FieldType.CHECKBOX && field.fieldMeta) {
+      if (field.type === FieldType.CHECKBOX) {
+        if (!field.fieldMeta) {
+          throw new Error('Checkbox field is missing required metadata');
+        }
         const checkboxFieldParsedMeta = ZCheckboxFieldMeta.parse(field.fieldMeta);
         const errors = validateCheckboxField(
           checkboxFieldParsedMeta?.values?.map((item) => item.value) ?? [],
@@ -118,7 +121,10 @@ export const setFieldsForTemplate = async ({
         }
       }
 
-      if (field.type === FieldType.RADIO && field.fieldMeta) {
+      if (field.type === FieldType.RADIO) {
+        if (!field.fieldMeta) {
+          throw new Error('Radio field is missing required metadata');
+        }
         const radioFieldParsedMeta = ZRadioFieldMeta.parse(field.fieldMeta);
         const checkedRadioFieldValue = radioFieldParsedMeta.values?.find(
           (option) => option.checked,
@@ -129,7 +135,10 @@ export const setFieldsForTemplate = async ({
         }
       }
 
-      if (field.type === FieldType.DROPDOWN && field.fieldMeta) {
+      if (field.type === FieldType.DROPDOWN) {
+        if (!field.fieldMeta) {
+          throw new Error('Dropdown field is missing required metadata');
+        }
         const dropdownFieldParsedMeta = ZDropdownFieldMeta.parse(field.fieldMeta);
         const errors = validateDropdownField(undefined, dropdownFieldParsedMeta);
         if (errors.length > 0) {

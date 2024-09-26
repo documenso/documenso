@@ -42,10 +42,8 @@ test.describe('[EE_ONLY]', () => {
     await page.getByPlaceholder('Email').fill('recipient1@documenso.com');
     await page.getByPlaceholder('Name').fill('Recipient 1');
     await page.getByRole('button', { name: 'Add Placeholder Recipient' }).click();
-    await page
-      .getByRole('textbox', { name: 'Email', exact: true })
-      .fill('recipient2@documenso.com');
-    await page.getByRole('textbox', { name: 'Name', exact: true }).nth(1).fill('Recipient 2');
+    await page.getByPlaceholder('Email').nth(1).fill('recipient2@documenso.com');
+    await page.getByPlaceholder('Name').nth(1).fill('Recipient 2');
 
     // Display advanced settings.
     await page.getByLabel('Show advanced settings').check();
@@ -94,8 +92,8 @@ test('[TEMPLATE_FLOW]: add placeholder', async ({ page }) => {
   await page.getByPlaceholder('Email').fill('recipient1@documenso.com');
   await page.getByPlaceholder('Name').fill('Recipient 1');
   await page.getByRole('button', { name: 'Add Placeholder Recipient' }).click();
-  await page.getByRole('textbox', { name: 'Email', exact: true }).fill('recipient2@documenso.com');
-  await page.getByRole('textbox', { name: 'Name', exact: true }).nth(1).fill('Recipient 2');
+  await page.getByPlaceholder('Email').nth(1).fill('recipient2@documenso.com');
+  await page.getByPlaceholder('Name').nth(1).fill('Recipient 2');
 
   // Advanced settings should not be visible for non EE users.
   await expect(page.getByLabel('Show advanced settings')).toBeHidden();

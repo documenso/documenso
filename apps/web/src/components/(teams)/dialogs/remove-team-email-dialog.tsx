@@ -4,6 +4,9 @@ import { useState } from 'react';
 
 import { useRouter } from 'next/navigation';
 
+import { Trans, msg } from '@lingui/macro';
+import { useLingui } from '@lingui/react';
+
 import { NEXT_PUBLIC_WEBAPP_URL } from '@documenso/lib/constants/app';
 import { extractInitials } from '@documenso/lib/utils/recipient-formatter';
 import type { Prisma } from '@documenso/prisma/client';
@@ -42,24 +45,26 @@ export type RemoveTeamEmailDialogProps = {
 export const RemoveTeamEmailDialog = ({ trigger, teamName, team }: RemoveTeamEmailDialogProps) => {
   const [open, setOpen] = useState(false);
 
+  const { _ } = useLingui();
   const { toast } = useToast();
+
   const router = useRouter();
 
   const { mutateAsync: deleteTeamEmail, isLoading: isDeletingTeamEmail } =
     trpc.team.deleteTeamEmail.useMutation({
       onSuccess: () => {
         toast({
-          title: 'Success',
-          description: 'Team email has been removed',
+          title: _(msg`Success`),
+          description: _(msg`Team email has been removed`),
           duration: 5000,
         });
       },
       onError: () => {
         toast({
-          title: 'Something went wrong',
+          title: _(msg`Something went wrong`),
+          description: _(msg`Unable to remove team email at this time. Please try again.`),
           variant: 'destructive',
           duration: 10000,
-          description: 'Unable to remove team email at this time. Please try again.',
         });
       },
     });
@@ -68,17 +73,17 @@ export const RemoveTeamEmailDialog = ({ trigger, teamName, team }: RemoveTeamEma
     trpc.team.deleteTeamEmailVerification.useMutation({
       onSuccess: () => {
         toast({
-          title: 'Success',
-          description: 'Email verification has been removed',
+          title: _(msg`Success`),
+          description: _(msg`Email verification has been removed`),
           duration: 5000,
         });
       },
       onError: () => {
         toast({
-          title: 'Something went wrong',
+          title: _(msg`Something went wrong`),
+          description: _(msg`Unable to remove email verification at this time. Please try again.`),
           variant: 'destructive',
           duration: 10000,
-          description: 'Unable to remove email verification at this time. Please try again.',
         });
       },
     });
@@ -98,16 +103,24 @@ export const RemoveTeamEmailDialog = ({ trigger, teamName, team }: RemoveTeamEma
   return (
     <Dialog open={open} onOpenChange={(value) => setOpen(value)}>
       <DialogTrigger asChild>
-        {trigger ?? <Button variant="destructive">Remove team email</Button>}
+        {trigger ?? (
+          <Button variant="destructive">
+            <Trans>Remove team email</Trans>
+          </Button>
+        )}
       </DialogTrigger>
 
       <DialogContent position="center">
         <DialogHeader>
-          <DialogTitle>Are you sure?</DialogTitle>
+          <DialogTitle>
+            <Trans>Are you sure?</Trans>
+          </DialogTitle>
 
           <DialogDescription className="mt-4">
-            You are about to delete the following team email from{' '}
-            <span className="font-semibold">{teamName}</span>.
+            <Trans>
+              You are about to delete the following team email from{' '}
+              <span className="font-semibold">{teamName}</span>.
+            </Trans>
           </DialogDescription>
         </DialogHeader>
 
@@ -134,7 +147,7 @@ export const RemoveTeamEmailDialog = ({ trigger, teamName, team }: RemoveTeamEma
         <fieldset disabled={isDeletingTeamEmail || isDeletingTeamEmailVerification}>
           <DialogFooter>
             <Button type="button" variant="secondary" onClick={() => setOpen(false)}>
-              Cancel
+              <Trans>Cancel</Trans>
             </Button>
 
             <Button
@@ -143,7 +156,7 @@ export const RemoveTeamEmailDialog = ({ trigger, teamName, team }: RemoveTeamEma
               loading={isDeletingTeamEmail || isDeletingTeamEmailVerification}
               onClick={async () => onRemove()}
             >
-              Remove
+              <Trans>Remove</Trans>
             </Button>
           </DialogFooter>
         </fieldset>

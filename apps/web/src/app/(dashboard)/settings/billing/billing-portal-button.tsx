@@ -2,6 +2,9 @@
 
 import { useState } from 'react';
 
+import { Trans, msg } from '@lingui/macro';
+import { useLingui } from '@lingui/react';
+
 import { Button } from '@documenso/ui/primitives/button';
 import { useToast } from '@documenso/ui/primitives/use-toast';
 
@@ -12,6 +15,7 @@ export type BillingPortalButtonProps = {
 };
 
 export const BillingPortalButton = ({ buttonProps }: BillingPortalButtonProps) => {
+  const { _ } = useLingui();
   const { toast } = useToast();
 
   const [isFetchingPortalUrl, setIsFetchingPortalUrl] = useState(false);
@@ -32,16 +36,18 @@ export const BillingPortalButton = ({ buttonProps }: BillingPortalButtonProps) =
 
       window.open(sessionUrl, '_blank');
     } catch (e) {
-      let description =
-        'We are unable to proceed to the billing portal at this time. Please try again, or contact support.';
+      let description = _(
+        msg`We are unable to proceed to the billing portal at this time. Please try again, or contact support.`,
+      );
 
       if (e.message === 'CUSTOMER_NOT_FOUND') {
-        description =
-          'You do not currently have a customer record, this should not happen. Please contact support for assistance.';
+        description = _(
+          msg`You do not currently have a customer record, this should not happen. Please contact support for assistance.`,
+        );
       }
 
       toast({
-        title: 'Something went wrong',
+        title: _(msg`Something went wrong`),
         description,
         variant: 'destructive',
         duration: 10000,
@@ -57,7 +63,7 @@ export const BillingPortalButton = ({ buttonProps }: BillingPortalButtonProps) =
       onClick={async () => handleFetchPortalUrl()}
       loading={isFetchingPortalUrl}
     >
-      Manage Subscription
+      <Trans>Manage Subscription</Trans>
     </Button>
   );
 };

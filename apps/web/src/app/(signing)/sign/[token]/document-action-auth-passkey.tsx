@@ -1,6 +1,8 @@
 import { useEffect, useState } from 'react';
 
 import { zodResolver } from '@hookform/resolvers/zod';
+import { Trans, msg } from '@lingui/macro';
+import { useLingui } from '@lingui/react';
 import { browserSupportsWebAuthn, startAuthentication } from '@simplewebauthn/browser';
 import { Loader } from 'lucide-react';
 import { useForm } from 'react-hook-form';
@@ -54,6 +56,8 @@ export const DocumentActionAuthPasskey = ({
   open,
   onOpenChange,
 }: DocumentActionAuthPasskeyProps) => {
+  const { _ } = useLingui();
+
   const {
     recipient,
     passkeyData,
@@ -123,6 +127,7 @@ export const DocumentActionAuthPasskey = ({
       <div className="space-y-4">
         <Alert variant="warning">
           <AlertDescription>
+            {/* Todo: Translate */}
             Your browser does not support passkeys, which is required to {actionVerb.toLowerCase()}{' '}
             this {actionTarget.toLowerCase()}.
           </AlertDescription>
@@ -130,7 +135,7 @@ export const DocumentActionAuthPasskey = ({
 
         <DialogFooter>
           <Button type="button" variant="secondary" onClick={() => onOpenChange(false)}>
-            Close
+            <Trans>Close</Trans>
           </Button>
         </DialogFooter>
       </div>
@@ -149,16 +154,18 @@ export const DocumentActionAuthPasskey = ({
     return (
       <div className="h-28 space-y-4">
         <Alert variant="destructive">
-          <AlertDescription>Something went wrong while loading your passkeys.</AlertDescription>
+          <AlertDescription>
+            <Trans>Something went wrong while loading your passkeys.</Trans>
+          </AlertDescription>
         </Alert>
 
         <DialogFooter>
           <Button type="button" variant="secondary" onClick={() => onOpenChange(false)}>
-            Cancel
+            <Trans>Cancel</Trans>
           </Button>
 
           <Button type="button" onClick={() => void refetchPasskeys()}>
-            Retry
+            <Trans>Retry</Trans>
           </Button>
         </DialogFooter>
       </div>
@@ -170,6 +177,7 @@ export const DocumentActionAuthPasskey = ({
       <div className="space-y-4">
         <Alert variant="warning">
           <AlertDescription>
+            {/* Todo: Translate */}
             {recipient.role === RecipientRole.VIEWER && actionTarget === 'DOCUMENT'
               ? 'You need to setup a passkey to mark this document as viewed.'
               : `You need to setup a passkey to ${actionVerb.toLowerCase()} this ${actionTarget.toLowerCase()}.`}
@@ -178,12 +186,16 @@ export const DocumentActionAuthPasskey = ({
 
         <DialogFooter>
           <Button type="button" variant="secondary" onClick={() => onOpenChange(false)}>
-            Cancel
+            <Trans>Cancel</Trans>
           </Button>
 
           <CreatePasskeyDialog
             onSuccess={async () => refetchPasskeys()}
-            trigger={<Button>Setup</Button>}
+            trigger={
+              <Button>
+                <Trans>Setup</Trans>
+              </Button>
+            }
           />
         </DialogFooter>
       </div>
@@ -207,7 +219,7 @@ export const DocumentActionAuthPasskey = ({
                       <SelectTrigger className="bg-background text-muted-foreground">
                         <SelectValue
                           data-testid="documentAccessSelectValue"
-                          placeholder="Select passkey"
+                          placeholder={_(msg`Select passkey`)}
                         />
                       </SelectTrigger>
 

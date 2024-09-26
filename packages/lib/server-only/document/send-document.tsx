@@ -1,13 +1,18 @@
-import { sealDocument } from '@documenso/lib/server-only/document/seal-document';
 import { DOCUMENT_AUDIT_LOG_TYPE } from '@documenso/lib/types/document-audit-logs';
 import type { RequestMetadata } from '@documenso/lib/universal/extract-request-metadata';
 import { putPdfFile } from '@documenso/lib/universal/upload/put-file';
 import { createDocumentAuditLogData } from '@documenso/lib/utils/document-audit-logs';
 import { prisma } from '@documenso/prisma';
-import { DocumentStatus, RecipientRole, SendStatus, SigningStatus } from '@documenso/prisma/client';
+import {
+  DocumentSigningOrder,
+  DocumentStatus,
+  RecipientRole,
+  SendStatus,
+  SigningStatus,
+} from '@documenso/prisma/client';
 import { WebhookTriggerEvents } from '@documenso/prisma/client';
 
-import { jobsClient } from '../../jobs/client';
+import { jobs } from '../../jobs/client';
 import { getFile } from '../../universal/upload/get-file';
 import { insertFormValuesInPdf } from '../pdf/insert-form-values-in-pdf';
 import { triggerWebhook } from '../webhooks/trigger/trigger-webhook';
@@ -58,7 +63,9 @@ export const sendDocument = async ({
           }),
     },
     include: {
-      Recipient: true,
+      Recipient: {
+        orderBy: [{ signingOrder: { sort: 'asc', nulls: 'last' } }, { id: 'asc' }],
+      },
       documentMeta: true,
       documentData: true,
     },
@@ -74,6 +81,21 @@ export const sendDocument = async ({
 
   if (document.status === DocumentStatus.COMPLETED) {
     throw new Error('Can not send completed document');
+  }
+
+  const signingOrder = document.documentMeta?.signingOrder || DocumentSigningOrder.PARALLEL;
+
+  let recipientsToNotify = document.Recipient;
+
+  if (signingOrder === DocumentSigningOrder.SEQUENTIAL) {
+    // Get the currently active recipient.
+    recipientsToNotify = document.Recipient.filter(
+      (r) => r.signingStatus === SigningStatus.NOT_SIGNED && r.role !== RecipientRole.CC,
+    ).slice(0, 1);
+
+    // Secondary filter so we aren't resending if the current active recipient has already
+    // received the document.
+    recipientsToNotify.filter((r) => r.sendStatus !== SendStatus.SENT);
   }
 
   const { documentData } = document;
@@ -136,12 +158,12 @@ export const sendDocument = async ({
 
   if (sendEmail) {
     await Promise.all(
-      document.Recipient.map(async (recipient) => {
+      recipientsToNotify.map(async (recipient) => {
         if (recipient.sendStatus === SendStatus.SENT || recipient.role === RecipientRole.CC) {
           return;
         }
 
-        await jobsClient.triggerJob({
+        await jobs.triggerJob({
           name: 'send.signing.requested.email',
           payload: {
             userId,
@@ -160,7 +182,13 @@ export const sendDocument = async ({
   );
 
   if (allRecipientsHaveNoActionToTake) {
-    await sealDocument({ documentId, requestMetadata });
+    await jobs.triggerJob({
+      name: 'internal.seal-document',
+      payload: {
+        documentId,
+        requestMetadata,
+      },
+    });
 
     // Keep the return type the same for the `sendDocument` method
     return await prisma.document.findFirstOrThrow({

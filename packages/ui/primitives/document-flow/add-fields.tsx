@@ -4,12 +4,14 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 import { Caveat } from 'next/font/google';
 
+import { Trans, msg } from '@lingui/macro';
 import {
   CalendarDays,
   Check,
   CheckSquare,
   ChevronDown,
   ChevronsUpDown,
+  Contact,
   Disc,
   Hash,
   Info,
@@ -18,27 +20,35 @@ import {
   User,
 } from 'lucide-react';
 import { useFieldArray, useForm } from 'react-hook-form';
+import { useHotkeys } from 'react-hotkeys-hook';
+import { prop, sortBy } from 'remeda';
 
 import { getBoundingClientRect } from '@documenso/lib/client-only/get-bounding-client-rect';
 import { useDocumentElement } from '@documenso/lib/client-only/hooks/use-document-element';
 import { PDF_VIEWER_PAGE_SELECTOR } from '@documenso/lib/constants/pdf-viewer';
-import { RECIPIENT_ROLES_DESCRIPTION } from '@documenso/lib/constants/recipient-roles';
+import { RECIPIENT_ROLES_DESCRIPTION_ENG } from '@documenso/lib/constants/recipient-roles';
 import {
   type TFieldMetaSchema as FieldMeta,
   ZFieldMetaSchema,
 } from '@documenso/lib/types/field-meta';
 import { nanoid } from '@documenso/lib/universal/id';
+import {
+  canRecipientBeModified,
+  canRecipientFieldsBeModified,
+} from '@documenso/lib/utils/recipients';
 import type { Field, Recipient } from '@documenso/prisma/client';
 import { FieldType, RecipientRole, SendStatus } from '@documenso/prisma/client';
 
 import { getSignerColorStyles, useSignerColors } from '../../lib/signer-colors';
 import { cn } from '../../lib/utils';
+import { Alert, AlertDescription } from '../alert';
 import { Button } from '../button';
 import { Card, CardContent } from '../card';
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem } from '../command';
 import { Popover, PopoverContent, PopoverTrigger } from '../popover';
 import { useStep } from '../stepper';
 import { Tooltip, TooltipContent, TooltipTrigger } from '../tooltip';
+import { useToast } from '../use-toast';
 import type { TAddFieldsFormSchema } from './add-fields.types';
 import {
   DocumentFlowFormContainerActions,
@@ -59,8 +69,8 @@ const fontCaveat = Caveat({
   variable: '--font-caveat',
 });
 
-const MIN_HEIGHT_PX = 40;
-const MIN_WIDTH_PX = 140;
+const MIN_HEIGHT_PX = 20;
+const MIN_WIDTH_PX = 80;
 
 export type FieldFormType = {
   nativeId?: number;
@@ -102,6 +112,8 @@ export const AddFieldsFormPartial = ({
   isDocumentPdfLoaded,
   teamId,
 }: AddFieldsFormProps) => {
+  const { toast } = useToast();
+
   const [isMissingSignatureDialogVisible, setIsMissingSignatureDialogVisible] = useState(false);
 
   const { isWithinPageBounds, getFieldPosition, getPage } = useDocumentElement();
@@ -135,7 +147,12 @@ export const AddFieldsFormPartial = ({
     },
   });
 
+  useHotkeys(['ctrl+c', 'meta+c'], (evt) => onFieldCopy(evt));
+  useHotkeys(['ctrl+v', 'meta+v'], (evt) => onFieldPaste(evt));
+  useHotkeys(['ctrl+d', 'meta+d'], (evt) => onFieldCopy(evt, { duplicate: true }));
+
   const onFormSubmit = handleSubmit(onSubmit);
+
   const handleSavedFieldSettings = (fieldState: FieldMeta) => {
     const initialValues = getValues();
 
@@ -168,12 +185,16 @@ export const AddFieldsFormPartial = ({
   const [selectedField, setSelectedField] = useState<FieldType | null>(null);
   const [selectedSigner, setSelectedSigner] = useState<Recipient | null>(null);
   const [showRecipientsSelector, setShowRecipientsSelector] = useState(false);
+  const [lastActiveField, setLastActiveField] = useState<TAddFieldsFormSchema['fields'][0] | null>(
+    null,
+  );
+  const [fieldClipboard, setFieldClipboard] = useState<TAddFieldsFormSchema['fields'][0] | null>(
+    null,
+  );
   const selectedSignerIndex = recipients.findIndex((r) => r.id === selectedSigner?.id);
   const selectedSignerStyles = useSignerColors(
     selectedSignerIndex === -1 ? 0 : selectedSignerIndex,
   );
-
-  const hasSelectedSignerBeenSent = selectedSigner?.sendStatus === SendStatus.SENT;
 
   const filterFieldsWithEmptyValues = (fields: typeof localFields, fieldType: string) =>
     fields
@@ -207,11 +228,13 @@ export const AddFieldsFormPartial = ({
   const hasErrors =
     emptyCheckboxFields.length > 0 || emptyRadioFields.length > 0 || emptySelectFields.length > 0;
 
-  const isFieldsDisabled =
-    !selectedSigner ||
-    hasSelectedSignerBeenSent ||
-    selectedSigner?.role === RecipientRole.VIEWER ||
-    selectedSigner?.role === RecipientRole.CC;
+  const isFieldsDisabled = useMemo(() => {
+    if (!selectedSigner) {
+      return true;
+    }
+
+    return !canRecipientFieldsBeModified(selectedSigner, fields);
+  }, [selectedSigner, fields]);
 
   const [isFieldWithinBounds, setIsFieldWithinBounds] = useState(false);
   const [coords, setCoords] = useState({
@@ -280,7 +303,7 @@ export const AddFieldsFormPartial = ({
       pageX -= fieldPageWidth / 2;
       pageY -= fieldPageHeight / 2;
 
-      append({
+      const field = {
         formId: nanoid(12),
         type: selectedField,
         pageNumber,
@@ -290,7 +313,9 @@ export const AddFieldsFormPartial = ({
         pageHeight: fieldPageHeight,
         signerEmail: selectedSigner.email,
         fieldMeta: undefined,
-      });
+      };
+
+      append(field);
 
       setIsFieldWithinBounds(false);
       setSelectedField(null);
@@ -351,6 +376,57 @@ export const AddFieldsFormPartial = ({
     [getFieldPosition, localFields, update],
   );
 
+  const onFieldCopy = useCallback(
+    (event?: KeyboardEvent | null, options?: { duplicate?: boolean }) => {
+      const { duplicate = false } = options ?? {};
+
+      if (lastActiveField) {
+        event?.preventDefault();
+
+        if (!duplicate) {
+          setFieldClipboard(lastActiveField);
+
+          toast({
+            title: 'Copied field',
+            description: 'Copied field to clipboard',
+          });
+
+          return;
+        }
+
+        const newField: TAddFieldsFormSchema['fields'][0] = {
+          ...structuredClone(lastActiveField),
+          formId: nanoid(12),
+          signerEmail: selectedSigner?.email ?? lastActiveField.signerEmail,
+          pageX: lastActiveField.pageX + 3,
+          pageY: lastActiveField.pageY + 3,
+        };
+
+        append(newField);
+      }
+    },
+    [append, lastActiveField, selectedSigner?.email, toast],
+  );
+
+  const onFieldPaste = useCallback(
+    (event: KeyboardEvent) => {
+      if (fieldClipboard) {
+        event.preventDefault();
+
+        const copiedField = structuredClone(fieldClipboard);
+
+        append({
+          ...copiedField,
+          formId: nanoid(12),
+          signerEmail: selectedSigner?.email ?? copiedField.signerEmail,
+          pageX: copiedField.pageX + 3,
+          pageY: copiedField.pageY + 3,
+        });
+      }
+    },
+    [append, fieldClipboard, selectedSigner?.email],
+  );
+
   useEffect(() => {
     if (selectedField) {
       window.addEventListener('mousemove', onMouseMove);
@@ -408,9 +484,20 @@ export const AddFieldsFormPartial = ({
 
   const recipientsByRoleToDisplay = useMemo(() => {
     // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
-    return (Object.entries(recipientsByRole) as [RecipientRole, Recipient[]][]).filter(
-      ([role]) => role !== RecipientRole.CC && role !== RecipientRole.VIEWER,
-    );
+    return (Object.entries(recipientsByRole) as [RecipientRole, Recipient[]][])
+      .filter(([role]) => role !== RecipientRole.CC && role !== RecipientRole.VIEWER)
+      .map(
+        ([role, roleRecipients]) =>
+          // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
+          [
+            role,
+            sortBy(
+              roleRecipients,
+              [(r) => r.signingOrder || Number.MAX_SAFE_INTEGER, 'asc'],
+              [prop('id'), 'asc'],
+            ),
+          ] as [RecipientRole, Recipient[]],
+      );
   }, [recipientsByRole]);
 
   const handleAdvancedSettings = () => {
@@ -437,8 +524,8 @@ export const AddFieldsFormPartial = ({
     <>
       {showAdvancedSettings && currentField ? (
         <FieldAdvancedSettings
-          title="Advanced settings"
-          description={`Configure the ${FRIENDLY_FIELD_TYPE[currentField.type]} field`}
+          title={msg`Advanced settings`}
+          description={msg`Configure the ${FRIENDLY_FIELD_TYPE[currentField.type]} field`}
           field={currentField}
           fields={localFields}
           onAdvancedSettings={handleAdvancedSettings}
@@ -463,6 +550,7 @@ export const AddFieldsFormPartial = ({
                       '-rotate-6 scale-90 opacity-50 dark:bg-black/20': !isFieldWithinBounds,
                       'dark:text-black/60': isFieldWithinBounds,
                     },
+                    selectedField === FieldType.SIGNATURE && fontCaveat.className,
                   )}
                   style={{
                     top: coords.y,
@@ -485,14 +573,18 @@ export const AddFieldsFormPartial = ({
                       recipientIndex={recipientIndex === -1 ? 0 : recipientIndex}
                       field={field}
                       disabled={
-                        selectedSigner?.email !== field.signerEmail || hasSelectedSignerBeenSent
+                        selectedSigner?.email !== field.signerEmail ||
+                        !canRecipientBeModified(selectedSigner, fields)
                       }
                       minHeight={fieldBounds.current.height}
                       minWidth={fieldBounds.current.width}
                       passive={isFieldWithinBounds && !!selectedField}
+                      onFocus={() => setLastActiveField(field)}
+                      onBlur={() => setLastActiveField(null)}
                       onResize={(options) => onFieldResize(options, index)}
                       onMove={(options) => onFieldMove(options, index)}
                       onRemove={() => remove(index)}
+                      onDuplicate={() => onFieldCopy(null, { duplicate: true })}
                       onAdvancedSettings={() => {
                         setCurrentField(field);
                         handleAdvancedSettings();
@@ -536,14 +628,15 @@ export const AddFieldsFormPartial = ({
 
                       <CommandEmpty>
                         <span className="text-muted-foreground inline-block px-4">
-                          No recipient matching this description was found.
+                          <Trans>No recipient matching this description was found.</Trans>
                         </span>
                       </CommandEmpty>
 
                       {recipientsByRoleToDisplay.map(([role, roleRecipients], roleIndex) => (
                         <CommandGroup key={roleIndex}>
                           <div className="text-muted-foreground mb-1 ml-2 mt-2 text-xs font-medium">
-                            {`${RECIPIENT_ROLES_DESCRIPTION[role].roleName}s`}
+                            {/* Todo: Translations - Add plural translations. */}
+                            {`${RECIPIENT_ROLES_DESCRIPTION_ENG[role].roleName}s`}
                           </div>
 
                           {roleRecipients.length === 0 && (
@@ -551,7 +644,7 @@ export const AddFieldsFormPartial = ({
                               key={`${role}-empty`}
                               className="text-muted-foreground/80 px-4 pb-4 pt-2.5 text-center text-xs"
                             >
-                              No recipients with this role
+                              <Trans>No recipients with this role</Trans>
                             </div>
                           )}
 
@@ -607,8 +700,10 @@ export const AddFieldsFormPartial = ({
                                     </TooltipTrigger>
 
                                     <TooltipContent className="text-muted-foreground max-w-xs">
-                                      This document has already been sent to this recipient. You can
-                                      no longer edit this recipient.
+                                      <Trans>
+                                        This document has already been sent to this recipient. You
+                                        can no longer edit this recipient.
+                                      </Trans>
                                     </TooltipContent>
                                   </Tooltip>
                                 )}
@@ -644,7 +739,33 @@ export const AddFieldsFormPartial = ({
                             fontCaveat.className,
                           )}
                         >
-                          Signature
+                          <Trans>Signature</Trans>
+                        </p>
+                      </CardContent>
+                    </Card>
+                  </button>
+
+                  <button
+                    type="button"
+                    className="group h-full w-full"
+                    onClick={() => setSelectedField(FieldType.INITIALS)}
+                    onMouseDown={() => setSelectedField(FieldType.INITIALS)}
+                    data-selected={selectedField === FieldType.INITIALS ? true : undefined}
+                  >
+                    <Card
+                      className={cn(
+                        'flex h-full w-full cursor-pointer items-center justify-center group-disabled:opacity-50',
+                        // selectedSignerStyles.borderClass,
+                      )}
+                    >
+                      <CardContent className="flex flex-col items-center justify-center px-6 py-4">
+                        <p
+                          className={cn(
+                            'text-muted-foreground group-data-[selected]:text-foreground flex items-center justify-center gap-x-1.5 text-sm font-normal',
+                          )}
+                        >
+                          <Contact className="h-4 w-4" />
+                          Initials
                         </p>
                       </CardContent>
                     </Card>
@@ -663,14 +784,14 @@ export const AddFieldsFormPartial = ({
                         // selectedSignerStyles.borderClass,
                       )}
                     >
-                      <CardContent className="p-4">
+                      <CardContent className="flex flex-col items-center justify-center px-6 py-4">
                         <p
                           className={cn(
                             'text-muted-foreground group-data-[selected]:text-foreground flex items-center justify-center gap-x-1.5 text-sm font-normal',
                           )}
                         >
                           <Mail className="h-4 w-4" />
-                          Email
+                          <Trans>Email</Trans>
                         </p>
                       </CardContent>
                     </Card>
@@ -696,7 +817,7 @@ export const AddFieldsFormPartial = ({
                           )}
                         >
                           <User className="h-4 w-4" />
-                          Name
+                          <Trans>Name</Trans>
                         </p>
                       </CardContent>
                     </Card>
@@ -722,7 +843,7 @@ export const AddFieldsFormPartial = ({
                           )}
                         >
                           <CalendarDays className="h-4 w-4" />
-                          Date
+                          <Trans>Date</Trans>
                         </p>
                       </CardContent>
                     </Card>
@@ -748,7 +869,7 @@ export const AddFieldsFormPartial = ({
                           )}
                         >
                           <Type className="h-4 w-4" />
-                          Text
+                          <Trans>Text</Trans>
                         </p>
                       </CardContent>
                     </Card>
@@ -774,7 +895,7 @@ export const AddFieldsFormPartial = ({
                           )}
                         >
                           <Hash className="h-4 w-4" />
-                          Number
+                          <Trans>Number</Trans>
                         </p>
                       </CardContent>
                     </Card>
@@ -800,7 +921,7 @@ export const AddFieldsFormPartial = ({
                           )}
                         >
                           <Disc className="h-4 w-4" />
-                          Radio
+                          <Trans>Radio</Trans>
                         </p>
                       </CardContent>
                     </Card>
@@ -826,7 +947,7 @@ export const AddFieldsFormPartial = ({
                           )}
                         >
                           <CheckSquare className="h-4 w-4" />
-                          Checkbox
+                          <Trans>Checkbox</Trans>
                         </p>
                       </CardContent>
                     </Card>
@@ -852,7 +973,7 @@ export const AddFieldsFormPartial = ({
                           )}
                         >
                           <ChevronDown className="h-4 w-4" />
-                          Dropdown
+                          <Trans>Dropdown</Trans>
                         </p>
                       </CardContent>
                     </Card>
@@ -861,27 +982,38 @@ export const AddFieldsFormPartial = ({
               </div>
             </div>
           </DocumentFlowFormContainerContent>
+
           {hasErrors && (
             <div className="mt-4">
               <ul>
                 <li className="text-sm text-red-500">
-                  To proceed further, please set at least one value for the{' '}
-                  {emptyCheckboxFields.length > 0
-                    ? 'Checkbox'
-                    : emptyRadioFields.length > 0
-                    ? 'Radio'
-                    : 'Select'}{' '}
-                  field.
+                  <Trans>
+                    To proceed further, please set at least one value for the{' '}
+                    {emptyCheckboxFields.length > 0
+                      ? 'Checkbox'
+                      : emptyRadioFields.length > 0
+                      ? 'Radio'
+                      : 'Select'}{' '}
+                    field.
+                  </Trans>
                 </li>
               </ul>
             </div>
           )}
+
+          {selectedSigner && !canRecipientFieldsBeModified(selectedSigner, fields) && (
+            <Alert variant="warning">
+              <AlertDescription>
+                <Trans>
+                  This recipient can no longer be modified as they have signed a field, or completed
+                  the document.
+                </Trans>
+              </AlertDescription>
+            </Alert>
+          )}
+
           <DocumentFlowFormContainerFooter>
-            <DocumentFlowFormContainerStep
-              title={documentFlow.title}
-              step={currentStep}
-              maxStep={totalSteps}
-            />
+            <DocumentFlowFormContainerStep step={currentStep} maxStep={totalSteps} />
 
             <DocumentFlowFormContainerActions
               loading={isSubmitting}
@@ -892,7 +1024,7 @@ export const AddFieldsFormPartial = ({
                 remove();
                 documentFlow.onBackStep?.();
               }}
-              goBackLabel={canRenderBackButtonAsRemove ? 'Remove' : undefined}
+              goBackLabel={canRenderBackButtonAsRemove ? msg`Remove` : undefined}
               onGoNextClick={handleGoNextClick}
             />
           </DocumentFlowFormContainerFooter>

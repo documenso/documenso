@@ -2,9 +2,11 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { notFound, redirect } from 'next/navigation';
 
+import { Trans } from '@lingui/macro';
 import { FileIcon } from 'lucide-react';
 import { DateTime } from 'luxon';
 
+import { setupI18nSSR } from '@documenso/lib/client-only/providers/i18n.server';
 import { NEXT_PUBLIC_WEBAPP_URL } from '@documenso/lib/constants/app';
 import { getServerComponentSession } from '@documenso/lib/next-auth/get-server-component-session';
 import { getPublicProfileByUrl } from '@documenso/lib/server-only/profile/get-public-profile-by-url';
@@ -40,6 +42,8 @@ const BADGE_DATA = {
 };
 
 export default async function PublicProfilePage({ params }: PublicProfilePageProps) {
+  setupI18nSSR();
+
   const { url: profileUrl } = params;
 
   if (!profileUrl) {
@@ -102,7 +106,9 @@ export default async function PublicProfilePage({ params }: PublicProfilePagePro
                     {BADGE_DATA[publicProfile.badge.type].name}
                   </p>
                   <p className="text-muted-foreground mt-0.5 text-sm">
-                    Since {DateTime.fromJSDate(publicProfile.badge.since).toFormat('LLL ‘yy')}
+                    <Trans>
+                      Since {DateTime.fromJSDate(publicProfile.badge.since).toFormat('LLL ‘yy')}
+                    </Trans>
                   </p>
                 </div>
               </TooltipContent>
@@ -125,20 +131,26 @@ export default async function PublicProfilePage({ params }: PublicProfilePagePro
       {templates.length === 0 && (
         <div className="mt-4 w-full max-w-xl border-t pt-4">
           <p className="text-muted-foreground max-w-[60ch] whitespace-pre-wrap break-words text-center text-sm leading-relaxed">
-            It looks like {publicProfile.name} hasn't added any documents to their profile yet.{' '}
+            <Trans>
+              It looks like {publicProfile.name} hasn't added any documents to their profile yet.
+            </Trans>{' '}
             {!user?.id && (
               <span className="mt-2 inline-block">
-                While waiting for them to do so you can create your own Documenso account and get
-                started with document signing right away.
+                <Trans>
+                  While waiting for them to do so you can create your own Documenso account and get
+                  started with document signing right away.
+                </Trans>
               </span>
             )}
             {'userId' in profile && user?.id === profile.userId && (
               <span className="mt-2 inline-block">
-                Go to your{' '}
-                <Link href="/settings/public-profile" className="underline">
-                  public profile settings
-                </Link>{' '}
-                to add documents.
+                <Trans>
+                  Go to your{' '}
+                  <Link href="/settings/public-profile" className="underline">
+                    public profile settings
+                  </Link>{' '}
+                  to add documents.
+                </Trans>
               </span>
             )}
           </p>
@@ -151,7 +163,7 @@ export default async function PublicProfilePage({ params }: PublicProfilePagePro
             <TableHeader>
               <TableRow>
                 <TableHead className="w-full rounded-tl-md bg-neutral-50 dark:bg-neutral-700">
-                  Documents
+                  <Trans>Documents</Trans>
                 </TableHead>
               </TableRow>
             </TableHeader>
@@ -177,7 +189,7 @@ export default async function PublicProfilePage({ params }: PublicProfilePagePro
 
                         <Button asChild className="w-20">
                           <Link href={formatDirectTemplatePath(template.directLink.token)}>
-                            Sign
+                            <Trans>Sign</Trans>
                           </Link>
                         </Button>
                       </div>
