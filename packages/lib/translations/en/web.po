@@ -21,15 +21,15 @@ msgstr "\"{0}\" will appear on the document as it has a timezone of \"{timezone}
 msgid "\"{documentTitle}\" has been successfully deleted"
 msgstr "\"{documentTitle}\" has been successfully deleted"
 
-#: apps/web/src/app/(signing)/sign/[token]/signing-page-view.tsx:79
+#: apps/web/src/app/(signing)/sign/[token]/signing-page-view.tsx:78
 msgid "({0}) has invited you to approve this document"
 msgstr "({0}) has invited you to approve this document"
 
-#: apps/web/src/app/(signing)/sign/[token]/signing-page-view.tsx:76
+#: apps/web/src/app/(signing)/sign/[token]/signing-page-view.tsx:75
 msgid "({0}) has invited you to sign this document"
 msgstr "({0}) has invited you to sign this document"
 
-#: apps/web/src/app/(signing)/sign/[token]/signing-page-view.tsx:73
+#: apps/web/src/app/(signing)/sign/[token]/signing-page-view.tsx:72
 msgid "({0}) has invited you to view this document"
 msgstr "({0}) has invited you to view this document"
 

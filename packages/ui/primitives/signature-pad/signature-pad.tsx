@@ -194,10 +194,7 @@ export const SignaturePad = ({
 
     onChange?.(null);
 
-    if (typedSignature) {
-      setTypedSignature('');
-    }
-
+    setTypedSignature('');
     setLines([]);
     setCurrentLine([]);
   };
@@ -218,13 +215,23 @@ export const SignaturePad = ({
   };
 
   const handleTypedSignatureChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setTypedSignature(event.target.value);
-    onChange?.($el.current?.toDataURL() || null);
+    const newValue = event.target.value;
+    setTypedSignature(newValue);
+
+    if (newValue.trim() !== '') {
+      onChange?.($el.current?.toDataURL() || null);
+    } else {
+      onChange?.(null);
+    }
   };
 
   useEffect(() => {
-    renderTypedSignature();
-    onChange?.($el.current?.toDataURL() || null);
+    if (typedSignature.trim() !== '') {
+      renderTypedSignature();
+      onChange?.($el.current?.toDataURL() || null);
+    } else {
+      onClearClick();
+    }
   }, [typedSignature, selectedColor]);
 
   const onUndoClick = () => {

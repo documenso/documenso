@@ -140,11 +140,11 @@ msgstr "Genehmiger"
 msgid "Approving"
 msgstr "Genehmigung"
 
-#: packages/ui/primitives/signature-pad/signature-pad.tsx:342
+#: packages/ui/primitives/signature-pad/signature-pad.tsx:349
 msgid "Black"
 msgstr "Schwarz"
 
-#: packages/ui/primitives/signature-pad/signature-pad.tsx:356
+#: packages/ui/primitives/signature-pad/signature-pad.tsx:363
 msgid "Blue"
 msgstr "Blau"
 
@@ -187,11 +187,11 @@ msgstr "Checkbox-Werte"
 msgid "Clear filters"
 msgstr "Filter löschen"
 
-#: packages/ui/primitives/signature-pad/signature-pad.tsx:376
+#: packages/ui/primitives/signature-pad/signature-pad.tsx:383
 msgid "Clear Signature"
 msgstr "Unterschrift löschen"
 
-#: packages/ui/primitives/document-flow/add-signature.tsx:395
+#: packages/ui/primitives/document-flow/add-signature.tsx:394
 msgid "Click to insert field"
 msgstr "Klicken, um das Feld einzufügen"
 
@@ -216,7 +216,7 @@ msgstr "Fortsetzen"
 msgid "Copied to clipboard"
 msgstr "In die Zwischenablage kopiert"
 
-#: packages/ui/primitives/document-flow/add-signature.tsx:361
+#: packages/ui/primitives/document-flow/add-signature.tsx:360
 msgid "Custom Text"
 msgstr "Benutzerdefinierter Text"
 
@@ -324,7 +324,7 @@ msgstr "Globale Empfängerauthentifizierung"
 msgid "Go Back"
 msgstr "Zurück"
 
-#: packages/ui/primitives/signature-pad/signature-pad.tsx:363
+#: packages/ui/primitives/signature-pad/signature-pad.tsx:370
 msgid "Green"
 msgstr "Grün"
 
@@ -494,7 +494,7 @@ msgstr "Erhält Kopie"
 msgid "Recipient action authentication"
 msgstr "Empfängeraktion Authentifizierung"
 
-#: packages/ui/primitives/signature-pad/signature-pad.tsx:349
+#: packages/ui/primitives/signature-pad/signature-pad.tsx:356
 msgid "Red"
 msgstr "Rot"
 
