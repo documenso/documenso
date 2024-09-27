@@ -36,6 +36,7 @@ export type SignatureFieldProps = {
   recipient: Recipient;
   onSignField?: (value: TSignFieldWithTokenMutationSchema) => Promise<void> | void;
   onUnsignField?: (value: TRemovedSignedFieldWithTokenMutationSchema) => Promise<void> | void;
+  enabledTypedSignature?: boolean;
 };
 
 export const SignatureField = ({
@@ -43,6 +44,7 @@ export const SignatureField = ({
   recipient,
   onSignField,
   onUnsignField,
+  enabledTypedSignature,
 }: SignatureFieldProps) => {
   const router = useRouter();
 
@@ -195,6 +197,7 @@ export const SignatureField = ({
               id="signature"
               className="border-border mt-2 h-44 w-full rounded-md border"
               onChange={(value) => setLocalSignature(value)}
+              enabledTypedSignature={enabledTypedSignature}
             />
           </div>
 

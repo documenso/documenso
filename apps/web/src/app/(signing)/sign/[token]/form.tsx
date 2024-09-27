@@ -196,6 +196,7 @@ export const SigningForm = ({
                           onChange={(value) => {
                             setSignature(value);
                           }}
+                          enabledTypedSignature={document.documentMeta?.enabledTypedSignature}
                         />
                       </CardContent>
                     </Card>
