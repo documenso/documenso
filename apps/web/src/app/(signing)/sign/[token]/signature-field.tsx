@@ -18,15 +18,8 @@ import type {
   TRemovedSignedFieldWithTokenMutationSchema,
   TSignFieldWithTokenMutationSchema,
 } from '@documenso/trpc/server/field-router/schema';
-import {
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger,
-} from '@documenso/ui/primitives/accordion';
 import { Button } from '@documenso/ui/primitives/button';
 import { Dialog, DialogContent, DialogFooter, DialogTitle } from '@documenso/ui/primitives/dialog';
-import { Input } from '@documenso/ui/primitives/input';
 import { Label } from '@documenso/ui/primitives/label';
 import { SignaturePad } from '@documenso/ui/primitives/signature-pad';
 import { useToast } from '@documenso/ui/primitives/use-toast';
@@ -38,13 +31,11 @@ import { useRequiredSigningContext } from './provider';
 import { SigningFieldContainer } from './signing-field-container';
 
 type SignatureFieldState = 'empty' | 'signed-image' | 'signed-text';
-
 export type SignatureFieldProps = {
   field: FieldWithSignature;
   recipient: Recipient;
   onSignField?: (value: TSignFieldWithTokenMutationSchema) => Promise<void> | void;
   onUnsignField?: (value: TRemovedSignedFieldWithTokenMutationSchema) => Promise<void> | void;
-  enabledTypedSignature: boolean;
 };
 
 export const SignatureField = ({
@@ -52,82 +43,62 @@ export const SignatureField = ({
   recipient,
   onSignField,
   onUnsignField,
-  enabledTypedSignature,
 }: SignatureFieldProps) => {
   const router = useRouter();
 
   const { _ } = useLingui();
   const { toast } = useToast();
-
   const { signature: providedSignature, setSignature: setProvidedSignature } =
     useRequiredSigningContext();
-
   const { executeActionAuthProcedure } = useRequiredDocumentAuthContext();
-
   const [isPending, startTransition] = useTransition();
-
   const { mutateAsync: signFieldWithToken, isLoading: isSignFieldWithTokenLoading } =
     trpc.field.signFieldWithToken.useMutation(DO_NOT_INVALIDATE_QUERY_ON_MUTATION);
-
   const {
     mutateAsync: removeSignedFieldWithToken,
     isLoading: isRemoveSignedFieldWithTokenLoading,
   } = trpc.field.removeSignedFieldWithToken.useMutation(DO_NOT_INVALIDATE_QUERY_ON_MUTATION);
-
   const { Signature: signature } = field;
-
   const isLoading = isSignFieldWithTokenLoading || isRemoveSignedFieldWithTokenLoading || isPending;
-
   const [showSignatureModal, setShowSignatureModal] = useState(false);
   const [localSignature, setLocalSignature] = useState<string | null>(null);
-
   const state = useMemo<SignatureFieldState>(() => {
     if (!field.inserted) {
       return 'empty';
     }
-
     if (signature?.signatureImageAsBase64) {
       return 'signed-image';
     }
-
     return 'signed-text';
   }, [field.inserted, signature?.signatureImageAsBase64]);
-
   const onPreSign = () => {
     if (!providedSignature) {
       setShowSignatureModal(true);
       return false;
     }
-
     return true;
   };
-
   /**
    * When the user clicks the sign button in the dialog where they enter their signature.
    */
   const onDialogSignClick = () => {
     setShowSignatureModal(false);
     setProvidedSignature(localSignature);
-
     if (!localSignature) {
       return;
     }
-
     void executeActionAuthProcedure({
       onReauthFormSubmit: async (authOptions) => await onSign(authOptions, localSignature),
       actionTarget: field.type,
     });
   };
-
   const onSign = async (authOptions?: TRecipientActionAuth, signature?: string) => {
     try {
       const value = signature || providedSignature;
-
       if (!value) {
         setShowSignatureModal(true);
         return;
       }
-
       const payload: TSignFieldWithTokenMutationSchema = {
         token: recipient.token,
         fieldId: field.id,
@@ -135,24 +106,18 @@ export const SignatureField = ({
         isBase64: true,
         authOptions,
       };
-
       if (onSignField) {
         await onSignField(payload);
         return;
       }
-
       await signFieldWithToken(payload);
-
       startTransition(() => router.refresh());
     } catch (err) {
       const error = AppError.parseError(err);
-
       if (error.code === AppErrorCode.UNAUTHORIZED) {
         throw error;
       }
-
       console.error(err);
-
       toast({
         title: _(msg`Error`),
         description: _(msg`An error occurred while signing the document.`),
@@ -160,25 +125,20 @@ export const SignatureField = ({
       });
     }
   };
-
   const onRemove = async () => {
     try {
       const payload: TRemovedSignedFieldWithTokenMutationSchema = {
         token: recipient.token,
         fieldId: field.id,
       };
-
       if (onUnsignField) {
         await onUnsignField(payload);
         return;
       }
-
       await removeSignedFieldWithToken(payload);
-
       startTransition(() => router.refresh());
     } catch (err) {
       console.error(err);
-
       toast({
         title: _(msg`Error`),
         description: _(msg`An error occurred while removing the signature.`),
@@ -186,7 +146,6 @@ export const SignatureField = ({
       });
     }
   };
-
   return (
     <SigningFieldContainer
       field={field}
@@ -200,13 +159,11 @@ export const SignatureField = ({
           <Loader className="text-primary h-5 w-5 animate-spin md:h-8 md:w-8" />
         </div>
       )}
-
       {state === 'empty' && (
         <p className="group-hover:text-primary font-signature text-muted-foreground text-xl duration-200 group-hover:text-yellow-300">
           <Trans>Signature</Trans>
         </p>
       )}
-
       {state === 'signed-image' && signature?.signatureImageAsBase64 && (
         <img
           src={signature.signatureImageAsBase64}
@@ -214,14 +171,12 @@ export const SignatureField = ({
           className="h-full w-full object-contain"
         />
       )}
-
       {state === 'signed-text' && (
         <p className="font-signature text-muted-foreground dark:text-background text-lg duration-200 sm:text-xl md:text-2xl lg:text-3xl">
           {/* This optional chaining is intentional, we don't want to move the check into the condition above */}
           {signature?.typedSignature}
         </p>
       )}
-
       <Dialog open={showSignatureModal} onOpenChange={setShowSignatureModal}>
         <DialogContent>
           <DialogTitle>
@@ -231,62 +186,19 @@ export const SignatureField = ({
             </Trans>
           </DialogTitle>
 
-          <div>
-            <Accordion
-              type="single"
-              collapsible
-              defaultValue={enabledTypedSignature ? undefined : 'signature'}
-            >
-              <AccordionItem value="signature" className="border-none py-2">
-                <AccordionTrigger className="text-foreground rounded border px-3 py-2 text-left hover:bg-neutral-200/30 hover:no-underline">
-                  <Trans>Draw</Trans>
-                </AccordionTrigger>
+          <div className="">
+            <Label htmlFor="signature">
+              <Trans>Signature</Trans>
+            </Label>
 
-                <AccordionContent className="text-muted-foreground -mx-1 px-1 pt-4 text-sm leading-relaxed [&>div]:pb-0">
-                  <div className="flex flex-col space-y-6">
-                    <div className="">
-                      <Label htmlFor="signature">
-                        <Trans>Signature</Trans>
-                      </Label>
-
-                      <SignaturePad
-                        id="signature"
-                        className="border-border my-2 h-44 w-full rounded-md border"
-                        onChange={(value) => setLocalSignature(value)}
-                      />
-                    </div>
-                  </div>
-                </AccordionContent>
-              </AccordionItem>
-
-              {enabledTypedSignature && (
-                <AccordionItem value="typed-signature" className="border-none py-2">
-                  <AccordionTrigger className="text-foreground rounded border px-3 py-2 text-left hover:bg-neutral-200/30 hover:no-underline">
-                    <Trans>Type</Trans>
-                  </AccordionTrigger>
-
-                  <AccordionContent className="text-muted-foreground -mx-1 px-1 pt-4 text-sm leading-relaxed [&>div]:pb-0">
-                    <div className="flex flex-col space-y-6">
-                      <div className="">
-                        <Label htmlFor="typed-signature">
-                          <Trans>Typed Signature</Trans>
-                        </Label>
-
-                        <Input
-                          id="typed-signature"
-                          className="my-2"
-                          onChange={(value) => setLocalSignature(value)}
-                        />
-                      </div>
-                    </div>
-                  </AccordionContent>
-                </AccordionItem>
-              )}
-            </Accordion>
+            <SignaturePad
+              id="signature"
+              className="border-border mt-2 h-44 w-full rounded-md border"
+              onChange={(value) => setLocalSignature(value)}
+            />
           </div>
 
           <SigningDisclosure />
-
           <DialogFooter>
             <div className="flex w-full flex-1 flex-nowrap gap-4">
               <Button
@@ -300,7 +212,6 @@ export const SignatureField = ({
               >
                 <Trans>Cancel</Trans>
               </Button>
-
               <Button
                 type="button"
                 className="flex-1"
