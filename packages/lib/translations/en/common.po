@@ -135,11 +135,11 @@ msgstr "Approver"
 msgid "Approving"
 msgstr "Approving"
 
-#: packages/ui/primitives/signature-pad/signature-pad.tsx:332
+#: packages/ui/primitives/signature-pad/signature-pad.tsx:342
 msgid "Black"
 msgstr "Black"
 
-#: packages/ui/primitives/signature-pad/signature-pad.tsx:346
+#: packages/ui/primitives/signature-pad/signature-pad.tsx:356
 msgid "Blue"
 msgstr "Blue"
 
@@ -182,7 +182,7 @@ msgstr "Checkbox values"
 msgid "Clear filters"
 msgstr "Clear filters"
 
-#: packages/ui/primitives/signature-pad/signature-pad.tsx:366
+#: packages/ui/primitives/signature-pad/signature-pad.tsx:376
 msgid "Clear Signature"
 msgstr "Clear Signature"
 
@@ -319,7 +319,7 @@ msgstr "Global recipient action authentication"
 msgid "Go Back"
 msgstr "Go Back"
 
-#: packages/ui/primitives/signature-pad/signature-pad.tsx:353
+#: packages/ui/primitives/signature-pad/signature-pad.tsx:363
 msgid "Green"
 msgstr "Green"
 
@@ -489,7 +489,7 @@ msgstr "Receives copy"
 msgid "Recipient action authentication"
 msgstr "Recipient action authentication"
 
-#: packages/ui/primitives/signature-pad/signature-pad.tsx:339
+#: packages/ui/primitives/signature-pad/signature-pad.tsx:349
 msgid "Red"
 msgstr "Red"
 

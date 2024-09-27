@@ -3,6 +3,8 @@
 import type { HTMLAttributes, MouseEvent, PointerEvent, TouchEvent } from 'react';
 import { useEffect, useMemo, useRef, useState } from 'react';
 
+import { Caveat } from 'next/font/google';
+
 import { Trans } from '@lingui/macro';
 import { Undo2 } from 'lucide-react';
 import type { StrokeOptions } from 'perfect-freehand';
@@ -21,6 +23,13 @@ import {
 import { cn } from '../../lib/utils';
 import { getSvgPathFromStroke } from './helper';
 import { Point } from './point';
+
+const fontCaveat = Caveat({
+  weight: ['500'],
+  subsets: ['latin'],
+  display: 'swap',
+  variable: '--font-caveat',
+});
 
 const DPI = 2;
 
@@ -198,7 +207,8 @@ export const SignaturePad = ({
       const ctx = $el.current.getContext('2d');
       if (ctx) {
         ctx.clearRect(0, 0, $el.current.width, $el.current.height);
-        ctx.font = '48px Caveat';
+
+        ctx.font = `48px ${fontCaveat.style.fontFamily}`;
         ctx.fillStyle = selectedColor;
         ctx.textAlign = 'center';
         ctx.textBaseline = 'middle';
