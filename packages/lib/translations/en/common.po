@@ -77,7 +77,7 @@ msgstr "Add another option"
 msgid "Add another value"
 msgstr "Add another value"
 
-#: packages/ui/primitives/document-flow/add-signers.tsx:653
+#: packages/ui/primitives/document-flow/add-signers.tsx:662
 msgid "Add myself"
 msgstr "Add myself"
 
@@ -89,7 +89,7 @@ msgstr "Add Myself"
 msgid "Add Placeholder Recipient"
 msgstr "Add Placeholder Recipient"
 
-#: packages/ui/primitives/document-flow/add-signers.tsx:642
+#: packages/ui/primitives/document-flow/add-signers.tsx:651
 msgid "Add Signer"
 msgstr "Add Signer"
 
@@ -148,9 +148,13 @@ msgstr "Blue"
 msgid "Cancel"
 msgstr "Cancel"
 
-#: packages/ui/primitives/document-flow/add-signers.tsx:194
+#: packages/ui/primitives/document-flow/add-signers.tsx:193
 msgid "Cannot remove signer"
 msgstr "Cannot remove signer"
+
+#: packages/ui/primitives/document-flow/add-signers.tsx:221
+#~ msgid "Cannot update signer because they have already signed a field"
+#~ msgstr "Cannot update signer because they have already signed a field"
 
 #: packages/lib/constants/recipient-roles.ts:17
 msgid "Cc"
@@ -258,7 +262,7 @@ msgstr "Dropdown options"
 
 #: packages/ui/primitives/document-flow/add-fields.tsx:822
 #: packages/ui/primitives/document-flow/add-signature.tsx:272
-#: packages/ui/primitives/document-flow/add-signers.tsx:491
+#: packages/ui/primitives/document-flow/add-signers.tsx:500
 #: packages/ui/primitives/template-flow/add-template-fields.tsx:632
 #: packages/ui/primitives/template-flow/add-template-placeholder-recipients.tsx:463
 #: packages/ui/primitives/template-flow/add-template-placeholder-recipients.tsx:470
@@ -273,7 +277,7 @@ msgstr "Email Options"
 msgid "Enable Direct Link Signing"
 msgstr "Enable Direct Link Signing"
 
-#: packages/ui/primitives/document-flow/add-signers.tsx:392
+#: packages/ui/primitives/document-flow/add-signers.tsx:401
 #: packages/ui/primitives/template-flow/add-template-placeholder-recipients.tsx:362
 msgid "Enable signing order"
 msgstr "Enable signing order"
@@ -377,8 +381,8 @@ msgstr "Min"
 
 #: packages/ui/primitives/document-flow/add-fields.tsx:848
 #: packages/ui/primitives/document-flow/add-signature.tsx:298
-#: packages/ui/primitives/document-flow/add-signers.tsx:526
-#: packages/ui/primitives/document-flow/add-signers.tsx:532
+#: packages/ui/primitives/document-flow/add-signers.tsx:535
+#: packages/ui/primitives/document-flow/add-signers.tsx:541
 #: packages/ui/primitives/template-flow/add-template-fields.tsx:658
 #: packages/ui/primitives/template-flow/add-template-placeholder-recipients.tsx:498
 #: packages/ui/primitives/template-flow/add-template-placeholder-recipients.tsx:504
@@ -560,7 +564,7 @@ msgstr "Share Signature Card"
 msgid "Share the Link"
 msgstr "Share the Link"
 
-#: packages/ui/primitives/document-flow/add-signers.tsx:671
+#: packages/ui/primitives/document-flow/add-signers.tsx:680
 #: packages/ui/primitives/template-flow/add-template-placeholder-recipients.tsx:655
 msgid "Show advanced settings"
 msgstr "Show advanced settings"
@@ -690,9 +694,17 @@ msgstr "This document is password protected. Please enter the password to view t
 msgid "This field cannot be modified or deleted. When you share this template's direct link or add it to your public profile, anyone who accesses it can input their name and email, and fill in the fields assigned to them."
 msgstr "This field cannot be modified or deleted. When you share this template's direct link or add it to your public profile, anyone who accesses it can input their name and email, and fill in the fields assigned to them."
 
-#: packages/ui/primitives/document-flow/add-signers.tsx:195
-msgid "This signer has already received the document."
-msgstr "This signer has already received the document."
+#: packages/ui/primitives/document-flow/add-fields.tsx:1007
+msgid "This recipient can no longer be modified as they have signed a field, or completed the document."
+msgstr "This recipient can no longer be modified as they have signed a field, or completed the document."
+
+#: packages/ui/primitives/document-flow/add-signers.tsx:165
+#~ msgid "This signer has already received the document."
+#~ msgstr "This signer has already received the document."
+
+#: packages/ui/primitives/document-flow/add-signers.tsx:194
+msgid "This signer has already signed the document."
+msgstr "This signer has already signed the document."
 
 #: packages/ui/components/recipient/recipient-action-auth-select.tsx:48
 msgid "This will override any global settings."

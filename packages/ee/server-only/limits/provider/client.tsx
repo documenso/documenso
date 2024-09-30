@@ -2,7 +2,7 @@
 
 import { createContext, useCallback, useContext, useEffect, useState } from 'react';
 
-import { equals } from 'remeda';
+import { isDeepEqual } from 'remeda';
 
 import { getLimits } from '../client';
 import { FREE_PLAN_LIMITS } from '../constants';
@@ -42,7 +42,7 @@ export const LimitsProvider = ({
     const newLimits = await getLimits({ teamId });
 
     setLimits((oldLimits) => {
-      if (equals(oldLimits, newLimits)) {
+      if (isDeepEqual(oldLimits, newLimits)) {
         return oldLimits;
       }
 
