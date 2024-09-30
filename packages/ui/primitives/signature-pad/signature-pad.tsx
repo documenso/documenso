@@ -46,7 +46,7 @@ export const SignaturePad = ({
   defaultValue,
   onChange,
   disabled = false,
-  enabledTypedSignature = true,
+  enabledTypedSignature,
   ...props
 }: SignaturePadProps) => {
   const $el = useRef<HTMLCanvasElement>(null);
@@ -205,7 +205,7 @@ export const SignaturePad = ({
       if (ctx) {
         ctx.clearRect(0, 0, $el.current.width, $el.current.height);
 
-        ctx.font = `48px ${fontCaveat.style.fontFamily}`;
+        ctx.font = `120px ${fontCaveat.style.fontFamily}`;
         ctx.fillStyle = selectedColor;
         ctx.textAlign = 'center';
         ctx.textBaseline = 'middle';

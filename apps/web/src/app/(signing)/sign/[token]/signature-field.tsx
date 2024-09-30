@@ -73,6 +73,7 @@ export const SignatureField = ({
     }
     return 'signed-text';
   }, [field.inserted, signature?.signatureImageAsBase64]);
+
   const onPreSign = () => {
     if (!providedSignature) {
       setShowSignatureModal(true);
