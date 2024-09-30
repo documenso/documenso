@@ -116,7 +116,17 @@ export const EditDocumentForm = ({
     trpc.document.updateTypedSignatureSettings.useMutation({
       ...DO_NOT_INVALIDATE_QUERY_ON_MUTATION,
       onSuccess: (newData) => {
-        console.log('newData', newData);
+        utils.document.getDocumentWithDetailsById.setData(
+          {
+            id: initialDocument.id,
+            teamId: team?.id,
+          },
+          (oldData) => ({
+            ...(oldData || initialDocument),
+            ...newData,
+            id: Number(newData.id),
+          }),
+        );
       },
     });
 
@@ -260,7 +270,6 @@ export const EditDocumentForm = ({
   };
 
   const onAddFieldsFormSubmit = async (data: TAddFieldsFormSchema) => {
-    console.log('data', data);
     try {
       await addFields({
         documentId: document.id,
