@@ -1,14 +1,10 @@
-interface DropdownFieldMeta {
-  readOnly?: boolean;
-  required?: boolean;
-  values?: { value: string }[];
-  defaultValue?: string;
-}
+import type { TDropdownFieldMeta } from '../types/field-meta';
 
 export const validateDropdownField = (
   value: string | undefined,
-  fieldMeta: DropdownFieldMeta,
+  fieldMeta: TDropdownFieldMeta,
   isSigningPage: boolean = false,
+  fontSize?: number,
 ): string[] => {
   const errors = [];
 
@@ -48,6 +44,10 @@ export const validateDropdownField = (
 
   if (values && new Set(values.map((item) => item.value)).size !== values.length) {
     errors.push('Duplicate values are not allowed');
+  }
+
+  if (fontSize && fontSize < 8) {
+    errors.push('Font size must be at least 8');
   }
 
   return errors;
