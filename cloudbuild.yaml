@@ -1,0 +1,57 @@
+steps:
+  # Build the container image and push it with Kaniko
+  - name: "gcr.io/kaniko-project/executor:latest"
+    script: |
+      #!/busybox/sh
+      cat <<EOF > /kaniko/.docker/config.json
+      {
+        "auths": {
+          "${_AZURE_REGISTRY}": {
+            "username": "${_AZURE_USERNAME}",
+            "password": "${AZURE_GITOPSDOCKER_PASSWORD}"
+          }
+        },
+        "credHelpers": {
+          "${_REGISTRY}": "gcr"
+        }
+      }
+      EOF
+      /kaniko/executor \
+      --context=dir:///workspace \
+      --cache=true \
+      --compressed-caching=false \
+      --dockerfile=docker/Dockerfile \
+      --destination=${_IMAGE_PATH}:${_VERSION} \
+      --destination=${_IMAGE_PATH}:${SHORT_SHA} \
+      --destination=${_IMAGE_PATH}:latest \
+      --destination ${_AZURE_IMAGE_PATH}:${_VERSION} \
+      --destination ${_AZURE_IMAGE_PATH}:${SHORT_SHA} \
+      --destination ${_AZURE_IMAGE_PATH}:latest \
+      --build-arg=NEXT_PUBLIC_WEBAPP_URL=${_DOCUMENSO_WEBAPP_URL} \
+      --build-arg=NEXT_PUBLIC_MARKETING_URL=${_DOCUMENSO_WEBAPP_URL} \
+      --build-arg=NEXT_PUBLIC_UPLOAD_TRANSPORT=${_DOCUMENSO_UPLOAD_TRANSPORT} \
+    automapSubstitutions: true
+    secretEnv:
+      - "AZURE_GITOPSDOCKER_PASSWORD"
+
+availableSecrets:
+  secretManager:
+    - versionName: projects/gpu-reservation-sarvam/secrets/azure-gitopsdocker-password/versions/cloudbuild
+      env: "AZURE_GITOPSDOCKER_PASSWORD"
+
+substitutions:
+  _LOCATION: "europe-west4"
+  _REGISTRY: "${_LOCATION}-docker.pkg.dev"
+  _DOCKER_REGISTRY_NAME: "sarvam-docker-ci"
+  _IMAGE_NAME: "documenso-service"
+  _IMAGE_PATH: "${_LOCATION}-docker.pkg.dev/${PROJECT_ID}/${_DOCKER_REGISTRY_NAME}/${_IMAGE_NAME}"
+  _VERSION: $TAG_NAME
+  _AZURE_USERNAME: "gitopsdocker"
+  _AZURE_REGISTRY: "gitopsdocker.azurecr.io"
+  _AZURE_IMAGE_PATH: "${_AZURE_REGISTRY}/${_IMAGE_NAME}"
+  _DOCUMENSO_WEBAPP_URL: "https://law-dev.sarvam.ai/internal/documenso"
+  _DOCUMENSO_UPLOAD_TRANSPORT: "s3"
+  # default substitutions
+
+options:
+  dynamic_substitutions: true
