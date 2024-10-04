@@ -218,6 +218,7 @@ msgstr "From the blog"
 
 #: apps/marketing/src/app/(marketing)/open/data.ts:9
 #: apps/marketing/src/app/(marketing)/open/data.ts:17
+#: apps/marketing/src/app/(marketing)/open/data.ts:25
 #: apps/marketing/src/app/(marketing)/open/data.ts:33
 #: apps/marketing/src/app/(marketing)/open/data.ts:41
 #: apps/marketing/src/app/(marketing)/open/data.ts:49
@@ -380,8 +381,8 @@ msgid "Our self-hosted option is great for small teams and individuals who need 
 msgstr "Our self-hosted option is great for small teams and individuals who need a simple solution. You can use our docker based setup to get started in minutes. Take control with full customizability and data ownership."
 
 #: apps/marketing/src/app/(marketing)/open/data.ts:25
-msgid "Part-Time"
-msgstr "Part-Time"
+#~ msgid "Part-Time"
+#~ msgstr "Part-Time"
 
 #: apps/marketing/src/components/(marketing)/pricing-table.tsx:151
 msgid "Premium Profile Name"
