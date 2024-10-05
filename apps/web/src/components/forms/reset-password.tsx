@@ -11,6 +11,7 @@ import { z } from 'zod';
 import { TRPCClientError } from '@documenso/trpc/client';
 import { trpc } from '@documenso/trpc/react';
 import { ZPasswordSchema } from '@documenso/trpc/server/auth-router/schema';
+import { ZHintedPasswordSchema } from '@documenso/trpc/server/auth-router/schema';
 import { cn } from '@documenso/ui/lib/utils';
 import { Button } from '@documenso/ui/primitives/button';
 import {
@@ -21,12 +22,13 @@ import {
   FormLabel,
   FormMessage,
 } from '@documenso/ui/primitives/form/form';
+import { HintedPasswordInput } from '@documenso/ui/primitives/hinted-password-input';
 import { PasswordInput } from '@documenso/ui/primitives/password-input';
 import { useToast } from '@documenso/ui/primitives/use-toast';
 
 export const ZResetPasswordFormSchema = z
   .object({
-    password: ZPasswordSchema,
+    password: ZHintedPasswordSchema,
     repeatedPassword: ZPasswordSchema,
   })
   .refine((data) => data.password === data.repeatedPassword, {
@@ -110,7 +112,7 @@ export const ResetPasswordForm = ({ className, token }: ResetPasswordFormProps) 
                   <Trans>Password</Trans>
                 </FormLabel>
                 <FormControl>
-                  <PasswordInput {...field} />
+                  <HintedPasswordInput {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
