@@ -1,14 +1,17 @@
 'use client';
 
-import { useCallback } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 
 import { useRouter, useSearchParams } from 'next/navigation';
 
+import { useDebouncedValue } from '@documenso/lib/client-only/hooks/use-debounced-value';
 import { Input } from '@documenso/ui/primitives/input';
 
 export const DocumentSearch = ({ initialValue = '' }: { initialValue?: string }) => {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const [searchTerm, setSearchTerm] = useState(initialValue);
+  const debouncedSearchTerm = useDebouncedValue(searchTerm, 500);
 
   const handleSearch = useCallback(
     (term: string) => {
@@ -23,12 +26,16 @@ export const DocumentSearch = ({ initialValue = '' }: { initialValue?: string })
     [router, searchParams],
   );
 
+  useEffect(() => {
+    handleSearch(searchTerm);
+  }, [debouncedSearchTerm]);
+
   return (
     <Input
       type="search"
       placeholder="Search documents..."
-      defaultValue={initialValue}
-      onChange={(e) => handleSearch(e.target.value)}
+      value={searchTerm}
+      onChange={(e) => setSearchTerm(e.target.value)}
     />
   );
 };
