@@ -1,11 +1,11 @@
 import { useState } from 'react';
 
+import { useRouter } from 'next/navigation';
+
 import { Trans } from '@lingui/macro';
-import { DateTime } from 'luxon';
 import { signOut } from 'next-auth/react';
 
 import { RecipientRole } from '@documenso/prisma/client';
-import { trpc } from '@documenso/trpc/react';
 import { Alert, AlertDescription } from '@documenso/ui/primitives/alert';
 import { Button } from '@documenso/ui/primitives/button';
 import { DialogFooter } from '@documenso/ui/primitives/dialog';
@@ -25,22 +25,19 @@ export const DocumentActionAuthAccount = ({
 }: DocumentActionAuthAccountProps) => {
   const { recipient } = useRequiredDocumentAuthContext();
 
-  const [isSigningOut, setIsSigningOut] = useState(false);
+  const router = useRouter();
 
-  const { mutateAsync: encryptSecondaryData } = trpc.crypto.encryptSecondaryData.useMutation();
+  const [isSigningOut, setIsSigningOut] = useState(false);
 
   const handleChangeAccount = async (email: string) => {
     try {
       setIsSigningOut(true);
 
-      const encryptedEmail = await encryptSecondaryData({
-        data: email,
-        expiresAt: DateTime.now().plus({ days: 1 }).toMillis(),
+      await signOut({
+        redirect: false,
       });
 
-      await signOut({
-        callbackUrl: `/signin?email=${encodeURIComponent(encryptedEmail)}`,
-      });
+      router.push(`/signin#email=${email}`);
     } catch {
       setIsSigningOut(false);
 

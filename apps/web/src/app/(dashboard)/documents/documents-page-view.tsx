@@ -135,10 +135,7 @@ export const DocumentsPageView = async ({ searchParams = {}, team }: DocumentsPa
                     <DocumentStatus status={value} />
 
                     {value !== ExtendedDocumentStatus.ALL && (
-                      <span className="ml-1 inline-block opacity-50">
-                        {Math.min(stats[value], 99)}
-                        {stats[value] > 99 && '+'}
-                      </span>
+                      <span className="ml-1 inline-block opacity-50">{stats[value]}</span>
                     )}
                   </Link>
                 </TabsTrigger>
