@@ -100,7 +100,7 @@ export const updateTemplateSettings = async ({
     },
     data: {
       title: data.title,
-      externalId: data.externalId || null,
+      externalId: data.externalId,
       type: data.type,
       publicDescription: data.publicDescription,
       publicTitle: data.publicTitle,
