@@ -18,6 +18,7 @@ export const ZAddFieldsFormSchema = z.object({
       fieldMeta: ZFieldMetaSchema,
     }),
   ),
+  enabledTypedSignature: z.boolean(),
 });
 
 export type TAddFieldsFormSchema = z.infer<typeof ZAddFieldsFormSchema>;

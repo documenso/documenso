@@ -31,12 +31,12 @@ import { useRequiredSigningContext } from './provider';
 import { SigningFieldContainer } from './signing-field-container';
 
 type SignatureFieldState = 'empty' | 'signed-image' | 'signed-text';
-
 export type SignatureFieldProps = {
   field: FieldWithSignature;
   recipient: Recipient;
   onSignField?: (value: TSignFieldWithTokenMutationSchema) => Promise<void> | void;
   onUnsignField?: (value: TRemovedSignedFieldWithTokenMutationSchema) => Promise<void> | void;
+  enabledTypedSignature?: boolean;
 };
 
 export const SignatureField = ({
@@ -44,43 +44,33 @@ export const SignatureField = ({
   recipient,
   onSignField,
   onUnsignField,
+  enabledTypedSignature,
 }: SignatureFieldProps) => {
   const router = useRouter();
 
   const { _ } = useLingui();
   const { toast } = useToast();
-
   const { signature: providedSignature, setSignature: setProvidedSignature } =
     useRequiredSigningContext();
-
   const { executeActionAuthProcedure } = useRequiredDocumentAuthContext();
-
   const [isPending, startTransition] = useTransition();
-
   const { mutateAsync: signFieldWithToken, isLoading: isSignFieldWithTokenLoading } =
     trpc.field.signFieldWithToken.useMutation(DO_NOT_INVALIDATE_QUERY_ON_MUTATION);
-
   const {
     mutateAsync: removeSignedFieldWithToken,
     isLoading: isRemoveSignedFieldWithTokenLoading,
   } = trpc.field.removeSignedFieldWithToken.useMutation(DO_NOT_INVALIDATE_QUERY_ON_MUTATION);
-
   const { Signature: signature } = field;
-
   const isLoading = isSignFieldWithTokenLoading || isRemoveSignedFieldWithTokenLoading || isPending;
-
   const [showSignatureModal, setShowSignatureModal] = useState(false);
   const [localSignature, setLocalSignature] = useState<string | null>(null);
-
   const state = useMemo<SignatureFieldState>(() => {
     if (!field.inserted) {
       return 'empty';
     }
-
     if (signature?.signatureImageAsBase64) {
       return 'signed-image';
     }
-
     return 'signed-text';
   }, [field.inserted, signature?.signatureImageAsBase64]);
 
@@ -89,36 +79,29 @@ export const SignatureField = ({
       setShowSignatureModal(true);
       return false;
     }
-
     return true;
   };
-
   /**
    * When the user clicks the sign button in the dialog where they enter their signature.
    */
   const onDialogSignClick = () => {
     setShowSignatureModal(false);
     setProvidedSignature(localSignature);
-
     if (!localSignature) {
       return;
     }
-
     void executeActionAuthProcedure({
       onReauthFormSubmit: async (authOptions) => await onSign(authOptions, localSignature),
       actionTarget: field.type,
     });
   };
-
   const onSign = async (authOptions?: TRecipientActionAuth, signature?: string) => {
     try {
       const value = signature || providedSignature;
-
       if (!value) {
         setShowSignatureModal(true);
         return;
       }
-
       const payload: TSignFieldWithTokenMutationSchema = {
         token: recipient.token,
         fieldId: field.id,
@@ -126,24 +109,18 @@ export const SignatureField = ({
         isBase64: true,
         authOptions,
       };
-
       if (onSignField) {
         await onSignField(payload);
         return;
       }
-
       await signFieldWithToken(payload);
-
       startTransition(() => router.refresh());
     } catch (err) {
       const error = AppError.parseError(err);
-
       if (error.code === AppErrorCode.UNAUTHORIZED) {
         throw error;
       }
-
       console.error(err);
-
       toast({
         title: _(msg`Error`),
         description: _(msg`An error occurred while signing the document.`),
@@ -151,25 +128,20 @@ export const SignatureField = ({
       });
     }
   };
-
   const onRemove = async () => {
     try {
       const payload: TRemovedSignedFieldWithTokenMutationSchema = {
         token: recipient.token,
         fieldId: field.id,
       };
-
       if (onUnsignField) {
         await onUnsignField(payload);
         return;
       }
-
       await removeSignedFieldWithToken(payload);
-
       startTransition(() => router.refresh());
     } catch (err) {
       console.error(err);
-
       toast({
         title: _(msg`Error`),
         description: _(msg`An error occurred while removing the signature.`),
@@ -177,7 +149,6 @@ export const SignatureField = ({
       });
     }
   };
-
   return (
     <SigningFieldContainer
       field={field}
@@ -191,13 +162,11 @@ export const SignatureField = ({
           <Loader className="text-primary h-5 w-5 animate-spin md:h-8 md:w-8" />
         </div>
       )}
-
       {state === 'empty' && (
         <p className="group-hover:text-primary font-signature text-muted-foreground text-xl duration-200 group-hover:text-yellow-300">
           <Trans>Signature</Trans>
         </p>
       )}
-
       {state === 'signed-image' && signature?.signatureImageAsBase64 && (
         <img
           src={signature.signatureImageAsBase64}
@@ -205,14 +174,12 @@ export const SignatureField = ({
           className="h-full w-full object-contain"
         />
       )}
-
       {state === 'signed-text' && (
         <p className="font-signature text-muted-foreground dark:text-background text-lg duration-200 sm:text-xl md:text-2xl lg:text-3xl">
           {/* This optional chaining is intentional, we don't want to move the check into the condition above */}
           {signature?.typedSignature}
         </p>
       )}
-
       <Dialog open={showSignatureModal} onOpenChange={setShowSignatureModal}>
         <DialogContent>
           <DialogTitle>
@@ -231,11 +198,11 @@ export const SignatureField = ({
               id="signature"
               className="border-border mt-2 h-44 w-full rounded-md border"
               onChange={(value) => setLocalSignature(value)}
+              enabledTypedSignature={enabledTypedSignature}
             />
           </div>
 
           <SigningDisclosure />
-
           <DialogFooter>
             <div className="flex w-full flex-1 flex-nowrap gap-4">
               <Button
@@ -249,7 +216,6 @@ export const SignatureField = ({
               >
                 <Trans>Cancel</Trans>
               </Button>
-
               <Button
                 type="button"
                 className="flex-1"
