@@ -1,0 +1,91 @@
+---
+title: Angular Integration
+description: Learn how to use our embedding SDK within your Angular application.
+---
+
+# Angular Integration
+
+Our Angular SDK provides a simple way to embed a signing experience within your Angular application. It supports both direct link templates and signing tokens.
+
+## Installation
+
+To install the SDK, run the following command:
+
+```bash
+npm install @documenso/embed-angular
+```
+
+## Usage
+
+To embed a signing experience, you'll need to provide the token for the document you want to embed. This can be done in a few different ways, depending on your use case.
+
+While the Angular components we provide are configured as standalone components, it can also be used with NgModule. The proceeding examples will assume your project is setup for standalone components.
+
+### Direct Link Template
+
+If you have a direct link template, you can simply provide the token for the template to the `EmbedDirectTemplate` component.
+
+```ts
+import { EmbedDirectTemplate } from '@documenso/embed-angular';
+
+@Component({
+  standalone: true,
+  selector: 'example-component',
+  imports: [EmbedDirectTemplate],
+  template: `
+    <embed-direct-template token="YOUR_TOKEN_HERE" />
+  `,
+})
+export class ExampleComponent {
+  // Component logic.
+}
+```
+
+#### Props
+
+| Prop                | Type                | Description                                                                                |
+| ------------------- | ------------------- | ------------------------------------------------------------------------------------------ |
+| token               | string              | The token for the document you want to embed                                               |
+| host                | string (optional)   | The host to be used for the signing experience, relevant for self-hosters                  |
+| name                | string (optional)   | The name the signer that will be used by default for signing                               |
+| lockName            | boolean (optional)  | Whether or not the name field should be locked disallowing modifications                   |
+| email               | string (optional)   | The email the signer that will be used by default for signing                              |
+| lockEmail           | boolean (optional)  | Whether or not the email field should be locked disallowing modifications                  |
+| externalId          | string (optional)   | The external ID to be used for the document that will be created upon completion           |
+| onDocumentReady     | function (optional) | A callback function that will be called when the document is loaded and ready to be signed |
+| onDocumentCompleted | function (optional) | A callback function that will be called when the document has been completed               |
+| onDocumentError     | function (optional) | A callback function that will be called when an error occurs with the document             |
+| onFieldSigned       | function (optional) | A callback function that will be called when a field has been signed                       |
+| onFieldUnsigned     | function (optional) | A callback function that will be called when a field has been unsigned                     |
+
+### Signing Token
+
+If you have a signing token, you can provide it to the `EmbedSignDocument` component.
+
+```ts
+import { EmbedSignDocument } from '@documenso/embed-angular';
+
+@Component({
+  standalone: true,
+  selector: 'example-component',
+  imports: [EmbedSignDocument],
+  template: `
+    <embed-sign-document token="YOUR_TOKEN_HERE" />
+  `,
+})
+export class ExampleComponent {
+  // Component logic.
+}
+```
+
+#### Props
+
+| Prop                | Type                | Description                                                                                |
+| ------------------- | ------------------- | ------------------------------------------------------------------------------------------ |
+| token               | string              | The token for the document you want to embed                                               |
+| host                | string (optional)   | The host to be used for the signing experience, relevant for self-hosters                  |
+| name                | string (optional)   | The name the signer that will be used by default for signing                               |
+| lockName            | boolean (optional)  | Whether or not the name field should be locked disallowing modifications                   |
+| onDocumentReady     | function (optional) | A callback function that will be called when the document is loaded and ready to be signed |
+| onDocumentCompleted | function (optional) | A callback function that will be called when the document has been completed               |
+| onDocumentError     | function (optional) | A callback function that will be called when an error occurs with the document             |

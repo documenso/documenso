@@ -41,6 +41,8 @@ Mitosis allowed us to quickly target several popular frameworks, including [Reac
 
 I had also hoped to include Angular, but while Mitosis makes it really easy to transpile component, we still have to take care of bundling and packaging the resulting component ourselves. While the above frameworks can all be bundled using Vite.js, Angular still has it's own set of tooling that we would need to learn and use. Given this constraint we opted to put Angular on hold for now while we wait for the newer Vite.js support to mature.
 
+Update: Angular support is now available! Check out the [Angular integration guide](https://docs.documenso.com/developers/embedding/angular) for more information.
+
 ### Challenges and Lessons with Mitosis and more
 
 While our experience with Mitosis was largely positive, there were some challenges along the way. For instance, certain state properties with the same names as props caused issues during the transpilation process, leading to type errors and unexpected transpilation results with some targets.
