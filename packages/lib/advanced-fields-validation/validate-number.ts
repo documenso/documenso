@@ -1,12 +1,5 @@
 // import { numberFormatValues } from '@documenso/ui/primitives/document-flow/field-items-advanced-settings/constants';
-
-interface NumberFieldMeta {
-  minValue?: number;
-  maxValue?: number;
-  readOnly?: boolean;
-  required?: boolean;
-  numberFormat?: string;
-}
+import type { TNumberFieldMeta as NumberFieldMeta } from '../types/field-meta';
 
 export const validateNumberField = (
   value: string,

@@ -10,6 +10,7 @@ export async function insertTextInPDF(
   positionY: number,
   page = 0,
   useHandwritingFont = true,
+  customFontSize?: number,
 ): Promise<string> {
   // Fetch the font file from the public URL.
   const fontResponse = await fetch(CAVEAT_FONT_PATH());
@@ -24,7 +25,7 @@ export async function insertTextInPDF(
   const pages = pdfDoc.getPages();
   const pdfPage = pages[page];
 
-  const textSize = useHandwritingFont ? 50 : 15;
+  const textSize = customFontSize || (useHandwritingFont ? 50 : 15);
   const textWidth = font.widthOfTextAtSize(text, textSize);
   const textHeight = font.heightAtSize(textSize);
   const fieldSize = { width: 250, height: 64 };

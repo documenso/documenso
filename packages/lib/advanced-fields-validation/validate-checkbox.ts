@@ -1,15 +1,10 @@
 import { checkboxValidationSigns } from '@documenso/ui/primitives/document-flow/field-items-advanced-settings/constants';
 
-interface CheckboxFieldMeta {
-  readOnly?: boolean;
-  required?: boolean;
-  validationRule?: string;
-  validationLength?: number;
-}
+import type { TCheckboxFieldMeta } from '../types/field-meta';
 
 export const validateCheckboxField = (
   values: string[],
-  fieldMeta: CheckboxFieldMeta,
+  fieldMeta: TCheckboxFieldMeta,
   isSigningPage: boolean = false,
 ): string[] => {
   const errors = [];

@@ -66,6 +66,7 @@ export const CheckboxFieldAdvancedSettings = ({
         required,
         validationRule,
         validationLength,
+        type: 'checkbox',
       },
     );
     handleErrors(errors);
@@ -86,6 +87,7 @@ export const CheckboxFieldAdvancedSettings = ({
         required,
         validationRule,
         validationLength,
+        type: 'checkbox',
       },
     );
     handleErrors(errors);
