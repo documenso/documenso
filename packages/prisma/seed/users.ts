@@ -21,8 +21,13 @@ export const seedUser = async ({
   password = 'password',
   verified = true,
 }: SeedUserOptions = {}) => {
-  if (!name) {
+  let url = name;
+
+  if (name) {
+    url = nanoid();
+  } else {
     name = nanoid();
+    url = name;
   }
 
   if (!email) {
@@ -35,7 +40,7 @@ export const seedUser = async ({
       email,
       password: hashSync(password),
       emailVerified: verified ? new Date() : undefined,
-      url: name,
+      url,
     },
   });
 };
