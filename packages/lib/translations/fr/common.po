@@ -8,7 +8,7 @@ msgstr ""
 "Language: fr\n"
 "Project-Id-Version: documenso-app\n"
 "Report-Msgid-Bugs-To: \n"
-"PO-Revision-Date: 2024-09-19 09:18\n"
+"PO-Revision-Date: 2024-10-08 12:05\n"
 "Last-Translator: \n"
 "Language-Team: French\n"
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
@@ -157,6 +157,10 @@ msgstr "Annuler"
 msgid "Cannot remove signer"
 msgstr "Impossible de retirer le signataire"
 
+#: packages/ui/primitives/document-flow/add-signers.tsx:221
+#~ msgid "Cannot update signer because they have already signed a field"
+#~ msgstr "Cannot update signer because they have already signed a field"
+
 #: packages/lib/constants/recipient-roles.ts:17
 msgid "Cc"
 msgstr "Cc"
@@ -276,7 +280,7 @@ msgstr "Options d'email"
 
 #: packages/ui/primitives/document-flow/add-fields.tsx:1082
 msgid "Empty field"
-msgstr ""
+msgstr "Champ vide"
 
 #: packages/lib/constants/template.ts:8
 msgid "Enable Direct Link Signing"
@@ -701,15 +705,15 @@ msgstr "Ce champ ne peut pas être modifié ou supprimé. Lorsque vous partagez 
 
 #: packages/ui/primitives/document-flow/add-fields.tsx:1050
 msgid "This recipient can no longer be modified as they have signed a field, or completed the document."
-msgstr ""
+msgstr "Ce destinataire ne peut plus être modifié car il a signé un champ ou complété le document."
 
-#: packages/ui/primitives/document-flow/add-signers.tsx:195
+#: packages/ui/primitives/document-flow/add-signers.tsx:165
 #~ msgid "This signer has already received the document."
-#~ msgstr "Ce signataire a déjà reçu le document."
+#~ msgstr "This signer has already received the document."
 
 #: packages/ui/primitives/document-flow/add-signers.tsx:194
 msgid "This signer has already signed the document."
-msgstr ""
+msgstr "Ce signataire a déjà signé le document."
 
 #: packages/ui/components/recipient/recipient-action-auth-select.tsx:48
 msgid "This will override any global settings."
@@ -790,3 +794,4 @@ msgstr "Vous ne pouvez pas télécharger de documents pour le moment."
 #: packages/ui/primitives/document-dropzone.tsx:69
 msgid "You have reached your document limit."
 msgstr "Vous avez atteint votre limite de documents."
+
