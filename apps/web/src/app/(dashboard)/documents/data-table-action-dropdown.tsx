@@ -7,6 +7,7 @@ import Link from 'next/link';
 import { Trans, msg } from '@lingui/macro';
 import { useLingui } from '@lingui/react';
 import {
+  ArchiveRestore,
   CheckCircle,
   Copy,
   Download,
@@ -41,6 +42,7 @@ import { ResendDocumentActionItem } from './_action-items/resend-document';
 import { DeleteDocumentDialog } from './delete-document-dialog';
 import { DuplicateDocumentDialog } from './duplicate-document-dialog';
 import { MoveDocumentDialog } from './move-document-dialog';
+import { RestoreDocumentDialog } from './restore-document-dialog';
 
 export type DataTableActionDropdownProps = {
   row: Document & {
@@ -59,6 +61,7 @@ export const DataTableActionDropdown = ({ row, team }: DataTableActionDropdownPr
   const [isDeleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [isDuplicateDialogOpen, setDuplicateDialogOpen] = useState(false);
   const [isMoveDialogOpen, setMoveDialogOpen] = useState(false);
+  const [isRestoreDialogOpen, setRestoreDialogOpen] = useState(false);
 
   if (!session) {
     return null;
@@ -74,6 +77,7 @@ export const DataTableActionDropdown = ({ row, team }: DataTableActionDropdownPr
   // const isSigned = recipient?.signingStatus === SigningStatus.SIGNED;
   const isCurrentTeamDocument = team && row.team?.url === team.url;
   const canManageDocument = Boolean(isOwner || isCurrentTeamDocument);
+  const isDeletedDocument = row.deletedAt !== null;
 
   const documentsPath = formatDocumentsPath(team?.url);
 
@@ -179,6 +183,23 @@ export const DataTableActionDropdown = ({ row, team }: DataTableActionDropdownPr
           Void
         </DropdownMenuItem> */}
 
+        {isDeletedDocument ? (
+          <DropdownMenuItem
+            onClick={() => setRestoreDialogOpen(true)}
+            disabled={Boolean(!canManageDocument)}
+          >
+            <ArchiveRestore className="mr-2 h-4 w-4" />
+            Restore
+          </DropdownMenuItem>
+        ) : (
+          <DropdownMenuItem
+            onClick={() => setDeleteDialogOpen(true)}
+            disabled={Boolean(!canManageDocument && team?.teamEmail)}
+          >
+            <Trash2 className="mr-2 h-4 w-4" />
+            {canManageDocument ? 'Delete' : 'Hide'}
+          </DropdownMenuItem>
+        )}
         <DropdownMenuItem
           onClick={() => setDeleteDialogOpen(true)}
           disabled={Boolean(!canManageDocument && team?.teamEmail)}
@@ -221,6 +242,16 @@ export const DataTableActionDropdown = ({ row, team }: DataTableActionDropdownPr
         documentId={row.id}
         open={isMoveDialogOpen}
         onOpenChange={setMoveDialogOpen}
+      />
+
+      <RestoreDocumentDialog
+        id={row.id}
+        status={row.status}
+        documentTitle={row.title}
+        open={isRestoreDialogOpen}
+        onOpenChange={setRestoreDialogOpen}
+        teamId={team?.id}
+        canManageDocument={canManageDocument}
       />
 
       {isDuplicateDialogOpen && (

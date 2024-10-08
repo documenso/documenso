@@ -26,7 +26,7 @@ export const DocumentPageViewInformation = ({
   const { _, i18n } = useLingui();
 
   const documentInformation = useMemo(() => {
-    return [
+    const info = [
       {
         description: msg`Uploaded by`,
         value: userId === document.userId ? _(msg`You`) : document.User.name ?? document.User.email,
@@ -44,8 +44,20 @@ export const DocumentPageViewInformation = ({
           .toRelative(),
       },
     ];
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isMounted, document, userId]);
+
+    if (document.deletedAt) {
+      info.push({
+        description: msg`Deleted`,
+        value:
+          document.deletedAt &&
+          DateTime.fromJSDate(document.deletedAt)
+            .setLocale(i18n.locales?.[0] || i18n.locale)
+            .toFormat('MMMM d, yyyy'),
+      });
+    }
+
+    return info;
+  }, [isMounted, document, i18n.locales?.[0] || i18n.locale, userId]);
 
   return (
     <section className="dark:bg-background text-foreground border-border bg-widget flex flex-col rounded-xl border">
