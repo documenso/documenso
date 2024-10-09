@@ -794,4 +794,3 @@ msgstr "Vous ne pouvez pas télécharger de documents pour le moment."
 #: packages/ui/primitives/document-dropzone.tsx:69
 msgid "You have reached your document limit."
 msgstr "Vous avez atteint votre limite de documents."
-
