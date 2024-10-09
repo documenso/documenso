@@ -1,7 +1,7 @@
 'use client';
 
 import type { HTMLAttributes, MouseEvent, PointerEvent, TouchEvent } from 'react';
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 import { Trans } from '@lingui/macro';
 import { Undo2 } from 'lucide-react';
@@ -185,7 +185,7 @@ export const SignaturePad = ({
     setCurrentLine([]);
   };
 
-  const onUndoClick = () => {
+  const onUndoClick = useCallback(() => {
     if (lines.length === 0) {
       return;
     }
@@ -210,7 +210,33 @@ export const SignaturePad = ({
 
       onChange?.($el.current.toDataURL());
     }
-  };
+  }, [lines, defaultValue, onChange, perfectFreehandOptions]);
+
+  const handleKeyDown = useCallback(
+    (event: KeyboardEvent) => {
+      if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === 'z') {
+        event.preventDefault();
+        onUndoClick();
+      }
+    },
+    [onUndoClick],
+  );
+
+  useEffect(() => {
+    const handleGlobalKeyDown = (event: globalThis.KeyboardEvent) => {
+      handleKeyDown(event);
+    };
+
+    if (typeof window !== 'undefined') {
+      window.addEventListener('keydown', handleGlobalKeyDown);
+    }
+
+    return () => {
+      if (typeof window !== 'undefined') {
+        window.removeEventListener('keydown', handleGlobalKeyDown);
+      }
+    };
+  }, [handleKeyDown]);
 
   useEffect(() => {
     if ($el.current) {
