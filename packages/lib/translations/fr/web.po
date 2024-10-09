@@ -527,8 +527,8 @@ msgstr "Tous les moyens de paiement associés à cette équipe resteront associ�
 #: apps/web/src/app/(teams)/t/[teamUrl]/settings/tokens/page.tsx:56
 #: apps/web/src/components/(dashboard)/settings/layout/desktop-nav.tsx:90
 #: apps/web/src/components/(dashboard)/settings/layout/mobile-nav.tsx:93
-#: apps/web/src/components/(teams)/settings/layout/desktop-nav.tsx:81
-#: apps/web/src/components/(teams)/settings/layout/mobile-nav.tsx:89
+#: apps/web/src/components/(teams)/settings/layout/desktop-nav.tsx:95
+#: apps/web/src/components/(teams)/settings/layout/mobile-nav.tsx:103
 msgid "API Tokens"
 msgstr "Jetons API"
 
@@ -629,8 +629,8 @@ msgstr "Détails de base"
 #: apps/web/src/app/(teams)/t/[teamUrl]/settings/billing/page.tsx:61
 #: apps/web/src/components/(dashboard)/settings/layout/desktop-nav.tsx:117
 #: apps/web/src/components/(dashboard)/settings/layout/mobile-nav.tsx:120
-#: apps/web/src/components/(teams)/settings/layout/desktop-nav.tsx:108
-#: apps/web/src/components/(teams)/settings/layout/mobile-nav.tsx:116
+#: apps/web/src/components/(teams)/settings/layout/desktop-nav.tsx:122
+#: apps/web/src/components/(teams)/settings/layout/mobile-nav.tsx:130
 msgid "Billing"
 msgstr "Facturation"
 
@@ -1278,6 +1278,10 @@ msgstr "Document resealé"
 msgid "Document sent"
 msgstr "Document envoyé"
 
+#: apps/web/src/app/(teams)/t/[teamUrl]/settings/documents/page.tsx:28
+msgid "Document Settings"
+msgstr ""
+
 #: apps/web/src/app/(signing)/sign/[token]/complete/page.tsx:132
 msgid "Document Signed"
 msgstr "Document signé"
@@ -1322,6 +1326,8 @@ msgstr "Le document sera supprimé de manière permanente"
 #: apps/web/src/components/(dashboard)/common/command-menu.tsx:205
 #: apps/web/src/components/(dashboard)/layout/desktop-nav.tsx:18
 #: apps/web/src/components/(dashboard)/layout/mobile-navigation.tsx:35
+#: apps/web/src/components/(teams)/settings/layout/desktop-nav.tsx:57
+#: apps/web/src/components/(teams)/settings/layout/mobile-nav.tsx:65
 #: apps/web/src/components/ui/user-profile-timur.tsx:60
 msgid "Documents"
 msgstr "Documents"
@@ -1600,8 +1606,8 @@ msgstr "Nom complet"
 #: apps/web/src/app/(dashboard)/documents/[id]/edit-document.tsx:146
 #: apps/web/src/app/(dashboard)/templates/[id]/edit-template.tsx:76
 #: apps/web/src/app/(recipient)/d/[token]/direct-template.tsx:60
-#: apps/web/src/components/(teams)/settings/layout/desktop-nav.tsx:43
-#: apps/web/src/components/(teams)/settings/layout/mobile-nav.tsx:51
+#: apps/web/src/components/(teams)/settings/layout/desktop-nav.tsx:44
+#: apps/web/src/components/(teams)/settings/layout/mobile-nav.tsx:52
 msgid "General"
 msgstr "Général"
 
@@ -1955,8 +1961,8 @@ msgid "Member Since"
 msgstr "Membre depuis"
 
 #: apps/web/src/app/(teams)/t/[teamUrl]/settings/members/page.tsx:31
-#: apps/web/src/components/(teams)/settings/layout/desktop-nav.tsx:71
-#: apps/web/src/components/(teams)/settings/layout/mobile-nav.tsx:79
+#: apps/web/src/components/(teams)/settings/layout/desktop-nav.tsx:85
+#: apps/web/src/components/(teams)/settings/layout/mobile-nav.tsx:93
 msgid "Members"
 msgstr "Membres"
 
@@ -2395,8 +2401,8 @@ msgstr "Public"
 #: apps/web/src/app/(dashboard)/settings/public-profile/public-profile-page-view.tsx:42
 #: apps/web/src/components/(dashboard)/settings/layout/desktop-nav.tsx:50
 #: apps/web/src/components/(dashboard)/settings/layout/mobile-nav.tsx:53
-#: apps/web/src/components/(teams)/settings/layout/desktop-nav.tsx:57
-#: apps/web/src/components/(teams)/settings/layout/mobile-nav.tsx:65
+#: apps/web/src/components/(teams)/settings/layout/desktop-nav.tsx:71
+#: apps/web/src/components/(teams)/settings/layout/mobile-nav.tsx:79
 msgid "Public Profile"
 msgstr "Profil public"
 
@@ -3193,6 +3199,10 @@ msgstr "Le document sera immédiatement envoyé aux destinataires si cela est co
 #: apps/web/src/components/(dashboard)/settings/webhooks/create-webhook-dialog.tsx:203
 msgid "The events that will trigger a webhook to be sent to your URL."
 msgstr "Les événements qui déclencheront un webhook à envoyer à votre URL."
+
+#: apps/web/src/app/(teams)/t/[teamUrl]/settings/documents/page.tsx:29
+msgid "The global settings for the documents in your team account."
+msgstr ""
 
 #: apps/web/src/app/(unauthenticated)/team/verify/transfer/[token]/page.tsx:114
 msgid "The ownership of team <0>{0}</0> has been successfully transferred to you."
@@ -4091,8 +4101,8 @@ msgstr "URL du webhook"
 #: apps/web/src/app/(teams)/t/[teamUrl]/settings/webhooks/page.tsx:33
 #: apps/web/src/components/(dashboard)/settings/layout/desktop-nav.tsx:103
 #: apps/web/src/components/(dashboard)/settings/layout/mobile-nav.tsx:106
-#: apps/web/src/components/(teams)/settings/layout/desktop-nav.tsx:94
-#: apps/web/src/components/(teams)/settings/layout/mobile-nav.tsx:102
+#: apps/web/src/components/(teams)/settings/layout/desktop-nav.tsx:108
+#: apps/web/src/components/(teams)/settings/layout/mobile-nav.tsx:116
 msgid "Webhooks"
 msgstr "Webhooks"
 
