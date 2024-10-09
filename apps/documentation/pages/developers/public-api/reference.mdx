@@ -1,0 +1,79 @@
+---
+title: API Reference
+description: Reference documentation for the Documenso public API.
+---
+
+# API Reference
+
+The Swagger UI for the API is available at [/api/v1/openapi](https://app.documenso.com/api/v1/openapi). This page provides detailed information about the API endpoints, request and response formats, and authentication requirements.
+
+## Upload a Document
+
+Uploading a document to your Documenso account requires a two-step process.
+
+First, you need to make a POST request to the `/api/v1/documents` endpoint, which takes a JSON payload with the following fields:
+
+- `title` - This represents the title of the document and it's a required field.
+- `externalId` - This is an optional field that you can use to store an external identifier for the document. This can be useful for tracking the document in your own systems.
+- `recipients` - This is an array of recipient objects. Each recipient object has the following fields:
+  - `name` - The name of the recipient.
+  - `email` - The email address of the recipient.
+  - `role` - The role of the recipient. See the [available roles](/users/signing-documents#roles).
+  - `signingOrder` - The order in which the recipient should sign the document. This is an integer value starting from 0.
+
+... continue the rest ...
+
+Here's an example of the JSON payload for uploading a document:
+
+```json
+{
+  "title": "string",
+  "externalId": "string",
+  "recipients": [
+    {
+      "name": "string",
+      "email": "user@example.com",
+      "role": "SIGNER",
+      "signingOrder": 0
+    }
+  ],
+  "meta": {
+    "subject": "string",
+    "message": "string",
+    "timezone": "Etc/UTC",
+    "dateFormat": "yyyy-MM-dd hh:mm a",
+    "redirectUrl": "string",
+    "signingOrder": "PARALLEL"
+  },
+  "authOptions": {
+    "globalAccessAuth": "ACCOUNT",
+    "globalActionAuth": "ACCOUNT"
+  },
+  "formValues": {
+    "additionalProp1": "string",
+    "additionalProp2": "string",
+    "additionalProp3": "string"
+  }
+}
+```
+
+A successful API call to this endpoint will return a pre-signed S3 URL to which you can upload the document.
+
+```json
+{
+  "uploadUrl": "string",
+  "documentId": 0,
+  "externalId": "string",
+  "recipients": [
+    {
+      "recipientId": 0,
+      "name": "string",
+      "email": "user@example.com",
+      "token": "string",
+      "role": "CC",
+      "signingOrder": 0,
+      "signingUrl": "string"
+    }
+  ]
+}
+```
