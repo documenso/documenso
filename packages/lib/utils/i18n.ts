@@ -7,9 +7,10 @@ import type { I18nLocaleData, SupportedLanguageCodes } from '../constants/i18n';
 import { APP_I18N_OPTIONS } from '../constants/i18n';
 
 export async function dynamicActivate(i18nInstance: I18n, locale: string) {
-  const { messages } = await import(
-    `../translations/${locale}/${IS_APP_WEB ? 'web' : 'marketing'}.js`
-  );
+  const extension = process.env.NODE_ENV === 'development' ? 'po' : 'js';
+  const context = IS_APP_WEB ? 'web' : 'marketing';
+
+  const { messages } = await import(`../translations/${locale}/${context}.${extension}`);
 
   i18nInstance.loadAndActivate({ locale, messages });
 }

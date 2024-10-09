@@ -5,7 +5,7 @@
   "license": "AGPL-3.0",
   "scripts": {
     "dev": "next dev -p 3001",
-    "build": "next build",
+    "build": "turbo run translate:extract && turbo run translate:compile && next build",
     "start": "next start -p 3001",
     "lint": "next lint",
     "lint:fix": "next lint --fix",
