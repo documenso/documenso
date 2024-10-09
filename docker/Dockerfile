@@ -58,7 +58,7 @@ COPY .gitignore .gitignore
 COPY --from=builder /app/out/json/ .
 COPY --from=builder /app/out/package-lock.json ./package-lock.json
 
-COPY --from=builder /app/out/lingui.config.js ./lingui.config.js
+COPY --from=builder /app/out/lingui.config.ts ./lingui.config.ts
 
 RUN npm ci
 
