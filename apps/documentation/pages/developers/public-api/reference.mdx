@@ -3,7 +3,7 @@ title: API Reference
 description: Reference documentation for the Documenso public API.
 ---
 
-import { Callout } from 'nextra/components';
+import { Callout, Steps } from 'nextra/components';
 
 # API Reference
 
@@ -12,6 +12,10 @@ The Swagger UI for the API is available at [/api/v1/openapi](https://app.documen
 ## Upload a Document
 
 Uploading a document to your Documenso account requires a two-step process.
+
+<Steps>
+
+### Create Document
 
 First, you need to make a POST request to the `/api/v1/documents` endpoint, which takes a JSON payload with the following fields:
 
@@ -79,7 +83,9 @@ Here's an example of the JSON payload for uploading a document:
 }
 ```
 
-A successful API call to this endpoint will return a pre-signed S3 URL to which you can upload the document.
+### Upload Document
+
+A successful API call to this endpoint returns a pre-signed S3 URL to which you can upload the document.
 
 ```json
 {
@@ -107,3 +113,5 @@ A successful API call to this endpoint will return a pre-signed S3 URL to which 
   ]
 }
 ```
+
+</Steps>
