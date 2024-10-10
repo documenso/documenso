@@ -15,44 +15,60 @@ First, you need to make a POST request to the `/api/v1/documents` endpoint, whic
 
 - `title` - This represents the title of the document and it's a required field.
 - `externalId` - This is an optional field that you can use to store an external identifier for the document. This can be useful for tracking the document in your own systems.
-- `recipients` - This is an array of recipient objects. Each recipient object has the following fields:
+- `recipients` - This is an array of recipient objects and it's required. Each recipient object has the following fields:
   - `name` - The name of the recipient.
   - `email` - The email address of the recipient.
   - `role` - The role of the recipient. See the [available roles](/users/signing-documents#roles).
   - `signingOrder` - The order in which the recipient should sign the document. This is an integer value starting from 0.
-
-... continue the rest ...
+- `meta` - This is an object that contains additional metadata for the document. It has the following fields:
+  - `subject` - The subject of the email that will be sent to the recipients.
+  - `message` - The message of the email that will be sent to the recipients.
+  - `timezone` - The timezone in which the document should be signed.
+  - `dateFormat` - The date format that should be used in the document.
+  - `redirectUrl` - The URL to which the user should be redirected after signing the document.
+  - `signingOrder` - The signing order for the document. This can be either `SEQUENTIAL` or `PARALLEL`.
+- `authOptions` - This is an object that contains authentication options for the document. It has the following fields:
+  - `globalAccessAuth` - The authentication level required to access the document. This can be either `ACCOUNT` or `null`.
+    - If the document is set to `ACCOUNT`, all recipients must authenticate with their Documenso account to access the document.
+    - If it's set to `null`, the document can be accessed without a Documenso account.
+  - `globalActionAuth` - The authentication level required to perform actions on the document. This can be either `ACCOUNT`, `PASSKEY`, `TWO_FACTOR_AUTH`, or `null`.
+    - If the document is set to `ACCOUNT`, all recipients must authenticate with their Documenso account to perform actions on the document.
+    - If it's set to `PASSKEY`, all recipients must have the passkey active to perform actions on the document.
+    - If it's set to `TWO_FACTOR_AUTH`, all recipients must have the two-factor authentication active to perform actions on the document.
+    - If it's set to `null`, all the recipients can perform actions on the document without any authentication.
+- `formValues` - This is an object that contains additional form values for the document. This property only works with native PDF fields and it only accepts three types: number, text and boolean.
 
 Here's an example of the JSON payload for uploading a document:
 
 ```json
 {
-  "title": "string",
-  "externalId": "string",
+  "title": "my-document.pdf",
+  "externalId": "12345",
   "recipients": [
     {
-      "name": "string",
-      "email": "user@example.com",
+      "name": "Alex Blake",
+      "email": "alexblake@email.com",
+      "role": "SIGNER",
+      "signingOrder": 1
+    },
+    {
+      "name": "Ash Drew",
+      "email": "ashdrew@email.com",
       "role": "SIGNER",
       "signingOrder": 0
     }
   ],
   "meta": {
-    "subject": "string",
-    "message": "string",
-    "timezone": "Etc/UTC",
-    "dateFormat": "yyyy-MM-dd hh:mm a",
-    "redirectUrl": "string",
-    "signingOrder": "PARALLEL"
+    "subject": "Sign the document",
+    "message": "Hey there, please sign this document.",
+    "timezone": "Europe/London",
+    "dateFormat": "Day, Month Year",
+    "redirectUrl": "https://mysite.com/welcome",
+    "signingOrder": "SEQUENTIAL"
   },
   "authOptions": {
     "globalAccessAuth": "ACCOUNT",
-    "globalActionAuth": "ACCOUNT"
-  },
-  "formValues": {
-    "additionalProp1": "string",
-    "additionalProp2": "string",
-    "additionalProp3": "string"
+    "globalActionAuth": "PASSKEY"
   }
 }
 ```
