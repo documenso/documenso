@@ -19,30 +19,30 @@ Uploading a document to your Documenso account requires a two-step process.
 
 First, you need to make a POST request to the `/api/v1/documents` endpoint, which takes a JSON payload with the following fields:
 
-- `title` - This represents the title of the document and it's a required field.
-- `externalId` - This is an optional field that you can use to store an external identifier for the document. This can be useful for tracking the document in your own systems.
-- `recipients` - This is an array of recipient objects and it's required. Each recipient object has the following fields:
+- `title` - This represents the document's title and is a required field.
+- `externalId` - This is an optional field that you can use to store an external identifier for the document. This can be useful for tracking the document in your systems.
+- `recipients` - This is an array of recipient objects and a required field. Each recipient object has the following fields:
   - `name` - The name of the recipient.
   - `email` - The email address of the recipient.
   - `role` - The role of the recipient. See the [available roles](/users/signing-documents#roles).
   - `signingOrder` - The order in which the recipient should sign the document. This is an integer value starting from 0.
-- `meta` - This is an object that contains additional metadata for the document. It has the following fields:
+- `meta` - This object contains additional metadata for the document. It has the following fields:
   - `subject` - The subject of the email that will be sent to the recipients.
   - `message` - The message of the email that will be sent to the recipients.
   - `timezone` - The timezone in which the document should be signed.
   - `dateFormat` - The date format that should be used in the document.
   - `redirectUrl` - The URL to which the user should be redirected after signing the document.
   - `signingOrder` - The signing order for the document. This can be either `SEQUENTIAL` or `PARALLEL`.
-- `authOptions` - This is an object that contains authentication options for the document. It has the following fields:
+- `authOptions` - This object contains authentication options for the document. It has the following fields:
   - `globalAccessAuth` - The authentication level required to access the document. This can be either `ACCOUNT` or `null`.
-    - If the document is set to `ACCOUNT`, all recipients must authenticate with their Documenso account to access the document.
-    - If it's set to `null`, the document can be accessed without a Documenso account.
-  - `globalActionAuth` - The authentication level required to perform actions on the document. This can be either `ACCOUNT`, `PASSKEY`, `TWO_FACTOR_AUTH`, or `null`.
+    - If the document is set to `ACCOUNT`, all recipients must authenticate with their Documenso account to access it.
+    - The document can be accessed without a Documenso account if it's set to `null`.
+  - `globalActionAuth` - The authentication level required to perform actions on the document. This can be `ACCOUNT`, `PASSKEY`, `TWO_FACTOR_AUTH`, or `null`.
     - If the document is set to `ACCOUNT`, all recipients must authenticate with their Documenso account to perform actions on the document.
     - If it's set to `PASSKEY`, all recipients must have the passkey active to perform actions on the document.
     - If it's set to `TWO_FACTOR_AUTH`, all recipients must have the two-factor authentication active to perform actions on the document.
     - If it's set to `null`, all the recipients can perform actions on the document without any authentication.
-- `formValues` - This is an object that contains additional form values for the document. This property only works with native PDF fields and it only accepts three types: number, text and boolean.
+- `formValues` - This object contains additional form values for the document. This property only works with native PDF fields and accepts three types: number, text and boolean.
 
 <Callout type="info">
   The `globalActionAuth` property is only available for Enterprise accounts.
@@ -83,9 +83,11 @@ Here's an example of the JSON payload for uploading a document:
 }
 ```
 
-### Upload Document
+### Upload to S3
 
-A successful API call to this endpoint returns a pre-signed S3 URL to which you can upload the document.
+A successful API call to the `/api/v1/documents` endpoint returns a JSON response containing the upload URL, document ID, and recipient information.
+
+The upload URL is a pre-signed S3 URL that you can use to upload the document to the Documenso (or your) S3 bucket. You need to make a `PUT` request to this URL to upload the document.
 
 ```json
 {
@@ -113,5 +115,9 @@ A successful API call to this endpoint returns a pre-signed S3 URL to which you 
   ]
 }
 ```
+
+You will see the document in your Documenso account dashboard if the request is successful. The screenshot below shows the above document that was uploaded via the API.
+
+![Uploaded Document](/api-reference/document-uploaded-to-documenso-via-api.webp)
 
 </Steps>
