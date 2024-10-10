@@ -220,6 +220,10 @@ msgstr "Fortsetzen"
 msgid "Copied to clipboard"
 msgstr "In die Zwischenablage kopiert"
 
+#: packages/ui/components/document/next-inbox-item-button.tsx:70
+msgid "Created {0}"
+msgstr ""
+
 #: packages/ui/primitives/document-flow/add-signature.tsx:360
 msgid "Custom Text"
 msgstr "Benutzerdefinierter Text"
@@ -577,6 +581,10 @@ msgstr "Erweiterte Einstellungen anzeigen"
 #: packages/lib/constants/recipient-roles.ts:20
 msgid "Sign"
 msgstr "Unterschreiben"
+
+#: packages/ui/components/document/next-inbox-item-button.tsx:58
+msgid "Sign Next Document"
+msgstr ""
 
 #: packages/ui/primitives/document-flow/add-fields.tsx:742
 #: packages/ui/primitives/document-flow/add-signature.tsx:323

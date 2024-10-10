@@ -4,7 +4,6 @@ import { notFound } from 'next/navigation';
 import { Trans, msg } from '@lingui/macro';
 import { useLingui } from '@lingui/react';
 import { CheckCircle2, Clock8 } from 'lucide-react';
-import { getServerSession } from 'next-auth';
 import { env } from 'next-runtime-env';
 import { match } from 'ts-pattern';
 
@@ -16,10 +15,12 @@ import { isRecipientAuthorized } from '@documenso/lib/server-only/document/is-re
 import { getFieldsForToken } from '@documenso/lib/server-only/field/get-fields-for-token';
 import { getRecipientByToken } from '@documenso/lib/server-only/recipient/get-recipient-by-token';
 import { getRecipientSignatures } from '@documenso/lib/server-only/recipient/get-recipient-signatures';
+import { getNextInboxDocument } from '@documenso/lib/server-only/user/get-next-inbox-document';
 import { getUserByEmail } from '@documenso/lib/server-only/user/get-user-by-email';
 import { DocumentStatus, FieldType, RecipientRole } from '@documenso/prisma/client';
 import { DocumentDownloadButton } from '@documenso/ui/components/document/document-download-button';
 import { DocumentShareButton } from '@documenso/ui/components/document/document-share-button';
+import { NextInboxItemButton } from '@documenso/ui/components/document/next-inbox-item-button';
 import { SigningCard3D } from '@documenso/ui/components/signing-card';
 import { cn } from '@documenso/ui/lib/utils';
 import { Badge } from '@documenso/ui/primitives/badge';
@@ -65,9 +66,10 @@ export default async function CompletedSigningPage({
 
   const { documentData } = document;
 
-  const [fields, recipient] = await Promise.all([
+  const [fields, recipient, nextInboxDocument] = await Promise.all([
     getFieldsForToken({ token }),
     getRecipientByToken({ token }).catch(() => null),
+    getNextInboxDocument({ email: user?.email }).catch(() => null),
   ]);
 
   if (!recipient) {
@@ -95,8 +97,7 @@ export default async function CompletedSigningPage({
     fields.find((field) => field.type === FieldType.NAME)?.customText ||
     recipient.email;
 
-  const sessionData = await getServerSession();
-  const isLoggedIn = !!sessionData?.user;
+  const isLoggedIn = !!user;
   const canSignUp = !isExistingUser && NEXT_PUBLIC_DISABLE_SIGNUP !== 'true';
 
   return (
@@ -184,12 +185,16 @@ export default async function CompletedSigningPage({
               </p>
             ))}
 
-          <div className="mt-8 flex w-full max-w-sm items-center justify-center gap-4">
+          <div
+            className={cn('mt-8 flex w-full items-center justify-center gap-4', {
+              'max-w-sm': !nextInboxDocument,
+            })}
+          >
             <DocumentShareButton documentId={document.id} token={recipient.token} />
 
             {document.status === DocumentStatus.COMPLETED ? (
               <DocumentDownloadButton
-                className="flex-1"
+                className="flex-1 text-xs"
                 fileName={document.title}
                 documentData={documentData}
                 disabled={document.status !== DocumentStatus.COMPLETED}
@@ -199,6 +204,15 @@ export default async function CompletedSigningPage({
                 className="text-[11px]"
                 title={_(msg`Signatures will appear once the document has been completed`)}
                 documentData={documentData}
+              />
+            )}
+
+            {isLoggedIn && nextInboxDocument && (
+              <NextInboxItemButton
+                className="text-xs"
+                userEmail={user?.email}
+                documentData={documentData}
+                nextInboxDocument={nextInboxDocument}
               />
             )}
           </div>
@@ -222,7 +236,7 @@ export default async function CompletedSigningPage({
           )}
 
           {isLoggedIn && (
-            <Link href="/documents" className="text-documenso-700 hover:text-documenso-600">
+            <Link href="/documents" className="text-documenso-700 hover:text-documenso-600 mt-4">
               <Trans>Go Back Home</Trans>
             </Link>
           )}
