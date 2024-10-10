@@ -1,0 +1,123 @@
+---
+title: API Reference
+description: Reference documentation for the Documenso public API.
+---
+
+import { Callout, Steps } from 'nextra/components';
+
+# API Reference
+
+The Swagger UI for the API is available at [/api/v1/openapi](https://app.documenso.com/api/v1/openapi). This page provides detailed information about the API endpoints, request and response formats, and authentication requirements.
+
+## Upload a Document
+
+Uploading a document to your Documenso account requires a two-step process.
+
+<Steps>
+
+### Create Document
+
+First, you need to make a POST request to the `/api/v1/documents` endpoint, which takes a JSON payload with the following fields:
+
+- `title` - This represents the document's title and is a required field.
+- `externalId` - This is an optional field that you can use to store an external identifier for the document. This can be useful for tracking the document in your systems.
+- `recipients` - This is an array of recipient objects and a required field. Each recipient object has the following fields:
+  - `name` - The name of the recipient.
+  - `email` - The email address of the recipient.
+  - `role` - The role of the recipient. See the [available roles](/users/signing-documents#roles).
+  - `signingOrder` - The order in which the recipient should sign the document. This is an integer value starting from 0.
+- `meta` - This object contains additional metadata for the document. It has the following fields:
+  - `subject` - The subject of the email that will be sent to the recipients.
+  - `message` - The message of the email that will be sent to the recipients.
+  - `timezone` - The timezone in which the document should be signed.
+  - `dateFormat` - The date format that should be used in the document.
+  - `redirectUrl` - The URL to which the user should be redirected after signing the document.
+  - `signingOrder` - The signing order for the document. This can be either `SEQUENTIAL` or `PARALLEL`.
+- `authOptions` - This object contains authentication options for the document. It has the following fields:
+  - `globalAccessAuth` - The authentication level required to access the document. This can be either `ACCOUNT` or `null`.
+    - If the document is set to `ACCOUNT`, all recipients must authenticate with their Documenso account to access it.
+    - The document can be accessed without a Documenso account if it's set to `null`.
+  - `globalActionAuth` - The authentication level required to perform actions on the document. This can be `ACCOUNT`, `PASSKEY`, `TWO_FACTOR_AUTH`, or `null`.
+    - If the document is set to `ACCOUNT`, all recipients must authenticate with their Documenso account to perform actions on the document.
+    - If it's set to `PASSKEY`, all recipients must have the passkey active to perform actions on the document.
+    - If it's set to `TWO_FACTOR_AUTH`, all recipients must have the two-factor authentication active to perform actions on the document.
+    - If it's set to `null`, all the recipients can perform actions on the document without any authentication.
+- `formValues` - This object contains additional form values for the document. This property only works with native PDF fields and accepts three types: number, text and boolean.
+
+<Callout type="info">
+  The `globalActionAuth` property is only available for Enterprise accounts.
+</Callout>
+
+Here's an example of the JSON payload for uploading a document:
+
+```json
+{
+  "title": "my-document.pdf",
+  "externalId": "12345",
+  "recipients": [
+    {
+      "name": "Alex Blake",
+      "email": "alexblake@email.com",
+      "role": "SIGNER",
+      "signingOrder": 1
+    },
+    {
+      "name": "Ash Drew",
+      "email": "ashdrew@email.com",
+      "role": "SIGNER",
+      "signingOrder": 0
+    }
+  ],
+  "meta": {
+    "subject": "Sign the document",
+    "message": "Hey there, please sign this document.",
+    "timezone": "Europe/London",
+    "dateFormat": "Day, Month Year",
+    "redirectUrl": "https://mysite.com/welcome",
+    "signingOrder": "SEQUENTIAL"
+  },
+  "authOptions": {
+    "globalAccessAuth": "ACCOUNT",
+    "globalActionAuth": "PASSKEY"
+  }
+}
+```
+
+### Upload to S3
+
+A successful API call to the `/api/v1/documents` endpoint returns a JSON response containing the upload URL, document ID, and recipient information.
+
+The upload URL is a pre-signed S3 URL that you can use to upload the document to the Documenso (or your) S3 bucket. You need to make a `PUT` request to this URL to upload the document.
+
+```json
+{
+  "uploadUrl": "https://<url>/<bucket-name>/<id>/my-document.pdf?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Content-Sha256=UNSIGNED-PAYLOAD&X-Amz-Credential=<credentials>&X-Amz-Date=<date>&X-Amz-Expires=3600&X-Amz-Signature=<signature>&X-Amz-SignedHeaders=host&x-id=PutObject",
+  "documentId": 51,
+  "recipients": [
+    {
+      "recipientId": 11,
+      "name": "Alex Blake",
+      "email": "alexblake@email.com",
+      "token": "<unique-signer-token>",
+      "role": "SIGNER",
+      "signingOrder": 1,
+      "signingUrl": "https://app.documenso.com/sign/<unique-signer-token>"
+    },
+    {
+      "recipientId": 12,
+      "name": "Ash Drew",
+      "email": "ashdrew@email.com",
+      "token": "<unique-signer-token>",
+      "role": "SIGNER",
+      "signingOrder": 0,
+      "signingUrl": "https://app.documenso.com/sign/<unique-signer-token>"
+    }
+  ]
+}
+```
+
+You will see the document in your Documenso account dashboard if the request is successful. The screenshot below shows the above document that was uploaded via the API.
+
+![Uploaded Document](/api-reference/document-uploaded-to-documenso-via-api.webp)
+
+</Steps>
