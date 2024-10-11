@@ -5,25 +5,41 @@ import type { HTMLAttributes } from 'react';
 import Link from 'next/link';
 
 import { Trans } from '@lingui/macro';
+import { CheckCircle, EyeIcon, Pencil } from 'lucide-react';
 import { DateTime } from 'luxon';
+import { match } from 'ts-pattern';
 
-import type { DocumentData, Prisma } from '@documenso/prisma/client';
+import { type DocumentData, type Prisma, RecipientRole } from '@documenso/prisma/client';
 import { SignatureIcon } from '@documenso/ui/icons/signature';
 import { Button } from '@documenso/ui/primitives/button';
-import { Tooltip, TooltipContent, TooltipTrigger } from '@documenso/ui/primitives/tooltip';
+import {
+  Sheet,
+  SheetContent,
+  SheetDescription,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from '@documenso/ui/primitives/sheet';
 
-type GetNextInboxDocumentResult = Prisma.DocumentGetPayload<{
-  select: {
-    createdAt: true;
-    title: true;
-    Recipient: {
+import { DocumentStatus } from './document-status';
+
+type GetNextInboxDocumentResult =
+  | Prisma.DocumentGetPayload<{
       select: {
-        token: true;
+        id: true;
+        createdAt: true;
+        title: true;
+        status: true;
+        Recipient: {
+          select: {
+            token: true;
+            role: true;
+          };
+        };
+        documentMeta: true;
       };
-    };
-    documentMeta: true;
-  };
-}> | null;
+    }>[]
+  | null;
 
 export type NextInboxItemButtonProps = HTMLAttributes<HTMLButtonElement> & {
   disabled?: boolean;
@@ -40,38 +56,76 @@ export const NextInboxItemButton = ({
   disabled,
   ...props
 }: NextInboxItemButtonProps) => {
-  const recipientToken = nextInboxDocument?.Recipient[0]?.token ?? null;
-
   return (
-    <Tooltip>
-      <TooltipTrigger>
-        <Link href={'/sign/' + recipientToken}>
-          <Button
-            type="button"
-            variant="outline"
-            className={className}
-            disabled={disabled || !documentData || !userEmail}
-            {...props}
-          >
-            <SignatureIcon className="mr-2 h-5 w-5" />
-            <Trans>Sign Next Document</Trans>
-          </Button>
-        </Link>
-      </TooltipTrigger>
+    <Sheet>
+      <SheetTrigger asChild>
+        <Button
+          type="button"
+          variant="outline"
+          className={className}
+          disabled={disabled || !documentData || !userEmail}
+          {...props}
+        >
+          <SignatureIcon className="mr-2 h-5 w-5" />
+          <Trans>Sign Next Document</Trans>
+        </Button>
+      </SheetTrigger>
+      <SheetContent>
+        <SheetHeader>
+          <SheetTitle className="text-2xl">Inbox</SheetTitle>
+          <SheetDescription>Documents awaiting your signature or review</SheetDescription>
+        </SheetHeader>
 
-      <TooltipContent className="flex flex-row items-start gap-x-2 p-4">
-        <div className="gap-y-2">
-          <p className="text-foreground text-base font-semibold">{nextInboxDocument?.title}</p>
+        <div className="mt-8 space-y-6">
+          {nextInboxDocument?.map((document) => {
+            const recipient = document.Recipient[0];
 
-          {nextInboxDocument?.createdAt && (
-            <p className="text-muted-foreground text-sm">
-              <Trans>
-                Created {DateTime.fromJSDate(nextInboxDocument?.createdAt).toFormat('LLL ‘yy')}
-              </Trans>
-            </p>
-          )}
+            return (
+              <div key={document.id} className="flex items-center justify-between space-y-1">
+                <div>
+                  <p className="text-foreground text-lg font-semibold">{document.title}</p>
+
+                  <div className="flex items-center gap-x-2">
+                    <DocumentStatus status={document.status} />
+
+                    {document.createdAt && (
+                      <p className="text-muted-foreground">
+                        <Trans>
+                          Created {DateTime.fromJSDate(document.createdAt).toFormat('LLL ‘yy')}
+                        </Trans>
+                      </p>
+                    )}
+                  </div>
+                </div>
+
+                <Button asChild className="w-28">
+                  <Link href={`/sign/${recipient?.token}`}>
+                    {match(recipient?.role)
+                      .with(RecipientRole.SIGNER, () => (
+                        <>
+                          <Pencil className="-ml-1 mr-2 h-4 w-4" />
+                          <Trans>Sign</Trans>
+                        </>
+                      ))
+                      .with(RecipientRole.APPROVER, () => (
+                        <>
+                          <CheckCircle className="-ml-1 mr-2 h-4 w-4" />
+                          <Trans>Approve</Trans>
+                        </>
+                      ))
+                      .otherwise(() => (
+                        <>
+                          <EyeIcon className="-ml-1 mr-2 h-4 w-4" />
+                          <Trans>View</Trans>
+                        </>
+                      ))}
+                  </Link>
+                </Button>
+              </div>
+            );
+          })}
         </div>
-      </TooltipContent>
-    </Tooltip>
+      </SheetContent>
+    </Sheet>
   );
 };

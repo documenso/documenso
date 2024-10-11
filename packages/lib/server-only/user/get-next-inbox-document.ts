@@ -11,7 +11,7 @@ export const getNextInboxDocument = async ({ email }: GetNextInboxDocumentOption
     throw new Error('User is required');
   }
 
-  return await prisma.document.findFirst({
+  return await prisma.document.findMany({
     where: {
       Recipient: {
         some: {
@@ -26,14 +26,17 @@ export const getNextInboxDocument = async ({ email }: GetNextInboxDocumentOption
       deletedAt: null,
     },
     select: {
+      id: true,
       createdAt: true,
       title: true,
+      status: true,
       Recipient: {
         where: {
           email,
         },
         select: {
           token: true,
+          role: true,
         },
       },
       documentMeta: true,

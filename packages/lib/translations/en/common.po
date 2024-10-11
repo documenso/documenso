@@ -119,7 +119,12 @@ msgstr "Advanced settings"
 msgid "After submission, a document will be automatically generated and added to your documents page. You will also receive a notification via email."
 msgstr "After submission, a document will be automatically generated and added to your documents page. You will also receive a notification via email."
 
+#: packages/ui/components/document/document-status.tsx:46
+msgid "All"
+msgstr "All"
+
 #: packages/lib/constants/recipient-roles.ts:8
+#: packages/ui/components/document/next-inbox-item-button.tsx:113
 msgid "Approve"
 msgstr "Approve"
 
@@ -198,6 +203,10 @@ msgstr "Click to insert field"
 msgid "Close"
 msgstr "Close"
 
+#: packages/ui/components/document/document-status.tsx:28
+msgid "Completed"
+msgstr "Completed"
+
 #: packages/lib/constants/template.ts:12
 msgid "Configure Direct Recipient"
 msgstr "Configure Direct Recipient"
@@ -215,7 +224,7 @@ msgstr "Continue"
 msgid "Copied to clipboard"
 msgstr "Copied to clipboard"
 
-#: packages/ui/components/document/next-inbox-item-button.tsx:70
+#: packages/ui/components/document/next-inbox-item-button.tsx:93
 msgid "Created {0}"
 msgstr "Created {0}"
 
@@ -243,13 +252,37 @@ msgstr "Direct link receiver"
 msgid "Document access"
 msgstr "Document access"
 
+#: packages/ui/components/document/document-status.tsx:47
+msgid "Document All"
+msgstr "Document All"
+
+#: packages/ui/components/document/document-status.tsx:29
+msgid "Document completed"
+msgstr "Document completed"
+
 #: packages/lib/constants/template.ts:20
 msgid "Document Creation"
 msgstr "Document Creation"
 
+#: packages/ui/components/document/document-status.tsx:35
+msgid "Document draft"
+msgstr "Document draft"
+
+#: packages/ui/components/document/document-status.tsx:41
+msgid "Document inbox"
+msgstr "Document inbox"
+
+#: packages/ui/components/document/document-status.tsx:23
+msgid "Document pending"
+msgstr "Document pending"
+
 #: packages/ui/components/document/document-download-button.tsx:68
 msgid "Download"
 msgstr "Download"
+
+#: packages/ui/components/document/document-status.tsx:34
+msgid "Draft"
+msgstr "Draft"
 
 #: packages/ui/primitives/document-dropzone.tsx:162
 msgid "Drag & drop your PDF here."
@@ -350,6 +383,10 @@ msgstr "I am required to receive a copy of this document"
 #: packages/lib/constants/recipient-roles.ts:74
 #~ msgid "I am required to recieve a copy of this document"
 #~ msgstr "I am required to recieve a copy of this document"
+
+#: packages/ui/components/document/document-status.tsx:40
+msgid "Inbox"
+msgstr "Inbox"
 
 #: packages/ui/components/recipient/recipient-action-auth-select.tsx:29
 #: packages/ui/components/recipient/recipient-action-auth-select.tsx:87
@@ -459,6 +496,10 @@ msgstr "Page {0} of {1}"
 #: packages/ui/primitives/document-password-dialog.tsx:62
 msgid "Password Required"
 msgstr "Password Required"
+
+#: packages/ui/components/document/document-status.tsx:22
+msgid "Pending"
+msgstr "Pending"
 
 #: packages/ui/primitives/document-flow/field-items-advanced-settings/checkbox-field.tsx:154
 msgid "Pick a number"
@@ -574,10 +615,11 @@ msgid "Show advanced settings"
 msgstr "Show advanced settings"
 
 #: packages/lib/constants/recipient-roles.ts:20
+#: packages/ui/components/document/next-inbox-item-button.tsx:107
 msgid "Sign"
 msgstr "Sign"
 
-#: packages/ui/components/document/next-inbox-item-button.tsx:58
+#: packages/ui/components/document/next-inbox-item-button.tsx:70
 msgid "Sign Next Document"
 msgstr "Sign Next Document"
 
@@ -759,6 +801,7 @@ msgid "Value"
 msgstr "Value"
 
 #: packages/lib/constants/recipient-roles.ts:26
+#: packages/ui/components/document/next-inbox-item-button.tsx:119
 msgid "View"
 msgstr "View"
 
