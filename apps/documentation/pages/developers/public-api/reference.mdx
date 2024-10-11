@@ -156,9 +156,9 @@ You will see the document in your Documenso account dashboard if the request is 
 
 ## Generate Document From Template
 
-Documenso allows you to generate documents from templates. This is useful when you have a standard document format that you want to reuse.
+Documenso allows you to generate documents from templates. This is useful when you have a standard document format you want to reuse.
 
-The API endpoint for generating a document from template is `/api/v1/templates/{templateId}/generate-document` and it takes a JSON payload with the following fields:
+The API endpoint for generating a document from a template is `/api/v1/templates/{templateId}/generate-document`, and it takes a JSON payload with the following fields:
 
 ```json
 {
@@ -271,7 +271,7 @@ You'll need the recipient(s) ID(s) for the next step.
 
 To generate a document from the template, you need to make a POST request to the `/api/v1/templates/{template-id}/generate-document` endpoint.
 
-At the minimum, you need to provide the `recipients` array in the JSON payload. Here's an example of the JSON payload:
+At the minimum, you must provide the `recipients` array in the JSON payload. Here's an example of the JSON payload:
 
 ```json
 {
@@ -286,8 +286,29 @@ At the minimum, you need to provide the `recipients` array in the JSON payload. 
 }
 ```
 
-It's recommended to fill the `recipients` array with the corresponding recipient for each template placeholder recipient. For eample, if the template has two placeholders, you should provide at least two recipients in the `recipients` array. Otherwise, the document will be sent to inexistent recipients such as "recipient.id: 0".
+Filling the `recipients` array with the corresponding recipient for each template placeholder recipient is recommended. For example, if the template has two placeholders, you should provide at least two recipients in the `recipients` array. Otherwise, the document will be sent to inexistent recipients such as `<recipient.1@documenso.com>`. However, the recipients can always be edited via the API or the web app.
 
-However, the recipients can always be edited via the API or the web app.
+A successful response will contain the document ID and recipient(s) information.
+
+```json
+{
+  "documentId": 999,
+  "recipients": [
+    {
+      "recipientId": 0,
+      "name": "Ash Drew",
+      "email": "ashdrew@email.com",
+      "token": "<signing-token>",
+      "role": "SIGNER",
+      "signingOrder": null,
+      "signingUrl": "https://app.documenso.com/sign/<signing-token>"
+    }
+  ]
+}
+```
+
+You can now access the document in your Documenso account dashboard. The screenshot below shows the document that was generated from the template.
+
+![Generated Document](/api-reference/document-generated-from-template.webp)
 
 </Steps>
