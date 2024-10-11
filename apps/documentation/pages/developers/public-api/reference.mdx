@@ -19,6 +19,38 @@ Uploading a document to your Documenso account requires a two-step process.
 
 First, you need to make a POST request to the `/api/v1/documents` endpoint, which takes a JSON payload with the following fields:
 
+```json
+{
+  "title": "string",
+  "externalId": "string",
+  "recipients": [
+    {
+      "name": "string",
+      "email": "user@example.com",
+      "role": "SIGNER",
+      "signingOrder": 0
+    }
+  ],
+  "meta": {
+    "subject": "string",
+    "message": "string",
+    "timezone": "Etc/UTC",
+    "dateFormat": "yyyy-MM-dd hh:mm a",
+    "redirectUrl": "string",
+    "signingOrder": "PARALLEL"
+  },
+  "authOptions": {
+    "globalAccessAuth": "ACCOUNT",
+    "globalActionAuth": "ACCOUNT"
+  },
+  "formValues": {
+    "additionalProp1": "string",
+    "additionalProp2": "string",
+    "additionalProp3": "string"
+  }
+}
+```
+
 - `title` - This represents the document's title and is a required field.
 - `externalId` - This is an optional field that you can use to store an external identifier for the document. This can be useful for tracking the document in your systems.
 - `recipients` - This is an array of recipient objects and a required field. Each recipient object has the following fields:
@@ -119,5 +151,143 @@ The upload URL is a pre-signed S3 URL that you can use to upload the document to
 You will see the document in your Documenso account dashboard if the request is successful. The screenshot below shows the above document that was uploaded via the API.
 
 ![Uploaded Document](/api-reference/document-uploaded-to-documenso-via-api.webp)
+
+</Steps>
+
+## Generate Document From Template
+
+Documenso allows you to generate documents from templates. This is useful when you have a standard document format that you want to reuse.
+
+The API endpoint for generating a document from template is `/api/v1/templates/{templateId}/generate-document` and it takes a JSON payload with the following fields:
+
+```json
+{
+  "title": "string",
+  "externalId": "string",
+  "recipients": [
+    {
+      "id": 0,
+      "name": "string",
+      "email": "user@example.com",
+      "signingOrder": 0
+    }
+  ],
+  "meta": {
+    "subject": "string",
+    "message": "string",
+    "timezone": "string",
+    "dateFormat": "string",
+    "redirectUrl": "string",
+    "signingOrder": "PARALLEL"
+  },
+  "authOptions": {
+    "globalAccessAuth": "ACCOUNT",
+    "globalActionAuth": "ACCOUNT"
+  },
+  "formValues": {
+    "additionalProp1": "string",
+    "additionalProp2": "string",
+    "additionalProp3": "string"
+  }
+}
+```
+
+The JSON payload is identical to the payload for uploading a document, so you can read more about the fields in the [Create Document](/developers/public-api/reference#create-document) step. For this API endpoint, the `recipients` property is required.
+
+<Steps>
+
+### Grab the Template ID
+
+The first step is to retrieve the template ID from the Documenso dashboard. You can find the template ID in the URL when you navigate to the template details page.
+
+![Template ID](/api-reference/documenso-template-id.webp)
+
+In this case, the template ID is "99999".
+
+### Retrieve the Recipient(s) ID(s)
+
+Once you have the template ID, the next step involves retrieving the ID(s) of the recipient(s) from the template. You can do this by making a GET request to `/api/v1/templates/{template-id}`.
+
+A successful response looks as follows:
+
+```json
+{
+  "id": 0,
+  "externalId": "string",
+  "type": "PUBLIC",
+  "title": "string",
+  "userId": 0,
+  "teamId": 0,
+  "templateDocumentDataId": "string",
+  "createdAt": "2024-10-11T08:46:58.247Z",
+  "updatedAt": "2024-10-11T08:46:58.247Z",
+  "templateMeta": {
+    "id": "string",
+    "subject": "string",
+    "message": "string",
+    "timezone": "string",
+    "dateFormat": "string",
+    "templateId": 0,
+    "redirectUrl": "string",
+    "signingOrder": "PARALLEL"
+  },
+  "directLink": {
+    "token": "string",
+    "enabled": true
+  },
+  "templateDocumentData": {
+    "id": "string",
+    "type": "S3_PATH",
+    "data": "string"
+  },
+  "Field": [
+    {
+      "id": 0,
+      "recipientId": 0,
+      "type": "SIGNATURE",
+      "page": 0,
+      "positionX": "string",
+      "positionY": "string",
+      "width": "string",
+      "height": "string"
+    }
+  ],
+  "Recipient": [
+    {
+      "id": 0,
+      "email": "user@example.com",
+      "name": "string",
+      "signingOrder": 0,
+      "authOptions": "string",
+      "role": "CC"
+    }
+  ]
+}
+```
+
+You'll need the recipient(s) ID(s) for the next step.
+
+### Generate the Document
+
+To generate a document from the template, you need to make a POST request to the `/api/v1/templates/{template-id}/generate-document` endpoint.
+
+At the minimum, you need to provide the `recipients` array in the JSON payload. Here's an example of the JSON payload:
+
+```json
+{
+  "recipients": [
+    {
+      "id": 0,
+      "name": "Ash Drew",
+      "email": "ashdrew@email.com",
+      "signingOrder": 0
+    }
+  ]
+}
+```
+
+It's recommended to fill the `recipients` array with the corresponding recipient for each template placeholder recipient. For eample, if the template has two placeholders, you should provide at least two recipients in the `recipients` array. Otherwise, the document will be sent to inexistent recipients such as "recipient.id: 0".
+
+However, the recipients can always be edited via the API or the web app.
 
 </Steps>
