@@ -20,11 +20,11 @@ export const EmailFieldAdvancedSettings = ({
   const { _ } = useLingui();
 
   const handleInput = (field: keyof EmailFieldMeta, value: string | boolean) => {
-    const fontSize = field === 'fontSize' ? Number(value) : Number(fieldState.fontSize || 14);
+    const fontSize = field === 'fontSize' ? Number(value) : Number(fieldState.fontSize ?? 14);
 
     const errors = validateEmailFields({
       fontSize,
-      type: 'initials',
+      type: 'email',
     });
 
     handleErrors(errors);
@@ -44,6 +44,8 @@ export const EmailFieldAdvancedSettings = ({
           placeholder={_(msg`Field font size`)}
           value={fieldState.fontSize}
           onChange={(e) => handleInput('fontSize', e.target.value)}
+          min={8}
+          max={96}
         />
       </div>
     </div>

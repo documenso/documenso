@@ -11,8 +11,8 @@ export const validateFields = (
   const errors = [];
   const { fontSize } = fieldMeta;
 
-  if (fontSize && fontSize < 8) {
-    errors.push('Font size must be at least 8');
+  if (fontSize && (fontSize < 8 || fontSize > 96)) {
+    errors.push('Font size must be between 8 and 96.');
   }
 
   return errors;

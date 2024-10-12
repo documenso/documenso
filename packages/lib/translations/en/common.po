@@ -303,7 +303,7 @@ msgstr "Failed to save settings."
 msgid "Field character limit"
 msgstr "Field character limit"
 
-#: packages/ui/primitives/document-flow/field-items-advanced-settings/date-field.tsx:44
+#: packages/ui/primitives/document-flow/field-items-advanced-settings/date-field.tsx:62
 #: packages/ui/primitives/document-flow/field-items-advanced-settings/email-field.tsx:44
 #: packages/ui/primitives/document-flow/field-items-advanced-settings/initials-field.tsx:44
 #: packages/ui/primitives/document-flow/field-items-advanced-settings/name-field.tsx:44
@@ -324,7 +324,7 @@ msgstr "Field label"
 msgid "Field placeholder"
 msgstr "Field placeholder"
 
-#: packages/ui/primitives/document-flow/field-items-advanced-settings/date-field.tsx:38
+#: packages/ui/primitives/document-flow/field-items-advanced-settings/date-field.tsx:56
 #: packages/ui/primitives/document-flow/field-items-advanced-settings/email-field.tsx:38
 #: packages/ui/primitives/document-flow/field-items-advanced-settings/initials-field.tsx:38
 #: packages/ui/primitives/document-flow/field-items-advanced-settings/name-field.tsx:38
@@ -380,7 +380,7 @@ msgstr "Label"
 msgid "Manager"
 msgstr "Manager"
 
-#: packages/ui/primitives/document-flow/field-items-advanced-settings/number-field.tsx:186
+#: packages/ui/primitives/document-flow/field-items-advanced-settings/number-field.tsx:188
 msgid "Max"
 msgstr "Max"
 
@@ -393,7 +393,7 @@ msgstr "Member"
 msgid "Message <0>(Optional)</0>"
 msgstr "Message <0>(Optional)</0>"
 
-#: packages/ui/primitives/document-flow/field-items-advanced-settings/number-field.tsx:174
+#: packages/ui/primitives/document-flow/field-items-advanced-settings/number-field.tsx:176
 msgid "Min"
 msgstr "Min"
 
@@ -495,9 +495,9 @@ msgstr "Radio values"
 
 #: packages/ui/primitives/document-flow/field-items-advanced-settings/checkbox-field.tsx:186
 #: packages/ui/primitives/document-flow/field-items-advanced-settings/dropdown-field.tsx:147
-#: packages/ui/primitives/document-flow/field-items-advanced-settings/number-field.tsx:154
+#: packages/ui/primitives/document-flow/field-items-advanced-settings/number-field.tsx:156
 #: packages/ui/primitives/document-flow/field-items-advanced-settings/radio-field.tsx:122
-#: packages/ui/primitives/document-flow/field-items-advanced-settings/text-field.tsx:131
+#: packages/ui/primitives/document-flow/field-items-advanced-settings/text-field.tsx:133
 msgid "Read only"
 msgstr "Read only"
 
@@ -526,9 +526,9 @@ msgstr "Remove"
 
 #: packages/ui/primitives/document-flow/field-items-advanced-settings/checkbox-field.tsx:176
 #: packages/ui/primitives/document-flow/field-items-advanced-settings/dropdown-field.tsx:137
-#: packages/ui/primitives/document-flow/field-items-advanced-settings/number-field.tsx:144
+#: packages/ui/primitives/document-flow/field-items-advanced-settings/number-field.tsx:146
 #: packages/ui/primitives/document-flow/field-items-advanced-settings/radio-field.tsx:112
-#: packages/ui/primitives/document-flow/field-items-advanced-settings/text-field.tsx:121
+#: packages/ui/primitives/document-flow/field-items-advanced-settings/text-field.tsx:123
 msgid "Required field"
 msgstr "Required field"
 
@@ -759,7 +759,7 @@ msgid "Upload Template Document"
 msgstr "Upload Template Document"
 
 #: packages/ui/primitives/document-flow/field-items-advanced-settings/checkbox-field.tsx:132
-#: packages/ui/primitives/document-flow/field-items-advanced-settings/number-field.tsx:165
+#: packages/ui/primitives/document-flow/field-items-advanced-settings/number-field.tsx:167
 msgid "Validation"
 msgstr "Validation"
 

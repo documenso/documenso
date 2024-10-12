@@ -22,10 +22,10 @@ export const TextFieldAdvancedSettings = ({
   const { _ } = useLingui();
 
   const handleInput = (field: keyof TextFieldMeta, value: string | boolean) => {
-    const text = field === 'text' ? String(value) : fieldState.text || '';
+    const text = field === 'text' ? String(value) : fieldState.text ?? '';
     const limit =
-      field === 'characterLimit' ? Number(value) : Number(fieldState.characterLimit || 0);
-    const fontSize = field === 'fontSize' ? Number(value) : Number(fieldState.fontSize || 14);
+      field === 'characterLimit' ? Number(value) : Number(fieldState.characterLimit ?? 0);
+    const fontSize = field === 'fontSize' ? Number(value) : Number(fieldState.fontSize ?? 14);
     const readOnly = field === 'readOnly' ? Boolean(value) : Boolean(fieldState.readOnly);
     const required = field === 'required' ? Boolean(value) : Boolean(fieldState.required);
 
@@ -107,6 +107,8 @@ export const TextFieldAdvancedSettings = ({
           placeholder={_(msg`Field font size`)}
           value={fieldState.fontSize}
           onChange={(e) => handleInput('fontSize', e.target.value)}
+          min={8}
+          max={96}
         />
       </div>
 

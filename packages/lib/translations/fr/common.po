@@ -304,7 +304,7 @@ msgstr "Échec de l'enregistrement des paramètres."
 msgid "Field character limit"
 msgstr "Limite de caractères du champ"
 
-#: packages/ui/primitives/document-flow/field-items-advanced-settings/date-field.tsx:44
+#: packages/ui/primitives/document-flow/field-items-advanced-settings/date-field.tsx:62
 #: packages/ui/primitives/document-flow/field-items-advanced-settings/email-field.tsx:44
 #: packages/ui/primitives/document-flow/field-items-advanced-settings/initials-field.tsx:44
 #: packages/ui/primitives/document-flow/field-items-advanced-settings/name-field.tsx:44
@@ -325,7 +325,7 @@ msgstr "Étiquette du champ"
 msgid "Field placeholder"
 msgstr "Espace réservé du champ"
 
-#: packages/ui/primitives/document-flow/field-items-advanced-settings/date-field.tsx:38
+#: packages/ui/primitives/document-flow/field-items-advanced-settings/date-field.tsx:56
 #: packages/ui/primitives/document-flow/field-items-advanced-settings/email-field.tsx:38
 #: packages/ui/primitives/document-flow/field-items-advanced-settings/initials-field.tsx:38
 #: packages/ui/primitives/document-flow/field-items-advanced-settings/name-field.tsx:38
@@ -381,7 +381,7 @@ msgstr "Étiquette"
 msgid "Manager"
 msgstr "Gestionnaire"
 
-#: packages/ui/primitives/document-flow/field-items-advanced-settings/number-field.tsx:186
+#: packages/ui/primitives/document-flow/field-items-advanced-settings/number-field.tsx:188
 msgid "Max"
 msgstr "Max"
 
@@ -394,7 +394,7 @@ msgstr "Membre"
 msgid "Message <0>(Optional)</0>"
 msgstr "Message <0>(Optionnel)</0>"
 
-#: packages/ui/primitives/document-flow/field-items-advanced-settings/number-field.tsx:174
+#: packages/ui/primitives/document-flow/field-items-advanced-settings/number-field.tsx:176
 msgid "Min"
 msgstr "Min"
 
@@ -496,9 +496,9 @@ msgstr "Valeurs radio"
 
 #: packages/ui/primitives/document-flow/field-items-advanced-settings/checkbox-field.tsx:186
 #: packages/ui/primitives/document-flow/field-items-advanced-settings/dropdown-field.tsx:147
-#: packages/ui/primitives/document-flow/field-items-advanced-settings/number-field.tsx:154
+#: packages/ui/primitives/document-flow/field-items-advanced-settings/number-field.tsx:156
 #: packages/ui/primitives/document-flow/field-items-advanced-settings/radio-field.tsx:122
-#: packages/ui/primitives/document-flow/field-items-advanced-settings/text-field.tsx:131
+#: packages/ui/primitives/document-flow/field-items-advanced-settings/text-field.tsx:133
 msgid "Read only"
 msgstr "Lecture seule"
 
@@ -527,9 +527,9 @@ msgstr "Retirer"
 
 #: packages/ui/primitives/document-flow/field-items-advanced-settings/checkbox-field.tsx:176
 #: packages/ui/primitives/document-flow/field-items-advanced-settings/dropdown-field.tsx:137
-#: packages/ui/primitives/document-flow/field-items-advanced-settings/number-field.tsx:144
+#: packages/ui/primitives/document-flow/field-items-advanced-settings/number-field.tsx:146
 #: packages/ui/primitives/document-flow/field-items-advanced-settings/radio-field.tsx:112
-#: packages/ui/primitives/document-flow/field-items-advanced-settings/text-field.tsx:121
+#: packages/ui/primitives/document-flow/field-items-advanced-settings/text-field.tsx:123
 msgid "Required field"
 msgstr "Champ requis"
 
@@ -760,7 +760,7 @@ msgid "Upload Template Document"
 msgstr "Télécharger le document modèle"
 
 #: packages/ui/primitives/document-flow/field-items-advanced-settings/checkbox-field.tsx:132
-#: packages/ui/primitives/document-flow/field-items-advanced-settings/number-field.tsx:165
+#: packages/ui/primitives/document-flow/field-items-advanced-settings/number-field.tsx:167
 msgid "Validation"
 msgstr "Validation"
 

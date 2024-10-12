@@ -20,7 +20,7 @@ export const InitialsFieldAdvancedSettings = ({
   const { _ } = useLingui();
 
   const handleInput = (field: keyof InitialsFieldMeta, value: string | boolean) => {
-    const fontSize = field === 'fontSize' ? Number(value) : Number(fieldState.fontSize || 14);
+    const fontSize = field === 'fontSize' ? Number(value) : Number(fieldState.fontSize ?? 14);
 
     const errors = validateInitialsFields({
       fontSize,
@@ -44,6 +44,8 @@ export const InitialsFieldAdvancedSettings = ({
           placeholder={_(msg`Field font size`)}
           value={fieldState.fontSize}
           onChange={(e) => handleInput('fontSize', e.target.value)}
+          min={8}
+          max={96}
         />
       </div>
     </div>

@@ -19,8 +19,26 @@ export const DateFieldAdvancedSettings = ({
 }: DateFieldAdvancedSettingsProps) => {
   const { _ } = useLingui();
 
+  // const handleInput = (field: keyof DateFieldMeta, value: string | boolean) => {
+  //   if (field === 'fontSize') {
+  //     const fontSize = value === '' ? '' : Number(value);
+  //     if (typeof fontSize === 'number' && !Number.isNaN(fontSize)) {
+  //       const errors = validateDateFields({
+  //         fontSize,
+  //         type: 'date',
+  //       });
+  //       handleErrors(errors);
+  //       handleFieldChange(field, fontSize.toString());
+  //     } else {
+  //       handleErrors(['Invalid font size']);
+  //     }
+  //   } else {
+  //     handleFieldChange(field, value);
+  //   }
+  // };
+
   const handleInput = (field: keyof DateFieldMeta, value: string | boolean) => {
-    const fontSize = field === 'fontSize' ? Number(value) : Number(fieldState.fontSize || 14);
+    const fontSize = field === 'fontSize' ? Number(value) : Number(fieldState.fontSize ?? 14);
 
     const errors = validateDateFields({
       fontSize,
@@ -44,6 +62,8 @@ export const DateFieldAdvancedSettings = ({
           placeholder={_(msg`Field font size`)}
           value={fieldState.fontSize}
           onChange={(e) => handleInput('fontSize', e.target.value)}
+          min={8}
+          max={96}
         />
       </div>
     </div>

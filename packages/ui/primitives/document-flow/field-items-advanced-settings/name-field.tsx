@@ -20,7 +20,7 @@ export const NameFieldAdvancedSettings = ({
   const { _ } = useLingui();
 
   const handleInput = (field: keyof NameFieldMeta, value: string | boolean) => {
-    const fontSize = field === 'fontSize' ? Number(value) : Number(fieldState.fontSize || 14);
+    const fontSize = field === 'fontSize' ? Number(value) : Number(fieldState.fontSize ?? 14);
 
     const errors = validateNameFields({
       fontSize,
@@ -44,6 +44,8 @@ export const NameFieldAdvancedSettings = ({
           placeholder={_(msg`Field font size`)}
           value={fieldState.fontSize}
           onChange={(e) => handleInput('fontSize', e.target.value)}
+          min={8}
+          max={96}
         />
       </div>
     </div>

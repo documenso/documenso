@@ -1,8 +1,8 @@
-import type { TDropdownFieldMeta } from '../types/field-meta';
+import type { TDropdownFieldMeta as DropdownFieldMeta } from '../types/field-meta';
 
 export const validateDropdownField = (
   value: string | undefined,
-  fieldMeta: TDropdownFieldMeta,
+  fieldMeta: DropdownFieldMeta,
   isSigningPage: boolean = false,
   fontSize?: number,
 ): string[] => {
@@ -46,8 +46,8 @@ export const validateDropdownField = (
     errors.push('Duplicate values are not allowed');
   }
 
-  if (fontSize && fontSize < 8) {
-    errors.push('Font size must be at least 8');
+  if (fontSize && (fontSize < 8 || fontSize > 96)) {
+    errors.push('Font size must be between 8 and 96.');
   }
 
   return errors;

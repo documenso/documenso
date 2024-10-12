@@ -216,22 +216,20 @@ export const insertFieldInPDF = async (pdf: PDFDocument, field: FieldWithSignatu
       }
     })
     .otherwise((field) => {
-      const meta =
-        field.type === FieldType.TEXT
-          ? ZTextFieldMeta.safeParse(field.fieldMeta)
-          : field.type === FieldType.NUMBER
-          ? ZNumberFieldMeta.safeParse(field.fieldMeta)
-          : field.type === FieldType.DATE
-          ? ZDateFieldMeta.safeParse(field.fieldMeta)
-          : field.type === FieldType.EMAIL
-          ? ZEmailFieldMeta.safeParse(field.fieldMeta)
-          : field.type === FieldType.NAME
-          ? ZNameFieldMeta.safeParse(field.fieldMeta)
-          : field.type === FieldType.INITIALS
-          ? ZInitialsFieldMeta.safeParse(field.fieldMeta)
-          : null;
+      const fieldMetaParsers = {
+        [FieldType.TEXT]: ZTextFieldMeta,
+        [FieldType.NUMBER]: ZNumberFieldMeta,
+        [FieldType.DATE]: ZDateFieldMeta,
+        [FieldType.EMAIL]: ZEmailFieldMeta,
+        [FieldType.NAME]: ZNameFieldMeta,
+        [FieldType.INITIALS]: ZInitialsFieldMeta,
+      } as const;
 
-      const customFontSize = meta?.success ? meta.data.fontSize : null;
+      // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
+      const Parser = fieldMetaParsers[field.type as keyof typeof fieldMetaParsers];
+      const meta = Parser ? Parser.safeParse(field.fieldMeta) : null;
+
+      const customFontSize = meta?.success && meta.data.fontSize ? meta.data.fontSize : null;
       const longestLineInTextForWidth = field.customText
         .split('\n')
         .sort((a, b) => b.length - a.length)[0];
