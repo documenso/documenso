@@ -312,3 +312,181 @@ You can now access the document in your Documenso account dashboard. The screens
 ![Generated Document](/api-reference/document-generated-from-template.webp)
 
 </Steps>
+
+## Add Fields to Document
+
+The API allows you to add fields to a document via the `/api/v1/documents/{documentId}/fields` endpoint. This is useful when you want to add fields to a document before sending it to recipients.
+
+To add fields to a document, you need to make a `POST` request with a JSON payload containing the field(s) information.
+
+```json
+{
+  "recipientId": 0,
+  "type": "SIGNATURE",
+  "pageNumber": 0,
+  "pageX": 0,
+  "pageY": 0,
+  "pageWidth": 0,
+  "pageHeight": 0,
+  "fieldMeta": {
+    "label": "string",
+    "placeholder": "string",
+    "required": true,
+    "readOnly": true,
+    "type": "text",
+    "text": "string",
+    "characterLimit": 0
+  }
+}
+
+// or
+
+[
+  {
+    "recipientId": 0,
+    "type": "SIGNATURE",
+    "pageNumber": 0,
+    "pageX": 0,
+    "pageY": 0,
+    "pageWidth": 0,
+    "pageHeight": 0
+  },
+  {
+    "recipientId": 0,
+    "type": "TEXT",
+    "pageNumber": 0,
+    "pageX": 0,
+    "pageY": 0,
+    "pageWidth": 0,
+    "pageHeight": 0,
+    "fieldMeta": {
+      "label": "string",
+      "placeholder": "string",
+      "required": true,
+      "readOnly": true,
+      "type": "text",
+      "text": "string",
+      "characterLimit": 0
+    }
+  }
+]
+```
+
+<Callout type="info">This endpoint accepts either one field or an array of fields.</Callout>
+
+Before adding fields to a document, you need each recipients' ID. If the document already has recipients, you can query the document to retrieve the recipients details. If the document doesn't have any recipients, you need to add a recipient via the UI or API before adding a field.
+
+<Steps>
+
+### Retrieve the Recipient(s) ID(s)
+
+Perform a `GET` request to the `/api/v1/documents/{id}` to retrieve the details of a specific document, including the recipients information.
+
+An example reponse would look like this:
+
+```json
+{
+  "id": 137,
+  "externalId": null,
+  "userId": 3,
+  "teamId": null,
+  "title": "documenso.pdf",
+  "status": "DRAFT",
+  "documentDataId": "<document-data-id>",
+  "createdAt": "2024-10-11T12:29:12.725Z",
+  "updatedAt": "2024-10-11T12:29:12.725Z",
+  "completedAt": null,
+  "recipients": [
+    {
+      "id": 55,
+      "documentId": 137,
+      "email": "ashdrew@email.com",
+      "name": "Ash Drew",
+      "role": "SIGNER",
+      "signingOrder": null,
+      "token": "<signing-token>",
+      "signedAt": null,
+      "readStatus": "NOT_OPENED",
+      "signingStatus": "NOT_SIGNED",
+      "sendStatus": "NOT_SENT",
+      "signingUrl": "https://app.documenso.com/sign/<signing-token>"
+    }
+  ]
+}
+```
+
+From this response, you'll only need the recipient ID, which is `55` in this case.
+
+### (OR) Add a Recipient
+
+If the document doesn't already have recipient(s), you can add a recipient via the API. Make a `POST` request to the `/api/v1/documents/{documentId}/recipients` endpoint with the recipient information. This endpoint takes the following JSON payload:
+
+```json
+{
+  "name": "string",
+  "email": "user@example.com",
+  "role": "SIGNER",
+  "signingOrder": 0,
+  "authOptions": {
+    "actionAuth": "ACCOUNT"
+  }
+}
+```
+
+<Callout type="info">The `authOptions` property is only available for Enterprise accounts.</Callout>
+
+```json
+{
+  "name": "Ash Drew",
+  "email": "ashdrew@email.com",
+  "role": "SIGNER",
+  "signingOrder": 0
+}
+```
+
+### Add Field(s)
+
+Now you can make a `POST` request to the `/api/v1/documents/{documentId}/fields` endpoint with the field(s) information. Here's an example:
+
+```json
+[
+  {
+    "recipientId": 55,
+    "type": "SIGNATURE",
+    "pageNumber": 1,
+    "pageX": 50,
+    "pageY": 20,
+    "pageWidth": 25,
+    "pageHeight": 5
+  },
+  {
+    "recipientId": 55,
+    "type": "TEXT",
+    "pageNumber": 1,
+    "pageX": 20,
+    "pageY": 50,
+    "pageWidth": 30,
+    "pageHeight": 7.5,
+    "fieldMeta": {
+      "label": "Address",
+      "placeholder": "32 New York Street, 41241",
+      "required": true,
+      "readOnly": false,
+      "type": "text",
+      "text": "32 New York Street, 41241",
+      "characterLimit": 40
+    }
+  }
+]
+```
+
+<Callout type="info">
+  The `text` field represents the default value of the field. If the user doesn't provide any other
+  value, this is the value that will be used to sign the field.
+</Callout>
+
+A successful request will return a JSON response with the newly-added fields. The image below illustrates the fields added to the document via the API.
+
+![A screenshot of the document in the Documenso editor](/api-reference/fields-added-via-api.webp)
+
+</Steps>
