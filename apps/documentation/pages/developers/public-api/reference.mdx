@@ -17,7 +17,7 @@ Uploading a document to your Documenso account requires a two-step process.
 
 ### Create Document
 
-First, you need to make a POST request to the `/api/v1/documents` endpoint, which takes a JSON payload with the following fields:
+First, you need to make a `POST` request to the `/api/v1/documents` endpoint, which takes a JSON payload with the following fields:
 
 ```json
 {
@@ -51,9 +51,9 @@ First, you need to make a POST request to the `/api/v1/documents` endpoint, whic
 }
 ```
 
-- `title` - This represents the document's title and is a required field.
-- `externalId` - This is an optional field that you can use to store an external identifier for the document. This can be useful for tracking the document in your systems.
-- `recipients` - This is an array of recipient objects and a required field. Each recipient object has the following fields:
+- `title` _(required)_ - This represents the document's title.
+- `externalId` - This is an optional field that you can use to store an external identifier for the document. This can be useful for tracking the document in your system.
+- `recipients` _(required)_ - This is an array of recipient objects. Each recipient object has the following fields:
   - `name` - The name of the recipient.
   - `email` - The email address of the recipient.
   - `role` - The role of the recipient. See the [available roles](/users/signing-documents#roles).
@@ -148,7 +148,18 @@ The upload URL is a pre-signed S3 URL that you can use to upload the document to
 }
 ```
 
-You will see the document in your Documenso account dashboard if the request is successful. The screenshot below shows the above document that was uploaded via the API.
+When you make the `PUT` request to the pre-signed URL, you need to include the document file you want to upload. The image below shows how to upload a document to the S3 bucket via Postman.
+
+![Upload document to S3](/api-reference/upload-document-to-s3.webp)
+
+Here's an example of how to upload a document using cURL:
+
+```bash
+curl --location --request PUT 'https://<url>/<bucket-name>/<id>/my-document.pdf?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Content-Sha256=UNSIGNED-PAYLOAD&X-Amz-Credential=<credentials>&X-Amz-Date=<date>&X-Amz-Expires=3600&X-Amz-Signature=<signature>&X-Amz-SignedHeaders=host&x-id=PutObject' \
+--form '=@"/Users/my-user/Documents/documenso.pdf"'
+```
+
+Once the document is successfully uploaded, you can access it in your Documenso account dashboard. The screenshot below shows the document that was uploaded via the API.
 
 ![Uploaded Document](/api-reference/document-uploaded-to-documenso-via-api.webp)
 
@@ -198,7 +209,7 @@ The JSON payload is identical to the payload for uploading a document, so you ca
 
 ### Grab the Template ID
 
-The first step is to retrieve the template ID from the Documenso dashboard. You can find the template ID in the URL when you navigate to the template details page.
+The first step is to retrieve the template ID from the Documenso dashboard. You can find the template ID in the URL by navigating to the template details page.
 
 ![Template ID](/api-reference/documenso-template-id.webp)
 
@@ -374,15 +385,15 @@ To add fields to a document, you need to make a `POST` request with a JSON paylo
 
 <Callout type="info">This endpoint accepts either one field or an array of fields.</Callout>
 
-Before adding fields to a document, you need each recipients' ID. If the document already has recipients, you can query the document to retrieve the recipients details. If the document doesn't have any recipients, you need to add a recipient via the UI or API before adding a field.
+Before adding fields to a document, you need each recipient's ID. If the document already has recipients, you can query the document to retrieve the recipient's details. If the document has no recipients, you need to add a recipient via the UI or API before adding a field.
 
 <Steps>
 
 ### Retrieve the Recipient(s) ID(s)
 
-Perform a `GET` request to the `/api/v1/documents/{id}` to retrieve the details of a specific document, including the recipients information.
+Perform a `GET` request to the `/api/v1/documents/{id}` to retrieve the details of a specific document, including the recipient's information.
 
-An example reponse would look like this:
+An example response would look like this:
 
 ```json
 {
@@ -419,7 +430,7 @@ From this response, you'll only need the recipient ID, which is `55` in this cas
 
 ### (OR) Add a Recipient
 
-If the document doesn't already have recipient(s), you can add a recipient via the API. Make a `POST` request to the `/api/v1/documents/{documentId}/recipients` endpoint with the recipient information. This endpoint takes the following JSON payload:
+If the document doesn't already have recipient(s), you can add recipient(s) via the API. Make a `POST` request to the `/api/v1/documents/{documentId}/recipients` endpoint with the recipient information. This endpoint takes the following JSON payload:
 
 ```json
 {
@@ -435,6 +446,8 @@ If the document doesn't already have recipient(s), you can add a recipient via t
 
 <Callout type="info">The `authOptions` property is only available for Enterprise accounts.</Callout>
 
+Here's an example of the JSON payload for adding a recipient:
+
 ```json
 {
   "name": "Ash Drew",
@@ -443,6 +456,8 @@ If the document doesn't already have recipient(s), you can add a recipient via t
   "signingOrder": 0
 }
 ```
+
+A successful request will return a JSON response with the newly added recipient. You can now use the recipient ID to add fields to the document.
 
 ### Add Field(s)
 
@@ -485,7 +500,7 @@ Now you can make a `POST` request to the `/api/v1/documents/{documentId}/fields`
   value, this is the value that will be used to sign the field.
 </Callout>
 
-A successful request will return a JSON response with the newly-added fields. The image below illustrates the fields added to the document via the API.
+A successful request will return a JSON response with the newly added fields. The image below illustrates the fields added to the document via the API.
 
 ![A screenshot of the document in the Documenso editor](/api-reference/fields-added-via-api.webp)
 
