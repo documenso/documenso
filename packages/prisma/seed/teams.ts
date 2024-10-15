@@ -105,13 +105,15 @@ export const unseedTeam = async (teamUrl: string) => {
 type SeedTeamMemberOptions = {
   teamId: number;
   role?: TeamMemberRole;
+  name?: string;
 };
 
 export const seedTeamMember = async ({
   teamId,
+  name,
   role = TeamMemberRole.ADMIN,
 }: SeedTeamMemberOptions) => {
-  const user = await seedUser();
+  const user = await seedUser({ name });
 
   await prisma.teamMember.create({
     data: {
