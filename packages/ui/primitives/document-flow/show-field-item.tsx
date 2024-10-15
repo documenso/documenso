@@ -1,13 +1,23 @@
 'use client';
 
+import { Caveat } from 'next/font/google';
+
 import type { Prisma } from '@prisma/client';
 import { createPortal } from 'react-dom';
 
 import { useFieldPageCoords } from '@documenso/lib/client-only/hooks/use-field-page-coords';
+import { FieldType } from '@documenso/prisma/client';
 
 import { cn } from '../../lib/utils';
 import { Card, CardContent } from '../card';
 import { FRIENDLY_FIELD_TYPE } from './types';
+
+const fontCaveat = Caveat({
+  weight: ['500'],
+  subsets: ['latin'],
+  display: 'swap',
+  variable: '--font-caveat',
+});
 
 export type ShowFieldItemProps = {
   field: Prisma.FieldGetPayload<null>;
@@ -33,7 +43,8 @@ export const ShowFieldItem = ({ field, recipients }: ShowFieldItemProps) => {
       <Card className={cn('bg-background h-full w-full')}>
         <CardContent
           className={cn(
-            'text-muted-foreground/50 flex h-full w-full flex-col items-center justify-center p-2',
+            'text-muted-foreground/50 flex h-full w-full flex-col items-center justify-center p-2 text-xl',
+            field.type === FieldType.SIGNATURE && fontCaveat.className,
           )}
         >
           {FRIENDLY_FIELD_TYPE[field.type]}
