@@ -1,0 +1,15 @@
+{
+  "name": "gcloud",
+  "description": "documenso on google cloud",
+  "main": "index.ts",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "dependencies": {
+    "@pulumi/pulumi": "*",
+    "@pulumi/gcp": "7.8.0",
+    "@pulumi/google-native": "0.31.1",
+    "@pulumi/random": "^4.16.6"
+  }
+}

@@ -59,7 +59,8 @@
   "name": "@documenso/root",
   "workspaces": [
     "apps/*",
-    "packages/*"
+    "packages/*",
+    "infra/*"
   ],
   "dependencies": {
     "@documenso/pdf-sign": "^0.1.0",

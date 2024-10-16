@@ -1,0 +1,10 @@
+name: gcloud
+runtime:
+  name: nodejs
+  options:
+    packagemanager: npm
+description: documenso on google cloud
+config:
+  app--url: 'https://app.documenso.com'
+  app--smtp-from-name: 'Documenso'
+  app--smtp-from-address: 'noreply@documenso.com'
