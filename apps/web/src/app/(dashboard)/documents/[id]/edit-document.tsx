@@ -6,6 +6,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 
 import { msg } from '@lingui/macro';
 import { useLingui } from '@lingui/react';
+import { useSession } from 'next-auth/react';
 
 import {
   DO_NOT_INVALIDATE_QUERY_ON_MUTATION,
@@ -53,6 +54,7 @@ export const EditDocumentForm = ({
   const router = useRouter();
   const searchParams = useSearchParams();
   const team = useOptionalCurrentTeam();
+  const { data: session } = useSession();
 
   const [isDocumentPdfLoaded, setIsDocumentPdfLoaded] = useState(false);
 
@@ -126,6 +128,19 @@ export const EditDocumentForm = ({
   });
 
   const { mutateAsync: sendDocument } = trpc.document.sendDocument.useMutation({
+    ...DO_NOT_INVALIDATE_QUERY_ON_MUTATION,
+    onSuccess: (newData) => {
+      utils.document.getDocumentWithDetailsById.setData(
+        {
+          id: initialDocument.id,
+          teamId: team?.id,
+        },
+        (oldData) => ({ ...(oldData || initialDocument), ...newData }),
+      );
+    },
+  });
+
+  const { mutateAsync: selfSignDocument } = trpc.document.selfSignDocument.useMutation({
     ...DO_NOT_INVALIDATE_QUERY_ON_MUTATION,
     onSuccess: (newData) => {
       utils.document.getDocumentWithDetailsById.setData(
@@ -266,10 +281,22 @@ export const EditDocumentForm = ({
         }
       }
 
-      // Router refresh is here to clear the router cache for when navigating to /documents.
-      router.refresh();
+      const hasSameOwnerAsRecipient =
+        recipients.length === 1 && recipients[0].email === session?.user?.email;
 
-      setStep('subject');
+      if (hasSameOwnerAsRecipient) {
+        await selfSignDocument({
+          documentId: document.id,
+          teamId: team?.id,
+        });
+
+        router.push(`/sign/${recipients[0].token}`);
+      } else {
+        // Router refresh is here to clear the router cache for when navigating to /documents.
+        router.refresh();
+
+        setStep('subject');
+      }
     } catch (err) {
       console.error(err);
 

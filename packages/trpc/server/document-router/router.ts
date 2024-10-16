@@ -37,6 +37,7 @@ import {
   ZMoveDocumentsToTeamSchema,
   ZResendDocumentMutationSchema,
   ZSearchDocumentsMutationSchema,
+  ZSelfSignDocumentMutationSchema,
   ZSendDocumentMutationSchema,
   ZSetPasswordForDocumentMutationSchema,
   ZSetSettingsForDocumentMutationSchema,
@@ -363,6 +364,29 @@ export const documentRouter = router({
         throw new TRPCError({
           code: 'BAD_REQUEST',
           message: 'We were unable to send this document. Please try again later.',
+        });
+      }
+    }),
+
+  selfSignDocument: authenticatedProcedure
+    .input(ZSelfSignDocumentMutationSchema)
+    .mutation(async ({ input, ctx }) => {
+      try {
+        const { documentId, teamId } = input;
+
+        return await sendDocument({
+          userId: ctx.user.id,
+          documentId,
+          teamId,
+          sendEmail: false,
+          requestMetadata: extractNextApiRequestMetadata(ctx.req),
+        });
+      } catch (err) {
+        console.error(err);
+
+        throw new TRPCError({
+          code: 'BAD_REQUEST',
+          message: 'We were unable to self sign this document. Please try again later.',
         });
       }
     }),

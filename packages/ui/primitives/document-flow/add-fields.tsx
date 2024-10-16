@@ -20,6 +20,7 @@ import {
   Type,
   User,
 } from 'lucide-react';
+import { useSession } from 'next-auth/react';
 import { useFieldArray, useForm } from 'react-hook-form';
 import { useHotkeys } from 'react-hotkeys-hook';
 import { prop, sortBy } from 'remeda';
@@ -99,6 +100,13 @@ export type AddFieldsFormProps = {
   teamId?: number;
 };
 
+// Self Sign
+// If the recipient is the user and it is the only recipient,
+// dont send the document, after adding the fields, skip the next step and go straight to the point
+// no need for the sending section
+// it will create the document
+// and redirect you to the signing page.
+
 export const AddFieldsFormPartial = ({
   documentFlow,
   hideRecipients = false,
@@ -110,6 +118,7 @@ export const AddFieldsFormPartial = ({
   teamId,
 }: AddFieldsFormProps) => {
   const { toast } = useToast();
+  const { data: session } = useSession();
 
   const [isMissingSignatureDialogVisible, setIsMissingSignatureDialogVisible] = useState(false);
 
@@ -529,6 +538,10 @@ export const AddFieldsFormPartial = ({
           ] as [RecipientRole, Recipient[]],
       );
   }, [recipientsByRole]);
+
+  const hasSameOwnerAsRecipient =
+    recipientsByRole.SIGNER.length === 1 &&
+    recipientsByRole.SIGNER[0].email === session?.user?.email;
 
   const handleAdvancedSettings = () => {
     setShowAdvancedSettings((prev) => !prev);
@@ -1067,6 +1080,7 @@ export const AddFieldsFormPartial = ({
                 documentFlow.onBackStep?.();
               }}
               goBackLabel={canRenderBackButtonAsRemove ? msg`Remove` : undefined}
+              goNextLabel={hasSameOwnerAsRecipient ? msg`Self Sign` : undefined}
               onGoNextClick={handleGoNextClick}
             />
           </DocumentFlowFormContainerFooter>
