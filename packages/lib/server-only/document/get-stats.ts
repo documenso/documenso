@@ -15,9 +15,10 @@ export type GetStatsInput = {
   user: User;
   team?: Omit<GetTeamCountsOption, 'createdAt'>;
   period?: PeriodSelectorValue;
+  search?: string;
 };
 
-export const getStats = async ({ user, period, ...options }: GetStatsInput) => {
+export const getStats = async ({ user, period, search, ...options }: GetStatsInput) => {
   let createdAt: Prisma.DocumentWhereInput['createdAt'];
 
   if (period) {
@@ -31,8 +32,14 @@ export const getStats = async ({ user, period, ...options }: GetStatsInput) => {
   }
 
   const [ownerCounts, notSignedCounts, hasSignedCounts, deletedCounts] = await (options.team
-    ? getTeamCounts({ ...options.team, createdAt, currentUserEmail: user.email, userId: user.id })
-    : getCounts({ user, createdAt }));
+    ? getTeamCounts({
+        ...options.team,
+        createdAt,
+        currentUserEmail: user.email,
+        userId: user.id,
+        search,
+      })
+    : getCounts({ user, createdAt, search }));
 
   const stats: Record<ExtendedDocumentStatus, number> = {
     [ExtendedDocumentStatus.DRAFT]: 0,
@@ -77,9 +84,18 @@ export const getStats = async ({ user, period, ...options }: GetStatsInput) => {
 type GetCountsOption = {
   user: User;
   createdAt: Prisma.DocumentWhereInput['createdAt'];
+  search?: string;
 };
 
-const getCounts = async ({ user, createdAt }: GetCountsOption) => {
+const getCounts = async ({ user, createdAt, search }: GetCountsOption) => {
+  const searchFilter: Prisma.DocumentWhereInput = {
+    OR: [
+      { title: { contains: search, mode: 'insensitive' } },
+      { Recipient: { some: { name: { contains: search, mode: 'insensitive' } } } },
+      { Recipient: { some: { email: { contains: search, mode: 'insensitive' } } } },
+    ],
+  };
+
   return Promise.all([
     // Owner counts.
     prisma.document.groupBy({
@@ -92,6 +108,7 @@ const getCounts = async ({ user, createdAt }: GetCountsOption) => {
         createdAt,
         teamId: null,
         deletedAt: null,
+        AND: [searchFilter],
       },
     }),
     // Not signed counts.
@@ -110,6 +127,7 @@ const getCounts = async ({ user, createdAt }: GetCountsOption) => {
           },
         },
         createdAt,
+        AND: [searchFilter],
       },
     }),
     // Has signed counts.
@@ -147,6 +165,7 @@ const getCounts = async ({ user, createdAt }: GetCountsOption) => {
             },
           },
         ],
+        AND: [searchFilter],
       },
     }),
     // Deleted counts.
@@ -202,6 +221,7 @@ type GetTeamCountsOption = {
   userId: number;
   createdAt: Prisma.DocumentWhereInput['createdAt'];
   currentTeamMemberRole?: TeamMemberRole;
+  search?: string;
 };
 
 const getTeamCounts = async (options: GetTeamCountsOption) => {
@@ -212,6 +232,7 @@ const getTeamCounts = async (options: GetTeamCountsOption) => {
     senderIds = [],
     currentUserEmail,
     currentTeamMemberRole,
+    search,
   } = options;
 
   const userIdWhereClause: Prisma.DocumentWhereInput['userId'] =
@@ -220,6 +241,14 @@ const getTeamCounts = async (options: GetTeamCountsOption) => {
           in: senderIds,
         }
       : undefined;
+
+  const searchFilter: Prisma.DocumentWhereInput = {
+    OR: [
+      { title: { contains: search, mode: 'insensitive' } },
+      { Recipient: { some: { name: { contains: search, mode: 'insensitive' } } } },
+      { Recipient: { some: { email: { contains: search, mode: 'insensitive' } } } },
+    ],
+  };
 
   const visibilityFilters = [
     ...match(currentTeamMemberRole)
@@ -266,6 +295,7 @@ const getTeamCounts = async (options: GetTeamCountsOption) => {
       },
     ],
     deletedAt: null,
+    ...searchFilter,
   };
 
   const notSignedCountsWhereInput: Prisma.DocumentWhereInput = {

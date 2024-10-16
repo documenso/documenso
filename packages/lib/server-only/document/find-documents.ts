@@ -25,6 +25,7 @@ export type FindDocumentsOptions = {
   };
   period?: PeriodSelectorValue;
   senderIds?: number[];
+  search?: string;
 };
 
 export const findDocuments = async ({
@@ -37,6 +38,7 @@ export const findDocuments = async ({
   orderBy,
   period,
   senderIds,
+  search,
 }: FindDocumentsOptions) => {
   const { user, team } = await prisma.$transaction(async (tx) => {
     const user = await tx.user.findFirstOrThrow({
@@ -85,6 +87,14 @@ export const findDocuments = async ({
     }))
     .otherwise(() => undefined);
 
+  const searchFilter: Prisma.DocumentWhereInput = {
+    OR: [
+      { title: { contains: search, mode: 'insensitive' } },
+      { Recipient: { some: { name: { contains: search, mode: 'insensitive' } } } },
+      { Recipient: { some: { email: { contains: search, mode: 'insensitive' } } } },
+    ],
+  };
+
   const visibilityFilters = [
     match(teamMemberRole)
       .with(TeamMemberRole.ADMIN, () => ({
@@ -130,6 +140,7 @@ export const findDocuments = async ({
   const whereClause: Prisma.DocumentWhereInput = {
     ...termFilters,
     ...filters,
+    ...searchFilter,
   };
 
   if (period) {

@@ -8,7 +8,7 @@ msgstr ""
 "Language: fr\n"
 "Project-Id-Version: documenso-app\n"
 "Report-Msgid-Bugs-To: \n"
-"PO-Revision-Date: 2024-09-19 09:18\n"
+"PO-Revision-Date: 2024-10-08 12:05\n"
 "Last-Translator: \n"
 "Language-Team: French\n"
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
@@ -223,6 +223,7 @@ msgstr "Du blog"
 
 #: apps/marketing/src/app/(marketing)/open/data.ts:9
 #: apps/marketing/src/app/(marketing)/open/data.ts:17
+#: apps/marketing/src/app/(marketing)/open/data.ts:25
 #: apps/marketing/src/app/(marketing)/open/data.ts:33
 #: apps/marketing/src/app/(marketing)/open/data.ts:41
 #: apps/marketing/src/app/(marketing)/open/data.ts:49
@@ -385,8 +386,8 @@ msgid "Our self-hosted option is great for small teams and individuals who need 
 msgstr "Notre option auto-hébergée est idéale pour les petites équipes et les individus qui ont besoin d'une solution simple. Vous pouvez utiliser notre configuration basée sur Docker pour commencer en quelques minutes. Prenez le contrôle avec une personnalisation complète et une propriété des données."
 
 #: apps/marketing/src/app/(marketing)/open/data.ts:25
-msgid "Part-Time"
-msgstr "Temps partiel"
+#~ msgid "Part-Time"
+#~ msgstr "Part-Time"
 
 #: apps/marketing/src/components/(marketing)/pricing-table.tsx:151
 msgid "Premium Profile Name"
@@ -614,6 +615,6 @@ msgstr "Oui ! Documenso est proposé sous la licence open source GNU AGPL V3. Ce
 msgid "You can self-host Documenso for free or use our ready-to-use hosted version. The hosted version comes with additional support, painless scalability and more. Early adopters will get access to all features we build this year, for no additional cost! Forever! Yes, that includes multiple users per account later. If you want Documenso for your enterprise, we are happy to talk about your needs."
 msgstr "Vous pouvez auto-héberger Documenso gratuitement ou utiliser notre version hébergée prête à l'emploi. La version hébergée est accompagnée d'une assistance supplémentaire, d'une montée en charge sans effort et d'autres avantages. Les premiers adoptants auront accès à toutes les fonctionnalités que nous construirons cette année, sans coût supplémentaire ! Pour toujours ! Oui, cela inclut plusieurs utilisateurs par compte à l'avenir. Si vous souhaitez Documenso pour votre entreprise, nous serons heureux de discuter de vos besoins."
 
-#: apps/marketing/src/components/(marketing)/carousel.tsx:265
+#: apps/marketing/src/components/(marketing)/carousel.tsx:272
 msgid "Your browser does not support the video tag."
 msgstr "Votre navigateur ne prend pas en charge la balise vidéo."

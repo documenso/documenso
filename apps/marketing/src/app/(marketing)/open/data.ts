@@ -19,10 +19,10 @@ export const TEAM_MEMBERS = [
   },
   {
     name: 'Ephraim Atta-Duncan',
-    role: 'Software Engineer - Intern',
-    salary: 15_000,
+    role: 'Software Engineer - I',
+    salary: 60_000,
     location: 'Ghana',
-    engagement: msg`Part-Time`,
+    engagement: msg`Full-Time`,
     joinDate: 'June 6th, 2023',
   },
   {

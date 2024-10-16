@@ -8,7 +8,7 @@ msgstr ""
 "Language: de\n"
 "Project-Id-Version: documenso-app\n"
 "Report-Msgid-Bugs-To: \n"
-"PO-Revision-Date: 2024-09-16 16:03\n"
+"PO-Revision-Date: 2024-10-08 12:05\n"
 "Last-Translator: \n"
 "Language-Team: German\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
@@ -793,7 +793,7 @@ msgstr "Unterzeichnung abschließen"
 msgid "Complete Viewing"
 msgstr "Betrachten abschließen"
 
-#: apps/web/src/components/(dashboard)/avatar/stack-avatars-with-tooltip.tsx:58
+#: apps/web/src/components/(dashboard)/avatar/stack-avatars-with-tooltip.tsx:62
 #: apps/web/src/components/formatter/document-status.tsx:28
 msgid "Completed"
 msgstr "Abgeschlossen"
@@ -1325,7 +1325,7 @@ msgstr "Dokument wird dauerhaft gelöscht"
 #: apps/web/src/app/(dashboard)/documents/[id]/edit/document-edit-page-view.tsx:109
 #: apps/web/src/app/(dashboard)/documents/[id]/loading.tsx:16
 #: apps/web/src/app/(dashboard)/documents/[id]/sent/page.tsx:15
-#: apps/web/src/app/(dashboard)/documents/documents-page-view.tsx:114
+#: apps/web/src/app/(dashboard)/documents/documents-page-view.tsx:119
 #: apps/web/src/app/(profile)/p/[url]/page.tsx:166
 #: apps/web/src/app/not-found.tsx:21
 #: apps/web/src/components/(dashboard)/common/command-menu.tsx:205
@@ -2156,7 +2156,7 @@ msgstr "Sobald Sie den QR-Code gescannt oder den Code manuell eingegeben haben, 
 msgid "Oops! Something went wrong."
 msgstr "Hoppla! Etwas ist schief gelaufen."
 
-#: apps/web/src/components/(dashboard)/avatar/stack-avatars-with-tooltip.tsx:97
+#: apps/web/src/components/(dashboard)/avatar/stack-avatars-with-tooltip.tsx:101
 msgid "Opened"
 msgstr "Geöffnet"
 
@@ -3653,7 +3653,7 @@ msgstr "Unable to sign in"
 msgid "Unauthorized"
 msgstr "Unauthorized"
 
-#: apps/web/src/components/(dashboard)/avatar/stack-avatars-with-tooltip.tsx:112
+#: apps/web/src/components/(dashboard)/avatar/stack-avatars-with-tooltip.tsx:116
 msgid "Uncompleted"
 msgstr "Uncompleted"
 
@@ -3865,7 +3865,7 @@ msgstr "Teams ansehen"
 msgid "Viewed"
 msgstr "Angesehen"
 
-#: apps/web/src/components/(dashboard)/avatar/stack-avatars-with-tooltip.tsx:82
+#: apps/web/src/components/(dashboard)/avatar/stack-avatars-with-tooltip.tsx:86
 msgid "Waiting"
 msgstr "Warten"
 

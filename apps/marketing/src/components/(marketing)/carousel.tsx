@@ -108,14 +108,21 @@ export const Carousel = () => {
       return;
     }
 
-    setSelectedIndex(emblaApi.selectedScrollSnap());
-    emblaThumbsApi.scrollTo(emblaApi.selectedScrollSnap());
+    const newIndex = emblaApi.selectedScrollSnap();
+
+    setSelectedIndex(newIndex);
+    emblaThumbsApi.scrollTo(newIndex);
 
     resetProgress();
 
+    const currentVideo = videoRefs.current[newIndex];
+    if (currentVideo) {
+      currentVideo.currentTime = 0;
+    }
+
     // moduleResolution: bundler breaks this type
     // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
-    const autoplay = emblaApi.plugins()?.autoplay as unknown as AutoplayType | undefined;
+    const autoplay = emblaApi?.plugins()?.autoplay as unknown as AutoplayType | undefined;
 
     if (autoplay) {
       autoplay.reset();

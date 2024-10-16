@@ -1,0 +1,507 @@
+---
+title: API Reference
+description: Reference documentation for the Documenso public API.
+---
+
+import { Callout, Steps } from 'nextra/components';
+
+# API Reference
+
+The Swagger UI for the API is available at [/api/v1/openapi](https://app.documenso.com/api/v1/openapi). This page provides detailed information about the API endpoints, request and response formats, and authentication requirements.
+
+## Upload a Document
+
+Uploading a document to your Documenso account requires a two-step process.
+
+<Steps>
+
+### Create Document
+
+First, you need to make a `POST` request to the `/api/v1/documents` endpoint, which takes a JSON payload with the following fields:
+
+```json
+{
+  "title": "string",
+  "externalId": "string",
+  "recipients": [
+    {
+      "name": "string",
+      "email": "user@example.com",
+      "role": "SIGNER",
+      "signingOrder": 0
+    }
+  ],
+  "meta": {
+    "subject": "string",
+    "message": "string",
+    "timezone": "Etc/UTC",
+    "dateFormat": "yyyy-MM-dd hh:mm a",
+    "redirectUrl": "string",
+    "signingOrder": "PARALLEL"
+  },
+  "authOptions": {
+    "globalAccessAuth": "ACCOUNT",
+    "globalActionAuth": "ACCOUNT"
+  },
+  "formValues": {
+    "additionalProp1": "string",
+    "additionalProp2": "string",
+    "additionalProp3": "string"
+  }
+}
+```
+
+- `title` _(required)_ - This represents the document's title.
+- `externalId` - This is an optional field that you can use to store an external identifier for the document. This can be useful for tracking the document in your system.
+- `recipients` _(required)_ - This is an array of recipient objects. Each recipient object has the following fields:
+  - `name` - The name of the recipient.
+  - `email` - The email address of the recipient.
+  - `role` - The role of the recipient. See the [available roles](/users/signing-documents#roles).
+  - `signingOrder` - The order in which the recipient should sign the document. This is an integer value starting from 0.
+- `meta` - This object contains additional metadata for the document. It has the following fields:
+  - `subject` - The subject of the email that will be sent to the recipients.
+  - `message` - The message of the email that will be sent to the recipients.
+  - `timezone` - The timezone in which the document should be signed.
+  - `dateFormat` - The date format that should be used in the document.
+  - `redirectUrl` - The URL to which the user should be redirected after signing the document.
+  - `signingOrder` - The signing order for the document. This can be either `SEQUENTIAL` or `PARALLEL`.
+- `authOptions` - This object contains authentication options for the document. It has the following fields:
+  - `globalAccessAuth` - The authentication level required to access the document. This can be either `ACCOUNT` or `null`.
+    - If the document is set to `ACCOUNT`, all recipients must authenticate with their Documenso account to access it.
+    - The document can be accessed without a Documenso account if it's set to `null`.
+  - `globalActionAuth` - The authentication level required to perform actions on the document. This can be `ACCOUNT`, `PASSKEY`, `TWO_FACTOR_AUTH`, or `null`.
+    - If the document is set to `ACCOUNT`, all recipients must authenticate with their Documenso account to perform actions on the document.
+    - If it's set to `PASSKEY`, all recipients must have the passkey active to perform actions on the document.
+    - If it's set to `TWO_FACTOR_AUTH`, all recipients must have the two-factor authentication active to perform actions on the document.
+    - If it's set to `null`, all the recipients can perform actions on the document without any authentication.
+- `formValues` - This object contains additional form values for the document. This property only works with native PDF fields and accepts three types: number, text and boolean.
+
+<Callout type="info">
+  The `globalActionAuth` property is only available for Enterprise accounts.
+</Callout>
+
+Here's an example of the JSON payload for uploading a document:
+
+```json
+{
+  "title": "my-document.pdf",
+  "externalId": "12345",
+  "recipients": [
+    {
+      "name": "Alex Blake",
+      "email": "alexblake@email.com",
+      "role": "SIGNER",
+      "signingOrder": 1
+    },
+    {
+      "name": "Ash Drew",
+      "email": "ashdrew@email.com",
+      "role": "SIGNER",
+      "signingOrder": 0
+    }
+  ],
+  "meta": {
+    "subject": "Sign the document",
+    "message": "Hey there, please sign this document.",
+    "timezone": "Europe/London",
+    "dateFormat": "Day, Month Year",
+    "redirectUrl": "https://mysite.com/welcome",
+    "signingOrder": "SEQUENTIAL"
+  },
+  "authOptions": {
+    "globalAccessAuth": "ACCOUNT",
+    "globalActionAuth": "PASSKEY"
+  }
+}
+```
+
+### Upload to S3
+
+A successful API call to the `/api/v1/documents` endpoint returns a JSON response containing the upload URL, document ID, and recipient information.
+
+The upload URL is a pre-signed S3 URL that you can use to upload the document to the Documenso (or your) S3 bucket. You need to make a `PUT` request to this URL to upload the document.
+
+```json
+{
+  "uploadUrl": "https://<url>/<bucket-name>/<id>/my-document.pdf?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Content-Sha256=UNSIGNED-PAYLOAD&X-Amz-Credential=<credentials>&X-Amz-Date=<date>&X-Amz-Expires=3600&X-Amz-Signature=<signature>&X-Amz-SignedHeaders=host&x-id=PutObject",
+  "documentId": 51,
+  "recipients": [
+    {
+      "recipientId": 11,
+      "name": "Alex Blake",
+      "email": "alexblake@email.com",
+      "token": "<unique-signer-token>",
+      "role": "SIGNER",
+      "signingOrder": 1,
+      "signingUrl": "https://app.documenso.com/sign/<unique-signer-token>"
+    },
+    {
+      "recipientId": 12,
+      "name": "Ash Drew",
+      "email": "ashdrew@email.com",
+      "token": "<unique-signer-token>",
+      "role": "SIGNER",
+      "signingOrder": 0,
+      "signingUrl": "https://app.documenso.com/sign/<unique-signer-token>"
+    }
+  ]
+}
+```
+
+When you make the `PUT` request to the pre-signed URL, you need to include the document file you want to upload. The image below shows how to upload a document to the S3 bucket via Postman.
+
+![Upload document to S3](/api-reference/upload-document-to-s3.webp)
+
+Here's an example of how to upload a document using cURL:
+
+```bash
+curl --location --request PUT 'https://<url>/<bucket-name>/<id>/my-document.pdf?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Content-Sha256=UNSIGNED-PAYLOAD&X-Amz-Credential=<credentials>&X-Amz-Date=<date>&X-Amz-Expires=3600&X-Amz-Signature=<signature>&X-Amz-SignedHeaders=host&x-id=PutObject' \
+--form '=@"/Users/my-user/Documents/documenso.pdf"'
+```
+
+Once the document is successfully uploaded, you can access it in your Documenso account dashboard. The screenshot below shows the document that was uploaded via the API.
+
+![Uploaded Document](/api-reference/document-uploaded-to-documenso-via-api.webp)
+
+</Steps>
+
+## Generate Document From Template
+
+Documenso allows you to generate documents from templates. This is useful when you have a standard document format you want to reuse.
+
+The API endpoint for generating a document from a template is `/api/v1/templates/{templateId}/generate-document`, and it takes a JSON payload with the following fields:
+
+```json
+{
+  "title": "string",
+  "externalId": "string",
+  "recipients": [
+    {
+      "id": 0,
+      "name": "string",
+      "email": "user@example.com",
+      "signingOrder": 0
+    }
+  ],
+  "meta": {
+    "subject": "string",
+    "message": "string",
+    "timezone": "string",
+    "dateFormat": "string",
+    "redirectUrl": "string",
+    "signingOrder": "PARALLEL"
+  },
+  "authOptions": {
+    "globalAccessAuth": "ACCOUNT",
+    "globalActionAuth": "ACCOUNT"
+  },
+  "formValues": {
+    "additionalProp1": "string",
+    "additionalProp2": "string",
+    "additionalProp3": "string"
+  }
+}
+```
+
+The JSON payload is identical to the payload for uploading a document, so you can read more about the fields in the [Create Document](/developers/public-api/reference#create-document) step. For this API endpoint, the `recipients` property is required.
+
+<Steps>
+
+### Grab the Template ID
+
+The first step is to retrieve the template ID from the Documenso dashboard. You can find the template ID in the URL by navigating to the template details page.
+
+![Template ID](/api-reference/documenso-template-id.webp)
+
+In this case, the template ID is "99999".
+
+### Retrieve the Recipient(s) ID(s)
+
+Once you have the template ID, the next step involves retrieving the ID(s) of the recipient(s) from the template. You can do this by making a GET request to `/api/v1/templates/{template-id}`.
+
+A successful response looks as follows:
+
+```json
+{
+  "id": 0,
+  "externalId": "string",
+  "type": "PUBLIC",
+  "title": "string",
+  "userId": 0,
+  "teamId": 0,
+  "templateDocumentDataId": "string",
+  "createdAt": "2024-10-11T08:46:58.247Z",
+  "updatedAt": "2024-10-11T08:46:58.247Z",
+  "templateMeta": {
+    "id": "string",
+    "subject": "string",
+    "message": "string",
+    "timezone": "string",
+    "dateFormat": "string",
+    "templateId": 0,
+    "redirectUrl": "string",
+    "signingOrder": "PARALLEL"
+  },
+  "directLink": {
+    "token": "string",
+    "enabled": true
+  },
+  "templateDocumentData": {
+    "id": "string",
+    "type": "S3_PATH",
+    "data": "string"
+  },
+  "Field": [
+    {
+      "id": 0,
+      "recipientId": 0,
+      "type": "SIGNATURE",
+      "page": 0,
+      "positionX": "string",
+      "positionY": "string",
+      "width": "string",
+      "height": "string"
+    }
+  ],
+  "Recipient": [
+    {
+      "id": 0,
+      "email": "user@example.com",
+      "name": "string",
+      "signingOrder": 0,
+      "authOptions": "string",
+      "role": "CC"
+    }
+  ]
+}
+```
+
+You'll need the recipient(s) ID(s) for the next step.
+
+### Generate the Document
+
+To generate a document from the template, you need to make a POST request to the `/api/v1/templates/{template-id}/generate-document` endpoint.
+
+At the minimum, you must provide the `recipients` array in the JSON payload. Here's an example of the JSON payload:
+
+```json
+{
+  "recipients": [
+    {
+      "id": 0,
+      "name": "Ash Drew",
+      "email": "ashdrew@email.com",
+      "signingOrder": 0
+    }
+  ]
+}
+```
+
+Filling the `recipients` array with the corresponding recipient for each template placeholder recipient is recommended. For example, if the template has two placeholders, you should provide at least two recipients in the `recipients` array. Otherwise, the document will be sent to inexistent recipients such as `<recipient.1@documenso.com>`. However, the recipients can always be edited via the API or the web app.
+
+A successful response will contain the document ID and recipient(s) information.
+
+```json
+{
+  "documentId": 999,
+  "recipients": [
+    {
+      "recipientId": 0,
+      "name": "Ash Drew",
+      "email": "ashdrew@email.com",
+      "token": "<signing-token>",
+      "role": "SIGNER",
+      "signingOrder": null,
+      "signingUrl": "https://app.documenso.com/sign/<signing-token>"
+    }
+  ]
+}
+```
+
+You can now access the document in your Documenso account dashboard. The screenshot below shows the document that was generated from the template.
+
+![Generated Document](/api-reference/document-generated-from-template.webp)
+
+</Steps>
+
+## Add Fields to Document
+
+The API allows you to add fields to a document via the `/api/v1/documents/{documentId}/fields` endpoint. This is useful when you want to add fields to a document before sending it to recipients.
+
+To add fields to a document, you need to make a `POST` request with a JSON payload containing the field(s) information.
+
+```json
+{
+  "recipientId": 0,
+  "type": "SIGNATURE",
+  "pageNumber": 0,
+  "pageX": 0,
+  "pageY": 0,
+  "pageWidth": 0,
+  "pageHeight": 0,
+  "fieldMeta": {
+    "label": "string",
+    "placeholder": "string",
+    "required": true,
+    "readOnly": true,
+    "type": "text",
+    "text": "string",
+    "characterLimit": 0
+  }
+}
+
+// or
+
+[
+  {
+    "recipientId": 0,
+    "type": "SIGNATURE",
+    "pageNumber": 0,
+    "pageX": 0,
+    "pageY": 0,
+    "pageWidth": 0,
+    "pageHeight": 0
+  },
+  {
+    "recipientId": 0,
+    "type": "TEXT",
+    "pageNumber": 0,
+    "pageX": 0,
+    "pageY": 0,
+    "pageWidth": 0,
+    "pageHeight": 0,
+    "fieldMeta": {
+      "label": "string",
+      "placeholder": "string",
+      "required": true,
+      "readOnly": true,
+      "type": "text",
+      "text": "string",
+      "characterLimit": 0
+    }
+  }
+]
+```
+
+<Callout type="info">This endpoint accepts either one field or an array of fields.</Callout>
+
+Before adding fields to a document, you need each recipient's ID. If the document already has recipients, you can query the document to retrieve the recipient's details. If the document has no recipients, you need to add a recipient via the UI or API before adding a field.
+
+<Steps>
+
+### Retrieve the Recipient(s) ID(s)
+
+Perform a `GET` request to the `/api/v1/documents/{id}` to retrieve the details of a specific document, including the recipient's information.
+
+An example response would look like this:
+
+```json
+{
+  "id": 137,
+  "externalId": null,
+  "userId": 3,
+  "teamId": null,
+  "title": "documenso.pdf",
+  "status": "DRAFT",
+  "documentDataId": "<document-data-id>",
+  "createdAt": "2024-10-11T12:29:12.725Z",
+  "updatedAt": "2024-10-11T12:29:12.725Z",
+  "completedAt": null,
+  "recipients": [
+    {
+      "id": 55,
+      "documentId": 137,
+      "email": "ashdrew@email.com",
+      "name": "Ash Drew",
+      "role": "SIGNER",
+      "signingOrder": null,
+      "token": "<signing-token>",
+      "signedAt": null,
+      "readStatus": "NOT_OPENED",
+      "signingStatus": "NOT_SIGNED",
+      "sendStatus": "NOT_SENT",
+      "signingUrl": "https://app.documenso.com/sign/<signing-token>"
+    }
+  ]
+}
+```
+
+From this response, you'll only need the recipient ID, which is `55` in this case.
+
+### (OR) Add a Recipient
+
+If the document doesn't already have recipient(s), you can add recipient(s) via the API. Make a `POST` request to the `/api/v1/documents/{documentId}/recipients` endpoint with the recipient information. This endpoint takes the following JSON payload:
+
+```json
+{
+  "name": "string",
+  "email": "user@example.com",
+  "role": "SIGNER",
+  "signingOrder": 0,
+  "authOptions": {
+    "actionAuth": "ACCOUNT"
+  }
+}
+```
+
+<Callout type="info">The `authOptions` property is only available for Enterprise accounts.</Callout>
+
+Here's an example of the JSON payload for adding a recipient:
+
+```json
+{
+  "name": "Ash Drew",
+  "email": "ashdrew@email.com",
+  "role": "SIGNER",
+  "signingOrder": 0
+}
+```
+
+A successful request will return a JSON response with the newly added recipient. You can now use the recipient ID to add fields to the document.
+
+### Add Field(s)
+
+Now you can make a `POST` request to the `/api/v1/documents/{documentId}/fields` endpoint with the field(s) information. Here's an example:
+
+```json
+[
+  {
+    "recipientId": 55,
+    "type": "SIGNATURE",
+    "pageNumber": 1,
+    "pageX": 50,
+    "pageY": 20,
+    "pageWidth": 25,
+    "pageHeight": 5
+  },
+  {
+    "recipientId": 55,
+    "type": "TEXT",
+    "pageNumber": 1,
+    "pageX": 20,
+    "pageY": 50,
+    "pageWidth": 30,
+    "pageHeight": 7.5,
+    "fieldMeta": {
+      "label": "Address",
+      "placeholder": "32 New York Street, 41241",
+      "required": true,
+      "readOnly": false,
+      "type": "text",
+      "text": "32 New York Street, 41241",
+      "characterLimit": 40
+    }
+  }
+]
+```
+
+<Callout type="info">
+  The `text` field represents the default value of the field. If the user doesn't provide any other
+  value, this is the value that will be used to sign the field.
+</Callout>
+
+A successful request will return a JSON response with the newly added fields. The image below illustrates the fields added to the document via the API.
+
+![A screenshot of the document in the Documenso editor](/api-reference/fields-added-via-api.webp)
+
+</Steps>
