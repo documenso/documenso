@@ -9,10 +9,39 @@ export const ZBaseFieldMeta = z.object({
 
 export type TBaseFieldMeta = z.infer<typeof ZBaseFieldMeta>;
 
+export const ZInitialsFieldMeta = z.object({
+  type: z.literal('initials').default('initials'),
+  fontSize: z.number().min(8).max(96).optional(),
+});
+
+export type TInitialsFieldMeta = z.infer<typeof ZInitialsFieldMeta>;
+
+export const ZNameFieldMeta = z.object({
+  type: z.literal('name').default('name'),
+  fontSize: z.number().min(8).max(96).optional(),
+});
+
+export type TNameFieldMeta = z.infer<typeof ZNameFieldMeta>;
+
+export const ZEmailFieldMeta = z.object({
+  type: z.literal('email').default('email'),
+  fontSize: z.number().min(8).max(96).optional(),
+});
+
+export type TEmailFieldMeta = z.infer<typeof ZEmailFieldMeta>;
+
+export const ZDateFieldMeta = z.object({
+  type: z.literal('date').default('date'),
+  fontSize: z.number().min(8).max(96).optional(),
+});
+
+export type TDateFieldMeta = z.infer<typeof ZDateFieldMeta>;
+
 export const ZTextFieldMeta = ZBaseFieldMeta.extend({
   type: z.literal('text').default('text'),
   text: z.string().optional(),
   characterLimit: z.number().optional(),
+  fontSize: z.number().min(8).max(96).optional(),
 });
 
 export type TTextFieldMeta = z.infer<typeof ZTextFieldMeta>;
@@ -23,6 +52,7 @@ export const ZNumberFieldMeta = ZBaseFieldMeta.extend({
   value: z.string().optional(),
   minValue: z.number().optional(),
   maxValue: z.number().optional(),
+  fontSize: z.number().min(8).max(96).optional(),
 });
 
 export type TNumberFieldMeta = z.infer<typeof ZNumberFieldMeta>;
@@ -69,6 +99,10 @@ export type TDropdownFieldMeta = z.infer<typeof ZDropdownFieldMeta>;
 
 export const ZFieldMetaSchema = z
   .union([
+    ZBaseFieldMeta.extend(ZInitialsFieldMeta.shape),
+    ZBaseFieldMeta.extend(ZNameFieldMeta.shape),
+    ZBaseFieldMeta.extend(ZEmailFieldMeta.shape),
+    ZBaseFieldMeta.extend(ZDateFieldMeta.shape),
     ZTextFieldMeta,
     ZNumberFieldMeta,
     ZRadioFieldMeta,

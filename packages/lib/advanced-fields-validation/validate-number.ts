@@ -1,12 +1,5 @@
 // import { numberFormatValues } from '@documenso/ui/primitives/document-flow/field-items-advanced-settings/constants';
-
-interface NumberFieldMeta {
-  minValue?: number;
-  maxValue?: number;
-  readOnly?: boolean;
-  required?: boolean;
-  numberFormat?: string;
-}
+import type { TNumberFieldMeta as NumberFieldMeta } from '../types/field-meta';
 
 export const validateNumberField = (
   value: string,
@@ -15,7 +8,7 @@ export const validateNumberField = (
 ): string[] => {
   const errors = [];
 
-  const { minValue, maxValue, readOnly, required, numberFormat } = fieldMeta || {};
+  const { minValue, maxValue, readOnly, required, numberFormat, fontSize } = fieldMeta || {};
 
   const formatRegex: { [key: string]: RegExp } = {
     '123,456,789.00': /^(?:\d{1,3}(?:,\d{3})*|\d+)(?:\.\d{1,2})?$/,
@@ -61,6 +54,10 @@ export const validateNumberField = (
 
   if (readOnly && required) {
     errors.push('A field cannot be both read-only and required');
+  }
+
+  if (fontSize && (fontSize < 8 || fontSize > 96)) {
+    errors.push('Font size must be between 8 and 96.');
   }
 
   return errors;

@@ -73,11 +73,11 @@ msgstr "Fügen Sie dem Dokument eine externe ID hinzu. Diese kann verwendet werd
 msgid "Add an external ID to the template. This can be used to identify in external systems."
 msgstr "Fügen Sie der Vorlage eine externe ID hinzu. Diese kann zur Identifizierung in externen Systemen verwendet werden."
 
-#: packages/ui/primitives/document-flow/field-items-advanced-settings/dropdown-field.tsx:177
+#: packages/ui/primitives/document-flow/field-items-advanced-settings/dropdown-field.tsx:187
 msgid "Add another option"
 msgstr "Weitere Option hinzufügen"
 
-#: packages/ui/primitives/document-flow/field-items-advanced-settings/checkbox-field.tsx:230
+#: packages/ui/primitives/document-flow/field-items-advanced-settings/checkbox-field.tsx:232
 #: packages/ui/primitives/document-flow/field-items-advanced-settings/radio-field.tsx:167
 msgid "Add another value"
 msgstr "Weiteren Wert hinzufügen"
@@ -98,11 +98,11 @@ msgstr "Platzhalterempfänger hinzufügen"
 msgid "Add Signer"
 msgstr "Unterzeichner hinzufügen"
 
-#: packages/ui/primitives/document-flow/field-items-advanced-settings/text-field.tsx:70
+#: packages/ui/primitives/document-flow/field-items-advanced-settings/text-field.tsx:73
 msgid "Add text"
 msgstr "Text hinzufügen"
 
-#: packages/ui/primitives/document-flow/field-items-advanced-settings/text-field.tsx:75
+#: packages/ui/primitives/document-flow/field-items-advanced-settings/text-field.tsx:78
 msgid "Add text to the field"
 msgstr "Text zum Feld hinzufügen"
 
@@ -148,7 +148,7 @@ msgstr "Schwarz"
 msgid "Blue"
 msgstr "Blau"
 
-#: packages/ui/primitives/document-flow/field-item-advanced-settings.tsx:287
+#: packages/ui/primitives/document-flow/field-item-advanced-settings.tsx:356
 #: packages/ui/primitives/document-flow/send-document-action-dialog.tsx:58
 msgid "Cancel"
 msgstr "Abbrechen"
@@ -174,7 +174,7 @@ msgstr "CC"
 msgid "CC'd"
 msgstr "CC'd"
 
-#: packages/ui/primitives/document-flow/field-items-advanced-settings/text-field.tsx:83
+#: packages/ui/primitives/document-flow/field-items-advanced-settings/text-field.tsx:86
 msgid "Character Limit"
 msgstr "Zeichenbeschränkung"
 
@@ -183,7 +183,7 @@ msgstr "Zeichenbeschränkung"
 msgid "Checkbox"
 msgstr "Checkbox"
 
-#: packages/ui/primitives/document-flow/field-items-advanced-settings/checkbox-field.tsx:195
+#: packages/ui/primitives/document-flow/field-items-advanced-settings/checkbox-field.tsx:197
 msgid "Checkbox values"
 msgstr "Checkbox-Werte"
 
@@ -261,7 +261,7 @@ msgstr "Ziehen Sie Ihr PDF hierher."
 msgid "Dropdown"
 msgstr "Dropdown"
 
-#: packages/ui/primitives/document-flow/field-items-advanced-settings/dropdown-field.tsx:148
+#: packages/ui/primitives/document-flow/field-items-advanced-settings/dropdown-field.tsx:158
 msgid "Dropdown options"
 msgstr "Dropdown-Optionen"
 
@@ -295,7 +295,7 @@ msgstr "Aktiviere die Signaturreihenfolge"
 msgid "Enter password"
 msgstr "Passwort eingeben"
 
-#: packages/ui/primitives/document-flow/field-item-advanced-settings.tsx:216
+#: packages/ui/primitives/document-flow/field-item-advanced-settings.tsx:257
 msgid "Error"
 msgstr "Fehler"
 
@@ -304,25 +304,43 @@ msgstr "Fehler"
 msgid "External ID"
 msgstr "Externe ID"
 
-#: packages/ui/primitives/document-flow/field-item-advanced-settings.tsx:217
+#: packages/ui/primitives/document-flow/field-item-advanced-settings.tsx:258
 msgid "Failed to save settings."
 msgstr "Einstellungen konnten nicht gespeichert werden."
 
-#: packages/ui/primitives/document-flow/field-items-advanced-settings/text-field.tsx:90
+#: packages/ui/primitives/document-flow/field-items-advanced-settings/text-field.tsx:93
 msgid "Field character limit"
 msgstr "Zeichenbeschränkung des Feldes"
 
-#: packages/ui/primitives/document-flow/field-items-advanced-settings/number-field.tsx:107
+#: packages/ui/primitives/document-flow/field-items-advanced-settings/date-field.tsx:62
+#: packages/ui/primitives/document-flow/field-items-advanced-settings/email-field.tsx:44
+#: packages/ui/primitives/document-flow/field-items-advanced-settings/initials-field.tsx:44
+#: packages/ui/primitives/document-flow/field-items-advanced-settings/name-field.tsx:44
+#: packages/ui/primitives/document-flow/field-items-advanced-settings/number-field.tsx:130
+#: packages/ui/primitives/document-flow/field-items-advanced-settings/text-field.tsx:107
+msgid "Field font size"
+msgstr ""
+
+#: packages/ui/primitives/document-flow/field-items-advanced-settings/number-field.tsx:110
 msgid "Field format"
 msgstr "Feldformat"
 
-#: packages/ui/primitives/document-flow/field-items-advanced-settings/text-field.tsx:50
+#: packages/ui/primitives/document-flow/field-items-advanced-settings/text-field.tsx:53
 msgid "Field label"
 msgstr "Feldbeschriftung"
 
-#: packages/ui/primitives/document-flow/field-items-advanced-settings/text-field.tsx:62
+#: packages/ui/primitives/document-flow/field-items-advanced-settings/text-field.tsx:65
 msgid "Field placeholder"
 msgstr "Feldplatzhalter"
+
+#: packages/ui/primitives/document-flow/field-items-advanced-settings/date-field.tsx:56
+#: packages/ui/primitives/document-flow/field-items-advanced-settings/email-field.tsx:38
+#: packages/ui/primitives/document-flow/field-items-advanced-settings/initials-field.tsx:38
+#: packages/ui/primitives/document-flow/field-items-advanced-settings/name-field.tsx:38
+#: packages/ui/primitives/document-flow/field-items-advanced-settings/number-field.tsx:124
+#: packages/ui/primitives/document-flow/field-items-advanced-settings/text-field.tsx:101
+msgid "Font Size"
+msgstr ""
 
 #: packages/ui/components/document/document-global-auth-action-select.tsx:64
 msgid "Global recipient action authentication"
@@ -361,9 +379,9 @@ msgstr "Ich bin verpflichtet, eine Kopie dieses Dokuments zu erhalten"
 msgid "Inherit authentication method"
 msgstr "Authentifizierungsmethode erben"
 
-#: packages/ui/primitives/document-flow/field-items-advanced-settings/number-field.tsx:64
-#: packages/ui/primitives/document-flow/field-items-advanced-settings/number-field.tsx:69
-#: packages/ui/primitives/document-flow/field-items-advanced-settings/text-field.tsx:45
+#: packages/ui/primitives/document-flow/field-items-advanced-settings/number-field.tsx:67
+#: packages/ui/primitives/document-flow/field-items-advanced-settings/number-field.tsx:72
+#: packages/ui/primitives/document-flow/field-items-advanced-settings/text-field.tsx:48
 msgid "Label"
 msgstr "Beschriftung"
 
@@ -371,7 +389,7 @@ msgstr "Beschriftung"
 msgid "Manager"
 msgstr "Manager"
 
-#: packages/ui/primitives/document-flow/field-items-advanced-settings/number-field.tsx:168
+#: packages/ui/primitives/document-flow/field-items-advanced-settings/number-field.tsx:188
 msgid "Max"
 msgstr "Max"
 
@@ -384,7 +402,7 @@ msgstr "Mitglied"
 msgid "Message <0>(Optional)</0>"
 msgstr "Nachricht <0>(Optional)</0>"
 
-#: packages/ui/primitives/document-flow/field-items-advanced-settings/number-field.tsx:156
+#: packages/ui/primitives/document-flow/field-items-advanced-settings/number-field.tsx:176
 msgid "Min"
 msgstr "Min"
 
@@ -445,7 +463,7 @@ msgstr "Kein Wert gefunden."
 msgid "Number"
 msgstr "Nummer"
 
-#: packages/ui/primitives/document-flow/field-items-advanced-settings/number-field.tsx:100
+#: packages/ui/primitives/document-flow/field-items-advanced-settings/number-field.tsx:103
 msgid "Number format"
 msgstr "Zahlenformat"
 
@@ -465,13 +483,13 @@ msgstr "Seite {0} von {1}"
 msgid "Password Required"
 msgstr "Passwort erforderlich"
 
-#: packages/ui/primitives/document-flow/field-items-advanced-settings/checkbox-field.tsx:154
+#: packages/ui/primitives/document-flow/field-items-advanced-settings/checkbox-field.tsx:156
 msgid "Pick a number"
 msgstr "Wählen Sie eine Zahl"
 
-#: packages/ui/primitives/document-flow/field-items-advanced-settings/number-field.tsx:76
-#: packages/ui/primitives/document-flow/field-items-advanced-settings/number-field.tsx:81
-#: packages/ui/primitives/document-flow/field-items-advanced-settings/text-field.tsx:57
+#: packages/ui/primitives/document-flow/field-items-advanced-settings/number-field.tsx:79
+#: packages/ui/primitives/document-flow/field-items-advanced-settings/number-field.tsx:84
+#: packages/ui/primitives/document-flow/field-items-advanced-settings/text-field.tsx:60
 msgid "Placeholder"
 msgstr "Platzhalter"
 
@@ -484,11 +502,11 @@ msgstr "Radio"
 msgid "Radio values"
 msgstr "Radio-Werte"
 
-#: packages/ui/primitives/document-flow/field-items-advanced-settings/checkbox-field.tsx:184
-#: packages/ui/primitives/document-flow/field-items-advanced-settings/dropdown-field.tsx:137
-#: packages/ui/primitives/document-flow/field-items-advanced-settings/number-field.tsx:136
+#: packages/ui/primitives/document-flow/field-items-advanced-settings/checkbox-field.tsx:186
+#: packages/ui/primitives/document-flow/field-items-advanced-settings/dropdown-field.tsx:147
+#: packages/ui/primitives/document-flow/field-items-advanced-settings/number-field.tsx:156
 #: packages/ui/primitives/document-flow/field-items-advanced-settings/radio-field.tsx:122
-#: packages/ui/primitives/document-flow/field-items-advanced-settings/text-field.tsx:114
+#: packages/ui/primitives/document-flow/field-items-advanced-settings/text-field.tsx:133
 msgid "Read only"
 msgstr "Nur lesen"
 
@@ -515,11 +533,11 @@ msgstr "Weiterleitungs-URL"
 msgid "Remove"
 msgstr "Entfernen"
 
-#: packages/ui/primitives/document-flow/field-items-advanced-settings/checkbox-field.tsx:174
-#: packages/ui/primitives/document-flow/field-items-advanced-settings/dropdown-field.tsx:127
-#: packages/ui/primitives/document-flow/field-items-advanced-settings/number-field.tsx:126
+#: packages/ui/primitives/document-flow/field-items-advanced-settings/checkbox-field.tsx:176
+#: packages/ui/primitives/document-flow/field-items-advanced-settings/dropdown-field.tsx:137
+#: packages/ui/primitives/document-flow/field-items-advanced-settings/number-field.tsx:146
 #: packages/ui/primitives/document-flow/field-items-advanced-settings/radio-field.tsx:112
-#: packages/ui/primitives/document-flow/field-items-advanced-settings/text-field.tsx:104
+#: packages/ui/primitives/document-flow/field-items-advanced-settings/text-field.tsx:123
 msgid "Required field"
 msgstr "Pflichtfeld"
 
@@ -527,7 +545,7 @@ msgstr "Pflichtfeld"
 msgid "Rows per page"
 msgstr "Zeilen pro Seite"
 
-#: packages/ui/primitives/document-flow/field-item-advanced-settings.tsx:286
+#: packages/ui/primitives/document-flow/field-item-advanced-settings.tsx:355
 msgid "Save"
 msgstr "Speichern"
 
@@ -539,7 +557,7 @@ msgstr "Vorlage speichern"
 msgid "Search languages..."
 msgstr "Sprachen suchen..."
 
-#: packages/ui/primitives/document-flow/field-items-advanced-settings/dropdown-field.tsx:105
+#: packages/ui/primitives/document-flow/field-items-advanced-settings/dropdown-field.tsx:115
 msgid "Select"
 msgstr "Auswählen"
 
@@ -547,11 +565,11 @@ msgstr "Auswählen"
 msgid "Select an option"
 msgstr "Option auswählen"
 
-#: packages/ui/primitives/document-flow/field-items-advanced-settings/checkbox-field.tsx:137
+#: packages/ui/primitives/document-flow/field-items-advanced-settings/checkbox-field.tsx:139
 msgid "Select at least"
 msgstr "Wählen Sie mindestens"
 
-#: packages/ui/primitives/document-flow/field-items-advanced-settings/dropdown-field.tsx:95
+#: packages/ui/primitives/document-flow/field-items-advanced-settings/dropdown-field.tsx:105
 msgid "Select default option"
 msgstr "Standardoption auswählen"
 
@@ -749,13 +767,13 @@ msgstr "Upgrade"
 msgid "Upload Template Document"
 msgstr "Vorlagendokument hochladen"
 
-#: packages/ui/primitives/document-flow/field-items-advanced-settings/checkbox-field.tsx:130
-#: packages/ui/primitives/document-flow/field-items-advanced-settings/number-field.tsx:147
+#: packages/ui/primitives/document-flow/field-items-advanced-settings/checkbox-field.tsx:132
+#: packages/ui/primitives/document-flow/field-items-advanced-settings/number-field.tsx:167
 msgid "Validation"
 msgstr "Validierung"
 
-#: packages/ui/primitives/document-flow/field-items-advanced-settings/number-field.tsx:88
-#: packages/ui/primitives/document-flow/field-items-advanced-settings/number-field.tsx:93
+#: packages/ui/primitives/document-flow/field-items-advanced-settings/number-field.tsx:91
+#: packages/ui/primitives/document-flow/field-items-advanced-settings/number-field.tsx:96
 msgid "Value"
 msgstr "Wert"
 
