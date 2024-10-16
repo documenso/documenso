@@ -1,6 +1,6 @@
 import { msg } from '@lingui/macro';
 import { useLingui } from '@lingui/react';
-import { Bird, CheckCircle2 } from 'lucide-react';
+import { Bird, CheckCircle2, Trash } from 'lucide-react';
 import { match } from 'ts-pattern';
 
 import { ExtendedDocumentStatus } from '@documenso/prisma/types/extended-document-status';
@@ -30,6 +30,11 @@ export const EmptyDocumentState = ({ status }: EmptyDocumentProps) => {
       message: msg`You have not yet created or received any documents. To create a document please upload one.`,
       icon: Bird,
     }))
+    .with(ExtendedDocumentStatus.BIN, () => ({
+      title: msg`No documents in the bin`,
+      message: msg`There are no documents in the bin.`,
+      icon: Trash,
+    }))
     .otherwise(() => ({
       title: msg`Nothing to do`,
       message: msg`All documents have been processed. Any new documents that are sent or received will show here.`,
@@ -42,7 +47,6 @@ export const EmptyDocumentState = ({ status }: EmptyDocumentProps) => {
       data-testid="empty-document-state"
     >
       <Icon className="h-12 w-12" strokeWidth={1.5} />
-
       <div className="text-center">
         <h3 className="text-lg font-semibold">{_(title)}</h3>
 

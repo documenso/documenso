@@ -191,7 +191,7 @@ msgstr "Compte supprimé"
 
 #: apps/web/src/app/(dashboard)/documents/[id]/document-page-view-dropdown.tsx:105
 #: apps/web/src/app/(dashboard)/documents/[id]/logs/document-logs-data-table.tsx:104
-#: apps/web/src/app/(dashboard)/documents/data-table-action-dropdown.tsx:121
+#: apps/web/src/app/(dashboard)/documents/data-table-action-dropdown.tsx:125
 #: apps/web/src/app/(dashboard)/settings/public-profile/public-templates-data-table.tsx:164
 #: apps/web/src/app/(dashboard)/settings/security/activity/user-security-activity-data-table.tsx:118
 msgid "Action"
@@ -315,7 +315,7 @@ msgstr "Tout"
 msgid "All documents"
 msgstr "Tous les documents"
 
-#: apps/web/src/app/(dashboard)/documents/empty-state.tsx:35
+#: apps/web/src/app/(dashboard)/documents/empty-state.tsx:40
 msgid "All documents have been processed. Any new documents that are sent or received will show here."
 msgstr "Tous les documents ont été traités. Tous nouveaux documents envoyés ou reçus s'afficheront ici."
 
@@ -395,7 +395,7 @@ msgstr "Une erreur est survenue lors de la désactivation de la signature par li
 #: apps/web/src/app/(dashboard)/documents/[id]/document-page-view-button.tsx:64
 #: apps/web/src/app/(dashboard)/documents/[id]/document-page-view-dropdown.tsx:89
 #: apps/web/src/app/(dashboard)/documents/data-table-action-button.tsx:76
-#: apps/web/src/app/(dashboard)/documents/data-table-action-dropdown.tsx:105
+#: apps/web/src/app/(dashboard)/documents/data-table-action-dropdown.tsx:109
 msgid "An error occurred while downloading your document."
 msgstr "Une erreur est survenue lors du téléchargement de votre document."
 
@@ -538,7 +538,7 @@ msgstr "Version de l'application"
 
 #: apps/web/src/app/(dashboard)/documents/[id]/document-page-view-button.tsx:89
 #: apps/web/src/app/(dashboard)/documents/data-table-action-button.tsx:120
-#: apps/web/src/app/(dashboard)/documents/data-table-action-dropdown.tsx:144
+#: apps/web/src/app/(dashboard)/documents/data-table-action-dropdown.tsx:148
 #: apps/web/src/app/(signing)/sign/[token]/sign-dialog.tsx:125
 msgid "Approve"
 msgstr "Approuver"
@@ -633,6 +633,10 @@ msgstr "Détails de base"
 #: apps/web/src/components/(teams)/settings/layout/mobile-nav.tsx:116
 msgid "Billing"
 msgstr "Facturation"
+
+#: apps/web/src/components/formatter/document-status.tsx:51
+msgid "Bin"
+msgstr ""
 
 #: apps/web/src/app/(dashboard)/settings/security/activity/user-security-activity-data-table.tsx:99
 msgid "Browser"
@@ -1031,7 +1035,7 @@ msgid "Declined team invitation"
 msgstr "Invitation d'équipe refusée"
 
 #: apps/web/src/app/(dashboard)/documents/[id]/document-page-view-dropdown.tsx:141
-#: apps/web/src/app/(dashboard)/documents/data-table-action-dropdown.tsx:187
+#: apps/web/src/app/(dashboard)/documents/data-table-action-dropdown.tsx:208
 #: apps/web/src/app/(dashboard)/documents/delete-document-dialog.tsx:200
 #: apps/web/src/app/(dashboard)/settings/security/passkeys/user-passkeys-data-table-actions.tsx:177
 #: apps/web/src/app/(dashboard)/settings/security/passkeys/user-passkeys-data-table-actions.tsx:211
@@ -1100,6 +1104,7 @@ msgid "Delete your account and all its contents, including completed documents. 
 msgstr "Supprimez votre compte et tout son contenu, y compris les documents complétés. Cette action est irréversible et annulera votre abonnement, alors procédez avec prudence."
 
 #: apps/web/src/app/(dashboard)/admin/documents/[id]/page.tsx:41
+#: apps/web/src/app/(dashboard)/documents/[id]/document-page-view-information.tsx:50
 msgid "Deleted"
 msgstr "Supprimé"
 
@@ -1202,6 +1207,10 @@ msgstr "Document Tout"
 #: apps/web/src/app/(signing)/sign/[token]/complete/page.tsx:134
 msgid "Document Approved"
 msgstr "Document Approuvé"
+
+#: apps/web/src/components/formatter/document-status.tsx:52
+msgid "Document Bin"
+msgstr ""
 
 #: apps/web/src/app/(signing)/sign/[token]/no-longer-available.tsx:40
 msgid "Document Cancelled"
@@ -1342,7 +1351,7 @@ msgstr "Vous n'avez pas de compte? <0>Inscrivez-vous</0>"
 #: apps/web/src/app/(dashboard)/documents/[id]/document-page-view-button.tsx:111
 #: apps/web/src/app/(dashboard)/documents/[id]/document-page-view-dropdown.tsx:120
 #: apps/web/src/app/(dashboard)/documents/data-table-action-button.tsx:141
-#: apps/web/src/app/(dashboard)/documents/data-table-action-dropdown.tsx:160
+#: apps/web/src/app/(dashboard)/documents/data-table-action-dropdown.tsx:164
 #: apps/web/src/components/(teams)/tables/team-billing-invoices-data-table.tsx:110
 #: apps/web/src/components/forms/2fa/enable-authenticator-app-dialog.tsx:185
 #: apps/web/src/components/forms/2fa/view-recovery-codes-dialog.tsx:107
@@ -1374,7 +1383,7 @@ msgid "Due to an unpaid invoice, your team has been restricted. Please settle th
 msgstr "En raison d'une facture impayée, votre équipe a été restreinte. Veuillez régler le paiement pour rétablir l'accès complet à votre équipe."
 
 #: apps/web/src/app/(dashboard)/documents/[id]/document-page-view-dropdown.tsx:133
-#: apps/web/src/app/(dashboard)/documents/data-table-action-dropdown.tsx:165
+#: apps/web/src/app/(dashboard)/documents/data-table-action-dropdown.tsx:169
 #: apps/web/src/app/(dashboard)/documents/duplicate-document-dialog.tsx:85
 #: apps/web/src/app/(dashboard)/documents/duplicate-document-dialog.tsx:118
 #: apps/web/src/app/(dashboard)/templates/data-table-action-dropdown.tsx:71
@@ -1385,7 +1394,7 @@ msgstr "Dupliquer"
 #: apps/web/src/app/(dashboard)/documents/[id]/document-page-view-button.tsx:104
 #: apps/web/src/app/(dashboard)/documents/[id]/document-page-view-dropdown.tsx:112
 #: apps/web/src/app/(dashboard)/documents/data-table-action-button.tsx:102
-#: apps/web/src/app/(dashboard)/documents/data-table-action-dropdown.tsx:154
+#: apps/web/src/app/(dashboard)/documents/data-table-action-dropdown.tsx:158
 #: apps/web/src/app/(dashboard)/settings/security/passkeys/user-passkeys-data-table-actions.tsx:111
 #: apps/web/src/app/(dashboard)/settings/webhooks/page.tsx:95
 #: apps/web/src/app/(dashboard)/templates/data-table-action-dropdown.tsx:62
@@ -1649,7 +1658,7 @@ msgstr "Voici comment cela fonctionne :"
 msgid "Hey I’m Timur"
 msgstr "Salut, je suis Timur"
 
-#: apps/web/src/app/(dashboard)/documents/data-table-action-dropdown.tsx:187
+#: apps/web/src/app/(dashboard)/documents/data-table-action-dropdown.tsx:208
 #: apps/web/src/app/(dashboard)/documents/delete-document-dialog.tsx:200
 #: apps/web/src/app/(dashboard)/settings/public-profile/public-profile-page-view.tsx:155
 msgid "Hide"
@@ -1692,7 +1701,7 @@ msgstr "Boîte de réception"
 msgid "Inbox documents"
 msgstr "Documents de la boîte de réception"
 
-#: apps/web/src/app/(dashboard)/documents/[id]/document-page-view-information.tsx:53
+#: apps/web/src/app/(dashboard)/documents/[id]/document-page-view-information.tsx:65
 msgid "Information"
 msgstr "Information"
 
@@ -1988,7 +1997,7 @@ msgstr "Déplacer le document vers l'équipe"
 msgid "Move Template to Team"
 msgstr "Déplacer le modèle vers l'équipe"
 
-#: apps/web/src/app/(dashboard)/documents/data-table-action-dropdown.tsx:172
+#: apps/web/src/app/(dashboard)/documents/data-table-action-dropdown.tsx:176
 #: apps/web/src/app/(dashboard)/templates/data-table-action-dropdown.tsx:82
 msgid "Move to Team"
 msgstr "Déplacer vers l'équipe"
@@ -2051,6 +2060,10 @@ msgstr "Champ suivant"
 msgid "No active drafts"
 msgstr "Pas de brouillons actifs"
 
+#: apps/web/src/app/(dashboard)/documents/empty-state.tsx:34
+msgid "No documents in the bin"
+msgstr ""
+
 #: apps/web/src/app/(teams)/t/[teamUrl]/settings/billing/page.tsx:42
 msgid "No payment required"
 msgstr "Aucun paiement requis"
@@ -2097,7 +2110,7 @@ msgid "Not supported"
 msgstr "Non pris en charge"
 
 #: apps/web/src/app/(dashboard)/documents/empty-state.tsx:19
-#: apps/web/src/app/(dashboard)/documents/empty-state.tsx:34
+#: apps/web/src/app/(dashboard)/documents/empty-state.tsx:39
 msgid "Nothing to do"
 msgstr "Rien à faire"
 
@@ -2698,12 +2711,12 @@ msgid "Setup"
 msgstr "Configuration"
 
 #: apps/web/src/app/(dashboard)/documents/[id]/document-page-view-dropdown.tsx:145
-#: apps/web/src/app/(dashboard)/documents/data-table-action-dropdown.tsx:191
+#: apps/web/src/app/(dashboard)/documents/data-table-action-dropdown.tsx:212
 msgid "Share"
 msgstr "Partager"
 
 #: apps/web/src/app/(dashboard)/documents/[id]/document-page-view-dropdown.tsx:161
-#: apps/web/src/app/(dashboard)/documents/data-table-action-dropdown.tsx:203
+#: apps/web/src/app/(dashboard)/documents/data-table-action-dropdown.tsx:224
 msgid "Share Signing Card"
 msgstr "Partager la carte de signature"
 
@@ -2725,7 +2738,7 @@ msgstr "Afficher des modèles dans le profil public de votre équipe pour que vo
 
 #: apps/web/src/app/(dashboard)/documents/[id]/document-page-view-button.tsx:83
 #: apps/web/src/app/(dashboard)/documents/data-table-action-button.tsx:114
-#: apps/web/src/app/(dashboard)/documents/data-table-action-dropdown.tsx:137
+#: apps/web/src/app/(dashboard)/documents/data-table-action-dropdown.tsx:141
 #: apps/web/src/app/(profile)/p/[url]/page.tsx:192
 #: apps/web/src/app/(signing)/sign/[token]/document-action-auth-2fa.tsx:182
 #: apps/web/src/app/(signing)/sign/[token]/name-field.tsx:224
@@ -2850,7 +2863,7 @@ msgstr "Paramètres du site"
 #: apps/web/src/app/(dashboard)/documents/[id]/logs/download-audit-log-button.tsx:65
 #: apps/web/src/app/(dashboard)/documents/[id]/logs/download-certificate-button.tsx:66
 #: apps/web/src/app/(dashboard)/documents/data-table-action-button.tsx:75
-#: apps/web/src/app/(dashboard)/documents/data-table-action-dropdown.tsx:104
+#: apps/web/src/app/(dashboard)/documents/data-table-action-dropdown.tsx:108
 #: apps/web/src/app/(dashboard)/documents/delete-document-dialog.tsx:80
 #: apps/web/src/app/(dashboard)/documents/duplicate-document-dialog.tsx:72
 #: apps/web/src/app/(dashboard)/settings/billing/billing-plans.tsx:62
@@ -3296,6 +3309,10 @@ msgstr "Il n'y a pas de brouillons actifs pour le moment. Vous pouvez téléchar
 #: apps/web/src/app/(dashboard)/documents/empty-state.tsx:20
 msgid "There are no completed documents yet. Documents that you have created or received will appear here once completed."
 msgstr "Il n'y a pas encore de documents complétés. Les documents que vous avez créés ou reçus apparaîtront ici une fois complétés."
+
+#: apps/web/src/app/(dashboard)/documents/empty-state.tsx:35
+msgid "There are no documents in the bin."
+msgstr ""
 
 #: apps/web/src/app/(dashboard)/settings/teams/team-email-usage.tsx:70
 msgid "They have permission on your behalf to:"
@@ -3797,7 +3814,7 @@ msgstr "Vérifiez votre e-mail pour télécharger des documents."
 #: apps/web/src/app/(dashboard)/documents/[id]/document-page-view-button.tsx:95
 #: apps/web/src/app/(dashboard)/documents/data-table-action-button.tsx:126
 #: apps/web/src/app/(dashboard)/documents/data-table-action-button.tsx:135
-#: apps/web/src/app/(dashboard)/documents/data-table-action-dropdown.tsx:130
+#: apps/web/src/app/(dashboard)/documents/data-table-action-dropdown.tsx:134
 #: apps/web/src/components/(teams)/tables/team-billing-invoices-data-table.tsx:100
 #: apps/web/src/components/forms/2fa/view-recovery-codes-dialog.tsx:168
 msgid "View"
