@@ -17,6 +17,7 @@ import { getDocumentWithDetailsById } from '@documenso/lib/server-only/document/
 import { moveDocumentToTeam } from '@documenso/lib/server-only/document/move-document-to-team';
 import { resendDocument } from '@documenso/lib/server-only/document/resend-document';
 import { searchDocumentsWithKeyword } from '@documenso/lib/server-only/document/search-documents-with-keyword';
+import { selfSignDocument } from '@documenso/lib/server-only/document/self-sign-document';
 import { sendDocument } from '@documenso/lib/server-only/document/send-document';
 import { updateDocumentSettings } from '@documenso/lib/server-only/document/update-document-settings';
 import { updateTitle } from '@documenso/lib/server-only/document/update-title';
@@ -372,13 +373,11 @@ export const documentRouter = router({
     .input(ZSelfSignDocumentMutationSchema)
     .mutation(async ({ input, ctx }) => {
       try {
-        const { documentId, teamId } = input;
+        const { documentId } = input;
 
-        return await sendDocument({
+        return await selfSignDocument({
           userId: ctx.user.id,
           documentId,
-          teamId,
-          sendEmail: false,
           requestMetadata: extractNextApiRequestMetadata(ctx.req),
         });
       } catch (err) {

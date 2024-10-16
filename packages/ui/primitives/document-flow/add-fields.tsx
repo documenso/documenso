@@ -100,13 +100,6 @@ export type AddFieldsFormProps = {
   teamId?: number;
 };
 
-// Self Sign
-// If the recipient is the user and it is the only recipient,
-// dont send the document, after adding the fields, skip the next step and go straight to the point
-// no need for the sending section
-// it will create the document
-// and redirect you to the signing page.
-
 export const AddFieldsFormPartial = ({
   documentFlow,
   hideRecipients = false,
@@ -1080,7 +1073,7 @@ export const AddFieldsFormPartial = ({
                 documentFlow.onBackStep?.();
               }}
               goBackLabel={canRenderBackButtonAsRemove ? msg`Remove` : undefined}
-              goNextLabel={hasSameOwnerAsRecipient ? msg`Self Sign` : undefined}
+              goNextLabel={hasSameOwnerAsRecipient ? msg`Sign` : undefined}
               onGoNextClick={handleGoNextClick}
             />
           </DocumentFlowFormContainerFooter>
