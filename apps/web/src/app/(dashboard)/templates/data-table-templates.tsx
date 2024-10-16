@@ -140,10 +140,13 @@ export const TemplatesDataTable = ({
         header: _(msg`Actions`),
         accessorKey: 'actions',
         cell: ({ row }) => {
+          console.log(row.original);
+
           return (
             <div className="flex items-center gap-x-4">
               <UseTemplateDialog
                 templateId={row.original.id}
+                templateSigningOrder={row.original.templateMeta?.signingOrder}
                 recipients={row.original.Recipient}
                 documentRootPath={documentRootPath}
               />
