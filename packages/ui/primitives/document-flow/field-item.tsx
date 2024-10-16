@@ -76,7 +76,17 @@ export const FieldItem = ({
 
   const signerStyles = useSignerColors(recipientIndex);
 
-  const advancedField = ['NUMBER', 'RADIO', 'CHECKBOX', 'DROPDOWN', 'TEXT'].includes(field.type);
+  const advancedField = [
+    'NUMBER',
+    'RADIO',
+    'CHECKBOX',
+    'DROPDOWN',
+    'TEXT',
+    'INITIALS',
+    'EMAIL',
+    'DATE',
+    'NAME',
+  ].includes(field.type);
 
   const calculateCoords = useCallback(() => {
     const $page = document.querySelector<HTMLElement>(
