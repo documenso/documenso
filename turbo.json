@@ -34,9 +34,6 @@
       "dependsOn": ["^build"],
       "cache": false
     },
-    "translate:extract": {
-      "cache": false
-    },
     "translate:compile": {
       "cache": false
     }
