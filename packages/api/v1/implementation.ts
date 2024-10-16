@@ -302,7 +302,9 @@ export const ApiContractV1Implementation = createNextRoute(ApiContractV1, {
           documentId: document.id,
           userId: user.id,
           teamId: team?.id,
-          data: body.authOptions,
+          data: {
+            ...body.authOptions,
+          },
           requestMetadata: extractNextApiRequestMetadata(args.req),
         });
       }

@@ -8,7 +8,7 @@ msgstr ""
 "Language: de\n"
 "Project-Id-Version: documenso-app\n"
 "Report-Msgid-Bugs-To: \n"
-"PO-Revision-Date: 2024-09-05 06:04\n"
+"PO-Revision-Date: 2024-10-08 12:05\n"
 "Last-Translator: \n"
 "Language-Team: German\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
@@ -223,6 +223,7 @@ msgstr "Aus dem Blog"
 
 #: apps/marketing/src/app/(marketing)/open/data.ts:9
 #: apps/marketing/src/app/(marketing)/open/data.ts:17
+#: apps/marketing/src/app/(marketing)/open/data.ts:25
 #: apps/marketing/src/app/(marketing)/open/data.ts:33
 #: apps/marketing/src/app/(marketing)/open/data.ts:41
 #: apps/marketing/src/app/(marketing)/open/data.ts:49
@@ -385,8 +386,8 @@ msgid "Our self-hosted option is great for small teams and individuals who need 
 msgstr "Unsere selbstgehostete Option ist ideal für kleine Teams und Einzelpersonen, die eine einfache Lösung benötigen. Sie können unser docker-basiertes Setup verwenden, um in wenigen Minuten loszulegen. Übernehmen Sie die Kontrolle mit vollständiger Anpassbarkeit und Datenhoheit."
 
 #: apps/marketing/src/app/(marketing)/open/data.ts:25
-msgid "Part-Time"
-msgstr "Teilzeit"
+#~ msgid "Part-Time"
+#~ msgstr "Part-Time"
 
 #: apps/marketing/src/components/(marketing)/pricing-table.tsx:151
 msgid "Premium Profile Name"
@@ -431,7 +432,7 @@ msgstr "Sparen Sie $60 oder $120"
 
 #: apps/marketing/src/components/(marketing)/i18n-switcher.tsx:47
 #~ msgid "Search languages..."
-#~ msgstr "Sprachen suchen..."
+#~ msgstr "Search languages..."
 
 #: apps/marketing/src/app/(marketing)/pricing/page.tsx:109
 msgid "Securely. Our data centers are located in Frankfurt (Germany), giving us the best local privacy laws. We are very aware of the sensitive nature of our data and follow best practices to ensure the security and integrity of the data entrusted to us."
@@ -614,6 +615,6 @@ msgstr "Ja! Documenso wird unter der GNU AGPL V3 Open-Source-Lizenz angeboten. D
 msgid "You can self-host Documenso for free or use our ready-to-use hosted version. The hosted version comes with additional support, painless scalability and more. Early adopters will get access to all features we build this year, for no additional cost! Forever! Yes, that includes multiple users per account later. If you want Documenso for your enterprise, we are happy to talk about your needs."
 msgstr "Sie können Documenso kostenlos selbst hosten oder unsere sofort einsatzbereite gehostete Version nutzen. Die gehostete Version bietet zusätzlichen Support, schmerzfreie Skalierbarkeit und mehr. Frühzeitige Anwender erhalten in diesem Jahr Zugriff auf alle Funktionen, die wir entwickeln, ohne zusätzliche Kosten! Für immer! Ja, das beinhaltet später mehrere Benutzer pro Konto. Wenn Sie Documenso für Ihr Unternehmen möchten, sprechen wir gerne über Ihre Bedürfnisse."
 
-#: apps/marketing/src/components/(marketing)/carousel.tsx:265
+#: apps/marketing/src/components/(marketing)/carousel.tsx:272
 msgid "Your browser does not support the video tag."
 msgstr "Ihr Browser unterstützt das Video-Tag nicht."

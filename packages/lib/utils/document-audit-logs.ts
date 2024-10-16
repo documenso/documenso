@@ -362,7 +362,7 @@ export const formatDocumentAuditLogAction = (auditLog: TDocumentAuditLog, userId
     })
     .with({ type: DOCUMENT_AUDIT_LOG_TYPE.EMAIL_SENT }, ({ data }) => ({
       anonymous: `Email ${data.isResending ? 'resent' : 'sent'}`,
-      identified: `${data.isResending ? 'resent' : 'sent'} an email`,
+      identified: `${data.isResending ? 'resent' : 'sent'} an email to ${data.recipientEmail}`,
     }))
     .with({ type: DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_COMPLETED }, () => {
       // Clear the prefix since this should be considered an 'anonymous' event.

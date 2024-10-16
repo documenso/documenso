@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 import Image from 'next/image';
 import Link from 'next/link';
@@ -202,6 +202,18 @@ export const SignUpFormV2 = ({
       });
     }
   };
+
+  useEffect(() => {
+    const hash = window.location.hash.slice(1);
+
+    const params = new URLSearchParams(hash);
+
+    const email = params.get('email');
+
+    if (email) {
+      form.setValue('email', email);
+    }
+  }, [form]);
 
   return (
     <div className={cn('flex justify-center gap-x-12', className)}>

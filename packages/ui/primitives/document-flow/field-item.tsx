@@ -44,6 +44,7 @@ export type FieldItemProps = {
   onBlur?: () => void;
   recipientIndex?: number;
   hideRecipients?: boolean;
+  hasErrors?: boolean;
 };
 
 export const FieldItem = ({
@@ -61,6 +62,7 @@ export const FieldItem = ({
   onAdvancedSettings,
   recipientIndex = 0,
   hideRecipients = false,
+  hasErrors,
 }: FieldItemProps) => {
   const [active, setActive] = useState(false);
   const [coords, setCoords] = useState({
@@ -74,7 +76,17 @@ export const FieldItem = ({
 
   const signerStyles = useSignerColors(recipientIndex);
 
-  const advancedField = ['NUMBER', 'RADIO', 'CHECKBOX', 'DROPDOWN', 'TEXT'].includes(field.type);
+  const advancedField = [
+    'NUMBER',
+    'RADIO',
+    'CHECKBOX',
+    'DROPDOWN',
+    'TEXT',
+    'INITIALS',
+    'EMAIL',
+    'DATE',
+    'NAME',
+  ].includes(field.type);
 
   const calculateCoords = useCallback(() => {
     const $page = document.querySelector<HTMLElement>(
@@ -201,15 +213,21 @@ export const FieldItem = ({
       <div
         className={cn(
           'relative flex h-full w-full items-center justify-center bg-white',
+          !hasErrors && signerStyles.default.base,
+          !hasErrors && signerStyles.default.fieldItem,
+          {
+            'rounded-lg border border-red-400 bg-red-400/20 shadow-[0_0_0_5px_theme(colors.red.500/10%),0_0_0_2px_theme(colors.red.500/40%),0_0_0_0.5px_theme(colors.red.500)]':
+              hasErrors,
+          },
           !fixedSize && '[container-type:size]',
-          signerStyles.default.base,
-          signerStyles.default.fieldItem,
         )}
+        data-error={hasErrors ? 'true' : undefined}
         onClick={() => {
           setSettingsActive((prev) => !prev);
           onFocus?.();
         }}
         ref={$el}
+        data-field-id={field.nativeId}
       >
         {match(field.type)
           .with('CHECKBOX', () => <CheckboxField field={field} />)

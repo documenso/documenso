@@ -10,6 +10,7 @@
   "signing-documents": "Signing Documents",
   "templates": "Templates",
   "direct-links": "Direct Signing Links",
+  "document-visibility": "Document Visibility",
   "-- Legal Overview": {
     "type": "separator",
     "title": "Legal Overview"
