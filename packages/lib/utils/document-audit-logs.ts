@@ -364,6 +364,10 @@ export const formatDocumentAuditLogAction = (auditLog: TDocumentAuditLog, userId
       anonymous: `Email ${data.isResending ? 'resent' : 'sent'}`,
       identified: `${data.isResending ? 'resent' : 'sent'} an email to ${data.recipientEmail}`,
     }))
+    .with({ type: DOCUMENT_AUDIT_LOG_TYPE.SELF_SIGN }, () => ({
+      anonymous: "You've signed the document",
+      identified: 'signed the document',
+    }))
     .with({ type: DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_COMPLETED }, () => {
       // Clear the prefix since this should be considered an 'anonymous' event.
       prefix = '';

@@ -122,12 +122,16 @@ export const selfSignDocument = async ({
     if (document.status === DocumentStatus.DRAFT) {
       await tx.documentAuditLog.create({
         data: createDocumentAuditLogData({
-          // todo: use a different audit log type
-          type: DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_SENT,
+          type: DOCUMENT_AUDIT_LOG_TYPE.SELF_SIGN,
           documentId: document.id,
           requestMetadata,
           user,
-          data: {},
+          data: {
+            recipientId: document.Recipient[0].id,
+            recipientEmail: document.Recipient[0].email,
+            recipientName: document.Recipient[0].name,
+            recipientRole: document.Recipient[0].role,
+          },
         }),
       });
     }
