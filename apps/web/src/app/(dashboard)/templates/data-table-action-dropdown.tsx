@@ -8,7 +8,7 @@ import { Trans } from '@lingui/macro';
 import { Copy, Edit, MoreHorizontal, MoveRight, Share2Icon, Trash2 } from 'lucide-react';
 import { useSession } from 'next-auth/react';
 
-import { type FindTemplateRow } from '@documenso/lib/server-only/template/find-templates';
+import type { Recipient, Template, TemplateDirectLink } from '@documenso/prisma/client';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -23,7 +23,10 @@ import { MoveTemplateDialog } from './move-template-dialog';
 import { TemplateDirectLinkDialog } from './template-direct-link-dialog';
 
 export type DataTableActionDropdownProps = {
-  row: FindTemplateRow;
+  row: Template & {
+    directLink?: Pick<TemplateDirectLink, 'token' | 'enabled'> | null;
+    Recipient: Recipient[];
+  };
   templateRootPath: string;
   teamId?: number;
 };
@@ -57,7 +60,7 @@ export const DataTableActionDropdown = ({
         <DropdownMenuLabel>Action</DropdownMenuLabel>
 
         <DropdownMenuItem disabled={!isOwner && !isTeamTemplate} asChild>
-          <Link href={`${templateRootPath}/${row.id}`}>
+          <Link href={`${templateRootPath}/${row.id}/edit`}>
             <Edit className="mr-2 h-4 w-4" />
             <Trans>Edit</Trans>
           </Link>

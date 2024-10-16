@@ -124,7 +124,7 @@ export const TemplatesDataTable = ({
         accessorKey: 'type',
         cell: ({ row }) => (
           <div className="flex flex-row items-center">
-            <TemplateType type="PRIVATE" />
+            <TemplateType type={row.original.type} />
 
             {row.original.directLink?.token && (
               <TemplateDirectLinkBadge

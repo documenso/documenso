@@ -25,9 +25,14 @@ import { PopoverHover } from '@documenso/ui/primitives/popover';
 export type DocumentReadOnlyFieldsProps = {
   fields: DocumentField[];
   documentMeta?: DocumentMeta;
+  showFieldStatus?: boolean;
 };
 
-export const DocumentReadOnlyFields = ({ documentMeta, fields }: DocumentReadOnlyFieldsProps) => {
+export const DocumentReadOnlyFields = ({
+  documentMeta,
+  fields,
+  showFieldStatus = true,
+}: DocumentReadOnlyFieldsProps) => {
   const [hiddenFieldIds, setHiddenFieldIds] = useState<Record<string, boolean>>({});
 
   const handleHideField = (fieldId: string) => {
@@ -58,8 +63,16 @@ export const DocumentReadOnlyFields = ({ documentMeta, fields }: DocumentReadOnl
                   }}
                 >
                   <p className="font-semibold">
-                    {field.Recipient.signingStatus === SigningStatus.SIGNED ? 'Signed' : 'Pending'}{' '}
-                    {FRIENDLY_FIELD_TYPE[field.type].toLowerCase()} field
+                    {showFieldStatus ? (
+                      <span>
+                        {field.Recipient.signingStatus === SigningStatus.SIGNED
+                          ? 'Signed'
+                          : 'Pending'}{' '}
+                        {FRIENDLY_FIELD_TYPE[field.type].toLowerCase()} field
+                      </span>
+                    ) : (
+                      <span>{FRIENDLY_FIELD_TYPE[field.type]} field</span>
+                    )}
                   </p>
 
                   <p className="text-muted-foreground text-xs">
