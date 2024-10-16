@@ -3,7 +3,7 @@ import type { RequestMetadata } from '@documenso/lib/universal/extract-request-m
 import { putPdfFile } from '@documenso/lib/universal/upload/put-file';
 import { createDocumentAuditLogData } from '@documenso/lib/utils/document-audit-logs';
 import { prisma } from '@documenso/prisma';
-import { DocumentStatus, RecipientRole, SigningStatus } from '@documenso/prisma/client';
+import { DocumentStatus, RecipientRole, SendStatus, SigningStatus } from '@documenso/prisma/client';
 
 import { jobs } from '../../jobs/client';
 import { getFile } from '../../universal/upload/get-file';
@@ -131,6 +131,15 @@ export const selfSignDocument = async ({
         }),
       });
     }
+
+    await tx.recipient.update({
+      where: {
+        id: document.Recipient[0].id,
+      },
+      data: {
+        sendStatus: SendStatus.SENT,
+      },
+    });
 
     return await tx.document.update({
       where: {
