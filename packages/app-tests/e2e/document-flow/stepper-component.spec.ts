@@ -2,7 +2,9 @@ import { expect, test } from '@playwright/test';
 import { DateTime } from 'luxon';
 import path from 'node:path';
 
+import { getDocumentById } from '@documenso/lib/server-only/document/get-document-by-id';
 import { getRecipientByEmail } from '@documenso/lib/server-only/recipient/get-recipient-by-email';
+import { getRecipientById } from '@documenso/lib/server-only/recipient/get-recipient-by-id';
 import { prisma } from '@documenso/prisma';
 import {
   DocumentSigningOrder,
@@ -600,7 +602,7 @@ test('[DOCUMENT_FLOW]: should be able to create and sign a document with 3 recip
       expect(previousRecipient?.signingStatus).toBe(SigningStatus.SIGNED);
     }
 
-    await page.goto(`/sign/${recipient?.token}`);
+    await page.goto(`/sign/${recipient!.token}`);
     await expect(page.getByRole('heading', { name: 'Sign Document' })).toBeVisible();
 
     await page.locator(`#field-${recipientField.id}`).getByRole('button').click();
@@ -618,11 +620,12 @@ test('[DOCUMENT_FLOW]: should be able to create and sign a document with 3 recip
     await page.getByRole('button', { name: 'Complete' }).click();
     await page.getByRole('button', { name: 'Sign' }).click();
 
-    await page.waitForURL(`/sign/${recipient?.token}/complete`);
+    await page.waitForURL(`/sign/${recipient!.token}/complete`);
     await expect(page.getByText('Document Signed')).toBeVisible();
 
-    const updatedRecipient = await prisma.recipient.findFirst({
-      where: { id: recipient?.id },
+    const updatedRecipient = await getRecipientById({
+      documentId: document.id,
+      id: recipient!.id,
     });
 
     expect(updatedRecipient?.signingStatus).toBe(SigningStatus.SIGNED);
@@ -631,11 +634,8 @@ test('[DOCUMENT_FLOW]: should be able to create and sign a document with 3 recip
   // Wait for the document to be signed.
   await page.waitForTimeout(5000);
 
-  const finalDocument = await prisma.document.findFirst({
-    where: { id: createdDocument?.id },
-  });
-
-  expect(finalDocument?.status).toBe(DocumentStatus.COMPLETED);
+  const signedDocument = await getDocumentById({ id: document.id, userId: user.id });
+  expect(signedDocument?.status).toBe(DocumentStatus.COMPLETED);
 });
 
 test('[DOCUMENT_FLOW]: should prevent out-of-order signing in sequential mode', async ({
@@ -643,7 +643,7 @@ test('[DOCUMENT_FLOW]: should prevent out-of-order signing in sequential mode', 
 }) => {
   const user = await seedUser();
 
-  const { document, recipients } = await seedPendingDocumentWithFullFields({
+  const { recipients } = await seedPendingDocumentWithFullFields({
     owner: user,
     recipients: ['user1@example.com', 'user2@example.com', 'user3@example.com'],
     fields: [FieldType.SIGNATURE],
@@ -669,4 +669,86 @@ test('[DOCUMENT_FLOW]: should prevent out-of-order signing in sequential mode', 
 
   await expect(page).not.toHaveURL(`/sign/${activeRecipient?.token}/waiting`);
   await expect(page.getByRole('heading', { name: 'Sign Document' })).toBeVisible();
+});
+
+test('[DOCUMENT_FLOW]: should be able to self sign a document', async ({ page }) => {
+  const user = await seedUser();
+  const document = await seedBlankDocument(user);
+
+  await apiSignin({
+    page,
+    email: user.email,
+    redirectPath: `/documents/${document.id}/edit`,
+  });
+
+  const documentTitle = `Self-Signing-${Date.now()}.pdf`;
+
+  await expect(page.getByRole('heading', { name: 'General' })).toBeVisible();
+  await page.getByLabel('Title').fill(documentTitle);
+  await page.getByRole('button', { name: 'Continue' }).click();
+
+  await expect(page.getByRole('heading', { name: 'Add Signers' })).toBeVisible();
+  await page.getByRole('button', { name: 'Add myself' }).click();
+  await page.getByRole('button', { name: 'Continue' }).click();
+
+  await expect(page.getByRole('heading', { name: 'Add Fields' })).toBeVisible();
+
+  await page.getByRole('button', { name: 'Signature' }).click();
+  await page.locator('canvas').click({
+    position: {
+      x: 100,
+      y: 100,
+    },
+  });
+
+  await page.getByRole('button', { name: 'Sign', exact: true }).click();
+
+  const documentRecipients = await prisma.recipient.findMany({
+    where: {
+      documentId: document.id,
+    },
+  });
+
+  const { token, email, id: recipientId } = documentRecipients[0];
+
+  expect(documentRecipients.length).toBe(1);
+  expect(email).toBe(user.email);
+
+  await page.waitForURL(`/sign/${token}`);
+  await expect(page.getByRole('heading', { name: documentTitle })).toBeVisible();
+
+  const { status } = await getDocumentByToken(token);
+  expect(status).toBe(DocumentStatus.PENDING);
+
+  const fields = await prisma.field.findMany({
+    where: { recipientId, documentId: document.id },
+  });
+  const recipientField = fields[0];
+  expect(recipientField).not.toBeNull();
+
+  await page.locator(`#field-${recipientField.id}`).getByRole('button').click();
+
+  const canvas = page.locator('canvas#signature');
+  const box = await canvas.boundingBox();
+  if (box) {
+    await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2);
+    await page.mouse.down();
+    await page.mouse.move(box.x + box.width / 4, box.y + box.height / 4);
+    await page.mouse.up();
+  }
+
+  await page.getByRole('button', { name: 'Sign', exact: true }).click();
+  await page.getByRole('button', { name: 'Complete' }).click();
+  await page.getByRole('button', { name: 'Sign' }).click();
+
+  await page.waitForURL(`/sign/${token}/complete`);
+  await expect(page.getByText('Document Signed')).toBeVisible();
+
+  const updatedRecipient = await getRecipientById({ documentId: document.id, id: recipientId });
+  expect(updatedRecipient?.signingStatus).toBe(SigningStatus.SIGNED);
+
+  await page.waitForTimeout(5000);
+
+  const signedDocument = await getDocumentById({ id: document.id, userId: user.id });
+  expect(signedDocument?.status).toBe(DocumentStatus.COMPLETED);
 });
