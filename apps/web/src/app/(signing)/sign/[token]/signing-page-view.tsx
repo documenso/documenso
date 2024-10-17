@@ -116,7 +116,7 @@ export const SigningPageView = ({
                 key={field.id}
                 field={field}
                 recipient={recipient}
-                enabledTypedSignature={documentMeta?.enabledTypedSignature}
+                typedSignatureEnabled={documentMeta?.typedSignatureEnabled}
               />
             ))
             .with(FieldType.INITIALS, () => (

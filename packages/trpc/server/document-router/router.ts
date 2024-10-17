@@ -337,16 +337,33 @@ export const documentRouter = router({
     .input(ZUpdateTypedSignatureSettingsMutationSchema)
     .mutation(async ({ input, ctx }) => {
       try {
-        const { documentId, enabledTypedSignature } = input;
+        const { documentId, teamId, typedSignatureEnabled } = input;
+
+        const document = await getDocumentById({
+          id: documentId,
+          teamId,
+          userId: ctx.user.id,
+        }).catch(() => null);
+
+        if (!document) {
+          throw new TRPCError({
+            code: 'NOT_FOUND',
+            message: 'Document not found',
+          });
+        }
 
         return await upsertDocumentMeta({
           documentId,
-          enabledTypedSignature,
+          typedSignatureEnabled,
           userId: ctx.user.id,
           requestMetadata: extractNextApiRequestMetadata(ctx.req),
         });
       } catch (err) {
         console.error(err);
+
+        if (err instanceof TRPCError) {
+          throw err;
+        }
 
         throw new TRPCError({
           code: 'BAD_REQUEST',

@@ -278,7 +278,7 @@ export const EditDocumentForm = ({
 
       await updateTypedSignature({
         documentId: document.id,
-        enabledTypedSignature: data.enabledTypedSignature,
+        typedSignatureEnabled: data.typedSignatureEnabled,
       });
 
       // Clear all field data from localStorage
@@ -410,7 +410,7 @@ export const EditDocumentForm = ({
               fields={fields}
               onSubmit={onAddFieldsFormSubmit}
               isDocumentPdfLoaded={isDocumentPdfLoaded}
-              enabledTypedSignature={document.documentMeta?.enabledTypedSignature}
+              typedSignatureEnabled={document.documentMeta?.typedSignatureEnabled}
               teamId={team?.id}
             />
 

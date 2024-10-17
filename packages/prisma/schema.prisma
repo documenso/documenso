@@ -369,7 +369,7 @@ model DocumentMeta {
   document              Document             @relation(fields: [documentId], references: [id], onDelete: Cascade)
   redirectUrl           String?
   signingOrder          DocumentSigningOrder @default(PARALLEL)
-  enabledTypedSignature Boolean              @default(false)
+  typedSignatureEnabled Boolean              @default(false)
 }
 
 enum ReadStatus {

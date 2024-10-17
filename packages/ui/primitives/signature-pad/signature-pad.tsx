@@ -37,7 +37,7 @@ export type SignaturePadProps = Omit<HTMLAttributes<HTMLCanvasElement>, 'onChang
   onChange?: (_signatureDataUrl: string | null) => void;
   containerClassName?: string;
   disabled?: boolean;
-  enabledTypedSignature?: boolean;
+  allowTypedSignature?: boolean;
 };
 
 export const SignaturePad = ({
@@ -46,7 +46,7 @@ export const SignaturePad = ({
   defaultValue,
   onChange,
   disabled = false,
-  enabledTypedSignature,
+  allowTypedSignature,
   ...props
 }: SignaturePadProps) => {
   const $el = useRef<HTMLCanvasElement>(null);
@@ -202,14 +202,42 @@ export const SignaturePad = ({
   const renderTypedSignature = () => {
     if ($el.current && typedSignature) {
       const ctx = $el.current.getContext('2d');
-      if (ctx) {
-        ctx.clearRect(0, 0, $el.current.width, $el.current.height);
 
-        ctx.font = `120px ${fontCaveat.style.fontFamily}`;
-        ctx.fillStyle = selectedColor;
+      if (ctx) {
+        const canvasWidth = $el.current.width;
+        const canvasHeight = $el.current.height;
+
+        ctx.clearRect(0, 0, canvasWidth, canvasHeight);
         ctx.textAlign = 'center';
         ctx.textBaseline = 'middle';
-        ctx.fillText(typedSignature, $el.current.width / 2, $el.current.height / 2);
+        ctx.fillStyle = selectedColor;
+
+        // Calculate the desired width (25ch)
+        const desiredWidth = canvasWidth * 0.85; // 85% of canvas width
+
+        // Start with a base font size
+        let fontSize = 18;
+        ctx.font = `${fontSize}px ${fontCaveat.style.fontFamily}`;
+
+        // Measure 10 characters and calculate scale factor
+        const characterWidth = ctx.measureText('m'.repeat(10)).width;
+        const scaleFactor = desiredWidth / characterWidth;
+
+        // Apply scale factor to font size
+        fontSize = fontSize * scaleFactor;
+
+        // Adjust font size if it exceeds canvas width
+        ctx.font = `${fontSize}px ${fontCaveat.style.fontFamily}`;
+
+        const textWidth = ctx.measureText(typedSignature).width;
+
+        if (textWidth > desiredWidth) {
+          fontSize = fontSize * (desiredWidth / textWidth);
+        }
+
+        // Set final font and render text
+        ctx.font = `${fontSize}px ${fontCaveat.style.fontFamily}`;
+        ctx.fillText(typedSignature, canvasWidth / 2, canvasHeight / 2);
       }
     }
   };
@@ -321,7 +349,7 @@ export const SignaturePad = ({
         {...props}
       />
 
-      {enabledTypedSignature && (
+      {allowTypedSignature && (
         <div
           className={cn('ml-4 pb-1', {
             'ml-10': lines.length > 0 || typedSignature.length > 0,

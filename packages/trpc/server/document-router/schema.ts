@@ -160,7 +160,8 @@ export type TSetSigningOrderForDocumentMutationSchema = z.infer<
 
 export const ZUpdateTypedSignatureSettingsMutationSchema = z.object({
   documentId: z.number(),
-  enabledTypedSignature: z.boolean(),
+  teamId: z.number().optional(),
+  typedSignatureEnabled: z.boolean(),
 });
 
 export type TUpdateTypedSignatureSettingsMutationSchema = z.infer<
