@@ -62,7 +62,12 @@ export const DropdownFieldAdvancedSettings = ({
     setReadOnly(readOnly);
     setRequired(required);
 
-    const errors = validateDropdownField(undefined, { readOnly, required, values });
+    const errors = validateDropdownField(undefined, {
+      readOnly,
+      required,
+      values,
+      type: 'dropdown',
+    });
     handleErrors(errors);
 
     handleFieldChange(field, value);
@@ -76,7 +81,12 @@ export const DropdownFieldAdvancedSettings = ({
   };
 
   useEffect(() => {
-    const errors = validateDropdownField(undefined, { readOnly, required, values });
+    const errors = validateDropdownField(undefined, {
+      readOnly,
+      required,
+      values,
+      type: 'dropdown',
+    });
     handleErrors(errors);
   }, [values]);
 
