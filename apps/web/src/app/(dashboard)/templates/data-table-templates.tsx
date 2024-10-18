@@ -140,8 +140,6 @@ export const TemplatesDataTable = ({
         header: _(msg`Actions`),
         accessorKey: 'actions',
         cell: ({ row }) => {
-          console.log(row.original);
-
           return (
             <div className="flex items-center gap-x-4">
               <UseTemplateDialog

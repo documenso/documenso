@@ -128,6 +128,7 @@ export function UseTemplateDialog({
             id: recipient.id,
             name: !isRecipientNamePlaceholder ? recipient.name : '',
             email: !isRecipientEmailPlaceholder ? recipient.email : '',
+            signingOrder: recipient.signingOrder ?? undefined,
           };
         }),
     },
@@ -225,7 +226,10 @@ export function UseTemplateDialog({
                                 {...field}
                                 disabled
                                 className="items-center justify-center"
-                                placeholder={recipients[index]?.signingOrder?.toString()}
+                                value={
+                                  field.value?.toString() ||
+                                  recipients[index]?.signingOrder?.toString()
+                                }
                               />
                             </FormControl>
                             <FormMessage />
