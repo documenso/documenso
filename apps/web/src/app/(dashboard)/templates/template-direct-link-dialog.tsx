@@ -343,7 +343,7 @@ export const TemplateDirectLinkDialog = ({
                         className="mt-2"
                         loading={isCreatingTemplateDirectLink && !selectedRecipientId}
                         onClick={async () =>
-                          await createTemplateDirectLink({
+                          createTemplateDirectLink({
                             templateId: template.id,
                             teamId: team?.id,
                           })
