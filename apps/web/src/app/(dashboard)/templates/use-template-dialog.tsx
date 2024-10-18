@@ -15,7 +15,9 @@ import {
 } from '@documenso/lib/constants/template';
 import { AppError } from '@documenso/lib/errors/app-error';
 import type { Recipient } from '@documenso/prisma/client';
+import { DocumentSigningOrder } from '@documenso/prisma/client';
 import { trpc } from '@documenso/trpc/react';
+import { cn } from '@documenso/ui/lib/utils';
 import { Button } from '@documenso/ui/primitives/button';
 import { Checkbox } from '@documenso/ui/primitives/checkbox';
 import {
@@ -51,6 +53,7 @@ const ZAddRecipientsForNewDocumentSchema = z
         id: z.number(),
         email: z.string().email(),
         name: z.string(),
+        signingOrder: z.number().optional(),
       }),
     ),
   })
@@ -86,6 +89,7 @@ type TAddRecipientsForNewDocumentSchema = z.infer<typeof ZAddRecipientsForNewDoc
 
 export type UseTemplateDialogProps = {
   templateId: number;
+  templateSigningOrder?: DocumentSigningOrder | null;
   recipients: Recipient[];
   documentRootPath: string;
 };
@@ -94,6 +98,7 @@ export function UseTemplateDialog({
   recipients,
   documentRootPath,
   templateId,
+  templateSigningOrder,
 }: UseTemplateDialogProps) {
   const router = useRouter();
 
@@ -108,21 +113,24 @@ export function UseTemplateDialog({
     resolver: zodResolver(ZAddRecipientsForNewDocumentSchema),
     defaultValues: {
       sendDocument: false,
-      recipients: recipients.map((recipient) => {
-        const isRecipientEmailPlaceholder = recipient.email.match(
-          TEMPLATE_RECIPIENT_EMAIL_PLACEHOLDER_REGEX,
-        );
+      recipients: recipients
+        .sort((a, b) => (a.signingOrder || 0) - (b.signingOrder || 0))
+        .map((recipient) => {
+          const isRecipientEmailPlaceholder = recipient.email.match(
+            TEMPLATE_RECIPIENT_EMAIL_PLACEHOLDER_REGEX,
+          );
 
-        const isRecipientNamePlaceholder = recipient.name.match(
-          TEMPLATE_RECIPIENT_NAME_PLACEHOLDER_REGEX,
-        );
+          const isRecipientNamePlaceholder = recipient.name.match(
+            TEMPLATE_RECIPIENT_NAME_PLACEHOLDER_REGEX,
+          );
 
-        return {
-          id: recipient.id,
-          name: !isRecipientNamePlaceholder ? recipient.name : '',
-          email: !isRecipientEmailPlaceholder ? recipient.email : '',
-        };
-      }),
+          return {
+            id: recipient.id,
+            name: !isRecipientNamePlaceholder ? recipient.name : '',
+            email: !isRecipientEmailPlaceholder ? recipient.email : '',
+            signingOrder: recipient.signingOrder ?? undefined,
+          };
+        }),
     },
   });
 
@@ -203,6 +211,33 @@ export function UseTemplateDialog({
               <div className="custom-scrollbar -m-1 max-h-[60vh] space-y-4 overflow-y-auto p-1">
                 {formRecipients.map((recipient, index) => (
                   <div className="flex w-full flex-row space-x-4" key={recipient.id}>
+                    {templateSigningOrder === DocumentSigningOrder.SEQUENTIAL && (
+                      <FormField
+                        control={form.control}
+                        name={`recipients.${index}.signingOrder`}
+                        render={({ field }) => (
+                          <FormItem
+                            className={cn('w-20', {
+                              'mt-8': index === 0,
+                            })}
+                          >
+                            <FormControl>
+                              <Input
+                                {...field}
+                                disabled
+                                className="items-center justify-center"
+                                value={
+                                  field.value?.toString() ||
+                                  recipients[index]?.signingOrder?.toString()
+                                }
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    )}
+
                     <FormField
                       control={form.control}
                       name={`recipients.${index}.email`}
