@@ -5,6 +5,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Caveat } from 'next/font/google';
 
 import { Trans, msg } from '@lingui/macro';
+import { Prisma } from '@prisma/client';
 import {
   CalendarDays,
   Check,
@@ -32,6 +33,7 @@ import {
   ZFieldMetaSchema,
 } from '@documenso/lib/types/field-meta';
 import { nanoid } from '@documenso/lib/universal/id';
+import { validateFieldsUninserted } from '@documenso/lib/utils/fields';
 import {
   canRecipientBeModified,
   canRecipientFieldsBeModified,
@@ -39,6 +41,7 @@ import {
 import type { Field, Recipient } from '@documenso/prisma/client';
 import { FieldType, RecipientRole, SendStatus } from '@documenso/prisma/client';
 
+import { FieldToolTip } from '../../components/field/field-tooltip';
 import { getSignerColorStyles, useSignerColors } from '../../lib/signer-colors';
 import { cn } from '../../lib/utils';
 import { Alert, AlertDescription } from '../alert';
@@ -188,6 +191,7 @@ export const AddFieldsFormPartial = ({
   const selectedSignerStyles = useSignerColors(
     selectedSignerIndex === -1 ? 0 : selectedSignerIndex,
   );
+  const [validateUninsertedFields, setValidateUninsertedFields] = useState(false);
 
   const filterFieldsWithEmptyValues = (fields: typeof localFields, fieldType: string) =>
     fields
@@ -220,6 +224,38 @@ export const AddFieldsFormPartial = ({
 
   const hasErrors =
     emptyCheckboxFields.length > 0 || emptyRadioFields.length > 0 || emptySelectFields.length > 0;
+
+  const fieldsWithError = useMemo(() => {
+    const fields = localFields.filter((field) => {
+      const hasError =
+        ((field.type === FieldType.CHECKBOX ||
+          field.type === FieldType.RADIO ||
+          field.type === FieldType.DROPDOWN) &&
+          field.fieldMeta === undefined) ||
+        (field.fieldMeta && 'values' in field.fieldMeta && field?.fieldMeta?.values?.length === 0);
+
+      return hasError;
+    });
+
+    const mappedFields = fields.map((field) => ({
+      id: field.nativeId ?? 0,
+      secondaryId: field.formId,
+      documentId: null,
+      templateId: null,
+      recipientId: 0,
+      type: field.type,
+      page: field.pageNumber,
+      positionX: new Prisma.Decimal(field.pageX),
+      positionY: new Prisma.Decimal(field.pageY),
+      width: new Prisma.Decimal(field.pageWidth),
+      height: new Prisma.Decimal(field.pageHeight),
+      customText: '',
+      inserted: true,
+      fieldMeta: field.fieldMeta ?? null,
+    }));
+
+    return mappedFields;
+  }, [localFields]);
 
   const isFieldsDisabled = useMemo(() => {
     if (!selectedSigner) {
@@ -514,6 +550,14 @@ export const AddFieldsFormPartial = ({
 
     if (!everySignerHasSignature) {
       setIsMissingSignatureDialogVisible(true);
+      return;
+    }
+
+    setValidateUninsertedFields(true);
+    const isFieldsValid = validateFieldsUninserted();
+
+    if (!isFieldsValid) {
+      return;
     } else {
       void onFormSubmit();
     }
@@ -566,6 +610,10 @@ export const AddFieldsFormPartial = ({
               {isDocumentPdfLoaded &&
                 localFields.map((field, index) => {
                   const recipientIndex = recipients.findIndex((r) => r.email === field.signerEmail);
+                  const hasFieldError =
+                    emptyCheckboxFields.find((f) => f.formId === field.formId) ||
+                    emptyRadioFields.find((f) => f.formId === field.formId) ||
+                    emptySelectFields.find((f) => f.formId === field.formId);
 
                   return (
                     <FieldItem
@@ -590,6 +638,7 @@ export const AddFieldsFormPartial = ({
                         handleAdvancedSettings();
                       }}
                       hideRecipients={hideRecipients}
+                      hasErrors={!!hasFieldError}
                     />
                   );
                 })}
@@ -1062,6 +1111,11 @@ export const AddFieldsFormPartial = ({
             onOpenChange={(value) => setIsMissingSignatureDialogVisible(value)}
           />
         </>
+      )}
+      {validateUninsertedFields && fieldsWithError[0] && (
+        <FieldToolTip key={fieldsWithError[0].id} field={fieldsWithError[0]} color="warning">
+          <Trans>Empty field</Trans>
+        </FieldToolTip>
       )}
     </>
   );

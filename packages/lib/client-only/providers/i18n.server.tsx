@@ -15,9 +15,10 @@ type SupportedLanguages = (typeof SUPPORTED_LANGUAGE_CODES)[number];
 async function loadCatalog(lang: SupportedLanguages): Promise<{
   [k: string]: Messages;
 }> {
-  const { messages } = await import(
-    `../../translations/${lang}/${IS_APP_WEB ? 'web' : 'marketing'}.js`
-  );
+  const extension = process.env.NODE_ENV === 'development' ? 'po' : 'js';
+  const context = IS_APP_WEB ? 'web' : 'marketing';
+
+  const { messages } = await import(`../../translations/${lang}/${context}.${extension}`);
 
   return {
     [lang]: messages,
