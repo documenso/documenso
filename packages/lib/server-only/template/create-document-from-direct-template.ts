@@ -540,23 +540,6 @@ export const createDocumentFromDirectTemplate = async ({
       text: render(emailTemplate, { plainText: true }),
     });
 
-    const updatedDocument = await tx.document.findFirstOrThrow({
-      where: {
-        id: document.id,
-      },
-      include: {
-        documentData: true,
-        Recipient: true,
-      },
-    });
-
-    await triggerWebhook({
-      event: WebhookTriggerEvents.DOCUMENT_SIGNED,
-      data: updatedDocument,
-      userId: document.userId,
-      teamId: document.teamId ?? undefined,
-    });
-
     return {
       token: createdDirectRecipient.token,
       documentId: document.id,
@@ -571,6 +554,23 @@ export const createDocumentFromDirectTemplate = async ({
       userId: template.userId,
       teamId: template.teamId || undefined,
       requestMetadata,
+    });
+
+    const updatedDocument = await prisma.document.findFirstOrThrow({
+      where: {
+        id: documentId,
+      },
+      include: {
+        documentData: true,
+        Recipient: true,
+      },
+    });
+
+    await triggerWebhook({
+      event: WebhookTriggerEvents.DOCUMENT_SIGNED,
+      data: updatedDocument,
+      userId: updatedDocument.userId,
+      teamId: updatedDocument.teamId ?? undefined,
     });
   } catch (err) {
     console.error('[CREATE_DOCUMENT_FROM_DIRECT_TEMPLATE]:', err);
