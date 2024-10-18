@@ -220,7 +220,7 @@ msgstr "Abonnements actifs"
 msgid "Add"
 msgstr "Ajouter"
 
-#: apps/web/src/app/(dashboard)/documents/[id]/edit-document.tsx:157
+#: apps/web/src/app/(dashboard)/documents/[id]/edit-document.tsx:175
 #: apps/web/src/app/(dashboard)/templates/[id]/edit-template.tsx:87
 msgid "Add all relevant fields for each recipient."
 msgstr "Ajouter tous les champs pertinents pour chaque destinataire."
@@ -241,7 +241,7 @@ msgstr "Ajouter un authentificateur pour servir de méthode d'authentification s
 msgid "Add email"
 msgstr "Ajouter un e-mail"
 
-#: apps/web/src/app/(dashboard)/documents/[id]/edit-document.tsx:156
+#: apps/web/src/app/(dashboard)/documents/[id]/edit-document.tsx:174
 #: apps/web/src/app/(dashboard)/templates/[id]/edit-template.tsx:86
 msgid "Add Fields"
 msgstr "Ajouter des champs"
@@ -263,11 +263,11 @@ msgstr "Ajouter une clé de passe"
 msgid "Add Placeholders"
 msgstr "Ajouter des espaces réservés"
 
-#: apps/web/src/app/(dashboard)/documents/[id]/edit-document.tsx:151
+#: apps/web/src/app/(dashboard)/documents/[id]/edit-document.tsx:169
 msgid "Add Signers"
 msgstr "Ajouter des signataires"
 
-#: apps/web/src/app/(dashboard)/documents/[id]/edit-document.tsx:161
+#: apps/web/src/app/(dashboard)/documents/[id]/edit-document.tsx:179
 msgid "Add Subject"
 msgstr "Ajouter un sujet"
 
@@ -283,7 +283,7 @@ msgstr "Ajouter un e-mail d'équipe"
 #~ msgid "Add Text"
 #~ msgstr "Add Text"
 
-#: apps/web/src/app/(dashboard)/documents/[id]/edit-document.tsx:152
+#: apps/web/src/app/(dashboard)/documents/[id]/edit-document.tsx:170
 msgid "Add the people who will sign the document."
 msgstr "Ajouter les personnes qui signeront le document."
 
@@ -291,7 +291,7 @@ msgstr "Ajouter les personnes qui signeront le document."
 msgid "Add the recipients to create the document with"
 msgstr "Ajouter les destinataires pour créer le document avec"
 
-#: apps/web/src/app/(dashboard)/documents/[id]/edit-document.tsx:162
+#: apps/web/src/app/(dashboard)/documents/[id]/edit-document.tsx:180
 msgid "Add the subject and message you wish to send to signers."
 msgstr "Ajouter le sujet et le message que vous souhaitez envoyer aux signataires."
 
@@ -370,13 +370,13 @@ msgstr "Un e-mail demandant le transfert de cette équipe a été envoyé."
 msgid "An error occurred"
 msgstr "Une erreur est survenue"
 
-#: apps/web/src/app/(dashboard)/documents/[id]/edit-document.tsx:248
+#: apps/web/src/app/(dashboard)/documents/[id]/edit-document.tsx:266
 #: apps/web/src/app/(dashboard)/templates/[id]/edit-template.tsx:197
 #: apps/web/src/app/(dashboard)/templates/[id]/edit-template.tsx:231
 msgid "An error occurred while adding signers."
 msgstr "Une erreur est survenue lors de l'ajout de signataires."
 
-#: apps/web/src/app/(dashboard)/documents/[id]/edit-document.tsx:278
+#: apps/web/src/app/(dashboard)/documents/[id]/edit-document.tsx:301
 msgid "An error occurred while adding the fields."
 msgstr "Une erreur est survenue lors de l'ajout des champs."
 
@@ -426,7 +426,7 @@ msgstr "Une erreur est survenue lors du déplacement du modèle."
 #: apps/web/src/app/(signing)/sign/[token]/name-field.tsx:148
 #: apps/web/src/app/(signing)/sign/[token]/number-field.tsx:195
 #: apps/web/src/app/(signing)/sign/[token]/radio-field.tsx:129
-#: apps/web/src/app/(signing)/sign/[token]/signature-field.tsx:175
+#: apps/web/src/app/(signing)/sign/[token]/signature-field.tsx:173
 msgid "An error occurred while removing the signature."
 msgstr "Une erreur est survenue lors de la suppression de la signature."
 
@@ -434,7 +434,7 @@ msgstr "Une erreur est survenue lors de la suppression de la signature."
 msgid "An error occurred while removing the text."
 msgstr "Une erreur est survenue lors de la suppression du texte."
 
-#: apps/web/src/app/(dashboard)/documents/[id]/edit-document.tsx:309
+#: apps/web/src/app/(dashboard)/documents/[id]/edit-document.tsx:332
 msgid "An error occurred while sending the document."
 msgstr "Une erreur est survenue lors de l'envoi du document."
 
@@ -449,7 +449,7 @@ msgstr "Une erreur est survenue lors de l'envoi de votre e-mail de confirmation"
 #: apps/web/src/app/(signing)/sign/[token]/name-field.tsx:122
 #: apps/web/src/app/(signing)/sign/[token]/number-field.tsx:150
 #: apps/web/src/app/(signing)/sign/[token]/radio-field.tsx:102
-#: apps/web/src/app/(signing)/sign/[token]/signature-field.tsx:149
+#: apps/web/src/app/(signing)/sign/[token]/signature-field.tsx:147
 #: apps/web/src/app/(signing)/sign/[token]/text-field.tsx:168
 msgid "An error occurred while signing the document."
 msgstr "Une erreur est survenue lors de la signature du document."
@@ -458,7 +458,7 @@ msgstr "Une erreur est survenue lors de la signature du document."
 msgid "An error occurred while trying to create a checkout session."
 msgstr "Une erreur est survenue lors de la création d'une session de paiement."
 
-#: apps/web/src/app/(dashboard)/documents/[id]/edit-document.tsx:214
+#: apps/web/src/app/(dashboard)/documents/[id]/edit-document.tsx:232
 #: apps/web/src/app/(dashboard)/templates/[id]/edit-template.tsx:166
 msgid "An error occurred while updating the document settings."
 msgstr "Une erreur est survenue lors de la mise à jour des paramètres du document."
@@ -665,11 +665,11 @@ msgstr "En activant l'authentification à deux facteurs (2FA), vous devrez entre
 #: apps/web/src/app/(signing)/sign/[token]/document-action-auth-account.tsx:71
 #: apps/web/src/app/(signing)/sign/[token]/document-action-auth-passkey.tsx:164
 #: apps/web/src/app/(signing)/sign/[token]/document-action-auth-passkey.tsx:189
-#: apps/web/src/app/(signing)/sign/[token]/form.tsx:150
+#: apps/web/src/app/(signing)/sign/[token]/form.tsx:151
 #: apps/web/src/app/(signing)/sign/[token]/name-field.tsx:215
 #: apps/web/src/app/(signing)/sign/[token]/number-field.tsx:327
 #: apps/web/src/app/(signing)/sign/[token]/sign-dialog.tsx:113
-#: apps/web/src/app/(signing)/sign/[token]/signature-field.tsx:250
+#: apps/web/src/app/(signing)/sign/[token]/signature-field.tsx:248
 #: apps/web/src/app/(signing)/sign/[token]/text-field.tsx:333
 #: apps/web/src/app/(teams)/t/[teamUrl]/settings/team-transfer-status.tsx:121
 #: apps/web/src/components/(dashboard)/settings/token/delete-token-dialog.tsx:176
@@ -752,7 +752,7 @@ msgid "Click to copy signing link for sending to recipient"
 msgstr "Cliquez pour copier le lien de signature à envoyer au destinataire"
 
 #: apps/web/src/app/(recipient)/d/[token]/sign-direct-template.tsx:175
-#: apps/web/src/app/(signing)/sign/[token]/form.tsx:114
+#: apps/web/src/app/(signing)/sign/[token]/form.tsx:115
 #: apps/web/src/app/embed/direct/[[...url]]/client.tsx:435
 #: apps/web/src/app/embed/sign/[[...url]]/client.tsx:314
 msgid "Click to insert field"
@@ -802,7 +802,7 @@ msgstr "Documents complétés"
 msgid "Completed Documents"
 msgstr "Documents Complétés"
 
-#: apps/web/src/app/(dashboard)/documents/[id]/edit-document.tsx:147
+#: apps/web/src/app/(dashboard)/documents/[id]/edit-document.tsx:165
 msgid "Configure general settings for the document."
 msgstr "Configurer les paramètres généraux pour le document."
 
@@ -1274,7 +1274,7 @@ msgstr "Document renvoyé"
 msgid "Document resealed"
 msgstr "Document resealé"
 
-#: apps/web/src/app/(dashboard)/documents/[id]/edit-document.tsx:298
+#: apps/web/src/app/(dashboard)/documents/[id]/edit-document.tsx:321
 msgid "Document sent"
 msgstr "Document envoyé"
 
@@ -1491,10 +1491,10 @@ msgstr "Entrez votre texte ici"
 
 #: apps/web/src/app/(dashboard)/admin/documents/[id]/admin-actions.tsx:41
 #: apps/web/src/app/(dashboard)/admin/users/[id]/page.tsx:78
-#: apps/web/src/app/(dashboard)/documents/[id]/edit-document.tsx:213
-#: apps/web/src/app/(dashboard)/documents/[id]/edit-document.tsx:247
-#: apps/web/src/app/(dashboard)/documents/[id]/edit-document.tsx:277
-#: apps/web/src/app/(dashboard)/documents/[id]/edit-document.tsx:308
+#: apps/web/src/app/(dashboard)/documents/[id]/edit-document.tsx:231
+#: apps/web/src/app/(dashboard)/documents/[id]/edit-document.tsx:265
+#: apps/web/src/app/(dashboard)/documents/[id]/edit-document.tsx:300
+#: apps/web/src/app/(dashboard)/documents/[id]/edit-document.tsx:331
 #: apps/web/src/app/(dashboard)/documents/move-document-dialog.tsx:57
 #: apps/web/src/app/(dashboard)/documents/upload-document.tsx:106
 #: apps/web/src/app/(dashboard)/documents/upload-document.tsx:112
@@ -1519,8 +1519,8 @@ msgstr "Entrez votre texte ici"
 #: apps/web/src/app/(signing)/sign/[token]/number-field.tsx:194
 #: apps/web/src/app/(signing)/sign/[token]/radio-field.tsx:101
 #: apps/web/src/app/(signing)/sign/[token]/radio-field.tsx:128
-#: apps/web/src/app/(signing)/sign/[token]/signature-field.tsx:148
-#: apps/web/src/app/(signing)/sign/[token]/signature-field.tsx:174
+#: apps/web/src/app/(signing)/sign/[token]/signature-field.tsx:146
+#: apps/web/src/app/(signing)/sign/[token]/signature-field.tsx:172
 #: apps/web/src/app/(signing)/sign/[token]/text-field.tsx:167
 #: apps/web/src/app/(signing)/sign/[token]/text-field.tsx:195
 #: apps/web/src/components/(dashboard)/layout/verify-email-banner.tsx:54
@@ -1597,7 +1597,7 @@ msgstr "Mot de passe oublié ?"
 msgid "Full Name"
 msgstr "Nom complet"
 
-#: apps/web/src/app/(dashboard)/documents/[id]/edit-document.tsx:146
+#: apps/web/src/app/(dashboard)/documents/[id]/edit-document.tsx:164
 #: apps/web/src/app/(dashboard)/templates/[id]/edit-template.tsx:76
 #: apps/web/src/app/(recipient)/d/[token]/direct-template.tsx:60
 #: apps/web/src/components/(teams)/settings/layout/desktop-nav.tsx:43
@@ -2294,7 +2294,7 @@ msgstr "Veuillez contacter le support si vous souhaitez annuler cette action."
 msgid "Please enter a meaningful name for your token. This will help you identify it later."
 msgstr "Veuillez entrer un nom significatif pour votre jeton. Cela vous aidera à l'identifier plus tard."
 
-#: apps/web/src/app/(signing)/sign/[token]/form.tsx:134
+#: apps/web/src/app/(signing)/sign/[token]/form.tsx:135
 msgid "Please mark as viewed to complete"
 msgstr "Veuillez marquer comme vu pour terminer"
 
@@ -2730,13 +2730,13 @@ msgstr "Afficher des modèles dans le profil public de votre équipe pour que vo
 #: apps/web/src/app/(signing)/sign/[token]/document-action-auth-2fa.tsx:182
 #: apps/web/src/app/(signing)/sign/[token]/name-field.tsx:224
 #: apps/web/src/app/(signing)/sign/[token]/sign-dialog.tsx:124
-#: apps/web/src/app/(signing)/sign/[token]/signature-field.tsx:259
+#: apps/web/src/app/(signing)/sign/[token]/signature-field.tsx:256
 #: apps/web/src/components/ui/user-profile-skeleton.tsx:75
 #: apps/web/src/components/ui/user-profile-timur.tsx:81
 msgid "Sign"
 msgstr "Signer"
 
-#: apps/web/src/app/(signing)/sign/[token]/signature-field.tsx:219
+#: apps/web/src/app/(signing)/sign/[token]/signature-field.tsx:217
 msgid "Sign as {0} <0>({1})</0>"
 msgstr "Signer comme {0} <0>({1})</0>"
 
@@ -2802,8 +2802,8 @@ msgstr "S'inscrire avec OIDC"
 
 #: apps/web/src/app/(dashboard)/admin/documents/[id]/recipient-item.tsx:88
 #: apps/web/src/app/(recipient)/d/[token]/sign-direct-template.tsx:338
-#: apps/web/src/app/(signing)/sign/[token]/signature-field.tsx:197
-#: apps/web/src/app/(signing)/sign/[token]/signature-field.tsx:227
+#: apps/web/src/app/(signing)/sign/[token]/signature-field.tsx:195
+#: apps/web/src/app/(signing)/sign/[token]/signature-field.tsx:225
 #: apps/web/src/app/embed/direct/[[...url]]/client.tsx:391
 #: apps/web/src/app/embed/sign/[[...url]]/client.tsx:270
 #: apps/web/src/components/forms/profile.tsx:132
@@ -4382,7 +4382,7 @@ msgstr "Votre document a été créé à partir du modèle avec succès."
 msgid "Your document has been re-sent successfully."
 msgstr "Votre document a été renvoyé avec succès."
 
-#: apps/web/src/app/(dashboard)/documents/[id]/edit-document.tsx:299
+#: apps/web/src/app/(dashboard)/documents/[id]/edit-document.tsx:322
 msgid "Your document has been sent successfully."
 msgstr "Votre document a été envoyé avec succès."
 

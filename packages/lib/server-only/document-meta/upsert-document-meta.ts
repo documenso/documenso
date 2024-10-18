@@ -18,6 +18,7 @@ export type CreateDocumentMetaOptions = {
   dateFormat?: string;
   redirectUrl?: string;
   signingOrder?: DocumentSigningOrder;
+  typedSignatureEnabled?: boolean;
   userId: number;
   requestMetadata: RequestMetadata;
 };
@@ -32,6 +33,7 @@ export const upsertDocumentMeta = async ({
   userId,
   redirectUrl,
   signingOrder,
+  typedSignatureEnabled,
   requestMetadata,
 }: CreateDocumentMetaOptions) => {
   const user = await prisma.user.findFirstOrThrow({
@@ -82,6 +84,7 @@ export const upsertDocumentMeta = async ({
         documentId,
         redirectUrl,
         signingOrder,
+        typedSignatureEnabled,
       },
       update: {
         subject,
@@ -91,6 +94,7 @@ export const upsertDocumentMeta = async ({
         timezone,
         redirectUrl,
         signingOrder,
+        typedSignatureEnabled,
       },
     });
 

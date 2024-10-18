@@ -42,6 +42,7 @@ import {
   ZSetSettingsForDocumentMutationSchema,
   ZSetSigningOrderForDocumentMutationSchema,
   ZSetTitleForDocumentMutationSchema,
+  ZUpdateTypedSignatureSettingsMutationSchema,
 } from './schema';
 
 export const documentRouter = router({
@@ -323,6 +324,46 @@ export const documentRouter = router({
         });
       } catch (err) {
         console.error(err);
+
+        throw new TRPCError({
+          code: 'BAD_REQUEST',
+          message:
+            'We were unable to update the settings for this document. Please try again later.',
+        });
+      }
+    }),
+
+  updateTypedSignatureSettings: authenticatedProcedure
+    .input(ZUpdateTypedSignatureSettingsMutationSchema)
+    .mutation(async ({ input, ctx }) => {
+      try {
+        const { documentId, teamId, typedSignatureEnabled } = input;
+
+        const document = await getDocumentById({
+          id: documentId,
+          teamId,
+          userId: ctx.user.id,
+        }).catch(() => null);
+
+        if (!document) {
+          throw new TRPCError({
+            code: 'NOT_FOUND',
+            message: 'Document not found',
+          });
+        }
+
+        return await upsertDocumentMeta({
+          documentId,
+          typedSignatureEnabled,
+          userId: ctx.user.id,
+          requestMetadata: extractNextApiRequestMetadata(ctx.req),
+        });
+      } catch (err) {
+        console.error(err);
+
+        if (err instanceof TRPCError) {
+          throw err;
+        }
 
         throw new TRPCError({
           code: 'BAD_REQUEST',
