@@ -540,14 +540,22 @@ export const createDocumentFromDirectTemplate = async ({
       text: render(emailTemplate, { plainText: true }),
     });
 
-    if (user?.id) {
-      await triggerWebhook({
-        event: WebhookTriggerEvents.DOCUMENT_SIGNED,
-        data: document,
-        userId: user.id,
-        teamId: document.teamId ?? undefined,
-      });
-    }
+    const updatedDocument = await tx.document.findFirstOrThrow({
+      where: {
+        id: document.id,
+      },
+      include: {
+        documentData: true,
+        Recipient: true,
+      },
+    });
+
+    await triggerWebhook({
+      event: WebhookTriggerEvents.DOCUMENT_SIGNED,
+      data: updatedDocument,
+      userId: document.userId,
+      teamId: document.teamId ?? undefined,
+    });
 
     return {
       token: createdDirectRecipient.token,
