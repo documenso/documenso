@@ -100,7 +100,7 @@ export const sendDocument = async ({
 
   const { documentData } = document;
 
-  if (!documentData.data) {
+  if (!documentData || !documentData.data) {
     throw new Error('Document data not found');
   }
 

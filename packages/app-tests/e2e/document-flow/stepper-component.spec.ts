@@ -632,10 +632,10 @@ test('[DOCUMENT_FLOW]: should be able to create and sign a document with 3 recip
   }
 
   // Wait for the document to be signed.
-  await page.waitForTimeout(5000);
-
-  const signedDocument = await getDocumentById({ id: document.id, userId: user.id });
-  expect(signedDocument?.status).toBe(DocumentStatus.COMPLETED);
+  await expect(async () => {
+    const signedDocument = await getDocumentById({ id: document.id, userId: user.id });
+    expect(signedDocument?.status).toBe(DocumentStatus.COMPLETED);
+  }).toPass();
 });
 
 test('[DOCUMENT_FLOW]: should prevent out-of-order signing in sequential mode', async ({
@@ -747,8 +747,8 @@ test('[DOCUMENT_FLOW]: should be able to self sign a document', async ({ page })
   const updatedRecipient = await getRecipientById({ documentId: document.id, id: recipientId });
   expect(updatedRecipient?.signingStatus).toBe(SigningStatus.SIGNED);
 
-  await page.waitForTimeout(5000);
-
-  const signedDocument = await getDocumentById({ id: document.id, userId: user.id });
-  expect(signedDocument?.status).toBe(DocumentStatus.COMPLETED);
+  await expect(async () => {
+    const signedDocument = await getDocumentById({ id: document.id, userId: user.id });
+    expect(signedDocument?.status).toBe(DocumentStatus.COMPLETED);
+  }).toPass();
 });

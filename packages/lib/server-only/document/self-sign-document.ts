@@ -31,7 +31,7 @@ export const selfSignDocument = async ({
     },
   });
 
-  const document = await prisma.document.findUnique({
+  const document = await prisma.document.findFirstOrThrow({
     where: {
       id: documentId,
       userId,
@@ -64,7 +64,7 @@ export const selfSignDocument = async ({
 
   const { documentData } = document;
 
-  if (!documentData.data) {
+  if (!documentData || !documentData.data) {
     throw new Error('Document data not found');
   }
 
