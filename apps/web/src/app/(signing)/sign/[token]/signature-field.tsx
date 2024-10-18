@@ -31,12 +31,12 @@ import { useRequiredSigningContext } from './provider';
 import { SigningFieldContainer } from './signing-field-container';
 
 type SignatureFieldState = 'empty' | 'signed-image' | 'signed-text';
-
 export type SignatureFieldProps = {
   field: FieldWithSignature;
   recipient: Recipient;
   onSignField?: (value: TSignFieldWithTokenMutationSchema) => Promise<void> | void;
   onUnsignField?: (value: TRemovedSignedFieldWithTokenMutationSchema) => Promise<void> | void;
+  typedSignatureEnabled?: boolean;
 };
 
 export const SignatureField = ({
@@ -44,6 +44,7 @@ export const SignatureField = ({
   recipient,
   onSignField,
   onUnsignField,
+  typedSignatureEnabled,
 }: SignatureFieldProps) => {
   const router = useRouter();
 
@@ -92,14 +93,12 @@ export const SignatureField = ({
 
     return true;
   };
-
   /**
    * When the user clicks the sign button in the dialog where they enter their signature.
    */
   const onDialogSignClick = () => {
     setShowSignatureModal(false);
     setProvidedSignature(localSignature);
-
     if (!localSignature) {
       return;
     }
@@ -109,7 +108,6 @@ export const SignatureField = ({
       actionTarget: field.type,
     });
   };
-
   const onSign = async (authOptions?: TRecipientActionAuth, signature?: string) => {
     try {
       const value = signature || providedSignature;
@@ -231,11 +229,11 @@ export const SignatureField = ({
               id="signature"
               className="border-border mt-2 h-44 w-full rounded-md border"
               onChange={(value) => setLocalSignature(value)}
+              allowTypedSignature={typedSignatureEnabled}
             />
           </div>
 
           <SigningDisclosure />
-
           <DialogFooter>
             <div className="flex w-full flex-1 flex-nowrap gap-4">
               <Button
@@ -249,7 +247,6 @@ export const SignatureField = ({
               >
                 <Trans>Cancel</Trans>
               </Button>
-
               <Button
                 type="button"
                 className="flex-1"
