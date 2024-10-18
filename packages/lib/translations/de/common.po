@@ -8,7 +8,7 @@ msgstr ""
 "Language: de\n"
 "Project-Id-Version: documenso-app\n"
 "Report-Msgid-Bugs-To: \n"
-"PO-Revision-Date: 2024-10-08 12:05\n"
+"PO-Revision-Date: 2024-10-18 04:04\n"
 "Last-Translator: \n"
 "Language-Team: German\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
@@ -293,7 +293,7 @@ msgstr "Aktiviere die Signaturreihenfolge"
 
 #: packages/ui/primitives/document-flow/add-fields.tsx:790
 msgid "Enable Typed Signatures"
-msgstr ""
+msgstr "Aktivieren Sie getippte Unterschriften"
 
 #: packages/ui/primitives/document-password-dialog.tsx:84
 msgid "Enter password"
@@ -323,7 +323,7 @@ msgstr "Zeichenbeschränkung des Feldes"
 #: packages/ui/primitives/document-flow/field-items-advanced-settings/number-field.tsx:130
 #: packages/ui/primitives/document-flow/field-items-advanced-settings/text-field.tsx:107
 msgid "Field font size"
-msgstr ""
+msgstr "Feldschriftgröße"
 
 #: packages/ui/primitives/document-flow/field-items-advanced-settings/number-field.tsx:110
 msgid "Field format"
@@ -344,7 +344,7 @@ msgstr "Feldplatzhalter"
 #: packages/ui/primitives/document-flow/field-items-advanced-settings/number-field.tsx:124
 #: packages/ui/primitives/document-flow/field-items-advanced-settings/text-field.tsx:101
 msgid "Font Size"
-msgstr ""
+msgstr "Schriftgröße"
 
 #: packages/ui/components/document/document-global-auth-action-select.tsx:64
 msgid "Global recipient action authentication"
@@ -816,3 +816,4 @@ msgstr "Sie können derzeit keine Dokumente hochladen."
 #: packages/ui/primitives/document-dropzone.tsx:69
 msgid "You have reached your document limit."
 msgstr "Sie haben Ihr Dokumentenlimit erreicht."
+
