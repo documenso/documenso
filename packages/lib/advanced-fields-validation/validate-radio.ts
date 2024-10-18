@@ -1,8 +1,4 @@
-interface RadioFieldMeta {
-  readOnly?: boolean;
-  required?: boolean;
-  values?: { checked: boolean; value: string }[];
-}
+import type { TRadioFieldMeta as RadioFieldMeta } from '../types/field-meta';
 
 export const validateRadioField = (
   value: string | undefined,
