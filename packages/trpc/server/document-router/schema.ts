@@ -140,6 +140,10 @@ export const ZSendDocumentMutationSchema = z.object({
   }),
 });
 
+export const ZSelfSignDocumentMutationSchema = z.object({
+  documentId: z.number(),
+});
+
 export const ZSetPasswordForDocumentMutationSchema = z.object({
   documentId: z.number(),
   password: z.string(),

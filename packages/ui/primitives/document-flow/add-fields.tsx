@@ -20,6 +20,7 @@ import {
   Type,
   User,
 } from 'lucide-react';
+import { useSession } from 'next-auth/react';
 import { useFieldArray, useForm } from 'react-hook-form';
 import { useHotkeys } from 'react-hotkeys-hook';
 import { prop, sortBy } from 'remeda';
@@ -110,6 +111,7 @@ export const AddFieldsFormPartial = ({
   teamId,
 }: AddFieldsFormProps) => {
   const { toast } = useToast();
+  const { data: session } = useSession();
 
   const [isMissingSignatureDialogVisible, setIsMissingSignatureDialogVisible] = useState(false);
 
@@ -529,6 +531,10 @@ export const AddFieldsFormPartial = ({
           ] as [RecipientRole, Recipient[]],
       );
   }, [recipientsByRole]);
+
+  const hasSameOwnerAsRecipient =
+    recipientsByRole.SIGNER.length === 1 &&
+    recipientsByRole.SIGNER[0].email === session?.user?.email;
 
   const handleAdvancedSettings = () => {
     setShowAdvancedSettings((prev) => !prev);
@@ -1067,6 +1073,7 @@ export const AddFieldsFormPartial = ({
                 documentFlow.onBackStep?.();
               }}
               goBackLabel={canRenderBackButtonAsRemove ? msg`Remove` : undefined}
+              goNextLabel={hasSameOwnerAsRecipient ? msg`Sign` : undefined}
               onGoNextClick={handleGoNextClick}
             />
           </DocumentFlowFormContainerFooter>

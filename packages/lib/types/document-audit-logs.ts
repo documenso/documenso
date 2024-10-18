@@ -13,6 +13,7 @@ import { ZRecipientActionAuthTypesSchema } from './document-auth';
 export const ZDocumentAuditLogTypeSchema = z.enum([
   // Document actions.
   'EMAIL_SENT',
+  'SELF_SIGN',
 
   // Document modification events.
   'FIELD_CREATED',
@@ -176,6 +177,14 @@ export const ZDocumentAuditLogEventEmailSentSchema = z.object({
     emailType: ZDocumentAuditLogEmailTypeSchema,
     isResending: z.boolean(),
   }),
+});
+
+/**
+ * Event: Self sign
+ */
+export const ZDocumentAuditLogSelfSignSchema = z.object({
+  type: z.literal(DOCUMENT_AUDIT_LOG_TYPE.SELF_SIGN),
+  data: ZBaseRecipientDataSchema,
 });
 
 /**
@@ -475,6 +484,7 @@ export const ZDocumentAuditLogBaseSchema = z.object({
 export const ZDocumentAuditLogSchema = ZDocumentAuditLogBaseSchema.and(
   z.union([
     ZDocumentAuditLogEventEmailSentSchema,
+    ZDocumentAuditLogSelfSignSchema,
     ZDocumentAuditLogEventDocumentCompletedSchema,
     ZDocumentAuditLogEventDocumentCreatedSchema,
     ZDocumentAuditLogEventDocumentDeletedSchema,

@@ -335,6 +335,16 @@ export const DocumentHistorySheet = ({
                       ]}
                     />
                   ))
+                  .with({ type: DOCUMENT_AUDIT_LOG_TYPE.SELF_SIGN }, ({ data }) => (
+                    <DocumentHistorySheetChanges
+                      values={[
+                        {
+                          key: 'Signed by',
+                          value: data.recipientEmail,
+                        },
+                      ]}
+                    />
+                  ))
                   .with(
                     { type: DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_VISIBILITY_UPDATED },
                     ({ data }) => (
