@@ -8,6 +8,17 @@ export const ZCurrentPasswordSchema = z
   .min(6, { message: 'Must be at least 6 characters in length' })
   .max(72);
 
+export const ZHintedPasswordSchema = z
+  .string()
+  .regex(new RegExp('.*[A-Z].*'))
+  .regex(new RegExp('.*[a-z].*'))
+  .regex(new RegExp('.*\\d.*'))
+  .regex(new RegExp('.*[`~<>?,./!@#$%^&*()\\-_+="\'|{}\\[\\];:\\\\].*'), {
+    message: 'One special character is required',
+  })
+  .min(8)
+  .max(72);
+
 export const ZPasswordSchema = z
   .string()
   .regex(new RegExp('.*[A-Z].*'), { message: 'One uppercase character' })
