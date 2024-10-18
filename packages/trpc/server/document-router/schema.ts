@@ -158,6 +158,16 @@ export type TSetSigningOrderForDocumentMutationSchema = z.infer<
   typeof ZSetSigningOrderForDocumentMutationSchema
 >;
 
+export const ZUpdateTypedSignatureSettingsMutationSchema = z.object({
+  documentId: z.number(),
+  teamId: z.number().optional(),
+  typedSignatureEnabled: z.boolean(),
+});
+
+export type TUpdateTypedSignatureSettingsMutationSchema = z.infer<
+  typeof ZUpdateTypedSignatureSettingsMutationSchema
+>;
+
 export const ZResendDocumentMutationSchema = z.object({
   documentId: z.number(),
   recipients: z.array(z.number()).min(1),
