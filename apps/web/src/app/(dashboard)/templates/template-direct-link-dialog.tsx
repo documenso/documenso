@@ -342,12 +342,12 @@ export const TemplateDirectLinkDialog = ({
                         type="button"
                         className="mt-2"
                         loading={isCreatingTemplateDirectLink && !selectedRecipientId}
-                        onClick={async () =>
+                        onClick={async () => {
                           createTemplateDirectLink({
                             templateId: template.id,
                             teamId: team?.id,
-                          })
-                        }
+                          });
+                        }}
                       >
                         <Trans>Create one automatically</Trans>
                       </Button>
@@ -434,12 +434,14 @@ export const TemplateDirectLinkDialog = ({
                   <Button
                     type="button"
                     loading={isTogglingTemplateAccess}
-                    onClick={async () =>
-                      toggleTemplateDirectLink({
+                    onClick={async () => {
+                      await toggleTemplateDirectLink({
                         templateId: template.id,
                         enabled: isEnabled,
-                      })
-                    }
+                      });
+
+                      onOpenChange(false);
+                    }}
                   >
                     <Trans>Save</Trans>
                   </Button>
