@@ -8,7 +8,7 @@ msgstr ""
 "Language: fr\n"
 "Project-Id-Version: documenso-app\n"
 "Report-Msgid-Bugs-To: \n"
-"PO-Revision-Date: 2024-10-08 12:05\n"
+"PO-Revision-Date: 2024-10-18 04:04\n"
 "Last-Translator: \n"
 "Language-Team: French\n"
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
@@ -1368,6 +1368,10 @@ msgstr "Documents en brouillon"
 #: apps/web/src/app/(dashboard)/admin/stats/page.tsx:86
 msgid "Drafted Documents"
 msgstr "Documents brouillon"
+
+#: apps/web/src/app/(signing)/sign/[token]/signature-field.tsx:245
+#~ msgid "Draw"
+#~ msgstr "Draw"
 
 #: apps/web/src/app/(teams)/t/[teamUrl]/layout-billing-banner.tsx:121
 msgid "Due to an unpaid invoice, your team has been restricted. Please settle the payment to restore full access to your team."
@@ -3552,6 +3556,10 @@ msgstr "Tapez 'supprimer' pour confirmer"
 msgid "Type a command or search..."
 msgstr "Tapez une commande ou recherchez..."
 
+#: apps/web/src/app/(signing)/sign/[token]/signature-field.tsx:275
+#~ msgid "Typed Signature"
+#~ msgstr "Typed Signature"
+
 #: apps/web/src/app/(unauthenticated)/verify-email/page.tsx:26
 msgid "Uh oh! Looks like you're missing a token"
 msgstr "Oh oh ! On dirait que vous manquez un jeton"
@@ -4489,3 +4497,4 @@ msgstr "Votre jeton a été créé avec succès ! Assurez-vous de le copier car 
 #: apps/web/src/app/(teams)/t/[teamUrl]/settings/tokens/page.tsx:86
 msgid "Your tokens will be shown here once you create them."
 msgstr "Vos jetons seront affichés ici une fois que vous les aurez créés."
+
