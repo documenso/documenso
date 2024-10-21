@@ -1,8 +1,4 @@
-interface TextFieldMeta {
-  characterLimit?: number;
-  readOnly?: boolean;
-  required?: boolean;
-}
+import type { TTextFieldMeta as TextFieldMeta } from '../types/field-meta';
 
 export const validateTextField = (
   value: string,
@@ -11,7 +7,7 @@ export const validateTextField = (
 ): string[] => {
   const errors = [];
 
-  const { characterLimit, readOnly, required } = fieldMeta;
+  const { characterLimit, readOnly, required, fontSize } = fieldMeta;
 
   if (required && !value && isSigningPage) {
     errors.push('Value is required');
@@ -27,6 +23,10 @@ export const validateTextField = (
 
   if (readOnly && required) {
     errors.push('A field cannot be both read-only and required');
+  }
+
+  if (fontSize && (fontSize < 8 || fontSize > 96)) {
+    errors.push('Font size must be between 8 and 96.');
   }
 
   return errors;

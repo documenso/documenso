@@ -38,12 +38,13 @@ export const NumberFieldAdvancedSettings = ({
   const [showValidation, setShowValidation] = useState(false);
 
   const handleInput = (field: keyof NumberFieldMeta, value: string | boolean) => {
-    const userValue = field === 'value' ? value : fieldState.value || 0;
-    const userMinValue = field === 'minValue' ? Number(value) : Number(fieldState.minValue || 0);
-    const userMaxValue = field === 'maxValue' ? Number(value) : Number(fieldState.maxValue || 0);
+    const userValue = field === 'value' ? value : fieldState.value ?? 0;
+    const userMinValue = field === 'minValue' ? Number(value) : Number(fieldState.minValue ?? 0);
+    const userMaxValue = field === 'maxValue' ? Number(value) : Number(fieldState.maxValue ?? 0);
     const readOnly = field === 'readOnly' ? Boolean(value) : Boolean(fieldState.readOnly);
     const required = field === 'required' ? Boolean(value) : Boolean(fieldState.required);
-    const numberFormat = field === 'numberFormat' ? String(value) : fieldState.numberFormat || '';
+    const numberFormat = field === 'numberFormat' ? String(value) : fieldState.numberFormat ?? '';
+    const fontSize = field === 'fontSize' ? Number(value) : Number(fieldState.fontSize ?? 14);
 
     const valueErrors = validateNumberField(String(userValue), {
       minValue: userMinValue,
@@ -51,6 +52,8 @@ export const NumberFieldAdvancedSettings = ({
       readOnly,
       required,
       numberFormat,
+      fontSize,
+      type: 'number',
     });
     handleErrors(valueErrors);
 
@@ -115,6 +118,23 @@ export const NumberFieldAdvancedSettings = ({
           </SelectContent>
         </Select>
       </div>
+
+      <div>
+        <Label>
+          <Trans>Font Size</Trans>
+        </Label>
+        <Input
+          id="fontSize"
+          type="number"
+          className="bg-background mt-2"
+          placeholder={_(msg`Field font size`)}
+          value={fieldState.fontSize}
+          onChange={(e) => handleInput('fontSize', e.target.value)}
+          min={8}
+          max={96}
+        />
+      </div>
+
       <div className="mt-2 flex flex-col gap-4">
         <div className="flex flex-row items-center gap-2">
           <Switch

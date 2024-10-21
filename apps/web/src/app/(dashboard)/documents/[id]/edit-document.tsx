@@ -112,6 +112,24 @@ export const EditDocumentForm = ({
     },
   });
 
+  const { mutateAsync: updateTypedSignature } =
+    trpc.document.updateTypedSignatureSettings.useMutation({
+      ...DO_NOT_INVALIDATE_QUERY_ON_MUTATION,
+      onSuccess: (newData) => {
+        utils.document.getDocumentWithDetailsById.setData(
+          {
+            id: initialDocument.id,
+            teamId: team?.id,
+          },
+          (oldData) => ({
+            ...(oldData || initialDocument),
+            ...newData,
+            id: Number(newData.id),
+          }),
+        );
+      },
+    });
+
   const { mutateAsync: addSigners } = trpc.recipient.addSigners.useMutation({
     ...DO_NOT_INVALIDATE_QUERY_ON_MUTATION,
     onSuccess: (newRecipients) => {
@@ -258,6 +276,11 @@ export const EditDocumentForm = ({
         fields: data.fields,
       });
 
+      await updateTypedSignature({
+        documentId: document.id,
+        typedSignatureEnabled: data.typedSignatureEnabled,
+      });
+
       // Clear all field data from localStorage
       for (let i = 0; i < localStorage.length; i++) {
         const key = localStorage.key(i);
@@ -387,6 +410,7 @@ export const EditDocumentForm = ({
               fields={fields}
               onSubmit={onAddFieldsFormSubmit}
               isDocumentPdfLoaded={isDocumentPdfLoaded}
+              typedSignatureEnabled={document.documentMeta?.typedSignatureEnabled}
               teamId={team?.id}
             />
 
