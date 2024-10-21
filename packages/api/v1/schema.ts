@@ -19,6 +19,7 @@ import {
   RecipientRole,
   SendStatus,
   SigningStatus,
+  TeamMemberRole,
   TemplateType,
 } from '@documenso/prisma/client';
 
@@ -531,4 +532,42 @@ export const ZSuccessfulGetTemplatesResponseSchema = z.object({
 export const ZGetTemplatesQuerySchema = z.object({
   page: z.coerce.number().min(1).optional().default(1),
   perPage: z.coerce.number().min(1).optional().default(1),
+});
+
+export const ZFindTeamMembersResponseSchema = z.object({
+  members: z.array(
+    z.object({
+      id: z.number(),
+      email: z.string().email(),
+      role: z.nativeEnum(TeamMemberRole),
+    }),
+  ),
+});
+
+export const ZInviteTeamMemberMutationSchema = z.object({
+  email: z
+    .string()
+    .email()
+    .transform((email) => email.toLowerCase()),
+  role: z.nativeEnum(TeamMemberRole).optional().default(TeamMemberRole.MEMBER),
+});
+
+export const ZSuccessfulInviteTeamMemberResponseSchema = z.object({
+  message: z.string(),
+});
+
+export const ZUpdateTeamMemberMutationSchema = z.object({
+  role: z.nativeEnum(TeamMemberRole),
+});
+
+export const ZSuccessfulUpdateTeamMemberResponseSchema = z.object({
+  id: z.number(),
+  email: z.string().email(),
+  role: z.nativeEnum(TeamMemberRole),
+});
+
+export const ZSuccessfulRemoveTeamMemberResponseSchema = z.object({
+  id: z.number(),
+  email: z.string().email(),
+  role: z.nativeEnum(TeamMemberRole),
 });

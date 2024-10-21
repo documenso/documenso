@@ -26,6 +26,8 @@ import { getRecipientById } from '@documenso/lib/server-only/recipient/get-recip
 import { getRecipientsForDocument } from '@documenso/lib/server-only/recipient/get-recipients-for-document';
 import { setRecipientsForDocument } from '@documenso/lib/server-only/recipient/set-recipients-for-document';
 import { updateRecipient } from '@documenso/lib/server-only/recipient/update-recipient';
+import { createTeamMemberInvites } from '@documenso/lib/server-only/team/create-team-member-invites';
+import { deleteTeamMembers } from '@documenso/lib/server-only/team/delete-team-members';
 import type { CreateDocumentFromTemplateResponse } from '@documenso/lib/server-only/template/create-document-from-template';
 import { createDocumentFromTemplate } from '@documenso/lib/server-only/template/create-document-from-template';
 import { createDocumentFromTemplateLegacy } from '@documenso/lib/server-only/template/create-document-from-template-legacy';
@@ -1276,6 +1278,198 @@ export const ApiContractV1Implementation = createNextRoute(ApiContractV1, {
       body: {
         ...remappedField,
         documentId: Number(documentId),
+      },
+    };
+  }),
+
+  findTeamMembers: authenticatedMiddleware(async (args, user, team) => {
+    const { id: teamId } = args.params;
+
+    if (team?.id !== Number(teamId)) {
+      return {
+        status: 400,
+        body: {
+          message: 'You must use the correct team api token for the provided team id.',
+        },
+      };
+    }
+
+    const members = await prisma.teamMember.findMany({
+      where: {
+        teamId: team.id,
+      },
+      include: {
+        user: true,
+      },
+    });
+
+    return {
+      status: 200,
+      body: {
+        members: members.map((member) => ({
+          id: member.id,
+          email: member.user.email,
+          role: member.role,
+        })),
+      },
+    };
+  }),
+
+  inviteTeamMember: authenticatedMiddleware(async (args, user, team) => {
+    const { id: teamId } = args.params;
+
+    const { email, role } = args.body;
+
+    if (team?.id !== Number(teamId)) {
+      return {
+        status: 400,
+        body: {
+          message: 'You must use the correct team api token for the provided team id.',
+        },
+      };
+    }
+
+    const hasAlreadyBeenInvited = await prisma.teamMember.findFirst({
+      where: {
+        user: {
+          email,
+        },
+      },
+    });
+
+    if (hasAlreadyBeenInvited) {
+      return {
+        status: 400,
+        body: {
+          message: 'This user has already been invited to the team',
+        },
+      };
+    }
+
+    await createTeamMemberInvites({
+      userId: user.id,
+      userName: user.name ?? '',
+      teamId: team.id,
+      invitations: [
+        {
+          email,
+          role,
+        },
+      ],
+    });
+
+    return {
+      status: 200,
+      body: {
+        message: 'An invite has been sent to the member',
+      },
+    };
+  }),
+
+  updateTeamMember: authenticatedMiddleware(async (args, user, team) => {
+    const { id: teamId, memberId } = args.params;
+
+    const { role } = args.body;
+
+    if (team?.id !== Number(teamId)) {
+      return {
+        status: 400,
+        body: {
+          message: 'You must use the correct team api token for the provided team id.',
+        },
+      };
+    }
+
+    const member = await prisma.teamMember.findUnique({
+      where: {
+        id: Number(memberId),
+        teamId: team.id,
+      },
+    });
+
+    if (!member) {
+      return {
+        status: 404,
+        body: {
+          message: 'The provided member id does not exist.',
+        },
+      };
+    }
+
+    const updatedMember = await prisma.teamMember.update({
+      where: {
+        id: member.id,
+      },
+      data: {
+        role,
+      },
+      include: {
+        user: true,
+      },
+    });
+
+    return {
+      status: 200,
+      body: {
+        id: updatedMember.id,
+        email: updatedMember.user.email,
+        role: updatedMember.role,
+      },
+    };
+  }),
+
+  removeTeamMember: authenticatedMiddleware(async (args, user, team) => {
+    const { id: teamId, memberId } = args.params;
+
+    if (team?.id !== Number(teamId)) {
+      return {
+        status: 400,
+        body: {
+          message: 'You must use the correct team api token for the provided team id.',
+        },
+      };
+    }
+
+    const member = await prisma.teamMember.findFirst({
+      where: {
+        id: Number(memberId),
+        teamId: Number(teamId),
+      },
+      include: {
+        user: true,
+      },
+    });
+
+    if (!member) {
+      return {
+        status: 404,
+        body: {
+          message: 'Member not found',
+        },
+      };
+    }
+
+    if (team.ownerUserId === member.userId) {
+      return {
+        status: 400,
+        body: {
+          message: 'You cannot remove the owner of the team',
+        },
+      };
+    }
+
+    await deleteTeamMembers({
+      userId: user.id,
+      teamId: team.id,
+      teamMemberIds: [member.id],
+    });
+
+    return {
+      status: 200,
+      body: {
+        id: member.id,
+        email: member.user.email,
+        role: member.role,
       },
     };
   }),
