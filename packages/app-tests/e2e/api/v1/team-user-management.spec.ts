@@ -20,6 +20,11 @@ test.describe('Team API', () => {
       createTeamMembers: 3,
     });
 
+    const ownerMember = team.members.find((member) => member.userId === team.owner.id)!;
+
+    // Should not be undefined
+    expect(ownerMember).toBeTruthy();
+
     const { token } = await createApiToken({
       userId: team.owner.id,
       teamId: team.id,
@@ -50,9 +55,9 @@ test.describe('Team API', () => {
     expect(safeData!.members[0]).toHaveProperty('role');
 
     expect(safeData!.members).toContainEqual({
-      id: team.owner.id,
-      email: team.owner.email,
-      role: TeamMemberRole.ADMIN,
+      id: ownerMember.id,
+      email: ownerMember.user.email,
+      role: ownerMember.role,
     });
   });
 
@@ -115,9 +120,10 @@ test.describe('Team API', () => {
       expiresIn: null,
     });
 
-    const member = team.members.at(-1)!;
+    const member = team.members.find((member) => member.role === TeamMemberRole.MEMBER)!;
 
-    expect(member.role).toBe(TeamMemberRole.MEMBER);
+    // Should not be undefined
+    expect(member).toBeTruthy();
 
     const response = await request.put(
       `${WEBAPP_BASE_URL}/api/v1/team/${team.id}/members/${member.id}`,
@@ -159,9 +165,10 @@ test.describe('Team API', () => {
       expiresIn: null,
     });
 
-    const member = team.members.at(-1)!;
+    const member = team.members.find((member) => member.role === TeamMemberRole.MEMBER)!;
 
-    expect(member.role).toBe(TeamMemberRole.MEMBER);
+    // Should not be undefined
+    expect(member).toBeTruthy();
 
     const response = await request.delete(
       `${WEBAPP_BASE_URL}/api/v1/team/${team.id}/members/${member.id}`,
@@ -188,7 +195,7 @@ test.describe('Team API', () => {
 
     const removedMemberCount = await prisma.teamMember.count({
       where: {
-        userId: member.userId,
+        id: member.id,
         teamId: team.id,
       },
     });
@@ -208,8 +215,13 @@ test.describe('Team API', () => {
       expiresIn: null,
     });
 
+    const ownerMember = team.members.find((member) => member.userId === team.owner.id)!;
+
+    // Should not be undefined
+    expect(ownerMember).toBeTruthy();
+
     const response = await request.delete(
-      `${WEBAPP_BASE_URL}/api/v1/team/${team.id}/members/${team.owner.id}`,
+      `${WEBAPP_BASE_URL}/api/v1/team/${team.id}/members/${ownerMember.id}`,
       {
         headers: {
           Authorization: `Bearer ${token}`,
