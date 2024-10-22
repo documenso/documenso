@@ -1434,7 +1434,7 @@ export const ApiContractV1Implementation = createNextRoute(ApiContractV1, {
       };
     }
 
-    const member = await prisma.teamMember.findUnique({
+    const member = await prisma.teamMember.findFirst({
       where: {
         id: Number(memberId),
         teamId: team.id,
