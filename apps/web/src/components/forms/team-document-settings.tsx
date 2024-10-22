@@ -51,8 +51,8 @@ export const TeamDocumentSettings = ({ team }: TeamDocumentSettingsProps) => {
   return (
     <div>
       <Form {...form}>
-        <form className="mt-6 flex flex-col gap-y-4" onSubmit={form.handleSubmit(onFormSubmit)}>
-          <fieldset className="flex w-full flex-col gap-y-4">
+        <form className="mt-6" onSubmit={form.handleSubmit(onFormSubmit)}>
+          <fieldset className="flex w-1/4 flex-col gap-y-4">
             <FormField
               control={form.control}
               name="documentVisibility"
@@ -79,13 +79,20 @@ export const TeamDocumentSettings = ({ team }: TeamDocumentSettingsProps) => {
               name="includeSenderDetails"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>
-                    <Trans>Include Sender Details</Trans>
-                  </FormLabel>
-                  <FormControl>
-                    <Checkbox />
-                  </FormControl>
-                  <FormMessage />
+                  <div className="mt-4 flex flex-row items-center gap-4">
+                    <FormLabel>
+                      <Trans>Include Sender Details</Trans>
+                    </FormLabel>
+                    <FormControl>
+                      <Checkbox
+                        className="h-5 w-5"
+                        checkClassName="text-white"
+                        checked={field.value}
+                        onCheckedChange={field.onChange}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </div>
                 </FormItem>
               )}
             />
