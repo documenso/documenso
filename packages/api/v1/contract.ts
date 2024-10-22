@@ -12,6 +12,7 @@ import {
   ZDeleteFieldMutationSchema,
   ZDeleteRecipientMutationSchema,
   ZDownloadDocumentSuccessfulSchema,
+  ZFindTeamMembersResponseSchema,
   ZGenerateDocumentFromTemplateMutationResponseSchema,
   ZGenerateDocumentFromTemplateMutationSchema,
   ZGetDocumentsQuerySchema,
