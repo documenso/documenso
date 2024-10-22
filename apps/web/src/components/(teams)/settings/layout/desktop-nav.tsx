@@ -54,7 +54,7 @@ export const DesktopNav = ({ className, ...props }: DesktopNavProps) => {
           )}
         >
           <FileCog className="mr-2 h-5 w-5" />
-          <Trans>Documents</Trans>
+          <Trans>Global Settings</Trans>
         </Button>
       </Link>
 

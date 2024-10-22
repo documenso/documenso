@@ -62,7 +62,7 @@ export const MobileNav = ({ className, ...props }: MobileNavProps) => {
           )}
         >
           <FileCog className="mr-2 h-5 w-5" />
-          <Trans>Documents</Trans>
+          <Trans>Global Settings</Trans>
         </Button>
       </Link>
 

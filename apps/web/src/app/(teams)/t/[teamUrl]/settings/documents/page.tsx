@@ -29,7 +29,7 @@ export default async function TeamDocumentSettingsPage({ params }: TeamDocumentS
         subtitle={_(msg`The global settings for the documents in your team account.`)}
       />
 
-      <TeamDocumentSettings />
+      <TeamDocumentSettings team={team} />
     </div>
   );
 }
