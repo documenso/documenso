@@ -51,7 +51,12 @@ import {
 } from '@documenso/lib/universal/upload/server-actions';
 import { createDocumentAuditLogData } from '@documenso/lib/utils/document-audit-logs';
 import { prisma } from '@documenso/prisma';
-import { DocumentDataType, DocumentStatus, SigningStatus } from '@documenso/prisma/client';
+import {
+  DocumentDataType,
+  DocumentStatus,
+  SigningStatus,
+  TeamMemberRole,
+} from '@documenso/prisma/client';
 
 import { ApiContractV1 } from './contract';
 import { authenticatedMiddleware } from './middleware/authenticated';
@@ -1287,9 +1292,25 @@ export const ApiContractV1Implementation = createNextRoute(ApiContractV1, {
 
     if (team?.id !== Number(teamId)) {
       return {
-        status: 400,
+        status: 403,
         body: {
-          message: 'You must use the correct team api token for the provided team id.',
+          message: 'You are not authorized to perform actions against this team.',
+        },
+      };
+    }
+
+    const self = await prisma.teamMember.findFirst({
+      where: {
+        userId: user.id,
+        teamId: team.id,
+      },
+    });
+
+    if (self?.role !== TeamMemberRole.ADMIN) {
+      return {
+        status: 403,
+        body: {
+          message: 'You are not authorized to perform actions against this team.',
         },
       };
     }
@@ -1322,15 +1343,32 @@ export const ApiContractV1Implementation = createNextRoute(ApiContractV1, {
 
     if (team?.id !== Number(teamId)) {
       return {
-        status: 400,
+        status: 403,
         body: {
-          message: 'You must use the correct team api token for the provided team id.',
+          message: 'You are not authorized to perform actions against this team.',
+        },
+      };
+    }
+
+    const self = await prisma.teamMember.findFirst({
+      where: {
+        userId: user.id,
+        teamId: team.id,
+      },
+    });
+
+    if (self?.role !== TeamMemberRole.ADMIN) {
+      return {
+        status: 403,
+        body: {
+          message: 'You are not authorized to perform actions against this team.',
         },
       };
     }
 
     const hasAlreadyBeenInvited = await prisma.teamMember.findFirst({
       where: {
+        teamId: team.id,
         user: {
           email,
         },
@@ -1373,9 +1411,25 @@ export const ApiContractV1Implementation = createNextRoute(ApiContractV1, {
 
     if (team?.id !== Number(teamId)) {
       return {
-        status: 400,
+        status: 403,
         body: {
-          message: 'You must use the correct team api token for the provided team id.',
+          message: 'You are not authorized to perform actions against this team.',
+        },
+      };
+    }
+
+    const self = await prisma.teamMember.findFirst({
+      where: {
+        userId: user.id,
+        teamId: team.id,
+      },
+    });
+
+    if (self?.role !== TeamMemberRole.ADMIN) {
+      return {
+        status: 403,
+        body: {
+          message: 'You are not authorized to perform actions against this team.',
         },
       };
     }
@@ -1423,9 +1477,25 @@ export const ApiContractV1Implementation = createNextRoute(ApiContractV1, {
 
     if (team?.id !== Number(teamId)) {
       return {
-        status: 400,
+        status: 403,
         body: {
-          message: 'You must use the correct team api token for the provided team id.',
+          message: 'You are not authorized to perform actions against this team.',
+        },
+      };
+    }
+
+    const self = await prisma.teamMember.findFirst({
+      where: {
+        userId: user.id,
+        teamId: team.id,
+      },
+    });
+
+    if (self?.role !== TeamMemberRole.ADMIN) {
+      return {
+        status: 403,
+        body: {
+          message: 'You are not authorized to perform actions against this team.',
         },
       };
     }
@@ -1451,9 +1521,18 @@ export const ApiContractV1Implementation = createNextRoute(ApiContractV1, {
 
     if (team.ownerUserId === member.userId) {
       return {
-        status: 400,
+        status: 403,
         body: {
           message: 'You cannot remove the owner of the team',
+        },
+      };
+    }
+
+    if (member.userId === user.id) {
+      return {
+        status: 403,
+        body: {
+          message: 'You cannot remove yourself from the team',
         },
       };
     }

@@ -229,7 +229,47 @@ test.describe('Team API', () => {
       },
     );
 
-    expect(response.status()).toBe(400);
+    expect(response.status()).toBe(403);
+
+    const parsed = ZUnsuccessfulResponseSchema.safeParse(await response.json());
+
+    expect(parsed.success).toBeTruthy();
+  });
+
+  test('removeTeamMember: should not remove self', async ({ request }) => {
+    const team = await seedTeam({
+      createTeamMembers: 3,
+    });
+
+    const member = team.members.find((member) => member.role === TeamMemberRole.MEMBER)!;
+
+    // Make our non-owner member an admin
+    await prisma.teamMember.update({
+      where: {
+        id: member.id,
+      },
+      data: {
+        role: TeamMemberRole.ADMIN,
+      },
+    });
+
+    const { token } = await createApiToken({
+      userId: member.userId,
+      teamId: team.id,
+      tokenName: 'test',
+      expiresIn: null,
+    });
+
+    const response = await request.delete(
+      `${WEBAPP_BASE_URL}/api/v1/team/${team.id}/members/${member.id}`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      },
+    );
+
+    expect(response.status()).toBe(403);
 
     const parsed = ZUnsuccessfulResponseSchema.safeParse(await response.json());
 
