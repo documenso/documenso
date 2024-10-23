@@ -73,7 +73,7 @@ export const NewTemplateDialog = ({ teamId, templateRootPath }: NewTemplateDialo
 
       setShowNewTemplateDialog(false);
 
-      router.push(`${templateRootPath}/${id}`);
+      router.push(`${templateRootPath}/${id}/edit`);
     } catch {
       toast({
         title: _(msg`Something went wrong`),

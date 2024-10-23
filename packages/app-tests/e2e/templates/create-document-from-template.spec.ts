@@ -37,7 +37,7 @@ test('[TEMPLATE]: should create a document from a template', async ({ page }) =>
   await apiSignin({
     page,
     email: user.email,
-    redirectPath: `/templates/${template.id}`,
+    redirectPath: `/templates/${template.id}/edit`,
   });
 
   // Set template title.
@@ -172,7 +172,7 @@ test('[TEMPLATE]: should create a team document from a team template', async ({ 
   await apiSignin({
     page,
     email: owner.email,
-    redirectPath: `/t/${team.url}/templates/${template.id}`,
+    redirectPath: `/t/${team.url}/templates/${template.id}/edit`,
   });
 
   // Set template title.
