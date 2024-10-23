@@ -9,7 +9,6 @@ export function GET(request: NextRequest) {
   });
 
   return NextResponse.json(apis, {
-    status: 200,
     headers: {
       // TODO: Update for marketing page
       'Access-Control-Allow-Origin': '*',
