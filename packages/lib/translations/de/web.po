@@ -3102,40 +3102,40 @@ msgstr "Teams"
 
 #: apps/web/src/app/(teams)/t/[teamUrl]/layout-billing-banner.tsx:83
 msgid "Teams restricted"
-msgstr "Teams restricted"
+msgstr "Teams beschränkt"
 
 #: apps/web/src/components/(teams)/dialogs/invite-team-member-dialog.tsx:408
 #: apps/web/src/components/templates/manage-public-template-dialog.tsx:271
 msgid "Template"
-msgstr "Template"
+msgstr "Vorlage"
 
 #: apps/web/src/app/(dashboard)/templates/delete-template-dialog.tsx:41
 msgid "Template deleted"
-msgstr "Template deleted"
+msgstr "Vorlage gelöscht"
 
 #: apps/web/src/app/(dashboard)/templates/new-template-dialog.tsx:67
 msgid "Template document uploaded"
-msgstr "Template document uploaded"
+msgstr "Vorlagendokument hochgeladen"
 
 #: apps/web/src/app/(dashboard)/templates/duplicate-template-dialog.tsx:42
 msgid "Template duplicated"
-msgstr "Template duplicated"
+msgstr "Vorlage dupliziert"
 
 #: apps/web/src/components/templates/manage-public-template-dialog.tsx:134
 msgid "Template has been removed from your public profile."
-msgstr "Template has been removed from your public profile."
+msgstr "Vorlage ist von Deinem öffentlichen Profil entfernt worden."
 
 #: apps/web/src/components/templates/manage-public-template-dialog.tsx:171
 msgid "Template has been updated."
-msgstr "Template has been updated."
+msgstr "Vorlage wurde aktualisiert."
 
 #: apps/web/src/app/(dashboard)/templates/move-template-dialog.tsx:48
 msgid "Template moved"
-msgstr "Template moved"
+msgstr "Vorlage verschoben"
 
 #: apps/web/src/app/(dashboard)/templates/[id]/edit-template.tsx:219
 msgid "Template saved"
-msgstr "Template saved"
+msgstr "Vorlage gespeichert"
 
 #: apps/web/src/app/(dashboard)/templates/[id]/template-page-view.tsx:60
 #: apps/web/src/app/(dashboard)/templates/templates-page-view.tsx:55
@@ -3143,11 +3143,11 @@ msgstr "Template saved"
 #: apps/web/src/components/(dashboard)/layout/desktop-nav.tsx:22
 #: apps/web/src/components/(dashboard)/layout/mobile-navigation.tsx:39
 msgid "Templates"
-msgstr "Templates"
+msgstr "Vorlagen"
 
 #: apps/web/src/app/(dashboard)/templates/new-template-dialog.tsx:106
 msgid "Templates allow you to quickly generate documents with pre-filled recipients and fields."
-msgstr "Templates allow you to quickly generate documents with pre-filled recipients and fields."
+msgstr "Vorlagen erlauben dir das schnelle Erstlelen von Dokumenten mit vorausgefüllten Empfängern und Feldern."
 
 #: apps/web/src/app/(signing)/sign/[token]/text-field.tsx:256
 #: apps/web/src/app/(signing)/sign/[token]/text-field.tsx:272
@@ -3156,25 +3156,25 @@ msgstr "Text"
 
 #: apps/web/src/app/(dashboard)/admin/site-settings/banner-form.tsx:166
 msgid "Text Color"
-msgstr "Text Color"
+msgstr "Textfarbe"
 
 #: apps/web/src/app/(dashboard)/admin/users/[id]/delete-user-dialog.tsx:52
 msgid "The account has been deleted successfully."
-msgstr "The account has been deleted successfully."
+msgstr "Das Konto wurde erfolgreich gelöscht."
 
 #: apps/web/src/app/(dashboard)/admin/site-settings/banner-form.tsx:197
 msgid "The content to show in the banner, HTML is allowed"
-msgstr "The content to show in the banner, HTML is allowed"
+msgstr "Der Inhalt, der im Banne rgezeig wird, HTML ist erlaubt"
 
 #: apps/web/src/app/(dashboard)/settings/public-profile/public-templates-data-table.tsx:78
 #: apps/web/src/app/(dashboard)/templates/template-direct-link-badge.tsx:32
 #: apps/web/src/app/(dashboard)/templates/template-direct-link-dialog.tsx:164
 msgid "The direct link has been copied to your clipboard"
-msgstr "The direct link has been copied to your clipboard"
+msgstr "Der direkte Linkt wurde in die Zwischenablage kopiert"
 
 #: apps/web/src/app/(dashboard)/documents/move-document-dialog.tsx:50
 msgid "The document has been successfully moved to the selected team."
-msgstr "The document has been successfully moved to the selected team."
+msgstr "Das Dokument wurde erfolgreich in das ausgewählte Team verschoben."
 
 #: apps/web/src/app/embed/completed.tsx:29
 msgid "The document is now completed, please follow any instructions provided within the parent application."
@@ -3182,7 +3182,7 @@ msgstr "Das Dokument ist jetzt abgeschlossen. Bitte folgen Sie allen Anweisungen
 
 #: apps/web/src/app/(dashboard)/templates/use-template-dialog.tsx:159
 msgid "The document was created but could not be sent to recipients."
-msgstr "The document was created but could not be sent to recipients."
+msgstr "Das Dokument wurde erstellt, konnte aber nicht an die Empfänger versendet werden."
 
 #: apps/web/src/app/(dashboard)/documents/delete-document-dialog.tsx:161
 msgid "The document will be hidden from your account"
