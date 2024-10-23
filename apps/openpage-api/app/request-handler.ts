@@ -45,15 +45,15 @@ export function requestHandler<T = Record<string, string | string[]>>(
 ): RouteHandler<T> {
   return async (req: NextRequest, ctx: { params: T }) => {
     try {
-      if (!isAllowedOrigin(req)) {
-        return NextResponse.json(
-          { error: 'Forbidden' },
-          {
-            status: 403,
-            headers: CORS_HEADERS,
-          },
-        );
-      }
+      // if (!isAllowedOrigin(req)) {
+      //   return NextResponse.json(
+      //     { error: 'Forbidden' },
+      //     {
+      //       status: 403,
+      //       headers: CORS_HEADERS,
+      //     },
+      //   );
+      // }
 
       const response = await handler(req, ctx);
 
