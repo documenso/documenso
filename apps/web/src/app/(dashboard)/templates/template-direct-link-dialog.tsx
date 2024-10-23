@@ -434,12 +434,14 @@ export const TemplateDirectLinkDialog = ({
                   <Button
                     type="button"
                     loading={isTogglingTemplateAccess}
-                    onClick={async () =>
-                      toggleTemplateDirectLink({
+                    onClick={async () => {
+                      await toggleTemplateDirectLink({
                         templateId: template.id,
                         enabled: isEnabled,
-                      })
-                    }
+                      }).catch((e) => null);
+
+                      onOpenChange(false);
+                    }}
                   >
                     <Trans>Save</Trans>
                   </Button>

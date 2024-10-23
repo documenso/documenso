@@ -17,6 +17,7 @@ import {
   RecipientRole,
   SendStatus,
   SigningStatus,
+  WebhookTriggerEvents,
 } from '@documenso/prisma/client';
 import type { TSignFieldWithTokenMutationSchema } from '@documenso/trpc/server/field-router/schema';
 
@@ -39,6 +40,7 @@ import {
 import { formatDocumentsPath } from '../../utils/teams';
 import { sendDocument } from '../document/send-document';
 import { validateFieldAuth } from '../document/validate-field-auth';
+import { triggerWebhook } from '../webhooks/trigger/trigger-webhook';
 
 export type CreateDocumentFromDirectTemplateOptions = {
   directRecipientName?: string;
@@ -552,6 +554,23 @@ export const createDocumentFromDirectTemplate = async ({
       userId: template.userId,
       teamId: template.teamId || undefined,
       requestMetadata,
+    });
+
+    const updatedDocument = await prisma.document.findFirstOrThrow({
+      where: {
+        id: documentId,
+      },
+      include: {
+        documentData: true,
+        Recipient: true,
+      },
+    });
+
+    await triggerWebhook({
+      event: WebhookTriggerEvents.DOCUMENT_SIGNED,
+      data: updatedDocument,
+      userId: updatedDocument.userId,
+      teamId: updatedDocument.teamId ?? undefined,
     });
   } catch (err) {
     console.error('[CREATE_DOCUMENT_FROM_DIRECT_TEMPLATE]:', err);

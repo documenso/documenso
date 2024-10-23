@@ -5,16 +5,16 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "X-Generator: @lingui/cli\n"
-"Language: fr\n"
+"Language: es\n"
 "Project-Id-Version: documenso-app\n"
 "Report-Msgid-Bugs-To: \n"
-"PO-Revision-Date: 2024-10-18 04:04\n"
+"PO-Revision-Date: 2024-10-22 02:25\n"
 "Last-Translator: \n"
-"Language-Team: French\n"
-"Plural-Forms: nplurals=2; plural=(n > 1);\n"
+"Language-Team: Spanish\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "X-Crowdin-Project: documenso-app\n"
 "X-Crowdin-Project-ID: 694691\n"
-"X-Crowdin-Language: fr\n"
+"X-Crowdin-Language: es-ES\n"
 "X-Crowdin-File: marketing.po\n"
 "X-Crowdin-File-ID: 6\n"
 
@@ -24,45 +24,45 @@ msgstr "{0}"
 
 #: apps/marketing/src/components/(marketing)/pricing-table.tsx:100
 msgid "5 standard documents per month"
-msgstr "5 documents standard par mois"
+msgstr "5 documentos estándar por mes"
 
 #: apps/marketing/src/components/(marketing)/pricing-table.tsx:198
 msgid "5 Users Included"
-msgstr "5 utilisateurs inclus"
+msgstr "5 Usuarios incluidos"
 
 #: apps/marketing/src/components/(marketing)/faster-smarter-beautiful-bento.tsx:34
 msgid "A 10x better signing experience."
-msgstr "Une expérience de signature 10 fois meilleure."
+msgstr "Una experiencia de firma 10 veces mejor."
 
 #: apps/marketing/src/app/(marketing)/singleplayer/client.tsx:51
 msgid "Add document"
-msgstr "Ajouter un document"
+msgstr "Agregar documento"
 
 #: apps/marketing/src/components/(marketing)/pricing-table.tsx:201
 msgid "Add More Users for {0}"
-msgstr "Ajouter plus d'utilisateurs pour {0}"
+msgstr "Agregar más usuarios por {0}"
 
 #: apps/marketing/src/app/(marketing)/open/page.tsx:165
 msgid "All our metrics, finances, and learnings are public. We believe in transparency and want to share our journey with you. You can read more about why here: <0>Announcing Open Metrics</0>"
-msgstr "Tous nos indicateurs, finances et apprentissages sont publics. Nous croyons en la transparence et souhaitons partager notre parcours avec vous. Vous pouvez en lire plus sur pourquoi ici : <0>Annonce de Open Metrics</0>"
+msgstr "Todos nuestros métricas, finanzas y aprendizajes son públicos. Creemos en la transparencia y queremos compartir nuestro viaje contigo. Puedes leer más sobre por qué aquí: <0>Anunciando Métricas Abiertas</0>"
 
 #: apps/marketing/src/app/(marketing)/open/funding-raised.tsx:58
 #: apps/marketing/src/app/(marketing)/open/funding-raised.tsx:65
 msgid "Amount Raised"
-msgstr "Montant levé"
+msgstr "Monto recaudado"
 
 #: apps/marketing/src/components/(marketing)/pricing-table.tsx:145
 #: apps/marketing/src/components/(marketing)/pricing-table.tsx:189
 msgid "API Access"
-msgstr "Accès API"
+msgstr "Acceso a API"
 
 #: apps/marketing/src/components/(marketing)/faster-smarter-beautiful-bento.tsx:67
 msgid "Beautiful."
-msgstr "Beau."
+msgstr "Hermoso."
 
 #: apps/marketing/src/components/(marketing)/faster-smarter-beautiful-bento.tsx:69
 msgid "Because signing should be celebrated. That’s why we care about the smallest detail in our product."
-msgstr "Parce que la signature doit être célébrée. C'est pourquoi nous nous soucions du moindre détail dans notre produit."
+msgstr "Porque la firma debe ser celebrada. Por eso nos importa el más mínimo detalle en nuestro producto."
 
 #: apps/marketing/src/components/(marketing)/footer.tsx:35
 #: apps/marketing/src/components/(marketing)/header.tsx:57
@@ -72,93 +72,93 @@ msgstr "Blog"
 
 #: apps/marketing/src/components/(marketing)/open-build-template-bento.tsx:64
 msgid "Build on top."
-msgstr "Construire dessus."
+msgstr "Construir sobre."
 
 #: apps/marketing/src/app/(marketing)/pricing/page.tsx:163
 msgid "Can I use Documenso commercially?"
-msgstr "Puis-je utiliser Documenso commercialement ?"
+msgstr "¿Puedo usar Documenso comercialmente?"
 
 #: apps/marketing/src/components/(marketing)/footer.tsx:42
 msgid "Careers"
-msgstr "Carrières"
+msgstr "Carreras"
 
 #: apps/marketing/src/components/(marketing)/footer.tsx:36
 msgid "Changelog"
-msgstr "Changelog"
+msgstr "Registro de cambios"
 
 #: apps/marketing/src/components/(marketing)/open-build-template-bento.tsx:85
 msgid "Choose a template from the community app store. Or submit your own template for others to use."
-msgstr "Choisissez un modèle dans la boutique d'applications communautaires. Ou soumettez votre propre modèle pour que d'autres puissent l'utiliser."
+msgstr "Elige una plantilla de la tienda de aplicaciones de la comunidad. O envía tu propia plantilla para que otros la usen."
 
 #: apps/marketing/src/app/(marketing)/open/page.tsx:219
 msgid "Community"
-msgstr "Communauté"
+msgstr "Comunidad"
 
 #: apps/marketing/src/app/(marketing)/open/monthly-completed-documents-chart.tsx:55
 msgid "Completed Documents"
-msgstr "Documents complets"
+msgstr "Documentos Completados"
 
 #: apps/marketing/src/app/(marketing)/open/monthly-completed-documents-chart.tsx:33
 msgid "Completed Documents per Month"
-msgstr "Documents complets par mois"
+msgstr "Documentos Completados por Mes"
 
 #: apps/marketing/src/components/(marketing)/share-connect-paid-widget-bento.tsx:65
 msgid "Connections"
-msgstr "Connexions"
+msgstr "Conexiones"
 
 #: apps/marketing/src/components/(marketing)/enterprise.tsx:35
 msgid "Contact Us"
-msgstr "Contactez-nous"
+msgstr "Contáctanos"
 
 #: apps/marketing/src/components/(marketing)/share-connect-paid-widget-bento.tsx:67
 msgid "Create connections and automations with Zapier and more to integrate with your favorite tools."
-msgstr "Créez des connexions et des automatisations avec Zapier et plus encore pour intégrer vos outils préférés."
+msgstr "Crea conexiones y automatizaciones con Zapier y más para integrarte con tus herramientas favoritas."
 
 #: apps/marketing/src/components/(marketing)/call-to-action.tsx:23
 msgid "Create your account and start using state-of-the-art document signing. Open and beautiful signing is within your grasp."
-msgstr "Créez votre compte et commencez à utiliser la signature de documents à la pointe de la technologie. Une signature ouverte et belle est à votre portée."
+msgstr "Crea tu cuenta y comienza a usar la firma de documentos de última generación. La firma abierta y hermosa está a tu alcance."
 
 #: apps/marketing/src/app/(marketing)/open/tooltip.tsx:35
 msgid "Customers with an Active Subscriptions."
-msgstr "Clients avec un abonnement actif."
+msgstr "Clientes con suscripciones activas."
 
 #: apps/marketing/src/components/(marketing)/open-build-template-bento.tsx:33
 msgid "Customise and expand."
-msgstr "Personnaliser et étendre."
+msgstr "Personaliza y expande."
 
 #: apps/marketing/src/components/(marketing)/footer.tsx:38
 msgid "Design"
-msgstr "Conception"
+msgstr "Diseño"
 
 #: apps/marketing/src/app/(marketing)/pricing/page.tsx:44
 msgid "Designed for every stage of your journey."
-msgstr "Conçu pour chaque étape de votre parcours."
+msgstr "Diseñado para cada etapa de tu viaje."
 
 #: apps/marketing/src/components/(marketing)/carousel.tsx:40
 msgid "Direct Link"
-msgstr "Lien Direct"
+msgstr "Enlace Directo"
 
 #: apps/marketing/src/app/(marketing)/pricing/page.tsx:181
 msgid "Documenso is a community effort to create an open and vibrant ecosystem around a tool, everybody is free to use and adapt. By being truly open we want to create trusted infrastructure for the future of the internet."
-msgstr "Documenso est un effort collectif pour créer un écosystème ouvert et dynamique autour d'un outil, tout le monde est libre de l'utiliser et de l'adapter. En étant vraiment ouvert, nous voulons créer une infrastructure de confiance pour l'avenir d'Internet."
+msgstr "Documenso es un esfuerzo comunitario para crear un ecosistema abierto y vibrante alrededor de una herramienta que todos son libres de usar y adaptar. Al ser verdaderamente abierto, queremos crear una infraestructura confiable para el futuro de internet."
 
 #: apps/marketing/src/app/(marketing)/open/typefully.tsx:28
 msgid "Documenso on X"
-msgstr "Documenso sur X"
+msgstr "Documenso en X"
 
 #: apps/marketing/src/components/(marketing)/hero.tsx:104
 msgid "Document signing,<0/>finally open source."
-msgstr "Signature de documents,<0/> enfin open source."
+msgstr "Firma de documentos,<0/>finalmente código abierto."
 
 #: apps/marketing/src/components/(marketing)/footer.tsx:33
 #: apps/marketing/src/components/(marketing)/header.tsx:50
 #: apps/marketing/src/components/(marketing)/mobile-navigation.tsx:28
 msgid "Documentation"
-msgstr "Documentation"
+msgstr "Documentación"
 
 #: apps/marketing/src/components/(marketing)/share-connect-paid-widget-bento.tsx:110
 msgid "Easily embed Documenso into your product. Simply copy and paste our react widget into your application."
-msgstr "Intégrez facilement Documenso dans votre produit. Il vous suffit de copier et coller notre widget React dans votre application."
+msgstr "Incrusta fácilmente Documenso en tu producto. Simplemente copia y pega nuestro widget de react en tu aplicación."
 
 #: apps/marketing/src/components/(marketing)/share-connect-paid-widget-bento.tsx:42
 #~ msgid "Easy Sharing (Soon)."
@@ -166,60 +166,60 @@ msgstr "Intégrez facilement Documenso dans votre produit. Il vous suffit de cop
 
 #: apps/marketing/src/components/(marketing)/share-connect-paid-widget-bento.tsx:46
 msgid "Easy Sharing."
-msgstr "Partage facile."
+msgstr "Compartición fácil."
 
 #: apps/marketing/src/components/(marketing)/pricing-table.tsx:148
 #: apps/marketing/src/components/(marketing)/pricing-table.tsx:192
 msgid "Email and Discord Support"
-msgstr "Support par e-mail et Discord"
+msgstr "Soporte por correo electrónico y Discord"
 
 #: apps/marketing/src/app/(marketing)/open/team-members.tsx:43
 msgid "Engagement"
-msgstr "Engagement"
+msgstr "Compromiso"
 
 #: apps/marketing/src/app/(marketing)/singleplayer/client.tsx:64
 msgid "Enter your details."
-msgstr "Entrez vos détails."
+msgstr "Ingresa tus detalles."
 
 #: apps/marketing/src/components/(marketing)/enterprise.tsx:16
 msgid "Enterprise Compliance, License or Technical Needs?"
-msgstr "Conformité des entreprises, besoins en licence ou techniques ?"
+msgstr "¿Cumplimiento, licencia o necesidades técnicas de la empresa?"
 
 #: apps/marketing/src/components/(marketing)/pricing-table.tsx:128
 msgid "Everything you need for a great signing experience."
-msgstr "Tout ce dont vous avez besoin pour une excellente expérience de signature."
+msgstr "Todo lo que necesitas para una gran experiencia de firma."
 
 #: apps/marketing/src/components/(marketing)/faster-smarter-beautiful-bento.tsx:45
 msgid "Fast."
-msgstr "Rapide."
+msgstr "Rápido."
 
 #: apps/marketing/src/components/(marketing)/faster-smarter-beautiful-bento.tsx:36
 msgid "Faster, smarter and more beautiful."
-msgstr "Plus rapide, plus intelligent et plus beau."
+msgstr "Más rápido, más inteligente y más hermoso."
 
 #: apps/marketing/src/app/(marketing)/open/page.tsx:210
 msgid "Finances"
-msgstr "Finances"
+msgstr "Finanzas"
 
 #: apps/marketing/src/app/(marketing)/open/typefully.tsx:38
 msgid "Follow us on X"
-msgstr "Suivez-nous sur X"
+msgstr "Síguenos en X"
 
 #: apps/marketing/src/components/(marketing)/pricing-table.tsx:172
 msgid "For companies looking to scale across multiple teams."
-msgstr "Pour les entreprises cherchant à se développer au sein de plusieurs équipes."
+msgstr "Para empresas que buscan escalar en múltiples equipos."
 
 #: apps/marketing/src/components/(marketing)/pricing-table.tsx:85
 msgid "For small teams and individuals with basic needs."
-msgstr "Pour les petites équipes et les individus ayant des besoins de base."
+msgstr "Para pequeños equipos e individuos con necesidades básicas."
 
 #: apps/marketing/src/components/(marketing)/pricing-table.tsx:80
 msgid "Free"
-msgstr "Gratuit"
+msgstr "Gratis"
 
 #: apps/marketing/src/app/(marketing)/blog/page.tsx:26
 msgid "From the blog"
-msgstr "Du blog"
+msgstr "Del blog"
 
 #: apps/marketing/src/app/(marketing)/open/data.ts:9
 #: apps/marketing/src/app/(marketing)/open/data.ts:17
@@ -228,154 +228,154 @@ msgstr "Du blog"
 #: apps/marketing/src/app/(marketing)/open/data.ts:41
 #: apps/marketing/src/app/(marketing)/open/data.ts:49
 msgid "Full-Time"
-msgstr "Temps plein"
+msgstr "A tiempo completo"
 
 #: apps/marketing/src/components/(marketing)/share-connect-paid-widget-bento.tsx:87
 msgid "Get paid (Soon)."
-msgstr "Recevez une rémunération (Bientôt)."
+msgstr "Recibe pago (Pronto)."
 
 #: apps/marketing/src/components/(marketing)/call-to-action.tsx:31
 msgid "Get started"
-msgstr "Commencez"
+msgstr "Empezar"
 
 #: apps/marketing/src/app/(marketing)/pricing/page.tsx:75
 msgid "Get Started"
-msgstr "Commencez"
+msgstr "Comienza"
 
 #: apps/marketing/src/app/(marketing)/pricing/page.tsx:47
 msgid "Get started today."
-msgstr "Commencez aujourd'hui."
+msgstr "Comienza hoy."
 
 #: apps/marketing/src/app/(marketing)/blog/page.tsx:30
 msgid "Get the latest news from Documenso, including product updates, team announcements and more!"
-msgstr "Obtenez les dernières nouvelles de Documenso, y compris les mises à jour de produits, les annonces d'équipe et plus encore !"
+msgstr "¡Obtén las últimas noticias de Documenso, incluidas actualizaciones de productos, anuncios del equipo y más!"
 
 #: apps/marketing/src/app/(marketing)/open/page.tsx:233
 msgid "GitHub: Total Merged PRs"
-msgstr "GitHub : Total des PRs fusionnées"
+msgstr "GitHub: Total de PRs fusionados"
 
 #: apps/marketing/src/app/(marketing)/open/page.tsx:251
 msgid "GitHub: Total Open Issues"
-msgstr "GitHub : Total des problèmes ouverts"
+msgstr "GitHub: Total de problemas abiertos"
 
 #: apps/marketing/src/app/(marketing)/open/page.tsx:225
 msgid "GitHub: Total Stars"
-msgstr "GitHub : Nombre total d'étoiles"
+msgstr "GitHub: Total de estrellas"
 
 #: apps/marketing/src/app/(marketing)/open/salary-bands.tsx:23
 msgid "Global Salary Bands"
-msgstr "Bandes de salaire globales"
+msgstr "Bandas salariales globales"
 
 #: apps/marketing/src/app/(marketing)/open/page.tsx:261
 msgid "Growth"
-msgstr "Croissance"
+msgstr "Crecimiento"
 
 #: apps/marketing/src/app/(marketing)/pricing/page.tsx:134
 msgid "How can I contribute?"
-msgstr "Comment puis-je contribuer ?"
+msgstr "¿Cómo puedo contribuir?"
 
 #: apps/marketing/src/app/(marketing)/pricing/page.tsx:105
 msgid "How do you handle my data?"
-msgstr "Comment gérez-vous mes données ?"
+msgstr "¿Cómo manejan mis datos?"
 
 #: apps/marketing/src/components/(marketing)/pricing-table.tsx:118
 msgid "Individual"
-msgstr "Individuel"
+msgstr "Individual"
 
 #: apps/marketing/src/components/(marketing)/share-connect-paid-widget-bento.tsx:89
 msgid "Integrated payments with Stripe so you don’t have to worry about getting paid."
-msgstr "Paiements intégrés avec Stripe afin que vous n'ayez pas à vous soucier d'être payé."
+msgstr "Pagos integrados con Stripe para que no tengas que preocuparte por cobrar."
 
 #: apps/marketing/src/components/(marketing)/share-connect-paid-widget-bento.tsx:35
 msgid "Integrates with all your favourite tools."
-msgstr "S'intègre à tous vos outils préférés."
+msgstr "Se integra con todas tus herramientas favoritas."
 
 #: apps/marketing/src/app/(marketing)/open/page.tsx:289
 msgid "Is there more?"
-msgstr "Y a-t-il plus ?"
+msgstr "¿Hay más?"
 
 #: apps/marketing/src/components/(marketing)/open-build-template-bento.tsx:44
 msgid "It’s up to you. Either clone our repository or rely on our easy to use hosting solution."
-msgstr "C'est à vous de décider. Soit vous clonez notre dépôt, soit vous vous fiez à notre solution d'hébergement simple à utiliser."
+msgstr "Depende de ti. O bien clona nuestro repositorio o confía en nuestra solución de hosting fácil de usar."
 
 #: apps/marketing/src/app/(marketing)/open/team-members.tsx:49
 msgid "Join Date"
-msgstr "Date d'adhésion"
+msgstr "Fecha de ingreso"
 
 #: apps/marketing/src/components/(marketing)/call-to-action.tsx:19
 msgid "Join the Open Signing Movement"
-msgstr "Rejoignez le mouvement de signature ouverte"
+msgstr "Únete al Movimiento de Firma Abierta"
 
 #: apps/marketing/src/app/(marketing)/open/team-members.tsx:46
 msgid "Location"
-msgstr "Emplacement"
+msgstr "Ubicación"
 
 #: apps/marketing/src/components/(marketing)/open-build-template-bento.tsx:66
 msgid "Make it your own through advanced customization and adjustability."
-msgstr "Faites-en votre propre grâce à une personnalisation avancée et un ajustement."
+msgstr "Hazlo tuyo a través de personalización y ajustabilidad avanzadas."
 
 #: apps/marketing/src/app/(marketing)/open/page.tsx:199
 msgid "Merged PR's"
-msgstr "PRs fusionnées"
+msgstr "PRs fusionados"
 
 #: apps/marketing/src/app/(marketing)/open/page.tsx:234
 msgid "Merged PRs"
-msgstr "PRs fusionnées"
+msgstr "PRs fusionados"
 
 #: apps/marketing/src/components/(marketing)/pricing-table.tsx:40
 msgid "Monthly"
-msgstr "Mensuel"
+msgstr "Mensual"
 
 #: apps/marketing/src/app/(marketing)/open/team-members.tsx:34
 msgid "Name"
-msgstr "Nom"
+msgstr "Nombre"
 
 #: apps/marketing/src/app/(marketing)/open/monthly-new-users-chart.tsx:30
 #: apps/marketing/src/app/(marketing)/open/monthly-new-users-chart.tsx:43
 #: apps/marketing/src/app/(marketing)/open/monthly-new-users-chart.tsx:52
 msgid "New Users"
-msgstr "Nouveaux utilisateurs"
+msgstr "Nuevos Usuarios"
 
 #: apps/marketing/src/components/(marketing)/pricing-table.tsx:106
 msgid "No credit card required"
-msgstr "Aucune carte de crédit requise"
+msgstr "No se requiere tarjeta de crédito"
 
 #: apps/marketing/src/components/(marketing)/callout.tsx:29
 #: apps/marketing/src/components/(marketing)/hero.tsx:125
 msgid "No Credit Card required"
-msgstr "Aucune carte de crédit requise"
+msgstr "No se requiere tarjeta de crédito"
 
 #: apps/marketing/src/app/(marketing)/pricing/page.tsx:61
 msgid "None of these work for you? Try self-hosting!"
-msgstr "Aucune de ces options ne fonctionne pour vous ? Essayez l'hébergement autonome !"
+msgstr "¿Ninguna de estas opciones funciona para ti? ¡Prueba el autoalojamiento!"
 
 #: apps/marketing/src/app/(marketing)/open/page.tsx:194
 #: apps/marketing/src/app/(marketing)/open/page.tsx:252
 msgid "Open Issues"
-msgstr "Problèmes ouverts"
+msgstr "Problemas Abiertos"
 
 #: apps/marketing/src/components/(marketing)/open-build-template-bento.tsx:42
 msgid "Open Source or Hosted."
-msgstr "Open Source ou hébergé."
+msgstr "Código Abierto o Alojado."
 
 #: apps/marketing/src/app/(marketing)/open/page.tsx:161
 #: apps/marketing/src/components/(marketing)/footer.tsx:37
 #: apps/marketing/src/components/(marketing)/header.tsx:64
 #: apps/marketing/src/components/(marketing)/mobile-navigation.tsx:40
 msgid "Open Startup"
-msgstr "Startup ouverte"
+msgstr "Startup Abierta"
 
 #: apps/marketing/src/components/(marketing)/footer.tsx:41
 msgid "OSS Friends"
-msgstr "Amis OSS"
+msgstr "Amigos OSS"
 
 #: apps/marketing/src/components/(marketing)/faster-smarter-beautiful-bento.tsx:91
 msgid "Our custom templates come with smart rules that can help you save time and energy."
-msgstr "Nos modèles personnalisés sont dotés de règles intelligentes qui peuvent vous aider à gagner du temps et de l'énergie."
+msgstr "Nuestras plantillas personalizadas vienen con reglas inteligentes que pueden ayudarte a ahorrar tiempo y energía."
 
 #: apps/marketing/src/components/(marketing)/enterprise.tsx:20
 msgid "Our Enterprise License is great for large organizations looking to switch to Documenso for all their signing needs. It's available for our cloud offering as well as self-hosted setups and offers a wide range of compliance and Adminstration Features."
-msgstr "Notre licence entreprise est idéale pour les grandes organisations cherchant à passer à Documenso pour tous leurs besoins de signature. Elle est disponible pour notre offre cloud ainsi que pour des configurations auto-hébergées et propose un large éventail de fonctionnalités de conformité et d'administration."
+msgstr "Nuestra Licencia Empresarial es excelente para grandes organizaciones que buscan cambiar a Documenso para todas sus necesidades de firma. Está disponible para nuestra oferta en la nube, así como para configuraciones autoalojadas y ofrece una amplia gama de funciones de cumplimiento y administración."
 
 #: apps/marketing/src/components/(marketing)/enterprise.tsx:20
 #~ msgid "Our Enterprise License is great large organizations looking to switch to Documenso for all their signing needs. It's availible for our cloud offering as well as self-hosted setups and offer a wide range of compliance and Adminstration Features."
@@ -383,7 +383,7 @@ msgstr "Notre licence entreprise est idéale pour les grandes organisations cher
 
 #: apps/marketing/src/app/(marketing)/pricing/page.tsx:65
 msgid "Our self-hosted option is great for small teams and individuals who need a simple solution. You can use our docker based setup to get started in minutes. Take control with full customizability and data ownership."
-msgstr "Notre option auto-hébergée est idéale pour les petites équipes et les individus qui ont besoin d'une solution simple. Vous pouvez utiliser notre configuration basée sur Docker pour commencer en quelques minutes. Prenez le contrôle avec une personnalisation complète et une propriété des données."
+msgstr "Nuestra opción de autoalojamiento es excelente para pequeños equipos e individuos que necesitan una solución simple. Puedes usar nuestra configuración basada en docker para empezar en minutos. Toma el control con total personalización y propiedad de los datos."
 
 #: apps/marketing/src/app/(marketing)/open/data.ts:25
 #~ msgid "Part-Time"
@@ -391,44 +391,44 @@ msgstr "Notre option auto-hébergée est idéale pour les petites équipes et le
 
 #: apps/marketing/src/components/(marketing)/pricing-table.tsx:151
 msgid "Premium Profile Name"
-msgstr "Nom de profil premium"
+msgstr "Nombre de Perfil Premium"
 
 #: apps/marketing/src/app/(marketing)/pricing/page.tsx:40
 #: apps/marketing/src/components/(marketing)/footer.tsx:31
 #: apps/marketing/src/components/(marketing)/header.tsx:42
 #: apps/marketing/src/components/(marketing)/mobile-navigation.tsx:24
 msgid "Pricing"
-msgstr "Prix"
+msgstr "Precios"
 
 #: apps/marketing/src/components/(marketing)/footer.tsx:43
 #: apps/marketing/src/components/(marketing)/mobile-navigation.tsx:53
 msgid "Privacy"
-msgstr "Confidentialité"
+msgstr "Privacidad"
 
 #: apps/marketing/src/components/(marketing)/carousel.tsx:58
 msgid "Profile"
-msgstr "Profil"
+msgstr "Perfil"
 
 #: apps/marketing/src/components/(marketing)/share-connect-paid-widget-bento.tsx:108
 msgid "React Widget (Soon)."
-msgstr "Widget React (Bientôt)."
+msgstr "Widget de React (Pronto)."
 
 #: apps/marketing/src/components/(marketing)/share-connect-paid-widget-bento.tsx:48
 msgid "Receive your personal link to share with everyone you care about."
-msgstr "Recevez votre lien personnel à partager avec tous ceux qui vous tiennent à cœur."
+msgstr "Recibe tu enlace personal para compartirlo con todos los que te importan."
 
 #: apps/marketing/src/app/(marketing)/open/team-members.tsx:37
 msgid "Role"
-msgstr "Rôle"
+msgstr "Rol"
 
 #: apps/marketing/src/app/(marketing)/open/salary-bands.tsx:37
 #: apps/marketing/src/app/(marketing)/open/team-members.tsx:40
 msgid "Salary"
-msgstr "Salaire"
+msgstr "Salario"
 
 #: apps/marketing/src/components/(marketing)/pricing-table.tsx:62
 msgid "Save $60 or $120"
-msgstr "Économisez 60 $ ou 120 $"
+msgstr "Ahorra $60 o $120"
 
 #: apps/marketing/src/components/(marketing)/i18n-switcher.tsx:47
 #~ msgid "Search languages..."
@@ -436,186 +436,186 @@ msgstr "Économisez 60 $ ou 120 $"
 
 #: apps/marketing/src/app/(marketing)/pricing/page.tsx:109
 msgid "Securely. Our data centers are located in Frankfurt (Germany), giving us the best local privacy laws. We are very aware of the sensitive nature of our data and follow best practices to ensure the security and integrity of the data entrusted to us."
-msgstr "De manière sécurisée. Nos centres de données sont situés à Francfort (Allemagne), ce qui nous permet de bénéficier des meilleures lois locales sur la confidentialité. Nous sommes très conscients de la nature sensible de nos données et suivons les meilleures pratiques pour garantir la sécurité et l'intégrité des données qui nous sont confiées."
+msgstr "De manera segura. Nuestros centros de datos están ubicados en Frankfurt (Alemania), dándonos las mejores leyes de privacidad locales. Somos muy conscientes de la naturaleza sensible de nuestros datos y seguimos las mejores prácticas para garantizar la seguridad y la integridad de los datos que se nos confían."
 
 #: apps/marketing/src/components/(marketing)/share-connect-paid-widget-bento.tsx:37
 msgid "Send, connect, receive and embed everywhere."
-msgstr "Envoyer, connecter, recevoir et intégrer partout."
+msgstr "Enviar, conectar, recibir e incrustar en todas partes."
 
 #: apps/marketing/src/app/(marketing)/open/salary-bands.tsx:34
 msgid "Seniority"
-msgstr "Ancienneté"
+msgstr "Antigüedad"
 
 #: apps/marketing/src/components/(marketing)/footer.tsx:39
 msgid "Shop"
-msgstr "Boutique"
+msgstr "Tienda"
 
 #: apps/marketing/src/app/(marketing)/singleplayer/client.tsx:63
 msgid "Sign"
-msgstr "Signer"
+msgstr "Firmar"
 
 #: apps/marketing/src/components/(marketing)/header.tsx:72
 #: apps/marketing/src/components/(marketing)/mobile-navigation.tsx:61
 msgid "Sign in"
-msgstr "Se connecter"
+msgstr "Iniciar sesión"
 
 #: apps/marketing/src/components/(marketing)/header.tsx:77
 #: apps/marketing/src/components/(marketing)/mobile-navigation.tsx:57
 msgid "Sign up"
-msgstr "S'inscrire"
+msgstr "Registrarse"
 
 #: apps/marketing/src/components/(marketing)/carousel.tsx:22
 msgid "Signing Process"
-msgstr "Processus de signature"
+msgstr "Proceso de firma"
 
 #: apps/marketing/src/components/(marketing)/pricing-table.tsx:94
 #: apps/marketing/src/components/(marketing)/pricing-table.tsx:136
 #: apps/marketing/src/components/(marketing)/pricing-table.tsx:180
 msgid "Signup Now"
-msgstr "Inscrivez-vous maintenant"
+msgstr "Regístrate ahora"
 
 #: apps/marketing/src/components/(marketing)/faster-smarter-beautiful-bento.tsx:89
 msgid "Smart."
-msgstr "Intelligent."
+msgstr "Inteligente."
 
 #: apps/marketing/src/components/(marketing)/hero.tsx:132
 msgid "Star on GitHub"
-msgstr "Étoile sur GitHub"
+msgstr "Estrella en GitHub"
 
 #: apps/marketing/src/app/(marketing)/open/page.tsx:226
 msgid "Stars"
-msgstr "Étoiles"
+msgstr "Estrellas"
 
 #: apps/marketing/src/components/(marketing)/footer.tsx:40
 #: apps/marketing/src/components/(marketing)/mobile-navigation.tsx:44
 msgid "Status"
-msgstr "Statut"
+msgstr "Estado"
 
 #: apps/marketing/src/components/(marketing)/footer.tsx:34
 #: apps/marketing/src/components/(marketing)/mobile-navigation.tsx:48
 msgid "Support"
-msgstr "Soutien"
+msgstr "Soporte"
 
 #: apps/marketing/src/app/(marketing)/open/team-members.tsx:26
 msgid "Team"
-msgstr "Équipe"
+msgstr "Equipo"
 
 #: apps/marketing/src/components/(marketing)/pricing-table.tsx:195
 msgid "Team Inbox"
-msgstr "Boîte de réception de l'équipe"
+msgstr "Bandeja de entrada del equipo"
 
 #: apps/marketing/src/components/(marketing)/carousel.tsx:28
 #: apps/marketing/src/components/(marketing)/pricing-table.tsx:162
 msgid "Teams"
-msgstr "Équipes"
+msgstr "Equipos"
 
 #: apps/marketing/src/components/(marketing)/open-build-template-bento.tsx:83
 msgid "Template Store (Soon)."
-msgstr "Boutique de modèles (Bientôt)."
+msgstr "Tienda de Plantillas (Pronto)."
 
 #: apps/marketing/src/app/(marketing)/pricing/page.tsx:138
 msgid "That's awesome. You can take a look at the current <0>Issues</0> and join our <1>Discord Community</1> to keep up to date, on what the current priorities are. In any case, we are an open community and welcome all input, technical and non-technical ❤️"
-msgstr "C'est génial. Vous pouvez consulter les <0>Problèmes</0> actuels et rejoindre notre <1>Communauté Discord</1> pour rester à jour sur ce qui est actuellement prioritaire. Dans tous les cas, nous sommes une communauté ouverte et accueillons toutes les contributions, techniques et non techniques ❤️"
+msgstr "Eso es increíble. Puedes echar un vistazo a los <0>Problemas</0> actuales y unirte a nuestra <1>Comunidad de Discord</1> para mantenerte al día sobre cuáles son las prioridades actuales. En cualquier caso, somos una comunidad abierta y agradecemos todas las aportaciones, técnicas y no técnicas ❤️"
 
 #: apps/marketing/src/app/(marketing)/open/page.tsx:293
 msgid "This page is evolving as we learn what makes a great signing company. We'll update it when we have more to share."
-msgstr "Cette page évolue à mesure que nous apprenons ce qui fait une grande entreprise de signature. Nous la mettrons à jour lorsque nous aurons plus à partager."
+msgstr "Esta página está evolucionando a medida que aprendemos lo que hace una gran empresa de firmas. La actualizaremos cuando tengamos más para compartir."
 
 #: apps/marketing/src/app/(marketing)/open/salary-bands.tsx:31
 msgid "Title"
-msgstr "Titre"
+msgstr "Título"
 
 #: apps/marketing/src/app/(marketing)/open/total-signed-documents-chart.tsx:30
 #: apps/marketing/src/app/(marketing)/open/total-signed-documents-chart.tsx:55
 msgid "Total Completed Documents"
-msgstr "Documents totalisés complétés"
+msgstr "Total de Documentos Completados"
 
 #: apps/marketing/src/app/(marketing)/open/page.tsx:267
 #: apps/marketing/src/app/(marketing)/open/page.tsx:268
 msgid "Total Customers"
-msgstr "Total des clients"
+msgstr "Total de Clientes"
 
 #: apps/marketing/src/app/(marketing)/open/funding-raised.tsx:29
 msgid "Total Funding Raised"
-msgstr "Total des fonds levés"
+msgstr "Total de Fondos Recaudados"
 
 #: apps/marketing/src/app/(marketing)/open/monthly-total-users-chart.tsx:30
 #: apps/marketing/src/app/(marketing)/open/monthly-total-users-chart.tsx:43
 #: apps/marketing/src/app/(marketing)/open/monthly-total-users-chart.tsx:52
 msgid "Total Users"
-msgstr "Total des utilisateurs"
+msgstr "Total de Usuarios"
 
 #: apps/marketing/src/components/(marketing)/open-build-template-bento.tsx:31
 msgid "Truly your own."
-msgstr "Vraiment le vôtre."
+msgstr "Realmente tuyo."
 
 #: apps/marketing/src/components/(marketing)/callout.tsx:27
 #: apps/marketing/src/components/(marketing)/hero.tsx:123
 msgid "Try our Free Plan"
-msgstr "Essayez notre plan gratuit"
+msgstr "Prueba nuestro Plan Gratuito"
 
 #: apps/marketing/src/app/(marketing)/open/typefully.tsx:20
 msgid "Twitter Stats"
-msgstr "Statistiques Twitter"
+msgstr "Estadísticas de Twitter"
 
 #: apps/marketing/src/components/(marketing)/pricing-table.tsx:142
 #: apps/marketing/src/components/(marketing)/pricing-table.tsx:186
 msgid "Unlimited Documents per Month"
-msgstr "Documents illimités par mois"
+msgstr "Documentos ilimitados por mes"
 
 #: apps/marketing/src/components/(marketing)/pricing-table.tsx:103
 msgid "Up to 10 recipients per document"
-msgstr "Jusqu'à 10 destinataires par document"
+msgstr "Hasta 10 destinatarios por documento"
 
 #: apps/marketing/src/app/(marketing)/singleplayer/client.tsx:52
 msgid "Upload a document and add fields."
-msgstr "Téléchargez un document et ajoutez des champs."
+msgstr "Sube un documento y agrega campos."
 
 #: apps/marketing/src/app/(marketing)/pricing/page.tsx:123
 msgid "Using our hosted version is the easiest way to get started, you can simply subscribe and start signing your documents. We take care of the infrastructure, so you can focus on your business. Additionally, when using our hosted version you benefit from our trusted signing certificates which helps you to build trust with your customers."
-msgstr "Utiliser notre version hébergée est le moyen le plus simple de commencer, vous pouvez simplement vous abonner et commencer à signer vos documents. Nous nous occupons de l'infrastructure, vous pouvez vous concentrer sur votre entreprise. De plus, en utilisant notre version hébergée, vous bénéficiez de nos certificats de signature de confiance, ce qui vous aide à instaurer une relation de confiance avec vos clients."
+msgstr "Usar nuestra versión alojada es la forma más fácil de comenzar, simplemente puedes suscribirte y comenzar a firmar tus documentos. Nos ocupamos de la infraestructura, para que puedas concentrarte en tu negocio. Además, al utilizar nuestra versión alojada, te beneficias de nuestros certificados de firma confiables, lo que te ayuda a generar confianza con tus clientes."
 
 #: apps/marketing/src/app/(marketing)/open/typefully.tsx:33
 msgid "View all stats"
-msgstr "Voir toutes les statistiques"
+msgstr "Ver todas las estadísticas"
 
 #: apps/marketing/src/app/(marketing)/pricing/page.tsx:195
 msgid "We are happy to assist you at <0>support@documenso.com</0> or <1>in our Discord-Support-Channel</1> please message either Lucas or Timur to get added to the channel if you are not already a member."
-msgstr "Nous sommes heureux de vous aider à <0>support@documenso.com</0> ou <1>dans notre canal de support Discord</1>, veuillez envoyer un message à Lucas ou Timur pour être ajouté au canal si vous n'êtes pas déjà membre."
+msgstr "Estamos felices de ayudarte en <0>support@documenso.com</0> o <1>en nuestro canal de soporte de Discord</1>. Mensaje a Lucas o Timur para que te agreguen al canal si aún no eres miembro."
 
 #: apps/marketing/src/app/(marketing)/pricing/page.tsx:89
 msgid "What is the difference between the plans?"
-msgstr "Quelle est la différence entre les plans ?"
+msgstr "¿Cuál es la diferencia entre los planes?"
 
 #: apps/marketing/src/components/(marketing)/faster-smarter-beautiful-bento.tsx:47
 msgid "When it comes to sending or receiving a contract, you can count on lightning-fast speeds."
-msgstr "En ce qui concerne l'envoi ou la réception d'un contrat, vous pouvez compter sur des vitesses ultrarapides."
+msgstr "Cuando se trata de enviar o recibir un contrato, puedes contar con velocidades ultrarrápidas."
 
 #: apps/marketing/src/app/(marketing)/pricing/page.tsx:191
 msgid "Where can I get support?"
-msgstr "Où puis-je obtenir du support ?"
+msgstr "¿Dónde puedo obtener soporte?"
 
 #: apps/marketing/src/app/(marketing)/pricing/page.tsx:177
 msgid "Why should I prefer Documenso over DocuSign or some other signing tool?"
-msgstr "Pourquoi devrais-je préférer Documenso à DocuSign ou à un autre outil de signature ?"
+msgstr "¿Por qué debería preferir Documenso sobre DocuSign u otra herramienta de firma?"
 
 #: apps/marketing/src/app/(marketing)/pricing/page.tsx:119
 msgid "Why should I use your hosting service?"
-msgstr "Pourquoi devrais-je utiliser votre service d'hébergement ?"
+msgstr "¿Por qué debería usar su servicio de alojamiento?"
 
 #: apps/marketing/src/components/(marketing)/pricing-table.tsx:60
 msgid "Yearly"
-msgstr "Annuel"
+msgstr "Anual"
 
 #: apps/marketing/src/app/(marketing)/pricing/page.tsx:167
 msgid "Yes! Documenso is offered under the GNU AGPL V3 open source license. This means you can use it for free and even modify it to fit your needs, as long as you publish your changes under the same license."
-msgstr "Oui ! Documenso est proposé sous la licence open source GNU AGPL V3. Cela signifie que vous pouvez l'utiliser gratuitement et même le modifier pour répondre à vos besoins, tant que vous publiez vos modifications sous la même licence."
+msgstr "¡Sí! Documenso se ofrece bajo la licencia de código abierto GNU AGPL V3. Esto significa que puedes usarlo de forma gratuita e incluso modificarlo para adaptarlo a tus necesidades, siempre que publiques tus cambios bajo la misma licencia."
 
 #: apps/marketing/src/app/(marketing)/pricing/page.tsx:93
 msgid "You can self-host Documenso for free or use our ready-to-use hosted version. The hosted version comes with additional support, painless scalability and more. Early adopters will get access to all features we build this year, for no additional cost! Forever! Yes, that includes multiple users per account later. If you want Documenso for your enterprise, we are happy to talk about your needs."
-msgstr "Vous pouvez auto-héberger Documenso gratuitement ou utiliser notre version hébergée prête à l'emploi. La version hébergée est accompagnée d'une assistance supplémentaire, d'une montée en charge sans effort et d'autres avantages. Les premiers adoptants auront accès à toutes les fonctionnalités que nous construirons cette année, sans coût supplémentaire ! Pour toujours ! Oui, cela inclut plusieurs utilisateurs par compte à l'avenir. Si vous souhaitez Documenso pour votre entreprise, nous serons heureux de discuter de vos besoins."
+msgstr "Puedes autoalojar Documenso de forma gratuita o usar nuestra versión alojada lista para usar. La versión alojada viene con soporte adicional, escalabilidad sin problemas y más. Los primeros adoptantes tendrán acceso a todas las funciones que construimos este año, sin costo adicional. ¡Para siempre! Sí, eso incluye múltiples usuarios por cuenta más adelante. Si quieres Documenso para tu empresa, estaremos encantados de hablar sobre tus necesidades."
 
 #: apps/marketing/src/components/(marketing)/carousel.tsx:272
 msgid "Your browser does not support the video tag."
-msgstr "Votre navigateur ne prend pas en charge la balise vidéo."
+msgstr "Tu navegador no soporta la etiqueta de video."
 

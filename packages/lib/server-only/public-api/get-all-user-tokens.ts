@@ -8,6 +8,7 @@ export const getUserTokens = async ({ userId }: GetUserTokensOptions) => {
   return await prisma.apiToken.findMany({
     where: {
       userId,
+      teamId: null,
     },
     select: {
       id: true,
