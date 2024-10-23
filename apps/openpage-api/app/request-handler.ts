@@ -6,7 +6,7 @@ type RouteHandler<T = Record<string, string | string[]>> = (
   ctx: { params: T },
 ) => Promise<Response> | Response;
 
-const ALLOWED_ORIGINS = new Set(['documenso.com']);
+const ALLOWED_ORIGINS = new Set(['documenso.com', 'prd-openpage-api.vercel.app']);
 
 const CORS_HEADERS = {
   'Access-Control-Allow-Origin': '*',
