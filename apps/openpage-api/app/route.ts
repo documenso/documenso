@@ -12,7 +12,7 @@ export function GET(request: NextRequest) {
     headers: {
       // TODO: Update for marketing page
       'Access-Control-Allow-Origin': '*',
-      'Access-Control-Allow-Methods': 'GET, OPTIONS',
+      'Access-Control-Allow-Methods': 'GET, PUT, DELETE, OPTIONS',
       'Access-Control-Allow-Headers': 'Content-Type',
     },
   });

@@ -10,7 +10,7 @@ const ALLOWED_ORIGINS = new Set(['documenso.com', 'prd-openpage-api.vercel.app']
 
 const CORS_HEADERS = {
   'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Methods': 'GET, OPTIONS',
+  'Access-Control-Allow-Methods': 'GET, PUT, DELETE, OPTIONS',
   'Access-Control-Allow-Headers': 'Content-Type',
 };
 
