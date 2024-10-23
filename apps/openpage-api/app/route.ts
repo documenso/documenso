@@ -1,4 +1,6 @@
-import { type NextRequest, NextResponse } from 'next/server';
+import type { NextRequest } from 'next/server';
+
+import cors from '@/lib/cors';
 
 const paths = [{ path: 'github', description: 'GitHub Data' }];
 
@@ -8,12 +10,22 @@ export function GET(request: NextRequest) {
     return { path: url + path, description };
   });
 
-  return NextResponse.json(apis, {
-    headers: {
-      // TODO: Update for marketing page
-      'Access-Control-Allow-Origin': '*',
-      'Access-Control-Allow-Methods': 'GET, PUT, DELETE, OPTIONS',
-      'Access-Control-Allow-Headers': 'Content-Type',
-    },
-  });
+  return cors(
+    request,
+    new Response(JSON.stringify(apis), {
+      status: 200,
+      headers: {
+        'content-type': 'application/json',
+      },
+    }),
+  );
+}
+
+export function OPTIONS(request: Request) {
+  return cors(
+    request,
+    new Response(null, {
+      status: 204,
+    }),
+  );
 }

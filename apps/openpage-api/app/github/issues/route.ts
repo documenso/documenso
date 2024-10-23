@@ -1,14 +1,27 @@
-import { NextResponse } from 'next/server';
+import cors from '@/lib/cors';
 
-import { requestHandler } from '@/app/request-handler';
-
-export const GET = requestHandler(async () => {
+export async function GET(request: Request) {
   const res = await fetch(
     'https://api.github.com/search/issues?q=repo:documenso/documenso+type:issue+state:open&page=0&per_page=1',
   );
   const { total_count } = await res.json();
 
-  return NextResponse.json({
-    data: total_count,
-  });
-});
+  return cors(
+    request,
+    new Response(JSON.stringify({ data: total_count }), {
+      status: 200,
+      headers: {
+        'content-type': 'application/json',
+      },
+    }),
+  );
+}
+
+export function OPTIONS(request: Request) {
+  return cors(
+    request,
+    new Response(null, {
+      status: 204,
+    }),
+  );
+}
