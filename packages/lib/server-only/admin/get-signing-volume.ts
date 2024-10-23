@@ -6,6 +6,7 @@ export type SigningVolume = {
   name: string;
   signingVolume: number;
   createdAt: Date;
+  planId: string;
 };
 
 export type GetSigningVolumeOptions = {
@@ -106,14 +107,15 @@ export async function getSigningVolume({
       subscription.User?.name || subscription.team?.name || subscription.User?.email || 'Unknown';
     const signingVolume =
       (subscription.User?.Document.length || 0) + (subscription.team?.document.length || 0);
+    const planId =
+      subscription.User?.Subscription?.[0]?.planId || subscription.team?.subscription?.planId || '';
 
     return {
       id: subscription.id,
       name,
       signingVolume,
       createdAt: subscription.createdAt,
-      planId:
-        subscription.User?.Subscription?.[0]?.planId || subscription.team?.subscription?.planId,
+      planId,
     };
   });
 
