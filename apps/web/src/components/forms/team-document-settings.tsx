@@ -5,10 +5,14 @@ import { Trans } from '@lingui/macro';
 import { useForm } from 'react-hook-form';
 import type { z } from 'zod';
 
-import { DOCUMENT_VISIBILITY } from '@documenso/lib/constants/document-visibility';
+import { DocumentVisibility } from '@documenso/lib/types/document-visibility';
 import type { Team } from '@documenso/prisma/client';
 import { ZUpdateTeamGlobalSettingsMutationSchema } from '@documenso/trpc/server/team-router/schema';
-import { DocumentVisibilitySelect } from '@documenso/ui/components/document/document-visibility-select';
+import {
+  DocumentVisibilitySelect,
+  DocumentVisibilityTooltip,
+} from '@documenso/ui/components/document/document-visibility-select';
+import { Button } from '@documenso/ui/primitives/button';
 import { Checkbox } from '@documenso/ui/primitives/checkbox';
 import {
   Form,
@@ -31,8 +35,6 @@ export type TeamDocumentSettingsProps = {
 };
 
 export const TeamDocumentSettings = ({ team }: TeamDocumentSettingsProps) => {
-  console.log('inside TeamDocumentSettings', { team });
-
   const form = useForm<TUpdateTeamGlobalSettings>({
     values: {
       documentVisibility: team.teamGlobalSettings.documentVisibility ?? '',
@@ -41,29 +43,46 @@ export const TeamDocumentSettings = ({ team }: TeamDocumentSettingsProps) => {
     resolver: zodResolver(ZUpdateTeamGlobalSettings),
   });
 
+  const isSubmitting = form.formState.isSubmitting;
+
   const onFormSubmit = (data: TUpdateTeamGlobalSettings) => {
-    console.log({ data });
+    console.log('lol', { data });
   };
 
-  const d = DOCUMENT_VISIBILITY[form.getValues('documentVisibility')].value;
-  console.log({ d });
+  const mapVisibilityToRole = (visibility: string): string => {
+    switch (visibility) {
+      case DocumentVisibility.ADMIN:
+        return 'ADMIN';
+      case DocumentVisibility.MANAGER_AND_ABOVE:
+        return 'MANAGER';
+      case DocumentVisibility.EVERYONE:
+      default:
+        return 'MEMBER';
+    }
+  };
+
+  const currentVisibilityRole = mapVisibilityToRole(team.teamGlobalSettings.documentVisibility);
 
   return (
     <div>
       <Form {...form}>
-        <form className="mt-6" onSubmit={form.handleSubmit(onFormSubmit)}>
-          <fieldset className="flex w-1/4 flex-col gap-y-4">
+        <form
+          className="mt-6 flex w-full flex-col gap-y-4"
+          onSubmit={form.handleSubmit(onFormSubmit)}
+        >
+          <fieldset>
             <FormField
               control={form.control}
               name="documentVisibility"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>
+                  <FormLabel className="flex flex-row items-center">
                     <Trans>Document Visibility</Trans>
+                    <DocumentVisibilityTooltip />
                   </FormLabel>
                   <FormControl>
                     <DocumentVisibilitySelect
-                      currentMemberRole={d}
+                      currentMemberRole={currentVisibilityRole}
                       {...field}
                       onValueChange={field.onChange}
                     />
@@ -79,7 +98,7 @@ export const TeamDocumentSettings = ({ team }: TeamDocumentSettingsProps) => {
               name="includeSenderDetails"
               render={({ field }) => (
                 <FormItem>
-                  <div className="mt-4 flex flex-row items-center gap-4">
+                  <div className="mt-6 flex flex-row items-center gap-4">
                     <FormLabel>
                       <Trans>Include Sender Details</Trans>
                     </FormLabel>
@@ -91,12 +110,27 @@ export const TeamDocumentSettings = ({ team }: TeamDocumentSettingsProps) => {
                         onCheckedChange={field.onChange}
                       />
                     </FormControl>
-                    <FormMessage />
                   </div>
+
+                  <p className="text-muted-foreground text-xs">
+                    <Trans>
+                      If enabled, the email will contain the sender details (
+                      <span className="italic">
+                        User on behalf of team has invited you to sign the document [...]"
+                      </span>
+                      )
+                    </Trans>
+                  </p>
+
+                  <FormMessage />
                 </FormItem>
               )}
             />
           </fieldset>
+
+          <Button type="submit" loading={isSubmitting} className="self-end">
+            {isSubmitting ? <Trans>Updating profile...</Trans> : <Trans>Update profile</Trans>}
+          </Button>
         </form>
       </Form>
     </div>
