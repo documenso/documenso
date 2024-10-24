@@ -3,9 +3,11 @@ import type { NextRequest } from 'next/server';
 import cors from '@/lib/cors';
 
 const paths = [
-  { path: 'github', description: 'GitHub Data' },
-  { path: 'community', description: 'Community Data' },
-  { path: 'growth', description: 'Growth Data' },
+  { path: '/total-customers', description: 'Total Customers' },
+  { path: '/total-users', description: 'Total Users' },
+  { path: '/new-users', description: 'New Users' },
+  { path: '/completed-documents', description: 'Completed Documents per Month' },
+  { path: '/total-completed-documents', description: 'Total Completed Documents' },
 ];
 
 export function GET(request: NextRequest) {
