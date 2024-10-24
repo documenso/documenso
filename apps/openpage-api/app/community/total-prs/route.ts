@@ -4,7 +4,7 @@ import { transformRepoStats } from '@/lib/transform-repo-stats';
 export async function GET(request: Request) {
   const res = await fetch('https://stargrazer-live.onrender.com/api/stats');
   const data = await res.json();
-  const transformedData = transformRepoStats(data, 'stars');
+  const transformedData = transformRepoStats(data, 'mergedPRs');
 
   return cors(
     request,
