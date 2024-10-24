@@ -42,7 +42,7 @@ export const seedTeam = async ({
         createMany: {
           data: [teamOwner, ...teamMembers].map((user) => ({
             userId: user.id,
-            role: TeamMemberRole.ADMIN,
+            role: user === teamOwner ? TeamMemberRole.ADMIN : TeamMemberRole.MEMBER,
           })),
         },
       },
