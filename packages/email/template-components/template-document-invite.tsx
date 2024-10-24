@@ -14,6 +14,7 @@ export interface TemplateDocumentInviteProps {
   selfSigner: boolean;
   isTeamInvite: boolean;
   teamName?: string;
+  includeSenderDetails?: boolean;
 }
 
 export const TemplateDocumentInvite = ({
@@ -25,6 +26,7 @@ export const TemplateDocumentInvite = ({
   selfSigner,
   isTeamInvite,
   teamName,
+  includeSenderDetails,
 }: TemplateDocumentInviteProps) => {
   const { actionVerb, progressiveVerb } = RECIPIENT_ROLES_DESCRIPTION_ENG[role];
 
@@ -42,7 +44,9 @@ export const TemplateDocumentInvite = ({
             </>
           ) : isTeamInvite ? (
             <>
-              {`${inviterName} on behalf of ${teamName} has invited you to ${actionVerb.toLowerCase()}`}
+              {includeSenderDetails
+                ? `${inviterName} on behalf of ${teamName} has invited you to ${actionVerb.toLowerCase()}`
+                : `${teamName} has invited you to ${actionVerb.toLowerCase()}`}
               <br />
               {`"${documentName}"`}
             </>

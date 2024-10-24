@@ -92,6 +92,7 @@ export const TeamDocumentSettings = ({ team }: TeamDocumentSettingsProps) => {
                   <FormControl>
                     <DocumentVisibilitySelect
                       currentMemberRole={currentVisibilityRole}
+                      isTeamSettings={true}
                       {...field}
                       onValueChange={field.onChange}
                     />

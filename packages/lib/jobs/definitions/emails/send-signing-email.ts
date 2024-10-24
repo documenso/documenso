@@ -62,6 +62,7 @@ export const SEND_SIGNING_EMAIL_JOB_DEFINITION = {
             select: {
               teamEmail: true,
               name: true,
+              teamGlobalSettings: true,
             },
           },
         },
@@ -105,7 +106,9 @@ export const SEND_SIGNING_EMAIL_JOB_DEFINITION = {
 
     if (isTeamDocument && team) {
       emailSubject = `${team.name} invited you to ${recipientActionVerb} a document`;
-      emailMessage = `${user.name} on behalf of ${team.name} has invited you to ${recipientActionVerb} the document "${document.title}".`;
+      emailMessage = team.teamGlobalSettings?.includeSenderDetails
+        ? `${user.name} on behalf of ${team.name} has invited you to ${recipientActionVerb} the document "${document.title}".`
+        : `${team.name} has invited you to ${recipientActionVerb} the document "${document.title}".`;
     }
 
     const customEmailTemplate = {
@@ -129,6 +132,7 @@ export const SEND_SIGNING_EMAIL_JOB_DEFINITION = {
       isTeamInvite: isTeamDocument,
       teamName: team?.name,
       teamEmail: team?.teamEmail?.email,
+      includeSenderDetails: team?.teamGlobalSettings?.includeSenderDetails,
     });
 
     await io.runTask('send-signing-email', async () => {

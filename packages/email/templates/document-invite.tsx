@@ -26,6 +26,7 @@ export type DocumentInviteEmailTemplateProps = Partial<TemplateDocumentInvitePro
   isTeamInvite?: boolean;
   teamName?: string;
   teamEmail?: string;
+  includeSenderDetails?: boolean;
 };
 
 export const DocumentInviteEmailTemplate = ({
@@ -39,13 +40,16 @@ export const DocumentInviteEmailTemplate = ({
   selfSigner = false,
   isTeamInvite = false,
   teamName,
+  includeSenderDetails,
 }: DocumentInviteEmailTemplateProps) => {
   const action = RECIPIENT_ROLES_DESCRIPTION_ENG[role].actionVerb.toLowerCase();
 
   const previewText = selfSigner
     ? `Please ${action} your document ${documentName}`
     : isTeamInvite
-    ? `${inviterName} on behalf of ${teamName} has invited you to ${action} ${documentName}`
+    ? includeSenderDetails
+      ? `${inviterName} on behalf of ${teamName} has invited you to ${action} ${documentName}`
+      : `${teamName} has invited you to ${action} ${documentName}`
     : `${inviterName} has invited you to ${action} ${documentName}`;
 
   const getAssetUrl = (path: string) => {
@@ -85,6 +89,7 @@ export const DocumentInviteEmailTemplate = ({
                   selfSigner={selfSigner}
                   isTeamInvite={isTeamInvite}
                   teamName={teamName}
+                  includeSenderDetails={includeSenderDetails}
                 />
               </Section>
             </Container>
