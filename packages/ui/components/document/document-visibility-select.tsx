@@ -17,15 +17,16 @@ import { Tooltip, TooltipContent, TooltipTrigger } from '@documenso/ui/primitive
 export type DocumentVisibilitySelectType = SelectProps & {
   currentMemberRole?: string;
   isTeamSettings?: boolean;
+  disabled?: boolean;
 };
 
 export const DocumentVisibilitySelect = forwardRef<HTMLButtonElement, DocumentVisibilitySelectType>(
-  ({ currentMemberRole, isTeamSettings = false, ...props }, ref) => {
+  ({ currentMemberRole, isTeamSettings = false, disabled, ...props }, ref) => {
     const canUpdateVisibility =
       currentMemberRole === 'ADMIN' || currentMemberRole === 'MANAGER' || isTeamSettings;
 
     return (
-      <Select {...props} disabled={!canUpdateVisibility && !isTeamSettings}>
+      <Select {...props} disabled={(!canUpdateVisibility && !isTeamSettings) || disabled}>
         <SelectTrigger ref={ref} className="bg-background text-muted-foreground">
           <SelectValue data-testid="documentVisibilitySelectValue" placeholder="Everyone" />
         </SelectTrigger>

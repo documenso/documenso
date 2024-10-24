@@ -389,6 +389,7 @@ export const EditDocumentForm = ({
               fields={fields}
               isDocumentEnterprise={isDocumentEnterprise}
               isDocumentPdfLoaded={isDocumentPdfLoaded}
+              teamDefaultDocumentVisibility={team?.teamGlobalSettings?.documentVisibility}
               onSubmit={onAddSettingsFormSubmit}
             />
 
