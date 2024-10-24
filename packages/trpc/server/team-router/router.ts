@@ -31,6 +31,7 @@ import { requestTeamOwnershipTransfer } from '@documenso/lib/server-only/team/re
 import { resendTeamEmailVerification } from '@documenso/lib/server-only/team/resend-team-email-verification';
 import { resendTeamMemberInvitation } from '@documenso/lib/server-only/team/resend-team-member-invitation';
 import { updateTeam } from '@documenso/lib/server-only/team/update-team';
+import { updateTeamDocumentsGlobalSettings } from '@documenso/lib/server-only/team/update-team-document-global-settings';
 import { updateTeamEmail } from '@documenso/lib/server-only/team/update-team-email';
 import { updateTeamMember } from '@documenso/lib/server-only/team/update-team-member';
 import { updateTeamPublicProfile } from '@documenso/lib/server-only/team/update-team-public-profile';
@@ -188,7 +189,7 @@ export const teamRouter = router({
 
       try {
         const { teamId, ...updateData } = input;
-        return await updateTeam({
+        return await updateTeamDocumentsGlobalSettings({
           userId: ctx.user.id,
           teamId,
           data: updateData,
