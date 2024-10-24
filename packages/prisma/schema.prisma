@@ -500,6 +500,14 @@ enum TeamMemberInviteStatus {
   DECLINED
 }
 
+model TeamGlobalSettings {
+  teamId               Int                @unique
+  documentVisibility   DocumentVisibility @default(EVERYONE)
+  includeSenderDetails Boolean            @default(true)
+
+  team Team @relation(fields: [teamId], references: [id], onDelete: Cascade)
+}
+
 model Team {
   id            Int      @id @default(autoincrement())
   name          String
@@ -514,6 +522,7 @@ model Team {
   teamEmail            TeamEmail?
   emailVerification    TeamEmailVerification?
   transferVerification TeamTransferVerification?
+  teamGlobalSettings   TeamGlobalSettings?
   avatarImage          AvatarImage?              @relation(fields: [avatarImageId], references: [id], onDelete: SetNull)
 
   profile      TeamProfile?

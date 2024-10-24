@@ -1,7 +1,7 @@
 import { z } from 'zod';
 
 import { PROTECTED_TEAM_URLS } from '@documenso/lib/constants/teams';
-import { TeamMemberRole } from '@documenso/prisma/client';
+import { DocumentVisibility, TeamMemberRole } from '@documenso/prisma/client';
 
 import { ZUpdatePublicProfileMutationSchema } from '../profile-router/schema';
 
@@ -189,6 +189,16 @@ export const ZResendTeamMemberInvitationMutationSchema = z.object({
   teamId: z.number(),
   invitationId: z.number(),
 });
+
+export const ZUpdateTeamDocumentGlobalSettingsMutationSchema = z.object({
+  teamId: z.number(),
+  documentVisibility: z.nativeEnum(DocumentVisibility),
+  includeSenderDetails: z.boolean(),
+});
+
+export type TUpdateTeamDocumentGlobalSettingsMutationSchema = z.infer<
+  typeof ZUpdateTeamDocumentGlobalSettingsMutationSchema
+>;
 
 export type TCreateTeamMutationSchema = z.infer<typeof ZCreateTeamMutationSchema>;
 export type TCreateTeamEmailVerificationMutationSchema = z.infer<

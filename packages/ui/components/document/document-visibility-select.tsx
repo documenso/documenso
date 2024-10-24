@@ -16,14 +16,16 @@ import { Tooltip, TooltipContent, TooltipTrigger } from '@documenso/ui/primitive
 
 export type DocumentVisibilitySelectType = SelectProps & {
   currentMemberRole?: string;
+  isTeamSettings?: boolean;
 };
 
 export const DocumentVisibilitySelect = forwardRef<HTMLButtonElement, DocumentVisibilitySelectType>(
-  ({ currentMemberRole, ...props }, ref) => {
-    const canUpdateVisibility = currentMemberRole === 'ADMIN' || currentMemberRole === 'MANAGER';
+  ({ currentMemberRole, isTeamSettings = false, ...props }, ref) => {
+    const canUpdateVisibility =
+      currentMemberRole === 'ADMIN' || currentMemberRole === 'MANAGER' || isTeamSettings;
 
     return (
-      <Select {...props} disabled={!canUpdateVisibility}>
+      <Select {...props} disabled={!canUpdateVisibility && !isTeamSettings}>
         <SelectTrigger ref={ref} className="bg-background text-muted-foreground">
           <SelectValue data-testid="documentVisibilitySelectValue" placeholder="Everyone" />
         </SelectTrigger>
@@ -33,13 +35,13 @@ export const DocumentVisibilitySelect = forwardRef<HTMLButtonElement, DocumentVi
             {DOCUMENT_VISIBILITY.EVERYONE.value}
           </SelectItem>
 
-          {(currentMemberRole === 'ADMIN' || currentMemberRole === 'MANAGER') && (
+          {(currentMemberRole === 'ADMIN' || currentMemberRole === 'MANAGER' || isTeamSettings) && (
             <SelectItem value={DocumentVisibility.MANAGER_AND_ABOVE}>
               {DOCUMENT_VISIBILITY.MANAGER_AND_ABOVE.value}
             </SelectItem>
           )}
 
-          {currentMemberRole === 'ADMIN' && (
+          {(currentMemberRole === 'ADMIN' || isTeamSettings) && (
             <SelectItem value={DocumentVisibility.ADMIN}>
               {DOCUMENT_VISIBILITY.ADMIN.value}
             </SelectItem>
