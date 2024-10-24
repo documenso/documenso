@@ -5,6 +5,7 @@ import { getRequiredServerComponentSession } from '@documenso/lib/next-auth/get-
 import { isAdmin } from '@documenso/lib/next-auth/guards/is-admin';
 
 import { LeaderboardTable } from './data-table-leaderboard';
+import { search as search2 } from './fetch-leaderboard-fix.actions';
 import { search } from './fetch-leaderboard.actions';
 
 type AdminLeaderboardProps = {
@@ -40,6 +41,14 @@ export default async function Leaderboard({ searchParams = {} }: AdminLeaderboar
     sortOrder,
   });
 
+  const { leaderboard: signingVolume2, totalPages: totalPagesFix2 } = await search2({
+    search: searchString,
+    page,
+    perPage,
+    sortBy,
+    sortOrder,
+  });
+
   return (
     <div>
       <h2 className="text-4xl font-semibold">
@@ -49,6 +58,18 @@ export default async function Leaderboard({ searchParams = {} }: AdminLeaderboar
         <LeaderboardTable
           signingVolume={signingVolume}
           totalPages={totalPages}
+          page={page}
+          perPage={perPage}
+          sortBy={sortBy}
+          sortOrder={sortOrder}
+        />
+
+        <h2 className="mt-20 text-2xl font-semibold">
+          <Trans>Signing Volume 2</Trans>
+        </h2>
+        <LeaderboardTable
+          signingVolume={signingVolume2}
+          totalPages={totalPagesFix2}
           page={page}
           perPage={perPage}
           sortBy={sortBy}
