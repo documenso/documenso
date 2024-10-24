@@ -1,4 +1,3 @@
-// Define interfaces for the data structure
 type RepoStats = {
   stars: number;
   forks: number;
