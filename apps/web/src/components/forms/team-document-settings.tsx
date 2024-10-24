@@ -7,7 +7,8 @@ import type { z } from 'zod';
 
 import { DocumentVisibility } from '@documenso/lib/types/document-visibility';
 import type { Team } from '@documenso/prisma/client';
-import { ZUpdateTeamGlobalSettingsMutationSchema } from '@documenso/trpc/server/team-router/schema';
+import { trpc } from '@documenso/trpc/react';
+import { ZUpdateTeamDocumentGlobalSettingsMutationSchema } from '@documenso/trpc/server/team-router/schema';
 import {
   DocumentVisibilitySelect,
   DocumentVisibilityTooltip,
@@ -23,7 +24,7 @@ import {
   FormMessage,
 } from '@documenso/ui/primitives/form/form';
 
-const ZUpdateTeamGlobalSettings = ZUpdateTeamGlobalSettingsMutationSchema.pick({
+const ZUpdateTeamGlobalSettings = ZUpdateTeamDocumentGlobalSettingsMutationSchema.pick({
   documentVisibility: true,
   includeSenderDetails: true,
 });
@@ -35,6 +36,9 @@ export type TeamDocumentSettingsProps = {
 };
 
 export const TeamDocumentSettings = ({ team }: TeamDocumentSettingsProps) => {
+  const { mutateAsync: updateTeamDocumentGlobalSettings } =
+    trpc.team.updateTeamDocumentGlobalSettings.useMutation();
+
   const form = useForm<TUpdateTeamGlobalSettings>({
     values: {
       documentVisibility: team.teamGlobalSettings.documentVisibility ?? '',
@@ -45,8 +49,13 @@ export const TeamDocumentSettings = ({ team }: TeamDocumentSettingsProps) => {
 
   const isSubmitting = form.formState.isSubmitting;
 
-  const onFormSubmit = (data: TUpdateTeamGlobalSettings) => {
+  const onFormSubmit = async (data: TUpdateTeamGlobalSettings) => {
     console.log('lol', { data });
+
+    await updateTeamDocumentGlobalSettings({
+      ...data,
+      teamId: team.id,
+    });
   };
 
   const mapVisibilityToRole = (visibility: string): string => {
@@ -77,7 +86,7 @@ export const TeamDocumentSettings = ({ team }: TeamDocumentSettingsProps) => {
               render={({ field }) => (
                 <FormItem>
                   <FormLabel className="flex flex-row items-center">
-                    <Trans>Document Visibility</Trans>
+                    <Trans>Default Document Visibility</Trans>
                     <DocumentVisibilityTooltip />
                   </FormLabel>
                   <FormControl>

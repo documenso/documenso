@@ -62,6 +62,7 @@ import {
   ZRequestTeamOwnerhsipTransferMutationSchema,
   ZResendTeamEmailVerificationMutationSchema,
   ZResendTeamMemberInvitationMutationSchema,
+  ZUpdateTeamDocumentGlobalSettingsMutationSchema,
   ZUpdateTeamEmailMutationSchema,
   ZUpdateTeamMemberMutationSchema,
   ZUpdateTeamMutationSchema,
@@ -171,6 +172,26 @@ export const teamRouter = router({
         return await createTeamPendingCheckoutSession({
           userId: ctx.user.id,
           ...input,
+        });
+      } catch (err) {
+        console.error(err);
+
+        throw AppError.parseErrorToTRPCError(err);
+      }
+    }),
+
+  updateTeamDocumentGlobalSettings: authenticatedProcedure
+    .input(ZUpdateTeamDocumentGlobalSettingsMutationSchema)
+    .mutation(async ({ input, ctx }) => {
+      console.log('input', input);
+      console.log('ctx', ctx.user);
+
+      try {
+        const { teamId, ...updateData } = input;
+        return await updateTeam({
+          userId: ctx.user.id,
+          teamId,
+          data: updateData,
         });
       } catch (err) {
         console.error(err);

@@ -190,14 +190,14 @@ export const ZResendTeamMemberInvitationMutationSchema = z.object({
   invitationId: z.number(),
 });
 
-export const ZUpdateTeamGlobalSettingsMutationSchema = z.object({
+export const ZUpdateTeamDocumentGlobalSettingsMutationSchema = z.object({
   teamId: z.number(),
   documentVisibility: z.nativeEnum(DocumentVisibility),
   includeSenderDetails: z.boolean(),
 });
 
-export type TUpdateTeamGlobalSettingsMutationSchema = z.infer<
-  typeof ZUpdateTeamGlobalSettingsMutationSchema
+export type TUpdateTeamDocumentGlobalSettingsMutationSchema = z.infer<
+  typeof ZUpdateTeamDocumentGlobalSettingsMutationSchema
 >;
 
 export type TCreateTeamMutationSchema = z.infer<typeof ZCreateTeamMutationSchema>;
