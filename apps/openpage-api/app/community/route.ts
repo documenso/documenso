@@ -3,7 +3,7 @@ import type { NextRequest } from 'next/server';
 import cors from '@/lib/cors';
 
 const paths = [
-  { path: '/total-prs', description: 'Total GitHub Forks' },
+  { path: '/total-prs', description: 'Total GitHub Merged PRs' },
   { path: '/total-stars', description: 'Total GitHub Stars' },
   { path: '/total-forks', description: 'Total GitHub Forks' },
   { path: '/total-issues', description: 'Total GitHub Issues' },

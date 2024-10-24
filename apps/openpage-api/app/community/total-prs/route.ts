@@ -8,7 +8,7 @@ export async function GET(request: Request) {
 
   return cors(
     request,
-    new Response(JSON.stringify({ 'total-stars': transformedData }), {
+    new Response(JSON.stringify(transformedData), {
       status: 200,
       headers: {
         'content-type': 'application/json',
