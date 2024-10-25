@@ -5,7 +5,8 @@ import { DOCUMENT_AUDIT_LOG_TYPE } from '@documenso/lib/types/document-audit-log
 import type { RequestMetadata } from '@documenso/lib/universal/extract-request-metadata';
 import { createDocumentAuditLogData } from '@documenso/lib/utils/document-audit-logs';
 import { prisma } from '@documenso/prisma';
-import { DocumentSource, WebhookTriggerEvents } from '@documenso/prisma/client';
+import { DocumentSource, DocumentVisibility, WebhookTriggerEvents } from '@documenso/prisma/client';
+import type { Team, TeamGlobalSettings, TeamMemberRole } from '@documenso/prisma/client';
 
 import { triggerWebhook } from '../webhooks/trigger/trigger-webhook';
 
@@ -48,6 +49,48 @@ export const createDocument = async ({
     throw new AppError(AppErrorCode.NOT_FOUND, 'Team not found');
   }
 
+  let team: Team & { teamGlobalSettings: TeamGlobalSettings | null };
+  let userTeamRole: TeamMemberRole;
+
+  if (teamId) {
+    const teamWithUserRole = await prisma.team.findFirstOrThrow({
+      where: {
+        id: teamId,
+      },
+      include: {
+        teamGlobalSettings: true,
+        members: {
+          where: {
+            userId: userId,
+          },
+          select: {
+            role: true,
+          },
+        },
+      },
+    });
+
+    team = teamWithUserRole;
+    userTeamRole = teamWithUserRole.members[0]?.role;
+  }
+
+  const determineVisibility = (
+    globalVisibility: DocumentVisibility | null | undefined,
+    userRole: TeamMemberRole,
+  ): DocumentVisibility => {
+    if (globalVisibility === DocumentVisibility.ADMIN) {
+      switch (userRole) {
+        case 'ADMIN':
+          return DocumentVisibility.ADMIN;
+        case 'MANAGER':
+          return DocumentVisibility.MANAGER_AND_ABOVE;
+        default:
+          return DocumentVisibility.EVERYONE;
+      }
+    }
+    return globalVisibility ?? DocumentVisibility.EVERYONE;
+  };
+
   return await prisma.$transaction(async (tx) => {
     const document = await tx.document.create({
       data: {
@@ -56,6 +99,7 @@ export const createDocument = async ({
         documentDataId,
         userId,
         teamId,
+        visibility: determineVisibility(team?.teamGlobalSettings?.documentVisibility, userTeamRole),
         formValues,
         source: DocumentSource.DOCUMENT,
       },
