@@ -1,7 +1,10 @@
 'use client';
 
+import { useRouter } from 'next/navigation';
+
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Trans } from '@lingui/macro';
+import { Trans, msg } from '@lingui/macro';
+import { useLingui } from '@lingui/react';
 import { useForm } from 'react-hook-form';
 import { match } from 'ts-pattern';
 import type { z } from 'zod';
@@ -24,6 +27,7 @@ import {
   FormLabel,
   FormMessage,
 } from '@documenso/ui/primitives/form/form';
+import { useToast } from '@documenso/ui/primitives/use-toast';
 
 const ZUpdateTeamGlobalSettings = ZUpdateTeamDocumentGlobalSettingsMutationSchema.pick({
   documentVisibility: true,
@@ -37,6 +41,10 @@ export type TeamDocumentSettingsProps = {
 };
 
 export const TeamDocumentSettings = ({ team }: TeamDocumentSettingsProps) => {
+  const { toast } = useToast();
+  const router = useRouter();
+  const { _ } = useLingui();
+
   const { mutateAsync: updateTeamDocumentGlobalSettings } =
     trpc.team.updateTeamDocumentGlobalSettings.useMutation();
 
@@ -51,12 +59,26 @@ export const TeamDocumentSettings = ({ team }: TeamDocumentSettingsProps) => {
   const isSubmitting = form.formState.isSubmitting;
 
   const onFormSubmit = async (data: TUpdateTeamGlobalSettings) => {
-    console.log('lol', { data });
+    try {
+      await updateTeamDocumentGlobalSettings({
+        ...data,
+        teamId: team.id,
+      });
 
-    await updateTeamDocumentGlobalSettings({
-      ...data,
-      teamId: team.id,
-    });
+      toast({
+        title: _(msg`Global Team Settings Updated`),
+        description: _(msg`Your global team document settings has been updated successfully.`),
+        duration: 5000,
+      });
+
+      router.refresh();
+    } catch (e) {
+      toast({
+        title: _(msg`Error updating global team settings`),
+        description: _(msg`An error occurred while updating the global team settings.`),
+        variant: 'destructive',
+      });
+    }
   };
 
   const mapVisibilityToRole = (visibility: string): string =>
