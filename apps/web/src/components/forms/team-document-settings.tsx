@@ -3,10 +3,11 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Trans } from '@lingui/macro';
 import { useForm } from 'react-hook-form';
+import { match } from 'ts-pattern';
 import type { z } from 'zod';
 
 import { DocumentVisibility } from '@documenso/lib/types/document-visibility';
-import type { Team } from '@documenso/prisma/client';
+import type { Team, TeamGlobalSettings } from '@documenso/prisma/client';
 import { trpc } from '@documenso/trpc/react';
 import { ZUpdateTeamDocumentGlobalSettingsMutationSchema } from '@documenso/trpc/server/team-router/schema';
 import {
@@ -32,7 +33,7 @@ const ZUpdateTeamGlobalSettings = ZUpdateTeamDocumentGlobalSettingsMutationSchem
 type TUpdateTeamGlobalSettings = z.infer<typeof ZUpdateTeamGlobalSettings>;
 
 export type TeamDocumentSettingsProps = {
-  team: Team;
+  team: Team & { teamGlobalSettings: TeamGlobalSettings };
 };
 
 export const TeamDocumentSettings = ({ team }: TeamDocumentSettingsProps) => {
@@ -58,17 +59,11 @@ export const TeamDocumentSettings = ({ team }: TeamDocumentSettingsProps) => {
     });
   };
 
-  const mapVisibilityToRole = (visibility: string): string => {
-    switch (visibility) {
-      case DocumentVisibility.ADMIN:
-        return 'ADMIN';
-      case DocumentVisibility.MANAGER_AND_ABOVE:
-        return 'MANAGER';
-      case DocumentVisibility.EVERYONE:
-      default:
-        return 'MEMBER';
-    }
-  };
+  const mapVisibilityToRole = (visibility: string): string =>
+    match(visibility)
+      .with(DocumentVisibility.ADMIN, () => 'ADMIN')
+      .with(DocumentVisibility.MANAGER_AND_ABOVE, () => 'MANAGER')
+      .otherwise(() => 'MEMBER');
 
   const currentVisibilityRole = mapVisibilityToRole(team.teamGlobalSettings.documentVisibility);
 

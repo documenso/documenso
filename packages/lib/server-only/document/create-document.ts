@@ -1,5 +1,7 @@
 'use server';
 
+import { match } from 'ts-pattern';
+
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import { DOCUMENT_AUDIT_LOG_TYPE } from '@documenso/lib/types/document-audit-logs';
 import type { RequestMetadata } from '@documenso/lib/universal/extract-request-metadata';
@@ -77,19 +79,15 @@ export const createDocument = async ({
   const determineVisibility = (
     globalVisibility: DocumentVisibility | null | undefined,
     userRole: TeamMemberRole,
-  ): DocumentVisibility => {
-    if (globalVisibility === DocumentVisibility.ADMIN) {
-      switch (userRole) {
-        case 'ADMIN':
-          return DocumentVisibility.ADMIN;
-        case 'MANAGER':
-          return DocumentVisibility.MANAGER_AND_ABOVE;
-        default:
-          return DocumentVisibility.EVERYONE;
-      }
-    }
-    return globalVisibility ?? DocumentVisibility.EVERYONE;
-  };
+  ): DocumentVisibility =>
+    match({ globalVisibility, userRole })
+      .with({ globalVisibility: DocumentVisibility.ADMIN }, ({ userRole }) =>
+        match(userRole)
+          .with('ADMIN', () => DocumentVisibility.ADMIN)
+          .with('MANAGER', () => DocumentVisibility.MANAGER_AND_ABOVE)
+          .otherwise(() => DocumentVisibility.EVERYONE),
+      )
+      .otherwise(({ globalVisibility }) => globalVisibility ?? DocumentVisibility.EVERYONE);
 
   return await prisma.$transaction(async (tx) => {
     const document = await tx.document.create({
