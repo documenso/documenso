@@ -98,6 +98,13 @@ export const TeamDocumentSettings = ({ team }: TeamDocumentSettingsProps) => {
                     />
                   </FormControl>
 
+                  <p className="text-muted-foreground text-xs">
+                    <Trans>
+                      The document visibility defaults to the role of the user who uploads the
+                      document.
+                    </Trans>
+                  </p>
+
                   <FormMessage />
                 </FormItem>
               )}
