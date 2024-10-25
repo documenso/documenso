@@ -20,8 +20,6 @@ export default async function TeamDocumentSettingsPage({ params }: TeamDocumentS
   const { user } = await getRequiredServerComponentSession();
   const team = await getTeamByUrl({ userId: user.id, teamUrl });
 
-  console.log({ team });
-
   return (
     <div>
       <SettingsHeader

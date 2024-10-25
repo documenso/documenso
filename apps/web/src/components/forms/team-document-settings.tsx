@@ -9,7 +9,7 @@ import { useForm } from 'react-hook-form';
 import { match } from 'ts-pattern';
 import type { z } from 'zod';
 
-import { DocumentVisibility } from '@documenso/lib/types/document-visibility';
+import { DocumentVisibility } from '@documenso/prisma/client';
 import type { Team, TeamGlobalSettings } from '@documenso/prisma/client';
 import { trpc } from '@documenso/trpc/react';
 import { ZUpdateTeamDocumentGlobalSettingsMutationSchema } from '@documenso/trpc/server/team-router/schema';
@@ -37,7 +37,7 @@ const ZUpdateTeamGlobalSettings = ZUpdateTeamDocumentGlobalSettingsMutationSchem
 type TUpdateTeamGlobalSettings = z.infer<typeof ZUpdateTeamGlobalSettings>;
 
 export type TeamDocumentSettingsProps = {
-  team: Team & { teamGlobalSettings: TeamGlobalSettings };
+  team: Team & { teamGlobalSettings: TeamGlobalSettings | null };
 };
 
 export const TeamDocumentSettings = ({ team }: TeamDocumentSettingsProps) => {
@@ -50,8 +50,8 @@ export const TeamDocumentSettings = ({ team }: TeamDocumentSettingsProps) => {
 
   const form = useForm<TUpdateTeamGlobalSettings>({
     values: {
-      documentVisibility: team.teamGlobalSettings.documentVisibility ?? '',
-      includeSenderDetails: team.teamGlobalSettings.includeSenderDetails ?? '',
+      documentVisibility: team?.teamGlobalSettings?.documentVisibility,
+      includeSenderDetails: team?.teamGlobalSettings?.includeSenderDetails,
     },
     resolver: zodResolver(ZUpdateTeamGlobalSettings),
   });
@@ -81,13 +81,15 @@ export const TeamDocumentSettings = ({ team }: TeamDocumentSettingsProps) => {
     }
   };
 
-  const mapVisibilityToRole = (visibility: string): string =>
+  const mapVisibilityToRole = (visibility: DocumentVisibility): DocumentVisibility =>
     match(visibility)
-      .with(DocumentVisibility.ADMIN, () => 'ADMIN')
-      .with(DocumentVisibility.MANAGER_AND_ABOVE, () => 'MANAGER')
-      .otherwise(() => 'MEMBER');
+      .with(DocumentVisibility.ADMIN, () => DocumentVisibility.ADMIN)
+      .with(DocumentVisibility.MANAGER_AND_ABOVE, () => DocumentVisibility.MANAGER_AND_ABOVE)
+      .otherwise(() => DocumentVisibility.EVERYONE);
 
-  const currentVisibilityRole = mapVisibilityToRole(team.teamGlobalSettings.documentVisibility);
+  const currentVisibilityRole = mapVisibilityToRole(
+    team?.teamGlobalSettings?.documentVisibility ?? DocumentVisibility.EVERYONE,
+  );
 
   return (
     <div>

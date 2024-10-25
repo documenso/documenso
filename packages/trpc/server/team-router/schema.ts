@@ -192,8 +192,8 @@ export const ZResendTeamMemberInvitationMutationSchema = z.object({
 
 export const ZUpdateTeamDocumentGlobalSettingsMutationSchema = z.object({
   teamId: z.number(),
-  documentVisibility: z.nativeEnum(DocumentVisibility),
-  includeSenderDetails: z.boolean(),
+  documentVisibility: z.nativeEnum(DocumentVisibility).optional(),
+  includeSenderDetails: z.boolean().optional(),
 });
 
 export type TUpdateTeamDocumentGlobalSettingsMutationSchema = z.infer<
