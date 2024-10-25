@@ -11,6 +11,7 @@
     "copy:pdfjs": "node ../../scripts/copy-pdfjs.cjs"
   },
   "dependencies": {
+    "@documenso/prisma": "*",
     "next": "14.2.6"
   },
   "devDependencies": {

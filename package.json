@@ -2,7 +2,7 @@
   "private": true,
   "version": "1.7.2-rc.1",
   "scripts": {
-    "build": "turbo run build",
+    "build": "turbo run build --no-cache --force",
     "build:web": "turbo run build --filter=@documenso/web",
     "dev": "turbo run dev --filter=@documenso/web",
     "dev:web": "turbo run dev --filter=@documenso/web",
