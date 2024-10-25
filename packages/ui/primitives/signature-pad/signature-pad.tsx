@@ -3,12 +3,15 @@
 import type { HTMLAttributes, MouseEvent, PointerEvent, TouchEvent } from 'react';
 import { useEffect, useMemo, useRef, useState } from 'react';
 
+import { Caveat } from 'next/font/google';
+
 import { Trans } from '@lingui/macro';
 import { Undo2 } from 'lucide-react';
 import type { StrokeOptions } from 'perfect-freehand';
 import { getStroke } from 'perfect-freehand';
 
 import { unsafe_useEffectOnce } from '@documenso/lib/client-only/hooks/use-effect-once';
+import { Input } from '@documenso/ui/primitives/input';
 import {
   Select,
   SelectContent,
@@ -21,12 +24,20 @@ import { cn } from '../../lib/utils';
 import { getSvgPathFromStroke } from './helper';
 import { Point } from './point';
 
+const fontCaveat = Caveat({
+  weight: ['500'],
+  subsets: ['latin'],
+  display: 'swap',
+  variable: '--font-caveat',
+});
+
 const DPI = 2;
 
 export type SignaturePadProps = Omit<HTMLAttributes<HTMLCanvasElement>, 'onChange'> & {
   onChange?: (_signatureDataUrl: string | null) => void;
   containerClassName?: string;
   disabled?: boolean;
+  allowTypedSignature?: boolean;
 };
 
 export const SignaturePad = ({
@@ -35,6 +46,7 @@ export const SignaturePad = ({
   defaultValue,
   onChange,
   disabled = false,
+  allowTypedSignature,
   ...props
 }: SignaturePadProps) => {
   const $el = useRef<HTMLCanvasElement>(null);
@@ -44,6 +56,7 @@ export const SignaturePad = ({
   const [lines, setLines] = useState<Point[][]>([]);
   const [currentLine, setCurrentLine] = useState<Point[]>([]);
   const [selectedColor, setSelectedColor] = useState('black');
+  const [typedSignature, setTypedSignature] = useState('');
 
   const perfectFreehandOptions = useMemo(() => {
     const size = $el.current ? Math.min($el.current.height, $el.current.width) * 0.03 : 10;
@@ -181,34 +194,107 @@ export const SignaturePad = ({
 
     onChange?.(null);
 
+    setTypedSignature('');
     setLines([]);
     setCurrentLine([]);
   };
 
+  const renderTypedSignature = () => {
+    if ($el.current && typedSignature) {
+      const ctx = $el.current.getContext('2d');
+
+      if (ctx) {
+        const canvasWidth = $el.current.width;
+        const canvasHeight = $el.current.height;
+
+        ctx.clearRect(0, 0, canvasWidth, canvasHeight);
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillStyle = selectedColor;
+
+        // Calculate the desired width (25ch)
+        const desiredWidth = canvasWidth * 0.85; // 85% of canvas width
+
+        // Start with a base font size
+        let fontSize = 18;
+        ctx.font = `${fontSize}px ${fontCaveat.style.fontFamily}`;
+
+        // Measure 10 characters and calculate scale factor
+        const characterWidth = ctx.measureText('m'.repeat(10)).width;
+        const scaleFactor = desiredWidth / characterWidth;
+
+        // Apply scale factor to font size
+        fontSize = fontSize * scaleFactor;
+
+        // Adjust font size if it exceeds canvas width
+        ctx.font = `${fontSize}px ${fontCaveat.style.fontFamily}`;
+
+        const textWidth = ctx.measureText(typedSignature).width;
+
+        if (textWidth > desiredWidth) {
+          fontSize = fontSize * (desiredWidth / textWidth);
+        }
+
+        // Set final font and render text
+        ctx.font = `${fontSize}px ${fontCaveat.style.fontFamily}`;
+        ctx.fillText(typedSignature, canvasWidth / 2, canvasHeight / 2);
+      }
+    }
+  };
+
+  const handleTypedSignatureChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const newValue = event.target.value;
+    setTypedSignature(newValue);
+
+    if (newValue.trim() !== '') {
+      onChange?.($el.current?.toDataURL() || null);
+    } else {
+      onChange?.(null);
+    }
+  };
+
+  useEffect(() => {
+    if (typedSignature.trim() !== '') {
+      renderTypedSignature();
+      onChange?.($el.current?.toDataURL() || null);
+    } else {
+      onClearClick();
+    }
+  }, [typedSignature, selectedColor]);
+
   const onUndoClick = () => {
-    if (lines.length === 0) {
+    if (lines.length === 0 && typedSignature.length === 0) {
       return;
     }
 
-    const newLines = lines.slice(0, -1);
-    setLines(newLines);
+    if (typedSignature.length > 0) {
+      const newTypedSignature = typedSignature.slice(0, -1);
+      setTypedSignature(newTypedSignature);
+      // You might want to call onChange here as well
+      // onChange?.(newTypedSignature);
+    } else {
+      const newLines = lines.slice(0, -1);
+      setLines(newLines);
 
-    // Clear the canvas
-    if ($el.current) {
-      const ctx = $el.current.getContext('2d');
-      const { width, height } = $el.current;
-      ctx?.clearRect(0, 0, width, height);
+      // Clear and redraw the canvas
+      if ($el.current) {
+        const ctx = $el.current.getContext('2d');
+        const { width, height } = $el.current;
+        ctx?.clearRect(0, 0, width, height);
 
-      if (typeof defaultValue === 'string' && $imageData.current) {
-        ctx?.putImageData($imageData.current, 0, 0);
+        if (typeof defaultValue === 'string' && $imageData.current) {
+          ctx?.putImageData($imageData.current, 0, 0);
+        }
+
+        newLines.forEach((line) => {
+          const pathData = new Path2D(
+            getSvgPathFromStroke(getStroke(line, perfectFreehandOptions)),
+          );
+          ctx?.fill(pathData);
+        });
+
+        onChange?.($el.current.toDataURL());
       }
-
-      newLines.forEach((line) => {
-        const pathData = new Path2D(getSvgPathFromStroke(getStroke(line, perfectFreehandOptions)));
-        ctx?.fill(pathData);
-      });
-
-      onChange?.($el.current.toDataURL());
     }
   };
 
@@ -263,6 +349,21 @@ export const SignaturePad = ({
         {...props}
       />
 
+      {allowTypedSignature && (
+        <div
+          className={cn('ml-4 pb-1', {
+            'ml-10': lines.length > 0 || typedSignature.length > 0,
+          })}
+        >
+          <Input
+            placeholder="Type your signature"
+            className="w-1/2 border-none p-0 focus-visible:outline-none focus-visible:ring-0 focus-visible:ring-offset-0"
+            value={typedSignature}
+            onChange={handleTypedSignatureChange}
+          />
+        </div>
+      )}
+
       <div className="text-foreground absolute right-2 top-2 filter">
         <Select defaultValue={selectedColor} onValueChange={(value) => setSelectedColor(value)}>
           <SelectTrigger className="h-auto w-auto border-none p-0.5">
@@ -311,13 +412,13 @@ export const SignaturePad = ({
         </button>
       </div>
 
-      {lines.length > 0 && (
+      {(lines.length > 0 || typedSignature.length > 0) && (
         <div className="absolute bottom-4 left-4 flex gap-2">
           <button
             type="button"
             title="undo"
             className="focus-visible:ring-ring ring-offset-background text-muted-foreground/60 hover:text-muted-foreground rounded-full p-0 text-[0.688rem] focus-visible:outline-none focus-visible:ring-2"
-            onClick={() => onUndoClick()}
+            onClick={onUndoClick}
           >
             <Undo2 className="h-4 w-4" />
             <span className="sr-only">Undo</span>

@@ -112,7 +112,6 @@ test('[DIRECT_TEMPLATES]: toggle direct template link', async ({ page }) => {
     await page.getByRole('switch').click();
     await page.getByRole('button', { name: 'Save' }).click();
     await expect(page.getByText('Direct link signing has been').first()).toBeVisible();
-    await page.getByLabel('Direct Link Signing', { exact: true }).press('Escape');
 
     // Check that the direct template link is no longer accessible.
     await page.goto(formatDirectTemplatePath(template.directLink?.token || ''));

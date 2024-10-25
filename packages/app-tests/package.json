@@ -5,9 +5,9 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test:dev": "playwright test",
-    "test-ui:dev": "playwright test --ui",
-    "test:e2e": "start-server-and-test \"npm run start -w @documenso/web\" http://localhost:3000 \"playwright test\""
+    "test:dev": "NODE_OPTIONS=--experimental-require-module playwright test",
+    "test-ui:dev": "NODE_OPTIONS=--experimental-require-module playwright test --ui",
+    "test:e2e": "NODE_OPTIONS=--experimental-require-module start-server-and-test \"npm run start -w @documenso/web\" http://localhost:3000 \"playwright test\""
   },
   "keywords": [],
   "author": "",
