@@ -152,7 +152,7 @@ export const TeamDocumentSettings = ({ team }: TeamDocumentSettingsProps) => {
                     <Trans>
                       If enabled, the email will contain the sender details (
                       <span className="italic">
-                        User on behalf of team has invited you to sign the document [...]"
+                        "User on behalf of team has invited you to sign the document [...]"
                       </span>
                       )
                     </Trans>
