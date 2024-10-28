@@ -5,7 +5,7 @@
   "license": "AGPL-3.0",
   "scripts": {
     "dev": "next dev -p 3000",
-    "build": "turbo run translate:extract && turbo run translate:compile && next build",
+    "build": "npm run translate:extract --prefix ../../ && turbo run translate:compile && next build",
     "start": "next start",
     "lint": "next lint",
     "e2e:prepare": "next build && next start",
