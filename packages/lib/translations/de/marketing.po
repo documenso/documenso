@@ -160,10 +160,6 @@ msgstr "Dokumentation"
 msgid "Easily embed Documenso into your product. Simply copy and paste our react widget into your application."
 msgstr "Betten Sie Documenso ganz einfach in Ihr Produkt ein. Kopieren und fügen Sie einfach unser React-Widget in Ihre Anwendung ein."
 
-#: apps/marketing/src/components/(marketing)/share-connect-paid-widget-bento.tsx:42
-#~ msgid "Easy Sharing (Soon)."
-#~ msgstr "Easy Sharing (Soon)."
-
 #: apps/marketing/src/components/(marketing)/share-connect-paid-widget-bento.tsx:46
 msgid "Easy Sharing."
 msgstr "Einfaches Teilen."
@@ -377,17 +373,9 @@ msgstr "Unsere benutzerdefinierten Vorlagen verfügen über intelligente Regeln,
 msgid "Our Enterprise License is great for large organizations looking to switch to Documenso for all their signing needs. It's available for our cloud offering as well as self-hosted setups and offers a wide range of compliance and Adminstration Features."
 msgstr "Unsere Enterprise-Lizenz ist ideal für große Organisationen, die auf Documenso für all ihre Signaturanforderungen umsteigen möchten. Sie ist sowohl für unser Cloud-Angebot als auch für selbstgehostete Setups verfügbar und bietet eine breite Palette an Compliance- und Verwaltungsfunktionen."
 
-#: apps/marketing/src/components/(marketing)/enterprise.tsx:20
-#~ msgid "Our Enterprise License is great large organizations looking to switch to Documenso for all their signing needs. It's availible for our cloud offering as well as self-hosted setups and offer a wide range of compliance and Adminstration Features."
-#~ msgstr "Our Enterprise License is great large organizations looking to switch to Documenso for all their signing needs. It's availible for our cloud offering as well as self-hosted setups and offer a wide range of compliance and Adminstration Features."
-
 #: apps/marketing/src/app/(marketing)/pricing/page.tsx:65
 msgid "Our self-hosted option is great for small teams and individuals who need a simple solution. You can use our docker based setup to get started in minutes. Take control with full customizability and data ownership."
 msgstr "Unsere selbstgehostete Option ist ideal für kleine Teams und Einzelpersonen, die eine einfache Lösung benötigen. Sie können unser docker-basiertes Setup verwenden, um in wenigen Minuten loszulegen. Übernehmen Sie die Kontrolle mit vollständiger Anpassbarkeit und Datenhoheit."
-
-#: apps/marketing/src/app/(marketing)/open/data.ts:25
-#~ msgid "Part-Time"
-#~ msgstr "Part-Time"
 
 #: apps/marketing/src/components/(marketing)/pricing-table.tsx:151
 msgid "Premium Profile Name"
@@ -429,10 +417,6 @@ msgstr "Gehalt"
 #: apps/marketing/src/components/(marketing)/pricing-table.tsx:62
 msgid "Save $60 or $120"
 msgstr "Sparen Sie $60 oder $120"
-
-#: apps/marketing/src/components/(marketing)/i18n-switcher.tsx:47
-#~ msgid "Search languages..."
-#~ msgstr "Search languages..."
 
 #: apps/marketing/src/app/(marketing)/pricing/page.tsx:109
 msgid "Securely. Our data centers are located in Frankfurt (Germany), giving us the best local privacy laws. We are very aware of the sensitive nature of our data and follow best practices to ensure the security and integrity of the data entrusted to us."
@@ -618,4 +602,3 @@ msgstr "Sie können Documenso kostenlos selbst hosten oder unsere sofort einsatz
 #: apps/marketing/src/components/(marketing)/carousel.tsx:272
 msgid "Your browser does not support the video tag."
 msgstr "Ihr Browser unterstützt das Video-Tag nicht."
-
