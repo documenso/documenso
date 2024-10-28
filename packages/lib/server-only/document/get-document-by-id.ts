@@ -143,11 +143,18 @@ export const getDocumentWhereInput = async ({
       ])
       .otherwise(() => [{ visibility: DocumentVisibility.EVERYONE }]),
     {
-      Recipient: {
-        some: {
-          email: user.email,
+      OR: [
+        {
+          Recipient: {
+            some: {
+              email: user.email,
+            },
+          },
         },
-      },
+        {
+          userId: user.id,
+        },
+      ],
     },
   ];
 

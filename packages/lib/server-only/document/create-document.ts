@@ -1,14 +1,13 @@
 'use server';
 
-import { match } from 'ts-pattern';
-
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import { DOCUMENT_AUDIT_LOG_TYPE } from '@documenso/lib/types/document-audit-logs';
 import type { RequestMetadata } from '@documenso/lib/universal/extract-request-metadata';
 import { createDocumentAuditLogData } from '@documenso/lib/utils/document-audit-logs';
 import { prisma } from '@documenso/prisma';
 import { DocumentSource, DocumentVisibility, WebhookTriggerEvents } from '@documenso/prisma/client';
-import type { Team, TeamGlobalSettings, TeamMemberRole } from '@documenso/prisma/client';
+import type { Team, TeamGlobalSettings } from '@documenso/prisma/client';
+import { TeamMemberRole } from '@documenso/prisma/client';
 
 import { triggerWebhook } from '../webhooks/trigger/trigger-webhook';
 
@@ -51,8 +50,8 @@ export const createDocument = async ({
     throw new AppError(AppErrorCode.NOT_FOUND, 'Team not found');
   }
 
-  let team: Team & { teamGlobalSettings: TeamGlobalSettings | null };
-  let userTeamRole: TeamMemberRole;
+  let team: (Team & { teamGlobalSettings: TeamGlobalSettings | null }) | null = null;
+  let userTeamRole: TeamMemberRole | undefined;
 
   if (teamId) {
     const teamWithUserRole = await prisma.team.findFirstOrThrow({
@@ -79,15 +78,17 @@ export const createDocument = async ({
   const determineVisibility = (
     globalVisibility: DocumentVisibility | null | undefined,
     userRole: TeamMemberRole,
-  ): DocumentVisibility =>
-    match({ globalVisibility, userRole })
-      .with({ globalVisibility: DocumentVisibility.ADMIN }, ({ userRole }) =>
-        match(userRole)
-          .with('ADMIN', () => DocumentVisibility.ADMIN)
-          .with('MANAGER', () => DocumentVisibility.MANAGER_AND_ABOVE)
-          .otherwise(() => DocumentVisibility.EVERYONE),
-      )
-      .otherwise(({ globalVisibility }) => globalVisibility ?? DocumentVisibility.EVERYONE);
+  ): DocumentVisibility => {
+    if (globalVisibility === DocumentVisibility.EVERYONE) {
+      return userRole === 'ADMIN'
+        ? DocumentVisibility.ADMIN
+        : userRole === 'MANAGER'
+        ? DocumentVisibility.MANAGER_AND_ABOVE
+        : DocumentVisibility.EVERYONE;
+    }
+
+    return globalVisibility ?? DocumentVisibility.EVERYONE;
+  };
 
   return await prisma.$transaction(async (tx) => {
     const document = await tx.document.create({
@@ -97,7 +98,10 @@ export const createDocument = async ({
         documentDataId,
         userId,
         teamId,
-        visibility: determineVisibility(team?.teamGlobalSettings?.documentVisibility, userTeamRole),
+        visibility: determineVisibility(
+          team?.teamGlobalSettings?.documentVisibility,
+          userTeamRole ?? TeamMemberRole.MEMBER,
+        ),
         formValues,
         source: DocumentSource.DOCUMENT,
       },
