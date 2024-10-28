@@ -9,9 +9,10 @@ import { useSession } from 'next-auth/react';
 import { useForm } from 'react-hook-form';
 
 import { useAnalytics } from '@documenso/lib/client-only/hooks/use-analytics';
+import type { DocumentAndSender } from '@documenso/lib/server-only/document/get-document-by-token';
 import type { TRecipientActionAuth } from '@documenso/lib/types/document-auth';
 import { sortFieldsByPosition, validateFieldsInserted } from '@documenso/lib/utils/fields';
-import { type Document, type Field, type Recipient, RecipientRole } from '@documenso/prisma/client';
+import { type Field, type Recipient, RecipientRole } from '@documenso/prisma/client';
 import { trpc } from '@documenso/trpc/react';
 import { FieldToolTip } from '@documenso/ui/components/field/field-tooltip';
 import { cn } from '@documenso/ui/lib/utils';
@@ -25,7 +26,7 @@ import { useRequiredSigningContext } from './provider';
 import { SignDialog } from './sign-dialog';
 
 export type SigningFormProps = {
-  document: Document;
+  document: DocumentAndSender;
   recipient: Recipient;
   fields: Field[];
   redirectUrl?: string | null;
@@ -196,6 +197,7 @@ export const SigningForm = ({
                           onChange={(value) => {
                             setSignature(value);
                           }}
+                          allowTypedSignature={document.documentMeta?.typedSignatureEnabled}
                         />
                       </CardContent>
                     </Card>
