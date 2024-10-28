@@ -10,6 +10,7 @@ import { nanoid } from '@documenso/lib/universal/id';
 import { prisma } from '@documenso/prisma';
 import type { Field, Signature } from '@documenso/prisma/client';
 import {
+  DocumentSigningOrder,
   DocumentSource,
   DocumentStatus,
   FieldType,
@@ -142,6 +143,7 @@ export const createDocumentFromDirectTemplate = async ({
   const metaDateFormat = template.templateMeta?.dateFormat || DEFAULT_DOCUMENT_DATE_FORMAT;
   const metaEmailMessage = template.templateMeta?.message || '';
   const metaEmailSubject = template.templateMeta?.subject || '';
+  const metaSigningOrder = template.templateMeta?.signingOrder || DocumentSigningOrder.PARALLEL;
 
   // Associate, validate and map to a query every direct template recipient field with the provided fields.
   const createDirectRecipientFieldArgs = await Promise.all(
@@ -256,6 +258,7 @@ export const createDocumentFromDirectTemplate = async ({
                   recipient.role === RecipientRole.CC
                     ? SigningStatus.SIGNED
                     : SigningStatus.NOT_SIGNED,
+                signingOrder: recipient.signingOrder,
                 token: nanoid(),
               };
             }),
@@ -267,6 +270,7 @@ export const createDocumentFromDirectTemplate = async ({
             dateFormat: metaDateFormat,
             message: metaEmailMessage,
             subject: metaEmailSubject,
+            signingOrder: metaSigningOrder,
           },
         },
       },
@@ -330,6 +334,7 @@ export const createDocumentFromDirectTemplate = async ({
         signingStatus: SigningStatus.SIGNED,
         sendStatus: SendStatus.SENT,
         signedAt: initialRequestTime,
+        signingOrder: directTemplateRecipient.signingOrder,
         Field: {
           createMany: {
             data: directTemplateNonSignatureFields.map(({ templateField, customText }) => ({
