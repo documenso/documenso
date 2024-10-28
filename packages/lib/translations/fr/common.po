@@ -405,24 +405,16 @@ msgstr "Je suis un approuveur de ce document"
 
 #: packages/lib/constants/recipient-roles.ts:74
 msgid "I am required to receive a copy of this document"
-msgstr "Je dois recevoir une copie de ce document"
+msgstr "Je dois recevoir une copie de ce document<<<<<<< HEAD"
 
-<<<<<<< HEAD
 #: packages/lib/constants/recipient-roles.ts:74
 #~ msgid "I am required to recieve a copy of this document"
-#~ msgstr "I am required to recieve a copy of this document"
+#~ msgstr "I am required to recieve a copy of this document=======>>>>>>> main"
 
 #: packages/ui/components/document/document-status.tsx:40
 msgid "Inbox"
-msgstr ""
+msgstr "||||||| e0c948c2"
 
-||||||| e0c948c2
-#: packages/lib/constants/recipient-roles.ts:74
-#~ msgid "I am required to recieve a copy of this document"
-#~ msgstr "I am required to recieve a copy of this document"
-
-=======
->>>>>>> main
 #: packages/ui/components/recipient/recipient-action-auth-select.tsx:29
 #: packages/ui/components/recipient/recipient-action-auth-select.tsx:87
 msgid "Inherit authentication method"
@@ -536,7 +528,7 @@ msgstr "Mot de passe requis"
 msgid "Pending"
 msgstr ""
 
-#: packages/ui/primitives/document-flow/field-items-advanced-settings/checkbox-field.tsx:154
+#: packages/ui/primitives/document-flow/field-items-advanced-settings/checkbox-field.tsx:156
 msgid "Pick a number"
 msgstr "Choisissez un numéro"
 
@@ -652,21 +644,13 @@ msgstr "Afficher les paramètres avancés"
 #: packages/lib/constants/recipient-roles.ts:20
 #: packages/ui/components/document/next-inbox-item-button.tsx:107
 msgid "Sign"
-msgstr "Signer"
+msgstr "Signer<<<<<<< HEAD"
 
-<<<<<<< HEAD
 #: packages/ui/components/document/next-inbox-item-button.tsx:70
 msgid "Sign Next Document"
 msgstr ""
 
-#: packages/ui/primitives/document-flow/add-fields.tsx:742
-||||||| f05b670d
-#: packages/ui/primitives/document-flow/add-fields.tsx:742
-||||||| e0c948c2
-#: packages/ui/primitives/document-flow/add-fields.tsx:785
-=======
 #: packages/ui/primitives/document-flow/add-fields.tsx:818
->>>>>>> main
 #: packages/ui/primitives/document-flow/add-signature.tsx:323
 #: packages/ui/primitives/document-flow/field-icon.tsx:52
 #: packages/ui/primitives/template-flow/add-template-fields.tsx:580
