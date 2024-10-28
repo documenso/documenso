@@ -117,13 +117,6 @@ export const TeamDocumentSettings = ({ team }: TeamDocumentSettingsProps) => {
                     />
                   </FormControl>
 
-                  <p className="text-muted-foreground text-xs">
-                    <Trans>
-                      The document visibility defaults to the role of the user who uploads the
-                      document.
-                    </Trans>
-                  </p>
-
                   <FormMessage />
                 </FormItem>
               )}
@@ -147,16 +140,6 @@ export const TeamDocumentSettings = ({ team }: TeamDocumentSettingsProps) => {
                       />
                     </FormControl>
                   </div>
-
-                  <p className="text-muted-foreground text-xs">
-                    <Trans>
-                      If enabled, the email will contain the sender details (
-                      <span className="italic">
-                        "User on behalf of team has invited you to sign the document [...]"
-                      </span>
-                      )
-                    </Trans>
-                  </p>
 
                   <FormMessage />
                 </FormItem>

@@ -3,22 +3,33 @@ title: Document Visibility
 description: Learn how to control the visibility of your team documents.
 ---
 
+import { Callout } from 'nextra/components';
+
 # Team's Document Visibility
 
-The default document visibility is automatically set to the role of the user who created the document:
-
-- If a user with the "User" role creates a document, the document's visibility is set to "Everyone".
-- If a user with the "Manager" role creates a document, the document's visibility is set to
-  "Managers and above".
-- If a user with the "Admin" role creates a document, the document's
-  visibility is set to "Admin only".
-
-However, you can control the visibility of your documents by changing the document's visibility settings. To set the visibility of a document, click on the **Document visibility** dropdown in the document's settings panel.
-
-![A screenshot of the Documenso's document editor page where you can update the document visibility](/teams/document-visibility-settings.webp)
-
-The document visibility can be set to one of the following options:
+The default document visibility option allows you to control who can view and access the documents uploaded to your team account. The document visibility can be set to one of the following options:
 
 - **Everyone** - The document is visible to all team members.
 - **Managers and above** - The document is visible to people with the role of Manager or above.
 - **Admin only** - The document is only visible to the team's admins.
+
+![A screenshot of the Documenso's document editor page where you can update the document visibility](/teams/document-visibility-settings.webp)
+
+If you don't set a default visibility option in the [team global settings](/users/teams/global-settings), the visibility of a document is determined by the role of the user who created the document. Here's how it works:
+
+- If a user with the "Member" role creates a document, the document's visibility is set to "Everyone".
+- If a user with the "Manager" role creates a document, the document's visibility is set to "Managers and above".
+- If a user with the "Admin" role creates a document, the document's visibility is set to "Admins only".
+
+You can change the visibility of a document at any time by editing the document and selecting a different visibility option.
+
+<Callout type="warning">
+  Updating the default document visibility will not affect the visibility of existing documents. You
+  will need to update the visibility of each document individually.
+</Callout>
+
+## A Note on Document Access
+
+The `document owner` (the user who created the document) always has access to the document, regardless of the document's visibility settings. This means that even if a document is set to "Admins only", the document owner can still view and edit the document.
+
+The `recipient` (the user who receives the document for signature, approval, etc.) also has access to the document, regardless of the document's visibility settings. This means that even if a document is set to "Admins only", the recipient can still view and sign the document.
