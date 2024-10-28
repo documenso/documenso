@@ -51,6 +51,11 @@ export const findTemplates = async ({
         },
         Field: true,
         Recipient: true,
+        templateMeta: {
+          select: {
+            signingOrder: true,
+          },
+        },
         directLink: {
           select: {
             token: true,
