@@ -35,18 +35,15 @@ export const DocumentVisibilitySelect = forwardRef<HTMLButtonElement, DocumentVi
           <SelectItem value={DocumentVisibility.EVERYONE}>
             {DOCUMENT_VISIBILITY.EVERYONE.value}
           </SelectItem>
-
-          {(currentMemberRole === 'ADMIN' || currentMemberRole === 'MANAGER' || isTeamSettings) && (
-            <SelectItem value={DocumentVisibility.MANAGER_AND_ABOVE}>
-              {DOCUMENT_VISIBILITY.MANAGER_AND_ABOVE.value}
-            </SelectItem>
-          )}
-
-          {(currentMemberRole === 'ADMIN' || isTeamSettings) && (
-            <SelectItem value={DocumentVisibility.ADMIN}>
-              {DOCUMENT_VISIBILITY.ADMIN.value}
-            </SelectItem>
-          )}
+          <SelectItem value={DocumentVisibility.MANAGER_AND_ABOVE} disabled={!canUpdateVisibility}>
+            {DOCUMENT_VISIBILITY.MANAGER_AND_ABOVE.value}
+          </SelectItem>
+          <SelectItem
+            value={DocumentVisibility.ADMIN}
+            disabled={currentMemberRole !== 'ADMIN' && !isTeamSettings}
+          >
+            {DOCUMENT_VISIBILITY.ADMIN.value}
+          </SelectItem>
         </SelectContent>
       </Select>
     );
