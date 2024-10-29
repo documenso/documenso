@@ -446,6 +446,10 @@ msgstr "An error occurred while trying to create a checkout session."
 msgid "An error occurred while updating the document settings."
 msgstr "An error occurred while updating the document settings."
 
+#: apps/web/src/components/forms/team-document-settings.tsx:78
+msgid "An error occurred while updating the global team settings."
+msgstr "An error occurred while updating the global team settings."
+
 #: apps/web/src/app/(signing)/sign/[token]/checkbox-field.tsx:213
 msgid "An error occurred while updating the signature."
 msgstr "An error occurred while updating the signature."
@@ -682,6 +686,10 @@ msgstr "Cancelled by user"
 #: apps/web/src/app/(dashboard)/admin/stats/page.tsx:132
 msgid "Charts"
 msgstr "Charts"
+
+#: apps/web/src/app/(teams)/t/[teamUrl]/settings/documents/page.tsx:32
+msgid "Check out the documentaton for the <0>global team settings</0>."
+msgstr "Check out the documentaton for the <0>global team settings</0>."
 
 #: apps/web/src/components/(teams)/dialogs/create-team-checkout-dialog.tsx:179
 msgid "Checkout"
@@ -1008,6 +1016,10 @@ msgstr "Decline"
 msgid "Declined team invitation"
 msgstr "Declined team invitation"
 
+#: apps/web/src/components/forms/team-document-settings.tsx:108
+msgid "Default Document Visibility"
+msgstr "Default Document Visibility"
+
 #: apps/web/src/app/(dashboard)/documents/[id]/document-page-view-dropdown.tsx:141
 #: apps/web/src/app/(dashboard)/documents/data-table-action-dropdown.tsx:187
 #: apps/web/src/app/(dashboard)/documents/delete-document-dialog.tsx:200
@@ -1252,7 +1264,7 @@ msgstr "Document resealed"
 msgid "Document sent"
 msgstr "Document sent"
 
-#: apps/web/src/app/(teams)/t/[teamUrl]/settings/documents/page.tsx:28
+#: apps/web/src/app/(teams)/t/[teamUrl]/settings/documents/page.tsx:26
 msgid "Document Settings"
 msgstr "Document Settings"
 
@@ -1300,8 +1312,6 @@ msgstr "Document will be permanently deleted"
 #: apps/web/src/components/(dashboard)/common/command-menu.tsx:205
 #: apps/web/src/components/(dashboard)/layout/desktop-nav.tsx:18
 #: apps/web/src/components/(dashboard)/layout/mobile-navigation.tsx:35
-#: apps/web/src/components/(teams)/settings/layout/desktop-nav.tsx:57
-#: apps/web/src/components/(teams)/settings/layout/mobile-nav.tsx:65
 #: apps/web/src/components/ui/user-profile-timur.tsx:60
 msgid "Documents"
 msgstr "Documents"
@@ -1508,6 +1518,10 @@ msgstr "Enter your text here"
 msgid "Error"
 msgstr "Error"
 
+#: apps/web/src/components/forms/team-document-settings.tsx:77
+msgid "Error updating global team settings"
+msgstr "Error updating global team settings"
+
 #: apps/web/src/app/(signing)/sign/[token]/complete/page.tsx:142
 msgid "Everyone has signed"
 msgstr "Everyone has signed"
@@ -1574,6 +1588,15 @@ msgstr "Full Name"
 #: apps/web/src/components/(teams)/settings/layout/mobile-nav.tsx:52
 msgid "General"
 msgstr "General"
+
+#: apps/web/src/components/(teams)/settings/layout/desktop-nav.tsx:57
+#: apps/web/src/components/(teams)/settings/layout/mobile-nav.tsx:65
+msgid "Global Settings"
+msgstr "Global Settings"
+
+#: apps/web/src/components/forms/team-document-settings.tsx:69
+msgid "Global Team Settings Updated"
+msgstr "Global Team Settings Updated"
 
 #: apps/web/src/app/(profile)/p/[url]/not-found.tsx:30
 #: apps/web/src/app/(recipient)/d/[token]/not-found.tsx:33
@@ -1657,6 +1680,10 @@ msgstr "Inbox"
 #: apps/web/src/components/(dashboard)/common/command-menu.tsx:52
 msgid "Inbox documents"
 msgstr "Inbox documents"
+
+#: apps/web/src/components/forms/team-document-settings.tsx:132
+msgid "Include Sender Details"
+msgstr "Include Sender Details"
 
 #: apps/web/src/app/(dashboard)/documents/[id]/document-page-view-information.tsx:53
 msgid "Information"
@@ -3156,7 +3183,7 @@ msgstr "The document will be immediately sent to recipients if this is checked."
 msgid "The events that will trigger a webhook to be sent to your URL."
 msgstr "The events that will trigger a webhook to be sent to your URL."
 
-#: apps/web/src/app/(teams)/t/[teamUrl]/settings/documents/page.tsx:29
+#: apps/web/src/app/(teams)/t/[teamUrl]/settings/documents/page.tsx:27
 msgid "The global settings for the documents in your team account."
 msgstr "The global settings for the documents in your team account."
 
@@ -3636,6 +3663,7 @@ msgid "Update password"
 msgstr "Update password"
 
 #: apps/web/src/components/forms/profile.tsx:150
+#: apps/web/src/components/forms/team-document-settings.tsx:151
 msgid "Update profile"
 msgstr "Update profile"
 
@@ -3675,6 +3703,7 @@ msgid "Updating password..."
 msgstr "Updating password..."
 
 #: apps/web/src/components/forms/profile.tsx:150
+#: apps/web/src/components/forms/team-document-settings.tsx:151
 msgid "Updating profile..."
 msgstr "Updating profile..."
 
@@ -4368,6 +4397,10 @@ msgstr "Your email is currently being used by team <0>{0}</0> ({1})."
 #: apps/web/src/app/(teams)/t/[teamUrl]/settings/tokens/page.tsx:80
 msgid "Your existing tokens"
 msgstr "Your existing tokens"
+
+#: apps/web/src/components/forms/team-document-settings.tsx:70
+msgid "Your global team document settings has been updated successfully."
+msgstr "Your global team document settings has been updated successfully."
 
 #: apps/web/src/components/forms/password.tsx:72
 #: apps/web/src/components/forms/reset-password.tsx:73

@@ -451,6 +451,10 @@ msgstr "Ocurrió un error al intentar crear una sesión de pago."
 msgid "An error occurred while updating the document settings."
 msgstr "Ocurrió un error al actualizar la configuración del documento."
 
+#: apps/web/src/components/forms/team-document-settings.tsx:78
+msgid "An error occurred while updating the global team settings."
+msgstr ""
+
 #: apps/web/src/app/(signing)/sign/[token]/checkbox-field.tsx:213
 msgid "An error occurred while updating the signature."
 msgstr "Ocurrió un error al actualizar la firma."
@@ -515,8 +519,8 @@ msgstr "Cualquier método de pago adjunto a este equipo permanecerá adjunto a e
 #: apps/web/src/app/(teams)/t/[teamUrl]/settings/tokens/page.tsx:56
 #: apps/web/src/components/(dashboard)/settings/layout/desktop-nav.tsx:90
 #: apps/web/src/components/(dashboard)/settings/layout/mobile-nav.tsx:93
-#: apps/web/src/components/(teams)/settings/layout/desktop-nav.tsx:81
-#: apps/web/src/components/(teams)/settings/layout/mobile-nav.tsx:89
+#: apps/web/src/components/(teams)/settings/layout/desktop-nav.tsx:95
+#: apps/web/src/components/(teams)/settings/layout/mobile-nav.tsx:103
 msgid "API Tokens"
 msgstr "Tokens de API"
 
@@ -617,8 +621,8 @@ msgstr "Detalles básicos"
 #: apps/web/src/app/(teams)/t/[teamUrl]/settings/billing/page.tsx:61
 #: apps/web/src/components/(dashboard)/settings/layout/desktop-nav.tsx:117
 #: apps/web/src/components/(dashboard)/settings/layout/mobile-nav.tsx:120
-#: apps/web/src/components/(teams)/settings/layout/desktop-nav.tsx:108
-#: apps/web/src/components/(teams)/settings/layout/mobile-nav.tsx:116
+#: apps/web/src/components/(teams)/settings/layout/desktop-nav.tsx:122
+#: apps/web/src/components/(teams)/settings/layout/mobile-nav.tsx:130
 msgid "Billing"
 msgstr "Facturación"
 
@@ -687,6 +691,10 @@ msgstr "Cancelado por el usuario"
 #: apps/web/src/app/(dashboard)/admin/stats/page.tsx:132
 msgid "Charts"
 msgstr "Gráficas"
+
+#: apps/web/src/app/(teams)/t/[teamUrl]/settings/documents/page.tsx:32
+msgid "Check out the documentaton for the <0>global team settings</0>."
+msgstr ""
 
 #: apps/web/src/components/(teams)/dialogs/create-team-checkout-dialog.tsx:179
 msgid "Checkout"
@@ -1013,6 +1021,10 @@ msgstr "Rechazar"
 msgid "Declined team invitation"
 msgstr "Invitación de equipo rechazada"
 
+#: apps/web/src/components/forms/team-document-settings.tsx:108
+msgid "Default Document Visibility"
+msgstr ""
+
 #: apps/web/src/app/(dashboard)/documents/[id]/document-page-view-dropdown.tsx:141
 #: apps/web/src/app/(dashboard)/documents/data-table-action-dropdown.tsx:187
 #: apps/web/src/app/(dashboard)/documents/delete-document-dialog.tsx:200
@@ -1256,6 +1268,10 @@ msgstr "Documento sellado nuevamente"
 #: apps/web/src/app/(dashboard)/documents/[id]/edit-document.tsx:321
 msgid "Document sent"
 msgstr "Documento enviado"
+
+#: apps/web/src/app/(teams)/t/[teamUrl]/settings/documents/page.tsx:26
+msgid "Document Settings"
+msgstr ""
 
 #: apps/web/src/app/(signing)/sign/[token]/complete/page.tsx:132
 msgid "Document Signed"
@@ -1507,6 +1523,10 @@ msgstr "Ingresa tu texto aquí"
 msgid "Error"
 msgstr "Error"
 
+#: apps/web/src/components/forms/team-document-settings.tsx:77
+msgid "Error updating global team settings"
+msgstr ""
+
 #: apps/web/src/app/(signing)/sign/[token]/complete/page.tsx:142
 msgid "Everyone has signed"
 msgstr "Todos han firmado"
@@ -1569,10 +1589,19 @@ msgstr "Nombre completo"
 #: apps/web/src/app/(dashboard)/documents/[id]/edit-document.tsx:164
 #: apps/web/src/app/(dashboard)/templates/[id]/edit-template.tsx:76
 #: apps/web/src/app/(recipient)/d/[token]/direct-template.tsx:60
-#: apps/web/src/components/(teams)/settings/layout/desktop-nav.tsx:43
-#: apps/web/src/components/(teams)/settings/layout/mobile-nav.tsx:51
+#: apps/web/src/components/(teams)/settings/layout/desktop-nav.tsx:44
+#: apps/web/src/components/(teams)/settings/layout/mobile-nav.tsx:52
 msgid "General"
 msgstr "General"
+
+#: apps/web/src/components/(teams)/settings/layout/desktop-nav.tsx:57
+#: apps/web/src/components/(teams)/settings/layout/mobile-nav.tsx:65
+msgid "Global Settings"
+msgstr ""
+
+#: apps/web/src/components/forms/team-document-settings.tsx:69
+msgid "Global Team Settings Updated"
+msgstr ""
 
 #: apps/web/src/app/(profile)/p/[url]/not-found.tsx:30
 #: apps/web/src/app/(recipient)/d/[token]/not-found.tsx:33
@@ -1656,6 +1685,10 @@ msgstr "Bandeja de entrada"
 #: apps/web/src/components/(dashboard)/common/command-menu.tsx:52
 msgid "Inbox documents"
 msgstr "Documentos en bandeja de entrada"
+
+#: apps/web/src/components/forms/team-document-settings.tsx:132
+msgid "Include Sender Details"
+msgstr ""
 
 #: apps/web/src/app/(dashboard)/documents/[id]/document-page-view-information.tsx:53
 msgid "Information"
@@ -1920,8 +1953,8 @@ msgid "Member Since"
 msgstr "Miembro desde"
 
 #: apps/web/src/app/(teams)/t/[teamUrl]/settings/members/page.tsx:31
-#: apps/web/src/components/(teams)/settings/layout/desktop-nav.tsx:71
-#: apps/web/src/components/(teams)/settings/layout/mobile-nav.tsx:79
+#: apps/web/src/components/(teams)/settings/layout/desktop-nav.tsx:85
+#: apps/web/src/components/(teams)/settings/layout/mobile-nav.tsx:93
 msgid "Members"
 msgstr "Miembros"
 
@@ -2360,8 +2393,8 @@ msgstr "Público"
 #: apps/web/src/app/(dashboard)/settings/public-profile/public-profile-page-view.tsx:42
 #: apps/web/src/components/(dashboard)/settings/layout/desktop-nav.tsx:50
 #: apps/web/src/components/(dashboard)/settings/layout/mobile-nav.tsx:53
-#: apps/web/src/components/(teams)/settings/layout/desktop-nav.tsx:57
-#: apps/web/src/components/(teams)/settings/layout/mobile-nav.tsx:65
+#: apps/web/src/components/(teams)/settings/layout/desktop-nav.tsx:71
+#: apps/web/src/components/(teams)/settings/layout/mobile-nav.tsx:79
 msgid "Public Profile"
 msgstr "Perfil Público"
 
@@ -3155,6 +3188,10 @@ msgstr "El documento se enviará inmediatamente a los destinatarios si esto est�
 msgid "The events that will trigger a webhook to be sent to your URL."
 msgstr "Los eventos que activarán un webhook para ser enviado a tu URL."
 
+#: apps/web/src/app/(teams)/t/[teamUrl]/settings/documents/page.tsx:27
+msgid "The global settings for the documents in your team account."
+msgstr ""
+
 #: apps/web/src/app/(unauthenticated)/team/verify/transfer/[token]/page.tsx:114
 msgid "The ownership of team <0>{0}</0> has been successfully transferred to you."
 msgstr "La propiedad del equipo <0>{0}</0> ha sido transferida con éxito a ti."
@@ -3631,6 +3668,7 @@ msgid "Update password"
 msgstr "Actualizar contraseña"
 
 #: apps/web/src/components/forms/profile.tsx:150
+#: apps/web/src/components/forms/team-document-settings.tsx:151
 msgid "Update profile"
 msgstr "Actualizar perfil"
 
@@ -3670,6 +3708,7 @@ msgid "Updating password..."
 msgstr "Actualizando contraseña..."
 
 #: apps/web/src/components/forms/profile.tsx:150
+#: apps/web/src/components/forms/team-document-settings.tsx:151
 msgid "Updating profile..."
 msgstr "Actualizando perfil..."
 
@@ -4052,8 +4091,8 @@ msgstr "URL del Webhook"
 #: apps/web/src/app/(teams)/t/[teamUrl]/settings/webhooks/page.tsx:33
 #: apps/web/src/components/(dashboard)/settings/layout/desktop-nav.tsx:103
 #: apps/web/src/components/(dashboard)/settings/layout/mobile-nav.tsx:106
-#: apps/web/src/components/(teams)/settings/layout/desktop-nav.tsx:94
-#: apps/web/src/components/(teams)/settings/layout/mobile-nav.tsx:102
+#: apps/web/src/components/(teams)/settings/layout/desktop-nav.tsx:108
+#: apps/web/src/components/(teams)/settings/layout/mobile-nav.tsx:116
 msgid "Webhooks"
 msgstr "Webhooks"
 
@@ -4363,6 +4402,10 @@ msgstr "Tu correo electrónico está siendo utilizado actualmente por el equipo 
 #: apps/web/src/app/(teams)/t/[teamUrl]/settings/tokens/page.tsx:80
 msgid "Your existing tokens"
 msgstr "Tus tokens existentes"
+
+#: apps/web/src/components/forms/team-document-settings.tsx:70
+msgid "Your global team document settings has been updated successfully."
+msgstr ""
 
 #: apps/web/src/components/forms/password.tsx:72
 #: apps/web/src/components/forms/reset-password.tsx:73
