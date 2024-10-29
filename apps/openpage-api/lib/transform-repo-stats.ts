@@ -3,6 +3,7 @@ type RepoStats = {
   forks: number;
   mergedPRs: number;
   openIssues: number;
+  earlyAdopters: number;
 };
 
 type DataEntry = {
@@ -28,6 +29,7 @@ const FRIENDLY_METRIC_NAMES: { [key in MetricKey]: string } = {
   forks: 'Forks',
   mergedPRs: 'Merged PRs',
   openIssues: 'Open Issues',
+  earlyAdopters: 'Customers',
 };
 
 export function transformRepoStats(data: DataEntry, metric: MetricKey): TransformedData {
