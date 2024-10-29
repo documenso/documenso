@@ -206,65 +206,39 @@ const getTeamCounts = async (options: GetTeamCountsOption) => {
   let notSignedCountsGroupByArgs = null;
   let hasSignedCountsGroupByArgs = null;
 
-  const visibilityFilters = [
-    match(options.currentTeamMemberRole)
-      .with(TeamMemberRole.ADMIN, () => ({
-        visibility: {
-          in: [
-            DocumentVisibility.EVERYONE,
-            DocumentVisibility.MANAGER_AND_ABOVE,
-            DocumentVisibility.ADMIN,
-          ],
-        },
-      }))
-      .with(TeamMemberRole.MANAGER, () => ({
-        visibility: {
-          in: [DocumentVisibility.EVERYONE, DocumentVisibility.MANAGER_AND_ABOVE],
-        },
-      }))
-      .otherwise(() => ({ visibility: DocumentVisibility.EVERYONE })),
-  ];
-
   const visibilityFiltersWhereInput: Prisma.DocumentWhereInput = {
     AND: [
-      match(options.currentTeamMemberRole)
-        .with(TeamMemberRole.ADMIN, () => ({}))
-        .with(TeamMemberRole.MANAGER, () => ({
-          visibility: {
-            in: [
-              DocumentVisibility.EVERYONE,
-              DocumentVisibility.MANAGER_AND_ABOVE,
-              DocumentVisibility.ADMIN,
+      { deletedAt: null },
+      {
+        OR: [
+          match(options.currentTeamMemberRole)
+            .with(TeamMemberRole.ADMIN, () => ({
+              visibility: {
+                in: [
+                  DocumentVisibility.EVERYONE,
+                  DocumentVisibility.MANAGER_AND_ABOVE,
+                  DocumentVisibility.ADMIN,
+                ],
+              },
+            }))
+            .with(TeamMemberRole.MANAGER, () => ({
+              visibility: {
+                in: [DocumentVisibility.EVERYONE, DocumentVisibility.MANAGER_AND_ABOVE],
+              },
+            }))
+            .otherwise(() => ({
+              visibility: {
+                equals: DocumentVisibility.EVERYONE,
+              },
+            })),
+          {
+            OR: [
+              { userId: options.userId },
+              { Recipient: { some: { email: options.currentUserEmail } } },
             ],
           },
-          AND: [
-            {
-              OR: [
-                { userId: options.userId },
-                { Recipient: { some: { email: options.currentUserEmail } } },
-                { visibility: DocumentVisibility.MANAGER_AND_ABOVE },
-              ],
-            },
-          ],
-        }))
-        .with(TeamMemberRole.MEMBER, () => ({
-          visibility: {
-            in: [
-              DocumentVisibility.EVERYONE,
-              DocumentVisibility.MANAGER_AND_ABOVE,
-              DocumentVisibility.ADMIN,
-            ],
-          },
-          AND: [
-            {
-              OR: [
-                { userId: options.userId },
-                { Recipient: { some: { email: options.currentUserEmail } } },
-              ],
-            },
-          ],
-        }))
-        .otherwise(() => ({ visibility: DocumentVisibility.EVERYONE })),
+        ],
+      },
     ],
   };
 
