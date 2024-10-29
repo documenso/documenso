@@ -13,9 +13,16 @@ The default document visibility option allows you to control who can view and ac
 - **Managers and above** - The document is visible to people with the role of Manager or above.
 - **Admin only** - The document is only visible to the team's admins.
 
-![A screenshot of the Documenso's document editor page where you can update the document visibility](/teams/document-visibility-settings.webp)
+![A screenshot of the document visibility selector from the team's global settings page](/teams/team-global-settings-document-visibility-select.webp)
 
-If you don't set a default visibility option in the [team global settings](/users/teams/global-settings), the visibility of a document is determined by the role of the user who created the document. Here's how it works:
+If you don't set a default visibility option in the [team global settings](/users/teams/global-settings), the visibility of a document is determined by the role of the user who created the document.
+
+<Callout type="warning">
+  If the default visibility option is set to "EVERYONE" in the global team settings, the document
+  will automatically inherit the visibility of the user who created it.
+</Callout>
+
+Here's how it works:
 
 - If a user with the "Member" role creates a document, the document's visibility is set to "Everyone".
 - If a user with the "Manager" role creates a document, the document's visibility is set to "Managers and above".
@@ -23,9 +30,12 @@ If you don't set a default visibility option in the [team global settings](/user
 
 You can change the visibility of a document at any time by editing the document and selecting a different visibility option.
 
+![A screenshot of the Documenso's document editor page where you can update the document visibility](/teams/document-visibility-settings.webp)
+
 <Callout type="warning">
-  Updating the default document visibility will not affect the visibility of existing documents. You
-  will need to update the visibility of each document individually.
+  Updating the default document visibility in the team's global settings will not affect the
+  visibility of existing documents. You will need to update the visibility of each document
+  individually.
 </Callout>
 
 ## A Note on Document Access
