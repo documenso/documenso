@@ -247,7 +247,7 @@ export const EmbedSignDocumentClientPage = ({
                     className="bg-background mt-2"
                     disabled={isNameLocked}
                     value={fullName}
-                    onChange={(e) => !isNameLocked && setFullName(e.target.value.trim())}
+                    onChange={(e) => !isNameLocked && setFullName(e.target.value)}
                   />
                 </div>
 
@@ -273,13 +273,17 @@ export const EmbedSignDocumentClientPage = ({
                   <Card className="mt-2" gradient degrees={-120}>
                     <CardContent className="p-0">
                       <SignaturePad
-                        key={signature}
                         className="h-44 w-full"
                         disabled={isThrottled || isSubmitting}
                         defaultValue={signature ?? undefined}
                         onChange={(value) => {
                           setSignature(value);
                         }}
+                        allowTypedSignature={Boolean(
+                          metadata &&
+                            'typedSignatureEnabled' in metadata &&
+                            metadata.typedSignatureEnabled,
+                        )}
                       />
                     </CardContent>
                   </Card>

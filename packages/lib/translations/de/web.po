@@ -741,8 +741,8 @@ msgstr "Klicken Sie, um den Signatur-Link zu kopieren, um ihn an den Empfänger 
 
 #: apps/web/src/app/(recipient)/d/[token]/sign-direct-template.tsx:175
 #: apps/web/src/app/(signing)/sign/[token]/form.tsx:115
-#: apps/web/src/app/embed/direct/[[...url]]/client.tsx:435
-#: apps/web/src/app/embed/sign/[[...url]]/client.tsx:314
+#: apps/web/src/app/embed/direct/[[...url]]/client.tsx:439
+#: apps/web/src/app/embed/sign/[[...url]]/client.tsx:318
 msgid "Click to insert field"
 msgstr "Klicken Sie, um das Feld einzufügen"
 
@@ -759,8 +759,8 @@ msgid "Close"
 msgstr "Schließen"
 
 #: apps/web/src/app/(signing)/sign/[token]/sign-dialog.tsx:61
-#: apps/web/src/app/embed/direct/[[...url]]/client.tsx:425
-#: apps/web/src/app/embed/sign/[[...url]]/client.tsx:304
+#: apps/web/src/app/embed/direct/[[...url]]/client.tsx:429
+#: apps/web/src/app/embed/sign/[[...url]]/client.tsx:308
 #: apps/web/src/components/forms/v2/signup.tsx:534
 msgid "Complete"
 msgstr "Vollständig"
@@ -2002,8 +2002,8 @@ msgstr "Neuer Teamowner"
 msgid "New Template"
 msgstr "Neue Vorlage"
 
-#: apps/web/src/app/embed/direct/[[...url]]/client.tsx:416
-#: apps/web/src/app/embed/sign/[[...url]]/client.tsx:295
+#: apps/web/src/app/embed/direct/[[...url]]/client.tsx:420
+#: apps/web/src/app/embed/sign/[[...url]]/client.tsx:299
 #: apps/web/src/components/forms/v2/signup.tsx:521
 msgid "Next"
 msgstr "Nächster"
