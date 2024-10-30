@@ -453,7 +453,16 @@ export const AddSignersFormPartial = ({
                                   control={form.control}
                                   name={`signers.${index}.signingOrder`}
                                   render={({ field }) => (
-                                    <FormItem className="col-span-2 mt-auto flex items-center gap-x-1 space-y-0">
+                                    <FormItem
+                                      className={cn(
+                                        'col-span-2 mt-auto flex items-center gap-x-1 space-y-0',
+                                        {
+                                          'mb-6':
+                                            form.formState.errors.signers?.[index] &&
+                                            !form.formState.errors.signers[index]?.signingOrder,
+                                        },
+                                      )}
+                                    >
                                       <GripVerticalIcon className="h-5 w-5 flex-shrink-0 opacity-40" />
                                       <FormControl>
                                         <Input
@@ -491,6 +500,9 @@ export const AddSignersFormPartial = ({
                                 render={({ field }) => (
                                   <FormItem
                                     className={cn('relative', {
+                                      'mb-6':
+                                        form.formState.errors.signers?.[index] &&
+                                        !form.formState.errors.signers[index]?.email,
                                       'col-span-4': !showAdvancedSettings,
                                       'col-span-5': showAdvancedSettings,
                                     })}
@@ -526,6 +538,9 @@ export const AddSignersFormPartial = ({
                                 render={({ field }) => (
                                   <FormItem
                                     className={cn({
+                                      'mb-6':
+                                        form.formState.errors.signers?.[index] &&
+                                        !form.formState.errors.signers[index]?.name,
                                       'col-span-4': !showAdvancedSettings,
                                       'col-span-5': showAdvancedSettings,
                                     })}
@@ -561,6 +576,9 @@ export const AddSignersFormPartial = ({
                                   render={({ field }) => (
                                     <FormItem
                                       className={cn('col-span-8', {
+                                        'mb-6':
+                                          form.formState.errors.signers?.[index] &&
+                                          !form.formState.errors.signers[index]?.actionAuth,
                                         'col-span-10': isSigningOrderSequential,
                                       })}
                                     >
@@ -586,7 +604,13 @@ export const AddSignersFormPartial = ({
                                 <FormField
                                   name={`signers.${index}.role`}
                                   render={({ field }) => (
-                                    <FormItem className="mt-auto">
+                                    <FormItem
+                                      className={cn('mt-auto', {
+                                        'mb-6':
+                                          form.formState.errors.signers?.[index] &&
+                                          !form.formState.errors.signers[index]?.role,
+                                      })}
+                                    >
                                       <FormControl>
                                         <RecipientRoleSelect
                                           {...field}
@@ -606,7 +630,12 @@ export const AddSignersFormPartial = ({
 
                                 <button
                                   type="button"
-                                  className="mt-auto inline-flex h-10 w-10 items-center justify-center hover:opacity-80 disabled:cursor-not-allowed disabled:opacity-50"
+                                  className={cn(
+                                    'mt-auto inline-flex h-10 w-10 items-center justify-center hover:opacity-80 disabled:cursor-not-allowed disabled:opacity-50',
+                                    {
+                                      'mb-6': form.formState.errors.signers?.[index],
+                                    },
+                                  )}
                                   disabled={
                                     snapshot.isDragging ||
                                     isSubmitting ||
