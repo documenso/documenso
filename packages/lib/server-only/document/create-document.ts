@@ -79,15 +79,20 @@ export const createDocument = async ({
     globalVisibility: DocumentVisibility | null | undefined,
     userRole: TeamMemberRole,
   ): DocumentVisibility => {
-    if (globalVisibility === DocumentVisibility.EVERYONE) {
-      return userRole === 'ADMIN'
-        ? DocumentVisibility.ADMIN
-        : userRole === 'MANAGER'
-        ? DocumentVisibility.MANAGER_AND_ABOVE
-        : DocumentVisibility.EVERYONE;
+    const defaultVisibility = globalVisibility ?? DocumentVisibility.EVERYONE;
+
+    if (userRole === TeamMemberRole.ADMIN) {
+      return defaultVisibility;
     }
 
-    return globalVisibility ?? DocumentVisibility.EVERYONE;
+    if (userRole === TeamMemberRole.MANAGER) {
+      if (defaultVisibility === DocumentVisibility.ADMIN) {
+        return DocumentVisibility.MANAGER_AND_ABOVE;
+      }
+      return defaultVisibility;
+    }
+
+    return DocumentVisibility.EVERYONE;
   };
 
   return await prisma.$transaction(async (tx) => {

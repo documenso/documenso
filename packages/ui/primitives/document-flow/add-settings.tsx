@@ -10,14 +10,8 @@ import { useForm } from 'react-hook-form';
 import { DATE_FORMATS, DEFAULT_DOCUMENT_DATE_FORMAT } from '@documenso/lib/constants/date-formats';
 import { DEFAULT_DOCUMENT_TIME_ZONE, TIME_ZONES } from '@documenso/lib/constants/time-zones';
 import { extractDocumentAuthMethods } from '@documenso/lib/utils/document-auth';
-import type { DocumentVisibility } from '@documenso/prisma/client';
-import {
-  DocumentStatus,
-  type Field,
-  type Recipient,
-  SendStatus,
-  TeamMemberRole,
-} from '@documenso/prisma/client';
+import type { DocumentVisibility, TeamMemberRole } from '@documenso/prisma/client';
+import { DocumentStatus, type Field, type Recipient, SendStatus } from '@documenso/prisma/client';
 import type { DocumentWithData } from '@documenso/prisma/types/document-with-data';
 import {
   DocumentGlobalAuthAccessSelect,
@@ -194,10 +188,6 @@ export const AddSettingsFormPartial = ({
               <FormField
                 control={form.control}
                 name="visibility"
-                disabled={
-                  Boolean(teamDefaultDocumentVisibility) &&
-                  currentTeamMemberRole !== TeamMemberRole.ADMIN
-                }
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel className="flex flex-row items-center">
