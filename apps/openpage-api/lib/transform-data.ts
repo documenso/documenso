@@ -44,16 +44,14 @@ export function transformData({
     return DateTime.local(yearA, monthA).toMillis() - DateTime.local(yearB, monthB).toMillis();
   });
 
-  const labels = sortedEntries
-    .map(([date]) => date)
-    .map((date) => {
-      const [year, month] = date.split('-');
-
-      return DateTime.fromObject({
-        year: Number(year),
-        month: Number(month),
-      }).toFormat('MMM yyyy');
+  const labels = sortedEntries.map(([date]) => {
+    const [year, month] = date.split('-');
+    const dateTime = DateTime.fromObject({
+      year: Number(year),
+      month: Number(month),
     });
+    return dateTime.toFormat('MMM yyyy');
+  });
 
   return {
     labels,
