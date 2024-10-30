@@ -150,6 +150,8 @@ export const ZUpdateTeamMutationSchema = z.object({
   data: z.object({
     name: ZTeamNameSchema,
     url: ZTeamUrlSchema,
+    documentVisibility: z.nativeEnum(DocumentVisibility).optional(),
+    includeSenderDetails: z.boolean().optional(),
   }),
 });
 
@@ -189,16 +191,6 @@ export const ZResendTeamMemberInvitationMutationSchema = z.object({
   teamId: z.number(),
   invitationId: z.number(),
 });
-
-export const ZUpdateTeamDocumentGlobalSettingsMutationSchema = z.object({
-  teamId: z.number(),
-  documentVisibility: z.nativeEnum(DocumentVisibility).optional(),
-  includeSenderDetails: z.boolean().optional(),
-});
-
-export type TUpdateTeamDocumentGlobalSettingsMutationSchema = z.infer<
-  typeof ZUpdateTeamDocumentGlobalSettingsMutationSchema
->;
 
 export type TCreateTeamMutationSchema = z.infer<typeof ZCreateTeamMutationSchema>;
 export type TCreateTeamEmailVerificationMutationSchema = z.infer<
