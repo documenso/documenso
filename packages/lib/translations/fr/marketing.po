@@ -618,4 +618,3 @@ msgstr "Vous pouvez auto-héberger Documenso gratuitement ou utiliser notre vers
 #: apps/marketing/src/components/(marketing)/carousel.tsx:272
 msgid "Your browser does not support the video tag."
 msgstr "Votre navigateur ne prend pas en charge la balise vidéo."
-

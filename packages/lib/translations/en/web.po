@@ -132,7 +132,7 @@ msgstr "404 Template not found"
 msgid "A confirmation email has been sent, and it should arrive in your inbox shortly."
 msgstr "A confirmation email has been sent, and it should arrive in your inbox shortly."
 
-#: apps/web/src/app/(dashboard)/templates/use-template-dialog.tsx:193
+#: apps/web/src/app/(dashboard)/templates/use-template-dialog.tsx:201
 msgid "A draft document will be created"
 msgstr "A draft document will be created"
 
@@ -282,7 +282,7 @@ msgstr "Add team email"
 msgid "Add the people who will sign the document."
 msgstr "Add the people who will sign the document."
 
-#: apps/web/src/app/(dashboard)/templates/use-template-dialog.tsx:195
+#: apps/web/src/app/(dashboard)/templates/use-template-dialog.tsx:203
 msgid "Add the recipients to create the document with"
 msgstr "Add the recipients to create the document with"
 
@@ -375,7 +375,7 @@ msgstr "An error occurred while adding signers."
 msgid "An error occurred while adding the fields."
 msgstr "An error occurred while adding the fields."
 
-#: apps/web/src/app/(dashboard)/templates/use-template-dialog.tsx:153
+#: apps/web/src/app/(dashboard)/templates/use-template-dialog.tsx:161
 msgid "An error occurred while creating document from template."
 msgstr "An error occurred while creating document from template."
 
@@ -556,7 +556,7 @@ msgstr "Are you sure you wish to delete this team?"
 
 #: apps/web/src/app/(dashboard)/documents/delete-document-dialog.tsx:98
 #: apps/web/src/app/(dashboard)/settings/teams/team-email-usage.tsx:94
-#: apps/web/src/app/(dashboard)/templates/template-direct-link-dialog.tsx:453
+#: apps/web/src/app/(dashboard)/templates/template-direct-link-dialog.tsx:455
 #: apps/web/src/components/(teams)/dialogs/delete-team-member-dialog.tsx:81
 #: apps/web/src/components/(teams)/dialogs/leave-team-dialog.tsx:81
 #: apps/web/src/components/(teams)/dialogs/remove-team-email-dialog.tsx:116
@@ -655,7 +655,7 @@ msgstr "By enabling 2FA, you will be required to enter a code from your authenti
 #: apps/web/src/app/(dashboard)/templates/delete-template-dialog.tsx:81
 #: apps/web/src/app/(dashboard)/templates/duplicate-template-dialog.tsx:78
 #: apps/web/src/app/(dashboard)/templates/move-template-dialog.tsx:119
-#: apps/web/src/app/(dashboard)/templates/template-direct-link-dialog.tsx:470
+#: apps/web/src/app/(dashboard)/templates/template-direct-link-dialog.tsx:472
 #: apps/web/src/app/(signing)/sign/[token]/document-action-auth-2fa.tsx:178
 #: apps/web/src/app/(signing)/sign/[token]/document-action-auth-account.tsx:71
 #: apps/web/src/app/(signing)/sign/[token]/document-action-auth-passkey.tsx:164
@@ -754,7 +754,7 @@ msgid "Click to insert field"
 msgstr "Click to insert field"
 
 #: apps/web/src/app/(dashboard)/templates/new-template-dialog.tsx:126
-#: apps/web/src/app/(dashboard)/templates/use-template-dialog.tsx:304
+#: apps/web/src/app/(dashboard)/templates/use-template-dialog.tsx:339
 #: apps/web/src/app/(signing)/sign/[token]/document-action-auth-2fa.tsx:125
 #: apps/web/src/app/(signing)/sign/[token]/document-action-auth-passkey.tsx:138
 #: apps/web/src/app/(teams)/t/[teamUrl]/settings/team-transfer-status.tsx:121
@@ -809,7 +809,7 @@ msgstr "Configure general settings for the template."
 msgid "Configure template"
 msgstr "Configure template"
 
-#: apps/web/src/app/(dashboard)/templates/template-direct-link-dialog.tsx:479
+#: apps/web/src/app/(dashboard)/templates/template-direct-link-dialog.tsx:481
 #: apps/web/src/components/templates/manage-public-template-dialog.tsx:460
 msgid "Confirm"
 msgstr "Confirm"
@@ -895,11 +895,11 @@ msgstr "Create a team to collaborate with your team members."
 msgid "Create account"
 msgstr "Create account"
 
-#: apps/web/src/app/(dashboard)/templates/use-template-dialog.tsx:310
+#: apps/web/src/app/(dashboard)/templates/use-template-dialog.tsx:345
 msgid "Create and send"
 msgstr "Create and send"
 
-#: apps/web/src/app/(dashboard)/templates/use-template-dialog.tsx:312
+#: apps/web/src/app/(dashboard)/templates/use-template-dialog.tsx:347
 msgid "Create as draft"
 msgstr "Create as draft"
 
@@ -911,7 +911,7 @@ msgstr "Create Direct Link"
 msgid "Create Direct Signing Link"
 msgstr "Create Direct Signing Link"
 
-#: apps/web/src/app/(dashboard)/templates/use-template-dialog.tsx:189
+#: apps/web/src/app/(dashboard)/templates/use-template-dialog.tsx:197
 msgid "Create document from template"
 msgstr "Create document from template"
 
@@ -1210,7 +1210,7 @@ msgstr "Document completed"
 msgid "Document Completed!"
 msgstr "Document Completed!"
 
-#: apps/web/src/app/(dashboard)/templates/use-template-dialog.tsx:142
+#: apps/web/src/app/(dashboard)/templates/use-template-dialog.tsx:150
 msgid "Document created"
 msgstr "Document created"
 
@@ -1241,7 +1241,7 @@ msgstr "Document ID"
 msgid "Document inbox"
 msgstr "Document inbox"
 
-#: apps/web/src/app/(dashboard)/templates/data-table-templates.tsx:178
+#: apps/web/src/app/(dashboard)/templates/data-table-templates.tsx:179
 msgid "Document Limit Exceeded!"
 msgstr "Document Limit Exceeded!"
 
@@ -1401,8 +1401,8 @@ msgstr "Edit webhook"
 #: apps/web/src/app/(dashboard)/admin/documents/[id]/recipient-item.tsx:166
 #: apps/web/src/app/(dashboard)/admin/users/[id]/page.tsx:114
 #: apps/web/src/app/(dashboard)/admin/users/data-table-users.tsx:71
-#: apps/web/src/app/(dashboard)/templates/use-template-dialog.tsx:213
-#: apps/web/src/app/(dashboard)/templates/use-template-dialog.tsx:220
+#: apps/web/src/app/(dashboard)/templates/use-template-dialog.tsx:248
+#: apps/web/src/app/(dashboard)/templates/use-template-dialog.tsx:255
 #: apps/web/src/app/(recipient)/d/[token]/configure-direct-template.tsx:118
 #: apps/web/src/app/(signing)/sign/[token]/email-field.tsx:126
 #: apps/web/src/app/embed/direct/[[...url]]/client.tsx:376
@@ -1502,7 +1502,7 @@ msgstr "Enter your text here"
 #: apps/web/src/app/(dashboard)/templates/[id]/edit-template.tsx:230
 #: apps/web/src/app/(dashboard)/templates/duplicate-template-dialog.tsx:51
 #: apps/web/src/app/(dashboard)/templates/move-template-dialog.tsx:56
-#: apps/web/src/app/(dashboard)/templates/use-template-dialog.tsx:152
+#: apps/web/src/app/(dashboard)/templates/use-template-dialog.tsx:160
 #: apps/web/src/app/(signing)/sign/[token]/checkbox-field.tsx:122
 #: apps/web/src/app/(signing)/sign/[token]/checkbox-field.tsx:151
 #: apps/web/src/app/(signing)/sign/[token]/checkbox-field.tsx:212
@@ -2005,8 +2005,8 @@ msgstr "My templates"
 #: apps/web/src/app/(dashboard)/admin/users/data-table-users.tsx:66
 #: apps/web/src/app/(dashboard)/settings/security/passkeys/user-passkeys-data-table-actions.tsx:144
 #: apps/web/src/app/(dashboard)/settings/security/passkeys/user-passkeys-data-table.tsx:61
-#: apps/web/src/app/(dashboard)/templates/use-template-dialog.tsx:235
-#: apps/web/src/app/(dashboard)/templates/use-template-dialog.tsx:242
+#: apps/web/src/app/(dashboard)/templates/use-template-dialog.tsx:270
+#: apps/web/src/app/(dashboard)/templates/use-template-dialog.tsx:277
 #: apps/web/src/app/(signing)/sign/[token]/complete/claim-account.tsx:119
 #: apps/web/src/app/(signing)/sign/[token]/name-field.tsx:170
 #: apps/web/src/components/(teams)/dialogs/add-team-email-dialog.tsx:153
@@ -2157,7 +2157,7 @@ msgstr "Or"
 msgid "Or continue with"
 msgstr "Or continue with"
 
-#: apps/web/src/app/(dashboard)/templates/use-template-dialog.tsx:289
+#: apps/web/src/app/(dashboard)/templates/use-template-dialog.tsx:324
 msgid "Otherwise, the document will be created as a draft."
 msgstr "Otherwise, the document will be created as a draft."
 
@@ -2297,7 +2297,7 @@ msgstr "Please enter a meaningful name for your token. This will help you identi
 msgid "Please mark as viewed to complete"
 msgstr "Please mark as viewed to complete"
 
-#: apps/web/src/app/(dashboard)/templates/template-direct-link-dialog.tsx:457
+#: apps/web/src/app/(dashboard)/templates/template-direct-link-dialog.tsx:459
 msgid "Please note that proceeding will remove direct linking recipient and turn it into a placeholder."
 msgstr "Please note that proceeding will remove direct linking recipient and turn it into a placeholder."
 
@@ -2588,7 +2588,7 @@ msgstr "Role"
 msgid "Roles"
 msgstr "Roles"
 
-#: apps/web/src/app/(dashboard)/templates/template-direct-link-dialog.tsx:444
+#: apps/web/src/app/(dashboard)/templates/template-direct-link-dialog.tsx:446
 #: apps/web/src/app/(signing)/sign/[token]/number-field.tsx:336
 #: apps/web/src/app/(signing)/sign/[token]/text-field.tsx:342
 msgid "Save"
@@ -2657,7 +2657,7 @@ msgstr "Select passkey"
 msgid "Send confirmation email"
 msgstr "Send confirmation email"
 
-#: apps/web/src/app/(dashboard)/templates/use-template-dialog.tsx:273
+#: apps/web/src/app/(dashboard)/templates/use-template-dialog.tsx:308
 msgid "Send document"
 msgstr "Send document"
 
@@ -3175,7 +3175,7 @@ msgstr "The document has been successfully moved to the selected team."
 msgid "The document is now completed, please follow any instructions provided within the parent application."
 msgstr "The document is now completed, please follow any instructions provided within the parent application."
 
-#: apps/web/src/app/(dashboard)/templates/use-template-dialog.tsx:159
+#: apps/web/src/app/(dashboard)/templates/use-template-dialog.tsx:167
 msgid "The document was created but could not be sent to recipients."
 msgstr "The document was created but could not be sent to recipients."
 
@@ -3183,7 +3183,7 @@ msgstr "The document was created but could not be sent to recipients."
 msgid "The document will be hidden from your account"
 msgstr "The document will be hidden from your account"
 
-#: apps/web/src/app/(dashboard)/templates/use-template-dialog.tsx:281
+#: apps/web/src/app/(dashboard)/templates/use-template-dialog.tsx:316
 msgid "The document will be immediately sent to recipients if this is checked."
 msgstr "The document will be immediately sent to recipients if this is checked."
 
@@ -3745,7 +3745,7 @@ msgstr "Use Authenticator"
 msgid "Use Backup Code"
 msgstr "Use Backup Code"
 
-#: apps/web/src/app/(dashboard)/templates/use-template-dialog.tsx:183
+#: apps/web/src/app/(dashboard)/templates/use-template-dialog.tsx:191
 msgid "Use Template"
 msgstr "Use Template"
 
@@ -4277,7 +4277,7 @@ msgstr "You have reached the maximum limit of {0} direct templates. <0>Upgrade y
 msgid "You have reached your document limit."
 msgstr "You have reached your document limit."
 
-#: apps/web/src/app/(dashboard)/templates/data-table-templates.tsx:181
+#: apps/web/src/app/(dashboard)/templates/data-table-templates.tsx:182
 msgid "You have reached your document limit. <0>Upgrade your account to continue!</0>"
 msgstr "You have reached your document limit. <0>Upgrade your account to continue!</0>"
 
@@ -4377,7 +4377,7 @@ msgstr "Your direct signing templates"
 msgid "Your document failed to upload."
 msgstr "Your document failed to upload."
 
-#: apps/web/src/app/(dashboard)/templates/use-template-dialog.tsx:143
+#: apps/web/src/app/(dashboard)/templates/use-template-dialog.tsx:151
 msgid "Your document has been created from the template successfully."
 msgstr "Your document has been created from the template successfully."
 

@@ -12,13 +12,21 @@ import { extractLocaleData } from '../../utils/i18n';
 
 type SupportedLanguages = (typeof SUPPORTED_LANGUAGE_CODES)[number];
 
-async function loadCatalog(lang: SupportedLanguages): Promise<{
+export async function loadCatalog(lang: SupportedLanguages): Promise<{
   [k: string]: Messages;
 }> {
   const extension = process.env.NODE_ENV === 'development' ? 'po' : 'js';
   const context = IS_APP_WEB ? 'web' : 'marketing';
 
-  const { messages } = await import(`../../translations/${lang}/${context}.${extension}`);
+  let { messages } = await import(`../../translations/${lang}/${context}.${extension}`);
+
+  if (extension === 'po') {
+    const { messages: commonMessages } = await import(
+      `../../translations/${lang}/common.${extension}`
+    );
+
+    messages = { ...messages, ...commonMessages };
+  }
 
   return {
     [lang]: messages,
