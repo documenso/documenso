@@ -28,7 +28,7 @@ test('[TEAMS]: update the default document visibility in the team global setting
   await expect(toast).toBeVisible();
   await expect(toast.getByText('Global Team Settings Updated')).toBeVisible();
   await expect(
-    toast.getByText('Your global team document settings has been updated successfully.'),
+    toast.getByText('Your global team document settings have been updated successfully.'),
   ).toBeVisible();
 });
 
@@ -55,7 +55,7 @@ test('[TEAMS]: update the sender details in the team global settings', async ({ 
   await expect(toast).toBeVisible();
   await expect(toast.getByText('Global Team Settings Updated')).toBeVisible();
   await expect(
-    toast.getByText('Your global team document settings has been updated successfully.'),
+    toast.getByText('Your global team document settings have been updated successfully.'),
   ).toBeVisible();
 
   await expect(checkbox).toBeChecked();

@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Trans, msg } from '@lingui/macro';
 import { useLingui } from '@lingui/react';
+import { useSession } from 'next-auth/react';
 import { useForm } from 'react-hook-form';
 import { match } from 'ts-pattern';
 import type { z } from 'zod';
@@ -41,6 +42,9 @@ export type TeamDocumentSettingsProps = {
 };
 
 export const TeamDocumentSettings = ({ team }: TeamDocumentSettingsProps) => {
+  const { data: session } = useSession();
+  const email = session?.user?.email;
+
   const { toast } = useToast();
   const router = useRouter();
   const { _ } = useLingui();
@@ -57,6 +61,7 @@ export const TeamDocumentSettings = ({ team }: TeamDocumentSettingsProps) => {
   });
 
   const isSubmitting = form.formState.isSubmitting;
+  const includeSenderDetails = form.watch('includeSenderDetails');
 
   const onFormSubmit = async (data: TUpdateTeamGlobalSettings) => {
     try {
@@ -67,7 +72,7 @@ export const TeamDocumentSettings = ({ team }: TeamDocumentSettingsProps) => {
 
       toast({
         title: _(msg`Global Team Settings Updated`),
-        description: _(msg`Your global team document settings has been updated successfully.`),
+        description: _(msg`Your global team document settings have been updated successfully.`),
         duration: 5000,
       });
 
@@ -122,29 +127,44 @@ export const TeamDocumentSettings = ({ team }: TeamDocumentSettingsProps) => {
               )}
             />
 
-            <FormField
-              control={form.control}
-              name="includeSenderDetails"
-              render={({ field }) => (
-                <FormItem>
-                  <div className="mt-6 flex flex-row items-center gap-4">
-                    <FormLabel>
-                      <Trans>Include Sender Details</Trans>
-                    </FormLabel>
-                    <FormControl>
-                      <Checkbox
-                        className="h-5 w-5"
-                        checkClassName="text-white"
-                        checked={field.value}
-                        onCheckedChange={field.onChange}
-                      />
-                    </FormControl>
-                  </div>
+            <div className="mb-4">
+              <FormField
+                control={form.control}
+                name="includeSenderDetails"
+                render={({ field }) => (
+                  <FormItem>
+                    <div className="mt-6 flex flex-row items-center gap-4">
+                      <FormLabel>
+                        <Trans>Send on Behalf of Team</Trans>
+                      </FormLabel>
+                      <FormControl>
+                        <Checkbox
+                          className="h-5 w-5"
+                          checkClassName="text-white"
+                          checked={field.value}
+                          onCheckedChange={field.onChange}
+                        />
+                      </FormControl>
+                    </div>
 
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+                    {includeSenderDetails ? (
+                      <blockquote className="text-foreground/50 text-xs italic">
+                        <Trans>
+                          "{email}" on behalf of "{team.name}" has invited you to sign "example
+                          document".
+                        </Trans>
+                      </blockquote>
+                    ) : (
+                      <blockquote className="text-foreground/50 text-xs italic">
+                        <Trans>"{team.name}" has invited you to sign "example document".</Trans>
+                      </blockquote>
+                    )}
+
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
           </fieldset>
 
           <Button type="submit" loading={isSubmitting} className="self-end">

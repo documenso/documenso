@@ -30,7 +30,7 @@ export default async function TeamDocumentSettingsPage({ params }: TeamDocumentS
 
       <p className="text-muted-foreground mt-2 text-sm">
         <Trans>
-          Check out the documentaton for the{' '}
+          Check out the documentation for the{' '}
           <a
             className="text-primary italic underline"
             href={'https://docs.documenso.com/users/teams/global-settings'}
