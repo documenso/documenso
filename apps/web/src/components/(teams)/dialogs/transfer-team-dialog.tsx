@@ -73,7 +73,7 @@ export const TransferTeamDialog = ({
     teamId,
   });
 
-  const confirmTransferMessage = `transfer ${teamName}`;
+  const confirmTransferMessage = _(msg`transfer ${teamName}`);
 
   const ZTransferTeamFormSchema = z.object({
     teamName: z.literal(confirmTransferMessage, {

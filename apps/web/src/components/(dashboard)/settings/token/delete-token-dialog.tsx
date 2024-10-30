@@ -53,7 +53,7 @@ export default function DeleteTokenDialog({
 
   const [isOpen, setIsOpen] = useState(false);
 
-  const deleteMessage = `delete ${token.name}`;
+  const deleteMessage = _(msg`delete ${token.name}`);
 
   const ZDeleteTokenDialogSchema = z.object({
     tokenName: z.literal(deleteMessage, {

@@ -47,7 +47,7 @@ export const DeleteTeamDialog = ({ trigger, teamId, teamName }: DeleteTeamDialog
   const { _ } = useLingui();
   const { toast } = useToast();
 
-  const deleteMessage = `delete ${teamName}`;
+  const deleteMessage = _(msg`delete ${teamName}`);
 
   const ZDeleteTeamFormSchema = z.object({
     teamName: z.literal(deleteMessage, {
