@@ -157,10 +157,6 @@ msgstr "Annuler"
 msgid "Cannot remove signer"
 msgstr "Impossible de retirer le signataire"
 
-#: packages/ui/primitives/document-flow/add-signers.tsx:221
-#~ msgid "Cannot update signer because they have already signed a field"
-#~ msgstr "Cannot update signer because they have already signed a field"
-
 #: packages/lib/constants/recipient-roles.ts:17
 msgid "Cc"
 msgstr "Cc"
@@ -373,10 +369,6 @@ msgstr "Je suis un approuveur de ce document"
 #: packages/lib/constants/recipient-roles.ts:74
 msgid "I am required to receive a copy of this document"
 msgstr "Je dois recevoir une copie de ce document"
-
-#: packages/lib/constants/recipient-roles.ts:74
-#~ msgid "I am required to recieve a copy of this document"
-#~ msgstr "I am required to recieve a copy of this document"
 
 #: packages/ui/components/recipient/recipient-action-auth-select.tsx:29
 #: packages/ui/components/recipient/recipient-action-auth-select.tsx:87
@@ -729,10 +721,6 @@ msgstr "Ce champ ne peut pas être modifié ou supprimé. Lorsque vous partagez 
 msgid "This recipient can no longer be modified as they have signed a field, or completed the document."
 msgstr "Ce destinataire ne peut plus être modifié car il a signé un champ ou complété le document."
 
-#: packages/ui/primitives/document-flow/add-signers.tsx:165
-#~ msgid "This signer has already received the document."
-#~ msgstr "This signer has already received the document."
-
 #: packages/ui/primitives/document-flow/add-signers.tsx:194
 msgid "This signer has already signed the document."
 msgstr "Ce signataire a déjà signé le document."
@@ -797,10 +785,6 @@ msgstr "Visiteur"
 msgid "Viewing"
 msgstr "Visionnage"
 
-#: packages/ui/primitives/signature-pad/signature-pad.tsx:280
-#~ msgid "White"
-#~ msgstr "White"
-
 #: packages/ui/primitives/document-flow/send-document-action-dialog.tsx:44
 msgid "You are about to send this document to the recipients. Are you sure you want to continue?"
 msgstr "Vous êtes sur le point d'envoyer ce document aux destinataires. Êtes-vous sûr de vouloir continuer ?"
@@ -816,4 +800,3 @@ msgstr "Vous ne pouvez pas télécharger de documents pour le moment."
 #: packages/ui/primitives/document-dropzone.tsx:69
 msgid "You have reached your document limit."
 msgstr "Vous avez atteint votre limite de documents."
-

@@ -137,7 +137,7 @@ msgstr "404 Modèle non trouvé"
 msgid "A confirmation email has been sent, and it should arrive in your inbox shortly."
 msgstr "Un e-mail de confirmation a été envoyé et devrait arriver dans votre boîte de réception sous peu."
 
-#: apps/web/src/app/(dashboard)/templates/use-template-dialog.tsx:193
+#: apps/web/src/app/(dashboard)/templates/use-template-dialog.tsx:201
 msgid "A draft document will be created"
 msgstr "Un document brouillon sera créé"
 
@@ -250,10 +250,6 @@ msgstr "Ajouter des champs"
 msgid "Add more"
 msgstr "Ajouter davantage"
 
-#: apps/web/src/app/(signing)/sign/[token]/number-field.tsx:270
-#~ msgid "Add number"
-#~ msgstr "Add number"
-
 #: apps/web/src/app/(dashboard)/settings/security/passkeys/create-passkey-dialog.tsx:146
 #: apps/web/src/app/(dashboard)/settings/security/passkeys/create-passkey-dialog.tsx:154
 msgid "Add passkey"
@@ -275,19 +271,11 @@ msgstr "Ajouter un sujet"
 msgid "Add team email"
 msgstr "Ajouter un e-mail d'équipe"
 
-#: apps/web/src/app/(signing)/sign/[token]/text-field.tsx:256
-#~ msgid "Add text"
-#~ msgstr "Add text"
-
-#: apps/web/src/app/(signing)/sign/[token]/text-field.tsx:272
-#~ msgid "Add Text"
-#~ msgstr "Add Text"
-
 #: apps/web/src/app/(dashboard)/documents/[id]/edit-document.tsx:170
 msgid "Add the people who will sign the document."
 msgstr "Ajouter les personnes qui signeront le document."
 
-#: apps/web/src/app/(dashboard)/templates/use-template-dialog.tsx:195
+#: apps/web/src/app/(dashboard)/templates/use-template-dialog.tsx:203
 msgid "Add the recipients to create the document with"
 msgstr "Ajouter les destinataires pour créer le document avec"
 
@@ -380,7 +368,7 @@ msgstr "Une erreur est survenue lors de l'ajout de signataires."
 msgid "An error occurred while adding the fields."
 msgstr "Une erreur est survenue lors de l'ajout des champs."
 
-#: apps/web/src/app/(dashboard)/templates/use-template-dialog.tsx:153
+#: apps/web/src/app/(dashboard)/templates/use-template-dialog.tsx:161
 msgid "An error occurred while creating document from template."
 msgstr "Une erreur est survenue lors de la création du document à partir d'un modèle."
 
@@ -561,7 +549,7 @@ msgstr "Êtes-vous sûr de vouloir supprimer cette équipe ?"
 
 #: apps/web/src/app/(dashboard)/documents/delete-document-dialog.tsx:98
 #: apps/web/src/app/(dashboard)/settings/teams/team-email-usage.tsx:94
-#: apps/web/src/app/(dashboard)/templates/template-direct-link-dialog.tsx:453
+#: apps/web/src/app/(dashboard)/templates/template-direct-link-dialog.tsx:455
 #: apps/web/src/components/(teams)/dialogs/delete-team-member-dialog.tsx:81
 #: apps/web/src/components/(teams)/dialogs/leave-team-dialog.tsx:81
 #: apps/web/src/components/(teams)/dialogs/remove-team-email-dialog.tsx:116
@@ -660,7 +648,7 @@ msgstr "En activant l'authentification à deux facteurs (2FA), vous devrez entre
 #: apps/web/src/app/(dashboard)/templates/delete-template-dialog.tsx:81
 #: apps/web/src/app/(dashboard)/templates/duplicate-template-dialog.tsx:78
 #: apps/web/src/app/(dashboard)/templates/move-template-dialog.tsx:119
-#: apps/web/src/app/(dashboard)/templates/template-direct-link-dialog.tsx:470
+#: apps/web/src/app/(dashboard)/templates/template-direct-link-dialog.tsx:472
 #: apps/web/src/app/(signing)/sign/[token]/document-action-auth-2fa.tsx:178
 #: apps/web/src/app/(signing)/sign/[token]/document-action-auth-account.tsx:71
 #: apps/web/src/app/(signing)/sign/[token]/document-action-auth-passkey.tsx:164
@@ -759,7 +747,7 @@ msgid "Click to insert field"
 msgstr "Cliquez pour insérer le champ"
 
 #: apps/web/src/app/(dashboard)/templates/new-template-dialog.tsx:126
-#: apps/web/src/app/(dashboard)/templates/use-template-dialog.tsx:304
+#: apps/web/src/app/(dashboard)/templates/use-template-dialog.tsx:339
 #: apps/web/src/app/(signing)/sign/[token]/document-action-auth-2fa.tsx:125
 #: apps/web/src/app/(signing)/sign/[token]/document-action-auth-passkey.tsx:138
 #: apps/web/src/app/(teams)/t/[teamUrl]/settings/team-transfer-status.tsx:121
@@ -814,7 +802,7 @@ msgstr "Configurer les paramètres généraux pour le modèle."
 msgid "Configure template"
 msgstr "Configurer le modèle"
 
-#: apps/web/src/app/(dashboard)/templates/template-direct-link-dialog.tsx:479
+#: apps/web/src/app/(dashboard)/templates/template-direct-link-dialog.tsx:481
 #: apps/web/src/components/templates/manage-public-template-dialog.tsx:460
 msgid "Confirm"
 msgstr "Confirmer"
@@ -900,11 +888,11 @@ msgstr "Créer une équipe pour collaborer avec vos membres."
 msgid "Create account"
 msgstr "Créer un compte"
 
-#: apps/web/src/app/(dashboard)/templates/use-template-dialog.tsx:310
+#: apps/web/src/app/(dashboard)/templates/use-template-dialog.tsx:345
 msgid "Create and send"
 msgstr "Créer et envoyer"
 
-#: apps/web/src/app/(dashboard)/templates/use-template-dialog.tsx:312
+#: apps/web/src/app/(dashboard)/templates/use-template-dialog.tsx:347
 msgid "Create as draft"
 msgstr "Créer en tant que brouillon"
 
@@ -916,7 +904,7 @@ msgstr "Créer un lien direct"
 msgid "Create Direct Signing Link"
 msgstr "Créer un lien de signature directe"
 
-#: apps/web/src/app/(dashboard)/templates/use-template-dialog.tsx:189
+#: apps/web/src/app/(dashboard)/templates/use-template-dialog.tsx:197
 msgid "Create document from template"
 msgstr "Créer un document à partir du modèle"
 
@@ -987,11 +975,6 @@ msgstr "Créé le"
 #: apps/web/src/app/(teams)/t/[teamUrl]/settings/webhooks/page.tsx:93
 msgid "Created on {0}"
 msgstr "Créé le {0}"
-
-#: apps/web/src/app/(dashboard)/settings/webhooks/page.tsx:89
-#: apps/web/src/app/(teams)/t/[teamUrl]/settings/webhooks/page.tsx:94
-#~ msgid "Created on <0/>"
-#~ msgstr "Created on <0/>"
 
 #: apps/web/src/app/(teams)/t/[teamUrl]/settings/tokens/page.tsx:100
 msgid "Created on{0}"
@@ -1107,10 +1090,6 @@ msgstr "Supprimé"
 msgid "Deleting account..."
 msgstr "Suppression du compte..."
 
-#: apps/web/src/app/(dashboard)/admin/documents/[id]/super-delete-document-dialog.tsx:135
-#~ msgid "Deleting document"
-#~ msgstr "Deleting document"
-
 #: apps/web/src/app/(dashboard)/settings/security/activity/user-security-activity-data-table.tsx:75
 msgid "Device"
 msgstr "Appareil"
@@ -1215,7 +1194,7 @@ msgstr "Document complété"
 msgid "Document Completed!"
 msgstr "Document Complété !"
 
-#: apps/web/src/app/(dashboard)/templates/use-template-dialog.tsx:142
+#: apps/web/src/app/(dashboard)/templates/use-template-dialog.tsx:150
 msgid "Document created"
 msgstr "Document créé"
 
@@ -1246,7 +1225,7 @@ msgstr "ID du document"
 msgid "Document inbox"
 msgstr "Boîte de réception des documents"
 
-#: apps/web/src/app/(dashboard)/templates/data-table-templates.tsx:178
+#: apps/web/src/app/(dashboard)/templates/data-table-templates.tsx:179
 msgid "Document Limit Exceeded!"
 msgstr "Limite de documents dépassée !"
 
@@ -1369,10 +1348,6 @@ msgstr "Documents en brouillon"
 msgid "Drafted Documents"
 msgstr "Documents brouillon"
 
-#: apps/web/src/app/(signing)/sign/[token]/signature-field.tsx:245
-#~ msgid "Draw"
-#~ msgstr "Draw"
-
 #: apps/web/src/app/(teams)/t/[teamUrl]/layout-billing-banner.tsx:121
 msgid "Due to an unpaid invoice, your team has been restricted. Please settle the payment to restore full access to your team."
 msgstr "En raison d'une facture impayée, votre équipe a été restreinte. Veuillez régler le paiement pour rétablir l'accès complet à votre équipe."
@@ -1406,8 +1381,8 @@ msgstr "Modifier le webhook"
 #: apps/web/src/app/(dashboard)/admin/documents/[id]/recipient-item.tsx:166
 #: apps/web/src/app/(dashboard)/admin/users/[id]/page.tsx:114
 #: apps/web/src/app/(dashboard)/admin/users/data-table-users.tsx:71
-#: apps/web/src/app/(dashboard)/templates/use-template-dialog.tsx:213
-#: apps/web/src/app/(dashboard)/templates/use-template-dialog.tsx:220
+#: apps/web/src/app/(dashboard)/templates/use-template-dialog.tsx:248
+#: apps/web/src/app/(dashboard)/templates/use-template-dialog.tsx:255
 #: apps/web/src/app/(recipient)/d/[token]/configure-direct-template.tsx:118
 #: apps/web/src/app/(signing)/sign/[token]/email-field.tsx:126
 #: apps/web/src/app/embed/direct/[[...url]]/client.tsx:376
@@ -1507,7 +1482,7 @@ msgstr "Entrez votre texte ici"
 #: apps/web/src/app/(dashboard)/templates/[id]/edit-template.tsx:230
 #: apps/web/src/app/(dashboard)/templates/duplicate-template-dialog.tsx:51
 #: apps/web/src/app/(dashboard)/templates/move-template-dialog.tsx:56
-#: apps/web/src/app/(dashboard)/templates/use-template-dialog.tsx:152
+#: apps/web/src/app/(dashboard)/templates/use-template-dialog.tsx:160
 #: apps/web/src/app/(signing)/sign/[token]/checkbox-field.tsx:122
 #: apps/web/src/app/(signing)/sign/[token]/checkbox-field.tsx:151
 #: apps/web/src/app/(signing)/sign/[token]/checkbox-field.tsx:212
@@ -1548,19 +1523,9 @@ msgstr "Délai dépassé"
 msgid "Expired"
 msgstr "Expiré"
 
-#: apps/web/src/app/(dashboard)/settings/tokens/page.tsx:73
-#: apps/web/src/app/(teams)/t/[teamUrl]/settings/tokens/page.tsx:106
-#~ msgid "Expires on"
-#~ msgstr "Expires on"
-
 #: apps/web/src/app/(dashboard)/settings/tokens/page.tsx:71
 msgid "Expires on {0}"
 msgstr "Expire le {0}"
-
-#: apps/web/src/app/(dashboard)/settings/tokens/page.tsx:75
-#: apps/web/src/app/(teams)/t/[teamUrl]/settings/tokens/page.tsx:108
-#~ msgid "Expires on <0/>"
-#~ msgstr "Expires on <0/>"
 
 #: apps/web/src/app/(teams)/t/[teamUrl]/settings/tokens/page.tsx:107
 msgid "Expires on{0}"
@@ -1662,10 +1627,6 @@ msgstr "Cacher"
 #: apps/web/src/components/document/document-history-sheet.tsx:111
 msgid "Hide additional information"
 msgstr "Cacher des informations supplémentaires"
-
-#: apps/web/src/app/(internal)/%5F%5Fhtmltopdf/certificate/page.tsx:40
-#~ msgid "I am the owner of this document"
-#~ msgstr "I am the owner of this document"
 
 #: apps/web/src/components/(dashboard)/settings/token/delete-token-dialog.tsx:186
 #: apps/web/src/components/(dashboard)/settings/webhooks/delete-webhook-dialog.tsx:173
@@ -2010,8 +1971,8 @@ msgstr "Mes modèles"
 #: apps/web/src/app/(dashboard)/admin/users/data-table-users.tsx:66
 #: apps/web/src/app/(dashboard)/settings/security/passkeys/user-passkeys-data-table-actions.tsx:144
 #: apps/web/src/app/(dashboard)/settings/security/passkeys/user-passkeys-data-table.tsx:61
-#: apps/web/src/app/(dashboard)/templates/use-template-dialog.tsx:235
-#: apps/web/src/app/(dashboard)/templates/use-template-dialog.tsx:242
+#: apps/web/src/app/(dashboard)/templates/use-template-dialog.tsx:270
+#: apps/web/src/app/(dashboard)/templates/use-template-dialog.tsx:277
 #: apps/web/src/app/(signing)/sign/[token]/complete/claim-account.tsx:119
 #: apps/web/src/app/(signing)/sign/[token]/name-field.tsx:170
 #: apps/web/src/components/(teams)/dialogs/add-team-email-dialog.tsx:153
@@ -2162,7 +2123,7 @@ msgstr "Ou"
 msgid "Or continue with"
 msgstr "Ou continuez avec"
 
-#: apps/web/src/app/(dashboard)/templates/use-template-dialog.tsx:289
+#: apps/web/src/app/(dashboard)/templates/use-template-dialog.tsx:324
 msgid "Otherwise, the document will be created as a draft."
 msgstr "Sinon, le document sera créé sous forme de brouillon."
 
@@ -2302,7 +2263,7 @@ msgstr "Veuillez entrer un nom significatif pour votre jeton. Cela vous aidera �
 msgid "Please mark as viewed to complete"
 msgstr "Veuillez marquer comme vu pour terminer"
 
-#: apps/web/src/app/(dashboard)/templates/template-direct-link-dialog.tsx:457
+#: apps/web/src/app/(dashboard)/templates/template-direct-link-dialog.tsx:459
 msgid "Please note that proceeding will remove direct linking recipient and turn it into a placeholder."
 msgstr "Veuillez noter que la poursuite supprimera le destinataire de lien direct et le transformera en espace réservé."
 
@@ -2593,7 +2554,7 @@ msgstr "Rôle"
 msgid "Roles"
 msgstr "Rôles"
 
-#: apps/web/src/app/(dashboard)/templates/template-direct-link-dialog.tsx:444
+#: apps/web/src/app/(dashboard)/templates/template-direct-link-dialog.tsx:446
 #: apps/web/src/app/(signing)/sign/[token]/number-field.tsx:336
 #: apps/web/src/app/(signing)/sign/[token]/text-field.tsx:342
 msgid "Save"
@@ -2662,7 +2623,7 @@ msgstr "Sélectionner la clé d'authentification"
 msgid "Send confirmation email"
 msgstr "Envoyer l'e-mail de confirmation"
 
-#: apps/web/src/app/(dashboard)/templates/use-template-dialog.tsx:273
+#: apps/web/src/app/(dashboard)/templates/use-template-dialog.tsx:308
 msgid "Send document"
 msgstr "Envoyer le document"
 
@@ -2743,10 +2704,6 @@ msgstr "Signer"
 #: apps/web/src/app/(signing)/sign/[token]/signature-field.tsx:217
 msgid "Sign as {0} <0>({1})</0>"
 msgstr "Signer comme {0} <0>({1})</0>"
-
-#: apps/web/src/app/(signing)/sign/[token]/signature-field.tsx:219
-#~ msgid "Sign as <0>{0} <1>({1})</1></0>"
-#~ msgstr "Sign as <0>{0} <1>({1})</1></0>"
 
 #: apps/web/src/app/(signing)/sign/[token]/name-field.tsx:183
 msgid "Sign as<0>{0} <1>({1})</1></0>"
@@ -3180,7 +3137,7 @@ msgstr "Le document a été déplacé avec succès vers l'équipe sélectionnée
 msgid "The document is now completed, please follow any instructions provided within the parent application."
 msgstr "Le document est maintenant complet, veuillez suivre toutes les instructions fournies dans l'application parente."
 
-#: apps/web/src/app/(dashboard)/templates/use-template-dialog.tsx:159
+#: apps/web/src/app/(dashboard)/templates/use-template-dialog.tsx:167
 msgid "The document was created but could not be sent to recipients."
 msgstr "Le document a été créé mais n'a pas pu être envoyé aux destinataires."
 
@@ -3188,7 +3145,7 @@ msgstr "Le document a été créé mais n'a pas pu être envoyé aux destinatair
 msgid "The document will be hidden from your account"
 msgstr "Le document sera caché de votre compte"
 
-#: apps/web/src/app/(dashboard)/templates/use-template-dialog.tsx:281
+#: apps/web/src/app/(dashboard)/templates/use-template-dialog.tsx:316
 msgid "The document will be immediately sent to recipients if this is checked."
 msgstr "Le document sera immédiatement envoyé aux destinataires si cela est coché."
 
@@ -3556,10 +3513,6 @@ msgstr "Tapez 'supprimer' pour confirmer"
 msgid "Type a command or search..."
 msgstr "Tapez une commande ou recherchez..."
 
-#: apps/web/src/app/(signing)/sign/[token]/signature-field.tsx:275
-#~ msgid "Typed Signature"
-#~ msgstr "Typed Signature"
-
 #: apps/web/src/app/(unauthenticated)/verify-email/page.tsx:26
 msgid "Uh oh! Looks like you're missing a token"
 msgstr "Oh oh ! On dirait que vous manquez un jeton"
@@ -3750,7 +3703,7 @@ msgstr "Utiliser l'authentificateur"
 msgid "Use Backup Code"
 msgstr "Utiliser le code de secours"
 
-#: apps/web/src/app/(dashboard)/templates/use-template-dialog.tsx:183
+#: apps/web/src/app/(dashboard)/templates/use-template-dialog.tsx:191
 msgid "Use Template"
 msgstr "Utiliser le modèle"
 
@@ -4184,10 +4137,6 @@ msgstr "Vous êtes sur le point de révoquer l'accès de l'équipe <0>{0}</0> ({
 msgid "You are currently on the <0>Free Plan</0>."
 msgstr "Vous êtes actuellement sur le <0>Plan Gratuit</0>."
 
-#: apps/web/src/app/(dashboard)/settings/billing/page.tsx:92
-#~ msgid "You are currently subscribed to <0>{0}</0>"
-#~ msgstr "You are currently subscribed to <0>{0}</0>"
-
 #: apps/web/src/components/(teams)/dialogs/update-team-member-dialog.tsx:148
 msgid "You are currently updating <0>{teamMemberName}.</0>"
 msgstr "Vous mettez à jour actuellement <0>{teamMemberName}.</0>"
@@ -4231,10 +4180,6 @@ msgstr "Vous ne pouvez pas modifier un membre de l'équipe qui a un rôle plus �
 #: apps/web/src/app/(dashboard)/documents/upload-document.tsx:101
 msgid "You cannot upload encrypted PDFs"
 msgstr "Vous ne pouvez pas télécharger de PDF cryptés"
-
-#: apps/web/src/app/(dashboard)/settings/billing/page.tsx:97
-#~ msgid "You currently have an active plan"
-#~ msgstr "You currently have an active plan"
 
 #: apps/web/src/app/(dashboard)/settings/billing/billing-portal-button.tsx:45
 msgid "You do not currently have a customer record, this should not happen. Please contact support for assistance."
@@ -4282,7 +4227,7 @@ msgstr "Vous avez atteint la limite maximale de {0} modèles directs. <0>Mettez 
 msgid "You have reached your document limit."
 msgstr "Vous avez atteint votre limite de documents."
 
-#: apps/web/src/app/(dashboard)/templates/data-table-templates.tsx:181
+#: apps/web/src/app/(dashboard)/templates/data-table-templates.tsx:182
 msgid "You have reached your document limit. <0>Upgrade your account to continue!</0>"
 msgstr "Vous avez atteint votre limite de documents. <0>Mettez à niveau votre compte pour continuer !</0>"
 
@@ -4315,10 +4260,6 @@ msgstr "Vous avez vérifié votre adresse e-mail pour <0>{0}</0>."
 #: apps/web/src/app/(teams)/t/[teamUrl]/settings/billing/page.tsx:82
 msgid "You must be an admin of this team to manage billing."
 msgstr "Vous devez être un administrateur de cette équipe pour gérer la facturation."
-
-#: apps/web/src/components/(teams)/dialogs/transfer-team-dialog.tsx:80
-#~ msgid "You must enter '{confirmTransferMessage}' to proceed"
-#~ msgstr "You must enter '{confirmTransferMessage}' to proceed"
 
 #: apps/web/src/components/(dashboard)/settings/token/delete-token-dialog.tsx:60
 #: apps/web/src/components/(dashboard)/settings/webhooks/delete-webhook-dialog.tsx:58
@@ -4382,7 +4323,7 @@ msgstr "Vos modèles de signature directe"
 msgid "Your document failed to upload."
 msgstr "Votre document a échoué à se télécharger."
 
-#: apps/web/src/app/(dashboard)/templates/use-template-dialog.tsx:143
+#: apps/web/src/app/(dashboard)/templates/use-template-dialog.tsx:151
 msgid "Your document has been created from the template successfully."
 msgstr "Votre document a été créé à partir du modèle avec succès."
 
@@ -4497,4 +4438,3 @@ msgstr "Votre jeton a été créé avec succès ! Assurez-vous de le copier car 
 #: apps/web/src/app/(teams)/t/[teamUrl]/settings/tokens/page.tsx:86
 msgid "Your tokens will be shown here once you create them."
 msgstr "Vos jetons seront affichés ici une fois que vous les aurez créés."
-

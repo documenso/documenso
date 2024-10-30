@@ -157,10 +157,6 @@ msgstr "Abbrechen"
 msgid "Cannot remove signer"
 msgstr "Unterzeichner kann nicht entfernt werden"
 
-#: packages/ui/primitives/document-flow/add-signers.tsx:221
-#~ msgid "Cannot update signer because they have already signed a field"
-#~ msgstr "Cannot update signer because they have already signed a field"
-
 #: packages/lib/constants/recipient-roles.ts:17
 msgid "Cc"
 msgstr "Cc"
@@ -373,10 +369,6 @@ msgstr "Ich bin ein Genehmiger dieses Dokuments"
 #: packages/lib/constants/recipient-roles.ts:74
 msgid "I am required to receive a copy of this document"
 msgstr "Ich bin verpflichtet, eine Kopie dieses Dokuments zu erhalten"
-
-#: packages/lib/constants/recipient-roles.ts:74
-#~ msgid "I am required to recieve a copy of this document"
-#~ msgstr "I am required to recieve a copy of this document"
 
 #: packages/ui/components/recipient/recipient-action-auth-select.tsx:29
 #: packages/ui/components/recipient/recipient-action-auth-select.tsx:87
@@ -729,10 +721,6 @@ msgstr "Dieses Feld kann nicht geändert oder gelöscht werden. Wenn Sie den dir
 msgid "This recipient can no longer be modified as they have signed a field, or completed the document."
 msgstr "Dieser Empfänger kann nicht mehr bearbeitet werden, da er ein Feld unterschrieben oder das Dokument abgeschlossen hat."
 
-#: packages/ui/primitives/document-flow/add-signers.tsx:165
-#~ msgid "This signer has already received the document."
-#~ msgstr "This signer has already received the document."
-
 #: packages/ui/primitives/document-flow/add-signers.tsx:194
 msgid "This signer has already signed the document."
 msgstr "Dieser Unterzeichner hat das Dokument bereits unterschrieben."
@@ -783,23 +771,19 @@ msgstr "Wert"
 
 #: packages/lib/constants/recipient-roles.ts:26
 msgid "View"
-msgstr "View"
+msgstr "Betrachten"
 
 #: packages/lib/constants/recipient-roles.ts:27
 msgid "Viewed"
-msgstr "Viewed"
+msgstr "Betrachtet"
 
 #: packages/lib/constants/recipient-roles.ts:29
 msgid "Viewer"
-msgstr "Viewer"
+msgstr "Betrachter"
 
 #: packages/lib/constants/recipient-roles.ts:28
 msgid "Viewing"
-msgstr "Viewing"
-
-#: packages/ui/primitives/signature-pad/signature-pad.tsx:280
-#~ msgid "White"
-#~ msgstr "White"
+msgstr "Betrachten"
 
 #: packages/ui/primitives/document-flow/send-document-action-dialog.tsx:44
 msgid "You are about to send this document to the recipients. Are you sure you want to continue?"
@@ -816,4 +800,3 @@ msgstr "Sie können derzeit keine Dokumente hochladen."
 #: packages/ui/primitives/document-dropzone.tsx:69
 msgid "You have reached your document limit."
 msgstr "Sie haben Ihr Dokumentenlimit erreicht."
-
