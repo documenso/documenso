@@ -1,11 +1,14 @@
 import cors from '@/lib/cors';
-import { transformRepoStats } from '@/lib/transform-repo-stats';
+import { transformData } from '@/lib/transform-data';
 
 export async function GET(request: Request) {
   const res = await fetch('https://stargrazer-live.onrender.com/api/stats/stripe');
   const EARLY_ADOPTERS_DATA = await res.json();
 
-  const transformedData = transformRepoStats(EARLY_ADOPTERS_DATA, 'earlyAdopters');
+  const transformedData = transformData({
+    data: EARLY_ADOPTERS_DATA,
+    metric: 'earlyAdopters',
+  });
 
   return cors(
     request,

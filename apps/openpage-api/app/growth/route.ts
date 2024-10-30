@@ -8,7 +8,6 @@ const paths = [
   { path: '/new-users', description: 'New Users' },
   { path: '/completed-documents', description: 'Completed Documents per Month' },
   { path: '/total-completed-documents', description: 'Total Completed Documents' },
-  { path: '/twitter', description: 'Twitter' },
 ];
 
 export function GET(request: NextRequest) {

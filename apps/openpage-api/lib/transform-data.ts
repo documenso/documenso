@@ -1,4 +1,6 @@
-type RepoStats = {
+import { DateTime } from 'luxon';
+
+type MetricKeys = {
   stars: number;
   forks: number;
   mergedPRs: number;
@@ -7,10 +9,10 @@ type RepoStats = {
 };
 
 type DataEntry = {
-  [key: string]: RepoStats;
+  [key: string]: MetricKeys;
 };
 
-type TransformedData = {
+type TransformData = {
   labels: string[];
   datasets: {
     label: string;
@@ -18,11 +20,7 @@ type TransformedData = {
   }[];
 };
 
-type MonthNames = {
-  [key: string]: string;
-};
-
-type MetricKey = keyof RepoStats;
+type MetricKey = keyof MetricKeys;
 
 const FRIENDLY_METRIC_NAMES: { [key in MetricKey]: string } = {
   stars: 'Stars',
@@ -32,33 +30,30 @@ const FRIENDLY_METRIC_NAMES: { [key in MetricKey]: string } = {
   earlyAdopters: 'Customers',
 };
 
-export function transformRepoStats(data: DataEntry, metric: MetricKey): TransformedData {
+export function transformData({
+  data,
+  metric,
+}: {
+  data: DataEntry;
+  metric: MetricKey;
+}): TransformData {
   const sortedEntries = Object.entries(data).sort(([dateA], [dateB]) => {
     const [yearA, monthA] = dateA.split('-').map(Number);
     const [yearB, monthB] = dateB.split('-').map(Number);
-    return new Date(yearA, monthA - 1).getTime() - new Date(yearB, monthB - 1).getTime();
+
+    return DateTime.local(yearA, monthA).toMillis() - DateTime.local(yearB, monthB).toMillis();
   });
 
-  const monthNames: MonthNames = {
-    '1': 'Jan',
-    '2': 'Feb',
-    '3': 'Mar',
-    '4': 'Apr',
-    '5': 'May',
-    '6': 'Jun',
-    '7': 'Jul',
-    '8': 'Aug',
-    '9': 'Sep',
-    '10': 'Oct',
-    '11': 'Nov',
-    '12': 'Dec',
-  };
+  const labels = sortedEntries
+    .map(([date]) => date)
+    .map((date) => {
+      const [year, month] = date.split('-');
 
-  const labels = sortedEntries.map(([date]) => {
-    const [year, month] = date.split('-');
-    const monthIndex = parseInt(month);
-    return `${monthNames[monthIndex.toString()]} ${year}`;
-  });
+      return DateTime.fromObject({
+        year: Number(year),
+        month: Number(month),
+      }).toFormat('MMM yyyy');
+    });
 
   return {
     labels,
@@ -70,3 +65,6 @@ export function transformRepoStats(data: DataEntry, metric: MetricKey): Transfor
     ],
   };
 }
+
+// To be on the safer side
+export const transformRepoStats = transformData;

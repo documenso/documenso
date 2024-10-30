@@ -1,10 +1,10 @@
 import cors from '@/lib/cors';
-import { transformRepoStats } from '@/lib/transform-repo-stats';
+import { transformData } from '@/lib/transform-data';
 
 export async function GET(request: Request) {
   const res = await fetch('https://stargrazer-live.onrender.com/api/stats');
   const data = await res.json();
-  const transformedData = transformRepoStats(data, 'forks');
+  const transformedData = transformData({ data, metric: 'forks' });
 
   return cors(
     request,
