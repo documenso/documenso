@@ -139,12 +139,16 @@ export const DocumentShareButton = ({
 
       <DialogContent position="end">
         <DialogHeader>
-          <DialogTitle>Share your signing experience!</DialogTitle>
+          <DialogTitle>
+            <Trans>Share your signing experience!</Trans>
+          </DialogTitle>
 
           <DialogDescription className="mt-4">
-            Rest assured, your document is strictly confidential and will never be shared. Only your
-            signing experience will be highlighted. Share your personalized signing card to showcase
-            your signature!
+            <Trans>
+              Rest assured, your document is strictly confidential and will never be shared. Only
+              your signing experience will be highlighted. Share your personalized signing card to
+              showcase your signature!
+            </Trans>
           </DialogDescription>
         </DialogHeader>
 
@@ -187,7 +191,7 @@ export const DocumentShareButton = ({
 
             <Button variant="outline" className="flex-1" onClick={onCopyClick}>
               <Copy className="mr-2 h-4 w-4" />
-              Copy Link
+              <Trans>Copy Link</Trans>
             </Button>
           </div>
         </div>

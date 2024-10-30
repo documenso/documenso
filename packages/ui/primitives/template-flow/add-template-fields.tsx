@@ -5,6 +5,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Caveat } from 'next/font/google';
 
 import { Trans, msg } from '@lingui/macro';
+import { useLingui } from '@lingui/react';
 import {
   CalendarDays,
   CheckSquare,
@@ -28,6 +29,7 @@ import {
   ZFieldMetaSchema,
 } from '@documenso/lib/types/field-meta';
 import { nanoid } from '@documenso/lib/universal/id';
+import { parseMessageDescriptor } from '@documenso/lib/utils/i18n';
 import type { Field, Recipient } from '@documenso/prisma/client';
 import { FieldType, RecipientRole } from '@documenso/prisma/client';
 import { cn } from '@documenso/ui/lib/utils';
@@ -85,6 +87,8 @@ export const AddTemplateFieldsFormPartial = ({
   onSubmit,
   teamId,
 }: AddTemplateFieldsFormProps) => {
+  const { _ } = useLingui();
+
   const { isWithinPageBounds, getFieldPosition, getPage } = useDocumentElement();
   const { currentStep, totalSteps, previousStep } = useStep();
   const [showAdvancedSettings, setShowAdvancedSettings] = useState(false);
@@ -400,7 +404,10 @@ export const AddTemplateFieldsFormPartial = ({
       {showAdvancedSettings && currentField ? (
         <FieldAdvancedSettings
           title={msg`Advanced settings`}
-          description={msg`Configure the ${FRIENDLY_FIELD_TYPE[currentField.type]} field`}
+          description={msg`Configure the ${parseMessageDescriptor(
+            _,
+            FRIENDLY_FIELD_TYPE[currentField.type],
+          )} field`}
           field={currentField}
           fields={localFields}
           onAdvancedSettings={handleAdvancedSettings}
@@ -432,7 +439,7 @@ export const AddTemplateFieldsFormPartial = ({
                     width: fieldBounds.current.width,
                   }}
                 >
-                  {FRIENDLY_FIELD_TYPE[selectedField]}
+                  {parseMessageDescriptor(_, FRIENDLY_FIELD_TYPE[selectedField])}
                 </div>
               )}
 
@@ -501,8 +508,7 @@ export const AddTemplateFieldsFormPartial = ({
                       {recipientsByRoleToDisplay.map(([role, roleRecipients], roleIndex) => (
                         <CommandGroup key={roleIndex}>
                           <div className="text-muted-foreground mb-1 ml-2 mt-2 text-xs font-medium">
-                            {/* Todo: Translations - Add plural translations. */}
-                            {`${RECIPIENT_ROLES_DESCRIPTION_ENG[role].roleName}s`}
+                            {_(RECIPIENT_ROLES_DESCRIPTION_ENG[role].roleNamePlural)}
                           </div>
 
                           {roleRecipients.length === 0 && (
@@ -785,7 +791,7 @@ export const AddTemplateFieldsFormPartial = ({
                           )}
                         >
                           <CheckSquare className="h-4 w-4" />
-                          <Trans>Checkbox</Trans>
+                          Checkbox
                         </p>
                       </CardContent>
                     </Card>
