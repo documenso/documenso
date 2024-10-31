@@ -46,9 +46,15 @@ export const updateTeam = async ({ userId, teamId, data }: UpdateTeamOptions) =>
           url: data.url,
           name: data.name,
           teamGlobalSettings: {
-            update: {
-              documentVisibility: data.documentVisibility,
-              includeSenderDetails: data.includeSenderDetails,
+            upsert: {
+              create: {
+                documentVisibility: data.documentVisibility,
+                includeSenderDetails: data.includeSenderDetails,
+              },
+              update: {
+                documentVisibility: data.documentVisibility,
+                includeSenderDetails: data.includeSenderDetails,
+              },
             },
           },
         },

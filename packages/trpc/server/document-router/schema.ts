@@ -6,7 +6,12 @@ import {
 } from '@documenso/lib/types/document-auth';
 import { ZBaseTableSearchParamsSchema } from '@documenso/lib/types/search-params';
 import { isValidRedirectUrl } from '@documenso/lib/utils/is-valid-redirect-url';
-import { DocumentSigningOrder, FieldType, RecipientRole } from '@documenso/prisma/client';
+import {
+  DocumentSigningOrder,
+  DocumentVisibility,
+  FieldType,
+  RecipientRole,
+} from '@documenso/prisma/client';
 
 export const ZFindDocumentAuditLogsQuerySchema = ZBaseTableSearchParamsSchema.extend({
   documentId: z.number().min(1),
@@ -56,7 +61,7 @@ export const ZSetSettingsForDocumentMutationSchema = z.object({
   data: z.object({
     title: z.string().min(1).optional(),
     externalId: z.string().nullish(),
-    visibility: z.string().optional(),
+    visibility: z.nativeEnum(DocumentVisibility).optional(),
     globalAccessAuth: ZDocumentAccessAuthTypesSchema.nullable().optional(),
     globalActionAuth: ZDocumentActionAuthTypesSchema.nullable().optional(),
   }),

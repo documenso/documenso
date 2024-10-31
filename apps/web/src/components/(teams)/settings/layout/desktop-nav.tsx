@@ -6,7 +6,7 @@ import Link from 'next/link';
 import { useParams, usePathname } from 'next/navigation';
 
 import { Trans } from '@lingui/macro';
-import { Braces, CreditCard, FileCog, Globe2Icon, Settings, Users, Webhook } from 'lucide-react';
+import { Braces, CreditCard, Globe2Icon, Settings, Users, Webhook } from 'lucide-react';
 
 import { useFeatureFlags } from '@documenso/lib/client-only/providers/feature-flag';
 import { IS_BILLING_ENABLED } from '@documenso/lib/constants/app';
@@ -42,19 +42,6 @@ export const DesktopNav = ({ className, ...props }: DesktopNavProps) => {
         >
           <Settings className="mr-2 h-5 w-5" />
           <Trans>General</Trans>
-        </Button>
-      </Link>
-
-      <Link href={documentSettingsPath}>
-        <Button
-          variant="ghost"
-          className={cn(
-            'w-full justify-start',
-            pathname?.startsWith(documentSettingsPath) && 'bg-secondary',
-          )}
-        >
-          <FileCog className="mr-2 h-5 w-5" />
-          <Trans>Global Settings</Trans>
         </Button>
       </Link>
 

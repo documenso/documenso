@@ -60,12 +60,12 @@ msgstr "<0>Passkey erforderlich</0> - Der Empfänger muss ein Konto haben und de
 msgid "Add a document"
 msgstr "Dokument hinzufügen"
 
-#: packages/ui/primitives/document-flow/add-settings.tsx:348
+#: packages/ui/primitives/document-flow/add-settings.tsx:336
 #: packages/ui/primitives/template-flow/add-template-settings.tsx:339
 msgid "Add a URL to redirect the user to once the document is signed"
 msgstr "Fügen Sie eine URL hinzu, um den Benutzer nach der Unterzeichnung des Dokuments weiterzuleiten"
 
-#: packages/ui/primitives/document-flow/add-settings.tsx:260
+#: packages/ui/primitives/document-flow/add-settings.tsx:248
 msgid "Add an external ID to the document. This can be used to identify the document in external systems."
 msgstr "Fügen Sie dem Dokument eine externe ID hinzu. Diese kann verwendet werden, um das Dokument in externen Systemen zu identifizieren."
 
@@ -110,7 +110,7 @@ msgstr "Text zum Feld hinzufügen"
 msgid "Admin"
 msgstr "Admin"
 
-#: packages/ui/primitives/document-flow/add-settings.tsx:242
+#: packages/ui/primitives/document-flow/add-settings.tsx:230
 #: packages/ui/primitives/template-flow/add-template-settings.tsx:238
 msgid "Advanced Options"
 msgstr "Erweiterte Optionen"
@@ -225,7 +225,7 @@ msgstr "Benutzerdefinierter Text"
 msgid "Date"
 msgstr "Datum"
 
-#: packages/ui/primitives/document-flow/add-settings.tsx:283
+#: packages/ui/primitives/document-flow/add-settings.tsx:271
 #: packages/ui/primitives/template-flow/add-template-settings.tsx:279
 msgid "Date Format"
 msgstr "Datumsformat"
@@ -235,7 +235,7 @@ msgid "Direct link receiver"
 msgstr "Empfänger des direkten Links"
 
 #: packages/ui/components/document/document-global-auth-access-select.tsx:62
-#: packages/ui/primitives/document-flow/add-settings.tsx:182
+#: packages/ui/primitives/document-flow/add-settings.tsx:174
 #: packages/ui/primitives/template-flow/add-template-settings.tsx:151
 msgid "Document access"
 msgstr "Dokumentenzugriff"
@@ -299,7 +299,7 @@ msgstr "Passwort eingeben"
 msgid "Error"
 msgstr "Fehler"
 
-#: packages/ui/primitives/document-flow/add-settings.tsx:253
+#: packages/ui/primitives/document-flow/add-settings.tsx:241
 #: packages/ui/primitives/template-flow/add-template-settings.tsx:249
 msgid "External ID"
 msgstr "Externe ID"
@@ -511,7 +511,7 @@ msgid "Receives copy"
 msgstr "Erhält Kopie"
 
 #: packages/ui/components/recipient/recipient-action-auth-select.tsx:39
-#: packages/ui/primitives/document-flow/add-settings.tsx:227
+#: packages/ui/primitives/document-flow/add-settings.tsx:215
 #: packages/ui/primitives/template-flow/add-template-settings.tsx:169
 msgid "Recipient action authentication"
 msgstr "Empfängeraktion Authentifizierung"
@@ -520,7 +520,7 @@ msgstr "Empfängeraktion Authentifizierung"
 msgid "Red"
 msgstr "Rot"
 
-#: packages/ui/primitives/document-flow/add-settings.tsx:341
+#: packages/ui/primitives/document-flow/add-settings.tsx:329
 #: packages/ui/primitives/template-flow/add-template-settings.tsx:332
 msgid "Redirect URL"
 msgstr "Weiterleitungs-URL"
@@ -729,12 +729,12 @@ msgstr "Dieser Unterzeichner hat das Dokument bereits unterschrieben."
 msgid "This will override any global settings."
 msgstr "Dies überschreibt alle globalen Einstellungen."
 
-#: packages/ui/primitives/document-flow/add-settings.tsx:317
+#: packages/ui/primitives/document-flow/add-settings.tsx:305
 #: packages/ui/primitives/template-flow/add-template-settings.tsx:309
 msgid "Time Zone"
 msgstr "Zeitzone"
 
-#: packages/ui/primitives/document-flow/add-settings.tsx:161
+#: packages/ui/primitives/document-flow/add-settings.tsx:153
 msgid "Title"
 msgstr "Titel"
 

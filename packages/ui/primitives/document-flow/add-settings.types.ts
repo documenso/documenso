@@ -7,6 +7,7 @@ import {
   ZDocumentActionAuthTypesSchema,
 } from '@documenso/lib/types/document-auth';
 import { isValidRedirectUrl } from '@documenso/lib/utils/is-valid-redirect-url';
+import { DocumentVisibility } from '@documenso/prisma/client';
 
 export const ZMapNegativeOneToUndefinedSchema = z
   .string()
@@ -22,7 +23,7 @@ export const ZMapNegativeOneToUndefinedSchema = z
 export const ZAddSettingsFormSchema = z.object({
   title: z.string().trim().min(1, { message: "Title can't be empty" }),
   externalId: z.string().optional(),
-  visibility: z.string().optional(),
+  visibility: z.nativeEnum(DocumentVisibility).optional(),
   globalAccessAuth: ZMapNegativeOneToUndefinedSchema.pipe(
     ZDocumentAccessAuthTypesSchema.optional(),
   ),
