@@ -18,7 +18,17 @@ async function loadCatalog(lang: SupportedLanguages): Promise<{
   const extension = process.env.NODE_ENV === 'development' ? 'po' : 'js';
   const context = IS_APP_WEB ? 'web' : 'marketing';
 
-  const { messages } = await import(`../../translations/${lang}/${context}.${extension}`);
+  let { messages } = await import(`../../translations/${lang}/${context}.${extension}`);
+
+  // Dirty way to load common messages for development since it's not compiled.
+  if (process.env.NODE_ENV === 'development') {
+    const commonMessages = await import(`../../translations/${lang}/common.${extension}`);
+
+    messages = {
+      ...messages,
+      ...commonMessages.messages,
+    };
+  }
 
   return {
     [lang]: messages,
