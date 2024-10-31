@@ -3121,7 +3121,7 @@ msgstr "Das Konto wurde erfolgreich gelöscht."
 
 #: apps/web/src/app/(dashboard)/admin/site-settings/banner-form.tsx:197
 msgid "The content to show in the banner, HTML is allowed"
-msgstr "Der Inhalt, der im Banne rgezeig wird, HTML ist erlaubt"
+msgstr "Der Inhalt, der im Banne angezeigt wird, HTML ist erlaubt"
 
 #: apps/web/src/app/(dashboard)/settings/public-profile/public-templates-data-table.tsx:78
 #: apps/web/src/app/(dashboard)/templates/template-direct-link-badge.tsx:32
