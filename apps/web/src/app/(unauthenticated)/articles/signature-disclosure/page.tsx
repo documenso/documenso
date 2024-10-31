@@ -5,6 +5,8 @@ import { Trans } from '@lingui/macro';
 import { setupI18nSSR } from '@documenso/lib/client-only/providers/i18n.server';
 import { Button } from '@documenso/ui/primitives/button';
 
+const SUPPORT_EMAIL = 'support@documenso.com';
+
 export default function SignatureDisclosure() {
   setupI18nSSR();
 
@@ -103,9 +105,9 @@ export default function SignatureDisclosure() {
             You have the right to withdraw your consent to use electronic signatures at any time
             before completing the signing process. To withdraw your consent, please contact the
             sender of the document. In failing to contact the sender you may reach out to{' '}
-            <a href="mailto:support@documenso.com">support@documenso.com</a> for assistance. Be
-            aware that withdrawing consent may delay or halt the completion of the related
-            transaction or service.
+            <a href={`mailto:${SUPPORT_EMAIL}`}>{SUPPORT_EMAIL}</a> for assistance. Be aware that
+            withdrawing consent may delay or halt the completion of the related transaction or
+            service.
           </Trans>
         </p>
 
@@ -151,8 +153,7 @@ export default function SignatureDisclosure() {
         <p>
           <Trans>
             For any questions regarding this disclosure, electronic signatures, or any related
-            process, please contact us at:{' '}
-            <a href="mailto:support@documenso.com">support@documenso.com</a>
+            process, please contact us at: <a href={`mailto:${SUPPORT_EMAIL}`}>{SUPPORT_EMAIL}</a>
           </Trans>
         </p>
       </article>

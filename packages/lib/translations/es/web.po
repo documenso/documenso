@@ -157,7 +157,7 @@ msgstr ""
 msgid "A confirmation email has been sent, and it should arrive in your inbox shortly."
 msgstr "Se ha enviado un correo electrónico de confirmación y debería llegar a tu bandeja de entrada en breve."
 
-#: apps/web/src/app/(unauthenticated)/articles/signature-disclosure/page.tsx:68
+#: apps/web/src/app/(unauthenticated)/articles/signature-disclosure/page.tsx:70
 msgid "A device capable of accessing, opening, and reading documents"
 msgstr ""
 
@@ -165,7 +165,7 @@ msgstr ""
 msgid "A draft document will be created"
 msgstr "Se creará un documento borrador"
 
-#: apps/web/src/app/(unauthenticated)/articles/signature-disclosure/page.tsx:71
+#: apps/web/src/app/(unauthenticated)/articles/signature-disclosure/page.tsx:73
 msgid "A means to print or download documents for your records"
 msgstr ""
 
@@ -191,7 +191,7 @@ msgstr "Un secreto que se enviará a tu URL para que puedas verificar que la sol
 msgid "A secret that will be sent to your URL so you can verify that the request has been sent by Documenso."
 msgstr "Un secreto que se enviará a tu URL para que puedas verificar que la solicitud ha sido enviada por Documenso."
 
-#: apps/web/src/app/(unauthenticated)/articles/signature-disclosure/page.tsx:62
+#: apps/web/src/app/(unauthenticated)/articles/signature-disclosure/page.tsx:64
 msgid "A stable internet connection"
 msgstr ""
 
@@ -212,7 +212,7 @@ msgstr "Se enviará un correo electrónico de verificación a la dirección prop
 msgid "Accept"
 msgstr "Aceptar"
 
-#: apps/web/src/app/(unauthenticated)/articles/signature-disclosure/page.tsx:31
+#: apps/web/src/app/(unauthenticated)/articles/signature-disclosure/page.tsx:33
 msgid "Acceptance and Consent"
 msgstr ""
 
@@ -225,7 +225,7 @@ msgstr "Invitación de equipo aceptada"
 msgid "Account deleted"
 msgstr "Cuenta eliminada"
 
-#: apps/web/src/app/(unauthenticated)/articles/signature-disclosure/page.tsx:137
+#: apps/web/src/app/(unauthenticated)/articles/signature-disclosure/page.tsx:139
 msgid "Acknowledgment"
 msgstr ""
 
@@ -335,7 +335,7 @@ msgstr "Acciones Administrativas"
 msgid "Admin panel"
 msgstr "Panel administrativo"
 
-#: apps/web/src/app/(unauthenticated)/articles/signature-disclosure/page.tsx:127
+#: apps/web/src/app/(unauthenticated)/articles/signature-disclosure/page.tsx:129
 msgid "After signing a document electronically, you will be provided the opportunity to view, download, and print the document for your records. It is highly recommended that you retain a copy of all electronically signed documents for your personal records. We will also retain a copy of the signed document for our records however we may not be able to provide you with a copy of the signed document after a certain period of time."
 msgstr ""
 
@@ -351,7 +351,7 @@ msgstr "Todos los documentos"
 msgid "All documents have been processed. Any new documents that are sent or received will show here."
 msgstr "Todos los documentos han sido procesados. Cualquier nuevo documento que se envíe o reciba aparecerá aquí."
 
-#: apps/web/src/app/(unauthenticated)/articles/signature-disclosure/page.tsx:79
+#: apps/web/src/app/(unauthenticated)/articles/signature-disclosure/page.tsx:81
 msgid "All documents related to the electronic signing process will be provided to you electronically through our platform or via email. It is your responsibility to ensure that your email address is current and that you can receive and open our emails."
 msgstr ""
 
@@ -383,11 +383,11 @@ msgstr "¿Ya tienes una cuenta? <0>Iniciar sesión en su lugar</0>"
 msgid "Amount"
 msgstr "Cantidad"
 
-#: apps/web/src/app/(unauthenticated)/articles/signature-disclosure/page.tsx:46
+#: apps/web/src/app/(unauthenticated)/articles/signature-disclosure/page.tsx:48
 msgid "An electronic signature provided by you on our platform, achieved through clicking through to a document and entering your name, or any other electronic signing method we provide, is legally binding. It carries the same weight and enforceability as a manual signature written with ink on paper."
 msgstr ""
 
-#: apps/web/src/app/(unauthenticated)/articles/signature-disclosure/page.tsx:65
+#: apps/web/src/app/(unauthenticated)/articles/signature-disclosure/page.tsx:67
 msgid "An email account"
 msgstr ""
 
@@ -653,7 +653,7 @@ msgstr "Esperando confirmación de correo electrónico"
 msgid "Back"
 msgstr "Atrás"
 
-#: apps/web/src/app/(unauthenticated)/articles/signature-disclosure/page.tsx:163
+#: apps/web/src/app/(unauthenticated)/articles/signature-disclosure/page.tsx:164
 msgid "Back to Documents"
 msgstr "Volver a Documentos"
 
@@ -703,7 +703,7 @@ msgstr "Al eliminar este documento, ocurrirá lo siguiente:"
 msgid "By enabling 2FA, you will be required to enter a code from your authenticator app every time you sign in."
 msgstr "Al habilitar la 2FA, se requerirá ingresar un código de su aplicación de autenticación cada vez que inicie sesión."
 
-#: apps/web/src/app/(unauthenticated)/articles/signature-disclosure/page.tsx:140
+#: apps/web/src/app/(unauthenticated)/articles/signature-disclosure/page.tsx:142
 msgid "By proceeding to use the electronic signature service provided by Documenso, you affirm that you have read and understood this disclosure. You agree to all terms and conditions related to the use of electronic signatures and electronic transactions as outlined herein."
 msgstr ""
 
@@ -711,7 +711,7 @@ msgstr ""
 msgid "By proceeding with your electronic signature, you acknowledge and consent that it will be used to sign the given document and holds the same legal validity as a handwritten signature. By completing the electronic signing process, you affirm your understanding and acceptance of these conditions."
 msgstr ""
 
-#: apps/web/src/app/(unauthenticated)/articles/signature-disclosure/page.tsx:90
+#: apps/web/src/app/(unauthenticated)/articles/signature-disclosure/page.tsx:92
 msgid "By using the electronic signature feature, you are consenting to conduct transactions and receive disclosures electronically. You acknowledge that your electronic signature on documents is binding and that you accept the terms outlined in the documents you are signing."
 msgstr ""
 
@@ -911,11 +911,11 @@ msgstr "Confirmar correo electrónico"
 msgid "Confirmation email sent"
 msgstr "Correo electrónico de confirmación enviado"
 
-#: apps/web/src/app/(unauthenticated)/articles/signature-disclosure/page.tsx:87
+#: apps/web/src/app/(unauthenticated)/articles/signature-disclosure/page.tsx:89
 msgid "Consent to Electronic Transactions"
 msgstr ""
 
-#: apps/web/src/app/(unauthenticated)/articles/signature-disclosure/page.tsx:149
+#: apps/web/src/app/(unauthenticated)/articles/signature-disclosure/page.tsx:151
 msgid "Contact Information"
 msgstr ""
 
@@ -1100,6 +1100,10 @@ msgstr "Rechazar"
 msgid "Declined team invitation"
 msgstr "Invitación de equipo rechazada"
 
+#: apps/web/src/app/(dashboard)/documents/delete-document-dialog.tsx:90
+msgid "delete"
+msgstr ""
+
 #: apps/web/src/app/(dashboard)/documents/[id]/document-page-view-dropdown.tsx:141
 #: apps/web/src/app/(dashboard)/documents/data-table-action-dropdown.tsx:187
 #: apps/web/src/app/(dashboard)/documents/delete-document-dialog.tsx:200
@@ -1117,6 +1121,15 @@ msgstr "Invitación de equipo rechazada"
 #: apps/web/src/components/(teams)/dialogs/delete-team-member-dialog.tsx:113
 msgid "Delete"
 msgstr "Eliminar"
+
+#: apps/web/src/components/(dashboard)/settings/token/delete-token-dialog.tsx:56
+#: apps/web/src/components/(dashboard)/settings/webhooks/delete-webhook-dialog.tsx:54
+msgid "delete {0}"
+msgstr ""
+
+#: apps/web/src/components/(teams)/dialogs/delete-team-dialog.tsx:50
+msgid "delete {teamName}"
+msgstr ""
 
 #: apps/web/src/app/(dashboard)/admin/users/[id]/delete-user-dialog.tsx:137
 msgid "Delete account"
@@ -1465,11 +1478,11 @@ msgstr "Editar"
 msgid "Edit webhook"
 msgstr "Editar webhook"
 
-#: apps/web/src/app/(unauthenticated)/articles/signature-disclosure/page.tsx:76
+#: apps/web/src/app/(unauthenticated)/articles/signature-disclosure/page.tsx:78
 msgid "Electronic Delivery of Documents"
 msgstr ""
 
-#: apps/web/src/app/(unauthenticated)/articles/signature-disclosure/page.tsx:15
+#: apps/web/src/app/(unauthenticated)/articles/signature-disclosure/page.tsx:17
 msgid "Electronic Signature Disclosure"
 msgstr ""
 
@@ -1653,9 +1666,13 @@ msgstr "Campos"
 msgid "File cannot be larger than {APP_DOCUMENT_UPLOAD_SIZE_LIMIT}MB"
 msgstr "El archivo no puede ser mayor a {APP_DOCUMENT_UPLOAD_SIZE_LIMIT}MB"
 
-#: apps/web/src/app/(unauthenticated)/articles/signature-disclosure/page.tsx:152
-msgid "For any questions regarding this disclosure, electronic signatures, or any related process, please contact us at: <0>support@documenso.com</0>"
+#: apps/web/src/app/(unauthenticated)/articles/signature-disclosure/page.tsx:154
+msgid "For any questions regarding this disclosure, electronic signatures, or any related process, please contact us at: <0>{SUPPORT_EMAIL}</0>"
 msgstr ""
+
+#: apps/web/src/app/(unauthenticated)/articles/signature-disclosure/page.tsx:152
+#~ msgid "For any questions regarding this disclosure, electronic signatures, or any related process, please contact us at: <0>support@documenso.com</0>"
+#~ msgstr ""
 
 #: apps/web/src/app/(unauthenticated)/forgot-password/page.tsx:21
 #: apps/web/src/components/forms/signin.tsx:370
@@ -1837,7 +1854,7 @@ msgstr "Invitado el"
 msgid "Invoice"
 msgstr "Factura"
 
-#: apps/web/src/app/(unauthenticated)/articles/signature-disclosure/page.tsx:116
+#: apps/web/src/app/(unauthenticated)/articles/signature-disclosure/page.tsx:118
 msgid "It is crucial to keep your contact information, especially your email address, up to date with us. Please notify us immediately of any changes to ensure that you continue to receive all necessary communications."
 msgstr ""
 
@@ -1902,7 +1919,7 @@ msgstr "Salir"
 msgid "Leave team"
 msgstr "Salir del equipo"
 
-#: apps/web/src/app/(unauthenticated)/articles/signature-disclosure/page.tsx:43
+#: apps/web/src/app/(unauthenticated)/articles/signature-disclosure/page.tsx:45
 msgid "Legality of Electronic Signatures"
 msgstr ""
 
@@ -2638,7 +2655,7 @@ msgstr "Resolver"
 msgid "Resolve payment"
 msgstr "Resolver pago"
 
-#: apps/web/src/app/(unauthenticated)/articles/signature-disclosure/page.tsx:124
+#: apps/web/src/app/(unauthenticated)/articles/signature-disclosure/page.tsx:126
 msgid "Retention of Documents"
 msgstr ""
 
@@ -3082,7 +3099,7 @@ msgstr "Éxito"
 msgid "Successfully created passkey"
 msgstr "Clave de acceso creada con éxito"
 
-#: apps/web/src/app/(unauthenticated)/articles/signature-disclosure/page.tsx:55
+#: apps/web/src/app/(unauthenticated)/articles/signature-disclosure/page.tsx:57
 msgid "System Requirements"
 msgstr ""
 
@@ -3262,7 +3279,7 @@ msgstr "Texto"
 msgid "Text Color"
 msgstr "Color de texto"
 
-#: apps/web/src/app/(unauthenticated)/articles/signature-disclosure/page.tsx:22
+#: apps/web/src/app/(unauthenticated)/articles/signature-disclosure/page.tsx:24
 msgid "Thank you for using Documenso to perform your electronic document signing. The purpose of this disclosure is to inform you about the process, legality, and your rights regarding the use of electronic signatures on our platform. By opting to use an electronic signature, you are agreeing to the terms and conditions outlined below."
 msgstr ""
 
@@ -3550,7 +3567,7 @@ msgstr "Para acceder a tu cuenta, por favor confirma tu dirección de correo ele
 msgid "To mark this document as viewed, you need to be logged in as <0>{0}</0>"
 msgstr "Para marcar este documento como visto, debes iniciar sesión como <0>{0}</0>"
 
-#: apps/web/src/app/(unauthenticated)/articles/signature-disclosure/page.tsx:58
+#: apps/web/src/app/(unauthenticated)/articles/signature-disclosure/page.tsx:60
 msgid "To use our electronic signature service, you must have access to:"
 msgstr ""
 
@@ -3610,6 +3627,10 @@ msgstr "Total de firmantes que se registraron"
 #: apps/web/src/app/(dashboard)/admin/stats/page.tsx:64
 msgid "Total Users"
 msgstr "Total de usuarios"
+
+#: apps/web/src/components/(teams)/dialogs/transfer-team-dialog.tsx:76
+msgid "transfer {teamName}"
+msgstr ""
 
 #: apps/web/src/components/(teams)/dialogs/transfer-team-dialog.tsx:160
 msgid "Transfer ownership of this team to a selected team member."
@@ -3828,7 +3849,7 @@ msgstr "Actualizando contraseña..."
 msgid "Updating profile..."
 msgstr "Actualizando perfil..."
 
-#: apps/web/src/app/(unauthenticated)/articles/signature-disclosure/page.tsx:113
+#: apps/web/src/app/(unauthenticated)/articles/signature-disclosure/page.tsx:115
 msgid "Updating Your Information"
 msgstr ""
 
@@ -4224,7 +4245,7 @@ msgstr "Webhooks"
 msgid "Weekly"
 msgstr "Semanal"
 
-#: apps/web/src/app/(unauthenticated)/articles/signature-disclosure/page.tsx:19
+#: apps/web/src/app/(unauthenticated)/articles/signature-disclosure/page.tsx:21
 msgid "Welcome"
 msgstr ""
 
@@ -4240,7 +4261,7 @@ msgstr "¿Estabas intentando editar este documento en su lugar?"
 msgid "When you click continue, you will be prompted to add the first available authenticator on your system."
 msgstr "Cuando haces clic en continuar, se te pedirá que añadas el primer autenticador disponible en tu sistema."
 
-#: apps/web/src/app/(unauthenticated)/articles/signature-disclosure/page.tsx:34
+#: apps/web/src/app/(unauthenticated)/articles/signature-disclosure/page.tsx:36
 msgid "When you use our platform to affix your electronic signature to documents, you are consenting to do so under the Electronic Signatures in Global and National Commerce Act (E-Sign Act) and other applicable laws. This action indicates your agreement to use electronic means to sign documents and receive notifications."
 msgstr ""
 
@@ -4252,7 +4273,7 @@ msgstr "Mientras esperas a que ellos lo hagan, puedes crear tu propia cuenta de 
 msgid "Who do you want to remind?"
 msgstr "¿A quién deseas recordar?"
 
-#: apps/web/src/app/(unauthenticated)/articles/signature-disclosure/page.tsx:99
+#: apps/web/src/app/(unauthenticated)/articles/signature-disclosure/page.tsx:101
 msgid "Withdrawing Consent"
 msgstr ""
 
@@ -4424,9 +4445,13 @@ msgstr "Has eliminado a este usuario del equipo con éxito."
 msgid "You have successfully revoked access."
 msgstr "Has revocado el acceso con éxito."
 
-#: apps/web/src/app/(unauthenticated)/articles/signature-disclosure/page.tsx:102
-msgid "You have the right to withdraw your consent to use electronic signatures at any time before completing the signing process. To withdraw your consent, please contact the sender of the document. In failing to contact the sender you may reach out to <0>support@documenso.com</0> for assistance. Be aware that withdrawing consent may delay or halt the completion of the related transaction or service."
+#: apps/web/src/app/(unauthenticated)/articles/signature-disclosure/page.tsx:104
+msgid "You have the right to withdraw your consent to use electronic signatures at any time before completing the signing process. To withdraw your consent, please contact the sender of the document. In failing to contact the sender you may reach out to <0>{SUPPORT_EMAIL}</0> for assistance. Be aware that withdrawing consent may delay or halt the completion of the related transaction or service."
 msgstr ""
+
+#: apps/web/src/app/(unauthenticated)/articles/signature-disclosure/page.tsx:102
+#~ msgid "You have the right to withdraw your consent to use electronic signatures at any time before completing the signing process. To withdraw your consent, please contact the sender of the document. In failing to contact the sender you may reach out to <0>support@documenso.com</0> for assistance. Be aware that withdrawing consent may delay or halt the completion of the related transaction or service."
+#~ msgstr ""
 
 #: apps/web/src/components/(teams)/dialogs/update-team-member-dialog.tsx:93
 msgid "You have updated {teamMemberName}."
