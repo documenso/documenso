@@ -26,7 +26,6 @@ export const MobileNav = ({ className, ...props }: MobileNavProps) => {
   const teamUrl = typeof params?.teamUrl === 'string' ? params?.teamUrl : '';
 
   const settingsPath = `/t/${teamUrl}/settings`;
-  const documentSettingsPath = `/t/${teamUrl}/settings/documents`;
   const publicProfilePath = `/t/${teamUrl}/settings/public-profile`;
   const membersPath = `/t/${teamUrl}/settings/members`;
   const tokensPath = `/t/${teamUrl}/settings/tokens`;
