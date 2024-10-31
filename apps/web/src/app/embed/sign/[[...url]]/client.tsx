@@ -198,6 +198,7 @@ export const EmbedSignDocumentClientPage = ({
 
         {/* Widget */}
         <div
+          key={isExpanded ? 'expanded' : 'collapsed'}
           className="group/document-widget fixed bottom-8 left-0 z-50 h-fit w-full flex-shrink-0 px-6 md:sticky md:top-4 md:z-auto md:w-[350px] md:px-0"
           data-expanded={isExpanded || undefined}
         >
