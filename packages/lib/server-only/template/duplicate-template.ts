@@ -1,3 +1,5 @@
+import { omit } from 'remeda';
+
 import { nanoid } from '@documenso/lib/universal/id';
 import { prisma } from '@documenso/prisma';
 import type { Prisma } from '@documenso/prisma/client';
@@ -38,6 +40,7 @@ export const duplicateTemplate = async ({
       Recipient: true,
       Field: true,
       templateDocumentData: true,
+      templateMeta: true,
     },
   });
 
@@ -53,6 +56,14 @@ export const duplicateTemplate = async ({
     },
   });
 
+  let templateMeta: Prisma.TemplateCreateArgs['data']['templateMeta'] | undefined = undefined;
+
+  if (template.templateMeta) {
+    templateMeta = {
+      create: omit(template.templateMeta, ['id', 'templateId']),
+    };
+  }
+
   const duplicatedTemplate = await prisma.template.create({
     data: {
       userId,
@@ -66,8 +77,8 @@ export const duplicateTemplate = async ({
           token: nanoid(),
         })),
       },
+      templateMeta,
     },
-
     include: {
       Recipient: true,
     },
