@@ -8,7 +8,7 @@ msgstr ""
 "Language: es\n"
 "Project-Id-Version: documenso-app\n"
 "Report-Msgid-Bugs-To: \n"
-"PO-Revision-Date: 2024-10-22 02:25\n"
+"PO-Revision-Date: 2024-11-01 04:00\n"
 "Last-Translator: \n"
 "Language-Team: Spanish\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
@@ -126,7 +126,7 @@ msgstr "Después de la presentación, se generará automáticamente un documento
 
 #: packages/ui/primitives/pdf-viewer.tsx:167
 msgid "An error occurred while loading the document."
-msgstr ""
+msgstr "Se produjo un error al cargar el documento."
 
 #: packages/lib/constants/recipient-roles.ts:8
 msgid "Approve"
@@ -142,7 +142,7 @@ msgstr "Aprobador"
 
 #: packages/lib/constants/recipient-roles.ts:44
 msgid "Approvers"
-msgstr ""
+msgstr "Aprobadores"
 
 #: packages/lib/constants/recipient-roles.ts:10
 msgid "Approving"
@@ -180,7 +180,7 @@ msgstr "CC'd"
 
 #: packages/lib/constants/recipient-roles.ts:51
 msgid "Ccers"
-msgstr ""
+msgstr "Ccers"
 
 #: packages/ui/primitives/document-flow/field-items-advanced-settings/text-field.tsx:86
 msgid "Character Limit"
@@ -225,7 +225,7 @@ msgstr "Copiado al portapapeles"
 
 #: packages/ui/components/document/document-share-button.tsx:194
 msgid "Copy Link"
-msgstr ""
+msgstr "Copiar enlace"
 
 #: packages/ui/primitives/document-flow/add-signature.tsx:360
 msgid "Custom Text"
@@ -286,7 +286,7 @@ msgstr "Correo electrónico"
 
 #: packages/ui/primitives/document-flow/add-signature.types.ts:7
 msgid "Email is required"
-msgstr ""
+msgstr "Se requiere email"
 
 #: packages/ui/primitives/template-flow/add-template-settings.tsx:184
 msgid "Email Options"
@@ -363,7 +363,7 @@ msgstr "Tamaño de fuente"
 
 #: packages/ui/primitives/document-flow/types.ts:50
 msgid "Free Signature"
-msgstr ""
+msgstr "Firma gratuita"
 
 #: packages/ui/components/document/document-global-auth-action-select.tsx:64
 msgid "Global recipient action authentication"
@@ -400,15 +400,15 @@ msgstr "Heredar método de autenticación"
 
 #: packages/ui/primitives/document-flow/types.ts:51
 msgid "Initials"
-msgstr ""
+msgstr "Iniciales"
 
 #: packages/ui/primitives/document-flow/add-signers.types.ts:17
 msgid "Invalid email"
-msgstr ""
+msgstr "Email inválido"
 
 #: packages/ui/primitives/document-flow/add-signature.types.ts:8
 msgid "Invalid email address"
-msgstr ""
+msgstr "Dirección de email inválida"
 
 #: packages/ui/primitives/document-flow/field-items-advanced-settings/number-field.tsx:67
 #: packages/ui/primitives/document-flow/field-items-advanced-settings/number-field.tsx:72
@@ -419,7 +419,7 @@ msgstr "Etiqueta"
 #: packages/ui/primitives/lazy-pdf-viewer.tsx:15
 #: packages/ui/primitives/pdf-viewer.tsx:44
 msgid "Loading document..."
-msgstr ""
+msgstr "Cargando documento..."
 
 #: packages/lib/constants/teams.ts:11
 msgid "Manager"
@@ -519,7 +519,7 @@ msgstr "Página {0} de {1}"
 
 #: packages/ui/primitives/pdf-viewer.tsx:259
 msgid "Page {0} of {numPages}"
-msgstr ""
+msgstr "Página {0} de {numPages}"
 
 #: packages/ui/primitives/document-password-dialog.tsx:62
 msgid "Password Required"
@@ -538,7 +538,7 @@ msgstr "Marcador de posición"
 #: packages/ui/primitives/pdf-viewer.tsx:223
 #: packages/ui/primitives/pdf-viewer.tsx:238
 msgid "Please try again or contact our support."
-msgstr ""
+msgstr "Por favor, inténtalo de nuevo o contacta a nuestro soporte."
 
 #: packages/ui/primitives/template-flow/add-template-fields.tsx:768
 msgid "Radio"
@@ -589,7 +589,7 @@ msgstr "Campo obligatorio"
 
 #: packages/ui/components/document/document-share-button.tsx:147
 msgid "Rest assured, your document is strictly confidential and will never be shared. Only your signing experience will be highlighted. Share your personalized signing card to showcase your signature!"
-msgstr ""
+msgstr "Ten la seguridad de que tu documento es estrictamente confidencial y nunca será compartido. Solo se destacará tu experiencia de firma. ¡Comparte tu tarjeta de firma personalizada para mostrar tu firma!"
 
 #: packages/ui/primitives/data-table-pagination.tsx:55
 msgid "Rows per page"
@@ -643,7 +643,7 @@ msgstr "Compartir el enlace"
 
 #: packages/ui/components/document/document-share-button.tsx:143
 msgid "Share your signing experience!"
-msgstr ""
+msgstr "¡Comparte tu experiencia de firma!"
 
 #: packages/ui/primitives/document-flow/add-signers.tsx:680
 #: packages/ui/primitives/template-flow/add-template-placeholder-recipients.tsx:655
@@ -672,11 +672,11 @@ msgstr "Firmante"
 
 #: packages/lib/constants/recipient-roles.ts:58
 msgid "Signers"
-msgstr ""
+msgstr "Firmantes"
 
 #: packages/ui/primitives/document-flow/add-signers.types.ts:36
 msgid "Signers must have unique emails"
-msgstr ""
+msgstr "Los firmantes deben tener correos electrónicos únicos"
 
 #: packages/lib/constants/recipient-roles.ts:22
 msgid "Signing"
@@ -693,7 +693,7 @@ msgstr "Algo salió mal"
 #: packages/ui/primitives/pdf-viewer.tsx:220
 #: packages/ui/primitives/pdf-viewer.tsx:235
 msgid "Something went wrong while loading the document."
-msgstr ""
+msgstr "Algo salió mal al cargar el documento."
 
 #: packages/ui/primitives/data-table.tsx:136
 msgid "Something went wrong."
@@ -856,7 +856,7 @@ msgstr "Visor"
 
 #: packages/lib/constants/recipient-roles.ts:65
 msgid "Viewers"
-msgstr ""
+msgstr "Espectadores"
 
 #: packages/lib/constants/recipient-roles.ts:28
 msgid "Viewing"
@@ -877,3 +877,4 @@ msgstr "No puede cargar documentos en este momento."
 #: packages/ui/primitives/document-dropzone.tsx:69
 msgid "You have reached your document limit."
 msgstr "Ha alcanzado su límite de documentos."
+
