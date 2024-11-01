@@ -4,7 +4,6 @@ import { useEffect } from 'react';
 
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Trans } from '@lingui/macro';
-import { useLingui } from '@lingui/react';
 import { InfoIcon } from 'lucide-react';
 import { useForm } from 'react-hook-form';
 
@@ -74,8 +73,6 @@ export const AddTemplateSettingsFormPartial = ({
   template,
   onSubmit,
 }: AddTemplateSettingsFormProps) => {
-  const { _ } = useLingui();
-
   const { documentAuthOption } = extractDocumentAuthMethods({
     documentAuth: template.authOptions,
   });
@@ -102,7 +99,7 @@ export const AddTemplateSettingsFormPartial = ({
   // We almost always want to set the timezone to the user's local timezone to avoid confusion
   // when the document is signed.
   useEffect(() => {
-    if (!form.formState.touchedFields.meta?.timezone) {
+    if (!form.formState.touchedFields.meta?.timezone && !template.templateMeta?.timezone) {
       form.setValue('meta.timezone', Intl.DateTimeFormat().resolvedOptions().timeZone);
     }
   }, [form, form.setValue, form.formState.touchedFields.meta?.timezone]);
