@@ -1054,13 +1054,10 @@ msgstr "Created on"
 
 #: apps/web/src/app/(dashboard)/settings/tokens/page.tsx:67
 #: apps/web/src/app/(dashboard)/settings/webhooks/page.tsx:88
+#: apps/web/src/app/(teams)/t/[teamUrl]/settings/tokens/page.tsx:100
 #: apps/web/src/app/(teams)/t/[teamUrl]/settings/webhooks/page.tsx:93
 msgid "Created on {0}"
 msgstr "Created on {0}"
-
-#: apps/web/src/app/(teams)/t/[teamUrl]/settings/tokens/page.tsx:100
-msgid "Created on{0}"
-msgstr "Created on{0}"
 
 #: apps/web/src/components/forms/password.tsx:107
 msgid "Current Password"
@@ -1108,7 +1105,7 @@ msgstr "delete"
 #: apps/web/src/app/(dashboard)/settings/webhooks/page.tsx:100
 #: apps/web/src/app/(dashboard)/templates/data-table-action-dropdown.tsx:91
 #: apps/web/src/app/(dashboard)/templates/delete-template-dialog.tsx:90
-#: apps/web/src/app/(teams)/t/[teamUrl]/settings/tokens/page.tsx:122
+#: apps/web/src/app/(teams)/t/[teamUrl]/settings/tokens/page.tsx:116
 #: apps/web/src/app/(teams)/t/[teamUrl]/settings/webhooks/page.tsx:105
 #: apps/web/src/components/(dashboard)/settings/token/delete-token-dialog.tsx:121
 #: apps/web/src/components/(dashboard)/settings/webhooks/delete-webhook-dialog.tsx:109
@@ -1633,12 +1630,9 @@ msgid "Expired"
 msgstr "Expired"
 
 #: apps/web/src/app/(dashboard)/settings/tokens/page.tsx:71
+#: apps/web/src/app/(teams)/t/[teamUrl]/settings/tokens/page.tsx:104
 msgid "Expires on {0}"
 msgstr "Expires on {0}"
-
-#: apps/web/src/app/(teams)/t/[teamUrl]/settings/tokens/page.tsx:107
-msgid "Expires on{0}"
-msgstr "Expires on{0}"
 
 #: apps/web/src/app/(dashboard)/admin/documents/[id]/admin-actions.tsx:42
 msgid "Failed to reseal document"
@@ -1664,10 +1658,6 @@ msgstr "File cannot be larger than {APP_DOCUMENT_UPLOAD_SIZE_LIMIT}MB"
 #: apps/web/src/app/(unauthenticated)/articles/signature-disclosure/page.tsx:154
 msgid "For any questions regarding this disclosure, electronic signatures, or any related process, please contact us at: <0>{SUPPORT_EMAIL}</0>"
 msgstr "For any questions regarding this disclosure, electronic signatures, or any related process, please contact us at: <0>{SUPPORT_EMAIL}</0>"
-
-#: apps/web/src/app/(unauthenticated)/articles/signature-disclosure/page.tsx:152
-#~ msgid "For any questions regarding this disclosure, electronic signatures, or any related process, please contact us at: <0>support@documenso.com</0>"
-#~ msgstr "For any questions regarding this disclosure, electronic signatures, or any related process, please contact us at: <0>support@documenso.com</0>"
 
 #: apps/web/src/app/(unauthenticated)/forgot-password/page.tsx:21
 #: apps/web/src/components/forms/signin.tsx:370
@@ -3595,7 +3585,7 @@ msgid "Token deleted"
 msgstr "Token deleted"
 
 #: apps/web/src/app/(dashboard)/settings/tokens/page.tsx:75
-#: apps/web/src/app/(teams)/t/[teamUrl]/settings/tokens/page.tsx:114
+#: apps/web/src/app/(teams)/t/[teamUrl]/settings/tokens/page.tsx:108
 msgid "Token doesn't have an expiration date"
 msgstr "Token doesn't have an expiration date"
 
@@ -4443,10 +4433,6 @@ msgstr "You have successfully revoked access."
 #: apps/web/src/app/(unauthenticated)/articles/signature-disclosure/page.tsx:104
 msgid "You have the right to withdraw your consent to use electronic signatures at any time before completing the signing process. To withdraw your consent, please contact the sender of the document. In failing to contact the sender you may reach out to <0>{SUPPORT_EMAIL}</0> for assistance. Be aware that withdrawing consent may delay or halt the completion of the related transaction or service."
 msgstr "You have the right to withdraw your consent to use electronic signatures at any time before completing the signing process. To withdraw your consent, please contact the sender of the document. In failing to contact the sender you may reach out to <0>{SUPPORT_EMAIL}</0> for assistance. Be aware that withdrawing consent may delay or halt the completion of the related transaction or service."
-
-#: apps/web/src/app/(unauthenticated)/articles/signature-disclosure/page.tsx:102
-#~ msgid "You have the right to withdraw your consent to use electronic signatures at any time before completing the signing process. To withdraw your consent, please contact the sender of the document. In failing to contact the sender you may reach out to <0>support@documenso.com</0> for assistance. Be aware that withdrawing consent may delay or halt the completion of the related transaction or service."
-#~ msgstr "You have the right to withdraw your consent to use electronic signatures at any time before completing the signing process. To withdraw your consent, please contact the sender of the document. In failing to contact the sender you may reach out to <0>support@documenso.com</0> for assistance. Be aware that withdrawing consent may delay or halt the completion of the related transaction or service."
 
 #: apps/web/src/components/(teams)/dialogs/update-team-member-dialog.tsx:93
 msgid "You have updated {teamMemberName}."

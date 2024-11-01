@@ -181,10 +181,6 @@ msgstr "Ccers"
 msgid "Character Limit"
 msgstr "Character Limit"
 
-#: packages/ui/primitives/template-flow/add-template-fields.tsx:794
-#~ msgid "Checkbox"
-#~ msgstr "Checkbox"
-
 #: packages/ui/primitives/document-flow/field-items-advanced-settings/checkbox-field.tsx:197
 msgid "Checkbox values"
 msgstr "Checkbox values"

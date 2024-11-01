@@ -186,10 +186,6 @@ msgstr ""
 msgid "Character Limit"
 msgstr "Limite de caractères"
 
-#: packages/ui/primitives/template-flow/add-template-fields.tsx:794
-#~ msgid "Checkbox"
-#~ msgstr "Case à cocher"
-
 #: packages/ui/primitives/document-flow/field-items-advanced-settings/checkbox-field.tsx:197
 msgid "Checkbox values"
 msgstr "Valeurs de case à cocher"
