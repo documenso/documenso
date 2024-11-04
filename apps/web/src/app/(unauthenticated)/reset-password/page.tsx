@@ -10,8 +10,8 @@ export const metadata: Metadata = {
   title: 'Reset Password',
 };
 
-export default function ResetPasswordPage() {
-  setupI18nSSR();
+export default async function ResetPasswordPage() {
+  await setupI18nSSR();
 
   return (
     <div className="w-screen max-w-lg px-4">

@@ -21,7 +21,7 @@ type ApiTokensPageProps = {
 };
 
 export default async function ApiTokensPage({ params }: ApiTokensPageProps) {
-  const { i18n } = setupI18nSSR();
+  const { i18n } = await setupI18nSSR();
 
   const { teamUrl } = params;
 

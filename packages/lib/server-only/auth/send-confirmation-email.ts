@@ -1,9 +1,12 @@
 import { createElement } from 'react';
 
+import { msg } from '@lingui/macro';
+
 import { mailer } from '@documenso/email/mailer';
 import { ConfirmEmailTemplate } from '@documenso/email/templates/confirm-email';
 import { prisma } from '@documenso/prisma';
 
+import { getI18nInstance } from '../../client-only/providers/i18n.server';
 import { NEXT_PUBLIC_WEBAPP_URL } from '../../constants/app';
 import { renderEmailWithI18N } from '../../utils/render-email-with-i18n';
 
@@ -40,18 +43,17 @@ export const sendConfirmationEmail = async ({ userId }: SendConfirmationEmailPro
   const senderName = NEXT_PRIVATE_SMTP_FROM_NAME || 'Documenso';
   const senderAddress = NEXT_PRIVATE_SMTP_FROM_ADDRESS || 'noreply@documenso.com';
 
-  const confirmationTemplate = () =>
-    createElement(ConfirmEmailTemplate, {
-      assetBaseUrl,
-      confirmationLink,
-    });
+  const confirmationTemplate = createElement(ConfirmEmailTemplate, {
+    assetBaseUrl,
+    confirmationLink,
+  });
 
   const [html, text] = await Promise.all([
-    renderEmailWithI18N('fr', confirmationTemplate),
-    // render(confirmationTemplate),
-    renderEmailWithI18N('fr', confirmationTemplate, { plainText: true }),
-    // render(confirmationTemplate, { plainText: true }),
+    renderEmailWithI18N(confirmationTemplate),
+    renderEmailWithI18N(confirmationTemplate, { plainText: true }),
   ]);
+
+  const i18n = await getI18nInstance();
 
   return mailer.sendMail({
     to: {
@@ -62,7 +64,7 @@ export const sendConfirmationEmail = async ({ userId }: SendConfirmationEmailPro
       name: senderName,
       address: senderAddress,
     },
-    subject: 'Please confirm your email',
+    subject: i18n._(msg`Please confirm your email`),
     html,
     text,
   });

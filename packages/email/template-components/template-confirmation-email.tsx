@@ -1,5 +1,5 @@
 import { Trans } from '@lingui/macro';
-import { Trans as LinguiTrans, useLingui } from '@lingui/react';
+import { useLingui } from '@lingui/react';
 
 import { Button, Section, Text } from '../components';
 import { TemplateDocumentImage } from './template-document-image';
@@ -38,10 +38,10 @@ export const TemplateConfirmationEmail = ({
             <Trans>Confirm email</Trans>
           </Button>
           <Text className="mt-8 text-center text-sm italic text-slate-400">
-            <LinguiTrans id="vJ5z1n">
+            <Trans>
               You can also copy and paste this link into your browser: {confirmationLink} (link
               expires in 1 hour)
-            </LinguiTrans>
+            </Trans>
           </Text>
         </Section>
       </Section>

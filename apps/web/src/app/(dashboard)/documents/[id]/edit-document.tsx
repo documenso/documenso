@@ -7,6 +7,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { msg } from '@lingui/macro';
 import { useLingui } from '@lingui/react';
 
+import { isValidLanguageCode } from '@documenso/lib/constants/i18n';
 import {
   DO_NOT_INVALIDATE_QUERY_ON_MUTATION,
   SKIP_QUERY_BATCH_META,
@@ -201,7 +202,7 @@ export const EditDocumentForm = ({
 
   const onAddSettingsFormSubmit = async (data: TAddSettingsFormSchema) => {
     try {
-      const { timezone, dateFormat, redirectUrl } = data.meta;
+      const { timezone, dateFormat, redirectUrl, language } = data.meta;
 
       await setSettingsForDocument({
         documentId: document.id,
@@ -217,6 +218,7 @@ export const EditDocumentForm = ({
           timezone,
           dateFormat,
           redirectUrl,
+          language: isValidLanguageCode(language) ? language : undefined,
         },
       });
 

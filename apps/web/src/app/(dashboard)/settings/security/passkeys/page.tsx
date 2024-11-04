@@ -17,7 +17,7 @@ export const metadata: Metadata = {
 };
 
 export default async function SettingsManagePasskeysPage() {
-  setupI18nSSR();
+  await setupI18nSSR();
 
   const { _ } = useLingui();
   const isPasskeyEnabled = await getServerComponentFlag('app_passkey');

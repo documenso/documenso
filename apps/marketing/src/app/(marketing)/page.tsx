@@ -26,7 +26,7 @@ const fontCaveat = Caveat({
 });
 
 export default async function IndexPage() {
-  setupI18nSSR();
+  await setupI18nSSR();
 
   const starCount = await fetch('https://api.github.com/repos/documenso/documenso', {
     headers: {

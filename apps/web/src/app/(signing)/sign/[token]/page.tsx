@@ -31,7 +31,7 @@ export type SigningPageProps = {
 };
 
 export default async function SigningPage({ params: { token } }: SigningPageProps) {
-  setupI18nSSR();
+  await setupI18nSSR();
 
   if (!token) {
     return notFound();

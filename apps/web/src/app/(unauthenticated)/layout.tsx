@@ -9,8 +9,8 @@ type UnauthenticatedLayoutProps = {
   children: React.ReactNode;
 };
 
-export default function UnauthenticatedLayout({ children }: UnauthenticatedLayoutProps) {
-  setupI18nSSR();
+export default async function UnauthenticatedLayout({ children }: UnauthenticatedLayoutProps) {
+  await setupI18nSSR();
 
   return (
     <main className="relative flex min-h-screen flex-col items-center justify-center overflow-hidden px-4 py-12 md:p-12 lg:p-24">

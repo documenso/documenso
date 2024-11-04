@@ -24,7 +24,7 @@ export default async function TeamsSettingsLayout({
   children,
   params: { teamUrl },
 }: TeamSettingsLayoutProps) {
-  setupI18nSSR();
+  await setupI18nSSR();
 
   const session = await getRequiredServerComponentSession();
 

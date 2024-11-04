@@ -5,8 +5,8 @@ import { Trans } from '@lingui/macro';
 import { setupI18nSSR } from '@documenso/lib/client-only/providers/i18n.server';
 import { Button } from '@documenso/ui/primitives/button';
 
-export default function SignatureDisclosure() {
-  setupI18nSSR();
+export default async function SignatureDisclosure() {
+  await setupI18nSSR();
 
   return (
     <div>

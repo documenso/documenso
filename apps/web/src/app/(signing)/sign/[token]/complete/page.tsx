@@ -40,7 +40,7 @@ export type CompletedSigningPageProps = {
 export default async function CompletedSigningPage({
   params: { token },
 }: CompletedSigningPageProps) {
-  setupI18nSSR();
+  await setupI18nSSR();
 
   const { _ } = useLingui();
 

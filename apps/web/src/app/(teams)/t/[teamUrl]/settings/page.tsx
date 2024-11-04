@@ -28,7 +28,7 @@ export type TeamsSettingsPageProps = {
 };
 
 export default async function TeamsSettingsPage({ params }: TeamsSettingsPageProps) {
-  setupI18nSSR();
+  await setupI18nSSR();
 
   const { teamUrl } = params;
 

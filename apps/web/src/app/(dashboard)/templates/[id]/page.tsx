@@ -7,8 +7,8 @@ import { TemplatePageView } from './template-page-view';
 
 type TemplatePageProps = Pick<TemplatePageViewProps, 'params'>;
 
-export default function TemplatePage({ params }: TemplatePageProps) {
-  setupI18nSSR();
+export default async function TemplatePage({ params }: TemplatePageProps) {
+  await setupI18nSSR();
 
   return <TemplatePageView params={params} />;
 }

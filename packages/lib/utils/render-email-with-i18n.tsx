@@ -1,39 +1,34 @@
-import { setupI18n } from '@lingui/core';
 import { I18nProvider } from '@lingui/react';
 
 import { render } from '@documenso/email/render';
 
-import type { SupportedLanguageCodes } from '../constants/i18n';
+import { getI18nInstance } from '../client-only/providers/i18n.server';
+import {
+  APP_I18N_OPTIONS,
+  type SupportedLanguageCodes,
+  isValidLanguageCode,
+} from '../constants/i18n';
 
 export const renderEmailWithI18N = async (
-  lang: SupportedLanguageCodes,
-  Component: () => React.ReactElement,
-  options?: { plainText?: boolean },
+  component: React.ReactElement,
+  options?: {
+    plainText?: boolean;
+    // eslint-disable-next-line @typescript-eslint/ban-types
+    lang?: SupportedLanguageCodes | (string & {});
+  },
 ) => {
   try {
-    const { allI18nInstances } = await import('../client-only/providers/i18n.server');
+    const providedLang = options?.lang;
 
-    const instance = allI18nInstances[lang];
+    const lang = isValidLanguageCode(providedLang) ? providedLang : APP_I18N_OPTIONS.sourceLang;
 
-    instance.activate(lang);
+    const i18n = await getI18nInstance(lang);
 
-    console.log({ instance });
+    i18n.activate(lang);
 
-    const i18n = setupI18n({
-      locale: lang,
-      locales: [lang],
-      messages: { [lang]: instance.messages },
+    return render(<I18nProvider i18n={i18n}>{component}</I18nProvider>, {
+      plainText: options?.plainText,
     });
-
-    console.log(JSON.stringify({ messages: instance.messages }, null, 2));
-
-    // setI18n(i18n);
-
-    return await render(
-      <I18nProvider i18n={i18n}>
-        <Component />
-      </I18nProvider>,
-    );
   } catch (err) {
     console.error(err);
     throw new Error('Failed to render email');

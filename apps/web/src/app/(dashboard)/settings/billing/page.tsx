@@ -24,7 +24,7 @@ export const metadata: Metadata = {
 };
 
 export default async function BillingSettingsPage() {
-  const { i18n } = setupI18nSSR();
+  const { i18n } = await setupI18nSSR();
 
   let { user } = await getRequiredServerComponentSession();
 

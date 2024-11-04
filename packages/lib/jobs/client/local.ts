@@ -43,16 +43,8 @@ export class LocalJobProvider extends BaseJobProvider {
   }
 
   public async triggerJob(options: SimpleTriggerJobOptions) {
-    console.log({ jobDefinitions: this._jobDefinitions });
-
     const eligibleJobs = Object.values(this._jobDefinitions).filter(
       (job) => job.trigger.name === options.name,
-    );
-
-    console.log({ options });
-    console.log(
-      'Eligible jobs:',
-      eligibleJobs.map((job) => job.name),
     );
 
     await Promise.all(

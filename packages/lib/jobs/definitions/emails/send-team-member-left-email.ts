@@ -1,13 +1,15 @@
+import { msg } from '@lingui/macro';
 import { z } from 'zod';
 
 import { mailer } from '@documenso/email/mailer';
-import { render } from '@documenso/email/render';
 import TeamJoinEmailTemplate from '@documenso/email/templates/team-join';
 import { prisma } from '@documenso/prisma';
 import { TeamMemberRole } from '@documenso/prisma/client';
 
+import { getI18nInstance } from '../../../client-only/providers/i18n.server';
 import { WEBAPP_BASE_URL } from '../../../constants/app';
 import { FROM_ADDRESS, FROM_NAME } from '../../../constants/email';
+import { renderEmailWithI18N } from '../../../utils/render-email-with-i18n';
 import type { JobDefinition } from '../../client/_internal/job';
 
 const SEND_TEAM_MEMBER_LEFT_EMAIL_JOB_DEFINITION_ID = 'send.team-member-left.email';
@@ -61,15 +63,22 @@ export const SEND_TEAM_MEMBER_LEFT_EMAIL_JOB_DEFINITION = {
           teamUrl: team.url,
         });
 
+        const [html, text] = await Promise.all([
+          renderEmailWithI18N(emailContent),
+          renderEmailWithI18N(emailContent, { plainText: true }),
+        ]);
+
+        const i18n = await getI18nInstance();
+
         await mailer.sendMail({
           to: member.user.email,
           from: {
             name: FROM_NAME,
             address: FROM_ADDRESS,
           },
-          subject: `A team member has left ${team.name}`,
-          html: render(emailContent),
-          text: render(emailContent, { plainText: true }),
+          subject: i18n._(msg`A team member has left ${team.name}`),
+          html,
+          text,
         });
       });
     }

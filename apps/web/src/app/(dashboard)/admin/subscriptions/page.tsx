@@ -14,7 +14,7 @@ import {
 } from '@documenso/ui/primitives/table';
 
 export default async function Subscriptions() {
-  setupI18nSSR();
+  await setupI18nSSR();
 
   const subscriptions = await findSubscriptions();
 

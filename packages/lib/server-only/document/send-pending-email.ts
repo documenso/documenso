@@ -1,11 +1,14 @@
 import { createElement } from 'react';
 
+import { msg } from '@lingui/macro';
+
 import { mailer } from '@documenso/email/mailer';
-import { render } from '@documenso/email/render';
 import { DocumentPendingEmailTemplate } from '@documenso/email/templates/document-pending';
 import { prisma } from '@documenso/prisma';
 
+import { getI18nInstance } from '../../client-only/providers/i18n.server';
 import { NEXT_PUBLIC_WEBAPP_URL } from '../../constants/app';
+import { renderEmailWithI18N } from '../../utils/render-email-with-i18n';
 
 export interface SendPendingEmailOptions {
   documentId: number;
@@ -28,6 +31,7 @@ export const sendPendingEmail = async ({ documentId, recipientId }: SendPendingE
           id: recipientId,
         },
       },
+      documentMeta: true,
     },
   });
 
@@ -50,6 +54,13 @@ export const sendPendingEmail = async ({ documentId, recipientId }: SendPendingE
     assetBaseUrl,
   });
 
+  const [html, text] = await Promise.all([
+    renderEmailWithI18N(template, { lang: document.documentMeta?.language }),
+    renderEmailWithI18N(template, { lang: document.documentMeta?.language, plainText: true }),
+  ]);
+
+  const i18n = await getI18nInstance();
+
   await mailer.sendMail({
     to: {
       address: email,
@@ -59,8 +70,8 @@ export const sendPendingEmail = async ({ documentId, recipientId }: SendPendingE
       name: process.env.NEXT_PRIVATE_SMTP_FROM_NAME || 'Documenso',
       address: process.env.NEXT_PRIVATE_SMTP_FROM_ADDRESS || 'noreply@documenso.com',
     },
-    subject: 'Waiting for others to complete signing.',
-    html: render(template),
-    text: render(template, { plainText: true }),
+    subject: i18n._(msg`Waiting for others to complete signing.`),
+    html,
+    text,
   });
 };
