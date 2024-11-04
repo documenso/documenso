@@ -88,6 +88,10 @@ export const ZUpdateTemplateSettingsMutationSchema = z.object({
       .max(MAX_TEMPLATE_PUBLIC_DESCRIPTION_LENGTH)
       .optional(),
     type: z.nativeEnum(TemplateType).optional(),
+    language: z
+      .union([z.string(), z.enum(SUPPORTED_LANGUAGE_CODES)])
+      .optional()
+      .default('en'),
   }),
   meta: z
     .object({
