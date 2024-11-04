@@ -76,9 +76,9 @@ export type EarlyAdoptersType = z.infer<typeof ZEarlyAdoptersResponse>;
 
 const fetchGithubStats = async () => {
   return await fetch('https://api.github.com/repos/documenso/documenso', {
-    headers: {
-      ...GITHUB_HEADERS,
-    },
+    // headers: {
+    //   ...GITHUB_HEADERS,
+    // },
   })
     .then(async (res) => res.json())
     .then((res) => ZGithubStatsResponse.parse(res));
