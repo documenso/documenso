@@ -38,11 +38,17 @@ You will be prompted to enter some information, such as the certificate's Common
 Combine the private key and the self-signed certificate to create a `.p12` certificate. Use the following command:
 
 ```bash
-openssl pkcs12 -export -out certificate.p12 -inkey private.key -in certificate.crt
+openssl pkcs12 -export -out certificate.p12 -inkey private.key -in certificate.crt -legacy
 ```
 
 <Callout type="warning">
-  If you get the error "Error: Failed to get private key bags", add the `-legacy` flag to the command `openssl pkcs12 -export -out certificate.p12 -inkey private.key -in certificate.crt -legacy`.
+If you are using Docker, you will need to ensure the application has permission to correctly read the certificate.
+
+This can be done by using `chown` to allow the NextJS user (1001) to read the certificate.
+
+```bash
+sudo chown 1001 certificate.p12
+```
 
 </Callout>
 
@@ -54,8 +60,8 @@ Note that for local development, the password can be left empty.
 
 ### Add Certificate to the Project
 
-Finally, add the certificate to the project. Place the `certificate.p12` file in the `/apps/web/resources` directory. If the directory doesn't exist, create it.
+Use the `NEXT_PRIVATE_SIGNING_LOCAL_FILE_PATH` environment variable to point at the certificate you created.
 
-The final file path should be `/apps/web/resources/certificate.p12`.
+Details about environment variables associated with certificates can be found [here](/developers/self-hosting/signing-certificate#configure-documenso-to-use-the-certificate).
 
 </Steps>
