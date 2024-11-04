@@ -1,5 +1,5 @@
-'use client';
-
+import { msg } from '@lingui/macro';
+import { useLingui } from '@lingui/react';
 import { DateTime } from 'luxon';
 import type { DateTimeFormatOptions } from 'luxon';
 import { UAParser } from 'ua-parser-js';
@@ -25,7 +25,12 @@ const dateFormat: DateTimeFormatOptions = {
   hourCycle: 'h12',
 };
 
+/**
+ * DO NOT USE TRANS. YOU MUST USE _ FOR THIS FILE AND ALL CHILDREN COMPONENTS.
+ */
 export const AuditLogDataTable = ({ logs }: AuditLogDataTableProps) => {
+  const { _ } = useLingui();
+
   const parser = new UAParser();
 
   const uppercaseFistLetter = (text: string) => {
@@ -36,11 +41,11 @@ export const AuditLogDataTable = ({ logs }: AuditLogDataTableProps) => {
     <Table overflowHidden>
       <TableHeader>
         <TableRow>
-          <TableHead>Time</TableHead>
-          <TableHead>User</TableHead>
-          <TableHead>Action</TableHead>
-          <TableHead>IP Address</TableHead>
-          <TableHead>Browser</TableHead>
+          <TableHead>{_(msg`Time`)}</TableHead>
+          <TableHead>{_(msg`User`)}</TableHead>
+          <TableHead>{_(msg`Action`)}</TableHead>
+          <TableHead>{_(msg`IP Address`)}</TableHead>
+          <TableHead>{_(msg`Browser`)}</TableHead>
         </TableRow>
       </TableHeader>
 
@@ -74,7 +79,7 @@ export const AuditLogDataTable = ({ logs }: AuditLogDataTableProps) => {
             </TableCell>
 
             <TableCell>
-              {uppercaseFistLetter(formatDocumentAuditLogAction(log).description)}
+              {uppercaseFistLetter(formatDocumentAuditLogAction(_, log).description)}
             </TableCell>
 
             <TableCell>{log.ipAddress}</TableCell>
