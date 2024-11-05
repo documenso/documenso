@@ -4,7 +4,6 @@ import { redirect } from 'next/navigation';
 import { Trans } from '@lingui/macro';
 import { ChevronLeft, LucideEdit } from 'lucide-react';
 
-import { setupI18nSSR } from '@documenso/lib/client-only/providers/i18n.server';
 import { getRequiredServerComponentSession } from '@documenso/lib/next-auth/get-server-component-session';
 import { getTemplateById } from '@documenso/lib/server-only/template/get-template-by-id';
 import { formatDocumentsPath, formatTemplatesPath } from '@documenso/lib/utils/teams';
@@ -33,8 +32,6 @@ export type TemplatePageViewProps = {
 };
 
 export const TemplatePageView = async ({ params, team }: TemplatePageViewProps) => {
-  await setupI18nSSR();
-
   const { id } = params;
 
   const templateId = Number(id);
