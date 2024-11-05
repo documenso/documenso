@@ -44,11 +44,11 @@ export const BillingPlans = ({ prices }: BillingPlansProps) => {
   const isMounted = useIsMounted();
 
   const [interval, setInterval] = useState<Interval>('month');
-  const [isFetchingCheckoutSession, setIsFetchingCheckoutSession] = useState(false);
+  const [checkoutSessionPriceId, setCheckoutSessionPriceId] = useState<string | null>(null);
 
   const onSubscribeClick = async (priceId: string) => {
     try {
-      setIsFetchingCheckoutSession(true);
+      setCheckoutSessionPriceId(priceId);
 
       const url = await createCheckout({ priceId });
 
@@ -64,7 +64,7 @@ export const BillingPlans = ({ prices }: BillingPlansProps) => {
         variant: 'destructive',
       });
     } finally {
-      setIsFetchingCheckoutSession(false);
+      setCheckoutSessionPriceId(null);
     }
   };
 
@@ -122,7 +122,8 @@ export const BillingPlans = ({ prices }: BillingPlansProps) => {
 
                 <Button
                   className="mt-4"
-                  loading={isFetchingCheckoutSession}
+                  disabled={checkoutSessionPriceId !== null}
+                  loading={checkoutSessionPriceId === price.id}
                   onClick={() => void onSubscribeClick(price.id)}
                 >
                   <Trans>Subscribe</Trans>
