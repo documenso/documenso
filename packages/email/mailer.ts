@@ -53,6 +53,9 @@ const getTransport = () => {
           pass: process.env.NEXT_PRIVATE_SMTP_PASSWORD ?? '',
         }
       : undefined,
+    ...(process.env.NEXT_PRIVATE_SMTP_SERVICE
+      ? { service: process.env.NEXT_PRIVATE_SMTP_SERVICE }
+      : {}),
   });
 };
 
