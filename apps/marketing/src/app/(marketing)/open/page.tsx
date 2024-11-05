@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 
 import { Trans, msg } from '@lingui/macro';
+import { useLingui } from '@lingui/react';
 import { z } from 'zod';
 
 import { setupI18nSSR } from '@documenso/lib/client-only/providers/i18n.server';
@@ -130,9 +131,9 @@ const fetchEarlyAdopters = async () => {
 };
 
 export default async function OpenPage() {
-  const { i18n } = await setupI18nSSR();
+  await setupI18nSSR();
 
-  const { _ } = i18n;
+  const { _ } = useLingui();
 
   const [
     { forks_count: forksCount, stargazers_count: stargazersCount },
