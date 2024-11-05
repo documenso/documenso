@@ -43,27 +43,27 @@ export const TemplateDocumentInvite = ({
         <Text className="text-primary mx-auto mb-0 max-w-[80%] text-center text-lg font-semibold">
           {selfSigner ? (
             <Trans>
-              {`Please ${_(actionVerb).toLowerCase()} your document`}
-              <br />
-              {`"${documentName}"`}
+              Please {_(actionVerb).toLowerCase()} your document
+              <br />"{documentName}"
             </Trans>
           ) : isTeamInvite ? (
-            <Trans>
-              {includeSenderDetails
-                ? _(
-                    msg`${inviterName} on behalf of ${teamName} has invited you to ${_(
-                      actionVerb,
-                    ).toLowerCase()}`,
-                  )
-                : _(msg`${teamName} has invited you to ${actionVerb.toLowerCase()}`)}
-              <br />
-              {`"${documentName}"`}
-            </Trans>
+            <>
+              {includeSenderDetails ? (
+                <Trans>
+                  {inviterName} on behalf of {teamName} has invited you to{' '}
+                  {_(actionVerb).toLowerCase()}
+                </Trans>
+              ) : (
+                <Trans>
+                  {teamName} has invited you to {actionVerb.toLowerCase()}
+                </Trans>
+              )}
+              <br />"{documentName}"
+            </>
           ) : (
             <Trans>
-              {`${inviterName} has invited you to ${_(actionVerb).toLowerCase()}`}
-              <br />
-              {`"${documentName}"`}
+              {inviterName} has invited you to {_(actionVerb).toLowerCase()}
+              <br />"{documentName}"
             </Trans>
           )}
         </Text>

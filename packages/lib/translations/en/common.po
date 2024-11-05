@@ -22,6 +22,9 @@ msgid "“{documentName}” has been signed"
 msgstr "“{documentName}” has been signed"
 
 #: packages/email/template-components/template-document-completed.tsx:41
+msgid "“{documentName}” was signed by all signers"
+msgstr "“{documentName}” was signed by all signers"
+
 #: packages/lib/server-only/document/resend-document.tsx:109
 msgid "{0}"
 msgstr "{0}"
@@ -56,8 +59,8 @@ msgid "{0} on behalf of {1} has invited you to {recipientActionVerb} the documen
 msgstr "{0} on behalf of {1} has invited you to {recipientActionVerb} the document \"{2}\"."
 
 #: packages/email/template-components/template-document-invite.tsx:51
-msgid "{0}<0/>\"{documentName}\""
-msgstr "{0}<0/>\"{documentName}\""
+#~ msgid "{0}<0/>\"{documentName}\""
+#~ msgstr "{0}<0/>\"{documentName}\""
 
 #: packages/email/templates/document-invite.tsx:88
 msgid "{inviterName} <0>({inviterEmail})</0>"
@@ -71,7 +74,7 @@ msgstr "{inviterName} has cancelled the document {documentName}, you don't need 
 msgid "{inviterName} has cancelled the document<0/>\"{documentName}\""
 msgstr "{inviterName} has cancelled the document<0/>\"{documentName}\""
 
-#: packages/email/template-components/template-document-invite.tsx:63
+#: packages/email/template-components/template-document-invite.tsx:64
 msgid "{inviterName} has invited you to {0}<0/>\"{documentName}\""
 msgstr "{inviterName} has invited you to {0}<0/>\"{documentName}\""
 
@@ -79,9 +82,17 @@ msgstr "{inviterName} has invited you to {0}<0/>\"{documentName}\""
 msgid "{inviterName} has invited you to {action} {documentName}"
 msgstr "{inviterName} has invited you to {action} {documentName}"
 
+#: packages/email/templates/document-invite.tsx:100
+msgid "{inviterName} has invited you to {action} the document \"{documentName}\"."
+msgstr "{inviterName} has invited you to {action} the document \"{documentName}\"."
+
 #: packages/email/templates/recipient-removed-from-document.tsx:18
 msgid "{inviterName} has removed you from the document {documentName}."
 msgstr "{inviterName} has removed you from the document {documentName}."
+
+#: packages/email/template-components/template-document-invite.tsx:52
+msgid "{inviterName} on behalf of {teamName} has invited you to {0}"
+msgstr "{inviterName} on behalf of {teamName} has invited you to {0}"
 
 #: packages/email/template-components/template-document-invite.tsx:49
 #~ msgid "{inviterName} on behalf of {teamName} has invited you to {0}<0/>\"{documentName}\""
@@ -103,6 +114,10 @@ msgstr "{memberEmail} left the following team"
 msgid "{recipientName} {action} a document by using one of your direct links"
 msgstr "{recipientName} {action} a document by using one of your direct links"
 
+#: packages/email/template-components/template-document-invite.tsx:57
+msgid "{teamName} has invited you to {0}"
+msgstr "{teamName} has invited you to {0}"
+
 #: packages/email/templates/document-invite.tsx:44
 msgid "{teamName} has invited you to {action} {documentName}"
 msgstr "{teamName} has invited you to {action} {documentName}"
@@ -116,12 +131,16 @@ msgid "{visibleRows, plural, one {Showing # result.} other {Showing # results.}}
 msgstr "{visibleRows, plural, one {Showing # result.} other {Showing # results.}}"
 
 #: packages/email/templates/document-invite.tsx:100
-msgid "`${inviterName} has invited you to ${action} the document \"${documentName}\".`"
-msgstr "`${inviterName} has invited you to ${action} the document \"${documentName}\".`"
+#~ msgid "`${inviterName} has invited you to ${action} the document \"${documentName}\".`"
+#~ msgstr "`${inviterName} has invited you to ${action} the document \"${documentName}\".`"
 
 #: packages/email/templates/team-transfer-request.tsx:59
 msgid "<0>{senderName}</0> has requested that you take ownership of the following team"
 msgstr "<0>{senderName}</0> has requested that you take ownership of the following team"
+
+#: packages/email/templates/confirm-team-email.tsx:68
+msgid "<0>{teamName}</0> has requested to use your email address for their team on Documenso."
+msgstr "<0>{teamName}</0> has requested to use your email address for their team on Documenso."
 
 #: packages/ui/components/recipient/recipient-action-auth-select.tsx:53
 msgid "<0>Inherit authentication method</0> - Use the global action signing authentication method configured in the \"General Settings\" step"
@@ -182,6 +201,7 @@ msgstr "A team member has left a team on Documenso"
 msgid "A team you were a part of has been deleted"
 msgstr "A team you were a part of has been deleted"
 
+#: packages/email/templates/confirm-team-email.tsx:111
 #: packages/email/templates/team-invite.tsx:77
 #: packages/email/templates/team-transfer-request.tsx:81
 msgid "Accept"
@@ -271,6 +291,10 @@ msgstr "After submission, a document will be automatically generated and added t
 msgid "All signatures have been voided."
 msgstr "All signatures have been voided."
 
+#: packages/email/templates/confirm-team-email.tsx:91
+msgid "Allow document recipients to reply directly to this email address"
+msgstr "Allow document recipients to reply directly to this email address"
+
 #: packages/email/templates/document-super-delete.tsx:20
 msgid "An admin has deleted your document \"{documentName}\"."
 msgstr "An admin has deleted your document \"{documentName}\"."
@@ -318,6 +342,10 @@ msgstr "Blue"
 #: packages/email/templates/team-invite.tsx:67
 msgid "by <0>{senderName}</0>"
 msgstr "by <0>{senderName}</0>"
+
+#: packages/email/templates/confirm-team-email.tsx:80
+msgid "By accepting this request, you will be granting <0>{teamName}</0> access to:"
+msgstr "By accepting this request, you will be granting <0>{teamName}</0> access to:"
 
 #: packages/email/templates/team-transfer-request.tsx:70
 msgid "By accepting this request, you will take responsibility for any billing items associated with this team."
@@ -475,7 +503,7 @@ msgstr "Document Creation"
 msgid "Document Deleted!"
 msgstr "Document Deleted!"
 
-#: packages/email/template-components/template-document-completed.tsx:64
+#: packages/email/template-components/template-document-completed.tsx:57
 #: packages/ui/components/document/document-download-button.tsx:68
 msgid "Download"
 msgstr "Download"
@@ -657,6 +685,7 @@ msgstr "Label"
 msgid "Language"
 msgstr "Language"
 
+#: packages/email/templates/confirm-team-email.tsx:117
 #: packages/email/templates/team-transfer-request.tsx:87
 msgid "Link expires in 1 hour."
 msgstr "Link expires in 1 hour."
@@ -942,6 +971,10 @@ msgstr "Send"
 msgid "Send Document"
 msgstr "Send Document"
 
+#: packages/email/templates/confirm-team-email.tsx:94
+msgid "Send documents on behalf of the team using the email address"
+msgstr "Send documents on behalf of the team using the email address"
+
 #: packages/ui/components/document/document-share-button.tsx:135
 msgid "Share Signature Card"
 msgstr "Share Signature Card"
@@ -1204,9 +1237,17 @@ msgstr "Validation"
 msgid "Value"
 msgstr "Value"
 
+#: packages/email/templates/confirm-team-email.tsx:64
+msgid "Verify your team email address"
+msgstr "Verify your team email address"
+
 #: packages/lib/constants/recipient-roles.ts:26
 msgid "View"
 msgstr "View"
+
+#: packages/email/templates/confirm-team-email.tsx:88
+msgid "View all documents sent to and from this email address"
+msgstr "View all documents sent to and from this email address"
 
 #: packages/email/templates/document-created-from-direct-template.tsx:69
 msgid "View document"
@@ -1263,6 +1304,10 @@ msgstr "You are about to send this document to the recipients. Are you sure you 
 #: packages/email/template-components/template-confirmation-email.tsx:41
 msgid "You can also copy and paste this link into your browser: {confirmationLink} (link expires in 1 hour)"
 msgstr "You can also copy and paste this link into your browser: {confirmationLink} (link expires in 1 hour)"
+
+#: packages/email/templates/confirm-team-email.tsx:99
+msgid "You can revoke access at any time in your team settings on Documenso <0>here.</0>"
+msgstr "You can revoke access at any time in your team settings on Documenso <0>here.</0>"
 
 #: packages/ui/components/document/document-send-email-message-helper.tsx:11
 msgid "You can use the following variables in your message:"
