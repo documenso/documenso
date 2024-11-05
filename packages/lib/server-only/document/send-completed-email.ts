@@ -1,17 +1,20 @@
 import { createElement } from 'react';
 
+import { msg } from '@lingui/macro';
+
 import { mailer } from '@documenso/email/mailer';
-import { render } from '@documenso/email/render';
 import { DocumentCompletedEmailTemplate } from '@documenso/email/templates/document-completed';
 import { prisma } from '@documenso/prisma';
 import { DocumentSource } from '@documenso/prisma/client';
 
+import { getI18nInstance } from '../../client-only/providers/i18n.server';
 import { NEXT_PUBLIC_WEBAPP_URL } from '../../constants/app';
 import { DOCUMENT_AUDIT_LOG_TYPE } from '../../types/document-audit-logs';
 import type { RequestMetadata } from '../../universal/extract-request-metadata';
 import { getFile } from '../../universal/upload/get-file';
 import { createDocumentAuditLogData } from '../../utils/document-audit-logs';
 import { renderCustomEmailTemplate } from '../../utils/render-custom-email-template';
+import { renderEmailWithI18N } from '../../utils/render-email-with-i18n';
 
 export interface SendDocumentOptions {
   documentId: number;
@@ -61,6 +64,8 @@ export const sendCompletedEmail = async ({ documentId, requestMetadata }: SendDo
     }`;
   }
 
+  const i18n = await getI18nInstance(document.documentMeta?.language);
+
   // If the document owner is not a recipient then send the email to them separately
   if (!document.Recipient.find((recipient) => recipient.email === owner.email)) {
     const template = createElement(DocumentCompletedEmailTemplate, {
@@ -68,6 +73,11 @@ export const sendCompletedEmail = async ({ documentId, requestMetadata }: SendDo
       assetBaseUrl,
       downloadLink: documentOwnerDownloadLink,
     });
+
+    const [html, text] = await Promise.all([
+      renderEmailWithI18N(template, { lang: document.documentMeta?.language }),
+      renderEmailWithI18N(template, { lang: document.documentMeta?.language, plainText: true }),
+    ]);
 
     await mailer.sendMail({
       to: [
@@ -80,9 +90,9 @@ export const sendCompletedEmail = async ({ documentId, requestMetadata }: SendDo
         name: process.env.NEXT_PRIVATE_SMTP_FROM_NAME || 'Documenso',
         address: process.env.NEXT_PRIVATE_SMTP_FROM_ADDRESS || 'noreply@documenso.com',
       },
-      subject: 'Signing Complete!',
-      html: render(template),
-      text: render(template, { plainText: true }),
+      subject: i18n._(msg`Signing Complete!`),
+      html,
+      text,
       attachments: [
         {
           filename: document.title.endsWith('.pdf') ? document.title : document.title + '.pdf',
@@ -129,6 +139,11 @@ export const sendCompletedEmail = async ({ documentId, requestMetadata }: SendDo
             : undefined,
       });
 
+      const [html, text] = await Promise.all([
+        renderEmailWithI18N(template, { lang: document.documentMeta?.language }),
+        renderEmailWithI18N(template, { lang: document.documentMeta?.language, plainText: true }),
+      ]);
+
       await mailer.sendMail({
         to: [
           {
@@ -143,9 +158,9 @@ export const sendCompletedEmail = async ({ documentId, requestMetadata }: SendDo
         subject:
           isDirectTemplate && document.documentMeta?.subject
             ? renderCustomEmailTemplate(document.documentMeta.subject, customEmailTemplate)
-            : 'Signing Complete!',
-        html: render(template),
-        text: render(template, { plainText: true }),
+            : i18n._(msg`Signing Complete!`),
+        html,
+        text,
         attachments: [
           {
             filename: document.title.endsWith('.pdf') ? document.title : document.title + '.pdf',

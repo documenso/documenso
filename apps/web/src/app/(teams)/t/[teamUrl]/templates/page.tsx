@@ -18,7 +18,7 @@ export default async function TeamTemplatesPage({
   searchParams = {},
   params,
 }: TeamTemplatesPageProps) {
-  setupI18nSSR();
+  await setupI18nSSR();
 
   const { teamUrl } = params;
 

@@ -81,7 +81,7 @@ export const acceptTeamInvitation = async ({ userId, teamId }: AcceptTeamInvitat
       await jobs.triggerJob({
         name: 'send.team-member-joined.email',
         payload: {
-          teamId: team.id,
+          teamId: teamMember.teamId,
           memberId: teamMember.id,
         },
       });

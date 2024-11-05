@@ -1,6 +1,7 @@
-import config from '@documenso/tailwind-config';
+import { msg } from '@lingui/macro';
+import { useLingui } from '@lingui/react';
 
-import { Body, Container, Head, Hr, Html, Img, Preview, Section, Tailwind } from '../components';
+import { Body, Container, Head, Hr, Html, Img, Preview, Section } from '../components';
 import {
   TemplateDocumentDelete,
   type TemplateDocumentDeleteProps,
@@ -14,7 +15,9 @@ export const DocumentSuperDeleteEmailTemplate = ({
   assetBaseUrl = 'http://localhost:3002',
   reason = 'Unknown',
 }: DocumentDeleteEmailTemplateProps) => {
-  const previewText = `An admin has deleted your document "${documentName}".`;
+  const { _ } = useLingui();
+
+  const previewText = msg`An admin has deleted your document "${documentName}".`;
 
   const getAssetUrl = (path: string) => {
     return new URL(path, assetBaseUrl).toString();
@@ -23,42 +26,33 @@ export const DocumentSuperDeleteEmailTemplate = ({
   return (
     <Html>
       <Head />
-      <Preview>{previewText}</Preview>
-      <Tailwind
-        config={{
-          theme: {
-            extend: {
-              colors: config.theme.extend.colors,
-            },
-          },
-        }}
-      >
-        <Body className="mx-auto my-auto bg-white font-sans">
-          <Section>
-            <Container className="mx-auto mb-2 mt-8 max-w-xl rounded-lg border border-solid border-slate-200 p-4 backdrop-blur-sm">
-              <Section>
-                <Img
-                  src={getAssetUrl('/static/logo.png')}
-                  alt="Documenso Logo"
-                  className="mb-4 h-6"
-                />
+      <Preview>{_(previewText)}</Preview>
 
-                <TemplateDocumentDelete
-                  reason={reason}
-                  documentName={documentName}
-                  assetBaseUrl={assetBaseUrl}
-                />
-              </Section>
-            </Container>
+      <Body className="mx-auto my-auto bg-white font-sans">
+        <Section>
+          <Container className="mx-auto mb-2 mt-8 max-w-xl rounded-lg border border-solid border-slate-200 p-4 backdrop-blur-sm">
+            <Section>
+              <Img
+                src={getAssetUrl('/static/logo.png')}
+                alt="Documenso Logo"
+                className="mb-4 h-6"
+              />
 
-            <Hr className="mx-auto mt-12 max-w-xl" />
+              <TemplateDocumentDelete
+                reason={reason}
+                documentName={documentName}
+                assetBaseUrl={assetBaseUrl}
+              />
+            </Section>
+          </Container>
 
-            <Container className="mx-auto max-w-xl">
-              <TemplateFooter />
-            </Container>
-          </Section>
-        </Body>
-      </Tailwind>
+          <Hr className="mx-auto mt-12 max-w-xl" />
+
+          <Container className="mx-auto max-w-xl">
+            <TemplateFooter />
+          </Container>
+        </Section>
+      </Body>
     </Html>
   );
 };

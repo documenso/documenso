@@ -14,7 +14,7 @@ export type TeamsSettingsPublicProfilePageProps = {
 export default async function TeamsSettingsPublicProfilePage({
   params,
 }: TeamsSettingsPublicProfilePageProps) {
-  setupI18nSSR();
+  await setupI18nSSR();
 
   const { teamUrl } = params;
 

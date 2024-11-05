@@ -301,6 +301,7 @@ export const ApiContractV1Implementation = createNextRoute(ApiContractV1, {
         dateFormat: dateFormat?.value,
         redirectUrl: body.meta.redirectUrl,
         signingOrder: body.meta.signingOrder,
+        language: body.meta.language,
         requestMetadata: extractNextApiRequestMetadata(args.req),
       });
 

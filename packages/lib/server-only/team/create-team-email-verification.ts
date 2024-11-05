@@ -1,9 +1,9 @@
 import { createElement } from 'react';
 
+import { msg } from '@lingui/macro';
 import { z } from 'zod';
 
 import { mailer } from '@documenso/email/mailer';
-import { render } from '@documenso/email/render';
 import { ConfirmTeamEmailTemplate } from '@documenso/email/templates/confirm-team-email';
 import { WEBAPP_BASE_URL } from '@documenso/lib/constants/app';
 import { FROM_ADDRESS, FROM_NAME } from '@documenso/lib/constants/email';
@@ -12,6 +12,9 @@ import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import { createTokenVerification } from '@documenso/lib/utils/token-verification';
 import { prisma } from '@documenso/prisma';
 import { Prisma } from '@documenso/prisma/client';
+
+import { getI18nInstance } from '../../client-only/providers/i18n.server';
+import { renderEmailWithI18N } from '../../utils/render-email-with-i18n';
 
 export type CreateTeamEmailVerificationOptions = {
   userId: number;
@@ -122,14 +125,23 @@ export const sendTeamEmailVerificationEmail = async (
     token,
   });
 
+  const [html, text] = await Promise.all([
+    renderEmailWithI18N(template),
+    renderEmailWithI18N(template, { plainText: true }),
+  ]);
+
+  const i18n = await getI18nInstance();
+
   await mailer.sendMail({
     to: email,
     from: {
       name: FROM_NAME,
       address: FROM_ADDRESS,
     },
-    subject: `A request to use your email has been initiated by ${teamName} on Documenso`,
-    html: render(template),
-    text: render(template, { plainText: true }),
+    subject: i18n._(
+      msg`A request to use your email has been initiated by ${teamName} on Documenso`,
+    ),
+    html,
+    text,
   });
 };

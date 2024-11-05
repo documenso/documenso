@@ -19,7 +19,7 @@ const config: LinguiConfig = {
     },
     {
       path: '<rootDir>/packages/lib/translations/{locale}/common',
-      include: ['packages/ui', 'packages/lib'],
+      include: ['packages/ui', 'packages/lib', 'packages/email'],
       exclude: ['**/node_modules/**'],
     },
   ],

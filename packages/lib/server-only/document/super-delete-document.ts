@@ -2,17 +2,20 @@
 
 import { createElement } from 'react';
 
+import { msg } from '@lingui/macro';
+
 import { mailer } from '@documenso/email/mailer';
-import { render } from '@documenso/email/render';
 import DocumentCancelTemplate from '@documenso/email/templates/document-cancel';
 import { prisma } from '@documenso/prisma';
 import { DocumentStatus, SendStatus } from '@documenso/prisma/client';
 
+import { getI18nInstance } from '../../client-only/providers/i18n.server';
 import { NEXT_PUBLIC_WEBAPP_URL } from '../../constants/app';
 import { FROM_ADDRESS, FROM_NAME } from '../../constants/email';
 import { DOCUMENT_AUDIT_LOG_TYPE } from '../../types/document-audit-logs';
 import type { RequestMetadata } from '../../universal/extract-request-metadata';
 import { createDocumentAuditLogData } from '../../utils/document-audit-logs';
+import { renderEmailWithI18N } from '../../utils/render-email-with-i18n';
 
 export type SuperDeleteDocumentOptions = {
   id: number;
@@ -53,6 +56,13 @@ export const superDeleteDocument = async ({ id, requestMetadata }: SuperDeleteDo
           assetBaseUrl,
         });
 
+        const [html, text] = await Promise.all([
+          renderEmailWithI18N(template, { lang: document.documentMeta?.language }),
+          renderEmailWithI18N(template, { lang: document.documentMeta?.language, plainText: true }),
+        ]);
+
+        const i18n = await getI18nInstance(document.documentMeta?.language);
+
         await mailer.sendMail({
           to: {
             address: recipient.email,
@@ -62,9 +72,9 @@ export const superDeleteDocument = async ({ id, requestMetadata }: SuperDeleteDo
             name: FROM_NAME,
             address: FROM_ADDRESS,
           },
-          subject: 'Document Cancelled',
-          html: render(template),
-          text: render(template, { plainText: true }),
+          subject: i18n._(msg`Document Cancelled`),
+          html,
+          text,
         });
       }),
     );

@@ -67,9 +67,9 @@ export const RECIPIENT_ROLES_DESCRIPTION_ENG = {
 } satisfies Record<keyof typeof RecipientRole, unknown>;
 
 export const RECIPIENT_ROLE_TO_EMAIL_TYPE = {
-  [RecipientRole.SIGNER]: 'SIGNING_REQUEST',
-  [RecipientRole.VIEWER]: 'VIEW_REQUEST',
-  [RecipientRole.APPROVER]: 'APPROVE_REQUEST',
+  [RecipientRole.SIGNER]: `SIGNING_REQUEST`,
+  [RecipientRole.VIEWER]: `VIEW_REQUEST`,
+  [RecipientRole.APPROVER]: `APPROVE_REQUEST`,
 } as const;
 
 export const RECIPIENT_ROLE_SIGNING_REASONS = {

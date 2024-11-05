@@ -48,8 +48,8 @@ const mdxComponents: MDXComponents = {
   ),
 };
 
-export default function BlogPostPage({ params }: { params: { post: string } }) {
-  setupI18nSSR();
+export default async function BlogPostPage({ params }: { params: { post: string } }) {
+  await setupI18nSSR();
 
   const post = allBlogPosts.find((post) => post._raw.flattenedPath === `blog/${params.post}`);
 

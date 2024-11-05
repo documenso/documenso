@@ -1,11 +1,11 @@
 import { createElement } from 'react';
 
 import { mailer } from '@documenso/email/mailer';
-import { render } from '@documenso/email/render';
 import { ResetPasswordTemplate } from '@documenso/email/templates/reset-password';
 import { prisma } from '@documenso/prisma';
 
 import { NEXT_PUBLIC_WEBAPP_URL } from '../../constants/app';
+import { renderEmailWithI18N } from '../../utils/render-email-with-i18n';
 
 export interface SendResetPasswordOptions {
   userId: number;
@@ -26,6 +26,11 @@ export const sendResetPassword = async ({ userId }: SendResetPasswordOptions) =>
     userName: user.name || '',
   });
 
+  const [html, text] = await Promise.all([
+    renderEmailWithI18N(template),
+    renderEmailWithI18N(template, { plainText: true }),
+  ]);
+
   return await mailer.sendMail({
     to: {
       address: user.email,
@@ -36,7 +41,7 @@ export const sendResetPassword = async ({ userId }: SendResetPasswordOptions) =>
       address: process.env.NEXT_PRIVATE_SMTP_FROM_ADDRESS || 'noreply@documenso.com',
     },
     subject: 'Password Reset Success!',
-    html: render(template),
-    text: render(template, { plainText: true }),
+    html,
+    text,
   });
 };

@@ -1,9 +1,9 @@
 import { createElement } from 'react';
 
+import { msg } from '@lingui/macro';
 import { z } from 'zod';
 
 import { mailer } from '@documenso/email/mailer';
-import { render } from '@documenso/email/render';
 import DocumentInviteEmailTemplate from '@documenso/email/templates/document-invite';
 import { prisma } from '@documenso/prisma';
 import {
@@ -13,6 +13,7 @@ import {
   SendStatus,
 } from '@documenso/prisma/client';
 
+import { getI18nInstance } from '../../../client-only/providers/i18n.server';
 import { NEXT_PUBLIC_WEBAPP_URL } from '../../../constants/app';
 import { FROM_ADDRESS, FROM_NAME } from '../../../constants/email';
 import {
@@ -23,6 +24,7 @@ import { DOCUMENT_AUDIT_LOG_TYPE } from '../../../types/document-audit-logs';
 import { ZRequestMetadataSchema } from '../../../universal/extract-request-metadata';
 import { createDocumentAuditLogData } from '../../../utils/document-audit-logs';
 import { renderCustomEmailTemplate } from '../../../utils/render-custom-email-template';
+import { renderEmailWithI18N } from '../../../utils/render-email-with-i18n';
 import { type JobDefinition } from '../../client/_internal/job';
 
 const SEND_SIGNING_EMAIL_JOB_DEFINITION_ID = 'send.signing.requested.email';
@@ -90,22 +92,32 @@ export const SEND_SIGNING_EMAIL_JOB_DEFINITION = {
     const recipientActionVerb =
       RECIPIENT_ROLES_DESCRIPTION_ENG[recipient.role].actionVerb.toLowerCase();
 
+    const i18n = await getI18nInstance(documentMeta?.language);
+
     let emailMessage = customEmail?.message || '';
-    let emailSubject = `Please ${recipientActionVerb} this document`;
+    let emailSubject = i18n._(msg`Please ${recipientActionVerb} this document`);
 
     if (selfSigner) {
-      emailMessage = `You have initiated the document ${`"${document.title}"`} that requires you to ${recipientActionVerb} it.`;
-      emailSubject = `Please ${recipientActionVerb} your document`;
+      emailMessage = i18n._(
+        msg`You have initiated the document ${`"${document.title}"`} that requires you to ${recipientActionVerb} it.`,
+      );
+      emailSubject = i18n._(msg`Please ${recipientActionVerb} your document`);
     }
 
     if (isDirectTemplate) {
-      emailMessage = `A document was created by your direct template that requires you to ${recipientActionVerb} it.`;
-      emailSubject = `Please ${recipientActionVerb} this document created by your direct template`;
+      emailMessage = i18n._(
+        msg`A document was created by your direct template that requires you to ${recipientActionVerb} it.`,
+      );
+      emailSubject = i18n._(
+        msg`Please ${recipientActionVerb} this document created by your direct template`,
+      );
     }
 
     if (isTeamDocument && team) {
-      emailSubject = `${team.name} invited you to ${recipientActionVerb} a document`;
-      emailMessage = `${user.name} on behalf of ${team.name} has invited you to ${recipientActionVerb} the document "${document.title}".`;
+      emailSubject = i18n._(msg`${team.name} invited you to ${recipientActionVerb} a document`);
+      emailMessage = i18n._(
+        msg`${user.name} on behalf of ${team.name} has invited you to ${recipientActionVerb} the document "${document.title}".`,
+      );
     }
 
     const customEmailTemplate = {
@@ -132,6 +144,14 @@ export const SEND_SIGNING_EMAIL_JOB_DEFINITION = {
     });
 
     await io.runTask('send-signing-email', async () => {
+      const [html, text] = await Promise.all([
+        renderEmailWithI18N(template, { lang: documentMeta?.language }),
+        renderEmailWithI18N(template, {
+          lang: documentMeta?.language,
+          plainText: true,
+        }),
+      ]);
+
       await mailer.sendMail({
         to: {
           name: recipient.name,
@@ -145,8 +165,8 @@ export const SEND_SIGNING_EMAIL_JOB_DEFINITION = {
           documentMeta?.subject || emailSubject,
           customEmailTemplate,
         ),
-        html: render(template),
-        text: render(template, { plainText: true }),
+        html,
+        text,
       });
     });
 

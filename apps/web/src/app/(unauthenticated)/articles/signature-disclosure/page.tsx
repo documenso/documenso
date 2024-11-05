@@ -7,8 +7,8 @@ import { Button } from '@documenso/ui/primitives/button';
 
 const SUPPORT_EMAIL = 'support@documenso.com';
 
-export default function SignatureDisclosure() {
-  setupI18nSSR();
+export default async function SignatureDisclosure() {
+  await setupI18nSSR();
 
   return (
     <div>

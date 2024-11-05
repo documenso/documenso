@@ -16,7 +16,7 @@ type AdminManageUsersProps = {
 };
 
 export default async function AdminManageUsers({ searchParams = {} }: AdminManageUsersProps) {
-  setupI18nSSR();
+  await setupI18nSSR();
 
   const page = Number(searchParams.page) || 1;
   const perPage = Number(searchParams.perPage) || 10;

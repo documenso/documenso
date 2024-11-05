@@ -17,7 +17,7 @@ export const metadata: Metadata = {
 };
 
 export default async function ProfileSettingsPage() {
-  setupI18nSSR();
+  await setupI18nSSR();
 
   const { _ } = useLingui();
   const { user } = await getRequiredServerComponentSession();

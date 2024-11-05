@@ -42,7 +42,7 @@ msgstr "Agregar documento"
 msgid "Add More Users for {0}"
 msgstr "Agregar más usuarios por {0}"
 
-#: apps/marketing/src/app/(marketing)/open/page.tsx:165
+#: apps/marketing/src/app/(marketing)/open/page.tsx:164
 msgid "All our metrics, finances, and learnings are public. We believe in transparency and want to share our journey with you. You can read more about why here: <0>Announcing Open Metrics</0>"
 msgstr "Todos nuestros métricas, finanzas y aprendizajes son públicos. Creemos en la transparencia y queremos compartir nuestro viaje contigo. Puedes leer más sobre por qué aquí: <0>Anunciando Métricas Abiertas</0>"
 
@@ -90,7 +90,7 @@ msgstr "Registro de cambios"
 msgid "Choose a template from the community app store. Or submit your own template for others to use."
 msgstr "Elige una plantilla de la tienda de aplicaciones de la comunidad. O envía tu propia plantilla para que otros la usen."
 
-#: apps/marketing/src/app/(marketing)/open/page.tsx:219
+#: apps/marketing/src/app/(marketing)/open/page.tsx:218
 msgid "Community"
 msgstr "Comunidad"
 
@@ -193,7 +193,7 @@ msgstr "Rápido."
 msgid "Faster, smarter and more beautiful."
 msgstr "Más rápido, más inteligente y más hermoso."
 
-#: apps/marketing/src/app/(marketing)/open/page.tsx:210
+#: apps/marketing/src/app/(marketing)/open/page.tsx:209
 msgid "Finances"
 msgstr "Finanzas"
 
@@ -246,15 +246,15 @@ msgstr "Comienza hoy."
 msgid "Get the latest news from Documenso, including product updates, team announcements and more!"
 msgstr "¡Obtén las últimas noticias de Documenso, incluidas actualizaciones de productos, anuncios del equipo y más!"
 
-#: apps/marketing/src/app/(marketing)/open/page.tsx:233
+#: apps/marketing/src/app/(marketing)/open/page.tsx:232
 msgid "GitHub: Total Merged PRs"
 msgstr "GitHub: Total de PRs fusionados"
 
-#: apps/marketing/src/app/(marketing)/open/page.tsx:251
+#: apps/marketing/src/app/(marketing)/open/page.tsx:250
 msgid "GitHub: Total Open Issues"
 msgstr "GitHub: Total de problemas abiertos"
 
-#: apps/marketing/src/app/(marketing)/open/page.tsx:225
+#: apps/marketing/src/app/(marketing)/open/page.tsx:224
 msgid "GitHub: Total Stars"
 msgstr "GitHub: Total de estrellas"
 
@@ -262,7 +262,7 @@ msgstr "GitHub: Total de estrellas"
 msgid "Global Salary Bands"
 msgstr "Bandas salariales globales"
 
-#: apps/marketing/src/app/(marketing)/open/page.tsx:261
+#: apps/marketing/src/app/(marketing)/open/page.tsx:260
 msgid "Growth"
 msgstr "Crecimiento"
 
@@ -286,7 +286,7 @@ msgstr "Pagos integrados con Stripe para que no tengas que preocuparte por cobra
 msgid "Integrates with all your favourite tools."
 msgstr "Se integra con todas tus herramientas favoritas."
 
-#: apps/marketing/src/app/(marketing)/open/page.tsx:289
+#: apps/marketing/src/app/(marketing)/open/page.tsx:288
 msgid "Is there more?"
 msgstr "¿Hay más?"
 
@@ -310,11 +310,11 @@ msgstr "Ubicación"
 msgid "Make it your own through advanced customization and adjustability."
 msgstr "Hazlo tuyo a través de personalización y ajustabilidad avanzadas."
 
-#: apps/marketing/src/app/(marketing)/open/page.tsx:199
+#: apps/marketing/src/app/(marketing)/open/page.tsx:198
 msgid "Merged PR's"
 msgstr "PRs fusionados"
 
-#: apps/marketing/src/app/(marketing)/open/page.tsx:234
+#: apps/marketing/src/app/(marketing)/open/page.tsx:233
 msgid "Merged PRs"
 msgstr "PRs fusionados"
 
@@ -345,8 +345,8 @@ msgstr "No se requiere tarjeta de crédito"
 msgid "None of these work for you? Try self-hosting!"
 msgstr "¿Ninguna de estas opciones funciona para ti? ¡Prueba el autoalojamiento!"
 
-#: apps/marketing/src/app/(marketing)/open/page.tsx:194
-#: apps/marketing/src/app/(marketing)/open/page.tsx:252
+#: apps/marketing/src/app/(marketing)/open/page.tsx:193
+#: apps/marketing/src/app/(marketing)/open/page.tsx:251
 msgid "Open Issues"
 msgstr "Problemas Abiertos"
 
@@ -354,7 +354,7 @@ msgstr "Problemas Abiertos"
 msgid "Open Source or Hosted."
 msgstr "Código Abierto o Alojado."
 
-#: apps/marketing/src/app/(marketing)/open/page.tsx:161
+#: apps/marketing/src/app/(marketing)/open/page.tsx:160
 #: apps/marketing/src/components/(marketing)/footer.tsx:37
 #: apps/marketing/src/components/(marketing)/header.tsx:64
 #: apps/marketing/src/components/(marketing)/mobile-navigation.tsx:40
@@ -466,7 +466,7 @@ msgstr "Inteligente."
 msgid "Star on GitHub"
 msgstr "Estrella en GitHub"
 
-#: apps/marketing/src/app/(marketing)/open/page.tsx:226
+#: apps/marketing/src/app/(marketing)/open/page.tsx:225
 msgid "Stars"
 msgstr "Estrellas"
 
@@ -501,7 +501,7 @@ msgstr "Tienda de Plantillas (Pronto)."
 msgid "That's awesome. You can take a look at the current <0>Issues</0> and join our <1>Discord Community</1> to keep up to date, on what the current priorities are. In any case, we are an open community and welcome all input, technical and non-technical ❤️"
 msgstr "Eso es increíble. Puedes echar un vistazo a los <0>Problemas</0> actuales y unirte a nuestra <1>Comunidad de Discord</1> para mantenerte al día sobre cuáles son las prioridades actuales. En cualquier caso, somos una comunidad abierta y agradecemos todas las aportaciones, técnicas y no técnicas ❤️"
 
-#: apps/marketing/src/app/(marketing)/open/page.tsx:293
+#: apps/marketing/src/app/(marketing)/open/page.tsx:292
 msgid "This page is evolving as we learn what makes a great signing company. We'll update it when we have more to share."
 msgstr "Esta página está evolucionando a medida que aprendemos lo que hace una gran empresa de firmas. La actualizaremos cuando tengamos más para compartir."
 
@@ -514,8 +514,8 @@ msgstr "Título"
 msgid "Total Completed Documents"
 msgstr "Total de Documentos Completados"
 
+#: apps/marketing/src/app/(marketing)/open/page.tsx:266
 #: apps/marketing/src/app/(marketing)/open/page.tsx:267
-#: apps/marketing/src/app/(marketing)/open/page.tsx:268
 msgid "Total Customers"
 msgstr "Total de Clientes"
 
@@ -602,4 +602,3 @@ msgstr "Puedes autoalojar Documenso de forma gratuita o usar nuestra versión al
 #: apps/marketing/src/components/(marketing)/carousel.tsx:272
 msgid "Your browser does not support the video tag."
 msgstr "Tu navegador no soporta la etiqueta de video."
-

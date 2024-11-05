@@ -260,12 +260,12 @@ msgstr "Suscripciones Activas"
 msgid "Add"
 msgstr "Agregar"
 
-#: apps/web/src/app/(dashboard)/documents/[id]/edit-document.tsx:175
-#: apps/web/src/app/(dashboard)/templates/[id]/edit-template.tsx:87
+#: apps/web/src/app/(dashboard)/documents/[id]/edit-document.tsx:176
+#: apps/web/src/app/(dashboard)/templates/[id]/edit-template.tsx:88
 msgid "Add all relevant fields for each recipient."
 msgstr "Agrega todos los campos relevantes para cada destinatario."
 
-#: apps/web/src/app/(dashboard)/templates/[id]/edit-template.tsx:82
+#: apps/web/src/app/(dashboard)/templates/[id]/edit-template.tsx:83
 msgid "Add all relevant placeholders for each recipient."
 msgstr "Agrega todos los marcadores de posición relevantes para cada destinatario."
 
@@ -281,8 +281,8 @@ msgstr "Agrega un autenticador para servir como método de autenticación secund
 msgid "Add email"
 msgstr "Agregar correo electrónico"
 
-#: apps/web/src/app/(dashboard)/documents/[id]/edit-document.tsx:174
-#: apps/web/src/app/(dashboard)/templates/[id]/edit-template.tsx:86
+#: apps/web/src/app/(dashboard)/documents/[id]/edit-document.tsx:175
+#: apps/web/src/app/(dashboard)/templates/[id]/edit-template.tsx:87
 msgid "Add Fields"
 msgstr "Agregar Campos"
 
@@ -295,15 +295,15 @@ msgstr "Agregar más"
 msgid "Add passkey"
 msgstr "Agregar clave"
 
-#: apps/web/src/app/(dashboard)/templates/[id]/edit-template.tsx:81
+#: apps/web/src/app/(dashboard)/templates/[id]/edit-template.tsx:82
 msgid "Add Placeholders"
 msgstr "Agregar Marcadores de posición"
 
-#: apps/web/src/app/(dashboard)/documents/[id]/edit-document.tsx:169
+#: apps/web/src/app/(dashboard)/documents/[id]/edit-document.tsx:170
 msgid "Add Signers"
 msgstr "Agregar Firmantes"
 
-#: apps/web/src/app/(dashboard)/documents/[id]/edit-document.tsx:179
+#: apps/web/src/app/(dashboard)/documents/[id]/edit-document.tsx:180
 msgid "Add Subject"
 msgstr "Agregar Asunto"
 
@@ -311,7 +311,7 @@ msgstr "Agregar Asunto"
 msgid "Add team email"
 msgstr "Agregar correo electrónico del equipo"
 
-#: apps/web/src/app/(dashboard)/documents/[id]/edit-document.tsx:170
+#: apps/web/src/app/(dashboard)/documents/[id]/edit-document.tsx:171
 msgid "Add the people who will sign the document."
 msgstr "Agrega a las personas que firmarán el documento."
 
@@ -319,7 +319,7 @@ msgstr "Agrega a las personas que firmarán el documento."
 msgid "Add the recipients to create the document with"
 msgstr "Agrega los destinatarios con los que crear el documento"
 
-#: apps/web/src/app/(dashboard)/documents/[id]/edit-document.tsx:180
+#: apps/web/src/app/(dashboard)/documents/[id]/edit-document.tsx:181
 msgid "Add the subject and message you wish to send to signers."
 msgstr "Agrega el asunto y el mensaje que deseas enviar a los firmantes."
 
@@ -414,13 +414,13 @@ msgstr "Se ha enviado un correo electrónico solicitando la transferencia de est
 msgid "An error occurred"
 msgstr "Ocurrió un error"
 
-#: apps/web/src/app/(dashboard)/documents/[id]/edit-document.tsx:266
-#: apps/web/src/app/(dashboard)/templates/[id]/edit-template.tsx:197
-#: apps/web/src/app/(dashboard)/templates/[id]/edit-template.tsx:231
+#: apps/web/src/app/(dashboard)/documents/[id]/edit-document.tsx:268
+#: apps/web/src/app/(dashboard)/templates/[id]/edit-template.tsx:201
+#: apps/web/src/app/(dashboard)/templates/[id]/edit-template.tsx:235
 msgid "An error occurred while adding signers."
 msgstr "Ocurrió un error al agregar firmantes."
 
-#: apps/web/src/app/(dashboard)/documents/[id]/edit-document.tsx:301
+#: apps/web/src/app/(dashboard)/documents/[id]/edit-document.tsx:303
 msgid "An error occurred while adding the fields."
 msgstr "Ocurrió un error al agregar los campos."
 
@@ -482,7 +482,7 @@ msgstr "Ocurrió un error al eliminar la firma."
 msgid "An error occurred while removing the text."
 msgstr "Ocurrió un error al eliminar el texto."
 
-#: apps/web/src/app/(dashboard)/documents/[id]/edit-document.tsx:332
+#: apps/web/src/app/(dashboard)/documents/[id]/edit-document.tsx:334
 msgid "An error occurred while sending the document."
 msgstr "Ocurrió un error al enviar el documento."
 
@@ -507,8 +507,8 @@ msgstr "Ocurrió un error al firmar el documento."
 msgid "An error occurred while trying to create a checkout session."
 msgstr "Ocurrió un error al intentar crear una sesión de pago."
 
-#: apps/web/src/app/(dashboard)/documents/[id]/edit-document.tsx:232
-#: apps/web/src/app/(dashboard)/templates/[id]/edit-template.tsx:166
+#: apps/web/src/app/(dashboard)/documents/[id]/edit-document.tsx:234
+#: apps/web/src/app/(dashboard)/templates/[id]/edit-template.tsx:170
 msgid "An error occurred while updating the document settings."
 msgstr "Ocurrió un error al actualizar la configuración del documento."
 
@@ -869,11 +869,11 @@ msgstr "Documentos completados"
 msgid "Completed Documents"
 msgstr "Documentos Completados"
 
-#: apps/web/src/app/(dashboard)/documents/[id]/edit-document.tsx:165
+#: apps/web/src/app/(dashboard)/documents/[id]/edit-document.tsx:166
 msgid "Configure general settings for the document."
 msgstr "Configurar ajustes generales para el documento."
 
-#: apps/web/src/app/(dashboard)/templates/[id]/edit-template.tsx:77
+#: apps/web/src/app/(dashboard)/templates/[id]/edit-template.tsx:78
 msgid "Configure general settings for the template."
 msgstr "Configurar ajustes generales para la plantilla."
 
@@ -1350,7 +1350,7 @@ msgstr "Documento reenviado"
 msgid "Document resealed"
 msgstr "Documento sellado nuevamente"
 
-#: apps/web/src/app/(dashboard)/documents/[id]/edit-document.tsx:321
+#: apps/web/src/app/(dashboard)/documents/[id]/edit-document.tsx:323
 msgid "Document sent"
 msgstr "Documento enviado"
 
@@ -1579,16 +1579,16 @@ msgstr "Ingresa tu texto aquí"
 
 #: apps/web/src/app/(dashboard)/admin/documents/[id]/admin-actions.tsx:41
 #: apps/web/src/app/(dashboard)/admin/users/[id]/page.tsx:78
-#: apps/web/src/app/(dashboard)/documents/[id]/edit-document.tsx:231
-#: apps/web/src/app/(dashboard)/documents/[id]/edit-document.tsx:265
-#: apps/web/src/app/(dashboard)/documents/[id]/edit-document.tsx:300
-#: apps/web/src/app/(dashboard)/documents/[id]/edit-document.tsx:331
+#: apps/web/src/app/(dashboard)/documents/[id]/edit-document.tsx:233
+#: apps/web/src/app/(dashboard)/documents/[id]/edit-document.tsx:267
+#: apps/web/src/app/(dashboard)/documents/[id]/edit-document.tsx:302
+#: apps/web/src/app/(dashboard)/documents/[id]/edit-document.tsx:333
 #: apps/web/src/app/(dashboard)/documents/move-document-dialog.tsx:57
 #: apps/web/src/app/(dashboard)/documents/upload-document.tsx:106
 #: apps/web/src/app/(dashboard)/documents/upload-document.tsx:112
-#: apps/web/src/app/(dashboard)/templates/[id]/edit-template.tsx:165
-#: apps/web/src/app/(dashboard)/templates/[id]/edit-template.tsx:196
-#: apps/web/src/app/(dashboard)/templates/[id]/edit-template.tsx:230
+#: apps/web/src/app/(dashboard)/templates/[id]/edit-template.tsx:169
+#: apps/web/src/app/(dashboard)/templates/[id]/edit-template.tsx:200
+#: apps/web/src/app/(dashboard)/templates/[id]/edit-template.tsx:234
 #: apps/web/src/app/(dashboard)/templates/duplicate-template-dialog.tsx:51
 #: apps/web/src/app/(dashboard)/templates/move-template-dialog.tsx:56
 #: apps/web/src/app/(dashboard)/templates/use-template-dialog.tsx:160
@@ -1679,8 +1679,8 @@ msgstr "¿Olvidaste tu contraseña?"
 msgid "Full Name"
 msgstr "Nombre completo"
 
-#: apps/web/src/app/(dashboard)/documents/[id]/edit-document.tsx:164
-#: apps/web/src/app/(dashboard)/templates/[id]/edit-template.tsx:76
+#: apps/web/src/app/(dashboard)/documents/[id]/edit-document.tsx:165
+#: apps/web/src/app/(dashboard)/templates/[id]/edit-template.tsx:77
 #: apps/web/src/app/(recipient)/d/[token]/direct-template.tsx:60
 #: apps/web/src/components/(teams)/settings/layout/desktop-nav.tsx:43
 #: apps/web/src/components/(teams)/settings/layout/mobile-nav.tsx:51
@@ -3244,7 +3244,7 @@ msgstr "La plantilla ha sido actualizada."
 msgid "Template moved"
 msgstr "Plantilla movida"
 
-#: apps/web/src/app/(dashboard)/templates/[id]/edit-template.tsx:219
+#: apps/web/src/app/(dashboard)/templates/[id]/edit-template.tsx:223
 msgid "Template saved"
 msgstr "Plantilla guardada"
 
@@ -4521,7 +4521,7 @@ msgstr "Tu documento se ha creado exitosamente a partir de la plantilla."
 msgid "Your document has been re-sent successfully."
 msgstr "Tu documento ha sido reenviado con éxito."
 
-#: apps/web/src/app/(dashboard)/documents/[id]/edit-document.tsx:322
+#: apps/web/src/app/(dashboard)/documents/[id]/edit-document.tsx:324
 msgid "Your document has been sent successfully."
 msgstr "Tu documento ha sido enviado con éxito."
 
@@ -4612,7 +4612,7 @@ msgstr "Tu plantilla ha sido eliminada con éxito."
 msgid "Your template will be duplicated."
 msgstr "Tu plantilla será duplicada."
 
-#: apps/web/src/app/(dashboard)/templates/[id]/edit-template.tsx:220
+#: apps/web/src/app/(dashboard)/templates/[id]/edit-template.tsx:224
 msgid "Your templates has been saved successfully."
 msgstr "Tus plantillas han sido guardadas con éxito."
 
@@ -4628,4 +4628,3 @@ msgstr "¡Tu token se creó con éxito! ¡Asegúrate de copiarlo porque no podr�
 #: apps/web/src/app/(teams)/t/[teamUrl]/settings/tokens/page.tsx:86
 msgid "Your tokens will be shown here once you create them."
 msgstr "Tus tokens se mostrarán aquí una vez que los crees."
-

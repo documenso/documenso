@@ -19,7 +19,7 @@ type RecipientLayoutProps = {
  * Such as direct template access, or signing.
  */
 export default async function RecipientLayout({ children }: RecipientLayoutProps) {
-  setupI18nSSR();
+  await setupI18nSSR();
 
   const { user, session } = await getServerComponentSession();
 
