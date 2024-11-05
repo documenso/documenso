@@ -17,8 +17,8 @@ export const metadata: Metadata = {
   title: 'Sign In',
 };
 
-export default function SignInPage() {
-  setupI18nSSR();
+export default async function SignInPage() {
+  await setupI18nSSR();
 
   const NEXT_PUBLIC_DISABLE_SIGNUP = env('NEXT_PUBLIC_DISABLE_SIGNUP');
 

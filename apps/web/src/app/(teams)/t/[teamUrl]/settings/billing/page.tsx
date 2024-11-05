@@ -21,7 +21,7 @@ export type TeamsSettingsBillingPageProps = {
 };
 
 export default async function TeamsSettingBillingPage({ params }: TeamsSettingsBillingPageProps) {
-  setupI18nSSR();
+  await setupI18nSSR();
 
   const { _ } = useLingui();
 

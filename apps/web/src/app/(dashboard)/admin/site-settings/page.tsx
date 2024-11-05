@@ -12,7 +12,7 @@ import { BannerForm } from './banner-form';
 // import { BannerForm } from './banner-form';
 
 export default async function AdminBannerPage() {
-  setupI18nSSR();
+  await setupI18nSSR();
 
   const { _ } = useLingui();
 

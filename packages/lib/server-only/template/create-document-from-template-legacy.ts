@@ -46,6 +46,7 @@ export const createDocumentFromTemplateLegacy = async ({
       Recipient: true,
       Field: true,
       templateDocumentData: true,
+      templateMeta: true,
     },
   });
 
@@ -77,6 +78,17 @@ export const createDocumentFromTemplateLegacy = async ({
           signingOrder: recipient.signingOrder,
           token: nanoid(),
         })),
+      },
+      documentMeta: {
+        create: {
+          subject: template.templateMeta?.subject,
+          message: template.templateMeta?.message,
+          timezone: template.templateMeta?.timezone,
+          dateFormat: template.templateMeta?.dateFormat,
+          redirectUrl: template.templateMeta?.redirectUrl,
+          signingOrder: template.templateMeta?.signingOrder ?? undefined,
+          language: template.templateMeta?.language,
+        },
       },
     },
 

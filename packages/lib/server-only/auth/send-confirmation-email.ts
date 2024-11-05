@@ -1,11 +1,14 @@
 import { createElement } from 'react';
 
+import { msg } from '@lingui/macro';
+
 import { mailer } from '@documenso/email/mailer';
-import { render } from '@documenso/email/render';
 import { ConfirmEmailTemplate } from '@documenso/email/templates/confirm-email';
 import { prisma } from '@documenso/prisma';
 
+import { getI18nInstance } from '../../client-only/providers/i18n.server';
 import { NEXT_PUBLIC_WEBAPP_URL } from '../../constants/app';
+import { renderEmailWithI18N } from '../../utils/render-email-with-i18n';
 
 export interface SendConfirmationEmailProps {
   userId: number;
@@ -45,6 +48,13 @@ export const sendConfirmationEmail = async ({ userId }: SendConfirmationEmailPro
     confirmationLink,
   });
 
+  const [html, text] = await Promise.all([
+    renderEmailWithI18N(confirmationTemplate),
+    renderEmailWithI18N(confirmationTemplate, { plainText: true }),
+  ]);
+
+  const i18n = await getI18nInstance();
+
   return mailer.sendMail({
     to: {
       address: user.email,
@@ -54,8 +64,8 @@ export const sendConfirmationEmail = async ({ userId }: SendConfirmationEmailPro
       name: senderName,
       address: senderAddress,
     },
-    subject: 'Please confirm your email',
-    html: render(confirmationTemplate),
-    text: render(confirmationTemplate, { plainText: true }),
+    subject: i18n._(msg`Please confirm your email`),
+    html,
+    text,
   });
 };

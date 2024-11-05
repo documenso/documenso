@@ -24,7 +24,7 @@ type AdminDocumentDetailsPageProps = {
 };
 
 export default async function AdminDocumentDetailsPage({ params }: AdminDocumentDetailsPageProps) {
-  const { i18n } = setupI18nSSR();
+  const { i18n } = await setupI18nSSR();
 
   const document = await getEntireDocument({ id: Number(params.id) });
 

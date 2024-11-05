@@ -39,7 +39,7 @@ export const sendConfirmationToken = async ({
     mostRecentToken?.createdAt &&
     DateTime.fromJSDate(mostRecentToken.createdAt).diffNow('minutes').minutes > -5
   ) {
-    return;
+    // return;
   }
 
   const createdToken = await prisma.verificationToken.create({
@@ -64,6 +64,7 @@ export const sendConfirmationToken = async ({
 
     return { success: true };
   } catch (err) {
+    console.log(err);
     throw new Error(`Failed to send the confirmation email`);
   }
 };

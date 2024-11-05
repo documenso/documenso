@@ -37,7 +37,7 @@ msgstr "Add document"
 msgid "Add More Users for {0}"
 msgstr "Add More Users for {0}"
 
-#: apps/marketing/src/app/(marketing)/open/page.tsx:165
+#: apps/marketing/src/app/(marketing)/open/page.tsx:164
 msgid "All our metrics, finances, and learnings are public. We believe in transparency and want to share our journey with you. You can read more about why here: <0>Announcing Open Metrics</0>"
 msgstr "All our metrics, finances, and learnings are public. We believe in transparency and want to share our journey with you. You can read more about why here: <0>Announcing Open Metrics</0>"
 
@@ -85,7 +85,7 @@ msgstr "Changelog"
 msgid "Choose a template from the community app store. Or submit your own template for others to use."
 msgstr "Choose a template from the community app store. Or submit your own template for others to use."
 
-#: apps/marketing/src/app/(marketing)/open/page.tsx:219
+#: apps/marketing/src/app/(marketing)/open/page.tsx:218
 msgid "Community"
 msgstr "Community"
 
@@ -155,10 +155,6 @@ msgstr "Documentation"
 msgid "Easily embed Documenso into your product. Simply copy and paste our react widget into your application."
 msgstr "Easily embed Documenso into your product. Simply copy and paste our react widget into your application."
 
-#: apps/marketing/src/components/(marketing)/share-connect-paid-widget-bento.tsx:42
-#~ msgid "Easy Sharing (Soon)."
-#~ msgstr "Easy Sharing (Soon)."
-
 #: apps/marketing/src/components/(marketing)/share-connect-paid-widget-bento.tsx:46
 msgid "Easy Sharing."
 msgstr "Easy Sharing."
@@ -192,7 +188,7 @@ msgstr "Fast."
 msgid "Faster, smarter and more beautiful."
 msgstr "Faster, smarter and more beautiful."
 
-#: apps/marketing/src/app/(marketing)/open/page.tsx:210
+#: apps/marketing/src/app/(marketing)/open/page.tsx:209
 msgid "Finances"
 msgstr "Finances"
 
@@ -245,15 +241,15 @@ msgstr "Get started today."
 msgid "Get the latest news from Documenso, including product updates, team announcements and more!"
 msgstr "Get the latest news from Documenso, including product updates, team announcements and more!"
 
-#: apps/marketing/src/app/(marketing)/open/page.tsx:233
+#: apps/marketing/src/app/(marketing)/open/page.tsx:232
 msgid "GitHub: Total Merged PRs"
 msgstr "GitHub: Total Merged PRs"
 
-#: apps/marketing/src/app/(marketing)/open/page.tsx:251
+#: apps/marketing/src/app/(marketing)/open/page.tsx:250
 msgid "GitHub: Total Open Issues"
 msgstr "GitHub: Total Open Issues"
 
-#: apps/marketing/src/app/(marketing)/open/page.tsx:225
+#: apps/marketing/src/app/(marketing)/open/page.tsx:224
 msgid "GitHub: Total Stars"
 msgstr "GitHub: Total Stars"
 
@@ -261,7 +257,7 @@ msgstr "GitHub: Total Stars"
 msgid "Global Salary Bands"
 msgstr "Global Salary Bands"
 
-#: apps/marketing/src/app/(marketing)/open/page.tsx:261
+#: apps/marketing/src/app/(marketing)/open/page.tsx:260
 msgid "Growth"
 msgstr "Growth"
 
@@ -285,7 +281,7 @@ msgstr "Integrated payments with Stripe so you don’t have to worry about getti
 msgid "Integrates with all your favourite tools."
 msgstr "Integrates with all your favourite tools."
 
-#: apps/marketing/src/app/(marketing)/open/page.tsx:289
+#: apps/marketing/src/app/(marketing)/open/page.tsx:288
 msgid "Is there more?"
 msgstr "Is there more?"
 
@@ -309,11 +305,11 @@ msgstr "Location"
 msgid "Make it your own through advanced customization and adjustability."
 msgstr "Make it your own through advanced customization and adjustability."
 
-#: apps/marketing/src/app/(marketing)/open/page.tsx:199
+#: apps/marketing/src/app/(marketing)/open/page.tsx:198
 msgid "Merged PR's"
 msgstr "Merged PR's"
 
-#: apps/marketing/src/app/(marketing)/open/page.tsx:234
+#: apps/marketing/src/app/(marketing)/open/page.tsx:233
 msgid "Merged PRs"
 msgstr "Merged PRs"
 
@@ -344,8 +340,8 @@ msgstr "No Credit Card required"
 msgid "None of these work for you? Try self-hosting!"
 msgstr "None of these work for you? Try self-hosting!"
 
-#: apps/marketing/src/app/(marketing)/open/page.tsx:194
-#: apps/marketing/src/app/(marketing)/open/page.tsx:252
+#: apps/marketing/src/app/(marketing)/open/page.tsx:193
+#: apps/marketing/src/app/(marketing)/open/page.tsx:251
 msgid "Open Issues"
 msgstr "Open Issues"
 
@@ -353,7 +349,7 @@ msgstr "Open Issues"
 msgid "Open Source or Hosted."
 msgstr "Open Source or Hosted."
 
-#: apps/marketing/src/app/(marketing)/open/page.tsx:161
+#: apps/marketing/src/app/(marketing)/open/page.tsx:160
 #: apps/marketing/src/components/(marketing)/footer.tsx:37
 #: apps/marketing/src/components/(marketing)/header.tsx:64
 #: apps/marketing/src/components/(marketing)/mobile-navigation.tsx:40
@@ -372,17 +368,9 @@ msgstr "Our custom templates come with smart rules that can help you save time a
 msgid "Our Enterprise License is great for large organizations looking to switch to Documenso for all their signing needs. It's available for our cloud offering as well as self-hosted setups and offers a wide range of compliance and Adminstration Features."
 msgstr "Our Enterprise License is great for large organizations looking to switch to Documenso for all their signing needs. It's available for our cloud offering as well as self-hosted setups and offers a wide range of compliance and Adminstration Features."
 
-#: apps/marketing/src/components/(marketing)/enterprise.tsx:20
-#~ msgid "Our Enterprise License is great large organizations looking to switch to Documenso for all their signing needs. It's availible for our cloud offering as well as self-hosted setups and offer a wide range of compliance and Adminstration Features."
-#~ msgstr "Our Enterprise License is great large organizations looking to switch to Documenso for all their signing needs. It's availible for our cloud offering as well as self-hosted setups and offer a wide range of compliance and Adminstration Features."
-
 #: apps/marketing/src/app/(marketing)/pricing/page.tsx:65
 msgid "Our self-hosted option is great for small teams and individuals who need a simple solution. You can use our docker based setup to get started in minutes. Take control with full customizability and data ownership."
 msgstr "Our self-hosted option is great for small teams and individuals who need a simple solution. You can use our docker based setup to get started in minutes. Take control with full customizability and data ownership."
-
-#: apps/marketing/src/app/(marketing)/open/data.ts:25
-#~ msgid "Part-Time"
-#~ msgstr "Part-Time"
 
 #: apps/marketing/src/components/(marketing)/pricing-table.tsx:151
 msgid "Premium Profile Name"
@@ -424,10 +412,6 @@ msgstr "Salary"
 #: apps/marketing/src/components/(marketing)/pricing-table.tsx:62
 msgid "Save $60 or $120"
 msgstr "Save $60 or $120"
-
-#: apps/marketing/src/components/(marketing)/i18n-switcher.tsx:47
-#~ msgid "Search languages..."
-#~ msgstr "Search languages..."
 
 #: apps/marketing/src/app/(marketing)/pricing/page.tsx:109
 msgid "Securely. Our data centers are located in Frankfurt (Germany), giving us the best local privacy laws. We are very aware of the sensitive nature of our data and follow best practices to ensure the security and integrity of the data entrusted to us."
@@ -477,7 +461,7 @@ msgstr "Smart."
 msgid "Star on GitHub"
 msgstr "Star on GitHub"
 
-#: apps/marketing/src/app/(marketing)/open/page.tsx:226
+#: apps/marketing/src/app/(marketing)/open/page.tsx:225
 msgid "Stars"
 msgstr "Stars"
 
@@ -512,7 +496,7 @@ msgstr "Template Store (Soon)."
 msgid "That's awesome. You can take a look at the current <0>Issues</0> and join our <1>Discord Community</1> to keep up to date, on what the current priorities are. In any case, we are an open community and welcome all input, technical and non-technical ❤️"
 msgstr "That's awesome. You can take a look at the current <0>Issues</0> and join our <1>Discord Community</1> to keep up to date, on what the current priorities are. In any case, we are an open community and welcome all input, technical and non-technical ❤️"
 
-#: apps/marketing/src/app/(marketing)/open/page.tsx:293
+#: apps/marketing/src/app/(marketing)/open/page.tsx:292
 msgid "This page is evolving as we learn what makes a great signing company. We'll update it when we have more to share."
 msgstr "This page is evolving as we learn what makes a great signing company. We'll update it when we have more to share."
 
@@ -525,8 +509,8 @@ msgstr "Title"
 msgid "Total Completed Documents"
 msgstr "Total Completed Documents"
 
+#: apps/marketing/src/app/(marketing)/open/page.tsx:266
 #: apps/marketing/src/app/(marketing)/open/page.tsx:267
-#: apps/marketing/src/app/(marketing)/open/page.tsx:268
 msgid "Total Customers"
 msgstr "Total Customers"
 

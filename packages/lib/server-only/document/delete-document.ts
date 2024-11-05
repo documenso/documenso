@@ -3,7 +3,6 @@
 import { createElement } from 'react';
 
 import { mailer } from '@documenso/email/mailer';
-import { render } from '@documenso/email/render';
 import DocumentCancelTemplate from '@documenso/email/templates/document-cancel';
 import { prisma } from '@documenso/prisma';
 import type { Document, DocumentMeta, Recipient, User } from '@documenso/prisma/client';
@@ -14,6 +13,7 @@ import { FROM_ADDRESS, FROM_NAME } from '../../constants/email';
 import { DOCUMENT_AUDIT_LOG_TYPE } from '../../types/document-audit-logs';
 import type { RequestMetadata } from '../../universal/extract-request-metadata';
 import { createDocumentAuditLogData } from '../../utils/document-audit-logs';
+import { renderEmailWithI18N } from '../../utils/render-email-with-i18n';
 
 export type DeleteDocumentOptions = {
   id: number;
@@ -191,6 +191,11 @@ const handleDocumentOwnerDelete = async ({
         assetBaseUrl,
       });
 
+      const [html, text] = await Promise.all([
+        renderEmailWithI18N(template),
+        renderEmailWithI18N(template, { plainText: true }),
+      ]);
+
       await mailer.sendMail({
         to: {
           address: recipient.email,
@@ -201,8 +206,8 @@ const handleDocumentOwnerDelete = async ({
           address: FROM_ADDRESS,
         },
         subject: 'Document Cancelled',
-        html: render(template),
-        text: render(template, { plainText: true }),
+        html,
+        text,
       });
     }),
   );

@@ -1,5 +1,6 @@
 import { z } from 'zod';
 
+import { SUPPORTED_LANGUAGE_CODES } from '@documenso/lib/constants/i18n';
 import {
   ZDocumentAccessAuthTypesSchema,
   ZDocumentActionAuthTypesSchema,
@@ -87,6 +88,10 @@ export const ZUpdateTemplateSettingsMutationSchema = z.object({
       .max(MAX_TEMPLATE_PUBLIC_DESCRIPTION_LENGTH)
       .optional(),
     type: z.nativeEnum(TemplateType).optional(),
+    language: z
+      .union([z.string(), z.enum(SUPPORTED_LANGUAGE_CODES)])
+      .optional()
+      .default('en'),
   }),
   meta: z
     .object({
@@ -101,6 +106,7 @@ export const ZUpdateTemplateSettingsMutationSchema = z.object({
           message:
             'Please enter a valid URL, make sure you include http:// or https:// part of the url.',
         }),
+      language: z.enum(SUPPORTED_LANGUAGE_CODES).optional(),
     })
     .optional(),
 });

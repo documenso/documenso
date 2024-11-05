@@ -83,7 +83,7 @@ export const CurrentUserTeamsDataTable = () => {
         accessorKey: 'role',
         cell: ({ row }) =>
           row.original.ownerUserId === row.original.currentTeamMember.userId
-            ? 'Owner'
+            ? _(msg`Owner`)
             : _(TEAM_MEMBER_ROLE_MAP[row.original.currentTeamMember.role]),
       },
       {

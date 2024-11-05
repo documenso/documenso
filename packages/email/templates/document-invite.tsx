@@ -1,20 +1,10 @@
+import { Trans, msg } from '@lingui/macro';
+import { useLingui } from '@lingui/react';
+
 import { RECIPIENT_ROLES_DESCRIPTION_ENG } from '@documenso/lib/constants/recipient-roles';
 import type { RecipientRole } from '@documenso/prisma/client';
-import config from '@documenso/tailwind-config';
 
-import {
-  Body,
-  Container,
-  Head,
-  Hr,
-  Html,
-  Img,
-  Link,
-  Preview,
-  Section,
-  Tailwind,
-  Text,
-} from '../components';
+import { Body, Container, Head, Hr, Html, Img, Link, Preview, Section, Text } from '../components';
 import type { TemplateDocumentInviteProps } from '../template-components/template-document-invite';
 import { TemplateDocumentInvite } from '../template-components/template-document-invite';
 import { TemplateFooter } from '../template-components/template-footer';
@@ -40,13 +30,15 @@ export const DocumentInviteEmailTemplate = ({
   isTeamInvite = false,
   teamName,
 }: DocumentInviteEmailTemplateProps) => {
-  const action = RECIPIENT_ROLES_DESCRIPTION_ENG[role].actionVerb.toLowerCase();
+  const { _ } = useLingui();
+
+  const action = _(RECIPIENT_ROLES_DESCRIPTION_ENG[role].actionVerb).toLowerCase();
 
   const previewText = selfSigner
-    ? `Please ${action} your document ${documentName}`
+    ? msg`Please ${action} your document ${documentName}`
     : isTeamInvite
-    ? `${inviterName} on behalf of ${teamName} has invited you to ${action} ${documentName}`
-    : `${inviterName} has invited you to ${action} ${documentName}`;
+    ? msg`${inviterName} on behalf of ${teamName} has invited you to ${action} ${documentName}`
+    : msg`${inviterName} has invited you to ${action} ${documentName}`;
 
   const getAssetUrl = (path: string) => {
     return new URL(path, assetBaseUrl).toString();
@@ -55,67 +47,62 @@ export const DocumentInviteEmailTemplate = ({
   return (
     <Html>
       <Head />
-      <Preview>{previewText}</Preview>
-      <Tailwind
-        config={{
-          theme: {
-            extend: {
-              colors: config.theme.extend.colors,
-            },
-          },
-        }}
-      >
-        <Body className="mx-auto my-auto bg-white font-sans">
-          <Section>
-            <Container className="mx-auto mb-2 mt-8 max-w-xl rounded-lg border border-solid border-slate-200 p-4 backdrop-blur-sm">
-              <Section>
-                <Img
-                  src={getAssetUrl('/static/logo.png')}
-                  alt="Documenso Logo"
-                  className="mb-4 h-6"
-                />
+      <Preview>{_(previewText)}</Preview>
 
-                <TemplateDocumentInvite
-                  inviterName={inviterName}
-                  inviterEmail={inviterEmail}
-                  documentName={documentName}
-                  signDocumentLink={signDocumentLink}
-                  assetBaseUrl={assetBaseUrl}
-                  role={role}
-                  selfSigner={selfSigner}
-                  isTeamInvite={isTeamInvite}
-                  teamName={teamName}
-                />
-              </Section>
-            </Container>
+      <Body className="mx-auto my-auto bg-white font-sans">
+        <Section>
+          <Container className="mx-auto mb-2 mt-8 max-w-xl rounded-lg border border-solid border-slate-200 p-4 backdrop-blur-sm">
+            <Section>
+              <Img
+                src={getAssetUrl('/static/logo.png')}
+                alt="Documenso Logo"
+                className="mb-4 h-6"
+              />
 
-            <Container className="mx-auto mt-12 max-w-xl">
-              <Section>
-                <Text className="my-4 text-base font-semibold">
+              <TemplateDocumentInvite
+                inviterName={inviterName}
+                inviterEmail={inviterEmail}
+                documentName={documentName}
+                signDocumentLink={signDocumentLink}
+                assetBaseUrl={assetBaseUrl}
+                role={role}
+                selfSigner={selfSigner}
+                isTeamInvite={isTeamInvite}
+                teamName={teamName}
+              />
+            </Section>
+          </Container>
+
+          <Container className="mx-auto mt-12 max-w-xl">
+            <Section>
+              <Text className="my-4 text-base font-semibold">
+                <Trans>
                   {inviterName}{' '}
                   <Link className="font-normal text-slate-400" href="mailto:{inviterEmail}">
                     ({inviterEmail})
                   </Link>
-                </Text>
+                </Trans>
+              </Text>
 
-                <Text className="mt-2 text-base text-slate-400">
-                  {customBody ? (
-                    <pre className="font-sans text-base text-slate-400">{customBody}</pre>
-                  ) : (
+              <Text className="mt-2 text-base text-slate-400">
+                {customBody ? (
+                  <pre className="font-sans text-base text-slate-400">{customBody}</pre>
+                ) : (
+                  <Trans>
                     `${inviterName} has invited you to ${action} the document "${documentName}".`
-                  )}
-                </Text>
-              </Section>
-            </Container>
+                  </Trans>
+                )}
+              </Text>
+            </Section>
+          </Container>
 
-            <Hr className="mx-auto mt-12 max-w-xl" />
+          <Hr className="mx-auto mt-12 max-w-xl" />
 
-            <Container className="mx-auto max-w-xl">
-              <TemplateFooter />
-            </Container>
-          </Section>
-        </Body>
-      </Tailwind>
+          <Container className="mx-auto max-w-xl">
+            <TemplateFooter />
+          </Container>
+        </Section>
+      </Body>
     </Html>
   );
 };

@@ -5,7 +5,7 @@ import { getUserPublicProfile } from '@documenso/lib/server-only/user/get-user-p
 import { PublicProfilePageView } from './public-profile-page-view';
 
 export default async function Page() {
-  setupI18nSSR();
+  await setupI18nSSR();
 
   const { user } = await getRequiredServerComponentSession();
 

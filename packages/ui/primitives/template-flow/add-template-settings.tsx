@@ -4,11 +4,11 @@ import { useEffect } from 'react';
 
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Trans } from '@lingui/macro';
-import { useLingui } from '@lingui/react';
 import { InfoIcon } from 'lucide-react';
 import { useForm } from 'react-hook-form';
 
 import { DATE_FORMATS, DEFAULT_DOCUMENT_DATE_FORMAT } from '@documenso/lib/constants/date-formats';
+import { SUPPORTED_LANGUAGES } from '@documenso/lib/constants/i18n';
 import { DEFAULT_DOCUMENT_TIME_ZONE, TIME_ZONES } from '@documenso/lib/constants/time-zones';
 import { extractDocumentAuthMethods } from '@documenso/lib/utils/document-auth';
 import { type Field, type Recipient } from '@documenso/prisma/client';
@@ -74,8 +74,6 @@ export const AddTemplateSettingsFormPartial = ({
   template,
   onSubmit,
 }: AddTemplateSettingsFormProps) => {
-  const { _ } = useLingui();
-
   const { documentAuthOption } = extractDocumentAuthMethods({
     documentAuth: template.authOptions,
   });
@@ -93,6 +91,7 @@ export const AddTemplateSettingsFormPartial = ({
         timezone: template.templateMeta?.timezone ?? DEFAULT_DOCUMENT_TIME_ZONE,
         dateFormat: template.templateMeta?.dateFormat ?? DEFAULT_DOCUMENT_DATE_FORMAT,
         redirectUrl: template.templateMeta?.redirectUrl ?? '',
+        language: template.templateMeta?.language ?? 'en',
       },
     },
   });
@@ -102,7 +101,7 @@ export const AddTemplateSettingsFormPartial = ({
   // We almost always want to set the timezone to the user's local timezone to avoid confusion
   // when the document is signed.
   useEffect(() => {
-    if (!form.formState.touchedFields.meta?.timezone) {
+    if (!form.formState.touchedFields.meta?.timezone && !template.templateMeta?.timezone) {
       form.setValue('meta.timezone', Intl.DateTimeFormat().resolvedOptions().timeZone);
     }
   }, [form, form.setValue, form.formState.touchedFields.meta?.timezone]);
@@ -136,6 +135,46 @@ export const AddTemplateSettingsFormPartial = ({
 
                   <FormControl>
                     <Input className="bg-background" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="meta.language"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="inline-flex items-center">
+                    <Trans>Language</Trans>
+                    <Tooltip>
+                      <TooltipTrigger>
+                        <InfoIcon className="mx-2 h-4 w-4" />
+                      </TooltipTrigger>
+
+                      <TooltipContent className="text-foreground max-w-md space-y-2 p-4">
+                        Controls the language for the document, including the language to be used
+                        for email notifications, and the final certificate that is generated and
+                        attached to the document.
+                      </TooltipContent>
+                    </Tooltip>
+                  </FormLabel>
+
+                  <FormControl>
+                    <Select {...field} onValueChange={field.onChange}>
+                      <SelectTrigger className="bg-background">
+                        <SelectValue />
+                      </SelectTrigger>
+
+                      <SelectContent>
+                        {Object.entries(SUPPORTED_LANGUAGES).map(([code, language]) => (
+                          <SelectItem key={code} value={code}>
+                            {language.full}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
                   </FormControl>
                   <FormMessage />
                 </FormItem>

@@ -117,10 +117,10 @@ export const MoveDocumentDialog = ({ documentId, open, onOpenChange }: MoveDocum
 
         <DialogFooter>
           <Button variant="secondary" onClick={() => onOpenChange(false)}>
-            Cancel
+            <Trans>Cancel</Trans>
           </Button>
           <Button onClick={onMove} loading={isLoading} disabled={!selectedTeamId || isLoading}>
-            {isLoading ? 'Moving...' : 'Move'}
+            {isLoading ? <Trans>Moving...</Trans> : <Trans>Move</Trans>}
           </Button>
         </DialogFooter>
       </DialogContent>
