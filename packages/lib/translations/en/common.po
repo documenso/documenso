@@ -445,6 +445,7 @@ msgstr "Direct link receiver"
 msgid "Document access"
 msgstr "Document access"
 
+#: packages/lib/server-only/document/delete-document.ts:213
 #: packages/lib/server-only/document/super-delete-document.ts:75
 msgid "Document Cancelled"
 msgstr "Document Cancelled"

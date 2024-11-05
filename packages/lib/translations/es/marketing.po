@@ -602,4 +602,3 @@ msgstr "Puedes autoalojar Documenso de forma gratuita o usar nuestra versión al
 #: apps/marketing/src/components/(marketing)/carousel.tsx:272
 msgid "Your browser does not support the video tag."
 msgstr "Tu navegador no soporta la etiqueta de video."
-

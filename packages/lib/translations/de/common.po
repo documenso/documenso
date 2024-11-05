@@ -450,6 +450,7 @@ msgstr "Empfänger des direkten Links"
 msgid "Document access"
 msgstr "Dokumentenzugriff"
 
+#: packages/lib/server-only/document/delete-document.ts:213
 #: packages/lib/server-only/document/super-delete-document.ts:75
 msgid "Document Cancelled"
 msgstr "Dokument storniert"
@@ -1309,4 +1310,3 @@ msgstr "Dein Passwort wurde aktualisiert."
 #: packages/email/templates/team-delete.tsx:30
 msgid "Your team has been deleted"
 msgstr "Dein Team wurde gelöscht"
-
