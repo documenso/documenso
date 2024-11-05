@@ -3,7 +3,14 @@ import { P, match } from 'ts-pattern';
 
 import { prisma } from '@documenso/prisma';
 import { RecipientRole, SigningStatus, TeamMemberRole } from '@documenso/prisma/client';
-import type { Document, Prisma, Team, TeamEmail, User } from '@documenso/prisma/client';
+import type {
+  Document,
+  DocumentSource,
+  Prisma,
+  Team,
+  TeamEmail,
+  User,
+} from '@documenso/prisma/client';
 import { ExtendedDocumentStatus } from '@documenso/prisma/types/extended-document-status';
 
 import { DocumentVisibility } from '../../types/document-visibility';
@@ -16,6 +23,8 @@ export type FindDocumentsOptions = {
   userId: number;
   teamId?: number;
   term?: string;
+  templateId?: number;
+  source?: DocumentSource;
   status?: ExtendedDocumentStatus;
   page?: number;
   perPage?: number;
@@ -32,6 +41,8 @@ export const findDocuments = async ({
   userId,
   teamId,
   term,
+  templateId,
+  source,
   status = ExtendedDocumentStatus.ALL,
   page = 1,
   perPage = 10,
@@ -40,44 +51,37 @@ export const findDocuments = async ({
   senderIds,
   search,
 }: FindDocumentsOptions) => {
-  const { user, team } = await prisma.$transaction(async (tx) => {
-    const user = await tx.user.findFirstOrThrow({
+  const user = await prisma.user.findFirstOrThrow({
+    where: {
+      id: userId,
+    },
+  });
+
+  let team = null;
+
+  if (teamId !== undefined) {
+    team = await prisma.team.findFirstOrThrow({
       where: {
-        id: userId,
+        id: teamId,
+        members: {
+          some: {
+            userId,
+          },
+        },
+      },
+      include: {
+        teamEmail: true,
+        members: {
+          where: {
+            userId,
+          },
+          select: {
+            role: true,
+          },
+        },
       },
     });
-
-    let team = null;
-
-    if (teamId !== undefined) {
-      team = await tx.team.findFirstOrThrow({
-        where: {
-          id: teamId,
-          members: {
-            some: {
-              userId,
-            },
-          },
-        },
-        include: {
-          teamEmail: true,
-          members: {
-            where: {
-              userId,
-            },
-            select: {
-              role: true,
-            },
-          },
-        },
-      });
-    }
-
-    return {
-      user,
-      team,
-    };
-  });
+  }
 
   const orderByColumn = orderBy?.column ?? 'createdAt';
   const orderByDirection = orderBy?.direction ?? 'desc';
@@ -197,8 +201,27 @@ export const findDocuments = async ({
     };
   }
 
+  const whereAndClause: Prisma.DocumentWhereInput['AND'] = [
+    { ...termFilters },
+    { ...filters },
+    { ...deletedFilter },
+    { ...searchFilter },
+  ];
+
+  if (templateId) {
+    whereAndClause.push({
+      templateId,
+    });
+  }
+
+  if (source) {
+    whereAndClause.push({
+      source,
+    });
+  }
+
   const whereClause: Prisma.DocumentWhereInput = {
-    AND: [{ ...termFilters }, { ...filters }, { ...deletedFilter }, { ...searchFilter }],
+    AND: whereAndClause,
   };
 
   if (period) {

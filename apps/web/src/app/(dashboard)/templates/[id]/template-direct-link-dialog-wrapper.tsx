@@ -10,11 +10,13 @@ import { Button } from '@documenso/ui/primitives/button';
 
 import { TemplateDirectLinkDialog } from '../template-direct-link-dialog';
 
-export type TemplatePageViewProps = {
+export type TemplateDirectLinkDialogWrapperProps = {
   template: Template & { directLink?: TemplateDirectLink | null; Recipient: Recipient[] };
 };
 
-export const TemplateDirectLinkDialogWrapper = ({ template }: TemplatePageViewProps) => {
+export const TemplateDirectLinkDialogWrapper = ({
+  template,
+}: TemplateDirectLinkDialogWrapperProps) => {
   const [isTemplateDirectLinkOpen, setTemplateDirectLinkOpen] = useState(false);
 
   return (
