@@ -19,7 +19,7 @@ type AdminLeaderboardProps = {
 };
 
 export default async function Leaderboard({ searchParams = {} }: AdminLeaderboardProps) {
-  setupI18nSSR();
+  await setupI18nSSR();
 
   const { user } = await getRequiredServerComponentSession();
 
