@@ -202,7 +202,7 @@ export const ApiTokenForm = ({ className, teamId, tokens }: ApiTokenFormProps) =
                           <SelectContent>
                             {Object.entries(EXPIRATION_DATES).map(([key, date]) => (
                               <SelectItem key={key} value={key}>
-                                {date}
+                                {_(date)}
                               </SelectItem>
                             ))}
                           </SelectContent>

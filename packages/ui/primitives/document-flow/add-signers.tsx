@@ -504,7 +504,7 @@ export const AddSignersFormPartial = ({
                                     <FormControl>
                                       <Input
                                         type="email"
-                                        placeholder="Email"
+                                        placeholder={_(msg`Email`)}
                                         {...field}
                                         disabled={
                                           snapshot.isDragging ||

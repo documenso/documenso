@@ -25,7 +25,10 @@ import {
 } from '../../utils/document-auth';
 import { triggerWebhook } from '../webhooks/trigger/trigger-webhook';
 
-type FinalRecipient = Pick<Recipient, 'name' | 'email' | 'role' | 'authOptions'> & {
+type FinalRecipient = Pick<
+  Recipient,
+  'name' | 'email' | 'role' | 'authOptions' | 'signingOrder'
+> & {
   templateRecipientId: number;
   fields: Field[];
 };
@@ -200,6 +203,7 @@ export const createDocumentFromTemplate = async ({
                   recipient.role === RecipientRole.CC
                     ? SigningStatus.SIGNED
                     : SigningStatus.NOT_SIGNED,
+                signingOrder: recipient.signingOrder,
                 token: nanoid(),
               };
             }),

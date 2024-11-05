@@ -222,7 +222,7 @@ export default async function CompletedSigningPage({
           )}
 
           {isLoggedIn && (
-            <Link href="/documents" className="text-documenso-700 hover:text-documenso-600">
+            <Link href="/documents" className="text-documenso-700 hover:text-documenso-600 mt-2">
               <Trans>Go Back Home</Trans>
             </Link>
           )}
