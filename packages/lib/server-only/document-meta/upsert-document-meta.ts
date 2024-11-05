@@ -9,6 +9,8 @@ import {
 import { prisma } from '@documenso/prisma';
 import type { DocumentSigningOrder } from '@documenso/prisma/client';
 
+import type { SupportedLanguageCodes } from '../../constants/i18n';
+
 export type CreateDocumentMetaOptions = {
   documentId: number;
   subject?: string;
@@ -19,6 +21,7 @@ export type CreateDocumentMetaOptions = {
   redirectUrl?: string;
   signingOrder?: DocumentSigningOrder;
   typedSignatureEnabled?: boolean;
+  language?: SupportedLanguageCodes;
   userId: number;
   requestMetadata: RequestMetadata;
 };
@@ -34,6 +37,7 @@ export const upsertDocumentMeta = async ({
   redirectUrl,
   signingOrder,
   typedSignatureEnabled,
+  language,
   requestMetadata,
 }: CreateDocumentMetaOptions) => {
   const user = await prisma.user.findFirstOrThrow({
@@ -85,6 +89,7 @@ export const upsertDocumentMeta = async ({
         redirectUrl,
         signingOrder,
         typedSignatureEnabled,
+        language,
       },
       update: {
         subject,
@@ -95,6 +100,7 @@ export const upsertDocumentMeta = async ({
         redirectUrl,
         signingOrder,
         typedSignatureEnabled,
+        language,
       },
     });
 

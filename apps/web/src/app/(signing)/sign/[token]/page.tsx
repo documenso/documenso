@@ -31,7 +31,7 @@ export type SigningPageProps = {
 };
 
 export default async function SigningPage({ params: { token } }: SigningPageProps) {
-  setupI18nSSR();
+  await setupI18nSSR();
 
   if (!token) {
     return notFound();
@@ -42,12 +42,6 @@ export default async function SigningPage({ params: { token } }: SigningPageProp
   const requestHeaders = Object.fromEntries(headers().entries());
 
   const requestMetadata = extractNextHeaderRequestMetadata(requestHeaders);
-
-  const isRecipientsTurn = await getIsRecipientsTurnToSign({ token });
-
-  if (!isRecipientsTurn) {
-    return redirect(`/sign/${token}/waiting`);
-  }
 
   const [document, fields, recipient, completedFields] = await Promise.all([
     getDocumentAndSenderByToken({
@@ -67,6 +61,12 @@ export default async function SigningPage({ params: { token } }: SigningPageProp
     document.status === DocumentStatus.DRAFT
   ) {
     return notFound();
+  }
+
+  const isRecipientsTurn = await getIsRecipientsTurnToSign({ token });
+
+  if (!isRecipientsTurn) {
+    return redirect(`/sign/${token}/waiting`);
   }
 
   const { derivedRecipientAccessAuth } = extractDocumentAuthMethods({

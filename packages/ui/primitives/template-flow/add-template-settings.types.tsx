@@ -1,6 +1,7 @@
 import { z } from 'zod';
 
 import { DEFAULT_DOCUMENT_DATE_FORMAT } from '@documenso/lib/constants/date-formats';
+import { SUPPORTED_LANGUAGE_CODES } from '@documenso/lib/constants/i18n';
 import { DEFAULT_DOCUMENT_TIME_ZONE } from '@documenso/lib/constants/time-zones';
 import {
   ZDocumentAccessAuthTypesSchema,
@@ -31,6 +32,10 @@ export const ZAddTemplateSettingsFormSchema = z.object({
         message:
           'Please enter a valid URL, make sure you include http:// or https:// part of the url.',
       }),
+    language: z
+      .union([z.string(), z.enum(SUPPORTED_LANGUAGE_CODES)])
+      .optional()
+      .default('en'),
   }),
 });
 

@@ -11,6 +11,7 @@ import {
   WebhookTriggerEvents,
 } from '@documenso/prisma/client';
 
+import type { SupportedLanguageCodes } from '../../constants/i18n';
 import { AppError, AppErrorCode } from '../../errors/app-error';
 import { DOCUMENT_AUDIT_LOG_TYPE } from '../../types/document-audit-logs';
 import { ZRecipientAuthOptionsSchema } from '../../types/document-auth';
@@ -24,7 +25,10 @@ import {
 } from '../../utils/document-auth';
 import { triggerWebhook } from '../webhooks/trigger/trigger-webhook';
 
-type FinalRecipient = Pick<Recipient, 'name' | 'email' | 'role' | 'authOptions'> & {
+type FinalRecipient = Pick<
+  Recipient,
+  'name' | 'email' | 'role' | 'authOptions' | 'signingOrder'
+> & {
   templateRecipientId: number;
   fields: Field[];
 };
@@ -57,6 +61,7 @@ export type CreateDocumentFromTemplateOptions = {
     dateFormat?: string;
     redirectUrl?: string;
     signingOrder?: DocumentSigningOrder;
+    language?: SupportedLanguageCodes;
   };
   requestMetadata?: RequestMetadata;
 };
@@ -176,6 +181,7 @@ export const createDocumentFromTemplate = async ({
               override?.signingOrder ||
               template.templateMeta?.signingOrder ||
               DocumentSigningOrder.PARALLEL,
+            language: override?.language || template.templateMeta?.language,
           },
         },
         Recipient: {
@@ -197,6 +203,7 @@ export const createDocumentFromTemplate = async ({
                   recipient.role === RecipientRole.CC
                     ? SigningStatus.SIGNED
                     : SigningStatus.NOT_SIGNED,
+                signingOrder: recipient.signingOrder,
                 token: nanoid(),
               };
             }),

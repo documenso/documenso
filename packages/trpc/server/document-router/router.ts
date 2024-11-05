@@ -232,6 +232,7 @@ export const documentRouter = router({
             dateFormat: meta.dateFormat,
             timezone: meta.timezone,
             redirectUrl: meta.redirectUrl,
+            language: meta.language,
             userId: ctx.user.id,
             requestMetadata,
           });

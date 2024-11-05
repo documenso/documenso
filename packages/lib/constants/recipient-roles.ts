@@ -41,31 +41,35 @@ export const RECIPIENT_ROLES_DESCRIPTION_ENG = {
     actioned: `Approved`,
     progressiveVerb: `Approving`,
     roleName: `Approver`,
+    roleNamePlural: msg`Approvers`,
   },
   [RecipientRole.CC]: {
     actionVerb: `CC`,
     actioned: `CC'd`,
     progressiveVerb: `CC`,
     roleName: `Cc`,
+    roleNamePlural: msg`Ccers`,
   },
   [RecipientRole.SIGNER]: {
     actionVerb: `Sign`,
     actioned: `Signed`,
     progressiveVerb: `Signing`,
     roleName: `Signer`,
+    roleNamePlural: msg`Signers`,
   },
   [RecipientRole.VIEWER]: {
     actionVerb: `View`,
     actioned: `Viewed`,
     progressiveVerb: `Viewing`,
     roleName: `Viewer`,
+    roleNamePlural: msg`Viewers`,
   },
 } satisfies Record<keyof typeof RecipientRole, unknown>;
 
 export const RECIPIENT_ROLE_TO_EMAIL_TYPE = {
-  [RecipientRole.SIGNER]: 'SIGNING_REQUEST',
-  [RecipientRole.VIEWER]: 'VIEW_REQUEST',
-  [RecipientRole.APPROVER]: 'APPROVE_REQUEST',
+  [RecipientRole.SIGNER]: `SIGNING_REQUEST`,
+  [RecipientRole.VIEWER]: `VIEW_REQUEST`,
+  [RecipientRole.APPROVER]: `APPROVE_REQUEST`,
 } as const;
 
 export const RECIPIENT_ROLE_SIGNING_REASONS = {

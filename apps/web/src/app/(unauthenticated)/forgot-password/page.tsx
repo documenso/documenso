@@ -11,8 +11,8 @@ export const metadata: Metadata = {
   title: 'Forgot Password',
 };
 
-export default function ForgotPasswordPage() {
-  setupI18nSSR();
+export default async function ForgotPasswordPage() {
+  await setupI18nSSR();
 
   return (
     <div className="w-screen max-w-lg px-4">

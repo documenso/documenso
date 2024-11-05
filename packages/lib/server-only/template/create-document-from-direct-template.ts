@@ -1,15 +1,16 @@
 import { createElement } from 'react';
 
+import { msg } from '@lingui/macro';
 import { DateTime } from 'luxon';
 import { match } from 'ts-pattern';
 
 import { mailer } from '@documenso/email/mailer';
-import { render } from '@documenso/email/render';
 import { DocumentCreatedFromDirectTemplateEmailTemplate } from '@documenso/email/templates/document-created-from-direct-template';
 import { nanoid } from '@documenso/lib/universal/id';
 import { prisma } from '@documenso/prisma';
 import type { Field, Signature } from '@documenso/prisma/client';
 import {
+  DocumentSigningOrder,
   DocumentSource,
   DocumentStatus,
   FieldType,
@@ -21,6 +22,7 @@ import {
 } from '@documenso/prisma/client';
 import type { TSignFieldWithTokenMutationSchema } from '@documenso/trpc/server/field-router/schema';
 
+import { getI18nInstance } from '../../client-only/providers/i18n.server';
 import { NEXT_PUBLIC_WEBAPP_URL } from '../../constants/app';
 import { DEFAULT_DOCUMENT_DATE_FORMAT } from '../../constants/date-formats';
 import { DEFAULT_DOCUMENT_TIME_ZONE } from '../../constants/time-zones';
@@ -37,6 +39,7 @@ import {
   createRecipientAuthOptions,
   extractDocumentAuthMethods,
 } from '../../utils/document-auth';
+import { renderEmailWithI18N } from '../../utils/render-email-with-i18n';
 import { formatDocumentsPath } from '../../utils/teams';
 import { sendDocument } from '../document/send-document';
 import { validateFieldAuth } from '../document/validate-field-auth';
@@ -142,6 +145,8 @@ export const createDocumentFromDirectTemplate = async ({
   const metaDateFormat = template.templateMeta?.dateFormat || DEFAULT_DOCUMENT_DATE_FORMAT;
   const metaEmailMessage = template.templateMeta?.message || '';
   const metaEmailSubject = template.templateMeta?.subject || '';
+  const metaLanguage = template.templateMeta?.language;
+  const metaSigningOrder = template.templateMeta?.signingOrder || DocumentSigningOrder.PARALLEL;
 
   // Associate, validate and map to a query every direct template recipient field with the provided fields.
   const createDirectRecipientFieldArgs = await Promise.all(
@@ -256,6 +261,7 @@ export const createDocumentFromDirectTemplate = async ({
                   recipient.role === RecipientRole.CC
                     ? SigningStatus.SIGNED
                     : SigningStatus.NOT_SIGNED,
+                signingOrder: recipient.signingOrder,
                 token: nanoid(),
               };
             }),
@@ -267,6 +273,8 @@ export const createDocumentFromDirectTemplate = async ({
             dateFormat: metaDateFormat,
             message: metaEmailMessage,
             subject: metaEmailSubject,
+            language: metaLanguage,
+            signingOrder: metaSigningOrder,
           },
         },
       },
@@ -330,6 +338,7 @@ export const createDocumentFromDirectTemplate = async ({
         signingStatus: SigningStatus.SIGNED,
         sendStatus: SendStatus.SENT,
         signedAt: initialRequestTime,
+        signingOrder: directTemplateRecipient.signingOrder,
         Field: {
           createMany: {
             data: directTemplateNonSignatureFields.map(({ templateField, customText }) => ({
@@ -524,6 +533,13 @@ export const createDocumentFromDirectTemplate = async ({
       assetBaseUrl: NEXT_PUBLIC_WEBAPP_URL() || 'http://localhost:3000',
     });
 
+    const [html, text] = await Promise.all([
+      renderEmailWithI18N(emailTemplate, { lang: metaLanguage }),
+      renderEmailWithI18N(emailTemplate, { lang: metaLanguage, plainText: true }),
+    ]);
+
+    const i18n = await getI18nInstance(metaLanguage);
+
     await mailer.sendMail({
       to: [
         {
@@ -535,9 +551,9 @@ export const createDocumentFromDirectTemplate = async ({
         name: process.env.NEXT_PRIVATE_SMTP_FROM_NAME || 'Documenso',
         address: process.env.NEXT_PRIVATE_SMTP_FROM_ADDRESS || 'noreply@documenso.com',
       },
-      subject: 'Document created from direct template',
-      html: render(emailTemplate),
-      text: render(emailTemplate, { plainText: true }),
+      subject: i18n._(msg`Document created from direct template`),
+      html,
+      text,
     });
 
     return {

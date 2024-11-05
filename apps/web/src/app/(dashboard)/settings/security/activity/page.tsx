@@ -14,8 +14,8 @@ export const metadata: Metadata = {
   title: 'Security activity',
 };
 
-export default function SettingsSecurityActivityPage() {
-  setupI18nSSR();
+export default async function SettingsSecurityActivityPage() {
+  await setupI18nSSR();
 
   const { _ } = useLingui();
 

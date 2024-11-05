@@ -4,8 +4,8 @@ import { setupI18nSSR } from '@documenso/lib/client-only/providers/i18n.server';
 
 import { AdminDocumentResults } from './document-results';
 
-export default function AdminDocumentsPage() {
-  setupI18nSSR();
+export default async function AdminDocumentsPage() {
+  await setupI18nSSR();
 
   return (
     <div>

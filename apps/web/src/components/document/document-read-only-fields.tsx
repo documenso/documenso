@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 
+import { useLingui } from '@lingui/react';
 import { EyeOffIcon } from 'lucide-react';
 import { P, match } from 'ts-pattern';
 
@@ -12,6 +13,7 @@ import {
 import { PDF_VIEWER_PAGE_SELECTOR } from '@documenso/lib/constants/pdf-viewer';
 import { DEFAULT_DOCUMENT_TIME_ZONE } from '@documenso/lib/constants/time-zones';
 import type { DocumentField } from '@documenso/lib/server-only/field/get-fields-for-document';
+import { parseMessageDescriptor } from '@documenso/lib/utils/i18n';
 import { extractInitials } from '@documenso/lib/utils/recipient-formatter';
 import type { DocumentMeta } from '@documenso/prisma/client';
 import { FieldType, SigningStatus } from '@documenso/prisma/client';
@@ -28,6 +30,8 @@ export type DocumentReadOnlyFieldsProps = {
 };
 
 export const DocumentReadOnlyFields = ({ documentMeta, fields }: DocumentReadOnlyFieldsProps) => {
+  const { _ } = useLingui();
+
   const [hiddenFieldIds, setHiddenFieldIds] = useState<Record<string, boolean>>({});
 
   const handleHideField = (fieldId: string) => {
@@ -59,7 +63,7 @@ export const DocumentReadOnlyFields = ({ documentMeta, fields }: DocumentReadOnl
                 >
                   <p className="font-semibold">
                     {field.Recipient.signingStatus === SigningStatus.SIGNED ? 'Signed' : 'Pending'}{' '}
-                    {FRIENDLY_FIELD_TYPE[field.type].toLowerCase()} field
+                    {parseMessageDescriptor(_, FRIENDLY_FIELD_TYPE[field.type]).toLowerCase()} field
                   </p>
 
                   <p className="text-muted-foreground text-xs">
@@ -127,7 +131,7 @@ export const DocumentReadOnlyFields = ({ documentMeta, fields }: DocumentReadOnl
                         field.type === FieldType.FREE_SIGNATURE,
                     })}
                   >
-                    {FRIENDLY_FIELD_TYPE[field.type]}
+                    {parseMessageDescriptor(_, FRIENDLY_FIELD_TYPE[field.type])}
                   </p>
                 )}
               </div>

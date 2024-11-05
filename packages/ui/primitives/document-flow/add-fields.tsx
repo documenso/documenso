@@ -5,6 +5,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Caveat } from 'next/font/google';
 
 import { Trans, msg } from '@lingui/macro';
+import { useLingui } from '@lingui/react';
 import { Prisma } from '@prisma/client';
 import {
   CalendarDays,
@@ -34,6 +35,7 @@ import {
 } from '@documenso/lib/types/field-meta';
 import { nanoid } from '@documenso/lib/universal/id';
 import { validateFieldsUninserted } from '@documenso/lib/utils/fields';
+import { parseMessageDescriptor } from '@documenso/lib/utils/i18n';
 import {
   canRecipientBeModified,
   canRecipientFieldsBeModified,
@@ -114,6 +116,7 @@ export const AddFieldsFormPartial = ({
   teamId,
 }: AddFieldsFormProps) => {
   const { toast } = useToast();
+  const { _ } = useLingui();
 
   const [isMissingSignatureDialogVisible, setIsMissingSignatureDialogVisible] = useState(false);
 
@@ -568,7 +571,10 @@ export const AddFieldsFormPartial = ({
       {showAdvancedSettings && currentField ? (
         <FieldAdvancedSettings
           title={msg`Advanced settings`}
-          description={msg`Configure the ${FRIENDLY_FIELD_TYPE[currentField.type]} field`}
+          description={msg`Configure the ${parseMessageDescriptor(
+            _,
+            FRIENDLY_FIELD_TYPE[currentField.type],
+          )} field`}
           field={currentField}
           fields={localFields}
           onAdvancedSettings={handleAdvancedSettings}
@@ -603,7 +609,7 @@ export const AddFieldsFormPartial = ({
                     width: fieldBounds.current.width,
                   }}
                 >
-                  {FRIENDLY_FIELD_TYPE[selectedField]}
+                  {parseMessageDescriptor(_, FRIENDLY_FIELD_TYPE[selectedField])}
                 </div>
               )}
 
@@ -684,8 +690,7 @@ export const AddFieldsFormPartial = ({
                       {recipientsByRoleToDisplay.map(([role, roleRecipients], roleIndex) => (
                         <CommandGroup key={roleIndex}>
                           <div className="text-muted-foreground mb-1 ml-2 mt-2 text-xs font-medium">
-                            {/* Todo: Translations - Add plural translations. */}
-                            {`${RECIPIENT_ROLES_DESCRIPTION_ENG[role].roleName}s`}
+                            {_(RECIPIENT_ROLES_DESCRIPTION_ENG[role].roleNamePlural)}
                           </div>
 
                           {roleRecipients.length === 0 && (
@@ -997,7 +1002,7 @@ export const AddFieldsFormPartial = ({
                             )}
                           >
                             <Disc className="h-4 w-4" />
-                            <Trans>Radio</Trans>
+                            Radio
                           </p>
                         </CardContent>
                       </Card>
@@ -1023,7 +1028,8 @@ export const AddFieldsFormPartial = ({
                             )}
                           >
                             <CheckSquare className="h-4 w-4" />
-                            <Trans>Checkbox</Trans>
+                            {/* Not translated on purpose. */}
+                            Checkbox
                           </p>
                         </CardContent>
                       </Card>

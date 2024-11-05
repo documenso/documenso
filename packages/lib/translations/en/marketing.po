@@ -37,7 +37,7 @@ msgstr "Add document"
 msgid "Add More Users for {0}"
 msgstr "Add More Users for {0}"
 
-#: apps/marketing/src/app/(marketing)/open/page.tsx:165
+#: apps/marketing/src/app/(marketing)/open/page.tsx:164
 msgid "All our metrics, finances, and learnings are public. We believe in transparency and want to share our journey with you. You can read more about why here: <0>Announcing Open Metrics</0>"
 msgstr "All our metrics, finances, and learnings are public. We believe in transparency and want to share our journey with you. You can read more about why here: <0>Announcing Open Metrics</0>"
 
@@ -85,7 +85,7 @@ msgstr "Changelog"
 msgid "Choose a template from the community app store. Or submit your own template for others to use."
 msgstr "Choose a template from the community app store. Or submit your own template for others to use."
 
-#: apps/marketing/src/app/(marketing)/open/page.tsx:219
+#: apps/marketing/src/app/(marketing)/open/page.tsx:218
 msgid "Community"
 msgstr "Community"
 
@@ -188,7 +188,7 @@ msgstr "Fast."
 msgid "Faster, smarter and more beautiful."
 msgstr "Faster, smarter and more beautiful."
 
-#: apps/marketing/src/app/(marketing)/open/page.tsx:210
+#: apps/marketing/src/app/(marketing)/open/page.tsx:209
 msgid "Finances"
 msgstr "Finances"
 
@@ -241,15 +241,15 @@ msgstr "Get started today."
 msgid "Get the latest news from Documenso, including product updates, team announcements and more!"
 msgstr "Get the latest news from Documenso, including product updates, team announcements and more!"
 
-#: apps/marketing/src/app/(marketing)/open/page.tsx:233
+#: apps/marketing/src/app/(marketing)/open/page.tsx:232
 msgid "GitHub: Total Merged PRs"
 msgstr "GitHub: Total Merged PRs"
 
-#: apps/marketing/src/app/(marketing)/open/page.tsx:251
+#: apps/marketing/src/app/(marketing)/open/page.tsx:250
 msgid "GitHub: Total Open Issues"
 msgstr "GitHub: Total Open Issues"
 
-#: apps/marketing/src/app/(marketing)/open/page.tsx:225
+#: apps/marketing/src/app/(marketing)/open/page.tsx:224
 msgid "GitHub: Total Stars"
 msgstr "GitHub: Total Stars"
 
@@ -257,7 +257,7 @@ msgstr "GitHub: Total Stars"
 msgid "Global Salary Bands"
 msgstr "Global Salary Bands"
 
-#: apps/marketing/src/app/(marketing)/open/page.tsx:261
+#: apps/marketing/src/app/(marketing)/open/page.tsx:260
 msgid "Growth"
 msgstr "Growth"
 
@@ -281,7 +281,7 @@ msgstr "Integrated payments with Stripe so you don’t have to worry about getti
 msgid "Integrates with all your favourite tools."
 msgstr "Integrates with all your favourite tools."
 
-#: apps/marketing/src/app/(marketing)/open/page.tsx:289
+#: apps/marketing/src/app/(marketing)/open/page.tsx:288
 msgid "Is there more?"
 msgstr "Is there more?"
 
@@ -305,11 +305,11 @@ msgstr "Location"
 msgid "Make it your own through advanced customization and adjustability."
 msgstr "Make it your own through advanced customization and adjustability."
 
-#: apps/marketing/src/app/(marketing)/open/page.tsx:199
+#: apps/marketing/src/app/(marketing)/open/page.tsx:198
 msgid "Merged PR's"
 msgstr "Merged PR's"
 
-#: apps/marketing/src/app/(marketing)/open/page.tsx:234
+#: apps/marketing/src/app/(marketing)/open/page.tsx:233
 msgid "Merged PRs"
 msgstr "Merged PRs"
 
@@ -340,8 +340,8 @@ msgstr "No Credit Card required"
 msgid "None of these work for you? Try self-hosting!"
 msgstr "None of these work for you? Try self-hosting!"
 
-#: apps/marketing/src/app/(marketing)/open/page.tsx:194
-#: apps/marketing/src/app/(marketing)/open/page.tsx:252
+#: apps/marketing/src/app/(marketing)/open/page.tsx:193
+#: apps/marketing/src/app/(marketing)/open/page.tsx:251
 msgid "Open Issues"
 msgstr "Open Issues"
 
@@ -349,7 +349,7 @@ msgstr "Open Issues"
 msgid "Open Source or Hosted."
 msgstr "Open Source or Hosted."
 
-#: apps/marketing/src/app/(marketing)/open/page.tsx:161
+#: apps/marketing/src/app/(marketing)/open/page.tsx:160
 #: apps/marketing/src/components/(marketing)/footer.tsx:37
 #: apps/marketing/src/components/(marketing)/header.tsx:64
 #: apps/marketing/src/components/(marketing)/mobile-navigation.tsx:40
@@ -461,7 +461,7 @@ msgstr "Smart."
 msgid "Star on GitHub"
 msgstr "Star on GitHub"
 
-#: apps/marketing/src/app/(marketing)/open/page.tsx:226
+#: apps/marketing/src/app/(marketing)/open/page.tsx:225
 msgid "Stars"
 msgstr "Stars"
 
@@ -496,7 +496,7 @@ msgstr "Template Store (Soon)."
 msgid "That's awesome. You can take a look at the current <0>Issues</0> and join our <1>Discord Community</1> to keep up to date, on what the current priorities are. In any case, we are an open community and welcome all input, technical and non-technical ❤️"
 msgstr "That's awesome. You can take a look at the current <0>Issues</0> and join our <1>Discord Community</1> to keep up to date, on what the current priorities are. In any case, we are an open community and welcome all input, technical and non-technical ❤️"
 
-#: apps/marketing/src/app/(marketing)/open/page.tsx:293
+#: apps/marketing/src/app/(marketing)/open/page.tsx:292
 msgid "This page is evolving as we learn what makes a great signing company. We'll update it when we have more to share."
 msgstr "This page is evolving as we learn what makes a great signing company. We'll update it when we have more to share."
 
@@ -509,8 +509,8 @@ msgstr "Title"
 msgid "Total Completed Documents"
 msgstr "Total Completed Documents"
 
+#: apps/marketing/src/app/(marketing)/open/page.tsx:266
 #: apps/marketing/src/app/(marketing)/open/page.tsx:267
-#: apps/marketing/src/app/(marketing)/open/page.tsx:268
 msgid "Total Customers"
 msgstr "Total Customers"
 

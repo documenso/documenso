@@ -106,7 +106,7 @@ export const TeamMembersDataTable = ({
         accessorKey: 'role',
         cell: ({ row }) =>
           teamOwnerUserId === row.original.userId
-            ? 'Owner'
+            ? _(msg`Owner`)
             : _(TEAM_MEMBER_ROLE_MAP[row.original.role]),
       },
       {
