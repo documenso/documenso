@@ -261,11 +261,11 @@ msgid "Add"
 msgstr "Agregar"
 
 #: apps/web/src/app/(dashboard)/documents/[id]/edit-document.tsx:176
-#: apps/web/src/app/(dashboard)/templates/[id]/edit-template.tsx:87
+#: apps/web/src/app/(dashboard)/templates/[id]/edit-template.tsx:88
 msgid "Add all relevant fields for each recipient."
 msgstr "Agrega todos los campos relevantes para cada destinatario."
 
-#: apps/web/src/app/(dashboard)/templates/[id]/edit-template.tsx:82
+#: apps/web/src/app/(dashboard)/templates/[id]/edit-template.tsx:83
 msgid "Add all relevant placeholders for each recipient."
 msgstr "Agrega todos los marcadores de posición relevantes para cada destinatario."
 
@@ -282,7 +282,7 @@ msgid "Add email"
 msgstr "Agregar correo electrónico"
 
 #: apps/web/src/app/(dashboard)/documents/[id]/edit-document.tsx:175
-#: apps/web/src/app/(dashboard)/templates/[id]/edit-template.tsx:86
+#: apps/web/src/app/(dashboard)/templates/[id]/edit-template.tsx:87
 msgid "Add Fields"
 msgstr "Agregar Campos"
 
@@ -295,7 +295,7 @@ msgstr "Agregar más"
 msgid "Add passkey"
 msgstr "Agregar clave"
 
-#: apps/web/src/app/(dashboard)/templates/[id]/edit-template.tsx:81
+#: apps/web/src/app/(dashboard)/templates/[id]/edit-template.tsx:82
 msgid "Add Placeholders"
 msgstr "Agregar Marcadores de posición"
 
@@ -415,8 +415,8 @@ msgid "An error occurred"
 msgstr "Ocurrió un error"
 
 #: apps/web/src/app/(dashboard)/documents/[id]/edit-document.tsx:268
-#: apps/web/src/app/(dashboard)/templates/[id]/edit-template.tsx:197
-#: apps/web/src/app/(dashboard)/templates/[id]/edit-template.tsx:231
+#: apps/web/src/app/(dashboard)/templates/[id]/edit-template.tsx:201
+#: apps/web/src/app/(dashboard)/templates/[id]/edit-template.tsx:235
 msgid "An error occurred while adding signers."
 msgstr "Ocurrió un error al agregar firmantes."
 
@@ -508,7 +508,7 @@ msgid "An error occurred while trying to create a checkout session."
 msgstr "Ocurrió un error al intentar crear una sesión de pago."
 
 #: apps/web/src/app/(dashboard)/documents/[id]/edit-document.tsx:234
-#: apps/web/src/app/(dashboard)/templates/[id]/edit-template.tsx:166
+#: apps/web/src/app/(dashboard)/templates/[id]/edit-template.tsx:170
 msgid "An error occurred while updating the document settings."
 msgstr "Ocurrió un error al actualizar la configuración del documento."
 
@@ -873,7 +873,7 @@ msgstr "Documentos Completados"
 msgid "Configure general settings for the document."
 msgstr "Configurar ajustes generales para el documento."
 
-#: apps/web/src/app/(dashboard)/templates/[id]/edit-template.tsx:77
+#: apps/web/src/app/(dashboard)/templates/[id]/edit-template.tsx:78
 msgid "Configure general settings for the template."
 msgstr "Configurar ajustes generales para la plantilla."
 
@@ -1586,9 +1586,9 @@ msgstr "Ingresa tu texto aquí"
 #: apps/web/src/app/(dashboard)/documents/move-document-dialog.tsx:57
 #: apps/web/src/app/(dashboard)/documents/upload-document.tsx:106
 #: apps/web/src/app/(dashboard)/documents/upload-document.tsx:112
-#: apps/web/src/app/(dashboard)/templates/[id]/edit-template.tsx:165
-#: apps/web/src/app/(dashboard)/templates/[id]/edit-template.tsx:196
-#: apps/web/src/app/(dashboard)/templates/[id]/edit-template.tsx:230
+#: apps/web/src/app/(dashboard)/templates/[id]/edit-template.tsx:169
+#: apps/web/src/app/(dashboard)/templates/[id]/edit-template.tsx:200
+#: apps/web/src/app/(dashboard)/templates/[id]/edit-template.tsx:234
 #: apps/web/src/app/(dashboard)/templates/duplicate-template-dialog.tsx:51
 #: apps/web/src/app/(dashboard)/templates/move-template-dialog.tsx:56
 #: apps/web/src/app/(dashboard)/templates/use-template-dialog.tsx:160
@@ -1680,7 +1680,7 @@ msgid "Full Name"
 msgstr "Nombre completo"
 
 #: apps/web/src/app/(dashboard)/documents/[id]/edit-document.tsx:165
-#: apps/web/src/app/(dashboard)/templates/[id]/edit-template.tsx:76
+#: apps/web/src/app/(dashboard)/templates/[id]/edit-template.tsx:77
 #: apps/web/src/app/(recipient)/d/[token]/direct-template.tsx:60
 #: apps/web/src/components/(teams)/settings/layout/desktop-nav.tsx:43
 #: apps/web/src/components/(teams)/settings/layout/mobile-nav.tsx:51
@@ -3244,7 +3244,7 @@ msgstr "La plantilla ha sido actualizada."
 msgid "Template moved"
 msgstr "Plantilla movida"
 
-#: apps/web/src/app/(dashboard)/templates/[id]/edit-template.tsx:219
+#: apps/web/src/app/(dashboard)/templates/[id]/edit-template.tsx:223
 msgid "Template saved"
 msgstr "Plantilla guardada"
 
@@ -4612,7 +4612,7 @@ msgstr "Tu plantilla ha sido eliminada con éxito."
 msgid "Your template will be duplicated."
 msgstr "Tu plantilla será duplicada."
 
-#: apps/web/src/app/(dashboard)/templates/[id]/edit-template.tsx:220
+#: apps/web/src/app/(dashboard)/templates/[id]/edit-template.tsx:224
 msgid "Your templates has been saved successfully."
 msgstr "Tus plantillas han sido guardadas con éxito."
 
