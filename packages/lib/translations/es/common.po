@@ -96,6 +96,90 @@ msgstr "{memberEmail} se unió al siguiente equipo"
 msgid "{memberEmail} left the following team"
 msgstr "{memberEmail} dejó el siguiente equipo"
 
+#: packages/lib/utils/document-audit-logs.ts:263
+msgid "{prefix} added a field"
+msgstr ""
+
+#: packages/lib/utils/document-audit-logs.ts:275
+msgid "{prefix} added a recipient"
+msgstr ""
+
+#: packages/lib/utils/document-audit-logs.ts:287
+msgid "{prefix} created the document"
+msgstr ""
+
+#: packages/lib/utils/document-audit-logs.ts:291
+msgid "{prefix} deleted the document"
+msgstr ""
+
+#: packages/lib/utils/document-audit-logs.ts:335
+msgid "{prefix} moved the document to team"
+msgstr ""
+
+#: packages/lib/utils/document-audit-logs.ts:319
+msgid "{prefix} opened the document"
+msgstr ""
+
+#: packages/lib/utils/document-audit-logs.ts:267
+msgid "{prefix} removed a field"
+msgstr ""
+
+#: packages/lib/utils/document-audit-logs.ts:279
+msgid "{prefix} removed a recipient"
+msgstr ""
+
+#: packages/lib/utils/document-audit-logs.ts:355
+msgid "{prefix} resent an email to {0}"
+msgstr ""
+
+#: packages/lib/utils/document-audit-logs.ts:356
+msgid "{prefix} sent an email to {0}"
+msgstr ""
+
+#: packages/lib/utils/document-audit-logs.ts:331
+msgid "{prefix} sent the document"
+msgstr ""
+
+#: packages/lib/utils/document-audit-logs.ts:295
+msgid "{prefix} signed a field"
+msgstr ""
+
+#: packages/lib/utils/document-audit-logs.ts:299
+msgid "{prefix} unsigned a field"
+msgstr ""
+
+#: packages/lib/utils/document-audit-logs.ts:271
+msgid "{prefix} updated a field"
+msgstr ""
+
+#: packages/lib/utils/document-audit-logs.ts:283
+msgid "{prefix} updated a recipient"
+msgstr ""
+
+#: packages/lib/utils/document-audit-logs.ts:315
+msgid "{prefix} updated the document"
+msgstr ""
+
+#: packages/lib/utils/document-audit-logs.ts:307
+msgid "{prefix} updated the document access auth requirements"
+msgstr ""
+
+#: packages/lib/utils/document-audit-logs.ts:327
+msgid "{prefix} updated the document external ID"
+msgstr ""
+
+#: packages/lib/utils/document-audit-logs.ts:311
+msgid "{prefix} updated the document signing auth requirements"
+msgstr ""
+
+#: packages/lib/utils/document-audit-logs.ts:323
+msgid "{prefix} updated the document title"
+msgstr ""
+
+#: packages/lib/utils/document-audit-logs.ts:303
+msgid "{prefix} updated the document visibility"
+msgstr ""
+
 #: packages/email/templates/document-created-from-direct-template.tsx:55
 msgid "{recipientName} {action} a document by using one of your direct links"
 msgstr "{recipientName} {action} un documento utilizando uno de tus enlaces directos"
@@ -103,6 +187,26 @@ msgstr "{recipientName} {action} un documento utilizando uno de tus enlaces dire
 #: packages/email/templates/team-transfer-request.tsx:55
 msgid "{teamName} ownership transfer request"
 msgstr "solicitud de transferencia de propiedad de {teamName}"
+
+#: packages/lib/utils/document-audit-logs.ts:343
+msgid "{userName} approved the document"
+msgstr ""
+
+#: packages/lib/utils/document-audit-logs.ts:344
+msgid "{userName} CC'd the document"
+msgstr ""
+
+#: packages/lib/utils/document-audit-logs.ts:345
+msgid "{userName} completed their task"
+msgstr ""
+
+#: packages/lib/utils/document-audit-logs.ts:341
+msgid "{userName} signed the document"
+msgstr ""
+
+#: packages/lib/utils/document-audit-logs.ts:342
+msgid "{userName} viewed the document"
+msgstr ""
 
 #: packages/ui/primitives/data-table-pagination.tsx:41
 msgid "{visibleRows, plural, one {Showing # result.} other {Showing # results.}}"
@@ -150,9 +254,33 @@ msgstr "<0>Requerir clave de acceso</0> - El destinatario debe tener una cuenta 
 msgid "A document was created by your direct template that requires you to {recipientActionVerb} it."
 msgstr "Se creó un documento a partir de tu plantilla directa que requiere que {recipientActionVerb}."
 
+#: packages/lib/utils/document-audit-logs.ts:262
+msgid "A field was added"
+msgstr ""
+
+#: packages/lib/utils/document-audit-logs.ts:266
+msgid "A field was removed"
+msgstr ""
+
+#: packages/lib/utils/document-audit-logs.ts:270
+msgid "A field was updated"
+msgstr ""
+
 #: packages/lib/jobs/definitions/emails/send-team-member-joined-email.ts:90
 msgid "A new member has joined your team"
 msgstr "Un nuevo miembro se ha unido a tu equipo"
+
+#: packages/lib/utils/document-audit-logs.ts:274
+msgid "A recipient was added"
+msgstr ""
+
+#: packages/lib/utils/document-audit-logs.ts:278
+msgid "A recipient was removed"
+msgstr ""
+
+#: packages/lib/utils/document-audit-logs.ts:282
+msgid "A recipient was updated"
+msgstr ""
 
 #: packages/lib/server-only/team/create-team-email-verification.ts:142
 msgid "A request to use your email has been initiated by {teamName} on Documenso"
@@ -368,6 +496,7 @@ msgstr "Cerrar"
 
 #: packages/email/template-components/template-document-completed.tsx:35
 #: packages/email/template-components/template-document-self-signed.tsx:36
+#: packages/lib/constants/document.ts:10
 msgid "Completed"
 msgstr "Completado"
 
@@ -450,10 +579,23 @@ msgstr "Receptor de enlace directo"
 msgid "Document access"
 msgstr "Acceso al documento"
 
+#: packages/lib/utils/document-audit-logs.ts:306
+msgid "Document access auth updated"
+msgstr ""
+
 #: packages/lib/server-only/document/delete-document.ts:213
 #: packages/lib/server-only/document/super-delete-document.ts:75
 msgid "Document Cancelled"
 msgstr "Documento cancelado"
+
+#: packages/lib/utils/document-audit-logs.ts:359
+#: packages/lib/utils/document-audit-logs.ts:360
+msgid "Document completed"
+msgstr ""
+
+#: packages/lib/utils/document-audit-logs.ts:286
+msgid "Document created"
+msgstr ""
 
 #: packages/email/templates/document-created-from-direct-template.tsx:30
 #: packages/lib/server-only/template/create-document-from-direct-template.ts:554
@@ -464,14 +606,54 @@ msgstr "Documento creado a partir de plantilla directa"
 msgid "Document Creation"
 msgstr "Creación de documento"
 
+#: packages/lib/utils/document-audit-logs.ts:290
+msgid "Document deleted"
+msgstr ""
+
 #: packages/lib/server-only/document/send-delete-email.ts:58
 msgid "Document Deleted!"
 msgstr "¡Documento eliminado!"
+
+#: packages/lib/utils/document-audit-logs.ts:326
+msgid "Document external ID updated"
+msgstr ""
+
+#: packages/lib/utils/document-audit-logs.ts:334
+msgid "Document moved to team"
+msgstr ""
+
+#: packages/lib/utils/document-audit-logs.ts:318
+msgid "Document opened"
+msgstr ""
+
+#: packages/lib/utils/document-audit-logs.ts:330
+msgid "Document sent"
+msgstr ""
+
+#: packages/lib/utils/document-audit-logs.ts:310
+msgid "Document signing auth updated"
+msgstr ""
+
+#: packages/lib/utils/document-audit-logs.ts:322
+msgid "Document title updated"
+msgstr ""
+
+#: packages/lib/utils/document-audit-logs.ts:314
+msgid "Document updated"
+msgstr ""
+
+#: packages/lib/utils/document-audit-logs.ts:302
+msgid "Document visibility updated"
+msgstr ""
 
 #: packages/email/template-components/template-document-completed.tsx:64
 #: packages/ui/components/document/document-download-button.tsx:68
 msgid "Download"
 msgstr "Descargar"
+
+#: packages/lib/constants/document.ts:13
+msgid "Draft"
+msgstr ""
 
 #: packages/ui/primitives/document-dropzone.tsx:162
 msgid "Drag & drop your PDF here."
@@ -504,6 +686,14 @@ msgstr "Se requiere email"
 #: packages/ui/primitives/template-flow/add-template-settings.tsx:223
 msgid "Email Options"
 msgstr "Opciones de correo electrónico"
+
+#: packages/lib/utils/document-audit-logs.ts:353
+msgid "Email resent"
+msgstr ""
+
+#: packages/lib/utils/document-audit-logs.ts:353
+msgid "Email sent"
+msgstr ""
 
 #: packages/ui/primitives/document-flow/add-fields.tsx:1123
 msgid "Empty field"
@@ -564,6 +754,14 @@ msgstr "Etiqueta de campo"
 #: packages/ui/primitives/document-flow/field-items-advanced-settings/text-field.tsx:65
 msgid "Field placeholder"
 msgstr "Marcador de posición de campo"
+
+#: packages/lib/utils/document-audit-logs.ts:294
+msgid "Field signed"
+msgstr ""
+
+#: packages/lib/utils/document-audit-logs.ts:298
+msgid "Field unsigned"
+msgstr ""
 
 #: packages/ui/primitives/document-flow/field-items-advanced-settings/date-field.tsx:56
 #: packages/ui/primitives/document-flow/field-items-advanced-settings/email-field.tsx:38
@@ -775,6 +973,10 @@ msgstr "Restablecimiento de contraseña exitoso"
 msgid "Password updated!"
 msgstr "¡Contraseña actualizada!"
 
+#: packages/lib/constants/document.ts:16
+msgid "Pending"
+msgstr ""
+
 #: packages/email/templates/document-pending.tsx:17
 msgid "Pending Document"
 msgstr "Documento pendiente"
@@ -841,6 +1043,10 @@ msgstr "Solo lectura"
 #: packages/ui/components/recipient/recipient-role-select.tsx:95
 msgid "Receives copy"
 msgstr "Recibe copia"
+
+#: packages/lib/utils/document-audit-logs.ts:338
+msgid "Recipient"
+msgstr ""
 
 #: packages/ui/components/recipient/recipient-action-auth-select.tsx:39
 #: packages/ui/primitives/document-flow/add-settings.tsx:257
@@ -1248,6 +1454,10 @@ msgstr "Hemos cambiado tu contraseña como solicitaste. Ahora puedes iniciar ses
 #: packages/email/template-components/template-confirmation-email.tsx:24
 msgid "Welcome to Documenso!"
 msgstr "¡Bienvenido a Documenso!"
+
+#: packages/lib/utils/document-audit-logs.ts:258
+msgid "You"
+msgstr ""
 
 #: packages/ui/primitives/document-flow/send-document-action-dialog.tsx:44
 msgid "You are about to send this document to the recipients. Are you sure you want to continue?"
