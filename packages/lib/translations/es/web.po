@@ -8,7 +8,7 @@ msgstr ""
 "Language: es\n"
 "Project-Id-Version: documenso-app\n"
 "Report-Msgid-Bugs-To: \n"
-"PO-Revision-Date: 2024-11-05 02:04\n"
+"PO-Revision-Date: 2024-11-05 09:34\n"
 "Last-Translator: \n"
 "Language-Team: Spanish\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
@@ -222,7 +222,7 @@ msgstr "Invitación de equipo aceptada"
 
 #: apps/web/src/app/(internal)/%5F%5Fhtmltopdf/certificate/page.tsx:128
 msgid "Account Authentication"
-msgstr ""
+msgstr "Autenticación de Cuenta"
 
 #: apps/web/src/app/(dashboard)/admin/users/[id]/delete-user-dialog.tsx:51
 #: apps/web/src/app/(dashboard)/settings/profile/delete-account-dialog.tsx:48
@@ -231,7 +231,7 @@ msgstr "Cuenta eliminada"
 
 #: apps/web/src/app/(internal)/%5F%5Fhtmltopdf/certificate/page.tsx:119
 msgid "Account Re-Authentication"
-msgstr ""
+msgstr "Re-autenticación de Cuenta"
 
 #: apps/web/src/app/(unauthenticated)/articles/signature-disclosure/page.tsx:139
 msgid "Acknowledgment"
@@ -583,11 +583,11 @@ msgstr "Cualquier método de pago adjunto a este equipo permanecerá adjunto a e
 
 #: apps/web/src/app/(dashboard)/templates/[id]/template-page-view-documents-table.tsx:225
 msgid "Any Source"
-msgstr ""
+msgstr "Cualquier fuente"
 
 #: apps/web/src/app/(dashboard)/templates/[id]/template-page-view-documents-table.tsx:205
 msgid "Any Status"
-msgstr ""
+msgstr "Cualquier estado"
 
 #: apps/web/src/app/(dashboard)/settings/tokens/page.tsx:22
 #: apps/web/src/app/(teams)/t/[teamUrl]/settings/tokens/page.tsx:42
@@ -650,7 +650,7 @@ msgstr "Registro de Auditoría"
 
 #: apps/web/src/app/(internal)/%5F%5Fhtmltopdf/certificate/page.tsx:198
 msgid "Authentication Level"
-msgstr ""
+msgstr "Nivel de Autenticación"
 
 #: apps/web/src/app/(recipient)/d/[token]/signing-auth-page.tsx:41
 #: apps/web/src/app/(signing)/sign/[token]/signing-auth-page.tsx:52
@@ -1218,7 +1218,7 @@ msgstr "Eliminando cuenta..."
 
 #: apps/web/src/app/(internal)/%5F%5Fhtmltopdf/certificate/page.tsx:178
 msgid "Details"
-msgstr ""
+msgstr "Detalles"
 
 #: apps/web/src/app/(dashboard)/settings/security/activity/user-security-activity-data-table.tsx:75
 #: apps/web/src/app/(internal)/%5F%5Fhtmltopdf/certificate/page.tsx:234
@@ -1238,7 +1238,7 @@ msgstr "Enlace directo"
 #: apps/web/src/app/(dashboard)/templates/[id]/template-page-view-documents-table.tsx:160
 #: apps/web/src/app/(dashboard)/templates/[id]/template-page-view-documents-table.tsx:231
 msgid "Direct Link"
-msgstr ""
+msgstr "Enlace directo"
 
 #: apps/web/src/app/(dashboard)/templates/template-direct-link-badge.tsx:46
 msgid "direct link disabled"
@@ -1338,11 +1338,11 @@ msgstr "Documento creado"
 
 #: apps/web/src/app/(dashboard)/templates/[id]/template-page-view-recent-activity.tsx:129
 msgid "Document created by <0>{0}</0>"
-msgstr ""
+msgstr "Documento creado por <0>{0}</0>"
 
 #: apps/web/src/app/(dashboard)/templates/[id]/template-page-view-recent-activity.tsx:134
 msgid "Document created using a <0>direct link</0>"
-msgstr ""
+msgstr "Documento creado usando un <0>enlace directo</0>"
 
 #: apps/web/src/app/(dashboard)/admin/documents/[id]/super-delete-document-dialog.tsx:51
 #: apps/web/src/app/(dashboard)/documents/[id]/document-page-view.tsx:173
@@ -1454,7 +1454,7 @@ msgstr "Documentos"
 
 #: apps/web/src/app/(dashboard)/templates/[id]/template-page-view.tsx:195
 msgid "Documents created from template"
-msgstr ""
+msgstr "Documentos creados a partir de la plantilla"
 
 #: apps/web/src/app/(dashboard)/admin/stats/page.tsx:113
 msgid "Documents Received"
@@ -1527,7 +1527,7 @@ msgstr "Editar"
 
 #: apps/web/src/app/(dashboard)/templates/[id]/template-page-view.tsx:115
 msgid "Edit Template"
-msgstr ""
+msgstr "Editar plantilla"
 
 #: apps/web/src/app/(dashboard)/settings/webhooks/[id]/page.tsx:94
 #: apps/web/src/app/(teams)/t/[teamUrl]/settings/webhooks/[id]/page.tsx:100
@@ -1620,7 +1620,7 @@ msgstr "Habilitado"
 
 #: apps/web/src/app/(internal)/%5F%5Fhtmltopdf/audit-log/page.tsx:87
 msgid "Enclosed Document"
-msgstr ""
+msgstr "Documento Adjunto"
 
 #: apps/web/src/app/(dashboard)/admin/subscriptions/page.tsx:38
 msgid "Ends On"
@@ -1808,7 +1808,7 @@ msgstr "Ocultar información adicional"
 
 #: apps/web/src/app/(internal)/%5F%5Fhtmltopdf/certificate/page.tsx:43
 msgid "I am the owner of this document"
-msgstr ""
+msgstr "Soy el propietario de este documento"
 
 #: apps/web/src/components/(dashboard)/settings/token/delete-token-dialog.tsx:186
 #: apps/web/src/components/(dashboard)/settings/webhooks/delete-webhook-dialog.tsx:173
@@ -1917,7 +1917,7 @@ msgstr "Factura"
 #: apps/web/src/app/(internal)/%5F%5Fhtmltopdf/audit-log/data-table.tsx:47
 #: apps/web/src/app/(internal)/%5F%5Fhtmltopdf/certificate/page.tsx:227
 msgid "IP Address"
-msgstr ""
+msgstr "Dirección IP"
 
 #: apps/web/src/app/(unauthenticated)/articles/signature-disclosure/page.tsx:118
 msgid "It is crucial to keep your contact information, especially your email address, up to date with us. Please notify us immediately of any changes to ensure that you continue to receive all necessary communications."
@@ -1970,7 +1970,7 @@ msgstr "Última actualización"
 
 #: apps/web/src/app/(internal)/%5F%5Fhtmltopdf/audit-log/page.tsx:121
 msgid "Last Updated"
-msgstr ""
+msgstr "Última Actualización"
 
 #: apps/web/src/app/(dashboard)/admin/documents/[id]/page.tsx:52
 msgid "Last updated at"
@@ -2053,7 +2053,7 @@ msgstr "Gestionar todos los equipos con los que estás asociado actualmente."
 
 #: apps/web/src/app/(dashboard)/templates/[id]/template-page-view.tsx:159
 msgid "Manage and view template"
-msgstr ""
+msgstr "Gestionar y ver plantilla"
 
 #: apps/web/src/components/templates/manage-public-template-dialog.tsx:341
 msgid "Manage details for this public template"
@@ -2242,7 +2242,7 @@ msgstr "No hay actividad reciente"
 
 #: apps/web/src/app/(dashboard)/templates/[id]/template-page-view-recent-activity.tsx:103
 msgid "No recent documents"
-msgstr ""
+msgstr "No hay documentos recientes"
 
 #: apps/web/src/app/(dashboard)/documents/[id]/document-page-view-recipients.tsx:55
 #: apps/web/src/app/(dashboard)/templates/[id]/template-page-view-recipients.tsx:49
@@ -2382,7 +2382,7 @@ msgstr "Nombre de clave de acceso"
 
 #: apps/web/src/app/(internal)/%5F%5Fhtmltopdf/certificate/page.tsx:121
 msgid "Passkey Re-Authentication"
-msgstr ""
+msgstr "Re-autenticación de Passkey"
 
 #: apps/web/src/app/(dashboard)/settings/security/page.tsx:106
 #: apps/web/src/app/(dashboard)/settings/security/passkeys/page.tsx:32
@@ -2621,7 +2621,7 @@ msgstr "Listo"
 
 #: apps/web/src/app/(internal)/%5F%5Fhtmltopdf/certificate/page.tsx:281
 msgid "Reason"
-msgstr ""
+msgstr "Razón"
 
 #: apps/web/src/app/(signing)/sign/[token]/document-action-auth-dialog.tsx:62
 msgid "Reauthentication is required to sign this field"
@@ -2634,7 +2634,7 @@ msgstr "Actividad reciente"
 
 #: apps/web/src/app/(dashboard)/templates/[id]/template-page-view-recent-activity.tsx:47
 msgid "Recent documents"
-msgstr ""
+msgstr "Documentos recientes"
 
 #: apps/web/src/app/(dashboard)/documents/data-table.tsx:69
 #: apps/web/src/app/(dashboard)/templates/[id]/template-page-view-documents-table.tsx:120
@@ -3033,7 +3033,7 @@ msgstr "Firma"
 
 #: apps/web/src/app/(internal)/%5F%5Fhtmltopdf/certificate/page.tsx:220
 msgid "Signature ID"
-msgstr ""
+msgstr "ID de Firma"
 
 #: apps/web/src/app/(dashboard)/admin/stats/page.tsx:123
 msgid "Signatures Collected"
@@ -3051,15 +3051,15 @@ msgstr "Firmado"
 
 #: apps/web/src/app/(internal)/%5F%5Fhtmltopdf/certificate/page.tsx:176
 msgid "Signer Events"
-msgstr ""
+msgstr "Eventos del Firmante"
 
 #: apps/web/src/app/(internal)/%5F%5Fhtmltopdf/certificate/page.tsx:168
 msgid "Signing Certificate"
-msgstr ""
+msgstr "Certificado de Firma"
 
 #: apps/web/src/app/(internal)/%5F%5Fhtmltopdf/certificate/page.tsx:303
 msgid "Signing certificate provided by"
-msgstr ""
+msgstr "Certificado de firma proporcionado por"
 
 #: apps/web/src/components/forms/signin.tsx:383
 #: apps/web/src/components/forms/signin.tsx:510
@@ -3160,7 +3160,7 @@ msgstr "Lo sentimos, no pudimos descargar el certificado. Por favor, intenta de 
 
 #: apps/web/src/app/(dashboard)/templates/[id]/template-page-view-documents-table.tsx:138
 msgid "Source"
-msgstr ""
+msgstr "Fuente"
 
 #: apps/web/src/app/(dashboard)/admin/nav.tsx:37
 msgid "Stats"
@@ -3595,11 +3595,11 @@ msgstr "Este documento es actualmente un borrador y no ha sido enviado"
 
 #: apps/web/src/app/(dashboard)/templates/[id]/template-page-view-documents-table.tsx:152
 msgid "This document was created by you or a team member using the template above."
-msgstr ""
+msgstr "Este documento fue creado por ti o un miembro del equipo usando la plantilla anterior."
 
 #: apps/web/src/app/(dashboard)/templates/[id]/template-page-view-documents-table.tsx:164
 msgid "This document was created using a direct link."
-msgstr ""
+msgstr "Este documento fue creado usando un enlace directo."
 
 #: apps/web/src/components/(teams)/dialogs/add-team-email-dialog.tsx:93
 msgid "This email is already being used by another team."
@@ -3669,7 +3669,7 @@ msgstr "Zona horaria"
 
 #: apps/web/src/app/(internal)/%5F%5Fhtmltopdf/audit-log/page.tsx:131
 msgid "Time Zone"
-msgstr ""
+msgstr "Zona Horaria"
 
 #: apps/web/src/app/(dashboard)/admin/documents/document-results.tsx:67
 #: apps/web/src/app/(dashboard)/documents/data-table.tsx:60
@@ -3821,7 +3821,7 @@ msgstr "La autenticación de dos factores ha sido desactivada para tu cuenta. Ya
 
 #: apps/web/src/app/(internal)/%5F%5Fhtmltopdf/certificate/page.tsx:120
 msgid "Two-Factor Re-Authentication"
-msgstr ""
+msgstr "Re-autenticación de Doble Factor"
 
 #: apps/web/src/app/(dashboard)/admin/documents/[id]/recipient-item.tsx:73
 #: apps/web/src/app/(dashboard)/templates/data-table-templates.tsx:67
@@ -3883,7 +3883,7 @@ msgstr "No se pudo cargar el historial del documento"
 
 #: apps/web/src/app/(dashboard)/templates/[id]/template-page-view-recent-activity.tsx:62
 msgid "Unable to load documents"
-msgstr ""
+msgstr "No se pueden cargar documentos"
 
 #: apps/web/src/app/(dashboard)/settings/public-profile/public-templates-data-table.tsx:111
 msgid "Unable to load your public profile templates at this time"
@@ -3933,7 +3933,7 @@ msgstr "Incompleto"
 #: apps/web/src/app/(internal)/%5F%5Fhtmltopdf/certificate/page.tsx:265
 #: apps/web/src/app/(internal)/%5F%5Fhtmltopdf/certificate/page.tsx:276
 msgid "Unknown"
-msgstr ""
+msgstr "Desconocido"
 
 #: apps/web/src/app/(teams)/t/[teamUrl]/error.tsx:23
 msgid "Unknown error"
@@ -4034,7 +4034,7 @@ msgstr "El archivo subido no es un tipo de archivo permitido"
 
 #: apps/web/src/app/(dashboard)/templates/[id]/template-page-view.tsx:170
 msgid "Use"
-msgstr ""
+msgstr "Usar"
 
 #: apps/web/src/components/forms/2fa/disable-authenticator-app-dialog.tsx:187
 #: apps/web/src/components/forms/signin.tsx:505
@@ -4101,7 +4101,7 @@ msgstr "Verifica tu correo electrónico para subir documentos."
 
 #: apps/web/src/app/(internal)/%5F%5Fhtmltopdf/audit-log/page.tsx:75
 msgid "Version History"
-msgstr ""
+msgstr "Historial de Versiones"
 
 #: apps/web/src/app/(dashboard)/documents/[id]/document-page-view-button.tsx:95
 #: apps/web/src/app/(dashboard)/documents/data-table-action-button.tsx:126
@@ -4126,7 +4126,7 @@ msgstr "Ver toda la actividad de seguridad reciente relacionada con tu cuenta."
 
 #: apps/web/src/app/(dashboard)/templates/[id]/template-page-view-recent-activity.tsx:157
 msgid "View all related documents"
-msgstr ""
+msgstr "Ver todos los documentos relacionados"
 
 #: apps/web/src/app/(dashboard)/settings/security/activity/page.tsx:26
 msgid "View all security activity related to your account."
@@ -4150,7 +4150,7 @@ msgstr "Ver invitaciones"
 
 #: apps/web/src/app/(dashboard)/templates/[id]/template-page-view-recent-activity.tsx:95
 msgid "View more"
-msgstr ""
+msgstr "Ver más"
 
 #: apps/web/src/app/(signing)/sign/[token]/complete/document-preview-button.tsx:34
 msgid "View Original Document"
@@ -4816,3 +4816,4 @@ msgstr "¡Tu token se creó con éxito! ¡Asegúrate de copiarlo porque no podr�
 #: apps/web/src/app/(teams)/t/[teamUrl]/settings/tokens/page.tsx:86
 msgid "Your tokens will be shown here once you create them."
 msgstr "Tus tokens se mostrarán aquí una vez que los crees."
+
