@@ -42,11 +42,9 @@ openssl pkcs12 -export -out certificate.p12 -inkey private.key -in certificate.c
 ```
 
 <Callout type="warning">
-If you are using Docker, you may run into permission issues when the application tries to sign a document using your certificate.
+When running the application in Docker, you may encounter permission issues when attempting to sign documents using your certificate (.p12) file. This happens because the application runs as a non-root user inside the container and needs read access to the certificate.
 
-If this happens, you will need to ensure the certificate has correct permission so the application can access it.
-
-This can be done by using `chown` to allow the NextJS user (1001) to read the certificate.
+To resolve this, you'll need to update the certificate file permissions to allow the container user 1001, which runs NextJS, to read it:
 
 ```bash
 sudo chown 1001 certificate.p12
