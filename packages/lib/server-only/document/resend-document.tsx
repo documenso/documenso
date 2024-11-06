@@ -106,17 +106,25 @@ export const resendDocument = async ({
         ._(RECIPIENT_ROLES_DESCRIPTION[recipient.role].actionVerb)
         .toLowerCase();
 
-      let emailMessage = msg`${customEmail?.message || ''}`;
-      let emailSubject = msg`Reminder: Please ${recipientActionVerb} this document`;
+      let emailMessage = customEmail?.message || '';
+      let emailSubject = i18n._(msg`Reminder: Please ${recipientActionVerb} this document`);
 
       if (selfSigner) {
-        emailMessage = msg`You have initiated the document ${`"${document.title}"`} that requires you to ${recipientActionVerb} it.`;
-        emailSubject = msg`Reminder: Please ${recipientActionVerb} your document`;
+        emailMessage = i18n._(
+          msg`You have initiated the document ${`"${document.title}"`} that requires you to ${recipientActionVerb} it.`,
+        );
+        emailSubject = i18n._(msg`Reminder: Please ${recipientActionVerb} your document`);
       }
 
       if (isTeamDocument && document.team) {
-        emailSubject = msg`Reminder: ${document.team.name} invited you to ${recipientActionVerb} a document`;
-        emailMessage = msg`${user.name} on behalf of ${document.team.name} has invited you to ${recipientActionVerb} the document "${document.title}".`;
+        emailSubject = i18n._(
+          msg`Reminder: ${document.team.name} invited you to ${recipientActionVerb} a document`,
+        );
+        emailMessage =
+          customEmail?.message ||
+          i18n._(
+            msg`${user.name} on behalf of ${document.team.name} has invited you to ${recipientActionVerb} the document "${document.title}".`,
+          );
       }
 
       const customEmailTemplate = {
@@ -134,7 +142,7 @@ export const resendDocument = async ({
         inviterEmail: isTeamDocument ? document.team?.teamEmail?.email || user.email : user.email,
         assetBaseUrl,
         signDocumentLink,
-        customBody: renderCustomEmailTemplate(i18n._(emailMessage), customEmailTemplate),
+        customBody: renderCustomEmailTemplate(emailMessage, customEmailTemplate),
         role: recipient.role,
         selfSigner,
         isTeamInvite: isTeamDocument,
@@ -165,7 +173,7 @@ export const resendDocument = async ({
                   i18n._(msg`Reminder: ${customEmail.subject}`),
                   customEmailTemplate,
                 )
-              : i18n._(emailSubject),
+              : emailSubject,
             html,
             text,
           });
