@@ -1520,4 +1520,3 @@ msgstr "Votre mot de passe a été mis à jour."
 #: packages/email/templates/team-delete.tsx:30
 msgid "Your team has been deleted"
 msgstr "Votre équipe a été supprimée"
-

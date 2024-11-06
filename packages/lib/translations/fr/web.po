@@ -64,7 +64,7 @@ msgstr "{0, plural, one {<0>Vous avez <1>1</1> invitation d'équipe en attente</
 msgid "{0, plural, one {1 Recipient} other {# Recipients}}"
 msgstr "{0, plural, one {1 Destinataire} other {# Destinataires}}"
 
-#: apps/web/src/app/(dashboard)/documents/[id]/document-page-view.tsx:230
+#: apps/web/src/app/(dashboard)/documents/[id]/document-page-view.tsx:235
 msgid "{0, plural, one {Waiting on 1 recipient} other {Waiting on # recipients}}"
 msgstr "{0, plural, one {En attente d'1 destinataire} other {En attente de # destinataires}}"
 
@@ -84,7 +84,7 @@ msgstr "{0} document"
 msgid "{0} of {1} documents remaining this month."
 msgstr "{0} des {1} documents restants ce mois-ci."
 
-#: apps/web/src/app/(dashboard)/documents/[id]/document-page-view.tsx:165
+#: apps/web/src/app/(dashboard)/documents/[id]/document-page-view.tsx:170
 msgid "{0} Recipient(s)"
 msgstr "{0} Destinataire(s)"
 
@@ -237,9 +237,9 @@ msgstr "Ré-authentification de compte"
 msgid "Acknowledgment"
 msgstr "Reconnaissance"
 
-#: apps/web/src/app/(dashboard)/documents/[id]/document-page-view-dropdown.tsx:105
+#: apps/web/src/app/(dashboard)/documents/[id]/document-page-view-dropdown.tsx:108
 #: apps/web/src/app/(dashboard)/documents/[id]/logs/document-logs-data-table.tsx:100
-#: apps/web/src/app/(dashboard)/documents/data-table-action-dropdown.tsx:121
+#: apps/web/src/app/(dashboard)/documents/data-table-action-dropdown.tsx:123
 #: apps/web/src/app/(dashboard)/settings/public-profile/public-templates-data-table.tsx:164
 #: apps/web/src/app/(dashboard)/settings/security/activity/user-security-activity-data-table.tsx:118
 #: apps/web/src/app/(internal)/%5F%5Fhtmltopdf/audit-log/data-table.tsx:46
@@ -373,6 +373,10 @@ msgstr "Toutes les signatures insérées seront annulées"
 msgid "All recipients will be notified"
 msgstr "Tous les destinataires seront notifiés"
 
+#: apps/web/src/components/document/document-recipient-link-copy-dialog.tsx:62
+msgid "All signing links have been copied to your clipboard."
+msgstr ""
+
 #: apps/web/src/components/(dashboard)/common/command-menu.tsx:57
 msgid "All templates"
 msgstr "Tous les modèles"
@@ -447,9 +451,9 @@ msgid "An error occurred while disabling direct link signing."
 msgstr "Une erreur est survenue lors de la désactivation de la signature par lien direct."
 
 #: apps/web/src/app/(dashboard)/documents/[id]/document-page-view-button.tsx:64
-#: apps/web/src/app/(dashboard)/documents/[id]/document-page-view-dropdown.tsx:89
+#: apps/web/src/app/(dashboard)/documents/[id]/document-page-view-dropdown.tsx:92
 #: apps/web/src/app/(dashboard)/documents/data-table-action-button.tsx:76
-#: apps/web/src/app/(dashboard)/documents/data-table-action-dropdown.tsx:105
+#: apps/web/src/app/(dashboard)/documents/data-table-action-dropdown.tsx:107
 msgid "An error occurred while downloading your document."
 msgstr "Une erreur est survenue lors du téléchargement de votre document."
 
@@ -605,7 +609,7 @@ msgstr "Version de l'application"
 
 #: apps/web/src/app/(dashboard)/documents/[id]/document-page-view-button.tsx:89
 #: apps/web/src/app/(dashboard)/documents/data-table-action-button.tsx:120
-#: apps/web/src/app/(dashboard)/documents/data-table-action-dropdown.tsx:144
+#: apps/web/src/app/(dashboard)/documents/data-table-action-dropdown.tsx:146
 #: apps/web/src/app/(signing)/sign/[token]/sign-dialog.tsx:125
 msgid "Approve"
 msgstr "Approuver"
@@ -614,7 +618,7 @@ msgstr "Approuver"
 msgid "Approve Document"
 msgstr "Approuver le document"
 
-#: apps/web/src/app/(dashboard)/documents/[id]/document-page-view-recipients.tsx:78
+#: apps/web/src/app/(dashboard)/documents/[id]/document-page-view-recipients.tsx:85
 msgid "Approved"
 msgstr "Approuvé"
 
@@ -644,7 +648,7 @@ msgstr "Êtes-vous sûr ?"
 msgid "Attempts sealing the document again, useful for after a code change has occurred to resolve an erroneous document."
 msgstr "Essaye de sceller le document à nouveau, utile après qu'un changement de code ait eu lieu pour résoudre un document erroné."
 
-#: apps/web/src/app/(dashboard)/documents/[id]/document-page-view-dropdown.tsx:127
+#: apps/web/src/app/(dashboard)/documents/[id]/document-page-view-dropdown.tsx:130
 msgid "Audit Log"
 msgstr "Journal d'audit"
 
@@ -713,6 +717,10 @@ msgstr "Facturation"
 #: apps/web/src/app/(internal)/%5F%5Fhtmltopdf/audit-log/data-table.tsx:48
 msgid "Browser"
 msgstr "Navigateur"
+
+#: apps/web/src/components/document/document-recipient-link-copy-dialog.tsx:145
+msgid "Bulk Copy"
+msgstr ""
 
 #: apps/web/src/components/(teams)/dialogs/invite-team-member-dialog.tsx:279
 msgid "Bulk Import"
@@ -854,6 +862,7 @@ msgstr "Cliquez pour insérer le champ"
 #: apps/web/src/app/(signing)/sign/[token]/document-action-auth-2fa.tsx:125
 #: apps/web/src/app/(signing)/sign/[token]/document-action-auth-passkey.tsx:138
 #: apps/web/src/app/(teams)/t/[teamUrl]/settings/team-transfer-status.tsx:121
+#: apps/web/src/components/document/document-recipient-link-copy-dialog.tsx:140
 #: apps/web/src/components/forms/2fa/enable-authenticator-app-dialog.tsx:180
 #: apps/web/src/components/forms/2fa/view-recovery-codes-dialog.tsx:102
 #: apps/web/src/components/templates/manage-public-template-dialog.tsx:319
@@ -962,13 +971,24 @@ msgstr "Continuer"
 msgid "Continue to login"
 msgstr "Continuer vers la connexion"
 
+#: apps/web/src/components/document/document-recipient-link-copy-dialog.tsx:128
+msgid "Copied"
+msgstr ""
+
+#: apps/web/src/app/(dashboard)/documents/[id]/document-page-view-recipients.tsx:133
 #: apps/web/src/app/(dashboard)/settings/public-profile/public-templates-data-table.tsx:77
 #: apps/web/src/app/(dashboard)/templates/template-direct-link-badge.tsx:31
 #: apps/web/src/app/(dashboard)/templates/template-direct-link-dialog.tsx:163
 #: apps/web/src/components/(dashboard)/avatar/avatar-with-recipient.tsx:40
+#: apps/web/src/components/document/document-recipient-link-copy-dialog.tsx:61
+#: apps/web/src/components/document/document-recipient-link-copy-dialog.tsx:117
 #: apps/web/src/components/forms/public-profile-form.tsx:117
 msgid "Copied to clipboard"
 msgstr "Copié dans le presse-papiers"
+
+#: apps/web/src/components/document/document-recipient-link-copy-dialog.tsx:123
+msgid "Copy"
+msgstr ""
 
 #: apps/web/src/app/(dashboard)/settings/public-profile/public-templates-data-table.tsx:169
 msgid "Copy sharable link"
@@ -977,6 +997,10 @@ msgstr "Copier le lien partageable"
 #: apps/web/src/app/(dashboard)/templates/template-direct-link-dialog.tsx:397
 msgid "Copy Shareable Link"
 msgstr "Copier le lien partageable"
+
+#: apps/web/src/components/document/document-recipient-link-copy-dialog.tsx:83
+msgid "Copy Signing Links"
+msgstr ""
 
 #: apps/web/src/components/forms/token.tsx:288
 msgid "Copy token"
@@ -1129,8 +1153,8 @@ msgstr "Invitation d'équipe refusée"
 msgid "delete"
 msgstr "supprimer"
 
-#: apps/web/src/app/(dashboard)/documents/[id]/document-page-view-dropdown.tsx:141
-#: apps/web/src/app/(dashboard)/documents/data-table-action-dropdown.tsx:187
+#: apps/web/src/app/(dashboard)/documents/[id]/document-page-view-dropdown.tsx:144
+#: apps/web/src/app/(dashboard)/documents/data-table-action-dropdown.tsx:189
 #: apps/web/src/app/(dashboard)/documents/delete-document-dialog.tsx:200
 #: apps/web/src/app/(dashboard)/settings/security/passkeys/user-passkeys-data-table-actions.tsx:177
 #: apps/web/src/app/(dashboard)/settings/security/passkeys/user-passkeys-data-table-actions.tsx:211
@@ -1345,7 +1369,7 @@ msgid "Document created using a <0>direct link</0>"
 msgstr "Document créé en utilisant un <0>lien direct</0>"
 
 #: apps/web/src/app/(dashboard)/admin/documents/[id]/super-delete-document-dialog.tsx:51
-#: apps/web/src/app/(dashboard)/documents/[id]/document-page-view.tsx:173
+#: apps/web/src/app/(dashboard)/documents/[id]/document-page-view.tsx:178
 #: apps/web/src/app/(dashboard)/documents/delete-document-dialog.tsx:59
 msgid "Document deleted"
 msgstr "Document supprimé"
@@ -1358,7 +1382,7 @@ msgstr "Brouillon de document"
 msgid "Document Duplicated"
 msgstr "Document dupliqué"
 
-#: apps/web/src/app/(dashboard)/documents/[id]/document-page-view.tsx:184
+#: apps/web/src/app/(dashboard)/documents/[id]/document-page-view.tsx:189
 #: apps/web/src/components/document/document-history-sheet.tsx:104
 msgid "Document history"
 msgstr "Historique du document"
@@ -1438,7 +1462,7 @@ msgstr "Le document sera supprimé de manière permanente"
 
 #: apps/web/src/app/(dashboard)/admin/nav.tsx:65
 #: apps/web/src/app/(dashboard)/admin/users/data-table-users.tsx:92
-#: apps/web/src/app/(dashboard)/documents/[id]/document-page-view.tsx:139
+#: apps/web/src/app/(dashboard)/documents/[id]/document-page-view.tsx:144
 #: apps/web/src/app/(dashboard)/documents/[id]/edit/document-edit-page-view.tsx:109
 #: apps/web/src/app/(dashboard)/documents/[id]/loading.tsx:16
 #: apps/web/src/app/(dashboard)/documents/[id]/sent/page.tsx:15
@@ -1470,9 +1494,9 @@ msgid "Don't have an account? <0>Sign up</0>"
 msgstr "Vous n'avez pas de compte? <0>Inscrivez-vous</0>"
 
 #: apps/web/src/app/(dashboard)/documents/[id]/document-page-view-button.tsx:111
-#: apps/web/src/app/(dashboard)/documents/[id]/document-page-view-dropdown.tsx:120
+#: apps/web/src/app/(dashboard)/documents/[id]/document-page-view-dropdown.tsx:123
 #: apps/web/src/app/(dashboard)/documents/data-table-action-button.tsx:141
-#: apps/web/src/app/(dashboard)/documents/data-table-action-dropdown.tsx:160
+#: apps/web/src/app/(dashboard)/documents/data-table-action-dropdown.tsx:162
 #: apps/web/src/components/(teams)/tables/team-billing-invoices-data-table.tsx:110
 #: apps/web/src/components/forms/2fa/enable-authenticator-app-dialog.tsx:185
 #: apps/web/src/components/forms/2fa/view-recovery-codes-dialog.tsx:107
@@ -1504,8 +1528,8 @@ msgstr "Documents brouillon"
 msgid "Due to an unpaid invoice, your team has been restricted. Please settle the payment to restore full access to your team."
 msgstr "En raison d'une facture impayée, votre équipe a été restreinte. Veuillez régler le paiement pour rétablir l'accès complet à votre équipe."
 
-#: apps/web/src/app/(dashboard)/documents/[id]/document-page-view-dropdown.tsx:133
-#: apps/web/src/app/(dashboard)/documents/data-table-action-dropdown.tsx:165
+#: apps/web/src/app/(dashboard)/documents/[id]/document-page-view-dropdown.tsx:136
+#: apps/web/src/app/(dashboard)/documents/data-table-action-dropdown.tsx:167
 #: apps/web/src/app/(dashboard)/documents/duplicate-document-dialog.tsx:85
 #: apps/web/src/app/(dashboard)/documents/duplicate-document-dialog.tsx:118
 #: apps/web/src/app/(dashboard)/templates/data-table-action-dropdown.tsx:74
@@ -1514,9 +1538,9 @@ msgid "Duplicate"
 msgstr "Dupliquer"
 
 #: apps/web/src/app/(dashboard)/documents/[id]/document-page-view-button.tsx:104
-#: apps/web/src/app/(dashboard)/documents/[id]/document-page-view-dropdown.tsx:112
+#: apps/web/src/app/(dashboard)/documents/[id]/document-page-view-dropdown.tsx:115
 #: apps/web/src/app/(dashboard)/documents/data-table-action-button.tsx:102
-#: apps/web/src/app/(dashboard)/documents/data-table-action-dropdown.tsx:154
+#: apps/web/src/app/(dashboard)/documents/data-table-action-dropdown.tsx:156
 #: apps/web/src/app/(dashboard)/settings/security/passkeys/user-passkeys-data-table-actions.tsx:111
 #: apps/web/src/app/(dashboard)/settings/webhooks/page.tsx:95
 #: apps/web/src/app/(dashboard)/templates/data-table-action-dropdown.tsx:65
@@ -1796,7 +1820,7 @@ msgstr "Voici comment cela fonctionne :"
 msgid "Hey I’m Timur"
 msgstr "Salut, je suis Timur"
 
-#: apps/web/src/app/(dashboard)/documents/data-table-action-dropdown.tsx:187
+#: apps/web/src/app/(dashboard)/documents/data-table-action-dropdown.tsx:189
 #: apps/web/src/app/(dashboard)/documents/delete-document-dialog.tsx:200
 #: apps/web/src/app/(dashboard)/settings/public-profile/public-profile-page-view.tsx:155
 msgid "Hide"
@@ -2134,7 +2158,7 @@ msgstr "Membre depuis"
 msgid "Members"
 msgstr "Membres"
 
-#: apps/web/src/app/(dashboard)/documents/[id]/document-page-view-recipients.tsx:40
+#: apps/web/src/app/(dashboard)/documents/[id]/document-page-view-recipients.tsx:46
 #: apps/web/src/app/(dashboard)/templates/[id]/template-page-view-recipients.tsx:35
 msgid "Modify recipients"
 msgstr "Modifier les destinataires"
@@ -2164,7 +2188,7 @@ msgstr "Déplacer le document vers l'équipe"
 msgid "Move Template to Team"
 msgstr "Déplacer le modèle vers l'équipe"
 
-#: apps/web/src/app/(dashboard)/documents/data-table-action-dropdown.tsx:172
+#: apps/web/src/app/(dashboard)/documents/data-table-action-dropdown.tsx:174
 #: apps/web/src/app/(dashboard)/templates/data-table-action-dropdown.tsx:85
 msgid "Move to Team"
 msgstr "Déplacer vers l'équipe"
@@ -2244,8 +2268,9 @@ msgstr "Aucune activité récente"
 msgid "No recent documents"
 msgstr "Aucun document récent"
 
-#: apps/web/src/app/(dashboard)/documents/[id]/document-page-view-recipients.tsx:55
+#: apps/web/src/app/(dashboard)/documents/[id]/document-page-view-recipients.tsx:61
 #: apps/web/src/app/(dashboard)/templates/[id]/template-page-view-recipients.tsx:49
+#: apps/web/src/components/document/document-recipient-link-copy-dialog.tsx:96
 msgid "No recipients"
 msgstr "Pas de destinataires"
 
@@ -2424,7 +2449,7 @@ msgstr "Un paiement est requis pour finaliser la création de votre équipe."
 msgid "Payment overdue"
 msgstr "Paiement en retard"
 
-#: apps/web/src/app/(dashboard)/documents/[id]/document-page-view-recipients.tsx:115
+#: apps/web/src/app/(dashboard)/documents/[id]/document-page-view-recipients.tsx:122
 #: apps/web/src/app/(dashboard)/templates/[id]/template-page-view-documents-table.tsx:211
 #: apps/web/src/components/(teams)/tables/teams-member-page-data-table.tsx:82
 #: apps/web/src/components/(teams)/tables/user-settings-teams-page-data-table.tsx:77
@@ -2615,7 +2640,7 @@ msgstr "Champ en lecture seule"
 msgid "Read the full <0>signature disclosure</0>."
 msgstr "Lisez l'intégralité de la <0>divulgation de signature</0>."
 
-#: apps/web/src/app/(dashboard)/documents/[id]/document-page-view-recipients.tsx:90
+#: apps/web/src/app/(dashboard)/documents/[id]/document-page-view-recipients.tsx:97
 msgid "Ready"
 msgstr "Prêt"
 
@@ -2647,7 +2672,7 @@ msgid "Recipient updated"
 msgstr "Destinataire mis à jour"
 
 #: apps/web/src/app/(dashboard)/admin/documents/[id]/page.tsx:66
-#: apps/web/src/app/(dashboard)/documents/[id]/document-page-view-recipients.tsx:34
+#: apps/web/src/app/(dashboard)/documents/[id]/document-page-view-recipients.tsx:40
 #: apps/web/src/app/(dashboard)/templates/[id]/template-page-view-recipients.tsx:30
 #: apps/web/src/app/(internal)/%5F%5Fhtmltopdf/audit-log/page.tsx:139
 msgid "Recipients"
@@ -2896,7 +2921,7 @@ msgstr "Envoi de l'e-mail de réinitialisation..."
 msgid "Sending..."
 msgstr "Envoi..."
 
-#: apps/web/src/app/(dashboard)/documents/[id]/document-page-view-recipients.tsx:85
+#: apps/web/src/app/(dashboard)/documents/[id]/document-page-view-recipients.tsx:92
 #: apps/web/src/app/(internal)/%5F%5Fhtmltopdf/certificate/page.tsx:248
 msgid "Sent"
 msgstr "Envoyé"
@@ -2916,13 +2941,13 @@ msgstr "Paramètres"
 msgid "Setup"
 msgstr "Configuration"
 
-#: apps/web/src/app/(dashboard)/documents/[id]/document-page-view-dropdown.tsx:145
-#: apps/web/src/app/(dashboard)/documents/data-table-action-dropdown.tsx:191
+#: apps/web/src/app/(dashboard)/documents/[id]/document-page-view-dropdown.tsx:148
+#: apps/web/src/app/(dashboard)/documents/data-table-action-dropdown.tsx:193
 msgid "Share"
 msgstr "Partager"
 
-#: apps/web/src/app/(dashboard)/documents/[id]/document-page-view-dropdown.tsx:161
-#: apps/web/src/app/(dashboard)/documents/data-table-action-dropdown.tsx:203
+#: apps/web/src/app/(dashboard)/documents/[id]/document-page-view-dropdown.tsx:179
+#: apps/web/src/app/(dashboard)/documents/data-table-action-dropdown.tsx:219
 msgid "Share Signing Card"
 msgstr "Partager la carte de signature"
 
@@ -2944,7 +2969,7 @@ msgstr "Afficher des modèles dans le profil public de votre équipe pour que vo
 
 #: apps/web/src/app/(dashboard)/documents/[id]/document-page-view-button.tsx:83
 #: apps/web/src/app/(dashboard)/documents/data-table-action-button.tsx:114
-#: apps/web/src/app/(dashboard)/documents/data-table-action-dropdown.tsx:137
+#: apps/web/src/app/(dashboard)/documents/data-table-action-dropdown.tsx:139
 #: apps/web/src/app/(profile)/p/[url]/page.tsx:192
 #: apps/web/src/app/(signing)/sign/[token]/document-action-auth-2fa.tsx:182
 #: apps/web/src/app/(signing)/sign/[token]/name-field.tsx:224
@@ -3043,7 +3068,7 @@ msgstr "Signatures collectées"
 msgid "Signatures will appear once the document has been completed"
 msgstr "Les signatures apparaîtront une fois le document complété"
 
-#: apps/web/src/app/(dashboard)/documents/[id]/document-page-view-recipients.tsx:98
+#: apps/web/src/app/(dashboard)/documents/[id]/document-page-view-recipients.tsx:105
 #: apps/web/src/app/(internal)/%5F%5Fhtmltopdf/certificate/page.tsx:270
 #: apps/web/src/components/document/document-read-only-fields.tsx:84
 msgid "Signed"
@@ -3066,6 +3091,11 @@ msgstr "Certificat de signature fourni par"
 msgid "Signing in..."
 msgstr "Connexion en cours..."
 
+#: apps/web/src/app/(dashboard)/documents/[id]/document-page-view-dropdown.tsx:160
+#: apps/web/src/app/(dashboard)/documents/data-table-action-dropdown.tsx:203
+msgid "Signing Links"
+msgstr ""
+
 #: apps/web/src/components/forms/signup.tsx:235
 msgid "Signing up..."
 msgstr "Inscription en cours..."
@@ -3085,11 +3115,11 @@ msgstr "Paramètres du site"
 
 #: apps/web/src/app/(dashboard)/documents/_action-items/resend-document.tsx:105
 #: apps/web/src/app/(dashboard)/documents/[id]/document-page-view-button.tsx:63
-#: apps/web/src/app/(dashboard)/documents/[id]/document-page-view-dropdown.tsx:88
+#: apps/web/src/app/(dashboard)/documents/[id]/document-page-view-dropdown.tsx:91
 #: apps/web/src/app/(dashboard)/documents/[id]/logs/download-audit-log-button.tsx:65
 #: apps/web/src/app/(dashboard)/documents/[id]/logs/download-certificate-button.tsx:66
 #: apps/web/src/app/(dashboard)/documents/data-table-action-button.tsx:75
-#: apps/web/src/app/(dashboard)/documents/data-table-action-dropdown.tsx:104
+#: apps/web/src/app/(dashboard)/documents/data-table-action-dropdown.tsx:106
 #: apps/web/src/app/(dashboard)/documents/delete-document-dialog.tsx:80
 #: apps/web/src/app/(dashboard)/documents/duplicate-document-dialog.tsx:72
 #: apps/web/src/app/(dashboard)/settings/billing/billing-plans.tsx:62
@@ -3175,7 +3205,7 @@ msgstr "Statistiques"
 msgid "Status"
 msgstr "Statut"
 
-#: apps/web/src/app/(dashboard)/settings/billing/billing-plans.tsx:128
+#: apps/web/src/app/(dashboard)/settings/billing/billing-plans.tsx:129
 msgid "Subscribe"
 msgstr "S'abonner"
 
@@ -3484,7 +3514,9 @@ msgstr "Le destinataire a été mis à jour avec succès"
 msgid "The selected team member will receive an email which they must accept before the team is transferred"
 msgstr "Le membre d'équipe sélectionné recevra un e-mail qu'il devra accepter avant que l'équipe soit transférée"
 
+#: apps/web/src/app/(dashboard)/documents/[id]/document-page-view-recipients.tsx:134
 #: apps/web/src/components/(dashboard)/avatar/avatar-with-recipient.tsx:41
+#: apps/web/src/components/document/document-recipient-link-copy-dialog.tsx:118
 msgid "The signing link has been copied to your clipboard."
 msgstr "Le lien de signature a été copié dans votre presse-papiers."
 
@@ -3585,11 +3617,11 @@ msgstr "Ce document a été annulé par le propriétaire et n'est plus disponibl
 msgid "This document has been cancelled by the owner."
 msgstr "Ce document a été annulé par le propriétaire."
 
-#: apps/web/src/app/(dashboard)/documents/[id]/document-page-view.tsx:219
+#: apps/web/src/app/(dashboard)/documents/[id]/document-page-view.tsx:224
 msgid "This document has been signed by all recipients"
 msgstr "Ce document a été signé par tous les destinataires"
 
-#: apps/web/src/app/(dashboard)/documents/[id]/document-page-view.tsx:222
+#: apps/web/src/app/(dashboard)/documents/[id]/document-page-view.tsx:227
 msgid "This document is currently a draft and has not been sent"
 msgstr "Ce document est actuellement un brouillon et n'a pas été envoyé"
 
@@ -4106,7 +4138,7 @@ msgstr "Historique des versions"
 #: apps/web/src/app/(dashboard)/documents/[id]/document-page-view-button.tsx:95
 #: apps/web/src/app/(dashboard)/documents/data-table-action-button.tsx:126
 #: apps/web/src/app/(dashboard)/documents/data-table-action-button.tsx:135
-#: apps/web/src/app/(dashboard)/documents/data-table-action-dropdown.tsx:130
+#: apps/web/src/app/(dashboard)/documents/data-table-action-dropdown.tsx:132
 #: apps/web/src/components/(teams)/tables/team-billing-invoices-data-table.tsx:100
 #: apps/web/src/components/forms/2fa/view-recovery-codes-dialog.tsx:168
 msgid "View"
@@ -4165,7 +4197,7 @@ msgstr "Voir les codes de récupération"
 msgid "View teams"
 msgstr "Voir les équipes"
 
-#: apps/web/src/app/(dashboard)/documents/[id]/document-page-view-recipients.tsx:104
+#: apps/web/src/app/(dashboard)/documents/[id]/document-page-view-recipients.tsx:111
 #: apps/web/src/app/(internal)/%5F%5Fhtmltopdf/certificate/page.tsx:259
 msgid "Viewed"
 msgstr "Vu"
@@ -4535,6 +4567,10 @@ msgstr "Vous pouvez choisir d'activer ou de désactiver le profil de votre équi
 msgid "You can claim your profile later on by going to your profile settings!"
 msgstr "Vous pouvez revendiquer votre profil plus tard en allant dans vos paramètres de profil !"
 
+#: apps/web/src/components/document/document-recipient-link-copy-dialog.tsx:87
+msgid "You can copy and share these links to recipients so they can action the document."
+msgstr ""
+
 #: apps/web/src/components/forms/public-profile-form.tsx:154
 msgid "You can update the profile URL by updating the team URL in the general settings page."
 msgstr "Vous pouvez mettre à jour l'URL de profil en mettant à jour l'URL de l'équipe dans la page des paramètres généraux."
@@ -4816,4 +4852,3 @@ msgstr "Votre jeton a été créé avec succès ! Assurez-vous de le copier car 
 #: apps/web/src/app/(teams)/t/[teamUrl]/settings/tokens/page.tsx:86
 msgid "Your tokens will be shown here once you create them."
 msgstr "Vos jetons seront affichés ici une fois que vous les aurez créés."
-

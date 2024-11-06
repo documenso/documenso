@@ -1520,4 +1520,3 @@ msgstr "Dein Passwort wurde aktualisiert."
 #: packages/email/templates/team-delete.tsx:30
 msgid "Your team has been deleted"
 msgstr "Dein Team wurde gelöscht"
-
