@@ -33,6 +33,8 @@ import {
 } from '@documenso/ui/primitives/dropdown-menu';
 import { useToast } from '@documenso/ui/primitives/use-toast';
 
+import { DocumentRecipientLinkCopyDialog } from '~/components/document/document-recipient-link-copy-dialog';
+
 import { ResendDocumentActionItem } from '../_action-items/resend-document';
 import { DeleteDocumentDialog } from '../delete-document-dialog';
 import { DuplicateDocumentDialog } from '../duplicate-document-dialog';
@@ -62,6 +64,7 @@ export const DocumentPageViewDropdown = ({ document, team }: DocumentPageViewDro
 
   const isOwner = document.User.id === session.user.id;
   const isDraft = document.status === DocumentStatus.DRAFT;
+  const isPending = document.status === DocumentStatus.PENDING;
   const isDeleted = document.deletedAt !== null;
   const isComplete = document.status === DocumentStatus.COMPLETED;
   const isCurrentTeamDocument = team && document.team?.url === team.url;
@@ -144,6 +147,21 @@ export const DocumentPageViewDropdown = ({ document, team }: DocumentPageViewDro
         <DropdownMenuLabel>
           <Trans>Share</Trans>
         </DropdownMenuLabel>
+
+        {canManageDocument && (
+          <DocumentRecipientLinkCopyDialog
+            recipients={document.Recipient}
+            trigger={
+              <DropdownMenuItem
+                disabled={!isPending || isDeleted}
+                onSelect={(e) => e.preventDefault()}
+              >
+                <Copy className="mr-2 h-4 w-4" />
+                <Trans>Signing Links</Trans>
+              </DropdownMenuItem>
+            }
+          />
+        )}
 
         <ResendDocumentActionItem
           document={document}
