@@ -42,6 +42,13 @@ export const getTemplateById = async ({ id, userId, teamId }: GetTemplateByIdOpt
       templateMeta: true,
       Recipient: true,
       Field: true,
+      User: {
+        select: {
+          id: true,
+          name: true,
+          email: true,
+        },
+      },
     },
   });
 

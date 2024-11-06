@@ -13,7 +13,7 @@ export type SigningLayoutProps = {
 };
 
 export default async function SigningLayout({ children }: SigningLayoutProps) {
-  setupI18nSSR();
+  await setupI18nSSR();
 
   const { user, session } = await getServerComponentSession();
 

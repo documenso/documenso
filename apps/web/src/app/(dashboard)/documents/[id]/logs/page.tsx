@@ -8,8 +8,8 @@ export type DocumentsLogsPageProps = {
   };
 };
 
-export default function DocumentsLogsPage({ params }: DocumentsLogsPageProps) {
-  setupI18nSSR();
+export default async function DocumentsLogsPage({ params }: DocumentsLogsPageProps) {
+  await setupI18nSSR();
 
   return <DocumentLogsPageView params={params} />;
 }

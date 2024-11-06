@@ -11,6 +11,7 @@ import {
   WebhookTriggerEvents,
 } from '@documenso/prisma/client';
 
+import type { SupportedLanguageCodes } from '../../constants/i18n';
 import { AppError, AppErrorCode } from '../../errors/app-error';
 import { DOCUMENT_AUDIT_LOG_TYPE } from '../../types/document-audit-logs';
 import { ZRecipientAuthOptionsSchema } from '../../types/document-auth';
@@ -60,6 +61,7 @@ export type CreateDocumentFromTemplateOptions = {
     dateFormat?: string;
     redirectUrl?: string;
     signingOrder?: DocumentSigningOrder;
+    language?: SupportedLanguageCodes;
   };
   requestMetadata?: RequestMetadata;
 };
@@ -179,6 +181,7 @@ export const createDocumentFromTemplate = async ({
               override?.signingOrder ||
               template.templateMeta?.signingOrder ||
               DocumentSigningOrder.PARALLEL,
+            language: override?.language || template.templateMeta?.language,
           },
         },
         Recipient: {

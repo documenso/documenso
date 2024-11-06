@@ -17,7 +17,7 @@ type VerifyTeamTransferPage = {
 export default async function VerifyTeamTransferPage({
   params: { token },
 }: VerifyTeamTransferPage) {
-  setupI18nSSR();
+  await setupI18nSSR();
 
   const teamTransferVerification = await prisma.teamTransferVerification.findUnique({
     where: {

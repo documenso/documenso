@@ -370,6 +370,7 @@ model DocumentMeta {
   redirectUrl           String?
   signingOrder          DocumentSigningOrder @default(PARALLEL)
   typedSignatureEnabled Boolean              @default(false)
+  language              String               @default("en")
 }
 
 enum ReadStatus {
@@ -612,6 +613,7 @@ model TemplateMeta {
   templateId   Int                   @unique
   template     Template              @relation(fields: [templateId], references: [id], onDelete: Cascade)
   redirectUrl  String?
+  language     String                @default("en")
 }
 
 model Template {

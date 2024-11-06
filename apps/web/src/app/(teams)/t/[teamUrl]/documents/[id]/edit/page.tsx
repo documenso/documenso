@@ -12,7 +12,7 @@ export type DocumentPageProps = {
 };
 
 export default async function TeamsDocumentEditPage({ params }: DocumentPageProps) {
-  setupI18nSSR();
+  await setupI18nSSR();
 
   const { teamUrl } = params;
 

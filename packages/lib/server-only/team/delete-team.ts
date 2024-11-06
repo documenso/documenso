@@ -1,7 +1,6 @@
 import { createElement } from 'react';
 
 import { mailer } from '@documenso/email/mailer';
-import { render } from '@documenso/email/render';
 import type { TeamDeleteEmailProps } from '@documenso/email/templates/team-delete';
 import { TeamDeleteEmailTemplate } from '@documenso/email/templates/team-delete';
 import { WEBAPP_BASE_URL } from '@documenso/lib/constants/app';
@@ -11,6 +10,7 @@ import { stripe } from '@documenso/lib/server-only/stripe';
 import { prisma } from '@documenso/prisma';
 
 import { jobs } from '../../jobs/client';
+import { renderEmailWithI18N } from '../../utils/render-email-with-i18n';
 
 export type DeleteTeamOptions = {
   userId: number;
@@ -95,6 +95,11 @@ export const sendTeamDeleteEmail = async ({
     ...emailTemplateOptions,
   });
 
+  const [html, text] = await Promise.all([
+    renderEmailWithI18N(template),
+    renderEmailWithI18N(template, { plainText: true }),
+  ]);
+
   await mailer.sendMail({
     to: email,
     from: {
@@ -102,7 +107,7 @@ export const sendTeamDeleteEmail = async ({
       address: FROM_ADDRESS,
     },
     subject: `Team "${emailTemplateOptions.teamName}" has been deleted on Documenso`,
-    html: render(template),
-    text: render(template, { plainText: true }),
+    html,
+    text,
   });
 };

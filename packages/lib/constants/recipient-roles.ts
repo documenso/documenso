@@ -67,9 +67,9 @@ export const RECIPIENT_ROLES_DESCRIPTION_ENG = {
 } satisfies Record<keyof typeof RecipientRole, unknown>;
 
 export const RECIPIENT_ROLE_TO_EMAIL_TYPE = {
-  [RecipientRole.SIGNER]: 'SIGNING_REQUEST',
-  [RecipientRole.VIEWER]: 'VIEW_REQUEST',
-  [RecipientRole.APPROVER]: 'APPROVE_REQUEST',
+  [RecipientRole.SIGNER]: `SIGNING_REQUEST`,
+  [RecipientRole.VIEWER]: `VIEW_REQUEST`,
+  [RecipientRole.APPROVER]: `APPROVE_REQUEST`,
 } as const;
 
 export const RECIPIENT_ROLE_SIGNING_REASONS = {
@@ -78,13 +78,3 @@ export const RECIPIENT_ROLE_SIGNING_REASONS = {
   [RecipientRole.CC]: msg`I am required to receive a copy of this document`,
   [RecipientRole.VIEWER]: msg`I am a viewer of this document`,
 } satisfies Record<keyof typeof RecipientRole, MessageDescriptor>;
-
-/**
- * Raw english descriptions for certificates.
- */
-export const RECIPIENT_ROLE_SIGNING_REASONS_ENG = {
-  [RecipientRole.SIGNER]: `I am a signer of this document`,
-  [RecipientRole.APPROVER]: `I am an approver of this document`,
-  [RecipientRole.CC]: `I am required to receive a copy of this document`,
-  [RecipientRole.VIEWER]: `I am a viewer of this document`,
-} satisfies Record<keyof typeof RecipientRole, string>;

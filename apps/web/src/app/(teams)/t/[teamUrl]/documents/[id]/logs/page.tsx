@@ -12,7 +12,7 @@ export type TeamDocumentsLogsPageProps = {
 };
 
 export default async function TeamsDocumentsLogsPage({ params }: TeamDocumentsLogsPageProps) {
-  setupI18nSSR();
+  await setupI18nSSR();
 
   const { teamUrl } = params;
 

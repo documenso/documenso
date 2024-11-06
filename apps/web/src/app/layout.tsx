@@ -56,7 +56,7 @@ export function generateMetadata() {
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
   const flags = await getServerComponentAllFlags();
 
-  const { i18n, lang, locales } = setupI18nSSR();
+  const { i18n, lang, locales } = await setupI18nSSR();
 
   return (
     <html
