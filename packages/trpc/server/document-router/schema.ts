@@ -9,10 +9,29 @@ import { ZBaseTableSearchParamsSchema } from '@documenso/lib/types/search-params
 import { isValidRedirectUrl } from '@documenso/lib/utils/is-valid-redirect-url';
 import {
   DocumentSigningOrder,
+  DocumentSource,
+  DocumentStatus,
   DocumentVisibility,
   FieldType,
   RecipientRole,
 } from '@documenso/prisma/client';
+
+export const ZFindDocumentsQuerySchema = ZBaseTableSearchParamsSchema.extend({
+  teamId: z.number().min(1).optional(),
+  templateId: z.number().min(1).optional(),
+  search: z
+    .string()
+    .optional()
+    .catch(() => undefined),
+  source: z.nativeEnum(DocumentSource).optional(),
+  status: z.nativeEnum(DocumentStatus).optional(),
+  orderBy: z
+    .object({
+      column: z.enum(['createdAt']),
+      direction: z.enum(['asc', 'desc']),
+    })
+    .optional(),
+}).omit({ query: true });
 
 export const ZFindDocumentAuditLogsQuerySchema = ZBaseTableSearchParamsSchema.extend({
   documentId: z.number().min(1),

@@ -26,6 +26,7 @@ import { LazyPDFViewer } from '@documenso/ui/primitives/lazy-pdf-viewer';
 import { StackAvatarsWithTooltip } from '~/components/(dashboard)/avatar/stack-avatars-with-tooltip';
 import { DocumentHistorySheet } from '~/components/document/document-history-sheet';
 import { DocumentReadOnlyFields } from '~/components/document/document-read-only-fields';
+import { DocumentRecipientLinkCopyDialog } from '~/components/document/document-recipient-link-copy-dialog';
 import {
   DocumentStatus as DocumentStatusComponent,
   FRIENDLY_STATUS_MAP,
@@ -134,6 +135,10 @@ export const DocumentPageView = async ({ params, team }: DocumentPageViewProps) 
 
   return (
     <div className="mx-auto -mt-4 w-full max-w-screen-xl px-4 md:px-8">
+      {document.status === DocumentStatus.PENDING && (
+        <DocumentRecipientLinkCopyDialog recipients={recipients} />
+      )}
+
       <Link href={documentRootPath} className="flex items-center text-[#7AC455] hover:opacity-80">
         <ChevronLeft className="mr-2 inline-block h-5 w-5" />
         <Trans>Documents</Trans>
