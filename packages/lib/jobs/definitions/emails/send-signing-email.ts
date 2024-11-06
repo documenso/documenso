@@ -115,9 +115,11 @@ export const SEND_SIGNING_EMAIL_JOB_DEFINITION = {
 
     if (isTeamDocument && team) {
       emailSubject = i18n._(msg`${team.name} invited you to ${recipientActionVerb} a document`);
-      emailMessage = i18n._(
-        msg`${user.name} on behalf of ${team.name} has invited you to ${recipientActionVerb} the document "${document.title}".`,
-      );
+      emailMessage =
+        customEmail?.message ||
+        i18n._(
+          msg`${user.name} on behalf of ${team.name} has invited you to ${recipientActionVerb} the document "${document.title}".`,
+        );
     }
 
     const customEmailTemplate = {
