@@ -8,6 +8,7 @@ import { prisma } from '@documenso/prisma';
 
 import { getI18nInstance } from '../../client-only/providers/i18n.server';
 import { NEXT_PUBLIC_WEBAPP_URL } from '../../constants/app';
+import { extractDerivedDocumentEmailSettings } from '../../types/document-email';
 import { renderEmailWithI18N } from '../../utils/render-email-with-i18n';
 
 export interface SendPendingEmailOptions {
@@ -41,6 +42,14 @@ export const sendPendingEmail = async ({ documentId, recipientId }: SendPendingE
 
   if (document.Recipient.length === 0) {
     throw new Error('Document has no recipients');
+  }
+
+  const isDocumentPendingEmailEnabled = extractDerivedDocumentEmailSettings(
+    document.documentMeta,
+  ).documentPending;
+
+  if (!isDocumentPendingEmailEnabled) {
+    return;
   }
 
   const [recipient] = document.Recipient;

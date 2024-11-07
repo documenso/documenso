@@ -275,6 +275,7 @@ export const createDocumentFromDirectTemplate = async ({
             subject: metaEmailSubject,
             language: metaLanguage,
             signingOrder: metaSigningOrder,
+            distributionMethod: template.templateMeta?.distributionMethod,
           },
         },
       },

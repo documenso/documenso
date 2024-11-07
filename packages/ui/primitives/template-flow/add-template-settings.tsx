@@ -4,14 +4,17 @@ import { useEffect } from 'react';
 
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Trans } from '@lingui/macro';
+import { useLingui } from '@lingui/react';
 import { InfoIcon } from 'lucide-react';
 import { useForm } from 'react-hook-form';
 
 import { DATE_FORMATS, DEFAULT_DOCUMENT_DATE_FORMAT } from '@documenso/lib/constants/date-formats';
+import { DOCUMENT_DISTRIBUTION_METHODS } from '@documenso/lib/constants/document';
 import { SUPPORTED_LANGUAGES } from '@documenso/lib/constants/i18n';
 import { DEFAULT_DOCUMENT_TIME_ZONE, TIME_ZONES } from '@documenso/lib/constants/time-zones';
+import { ZDocumentEmailSettingsSchema } from '@documenso/lib/types/document-email';
 import { extractDocumentAuthMethods } from '@documenso/lib/utils/document-auth';
-import { type Field, type Recipient } from '@documenso/prisma/client';
+import { DocumentDistributionMethod, type Field, type Recipient } from '@documenso/prisma/client';
 import type { TemplateWithData } from '@documenso/prisma/types/template';
 import {
   DocumentGlobalAuthAccessSelect,
@@ -37,6 +40,7 @@ import {
   FormMessage,
 } from '@documenso/ui/primitives/form/form';
 
+import { DocumentEmailCheckboxes } from '../../components/document/document-email-checkboxes';
 import { Combobox } from '../combobox';
 import {
   DocumentFlowFormContainerActions,
@@ -74,6 +78,8 @@ export const AddTemplateSettingsFormPartial = ({
   template,
   onSubmit,
 }: AddTemplateSettingsFormProps) => {
+  const { _ } = useLingui();
+
   const { documentAuthOption } = extractDocumentAuthMethods({
     documentAuth: template.authOptions,
   });
@@ -90,13 +96,19 @@ export const AddTemplateSettingsFormPartial = ({
         message: template.templateMeta?.message ?? '',
         timezone: template.templateMeta?.timezone ?? DEFAULT_DOCUMENT_TIME_ZONE,
         dateFormat: template.templateMeta?.dateFormat ?? DEFAULT_DOCUMENT_DATE_FORMAT,
+        distributionMethod:
+          template.templateMeta?.distributionMethod || DocumentDistributionMethod.EMAIL,
         redirectUrl: template.templateMeta?.redirectUrl ?? '',
         language: template.templateMeta?.language ?? 'en',
+        emailSettings: ZDocumentEmailSettingsSchema.parse(template?.templateMeta?.emailSettings),
       },
     },
   });
 
   const { stepIndex, currentStep, totalSteps, previousStep } = useStep();
+
+  const distributionMethod = form.watch('meta.distributionMethod');
+  const emailSettings = form.watch('meta.emailSettings');
 
   // We almost always want to set the timezone to the user's local timezone to avoid confusion
   // when the document is signed.
@@ -198,6 +210,77 @@ export const AddTemplateSettingsFormPartial = ({
               )}
             />
 
+            <FormField
+              control={form.control}
+              name="meta.distributionMethod"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="flex flex-row items-center">
+                    <Trans>Document Distribution Method</Trans>
+                    <Tooltip>
+                      <TooltipTrigger>
+                        <InfoIcon className="mx-2 h-4 w-4" />
+                      </TooltipTrigger>
+
+                      <TooltipContent className="text-foreground max-w-md space-y-2 p-4">
+                        <h2>
+                          <strong>
+                            <Trans>Document Distribution Method</Trans>
+                          </strong>
+                        </h2>
+
+                        <p>
+                          <Trans>
+                            This is how the document will reach the recipients once the document is
+                            ready for signing.
+                          </Trans>
+                        </p>
+
+                        <ul className="ml-3.5 list-outside list-disc space-y-0.5 py-2">
+                          <li>
+                            <Trans>
+                              <strong>Email</strong> - The recipient will be emailed the document to
+                              sign, approve, etc.
+                            </Trans>
+                          </li>
+                          <li>
+                            <Trans>
+                              <strong>Links</strong> - We will generate links which you can send to
+                              the recipients manually.
+                            </Trans>
+                          </li>
+                        </ul>
+
+                        <Trans>
+                          <strong>Note</strong> - If you use Links in combination with direct
+                          templates, you will need to manually send the links to the remaining
+                          recipients.
+                        </Trans>
+                      </TooltipContent>
+                    </Tooltip>
+                  </FormLabel>
+
+                  <FormControl>
+                    <Select {...field} onValueChange={field.onChange}>
+                      <SelectTrigger className="bg-background text-muted-foreground">
+                        <SelectValue data-testid="documentDistributionMethodSelectValue" />
+                      </SelectTrigger>
+
+                      <SelectContent position="popper">
+                        {Object.values(DOCUMENT_DISTRIBUTION_METHODS).map(
+                          ({ value, description }) => (
+                            <SelectItem key={value} value={value}>
+                              {_(description)}
+                            </SelectItem>
+                          ),
+                        )}
+                      </SelectContent>
+                    </Select>
+                  </FormControl>
+                </FormItem>
+              )}
+            />
+
             {isEnterprise && (
               <FormField
                 control={form.control}
@@ -217,59 +300,66 @@ export const AddTemplateSettingsFormPartial = ({
               />
             )}
 
-            <Accordion type="multiple">
-              <AccordionItem value="email-options" className="border-none">
-                <AccordionTrigger className="text-foreground rounded border px-3 py-2 text-left hover:bg-neutral-200/30 hover:no-underline">
-                  <Trans>Email Options</Trans>
-                </AccordionTrigger>
+            {distributionMethod === DocumentDistributionMethod.EMAIL && (
+              <Accordion type="multiple">
+                <AccordionItem value="email-options" className="border-none">
+                  <AccordionTrigger className="text-foreground rounded border px-3 py-2 text-left hover:bg-neutral-200/30 hover:no-underline">
+                    <Trans>Email Options</Trans>
+                  </AccordionTrigger>
 
-                <AccordionContent className="text-muted-foreground -mx-1 px-1 pt-4 text-sm leading-relaxed [&>div]:pb-0">
-                  <div className="flex flex-col space-y-6">
-                    <FormField
-                      control={form.control}
-                      name="meta.subject"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>
-                            <Trans>
-                              Subject <span className="text-muted-foreground">(Optional)</span>
-                            </Trans>
-                          </FormLabel>
+                  <AccordionContent className="text-muted-foreground -mx-1 px-1 pt-4 text-sm leading-relaxed [&>div]:pb-0">
+                    <div className="flex flex-col space-y-6">
+                      <FormField
+                        control={form.control}
+                        name="meta.subject"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>
+                              <Trans>
+                                Subject <span className="text-muted-foreground">(Optional)</span>
+                              </Trans>
+                            </FormLabel>
 
-                          <FormControl>
-                            <Input {...field} />
-                          </FormControl>
+                            <FormControl>
+                              <Input {...field} />
+                            </FormControl>
 
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
 
-                    <FormField
-                      control={form.control}
-                      name="meta.message"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>
-                            <Trans>
-                              Message <span className="text-muted-foreground">(Optional)</span>
-                            </Trans>
-                          </FormLabel>
+                      <FormField
+                        control={form.control}
+                        name="meta.message"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>
+                              <Trans>
+                                Message <span className="text-muted-foreground">(Optional)</span>
+                              </Trans>
+                            </FormLabel>
 
-                          <FormControl>
-                            <Textarea className="bg-background h-32 resize-none" {...field} />
-                          </FormControl>
+                            <FormControl>
+                              <Textarea className="bg-background h-32 resize-none" {...field} />
+                            </FormControl>
 
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
 
-                    <DocumentSendEmailMessageHelper />
-                  </div>
-                </AccordionContent>
-              </AccordionItem>
-            </Accordion>
+                      <DocumentSendEmailMessageHelper />
+
+                      <DocumentEmailCheckboxes
+                        value={emailSettings}
+                        onChange={(value) => form.setValue('meta.emailSettings', value)}
+                      />
+                    </div>
+                  </AccordionContent>
+                </AccordionItem>
+              </Accordion>
+            )}
 
             <Accordion type="multiple">
               <AccordionItem value="advanced-options" className="border-none">

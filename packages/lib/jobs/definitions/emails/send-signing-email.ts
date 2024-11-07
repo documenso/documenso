@@ -21,6 +21,7 @@ import {
   RECIPIENT_ROLE_TO_EMAIL_TYPE,
 } from '../../../constants/recipient-roles';
 import { DOCUMENT_AUDIT_LOG_TYPE } from '../../../types/document-audit-logs';
+import { extractDerivedDocumentEmailSettings } from '../../../types/document-email';
 import { ZRequestMetadataSchema } from '../../../universal/extract-request-metadata';
 import { createDocumentAuditLogData } from '../../../utils/document-audit-logs';
 import { renderCustomEmailTemplate } from '../../../utils/render-custom-email-template';
@@ -78,6 +79,14 @@ export const SEND_SIGNING_EMAIL_JOB_DEFINITION = {
     const { documentMeta, team } = document;
 
     if (recipient.role === RecipientRole.CC) {
+      return;
+    }
+
+    const isRecipientSigningRequestEmailEnabled = extractDerivedDocumentEmailSettings(
+      document.documentMeta,
+    ).recipientSigningRequest;
+
+    if (!isRecipientSigningRequestEmailEnabled) {
       return;
     }
 
