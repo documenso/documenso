@@ -71,6 +71,11 @@ export const searchDocumentsWithKeyword = async ({
     },
     include: {
       Recipient: true,
+      team: {
+        select: {
+          url: true,
+        },
+      },
     },
     orderBy: {
       createdAt: 'desc',
