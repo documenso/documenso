@@ -1,7 +1,7 @@
 import { Trans, msg } from '@lingui/macro';
 import { useLingui } from '@lingui/react';
 
-import { RECIPIENT_ROLES_DESCRIPTION_ENG } from '@documenso/lib/constants/recipient-roles';
+import { RECIPIENT_ROLES_DESCRIPTION } from '@documenso/lib/constants/recipient-roles';
 
 import { Body, Button, Container, Head, Html, Img, Preview, Section, Text } from '../components';
 import TemplateDocumentImage from '../template-components/template-document-image';
@@ -25,7 +25,7 @@ export const DocumentCreatedFromDirectTemplateEmailTemplate = ({
 }: DocumentCompletedEmailTemplateProps) => {
   const { _ } = useLingui();
 
-  const action = _(RECIPIENT_ROLES_DESCRIPTION_ENG[recipientRole].actioned).toLowerCase();
+  const action = _(RECIPIENT_ROLES_DESCRIPTION[recipientRole].actioned).toLowerCase();
 
   const previewText = msg`Document created from direct template`;
 

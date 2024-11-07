@@ -17,7 +17,7 @@ import { getI18nInstance } from '../../../client-only/providers/i18n.server';
 import { NEXT_PUBLIC_WEBAPP_URL } from '../../../constants/app';
 import { FROM_ADDRESS, FROM_NAME } from '../../../constants/email';
 import {
-  RECIPIENT_ROLES_DESCRIPTION_ENG,
+  RECIPIENT_ROLES_DESCRIPTION,
   RECIPIENT_ROLE_TO_EMAIL_TYPE,
 } from '../../../constants/recipient-roles';
 import { DOCUMENT_AUDIT_LOG_TYPE } from '../../../types/document-audit-logs';
@@ -89,10 +89,12 @@ export const SEND_SIGNING_EMAIL_JOB_DEFINITION = {
 
     const { email, name } = recipient;
     const selfSigner = email === user.email;
-    const recipientActionVerb =
-      RECIPIENT_ROLES_DESCRIPTION_ENG[recipient.role].actionVerb.toLowerCase();
 
     const i18n = await getI18nInstance(documentMeta?.language);
+
+    const recipientActionVerb = i18n
+      ._(RECIPIENT_ROLES_DESCRIPTION[recipient.role].actionVerb)
+      .toLowerCase();
 
     let emailMessage = customEmail?.message || '';
     let emailSubject = i18n._(msg`Please ${recipientActionVerb} this document`);
