@@ -27,15 +27,19 @@ msgid "“{documentName}” has been signed"
 msgstr "« {documentName} » a été signé"
 
 #: packages/email/template-components/template-document-completed.tsx:41
+msgid "“{documentName}” was signed by all signers"
+msgstr ""
+
+#: packages/email/template-components/template-document-completed.tsx:41
 #: packages/lib/server-only/document/resend-document.tsx:109
-msgid "{0}"
-msgstr "{0}"
+#~ msgid "{0}"
+#~ msgstr "{0}"
 
 #: packages/email/template-components/template-document-invite.tsx:74
-msgid "{0} Document"
-msgstr "{0} Document"
+#~ msgid "{0} Document"
+#~ msgstr "{0} Document"
 
-#: packages/lib/jobs/definitions/emails/send-signing-email.ts:117
+#: packages/lib/jobs/definitions/emails/send-signing-email.ts:119
 msgid "{0} invited you to {recipientActionVerb} a document"
 msgstr "{0} vous a invité à {recipientActionVerb} un document"
 
@@ -51,8 +55,8 @@ msgstr "{0} a quitté l'équipe {teamName} sur Documenso"
 msgid "{0} of {1} row(s) selected."
 msgstr "{0} sur {1} ligne(s) sélectionnée(s)."
 
-#: packages/lib/jobs/definitions/emails/send-signing-email.ts:119
-#: packages/lib/server-only/document/resend-document.tsx:119
+#: packages/lib/jobs/definitions/emails/send-signing-email.ts:123
+#: packages/lib/server-only/document/resend-document.tsx:126
 msgid "{0} on behalf of {1} has invited you to {recipientActionVerb} the document \"{2}\"."
 msgstr "{0} au nom de {1} vous a invité à {recipientActionVerb} le document \"{2}\"."
 
@@ -68,7 +72,7 @@ msgstr "{inviterName} a annulé le document {documentName}, vous n'avez plus bes
 msgid "{inviterName} has cancelled the document<0/>\"{documentName}\""
 msgstr "{inviterName} a annulé le document<0/>\"{documentName}\""
 
-#: packages/email/template-components/template-document-invite.tsx:57
+#: packages/email/template-components/template-document-invite.tsx:54
 msgid "{inviterName} has invited you to {0}<0/>\"{documentName}\""
 msgstr "{inviterName} vous a invité à {0}<0/>\"{documentName}\""
 
@@ -76,9 +80,17 @@ msgstr "{inviterName} vous a invité à {0}<0/>\"{documentName}\""
 msgid "{inviterName} has invited you to {action} {documentName}"
 msgstr "{inviterName} vous a invité à {action} {documentName}"
 
+#: packages/email/templates/document-invite.tsx:91
+msgid "{inviterName} has invited you to {action} the document {documentName}."
+msgstr ""
+
 #: packages/email/templates/recipient-removed-from-document.tsx:18
 msgid "{inviterName} has removed you from the document {documentName}."
 msgstr "{inviterName} vous a retiré du document {documentName}."
+
+#: packages/email/templates/recipient-removed-from-document.tsx:43
+msgid "{inviterName} has removed you from the document<0/>\"{documentName}\""
+msgstr ""
 
 #: packages/email/template-components/template-document-invite.tsx:49
 msgid "{inviterName} on behalf of {teamName} has invited you to {0}<0/>\"{documentName}\""
@@ -213,8 +225,8 @@ msgid "{visibleRows, plural, one {Showing # result.} other {Showing # results.}}
 msgstr "{visibleRows, plural, one {Affichage de # résultat.} other {Affichage de # résultats.}}"
 
 #: packages/email/templates/document-invite.tsx:91
-msgid "`${inviterName} has invited you to ${action} the document \"${documentName}\".`"
-msgstr "`${inviterName} vous a invité à ${action} le document \"${documentName}\".`"
+#~ msgid "`${inviterName} has invited you to ${action} the document \"${documentName}\".`"
+#~ msgstr "`${inviterName} vous a invité à ${action} le document \"${documentName}\".`"
 
 #: packages/email/templates/team-transfer-request.tsx:59
 msgid "<0>{senderName}</0> has requested that you take ownership of the following team"
@@ -250,7 +262,7 @@ msgstr "<0>Exiger un compte</0> - Le destinataire doit être connecté pour voir
 msgid "<0>Require passkey</0> - The recipient must have an account and passkey configured via their settings"
 msgstr "<0>Exiger une clé d'accès</0> - Le destinataire doit avoir un compte et une clé d'accès configurée via ses paramètres"
 
-#: packages/lib/jobs/definitions/emails/send-signing-email.ts:109
+#: packages/lib/jobs/definitions/emails/send-signing-email.ts:111
 msgid "A document was created by your direct template that requires you to {recipientActionVerb} it."
 msgstr "Un document a été créé par votre modèle direct qui nécessite que vous {recipientActionVerb} celui-ci."
 
@@ -404,6 +416,10 @@ msgstr "Une erreur s'est produite lors du chargement du document."
 msgid "Approve"
 msgstr "Approuver"
 
+#: packages/email/template-components/template-document-invite.tsx:78
+msgid "Approve Document"
+msgstr ""
+
 #: packages/lib/constants/recipient-roles.ts:68
 #~ msgid "APPROVE_REQUEST"
 #~ msgstr "APPROVE_REQUEST"
@@ -416,7 +432,7 @@ msgstr "Approuvé"
 msgid "Approver"
 msgstr "Approuveur"
 
-#: packages/lib/constants/recipient-roles.ts:44
+#: packages/lib/constants/recipient-roles.ts:12
 msgid "Approvers"
 msgstr "Approbateurs"
 
@@ -424,7 +440,7 @@ msgstr "Approbateurs"
 msgid "Approving"
 msgstr "En attente d'approbation"
 
-#: packages/email/template-components/template-confirmation-email.tsx:28
+#: packages/email/template-components/template-confirmation-email.tsx:25
 msgid "Before you get started, please confirm your email address by clicking the button below:"
 msgstr "Avant de commencer, veuillez confirmer votre adresse email en cliquant sur le bouton ci-dessous :"
 
@@ -453,20 +469,20 @@ msgstr "Annuler"
 msgid "Cannot remove signer"
 msgstr "Impossible de retirer le signataire"
 
-#: packages/lib/constants/recipient-roles.ts:17
+#: packages/lib/constants/recipient-roles.ts:18
 msgid "Cc"
 msgstr "Cc"
 
-#: packages/lib/constants/recipient-roles.ts:14
-#: packages/lib/constants/recipient-roles.ts:16
+#: packages/lib/constants/recipient-roles.ts:15
+#: packages/lib/constants/recipient-roles.ts:17
 msgid "CC"
 msgstr "CC"
 
-#: packages/lib/constants/recipient-roles.ts:15
+#: packages/lib/constants/recipient-roles.ts:16
 msgid "CC'd"
 msgstr "CC'd"
 
-#: packages/lib/constants/recipient-roles.ts:51
+#: packages/lib/constants/recipient-roles.ts:19
 msgid "Ccers"
 msgstr "Ccers"
 
@@ -514,7 +530,7 @@ msgstr "Configurer le destinataire direct"
 msgid "Configure the {0} field"
 msgstr "Configurer le champ {0}"
 
-#: packages/email/template-components/template-confirmation-email.tsx:38
+#: packages/email/template-components/template-confirmation-email.tsx:35
 msgid "Confirm email"
 msgstr "Confirmer l'email"
 
@@ -523,12 +539,24 @@ msgid "Continue"
 msgstr "Continuer"
 
 #: packages/email/template-components/template-document-invite.tsx:66
-msgid "Continue by {0} the document."
-msgstr "Continuez en {0} le document."
+#~ msgid "Continue by {0} the document."
+#~ msgstr "Continuez en {0} le document."
+
+#: packages/email/template-components/template-document-invite.tsx:65
+msgid "Continue by approving the document."
+msgstr ""
 
 #: packages/email/template-components/template-document-completed.tsx:45
 msgid "Continue by downloading the document."
 msgstr "Continuez en téléchargeant le document."
+
+#: packages/email/template-components/template-document-invite.tsx:63
+msgid "Continue by signing the document."
+msgstr ""
+
+#: packages/email/template-components/template-document-invite.tsx:64
+msgid "Continue by viewing the document."
+msgstr ""
 
 #: packages/ui/components/document/document-share-button.tsx:46
 msgid "Copied to clipboard"
@@ -800,19 +828,19 @@ msgstr "Vert"
 msgid "Hi, {userName} <0>({userEmail})</0>"
 msgstr "Bonjour, {userName} <0>({userEmail})</0>"
 
-#: packages/lib/constants/recipient-roles.ts:76
+#: packages/lib/constants/recipient-roles.ts:44
 msgid "I am a signer of this document"
 msgstr "Je suis un signataire de ce document"
 
-#: packages/lib/constants/recipient-roles.ts:79
+#: packages/lib/constants/recipient-roles.ts:47
 msgid "I am a viewer of this document"
 msgstr "Je suis un visualiseur de ce document"
 
-#: packages/lib/constants/recipient-roles.ts:77
+#: packages/lib/constants/recipient-roles.ts:45
 msgid "I am an approver of this document"
 msgstr "Je suis un approuveur de ce document"
 
-#: packages/lib/constants/recipient-roles.ts:78
+#: packages/lib/constants/recipient-roles.ts:46
 msgid "I am required to receive a copy of this document"
 msgstr "Je dois recevoir une copie de ce document"
 
@@ -991,7 +1019,7 @@ msgstr "Choisissez un numéro"
 msgid "Placeholder"
 msgstr "Espace réservé"
 
-#: packages/email/template-components/template-document-invite.tsx:43
+#: packages/email/template-components/template-document-invite.tsx:44
 msgid "Please {0} your document<0/>\"{documentName}\""
 msgstr "Veuillez {0} votre document<0/>\"{documentName}\""
 
@@ -999,15 +1027,15 @@ msgstr "Veuillez {0} votre document<0/>\"{documentName}\""
 msgid "Please {action} your document {documentName}"
 msgstr "Veuillez {action} votre document {documentName}"
 
-#: packages/lib/jobs/definitions/emails/send-signing-email.ts:98
+#: packages/lib/jobs/definitions/emails/send-signing-email.ts:100
 msgid "Please {recipientActionVerb} this document"
 msgstr "Veuillez {recipientActionVerb} ce document"
 
-#: packages/lib/jobs/definitions/emails/send-signing-email.ts:112
+#: packages/lib/jobs/definitions/emails/send-signing-email.ts:114
 msgid "Please {recipientActionVerb} this document created by your direct template"
 msgstr "Veuillez {recipientActionVerb} ce document créé par votre modèle direct"
 
-#: packages/lib/jobs/definitions/emails/send-signing-email.ts:104
+#: packages/lib/jobs/definitions/emails/send-signing-email.ts:106
 msgid "Please {recipientActionVerb} your document"
 msgstr "Veuillez {recipientActionVerb} votre document"
 
@@ -1063,11 +1091,11 @@ msgstr "Rouge"
 msgid "Redirect URL"
 msgstr "URL de redirection"
 
-#: packages/lib/server-only/document/resend-document.tsx:165
+#: packages/lib/server-only/document/resend-document.tsx:173
 msgid "Reminder: {0}"
 msgstr "Rappel : {0}"
 
-#: packages/lib/server-only/document/resend-document.tsx:118
+#: packages/lib/server-only/document/resend-document.tsx:121
 msgid "Reminder: {0} invited you to {recipientActionVerb} a document"
 msgstr "Rappel : {0} vous a invité à {recipientActionVerb} un document"
 
@@ -1075,7 +1103,7 @@ msgstr "Rappel : {0} vous a invité à {recipientActionVerb} un document"
 msgid "Reminder: Please {recipientActionVerb} this document"
 msgstr "Rappel : Veuillez {recipientActionVerb} ce document"
 
-#: packages/lib/server-only/document/resend-document.tsx:114
+#: packages/lib/server-only/document/resend-document.tsx:116
 msgid "Reminder: Please {recipientActionVerb} your document"
 msgstr "Rappel : Veuillez {recipientActionVerb} votre document"
 
@@ -1158,9 +1186,13 @@ msgstr "Partagez votre expérience de signature !"
 msgid "Show advanced settings"
 msgstr "Afficher les paramètres avancés"
 
-#: packages/lib/constants/recipient-roles.ts:20
+#: packages/lib/constants/recipient-roles.ts:22
 msgid "Sign"
 msgstr "Signer"
+
+#: packages/email/template-components/template-document-invite.tsx:76
+msgid "Sign Document"
+msgstr ""
 
 #: packages/email/template-components/template-reset-password.tsx:34
 msgid "Sign In"
@@ -1174,15 +1206,15 @@ msgstr "Se connecter"
 msgid "Signature"
 msgstr "Signature"
 
-#: packages/lib/constants/recipient-roles.ts:21
+#: packages/lib/constants/recipient-roles.ts:23
 msgid "Signed"
 msgstr "Signé"
 
-#: packages/lib/constants/recipient-roles.ts:23
+#: packages/lib/constants/recipient-roles.ts:25
 msgid "Signer"
 msgstr "Signataire"
 
-#: packages/lib/constants/recipient-roles.ts:58
+#: packages/lib/constants/recipient-roles.ts:26
 msgid "Signers"
 msgstr "Signataires"
 
@@ -1190,7 +1222,7 @@ msgstr "Signataires"
 msgid "Signers must have unique emails"
 msgstr "Les signataires doivent avoir des e-mails uniques"
 
-#: packages/lib/constants/recipient-roles.ts:22
+#: packages/lib/constants/recipient-roles.ts:24
 msgid "Signing"
 msgstr "Signature en cours"
 
@@ -1403,13 +1435,17 @@ msgstr "Validation"
 msgid "Value"
 msgstr "Valeur"
 
-#: packages/lib/constants/recipient-roles.ts:26
+#: packages/lib/constants/recipient-roles.ts:29
 msgid "View"
 msgstr "Voir"
 
 #: packages/email/templates/document-created-from-direct-template.tsx:69
 msgid "View document"
 msgstr "Voir le document"
+
+#: packages/email/template-components/template-document-invite.tsx:77
+msgid "View Document"
+msgstr ""
 
 #: packages/email/template-components/template-document-self-signed.tsx:79
 msgid "View plans"
@@ -1419,19 +1455,19 @@ msgstr "Voir les forfaits"
 #~ msgid "VIEW_REQUEST"
 #~ msgstr "VIEW_REQUEST"
 
-#: packages/lib/constants/recipient-roles.ts:27
+#: packages/lib/constants/recipient-roles.ts:30
 msgid "Viewed"
 msgstr "Vu"
 
-#: packages/lib/constants/recipient-roles.ts:29
+#: packages/lib/constants/recipient-roles.ts:32
 msgid "Viewer"
 msgstr "Visiteur"
 
-#: packages/lib/constants/recipient-roles.ts:65
+#: packages/lib/constants/recipient-roles.ts:33
 msgid "Viewers"
 msgstr "Spectateurs"
 
-#: packages/lib/constants/recipient-roles.ts:28
+#: packages/lib/constants/recipient-roles.ts:31
 msgid "Viewing"
 msgstr "Consultation"
 
@@ -1451,7 +1487,7 @@ msgstr "Nous attendons encore que d'autres signataires signent ce document.<0/>N
 msgid "We've changed your password as you asked. You can now sign in with your new password."
 msgstr "Nous avons changé votre mot de passe comme demandé. Vous pouvez maintenant vous connecter avec votre nouveau mot de passe."
 
-#: packages/email/template-components/template-confirmation-email.tsx:24
+#: packages/email/template-components/template-confirmation-email.tsx:21
 msgid "Welcome to Documenso!"
 msgstr "Bienvenue sur Documenso !"
 
@@ -1463,7 +1499,7 @@ msgstr "Vous"
 msgid "You are about to send this document to the recipients. Are you sure you want to continue?"
 msgstr "Vous êtes sur le point d'envoyer ce document aux destinataires. Êtes-vous sûr de vouloir continuer ?"
 
-#: packages/email/template-components/template-confirmation-email.tsx:41
+#: packages/email/template-components/template-confirmation-email.tsx:38
 msgid "You can also copy and paste this link into your browser: {confirmationLink} (link expires in 1 hour)"
 msgstr "Vous pouvez également copier et coller ce lien dans votre navigateur : {confirmationLink} (le lien expire dans 1 heure)"
 
@@ -1495,8 +1531,8 @@ msgstr "Vous avez été supprimé d'un document"
 msgid "You have been requested to take ownership of team {0} on Documenso"
 msgstr "On vous a demandé de prendre possession de l'équipe {0} sur Documenso"
 
-#: packages/lib/jobs/definitions/emails/send-signing-email.ts:102
-#: packages/lib/server-only/document/resend-document.tsx:113
+#: packages/lib/jobs/definitions/emails/send-signing-email.ts:104
+#: packages/lib/server-only/document/resend-document.tsx:114
 msgid "You have initiated the document {0} that requires you to {recipientActionVerb} it."
 msgstr "Vous avez initié le document {0} qui nécessite que vous {recipientActionVerb} celui-ci."
 

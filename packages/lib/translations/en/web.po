@@ -72,8 +72,8 @@ msgid "{0} direct signing templates"
 msgstr "{0} direct signing templates"
 
 #: apps/web/src/app/(recipient)/d/[token]/direct-template.tsx:66
-msgid "{0} document"
-msgstr "{0} document"
+#~ msgid "{0} document"
+#~ msgstr "{0} document"
 
 #: apps/web/src/app/(dashboard)/documents/upload-document.tsx:146
 msgid "{0} of {1} documents remaining this month."
@@ -84,8 +84,8 @@ msgid "{0} Recipient(s)"
 msgstr "{0} Recipient(s)"
 
 #: apps/web/src/app/(recipient)/d/[token]/direct-template.tsx:67
-msgid "{0} the document to complete the process."
-msgstr "{0} the document to complete the process."
+#~ msgid "{0} the document to complete the process."
+#~ msgstr "{0} the document to complete the process."
 
 #: apps/web/src/app/(signing)/sign/[token]/text-field.tsx:292
 msgid "{charactersRemaining, plural, one {1 character remaining} other {{charactersRemaining} characters remaining}}"
@@ -98,6 +98,14 @@ msgstr "{formattedTeamMemberQuanity} • Monthly • Renews: {formattedDate}"
 #: apps/web/src/app/(teams)/t/[teamUrl]/settings/billing/page.tsx:48
 msgid "{numberOfSeats, plural, one {# member} other {# members}}"
 msgstr "{numberOfSeats, plural, one {# member} other {# members}}"
+
+#: apps/web/src/app/(recipient)/d/[token]/direct-template.tsx:67
+msgid "{recipientActionVerb} document"
+msgstr "{recipientActionVerb} document"
+
+#: apps/web/src/app/(recipient)/d/[token]/direct-template.tsx:68
+msgid "{recipientActionVerb} the document to complete the process."
+msgstr "{recipientActionVerb} the document to complete the process."
 
 #: apps/web/src/components/forms/public-profile-form.tsx:231
 #: apps/web/src/components/templates/manage-public-template-dialog.tsx:389
@@ -1765,7 +1773,7 @@ msgstr "Full Name"
 
 #: apps/web/src/app/(dashboard)/documents/[id]/edit-document.tsx:165
 #: apps/web/src/app/(dashboard)/templates/[id]/edit/edit-template.tsx:77
-#: apps/web/src/app/(recipient)/d/[token]/direct-template.tsx:60
+#: apps/web/src/app/(recipient)/d/[token]/direct-template.tsx:62
 #: apps/web/src/components/(teams)/settings/layout/desktop-nav.tsx:43
 #: apps/web/src/components/(teams)/settings/layout/mobile-nav.tsx:51
 msgid "General"
@@ -2569,7 +2577,7 @@ msgstr "Please type <0>{0}</0> to confirm."
 msgid "Preferences"
 msgstr "Preferences"
 
-#: apps/web/src/app/(recipient)/d/[token]/direct-template.tsx:61
+#: apps/web/src/app/(recipient)/d/[token]/direct-template.tsx:63
 msgid "Preview and configure template."
 msgstr "Preview and configure template."
 
@@ -3130,7 +3138,7 @@ msgstr "Site Settings"
 #: apps/web/src/app/(dashboard)/templates/template-direct-link-dialog.tsx:104
 #: apps/web/src/app/(dashboard)/templates/template-direct-link-dialog.tsx:127
 #: apps/web/src/app/(dashboard)/templates/template-direct-link-dialog.tsx:151
-#: apps/web/src/app/(recipient)/d/[token]/direct-template.tsx:117
+#: apps/web/src/app/(recipient)/d/[token]/direct-template.tsx:118
 #: apps/web/src/app/(recipient)/d/[token]/signing-auth-page.tsx:27
 #: apps/web/src/app/(signing)/sign/[token]/signing-auth-page.tsx:38
 #: apps/web/src/app/(teams)/t/[teamUrl]/layout-billing-banner.tsx:53
@@ -4395,7 +4403,7 @@ msgstr "We were unable to set your public profile to public. Please try again."
 msgid "We were unable to setup two-factor authentication for your account. Please ensure that you have entered your code correctly and try again."
 msgstr "We were unable to setup two-factor authentication for your account. Please ensure that you have entered your code correctly and try again."
 
-#: apps/web/src/app/(recipient)/d/[token]/direct-template.tsx:119
+#: apps/web/src/app/(recipient)/d/[token]/direct-template.tsx:120
 #: apps/web/src/app/embed/direct/[[...url]]/client.tsx:245
 #: apps/web/src/app/embed/sign/[[...url]]/client.tsx:127
 msgid "We were unable to submit this document at this time. Please try again later."
