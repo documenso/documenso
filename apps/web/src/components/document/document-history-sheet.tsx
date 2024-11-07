@@ -12,7 +12,7 @@ import { UAParser } from 'ua-parser-js';
 import { DOCUMENT_AUDIT_LOG_EMAIL_FORMAT } from '@documenso/lib/constants/document-audit-logs';
 import { DOCUMENT_AUTH_TYPES } from '@documenso/lib/constants/document-auth';
 import { DOCUMENT_AUDIT_LOG_TYPE } from '@documenso/lib/types/document-audit-logs';
-import { formatDocumentAuditLogActionString } from '@documenso/lib/utils/document-audit-logs';
+import { formatDocumentAuditLogAction } from '@documenso/lib/utils/document-audit-logs';
 import { trpc } from '@documenso/trpc/react';
 import { cn } from '@documenso/ui/lib/utils';
 import { Avatar, AvatarFallback } from '@documenso/ui/primitives/avatar';
@@ -37,7 +37,7 @@ export const DocumentHistorySheet = ({
   onMenuOpenChange,
   children,
 }: DocumentHistorySheetProps) => {
-  const { i18n } = useLingui();
+  const { _, i18n } = useLingui();
 
   const [isUserDetailsVisible, setIsUserDetailsVisible] = useState(false);
 
@@ -152,7 +152,7 @@ export const DocumentHistorySheet = ({
 
                   <div>
                     <p className="text-foreground text-xs font-bold">
-                      {formatDocumentAuditLogActionString(auditLog, userId)}
+                      {formatDocumentAuditLogAction(_, auditLog, userId).description}
                     </p>
                     <p className="text-foreground/50 text-xs">
                       {DateTime.fromJSDate(auditLog.createdAt)

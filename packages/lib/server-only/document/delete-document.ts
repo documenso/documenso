@@ -2,12 +2,15 @@
 
 import { createElement } from 'react';
 
+import { msg } from '@lingui/macro';
+
 import { mailer } from '@documenso/email/mailer';
 import DocumentCancelTemplate from '@documenso/email/templates/document-cancel';
 import { prisma } from '@documenso/prisma';
 import type { Document, DocumentMeta, Recipient, User } from '@documenso/prisma/client';
 import { DocumentStatus, SendStatus } from '@documenso/prisma/client';
 
+import { getI18nInstance } from '../../client-only/providers/i18n.server';
 import { NEXT_PUBLIC_WEBAPP_URL } from '../../constants/app';
 import { FROM_ADDRESS, FROM_NAME } from '../../constants/email';
 import { DOCUMENT_AUDIT_LOG_TYPE } from '../../types/document-audit-logs';
@@ -192,9 +195,11 @@ const handleDocumentOwnerDelete = async ({
       });
 
       const [html, text] = await Promise.all([
-        renderEmailWithI18N(template),
-        renderEmailWithI18N(template, { plainText: true }),
+        renderEmailWithI18N(template, { lang: document.documentMeta?.language }),
+        renderEmailWithI18N(template, { lang: document.documentMeta?.language, plainText: true }),
       ]);
+
+      const i18n = await getI18nInstance(document.documentMeta?.language);
 
       await mailer.sendMail({
         to: {
@@ -205,7 +210,7 @@ const handleDocumentOwnerDelete = async ({
           name: FROM_NAME,
           address: FROM_ADDRESS,
         },
-        subject: 'Document Cancelled',
+        subject: i18n._(msg`Document Cancelled`),
         html,
         text,
       });

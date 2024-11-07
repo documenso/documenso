@@ -1,3 +1,5 @@
+'use client';
+
 import { useEffect, useState } from 'react';
 
 import { useRouter } from 'next/navigation';
@@ -92,6 +94,7 @@ export type UseTemplateDialogProps = {
   templateSigningOrder?: DocumentSigningOrder | null;
   recipients: Recipient[];
   documentRootPath: string;
+  trigger?: React.ReactNode;
 };
 
 export function UseTemplateDialog({
@@ -99,6 +102,7 @@ export function UseTemplateDialog({
   documentRootPath,
   templateId,
   templateSigningOrder,
+  trigger,
 }: UseTemplateDialogProps) {
   const router = useRouter();
 
@@ -186,10 +190,12 @@ export function UseTemplateDialog({
   return (
     <Dialog open={open} onOpenChange={(value) => !form.formState.isSubmitting && setOpen(value)}>
       <DialogTrigger asChild>
-        <Button variant="outline" className="bg-background">
-          <Plus className="-ml-1 mr-2 h-4 w-4" />
-          <Trans>Use Template</Trans>
-        </Button>
+        {trigger || (
+          <Button variant="outline" className="bg-background">
+            <Plus className="-ml-1 mr-2 h-4 w-4" />
+            <Trans>Use Template</Trans>
+          </Button>
+        )}
       </DialogTrigger>
       <DialogContent className="sm:max-w-lg">
         <DialogHeader>

@@ -1,14 +1,10 @@
+import type { I18n } from '@lingui/core';
+import { msg } from '@lingui/macro';
 import { match } from 'ts-pattern';
 
-import type {
-  DocumentAuditLog,
-  DocumentMeta,
-  Field,
-  Recipient,
-  RecipientRole,
-} from '@documenso/prisma/client';
+import type { DocumentAuditLog, DocumentMeta, Field, Recipient } from '@documenso/prisma/client';
+import { RecipientRole } from '@documenso/prisma/client';
 
-import { RECIPIENT_ROLES_DESCRIPTION_ENG } from '../constants/recipient-roles';
 import type {
   TDocumentAuditLog,
   TDocumentAuditLogDocumentMetaDiffSchema,
@@ -254,129 +250,119 @@ export const diffDocumentMetaChanges = (
  *
  * Provide a userId to prefix the action with the user, example 'X did Y'.
  */
-export const formatDocumentAuditLogActionString = (
+export const formatDocumentAuditLogAction = (
+  _: I18n['_'],
   auditLog: TDocumentAuditLog,
   userId?: number,
 ) => {
-  const { prefix, description } = formatDocumentAuditLogAction(auditLog, userId);
-
-  return prefix ? `${prefix} ${description}` : description;
-};
-
-/**
- * Formats the audit log into a description of the action.
- *
- * Provide a userId to prefix the action with the user, example 'X did Y'.
- */
-// Todo: Translations.
-export const formatDocumentAuditLogAction = (auditLog: TDocumentAuditLog, userId?: number) => {
-  let prefix = userId === auditLog.userId ? 'You' : auditLog.name || auditLog.email || '';
+  const prefix = userId === auditLog.userId ? _(msg`You`) : auditLog.name || auditLog.email || '';
 
   const description = match(auditLog)
     .with({ type: DOCUMENT_AUDIT_LOG_TYPE.FIELD_CREATED }, () => ({
-      anonymous: 'A field was added',
-      identified: 'added a field',
+      anonymous: msg`A field was added`,
+      identified: msg`${prefix} added a field`,
     }))
     .with({ type: DOCUMENT_AUDIT_LOG_TYPE.FIELD_DELETED }, () => ({
-      anonymous: 'A field was removed',
-      identified: 'removed a field',
+      anonymous: msg`A field was removed`,
+      identified: msg`${prefix} removed a field`,
     }))
     .with({ type: DOCUMENT_AUDIT_LOG_TYPE.FIELD_UPDATED }, () => ({
-      anonymous: 'A field was updated',
-      identified: 'updated a field',
+      anonymous: msg`A field was updated`,
+      identified: msg`${prefix} updated a field`,
     }))
     .with({ type: DOCUMENT_AUDIT_LOG_TYPE.RECIPIENT_CREATED }, () => ({
-      anonymous: 'A recipient was added',
-      identified: 'added a recipient',
+      anonymous: msg`A recipient was added`,
+      identified: msg`${prefix} added a recipient`,
     }))
     .with({ type: DOCUMENT_AUDIT_LOG_TYPE.RECIPIENT_DELETED }, () => ({
-      anonymous: 'A recipient was removed',
-      identified: 'removed a recipient',
+      anonymous: msg`A recipient was removed`,
+      identified: msg`${prefix} removed a recipient`,
     }))
     .with({ type: DOCUMENT_AUDIT_LOG_TYPE.RECIPIENT_UPDATED }, () => ({
-      anonymous: 'A recipient was updated',
-      identified: 'updated a recipient',
+      anonymous: msg`A recipient was updated`,
+      identified: msg`${prefix} updated a recipient`,
     }))
     .with({ type: DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_CREATED }, () => ({
-      anonymous: 'Document created',
-      identified: 'created the document',
+      anonymous: msg`Document created`,
+      identified: msg`${prefix} created the document`,
     }))
     .with({ type: DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_DELETED }, () => ({
-      anonymous: 'Document deleted',
-      identified: 'deleted the document',
+      anonymous: msg`Document deleted`,
+      identified: msg`${prefix} deleted the document`,
     }))
     .with({ type: DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_FIELD_INSERTED }, () => ({
-      anonymous: 'Field signed',
-      identified: 'signed a field',
+      anonymous: msg`Field signed`,
+      identified: msg`${prefix} signed a field`,
     }))
     .with({ type: DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_FIELD_UNINSERTED }, () => ({
-      anonymous: 'Field unsigned',
-      identified: 'unsigned a field',
+      anonymous: msg`Field unsigned`,
+      identified: msg`${prefix} unsigned a field`,
     }))
     .with({ type: DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_VISIBILITY_UPDATED }, () => ({
-      anonymous: 'Document visibility updated',
-      identified: 'updated the document visibility',
+      anonymous: msg`Document visibility updated`,
+      identified: msg`${prefix} updated the document visibility`,
     }))
     .with({ type: DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_GLOBAL_AUTH_ACCESS_UPDATED }, () => ({
-      anonymous: 'Document access auth updated',
-      identified: 'updated the document access auth requirements',
+      anonymous: msg`Document access auth updated`,
+      identified: msg`${prefix} updated the document access auth requirements`,
     }))
     .with({ type: DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_GLOBAL_AUTH_ACTION_UPDATED }, () => ({
-      anonymous: 'Document signing auth updated',
-      identified: 'updated the document signing auth requirements',
+      anonymous: msg`Document signing auth updated`,
+      identified: msg`${prefix} updated the document signing auth requirements`,
     }))
     .with({ type: DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_META_UPDATED }, () => ({
-      anonymous: 'Document updated',
-      identified: 'updated the document',
+      anonymous: msg`Document updated`,
+      identified: msg`${prefix} updated the document`,
     }))
     .with({ type: DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_OPENED }, () => ({
-      anonymous: 'Document opened',
-      identified: 'opened the document',
+      anonymous: msg`Document opened`,
+      identified: msg`${prefix} opened the document`,
     }))
     .with({ type: DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_TITLE_UPDATED }, () => ({
-      anonymous: 'Document title updated',
-      identified: 'updated the document title',
+      anonymous: msg`Document title updated`,
+      identified: msg`${prefix} updated the document title`,
     }))
     .with({ type: DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_EXTERNAL_ID_UPDATED }, () => ({
-      anonymous: 'Document external ID updated',
-      identified: 'updated the document external ID',
+      anonymous: msg`Document external ID updated`,
+      identified: msg`${prefix} updated the document external ID`,
     }))
     .with({ type: DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_SENT }, () => ({
-      anonymous: 'Document sent',
-      identified: 'sent the document',
+      anonymous: msg`Document sent`,
+      identified: msg`${prefix} sent the document`,
     }))
     .with({ type: DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_MOVED_TO_TEAM }, () => ({
-      anonymous: 'Document moved to team',
-      identified: 'moved the document to team',
+      anonymous: msg`Document moved to team`,
+      identified: msg`${prefix} moved the document to team`,
     }))
     .with({ type: DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_RECIPIENT_COMPLETED }, ({ data }) => {
-      // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
-      const action = RECIPIENT_ROLES_DESCRIPTION_ENG[data.recipientRole as RecipientRole]?.actioned;
+      const userName = prefix || _(msg`Recipient`);
 
-      const value = action ? `${action.toLowerCase()} the document` : 'completed their task';
+      const result = match(data.recipientRole)
+        .with(RecipientRole.SIGNER, () => msg`${userName} signed the document`)
+        .with(RecipientRole.VIEWER, () => msg`${userName} viewed the document`)
+        .with(RecipientRole.APPROVER, () => msg`${userName} approved the document`)
+        .with(RecipientRole.CC, () => msg`${userName} CC'd the document`)
+        .otherwise(() => msg`${userName} completed their task`);
 
       return {
-        anonymous: `Recipient ${value}`,
-        identified: value,
+        anonymous: result,
+        identified: result,
       };
     })
     .with({ type: DOCUMENT_AUDIT_LOG_TYPE.EMAIL_SENT }, ({ data }) => ({
-      anonymous: `Email ${data.isResending ? 'resent' : 'sent'}`,
-      identified: `${data.isResending ? 'resent' : 'sent'} an email to ${data.recipientEmail}`,
+      anonymous: data.isResending ? msg`Email resent` : msg`Email sent`,
+      identified: data.isResending
+        ? msg`${prefix} resent an email to ${data.recipientEmail}`
+        : msg`${prefix} sent an email to ${data.recipientEmail}`,
     }))
-    .with({ type: DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_COMPLETED }, () => {
-      // Clear the prefix since this should be considered an 'anonymous' event.
-      prefix = '';
-
-      return {
-        anonymous: 'Document completed',
-        identified: 'Document completed',
-      };
-    })
+    .with({ type: DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_COMPLETED }, () => ({
+      anonymous: msg`Document completed`,
+      identified: msg`Document completed`,
+    }))
     .exhaustive();
 
   return {
     prefix,
-    description: prefix ? description.identified : description.anonymous,
+    description: _(prefix ? description.identified : description.anonymous),
   };
 };

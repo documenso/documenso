@@ -31,7 +31,7 @@ test.describe('[EE_ONLY]', () => {
     await apiSignin({
       page,
       email: user.email,
-      redirectPath: `/templates/${template.id}`,
+      redirectPath: `/templates/${template.id}/edit`,
     });
 
     // Save the settings by going to the next step.
@@ -81,7 +81,7 @@ test('[TEMPLATE_FLOW]: add placeholder', async ({ page }) => {
   await apiSignin({
     page,
     email: user.email,
-    redirectPath: `/templates/${template.id}`,
+    redirectPath: `/templates/${template.id}/edit`,
   });
 
   // Save the settings by going to the next step.
