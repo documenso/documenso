@@ -1,4 +1,4 @@
-import { msg } from '@lingui/macro';
+import { Trans, msg } from '@lingui/macro';
 import { useLingui } from '@lingui/react';
 
 import { Body, Container, Head, Hr, Html, Img, Preview, Section, Text } from '../components';
@@ -40,8 +40,10 @@ export const RecipientRemovedFromDocumentTemplate = ({
 
               <Section>
                 <Text className="text-primary mx-auto mb-0 max-w-[80%] text-center text-lg font-semibold">
-                  {inviterName} has removed you from the document
-                  <br />"{documentName}"
+                  <Trans>
+                    {inviterName} has removed you from the document
+                    <br />"{documentName}"
+                  </Trans>
                 </Text>
               </Section>
             </Section>
