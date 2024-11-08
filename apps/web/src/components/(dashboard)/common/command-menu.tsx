@@ -106,7 +106,7 @@ export function CommandMenu({ open, onOpenChange }: CommandMenuProps) {
 
     return searchDocumentsData.map((document) => ({
       label: document.title,
-      path: document.teamId ? `/t/${document?.team?.url}/documents/${document.id}` : document.path,
+      path: document.path,
       value: document.value,
     }));
   }, [searchDocumentsData]);
