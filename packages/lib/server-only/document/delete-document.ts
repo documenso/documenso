@@ -184,7 +184,7 @@ const handleDocumentOwnerDelete = async ({
   ).documentDeleted;
 
   if (!isDocumentDeleteEmailEnabled) {
-    return deleteDocument;
+    return deletedDocument;
   }
 
   // Send cancellation emails to recipients.
