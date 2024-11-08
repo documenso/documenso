@@ -11,6 +11,7 @@ import { prisma } from '@documenso/prisma';
 
 import { getI18nInstance } from '../../client-only/providers/i18n.server';
 import { renderEmailWithI18N } from '../../utils/render-email-with-i18n';
+import { teamGlobalSettingsToBranding } from '../../utils/team-global-settings-to-branding';
 
 export type DeleteTeamEmailOptions = {
   userId: number;
@@ -54,6 +55,7 @@ export const deleteTeamEmail = async ({ userId, userEmail, teamId }: DeleteTeamE
             email: true,
           },
         },
+        teamGlobalSettings: true,
       },
     });
 
@@ -77,12 +79,18 @@ export const deleteTeamEmail = async ({ userId, userEmail, teamId }: DeleteTeamE
       teamUrl: team.url,
     });
 
+    const branding = team.teamGlobalSettings
+      ? teamGlobalSettingsToBranding(team.teamGlobalSettings)
+      : undefined;
+
+    const lang = team.teamGlobalSettings?.documentLanguage;
+
     const [html, text] = await Promise.all([
-      renderEmailWithI18N(template),
-      renderEmailWithI18N(template, { plainText: true }),
+      renderEmailWithI18N(template, { lang, branding }),
+      renderEmailWithI18N(template, { lang, branding, plainText: true }),
     ]);
 
-    const i18n = await getI18nInstance();
+    const i18n = await getI18nInstance(lang);
 
     await mailer.sendMail({
       to: {

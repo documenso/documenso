@@ -5,9 +5,14 @@ import {
   ZDocumentAccessAuthTypesSchema,
   ZDocumentActionAuthTypesSchema,
 } from '@documenso/lib/types/document-auth';
+import { ZDocumentEmailSettingsSchema } from '@documenso/lib/types/document-email';
 import { ZBaseTableSearchParamsSchema } from '@documenso/lib/types/search-params';
 import { isValidRedirectUrl } from '@documenso/lib/utils/is-valid-redirect-url';
-import { DocumentSigningOrder, TemplateType } from '@documenso/prisma/client';
+import {
+  DocumentDistributionMethod,
+  DocumentSigningOrder,
+  TemplateType,
+} from '@documenso/prisma/client';
 
 import { ZSignFieldWithTokenMutationSchema } from '../field-router/schema';
 
@@ -41,7 +46,7 @@ export const ZCreateDocumentFromTemplateMutationSchema = z.object({
       const emails = recipients.map((signer) => signer.email);
       return new Set(emails).size === emails.length;
     }, 'Recipients must have unique emails'),
-  sendDocument: z.boolean().optional(),
+  distributeDocument: z.boolean().optional(),
 });
 
 export const ZDuplicateTemplateMutationSchema = z.object({
@@ -99,6 +104,8 @@ export const ZUpdateTemplateSettingsMutationSchema = z.object({
       message: z.string(),
       timezone: z.string(),
       dateFormat: z.string(),
+      distributionMethod: z.nativeEnum(DocumentDistributionMethod),
+      emailSettings: ZDocumentEmailSettingsSchema,
       redirectUrl: z
         .string()
         .optional()

@@ -3,7 +3,8 @@ import { useLingui } from '@lingui/react';
 
 import { formatTeamUrl } from '@documenso/lib/utils/teams';
 
-import { Body, Container, Head, Hr, Html, Preview, Section, Text } from '../components';
+import { Body, Container, Head, Hr, Html, Img, Preview, Section, Text } from '../components';
+import { useBranding } from '../providers/branding';
 import { TemplateFooter } from '../template-components/template-footer';
 import TemplateImage from '../template-components/template-image';
 
@@ -25,6 +26,7 @@ export const TeamLeaveEmailTemplate = ({
   teamUrl = 'demo',
 }: TeamLeaveEmailProps) => {
   const { _ } = useLingui();
+  const branding = useBranding();
 
   const previewText = msg`A team member has left a team on Documenso`;
 
@@ -36,11 +38,15 @@ export const TeamLeaveEmailTemplate = ({
       <Body className="mx-auto my-auto font-sans">
         <Section className="bg-white text-slate-500">
           <Container className="mx-auto mb-2 mt-8 max-w-xl rounded-lg border border-solid border-slate-200 p-2 backdrop-blur-sm">
-            <TemplateImage
-              assetBaseUrl={assetBaseUrl}
-              className="mb-4 h-6 p-2"
-              staticAsset="logo.png"
-            />
+            {branding.brandingEnabled && branding.brandingLogo ? (
+              <Img src={branding.brandingLogo} alt="Branding Logo" className="mb-4 h-6 p-2" />
+            ) : (
+              <TemplateImage
+                assetBaseUrl={assetBaseUrl}
+                className="mb-4 h-6 p-2"
+                staticAsset="logo.png"
+              />
+            )}
 
             <Section>
               <TemplateImage

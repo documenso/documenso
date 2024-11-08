@@ -60,7 +60,10 @@ export const duplicateTemplate = async ({
 
   if (template.templateMeta) {
     templateMeta = {
-      create: omit(template.templateMeta, ['id', 'templateId']),
+      create: {
+        ...omit(template.templateMeta, ['id', 'templateId']),
+        emailSettings: template.templateMeta.emailSettings || undefined,
+      },
     };
   }
 

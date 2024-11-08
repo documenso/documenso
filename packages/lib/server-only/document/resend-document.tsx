@@ -19,7 +19,9 @@ import type { Prisma } from '@documenso/prisma/client';
 
 import { getI18nInstance } from '../../client-only/providers/i18n.server';
 import { NEXT_PUBLIC_WEBAPP_URL } from '../../constants/app';
+import { extractDerivedDocumentEmailSettings } from '../../types/document-email';
 import { renderEmailWithI18N } from '../../utils/render-email-with-i18n';
+import { teamGlobalSettingsToBranding } from '../../utils/team-global-settings-to-branding';
 import { getDocumentWhereInput } from './get-document-by-id';
 
 export type ResendDocumentOptions = {
@@ -65,6 +67,7 @@ export const resendDocument = async ({
         select: {
           teamEmail: true,
           name: true,
+          teamGlobalSettings: true,
         },
       },
     },
@@ -87,6 +90,14 @@ export const resendDocument = async ({
 
   if (document.status === DocumentStatus.COMPLETED) {
     throw new Error('Can not send completed document');
+  }
+
+  const isRecipientSigningRequestEmailEnabled = extractDerivedDocumentEmailSettings(
+    document.documentMeta,
+  ).recipientSigningRequest;
+
+  if (!isRecipientSigningRequestEmailEnabled) {
+    return;
   }
 
   await Promise.all(
@@ -149,12 +160,20 @@ export const resendDocument = async ({
         teamName: document.team?.name,
       });
 
+      const branding = document.team?.teamGlobalSettings
+        ? teamGlobalSettingsToBranding(document.team.teamGlobalSettings)
+        : undefined;
+
       await prisma.$transaction(
         async (tx) => {
           const [html, text] = await Promise.all([
-            renderEmailWithI18N(template, { lang: document.documentMeta?.language }),
             renderEmailWithI18N(template, {
               lang: document.documentMeta?.language,
+              branding,
+            }),
+            renderEmailWithI18N(template, {
+              lang: document.documentMeta?.language,
+              branding,
               plainText: true,
             }),
           ]);

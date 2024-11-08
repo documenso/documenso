@@ -8,7 +8,9 @@ import { prisma } from '@documenso/prisma';
 
 import { getI18nInstance } from '../../client-only/providers/i18n.server';
 import { NEXT_PUBLIC_WEBAPP_URL } from '../../constants/app';
+import { extractDerivedDocumentEmailSettings } from '../../types/document-email';
 import { renderEmailWithI18N } from '../../utils/render-email-with-i18n';
+import { teamGlobalSettingsToBranding } from '../../utils/team-global-settings-to-branding';
 
 export interface SendPendingEmailOptions {
   documentId: number;
@@ -32,6 +34,11 @@ export const sendPendingEmail = async ({ documentId, recipientId }: SendPendingE
         },
       },
       documentMeta: true,
+      team: {
+        include: {
+          teamGlobalSettings: true,
+        },
+      },
     },
   });
 
@@ -41,6 +48,14 @@ export const sendPendingEmail = async ({ documentId, recipientId }: SendPendingE
 
   if (document.Recipient.length === 0) {
     throw new Error('Document has no recipients');
+  }
+
+  const isDocumentPendingEmailEnabled = extractDerivedDocumentEmailSettings(
+    document.documentMeta,
+  ).documentPending;
+
+  if (!isDocumentPendingEmailEnabled) {
+    return;
   }
 
   const [recipient] = document.Recipient;
@@ -54,12 +69,20 @@ export const sendPendingEmail = async ({ documentId, recipientId }: SendPendingE
     assetBaseUrl,
   });
 
+  const branding = document.team?.teamGlobalSettings
+    ? teamGlobalSettingsToBranding(document.team.teamGlobalSettings)
+    : undefined;
+
   const [html, text] = await Promise.all([
-    renderEmailWithI18N(template, { lang: document.documentMeta?.language }),
-    renderEmailWithI18N(template, { lang: document.documentMeta?.language, plainText: true }),
+    renderEmailWithI18N(template, { lang: document.documentMeta?.language, branding }),
+    renderEmailWithI18N(template, {
+      lang: document.documentMeta?.language,
+      branding,
+      plainText: true,
+    }),
   ]);
 
-  const i18n = await getI18nInstance();
+  const i18n = await getI18nInstance(document.documentMeta?.language);
 
   await mailer.sendMail({
     to: {

@@ -2,6 +2,7 @@ import { msg } from '@lingui/macro';
 import { useLingui } from '@lingui/react';
 
 import { Body, Container, Head, Html, Img, Preview, Section } from '../components';
+import { useBranding } from '../providers/branding';
 import type { TemplateDocumentSelfSignedProps } from '../template-components/template-document-self-signed';
 import { TemplateDocumentSelfSigned } from '../template-components/template-document-self-signed';
 import { TemplateFooter } from '../template-components/template-footer';
@@ -13,6 +14,7 @@ export const DocumentSelfSignedEmailTemplate = ({
   assetBaseUrl = 'http://localhost:3002',
 }: DocumentSelfSignedTemplateProps) => {
   const { _ } = useLingui();
+  const branding = useBranding();
 
   const previewText = msg`Completed Document`;
 
@@ -29,11 +31,15 @@ export const DocumentSelfSignedEmailTemplate = ({
         <Section className="bg-white">
           <Container className="mx-auto mb-2 mt-8 max-w-xl rounded-lg border border-solid border-slate-200 p-2 backdrop-blur-sm">
             <Section className="p-2">
-              <Img
-                src={getAssetUrl('/static/logo.png')}
-                alt="Documenso Logo"
-                className="mb-4 h-6"
-              />
+              {branding.brandingEnabled && branding.brandingLogo ? (
+                <Img src={branding.brandingLogo} alt="Branding Logo" className="mb-4 h-6" />
+              ) : (
+                <Img
+                  src={getAssetUrl('/static/logo.png')}
+                  alt="Documenso Logo"
+                  className="mb-4 h-6"
+                />
+              )}
 
               <TemplateDocumentSelfSigned documentName={documentName} assetBaseUrl={assetBaseUrl} />
             </Section>

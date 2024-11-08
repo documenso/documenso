@@ -8,7 +8,9 @@ import { prisma } from '@documenso/prisma';
 
 import { getI18nInstance } from '../../client-only/providers/i18n.server';
 import { NEXT_PUBLIC_WEBAPP_URL } from '../../constants/app';
+import { extractDerivedDocumentEmailSettings } from '../../types/document-email';
 import { renderEmailWithI18N } from '../../utils/render-email-with-i18n';
+import { teamGlobalSettingsToBranding } from '../../utils/team-global-settings-to-branding';
 
 export interface SendDeleteEmailOptions {
   documentId: number;
@@ -22,11 +24,25 @@ export const sendDeleteEmail = async ({ documentId, reason }: SendDeleteEmailOpt
     },
     include: {
       User: true,
+      documentMeta: true,
+      team: {
+        include: {
+          teamGlobalSettings: true,
+        },
+      },
     },
   });
 
   if (!document) {
     throw new Error('Document not found');
+  }
+
+  const isDocumentDeletedEmailEnabled = extractDerivedDocumentEmailSettings(
+    document.documentMeta,
+  ).documentDeleted;
+
+  if (!isDocumentDeletedEmailEnabled) {
+    return;
   }
 
   const { email, name } = document.User;
@@ -39,9 +55,17 @@ export const sendDeleteEmail = async ({ documentId, reason }: SendDeleteEmailOpt
     assetBaseUrl,
   });
 
+  const branding = document.team?.teamGlobalSettings
+    ? teamGlobalSettingsToBranding(document.team.teamGlobalSettings)
+    : undefined;
+
   const [html, text] = await Promise.all([
-    renderEmailWithI18N(template),
-    renderEmailWithI18N(template, { plainText: true }),
+    renderEmailWithI18N(template, { lang: document.documentMeta?.language, branding }),
+    renderEmailWithI18N(template, {
+      lang: document.documentMeta?.language,
+      branding,
+      plainText: true,
+    }),
   ]);
 
   const i18n = await getI18nInstance();

@@ -12,6 +12,7 @@ import {
   DO_NOT_INVALIDATE_QUERY_ON_MUTATION,
   SKIP_QUERY_BATCH_META,
 } from '@documenso/lib/constants/trpc';
+import { DocumentDistributionMethod, DocumentStatus } from '@documenso/prisma/client';
 import type { DocumentWithDetails } from '@documenso/prisma/types/document';
 import { trpc } from '@documenso/trpc/react';
 import { cn } from '@documenso/ui/lib/utils';
@@ -177,8 +178,8 @@ export const EditDocumentForm = ({
       stepIndex: 3,
     },
     subject: {
-      title: msg`Add Subject`,
-      description: msg`Add the subject and message you wish to send to signers.`,
+      title: msg`Distribute Document`,
+      description: msg`Choose how the document will reach recipients`,
       stepIndex: 4,
     },
   };
@@ -307,7 +308,7 @@ export const EditDocumentForm = ({
   };
 
   const onAddSubjectFormSubmit = async (data: TAddSubjectFormSchema) => {
-    const { subject, message } = data.meta;
+    const { subject, message, distributionMethod, emailSettings } = data.meta;
 
     try {
       await sendDocument({
@@ -316,16 +317,31 @@ export const EditDocumentForm = ({
         meta: {
           subject,
           message,
+          distributionMethod,
+          emailSettings,
         },
       });
 
-      toast({
-        title: _(msg`Document sent`),
-        description: _(msg`Your document has been sent successfully.`),
-        duration: 5000,
-      });
+      if (distributionMethod === DocumentDistributionMethod.EMAIL) {
+        toast({
+          title: _(msg`Document sent`),
+          description: _(msg`Your document has been sent successfully.`),
+          duration: 5000,
+        });
 
-      router.push(documentRootPath);
+        router.push(documentRootPath);
+        return;
+      }
+
+      if (document.status === DocumentStatus.DRAFT) {
+        toast({
+          title: _(msg`Links Generated`),
+          description: _(msg`Signing links have been generated for this document.`),
+          duration: 5000,
+        });
+      } else {
+        router.push(`${documentRootPath}/${document.id}`);
+      }
     } catch (err) {
       console.error(err);
 

@@ -26,8 +26,10 @@ import { getI18nInstance } from '../../client-only/providers/i18n.server';
 import { NEXT_PUBLIC_WEBAPP_URL } from '../../constants/app';
 import { FROM_ADDRESS, FROM_NAME } from '../../constants/email';
 import { AppError, AppErrorCode } from '../../errors/app-error';
+import { extractDerivedDocumentEmailSettings } from '../../types/document-email';
 import { canRecipientBeModified } from '../../utils/recipients';
 import { renderEmailWithI18N } from '../../utils/render-email-with-i18n';
+import { teamGlobalSettingsToBranding } from '../../utils/team-global-settings-to-branding';
 
 export interface SetRecipientsForDocumentOptions {
   userId: number;
@@ -66,6 +68,11 @@ export const setRecipientsForDocument = async ({
     include: {
       Field: true,
       documentMeta: true,
+      team: {
+        include: {
+          teamGlobalSettings: true,
+        },
+      },
     },
   });
 
@@ -280,10 +287,14 @@ export const setRecipientsForDocument = async ({
       });
     });
 
+    const isRecipientRemovedEmailEnabled = extractDerivedDocumentEmailSettings(
+      document.documentMeta,
+    ).recipientRemoved;
+
     // Send emails to deleted recipients.
     await Promise.all(
       removedRecipients.map(async (recipient) => {
-        if (recipient.sendStatus !== SendStatus.SENT) {
+        if (recipient.sendStatus !== SendStatus.SENT || !isRecipientRemovedEmailEnabled) {
           return;
         }
 
@@ -294,6 +305,10 @@ export const setRecipientsForDocument = async ({
           inviterName: user.name || undefined,
           assetBaseUrl,
         });
+
+        const branding = document.team?.teamGlobalSettings
+          ? teamGlobalSettingsToBranding(document.team.teamGlobalSettings)
+          : undefined;
 
         const [html, text] = await Promise.all([
           renderEmailWithI18N(template, { lang: document.documentMeta?.language }),

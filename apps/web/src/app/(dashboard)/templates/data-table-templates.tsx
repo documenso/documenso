@@ -145,6 +145,7 @@ export const TemplatesDataTable = ({
               <UseTemplateDialog
                 templateId={row.original.id}
                 templateSigningOrder={row.original.templateMeta?.signingOrder}
+                documentDistributionMethod={row.original.templateMeta?.distributionMethod}
                 recipients={row.original.Recipient}
                 documentRootPath={documentRootPath}
               />

@@ -462,6 +462,45 @@ test('[TEAMS]: check document visibility based on team member role', async ({ pa
   }
 });
 
+test('[TEAMS]: ensure document owner can see document regardless of visibility', async ({
+  page,
+}) => {
+  const team = await seedTeam();
+
+  // Seed a member user
+  const memberUser = await seedTeamMember({
+    teamId: team.id,
+    role: TeamMemberRole.MEMBER,
+  });
+
+  // Seed a document with ADMIN visibility but make the member user a recipient
+  await seedDocuments([
+    {
+      sender: memberUser,
+      recipients: [],
+      type: DocumentStatus.COMPLETED,
+      documentOptions: {
+        teamId: team.id,
+        visibility: 'ADMIN',
+        title: 'Admin Document with Member Document Owner',
+      },
+    },
+  ]);
+
+  await apiSignin({
+    page,
+    email: memberUser.email,
+    redirectPath: `/t/${team.url}/documents?status=COMPLETED`,
+  });
+
+  // Check that the member user can see the document
+  await expect(
+    page.getByRole('link', { name: 'Admin Document with Member Document Owner', exact: true }),
+  ).toBeVisible();
+
+  await apiSignout({ page });
+});
+
 test('[TEAMS]: ensure recipient can see document regardless of visibility', async ({ page }) => {
   const team = await seedTeam();
 

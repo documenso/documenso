@@ -1,5 +1,7 @@
 import { z } from 'zod';
 
+import { DocumentVisibility } from '@documenso/prisma/client';
+
 import { sendTeamDeleteEmail } from '../../../server-only/team/delete-team';
 import type { JobDefinition } from '../../client/_internal/job';
 
@@ -10,6 +12,19 @@ const SEND_TEAM_DELETED_EMAIL_JOB_DEFINITION_SCHEMA = z.object({
     name: z.string(),
     url: z.string(),
     ownerUserId: z.number(),
+    teamGlobalSettings: z
+      .object({
+        documentVisibility: z.nativeEnum(DocumentVisibility),
+        documentLanguage: z.string(),
+        includeSenderDetails: z.boolean(),
+        brandingEnabled: z.boolean(),
+        brandingLogo: z.string(),
+        brandingUrl: z.string(),
+        brandingCompanyDetails: z.string(),
+        brandingHidePoweredBy: z.boolean(),
+        teamId: z.number(),
+      })
+      .nullish(),
   }),
   members: z.array(
     z.object({
@@ -35,8 +50,7 @@ export const SEND_TEAM_DELETED_EMAIL_JOB_DEFINITION = {
       await io.runTask(`send-team-deleted-email--${team.url}_${member.id}`, async () => {
         await sendTeamDeleteEmail({
           email: member.email,
-          teamName: team.name,
-          teamUrl: team.url,
+          team,
           isOwner: member.id === team.ownerUserId,
         });
       });

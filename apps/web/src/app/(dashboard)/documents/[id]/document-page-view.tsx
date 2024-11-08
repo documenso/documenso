@@ -74,7 +74,7 @@ export const DocumentPageView = async ({ params, team }: DocumentPageViewProps) 
   const isRecipient = document?.Recipient.find((recipient) => recipient.email === user.email);
   let canAccessDocument = true;
 
-  if (team && !isRecipient) {
+  if (team && !isRecipient && document?.userId !== user.id) {
     canAccessDocument = match([documentVisibility, currentTeamMemberRole])
       .with([DocumentVisibility.EVERYONE, TeamMemberRole.ADMIN], () => true)
       .with([DocumentVisibility.EVERYONE, TeamMemberRole.MANAGER], () => true)

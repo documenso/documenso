@@ -1,5 +1,6 @@
 import { nanoid } from '@documenso/lib/universal/id';
 import { prisma } from '@documenso/prisma';
+import type { DocumentDistributionMethod } from '@documenso/prisma/client';
 import {
   DocumentSigningOrder,
   DocumentSource,
@@ -62,6 +63,7 @@ export type CreateDocumentFromTemplateOptions = {
     redirectUrl?: string;
     signingOrder?: DocumentSigningOrder;
     language?: SupportedLanguageCodes;
+    distributionMethod?: DocumentDistributionMethod;
   };
   requestMetadata?: RequestMetadata;
 };
@@ -108,6 +110,11 @@ export const createDocumentFromTemplate = async ({
       },
       templateDocumentData: true,
       templateMeta: true,
+      team: {
+        include: {
+          teamGlobalSettings: true,
+        },
+      },
     },
   });
 
@@ -169,6 +176,7 @@ export const createDocumentFromTemplate = async ({
           globalAccessAuth: templateAuthOptions.globalAccessAuth,
           globalActionAuth: templateAuthOptions.globalActionAuth,
         }),
+        visibility: template.team?.teamGlobalSettings?.documentVisibility,
         documentMeta: {
           create: {
             subject: override?.subject || template.templateMeta?.subject,
@@ -177,11 +185,17 @@ export const createDocumentFromTemplate = async ({
             password: override?.password || template.templateMeta?.password,
             dateFormat: override?.dateFormat || template.templateMeta?.dateFormat,
             redirectUrl: override?.redirectUrl || template.templateMeta?.redirectUrl,
+            distributionMethod:
+              override?.distributionMethod || template.templateMeta?.distributionMethod,
+            emailSettings: template.templateMeta?.emailSettings || undefined,
             signingOrder:
               override?.signingOrder ||
               template.templateMeta?.signingOrder ||
               DocumentSigningOrder.PARALLEL,
-            language: override?.language || template.templateMeta?.language,
+            language:
+              override?.language ||
+              template.templateMeta?.language ||
+              template.team?.teamGlobalSettings?.documentLanguage,
           },
         },
         Recipient: {

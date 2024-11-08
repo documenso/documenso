@@ -17,14 +17,16 @@ import { getI18nInstance } from '../../../client-only/providers/i18n.server';
 import { NEXT_PUBLIC_WEBAPP_URL } from '../../../constants/app';
 import { FROM_ADDRESS, FROM_NAME } from '../../../constants/email';
 import {
-  RECIPIENT_ROLES_DESCRIPTION_ENG,
+  RECIPIENT_ROLES_DESCRIPTION,
   RECIPIENT_ROLE_TO_EMAIL_TYPE,
 } from '../../../constants/recipient-roles';
 import { DOCUMENT_AUDIT_LOG_TYPE } from '../../../types/document-audit-logs';
+import { extractDerivedDocumentEmailSettings } from '../../../types/document-email';
 import { ZRequestMetadataSchema } from '../../../universal/extract-request-metadata';
 import { createDocumentAuditLogData } from '../../../utils/document-audit-logs';
 import { renderCustomEmailTemplate } from '../../../utils/render-custom-email-template';
 import { renderEmailWithI18N } from '../../../utils/render-email-with-i18n';
+import { teamGlobalSettingsToBranding } from '../../../utils/team-global-settings-to-branding';
 import { type JobDefinition } from '../../client/_internal/job';
 
 const SEND_SIGNING_EMAIL_JOB_DEFINITION_ID = 'send.signing.requested.email';
@@ -64,6 +66,7 @@ export const SEND_SIGNING_EMAIL_JOB_DEFINITION = {
             select: {
               teamEmail: true,
               name: true,
+              teamGlobalSettings: true,
             },
           },
         },
@@ -81,6 +84,14 @@ export const SEND_SIGNING_EMAIL_JOB_DEFINITION = {
       return;
     }
 
+    const isRecipientSigningRequestEmailEnabled = extractDerivedDocumentEmailSettings(
+      document.documentMeta,
+    ).recipientSigningRequest;
+
+    if (!isRecipientSigningRequestEmailEnabled) {
+      return;
+    }
+
     const customEmail = document?.documentMeta;
     const isDirectTemplate = document.source === DocumentSource.TEMPLATE_DIRECT_LINK;
     const isTeamDocument = document.teamId !== null;
@@ -89,10 +100,12 @@ export const SEND_SIGNING_EMAIL_JOB_DEFINITION = {
 
     const { email, name } = recipient;
     const selfSigner = email === user.email;
-    const recipientActionVerb =
-      RECIPIENT_ROLES_DESCRIPTION_ENG[recipient.role].actionVerb.toLowerCase();
 
     const i18n = await getI18nInstance(documentMeta?.language);
+
+    const recipientActionVerb = i18n
+      ._(RECIPIENT_ROLES_DESCRIPTION[recipient.role].actionVerb)
+      .toLowerCase();
 
     let emailMessage = customEmail?.message || '';
     let emailSubject = i18n._(msg`Please ${recipientActionVerb} this document`);
@@ -115,11 +128,15 @@ export const SEND_SIGNING_EMAIL_JOB_DEFINITION = {
 
     if (isTeamDocument && team) {
       emailSubject = i18n._(msg`${team.name} invited you to ${recipientActionVerb} a document`);
-      emailMessage =
-        customEmail?.message ||
-        i18n._(
-          msg`${user.name} on behalf of ${team.name} has invited you to ${recipientActionVerb} the document "${document.title}".`,
+      emailMessage = customEmail?.message ?? '';
+
+      if (!emailMessage) {
+        emailMessage = i18n._(
+          team.teamGlobalSettings?.includeSenderDetails
+            ? msg`${user.name} on behalf of ${team.name} has invited you to ${recipientActionVerb} the document "${document.title}".`
+            : msg`${team.name} has invited you to ${recipientActionVerb} the document "${document.title}".`,
         );
+      }
     }
 
     const customEmailTemplate = {
@@ -143,13 +160,19 @@ export const SEND_SIGNING_EMAIL_JOB_DEFINITION = {
       isTeamInvite: isTeamDocument,
       teamName: team?.name,
       teamEmail: team?.teamEmail?.email,
+      includeSenderDetails: team?.teamGlobalSettings?.includeSenderDetails,
     });
 
     await io.runTask('send-signing-email', async () => {
+      const branding = document.team?.teamGlobalSettings
+        ? teamGlobalSettingsToBranding(document.team.teamGlobalSettings)
+        : undefined;
+
       const [html, text] = await Promise.all([
-        renderEmailWithI18N(template, { lang: documentMeta?.language }),
+        renderEmailWithI18N(template, { lang: documentMeta?.language, branding }),
         renderEmailWithI18N(template, {
           lang: documentMeta?.language,
+          branding,
           plainText: true,
         }),
       ]);
