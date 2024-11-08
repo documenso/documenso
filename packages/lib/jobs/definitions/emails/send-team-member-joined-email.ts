@@ -1,3 +1,5 @@
+import { createElement } from 'react';
+
 import { msg } from '@lingui/macro';
 import { z } from 'zod';
 
@@ -66,7 +68,7 @@ export const SEND_TEAM_MEMBER_JOINED_EMAIL_JOB_DEFINITION = {
       await io.runTask(
         `send-team-member-joined-email--${invitedMember.id}_${member.id}`,
         async () => {
-          const emailContent = TeamJoinEmailTemplate({
+          const emailContent = createElement(TeamJoinEmailTemplate, {
             assetBaseUrl: WEBAPP_BASE_URL,
             baseUrl: WEBAPP_BASE_URL,
             memberName: invitedMember.user.name || '',
@@ -79,20 +81,22 @@ export const SEND_TEAM_MEMBER_JOINED_EMAIL_JOB_DEFINITION = {
             ? teamGlobalSettingsToBranding(team.teamGlobalSettings)
             : undefined;
 
+          const lang = team.teamGlobalSettings?.documentLanguage;
+
           // !: Replace with the actual language of the recipient later
           const [html, text] = await Promise.all([
             renderEmailWithI18N(emailContent, {
-              lang: team.teamGlobalSettings?.documentLanguage,
+              lang,
               branding,
             }),
             renderEmailWithI18N(emailContent, {
-              lang: team.teamGlobalSettings?.documentLanguage,
+              lang,
               branding,
               plainText: true,
             }),
           ]);
 
-          const i18n = await getI18nInstance();
+          const i18n = await getI18nInstance(lang);
 
           await mailer.sendMail({
             to: member.user.email,

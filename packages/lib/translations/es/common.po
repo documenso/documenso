@@ -313,7 +313,7 @@ msgstr "Se eliminó un campo"
 msgid "A field was updated"
 msgstr "Se actualizó un campo"
 
-#: packages/lib/jobs/definitions/emails/send-team-member-joined-email.ts:103
+#: packages/lib/jobs/definitions/emails/send-team-member-joined-email.ts:107
 msgid "A new member has joined your team"
 msgstr "Un nuevo miembro se ha unido a tu equipo"
 
@@ -341,7 +341,7 @@ msgstr ""
 msgid "A team member has joined a team on Documenso"
 msgstr "Un miembro del equipo se ha unido a un equipo en Documenso"
 
-#: packages/lib/jobs/definitions/emails/send-team-member-left-email.ts:92
+#: packages/lib/jobs/definitions/emails/send-team-member-left-email.ts:96
 msgid "A team member has left {0}"
 msgstr "Un miembro del equipo ha dejado {0}"
 

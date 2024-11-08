@@ -1,3 +1,5 @@
+import { createElement } from 'react';
+
 import { msg } from '@lingui/macro';
 import { z } from 'zod';
 
@@ -56,7 +58,7 @@ export const SEND_TEAM_MEMBER_LEFT_EMAIL_JOB_DEFINITION = {
 
     for (const member of team.members) {
       await io.runTask(`send-team-member-left-email--${oldMember.id}_${member.id}`, async () => {
-        const emailContent = TeamJoinEmailTemplate({
+        const emailContent = createElement(TeamJoinEmailTemplate, {
           assetBaseUrl: WEBAPP_BASE_URL,
           baseUrl: WEBAPP_BASE_URL,
           memberName: oldMember.name || '',
@@ -69,19 +71,21 @@ export const SEND_TEAM_MEMBER_LEFT_EMAIL_JOB_DEFINITION = {
           ? teamGlobalSettingsToBranding(team.teamGlobalSettings)
           : undefined;
 
+        const lang = team.teamGlobalSettings?.documentLanguage;
+
         const [html, text] = await Promise.all([
           renderEmailWithI18N(emailContent, {
-            lang: team.teamGlobalSettings?.documentLanguage,
+            lang,
             branding,
           }),
           renderEmailWithI18N(emailContent, {
-            lang: team.teamGlobalSettings?.documentLanguage,
+            lang,
             branding,
             plainText: true,
           }),
         ]);
 
-        const i18n = await getI18nInstance();
+        const i18n = await getI18nInstance(lang);
 
         await mailer.sendMail({
           to: member.user.email,
