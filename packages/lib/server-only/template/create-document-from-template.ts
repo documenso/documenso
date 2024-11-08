@@ -110,6 +110,11 @@ export const createDocumentFromTemplate = async ({
       },
       templateDocumentData: true,
       templateMeta: true,
+      team: {
+        include: {
+          teamGlobalSettings: true,
+        },
+      },
     },
   });
 
@@ -171,6 +176,7 @@ export const createDocumentFromTemplate = async ({
           globalAccessAuth: templateAuthOptions.globalAccessAuth,
           globalActionAuth: templateAuthOptions.globalActionAuth,
         }),
+        visibility: template.team?.teamGlobalSettings?.documentVisibility,
         documentMeta: {
           create: {
             subject: override?.subject || template.templateMeta?.subject,
@@ -186,7 +192,10 @@ export const createDocumentFromTemplate = async ({
               override?.signingOrder ||
               template.templateMeta?.signingOrder ||
               DocumentSigningOrder.PARALLEL,
-            language: override?.language || template.templateMeta?.language,
+            language:
+              override?.language ||
+              template.templateMeta?.language ||
+              template.team?.teamGlobalSettings?.documentLanguage,
           },
         },
         Recipient: {

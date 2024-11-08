@@ -16,6 +16,7 @@ import { getFile } from '../../universal/upload/get-file';
 import { createDocumentAuditLogData } from '../../utils/document-audit-logs';
 import { renderCustomEmailTemplate } from '../../utils/render-custom-email-template';
 import { renderEmailWithI18N } from '../../utils/render-email-with-i18n';
+import { teamGlobalSettingsToBranding } from '../../utils/team-global-settings-to-branding';
 
 export interface SendDocumentOptions {
   documentId: number;
@@ -36,6 +37,7 @@ export const sendCompletedEmail = async ({ documentId, requestMetadata }: SendDo
         select: {
           id: true,
           url: true,
+          teamGlobalSettings: true,
         },
       },
     },
@@ -82,9 +84,17 @@ export const sendCompletedEmail = async ({ documentId, requestMetadata }: SendDo
       downloadLink: documentOwnerDownloadLink,
     });
 
+    const branding = document.team?.teamGlobalSettings
+      ? teamGlobalSettingsToBranding(document.team.teamGlobalSettings)
+      : undefined;
+
     const [html, text] = await Promise.all([
-      renderEmailWithI18N(template, { lang: document.documentMeta?.language }),
-      renderEmailWithI18N(template, { lang: document.documentMeta?.language, plainText: true }),
+      renderEmailWithI18N(template, { lang: document.documentMeta?.language, branding }),
+      renderEmailWithI18N(template, {
+        lang: document.documentMeta?.language,
+        branding,
+        plainText: true,
+      }),
     ]);
 
     await mailer.sendMail({
@@ -151,9 +161,17 @@ export const sendCompletedEmail = async ({ documentId, requestMetadata }: SendDo
             : undefined,
       });
 
+      const branding = document.team?.teamGlobalSettings
+        ? teamGlobalSettingsToBranding(document.team.teamGlobalSettings)
+        : undefined;
+
       const [html, text] = await Promise.all([
-        renderEmailWithI18N(template, { lang: document.documentMeta?.language }),
-        renderEmailWithI18N(template, { lang: document.documentMeta?.language, plainText: true }),
+        renderEmailWithI18N(template, { lang: document.documentMeta?.language, branding }),
+        renderEmailWithI18N(template, {
+          lang: document.documentMeta?.language,
+          branding,
+          plainText: true,
+        }),
       ]);
 
       await mailer.sendMail({

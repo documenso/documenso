@@ -508,6 +508,21 @@ enum TeamMemberInviteStatus {
   DECLINED
 }
 
+model TeamGlobalSettings {
+  teamId               Int                @unique
+  documentVisibility   DocumentVisibility @default(EVERYONE)
+  documentLanguage     String             @default("en")
+  includeSenderDetails Boolean            @default(true)
+
+  brandingEnabled        Boolean @default(false)
+  brandingLogo           String  @default("")
+  brandingUrl            String  @default("")
+  brandingCompanyDetails String  @default("")
+  brandingHidePoweredBy  Boolean @default(false)
+
+  team Team @relation(fields: [teamId], references: [id], onDelete: Cascade)
+}
+
 model Team {
   id            Int      @id @default(autoincrement())
   name          String
@@ -522,6 +537,7 @@ model Team {
   teamEmail            TeamEmail?
   emailVerification    TeamEmailVerification?
   transferVerification TeamTransferVerification?
+  teamGlobalSettings   TeamGlobalSettings?
   avatarImage          AvatarImage?              @relation(fields: [avatarImageId], references: [id], onDelete: SetNull)
 
   profile      TeamProfile?

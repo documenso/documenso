@@ -1,11 +1,18 @@
-import * as reactEmail from '@react-email/render';
+import * as ReactEmail from '@react-email/render';
 
 import config from '@documenso/tailwind-config';
 
 import { Tailwind } from './components';
+import { BrandingProvider, type BrandingSettings } from './providers/branding';
 
-export const render: typeof reactEmail.render = (element, options) => {
-  return reactEmail.render(
+export type RenderOptions = ReactEmail.Options & {
+  branding?: BrandingSettings;
+};
+
+export const render = (element: React.ReactNode, options?: RenderOptions) => {
+  const { branding, ...otherOptions } = options ?? {};
+
+  return ReactEmail.render(
     <Tailwind
       config={{
         theme: {
@@ -15,14 +22,16 @@ export const render: typeof reactEmail.render = (element, options) => {
         },
       }}
     >
-      {element}
+      <BrandingProvider branding={branding}>{element}</BrandingProvider>
     </Tailwind>,
-    options,
+    otherOptions,
   );
 };
 
-export const renderAsync: typeof reactEmail.renderAsync = async (element, options) => {
-  return reactEmail.renderAsync(
+export const renderAsync = async (element: React.ReactNode, options?: RenderOptions) => {
+  const { branding, ...otherOptions } = options ?? {};
+
+  return await ReactEmail.renderAsync(
     <Tailwind
       config={{
         theme: {
@@ -32,8 +41,8 @@ export const renderAsync: typeof reactEmail.renderAsync = async (element, option
         },
       }}
     >
-      {element}
+      <BrandingProvider branding={branding}>{element}</BrandingProvider>
     </Tailwind>,
-    options,
+    otherOptions,
   );
 };

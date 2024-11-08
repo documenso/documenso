@@ -18,6 +18,10 @@ msgstr ""
 "X-Crowdin-File: web.po\n"
 "X-Crowdin-File-ID: 8\n"
 
+#: apps/web/src/app/(teams)/t/[teamUrl]/settings/preferences/document-preferences.tsx:211
+msgid "\"{0}\" has invited you to sign \"example document\"."
+msgstr ""
+
 #: apps/web/src/app/(signing)/sign/[token]/date-field.tsx:69
 msgid "\"{0}\" will appear on the document as it has a timezone of \"{timezone}\"."
 msgstr "\"{0}\" aparecerá en el documento ya que tiene un huso horario de \"{timezone}\"."
@@ -25,6 +29,20 @@ msgstr "\"{0}\" aparecerá en el documento ya que tiene un huso horario de \"{ti
 #: apps/web/src/app/(dashboard)/documents/delete-document-dialog.tsx:60
 msgid "\"{documentTitle}\" has been successfully deleted"
 msgstr "\"{documentTitle}\" ha sido eliminado con éxito"
+
+#: apps/web/src/components/(teams)/forms/update-team-form.tsx:234
+msgid "\"{email}\" on behalf of \"{teamName}\" has invited you to sign \"example document\"."
+msgstr ""
+
+#: apps/web/src/app/(teams)/t/[teamUrl]/settings/preferences/document-preferences.tsx:209
+msgid ""
+"\"{placeholderEmail}\" on behalf of \"{0}\" has invited you to sign \"example\n"
+"document\"."
+msgstr ""
+
+#: apps/web/src/components/(teams)/forms/update-team-form.tsx:241
+msgid "\"{teamUrl}\" has invited you to sign \"example document\"."
+msgstr ""
 
 #: apps/web/src/app/(signing)/sign/[token]/signing-page-view.tsx:78
 msgid "({0}) has invited you to approve this document"
@@ -169,7 +187,7 @@ msgstr "Se ha enviado un correo electrónico de confirmación y debería llegar 
 msgid "A device capable of accessing, opening, and reading documents"
 msgstr "Un dispositivo capaz de acceder, abrir y leer documentos"
 
-#: apps/web/src/app/(dashboard)/templates/use-template-dialog.tsx:207
+#: apps/web/src/app/(dashboard)/templates/use-template-dialog.tsx:218
 msgid "A draft document will be created"
 msgstr "Se creará un documento borrador"
 
@@ -208,7 +226,7 @@ msgid "A unique URL to access your profile"
 msgstr "Una URL única para acceder a tu perfil"
 
 #: apps/web/src/components/(teams)/dialogs/create-team-dialog.tsx:206
-#: apps/web/src/components/(teams)/forms/update-team-form.tsx:139
+#: apps/web/src/components/(teams)/forms/update-team-form.tsx:179
 msgid "A unique URL to identify your team"
 msgstr "Una URL única para identificar tu equipo"
 
@@ -264,7 +282,7 @@ msgstr "Acción"
 msgid "Actions"
 msgstr "Acciones"
 
-#: apps/web/src/app/(teams)/t/[teamUrl]/settings/page.tsx:101
+#: apps/web/src/app/(teams)/t/[teamUrl]/settings/page.tsx:107
 #: apps/web/src/components/(teams)/tables/teams-member-page-data-table.tsx:76
 #: apps/web/src/components/(teams)/tables/user-settings-teams-page-data-table.tsx:71
 msgid "Active"
@@ -278,7 +296,7 @@ msgstr "Suscripciones Activas"
 msgid "Add"
 msgstr "Agregar"
 
-#: apps/web/src/app/(dashboard)/documents/[id]/edit-document.tsx:176
+#: apps/web/src/app/(dashboard)/documents/[id]/edit-document.tsx:177
 #: apps/web/src/app/(dashboard)/templates/[id]/edit/edit-template.tsx:88
 msgid "Add all relevant fields for each recipient."
 msgstr "Agrega todos los campos relevantes para cada destinatario."
@@ -299,7 +317,7 @@ msgstr "Agrega un autenticador para servir como método de autenticación secund
 msgid "Add email"
 msgstr "Agregar correo electrónico"
 
-#: apps/web/src/app/(dashboard)/documents/[id]/edit-document.tsx:175
+#: apps/web/src/app/(dashboard)/documents/[id]/edit-document.tsx:176
 #: apps/web/src/app/(dashboard)/templates/[id]/edit/edit-template.tsx:87
 msgid "Add Fields"
 msgstr "Agregar Campos"
@@ -317,33 +335,37 @@ msgstr "Agregar clave"
 msgid "Add Placeholders"
 msgstr "Agregar Marcadores de posición"
 
-#: apps/web/src/app/(dashboard)/documents/[id]/edit-document.tsx:170
+#: apps/web/src/app/(dashboard)/documents/[id]/edit-document.tsx:171
 msgid "Add Signers"
 msgstr "Agregar Firmantes"
 
 #: apps/web/src/app/(dashboard)/documents/[id]/edit-document.tsx:180
-msgid "Add Subject"
-msgstr "Agregar Asunto"
+#~ msgid "Add Subject"
+#~ msgstr "Agregar Asunto"
 
 #: apps/web/src/components/(teams)/dialogs/add-team-email-dialog.tsx:133
 msgid "Add team email"
 msgstr "Agregar correo electrónico del equipo"
 
-#: apps/web/src/app/(dashboard)/documents/[id]/edit-document.tsx:171
+#: apps/web/src/app/(dashboard)/documents/[id]/edit-document.tsx:172
 msgid "Add the people who will sign the document."
 msgstr "Agrega a las personas que firmarán el documento."
 
-#: apps/web/src/app/(dashboard)/templates/use-template-dialog.tsx:209
+#: apps/web/src/app/(dashboard)/templates/use-template-dialog.tsx:220
 msgid "Add the recipients to create the document with"
 msgstr "Agrega los destinatarios con los que crear el documento"
 
 #: apps/web/src/app/(dashboard)/documents/[id]/edit-document.tsx:181
-msgid "Add the subject and message you wish to send to signers."
-msgstr "Agrega el asunto y el mensaje que deseas enviar a los firmantes."
+#~ msgid "Add the subject and message you wish to send to signers."
+#~ msgstr "Agrega el asunto y el mensaje que deseas enviar a los firmantes."
 
 #: apps/web/src/components/(teams)/dialogs/create-team-checkout-dialog.tsx:152
 msgid "Adding and removing seats will adjust your invoice accordingly."
 msgstr "Agregar y eliminar asientos ajustará tu factura en consecuencia."
+
+#: apps/web/src/app/(teams)/t/[teamUrl]/settings/preferences/branding-preferences.tsx:303
+msgid "Additional brand information to display at the bottom of emails"
+msgstr ""
 
 #: apps/web/src/app/(dashboard)/admin/documents/[id]/page.tsx:59
 msgid "Admin Actions"
@@ -436,17 +458,17 @@ msgstr "Se ha enviado un correo electrónico solicitando la transferencia de est
 msgid "An error occurred"
 msgstr "Ocurrió un error"
 
-#: apps/web/src/app/(dashboard)/documents/[id]/edit-document.tsx:268
+#: apps/web/src/app/(dashboard)/documents/[id]/edit-document.tsx:269
 #: apps/web/src/app/(dashboard)/templates/[id]/edit/edit-template.tsx:201
 #: apps/web/src/app/(dashboard)/templates/[id]/edit/edit-template.tsx:235
 msgid "An error occurred while adding signers."
 msgstr "Ocurrió un error al agregar firmantes."
 
-#: apps/web/src/app/(dashboard)/documents/[id]/edit-document.tsx:303
+#: apps/web/src/app/(dashboard)/documents/[id]/edit-document.tsx:304
 msgid "An error occurred while adding the fields."
 msgstr "Ocurrió un error al agregar los campos."
 
-#: apps/web/src/app/(dashboard)/templates/use-template-dialog.tsx:165
+#: apps/web/src/app/(dashboard)/templates/use-template-dialog.tsx:176
 msgid "An error occurred while creating document from template."
 msgstr "Ocurrió un error al crear el documento a partir de la plantilla."
 
@@ -504,7 +526,7 @@ msgstr "Ocurrió un error al eliminar la firma."
 msgid "An error occurred while removing the text."
 msgstr "Ocurrió un error al eliminar el texto."
 
-#: apps/web/src/app/(dashboard)/documents/[id]/edit-document.tsx:334
+#: apps/web/src/app/(dashboard)/documents/[id]/edit-document.tsx:350
 msgid "An error occurred while sending the document."
 msgstr "Ocurrió un error al enviar el documento."
 
@@ -529,10 +551,14 @@ msgstr "Ocurrió un error al firmar el documento."
 msgid "An error occurred while trying to create a checkout session."
 msgstr "Ocurrió un error al intentar crear una sesión de pago."
 
-#: apps/web/src/app/(dashboard)/documents/[id]/edit-document.tsx:234
+#: apps/web/src/app/(dashboard)/documents/[id]/edit-document.tsx:235
 #: apps/web/src/app/(dashboard)/templates/[id]/edit/edit-template.tsx:170
 msgid "An error occurred while updating the document settings."
 msgstr "Ocurrió un error al actualizar la configuración del documento."
+
+#: apps/web/src/components/forms/team-document-settings.tsx:78
+#~ msgid "An error occurred while updating the global team settings."
+#~ msgstr ""
 
 #: apps/web/src/app/(signing)/sign/[token]/checkbox-field.tsx:213
 msgid "An error occurred while updating the signature."
@@ -564,7 +590,7 @@ msgstr "Ocurrió un error al subir tu documento."
 #: apps/web/src/components/(teams)/dialogs/transfer-team-dialog.tsx:116
 #: apps/web/src/components/(teams)/dialogs/update-team-email-dialog.tsx:89
 #: apps/web/src/components/(teams)/dialogs/update-team-member-dialog.tsx:100
-#: apps/web/src/components/(teams)/forms/update-team-form.tsx:94
+#: apps/web/src/components/(teams)/forms/update-team-form.tsx:134
 #: apps/web/src/components/forms/avatar-image.tsx:94
 #: apps/web/src/components/forms/avatar-image.tsx:122
 #: apps/web/src/components/forms/password.tsx:84
@@ -606,8 +632,8 @@ msgstr "Cualquier estado"
 #: apps/web/src/app/(teams)/t/[teamUrl]/settings/tokens/page.tsx:56
 #: apps/web/src/components/(dashboard)/settings/layout/desktop-nav.tsx:90
 #: apps/web/src/components/(dashboard)/settings/layout/mobile-nav.tsx:93
-#: apps/web/src/components/(teams)/settings/layout/desktop-nav.tsx:81
-#: apps/web/src/components/(teams)/settings/layout/mobile-nav.tsx:89
+#: apps/web/src/components/(teams)/settings/layout/desktop-nav.tsx:96
+#: apps/web/src/components/(teams)/settings/layout/mobile-nav.tsx:105
 msgid "API Tokens"
 msgstr "Tokens de API"
 
@@ -677,7 +703,7 @@ msgstr "Avatar"
 msgid "Avatar Updated"
 msgstr "Avatar actualizado"
 
-#: apps/web/src/app/(teams)/t/[teamUrl]/settings/page.tsx:121
+#: apps/web/src/app/(teams)/t/[teamUrl]/settings/page.tsx:127
 msgid "Awaiting email confirmation"
 msgstr "Esperando confirmación de correo electrónico"
 
@@ -716,10 +742,18 @@ msgstr "Detalles básicos"
 #: apps/web/src/app/(teams)/t/[teamUrl]/settings/billing/page.tsx:61
 #: apps/web/src/components/(dashboard)/settings/layout/desktop-nav.tsx:117
 #: apps/web/src/components/(dashboard)/settings/layout/mobile-nav.tsx:120
-#: apps/web/src/components/(teams)/settings/layout/desktop-nav.tsx:108
-#: apps/web/src/components/(teams)/settings/layout/mobile-nav.tsx:116
+#: apps/web/src/components/(teams)/settings/layout/desktop-nav.tsx:123
+#: apps/web/src/components/(teams)/settings/layout/mobile-nav.tsx:132
 msgid "Billing"
 msgstr "Facturación"
+
+#: apps/web/src/app/(teams)/t/[teamUrl]/settings/preferences/page.tsx:42
+msgid "Branding Preferences"
+msgstr ""
+
+#: apps/web/src/app/(teams)/t/[teamUrl]/settings/preferences/branding-preferences.tsx:102
+msgid "Branding preferences updated"
+msgstr ""
 
 #: apps/web/src/app/(dashboard)/settings/security/activity/user-security-activity-data-table.tsx:99
 #: apps/web/src/app/(internal)/%5F%5Fhtmltopdf/audit-log/data-table.tsx:48
@@ -806,6 +840,10 @@ msgstr "Cancelado por el usuario"
 msgid "Charts"
 msgstr "Gráficas"
 
+#: apps/web/src/app/(teams)/t/[teamUrl]/settings/documents/page.tsx:32
+#~ msgid "Check out the documentaton for the <0>global team settings</0>."
+#~ msgstr ""
+
 #: apps/web/src/components/(teams)/dialogs/create-team-checkout-dialog.tsx:179
 msgid "Checkout"
 msgstr "Checkout"
@@ -817,6 +855,10 @@ msgstr "Elija un destinatario existente de abajo para continuar"
 #: apps/web/src/app/(dashboard)/templates/template-direct-link-dialog.tsx:267
 msgid "Choose Direct Link Recipient"
 msgstr "Elija el destinatario del enlace directo"
+
+#: apps/web/src/app/(dashboard)/documents/[id]/edit-document.tsx:182
+msgid "Choose how the document will reach recipients"
+msgstr ""
 
 #: apps/web/src/components/forms/token.tsx:200
 msgid "Choose..."
@@ -866,7 +908,7 @@ msgid "Click to insert field"
 msgstr "Haga clic para insertar campo"
 
 #: apps/web/src/app/(dashboard)/templates/new-template-dialog.tsx:126
-#: apps/web/src/app/(dashboard)/templates/use-template-dialog.tsx:345
+#: apps/web/src/app/(dashboard)/templates/use-template-dialog.tsx:389
 #: apps/web/src/app/(signing)/sign/[token]/document-action-auth-2fa.tsx:125
 #: apps/web/src/app/(signing)/sign/[token]/document-action-auth-passkey.tsx:138
 #: apps/web/src/app/(teams)/t/[teamUrl]/settings/team-transfer-status.tsx:121
@@ -911,7 +953,7 @@ msgstr "Documentos completados"
 msgid "Completed Documents"
 msgstr "Documentos Completados"
 
-#: apps/web/src/app/(dashboard)/documents/[id]/edit-document.tsx:166
+#: apps/web/src/app/(dashboard)/documents/[id]/edit-document.tsx:167
 msgid "Configure general settings for the document."
 msgstr "Configurar ajustes generales para el documento."
 
@@ -979,6 +1021,18 @@ msgstr "Continuar"
 msgid "Continue to login"
 msgstr "Continuar con el inicio de sesión"
 
+#: apps/web/src/app/(teams)/t/[teamUrl]/settings/preferences/document-preferences.tsx:173
+msgid "Controls the default language of an uploaded document. This will be used as the language in email communications with the recipients."
+msgstr ""
+
+#: apps/web/src/app/(teams)/t/[teamUrl]/settings/preferences/document-preferences.tsx:141
+msgid "Controls the default visibility of an uploaded document."
+msgstr ""
+
+#: apps/web/src/app/(teams)/t/[teamUrl]/settings/preferences/document-preferences.tsx:216
+msgid "Controls the formatting of the message that will be sent when inviting a recipient to sign a document. If a custom message has been provided while configuring the document, it will be used instead."
+msgstr ""
+
 #: apps/web/src/components/document/document-recipient-link-copy-dialog.tsx:128
 msgid "Copied"
 msgstr ""
@@ -1032,13 +1086,17 @@ msgstr "Crea un equipo para colaborar con los miembros de tu equipo."
 msgid "Create account"
 msgstr "Crear cuenta"
 
-#: apps/web/src/app/(dashboard)/templates/use-template-dialog.tsx:351
+#: apps/web/src/app/(dashboard)/templates/use-template-dialog.tsx:397
 msgid "Create and send"
 msgstr "Crear y enviar"
 
-#: apps/web/src/app/(dashboard)/templates/use-template-dialog.tsx:353
+#: apps/web/src/app/(dashboard)/templates/use-template-dialog.tsx:395
 msgid "Create as draft"
 msgstr "Crear como borrador"
+
+#: apps/web/src/app/(dashboard)/templates/use-template-dialog.tsx:355
+msgid "Create as pending"
+msgstr ""
 
 #: apps/web/src/app/(dashboard)/templates/[id]/template-direct-link-dialog-wrapper.tsx:37
 msgid "Create Direct Link"
@@ -1048,7 +1106,7 @@ msgstr "Crear enlace directo"
 msgid "Create Direct Signing Link"
 msgstr "Crear enlace de firma directo"
 
-#: apps/web/src/app/(dashboard)/templates/use-template-dialog.tsx:203
+#: apps/web/src/app/(dashboard)/templates/use-template-dialog.tsx:214
 msgid "Create document from template"
 msgstr "Crear documento a partir de la plantilla"
 
@@ -1060,6 +1118,10 @@ msgstr "Crear ahora"
 msgid "Create one automatically"
 msgstr "Crear uno automáticamente"
 
+#: apps/web/src/app/(dashboard)/templates/use-template-dialog.tsx:399
+msgid "Create signing links"
+msgstr ""
+
 #: apps/web/src/components/(dashboard)/layout/menu-switcher.tsx:181
 #: apps/web/src/components/(dashboard)/layout/menu-switcher.tsx:251
 #: apps/web/src/components/(teams)/dialogs/create-team-dialog.tsx:138
@@ -1070,6 +1132,10 @@ msgstr "Crear equipo"
 #: apps/web/src/components/(teams)/dialogs/create-team-dialog.tsx:226
 msgid "Create Team"
 msgstr "Crear Equipo"
+
+#: apps/web/src/app/(dashboard)/templates/use-template-dialog.tsx:362
+msgid "Create the document as pending and ready to sign."
+msgstr ""
 
 #: apps/web/src/components/forms/token.tsx:250
 #: apps/web/src/components/forms/token.tsx:259
@@ -1157,6 +1223,15 @@ msgstr "Rechazar"
 msgid "Declined team invitation"
 msgstr "Invitación de equipo rechazada"
 
+#: apps/web/src/app/(teams)/t/[teamUrl]/settings/preferences/document-preferences.tsx:153
+msgid "Default Document Language"
+msgstr ""
+
+#: apps/web/src/app/(teams)/t/[teamUrl]/settings/preferences/document-preferences.tsx:117
+#: apps/web/src/components/(teams)/forms/update-team-form.tsx:195
+msgid "Default Document Visibility"
+msgstr ""
+
 #: apps/web/src/app/(dashboard)/documents/delete-document-dialog.tsx:90
 msgid "delete"
 msgstr "eliminar"
@@ -1214,7 +1289,7 @@ msgstr "Eliminar Documento"
 msgid "Delete passkey"
 msgstr "Eliminar clave de paso"
 
-#: apps/web/src/app/(teams)/t/[teamUrl]/settings/page.tsx:191
+#: apps/web/src/app/(teams)/t/[teamUrl]/settings/page.tsx:197
 #: apps/web/src/components/(teams)/dialogs/delete-team-dialog.tsx:118
 msgid "Delete team"
 msgstr "Eliminar equipo"
@@ -1327,6 +1402,10 @@ msgstr "Deshabilitar la firma de enlace directo evitará que cualquiera acceda a
 msgid "Display your name and email in documents"
 msgstr "Mostrar su nombre y correo electrónico en documentos"
 
+#: apps/web/src/app/(dashboard)/documents/[id]/edit-document.tsx:181
+msgid "Distribute Document"
+msgstr ""
+
 #: apps/web/src/app/(dashboard)/templates/delete-template-dialog.tsx:63
 msgid "Do you want to delete this template?"
 msgstr "¿Desea eliminar esta plantilla?"
@@ -1364,7 +1443,7 @@ msgstr "Documento completado"
 msgid "Document Completed!"
 msgstr "¡Documento completado!"
 
-#: apps/web/src/app/(dashboard)/templates/use-template-dialog.tsx:154
+#: apps/web/src/app/(dashboard)/templates/use-template-dialog.tsx:156
 msgid "Document created"
 msgstr "Documento creado"
 
@@ -1404,7 +1483,7 @@ msgstr "ID del documento"
 msgid "Document inbox"
 msgstr "Bandeja de documentos"
 
-#: apps/web/src/app/(dashboard)/templates/data-table-templates.tsx:179
+#: apps/web/src/app/(dashboard)/templates/data-table-templates.tsx:180
 msgid "Document Limit Exceeded!"
 msgstr "¡Límite de documentos excedido!"
 
@@ -1424,6 +1503,10 @@ msgstr "El documento ya no está disponible para firmar"
 msgid "Document pending"
 msgstr "Documento pendiente"
 
+#: apps/web/src/app/(teams)/t/[teamUrl]/settings/preferences/document-preferences.tsx:91
+msgid "Document preferences updated"
+msgstr ""
+
 #: apps/web/src/app/(dashboard)/documents/_action-items/resend-document.tsx:97
 msgid "Document re-sent"
 msgstr "Documento reenviado"
@@ -1432,9 +1515,13 @@ msgstr "Documento reenviado"
 msgid "Document resealed"
 msgstr "Documento sellado nuevamente"
 
-#: apps/web/src/app/(dashboard)/documents/[id]/edit-document.tsx:323
+#: apps/web/src/app/(dashboard)/documents/[id]/edit-document.tsx:327
 msgid "Document sent"
 msgstr "Documento enviado"
+
+#: apps/web/src/app/(teams)/t/[teamUrl]/settings/documents/page.tsx:26
+#~ msgid "Document Settings"
+#~ msgstr ""
 
 #: apps/web/src/app/(signing)/sign/[token]/complete/page.tsx:132
 msgid "Document Signed"
@@ -1577,8 +1664,8 @@ msgstr "Divulgación de Firma Electrónica"
 #: apps/web/src/app/(dashboard)/admin/documents/[id]/recipient-item.tsx:166
 #: apps/web/src/app/(dashboard)/admin/users/[id]/page.tsx:114
 #: apps/web/src/app/(dashboard)/admin/users/data-table-users.tsx:71
-#: apps/web/src/app/(dashboard)/templates/use-template-dialog.tsx:254
-#: apps/web/src/app/(dashboard)/templates/use-template-dialog.tsx:261
+#: apps/web/src/app/(dashboard)/templates/use-template-dialog.tsx:265
+#: apps/web/src/app/(dashboard)/templates/use-template-dialog.tsx:272
 #: apps/web/src/app/(internal)/%5F%5Fhtmltopdf/certificate/page.tsx:122
 #: apps/web/src/app/(internal)/%5F%5Fhtmltopdf/certificate/page.tsx:129
 #: apps/web/src/app/(recipient)/d/[token]/configure-direct-template.tsx:118
@@ -1633,6 +1720,10 @@ msgstr "Habilitar 2FA"
 msgid "Enable Authenticator App"
 msgstr "Habilitar aplicación autenticadora"
 
+#: apps/web/src/app/(teams)/t/[teamUrl]/settings/preferences/branding-preferences.tsx:170
+msgid "Enable custom branding for all documents in this team."
+msgstr ""
+
 #: apps/web/src/app/(dashboard)/templates/template-direct-link-dialog.tsx:251
 msgid "Enable direct link signing"
 msgstr "Habilitar firma de enlace directo"
@@ -1658,6 +1749,10 @@ msgstr "Documento Adjunto"
 msgid "Ends On"
 msgstr "Termina en"
 
+#: apps/web/src/app/(teams)/t/[teamUrl]/settings/preferences/branding-preferences.tsx:295
+msgid "Enter your brand details"
+msgstr ""
+
 #: apps/web/src/app/(signing)/sign/[token]/complete/claim-account.tsx:137
 msgid "Enter your email"
 msgstr "Ingresa tu correo electrónico"
@@ -1676,10 +1771,10 @@ msgstr "Ingresa tu texto aquí"
 
 #: apps/web/src/app/(dashboard)/admin/documents/[id]/admin-actions.tsx:41
 #: apps/web/src/app/(dashboard)/admin/users/[id]/page.tsx:78
-#: apps/web/src/app/(dashboard)/documents/[id]/edit-document.tsx:233
-#: apps/web/src/app/(dashboard)/documents/[id]/edit-document.tsx:267
-#: apps/web/src/app/(dashboard)/documents/[id]/edit-document.tsx:302
-#: apps/web/src/app/(dashboard)/documents/[id]/edit-document.tsx:333
+#: apps/web/src/app/(dashboard)/documents/[id]/edit-document.tsx:234
+#: apps/web/src/app/(dashboard)/documents/[id]/edit-document.tsx:268
+#: apps/web/src/app/(dashboard)/documents/[id]/edit-document.tsx:303
+#: apps/web/src/app/(dashboard)/documents/[id]/edit-document.tsx:349
 #: apps/web/src/app/(dashboard)/documents/move-document-dialog.tsx:57
 #: apps/web/src/app/(dashboard)/documents/upload-document.tsx:106
 #: apps/web/src/app/(dashboard)/documents/upload-document.tsx:112
@@ -1688,7 +1783,7 @@ msgstr "Ingresa tu texto aquí"
 #: apps/web/src/app/(dashboard)/templates/[id]/edit/edit-template.tsx:234
 #: apps/web/src/app/(dashboard)/templates/duplicate-template-dialog.tsx:51
 #: apps/web/src/app/(dashboard)/templates/move-template-dialog.tsx:56
-#: apps/web/src/app/(dashboard)/templates/use-template-dialog.tsx:164
+#: apps/web/src/app/(dashboard)/templates/use-template-dialog.tsx:175
 #: apps/web/src/app/(signing)/sign/[token]/checkbox-field.tsx:122
 #: apps/web/src/app/(signing)/sign/[token]/checkbox-field.tsx:151
 #: apps/web/src/app/(signing)/sign/[token]/checkbox-field.tsx:212
@@ -1715,6 +1810,14 @@ msgstr "Ingresa tu texto aquí"
 msgid "Error"
 msgstr "Error"
 
+#: apps/web/src/components/forms/team-document-settings.tsx:77
+#~ msgid "Error updating global team settings"
+#~ msgstr ""
+
+#: apps/web/src/app/(teams)/t/[teamUrl]/settings/preferences/document-preferences.tsx:128
+msgid "Everyone can access and view the document"
+msgstr ""
+
 #: apps/web/src/app/(signing)/sign/[token]/complete/page.tsx:142
 msgid "Everyone has signed"
 msgstr "Todos han firmado"
@@ -1727,7 +1830,7 @@ msgstr "¡Todos han firmado! Recibirás una copia por correo electrónico del do
 msgid "Exceeded timeout"
 msgstr "Tiempo de espera excedido"
 
-#: apps/web/src/app/(teams)/t/[teamUrl]/settings/page.tsx:114
+#: apps/web/src/app/(teams)/t/[teamUrl]/settings/page.tsx:120
 msgid "Expired"
 msgstr "Expirado"
 
@@ -1776,13 +1879,22 @@ msgstr "¿Olvidaste tu contraseña?"
 msgid "Full Name"
 msgstr "Nombre completo"
 
-#: apps/web/src/app/(dashboard)/documents/[id]/edit-document.tsx:165
+#: apps/web/src/app/(dashboard)/documents/[id]/edit-document.tsx:166
 #: apps/web/src/app/(dashboard)/templates/[id]/edit/edit-template.tsx:77
 #: apps/web/src/app/(recipient)/d/[token]/direct-template.tsx:62
-#: apps/web/src/components/(teams)/settings/layout/desktop-nav.tsx:43
-#: apps/web/src/components/(teams)/settings/layout/mobile-nav.tsx:51
+#: apps/web/src/components/(teams)/settings/layout/desktop-nav.tsx:44
+#: apps/web/src/components/(teams)/settings/layout/mobile-nav.tsx:52
 msgid "General"
 msgstr "General"
+
+#: apps/web/src/components/(teams)/settings/layout/desktop-nav.tsx:57
+#: apps/web/src/components/(teams)/settings/layout/mobile-nav.tsx:65
+#~ msgid "Global Settings"
+#~ msgstr ""
+
+#: apps/web/src/components/forms/team-document-settings.tsx:69
+#~ msgid "Global Team Settings Updated"
+#~ msgstr ""
 
 #: apps/web/src/app/(profile)/p/[url]/not-found.tsx:30
 #: apps/web/src/app/(recipient)/d/[token]/not-found.tsx:33
@@ -1819,6 +1931,14 @@ msgstr "Aquí puedes editar tus datos personales."
 #: apps/web/src/app/(dashboard)/settings/security/page.tsx:35
 msgid "Here you can manage your password and security settings."
 msgstr "Aquí puedes gestionar tu contraseña y la configuración de seguridad."
+
+#: apps/web/src/app/(teams)/t/[teamUrl]/settings/preferences/page.tsx:43
+msgid "Here you can set preferences and defaults for branding."
+msgstr ""
+
+#: apps/web/src/app/(teams)/t/[teamUrl]/settings/preferences/page.tsx:34
+msgid "Here you can set preferences and defaults for your team."
+msgstr ""
 
 #: apps/web/src/app/(dashboard)/templates/template-direct-link-dialog.tsx:206
 msgid "Here's how it works:"
@@ -1870,6 +1990,10 @@ msgstr "Bandeja de entrada"
 #: apps/web/src/components/(dashboard)/common/command-menu.tsx:52
 msgid "Inbox documents"
 msgstr "Documentos en bandeja de entrada"
+
+#: apps/web/src/components/forms/team-document-settings.tsx:132
+#~ msgid "Include Sender Details"
+#~ msgstr ""
 
 #: apps/web/src/app/(dashboard)/documents/[id]/document-page-view-information.tsx:53
 #: apps/web/src/app/(dashboard)/templates/[id]/template-page-view-information.tsx:50
@@ -2037,6 +2161,10 @@ msgstr "¿Te gustaría tener tu propio perfil público con acuerdos?"
 msgid "Link template"
 msgstr "Enlace de plantilla"
 
+#: apps/web/src/app/(dashboard)/documents/[id]/edit-document.tsx:338
+msgid "Links Generated"
+msgstr ""
+
 #: apps/web/src/app/(dashboard)/settings/webhooks/page.tsx:79
 #: apps/web/src/app/(teams)/t/[teamUrl]/settings/webhooks/page.tsx:84
 msgid "Listening to {0}"
@@ -2161,8 +2289,8 @@ msgid "Member Since"
 msgstr "Miembro desde"
 
 #: apps/web/src/app/(teams)/t/[teamUrl]/settings/members/page.tsx:31
-#: apps/web/src/components/(teams)/settings/layout/desktop-nav.tsx:71
-#: apps/web/src/components/(teams)/settings/layout/mobile-nav.tsx:79
+#: apps/web/src/components/(teams)/settings/layout/desktop-nav.tsx:86
+#: apps/web/src/components/(teams)/settings/layout/mobile-nav.tsx:95
 msgid "Members"
 msgstr "Miembros"
 
@@ -2215,8 +2343,8 @@ msgstr "Mis plantillas"
 #: apps/web/src/app/(dashboard)/admin/users/data-table-users.tsx:66
 #: apps/web/src/app/(dashboard)/settings/security/passkeys/user-passkeys-data-table-actions.tsx:144
 #: apps/web/src/app/(dashboard)/settings/security/passkeys/user-passkeys-data-table.tsx:61
-#: apps/web/src/app/(dashboard)/templates/use-template-dialog.tsx:276
-#: apps/web/src/app/(dashboard)/templates/use-template-dialog.tsx:283
+#: apps/web/src/app/(dashboard)/templates/use-template-dialog.tsx:287
+#: apps/web/src/app/(dashboard)/templates/use-template-dialog.tsx:294
 #: apps/web/src/app/(signing)/sign/[token]/complete/claim-account.tsx:119
 #: apps/web/src/app/(signing)/sign/[token]/name-field.tsx:170
 #: apps/web/src/components/(teams)/dialogs/add-team-email-dialog.tsx:153
@@ -2350,6 +2478,14 @@ msgstr "Una vez confirmado, ocurrirá lo siguiente:"
 msgid "Once you have scanned the QR code or entered the code manually, enter the code provided by your authenticator app below."
 msgstr "Una vez que hayas escaneado el código QR o ingresado el código manualmente, ingresa el código proporcionado por tu aplicación de autenticación a continuación."
 
+#: apps/web/src/app/(teams)/t/[teamUrl]/settings/preferences/document-preferences.tsx:134
+msgid "Only admins can access and view the document"
+msgstr ""
+
+#: apps/web/src/app/(teams)/t/[teamUrl]/settings/preferences/document-preferences.tsx:131
+msgid "Only managers and above can access and view the document"
+msgstr ""
+
 #: apps/web/src/app/(profile)/p/[url]/not-found.tsx:19
 #: apps/web/src/app/(recipient)/d/[token]/not-found.tsx:19
 #: apps/web/src/app/(teams)/t/[teamUrl]/error.tsx:37
@@ -2373,7 +2509,7 @@ msgstr "O"
 msgid "Or continue with"
 msgstr "O continúa con"
 
-#: apps/web/src/app/(dashboard)/templates/use-template-dialog.tsx:330
+#: apps/web/src/app/(dashboard)/templates/use-template-dialog.tsx:341
 msgid "Otherwise, the document will be created as a draft."
 msgstr "De lo contrario, el documento se creará como un borrador."
 
@@ -2579,12 +2715,22 @@ msgid "Please type <0>{0}</0> to confirm."
 msgstr "Por favor, escribe <0>{0}</0> para confirmar."
 
 #: apps/web/src/components/(dashboard)/common/command-menu.tsx:214
+#: apps/web/src/components/(teams)/settings/layout/desktop-nav.tsx:58
+#: apps/web/src/components/(teams)/settings/layout/mobile-nav.tsx:67
 msgid "Preferences"
 msgstr "Preferencias"
+
+#: apps/web/src/app/(teams)/t/[teamUrl]/settings/preferences/document-preferences.tsx:204
+msgid "Preview"
+msgstr ""
 
 #: apps/web/src/app/(recipient)/d/[token]/direct-template.tsx:63
 msgid "Preview and configure template."
 msgstr "Vista previa y configurar plantilla."
+
+#: apps/web/src/app/(teams)/t/[teamUrl]/settings/preferences/document-preferences.tsx:130
+#~ msgid "Preview: {0}"
+#~ msgstr ""
 
 #: apps/web/src/app/(dashboard)/templates/data-table-templates.tsx:105
 #: apps/web/src/components/formatter/template-type.tsx:22
@@ -2623,8 +2769,8 @@ msgstr "Público"
 #: apps/web/src/app/(dashboard)/settings/public-profile/public-profile-page-view.tsx:42
 #: apps/web/src/components/(dashboard)/settings/layout/desktop-nav.tsx:50
 #: apps/web/src/components/(dashboard)/settings/layout/mobile-nav.tsx:53
-#: apps/web/src/components/(teams)/settings/layout/desktop-nav.tsx:57
-#: apps/web/src/components/(teams)/settings/layout/mobile-nav.tsx:65
+#: apps/web/src/components/(teams)/settings/layout/desktop-nav.tsx:72
+#: apps/web/src/components/(teams)/settings/layout/mobile-nav.tsx:81
 msgid "Public Profile"
 msgstr "Perfil Público"
 
@@ -2716,6 +2862,7 @@ msgstr "¿Recordaste tu contraseña? <0>Iniciar sesión</0>"
 #: apps/web/src/app/(dashboard)/templates/template-direct-link-dialog.tsx:431
 #: apps/web/src/app/(signing)/sign/[token]/signing-field-container.tsx:156
 #: apps/web/src/app/(signing)/sign/[token]/signing-field-container.tsx:180
+#: apps/web/src/app/(teams)/t/[teamUrl]/settings/preferences/branding-preferences.tsx:250
 #: apps/web/src/app/(teams)/t/[teamUrl]/settings/team-email-dropdown.tsx:89
 #: apps/web/src/components/(teams)/dialogs/remove-team-email-dialog.tsx:159
 #: apps/web/src/components/(teams)/tables/pending-user-teams-data-table-actions.tsx:54
@@ -2759,7 +2906,7 @@ msgstr "Reenviar correo de confirmación"
 msgid "Resend verification"
 msgstr "Reenviar verificación"
 
-#: apps/web/src/components/(teams)/forms/update-team-form.tsx:164
+#: apps/web/src/components/(teams)/forms/update-team-form.tsx:266
 #: apps/web/src/components/forms/public-profile-form.tsx:267
 msgid "Reset"
 msgstr "Restablecer"
@@ -2839,6 +2986,8 @@ msgstr "Roles"
 #: apps/web/src/app/(dashboard)/templates/template-direct-link-dialog.tsx:446
 #: apps/web/src/app/(signing)/sign/[token]/number-field.tsx:336
 #: apps/web/src/app/(signing)/sign/[token]/text-field.tsx:342
+#: apps/web/src/app/(teams)/t/[teamUrl]/settings/preferences/branding-preferences.tsx:312
+#: apps/web/src/app/(teams)/t/[teamUrl]/settings/preferences/document-preferences.tsx:228
 msgid "Save"
 msgstr "Guardar"
 
@@ -2909,9 +3058,14 @@ msgstr "Seleccionar clave de acceso"
 msgid "Send confirmation email"
 msgstr "Enviar correo de confirmación"
 
-#: apps/web/src/app/(dashboard)/templates/use-template-dialog.tsx:314
+#: apps/web/src/app/(dashboard)/templates/use-template-dialog.tsx:326
 msgid "Send document"
 msgstr "Enviar documento"
+
+#: apps/web/src/app/(teams)/t/[teamUrl]/settings/preferences/document-preferences.tsx:188
+#: apps/web/src/components/(teams)/forms/update-team-form.tsx:220
+msgid "Send on Behalf of Team"
+msgstr ""
 
 #: apps/web/src/app/(dashboard)/documents/_action-items/resend-document.tsx:191
 msgid "Send reminder"
@@ -3104,6 +3258,10 @@ msgstr "Iniciando sesión..."
 msgid "Signing Links"
 msgstr ""
 
+#: apps/web/src/app/(dashboard)/documents/[id]/edit-document.tsx:339
+msgid "Signing links have been generated for this document."
+msgstr ""
+
 #: apps/web/src/components/forms/signup.tsx:235
 msgid "Signing up..."
 msgstr "Registrándose..."
@@ -3147,6 +3305,7 @@ msgstr "Configuraciones del sitio"
 #: apps/web/src/app/(recipient)/d/[token]/signing-auth-page.tsx:27
 #: apps/web/src/app/(signing)/sign/[token]/signing-auth-page.tsx:38
 #: apps/web/src/app/(teams)/t/[teamUrl]/layout-billing-banner.tsx:53
+#: apps/web/src/app/(teams)/t/[teamUrl]/settings/preferences/branding-preferences.tsx:107
 #: apps/web/src/app/(teams)/t/[teamUrl]/settings/team-email-dropdown.tsx:39
 #: apps/web/src/app/(unauthenticated)/verify-email/[token]/page.tsx:61
 #: apps/web/src/app/embed/direct/[[...url]]/client.tsx:243
@@ -3182,6 +3341,10 @@ msgstr "Algo salió mal al enviar el correo de confirmación."
 #: apps/web/src/components/(teams)/dialogs/delete-team-dialog.tsx:96
 msgid "Something went wrong while updating the team billing subscription, please contact support."
 msgstr "Algo salió mal al actualizar la suscripción de facturación del equipo, por favor contacta al soporte."
+
+#: apps/web/src/app/(teams)/t/[teamUrl]/settings/preferences/document-preferences.tsx:96
+msgid "Something went wrong!"
+msgstr ""
 
 #: apps/web/src/app/(dashboard)/settings/security/passkeys/create-passkey-dialog.tsx:240
 #: apps/web/src/components/forms/2fa/view-recovery-codes-dialog.tsx:154
@@ -3247,7 +3410,7 @@ msgstr "Suscripciones"
 #: apps/web/src/components/(teams)/dialogs/transfer-team-dialog.tsx:108
 #: apps/web/src/components/(teams)/dialogs/update-team-email-dialog.tsx:79
 #: apps/web/src/components/(teams)/dialogs/update-team-member-dialog.tsx:92
-#: apps/web/src/components/(teams)/forms/update-team-form.tsx:68
+#: apps/web/src/components/(teams)/forms/update-team-form.tsx:106
 #: apps/web/src/components/(teams)/tables/pending-user-teams-data-table-actions.tsx:27
 #: apps/web/src/components/(teams)/tables/team-member-invites-data-table.tsx:62
 #: apps/web/src/components/(teams)/tables/team-member-invites-data-table.tsx:79
@@ -3278,8 +3441,8 @@ msgstr "Equipo"
 msgid "Team checkout"
 msgstr "Checkout del equipo"
 
-#: apps/web/src/app/(teams)/t/[teamUrl]/settings/page.tsx:61
-#: apps/web/src/app/(teams)/t/[teamUrl]/settings/page.tsx:140
+#: apps/web/src/app/(teams)/t/[teamUrl]/settings/page.tsx:67
+#: apps/web/src/app/(teams)/t/[teamUrl]/settings/page.tsx:146
 msgid "Team email"
 msgstr "Correo del equipo"
 
@@ -3322,7 +3485,7 @@ msgid "Team Member"
 msgstr "Miembro del equipo"
 
 #: apps/web/src/components/(teams)/dialogs/create-team-dialog.tsx:166
-#: apps/web/src/components/(teams)/forms/update-team-form.tsx:113
+#: apps/web/src/components/(teams)/forms/update-team-form.tsx:153
 msgid "Team Name"
 msgstr "Nombre del equipo"
 
@@ -3345,6 +3508,10 @@ msgstr "¡La transferencia de propiedad del equipo ya se ha completado!"
 #: apps/web/src/app/(unauthenticated)/team/verify/transfer/[token]/page.tsx:110
 msgid "Team ownership transferred!"
 msgstr "¡Propiedad del equipo transferida!"
+
+#: apps/web/src/app/(teams)/t/[teamUrl]/settings/preferences/page.tsx:33
+msgid "Team Preferences"
+msgstr ""
 
 #: apps/web/src/app/(dashboard)/settings/public-profile/public-profile-page-view.tsx:49
 msgid "Team Public Profile"
@@ -3371,7 +3538,7 @@ msgid "Team transfer request expired"
 msgstr "Solicitud de transferencia del equipo expirada"
 
 #: apps/web/src/components/(teams)/dialogs/create-team-dialog.tsx:196
-#: apps/web/src/components/(teams)/forms/update-team-form.tsx:129
+#: apps/web/src/components/(teams)/forms/update-team-form.tsx:169
 msgid "Team URL"
 msgstr "URL del equipo"
 
@@ -3472,7 +3639,7 @@ msgstr "El documento ha sido movido con éxito al equipo seleccionado."
 msgid "The document is now completed, please follow any instructions provided within the parent application."
 msgstr "El documento ahora está completado, por favor sigue cualquier instrucción proporcionada dentro de la aplicación principal."
 
-#: apps/web/src/app/(dashboard)/templates/use-template-dialog.tsx:171
+#: apps/web/src/app/(dashboard)/templates/use-template-dialog.tsx:182
 msgid "The document was created but could not be sent to recipients."
 msgstr "El documento fue creado pero no se pudo enviar a los destinatarios."
 
@@ -3480,7 +3647,7 @@ msgstr "El documento fue creado pero no se pudo enviar a los destinatarios."
 msgid "The document will be hidden from your account"
 msgstr "El documento será ocultado de tu cuenta"
 
-#: apps/web/src/app/(dashboard)/templates/use-template-dialog.tsx:322
+#: apps/web/src/app/(dashboard)/templates/use-template-dialog.tsx:334
 msgid "The document will be immediately sent to recipients if this is checked."
 msgstr "El documento se enviará inmediatamente a los destinatarios si esto está marcado."
 
@@ -3489,6 +3656,10 @@ msgstr "El documento se enviará inmediatamente a los destinatarios si esto est�
 #: apps/web/src/components/(dashboard)/settings/webhooks/create-webhook-dialog.tsx:203
 msgid "The events that will trigger a webhook to be sent to your URL."
 msgstr "Los eventos que activarán un webhook para ser enviado a tu URL."
+
+#: apps/web/src/app/(teams)/t/[teamUrl]/settings/documents/page.tsx:27
+#~ msgid "The global settings for the documents in your team account."
+#~ msgstr ""
 
 #: apps/web/src/app/(unauthenticated)/team/verify/transfer/[token]/page.tsx:114
 msgid "The ownership of team <0>{0}</0> has been successfully transferred to you."
@@ -3669,7 +3840,7 @@ msgstr "Este precio incluye un mínimo de 5 asientos."
 msgid "This session has expired. Please try again."
 msgstr "Esta sesión ha expirado. Por favor, inténtalo de nuevo."
 
-#: apps/web/src/app/(teams)/t/[teamUrl]/settings/page.tsx:195
+#: apps/web/src/app/(teams)/t/[teamUrl]/settings/page.tsx:201
 msgid "This team, and any associated data excluding billing invoices will be permanently deleted."
 msgstr "Este equipo, y cualquier dato asociado, excluyendo las facturas de facturación, serán eliminados permanentemente."
 
@@ -3686,7 +3857,7 @@ msgid "This token is invalid or has expired. Please contact your team for a new 
 msgstr "Este token es inválido o ha expirado. Por favor, contacta a tu equipo para una nueva invitación."
 
 #: apps/web/src/components/(teams)/dialogs/create-team-dialog.tsx:98
-#: apps/web/src/components/(teams)/forms/update-team-form.tsx:87
+#: apps/web/src/components/(teams)/forms/update-team-form.tsx:127
 msgid "This URL is already in use."
 msgstr "Esta URL ya está en uso."
 
@@ -3819,13 +3990,13 @@ msgstr "transferir {teamName}"
 msgid "Transfer ownership of this team to a selected team member."
 msgstr "Transferir la propiedad de este equipo a un miembro del equipo seleccionado."
 
-#: apps/web/src/app/(teams)/t/[teamUrl]/settings/page.tsx:169
+#: apps/web/src/app/(teams)/t/[teamUrl]/settings/page.tsx:175
 #: apps/web/src/components/(teams)/dialogs/transfer-team-dialog.tsx:147
 #: apps/web/src/components/(teams)/dialogs/transfer-team-dialog.tsx:156
 msgid "Transfer team"
 msgstr "Transferir equipo"
 
-#: apps/web/src/app/(teams)/t/[teamUrl]/settings/page.tsx:173
+#: apps/web/src/app/(teams)/t/[teamUrl]/settings/page.tsx:179
 msgid "Transfer the ownership of the team to another team member."
 msgstr "Transferir la propiedad del equipo a otro miembro del equipo."
 
@@ -4016,7 +4187,7 @@ msgstr "Actualizar destinatario"
 msgid "Update role"
 msgstr "Actualizar rol"
 
-#: apps/web/src/components/(teams)/forms/update-team-form.tsx:176
+#: apps/web/src/components/(teams)/forms/update-team-form.tsx:278
 msgid "Update team"
 msgstr "Actualizar equipo"
 
@@ -4055,6 +4226,10 @@ msgstr "Actualizando Su Información"
 msgid "Upload Avatar"
 msgstr "Subir avatar"
 
+#: apps/web/src/app/(teams)/t/[teamUrl]/settings/preferences/branding-preferences.tsx:256
+msgid "Upload your brand logo (max 5MB, JPG, PNG, or WebP)"
+msgstr ""
+
 #: apps/web/src/app/(dashboard)/documents/[id]/document-page-view-information.tsx:31
 #: apps/web/src/app/(dashboard)/templates/[id]/template-page-view-information.tsx:30
 msgid "Uploaded by"
@@ -4086,7 +4261,7 @@ msgstr "Usar Autenticador"
 msgid "Use Backup Code"
 msgstr "Usar Código de Respaldo"
 
-#: apps/web/src/app/(dashboard)/templates/use-template-dialog.tsx:196
+#: apps/web/src/app/(dashboard)/templates/use-template-dialog.tsx:207
 msgid "Use Template"
 msgstr "Usar Plantilla"
 
@@ -4180,7 +4355,7 @@ msgstr "Ver Códigos"
 msgid "View Document"
 msgstr "Ver Documento"
 
-#: apps/web/src/app/(teams)/t/[teamUrl]/settings/page.tsx:150
+#: apps/web/src/app/(teams)/t/[teamUrl]/settings/page.tsx:156
 msgid "View documents associated with this email"
 msgstr "Ver documentos asociados con este correo electrónico"
 
@@ -4366,7 +4541,7 @@ msgstr "Encontramos un error desconocido al intentar actualizar tu contraseña. 
 msgid "We encountered an unknown error while attempting to update your public profile. Please try again later."
 msgstr "Encontramos un error desconocido al intentar actualizar tu perfil público. Por favor, inténtalo de nuevo más tarde."
 
-#: apps/web/src/components/(teams)/forms/update-team-form.tsx:96
+#: apps/web/src/components/(teams)/forms/update-team-form.tsx:136
 msgid "We encountered an unknown error while attempting to update your team. Please try again later."
 msgstr "Encontramos un error desconocido al intentar actualizar tu equipo. Por favor, inténtalo de nuevo más tarde."
 
@@ -4414,6 +4589,14 @@ msgstr "No pudimos configurar la autenticación de dos factores para tu cuenta. 
 msgid "We were unable to submit this document at this time. Please try again later."
 msgstr "No pudimos enviar este documento en este momento. Por favor, inténtalo de nuevo más tarde."
 
+#: apps/web/src/app/(teams)/t/[teamUrl]/settings/preferences/branding-preferences.tsx:109
+msgid "We were unable to update your branding preferences at this time, please try again later"
+msgstr ""
+
+#: apps/web/src/app/(teams)/t/[teamUrl]/settings/preferences/document-preferences.tsx:98
+msgid "We were unable to update your document preferences at this time, please try again later"
+msgstr ""
+
 #: apps/web/src/app/(signing)/sign/[token]/document-action-auth-2fa.tsx:169
 msgid "We were unable to verify your details. Please try again or contact support"
 msgstr "No pudimos verificar tus datos. Por favor, inténtalo de nuevo o contacta con soporte"
@@ -4421,6 +4604,14 @@ msgstr "No pudimos verificar tus datos. Por favor, inténtalo de nuevo o contact
 #: apps/web/src/app/(unauthenticated)/verify-email/[token]/page.tsx:65
 msgid "We were unable to verify your email. If your email is not verified already, please try again."
 msgstr "No pudimos verificar tu correo electrónico. Si tu correo electrónico no está verificado ya, por favor inténtalo de nuevo."
+
+#: apps/web/src/app/(dashboard)/templates/use-template-dialog.tsx:370
+msgid "We will generate signing links for you, which you can send to the recipients through your method of choice."
+msgstr ""
+
+#: apps/web/src/app/(dashboard)/templates/use-template-dialog.tsx:366
+msgid "We won't send anything to notify recipients."
+msgstr ""
 
 #: apps/web/src/app/(dashboard)/documents/empty-state.tsx:29
 #: apps/web/src/app/(dashboard)/templates/empty-state.tsx:11
@@ -4453,8 +4644,8 @@ msgstr "URL del Webhook"
 #: apps/web/src/app/(teams)/t/[teamUrl]/settings/webhooks/page.tsx:33
 #: apps/web/src/components/(dashboard)/settings/layout/desktop-nav.tsx:103
 #: apps/web/src/components/(dashboard)/settings/layout/mobile-nav.tsx:106
-#: apps/web/src/components/(teams)/settings/layout/desktop-nav.tsx:94
-#: apps/web/src/components/(teams)/settings/layout/mobile-nav.tsx:102
+#: apps/web/src/components/(teams)/settings/layout/desktop-nav.tsx:109
+#: apps/web/src/components/(teams)/settings/layout/mobile-nav.tsx:118
 msgid "Webhooks"
 msgstr "Webhooks"
 
@@ -4583,7 +4774,7 @@ msgstr ""
 msgid "You can update the profile URL by updating the team URL in the general settings page."
 msgstr "Puedes actualizar la URL del perfil actualizando la URL del equipo en la página de configuración general."
 
-#: apps/web/src/app/(teams)/t/[teamUrl]/settings/page.tsx:65
+#: apps/web/src/app/(teams)/t/[teamUrl]/settings/page.tsx:71
 msgid "You can view documents associated with this email and use this identity when sending documents."
 msgstr "Puedes ver documentos asociados a este correo electrónico y usar esta identidad al enviar documentos."
 
@@ -4645,7 +4836,7 @@ msgstr "Has alcanzado el límite máximo de {0} plantillas directas. <0>¡Actual
 msgid "You have reached your document limit."
 msgstr "Has alcanzado tu límite de documentos."
 
-#: apps/web/src/app/(dashboard)/templates/data-table-templates.tsx:182
+#: apps/web/src/app/(dashboard)/templates/data-table-templates.tsx:183
 msgid "You have reached your document limit. <0>Upgrade your account to continue!</0>"
 msgstr "Has alcanzado tu límite de documentos. <0>¡Actualiza tu cuenta para continuar!</0>"
 
@@ -4733,6 +4924,14 @@ msgstr "Tu avatar ha sido actualizado con éxito."
 msgid "Your banner has been updated successfully."
 msgstr "Tu banner ha sido actualizado con éxito."
 
+#: apps/web/src/app/(teams)/t/[teamUrl]/settings/preferences/branding-preferences.tsx:280
+msgid "Your brand website URL"
+msgstr ""
+
+#: apps/web/src/app/(teams)/t/[teamUrl]/settings/preferences/branding-preferences.tsx:103
+msgid "Your branding preferences have been updated"
+msgstr ""
+
 #: apps/web/src/app/(dashboard)/settings/billing/page.tsx:119
 msgid "Your current plan is past due. Please update your payment information."
 msgstr "Tu plan actual está vencido. Por favor actualiza tu información de pago."
@@ -4745,7 +4944,7 @@ msgstr "Tus {0} plantillas de firma directa"
 msgid "Your document failed to upload."
 msgstr "Tu documento no se pudo cargar."
 
-#: apps/web/src/app/(dashboard)/templates/use-template-dialog.tsx:155
+#: apps/web/src/app/(dashboard)/templates/use-template-dialog.tsx:157
 msgid "Your document has been created from the template successfully."
 msgstr "Tu documento se ha creado exitosamente a partir de la plantilla."
 
@@ -4753,7 +4952,7 @@ msgstr "Tu documento se ha creado exitosamente a partir de la plantilla."
 msgid "Your document has been re-sent successfully."
 msgstr "Tu documento ha sido reenviado con éxito."
 
-#: apps/web/src/app/(dashboard)/documents/[id]/edit-document.tsx:324
+#: apps/web/src/app/(dashboard)/documents/[id]/edit-document.tsx:328
 msgid "Your document has been sent successfully."
 msgstr "Tu documento ha sido enviado con éxito."
 
@@ -4768,6 +4967,10 @@ msgstr "Tu documento ha sido subido con éxito."
 #: apps/web/src/app/(dashboard)/templates/new-template-dialog.tsx:69
 msgid "Your document has been uploaded successfully. You will be redirected to the template page."
 msgstr "Tu documento ha sido subido con éxito. Serás redirigido a la página de plantillas."
+
+#: apps/web/src/app/(teams)/t/[teamUrl]/settings/preferences/document-preferences.tsx:92
+msgid "Your document preferences have been updated"
+msgstr ""
 
 #: apps/web/src/components/(dashboard)/common/command-menu.tsx:223
 msgid "Your documents"
@@ -4785,6 +4988,10 @@ msgstr "Tu correo electrónico está siendo utilizado actualmente por el equipo 
 #: apps/web/src/app/(teams)/t/[teamUrl]/settings/tokens/page.tsx:80
 msgid "Your existing tokens"
 msgstr "Tus tokens existentes"
+
+#: apps/web/src/components/forms/team-document-settings.tsx:70
+#~ msgid "Your global team document settings has been updated successfully."
+#~ msgstr ""
 
 #: apps/web/src/components/forms/password.tsx:72
 #: apps/web/src/components/forms/reset-password.tsx:73
@@ -4828,7 +5035,7 @@ msgstr "Tu equipo ha sido creado."
 msgid "Your team has been successfully deleted."
 msgstr "Tu equipo ha sido eliminado con éxito."
 
-#: apps/web/src/components/(teams)/forms/update-team-form.tsx:69
+#: apps/web/src/components/(teams)/forms/update-team-form.tsx:107
 msgid "Your team has been successfully updated."
 msgstr "Tu equipo ha sido actualizado con éxito."
 

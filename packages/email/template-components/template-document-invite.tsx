@@ -18,6 +18,7 @@ export interface TemplateDocumentInviteProps {
   selfSigner: boolean;
   isTeamInvite: boolean;
   teamName?: string;
+  includeSenderDetails?: boolean;
 }
 
 export const TemplateDocumentInvite = ({
@@ -29,6 +30,7 @@ export const TemplateDocumentInvite = ({
   selfSigner,
   isTeamInvite,
   teamName,
+  includeSenderDetails,
 }: TemplateDocumentInviteProps) => {
   const { _ } = useLingui();
 
@@ -46,10 +48,19 @@ export const TemplateDocumentInvite = ({
               <br />"{documentName}"
             </Trans>
           ) : isTeamInvite ? (
-            <Trans>
-              {inviterName} on behalf of {teamName} has invited you to {_(actionVerb).toLowerCase()}
+            <>
+              {includeSenderDetails ? (
+                <Trans>
+                  {inviterName} on behalf of {teamName} has invited you to{' '}
+                  {_(actionVerb).toLowerCase()}
+                </Trans>
+              ) : (
+                <Trans>
+                  {teamName} has invited you to {_(actionVerb).toLowerCase()}
+                </Trans>
+              )}
               <br />"{documentName}"
-            </Trans>
+            </>
           ) : (
             <Trans>
               {inviterName} has invited you to {_(actionVerb).toLowerCase()}

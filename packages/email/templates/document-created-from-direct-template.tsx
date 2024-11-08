@@ -4,6 +4,7 @@ import { useLingui } from '@lingui/react';
 import { RECIPIENT_ROLES_DESCRIPTION } from '@documenso/lib/constants/recipient-roles';
 
 import { Body, Button, Container, Head, Html, Img, Preview, Section, Text } from '../components';
+import { useBranding } from '../providers/branding';
 import TemplateDocumentImage from '../template-components/template-document-image';
 import { TemplateFooter } from '../template-components/template-footer';
 import { RecipientRole } from '.prisma/client';
@@ -24,6 +25,7 @@ export const DocumentCreatedFromDirectTemplateEmailTemplate = ({
   assetBaseUrl = 'http://localhost:3002',
 }: DocumentCompletedEmailTemplateProps) => {
   const { _ } = useLingui();
+  const branding = useBranding();
 
   const action = _(RECIPIENT_ROLES_DESCRIPTION[recipientRole].actioned).toLowerCase();
 
@@ -42,11 +44,15 @@ export const DocumentCreatedFromDirectTemplateEmailTemplate = ({
         <Section className="bg-white">
           <Container className="mx-auto mb-2 mt-8 max-w-xl rounded-lg border border-solid border-slate-200 p-2 backdrop-blur-sm">
             <Section className="p-2">
-              <Img
-                src={getAssetUrl('/static/logo.png')}
-                alt="Documenso Logo"
-                className="mb-4 h-6"
-              />
+              {branding.brandingEnabled && branding.brandingLogo ? (
+                <Img src={branding.brandingLogo} alt="Branding Logo" className="mb-4 h-6" />
+              ) : (
+                <Img
+                  src={getAssetUrl('/static/logo.png')}
+                  alt="Documenso Logo"
+                  className="mb-4 h-6"
+                />
+              )}
 
               <TemplateDocumentImage className="mt-6" assetBaseUrl={assetBaseUrl} />
 

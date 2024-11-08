@@ -2,6 +2,7 @@ import { msg } from '@lingui/macro';
 import { useLingui } from '@lingui/react';
 
 import { Body, Container, Head, Html, Img, Preview, Section } from '../components';
+import { useBranding } from '../providers/branding';
 import type { TemplateConfirmationEmailProps } from '../template-components/template-confirmation-email';
 import { TemplateConfirmationEmail } from '../template-components/template-confirmation-email';
 import { TemplateFooter } from '../template-components/template-footer';
@@ -11,6 +12,7 @@ export const ConfirmEmailTemplate = ({
   assetBaseUrl = 'http://localhost:3002',
 }: TemplateConfirmationEmailProps) => {
   const { _ } = useLingui();
+  const branding = useBranding();
 
   const previewText = msg`Please confirm your email address`;
 
@@ -26,11 +28,15 @@ export const ConfirmEmailTemplate = ({
         <Section>
           <Container className="mx-auto mb-2 mt-8 max-w-xl rounded-lg border border-solid border-slate-200 p-4 backdrop-blur-sm">
             <Section>
-              <Img
-                src={getAssetUrl('/static/logo.png')}
-                alt="Documenso Logo"
-                className="mb-4 h-6"
-              />
+              {branding.brandingEnabled && branding.brandingLogo ? (
+                <Img src={branding.brandingLogo} alt="Branding Logo" className="mb-4 h-6" />
+              ) : (
+                <Img
+                  src={getAssetUrl('/static/logo.png')}
+                  alt="Documenso Logo"
+                  className="mb-4 h-6"
+                />
+              )}
 
               <TemplateConfirmationEmail
                 confirmationLink={confirmationLink}
