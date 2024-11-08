@@ -9,59 +9,27 @@ export const RECIPIENT_ROLES_DESCRIPTION = {
     actioned: msg`Approved`,
     progressiveVerb: msg`Approving`,
     roleName: msg`Approver`,
+    roleNamePlural: msg`Approvers`,
   },
   [RecipientRole.CC]: {
     actionVerb: msg`CC`,
     actioned: msg`CC'd`,
     progressiveVerb: msg`CC`,
     roleName: msg`Cc`,
+    roleNamePlural: msg`Ccers`,
   },
   [RecipientRole.SIGNER]: {
     actionVerb: msg`Sign`,
     actioned: msg`Signed`,
     progressiveVerb: msg`Signing`,
     roleName: msg`Signer`,
+    roleNamePlural: msg`Signers`,
   },
   [RecipientRole.VIEWER]: {
     actionVerb: msg`View`,
     actioned: msg`Viewed`,
     progressiveVerb: msg`Viewing`,
     roleName: msg`Viewer`,
-  },
-} satisfies Record<keyof typeof RecipientRole, unknown>;
-
-/**
- * Raw english descriptions for emails.
- *
- * Todo: Handle i18n for emails.
- */
-export const RECIPIENT_ROLES_DESCRIPTION_ENG = {
-  [RecipientRole.APPROVER]: {
-    actionVerb: `Approve`,
-    actioned: `Approved`,
-    progressiveVerb: `Approving`,
-    roleName: `Approver`,
-    roleNamePlural: msg`Approvers`,
-  },
-  [RecipientRole.CC]: {
-    actionVerb: `CC`,
-    actioned: `CC'd`,
-    progressiveVerb: `CC`,
-    roleName: `Cc`,
-    roleNamePlural: msg`Ccers`,
-  },
-  [RecipientRole.SIGNER]: {
-    actionVerb: `Sign`,
-    actioned: `Signed`,
-    progressiveVerb: `Signing`,
-    roleName: `Signer`,
-    roleNamePlural: msg`Signers`,
-  },
-  [RecipientRole.VIEWER]: {
-    actionVerb: `View`,
-    actioned: `Viewed`,
-    progressiveVerb: `Viewing`,
-    roleName: `Viewer`,
     roleNamePlural: msg`Viewers`,
   },
 } satisfies Record<keyof typeof RecipientRole, unknown>;

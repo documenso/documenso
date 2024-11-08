@@ -1,5 +1,4 @@
 import { Trans } from '@lingui/macro';
-import { useLingui } from '@lingui/react';
 
 import { Button, Section, Text } from '../components';
 import { TemplateDocumentImage } from './template-document-image';
@@ -13,8 +12,6 @@ export const TemplateConfirmationEmail = ({
   confirmationLink,
   assetBaseUrl,
 }: TemplateConfirmationEmailProps) => {
-  const { _ } = useLingui();
-
   return (
     <>
       <TemplateDocumentImage className="mt-6" assetBaseUrl={assetBaseUrl} />

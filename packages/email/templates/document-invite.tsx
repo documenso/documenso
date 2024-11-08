@@ -1,7 +1,7 @@
 import { Trans, msg } from '@lingui/macro';
 import { useLingui } from '@lingui/react';
 
-import { RECIPIENT_ROLES_DESCRIPTION_ENG } from '@documenso/lib/constants/recipient-roles';
+import { RECIPIENT_ROLES_DESCRIPTION } from '@documenso/lib/constants/recipient-roles';
 import type { RecipientRole } from '@documenso/prisma/client';
 
 import { Body, Container, Head, Hr, Html, Img, Link, Preview, Section, Text } from '../components';
@@ -32,7 +32,7 @@ export const DocumentInviteEmailTemplate = ({
 }: DocumentInviteEmailTemplateProps) => {
   const { _ } = useLingui();
 
-  const action = _(RECIPIENT_ROLES_DESCRIPTION_ENG[role].actionVerb).toLowerCase();
+  const action = _(RECIPIENT_ROLES_DESCRIPTION[role].actionVerb).toLowerCase();
 
   const previewText = selfSigner
     ? msg`Please ${action} your document ${documentName}`
@@ -89,7 +89,7 @@ export const DocumentInviteEmailTemplate = ({
                   <pre className="font-sans text-base text-slate-400">{customBody}</pre>
                 ) : (
                   <Trans>
-                    `${inviterName} has invited you to ${action} the document "${documentName}".`
+                    {inviterName} has invited you to {action} the document {documentName}.
                   </Trans>
                 )}
               </Text>
