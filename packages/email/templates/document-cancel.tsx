@@ -2,6 +2,7 @@ import { msg } from '@lingui/macro';
 import { useLingui } from '@lingui/react';
 
 import { Body, Container, Head, Hr, Html, Img, Preview, Section } from '../components';
+import { useBranding } from '../providers/branding';
 import type { TemplateDocumentCancelProps } from '../template-components/template-document-cancel';
 import { TemplateDocumentCancel } from '../template-components/template-document-cancel';
 import { TemplateFooter } from '../template-components/template-footer';
@@ -15,6 +16,7 @@ export const DocumentCancelTemplate = ({
   assetBaseUrl = 'http://localhost:3002',
 }: DocumentCancelEmailTemplateProps) => {
   const { _ } = useLingui();
+  const branding = useBranding();
 
   const previewText = msg`${inviterName} has cancelled the document ${documentName}, you don't need to sign it anymore.`;
 
@@ -31,11 +33,15 @@ export const DocumentCancelTemplate = ({
         <Section>
           <Container className="mx-auto mb-2 mt-8 max-w-xl rounded-lg border border-solid border-slate-200 p-4 backdrop-blur-sm">
             <Section>
-              <Img
-                src={getAssetUrl('/static/logo.png')}
-                alt="Documenso Logo"
-                className="mb-4 h-6"
-              />
+              {branding.brandingEnabled && branding.brandingLogo ? (
+                <Img src={branding.brandingLogo} alt="Branding Logo" className="mb-4 h-6" />
+              ) : (
+                <Img
+                  src={getAssetUrl('/static/logo.png')}
+                  alt="Documenso Logo"
+                  className="mb-4 h-6"
+                />
+              )}
 
               <TemplateDocumentCancel
                 inviterName={inviterName}

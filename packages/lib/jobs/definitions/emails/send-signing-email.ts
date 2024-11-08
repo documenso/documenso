@@ -25,6 +25,7 @@ import { ZRequestMetadataSchema } from '../../../universal/extract-request-metad
 import { createDocumentAuditLogData } from '../../../utils/document-audit-logs';
 import { renderCustomEmailTemplate } from '../../../utils/render-custom-email-template';
 import { renderEmailWithI18N } from '../../../utils/render-email-with-i18n';
+import { teamGlobalSettingsToBranding } from '../../../utils/team-global-settings-to-branding';
 import { type JobDefinition } from '../../client/_internal/job';
 
 const SEND_SIGNING_EMAIL_JOB_DEFINITION_ID = 'send.signing.requested.email';
@@ -152,10 +153,15 @@ export const SEND_SIGNING_EMAIL_JOB_DEFINITION = {
     });
 
     await io.runTask('send-signing-email', async () => {
+      const branding = document.team?.teamGlobalSettings
+        ? teamGlobalSettingsToBranding(document.team.teamGlobalSettings)
+        : undefined;
+
       const [html, text] = await Promise.all([
-        renderEmailWithI18N(template, { lang: documentMeta?.language }),
+        renderEmailWithI18N(template, { lang: documentMeta?.language, branding }),
         renderEmailWithI18N(template, {
           lang: documentMeta?.language,
+          branding,
           plainText: true,
         }),
       ]);

@@ -504,7 +504,14 @@ enum TeamMemberInviteStatus {
 model TeamGlobalSettings {
   teamId               Int                @unique
   documentVisibility   DocumentVisibility @default(EVERYONE)
+  documentLanguage     String             @default("en")
   includeSenderDetails Boolean            @default(true)
+
+  brandingEnabled        Boolean @default(false)
+  brandingLogo           String  @default("")
+  brandingUrl            String  @default("")
+  brandingCompanyDetails String  @default("")
+  brandingHidePoweredBy  Boolean @default(false)
 
   team Team @relation(fields: [teamId], references: [id], onDelete: Cascade)
 }

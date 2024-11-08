@@ -13,6 +13,10 @@ msgstr ""
 "Language-Team: \n"
 "Plural-Forms: \n"
 
+#: apps/web/src/app/(teams)/t/[teamUrl]/settings/preferences/document-preferences.tsx:211
+msgid "\"{0}\" has invited you to sign \"example document\"."
+msgstr "\"{0}\" has invited you to sign \"example document\"."
+
 #: apps/web/src/app/(signing)/sign/[token]/date-field.tsx:69
 msgid "\"{0}\" will appear on the document as it has a timezone of \"{timezone}\"."
 msgstr "\"{0}\" will appear on the document as it has a timezone of \"{timezone}\"."
@@ -24,6 +28,14 @@ msgstr "\"{documentTitle}\" has been successfully deleted"
 #: apps/web/src/components/(teams)/forms/update-team-form.tsx:234
 msgid "\"{email}\" on behalf of \"{teamName}\" has invited you to sign \"example document\"."
 msgstr "\"{email}\" on behalf of \"{teamName}\" has invited you to sign \"example document\"."
+
+#: apps/web/src/app/(teams)/t/[teamUrl]/settings/preferences/document-preferences.tsx:209
+msgid ""
+"\"{placeholderEmail}\" on behalf of \"{0}\" has invited you to sign \"example\n"
+"document\"."
+msgstr ""
+"\"{placeholderEmail}\" on behalf of \"{0}\" has invited you to sign \"example\n"
+"document\"."
 
 #: apps/web/src/components/(teams)/forms/update-team-form.tsx:241
 msgid "\"{teamUrl}\" has invited you to sign \"example document\"."
@@ -340,6 +352,10 @@ msgstr "Add the subject and message you wish to send to signers."
 msgid "Adding and removing seats will adjust your invoice accordingly."
 msgstr "Adding and removing seats will adjust your invoice accordingly."
 
+#: apps/web/src/app/(teams)/t/[teamUrl]/settings/preferences/branding-preferences.tsx:303
+msgid "Additional brand information to display at the bottom of emails"
+msgstr "Additional brand information to display at the bottom of emails"
+
 #: apps/web/src/app/(dashboard)/admin/documents/[id]/page.tsx:59
 msgid "Admin Actions"
 msgstr "Admin Actions"
@@ -605,8 +621,8 @@ msgstr "Any Status"
 #: apps/web/src/app/(teams)/t/[teamUrl]/settings/tokens/page.tsx:56
 #: apps/web/src/components/(dashboard)/settings/layout/desktop-nav.tsx:90
 #: apps/web/src/components/(dashboard)/settings/layout/mobile-nav.tsx:93
-#: apps/web/src/components/(teams)/settings/layout/desktop-nav.tsx:81
-#: apps/web/src/components/(teams)/settings/layout/mobile-nav.tsx:89
+#: apps/web/src/components/(teams)/settings/layout/desktop-nav.tsx:96
+#: apps/web/src/components/(teams)/settings/layout/mobile-nav.tsx:105
 msgid "API Tokens"
 msgstr "API Tokens"
 
@@ -715,10 +731,18 @@ msgstr "Basic details"
 #: apps/web/src/app/(teams)/t/[teamUrl]/settings/billing/page.tsx:61
 #: apps/web/src/components/(dashboard)/settings/layout/desktop-nav.tsx:117
 #: apps/web/src/components/(dashboard)/settings/layout/mobile-nav.tsx:120
-#: apps/web/src/components/(teams)/settings/layout/desktop-nav.tsx:108
-#: apps/web/src/components/(teams)/settings/layout/mobile-nav.tsx:116
+#: apps/web/src/components/(teams)/settings/layout/desktop-nav.tsx:123
+#: apps/web/src/components/(teams)/settings/layout/mobile-nav.tsx:132
 msgid "Billing"
 msgstr "Billing"
+
+#: apps/web/src/app/(teams)/t/[teamUrl]/settings/preferences/page.tsx:42
+msgid "Branding Preferences"
+msgstr "Branding Preferences"
+
+#: apps/web/src/app/(teams)/t/[teamUrl]/settings/preferences/branding-preferences.tsx:102
+msgid "Branding preferences updated"
+msgstr "Branding preferences updated"
 
 #: apps/web/src/app/(dashboard)/settings/security/activity/user-security-activity-data-table.tsx:99
 #: apps/web/src/app/(internal)/%5F%5Fhtmltopdf/audit-log/data-table.tsx:48
@@ -982,6 +1006,18 @@ msgstr "Continue"
 msgid "Continue to login"
 msgstr "Continue to login"
 
+#: apps/web/src/app/(teams)/t/[teamUrl]/settings/preferences/document-preferences.tsx:173
+msgid "Controls the default language of an uploaded document. This will be used as the language in email communications with the recipients."
+msgstr "Controls the default language of an uploaded document. This will be used as the language in email communications with the recipients."
+
+#: apps/web/src/app/(teams)/t/[teamUrl]/settings/preferences/document-preferences.tsx:141
+msgid "Controls the default visibility of an uploaded document."
+msgstr "Controls the default visibility of an uploaded document."
+
+#: apps/web/src/app/(teams)/t/[teamUrl]/settings/preferences/document-preferences.tsx:216
+msgid "Controls the formatting of the message that will be sent when inviting a recipient to sign a document. If a custom message has been provided while configuring the document, it will be used instead."
+msgstr "Controls the formatting of the message that will be sent when inviting a recipient to sign a document. If a custom message has been provided while configuring the document, it will be used instead."
+
 #: apps/web/src/components/document/document-recipient-link-copy-dialog.tsx:128
 msgid "Copied"
 msgstr "Copied"
@@ -1160,6 +1196,11 @@ msgstr "Decline"
 msgid "Declined team invitation"
 msgstr "Declined team invitation"
 
+#: apps/web/src/app/(teams)/t/[teamUrl]/settings/preferences/document-preferences.tsx:153
+msgid "Default Document Language"
+msgstr "Default Document Language"
+
+#: apps/web/src/app/(teams)/t/[teamUrl]/settings/preferences/document-preferences.tsx:117
 #: apps/web/src/components/(teams)/forms/update-team-form.tsx:195
 msgid "Default Document Visibility"
 msgstr "Default Document Visibility"
@@ -1431,6 +1472,10 @@ msgstr "Document no longer available to sign"
 msgid "Document pending"
 msgstr "Document pending"
 
+#: apps/web/src/app/(teams)/t/[teamUrl]/settings/preferences/document-preferences.tsx:91
+msgid "Document preferences updated"
+msgstr "Document preferences updated"
+
 #: apps/web/src/app/(dashboard)/documents/_action-items/resend-document.tsx:97
 msgid "Document re-sent"
 msgstr "Document re-sent"
@@ -1644,6 +1689,10 @@ msgstr "Enable 2FA"
 msgid "Enable Authenticator App"
 msgstr "Enable Authenticator App"
 
+#: apps/web/src/app/(teams)/t/[teamUrl]/settings/preferences/branding-preferences.tsx:170
+msgid "Enable custom branding for all documents in this team."
+msgstr "Enable custom branding for all documents in this team."
+
 #: apps/web/src/app/(dashboard)/templates/template-direct-link-dialog.tsx:251
 msgid "Enable direct link signing"
 msgstr "Enable direct link signing"
@@ -1668,6 +1717,10 @@ msgstr "Enclosed Document"
 #: apps/web/src/app/(dashboard)/admin/subscriptions/page.tsx:38
 msgid "Ends On"
 msgstr "Ends On"
+
+#: apps/web/src/app/(teams)/t/[teamUrl]/settings/preferences/branding-preferences.tsx:295
+msgid "Enter your brand details"
+msgstr "Enter your brand details"
 
 #: apps/web/src/app/(signing)/sign/[token]/complete/claim-account.tsx:137
 msgid "Enter your email"
@@ -1729,6 +1782,10 @@ msgstr "Error"
 #: apps/web/src/components/forms/team-document-settings.tsx:77
 #~ msgid "Error updating global team settings"
 #~ msgstr "Error updating global team settings"
+
+#: apps/web/src/app/(teams)/t/[teamUrl]/settings/preferences/document-preferences.tsx:128
+msgid "Everyone can access and view the document"
+msgstr "Everyone can access and view the document"
 
 #: apps/web/src/app/(signing)/sign/[token]/complete/page.tsx:142
 msgid "Everyone has signed"
@@ -1794,8 +1851,8 @@ msgstr "Full Name"
 #: apps/web/src/app/(dashboard)/documents/[id]/edit-document.tsx:165
 #: apps/web/src/app/(dashboard)/templates/[id]/edit/edit-template.tsx:77
 #: apps/web/src/app/(recipient)/d/[token]/direct-template.tsx:60
-#: apps/web/src/components/(teams)/settings/layout/desktop-nav.tsx:43
-#: apps/web/src/components/(teams)/settings/layout/mobile-nav.tsx:51
+#: apps/web/src/components/(teams)/settings/layout/desktop-nav.tsx:44
+#: apps/web/src/components/(teams)/settings/layout/mobile-nav.tsx:52
 msgid "General"
 msgstr "General"
 
@@ -1843,6 +1900,14 @@ msgstr "Here you can edit your personal details."
 #: apps/web/src/app/(dashboard)/settings/security/page.tsx:35
 msgid "Here you can manage your password and security settings."
 msgstr "Here you can manage your password and security settings."
+
+#: apps/web/src/app/(teams)/t/[teamUrl]/settings/preferences/page.tsx:43
+msgid "Here you can set preferences and defaults for branding."
+msgstr "Here you can set preferences and defaults for branding."
+
+#: apps/web/src/app/(teams)/t/[teamUrl]/settings/preferences/page.tsx:34
+msgid "Here you can set preferences and defaults for your team."
+msgstr "Here you can set preferences and defaults for your team."
 
 #: apps/web/src/app/(dashboard)/templates/template-direct-link-dialog.tsx:206
 msgid "Here's how it works:"
@@ -2189,8 +2254,8 @@ msgid "Member Since"
 msgstr "Member Since"
 
 #: apps/web/src/app/(teams)/t/[teamUrl]/settings/members/page.tsx:31
-#: apps/web/src/components/(teams)/settings/layout/desktop-nav.tsx:71
-#: apps/web/src/components/(teams)/settings/layout/mobile-nav.tsx:79
+#: apps/web/src/components/(teams)/settings/layout/desktop-nav.tsx:86
+#: apps/web/src/components/(teams)/settings/layout/mobile-nav.tsx:95
 msgid "Members"
 msgstr "Members"
 
@@ -2377,6 +2442,14 @@ msgstr "Once confirmed, the following will occur:"
 #: apps/web/src/components/forms/2fa/enable-authenticator-app-dialog.tsx:224
 msgid "Once you have scanned the QR code or entered the code manually, enter the code provided by your authenticator app below."
 msgstr "Once you have scanned the QR code or entered the code manually, enter the code provided by your authenticator app below."
+
+#: apps/web/src/app/(teams)/t/[teamUrl]/settings/preferences/document-preferences.tsx:134
+msgid "Only admins can access and view the document"
+msgstr "Only admins can access and view the document"
+
+#: apps/web/src/app/(teams)/t/[teamUrl]/settings/preferences/document-preferences.tsx:131
+msgid "Only managers and above can access and view the document"
+msgstr "Only managers and above can access and view the document"
 
 #: apps/web/src/app/(profile)/p/[url]/not-found.tsx:19
 #: apps/web/src/app/(recipient)/d/[token]/not-found.tsx:19
@@ -2607,12 +2680,22 @@ msgid "Please type <0>{0}</0> to confirm."
 msgstr "Please type <0>{0}</0> to confirm."
 
 #: apps/web/src/components/(dashboard)/common/command-menu.tsx:214
+#: apps/web/src/components/(teams)/settings/layout/desktop-nav.tsx:58
+#: apps/web/src/components/(teams)/settings/layout/mobile-nav.tsx:67
 msgid "Preferences"
 msgstr "Preferences"
+
+#: apps/web/src/app/(teams)/t/[teamUrl]/settings/preferences/document-preferences.tsx:204
+msgid "Preview"
+msgstr "Preview"
 
 #: apps/web/src/app/(recipient)/d/[token]/direct-template.tsx:61
 msgid "Preview and configure template."
 msgstr "Preview and configure template."
+
+#: apps/web/src/app/(teams)/t/[teamUrl]/settings/preferences/document-preferences.tsx:130
+#~ msgid "Preview: {0}"
+#~ msgstr "Preview: {0}"
 
 #: apps/web/src/app/(dashboard)/templates/data-table-templates.tsx:105
 #: apps/web/src/components/formatter/template-type.tsx:22
@@ -2651,8 +2734,8 @@ msgstr "Public"
 #: apps/web/src/app/(dashboard)/settings/public-profile/public-profile-page-view.tsx:42
 #: apps/web/src/components/(dashboard)/settings/layout/desktop-nav.tsx:50
 #: apps/web/src/components/(dashboard)/settings/layout/mobile-nav.tsx:53
-#: apps/web/src/components/(teams)/settings/layout/desktop-nav.tsx:57
-#: apps/web/src/components/(teams)/settings/layout/mobile-nav.tsx:65
+#: apps/web/src/components/(teams)/settings/layout/desktop-nav.tsx:72
+#: apps/web/src/components/(teams)/settings/layout/mobile-nav.tsx:81
 msgid "Public Profile"
 msgstr "Public Profile"
 
@@ -2744,6 +2827,7 @@ msgstr "Remembered your password? <0>Sign In</0>"
 #: apps/web/src/app/(dashboard)/templates/template-direct-link-dialog.tsx:431
 #: apps/web/src/app/(signing)/sign/[token]/signing-field-container.tsx:156
 #: apps/web/src/app/(signing)/sign/[token]/signing-field-container.tsx:180
+#: apps/web/src/app/(teams)/t/[teamUrl]/settings/preferences/branding-preferences.tsx:250
 #: apps/web/src/app/(teams)/t/[teamUrl]/settings/team-email-dropdown.tsx:89
 #: apps/web/src/components/(teams)/dialogs/remove-team-email-dialog.tsx:159
 #: apps/web/src/components/(teams)/tables/pending-user-teams-data-table-actions.tsx:54
@@ -2867,6 +2951,8 @@ msgstr "Roles"
 #: apps/web/src/app/(dashboard)/templates/template-direct-link-dialog.tsx:446
 #: apps/web/src/app/(signing)/sign/[token]/number-field.tsx:336
 #: apps/web/src/app/(signing)/sign/[token]/text-field.tsx:342
+#: apps/web/src/app/(teams)/t/[teamUrl]/settings/preferences/branding-preferences.tsx:312
+#: apps/web/src/app/(teams)/t/[teamUrl]/settings/preferences/document-preferences.tsx:228
 msgid "Save"
 msgstr "Save"
 
@@ -2941,6 +3027,7 @@ msgstr "Send confirmation email"
 msgid "Send document"
 msgstr "Send document"
 
+#: apps/web/src/app/(teams)/t/[teamUrl]/settings/preferences/document-preferences.tsx:188
 #: apps/web/src/components/(teams)/forms/update-team-form.tsx:220
 msgid "Send on Behalf of Team"
 msgstr "Send on Behalf of Team"
@@ -3179,6 +3266,7 @@ msgstr "Site Settings"
 #: apps/web/src/app/(recipient)/d/[token]/signing-auth-page.tsx:27
 #: apps/web/src/app/(signing)/sign/[token]/signing-auth-page.tsx:38
 #: apps/web/src/app/(teams)/t/[teamUrl]/layout-billing-banner.tsx:53
+#: apps/web/src/app/(teams)/t/[teamUrl]/settings/preferences/branding-preferences.tsx:107
 #: apps/web/src/app/(teams)/t/[teamUrl]/settings/team-email-dropdown.tsx:39
 #: apps/web/src/app/(unauthenticated)/verify-email/[token]/page.tsx:61
 #: apps/web/src/app/embed/direct/[[...url]]/client.tsx:243
@@ -3214,6 +3302,10 @@ msgstr "Something went wrong while sending the confirmation email."
 #: apps/web/src/components/(teams)/dialogs/delete-team-dialog.tsx:96
 msgid "Something went wrong while updating the team billing subscription, please contact support."
 msgstr "Something went wrong while updating the team billing subscription, please contact support."
+
+#: apps/web/src/app/(teams)/t/[teamUrl]/settings/preferences/document-preferences.tsx:96
+msgid "Something went wrong!"
+msgstr "Something went wrong!"
 
 #: apps/web/src/app/(dashboard)/settings/security/passkeys/create-passkey-dialog.tsx:240
 #: apps/web/src/components/forms/2fa/view-recovery-codes-dialog.tsx:154
@@ -3377,6 +3469,10 @@ msgstr "Team ownership transfer already completed!"
 #: apps/web/src/app/(unauthenticated)/team/verify/transfer/[token]/page.tsx:110
 msgid "Team ownership transferred!"
 msgstr "Team ownership transferred!"
+
+#: apps/web/src/app/(teams)/t/[teamUrl]/settings/preferences/page.tsx:33
+msgid "Team Preferences"
+msgstr "Team Preferences"
 
 #: apps/web/src/app/(dashboard)/settings/public-profile/public-profile-page-view.tsx:49
 msgid "Team Public Profile"
@@ -4091,6 +4187,10 @@ msgstr "Updating Your Information"
 msgid "Upload Avatar"
 msgstr "Upload Avatar"
 
+#: apps/web/src/app/(teams)/t/[teamUrl]/settings/preferences/branding-preferences.tsx:256
+msgid "Upload your brand logo (max 5MB, JPG, PNG, or WebP)"
+msgstr "Upload your brand logo (max 5MB, JPG, PNG, or WebP)"
+
 #: apps/web/src/app/(dashboard)/documents/[id]/document-page-view-information.tsx:31
 #: apps/web/src/app/(dashboard)/templates/[id]/template-page-view-information.tsx:30
 msgid "Uploaded by"
@@ -4450,6 +4550,14 @@ msgstr "We were unable to setup two-factor authentication for your account. Plea
 msgid "We were unable to submit this document at this time. Please try again later."
 msgstr "We were unable to submit this document at this time. Please try again later."
 
+#: apps/web/src/app/(teams)/t/[teamUrl]/settings/preferences/branding-preferences.tsx:109
+msgid "We were unable to update your branding preferences at this time, please try again later"
+msgstr "We were unable to update your branding preferences at this time, please try again later"
+
+#: apps/web/src/app/(teams)/t/[teamUrl]/settings/preferences/document-preferences.tsx:98
+msgid "We were unable to update your document preferences at this time, please try again later"
+msgstr "We were unable to update your document preferences at this time, please try again later"
+
 #: apps/web/src/app/(signing)/sign/[token]/document-action-auth-2fa.tsx:169
 msgid "We were unable to verify your details. Please try again or contact support"
 msgstr "We were unable to verify your details. Please try again or contact support"
@@ -4489,8 +4597,8 @@ msgstr "Webhook URL"
 #: apps/web/src/app/(teams)/t/[teamUrl]/settings/webhooks/page.tsx:33
 #: apps/web/src/components/(dashboard)/settings/layout/desktop-nav.tsx:103
 #: apps/web/src/components/(dashboard)/settings/layout/mobile-nav.tsx:106
-#: apps/web/src/components/(teams)/settings/layout/desktop-nav.tsx:94
-#: apps/web/src/components/(teams)/settings/layout/mobile-nav.tsx:102
+#: apps/web/src/components/(teams)/settings/layout/desktop-nav.tsx:109
+#: apps/web/src/components/(teams)/settings/layout/mobile-nav.tsx:118
 msgid "Webhooks"
 msgstr "Webhooks"
 
@@ -4769,6 +4877,14 @@ msgstr "Your avatar has been updated successfully."
 msgid "Your banner has been updated successfully."
 msgstr "Your banner has been updated successfully."
 
+#: apps/web/src/app/(teams)/t/[teamUrl]/settings/preferences/branding-preferences.tsx:280
+msgid "Your brand website URL"
+msgstr "Your brand website URL"
+
+#: apps/web/src/app/(teams)/t/[teamUrl]/settings/preferences/branding-preferences.tsx:103
+msgid "Your branding preferences have been updated"
+msgstr "Your branding preferences have been updated"
+
 #: apps/web/src/app/(dashboard)/settings/billing/page.tsx:119
 msgid "Your current plan is past due. Please update your payment information."
 msgstr "Your current plan is past due. Please update your payment information."
@@ -4804,6 +4920,10 @@ msgstr "Your document has been uploaded successfully."
 #: apps/web/src/app/(dashboard)/templates/new-template-dialog.tsx:69
 msgid "Your document has been uploaded successfully. You will be redirected to the template page."
 msgstr "Your document has been uploaded successfully. You will be redirected to the template page."
+
+#: apps/web/src/app/(teams)/t/[teamUrl]/settings/preferences/document-preferences.tsx:92
+msgid "Your document preferences have been updated"
+msgstr "Your document preferences have been updated"
 
 #: apps/web/src/components/(dashboard)/common/command-menu.tsx:223
 msgid "Your documents"

@@ -47,6 +47,11 @@ export const createDocumentFromTemplateLegacy = async ({
       Field: true,
       templateDocumentData: true,
       templateMeta: true,
+      team: {
+        include: {
+          teamGlobalSettings: true,
+        },
+      },
     },
   });
 
@@ -69,6 +74,7 @@ export const createDocumentFromTemplateLegacy = async ({
       userId,
       teamId: template.teamId,
       title: template.title,
+      visibility: template.team?.teamGlobalSettings?.documentVisibility,
       documentDataId: documentData.id,
       Recipient: {
         create: template.Recipient.map((recipient) => ({
@@ -87,7 +93,8 @@ export const createDocumentFromTemplateLegacy = async ({
           dateFormat: template.templateMeta?.dateFormat,
           redirectUrl: template.templateMeta?.redirectUrl,
           signingOrder: template.templateMeta?.signingOrder ?? undefined,
-          language: template.templateMeta?.language,
+          language:
+            template.templateMeta?.language || template.team?.teamGlobalSettings?.documentLanguage,
         },
       },
     },

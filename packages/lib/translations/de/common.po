@@ -38,19 +38,19 @@ msgstr ""
 msgid "{0} Document"
 msgstr "{0} Dokument"
 
-#: packages/lib/jobs/definitions/emails/send-signing-email.ts:125
+#: packages/lib/jobs/definitions/emails/send-signing-email.ts:126
 msgid "{0} has invited you to {recipientActionVerb} the document \"{1}\"."
 msgstr ""
 
-#: packages/lib/jobs/definitions/emails/send-signing-email.ts:118
+#: packages/lib/jobs/definitions/emails/send-signing-email.ts:119
 msgid "{0} invited you to {recipientActionVerb} a document"
 msgstr "{0} hat dich eingeladen, ein Dokument {recipientActionVerb}"
 
-#: packages/email/templates/team-join.tsx:55
+#: packages/email/templates/team-join.tsx:61
 msgid "{0} joined the team {teamName} on Documenso"
 msgstr "{0} ist dem Team {teamName} bei Documenso beigetreten"
 
-#: packages/email/templates/team-leave.tsx:55
+#: packages/email/templates/team-leave.tsx:61
 msgid "{0} left the team {teamName} on Documenso"
 msgstr "{0} hat das Team {teamName} bei Documenso verlassen"
 
@@ -58,8 +58,8 @@ msgstr "{0} hat das Team {teamName} bei Documenso verlassen"
 msgid "{0} of {1} row(s) selected."
 msgstr "{0} von {1} Zeile(n) ausgewählt."
 
-#: packages/lib/jobs/definitions/emails/send-signing-email.ts:124
-#: packages/lib/server-only/document/resend-document.tsx:126
+#: packages/lib/jobs/definitions/emails/send-signing-email.ts:125
+#: packages/lib/server-only/document/resend-document.tsx:128
 msgid "{0} on behalf of {1} has invited you to {recipientActionVerb} the document \"{2}\"."
 msgstr "{0} hat dich im Namen von {1} eingeladen, das Dokument \"{2}\" {recipientActionVerb}."
 
@@ -67,11 +67,11 @@ msgstr "{0} hat dich im Namen von {1} eingeladen, das Dokument \"{2}\" {recipien
 #~ msgid "{0}<0/>\"{documentName}\""
 #~ msgstr ""
 
-#: packages/email/templates/document-invite.tsx:88
+#: packages/email/templates/document-invite.tsx:97
 msgid "{inviterName} <0>({inviterEmail})</0>"
 msgstr "{inviterName} <0>({inviterEmail})</0>"
 
-#: packages/email/templates/document-cancel.tsx:19
+#: packages/email/templates/document-cancel.tsx:21
 msgid "{inviterName} has cancelled the document {documentName}, you don't need to sign it anymore."
 msgstr "{inviterName} hat das Dokument {documentName} storniert, du musst es nicht mehr unterzeichnen."
 
@@ -83,15 +83,15 @@ msgstr "{inviterName} hat das Dokument<0/>\"{documentName}\" storniert"
 msgid "{inviterName} has invited you to {0}<0/>\"{documentName}\""
 msgstr "{inviterName} hat dich eingeladen, {0}<0/>\"{documentName}\""
 
-#: packages/email/templates/document-invite.tsx:39
+#: packages/email/templates/document-invite.tsx:44
 msgid "{inviterName} has invited you to {action} {documentName}"
 msgstr "{inviterName} hat dich eingeladen, {action} {documentName}"
 
-#: packages/email/templates/document-invite.tsx:100
+#: packages/email/templates/document-invite.tsx:109
 msgid "{inviterName} has invited you to {action} the document \"{documentName}\"."
 msgstr ""
 
-#: packages/email/templates/recipient-removed-from-document.tsx:18
+#: packages/email/templates/recipient-removed-from-document.tsx:20
 msgid "{inviterName} has removed you from the document {documentName}."
 msgstr "{inviterName} hat dich aus dem Dokument {documentName} entfernt."
 
@@ -103,15 +103,15 @@ msgstr ""
 #~ msgid "{inviterName} on behalf of {teamName} has invited you to {0}<0/>\"{documentName}\""
 #~ msgstr "{inviterName} hat dich im Namen von {teamName} eingeladen, {0}<0/>\"{documentName}\""
 
-#: packages/email/templates/document-invite.tsx:43
+#: packages/email/templates/document-invite.tsx:48
 msgid "{inviterName} on behalf of {teamName} has invited you to {action} {documentName}"
 msgstr "{inviterName} hat dich im Namen von {teamName} eingeladen, {action} {documentName}"
 
-#: packages/email/templates/team-join.tsx:61
+#: packages/email/templates/team-join.tsx:67
 msgid "{memberEmail} joined the following team"
 msgstr "{memberEmail} ist dem folgenden Team beigetreten"
 
-#: packages/email/templates/team-leave.tsx:61
+#: packages/email/templates/team-leave.tsx:67
 msgid "{memberEmail} left the following team"
 msgstr "{memberEmail} hat das folgende Team verlassen"
 
@@ -199,7 +199,7 @@ msgstr "{prefix} hat den Titel des Dokuments aktualisiert"
 msgid "{prefix} updated the document visibility"
 msgstr "{prefix} hat die Sichtbarkeit des Dokuments aktualisiert"
 
-#: packages/email/templates/document-created-from-direct-template.tsx:55
+#: packages/email/templates/document-created-from-direct-template.tsx:61
 msgid "{recipientName} {action} a document by using one of your direct links"
 msgstr "{recipientName} {action} ein Dokument, indem Sie einen Ihrer direkten Links verwenden"
 
@@ -207,7 +207,7 @@ msgstr "{recipientName} {action} ein Dokument, indem Sie einen Ihrer direkten Li
 msgid "{teamName} has invited you to {0}"
 msgstr ""
 
-#: packages/email/templates/document-invite.tsx:44
+#: packages/email/templates/document-invite.tsx:49
 msgid "{teamName} has invited you to {action} {documentName}"
 msgstr ""
 
@@ -247,7 +247,7 @@ msgstr "{visibleRows, plural, one {Eine # Ergebnis wird angezeigt.} other {# Erg
 msgid "<0>{senderName}</0> has requested that you take ownership of the following team"
 msgstr "<0>{senderName}</0> hat angefordert, dass du das folgende Team übernimmst"
 
-#: packages/email/templates/confirm-team-email.tsx:68
+#: packages/email/templates/confirm-team-email.tsx:75
 msgid "<0>{teamName}</0> has requested to use your email address for their team on Documenso."
 msgstr ""
 
@@ -281,7 +281,7 @@ msgstr "<0>Konto erforderlich</0> - Der Empfänger muss angemeldet sein, um das 
 msgid "<0>Require passkey</0> - The recipient must have an account and passkey configured via their settings"
 msgstr "<0>Passkey erforderlich</0> - Der Empfänger muss ein Konto haben und den Passkey über seine Einstellungen konfiguriert haben"
 
-#: packages/lib/jobs/definitions/emails/send-signing-email.ts:110
+#: packages/lib/jobs/definitions/emails/send-signing-email.ts:111
 msgid "A document was created by your direct template that requires you to {recipientActionVerb} it."
 msgstr "Ein Dokument wurde von deiner direkten Vorlage erstellt, das erfordert, dass du {recipientActionVerb}."
 
@@ -297,7 +297,7 @@ msgstr "Ein Feld wurde entfernt"
 msgid "A field was updated"
 msgstr "Ein Feld wurde aktualisiert"
 
-#: packages/lib/jobs/definitions/emails/send-team-member-joined-email.ts:90
+#: packages/lib/jobs/definitions/emails/send-team-member-joined-email.ts:103
 msgid "A new member has joined your team"
 msgstr "Ein neues Mitglied ist deinem Team beigetreten"
 
@@ -313,38 +313,42 @@ msgstr "Ein Empfänger wurde entfernt"
 msgid "A recipient was updated"
 msgstr "Ein Empfänger wurde aktualisiert"
 
-#: packages/lib/server-only/team/create-team-email-verification.ts:142
-msgid "A request to use your email has been initiated by {teamName} on Documenso"
-msgstr "Eine Anfrage zur Verwendung deiner E-Mail wurde von {teamName} auf Documenso initiiert"
+#: packages/lib/server-only/team/create-team-email-verification.ts:156
+msgid "A request to use your email has been initiated by {0} on Documenso"
+msgstr ""
 
-#: packages/email/templates/team-join.tsx:29
+#: packages/lib/server-only/team/create-team-email-verification.ts:142
+#~ msgid "A request to use your email has been initiated by {teamName} on Documenso"
+#~ msgstr "Eine Anfrage zur Verwendung deiner E-Mail wurde von {teamName} auf Documenso initiiert"
+
+#: packages/email/templates/team-join.tsx:31
 msgid "A team member has joined a team on Documenso"
 msgstr "Ein Teammitglied ist einem Team bei Documenso beigetreten"
 
-#: packages/lib/jobs/definitions/emails/send-team-member-left-email.ts:79
+#: packages/lib/jobs/definitions/emails/send-team-member-left-email.ts:92
 msgid "A team member has left {0}"
 msgstr "Ein Teammitglied hat {0} verlassen"
 
-#: packages/email/templates/team-leave.tsx:29
+#: packages/email/templates/team-leave.tsx:31
 msgid "A team member has left a team on Documenso"
 msgstr "Ein Teammitglied hat ein Team auf Documenso verlassen"
 
-#: packages/email/templates/team-delete.tsx:27
-#: packages/email/templates/team-delete.tsx:31
+#: packages/email/templates/team-delete.tsx:29
+#: packages/email/templates/team-delete.tsx:33
 msgid "A team you were a part of has been deleted"
 msgstr "Ein Team, dem du angehörtest, wurde gelöscht"
 
-#: packages/email/templates/confirm-team-email.tsx:111
-#: packages/email/templates/team-invite.tsx:77
+#: packages/email/templates/confirm-team-email.tsx:118
+#: packages/email/templates/team-invite.tsx:94
 #: packages/email/templates/team-transfer-request.tsx:81
 msgid "Accept"
 msgstr "Akzeptieren"
 
-#: packages/email/templates/team-invite.tsx:29
+#: packages/email/templates/team-invite.tsx:42
 msgid "Accept invitation to join a team on Documenso"
 msgstr "Einladung annehmen, um einem Team auf Documenso beizutreten"
 
-#: packages/email/templates/confirm-team-email.tsx:38
+#: packages/email/templates/confirm-team-email.tsx:41
 msgid "Accept team email request for {teamName} on Documenso"
 msgstr "Akzeptiere die Team-E-Mail-Anfrage für {teamName} bei Documenso"
 
@@ -424,11 +428,11 @@ msgstr "Nach der Übermittlung wird ein Dokument automatisch generiert und zu Ih
 msgid "All signatures have been voided."
 msgstr "Alle Unterschriften wurden ungültig gemacht."
 
-#: packages/email/templates/confirm-team-email.tsx:91
+#: packages/email/templates/confirm-team-email.tsx:98
 msgid "Allow document recipients to reply directly to this email address"
 msgstr ""
 
-#: packages/email/templates/document-super-delete.tsx:20
+#: packages/email/templates/document-super-delete.tsx:22
 msgid "An admin has deleted your document \"{documentName}\"."
 msgstr "Ein Administrator hat dein Dokument \"{documentName}\" gelöscht."
 
@@ -472,11 +476,11 @@ msgstr "Schwarz"
 msgid "Blue"
 msgstr "Blau"
 
-#: packages/email/templates/team-invite.tsx:67
+#: packages/email/templates/team-invite.tsx:84
 msgid "by <0>{senderName}</0>"
 msgstr "von <0>{senderName}</0>"
 
-#: packages/email/templates/confirm-team-email.tsx:80
+#: packages/email/templates/confirm-team-email.tsx:87
 msgid "By accepting this request, you will be granting <0>{teamName}</0> access to:"
 msgstr ""
 
@@ -540,8 +544,8 @@ msgstr "Schließen"
 msgid "Completed"
 msgstr "Abgeschlossen"
 
-#: packages/email/templates/document-completed.tsx:21
-#: packages/email/templates/document-self-signed.tsx:17
+#: packages/email/templates/document-completed.tsx:23
+#: packages/email/templates/document-self-signed.tsx:19
 msgid "Completed Document"
 msgstr "Abgeschlossenes Dokument"
 
@@ -601,11 +605,11 @@ msgstr "Datum"
 msgid "Date Format"
 msgstr "Datumsformat"
 
-#: packages/email/templates/team-invite.tsx:83
+#: packages/email/templates/team-invite.tsx:100
 msgid "Decline"
 msgstr "Ablehnen"
 
-#: packages/email/templates/reset-password.tsx:65
+#: packages/email/templates/reset-password.tsx:71
 msgid "Didn't request a password change? We are here to help you secure your account, just <0>contact us.</0>"
 msgstr "Hast du keinen Passwortwechsel angefordert? Wir helfen dir, dein Konto abzusichern, kontaktiere uns einfach <0>hier.</0>"
 
@@ -623,8 +627,8 @@ msgstr "Dokumentenzugriff"
 msgid "Document access auth updated"
 msgstr "Die Authentifizierung für den Dokumentenzugriff wurde aktualisiert"
 
-#: packages/lib/server-only/document/delete-document.ts:213
-#: packages/lib/server-only/document/super-delete-document.ts:75
+#: packages/lib/server-only/document/delete-document.ts:237
+#: packages/lib/server-only/document/super-delete-document.ts:89
 msgid "Document Cancelled"
 msgstr "Dokument storniert"
 
@@ -637,8 +641,8 @@ msgstr "Dokument abgeschlossen"
 msgid "Document created"
 msgstr "Dokument erstellt"
 
-#: packages/email/templates/document-created-from-direct-template.tsx:30
-#: packages/lib/server-only/template/create-document-from-direct-template.ts:554
+#: packages/email/templates/document-created-from-direct-template.tsx:32
+#: packages/lib/server-only/template/create-document-from-direct-template.ts:566
 msgid "Document created from direct template"
 msgstr "Dokument erstellt aus direkter Vorlage"
 
@@ -650,7 +654,7 @@ msgstr "Dokumenterstellung"
 msgid "Document deleted"
 msgstr "Dokument gelöscht"
 
-#: packages/lib/server-only/document/send-delete-email.ts:58
+#: packages/lib/server-only/document/send-delete-email.ts:73
 msgid "Document Deleted!"
 msgstr "Dokument gelöscht!"
 
@@ -836,7 +840,7 @@ msgstr "Zurück"
 msgid "Green"
 msgstr "Grün"
 
-#: packages/email/templates/reset-password.tsx:50
+#: packages/email/templates/reset-password.tsx:56
 msgid "Hi, {userName} <0>({userEmail})</0>"
 msgstr "Hallo, {userName} <0>({userEmail})</0>"
 
@@ -873,7 +877,7 @@ msgstr "Ungültige E-Mail"
 msgid "Invalid email address"
 msgstr "Ungültige E-Mail-Adresse"
 
-#: packages/email/templates/team-invite.tsx:55
+#: packages/email/templates/team-invite.tsx:72
 msgid "Join {teamName} on Documenso"
 msgstr "Tritt {teamName} auf Documenso bei"
 
@@ -888,7 +892,7 @@ msgstr "Beschriftung"
 msgid "Language"
 msgstr "Sprache"
 
-#: packages/email/templates/confirm-team-email.tsx:117
+#: packages/email/templates/confirm-team-email.tsx:124
 #: packages/email/templates/team-transfer-request.tsx:87
 msgid "Link expires in 1 hour."
 msgstr "Link läuft in 1 Stunde ab."
@@ -1002,11 +1006,11 @@ msgstr "Seite {0} von {numPages}"
 msgid "Password Required"
 msgstr "Passwort erforderlich"
 
-#: packages/email/templates/forgot-password.tsx:17
+#: packages/email/templates/forgot-password.tsx:19
 msgid "Password Reset Requested"
 msgstr "Passwortzurücksetzung angefordert"
 
-#: packages/email/templates/reset-password.tsx:18
+#: packages/email/templates/reset-password.tsx:20
 msgid "Password Reset Successful"
 msgstr "Passwort erfolgreich zurückgesetzt"
 
@@ -1018,7 +1022,7 @@ msgstr "Passwort aktualisiert!"
 msgid "Pending"
 msgstr "Ausstehend"
 
-#: packages/email/templates/document-pending.tsx:17
+#: packages/email/templates/document-pending.tsx:19
 msgid "Pending Document"
 msgstr "Ausstehendes Dokument"
 
@@ -1036,19 +1040,19 @@ msgstr "Platzhalter"
 msgid "Please {0} your document<0/>\"{documentName}\""
 msgstr "Bitte {0} dein Dokument<0/>\"{documentName}\""
 
-#: packages/email/templates/document-invite.tsx:48
+#: packages/email/templates/document-invite.tsx:53
 msgid "Please {action} your document {documentName}"
 msgstr "Bitte {action} dein Dokument {documentName}"
 
-#: packages/lib/jobs/definitions/emails/send-signing-email.ts:99
+#: packages/lib/jobs/definitions/emails/send-signing-email.ts:100
 msgid "Please {recipientActionVerb} this document"
 msgstr "Bitte {recipientActionVerb} dieses Dokument"
 
-#: packages/lib/jobs/definitions/emails/send-signing-email.ts:113
+#: packages/lib/jobs/definitions/emails/send-signing-email.ts:114
 msgid "Please {recipientActionVerb} this document created by your direct template"
 msgstr "Bitte {recipientActionVerb} dieses Dokument, das von deiner direkten Vorlage erstellt wurde"
 
-#: packages/lib/jobs/definitions/emails/send-signing-email.ts:105
+#: packages/lib/jobs/definitions/emails/send-signing-email.ts:106
 msgid "Please {recipientActionVerb} your document"
 msgstr "Bitte {recipientActionVerb} dein Dokument"
 
@@ -1056,7 +1060,7 @@ msgstr "Bitte {recipientActionVerb} dein Dokument"
 msgid "Please confirm your email"
 msgstr "Bitte bestätige deine E-Mail"
 
-#: packages/email/templates/confirm-email.tsx:15
+#: packages/email/templates/confirm-email.tsx:17
 msgid "Please confirm your email address"
 msgstr "Bitte bestätige deine E-Mail-Adresse"
 
@@ -1104,19 +1108,19 @@ msgstr "Rot"
 msgid "Redirect URL"
 msgstr "Weiterleitungs-URL"
 
-#: packages/lib/server-only/document/resend-document.tsx:173
+#: packages/lib/server-only/document/resend-document.tsx:183
 msgid "Reminder: {0}"
 msgstr "Erinnerung: {0}"
 
-#: packages/lib/server-only/document/resend-document.tsx:121
+#: packages/lib/server-only/document/resend-document.tsx:123
 msgid "Reminder: {0} invited you to {recipientActionVerb} a document"
 msgstr "Erinnerung: {0} hat dich eingeladen, ein Dokument {recipientActionVerb}"
 
-#: packages/lib/server-only/document/resend-document.tsx:110
+#: packages/lib/server-only/document/resend-document.tsx:112
 msgid "Reminder: Please {recipientActionVerb} this document"
 msgstr "Erinnerung: Bitte {recipientActionVerb} dieses Dokument"
 
-#: packages/lib/server-only/document/resend-document.tsx:116
+#: packages/lib/server-only/document/resend-document.tsx:118
 msgid "Reminder: Please {recipientActionVerb} your document"
 msgstr "Erinnerung: Bitte {recipientActionVerb} dein Dokument"
 
@@ -1182,7 +1186,7 @@ msgstr "Senden"
 msgid "Send Document"
 msgstr "Dokument senden"
 
-#: packages/email/templates/confirm-team-email.tsx:94
+#: packages/email/templates/confirm-team-email.tsx:101
 msgid "Send documents on behalf of the team using the email address"
 msgstr ""
 
@@ -1239,8 +1243,8 @@ msgstr "Unterzeichner müssen eindeutige E-Mails haben"
 msgid "Signing"
 msgstr "Unterzeichnung"
 
-#: packages/lib/server-only/document/send-completed-email.ts:93
-#: packages/lib/server-only/document/send-completed-email.ts:161
+#: packages/lib/server-only/document/send-completed-email.ts:103
+#: packages/lib/server-only/document/send-completed-email.ts:179
 msgid "Signing Complete!"
 msgstr "Unterzeichnung abgeschlossen!"
 
@@ -1278,15 +1282,19 @@ msgstr "Betreff <0>(Optional)</0>"
 msgid "Submit"
 msgstr "Einreichen"
 
-#: packages/lib/server-only/team/delete-team-email.ts:96
+#: packages/lib/server-only/team/delete-team.ts:124
+msgid "Team \"{0}\" has been deleted on Documenso"
+msgstr ""
+
+#: packages/lib/server-only/team/delete-team-email.ts:104
 msgid "Team email has been revoked for {0}"
 msgstr "Team-E-Mail wurde für {0} widerrufen"
 
-#: packages/email/templates/team-email-removed.tsx:53
+#: packages/email/templates/team-email-removed.tsx:59
 msgid "Team email removed"
 msgstr "Team-E-Mail entfernt"
 
-#: packages/email/templates/team-email-removed.tsx:27
+#: packages/email/templates/team-email-removed.tsx:29
 msgid "Team email removed for {teamName} on Documenso"
 msgstr "Team-E-Mail für {teamName} auf Documenso entfernt"
 
@@ -1320,11 +1328,11 @@ msgstr "Die Authentifizierung, die erforderlich ist, damit Empfänger das Dokume
 msgid "The document's name"
 msgstr "Der Name des Dokuments"
 
-#: packages/email/templates/team-delete.tsx:35
+#: packages/email/templates/team-delete.tsx:37
 msgid "The following team has been deleted by its owner. You will no longer be able to access this team and its documents"
 msgstr "Das folgende Team wurde von seinem Besitzer gelöscht. Du kannst nicht mehr auf dieses Team und seine Dokumente zugreifen"
 
-#: packages/email/templates/team-delete.tsx:34
+#: packages/email/templates/team-delete.tsx:36
 msgid "The following team has been deleted by you"
 msgstr "Das folgende Team wurde von dir gelöscht"
 
@@ -1368,7 +1376,7 @@ msgstr "Die E-Mail des Unterzeichners"
 msgid "The signer's name"
 msgstr "Der Name des Unterzeichners"
 
-#: packages/email/templates/team-email-removed.tsx:57
+#: packages/email/templates/team-email-removed.tsx:63
 msgid "The team email <0>{teamEmail}</0> has been removed from the following team"
 msgstr "Die Team-E-Mail <0>{teamEmail}</0> wurde aus dem folgenden Team entfernt"
 
@@ -1388,7 +1396,7 @@ msgstr "Dieses Dokument wurde bereits an diesen Empfänger gesendet. Sie können
 msgid "This document is password protected. Please enter the password to view the document."
 msgstr "Dieses Dokument ist durch ein Passwort geschützt. Bitte geben Sie das Passwort ein, um das Dokument anzusehen."
 
-#: packages/email/template-components/template-footer.tsx:14
+#: packages/email/template-components/template-footer.tsx:17
 msgid "This document was sent using <0>Documenso.</0>"
 msgstr "Dieses Dokument wurde mit <0>Documenso.</0> gesendet"
 
@@ -1448,7 +1456,7 @@ msgstr "Validierung"
 msgid "Value"
 msgstr "Wert"
 
-#: packages/email/templates/confirm-team-email.tsx:64
+#: packages/email/templates/confirm-team-email.tsx:71
 msgid "Verify your team email address"
 msgstr ""
 
@@ -1456,11 +1464,11 @@ msgstr ""
 msgid "View"
 msgstr "Betrachten"
 
-#: packages/email/templates/confirm-team-email.tsx:88
+#: packages/email/templates/confirm-team-email.tsx:95
 msgid "View all documents sent to and from this email address"
 msgstr ""
 
-#: packages/email/templates/document-created-from-direct-template.tsx:69
+#: packages/email/templates/document-created-from-direct-template.tsx:75
 msgid "View document"
 msgstr "Dokument anzeigen"
 
@@ -1492,7 +1500,7 @@ msgstr "Betrachten"
 msgid "Waiting for others"
 msgstr "Warten auf andere"
 
-#: packages/lib/server-only/document/send-pending-email.ts:73
+#: packages/lib/server-only/document/send-pending-email.ts:87
 msgid "Waiting for others to complete signing."
 msgstr "Warten auf andere, um die Unterzeichnung abzuschließen."
 
@@ -1500,7 +1508,7 @@ msgstr "Warten auf andere, um die Unterzeichnung abzuschließen."
 msgid "We're still waiting for other signers to sign this document.<0/>We'll notify you as soon as it's ready."
 msgstr "Wir warten noch darauf, dass andere Unterzeichner dieses Dokument unterzeichnen.<0/>Wir benachrichtigen dich, sobald es bereit ist."
 
-#: packages/email/templates/reset-password.tsx:59
+#: packages/email/templates/reset-password.tsx:65
 msgid "We've changed your password as you asked. You can now sign in with your new password."
 msgstr "Wir haben dein Passwort wie gewünscht geändert. Du kannst dich jetzt mit deinem neuen Passwort anmelden."
 
@@ -1520,7 +1528,7 @@ msgstr "Sie sind dabei, dieses Dokument an die Empfänger zu senden. Sind Sie si
 msgid "You can also copy and paste this link into your browser: {confirmationLink} (link expires in 1 hour)"
 msgstr "Du kannst diesen Link auch kopieren und in deinen Browser einfügen: {confirmationLink} (Link läuft in 1 Stunde ab)"
 
-#: packages/email/templates/confirm-team-email.tsx:99
+#: packages/email/templates/confirm-team-email.tsx:106
 msgid "You can revoke access at any time in your team settings on Documenso <0>here.</0>"
 msgstr ""
 
@@ -1536,15 +1544,15 @@ msgstr "Sie können derzeit keine Dokumente hochladen."
 msgid "You don't need to sign it anymore."
 msgstr "Du musst es nicht mehr unterschreiben."
 
-#: packages/lib/server-only/team/create-team-member-invites.ts:168
+#: packages/lib/server-only/team/create-team-member-invites.ts:186
 msgid "You have been invited to join {0} on Documenso"
 msgstr "Du wurdest eingeladen, {0} auf Documenso beizutreten"
 
-#: packages/email/templates/team-invite.tsx:59
+#: packages/email/templates/team-invite.tsx:76
 msgid "You have been invited to join the following team"
 msgstr "Du wurdest eingeladen, dem folgenden Team beizutreten"
 
-#: packages/lib/server-only/recipient/set-recipients-for-document.ts:314
+#: packages/lib/server-only/recipient/set-recipients-for-document.ts:324
 msgid "You have been removed from a document"
 msgstr "Du wurdest von einem Dokument entfernt"
 
@@ -1552,8 +1560,8 @@ msgstr "Du wurdest von einem Dokument entfernt"
 msgid "You have been requested to take ownership of team {0} on Documenso"
 msgstr "Du wurdest gebeten, das Team {0} auf Documenso zu übernehmen"
 
-#: packages/lib/jobs/definitions/emails/send-signing-email.ts:103
-#: packages/lib/server-only/document/resend-document.tsx:114
+#: packages/lib/jobs/definitions/emails/send-signing-email.ts:104
+#: packages/lib/server-only/document/resend-document.tsx:116
 msgid "You have initiated the document {0} that requires you to {recipientActionVerb} it."
 msgstr "Du hast das Dokument {0} initiiert, das erfordert, dass du {recipientActionVerb}."
 
@@ -1573,7 +1581,7 @@ msgstr "Dein Dokument wurde von einem Administrator gelöscht!"
 msgid "Your password has been updated."
 msgstr "Dein Passwort wurde aktualisiert."
 
-#: packages/email/templates/team-delete.tsx:26
-#: packages/email/templates/team-delete.tsx:30
+#: packages/email/templates/team-delete.tsx:28
+#: packages/email/templates/team-delete.tsx:32
 msgid "Your team has been deleted"
 msgstr "Dein Team wurde gelöscht"

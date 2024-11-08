@@ -2,6 +2,7 @@ import { msg } from '@lingui/macro';
 import { useLingui } from '@lingui/react';
 
 import { Body, Container, Head, Hr, Html, Img, Preview, Section } from '../components';
+import { useBranding } from '../providers/branding';
 import {
   TemplateDocumentDelete,
   type TemplateDocumentDeleteProps,
@@ -16,6 +17,7 @@ export const DocumentSuperDeleteEmailTemplate = ({
   reason = 'Unknown',
 }: DocumentDeleteEmailTemplateProps) => {
   const { _ } = useLingui();
+  const branding = useBranding();
 
   const previewText = msg`An admin has deleted your document "${documentName}".`;
 
@@ -32,11 +34,15 @@ export const DocumentSuperDeleteEmailTemplate = ({
         <Section>
           <Container className="mx-auto mb-2 mt-8 max-w-xl rounded-lg border border-solid border-slate-200 p-4 backdrop-blur-sm">
             <Section>
-              <Img
-                src={getAssetUrl('/static/logo.png')}
-                alt="Documenso Logo"
-                className="mb-4 h-6"
-              />
+              {branding.brandingEnabled && branding.brandingLogo ? (
+                <Img src={branding.brandingLogo} alt="Branding Logo" className="mb-4 h-6" />
+              ) : (
+                <Img
+                  src={getAssetUrl('/static/logo.png')}
+                  alt="Documenso Logo"
+                  className="mb-4 h-6"
+                />
+              )}
 
               <TemplateDocumentDelete
                 reason={reason}

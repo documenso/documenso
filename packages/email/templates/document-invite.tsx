@@ -1,10 +1,11 @@
 import { Trans, msg } from '@lingui/macro';
 import { useLingui } from '@lingui/react';
 
-import { RECIPIENT_ROLES_DESCRIPTION_ENG } from '@documenso/lib/constants/recipient-roles';
+import { RECIPIENT_ROLES_DESCRIPTION } from '@documenso/lib/constants/recipient-roles';
 import type { RecipientRole } from '@documenso/prisma/client';
 
 import { Body, Container, Head, Hr, Html, Img, Link, Preview, Section, Text } from '../components';
+import { useBranding } from '../providers/branding';
 import type { TemplateDocumentInviteProps } from '../template-components/template-document-invite';
 import { TemplateDocumentInvite } from '../template-components/template-document-invite';
 import { TemplateFooter } from '../template-components/template-footer';
@@ -33,8 +34,9 @@ export const DocumentInviteEmailTemplate = ({
   includeSenderDetails,
 }: DocumentInviteEmailTemplateProps) => {
   const { _ } = useLingui();
+  const branding = useBranding();
 
-  const action = _(RECIPIENT_ROLES_DESCRIPTION_ENG[role].actionVerb).toLowerCase();
+  const action = _(RECIPIENT_ROLES_DESCRIPTION[role].actionVerb).toLowerCase();
 
   let previewText = msg`${inviterName} has invited you to ${action} ${documentName}`;
 
@@ -61,11 +63,15 @@ export const DocumentInviteEmailTemplate = ({
         <Section>
           <Container className="mx-auto mb-2 mt-8 max-w-xl rounded-lg border border-solid border-slate-200 p-4 backdrop-blur-sm">
             <Section>
-              <Img
-                src={getAssetUrl('/static/logo.png')}
-                alt="Documenso Logo"
-                className="mb-4 h-6"
-              />
+              {branding.brandingEnabled && branding.brandingLogo ? (
+                <Img src={branding.brandingLogo} alt="Branding Logo" className="mb-4 h-6" />
+              ) : (
+                <Img
+                  src={getAssetUrl('/static/logo.png')}
+                  alt="Documenso Logo"
+                  className="mb-4 h-6"
+                />
+              )}
 
               <TemplateDocumentInvite
                 inviterName={inviterName}

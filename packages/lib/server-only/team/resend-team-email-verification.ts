@@ -33,6 +33,7 @@ export const resendTeamEmailVerification = async ({
         },
         include: {
           emailVerification: true,
+          teamGlobalSettings: true,
         },
       });
 
@@ -61,7 +62,7 @@ export const resendTeamEmailVerification = async ({
         },
       });
 
-      await sendTeamEmailVerificationEmail(emailVerification.email, token, team.name, team.url);
+      await sendTeamEmailVerificationEmail(emailVerification.email, token, team);
     },
     { timeout: 30_000 },
   );

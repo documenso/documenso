@@ -1,7 +1,7 @@
 import { Trans } from '@lingui/macro';
 import { useLingui } from '@lingui/react';
 
-import { RECIPIENT_ROLES_DESCRIPTION_ENG } from '@documenso/lib/constants/recipient-roles';
+import { RECIPIENT_ROLES_DESCRIPTION } from '@documenso/lib/constants/recipient-roles';
 import type { RecipientRole } from '@documenso/prisma/client';
 
 import { Button, Section, Text } from '../components';
@@ -33,7 +33,7 @@ export const TemplateDocumentInvite = ({
 }: TemplateDocumentInviteProps) => {
   const { _ } = useLingui();
 
-  const { actionVerb, progressiveVerb } = RECIPIENT_ROLES_DESCRIPTION_ENG[role];
+  const { actionVerb, progressiveVerb } = RECIPIENT_ROLES_DESCRIPTION[role];
 
   return (
     <>
@@ -55,7 +55,7 @@ export const TemplateDocumentInvite = ({
                 </Trans>
               ) : (
                 <Trans>
-                  {teamName} has invited you to {actionVerb.toLowerCase()}
+                  {teamName} has invited you to {_(actionVerb).toLowerCase()}
                 </Trans>
               )}
               <br />"{documentName}"

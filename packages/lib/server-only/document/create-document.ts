@@ -109,6 +109,11 @@ export const createDocument = async ({
         ),
         formValues,
         source: DocumentSource.DOCUMENT,
+        documentMeta: {
+          create: {
+            language: team?.teamGlobalSettings?.documentLanguage,
+          },
+        },
       },
     });
 

@@ -28,6 +28,7 @@ import { FROM_ADDRESS, FROM_NAME } from '../../constants/email';
 import { AppError, AppErrorCode } from '../../errors/app-error';
 import { canRecipientBeModified } from '../../utils/recipients';
 import { renderEmailWithI18N } from '../../utils/render-email-with-i18n';
+import { teamGlobalSettingsToBranding } from '../../utils/team-global-settings-to-branding';
 
 export interface SetRecipientsForDocumentOptions {
   userId: number;
@@ -66,6 +67,11 @@ export const setRecipientsForDocument = async ({
     include: {
       Field: true,
       documentMeta: true,
+      team: {
+        include: {
+          teamGlobalSettings: true,
+        },
+      },
     },
   });
 
@@ -294,6 +300,10 @@ export const setRecipientsForDocument = async ({
           inviterName: user.name || undefined,
           assetBaseUrl,
         });
+
+        const branding = document.team?.teamGlobalSettings
+          ? teamGlobalSettingsToBranding(document.team.teamGlobalSettings)
+          : undefined;
 
         const [html, text] = await Promise.all([
           renderEmailWithI18N(template, { lang: document.documentMeta?.language }),
