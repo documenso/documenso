@@ -19,6 +19,7 @@ import type { Prisma } from '@documenso/prisma/client';
 
 import { getI18nInstance } from '../../client-only/providers/i18n.server';
 import { NEXT_PUBLIC_WEBAPP_URL } from '../../constants/app';
+import { extractDerivedDocumentEmailSettings } from '../../types/document-email';
 import { renderEmailWithI18N } from '../../utils/render-email-with-i18n';
 import { getDocumentWhereInput } from './get-document-by-id';
 
@@ -87,6 +88,14 @@ export const resendDocument = async ({
 
   if (document.status === DocumentStatus.COMPLETED) {
     throw new Error('Can not send completed document');
+  }
+
+  const isRecipientSigningRequestEmailEnabled = extractDerivedDocumentEmailSettings(
+    document.documentMeta,
+  ).recipientSigningRequest;
+
+  if (!isRecipientSigningRequestEmailEnabled) {
+    return;
   }
 
   await Promise.all(

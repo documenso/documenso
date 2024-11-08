@@ -10,6 +10,7 @@ import { DocumentSource } from '@documenso/prisma/client';
 import { getI18nInstance } from '../../client-only/providers/i18n.server';
 import { NEXT_PUBLIC_WEBAPP_URL } from '../../constants/app';
 import { DOCUMENT_AUDIT_LOG_TYPE } from '../../types/document-audit-logs';
+import { extractDerivedDocumentEmailSettings } from '../../types/document-email';
 import type { RequestMetadata } from '../../universal/extract-request-metadata';
 import { getFile } from '../../universal/upload/get-file';
 import { createDocumentAuditLogData } from '../../utils/document-audit-logs';
@@ -66,8 +67,15 @@ export const sendCompletedEmail = async ({ documentId, requestMetadata }: SendDo
 
   const i18n = await getI18nInstance(document.documentMeta?.language);
 
-  // If the document owner is not a recipient then send the email to them separately
-  if (!document.Recipient.find((recipient) => recipient.email === owner.email)) {
+  const isDocumentCompletedEmailEnabled = extractDerivedDocumentEmailSettings(
+    document.documentMeta,
+  ).documentCompleted;
+
+  // If the document owner is not a recipient, OR recipient emails are disabled, then send the email to them separately.
+  if (
+    !document.Recipient.find((recipient) => recipient.email === owner.email) ||
+    !isDocumentCompletedEmailEnabled
+  ) {
     const template = createElement(DocumentCompletedEmailTemplate, {
       documentName: document.title,
       assetBaseUrl,
@@ -117,6 +125,10 @@ export const sendCompletedEmail = async ({ documentId, requestMetadata }: SendDo
         },
       }),
     });
+  }
+
+  if (!isDocumentCompletedEmailEnabled) {
+    return;
   }
 
   await Promise.all(
