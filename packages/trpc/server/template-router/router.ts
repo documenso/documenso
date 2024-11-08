@@ -120,7 +120,7 @@ export const templateRouter = router({
           requestMetadata,
         });
 
-        if (input.sendDocument) {
+        if (input.distributeDocument) {
           document = await sendDocument({
             documentId: document.id,
             userId: ctx.user.id,

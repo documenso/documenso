@@ -14,6 +14,7 @@ import { getI18nInstance } from '../../client-only/providers/i18n.server';
 import { NEXT_PUBLIC_WEBAPP_URL } from '../../constants/app';
 import { FROM_ADDRESS, FROM_NAME } from '../../constants/email';
 import { DOCUMENT_AUDIT_LOG_TYPE } from '../../types/document-audit-logs';
+import { extractDerivedDocumentEmailSettings } from '../../types/document-email';
 import type { RequestMetadata } from '../../universal/extract-request-metadata';
 import { createDocumentAuditLogData } from '../../utils/document-audit-logs';
 import { renderEmailWithI18N } from '../../utils/render-email-with-i18n';
@@ -177,6 +178,14 @@ const handleDocumentOwnerDelete = async ({
       },
     });
   });
+
+  const isDocumentDeleteEmailEnabled = extractDerivedDocumentEmailSettings(
+    document.documentMeta,
+  ).documentDeleted;
+
+  if (!isDocumentDeleteEmailEnabled) {
+    return deletedDocument;
+  }
 
   // Send cancellation emails to recipients.
   await Promise.all(

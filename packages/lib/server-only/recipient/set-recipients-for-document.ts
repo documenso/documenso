@@ -26,6 +26,7 @@ import { getI18nInstance } from '../../client-only/providers/i18n.server';
 import { NEXT_PUBLIC_WEBAPP_URL } from '../../constants/app';
 import { FROM_ADDRESS, FROM_NAME } from '../../constants/email';
 import { AppError, AppErrorCode } from '../../errors/app-error';
+import { extractDerivedDocumentEmailSettings } from '../../types/document-email';
 import { canRecipientBeModified } from '../../utils/recipients';
 import { renderEmailWithI18N } from '../../utils/render-email-with-i18n';
 
@@ -280,10 +281,14 @@ export const setRecipientsForDocument = async ({
       });
     });
 
+    const isRecipientRemovedEmailEnabled = extractDerivedDocumentEmailSettings(
+      document.documentMeta,
+    ).recipientRemoved;
+
     // Send emails to deleted recipients.
     await Promise.all(
       removedRecipients.map(async (recipient) => {
-        if (recipient.sendStatus !== SendStatus.SENT) {
+        if (recipient.sendStatus !== SendStatus.SENT || !isRecipientRemovedEmailEnabled) {
           return;
         }
 

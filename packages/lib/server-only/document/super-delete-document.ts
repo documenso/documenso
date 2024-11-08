@@ -13,6 +13,7 @@ import { getI18nInstance } from '../../client-only/providers/i18n.server';
 import { NEXT_PUBLIC_WEBAPP_URL } from '../../constants/app';
 import { FROM_ADDRESS, FROM_NAME } from '../../constants/email';
 import { DOCUMENT_AUDIT_LOG_TYPE } from '../../types/document-audit-logs';
+import { extractDerivedDocumentEmailSettings } from '../../types/document-email';
 import type { RequestMetadata } from '../../universal/extract-request-metadata';
 import { createDocumentAuditLogData } from '../../utils/document-audit-logs';
 import { renderEmailWithI18N } from '../../utils/render-email-with-i18n';
@@ -40,8 +41,16 @@ export const superDeleteDocument = async ({ id, requestMetadata }: SuperDeleteDo
 
   const { status, User: user } = document;
 
+  const isDocumentDeletedEmailEnabled = extractDerivedDocumentEmailSettings(
+    document.documentMeta,
+  ).documentDeleted;
+
   // if the document is pending, send cancellation emails to all recipients
-  if (status === DocumentStatus.PENDING && document.Recipient.length > 0) {
+  if (
+    status === DocumentStatus.PENDING &&
+    document.Recipient.length > 0 &&
+    isDocumentDeletedEmailEnabled
+  ) {
     await Promise.all(
       document.Recipient.map(async (recipient) => {
         if (recipient.sendStatus !== SendStatus.SENT) {

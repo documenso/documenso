@@ -5,9 +5,11 @@ import {
   ZDocumentAccessAuthTypesSchema,
   ZDocumentActionAuthTypesSchema,
 } from '@documenso/lib/types/document-auth';
+import { ZDocumentEmailSettingsSchema } from '@documenso/lib/types/document-email';
 import { ZBaseTableSearchParamsSchema } from '@documenso/lib/types/search-params';
 import { isValidRedirectUrl } from '@documenso/lib/utils/is-valid-redirect-url';
 import {
+  DocumentDistributionMethod,
   DocumentSigningOrder,
   DocumentSource,
   DocumentStatus,
@@ -155,6 +157,7 @@ export const ZSendDocumentMutationSchema = z.object({
     message: z.string(),
     timezone: z.string().optional(),
     dateFormat: z.string().optional(),
+    distributionMethod: z.nativeEnum(DocumentDistributionMethod).optional(),
     redirectUrl: z
       .string()
       .optional()
@@ -162,6 +165,7 @@ export const ZSendDocumentMutationSchema = z.object({
         message:
           'Please enter a valid URL, make sure you include http:// or https:// part of the url.',
       }),
+    emailSettings: ZDocumentEmailSettingsSchema.optional(),
   }),
 });
 
