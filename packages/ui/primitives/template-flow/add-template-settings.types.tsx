@@ -7,9 +7,11 @@ import {
   ZDocumentAccessAuthTypesSchema,
   ZDocumentActionAuthTypesSchema,
 } from '@documenso/lib/types/document-auth';
+import { ZDocumentEmailSettingsSchema } from '@documenso/lib/types/document-email';
 import { isValidRedirectUrl } from '@documenso/lib/utils/is-valid-redirect-url';
 
 import { ZMapNegativeOneToUndefinedSchema } from '../document-flow/add-settings.types';
+import { DocumentDistributionMethod } from '.prisma/client';
 
 export const ZAddTemplateSettingsFormSchema = z.object({
   title: z.string().trim().min(1, { message: "Title can't be empty" }),
@@ -25,6 +27,10 @@ export const ZAddTemplateSettingsFormSchema = z.object({
     message: z.string(),
     timezone: z.string().optional().default(DEFAULT_DOCUMENT_TIME_ZONE),
     dateFormat: z.string().optional().default(DEFAULT_DOCUMENT_DATE_FORMAT),
+    distributionMethod: z
+      .nativeEnum(DocumentDistributionMethod)
+      .optional()
+      .default(DocumentDistributionMethod.EMAIL),
     redirectUrl: z
       .string()
       .optional()
@@ -36,6 +42,7 @@ export const ZAddTemplateSettingsFormSchema = z.object({
       .union([z.string(), z.enum(SUPPORTED_LANGUAGE_CODES)])
       .optional()
       .default('en'),
+    emailSettings: ZDocumentEmailSettingsSchema,
   }),
 });
 

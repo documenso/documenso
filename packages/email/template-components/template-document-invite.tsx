@@ -1,8 +1,9 @@
 import { Trans } from '@lingui/macro';
 import { useLingui } from '@lingui/react';
+import { match } from 'ts-pattern';
 
 import { RECIPIENT_ROLES_DESCRIPTION } from '@documenso/lib/constants/recipient-roles';
-import type { RecipientRole } from '@documenso/prisma/client';
+import { RecipientRole } from '@documenso/prisma/client';
 
 import { Button, Section, Text } from '../components';
 import { TemplateDocumentImage } from './template-document-image';
@@ -33,7 +34,7 @@ export const TemplateDocumentInvite = ({
 }: TemplateDocumentInviteProps) => {
   const { _ } = useLingui();
 
-  const { actionVerb, progressiveVerb } = RECIPIENT_ROLES_DESCRIPTION[role];
+  const { actionVerb } = RECIPIENT_ROLES_DESCRIPTION[role];
 
   return (
     <>
@@ -69,7 +70,12 @@ export const TemplateDocumentInvite = ({
         </Text>
 
         <Text className="my-1 text-center text-base text-slate-400">
-          <Trans>Continue by {_(progressiveVerb).toLowerCase()} the document.</Trans>
+          {match(role)
+            .with(RecipientRole.SIGNER, () => <Trans>Continue by signing the document.</Trans>)
+            .with(RecipientRole.VIEWER, () => <Trans>Continue by viewing the document.</Trans>)
+            .with(RecipientRole.APPROVER, () => <Trans>Continue by approving the document.</Trans>)
+            .with(RecipientRole.CC, () => '')
+            .exhaustive()}
         </Text>
 
         <Section className="mb-6 mt-8 text-center">
@@ -77,7 +83,12 @@ export const TemplateDocumentInvite = ({
             className="bg-documenso-500 inline-flex items-center justify-center rounded-lg px-6 py-3 text-center text-sm font-medium text-black no-underline"
             href={signDocumentLink}
           >
-            <Trans>{_(actionVerb)} Document</Trans>
+            {match(role)
+              .with(RecipientRole.SIGNER, () => <Trans>Sign Document</Trans>)
+              .with(RecipientRole.VIEWER, () => <Trans>View Document</Trans>)
+              .with(RecipientRole.APPROVER, () => <Trans>Approve Document</Trans>)
+              .with(RecipientRole.CC, () => '')
+              .exhaustive()}
           </Button>
         </Section>
       </Section>

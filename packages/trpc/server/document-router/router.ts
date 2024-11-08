@@ -413,7 +413,15 @@ export const documentRouter = router({
       try {
         const { documentId, teamId, meta } = input;
 
-        if (meta.message || meta.subject || meta.timezone || meta.dateFormat || meta.redirectUrl) {
+        if (
+          meta.message ||
+          meta.subject ||
+          meta.timezone ||
+          meta.dateFormat ||
+          meta.redirectUrl ||
+          meta.distributionMethod ||
+          meta.emailSettings
+        ) {
           await upsertDocumentMeta({
             documentId,
             subject: meta.subject,
@@ -421,7 +429,9 @@ export const documentRouter = router({
             dateFormat: meta.dateFormat,
             timezone: meta.timezone,
             redirectUrl: meta.redirectUrl,
+            distributionMethod: meta.distributionMethod,
             userId: ctx.user.id,
+            emailSettings: meta.emailSettings,
             requestMetadata: extractNextApiRequestMetadata(ctx.req),
           });
         }
