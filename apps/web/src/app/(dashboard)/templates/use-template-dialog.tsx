@@ -368,8 +368,8 @@ export function UseTemplateDialog({
 
                                   <p className="mt-2">
                                     <Trans>
-                                      We will generate signing links for with you, which you can
-                                      send to the recipients through your method of choice.
+                                      We will generate signing links for you, which you can send to
+                                      the recipients through your method of choice.
                                     </Trans>
                                   </p>
                                 </TooltipContent>

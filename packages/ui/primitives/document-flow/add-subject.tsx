@@ -112,8 +112,9 @@ export const AddSubjectFormPartial = ({
             ))}
 
           <Tabs
-            onValueChange={(value: DocumentDistributionMethod) =>
-              setValue('meta.distributionMethod', value)
+            onValueChange={(value) =>
+              // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
+              setValue('meta.distributionMethod', value as DocumentDistributionMethod)
             }
             value={distributionMethod}
             className="mb-2"
