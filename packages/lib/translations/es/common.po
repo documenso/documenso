@@ -8,7 +8,7 @@ msgstr ""
 "Language: es\n"
 "Project-Id-Version: documenso-app\n"
 "Report-Msgid-Bugs-To: \n"
-"PO-Revision-Date: 2024-11-05 09:34\n"
+"PO-Revision-Date: 2024-11-08 12:05\n"
 "Last-Translator: \n"
 "Language-Team: Spanish\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
@@ -28,7 +28,7 @@ msgstr "“{documentName}” ha sido firmado"
 
 #: packages/email/template-components/template-document-completed.tsx:41
 msgid "“{documentName}” was signed by all signers"
-msgstr ""
+msgstr "\"{documentName}\" fue firmado por todos los firmantes"
 
 #: packages/lib/server-only/document/resend-document.tsx:109
 #~ msgid "{0}"
@@ -36,11 +36,11 @@ msgstr ""
 
 #: packages/email/template-components/template-document-invite.tsx:80
 #~ msgid "{0} Document"
-#~ msgstr "{0} Documento"
+#~ msgstr "{0} Document"
 
 #: packages/lib/jobs/definitions/emails/send-signing-email.ts:137
 msgid "{0} has invited you to {recipientActionVerb} the document \"{1}\"."
-msgstr ""
+msgstr "{0} te ha invitado a {recipientActionVerb} el documento \"{1}\"."
 
 #: packages/lib/jobs/definitions/emails/send-signing-email.ts:130
 msgid "{0} invited you to {recipientActionVerb} a document"
@@ -65,7 +65,7 @@ msgstr "{0} en nombre de {1} te ha invitado a {recipientActionVerb} el documento
 
 #: packages/email/template-components/template-document-invite.tsx:51
 #~ msgid "{0}<0/>\"{documentName}\""
-#~ msgstr ""
+#~ msgstr "{0}<0/>\"{documentName}\""
 
 #: packages/email/templates/document-invite.tsx:94
 msgid "{inviterName} <0>({inviterEmail})</0>"
@@ -89,7 +89,7 @@ msgstr "{inviterName} te ha invitado a {action} {documentName}"
 
 #: packages/email/templates/document-invite.tsx:106
 msgid "{inviterName} has invited you to {action} the document \"{documentName}\"."
-msgstr ""
+msgstr "{inviterName} te ha invitado a {action} el documento \"{documentName}\"."
 
 #: packages/email/templates/recipient-removed-from-document.tsx:20
 msgid "{inviterName} has removed you from the document {documentName}."
@@ -97,15 +97,15 @@ msgstr "{inviterName} te ha eliminado del documento {documentName}."
 
 #: packages/email/templates/recipient-removed-from-document.tsx:49
 msgid "{inviterName} has removed you from the document<0/>\"{documentName}\""
-msgstr ""
+msgstr "{inviterName} te ha eliminado del documento<0/>\"{documentName}\""
 
 #: packages/email/template-components/template-document-invite.tsx:53
 msgid "{inviterName} on behalf of {teamName} has invited you to {0}"
-msgstr ""
+msgstr "{inviterName} en nombre de {teamName} te ha invitado a {0}"
 
 #: packages/email/template-components/template-document-invite.tsx:49
 #~ msgid "{inviterName} on behalf of {teamName} has invited you to {0}<0/>\"{documentName}\""
-#~ msgstr "{inviterName} en nombre de {teamName} te ha invitado a {0}<0/>\"{documentName}\""
+#~ msgstr "{inviterName} on behalf of {teamName} has invited you to {0}<0/>\"{documentName}\""
 
 #: packages/email/templates/document-invite.tsx:45
 msgid "{inviterName} on behalf of {teamName} has invited you to {action} {documentName}"
@@ -209,11 +209,11 @@ msgstr "{recipientName} {action} un documento utilizando uno de tus enlaces dire
 
 #: packages/email/template-components/template-document-invite.tsx:58
 msgid "{teamName} has invited you to {0}"
-msgstr ""
+msgstr "{teamName} te ha invitado a {0}"
 
 #: packages/email/templates/document-invite.tsx:46
 msgid "{teamName} has invited you to {action} {documentName}"
-msgstr ""
+msgstr "{teamName} te ha invitado a {action} {documentName}"
 
 #: packages/email/templates/team-transfer-request.tsx:55
 msgid "{teamName} ownership transfer request"
@@ -245,7 +245,7 @@ msgstr "{visibleRows, plural, one {Mostrando # resultado.} other {Mostrando # re
 
 #: packages/email/templates/document-invite.tsx:100
 #~ msgid "`${inviterName} has invited you to ${action} the document \"${documentName}\".`"
-#~ msgstr "`${inviterName} te ha invitado a ${action} el documento \"${documentName}\".`"
+#~ msgstr "`${inviterName} has invited you to ${action} the document \"${documentName}\".`"
 
 #: packages/email/templates/team-transfer-request.tsx:59
 msgid "<0>{senderName}</0> has requested that you take ownership of the following team"
@@ -253,11 +253,11 @@ msgstr "<0>{senderName}</0> ha solicitado que asumas la propiedad del siguiente 
 
 #: packages/email/templates/confirm-team-email.tsx:75
 msgid "<0>{teamName}</0> has requested to use your email address for their team on Documenso."
-msgstr ""
+msgstr "<0>{teamName}</0> ha solicitado usar tu dirección de correo electrónico para su equipo en Documenso."
 
 #: packages/ui/primitives/template-flow/add-template-settings.tsx:241
 msgid "<0>Email</0> - The recipient will be emailed the document to sign, approve, etc."
-msgstr ""
+msgstr "<0>Correo electrónico</0> - Al destinatario se le enviará el documento para firmar, aprobar, etc."
 
 #: packages/ui/components/recipient/recipient-action-auth-select.tsx:53
 msgid "<0>Inherit authentication method</0> - Use the global action signing authentication method configured in the \"General Settings\" step"
@@ -265,7 +265,7 @@ msgstr "<0>Heredar método de autenticación</0> - Use el método de autenticaci
 
 #: packages/ui/primitives/template-flow/add-template-settings.tsx:247
 msgid "<0>Links</0> - We will generate links which you can send to the recipients manually."
-msgstr ""
+msgstr "<0>Enlaces</0> - Generaremos enlaces que puedes enviar a los destinatarios manualmente."
 
 #: packages/ui/components/document/document-global-auth-action-select.tsx:95
 msgid "<0>No restrictions</0> - No authentication required"
@@ -281,7 +281,7 @@ msgstr "<0>Ninguno</0> - No se requiere autenticación"
 
 #: packages/ui/primitives/template-flow/add-template-settings.tsx:254
 msgid "<0>Note</0> - If you use Links in combination with direct templates, you will need to manually send the links to the remaining recipients."
-msgstr ""
+msgstr "<0>Nota</0> - Si usas Enlaces en combinación con plantillas directas, necesitarás enviar manualmente los enlaces a los destinatarios restantes."
 
 #: packages/ui/components/document/document-global-auth-action-select.tsx:89
 #: packages/ui/components/recipient/recipient-action-auth-select.tsx:69
@@ -331,11 +331,11 @@ msgstr "Se actualizó un destinatario"
 
 #: packages/lib/server-only/team/create-team-email-verification.ts:156
 msgid "A request to use your email has been initiated by {0} on Documenso"
-msgstr ""
+msgstr "Se ha iniciado una solicitud para usar tu correo electrónico por {0} en Documenso"
 
 #: packages/lib/server-only/team/create-team-email-verification.ts:142
 #~ msgid "A request to use your email has been initiated by {teamName} on Documenso"
-#~ msgstr "Se ha iniciado una solicitud para utilizar tu correo electrónico por {teamName} en Documenso"
+#~ msgstr "A request to use your email has been initiated by {teamName} on Documenso"
 
 #: packages/email/templates/team-join.tsx:31
 msgid "A team member has joined a team on Documenso"
@@ -446,7 +446,7 @@ msgstr "Todas las firmas han sido anuladas."
 
 #: packages/email/templates/confirm-team-email.tsx:98
 msgid "Allow document recipients to reply directly to this email address"
-msgstr ""
+msgstr "Permitir que los destinatarios del documento respondan directamente a esta dirección de correo electrónico"
 
 #: packages/email/templates/document-super-delete.tsx:22
 msgid "An admin has deleted your document \"{documentName}\"."
@@ -462,7 +462,7 @@ msgstr "Aprobar"
 
 #: packages/email/template-components/template-document-invite.tsx:89
 msgid "Approve Document"
-msgstr ""
+msgstr "Aprobar Documento"
 
 #: packages/lib/constants/recipient-roles.ts:68
 #~ msgid "APPROVE_REQUEST"
@@ -502,7 +502,7 @@ msgstr "por <0>{senderName}</0>"
 
 #: packages/email/templates/confirm-team-email.tsx:87
 msgid "By accepting this request, you will be granting <0>{teamName}</0> access to:"
-msgstr ""
+msgstr "Al aceptar esta solicitud, estarás concediendo a <0>{teamName}</0> acceso a:"
 
 #: packages/email/templates/team-transfer-request.tsx:70
 msgid "By accepting this request, you will take responsibility for any billing items associated with this team."
@@ -588,11 +588,11 @@ msgstr "Continuar"
 
 #: packages/email/template-components/template-document-invite.tsx:72
 #~ msgid "Continue by {0} the document."
-#~ msgstr "Continúa {0} el documento."
+#~ msgstr "Continue by {0} the document."
 
 #: packages/email/template-components/template-document-invite.tsx:76
 msgid "Continue by approving the document."
-msgstr ""
+msgstr "Continúa aprobando el documento."
 
 #: packages/email/template-components/template-document-completed.tsx:45
 msgid "Continue by downloading the document."
@@ -600,15 +600,15 @@ msgstr "Continúa descargando el documento."
 
 #: packages/email/template-components/template-document-invite.tsx:74
 msgid "Continue by signing the document."
-msgstr ""
+msgstr "Continúa firmando el documento."
 
 #: packages/email/template-components/template-document-invite.tsx:75
 msgid "Continue by viewing the document."
-msgstr ""
+msgstr "Continúa viendo el documento."
 
 #: packages/ui/primitives/document-flow/add-subject.tsx:254
 msgid "Copied"
-msgstr ""
+msgstr "Copiado"
 
 #: packages/ui/components/document/document-share-button.tsx:46
 #: packages/ui/primitives/document-flow/add-subject.tsx:241
@@ -617,7 +617,7 @@ msgstr "Copiado al portapapeles"
 
 #: packages/ui/primitives/document-flow/add-subject.tsx:249
 msgid "Copy"
-msgstr ""
+msgstr "Copiar"
 
 #: packages/ui/components/document/document-share-button.tsx:194
 msgid "Copy Link"
@@ -680,7 +680,7 @@ msgstr "Documento completado"
 
 #: packages/ui/components/document/document-email-checkboxes.tsx:168
 msgid "Document completed email"
-msgstr ""
+msgstr "Correo electrónico de documento completado"
 
 #: packages/lib/utils/document-audit-logs.ts:286
 msgid "Document created"
@@ -701,7 +701,7 @@ msgstr "Documento eliminado"
 
 #: packages/ui/components/document/document-email-checkboxes.tsx:207
 msgid "Document deleted email"
-msgstr ""
+msgstr "Correo electrónico de documento eliminado"
 
 #: packages/lib/server-only/document/send-delete-email.ts:82
 msgid "Document Deleted!"
@@ -710,7 +710,7 @@ msgstr "¡Documento eliminado!"
 #: packages/ui/primitives/template-flow/add-template-settings.tsx:219
 #: packages/ui/primitives/template-flow/add-template-settings.tsx:228
 msgid "Document Distribution Method"
-msgstr ""
+msgstr "Método de distribución de documentos"
 
 #: packages/lib/utils/document-audit-logs.ts:326
 msgid "Document external ID updated"
@@ -726,7 +726,7 @@ msgstr "Documento abierto"
 
 #: packages/ui/components/document/document-email-checkboxes.tsx:128
 msgid "Document pending email"
-msgstr ""
+msgstr "Correo electrónico de documento pendiente"
 
 #: packages/lib/utils/document-audit-logs.ts:330
 msgid "Document sent"
@@ -889,7 +889,7 @@ msgstr "Firma gratuita"
 
 #: packages/ui/primitives/document-flow/add-subject.tsx:89
 msgid "Generate Links"
-msgstr ""
+msgstr "Generar enlaces"
 
 #: packages/ui/components/document/document-global-auth-action-select.tsx:64
 msgid "Global recipient action authentication"
@@ -1016,7 +1016,7 @@ msgstr "No se encontró ningún destinatario que coincidiera con esta descripci�
 
 #: packages/ui/primitives/document-flow/add-subject.tsx:215
 msgid "No recipients"
-msgstr ""
+msgstr "Sin destinatarios"
 
 #: packages/ui/primitives/document-flow/add-fields.tsx:701
 #: packages/ui/primitives/template-flow/add-template-fields.tsx:519
@@ -1045,7 +1045,7 @@ msgstr "No se encontró valor."
 
 #: packages/lib/constants/document.ts:32
 msgid "None"
-msgstr ""
+msgstr "Ninguno"
 
 #: packages/ui/primitives/document-flow/add-fields.tsx:979
 #: packages/ui/primitives/document-flow/types.ts:56
@@ -1172,11 +1172,11 @@ msgstr "Autenticación de acción de destinatario"
 
 #: packages/ui/components/document/document-email-checkboxes.tsx:89
 msgid "Recipient removed email"
-msgstr ""
+msgstr "Correo electrónico de destinatario eliminado"
 
 #: packages/ui/components/document/document-email-checkboxes.tsx:50
 msgid "Recipient signing request email"
-msgstr ""
+msgstr "Correo electrónico de solicitud de firma de destinatario"
 
 #: packages/ui/primitives/signature-pad/signature-pad.tsx:384
 msgid "Red"
@@ -1217,7 +1217,7 @@ msgstr "Campo obligatorio"
 
 #: packages/ui/primitives/document-flow/add-subject.tsx:84
 msgid "Resend"
-msgstr ""
+msgstr "Reenviar"
 
 #: packages/email/template-components/template-forgot-password.tsx:33
 msgid "Reset Password"
@@ -1272,27 +1272,27 @@ msgstr "Enviar documento"
 
 #: packages/ui/components/document/document-email-checkboxes.tsx:158
 msgid "Send document completed email"
-msgstr ""
+msgstr "Enviar correo electrónico de documento completado"
 
 #: packages/ui/components/document/document-email-checkboxes.tsx:197
 msgid "Send document deleted email"
-msgstr ""
+msgstr "Enviar correo electrónico de documento eliminado"
 
 #: packages/ui/components/document/document-email-checkboxes.tsx:118
 msgid "Send document pending email"
-msgstr ""
+msgstr "Enviar correo electrónico de documento pendiente"
 
 #: packages/email/templates/confirm-team-email.tsx:101
 msgid "Send documents on behalf of the team using the email address"
-msgstr ""
+msgstr "Enviar documentos en nombre del equipo usando la dirección de correo electrónico"
 
 #: packages/ui/components/document/document-email-checkboxes.tsx:79
 msgid "Send recipient removed email"
-msgstr ""
+msgstr "Enviar correo electrónico de destinatario eliminado"
 
 #: packages/ui/components/document/document-email-checkboxes.tsx:40
 msgid "Send recipient signing request email"
-msgstr ""
+msgstr "Enviar correo electrónico de solicitud de firma de destinatario"
 
 #: packages/ui/components/document/document-share-button.tsx:135
 msgid "Share Signature Card"
@@ -1317,7 +1317,7 @@ msgstr "Firmar"
 
 #: packages/email/template-components/template-document-invite.tsx:87
 msgid "Sign Document"
-msgstr ""
+msgstr "Firmar Documento"
 
 #: packages/email/template-components/template-reset-password.tsx:34
 msgid "Sign In"
@@ -1392,7 +1392,7 @@ msgstr "Enviar"
 
 #: packages/lib/server-only/team/delete-team.ts:124
 msgid "Team \"{0}\" has been deleted on Documenso"
-msgstr ""
+msgstr "El equipo \"{0}\" ha sido eliminado en Documenso"
 
 #: packages/lib/server-only/team/delete-team-email.ts:104
 msgid "Team email has been revoked for {0}"
@@ -1486,7 +1486,7 @@ msgstr "El nombre del firmante"
 
 #: packages/ui/primitives/document-flow/add-subject.tsx:243
 msgid "The signing link has been copied to your clipboard."
-msgstr ""
+msgstr "El enlace de firma ha sido copiado a tu portapapeles."
 
 #: packages/email/templates/team-email-removed.tsx:63
 msgid "The team email <0>{teamEmail}</0> has been removed from the following team"
@@ -1514,15 +1514,15 @@ msgstr "Este documento fue enviado usando <0>Documenso.</0>"
 
 #: packages/ui/components/document/document-email-checkboxes.tsx:94
 msgid "This email is sent to the recipient if they are removed from a pending document."
-msgstr ""
+msgstr "Este correo electrónico se envía al destinatario si es eliminado de un documento pendiente."
 
 #: packages/ui/components/document/document-email-checkboxes.tsx:55
 msgid "This email is sent to the recipient requesting them to sign the document."
-msgstr ""
+msgstr "Este correo electrónico se envía al destinatario solicitando que firme el documento."
 
 #: packages/ui/components/document/document-email-checkboxes.tsx:133
 msgid "This email will be sent to the recipient who has just signed the document, if there are still other recipients who have not signed yet."
-msgstr ""
+msgstr "Este correo electrónico se enviará al destinatario que acaba de firmar el documento, si todavía hay otros destinatarios que no han firmado."
 
 #: packages/ui/primitives/template-flow/add-template-placeholder-recipients.tsx:573
 msgid "This field cannot be modified or deleted. When you share this template's direct link or add it to your public profile, anyone who accesses it can input their name and email, and fill in the fields assigned to them."
@@ -1530,7 +1530,7 @@ msgstr "Este campo no se puede modificar ni eliminar. Cuando comparta el enlace 
 
 #: packages/ui/primitives/template-flow/add-template-settings.tsx:233
 msgid "This is how the document will reach the recipients once the document is ready for signing."
-msgstr ""
+msgstr "Así es como el documento llegará a los destinatarios una vez que esté listo para firmarse."
 
 #: packages/ui/primitives/document-flow/add-fields.tsx:1090
 msgid "This recipient can no longer be modified as they have signed a field, or completed the document."
@@ -1542,11 +1542,11 @@ msgstr "Este firmante ya ha firmado el documento."
 
 #: packages/ui/components/document/document-email-checkboxes.tsx:212
 msgid "This will be sent to all recipients if a pending document has been deleted."
-msgstr ""
+msgstr "Esto se enviará a todos los destinatarios si un documento pendiente ha sido eliminado."
 
 #: packages/ui/components/document/document-email-checkboxes.tsx:173
 msgid "This will be sent to all recipients once the document has been fully completed."
-msgstr ""
+msgstr "Esto se enviará a todos los destinatarios una vez que el documento esté completamente completado."
 
 #: packages/ui/components/recipient/recipient-action-auth-select.tsx:48
 msgid "This will override any global settings."
@@ -1594,7 +1594,7 @@ msgstr "Valor"
 
 #: packages/email/templates/confirm-team-email.tsx:71
 msgid "Verify your team email address"
-msgstr ""
+msgstr "Verifica tu dirección de correo electrónico del equipo"
 
 #: packages/lib/constants/recipient-roles.ts:29
 msgid "View"
@@ -1602,7 +1602,7 @@ msgstr "Ver"
 
 #: packages/email/templates/confirm-team-email.tsx:95
 msgid "View all documents sent to and from this email address"
-msgstr ""
+msgstr "Ver todos los documentos enviados hacia y desde esta dirección de correo electrónico"
 
 #: packages/email/templates/document-created-from-direct-template.tsx:75
 msgid "View document"
@@ -1612,7 +1612,7 @@ msgstr "Ver documento"
 #: packages/ui/primitives/document-flow/add-subject.tsx:90
 #: packages/ui/primitives/document-flow/add-subject.tsx:91
 msgid "View Document"
-msgstr ""
+msgstr "Ver Documento"
 
 #: packages/email/template-components/template-document-self-signed.tsx:79
 msgid "View plans"
@@ -1648,11 +1648,11 @@ msgstr "Esperando a que otros completen la firma."
 
 #: packages/ui/primitives/document-flow/add-subject.tsx:205
 msgid "We will generate signing links for with you, which you can send to the recipients through your method of choice."
-msgstr ""
+msgstr "Generaremos enlaces de firma para ti, que podrás enviar a los destinatarios a través de tu método preferido."
 
 #: packages/ui/primitives/document-flow/add-subject.tsx:201
 msgid "We won't send anything to notify recipients."
-msgstr ""
+msgstr "No enviaremos nada para notificar a los destinatarios."
 
 #: packages/email/template-components/template-document-pending.tsx:41
 msgid "We're still waiting for other signers to sign this document.<0/>We'll notify you as soon as it's ready."
@@ -1680,7 +1680,7 @@ msgstr "También puedes copiar y pegar este enlace en tu navegador: {confirmatio
 
 #: packages/email/templates/confirm-team-email.tsx:106
 msgid "You can revoke access at any time in your team settings on Documenso <0>here.</0>"
-msgstr ""
+msgstr "Puedes revocar el acceso en cualquier momento en la configuración de tu equipo en Documenso <0>aquí.</0>"
 
 #: packages/ui/components/document/document-send-email-message-helper.tsx:11
 msgid "You can use the following variables in your message:"
@@ -1735,3 +1735,4 @@ msgstr "Tu contraseña ha sido actualizada."
 #: packages/email/templates/team-delete.tsx:32
 msgid "Your team has been deleted"
 msgstr "Tu equipo ha sido eliminado"
+
