@@ -7,7 +7,14 @@ import { msg } from '@lingui/macro';
 import { mailer } from '@documenso/email/mailer';
 import DocumentCancelTemplate from '@documenso/email/templates/document-cancel';
 import { prisma } from '@documenso/prisma';
-import type { Document, DocumentMeta, Recipient, User } from '@documenso/prisma/client';
+import type {
+  Document,
+  DocumentMeta,
+  Recipient,
+  Team,
+  TeamGlobalSettings,
+  User,
+} from '@documenso/prisma/client';
 import { DocumentStatus, SendStatus } from '@documenso/prisma/client';
 
 import { getI18nInstance } from '../../client-only/providers/i18n.server';
@@ -18,6 +25,7 @@ import { extractDerivedDocumentEmailSettings } from '../../types/document-email'
 import type { RequestMetadata } from '../../universal/extract-request-metadata';
 import { createDocumentAuditLogData } from '../../utils/document-audit-logs';
 import { renderEmailWithI18N } from '../../utils/render-email-with-i18n';
+import { teamGlobalSettingsToBranding } from '../../utils/team-global-settings-to-branding';
 
 export type DeleteDocumentOptions = {
   id: number;
@@ -50,8 +58,9 @@ export const deleteDocument = async ({
       Recipient: true,
       documentMeta: true,
       team: {
-        select: {
+        include: {
           members: true,
+          teamGlobalSettings: true,
         },
       },
     },
@@ -74,6 +83,7 @@ export const deleteDocument = async ({
     await handleDocumentOwnerDelete({
       document,
       user,
+      team: document.team,
       requestMetadata,
     });
   }
@@ -114,6 +124,11 @@ type HandleDocumentOwnerDeleteOptions = {
     Recipient: Recipient[];
     documentMeta: DocumentMeta | null;
   };
+  team?:
+    | (Team & {
+        teamGlobalSettings?: TeamGlobalSettings | null;
+      })
+    | null;
   user: User;
   requestMetadata?: RequestMetadata;
 };
@@ -121,6 +136,7 @@ type HandleDocumentOwnerDeleteOptions = {
 const handleDocumentOwnerDelete = async ({
   document,
   user,
+  team,
   requestMetadata,
 }: HandleDocumentOwnerDeleteOptions) => {
   if (document.deletedAt) {
@@ -203,9 +219,17 @@ const handleDocumentOwnerDelete = async ({
         assetBaseUrl,
       });
 
+      const branding = team?.teamGlobalSettings
+        ? teamGlobalSettingsToBranding(team.teamGlobalSettings)
+        : undefined;
+
       const [html, text] = await Promise.all([
-        renderEmailWithI18N(template, { lang: document.documentMeta?.language }),
-        renderEmailWithI18N(template, { lang: document.documentMeta?.language, plainText: true }),
+        renderEmailWithI18N(template, { lang: document.documentMeta?.language, branding }),
+        renderEmailWithI18N(template, {
+          lang: document.documentMeta?.language,
+          branding,
+          plainText: true,
+        }),
       ]);
 
       const i18n = await getI18nInstance(document.documentMeta?.language);

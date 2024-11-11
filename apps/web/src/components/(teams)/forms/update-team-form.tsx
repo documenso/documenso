@@ -6,14 +6,22 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { Trans, msg } from '@lingui/macro';
 import { useLingui } from '@lingui/react';
 import { AnimatePresence, motion } from 'framer-motion';
+import { useSession } from 'next-auth/react';
 import { useForm } from 'react-hook-form';
+import { match } from 'ts-pattern';
 import type { z } from 'zod';
 
 import { WEBAPP_BASE_URL } from '@documenso/lib/constants/app';
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
+import { DocumentVisibility } from '@documenso/prisma/client';
 import { trpc } from '@documenso/trpc/react';
 import { ZUpdateTeamMutationSchema } from '@documenso/trpc/server/team-router/schema';
+import {
+  DocumentVisibilitySelect,
+  DocumentVisibilityTooltip,
+} from '@documenso/ui/components/document/document-visibility-select';
 import { Button } from '@documenso/ui/primitives/button';
+import { Checkbox } from '@documenso/ui/primitives/checkbox';
 import {
   Form,
   FormControl,
@@ -29,18 +37,29 @@ export type UpdateTeamDialogProps = {
   teamId: number;
   teamName: string;
   teamUrl: string;
+  documentVisibility?: DocumentVisibility;
+  includeSenderDetails?: boolean;
 };
 
 const ZUpdateTeamFormSchema = ZUpdateTeamMutationSchema.shape.data.pick({
   name: true,
   url: true,
+  documentVisibility: true,
+  includeSenderDetails: true,
 });
 
 type TUpdateTeamFormSchema = z.infer<typeof ZUpdateTeamFormSchema>;
 
-export const UpdateTeamForm = ({ teamId, teamName, teamUrl }: UpdateTeamDialogProps) => {
+export const UpdateTeamForm = ({
+  teamId,
+  teamName,
+  teamUrl,
+  documentVisibility,
+  includeSenderDetails,
+}: UpdateTeamDialogProps) => {
   const router = useRouter();
-
+  const { data: session } = useSession();
+  const email = session?.user?.email;
   const { _ } = useLingui();
   const { toast } = useToast();
 
@@ -49,17 +68,36 @@ export const UpdateTeamForm = ({ teamId, teamName, teamUrl }: UpdateTeamDialogPr
     defaultValues: {
       name: teamName,
       url: teamUrl,
+      documentVisibility,
+      includeSenderDetails,
     },
   });
 
   const { mutateAsync: updateTeam } = trpc.team.updateTeam.useMutation();
+  const includeSenderDetailsCheck = form.watch('includeSenderDetails');
 
-  const onFormSubmit = async ({ name, url }: TUpdateTeamFormSchema) => {
+  const mapVisibilityToRole = (visibility: DocumentVisibility): DocumentVisibility =>
+    match(visibility)
+      .with(DocumentVisibility.ADMIN, () => DocumentVisibility.ADMIN)
+      .with(DocumentVisibility.MANAGER_AND_ABOVE, () => DocumentVisibility.MANAGER_AND_ABOVE)
+      .otherwise(() => DocumentVisibility.EVERYONE);
+
+  const currentVisibilityRole = mapVisibilityToRole(
+    documentVisibility ?? DocumentVisibility.EVERYONE,
+  );
+  const onFormSubmit = async ({
+    name,
+    url,
+    documentVisibility,
+    includeSenderDetails,
+  }: TUpdateTeamFormSchema) => {
     try {
       await updateTeam({
         data: {
           name,
           url,
+          documentVisibility,
+          includeSenderDetails,
         },
         teamId,
       });
@@ -73,6 +111,8 @@ export const UpdateTeamForm = ({ teamId, teamName, teamUrl }: UpdateTeamDialogPr
       form.reset({
         name,
         url,
+        documentVisibility,
+        includeSenderDetails,
       });
 
       if (url !== teamUrl) {
@@ -145,6 +185,68 @@ export const UpdateTeamForm = ({ teamId, teamName, teamUrl }: UpdateTeamDialogPr
               </FormItem>
             )}
           />
+
+          <FormField
+            control={form.control}
+            name="documentVisibility"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel className="mt-4 flex flex-row items-center">
+                  <Trans>Default Document Visibility</Trans>
+                  <DocumentVisibilityTooltip />
+                </FormLabel>
+                <FormControl>
+                  <DocumentVisibilitySelect
+                    currentMemberRole={currentVisibilityRole}
+                    isTeamSettings={true}
+                    {...field}
+                    onValueChange={field.onChange}
+                  />
+                </FormControl>
+
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <div className="mb-4">
+            <FormField
+              control={form.control}
+              name="includeSenderDetails"
+              render={({ field }) => (
+                <FormItem>
+                  <div className="mt-6 flex flex-row items-center gap-4">
+                    <FormLabel>
+                      <Trans>Send on Behalf of Team</Trans>
+                    </FormLabel>
+                    <FormControl>
+                      <Checkbox
+                        className="h-5 w-5"
+                        checkClassName="text-white"
+                        checked={field.value}
+                        onCheckedChange={field.onChange}
+                      />
+                    </FormControl>
+                  </div>
+
+                  {includeSenderDetailsCheck ? (
+                    <blockquote className="text-foreground/50 text-xs italic">
+                      <Trans>
+                        "{email}" on behalf of "{teamName}" has invited you to sign "example
+                        document".
+                      </Trans>
+                    </blockquote>
+                  ) : (
+                    <blockquote className="text-foreground/50 text-xs italic">
+                      <Trans>"{teamUrl}" has invited you to sign "example document".</Trans>
+                    </blockquote>
+                  )}
+
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </div>
 
           <div className="flex flex-row justify-end space-x-4">
             <AnimatePresence>

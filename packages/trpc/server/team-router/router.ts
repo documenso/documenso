@@ -31,6 +31,8 @@ import { requestTeamOwnershipTransfer } from '@documenso/lib/server-only/team/re
 import { resendTeamEmailVerification } from '@documenso/lib/server-only/team/resend-team-email-verification';
 import { resendTeamMemberInvitation } from '@documenso/lib/server-only/team/resend-team-member-invitation';
 import { updateTeam } from '@documenso/lib/server-only/team/update-team';
+import { updateTeamBrandingSettings } from '@documenso/lib/server-only/team/update-team-branding-settings';
+import { updateTeamDocumentSettings } from '@documenso/lib/server-only/team/update-team-document-settings';
 import { updateTeamEmail } from '@documenso/lib/server-only/team/update-team-email';
 import { updateTeamMember } from '@documenso/lib/server-only/team/update-team-member';
 import { updateTeamPublicProfile } from '@documenso/lib/server-only/team/update-team-public-profile';
@@ -62,6 +64,8 @@ import {
   ZRequestTeamOwnerhsipTransferMutationSchema,
   ZResendTeamEmailVerificationMutationSchema,
   ZResendTeamMemberInvitationMutationSchema,
+  ZUpdateTeamBrandingSettingsMutationSchema,
+  ZUpdateTeamDocumentSettingsMutationSchema,
   ZUpdateTeamEmailMutationSchema,
   ZUpdateTeamMemberMutationSchema,
   ZUpdateTeamMutationSchema,
@@ -552,6 +556,42 @@ export const teamRouter = router({
           userId: ctx.user.id,
           userName: ctx.user.name ?? '',
           ...input,
+        });
+      } catch (err) {
+        console.error(err);
+
+        throw AppError.parseErrorToTRPCError(err);
+      }
+    }),
+
+  updateTeamBrandingSettings: authenticatedProcedure
+    .input(ZUpdateTeamBrandingSettingsMutationSchema)
+    .mutation(async ({ ctx, input }) => {
+      const { teamId, settings } = input;
+
+      try {
+        return await updateTeamBrandingSettings({
+          userId: ctx.user.id,
+          teamId,
+          settings,
+        });
+      } catch (err) {
+        console.error(err);
+
+        throw AppError.parseErrorToTRPCError(err);
+      }
+    }),
+
+  updateTeamDocumentSettings: authenticatedProcedure
+    .input(ZUpdateTeamDocumentSettingsMutationSchema)
+    .mutation(async ({ ctx, input }) => {
+      const { teamId, settings } = input;
+
+      try {
+        return await updateTeamDocumentSettings({
+          userId: ctx.user.id,
+          teamId,
+          settings,
         });
       } catch (err) {
         console.error(err);

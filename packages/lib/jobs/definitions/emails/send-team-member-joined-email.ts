@@ -1,3 +1,5 @@
+import { createElement } from 'react';
+
 import { msg } from '@lingui/macro';
 import { z } from 'zod';
 
@@ -10,6 +12,7 @@ import { getI18nInstance } from '../../../client-only/providers/i18n.server';
 import { WEBAPP_BASE_URL } from '../../../constants/app';
 import { FROM_ADDRESS, FROM_NAME } from '../../../constants/email';
 import { renderEmailWithI18N } from '../../../utils/render-email-with-i18n';
+import { teamGlobalSettingsToBranding } from '../../../utils/team-global-settings-to-branding';
 import type { JobDefinition } from '../../client/_internal/job';
 
 const SEND_TEAM_MEMBER_JOINED_EMAIL_JOB_DEFINITION_ID = 'send.team-member-joined.email';
@@ -43,6 +46,7 @@ export const SEND_TEAM_MEMBER_JOINED_EMAIL_JOB_DEFINITION = {
             user: true,
           },
         },
+        teamGlobalSettings: true,
       },
     });
 
@@ -64,7 +68,7 @@ export const SEND_TEAM_MEMBER_JOINED_EMAIL_JOB_DEFINITION = {
       await io.runTask(
         `send-team-member-joined-email--${invitedMember.id}_${member.id}`,
         async () => {
-          const emailContent = TeamJoinEmailTemplate({
+          const emailContent = createElement(TeamJoinEmailTemplate, {
             assetBaseUrl: WEBAPP_BASE_URL,
             baseUrl: WEBAPP_BASE_URL,
             memberName: invitedMember.user.name || '',
@@ -73,13 +77,26 @@ export const SEND_TEAM_MEMBER_JOINED_EMAIL_JOB_DEFINITION = {
             teamUrl: team.url,
           });
 
+          const branding = team.teamGlobalSettings
+            ? teamGlobalSettingsToBranding(team.teamGlobalSettings)
+            : undefined;
+
+          const lang = team.teamGlobalSettings?.documentLanguage;
+
           // !: Replace with the actual language of the recipient later
           const [html, text] = await Promise.all([
-            renderEmailWithI18N(emailContent),
-            renderEmailWithI18N(emailContent, { plainText: true }),
+            renderEmailWithI18N(emailContent, {
+              lang,
+              branding,
+            }),
+            renderEmailWithI18N(emailContent, {
+              lang,
+              branding,
+              plainText: true,
+            }),
           ]);
 
-          const i18n = await getI18nInstance();
+          const i18n = await getI18nInstance(lang);
 
           await mailer.sendMail({
             to: member.user.email,

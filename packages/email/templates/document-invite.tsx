@@ -5,6 +5,7 @@ import { RECIPIENT_ROLES_DESCRIPTION } from '@documenso/lib/constants/recipient-
 import type { RecipientRole } from '@documenso/prisma/client';
 
 import { Body, Container, Head, Hr, Html, Img, Link, Preview, Section, Text } from '../components';
+import { useBranding } from '../providers/branding';
 import type { TemplateDocumentInviteProps } from '../template-components/template-document-invite';
 import { TemplateDocumentInvite } from '../template-components/template-document-invite';
 import { TemplateFooter } from '../template-components/template-footer';
@@ -16,6 +17,7 @@ export type DocumentInviteEmailTemplateProps = Partial<TemplateDocumentInvitePro
   isTeamInvite?: boolean;
   teamName?: string;
   teamEmail?: string;
+  includeSenderDetails?: boolean;
 };
 
 export const DocumentInviteEmailTemplate = ({
@@ -29,16 +31,24 @@ export const DocumentInviteEmailTemplate = ({
   selfSigner = false,
   isTeamInvite = false,
   teamName,
+  includeSenderDetails,
 }: DocumentInviteEmailTemplateProps) => {
   const { _ } = useLingui();
+  const branding = useBranding();
 
   const action = _(RECIPIENT_ROLES_DESCRIPTION[role].actionVerb).toLowerCase();
 
-  const previewText = selfSigner
-    ? msg`Please ${action} your document ${documentName}`
-    : isTeamInvite
-    ? msg`${inviterName} on behalf of ${teamName} has invited you to ${action} ${documentName}`
-    : msg`${inviterName} has invited you to ${action} ${documentName}`;
+  let previewText = msg`${inviterName} has invited you to ${action} ${documentName}`;
+
+  if (isTeamInvite) {
+    previewText = includeSenderDetails
+      ? msg`${inviterName} on behalf of ${teamName} has invited you to ${action} ${documentName}`
+      : msg`${teamName} has invited you to ${action} ${documentName}`;
+  }
+
+  if (selfSigner) {
+    previewText = msg`Please ${action} your document ${documentName}`;
+  }
 
   const getAssetUrl = (path: string) => {
     return new URL(path, assetBaseUrl).toString();
@@ -53,11 +63,15 @@ export const DocumentInviteEmailTemplate = ({
         <Section>
           <Container className="mx-auto mb-2 mt-8 max-w-xl rounded-lg border border-solid border-slate-200 p-4 backdrop-blur-sm">
             <Section>
-              <Img
-                src={getAssetUrl('/static/logo.png')}
-                alt="Documenso Logo"
-                className="mb-4 h-6"
-              />
+              {branding.brandingEnabled && branding.brandingLogo ? (
+                <Img src={branding.brandingLogo} alt="Branding Logo" className="mb-4 h-6" />
+              ) : (
+                <Img
+                  src={getAssetUrl('/static/logo.png')}
+                  alt="Documenso Logo"
+                  className="mb-4 h-6"
+                />
+              )}
 
               <TemplateDocumentInvite
                 inviterName={inviterName}
@@ -69,6 +83,7 @@ export const DocumentInviteEmailTemplate = ({
                 selfSigner={selfSigner}
                 isTeamInvite={isTeamInvite}
                 teamName={teamName}
+                includeSenderDetails={includeSenderDetails}
               />
             </Section>
           </Container>
@@ -89,7 +104,7 @@ export const DocumentInviteEmailTemplate = ({
                   <pre className="font-sans text-base text-slate-400">{customBody}</pre>
                 ) : (
                   <Trans>
-                    {inviterName} has invited you to {action} the document {documentName}.
+                    {inviterName} has invited you to {action} the document "{documentName}".
                   </Trans>
                 )}
               </Text>

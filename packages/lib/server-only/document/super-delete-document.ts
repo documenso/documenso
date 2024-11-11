@@ -17,6 +17,7 @@ import { extractDerivedDocumentEmailSettings } from '../../types/document-email'
 import type { RequestMetadata } from '../../universal/extract-request-metadata';
 import { createDocumentAuditLogData } from '../../utils/document-audit-logs';
 import { renderEmailWithI18N } from '../../utils/render-email-with-i18n';
+import { teamGlobalSettingsToBranding } from '../../utils/team-global-settings-to-branding';
 
 export type SuperDeleteDocumentOptions = {
   id: number;
@@ -32,6 +33,11 @@ export const superDeleteDocument = async ({ id, requestMetadata }: SuperDeleteDo
       Recipient: true,
       documentMeta: true,
       User: true,
+      team: {
+        include: {
+          teamGlobalSettings: true,
+        },
+      },
     },
   });
 
@@ -65,9 +71,17 @@ export const superDeleteDocument = async ({ id, requestMetadata }: SuperDeleteDo
           assetBaseUrl,
         });
 
+        const branding = document.team?.teamGlobalSettings
+          ? teamGlobalSettingsToBranding(document.team.teamGlobalSettings)
+          : undefined;
+
         const [html, text] = await Promise.all([
-          renderEmailWithI18N(template, { lang: document.documentMeta?.language }),
-          renderEmailWithI18N(template, { lang: document.documentMeta?.language, plainText: true }),
+          renderEmailWithI18N(template, { lang: document.documentMeta?.language, branding }),
+          renderEmailWithI18N(template, {
+            lang: document.documentMeta?.language,
+            branding,
+            plainText: true,
+          }),
         ]);
 
         const i18n = await getI18nInstance(document.documentMeta?.language);

@@ -6,7 +6,7 @@ import Link from 'next/link';
 import { useParams, usePathname } from 'next/navigation';
 
 import { Trans } from '@lingui/macro';
-import { Braces, CreditCard, Globe2Icon, Key, User, Webhook } from 'lucide-react';
+import { Braces, CreditCard, Globe2Icon, Key, Settings2, User, Webhook } from 'lucide-react';
 
 import { useFeatureFlags } from '@documenso/lib/client-only/providers/feature-flag';
 import { IS_BILLING_ENABLED } from '@documenso/lib/constants/app';
@@ -26,6 +26,7 @@ export const MobileNav = ({ className, ...props }: MobileNavProps) => {
   const teamUrl = typeof params?.teamUrl === 'string' ? params?.teamUrl : '';
 
   const settingsPath = `/t/${teamUrl}/settings`;
+  const preferencesPath = `/t/${teamUrl}/preferences`;
   const publicProfilePath = `/t/${teamUrl}/settings/public-profile`;
   const membersPath = `/t/${teamUrl}/settings/members`;
   const tokensPath = `/t/${teamUrl}/settings/tokens`;
@@ -49,6 +50,21 @@ export const MobileNav = ({ className, ...props }: MobileNavProps) => {
         >
           <User className="mr-2 h-5 w-5" />
           <Trans>General</Trans>
+        </Button>
+      </Link>
+
+      <Link href={preferencesPath}>
+        <Button
+          variant="ghost"
+          className={cn(
+            'w-full justify-start',
+            pathname?.startsWith(preferencesPath) &&
+              pathname.split('/').length === 4 &&
+              'bg-secondary',
+          )}
+        >
+          <Settings2 className="mr-2 h-5 w-5" />
+          <Trans>Preferences</Trans>
         </Button>
       </Link>
 

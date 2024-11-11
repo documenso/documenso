@@ -1,6 +1,6 @@
 {
   "name": "@documenso/web",
-  "version": "1.7.2-rc.4",
+  "version": "1.8.0-rc.0",
   "private": true,
   "license": "AGPL-3.0",
   "scripts": {
