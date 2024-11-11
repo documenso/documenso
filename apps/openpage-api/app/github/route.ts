@@ -6,7 +6,7 @@ const paths = [
   { path: '/forks', description: 'GitHub Forks' },
   { path: '/stars', description: 'GitHub Stars' },
   { path: '/issues', description: 'GitHub Merged Issues' },
-  { path: '/prs', description: 'GitHub Pull Request' },
+  { path: '/prs', description: 'GitHub Pull Requests' },
 ];
 
 export function GET(request: NextRequest) {
