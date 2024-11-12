@@ -209,11 +209,19 @@ export default async function SigningCertificate({ searchParams }: SigningCertif
                               boxShadow: `0px 0px 0px 4.88px rgba(122, 196, 85, 0.1), 0px 0px 0px 1.22px rgba(122, 196, 85, 0.6), 0px 0px 0px 0.61px rgba(122, 196, 85, 1)`,
                             }}
                           >
-                            <img
-                              src={`${signature.Signature?.signatureImageAsBase64}`}
-                              alt="Signature"
-                              className="max-h-12 max-w-full"
-                            />
+                            {signature.Signature?.signatureImageAsBase64 && (
+                              <img
+                                src={`${signature.Signature?.signatureImageAsBase64}`}
+                                alt="Signature"
+                                className="max-h-12 max-w-full"
+                              />
+                            )}
+
+                            {signature.Signature?.typedSignature && (
+                              <p className="font-signature text-center text-sm">
+                                {signature.Signature?.typedSignature}
+                              </p>
+                            )}
                           </div>
 
                           <p className="text-muted-foreground mt-2 text-sm print:text-xs">
