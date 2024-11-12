@@ -13,7 +13,7 @@ msgstr ""
 "Language-Team: \n"
 "Plural-Forms: \n"
 
-#: apps/web/src/app/(teams)/t/[teamUrl]/settings/preferences/document-preferences.tsx:211
+#: apps/web/src/app/(teams)/t/[teamUrl]/settings/preferences/document-preferences.tsx:214
 msgid "\"{0}\" has invited you to sign \"example document\"."
 msgstr "\"{0}\" has invited you to sign \"example document\"."
 
@@ -30,12 +30,16 @@ msgid "\"{email}\" on behalf of \"{teamName}\" has invited you to sign \"example
 msgstr "\"{email}\" on behalf of \"{teamName}\" has invited you to sign \"example document\"."
 
 #: apps/web/src/app/(teams)/t/[teamUrl]/settings/preferences/document-preferences.tsx:209
-msgid ""
-"\"{placeholderEmail}\" on behalf of \"{0}\" has invited you to sign \"example\n"
-"document\"."
-msgstr ""
-"\"{placeholderEmail}\" on behalf of \"{0}\" has invited you to sign \"example\n"
-"document\"."
+#~ msgid ""
+#~ "\"{placeholderEmail}\" on behalf of \"{0}\" has invited you to sign \"example\n"
+#~ "document\"."
+#~ msgstr ""
+#~ "\"{placeholderEmail}\" on behalf of \"{0}\" has invited you to sign \"example\n"
+#~ "document\"."
+
+#: apps/web/src/app/(teams)/t/[teamUrl]/settings/preferences/document-preferences.tsx:209
+msgid "\"{placeholderEmail}\" on behalf of \"{0}\" has invited you to sign \"example document\"."
+msgstr "\"{placeholderEmail}\" on behalf of \"{0}\" has invited you to sign \"example document\"."
 
 #: apps/web/src/components/(teams)/forms/update-team-form.tsx:241
 msgid "\"{teamUrl}\" has invited you to sign \"example document\"."
@@ -1026,7 +1030,7 @@ msgstr "Controls the default language of an uploaded document. This will be used
 msgid "Controls the default visibility of an uploaded document."
 msgstr "Controls the default visibility of an uploaded document."
 
-#: apps/web/src/app/(teams)/t/[teamUrl]/settings/preferences/document-preferences.tsx:216
+#: apps/web/src/app/(teams)/t/[teamUrl]/settings/preferences/document-preferences.tsx:220
 msgid "Controls the formatting of the message that will be sent when inviting a recipient to sign a document. If a custom message has been provided while configuring the document, it will be used instead."
 msgstr "Controls the formatting of the message that will be sent when inviting a recipient to sign a document. If a custom message has been provided while configuring the document, it will be used instead."
 
@@ -1599,7 +1603,7 @@ msgstr "Download"
 msgid "Download Audit Logs"
 msgstr "Download Audit Logs"
 
-#: apps/web/src/app/(dashboard)/documents/[id]/logs/download-certificate-button.tsx:84
+#: apps/web/src/app/(dashboard)/documents/[id]/logs/download-certificate-button.tsx:86
 msgid "Download Certificate"
 msgstr "Download Certificate"
 
@@ -2984,7 +2988,7 @@ msgstr "Roles"
 #: apps/web/src/app/(signing)/sign/[token]/number-field.tsx:336
 #: apps/web/src/app/(signing)/sign/[token]/text-field.tsx:342
 #: apps/web/src/app/(teams)/t/[teamUrl]/settings/preferences/branding-preferences.tsx:312
-#: apps/web/src/app/(teams)/t/[teamUrl]/settings/preferences/document-preferences.tsx:228
+#: apps/web/src/app/(teams)/t/[teamUrl]/settings/preferences/document-preferences.tsx:232
 msgid "Save"
 msgstr "Save"
 
@@ -3280,7 +3284,7 @@ msgstr "Site Settings"
 #: apps/web/src/app/(dashboard)/documents/[id]/document-page-view-button.tsx:63
 #: apps/web/src/app/(dashboard)/documents/[id]/document-page-view-dropdown.tsx:91
 #: apps/web/src/app/(dashboard)/documents/[id]/logs/download-audit-log-button.tsx:65
-#: apps/web/src/app/(dashboard)/documents/[id]/logs/download-certificate-button.tsx:66
+#: apps/web/src/app/(dashboard)/documents/[id]/logs/download-certificate-button.tsx:68
 #: apps/web/src/app/(dashboard)/documents/data-table-action-button.tsx:75
 #: apps/web/src/app/(dashboard)/documents/data-table-action-dropdown.tsx:106
 #: apps/web/src/app/(dashboard)/documents/delete-document-dialog.tsx:80
@@ -3352,7 +3356,7 @@ msgstr "Something went wrong. Please try again or contact support."
 msgid "Sorry, we were unable to download the audit logs. Please try again later."
 msgstr "Sorry, we were unable to download the audit logs. Please try again later."
 
-#: apps/web/src/app/(dashboard)/documents/[id]/logs/download-certificate-button.tsx:68
+#: apps/web/src/app/(dashboard)/documents/[id]/logs/download-certificate-button.tsx:70
 msgid "Sorry, we were unable to download the certificate. Please try again later."
 msgstr "Sorry, we were unable to download the certificate. Please try again later."
 

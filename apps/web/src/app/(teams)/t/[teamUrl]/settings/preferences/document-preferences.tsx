@@ -205,10 +205,14 @@ export const TeamDocumentPreferencesForm = ({
                   </div>
 
                   <Alert variant="neutral" className="mt-1 px-2.5 py-1.5 text-sm">
-                    {includeSenderDetails
-                      ? _(msg`'${placeholderEmail}' on behalf of '${team.name}' has invited you to sign 'example
-                      document'.`)
-                      : _(msg`'${team.name}' has invited you to sign 'example document'.`)}
+                    {includeSenderDetails ? (
+                      <Trans>
+                        "{placeholderEmail}" on behalf of "{team.name}" has invited you to sign
+                        "example document".
+                      </Trans>
+                    ) : (
+                      <Trans>"{team.name}" has invited you to sign "example document".</Trans>
+                    )}
                   </Alert>
                 </div>
 

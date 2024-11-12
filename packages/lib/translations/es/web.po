@@ -18,7 +18,7 @@ msgstr ""
 "X-Crowdin-File: web.po\n"
 "X-Crowdin-File-ID: 8\n"
 
-#: apps/web/src/app/(teams)/t/[teamUrl]/settings/preferences/document-preferences.tsx:211
+#: apps/web/src/app/(teams)/t/[teamUrl]/settings/preferences/document-preferences.tsx:214
 msgid "\"{0}\" has invited you to sign \"example document\"."
 msgstr "\"{0}\" te ha invitado a firmar \"ejemplo de documento\"."
 
@@ -35,10 +35,16 @@ msgid "\"{email}\" on behalf of \"{teamName}\" has invited you to sign \"example
 msgstr "\"{email}\" en nombre de \"{teamName}\" te ha invitado a firmar \"ejemplo de documento\"."
 
 #: apps/web/src/app/(teams)/t/[teamUrl]/settings/preferences/document-preferences.tsx:209
-msgid "\"{placeholderEmail}\" on behalf of \"{0}\" has invited you to sign \"example\n"
-"document\"."
-msgstr "\"{placeholderEmail}\" en nombre de \"{0}\" te ha invitado a firmar \"ejemplo\n"
-"documento\"."
+#~ msgid ""
+#~ "\"{placeholderEmail}\" on behalf of \"{0}\" has invited you to sign \"example\n"
+#~ "document\"."
+#~ msgstr ""
+#~ "\"{placeholderEmail}\" en nombre de \"{0}\" te ha invitado a firmar \"ejemplo\n"
+#~ "documento\"."
+
+#: apps/web/src/app/(teams)/t/[teamUrl]/settings/preferences/document-preferences.tsx:209
+msgid "\"{placeholderEmail}\" on behalf of \"{0}\" has invited you to sign \"example document\"."
+msgstr ""
 
 #: apps/web/src/components/(teams)/forms/update-team-form.tsx:241
 msgid "\"{teamUrl}\" has invited you to sign \"example document\"."
@@ -1029,7 +1035,7 @@ msgstr "Controla el idioma predeterminado de un documento cargado. Este se utili
 msgid "Controls the default visibility of an uploaded document."
 msgstr "Controla la visibilidad predeterminada de un documento cargado."
 
-#: apps/web/src/app/(teams)/t/[teamUrl]/settings/preferences/document-preferences.tsx:216
+#: apps/web/src/app/(teams)/t/[teamUrl]/settings/preferences/document-preferences.tsx:220
 msgid "Controls the formatting of the message that will be sent when inviting a recipient to sign a document. If a custom message has been provided while configuring the document, it will be used instead."
 msgstr "Controla el formato del mensaje que se enviará al invitar a un destinatario a firmar un documento. Si se ha proporcionado un mensaje personalizado al configurar el documento, se usará en su lugar."
 
@@ -1602,7 +1608,7 @@ msgstr "Descargar"
 msgid "Download Audit Logs"
 msgstr "Descargar registros de auditoría"
 
-#: apps/web/src/app/(dashboard)/documents/[id]/logs/download-certificate-button.tsx:84
+#: apps/web/src/app/(dashboard)/documents/[id]/logs/download-certificate-button.tsx:86
 msgid "Download Certificate"
 msgstr "Descargar certificado"
 
@@ -2987,7 +2993,7 @@ msgstr "Roles"
 #: apps/web/src/app/(signing)/sign/[token]/number-field.tsx:336
 #: apps/web/src/app/(signing)/sign/[token]/text-field.tsx:342
 #: apps/web/src/app/(teams)/t/[teamUrl]/settings/preferences/branding-preferences.tsx:312
-#: apps/web/src/app/(teams)/t/[teamUrl]/settings/preferences/document-preferences.tsx:228
+#: apps/web/src/app/(teams)/t/[teamUrl]/settings/preferences/document-preferences.tsx:232
 msgid "Save"
 msgstr "Guardar"
 
@@ -3283,7 +3289,7 @@ msgstr "Configuraciones del sitio"
 #: apps/web/src/app/(dashboard)/documents/[id]/document-page-view-button.tsx:63
 #: apps/web/src/app/(dashboard)/documents/[id]/document-page-view-dropdown.tsx:91
 #: apps/web/src/app/(dashboard)/documents/[id]/logs/download-audit-log-button.tsx:65
-#: apps/web/src/app/(dashboard)/documents/[id]/logs/download-certificate-button.tsx:66
+#: apps/web/src/app/(dashboard)/documents/[id]/logs/download-certificate-button.tsx:68
 #: apps/web/src/app/(dashboard)/documents/data-table-action-button.tsx:75
 #: apps/web/src/app/(dashboard)/documents/data-table-action-dropdown.tsx:106
 #: apps/web/src/app/(dashboard)/documents/delete-document-dialog.tsx:80
@@ -3355,7 +3361,7 @@ msgstr "Algo salió mal. Por favor, intenta de nuevo o contacta al soporte."
 msgid "Sorry, we were unable to download the audit logs. Please try again later."
 msgstr "Lo sentimos, no pudimos descargar los registros de auditoría. Por favor, intenta de nuevo más tarde."
 
-#: apps/web/src/app/(dashboard)/documents/[id]/logs/download-certificate-button.tsx:68
+#: apps/web/src/app/(dashboard)/documents/[id]/logs/download-certificate-button.tsx:70
 msgid "Sorry, we were unable to download the certificate. Please try again later."
 msgstr "Lo sentimos, no pudimos descargar el certificado. Por favor, intenta de nuevo más tarde."
 
@@ -5067,4 +5073,3 @@ msgstr "¡Tu token se creó con éxito! ¡Asegúrate de copiarlo porque no podr�
 #: apps/web/src/app/(teams)/t/[teamUrl]/settings/tokens/page.tsx:86
 msgid "Your tokens will be shown here once you create them."
 msgstr "Tus tokens se mostrarán aquí una vez que los crees."
-
