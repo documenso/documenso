@@ -2,7 +2,7 @@ name: Publish Docker
 
 on:
   push:
-    branches: ['release']
+    branches: ["release"]
 
 jobs:
   build_and_publish_platform_containers:
@@ -89,22 +89,35 @@ jobs:
           APP_VERSION="$(git name-rev --tags --name-only $(git rev-parse HEAD) | head -n 1 | sed 's/\^0//')"
           GIT_SHA="$(git rev-parse HEAD)"
 
-          docker manifest create \
-            documenso/documenso:latest \
-            --amend documenso/documenso-amd64:latest \
-            --amend documenso/documenso-arm64:latest \
+          # Check if the version is stable (no rc or beta in the version)
+          if [[ "$APP_VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            docker manifest create \
+              documenso/documenso:latest \
+              --amend documenso/documenso-amd64:latest \
+              --amend documenso/documenso-arm64:latest
+
+            docker manifest push documenso/documenso:latest
+          fi
+
+          if [[ "$APP_VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+-rc\.[0-9]+$ ]]; then
+            docker manifest create \
+              documenso/documenso:rc \
+              --amend documenso/documenso-amd64:rc \
+              --amend documenso/documenso-arm64:rc
+
+            docker manifest push documenso/documenso:rc
+          fi
 
           docker manifest create \
             documenso/documenso:$GIT_SHA \
             --amend documenso/documenso-amd64:$GIT_SHA \
-            --amend documenso/documenso-arm64:$GIT_SHA \
+            --amend documenso/documenso-arm64:$GIT_SHA
 
           docker manifest create \
             documenso/documenso:$APP_VERSION \
             --amend documenso/documenso-amd64:$APP_VERSION \
-            --amend documenso/documenso-arm64:$APP_VERSION \
+            --amend documenso/documenso-arm64:$APP_VERSION
 
-          docker manifest push documenso/documenso:latest
           docker manifest push documenso/documenso:$GIT_SHA
           docker manifest push documenso/documenso:$APP_VERSION
 
@@ -113,21 +126,34 @@ jobs:
           APP_VERSION="$(git name-rev --tags --name-only $(git rev-parse HEAD) | head -n 1 | sed 's/\^0//')"
           GIT_SHA="$(git rev-parse HEAD)"
 
-          docker manifest create \
-            ghcr.io/documenso/documenso:latest \
-            --amend ghcr.io/documenso/documenso-amd64:latest \
-            --amend ghcr.io/documenso/documenso-arm64:latest \
+          # Check if the version is stable (no rc or beta in the version)
+          if [[ "$APP_VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            docker manifest create \
+              ghcr.io/documenso/documenso:latest \
+              --amend ghcr.io/documenso/documenso-amd64:latest \
+              --amend ghcr.io/documenso/documenso-arm64:latest
+
+            docker manifest push ghcr.io/documenso/documenso:latest
+          fi
+
+          if [[ "$APP_VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+-rc\.[0-9]+$ ]]; then
+            docker manifest create \
+              ghcr.io/documenso/documenso:rc \
+              --amend ghcr.io/documenso/documenso-amd64:rc \
+              --amend ghcr.io/documenso/documenso-arm64:rc
+
+            docker manifest push ghcr.io/documenso/documenso:rc
+          fi
 
           docker manifest create \
             ghcr.io/documenso/documenso:$GIT_SHA \
             --amend ghcr.io/documenso/documenso-amd64:$GIT_SHA \
-            --amend ghcr.io/documenso/documenso-arm64:$GIT_SHA \
+            --amend ghcr.io/documenso/documenso-arm64:$GIT_SHA
 
           docker manifest create \
             ghcr.io/documenso/documenso:$APP_VERSION \
             --amend ghcr.io/documenso/documenso-amd64:$APP_VERSION \
-            --amend ghcr.io/documenso/documenso-arm64:$APP_VERSION \
+            --amend ghcr.io/documenso/documenso-arm64:$APP_VERSION
 
-          docker manifest push ghcr.io/documenso/documenso:latest
           docker manifest push ghcr.io/documenso/documenso:$GIT_SHA
           docker manifest push ghcr.io/documenso/documenso:$APP_VERSION
