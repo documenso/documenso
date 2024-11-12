@@ -40,10 +40,8 @@ function getOriginHeaders(reqOrigin: string | undefined, origin: StaticOrigin) {
   const headers = new Headers();
 
   if (origin === '*') {
-    // Allow any origin
     headers.set('Access-Control-Allow-Origin', '*');
   } else if (typeof origin === 'string') {
-    // Fixed origin
     headers.set('Access-Control-Allow-Origin', origin);
     headers.append('Vary', 'Origin');
   } else {
@@ -73,7 +71,6 @@ function getAllowedHeaders(req: Request, allowed?: string | string[]) {
     allowed = req.headers.get('Access-Control-Request-Headers')!;
     headers.append('Vary', 'Access-Control-Request-Headers');
   } else if (Array.isArray(allowed)) {
-    // If the allowed headers is an array, turn it into a string
     allowed = allowed.join(',');
   }
   if (allowed) {
