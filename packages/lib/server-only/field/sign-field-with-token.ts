@@ -177,6 +177,10 @@ export const signFieldWithToken = async ({
     throw new Error('Signature field must have a signature');
   }
 
+  if (isSignatureField && !documentMeta?.typedSignatureEnabled && typedSignature) {
+    throw new Error('Typed signatures are not allowed. Please draw your signature');
+  }
+
   return await prisma.$transaction(async (tx) => {
     const updatedField = await tx.field.update({
       where: {

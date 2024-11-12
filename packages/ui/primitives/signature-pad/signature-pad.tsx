@@ -38,6 +38,7 @@ export type SignaturePadProps = Omit<HTMLAttributes<HTMLCanvasElement>, 'onChang
   containerClassName?: string;
   disabled?: boolean;
   allowTypedSignature?: boolean;
+  defaultValue?: string;
 };
 
 export const SignaturePad = ({
@@ -56,7 +57,7 @@ export const SignaturePad = ({
   const [lines, setLines] = useState<Point[][]>([]);
   const [currentLine, setCurrentLine] = useState<Point[]>([]);
   const [selectedColor, setSelectedColor] = useState('black');
-  const [typedSignature, setTypedSignature] = useState('');
+  const [typedSignature, setTypedSignature] = useState(defaultValue ?? '');
 
   const perfectFreehandOptions = useMemo(() => {
     const size = $el.current ? Math.min($el.current.height, $el.current.width) * 0.03 : 10;
@@ -206,6 +207,7 @@ export const SignaturePad = ({
       if (ctx) {
         const canvasWidth = $el.current.width;
         const canvasHeight = $el.current.height;
+        const fontFamily = String(fontCaveat.style.fontFamily);
 
         ctx.clearRect(0, 0, canvasWidth, canvasHeight);
         ctx.textAlign = 'center';
@@ -217,7 +219,7 @@ export const SignaturePad = ({
 
         // Start with a base font size
         let fontSize = 18;
-        ctx.font = `${fontSize}px ${fontCaveat.style.fontFamily}`;
+        ctx.font = `${fontSize}px ${fontFamily}`;
 
         // Measure 10 characters and calculate scale factor
         const characterWidth = ctx.measureText('m'.repeat(10)).width;
@@ -227,7 +229,7 @@ export const SignaturePad = ({
         fontSize = fontSize * scaleFactor;
 
         // Adjust font size if it exceeds canvas width
-        ctx.font = `${fontSize}px ${fontCaveat.style.fontFamily}`;
+        ctx.font = `${fontSize}px ${fontFamily}`;
 
         const textWidth = ctx.measureText(typedSignature).width;
 
@@ -236,7 +238,7 @@ export const SignaturePad = ({
         }
 
         // Set final font and render text
-        ctx.font = `${fontSize}px ${fontCaveat.style.fontFamily}`;
+        ctx.font = `${fontSize}px ${fontFamily}`;
         ctx.fillText(typedSignature, canvasWidth / 2, canvasHeight / 2);
       }
     }
@@ -247,7 +249,7 @@ export const SignaturePad = ({
     setTypedSignature(newValue);
 
     if (newValue.trim() !== '') {
-      onChange?.($el.current?.toDataURL() || null);
+      onChange?.(newValue);
     } else {
       onChange?.(null);
     }
@@ -256,7 +258,7 @@ export const SignaturePad = ({
   useEffect(() => {
     if (typedSignature.trim() !== '') {
       renderTypedSignature();
-      onChange?.($el.current?.toDataURL() || null);
+      onChange?.(typedSignature);
     } else {
       onClearClick();
     }
@@ -302,6 +304,10 @@ export const SignaturePad = ({
     if ($el.current) {
       $el.current.width = $el.current.clientWidth * DPI;
       $el.current.height = $el.current.clientHeight * DPI;
+    }
+
+    if (defaultValue && typedSignature) {
+      renderTypedSignature();
     }
   }, []);
 
