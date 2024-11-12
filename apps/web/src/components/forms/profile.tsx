@@ -138,7 +138,6 @@ export const ProfileForm = ({ className, user }: ProfileFormProps) => {
                     containerClassName={cn('rounded-lg border bg-background')}
                     defaultValue={user.signature ?? undefined}
                     onChange={(v) => onChange(v ?? '')}
-                    allowTypedSignature={true}
                   />
                 </FormControl>
                 <FormMessage />

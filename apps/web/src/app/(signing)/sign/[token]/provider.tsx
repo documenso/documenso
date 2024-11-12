@@ -1,6 +1,6 @@
 'use client';
 
-import { createContext, useContext, useEffect, useState } from 'react';
+import { createContext, useContext, useState } from 'react';
 
 export type SigningContextValue = {
   fullName: string;
@@ -43,12 +43,6 @@ export const SigningProvider = ({
   const [fullName, setFullName] = useState(initialFullName || '');
   const [email, setEmail] = useState(initialEmail || '');
   const [signature, setSignature] = useState(initialSignature || null);
-
-  useEffect(() => {
-    if (initialSignature) {
-      setSignature(initialSignature);
-    }
-  }, [initialSignature]);
 
   return (
     <SigningContext.Provider

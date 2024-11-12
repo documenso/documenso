@@ -92,76 +92,45 @@ export const insertFieldInPDF = async (pdf: PDFDocument, field: FieldWithSignatu
     .with(
       {
         type: P.union(FieldType.SIGNATURE, FieldType.FREE_SIGNATURE),
+        Signature: { signatureImageAsBase64: P.string },
       },
       async (field) => {
-        if (field.Signature?.signatureImageAsBase64) {
-          const image = await pdf.embedPng(field.Signature?.signatureImageAsBase64 ?? '');
+        const image = await pdf.embedPng(field.Signature?.signatureImageAsBase64 ?? '');
 
-          let imageWidth = image.width;
-          let imageHeight = image.height;
+        let imageWidth = image.width;
+        let imageHeight = image.height;
 
-          const scalingFactor = Math.min(fieldWidth / imageWidth, fieldHeight / imageHeight, 1);
+        const scalingFactor = Math.min(fieldWidth / imageWidth, fieldHeight / imageHeight, 1);
 
-          imageWidth = imageWidth * scalingFactor;
-          imageHeight = imageHeight * scalingFactor;
+        imageWidth = imageWidth * scalingFactor;
+        imageHeight = imageHeight * scalingFactor;
 
-          let imageX = fieldX + (fieldWidth - imageWidth) / 2;
-          let imageY = fieldY + (fieldHeight - imageHeight) / 2;
+        let imageX = fieldX + (fieldWidth - imageWidth) / 2;
+        let imageY = fieldY + (fieldHeight - imageHeight) / 2;
 
-          // Invert the Y axis since PDFs use a bottom-left coordinate system
-          imageY = pageHeight - imageY - imageHeight;
+        // Invert the Y axis since PDFs use a bottom-left coordinate system
+        imageY = pageHeight - imageY - imageHeight;
 
-          if (pageRotationInDegrees !== 0) {
-            const adjustedPosition = adjustPositionForRotation(
-              pageWidth,
-              pageHeight,
-              imageX,
-              imageY,
-              pageRotationInDegrees,
-            );
+        if (pageRotationInDegrees !== 0) {
+          const adjustedPosition = adjustPositionForRotation(
+            pageWidth,
+            pageHeight,
+            imageX,
+            imageY,
+            pageRotationInDegrees,
+          );
 
-            imageX = adjustedPosition.xPos;
-            imageY = adjustedPosition.yPos;
-          }
-
-          page.drawImage(image, {
-            x: imageX,
-            y: imageY,
-            width: imageWidth,
-            height: imageHeight,
-            rotate: degrees(pageRotationInDegrees),
-          });
-        } else {
-          const fontSize = 12;
-          const textWidth = font.widthOfTextAtSize(field.Signature?.typedSignature ?? '', fontSize);
-          const textHeight = font.heightAtSize(fontSize);
-
-          let textX = fieldX + (fieldWidth - textWidth) / 2;
-          let textY = fieldY + (fieldHeight - textHeight) / 2;
-
-          textY = pageHeight - textY - textHeight;
-
-          if (pageRotationInDegrees !== 0) {
-            const adjustedPosition = adjustPositionForRotation(
-              pageWidth,
-              pageHeight,
-              textX,
-              textY,
-              pageRotationInDegrees,
-            );
-
-            textX = adjustedPosition.xPos;
-            textY = adjustedPosition.yPos;
-          }
-
-          page.drawText(field.Signature?.typedSignature ?? '', {
-            x: textX,
-            y: textY,
-            size: fontSize,
-            font,
-            rotate: degrees(pageRotationInDegrees),
-          });
+          imageX = adjustedPosition.xPos;
+          imageY = adjustedPosition.yPos;
         }
+
+        page.drawImage(image, {
+          x: imageX,
+          y: imageY,
+          width: imageWidth,
+          height: imageHeight,
+          rotate: degrees(pageRotationInDegrees),
+        });
       },
     )
     .with({ type: FieldType.CHECKBOX }, (field) => {

@@ -374,7 +374,7 @@ model DocumentMeta {
   document              Document                   @relation(fields: [documentId], references: [id], onDelete: Cascade)
   redirectUrl           String?
   signingOrder          DocumentSigningOrder       @default(PARALLEL)
-  typedSignatureEnabled Boolean                    @default(true)
+  typedSignatureEnabled Boolean                    @default(false)
   language              String                     @default("en")
   distributionMethod    DocumentDistributionMethod @default(EMAIL)
   emailSettings         Json?
