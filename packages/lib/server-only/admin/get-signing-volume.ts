@@ -43,57 +43,34 @@ export async function getSigningVolume({
     ],
   });
 
-  const orderBy = getOrderByClause({ sortBy, sortOrder });
+  const orderByClause = getOrderByClause({ sortBy, sortOrder });
 
   const [subscriptions, totalCount] = await Promise.all([
     prisma.subscription.findMany({
       where: whereClause,
-      select: {
-        id: true,
-        createdAt: true,
+      include: {
         User: {
-          select: {
-            id: true,
-            name: true,
-            email: true,
+          include: {
             Document: {
               where: {
                 status: 'COMPLETED',
                 deletedAt: null,
               },
-              select: {
-                id: true,
-              },
-            },
-            Subscription: {
-              select: {
-                planId: true,
-              },
             },
           },
         },
         team: {
-          select: {
-            id: true,
-            name: true,
+          include: {
             document: {
               where: {
                 status: 'COMPLETED',
                 deletedAt: null,
               },
-              select: {
-                id: true,
-              },
-            },
-            subscription: {
-              select: {
-                planId: true,
-              },
             },
           },
         },
       },
-      orderBy,
+      orderBy: orderByClause,
       skip: Math.max(page - 1, 0) * perPage,
       take: perPage,
     }),
@@ -105,17 +82,16 @@ export async function getSigningVolume({
   const leaderboardWithVolume: SigningVolume[] = subscriptions.map((subscription) => {
     const name =
       subscription.User?.name || subscription.team?.name || subscription.User?.email || 'Unknown';
-    const signingVolume =
-      (subscription.User?.Document.length || 0) + (subscription.team?.document.length || 0);
-    const planId =
-      subscription.User?.Subscription?.[0]?.planId || subscription.team?.subscription?.planId || '';
+
+    const userSignedDocs = subscription.User?.Document?.length || 0;
+    const teamSignedDocs = subscription.team?.document?.length || 0;
 
     return {
       id: subscription.id,
       name,
-      signingVolume,
+      signingVolume: userSignedDocs + teamSignedDocs,
       createdAt: subscription.createdAt,
-      planId,
+      planId: subscription.planId,
     };
   });
 
@@ -125,33 +101,48 @@ export async function getSigningVolume({
   };
 }
 
-type GetOrderByClauseOptions = {
+function getOrderByClause(options: {
   sortBy: string;
   sortOrder: 'asc' | 'desc';
-};
+}): Prisma.SubscriptionOrderByWithRelationInput | Prisma.SubscriptionOrderByWithRelationInput[] {
+  const { sortBy, sortOrder } = options;
 
-const getOrderByClause = ({ sortBy, sortOrder }: GetOrderByClauseOptions) => {
-  switch (sortBy) {
-    case 'name':
-      return [{ User: { name: sortOrder } }, { team: { name: sortOrder } }];
-    case 'createdAt':
-      return { createdAt: sortOrder };
-    default:
-      return [
-        {
-          User: {
-            Document: {
-              _count: sortOrder,
-            },
-          },
+  if (sortBy === 'name') {
+    return [
+      {
+        User: {
+          name: sortOrder,
         },
-        {
-          team: {
-            document: {
-              _count: sortOrder,
-            },
-          },
+      },
+      {
+        team: {
+          name: sortOrder,
         },
-      ];
+      },
+    ];
   }
-};
+
+  if (sortBy === 'createdAt') {
+    return {
+      createdAt: sortOrder,
+    };
+  }
+
+  // Default: sort by signing volume
+  return [
+    {
+      User: {
+        Document: {
+          _count: sortOrder,
+        },
+      },
+    },
+    {
+      team: {
+        document: {
+          _count: sortOrder,
+        },
+      },
+    },
+  ];
+}

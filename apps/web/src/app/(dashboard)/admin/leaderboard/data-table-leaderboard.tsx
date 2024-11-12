@@ -59,8 +59,6 @@ export const LeaderboardTable = ({
         ),
         accessorKey: 'name',
         cell: ({ row }) => {
-          console.log('row.original', row.original);
-
           return (
             <div>
               <a
