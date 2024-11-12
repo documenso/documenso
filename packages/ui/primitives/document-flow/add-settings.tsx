@@ -180,9 +180,11 @@ export const AddSettingsFormPartial = ({
                       </TooltipTrigger>
 
                       <TooltipContent className="text-foreground max-w-md space-y-2 p-4">
-                        Controls the language for the document, including the language to be used
-                        for email notifications, and the final certificate that is generated and
-                        attached to the document.
+                        <Trans>
+                          Controls the language for the document, including the language to be used
+                          for email notifications, and the final certificate that is generated and
+                          attached to the document.
+                        </Trans>
                       </TooltipContent>
                     </Tooltip>
                   </FormLabel>
