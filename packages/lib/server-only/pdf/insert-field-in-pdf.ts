@@ -82,7 +82,10 @@ export const insertFieldInPDF = async (pdf: PDFDocument, field: FieldWithSignatu
   const fieldX = pageWidth * (Number(field.positionX) / 100);
   const fieldY = pageHeight * (Number(field.positionY) / 100);
 
-  const font = await pdf.embedFont(isSignatureField ? fontCaveat : fontNoto);
+  const font = await pdf.embedFont(
+    isSignatureField ? fontCaveat : fontNoto,
+    isSignatureField ? { features: { calt: false } } : undefined,
+  );
 
   if (field.type === FieldType.SIGNATURE || field.type === FieldType.FREE_SIGNATURE) {
     await pdf.embedFont(fontCaveat);
@@ -132,13 +135,25 @@ export const insertFieldInPDF = async (pdf: PDFDocument, field: FieldWithSignatu
             rotate: degrees(pageRotationInDegrees),
           });
         } else {
-          const fontSize = 12;
-          const textWidth = font.widthOfTextAtSize(field.Signature?.typedSignature ?? '', fontSize);
+          const signatureText = field.Signature?.typedSignature ?? '';
+
+          const longestLineInTextForWidth = signatureText
+            .split('\n')
+            .sort((a, b) => b.length - a.length)[0];
+
+          let fontSize = maxFontSize;
+          let textWidth = font.widthOfTextAtSize(longestLineInTextForWidth, fontSize);
           const textHeight = font.heightAtSize(fontSize);
+
+          const scalingFactor = Math.min(fieldWidth / textWidth, fieldHeight / textHeight, 1);
+          fontSize = Math.max(Math.min(fontSize * scalingFactor, maxFontSize), minFontSize);
+
+          textWidth = font.widthOfTextAtSize(longestLineInTextForWidth, fontSize);
 
           let textX = fieldX + (fieldWidth - textWidth) / 2;
           let textY = fieldY + (fieldHeight - textHeight) / 2;
 
+          // Invert the Y axis since PDFs use a bottom-left coordinate system
           textY = pageHeight - textY - textHeight;
 
           if (pageRotationInDegrees !== 0) {
@@ -154,7 +169,7 @@ export const insertFieldInPDF = async (pdf: PDFDocument, field: FieldWithSignatu
             textY = adjustedPosition.yPos;
           }
 
-          page.drawText(field.Signature?.typedSignature ?? '', {
+          page.drawText(signatureText, {
             x: textX,
             y: textY,
             size: fontSize,
