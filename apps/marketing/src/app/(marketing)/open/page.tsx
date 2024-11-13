@@ -6,6 +6,7 @@ import { z } from 'zod';
 
 import { setupI18nSSR } from '@documenso/lib/client-only/providers/i18n.server';
 import { getCompletedDocumentsMonthly } from '@documenso/lib/server-only/user/get-monthly-completed-document';
+import { getSignerConversionMonthly } from '@documenso/lib/server-only/user/get-signer-conversion';
 import { getUserMonthlyGrowth } from '@documenso/lib/server-only/user/get-user-monthly-growth';
 
 import { FUNDING_RAISED } from '~/app/(marketing)/open/data';
@@ -19,6 +20,7 @@ import { MonthlyCompletedDocumentsChart } from './monthly-completed-documents-ch
 import { MonthlyNewUsersChart } from './monthly-new-users-chart';
 import { MonthlyTotalUsersChart } from './monthly-total-users-chart';
 import { SalaryBands } from './salary-bands';
+import { SignerConversionChart } from './signer-conversion-chart';
 import { TeamMembers } from './team-members';
 import { OpenPageTooltip } from './tooltip';
 import { TotalSignedDocumentsChart } from './total-signed-documents-chart';
@@ -143,6 +145,7 @@ export default async function OpenPage() {
     EARLY_ADOPTERS_DATA,
     MONTHLY_USERS,
     MONTHLY_COMPLETED_DOCUMENTS,
+    MONTHLY_SIGNER_CONVERSION,
   ] = await Promise.all([
     fetchGithubStats(),
     fetchOpenIssues(),
@@ -151,6 +154,7 @@ export default async function OpenPage() {
     fetchEarlyAdopters(),
     getUserMonthlyGrowth(),
     getCompletedDocumentsMonthly(),
+    getSignerConversionMonthly(),
   ]);
 
   return (
@@ -280,6 +284,17 @@ export default async function OpenPage() {
           <TotalSignedDocumentsChart
             data={MONTHLY_COMPLETED_DOCUMENTS}
             className="col-span-12 lg:col-span-6"
+          />
+          <SignerConversionChart
+            className="col-span-12 lg:col-span-6"
+            title={_(msg`Signers that Signed Up`)}
+            data={MONTHLY_SIGNER_CONVERSION}
+          />
+          <SignerConversionChart
+            className="col-span-12 lg:col-span-6"
+            title={_(msg`Total Signers that Signed Up`)}
+            data={MONTHLY_SIGNER_CONVERSION}
+            cummulative
           />
         </div>
       </div>

@@ -145,7 +145,10 @@ export default async function AdminStatsPage() {
               msg`Monthly Active Users: Users that had at least one of their documents completed`,
             )}
           />
-          <SignerConversionChart title="Signers that Signed Up" data={signerConversionMonthly} />
+          <SignerConversionChart
+            title={_(msg`Signers that Signed Up`)}
+            data={signerConversionMonthly}
+          />
           <SignerConversionChart
             title={_(msg`Total Signers that Signed Up`)}
             data={signerConversionMonthly}
