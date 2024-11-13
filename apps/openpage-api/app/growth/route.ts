@@ -8,6 +8,8 @@ const paths = [
   { path: '/new-users', description: 'New Users' },
   { path: '/completed-documents', description: 'Completed Documents per Month' },
   { path: '/total-completed-documents', description: 'Total Completed Documents' },
+  { path: '/signer-conversion', description: 'Signers That Signed Up' },
+  { path: '/total-signer-conversion', description: 'Total Signers That Signed Up' },
 ];
 
 export function GET(request: NextRequest) {
