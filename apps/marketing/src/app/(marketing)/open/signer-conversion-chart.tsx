@@ -42,9 +42,9 @@ export const SignerConversionChart = ({
               labelStyle={{
                 color: 'hsl(var(--primary-foreground))',
               }}
-              formatter={(value, name) => [
+              formatter={(value) => [
                 Number(value).toLocaleString('en-US'),
-                name === 'Recipients',
+                cummulative ? 'Total Signers' : 'Monthly Signers',
               ]}
               cursor={{ fill: 'hsl(var(--primary) / 10%)' }}
             />
@@ -54,7 +54,7 @@ export const SignerConversionChart = ({
               fill="hsl(var(--primary))"
               radius={[4, 4, 0, 0]}
               maxBarSize={60}
-              label="Recipients"
+              name={cummulative ? 'Total Signers' : 'Monthly Signers'}
             />
           </BarChart>
         </ResponsiveContainer>
