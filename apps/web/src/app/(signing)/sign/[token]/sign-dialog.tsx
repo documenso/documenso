@@ -14,7 +14,6 @@ import {
 } from '@documenso/ui/primitives/dialog';
 
 import { SigningDisclosure } from '~/components/general/signing-disclosure';
-import { truncateTitle } from '~/helpers/truncate-title';
 
 export type SignDialogProps = {
   isSubmitting: boolean;
@@ -36,7 +35,7 @@ export const SignDialog = ({
   disabled = false,
 }: SignDialogProps) => {
   const [showDialog, setShowDialog] = useState(false);
-  const truncatedTitle = truncateTitle(documentTitle);
+
   const isComplete = fields.every((field) => field.inserted);
 
   const handleOpenChange = (open: boolean) => {
@@ -75,7 +74,7 @@ export const SignDialog = ({
           {role === RecipientRole.VIEWER && (
             <span>
               <Trans>
-                You are about to complete viewing "{truncatedTitle}".
+                You are about to complete viewing "{documentTitle}".
                 <br /> Are you sure?
               </Trans>
             </span>
@@ -83,7 +82,7 @@ export const SignDialog = ({
           {role === RecipientRole.SIGNER && (
             <span>
               <Trans>
-                You are about to complete signing "{truncatedTitle}".
+                You are about to complete signing "{documentTitle}".
                 <br /> Are you sure?
               </Trans>
             </span>
@@ -91,7 +90,7 @@ export const SignDialog = ({
           {role === RecipientRole.APPROVER && (
             <span>
               <Trans>
-                You are about to complete approving "{truncatedTitle}".
+                You are about to complete approving "{documentTitle}".
                 <br /> Are you sure?
               </Trans>
             </span>

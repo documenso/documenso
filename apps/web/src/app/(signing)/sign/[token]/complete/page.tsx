@@ -24,8 +24,6 @@ import { SigningCard3D } from '@documenso/ui/components/signing-card';
 import { cn } from '@documenso/ui/lib/utils';
 import { Badge } from '@documenso/ui/primitives/badge';
 
-import { truncateTitle } from '~/helpers/truncate-title';
-
 import { SigningAuthPageView } from '../signing-auth-page';
 import { ClaimAccount } from './claim-account';
 import { DocumentPreviewButton } from './document-preview-button';
@@ -60,8 +58,6 @@ export default async function CompletedSigningPage({
   if (!document || !document.documentData) {
     return notFound();
   }
-
-  const truncatedTitle = truncateTitle(document.title);
 
   const { documentData } = document;
 
@@ -118,7 +114,7 @@ export default async function CompletedSigningPage({
           })}
         >
           <Badge variant="neutral" size="default" className="mb-6 rounded-xl border bg-transparent">
-            {truncatedTitle}
+            {document.title}
           </Badge>
 
           {/* Card with recipient */}
