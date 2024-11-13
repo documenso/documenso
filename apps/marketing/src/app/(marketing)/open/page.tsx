@@ -294,7 +294,7 @@ export default async function OpenPage() {
             className="col-span-12 lg:col-span-6"
             title={_(msg`Total Signers that Signed Up`)}
             data={MONTHLY_SIGNER_CONVERSION}
-            cummulative
+            cumulative
           />
         </div>
       </div>

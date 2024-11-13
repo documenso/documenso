@@ -8,7 +8,7 @@ import type { GetSignerConversionMonthlyResult } from '@documenso/lib/server-onl
 export type SignerConversionChartProps = {
   className?: string;
   title: string;
-  cummulative?: boolean;
+  cumulative?: boolean;
   data: GetSignerConversionMonthlyResult;
 };
 
@@ -16,7 +16,7 @@ export const SignerConversionChart = ({
   className,
   data,
   title,
-  cummulative = false,
+  cumulative = false,
 }: SignerConversionChartProps) => {
   const formattedData = [...data].reverse().map(({ month, count, cume_count }) => {
     return {
@@ -44,17 +44,17 @@ export const SignerConversionChart = ({
               }}
               formatter={(value) => [
                 Number(value).toLocaleString('en-US'),
-                cummulative ? 'Total Signers' : 'Monthly Signers',
+                cumulative ? 'Total Signers' : 'Monthly Signers',
               ]}
               cursor={{ fill: 'hsl(var(--primary) / 10%)' }}
             />
 
             <Bar
-              dataKey={cummulative ? 'signed_count' : 'count'}
+              dataKey={cumulative ? 'signed_count' : 'count'}
               fill="hsl(var(--primary))"
               radius={[4, 4, 0, 0]}
               maxBarSize={60}
-              name={cummulative ? 'Total Signers' : 'Monthly Signers'}
+              name={cumulative ? 'Total Signers' : 'Monthly Signers'}
             />
           </BarChart>
         </ResponsiveContainer>
