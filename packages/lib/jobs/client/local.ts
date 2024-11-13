@@ -43,16 +43,8 @@ export class LocalJobProvider extends BaseJobProvider {
   }
 
   public async triggerJob(options: SimpleTriggerJobOptions) {
-    console.log({ jobDefinitions: this._jobDefinitions });
-
     const eligibleJobs = Object.values(this._jobDefinitions).filter(
       (job) => job.trigger.name === options.name,
-    );
-
-    console.log({ options });
-    console.log(
-      'Eligible jobs:',
-      eligibleJobs.map((job) => job.name),
     );
 
     await Promise.all(
@@ -177,7 +169,7 @@ export class LocalJobProvider extends BaseJobProvider {
           },
         });
       } catch (error) {
-        console.error(`[JOBS]: Job ${options.name} failed`, error);
+        console.log(`[JOBS]: Job ${options.name} failed`, error);
 
         const taskHasExceededRetries = error instanceof BackgroundTaskExceededRetriesError;
         const jobHasExceededRetries =
@@ -303,7 +295,7 @@ export class LocalJobProvider extends BaseJobProvider {
           });
 
           return result;
-        } catch {
+        } catch (err) {
           task = await prisma.backgroundJobTask.update({
             where: {
               id: task.id,
@@ -316,6 +308,8 @@ export class LocalJobProvider extends BaseJobProvider {
               },
             },
           });
+
+          console.log(`[JOBS:${task.id}] Task failed`, err);
 
           throw new BackgroundTaskFailedError('Task failed');
         }

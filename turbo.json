@@ -34,9 +34,6 @@
       "dependsOn": ["^build"],
       "cache": false
     },
-    "translate:extract": {
-      "cache": false
-    },
     "translate:compile": {
       "cache": false
     }
@@ -108,6 +105,7 @@
     "NEXT_PRIVATE_SMTP_UNSAFE_IGNORE_TLS",
     "NEXT_PRIVATE_SMTP_FROM_NAME",
     "NEXT_PRIVATE_SMTP_FROM_ADDRESS",
+    "NEXT_PRIVATE_SMTP_SERVICE",
     "NEXT_PRIVATE_STRIPE_API_KEY",
     "NEXT_PRIVATE_STRIPE_WEBHOOK_SECRET",
     "NEXT_PRIVATE_GITHUB_TOKEN",

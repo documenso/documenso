@@ -1,7 +1,8 @@
 import { z } from 'zod';
 
+import { SUPPORTED_LANGUAGE_CODES } from '@documenso/lib/constants/i18n';
 import { PROTECTED_TEAM_URLS } from '@documenso/lib/constants/teams';
-import { TeamMemberRole } from '@documenso/prisma/client';
+import { DocumentVisibility, TeamMemberRole } from '@documenso/prisma/client';
 
 import { ZUpdatePublicProfileMutationSchema } from '../profile-router/schema';
 
@@ -150,6 +151,8 @@ export const ZUpdateTeamMutationSchema = z.object({
   data: z.object({
     name: ZTeamNameSchema,
     url: ZTeamUrlSchema,
+    documentVisibility: z.nativeEnum(DocumentVisibility).optional(),
+    includeSenderDetails: z.boolean().optional(),
   }),
 });
 
@@ -190,6 +193,28 @@ export const ZResendTeamMemberInvitationMutationSchema = z.object({
   invitationId: z.number(),
 });
 
+export const ZUpdateTeamBrandingSettingsMutationSchema = z.object({
+  teamId: z.number(),
+  settings: z.object({
+    brandingEnabled: z.boolean().optional().default(false),
+    brandingLogo: z.string().optional().default(''),
+    brandingUrl: z.string().optional().default(''),
+    brandingCompanyDetails: z.string().optional().default(''),
+  }),
+});
+
+export const ZUpdateTeamDocumentSettingsMutationSchema = z.object({
+  teamId: z.number(),
+  settings: z.object({
+    documentVisibility: z
+      .nativeEnum(DocumentVisibility)
+      .optional()
+      .default(DocumentVisibility.EVERYONE),
+    documentLanguage: z.enum(SUPPORTED_LANGUAGE_CODES).optional().default('en'),
+    includeSenderDetails: z.boolean().optional().default(false),
+  }),
+});
+
 export type TCreateTeamMutationSchema = z.infer<typeof ZCreateTeamMutationSchema>;
 export type TCreateTeamEmailVerificationMutationSchema = z.infer<
   typeof ZCreateTeamEmailVerificationMutationSchema
@@ -224,4 +249,10 @@ export type TResendTeamEmailVerificationMutationSchema = z.infer<
 >;
 export type TResendTeamMemberInvitationMutationSchema = z.infer<
   typeof ZResendTeamMemberInvitationMutationSchema
+>;
+export type TUpdateTeamBrandingSettingsMutationSchema = z.infer<
+  typeof ZUpdateTeamBrandingSettingsMutationSchema
+>;
+export type TUpdateTeamDocumentSettingsMutationSchema = z.infer<
+  typeof ZUpdateTeamDocumentSettingsMutationSchema
 >;

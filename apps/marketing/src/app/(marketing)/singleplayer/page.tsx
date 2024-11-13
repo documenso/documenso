@@ -14,8 +14,8 @@ export const dynamic = 'force-dynamic';
 // !: This entire file is a hack to get around failed prerendering of
 // !: the Single Player Mode page. This regression was introduced during
 // !: the upgrade of Next.js to v13.5.x.
-export default function SingleplayerPage() {
-  setupI18nSSR();
+export default async function SingleplayerPage() {
+  await setupI18nSSR();
 
   return <SinglePlayerClient />;
 }

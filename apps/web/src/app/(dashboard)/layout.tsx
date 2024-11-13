@@ -23,7 +23,7 @@ export type AuthenticatedDashboardLayoutProps = {
 export default async function AuthenticatedDashboardLayout({
   children,
 }: AuthenticatedDashboardLayoutProps) {
-  setupI18nSSR();
+  await setupI18nSSR();
 
   const session = await getServerSession(NEXT_AUTH_OPTIONS);
 

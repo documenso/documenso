@@ -21,7 +21,7 @@ type DeclineInvitationPageProps = {
 export default async function DeclineInvitationPage({
   params: { token },
 }: DeclineInvitationPageProps) {
-  setupI18nSSR();
+  await setupI18nSSR();
 
   const session = await getServerComponentSession();
 

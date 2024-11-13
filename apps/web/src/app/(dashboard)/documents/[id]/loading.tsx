@@ -6,8 +6,8 @@ import { ChevronLeft, Loader } from 'lucide-react';
 import { setupI18nSSR } from '@documenso/lib/client-only/providers/i18n.server';
 import { Skeleton } from '@documenso/ui/primitives/skeleton';
 
-export default function Loading() {
-  setupI18nSSR();
+export default async function Loading() {
+  await setupI18nSSR();
 
   return (
     <div className="mx-auto -mt-4 flex w-full max-w-screen-xl flex-col px-4 md:px-8">

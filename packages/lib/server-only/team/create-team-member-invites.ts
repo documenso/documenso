@@ -1,10 +1,9 @@
 import { createElement } from 'react';
 
+import { msg } from '@lingui/macro';
 import { nanoid } from 'nanoid';
 
 import { mailer } from '@documenso/email/mailer';
-import { render } from '@documenso/email/render';
-import type { TeamInviteEmailProps } from '@documenso/email/templates/team-invite';
 import { TeamInviteEmailTemplate } from '@documenso/email/templates/team-invite';
 import { WEBAPP_BASE_URL } from '@documenso/lib/constants/app';
 import { FROM_ADDRESS, FROM_NAME } from '@documenso/lib/constants/email';
@@ -12,8 +11,13 @@ import { TEAM_MEMBER_ROLE_PERMISSIONS_MAP } from '@documenso/lib/constants/teams
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import { isTeamRoleWithinUserHierarchy } from '@documenso/lib/utils/teams';
 import { prisma } from '@documenso/prisma';
+import type { Team, TeamGlobalSettings } from '@documenso/prisma/client';
 import { TeamMemberInviteStatus } from '@documenso/prisma/client';
 import type { TCreateTeamMemberInvitesMutationSchema } from '@documenso/trpc/server/team-router/schema';
+
+import { getI18nInstance } from '../../client-only/providers/i18n.server';
+import { renderEmailWithI18N } from '../../utils/render-email-with-i18n';
+import { teamGlobalSettingsToBranding } from '../../utils/team-global-settings-to-branding';
 
 export type CreateTeamMemberInvitesOptions = {
   userId: number;
@@ -56,6 +60,7 @@ export const createTeamMemberInvites = async ({
         },
       },
       invites: true,
+      teamGlobalSettings: true,
     },
   });
 
@@ -109,8 +114,7 @@ export const createTeamMemberInvites = async ({
       sendTeamMemberInviteEmail({
         email,
         token,
-        teamName: team.name,
-        teamUrl: team.url,
+        team,
         senderName: userName,
       }),
     ),
@@ -131,8 +135,13 @@ export const createTeamMemberInvites = async ({
   }
 };
 
-type SendTeamMemberInviteEmailOptions = Omit<TeamInviteEmailProps, 'baseUrl' | 'assetBaseUrl'> & {
+type SendTeamMemberInviteEmailOptions = {
   email: string;
+  senderName: string;
+  token: string;
+  team: Team & {
+    teamGlobalSettings?: TeamGlobalSettings | null;
+  };
 };
 
 /**
@@ -140,13 +149,33 @@ type SendTeamMemberInviteEmailOptions = Omit<TeamInviteEmailProps, 'baseUrl' | '
  */
 export const sendTeamMemberInviteEmail = async ({
   email,
-  ...emailTemplateOptions
+  senderName,
+  token,
+  team,
 }: SendTeamMemberInviteEmailOptions) => {
   const template = createElement(TeamInviteEmailTemplate, {
     assetBaseUrl: WEBAPP_BASE_URL,
     baseUrl: WEBAPP_BASE_URL,
-    ...emailTemplateOptions,
+    senderName,
+    token,
+    teamName: team.name,
+    teamUrl: team.url,
   });
+
+  const branding = team.teamGlobalSettings
+    ? teamGlobalSettingsToBranding(team.teamGlobalSettings)
+    : undefined;
+
+  const [html, text] = await Promise.all([
+    renderEmailWithI18N(template, { lang: team.teamGlobalSettings?.documentLanguage, branding }),
+    renderEmailWithI18N(template, {
+      lang: team.teamGlobalSettings?.documentLanguage,
+      branding,
+      plainText: true,
+    }),
+  ]);
+
+  const i18n = await getI18nInstance(team.teamGlobalSettings?.documentLanguage);
 
   await mailer.sendMail({
     to: email,
@@ -154,8 +183,8 @@ export const sendTeamMemberInviteEmail = async ({
       name: FROM_NAME,
       address: FROM_ADDRESS,
     },
-    subject: `You have been invited to join ${emailTemplateOptions.teamName} on Documenso`,
-    html: render(template),
-    text: render(template, { plainText: true }),
+    subject: i18n._(msg`You have been invited to join ${team.name} on Documenso`),
+    html,
+    text,
   });
 };

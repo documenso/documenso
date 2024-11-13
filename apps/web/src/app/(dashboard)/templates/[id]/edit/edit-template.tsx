@@ -7,6 +7,7 @@ import { useRouter } from 'next/navigation';
 import { msg } from '@lingui/macro';
 import { useLingui } from '@lingui/react';
 
+import { isValidLanguageCode } from '@documenso/lib/constants/i18n';
 import {
   DO_NOT_INVALIDATE_QUERY_ON_MUTATION,
   SKIP_QUERY_BATCH_META,
@@ -151,7 +152,10 @@ export const EditTemplateForm = ({
           globalAccessAuth: data.globalAccessAuth ?? null,
           globalActionAuth: data.globalActionAuth ?? null,
         },
-        meta: data.meta,
+        meta: {
+          ...data.meta,
+          language: isValidLanguageCode(data.meta.language) ? data.meta.language : undefined,
+        },
       });
 
       // Router refresh is here to clear the router cache for when navigating to /documents.

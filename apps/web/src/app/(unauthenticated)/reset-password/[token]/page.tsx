@@ -15,7 +15,7 @@ type ResetPasswordPageProps = {
 };
 
 export default async function ResetPasswordPage({ params: { token } }: ResetPasswordPageProps) {
-  setupI18nSSR();
+  await setupI18nSSR();
 
   const isValid = await getResetTokenValidity({ token });
 

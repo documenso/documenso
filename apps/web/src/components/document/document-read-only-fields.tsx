@@ -2,7 +2,9 @@
 
 import { useState } from 'react';
 
-import { EyeOffIcon } from 'lucide-react';
+import { Trans } from '@lingui/macro';
+import { useLingui } from '@lingui/react';
+import { Clock, EyeOffIcon } from 'lucide-react';
 import { P, match } from 'ts-pattern';
 
 import {
@@ -12,12 +14,15 @@ import {
 import { PDF_VIEWER_PAGE_SELECTOR } from '@documenso/lib/constants/pdf-viewer';
 import { DEFAULT_DOCUMENT_TIME_ZONE } from '@documenso/lib/constants/time-zones';
 import type { DocumentField } from '@documenso/lib/server-only/field/get-fields-for-document';
+import { parseMessageDescriptor } from '@documenso/lib/utils/i18n';
 import { extractInitials } from '@documenso/lib/utils/recipient-formatter';
 import type { DocumentMeta } from '@documenso/prisma/client';
 import { FieldType, SigningStatus } from '@documenso/prisma/client';
 import { FieldRootContainer } from '@documenso/ui/components/field/field';
+import { SignatureIcon } from '@documenso/ui/icons/signature';
 import { cn } from '@documenso/ui/lib/utils';
 import { Avatar, AvatarFallback } from '@documenso/ui/primitives/avatar';
+import { Badge } from '@documenso/ui/primitives/badge';
 import { FRIENDLY_FIELD_TYPE } from '@documenso/ui/primitives/document-flow/types';
 import { ElementVisible } from '@documenso/ui/primitives/element-visible';
 import { PopoverHover } from '@documenso/ui/primitives/popover';
@@ -25,9 +30,16 @@ import { PopoverHover } from '@documenso/ui/primitives/popover';
 export type DocumentReadOnlyFieldsProps = {
   fields: DocumentField[];
   documentMeta?: DocumentMeta;
+  showFieldStatus?: boolean;
 };
 
-export const DocumentReadOnlyFields = ({ documentMeta, fields }: DocumentReadOnlyFieldsProps) => {
+export const DocumentReadOnlyFields = ({
+  documentMeta,
+  fields,
+  showFieldStatus = true,
+}: DocumentReadOnlyFieldsProps) => {
+  const { _ } = useLingui();
+
   const [hiddenFieldIds, setHiddenFieldIds] = useState<Record<string, boolean>>({});
 
   const handleHideField = (fieldId: string) => {
@@ -54,15 +66,37 @@ export const DocumentReadOnlyFields = ({ documentMeta, fields }: DocumentReadOnl
                     </Avatar>
                   }
                   contentProps={{
-                    className: 'relative flex w-fit flex-col p-2.5 text-sm',
+                    className: 'relative flex w-fit flex-col p-4 text-sm',
                   }}
                 >
-                  <p className="font-semibold">
-                    {field.Recipient.signingStatus === SigningStatus.SIGNED ? 'Signed' : 'Pending'}{' '}
-                    {FRIENDLY_FIELD_TYPE[field.type].toLowerCase()} field
+                  {showFieldStatus && (
+                    <Badge
+                      className="mx-auto mb-1 py-0.5"
+                      variant={
+                        field.Recipient.signingStatus === SigningStatus.SIGNED
+                          ? 'default'
+                          : 'secondary'
+                      }
+                    >
+                      {field.Recipient.signingStatus === SigningStatus.SIGNED ? (
+                        <>
+                          <SignatureIcon className="mr-1 h-3 w-3" />
+                          <Trans>Signed</Trans>
+                        </>
+                      ) : (
+                        <>
+                          <Clock className="mr-1 h-3 w-3" />
+                          <Trans>Pending</Trans>
+                        </>
+                      )}
+                    </Badge>
+                  )}
+
+                  <p className="text-center font-semibold">
+                    <span>{parseMessageDescriptor(_, FRIENDLY_FIELD_TYPE[field.type])} field</span>
                   </p>
 
-                  <p className="text-muted-foreground text-xs">
+                  <p className="text-muted-foreground mt-1 text-center text-xs">
                     {field.Recipient.name
                       ? `${field.Recipient.name} (${field.Recipient.email})`
                       : field.Recipient.email}{' '}
@@ -127,7 +161,7 @@ export const DocumentReadOnlyFields = ({ documentMeta, fields }: DocumentReadOnl
                         field.type === FieldType.FREE_SIGNATURE,
                     })}
                   >
-                    {FRIENDLY_FIELD_TYPE[field.type]}
+                    {parseMessageDescriptor(_, FRIENDLY_FIELD_TYPE[field.type])}
                   </p>
                 )}
               </div>

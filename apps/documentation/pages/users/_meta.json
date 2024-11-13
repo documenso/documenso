@@ -11,6 +11,7 @@
   "templates": "Templates",
   "direct-links": "Direct Signing Links",
   "document-visibility": "Document Visibility",
+  "teams": "Teams",
   "-- Legal Overview": {
     "type": "separator",
     "title": "Legal Overview"

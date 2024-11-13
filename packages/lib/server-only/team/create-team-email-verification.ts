@@ -1,9 +1,9 @@
 import { createElement } from 'react';
 
+import { msg } from '@lingui/macro';
 import { z } from 'zod';
 
 import { mailer } from '@documenso/email/mailer';
-import { render } from '@documenso/email/render';
 import { ConfirmTeamEmailTemplate } from '@documenso/email/templates/confirm-team-email';
 import { WEBAPP_BASE_URL } from '@documenso/lib/constants/app';
 import { FROM_ADDRESS, FROM_NAME } from '@documenso/lib/constants/email';
@@ -11,7 +11,12 @@ import { TEAM_MEMBER_ROLE_PERMISSIONS_MAP } from '@documenso/lib/constants/teams
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import { createTokenVerification } from '@documenso/lib/utils/token-verification';
 import { prisma } from '@documenso/prisma';
+import type { Team, TeamGlobalSettings } from '@documenso/prisma/client';
 import { Prisma } from '@documenso/prisma/client';
+
+import { getI18nInstance } from '../../client-only/providers/i18n.server';
+import { renderEmailWithI18N } from '../../utils/render-email-with-i18n';
+import { teamGlobalSettingsToBranding } from '../../utils/team-global-settings-to-branding';
 
 export type CreateTeamEmailVerificationOptions = {
   userId: number;
@@ -45,6 +50,7 @@ export const createTeamEmailVerification = async ({
           include: {
             teamEmail: true,
             emailVerification: true,
+            teamGlobalSettings: true,
           },
         });
 
@@ -77,7 +83,7 @@ export const createTeamEmailVerification = async ({
           },
         });
 
-        await sendTeamEmailVerificationEmail(data.email, token, team.name, team.url);
+        await sendTeamEmailVerificationEmail(data.email, token, team);
       },
       { timeout: 30_000 },
     );
@@ -109,18 +115,36 @@ export const createTeamEmailVerification = async ({
 export const sendTeamEmailVerificationEmail = async (
   email: string,
   token: string,
-  teamName: string,
-  teamUrl: string,
+  team: Team & {
+    teamGlobalSettings?: TeamGlobalSettings | null;
+  },
 ) => {
   const assetBaseUrl = process.env.NEXT_PUBLIC_WEBAPP_URL || 'http://localhost:3000';
 
   const template = createElement(ConfirmTeamEmailTemplate, {
     assetBaseUrl,
     baseUrl: WEBAPP_BASE_URL,
-    teamName,
-    teamUrl,
+    teamName: team.name,
+    teamUrl: team.url,
     token,
   });
+
+  const branding = team.teamGlobalSettings
+    ? teamGlobalSettingsToBranding(team.teamGlobalSettings)
+    : undefined;
+
+  const lang = team.teamGlobalSettings?.documentLanguage;
+
+  const [html, text] = await Promise.all([
+    renderEmailWithI18N(template, { lang, branding }),
+    renderEmailWithI18N(template, {
+      lang,
+      branding,
+      plainText: true,
+    }),
+  ]);
+
+  const i18n = await getI18nInstance(lang);
 
   await mailer.sendMail({
     to: email,
@@ -128,8 +152,10 @@ export const sendTeamEmailVerificationEmail = async (
       name: FROM_NAME,
       address: FROM_ADDRESS,
     },
-    subject: `A request to use your email has been initiated by ${teamName} on Documenso`,
-    html: render(template),
-    text: render(template, { plainText: true }),
+    subject: i18n._(
+      msg`A request to use your email has been initiated by ${team.name} on Documenso`,
+    ),
+    html,
+    text,
   });
 };
