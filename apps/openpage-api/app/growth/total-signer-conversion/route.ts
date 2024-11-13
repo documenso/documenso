@@ -2,7 +2,7 @@ import cors from '@/lib/cors';
 import { getSignerConversionMonthly } from '@/lib/growth/get-signer-conversion';
 
 export async function GET(request: Request) {
-  const totalSigners = await getSignerConversionMonthly();
+  const totalSigners = await getSignerConversionMonthly('cumulative');
 
   return cors(
     request,
