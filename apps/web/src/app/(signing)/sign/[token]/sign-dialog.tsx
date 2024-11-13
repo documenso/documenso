@@ -37,6 +37,8 @@ export const SignDialog = ({
 }: SignDialogProps) => {
   const [showDialog, setShowDialog] = useState(false);
   const truncatedTitle = truncateTitle(documentTitle);
+
+  // TODO: Fix this
   const isComplete = fields.every((field) => field.inserted);
 
   const handleOpenChange = (open: boolean) => {

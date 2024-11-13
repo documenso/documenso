@@ -25,6 +25,8 @@ import { SignaturePad } from '@documenso/ui/primitives/signature-pad';
 import { useRequiredSigningContext } from './provider';
 import { SignDialog } from './sign-dialog';
 
+const ADVANCED_FIELD_TYPES = ['NUMBER', 'TEXT', 'DROPDOWN', 'RADIO', 'CHECKBOX'];
+
 export type SigningFormProps = {
   document: DocumentAndSender;
   recipient: Recipient;
@@ -57,7 +59,16 @@ export const SigningForm = ({
   const isSubmitting = formState.isSubmitting || formState.isSubmitSuccessful;
 
   const uninsertedFields = useMemo(() => {
-    return sortFieldsByPosition(fields.filter((field) => !field.inserted));
+    // Filter fields that require validation first
+    const fieldsRequiringValidation = fields.filter((field) => {
+      const isAdvancedField = ADVANCED_FIELD_TYPES.includes(field.type);
+      const isRequired = field.fieldMeta?.required;
+
+      // Return true if field needs validation (not advanced or is required)
+      return !isAdvancedField || (field.fieldMeta && isRequired);
+    });
+
+    return sortFieldsByPosition(fieldsRequiringValidation.filter((field) => !field.inserted));
   }, [fields]);
 
   const fieldsValidated = () => {
