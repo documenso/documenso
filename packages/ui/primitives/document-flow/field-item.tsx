@@ -45,6 +45,9 @@ export type FieldItemProps = {
   recipientIndex?: number;
   hideRecipients?: boolean;
   hasErrors?: boolean;
+  active?: boolean;
+  onFieldActivate?: () => void;
+  onFieldDeactivate?: () => void;
 };
 
 export const FieldItem = ({
@@ -63,8 +66,10 @@ export const FieldItem = ({
   recipientIndex = 0,
   hideRecipients = false,
   hasErrors,
+  active,
+  onFieldActivate,
+  onFieldDeactivate,
 }: FieldItemProps) => {
-  const [active, setActive] = useState(false);
   const [coords, setCoords] = useState({
     pageX: 0,
     pageY: 0,
@@ -146,6 +151,8 @@ export const FieldItem = ({
       });
 
       if (isOutsideOfField) {
+        setSettingsActive(false);
+        onFieldDeactivate?.();
         onBlur?.();
       }
     };
@@ -184,10 +191,12 @@ export const FieldItem = ({
   return createPortal(
     <Rnd
       key={coords.pageX + coords.pageY + coords.pageHeight + coords.pageWidth}
-      className={cn('group z-20', {
+      className={cn('group', {
         'pointer-events-none': passive,
         'pointer-events-none cursor-not-allowed opacity-75': disabled,
-        'z-10': !active || disabled,
+        'z-50': active && !disabled,
+        'z-20': !active && !disabled,
+        'z-10': disabled,
       })}
       minHeight={fixedSize ? '' : minHeight || 'auto'}
       minWidth={fixedSize ? '' : minWidth || 'auto'}
@@ -198,15 +207,15 @@ export const FieldItem = ({
         width: fixedSize ? '' : coords.pageWidth,
       }}
       bounds={`${PDF_VIEWER_PAGE_SELECTOR}[data-page-number="${field.pageNumber}"]`}
-      onDragStart={() => setActive(true)}
-      onResizeStart={() => setActive(true)}
+      onDragStart={() => onFieldActivate?.()}
+      onResizeStart={() => onFieldActivate?.()}
       enableResizing={!fixedSize}
       onResizeStop={(_e, _d, ref) => {
-        setActive(false);
+        onFieldDeactivate?.();
         onResize?.(ref);
       }}
       onDragStop={(_e, d) => {
-        setActive(false);
+        onFieldDeactivate?.();
         onMove?.(d.node);
       }}
     >
@@ -222,8 +231,10 @@ export const FieldItem = ({
           !fixedSize && '[container-type:size]',
         )}
         data-error={hasErrors ? 'true' : undefined}
-        onClick={() => {
+        onClick={(e) => {
+          e.stopPropagation();
           setSettingsActive((prev) => !prev);
+          onFieldActivate?.();
           onFocus?.();
         }}
         ref={$el}
@@ -260,7 +271,7 @@ export const FieldItem = ({
       </div>
 
       {!disabled && settingsActive && (
-        <div className="mt-1 flex justify-center">
+        <div className="z-[60] mt-1 flex justify-center">
           <div className="dark:bg-background group flex items-center justify-evenly gap-x-1 rounded-md border bg-gray-900 p-0.5">
             {advancedField && (
               <button
