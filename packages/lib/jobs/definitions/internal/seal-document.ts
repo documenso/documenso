@@ -21,10 +21,12 @@ import { insertFieldInPDF } from '../../../server-only/pdf/insert-field-in-pdf';
 import { normalizeSignatureAppearances } from '../../../server-only/pdf/normalize-signature-appearances';
 import { triggerWebhook } from '../../../server-only/webhooks/trigger/trigger-webhook';
 import { DOCUMENT_AUDIT_LOG_TYPE } from '../../../types/document-audit-logs';
+import { ZFieldMetaSchema } from '../../../types/field-meta';
 import { ZRequestMetadataSchema } from '../../../universal/extract-request-metadata';
 import { getFile } from '../../../universal/upload/get-file';
 import { putPdfFile } from '../../../universal/upload/put-file';
 import { createDocumentAuditLogData } from '../../../utils/document-audit-logs';
+import { isAdvancedField } from '../../../utils/is-advanced-field';
 import { type JobDefinition } from '../../client/_internal/job';
 
 const SEAL_DOCUMENT_JOB_DEFINITION_ID = 'internal.seal-document';
@@ -107,11 +109,11 @@ export const SEAL_DOCUMENT_JOB_DEFINITION = {
     });
 
     const hasUnsignedRequiredFields = fields.some((field) => {
-      if (!['CHECKBOX', 'DROPDOWN', 'RADIO', 'TEXT', 'NUMBER'].includes(field.type)) {
+      if (!isAdvancedField(field.type)) {
         return !field.inserted;
       }
 
-      if (!field.fieldMeta) {
+      if (!field.fieldMeta || ZFieldMetaSchema.parse(field.fieldMeta)?.required === false) {
         return false;
       }
 

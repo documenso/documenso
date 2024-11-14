@@ -13,6 +13,7 @@ import type { DocumentAndSender } from '@documenso/lib/server-only/document/get-
 import type { TRecipientActionAuth } from '@documenso/lib/types/document-auth';
 import { ZFieldMetaSchema } from '@documenso/lib/types/field-meta';
 import { sortFieldsByPosition, validateFieldsInserted } from '@documenso/lib/utils/fields';
+import { isAdvancedField } from '@documenso/lib/utils/is-advanced-field';
 import { type Field, type Recipient, RecipientRole } from '@documenso/prisma/client';
 import { trpc } from '@documenso/trpc/react';
 import { FieldToolTip } from '@documenso/ui/components/field/field-tooltip';
@@ -25,8 +26,6 @@ import { SignaturePad } from '@documenso/ui/primitives/signature-pad';
 
 import { useRequiredSigningContext } from './provider';
 import { SignDialog } from './sign-dialog';
-
-const ADVANCED_FIELD_TYPES = ['NUMBER', 'TEXT', 'DROPDOWN', 'RADIO', 'CHECKBOX'];
 
 export type SigningFormProps = {
   document: DocumentAndSender;
@@ -60,15 +59,13 @@ export const SigningForm = ({
   const isSubmitting = formState.isSubmitting || formState.isSubmitSuccessful;
 
   const uninsertedFields = useMemo(() => {
-    // Filter fields that require validation first
     const fieldsRequiringValidation = fields.filter((field) => {
-      const isAdvancedField = ADVANCED_FIELD_TYPES.includes(field.type);
       const isRequired = field.fieldMeta
         ? ZFieldMetaSchema.parse(field.fieldMeta)?.required
         : false;
 
       // Return true if field needs validation (not advanced or is required)
-      return !isAdvancedField || (field.fieldMeta && isRequired);
+      return !isAdvancedField(field.type) || isRequired;
     });
 
     return sortFieldsByPosition(fieldsRequiringValidation.filter((field) => !field.inserted));

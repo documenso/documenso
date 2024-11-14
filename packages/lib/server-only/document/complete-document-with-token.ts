@@ -1,6 +1,7 @@
 import { DOCUMENT_AUDIT_LOG_TYPE } from '@documenso/lib/types/document-audit-logs';
 import type { RequestMetadata } from '@documenso/lib/universal/extract-request-metadata';
 import { createDocumentAuditLogData } from '@documenso/lib/utils/document-audit-logs';
+import { isAdvancedField } from '@documenso/lib/utils/is-advanced-field';
 import { prisma } from '@documenso/prisma';
 import {
   DocumentSigningOrder,
@@ -85,7 +86,7 @@ export const completeDocumentWithToken = async ({
   });
 
   const hasUnsignedRequiredFields = fields.some((field) => {
-    if (!['CHECKBOX', 'DROPDOWN', 'RADIO', 'TEXT', 'NUMBER'].includes(field.type)) {
+    if (isAdvancedField(field.type)) {
       return !field.inserted;
     }
 
