@@ -58,28 +58,29 @@ export const SigningForm = ({
   // Keep the loading state going if successful since the redirect may take some time.
   const isSubmitting = formState.isSubmitting || formState.isSubmitSuccessful;
 
+  const fieldsRequiringValidation = useMemo(
+    () =>
+      fields.filter((field) => {
+        const isRequired = field.fieldMeta && ZFieldMetaSchema.parse(field.fieldMeta)?.required;
+
+        return isRequired || !isAdvancedField(field.type) ? !field.inserted : false;
+      }),
+    [fields],
+  );
+
   const uninsertedFields = useMemo(() => {
-    const fieldsRequiringValidation = fields.filter((field) => {
-      const isRequired = field.fieldMeta
-        ? ZFieldMetaSchema.parse(field.fieldMeta)?.required
-        : false;
-
-      // Return true if field needs validation (not advanced or is required)
-      return !isAdvancedField(field.type) || isRequired;
-    });
-
     return sortFieldsByPosition(fieldsRequiringValidation.filter((field) => !field.inserted));
   }, [fields]);
 
   const fieldsValidated = () => {
     setValidateUninsertedFields(true);
-    validateFieldsInserted(fields);
+    validateFieldsInserted(fieldsRequiringValidation);
   };
 
   const onFormSubmit = async () => {
     setValidateUninsertedFields(true);
 
-    const isFieldsValid = validateFieldsInserted(fields);
+    const isFieldsValid = validateFieldsInserted(fieldsRequiringValidation);
 
     if (!isFieldsValid) {
       return;
