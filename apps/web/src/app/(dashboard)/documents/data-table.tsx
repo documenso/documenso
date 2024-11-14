@@ -78,7 +78,7 @@ export const DocumentsDataTable = ({
       {
         header: _(msg`Status`),
         accessorKey: 'status',
-        cell: ({ row }) => <DocumentStatus status={row.getValue('status')} />,
+        cell: ({ row }) => <DocumentStatus status={row.original.status} />,
         size: 140,
       },
       {

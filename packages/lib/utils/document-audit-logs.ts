@@ -349,6 +349,16 @@ export const formatDocumentAuditLogAction = (
         identified: result,
       };
     })
+    .with({ type: DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_RECIPIENT_REJECTED }, ({ data }) => {
+      const userName = prefix || _(msg`Recipient`);
+
+      const result = msg`${userName} rejected the document`;
+
+      return {
+        anonymous: result,
+        identified: result,
+      };
+    })
     .with({ type: DOCUMENT_AUDIT_LOG_TYPE.EMAIL_SENT }, ({ data }) => ({
       anonymous: data.isResending ? msg`Email resent` : msg`Email sent`,
       identified: data.isResending
