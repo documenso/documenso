@@ -84,7 +84,19 @@ export const completeDocumentWithToken = async ({
     },
   });
 
-  if (fields.some((field) => !field.inserted)) {
+  const hasUnsignedRequiredFields = fields.some((field) => {
+    if (!['CHECKBOX', 'DROPDOWN', 'RADIO', 'TEXT', 'NUMBER'].includes(field.type)) {
+      return !field.inserted;
+    }
+
+    if (!field.fieldMeta) {
+      return false;
+    }
+
+    return !field.inserted;
+  });
+
+  if (hasUnsignedRequiredFields) {
     throw new Error(`Recipient ${recipient.id} has unsigned fields`);
   }
 

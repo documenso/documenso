@@ -11,6 +11,7 @@ import { useForm } from 'react-hook-form';
 import { useAnalytics } from '@documenso/lib/client-only/hooks/use-analytics';
 import type { DocumentAndSender } from '@documenso/lib/server-only/document/get-document-by-token';
 import type { TRecipientActionAuth } from '@documenso/lib/types/document-auth';
+import { ZFieldMetaSchema } from '@documenso/lib/types/field-meta';
 import { sortFieldsByPosition, validateFieldsInserted } from '@documenso/lib/utils/fields';
 import { type Field, type Recipient, RecipientRole } from '@documenso/prisma/client';
 import { trpc } from '@documenso/trpc/react';
@@ -62,7 +63,9 @@ export const SigningForm = ({
     // Filter fields that require validation first
     const fieldsRequiringValidation = fields.filter((field) => {
       const isAdvancedField = ADVANCED_FIELD_TYPES.includes(field.type);
-      const isRequired = field.fieldMeta?.required;
+      const isRequired = field.fieldMeta
+        ? ZFieldMetaSchema.parse(field.fieldMeta)?.required
+        : false;
 
       // Return true if field needs validation (not advanced or is required)
       return !isAdvancedField || (field.fieldMeta && isRequired);

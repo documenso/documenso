@@ -2,6 +2,7 @@ import { useState } from 'react';
 
 import { Trans } from '@lingui/macro';
 
+import { ZFieldMetaSchema } from '@documenso/lib/types/field-meta';
 import type { Field } from '@documenso/prisma/client';
 import { RecipientRole } from '@documenso/prisma/client';
 import { Button } from '@documenso/ui/primitives/button';
@@ -38,8 +39,18 @@ export const SignDialog = ({
   const [showDialog, setShowDialog] = useState(false);
   const truncatedTitle = truncateTitle(documentTitle);
 
-  // TODO: Fix this
-  const isComplete = fields.every((field) => field.inserted);
+  const advancedFieldTypes = ['NUMBER', 'TEXT', 'DROPDOWN', 'RADIO', 'CHECKBOX'];
+
+  const isComplete = fields.every((field) => {
+    if (
+      advancedFieldTypes.includes(field.type) &&
+      (field.fieldMeta === null || ZFieldMetaSchema.parse(field.fieldMeta)?.required === false)
+    ) {
+      return true;
+    }
+
+    return field.inserted;
+  });
 
   const handleOpenChange = (open: boolean) => {
     if (isSubmitting || !isComplete) {

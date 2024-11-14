@@ -79,8 +79,20 @@ export const sealDocument = async ({
     },
   });
 
-  if (fields.some((field) => !field.inserted)) {
-    throw new Error(`Document ${document.id} has unsigned fields`);
+  const hasUnsignedRequiredFields = fields.some((field) => {
+    if (!['CHECKBOX', 'DROPDOWN', 'RADIO', 'TEXT', 'NUMBER'].includes(field.type)) {
+      return !field.inserted;
+    }
+
+    if (!field.fieldMeta) {
+      return false;
+    }
+
+    return !field.inserted;
+  });
+
+  if (hasUnsignedRequiredFields) {
+    throw new Error(`Recipient ${document.id} has unsigned fields`);
   }
 
   if (isResealing) {
