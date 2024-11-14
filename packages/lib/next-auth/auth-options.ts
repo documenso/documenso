@@ -1,6 +1,7 @@
 /// <reference types="../types/next-auth.d.ts" />
 import { PrismaAdapter } from '@next-auth/prisma-adapter';
 import { compare } from '@node-rs/bcrypt';
+import { Prisma } from '@prisma/client';
 import { verifyAuthenticationResponse } from '@simplewebauthn/server';
 import { DateTime } from 'luxon';
 import type { AuthOptions, Session, User } from 'next-auth';
@@ -26,8 +27,25 @@ import { extractNextAuthRequestMetadata } from '../universal/extract-request-met
 import { getAuthenticatorOptions } from '../utils/authenticator';
 import { ErrorCode } from './error-codes';
 
+// Delete unrecognized fields from authorization response to comply with
+// https://datatracker.ietf.org/doc/html/rfc6749#section-4.1.2
+const prismaAdapter = PrismaAdapter(prisma);
+const originalLinkAccount = prismaAdapter.linkAccount;
+
+const accountFields =
+  Prisma.dmmf.datamodel.models.find(({ name }) => name === 'Account')?.fields || [];
+
+prismaAdapter.linkAccount = (data) => {
+  const availableFields = accountFields.map((field) => field.name);
+  Object.keys(data).forEach((key) => {
+    if (availableFields.includes(key)) return;
+    delete data[key];
+  });
+  return originalLinkAccount?.(data);
+};
+
 export const NEXT_AUTH_OPTIONS: AuthOptions = {
-  adapter: PrismaAdapter(prisma),
+  adapter: prismaAdapter,
   secret: process.env.NEXTAUTH_SECRET ?? 'secret',
   session: {
     strategy: 'jwt',
