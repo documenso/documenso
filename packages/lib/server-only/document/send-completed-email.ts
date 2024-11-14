@@ -17,6 +17,7 @@ import { createDocumentAuditLogData } from '../../utils/document-audit-logs';
 import { renderCustomEmailTemplate } from '../../utils/render-custom-email-template';
 import { renderEmailWithI18N } from '../../utils/render-email-with-i18n';
 import { teamGlobalSettingsToBranding } from '../../utils/team-global-settings-to-branding';
+import { formatDocumentsPath } from '../../utils/teams';
 
 export interface SendDocumentOptions {
   documentId: number;
@@ -59,7 +60,9 @@ export const sendCompletedEmail = async ({ documentId, requestMetadata }: SendDo
 
   const assetBaseUrl = NEXT_PUBLIC_WEBAPP_URL() || 'http://localhost:3000';
 
-  let documentOwnerDownloadLink = `${NEXT_PUBLIC_WEBAPP_URL()}/documents/${document.id}`;
+  let documentOwnerDownloadLink = `${NEXT_PUBLIC_WEBAPP_URL()}${formatDocumentsPath(
+    document.team?.url,
+  )}/${document.id}`;
 
   if (document.team?.url) {
     documentOwnerDownloadLink = `${NEXT_PUBLIC_WEBAPP_URL()}/t/${document.team.url}/documents/${

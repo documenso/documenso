@@ -1,3 +1,4 @@
+import { RecipientStatusType } from '@documenso/lib/client-only/recipient-type';
 import { Avatar, AvatarFallback } from '@documenso/ui/primitives/avatar';
 
 const ZIndexes: { [key: string]: string } = {
@@ -12,7 +13,7 @@ export type StackAvatarProps = {
   first?: boolean;
   zIndex?: string;
   fallbackText?: string;
-  type: 'unsigned' | 'waiting' | 'opened' | 'completed';
+  type: RecipientStatusType;
 };
 
 export const StackAvatar = ({ first, zIndex, fallbackText = '', type }: StackAvatarProps) => {
@@ -24,18 +25,23 @@ export const StackAvatar = ({ first, zIndex, fallbackText = '', type }: StackAva
     zIndexClass = ZIndexes[zIndex] ?? '';
   }
 
+  console.log({ type, fallbackText });
+
   switch (type) {
-    case 'unsigned':
+    case RecipientStatusType.UNSIGNED:
       classes = 'bg-dawn-200 text-dawn-900';
       break;
-    case 'opened':
+    case RecipientStatusType.OPENED:
       classes = 'bg-yellow-200 text-yellow-700';
       break;
-    case 'waiting':
+    case RecipientStatusType.WAITING:
       classes = 'bg-water text-water-700';
       break;
-    case 'completed':
+    case RecipientStatusType.COMPLETED:
       classes = 'bg-documenso-200 text-documenso-800';
+      break;
+    case RecipientStatusType.REJECTED:
+      classes = 'bg-red-200 text-red-800';
       break;
     default:
       break;

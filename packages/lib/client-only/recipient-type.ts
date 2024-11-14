@@ -6,6 +6,7 @@ export enum RecipientStatusType {
   OPENED = 'opened',
   WAITING = 'waiting',
   UNSIGNED = 'unsigned',
+  REJECTED = 'rejected',
 }
 
 export const getRecipientType = (recipient: Recipient) => {
@@ -14,6 +15,10 @@ export const getRecipientType = (recipient: Recipient) => {
     (recipient.sendStatus === SendStatus.SENT && recipient.signingStatus === SigningStatus.SIGNED)
   ) {
     return RecipientStatusType.COMPLETED;
+  }
+
+  if (recipient.signingStatus === SigningStatus.REJECTED) {
+    return RecipientStatusType.REJECTED;
   }
 
   if (
