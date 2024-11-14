@@ -8,7 +8,7 @@ msgstr ""
 "Language: fr\n"
 "Project-Id-Version: documenso-app\n"
 "Report-Msgid-Bugs-To: \n"
-"PO-Revision-Date: 2024-11-08 12:05\n"
+"PO-Revision-Date: 2024-11-12 05:45\n"
 "Last-Translator: \n"
 "Language-Team: French\n"
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
@@ -410,7 +410,7 @@ msgstr "Ajouter une autre option"
 msgid "Add another value"
 msgstr "Ajouter une autre valeur"
 
-#: packages/ui/primitives/document-flow/add-signers.tsx:662
+#: packages/ui/primitives/document-flow/add-signers.tsx:691
 msgid "Add myself"
 msgstr "Ajoutez-moi"
 
@@ -422,7 +422,7 @@ msgstr "Ajoutez-moi"
 msgid "Add Placeholder Recipient"
 msgstr "Ajouter un destinataire de substitution"
 
-#: packages/ui/primitives/document-flow/add-signers.tsx:651
+#: packages/ui/primitives/document-flow/add-signers.tsx:680
 msgid "Add Signer"
 msgstr "Ajouter un signataire"
 
@@ -797,8 +797,8 @@ msgstr "Options de liste déroulante"
 #: packages/lib/constants/document.ts:28
 #: packages/ui/primitives/document-flow/add-fields.tsx:875
 #: packages/ui/primitives/document-flow/add-signature.tsx:272
-#: packages/ui/primitives/document-flow/add-signers.tsx:500
-#: packages/ui/primitives/document-flow/add-signers.tsx:507
+#: packages/ui/primitives/document-flow/add-signers.tsx:512
+#: packages/ui/primitives/document-flow/add-signers.tsx:519
 #: packages/ui/primitives/document-flow/types.ts:54
 #: packages/ui/primitives/template-flow/add-template-fields.tsx:638
 #: packages/ui/primitives/template-flow/add-template-placeholder-recipients.tsx:463
@@ -1012,8 +1012,8 @@ msgstr "Min"
 
 #: packages/ui/primitives/document-flow/add-fields.tsx:901
 #: packages/ui/primitives/document-flow/add-signature.tsx:298
-#: packages/ui/primitives/document-flow/add-signers.tsx:535
-#: packages/ui/primitives/document-flow/add-signers.tsx:541
+#: packages/ui/primitives/document-flow/add-signers.tsx:550
+#: packages/ui/primitives/document-flow/add-signers.tsx:556
 #: packages/ui/primitives/document-flow/types.ts:55
 #: packages/ui/primitives/template-flow/add-template-fields.tsx:664
 #: packages/ui/primitives/template-flow/add-template-placeholder-recipients.tsx:498
@@ -1347,7 +1347,7 @@ msgstr "Partager le lien"
 msgid "Share your signing experience!"
 msgstr "Partagez votre expérience de signature !"
 
-#: packages/ui/primitives/document-flow/add-signers.tsx:680
+#: packages/ui/primitives/document-flow/add-signers.tsx:709
 #: packages/ui/primitives/template-flow/add-template-placeholder-recipients.tsx:655
 msgid "Show advanced settings"
 msgstr "Afficher les paramètres avancés"

@@ -405,7 +405,7 @@ msgstr "Add another option"
 msgid "Add another value"
 msgstr "Add another value"
 
-#: packages/ui/primitives/document-flow/add-signers.tsx:662
+#: packages/ui/primitives/document-flow/add-signers.tsx:691
 msgid "Add myself"
 msgstr "Add myself"
 
@@ -417,7 +417,7 @@ msgstr "Add Myself"
 msgid "Add Placeholder Recipient"
 msgstr "Add Placeholder Recipient"
 
-#: packages/ui/primitives/document-flow/add-signers.tsx:651
+#: packages/ui/primitives/document-flow/add-signers.tsx:680
 msgid "Add Signer"
 msgstr "Add Signer"
 
@@ -795,8 +795,8 @@ msgstr "Dropdown options"
 #: packages/lib/constants/document.ts:28
 #: packages/ui/primitives/document-flow/add-fields.tsx:875
 #: packages/ui/primitives/document-flow/add-signature.tsx:272
-#: packages/ui/primitives/document-flow/add-signers.tsx:500
-#: packages/ui/primitives/document-flow/add-signers.tsx:507
+#: packages/ui/primitives/document-flow/add-signers.tsx:512
+#: packages/ui/primitives/document-flow/add-signers.tsx:519
 #: packages/ui/primitives/document-flow/types.ts:54
 #: packages/ui/primitives/template-flow/add-template-fields.tsx:638
 #: packages/ui/primitives/template-flow/add-template-placeholder-recipients.tsx:463
@@ -1013,8 +1013,8 @@ msgstr "Min"
 
 #: packages/ui/primitives/document-flow/add-fields.tsx:901
 #: packages/ui/primitives/document-flow/add-signature.tsx:298
-#: packages/ui/primitives/document-flow/add-signers.tsx:535
-#: packages/ui/primitives/document-flow/add-signers.tsx:541
+#: packages/ui/primitives/document-flow/add-signers.tsx:550
+#: packages/ui/primitives/document-flow/add-signers.tsx:556
 #: packages/ui/primitives/document-flow/types.ts:55
 #: packages/ui/primitives/template-flow/add-template-fields.tsx:664
 #: packages/ui/primitives/template-flow/add-template-placeholder-recipients.tsx:498
@@ -1348,7 +1348,7 @@ msgstr "Share the Link"
 msgid "Share your signing experience!"
 msgstr "Share your signing experience!"
 
-#: packages/ui/primitives/document-flow/add-signers.tsx:680
+#: packages/ui/primitives/document-flow/add-signers.tsx:709
 #: packages/ui/primitives/template-flow/add-template-placeholder-recipients.tsx:655
 msgid "Show advanced settings"
 msgstr "Show advanced settings"

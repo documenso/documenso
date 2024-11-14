@@ -10,6 +10,7 @@ import { DocumentStatus, RecipientRole, SigningStatus } from '@documenso/prisma/
 import { WebhookTriggerEvents } from '@documenso/prisma/client';
 import { signPdf } from '@documenso/signing';
 
+import { ZSupportedLanguageCodeSchema } from '../../constants/i18n';
 import type { RequestMetadata } from '../../universal/extract-request-metadata';
 import { getFile } from '../../universal/upload/get-file';
 import { putPdfFile } from '../../universal/upload/put-file';
@@ -45,6 +46,7 @@ export const sealDocument = async ({
     },
     include: {
       documentData: true,
+      documentMeta: true,
       Recipient: true,
     },
   });
@@ -90,7 +92,9 @@ export const sealDocument = async ({
   // !: Need to write the fields onto the document as a hard copy
   const pdfData = await getFile(documentData);
 
-  const certificate = await getCertificatePdf({ documentId })
+  const documentLanguage = ZSupportedLanguageCodeSchema.parse(document.documentMeta?.language);
+
+  const certificate = await getCertificatePdf({ documentId, language: documentLanguage })
     .then(async (doc) => PDFDocument.load(doc))
     .catch(() => null);
 

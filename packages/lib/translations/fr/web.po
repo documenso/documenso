@@ -8,7 +8,7 @@ msgstr ""
 "Language: fr\n"
 "Project-Id-Version: documenso-app\n"
 "Report-Msgid-Bugs-To: \n"
-"PO-Revision-Date: 2024-11-08 12:05\n"
+"PO-Revision-Date: 2024-11-12 05:45\n"
 "Last-Translator: \n"
 "Language-Team: French\n"
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
@@ -18,7 +18,7 @@ msgstr ""
 "X-Crowdin-File: web.po\n"
 "X-Crowdin-File-ID: 8\n"
 
-#: apps/web/src/app/(teams)/t/[teamUrl]/settings/preferences/document-preferences.tsx:211
+#: apps/web/src/app/(teams)/t/[teamUrl]/settings/preferences/document-preferences.tsx:214
 msgid "\"{0}\" has invited you to sign \"example document\"."
 msgstr "\"{0}\" vous a invité à signer \"example document\"."
 
@@ -35,12 +35,16 @@ msgid "\"{email}\" on behalf of \"{teamName}\" has invited you to sign \"example
 msgstr "\"{email}\" au nom de \"{teamName}\" vous a invité à signer \"example document\"."
 
 #: apps/web/src/app/(teams)/t/[teamUrl]/settings/preferences/document-preferences.tsx:209
-msgid ""
-"\"{placeholderEmail}\" on behalf of \"{0}\" has invited you to sign \"example\n"
-"document\"."
+#~ msgid ""
+#~ "\"{placeholderEmail}\" on behalf of \"{0}\" has invited you to sign \"example\n"
+#~ "document\"."
+#~ msgstr ""
+#~ "\"{placeholderEmail}\" au nom de \"{0}\" vous a invité à signer \"example\n"
+#~ "document\"."
+
+#: apps/web/src/app/(teams)/t/[teamUrl]/settings/preferences/document-preferences.tsx:209
+msgid "\"{placeholderEmail}\" on behalf of \"{0}\" has invited you to sign \"example document\"."
 msgstr ""
-"\"{placeholderEmail}\" au nom de \"{0}\" vous a invité à signer \"example\n"
-"document\"."
 
 #: apps/web/src/components/(teams)/forms/update-team-form.tsx:241
 msgid "\"{teamUrl}\" has invited you to sign \"example document\"."
@@ -654,7 +658,7 @@ msgstr "Approuver"
 msgid "Approve Document"
 msgstr "Approuver le document"
 
-#: apps/web/src/app/(dashboard)/documents/[id]/document-page-view-recipients.tsx:100
+#: apps/web/src/app/(dashboard)/documents/[id]/document-page-view-recipients.tsx:94
 msgid "Approved"
 msgstr "Approuvé"
 
@@ -1036,7 +1040,7 @@ msgstr "Contrôle la langue par défaut d'un document téléchargé. Cela sera u
 msgid "Controls the default visibility of an uploaded document."
 msgstr "Contrôle la visibilité par défaut d'un document téléchargé."
 
-#: apps/web/src/app/(teams)/t/[teamUrl]/settings/preferences/document-preferences.tsx:216
+#: apps/web/src/app/(teams)/t/[teamUrl]/settings/preferences/document-preferences.tsx:220
 msgid "Controls the formatting of the message that will be sent when inviting a recipient to sign a document. If a custom message has been provided while configuring the document, it will be used instead."
 msgstr "Contrôle le formatage du message qui sera envoyé lors de l'invitation d'un destinataire à signer un document. Si un message personnalisé a été fourni lors de la configuration du document, il sera utilisé à la place."
 
@@ -1044,7 +1048,7 @@ msgstr "Contrôle le formatage du message qui sera envoyé lors de l'invitation 
 msgid "Copied"
 msgstr "Copié"
 
-#: apps/web/src/app/(dashboard)/documents/[id]/document-page-view-recipients.tsx:168
+#: apps/web/src/app/(dashboard)/documents/[id]/document-page-view-recipients.tsx:162
 #: apps/web/src/app/(dashboard)/settings/public-profile/public-templates-data-table.tsx:77
 #: apps/web/src/app/(dashboard)/templates/template-direct-link-badge.tsx:31
 #: apps/web/src/app/(dashboard)/templates/template-direct-link-dialog.tsx:163
@@ -1613,7 +1617,7 @@ msgstr "Télécharger"
 msgid "Download Audit Logs"
 msgstr "Télécharger les journaux d'audit"
 
-#: apps/web/src/app/(dashboard)/documents/[id]/logs/download-certificate-button.tsx:84
+#: apps/web/src/app/(dashboard)/documents/[id]/logs/download-certificate-button.tsx:86
 msgid "Download Certificate"
 msgstr "Télécharger le certificat"
 
@@ -2305,7 +2309,7 @@ msgstr "Membre depuis"
 msgid "Members"
 msgstr "Membres"
 
-#: apps/web/src/app/(dashboard)/documents/[id]/document-page-view-recipients.tsx:61
+#: apps/web/src/app/(dashboard)/documents/[id]/document-page-view-recipients.tsx:55
 #: apps/web/src/app/(dashboard)/templates/[id]/template-page-view-recipients.tsx:35
 msgid "Modify recipients"
 msgstr "Modifier les destinataires"
@@ -2419,7 +2423,7 @@ msgstr "Aucune activité récente"
 msgid "No recent documents"
 msgstr "Aucun document récent"
 
-#: apps/web/src/app/(dashboard)/documents/[id]/document-page-view-recipients.tsx:76
+#: apps/web/src/app/(dashboard)/documents/[id]/document-page-view-recipients.tsx:70
 #: apps/web/src/app/(dashboard)/templates/[id]/template-page-view-recipients.tsx:49
 #: apps/web/src/components/document/document-recipient-link-copy-dialog.tsx:96
 msgid "No recipients"
@@ -2608,7 +2612,7 @@ msgstr "Un paiement est requis pour finaliser la création de votre équipe."
 msgid "Payment overdue"
 msgstr "Paiement en retard"
 
-#: apps/web/src/app/(dashboard)/documents/[id]/document-page-view-recipients.tsx:137
+#: apps/web/src/app/(dashboard)/documents/[id]/document-page-view-recipients.tsx:131
 #: apps/web/src/app/(dashboard)/templates/[id]/template-page-view-documents-table.tsx:211
 #: apps/web/src/components/(teams)/tables/teams-member-page-data-table.tsx:82
 #: apps/web/src/components/(teams)/tables/user-settings-teams-page-data-table.tsx:77
@@ -2813,7 +2817,7 @@ msgstr "Champ en lecture seule"
 msgid "Read the full <0>signature disclosure</0>."
 msgstr "Lisez l'intégralité de la <0>divulgation de signature</0>."
 
-#: apps/web/src/app/(dashboard)/documents/[id]/document-page-view-recipients.tsx:112
+#: apps/web/src/app/(dashboard)/documents/[id]/document-page-view-recipients.tsx:106
 msgid "Ready"
 msgstr "Prêt"
 
@@ -2821,7 +2825,7 @@ msgstr "Prêt"
 msgid "Reason"
 msgstr "Raison"
 
-#: apps/web/src/app/(dashboard)/documents/[id]/document-page-view-recipients.tsx:152
+#: apps/web/src/app/(dashboard)/documents/[id]/document-page-view-recipients.tsx:146
 msgid "Reason for rejection:"
 msgstr ""
 
@@ -2853,7 +2857,7 @@ msgid "Recipient updated"
 msgstr "Destinataire mis à jour"
 
 #: apps/web/src/app/(dashboard)/admin/documents/[id]/page.tsx:66
-#: apps/web/src/app/(dashboard)/documents/[id]/document-page-view-recipients.tsx:55
+#: apps/web/src/app/(dashboard)/documents/[id]/document-page-view-recipients.tsx:49
 #: apps/web/src/app/(dashboard)/templates/[id]/template-page-view-recipients.tsx:30
 #: apps/web/src/app/(internal)/%5F%5Fhtmltopdf/audit-log/page.tsx:139
 msgid "Recipients"
@@ -2887,7 +2891,7 @@ msgstr "Inscription réussie"
 msgid "Reject Document"
 msgstr ""
 
-#: apps/web/src/app/(dashboard)/documents/[id]/document-page-view-recipients.tsx:147
+#: apps/web/src/app/(dashboard)/documents/[id]/document-page-view-recipients.tsx:141
 #: apps/web/src/components/(dashboard)/avatar/stack-avatars-with-tooltip.tsx:101
 msgid "Rejected"
 msgstr ""
@@ -3025,7 +3029,7 @@ msgstr "Rôles"
 #: apps/web/src/app/(signing)/sign/[token]/number-field.tsx:336
 #: apps/web/src/app/(signing)/sign/[token]/text-field.tsx:342
 #: apps/web/src/app/(teams)/t/[teamUrl]/settings/preferences/branding-preferences.tsx:312
-#: apps/web/src/app/(teams)/t/[teamUrl]/settings/preferences/document-preferences.tsx:228
+#: apps/web/src/app/(teams)/t/[teamUrl]/settings/preferences/document-preferences.tsx:232
 msgid "Save"
 msgstr "Sauvegarder"
 
@@ -3121,7 +3125,7 @@ msgstr "Envoi de l'e-mail de réinitialisation..."
 msgid "Sending..."
 msgstr "Envoi..."
 
-#: apps/web/src/app/(dashboard)/documents/[id]/document-page-view-recipients.tsx:107
+#: apps/web/src/app/(dashboard)/documents/[id]/document-page-view-recipients.tsx:101
 #: apps/web/src/app/(internal)/%5F%5Fhtmltopdf/certificate/page.tsx:248
 msgid "Sent"
 msgstr "Envoyé"
@@ -3268,7 +3272,7 @@ msgstr "Signatures collectées"
 msgid "Signatures will appear once the document has been completed"
 msgstr "Les signatures apparaîtront une fois le document complété"
 
-#: apps/web/src/app/(dashboard)/documents/[id]/document-page-view-recipients.tsx:120
+#: apps/web/src/app/(dashboard)/documents/[id]/document-page-view-recipients.tsx:114
 #: apps/web/src/app/(internal)/%5F%5Fhtmltopdf/certificate/page.tsx:270
 #: apps/web/src/components/document/document-read-only-fields.tsx:84
 msgid "Signed"
@@ -3321,7 +3325,7 @@ msgstr "Paramètres du site"
 #: apps/web/src/app/(dashboard)/documents/[id]/document-page-view-button.tsx:63
 #: apps/web/src/app/(dashboard)/documents/[id]/document-page-view-dropdown.tsx:91
 #: apps/web/src/app/(dashboard)/documents/[id]/logs/download-audit-log-button.tsx:65
-#: apps/web/src/app/(dashboard)/documents/[id]/logs/download-certificate-button.tsx:66
+#: apps/web/src/app/(dashboard)/documents/[id]/logs/download-certificate-button.tsx:68
 #: apps/web/src/app/(dashboard)/documents/data-table-action-button.tsx:75
 #: apps/web/src/app/(dashboard)/documents/data-table-action-dropdown.tsx:106
 #: apps/web/src/app/(dashboard)/documents/delete-document-dialog.tsx:80
@@ -3393,7 +3397,7 @@ msgstr "Quelque chose a mal tourné. Veuillez réessayer ou contacter le support
 msgid "Sorry, we were unable to download the audit logs. Please try again later."
 msgstr "Désolé, nous n'avons pas pu télécharger les journaux d'audit. Veuillez réessayer plus tard."
 
-#: apps/web/src/app/(dashboard)/documents/[id]/logs/download-certificate-button.tsx:68
+#: apps/web/src/app/(dashboard)/documents/[id]/logs/download-certificate-button.tsx:70
 msgid "Sorry, we were unable to download the certificate. Please try again later."
 msgstr "Désolé, nous n'avons pas pu télécharger le certificat. Veuillez réessayer plus tard."
 
@@ -3735,7 +3739,7 @@ msgstr "Le destinataire a été mis à jour avec succès"
 msgid "The selected team member will receive an email which they must accept before the team is transferred"
 msgstr "Le membre d'équipe sélectionné recevra un e-mail qu'il devra accepter avant que l'équipe soit transférée"
 
-#: apps/web/src/app/(dashboard)/documents/[id]/document-page-view-recipients.tsx:169
+#: apps/web/src/app/(dashboard)/documents/[id]/document-page-view-recipients.tsx:163
 #: apps/web/src/components/(dashboard)/avatar/avatar-with-recipient.tsx:41
 #: apps/web/src/components/document/document-recipient-link-copy-dialog.tsx:118
 msgid "The signing link has been copied to your clipboard."
@@ -4422,7 +4426,7 @@ msgstr "Voir les codes de récupération"
 msgid "View teams"
 msgstr "Voir les équipes"
 
-#: apps/web/src/app/(dashboard)/documents/[id]/document-page-view-recipients.tsx:126
+#: apps/web/src/app/(dashboard)/documents/[id]/document-page-view-recipients.tsx:120
 #: apps/web/src/app/(internal)/%5F%5Fhtmltopdf/certificate/page.tsx:259
 msgid "Viewed"
 msgstr "Vu"
