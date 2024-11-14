@@ -14,6 +14,7 @@ import { WebhookTriggerEvents } from '@documenso/prisma/client';
 
 import { jobs } from '../../jobs/client';
 import type { TRecipientActionAuth } from '../../types/document-auth';
+import { ZFieldMetaSchema } from '../../types/field-meta';
 import { getIsRecipientsTurnToSign } from '../recipient/get-is-recipient-turn';
 import { triggerWebhook } from '../webhooks/trigger/trigger-webhook';
 import { sendPendingEmail } from './send-pending-email';
@@ -86,15 +87,12 @@ export const completeDocumentWithToken = async ({
   });
 
   const hasUnsignedRequiredFields = fields.some((field) => {
-    if (isAdvancedField(field.type)) {
+    if (!isAdvancedField(field.type)) {
       return !field.inserted;
     }
 
-    if (!field.fieldMeta) {
-      return false;
-    }
-
-    return !field.inserted;
+    const isRequired = field.fieldMeta && ZFieldMetaSchema.parse(field.fieldMeta)?.required;
+    return isRequired ? !field.inserted : false;
   });
 
   if (hasUnsignedRequiredFields) {

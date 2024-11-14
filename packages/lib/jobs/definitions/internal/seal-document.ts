@@ -113,11 +113,8 @@ export const SEAL_DOCUMENT_JOB_DEFINITION = {
         return !field.inserted;
       }
 
-      if (!field.fieldMeta || ZFieldMetaSchema.parse(field.fieldMeta)?.required === false) {
-        return false;
-      }
-
-      return !field.inserted;
+      const isRequired = field.fieldMeta && ZFieldMetaSchema.parse(field.fieldMeta)?.required;
+      return isRequired ? !field.inserted : false;
     });
 
     if (hasUnsignedRequiredFields) {
@@ -155,7 +152,9 @@ export const SEAL_DOCUMENT_JOB_DEFINITION = {
       }
 
       for (const field of fields) {
-        await insertFieldInPDF(pdfDoc, field);
+        if (field.inserted) {
+          await insertFieldInPDF(pdfDoc, field);
+        }
       }
 
       // Re-flatten the form to handle our checkbox and radio fields that
