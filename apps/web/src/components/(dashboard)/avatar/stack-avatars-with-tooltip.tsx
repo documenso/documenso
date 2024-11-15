@@ -8,7 +8,7 @@ import { useLingui } from '@lingui/react';
 import { RecipientStatusType, getRecipientType } from '@documenso/lib/client-only/recipient-type';
 import { RECIPIENT_ROLES_DESCRIPTION } from '@documenso/lib/constants/recipient-roles';
 import { recipientAbbreviation } from '@documenso/lib/utils/recipient-formatter';
-import type { DocumentStatus, Recipient } from '@documenso/prisma/client';
+import { type DocumentStatus, type Recipient } from '@documenso/prisma/client';
 import { PopoverHover } from '@documenso/ui/primitives/popover';
 
 import { AvatarWithRecipient } from './avatar-with-recipient';
@@ -46,7 +46,22 @@ export const StackAvatarsWithTooltip = ({
     (recipient) => getRecipientType(recipient) === RecipientStatusType.UNSIGNED,
   );
 
-  const sortedRecipients = useMemo(() => recipients.sort((a, b) => a.id - b.id), [recipients]);
+  const rejectedRecipients = recipients.filter(
+    (recipient) => getRecipientType(recipient) === RecipientStatusType.REJECTED,
+  );
+
+  const sortedRecipients = useMemo(() => {
+    const otherRecipients = recipients.filter(
+      (recipient) => getRecipientType(recipient) !== RecipientStatusType.REJECTED,
+    );
+
+    return [
+      ...rejectedRecipients.sort((a, b) => a.id - b.id),
+      ...otherRecipients.sort((a, b) => {
+        return a.id - b.id;
+      }),
+    ];
+  }, [recipients]);
 
   return (
     <PopoverHover
@@ -62,6 +77,30 @@ export const StackAvatarsWithTooltip = ({
             <Trans>Completed</Trans>
           </h1>
           {completedRecipients.map((recipient: Recipient) => (
+            <div key={recipient.id} className="my-1 flex items-center gap-2">
+              <StackAvatar
+                first={true}
+                key={recipient.id}
+                type={getRecipientType(recipient)}
+                fallbackText={recipientAbbreviation(recipient)}
+              />
+              <div>
+                <p className="text-muted-foreground text-sm">{recipient.email}</p>
+                <p className="text-muted-foreground/70 text-xs">
+                  {_(RECIPIENT_ROLES_DESCRIPTION[recipient.role].roleName)}
+                </p>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {rejectedRecipients.length > 0 && (
+        <div>
+          <h1 className="text-base font-medium">
+            <Trans>Rejected</Trans>
+          </h1>
+          {rejectedRecipients.map((recipient: Recipient) => (
             <div key={recipient.id} className="my-1 flex items-center gap-2">
               <StackAvatar
                 first={true}

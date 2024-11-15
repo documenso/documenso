@@ -1,12 +1,17 @@
 import { createElement } from 'react';
 
+import { msg } from '@lingui/macro';
+
 import { mailer } from '@documenso/email/mailer';
-import { render } from '@documenso/email/render';
 import { TeamEmailRemovedTemplate } from '@documenso/email/templates/team-email-removed';
 import { WEBAPP_BASE_URL } from '@documenso/lib/constants/app';
 import { FROM_ADDRESS, FROM_NAME } from '@documenso/lib/constants/email';
 import { TEAM_MEMBER_ROLE_PERMISSIONS_MAP } from '@documenso/lib/constants/teams';
 import { prisma } from '@documenso/prisma';
+
+import { getI18nInstance } from '../../client-only/providers/i18n.server';
+import { renderEmailWithI18N } from '../../utils/render-email-with-i18n';
+import { teamGlobalSettingsToBranding } from '../../utils/team-global-settings-to-branding';
 
 export type DeleteTeamEmailOptions = {
   userId: number;
@@ -50,6 +55,7 @@ export const deleteTeamEmail = async ({ userId, userEmail, teamId }: DeleteTeamE
             email: true,
           },
         },
+        teamGlobalSettings: true,
       },
     });
 
@@ -73,6 +79,19 @@ export const deleteTeamEmail = async ({ userId, userEmail, teamId }: DeleteTeamE
       teamUrl: team.url,
     });
 
+    const branding = team.teamGlobalSettings
+      ? teamGlobalSettingsToBranding(team.teamGlobalSettings)
+      : undefined;
+
+    const lang = team.teamGlobalSettings?.documentLanguage;
+
+    const [html, text] = await Promise.all([
+      renderEmailWithI18N(template, { lang, branding }),
+      renderEmailWithI18N(template, { lang, branding, plainText: true }),
+    ]);
+
+    const i18n = await getI18nInstance(lang);
+
     await mailer.sendMail({
       to: {
         address: team.owner.email,
@@ -82,9 +101,9 @@ export const deleteTeamEmail = async ({ userId, userEmail, teamId }: DeleteTeamE
         name: FROM_NAME,
         address: FROM_ADDRESS,
       },
-      subject: `Team email has been revoked for ${team.name}`,
-      html: render(template),
-      text: render(template, { plainText: true }),
+      subject: i18n._(msg`Team email has been revoked for ${team.name}`),
+      html,
+      text,
     });
   } catch (e) {
     // Todo: Teams - Alert us.

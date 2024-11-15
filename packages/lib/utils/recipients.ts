@@ -1,5 +1,9 @@
 import { type Field, type Recipient, RecipientRole, SigningStatus } from '@documenso/prisma/client';
 
+import { NEXT_PUBLIC_WEBAPP_URL } from '../constants/app';
+
+export const formatSigningLink = (token: string) => `${NEXT_PUBLIC_WEBAPP_URL()}/sign/${token}`;
+
 /**
  * Whether a recipient can be modified by the document owner.
  */

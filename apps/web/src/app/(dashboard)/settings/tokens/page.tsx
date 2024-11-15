@@ -10,7 +10,7 @@ import DeleteTokenDialog from '~/components/(dashboard)/settings/token/delete-to
 import { ApiTokenForm } from '~/components/forms/token';
 
 export default async function ApiTokensPage() {
-  const { i18n } = setupI18nSSR();
+  const { i18n } = await setupI18nSSR();
 
   const { user } = await getRequiredServerComponentSession();
 

@@ -18,7 +18,7 @@ test('[USER] can sign up with email and password', async ({ page }: { page: Page
   await page.getByLabel('Email').fill(email);
   await page.getByLabel('Password', { exact: true }).fill(password);
 
-  const canvas = page.locator('canvas');
+  const canvas = page.locator('canvas').first();
   const box = await canvas.boundingBox();
 
   if (box) {

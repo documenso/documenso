@@ -54,6 +54,7 @@ export const findTemplates = async ({
         templateMeta: {
           select: {
             signingOrder: true,
+            distributionMethod: true,
           },
         },
         directLink: {

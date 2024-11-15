@@ -6,10 +6,9 @@ import { prisma } from '@documenso/prisma';
 import { TeamMemberRole } from '@documenso/prisma/client';
 import type { Prisma, User } from '@documenso/prisma/client';
 import { SigningStatus } from '@documenso/prisma/client';
+import { DocumentVisibility } from '@documenso/prisma/client';
 import { isExtendedDocumentStatus } from '@documenso/prisma/guards/is-extended-document-status';
 import { ExtendedDocumentStatus } from '@documenso/prisma/types/extended-document-status';
-
-import { DocumentVisibility } from '../../types/document-visibility';
 
 export type GetStatsInput = {
   user: User;
@@ -207,47 +206,45 @@ const getTeamCounts = async (options: GetTeamCountsOption) => {
   let notSignedCountsGroupByArgs = null;
   let hasSignedCountsGroupByArgs = null;
 
-  const visibilityFilters = [
-    ...match(options.currentTeamMemberRole)
-      .with(TeamMemberRole.ADMIN, () => [
-        { visibility: DocumentVisibility.EVERYONE },
-        { visibility: DocumentVisibility.MANAGER_AND_ABOVE },
-        { visibility: DocumentVisibility.ADMIN },
-      ])
-      .with(TeamMemberRole.MANAGER, () => [
-        { visibility: DocumentVisibility.EVERYONE },
-        { visibility: DocumentVisibility.MANAGER_AND_ABOVE },
-      ])
-      .otherwise(() => [{ visibility: DocumentVisibility.EVERYONE }]),
-  ];
-
-  ownerCountsWhereInput = {
-    ...ownerCountsWhereInput,
-    OR: [
+  const visibilityFiltersWhereInput: Prisma.DocumentWhereInput = {
+    AND: [
+      { deletedAt: null },
       {
-        AND: [
-          {
-            visibility: {
-              in: visibilityFilters.map((filter) => filter.visibility),
-            },
-          },
-          {
-            Recipient: {
-              none: {
-                email: options.currentUserEmail,
+        OR: [
+          match(options.currentTeamMemberRole)
+            .with(TeamMemberRole.ADMIN, () => ({
+              visibility: {
+                in: [
+                  DocumentVisibility.EVERYONE,
+                  DocumentVisibility.MANAGER_AND_ABOVE,
+                  DocumentVisibility.ADMIN,
+                ],
               },
-            },
+            }))
+            .with(TeamMemberRole.MANAGER, () => ({
+              visibility: {
+                in: [DocumentVisibility.EVERYONE, DocumentVisibility.MANAGER_AND_ABOVE],
+              },
+            }))
+            .otherwise(() => ({
+              visibility: {
+                equals: DocumentVisibility.EVERYONE,
+              },
+            })),
+          {
+            OR: [
+              { userId: options.userId },
+              { Recipient: { some: { email: options.currentUserEmail } } },
+            ],
           },
         ],
       },
-      {
-        Recipient: {
-          some: {
-            email: options.currentUserEmail,
-          },
-        },
-      },
     ],
+  };
+
+  ownerCountsWhereInput = {
+    ...ownerCountsWhereInput,
+    ...visibilityFiltersWhereInput,
     ...searchFilter,
   };
 

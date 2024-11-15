@@ -11,8 +11,8 @@ export type DashboardSettingsLayoutProps = {
   children: React.ReactNode;
 };
 
-export default function DashboardSettingsLayout({ children }: DashboardSettingsLayoutProps) {
-  setupI18nSSR();
+export default async function DashboardSettingsLayout({ children }: DashboardSettingsLayoutProps) {
+  await setupI18nSSR();
 
   return (
     <div className="mx-auto w-full max-w-screen-xl px-4 md:px-8">

@@ -2,17 +2,22 @@
 
 import { createElement } from 'react';
 
+import { msg } from '@lingui/macro';
+
 import { mailer } from '@documenso/email/mailer';
-import { render } from '@documenso/email/render';
 import DocumentCancelTemplate from '@documenso/email/templates/document-cancel';
 import { prisma } from '@documenso/prisma';
 import { DocumentStatus, SendStatus } from '@documenso/prisma/client';
 
+import { getI18nInstance } from '../../client-only/providers/i18n.server';
 import { NEXT_PUBLIC_WEBAPP_URL } from '../../constants/app';
 import { FROM_ADDRESS, FROM_NAME } from '../../constants/email';
 import { DOCUMENT_AUDIT_LOG_TYPE } from '../../types/document-audit-logs';
+import { extractDerivedDocumentEmailSettings } from '../../types/document-email';
 import type { RequestMetadata } from '../../universal/extract-request-metadata';
 import { createDocumentAuditLogData } from '../../utils/document-audit-logs';
+import { renderEmailWithI18N } from '../../utils/render-email-with-i18n';
+import { teamGlobalSettingsToBranding } from '../../utils/team-global-settings-to-branding';
 
 export type SuperDeleteDocumentOptions = {
   id: number;
@@ -28,6 +33,11 @@ export const superDeleteDocument = async ({ id, requestMetadata }: SuperDeleteDo
       Recipient: true,
       documentMeta: true,
       User: true,
+      team: {
+        include: {
+          teamGlobalSettings: true,
+        },
+      },
     },
   });
 
@@ -37,8 +47,16 @@ export const superDeleteDocument = async ({ id, requestMetadata }: SuperDeleteDo
 
   const { status, User: user } = document;
 
+  const isDocumentDeletedEmailEnabled = extractDerivedDocumentEmailSettings(
+    document.documentMeta,
+  ).documentDeleted;
+
   // if the document is pending, send cancellation emails to all recipients
-  if (status === DocumentStatus.PENDING && document.Recipient.length > 0) {
+  if (
+    status === DocumentStatus.PENDING &&
+    document.Recipient.length > 0 &&
+    isDocumentDeletedEmailEnabled
+  ) {
     await Promise.all(
       document.Recipient.map(async (recipient) => {
         if (recipient.sendStatus !== SendStatus.SENT) {
@@ -53,6 +71,21 @@ export const superDeleteDocument = async ({ id, requestMetadata }: SuperDeleteDo
           assetBaseUrl,
         });
 
+        const branding = document.team?.teamGlobalSettings
+          ? teamGlobalSettingsToBranding(document.team.teamGlobalSettings)
+          : undefined;
+
+        const [html, text] = await Promise.all([
+          renderEmailWithI18N(template, { lang: document.documentMeta?.language, branding }),
+          renderEmailWithI18N(template, {
+            lang: document.documentMeta?.language,
+            branding,
+            plainText: true,
+          }),
+        ]);
+
+        const i18n = await getI18nInstance(document.documentMeta?.language);
+
         await mailer.sendMail({
           to: {
             address: recipient.email,
@@ -62,9 +95,9 @@ export const superDeleteDocument = async ({ id, requestMetadata }: SuperDeleteDo
             name: FROM_NAME,
             address: FROM_ADDRESS,
           },
-          subject: 'Document Cancelled',
-          html: render(template),
-          text: render(template, { plainText: true }),
+          subject: i18n._(msg`Document Cancelled`),
+          html,
+          text,
         });
       }),
     );

@@ -36,7 +36,7 @@ test('[DOCUMENT_AUTH]: should allow signing when no auth setup', async ({ page }
     await expect(page.getByRole('heading', { name: 'Sign Document' })).toBeVisible();
 
     // Add signature.
-    const canvas = page.locator('canvas');
+    const canvas = page.locator('canvas').first();
     const box = await canvas.boundingBox();
     if (box) {
       await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2);
@@ -93,7 +93,7 @@ test('[DOCUMENT_AUTH]: should allow signing with valid global auth', async ({ pa
   await expect(page.getByRole('heading', { name: 'Sign Document' })).toBeVisible();
 
   // Add signature.
-  const canvas = page.locator('canvas');
+  const canvas = page.locator('canvas').first();
   const box = await canvas.boundingBox();
   if (box) {
     await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2);
@@ -262,7 +262,7 @@ test('[DOCUMENT_AUTH]: should allow field signing when required for recipient au
     }
 
     // Add signature.
-    const canvas = page.locator('canvas');
+    const canvas = page.locator('canvas').first();
     const box = await canvas.boundingBox();
     if (box) {
       await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2);
@@ -373,7 +373,7 @@ test('[DOCUMENT_AUTH]: should allow field signing when required for recipient an
     }
 
     // Add signature.
-    const canvas = page.locator('canvas');
+    const canvas = page.locator('canvas').first();
     const box = await canvas.boundingBox();
     if (box) {
       await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2);

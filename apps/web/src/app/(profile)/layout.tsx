@@ -14,7 +14,7 @@ type PublicProfileLayoutProps = {
 };
 
 export default async function PublicProfileLayout({ children }: PublicProfileLayoutProps) {
-  setupI18nSSR();
+  await setupI18nSSR();
 
   const { user, session } = await getServerComponentSession();
 

@@ -1,12 +1,14 @@
 import { z } from 'zod';
 
 import { DEFAULT_DOCUMENT_DATE_FORMAT } from '@documenso/lib/constants/date-formats';
+import { SUPPORTED_LANGUAGE_CODES } from '@documenso/lib/constants/i18n';
 import { DEFAULT_DOCUMENT_TIME_ZONE } from '@documenso/lib/constants/time-zones';
 import {
   ZDocumentAccessAuthTypesSchema,
   ZDocumentActionAuthTypesSchema,
 } from '@documenso/lib/types/document-auth';
 import { isValidRedirectUrl } from '@documenso/lib/utils/is-valid-redirect-url';
+import { DocumentVisibility } from '@documenso/prisma/client';
 
 export const ZMapNegativeOneToUndefinedSchema = z
   .string()
@@ -22,7 +24,7 @@ export const ZMapNegativeOneToUndefinedSchema = z
 export const ZAddSettingsFormSchema = z.object({
   title: z.string().trim().min(1, { message: "Title can't be empty" }),
   externalId: z.string().optional(),
-  visibility: z.string().optional(),
+  visibility: z.nativeEnum(DocumentVisibility).optional(),
   globalAccessAuth: ZMapNegativeOneToUndefinedSchema.pipe(
     ZDocumentAccessAuthTypesSchema.optional(),
   ),
@@ -39,6 +41,10 @@ export const ZAddSettingsFormSchema = z.object({
         message:
           'Please enter a valid URL, make sure you include http:// or https:// part of the url.',
       }),
+    language: z
+      .union([z.string(), z.enum(SUPPORTED_LANGUAGE_CODES)])
+      .optional()
+      .default('en'),
   }),
 });
 
