@@ -458,11 +458,12 @@ export const documentRouter = router({
     .input(ZSelfSignDocumentMutationSchema)
     .mutation(async ({ input, ctx }) => {
       try {
-        const { documentId } = input;
+        const { documentId, teamId } = input;
 
         return await selfSignDocument({
           userId: ctx.user.id,
           documentId,
+          teamId,
           requestMetadata: extractNextApiRequestMetadata(ctx.req),
         });
       } catch (err) {

@@ -313,6 +313,7 @@ export const EditDocumentForm = ({
       if (hasSameOwnerAsRecipient) {
         await selfSignDocument({
           documentId: document.id,
+          teamId: team?.id,
         });
 
         router.push(`/sign/${recipients[0].token}`);

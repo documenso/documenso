@@ -12,12 +12,14 @@ import { insertFormValuesInPdf } from '../pdf/insert-form-values-in-pdf';
 export type SelfSignDocumentOptions = {
   documentId: number;
   userId: number;
+  teamId?: number;
   requestMetadata?: RequestMetadata;
 };
 
 export const selfSignDocument = async ({
   documentId,
   userId,
+  teamId,
   requestMetadata,
 }: SelfSignDocumentOptions) => {
   const user = await prisma.user.findFirstOrThrow({
@@ -31,11 +33,24 @@ export const selfSignDocument = async ({
     },
   });
 
-  const document = await prisma.document.findFirstOrThrow({
+  const document = await prisma.document.findUnique({
     where: {
       id: documentId,
-      userId,
-      teamId: null,
+      ...(teamId
+        ? {
+            team: {
+              id: teamId,
+              members: {
+                some: {
+                  userId,
+                },
+              },
+            },
+          }
+        : {
+            userId,
+            teamId: null,
+          }),
     },
     include: {
       Recipient: {
