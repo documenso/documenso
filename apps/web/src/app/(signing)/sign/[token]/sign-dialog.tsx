@@ -41,14 +41,11 @@ export const SignDialog = ({
   const truncatedTitle = truncateTitle(documentTitle);
 
   const isComplete = fields.every((field) => {
-    if (
+    const isOptionalAdvancedField =
       isAdvancedField(field.type) &&
-      (field.fieldMeta === null || ZFieldMetaSchema.parse(field.fieldMeta)?.required === false)
-    ) {
-      return true;
-    }
+      (!field.fieldMeta || !ZFieldMetaSchema.parse(field.fieldMeta)?.required);
 
-    return field.inserted;
+    return isOptionalAdvancedField || field.inserted;
   });
 
   const handleOpenChange = (open: boolean) => {

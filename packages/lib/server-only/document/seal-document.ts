@@ -11,6 +11,7 @@ import { WebhookTriggerEvents } from '@documenso/prisma/client';
 import { signPdf } from '@documenso/signing';
 
 import { ZSupportedLanguageCodeSchema } from '../../constants/i18n';
+import { ZFieldMetaSchema } from '../../types/field-meta';
 import type { RequestMetadata } from '../../universal/extract-request-metadata';
 import { getFile } from '../../universal/upload/get-file';
 import { putPdfFile } from '../../universal/upload/put-file';
@@ -85,11 +86,8 @@ export const sealDocument = async ({
       return !field.inserted;
     }
 
-    if (!field.fieldMeta) {
-      return false;
-    }
-
-    return !field.inserted;
+    const isRequired = field.fieldMeta && ZFieldMetaSchema.parse(field.fieldMeta)?.required;
+    return isRequired ? !field.inserted : false;
   });
 
   if (hasUnsignedRequiredFields) {
