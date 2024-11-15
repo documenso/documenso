@@ -14,6 +14,7 @@ import { ZSupportedLanguageCodeSchema } from '../../constants/i18n';
 import type { RequestMetadata } from '../../universal/extract-request-metadata';
 import { getFile } from '../../universal/upload/get-file';
 import { putPdfFile } from '../../universal/upload/put-file';
+import { isAdvancedField } from '../../utils/is-advanced-field';
 import { getCertificatePdf } from '../htmltopdf/get-certificate-pdf';
 import { flattenAnnotations } from '../pdf/flatten-annotations';
 import { flattenForm } from '../pdf/flatten-form';
@@ -80,7 +81,7 @@ export const sealDocument = async ({
   });
 
   const hasUnsignedRequiredFields = fields.some((field) => {
-    if (!['CHECKBOX', 'DROPDOWN', 'RADIO', 'TEXT', 'NUMBER'].includes(field.type)) {
+    if (!isAdvancedField(field.type)) {
       return !field.inserted;
     }
 
