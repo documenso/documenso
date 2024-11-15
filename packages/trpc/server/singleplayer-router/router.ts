@@ -3,7 +3,6 @@ import { createElement } from 'react';
 import { PDFDocument } from 'pdf-lib';
 
 import { mailer } from '@documenso/email/mailer';
-import { renderAsync } from '@documenso/email/render';
 import { DocumentSelfSignedEmailTemplate } from '@documenso/email/templates/document-self-signed';
 import { NEXT_PUBLIC_WEBAPP_URL } from '@documenso/lib/constants/app';
 import { FROM_ADDRESS, FROM_NAME, SERVICE_USER_EMAIL } from '@documenso/lib/constants/email';
@@ -11,6 +10,7 @@ import { insertFieldInPDF } from '@documenso/lib/server-only/pdf/insert-field-in
 import { alphaid } from '@documenso/lib/universal/id';
 import { getFile } from '@documenso/lib/universal/upload/get-file';
 import { putPdfFile } from '@documenso/lib/universal/upload/put-file';
+import { renderEmailWithI18N } from '@documenso/lib/utils/render-email-with-i18n';
 import { prisma } from '@documenso/prisma';
 import {
   DocumentSource,
@@ -158,8 +158,8 @@ export const singleplayerRouter = router({
         });
 
         const [html, text] = await Promise.all([
-          renderAsync(template),
-          renderAsync(template, { plainText: true }),
+          renderEmailWithI18N(template),
+          renderEmailWithI18N(template, { plainText: true }),
         ]);
 
         // Send email to signer.

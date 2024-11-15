@@ -58,10 +58,6 @@ export const DocumentLogsDataTable = ({ documentId }: DocumentLogsDataTableProps
     });
   };
 
-  const uppercaseFistLetter = (text: string) => {
-    return text.charAt(0).toUpperCase() + text.slice(1);
-  };
-
   const results = data ?? {
     data: [],
     perPage: 10,
@@ -103,9 +99,7 @@ export const DocumentLogsDataTable = ({ documentId }: DocumentLogsDataTableProps
       {
         header: _(msg`Action`),
         accessorKey: 'type',
-        cell: ({ row }) => (
-          <span>{uppercaseFistLetter(formatDocumentAuditLogAction(row.original).description)}</span>
-        ),
+        cell: ({ row }) => <span>{formatDocumentAuditLogAction(_, row.original).description}</span>,
       },
       {
         header: 'IP Address',

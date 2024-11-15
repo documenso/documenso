@@ -49,6 +49,9 @@ export const resendTeamMemberInvitation = async ({
             },
           },
         },
+        include: {
+          teamGlobalSettings: true,
+        },
       });
 
       if (!team) {
@@ -69,9 +72,8 @@ export const resendTeamMemberInvitation = async ({
       await sendTeamMemberInviteEmail({
         email: teamMemberInvite.email,
         token: teamMemberInvite.token,
-        teamName: team.name,
-        teamUrl: team.url,
         senderName: userName,
+        team,
       });
     },
     { timeout: 30_000 },

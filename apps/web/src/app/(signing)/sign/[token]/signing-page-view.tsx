@@ -31,6 +31,7 @@ import { InitialsField } from './initials-field';
 import { NameField } from './name-field';
 import { NumberField } from './number-field';
 import { RadioField } from './radio-field';
+import { RejectDocumentDialog } from './reject-document-dialog';
 import { SignatureField } from './signature-field';
 import { TextField } from './text-field';
 
@@ -57,28 +58,32 @@ export const SigningPageView = ({
         {document.title}
       </h1>
 
-      <div className="mt-2.5 flex items-center gap-x-6">
-        <p
-          className="text-muted-foreground truncate"
-          title={document.User.name ? document.User.name : ''}
-        >
-          {document.User.name}
-        </p>
-      </div>
+      <div className="mt-2.5 flex flex-wrap items-center justify-between gap-x-6">
+        <div>
+          <p
+            className="text-muted-foreground truncate"
+            title={document.User.name ? document.User.name : ''}
+          >
+            {document.User.name}
+          </p>
 
-      <p className="text-muted-foreground">
-        {match(recipient.role)
-          .with(RecipientRole.VIEWER, () => (
-            <Trans>({document.User.email}) has invited you to view this document</Trans>
-          ))
-          .with(RecipientRole.SIGNER, () => (
-            <Trans>({document.User.email}) has invited you to sign this document</Trans>
-          ))
-          .with(RecipientRole.APPROVER, () => (
-            <Trans>({document.User.email}) has invited you to approve this document</Trans>
-          ))
-          .otherwise(() => null)}
-      </p>
+          <p className="text-muted-foreground">
+            {match(recipient.role)
+              .with(RecipientRole.VIEWER, () => (
+                <Trans>({document.User.email}) has invited you to view this document</Trans>
+              ))
+              .with(RecipientRole.SIGNER, () => (
+                <Trans>({document.User.email}) has invited you to sign this document</Trans>
+              ))
+              .with(RecipientRole.APPROVER, () => (
+                <Trans>({document.User.email}) has invited you to approve this document</Trans>
+              ))
+              .otherwise(() => null)}
+          </p>
+        </div>
+
+        <RejectDocumentDialog document={document} token={recipient.token} />
+      </div>
 
       <div className="mt-8 grid grid-cols-12 gap-y-8 lg:gap-x-8 lg:gap-y-0">
         <Card

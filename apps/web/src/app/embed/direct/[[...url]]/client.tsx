@@ -318,6 +318,7 @@ export const EmbedDirectTemplateClientPage = ({
 
         {/* Widget */}
         <div
+          key={isExpanded ? 'expanded' : 'collapsed'}
           className="group/document-widget fixed bottom-8 left-0 z-50 h-fit w-full flex-shrink-0 px-6 md:sticky md:top-4 md:z-auto md:w-[350px] md:px-0"
           data-expanded={isExpanded || undefined}
         >
@@ -367,7 +368,7 @@ export const EmbedDirectTemplateClientPage = ({
                     className="bg-background mt-2"
                     disabled={isNameLocked}
                     value={fullName}
-                    onChange={(e) => !isNameLocked && setFullName(e.target.value.trim())}
+                    onChange={(e) => !isNameLocked && setFullName(e.target.value)}
                   />
                 </div>
 
@@ -394,13 +395,17 @@ export const EmbedDirectTemplateClientPage = ({
                   <Card className="mt-2" gradient degrees={-120}>
                     <CardContent className="p-0">
                       <SignaturePad
-                        key={signature}
                         className="h-44 w-full"
                         disabled={isThrottled || isSubmitting}
                         defaultValue={signature ?? undefined}
                         onChange={(value) => {
                           setSignature(value);
                         }}
+                        allowTypedSignature={Boolean(
+                          metadata &&
+                            'typedSignatureEnabled' in metadata &&
+                            metadata.typedSignatureEnabled,
+                        )}
                       />
                     </CardContent>
                   </Card>

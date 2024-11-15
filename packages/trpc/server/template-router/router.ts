@@ -1,6 +1,7 @@
 import { TRPCError } from '@trpc/server';
 
 import { getServerLimits } from '@documenso/ee/server-only/limits/server';
+import { isValidLanguageCode } from '@documenso/lib/constants/i18n';
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import { sendDocument } from '@documenso/lib/server-only/document/send-document';
 import { createDocumentFromDirectTemplate } from '@documenso/lib/server-only/template/create-document-from-direct-template';
@@ -119,7 +120,7 @@ export const templateRouter = router({
           requestMetadata,
         });
 
-        if (input.sendDocument) {
+        if (input.distributeDocument) {
           document = await sendDocument({
             documentId: document.id,
             userId: ctx.user.id,
@@ -214,7 +215,10 @@ export const templateRouter = router({
           teamId,
           templateId,
           data,
-          meta,
+          meta: {
+            ...meta,
+            language: isValidLanguageCode(meta?.language) ? meta?.language : undefined,
+          },
           requestMetadata,
         });
       } catch (err) {

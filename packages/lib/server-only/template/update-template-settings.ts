@@ -112,9 +112,11 @@ export const updateTemplateSettings = async ({
           },
           create: {
             ...meta,
+            emailSettings: meta?.emailSettings || undefined,
           },
           update: {
             ...meta,
+            emailSettings: meta?.emailSettings || undefined,
           },
         },
       },

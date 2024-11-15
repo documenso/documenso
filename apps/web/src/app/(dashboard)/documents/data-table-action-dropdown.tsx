@@ -37,6 +37,8 @@ import {
 } from '@documenso/ui/primitives/dropdown-menu';
 import { useToast } from '@documenso/ui/primitives/use-toast';
 
+import { DocumentRecipientLinkCopyDialog } from '~/components/document/document-recipient-link-copy-dialog';
+
 import { ResendDocumentActionItem } from './_action-items/resend-document';
 import { DeleteDocumentDialog } from './delete-document-dialog';
 import { DuplicateDocumentDialog } from './duplicate-document-dialog';
@@ -69,7 +71,7 @@ export const DataTableActionDropdown = ({ row, team }: DataTableActionDropdownPr
   const isOwner = row.User.id === session.user.id;
   // const isRecipient = !!recipient;
   const isDraft = row.status === DocumentStatus.DRAFT;
-  // const isPending = row.status === DocumentStatus.PENDING;
+  const isPending = row.status === DocumentStatus.PENDING;
   const isComplete = row.status === DocumentStatus.COMPLETED;
   // const isSigned = recipient?.signingStatus === SigningStatus.SIGNED;
   const isCurrentTeamDocument = team && row.team?.url === team.url;
@@ -190,6 +192,20 @@ export const DataTableActionDropdown = ({ row, team }: DataTableActionDropdownPr
         <DropdownMenuLabel>
           <Trans>Share</Trans>
         </DropdownMenuLabel>
+
+        {canManageDocument && (
+          <DocumentRecipientLinkCopyDialog
+            recipients={row.Recipient}
+            trigger={
+              <DropdownMenuItem disabled={!isPending} asChild onSelect={(e) => e.preventDefault()}>
+                <div>
+                  <Copy className="mr-2 h-4 w-4" />
+                  <Trans>Signing Links</Trans>
+                </div>
+              </DropdownMenuItem>
+            }
+          />
+        )}
 
         <ResendDocumentActionItem document={row} recipients={nonSignedRecipients} team={team} />
 

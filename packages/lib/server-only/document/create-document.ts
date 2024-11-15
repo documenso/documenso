@@ -5,7 +5,9 @@ import { DOCUMENT_AUDIT_LOG_TYPE } from '@documenso/lib/types/document-audit-log
 import type { RequestMetadata } from '@documenso/lib/universal/extract-request-metadata';
 import { createDocumentAuditLogData } from '@documenso/lib/utils/document-audit-logs';
 import { prisma } from '@documenso/prisma';
-import { DocumentSource, WebhookTriggerEvents } from '@documenso/prisma/client';
+import { DocumentSource, DocumentVisibility, WebhookTriggerEvents } from '@documenso/prisma/client';
+import type { Team, TeamGlobalSettings } from '@documenso/prisma/client';
+import { TeamMemberRole } from '@documenso/prisma/client';
 
 import { triggerWebhook } from '../webhooks/trigger/trigger-webhook';
 
@@ -48,6 +50,51 @@ export const createDocument = async ({
     throw new AppError(AppErrorCode.NOT_FOUND, 'Team not found');
   }
 
+  let team: (Team & { teamGlobalSettings: TeamGlobalSettings | null }) | null = null;
+  let userTeamRole: TeamMemberRole | undefined;
+
+  if (teamId) {
+    const teamWithUserRole = await prisma.team.findFirstOrThrow({
+      where: {
+        id: teamId,
+      },
+      include: {
+        teamGlobalSettings: true,
+        members: {
+          where: {
+            userId: userId,
+          },
+          select: {
+            role: true,
+          },
+        },
+      },
+    });
+
+    team = teamWithUserRole;
+    userTeamRole = teamWithUserRole.members[0]?.role;
+  }
+
+  const determineVisibility = (
+    globalVisibility: DocumentVisibility | null | undefined,
+    userRole: TeamMemberRole,
+  ): DocumentVisibility => {
+    const defaultVisibility = globalVisibility ?? DocumentVisibility.EVERYONE;
+
+    if (userRole === TeamMemberRole.ADMIN) {
+      return defaultVisibility;
+    }
+
+    if (userRole === TeamMemberRole.MANAGER) {
+      if (defaultVisibility === DocumentVisibility.ADMIN) {
+        return DocumentVisibility.MANAGER_AND_ABOVE;
+      }
+      return defaultVisibility;
+    }
+
+    return DocumentVisibility.EVERYONE;
+  };
+
   return await prisma.$transaction(async (tx) => {
     const document = await tx.document.create({
       data: {
@@ -56,8 +103,17 @@ export const createDocument = async ({
         documentDataId,
         userId,
         teamId,
+        visibility: determineVisibility(
+          team?.teamGlobalSettings?.documentVisibility,
+          userTeamRole ?? TeamMemberRole.MEMBER,
+        ),
         formValues,
         source: DocumentSource.DOCUMENT,
+        documentMeta: {
+          create: {
+            language: team?.teamGlobalSettings?.documentLanguage,
+          },
+        },
       },
     });
 

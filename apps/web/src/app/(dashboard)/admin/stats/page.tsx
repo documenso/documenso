@@ -30,7 +30,7 @@ import { SignerConversionChart } from './signer-conversion-chart';
 import { UserWithDocumentChart } from './user-with-document';
 
 export default async function AdminStatsPage() {
-  setupI18nSSR();
+  await setupI18nSSR();
 
   const { _ } = useLingui();
 

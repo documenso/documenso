@@ -11,6 +11,7 @@ import { createDocument } from '@documenso/lib/server-only/document/create-docum
 import { deleteDocument } from '@documenso/lib/server-only/document/delete-document';
 import { duplicateDocumentById } from '@documenso/lib/server-only/document/duplicate-document-by-id';
 import { findDocumentAuditLogs } from '@documenso/lib/server-only/document/find-document-audit-logs';
+import { findDocuments } from '@documenso/lib/server-only/document/find-documents';
 import { getDocumentById } from '@documenso/lib/server-only/document/get-document-by-id';
 import { getDocumentAndSenderByToken } from '@documenso/lib/server-only/document/get-document-by-token';
 import { getDocumentWithDetailsById } from '@documenso/lib/server-only/document/get-document-with-details-by-id';
@@ -32,6 +33,7 @@ import {
   ZDownloadAuditLogsMutationSchema,
   ZDownloadCertificateMutationSchema,
   ZFindDocumentAuditLogsQuerySchema,
+  ZFindDocumentsQuerySchema,
   ZGetDocumentByIdQuerySchema,
   ZGetDocumentByTokenQuerySchema,
   ZGetDocumentWithDetailsByIdQuerySchema,
@@ -192,6 +194,37 @@ export const documentRouter = router({
       }
     }),
 
+  findDocuments: authenticatedProcedure
+    .input(ZFindDocumentsQuerySchema)
+    .query(async ({ input, ctx }) => {
+      const { user } = ctx;
+
+      const { search, teamId, templateId, page, perPage, orderBy, source, status } = input;
+
+      try {
+        const documents = await findDocuments({
+          userId: user.id,
+          teamId,
+          templateId,
+          search,
+          source,
+          status,
+          page,
+          perPage,
+          orderBy,
+        });
+
+        return documents;
+      } catch (err) {
+        console.error(err);
+
+        throw new TRPCError({
+          code: 'BAD_REQUEST',
+          message: 'We are unable to search for documents. Please try again later.',
+        });
+      }
+    }),
+
   findDocumentAuditLogs: authenticatedProcedure
     .input(ZFindDocumentAuditLogsQuerySchema)
     .query(async ({ input, ctx }) => {
@@ -234,6 +267,7 @@ export const documentRouter = router({
             dateFormat: meta.dateFormat,
             timezone: meta.timezone,
             redirectUrl: meta.redirectUrl,
+            language: meta.language,
             userId: ctx.user.id,
             requestMetadata,
           });
@@ -381,7 +415,15 @@ export const documentRouter = router({
       try {
         const { documentId, teamId, meta } = input;
 
-        if (meta.message || meta.subject || meta.timezone || meta.dateFormat || meta.redirectUrl) {
+        if (
+          meta.message ||
+          meta.subject ||
+          meta.timezone ||
+          meta.dateFormat ||
+          meta.redirectUrl ||
+          meta.distributionMethod ||
+          meta.emailSettings
+        ) {
           await upsertDocumentMeta({
             documentId,
             subject: meta.subject,
@@ -389,7 +431,9 @@ export const documentRouter = router({
             dateFormat: meta.dateFormat,
             timezone: meta.timezone,
             redirectUrl: meta.redirectUrl,
+            distributionMethod: meta.distributionMethod,
             userId: ctx.user.id,
+            emailSettings: meta.emailSettings,
             requestMetadata: extractNextApiRequestMetadata(ctx.req),
           });
         }

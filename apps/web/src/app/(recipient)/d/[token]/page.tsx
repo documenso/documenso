@@ -24,7 +24,7 @@ export type TemplatesDirectPageProps = {
 };
 
 export default async function TemplatesDirectPage({ params }: TemplatesDirectPageProps) {
-  setupI18nSSR();
+  await setupI18nSSR();
 
   const { token } = params;
 

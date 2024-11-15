@@ -13,6 +13,7 @@ import {
 import { WebhookTriggerEvents } from '@documenso/prisma/client';
 
 import { jobs } from '../../jobs/client';
+import { extractDerivedDocumentEmailSettings } from '../../types/document-email';
 import { getFile } from '../../universal/upload/get-file';
 import { insertFormValuesInPdf } from '../pdf/insert-form-values-in-pdf';
 import { triggerWebhook } from '../webhooks/trigger/trigger-webhook';
@@ -29,7 +30,7 @@ export const sendDocument = async ({
   documentId,
   userId,
   teamId,
-  sendEmail = true,
+  sendEmail,
   requestMetadata,
 }: SendDocumentOptions) => {
   const user = await prisma.user.findFirstOrThrow({
@@ -156,7 +157,14 @@ export const sendDocument = async ({
   //   throw new Error('Some signers have not been assigned a signature field.');
   // }
 
-  if (sendEmail) {
+  const isRecipientSigningRequestEmailEnabled = extractDerivedDocumentEmailSettings(
+    document.documentMeta,
+  ).recipientSigningRequest;
+
+  // Only send email if one of the following is true:
+  // - It is explicitly set
+  // - The email is enabled for signing requests AND sendEmail is undefined
+  if (sendEmail || (isRecipientSigningRequestEmailEnabled && sendEmail === undefined)) {
     await Promise.all(
       recipientsToNotify.map(async (recipient) => {
         if (recipient.sendStatus === SendStatus.SENT || recipient.role === RecipientRole.CC) {
