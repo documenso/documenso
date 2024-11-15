@@ -2,7 +2,7 @@ name: Publish Docker
 
 on:
   push:
-    branches: ["release"]
+    branches: ['release']
 
 jobs:
   build_and_publish_platform_containers:
