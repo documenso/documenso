@@ -63,7 +63,11 @@ export const SigningForm = ({
       fields.filter((field) => {
         const isRequired = field.fieldMeta && ZFieldMetaSchema.parse(field.fieldMeta)?.required;
 
-        return isRequired || !isAdvancedField(field.type) ? !field.inserted : false;
+        if (isAdvancedField(field.type) && !isRequired) {
+          return false;
+        }
+
+        return !field.inserted;
       }),
     [fields],
   );

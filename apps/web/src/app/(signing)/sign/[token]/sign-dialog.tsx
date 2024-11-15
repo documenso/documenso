@@ -45,7 +45,11 @@ export const SignDialog = ({
       isAdvancedField(field.type) &&
       (!field.fieldMeta || !ZFieldMetaSchema.parse(field.fieldMeta)?.required);
 
-    return isOptionalAdvancedField || field.inserted;
+    if (isOptionalAdvancedField) {
+      return true;
+    }
+
+    return field.inserted;
   });
 
   const handleOpenChange = (open: boolean) => {
