@@ -69,3 +69,14 @@ export const ZCompleteDocumentWithTokenMutationSchema = z.object({
 export type TCompleteDocumentWithTokenMutationSchema = z.infer<
   typeof ZCompleteDocumentWithTokenMutationSchema
 >;
+
+export const ZRejectDocumentWithTokenMutationSchema = z.object({
+  token: z.string(),
+  documentId: z.number(),
+  reason: z.string(),
+  authOptions: ZRecipientActionAuthSchema.optional(),
+});
+
+export type TRejectDocumentWithTokenMutationSchema = z.infer<
+  typeof ZRejectDocumentWithTokenMutationSchema
+>;
