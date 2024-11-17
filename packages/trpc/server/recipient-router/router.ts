@@ -2,6 +2,7 @@ import { TRPCError } from '@trpc/server';
 
 import { completeDocumentWithToken } from '@documenso/lib/server-only/document/complete-document-with-token';
 import { rejectDocumentWithToken } from '@documenso/lib/server-only/document/reject-document-with-token';
+import { setRecipientExpiry } from '@documenso/lib/server-only/recipient/set-recipient-expiry';
 import { setRecipientsForDocument } from '@documenso/lib/server-only/recipient/set-recipients-for-document';
 import { setRecipientsForTemplate } from '@documenso/lib/server-only/recipient/set-recipients-for-template';
 import { extractNextApiRequestMetadata } from '@documenso/lib/universal/extract-request-metadata';
@@ -12,6 +13,7 @@ import {
   ZAddTemplateSignersMutationSchema,
   ZCompleteDocumentWithTokenMutationSchema,
   ZRejectDocumentWithTokenMutationSchema,
+  ZSetSignerExpirySchema,
 } from './schema';
 
 export const recipientRouter = router({
@@ -41,6 +43,30 @@ export const recipientRouter = router({
         throw new TRPCError({
           code: 'BAD_REQUEST',
           message: 'We were unable to set this field. Please try again later.',
+        });
+      }
+    }),
+
+  setSignerExpiry: authenticatedProcedure
+    .input(ZSetSignerExpirySchema)
+    .mutation(async ({ input, ctx }) => {
+      try {
+        const { documentId, signerId, expiry, teamId } = input;
+
+        return await setRecipientExpiry({
+          documentId,
+          recipientId: signerId,
+          expiry,
+          teamId,
+          userId: ctx.user.id,
+          requestMetadata: extractNextApiRequestMetadata(ctx.req),
+        });
+      } catch (error) {
+        console.log(error);
+
+        throw new TRPCError({
+          code: 'BAD_REQUEST',
+          message: "We're unable to set the expiry for this signer. Please try again later.",
         });
       }
     }),

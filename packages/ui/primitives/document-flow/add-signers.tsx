@@ -52,6 +52,7 @@ export type AddSignersFormProps = {
   isDocumentEnterprise: boolean;
   onSubmit: (_data: TAddSignersFormSchema) => void;
   isDocumentPdfLoaded: boolean;
+  documentId: number;
 };
 
 export const AddSignersFormPartial = ({
@@ -62,6 +63,7 @@ export const AddSignersFormPartial = ({
   isDocumentEnterprise,
   onSubmit,
   isDocumentPdfLoaded,
+  documentId,
 }: AddSignersFormProps) => {
   const { _ } = useLingui();
   const { toast } = useToast();
@@ -634,6 +636,8 @@ export const AddSignersFormPartial = ({
                                     'mb-6': form.formState.errors.signers?.[index],
                                   })}
                                   onDelete={() => onRemoveSigner(index)}
+                                  signer={signer}
+                                  documentId={documentId}
                                   deleteDisabled={
                                     snapshot.isDragging ||
                                     isSubmitting ||

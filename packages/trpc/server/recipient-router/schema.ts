@@ -80,3 +80,12 @@ export const ZRejectDocumentWithTokenMutationSchema = z.object({
 export type TRejectDocumentWithTokenMutationSchema = z.infer<
   typeof ZRejectDocumentWithTokenMutationSchema
 >;
+
+export const ZSetSignerExpirySchema = z.object({
+  documentId: z.number(),
+  signerId: z.number(),
+  expiry: z.date(),
+  teamId: z.number().optional(),
+});
+
+export type TSetSignerExpirySchema = z.infer<typeof ZSetSignerExpirySchema>;

@@ -1,12 +1,16 @@
 'use client';
 
+import { useRouter } from 'next/navigation';
+
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Trans } from '@lingui/macro';
+import { Trans, msg } from '@lingui/macro';
+import { useLingui } from '@lingui/react';
 import { format } from 'date-fns';
 import { Calendar as CalendarIcon } from 'lucide-react';
 import { useForm } from 'react-hook-form';
 import * as z from 'zod';
 
+import { trpc } from '@documenso/trpc/react';
 import { Button } from '@documenso/ui/primitives/button';
 import { Calendar } from '@documenso/ui/primitives/calendar';
 import {
@@ -30,9 +34,11 @@ import {
 import { Popover, PopoverContent, PopoverTrigger } from '@documenso/ui/primitives/popover';
 
 import { cn } from '../../lib/utils';
+import { useToast } from '../use-toast';
+import type { TAddSignerSchema as Signer } from './add-signers.types';
 
 const formSchema = z.object({
-  expiryDate: z.date({
+  expiry: z.date({
     required_error: 'Please select an expiry date.',
   }),
 });
@@ -40,37 +46,61 @@ const formSchema = z.object({
 type DocumentExpiryDialogProps = {
   open: boolean;
   onOpenChange: (_open: boolean) => void;
+  signer: Signer;
+  documentId: number;
 };
 
-export default function DocumentExpiryDialog({ open, onOpenChange }: DocumentExpiryDialogProps) {
+export default function DocumentExpiryDialog({
+  open,
+  onOpenChange,
+  signer,
+  documentId,
+}: DocumentExpiryDialogProps) {
+  const { toast } = useToast();
+  const router = useRouter();
+
+  const { _ } = useLingui();
+
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
   });
 
-  // const { mutateAsync: moveDocument, isLoading } = trpc.document.moveDocumentToTeam.useMutation({
-  //   onSuccess: () => {
-  //     router.refresh();
-  //     toast({
-  //       title: _(msg`Document moved`),
-  //       description: _(msg`The document has been successfully moved to the selected team.`),
-  //       duration: 5000,
-  //     });
-  //     onOpenChange(false);
-  //   },
-  //   onError: (error) => {
-  //     toast({
-  //       title: _(msg`Error`),
-  //       description: error.message || _(msg`An error occurred while moving the document.`),
-  //       variant: 'destructive',
-  //       duration: 7500,
-  //     });
-  //   },
-  // });
+  const { mutateAsync: setSignerExpiry, isLoading } = trpc.recipient.setSignerExpiry.useMutation({
+    onSuccess: () => {
+      router.refresh();
+      toast({
+        title: _(msg`Signer Expiry Set`),
+        description: _(msg`The expiry date for the signer has been set.`),
+        duration: 5000,
+      });
+      onOpenChange(false);
+    },
+    onError: (error) => {
+      toast({
+        title: _(msg`Error`),
+        description: error.message || _(msg`An error occurred while setting the expiry date.`),
+        variant: 'destructive',
+        duration: 7500,
+      });
+    },
+  });
 
-  function onSubmit(values: z.infer<typeof formSchema>) {
-    console.log(values);
-    onOpenChange(false);
-  }
+  const onSetExpiry = async (values: z.infer<typeof formSchema>) => {
+    if (!signer.nativeId) {
+      return toast({
+        title: _(msg`Error`),
+        description: _(msg`An error occurred while setting the expiry date.`),
+        variant: 'destructive',
+        duration: 7500,
+      });
+    }
+
+    await setSignerExpiry({
+      documentId,
+      signerId: signer.nativeId,
+      expiry: new Date(values.expiry),
+    });
+  };
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -83,10 +113,10 @@ export default function DocumentExpiryDialog({ open, onOpenChange }: DocumentExp
           </DialogDescription>
         </DialogHeader>
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+          <form onSubmit={form.handleSubmit(onSetExpiry)} className="space-y-8">
             <FormField
               control={form.control}
-              name="expiryDate"
+              name="expiry"
               render={({ field }) => (
                 <FormItem className="flex flex-col">
                   <FormLabel>Expiry Date</FormLabel>
@@ -128,7 +158,7 @@ export default function DocumentExpiryDialog({ open, onOpenChange }: DocumentExp
                   <Trans>Cancel</Trans>
                 </Button>
               </DialogClose>
-              <Button type="submit">
+              <Button type="submit" loading={isLoading}>
                 <Trans>Save Changes</Trans>
               </Button>
             </DialogFooter>

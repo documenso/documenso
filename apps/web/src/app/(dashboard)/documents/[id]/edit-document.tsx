@@ -419,6 +419,8 @@ export const EditDocumentForm = ({
               isDocumentEnterprise={isDocumentEnterprise}
               onSubmit={onAddSignersFormSubmit}
               isDocumentPdfLoaded={isDocumentPdfLoaded}
+              documentId={document.id}
+              // teamId={team?.id}
             />
 
             <AddFieldsFormPartial

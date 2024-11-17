@@ -6,24 +6,22 @@ import { ZRecipientActionAuthTypesSchema } from '@documenso/lib/types/document-a
 import { ZMapNegativeOneToUndefinedSchema } from './add-settings.types';
 import { DocumentSigningOrder, RecipientRole } from '.prisma/client';
 
+export const ZAddSignerSchema = z.object({
+  formId: z.string().min(1),
+  nativeId: z.number().optional(),
+  email: z
+    .string()
+    .email({ message: msg`Invalid email`.id })
+    .min(1),
+  name: z.string(),
+  role: z.nativeEnum(RecipientRole),
+  signingOrder: z.number().optional(),
+  actionAuth: ZMapNegativeOneToUndefinedSchema.pipe(ZRecipientActionAuthTypesSchema.optional()),
+});
+
 export const ZAddSignersFormSchema = z
   .object({
-    signers: z.array(
-      z.object({
-        formId: z.string().min(1),
-        nativeId: z.number().optional(),
-        email: z
-          .string()
-          .email({ message: msg`Invalid email`.id })
-          .min(1),
-        name: z.string(),
-        role: z.nativeEnum(RecipientRole),
-        signingOrder: z.number().optional(),
-        actionAuth: ZMapNegativeOneToUndefinedSchema.pipe(
-          ZRecipientActionAuthTypesSchema.optional(),
-        ),
-      }),
-    ),
+    signers: z.array(ZAddSignerSchema),
     signingOrder: z.nativeEnum(DocumentSigningOrder),
   })
   .refine(
@@ -37,3 +35,4 @@ export const ZAddSignersFormSchema = z
   );
 
 export type TAddSignersFormSchema = z.infer<typeof ZAddSignersFormSchema>;
+export type TAddSignerSchema = z.infer<typeof ZAddSignerSchema>;

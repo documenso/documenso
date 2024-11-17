@@ -13,15 +13,23 @@ import {
 } from '@documenso/ui/primitives/dropdown-menu';
 
 import { cn } from '../../lib/utils';
+import type { TAddSignerSchema as Signer } from './add-signers.types';
 import DocumentExpiryDialog from './document-expiry-dialog';
 
 type SignerActionDropdownProps = {
   onDelete: () => void;
   deleteDisabled?: boolean;
   className?: string;
+  signer: Signer;
+  documentId: number;
 };
 
-export function SignerActionDropdown({ deleteDisabled, className }: SignerActionDropdownProps) {
+export function SignerActionDropdown({
+  deleteDisabled,
+  className,
+  signer,
+  documentId,
+}: SignerActionDropdownProps) {
   const [isExpiryDialogOpen, setExpiryDialogOpen] = useState(false);
 
   return (
@@ -45,7 +53,12 @@ export function SignerActionDropdown({ deleteDisabled, className }: SignerAction
           </DropdownMenuContent>
         </DropdownMenu>
       </div>
-      <DocumentExpiryDialog open={isExpiryDialogOpen} onOpenChange={setExpiryDialogOpen} />
+      <DocumentExpiryDialog
+        open={isExpiryDialogOpen}
+        onOpenChange={setExpiryDialogOpen}
+        signer={signer}
+        documentId={documentId}
+      />
     </>
   );
 }
