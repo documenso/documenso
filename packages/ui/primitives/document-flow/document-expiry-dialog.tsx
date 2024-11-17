@@ -66,7 +66,7 @@ type DocumentExpiryDialogProps = {
   documentId: number;
 };
 
-export default function DocumentExpiryDialog({
+export function DocumentExpiryDialog({
   open,
   onOpenChange,
   signer,
@@ -98,12 +98,12 @@ export default function DocumentExpiryDialog({
   const watchUnit = periodForm.watch('unit');
 
   const { mutateAsync: setSignerExpiry, isLoading } = trpc.recipient.setSignerExpiry.useMutation({
-    onSuccess: ({ expired }) => {
+    onSuccess: (updatedRecipient) => {
       router.refresh();
 
       periodForm.reset(
-        expired
-          ? calculatePeriod(expired)
+        updatedRecipient?.expired
+          ? calculatePeriod(updatedRecipient.expired)
           : {
               amount: undefined,
               unit: undefined,
@@ -112,7 +112,7 @@ export default function DocumentExpiryDialog({
 
       dateForm.reset(
         {
-          expiry: expired ?? undefined,
+          expiry: updatedRecipient?.expired ?? undefined,
         },
         {
           keepValues: false,
@@ -166,8 +166,6 @@ export default function DocumentExpiryDialog({
           break;
       }
     }
-
-    console.log('finalll expiry date', expiryDate);
 
     await setSignerExpiry({
       documentId,

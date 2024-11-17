@@ -1,5 +1,6 @@
-import type { I18n } from '@lingui/core';
+import { type I18n, i18n } from '@lingui/core';
 import { msg } from '@lingui/macro';
+import { DateTime } from 'luxon';
 import { match } from 'ts-pattern';
 
 import type { DocumentAuditLog, DocumentMeta, Field, Recipient } from '@documenso/prisma/client';
@@ -73,7 +74,7 @@ export const parseDocumentAuditLogData = (auditLog: DocumentAuditLog): TDocument
   return data.data;
 };
 
-type PartialRecipient = Pick<Recipient, 'email' | 'name' | 'role' | 'authOptions'>;
+type PartialRecipient = Pick<Recipient, 'email' | 'name' | 'role' | 'authOptions' | 'expired'>;
 
 export const diffRecipientChanges = (
   oldRecipient: PartialRecipient,
@@ -128,6 +129,18 @@ export const diffRecipientChanges = (
       type: RECIPIENT_DIFF_TYPE.NAME,
       from: oldRecipient.name,
       to: newRecipient.name,
+    });
+  }
+
+  if (oldRecipient.expired !== newRecipient.expired) {
+    diffs.push({
+      type: RECIPIENT_DIFF_TYPE.EXPIRY,
+      from: DateTime.fromJSDate(oldRecipient.expired!)
+        .setLocale(i18n.locales?.[0] || i18n.locale)
+        .toLocaleString(DateTime.DATETIME_FULL),
+      to: DateTime.fromJSDate(newRecipient.expired!)
+        .setLocale(i18n.locales?.[0] || i18n.locale)
+        .toLocaleString(DateTime.DATETIME_FULL),
     });
   }
 
@@ -349,10 +362,20 @@ export const formatDocumentAuditLogAction = (
         identified: result,
       };
     })
-    .with({ type: DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_RECIPIENT_REJECTED }, ({ data }) => {
+    .with({ type: DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_RECIPIENT_REJECTED }, () => {
       const userName = prefix || _(msg`Recipient`);
 
       const result = msg`${userName} rejected the document`;
+
+      return {
+        anonymous: result,
+        identified: result,
+      };
+    })
+    .with({ type: DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_RECIPIENT_EXPIRED }, () => {
+      const userName = prefix || _(msg`Recipient`);
+
+      const result = msg`${userName} expired`;
 
       return {
         anonymous: result,

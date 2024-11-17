@@ -14,7 +14,7 @@ import {
 
 import { cn } from '../../lib/utils';
 import type { TAddSignerSchema as Signer } from './add-signers.types';
-import DocumentExpiryDialog from './document-expiry-dialog';
+import { DocumentExpiryDialog } from './document-expiry-dialog';
 
 type SignerActionDropdownProps = {
   onDelete: () => void;
@@ -29,6 +29,7 @@ export function SignerActionDropdown({
   className,
   signer,
   documentId,
+  onDelete,
 }: SignerActionDropdownProps) {
   const [isExpiryDialogOpen, setExpiryDialogOpen] = useState(false);
 
@@ -45,7 +46,7 @@ export function SignerActionDropdown({
                 <Timer className="h-4 w-4" />
                 Expiry
               </DropdownMenuItem>
-              <DropdownMenuItem disabled={deleteDisabled} className="gap-x-2">
+              <DropdownMenuItem disabled={deleteDisabled} className="gap-x-2" onClick={onDelete}>
                 <Trash className="h-4 w-4" />
                 Delete
               </DropdownMenuItem>

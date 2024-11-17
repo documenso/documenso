@@ -1,7 +1,9 @@
 import { prisma } from '@documenso/prisma';
 import type { Team } from '@documenso/prisma/client';
 
+import { DOCUMENT_AUDIT_LOG_TYPE } from '../../types/document-audit-logs';
 import type { RequestMetadata } from '../../universal/extract-request-metadata';
+import { createDocumentAuditLogData, diffRecipientChanges } from '../../utils/document-audit-logs';
 
 export type SetRecipientExpiryOptions = {
   documentId: number;
@@ -70,7 +72,7 @@ export const setRecipientExpiry = async ({
   }
 
   const updatedRecipient = await prisma.$transaction(async (tx) => {
-    const updated = await tx.recipient.update({
+    const persisted = await tx.recipient.update({
       where: {
         id: recipient.id,
       },
@@ -79,28 +81,31 @@ export const setRecipientExpiry = async ({
       },
     });
 
-    // TODO: fix the audit logs
-    // await tx.documentAuditLog.create({
-    //   data: createDocumentAuditLogData({
-    //     type: 'RECIPIENT_EXPIRY_UPDATED',
-    //     documentId,
-    //     user: {
-    //       id: team?.id ?? user.id,
-    //       email: team?.name ?? user.email,
-    //       name: team ? '' : user.name,
-    //     },
-    //     data: {
-    //       recipientEmail: recipient.email,
-    //       recipientName: recipient.name,
-    //       recipientId: recipient.id,
-    //       recipientRole: recipient.role,
-    //       expiry,
-    //     },
-    //     requestMetadata,
-    //   }),
-    // });
+    const changes = diffRecipientChanges(recipient, persisted);
 
-    return updated;
+    if (changes.length > 0) {
+      await tx.documentAuditLog.create({
+        data: createDocumentAuditLogData({
+          type: DOCUMENT_AUDIT_LOG_TYPE.RECIPIENT_UPDATED,
+          documentId: documentId,
+          user: {
+            id: team?.id ?? user.id,
+            name: team?.name ?? user.name,
+            email: team ? '' : user.email,
+          },
+          requestMetadata,
+          data: {
+            changes,
+            recipientId,
+            recipientEmail: persisted.email,
+            recipientName: persisted.name,
+            recipientRole: persisted.role,
+          },
+        }),
+      });
+
+      return persisted;
+    }
   });
 
   return updatedRecipient;
