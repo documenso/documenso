@@ -15,9 +15,8 @@ import { getRecipientsForDocument } from '@documenso/lib/server-only/recipient/g
 import { DocumentVisibility } from '@documenso/lib/types/document-visibility';
 import { symmetricDecrypt } from '@documenso/lib/universal/crypto';
 import { formatDocumentsPath } from '@documenso/lib/utils/teams';
-import { DocumentStatus } from '@documenso/prisma/client';
 import type { Team, TeamEmail } from '@documenso/prisma/client';
-import { TeamMemberRole } from '@documenso/prisma/client';
+import { DocumentStatus, SigningStatus, TeamMemberRole } from '@documenso/prisma/client';
 import { Badge } from '@documenso/ui/primitives/badge';
 import { Button } from '@documenso/ui/primitives/button';
 import { Card, CardContent } from '@documenso/ui/primitives/card';
@@ -218,7 +217,7 @@ export const DocumentPageView = async ({ params, team }: DocumentPageViewProps) 
                 <DocumentPageViewDropdown document={documentWithRecipients} team={team} />
               </div>
 
-              <p className="text-muted-foreground mt-2 px-4 text-sm ">
+              <p className="text-muted-foreground mt-2 px-4 text-sm">
                 {match(document.status)
                   .with(DocumentStatus.COMPLETED, () => (
                     <Trans>This document has been signed by all recipients</Trans>
@@ -228,8 +227,52 @@ export const DocumentPageView = async ({ params, team }: DocumentPageViewProps) 
                   ))
                   .with(DocumentStatus.PENDING, () => {
                     const pendingRecipients = recipients.filter(
-                      (recipient) => recipient.signingStatus === 'NOT_SIGNED',
+                      (recipient) => recipient.signingStatus === SigningStatus.NOT_SIGNED,
                     );
+                    const rejectedCount = recipients.filter(
+                      (recipient) => recipient.signingStatus === SigningStatus.REJECTED,
+                    ).length;
+                    const expiredCount = recipients.filter(
+                      (recipient) => recipient.signingStatus === SigningStatus.EXPIRED,
+                    ).length;
+
+                    if (rejectedCount > 0 && expiredCount > 0) {
+                      return (
+                        <>
+                          <Plural
+                            value={rejectedCount}
+                            one="1 recipient has rejected the document"
+                            other="# recipients have rejected the document"
+                          />
+                          {' and '}
+                          <Plural
+                            value={expiredCount}
+                            one="1 recipient's signing link has expired"
+                            other="# recipients' signing links have expired"
+                          />
+                        </>
+                      );
+                    }
+
+                    if (rejectedCount > 0) {
+                      return (
+                        <Plural
+                          value={rejectedCount}
+                          one="1 recipient has rejected the document"
+                          other="# recipients have rejected the document"
+                        />
+                      );
+                    }
+
+                    if (expiredCount > 0) {
+                      return (
+                        <Plural
+                          value={expiredCount}
+                          one="1 recipient's signing link has expired"
+                          other="# recipients' signing links have expired"
+                        />
+                      );
+                    }
 
                     return (
                       <Plural

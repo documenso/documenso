@@ -2,7 +2,7 @@ import Link from 'next/link';
 import { notFound } from 'next/navigation';
 
 import { Trans } from '@lingui/macro';
-import { Clock } from 'lucide-react';
+import { Timer } from 'lucide-react';
 
 import { setupI18nSSR } from '@documenso/lib/client-only/providers/i18n.server';
 import { getServerComponentSession } from '@documenso/lib/next-auth/get-server-component-session';
@@ -67,7 +67,7 @@ export default async function ExpiredSigningPage({ params: { token } }: ExpiredS
 
       <div className="flex flex-col items-center">
         <div className="flex items-center gap-x-4">
-          <Clock className="text-destructive h-10 w-10" />
+          <Timer className="text-destructive h-10 w-10" />
           <h2 className="max-w-[35ch] text-center text-2xl font-semibold leading-normal md:text-3xl lg:text-4xl">
             <Trans>Document Expired</Trans>
           </h2>
