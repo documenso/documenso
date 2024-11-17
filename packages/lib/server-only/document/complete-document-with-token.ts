@@ -16,6 +16,7 @@ import type { TRecipientActionAuth } from '../../types/document-auth';
 import { getIsRecipientsTurnToSign } from '../recipient/get-is-recipient-turn';
 import { triggerWebhook } from '../webhooks/trigger/trigger-webhook';
 import { sendPendingEmail } from './send-pending-email';
+import { updateExpiredRecipients } from './update-expired-recipients';
 
 export type CompleteDocumentWithTokenOptions = {
   token: string;
@@ -61,10 +62,20 @@ export const completeDocumentWithToken = async ({
     throw new Error(`Document ${document.id} has no recipient with token ${token}`);
   }
 
+  await updateExpiredRecipients(documentId);
+
   const [recipient] = document.Recipient;
+
+  if (recipient.expired && recipient.expired < new Date()) {
+    throw new Error(`Recipient ${recipient.id} signature period has expired`);
+  }
 
   if (recipient.signingStatus === SigningStatus.SIGNED) {
     throw new Error(`Recipient ${recipient.id} has already signed`);
+  }
+
+  if (recipient.signingStatus === SigningStatus.EXPIRED) {
+    throw new Error(`Recipient ${recipient.id} signature period has expired`);
   }
 
   if (document.documentMeta?.signingOrder === DocumentSigningOrder.SEQUENTIAL) {

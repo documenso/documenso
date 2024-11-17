@@ -101,6 +101,8 @@ export const ResendDocumentActionItem = ({
 
       setIsOpen(false);
     } catch (err) {
+      console.log(err);
+
       toast({
         title: _(msg`Something went wrong`),
         description: _(msg`This document could not be re-sent at this time. Please try again.`),

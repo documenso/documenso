@@ -184,7 +184,7 @@ export function DocumentExpiryDialog({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-[450px]">
         <DialogHeader>
-          <DialogTitle>Set Document Expiry</DialogTitle>
+          <DialogTitle>Set Recipient Expiry</DialogTitle>
           <DialogDescription>
             Set the expiry date for the document signing recipient. The recipient will not be able
             to sign the document after this date.

@@ -14,8 +14,8 @@ import type { RequestMetadata } from '@documenso/lib/universal/extract-request-m
 import { createDocumentAuditLogData } from '@documenso/lib/utils/document-audit-logs';
 import { renderCustomEmailTemplate } from '@documenso/lib/utils/render-custom-email-template';
 import { prisma } from '@documenso/prisma';
-import { DocumentStatus, RecipientRole, SigningStatus } from '@documenso/prisma/client';
 import type { Prisma } from '@documenso/prisma/client';
+import { DocumentStatus, RecipientRole, SigningStatus } from '@documenso/prisma/client';
 
 import { getI18nInstance } from '../../client-only/providers/i18n.server';
 import { NEXT_PUBLIC_WEBAPP_URL } from '../../constants/app';
@@ -104,6 +104,23 @@ export const resendDocument = async ({
     document.Recipient.map(async (recipient) => {
       if (recipient.role === RecipientRole.CC) {
         return;
+      }
+
+      let newExpiryDate: Date | null = null;
+      if (recipient.expired) {
+        const durationInMs = recipient.expired.getTime() - document.updatedAt.getTime();
+        newExpiryDate = new Date(Date.now() + durationInMs);
+
+        await prisma.recipient.update({
+          where: { id: recipient.id },
+          data: {
+            expired: newExpiryDate,
+            signingStatus:
+              recipient.signingStatus === SigningStatus.EXPIRED
+                ? SigningStatus.NOT_SIGNED
+                : recipient.signingStatus,
+          },
+        });
       }
 
       const i18n = await getI18nInstance(document.documentMeta?.language);
