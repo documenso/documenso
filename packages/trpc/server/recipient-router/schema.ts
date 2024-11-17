@@ -16,6 +16,7 @@ export const ZAddSignersMutationSchema = z
         email: z.string().email().min(1),
         name: z.string(),
         role: z.nativeEnum(RecipientRole),
+        signingOrder: z.number().optional(),
         actionAuth: ZRecipientActionAuthTypesSchema.optional().nullable(),
       }),
     ),
@@ -42,6 +43,7 @@ export const ZAddTemplateSignersMutationSchema = z
         email: z.string().email().min(1),
         name: z.string(),
         role: z.nativeEnum(RecipientRole),
+        signingOrder: z.number().optional(),
         actionAuth: ZRecipientActionAuthTypesSchema.optional().nullable(),
       }),
     ),
@@ -66,4 +68,15 @@ export const ZCompleteDocumentWithTokenMutationSchema = z.object({
 
 export type TCompleteDocumentWithTokenMutationSchema = z.infer<
   typeof ZCompleteDocumentWithTokenMutationSchema
+>;
+
+export const ZRejectDocumentWithTokenMutationSchema = z.object({
+  token: z.string(),
+  documentId: z.number(),
+  reason: z.string(),
+  authOptions: ZRecipientActionAuthSchema.optional(),
+});
+
+export type TRejectDocumentWithTokenMutationSchema = z.infer<
+  typeof ZRejectDocumentWithTokenMutationSchema
 >;

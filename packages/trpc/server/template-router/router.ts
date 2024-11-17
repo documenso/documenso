@@ -1,6 +1,7 @@
 import { TRPCError } from '@trpc/server';
 
 import { getServerLimits } from '@documenso/ee/server-only/limits/server';
+import { isValidLanguageCode } from '@documenso/lib/constants/i18n';
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import { sendDocument } from '@documenso/lib/server-only/document/send-document';
 import { createDocumentFromDirectTemplate } from '@documenso/lib/server-only/template/create-document-from-direct-template';
@@ -31,6 +32,7 @@ import {
   ZFindTemplatesQuerySchema,
   ZGetTemplateWithDetailsByIdQuerySchema,
   ZMoveTemplatesToTeamSchema,
+  ZSetSigningOrderForTemplateMutationSchema,
   ZToggleTemplateDirectLinkMutationSchema,
   ZUpdateTemplateSettingsMutationSchema,
 } from './schema';
@@ -100,7 +102,7 @@ export const templateRouter = router({
     .input(ZCreateDocumentFromTemplateMutationSchema)
     .mutation(async ({ input, ctx }) => {
       try {
-        const { templateId, teamId } = input;
+        const { templateId, teamId, recipients } = input;
 
         const limits = await getServerLimits({ email: ctx.user.email, teamId });
 
@@ -114,11 +116,11 @@ export const templateRouter = router({
           templateId,
           teamId,
           userId: ctx.user.id,
-          recipients: input.recipients,
+          recipients,
           requestMetadata,
         });
 
-        if (input.sendDocument) {
+        if (input.distributeDocument) {
           document = await sendDocument({
             documentId: document.id,
             userId: ctx.user.id,
@@ -213,7 +215,10 @@ export const templateRouter = router({
           teamId,
           templateId,
           data,
-          meta,
+          meta: {
+            ...meta,
+            language: isValidLanguageCode(meta?.language) ? meta?.language : undefined,
+          },
           requestMetadata,
         });
       } catch (err) {
@@ -223,6 +228,31 @@ export const templateRouter = router({
           code: 'BAD_REQUEST',
           message:
             'We were unable to update the settings for this template. Please try again later.',
+        });
+      }
+    }),
+
+  setSigningOrderForTemplate: authenticatedProcedure
+    .input(ZSetSigningOrderForTemplateMutationSchema)
+    .mutation(async ({ input, ctx }) => {
+      try {
+        const { templateId, teamId, signingOrder } = input;
+
+        return await updateTemplateSettings({
+          templateId,
+          teamId,
+          data: {},
+          meta: { signingOrder },
+          userId: ctx.user.id,
+          requestMetadata: extractNextApiRequestMetadata(ctx.req),
+        });
+      } catch (err) {
+        console.error(err);
+
+        throw new TRPCError({
+          code: 'BAD_REQUEST',
+          message:
+            'We were unable to update the settings for this document. Please try again later.',
         });
       }
     }),

@@ -42,7 +42,7 @@ export const seedTeam = async ({
         createMany: {
           data: [teamOwner, ...teamMembers].map((user) => ({
             userId: user.id,
-            role: TeamMemberRole.ADMIN,
+            role: user === teamOwner ? TeamMemberRole.ADMIN : TeamMemberRole.MEMBER,
           })),
         },
       },
@@ -97,6 +97,46 @@ export const unseedTeam = async (teamUrl: string) => {
     where: {
       id: {
         in: team.members.map((member) => member.userId),
+      },
+    },
+  });
+};
+
+type SeedTeamMemberOptions = {
+  teamId: number;
+  role?: TeamMemberRole;
+  name?: string;
+};
+
+export const seedTeamMember = async ({
+  teamId,
+  name,
+  role = TeamMemberRole.ADMIN,
+}: SeedTeamMemberOptions) => {
+  const user = await seedUser({ name });
+
+  await prisma.teamMember.create({
+    data: {
+      teamId,
+      role,
+      userId: user.id,
+    },
+  });
+
+  return user;
+};
+
+type UnseedTeamMemberOptions = {
+  teamId: number;
+  userId: number;
+};
+
+export const unseedTeamMember = async ({ teamId, userId }: UnseedTeamMemberOptions) => {
+  await prisma.teamMember.delete({
+    where: {
+      userId_teamId: {
+        userId,
+        teamId,
       },
     },
   });

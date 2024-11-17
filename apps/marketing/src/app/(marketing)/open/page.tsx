@@ -131,7 +131,7 @@ const fetchEarlyAdopters = async () => {
 };
 
 export default async function OpenPage() {
-  setupI18nSSR();
+  await setupI18nSSR();
 
   const { _ } = useLingui();
 

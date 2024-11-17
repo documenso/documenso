@@ -1,61 +1,82 @@
 import type { ReadonlyRequestCookies } from 'next/dist/server/web/spec-extension/adapters/request-cookies';
 
-import type { I18n } from '@lingui/core';
+import type { I18n, MessageDescriptor } from '@lingui/core';
 
-import { IS_APP_WEB } from '../constants/app';
-import type { SupportedLanguageCodes } from '../constants/i18n';
+import { IS_APP_WEB, IS_APP_WEB_I18N_ENABLED } from '../constants/app';
+import type { I18nLocaleData, SupportedLanguageCodes } from '../constants/i18n';
 import { APP_I18N_OPTIONS } from '../constants/i18n';
 
 export async function dynamicActivate(i18nInstance: I18n, locale: string) {
-  const { messages } = await import(
-    `../translations/${locale}/${IS_APP_WEB ? 'web' : 'marketing'}.js`
-  );
+  const extension = process.env.NODE_ENV === 'development' ? 'po' : 'js';
+  const context = IS_APP_WEB ? 'web' : 'marketing';
+
+  let { messages } = await import(`../translations/${locale}/${context}.${extension}`);
+
+  // Dirty way to load common messages for development since it's not compiled.
+  if (process.env.NODE_ENV === 'development') {
+    const commonMessages = await import(`../translations/${locale}/common.${extension}`);
+
+    messages = {
+      ...messages,
+      ...commonMessages.messages,
+    };
+  }
 
   i18nInstance.loadAndActivate({ locale, messages });
 }
+
+const parseLanguageFromLocale = (locale: string): SupportedLanguageCodes | null => {
+  const [language, _country] = locale.split('-');
+
+  const foundSupportedLanguage = APP_I18N_OPTIONS.supportedLangs.find(
+    (lang): lang is SupportedLanguageCodes => lang === language,
+  );
+
+  if (!foundSupportedLanguage) {
+    return null;
+  }
+
+  return foundSupportedLanguage;
+};
 
 /**
  * Extract the language if supported from the cookies header.
  *
  * Returns `null` if not supported or not found.
  */
-export const extractSupportedLanguageFromCookies = (
+export const extractLocaleDataFromCookies = (
   cookies: ReadonlyRequestCookies,
 ): SupportedLanguageCodes | null => {
-  const preferredLanguage = cookies.get('i18n');
+  const preferredLocale = cookies.get('language')?.value || '';
 
-  const foundSupportedLanguage = APP_I18N_OPTIONS.supportedLangs.find(
-    (lang): lang is SupportedLanguageCodes => lang === preferredLanguage?.value,
-  );
+  const language = parseLanguageFromLocale(preferredLocale || '');
 
-  return foundSupportedLanguage || null;
+  if (!language) {
+    return null;
+  }
+
+  return language;
 };
 
 /**
  * Extracts the language from the `accept-language` header.
- *
- * Returns `null` if not supported or not found.
  */
-export const extractSupportedLanguageFromHeaders = (
+export const extractLocaleDataFromHeaders = (
   headers: Headers,
-): SupportedLanguageCodes | null => {
-  const locales = headers.get('accept-language') ?? '';
+): { lang: SupportedLanguageCodes | null; locales: string[] } => {
+  const headerLocales = (headers.get('accept-language') ?? '').split(',');
 
-  const [locale] = locales.split(',');
+  const language = parseLanguageFromLocale(headerLocales[0]);
 
-  // Convert locale to language.
-  const [language] = locale.split('-');
-
-  const foundSupportedLanguage = APP_I18N_OPTIONS.supportedLangs.find(
-    (lang): lang is SupportedLanguageCodes => lang === language,
-  );
-
-  return foundSupportedLanguage || null;
+  return {
+    lang: language,
+    locales: [headerLocales[0]],
+  };
 };
 
-type ExtractSupportedLanguageOptions = {
-  headers?: Headers;
-  cookies?: ReadonlyRequestCookies;
+type ExtractLocaleDataOptions = {
+  headers: Headers;
+  cookies: ReadonlyRequestCookies;
 };
 
 /**
@@ -63,25 +84,39 @@ type ExtractSupportedLanguageOptions = {
  *
  * Will return the default fallback language if not found.
  */
-export const extractSupportedLanguage = ({
+export const extractLocaleData = ({
   headers,
   cookies,
-}: ExtractSupportedLanguageOptions): SupportedLanguageCodes => {
-  if (cookies) {
-    const langCookie = extractSupportedLanguageFromCookies(cookies);
+}: ExtractLocaleDataOptions): I18nLocaleData => {
+  let lang: SupportedLanguageCodes | null = extractLocaleDataFromCookies(cookies);
 
-    if (langCookie) {
-      return langCookie;
-    }
+  const langHeader = extractLocaleDataFromHeaders(headers);
+
+  if (!lang && langHeader?.lang) {
+    lang = langHeader.lang;
   }
 
-  if (headers) {
-    const langHeader = extractSupportedLanguageFromHeaders(headers);
-
-    if (langHeader) {
-      return langHeader;
-    }
+  // Override web app to be English.
+  if (!IS_APP_WEB_I18N_ENABLED && IS_APP_WEB) {
+    lang = 'en';
   }
 
-  return APP_I18N_OPTIONS.sourceLang;
+  // Filter out locales that are not valid.
+  const locales = (langHeader?.locales ?? []).filter((locale) => {
+    try {
+      new Intl.Locale(locale);
+      return true;
+    } catch {
+      return false;
+    }
+  });
+
+  return {
+    lang: lang || APP_I18N_OPTIONS.sourceLang,
+    locales,
+  };
+};
+
+export const parseMessageDescriptor = (_: I18n['_'], value: string | MessageDescriptor) => {
+  return typeof value === 'string' ? value : _(value);
 };

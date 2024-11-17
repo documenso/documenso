@@ -3,10 +3,17 @@ import type { RequestMetadata } from '@documenso/lib/universal/extract-request-m
 import { putPdfFile } from '@documenso/lib/universal/upload/put-file';
 import { createDocumentAuditLogData } from '@documenso/lib/utils/document-audit-logs';
 import { prisma } from '@documenso/prisma';
-import { DocumentStatus, RecipientRole, SendStatus, SigningStatus } from '@documenso/prisma/client';
+import {
+  DocumentSigningOrder,
+  DocumentStatus,
+  RecipientRole,
+  SendStatus,
+  SigningStatus,
+} from '@documenso/prisma/client';
 import { WebhookTriggerEvents } from '@documenso/prisma/client';
 
 import { jobs } from '../../jobs/client';
+import { extractDerivedDocumentEmailSettings } from '../../types/document-email';
 import { getFile } from '../../universal/upload/get-file';
 import { insertFormValuesInPdf } from '../pdf/insert-form-values-in-pdf';
 import { triggerWebhook } from '../webhooks/trigger/trigger-webhook';
@@ -23,7 +30,7 @@ export const sendDocument = async ({
   documentId,
   userId,
   teamId,
-  sendEmail = true,
+  sendEmail,
   requestMetadata,
 }: SendDocumentOptions) => {
   const user = await prisma.user.findFirstOrThrow({
@@ -57,7 +64,9 @@ export const sendDocument = async ({
           }),
     },
     include: {
-      Recipient: true,
+      Recipient: {
+        orderBy: [{ signingOrder: { sort: 'asc', nulls: 'last' } }, { id: 'asc' }],
+      },
       documentMeta: true,
       documentData: true,
     },
@@ -73,6 +82,21 @@ export const sendDocument = async ({
 
   if (document.status === DocumentStatus.COMPLETED) {
     throw new Error('Can not send completed document');
+  }
+
+  const signingOrder = document.documentMeta?.signingOrder || DocumentSigningOrder.PARALLEL;
+
+  let recipientsToNotify = document.Recipient;
+
+  if (signingOrder === DocumentSigningOrder.SEQUENTIAL) {
+    // Get the currently active recipient.
+    recipientsToNotify = document.Recipient.filter(
+      (r) => r.signingStatus === SigningStatus.NOT_SIGNED && r.role !== RecipientRole.CC,
+    ).slice(0, 1);
+
+    // Secondary filter so we aren't resending if the current active recipient has already
+    // received the document.
+    recipientsToNotify.filter((r) => r.sendStatus !== SendStatus.SENT);
   }
 
   const { documentData } = document;
@@ -133,9 +157,16 @@ export const sendDocument = async ({
   //   throw new Error('Some signers have not been assigned a signature field.');
   // }
 
-  if (sendEmail) {
+  const isRecipientSigningRequestEmailEnabled = extractDerivedDocumentEmailSettings(
+    document.documentMeta,
+  ).recipientSigningRequest;
+
+  // Only send email if one of the following is true:
+  // - It is explicitly set
+  // - The email is enabled for signing requests AND sendEmail is undefined
+  if (sendEmail || (isRecipientSigningRequestEmailEnabled && sendEmail === undefined)) {
     await Promise.all(
-      document.Recipient.map(async (recipient) => {
+      recipientsToNotify.map(async (recipient) => {
         if (recipient.sendStatus === SendStatus.SENT || recipient.role === RecipientRole.CC) {
           return;
         }

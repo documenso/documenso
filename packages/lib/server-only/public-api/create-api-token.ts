@@ -51,7 +51,7 @@ export const createApiToken = async ({
       name: tokenName,
       token: hashedToken,
       expires: expiresIn ? DateTime.now().plus(timeConstantsRecords[expiresIn]).toJSDate() : null,
-      userId: teamId ? null : userId,
+      userId,
       teamId,
     },
   });

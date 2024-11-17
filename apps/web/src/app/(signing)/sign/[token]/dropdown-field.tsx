@@ -127,7 +127,7 @@ export const DropdownField = ({
         await removeSignedFieldWithToken(payload);
       }
 
-      setLocalChoice(parsedFieldMeta.defaultValue ?? '');
+      setLocalChoice('');
       startTransition(() => router.refresh());
     } catch (err) {
       console.error(err);
@@ -179,7 +179,7 @@ export const DropdownField = ({
 
         {!field.inserted && (
           <p className="group-hover:text-primary text-muted-foreground flex flex-col items-center justify-center duration-200">
-            <Select value={parsedFieldMeta.defaultValue} onValueChange={handleSelectItem}>
+            <Select value={localChoice} onValueChange={handleSelectItem}>
               <SelectTrigger
                 className={cn(
                   'text-muted-foreground z-10 h-full w-full border-none ring-0 focus:ring-0',
@@ -189,7 +189,10 @@ export const DropdownField = ({
                   },
                 )}
               >
-                <SelectValue placeholder={`-- ${_(msg`Select`)} --`} />
+                <SelectValue
+                  className="text-[clamp(0.625rem,1cqw,0.825rem)]"
+                  placeholder={`${_(msg`Select`)}`}
+                />
               </SelectTrigger>
               <SelectContent className="w-full ring-0 focus:ring-0" position="popper">
                 {parsedFieldMeta?.values?.map((item, index) => (
@@ -203,7 +206,7 @@ export const DropdownField = ({
         )}
 
         {field.inserted && (
-          <p className="text-muted-foreground dark:text-background/80 flex items-center justify-center gap-x-1 duration-200">
+          <p className="text-muted-foreground dark:text-background/80 text-[clamp(0.625rem,1cqw,0.825rem)] duration-200">
             {field.customText}
           </p>
         )}

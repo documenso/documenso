@@ -10,6 +10,7 @@ export type CreateDocumentFromTemplateLegacyOptions = {
     name?: string;
     email: string;
     role?: RecipientRole;
+    signingOrder?: number | null;
   }[];
 };
 
@@ -45,6 +46,12 @@ export const createDocumentFromTemplateLegacy = async ({
       Recipient: true,
       Field: true,
       templateDocumentData: true,
+      templateMeta: true,
+      team: {
+        include: {
+          teamGlobalSettings: true,
+        },
+      },
     },
   });
 
@@ -67,14 +74,28 @@ export const createDocumentFromTemplateLegacy = async ({
       userId,
       teamId: template.teamId,
       title: template.title,
+      visibility: template.team?.teamGlobalSettings?.documentVisibility,
       documentDataId: documentData.id,
       Recipient: {
         create: template.Recipient.map((recipient) => ({
           email: recipient.email,
           name: recipient.name,
           role: recipient.role,
+          signingOrder: recipient.signingOrder,
           token: nanoid(),
         })),
+      },
+      documentMeta: {
+        create: {
+          subject: template.templateMeta?.subject,
+          message: template.templateMeta?.message,
+          timezone: template.templateMeta?.timezone,
+          dateFormat: template.templateMeta?.dateFormat,
+          redirectUrl: template.templateMeta?.redirectUrl,
+          signingOrder: template.templateMeta?.signingOrder ?? undefined,
+          language:
+            template.templateMeta?.language || template.team?.teamGlobalSettings?.documentLanguage,
+        },
       },
     },
 
@@ -129,12 +150,14 @@ export const createDocumentFromTemplateLegacy = async ({
             name: recipient.name,
             email: recipient.email,
             role: recipient.role,
+            signingOrder: recipient.signingOrder,
           },
           create: {
             documentId: document.id,
             email: recipient.email,
             name: recipient.name,
             role: recipient.role,
+            signingOrder: recipient.signingOrder,
             token: nanoid(),
           },
         });

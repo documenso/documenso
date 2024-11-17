@@ -2,19 +2,24 @@ import React from 'react';
 
 import { redirect } from 'next/navigation';
 
+import { msg } from '@lingui/macro';
+import { useLingui } from '@lingui/react';
+import { DateTime } from 'luxon';
 import { match } from 'ts-pattern';
 import { UAParser } from 'ua-parser-js';
 
 import { setupI18nSSR } from '@documenso/lib/client-only/providers/i18n.server';
+import { APP_I18N_OPTIONS, ZSupportedLanguageCodeSchema } from '@documenso/lib/constants/i18n';
 import {
-  RECIPIENT_ROLES_DESCRIPTION_ENG,
-  RECIPIENT_ROLE_SIGNING_REASONS_ENG,
+  RECIPIENT_ROLES_DESCRIPTION,
+  RECIPIENT_ROLE_SIGNING_REASONS,
 } from '@documenso/lib/constants/recipient-roles';
 import { getEntireDocument } from '@documenso/lib/server-only/admin/get-entire-document';
 import { decryptSecondaryData } from '@documenso/lib/server-only/crypto/decrypt';
 import { getDocumentCertificateAuditLogs } from '@documenso/lib/server-only/document/get-document-certificate-audit-logs';
 import { DOCUMENT_AUDIT_LOG_TYPE } from '@documenso/lib/types/document-audit-logs';
 import { extractDocumentAuthMethods } from '@documenso/lib/utils/document-auth';
+import { dynamicActivate } from '@documenso/lib/utils/i18n';
 import { FieldType } from '@documenso/prisma/client';
 import { Card, CardContent } from '@documenso/ui/primitives/card';
 import {
@@ -27,7 +32,6 @@ import {
 } from '@documenso/ui/primitives/table';
 
 import { Logo } from '~/components/branding/logo';
-import { LocaleDate } from '~/components/formatter/locale-date';
 
 type SigningCertificateProps = {
   searchParams: {
@@ -36,12 +40,20 @@ type SigningCertificateProps = {
 };
 
 const FRIENDLY_SIGNING_REASONS = {
-  ['__OWNER__']: `I am the owner of this document`,
-  ...RECIPIENT_ROLE_SIGNING_REASONS_ENG,
+  ['__OWNER__']: msg`I am the owner of this document`,
+  ...RECIPIENT_ROLE_SIGNING_REASONS,
 };
 
+/**
+ * DO NOT USE TRANS. YOU MUST USE _ FOR THIS FILE AND ALL CHILDREN COMPONENTS.
+ *
+ * Cannot use dynamicActivate by itself to translate this specific page and all
+ * children components because `not-found.tsx` page runs and overrides the i18n.
+ */
 export default async function SigningCertificate({ searchParams }: SigningCertificateProps) {
-  setupI18nSSR();
+  const { i18n } = await setupI18nSSR();
+
+  const { _ } = useLingui();
 
   const { d } = searchParams;
 
@@ -64,6 +76,10 @@ export default async function SigningCertificate({ searchParams }: SigningCertif
   if (!document) {
     return redirect('/');
   }
+
+  const documentLanguage = ZSupportedLanguageCodeSchema.parse(document.documentMeta?.language);
+
+  await dynamicActivate(i18n, documentLanguage);
 
   const auditLogs = await getDocumentCertificateAuditLogs({
     id: documentId,
@@ -100,17 +116,17 @@ export default async function SigningCertificate({ searchParams }: SigningCertif
     });
 
     let authLevel = match(extractedAuthMethods.derivedRecipientActionAuth)
-      .with('ACCOUNT', () => 'Account Re-Authentication')
-      .with('TWO_FACTOR_AUTH', () => 'Two-Factor Re-Authentication')
-      .with('PASSKEY', () => 'Passkey Re-Authentication')
-      .with('EXPLICIT_NONE', () => 'Email')
+      .with('ACCOUNT', () => _(msg`Account Re-Authentication`))
+      .with('TWO_FACTOR_AUTH', () => _(msg`Two-Factor Re-Authentication`))
+      .with('PASSKEY', () => _(msg`Passkey Re-Authentication`))
+      .with('EXPLICIT_NONE', () => _(msg`Email`))
       .with(null, () => null)
       .exhaustive();
 
     if (!authLevel) {
       authLevel = match(extractedAuthMethods.derivedRecipientAccessAuth)
-        .with('ACCOUNT', () => 'Account Authentication')
-        .with(null, () => 'Email')
+        .with('ACCOUNT', () => _(msg`Account Authentication`))
+        .with(null, () => _(msg`Email`))
         .exhaustive();
     }
 
@@ -149,7 +165,7 @@ export default async function SigningCertificate({ searchParams }: SigningCertif
   return (
     <div className="print-provider pointer-events-none mx-auto max-w-screen-md">
       <div className="flex items-center">
-        <h1 className="my-8 text-2xl font-bold">Signing Certificate</h1>
+        <h1 className="my-8 text-2xl font-bold">{_(msg`Signing Certificate`)}</h1>
       </div>
 
       <Card>
@@ -157,9 +173,9 @@ export default async function SigningCertificate({ searchParams }: SigningCertif
           <Table overflowHidden>
             <TableHeader>
               <TableRow>
-                <TableHead>Signer Events</TableHead>
-                <TableHead>Signature</TableHead>
-                <TableHead>Details</TableHead>
+                <TableHead>{_(msg`Signer Events`)}</TableHead>
+                <TableHead>{_(msg`Signature`)}</TableHead>
+                <TableHead>{_(msg`Details`)}</TableHead>
                 {/* <TableHead>Security</TableHead> */}
               </TableRow>
             </TableHeader>
@@ -175,11 +191,11 @@ export default async function SigningCertificate({ searchParams }: SigningCertif
                       <div className="hyphens-auto break-words font-medium">{recipient.name}</div>
                       <div className="break-all">{recipient.email}</div>
                       <p className="text-muted-foreground mt-2 text-sm print:text-xs">
-                        {RECIPIENT_ROLES_DESCRIPTION_ENG[recipient.role].roleName}
+                        {_(RECIPIENT_ROLES_DESCRIPTION[recipient.role].roleName)}
                       </p>
 
                       <p className="text-muted-foreground mt-2 text-sm print:text-xs">
-                        <span className="font-medium">Authentication Level:</span>{' '}
+                        <span className="font-medium">{_(msg`Authentication Level`)}:</span>{' '}
                         <span className="block">{getAuthenticationLevel(recipient.id)}</span>
                       </p>
                     </TableCell>
@@ -201,21 +217,21 @@ export default async function SigningCertificate({ searchParams }: SigningCertif
                           </div>
 
                           <p className="text-muted-foreground mt-2 text-sm print:text-xs">
-                            <span className="font-medium">Signature ID:</span>{' '}
+                            <span className="font-medium">{_(msg`Signature ID`)}:</span>{' '}
                             <span className="block font-mono uppercase">
                               {signature.secondaryId}
                             </span>
                           </p>
 
                           <p className="text-muted-foreground mt-2 text-sm print:text-xs">
-                            <span className="font-medium">IP Address:</span>{' '}
+                            <span className="font-medium">{_(msg`IP Address`)}:</span>{' '}
                             <span className="inline-block">
-                              {logs.DOCUMENT_RECIPIENT_COMPLETED[0]?.ipAddress ?? 'Unknown'}
+                              {logs.DOCUMENT_RECIPIENT_COMPLETED[0]?.ipAddress ?? _(msg`Unknown`)}
                             </span>
                           </p>
 
                           <p className="text-muted-foreground mt-1 text-sm print:text-xs">
-                            <span className="font-medium">Device:</span>{' '}
+                            <span className="font-medium">{_(msg`Device`)}:</span>{' '}
                             <span className="inline-block">
                               {getDevice(logs.DOCUMENT_RECIPIENT_COMPLETED[0]?.userAgent)}
                             </span>
@@ -229,53 +245,46 @@ export default async function SigningCertificate({ searchParams }: SigningCertif
                     <TableCell truncate={false} className="w-[min-content] align-top">
                       <div className="space-y-1">
                         <p className="text-muted-foreground text-sm print:text-xs">
-                          <span className="font-medium">Sent:</span>{' '}
+                          <span className="font-medium">{_(msg`Sent`)}:</span>{' '}
                           <span className="inline-block">
-                            {logs.EMAIL_SENT[0] ? (
-                              <LocaleDate
-                                date={logs.EMAIL_SENT[0].createdAt}
-                                format="yyyy-MM-dd hh:mm:ss a (ZZZZ)"
-                              />
-                            ) : (
-                              'Unknown'
-                            )}
+                            {logs.EMAIL_SENT[0]
+                              ? DateTime.fromJSDate(logs.EMAIL_SENT[0].createdAt)
+                                  .setLocale(APP_I18N_OPTIONS.defaultLocale)
+                                  .toFormat('yyyy-MM-dd hh:mm:ss a (ZZZZ)')
+                              : _(msg`Unknown`)}
                           </span>
                         </p>
 
                         <p className="text-muted-foreground text-sm print:text-xs">
-                          <span className="font-medium">Viewed:</span>{' '}
+                          <span className="font-medium">{_(msg`Viewed`)}:</span>{' '}
                           <span className="inline-block">
-                            {logs.DOCUMENT_OPENED[0] ? (
-                              <LocaleDate
-                                date={logs.DOCUMENT_OPENED[0].createdAt}
-                                format="yyyy-MM-dd hh:mm:ss a (ZZZZ)"
-                              />
-                            ) : (
-                              'Unknown'
-                            )}
+                            {logs.DOCUMENT_OPENED[0]
+                              ? DateTime.fromJSDate(logs.DOCUMENT_OPENED[0].createdAt)
+                                  .setLocale(APP_I18N_OPTIONS.defaultLocale)
+                                  .toFormat('yyyy-MM-dd hh:mm:ss a (ZZZZ)')
+                              : _(msg`Unknown`)}
                           </span>
                         </p>
 
                         <p className="text-muted-foreground text-sm print:text-xs">
-                          <span className="font-medium">Signed:</span>{' '}
+                          <span className="font-medium">{_(msg`Signed`)}:</span>{' '}
                           <span className="inline-block">
-                            {logs.DOCUMENT_RECIPIENT_COMPLETED[0] ? (
-                              <LocaleDate
-                                date={logs.DOCUMENT_RECIPIENT_COMPLETED[0].createdAt}
-                                format="yyyy-MM-dd hh:mm:ss a (ZZZZ)"
-                              />
-                            ) : (
-                              'Unknown'
-                            )}
+                            {logs.DOCUMENT_RECIPIENT_COMPLETED[0]
+                              ? DateTime.fromJSDate(logs.DOCUMENT_RECIPIENT_COMPLETED[0].createdAt)
+                                  .setLocale(APP_I18N_OPTIONS.defaultLocale)
+                                  .toFormat('yyyy-MM-dd hh:mm:ss a (ZZZZ)')
+                              : _(msg`Unknown`)}
                           </span>
                         </p>
 
                         <p className="text-muted-foreground text-sm print:text-xs">
-                          <span className="font-medium">Reason:</span>{' '}
+                          <span className="font-medium">{_(msg`Reason`)}:</span>{' '}
                           <span className="inline-block">
-                            {isOwner(recipient.email)
-                              ? FRIENDLY_SIGNING_REASONS['__OWNER__']
-                              : FRIENDLY_SIGNING_REASONS[recipient.role]}
+                            {_(
+                              isOwner(recipient.email)
+                                ? FRIENDLY_SIGNING_REASONS['__OWNER__']
+                                : FRIENDLY_SIGNING_REASONS[recipient.role],
+                            )}
                           </span>
                         </p>
                       </div>
@@ -291,7 +300,7 @@ export default async function SigningCertificate({ searchParams }: SigningCertif
       <div className="my-8 flex-row-reverse">
         <div className="flex items-end justify-end gap-x-4">
           <p className="flex-shrink-0 text-sm font-medium print:text-xs">
-            Signing certificate provided by:
+            {_(msg`Signing certificate provided by`)}:
           </p>
 
           <Logo className="max-h-6 print:max-h-4" />

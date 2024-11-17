@@ -4,6 +4,8 @@ import { useEffect, useTransition } from 'react';
 
 import { useRouter } from 'next/navigation';
 
+import { Trans, msg } from '@lingui/macro';
+import { useLingui } from '@lingui/react';
 import { Loader } from 'lucide-react';
 
 import { useDebouncedValue } from '@documenso/lib/client-only/hooks/use-debounced-value';
@@ -39,6 +41,7 @@ export const InitialsField = ({
 }: InitialsFieldProps) => {
   const router = useRouter();
   const { toast } = useToast();
+  const { _ } = useLingui();
 
   const { fullName } = useRequiredSigningContext();
   const initials = extractInitials(fullName);
@@ -89,8 +92,8 @@ export const InitialsField = ({
       console.error(err);
 
       toast({
-        title: 'Error',
-        description: 'An error occurred while signing the document.',
+        title: _(msg`Error`),
+        description: _(msg`An error occurred while signing the document.`),
         variant: 'destructive',
       });
     }
@@ -115,8 +118,8 @@ export const InitialsField = ({
       console.error(err);
 
       toast({
-        title: 'Error',
-        description: 'An error occurred while removing the signature.',
+        title: _(msg`Error`),
+        description: _(msg`An error occurred while removing the field.`),
         variant: 'destructive',
       });
     }
@@ -141,12 +144,12 @@ export const InitialsField = ({
 
       {!field.inserted && (
         <p className="group-hover:text-primary text-muted-foreground duration-200 group-hover:text-yellow-300">
-          Initials
+          <Trans>Initials</Trans>
         </p>
       )}
 
       {field.inserted && (
-        <p className="text-muted-foreground dark:text-background/80 truncate duration-200">
+        <p className="text-muted-foreground dark:text-background/80 text-[clamp(0.625rem,1cqw,0.825rem)] duration-200">
           {field.customText}
         </p>
       )}

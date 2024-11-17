@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
@@ -306,6 +306,18 @@ export const SignInForm = ({
       });
     }
   };
+
+  useEffect(() => {
+    const hash = window.location.hash.slice(1);
+
+    const params = new URLSearchParams(hash);
+
+    const email = params.get('email');
+
+    if (email) {
+      form.setValue('email', email);
+    }
+  }, [form]);
 
   return (
     <Form {...form}>

@@ -3,19 +3,19 @@ import { useCallback, useRef, useState } from 'react';
 type ThrottleOptions = {
   leading?: boolean;
   trailing?: boolean;
-}
+};
 
 export function useThrottleFn<T extends (...args: unknown[]) => unknown>(
   fn: T,
   ms = 500,
-  options: ThrottleOptions = {}
+  options: ThrottleOptions = {},
 ): [(...args: Parameters<T>) => void, boolean, () => void] {
   const [isThrottling, setIsThrottling] = useState(false);
   const $isThrottling = useRef(false);
 
   const $timeout = useRef<NodeJS.Timeout | null>(null);
   const $lastArgs = useRef<Parameters<T> | null>(null);
-  
+
   const { leading = true, trailing = true } = options;
 
   const $setIsThrottling = useCallback((value: boolean) => {
@@ -44,7 +44,7 @@ export function useThrottleFn<T extends (...args: unknown[]) => unknown>(
         $lastArgs.current = args;
       }
     },
-    [fn, ms, leading, trailing, $setIsThrottling]
+    [fn, ms, leading, trailing, $setIsThrottling],
   );
 
   const cancel = useCallback(() => {

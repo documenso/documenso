@@ -27,7 +27,7 @@ export default async function AuthenticatedTeamsLayout({
   children,
   params,
 }: AuthenticatedTeamsLayoutProps) {
-  setupI18nSSR();
+  await setupI18nSSR();
 
   const { session, user } = await getServerComponentSession();
 

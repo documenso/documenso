@@ -16,7 +16,7 @@ export default async function TeamsDocumentPage({
   params,
   searchParams = {},
 }: TeamsDocumentPageProps) {
-  setupI18nSSR();
+  await setupI18nSSR();
 
   const { teamUrl } = params;
 

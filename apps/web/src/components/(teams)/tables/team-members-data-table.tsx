@@ -29,8 +29,6 @@ import {
 import { Skeleton } from '@documenso/ui/primitives/skeleton';
 import { TableCell } from '@documenso/ui/primitives/table';
 
-import { LocaleDate } from '~/components/formatter/locale-date';
-
 import { DeleteTeamMemberDialog } from '../dialogs/delete-team-member-dialog';
 import { UpdateTeamMemberDialog } from '../dialogs/update-team-member-dialog';
 
@@ -47,7 +45,7 @@ export const TeamMembersDataTable = ({
   teamId,
   teamName,
 }: TeamMembersDataTableProps) => {
-  const { _ } = useLingui();
+  const { _, i18n } = useLingui();
 
   const searchParams = useSearchParams();
   const updateSearchParams = useUpdateSearchParams();
@@ -108,13 +106,13 @@ export const TeamMembersDataTable = ({
         accessorKey: 'role',
         cell: ({ row }) =>
           teamOwnerUserId === row.original.userId
-            ? 'Owner'
+            ? _(msg`Owner`)
             : _(TEAM_MEMBER_ROLE_MAP[row.original.role]),
       },
       {
         header: _(msg`Member Since`),
         accessorKey: 'createdAt',
-        cell: ({ row }) => <LocaleDate date={row.original.createdAt} />,
+        cell: ({ row }) => i18n.date(row.original.createdAt),
       },
       {
         header: _(msg`Actions`),

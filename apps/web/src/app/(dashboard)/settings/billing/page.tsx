@@ -16,8 +16,6 @@ import { type Stripe } from '@documenso/lib/server-only/stripe';
 import { getSubscriptionsByUserId } from '@documenso/lib/server-only/subscription/get-subscriptions-by-user-id';
 import { SubscriptionStatus } from '@documenso/prisma/client';
 
-import { LocaleDate } from '~/components/formatter/locale-date';
-
 import { BillingPlans } from './billing-plans';
 import { BillingPortalButton } from './billing-portal-button';
 
@@ -26,7 +24,7 @@ export const metadata: Metadata = {
 };
 
 export default async function BillingSettingsPage() {
-  setupI18nSSR();
+  const { i18n } = await setupI18nSSR();
 
   let { user } = await getRequiredServerComponentSession();
 
@@ -70,60 +68,74 @@ export default async function BillingSettingsPage() {
 
   return (
     <div>
-      <h3 className="text-2xl font-semibold">
-        <Trans>Billing</Trans>
-      </h3>
+      <div className="flex flex-row items-end justify-between">
+        <div>
+          <h3 className="text-2xl font-semibold">
+            <Trans>Billing</Trans>
+          </h3>
 
-      <div className="text-muted-foreground mt-2 text-sm">
-        {isMissingOrInactiveOrFreePlan && (
-          <p>
-            <Trans>
-              You are currently on the <span className="font-semibold">Free Plan</span>.
-            </Trans>
-          </p>
-        )}
-
-        {/* Todo: Translation */}
-        {!isMissingOrInactiveOrFreePlan &&
-          match(subscription.status)
-            .with('ACTIVE', () => (
-              <p>
-                {subscriptionProduct ? (
-                  <span>
-                    You are currently subscribed to{' '}
-                    <span className="font-semibold">{subscriptionProduct.name}</span>
-                  </span>
-                ) : (
-                  <span>You currently have an active plan</span>
-                )}
-
-                {subscription.periodEnd && (
-                  <span>
-                    {' '}
-                    which is set to{' '}
-                    {subscription.cancelAtPeriodEnd ? (
-                      <span>
-                        end on{' '}
-                        <LocaleDate className="font-semibold" date={subscription.periodEnd} />.
-                      </span>
-                    ) : (
-                      <span>
-                        automatically renew on{' '}
-                        <LocaleDate className="font-semibold" date={subscription.periodEnd} />.
-                      </span>
-                    )}
-                  </span>
-                )}
-              </p>
-            ))
-            .with('PAST_DUE', () => (
+          <div className="text-muted-foreground mt-2 text-sm">
+            {isMissingOrInactiveOrFreePlan && (
               <p>
                 <Trans>
-                  Your current plan is past due. Please update your payment information.
+                  You are currently on the <span className="font-semibold">Free Plan</span>.
                 </Trans>
               </p>
-            ))
-            .otherwise(() => null)}
+            )}
+
+            {/* Todo: Translation */}
+            {!isMissingOrInactiveOrFreePlan &&
+              match(subscription.status)
+                .with('ACTIVE', () => (
+                  <p>
+                    {subscriptionProduct ? (
+                      <span>
+                        You are currently subscribed to{' '}
+                        <span className="font-semibold">{subscriptionProduct.name}</span>
+                      </span>
+                    ) : (
+                      <span>You currently have an active plan</span>
+                    )}
+
+                    {subscription.periodEnd && (
+                      <span>
+                        {' '}
+                        which is set to{' '}
+                        {subscription.cancelAtPeriodEnd ? (
+                          <span>
+                            end on{' '}
+                            <span className="font-semibold">
+                              {i18n.date(subscription.periodEnd)}.
+                            </span>
+                          </span>
+                        ) : (
+                          <span>
+                            automatically renew on{' '}
+                            <span className="font-semibold">
+                              {i18n.date(subscription.periodEnd)}.
+                            </span>
+                          </span>
+                        )}
+                      </span>
+                    )}
+                  </p>
+                ))
+                .with('PAST_DUE', () => (
+                  <p>
+                    <Trans>
+                      Your current plan is past due. Please update your payment information.
+                    </Trans>
+                  </p>
+                ))
+                .otherwise(() => null)}
+          </div>
+        </div>
+
+        {isMissingOrInactiveOrFreePlan && (
+          <BillingPortalButton>
+            <Trans>Manage billing</Trans>
+          </BillingPortalButton>
+        )}
       </div>
 
       <hr className="my-4" />

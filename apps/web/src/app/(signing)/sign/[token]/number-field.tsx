@@ -259,7 +259,7 @@ export const NumberField = ({ field, recipient, onSignField, onUnsignField }: Nu
       )}
 
       {field.inserted && (
-        <p className="text-muted-foreground dark:text-background/80 flex items-center justify-center gap-x-1 duration-200">
+        <p className="text-muted-foreground dark:text-background/80 text-[clamp(0.625rem,1cqw,0.825rem)] duration-200">
           {field.customText}
         </p>
       )}
@@ -267,7 +267,7 @@ export const NumberField = ({ field, recipient, onSignField, onUnsignField }: Nu
       <Dialog open={showRadioModal} onOpenChange={setShowRadioModal}>
         <DialogContent>
           <DialogTitle>
-            {parsedFieldMeta?.label ? parsedFieldMeta?.label : <Trans>Add number</Trans>}
+            {parsedFieldMeta?.label ? parsedFieldMeta?.label : <Trans>Number</Trans>}
           </DialogTitle>
 
           <div>

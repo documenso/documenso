@@ -1,10 +1,11 @@
+import { msg } from '@lingui/macro';
 import { z } from 'zod';
 
 export const ZAddSignatureFormSchema = z.object({
   email: z
     .string()
-    .min(1, { message: 'Email is required' })
-    .email({ message: 'Invalid email address' }),
+    .min(1, { message: msg`Email is required`.id })
+    .email({ message: msg`Invalid email address`.id }),
   name: z.string(),
   customText: z.string(),
   number: z.number().optional(),

@@ -1,12 +1,39 @@
 import { z } from 'zod';
 
+import { SUPPORTED_LANGUAGE_CODES } from '@documenso/lib/constants/i18n';
 import {
   ZDocumentAccessAuthTypesSchema,
   ZDocumentActionAuthTypesSchema,
 } from '@documenso/lib/types/document-auth';
+import { ZDocumentEmailSettingsSchema } from '@documenso/lib/types/document-email';
 import { ZBaseTableSearchParamsSchema } from '@documenso/lib/types/search-params';
 import { isValidRedirectUrl } from '@documenso/lib/utils/is-valid-redirect-url';
-import { FieldType, RecipientRole } from '@documenso/prisma/client';
+import {
+  DocumentDistributionMethod,
+  DocumentSigningOrder,
+  DocumentSource,
+  DocumentStatus,
+  DocumentVisibility,
+  FieldType,
+  RecipientRole,
+} from '@documenso/prisma/client';
+
+export const ZFindDocumentsQuerySchema = ZBaseTableSearchParamsSchema.extend({
+  teamId: z.number().min(1).optional(),
+  templateId: z.number().min(1).optional(),
+  search: z
+    .string()
+    .optional()
+    .catch(() => undefined),
+  source: z.nativeEnum(DocumentSource).optional(),
+  status: z.nativeEnum(DocumentStatus).optional(),
+  orderBy: z
+    .object({
+      column: z.enum(['createdAt']),
+      direction: z.enum(['asc', 'desc']),
+    })
+    .optional(),
+}).omit({ query: true });
 
 export const ZFindDocumentAuditLogsQuerySchema = ZBaseTableSearchParamsSchema.extend({
   documentId: z.number().min(1),
@@ -56,6 +83,7 @@ export const ZSetSettingsForDocumentMutationSchema = z.object({
   data: z.object({
     title: z.string().min(1).optional(),
     externalId: z.string().nullish(),
+    visibility: z.nativeEnum(DocumentVisibility).optional(),
     globalAccessAuth: ZDocumentAccessAuthTypesSchema.nullable().optional(),
     globalActionAuth: ZDocumentActionAuthTypesSchema.nullable().optional(),
   }),
@@ -69,6 +97,7 @@ export const ZSetSettingsForDocumentMutationSchema = z.object({
         message:
           'Please enter a valid URL, make sure you include http:// or https:// part of the url.',
       }),
+    language: z.enum(SUPPORTED_LANGUAGE_CODES).optional(),
   }),
 });
 
@@ -129,6 +158,7 @@ export const ZSendDocumentMutationSchema = z.object({
     message: z.string(),
     timezone: z.string().optional(),
     dateFormat: z.string().optional(),
+    distributionMethod: z.nativeEnum(DocumentDistributionMethod).optional(),
     redirectUrl: z
       .string()
       .optional()
@@ -136,6 +166,7 @@ export const ZSendDocumentMutationSchema = z.object({
         message:
           'Please enter a valid URL, make sure you include http:// or https:// part of the url.',
       }),
+    emailSettings: ZDocumentEmailSettingsSchema.optional(),
   }),
 });
 
@@ -146,6 +177,25 @@ export const ZSetPasswordForDocumentMutationSchema = z.object({
 
 export type TSetPasswordForDocumentMutationSchema = z.infer<
   typeof ZSetPasswordForDocumentMutationSchema
+>;
+
+export const ZSetSigningOrderForDocumentMutationSchema = z.object({
+  documentId: z.number(),
+  signingOrder: z.nativeEnum(DocumentSigningOrder),
+});
+
+export type TSetSigningOrderForDocumentMutationSchema = z.infer<
+  typeof ZSetSigningOrderForDocumentMutationSchema
+>;
+
+export const ZUpdateTypedSignatureSettingsMutationSchema = z.object({
+  documentId: z.number(),
+  teamId: z.number().optional(),
+  typedSignatureEnabled: z.boolean(),
+});
+
+export type TUpdateTypedSignatureSettingsMutationSchema = z.infer<
+  typeof ZUpdateTypedSignatureSettingsMutationSchema
 >;
 
 export const ZResendDocumentMutationSchema = z.object({

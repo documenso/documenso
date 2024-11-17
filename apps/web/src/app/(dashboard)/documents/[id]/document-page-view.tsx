@@ -12,10 +12,12 @@ import { getDocumentById } from '@documenso/lib/server-only/document/get-documen
 import { getServerComponentFlag } from '@documenso/lib/server-only/feature-flags/get-server-component-feature-flag';
 import { getFieldsForDocument } from '@documenso/lib/server-only/field/get-fields-for-document';
 import { getRecipientsForDocument } from '@documenso/lib/server-only/recipient/get-recipients-for-document';
+import { DocumentVisibility } from '@documenso/lib/types/document-visibility';
 import { symmetricDecrypt } from '@documenso/lib/universal/crypto';
 import { formatDocumentsPath } from '@documenso/lib/utils/teams';
 import { DocumentStatus } from '@documenso/prisma/client';
 import type { Team, TeamEmail } from '@documenso/prisma/client';
+import { TeamMemberRole } from '@documenso/prisma/client';
 import { Badge } from '@documenso/ui/primitives/badge';
 import { Button } from '@documenso/ui/primitives/button';
 import { Card, CardContent } from '@documenso/ui/primitives/card';
@@ -24,6 +26,7 @@ import { LazyPDFViewer } from '@documenso/ui/primitives/lazy-pdf-viewer';
 import { StackAvatarsWithTooltip } from '~/components/(dashboard)/avatar/stack-avatars-with-tooltip';
 import { DocumentHistorySheet } from '~/components/document/document-history-sheet';
 import { DocumentReadOnlyFields } from '~/components/document/document-read-only-fields';
+import { DocumentRecipientLinkCopyDialog } from '~/components/document/document-recipient-link-copy-dialog';
 import {
   DocumentStatus as DocumentStatusComponent,
   FRIENDLY_STATUS_MAP,
@@ -39,7 +42,7 @@ export type DocumentPageViewProps = {
   params: {
     id: string;
   };
-  team?: Team & { teamEmail: TeamEmail | null };
+  team?: Team & { teamEmail: TeamEmail | null } & { currentTeamMember: { role: TeamMemberRole } };
 };
 
 export const DocumentPageView = async ({ params, team }: DocumentPageViewProps) => {
@@ -62,11 +65,35 @@ export const DocumentPageView = async ({ params, team }: DocumentPageViewProps) 
     teamId: team?.id,
   }).catch(() => null);
 
+  if (document?.teamId && !team?.url) {
+    redirect(documentRootPath);
+  }
+
+  const documentVisibility = document?.visibility;
+  const currentTeamMemberRole = team?.currentTeamMember?.role;
+  const isRecipient = document?.Recipient.find((recipient) => recipient.email === user.email);
+  let canAccessDocument = true;
+
+  if (team && !isRecipient && document?.userId !== user.id) {
+    canAccessDocument = match([documentVisibility, currentTeamMemberRole])
+      .with([DocumentVisibility.EVERYONE, TeamMemberRole.ADMIN], () => true)
+      .with([DocumentVisibility.EVERYONE, TeamMemberRole.MANAGER], () => true)
+      .with([DocumentVisibility.EVERYONE, TeamMemberRole.MEMBER], () => true)
+      .with([DocumentVisibility.MANAGER_AND_ABOVE, TeamMemberRole.ADMIN], () => true)
+      .with([DocumentVisibility.MANAGER_AND_ABOVE, TeamMemberRole.MANAGER], () => true)
+      .with([DocumentVisibility.ADMIN, TeamMemberRole.ADMIN], () => true)
+      .otherwise(() => false);
+  }
+
   const isDocumentHistoryEnabled = await getServerComponentFlag(
     'app_document_page_view_history_sheet',
   );
 
-  if (!document || !document.documentData) {
+  if (!document || !document.documentData || (team && !canAccessDocument)) {
+    redirect(documentRootPath);
+  }
+
+  if (team && !canAccessDocument) {
     redirect(documentRootPath);
   }
 
@@ -108,6 +135,10 @@ export const DocumentPageView = async ({ params, team }: DocumentPageViewProps) 
 
   return (
     <div className="mx-auto -mt-4 w-full max-w-screen-xl px-4 md:px-8">
+      {document.status === DocumentStatus.PENDING && (
+        <DocumentRecipientLinkCopyDialog recipients={recipients} />
+      )}
+
       <Link href={documentRootPath} className="flex items-center text-[#7AC455] hover:opacity-80">
         <ChevronLeft className="mr-2 inline-block h-5 w-5" />
         <Trans>Documents</Trans>

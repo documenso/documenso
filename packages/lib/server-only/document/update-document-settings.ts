@@ -1,12 +1,15 @@
 'use server';
 
+import { match } from 'ts-pattern';
+
 import { isUserEnterprise } from '@documenso/ee/server-only/util/is-document-enterprise';
 import { DOCUMENT_AUDIT_LOG_TYPE } from '@documenso/lib/types/document-audit-logs';
 import type { RequestMetadata } from '@documenso/lib/universal/extract-request-metadata';
 import type { CreateDocumentAuditLogDataResponse } from '@documenso/lib/utils/document-audit-logs';
 import { createDocumentAuditLogData } from '@documenso/lib/utils/document-audit-logs';
 import { prisma } from '@documenso/prisma';
-import { DocumentStatus } from '@documenso/prisma/client';
+import { DocumentVisibility } from '@documenso/prisma/client';
+import { DocumentStatus, TeamMemberRole } from '@documenso/prisma/client';
 
 import { AppError, AppErrorCode } from '../../errors/app-error';
 import type { TDocumentAccessAuthTypes, TDocumentActionAuthTypes } from '../../types/document-auth';
@@ -19,6 +22,7 @@ export type UpdateDocumentSettingsOptions = {
   data: {
     title?: string;
     externalId?: string | null;
+    visibility?: DocumentVisibility | null;
     globalAccessAuth?: TDocumentAccessAuthTypes | null;
     globalActionAuth?: TDocumentActionAuthTypes | null;
   };
@@ -61,7 +65,61 @@ export const updateDocumentSettings = async ({
             teamId: null,
           }),
     },
+    include: {
+      team: {
+        select: {
+          members: {
+            where: {
+              userId,
+            },
+            select: {
+              role: true,
+            },
+          },
+        },
+      },
+    },
   });
+
+  if (teamId) {
+    const currentUserRole = document.team?.members[0]?.role;
+
+    match(currentUserRole)
+      .with(TeamMemberRole.ADMIN, () => true)
+      .with(TeamMemberRole.MANAGER, () => {
+        const allowedVisibilities: DocumentVisibility[] = [
+          DocumentVisibility.EVERYONE,
+          DocumentVisibility.MANAGER_AND_ABOVE,
+        ];
+
+        if (
+          !allowedVisibilities.includes(document.visibility) ||
+          (data.visibility && !allowedVisibilities.includes(data.visibility))
+        ) {
+          throw new AppError(
+            AppErrorCode.UNAUTHORIZED,
+            'You do not have permission to update the document visibility',
+          );
+        }
+      })
+      .with(TeamMemberRole.MEMBER, () => {
+        if (
+          document.visibility !== DocumentVisibility.EVERYONE ||
+          (data.visibility && data.visibility !== DocumentVisibility.EVERYONE)
+        ) {
+          throw new AppError(
+            AppErrorCode.UNAUTHORIZED,
+            'You do not have permission to update the document visibility',
+          );
+        }
+      })
+      .otherwise(() => {
+        throw new AppError(
+          AppErrorCode.UNAUTHORIZED,
+          'You do not have permission to update the document',
+        );
+      });
+  }
 
   const { documentAuthOption } = extractDocumentAuthMethods({
     documentAuth: document.authOptions,
@@ -91,10 +149,14 @@ export const updateDocumentSettings = async ({
     }
   }
 
-  const isTitleSame = data.title === document.title;
-  const isExternalIdSame = data.externalId === document.externalId;
-  const isGlobalAccessSame = documentGlobalAccessAuth === newGlobalAccessAuth;
-  const isGlobalActionSame = documentGlobalActionAuth === newGlobalActionAuth;
+  const isTitleSame = data.title === undefined || data.title === document.title;
+  const isExternalIdSame = data.externalId === undefined || data.externalId === document.externalId;
+  const isGlobalAccessSame =
+    documentGlobalAccessAuth === undefined || documentGlobalAccessAuth === newGlobalAccessAuth;
+  const isGlobalActionSame =
+    documentGlobalActionAuth === undefined || documentGlobalActionAuth === newGlobalActionAuth;
+  const isDocumentVisibilitySame =
+    data.visibility === undefined || data.visibility === document.visibility;
 
   const auditLogs: CreateDocumentAuditLogDataResponse[] = [];
 
@@ -165,6 +227,21 @@ export const updateDocumentSettings = async ({
     );
   }
 
+  if (!isDocumentVisibilitySame) {
+    auditLogs.push(
+      createDocumentAuditLogData({
+        type: DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_VISIBILITY_UPDATED,
+        documentId,
+        user,
+        requestMetadata,
+        data: {
+          from: document.visibility,
+          to: data.visibility || '',
+        },
+      }),
+    );
+  }
+
   // Early return if nothing is required.
   if (auditLogs.length === 0) {
     return document;
@@ -182,7 +259,8 @@ export const updateDocumentSettings = async ({
       },
       data: {
         title: data.title,
-        externalId: data.externalId || null,
+        externalId: data.externalId,
+        visibility: data.visibility as DocumentVisibility,
         authOptions,
       },
     });

@@ -6,7 +6,7 @@ import { json } from 'micro';
 import { prisma } from '@documenso/prisma';
 import { BackgroundJobStatus, Prisma } from '@documenso/prisma/client';
 
-import { NEXT_PUBLIC_WEBAPP_URL } from '../../constants/app';
+import { NEXT_PRIVATE_INTERNAL_WEBAPP_URL } from '../../constants/app';
 import { sign } from '../../server-only/crypto/sign';
 import { verify } from '../../server-only/crypto/verify';
 import {
@@ -43,16 +43,8 @@ export class LocalJobProvider extends BaseJobProvider {
   }
 
   public async triggerJob(options: SimpleTriggerJobOptions) {
-    console.log({ jobDefinitions: this._jobDefinitions });
-
     const eligibleJobs = Object.values(this._jobDefinitions).filter(
       (job) => job.trigger.name === options.name,
-    );
-
-    console.log({ options });
-    console.log(
-      'Eligible jobs:',
-      eligibleJobs.map((job) => job.name),
     );
 
     await Promise.all(
@@ -177,7 +169,7 @@ export class LocalJobProvider extends BaseJobProvider {
           },
         });
       } catch (error) {
-        console.error(`[JOBS]: Job ${options.name} failed`, error);
+        console.log(`[JOBS]: Job ${options.name} failed`, error);
 
         const taskHasExceededRetries = error instanceof BackgroundTaskExceededRetriesError;
         const jobHasExceededRetries =
@@ -229,7 +221,7 @@ export class LocalJobProvider extends BaseJobProvider {
   }) {
     const { jobId, jobDefinitionId, data, isRetry } = options;
 
-    const endpoint = `${NEXT_PUBLIC_WEBAPP_URL()}/api/jobs/${jobDefinitionId}/${jobId}`;
+    const endpoint = `${NEXT_PRIVATE_INTERNAL_WEBAPP_URL}/api/jobs/${jobDefinitionId}/${jobId}`;
     const signature = sign(data);
 
     const headers: Record<string, string> = {
@@ -303,7 +295,7 @@ export class LocalJobProvider extends BaseJobProvider {
           });
 
           return result;
-        } catch {
+        } catch (err) {
           task = await prisma.backgroundJobTask.update({
             where: {
               id: task.id,
@@ -316,6 +308,8 @@ export class LocalJobProvider extends BaseJobProvider {
               },
             },
           });
+
+          console.log(`[JOBS:${task.id}] Task failed`, err);
 
           throw new BackgroundTaskFailedError('Task failed');
         }

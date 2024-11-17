@@ -12,7 +12,7 @@ test('[USER] update full name', async ({ page }) => {
 
   await page.getByLabel('Full Name').fill('John Doe');
 
-  const canvas = page.locator('canvas');
+  const canvas = page.locator('canvas').first();
   const box = await canvas.boundingBox();
 
   if (box) {

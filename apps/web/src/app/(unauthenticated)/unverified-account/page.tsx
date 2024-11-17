@@ -5,8 +5,8 @@ import { setupI18nSSR } from '@documenso/lib/client-only/providers/i18n.server';
 
 import { SendConfirmationEmailForm } from '~/components/forms/send-confirmation-email';
 
-export default function UnverifiedAccount() {
-  setupI18nSSR();
+export default async function UnverifiedAccount() {
+  await setupI18nSSR();
 
   return (
     <div className="w-screen max-w-lg px-4">

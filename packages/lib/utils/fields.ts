@@ -39,3 +39,27 @@ export const validateFieldsInserted = (fields: Field[]): boolean => {
 
   return uninsertedFields.length === 0;
 };
+
+export const validateFieldsUninserted = (): boolean => {
+  const fieldCardElements = document.getElementsByClassName('react-draggable');
+
+  const errorElements: HTMLElement[] = [];
+
+  Array.from(fieldCardElements).forEach((element) => {
+    const innerDiv = element.querySelector('div');
+    const hasError = innerDiv?.getAttribute('data-error') === 'true';
+
+    if (hasError) {
+      errorElements.push(element as HTMLElement);
+    } else {
+      element.removeAttribute('data-error');
+    }
+  });
+
+  if (errorElements.length > 0) {
+    errorElements[0].scrollIntoView({ behavior: 'smooth', block: 'center' });
+    return false;
+  }
+
+  return errorElements.length === 0;
+};

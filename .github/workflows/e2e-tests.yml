@@ -32,6 +32,9 @@ jobs:
 
       - name: Run Playwright tests
         run: npm run ci
+        env:
+          # Needed since we use next start which will set the NODE_ENV to production
+          NEXT_PRIVATE_SIGNING_LOCAL_FILE_PATH: './example/cert.p12'
 
       - uses: actions/upload-artifact@v4
         if: always()

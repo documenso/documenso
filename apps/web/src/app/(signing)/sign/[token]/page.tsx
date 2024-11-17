@@ -9,6 +9,7 @@ import { isRecipientAuthorized } from '@documenso/lib/server-only/document/is-re
 import { viewedDocument } from '@documenso/lib/server-only/document/viewed-document';
 import { getCompletedFieldsForToken } from '@documenso/lib/server-only/field/get-completed-fields-for-token';
 import { getFieldsForToken } from '@documenso/lib/server-only/field/get-fields-for-token';
+import { getIsRecipientsTurnToSign } from '@documenso/lib/server-only/recipient/get-is-recipient-turn';
 import { getRecipientByToken } from '@documenso/lib/server-only/recipient/get-recipient-by-token';
 import { getRecipientSignatures } from '@documenso/lib/server-only/recipient/get-recipient-signatures';
 import { getUserByEmail } from '@documenso/lib/server-only/user/get-user-by-email';
@@ -30,7 +31,7 @@ export type SigningPageProps = {
 };
 
 export default async function SigningPage({ params: { token } }: SigningPageProps) {
-  setupI18nSSR();
+  await setupI18nSSR();
 
   if (!token) {
     return notFound();
@@ -62,6 +63,12 @@ export default async function SigningPage({ params: { token } }: SigningPageProp
     return notFound();
   }
 
+  const isRecipientsTurn = await getIsRecipientsTurnToSign({ token });
+
+  if (!isRecipientsTurn) {
+    return redirect(`/sign/${token}/waiting`);
+  }
+
   const { derivedRecipientAccessAuth } = extractDocumentAuthMethods({
     documentAuth: document.authOptions,
     recipientAuth: recipient.authOptions,
@@ -91,6 +98,10 @@ export default async function SigningPage({ params: { token } }: SigningPageProp
   }).catch(() => null);
 
   const { documentMeta } = document;
+
+  if (recipient.signingStatus === SigningStatus.REJECTED) {
+    return redirect(`/sign/${token}/rejected`);
+  }
 
   if (
     document.status === DocumentStatus.COMPLETED ||
@@ -146,6 +157,7 @@ export default async function SigningPage({ params: { token } }: SigningPageProp
           document={document}
           fields={fields}
           completedFields={completedFields}
+          isRecipientsTurn={isRecipientsTurn}
         />
       </DocumentAuthProvider>
     </SigningProvider>

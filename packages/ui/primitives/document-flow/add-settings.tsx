@@ -8,8 +8,10 @@ import { InfoIcon } from 'lucide-react';
 import { useForm } from 'react-hook-form';
 
 import { DATE_FORMATS, DEFAULT_DOCUMENT_DATE_FORMAT } from '@documenso/lib/constants/date-formats';
+import { SUPPORTED_LANGUAGES } from '@documenso/lib/constants/i18n';
 import { DEFAULT_DOCUMENT_TIME_ZONE, TIME_ZONES } from '@documenso/lib/constants/time-zones';
 import { extractDocumentAuthMethods } from '@documenso/lib/utils/document-auth';
+import type { TeamMemberRole } from '@documenso/prisma/client';
 import { DocumentStatus, type Field, type Recipient, SendStatus } from '@documenso/prisma/client';
 import type { DocumentWithData } from '@documenso/prisma/types/document-with-data';
 import {
@@ -20,6 +22,10 @@ import {
   DocumentGlobalAuthActionSelect,
   DocumentGlobalAuthActionTooltip,
 } from '@documenso/ui/components/document/document-global-auth-action-select';
+import {
+  DocumentVisibilitySelect,
+  DocumentVisibilityTooltip,
+} from '@documenso/ui/components/document/document-visibility-select';
 import {
   Accordion,
   AccordionContent,
@@ -59,6 +65,7 @@ export type AddSettingsFormProps = {
   isDocumentEnterprise: boolean;
   isDocumentPdfLoaded: boolean;
   document: DocumentWithData;
+  currentTeamMemberRole?: TeamMemberRole;
   onSubmit: (_data: TAddSettingsFormSchema) => void;
 };
 
@@ -69,6 +76,7 @@ export const AddSettingsFormPartial = ({
   isDocumentEnterprise,
   isDocumentPdfLoaded,
   document,
+  currentTeamMemberRole,
   onSubmit,
 }: AddSettingsFormProps) => {
   const { documentAuthOption } = extractDocumentAuthMethods({
@@ -80,6 +88,7 @@ export const AddSettingsFormPartial = ({
     defaultValues: {
       title: document.title,
       externalId: document.externalId || '',
+      visibility: document.visibility || '',
       globalAccessAuth: documentAuthOption?.globalAccessAuth || undefined,
       globalActionAuth: documentAuthOption?.globalActionAuth || undefined,
       meta: {
@@ -87,9 +96,10 @@ export const AddSettingsFormPartial = ({
           TIME_ZONES.find((timezone) => timezone === document.documentMeta?.timezone) ??
           DEFAULT_DOCUMENT_TIME_ZONE,
         dateFormat:
-          DATE_FORMATS.find((format) => format.label === document.documentMeta?.dateFormat)
+          DATE_FORMATS.find((format) => format.value === document.documentMeta?.dateFormat)
             ?.value ?? DEFAULT_DOCUMENT_DATE_FORMAT,
         redirectUrl: document.documentMeta?.redirectUrl ?? '',
+        language: document.documentMeta?.language ?? 'en',
       },
     },
   });
@@ -159,6 +169,46 @@ export const AddSettingsFormPartial = ({
 
             <FormField
               control={form.control}
+              name="meta.language"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="inline-flex items-center">
+                    <Trans>Language</Trans>
+                    <Tooltip>
+                      <TooltipTrigger>
+                        <InfoIcon className="mx-2 h-4 w-4" />
+                      </TooltipTrigger>
+
+                      <TooltipContent className="text-foreground max-w-md space-y-2 p-4">
+                        Controls the language for the document, including the language to be used
+                        for email notifications, and the final certificate that is generated and
+                        attached to the document.
+                      </TooltipContent>
+                    </Tooltip>
+                  </FormLabel>
+
+                  <FormControl>
+                    <Select {...field} onValueChange={field.onChange}>
+                      <SelectTrigger className="bg-background">
+                        <SelectValue />
+                      </SelectTrigger>
+
+                      <SelectContent>
+                        {Object.entries(SUPPORTED_LANGUAGES).map(([code, language]) => (
+                          <SelectItem key={code} value={code}>
+                            {language.full}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
               name="globalAccessAuth"
               render={({ field }) => (
                 <FormItem>
@@ -173,6 +223,29 @@ export const AddSettingsFormPartial = ({
                 </FormItem>
               )}
             />
+
+            {currentTeamMemberRole && (
+              <FormField
+                control={form.control}
+                name="visibility"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="flex flex-row items-center">
+                      Document visibility
+                      <DocumentVisibilityTooltip />
+                    </FormLabel>
+
+                    <FormControl>
+                      <DocumentVisibilitySelect
+                        currentMemberRole={currentTeamMemberRole}
+                        {...field}
+                        onValueChange={field.onChange}
+                      />
+                    </FormControl>
+                  </FormItem>
+                )}
+              />
+            )}
 
             {isDocumentEnterprise && (
               <FormField

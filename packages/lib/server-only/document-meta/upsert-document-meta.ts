@@ -7,6 +7,10 @@ import {
   diffDocumentMetaChanges,
 } from '@documenso/lib/utils/document-audit-logs';
 import { prisma } from '@documenso/prisma';
+import type { DocumentDistributionMethod, DocumentSigningOrder } from '@documenso/prisma/client';
+
+import type { SupportedLanguageCodes } from '../../constants/i18n';
+import type { TDocumentEmailSettings } from '../../types/document-email';
 
 export type CreateDocumentMetaOptions = {
   documentId: number;
@@ -16,6 +20,11 @@ export type CreateDocumentMetaOptions = {
   password?: string;
   dateFormat?: string;
   redirectUrl?: string;
+  emailSettings?: TDocumentEmailSettings;
+  signingOrder?: DocumentSigningOrder;
+  distributionMethod?: DocumentDistributionMethod;
+  typedSignatureEnabled?: boolean;
+  language?: SupportedLanguageCodes;
   userId: number;
   requestMetadata: RequestMetadata;
 };
@@ -29,6 +38,11 @@ export const upsertDocumentMeta = async ({
   password,
   userId,
   redirectUrl,
+  signingOrder,
+  emailSettings,
+  distributionMethod,
+  typedSignatureEnabled,
+  language,
   requestMetadata,
 }: CreateDocumentMetaOptions) => {
   const user = await prisma.user.findFirstOrThrow({
@@ -78,6 +92,11 @@ export const upsertDocumentMeta = async ({
         timezone,
         documentId,
         redirectUrl,
+        signingOrder,
+        emailSettings,
+        distributionMethod,
+        typedSignatureEnabled,
+        language,
       },
       update: {
         subject,
@@ -86,6 +105,11 @@ export const upsertDocumentMeta = async ({
         dateFormat,
         timezone,
         redirectUrl,
+        signingOrder,
+        emailSettings,
+        distributionMethod,
+        typedSignatureEnabled,
+        language,
       },
     });
 

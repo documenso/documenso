@@ -1,9 +1,10 @@
-'use client';
-
+import { msg } from '@lingui/macro';
+import { useLingui } from '@lingui/react';
 import { DateTime } from 'luxon';
 import type { DateTimeFormatOptions } from 'luxon';
 import { UAParser } from 'ua-parser-js';
 
+import { APP_I18N_OPTIONS } from '@documenso/lib/constants/i18n';
 import type { TDocumentAuditLog } from '@documenso/lib/types/document-audit-logs';
 import { formatDocumentAuditLogAction } from '@documenso/lib/utils/document-audit-logs';
 import {
@@ -15,8 +16,6 @@ import {
   TableRow,
 } from '@documenso/ui/primitives/table';
 
-import { LocaleDate } from '~/components/formatter/locale-date';
-
 export type AuditLogDataTableProps = {
   logs: TDocumentAuditLog[];
 };
@@ -26,7 +25,12 @@ const dateFormat: DateTimeFormatOptions = {
   hourCycle: 'h12',
 };
 
+/**
+ * DO NOT USE TRANS. YOU MUST USE _ FOR THIS FILE AND ALL CHILDREN COMPONENTS.
+ */
 export const AuditLogDataTable = ({ logs }: AuditLogDataTableProps) => {
+  const { _ } = useLingui();
+
   const parser = new UAParser();
 
   const uppercaseFistLetter = (text: string) => {
@@ -37,11 +41,11 @@ export const AuditLogDataTable = ({ logs }: AuditLogDataTableProps) => {
     <Table overflowHidden>
       <TableHeader>
         <TableRow>
-          <TableHead>Time</TableHead>
-          <TableHead>User</TableHead>
-          <TableHead>Action</TableHead>
-          <TableHead>IP Address</TableHead>
-          <TableHead>Browser</TableHead>
+          <TableHead>{_(msg`Time`)}</TableHead>
+          <TableHead>{_(msg`User`)}</TableHead>
+          <TableHead>{_(msg`Action`)}</TableHead>
+          <TableHead>{_(msg`IP Address`)}</TableHead>
+          <TableHead>{_(msg`Browser`)}</TableHead>
         </TableRow>
       </TableHeader>
 
@@ -49,7 +53,9 @@ export const AuditLogDataTable = ({ logs }: AuditLogDataTableProps) => {
         {logs.map((log, i) => (
           <TableRow className="break-inside-avoid" key={i}>
             <TableCell>
-              <LocaleDate format={dateFormat} date={log.createdAt} />
+              {DateTime.fromJSDate(log.createdAt)
+                .setLocale(APP_I18N_OPTIONS.defaultLocale)
+                .toLocaleString(dateFormat)}
             </TableCell>
 
             <TableCell>
@@ -73,7 +79,7 @@ export const AuditLogDataTable = ({ logs }: AuditLogDataTableProps) => {
             </TableCell>
 
             <TableCell>
-              {uppercaseFistLetter(formatDocumentAuditLogAction(log).description)}
+              {uppercaseFistLetter(formatDocumentAuditLogAction(_, log).description)}
             </TableCell>
 
             <TableCell>{log.ipAddress}</TableCell>

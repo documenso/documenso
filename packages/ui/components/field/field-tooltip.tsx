@@ -49,7 +49,7 @@ export function FieldToolTip({ children, color, className = '', field }: FieldTo
       }}
     >
       <TooltipProvider>
-        <Tooltip delayDuration={0} open={!field.inserted}>
+        <Tooltip delayDuration={0} open={!field.inserted || !field.fieldMeta}>
           <TooltipTrigger className="absolute inset-0 w-full"></TooltipTrigger>
 
           <TooltipContent className={tooltipVariants({ color, className })} sideOffset={2}>

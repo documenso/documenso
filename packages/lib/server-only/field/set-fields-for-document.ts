@@ -1,3 +1,5 @@
+import { isDeepEqual } from 'remeda';
+
 import { validateCheckboxField } from '@documenso/lib/advanced-fields-validation/validate-checkbox';
 import { validateDropdownField } from '@documenso/lib/advanced-fields-validation/validate-dropdown';
 import { validateNumberField } from '@documenso/lib/advanced-fields-validation/validate-number';
@@ -20,22 +22,15 @@ import {
 } from '@documenso/lib/utils/document-audit-logs';
 import { prisma } from '@documenso/prisma';
 import type { Field } from '@documenso/prisma/client';
-import { FieldType, SendStatus, SigningStatus } from '@documenso/prisma/client';
+import { FieldType } from '@documenso/prisma/client';
+
+import { AppError, AppErrorCode } from '../../errors/app-error';
+import { canRecipientFieldsBeModified } from '../../utils/recipients';
 
 export interface SetFieldsForDocumentOptions {
   userId: number;
   documentId: number;
-  fields: {
-    id?: number | null;
-    type: FieldType;
-    signerEmail: string;
-    pageNumber: number;
-    pageX: number;
-    pageY: number;
-    pageWidth: number;
-    pageHeight: number;
-    fieldMeta?: FieldMeta;
-  }[];
+  fields: FieldData[];
   requestMetadata?: RequestMetadata;
 }
 
@@ -62,6 +57,9 @@ export const setFieldsForDocument = async ({
           },
         },
       ],
+    },
+    include: {
+      Recipient: true,
     },
   });
 
@@ -97,21 +95,36 @@ export const setFieldsForDocument = async ({
     (existingField) => !fields.find((field) => field.id === existingField.id),
   );
 
-  const linkedFields = fields
-    .map((field) => {
-      const existing = existingFields.find((existingField) => existingField.id === field.id);
+  const linkedFields = fields.map((field) => {
+    const existing = existingFields.find((existingField) => existingField.id === field.id);
 
-      return {
-        ...field,
-        _persisted: existing,
-      };
-    })
-    .filter((field) => {
-      return (
-        field._persisted?.Recipient?.sendStatus !== SendStatus.SENT &&
-        field._persisted?.Recipient?.signingStatus !== SigningStatus.SIGNED
+    const recipient = document.Recipient.find(
+      (recipient) => recipient.email.toLowerCase() === field.signerEmail.toLowerCase(),
+    );
+
+    // Each field MUST have a recipient associated with it.
+    if (!recipient) {
+      throw new AppError(AppErrorCode.INVALID_REQUEST, `Recipient not found for field ${field.id}`);
+    }
+
+    // Check whether the existing field can be modified.
+    if (
+      existing &&
+      hasFieldBeenChanged(existing, field) &&
+      !canRecipientFieldsBeModified(recipient, existingFields)
+    ) {
+      throw new AppError(
+        AppErrorCode.INVALID_REQUEST,
+        'Cannot modify a field where the recipient has already interacted with the document',
       );
-    });
+    }
+
+    return {
+      ...field,
+      _persisted: existing,
+      _recipient: recipient,
+    };
+  });
 
   const persistedFields = await prisma.$transaction(async (tx) => {
     return await Promise.all(
@@ -321,4 +334,34 @@ export const setFieldsForDocument = async ({
   });
 
   return [...filteredFields, ...persistedFields];
+};
+
+/**
+ * If you change this you MUST update the `hasFieldBeenChanged` function.
+ */
+type FieldData = {
+  id?: number | null;
+  type: FieldType;
+  signerEmail: string;
+  pageNumber: number;
+  pageX: number;
+  pageY: number;
+  pageWidth: number;
+  pageHeight: number;
+  fieldMeta?: FieldMeta;
+};
+
+const hasFieldBeenChanged = (field: Field, newFieldData: FieldData) => {
+  const currentFieldMeta = field.fieldMeta || null;
+  const newFieldMeta = newFieldData.fieldMeta || null;
+
+  return (
+    field.type !== newFieldData.type ||
+    field.page !== newFieldData.pageNumber ||
+    field.positionX.toNumber() !== newFieldData.pageX ||
+    field.positionY.toNumber() !== newFieldData.pageY ||
+    field.width.toNumber() !== newFieldData.pageWidth ||
+    field.height.toNumber() !== newFieldData.pageHeight ||
+    !isDeepEqual(currentFieldMeta, newFieldMeta)
+  );
 };

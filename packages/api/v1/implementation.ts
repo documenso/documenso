@@ -16,6 +16,7 @@ import { getDocumentById } from '@documenso/lib/server-only/document/get-documen
 import { resendDocument } from '@documenso/lib/server-only/document/resend-document';
 import { sendDocument } from '@documenso/lib/server-only/document/send-document';
 import { updateDocument } from '@documenso/lib/server-only/document/update-document';
+import { updateDocumentSettings } from '@documenso/lib/server-only/document/update-document-settings';
 import { deleteField } from '@documenso/lib/server-only/field/delete-field';
 import { getFieldById } from '@documenso/lib/server-only/field/get-field-by-id';
 import { updateField } from '@documenso/lib/server-only/field/update-field';
@@ -25,6 +26,8 @@ import { getRecipientById } from '@documenso/lib/server-only/recipient/get-recip
 import { getRecipientsForDocument } from '@documenso/lib/server-only/recipient/get-recipients-for-document';
 import { setRecipientsForDocument } from '@documenso/lib/server-only/recipient/set-recipients-for-document';
 import { updateRecipient } from '@documenso/lib/server-only/recipient/update-recipient';
+import { createTeamMemberInvites } from '@documenso/lib/server-only/team/create-team-member-invites';
+import { deleteTeamMembers } from '@documenso/lib/server-only/team/delete-team-members';
 import type { CreateDocumentFromTemplateResponse } from '@documenso/lib/server-only/template/create-document-from-template';
 import { createDocumentFromTemplate } from '@documenso/lib/server-only/template/create-document-from-template';
 import { createDocumentFromTemplateLegacy } from '@documenso/lib/server-only/template/create-document-from-template-legacy';
@@ -48,7 +51,12 @@ import {
 } from '@documenso/lib/universal/upload/server-actions';
 import { createDocumentAuditLogData } from '@documenso/lib/utils/document-audit-logs';
 import { prisma } from '@documenso/prisma';
-import { DocumentDataType, DocumentStatus, SigningStatus } from '@documenso/prisma/client';
+import {
+  DocumentDataType,
+  DocumentStatus,
+  SigningStatus,
+  TeamMemberRole,
+} from '@documenso/prisma/client';
 
 import { ApiContractV1 } from './contract';
 import { authenticatedMiddleware } from './middleware/authenticated';
@@ -292,8 +300,22 @@ export const ApiContractV1Implementation = createNextRoute(ApiContractV1, {
         timezone,
         dateFormat: dateFormat?.value,
         redirectUrl: body.meta.redirectUrl,
+        signingOrder: body.meta.signingOrder,
+        language: body.meta.language,
         requestMetadata: extractNextApiRequestMetadata(args.req),
       });
+
+      if (body.authOptions) {
+        await updateDocumentSettings({
+          documentId: document.id,
+          userId: user.id,
+          teamId: team?.id,
+          data: {
+            ...body.authOptions,
+          },
+          requestMetadata: extractNextApiRequestMetadata(args.req),
+        });
+      }
 
       const recipients = await setRecipientsForDocument({
         userId: user.id,
@@ -314,6 +336,7 @@ export const ApiContractV1Implementation = createNextRoute(ApiContractV1, {
             email: recipient.email,
             token: recipient.token,
             role: recipient.role,
+            signingOrder: recipient.signingOrder,
 
             signingUrl: `${NEXT_PUBLIC_WEBAPP_URL()}/sign/${recipient.token}`,
           })),
@@ -465,6 +488,16 @@ export const ApiContractV1Implementation = createNextRoute(ApiContractV1, {
       });
     }
 
+    if (body.authOptions) {
+      await updateDocumentSettings({
+        documentId: document.id,
+        userId: user.id,
+        teamId: team?.id,
+        data: body.authOptions,
+        requestMetadata: extractNextApiRequestMetadata(args.req),
+      });
+    }
+
     return {
       status: 200,
       body: {
@@ -475,6 +508,7 @@ export const ApiContractV1Implementation = createNextRoute(ApiContractV1, {
           email: recipient.email,
           token: recipient.token,
           role: recipient.role,
+          signingOrder: recipient.signingOrder,
 
           signingUrl: `${NEXT_PUBLIC_WEBAPP_URL()}/sign/${recipient.token}`,
         })),
@@ -547,6 +581,16 @@ export const ApiContractV1Implementation = createNextRoute(ApiContractV1, {
       });
     }
 
+    if (body.authOptions) {
+      await updateDocumentSettings({
+        documentId: document.id,
+        userId: user.id,
+        teamId: team?.id,
+        data: body.authOptions,
+        requestMetadata: extractNextApiRequestMetadata(args.req),
+      });
+    }
+
     return {
       status: 200,
       body: {
@@ -557,6 +601,7 @@ export const ApiContractV1Implementation = createNextRoute(ApiContractV1, {
           email: recipient.email,
           token: recipient.token,
           role: recipient.role,
+          signingOrder: recipient.signingOrder,
 
           signingUrl: `${NEXT_PUBLIC_WEBAPP_URL()}/sign/${recipient.token}`,
         })),
@@ -682,7 +727,7 @@ export const ApiContractV1Implementation = createNextRoute(ApiContractV1, {
 
   createRecipient: authenticatedMiddleware(async (args, user, team) => {
     const { id: documentId } = args.params;
-    const { name, email, role } = args.body;
+    const { name, email, role, authOptions, signingOrder } = args.body;
 
     const document = await getDocumentById({
       id: Number(documentId),
@@ -731,11 +776,17 @@ export const ApiContractV1Implementation = createNextRoute(ApiContractV1, {
         userId: user.id,
         teamId: team?.id,
         recipients: [
-          ...recipients,
+          ...recipients.map(({ email, name }) => ({
+            email,
+            name,
+            role,
+          })),
           {
             email,
             name,
             role,
+            signingOrder,
+            actionAuth: authOptions?.actionAuth ?? null,
           },
         ],
         requestMetadata: extractNextApiRequestMetadata(args.req),
@@ -767,7 +818,7 @@ export const ApiContractV1Implementation = createNextRoute(ApiContractV1, {
 
   updateRecipient: authenticatedMiddleware(async (args, user, team) => {
     const { id: documentId, recipientId } = args.params;
-    const { name, email, role } = args.body;
+    const { name, email, role, authOptions, signingOrder } = args.body;
 
     const document = await getDocumentById({
       id: Number(documentId),
@@ -801,6 +852,8 @@ export const ApiContractV1Implementation = createNextRoute(ApiContractV1, {
       email,
       name,
       role,
+      signingOrder,
+      actionAuth: authOptions?.actionAuth,
       requestMetadata: extractNextApiRequestMetadata(args.req),
     }).catch(() => null);
 
@@ -1231,6 +1284,272 @@ export const ApiContractV1Implementation = createNextRoute(ApiContractV1, {
       body: {
         ...remappedField,
         documentId: Number(documentId),
+      },
+    };
+  }),
+
+  findTeamMembers: authenticatedMiddleware(async (args, user, team) => {
+    const { id: teamId } = args.params;
+
+    if (team?.id !== Number(teamId)) {
+      return {
+        status: 403,
+        body: {
+          message: 'You are not authorized to perform actions against this team.',
+        },
+      };
+    }
+
+    const self = await prisma.teamMember.findFirst({
+      where: {
+        userId: user.id,
+        teamId: team.id,
+      },
+    });
+
+    if (self?.role !== TeamMemberRole.ADMIN) {
+      return {
+        status: 403,
+        body: {
+          message: 'You are not authorized to perform actions against this team.',
+        },
+      };
+    }
+
+    const members = await prisma.teamMember.findMany({
+      where: {
+        teamId: team.id,
+      },
+      include: {
+        user: true,
+      },
+    });
+
+    return {
+      status: 200,
+      body: {
+        members: members.map((member) => ({
+          id: member.id,
+          email: member.user.email,
+          role: member.role,
+        })),
+      },
+    };
+  }),
+
+  inviteTeamMember: authenticatedMiddleware(async (args, user, team) => {
+    const { id: teamId } = args.params;
+
+    const { email, role } = args.body;
+
+    if (team?.id !== Number(teamId)) {
+      return {
+        status: 403,
+        body: {
+          message: 'You are not authorized to perform actions against this team.',
+        },
+      };
+    }
+
+    const self = await prisma.teamMember.findFirst({
+      where: {
+        userId: user.id,
+        teamId: team.id,
+      },
+    });
+
+    if (self?.role !== TeamMemberRole.ADMIN) {
+      return {
+        status: 403,
+        body: {
+          message: 'You are not authorized to perform actions against this team.',
+        },
+      };
+    }
+
+    const hasAlreadyBeenInvited = await prisma.teamMember.findFirst({
+      where: {
+        teamId: team.id,
+        user: {
+          email,
+        },
+      },
+    });
+
+    if (hasAlreadyBeenInvited) {
+      return {
+        status: 400,
+        body: {
+          message: 'This user has already been invited to the team',
+        },
+      };
+    }
+
+    await createTeamMemberInvites({
+      userId: user.id,
+      userName: user.name ?? '',
+      teamId: team.id,
+      invitations: [
+        {
+          email,
+          role,
+        },
+      ],
+    });
+
+    return {
+      status: 200,
+      body: {
+        message: 'An invite has been sent to the member',
+      },
+    };
+  }),
+
+  updateTeamMember: authenticatedMiddleware(async (args, user, team) => {
+    const { id: teamId, memberId } = args.params;
+
+    const { role } = args.body;
+
+    if (team?.id !== Number(teamId)) {
+      return {
+        status: 403,
+        body: {
+          message: 'You are not authorized to perform actions against this team.',
+        },
+      };
+    }
+
+    const self = await prisma.teamMember.findFirst({
+      where: {
+        userId: user.id,
+        teamId: team.id,
+      },
+    });
+
+    if (self?.role !== TeamMemberRole.ADMIN) {
+      return {
+        status: 403,
+        body: {
+          message: 'You are not authorized to perform actions against this team.',
+        },
+      };
+    }
+
+    const member = await prisma.teamMember.findFirst({
+      where: {
+        id: Number(memberId),
+        teamId: team.id,
+      },
+    });
+
+    if (!member) {
+      return {
+        status: 404,
+        body: {
+          message: 'The provided member id does not exist.',
+        },
+      };
+    }
+
+    const updatedMember = await prisma.teamMember.update({
+      where: {
+        id: member.id,
+      },
+      data: {
+        role,
+      },
+      include: {
+        user: true,
+      },
+    });
+
+    return {
+      status: 200,
+      body: {
+        id: updatedMember.id,
+        email: updatedMember.user.email,
+        role: updatedMember.role,
+      },
+    };
+  }),
+
+  removeTeamMember: authenticatedMiddleware(async (args, user, team) => {
+    const { id: teamId, memberId } = args.params;
+
+    if (team?.id !== Number(teamId)) {
+      return {
+        status: 403,
+        body: {
+          message: 'You are not authorized to perform actions against this team.',
+        },
+      };
+    }
+
+    const self = await prisma.teamMember.findFirst({
+      where: {
+        userId: user.id,
+        teamId: team.id,
+      },
+    });
+
+    if (self?.role !== TeamMemberRole.ADMIN) {
+      return {
+        status: 403,
+        body: {
+          message: 'You are not authorized to perform actions against this team.',
+        },
+      };
+    }
+
+    const member = await prisma.teamMember.findFirst({
+      where: {
+        id: Number(memberId),
+        teamId: Number(teamId),
+      },
+      include: {
+        user: true,
+      },
+    });
+
+    if (!member) {
+      return {
+        status: 404,
+        body: {
+          message: 'Member not found',
+        },
+      };
+    }
+
+    if (team.ownerUserId === member.userId) {
+      return {
+        status: 403,
+        body: {
+          message: 'You cannot remove the owner of the team',
+        },
+      };
+    }
+
+    if (member.userId === user.id) {
+      return {
+        status: 403,
+        body: {
+          message: 'You cannot remove yourself from the team',
+        },
+      };
+    }
+
+    await deleteTeamMembers({
+      userId: user.id,
+      teamId: team.id,
+      teamMemberIds: [member.id],
+    });
+
+    return {
+      status: 200,
+      body: {
+        id: member.id,
+        email: member.user.email,
+        role: member.role,
       },
     };
   }),

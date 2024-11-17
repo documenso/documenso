@@ -32,7 +32,7 @@ test.describe('[EE_ONLY]', () => {
     await apiSignin({
       page,
       email: user.email,
-      redirectPath: `/templates/${template.id}`,
+      redirectPath: `/templates/${template.id}/edit`,
     });
 
     // Set EE action auth.
@@ -74,7 +74,7 @@ test.describe('[EE_ONLY]', () => {
     await apiSignin({
       page,
       email: teamMemberUser.email,
-      redirectPath: `/t/${team.url}/templates/${template.id}`,
+      redirectPath: `/t/${team.url}/templates/${template.id}/edit`,
     });
 
     // Set EE action auth.
@@ -110,7 +110,7 @@ test.describe('[EE_ONLY]', () => {
     await apiSignin({
       page,
       email: teamMemberUser.email,
-      redirectPath: `/templates/${template.id}`,
+      redirectPath: `/templates/${template.id}/edit`,
     });
 
     // Global action auth should not be visible.
@@ -132,7 +132,7 @@ test('[TEMPLATE_FLOW]: add settings', async ({ page }) => {
   await apiSignin({
     page,
     email: user.email,
-    redirectPath: `/templates/${template.id}`,
+    redirectPath: `/templates/${template.id}/edit`,
   });
 
   // Set title.

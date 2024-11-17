@@ -1,9 +1,10 @@
+import { msg } from '@lingui/macro';
 import { z } from 'zod';
 
 import { ZRecipientActionAuthTypesSchema } from '@documenso/lib/types/document-auth';
 
 import { ZMapNegativeOneToUndefinedSchema } from './add-settings.types';
-import { RecipientRole } from '.prisma/client';
+import { DocumentSigningOrder, RecipientRole } from '.prisma/client';
 
 export const ZAddSignersFormSchema = z
   .object({
@@ -11,14 +12,19 @@ export const ZAddSignersFormSchema = z
       z.object({
         formId: z.string().min(1),
         nativeId: z.number().optional(),
-        email: z.string().email().min(1),
+        email: z
+          .string()
+          .email({ message: msg`Invalid email`.id })
+          .min(1),
         name: z.string(),
         role: z.nativeEnum(RecipientRole),
+        signingOrder: z.number().optional(),
         actionAuth: ZMapNegativeOneToUndefinedSchema.pipe(
           ZRecipientActionAuthTypesSchema.optional(),
         ),
       }),
     ),
+    signingOrder: z.nativeEnum(DocumentSigningOrder),
   })
   .refine(
     (schema) => {
@@ -27,7 +33,7 @@ export const ZAddSignersFormSchema = z
       return new Set(emails).size === emails.length;
     },
     // Dirty hack to handle errors when .root is populated for an array type
-    { message: 'Signers must have unique emails', path: ['signers__root'] },
+    { message: msg`Signers must have unique emails`.id, path: ['signers__root'] },
   );
 
 export type TAddSignersFormSchema = z.infer<typeof ZAddSignersFormSchema>;

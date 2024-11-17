@@ -6,6 +6,8 @@ export type GetTeamByIdOptions = {
   teamId: number;
 };
 
+export type GetTeamResponse = Awaited<ReturnType<typeof getTeamById>>;
+
 /**
  * Get a team given a teamId.
  *
@@ -28,6 +30,7 @@ export const getTeamById = async ({ userId, teamId }: GetTeamByIdOptions) => {
     where: whereFilter,
     include: {
       teamEmail: true,
+      teamGlobalSettings: true,
       members: {
         where: {
           userId,
@@ -87,6 +90,7 @@ export const getTeamByUrl = async ({ userId, teamUrl }: GetTeamByUrlOptions) => 
         },
       },
       subscription: true,
+      teamGlobalSettings: true,
       members: {
         where: {
           userId,
