@@ -8,7 +8,7 @@ msgstr ""
 "Language: fr\n"
 "Project-Id-Version: documenso-app\n"
 "Report-Msgid-Bugs-To: \n"
-"PO-Revision-Date: 2024-11-12 05:45\n"
+"PO-Revision-Date: 2024-11-14 12:05\n"
 "Last-Translator: \n"
 "Language-Team: French\n"
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
@@ -39,12 +39,12 @@ msgstr "\"{email}\" au nom de \"{teamName}\" vous a invité à signer \"example 
 #~ "\"{placeholderEmail}\" on behalf of \"{0}\" has invited you to sign \"example\n"
 #~ "document\"."
 #~ msgstr ""
-#~ "\"{placeholderEmail}\" au nom de \"{0}\" vous a invité à signer \"example\n"
+#~ "\"{placeholderEmail}\" on behalf of \"{0}\" has invited you to sign \"example\n"
 #~ "document\"."
 
 #: apps/web/src/app/(teams)/t/[teamUrl]/settings/preferences/document-preferences.tsx:209
 msgid "\"{placeholderEmail}\" on behalf of \"{0}\" has invited you to sign \"example document\"."
-msgstr ""
+msgstr "\"{placeholderEmail}\" au nom de \"{0}\" vous a invité à signer \"exemple de document\"."
 
 #: apps/web/src/components/(teams)/forms/update-team-form.tsx:241
 msgid "\"{teamUrl}\" has invited you to sign \"example document\"."
@@ -668,7 +668,7 @@ msgstr "Êtes-vous sûr de vouloir supprimer ce jeton ?"
 
 #: apps/web/src/app/(signing)/sign/[token]/reject-document-dialog.tsx:120
 msgid "Are you sure you want to reject this document? This action cannot be undone."
-msgstr ""
+msgstr "Êtes-vous sûr de vouloir rejeter ce document ? Cette action ne peut pas être annulée."
 
 #: apps/web/src/app/(dashboard)/settings/security/passkeys/user-passkeys-data-table-actions.tsx:188
 msgid "Are you sure you want to remove the <0>{passkeyName}</0> passkey."
@@ -1524,7 +1524,7 @@ msgstr "Document renvoyé"
 
 #: apps/web/src/app/(signing)/sign/[token]/rejected/page.tsx:83
 msgid "Document Rejected"
-msgstr ""
+msgstr "Document rejeté"
 
 #: apps/web/src/app/(dashboard)/admin/documents/[id]/admin-actions.tsx:36
 msgid "Document resealed"
@@ -2405,7 +2405,7 @@ msgstr "Pas de brouillons actifs"
 
 #: apps/web/src/app/(signing)/sign/[token]/rejected/page.tsx:99
 msgid "No further action is required from you at this time."
-msgstr ""
+msgstr "Aucune autre action n'est requise de votre part pour le moment."
 
 #: apps/web/src/app/(teams)/t/[teamUrl]/settings/billing/page.tsx:42
 msgid "No payment required"
@@ -2707,7 +2707,7 @@ msgstr "Veuillez noter que vous perdrez l'accès à tous les documents associés
 
 #: apps/web/src/app/(signing)/sign/[token]/reject-document-dialog.tsx:37
 msgid "Please provide a reason"
-msgstr ""
+msgstr "Veuillez fournir une raison"
 
 #: apps/web/src/components/forms/2fa/disable-authenticator-app-dialog.tsx:127
 msgid "Please provide a token from the authenticator, or a backup code. If you do not have a backup code available, please contact support."
@@ -2827,11 +2827,11 @@ msgstr "Raison"
 
 #: apps/web/src/app/(dashboard)/documents/[id]/document-page-view-recipients.tsx:146
 msgid "Reason for rejection:"
-msgstr ""
+msgstr "Raison du rejet :"
 
 #: apps/web/src/app/(signing)/sign/[token]/reject-document-dialog.tsx:38
 msgid "Reason must be less than 500 characters"
-msgstr ""
+msgstr "La raison doit contenir moins de 500 caractères"
 
 #: apps/web/src/app/(signing)/sign/[token]/document-action-auth-dialog.tsx:62
 msgid "Reauthentication is required to sign this field"
@@ -2889,12 +2889,12 @@ msgstr "Inscription réussie"
 #: apps/web/src/app/(signing)/sign/[token]/reject-document-dialog.tsx:116
 #: apps/web/src/app/(signing)/sign/[token]/reject-document-dialog.tsx:162
 msgid "Reject Document"
-msgstr ""
+msgstr "Rejeter le document"
 
 #: apps/web/src/app/(dashboard)/documents/[id]/document-page-view-recipients.tsx:141
 #: apps/web/src/components/(dashboard)/avatar/stack-avatars-with-tooltip.tsx:101
 msgid "Rejected"
-msgstr ""
+msgstr "Rejeté"
 
 #: apps/web/src/app/(unauthenticated)/forgot-password/page.tsx:34
 msgid "Remembered your password? <0>Sign In</0>"
@@ -3683,7 +3683,7 @@ msgstr "Le document est maintenant complet, veuillez suivre toutes les instructi
 
 #: apps/web/src/app/(signing)/sign/[token]/rejected/page.tsx:92
 msgid "The document owner has been notified of your decision. They may contact you with further instructions if necessary."
-msgstr ""
+msgstr "Le propriétaire du document a été informé de votre décision. Il peut vous contacter pour des instructions supplémentaires si nécessaire."
 
 #: apps/web/src/app/(dashboard)/templates/use-template-dialog.tsx:182
 msgid "The document was created but could not be sent to recipients."
@@ -4888,7 +4888,7 @@ msgstr "Vous avez atteint votre limite de documents. <0>Mettez à niveau votre c
 
 #: apps/web/src/app/(signing)/sign/[token]/rejected/page.tsx:88
 msgid "You have rejected this document"
-msgstr ""
+msgstr "Vous avez rejeté ce document"
 
 #: apps/web/src/components/(teams)/dialogs/leave-team-dialog.tsx:50
 msgid "You have successfully left this team."
@@ -5117,3 +5117,4 @@ msgstr "Votre jeton a été créé avec succès ! Assurez-vous de le copier car 
 #: apps/web/src/app/(teams)/t/[teamUrl]/settings/tokens/page.tsx:86
 msgid "Your tokens will be shown here once you create them."
 msgstr "Vos jetons seront affichés ici une fois que vous les aurez créés."
+
