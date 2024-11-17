@@ -8,7 +8,7 @@ msgstr ""
 "Language: de\n"
 "Project-Id-Version: documenso-app\n"
 "Report-Msgid-Bugs-To: \n"
-"PO-Revision-Date: 2024-11-12 05:45\n"
+"PO-Revision-Date: 2024-11-14 12:05\n"
 "Last-Translator: \n"
 "Language-Team: German\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
@@ -209,11 +209,11 @@ msgstr "{recipientName} {action} ein Dokument, indem Sie einen Ihrer direkten Li
 
 #: packages/email/templates/document-rejected.tsx:27
 msgid "{recipientName} has rejected the document '{documentName}'"
-msgstr ""
+msgstr "{recipientName} hat das Dokument '{documentName}' abgelehnt"
 
 #: packages/email/template-components/template-document-rejected.tsx:25
 msgid "{signerName} has rejected the document \"{documentName}\"."
-msgstr ""
+msgstr "{signerName} hat das Dokument \"{documentName}\" abgelehnt."
 
 #: packages/email/template-components/template-document-invite.tsx:68
 msgid "{teamName} has invited you to {0}"
@@ -241,7 +241,7 @@ msgstr "{userName} hat ihre Aufgabe abgeschlossen"
 
 #: packages/lib/utils/document-audit-logs.ts:355
 msgid "{userName} rejected the document"
-msgstr ""
+msgstr "{userName} hat das Dokument abgelehnt"
 
 #: packages/lib/utils/document-audit-logs.ts:341
 msgid "{userName} signed the document"
@@ -672,11 +672,11 @@ msgstr "Empfänger des direkten Links"
 
 #: packages/lib/jobs/definitions/emails/send-rejection-emails.ts:149
 msgid "Document \"{0}\" - Rejected by {1}"
-msgstr ""
+msgstr "Dokument \"{0}\" - Abgelehnt von {1}"
 
 #: packages/lib/jobs/definitions/emails/send-rejection-emails.ts:109
 msgid "Document \"{0}\" - Rejection Confirmed"
-msgstr ""
+msgstr "Dokument \"{0}\" - Ablehnung Bestätigt"
 
 #: packages/ui/components/document/document-global-auth-access-select.tsx:62
 #: packages/ui/primitives/document-flow/add-settings.tsx:216
@@ -750,7 +750,10 @@ msgstr "E-Mail über ausstehende Dokumente"
 
 #: packages/email/template-components/template-document-rejected.tsx:21
 msgid "Document Rejected"
-msgstr ""
+msgstr "Dokument Abgelehnt"
+
+#~ msgid "Document Rejection Confirmed"
+#~ msgstr "Document Rejection Confirmed"
 
 #: packages/lib/utils/document-audit-logs.ts:330
 msgid "Document sent"
@@ -926,6 +929,9 @@ msgstr "Zurück"
 #: packages/ui/primitives/signature-pad/signature-pad.tsx:398
 msgid "Green"
 msgstr "Grün"
+
+#~ msgid "Hello {recipientName},"
+#~ msgstr "Hello {recipientName},"
 
 #: packages/email/templates/reset-password.tsx:56
 msgid "Hi, {userName} <0>({userEmail})</0>"
@@ -1182,7 +1188,7 @@ msgstr "Nur lesen"
 
 #: packages/email/template-components/template-document-rejected.tsx:32
 msgid "Reason for rejection: {rejectionReason}"
-msgstr ""
+msgstr "Grund für die Ablehnung: {rejectionReason}"
 
 #: packages/ui/components/recipient/recipient-role-select.tsx:95
 msgid "Receives copy"
@@ -1218,15 +1224,15 @@ msgstr "Weiterleitungs-URL"
 
 #: packages/email/template-components/template-document-invite.tsx:96
 msgid "Reject Document"
-msgstr ""
+msgstr "Dokument Ablehnen"
 
 #: packages/email/template-components/template-document-rejection-confirmed.tsx:22
 msgid "Rejection Confirmed"
-msgstr ""
+msgstr "Ablehnung Bestätigt"
 
 #: packages/email/template-components/template-document-rejection-confirmed.tsx:34
 msgid "Rejection reason: {reason}"
-msgstr ""
+msgstr "Ablehnungsgrund: {reason}"
 
 #: packages/lib/server-only/document/resend-document.tsx:192
 msgid "Reminder: {0}"
@@ -1473,9 +1479,12 @@ msgstr "Die Authentifizierung, die erforderlich ist, damit Empfänger das Signat
 msgid "The authentication required for recipients to view the document."
 msgstr "Die Authentifizierung, die erforderlich ist, damit Empfänger das Dokument anzeigen können."
 
+#~ msgid "The document owner has been notified of this rejection. No further action is required from you at this time."
+#~ msgstr "The document owner has been notified of this rejection. No further action is required from you at this time."
+
 #: packages/email/template-components/template-document-rejection-confirmed.tsx:39
 msgid "The document owner has been notified of this rejection. No further action is required from you at this time. The document owner may contact you with any questions regarding this rejection."
-msgstr ""
+msgstr "Der Dokumenteninhaber wurde über diese Ablehnung informiert. Es sind derzeit keine weiteren Maßnahmen von Ihnen erforderlich. Der Dokumenteninhaber kann Sie bei Fragen zu dieser Ablehnung kontaktieren."
 
 #: packages/ui/components/document/document-send-email-message-helper.tsx:31
 msgid "The document's name"
@@ -1557,9 +1566,12 @@ msgstr "Dieses Dokument ist durch ein Passwort geschützt. Bitte geben Sie das P
 msgid "This document was sent using <0>Documenso.</0>"
 msgstr "Dieses Dokument wurde mit <0>Documenso.</0> gesendet"
 
+#~ msgid "This email confirms that you have rejected the document \"{documentName}\" sent by {documentOwnerName}."
+#~ msgstr "This email confirms that you have rejected the document \"{documentName}\" sent by {documentOwnerName}."
+
 #: packages/email/template-components/template-document-rejection-confirmed.tsx:26
 msgid "This email confirms that you have rejected the document <0>\"{documentName}\"</0> sent by {documentOwnerName}."
-msgstr ""
+msgstr "Diese E-Mail bestätigt, dass Sie das Dokument <0>\"{documentName}\"</0> abgelehnt haben, das von {documentOwnerName} gesendet wurde."
 
 #: packages/ui/components/document/document-email-checkboxes.tsx:94
 msgid "This email is sent to the recipient if they are removed from a pending document."
@@ -1738,7 +1750,7 @@ msgstr "Sie können die folgenden Variablen in Ihrer Nachricht verwenden:"
 
 #: packages/email/template-components/template-document-rejected.tsx:37
 msgid "You can view the document and its status by clicking the button below."
-msgstr ""
+msgstr "Sie können das Dokument und seinen Status einsehen, indem Sie auf die Schaltfläche unten klicken."
 
 #: packages/ui/primitives/document-dropzone.tsx:43
 msgid "You cannot upload documents at this time."
@@ -1775,7 +1787,10 @@ msgstr "Sie haben Ihr Dokumentenlimit erreicht."
 
 #: packages/email/templates/document-rejection-confirmed.tsx:27
 msgid "You have rejected the document '{documentName}'"
-msgstr ""
+msgstr "Sie haben das Dokument '{documentName}' abgelehnt"
+
+#~ msgid "You have rejected the document \"{documentName}\""
+#~ msgstr "You have rejected the document \"{documentName}\""
 
 #: packages/email/template-components/template-document-self-signed.tsx:42
 msgid "You have signed “{documentName}”"
@@ -1793,3 +1808,4 @@ msgstr "Dein Passwort wurde aktualisiert."
 #: packages/email/templates/team-delete.tsx:32
 msgid "Your team has been deleted"
 msgstr "Dein Team wurde gelöscht"
+
