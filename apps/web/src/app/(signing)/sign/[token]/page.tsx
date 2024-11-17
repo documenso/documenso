@@ -12,6 +12,7 @@ import { getFieldsForToken } from '@documenso/lib/server-only/field/get-fields-f
 import { getIsRecipientsTurnToSign } from '@documenso/lib/server-only/recipient/get-is-recipient-turn';
 import { getRecipientByToken } from '@documenso/lib/server-only/recipient/get-recipient-by-token';
 import { getRecipientSignatures } from '@documenso/lib/server-only/recipient/get-recipient-signatures';
+import { isRecipientExpired } from '@documenso/lib/server-only/recipient/is-recipient-expired';
 import { getUserByEmail } from '@documenso/lib/server-only/user/get-user-by-email';
 import { symmetricDecrypt } from '@documenso/lib/universal/crypto';
 import { extractNextHeaderRequestMetadata } from '@documenso/lib/universal/extract-request-metadata';
@@ -43,6 +44,16 @@ export default async function SigningPage({ params: { token } }: SigningPageProp
 
   const requestMetadata = extractNextHeaderRequestMetadata(requestHeaders);
 
+  const isExpired = await isRecipientExpired({ token });
+  if (isExpired) {
+    return redirect(`/sign/${token}/expired`);
+  }
+
+  const isRecipientsTurn = await getIsRecipientsTurnToSign({ token });
+  if (!isRecipientsTurn) {
+    return redirect(`/sign/${token}/waiting`);
+  }
+
   const [document, fields, recipient, completedFields] = await Promise.all([
     getDocumentAndSenderByToken({
       token,
@@ -61,12 +72,6 @@ export default async function SigningPage({ params: { token } }: SigningPageProp
     document.status === DocumentStatus.DRAFT
   ) {
     return notFound();
-  }
-
-  const isRecipientsTurn = await getIsRecipientsTurnToSign({ token });
-
-  if (!isRecipientsTurn) {
-    return redirect(`/sign/${token}/waiting`);
   }
 
   const { derivedRecipientAccessAuth } = extractDocumentAuthMethods({

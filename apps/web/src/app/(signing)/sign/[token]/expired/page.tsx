@@ -2,7 +2,7 @@ import Link from 'next/link';
 import { notFound } from 'next/navigation';
 
 import { Trans } from '@lingui/macro';
-import { XCircle } from 'lucide-react';
+import { Clock } from 'lucide-react';
 
 import { setupI18nSSR } from '@documenso/lib/client-only/providers/i18n.server';
 import { getServerComponentSession } from '@documenso/lib/next-auth/get-server-component-session';
@@ -16,13 +16,13 @@ import { truncateTitle } from '~/helpers/truncate-title';
 
 import { SigningAuthPageView } from '../signing-auth-page';
 
-export type RejectedSigningPageProps = {
+export type ExpiredSigningPageProps = {
   params: {
     token?: string;
   };
 };
 
-export default async function RejectedSigningPage({ params: { token } }: RejectedSigningPageProps) {
+export default async function ExpiredSigningPage({ params: { token } }: ExpiredSigningPageProps) {
   await setupI18nSSR();
 
   if (!token) {
@@ -67,21 +67,20 @@ export default async function RejectedSigningPage({ params: { token } }: Rejecte
 
       <div className="flex flex-col items-center">
         <div className="flex items-center gap-x-4">
-          <XCircle className="text-destructive h-10 w-10" />
-
+          <Clock className="text-destructive h-10 w-10" />
           <h2 className="max-w-[35ch] text-center text-2xl font-semibold leading-normal md:text-3xl lg:text-4xl">
-            <Trans>Document Rejected</Trans>
+            <Trans>Document Expired</Trans>
           </h2>
         </div>
 
         <div className="text-destructive mt-4 flex items-center text-center text-sm">
-          <Trans>You have rejected this document</Trans>
+          <Trans>This document has expired and is no longer available to sign</Trans>
         </div>
 
         <p className="text-muted-foreground mt-6 max-w-[60ch] text-center text-sm">
           <Trans>
-            The document owner has been notified of your decision. They may contact you with further
-            instructions if necessary.
+            {/* TODO: send email to owner when a user tried to sign an expired document??? */}
+            The document owner has been notified. They may send you a new signing link if required.
           </Trans>
         </p>
 

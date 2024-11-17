@@ -53,6 +53,7 @@ export function SignerActionDropdown({
           </DropdownMenuContent>
         </DropdownMenu>
       </div>
+
       <DocumentExpiryDialog
         open={isExpiryDialogOpen}
         onOpenChange={setExpiryDialogOpen}
