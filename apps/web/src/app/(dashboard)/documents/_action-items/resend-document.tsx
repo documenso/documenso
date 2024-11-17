@@ -177,12 +177,7 @@ export const ResendDocumentActionItem = ({
         <DialogFooter>
           <div className="flex w-full flex-1 flex-nowrap gap-4">
             <DialogClose asChild>
-              <Button
-                type="button"
-                className="dark:bg-muted dark:hover:bg-muted/80 flex-1  bg-black/5 hover:bg-black/10"
-                variant="secondary"
-                disabled={isSubmitting}
-              >
+              <Button type="button" className="flex-1" variant="secondary" disabled={isSubmitting}>
                 <Trans>Cancel</Trans>
               </Button>
             </DialogClose>

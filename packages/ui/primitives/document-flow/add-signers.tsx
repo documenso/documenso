@@ -8,7 +8,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { Trans, msg } from '@lingui/macro';
 import { useLingui } from '@lingui/react';
 import { motion } from 'framer-motion';
-import { GripVerticalIcon, Plus, Trash } from 'lucide-react';
+import { GripVerticalIcon, Plus } from 'lucide-react';
 import { useSession } from 'next-auth/react';
 import { useFieldArray, useForm } from 'react-hook-form';
 import { prop, sortBy } from 'remeda';
@@ -41,6 +41,7 @@ import {
   DocumentFlowFormContainerStep,
 } from './document-flow-root';
 import { ShowFieldItem } from './show-field-item';
+import { SignerActionDropdown } from './signer-action-dropdown';
 import type { DocumentFlowStep } from './types';
 
 export type AddSignersFormProps = {
@@ -628,24 +629,18 @@ export const AddSignersFormPartial = ({
                                   )}
                                 />
 
-                                <button
-                                  type="button"
-                                  className={cn(
-                                    'mt-auto inline-flex h-10 w-10 items-center justify-center hover:opacity-80 disabled:cursor-not-allowed disabled:opacity-50',
-                                    {
-                                      'mb-6': form.formState.errors.signers?.[index],
-                                    },
-                                  )}
-                                  disabled={
+                                <SignerActionDropdown
+                                  className={cn({
+                                    'mb-6': form.formState.errors.signers?.[index],
+                                  })}
+                                  onDelete={() => onRemoveSigner(index)}
+                                  deleteDisabled={
                                     snapshot.isDragging ||
                                     isSubmitting ||
                                     !canRecipientBeModified(signer.nativeId) ||
                                     signers.length === 1
                                   }
-                                  onClick={() => onRemoveSigner(index)}
-                                >
-                                  <Trash className="h-4 w-4" />
-                                </button>
+                                />
                               </div>
                             </motion.fieldset>
                           </div>

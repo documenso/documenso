@@ -92,4 +92,4 @@ const PopoverHover = ({ trigger, children, contentProps }: PopoverHoverProps) =>
   );
 };
 
-export { Popover, PopoverTrigger, PopoverContent, PopoverHover };
+export { Popover, PopoverContent, PopoverHover, PopoverTrigger };
