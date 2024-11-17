@@ -63,6 +63,9 @@ export default function DocumentExpiryDialog({
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
+    defaultValues: {
+      expiry: signer.expiry,
+    },
   });
 
   const { mutateAsync: setSignerExpiry, isLoading } = trpc.recipient.setSignerExpiry.useMutation({

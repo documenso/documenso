@@ -84,6 +84,7 @@ export const AddSignersFormPartial = ({
       email: '',
       role: RecipientRole.SIGNER,
       signingOrder: 1,
+      expiry: undefined,
       actionAuth: undefined,
     },
   ];
@@ -100,6 +101,7 @@ export const AddSignersFormPartial = ({
                 name: recipient.name,
                 email: recipient.email,
                 role: recipient.role,
+                expiry: recipient.expired ?? undefined,
                 signingOrder: recipient.signingOrder ?? index + 1,
                 actionAuth:
                   ZRecipientAuthOptionsSchema.parse(recipient.authOptions)?.actionAuth ?? undefined,
@@ -184,6 +186,7 @@ export const AddSignersFormPartial = ({
       email: '',
       role: RecipientRole.SIGNER,
       actionAuth: undefined,
+      expiry: undefined,
       signingOrder: signers.length > 0 ? (signers[signers.length - 1]?.signingOrder ?? 0) + 1 : 1,
     });
   };
@@ -218,6 +221,7 @@ export const AddSignersFormPartial = ({
         email: user?.email ?? '',
         role: RecipientRole.SIGNER,
         actionAuth: undefined,
+        expiry: undefined,
         signingOrder: signers.length > 0 ? (signers[signers.length - 1]?.signingOrder ?? 0) + 1 : 1,
       });
     }
@@ -255,6 +259,7 @@ export const AddSignersFormPartial = ({
           'email',
           'name',
           'role',
+          'expiry',
           'signingOrder',
           'actionAuth',
         ];

@@ -15,6 +15,7 @@ export const ZAddSignerSchema = z.object({
     .min(1),
   name: z.string(),
   role: z.nativeEnum(RecipientRole),
+  expiry: z.date().optional(),
   signingOrder: z.number().optional(),
   actionAuth: ZMapNegativeOneToUndefinedSchema.pipe(ZRecipientActionAuthTypesSchema.optional()),
 });
