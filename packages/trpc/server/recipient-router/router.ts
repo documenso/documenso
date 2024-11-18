@@ -1,6 +1,7 @@
 import { TRPCError } from '@trpc/server';
 
 import { completeDocumentWithToken } from '@documenso/lib/server-only/document/complete-document-with-token';
+import { rejectDocumentWithToken } from '@documenso/lib/server-only/document/reject-document-with-token';
 import { setRecipientsForDocument } from '@documenso/lib/server-only/recipient/set-recipients-for-document';
 import { setRecipientsForTemplate } from '@documenso/lib/server-only/recipient/set-recipients-for-template';
 import { extractNextApiRequestMetadata } from '@documenso/lib/universal/extract-request-metadata';
@@ -10,6 +11,7 @@ import {
   ZAddSignersMutationSchema,
   ZAddTemplateSignersMutationSchema,
   ZCompleteDocumentWithTokenMutationSchema,
+  ZRejectDocumentWithTokenMutationSchema,
 } from './schema';
 
 export const recipientRouter = router({
@@ -91,6 +93,28 @@ export const recipientRouter = router({
         throw new TRPCError({
           code: 'BAD_REQUEST',
           message: 'We were unable to sign this field. Please try again later.',
+        });
+      }
+    }),
+
+  rejectDocumentWithToken: procedure
+    .input(ZRejectDocumentWithTokenMutationSchema)
+    .mutation(async ({ input, ctx }) => {
+      try {
+        const { token, documentId, reason } = input;
+
+        return await rejectDocumentWithToken({
+          token,
+          documentId,
+          reason,
+          requestMetadata: extractNextApiRequestMetadata(ctx.req),
+        });
+      } catch (err) {
+        console.error(err);
+
+        throw new TRPCError({
+          code: 'BAD_REQUEST',
+          message: 'We were unable to handle this request. Please try again later.',
         });
       }
     }),

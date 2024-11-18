@@ -4,7 +4,7 @@ import { useMemo } from 'react';
 
 import { Trans, msg } from '@lingui/macro';
 import { useLingui } from '@lingui/react';
-import { CheckCheckIcon, CheckIcon, Loader, MailOpen } from 'lucide-react';
+import { AlertTriangle, CheckCheckIcon, CheckIcon, Loader, MailOpen } from 'lucide-react';
 import { DateTime } from 'luxon';
 import { match } from 'ts-pattern';
 
@@ -131,6 +131,11 @@ export const DocumentPageViewRecentActivity = ({
                     .with(DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_RECIPIENT_COMPLETED, () => (
                       <div className="bg-widget rounded-full border border-gray-300 p-1 dark:border-neutral-600">
                         <CheckIcon className="h-3 w-3" aria-hidden="true" />
+                      </div>
+                    ))
+                    .with(DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_RECIPIENT_REJECTED, () => (
+                      <div className="bg-widget rounded-full border border-gray-300 p-1 dark:border-neutral-600">
+                        <AlertTriangle className="h-3 w-3" aria-hidden="true" />
                       </div>
                     ))
                     .with(DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_OPENED, () => (
