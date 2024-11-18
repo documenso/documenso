@@ -129,6 +129,7 @@ export const ZCreateDocumentMutationSchema = z.object({
       redirectUrl: z.string(),
       signingOrder: z.nativeEnum(DocumentSigningOrder).optional(),
       language: z.enum(SUPPORTED_LANGUAGE_CODES).optional(),
+      typedSignatureEnabled: z.boolean().optional(),
     })
     .partial(),
   authOptions: z
