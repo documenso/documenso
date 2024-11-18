@@ -9,11 +9,17 @@ msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
 <<<<<<< HEAD
+<<<<<<< HEAD
 "PO-Revision-Date: \n"
 ||||||| 7fc497a64
 "PO-Revision-Date: 2024-10-18 04:04\n"
 =======
 "PO-Revision-Date: 2024-11-12 05:45\n"
+>>>>>>> main
+||||||| 876803b5d
+"PO-Revision-Date: 2024-11-12 05:45\n"
+=======
+"PO-Revision-Date: 2024-11-14 12:05\n"
 >>>>>>> main
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -602,4 +608,11 @@ msgstr ""
 
 #: apps/marketing/src/components/(marketing)/carousel.tsx:272
 msgid "Your browser does not support the video tag."
+<<<<<<< HEAD
 msgstr ""
+||||||| 876803b5d
+msgstr "Ihr Browser unterstützt das Video-Tag nicht."
+=======
+msgstr "Ihr Browser unterstützt das Video-Tag nicht."
+
+>>>>>>> main
