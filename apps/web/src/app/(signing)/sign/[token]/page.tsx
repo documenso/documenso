@@ -99,6 +99,10 @@ export default async function SigningPage({ params: { token } }: SigningPageProp
 
   const { documentMeta } = document;
 
+  if (recipient.signingStatus === SigningStatus.REJECTED) {
+    return redirect(`/sign/${token}/rejected`);
+  }
+
   if (
     document.status === DocumentStatus.COMPLETED ||
     recipient.signingStatus === SigningStatus.SIGNED
