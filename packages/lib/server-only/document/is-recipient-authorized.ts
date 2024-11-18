@@ -112,6 +112,7 @@ export const isRecipientAuthorized = async ({
       return await verifyTwoFactorAuthenticationToken({
         user,
         totpCode: token,
+        window: 10, // 5 minutes worth of tokens
       });
     })
     .exhaustive();
