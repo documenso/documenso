@@ -61,18 +61,18 @@ module.exports = {
           foreground: 'hsl(var(--widget-foreground))',
         },
         documenso: {
-          DEFAULT: '#A2E771',
-          50: '#FFFFFF',
-          100: '#FDFFFD',
-          200: '#E7F9DA',
-          300: '#D0F3B7',
-          400: '#B9ED94',
-          500: '#A2E771',
-          600: '#83DF41',
-          700: '#66C622',
-          800: '#4D9619',
-          900: '#356611',
-          950: '#284E0D',
+          DEFAULT: '#4A90E2', // A medium, vibrant blue
+          50: '#F5F9FF', // Lightest blue
+          100: '#EAF2FE', // Very light blue
+          200: '#CCE0FC', // Light pastel blue
+          300: '#ADD0FA', // Lighter blue
+          400: '#8DBFF8', // Soft, medium-light blue
+          500: '#4A90E2', // Core blue color
+          600: '#3A74C2', // Vibrant, slightly darker blue
+          700: '#2B58A1', // Deeper, darker blue
+          800: '#1F407F', // Very dark blue
+          900: '#13285E', // Near navy blue
+          950: '#0B1B42',
         },
         dawn: {
           DEFAULT: '#aaa89f',
