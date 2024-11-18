@@ -393,6 +393,7 @@ enum SendStatus {
 enum SigningStatus {
   NOT_SIGNED
   SIGNED
+  REJECTED
 }
 
 enum RecipientRole {
@@ -414,6 +415,7 @@ model Recipient {
   signedAt          DateTime?
   authOptions       Json?
   signingOrder      Int?
+  rejectionReason   String?
   role              RecipientRole @default(SIGNER)
   readStatus        ReadStatus    @default(NOT_OPENED)
   signingStatus     SigningStatus @default(NOT_SIGNED)
