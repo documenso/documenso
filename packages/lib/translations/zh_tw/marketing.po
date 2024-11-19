@@ -53,11 +53,11 @@ msgstr "API 存取權限"
 
 #: apps/marketing/src/components/(marketing)/faster-smarter-beautiful-bento.tsx:67
 msgid "Beautiful."
-msgstr "美麗。"
+msgstr "直覺。"
 
 #: apps/marketing/src/components/(marketing)/faster-smarter-beautiful-bento.tsx:69
 msgid "Because signing should be celebrated. That’s why we care about the smallest detail in our product."
-msgstr "因為簽署值得被慶祝。這就是為什麼我們關心產品中每一個細節。"
+msgstr "我們著重產品中每一個細節。"
 
 #: apps/marketing/src/components/(marketing)/footer.tsx:35
 #: apps/marketing/src/components/(marketing)/header.tsx:57
@@ -71,7 +71,7 @@ msgstr "建置於頂部。"
 
 #: apps/marketing/src/app/(marketing)/pricing/page.tsx:163
 msgid "Can I use Documenso commercially?"
-msgstr "我可以商業使用 Documenso 嗎？"
+msgstr "我可以商業使用嗎？"
 
 #: apps/marketing/src/components/(marketing)/footer.tsx:42
 msgid "Careers"
@@ -135,15 +135,15 @@ msgstr "直接連結"
 
 #: apps/marketing/src/app/(marketing)/pricing/page.tsx:181
 msgid "Documenso is a community effort to create an open and vibrant ecosystem around a tool, everybody is free to use and adapt. By being truly open we want to create trusted infrastructure for the future of the internet."
-msgstr "Documenso 是一個社群合作的計畫，旨在圍繞一個每個人都可以自由使用和調整的工具建立開放且充滿活力的生態系統。通過真正的開放性，我們希望為未來的互聯網創建值得信賴的基礎設施。"
+msgstr "這是一個社群合作的計畫，旨在圍繞一個每個人都可以自由使用和調整的工具建立開放且充滿活力的生態系統。通過真正的開放性，我們希望為未來的互聯網創建值得信賴的基礎設施。"
 
 #: apps/marketing/src/app/(marketing)/open/typefully.tsx:28
 msgid "Documenso on X"
-msgstr "Documenso 在 X"
+msgstr ""
 
 #: apps/marketing/src/components/(marketing)/hero.tsx:104
 msgid "Document signing,<0/>finally open source."
-msgstr "文件簽署，<0/>終於開源。"
+msgstr "輕鬆簽署，<0/>零壓力搞定。"
 
 #: apps/marketing/src/components/(marketing)/footer.tsx:33
 #: apps/marketing/src/components/(marketing)/header.tsx:50
@@ -153,7 +153,7 @@ msgstr "文件說明"
 
 #: apps/marketing/src/components/(marketing)/share-connect-paid-widget-bento.tsx:110
 msgid "Easily embed Documenso into your product. Simply copy and paste our react widget into your application."
-msgstr "輕鬆將 Documenso 嵌入到您的產品中。只需將我們的 React 小工具複製並粘貼到您的應用程式中。"
+msgstr "輕鬆嵌入到您的產品中。只需將我們的 React 小工具複製並粘貼到您的應用程式中。"
 
 #: apps/marketing/src/components/(marketing)/share-connect-paid-widget-bento.tsx:46
 msgid "Easy Sharing."
@@ -186,15 +186,15 @@ msgstr "快速。"
 
 #: apps/marketing/src/components/(marketing)/faster-smarter-beautiful-bento.tsx:36
 msgid "Faster, smarter and more beautiful."
-msgstr "更快、更智能、更美觀。"
+msgstr "快又直覺的操作方式。"
 
 #: apps/marketing/src/app/(marketing)/open/page.tsx:210
 msgid "Finances"
 msgstr "財務"
 
 #: apps/marketing/src/app/(marketing)/open/typefully.tsx:38
-msgid "Follow us on X"
-msgstr "在X上關注我們"
+msgid "Follow us on Threads"
+msgstr "在 Threads 上關注我們"
 
 #: apps/marketing/src/components/(marketing)/pricing-table.tsx:172
 msgid "For companies looking to scale across multiple teams."
@@ -239,7 +239,7 @@ msgstr "立即開始。"
 
 #: apps/marketing/src/app/(marketing)/blog/page.tsx:30
 msgid "Get the latest news from Documenso, including product updates, team announcements and more!"
-msgstr "獲取來自 Documenso 的最新消息，包括產品更新、團隊公告等！"
+msgstr "獲取最新消息，包括產品更新、團隊公告等！"
 
 #: apps/marketing/src/app/(marketing)/open/page.tsx:233
 msgid "GitHub: Total Merged PRs"
@@ -362,11 +362,11 @@ msgstr "OSS 朋友們"
 
 #: apps/marketing/src/components/(marketing)/faster-smarter-beautiful-bento.tsx:91
 msgid "Our custom templates come with smart rules that can help you save time and energy."
-msgstr "我們的自訂範本附帶智慧規則，可以幫助您節省時間和精力。"
+msgstr "我們提供一些常用範本，可以幫助您節省時間和精力。"
 
 #: apps/marketing/src/components/(marketing)/enterprise.tsx:20
 msgid "Our Enterprise License is great for large organizations looking to switch to Documenso for all their signing needs. It's available for our cloud offering as well as self-hosted setups and offers a wide range of compliance and Adminstration Features."
-msgstr "我們的企業許可證非常適合大型組織尋求將所有簽署需求轉移到 Documenso。該許可證適用於我們的雲端服務以及自行託管設置，並提供廣泛的合規性和管理功能。"
+msgstr "我們的企業許可證非常適合大型組織尋求將所有簽署需求。該許可證適用於我們的雲端服務以及自行託管設置，並提供廣泛的合規性和管理功能。"
 
 #: apps/marketing/src/app/(marketing)/pricing/page.tsx:65
 msgid "Our self-hosted option is great for small teams and individuals who need a simple solution. You can use our docker based setup to get started in minutes. Take control with full customizability and data ownership."
@@ -455,11 +455,11 @@ msgstr "立即註冊"
 
 #: apps/marketing/src/components/(marketing)/faster-smarter-beautiful-bento.tsx:89
 msgid "Smart."
-msgstr "智能。"
+msgstr "範本商店。"
 
 #: apps/marketing/src/components/(marketing)/hero.tsx:132
 msgid "Star on GitHub"
-msgstr "在 GitHub 上加星标"
+msgstr "在 GitHub 上加星星"
 
 #: apps/marketing/src/app/(marketing)/open/page.tsx:226
 msgid "Stars"
@@ -560,7 +560,7 @@ msgstr "查看所有統計數據"
 
 #: apps/marketing/src/app/(marketing)/pricing/page.tsx:195
 msgid "We are happy to assist you at <0>support@documenso.com</0> or <1>in our Discord-Support-Channel</1> please message either Lucas or Timur to get added to the channel if you are not already a member."
-msgstr "我們很樂意在 <0>support@documenso.com</0> 或 <1>我們的 Discord 支援頻道</1> 協助您，如果您還不是成員，請訊息 Lucas 或 Timur 以被添加到頻道中。"
+msgstr "我們很樂意協助您"
 
 #: apps/marketing/src/app/(marketing)/pricing/page.tsx:89
 msgid "What is the difference between the plans?"
@@ -568,15 +568,15 @@ msgstr "方案之間有什麼不同？"
 
 #: apps/marketing/src/components/(marketing)/faster-smarter-beautiful-bento.tsx:47
 msgid "When it comes to sending or receiving a contract, you can count on lightning-fast speeds."
-msgstr "當涉及發送或接收合約時，您可以依賴閃電般的速度。"
+msgstr "迅速的發送或接收合約時。"
 
 #: apps/marketing/src/app/(marketing)/pricing/page.tsx:191
 msgid "Where can I get support?"
 msgstr "我可以在哪裡獲得支援？"
 
 #: apps/marketing/src/app/(marketing)/pricing/page.tsx:177
-msgid "Why should I prefer Documenso over DocuSign or some other signing tool?"
-msgstr "為什麼我應該選擇使用 Documenso 而不是 DocuSign 或其他簽名工具？"
+msgid "Why should I prefer SignEzily over DocuSign or some other signing tool?"
+msgstr "為什麼我應該選擇使用 SignEzily 而不是 DocuSign 或其他簽名工具？"
 
 #: apps/marketing/src/app/(marketing)/pricing/page.tsx:119
 msgid "Why should I use your hosting service?"
@@ -588,11 +588,11 @@ msgstr "每年"
 
 #: apps/marketing/src/app/(marketing)/pricing/page.tsx:167
 msgid "Yes! Documenso is offered under the GNU AGPL V3 open source license. This means you can use it for free and even modify it to fit your needs, as long as you publish your changes under the same license."
-msgstr "是的！Documenso 是在 GNU AGPL V3 開源許可證下提供的。這意味著您可以免費使用，甚至可以修改以符合您的需求，只要您將更改發佈在相同的許可證下即可。"
+msgstr "在 GNU AGPL V3 開源許可證下提供的。這意味著您可以免費使用，甚至可以修改以符合您的需求，只要您將更改發佈在相同的許可證下即可。"
 
 #: apps/marketing/src/app/(marketing)/pricing/page.tsx:93
 msgid "You can self-host Documenso for free or use our ready-to-use hosted version. The hosted version comes with additional support, painless scalability and more. Early adopters will get access to all features we build this year, for no additional cost! Forever! Yes, that includes multiple users per account later. If you want Documenso for your enterprise, we are happy to talk about your needs."
-msgstr "您可以免費自行託管 Documenso，或者使用我們現成的託管版本。託管版本附有額外支援、輕鬆的擴充能力等。早期採用者將免費獲得我們今年開發的所有功能！永遠免費！是的，這包括未來每個帳戶的多位使用者。如果您需要 Documenso 來服務您的企業，我們非常樂意討論您的需求。"
+msgstr "您可以免費自行託管，或者使用我們現成的託管版本。託管版本附有額外支援、輕鬆的擴充能力等。早期採用者將免費獲得我們今年開發的所有功能！永遠免費！是的，這包括未來每個帳戶的多位使用者。如果您需要來服務您的企業，我們非常樂意討論您的需求。"
 
 #: apps/marketing/src/components/(marketing)/carousel.tsx:272
 msgid "Your browser does not support the video tag."

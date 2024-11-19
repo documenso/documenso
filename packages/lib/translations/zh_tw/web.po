@@ -3981,7 +3981,7 @@ msgstr "類型"
 
 #: apps/web/src/app/(dashboard)/documents/delete-document-dialog.tsx:184
 msgid "Type 'delete' to confirm"
-msgstr "鍵入「delete」以確認"
+msgstr "鍵入「刪除」以確認"
 
 #: apps/web/src/components/(dashboard)/common/command-menu.tsx:186
 msgid "Type a command or search..."

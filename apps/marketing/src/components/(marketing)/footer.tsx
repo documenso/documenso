@@ -7,9 +7,8 @@ import Link from 'next/link';
 
 import { msg } from '@lingui/macro';
 import { useLingui } from '@lingui/react';
-import { FaXTwitter } from 'react-icons/fa6';
-import { LiaDiscord } from 'react-icons/lia';
-import { LuGithub, LuLanguages } from 'react-icons/lu';
+import { FaFacebook } from 'react-icons/fa6';
+import { LuLanguages } from 'react-icons/lu';
 
 import LogoImage from '@documenso/assets/logo.png';
 import { SUPPORTED_LANGUAGES } from '@documenso/lib/constants/i18n';
@@ -22,23 +21,11 @@ import { ThemeSwitcher } from '@documenso/ui/primitives/theme-switcher';
 export type FooterProps = HTMLAttributes<HTMLDivElement>;
 
 const SOCIAL_LINKS = [
-  { href: 'https://twitter.com/documenso', icon: <FaXTwitter className="h-6 w-6" /> },
-  { href: 'https://github.com/documenso/documenso', icon: <LuGithub className="h-6 w-6" /> },
-  { href: 'https://documen.so/discord', icon: <LiaDiscord className="h-7 w-7" /> },
+  { href: 'https://facebook.com/ezilyio', icon: <FaFacebook className="h-6 w-6" /> },
 ];
 
 const FOOTER_LINKS = [
-  { href: '/pricing', text: msg`Pricing` },
-  { href: '/singleplayer', text: 'Singleplayer' },
-  { href: 'https://docs.documenso.com', text: msg`Documentation`, target: '_blank' },
-  { href: 'mailto:support@documenso.com', text: msg`Support`, target: '_blank' },
-  { href: '/blog', text: msg`Blog` },
-  { href: '/changelog', text: msg`Changelog` },
-  { href: '/open', text: msg`Open Startup` },
-  { href: '/design-system', text: msg`Design` },
-  { href: 'https://shop.documenso.com', text: msg`Shop`, target: '_blank' },
-  { href: 'https://status.documenso.com', text: msg`Status`, target: '_blank' },
-  { href: '/oss-friends', text: msg`OSS Friends` },
+  { href: 'mailto:support@sign.ezily.io', text: msg`Support`, target: '_blank' },
   { href: '/careers', text: msg`Careers` },
   { href: '/privacy', text: msg`Privacy` },
 ];
@@ -95,7 +82,7 @@ export const Footer = ({ className, ...props }: FooterProps) => {
       </div>
       <div className="mx-auto mt-4 flex w-full max-w-screen-xl flex-wrap items-center justify-between gap-4 px-8 md:mt-12 lg:mt-24">
         <p className="text-muted-foreground text-sm">
-          © {new Date().getFullYear()} Documenso, Inc. All rights reserved.
+          © {new Date().getFullYear()} Ezily io, Inc. All rights reserved.
         </p>
 
         <div className="flex flex-row-reverse items-center sm:flex-row">

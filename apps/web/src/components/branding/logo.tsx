@@ -14,7 +14,7 @@ export const Logo = ({ ...props }: LogoProps) => {
     >
       <g
         transform="translate(0.000000,146.000000) scale(0.100000,-0.100000)"
-        fill="#e43c3c"
+        fill="#3cc0e4"
         stroke="none"
       >
         <path

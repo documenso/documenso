@@ -69,6 +69,7 @@ Contact us if you are interested in our Enterprise plan for large organizations 
 <a href="https://cal.com/timurercan/enterprise-customers?utm_source=banner&utm_campaign=oss"><img alt="Book us with Cal.com" src="https://cal.com/book-with-cal-dark.svg" /></a>
 
 ## Tech Stack
+
 <p align="left">
   <a href="https://www.typescriptlang.org"><img src="https://shields.io/badge/TypeScript-3178C6?logo=TypeScript&logoColor=FFF&style=flat-square" alt="TypeScript"></a>
   <a href="https://nextjs.org/"><img src="https://img.shields.io/badge/next.js-000000?style=flat-square&logo=nextdotjs&logoColor=white" alt="NextJS"></a>
@@ -81,10 +82,9 @@ Contact us if you are interested in our Enterprise plan for large organizations 
   <a href=""><img src="" alt=""></a>
 </p>
 
-
 - [Typescript](https://www.typescriptlang.org/) - Language
 - [Next.js](https://nextjs.org/) - Framework
-- [Prisma](https://www.prisma.io/)  - ORM
+- [Prisma](https://www.prisma.io/) - ORM
 - [Tailwind](https://tailwindcss.com/) - CSS
 - [shadcn/ui](https://ui.shadcn.com/) - Component Library
 - [NextAuth.js](https://next-auth.js.org/) - Authentication
@@ -178,9 +178,11 @@ git clone https://github.com/<your-username>/documenso
 
 5. Create the database schema by running `npm run prisma:migrate-dev`
 
-6. Run `npm run dev` in the root directory to start
+6. set up traditional chinese by running `npm run translate:compile`
 
-7. Register a new user at http://localhost:3000/signup
+7. Run `npm run dev` in the root directory to start
+
+8. Register a new user at http://localhost:3000/signup
 
 ---
 

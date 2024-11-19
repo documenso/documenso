@@ -4,7 +4,6 @@ import React, { useEffect, useState } from 'react';
 
 import { usePathname } from 'next/navigation';
 
-import { useFeatureFlags } from '@documenso/lib/client-only/providers/feature-flag';
 import { NEXT_PUBLIC_WEBAPP_URL } from '@documenso/lib/constants/app';
 import { cn } from '@documenso/ui/lib/utils';
 
@@ -19,9 +18,9 @@ export default function MarketingLayout({ children }: MarketingLayoutProps) {
   const [scrollY, setScrollY] = useState(0);
   const pathname = usePathname();
 
-  const { getFlag } = useFeatureFlags();
+  // const { getFlag } = useFeatureFlags();
 
-  const showProfilesAnnouncementBar = getFlag('marketing_profiles_announcement_bar');
+  const showProfilesAnnouncementBar = false;
 
   useEffect(() => {
     const onScroll = () => {
@@ -47,7 +46,7 @@ export default function MarketingLayout({ children }: MarketingLayoutProps) {
       >
         {showProfilesAnnouncementBar && (
           <div className="relative inline-flex w-full items-center justify-center overflow-hidden bg-[#e7f3df] px-4 py-2.5">
-            <div className="text-black text-center text-sm font-medium">
+            <div className="text-center text-sm font-medium text-black">
               Claim your documenso public profile username now!{' '}
               <span className="hidden font-semibold md:inline">documenso.com/u/yourname</span>
               <div className="mt-1.5 block md:ml-4 md:mt-0 md:inline-block">

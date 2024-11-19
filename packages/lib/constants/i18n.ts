@@ -31,7 +31,7 @@ type SupportedLanguage = {
 
 export const SUPPORTED_LANGUAGES: Record<string, SupportedLanguage> = {
   de: {
-    full: 'German',
+    full: 'Deutsch',
     short: 'de',
   },
   en: {
@@ -39,15 +39,15 @@ export const SUPPORTED_LANGUAGES: Record<string, SupportedLanguage> = {
     short: 'en',
   },
   fr: {
-    full: 'French',
+    full: 'Français',
     short: 'fr',
   },
   es: {
-    full: 'Spanish',
+    full: 'Español',
     short: 'es',
   },
   zh_tw: {
-    full: 'Tranditional Chinese',
+    full: '繁體中文',
     short: 'zh_tw',
   },
 } satisfies Record<SupportedLanguageCodes, SupportedLanguage>;

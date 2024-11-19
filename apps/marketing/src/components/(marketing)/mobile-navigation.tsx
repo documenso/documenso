@@ -20,44 +20,11 @@ export type MobileNavigationProps = {
 
 export const MENU_NAVIGATION_LINKS = [
   {
-    href: '/pricing',
-    text: msg`Pricing`,
-  },
-  {
-    href: 'https://documen.so/docs-nav',
-    text: msg`Documentation`,
-  },
-  {
-    href: '/singleplayer',
-    text: 'Singleplayer',
-  },
-  {
-    href: '/blog',
-    text: msg`Blog`,
-  },
-  {
-    href: '/open',
-    text: msg`Open Startup`,
-  },
-  {
-    href: 'https://status.documenso.com',
-    text: msg`Status`,
-  },
-  {
-    href: 'mailto:support@documenso.com',
-    text: msg`Support`,
-    target: '_blank',
-  },
-  {
-    href: '/privacy',
-    text: msg`Privacy`,
-  },
-  {
-    href: 'https://app.documenso.com/signup?utm_source=marketing-header',
+    href: 'https://sign.ezily.io/signup?utm_source=marketing-header',
     text: msg`Sign up`,
   },
   {
-    href: 'https://app.documenso.com/signin?utm_source=marketing-header',
+    href: 'https://sign.ezily.io/signin?utm_source=marketing-header',
     text: msg`Sign in`,
   },
 ];
