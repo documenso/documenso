@@ -114,7 +114,9 @@ export default async function CompletedSigningPage({
           })}
         >
           <Badge variant="neutral" size="default" className="mb-6 rounded-xl border bg-transparent">
-            {document.title}
+            <span className="block max-w-[10rem] truncate font-medium hover:underline md:max-w-[20rem]">
+              {document.title}
+            </span>
           </Badge>
 
           {/* Card with recipient */}
