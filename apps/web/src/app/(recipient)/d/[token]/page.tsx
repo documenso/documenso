@@ -72,7 +72,7 @@ export default async function TemplatesDirectPage({ params }: TemplatesDirectPag
       >
         <div className="mx-auto -mt-4 w-full max-w-screen-xl px-4 md:px-8">
           <h1
-            className="mt-4 block max-w-[20rem] truncate text-2xl font-semibold  md:max-w-[30rem] md:text-3xl"
+            className="mt-4 block max-w-[20rem] truncate text-2xl font-semibold md:max-w-[30rem] md:text-3xl"
             title={template.title}
           >
             {template.title}

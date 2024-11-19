@@ -64,7 +64,7 @@ export const TemplateEditPageView = async ({ params, team }: TemplateEditPageVie
           </Link>
 
           <h1
-            className="mt-4 block max-w-[20rem] truncate text-2xl font-semibold  md:max-w-[30rem] md:text-3xl"
+            className="mt-4 block max-w-[20rem] truncate text-2xl font-semibold md:max-w-[30rem] md:text-3xl"
             title={template.title}
           >
             {template.title}

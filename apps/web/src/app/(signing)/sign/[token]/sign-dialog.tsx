@@ -74,7 +74,13 @@ export const SignDialog = ({
           {role === RecipientRole.VIEWER && (
             <span>
               <Trans>
-                You are about to complete viewing "{documentTitle}".
+                <span className="inline-flex flex-wrap">
+                  You are about to complete viewing "
+                  <span className="inline-block max-w-[11rem] truncate align-baseline">
+                    {documentTitle}
+                  </span>
+                  ".
+                </span>
                 <br /> Are you sure?
               </Trans>
             </span>
@@ -82,7 +88,13 @@ export const SignDialog = ({
           {role === RecipientRole.SIGNER && (
             <span>
               <Trans>
-                You are about to complete signing "{documentTitle}".
+                <span className="inline-flex flex-wrap">
+                  You are about to complete signing "
+                  <span className="inline-block max-w-[11rem] truncate align-baseline">
+                    {documentTitle}
+                  </span>
+                  ".
+                </span>
                 <br /> Are you sure?
               </Trans>
             </span>
@@ -90,7 +102,13 @@ export const SignDialog = ({
           {role === RecipientRole.APPROVER && (
             <span>
               <Trans>
-                You are about to complete approving "{documentTitle}".
+                <span className="inline-flex flex-wrap">
+                  You are about to complete approving{' '}
+                  <span className="inline-block max-w-[11rem] truncate align-baseline">
+                    "{documentTitle}"
+                  </span>
+                  .
+                </span>
                 <br /> Are you sure?
               </Trans>
             </span>
