@@ -748,7 +748,7 @@ msgstr "Banner actualizado"
 msgid "Basic details"
 msgstr "Detalles básicos"
 
-#: apps/web/src/app/(dashboard)/settings/billing/page.tsx:72
+#: apps/web/src/app/(dashboard)/settings/billing/page.tsx:74
 #: apps/web/src/app/(teams)/t/[teamUrl]/settings/billing/page.tsx:61
 #: apps/web/src/components/(dashboard)/settings/layout/desktop-nav.tsx:117
 #: apps/web/src/components/(dashboard)/settings/layout/mobile-nav.tsx:120
@@ -1170,6 +1170,7 @@ msgid "Create your account and start using state-of-the-art document signing. Op
 msgstr "Crea tu cuenta y comienza a utilizar la firma de documentos de última generación. La firma abierta y hermosa está al alcance de tu mano."
 
 #: apps/web/src/app/(dashboard)/admin/documents/document-results.tsx:62
+#: apps/web/src/app/(dashboard)/admin/leaderboard/data-table-leaderboard.tsx:96
 #: apps/web/src/app/(dashboard)/documents/[id]/document-page-view-information.tsx:35
 #: apps/web/src/app/(dashboard)/documents/data-table.tsx:54
 #: apps/web/src/app/(dashboard)/settings/security/passkeys/user-passkeys-data-table.tsx:65
@@ -2151,6 +2152,10 @@ msgstr "Última actualización el"
 msgid "Last used"
 msgstr "Último uso"
 
+#: apps/web/src/app/(dashboard)/admin/nav.tsx:93
+msgid "Leaderboard"
+msgstr ""
+
 #: apps/web/src/components/(teams)/dialogs/leave-team-dialog.tsx:111
 #: apps/web/src/components/(teams)/tables/current-user-teams-data-table.tsx:117
 msgid "Leave"
@@ -2230,6 +2235,10 @@ msgstr "Gestionar todos los equipos con los que estás asociado actualmente."
 msgid "Manage and view template"
 msgstr "Gestionar y ver plantilla"
 
+#: apps/web/src/app/(dashboard)/settings/billing/page.tsx:136
+msgid "Manage billing"
+msgstr ""
+
 #: apps/web/src/components/templates/manage-public-template-dialog.tsx:341
 msgid "Manage details for this public template"
 msgstr "Gestionar detalles de esta plantilla pública"
@@ -2250,7 +2259,7 @@ msgstr "Gestionar claves de acceso"
 msgid "Manage subscription"
 msgstr "Gestionar suscripción"
 
-#: apps/web/src/app/(dashboard)/settings/billing/billing-portal-button.tsx:66
+#: apps/web/src/app/(dashboard)/settings/billing/billing-portal-button.tsx:67
 msgid "Manage Subscription"
 msgstr "Gestionar Suscripción"
 
@@ -2354,6 +2363,7 @@ msgid "My templates"
 msgstr "Mis plantillas"
 
 #: apps/web/src/app/(dashboard)/admin/documents/[id]/recipient-item.tsx:148
+#: apps/web/src/app/(dashboard)/admin/leaderboard/data-table-leaderboard.tsx:56
 #: apps/web/src/app/(dashboard)/admin/users/[id]/page.tsx:99
 #: apps/web/src/app/(dashboard)/admin/users/data-table-users.tsx:66
 #: apps/web/src/app/(dashboard)/settings/security/passkeys/user-passkeys-data-table-actions.tsx:144
@@ -3044,6 +3054,7 @@ msgstr "Buscar"
 msgid "Search by document title"
 msgstr "Buscar por título del documento"
 
+#: apps/web/src/app/(dashboard)/admin/leaderboard/data-table-leaderboard.tsx:147
 #: apps/web/src/app/(dashboard)/admin/users/data-table-users.tsx:144
 msgid "Search by name or email"
 msgstr "Buscar por nombre o correo electrónico"
@@ -3308,6 +3319,11 @@ msgstr "Se han generado enlaces de firma para este documento."
 msgid "Signing up..."
 msgstr "Registrándose..."
 
+#: apps/web/src/app/(dashboard)/admin/leaderboard/data-table-leaderboard.tsx:82
+#: apps/web/src/app/(dashboard)/admin/leaderboard/page.tsx:46
+msgid "Signing Volume"
+msgstr ""
+
 #: apps/web/src/app/(profile)/p/[url]/page.tsx:109
 msgid "Since {0}"
 msgstr "Desde {0}"
@@ -3316,7 +3332,7 @@ msgstr "Desde {0}"
 msgid "Site Banner"
 msgstr "Banner del sitio"
 
-#: apps/web/src/app/(dashboard)/admin/nav.tsx:93
+#: apps/web/src/app/(dashboard)/admin/nav.tsx:107
 #: apps/web/src/app/(dashboard)/admin/site-settings/page.tsx:26
 msgid "Site Settings"
 msgstr "Configuraciones del sitio"
@@ -3331,7 +3347,7 @@ msgstr "Configuraciones del sitio"
 #: apps/web/src/app/(dashboard)/documents/delete-document-dialog.tsx:80
 #: apps/web/src/app/(dashboard)/documents/duplicate-document-dialog.tsx:72
 #: apps/web/src/app/(dashboard)/settings/billing/billing-plans.tsx:62
-#: apps/web/src/app/(dashboard)/settings/billing/billing-portal-button.tsx:50
+#: apps/web/src/app/(dashboard)/settings/billing/billing-portal-button.tsx:51
 #: apps/web/src/app/(dashboard)/settings/public-profile/public-profile-page-view.tsx:124
 #: apps/web/src/app/(dashboard)/settings/security/passkeys/user-passkeys-data-table-actions.tsx:73
 #: apps/web/src/app/(dashboard)/settings/security/passkeys/user-passkeys-data-table-actions.tsx:93
@@ -4451,7 +4467,7 @@ msgstr "¿Quieres enviar enlaces de firma elegantes como este? <0>Consulta Docum
 msgid "Want your own public profile?"
 msgstr "¿Quieres tu propio perfil público?"
 
-#: apps/web/src/app/(dashboard)/settings/billing/billing-portal-button.tsx:40
+#: apps/web/src/app/(dashboard)/settings/billing/billing-portal-button.tsx:41
 #: apps/web/src/app/(teams)/t/[teamUrl]/layout-billing-banner.tsx:55
 #: apps/web/src/components/(teams)/team-billing-portal-button.tsx:31
 msgid "We are unable to proceed to the billing portal at this time. Please try again, or contact support."
@@ -4784,7 +4800,7 @@ msgstr "Estás a punto de eliminar al siguiente usuario de <0>{teamName}</0>."
 msgid "You are about to revoke access for team <0>{0}</0> ({1}) to use your email."
 msgstr "Estás a punto de revocar el acceso para el equipo <0>{0}</0> ({1}) para usar tu correo electrónico."
 
-#: apps/web/src/app/(dashboard)/settings/billing/page.tsx:78
+#: apps/web/src/app/(dashboard)/settings/billing/page.tsx:80
 msgid "You are currently on the <0>Free Plan</0>."
 msgstr "Actualmente estás en el <0>Plan Gratuito</0>."
 
@@ -4836,7 +4852,7 @@ msgstr "No puedes modificar a un miembro del equipo que tenga un rol más alto q
 msgid "You cannot upload encrypted PDFs"
 msgstr "No puedes subir PDFs encriptados"
 
-#: apps/web/src/app/(dashboard)/settings/billing/billing-portal-button.tsx:45
+#: apps/web/src/app/(dashboard)/settings/billing/billing-portal-button.tsx:46
 msgid "You do not currently have a customer record, this should not happen. Please contact support for assistance."
 msgstr "Actualmente no tienes un registro de cliente, esto no debería suceder. Por favor contacta a soporte para obtener asistencia."
 
@@ -4982,7 +4998,7 @@ msgstr "La URL de tu sitio web de marca"
 msgid "Your branding preferences have been updated"
 msgstr "Tus preferencias de marca han sido actualizadas"
 
-#: apps/web/src/app/(dashboard)/settings/billing/page.tsx:119
+#: apps/web/src/app/(dashboard)/settings/billing/page.tsx:125
 msgid "Your current plan is past due. Please update your payment information."
 msgstr "Tu plan actual está vencido. Por favor actualiza tu información de pago."
 
@@ -5117,4 +5133,3 @@ msgstr "¡Tu token se creó con éxito! ¡Asegúrate de copiarlo porque no podr�
 #: apps/web/src/app/(teams)/t/[teamUrl]/settings/tokens/page.tsx:86
 msgid "Your tokens will be shown here once you create them."
 msgstr "Tus tokens se mostrarán aquí una vez que los crees."
-
