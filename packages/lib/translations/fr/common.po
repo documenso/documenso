@@ -8,19 +8,11 @@ msgstr ""
 "Language: fr\n"
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-<<<<<<< HEAD
-<<<<<<< HEAD
-"PO-Revision-Date: \n"
-||||||| 7fc497a64
-"PO-Revision-Date: 2024-10-18 04:04\n"
-=======
-"PO-Revision-Date: 2024-11-12 05:45\n"
->>>>>>> main
-||||||| 876803b5d
-"PO-Revision-Date: 2024-11-12 05:45\n"
-=======
 "PO-Revision-Date: 2024-11-14 12:05\n"
->>>>>>> main
+"PO-Revision-Date: 2024-11-14 12:05\n"
+"PO-Revision-Date: 2024-11-14 12:05\n"
+"PO-Revision-Date: 2024-11-14 12:05\n"
+"PO-Revision-Date: 2024-11-14 12:05\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Plural-Forms: \n"
@@ -421,11 +413,11 @@ msgstr ""
 msgid "Add myself"
 msgstr ""
 
-#: packages/ui/primitives/template-flow/add-template-placeholder-recipients.tsx:637
+#: packages/ui/primitives/template-flow/add-template-placeholder-recipients.tsx:645
 msgid "Add Myself"
 msgstr ""
 
-#: packages/ui/primitives/template-flow/add-template-placeholder-recipients.tsx:623
+#: packages/ui/primitives/template-flow/add-template-placeholder-recipients.tsx:631
 msgid "Add Placeholder Recipient"
 msgstr ""
 
@@ -560,22 +552,13 @@ msgstr "Ccers"
 
 #: packages/ui/primitives/document-flow/field-items-advanced-settings/text-field.tsx:86
 msgid "Character Limit"
-msgstr ""
+msgstr "<<<<<<< HEAD"
 
-<<<<<<< HEAD
 #: packages/ui/primitives/document-flow/add-fields.tsx:1026
 #: packages/ui/primitives/template-flow/add-template-fields.tsx:788
-msgid "Checkbox"
-msgstr ""
+#~ msgid "Checkbox"
+#~ msgstr "Case à cocher=======>>>>>>> main"
 
-||||||| 7fc497a64
-#: packages/ui/primitives/document-flow/add-fields.tsx:1026
-#: packages/ui/primitives/template-flow/add-template-fields.tsx:788
-msgid "Checkbox"
-msgstr "Case à cocher"
-
-=======
->>>>>>> main
 #: packages/ui/primitives/document-flow/field-items-advanced-settings/checkbox-field.tsx:197
 msgid "Checkbox values"
 msgstr ""
@@ -596,13 +579,10 @@ msgstr ""
 msgid "Close"
 msgstr ""
 
-#: packages/ui/components/document/document-status.tsx:28
-msgid "Completed"
-msgstr ""
-
 #: packages/email/template-components/template-document-completed.tsx:35
 #: packages/email/template-components/template-document-self-signed.tsx:36
 #: packages/lib/constants/document.ts:10
+#: packages/ui/components/document/document-status.tsx:28
 msgid "Completed"
 msgstr "Terminé"
 
@@ -657,10 +637,6 @@ msgstr "Copié"
 msgid "Copied to clipboard"
 msgstr ""
 
-#: packages/ui/components/document/next-inbox-item-button.tsx:93
-msgid "Created {0}"
-msgstr ""
-
 #: packages/ui/primitives/document-flow/add-subject.tsx:249
 msgid "Copy"
 msgstr "Copier"
@@ -676,6 +652,10 @@ msgstr "Créez un <0>compte gratuit</0> pour accéder à vos documents signés �
 #: packages/email/template-components/template-document-self-signed.tsx:68
 msgid "Create account"
 msgstr "Créer un compte"
+
+#: packages/ui/components/document/next-inbox-item-button.tsx:93
+msgid "Created {0}"
+msgstr ""
 
 #: packages/ui/primitives/document-flow/add-signature.tsx:360
 msgid "Custom Text"
@@ -700,7 +680,7 @@ msgstr "Décliner"
 msgid "Didn't request a password change? We are here to help you secure your account, just <0>contact us.</0>"
 msgstr "Vous n'avez pas demandé de changement de mot de passe ? Nous sommes ici pour vous aider à sécuriser votre compte, il suffit de <0>nous contacter.</0>"
 
-#: packages/ui/primitives/template-flow/add-template-placeholder-recipients.tsx:570
+#: packages/ui/primitives/template-flow/add-template-placeholder-recipients.tsx:578
 msgid "Direct link receiver"
 msgstr ""
 
@@ -718,17 +698,13 @@ msgstr "Document \"{0}\" - Rejet Confirmé"
 msgid "Document access"
 msgstr ""
 
-#: packages/ui/components/document/document-status.tsx:47
-msgid "Document All"
-msgstr ""
-
-#: packages/ui/components/document/document-status.tsx:29
-msgid "Document completed"
-msgstr ""
-
 #: packages/lib/utils/document-audit-logs.ts:306
 msgid "Document access auth updated"
 msgstr "L'authentification d'accès au document a été mise à jour"
+
+#: packages/ui/components/document/document-status.tsx:47
+msgid "Document All"
+msgstr ""
 
 #: packages/lib/server-only/document/delete-document.ts:246
 #: packages/lib/server-only/document/super-delete-document.ts:98
@@ -737,6 +713,7 @@ msgstr "Document Annulé"
 
 #: packages/lib/utils/document-audit-logs.ts:369
 #: packages/lib/utils/document-audit-logs.ts:370
+#: packages/ui/components/document/document-status.tsx:29
 msgid "Document completed"
 msgstr "Document terminé"
 
@@ -757,18 +734,6 @@ msgstr "Document créé à partir d'un modèle direct"
 msgid "Document Creation"
 msgstr ""
 
-#: packages/ui/components/document/document-status.tsx:35
-msgid "Document draft"
-msgstr ""
-
-#: packages/ui/components/document/document-status.tsx:41
-msgid "Document inbox"
-msgstr ""
-
-#: packages/ui/components/document/document-status.tsx:23
-msgid "Document pending"
-msgstr ""
-
 #: packages/lib/utils/document-audit-logs.ts:290
 msgid "Document deleted"
 msgstr "Document supprimé"
@@ -786,9 +751,17 @@ msgstr "Document Supprimé !"
 msgid "Document Distribution Method"
 msgstr "Méthode de distribution du document"
 
+#: packages/ui/components/document/document-status.tsx:35
+msgid "Document draft"
+msgstr ""
+
 #: packages/lib/utils/document-audit-logs.ts:326
 msgid "Document external ID updated"
 msgstr "ID externe du document mis à jour"
+
+#: packages/ui/components/document/document-status.tsx:41
+msgid "Document inbox"
+msgstr ""
 
 #: packages/lib/utils/document-audit-logs.ts:334
 msgid "Document moved to team"
@@ -797,6 +770,10 @@ msgstr "Document déplacé vers l'équipe"
 #: packages/lib/utils/document-audit-logs.ts:318
 msgid "Document opened"
 msgstr "Document ouvert"
+
+#: packages/ui/components/document/document-status.tsx:23
+msgid "Document pending"
+msgstr ""
 
 #: packages/ui/components/document/document-email-checkboxes.tsx:128
 msgid "Document pending email"
@@ -834,11 +811,8 @@ msgstr "Visibilité du document mise à jour"
 msgid "Download"
 msgstr ""
 
-#: packages/ui/components/document/document-status.tsx:34
-msgid "Draft"
-msgstr ""
-
 #: packages/lib/constants/document.ts:13
+#: packages/ui/components/document/document-status.tsx:34
 msgid "Draft"
 msgstr "Brouillon"
 
@@ -862,8 +836,8 @@ msgstr ""
 #: packages/ui/primitives/document-flow/add-signers.tsx:519
 #: packages/ui/primitives/document-flow/types.ts:54
 #: packages/ui/primitives/template-flow/add-template-fields.tsx:638
-#: packages/ui/primitives/template-flow/add-template-placeholder-recipients.tsx:463
-#: packages/ui/primitives/template-flow/add-template-placeholder-recipients.tsx:470
+#: packages/ui/primitives/template-flow/add-template-placeholder-recipients.tsx:471
+#: packages/ui/primitives/template-flow/add-template-placeholder-recipients.tsx:478
 msgid "Email"
 msgstr ""
 
@@ -892,7 +866,7 @@ msgid "Enable Direct Link Signing"
 msgstr ""
 
 #: packages/ui/primitives/document-flow/add-signers.tsx:401
-#: packages/ui/primitives/template-flow/add-template-placeholder-recipients.tsx:362
+#: packages/ui/primitives/template-flow/add-template-placeholder-recipients.tsx:370
 msgid "Enable signing order"
 msgstr ""
 
@@ -1084,8 +1058,8 @@ msgstr ""
 #: packages/ui/primitives/document-flow/add-signers.tsx:556
 #: packages/ui/primitives/document-flow/types.ts:55
 #: packages/ui/primitives/template-flow/add-template-fields.tsx:664
-#: packages/ui/primitives/template-flow/add-template-placeholder-recipients.tsx:498
-#: packages/ui/primitives/template-flow/add-template-placeholder-recipients.tsx:504
+#: packages/ui/primitives/template-flow/add-template-placeholder-recipients.tsx:506
+#: packages/ui/primitives/template-flow/add-template-placeholder-recipients.tsx:512
 msgid "Name"
 msgstr ""
 
@@ -1169,10 +1143,6 @@ msgstr "Page {0} sur {numPages}"
 msgid "Password Required"
 msgstr ""
 
-#: packages/ui/components/document/document-status.tsx:22
-msgid "Pending"
-msgstr ""
-
 #: packages/email/templates/forgot-password.tsx:19
 msgid "Password Reset Requested"
 msgstr "Réinitialisation du mot de passe demandée"
@@ -1186,6 +1156,7 @@ msgid "Password updated!"
 msgstr "Mot de passe mis à jour !"
 
 #: packages/lib/constants/document.ts:16
+#: packages/ui/components/document/document-status.tsx:22
 msgid "Pending"
 msgstr "En attente"
 
@@ -1420,23 +1391,13 @@ msgid "Share your signing experience!"
 msgstr "Partagez votre expérience de signature !"
 
 #: packages/ui/primitives/document-flow/add-signers.tsx:709
-#: packages/ui/primitives/template-flow/add-template-placeholder-recipients.tsx:655
+#: packages/ui/primitives/template-flow/add-template-placeholder-recipients.tsx:663
 msgid "Show advanced settings"
-msgstr ""
+msgstr "<<<<<<< HEAD"
 
-<<<<<<< HEAD
-#: packages/lib/constants/recipient-roles.ts:20
-#: packages/ui/components/document/next-inbox-item-button.tsx:107
-||||||| 7fc497a64
-#: packages/lib/constants/recipient-roles.ts:20
-=======
 #: packages/lib/constants/recipient-roles.ts:22
->>>>>>> main
+#: packages/ui/components/document/next-inbox-item-button.tsx:107
 msgid "Sign"
-msgstr ""
-
-#: packages/ui/components/document/next-inbox-item-button.tsx:70
-msgid "Sign Next Document"
 msgstr ""
 
 #: packages/email/template-components/template-document-invite.tsx:104
@@ -1446,6 +1407,10 @@ msgstr "Signer le document"
 #: packages/email/template-components/template-reset-password.tsx:34
 msgid "Sign In"
 msgstr "Se connecter"
+
+#: packages/ui/components/document/next-inbox-item-button.tsx:70
+msgid "Sign Next Document"
+msgstr ""
 
 #: packages/ui/primitives/document-flow/add-fields.tsx:823
 #: packages/ui/primitives/document-flow/add-signature.tsx:323
@@ -1662,7 +1627,7 @@ msgstr "Cet e-mail est envoyé au destinataire lui demandant de signer le docume
 msgid "This email will be sent to the recipient who has just signed the document, if there are still other recipients who have not signed yet."
 msgstr "Cet e-mail sera envoyé au destinataire qui vient de signer le document, s'il y a encore d'autres destinataires qui n'ont pas signé."
 
-#: packages/ui/primitives/template-flow/add-template-placeholder-recipients.tsx:573
+#: packages/ui/primitives/template-flow/add-template-placeholder-recipients.tsx:581
 msgid "This field cannot be modified or deleted. When you share this template's direct link or add it to your public profile, anyone who accesses it can input their name and email, and fill in the fields assigned to them."
 msgstr ""
 
@@ -1728,24 +1693,14 @@ msgstr ""
 #: packages/ui/primitives/document-flow/field-items-advanced-settings/number-field.tsx:91
 #: packages/ui/primitives/document-flow/field-items-advanced-settings/number-field.tsx:96
 msgid "Value"
-msgstr ""
+msgstr "<<<<<<< HEAD"
 
-<<<<<<< HEAD
-#: packages/lib/constants/recipient-roles.ts:26
-#: packages/ui/components/document/next-inbox-item-button.tsx:119
-msgid "View"
-msgstr ""
-||||||| 7fc497a64
-#: packages/lib/constants/recipient-roles.ts:26
-msgid "View"
-msgstr "Vue"
-=======
 #: packages/email/templates/confirm-team-email.tsx:71
 msgid "Verify your team email address"
-msgstr "Vérifiez votre adresse e-mail d'équipe"
->>>>>>> main
+msgstr "Vérifiez votre adresse e-mail d'équipe>>>>>>> main"
 
 #: packages/lib/constants/recipient-roles.ts:29
+#: packages/ui/components/document/next-inbox-item-button.tsx:119
 msgid "View"
 msgstr "Voir"
 
@@ -1786,12 +1741,11 @@ msgstr "Spectateurs"
 
 #: packages/lib/constants/recipient-roles.ts:31
 msgid "Viewing"
-<<<<<<< HEAD
 msgstr ""
-||||||| 7fc497a64
-msgstr "Visionnage"
-=======
-msgstr "Consultation"
+
+#: packages/lib/constants/recipient-roles.ts:31
+#~ msgid "Viewing<<<<<<< HEAD"
+#~ msgstr "Consultation"
 
 #: packages/email/template-components/template-document-pending.tsx:31
 msgid "Waiting for others"
@@ -1823,8 +1777,7 @@ msgstr "Bienvenue sur Documenso !"
 
 #: packages/lib/utils/document-audit-logs.ts:258
 msgid "You"
-msgstr "Vous"
->>>>>>> main
+msgstr "Vous>>>>>>> main"
 
 #: packages/ui/primitives/document-flow/send-document-action-dialog.tsx:44
 msgid "You are about to send this document to the recipients. Are you sure you want to continue?"
@@ -1877,12 +1830,11 @@ msgstr "Vous avez initié le document {0} qui nécessite que vous {recipientActi
 
 #: packages/ui/primitives/document-dropzone.tsx:69
 msgid "You have reached your document limit."
-<<<<<<< HEAD
 msgstr ""
-||||||| 7fc497a64
-msgstr "Vous avez atteint votre limite de documents."
-=======
-msgstr "Vous avez atteint votre limite de documents."
+
+#: packages/ui/primitives/document-dropzone.tsx:69
+#~ msgid "You have reached your document limit.<<<<<<< HEAD"
+#~ msgstr "Vous avez atteint votre limite de documents."
 
 #: packages/email/templates/document-rejection-confirmed.tsx:27
 msgid "You have rejected the document '{documentName}'"
@@ -1906,10 +1858,4 @@ msgstr "Votre mot de passe a été mis à jour."
 #: packages/email/templates/team-delete.tsx:28
 #: packages/email/templates/team-delete.tsx:32
 msgid "Your team has been deleted"
-msgstr "Votre équipe a été supprimée"
-<<<<<<< HEAD
->>>>>>> main
-||||||| 876803b5d
-=======
-
->>>>>>> main
+msgstr "Votre équipe a été supprimée<<<<<<< HEAD>>>>>>> main||||||| 876803b5d=======>>>>>>> main"

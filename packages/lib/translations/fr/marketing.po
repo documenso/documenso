@@ -8,19 +8,11 @@ msgstr ""
 "Language: fr\n"
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-<<<<<<< HEAD
-<<<<<<< HEAD
-"PO-Revision-Date: \n"
-||||||| 7fc497a64
-"PO-Revision-Date: 2024-10-18 04:04\n"
-=======
-"PO-Revision-Date: 2024-11-12 05:45\n"
->>>>>>> main
-||||||| 876803b5d
-"PO-Revision-Date: 2024-11-12 05:45\n"
-=======
 "PO-Revision-Date: 2024-11-14 12:05\n"
->>>>>>> main
+"PO-Revision-Date: 2024-11-14 12:05\n"
+"PO-Revision-Date: 2024-11-14 12:05\n"
+"PO-Revision-Date: 2024-11-14 12:05\n"
+"PO-Revision-Date: 2024-11-14 12:05\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Plural-Forms: \n"
@@ -608,11 +600,8 @@ msgstr ""
 
 #: apps/marketing/src/components/(marketing)/carousel.tsx:272
 msgid "Your browser does not support the video tag."
-<<<<<<< HEAD
 msgstr ""
-||||||| 876803b5d
-msgstr "Votre navigateur ne prend pas en charge la balise vidéo."
-=======
-msgstr "Votre navigateur ne prend pas en charge la balise vidéo."
 
->>>>>>> main
+#: apps/marketing/src/components/(marketing)/carousel.tsx:272
+#~ msgid "Your browser does not support the video tag.<<<<<<< HEAD"
+#~ msgstr "Votre navigateur ne prend pas en charge la balise vidéo.>>>>>>> main"

@@ -8,19 +8,11 @@ msgstr ""
 "Language: es\n"
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-<<<<<<< HEAD
-<<<<<<< HEAD
-"PO-Revision-Date: \n"
-||||||| 7fc497a64
-"PO-Revision-Date: 2024-10-22 02:26\n"
-=======
-"PO-Revision-Date: 2024-11-12 05:45\n"
->>>>>>> main
-||||||| 876803b5d
-"PO-Revision-Date: 2024-11-12 05:45\n"
-=======
 "PO-Revision-Date: 2024-11-14 12:05\n"
->>>>>>> main
+"PO-Revision-Date: 2024-11-14 12:05\n"
+"PO-Revision-Date: 2024-11-14 12:05\n"
+"PO-Revision-Date: 2024-11-14 12:05\n"
+"PO-Revision-Date: 2024-11-14 12:05\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Plural-Forms: \n"
@@ -107,17 +99,8 @@ msgstr ""
 msgid "{0} direct signing templates"
 msgstr ""
 
-#: apps/web/src/app/(recipient)/d/[token]/direct-template.tsx:66
-<<<<<<< HEAD
-msgid "{0} document"
-msgstr ""
-||||||| 7fc497a64
-msgid "{0} document"
-msgstr "{0} documento"
-=======
 #~ msgid "{0} document"
-#~ msgstr "{0} document"
->>>>>>> main
+#~ msgstr "{0} document>>>>>>> main"
 
 #: apps/web/src/app/(dashboard)/documents/upload-document.tsx:146
 msgid "{0} of {1} documents remaining this month."
@@ -127,17 +110,8 @@ msgstr ""
 msgid "{0} Recipient(s)"
 msgstr ""
 
-#: apps/web/src/app/(recipient)/d/[token]/direct-template.tsx:67
-<<<<<<< HEAD
-msgid "{0} the document to complete the process."
-msgstr ""
-||||||| 7fc497a64
-msgid "{0} the document to complete the process."
-msgstr "{0} el documento para completar el proceso."
-=======
 #~ msgid "{0} the document to complete the process."
-#~ msgstr "{0} the document to complete the process."
->>>>>>> main
+#~ msgstr "{0} the document to complete the process.>>>>>>> main"
 
 #: apps/web/src/app/(signing)/sign/[token]/text-field.tsx:292
 msgid "{charactersRemaining, plural, one {1 character remaining} other {{charactersRemaining} characters remaining}}"
@@ -366,21 +340,11 @@ msgstr ""
 
 #: apps/web/src/app/(dashboard)/documents/[id]/edit-document.tsx:171
 msgid "Add Signers"
-msgstr ""
+msgstr "<<<<<<< HEAD"
 
-<<<<<<< HEAD
-#: apps/web/src/app/(dashboard)/documents/[id]/edit-document.tsx:179
-msgid "Add Subject"
-msgstr ""
-||||||| 7fc497a64
-#: apps/web/src/app/(dashboard)/documents/[id]/edit-document.tsx:179
-msgid "Add Subject"
-msgstr "Agregar Asunto"
-=======
 #: apps/web/src/app/(dashboard)/documents/[id]/edit-document.tsx:180
 #~ msgid "Add Subject"
-#~ msgstr "Add Subject"
->>>>>>> main
+#~ msgstr "Add Subject>>>>>>> main"
 
 #: apps/web/src/components/(teams)/dialogs/add-team-email-dialog.tsx:133
 msgid "Add team email"
@@ -392,21 +356,11 @@ msgstr ""
 
 #: apps/web/src/app/(dashboard)/templates/use-template-dialog.tsx:220
 msgid "Add the recipients to create the document with"
-msgstr ""
+msgstr "<<<<<<< HEAD"
 
-<<<<<<< HEAD
-#: apps/web/src/app/(dashboard)/documents/[id]/edit-document.tsx:180
-msgid "Add the subject and message you wish to send to signers."
-msgstr ""
-||||||| 7fc497a64
-#: apps/web/src/app/(dashboard)/documents/[id]/edit-document.tsx:180
-msgid "Add the subject and message you wish to send to signers."
-msgstr "Agrega el asunto y el mensaje que deseas enviar a los firmantes."
-=======
 #: apps/web/src/app/(dashboard)/documents/[id]/edit-document.tsx:181
 #~ msgid "Add the subject and message you wish to send to signers."
-#~ msgstr "Add the subject and message you wish to send to signers."
->>>>>>> main
+#~ msgstr "Add the subject and message you wish to send to signers.>>>>>>> main"
 
 #: apps/web/src/components/(teams)/dialogs/create-team-checkout-dialog.tsx:152
 msgid "Adding and removing seats will adjust your invoice accordingly."
@@ -791,7 +745,7 @@ msgstr ""
 msgid "Basic details"
 msgstr ""
 
-#: apps/web/src/app/(dashboard)/settings/billing/page.tsx:72
+#: apps/web/src/app/(dashboard)/settings/billing/page.tsx:74
 #: apps/web/src/app/(teams)/t/[teamUrl]/settings/billing/page.tsx:61
 #: apps/web/src/components/(dashboard)/settings/layout/desktop-nav.tsx:117
 #: apps/web/src/components/(dashboard)/settings/layout/mobile-nav.tsx:120
@@ -1242,20 +1196,12 @@ msgstr ""
 #: apps/web/src/app/(teams)/t/[teamUrl]/settings/tokens/page.tsx:100
 #: apps/web/src/app/(teams)/t/[teamUrl]/settings/webhooks/page.tsx:93
 msgid "Created on {0}"
-msgstr ""
+msgstr "<<<<<<< HEAD"
 
-<<<<<<< HEAD
 #: apps/web/src/app/(teams)/t/[teamUrl]/settings/tokens/page.tsx:100
-msgid "Created on{0}"
-msgstr ""
+#~ msgid "Created on{0}"
+#~ msgstr "Creado el{0}=======>>>>>>> main"
 
-||||||| 7fc497a64
-#: apps/web/src/app/(teams)/t/[teamUrl]/settings/tokens/page.tsx:100
-msgid "Created on{0}"
-msgstr "Creado el{0}"
-
-=======
->>>>>>> main
 #: apps/web/src/components/forms/password.tsx:107
 msgid "Current Password"
 msgstr ""
@@ -1587,19 +1533,15 @@ msgstr ""
 
 #: apps/web/src/app/(dashboard)/documents/[id]/edit-document.tsx:327
 msgid "Document sent"
-msgstr ""
+msgstr "<<<<<<< HEAD"
 
-<<<<<<< HEAD
 #: apps/web/src/app/(signing)/sign/[token]/complete/page.tsx:133
-||||||| 7fc497a64
 #: apps/web/src/app/(signing)/sign/[token]/complete/page.tsx:132
-=======
 #: apps/web/src/app/(teams)/t/[teamUrl]/settings/documents/page.tsx:26
 #~ msgid "Document Settings"
 #~ msgstr "Document Settings"
 
-#: apps/web/src/app/(signing)/sign/[token]/complete/page.tsx:132
->>>>>>> main
+#: apps/web/src/app/(signing)/sign/[token]/complete/page.tsx:133
 msgid "Document Signed"
 msgstr ""
 
@@ -1884,13 +1826,10 @@ msgstr ""
 #: apps/web/src/components/(dashboard)/layout/verify-email-banner.tsx:54
 #: apps/web/src/components/(dashboard)/settings/webhooks/create-webhook-dialog.tsx:101
 msgid "Error"
-msgstr ""
+msgstr "<<<<<<< HEAD"
 
-<<<<<<< HEAD
 #: apps/web/src/app/(signing)/sign/[token]/complete/page.tsx:143
-||||||| 7fc497a64
 #: apps/web/src/app/(signing)/sign/[token]/complete/page.tsx:142
-=======
 #: apps/web/src/components/forms/team-document-settings.tsx:77
 #~ msgid "Error updating global team settings"
 #~ msgstr "Error updating global team settings"
@@ -1899,8 +1838,7 @@ msgstr ""
 msgid "Everyone can access and view the document"
 msgstr "Todos pueden acceder y ver el documento"
 
-#: apps/web/src/app/(signing)/sign/[token]/complete/page.tsx:142
->>>>>>> main
+#: apps/web/src/app/(signing)/sign/[token]/complete/page.tsx:143
 msgid "Everyone has signed"
 msgstr ""
 
@@ -1919,20 +1857,12 @@ msgstr ""
 #: apps/web/src/app/(dashboard)/settings/tokens/page.tsx:71
 #: apps/web/src/app/(teams)/t/[teamUrl]/settings/tokens/page.tsx:104
 msgid "Expires on {0}"
-msgstr ""
+msgstr "<<<<<<< HEAD"
 
-<<<<<<< HEAD
 #: apps/web/src/app/(teams)/t/[teamUrl]/settings/tokens/page.tsx:107
-msgid "Expires on{0}"
-msgstr ""
+#~ msgid "Expires on{0}"
+#~ msgstr "Expira el{0}=======>>>>>>> main"
 
-||||||| 7fc497a64
-#: apps/web/src/app/(teams)/t/[teamUrl]/settings/tokens/page.tsx:107
-msgid "Expires on{0}"
-msgstr "Expira el{0}"
-
-=======
->>>>>>> main
 #: apps/web/src/app/(dashboard)/admin/documents/[id]/admin-actions.tsx:42
 msgid "Failed to reseal document"
 msgstr ""
@@ -2309,6 +2239,10 @@ msgstr ""
 msgid "Manage and view template"
 msgstr "Gestionar y ver plantilla"
 
+#: apps/web/src/app/(dashboard)/settings/billing/page.tsx:136
+msgid "Manage billing"
+msgstr ""
+
 #: apps/web/src/components/templates/manage-public-template-dialog.tsx:341
 msgid "Manage details for this public template"
 msgstr ""
@@ -2329,7 +2263,7 @@ msgstr ""
 msgid "Manage subscription"
 msgstr ""
 
-#: apps/web/src/app/(dashboard)/settings/billing/billing-portal-button.tsx:66
+#: apps/web/src/app/(dashboard)/settings/billing/billing-portal-button.tsx:67
 msgid "Manage Subscription"
 msgstr ""
 
@@ -3410,7 +3344,7 @@ msgstr ""
 #: apps/web/src/app/(dashboard)/documents/delete-document-dialog.tsx:80
 #: apps/web/src/app/(dashboard)/documents/duplicate-document-dialog.tsx:72
 #: apps/web/src/app/(dashboard)/settings/billing/billing-plans.tsx:62
-#: apps/web/src/app/(dashboard)/settings/billing/billing-portal-button.tsx:50
+#: apps/web/src/app/(dashboard)/settings/billing/billing-portal-button.tsx:51
 #: apps/web/src/app/(dashboard)/settings/public-profile/public-profile-page-view.tsx:124
 #: apps/web/src/app/(dashboard)/settings/security/passkeys/user-passkeys-data-table-actions.tsx:73
 #: apps/web/src/app/(dashboard)/settings/security/passkeys/user-passkeys-data-table-actions.tsx:93
@@ -4530,7 +4464,7 @@ msgstr ""
 msgid "Want your own public profile?"
 msgstr ""
 
-#: apps/web/src/app/(dashboard)/settings/billing/billing-portal-button.tsx:40
+#: apps/web/src/app/(dashboard)/settings/billing/billing-portal-button.tsx:41
 #: apps/web/src/app/(teams)/t/[teamUrl]/layout-billing-banner.tsx:55
 #: apps/web/src/components/(teams)/team-billing-portal-button.tsx:31
 msgid "We are unable to proceed to the billing portal at this time. Please try again, or contact support."
@@ -4863,7 +4797,7 @@ msgstr ""
 msgid "You are about to revoke access for team <0>{0}</0> ({1}) to use your email."
 msgstr ""
 
-#: apps/web/src/app/(dashboard)/settings/billing/page.tsx:78
+#: apps/web/src/app/(dashboard)/settings/billing/page.tsx:80
 msgid "You are currently on the <0>Free Plan</0>."
 msgstr ""
 
@@ -4915,7 +4849,7 @@ msgstr ""
 msgid "You cannot upload encrypted PDFs"
 msgstr ""
 
-#: apps/web/src/app/(dashboard)/settings/billing/billing-portal-button.tsx:45
+#: apps/web/src/app/(dashboard)/settings/billing/billing-portal-button.tsx:46
 msgid "You do not currently have a customer record, this should not happen. Please contact support for assistance."
 msgstr ""
 
@@ -5061,7 +4995,7 @@ msgstr "La URL de tu sitio web de marca"
 msgid "Your branding preferences have been updated"
 msgstr "Tus preferencias de marca han sido actualizadas"
 
-#: apps/web/src/app/(dashboard)/settings/billing/page.tsx:119
+#: apps/web/src/app/(dashboard)/settings/billing/page.tsx:125
 msgid "Your current plan is past due. Please update your payment information."
 msgstr ""
 
@@ -5195,11 +5129,9 @@ msgstr ""
 #: apps/web/src/app/(dashboard)/settings/tokens/page.tsx:53
 #: apps/web/src/app/(teams)/t/[teamUrl]/settings/tokens/page.tsx:86
 msgid "Your tokens will be shown here once you create them."
-<<<<<<< HEAD
 msgstr ""
-||||||| 876803b5d
-msgstr "Tus tokens se mostrarán aquí una vez que los crees."
-=======
-msgstr "Tus tokens se mostrarán aquí una vez que los crees."
 
->>>>>>> main
+#: apps/web/src/app/(dashboard)/settings/tokens/page.tsx:53
+#: apps/web/src/app/(teams)/t/[teamUrl]/settings/tokens/page.tsx:86
+#~ msgid "Your tokens will be shown here once you create them.<<<<<<< HEAD"
+#~ msgstr "Tus tokens se mostrarán aquí una vez que los crees.>>>>>>> main"
