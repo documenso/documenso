@@ -39,6 +39,7 @@ const ZTeamDocumentPreferencesFormSchema = z.object({
   documentVisibility: z.nativeEnum(DocumentVisibility),
   documentLanguage: z.enum(SUPPORTED_LANGUAGE_CODES),
   includeSenderDetails: z.boolean(),
+  typedSignatureEnabled: z.boolean(),
 });
 
 type TTeamDocumentPreferencesFormSchema = z.infer<typeof ZTeamDocumentPreferencesFormSchema>;
@@ -68,6 +69,7 @@ export const TeamDocumentPreferencesForm = ({
         ? settings?.documentLanguage
         : 'en',
       includeSenderDetails: settings?.includeSenderDetails ?? false,
+      typedSignatureEnabled: settings?.typedSignatureEnabled ?? true,
     },
     resolver: zodResolver(ZTeamDocumentPreferencesFormSchema),
   });
@@ -76,7 +78,8 @@ export const TeamDocumentPreferencesForm = ({
 
   const onSubmit = async (data: TTeamDocumentPreferencesFormSchema) => {
     try {
-      const { documentVisibility, documentLanguage, includeSenderDetails } = data;
+      const { documentVisibility, documentLanguage, includeSenderDetails, typedSignatureEnabled } =
+        data;
 
       await updateTeamDocumentPreferences({
         teamId: team.id,
@@ -84,6 +87,7 @@ export const TeamDocumentPreferencesForm = ({
           documentVisibility,
           documentLanguage,
           includeSenderDetails,
+          typedSignatureEnabled,
         },
       });
 
@@ -108,124 +112,162 @@ export const TeamDocumentPreferencesForm = ({
           className="flex h-full max-w-xl flex-col gap-y-4"
           disabled={form.formState.isSubmitting}
         >
-          <FormField
-            control={form.control}
-            name="documentVisibility"
-            render={({ field }) => (
-              <FormItem className="flex-1">
-                <FormLabel>
-                  <Trans>Default Document Visibility</Trans>
-                </FormLabel>
+          <span className="mb-2 rounded-md border p-4">
+            <FormField
+              control={form.control}
+              name="documentVisibility"
+              render={({ field }) => (
+                <FormItem className="flex-1">
+                  <FormLabel>
+                    <Trans>Default Document Visibility</Trans>
+                  </FormLabel>
 
-                <FormControl>
-                  <Select {...field} onValueChange={field.onChange}>
-                    <SelectTrigger className="bg-background text-muted-foreground">
-                      <SelectValue />
-                    </SelectTrigger>
+                  <FormControl>
+                    <Select {...field} onValueChange={field.onChange}>
+                      <SelectTrigger className="bg-background text-muted-foreground">
+                        <SelectValue />
+                      </SelectTrigger>
 
-                    <SelectContent>
-                      <SelectItem value={DocumentVisibility.EVERYONE}>
-                        <Trans>Everyone can access and view the document</Trans>
-                      </SelectItem>
-                      <SelectItem value={DocumentVisibility.MANAGER_AND_ABOVE}>
-                        <Trans>Only managers and above can access and view the document</Trans>
-                      </SelectItem>
-                      <SelectItem value={DocumentVisibility.ADMIN}>
-                        <Trans>Only admins can access and view the document</Trans>
-                      </SelectItem>
-                    </SelectContent>
-                  </Select>
-                </FormControl>
-
-                <FormDescription>
-                  <Trans>Controls the default visibility of an uploaded document.</Trans>
-                </FormDescription>
-              </FormItem>
-            )}
-          />
-
-          <FormField
-            control={form.control}
-            name="documentLanguage"
-            render={({ field }) => (
-              <FormItem className="flex-1">
-                <FormLabel>
-                  <Trans>Default Document Language</Trans>
-                </FormLabel>
-
-                <FormControl>
-                  <Select {...field} onValueChange={field.onChange}>
-                    <SelectTrigger className="bg-background text-muted-foreground">
-                      <SelectValue />
-                    </SelectTrigger>
-
-                    <SelectContent>
-                      {Object.entries(SUPPORTED_LANGUAGES).map(([code, language]) => (
-                        <SelectItem key={code} value={code}>
-                          {language.full}
+                      <SelectContent>
+                        <SelectItem value={DocumentVisibility.EVERYONE}>
+                          <Trans>Everyone can access and view the document</Trans>
                         </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </FormControl>
-
-                <FormDescription>
-                  <Trans>
-                    Controls the default language of an uploaded document. This will be used as the
-                    language in email communications with the recipients.
-                  </Trans>
-                </FormDescription>
-              </FormItem>
-            )}
-          />
-
-          <FormField
-            control={form.control}
-            name="includeSenderDetails"
-            render={({ field }) => (
-              <FormItem className="flex-1">
-                <FormLabel>
-                  <Trans>Send on Behalf of Team</Trans>
-                </FormLabel>
-
-                <div>
-                  <FormControl className="block">
-                    <Switch
-                      ref={field.ref}
-                      name={field.name}
-                      checked={field.value}
-                      onCheckedChange={field.onChange}
-                    />
+                        <SelectItem value={DocumentVisibility.MANAGER_AND_ABOVE}>
+                          <Trans>Only managers and above can access and view the document</Trans>
+                        </SelectItem>
+                        <SelectItem value={DocumentVisibility.ADMIN}>
+                          <Trans>Only admins can access and view the document</Trans>
+                        </SelectItem>
+                      </SelectContent>
+                    </Select>
                   </FormControl>
-                </div>
 
-                <div className="pt-2">
-                  <div className="text-muted-foreground text-xs font-medium">
-                    <Trans>Preview</Trans>
+                  <FormDescription>
+                    <Trans>Controls the default visibility of an uploaded document.</Trans>
+                  </FormDescription>
+                </FormItem>
+              )}
+            />
+          </span>
+
+          <span className="mb-2 rounded-md border p-4">
+            <FormField
+              control={form.control}
+              name="documentLanguage"
+              render={({ field }) => (
+                <FormItem className="flex-1">
+                  <FormLabel>
+                    <Trans>Default Document Language</Trans>
+                  </FormLabel>
+
+                  <FormControl>
+                    <Select {...field} onValueChange={field.onChange}>
+                      <SelectTrigger className="bg-background text-muted-foreground">
+                        <SelectValue />
+                      </SelectTrigger>
+
+                      <SelectContent>
+                        {Object.entries(SUPPORTED_LANGUAGES).map(([code, language]) => (
+                          <SelectItem key={code} value={code}>
+                            {language.full}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </FormControl>
+
+                  <FormDescription>
+                    <Trans>
+                      Controls the default language of an uploaded document. This will be used as
+                      the language in email communications with the recipients.
+                    </Trans>
+                  </FormDescription>
+                </FormItem>
+              )}
+            />
+          </span>
+
+          <span className="mb-2 rounded-md border p-4">
+            <FormField
+              control={form.control}
+              name="includeSenderDetails"
+              render={({ field }) => (
+                <FormItem className="flex-1">
+                  <FormLabel>
+                    <Trans>Send on Behalf of Team</Trans>
+                  </FormLabel>
+
+                  <div>
+                    <FormControl className="block">
+                      <Switch
+                        ref={field.ref}
+                        name={field.name}
+                        checked={field.value}
+                        onCheckedChange={field.onChange}
+                      />
+                    </FormControl>
                   </div>
 
-                  <Alert variant="neutral" className="mt-1 px-2.5 py-1.5 text-sm">
-                    {includeSenderDetails ? (
-                      <Trans>
-                        "{placeholderEmail}" on behalf of "{team.name}" has invited you to sign
-                        "example document".
-                      </Trans>
-                    ) : (
-                      <Trans>"{team.name}" has invited you to sign "example document".</Trans>
-                    )}
-                  </Alert>
-                </div>
+                  <div className="pt-2">
+                    <div className="text-muted-foreground text-xs font-medium">
+                      <Trans>Preview</Trans>
+                    </div>
 
-                <FormDescription>
-                  <Trans>
-                    Controls the formatting of the message that will be sent when inviting a
-                    recipient to sign a document. If a custom message has been provided while
-                    configuring the document, it will be used instead.
-                  </Trans>
-                </FormDescription>
-              </FormItem>
-            )}
-          />
+                    <Alert variant="neutral" className="mt-1 px-2.5 py-1.5 text-sm">
+                      {includeSenderDetails ? (
+                        <Trans>
+                          "{placeholderEmail}" on behalf of "{team.name}" has invited you to sign
+                          "example document".
+                        </Trans>
+                      ) : (
+                        <Trans>"{team.name}" has invited you to sign "example document".</Trans>
+                      )}
+                    </Alert>
+                  </div>
+
+                  <FormDescription>
+                    <Trans>
+                      Controls the formatting of the message that will be sent when inviting a
+                      recipient to sign a document. If a custom message has been provided while
+                      configuring the document, it will be used instead.
+                    </Trans>
+                  </FormDescription>
+                </FormItem>
+              )}
+            />
+          </span>
+
+          <span className="mb-2 rounded-md border p-4">
+            <FormField
+              control={form.control}
+              name="typedSignatureEnabled"
+              render={({ field }) => (
+                <FormItem className="flex-1">
+                  <FormLabel>
+                    <Trans>Enable Typed Signature</Trans>
+                  </FormLabel>
+
+                  <div>
+                    <FormControl className="block">
+                      <Switch
+                        ref={field.ref}
+                        name={field.name}
+                        checked={field.value}
+                        onCheckedChange={field.onChange}
+                      />
+                    </FormControl>
+                  </div>
+
+                  <FormDescription>
+                    <Trans>
+                      Controls whether the recipients can sign the documents using a typed
+                      signature. Enable or disable the typed signature globally.
+                    </Trans>
+                  </FormDescription>
+                </FormItem>
+              )}
+            />
+          </span>
 
           <div className="flex flex-row justify-end space-x-4">
             <Button type="submit" loading={form.formState.isSubmitting}>
