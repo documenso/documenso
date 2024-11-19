@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useCallback, useEffect, useId, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useId, useMemo, useRef, useState } from 'react';
 
 import type { DropResult, SensorAPI } from '@hello-pangea/dnd';
 import { DragDropContext, Draggable, Droppable } from '@hello-pangea/dnd';
@@ -94,7 +94,7 @@ export const AddTemplatePlaceholderRecipientsFormPartial = ({
       ];
     }
 
-    return recipients.map((recipient, index) => ({
+    let mappedRecipients = recipients.map((recipient, index) => ({
       nativeId: recipient.id,
       formId: String(recipient.id),
       name: recipient.name,
@@ -103,6 +103,14 @@ export const AddTemplatePlaceholderRecipientsFormPartial = ({
       actionAuth: ZRecipientAuthOptionsSchema.parse(recipient.authOptions)?.actionAuth ?? undefined,
       signingOrder: recipient.signingOrder ?? index + 1,
     }));
+
+    if (signingOrder === DocumentSigningOrder.SEQUENTIAL) {
+      mappedRecipients = mappedRecipients.sort(
+        (a, b) => (a.signingOrder ?? 0) - (b.signingOrder ?? 0),
+      );
+    }
+
+    return mappedRecipients;
   };
 
   const form = useForm<TAddTemplatePlacholderRecipientsFormSchema>({
