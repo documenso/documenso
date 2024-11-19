@@ -67,7 +67,10 @@ export type TSuccessfulDocumentResponseSchema = z.infer<typeof ZSuccessfulDocume
 
 export const ZSendDocumentForSigningMutationSchema = z
   .object({
-    sendEmail: z.boolean().optional().default(true),
+    sendEmail: z.boolean().optional().default(true).openapi({
+      description:
+        'Whether to send an email to the recipients asking them to action the document. If you disable this, you will need to manually distribute the document to the recipients using the generated signing links.',
+    }),
   })
   .or(z.literal('').transform(() => ({ sendEmail: true })));
 
