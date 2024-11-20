@@ -1,6 +1,6 @@
 import { createPagesRoute } from '@trigger.dev/nextjs';
 import type { IO } from '@trigger.dev/sdk';
-import { TriggerClient, eventTrigger } from '@trigger.dev/sdk';
+import { TriggerClient, cronTrigger, eventTrigger } from '@trigger.dev/sdk';
 
 import type { JobDefinition, JobRunIO, SimpleTriggerJobOptions } from './_internal/job';
 import { BaseJobProvider } from './base';
@@ -31,16 +31,30 @@ export class TriggerJobProvider extends BaseJobProvider {
   }
 
   public defineJob<N extends string, T>(job: JobDefinition<N, T>): void {
-    this._client.defineJob({
-      id: job.id,
-      name: job.name,
-      version: job.version,
-      trigger: eventTrigger({
-        name: job.trigger.name,
-        schema: job.trigger.schema,
-      }),
-      run: async (payload, io) => job.handler({ payload, io: this.convertTriggerIoToJobRunIo(io) }),
-    });
+    if (job.trigger.type === 'cron') {
+      this._client.defineJob({
+        id: job.id,
+        name: job.name,
+        version: job.version,
+        trigger: cronTrigger({
+          cron: job.trigger.schedule,
+        }),
+        run: async (payload, io) =>
+          job.handler({ payload: payload as T, io: this.convertTriggerIoToJobRunIo(io) }),
+      });
+    } else {
+      this._client.defineJob({
+        id: job.id,
+        name: job.name,
+        version: job.version,
+        trigger: eventTrigger({
+          name: job.trigger.name,
+          schema: job.trigger.schema,
+        }),
+        run: async (payload, io) =>
+          job.handler({ payload, io: this.convertTriggerIoToJobRunIo(io) }),
+      });
+    }
   }
 
   public async triggerJob(options: SimpleTriggerJobOptions): Promise<void> {

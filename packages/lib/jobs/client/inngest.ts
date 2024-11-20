@@ -38,30 +38,58 @@ export class InngestJobProvider extends BaseJobProvider {
 
   public defineJob<N extends string, T>(job: JobDefinition<N, T>): void {
     console.log('defining job', job.id);
-    const fn = this._client.createFunction(
-      {
-        id: job.id,
-        name: job.name,
-      },
-      {
-        event: job.trigger.name,
-      },
-      async (ctx) => {
-        const io = this.convertInngestIoToJobRunIo(ctx);
 
-        // We need to cast to any so we can deal with parsing later.
-        // eslint-disable-next-line @typescript-eslint/consistent-type-assertions, @typescript-eslint/no-explicit-any
-        let payload = ctx.event.data as any;
+    if (job.trigger.type === 'cron') {
+      const fn = this._client.createFunction(
+        {
+          id: job.id,
+          name: job.name,
+        },
+        {
+          cron: job.trigger.schedule,
+        },
+        async (ctx) => {
+          const io = this.convertInngestIoToJobRunIo(ctx);
 
-        if (job.trigger.schema) {
-          payload = job.trigger.schema.parse(payload);
-        }
+          // We need to cast to any so we can deal with parsing later.
+          // eslint-disable-next-line @typescript-eslint/consistent-type-assertions, @typescript-eslint/no-explicit-any
+          let payload = ctx.event.data as any;
 
-        await job.handler({ payload, io });
-      },
-    );
+          if (job.trigger.schema) {
+            payload = job.trigger.schema.parse(payload);
+          }
 
-    this._functions.push(fn);
+          await job.handler({ payload, io });
+        },
+      );
+
+      this._functions.push(fn);
+    } else {
+      const fn = this._client.createFunction(
+        {
+          id: job.id,
+          name: job.name,
+        },
+        {
+          event: job.trigger.name,
+        },
+        async (ctx) => {
+          const io = this.convertInngestIoToJobRunIo(ctx);
+
+          // We need to cast to any so we can deal with parsing later.
+          // eslint-disable-next-line @typescript-eslint/consistent-type-assertions, @typescript-eslint/no-explicit-any
+          let payload = ctx.event.data as any;
+
+          if (job.trigger.schema) {
+            payload = job.trigger.schema.parse(payload);
+          }
+
+          await job.handler({ payload, io });
+        },
+      );
+
+      this._functions.push(fn);
+    }
   }
 
   public async triggerJob(options: SimpleTriggerJobOptions): Promise<void> {

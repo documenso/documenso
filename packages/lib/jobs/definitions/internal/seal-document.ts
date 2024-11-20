@@ -41,6 +41,7 @@ export const SEAL_DOCUMENT_JOB_DEFINITION = {
   name: 'Seal Document',
   version: '1.0.0',
   trigger: {
+    type: 'event',
     name: SEAL_DOCUMENT_JOB_DEFINITION_ID,
     schema: SEAL_DOCUMENT_JOB_DEFINITION_SCHEMA,
   },

@@ -26,16 +26,26 @@ export type TriggerJobOptions<Definitions extends ReadonlyArray<JobDefinition> =
   };
 }[number];
 
+export type CronTrigger = {
+  type: 'cron';
+  schedule: string;
+  name?: string;
+};
+
+export type EventTrigger<N extends string = string> = {
+  type: 'event';
+  name: N;
+};
+
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type JobDefinition<Name extends string = string, Schema = any> = {
   id: string;
   name: string;
   version: string;
   enabled?: boolean;
-  trigger: {
-    name: Name;
-    schema?: z.ZodType<Schema>;
-  };
+  trigger:
+    | (EventTrigger<Name> & { schema?: z.ZodType<Schema> })
+    | (CronTrigger & { schema?: z.ZodType<Schema> });
   handler: (options: { payload: Schema; io: JobRunIO }) => Promise<Json | void>;
 };
 

@@ -15,6 +15,7 @@ export const SEND_CONFIRMATION_EMAIL_JOB_DEFINITION = {
   name: 'Send Confirmation Email',
   version: '1.0.0',
   trigger: {
+    type: 'event',
     name: SEND_CONFIRMATION_EMAIL_JOB_DEFINITION_ID,
     schema: SEND_CONFIRMATION_EMAIL_JOB_DEFINITION_SCHEMA,
   },

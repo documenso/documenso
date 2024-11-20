@@ -30,6 +30,7 @@ export const SEND_SIGNING_REJECTION_EMAILS_JOB_DEFINITION = {
   name: 'Send Rejection Emails',
   version: '1.0.0',
   trigger: {
+    type: 'event',
     name: SEND_SIGNING_REJECTION_EMAILS_JOB_DEFINITION_ID,
     schema: SEND_SIGNING_REJECTION_EMAILS_JOB_DEFINITION_SCHEMA,
   },
