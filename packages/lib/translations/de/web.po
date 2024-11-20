@@ -8,7 +8,7 @@ msgstr ""
 "Language: de\n"
 "Project-Id-Version: documenso-app\n"
 "Report-Msgid-Bugs-To: \n"
-"PO-Revision-Date: 2024-11-14 12:05\n"
+"PO-Revision-Date: 2024-11-20 11:56\n"
 "Last-Translator: \n"
 "Language-Team: German\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
@@ -62,7 +62,7 @@ msgstr "({0}) hat dich eingeladen, dieses Dokument zu unterzeichnen"
 msgid "({0}) has invited you to view this document"
 msgstr "({0}) hat dich eingeladen, dieses Dokument zu betrachten"
 
-#: apps/web/src/app/(signing)/sign/[token]/text-field.tsx:311
+#: apps/web/src/app/(signing)/sign/[token]/text-field.tsx:313
 msgid "{0, plural, one {(1 character over)} other {(# characters over)}}"
 msgstr "{0, plural, one {(1 Zeichen über dem Limit)} other {(# Zeichen über dem Limit)}}"
 
@@ -86,7 +86,7 @@ msgstr "{0, plural, one {<0>Du hast <1>1</1> ausstehende Team-Einladung</0>} oth
 
 #: apps/web/src/app/(signing)/sign/[token]/auto-sign.tsx:196
 msgid "{0, plural, one {1 matching field} other {# matching fields}}"
-msgstr ""
+msgstr "{0, plural, one {1 passendes Feld} other {# passende Felder}}"
 
 #: apps/web/src/app/(dashboard)/documents/[id]/edit/document-edit-page-view.tsx:129
 msgid "{0, plural, one {1 Recipient} other {# Recipients}}"
@@ -102,7 +102,7 @@ msgstr "{0, plural, zero {Werte auswählen} other {# ausgewählt...}}"
 
 #: apps/web/src/app/(signing)/sign/[token]/auto-sign.tsx:193
 msgid "{0}"
-msgstr ""
+msgstr "{0}"
 
 #: apps/web/src/components/templates/manage-public-template-dialog.tsx:249
 msgid "{0} direct signing templates"
@@ -124,7 +124,7 @@ msgstr "{0} Empfänger(in)"
 #~ msgid "{0} the document to complete the process."
 #~ msgstr "{0} the document to complete the process."
 
-#: apps/web/src/app/(signing)/sign/[token]/text-field.tsx:292
+#: apps/web/src/app/(signing)/sign/[token]/text-field.tsx:294
 msgid "{charactersRemaining, plural, one {1 character remaining} other {{charactersRemaining} characters remaining}}"
 msgstr "{charactersRemaining, plural, one {1 Zeichen verbleibend} other {{charactersRemaining} Zeichen verbleibend}}"
 
@@ -484,7 +484,7 @@ msgstr "Ein Fehler ist aufgetreten, während die Felder hinzugefügt wurden."
 
 #: apps/web/src/app/(signing)/sign/[token]/auto-sign.tsx:154
 msgid "An error occurred while auto-signing the document, some fields may not be signed. Please review and manually sign any remaining fields."
-msgstr ""
+msgstr "Beim automatischen Signieren des Dokuments ist ein Fehler aufgetreten, einige Felder wurden möglicherweise nicht signiert. Bitte überprüfen Sie und signieren Sie alle verbleibenden Felder manuell."
 
 #: apps/web/src/app/(dashboard)/templates/use-template-dialog.tsx:176
 msgid "An error occurred while creating document from template."
@@ -830,11 +830,11 @@ msgstr "Durch die Verwendung der elektronischen Unterschriftsfunktion stimmen Si
 #: apps/web/src/app/(signing)/sign/[token]/form.tsx:151
 #: apps/web/src/app/(signing)/sign/[token]/form.tsx:220
 #: apps/web/src/app/(signing)/sign/[token]/name-field.tsx:215
-#: apps/web/src/app/(signing)/sign/[token]/number-field.tsx:327
+#: apps/web/src/app/(signing)/sign/[token]/number-field.tsx:328
 #: apps/web/src/app/(signing)/sign/[token]/reject-document-dialog.tsx:153
 #: apps/web/src/app/(signing)/sign/[token]/sign-dialog.tsx:113
-#: apps/web/src/app/(signing)/sign/[token]/signature-field.tsx:305
-#: apps/web/src/app/(signing)/sign/[token]/text-field.tsx:333
+#: apps/web/src/app/(signing)/sign/[token]/signature-field.tsx:248
+#: apps/web/src/app/(signing)/sign/[token]/text-field.tsx:335
 #: apps/web/src/app/(teams)/t/[teamUrl]/settings/team-transfer-status.tsx:121
 #: apps/web/src/components/(dashboard)/settings/token/delete-token-dialog.tsx:176
 #: apps/web/src/components/(dashboard)/settings/webhooks/create-webhook-dialog.tsx:242
@@ -1800,7 +1800,7 @@ msgstr "Geben Sie Ihre E-Mail-Adresse ein, um das abgeschlossene Dokument zu erh
 msgid "Enter your name"
 msgstr "Geben Sie Ihren Namen ein"
 
-#: apps/web/src/app/(signing)/sign/[token]/text-field.tsx:278
+#: apps/web/src/app/(signing)/sign/[token]/text-field.tsx:280
 msgid "Enter your text here"
 msgstr "Geben Sie hier Ihren Text ein"
 
@@ -2254,7 +2254,7 @@ msgstr "Vorlage verwalten und anzeigen"
 
 #: apps/web/src/app/(dashboard)/settings/billing/page.tsx:136
 msgid "Manage billing"
-msgstr ""
+msgstr "Rechnungsmanagement"
 
 #: apps/web/src/components/templates/manage-public-template-dialog.tsx:341
 msgid "Manage details for this public template"
@@ -2489,7 +2489,7 @@ msgstr "Nicht unterstützt"
 msgid "Nothing to do"
 msgstr "Nichts zu tun"
 
-#: apps/web/src/app/(signing)/sign/[token]/number-field.tsx:270
+#: apps/web/src/app/(signing)/sign/[token]/number-field.tsx:271
 msgid "Number"
 msgstr "Nummer"
 
@@ -3052,8 +3052,8 @@ msgid "Roles"
 msgstr "Rollen"
 
 #: apps/web/src/app/(dashboard)/templates/template-direct-link-dialog.tsx:446
-#: apps/web/src/app/(signing)/sign/[token]/number-field.tsx:336
-#: apps/web/src/app/(signing)/sign/[token]/text-field.tsx:342
+#: apps/web/src/app/(signing)/sign/[token]/number-field.tsx:337
+#: apps/web/src/app/(signing)/sign/[token]/text-field.tsx:344
 #: apps/web/src/app/(teams)/t/[teamUrl]/settings/preferences/branding-preferences.tsx:312
 #: apps/web/src/app/(teams)/t/[teamUrl]/settings/preferences/document-preferences.tsx:274
 msgid "Save"
@@ -3672,8 +3672,8 @@ msgstr "Vorlagen"
 msgid "Templates allow you to quickly generate documents with pre-filled recipients and fields."
 msgstr "Vorlagen erlauben dir das schnelle Erstlelen von Dokumenten mit vorausgefüllten Empfängern und Feldern."
 
-#: apps/web/src/app/(signing)/sign/[token]/text-field.tsx:256
-#: apps/web/src/app/(signing)/sign/[token]/text-field.tsx:272
+#: apps/web/src/app/(signing)/sign/[token]/text-field.tsx:257
+#: apps/web/src/app/(signing)/sign/[token]/text-field.tsx:274
 msgid "Text"
 msgstr "Text"
 
@@ -4747,7 +4747,7 @@ msgstr "Wenn Sie auf Fortfahren klicken, werden Sie aufgefordert, den ersten ver
 
 #: apps/web/src/app/(signing)/sign/[token]/auto-sign.tsx:183
 msgid "When you sign a document, we can automatically fill in and sign the following fields using information that has already been provided. You can also manually sign or remove any automatically signed fields afterwards if you desire."
-msgstr ""
+msgstr "Wenn Sie ein Dokument unterschreiben, können wir die folgenden Felder automatisch ausfüllen und signieren, indem wir bereits bereitgestellte Informationen verwenden. Sie können auch nachträglich manuell unterschreiben oder automatisch signierte Felder entfernen, wenn Sie möchten."
 
 #: apps/web/src/app/(unauthenticated)/articles/signature-disclosure/page.tsx:36
 msgid "When you use our platform to affix your electronic signature to documents, you are consenting to do so under the Electronic Signatures in Global and National Commerce Act (E-Sign Act) and other applicable laws. This action indicates your agreement to use electronic means to sign documents and receive notifications."

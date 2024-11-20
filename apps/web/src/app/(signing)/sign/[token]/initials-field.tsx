@@ -128,13 +128,13 @@ export const InitialsField = ({
       )}
 
       {!field.inserted && (
-        <p className="group-hover:text-primary text-muted-foreground duration-200 group-hover:text-yellow-300">
+        <p className="group-hover:text-primary text-muted-foreground text-[clamp(0.425rem,25cqw,0.825rem)] duration-200 group-hover:text-yellow-300">
           <Trans>Initials</Trans>
         </p>
       )}
 
       {field.inserted && (
-        <p className="text-muted-foreground dark:text-background/80 text-[clamp(0.625rem,1cqw,0.825rem)] duration-200">
+        <p className="text-muted-foreground dark:text-background/80 text-[clamp(0.425rem,25cqw,0.825rem)] duration-200">
           {field.customText}
         </p>
       )}
