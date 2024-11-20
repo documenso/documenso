@@ -550,6 +550,10 @@ msgstr "Ccers"
 msgid "Character Limit"
 msgstr "Límite de caracteres"
 
+#: packages/ui/primitives/document-flow/types.ts:58
+msgid "Checkbox"
+msgstr ""
+
 #: packages/ui/primitives/document-flow/field-items-advanced-settings/checkbox-field.tsx:197
 msgid "Checkbox values"
 msgstr "Valores de Checkbox"
@@ -1170,6 +1174,7 @@ msgstr "Por favor confirma tu dirección de correo electrónico"
 msgid "Please try again or contact our support."
 msgstr "Por favor, inténtalo de nuevo o contacta a nuestro soporte."
 
+#: packages/ui/primitives/document-flow/types.ts:57
 #: packages/ui/primitives/template-flow/add-template-fields.tsx:768
 msgid "Radio"
 msgstr "Radio"
@@ -1291,6 +1296,7 @@ msgid "Search languages..."
 msgstr "Buscar idiomas..."
 
 #: packages/ui/primitives/document-flow/field-items-advanced-settings/dropdown-field.tsx:115
+#: packages/ui/primitives/document-flow/types.ts:59
 msgid "Select"
 msgstr "Seleccionar"
 
@@ -1808,4 +1814,3 @@ msgstr "Tu contraseña ha sido actualizada."
 #: packages/email/templates/team-delete.tsx:32
 msgid "Your team has been deleted"
 msgstr "Tu equipo ha sido eliminado"
-
