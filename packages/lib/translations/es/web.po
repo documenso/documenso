@@ -8,7 +8,7 @@ msgstr ""
 "Language: es\n"
 "Project-Id-Version: documenso-app\n"
 "Report-Msgid-Bugs-To: \n"
-"PO-Revision-Date: 2024-11-14 12:05\n"
+"PO-Revision-Date: 2024-11-20 11:56\n"
 "Last-Translator: \n"
 "Language-Team: Spanish\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
@@ -86,7 +86,7 @@ msgstr "{0, plural, one {<0>Tienes <1>1</1> invitación de equipo pendiente</0>}
 
 #: apps/web/src/app/(signing)/sign/[token]/auto-sign.tsx:196
 msgid "{0, plural, one {1 matching field} other {# matching fields}}"
-msgstr ""
+msgstr "{0, plural, one {1 campo que coincide} other {# campos que coinciden}}"
 
 #: apps/web/src/app/(dashboard)/documents/[id]/edit/document-edit-page-view.tsx:129
 msgid "{0, plural, one {1 Recipient} other {# Recipients}}"
@@ -102,7 +102,7 @@ msgstr "{0, plural, zero {Selecciona valores} other {# seleccionados...}}"
 
 #: apps/web/src/app/(signing)/sign/[token]/auto-sign.tsx:193
 msgid "{0}"
-msgstr ""
+msgstr "{0}"
 
 #: apps/web/src/components/templates/manage-public-template-dialog.tsx:249
 msgid "{0} direct signing templates"
@@ -484,7 +484,7 @@ msgstr "Ocurrió un error al agregar los campos."
 
 #: apps/web/src/app/(signing)/sign/[token]/auto-sign.tsx:154
 msgid "An error occurred while auto-signing the document, some fields may not be signed. Please review and manually sign any remaining fields."
-msgstr ""
+msgstr "Se produjo un error al firmar automáticamente el documento, es posible que algunos campos no estén firmados. Por favor, revise y firme manualmente cualquier campo restante."
 
 #: apps/web/src/app/(dashboard)/templates/use-template-dialog.tsx:176
 msgid "An error occurred while creating document from template."
@@ -2246,7 +2246,7 @@ msgstr "Gestionar y ver plantilla"
 
 #: apps/web/src/app/(dashboard)/settings/billing/page.tsx:136
 msgid "Manage billing"
-msgstr ""
+msgstr "Gestionar la facturación"
 
 #: apps/web/src/components/templates/manage-public-template-dialog.tsx:341
 msgid "Manage details for this public template"
@@ -4736,7 +4736,7 @@ msgstr "Cuando haces clic en continuar, se te pedirá que añadas el primer aute
 
 #: apps/web/src/app/(signing)/sign/[token]/auto-sign.tsx:183
 msgid "When you sign a document, we can automatically fill in and sign the following fields using information that has already been provided. You can also manually sign or remove any automatically signed fields afterwards if you desire."
-msgstr ""
+msgstr "Cuando firme un documento, podemos completar y firmar automáticamente los siguientes campos usando información que ya se ha proporcionado. También puede firmar manualmente o eliminar cualquier campo firmado automáticamente más tarde si lo desea."
 
 #: apps/web/src/app/(unauthenticated)/articles/signature-disclosure/page.tsx:36
 msgid "When you use our platform to affix your electronic signature to documents, you are consenting to do so under the Electronic Signatures in Global and National Commerce Act (E-Sign Act) and other applicable laws. This action indicates your agreement to use electronic means to sign documents and receive notifications."
@@ -5140,3 +5140,4 @@ msgstr "¡Tu token se creó con éxito! ¡Asegúrate de copiarlo porque no podr�
 #: apps/web/src/app/(teams)/t/[teamUrl]/settings/tokens/page.tsx:86
 msgid "Your tokens will be shown here once you create them."
 msgstr "Tus tokens se mostrarán aquí una vez que los crees."
+
