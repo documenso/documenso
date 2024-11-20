@@ -9,8 +9,8 @@ import {
   RecipientRole,
   SendStatus,
   SigningStatus,
+  WebhookTriggerEvents,
 } from '@documenso/prisma/client';
-import { WebhookTriggerEvents } from '@documenso/prisma/client';
 
 import { jobs } from '../../jobs/client';
 import { extractDerivedDocumentEmailSettings } from '../../types/document-email';
@@ -178,6 +178,16 @@ export const sendDocument = async ({
             documentId,
             recipientId: recipient.id,
             requestMetadata,
+          },
+        });
+
+        // TODO: Duncan: Audit Log
+        await jobs.triggerJob({
+          name: 'send.signing.reminder.email',
+          payload: {
+            documentId,
+            recipientId: recipient.id,
+            initialDelay: 24 * 60 * 60 * 1000, // 24 hours in milliseconds
           },
         });
       }),

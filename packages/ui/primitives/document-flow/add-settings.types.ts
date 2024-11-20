@@ -45,6 +45,7 @@ export const ZAddSettingsFormSchema = z.object({
       .union([z.string(), z.enum(SUPPORTED_LANGUAGE_CODES)])
       .optional()
       .default('en'),
+    reminderDays: z.number().optional(),
   }),
 });
 

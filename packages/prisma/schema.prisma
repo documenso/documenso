@@ -378,6 +378,7 @@ model DocumentMeta {
   language              String                     @default("en")
   distributionMethod    DocumentDistributionMethod @default(EMAIL)
   emailSettings         Json?
+  reminderDays          Int?                       @default(0)
 }
 
 enum ReadStatus {

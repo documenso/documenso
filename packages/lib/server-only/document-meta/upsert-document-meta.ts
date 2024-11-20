@@ -24,6 +24,7 @@ export type CreateDocumentMetaOptions = {
   signingOrder?: DocumentSigningOrder;
   distributionMethod?: DocumentDistributionMethod;
   typedSignatureEnabled?: boolean;
+  reminderDays?: number;
   language?: SupportedLanguageCodes;
   userId: number;
   requestMetadata: RequestMetadata;
@@ -42,6 +43,7 @@ export const upsertDocumentMeta = async ({
   emailSettings,
   distributionMethod,
   typedSignatureEnabled,
+  reminderDays,
   language,
   requestMetadata,
 }: CreateDocumentMetaOptions) => {
@@ -96,6 +98,7 @@ export const upsertDocumentMeta = async ({
         emailSettings,
         distributionMethod,
         typedSignatureEnabled,
+        reminderDays,
         language,
       },
       update: {
@@ -109,6 +112,7 @@ export const upsertDocumentMeta = async ({
         emailSettings,
         distributionMethod,
         typedSignatureEnabled,
+        reminderDays,
         language,
       },
     });
@@ -123,7 +127,7 @@ export const upsertDocumentMeta = async ({
           user,
           requestMetadata,
           data: {
-            changes: diffDocumentMetaChanges(originalDocumentMeta ?? {}, upsertedDocumentMeta),
+            changes,
           },
         }),
       });

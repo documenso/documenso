@@ -98,6 +98,7 @@ export const ZSetSettingsForDocumentMutationSchema = z.object({
           'Please enter a valid URL, make sure you include http:// or https:// part of the url.',
       }),
     language: z.enum(SUPPORTED_LANGUAGE_CODES).optional(),
+    reminderDays: z.number().optional(),
   }),
 });
 
@@ -167,6 +168,7 @@ export const ZSendDocumentMutationSchema = z.object({
           'Please enter a valid URL, make sure you include http:// or https:// part of the url.',
       }),
     emailSettings: ZDocumentEmailSettingsSchema.optional(),
+    reminderDays: z.number().optional(),
   }),
 });
 
