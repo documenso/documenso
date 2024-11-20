@@ -151,8 +151,6 @@ export const ZUpdateTeamMutationSchema = z.object({
   data: z.object({
     name: ZTeamNameSchema,
     url: ZTeamUrlSchema,
-    documentVisibility: z.nativeEnum(DocumentVisibility).optional(),
-    includeSenderDetails: z.boolean().optional(),
   }),
 });
 

@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useMemo, useRef, useState, useTransition } from 'react';
+import { useLayoutEffect, useMemo, useRef, useState, useTransition } from 'react';
 
 import { useRouter } from 'next/navigation';
 
@@ -112,6 +112,7 @@ export const SignatureField = ({
       actionTarget: field.type,
     });
   };
+
   const onSign = async (authOptions?: TRecipientActionAuth, signature?: string) => {
     try {
       const value = signature || providedSignature;
@@ -192,7 +193,7 @@ export const SignatureField = ({
     }
   };
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     if (!signatureRef.current || !containerRef.current || !signature?.typedSignature) {
       return;
     }
