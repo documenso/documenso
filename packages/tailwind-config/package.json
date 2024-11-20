@@ -7,14 +7,14 @@
     "clean": "rimraf node_modules"
   },
   "dependencies": {
+    "@tailwindcss/container-queries": "^0.1.1",
+    "@tailwindcss/typography": "^0.5.9",
     "autoprefixer": "^10.4.13",
     "postcss": "^8.4.32",
     "tailwindcss": "3.3.2",
     "tailwindcss-animate": "^1.0.5"
   },
-  "devDependencies": {
-    "@tailwindcss/typography": "^0.5.9"
-  },
+  "devDependencies": {},
   "publishConfig": {
     "access": "public"
   }
