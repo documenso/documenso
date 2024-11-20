@@ -178,7 +178,7 @@ export const DropdownField = ({
         )}
 
         {!field.inserted && (
-          <p className="group-hover:text-primary text-muted-foreground flex flex-col items-center justify-center duration-200">
+          <p className="group-hover:text-primary text-muted-foreground flex flex-col items-center justify-center duration-200 ">
             <Select value={localChoice} onValueChange={handleSelectItem}>
               <SelectTrigger
                 className={cn(
@@ -190,7 +190,7 @@ export const DropdownField = ({
                 )}
               >
                 <SelectValue
-                  className="text-[clamp(0.625rem,1cqw,0.825rem)]"
+                  className="text-[clamp(0.425rem,25cqw,0.825rem)]"
                   placeholder={`${_(msg`Select`)}`}
                 />
               </SelectTrigger>
@@ -206,7 +206,7 @@ export const DropdownField = ({
         )}
 
         {field.inserted && (
-          <p className="text-muted-foreground dark:text-background/80 text-[clamp(0.625rem,1cqw,0.825rem)] duration-200">
+          <p className="text-muted-foreground dark:text-background/80 text-[clamp(0.425rem,25cqw,0.825rem)] duration-200">
             {field.customText}
           </p>
         )}
