@@ -76,12 +76,6 @@ export function AutoSizedText({
     const isElementTooBig =
       childDimensions.width > parentDimensions.width || childDimensions.height > targetHeight;
 
-    console.log({
-      fontSizeLowerBound: fontSizeLowerBound.current,
-      fontSizeUpperBound: fontSizeUpperBound.current,
-      fontSize: fontSize.current,
-    });
-
     if (isElementTooBig) {
       // Scale down if element is bigger than target
       newFontSize = (fontSizeLowerBound.current + fontSize.current) / 2;
@@ -94,14 +88,6 @@ export function AutoSizedText({
       newFontSize = (fontSizeUpperBound.current + fontSize.current) / 2;
       fontSizeLowerBound.current = fontSize.current;
     }
-
-    console.log({
-      currentFontSize: fontSize.current,
-      newFontSize,
-      targetHeight,
-      currentHeight: childDimensions.height,
-      parentHeight: parentDimensions.height,
-    });
 
     fontSize.current = newFontSize;
 
@@ -131,13 +117,10 @@ export function AutoSizedText({
       fontSizeLowerBound.current = 0;
       fontSizeUpperBound.current = parentDimensions.height;
 
-      console.log('parentDimensions', structuredClone(parentDimensions));
-
       let iterationCount = 0;
 
       while (iterationCount <= ITERATION_LIMIT) {
         const childDimensions = getElementDimensions(childElement);
-        console.log({ childDimensions });
 
         const targetHeight =
           maxHeight && maxHeight < parentDimensions.height ? maxHeight : parentDimensions.height;
