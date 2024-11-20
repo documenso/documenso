@@ -45,7 +45,7 @@ export const FieldIcon = ({
     return (
       <div
         className={cn(
-          'text-field-card-foreground flex items-center justify-center gap-x-1 text-[clamp(0.875rem,1.8cqw,1.2rem)]',
+          'text-field-card-foreground flex items-center justify-center gap-x-1 text-[clamp(0.575rem,25cqw,1.2rem)]',
           fontCaveatClassName,
         )}
       >
@@ -71,8 +71,9 @@ export const FieldIcon = ({
     }
 
     return (
-      <div className="text-field-card-foreground flex items-center justify-center gap-x-1.5 text-[clamp(0.625rem,1cqw,0.825rem)]">
-        <Icon className="h-4 w-4" /> {label}
+      <div className="text-field-card-foreground flex items-center justify-center gap-x-1.5 text-[clamp(0.425rem,25cqw,0.825rem)]">
+        <Icon className="h-[clamp(0.625rem,20cqw,0.925rem)] w-[clamp(0.625rem,20cqw,0.925rem)]" />{' '}
+        {label}
       </div>
     );
   }

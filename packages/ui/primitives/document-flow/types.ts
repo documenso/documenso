@@ -45,7 +45,7 @@ export const ZDocumentFlowFormSchema = z.object({
 
 export type TDocumentFlowFormSchema = z.infer<typeof ZDocumentFlowFormSchema>;
 
-export const FRIENDLY_FIELD_TYPE: Record<FieldType, MessageDescriptor | string> = {
+export const FRIENDLY_FIELD_TYPE: Record<FieldType, MessageDescriptor> = {
   [FieldType.SIGNATURE]: msg`Signature`,
   [FieldType.FREE_SIGNATURE]: msg`Free Signature`,
   [FieldType.INITIALS]: msg`Initials`,
@@ -54,9 +54,9 @@ export const FRIENDLY_FIELD_TYPE: Record<FieldType, MessageDescriptor | string> 
   [FieldType.EMAIL]: msg`Email`,
   [FieldType.NAME]: msg`Name`,
   [FieldType.NUMBER]: msg`Number`,
-  [FieldType.RADIO]: `Radio`,
-  [FieldType.CHECKBOX]: `Checkbox`,
-  [FieldType.DROPDOWN]: `Select`,
+  [FieldType.RADIO]: msg`Radio`,
+  [FieldType.CHECKBOX]: msg`Checkbox`,
+  [FieldType.DROPDOWN]: msg`Select`,
 };
 
 export interface DocumentFlowStep {

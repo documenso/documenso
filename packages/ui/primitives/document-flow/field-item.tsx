@@ -35,6 +35,8 @@ export type FieldItemProps = {
   disabled?: boolean;
   minHeight?: number;
   minWidth?: number;
+  defaultHeight?: number;
+  defaultWidth?: number;
   onResize?: (_node: HTMLElement) => void;
   onMove?: (_node: HTMLElement) => void;
   onRemove?: () => void;
@@ -53,6 +55,8 @@ export const FieldItem = ({
   disabled,
   minHeight,
   minWidth,
+  defaultHeight,
+  defaultWidth,
   onResize,
   onMove,
   onRemove,
@@ -68,8 +72,8 @@ export const FieldItem = ({
   const [coords, setCoords] = useState({
     pageX: 0,
     pageY: 0,
-    pageHeight: 0,
-    pageWidth: 0,
+    pageHeight: defaultHeight || 0,
+    pageWidth: defaultWidth || 0,
   });
   const [settingsActive, setSettingsActive] = useState(false);
   const $el = useRef(null);
