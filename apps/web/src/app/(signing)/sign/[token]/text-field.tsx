@@ -252,14 +252,16 @@ export const TextField = ({ field, recipient, onSignField, onUnsignField }: Text
           )}
         >
           <span className="flex items-center justify-center gap-x-1">
-            <Type />
-            {fieldDisplayName || <Trans>Text</Trans>}
+            <Type className="h-[clamp(0.625rem,20cqw,0.925rem)] w-[clamp(0.625rem,20cqw,0.925rem)]" />
+            <span className="text-[clamp(0.425rem,25cqw,0.825rem)]">
+              {fieldDisplayName || <Trans>Text</Trans>}
+            </span>
           </span>
         </p>
       )}
 
       {field.inserted && (
-        <p className="text-muted-foreground dark:text-background/80 flex items-center justify-center gap-x-1 duration-200">
+        <p className="text-muted-foreground dark:text-background/80 flex items-center justify-center gap-x-1 text-[clamp(0.425rem,25cqw,0.825rem)] duration-200">
           {field.customText.length < 20
             ? field.customText
             : field.customText.substring(0, 15) + '...'}

@@ -12,9 +12,10 @@ import { createBillingPortal } from './create-billing-portal.action';
 
 export type BillingPortalButtonProps = {
   buttonProps?: React.ComponentProps<typeof Button>;
+  children?: React.ReactNode;
 };
 
-export const BillingPortalButton = ({ buttonProps }: BillingPortalButtonProps) => {
+export const BillingPortalButton = ({ buttonProps, children }: BillingPortalButtonProps) => {
   const { _ } = useLingui();
   const { toast } = useToast();
 
@@ -63,7 +64,7 @@ export const BillingPortalButton = ({ buttonProps }: BillingPortalButtonProps) =
       onClick={async () => handleFetchPortalUrl()}
       loading={isFetchingPortalUrl}
     >
-      <Trans>Manage Subscription</Trans>
+      {children || <Trans>Manage Subscription</Trans>}
     </Button>
   );
 };
