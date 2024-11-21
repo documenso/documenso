@@ -1,12 +1,12 @@
 /* eslint-disable turbo/no-undeclared-env-vars */
-import { NEXT_PUBLIC_MARKETING_URL } from '../constants/app';
+import { APP_BASE_URL } from '../constants/app';
 
 export const getBaseUrl = () => {
   if (typeof window !== 'undefined') {
     return '';
   }
 
-  const marketingAppUrl = NEXT_PUBLIC_MARKETING_URL();
+  const marketingAppUrl = APP_BASE_URL();
 
   if (marketingAppUrl) {
     return marketingAppUrl;
