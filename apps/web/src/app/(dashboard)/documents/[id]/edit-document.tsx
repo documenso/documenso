@@ -371,10 +371,6 @@ export const EditDocumentForm = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [step]);
 
-  const typedSignatureEnabled = team
-    ? team.teamGlobalSettings?.typedSignatureEnabled
-    : document.documentMeta?.typedSignatureEnabled;
-
   return (
     <div className={cn('grid w-full grid-cols-12 gap-8', className)}>
       <Card
@@ -432,7 +428,7 @@ export const EditDocumentForm = ({
               fields={fields}
               onSubmit={onAddFieldsFormSubmit}
               isDocumentPdfLoaded={isDocumentPdfLoaded}
-              typedSignatureEnabled={typedSignatureEnabled}
+              typedSignatureEnabled={document.documentMeta?.typedSignatureEnabled}
               teamId={team?.id}
             />
 

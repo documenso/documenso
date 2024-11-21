@@ -112,6 +112,7 @@ export const createDocument = async ({
         documentMeta: {
           create: {
             language: team?.teamGlobalSettings?.documentLanguage,
+            typedSignatureEnabled: team?.teamGlobalSettings?.typedSignatureEnabled,
           },
         },
       },
