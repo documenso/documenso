@@ -1317,7 +1317,7 @@ msgstr "顯示進階設定"
 
 #: packages/lib/constants/recipient-roles.ts:22
 msgid "Sign"
-msgstr "註冊/登入"
+msgstr "簽署"
 
 #: packages/email/template-components/template-document-invite.tsx:104
 msgid "Sign Document"
