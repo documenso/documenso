@@ -178,6 +178,10 @@ export const completeDocumentWithToken = async ({
             requestMetadata,
           },
         });
+
+        // TODO: Duncan -- trigger cron job to send reminder email
+        // TODO: Duncan -- audit log
+        // TODO: Trigger cron job if cron is activated
       });
     }
   }

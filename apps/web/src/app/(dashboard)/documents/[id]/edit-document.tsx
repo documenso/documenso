@@ -203,7 +203,7 @@ export const EditDocumentForm = ({
 
   const onAddSettingsFormSubmit = async (data: TAddSettingsFormSchema) => {
     try {
-      const { timezone, dateFormat, redirectUrl, language, reminderDays } = data.meta;
+      const { timezone, dateFormat, redirectUrl, language, reminderInterval } = data.meta;
 
       await setSettingsForDocument({
         documentId: document.id,
@@ -220,7 +220,7 @@ export const EditDocumentForm = ({
           dateFormat,
           redirectUrl,
           language: isValidLanguageCode(language) ? language : undefined,
-          reminderDays,
+          reminderInterval,
         },
       });
 

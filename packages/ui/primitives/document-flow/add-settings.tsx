@@ -13,6 +13,7 @@ import { DEFAULT_DOCUMENT_TIME_ZONE, TIME_ZONES } from '@documenso/lib/constants
 import { extractDocumentAuthMethods } from '@documenso/lib/utils/document-auth';
 import type { TeamMemberRole } from '@documenso/prisma/client';
 import { DocumentStatus, type Field, type Recipient, SendStatus } from '@documenso/prisma/client';
+import { ReminderInterval } from '@documenso/prisma/generated/types';
 import type { DocumentWithData } from '@documenso/prisma/types/document-with-data';
 import {
   DocumentGlobalAuthAccessSelect,
@@ -100,7 +101,7 @@ export const AddSettingsFormPartial = ({
             ?.value ?? DEFAULT_DOCUMENT_DATE_FORMAT,
         redirectUrl: document.documentMeta?.redirectUrl ?? '',
         language: document.documentMeta?.language ?? 'en',
-        reminderDays: document.documentMeta?.reminderDays ?? 0,
+        reminderInterval: document.documentMeta?.reminderInterval ?? ReminderInterval.NONE,
       },
     },
   });
@@ -394,32 +395,50 @@ export const AddSettingsFormPartial = ({
 
                     <FormField
                       control={form.control}
-                      name="meta.reminderDays"
+                      name="meta.reminderInterval"
                       render={({ field }) => (
                         <FormItem>
                           <FormLabel className="flex flex-row items-center">
-                            <Trans>Reminder</Trans>{' '}
+                            <Trans>Reminder Interval</Trans>{' '}
                             <Tooltip>
                               <TooltipTrigger>
                                 <InfoIcon className="mx-2 h-4 w-4" />
                               </TooltipTrigger>
 
                               <TooltipContent className="text-muted-foreground max-w-xs">
-                                <Trans>
-                                  Set the number of days between reminders for this document.
-                                </Trans>
+                                <Trans>Set the interval between reminders for this document.</Trans>
                               </TooltipContent>
                             </Tooltip>
                           </FormLabel>
 
                           <FormControl>
-                            <Input
-                              className="bg-background"
-                              type="number"
-                              min="0"
-                              {...field}
-                              onChange={(e) => field.onChange(parseInt(e.target.value, 10))}
-                            />
+                            <Select {...field} onValueChange={field.onChange}>
+                              <SelectTrigger className="bg-background">
+                                <SelectValue />
+                              </SelectTrigger>
+
+                              <SelectContent>
+                                <SelectItem value={ReminderInterval.NONE}>No reminders</SelectItem>
+                                <SelectItem value={ReminderInterval.EVERY_1_HOUR}>
+                                  Every hour
+                                </SelectItem>
+                                <SelectItem value={ReminderInterval.EVERY_6_HOURS}>
+                                  Every 6 hours
+                                </SelectItem>
+                                <SelectItem value={ReminderInterval.EVERY_12_HOURS}>
+                                  Every 12 hours
+                                </SelectItem>
+                                <SelectItem value={ReminderInterval.DAILY}>Daily</SelectItem>
+                                <SelectItem value={ReminderInterval.EVERY_3_DAYS}>
+                                  Every 3 days
+                                </SelectItem>
+                                <SelectItem value={ReminderInterval.WEEKLY}>Weekly</SelectItem>
+                                <SelectItem value={ReminderInterval.EVERY_2_WEEKS}>
+                                  Every 2 weeks
+                                </SelectItem>
+                                <SelectItem value={ReminderInterval.MONTHLY}>Monthly</SelectItem>
+                              </SelectContent>
+                            </Select>
                           </FormControl>
 
                           <FormMessage />

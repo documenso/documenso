@@ -9,6 +9,7 @@ import {
 } from '@documenso/lib/types/document-auth';
 import { isValidRedirectUrl } from '@documenso/lib/utils/is-valid-redirect-url';
 import { DocumentVisibility } from '@documenso/prisma/client';
+import { ReminderInterval } from '@documenso/prisma/generated/types';
 
 export const ZMapNegativeOneToUndefinedSchema = z
   .string()
@@ -45,7 +46,7 @@ export const ZAddSettingsFormSchema = z.object({
       .union([z.string(), z.enum(SUPPORTED_LANGUAGE_CODES)])
       .optional()
       .default('en'),
-    reminderDays: z.number().optional(),
+    reminderInterval: z.nativeEnum(ReminderInterval).optional().default(ReminderInterval.NONE),
   }),
 });
 

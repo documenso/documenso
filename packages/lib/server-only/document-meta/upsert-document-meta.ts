@@ -7,7 +7,11 @@ import {
   diffDocumentMetaChanges,
 } from '@documenso/lib/utils/document-audit-logs';
 import { prisma } from '@documenso/prisma';
-import type { DocumentDistributionMethod, DocumentSigningOrder } from '@documenso/prisma/client';
+import type {
+  DocumentDistributionMethod,
+  DocumentSigningOrder,
+  ReminderInterval,
+} from '@documenso/prisma/client';
 
 import type { SupportedLanguageCodes } from '../../constants/i18n';
 import type { TDocumentEmailSettings } from '../../types/document-email';
@@ -24,7 +28,7 @@ export type CreateDocumentMetaOptions = {
   signingOrder?: DocumentSigningOrder;
   distributionMethod?: DocumentDistributionMethod;
   typedSignatureEnabled?: boolean;
-  reminderDays?: number;
+  reminderInterval?: ReminderInterval;
   language?: SupportedLanguageCodes;
   userId: number;
   requestMetadata: RequestMetadata;
@@ -43,7 +47,7 @@ export const upsertDocumentMeta = async ({
   emailSettings,
   distributionMethod,
   typedSignatureEnabled,
-  reminderDays,
+  reminderInterval,
   language,
   requestMetadata,
 }: CreateDocumentMetaOptions) => {
@@ -98,7 +102,7 @@ export const upsertDocumentMeta = async ({
         emailSettings,
         distributionMethod,
         typedSignatureEnabled,
-        reminderDays,
+        reminderInterval,
         language,
       },
       update: {
@@ -112,7 +116,7 @@ export const upsertDocumentMeta = async ({
         emailSettings,
         distributionMethod,
         typedSignatureEnabled,
-        reminderDays,
+        reminderInterval,
         language,
       },
     });

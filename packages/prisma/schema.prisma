@@ -363,6 +363,18 @@ enum DocumentDistributionMethod {
   NONE
 }
 
+enum ReminderInterval {
+  NONE
+  EVERY_1_HOUR
+  EVERY_6_HOURS
+  EVERY_12_HOURS
+  DAILY
+  EVERY_3_DAYS
+  WEEKLY
+  EVERY_2_WEEKS
+  MONTHLY
+}
+
 model DocumentMeta {
   id                    String                     @id @default(cuid())
   subject               String?
@@ -378,7 +390,8 @@ model DocumentMeta {
   language              String                     @default("en")
   distributionMethod    DocumentDistributionMethod @default(EMAIL)
   emailSettings         Json?
-  reminderDays          Int?                       @default(0)
+  reminderInterval      ReminderInterval           @default(NONE)
+  lastReminderSentAt    DateTime?
 }
 
 enum ReadStatus {

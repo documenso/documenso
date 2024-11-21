@@ -264,7 +264,7 @@ export const documentRouter = router({
           meta.dateFormat ||
           meta.redirectUrl ||
           meta.language ||
-          meta.reminderDays
+          meta.reminderInterval
         ) {
           await upsertDocumentMeta({
             documentId,
@@ -272,7 +272,7 @@ export const documentRouter = router({
             timezone: meta.timezone,
             redirectUrl: meta.redirectUrl,
             language: meta.language,
-            reminderDays: meta.reminderDays,
+            reminderInterval: meta.reminderInterval,
             userId: ctx.user.id,
             requestMetadata,
           });
@@ -428,7 +428,7 @@ export const documentRouter = router({
           meta.redirectUrl ||
           meta.distributionMethod ||
           meta.emailSettings ||
-          meta.reminderDays
+          meta.reminderInterval
         ) {
           await upsertDocumentMeta({
             documentId,
@@ -438,7 +438,7 @@ export const documentRouter = router({
             timezone: meta.timezone,
             redirectUrl: meta.redirectUrl,
             distributionMethod: meta.distributionMethod,
-            reminderDays: meta.reminderDays,
+            reminderInterval: meta.reminderInterval,
             userId: ctx.user.id,
             emailSettings: meta.emailSettings,
             requestMetadata: extractNextApiRequestMetadata(ctx.req),

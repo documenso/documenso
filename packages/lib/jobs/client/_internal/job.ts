@@ -26,10 +26,10 @@ export type TriggerJobOptions<Definitions extends ReadonlyArray<JobDefinition> =
   };
 }[number];
 
-export type CronTrigger = {
+export type CronTrigger<N extends string = string> = {
   type: 'cron';
   schedule: string;
-  name?: string;
+  name: N;
 };
 
 export type EventTrigger<N extends string = string> = {
@@ -45,7 +45,7 @@ export type JobDefinition<Name extends string = string, Schema = any> = {
   enabled?: boolean;
   trigger:
     | (EventTrigger<Name> & { schema?: z.ZodType<Schema> })
-    | (CronTrigger & { schema?: z.ZodType<Schema> });
+    | (CronTrigger<Name> & { schema?: z.ZodType<Schema> });
   handler: (options: { payload: Schema; io: JobRunIO }) => Promise<Json | void>;
 };
 
