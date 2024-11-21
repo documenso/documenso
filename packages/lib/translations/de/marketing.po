@@ -67,8 +67,8 @@ msgstr "Weil Unterschriften gefeiert werden sollten. Deshalb kümmern wir uns um
 #: apps/marketing/src/components/(marketing)/footer.tsx:35
 #: apps/marketing/src/components/(marketing)/header.tsx:57
 #: apps/marketing/src/components/(marketing)/mobile-navigation.tsx:36
-msgid "Blog"
-msgstr "Blog"
+#~ msgid "Blog"
+#~ msgstr "Blog"
 
 #: apps/marketing/src/components/(marketing)/open-build-template-bento.tsx:64
 msgid "Build on top."
@@ -78,13 +78,13 @@ msgstr "Aufbauen oben drauf."
 msgid "Can I use Documenso commercially?"
 msgstr "Kann ich Documenso kommerziell nutzen?"
 
-#: apps/marketing/src/components/(marketing)/footer.tsx:42
+#: apps/marketing/src/components/(marketing)/footer.tsx:29
 msgid "Careers"
 msgstr "Karrieren"
 
 #: apps/marketing/src/components/(marketing)/footer.tsx:36
-msgid "Changelog"
-msgstr "Änderungsprotokoll"
+#~ msgid "Changelog"
+#~ msgstr "Änderungsprotokoll"
 
 #: apps/marketing/src/components/(marketing)/open-build-template-bento.tsx:85
 msgid "Choose a template from the community app store. Or submit your own template for others to use."
@@ -127,8 +127,8 @@ msgid "Customise and expand."
 msgstr "Anpassen und erweitern."
 
 #: apps/marketing/src/components/(marketing)/footer.tsx:38
-msgid "Design"
-msgstr "Design"
+#~ msgid "Design"
+#~ msgstr "Design"
 
 #: apps/marketing/src/app/(marketing)/pricing/page.tsx:44
 msgid "Designed for every stage of your journey."
@@ -146,15 +146,15 @@ msgstr "Documenso ist eine Gemeinschaftsanstrengung, um ein offenes und lebendig
 msgid "Documenso on X"
 msgstr "Documenso auf X"
 
-#: apps/marketing/src/components/(marketing)/hero.tsx:104
+#: apps/marketing/src/components/(marketing)/hero.tsx:38
 msgid "Document signing,<0/>finally open source."
 msgstr "Unterschriften,<0/>endlich Open Source."
 
 #: apps/marketing/src/components/(marketing)/footer.tsx:33
 #: apps/marketing/src/components/(marketing)/header.tsx:50
 #: apps/marketing/src/components/(marketing)/mobile-navigation.tsx:28
-msgid "Documentation"
-msgstr "Dokumentation"
+#~ msgid "Documentation"
+#~ msgstr "Dokumentation"
 
 #: apps/marketing/src/components/(marketing)/share-connect-paid-widget-bento.tsx:110
 msgid "Easily embed Documenso into your product. Simply copy and paste our react widget into your application."
@@ -337,7 +337,6 @@ msgid "No credit card required"
 msgstr "Keine Kreditkarte erforderlich"
 
 #: apps/marketing/src/components/(marketing)/callout.tsx:29
-#: apps/marketing/src/components/(marketing)/hero.tsx:125
 msgid "No Credit Card required"
 msgstr "Keine Kreditkarte erforderlich"
 
@@ -355,15 +354,12 @@ msgid "Open Source or Hosted."
 msgstr "Open Source oder Hosted."
 
 #: apps/marketing/src/app/(marketing)/open/page.tsx:161
-#: apps/marketing/src/components/(marketing)/footer.tsx:37
-#: apps/marketing/src/components/(marketing)/header.tsx:64
-#: apps/marketing/src/components/(marketing)/mobile-navigation.tsx:40
 msgid "Open Startup"
 msgstr "Offenes Startup"
 
 #: apps/marketing/src/components/(marketing)/footer.tsx:41
-msgid "OSS Friends"
-msgstr "OSS-Freunde"
+#~ msgid "OSS Friends"
+#~ msgstr "OSS-Freunde"
 
 #: apps/marketing/src/components/(marketing)/faster-smarter-beautiful-bento.tsx:91
 msgid "Our custom templates come with smart rules that can help you save time and energy."
@@ -382,14 +378,10 @@ msgid "Premium Profile Name"
 msgstr "Premium Profilname"
 
 #: apps/marketing/src/app/(marketing)/pricing/page.tsx:40
-#: apps/marketing/src/components/(marketing)/footer.tsx:31
-#: apps/marketing/src/components/(marketing)/header.tsx:42
-#: apps/marketing/src/components/(marketing)/mobile-navigation.tsx:24
 msgid "Pricing"
 msgstr "Preise"
 
-#: apps/marketing/src/components/(marketing)/footer.tsx:43
-#: apps/marketing/src/components/(marketing)/mobile-navigation.tsx:53
+#: apps/marketing/src/components/(marketing)/footer.tsx:30
 msgid "Privacy"
 msgstr "Datenschutz"
 
@@ -431,20 +423,20 @@ msgid "Seniority"
 msgstr "Dienstalter"
 
 #: apps/marketing/src/components/(marketing)/footer.tsx:39
-msgid "Shop"
-msgstr "Shop"
+#~ msgid "Shop"
+#~ msgstr "Shop"
 
 #: apps/marketing/src/app/(marketing)/singleplayer/client.tsx:63
 msgid "Sign"
 msgstr "Signieren"
 
-#: apps/marketing/src/components/(marketing)/header.tsx:72
-#: apps/marketing/src/components/(marketing)/mobile-navigation.tsx:61
+#: apps/marketing/src/components/(marketing)/header.tsx:43
+#: apps/marketing/src/components/(marketing)/mobile-navigation.tsx:28
 msgid "Sign in"
 msgstr "Anmelden"
 
-#: apps/marketing/src/components/(marketing)/header.tsx:77
-#: apps/marketing/src/components/(marketing)/mobile-navigation.tsx:57
+#: apps/marketing/src/components/(marketing)/header.tsx:48
+#: apps/marketing/src/components/(marketing)/mobile-navigation.tsx:24
 msgid "Sign up"
 msgstr "Registrieren"
 
@@ -463,8 +455,8 @@ msgid "Smart."
 msgstr "Intelligent."
 
 #: apps/marketing/src/components/(marketing)/hero.tsx:132
-msgid "Star on GitHub"
-msgstr "Auf GitHub favorisieren"
+#~ msgid "Star on GitHub"
+#~ msgstr "Auf GitHub favorisieren"
 
 #: apps/marketing/src/app/(marketing)/open/page.tsx:226
 msgid "Stars"
@@ -472,11 +464,10 @@ msgstr "Favoriten"
 
 #: apps/marketing/src/components/(marketing)/footer.tsx:40
 #: apps/marketing/src/components/(marketing)/mobile-navigation.tsx:44
-msgid "Status"
-msgstr "Status"
+#~ msgid "Status"
+#~ msgstr "Status"
 
-#: apps/marketing/src/components/(marketing)/footer.tsx:34
-#: apps/marketing/src/components/(marketing)/mobile-navigation.tsx:48
+#: apps/marketing/src/components/(marketing)/footer.tsx:28
 msgid "Support"
 msgstr "Support"
 
@@ -534,7 +525,6 @@ msgid "Truly your own."
 msgstr "Wirklich Ihr Eigenes."
 
 #: apps/marketing/src/components/(marketing)/callout.tsx:27
-#: apps/marketing/src/components/(marketing)/hero.tsx:123
 msgid "Try our Free Plan"
 msgstr "Probieren Sie unseren Gratisplan aus"
 
@@ -602,4 +592,3 @@ msgstr "Sie können Documenso kostenlos selbst hosten oder unsere sofort einsatz
 #: apps/marketing/src/components/(marketing)/carousel.tsx:272
 msgid "Your browser does not support the video tag."
 msgstr "Ihr Browser unterstützt das Video-Tag nicht."
-

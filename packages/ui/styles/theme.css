@@ -28,19 +28,19 @@
     --border: 214.3 31.8% 91.4%;
     --input: 214.3 31.8% 91.4%;
 
-    --primary: 195.08 71.08% 67.45%;
-    --primary-foreground: 195.08 71.08% 10%;
+    --primary: 266 100% 64%;
+    --primary-foreground: 266 100% 10%;
 
-    --secondary: 210 40% 96.1%;
-    --secondary-foreground: 222.2 47.4% 11.2%;
+    --secondary: 270, 93%, 73%;
+    --secondary-foreground: 270, 93%, 20%;
 
-    --accent: 210 40% 96.1%;
-    --accent-foreground: 222.2 47.4% 11.2%;
+    --accent: 270, 93%, 73%;
+    --accent-foreground: 270, 93%, 20%;
 
     --destructive: 0 100% 50%;
     --destructive-foreground: 210 40% 98%;
 
-    --ring: 95.08 71.08% 67.45%;
+    --ring: 266 100% 67.45%;
 
     --radius: 0.5rem;
 
@@ -81,31 +81,31 @@
     --new-white-800: 0, 0%, 90%;
     --new-white-900: 0, 0%, 100%;
 
-    /* Primary - Green */
-    --new-primary-50: 198, 73%, 97%;
-    --new-primary-100: 195, 73%, 94%;
-    --new-primary-200: 194, 70%, 87%;
-    --new-primary-300: 195, 71%, 81%;
-    --new-primary-400: 195, 71%, 74%;
-    --new-primary-500: 195, 71%, 67%;
-    --new-primary-600: 195, 71%, 54%;
-    --new-primary-700: 195, 71%, 41%;
-    --new-primary-800: 195, 71%, 27%;
-    --new-primary-900: 195, 72%, 14%;
-    --new-primary-950: 195, 72%, 7%;
+    /* Primary - Purple */
+    --new-primary-50: 268, 100%, 97%;
+    --new-primary-100: 267, 100%, 94%;
+    --new-primary-200: 266, 100%, 87%;
+    --new-primary-300: 266, 100%, 81%;
+    --new-primary-400: 266, 100%, 74%;
+    --new-primary-500: 266, 100%, 64%; /* Main color */
+    --new-primary-600: 266, 100%, 54%;
+    --new-primary-700: 266, 100%, 41%;
+    --new-primary-800: 266, 100%, 27%;
+    --new-primary-900: 266, 100%, 14%;
+    --new-primary-950: 266, 100%, 7%;
 
     /* Secondary - Info */
-    --new-info-50: 210, 54%, 95%;
-    --new-info-100: 211, 57%, 90%;
-    --new-info-200: 212, 55%, 80%;
-    --new-info-300: 212, 56%, 70%;
-    --new-info-400: 212, 56%, 60%;
-    --new-info-500: 212, 56%, 50%;
-    --new-info-600: 212, 56%, 40%;
-    --new-info-700: 212, 56%, 30%;
-    --new-info-800: 212, 55%, 20%;
-    --new-info-900: 211, 57%, 10%;
-    --new-info-950: 214, 54%, 5%;
+    --new-info-50: 270, 93%, 95%;
+    --new-info-100: 270, 93%, 90%;
+    --new-info-200: 270, 93%, 80%;
+    --new-info-300: 270, 93%, 70%;
+    --new-info-400: 270, 93%, 65%;
+    --new-info-500: 270, 93%, 60%; /* Main color lighter shade */
+    --new-info-600: 270, 93%, 50%;
+    --new-info-700: 270, 93%, 40%;
+    --new-info-800: 270, 93%, 30%;
+    --new-info-900: 270, 93%, 20%;
+    --new-info-950: 270, 93%, 10%;
 
     /* Secondary - Error */
     --new-error-50: 4, 80%, 96%;
@@ -159,8 +159,8 @@
     --border: 0 0% 27.9%;
     --input: 0 0% 27.9%;
 
-    --primary: 195.08 71.08% 67.45%;
-    --primary-foreground: 195.08 71.08% 10%;
+    --primary: 266 100% 64%;
+    --primary-foreground: 266 100% 10%;
 
     --secondary: 0 0% 23.4%;
     --secondary-foreground: 95.08 71.08% 67.45%;
@@ -171,7 +171,7 @@
     --destructive: 0 87% 62%;
     --destructive-foreground: 0 87% 19%;
 
-    --ring: 195.08 71.08% 67.45%;
+    --ring: 266 100% 67.45%;
 
     --radius: 0.5rem;
 

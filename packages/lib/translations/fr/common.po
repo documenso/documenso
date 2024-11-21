@@ -267,7 +267,7 @@ msgstr "<0>{senderName}</0> a demandé que vous preniez possession de l'équipe 
 msgid "<0>{teamName}</0> has requested to use your email address for their team on Documenso."
 msgstr "<0>{teamName}</0> a demandé à utiliser votre adresse e-mail pour leur équipe sur Documenso."
 
-#: packages/ui/primitives/template-flow/add-template-settings.tsx:241
+#: packages/ui/primitives/template-flow/add-template-settings.tsx:239
 msgid "<0>Email</0> - The recipient will be emailed the document to sign, approve, etc."
 msgstr "<0>E-mail</0> - Le destinataire recevra le document par e-mail pour signer, approuver, etc."
 
@@ -275,7 +275,7 @@ msgstr "<0>E-mail</0> - Le destinataire recevra le document par e-mail pour sign
 msgid "<0>Inherit authentication method</0> - Use the global action signing authentication method configured in the \"General Settings\" step"
 msgstr "<0>Hériter du méthode d'authentification</0> - Utiliser la méthode d'authentification de signature d'action globale configurée dans l'étape \"Paramètres Générales\""
 
-#: packages/ui/primitives/template-flow/add-template-settings.tsx:247
+#: packages/ui/primitives/template-flow/add-template-settings.tsx:245
 msgid "<0>Links</0> - We will generate links which you can send to the recipients manually."
 msgstr "<0>Liens</0> - Nous générerons des liens que vous pourrez envoyer manuellement aux destinataires."
 
@@ -291,7 +291,7 @@ msgstr "<0>Aucune restriction</0> - Le document peut être accédé directement 
 msgid "<0>None</0> - No authentication required"
 msgstr "<0>Aucun</0> - Aucune authentification requise"
 
-#: packages/ui/primitives/template-flow/add-template-settings.tsx:254
+#: packages/ui/primitives/template-flow/add-template-settings.tsx:252
 msgid "<0>Note</0> - If you use Links in combination with direct templates, you will need to manually send the links to the remaining recipients."
 msgstr "<0>Remarque</0> - Si vous utilisez des liens en combinaison avec des modèles directs, vous devrez envoyer manuellement les liens aux autres destinataires."
 
@@ -388,16 +388,16 @@ msgstr "Accepter la demande de transfert d'équipe sur Documenso"
 msgid "Add a document"
 msgstr "Ajouter un document"
 
-#: packages/ui/primitives/document-flow/add-settings.tsx:378
-#: packages/ui/primitives/template-flow/add-template-settings.tsx:468
+#: packages/ui/primitives/document-flow/add-settings.tsx:376
+#: packages/ui/primitives/template-flow/add-template-settings.tsx:466
 msgid "Add a URL to redirect the user to once the document is signed"
 msgstr "Ajouter une URL pour rediriger l'utilisateur une fois le document signé"
 
-#: packages/ui/primitives/document-flow/add-settings.tsx:290
+#: packages/ui/primitives/document-flow/add-settings.tsx:288
 msgid "Add an external ID to the document. This can be used to identify the document in external systems."
 msgstr "Ajouter un ID externe au document. Cela peut être utilisé pour identifier le document dans des systèmes externes."
 
-#: packages/ui/primitives/template-flow/add-template-settings.tsx:385
+#: packages/ui/primitives/template-flow/add-template-settings.tsx:383
 msgid "Add an external ID to the template. This can be used to identify in external systems."
 msgstr "Ajouter un ID externe au modèle. Cela peut être utilisé pour identifier dans des systèmes externes."
 
@@ -438,8 +438,8 @@ msgstr "Ajouter du texte au champ"
 msgid "Admin"
 msgstr "Administrateur"
 
-#: packages/ui/primitives/document-flow/add-settings.tsx:272
-#: packages/ui/primitives/template-flow/add-template-settings.tsx:367
+#: packages/ui/primitives/document-flow/add-settings.tsx:270
+#: packages/ui/primitives/template-flow/add-template-settings.tsx:365
 msgid "Advanced Options"
 msgstr "Options avancées"
 
@@ -653,8 +653,8 @@ msgstr "Texte personnalisé"
 msgid "Date"
 msgstr "Date"
 
-#: packages/ui/primitives/document-flow/add-settings.tsx:313
-#: packages/ui/primitives/template-flow/add-template-settings.tsx:408
+#: packages/ui/primitives/document-flow/add-settings.tsx:311
+#: packages/ui/primitives/template-flow/add-template-settings.tsx:406
 msgid "Date Format"
 msgstr "Format de date"
 
@@ -679,8 +679,8 @@ msgid "Document \"{0}\" - Rejection Confirmed"
 msgstr "Document \"{0}\" - Rejet Confirmé"
 
 #: packages/ui/components/document/document-global-auth-access-select.tsx:62
-#: packages/ui/primitives/document-flow/add-settings.tsx:216
-#: packages/ui/primitives/template-flow/add-template-settings.tsx:202
+#: packages/ui/primitives/document-flow/add-settings.tsx:214
+#: packages/ui/primitives/template-flow/add-template-settings.tsx:200
 msgid "Document access"
 msgstr "Accès au document"
 
@@ -727,8 +727,8 @@ msgstr "E-mail de document supprimé"
 msgid "Document Deleted!"
 msgstr "Document Supprimé !"
 
-#: packages/ui/primitives/template-flow/add-template-settings.tsx:219
-#: packages/ui/primitives/template-flow/add-template-settings.tsx:228
+#: packages/ui/primitives/template-flow/add-template-settings.tsx:217
+#: packages/ui/primitives/template-flow/add-template-settings.tsx:226
 msgid "Document Distribution Method"
 msgstr "Méthode de distribution du document"
 
@@ -813,7 +813,7 @@ msgstr "Email"
 msgid "Email is required"
 msgstr "L'email est requis"
 
-#: packages/ui/primitives/template-flow/add-template-settings.tsx:307
+#: packages/ui/primitives/template-flow/add-template-settings.tsx:305
 msgid "Email Options"
 msgstr "Options d'email"
 
@@ -851,8 +851,8 @@ msgstr "Entrez le mot de passe"
 msgid "Error"
 msgstr "Erreur"
 
-#: packages/ui/primitives/document-flow/add-settings.tsx:283
-#: packages/ui/primitives/template-flow/add-template-settings.tsx:378
+#: packages/ui/primitives/document-flow/add-settings.tsx:281
+#: packages/ui/primitives/template-flow/add-template-settings.tsx:376
 msgid "External ID"
 msgstr "ID externe"
 
@@ -1008,7 +1008,7 @@ msgid "Member"
 msgstr "Membre"
 
 #: packages/ui/primitives/document-flow/add-subject.tsx:160
-#: packages/ui/primitives/template-flow/add-template-settings.tsx:338
+#: packages/ui/primitives/template-flow/add-template-settings.tsx:336
 msgid "Message <0>(Optional)</0>"
 msgstr "Message <0>(Optionnel)</0>"
 
@@ -1200,8 +1200,8 @@ msgid "Recipient"
 msgstr "Destinataire"
 
 #: packages/ui/components/recipient/recipient-action-auth-select.tsx:39
-#: packages/ui/primitives/document-flow/add-settings.tsx:257
-#: packages/ui/primitives/template-flow/add-template-settings.tsx:291
+#: packages/ui/primitives/document-flow/add-settings.tsx:255
+#: packages/ui/primitives/template-flow/add-template-settings.tsx:289
 msgid "Recipient action authentication"
 msgstr "Authentification d'action de destinataire"
 
@@ -1217,8 +1217,8 @@ msgstr "E-mail de demande de signature de destinataire"
 msgid "Red"
 msgstr "Rouge"
 
-#: packages/ui/primitives/document-flow/add-settings.tsx:371
-#: packages/ui/primitives/template-flow/add-template-settings.tsx:461
+#: packages/ui/primitives/document-flow/add-settings.tsx:369
+#: packages/ui/primitives/template-flow/add-template-settings.tsx:459
 msgid "Redirect URL"
 msgstr "URL de redirection"
 
@@ -1429,7 +1429,7 @@ msgid "Step <0>{step} of {maxStep}</0>"
 msgstr "Étape <0>{step} sur {maxStep}</0>"
 
 #: packages/ui/primitives/document-flow/add-subject.tsx:143
-#: packages/ui/primitives/template-flow/add-template-settings.tsx:318
+#: packages/ui/primitives/template-flow/add-template-settings.tsx:316
 msgid "Subject <0>(Optional)</0>"
 msgstr "Objet <0>(Optionnel)</0>"
 
@@ -1589,7 +1589,7 @@ msgstr "Cet e-mail sera envoyé au destinataire qui vient de signer le document,
 msgid "This field cannot be modified or deleted. When you share this template's direct link or add it to your public profile, anyone who accesses it can input their name and email, and fill in the fields assigned to them."
 msgstr "Ce champ ne peut pas être modifié ou supprimé. Lorsque vous partagez le lien direct de ce modèle ou l'ajoutez à votre profil public, toute personne qui y accède peut saisir son nom et son email, et remplir les champs qui lui sont attribués."
 
-#: packages/ui/primitives/template-flow/add-template-settings.tsx:233
+#: packages/ui/primitives/template-flow/add-template-settings.tsx:231
 msgid "This is how the document will reach the recipients once the document is ready for signing."
 msgstr "Voici comment le document atteindra les destinataires une fois qu'il sera prêt à être signé."
 
@@ -1613,8 +1613,8 @@ msgstr "Cela sera envoyé à tous les destinataires une fois que le document aur
 msgid "This will override any global settings."
 msgstr "Cela remplacera tous les paramètres globaux."
 
-#: packages/ui/primitives/document-flow/add-settings.tsx:347
-#: packages/ui/primitives/template-flow/add-template-settings.tsx:438
+#: packages/ui/primitives/document-flow/add-settings.tsx:345
+#: packages/ui/primitives/template-flow/add-template-settings.tsx:436
 msgid "Time Zone"
 msgstr "Fuseau horaire"
 
@@ -1808,4 +1808,3 @@ msgstr "Votre mot de passe a été mis à jour."
 #: packages/email/templates/team-delete.tsx:32
 msgid "Your team has been deleted"
 msgstr "Votre équipe a été supprimée"
-

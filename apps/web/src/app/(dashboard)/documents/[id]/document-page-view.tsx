@@ -139,7 +139,7 @@ export const DocumentPageView = async ({ params, team }: DocumentPageViewProps) 
         <DocumentRecipientLinkCopyDialog recipients={recipients} />
       )}
 
-      <Link href={documentRootPath} className="flex items-center text-[#559DC4] hover:opacity-80">
+      <Link href={documentRootPath} className="flex items-center text-[#B978FA] hover:opacity-80">
         <ChevronLeft className="mr-2 inline-block h-5 w-5" />
         <Trans>Documents</Trans>
       </Link>

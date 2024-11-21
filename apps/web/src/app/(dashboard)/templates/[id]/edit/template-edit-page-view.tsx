@@ -57,7 +57,7 @@ export const TemplateEditPageView = async ({ params, team }: TemplateEditPageVie
         <div>
           <Link
             href={`${templateRootPath}/${templateId}`}
-            className="flex items-center text-[#559DC4] hover:opacity-80"
+            className="flex items-center text-[#B978FA] hover:opacity-80"
           >
             <ChevronLeft className="mr-2 inline-block h-5 w-5" />
             <Trans>Template</Trans>

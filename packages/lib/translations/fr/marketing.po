@@ -67,8 +67,8 @@ msgstr "Parce que la signature doit être célébrée. C'est pourquoi nous nous 
 #: apps/marketing/src/components/(marketing)/footer.tsx:35
 #: apps/marketing/src/components/(marketing)/header.tsx:57
 #: apps/marketing/src/components/(marketing)/mobile-navigation.tsx:36
-msgid "Blog"
-msgstr "Blog"
+#~ msgid "Blog"
+#~ msgstr "Blog"
 
 #: apps/marketing/src/components/(marketing)/open-build-template-bento.tsx:64
 msgid "Build on top."
@@ -78,13 +78,13 @@ msgstr "Construire dessus."
 msgid "Can I use Documenso commercially?"
 msgstr "Puis-je utiliser Documenso commercialement ?"
 
-#: apps/marketing/src/components/(marketing)/footer.tsx:42
+#: apps/marketing/src/components/(marketing)/footer.tsx:29
 msgid "Careers"
 msgstr "Carrières"
 
 #: apps/marketing/src/components/(marketing)/footer.tsx:36
-msgid "Changelog"
-msgstr "Changelog"
+#~ msgid "Changelog"
+#~ msgstr "Changelog"
 
 #: apps/marketing/src/components/(marketing)/open-build-template-bento.tsx:85
 msgid "Choose a template from the community app store. Or submit your own template for others to use."
@@ -127,8 +127,8 @@ msgid "Customise and expand."
 msgstr "Personnaliser et étendre."
 
 #: apps/marketing/src/components/(marketing)/footer.tsx:38
-msgid "Design"
-msgstr "Conception"
+#~ msgid "Design"
+#~ msgstr "Conception"
 
 #: apps/marketing/src/app/(marketing)/pricing/page.tsx:44
 msgid "Designed for every stage of your journey."
@@ -146,15 +146,15 @@ msgstr "Documenso est un effort collectif pour créer un écosystème ouvert et 
 msgid "Documenso on X"
 msgstr "Documenso sur X"
 
-#: apps/marketing/src/components/(marketing)/hero.tsx:104
+#: apps/marketing/src/components/(marketing)/hero.tsx:38
 msgid "Document signing,<0/>finally open source."
 msgstr "Signature de documents,<0/> enfin open source."
 
 #: apps/marketing/src/components/(marketing)/footer.tsx:33
 #: apps/marketing/src/components/(marketing)/header.tsx:50
 #: apps/marketing/src/components/(marketing)/mobile-navigation.tsx:28
-msgid "Documentation"
-msgstr "Documentation"
+#~ msgid "Documentation"
+#~ msgstr "Documentation"
 
 #: apps/marketing/src/components/(marketing)/share-connect-paid-widget-bento.tsx:110
 msgid "Easily embed Documenso into your product. Simply copy and paste our react widget into your application."
@@ -337,7 +337,6 @@ msgid "No credit card required"
 msgstr "Aucune carte de crédit requise"
 
 #: apps/marketing/src/components/(marketing)/callout.tsx:29
-#: apps/marketing/src/components/(marketing)/hero.tsx:125
 msgid "No Credit Card required"
 msgstr "Aucune carte de crédit requise"
 
@@ -355,15 +354,12 @@ msgid "Open Source or Hosted."
 msgstr "Open Source ou hébergé."
 
 #: apps/marketing/src/app/(marketing)/open/page.tsx:161
-#: apps/marketing/src/components/(marketing)/footer.tsx:37
-#: apps/marketing/src/components/(marketing)/header.tsx:64
-#: apps/marketing/src/components/(marketing)/mobile-navigation.tsx:40
 msgid "Open Startup"
 msgstr "Startup ouverte"
 
 #: apps/marketing/src/components/(marketing)/footer.tsx:41
-msgid "OSS Friends"
-msgstr "Amis OSS"
+#~ msgid "OSS Friends"
+#~ msgstr "Amis OSS"
 
 #: apps/marketing/src/components/(marketing)/faster-smarter-beautiful-bento.tsx:91
 msgid "Our custom templates come with smart rules that can help you save time and energy."
@@ -382,14 +378,10 @@ msgid "Premium Profile Name"
 msgstr "Nom de profil premium"
 
 #: apps/marketing/src/app/(marketing)/pricing/page.tsx:40
-#: apps/marketing/src/components/(marketing)/footer.tsx:31
-#: apps/marketing/src/components/(marketing)/header.tsx:42
-#: apps/marketing/src/components/(marketing)/mobile-navigation.tsx:24
 msgid "Pricing"
 msgstr "Prix"
 
-#: apps/marketing/src/components/(marketing)/footer.tsx:43
-#: apps/marketing/src/components/(marketing)/mobile-navigation.tsx:53
+#: apps/marketing/src/components/(marketing)/footer.tsx:30
 msgid "Privacy"
 msgstr "Confidentialité"
 
@@ -431,20 +423,20 @@ msgid "Seniority"
 msgstr "Ancienneté"
 
 #: apps/marketing/src/components/(marketing)/footer.tsx:39
-msgid "Shop"
-msgstr "Boutique"
+#~ msgid "Shop"
+#~ msgstr "Boutique"
 
 #: apps/marketing/src/app/(marketing)/singleplayer/client.tsx:63
 msgid "Sign"
 msgstr "Signer"
 
-#: apps/marketing/src/components/(marketing)/header.tsx:72
-#: apps/marketing/src/components/(marketing)/mobile-navigation.tsx:61
+#: apps/marketing/src/components/(marketing)/header.tsx:43
+#: apps/marketing/src/components/(marketing)/mobile-navigation.tsx:28
 msgid "Sign in"
 msgstr "Se connecter"
 
-#: apps/marketing/src/components/(marketing)/header.tsx:77
-#: apps/marketing/src/components/(marketing)/mobile-navigation.tsx:57
+#: apps/marketing/src/components/(marketing)/header.tsx:48
+#: apps/marketing/src/components/(marketing)/mobile-navigation.tsx:24
 msgid "Sign up"
 msgstr "S'inscrire"
 
@@ -463,8 +455,8 @@ msgid "Smart."
 msgstr "Intelligent."
 
 #: apps/marketing/src/components/(marketing)/hero.tsx:132
-msgid "Star on GitHub"
-msgstr "Étoile sur GitHub"
+#~ msgid "Star on GitHub"
+#~ msgstr "Étoile sur GitHub"
 
 #: apps/marketing/src/app/(marketing)/open/page.tsx:226
 msgid "Stars"
@@ -472,11 +464,10 @@ msgstr "Étoiles"
 
 #: apps/marketing/src/components/(marketing)/footer.tsx:40
 #: apps/marketing/src/components/(marketing)/mobile-navigation.tsx:44
-msgid "Status"
-msgstr "Statut"
+#~ msgid "Status"
+#~ msgstr "Statut"
 
-#: apps/marketing/src/components/(marketing)/footer.tsx:34
-#: apps/marketing/src/components/(marketing)/mobile-navigation.tsx:48
+#: apps/marketing/src/components/(marketing)/footer.tsx:28
 msgid "Support"
 msgstr "Soutien"
 
@@ -534,7 +525,6 @@ msgid "Truly your own."
 msgstr "Vraiment le vôtre."
 
 #: apps/marketing/src/components/(marketing)/callout.tsx:27
-#: apps/marketing/src/components/(marketing)/hero.tsx:123
 msgid "Try our Free Plan"
 msgstr "Essayez notre plan gratuit"
 
@@ -602,4 +592,3 @@ msgstr "Vous pouvez auto-héberger Documenso gratuitement ou utiliser notre vers
 #: apps/marketing/src/components/(marketing)/carousel.tsx:272
 msgid "Your browser does not support the video tag."
 msgstr "Votre navigateur ne prend pas en charge la balise vidéo."
-

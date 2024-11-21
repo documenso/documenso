@@ -62,8 +62,8 @@ msgstr "我們著重產品中每一個細節。"
 #: apps/marketing/src/components/(marketing)/footer.tsx:35
 #: apps/marketing/src/components/(marketing)/header.tsx:57
 #: apps/marketing/src/components/(marketing)/mobile-navigation.tsx:36
-msgid "Blog"
-msgstr "部落格"
+#~ msgid "Blog"
+#~ msgstr "部落格"
 
 #: apps/marketing/src/components/(marketing)/open-build-template-bento.tsx:64
 msgid "Build on top."
@@ -73,13 +73,13 @@ msgstr "建置於頂部。"
 msgid "Can I use Documenso commercially?"
 msgstr "我可以商業使用嗎？"
 
-#: apps/marketing/src/components/(marketing)/footer.tsx:42
+#: apps/marketing/src/components/(marketing)/footer.tsx:29
 msgid "Careers"
 msgstr "職涯發展"
 
 #: apps/marketing/src/components/(marketing)/footer.tsx:36
-msgid "Changelog"
-msgstr "更新日誌"
+#~ msgid "Changelog"
+#~ msgstr "更新日誌"
 
 #: apps/marketing/src/components/(marketing)/open-build-template-bento.tsx:85
 msgid "Choose a template from the community app store. Or submit your own template for others to use."
@@ -122,8 +122,8 @@ msgid "Customise and expand."
 msgstr "自訂和擴展。"
 
 #: apps/marketing/src/components/(marketing)/footer.tsx:38
-msgid "Design"
-msgstr "設計"
+#~ msgid "Design"
+#~ msgstr "設計"
 
 #: apps/marketing/src/app/(marketing)/pricing/page.tsx:44
 msgid "Designed for every stage of your journey."
@@ -141,15 +141,15 @@ msgstr "這是一個社群合作的計畫，旨在圍繞一個每個人都可以
 msgid "Documenso on X"
 msgstr ""
 
-#: apps/marketing/src/components/(marketing)/hero.tsx:104
+#: apps/marketing/src/components/(marketing)/hero.tsx:38
 msgid "Document signing,<0/>finally open source."
 msgstr "輕鬆簽署，<0/>零壓力搞定。"
 
 #: apps/marketing/src/components/(marketing)/footer.tsx:33
 #: apps/marketing/src/components/(marketing)/header.tsx:50
 #: apps/marketing/src/components/(marketing)/mobile-navigation.tsx:28
-msgid "Documentation"
-msgstr "文件說明"
+#~ msgid "Documentation"
+#~ msgstr "文件說明"
 
 #: apps/marketing/src/components/(marketing)/share-connect-paid-widget-bento.tsx:110
 msgid "Easily embed Documenso into your product. Simply copy and paste our react widget into your application."
@@ -193,8 +193,12 @@ msgid "Finances"
 msgstr "財務"
 
 #: apps/marketing/src/app/(marketing)/open/typefully.tsx:38
-msgid "Follow us on Threads"
-msgstr "在 Threads 上關注我們"
+#~ msgid "Follow us on Threads"
+#~ msgstr "在 Threads 上關注我們"
+
+#: apps/marketing/src/app/(marketing)/open/typefully.tsx:38
+msgid "Follow us on X"
+msgstr ""
 
 #: apps/marketing/src/components/(marketing)/pricing-table.tsx:172
 msgid "For companies looking to scale across multiple teams."
@@ -332,7 +336,6 @@ msgid "No credit card required"
 msgstr "不需要信用卡"
 
 #: apps/marketing/src/components/(marketing)/callout.tsx:29
-#: apps/marketing/src/components/(marketing)/hero.tsx:125
 msgid "No Credit Card required"
 msgstr "不需信用卡"
 
@@ -350,15 +353,12 @@ msgid "Open Source or Hosted."
 msgstr "開源或託管。"
 
 #: apps/marketing/src/app/(marketing)/open/page.tsx:161
-#: apps/marketing/src/components/(marketing)/footer.tsx:37
-#: apps/marketing/src/components/(marketing)/header.tsx:64
-#: apps/marketing/src/components/(marketing)/mobile-navigation.tsx:40
 msgid "Open Startup"
 msgstr "開啟 Startup"
 
 #: apps/marketing/src/components/(marketing)/footer.tsx:41
-msgid "OSS Friends"
-msgstr "OSS 朋友們"
+#~ msgid "OSS Friends"
+#~ msgstr "OSS 朋友們"
 
 #: apps/marketing/src/components/(marketing)/faster-smarter-beautiful-bento.tsx:91
 msgid "Our custom templates come with smart rules that can help you save time and energy."
@@ -377,14 +377,10 @@ msgid "Premium Profile Name"
 msgstr "高級個人檔案名稱"
 
 #: apps/marketing/src/app/(marketing)/pricing/page.tsx:40
-#: apps/marketing/src/components/(marketing)/footer.tsx:31
-#: apps/marketing/src/components/(marketing)/header.tsx:42
-#: apps/marketing/src/components/(marketing)/mobile-navigation.tsx:24
 msgid "Pricing"
 msgstr "定價"
 
-#: apps/marketing/src/components/(marketing)/footer.tsx:43
-#: apps/marketing/src/components/(marketing)/mobile-navigation.tsx:53
+#: apps/marketing/src/components/(marketing)/footer.tsx:30
 msgid "Privacy"
 msgstr "隱私權"
 
@@ -426,20 +422,20 @@ msgid "Seniority"
 msgstr "資歷"
 
 #: apps/marketing/src/components/(marketing)/footer.tsx:39
-msgid "Shop"
-msgstr "商店"
+#~ msgid "Shop"
+#~ msgstr "商店"
 
 #: apps/marketing/src/app/(marketing)/singleplayer/client.tsx:63
 msgid "Sign"
-msgstr "註冊/登入"
+msgstr "簽名"
 
-#: apps/marketing/src/components/(marketing)/header.tsx:72
-#: apps/marketing/src/components/(marketing)/mobile-navigation.tsx:61
+#: apps/marketing/src/components/(marketing)/header.tsx:43
+#: apps/marketing/src/components/(marketing)/mobile-navigation.tsx:28
 msgid "Sign in"
 msgstr "登入"
 
-#: apps/marketing/src/components/(marketing)/header.tsx:77
-#: apps/marketing/src/components/(marketing)/mobile-navigation.tsx:57
+#: apps/marketing/src/components/(marketing)/header.tsx:48
+#: apps/marketing/src/components/(marketing)/mobile-navigation.tsx:24
 msgid "Sign up"
 msgstr "註冊帳號"
 
@@ -458,8 +454,8 @@ msgid "Smart."
 msgstr "範本商店。"
 
 #: apps/marketing/src/components/(marketing)/hero.tsx:132
-msgid "Star on GitHub"
-msgstr "在 GitHub 上加星星"
+#~ msgid "Star on GitHub"
+#~ msgstr "在 GitHub 上加星星"
 
 #: apps/marketing/src/app/(marketing)/open/page.tsx:226
 msgid "Stars"
@@ -467,11 +463,10 @@ msgstr "星星"
 
 #: apps/marketing/src/components/(marketing)/footer.tsx:40
 #: apps/marketing/src/components/(marketing)/mobile-navigation.tsx:44
-msgid "Status"
-msgstr "狀態"
+#~ msgid "Status"
+#~ msgstr "狀態"
 
-#: apps/marketing/src/components/(marketing)/footer.tsx:34
-#: apps/marketing/src/components/(marketing)/mobile-navigation.tsx:48
+#: apps/marketing/src/components/(marketing)/footer.tsx:28
 msgid "Support"
 msgstr "支援"
 
@@ -529,7 +524,6 @@ msgid "Truly your own."
 msgstr "真正屬於您的。"
 
 #: apps/marketing/src/components/(marketing)/callout.tsx:27
-#: apps/marketing/src/components/(marketing)/hero.tsx:123
 msgid "Try our Free Plan"
 msgstr "試用我們的免費方案"
 
@@ -575,8 +569,12 @@ msgid "Where can I get support?"
 msgstr "我可以在哪裡獲得支援？"
 
 #: apps/marketing/src/app/(marketing)/pricing/page.tsx:177
-msgid "Why should I prefer SignEzily over DocuSign or some other signing tool?"
-msgstr "為什麼我應該選擇使用 SignEzily 而不是 DocuSign 或其他簽名工具？"
+msgid "Why should I prefer Documenso over DocuSign or some other signing tool?"
+msgstr ""
+
+#: apps/marketing/src/app/(marketing)/pricing/page.tsx:177
+#~ msgid "Why should I prefer SignEzily over DocuSign or some other signing tool?"
+#~ msgstr "為什麼我應該選擇使用 SignEzily 而不是 DocuSign 或其他簽名工具？"
 
 #: apps/marketing/src/app/(marketing)/pricing/page.tsx:119
 msgid "Why should I use your hosting service?"

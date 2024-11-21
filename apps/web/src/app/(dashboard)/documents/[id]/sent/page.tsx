@@ -10,7 +10,7 @@ export default async function DocumentSentPage() {
 
   return (
     <div className="mx-auto -mt-4 flex w-full max-w-screen-xl flex-col px-4 md:px-8">
-      <Link href="/documents" className="flex grow-0 items-center text-[#559DC4] hover:opacity-80">
+      <Link href="/documents" className="flex grow-0 items-center text-[#B978FA] hover:opacity-80">
         <ChevronLeft className="mr-2 inline-block h-5 w-5" />
         <Trans>Documents</Trans>
       </Link>

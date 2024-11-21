@@ -743,7 +743,7 @@ msgstr "Banner Updated"
 msgid "Basic details"
 msgstr "Basic details"
 
-#: apps/web/src/app/(dashboard)/settings/billing/page.tsx:72
+#: apps/web/src/app/(dashboard)/settings/billing/page.tsx:74
 #: apps/web/src/app/(teams)/t/[teamUrl]/settings/billing/page.tsx:61
 #: apps/web/src/components/(dashboard)/settings/layout/desktop-nav.tsx:117
 #: apps/web/src/components/(dashboard)/settings/layout/mobile-nav.tsx:120
@@ -2225,6 +2225,10 @@ msgstr "Manage all teams you are currently associated with."
 msgid "Manage and view template"
 msgstr "Manage and view template"
 
+#: apps/web/src/app/(dashboard)/settings/billing/page.tsx:136
+msgid "Manage billing"
+msgstr "Manage billing"
+
 #: apps/web/src/components/templates/manage-public-template-dialog.tsx:341
 msgid "Manage details for this public template"
 msgstr "Manage details for this public template"
@@ -2245,7 +2249,7 @@ msgstr "Manage passkeys"
 msgid "Manage subscription"
 msgstr "Manage subscription"
 
-#: apps/web/src/app/(dashboard)/settings/billing/billing-portal-button.tsx:66
+#: apps/web/src/app/(dashboard)/settings/billing/billing-portal-button.tsx:67
 msgid "Manage Subscription"
 msgstr "Manage Subscription"
 
@@ -3326,7 +3330,7 @@ msgstr "Site Settings"
 #: apps/web/src/app/(dashboard)/documents/delete-document-dialog.tsx:80
 #: apps/web/src/app/(dashboard)/documents/duplicate-document-dialog.tsx:72
 #: apps/web/src/app/(dashboard)/settings/billing/billing-plans.tsx:62
-#: apps/web/src/app/(dashboard)/settings/billing/billing-portal-button.tsx:50
+#: apps/web/src/app/(dashboard)/settings/billing/billing-portal-button.tsx:51
 #: apps/web/src/app/(dashboard)/settings/public-profile/public-profile-page-view.tsx:124
 #: apps/web/src/app/(dashboard)/settings/security/passkeys/user-passkeys-data-table-actions.tsx:73
 #: apps/web/src/app/(dashboard)/settings/security/passkeys/user-passkeys-data-table-actions.tsx:93
@@ -4446,7 +4450,7 @@ msgstr "Want to send slick signing links like this one? <0>Check out Documenso.<
 msgid "Want your own public profile?"
 msgstr "Want your own public profile?"
 
-#: apps/web/src/app/(dashboard)/settings/billing/billing-portal-button.tsx:40
+#: apps/web/src/app/(dashboard)/settings/billing/billing-portal-button.tsx:41
 #: apps/web/src/app/(teams)/t/[teamUrl]/layout-billing-banner.tsx:55
 #: apps/web/src/components/(teams)/team-billing-portal-button.tsx:31
 msgid "We are unable to proceed to the billing portal at this time. Please try again, or contact support."
@@ -4779,7 +4783,7 @@ msgstr "You are about to remove the following user from <0>{teamName}</0>."
 msgid "You are about to revoke access for team <0>{0}</0> ({1}) to use your email."
 msgstr "You are about to revoke access for team <0>{0}</0> ({1}) to use your email."
 
-#: apps/web/src/app/(dashboard)/settings/billing/page.tsx:78
+#: apps/web/src/app/(dashboard)/settings/billing/page.tsx:80
 msgid "You are currently on the <0>Free Plan</0>."
 msgstr "You are currently on the <0>Free Plan</0>."
 
@@ -4831,7 +4835,7 @@ msgstr "You cannot modify a team member who has a higher role than you."
 msgid "You cannot upload encrypted PDFs"
 msgstr "You cannot upload encrypted PDFs"
 
-#: apps/web/src/app/(dashboard)/settings/billing/billing-portal-button.tsx:45
+#: apps/web/src/app/(dashboard)/settings/billing/billing-portal-button.tsx:46
 msgid "You do not currently have a customer record, this should not happen. Please contact support for assistance."
 msgstr "You do not currently have a customer record, this should not happen. Please contact support for assistance."
 
@@ -4977,7 +4981,7 @@ msgstr "Your brand website URL"
 msgid "Your branding preferences have been updated"
 msgstr "Your branding preferences have been updated"
 
-#: apps/web/src/app/(dashboard)/settings/billing/page.tsx:119
+#: apps/web/src/app/(dashboard)/settings/billing/page.tsx:125
 msgid "Your current plan is past due. Please update your payment information."
 msgstr "Your current plan is past due. Please update your payment information."
 

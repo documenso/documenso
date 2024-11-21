@@ -113,7 +113,7 @@ export const DocumentLogsPageView = async ({ params, team }: DocumentLogsPageVie
     <div className="mx-auto -mt-4 w-full max-w-screen-xl px-4 md:px-8">
       <Link
         href={`${documentRootPath}/${document.id}`}
-        className="flex items-center text-[#559DC4] hover:opacity-80"
+        className="flex items-center text-[#B978FA] hover:opacity-80"
       >
         <ChevronLeft className="mr-2 inline-block h-5 w-5" />
         <Trans>Document</Trans>

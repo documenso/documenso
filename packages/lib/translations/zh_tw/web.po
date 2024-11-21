@@ -37,15 +37,15 @@ msgstr "\\{placeholderEmail}\\ 代表 \\{0}\\ 邀請您簽署 \\example document
 msgid "\"{teamUrl}\" has invited you to sign \"example document\"."
 msgstr "\\{teamUrl}\\ 已邀請您簽署 \\example document\\。"
 
-#: apps/web/src/app/(signing)/sign/[token]/signing-page-view.tsx:78
+#: apps/web/src/app/(signing)/sign/[token]/signing-page-view.tsx:79
 msgid "({0}) has invited you to approve this document"
 msgstr "({0}) 已邀請您批准此文件"
 
-#: apps/web/src/app/(signing)/sign/[token]/signing-page-view.tsx:75
+#: apps/web/src/app/(signing)/sign/[token]/signing-page-view.tsx:76
 msgid "({0}) has invited you to sign this document"
 msgstr "({0}) 已邀請您簽署此文件"
 
-#: apps/web/src/app/(signing)/sign/[token]/signing-page-view.tsx:72
+#: apps/web/src/app/(signing)/sign/[token]/signing-page-view.tsx:73
 msgid "({0}) has invited you to view this document"
 msgstr "({0}) 已邀請您查看此文件"
 
@@ -625,13 +625,17 @@ msgstr "核准"
 msgid "Approve Document"
 msgstr "核准文件"
 
-#: apps/web/src/app/(dashboard)/documents/[id]/document-page-view-recipients.tsx:85
+#: apps/web/src/app/(dashboard)/documents/[id]/document-page-view-recipients.tsx:94
 msgid "Approved"
 msgstr "已核准"
 
 #: apps/web/src/components/(dashboard)/settings/token/delete-token-dialog.tsx:129
 msgid "Are you sure you want to delete this token?"
 msgstr "您確定要刪除此 Token 嗎？"
+
+#: apps/web/src/app/(signing)/sign/[token]/reject-document-dialog.tsx:120
+msgid "Are you sure you want to reject this document? This action cannot be undone."
+msgstr "您確定要拒絕這個文件嗎"
 
 #: apps/web/src/app/(dashboard)/settings/security/passkeys/user-passkeys-data-table-actions.tsx:188
 msgid "Are you sure you want to remove the <0>{passkeyName}</0> passkey."
@@ -711,7 +715,7 @@ msgstr "橫幅已更新"
 msgid "Basic details"
 msgstr "基本詳細資訊"
 
-#: apps/web/src/app/(dashboard)/settings/billing/page.tsx:72
+#: apps/web/src/app/(dashboard)/settings/billing/page.tsx:74
 #: apps/web/src/app/(teams)/t/[teamUrl]/settings/billing/page.tsx:61
 #: apps/web/src/components/(dashboard)/settings/layout/desktop-nav.tsx:117
 #: apps/web/src/components/(dashboard)/settings/layout/mobile-nav.tsx:120
@@ -781,6 +785,7 @@ msgstr "使用電子簽名功能即表示您同意以電子方式進行交易和
 #: apps/web/src/app/(signing)/sign/[token]/form.tsx:220
 #: apps/web/src/app/(signing)/sign/[token]/name-field.tsx:215
 #: apps/web/src/app/(signing)/sign/[token]/number-field.tsx:327
+#: apps/web/src/app/(signing)/sign/[token]/reject-document-dialog.tsx:153
 #: apps/web/src/app/(signing)/sign/[token]/sign-dialog.tsx:113
 #: apps/web/src/app/(signing)/sign/[token]/signature-field.tsx:248
 #: apps/web/src/app/(signing)/sign/[token]/text-field.tsx:333
@@ -909,7 +914,7 @@ msgid "Complete Viewing"
 msgstr "完成查看"
 
 #: apps/web/src/app/(dashboard)/templates/[id]/template-page-view-documents-table.tsx:208
-#: apps/web/src/components/(dashboard)/avatar/stack-avatars-with-tooltip.tsx:62
+#: apps/web/src/components/(dashboard)/avatar/stack-avatars-with-tooltip.tsx:77
 #: apps/web/src/components/formatter/document-status.tsx:28
 msgid "Completed"
 msgstr "已完成"
@@ -1006,7 +1011,7 @@ msgstr "控制在邀請接收者簽署文件時所發送消息的格式。如果
 msgid "Copied"
 msgstr "已複製"
 
-#: apps/web/src/app/(dashboard)/documents/[id]/document-page-view-recipients.tsx:133
+#: apps/web/src/app/(dashboard)/documents/[id]/document-page-view-recipients.tsx:162
 #: apps/web/src/app/(dashboard)/settings/public-profile/public-templates-data-table.tsx:77
 #: apps/web/src/app/(dashboard)/templates/template-direct-link-badge.tsx:31
 #: apps/web/src/app/(dashboard)/templates/template-direct-link-dialog.tsx:163
@@ -1479,6 +1484,10 @@ msgstr "文件偏好設定已更新"
 #: apps/web/src/app/(dashboard)/documents/_action-items/resend-document.tsx:97
 msgid "Document re-sent"
 msgstr "文件已重新發送"
+
+#: apps/web/src/app/(signing)/sign/[token]/rejected/page.tsx:83
+msgid "Document Rejected"
+msgstr "文件已被拒絕"
 
 #: apps/web/src/app/(dashboard)/admin/documents/[id]/admin-actions.tsx:36
 msgid "Document resealed"
@@ -2163,6 +2172,10 @@ msgstr "管理您目前所屬的所有團隊。"
 msgid "Manage and view template"
 msgstr "管理和查看模板"
 
+#: apps/web/src/app/(dashboard)/settings/billing/page.tsx:136
+msgid "Manage billing"
+msgstr "帳單編輯"
+
 #: apps/web/src/components/templates/manage-public-template-dialog.tsx:341
 msgid "Manage details for this public template"
 msgstr "管理此公共範本的詳細資料"
@@ -2183,7 +2196,7 @@ msgstr "管理通行密钥"
 msgid "Manage subscription"
 msgstr "管理訂閱"
 
-#: apps/web/src/app/(dashboard)/settings/billing/billing-portal-button.tsx:66
+#: apps/web/src/app/(dashboard)/settings/billing/billing-portal-button.tsx:67
 msgid "Manage Subscription"
 msgstr "管理訂閱"
 
@@ -2242,7 +2255,7 @@ msgstr "會員自"
 msgid "Members"
 msgstr "會員"
 
-#: apps/web/src/app/(dashboard)/documents/[id]/document-page-view-recipients.tsx:46
+#: apps/web/src/app/(dashboard)/documents/[id]/document-page-view-recipients.tsx:55
 #: apps/web/src/app/(dashboard)/templates/[id]/template-page-view-recipients.tsx:35
 msgid "Modify recipients"
 msgstr "修改收件人"
@@ -2336,6 +2349,10 @@ msgstr "下一個欄位"
 msgid "No active drafts"
 msgstr "沒有正在編輯的草稿"
 
+#: apps/web/src/app/(signing)/sign/[token]/rejected/page.tsx:99
+msgid "No further action is required from you at this time."
+msgstr "您不需要多的動作"
+
 #: apps/web/src/app/(teams)/t/[teamUrl]/settings/billing/page.tsx:42
 msgid "No payment required"
 msgstr "不需付款"
@@ -2352,7 +2369,7 @@ msgstr "沒有最近的活動"
 msgid "No recent documents"
 msgstr "沒有最近的文件"
 
-#: apps/web/src/app/(dashboard)/documents/[id]/document-page-view-recipients.tsx:61
+#: apps/web/src/app/(dashboard)/documents/[id]/document-page-view-recipients.tsx:70
 #: apps/web/src/app/(dashboard)/templates/[id]/template-page-view-recipients.tsx:49
 #: apps/web/src/components/document/document-recipient-link-copy-dialog.tsx:96
 msgid "No recipients"
@@ -2442,7 +2459,7 @@ msgstr "只有經理及以上職位可以存取和查看該文件。"
 msgid "Oops! Something went wrong."
 msgstr "糟糕！發生了一些錯誤。"
 
-#: apps/web/src/components/(dashboard)/avatar/stack-avatars-with-tooltip.tsx:101
+#: apps/web/src/components/(dashboard)/avatar/stack-avatars-with-tooltip.tsx:140
 msgid "Opened"
 msgstr "已開啟"
 
@@ -2541,12 +2558,12 @@ msgstr "需要付款才能完成您的團隊創建。"
 msgid "Payment overdue"
 msgstr "付款逾期"
 
-#: apps/web/src/app/(dashboard)/documents/[id]/document-page-view-recipients.tsx:122
+#: apps/web/src/app/(dashboard)/documents/[id]/document-page-view-recipients.tsx:131
 #: apps/web/src/app/(dashboard)/templates/[id]/template-page-view-documents-table.tsx:211
 #: apps/web/src/components/(teams)/tables/teams-member-page-data-table.tsx:82
 #: apps/web/src/components/(teams)/tables/user-settings-teams-page-data-table.tsx:77
+#: apps/web/src/components/document/document-read-only-fields.tsx:89
 #: apps/web/src/components/formatter/document-status.tsx:22
-#: apps/web/src/components/partials/document-read-only-fields.tsx:89
 msgid "Pending"
 msgstr "待處理"
 
@@ -2633,6 +2650,10 @@ msgstr "請注意，此操作不可逆。一旦確認，您的 webhook 將被永
 #: apps/web/src/components/(teams)/dialogs/delete-team-dialog.tsx:130
 msgid "Please note that you will lose access to all documents associated with this team & all the members will be removed and notified"
 msgstr "請注意，您將失去對此團隊相關所有文件的訪問權限，且所有成員將被移除並收到通知。"
+
+#: apps/web/src/app/(signing)/sign/[token]/reject-document-dialog.tsx:37
+msgid "Please provide a reason"
+msgstr "請提供理由"
 
 #: apps/web/src/components/forms/2fa/disable-authenticator-app-dialog.tsx:127
 msgid "Please provide a token from the authenticator, or a backup code. If you do not have a backup code available, please contact support."
@@ -2738,13 +2759,21 @@ msgstr "唯讀欄位"
 msgid "Read the full <0>signature disclosure</0>."
 msgstr "閱讀完整的<0>簽署披露</0>。"
 
-#: apps/web/src/app/(dashboard)/documents/[id]/document-page-view-recipients.tsx:97
+#: apps/web/src/app/(dashboard)/documents/[id]/document-page-view-recipients.tsx:106
 msgid "Ready"
 msgstr "準備好了"
 
 #: apps/web/src/app/(internal)/%5F%5Fhtmltopdf/certificate/page.tsx:281
 msgid "Reason"
 msgstr "原因"
+
+#: apps/web/src/app/(dashboard)/documents/[id]/document-page-view-recipients.tsx:146
+msgid "Reason for rejection:"
+msgstr "拒絕的理由"
+
+#: apps/web/src/app/(signing)/sign/[token]/reject-document-dialog.tsx:38
+msgid "Reason must be less than 500 characters"
+msgstr "理由請給少於500字"
 
 #: apps/web/src/app/(signing)/sign/[token]/document-action-auth-dialog.tsx:62
 msgid "Reauthentication is required to sign this field"
@@ -2770,7 +2799,7 @@ msgid "Recipient updated"
 msgstr "收件人已更新"
 
 #: apps/web/src/app/(dashboard)/admin/documents/[id]/page.tsx:66
-#: apps/web/src/app/(dashboard)/documents/[id]/document-page-view-recipients.tsx:40
+#: apps/web/src/app/(dashboard)/documents/[id]/document-page-view-recipients.tsx:49
 #: apps/web/src/app/(dashboard)/templates/[id]/template-page-view-recipients.tsx:30
 #: apps/web/src/app/(internal)/%5F%5Fhtmltopdf/audit-log/page.tsx:139
 msgid "Recipients"
@@ -2797,6 +2826,17 @@ msgstr "恢復代碼"
 #: apps/web/src/components/forms/v2/signup.tsx:127
 msgid "Registration Successful"
 msgstr "註冊成功"
+
+#: apps/web/src/app/(signing)/sign/[token]/reject-document-dialog.tsx:109
+#: apps/web/src/app/(signing)/sign/[token]/reject-document-dialog.tsx:116
+#: apps/web/src/app/(signing)/sign/[token]/reject-document-dialog.tsx:162
+msgid "Reject Document"
+msgstr "拒絕文件"
+
+#: apps/web/src/app/(dashboard)/documents/[id]/document-page-view-recipients.tsx:141
+#: apps/web/src/components/(dashboard)/avatar/stack-avatars-with-tooltip.tsx:101
+msgid "Rejected"
+msgstr "拒絕"
 
 #: apps/web/src/app/(unauthenticated)/forgot-password/page.tsx:34
 msgid "Remembered your password? <0>Sign In</0>"
@@ -3027,7 +3067,7 @@ msgstr "正在發送重設電子郵件..."
 msgid "Sending..."
 msgstr "傳送中..."
 
-#: apps/web/src/app/(dashboard)/documents/[id]/document-page-view-recipients.tsx:92
+#: apps/web/src/app/(dashboard)/documents/[id]/document-page-view-recipients.tsx:101
 #: apps/web/src/app/(internal)/%5F%5Fhtmltopdf/certificate/page.tsx:248
 msgid "Sent"
 msgstr "已傳送"
@@ -3138,7 +3178,7 @@ msgstr "註冊"
 
 #: apps/web/src/components/forms/signup.tsx:235
 msgid "Sign Up"
-msgstr "註冊账号"
+msgstr "註冊賬号"
 
 #: apps/web/src/components/forms/signup.tsx:257
 #: apps/web/src/components/forms/v2/signup.tsx:401
@@ -3174,9 +3214,9 @@ msgstr "已收集的簽名"
 msgid "Signatures will appear once the document has been completed"
 msgstr "簽名將在文件完成後顯示"
 
-#: apps/web/src/app/(dashboard)/documents/[id]/document-page-view-recipients.tsx:105
+#: apps/web/src/app/(dashboard)/documents/[id]/document-page-view-recipients.tsx:114
 #: apps/web/src/app/(internal)/%5F%5Fhtmltopdf/certificate/page.tsx:270
-#: apps/web/src/components/partials/document-read-only-fields.tsx:84
+#: apps/web/src/components/document/document-read-only-fields.tsx:84
 msgid "Signed"
 msgstr "已簽署"
 
@@ -3233,7 +3273,7 @@ msgstr "網站設定"
 #: apps/web/src/app/(dashboard)/documents/delete-document-dialog.tsx:80
 #: apps/web/src/app/(dashboard)/documents/duplicate-document-dialog.tsx:72
 #: apps/web/src/app/(dashboard)/settings/billing/billing-plans.tsx:62
-#: apps/web/src/app/(dashboard)/settings/billing/billing-portal-button.tsx:50
+#: apps/web/src/app/(dashboard)/settings/billing/billing-portal-button.tsx:51
 #: apps/web/src/app/(dashboard)/settings/public-profile/public-profile-page-view.tsx:124
 #: apps/web/src/app/(dashboard)/settings/security/passkeys/user-passkeys-data-table-actions.tsx:73
 #: apps/web/src/app/(dashboard)/settings/security/passkeys/user-passkeys-data-table-actions.tsx:93
@@ -3583,6 +3623,10 @@ msgstr "文件已成功移至所選團隊。"
 msgid "The document is now completed, please follow any instructions provided within the parent application."
 msgstr "文件現已完成，請遵循主應用程式中提供的任何指示。"
 
+#: apps/web/src/app/(signing)/sign/[token]/rejected/page.tsx:92
+msgid "The document owner has been notified of your decision. They may contact you with further instructions if necessary."
+msgstr "文件擁有者已經被告知, 他們可能會與您聯絡"
+
 #: apps/web/src/app/(dashboard)/templates/use-template-dialog.tsx:182
 msgid "The document was created but could not be sent to recipients."
 msgstr "文件已建立，但無法傳送給收件人。"
@@ -3633,7 +3677,7 @@ msgstr "收件人已成功更新"
 msgid "The selected team member will receive an email which they must accept before the team is transferred"
 msgstr "選定的團隊成員將收到一封電子郵件，必須接受後才能轉移團隊。"
 
-#: apps/web/src/app/(dashboard)/documents/[id]/document-page-view-recipients.tsx:134
+#: apps/web/src/app/(dashboard)/documents/[id]/document-page-view-recipients.tsx:163
 #: apps/web/src/components/(dashboard)/avatar/avatar-with-recipient.tsx:41
 #: apps/web/src/components/document/document-recipient-link-copy-dialog.tsx:118
 msgid "The signing link has been copied to your clipboard."
@@ -4075,7 +4119,7 @@ msgstr "無法登入"
 msgid "Unauthorized"
 msgstr "未授權"
 
-#: apps/web/src/components/(dashboard)/avatar/stack-avatars-with-tooltip.tsx:116
+#: apps/web/src/components/(dashboard)/avatar/stack-avatars-with-tooltip.tsx:155
 msgid "Uncompleted"
 msgstr "未完成"
 
@@ -4320,12 +4364,12 @@ msgstr "查看恢復代碼"
 msgid "View teams"
 msgstr "檢視團隊"
 
-#: apps/web/src/app/(dashboard)/documents/[id]/document-page-view-recipients.tsx:111
+#: apps/web/src/app/(dashboard)/documents/[id]/document-page-view-recipients.tsx:120
 #: apps/web/src/app/(internal)/%5F%5Fhtmltopdf/certificate/page.tsx:259
 msgid "Viewed"
 msgstr "已檢視"
 
-#: apps/web/src/components/(dashboard)/avatar/stack-avatars-with-tooltip.tsx:86
+#: apps/web/src/components/(dashboard)/avatar/stack-avatars-with-tooltip.tsx:125
 msgid "Waiting"
 msgstr "等待中"
 
@@ -4345,7 +4389,7 @@ msgstr "想要發送像這樣的流暢簽署連結嗎？<0>查看 Documenso。</
 msgid "Want your own public profile?"
 msgstr "想要擁有自己的公開個人檔案嗎？"
 
-#: apps/web/src/app/(dashboard)/settings/billing/billing-portal-button.tsx:40
+#: apps/web/src/app/(dashboard)/settings/billing/billing-portal-button.tsx:41
 #: apps/web/src/app/(teams)/t/[teamUrl]/layout-billing-banner.tsx:55
 #: apps/web/src/components/(teams)/team-billing-portal-button.tsx:31
 msgid "We are unable to proceed to the billing portal at this time. Please try again, or contact support."
@@ -4678,7 +4722,7 @@ msgstr "您即將從 <0>{teamName}</0> 中移除以下使用者。"
 msgid "You are about to revoke access for team <0>{0}</0> ({1}) to use your email."
 msgstr "您即將撤銷團隊 <0>{0}</0> ({1}) 使用您電子郵件的權限。"
 
-#: apps/web/src/app/(dashboard)/settings/billing/page.tsx:78
+#: apps/web/src/app/(dashboard)/settings/billing/page.tsx:80
 msgid "You are currently on the <0>Free Plan</0>."
 msgstr "您目前使用的是<0>免費方案</0>。"
 
@@ -4730,7 +4774,7 @@ msgstr "您無法修改擁有比您更高角色的團隊成員。"
 msgid "You cannot upload encrypted PDFs"
 msgstr "您無法上傳加密的 PDF 檔案。"
 
-#: apps/web/src/app/(dashboard)/settings/billing/billing-portal-button.tsx:45
+#: apps/web/src/app/(dashboard)/settings/billing/billing-portal-button.tsx:46
 msgid "You do not currently have a customer record, this should not happen. Please contact support for assistance."
 msgstr "您目前沒有客戶紀錄，這不應該發生。請聯絡支援以獲取協助。"
 
@@ -4779,6 +4823,10 @@ msgstr "您已達到文件數量限制。"
 #: apps/web/src/app/(dashboard)/templates/data-table-templates.tsx:183
 msgid "You have reached your document limit. <0>Upgrade your account to continue!</0>"
 msgstr "您已達到您的文件限制。<0>升級您的帳戶以繼續！</0>"
+
+#: apps/web/src/app/(signing)/sign/[token]/rejected/page.tsx:88
+msgid "You have rejected this document"
+msgstr "您拒絕了這封文件"
 
 #: apps/web/src/components/(teams)/dialogs/leave-team-dialog.tsx:50
 msgid "You have successfully left this team."
@@ -4872,7 +4920,7 @@ msgstr "您的品牌網站URL"
 msgid "Your branding preferences have been updated"
 msgstr "您的品牌偏好設定已更新"
 
-#: apps/web/src/app/(dashboard)/settings/billing/page.tsx:119
+#: apps/web/src/app/(dashboard)/settings/billing/page.tsx:125
 msgid "Your current plan is past due. Please update your payment information."
 msgstr "您目前的方案已逾期。請更新您的付款資訊。"
 
