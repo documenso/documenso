@@ -1,3 +1,5 @@
+import { DateTime } from 'luxon';
+
 import { prisma } from '@documenso/prisma';
 import { SigningStatus } from '@documenso/prisma/client';
 
@@ -16,8 +18,8 @@ export const isRecipientExpired = async ({ token }: IsRecipientExpiredOptions) =
     throw new Error('Recipient not found');
   }
 
-  const now = new Date();
-  const hasExpired = recipient.expired && new Date(recipient.expired) <= now;
+  const now = DateTime.now();
+  const hasExpired = recipient.expired && DateTime.fromJSDate(recipient.expired) <= now;
 
   if (hasExpired && recipient.signingStatus !== SigningStatus.EXPIRED) {
     await prisma.recipient.update({

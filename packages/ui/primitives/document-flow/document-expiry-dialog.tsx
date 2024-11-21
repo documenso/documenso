@@ -164,6 +164,8 @@ export function DocumentExpiryDialog({
         case 'months':
           expiryDate = addMonths(now, values.amount);
           break;
+        default:
+          throw new Error(`Invalid unit: ${values.unit}`);
       }
     }
 
@@ -173,10 +175,10 @@ export function DocumentExpiryDialog({
       expiry: expiryDate,
     });
 
-    // TODO: Implement logic to update expiry when resending document
+    // TODO: Duncan => Implement logic to update expiry when resending document
     // This should be handled on the server-side when a document is resent
 
-    // TODO: Implement logic to mark recipients as expired
+    // TODO: Duncan => Implement logic to mark recipients as expired
     // This should be a scheduled task or part of the completion process on the server
   };
 

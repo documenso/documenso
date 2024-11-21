@@ -106,23 +106,6 @@ export const resendDocument = async ({
         return;
       }
 
-      let newExpiryDate: Date | null = null;
-      if (recipient.expired) {
-        const durationInMs = recipient.expired.getTime() - document.updatedAt.getTime();
-        newExpiryDate = new Date(Date.now() + durationInMs);
-
-        await prisma.recipient.update({
-          where: { id: recipient.id },
-          data: {
-            expired: newExpiryDate,
-            signingStatus:
-              recipient.signingStatus === SigningStatus.EXPIRED
-                ? SigningStatus.NOT_SIGNED
-                : recipient.signingStatus,
-          },
-        });
-      }
-
       const i18n = await getI18nInstance(document.documentMeta?.language);
 
       const recipientEmailType = RECIPIENT_ROLE_TO_EMAIL_TYPE[recipient.role];
@@ -183,6 +166,22 @@ export const resendDocument = async ({
 
       await prisma.$transaction(
         async (tx) => {
+          if (recipient.expired) {
+            const durationInMs = recipient.expired.getTime() - document.updatedAt.getTime();
+            const newExpiryDate = new Date(Date.now() + durationInMs);
+
+            await tx.recipient.update({
+              where: { id: recipient.id },
+              data: {
+                expired: newExpiryDate,
+                signingStatus:
+                  recipient.signingStatus === SigningStatus.EXPIRED
+                    ? SigningStatus.NOT_SIGNED
+                    : recipient.signingStatus,
+              },
+            });
+          }
+
           const [html, text] = await Promise.all([
             renderEmailWithI18N(template, {
               lang: document.documentMeta?.language,

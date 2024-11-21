@@ -375,7 +375,7 @@ export const formatDocumentAuditLogAction = (
     .with({ type: DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_RECIPIENT_EXPIRED }, () => {
       const userName = prefix || _(msg`Recipient`);
 
-      const result = msg`${userName} expired`;
+      const result = msg`${userName}'s signing period has expired`;
 
       return {
         anonymous: result,

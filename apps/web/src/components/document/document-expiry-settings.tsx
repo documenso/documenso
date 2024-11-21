@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 
-import { msg } from '@lingui/macro';
+import { Trans, msg } from '@lingui/macro';
 import { useLingui } from '@lingui/react';
 
 import { Input } from '@documenso/ui/primitives/input';
@@ -25,12 +25,14 @@ export const DocumentExpirySettings = ({ onChange }: DocumentExpirySettingsProps
 
   const handleExpiryValueChange = (value: string) => {
     const parsedValue = parseInt(value, 10);
-    if (isNaN(parsedValue)) {
+
+    if (Number.isNaN(parsedValue) || parsedValue <= 0) {
       setExpiryValue(undefined);
+      return;
     } else {
       setExpiryValue(parsedValue);
+      onChange(parsedValue, expiryUnit);
     }
-    onChange(parsedValue, expiryUnit);
   };
 
   const handleExpiryUnitChange = (value: 'day' | 'week' | 'month') => {
@@ -50,12 +52,18 @@ export const DocumentExpirySettings = ({ onChange }: DocumentExpirySettingsProps
       />
       <Select value={expiryUnit} onValueChange={handleExpiryUnitChange}>
         <SelectTrigger className="text-muted-foreground">
-          <SelectValue placeholder="Select..." />
+          <SelectValue placeholder={_(msg`Select...`)} />
         </SelectTrigger>
         <SelectContent>
-          <SelectItem value="day">Day</SelectItem>
-          <SelectItem value="week">Week</SelectItem>
-          <SelectItem value="month">Month</SelectItem>
+          <SelectItem value="day">
+            <Trans>Day</Trans>
+          </SelectItem>
+          <SelectItem value="week">
+            <Trans>Week</Trans>
+          </SelectItem>
+          <SelectItem value="month">
+            <Trans>Month</Trans>
+          </SelectItem>
         </SelectContent>
       </Select>
     </div>

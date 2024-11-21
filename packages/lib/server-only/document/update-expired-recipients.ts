@@ -31,26 +31,24 @@ export const updateExpiredRecipients = async (documentId: number) => {
       },
     });
 
-    await Promise.all(
-      expiredRecipients.map(async (recipient) =>
-        prisma.documentAuditLog.create({
-          data: createDocumentAuditLogData({
-            type: DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_RECIPIENT_EXPIRED,
-            documentId,
-            user: {
-              name: recipient.name,
-              email: recipient.email,
-            },
-            data: {
-              recipientEmail: recipient.email,
-              recipientName: recipient.name,
-              recipientId: recipient.id,
-              recipientRole: recipient.role,
-            },
-          }),
+    await prisma.documentAuditLog.createMany({
+      data: expiredRecipients.map((recipient) =>
+        createDocumentAuditLogData({
+          type: DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_RECIPIENT_EXPIRED,
+          documentId,
+          user: {
+            name: recipient.name,
+            email: recipient.email,
+          },
+          data: {
+            recipientName: recipient.name,
+            recipientRole: recipient.role,
+            recipientId: recipient.id,
+            recipientEmail: recipient.email,
+          },
         }),
       ),
-    );
+    });
   }
 
   return expiredRecipients;

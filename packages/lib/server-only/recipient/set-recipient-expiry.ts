@@ -103,9 +103,9 @@ export const setRecipientExpiry = async ({
           },
         }),
       });
-
-      return persisted;
     }
+
+    return persisted;
   });
 
   return updatedRecipient;
