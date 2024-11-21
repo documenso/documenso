@@ -45,19 +45,19 @@ msgstr "\"{placeholderEmail}\" on behalf of \"{0}\" has invited you to sign \"ex
 msgid "\"{teamUrl}\" has invited you to sign \"example document\"."
 msgstr "\"{teamUrl}\" has invited you to sign \"example document\"."
 
-#: apps/web/src/app/(signing)/sign/[token]/signing-page-view.tsx:79
+#: apps/web/src/app/(signing)/sign/[token]/signing-page-view.tsx:80
 msgid "({0}) has invited you to approve this document"
 msgstr "({0}) has invited you to approve this document"
 
-#: apps/web/src/app/(signing)/sign/[token]/signing-page-view.tsx:76
+#: apps/web/src/app/(signing)/sign/[token]/signing-page-view.tsx:77
 msgid "({0}) has invited you to sign this document"
 msgstr "({0}) has invited you to sign this document"
 
-#: apps/web/src/app/(signing)/sign/[token]/signing-page-view.tsx:73
+#: apps/web/src/app/(signing)/sign/[token]/signing-page-view.tsx:74
 msgid "({0}) has invited you to view this document"
 msgstr "({0}) has invited you to view this document"
 
-#: apps/web/src/app/(signing)/sign/[token]/text-field.tsx:311
+#: apps/web/src/app/(signing)/sign/[token]/text-field.tsx:313
 msgid "{0, plural, one {(1 character over)} other {(# characters over)}}"
 msgstr "{0, plural, one {(1 character over)} other {(# characters over)}}"
 
@@ -79,6 +79,10 @@ msgstr "{0, plural, one {# Seat} other {# Seats}}"
 msgid "{0, plural, one {<0>You have <1>1</1> pending team invitation</0>} other {<2>You have <3>#</3> pending team invitations</2>}}"
 msgstr "{0, plural, one {<0>You have <1>1</1> pending team invitation</0>} other {<2>You have <3>#</3> pending team invitations</2>}}"
 
+#: apps/web/src/app/(signing)/sign/[token]/auto-sign.tsx:196
+msgid "{0, plural, one {1 matching field} other {# matching fields}}"
+msgstr "{0, plural, one {1 matching field} other {# matching fields}}"
+
 #: apps/web/src/app/(dashboard)/documents/[id]/edit/document-edit-page-view.tsx:129
 msgid "{0, plural, one {1 Recipient} other {# Recipients}}"
 msgstr "{0, plural, one {1 Recipient} other {# Recipients}}"
@@ -90,6 +94,10 @@ msgstr "{0, plural, one {Waiting on 1 recipient} other {Waiting on # recipients}
 #: apps/web/src/components/(dashboard)/settings/webhooks/trigger-multiselect-combobox.tsx:64
 msgid "{0, plural, zero {Select values} other {# selected...}}"
 msgstr "{0, plural, zero {Select values} other {# selected...}}"
+
+#: apps/web/src/app/(signing)/sign/[token]/auto-sign.tsx:193
+msgid "{0}"
+msgstr "{0}"
 
 #: apps/web/src/components/templates/manage-public-template-dialog.tsx:249
 msgid "{0} direct signing templates"
@@ -111,7 +119,7 @@ msgstr "{0} Recipient(s)"
 #~ msgid "{0} the document to complete the process."
 #~ msgstr "{0} the document to complete the process."
 
-#: apps/web/src/app/(signing)/sign/[token]/text-field.tsx:292
+#: apps/web/src/app/(signing)/sign/[token]/text-field.tsx:294
 msgid "{charactersRemaining, plural, one {1 character remaining} other {{charactersRemaining} characters remaining}}"
 msgstr "{charactersRemaining, plural, one {1 character remaining} other {{charactersRemaining} characters remaining}}"
 
@@ -469,6 +477,10 @@ msgstr "An error occurred while adding signers."
 msgid "An error occurred while adding the fields."
 msgstr "An error occurred while adding the fields."
 
+#: apps/web/src/app/(signing)/sign/[token]/auto-sign.tsx:154
+msgid "An error occurred while auto-signing the document, some fields may not be signed. Please review and manually sign any remaining fields."
+msgstr "An error occurred while auto-signing the document, some fields may not be signed. Please review and manually sign any remaining fields."
+
 #: apps/web/src/app/(dashboard)/templates/use-template-dialog.tsx:176
 msgid "An error occurred while creating document from template."
 msgstr "An error occurred while creating document from template."
@@ -805,6 +817,7 @@ msgstr "By using the electronic signature feature, you are consenting to conduct
 #: apps/web/src/app/(dashboard)/templates/duplicate-template-dialog.tsx:78
 #: apps/web/src/app/(dashboard)/templates/move-template-dialog.tsx:119
 #: apps/web/src/app/(dashboard)/templates/template-direct-link-dialog.tsx:472
+#: apps/web/src/app/(signing)/sign/[token]/auto-sign.tsx:220
 #: apps/web/src/app/(signing)/sign/[token]/document-action-auth-2fa.tsx:178
 #: apps/web/src/app/(signing)/sign/[token]/document-action-auth-account.tsx:71
 #: apps/web/src/app/(signing)/sign/[token]/document-action-auth-passkey.tsx:164
@@ -812,11 +825,11 @@ msgstr "By using the electronic signature feature, you are consenting to conduct
 #: apps/web/src/app/(signing)/sign/[token]/form.tsx:151
 #: apps/web/src/app/(signing)/sign/[token]/form.tsx:220
 #: apps/web/src/app/(signing)/sign/[token]/name-field.tsx:215
-#: apps/web/src/app/(signing)/sign/[token]/number-field.tsx:327
+#: apps/web/src/app/(signing)/sign/[token]/number-field.tsx:328
 #: apps/web/src/app/(signing)/sign/[token]/reject-document-dialog.tsx:153
 #: apps/web/src/app/(signing)/sign/[token]/sign-dialog.tsx:113
 #: apps/web/src/app/(signing)/sign/[token]/signature-field.tsx:248
-#: apps/web/src/app/(signing)/sign/[token]/text-field.tsx:333
+#: apps/web/src/app/(signing)/sign/[token]/text-field.tsx:335
 #: apps/web/src/app/(teams)/t/[teamUrl]/settings/team-transfer-status.tsx:121
 #: apps/web/src/components/(dashboard)/settings/token/delete-token-dialog.tsx:176
 #: apps/web/src/components/(dashboard)/settings/webhooks/create-webhook-dialog.tsx:242
@@ -1781,7 +1794,7 @@ msgstr "Enter your email address to receive the completed document."
 msgid "Enter your name"
 msgstr "Enter your name"
 
-#: apps/web/src/app/(signing)/sign/[token]/text-field.tsx:278
+#: apps/web/src/app/(signing)/sign/[token]/text-field.tsx:280
 msgid "Enter your text here"
 msgstr "Enter your text here"
 
@@ -1800,6 +1813,7 @@ msgstr "Enter your text here"
 #: apps/web/src/app/(dashboard)/templates/duplicate-template-dialog.tsx:51
 #: apps/web/src/app/(dashboard)/templates/move-template-dialog.tsx:56
 #: apps/web/src/app/(dashboard)/templates/use-template-dialog.tsx:175
+#: apps/web/src/app/(signing)/sign/[token]/auto-sign.tsx:152
 #: apps/web/src/app/(signing)/sign/[token]/checkbox-field.tsx:122
 #: apps/web/src/app/(signing)/sign/[token]/checkbox-field.tsx:151
 #: apps/web/src/app/(signing)/sign/[token]/checkbox-field.tsx:212
@@ -2473,7 +2487,7 @@ msgstr "Not supported"
 msgid "Nothing to do"
 msgstr "Nothing to do"
 
-#: apps/web/src/app/(signing)/sign/[token]/number-field.tsx:270
+#: apps/web/src/app/(signing)/sign/[token]/number-field.tsx:271
 msgid "Number"
 msgstr "Number"
 
@@ -3036,8 +3050,8 @@ msgid "Roles"
 msgstr "Roles"
 
 #: apps/web/src/app/(dashboard)/templates/template-direct-link-dialog.tsx:446
-#: apps/web/src/app/(signing)/sign/[token]/number-field.tsx:336
-#: apps/web/src/app/(signing)/sign/[token]/text-field.tsx:342
+#: apps/web/src/app/(signing)/sign/[token]/number-field.tsx:337
+#: apps/web/src/app/(signing)/sign/[token]/text-field.tsx:344
 #: apps/web/src/app/(teams)/t/[teamUrl]/settings/preferences/branding-preferences.tsx:312
 #: apps/web/src/app/(teams)/t/[teamUrl]/settings/preferences/document-preferences.tsx:232
 msgid "Save"
@@ -3186,6 +3200,7 @@ msgstr "Show templates in your team public profile for your audience to sign and
 #: apps/web/src/app/(dashboard)/documents/data-table-action-button.tsx:114
 #: apps/web/src/app/(dashboard)/documents/data-table-action-dropdown.tsx:139
 #: apps/web/src/app/(profile)/p/[url]/page.tsx:192
+#: apps/web/src/app/(signing)/sign/[token]/auto-sign.tsx:229
 #: apps/web/src/app/(signing)/sign/[token]/document-action-auth-2fa.tsx:182
 #: apps/web/src/app/(signing)/sign/[token]/name-field.tsx:224
 #: apps/web/src/app/(signing)/sign/[token]/sign-dialog.tsx:124
@@ -3662,8 +3677,8 @@ msgstr "Templates"
 msgid "Templates allow you to quickly generate documents with pre-filled recipients and fields."
 msgstr "Templates allow you to quickly generate documents with pre-filled recipients and fields."
 
-#: apps/web/src/app/(signing)/sign/[token]/text-field.tsx:256
-#: apps/web/src/app/(signing)/sign/[token]/text-field.tsx:272
+#: apps/web/src/app/(signing)/sign/[token]/text-field.tsx:257
+#: apps/web/src/app/(signing)/sign/[token]/text-field.tsx:274
 msgid "Text"
 msgstr "Text"
 
@@ -4730,6 +4745,10 @@ msgstr "Were you trying to edit this document instead?"
 #: apps/web/src/app/(dashboard)/settings/security/passkeys/create-passkey-dialog.tsx:189
 msgid "When you click continue, you will be prompted to add the first available authenticator on your system."
 msgstr "When you click continue, you will be prompted to add the first available authenticator on your system."
+
+#: apps/web/src/app/(signing)/sign/[token]/auto-sign.tsx:183
+msgid "When you sign a document, we can automatically fill in and sign the following fields using information that has already been provided. You can also manually sign or remove any automatically signed fields afterwards if you desire."
+msgstr "When you sign a document, we can automatically fill in and sign the following fields using information that has already been provided. You can also manually sign or remove any automatically signed fields afterwards if you desire."
 
 #: apps/web/src/app/(unauthenticated)/articles/signature-disclosure/page.tsx:36
 msgid "When you use our platform to affix your electronic signature to documents, you are consenting to do so under the Electronic Signatures in Global and National Commerce Act (E-Sign Act) and other applicable laws. This action indicates your agreement to use electronic means to sign documents and receive notifications."

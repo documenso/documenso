@@ -8,7 +8,7 @@ msgstr ""
 "Language: pl\n"
 "Project-Id-Version: documenso-app\n"
 "Report-Msgid-Bugs-To: \n"
-"PO-Revision-Date: 2024-11-14 12:05\n"
+"PO-Revision-Date: 2024-11-20 11:56\n"
 "Last-Translator: \n"
 "Language-Team: Polish\n"
 "Plural-Forms: nplurals=4; plural=(n==1 ? 0 : (n%10>=2 && n%10<=4) && (n%100<12 || n%100>14) ? 1 : n!=1 && (n%10>=0 && n%10<=1) || (n%10>=5 && n%10<=9) || (n%100>=12 && n%100<=14) ? 2 : 3);\n"
@@ -50,19 +50,19 @@ msgstr "\"{placeholderEmail}\" w imieniu \"{0}\" zaprosił Cię do podpisania \"
 msgid "\"{teamUrl}\" has invited you to sign \"example document\"."
 msgstr "\"{teamUrl}\" zaprosił Cię do podpisania \"przykładowego dokumentu\"."
 
-#: apps/web/src/app/(signing)/sign/[token]/signing-page-view.tsx:79
+#: apps/web/src/app/(signing)/sign/[token]/signing-page-view.tsx:80
 msgid "({0}) has invited you to approve this document"
 msgstr "({0}) zaprosił Cię do zatwierdzenia tego dokumentu"
 
-#: apps/web/src/app/(signing)/sign/[token]/signing-page-view.tsx:76
+#: apps/web/src/app/(signing)/sign/[token]/signing-page-view.tsx:77
 msgid "({0}) has invited you to sign this document"
 msgstr "({0}) zaprosił Cię do podpisania tego dokumentu"
 
-#: apps/web/src/app/(signing)/sign/[token]/signing-page-view.tsx:73
+#: apps/web/src/app/(signing)/sign/[token]/signing-page-view.tsx:74
 msgid "({0}) has invited you to view this document"
 msgstr "({0}) zaprosił Cię do przeglądania tego dokumentu"
 
-#: apps/web/src/app/(signing)/sign/[token]/text-field.tsx:311
+#: apps/web/src/app/(signing)/sign/[token]/text-field.tsx:313
 msgid "{0, plural, one {(1 character over)} other {(# characters over)}}"
 msgstr "{0, plural, one {(1 znak przekroczony)} other {(# znaków przekroczonych)}}"
 
@@ -84,6 +84,10 @@ msgstr "{0, plural, one {# miejsce} other {# miejsc}}"
 msgid "{0, plural, one {<0>You have <1>1</1> pending team invitation</0>} other {<2>You have <3>#</3> pending team invitations</2>}}"
 msgstr "{0, plural, one {<0>Masz <1>1</1> oczekujące zaproszenie do zespołu</0>} other {<2>Masz <3>#</3> oczekujących zaproszeń do zespołu</2>}}"
 
+#: apps/web/src/app/(signing)/sign/[token]/auto-sign.tsx:196
+msgid "{0, plural, one {1 matching field} other {# matching fields}}"
+msgstr "{0, plural, one {1 pasujące pole} other {# pasujących pól}}"
+
 #: apps/web/src/app/(dashboard)/documents/[id]/edit/document-edit-page-view.tsx:129
 msgid "{0, plural, one {1 Recipient} other {# Recipients}}"
 msgstr "{0, plural, one {1 Odbiorca} other {# Odbiorców}}"
@@ -95,6 +99,10 @@ msgstr "{0, plural, one {Czekam na 1 odbiorcę} other {Czekam na # odbiorców}}"
 #: apps/web/src/components/(dashboard)/settings/webhooks/trigger-multiselect-combobox.tsx:64
 msgid "{0, plural, zero {Select values} other {# selected...}}"
 msgstr "{0, plural, zero {Wybierz wartości} other {# wybranych...}}"
+
+#: apps/web/src/app/(signing)/sign/[token]/auto-sign.tsx:193
+msgid "{0}"
+msgstr "{0}"
 
 #: apps/web/src/components/templates/manage-public-template-dialog.tsx:249
 msgid "{0} direct signing templates"
@@ -116,7 +124,7 @@ msgstr "{0} Odbiorca (ów)"
 #~ msgid "{0} the document to complete the process."
 #~ msgstr "{0} the document to complete the process."
 
-#: apps/web/src/app/(signing)/sign/[token]/text-field.tsx:292
+#: apps/web/src/app/(signing)/sign/[token]/text-field.tsx:294
 msgid "{charactersRemaining, plural, one {1 character remaining} other {{charactersRemaining} characters remaining}}"
 msgstr "{charactersRemaining, plural, one {1 znak pozostały} other {{charactersRemaining} znaki pozostałe}}"
 
@@ -254,7 +262,7 @@ msgstr "Akceptowane zaproszenie do zespołu"
 
 #: apps/web/src/app/(internal)/%5F%5Fhtmltopdf/certificate/page.tsx:128
 msgid "Account Authentication"
-msgstr "Autoryzacja konta"
+msgstr "Uwierzytelnianie konta"
 
 #: apps/web/src/app/(dashboard)/admin/users/[id]/delete-user-dialog.tsx:51
 #: apps/web/src/app/(dashboard)/settings/profile/delete-account-dialog.tsx:48
@@ -263,7 +271,7 @@ msgstr "Konto usunięte"
 
 #: apps/web/src/app/(internal)/%5F%5Fhtmltopdf/certificate/page.tsx:119
 msgid "Account Re-Authentication"
-msgstr "Ponowna autoryzacja konta"
+msgstr "Ponowna Autoryzacja Konta"
 
 #: apps/web/src/app/(unauthenticated)/articles/signature-disclosure/page.tsx:139
 msgid "Acknowledgment"
@@ -296,7 +304,7 @@ msgstr "Aktywny"
 
 #: apps/web/src/app/(dashboard)/admin/stats/page.tsx:68
 msgid "Active Subscriptions"
-msgstr "Aktywne subskrypcje"
+msgstr "Aktywne Subskrypcje"
 
 #: apps/web/src/components/(teams)/dialogs/add-team-email-dialog.tsx:189
 msgid "Add"
@@ -309,7 +317,7 @@ msgstr "Dodaj wszystkie istotne pola dla każdego odbiorcy."
 
 #: apps/web/src/app/(dashboard)/templates/[id]/edit/edit-template.tsx:83
 msgid "Add all relevant placeholders for each recipient."
-msgstr "Dodaj wszystkie istotne znaczniki dla każdego odbiorcy."
+msgstr "Dodaj wszystkie odpowiednie symbole zastępcze dla każdego odbiorcy."
 
 #: apps/web/src/app/(dashboard)/settings/security/page.tsx:62
 msgid "Add an authenticator to serve as a secondary authentication method for signing documents."
@@ -335,7 +343,7 @@ msgstr "Dodaj więcej"
 #: apps/web/src/app/(dashboard)/settings/security/passkeys/create-passkey-dialog.tsx:146
 #: apps/web/src/app/(dashboard)/settings/security/passkeys/create-passkey-dialog.tsx:154
 msgid "Add passkey"
-msgstr "Dodaj klucz hasła"
+msgstr "Dodaj hasło"
 
 #: apps/web/src/app/(dashboard)/templates/[id]/edit/edit-template.tsx:82
 msgid "Add Placeholders"
@@ -359,7 +367,7 @@ msgstr "Dodaj osoby, które podpiszą dokument."
 
 #: apps/web/src/app/(dashboard)/templates/use-template-dialog.tsx:220
 msgid "Add the recipients to create the document with"
-msgstr "Dodaj odbiorców, aby stworzyć dokument"
+msgstr "Dodaj odbiorców, aby utworzyć dokument"
 
 #: apps/web/src/app/(dashboard)/documents/[id]/edit-document.tsx:181
 #~ msgid "Add the subject and message you wish to send to signers."
@@ -473,6 +481,10 @@ msgstr "Wystąpił błąd podczas dodawania sygnatariuszy."
 #: apps/web/src/app/(dashboard)/documents/[id]/edit-document.tsx:304
 msgid "An error occurred while adding the fields."
 msgstr "Wystąpił błąd podczas dodawania pól."
+
+#: apps/web/src/app/(signing)/sign/[token]/auto-sign.tsx:154
+msgid "An error occurred while auto-signing the document, some fields may not be signed. Please review and manually sign any remaining fields."
+msgstr "Wystąpił błąd podczas automatycznego podpisywania dokumentu, niektóre pola mogą nie być podpisane. Proszę sprawdzić i ręcznie podpisać wszystkie pozostałe pola."
 
 #: apps/web/src/app/(dashboard)/templates/use-template-dialog.tsx:176
 msgid "An error occurred while creating document from template."
@@ -748,7 +760,7 @@ msgstr "Baner zaktualizowany"
 msgid "Basic details"
 msgstr "Podstawowe szczegóły"
 
-#: apps/web/src/app/(dashboard)/settings/billing/page.tsx:72
+#: apps/web/src/app/(dashboard)/settings/billing/page.tsx:74
 #: apps/web/src/app/(teams)/t/[teamUrl]/settings/billing/page.tsx:61
 #: apps/web/src/components/(dashboard)/settings/layout/desktop-nav.tsx:117
 #: apps/web/src/components/(dashboard)/settings/layout/mobile-nav.tsx:120
@@ -810,6 +822,7 @@ msgstr "Korzystając z funkcji podpisu elektronicznego, wyrażasz zgodę na prze
 #: apps/web/src/app/(dashboard)/templates/duplicate-template-dialog.tsx:78
 #: apps/web/src/app/(dashboard)/templates/move-template-dialog.tsx:119
 #: apps/web/src/app/(dashboard)/templates/template-direct-link-dialog.tsx:472
+#: apps/web/src/app/(signing)/sign/[token]/auto-sign.tsx:220
 #: apps/web/src/app/(signing)/sign/[token]/document-action-auth-2fa.tsx:178
 #: apps/web/src/app/(signing)/sign/[token]/document-action-auth-account.tsx:71
 #: apps/web/src/app/(signing)/sign/[token]/document-action-auth-passkey.tsx:164
@@ -817,11 +830,11 @@ msgstr "Korzystając z funkcji podpisu elektronicznego, wyrażasz zgodę na prze
 #: apps/web/src/app/(signing)/sign/[token]/form.tsx:151
 #: apps/web/src/app/(signing)/sign/[token]/form.tsx:220
 #: apps/web/src/app/(signing)/sign/[token]/name-field.tsx:215
-#: apps/web/src/app/(signing)/sign/[token]/number-field.tsx:327
+#: apps/web/src/app/(signing)/sign/[token]/number-field.tsx:328
 #: apps/web/src/app/(signing)/sign/[token]/reject-document-dialog.tsx:153
 #: apps/web/src/app/(signing)/sign/[token]/sign-dialog.tsx:113
 #: apps/web/src/app/(signing)/sign/[token]/signature-field.tsx:248
-#: apps/web/src/app/(signing)/sign/[token]/text-field.tsx:333
+#: apps/web/src/app/(signing)/sign/[token]/text-field.tsx:335
 #: apps/web/src/app/(teams)/t/[teamUrl]/settings/team-transfer-status.tsx:121
 #: apps/web/src/components/(dashboard)/settings/token/delete-token-dialog.tsx:176
 #: apps/web/src/components/(dashboard)/settings/webhooks/create-webhook-dialog.tsx:242
@@ -1780,7 +1793,7 @@ msgstr "Wprowadź swój adres e-mail, aby otrzymać ukończony dokument."
 msgid "Enter your name"
 msgstr "Wprowadź swoje imię"
 
-#: apps/web/src/app/(signing)/sign/[token]/text-field.tsx:278
+#: apps/web/src/app/(signing)/sign/[token]/text-field.tsx:280
 msgid "Enter your text here"
 msgstr "Wprowadź swój tekst tutaj"
 
@@ -1799,6 +1812,7 @@ msgstr "Wprowadź swój tekst tutaj"
 #: apps/web/src/app/(dashboard)/templates/duplicate-template-dialog.tsx:51
 #: apps/web/src/app/(dashboard)/templates/move-template-dialog.tsx:56
 #: apps/web/src/app/(dashboard)/templates/use-template-dialog.tsx:175
+#: apps/web/src/app/(signing)/sign/[token]/auto-sign.tsx:152
 #: apps/web/src/app/(signing)/sign/[token]/checkbox-field.tsx:122
 #: apps/web/src/app/(signing)/sign/[token]/checkbox-field.tsx:151
 #: apps/web/src/app/(signing)/sign/[token]/checkbox-field.tsx:212
@@ -2230,6 +2244,10 @@ msgstr "Zarządzaj wszystkimi zespołami, z którymi jesteś obecnie związany."
 msgid "Manage and view template"
 msgstr "Zarządzaj i przeglądaj szablon"
 
+#: apps/web/src/app/(dashboard)/settings/billing/page.tsx:136
+msgid "Manage billing"
+msgstr "Zarządzaj fakturowaniem"
+
 #: apps/web/src/components/templates/manage-public-template-dialog.tsx:341
 msgid "Manage details for this public template"
 msgstr "Zarządzaj szczegółami tego publicznego szablonu"
@@ -2250,7 +2268,7 @@ msgstr "Zarządzaj kluczami dostępu"
 msgid "Manage subscription"
 msgstr "Zarządzaj subskrypcją"
 
-#: apps/web/src/app/(dashboard)/settings/billing/billing-portal-button.tsx:66
+#: apps/web/src/app/(dashboard)/settings/billing/billing-portal-button.tsx:67
 msgid "Manage Subscription"
 msgstr "Zarządzaj Subskrypcją"
 
@@ -2463,7 +2481,7 @@ msgstr "Nieobsługiwane"
 msgid "Nothing to do"
 msgstr "Nic do zrobienia"
 
-#: apps/web/src/app/(signing)/sign/[token]/number-field.tsx:270
+#: apps/web/src/app/(signing)/sign/[token]/number-field.tsx:271
 msgid "Number"
 msgstr "Numer"
 
@@ -2570,7 +2588,7 @@ msgstr "Nazwa klucza dostępu"
 
 #: apps/web/src/app/(internal)/%5F%5Fhtmltopdf/certificate/page.tsx:121
 msgid "Passkey Re-Authentication"
-msgstr "Ponowna autoryzacja za pomocą klucza"
+msgstr "Ponowna Autoryzacja Klucza Dostępu"
 
 #: apps/web/src/app/(dashboard)/settings/security/page.tsx:106
 #: apps/web/src/app/(dashboard)/settings/security/passkeys/page.tsx:32
@@ -2627,7 +2645,7 @@ msgstr "Oczekujące Dokumenty"
 
 #: apps/web/src/app/(dashboard)/admin/stats/page.tsx:89
 msgid "Pending Documents"
-msgstr "Oczekujące zaproszenia"
+msgstr "Oczekujące dokumenty"
 
 #: apps/web/src/app/(dashboard)/settings/teams/team-invitations.tsx:62
 msgid "Pending invitations"
@@ -2639,71 +2657,71 @@ msgstr "Oczekujący zespół usunięty."
 
 #: apps/web/src/components/(dashboard)/layout/menu-switcher.tsx:134
 msgid "Personal"
-msgstr "Konto osobiste"
+msgstr "Osobiste"
 
 #: apps/web/src/components/(dashboard)/layout/menu-switcher.tsx:77
 msgid "Personal Account"
-msgstr "Wybierz hasło"
+msgstr "Konto osobiste"
 
 #: apps/web/src/app/(signing)/sign/[token]/complete/claim-account.tsx:152
 msgid "Pick a password"
-msgstr "Wybierz jedną z poniższych umów i zacznij podpisywać, aby się zarejestrować"
+msgstr "Wybierz hasło"
 
 #: apps/web/src/components/ui/user-profile-timur.tsx:53
 msgid "Pick any of the following agreements below and start signing to get started"
-msgstr "Pick any of the following agreements below and start signing to get started"
+msgstr "Wybierz dowolną z poniższych umów i zacznij podpisywanie, aby rozpocząć"
 
 #: apps/web/src/components/(teams)/dialogs/invite-team-member-dialog.tsx:212
 msgid "Please check the CSV file and make sure it is according to our format"
-msgstr "Proszę wybrać nowe hasło"
+msgstr "Proszę sprawdzić plik CSV i upewnić się, że jest zgodny z naszym formatem"
 
 #: apps/web/src/app/(signing)/sign/[token]/waiting/page.tsx:81
 msgid "Please check your email for updates."
-msgstr "Proszę sprawdź swój e-mail w celu uzyskania aktualizacji."
+msgstr "Proszę sprawdzić swój email w celu aktualizacji."
 
 #: apps/web/src/app/(unauthenticated)/reset-password/[token]/page.tsx:34
 msgid "Please choose your new password"
-msgstr "Please choose your new password"
+msgstr "Proszę wybrać nowe hasło"
 
 #: apps/web/src/app/(dashboard)/documents/delete-document-dialog.tsx:174
 msgid "Please contact support if you would like to revert this action."
-msgstr "Proszę podać znaczącą nazwę dla swojego tokena. To pomoże Ci zidentyfikować go później."
+msgstr "Proszę skontaktować się z pomocą techniczną, jeśli chcesz cofnąć tę akcję."
 
 #: apps/web/src/components/forms/token.tsx:175
 msgid "Please enter a meaningful name for your token. This will help you identify it later."
-msgstr "Please enter a meaningful name for your token. This will help you identify it later."
+msgstr "Proszę podać wartościową nazwę dla swojego tokena. Pomoże to później w jego identyfikacji."
 
 #: apps/web/src/app/(signing)/sign/[token]/form.tsx:135
 msgid "Please mark as viewed to complete"
-msgstr "Please mark as viewed to complete"
+msgstr "Proszę zaznaczyć jako obejrzane, aby zakończyć"
 
 #: apps/web/src/app/(dashboard)/templates/template-direct-link-dialog.tsx:459
 msgid "Please note that proceeding will remove direct linking recipient and turn it into a placeholder."
-msgstr "Please note that proceeding will remove direct linking recipient and turn it into a placeholder."
+msgstr "Proszę zauważyć, że kontynuowanie usunie bezpośrednio łączącego odbiorcę i zamieni go w symbol zastępczy."
 
 #: apps/web/src/app/(dashboard)/documents/delete-document-dialog.tsx:128
 msgid "Please note that this action is <0>irreversible</0>."
-msgstr "Proszę pamiętać, że ta akcja jest <0>nieodwracalna</0>. Po zatwierdzeniu ten dokument zostanie trwale usunięty."
+msgstr "Proszę zauważyć, że ta czynność jest <0>nieodwracalna</0>."
 
 #: apps/web/src/app/(dashboard)/documents/delete-document-dialog.tsx:119
 msgid "Please note that this action is <0>irreversible</0>. Once confirmed, this document will be permanently deleted."
-msgstr "Please note that this action is <0>irreversible</0>. Once confirmed, this document will be permanently deleted."
+msgstr "Proszę pamiętać, że ta czynność jest <0>nieodwracalna</0>. Po potwierdzeniu, ten dokument zostanie trwale usunięty."
 
 #: apps/web/src/app/(dashboard)/templates/delete-template-dialog.tsx:67
 msgid "Please note that this action is irreversible. Once confirmed, your template will be permanently deleted."
-msgstr "Proszę pamiętać, że ta akcja jest nieodwracalna. Po zatwierdzeniu Twój token zostanie trwale usunięty."
+msgstr "Proszę pamiętać, że ta czynność jest nieodwracalna. Po potwierdzeniu, Twój szablon zostanie trwale usunięty."
 
 #: apps/web/src/components/(dashboard)/settings/token/delete-token-dialog.tsx:133
 msgid "Please note that this action is irreversible. Once confirmed, your token will be permanently deleted."
-msgstr "Proszę pamiętać, że ta akcja jest nieodwracalna. Po zatwierdzeniu Twój webhook zostanie trwale usunięty."
+msgstr "Proszę zauważyć, że ta czynność jest nieodwracalna. Po potwierdzeniu, twój token zostanie trwale usunięty."
 
 #: apps/web/src/components/(dashboard)/settings/webhooks/delete-webhook-dialog.tsx:121
 msgid "Please note that this action is irreversible. Once confirmed, your webhook will be permanently deleted."
-msgstr "Please note that this action is irreversible. Once confirmed, your webhook will be permanently deleted."
+msgstr "Proszę pamiętać, że ta czynność jest nieodwracalna. Po potwierdzeniu, Twój webhook zostanie trwale usunięty."
 
 #: apps/web/src/components/(teams)/dialogs/delete-team-dialog.tsx:130
 msgid "Please note that you will lose access to all documents associated with this team & all the members will be removed and notified"
-msgstr "Please note that you will lose access to all documents associated with this team & all the members will be removed and notified"
+msgstr "Proszę pamiętać, że stracisz dostęp do wszystkich dokumentów powiązanych z tym zespołem i wszyscy członkowie zostaną usunięci oraz powiadomieni"
 
 #: apps/web/src/app/(signing)/sign/[token]/reject-document-dialog.tsx:37
 msgid "Please provide a reason"
@@ -2711,11 +2729,11 @@ msgstr "Proszę podać powód"
 
 #: apps/web/src/components/forms/2fa/disable-authenticator-app-dialog.tsx:127
 msgid "Please provide a token from the authenticator, or a backup code. If you do not have a backup code available, please contact support."
-msgstr "Proszę podać token z swojego autoryzatora lub kod zapasowy."
+msgstr "Proszę podać token z aplikacji uwierzytelniającej lub kod zapasowy. Jeśli nie masz dostępnego kodu zapasowego, skontaktuj się z pomocą techniczną."
 
 #: apps/web/src/components/forms/2fa/view-recovery-codes-dialog.tsx:120
 msgid "Please provide a token from your authenticator, or a backup code."
-msgstr "Proszę spróbować ponownie i upewnić się, że wprowadzasz poprawny adres e-mail."
+msgstr "Proszę podać token z Twojego uwierzytelniacza lub kod zapasowy."
 
 #: apps/web/src/app/(signing)/sign/[token]/form.tsx:169
 msgid "Please review the document before signing."
@@ -2723,25 +2741,25 @@ msgstr "Proszę przejrzeć dokument przed podpisaniem."
 
 #: apps/web/src/components/forms/send-confirmation-email.tsx:64
 msgid "Please try again and make sure you enter the correct email address."
-msgstr "Please try again and make sure you enter the correct email address."
+msgstr "Spróbuj ponownie i upewnij się, że wprowadzasz poprawny adres email."
 
 #: apps/web/src/components/forms/signin.tsx:203
 msgid "Please try again later or login using your normal details"
-msgstr "Please try again later or login using your normal details"
+msgstr "Spróbuj ponownie później lub zaloguj się, używając swoich normalnych danych"
 
 #: apps/web/src/app/(dashboard)/templates/new-template-dialog.tsx:80
 msgid "Please try again later."
-msgstr "Please try again later."
+msgstr "Proszę spróbować ponownie później."
 
 #: apps/web/src/app/(dashboard)/settings/profile/delete-account-dialog.tsx:134
 msgid "Please type <0>{0}</0> to confirm."
-msgstr "Please type <0>{0}</0> to confirm."
+msgstr "Proszę wpisać <0>{0}</0> aby potwierdzić."
 
 #: apps/web/src/components/(dashboard)/common/command-menu.tsx:214
 #: apps/web/src/components/(teams)/settings/layout/desktop-nav.tsx:58
 #: apps/web/src/components/(teams)/settings/layout/mobile-nav.tsx:67
 msgid "Preferences"
-msgstr "Preferences"
+msgstr "Preferencje"
 
 #: apps/web/src/app/(teams)/t/[teamUrl]/settings/preferences/document-preferences.tsx:204
 msgid "Preview"
@@ -2749,7 +2767,7 @@ msgstr "Podgląd"
 
 #: apps/web/src/app/(recipient)/d/[token]/direct-template.tsx:63
 msgid "Preview and configure template."
-msgstr "Preview and configure template."
+msgstr "Podgląd i konfiguracja szablonu."
 
 #: apps/web/src/app/(teams)/t/[teamUrl]/settings/preferences/document-preferences.tsx:130
 #~ msgid "Preview: {0}"
@@ -2758,36 +2776,36 @@ msgstr "Preview and configure template."
 #: apps/web/src/app/(dashboard)/templates/data-table-templates.tsx:105
 #: apps/web/src/components/formatter/template-type.tsx:22
 msgid "Private"
-msgstr "Private"
+msgstr "Prywatne"
 
 #: apps/web/src/app/(dashboard)/templates/data-table-templates.tsx:115
 msgid "Private templates can only be modified and viewed by you."
-msgstr "Private templates can only be modified and viewed by you."
+msgstr "Prywatne szablony mogą być modyfikowane i przeglądane tylko przez Ciebie."
 
 #: apps/web/src/app/(dashboard)/settings/profile/page.tsx:28
 #: apps/web/src/components/(dashboard)/common/command-menu.tsx:69
 #: apps/web/src/components/(dashboard)/settings/layout/desktop-nav.tsx:36
 #: apps/web/src/components/(dashboard)/settings/layout/mobile-nav.tsx:39
 msgid "Profile"
-msgstr "Profile"
+msgstr "Profil"
 
 #: apps/web/src/app/(dashboard)/settings/public-profile/public-profile-page-view.tsx:184
 msgid "Profile is currently <0>hidden</0>."
-msgstr "Profil jest obecnie <0>widoczny</0>."
+msgstr "Profil jest obecnie <0>ukryty</0>."
 
 #: apps/web/src/app/(dashboard)/settings/public-profile/public-profile-page-view.tsx:172
 msgid "Profile is currently <0>visible</0>."
-msgstr "Profile is currently <0>visible</0>."
+msgstr "Profil jest obecnie <0>widoczny</0>."
 
 #: apps/web/src/app/(dashboard)/admin/users/[id]/page.tsx:72
 #: apps/web/src/components/forms/profile.tsx:72
 msgid "Profile updated"
-msgstr "Publiczny"
+msgstr "Profil zaktualizowano"
 
 #: apps/web/src/app/(dashboard)/templates/data-table-templates.tsx:78
 #: apps/web/src/components/formatter/template-type.tsx:27
 msgid "Public"
-msgstr "Publiczny profil"
+msgstr "Publiczny"
 
 #: apps/web/src/app/(dashboard)/settings/public-profile/public-profile-page-view.tsx:42
 #: apps/web/src/components/(dashboard)/settings/layout/desktop-nav.tsx:50
@@ -2795,23 +2813,23 @@ msgstr "Publiczny profil"
 #: apps/web/src/components/(teams)/settings/layout/desktop-nav.tsx:72
 #: apps/web/src/components/(teams)/settings/layout/mobile-nav.tsx:81
 msgid "Public Profile"
-msgstr "Public Profile"
+msgstr "Profil publiczny"
 
 #: apps/web/src/components/forms/public-profile-form.tsx:146
 msgid "Public profile URL"
-msgstr "Nazwa użytkownika publicznego profilu"
+msgstr "URL publicznego profilu"
 
 #: apps/web/src/components/forms/v2/signup.tsx:450
 msgid "Public profile username"
-msgstr "Public profile username"
+msgstr "Nazwa użytkownika profilu publicznego"
 
 #: apps/web/src/app/(dashboard)/templates/data-table-templates.tsx:82
 msgid "Public templates are connected to your public profile. Any modifications to public templates will also appear in your public profile."
-msgstr "Public templates are connected to your public profile. Any modifications to public templates will also appear in your public profile."
+msgstr "Szablony publiczne są powiązane z Twoim publicznym profilem. Wszelkie modyfikacje szablonów publicznych również pojawią się w Twoim publicznym profilu."
 
 #: apps/web/src/app/(signing)/sign/[token]/signing-field-container.tsx:144
 msgid "Read only field"
-msgstr "Gotowe"
+msgstr "Pole tylko do odczytu"
 
 #: apps/web/src/components/general/signing-disclosure.tsx:21
 msgid "Read the full <0>signature disclosure</0>."
@@ -2819,7 +2837,7 @@ msgstr "Przeczytaj pełne <0>ujawnienie podpisu</0>."
 
 #: apps/web/src/app/(dashboard)/documents/[id]/document-page-view-recipients.tsx:106
 msgid "Ready"
-msgstr "Wymagana ponowna autoryzacja, aby podpisać to pole"
+msgstr "Gotowy"
 
 #: apps/web/src/app/(internal)/%5F%5Fhtmltopdf/certificate/page.tsx:281
 msgid "Reason"
@@ -2835,12 +2853,12 @@ msgstr "Powód musi mieć mniej niż 500 znaków"
 
 #: apps/web/src/app/(signing)/sign/[token]/document-action-auth-dialog.tsx:62
 msgid "Reauthentication is required to sign this field"
-msgstr "Ostatnia aktywność"
+msgstr "Wymagana jest ponowna autoryzacja, aby podpisać to pole"
 
 #: apps/web/src/app/(dashboard)/documents/[id]/document-page-view-recent-activity.tsx:57
 #: apps/web/src/app/(dashboard)/settings/security/page.tsx:130
 msgid "Recent activity"
-msgstr "Odbiorca"
+msgstr "Ostatnia aktywność"
 
 #: apps/web/src/app/(dashboard)/templates/[id]/template-page-view-recent-activity.tsx:47
 msgid "Recent documents"
@@ -2898,7 +2916,7 @@ msgstr "Odrzucony"
 
 #: apps/web/src/app/(unauthenticated)/forgot-password/page.tsx:34
 msgid "Remembered your password? <0>Sign In</0>"
-msgstr "Pamiętasz swoje hasło? <0>Zaloguj się</0>"
+msgstr "Zapamiętałeś hasło? <0>Zaloguj się</0>"
 
 #: apps/web/src/app/(dashboard)/settings/public-profile/public-templates-data-table.tsx:193
 #: apps/web/src/app/(dashboard)/templates/template-direct-link-dialog.tsx:431
@@ -2929,11 +2947,11 @@ msgstr "Powtórz hasło"
 
 #: apps/web/src/components/(teams)/dialogs/transfer-team-dialog.tsx:282
 msgid "Request transfer"
-msgstr "Poproś o transfer"
+msgstr "Zleć przeniesienie"
 
 #: apps/web/src/app/(dashboard)/admin/documents/[id]/admin-actions.tsx:61
 msgid "Reseal document"
-msgstr "Zamknij dokument"
+msgstr "Zapieczętuj ponownie dokument"
 
 #: apps/web/src/app/(dashboard)/documents/_action-items/resend-document.tsx:118
 #: apps/web/src/components/(teams)/tables/team-member-invites-data-table.tsx:154
@@ -2992,7 +3010,7 @@ msgstr "Zwróć"
 
 #: apps/web/src/app/(unauthenticated)/team/decline/[token]/page.tsx:130
 msgid "Return to Dashboard"
-msgstr "Powrót do pulpitu nawigacyjnego"
+msgstr "Powrót do pulpitu"
 
 #: apps/web/src/app/(unauthenticated)/team/decline/[token]/page.tsx:136
 msgid "Return to Home"
@@ -3026,8 +3044,8 @@ msgid "Roles"
 msgstr "Role"
 
 #: apps/web/src/app/(dashboard)/templates/template-direct-link-dialog.tsx:446
-#: apps/web/src/app/(signing)/sign/[token]/number-field.tsx:336
-#: apps/web/src/app/(signing)/sign/[token]/text-field.tsx:342
+#: apps/web/src/app/(signing)/sign/[token]/number-field.tsx:337
+#: apps/web/src/app/(signing)/sign/[token]/text-field.tsx:344
 #: apps/web/src/app/(teams)/t/[teamUrl]/settings/preferences/branding-preferences.tsx:312
 #: apps/web/src/app/(teams)/t/[teamUrl]/settings/preferences/document-preferences.tsx:232
 msgid "Save"
@@ -3175,6 +3193,7 @@ msgstr "Pokaż szablony w profilu publicznym zespołu dla swojej publiczności, 
 #: apps/web/src/app/(dashboard)/documents/data-table-action-button.tsx:114
 #: apps/web/src/app/(dashboard)/documents/data-table-action-dropdown.tsx:139
 #: apps/web/src/app/(profile)/p/[url]/page.tsx:192
+#: apps/web/src/app/(signing)/sign/[token]/auto-sign.tsx:229
 #: apps/web/src/app/(signing)/sign/[token]/document-action-auth-2fa.tsx:182
 #: apps/web/src/app/(signing)/sign/[token]/name-field.tsx:224
 #: apps/web/src/app/(signing)/sign/[token]/sign-dialog.tsx:124
@@ -3331,7 +3350,7 @@ msgstr "Ustawienia strony"
 #: apps/web/src/app/(dashboard)/documents/delete-document-dialog.tsx:80
 #: apps/web/src/app/(dashboard)/documents/duplicate-document-dialog.tsx:72
 #: apps/web/src/app/(dashboard)/settings/billing/billing-plans.tsx:62
-#: apps/web/src/app/(dashboard)/settings/billing/billing-portal-button.tsx:50
+#: apps/web/src/app/(dashboard)/settings/billing/billing-portal-button.tsx:51
 #: apps/web/src/app/(dashboard)/settings/public-profile/public-profile-page-view.tsx:124
 #: apps/web/src/app/(dashboard)/settings/security/passkeys/user-passkeys-data-table-actions.tsx:73
 #: apps/web/src/app/(dashboard)/settings/security/passkeys/user-passkeys-data-table-actions.tsx:93
@@ -3646,8 +3665,8 @@ msgstr "Szablony"
 msgid "Templates allow you to quickly generate documents with pre-filled recipients and fields."
 msgstr "Szablony pozwalają na szybkie generowanie dokumentów z wypełnionymi odbiorcami i polami."
 
-#: apps/web/src/app/(signing)/sign/[token]/text-field.tsx:256
-#: apps/web/src/app/(signing)/sign/[token]/text-field.tsx:272
+#: apps/web/src/app/(signing)/sign/[token]/text-field.tsx:257
+#: apps/web/src/app/(signing)/sign/[token]/text-field.tsx:274
 msgid "Text"
 msgstr "Tekst"
 
@@ -4451,7 +4470,7 @@ msgstr "Chcesz wysłać eleganckie linki do podpisywania, takie jak ten? <0>Spra
 msgid "Want your own public profile?"
 msgstr "Chcesz swój własny profil publiczny?"
 
-#: apps/web/src/app/(dashboard)/settings/billing/billing-portal-button.tsx:40
+#: apps/web/src/app/(dashboard)/settings/billing/billing-portal-button.tsx:41
 #: apps/web/src/app/(teams)/t/[teamUrl]/layout-billing-banner.tsx:55
 #: apps/web/src/components/(teams)/team-billing-portal-button.tsx:31
 msgid "We are unable to proceed to the billing portal at this time. Please try again, or contact support."
@@ -4715,6 +4734,10 @@ msgstr "Czy próbowałeś raczej edytować ten dokument?"
 msgid "When you click continue, you will be prompted to add the first available authenticator on your system."
 msgstr "Kiedy klikniesz kontynuuj, zostaniesz poproszony o dodanie pierwszego dostępnego autoryzatora w swoim systemie."
 
+#: apps/web/src/app/(signing)/sign/[token]/auto-sign.tsx:183
+msgid "When you sign a document, we can automatically fill in and sign the following fields using information that has already been provided. You can also manually sign or remove any automatically signed fields afterwards if you desire."
+msgstr "Podczas podpisywania dokumentu możemy automatycznie wypełnić i podpisać następujące pola, używając informacji, które zostały już podane. Możesz również ręcznie podpisać lub usunąć każde automatycznie podpisane pole później, jeśli chcesz."
+
 #: apps/web/src/app/(unauthenticated)/articles/signature-disclosure/page.tsx:36
 msgid "When you use our platform to affix your electronic signature to documents, you are consenting to do so under the Electronic Signatures in Global and National Commerce Act (E-Sign Act) and other applicable laws. This action indicates your agreement to use electronic means to sign documents and receive notifications."
 msgstr "Kiedy korzystasz z naszej platformy, aby przyczepić swój podpis elektroniczny do dokumentów, wyrażasz zgodę na dokonanie tego zgodnie z Ustawą o podpisach elektronicznych w handlu globalnym i krajowym (Ustawa E-Sign) oraz innymi obowiązującymi przepisami. Ta czynność wskazuje na twoją zgodę na korzystanie z elektronicznych środków do podpisywania dokumentów i otrzymywania powiadomień."
@@ -4784,7 +4807,7 @@ msgstr "Zaraz usuniesz następującego użytkownika z <0>{teamName}</0>."
 msgid "You are about to revoke access for team <0>{0}</0> ({1}) to use your email."
 msgstr "Zaraz cofniesz dostęp dla zespołu <0>{0}</0> ({1}) do korzystania z twojego e-maila."
 
-#: apps/web/src/app/(dashboard)/settings/billing/page.tsx:78
+#: apps/web/src/app/(dashboard)/settings/billing/page.tsx:80
 msgid "You are currently on the <0>Free Plan</0>."
 msgstr "Obecnie jesteś na <0>Planie darmowym</0>."
 
@@ -4836,7 +4859,7 @@ msgstr "Nie możesz modyfikować członka zespołu, który ma wyższą rolę ni�
 msgid "You cannot upload encrypted PDFs"
 msgstr "Nie możesz przesyłać zaszyfrowanych plików PDF"
 
-#: apps/web/src/app/(dashboard)/settings/billing/billing-portal-button.tsx:45
+#: apps/web/src/app/(dashboard)/settings/billing/billing-portal-button.tsx:46
 msgid "You do not currently have a customer record, this should not happen. Please contact support for assistance."
 msgstr "Obecnie nie masz rekordu klienta, nie powinno tak się dziać. Proszę skontaktuj się z pomocą techniczną."
 
@@ -4982,7 +5005,7 @@ msgstr "Adres URL witryny Twojej marki"
 msgid "Your branding preferences have been updated"
 msgstr "Preferencje dotyczące marki zostały zaktualizowane"
 
-#: apps/web/src/app/(dashboard)/settings/billing/page.tsx:119
+#: apps/web/src/app/(dashboard)/settings/billing/page.tsx:125
 msgid "Your current plan is past due. Please update your payment information."
 msgstr "Twój obecny plan jest przeterminowany. Zaktualizuj swoje informacje płatnicze."
 
