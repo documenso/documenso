@@ -26,7 +26,7 @@ msgstr "\"{0}\" te ha invitado a firmar \"ejemplo de documento\"."
 msgid "\"{0}\" will appear on the document as it has a timezone of \"{timezone}\"."
 msgstr "\"{0}\" aparecerá en el documento ya que tiene un huso horario de \"{timezone}\"."
 
-#: apps/web/src/app/(dashboard)/documents/delete-document-dialog.tsx:60
+#: apps/web/src/app/(dashboard)/documents/delete-document-dialog.tsx:62
 msgid "\"{documentTitle}\" has been successfully deleted"
 msgstr "\"{documentTitle}\" ha sido eliminado con éxito"
 
@@ -279,7 +279,7 @@ msgstr "Reconocimiento"
 
 #: apps/web/src/app/(dashboard)/documents/[id]/document-page-view-dropdown.tsx:108
 #: apps/web/src/app/(dashboard)/documents/[id]/logs/document-logs-data-table.tsx:100
-#: apps/web/src/app/(dashboard)/documents/data-table-action-dropdown.tsx:123
+#: apps/web/src/app/(dashboard)/documents/data-table-action-dropdown.tsx:127
 #: apps/web/src/app/(dashboard)/settings/public-profile/public-templates-data-table.tsx:164
 #: apps/web/src/app/(dashboard)/settings/security/activity/user-security-activity-data-table.tsx:118
 #: apps/web/src/app/(internal)/%5F%5Fhtmltopdf/audit-log/data-table.tsx:46
@@ -401,7 +401,7 @@ msgstr "Todos"
 msgid "All documents"
 msgstr "Todos los documentos"
 
-#: apps/web/src/app/(dashboard)/documents/empty-state.tsx:35
+#: apps/web/src/app/(dashboard)/documents/empty-state.tsx:40
 msgid "All documents have been processed. Any new documents that are sent or received will show here."
 msgstr "Todos los documentos han sido procesados. Cualquier nuevo documento que se envíe o reciba aparecerá aquí."
 
@@ -409,11 +409,11 @@ msgstr "Todos los documentos han sido procesados. Cualquier nuevo documento que 
 msgid "All documents related to the electronic signing process will be provided to you electronically through our platform or via email. It is your responsibility to ensure that your email address is current and that you can receive and open our emails."
 msgstr "Todos los documentos relacionados con el proceso de firma electrónica se le proporcionarán electrónicamente a través de nuestra plataforma o por correo electrónico. Es su responsabilidad asegurarse de que su dirección de correo electrónico esté actualizada y que pueda recibir y abrir nuestros correos electrónicos."
 
-#: apps/web/src/app/(dashboard)/documents/delete-document-dialog.tsx:145
+#: apps/web/src/app/(dashboard)/documents/delete-document-dialog.tsx:147
 msgid "All inserted signatures will be voided"
 msgstr "Todas las firmas insertadas serán anuladas"
 
-#: apps/web/src/app/(dashboard)/documents/delete-document-dialog.tsx:148
+#: apps/web/src/app/(dashboard)/documents/delete-document-dialog.tsx:150
 msgid "All recipients will be notified"
 msgstr "Todos los destinatarios serán notificados"
 
@@ -501,7 +501,7 @@ msgstr "Ocurrió un error al desactivar la firma de enlace directo."
 #: apps/web/src/app/(dashboard)/documents/[id]/document-page-view-button.tsx:64
 #: apps/web/src/app/(dashboard)/documents/[id]/document-page-view-dropdown.tsx:92
 #: apps/web/src/app/(dashboard)/documents/data-table-action-button.tsx:76
-#: apps/web/src/app/(dashboard)/documents/data-table-action-dropdown.tsx:107
+#: apps/web/src/app/(dashboard)/documents/data-table-action-dropdown.tsx:111
 msgid "An error occurred while downloading your document."
 msgstr "Ocurrió un error al descargar tu documento."
 
@@ -661,7 +661,7 @@ msgstr "Versión de la Aplicación"
 
 #: apps/web/src/app/(dashboard)/documents/[id]/document-page-view-button.tsx:89
 #: apps/web/src/app/(dashboard)/documents/data-table-action-button.tsx:120
-#: apps/web/src/app/(dashboard)/documents/data-table-action-dropdown.tsx:146
+#: apps/web/src/app/(dashboard)/documents/data-table-action-dropdown.tsx:150
 #: apps/web/src/app/(signing)/sign/[token]/sign-dialog.tsx:125
 msgid "Approve"
 msgstr "Aprobar"
@@ -690,7 +690,7 @@ msgstr "¿Está seguro de que desea eliminar la clave de acceso <0>{passkeyName}
 msgid "Are you sure you wish to delete this team?"
 msgstr "¿Estás seguro de que deseas eliminar este equipo?"
 
-#: apps/web/src/app/(dashboard)/documents/delete-document-dialog.tsx:98
+#: apps/web/src/app/(dashboard)/documents/delete-document-dialog.tsx:100
 #: apps/web/src/app/(dashboard)/settings/teams/team-email-usage.tsx:94
 #: apps/web/src/app/(dashboard)/templates/template-direct-link-dialog.tsx:455
 #: apps/web/src/components/(teams)/dialogs/delete-team-member-dialog.tsx:81
@@ -769,6 +769,10 @@ msgstr "Detalles básicos"
 msgid "Billing"
 msgstr "Facturación"
 
+#: apps/web/src/components/formatter/document-status.tsx:51
+msgid "Bin"
+msgstr ""
+
 #: apps/web/src/app/(teams)/t/[teamUrl]/settings/preferences/page.tsx:42
 msgid "Branding Preferences"
 msgstr "Preferencias de marca"
@@ -790,7 +794,7 @@ msgstr "Copia masiva"
 msgid "Bulk Import"
 msgstr "Importación masiva"
 
-#: apps/web/src/app/(dashboard)/documents/delete-document-dialog.tsx:156
+#: apps/web/src/app/(dashboard)/documents/delete-document-dialog.tsx:158
 msgid "By deleting this document, the following will occur:"
 msgstr "Al eliminar este documento, ocurrirá lo siguiente:"
 
@@ -811,7 +815,7 @@ msgid "By using the electronic signature feature, you are consenting to conduct 
 msgstr "Al utilizar la función de firma electrónica, usted está consintiendo realizar transacciones y recibir divulgaciones electrónicamente. Reconoce que su firma electrónica en los documentos es vinculante y que acepta los términos esbozados en los documentos que está firmando."
 
 #: apps/web/src/app/(dashboard)/documents/_action-items/resend-document.tsx:186
-#: apps/web/src/app/(dashboard)/documents/delete-document-dialog.tsx:190
+#: apps/web/src/app/(dashboard)/documents/delete-document-dialog.tsx:192
 #: apps/web/src/app/(dashboard)/documents/duplicate-document-dialog.tsx:108
 #: apps/web/src/app/(dashboard)/documents/move-document-dialog.tsx:120
 #: apps/web/src/app/(dashboard)/settings/security/passkeys/create-passkey-dialog.tsx:248
@@ -1256,13 +1260,13 @@ msgstr "Idioma predeterminado del documento"
 msgid "Default Document Visibility"
 msgstr "Visibilidad predeterminada del documento"
 
-#: apps/web/src/app/(dashboard)/documents/delete-document-dialog.tsx:90
+#: apps/web/src/app/(dashboard)/documents/delete-document-dialog.tsx:50
 msgid "delete"
 msgstr "eliminar"
 
 #: apps/web/src/app/(dashboard)/documents/[id]/document-page-view-dropdown.tsx:144
-#: apps/web/src/app/(dashboard)/documents/data-table-action-dropdown.tsx:189
-#: apps/web/src/app/(dashboard)/documents/delete-document-dialog.tsx:200
+#: apps/web/src/app/(dashboard)/documents/data-table-action-dropdown.tsx:210
+#: apps/web/src/app/(dashboard)/documents/delete-document-dialog.tsx:202
 #: apps/web/src/app/(dashboard)/settings/security/passkeys/user-passkeys-data-table-actions.tsx:177
 #: apps/web/src/app/(dashboard)/settings/security/passkeys/user-passkeys-data-table-actions.tsx:211
 #: apps/web/src/app/(dashboard)/settings/tokens/page.tsx:83
@@ -1339,6 +1343,7 @@ msgid "Delete your account and all its contents, including completed documents. 
 msgstr "Eliminar su cuenta y todo su contenido, incluidos documentos completados. Esta acción es irreversible y cancelará su suscripción, así que proceda con cuidado."
 
 #: apps/web/src/app/(dashboard)/admin/documents/[id]/page.tsx:41
+#: apps/web/src/app/(dashboard)/documents/[id]/document-page-view-information.tsx:50
 #: apps/web/src/app/(internal)/%5F%5Fhtmltopdf/audit-log/page.tsx:97
 msgid "Deleted"
 msgstr "Eliminado"
@@ -1455,6 +1460,10 @@ msgstr "Documentar Todo"
 msgid "Document Approved"
 msgstr "Documento Aprobado"
 
+#: apps/web/src/components/formatter/document-status.tsx:52
+msgid "Document Bin"
+msgstr ""
+
 #: apps/web/src/app/(signing)/sign/[token]/no-longer-available.tsx:40
 msgid "Document Cancelled"
 msgstr "Documento Cancelado"
@@ -1481,7 +1490,7 @@ msgstr "Documento creado usando un <0>enlace directo</0>"
 
 #: apps/web/src/app/(dashboard)/admin/documents/[id]/super-delete-document-dialog.tsx:51
 #: apps/web/src/app/(dashboard)/documents/[id]/document-page-view.tsx:178
-#: apps/web/src/app/(dashboard)/documents/delete-document-dialog.tsx:59
+#: apps/web/src/app/(dashboard)/documents/delete-document-dialog.tsx:61
 msgid "Document deleted"
 msgstr "Documento eliminado"
 
@@ -1555,7 +1564,7 @@ msgstr "Documento enviado"
 msgid "Document Signed"
 msgstr "Documento firmado"
 
-#: apps/web/src/app/(dashboard)/documents/delete-document-dialog.tsx:142
+#: apps/web/src/app/(dashboard)/documents/delete-document-dialog.tsx:144
 msgid "Document signing process will be cancelled"
 msgstr "El proceso de firma del documento será cancelado"
 
@@ -1579,7 +1588,7 @@ msgstr "Documento subido"
 msgid "Document Viewed"
 msgstr "Documento visto"
 
-#: apps/web/src/app/(dashboard)/documents/delete-document-dialog.tsx:139
+#: apps/web/src/app/(dashboard)/documents/delete-document-dialog.tsx:141
 msgid "Document will be permanently deleted"
 msgstr "El documento será eliminado permanentemente"
 
@@ -1619,7 +1628,7 @@ msgstr "¿No tienes una cuenta? <0>Regístrate</0>"
 #: apps/web/src/app/(dashboard)/documents/[id]/document-page-view-button.tsx:111
 #: apps/web/src/app/(dashboard)/documents/[id]/document-page-view-dropdown.tsx:123
 #: apps/web/src/app/(dashboard)/documents/data-table-action-button.tsx:141
-#: apps/web/src/app/(dashboard)/documents/data-table-action-dropdown.tsx:162
+#: apps/web/src/app/(dashboard)/documents/data-table-action-dropdown.tsx:166
 #: apps/web/src/components/(teams)/tables/team-billing-invoices-data-table.tsx:110
 #: apps/web/src/components/forms/2fa/enable-authenticator-app-dialog.tsx:185
 #: apps/web/src/components/forms/2fa/view-recovery-codes-dialog.tsx:107
@@ -1652,7 +1661,7 @@ msgid "Due to an unpaid invoice, your team has been restricted. Please settle th
 msgstr "Debido a una factura impaga, tu equipo ha sido restringido. Realiza el pago para restaurar el acceso completo a tu equipo."
 
 #: apps/web/src/app/(dashboard)/documents/[id]/document-page-view-dropdown.tsx:136
-#: apps/web/src/app/(dashboard)/documents/data-table-action-dropdown.tsx:167
+#: apps/web/src/app/(dashboard)/documents/data-table-action-dropdown.tsx:171
 #: apps/web/src/app/(dashboard)/documents/duplicate-document-dialog.tsx:85
 #: apps/web/src/app/(dashboard)/documents/duplicate-document-dialog.tsx:118
 #: apps/web/src/app/(dashboard)/templates/data-table-action-dropdown.tsx:74
@@ -1663,7 +1672,7 @@ msgstr "Duplicar"
 #: apps/web/src/app/(dashboard)/documents/[id]/document-page-view-button.tsx:104
 #: apps/web/src/app/(dashboard)/documents/[id]/document-page-view-dropdown.tsx:115
 #: apps/web/src/app/(dashboard)/documents/data-table-action-button.tsx:102
-#: apps/web/src/app/(dashboard)/documents/data-table-action-dropdown.tsx:156
+#: apps/web/src/app/(dashboard)/documents/data-table-action-dropdown.tsx:160
 #: apps/web/src/app/(dashboard)/settings/security/passkeys/user-passkeys-data-table-actions.tsx:111
 #: apps/web/src/app/(dashboard)/settings/webhooks/page.tsx:95
 #: apps/web/src/app/(dashboard)/templates/data-table-action-dropdown.tsx:65
@@ -1977,8 +1986,8 @@ msgstr "Así es como funciona:"
 msgid "Hey I’m Timur"
 msgstr "Hola, soy Timur"
 
-#: apps/web/src/app/(dashboard)/documents/data-table-action-dropdown.tsx:189
-#: apps/web/src/app/(dashboard)/documents/delete-document-dialog.tsx:200
+#: apps/web/src/app/(dashboard)/documents/data-table-action-dropdown.tsx:210
+#: apps/web/src/app/(dashboard)/documents/delete-document-dialog.tsx:202
 #: apps/web/src/app/(dashboard)/settings/public-profile/public-profile-page-view.tsx:155
 msgid "Hide"
 msgstr "Ocultar"
@@ -2024,7 +2033,7 @@ msgstr "Documentos en bandeja de entrada"
 #~ msgid "Include Sender Details"
 #~ msgstr "Include Sender Details"
 
-#: apps/web/src/app/(dashboard)/documents/[id]/document-page-view-information.tsx:53
+#: apps/web/src/app/(dashboard)/documents/[id]/document-page-view-information.tsx:65
 #: apps/web/src/app/(dashboard)/templates/[id]/template-page-view-information.tsx:50
 msgid "Information"
 msgstr "Información"
@@ -2357,7 +2366,7 @@ msgstr "Mover documento al equipo"
 msgid "Move Template to Team"
 msgstr "Mover plantilla al equipo"
 
-#: apps/web/src/app/(dashboard)/documents/data-table-action-dropdown.tsx:174
+#: apps/web/src/app/(dashboard)/documents/data-table-action-dropdown.tsx:178
 #: apps/web/src/app/(dashboard)/templates/data-table-action-dropdown.tsx:85
 msgid "Move to Team"
 msgstr "Mover al equipo"
@@ -2421,6 +2430,10 @@ msgstr "Siguiente campo"
 msgid "No active drafts"
 msgstr "No hay borradores activos"
 
+#: apps/web/src/app/(dashboard)/documents/empty-state.tsx:34
+msgid "No documents in the bin"
+msgstr ""
+
 #: apps/web/src/app/(signing)/sign/[token]/rejected/page.tsx:99
 msgid "No further action is required from you at this time."
 msgstr "No further action is required from you at this time."
@@ -2477,7 +2490,7 @@ msgid "Not supported"
 msgstr "No soportado"
 
 #: apps/web/src/app/(dashboard)/documents/empty-state.tsx:19
-#: apps/web/src/app/(dashboard)/documents/empty-state.tsx:34
+#: apps/web/src/app/(dashboard)/documents/empty-state.tsx:39
 msgid "Nothing to do"
 msgstr "Nada que hacer"
 
@@ -2507,7 +2520,7 @@ msgstr "En esta página, puedes editar el webhook y sus configuraciones."
 msgid "On this page, you can edit the webhook and its settings."
 msgstr "En esta página, puedes editar el webhook y su configuración."
 
-#: apps/web/src/app/(dashboard)/documents/delete-document-dialog.tsx:134
+#: apps/web/src/app/(dashboard)/documents/delete-document-dialog.tsx:136
 msgid "Once confirmed, the following will occur:"
 msgstr "Una vez confirmado, ocurrirá lo siguiente:"
 
@@ -2683,7 +2696,7 @@ msgstr "Por favor, revisa tu correo electrónico para actualizaciones."
 msgid "Please choose your new password"
 msgstr "Por favor, elige tu nueva contraseña"
 
-#: apps/web/src/app/(dashboard)/documents/delete-document-dialog.tsx:174
+#: apps/web/src/app/(dashboard)/documents/delete-document-dialog.tsx:176
 msgid "Please contact support if you would like to revert this action."
 msgstr "Por favor, contacta al soporte si deseas revertir esta acción."
 
@@ -2699,11 +2712,11 @@ msgstr "Por favor, marca como visto para completar"
 msgid "Please note that proceeding will remove direct linking recipient and turn it into a placeholder."
 msgstr "Por favor, ten en cuenta que proceder eliminará el destinatario de enlace directo y lo convertirá en un marcador de posición."
 
-#: apps/web/src/app/(dashboard)/documents/delete-document-dialog.tsx:128
+#: apps/web/src/app/(dashboard)/documents/delete-document-dialog.tsx:130
 msgid "Please note that this action is <0>irreversible</0>."
 msgstr "Por favor, ten en cuenta que esta acción es <0>irreversible</0>."
 
-#: apps/web/src/app/(dashboard)/documents/delete-document-dialog.tsx:119
+#: apps/web/src/app/(dashboard)/documents/delete-document-dialog.tsx:121
 msgid "Please note that this action is <0>irreversible</0>. Once confirmed, this document will be permanently deleted."
 msgstr "Por favor, ten en cuenta que esta acción es <0>irreversible</0>. Una vez confirmada, este documento será eliminado permanentemente."
 
@@ -2750,6 +2763,10 @@ msgstr "Por favor, intenta de nuevo más tarde o inicia sesión utilizando tus d
 #: apps/web/src/app/(dashboard)/templates/new-template-dialog.tsx:80
 msgid "Please try again later."
 msgstr "Por favor, intenta de nuevo más tarde."
+
+#: apps/web/src/app/(dashboard)/documents/delete-document-dialog.tsx:186
+msgid "Please type {0} to confirm"
+msgstr ""
 
 #: apps/web/src/app/(dashboard)/settings/profile/delete-account-dialog.tsx:134
 msgid "Please type <0>{0}</0> to confirm."
@@ -2885,7 +2902,7 @@ msgstr "Destinatarios"
 msgid "Recipients metrics"
 msgstr "Métricas de destinatarios"
 
-#: apps/web/src/app/(dashboard)/documents/delete-document-dialog.tsx:164
+#: apps/web/src/app/(dashboard)/documents/delete-document-dialog.tsx:166
 msgid "Recipients will still retain their copy of the document"
 msgstr "Los destinatarios aún conservarán su copia del documento"
 
@@ -3164,12 +3181,12 @@ msgid "Setup"
 msgstr "Configuración"
 
 #: apps/web/src/app/(dashboard)/documents/[id]/document-page-view-dropdown.tsx:148
-#: apps/web/src/app/(dashboard)/documents/data-table-action-dropdown.tsx:193
+#: apps/web/src/app/(dashboard)/documents/data-table-action-dropdown.tsx:214
 msgid "Share"
 msgstr "Compartir"
 
 #: apps/web/src/app/(dashboard)/documents/[id]/document-page-view-dropdown.tsx:179
-#: apps/web/src/app/(dashboard)/documents/data-table-action-dropdown.tsx:219
+#: apps/web/src/app/(dashboard)/documents/data-table-action-dropdown.tsx:240
 msgid "Share Signing Card"
 msgstr "Compartir tarjeta de firma"
 
@@ -3191,7 +3208,7 @@ msgstr "Mostrar plantillas en el perfil público de tu equipo para que tu audien
 
 #: apps/web/src/app/(dashboard)/documents/[id]/document-page-view-button.tsx:83
 #: apps/web/src/app/(dashboard)/documents/data-table-action-button.tsx:114
-#: apps/web/src/app/(dashboard)/documents/data-table-action-dropdown.tsx:139
+#: apps/web/src/app/(dashboard)/documents/data-table-action-dropdown.tsx:143
 #: apps/web/src/app/(profile)/p/[url]/page.tsx:192
 #: apps/web/src/app/(signing)/sign/[token]/auto-sign.tsx:229
 #: apps/web/src/app/(signing)/sign/[token]/document-action-auth-2fa.tsx:182
@@ -3315,7 +3332,7 @@ msgid "Signing in..."
 msgstr "Iniciando sesión..."
 
 #: apps/web/src/app/(dashboard)/documents/[id]/document-page-view-dropdown.tsx:160
-#: apps/web/src/app/(dashboard)/documents/data-table-action-dropdown.tsx:203
+#: apps/web/src/app/(dashboard)/documents/data-table-action-dropdown.tsx:224
 msgid "Signing Links"
 msgstr "Enlaces de firma"
 
@@ -3346,8 +3363,8 @@ msgstr "Configuraciones del sitio"
 #: apps/web/src/app/(dashboard)/documents/[id]/logs/download-audit-log-button.tsx:65
 #: apps/web/src/app/(dashboard)/documents/[id]/logs/download-certificate-button.tsx:68
 #: apps/web/src/app/(dashboard)/documents/data-table-action-button.tsx:75
-#: apps/web/src/app/(dashboard)/documents/data-table-action-dropdown.tsx:106
-#: apps/web/src/app/(dashboard)/documents/delete-document-dialog.tsx:80
+#: apps/web/src/app/(dashboard)/documents/data-table-action-dropdown.tsx:110
+#: apps/web/src/app/(dashboard)/documents/delete-document-dialog.tsx:82
 #: apps/web/src/app/(dashboard)/documents/duplicate-document-dialog.tsx:72
 #: apps/web/src/app/(dashboard)/settings/billing/billing-plans.tsx:62
 #: apps/web/src/app/(dashboard)/settings/billing/billing-portal-button.tsx:51
@@ -3708,7 +3725,7 @@ msgstr "The document owner has been notified of your decision. They may contact 
 msgid "The document was created but could not be sent to recipients."
 msgstr "El documento fue creado pero no se pudo enviar a los destinatarios."
 
-#: apps/web/src/app/(dashboard)/documents/delete-document-dialog.tsx:161
+#: apps/web/src/app/(dashboard)/documents/delete-document-dialog.tsx:163
 msgid "The document will be hidden from your account"
 msgstr "El documento será ocultado de tu cuenta"
 
@@ -3831,6 +3848,10 @@ msgstr "No hay borradores activos en este momento. Puedes subir un documento par
 msgid "There are no completed documents yet. Documents that you have created or received will appear here once completed."
 msgstr "Aún no hay documentos completados. Los documentos que hayas creado o recibido aparecerán aquí una vez completados."
 
+#: apps/web/src/app/(dashboard)/documents/empty-state.tsx:35
+msgid "There are no documents in the bin."
+msgstr ""
+
 #: apps/web/src/app/(dashboard)/settings/teams/team-email-usage.tsx:70
 msgid "They have permission on your behalf to:"
 msgstr "Tienen permiso en tu nombre para:"
@@ -3841,7 +3862,7 @@ msgstr "Tienen permiso en tu nombre para:"
 msgid "This action is not reversible. Please be certain."
 msgstr "Esta acción no es reversible. Por favor, asegúrate."
 
-#: apps/web/src/app/(dashboard)/documents/delete-document-dialog.tsx:81
+#: apps/web/src/app/(dashboard)/documents/delete-document-dialog.tsx:83
 msgid "This document could not be deleted at this time. Please try again."
 msgstr "Este documento no se pudo eliminar en este momento. Por favor, inténtalo de nuevo."
 
@@ -4105,8 +4126,8 @@ msgid "Type"
 msgstr "Tipo"
 
 #: apps/web/src/app/(dashboard)/documents/delete-document-dialog.tsx:184
-msgid "Type 'delete' to confirm"
-msgstr "Escribe 'eliminar' para confirmar"
+#~ msgid "Type 'delete' to confirm"
+#~ msgstr "Escribe 'eliminar' para confirmar"
 
 #: apps/web/src/components/(dashboard)/common/command-menu.tsx:186
 msgid "Type a command or search..."
@@ -4386,7 +4407,7 @@ msgstr "Historial de Versiones"
 #: apps/web/src/app/(dashboard)/documents/[id]/document-page-view-button.tsx:95
 #: apps/web/src/app/(dashboard)/documents/data-table-action-button.tsx:126
 #: apps/web/src/app/(dashboard)/documents/data-table-action-button.tsx:135
-#: apps/web/src/app/(dashboard)/documents/data-table-action-dropdown.tsx:132
+#: apps/web/src/app/(dashboard)/documents/data-table-action-dropdown.tsx:136
 #: apps/web/src/components/(teams)/tables/team-billing-invoices-data-table.tsx:100
 #: apps/web/src/components/forms/2fa/view-recovery-codes-dialog.tsx:168
 msgid "View"
@@ -4783,7 +4804,7 @@ msgstr "Estás a punto de completar la firma de \"{truncatedTitle}\".<0/> ¿Est�
 msgid "You are about to complete viewing \"{truncatedTitle}\".<0/> Are you sure?"
 msgstr "Estás a punto de completar la visualización de \"{truncatedTitle}\".<0/> ¿Estás seguro?"
 
-#: apps/web/src/app/(dashboard)/documents/delete-document-dialog.tsx:103
+#: apps/web/src/app/(dashboard)/documents/delete-document-dialog.tsx:105
 msgid "You are about to delete <0>\"{documentTitle}\"</0>"
 msgstr "Estás a punto de eliminar <0>\"{documentTitle}\"</0>"
 
@@ -4791,7 +4812,7 @@ msgstr "Estás a punto de eliminar <0>\"{documentTitle}\"</0>"
 msgid "You are about to delete the following team email from <0>{teamName}</0>."
 msgstr "Estás a punto de eliminar el siguiente correo electrónico del equipo de <0>{teamName}</0>."
 
-#: apps/web/src/app/(dashboard)/documents/delete-document-dialog.tsx:107
+#: apps/web/src/app/(dashboard)/documents/delete-document-dialog.tsx:109
 msgid "You are about to hide <0>\"{documentTitle}\"</0>"
 msgstr "Estás a punto de ocultar <0>\"{documentTitle}\"</0>"
 
@@ -5140,4 +5161,3 @@ msgstr "¡Tu token se creó con éxito! ¡Asegúrate de copiarlo porque no podr�
 #: apps/web/src/app/(teams)/t/[teamUrl]/settings/tokens/page.tsx:86
 msgid "Your tokens will be shown here once you create them."
 msgstr "Tus tokens se mostrarán aquí una vez que los crees."
-

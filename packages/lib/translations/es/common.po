@@ -135,11 +135,11 @@ msgstr "{prefix} creó el documento"
 msgid "{prefix} deleted the document"
 msgstr "{prefix} eliminó el documento"
 
-#: packages/lib/utils/document-audit-logs.ts:335
+#: packages/lib/utils/document-audit-logs.ts:339
 msgid "{prefix} moved the document to team"
 msgstr "{prefix} movió el documento al equipo"
 
-#: packages/lib/utils/document-audit-logs.ts:319
+#: packages/lib/utils/document-audit-logs.ts:323
 msgid "{prefix} opened the document"
 msgstr "{prefix} abrió el documento"
 
@@ -151,23 +151,23 @@ msgstr "{prefix} eliminó un campo"
 msgid "{prefix} removed a recipient"
 msgstr "{prefix} eliminó un destinatario"
 
-#: packages/lib/utils/document-audit-logs.ts:365
+#: packages/lib/utils/document-audit-logs.ts:369
 msgid "{prefix} resent an email to {0}"
 msgstr "{prefix} reenviaron un correo electrónico a {0}"
 
-#: packages/lib/utils/document-audit-logs.ts:366
+#: packages/lib/utils/document-audit-logs.ts:370
 msgid "{prefix} sent an email to {0}"
 msgstr "{prefix} envió un correo electrónico a {0}"
 
-#: packages/lib/utils/document-audit-logs.ts:331
+#: packages/lib/utils/document-audit-logs.ts:335
 msgid "{prefix} sent the document"
 msgstr "{prefix} envió el documento"
 
-#: packages/lib/utils/document-audit-logs.ts:295
+#: packages/lib/utils/document-audit-logs.ts:299
 msgid "{prefix} signed a field"
 msgstr "{prefix} firmó un campo"
 
-#: packages/lib/utils/document-audit-logs.ts:299
+#: packages/lib/utils/document-audit-logs.ts:303
 msgid "{prefix} unsigned a field"
 msgstr "{prefix} no firmó un campo"
 
@@ -179,27 +179,27 @@ msgstr "{prefix} actualizó un campo"
 msgid "{prefix} updated a recipient"
 msgstr "{prefix} actualizó un destinatario"
 
-#: packages/lib/utils/document-audit-logs.ts:315
+#: packages/lib/utils/document-audit-logs.ts:319
 msgid "{prefix} updated the document"
 msgstr "{prefix} actualizó el documento"
 
-#: packages/lib/utils/document-audit-logs.ts:307
+#: packages/lib/utils/document-audit-logs.ts:311
 msgid "{prefix} updated the document access auth requirements"
 msgstr "{prefix} actualizó los requisitos de autorización de acceso al documento"
 
-#: packages/lib/utils/document-audit-logs.ts:327
+#: packages/lib/utils/document-audit-logs.ts:331
 msgid "{prefix} updated the document external ID"
 msgstr "{prefix} actualizó el ID externo del documento"
 
-#: packages/lib/utils/document-audit-logs.ts:311
+#: packages/lib/utils/document-audit-logs.ts:315
 msgid "{prefix} updated the document signing auth requirements"
 msgstr "{prefix} actualizó los requisitos de autenticación para la firma del documento"
 
-#: packages/lib/utils/document-audit-logs.ts:323
+#: packages/lib/utils/document-audit-logs.ts:327
 msgid "{prefix} updated the document title"
 msgstr "{prefix} actualizó el título del documento"
 
-#: packages/lib/utils/document-audit-logs.ts:303
+#: packages/lib/utils/document-audit-logs.ts:307
 msgid "{prefix} updated the document visibility"
 msgstr "{prefix} actualizó la visibilidad del documento"
 
@@ -227,27 +227,27 @@ msgstr "{teamName} te ha invitado a {action} {documentName}"
 msgid "{teamName} ownership transfer request"
 msgstr "solicitud de transferencia de propiedad de {teamName}"
 
-#: packages/lib/utils/document-audit-logs.ts:343
+#: packages/lib/utils/document-audit-logs.ts:347
 msgid "{userName} approved the document"
 msgstr "{userName} aprobó el documento"
 
-#: packages/lib/utils/document-audit-logs.ts:344
+#: packages/lib/utils/document-audit-logs.ts:348
 msgid "{userName} CC'd the document"
 msgstr "{userName} envió una copia del documento"
 
-#: packages/lib/utils/document-audit-logs.ts:345
+#: packages/lib/utils/document-audit-logs.ts:349
 msgid "{userName} completed their task"
 msgstr "{userName} completó su tarea"
 
-#: packages/lib/utils/document-audit-logs.ts:355
+#: packages/lib/utils/document-audit-logs.ts:359
 msgid "{userName} rejected the document"
 msgstr "{userName} rechazó el documento"
 
-#: packages/lib/utils/document-audit-logs.ts:341
+#: packages/lib/utils/document-audit-logs.ts:345
 msgid "{userName} signed the document"
 msgstr "{userName} firmó el documento"
 
-#: packages/lib/utils/document-audit-logs.ts:342
+#: packages/lib/utils/document-audit-logs.ts:346
 msgid "{userName} viewed the document"
 msgstr "{userName} vio el documento"
 
@@ -688,17 +688,17 @@ msgstr "Documento \"{0}\" - Rechazo confirmado"
 msgid "Document access"
 msgstr "Acceso al documento"
 
-#: packages/lib/utils/document-audit-logs.ts:306
+#: packages/lib/utils/document-audit-logs.ts:310
 msgid "Document access auth updated"
 msgstr "Se actualizó la autenticación de acceso al documento"
 
-#: packages/lib/server-only/document/delete-document.ts:246
+#: packages/lib/server-only/document/delete-document.ts:256
 #: packages/lib/server-only/document/super-delete-document.ts:98
 msgid "Document Cancelled"
 msgstr "Documento cancelado"
 
-#: packages/lib/utils/document-audit-logs.ts:369
-#: packages/lib/utils/document-audit-logs.ts:370
+#: packages/lib/utils/document-audit-logs.ts:373
+#: packages/lib/utils/document-audit-logs.ts:374
 msgid "Document completed"
 msgstr "Documento completado"
 
@@ -736,15 +736,15 @@ msgstr "¡Documento eliminado!"
 msgid "Document Distribution Method"
 msgstr "Método de distribución de documentos"
 
-#: packages/lib/utils/document-audit-logs.ts:326
+#: packages/lib/utils/document-audit-logs.ts:330
 msgid "Document external ID updated"
 msgstr "ID externo del documento actualizado"
 
-#: packages/lib/utils/document-audit-logs.ts:334
+#: packages/lib/utils/document-audit-logs.ts:338
 msgid "Document moved to team"
 msgstr "Documento movido al equipo"
 
-#: packages/lib/utils/document-audit-logs.ts:318
+#: packages/lib/utils/document-audit-logs.ts:322
 msgid "Document opened"
 msgstr "Documento abierto"
 
@@ -759,23 +759,23 @@ msgstr "Documento Rechazado"
 #~ msgid "Document Rejection Confirmed"
 #~ msgstr "Document Rejection Confirmed"
 
-#: packages/lib/utils/document-audit-logs.ts:330
+#: packages/lib/utils/document-audit-logs.ts:334
 msgid "Document sent"
 msgstr "Documento enviado"
 
-#: packages/lib/utils/document-audit-logs.ts:310
+#: packages/lib/utils/document-audit-logs.ts:314
 msgid "Document signing auth updated"
 msgstr "Se actualizó la autenticación de firma del documento"
 
-#: packages/lib/utils/document-audit-logs.ts:322
+#: packages/lib/utils/document-audit-logs.ts:326
 msgid "Document title updated"
 msgstr "Título del documento actualizado"
 
-#: packages/lib/utils/document-audit-logs.ts:314
+#: packages/lib/utils/document-audit-logs.ts:318
 msgid "Document updated"
 msgstr "Documento actualizado"
 
-#: packages/lib/utils/document-audit-logs.ts:302
+#: packages/lib/utils/document-audit-logs.ts:306
 msgid "Document visibility updated"
 msgstr "Visibilidad del documento actualizada"
 
@@ -821,11 +821,11 @@ msgstr "Se requiere email"
 msgid "Email Options"
 msgstr "Opciones de correo electrónico"
 
-#: packages/lib/utils/document-audit-logs.ts:363
+#: packages/lib/utils/document-audit-logs.ts:367
 msgid "Email resent"
 msgstr "Correo electrónico reeenviado"
 
-#: packages/lib/utils/document-audit-logs.ts:363
+#: packages/lib/utils/document-audit-logs.ts:367
 msgid "Email sent"
 msgstr "Correo electrónico enviado"
 
@@ -889,11 +889,11 @@ msgstr "Etiqueta de campo"
 msgid "Field placeholder"
 msgstr "Marcador de posición de campo"
 
-#: packages/lib/utils/document-audit-logs.ts:294
+#: packages/lib/utils/document-audit-logs.ts:298
 msgid "Field signed"
 msgstr "Campo firmado"
 
-#: packages/lib/utils/document-audit-logs.ts:298
+#: packages/lib/utils/document-audit-logs.ts:302
 msgid "Field unsigned"
 msgstr "Campo no firmado"
 
@@ -1199,8 +1199,8 @@ msgstr "Razón del rechazo: {rejectionReason}"
 msgid "Receives copy"
 msgstr "Recibe copia"
 
-#: packages/lib/utils/document-audit-logs.ts:338
-#: packages/lib/utils/document-audit-logs.ts:353
+#: packages/lib/utils/document-audit-logs.ts:342
+#: packages/lib/utils/document-audit-logs.ts:357
 msgid "Recipient"
 msgstr "Destinatario"
 
@@ -1814,4 +1814,3 @@ msgstr "Tu contraseña ha sido actualizada."
 #: packages/email/templates/team-delete.tsx:32
 msgid "Your team has been deleted"
 msgstr "Tu equipo ha sido eliminado"
-
