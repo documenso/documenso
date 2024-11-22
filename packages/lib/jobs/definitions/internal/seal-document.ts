@@ -58,6 +58,15 @@ export const SEAL_DOCUMENT_JOB_DEFINITION = {
       },
       include: {
         Recipient: true,
+        team: {
+          select: {
+            teamGlobalSettings: {
+              select: {
+                includeSigningCertificate: true,
+              },
+            },
+          },
+        },
       },
     });
 
@@ -127,7 +136,11 @@ export const SEAL_DOCUMENT_JOB_DEFINITION = {
       flattenForm(pdfDoc);
       flattenAnnotations(pdfDoc);
 
-      if (certificateData) {
+      if (
+        certificateData &&
+        document.teamId &&
+        document.team?.teamGlobalSettings?.includeSigningCertificate
+      ) {
         const certificateDoc = await PDFDocument.load(certificateData);
 
         const certificatePages = await pdfDoc.copyPages(

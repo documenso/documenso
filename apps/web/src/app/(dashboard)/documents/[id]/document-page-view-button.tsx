@@ -44,14 +44,12 @@ export const DocumentPageViewButton = ({ document, team }: DocumentPageViewButto
 
   const documentsPath = formatDocumentsPath(document.team?.url);
 
-  const onDownloadClick = async (withCertificate: boolean) => {
+  const onDownloadClick = async () => {
     try {
       const documentWithData = await trpcClient.document.getDocumentById.query({
         id: document.id,
         teamId: team?.id,
       });
-
-      console.log({ documentWithData });
 
       const documentData = documentWithData?.documentData;
 
@@ -59,7 +57,7 @@ export const DocumentPageViewButton = ({ document, team }: DocumentPageViewButto
         throw new Error('No document available');
       }
 
-      await downloadPDF({ documentData, fileName: documentWithData.title, withCertificate });
+      await downloadPDF({ documentData, fileName: documentWithData.title });
     } catch (err) {
       toast({
         title: _(msg`Something went wrong`),
@@ -108,16 +106,10 @@ export const DocumentPageViewButton = ({ document, team }: DocumentPageViewButto
       </Button>
     ))
     .with({ isComplete: true }, () => (
-      <div className="flex w-full gap-2">
-        <Button className="flex-1" onClick={() => void onDownloadClick(true)}>
-          <Download className="-ml-1 mr-2 inline h-4 w-4" />
-          <Trans>Download with Certificate</Trans>
-        </Button>
-        <Button className="flex-1" onClick={() => void onDownloadClick(false)}>
-          <Download className="-ml-1 mr-2 inline h-4 w-4" />
-          <Trans>Download without Certificate</Trans>
-        </Button>
-      </div>
+      <Button className="w-full" onClick={onDownloadClick}>
+        <Download className="-ml-1 mr-2 inline h-4 w-4" />
+        <Trans>Download</Trans>
+      </Button>
     ))
     .otherwise(() => null);
 };

@@ -48,6 +48,15 @@ export const sealDocument = async ({
       documentData: true,
       documentMeta: true,
       Recipient: true,
+      team: {
+        select: {
+          teamGlobalSettings: {
+            select: {
+              includeSigningCertificate: true,
+            },
+          },
+        },
+      },
     },
   });
 
@@ -105,7 +114,11 @@ export const sealDocument = async ({
   flattenForm(doc);
   flattenAnnotations(doc);
 
-  if (certificate) {
+  if (
+    document.teamId &&
+    document.team?.teamGlobalSettings?.includeSigningCertificate &&
+    certificate
+  ) {
     const certificatePages = await doc.copyPages(certificate, certificate.getPageIndices());
 
     certificatePages.forEach((page) => {

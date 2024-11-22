@@ -12,6 +12,7 @@ export type UpdateTeamDocumentSettingsOptions = {
     documentVisibility: DocumentVisibility;
     documentLanguage: SupportedLanguageCodes;
     includeSenderDetails: boolean;
+    includeSigningCertificate: boolean;
   };
 };
 
@@ -20,7 +21,8 @@ export const updateTeamDocumentSettings = async ({
   teamId,
   settings,
 }: UpdateTeamDocumentSettingsOptions) => {
-  const { documentVisibility, documentLanguage, includeSenderDetails } = settings;
+  const { documentVisibility, documentLanguage, includeSenderDetails, includeSigningCertificate } =
+    settings;
 
   const member = await prisma.teamMember.findFirst({
     where: {
@@ -42,11 +44,13 @@ export const updateTeamDocumentSettings = async ({
       documentVisibility,
       documentLanguage,
       includeSenderDetails,
+      includeSigningCertificate,
     },
     update: {
       documentVisibility,
       documentLanguage,
       includeSenderDetails,
+      includeSigningCertificate,
     },
   });
 };

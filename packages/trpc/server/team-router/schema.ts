@@ -212,6 +212,7 @@ export const ZUpdateTeamDocumentSettingsMutationSchema = z.object({
       .default(DocumentVisibility.EVERYONE),
     documentLanguage: z.enum(SUPPORTED_LANGUAGE_CODES).optional().default('en'),
     includeSenderDetails: z.boolean().optional().default(false),
+    includeSigningCertificate: z.boolean().optional().default(true),
   }),
 });
 
