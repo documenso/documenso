@@ -2,6 +2,7 @@ import { extendZodWithOpenApi } from '@anatine/zod-openapi';
 import { z } from 'zod';
 
 import { DATE_FORMATS, DEFAULT_DOCUMENT_DATE_FORMAT } from '@documenso/lib/constants/date-formats';
+import { SUPPORTED_LANGUAGE_CODES } from '@documenso/lib/constants/i18n';
 import '@documenso/lib/constants/time-zones';
 import { DEFAULT_DOCUMENT_TIME_ZONE, TIME_ZONES } from '@documenso/lib/constants/time-zones';
 import { ZUrlSchema } from '@documenso/lib/schemas/common';
@@ -19,6 +20,7 @@ import {
   RecipientRole,
   SendStatus,
   SigningStatus,
+  TeamMemberRole,
   TemplateType,
 } from '@documenso/prisma/client';
 
@@ -65,7 +67,10 @@ export type TSuccessfulDocumentResponseSchema = z.infer<typeof ZSuccessfulDocume
 
 export const ZSendDocumentForSigningMutationSchema = z
   .object({
-    sendEmail: z.boolean().optional().default(true),
+    sendEmail: z.boolean().optional().default(true).openapi({
+      description:
+        'Whether to send an email to the recipients asking them to action the document. If you disable this, you will need to manually distribute the document to the recipients using the generated signing links.',
+    }),
   })
   .or(z.literal('').transform(() => ({ sendEmail: true })));
 
@@ -126,6 +131,7 @@ export const ZCreateDocumentMutationSchema = z.object({
         }),
       redirectUrl: z.string(),
       signingOrder: z.nativeEnum(DocumentSigningOrder).optional(),
+      language: z.enum(SUPPORTED_LANGUAGE_CODES).optional(),
     })
     .partial(),
   authOptions: z
@@ -180,6 +186,7 @@ export const ZCreateDocumentFromTemplateMutationSchema = z.object({
       dateFormat: z.string(),
       redirectUrl: z.string(),
       signingOrder: z.nativeEnum(DocumentSigningOrder).optional(),
+      language: z.enum(SUPPORTED_LANGUAGE_CODES).optional(),
     })
     .partial()
     .optional(),
@@ -246,6 +253,7 @@ export const ZGenerateDocumentFromTemplateMutationSchema = z.object({
       dateFormat: z.string(),
       redirectUrl: ZUrlSchema,
       signingOrder: z.nativeEnum(DocumentSigningOrder).optional(),
+      language: z.enum(SUPPORTED_LANGUAGE_CODES).optional(),
     })
     .partial()
     .optional(),
@@ -531,4 +539,42 @@ export const ZSuccessfulGetTemplatesResponseSchema = z.object({
 export const ZGetTemplatesQuerySchema = z.object({
   page: z.coerce.number().min(1).optional().default(1),
   perPage: z.coerce.number().min(1).optional().default(1),
+});
+
+export const ZFindTeamMembersResponseSchema = z.object({
+  members: z.array(
+    z.object({
+      id: z.number(),
+      email: z.string().email(),
+      role: z.nativeEnum(TeamMemberRole),
+    }),
+  ),
+});
+
+export const ZInviteTeamMemberMutationSchema = z.object({
+  email: z
+    .string()
+    .email()
+    .transform((email) => email.toLowerCase()),
+  role: z.nativeEnum(TeamMemberRole).optional().default(TeamMemberRole.MEMBER),
+});
+
+export const ZSuccessfulInviteTeamMemberResponseSchema = z.object({
+  message: z.string(),
+});
+
+export const ZUpdateTeamMemberMutationSchema = z.object({
+  role: z.nativeEnum(TeamMemberRole),
+});
+
+export const ZSuccessfulUpdateTeamMemberResponseSchema = z.object({
+  id: z.number(),
+  email: z.string().email(),
+  role: z.nativeEnum(TeamMemberRole),
+});
+
+export const ZSuccessfulRemoveTeamMemberResponseSchema = z.object({
+  id: z.number(),
+  email: z.string().email(),
+  role: z.nativeEnum(TeamMemberRole),
 });

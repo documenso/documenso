@@ -21,7 +21,7 @@ type WaitingForTurnToSignPageProps = {
 export default async function WaitingForTurnToSignPage({
   params: { token },
 }: WaitingForTurnToSignPageProps) {
-  setupI18nSSR();
+  await setupI18nSSR();
 
   if (!token) {
     return notFound();

@@ -139,6 +139,7 @@ export const DocumentLogsPageView = async ({ params, team }: DocumentLogsPageVie
             className="mr-2"
             documentId={document.id}
             documentStatus={document.status}
+            teamId={team?.id}
           />
 
           <DownloadAuditLogButton teamId={team?.id} documentId={document.id} />

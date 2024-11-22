@@ -23,7 +23,8 @@ export const getApiTokenByToken = async ({ token }: { token: string }) => {
     throw new Error('Expired token');
   }
 
-  if (apiToken.team) {
+  // Handle a silly choice from many moons ago
+  if (apiToken.team && !apiToken.user) {
     apiToken.user = await prisma.user.findFirst({
       where: {
         id: apiToken.team.ownerUserId,
@@ -33,9 +34,13 @@ export const getApiTokenByToken = async ({ token }: { token: string }) => {
 
   const { user } = apiToken;
 
+  // This will never happen but we need to narrow types
   if (!user) {
     throw new Error('Invalid token');
   }
 
-  return { ...apiToken, user };
+  return {
+    ...apiToken,
+    user,
+  };
 };

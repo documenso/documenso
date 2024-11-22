@@ -14,7 +14,7 @@ type VerifyTeamEmailPageProps = {
 };
 
 export default async function VerifyTeamEmailPage({ params: { token } }: VerifyTeamEmailPageProps) {
-  setupI18nSSR();
+  await setupI18nSSR();
 
   const teamEmailVerification = await prisma.teamEmailVerification.findUnique({
     where: {

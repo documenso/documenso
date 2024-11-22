@@ -16,7 +16,7 @@ export const metadata: Metadata = {
 };
 
 export default async function DocumentsPage({ searchParams = {} }: DocumentsPageProps) {
-  setupI18nSSR();
+  await setupI18nSSR();
 
   const { user } = await getRequiredServerComponentSession();
 

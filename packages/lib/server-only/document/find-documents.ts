@@ -2,8 +2,9 @@ import { DateTime } from 'luxon';
 import { P, match } from 'ts-pattern';
 
 import { prisma } from '@documenso/prisma';
-import { Prisma, RecipientRole, SigningStatus, TeamMemberRole } from '@documenso/prisma/client';
-import type { Document, Team, TeamEmail, User } from '@documenso/prisma/client';
+import { RecipientRole, SigningStatus, TeamMemberRole } from '@documenso/prisma/client';
+import type { Document, DocumentSource, Team, TeamEmail, User } from '@documenso/prisma/client';
+import { Prisma } from '@documenso/prisma/client';
 import { ExtendedDocumentStatus } from '@documenso/prisma/types/extended-document-status';
 
 import { DocumentVisibility } from '../../types/document-visibility';
@@ -16,6 +17,8 @@ export type FindDocumentsOptions = {
   userId: number;
   teamId?: number;
   term?: string;
+  templateId?: number;
+  source?: DocumentSource;
   status?: ExtendedDocumentStatus;
   page?: number;
   perPage?: number;
@@ -32,6 +35,8 @@ export const findDocuments = async ({
   userId,
   teamId,
   term,
+  templateId,
+  source,
   status = ExtendedDocumentStatus.ALL,
   page = 1,
   perPage = 10,
@@ -40,39 +45,37 @@ export const findDocuments = async ({
   senderIds,
   search,
 }: FindDocumentsOptions) => {
-  const { user, team } = await prisma.$transaction(async (tx) => {
-    const user = await tx.user.findFirstOrThrow({
-      where: { id: userId },
-    });
-
-    let team = null;
-
-    if (teamId !== undefined) {
-      team = await tx.team.findFirstOrThrow({
-        where: {
-          id: teamId,
-          members: {
-            some: {
-              userId,
-            },
-          },
-        },
-        include: {
-          teamEmail: true,
-          members: {
-            where: {
-              userId,
-            },
-            select: {
-              role: true,
-            },
-          },
-        },
-      });
-    }
-
-    return { user, team };
+  const user = await prisma.user.findFirstOrThrow({
+    where: {
+      id: userId,
+    },
   });
+
+  let team = null;
+
+  if (teamId !== undefined) {
+    team = await prisma.team.findFirstOrThrow({
+      where: {
+        id: teamId,
+        members: {
+          some: {
+            userId,
+          },
+        },
+      },
+      include: {
+        teamEmail: true,
+        members: {
+          where: {
+            userId,
+          },
+          select: {
+            role: true,
+          },
+        },
+      },
+    });
+  }
 
   const orderByColumn = orderBy?.column ?? 'createdAt';
   const orderByDirection = orderBy?.direction ?? 'desc';
@@ -113,11 +116,18 @@ export const findDocuments = async ({
       }))
       .otherwise(() => ({ visibility: DocumentVisibility.EVERYONE })),
     {
-      Recipient: {
-        some: {
-          email: user.email,
+      OR: [
+        {
+          Recipient: {
+            some: {
+              email: user.email,
+            },
+          },
         },
-      },
+        {
+          userId: user.id,
+        },
+      ],
     },
   ];
 
@@ -137,10 +147,80 @@ export const findDocuments = async ({
     };
   }
 
+  let deletedFilter: Prisma.DocumentWhereInput = {
+    AND: {
+      OR: [
+        {
+          userId: user.id,
+          deletedAt: null,
+        },
+        {
+          Recipient: {
+            some: {
+              email: user.email,
+              documentDeletedAt: null,
+            },
+          },
+        },
+      ],
+    },
+  };
+
+  if (team) {
+    deletedFilter = {
+      AND: {
+        OR: team.teamEmail
+          ? [
+              {
+                teamId: team.id,
+                deletedAt: null,
+              },
+              {
+                User: {
+                  email: team.teamEmail.email,
+                },
+                deletedAt: null,
+              },
+              {
+                Recipient: {
+                  some: {
+                    email: team.teamEmail.email,
+                    documentDeletedAt: null,
+                  },
+                },
+              },
+            ]
+          : [
+              {
+                teamId: team.id,
+                deletedAt: null,
+              },
+            ],
+      },
+    };
+  }
+
+  const whereAndClause: Prisma.DocumentWhereInput['AND'] = [
+    { ...termFilters },
+    { ...filters },
+    { ...deletedFilter },
+    { ...searchFilter },
+  ];
+
+  if (templateId) {
+    whereAndClause.push({
+      templateId,
+    });
+  }
+
+  if (source) {
+    whereAndClause.push({
+      source,
+    });
+  }
+
   const whereClause: Prisma.DocumentWhereInput = {
-    ...termFilters,
-    ...filters,
-    ...searchFilter,
+    AND: whereAndClause,
   };
 
   if (period) {

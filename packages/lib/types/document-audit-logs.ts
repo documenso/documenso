@@ -34,6 +34,7 @@ export const ZDocumentAuditLogTypeSchema = z.enum([
   'DOCUMENT_GLOBAL_AUTH_ACTION_UPDATED', // When the global action authentication is updated.
   'DOCUMENT_META_UPDATED', // When the document meta data is updated.
   'DOCUMENT_OPENED', // When the document is opened by a recipient.
+  'DOCUMENT_RECIPIENT_REJECTED', // When a recipient rejects the document.
   'DOCUMENT_RECIPIENT_COMPLETED', // When a recipient completes all their required tasks for the document.
   'DOCUMENT_SENT', // When the document transitions from DRAFT to PENDING.
   'DOCUMENT_TITLE_UPDATED', // When the document title is updated.
@@ -375,6 +376,16 @@ export const ZDocumentAuditLogEventDocumentRecipientCompleteSchema = z.object({
 });
 
 /**
+ * Event: Document recipient completed the document (the recipient has fully actioned and completed their required steps for the document).
+ */
+export const ZDocumentAuditLogEventDocumentRecipientRejectedSchema = z.object({
+  type: z.literal(DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_RECIPIENT_REJECTED),
+  data: ZBaseRecipientDataSchema.extend({
+    reason: z.string(),
+  }),
+});
+
+/**
  * Event: Document sent.
  */
 export const ZDocumentAuditLogEventDocumentSentSchema = z.object({
@@ -499,6 +510,7 @@ export const ZDocumentAuditLogSchema = ZDocumentAuditLogBaseSchema.and(
     ZDocumentAuditLogEventDocumentMetaUpdatedSchema,
     ZDocumentAuditLogEventDocumentOpenedSchema,
     ZDocumentAuditLogEventDocumentRecipientCompleteSchema,
+    ZDocumentAuditLogEventDocumentRecipientRejectedSchema,
     ZDocumentAuditLogEventDocumentSentSchema,
     ZDocumentAuditLogEventDocumentTitleUpdatedSchema,
     ZDocumentAuditLogEventDocumentExternalIdUpdatedSchema,

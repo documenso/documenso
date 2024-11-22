@@ -14,7 +14,7 @@ type TeamTemplatePageProps = {
 };
 
 export default async function TeamTemplatePage({ params }: TeamTemplatePageProps) {
-  setupI18nSSR();
+  await setupI18nSSR();
 
   const { teamUrl } = params;
 

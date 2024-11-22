@@ -1,15 +1,14 @@
-import Image from 'next/image';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 
 import { allBlogPosts } from 'contentlayer/generated';
 import { ChevronLeft } from 'lucide-react';
-import type { MDXComponents } from 'mdx/types';
-import { useMDXComponent } from 'next-contentlayer/hooks';
 
 import { setupI18nSSR } from '@documenso/lib/client-only/providers/i18n.server';
 
 import { CallToAction } from '~/components/(marketing)/call-to-action';
+
+import { BlogPostContent } from './content';
 
 export const dynamic = 'force-dynamic';
 
@@ -42,22 +41,14 @@ export const generateMetadata = ({ params }: { params: { post: string } }) => {
   };
 };
 
-const mdxComponents: MDXComponents = {
-  MdxNextImage: (props: { width: number; height: number; alt?: string; src: string }) => (
-    <Image {...props} alt={props.alt ?? ''} />
-  ),
-};
-
-export default function BlogPostPage({ params }: { params: { post: string } }) {
-  setupI18nSSR();
+export default async function BlogPostPage({ params }: { params: { post: string } }) {
+  await setupI18nSSR();
 
   const post = allBlogPosts.find((post) => post._raw.flattenedPath === `blog/${params.post}`);
 
   if (!post) {
     notFound();
   }
-
-  const MDXContent = useMDXComponent(post.body.code);
 
   return (
     <div>
@@ -87,7 +78,7 @@ export default function BlogPostPage({ params }: { params: { post: string } }) {
           </div>
         </div>
 
-        <MDXContent components={mdxComponents} />
+        <BlogPostContent post={post} />
 
         {post.tags.length > 0 && (
           <ul className="not-prose flex list-none flex-row space-x-2 px-0">

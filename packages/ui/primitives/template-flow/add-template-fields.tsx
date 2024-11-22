@@ -5,6 +5,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Caveat } from 'next/font/google';
 
 import { Trans, msg } from '@lingui/macro';
+import { useLingui } from '@lingui/react';
 import {
   CalendarDays,
   CheckSquare,
@@ -22,12 +23,13 @@ import { useFieldArray, useForm } from 'react-hook-form';
 import { getBoundingClientRect } from '@documenso/lib/client-only/get-bounding-client-rect';
 import { useDocumentElement } from '@documenso/lib/client-only/hooks/use-document-element';
 import { PDF_VIEWER_PAGE_SELECTOR } from '@documenso/lib/constants/pdf-viewer';
-import { RECIPIENT_ROLES_DESCRIPTION_ENG } from '@documenso/lib/constants/recipient-roles';
+import { RECIPIENT_ROLES_DESCRIPTION } from '@documenso/lib/constants/recipient-roles';
 import {
   type TFieldMetaSchema as FieldMeta,
   ZFieldMetaSchema,
 } from '@documenso/lib/types/field-meta';
 import { nanoid } from '@documenso/lib/universal/id';
+import { parseMessageDescriptor } from '@documenso/lib/utils/i18n';
 import type { Field, Recipient } from '@documenso/prisma/client';
 import { FieldType, RecipientRole } from '@documenso/prisma/client';
 import { cn } from '@documenso/ui/lib/utils';
@@ -65,8 +67,11 @@ const fontCaveat = Caveat({
   variable: '--font-caveat',
 });
 
-const MIN_HEIGHT_PX = 20;
-const MIN_WIDTH_PX = 80;
+const MIN_HEIGHT_PX = 12;
+const MIN_WIDTH_PX = 36;
+
+const DEFAULT_HEIGHT_PX = MIN_HEIGHT_PX * 2.5;
+const DEFAULT_WIDTH_PX = MIN_WIDTH_PX * 2.5;
 
 export type AddTemplateFieldsFormProps = {
   documentFlow: DocumentFlowStep;
@@ -85,6 +90,8 @@ export const AddTemplateFieldsFormPartial = ({
   onSubmit,
   teamId,
 }: AddTemplateFieldsFormProps) => {
+  const { _ } = useLingui();
+
   const { isWithinPageBounds, getFieldPosition, getPage } = useDocumentElement();
   const { currentStep, totalSteps, previousStep } = useStep();
   const [showAdvancedSettings, setShowAdvancedSettings] = useState(false);
@@ -350,8 +357,8 @@ export const AddTemplateFieldsFormPartial = ({
       }
 
       fieldBounds.current = {
-        height: Math.max(MIN_HEIGHT_PX),
-        width: Math.max(MIN_WIDTH_PX),
+        height: Math.max(DEFAULT_HEIGHT_PX),
+        width: Math.max(DEFAULT_WIDTH_PX),
       };
     });
 
@@ -400,7 +407,10 @@ export const AddTemplateFieldsFormPartial = ({
       {showAdvancedSettings && currentField ? (
         <FieldAdvancedSettings
           title={msg`Advanced settings`}
-          description={msg`Configure the ${FRIENDLY_FIELD_TYPE[currentField.type]} field`}
+          description={msg`Configure the ${parseMessageDescriptor(
+            _,
+            FRIENDLY_FIELD_TYPE[currentField.type],
+          )} field`}
           field={currentField}
           fields={localFields}
           onAdvancedSettings={handleAdvancedSettings}
@@ -418,7 +428,7 @@ export const AddTemplateFieldsFormPartial = ({
               {selectedField && (
                 <div
                   className={cn(
-                    'text-muted-foreground dark:text-muted-background pointer-events-none fixed z-50 flex cursor-pointer flex-col items-center justify-center bg-white transition duration-200',
+                    'text-muted-foreground dark:text-muted-background pointer-events-none fixed z-50 flex cursor-pointer flex-col items-center justify-center bg-white transition duration-200 [container-type:size]',
                     selectedSignerStyles.default.base,
                     {
                       '-rotate-6 scale-90 opacity-50 dark:bg-black/20': !isFieldWithinBounds,
@@ -432,7 +442,9 @@ export const AddTemplateFieldsFormPartial = ({
                     width: fieldBounds.current.width,
                   }}
                 >
-                  {FRIENDLY_FIELD_TYPE[selectedField]}
+                  <span className="text-[clamp(0.425rem,25cqw,0.825rem)]">
+                    {parseMessageDescriptor(_, FRIENDLY_FIELD_TYPE[selectedField])}
+                  </span>
                 </div>
               )}
 
@@ -445,8 +457,10 @@ export const AddTemplateFieldsFormPartial = ({
                     recipientIndex={recipientIndex === -1 ? 0 : recipientIndex}
                     field={field}
                     disabled={selectedSigner?.email !== field.signerEmail}
-                    minHeight={fieldBounds.current.height}
-                    minWidth={fieldBounds.current.width}
+                    minHeight={MIN_HEIGHT_PX}
+                    minWidth={MIN_WIDTH_PX}
+                    defaultHeight={DEFAULT_HEIGHT_PX}
+                    defaultWidth={DEFAULT_WIDTH_PX}
                     passive={isFieldWithinBounds && !!selectedField}
                     onResize={(options) => onFieldResize(options, index)}
                     onMove={(options) => onFieldMove(options, index)}
@@ -501,8 +515,7 @@ export const AddTemplateFieldsFormPartial = ({
                       {recipientsByRoleToDisplay.map(([role, roleRecipients], roleIndex) => (
                         <CommandGroup key={roleIndex}>
                           <div className="text-muted-foreground mb-1 ml-2 mt-2 text-xs font-medium">
-                            {/* Todo: Translations - Add plural translations. */}
-                            {`${RECIPIENT_ROLES_DESCRIPTION_ENG[role].roleName}s`}
+                            {_(RECIPIENT_ROLES_DESCRIPTION[role].roleNamePlural)}
                           </div>
 
                           {roleRecipients.length === 0 && (
@@ -785,7 +798,7 @@ export const AddTemplateFieldsFormPartial = ({
                           )}
                         >
                           <CheckSquare className="h-4 w-4" />
-                          <Trans>Checkbox</Trans>
+                          Checkbox
                         </p>
                       </CardContent>
                     </Card>

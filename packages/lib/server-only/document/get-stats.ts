@@ -6,10 +6,9 @@ import { prisma } from '@documenso/prisma';
 import { TeamMemberRole } from '@documenso/prisma/client';
 import type { Prisma, User } from '@documenso/prisma/client';
 import { SigningStatus } from '@documenso/prisma/client';
+import { DocumentVisibility } from '@documenso/prisma/client';
 import { isExtendedDocumentStatus } from '@documenso/prisma/guards/is-extended-document-status';
 import { ExtendedDocumentStatus } from '@documenso/prisma/types/extended-document-status';
-
-import { DocumentVisibility } from '../../types/document-visibility';
 
 export type GetStatsInput = {
   user: User;
