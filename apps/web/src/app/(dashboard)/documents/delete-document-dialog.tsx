@@ -47,6 +47,8 @@ export const DeleteDocumentDialog = ({
   const { refreshLimits } = useLimits();
   const { _ } = useLingui();
 
+  const deleteMessage = msg`delete`;
+
   const [inputValue, setInputValue] = useState('');
   const [isDeleteEnabled, setIsDeleteEnabled] = useState(status === DocumentStatus.DRAFT);
 
@@ -87,7 +89,7 @@ export const DeleteDocumentDialog = ({
 
   const onInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setInputValue(event.target.value);
-    setIsDeleteEnabled(event.target.value === _(msg`delete`));
+    setIsDeleteEnabled(event.target.value === _(deleteMessage));
   };
 
   return (
@@ -181,7 +183,7 @@ export const DeleteDocumentDialog = ({
             type="text"
             value={inputValue}
             onChange={onInputChange}
-            placeholder={_(msg`Type 'delete' to confirm`)}
+            placeholder={_(msg`Please type ${`'${_(deleteMessage)}'`} to confirm`)}
           />
         )}
 
