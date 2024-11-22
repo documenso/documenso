@@ -11,7 +11,9 @@ import { useForm } from 'react-hook-form';
 import { useAnalytics } from '@documenso/lib/client-only/hooks/use-analytics';
 import type { DocumentAndSender } from '@documenso/lib/server-only/document/get-document-by-token';
 import type { TRecipientActionAuth } from '@documenso/lib/types/document-auth';
+import { ZFieldMetaSchema } from '@documenso/lib/types/field-meta';
 import { sortFieldsByPosition, validateFieldsInserted } from '@documenso/lib/utils/fields';
+import { isAdvancedField } from '@documenso/lib/utils/is-advanced-field';
 import { type Field, type Recipient, RecipientRole } from '@documenso/prisma/client';
 import { trpc } from '@documenso/trpc/react';
 import { FieldToolTip } from '@documenso/ui/components/field/field-tooltip';
@@ -56,19 +58,33 @@ export const SigningForm = ({
   // Keep the loading state going if successful since the redirect may take some time.
   const isSubmitting = formState.isSubmitting || formState.isSubmitSuccessful;
 
+  const fieldsRequiringValidation = useMemo(
+    () =>
+      fields.filter((field) => {
+        const isRequired = field.fieldMeta && ZFieldMetaSchema.parse(field.fieldMeta)?.required;
+
+        if (isAdvancedField(field.type) && !isRequired) {
+          return false;
+        }
+
+        return !field.inserted;
+      }),
+    [fields],
+  );
+
   const uninsertedFields = useMemo(() => {
-    return sortFieldsByPosition(fields.filter((field) => !field.inserted));
+    return sortFieldsByPosition(fieldsRequiringValidation.filter((field) => !field.inserted));
   }, [fields]);
 
   const fieldsValidated = () => {
     setValidateUninsertedFields(true);
-    validateFieldsInserted(fields);
+    validateFieldsInserted(fieldsRequiringValidation);
   };
 
   const onFormSubmit = async () => {
     setValidateUninsertedFields(true);
 
-    const isFieldsValid = validateFieldsInserted(fields);
+    const isFieldsValid = validateFieldsInserted(fieldsRequiringValidation);
 
     if (!isFieldsValid) {
       return;

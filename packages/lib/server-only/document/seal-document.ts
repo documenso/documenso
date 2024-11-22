@@ -11,9 +11,11 @@ import { WebhookTriggerEvents } from '@documenso/prisma/client';
 import { signPdf } from '@documenso/signing';
 
 import { ZSupportedLanguageCodeSchema } from '../../constants/i18n';
+import { ZFieldMetaSchema } from '../../types/field-meta';
 import type { RequestMetadata } from '../../universal/extract-request-metadata';
 import { getFile } from '../../universal/upload/get-file';
 import { putPdfFile } from '../../universal/upload/put-file';
+import { isAdvancedField } from '../../utils/is-advanced-field';
 import { getCertificatePdf } from '../htmltopdf/get-certificate-pdf';
 import { flattenAnnotations } from '../pdf/flatten-annotations';
 import { flattenForm } from '../pdf/flatten-form';
@@ -79,8 +81,17 @@ export const sealDocument = async ({
     },
   });
 
-  if (fields.some((field) => !field.inserted)) {
-    throw new Error(`Document ${document.id} has unsigned fields`);
+  const hasUnsignedRequiredFields = fields.some((field) => {
+    if (!isAdvancedField(field.type)) {
+      return !field.inserted;
+    }
+
+    const isRequired = field.fieldMeta && ZFieldMetaSchema.parse(field.fieldMeta)?.required;
+    return isRequired ? !field.inserted : false;
+  });
+
+  if (hasUnsignedRequiredFields) {
+    throw new Error(`Recipient ${document.id} has unsigned fields`);
   }
 
   if (isResealing) {

@@ -2,6 +2,8 @@ import { useState } from 'react';
 
 import { Trans } from '@lingui/macro';
 
+import { ZFieldMetaSchema } from '@documenso/lib/types/field-meta';
+import { isAdvancedField } from '@documenso/lib/utils/is-advanced-field';
 import type { Field } from '@documenso/prisma/client';
 import { RecipientRole } from '@documenso/prisma/client';
 import { Button } from '@documenso/ui/primitives/button';
@@ -37,7 +39,18 @@ export const SignDialog = ({
 }: SignDialogProps) => {
   const [showDialog, setShowDialog] = useState(false);
   const truncatedTitle = truncateTitle(documentTitle);
-  const isComplete = fields.every((field) => field.inserted);
+
+  const isComplete = fields.every((field) => {
+    const isOptionalAdvancedField =
+      isAdvancedField(field.type) &&
+      (!field.fieldMeta || !ZFieldMetaSchema.parse(field.fieldMeta)?.required);
+
+    if (isOptionalAdvancedField) {
+      return true;
+    }
+
+    return field.inserted;
+  });
 
   const handleOpenChange = (open: boolean) => {
     if (isSubmitting || !isComplete) {
