@@ -150,6 +150,10 @@ msgstr "{prefix} removed a recipient"
 msgid "{prefix} resent an email to {0}"
 msgstr "{prefix} resent an email to {0}"
 
+#: packages/lib/utils/document-audit-logs.ts:295
+msgid "{prefix} restored the document"
+msgstr "{prefix} restored the document"
+
 #: packages/lib/utils/document-audit-logs.ts:370
 msgid "{prefix} sent an email to {0}"
 msgstr "{prefix} sent an email to {0}"
@@ -753,6 +757,10 @@ msgstr "Document Rejected"
 
 #~ msgid "Document Rejection Confirmed"
 #~ msgstr "Document Rejection Confirmed"
+
+#: packages/lib/utils/document-audit-logs.ts:294
+msgid "Document restored"
+msgstr "Document restored"
 
 #: packages/lib/utils/document-audit-logs.ts:334
 msgid "Document sent"
