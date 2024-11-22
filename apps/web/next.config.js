@@ -33,7 +33,7 @@ const config = {
     },
     swcPlugins: [['@lingui/swc-plugin', {}]],
   },
-  reactStrictMode: true,
+  reactStrictMode: false,
   transpilePackages: [
     '@documenso/assets',
     '@documenso/ee',

@@ -25,6 +25,7 @@ import { SignaturePad } from '@documenso/ui/primitives/signature-pad';
 import { useToast } from '@documenso/ui/primitives/use-toast';
 
 import { SigningDisclosure } from '~/components/general/signing-disclosure';
+import { NoseCanvasDrawer } from '~/components/nose-canvas-drawer';
 
 import { useRequiredDocumentAuthContext } from './document-auth-provider';
 import { useRequiredSigningContext } from './provider';
@@ -69,6 +70,8 @@ export const SignatureField = ({
   const { Signature: signature } = field;
 
   const isLoading = isSignFieldWithTokenLoading || isRemoveSignedFieldWithTokenLoading || isPending;
+
+  const [isDrawing, setIsDrawing] = useState(false);
 
   const [showSignatureModal, setShowSignatureModal] = useState(false);
   const [localSignature, setLocalSignature] = useState<string | null>(null);
@@ -225,12 +228,16 @@ export const SignatureField = ({
               <Trans>Signature</Trans>
             </Label>
 
-            <SignaturePad
-              id="signature"
-              className="border-border mt-2 h-44 w-full rounded-md border"
-              onChange={(value) => setLocalSignature(value)}
-              allowTypedSignature={typedSignatureEnabled}
-            />
+            <div className="mt-4">
+              <NoseCanvasDrawer
+                className="h-[320px]"
+                onStart={() => setIsDrawing(true)}
+                onStop={() => setIsDrawing(false)}
+                onCapture={(dataUrl) => {
+                  setLocalSignature(dataUrl);
+                }}
+              />
+            </div>
           </div>
 
           <SigningDisclosure />
@@ -250,7 +257,7 @@ export const SignatureField = ({
               <Button
                 type="button"
                 className="flex-1"
-                disabled={!localSignature}
+                disabled={!localSignature || isDrawing}
                 onClick={() => onDialogSignClick()}
               >
                 <Trans>Sign</Trans>
