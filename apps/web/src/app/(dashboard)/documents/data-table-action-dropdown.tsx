@@ -24,8 +24,8 @@ import { useSession } from 'next-auth/react';
 
 import { downloadPDF } from '@documenso/lib/client-only/download-pdf';
 import { formatDocumentsPath } from '@documenso/lib/utils/teams';
-import { DocumentStatus, RecipientRole } from '@documenso/prisma/client';
 import type { Document, Recipient, Team, User } from '@documenso/prisma/client';
+import { DocumentStatus, RecipientRole } from '@documenso/prisma/client';
 import type { DocumentWithData } from '@documenso/prisma/types/document-with-data';
 import { trpc as trpcClient } from '@documenso/trpc/client';
 import { DocumentShareButton } from '@documenso/ui/components/document/document-share-button';
@@ -202,13 +202,6 @@ export const DataTableActionDropdown = ({ row, team }: DataTableActionDropdownPr
             {canManageDocument ? 'Delete' : 'Hide'}
           </DropdownMenuItem>
         )}
-        <DropdownMenuItem
-          onClick={() => setDeleteDialogOpen(true)}
-          disabled={Boolean(!canManageDocument && team?.teamEmail)}
-        >
-          <Trash2 className="mr-2 h-4 w-4" />
-          {canManageDocument ? _(msg`Delete`) : _(msg`Hide`)}
-        </DropdownMenuItem>
 
         <DropdownMenuLabel>
           <Trans>Share</Trans>
