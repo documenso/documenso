@@ -103,9 +103,21 @@ export const sealDocument = async ({
 
   const documentLanguage = ZSupportedLanguageCodeSchema.parse(document.documentMeta?.language);
 
-  const certificate = await getCertificatePdf({ documentId, language: documentLanguage })
-    .then(async (doc) => PDFDocument.load(doc))
-    .catch(() => null);
+  const shouldGenerateCertificate = () => {
+    if (!document.teamId) {
+      return true;
+    }
+
+    return document.team?.teamGlobalSettings?.includeSigningCertificate ?? false;
+  };
+
+  const certificate = shouldGenerateCertificate()
+    ? await getCertificatePdf({ documentId, language: documentLanguage })
+        .then(async (doc) => PDFDocument.load(doc))
+        .catch(() => null)
+    : null;
+
+  console.log({ certificate });
 
   const doc = await PDFDocument.load(pdfData);
 
@@ -114,11 +126,7 @@ export const sealDocument = async ({
   flattenForm(doc);
   flattenAnnotations(doc);
 
-  if (
-    document.teamId &&
-    document.team?.teamGlobalSettings?.includeSigningCertificate &&
-    certificate
-  ) {
+  if (certificate) {
     const certificatePages = await doc.copyPages(certificate, certificate.getPageIndices());
 
     certificatePages.forEach((page) => {

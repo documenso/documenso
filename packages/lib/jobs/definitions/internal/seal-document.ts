@@ -125,8 +125,20 @@ export const SEAL_DOCUMENT_JOB_DEFINITION = {
       documentData.data = documentData.initialData;
     }
 
+    const shouldGenerateCertificate = () => {
+      if (!document.teamId) {
+        return true;
+      }
+
+      return document.team?.teamGlobalSettings?.includeSigningCertificate ?? false;
+    };
+
     const pdfData = await getFile(documentData);
-    const certificateData = await getCertificatePdf({ documentId }).catch(() => null);
+    const certificateData = shouldGenerateCertificate()
+      ? await getCertificatePdf({ documentId }).catch(() => null)
+      : null;
+
+    console.log({ certificateData });
 
     const newDataId = await io.runTask('decorate-and-sign-pdf', async () => {
       const pdfDoc = await PDFDocument.load(pdfData);
@@ -136,11 +148,7 @@ export const SEAL_DOCUMENT_JOB_DEFINITION = {
       flattenForm(pdfDoc);
       flattenAnnotations(pdfDoc);
 
-      if (
-        certificateData &&
-        document.teamId &&
-        document.team?.teamGlobalSettings?.includeSigningCertificate
-      ) {
+      if (certificateData) {
         const certificateDoc = await PDFDocument.load(certificateData);
 
         const certificatePages = await pdfDoc.copyPages(

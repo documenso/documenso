@@ -78,7 +78,12 @@ export const TeamDocumentPreferencesForm = ({
 
   const onSubmit = async (data: TTeamDocumentPreferencesFormSchema) => {
     try {
-      const { documentVisibility, documentLanguage, includeSenderDetails } = data;
+      const {
+        documentVisibility,
+        documentLanguage,
+        includeSenderDetails,
+        includeSigningCertificate,
+      } = data;
 
       await updateTeamDocumentPreferences({
         teamId: team.id,
@@ -86,6 +91,7 @@ export const TeamDocumentPreferencesForm = ({
           documentVisibility,
           documentLanguage,
           includeSenderDetails,
+          includeSigningCertificate,
         },
       });
 
