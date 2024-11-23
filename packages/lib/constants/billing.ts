@@ -7,5 +7,6 @@ export enum STRIPE_PLAN_TYPE {
   REGULAR = 'regular',
   TEAM = 'team',
   COMMUNITY = 'community',
+  PLATFORM = 'platform',
   ENTERPRISE = 'enterprise',
 }

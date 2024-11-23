@@ -74,7 +74,7 @@
     "react-hook-form": "^7.45.4",
     "react-pdf": "7.7.3",
     "react-rnd": "^10.4.1",
-    "remeda": "^1.27.1",
+    "remeda": "^2.17.3",
     "tailwind-merge": "^1.12.0",
     "tailwindcss-animate": "^1.0.5",
     "ts-pattern": "^5.0.5",
