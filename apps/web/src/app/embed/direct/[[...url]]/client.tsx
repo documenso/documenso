@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useLayoutEffect, useState } from 'react';
 
 import { useSearchParams } from 'next/navigation';
 
@@ -38,6 +38,7 @@ import { Logo } from '~/components/branding/logo';
 import { EmbedClientLoading } from '../../client-loading';
 import { EmbedDocumentCompleted } from '../../completed';
 import { EmbedDocumentFields } from '../../document-fields';
+import { injectCss } from '../../util';
 import { ZDirectTemplateEmbedDataSchema } from './schema';
 
 export type EmbedDirectTemplateClientPageProps = {
@@ -47,6 +48,8 @@ export type EmbedDirectTemplateClientPageProps = {
   recipient: Recipient;
   fields: Field[];
   metadata?: DocumentMeta | TemplateMeta | null;
+  hidePoweredBy?: boolean;
+  isPlatformOrEnterprise?: boolean;
 };
 
 export const EmbedDirectTemplateClientPage = ({
@@ -56,6 +59,8 @@ export const EmbedDirectTemplateClientPage = ({
   recipient,
   fields,
   metadata,
+  hidePoweredBy = false,
+  isPlatformOrEnterprise = false,
 }: EmbedDirectTemplateClientPageProps) => {
   const { _ } = useLingui();
   const { toast } = useToast();
@@ -249,7 +254,7 @@ export const EmbedDirectTemplateClientPage = ({
     }
   };
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     const hash = window.location.hash.slice(1);
 
     try {
@@ -263,6 +268,17 @@ export const EmbedDirectTemplateClientPage = ({
       if (data.name) {
         setFullName(data.name);
         setIsNameLocked(!!data.lockName);
+      }
+
+      if (data.darkModeDisabled) {
+        document.documentElement.classList.add('dark-mode-disabled');
+      }
+
+      if (isPlatformOrEnterprise) {
+        injectCss({
+          css: data.css,
+          cssVars: data.cssVars,
+        });
       }
     } catch (err) {
       console.error(err);
@@ -452,10 +468,12 @@ export const EmbedDirectTemplateClientPage = ({
         />
       </div>
 
-      <div className="bg-primary text-primary-foreground fixed bottom-0 left-0 z-40 rounded-tr px-2 py-1 text-xs font-medium opacity-60 hover:opacity-100">
-        <span>Powered by</span>
-        <Logo className="ml-2 inline-block h-[14px]" />
-      </div>
+      {!hidePoweredBy && (
+        <div className="bg-primary text-primary-foreground fixed bottom-0 left-0 z-40 rounded-tr px-2 py-1 text-xs font-medium opacity-60 hover:opacity-100">
+          <span>Powered by</span>
+          <Logo className="ml-2 inline-block h-[14px]" />
+        </div>
+      )}
     </div>
   );
 };

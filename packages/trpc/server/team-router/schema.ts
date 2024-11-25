@@ -211,6 +211,7 @@ export const ZUpdateTeamDocumentSettingsMutationSchema = z.object({
     documentLanguage: z.enum(SUPPORTED_LANGUAGE_CODES).optional().default('en'),
     includeSenderDetails: z.boolean().optional().default(false),
     typedSignatureEnabled: z.boolean().optional().default(true),
+    includeSigningCertificate: z.boolean().optional().default(true),
   }),
 });
 

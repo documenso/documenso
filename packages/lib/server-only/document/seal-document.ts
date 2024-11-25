@@ -10,7 +10,6 @@ import { DocumentStatus, RecipientRole, SigningStatus } from '@documenso/prisma/
 import { WebhookTriggerEvents } from '@documenso/prisma/client';
 import { signPdf } from '@documenso/signing';
 
-import { ZSupportedLanguageCodeSchema } from '../../constants/i18n';
 import type { RequestMetadata } from '../../universal/extract-request-metadata';
 import { getFile } from '../../universal/upload/get-file';
 import { putPdfFile } from '../../universal/upload/put-file';
@@ -48,6 +47,15 @@ export const sealDocument = async ({
       documentData: true,
       documentMeta: true,
       Recipient: true,
+      team: {
+        select: {
+          teamGlobalSettings: {
+            select: {
+              includeSigningCertificate: true,
+            },
+          },
+        },
+      },
     },
   });
 
@@ -92,11 +100,13 @@ export const sealDocument = async ({
   // !: Need to write the fields onto the document as a hard copy
   const pdfData = await getFile(documentData);
 
-  const documentLanguage = ZSupportedLanguageCodeSchema.parse(document.documentMeta?.language);
-
-  const certificate = await getCertificatePdf({ documentId, language: documentLanguage })
-    .then(async (doc) => PDFDocument.load(doc))
-    .catch(() => null);
+  const certificateData =
+    document.team?.teamGlobalSettings?.includeSigningCertificate ?? true
+      ? await getCertificatePdf({
+          documentId,
+          language: document.documentMeta?.language,
+        }).catch(() => null)
+      : null;
 
   const doc = await PDFDocument.load(pdfData);
 
@@ -105,7 +115,9 @@ export const sealDocument = async ({
   flattenForm(doc);
   flattenAnnotations(doc);
 
-  if (certificate) {
+  if (certificateData) {
+    const certificate = await PDFDocument.load(certificateData);
+
     const certificatePages = await doc.copyPages(certificate, certificate.getPageIndices());
 
     certificatePages.forEach((page) => {

@@ -40,6 +40,7 @@ const ZTeamDocumentPreferencesFormSchema = z.object({
   documentLanguage: z.enum(SUPPORTED_LANGUAGE_CODES),
   includeSenderDetails: z.boolean(),
   typedSignatureEnabled: z.boolean(),
+  includeSigningCertificate: z.boolean(),
 });
 
 type TTeamDocumentPreferencesFormSchema = z.infer<typeof ZTeamDocumentPreferencesFormSchema>;
@@ -70,6 +71,7 @@ export const TeamDocumentPreferencesForm = ({
         : 'en',
       includeSenderDetails: settings?.includeSenderDetails ?? false,
       typedSignatureEnabled: settings?.typedSignatureEnabled ?? true,
+      includeSigningCertificate: settings?.includeSigningCertificate ?? true,
     },
     resolver: zodResolver(ZTeamDocumentPreferencesFormSchema),
   });
@@ -78,8 +80,13 @@ export const TeamDocumentPreferencesForm = ({
 
   const onSubmit = async (data: TTeamDocumentPreferencesFormSchema) => {
     try {
-      const { documentVisibility, documentLanguage, includeSenderDetails, typedSignatureEnabled } =
-        data;
+      const {
+        documentVisibility,
+        documentLanguage,
+        includeSenderDetails,
+        includeSigningCertificate,
+        typedSignatureEnabled,
+      } = data;
 
       await updateTeamDocumentPreferences({
         teamId: team.id,
@@ -88,6 +95,7 @@ export const TeamDocumentPreferencesForm = ({
           documentLanguage,
           includeSenderDetails,
           typedSignatureEnabled,
+          includeSigningCertificate,
         },
       });
 
@@ -268,6 +276,37 @@ export const TeamDocumentPreferencesForm = ({
               )}
             />
           </span>
+
+          <FormField
+            control={form.control}
+            name="includeSigningCertificate"
+            render={({ field }) => (
+              <FormItem className="flex-1">
+                <FormLabel>
+                  <Trans>Include the Signing Certificate in the Document</Trans>
+                </FormLabel>
+
+                <div>
+                  <FormControl className="block">
+                    <Switch
+                      ref={field.ref}
+                      name={field.name}
+                      checked={field.value}
+                      onCheckedChange={field.onChange}
+                    />
+                  </FormControl>
+                </div>
+
+                <FormDescription>
+                  <Trans>
+                    Controls whether the signing certificate will be included in the document when
+                    it is downloaded. The signing certificate can still be downloaded from the logs
+                    page separately.
+                  </Trans>
+                </FormDescription>
+              </FormItem>
+            )}
+          />
 
           <div className="flex flex-row justify-end space-x-4">
             <Button type="submit" loading={form.formState.isSubmitting}>

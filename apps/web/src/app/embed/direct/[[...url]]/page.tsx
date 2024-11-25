@@ -2,8 +2,11 @@ import { notFound } from 'next/navigation';
 
 import { match } from 'ts-pattern';
 
+import { isUserEnterprise } from '@documenso/ee/server-only/util/is-document-enterprise';
+import { isDocumentPlatform } from '@documenso/ee/server-only/util/is-document-platform';
 import { IS_BILLING_ENABLED } from '@documenso/lib/constants/app';
 import { getServerComponentSession } from '@documenso/lib/next-auth/get-server-component-session';
+import { getTeamById } from '@documenso/lib/server-only/team/get-team';
 import { getTemplateByDirectLinkToken } from '@documenso/lib/server-only/template/get-template-by-direct-link-token';
 import { DocumentAccessAuth } from '@documenso/lib/types/document-auth';
 import { extractDocumentAuthMethods } from '@documenso/lib/utils/document-auth';
@@ -51,6 +54,14 @@ export default async function EmbedDirectTemplatePage({ params }: EmbedDirectTem
     documentAuth: template.authOptions,
   });
 
+  const [isPlatformDocument, isEnterpriseDocument] = await Promise.all([
+    isDocumentPlatform(template),
+    isUserEnterprise({
+      userId: template.userId,
+      teamId: template.teamId ?? undefined,
+    }),
+  ]);
+
   const isAccessAuthValid = match(derivedRecipientAccessAuth)
     .with(DocumentAccessAuth.ACCOUNT, () => user !== null)
     .with(null, () => true)
@@ -72,6 +83,12 @@ export default async function EmbedDirectTemplatePage({ params }: EmbedDirectTem
 
   const fields = template.Field.filter((field) => field.recipientId === directTemplateRecipientId);
 
+  const team = template.teamId
+    ? await getTeamById({ teamId: template.teamId, userId: template.userId }).catch(() => null)
+    : null;
+
+  const hidePoweredBy = team?.teamGlobalSettings?.brandingHidePoweredBy ?? false;
+
   return (
     <SigningProvider email={user?.email} fullName={user?.name} signature={user?.signature}>
       <DocumentAuthProvider
@@ -86,6 +103,8 @@ export default async function EmbedDirectTemplatePage({ params }: EmbedDirectTem
           recipient={recipient}
           fields={fields}
           metadata={template.templateMeta}
+          hidePoweredBy={isPlatformDocument || isEnterpriseDocument || hidePoweredBy}
+          isPlatformOrEnterprise={isPlatformDocument || isEnterpriseDocument}
         />
       </DocumentAuthProvider>
     </SigningProvider>
