@@ -489,6 +489,7 @@ export const ZFieldSchema = z.object({
   height: z.unknown(),
   customText: z.string(),
   inserted: z.boolean(),
+  fieldMeta: ZFieldMetaSchema.nullable(),
 });
 
 export const ZTemplateWithDataSchema = ZTemplateSchema.extend({
@@ -513,6 +514,7 @@ export const ZTemplateWithDataSchema = ZTemplateSchema.extend({
     positionY: true,
     width: true,
     height: true,
+    fieldMeta: true,
   }).array(),
   Recipient: ZRecipientSchema.pick({
     id: true,
