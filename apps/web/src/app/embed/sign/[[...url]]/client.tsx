@@ -150,6 +150,10 @@ export const EmbedSignDocumentClientPage = ({
       // a to be provided by the parent application, unlike direct templates.
       setIsNameLocked(!!data.lockName);
 
+      if (data.darkModeDisabled) {
+        document.documentElement.classList.add('dark-mode-disabled');
+      }
+
       if (isPlatformOrEnterprise) {
         injectCss({
           css: data.css,

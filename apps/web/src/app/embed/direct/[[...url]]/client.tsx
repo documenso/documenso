@@ -270,6 +270,10 @@ export const EmbedDirectTemplateClientPage = ({
         setIsNameLocked(!!data.lockName);
       }
 
+      if (data.darkModeDisabled) {
+        document.documentElement.classList.add('dark-mode-disabled');
+      }
+
       if (isPlatformOrEnterprise) {
         injectCss({
           css: data.css,
