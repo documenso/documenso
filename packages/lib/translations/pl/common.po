@@ -8,7 +8,7 @@ msgstr ""
 "Language: pl\n"
 "Project-Id-Version: documenso-app\n"
 "Report-Msgid-Bugs-To: \n"
-"PO-Revision-Date: 2024-11-20 11:56\n"
+"PO-Revision-Date: 2024-11-25 08:04\n"
 "Last-Translator: \n"
 "Language-Team: Polish\n"
 "Plural-Forms: nplurals=4; plural=(n==1 ? 0 : (n%10>=2 && n%10<=4) && (n%100<12 || n%100>14) ? 1 : n!=1 && (n%10>=0 && n%10<=1) || (n%10>=5 && n%10<=9) || (n%100>=12 && n%100<=14) ? 2 : 3);\n"
@@ -56,7 +56,7 @@ msgstr "{0} opuścił zespół {teamName} na Documenso"
 
 #: packages/ui/primitives/data-table-pagination.tsx:30
 msgid "{0} of {1} row(s) selected."
-msgstr "{0} z {1} wybranych wierszy."
+msgstr "{0} z {1} <b>wybranych</b> wierszy."
 
 #: packages/lib/jobs/definitions/emails/send-signing-email.ts:136
 #: packages/lib/server-only/document/resend-document.tsx:137
@@ -169,39 +169,39 @@ msgstr "{prefix} podpisał pole"
 
 #: packages/lib/utils/document-audit-logs.ts:299
 msgid "{prefix} unsigned a field"
-msgstr "{prefix} niepodpisane pole"
+msgstr "{prefix} nie podpisał pola"
 
 #: packages/lib/utils/document-audit-logs.ts:271
 msgid "{prefix} updated a field"
-msgstr "{prefix} zaktualizowane pole"
+msgstr "{prefix} zaktualizował pole"
 
 #: packages/lib/utils/document-audit-logs.ts:283
 msgid "{prefix} updated a recipient"
-msgstr "{prefix} zaktualizowany odbiorca"
+msgstr "{prefix} zaktualizował odbiorcę"
 
 #: packages/lib/utils/document-audit-logs.ts:315
 msgid "{prefix} updated the document"
-msgstr "{prefix} zaktualizowany dokument"
+msgstr "{prefix} zaktualizował dokument"
 
 #: packages/lib/utils/document-audit-logs.ts:307
 msgid "{prefix} updated the document access auth requirements"
-msgstr "{prefix} zaktualizowane wymagania dotyczące autoryzacji dostępu do dokumentu"
+msgstr "{prefix} zaktualizował wymagania dotyczące autoryzacji dostępu do dokumentu"
 
 #: packages/lib/utils/document-audit-logs.ts:327
 msgid "{prefix} updated the document external ID"
-msgstr "{prefix} zaktualizowane ID zewnętrzne dokumentu"
+msgstr "{prefix} zaktualizował zewnętrzne ID dokumentu"
 
 #: packages/lib/utils/document-audit-logs.ts:311
 msgid "{prefix} updated the document signing auth requirements"
-msgstr "{prefix} zaktualizowane wymagania dotyczące autoryzacji podpisu dokumentu"
+msgstr "{prefix} zaktualizował wymagania dotyczące autoryzacji podpisu dokumentu"
 
 #: packages/lib/utils/document-audit-logs.ts:323
 msgid "{prefix} updated the document title"
-msgstr "{prefix} zaktualizowany tytuł dokumentu"
+msgstr "{prefix} zaktualizował tytuł dokumentu"
 
 #: packages/lib/utils/document-audit-logs.ts:303
 msgid "{prefix} updated the document visibility"
-msgstr "{prefix} zaktualizowana widoczność dokumentu"
+msgstr "{prefix} zaktualizował widoczność dokumentu"
 
 #: packages/email/templates/document-created-from-direct-template.tsx:61
 msgid "{recipientName} {action} a document by using one of your direct links"
@@ -233,7 +233,7 @@ msgstr "{userName} zatwierdził dokument"
 
 #: packages/lib/utils/document-audit-logs.ts:344
 msgid "{userName} CC'd the document"
-msgstr "{userName} dodał CC do dokumentu"
+msgstr "{userName} dodał dokument do kopii"
 
 #: packages/lib/utils/document-audit-logs.ts:345
 msgid "{userName} completed their task"
@@ -253,7 +253,7 @@ msgstr "{userName} wyświetlił dokument"
 
 #: packages/ui/primitives/data-table-pagination.tsx:41
 msgid "{visibleRows, plural, one {Showing # result.} other {Showing # results.}}"
-msgstr "{visibleRows, plural, one {Wyświetlanie # wyniku.} other {Wyświetlanie # wyników.}}"
+msgstr "{visibleRows, plural, one {Wyświetlanie # wyniku.} few {Wyświetlanie # wyników.} many {Wyświetlanie # wyników.} other {Wyświetlanie # wyników.}}"
 
 #: packages/email/templates/document-invite.tsx:100
 #~ msgid "`${inviterName} has invited you to ${action} the document \"${documentName}\".`"
@@ -273,7 +273,7 @@ msgstr "<0>E-mail</0> - Odbiorca otrzyma e-mail z dokumentem do podpisania, zatw
 
 #: packages/ui/components/recipient/recipient-action-auth-select.tsx:53
 msgid "<0>Inherit authentication method</0> - Use the global action signing authentication method configured in the \"General Settings\" step"
-msgstr "<0>Przechwyć metodę uwierzytelniania</0> - Użyj globalnej metody uwierzytelniania podpisywania akcji skonfigurowanej w kroku \"Ustawienia ogólne\""
+msgstr "<0>Przejmij metodę uwierzytelniania</0> - Użyj globalnej metody uwierzytelniania podpisywania akcji skonfigurowanej w kroku \"Ustawienia ogólne\""
 
 #: packages/ui/primitives/template-flow/add-template-settings.tsx:247
 msgid "<0>Links</0> - We will generate links which you can send to the recipients manually."
@@ -552,7 +552,7 @@ msgstr "Limit znaków"
 
 #: packages/ui/primitives/document-flow/types.ts:58
 msgid "Checkbox"
-msgstr "Checkbox"
+msgstr "Pole wyboru"
 
 #: packages/ui/primitives/document-flow/field-items-advanced-settings/checkbox-field.tsx:197
 msgid "Checkbox values"
@@ -811,7 +811,7 @@ msgstr "Opcje rozwijane"
 #: packages/ui/primitives/template-flow/add-template-placeholder-recipients.tsx:471
 #: packages/ui/primitives/template-flow/add-template-placeholder-recipients.tsx:478
 msgid "Email"
-msgstr "Email"
+msgstr "E-mail"
 
 #: packages/ui/primitives/document-flow/add-signature.types.ts:7
 msgid "Email is required"
@@ -1398,7 +1398,7 @@ msgstr "Podpisujący"
 
 #: packages/ui/primitives/document-flow/add-signers.types.ts:36
 msgid "Signers must have unique emails"
-msgstr "Podpisujący muszą mieć unikalne emaile"
+msgstr "Podpisujący muszą mieć unikalne adresy e-mail"
 
 #: packages/lib/constants/recipient-roles.ts:24
 msgid "Signing"
@@ -1593,7 +1593,7 @@ msgstr "Ten e-mail zostanie wysłany do odbiorcy, który właśnie podpisał dok
 
 #: packages/ui/primitives/template-flow/add-template-placeholder-recipients.tsx:581
 msgid "This field cannot be modified or deleted. When you share this template's direct link or add it to your public profile, anyone who accesses it can input their name and email, and fill in the fields assigned to them."
-msgstr "To pole nie może być modyfikowane ani usuwane. Po udostępnieniu bezpośredniego linku do tego szablonu lub dodaniu go do swojego publicznego profilu, każdy, kto się w nim dostanie, może wpisać swoje imię i email oraz wypełnić przypisane mu pola."
+msgstr "To pole nie może być modyfikowane ani usuwane. Po udostępnieniu bezpośredniego linku do tego szablonu lub dodaniu go do swojego publicznego profilu, każdy, kto uzyska do niego dostęp, może wpisać swoje imię i email oraz wypełnić przypisane mu pola."
 
 #: packages/ui/primitives/template-flow/add-template-settings.tsx:233
 msgid "This is how the document will reach the recipients once the document is ready for signing."
@@ -1712,7 +1712,7 @@ msgstr "Czekam na innych"
 
 #: packages/lib/server-only/document/send-pending-email.ts:96
 msgid "Waiting for others to complete signing."
-msgstr "Czekam na innych, aby zakończyć podpisywanie."
+msgstr "Oczekiwanie na innych dotyczące zakończenia podpisywania."
 
 #: packages/ui/primitives/document-flow/add-subject.tsx:205
 msgid "We will generate signing links for with you, which you can send to the recipients through your method of choice."
@@ -1724,11 +1724,11 @@ msgstr "Nie wyślemy nic, aby powiadomić odbiorców."
 
 #: packages/email/template-components/template-document-pending.tsx:41
 msgid "We're still waiting for other signers to sign this document.<0/>We'll notify you as soon as it's ready."
-msgstr "Wciąż czekamy na innych sygnatariuszy, aby podpisać ten dokument.<0/>Powiadomimy Cię, gdy będzie gotowy."
+msgstr "Wciąż czekamy, aż inni sygnatariusze podpiszą ten dokument.<0/>Powiadomimy Cię, gdy będzie gotowy."
 
 #: packages/email/templates/reset-password.tsx:65
 msgid "We've changed your password as you asked. You can now sign in with your new password."
-msgstr "Zmieniłem hasło, jak prosiłeś. Teraz możesz zalogować się za pomocą nowego hasła."
+msgstr "Zmieniłem hasło zgodnie z Twoją prośbą. Teraz możesz zalogować się za pomocą nowego hasła."
 
 #: packages/email/template-components/template-confirmation-email.tsx:21
 msgid "Welcome to Documenso!"

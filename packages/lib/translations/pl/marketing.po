@@ -8,7 +8,7 @@ msgstr ""
 "Language: pl\n"
 "Project-Id-Version: documenso-app\n"
 "Report-Msgid-Bugs-To: \n"
-"PO-Revision-Date: 2024-11-20 11:56\n"
+"PO-Revision-Date: 2024-11-25 08:04\n"
 "Last-Translator: \n"
 "Language-Team: Polish\n"
 "Plural-Forms: nplurals=4; plural=(n==1 ? 0 : (n%10>=2 && n%10<=4) && (n%100<12 || n%100>14) ? 1 : n!=1 && (n%10>=0 && n%10<=1) || (n%10>=5 && n%10<=9) || (n%100>=12 && n%100<=14) ? 2 : 3);\n"
@@ -24,7 +24,7 @@ msgstr "{0}"
 
 #: apps/marketing/src/components/(marketing)/pricing-table.tsx:100
 msgid "5 standard documents per month"
-msgstr "5 standard documents per month"
+msgstr "5 standardowych dokumentów na miesiąc"
 
 #: apps/marketing/src/components/(marketing)/pricing-table.tsx:198
 msgid "5 Users Included"
@@ -32,7 +32,7 @@ msgstr "5 użytkowników w cenie"
 
 #: apps/marketing/src/components/(marketing)/faster-smarter-beautiful-bento.tsx:34
 msgid "A 10x better signing experience."
-msgstr "10 razy lepsze doświadczenie podpisywania."
+msgstr "A 10x better signing experience."
 
 #: apps/marketing/src/app/(marketing)/singleplayer/client.tsx:51
 msgid "Add document"
@@ -58,7 +58,7 @@ msgstr "Dostęp do API"
 
 #: apps/marketing/src/components/(marketing)/faster-smarter-beautiful-bento.tsx:67
 msgid "Beautiful."
-msgstr "Piękny."
+msgstr "Piękne."
 
 #: apps/marketing/src/components/(marketing)/faster-smarter-beautiful-bento.tsx:69
 msgid "Because signing should be celebrated. That’s why we care about the smallest detail in our product."
@@ -473,7 +473,7 @@ msgstr "Gwiazdy"
 #: apps/marketing/src/components/(marketing)/footer.tsx:40
 #: apps/marketing/src/components/(marketing)/mobile-navigation.tsx:44
 msgid "Status"
-msgstr "Status"
+msgstr "Stan"
 
 #: apps/marketing/src/components/(marketing)/footer.tsx:34
 #: apps/marketing/src/components/(marketing)/mobile-navigation.tsx:48
@@ -597,7 +597,7 @@ msgstr "Tak! Documenso jest oferowane na podstawie licencji GNU AGPL V3 open sou
 
 #: apps/marketing/src/app/(marketing)/pricing/page.tsx:93
 msgid "You can self-host Documenso for free or use our ready-to-use hosted version. The hosted version comes with additional support, painless scalability and more. Early adopters will get access to all features we build this year, for no additional cost! Forever! Yes, that includes multiple users per account later. If you want Documenso for your enterprise, we are happy to talk about your needs."
-msgstr "Możesz samodzielnie hostować Documenso za darmo lub skorzystać z naszej gotowej wersji hostowanej. Wersja hostowana zapewnia dodatkowe wsparcie, łatwą skalowalność i inne. Wczesni użytkownicy będą mieli dostęp do wszystkich funkcji, które budujemy w tym roku, bez dodatkowych kosztów! Na zawsze! Tak, to obejmuje wielu użytkowników na konto później. Jeśli chcesz Documenso dla swojej firmy, chętnie porozmawiamy o Twoich potrzebach."
+msgstr "Możesz samodzielnie hostować Documenso za darmo lub skorzystać z naszej gotowej wersji hostowanej. Wersja hostowana zapewnia dodatkowe wsparcie, łatwą skalowalność i więcej. Wcześni użytkownicy będą mieli dostęp do wszystkich funkcji, które zbudujemy w tym roku, bez żadnych dodatkowych kosztów! Na zawsze! Tak, to obejmuje później wielu użytkowników na konto. Jeśli chcesz Documenso dla swojego przedsiębiorstwa, chętnie porozmawiamy o Twoich potrzebach."
 
 #: apps/marketing/src/components/(marketing)/carousel.tsx:272
 msgid "Your browser does not support the video tag."

@@ -8,7 +8,7 @@ msgstr ""
 "Language: pl\n"
 "Project-Id-Version: documenso-app\n"
 "Report-Msgid-Bugs-To: \n"
-"PO-Revision-Date: 2024-11-20 11:56\n"
+"PO-Revision-Date: 2024-11-25 08:04\n"
 "Last-Translator: \n"
 "Language-Team: Polish\n"
 "Plural-Forms: nplurals=4; plural=(n==1 ? 0 : (n%10>=2 && n%10<=4) && (n%100<12 || n%100>14) ? 1 : n!=1 && (n%10>=0 && n%10<=1) || (n%10>=5 && n%10<=9) || (n%100>=12 && n%100<=14) ? 2 : 3);\n"
@@ -64,25 +64,25 @@ msgstr "({0}) zaprosił Cię do przeglądania tego dokumentu"
 
 #: apps/web/src/app/(signing)/sign/[token]/text-field.tsx:313
 msgid "{0, plural, one {(1 character over)} other {(# characters over)}}"
-msgstr "{0, plural, one {(1 znak przekroczony)} other {(# znaków przekroczonych)}}"
+msgstr "{0, plural, one {(1 znak przekroczony)} few {(# znaki przekroczone)} many {(# znaków przekroczonych)} other {(# znaków przekroczonych)}}"
 
 #: apps/web/src/components/forms/public-profile-form.tsx:237
 #: apps/web/src/components/templates/manage-public-template-dialog.tsx:395
 msgid "{0, plural, one {# character over the limit} other {# characters over the limit}}"
-msgstr "{0, plural, one {# znak przekroczony} other {# znaki przekroczone}}"
+msgstr "{0, plural, one {# znak przekroczony} few {# znaki przekroczone} many {# znaków przekroczonych} other {# znaków przekroczonych}}"
 
 #: apps/web/src/app/(recipient)/d/[token]/page.tsx:82
 msgid "{0, plural, one {# recipient} other {# recipients}}"
-msgstr "{0, plural, one {# odbiorca} other {# odbiorców}}"
+msgstr "{0, plural, one {# odbiorca} few {# odbiorcy} many {# odbiorców} other {# odbiorców}}"
 
 #: apps/web/src/components/(teams)/tables/team-billing-invoices-data-table.tsx:66
 msgid "{0, plural, one {# Seat} other {# Seats}}"
-msgstr "{0, plural, one {# miejsce} other {# miejsc}}"
+msgstr "{0, plural, one {# miejsce} few {# miejsca} many {# miejsc} other {# miejsc}}"
 
 #: apps/web/src/app/(dashboard)/settings/teams/team-invitations.tsx:37
 #: apps/web/src/app/(dashboard)/settings/teams/team-invitations.tsx:66
 msgid "{0, plural, one {<0>You have <1>1</1> pending team invitation</0>} other {<2>You have <3>#</3> pending team invitations</2>}}"
-msgstr "{0, plural, one {<0>Masz <1>1</1> oczekujące zaproszenie do zespołu</0>} other {<2>Masz <3>#</3> oczekujących zaproszeń do zespołu</2>}}"
+msgstr "{0, plural, one {<0>Masz <1>1</1> oczekujące zaproszenie do zespołu</0>} few {<2>Masz <3>#</3> oczekujące zaproszenia do zespołu</2>} many {<2>Masz <3>#</3> oczekujących zaproszeń do zespołu</2>} other {<2>Masz <3>#</3> oczekujących zaproszeń do zespołu</2>}}"
 
 #: apps/web/src/app/(signing)/sign/[token]/auto-sign.tsx:196
 msgid "{0, plural, one {1 matching field} other {# matching fields}}"
@@ -90,15 +90,15 @@ msgstr "{0, plural, one {1 pasujące pole} other {# pasujących pól}}"
 
 #: apps/web/src/app/(dashboard)/documents/[id]/edit/document-edit-page-view.tsx:129
 msgid "{0, plural, one {1 Recipient} other {# Recipients}}"
-msgstr "{0, plural, one {1 Odbiorca} other {# Odbiorców}}"
+msgstr "{0, plural, one {1 Odbiorca} few {# odbiorcy} many {# odbiorców} other {# odbiorców}}"
 
 #: apps/web/src/app/(dashboard)/documents/[id]/document-page-view.tsx:235
 msgid "{0, plural, one {Waiting on 1 recipient} other {Waiting on # recipients}}"
-msgstr "{0, plural, one {Czekam na 1 odbiorcę} other {Czekam na # odbiorców}}"
+msgstr "{0, plural, one {Czekam na 1 odbiorcę} few {Czekam na # odbiorców} many {Czekam na # odbiorców} other {Czekam na # odbiorców}}"
 
 #: apps/web/src/components/(dashboard)/settings/webhooks/trigger-multiselect-combobox.tsx:64
 msgid "{0, plural, zero {Select values} other {# selected...}}"
-msgstr "{0, plural, zero {Wybierz wartości} other {# wybranych...}}"
+msgstr "{0, plural, zero {Wybierz wartości} one {# wybrana...} few {# wybrane...} many {# wybranych...} other {# wybranych...}}"
 
 #: apps/web/src/app/(signing)/sign/[token]/auto-sign.tsx:193
 msgid "{0}"
@@ -126,7 +126,7 @@ msgstr "{0} Odbiorca (ów)"
 
 #: apps/web/src/app/(signing)/sign/[token]/text-field.tsx:294
 msgid "{charactersRemaining, plural, one {1 character remaining} other {{charactersRemaining} characters remaining}}"
-msgstr "{charactersRemaining, plural, one {1 znak pozostały} other {{charactersRemaining} znaki pozostałe}}"
+msgstr "{charactersRemaining, plural, one {1 znak pozostały} few {{charactersRemaining} znaki pozostałe} many {{charactersRemaining} znaków pozostałych} other {{charactersRemaining} znaków pozostałych}}"
 
 #: apps/web/src/app/(teams)/t/[teamUrl]/settings/billing/page.tsx:55
 msgid "{formattedTeamMemberQuanity} • Monthly • Renews: {formattedDate}"
@@ -134,7 +134,7 @@ msgstr "{formattedTeamMemberQuanity} • Miesięcznie • Odnawia się: {formatt
 
 #: apps/web/src/app/(teams)/t/[teamUrl]/settings/billing/page.tsx:48
 msgid "{numberOfSeats, plural, one {# member} other {# members}}"
-msgstr "{numberOfSeats, plural, one {# członek} other {# członków}}"
+msgstr "{numberOfSeats, plural, one {# członek} few {# członkowie} many {# członków} other {# członków}}"
 
 #: apps/web/src/app/(recipient)/d/[token]/direct-template.tsx:67
 msgid "{recipientActionVerb} document"
@@ -147,7 +147,7 @@ msgstr "{recipientActionVerb} dokument, aby zakończyć proces."
 #: apps/web/src/components/forms/public-profile-form.tsx:231
 #: apps/web/src/components/templates/manage-public-template-dialog.tsx:389
 msgid "{remaningLength, plural, one {# character remaining} other {# characters remaining}}"
-msgstr "{remaningLength, plural, one {# znak pozostały} other {# znaki pozostałe}}"
+msgstr "{remaningLength, plural, one {# znak pozostały} few {# znaki pozostałe} many {# znaków pozostałych} other {# znaków pozostałych}}"
 
 #: apps/web/src/app/(signing)/sign/[token]/no-longer-available.tsx:45
 msgid "<0>\"{0}\"</0>is no longer available to sign"
@@ -427,7 +427,7 @@ msgstr "Wszystkie szablony"
 
 #: apps/web/src/components/(dashboard)/period-selector/period-selector.tsx:55
 msgid "All Time"
-msgstr "Wszystko"
+msgstr "Cały czas"
 
 #: apps/web/src/app/(dashboard)/settings/security/page.tsx:110
 msgid "Allows authenticating using biometrics, password managers, hardware keys, etc."
@@ -684,7 +684,7 @@ msgstr "Czy na pewno chcesz odrzucić ten dokument? Ta akcja nie może być cofn
 
 #: apps/web/src/app/(dashboard)/settings/security/passkeys/user-passkeys-data-table-actions.tsx:188
 msgid "Are you sure you want to remove the <0>{passkeyName}</0> passkey."
-msgstr "Czy na pewno chcesz usunąć klucz hasła <0>{passkeyName}</0>?"
+msgstr "Czy na pewno chcesz usunąć klucz hasła <0>{passkeyName}</0>."
 
 #: apps/web/src/components/(teams)/dialogs/delete-team-dialog.tsx:126
 msgid "Are you sure you wish to delete this team?"
@@ -702,7 +702,7 @@ msgstr "Czy na pewno?"
 
 #: apps/web/src/app/(dashboard)/admin/documents/[id]/admin-actions.tsx:66
 msgid "Attempts sealing the document again, useful for after a code change has occurred to resolve an erroneous document."
-msgstr "Ponowne prób sealing the document, przydatne po zmianie kodu w celu rozwiązania błędnego dokumentu."
+msgstr "Podejmuje próbę ponownego zapieczętowania dokumentu, co jest przydatne po wprowadzeniu zmian w kodzie w celu rozwiązania błędnego dokumentu."
 
 #: apps/web/src/app/(dashboard)/documents/[id]/document-page-view-dropdown.tsx:130
 msgid "Audit Log"
@@ -1951,7 +1951,7 @@ msgstr "Przejdź do właściciela"
 
 #: apps/web/src/app/(profile)/p/[url]/page.tsx:147
 msgid "Go to your <0>public profile settings</0> to add documents."
-msgstr "Przejdź do swojego <0>ustawienia profilu publicznego</0>, aby dodać dokumenty."
+msgstr "Przejdź do swoich <0>ustawień profilu publicznego</0>, aby dodać dokumenty."
 
 #: apps/web/src/app/(dashboard)/settings/profile/page.tsx:29
 msgid "Here you can edit your personal details."
@@ -2449,7 +2449,7 @@ msgstr "Brak odbiorców"
 
 #: apps/web/src/components/(dashboard)/common/command-menu.tsx:200
 msgid "No results found."
-msgstr "Brak wyników."
+msgstr "Nie znaleziono wyników."
 
 #: apps/web/src/app/(unauthenticated)/verify-email/[token]/page.tsx:37
 msgid "No token provided"
@@ -2641,7 +2641,7 @@ msgstr "Oczekujące"
 
 #: apps/web/src/components/(dashboard)/common/command-menu.tsx:51
 msgid "Pending documents"
-msgstr "Oczekujące Dokumenty"
+msgstr "Oczekujące dokumenty"
 
 #: apps/web/src/app/(dashboard)/admin/stats/page.tsx:89
 msgid "Pending Documents"
@@ -3435,7 +3435,7 @@ msgstr "Statystyki"
 #: apps/web/src/app/(internal)/%5F%5Fhtmltopdf/audit-log/page.tsx:93
 #: apps/web/src/components/(teams)/tables/team-billing-invoices-data-table.tsx:73
 msgid "Status"
-msgstr "Status"
+msgstr "Stan"
 
 #: apps/web/src/app/(dashboard)/settings/billing/billing-plans.tsx:129
 msgid "Subscribe"
@@ -3732,7 +3732,7 @@ msgstr "Własność zespołu <0>{0}</0> została pomyślnie przeniesiona na Cieb
 
 #: apps/web/src/components/partials/not-found.tsx:53
 msgid "The page you are looking for was moved, removed, renamed or might never have existed."
-msgstr "Strona, której szukasz, została przeniesiona, usunięta, zmieniona lub mogła nigdy nie istnieć."
+msgstr "Strona, której szukasz, została przeniesiona, usunięta, zmieniona lub mogla nigdy nie istnieć."
 
 #: apps/web/src/components/forms/public-profile-form.tsx:118
 msgid "The profile link has been copied to your clipboard"
@@ -3778,7 +3778,7 @@ msgstr "Prośba o przeniesienie zespołu do <0>{0}</0> wygasła."
 
 #: apps/web/src/app/(teams)/t/[teamUrl]/not-found.tsx:23
 msgid "The team you are looking for may have been removed, renamed or may have never existed."
-msgstr "Zespół, którego szukasz, mógł zostać usunięty, zmieniony lub mogł nie istnieć."
+msgstr "Zespół, którego szukasz, mógł zostać usunięty, zmieniony lub mogl nie istnieć."
 
 #: apps/web/src/app/(dashboard)/templates/move-template-dialog.tsx:49
 msgid "The template has been successfully moved to the selected team."
@@ -3867,7 +3867,7 @@ msgstr "Ten dokument został podpisany przez wszystkich odbiorców"
 
 #: apps/web/src/app/(dashboard)/documents/[id]/document-page-view.tsx:227
 msgid "This document is currently a draft and has not been sent"
-msgstr "Ten dokument jest obecnie szkicowany i nie został wysłany"
+msgstr "Ten dokument jest obecnie w wersji roboczej i nie został wysłany"
 
 #: apps/web/src/app/(dashboard)/templates/[id]/template-page-view-documents-table.tsx:152
 msgid "This document was created by you or a team member using the template above."
@@ -3883,11 +3883,11 @@ msgstr "Ten e-mail jest już używany przez inny zespół."
 
 #: apps/web/src/app/(unauthenticated)/team/verify/transfer/[token]/page.tsx:40
 msgid "This link is invalid or has expired. Please contact your team to resend a transfer request."
-msgstr "Ten link jest nieprawidłowy lub wygasł. Proszę skontaktować się ze swoim zespołem, aby ponownie wysłać prośbę o transfer."
+msgstr "Ten link jest nieprawidłowy lub wygasł. Proszę skontaktować się z zespołem w celu ponownego przesłania prośby o transfer."
 
 #: apps/web/src/app/(unauthenticated)/team/verify/email/[token]/page.tsx:37
 msgid "This link is invalid or has expired. Please contact your team to resend a verification."
-msgstr "Ten link jest nieprawidłowy lub wygasł. Proszę skontaktować się ze swoim zespołem, aby ponownie wysłać weryfikację."
+msgstr "Ten link jest nieprawidłowy lub wygasł. Proszę skontaktować się z zespołem w celu ponownej weryfikacji."
 
 #: apps/web/src/app/(dashboard)/settings/security/passkeys/create-passkey-dialog.tsx:208
 msgid "This passkey has already been registered."
@@ -3895,7 +3895,7 @@ msgstr "Ten klucz dostępu został już zarejestrowany."
 
 #: apps/web/src/components/forms/signin.tsx:200
 msgid "This passkey is not configured for this application. Please login and add one in the user settings."
-msgstr "Ten klucz dostępu nie jest skonfigurowany dla tej aplikacji. Proszę zalogować się i dodać jeden w ustawieniach użytkownika."
+msgstr "Ten klucz dostępu nie jest skonfigurowany dla tej aplikacji. Proszę się zalogować i dodać go w ustawieniach użytkownika."
 
 #: apps/web/src/components/(teams)/dialogs/create-team-checkout-dialog.tsx:148
 msgid "This price includes minimum 5 seats."
@@ -3911,11 +3911,11 @@ msgstr "Ten zespół oraz wszelkie powiązane dane, z wyjątkiem faktur, zostan�
 
 #: apps/web/src/app/(dashboard)/templates/delete-template-dialog.tsx:51
 msgid "This template could not be deleted at this time. Please try again."
-msgstr "Ten szablon nie mógł zostać usunięty w tej chwili. Proszę spróbować ponownie."
+msgstr "Tego szablonu nie można usunąć w tym momencie. Proszę spróbować ponownie."
 
 #: apps/web/src/app/(unauthenticated)/team/decline/[token]/page.tsx:43
 msgid "This token is invalid or has expired. No action is needed."
-msgstr "Ten token jest nieprawidłowy lub wygasł. Nie wymaga żadnej akcji."
+msgstr "Ten token jest nieprawidłowy lub wygasł. Nie jest wymagana żadna akcja."
 
 #: apps/web/src/app/(unauthenticated)/team/invite/[token]/page.tsx:43
 msgid "This token is invalid or has expired. Please contact your team for a new invitation."
