@@ -13,7 +13,7 @@ msgstr ""
 "Language-Team: \n"
 "Plural-Forms: \n"
 
-#: apps/web/src/app/(teams)/t/[teamUrl]/settings/preferences/document-preferences.tsx:214
+#: apps/web/src/app/(teams)/t/[teamUrl]/settings/preferences/document-preferences.tsx:222
 msgid "\"{0}\" has invited you to sign \"example document\"."
 msgstr "\"{0}\" has invited you to sign \"example document\"."
 
@@ -21,7 +21,7 @@ msgstr "\"{0}\" has invited you to sign \"example document\"."
 msgid "\"{0}\" will appear on the document as it has a timezone of \"{timezone}\"."
 msgstr "\"{0}\" will appear on the document as it has a timezone of \"{timezone}\"."
 
-#: apps/web/src/app/(dashboard)/documents/delete-document-dialog.tsx:60
+#: apps/web/src/app/(dashboard)/documents/delete-document-dialog.tsx:62
 msgid "\"{documentTitle}\" has been successfully deleted"
 msgstr "\"{documentTitle}\" has been successfully deleted"
 
@@ -37,7 +37,7 @@ msgstr "\"{email}\" on behalf of \"{teamName}\" has invited you to sign \"exampl
 #~ "\"{placeholderEmail}\" on behalf of \"{0}\" has invited you to sign \"example\n"
 #~ "document\"."
 
-#: apps/web/src/app/(teams)/t/[teamUrl]/settings/preferences/document-preferences.tsx:209
+#: apps/web/src/app/(teams)/t/[teamUrl]/settings/preferences/document-preferences.tsx:217
 msgid "\"{placeholderEmail}\" on behalf of \"{0}\" has invited you to sign \"example document\"."
 msgstr "\"{placeholderEmail}\" on behalf of \"{0}\" has invited you to sign \"example document\"."
 
@@ -404,11 +404,11 @@ msgstr "All documents have been processed. Any new documents that are sent or re
 msgid "All documents related to the electronic signing process will be provided to you electronically through our platform or via email. It is your responsibility to ensure that your email address is current and that you can receive and open our emails."
 msgstr "All documents related to the electronic signing process will be provided to you electronically through our platform or via email. It is your responsibility to ensure that your email address is current and that you can receive and open our emails."
 
-#: apps/web/src/app/(dashboard)/documents/delete-document-dialog.tsx:145
+#: apps/web/src/app/(dashboard)/documents/delete-document-dialog.tsx:147
 msgid "All inserted signatures will be voided"
 msgstr "All inserted signatures will be voided"
 
-#: apps/web/src/app/(dashboard)/documents/delete-document-dialog.tsx:148
+#: apps/web/src/app/(dashboard)/documents/delete-document-dialog.tsx:150
 msgid "All recipients will be notified"
 msgstr "All recipients will be notified"
 
@@ -685,7 +685,7 @@ msgstr "Are you sure you want to remove the <0>{passkeyName}</0> passkey."
 msgid "Are you sure you wish to delete this team?"
 msgstr "Are you sure you wish to delete this team?"
 
-#: apps/web/src/app/(dashboard)/documents/delete-document-dialog.tsx:98
+#: apps/web/src/app/(dashboard)/documents/delete-document-dialog.tsx:100
 #: apps/web/src/app/(dashboard)/settings/teams/team-email-usage.tsx:94
 #: apps/web/src/app/(dashboard)/templates/template-direct-link-dialog.tsx:455
 #: apps/web/src/components/(teams)/dialogs/delete-team-member-dialog.tsx:81
@@ -785,7 +785,7 @@ msgstr "Bulk Copy"
 msgid "Bulk Import"
 msgstr "Bulk Import"
 
-#: apps/web/src/app/(dashboard)/documents/delete-document-dialog.tsx:156
+#: apps/web/src/app/(dashboard)/documents/delete-document-dialog.tsx:158
 msgid "By deleting this document, the following will occur:"
 msgstr "By deleting this document, the following will occur:"
 
@@ -806,7 +806,7 @@ msgid "By using the electronic signature feature, you are consenting to conduct 
 msgstr "By using the electronic signature feature, you are consenting to conduct transactions and receive disclosures electronically. You acknowledge that your electronic signature on documents is binding and that you accept the terms outlined in the documents you are signing."
 
 #: apps/web/src/app/(dashboard)/documents/_action-items/resend-document.tsx:186
-#: apps/web/src/app/(dashboard)/documents/delete-document-dialog.tsx:190
+#: apps/web/src/app/(dashboard)/documents/delete-document-dialog.tsx:192
 #: apps/web/src/app/(dashboard)/documents/duplicate-document-dialog.tsx:108
 #: apps/web/src/app/(dashboard)/documents/move-document-dialog.tsx:120
 #: apps/web/src/app/(dashboard)/settings/security/passkeys/create-passkey-dialog.tsx:248
@@ -1040,17 +1040,21 @@ msgstr "Continue"
 msgid "Continue to login"
 msgstr "Continue to login"
 
-#: apps/web/src/app/(teams)/t/[teamUrl]/settings/preferences/document-preferences.tsx:173
+#: apps/web/src/app/(teams)/t/[teamUrl]/settings/preferences/document-preferences.tsx:181
 msgid "Controls the default language of an uploaded document. This will be used as the language in email communications with the recipients."
 msgstr "Controls the default language of an uploaded document. This will be used as the language in email communications with the recipients."
 
-#: apps/web/src/app/(teams)/t/[teamUrl]/settings/preferences/document-preferences.tsx:141
+#: apps/web/src/app/(teams)/t/[teamUrl]/settings/preferences/document-preferences.tsx:149
 msgid "Controls the default visibility of an uploaded document."
 msgstr "Controls the default visibility of an uploaded document."
 
-#: apps/web/src/app/(teams)/t/[teamUrl]/settings/preferences/document-preferences.tsx:220
+#: apps/web/src/app/(teams)/t/[teamUrl]/settings/preferences/document-preferences.tsx:228
 msgid "Controls the formatting of the message that will be sent when inviting a recipient to sign a document. If a custom message has been provided while configuring the document, it will be used instead."
 msgstr "Controls the formatting of the message that will be sent when inviting a recipient to sign a document. If a custom message has been provided while configuring the document, it will be used instead."
+
+#: apps/web/src/app/(teams)/t/[teamUrl]/settings/preferences/document-preferences.tsx:259
+msgid "Controls whether the signing certificate will be included in the document when it is downloaded. The signing certificate can still be downloaded from the logs page separately."
+msgstr "Controls whether the signing certificate will be included in the document when it is downloaded. The signing certificate can still be downloaded from the logs page separately."
 
 #: apps/web/src/components/document/document-recipient-link-copy-dialog.tsx:128
 msgid "Copied"
@@ -1242,22 +1246,22 @@ msgstr "Decline"
 msgid "Declined team invitation"
 msgstr "Declined team invitation"
 
-#: apps/web/src/app/(teams)/t/[teamUrl]/settings/preferences/document-preferences.tsx:153
+#: apps/web/src/app/(teams)/t/[teamUrl]/settings/preferences/document-preferences.tsx:161
 msgid "Default Document Language"
 msgstr "Default Document Language"
 
-#: apps/web/src/app/(teams)/t/[teamUrl]/settings/preferences/document-preferences.tsx:117
+#: apps/web/src/app/(teams)/t/[teamUrl]/settings/preferences/document-preferences.tsx:125
 #: apps/web/src/components/(teams)/forms/update-team-form.tsx:195
 msgid "Default Document Visibility"
 msgstr "Default Document Visibility"
 
-#: apps/web/src/app/(dashboard)/documents/delete-document-dialog.tsx:90
+#: apps/web/src/app/(dashboard)/documents/delete-document-dialog.tsx:50
 msgid "delete"
 msgstr "delete"
 
 #: apps/web/src/app/(dashboard)/documents/[id]/document-page-view-dropdown.tsx:144
 #: apps/web/src/app/(dashboard)/documents/data-table-action-dropdown.tsx:189
-#: apps/web/src/app/(dashboard)/documents/delete-document-dialog.tsx:200
+#: apps/web/src/app/(dashboard)/documents/delete-document-dialog.tsx:202
 #: apps/web/src/app/(dashboard)/settings/security/passkeys/user-passkeys-data-table-actions.tsx:177
 #: apps/web/src/app/(dashboard)/settings/security/passkeys/user-passkeys-data-table-actions.tsx:211
 #: apps/web/src/app/(dashboard)/settings/tokens/page.tsx:83
@@ -1476,7 +1480,7 @@ msgstr "Document created using a <0>direct link</0>"
 
 #: apps/web/src/app/(dashboard)/admin/documents/[id]/super-delete-document-dialog.tsx:51
 #: apps/web/src/app/(dashboard)/documents/[id]/document-page-view.tsx:178
-#: apps/web/src/app/(dashboard)/documents/delete-document-dialog.tsx:59
+#: apps/web/src/app/(dashboard)/documents/delete-document-dialog.tsx:61
 msgid "Document deleted"
 msgstr "Document deleted"
 
@@ -1522,7 +1526,7 @@ msgstr "Document no longer available to sign"
 msgid "Document pending"
 msgstr "Document pending"
 
-#: apps/web/src/app/(teams)/t/[teamUrl]/settings/preferences/document-preferences.tsx:91
+#: apps/web/src/app/(teams)/t/[teamUrl]/settings/preferences/document-preferences.tsx:99
 msgid "Document preferences updated"
 msgstr "Document preferences updated"
 
@@ -1550,7 +1554,7 @@ msgstr "Document sent"
 msgid "Document Signed"
 msgstr "Document Signed"
 
-#: apps/web/src/app/(dashboard)/documents/delete-document-dialog.tsx:142
+#: apps/web/src/app/(dashboard)/documents/delete-document-dialog.tsx:144
 msgid "Document signing process will be cancelled"
 msgstr "Document signing process will be cancelled"
 
@@ -1574,7 +1578,7 @@ msgstr "Document uploaded"
 msgid "Document Viewed"
 msgstr "Document Viewed"
 
-#: apps/web/src/app/(dashboard)/documents/delete-document-dialog.tsx:139
+#: apps/web/src/app/(dashboard)/documents/delete-document-dialog.tsx:141
 msgid "Document will be permanently deleted"
 msgstr "Document will be permanently deleted"
 
@@ -1628,6 +1632,14 @@ msgstr "Download Audit Logs"
 #: apps/web/src/app/(dashboard)/documents/[id]/logs/download-certificate-button.tsx:86
 msgid "Download Certificate"
 msgstr "Download Certificate"
+
+#: apps/web/src/app/(dashboard)/documents/[id]/document-page-view-button.tsx:114
+#~ msgid "Download with Certificate"
+#~ msgstr "Download with Certificate"
+
+#: apps/web/src/app/(dashboard)/documents/[id]/document-page-view-button.tsx:118
+#~ msgid "Download without Certificate"
+#~ msgstr "Download without Certificate"
 
 #: apps/web/src/app/(dashboard)/templates/[id]/template-page-view-documents-table.tsx:214
 #: apps/web/src/components/formatter/document-status.tsx:34
@@ -1838,7 +1850,7 @@ msgstr "Error"
 #~ msgid "Error updating global team settings"
 #~ msgstr "Error updating global team settings"
 
-#: apps/web/src/app/(teams)/t/[teamUrl]/settings/preferences/document-preferences.tsx:128
+#: apps/web/src/app/(teams)/t/[teamUrl]/settings/preferences/document-preferences.tsx:136
 msgid "Everyone can access and view the document"
 msgstr "Everyone can access and view the document"
 
@@ -1973,7 +1985,7 @@ msgid "Hey I’m Timur"
 msgstr "Hey I’m Timur"
 
 #: apps/web/src/app/(dashboard)/documents/data-table-action-dropdown.tsx:189
-#: apps/web/src/app/(dashboard)/documents/delete-document-dialog.tsx:200
+#: apps/web/src/app/(dashboard)/documents/delete-document-dialog.tsx:202
 #: apps/web/src/app/(dashboard)/settings/public-profile/public-profile-page-view.tsx:155
 msgid "Hide"
 msgstr "Hide"
@@ -2018,6 +2030,10 @@ msgstr "Inbox documents"
 #: apps/web/src/components/forms/team-document-settings.tsx:132
 #~ msgid "Include Sender Details"
 #~ msgstr "Include Sender Details"
+
+#: apps/web/src/app/(teams)/t/[teamUrl]/settings/preferences/document-preferences.tsx:244
+msgid "Include the Signing Certificate in the Document"
+msgstr "Include the Signing Certificate in the Document"
 
 #: apps/web/src/app/(dashboard)/documents/[id]/document-page-view-information.tsx:53
 #: apps/web/src/app/(dashboard)/templates/[id]/template-page-view-information.tsx:50
@@ -2502,7 +2518,7 @@ msgstr "On this page, you can create new Webhooks and manage the existing ones."
 msgid "On this page, you can edit the webhook and its settings."
 msgstr "On this page, you can edit the webhook and its settings."
 
-#: apps/web/src/app/(dashboard)/documents/delete-document-dialog.tsx:134
+#: apps/web/src/app/(dashboard)/documents/delete-document-dialog.tsx:136
 msgid "Once confirmed, the following will occur:"
 msgstr "Once confirmed, the following will occur:"
 
@@ -2510,11 +2526,11 @@ msgstr "Once confirmed, the following will occur:"
 msgid "Once you have scanned the QR code or entered the code manually, enter the code provided by your authenticator app below."
 msgstr "Once you have scanned the QR code or entered the code manually, enter the code provided by your authenticator app below."
 
-#: apps/web/src/app/(teams)/t/[teamUrl]/settings/preferences/document-preferences.tsx:134
+#: apps/web/src/app/(teams)/t/[teamUrl]/settings/preferences/document-preferences.tsx:142
 msgid "Only admins can access and view the document"
 msgstr "Only admins can access and view the document"
 
-#: apps/web/src/app/(teams)/t/[teamUrl]/settings/preferences/document-preferences.tsx:131
+#: apps/web/src/app/(teams)/t/[teamUrl]/settings/preferences/document-preferences.tsx:139
 msgid "Only managers and above can access and view the document"
 msgstr "Only managers and above can access and view the document"
 
@@ -2678,7 +2694,7 @@ msgstr "Please check your email for updates."
 msgid "Please choose your new password"
 msgstr "Please choose your new password"
 
-#: apps/web/src/app/(dashboard)/documents/delete-document-dialog.tsx:174
+#: apps/web/src/app/(dashboard)/documents/delete-document-dialog.tsx:176
 msgid "Please contact support if you would like to revert this action."
 msgstr "Please contact support if you would like to revert this action."
 
@@ -2694,11 +2710,11 @@ msgstr "Please mark as viewed to complete"
 msgid "Please note that proceeding will remove direct linking recipient and turn it into a placeholder."
 msgstr "Please note that proceeding will remove direct linking recipient and turn it into a placeholder."
 
-#: apps/web/src/app/(dashboard)/documents/delete-document-dialog.tsx:128
+#: apps/web/src/app/(dashboard)/documents/delete-document-dialog.tsx:130
 msgid "Please note that this action is <0>irreversible</0>."
 msgstr "Please note that this action is <0>irreversible</0>."
 
-#: apps/web/src/app/(dashboard)/documents/delete-document-dialog.tsx:119
+#: apps/web/src/app/(dashboard)/documents/delete-document-dialog.tsx:121
 msgid "Please note that this action is <0>irreversible</0>. Once confirmed, this document will be permanently deleted."
 msgstr "Please note that this action is <0>irreversible</0>. Once confirmed, this document will be permanently deleted."
 
@@ -2746,6 +2762,10 @@ msgstr "Please try again later or login using your normal details"
 msgid "Please try again later."
 msgstr "Please try again later."
 
+#: apps/web/src/app/(dashboard)/documents/delete-document-dialog.tsx:186
+msgid "Please type {0} to confirm"
+msgstr "Please type {0} to confirm"
+
 #: apps/web/src/app/(dashboard)/settings/profile/delete-account-dialog.tsx:134
 msgid "Please type <0>{0}</0> to confirm."
 msgstr "Please type <0>{0}</0> to confirm."
@@ -2756,7 +2776,7 @@ msgstr "Please type <0>{0}</0> to confirm."
 msgid "Preferences"
 msgstr "Preferences"
 
-#: apps/web/src/app/(teams)/t/[teamUrl]/settings/preferences/document-preferences.tsx:204
+#: apps/web/src/app/(teams)/t/[teamUrl]/settings/preferences/document-preferences.tsx:212
 msgid "Preview"
 msgstr "Preview"
 
@@ -2880,7 +2900,7 @@ msgstr "Recipients"
 msgid "Recipients metrics"
 msgstr "Recipients metrics"
 
-#: apps/web/src/app/(dashboard)/documents/delete-document-dialog.tsx:164
+#: apps/web/src/app/(dashboard)/documents/delete-document-dialog.tsx:166
 msgid "Recipients will still retain their copy of the document"
 msgstr "Recipients will still retain their copy of the document"
 
@@ -3042,7 +3062,7 @@ msgstr "Roles"
 #: apps/web/src/app/(signing)/sign/[token]/number-field.tsx:337
 #: apps/web/src/app/(signing)/sign/[token]/text-field.tsx:344
 #: apps/web/src/app/(teams)/t/[teamUrl]/settings/preferences/branding-preferences.tsx:312
-#: apps/web/src/app/(teams)/t/[teamUrl]/settings/preferences/document-preferences.tsx:232
+#: apps/web/src/app/(teams)/t/[teamUrl]/settings/preferences/document-preferences.tsx:271
 msgid "Save"
 msgstr "Save"
 
@@ -3117,7 +3137,7 @@ msgstr "Send confirmation email"
 msgid "Send document"
 msgstr "Send document"
 
-#: apps/web/src/app/(teams)/t/[teamUrl]/settings/preferences/document-preferences.tsx:188
+#: apps/web/src/app/(teams)/t/[teamUrl]/settings/preferences/document-preferences.tsx:196
 #: apps/web/src/components/(teams)/forms/update-team-form.tsx:220
 msgid "Send on Behalf of Team"
 msgstr "Send on Behalf of Team"
@@ -3342,7 +3362,7 @@ msgstr "Site Settings"
 #: apps/web/src/app/(dashboard)/documents/[id]/logs/download-certificate-button.tsx:68
 #: apps/web/src/app/(dashboard)/documents/data-table-action-button.tsx:75
 #: apps/web/src/app/(dashboard)/documents/data-table-action-dropdown.tsx:106
-#: apps/web/src/app/(dashboard)/documents/delete-document-dialog.tsx:80
+#: apps/web/src/app/(dashboard)/documents/delete-document-dialog.tsx:82
 #: apps/web/src/app/(dashboard)/documents/duplicate-document-dialog.tsx:72
 #: apps/web/src/app/(dashboard)/settings/billing/billing-plans.tsx:62
 #: apps/web/src/app/(dashboard)/settings/billing/billing-portal-button.tsx:51
@@ -3398,7 +3418,7 @@ msgstr "Something went wrong while sending the confirmation email."
 msgid "Something went wrong while updating the team billing subscription, please contact support."
 msgstr "Something went wrong while updating the team billing subscription, please contact support."
 
-#: apps/web/src/app/(teams)/t/[teamUrl]/settings/preferences/document-preferences.tsx:96
+#: apps/web/src/app/(teams)/t/[teamUrl]/settings/preferences/document-preferences.tsx:104
 msgid "Something went wrong!"
 msgstr "Something went wrong!"
 
@@ -3703,7 +3723,7 @@ msgstr "The document owner has been notified of your decision. They may contact 
 msgid "The document was created but could not be sent to recipients."
 msgstr "The document was created but could not be sent to recipients."
 
-#: apps/web/src/app/(dashboard)/documents/delete-document-dialog.tsx:161
+#: apps/web/src/app/(dashboard)/documents/delete-document-dialog.tsx:163
 msgid "The document will be hidden from your account"
 msgstr "The document will be hidden from your account"
 
@@ -3836,7 +3856,7 @@ msgstr "They have permission on your behalf to:"
 msgid "This action is not reversible. Please be certain."
 msgstr "This action is not reversible. Please be certain."
 
-#: apps/web/src/app/(dashboard)/documents/delete-document-dialog.tsx:81
+#: apps/web/src/app/(dashboard)/documents/delete-document-dialog.tsx:83
 msgid "This document could not be deleted at this time. Please try again."
 msgstr "This document could not be deleted at this time. Please try again."
 
@@ -4100,8 +4120,8 @@ msgid "Type"
 msgstr "Type"
 
 #: apps/web/src/app/(dashboard)/documents/delete-document-dialog.tsx:184
-msgid "Type 'delete' to confirm"
-msgstr "Type 'delete' to confirm"
+#~ msgid "Type 'delete' to confirm"
+#~ msgstr "Type 'delete' to confirm"
 
 #: apps/web/src/components/(dashboard)/common/command-menu.tsx:186
 msgid "Type a command or search..."
@@ -4653,7 +4673,7 @@ msgstr "We were unable to submit this document at this time. Please try again la
 msgid "We were unable to update your branding preferences at this time, please try again later"
 msgstr "We were unable to update your branding preferences at this time, please try again later"
 
-#: apps/web/src/app/(teams)/t/[teamUrl]/settings/preferences/document-preferences.tsx:98
+#: apps/web/src/app/(teams)/t/[teamUrl]/settings/preferences/document-preferences.tsx:106
 msgid "We were unable to update your document preferences at this time, please try again later"
 msgstr "We were unable to update your document preferences at this time, please try again later"
 
@@ -4778,7 +4798,7 @@ msgstr "You are about to complete signing \"{truncatedTitle}\".<0/> Are you sure
 msgid "You are about to complete viewing \"{truncatedTitle}\".<0/> Are you sure?"
 msgstr "You are about to complete viewing \"{truncatedTitle}\".<0/> Are you sure?"
 
-#: apps/web/src/app/(dashboard)/documents/delete-document-dialog.tsx:103
+#: apps/web/src/app/(dashboard)/documents/delete-document-dialog.tsx:105
 msgid "You are about to delete <0>\"{documentTitle}\"</0>"
 msgstr "You are about to delete <0>\"{documentTitle}\"</0>"
 
@@ -4786,7 +4806,7 @@ msgstr "You are about to delete <0>\"{documentTitle}\"</0>"
 msgid "You are about to delete the following team email from <0>{teamName}</0>."
 msgstr "You are about to delete the following team email from <0>{teamName}</0>."
 
-#: apps/web/src/app/(dashboard)/documents/delete-document-dialog.tsx:107
+#: apps/web/src/app/(dashboard)/documents/delete-document-dialog.tsx:109
 msgid "You are about to hide <0>\"{documentTitle}\"</0>"
 msgstr "You are about to hide <0>\"{documentTitle}\"</0>"
 
@@ -5036,7 +5056,7 @@ msgstr "Your document has been uploaded successfully."
 msgid "Your document has been uploaded successfully. You will be redirected to the template page."
 msgstr "Your document has been uploaded successfully. You will be redirected to the template page."
 
-#: apps/web/src/app/(teams)/t/[teamUrl]/settings/preferences/document-preferences.tsx:92
+#: apps/web/src/app/(teams)/t/[teamUrl]/settings/preferences/document-preferences.tsx:100
 msgid "Your document preferences have been updated"
 msgstr "Your document preferences have been updated"
 

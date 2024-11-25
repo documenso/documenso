@@ -511,10 +511,11 @@ enum TeamMemberInviteStatus {
 }
 
 model TeamGlobalSettings {
-  teamId               Int                @unique
-  documentVisibility   DocumentVisibility @default(EVERYONE)
-  documentLanguage     String             @default("en")
-  includeSenderDetails Boolean            @default(true)
+  teamId                    Int                @unique
+  documentVisibility        DocumentVisibility @default(EVERYONE)
+  documentLanguage          String             @default("en")
+  includeSenderDetails      Boolean            @default(true)
+  includeSigningCertificate Boolean            @default(true)
 
   brandingEnabled        Boolean @default(false)
   brandingLogo           String  @default("")
