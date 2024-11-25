@@ -2,12 +2,13 @@ import { DateTime } from 'luxon';
 import type { Browser } from 'playwright';
 
 import { NEXT_PUBLIC_WEBAPP_URL } from '../../constants/app';
-import type { SupportedLanguageCodes } from '../../constants/i18n';
+import { type SupportedLanguageCodes, isValidLanguageCode } from '../../constants/i18n';
 import { encryptSecondaryData } from '../crypto/encrypt';
 
 export type GetCertificatePdfOptions = {
   documentId: number;
-  language?: SupportedLanguageCodes;
+  // eslint-disable-next-line @typescript-eslint/ban-types
+  language?: SupportedLanguageCodes | (string & {});
 };
 
 export const getCertificatePdf = async ({ documentId, language }: GetCertificatePdfOptions) => {
@@ -38,11 +39,13 @@ export const getCertificatePdf = async ({ documentId, language }: GetCertificate
 
   const page = await browserContext.newPage();
 
+  const lang = isValidLanguageCode(language) ? language : 'en';
+
   if (language) {
     await page.context().addCookies([
       {
         name: 'language',
-        value: language,
+        value: lang,
         url: NEXT_PUBLIC_WEBAPP_URL(),
       },
     ]);
