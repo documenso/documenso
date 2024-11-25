@@ -41,15 +41,13 @@ export const getCertificatePdf = async ({ documentId, language }: GetCertificate
 
   const lang = isValidLanguageCode(language) ? language : 'en';
 
-  if (language) {
-    await page.context().addCookies([
-      {
-        name: 'language',
-        value: lang,
-        url: NEXT_PUBLIC_WEBAPP_URL(),
-      },
-    ]);
-  }
+  await page.context().addCookies([
+    {
+      name: 'language',
+      value: lang,
+      url: NEXT_PUBLIC_WEBAPP_URL(),
+    },
+  ]);
 
   await page.goto(`${NEXT_PUBLIC_WEBAPP_URL()}/__htmltopdf/certificate?d=${encryptedId}`, {
     waitUntil: 'networkidle',

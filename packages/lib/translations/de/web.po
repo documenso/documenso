@@ -18,7 +18,7 @@ msgstr ""
 "X-Crowdin-File: web.po\n"
 "X-Crowdin-File-ID: 8\n"
 
-#: apps/web/src/app/(teams)/t/[teamUrl]/settings/preferences/document-preferences.tsx:216
+#: apps/web/src/app/(teams)/t/[teamUrl]/settings/preferences/document-preferences.tsx:222
 msgid "\"{0}\" has invited you to sign \"example document\"."
 msgstr "\"{0}\" hat Sie eingeladen, \"Beispieldokument\" zu unterschreiben."
 
@@ -42,7 +42,7 @@ msgstr "\"{email}\" im Namen von \"{teamName}\" hat Sie eingeladen, \"Beispieldo
 #~ "\"{placeholderEmail}\" on behalf of \"{0}\" has invited you to sign \"example\n"
 #~ "document\"."
 
-#: apps/web/src/app/(teams)/t/[teamUrl]/settings/preferences/document-preferences.tsx:211
+#: apps/web/src/app/(teams)/t/[teamUrl]/settings/preferences/document-preferences.tsx:217
 msgid "\"{placeholderEmail}\" on behalf of \"{0}\" has invited you to sign \"example document\"."
 msgstr "\"{placeholderEmail}\" im Namen von \"{0}\" hat Sie eingeladen, \"Beispieldokument\" zu unterzeichnen."
 
@@ -1045,18 +1045,21 @@ msgstr "Fortfahren"
 msgid "Continue to login"
 msgstr "Weiter zum Login"
 
-#: apps/web/src/app/(teams)/t/[teamUrl]/settings/preferences/document-preferences.tsx:175
+#: apps/web/src/app/(teams)/t/[teamUrl]/settings/preferences/document-preferences.tsx:181
 msgid "Controls the default language of an uploaded document. This will be used as the language in email communications with the recipients."
 msgstr "Steuert die Standardsprache eines hochgeladenen Dokuments. Diese wird als Sprache in der E-Mail-Kommunikation mit den Empfängern verwendet."
 
-#: apps/web/src/app/(teams)/t/[teamUrl]/settings/preferences/document-preferences.tsx:143
+#: apps/web/src/app/(teams)/t/[teamUrl]/settings/preferences/document-preferences.tsx:149
 msgid "Controls the default visibility of an uploaded document."
 msgstr "Steuert die Standard-sichtbarkeit eines hochgeladenen Dokuments."
 
-#: apps/web/src/app/(teams)/t/[teamUrl]/settings/preferences/document-preferences.tsx:222
-#: apps/web/src/app/(teams)/t/[teamUrl]/settings/preferences/document-preferences.tsx:253
+#: apps/web/src/app/(teams)/t/[teamUrl]/settings/preferences/document-preferences.tsx:228
 msgid "Controls the formatting of the message that will be sent when inviting a recipient to sign a document. If a custom message has been provided while configuring the document, it will be used instead."
 msgstr "Steuert das Format der Nachricht, die gesendet wird, wenn ein Empfänger eingeladen wird, ein Dokument zu unterschreiben. Wenn eine benutzerdefinierte Nachricht beim Konfigurieren des Dokuments bereitgestellt wurde, wird diese stattdessen verwendet."
+
+#: apps/web/src/app/(teams)/t/[teamUrl]/settings/preferences/document-preferences.tsx:259
+msgid "Controls whether the signing certificate will be included in the document when it is downloaded. The signing certificate can still be downloaded from the logs page separately."
+msgstr ""
 
 #: apps/web/src/components/document/document-recipient-link-copy-dialog.tsx:128
 msgid "Copied"
@@ -1248,11 +1251,11 @@ msgstr "Ablehnen"
 msgid "Declined team invitation"
 msgstr "Team-Einladung abgelehnt"
 
-#: apps/web/src/app/(teams)/t/[teamUrl]/settings/preferences/document-preferences.tsx:155
+#: apps/web/src/app/(teams)/t/[teamUrl]/settings/preferences/document-preferences.tsx:161
 msgid "Default Document Language"
 msgstr "Standardsprache des Dokuments"
 
-#: apps/web/src/app/(teams)/t/[teamUrl]/settings/preferences/document-preferences.tsx:119
+#: apps/web/src/app/(teams)/t/[teamUrl]/settings/preferences/document-preferences.tsx:125
 #: apps/web/src/components/(teams)/forms/update-team-form.tsx:195
 msgid "Default Document Visibility"
 msgstr "Standard Sichtbarkeit des Dokuments"
@@ -1528,7 +1531,7 @@ msgstr "Dokument steht nicht mehr zur Unterschrift zur Verfügung"
 msgid "Document pending"
 msgstr "Dokument ausstehend"
 
-#: apps/web/src/app/(teams)/t/[teamUrl]/settings/preferences/document-preferences.tsx:93
+#: apps/web/src/app/(teams)/t/[teamUrl]/settings/preferences/document-preferences.tsx:99
 msgid "Document preferences updated"
 msgstr "Dokumentpräferenzen aktualisiert"
 
@@ -1852,7 +1855,7 @@ msgstr "Fehler"
 #~ msgid "Error updating global team settings"
 #~ msgstr "Error updating global team settings"
 
-#: apps/web/src/app/(teams)/t/[teamUrl]/settings/preferences/document-preferences.tsx:130
+#: apps/web/src/app/(teams)/t/[teamUrl]/settings/preferences/document-preferences.tsx:136
 msgid "Everyone can access and view the document"
 msgstr "Jeder kann auf das Dokument zugreifen und es anzeigen"
 
@@ -2033,7 +2036,7 @@ msgstr "Posteingang Dokumente"
 #~ msgid "Include Sender Details"
 #~ msgstr "Include Sender Details"
 
-#: apps/web/src/app/(teams)/t/[teamUrl]/settings/preferences/document-preferences.tsx:238
+#: apps/web/src/app/(teams)/t/[teamUrl]/settings/preferences/document-preferences.tsx:244
 msgid "Include the Signing Certificate in the Document"
 msgstr ""
 
@@ -2528,11 +2531,11 @@ msgstr "Sobald dies bestätigt ist, wird Folgendes geschehen:"
 msgid "Once you have scanned the QR code or entered the code manually, enter the code provided by your authenticator app below."
 msgstr "Sobald Sie den QR-Code gescannt oder den Code manuell eingegeben haben, geben Sie den von Ihrer Authentifizierungs-App bereitgestellten Code unten ein."
 
-#: apps/web/src/app/(teams)/t/[teamUrl]/settings/preferences/document-preferences.tsx:136
+#: apps/web/src/app/(teams)/t/[teamUrl]/settings/preferences/document-preferences.tsx:142
 msgid "Only admins can access and view the document"
 msgstr "Nur Administratoren können auf das Dokument zugreifen und es anzeigen"
 
-#: apps/web/src/app/(teams)/t/[teamUrl]/settings/preferences/document-preferences.tsx:133
+#: apps/web/src/app/(teams)/t/[teamUrl]/settings/preferences/document-preferences.tsx:139
 msgid "Only managers and above can access and view the document"
 msgstr "Nur Manager und darüber können auf das Dokument zugreifen und es anzeigen"
 
@@ -2778,7 +2781,7 @@ msgstr "Bitte geben Sie <0>{0}</0> ein, um zu bestätigen."
 msgid "Preferences"
 msgstr "Einstellungen"
 
-#: apps/web/src/app/(teams)/t/[teamUrl]/settings/preferences/document-preferences.tsx:206
+#: apps/web/src/app/(teams)/t/[teamUrl]/settings/preferences/document-preferences.tsx:212
 msgid "Preview"
 msgstr "Vorschau"
 
@@ -3064,7 +3067,7 @@ msgstr "Rollen"
 #: apps/web/src/app/(signing)/sign/[token]/number-field.tsx:337
 #: apps/web/src/app/(signing)/sign/[token]/text-field.tsx:344
 #: apps/web/src/app/(teams)/t/[teamUrl]/settings/preferences/branding-preferences.tsx:312
-#: apps/web/src/app/(teams)/t/[teamUrl]/settings/preferences/document-preferences.tsx:265
+#: apps/web/src/app/(teams)/t/[teamUrl]/settings/preferences/document-preferences.tsx:271
 msgid "Save"
 msgstr "Speichern"
 
@@ -3139,7 +3142,7 @@ msgstr "Bestätigungs-E-Mail senden"
 msgid "Send document"
 msgstr "Dokument senden"
 
-#: apps/web/src/app/(teams)/t/[teamUrl]/settings/preferences/document-preferences.tsx:190
+#: apps/web/src/app/(teams)/t/[teamUrl]/settings/preferences/document-preferences.tsx:196
 #: apps/web/src/components/(teams)/forms/update-team-form.tsx:220
 msgid "Send on Behalf of Team"
 msgstr "Im Namen des Teams senden"
@@ -3420,7 +3423,7 @@ msgstr "Etwas ist schiefgelaufen beim Senden der Bestätigungs-E-Mail."
 msgid "Something went wrong while updating the team billing subscription, please contact support."
 msgstr "Etwas ist schiefgelaufen beim Aktualisieren des Abonnements für die Team-Zahlung. Bitte kontaktieren Sie den Support."
 
-#: apps/web/src/app/(teams)/t/[teamUrl]/settings/preferences/document-preferences.tsx:98
+#: apps/web/src/app/(teams)/t/[teamUrl]/settings/preferences/document-preferences.tsx:104
 msgid "Something went wrong!"
 msgstr "Etwas ist schiefgelaufen!"
 
@@ -4675,7 +4678,7 @@ msgstr "Wir konnten dieses Dokument zurzeit nicht einreichen. Bitte versuchen Si
 msgid "We were unable to update your branding preferences at this time, please try again later"
 msgstr "Wir konnten Ihre Markenpräferenzen zu diesem Zeitpunkt nicht aktualisieren, bitte versuchen Sie es später noch einmal"
 
-#: apps/web/src/app/(teams)/t/[teamUrl]/settings/preferences/document-preferences.tsx:100
+#: apps/web/src/app/(teams)/t/[teamUrl]/settings/preferences/document-preferences.tsx:106
 msgid "We were unable to update your document preferences at this time, please try again later"
 msgstr "Wir konnten Ihre Dokumentpräferenzen zu diesem Zeitpunkt nicht aktualisieren, bitte versuchen Sie es später noch einmal"
 
@@ -5058,7 +5061,7 @@ msgstr "Ihr Dokument wurde erfolgreich hochgeladen."
 msgid "Your document has been uploaded successfully. You will be redirected to the template page."
 msgstr "Ihr Dokument wurde erfolgreich hochgeladen. Sie werden zur Vorlagenseite weitergeleitet."
 
-#: apps/web/src/app/(teams)/t/[teamUrl]/settings/preferences/document-preferences.tsx:94
+#: apps/web/src/app/(teams)/t/[teamUrl]/settings/preferences/document-preferences.tsx:100
 msgid "Your document preferences have been updated"
 msgstr "Ihre Dokumentpräferenzen wurden aktualisiert"
 
