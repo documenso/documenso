@@ -1,7 +1,5 @@
 import Honeybadger from '@honeybadger-io/js';
 
-import { AppError } from '../errors/app-error';
-
 export const buildLogger = () => {
   if (process.env.NEXT_PRIVATE_LOGGER_HONEY_BADGER_API_KEY) {
     return new HoneybadgerLogger();
@@ -10,16 +8,9 @@ export const buildLogger = () => {
   return new DefaultLogger();
 };
 
-export const logApiError = (err: Error | unknown, logger: Logger) => {
-  const error = AppError.parseError(err);
-
-  logger.error(error, { level: 'critical' });
-};
-
 interface LoggerDescriptionOptions {
   method?: string;
   path?: string;
-  statusCode?: number;
   context?: Record<string, unknown>;
 
   /**
@@ -47,7 +38,7 @@ class DefaultLogger implements Logger {
     // Do nothing.
   }
 
-  error(_error: Error, _options?: LoggerDescriptionOptions | undefined): void {
+  error(_error: Error, _options?: LoggerDescriptionOptions): void {
     // Do nothing.
   }
 }
@@ -84,7 +75,7 @@ class HoneybadgerLogger implements Logger {
     }
   }
 
-  error(error: Error, options?: LoggerDescriptionOptions | undefined): void {
+  error(error: Error, options?: LoggerDescriptionOptions): void {
     const { context = {}, level = 'error', method, path } = options || {};
 
     const tags = [`level:${level}`];

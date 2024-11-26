@@ -34,7 +34,6 @@ export default trpcNext.createNextApiHandler({
     // Only log uncaught 500 errors.
     if (appError.code === 'INTERNAL_SERVER_ERROR' || appError.code === AppErrorCode.UNKNOWN_ERROR) {
       logger.error(error, {
-        level: 'error',
         method: path,
         context: {
           appError: AppError.toJSON(appError),
