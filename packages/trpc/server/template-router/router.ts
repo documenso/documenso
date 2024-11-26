@@ -1,3 +1,5 @@
+import { TRPCError } from '@trpc/server';
+
 import { getServerLimits } from '@documenso/ee/server-only/limits/server';
 import { isValidLanguageCode } from '@documenso/lib/constants/i18n';
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
