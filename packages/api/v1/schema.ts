@@ -5,7 +5,6 @@ import { DATE_FORMATS, DEFAULT_DOCUMENT_DATE_FORMAT } from '@documenso/lib/const
 import { SUPPORTED_LANGUAGE_CODES } from '@documenso/lib/constants/i18n';
 import '@documenso/lib/constants/time-zones';
 import { DEFAULT_DOCUMENT_TIME_ZONE, TIME_ZONES } from '@documenso/lib/constants/time-zones';
-import { ZUrlSchema } from '@documenso/lib/schemas/common';
 import {
   ZDocumentAccessAuthTypesSchema,
   ZDocumentActionAuthTypesSchema,
@@ -14,6 +13,7 @@ import {
 import { ZFieldMetaSchema } from '@documenso/lib/types/field-meta';
 import {
   DocumentDataType,
+  DocumentDistributionMethod,
   DocumentSigningOrder,
   FieldType,
   ReadStatus,
@@ -227,14 +227,14 @@ export type TCreateDocumentFromTemplateMutationResponseSchema = z.infer<
 
 export const ZGenerateDocumentFromTemplateMutationSchema = z.object({
   title: z.string().optional(),
-  externalId: z.string().nullish(),
+  externalId: z.string().optional(),
   recipients: z
     .array(
       z.object({
         id: z.number(),
+        email: z.string().email(),
         name: z.string().optional(),
-        email: z.string().email().min(1),
-        signingOrder: z.number().nullish(),
+        signingOrder: z.number().optional(),
       }),
     )
     .refine(
@@ -253,8 +253,10 @@ export const ZGenerateDocumentFromTemplateMutationSchema = z.object({
       timezone: z.string(),
       dateFormat: z.string(),
       redirectUrl: ZUrlSchema,
-      signingOrder: z.nativeEnum(DocumentSigningOrder).optional(),
-      language: z.enum(SUPPORTED_LANGUAGE_CODES).optional(),
+      signingOrder: z.nativeEnum(DocumentSigningOrder),
+      language: z.enum(SUPPORTED_LANGUAGE_CODES),
+      distributionMethod: z.nativeEnum(DocumentDistributionMethod),
+      typedSignatureEnabled: z.boolean(),
     })
     .partial()
     .optional(),

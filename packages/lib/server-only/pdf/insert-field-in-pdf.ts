@@ -143,12 +143,13 @@ export const insertFieldInPDF = async (pdf: PDFDocument, field: FieldWithSignatu
 
           let fontSize = maxFontSize;
           let textWidth = font.widthOfTextAtSize(longestLineInTextForWidth, fontSize);
-          const textHeight = font.heightAtSize(fontSize);
+          let textHeight = font.heightAtSize(fontSize);
 
           const scalingFactor = Math.min(fieldWidth / textWidth, fieldHeight / textHeight, 1);
           fontSize = Math.max(Math.min(fontSize * scalingFactor, maxFontSize), minFontSize);
 
           textWidth = font.widthOfTextAtSize(longestLineInTextForWidth, fontSize);
+          textHeight = font.heightAtSize(fontSize);
 
           let textX = fieldX + (fieldWidth - textWidth) / 2;
           let textY = fieldY + (fieldHeight - textHeight) / 2;

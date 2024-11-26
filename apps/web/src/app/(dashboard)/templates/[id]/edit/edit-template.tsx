@@ -141,6 +141,23 @@ export const EditTemplateForm = ({
     },
   });
 
+  const { mutateAsync: updateTypedSignature } =
+    trpc.template.updateTemplateTypedSignatureSettings.useMutation({
+      ...DO_NOT_INVALIDATE_QUERY_ON_MUTATION,
+      onSuccess: (newData) => {
+        utils.template.getTemplateWithDetailsById.setData(
+          {
+            id: initialTemplate.id,
+          },
+          (oldData) => ({
+            ...(oldData || initialTemplate),
+            ...newData,
+            id: Number(newData.id),
+          }),
+        );
+      },
+    });
+
   const onAddSettingsFormSubmit = async (data: TAddTemplateSettingsFormSchema) => {
     try {
       await updateTemplateSettings({
@@ -211,6 +228,12 @@ export const EditTemplateForm = ({
         fields: data.fields,
       });
 
+      await updateTypedSignature({
+        templateId: template.id,
+        teamId: team?.id,
+        typedSignatureEnabled: data.typedSignatureEnabled,
+      });
+
       // Clear all field data from localStorage
       for (let i = 0; i < localStorage.length; i++) {
         const key = localStorage.key(i);
@@ -225,14 +248,13 @@ export const EditTemplateForm = ({
         duration: 5000,
       });
 
-      // Router refresh is here to clear the router cache for when navigating to /documents.
-      router.refresh();
-
       router.push(templateRootPath);
     } catch (err) {
+      console.error(err);
+
       toast({
         title: _(msg`Error`),
-        description: _(msg`An error occurred while adding signers.`),
+        description: _(msg`An error occurred while adding fields.`),
         variant: 'destructive',
       });
     }
@@ -301,6 +323,7 @@ export const EditTemplateForm = ({
               fields={fields}
               onSubmit={onAddFieldsFormSubmit}
               teamId={team?.id}
+              typedSignatureEnabled={template.templateMeta?.typedSignatureEnabled}
             />
           </Stepper>
         </DocumentFlowFormContainer>
