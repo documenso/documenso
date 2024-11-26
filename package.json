@@ -52,7 +52,7 @@
     "husky": "^9.0.11",
     "lint-staged": "^15.2.2",
     "playwright": "1.43.0",
-    "prettier": "^2.5.1",
+    "prettier": "^3.3.3",
     "rimraf": "^5.0.1",
     "turbo": "^1.9.3"
   },
