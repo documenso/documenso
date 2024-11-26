@@ -64,6 +64,7 @@ export type CreateDocumentFromTemplateOptions = {
     signingOrder?: DocumentSigningOrder;
     language?: SupportedLanguageCodes;
     distributionMethod?: DocumentDistributionMethod;
+    typedSignatureEnabled?: boolean;
   };
   requestMetadata?: RequestMetadata;
 };
@@ -146,7 +147,7 @@ export const createDocumentFromTemplate = async ({
     return {
       templateRecipientId: templateRecipient.id,
       fields: templateRecipient.Field,
-      name: foundRecipient ? foundRecipient.name ?? '' : templateRecipient.name,
+      name: foundRecipient ? (foundRecipient.name ?? '') : templateRecipient.name,
       email: foundRecipient ? foundRecipient.email : templateRecipient.email,
       role: templateRecipient.role,
       signingOrder: foundRecipient?.signingOrder ?? templateRecipient.signingOrder,
@@ -196,6 +197,8 @@ export const createDocumentFromTemplate = async ({
               override?.language ||
               template.templateMeta?.language ||
               template.team?.teamGlobalSettings?.documentLanguage,
+            typedSignatureEnabled:
+              override?.typedSignatureEnabled ?? template.templateMeta?.typedSignatureEnabled,
           },
         },
         Recipient: {

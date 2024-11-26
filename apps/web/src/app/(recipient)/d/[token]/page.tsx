@@ -12,7 +12,6 @@ import { extractDocumentAuthMethods } from '@documenso/lib/utils/document-auth';
 
 import { DocumentAuthProvider } from '~/app/(signing)/sign/[token]/document-auth-provider';
 import { SigningProvider } from '~/app/(signing)/sign/[token]/provider';
-import { truncateTitle } from '~/helpers/truncate-title';
 
 import { DirectTemplatePageView } from './direct-template';
 import { DirectTemplateAuthPageView } from './signing-auth-page';
@@ -72,8 +71,11 @@ export default async function TemplatesDirectPage({ params }: TemplatesDirectPag
         user={user}
       >
         <div className="mx-auto -mt-4 w-full max-w-screen-xl px-4 md:px-8">
-          <h1 className="mt-4 truncate text-2xl font-semibold md:text-3xl" title={template.title}>
-            {truncateTitle(template.title)}
+          <h1
+            className="mt-4 block max-w-[20rem] truncate text-2xl font-semibold md:max-w-[30rem] md:text-3xl"
+            title={template.title}
+          >
+            {template.title}
           </h1>
 
           <div className="text-muted-foreground mb-8 mt-2.5 flex items-center gap-x-2">

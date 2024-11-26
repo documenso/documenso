@@ -3,7 +3,7 @@ const { fontFamily } = require('tailwindcss/defaultTheme');
 
 /** @type {import('tailwindcss').Config} */
 module.exports = {
-  darkMode: ['class'],
+  darkMode: ['variant', '&:is(.dark:not(.dark-mode-disabled) *)'],
   content: ['src/**/*.{ts,tsx}'],
   theme: {
     extend: {
@@ -108,6 +108,9 @@ module.exports = {
         'gradient-conic': 'conic-gradient(from 180deg at 50% 50%, var(--tw-gradient-stops))',
       },
       borderRadius: {
+        DEFAULT: 'calc(var(--radius) - 3px)',
+        '2xl': 'calc(var(--radius) + 4px)',
+        xl: 'calc(var(--radius) + 2px)',
         lg: 'var(--radius)',
         md: 'calc(var(--radius) - 2px)',
         sm: 'calc(var(--radius) - 4px)',

@@ -121,7 +121,10 @@ export const DocumentLogsPageView = async ({ params, team }: DocumentLogsPageVie
 
       <div className="flex flex-col justify-between truncate sm:flex-row">
         <div>
-          <h1 className="mt-4 truncate text-2xl font-semibold md:text-3xl" title={document.title}>
+          <h1
+            className="mt-4 block max-w-[20rem] truncate text-2xl font-semibold md:max-w-[30rem] md:text-3xl"
+            title={document.title}
+          >
             {document.title}
           </h1>
 

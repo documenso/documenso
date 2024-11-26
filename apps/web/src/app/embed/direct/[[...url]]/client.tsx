@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useLayoutEffect, useState } from 'react';
 
 import { useSearchParams } from 'next/navigation';
 
@@ -14,7 +14,7 @@ import { DEFAULT_DOCUMENT_DATE_FORMAT } from '@documenso/lib/constants/date-form
 import { PDF_VIEWER_PAGE_SELECTOR } from '@documenso/lib/constants/pdf-viewer';
 import { DEFAULT_DOCUMENT_TIME_ZONE } from '@documenso/lib/constants/time-zones';
 import { validateFieldsInserted } from '@documenso/lib/utils/fields';
-import type { DocumentMeta, Recipient, TemplateMeta } from '@documenso/prisma/client';
+import type { DocumentMeta, Recipient, Signature, TemplateMeta } from '@documenso/prisma/client';
 import { type DocumentData, type Field, FieldType } from '@documenso/prisma/client';
 import { trpc } from '@documenso/trpc/react';
 import type {
@@ -38,6 +38,7 @@ import { Logo } from '~/components/branding/logo';
 import { EmbedClientLoading } from '../../client-loading';
 import { EmbedDocumentCompleted } from '../../completed';
 import { EmbedDocumentFields } from '../../document-fields';
+import { injectCss } from '../../util';
 import { ZDirectTemplateEmbedDataSchema } from './schema';
 
 export type EmbedDirectTemplateClientPageProps = {
@@ -47,6 +48,8 @@ export type EmbedDirectTemplateClientPageProps = {
   recipient: Recipient;
   fields: Field[];
   metadata?: DocumentMeta | TemplateMeta | null;
+  hidePoweredBy?: boolean;
+  isPlatformOrEnterprise?: boolean;
 };
 
 export const EmbedDirectTemplateClientPage = ({
@@ -56,6 +59,8 @@ export const EmbedDirectTemplateClientPage = ({
   recipient,
   fields,
   metadata,
+  hidePoweredBy = false,
+  isPlatformOrEnterprise = false,
 }: EmbedDirectTemplateClientPageProps) => {
   const { _ } = useLingui();
   const { toast } = useToast();
@@ -108,9 +113,9 @@ export const EmbedDirectTemplateClientPage = ({
             created: new Date(),
             recipientId: 1,
             fieldId: 1,
-            signatureImageAsBase64: payload.value,
-            typedSignature: null,
-          };
+            signatureImageAsBase64: payload.value.startsWith('data:') ? payload.value : null,
+            typedSignature: payload.value.startsWith('data:') ? null : payload.value,
+          } satisfies Signature;
         }
 
         if (field.type === FieldType.DATE) {
@@ -249,7 +254,7 @@ export const EmbedDirectTemplateClientPage = ({
     }
   };
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     const hash = window.location.hash.slice(1);
 
     try {
@@ -263,6 +268,17 @@ export const EmbedDirectTemplateClientPage = ({
       if (data.name) {
         setFullName(data.name);
         setIsNameLocked(!!data.lockName);
+      }
+
+      if (data.darkModeDisabled) {
+        document.documentElement.classList.add('dark-mode-disabled');
+      }
+
+      if (isPlatformOrEnterprise) {
+        injectCss({
+          css: data.css,
+          cssVars: data.cssVars,
+        });
       }
     } catch (err) {
       console.error(err);
@@ -296,8 +312,8 @@ export const EmbedDirectTemplateClientPage = ({
           fieldId: 1,
           recipientId: 1,
           created: new Date(),
-          typedSignature: null,
-          signatureImageAsBase64: signature,
+          signatureImageAsBase64: signature?.startsWith('data:') ? signature : null,
+          typedSignature: signature?.startsWith('data:') ? null : signature,
         }}
       />
     );
@@ -452,10 +468,12 @@ export const EmbedDirectTemplateClientPage = ({
         />
       </div>
 
-      <div className="bg-primary text-primary-foreground fixed bottom-0 left-0 z-40 rounded-tr px-2 py-1 text-xs font-medium opacity-60 hover:opacity-100">
-        <span>Powered by</span>
-        <Logo className="ml-2 inline-block h-[14px]" />
-      </div>
+      {!hidePoweredBy && (
+        <div className="bg-primary text-primary-foreground fixed bottom-0 left-0 z-40 rounded-tr px-2 py-1 text-xs font-medium opacity-60 hover:opacity-100">
+          <span>Powered by</span>
+          <Logo className="ml-2 inline-block h-[14px]" />
+        </div>
+      )}
     </div>
   );
 };

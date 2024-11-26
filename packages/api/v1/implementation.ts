@@ -302,6 +302,7 @@ export const ApiContractV1Implementation = createNextRoute(ApiContractV1, {
         redirectUrl: body.meta.redirectUrl,
         signingOrder: body.meta.signingOrder,
         language: body.meta.language,
+        typedSignatureEnabled: body.meta.typedSignatureEnabled,
         requestMetadata: extractNextApiRequestMetadata(args.req),
       });
 

@@ -4,7 +4,6 @@ import { TEAM_MEMBER_ROLE_PERMISSIONS_MAP } from '@documenso/lib/constants/teams
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import { prisma } from '@documenso/prisma';
 import { Prisma } from '@documenso/prisma/client';
-import type { DocumentVisibility } from '@documenso/prisma/client';
 
 export type UpdateTeamOptions = {
   userId: number;
@@ -12,8 +11,6 @@ export type UpdateTeamOptions = {
   data: {
     name?: string;
     url?: string;
-    documentVisibility?: DocumentVisibility;
-    includeSenderDetails?: boolean;
   };
 };
 
@@ -45,18 +42,6 @@ export const updateTeam = async ({ userId, teamId, data }: UpdateTeamOptions) =>
         data: {
           url: data.url,
           name: data.name,
-          teamGlobalSettings: {
-            upsert: {
-              create: {
-                documentVisibility: data.documentVisibility,
-                includeSenderDetails: data.includeSenderDetails,
-              },
-              update: {
-                documentVisibility: data.documentVisibility,
-                includeSenderDetails: data.includeSenderDetails,
-              },
-            },
-          },
         },
       });
 

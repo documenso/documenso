@@ -17,19 +17,17 @@ test('[TEAMS]: update the default document visibility in the team global setting
     page,
     email: team.owner.email,
     password: 'password',
-    redirectPath: `/t/${team.url}/settings`,
+    redirectPath: `/t/${team.url}/settings/preferences`,
   });
 
-  await page.getByRole('combobox').click();
+  // !: Brittle selector
+  await page.getByRole('combobox').first().click();
   await page.getByRole('option', { name: 'Admin' }).click();
-  await page.getByRole('button', { name: 'Update team' }).click();
+  await page.getByRole('button', { name: 'Save' }).first().click();
 
   const toast = page.locator('li[role="status"][data-state="open"]').first();
   await expect(toast).toBeVisible();
-  await expect(toast.getByText('Success', { exact: true })).toBeVisible();
-  await expect(
-    toast.getByText('Your team has been successfully updated.', { exact: true }),
-  ).toBeVisible();
+  await expect(toast.getByText('Document preferences updated', { exact: true })).toBeVisible();
 });
 
 test('[TEAMS]: update the sender details in the team global settings', async ({ page }) => {
@@ -41,7 +39,7 @@ test('[TEAMS]: update the sender details in the team global settings', async ({ 
     page,
     email: team.owner.email,
     password: 'password',
-    redirectPath: `/t/${team.url}/settings`,
+    redirectPath: `/t/${team.url}/settings/preferences`,
   });
 
   const checkbox = page.getByLabel('Send on Behalf of Team');
@@ -49,14 +47,11 @@ test('[TEAMS]: update the sender details in the team global settings', async ({ 
 
   await expect(checkbox).toBeChecked();
 
-  await page.getByRole('button', { name: 'Update team' }).click();
+  await page.getByRole('button', { name: 'Save' }).first().click();
 
   const toast = page.locator('li[role="status"][data-state="open"]').first();
   await expect(toast).toBeVisible();
-  await expect(toast.getByText('Success', { exact: true })).toBeVisible();
-  await expect(
-    toast.getByText('Your team has been successfully updated.', { exact: true }),
-  ).toBeVisible();
+  await expect(toast.getByText('Document preferences updated', { exact: true })).toBeVisible();
 
   await expect(checkbox).toBeChecked();
 });
