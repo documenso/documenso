@@ -33,6 +33,7 @@ import {
   ZSetSigningOrderForTemplateMutationSchema,
   ZToggleTemplateDirectLinkMutationSchema,
   ZUpdateTemplateSettingsMutationSchema,
+  ZUpdateTemplateTypedSignatureSettingsMutationSchema,
 } from './schema';
 
 export const templateRouter = router({
@@ -248,5 +249,49 @@ export const templateRouter = router({
         teamId,
         userId,
       });
+    }),
+
+  updateTemplateTypedSignatureSettings: authenticatedProcedure
+    .input(ZUpdateTemplateTypedSignatureSettingsMutationSchema)
+    .mutation(async ({ input, ctx }) => {
+      try {
+        const { templateId, teamId, typedSignatureEnabled } = input;
+
+        const template = await getTemplateById({
+          id: templateId,
+          teamId,
+          userId: ctx.user.id,
+        }).catch(() => null);
+
+        if (!template) {
+          throw new TRPCError({
+            code: 'NOT_FOUND',
+            message: 'Template not found',
+          });
+        }
+
+        return await updateTemplateSettings({
+          templateId,
+          teamId,
+          userId: ctx.user.id,
+          data: {},
+          meta: {
+            typedSignatureEnabled,
+          },
+          requestMetadata: extractNextApiRequestMetadata(ctx.req),
+        });
+      } catch (err) {
+        console.error(err);
+
+        if (err instanceof TRPCError) {
+          throw err;
+        }
+
+        throw new TRPCError({
+          code: 'BAD_REQUEST',
+          message:
+            'We were unable to update the settings for this template. Please try again later.',
+        });
+      }
     }),
 });

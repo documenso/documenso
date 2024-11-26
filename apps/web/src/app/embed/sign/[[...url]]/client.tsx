@@ -192,8 +192,8 @@ export const EmbedSignDocumentClientPage = ({
           fieldId: 1,
           recipientId: 1,
           created: new Date(),
-          typedSignature: null,
-          signatureImageAsBase64: signature,
+          signatureImageAsBase64: signature?.startsWith('data:') ? signature : null,
+          typedSignature: signature?.startsWith('data:') ? null : signature,
         }}
       />
     );
@@ -218,7 +218,7 @@ export const EmbedSignDocumentClientPage = ({
           className="group/document-widget fixed bottom-8 left-0 z-50 h-fit w-full flex-shrink-0 px-6 md:sticky md:top-4 md:z-auto md:w-[350px] md:px-0"
           data-expanded={isExpanded || undefined}
         >
-          <div className="border-border bg-widget flex w-full  flex-col rounded-xl border px-4 py-4 md:py-6">
+          <div className="border-border bg-widget flex w-full flex-col rounded-xl border px-4 py-4 md:py-6">
             {/* Header */}
             <div>
               <div className="flex items-center justify-between gap-x-2">
