@@ -310,7 +310,7 @@ msgstr "Aktive Abonnements"
 msgid "Add"
 msgstr "Hinzufügen"
 
-#: apps/web/src/app/(dashboard)/documents/[id]/edit-document.tsx:177
+#: apps/web/src/app/(dashboard)/documents/[id]/edit-document.tsx:192
 #: apps/web/src/app/(dashboard)/templates/[id]/edit/edit-template.tsx:88
 msgid "Add all relevant fields for each recipient."
 msgstr "Fügen Sie alle relevanten Felder für jeden Empfänger hinzu."
@@ -331,7 +331,7 @@ msgstr "Fügen Sie einen Authenticator hinzu, um als sekundäre Authentifizierun
 msgid "Add email"
 msgstr "E-Mail hinzufügen"
 
-#: apps/web/src/app/(dashboard)/documents/[id]/edit-document.tsx:176
+#: apps/web/src/app/(dashboard)/documents/[id]/edit-document.tsx:191
 #: apps/web/src/app/(dashboard)/templates/[id]/edit/edit-template.tsx:87
 msgid "Add Fields"
 msgstr "Felder hinzufügen"
@@ -349,7 +349,7 @@ msgstr "Passkey hinzufügen"
 msgid "Add Placeholders"
 msgstr "Platzhalter hinzufügen"
 
-#: apps/web/src/app/(dashboard)/documents/[id]/edit-document.tsx:171
+#: apps/web/src/app/(dashboard)/documents/[id]/edit-document.tsx:186
 msgid "Add Signers"
 msgstr "Unterzeichner hinzufügen"
 
@@ -361,7 +361,7 @@ msgstr "Unterzeichner hinzufügen"
 msgid "Add team email"
 msgstr "Team-E-Mail hinzufügen"
 
-#: apps/web/src/app/(dashboard)/documents/[id]/edit-document.tsx:172
+#: apps/web/src/app/(dashboard)/documents/[id]/edit-document.tsx:187
 msgid "Add the people who will sign the document."
 msgstr "Fügen Sie die Personen hinzu, die das Dokument unterschreiben werden."
 
@@ -472,13 +472,13 @@ msgstr "Eine E-Mail, in der die Übertragung dieses Teams angefordert wird, wurd
 msgid "An error occurred"
 msgstr "Ein Fehler ist aufgetreten"
 
-#: apps/web/src/app/(dashboard)/documents/[id]/edit-document.tsx:269
+#: apps/web/src/app/(dashboard)/documents/[id]/edit-document.tsx:284
 #: apps/web/src/app/(dashboard)/templates/[id]/edit/edit-template.tsx:201
 #: apps/web/src/app/(dashboard)/templates/[id]/edit/edit-template.tsx:235
 msgid "An error occurred while adding signers."
 msgstr "Ein Fehler ist aufgetreten, während Unterzeichner hinzugefügt wurden."
 
-#: apps/web/src/app/(dashboard)/documents/[id]/edit-document.tsx:304
+#: apps/web/src/app/(dashboard)/documents/[id]/edit-document.tsx:330
 msgid "An error occurred while adding the fields."
 msgstr "Ein Fehler ist aufgetreten, während die Felder hinzugefügt wurden."
 
@@ -544,7 +544,7 @@ msgstr "Ein Fehler ist aufgetreten, während die Unterschrift entfernt wurde."
 msgid "An error occurred while removing the text."
 msgstr "Ein Fehler ist aufgetreten, während der Text entfernt wurde."
 
-#: apps/web/src/app/(dashboard)/documents/[id]/edit-document.tsx:350
+#: apps/web/src/app/(dashboard)/documents/[id]/edit-document.tsx:376
 msgid "An error occurred while sending the document."
 msgstr "Ein Fehler ist aufgetreten, während das Dokument gesendet wurde."
 
@@ -569,7 +569,7 @@ msgstr "Ein Fehler ist aufgetreten, während das Dokument unterzeichnet wurde."
 msgid "An error occurred while trying to create a checkout session."
 msgstr "Ein Fehler ist aufgetreten, während versucht wurde, eine Checkout-Sitzung zu erstellen."
 
-#: apps/web/src/app/(dashboard)/documents/[id]/edit-document.tsx:235
+#: apps/web/src/app/(dashboard)/documents/[id]/edit-document.tsx:250
 #: apps/web/src/app/(dashboard)/templates/[id]/edit/edit-template.tsx:170
 msgid "An error occurred while updating the document settings."
 msgstr "Ein Fehler ist aufgetreten, während die Dokumenteinstellungen aktualisiert wurden."
@@ -880,7 +880,7 @@ msgstr "Wählen Sie einen vorhandenen Empfänger unten aus, um fortzufahren"
 msgid "Choose Direct Link Recipient"
 msgstr "Wählen Sie den direkten Link Empfänger"
 
-#: apps/web/src/app/(dashboard)/documents/[id]/edit-document.tsx:182
+#: apps/web/src/app/(dashboard)/documents/[id]/edit-document.tsx:197
 msgid "Choose how the document will reach recipients"
 msgstr "Wählen Sie, wie das Dokument die Empfänger erreichen soll"
 
@@ -977,7 +977,7 @@ msgstr "Abgeschlossene Dokumente"
 msgid "Completed Documents"
 msgstr "Abgeschlossene Dokumente"
 
-#: apps/web/src/app/(dashboard)/documents/[id]/edit-document.tsx:167
+#: apps/web/src/app/(dashboard)/documents/[id]/edit-document.tsx:182
 msgid "Configure general settings for the document."
 msgstr "Konfigurieren Sie die allgemeinen Einstellungen für das Dokument."
 
@@ -1430,7 +1430,7 @@ msgstr "Das Deaktivieren der direkten Link-Signatur verhindert, dass jemand auf 
 msgid "Display your name and email in documents"
 msgstr "Zeigen Sie Ihren Namen und Ihre E-Mail in Dokumenten an"
 
-#: apps/web/src/app/(dashboard)/documents/[id]/edit-document.tsx:181
+#: apps/web/src/app/(dashboard)/documents/[id]/edit-document.tsx:196
 msgid "Distribute Document"
 msgstr "Dokument verteilen"
 
@@ -1547,7 +1547,7 @@ msgstr "Dokument abgelehnt"
 msgid "Document resealed"
 msgstr "Dokument wieder versiegelt"
 
-#: apps/web/src/app/(dashboard)/documents/[id]/edit-document.tsx:327
+#: apps/web/src/app/(dashboard)/documents/[id]/edit-document.tsx:353
 msgid "Document sent"
 msgstr "Dokument gesendet"
 
@@ -1811,10 +1811,10 @@ msgstr "Geben Sie hier Ihren Text ein"
 
 #: apps/web/src/app/(dashboard)/admin/documents/[id]/admin-actions.tsx:41
 #: apps/web/src/app/(dashboard)/admin/users/[id]/page.tsx:78
-#: apps/web/src/app/(dashboard)/documents/[id]/edit-document.tsx:234
-#: apps/web/src/app/(dashboard)/documents/[id]/edit-document.tsx:268
-#: apps/web/src/app/(dashboard)/documents/[id]/edit-document.tsx:303
-#: apps/web/src/app/(dashboard)/documents/[id]/edit-document.tsx:349
+#: apps/web/src/app/(dashboard)/documents/[id]/edit-document.tsx:249
+#: apps/web/src/app/(dashboard)/documents/[id]/edit-document.tsx:283
+#: apps/web/src/app/(dashboard)/documents/[id]/edit-document.tsx:329
+#: apps/web/src/app/(dashboard)/documents/[id]/edit-document.tsx:375
 #: apps/web/src/app/(dashboard)/documents/move-document-dialog.tsx:57
 #: apps/web/src/app/(dashboard)/documents/upload-document.tsx:106
 #: apps/web/src/app/(dashboard)/documents/upload-document.tsx:112
@@ -1920,7 +1920,7 @@ msgstr "Haben Sie Ihr Passwort vergessen?"
 msgid "Full Name"
 msgstr "Vollständiger Name"
 
-#: apps/web/src/app/(dashboard)/documents/[id]/edit-document.tsx:166
+#: apps/web/src/app/(dashboard)/documents/[id]/edit-document.tsx:181
 #: apps/web/src/app/(dashboard)/templates/[id]/edit/edit-template.tsx:77
 #: apps/web/src/app/(recipient)/d/[token]/direct-template.tsx:62
 #: apps/web/src/components/(teams)/settings/layout/desktop-nav.tsx:44
@@ -2206,7 +2206,7 @@ msgstr "Möchten Sie Ihr eigenes öffentliches Profil mit Vereinbarungen haben?"
 msgid "Link template"
 msgstr "Vorlage verlinken"
 
-#: apps/web/src/app/(dashboard)/documents/[id]/edit-document.tsx:338
+#: apps/web/src/app/(dashboard)/documents/[id]/edit-document.tsx:364
 msgid "Links Generated"
 msgstr "Links generiert"
 
@@ -3339,7 +3339,7 @@ msgstr "Anmeldung..."
 msgid "Signing Links"
 msgstr "Signierlinks"
 
-#: apps/web/src/app/(dashboard)/documents/[id]/edit-document.tsx:339
+#: apps/web/src/app/(dashboard)/documents/[id]/edit-document.tsx:365
 msgid "Signing links have been generated for this document."
 msgstr "Unterzeichnungslinks wurden für dieses Dokument erstellt."
 
@@ -5045,7 +5045,7 @@ msgstr "Ihr Dokument wurde erfolgreich aus der Vorlage erstellt."
 msgid "Your document has been re-sent successfully."
 msgstr "Ihr Dokument wurde erfolgreich erneut gesendet."
 
-#: apps/web/src/app/(dashboard)/documents/[id]/edit-document.tsx:328
+#: apps/web/src/app/(dashboard)/documents/[id]/edit-document.tsx:354
 msgid "Your document has been sent successfully."
 msgstr "Ihr Dokument wurde erfolgreich gesendet."
 

@@ -143,6 +143,10 @@ msgstr "{prefix} hat das Dokument ins Team verschoben"
 msgid "{prefix} opened the document"
 msgstr "{prefix} hat das Dokument geöffnet"
 
+#: packages/lib/utils/document-audit-logs.ts:368
+msgid "{prefix} rejected the document: {0}"
+msgstr ""
+
 #: packages/lib/utils/document-audit-logs.ts:267
 msgid "{prefix} removed a field"
 msgstr "{prefix} hat ein Feld entfernt"
@@ -151,11 +155,15 @@ msgstr "{prefix} hat ein Feld entfernt"
 msgid "{prefix} removed a recipient"
 msgstr "{prefix} hat einen Empfänger entfernt"
 
-#: packages/lib/utils/document-audit-logs.ts:365
+#: packages/lib/utils/document-audit-logs.ts:355
 msgid "{prefix} resent an email to {0}"
 msgstr "{prefix} hat eine E-Mail an {0} erneut gesendet"
 
-#: packages/lib/utils/document-audit-logs.ts:366
+#: packages/lib/utils/document-audit-logs.ts:364
+msgid "{prefix} self-signed the document"
+msgstr ""
+
+#: packages/lib/utils/document-audit-logs.ts:356
 msgid "{prefix} sent an email to {0}"
 msgstr "{prefix} hat eine E-Mail an {0} gesendet"
 
@@ -443,8 +451,8 @@ msgstr "Admin"
 msgid "Advanced Options"
 msgstr "Erweiterte Optionen"
 
-#: packages/ui/primitives/document-flow/add-fields.tsx:576
-#: packages/ui/primitives/template-flow/add-template-fields.tsx:409
+#: packages/ui/primitives/document-flow/add-fields.tsx:579
+#: packages/ui/primitives/template-flow/add-template-fields.tsx:406
 msgid "Advanced settings"
 msgstr "Erweiterte Einstellungen"
 
@@ -589,8 +597,8 @@ msgstr "Abgeschlossenes Dokument"
 msgid "Configure Direct Recipient"
 msgstr "Direkten Empfänger konfigurieren"
 
-#: packages/ui/primitives/document-flow/add-fields.tsx:577
-#: packages/ui/primitives/template-flow/add-template-fields.tsx:410
+#: packages/ui/primitives/document-flow/add-fields.tsx:580
+#: packages/ui/primitives/template-flow/add-template-fields.tsx:407
 msgid "Configure the {0} field"
 msgstr "Konfigurieren Sie das Feld {0}"
 
@@ -651,7 +659,7 @@ msgstr "Konto erstellen"
 msgid "Custom Text"
 msgstr "Benutzerdefinierter Text"
 
-#: packages/ui/primitives/document-flow/add-fields.tsx:934
+#: packages/ui/primitives/document-flow/add-fields.tsx:933
 #: packages/ui/primitives/document-flow/types.ts:53
 #: packages/ui/primitives/template-flow/add-template-fields.tsx:697
 msgid "Date"
@@ -697,8 +705,8 @@ msgstr "Die Authentifizierung für den Dokumentenzugriff wurde aktualisiert"
 msgid "Document Cancelled"
 msgstr "Dokument storniert"
 
-#: packages/lib/utils/document-audit-logs.ts:369
-#: packages/lib/utils/document-audit-logs.ts:370
+#: packages/lib/utils/document-audit-logs.ts:359
+#: packages/lib/utils/document-audit-logs.ts:360
 msgid "Document completed"
 msgstr "Dokument abgeschlossen"
 
@@ -752,6 +760,10 @@ msgstr "Dokument geöffnet"
 msgid "Document pending email"
 msgstr "E-Mail über ausstehende Dokumente"
 
+#: packages/lib/utils/document-audit-logs.ts:367
+msgid "Document rejected"
+msgstr ""
+
 #: packages/email/template-components/template-document-rejected.tsx:21
 msgid "Document Rejected"
 msgstr "Dokument Abgelehnt"
@@ -792,8 +804,8 @@ msgstr "Entwurf"
 msgid "Drag & drop your PDF here."
 msgstr "Ziehen Sie Ihr PDF hierher."
 
-#: packages/ui/primitives/document-flow/add-fields.tsx:1065
-#: packages/ui/primitives/template-flow/add-template-fields.tsx:827
+#: packages/ui/primitives/document-flow/add-fields.tsx:1064
+#: packages/ui/primitives/template-flow/add-template-fields.tsx:820
 msgid "Dropdown"
 msgstr "Dropdown"
 
@@ -802,7 +814,7 @@ msgid "Dropdown options"
 msgstr "Dropdown-Optionen"
 
 #: packages/lib/constants/document.ts:28
-#: packages/ui/primitives/document-flow/add-fields.tsx:882
+#: packages/ui/primitives/document-flow/add-fields.tsx:881
 #: packages/ui/primitives/document-flow/add-signature.tsx:272
 #: packages/ui/primitives/document-flow/add-signers.tsx:512
 #: packages/ui/primitives/document-flow/add-signers.tsx:519
@@ -821,11 +833,11 @@ msgstr "E-Mail ist erforderlich"
 msgid "Email Options"
 msgstr "E-Mail-Optionen"
 
-#: packages/lib/utils/document-audit-logs.ts:363
+#: packages/lib/utils/document-audit-logs.ts:353
 msgid "Email resent"
 msgstr "E-Mail erneut gesendet"
 
-#: packages/lib/utils/document-audit-logs.ts:363
+#: packages/lib/utils/document-audit-logs.ts:353
 msgid "Email sent"
 msgstr "E-Mail gesendet"
 
@@ -842,7 +854,7 @@ msgstr "Direktlink-Signierung aktivieren"
 msgid "Enable signing order"
 msgstr "Aktiviere die Signaturreihenfolge"
 
-#: packages/ui/primitives/document-flow/add-fields.tsx:802
+#: packages/ui/primitives/document-flow/add-fields.tsx:801
 msgid "Enable Typed Signatures"
 msgstr "Aktivieren Sie getippte Unterschriften"
 
@@ -1020,7 +1032,7 @@ msgstr "Nachricht <0>(Optional)</0>"
 msgid "Min"
 msgstr "Min"
 
-#: packages/ui/primitives/document-flow/add-fields.tsx:908
+#: packages/ui/primitives/document-flow/add-fields.tsx:907
 #: packages/ui/primitives/document-flow/add-signature.tsx:298
 #: packages/ui/primitives/document-flow/add-signers.tsx:550
 #: packages/ui/primitives/document-flow/add-signers.tsx:556
@@ -1043,8 +1055,8 @@ msgstr "Muss unterzeichnen"
 msgid "Needs to view"
 msgstr "Muss sehen"
 
-#: packages/ui/primitives/document-flow/add-fields.tsx:693
-#: packages/ui/primitives/template-flow/add-template-fields.tsx:511
+#: packages/ui/primitives/document-flow/add-fields.tsx:692
+#: packages/ui/primitives/template-flow/add-template-fields.tsx:504
 msgid "No recipient matching this description was found."
 msgstr "Kein passender Empfänger mit dieser Beschreibung gefunden."
 
@@ -1052,8 +1064,8 @@ msgstr "Kein passender Empfänger mit dieser Beschreibung gefunden."
 msgid "No recipients"
 msgstr "Keine Empfänger"
 
-#: packages/ui/primitives/document-flow/add-fields.tsx:708
-#: packages/ui/primitives/template-flow/add-template-fields.tsx:526
+#: packages/ui/primitives/document-flow/add-fields.tsx:707
+#: packages/ui/primitives/template-flow/add-template-fields.tsx:519
 msgid "No recipients with this role"
 msgstr "Keine Empfänger mit dieser Rolle"
 
@@ -1081,7 +1093,7 @@ msgstr "Kein Wert gefunden."
 msgid "None"
 msgstr "Keine"
 
-#: packages/ui/primitives/document-flow/add-fields.tsx:986
+#: packages/ui/primitives/document-flow/add-fields.tsx:985
 #: packages/ui/primitives/document-flow/types.ts:56
 #: packages/ui/primitives/template-flow/add-template-fields.tsx:749
 msgid "Number"
@@ -1200,7 +1212,6 @@ msgid "Receives copy"
 msgstr "Erhält Kopie"
 
 #: packages/lib/utils/document-audit-logs.ts:338
-#: packages/lib/utils/document-audit-logs.ts:353
 msgid "Recipient"
 msgstr "Empfänger"
 
@@ -1255,7 +1266,7 @@ msgstr "Erinnerung: Bitte {recipientActionVerb} dieses Dokument"
 msgid "Reminder: Please {recipientActionVerb} your document"
 msgstr "Erinnerung: Bitte {recipientActionVerb} dein Dokument"
 
-#: packages/ui/primitives/document-flow/add-fields.tsx:1117
+#: packages/ui/primitives/document-flow/add-fields.tsx:1116
 msgid "Remove"
 msgstr "Entfernen"
 
@@ -1312,6 +1323,10 @@ msgstr "Wählen Sie mindestens"
 msgid "Select default option"
 msgstr "Standardoption auswählen"
 
+#: packages/lib/utils/document-audit-logs.ts:363
+msgid "Self-signed document"
+msgstr ""
+
 #: packages/ui/primitives/document-flow/add-subject.tsx:82
 #: packages/ui/primitives/document-flow/add-subject.tsx:85
 #: packages/ui/primitives/document-flow/send-document-action-dialog.tsx:34
@@ -1365,6 +1380,7 @@ msgid "Show advanced settings"
 msgstr "Erweiterte Einstellungen anzeigen"
 
 #: packages/lib/constants/recipient-roles.ts:22
+#: packages/ui/primitives/document-flow/add-fields.tsx:1117
 msgid "Sign"
 msgstr "Unterschreiben"
 
@@ -1376,7 +1392,7 @@ msgstr "Dokument signieren"
 msgid "Sign In"
 msgstr "Anmelden"
 
-#: packages/ui/primitives/document-flow/add-fields.tsx:830
+#: packages/ui/primitives/document-flow/add-fields.tsx:829
 #: packages/ui/primitives/document-flow/add-signature.tsx:323
 #: packages/ui/primitives/document-flow/field-icon.tsx:52
 #: packages/ui/primitives/document-flow/types.ts:49
@@ -1463,7 +1479,7 @@ msgstr "Team-E-Mail für {teamName} auf Documenso entfernt"
 msgid "Template title"
 msgstr "Vorlagentitel"
 
-#: packages/ui/primitives/document-flow/add-fields.tsx:960
+#: packages/ui/primitives/document-flow/add-fields.tsx:959
 #: packages/ui/primitives/document-flow/types.ts:52
 #: packages/ui/primitives/template-flow/add-template-fields.tsx:723
 msgid "Text"

@@ -143,6 +143,10 @@ msgstr "{prefix} movió el documento al equipo"
 msgid "{prefix} opened the document"
 msgstr "{prefix} abrió el documento"
 
+#: packages/lib/utils/document-audit-logs.ts:368
+msgid "{prefix} rejected the document: {0}"
+msgstr ""
+
 #: packages/lib/utils/document-audit-logs.ts:267
 msgid "{prefix} removed a field"
 msgstr "{prefix} eliminó un campo"
@@ -151,11 +155,15 @@ msgstr "{prefix} eliminó un campo"
 msgid "{prefix} removed a recipient"
 msgstr "{prefix} eliminó un destinatario"
 
-#: packages/lib/utils/document-audit-logs.ts:365
+#: packages/lib/utils/document-audit-logs.ts:355
 msgid "{prefix} resent an email to {0}"
 msgstr "{prefix} reenviaron un correo electrónico a {0}"
 
-#: packages/lib/utils/document-audit-logs.ts:366
+#: packages/lib/utils/document-audit-logs.ts:364
+msgid "{prefix} self-signed the document"
+msgstr ""
+
+#: packages/lib/utils/document-audit-logs.ts:356
 msgid "{prefix} sent an email to {0}"
 msgstr "{prefix} envió un correo electrónico a {0}"
 
@@ -697,8 +705,8 @@ msgstr "Se actualizó la autenticación de acceso al documento"
 msgid "Document Cancelled"
 msgstr "Documento cancelado"
 
-#: packages/lib/utils/document-audit-logs.ts:369
-#: packages/lib/utils/document-audit-logs.ts:370
+#: packages/lib/utils/document-audit-logs.ts:359
+#: packages/lib/utils/document-audit-logs.ts:360
 msgid "Document completed"
 msgstr "Documento completado"
 
@@ -751,6 +759,10 @@ msgstr "Documento abierto"
 #: packages/ui/components/document/document-email-checkboxes.tsx:128
 msgid "Document pending email"
 msgstr "Correo electrónico de documento pendiente"
+
+#: packages/lib/utils/document-audit-logs.ts:367
+msgid "Document rejected"
+msgstr ""
 
 #: packages/email/template-components/template-document-rejected.tsx:21
 msgid "Document Rejected"
@@ -821,11 +833,11 @@ msgstr "Se requiere email"
 msgid "Email Options"
 msgstr "Opciones de correo electrónico"
 
-#: packages/lib/utils/document-audit-logs.ts:363
+#: packages/lib/utils/document-audit-logs.ts:353
 msgid "Email resent"
 msgstr "Correo electrónico reeenviado"
 
-#: packages/lib/utils/document-audit-logs.ts:363
+#: packages/lib/utils/document-audit-logs.ts:353
 msgid "Email sent"
 msgstr "Correo electrónico enviado"
 
@@ -1200,7 +1212,6 @@ msgid "Receives copy"
 msgstr "Recibe copia"
 
 #: packages/lib/utils/document-audit-logs.ts:338
-#: packages/lib/utils/document-audit-logs.ts:353
 msgid "Recipient"
 msgstr "Destinatario"
 
@@ -1312,6 +1323,10 @@ msgstr "Seleccionar al menos"
 msgid "Select default option"
 msgstr "Seleccionar opción predeterminada"
 
+#: packages/lib/utils/document-audit-logs.ts:363
+msgid "Self-signed document"
+msgstr ""
+
 #: packages/ui/primitives/document-flow/add-subject.tsx:82
 #: packages/ui/primitives/document-flow/add-subject.tsx:85
 #: packages/ui/primitives/document-flow/send-document-action-dialog.tsx:34
@@ -1365,6 +1380,7 @@ msgid "Show advanced settings"
 msgstr "Mostrar configuraciones avanzadas"
 
 #: packages/lib/constants/recipient-roles.ts:22
+#: packages/ui/primitives/document-flow/add-fields.tsx:1117
 msgid "Sign"
 msgstr "Firmar"
 
