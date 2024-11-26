@@ -73,7 +73,6 @@ export const TemplatePageView = async ({ params, team }: TemplatePageViewProps) 
 
   const mockedDocumentMeta = templateMeta
     ? {
-        typedSignatureEnabled: false,
         ...templateMeta,
         signingOrder: templateMeta.signingOrder || DocumentSigningOrder.SEQUENTIAL,
         documentId: 0,
@@ -155,7 +154,7 @@ export const TemplatePageView = async ({ params, team }: TemplatePageViewProps) 
                 </div>
               </div>
 
-              <p className="text-muted-foreground mt-2 px-4 text-sm ">
+              <p className="text-muted-foreground mt-2 px-4 text-sm">
                 <Trans>Manage and view template</Trans>
               </p>
 

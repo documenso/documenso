@@ -472,9 +472,12 @@ msgstr "Eine E-Mail, in der die Übertragung dieses Teams angefordert wird, wurd
 msgid "An error occurred"
 msgstr "Ein Fehler ist aufgetreten"
 
+#: apps/web/src/app/(dashboard)/templates/[id]/edit/edit-template.tsx:257
+msgid "An error occurred while adding fields."
+msgstr ""
+
 #: apps/web/src/app/(dashboard)/documents/[id]/edit-document.tsx:269
-#: apps/web/src/app/(dashboard)/templates/[id]/edit/edit-template.tsx:201
-#: apps/web/src/app/(dashboard)/templates/[id]/edit/edit-template.tsx:235
+#: apps/web/src/app/(dashboard)/templates/[id]/edit/edit-template.tsx:218
 msgid "An error occurred while adding signers."
 msgstr "Ein Fehler ist aufgetreten, während Unterzeichner hinzugefügt wurden."
 
@@ -570,7 +573,7 @@ msgid "An error occurred while trying to create a checkout session."
 msgstr "Ein Fehler ist aufgetreten, während versucht wurde, eine Checkout-Sitzung zu erstellen."
 
 #: apps/web/src/app/(dashboard)/documents/[id]/edit-document.tsx:235
-#: apps/web/src/app/(dashboard)/templates/[id]/edit/edit-template.tsx:170
+#: apps/web/src/app/(dashboard)/templates/[id]/edit/edit-template.tsx:187
 msgid "An error occurred while updating the document settings."
 msgstr "Ein Fehler ist aufgetreten, während die Dokumenteinstellungen aktualisiert wurden."
 
@@ -1470,7 +1473,7 @@ msgstr "Dokument abgebrochen"
 msgid "Document completed"
 msgstr "Dokument abgeschlossen"
 
-#: apps/web/src/app/embed/completed.tsx:16
+#: apps/web/src/app/embed/completed.tsx:17
 msgid "Document Completed!"
 msgstr "Dokument abgeschlossen!"
 
@@ -1606,7 +1609,7 @@ msgstr "Dokument wird dauerhaft gelöscht"
 msgid "Documents"
 msgstr "Dokumente"
 
-#: apps/web/src/app/(dashboard)/templates/[id]/template-page-view.tsx:195
+#: apps/web/src/app/(dashboard)/templates/[id]/template-page-view.tsx:194
 msgid "Documents created from template"
 msgstr "Dokumente erstellt aus Vorlage"
 
@@ -1687,7 +1690,7 @@ msgstr "Duplizieren"
 msgid "Edit"
 msgstr "Bearbeiten"
 
-#: apps/web/src/app/(dashboard)/templates/[id]/template-page-view.tsx:115
+#: apps/web/src/app/(dashboard)/templates/[id]/template-page-view.tsx:114
 msgid "Edit Template"
 msgstr "Vorlage bearbeiten"
 
@@ -1825,9 +1828,9 @@ msgstr "Geben Sie hier Ihren Text ein"
 #: apps/web/src/app/(dashboard)/documents/move-document-dialog.tsx:57
 #: apps/web/src/app/(dashboard)/documents/upload-document.tsx:106
 #: apps/web/src/app/(dashboard)/documents/upload-document.tsx:112
-#: apps/web/src/app/(dashboard)/templates/[id]/edit/edit-template.tsx:169
-#: apps/web/src/app/(dashboard)/templates/[id]/edit/edit-template.tsx:200
-#: apps/web/src/app/(dashboard)/templates/[id]/edit/edit-template.tsx:234
+#: apps/web/src/app/(dashboard)/templates/[id]/edit/edit-template.tsx:186
+#: apps/web/src/app/(dashboard)/templates/[id]/edit/edit-template.tsx:217
+#: apps/web/src/app/(dashboard)/templates/[id]/edit/edit-template.tsx:256
 #: apps/web/src/app/(dashboard)/templates/duplicate-template-dialog.tsx:51
 #: apps/web/src/app/(dashboard)/templates/move-template-dialog.tsx:56
 #: apps/web/src/app/(dashboard)/templates/use-template-dialog.tsx:175
@@ -2264,7 +2267,7 @@ msgstr "Verwalten Sie das Profil von {0}"
 msgid "Manage all teams you are currently associated with."
 msgstr "Verwalten Sie alle Teams, mit denen Sie derzeit verbunden sind."
 
-#: apps/web/src/app/(dashboard)/templates/[id]/template-page-view.tsx:159
+#: apps/web/src/app/(dashboard)/templates/[id]/template-page-view.tsx:158
 msgid "Manage and view template"
 msgstr "Vorlage verwalten und anzeigen"
 
@@ -3646,7 +3649,7 @@ msgstr "Teams beschränkt"
 #: apps/web/src/app/(dashboard)/templates/[id]/template-page-view-documents-table.tsx:39
 #: apps/web/src/app/(dashboard)/templates/[id]/template-page-view-documents-table.tsx:148
 #: apps/web/src/app/(dashboard)/templates/[id]/template-page-view-documents-table.tsx:228
-#: apps/web/src/app/(dashboard)/templates/[id]/template-page-view.tsx:146
+#: apps/web/src/app/(dashboard)/templates/[id]/template-page-view.tsx:145
 #: apps/web/src/components/(teams)/dialogs/invite-team-member-dialog.tsx:408
 #: apps/web/src/components/templates/manage-public-template-dialog.tsx:271
 msgid "Template"
@@ -3676,11 +3679,11 @@ msgstr "Vorlage wurde aktualisiert."
 msgid "Template moved"
 msgstr "Vorlage verschoben"
 
-#: apps/web/src/app/(dashboard)/templates/[id]/edit/edit-template.tsx:223
+#: apps/web/src/app/(dashboard)/templates/[id]/edit/edit-template.tsx:246
 msgid "Template saved"
 msgstr "Vorlage gespeichert"
 
-#: apps/web/src/app/(dashboard)/templates/[id]/template-page-view.tsx:87
+#: apps/web/src/app/(dashboard)/templates/[id]/template-page-view.tsx:86
 #: apps/web/src/app/(dashboard)/templates/templates-page-view.tsx:55
 #: apps/web/src/components/(dashboard)/common/command-menu.tsx:208
 #: apps/web/src/components/(dashboard)/layout/desktop-nav.tsx:22
@@ -3723,7 +3726,7 @@ msgstr "Der direkte Linkt wurde in die Zwischenablage kopiert"
 msgid "The document has been successfully moved to the selected team."
 msgstr "Das Dokument wurde erfolgreich in das ausgewählte Team verschoben."
 
-#: apps/web/src/app/embed/completed.tsx:29
+#: apps/web/src/app/embed/completed.tsx:30
 msgid "The document is now completed, please follow any instructions provided within the parent application."
 msgstr "Das Dokument ist jetzt abgeschlossen. Bitte folgen Sie allen Anweisungen, die in der übergeordneten Anwendung bereitgestellt werden."
 
@@ -4343,7 +4346,7 @@ msgstr "Die hochgeladene Datei ist zu klein"
 msgid "Uploaded file not an allowed file type"
 msgstr "Die hochgeladene Datei ist kein zulässiger Dateityp"
 
-#: apps/web/src/app/(dashboard)/templates/[id]/template-page-view.tsx:170
+#: apps/web/src/app/(dashboard)/templates/[id]/template-page-view.tsx:169
 msgid "Use"
 msgstr "Verwenden"
 
@@ -5155,7 +5158,7 @@ msgstr "Ihre Vorlage wurde erfolgreich gelöscht."
 msgid "Your template will be duplicated."
 msgstr "Ihre Vorlage wird dupliziert."
 
-#: apps/web/src/app/(dashboard)/templates/[id]/edit/edit-template.tsx:224
+#: apps/web/src/app/(dashboard)/templates/[id]/edit/edit-template.tsx:247
 msgid "Your templates has been saved successfully."
 msgstr "Ihre Vorlagen wurden erfolgreich gespeichert."
 
