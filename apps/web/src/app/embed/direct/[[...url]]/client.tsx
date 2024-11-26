@@ -14,7 +14,7 @@ import { DEFAULT_DOCUMENT_DATE_FORMAT } from '@documenso/lib/constants/date-form
 import { PDF_VIEWER_PAGE_SELECTOR } from '@documenso/lib/constants/pdf-viewer';
 import { DEFAULT_DOCUMENT_TIME_ZONE } from '@documenso/lib/constants/time-zones';
 import { validateFieldsInserted } from '@documenso/lib/utils/fields';
-import type { DocumentMeta, Recipient, TemplateMeta } from '@documenso/prisma/client';
+import type { DocumentMeta, Recipient, Signature, TemplateMeta } from '@documenso/prisma/client';
 import { type DocumentData, type Field, FieldType } from '@documenso/prisma/client';
 import { trpc } from '@documenso/trpc/react';
 import type {
@@ -113,9 +113,9 @@ export const EmbedDirectTemplateClientPage = ({
             created: new Date(),
             recipientId: 1,
             fieldId: 1,
-            signatureImageAsBase64: payload.value,
-            typedSignature: null,
-          };
+            signatureImageAsBase64: payload.value.startsWith('data:') ? payload.value : null,
+            typedSignature: payload.value.startsWith('data:') ? null : payload.value,
+          } satisfies Signature;
         }
 
         if (field.type === FieldType.DATE) {
@@ -312,8 +312,8 @@ export const EmbedDirectTemplateClientPage = ({
           fieldId: 1,
           recipientId: 1,
           created: new Date(),
-          typedSignature: null,
-          signatureImageAsBase64: signature,
+          signatureImageAsBase64: signature?.startsWith('data:') ? signature : null,
+          typedSignature: signature?.startsWith('data:') ? null : signature,
         }}
       />
     );

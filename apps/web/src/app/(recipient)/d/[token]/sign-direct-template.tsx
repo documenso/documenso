@@ -102,9 +102,9 @@ export const SignDirectTemplateForm = ({
             created: new Date(),
             recipientId: 1,
             fieldId: 1,
-            signatureImageAsBase64: value.value,
-            typedSignature: null,
-          };
+            signatureImageAsBase64: value.value.startsWith('data:') ? value.value : null,
+            typedSignature: value.value.startsWith('data:') ? null : value.value,
+          } satisfies Signature;
         }
 
         if (field.type === FieldType.DATE) {
