@@ -39,6 +39,8 @@ export type SignaturePadProps = Omit<HTMLAttributes<HTMLCanvasElement>, 'onChang
   disabled?: boolean;
   allowTypedSignature?: boolean;
   defaultValue?: string;
+
+  onValidityChange?: (isValid: boolean) => void;
 };
 
 export const SignaturePad = ({
@@ -48,6 +50,7 @@ export const SignaturePad = ({
   onChange,
   disabled = false,
   allowTypedSignature,
+  onValidityChange,
   ...props
 }: SignaturePadProps) => {
   const $el = useRef<HTMLCanvasElement>(null);
@@ -72,6 +75,29 @@ export const SignaturePad = ({
       },
     } satisfies StrokeOptions;
   }, []);
+
+  const isSignatureValid = () => {
+    if ($el.current) {
+      const ctx = $el.current.getContext('2d');
+
+      if (ctx) {
+        const imageData = ctx.getImageData(0, 0, $el.current.width, $el.current.height);
+        const data = imageData.data;
+        let filledPixels = 0;
+        const totalPixels = data.length / 4;
+
+        for (let i = 0; i < data.length; i += 4) {
+          if (data[i + 3] > 0) filledPixels++;
+        }
+
+        const filledPercentage = filledPixels / totalPixels;
+        const isValid = filledPercentage > 0.01; // 5%
+        onValidityChange?.(isValid);
+
+        return isValid;
+      }
+    }
+  };
 
   const onMouseDown = (event: MouseEvent | PointerEvent | TouchEvent) => {
     if (event.cancelable) {
@@ -162,6 +188,7 @@ export const SignaturePad = ({
         });
 
         onChange?.($el.current.toDataURL());
+        isSignatureValid();
         ctx.save();
       }
     }
