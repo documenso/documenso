@@ -88,7 +88,10 @@ export const TemplatePageView = async ({ params, team }: TemplatePageViewProps) 
 
       <div className="flex flex-row justify-between truncate">
         <div>
-          <h1 className="mt-4 truncate text-2xl font-semibold md:text-3xl" title={template.title}>
+          <h1
+            className="mt-4 block max-w-[20rem] truncate text-2xl font-semibold md:max-w-[30rem] md:text-3xl"
+            title={template.title}
+          >
             {template.title}
           </h1>
 

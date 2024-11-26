@@ -55,7 +55,10 @@ export const SigningPageView = ({
 
   return (
     <div className="mx-auto w-full max-w-screen-xl">
-      <h1 className="mt-4 truncate text-2xl font-semibold md:text-3xl" title={document.title}>
+      <h1
+        className="mt-4 block max-w-[20rem] truncate text-2xl font-semibold md:max-w-[30rem] md:text-3xl"
+        title={document.title}
+      >
         {document.title}
       </h1>
 
