@@ -123,7 +123,7 @@ export const profileRouter = router({
         const error = AppError.parseError(err);
 
         if (error.code !== AppErrorCode.UNKNOWN_ERROR) {
-          throw AppError.parseErrorToTRPCError(error);
+          throw error;
         }
 
         throw new TRPCError({

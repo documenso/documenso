@@ -66,7 +66,7 @@ export const authRouter = router({
       const error = AppError.parseError(err);
 
       if (error.code !== AppErrorCode.UNKNOWN_ERROR) {
-        throw AppError.parseErrorToTRPCError(error);
+        throw error;
       }
 
       let message =
@@ -118,7 +118,7 @@ export const authRouter = router({
       } catch (err) {
         console.error(err);
 
-        throw AppError.parseErrorToTRPCError(err);
+        throw err;
       }
     }),
 

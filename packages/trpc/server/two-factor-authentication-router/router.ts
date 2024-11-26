@@ -98,7 +98,7 @@ export const twoFactorAuthenticationRouter = router({
           console.error(err);
         }
 
-        throw AppError.parseErrorToTRPCError(err);
+        throw error;
       }
     }),
 });
