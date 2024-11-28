@@ -13,7 +13,9 @@ export const getTeamPrices = async () => {
   const priceIds = prices.map((price) => price.id);
 
   if (!monthlyPrice || !yearlyPrice) {
-    throw new AppError('INVALID_CONFIG', 'Missing monthly or yearly price');
+    throw new AppError('INVALID_CONFIG', {
+      message: 'Missing monthly or yearly price',
+    });
   }
 
   return {

@@ -26,7 +26,7 @@ export const getUserPublicProfile = async ({
   });
 
   if (!user) {
-    throw new AppError(AppErrorCode.NOT_FOUND, 'User not found');
+    throw new AppError(AppErrorCode.NOT_FOUND, { message: 'User not found' });
   }
 
   // Create and return the public profile.
@@ -39,7 +39,7 @@ export const getUserPublicProfile = async ({
     });
 
     if (!profile) {
-      throw new AppError(AppErrorCode.NOT_FOUND, 'Failed to create public profile');
+      throw new AppError(AppErrorCode.NOT_FOUND, { message: 'Failed to create public profile' });
     }
 
     return {

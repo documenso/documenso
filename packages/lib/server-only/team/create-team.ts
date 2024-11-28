@@ -87,7 +87,9 @@ export const createTeam = async ({
         });
 
         if (existingUserProfileWithUrl) {
-          throw new AppError(AppErrorCode.ALREADY_EXISTS, 'URL already taken.');
+          throw new AppError(AppErrorCode.ALREADY_EXISTS, {
+            message: 'URL already taken.',
+          });
         }
 
         await tx.team.create({
@@ -131,15 +133,21 @@ export const createTeam = async ({
       });
 
       if (existingUserProfileWithUrl) {
-        throw new AppError(AppErrorCode.ALREADY_EXISTS, 'URL already taken.');
+        throw new AppError(AppErrorCode.ALREADY_EXISTS, {
+          message: 'URL already taken.',
+        });
       }
 
       if (existingTeamWithUrl) {
-        throw new AppError(AppErrorCode.ALREADY_EXISTS, 'Team URL already exists.');
+        throw new AppError(AppErrorCode.ALREADY_EXISTS, {
+          message: 'Team URL already exists.',
+        });
       }
 
       if (!customerId) {
-        throw new AppError(AppErrorCode.UNKNOWN_ERROR, 'Missing customer ID for pending teams.');
+        throw new AppError(AppErrorCode.UNKNOWN_ERROR, {
+          message: 'Missing customer ID for pending teams.',
+        });
       }
 
       return await tx.teamPending.create({
@@ -166,7 +174,9 @@ export const createTeam = async ({
     const target = z.array(z.string()).safeParse(err.meta?.target);
 
     if (err.code === 'P2002' && target.success && target.data.includes('url')) {
-      throw new AppError(AppErrorCode.ALREADY_EXISTS, 'Team URL already exists.');
+      throw new AppError(AppErrorCode.ALREADY_EXISTS, {
+        message: 'Team URL already exists.',
+      });
     }
 
     throw err;

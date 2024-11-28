@@ -105,10 +105,9 @@ export const setRecipientsForDocument = async ({
     });
 
     if (!isDocumentEnterprise) {
-      throw new AppError(
-        AppErrorCode.UNAUTHORIZED,
-        'You do not have permission to set the action auth',
-      );
+      throw new AppError(AppErrorCode.UNAUTHORIZED, {
+        message: 'You do not have permission to set the action auth',
+      });
     }
   }
 
@@ -142,10 +141,9 @@ export const setRecipientsForDocument = async ({
       hasRecipientBeenChanged(existing, recipient) &&
       !canRecipientBeModified(existing, document.Field)
     ) {
-      throw new AppError(
-        AppErrorCode.INVALID_REQUEST,
-        'Cannot modify a recipient who has already interacted with the document',
-      );
+      throw new AppError(AppErrorCode.INVALID_REQUEST, {
+        message: 'Cannot modify a recipient who has already interacted with the document',
+      });
     }
 
     return {

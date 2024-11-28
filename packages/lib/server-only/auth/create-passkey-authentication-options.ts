@@ -40,7 +40,9 @@ export const createPasskeyAuthenticationOptions = async ({
     });
 
     if (!preferredPasskey) {
-      throw new AppError(AppErrorCode.NOT_FOUND, 'Requested passkey not found');
+      throw new AppError(AppErrorCode.NOT_FOUND, {
+        message: 'Requested passkey not found',
+      });
     }
   }
 

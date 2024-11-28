@@ -44,10 +44,9 @@ export const authRouter = router({
       const { name, email, password, signature, url } = input;
 
       if (IS_BILLING_ENABLED() && url && url.length < 6) {
-        throw new AppError(
-          AppErrorCode.PREMIUM_PROFILE_URL,
-          'Only subscribers can have a username shorter than 6 characters',
-        );
+        throw new AppError(AppErrorCode.PREMIUM_PROFILE_URL, {
+          message: 'Only subscribers can have a username shorter than 6 characters',
+        });
       }
 
       const user = await createUser({ name, email, password, signature, url });
@@ -66,7 +65,7 @@ export const authRouter = router({
       const error = AppError.parseError(err);
 
       if (error.code !== AppErrorCode.UNKNOWN_ERROR) {
-        throw AppError.parseErrorToTRPCError(error);
+        throw error;
       }
 
       let message =
@@ -118,7 +117,7 @@ export const authRouter = router({
       } catch (err) {
         console.error(err);
 
-        throw AppError.parseErrorToTRPCError(err);
+        throw err;
       }
     }),
 
