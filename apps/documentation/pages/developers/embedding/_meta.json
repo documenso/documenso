@@ -1,0 +1,9 @@
+{
+  "index": "Get Started",
+  "react": "React Integration",
+  "vue": "Vue Integration",
+  "svelte": "Svelte Integration",
+  "solid": "Solid Integration",
+  "preact": "Preact Integration",
+  "css-variables": "CSS Variables"
+}

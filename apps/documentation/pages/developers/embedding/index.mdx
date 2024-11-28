@@ -11,7 +11,11 @@ Our embedding feature lets you integrate our document signing experience into yo
 
 Embedding is currently available for all users on a **Teams Plan** and above, as well as **Early Adopter's** within a team (Early Adopters can create a team for free).
 
-In the future, we will roll out a **Platform Plan** that will offer additional enhancements for embedding, including the option to remove Documenso branding for a more customized experience.
+Our **Platform Plan** offers enhanced customization features including:
+
+- Custom CSS and styling variables
+- Dark mode controls
+- The removal of Documenso branding from the embedding experience
 
 ## How Embedding Works
 
@@ -21,6 +25,49 @@ Embedding with Documenso allows you to handle document signing in two main ways:
 2. **Using a Signing Token**: A more advanced option for those running rich integrations with Documenso already. Given a recipients signing token you can embed the signing experience in your application rather than direct the recipient to Documenso.
 
 _For most use-cases we recommend using direct templates, however if you have a need for a more advanced integration, we are happy to help you get started._
+
+## Customization Options
+
+### Styling and Theming
+
+Platform customers have access to advanced styling options to customize the embedding experience:
+
+1. **Custom CSS**: You can provide custom CSS to style the embedded component:
+
+```jsx
+<EmbedDirectTemplate
+  token={token}
+  css={`
+    .documenso-embed {
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+  `}
+/>
+```
+
+2. **CSS Variables**: Fine-tune the appearance using CSS variables for colors, spacing, and more:
+
+```jsx
+<EmbedDirectTemplate
+  token={token}
+  cssVars={{
+    colorPrimary: '#0000FF',
+    colorBackground: '#F5F5F5',
+    borderRadius: '8px',
+  }}
+/>
+```
+
+For a complete list of available CSS variables and their usage, see our [CSS Variables](/developers/embedding/css-variables) documentation.
+
+3. **Dark Mode Control**: Disable dark mode if it doesn't match your application's theme:
+
+```jsx
+<EmbedDirectTemplate token={token} darkModeDisabled={true} />
+```
+
+These customization options are available for both Direct Templates and Signing Token embeds.
 
 ## Supported Frameworks
 
@@ -120,12 +167,11 @@ Once you've obtained the appropriate tokens, you can integrate the signing exper
 
 If you're using **web components**, the integration process is slightly different. Keep in mind that web components are currently less tested but can still provide flexibility for general use cases.
 
-## Stay Tuned for the Platform Plan
+## Related
 
-While embedding is already a powerful tool, we're working on a **Platform Plan** that will introduce even more functionality. This plan will offer:
-
-- Additional customization options
-- The ability to remove Documenso branding
-- Additional controls for the signing experience
-
-More details will be shared as we approach the release.
+- [React Integration](/developers/embedding/react)
+- [Vue Integration](/developers/embedding/vue)
+- [Svelte Integration](/developers/embedding/svelte)
+- [Solid Integration](/developers/embedding/solid)
+- [Preact Integration](/developers/embedding/preact)
+- [CSS Variables](/developers/embedding/css-variables)
