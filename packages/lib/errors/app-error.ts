@@ -47,9 +47,29 @@ export const ZAppErrorJsonSchema = z.object({
   code: z.string(),
   message: z.string().optional(),
   userMessage: z.string().optional(),
+  statusCode: z.number().optional(),
 });
 
 export type TAppErrorJsonSchema = z.infer<typeof ZAppErrorJsonSchema>;
+
+type AppErrorOptions = {
+  /**
+   * An internal message for logging.
+   */
+  message?: string;
+
+  /**
+   * A message which can be potientially displayed to the user.
+   */
+  userMessage?: string;
+
+  /**
+   * The status code to be associated with the error.
+   *
+   * Mainly used for API -> Frontend communication and logging filtering.
+   */
+  statusCode?: number;
+};
 
 export class AppError extends Error {
   /**
@@ -63,16 +83,23 @@ export class AppError extends Error {
   userMessage?: string;
 
   /**
+   * The status code to be associated with the error.
+   */
+  statusCode?: number;
+
+  /**
    * Create a new AppError.
    *
    * @param errorCode A string representing the error code.
    * @param message An internal error message.
    * @param userMessage A error message which can be displayed to the user.
    */
-  public constructor(errorCode: string, message?: string, userMessage?: string) {
-    super(message || errorCode);
+  public constructor(errorCode: string, options?: AppErrorOptions) {
+    super(options?.message || errorCode);
+
     this.code = errorCode;
-    this.userMessage = userMessage;
+    this.userMessage = options?.userMessage;
+    this.statusCode = options?.statusCode;
   }
 
   /**
@@ -88,15 +115,20 @@ export class AppError extends Error {
     // Handle TRPC errors.
     if (error instanceof TRPCClientError) {
       const parsedJsonError = AppError.parseFromJSON(error.data?.appError);
-      return parsedJsonError || new AppError(AppErrorCode.UNKNOWN_ERROR, error.message);
+
+      const fallbackError = new AppError(AppErrorCode.UNKNOWN_ERROR, {
+        message: error.message,
+      });
+
+      return parsedJsonError || fallbackError;
     }
 
     // Handle completely unknown errors.
     // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
-    const { code, message, userMessage } = error as {
+    const { code, message, userMessage, statusCode } = error as {
       code: unknown;
       message: unknown;
-      status: unknown;
+      statusCode: unknown;
       userMessage: unknown;
     };
 
@@ -105,7 +137,15 @@ export class AppError extends Error {
     const validUserMessage: string | undefined =
       typeof userMessage === 'string' ? userMessage : undefined;
 
-    return new AppError(validCode, validMessage, validUserMessage);
+    const validStatusCode = typeof statusCode === 'number' ? statusCode : undefined;
+
+    const options: AppErrorOptions = {
+      message: validMessage,
+      userMessage: validUserMessage,
+      statusCode: validStatusCode,
+    };
+
+    return new AppError(validCode, options);
   }
 
   /**
@@ -114,7 +154,7 @@ export class AppError extends Error {
    * @param appError The AppError to convert to JSON.
    * @returns A JSON object representing the AppError.
    */
-  static toJSON({ code, message, userMessage }: AppError): TAppErrorJsonSchema {
+  static toJSON({ code, message, userMessage, statusCode }: AppError): TAppErrorJsonSchema {
     const data: TAppErrorJsonSchema = {
       code,
     };
@@ -127,6 +167,10 @@ export class AppError extends Error {
 
     if (userMessage) {
       data.userMessage = userMessage;
+    }
+
+    if (statusCode) {
+      data.statusCode = statusCode;
     }
 
     return data;
@@ -150,7 +194,13 @@ export class AppError extends Error {
         return null;
       }
 
-      return new AppError(parsed.data.code, parsed.data.message, parsed.data.userMessage);
+      const { message, userMessage, statusCode } = parsed.data;
+
+      return new AppError(parsed.data.code, {
+        message,
+        userMessage,
+        statusCode,
+      });
     } catch {
       return null;
     }

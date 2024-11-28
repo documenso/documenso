@@ -48,7 +48,9 @@ export const getDocumentById = async ({ id, userId, teamId }: GetDocumentByIdOpt
   });
 
   if (!document) {
-    throw new AppError(AppErrorCode.NOT_FOUND, 'Document could not be found');
+    throw new AppError(AppErrorCode.NOT_FOUND, {
+      message: 'Document could not be found',
+    });
   }
 
   return document;

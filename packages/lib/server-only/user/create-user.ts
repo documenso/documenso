@@ -38,11 +38,10 @@ export const createUser = async ({ name, email, password, signature, url }: Crea
     });
 
     if (urlExists) {
-      throw new AppError(
-        AppErrorCode.PROFILE_URL_TAKEN,
-        'Profile username is taken',
-        'The profile username is already taken',
-      );
+      throw new AppError(AppErrorCode.PROFILE_URL_TAKEN, {
+        message: 'Profile username is taken',
+        userMessage: 'The profile username is already taken',
+      });
     }
   }
 

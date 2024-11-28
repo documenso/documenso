@@ -120,7 +120,9 @@ export const createDocumentFromTemplate = async ({
   });
 
   if (!template) {
-    throw new AppError(AppErrorCode.NOT_FOUND, 'Template not found');
+    throw new AppError(AppErrorCode.NOT_FOUND, {
+      message: 'Template not found',
+    });
   }
 
   // Check that all the passed in recipient IDs can be associated with a template recipient.
@@ -130,10 +132,9 @@ export const createDocumentFromTemplate = async ({
     );
 
     if (!foundRecipient) {
-      throw new AppError(
-        AppErrorCode.INVALID_BODY,
-        `Recipient with ID ${recipient.id} not found in the template.`,
-      );
+      throw new AppError(AppErrorCode.INVALID_BODY, {
+        message: `Recipient with ID ${recipient.id} not found in the template.`,
+      });
     }
   });
 

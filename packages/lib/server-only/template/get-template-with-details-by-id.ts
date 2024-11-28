@@ -40,7 +40,9 @@ export const getTemplateWithDetailsById = async ({
   });
 
   if (!template) {
-    throw new AppError(AppErrorCode.NOT_FOUND, 'Template not found');
+    throw new AppError(AppErrorCode.NOT_FOUND, {
+      message: 'Template not found',
+    });
   }
 
   return template;

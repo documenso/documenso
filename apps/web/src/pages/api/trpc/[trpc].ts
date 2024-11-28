@@ -26,13 +26,23 @@ export default trpcNext.createNextApiHandler({
       return;
     }
 
-    // Always console log the error for now.
+    // Always log the error for now.
     console.error(error);
 
     const appError = AppError.parseError(error.cause || error);
 
-    // Only log uncaught 500 errors.
-    if (appError.code === 'INTERNAL_SERVER_ERROR' || appError.code === AppErrorCode.UNKNOWN_ERROR) {
+    const isAppError = error.cause instanceof AppError;
+
+    // Only log AppErrors that are explicitly set to 500 or the error code
+    // is in the errorCodesToAlertOn list.
+    const isLoggableAppError =
+      isAppError && (appError.statusCode === 500 || errorCodesToAlertOn.includes(appError.code));
+
+    // Only log TRPC errors that are in the `errorCodesToAlertOn` list and is
+    // not an AppError.
+    const isLoggableTrpcError = !isAppError && errorCodesToAlertOn.includes(error.code);
+
+    if (isLoggableAppError || isLoggableTrpcError) {
       logger.error(error, {
         method: path,
         context: {
@@ -42,3 +52,5 @@ export default trpcNext.createNextApiHandler({
     }
   },
 });
+
+const errorCodesToAlertOn = [AppErrorCode.UNKNOWN_ERROR, 'INTERNAL_SERVER_ERROR'];

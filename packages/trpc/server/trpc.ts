@@ -18,9 +18,12 @@ const t = initTRPC.context<TrpcContext>().create({
     if (originalError instanceof AppError) {
       data = {
         ...data,
-        code: originalError.code,
-        httpStatus: genericErrorCodeToTrpcErrorCodeMap[originalError.code]?.status || 500,
         appError: AppError.toJSON(originalError),
+        code: originalError.code,
+        httpStatus:
+          originalError.statusCode ??
+          genericErrorCodeToTrpcErrorCodeMap[originalError.code]?.status ??
+          500,
       };
     }
 

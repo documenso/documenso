@@ -211,10 +211,9 @@ export const templateRouter = router({
       const limits = await getServerLimits({ email: ctx.user.email, teamId: template.teamId });
 
       if (limits.remaining.directTemplates === 0) {
-        throw new AppError(
-          AppErrorCode.LIMIT_EXCEEDED,
-          'You have reached your direct templates limit.',
-        );
+        throw new AppError(AppErrorCode.LIMIT_EXCEEDED, {
+          message: 'You have reached your direct templates limit.',
+        });
       }
 
       return await createTemplateDirectLink({ userId, templateId, directRecipientId });

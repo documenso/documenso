@@ -100,10 +100,9 @@ export const profileRouter = router({
           );
 
           if (subscriptions.length === 0) {
-            throw new AppError(
-              AppErrorCode.PREMIUM_PROFILE_URL,
-              'Only subscribers can have a username shorter than 6 characters',
-            );
+            throw new AppError(AppErrorCode.PREMIUM_PROFILE_URL, {
+              message: 'Only subscribers can have a username shorter than 6 characters',
+            });
           }
         }
 

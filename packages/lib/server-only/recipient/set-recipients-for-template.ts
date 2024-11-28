@@ -72,10 +72,9 @@ export const setRecipientsForTemplate = async ({
     });
 
     if (!isDocumentEnterprise) {
-      throw new AppError(
-        AppErrorCode.UNAUTHORIZED,
-        'You do not have permission to set the action auth',
-      );
+      throw new AppError(AppErrorCode.UNAUTHORIZED, {
+        message: 'You do not have permission to set the action auth',
+      });
     }
   }
 
@@ -119,14 +118,15 @@ export const setRecipientsForTemplate = async ({
     );
 
     if (updatedDirectRecipient?.role === RecipientRole.CC) {
-      throw new AppError(AppErrorCode.INVALID_BODY, 'Cannot set direct recipient as CC');
+      throw new AppError(AppErrorCode.INVALID_BODY, {
+        message: 'Cannot set direct recipient as CC',
+      });
     }
 
     if (deletedDirectRecipient) {
-      throw new AppError(
-        AppErrorCode.INVALID_BODY,
-        'Cannot delete direct recipient while direct template exists',
-      );
+      throw new AppError(AppErrorCode.INVALID_BODY, {
+        message: 'Cannot delete direct recipient while direct template exists',
+      });
     }
   }
 

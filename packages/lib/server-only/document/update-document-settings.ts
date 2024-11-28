@@ -37,7 +37,9 @@ export const updateDocumentSettings = async ({
   requestMetadata,
 }: UpdateDocumentSettingsOptions) => {
   if (!data.title && !data.globalAccessAuth && !data.globalActionAuth) {
-    throw new AppError(AppErrorCode.INVALID_BODY, 'Missing data to update');
+    throw new AppError(AppErrorCode.INVALID_BODY, {
+      message: 'Missing data to update',
+    });
   }
 
   const user = await prisma.user.findFirstOrThrow({
@@ -96,10 +98,9 @@ export const updateDocumentSettings = async ({
           !allowedVisibilities.includes(document.visibility) ||
           (data.visibility && !allowedVisibilities.includes(data.visibility))
         ) {
-          throw new AppError(
-            AppErrorCode.UNAUTHORIZED,
-            'You do not have permission to update the document visibility',
-          );
+          throw new AppError(AppErrorCode.UNAUTHORIZED, {
+            message: 'You do not have permission to update the document visibility',
+          });
         }
       })
       .with(TeamMemberRole.MEMBER, () => {
@@ -107,17 +108,15 @@ export const updateDocumentSettings = async ({
           document.visibility !== DocumentVisibility.EVERYONE ||
           (data.visibility && data.visibility !== DocumentVisibility.EVERYONE)
         ) {
-          throw new AppError(
-            AppErrorCode.UNAUTHORIZED,
-            'You do not have permission to update the document visibility',
-          );
+          throw new AppError(AppErrorCode.UNAUTHORIZED, {
+            message: 'You do not have permission to update the document visibility',
+          });
         }
       })
       .otherwise(() => {
-        throw new AppError(
-          AppErrorCode.UNAUTHORIZED,
-          'You do not have permission to update the document',
-        );
+        throw new AppError(AppErrorCode.UNAUTHORIZED, {
+          message: 'You do not have permission to update the document',
+        });
       });
   }
 
@@ -142,10 +141,9 @@ export const updateDocumentSettings = async ({
     });
 
     if (!isDocumentEnterprise) {
-      throw new AppError(
-        AppErrorCode.UNAUTHORIZED,
-        'You do not have permission to set the action auth',
-      );
+      throw new AppError(AppErrorCode.UNAUTHORIZED, {
+        message: 'You do not have permission to set the action auth',
+      });
     }
   }
 
@@ -161,10 +159,9 @@ export const updateDocumentSettings = async ({
   const auditLogs: CreateDocumentAuditLogDataResponse[] = [];
 
   if (!isTitleSame && document.status !== DocumentStatus.DRAFT) {
-    throw new AppError(
-      AppErrorCode.INVALID_BODY,
-      'You cannot update the title if the document has been sent',
-    );
+    throw new AppError(AppErrorCode.INVALID_BODY, {
+      message: 'You cannot update the title if the document has been sent',
+    });
   }
 
   if (!isTitleSame) {
