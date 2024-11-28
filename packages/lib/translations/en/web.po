@@ -13,7 +13,7 @@ msgstr ""
 "Language-Team: \n"
 "Plural-Forms: \n"
 
-#: apps/web/src/app/(teams)/t/[teamUrl]/settings/preferences/document-preferences.tsx:231
+#: apps/web/src/app/(teams)/t/[teamUrl]/settings/preferences/document-preferences.tsx:226
 msgid "\"{0}\" has invited you to sign \"example document\"."
 msgstr "\"{0}\" has invited you to sign \"example document\"."
 
@@ -37,7 +37,7 @@ msgstr "\"{documentTitle}\" has been successfully deleted"
 #~ "\"{placeholderEmail}\" on behalf of \"{0}\" has invited you to sign \"example\n"
 #~ "document\"."
 
-#: apps/web/src/app/(teams)/t/[teamUrl]/settings/preferences/document-preferences.tsx:226
+#: apps/web/src/app/(teams)/t/[teamUrl]/settings/preferences/document-preferences.tsx:221
 msgid "\"{placeholderEmail}\" on behalf of \"{0}\" has invited you to sign \"example document\"."
 msgstr "\"{placeholderEmail}\" on behalf of \"{0}\" has invited you to sign \"example document\"."
 
@@ -534,7 +534,7 @@ msgstr "An error occurred while removing the field."
 #: apps/web/src/app/(signing)/sign/[token]/name-field.tsx:148
 #: apps/web/src/app/(signing)/sign/[token]/number-field.tsx:195
 #: apps/web/src/app/(signing)/sign/[token]/radio-field.tsx:129
-#: apps/web/src/app/(signing)/sign/[token]/signature-field.tsx:190
+#: apps/web/src/app/(signing)/sign/[token]/signature-field.tsx:193
 msgid "An error occurred while removing the signature."
 msgstr "An error occurred while removing the signature."
 
@@ -558,7 +558,7 @@ msgstr "An error occurred while sending your confirmation email"
 #: apps/web/src/app/(signing)/sign/[token]/name-field.tsx:122
 #: apps/web/src/app/(signing)/sign/[token]/number-field.tsx:150
 #: apps/web/src/app/(signing)/sign/[token]/radio-field.tsx:102
-#: apps/web/src/app/(signing)/sign/[token]/signature-field.tsx:164
+#: apps/web/src/app/(signing)/sign/[token]/signature-field.tsx:167
 #: apps/web/src/app/(signing)/sign/[token]/text-field.tsx:168
 msgid "An error occurred while signing the document."
 msgstr "An error occurred while signing the document."
@@ -831,7 +831,7 @@ msgstr "By using the electronic signature feature, you are consenting to conduct
 #: apps/web/src/app/(signing)/sign/[token]/number-field.tsx:328
 #: apps/web/src/app/(signing)/sign/[token]/reject-document-dialog.tsx:153
 #: apps/web/src/app/(signing)/sign/[token]/sign-dialog.tsx:113
-#: apps/web/src/app/(signing)/sign/[token]/signature-field.tsx:305
+#: apps/web/src/app/(signing)/sign/[token]/signature-field.tsx:309
 #: apps/web/src/app/(signing)/sign/[token]/text-field.tsx:335
 #: apps/web/src/app/(teams)/t/[teamUrl]/settings/team-transfer-status.tsx:121
 #: apps/web/src/components/(dashboard)/settings/token/delete-token-dialog.tsx:176
@@ -1043,23 +1043,23 @@ msgstr "Continue"
 msgid "Continue to login"
 msgstr "Continue to login"
 
-#: apps/web/src/app/(teams)/t/[teamUrl]/settings/preferences/document-preferences.tsx:188
+#: apps/web/src/app/(teams)/t/[teamUrl]/settings/preferences/document-preferences.tsx:185
 msgid "Controls the default language of an uploaded document. This will be used as the language in email communications with the recipients."
 msgstr "Controls the default language of an uploaded document. This will be used as the language in email communications with the recipients."
 
-#: apps/web/src/app/(teams)/t/[teamUrl]/settings/preferences/document-preferences.tsx:154
+#: apps/web/src/app/(teams)/t/[teamUrl]/settings/preferences/document-preferences.tsx:153
 msgid "Controls the default visibility of an uploaded document."
 msgstr "Controls the default visibility of an uploaded document."
 
-#: apps/web/src/app/(teams)/t/[teamUrl]/settings/preferences/document-preferences.tsx:237
+#: apps/web/src/app/(teams)/t/[teamUrl]/settings/preferences/document-preferences.tsx:232
 msgid "Controls the formatting of the message that will be sent when inviting a recipient to sign a document. If a custom message has been provided while configuring the document, it will be used instead."
 msgstr "Controls the formatting of the message that will be sent when inviting a recipient to sign a document. If a custom message has been provided while configuring the document, it will be used instead."
 
-#: apps/web/src/app/(teams)/t/[teamUrl]/settings/preferences/document-preferences.tsx:270
+#: apps/web/src/app/(teams)/t/[teamUrl]/settings/preferences/document-preferences.tsx:263
 msgid "Controls whether the recipients can sign the documents using a typed signature. Enable or disable the typed signature globally."
 msgstr "Controls whether the recipients can sign the documents using a typed signature. Enable or disable the typed signature globally."
 
-#: apps/web/src/app/(teams)/t/[teamUrl]/settings/preferences/document-preferences.tsx:301
+#: apps/web/src/app/(teams)/t/[teamUrl]/settings/preferences/document-preferences.tsx:293
 msgid "Controls whether the signing certificate will be included in the document when it is downloaded. The signing certificate can still be downloaded from the logs page separately."
 msgstr "Controls whether the signing certificate will be included in the document when it is downloaded. The signing certificate can still be downloaded from the logs page separately."
 
@@ -1253,11 +1253,11 @@ msgstr "Decline"
 msgid "Declined team invitation"
 msgstr "Declined team invitation"
 
-#: apps/web/src/app/(teams)/t/[teamUrl]/settings/preferences/document-preferences.tsx:168
+#: apps/web/src/app/(teams)/t/[teamUrl]/settings/preferences/document-preferences.tsx:165
 msgid "Default Document Language"
 msgstr "Default Document Language"
 
-#: apps/web/src/app/(teams)/t/[teamUrl]/settings/preferences/document-preferences.tsx:130
+#: apps/web/src/app/(teams)/t/[teamUrl]/settings/preferences/document-preferences.tsx:129
 msgid "Default Document Visibility"
 msgstr "Default Document Visibility"
 
@@ -1773,7 +1773,7 @@ msgstr "Enable direct link signing"
 msgid "Enable Direct Link Signing"
 msgstr "Enable Direct Link Signing"
 
-#: apps/web/src/app/(teams)/t/[teamUrl]/settings/preferences/document-preferences.tsx:255
+#: apps/web/src/app/(teams)/t/[teamUrl]/settings/preferences/document-preferences.tsx:248
 msgid "Enable Typed Signature"
 msgstr "Enable Typed Signature"
 
@@ -1847,9 +1847,9 @@ msgstr "Enter your text here"
 #: apps/web/src/app/(signing)/sign/[token]/number-field.tsx:194
 #: apps/web/src/app/(signing)/sign/[token]/radio-field.tsx:101
 #: apps/web/src/app/(signing)/sign/[token]/radio-field.tsx:128
-#: apps/web/src/app/(signing)/sign/[token]/signature-field.tsx:129
-#: apps/web/src/app/(signing)/sign/[token]/signature-field.tsx:163
-#: apps/web/src/app/(signing)/sign/[token]/signature-field.tsx:189
+#: apps/web/src/app/(signing)/sign/[token]/signature-field.tsx:132
+#: apps/web/src/app/(signing)/sign/[token]/signature-field.tsx:166
+#: apps/web/src/app/(signing)/sign/[token]/signature-field.tsx:192
 #: apps/web/src/app/(signing)/sign/[token]/text-field.tsx:167
 #: apps/web/src/app/(signing)/sign/[token]/text-field.tsx:195
 #: apps/web/src/components/(dashboard)/layout/verify-email-banner.tsx:54
@@ -1861,7 +1861,7 @@ msgstr "Error"
 #~ msgid "Error updating global team settings"
 #~ msgstr "Error updating global team settings"
 
-#: apps/web/src/app/(teams)/t/[teamUrl]/settings/preferences/document-preferences.tsx:141
+#: apps/web/src/app/(teams)/t/[teamUrl]/settings/preferences/document-preferences.tsx:140
 msgid "Everyone can access and view the document"
 msgstr "Everyone can access and view the document"
 
@@ -2042,7 +2042,7 @@ msgstr "Inbox documents"
 #~ msgid "Include Sender Details"
 #~ msgstr "Include Sender Details"
 
-#: apps/web/src/app/(teams)/t/[teamUrl]/settings/preferences/document-preferences.tsx:286
+#: apps/web/src/app/(teams)/t/[teamUrl]/settings/preferences/document-preferences.tsx:278
 msgid "Include the Signing Certificate in the Document"
 msgstr "Include the Signing Certificate in the Document"
 
@@ -2537,11 +2537,11 @@ msgstr "Once confirmed, the following will occur:"
 msgid "Once you have scanned the QR code or entered the code manually, enter the code provided by your authenticator app below."
 msgstr "Once you have scanned the QR code or entered the code manually, enter the code provided by your authenticator app below."
 
-#: apps/web/src/app/(teams)/t/[teamUrl]/settings/preferences/document-preferences.tsx:147
+#: apps/web/src/app/(teams)/t/[teamUrl]/settings/preferences/document-preferences.tsx:146
 msgid "Only admins can access and view the document"
 msgstr "Only admins can access and view the document"
 
-#: apps/web/src/app/(teams)/t/[teamUrl]/settings/preferences/document-preferences.tsx:144
+#: apps/web/src/app/(teams)/t/[teamUrl]/settings/preferences/document-preferences.tsx:143
 msgid "Only managers and above can access and view the document"
 msgstr "Only managers and above can access and view the document"
 
@@ -2787,7 +2787,7 @@ msgstr "Please type <0>{0}</0> to confirm."
 msgid "Preferences"
 msgstr "Preferences"
 
-#: apps/web/src/app/(teams)/t/[teamUrl]/settings/preferences/document-preferences.tsx:221
+#: apps/web/src/app/(teams)/t/[teamUrl]/settings/preferences/document-preferences.tsx:216
 msgid "Preview"
 msgstr "Preview"
 
@@ -3073,7 +3073,7 @@ msgstr "Roles"
 #: apps/web/src/app/(signing)/sign/[token]/number-field.tsx:337
 #: apps/web/src/app/(signing)/sign/[token]/text-field.tsx:344
 #: apps/web/src/app/(teams)/t/[teamUrl]/settings/preferences/branding-preferences.tsx:312
-#: apps/web/src/app/(teams)/t/[teamUrl]/settings/preferences/document-preferences.tsx:313
+#: apps/web/src/app/(teams)/t/[teamUrl]/settings/preferences/document-preferences.tsx:305
 msgid "Save"
 msgstr "Save"
 
@@ -3148,7 +3148,7 @@ msgstr "Send confirmation email"
 msgid "Send document"
 msgstr "Send document"
 
-#: apps/web/src/app/(teams)/t/[teamUrl]/settings/preferences/document-preferences.tsx:205
+#: apps/web/src/app/(teams)/t/[teamUrl]/settings/preferences/document-preferences.tsx:200
 msgid "Send on Behalf of Team"
 msgstr "Send on Behalf of Team"
 
@@ -3222,13 +3222,13 @@ msgstr "Show templates in your team public profile for your audience to sign and
 #: apps/web/src/app/(signing)/sign/[token]/document-action-auth-2fa.tsx:182
 #: apps/web/src/app/(signing)/sign/[token]/name-field.tsx:224
 #: apps/web/src/app/(signing)/sign/[token]/sign-dialog.tsx:124
-#: apps/web/src/app/(signing)/sign/[token]/signature-field.tsx:313
+#: apps/web/src/app/(signing)/sign/[token]/signature-field.tsx:317
 #: apps/web/src/components/ui/user-profile-skeleton.tsx:75
 #: apps/web/src/components/ui/user-profile-timur.tsx:81
 msgid "Sign"
 msgstr "Sign"
 
-#: apps/web/src/app/(signing)/sign/[token]/signature-field.tsx:274
+#: apps/web/src/app/(signing)/sign/[token]/signature-field.tsx:277
 msgid "Sign as {0} <0>({1})</0>"
 msgstr "Sign as {0} <0>({1})</0>"
 
@@ -3296,8 +3296,8 @@ msgstr "Sign Up with OIDC"
 #: apps/web/src/app/(internal)/%5F%5Fhtmltopdf/certificate/page.tsx:177
 #: apps/web/src/app/(recipient)/d/[token]/sign-direct-template.tsx:338
 #: apps/web/src/app/(signing)/sign/[token]/form.tsx:192
-#: apps/web/src/app/(signing)/sign/[token]/signature-field.tsx:247
-#: apps/web/src/app/(signing)/sign/[token]/signature-field.tsx:282
+#: apps/web/src/app/(signing)/sign/[token]/signature-field.tsx:250
+#: apps/web/src/app/(signing)/sign/[token]/signature-field.tsx:285
 #: apps/web/src/app/embed/direct/[[...url]]/client.tsx:408
 #: apps/web/src/app/embed/sign/[[...url]]/client.tsx:287
 #: apps/web/src/components/forms/profile.tsx:132
@@ -4137,7 +4137,7 @@ msgstr "Type"
 msgid "Type a command or search..."
 msgstr "Type a command or search..."
 
-#: apps/web/src/app/(signing)/sign/[token]/signature-field.tsx:130
+#: apps/web/src/app/(signing)/sign/[token]/signature-field.tsx:133
 msgid "Typed signatures are not allowed. Please draw your signature."
 msgstr "Typed signatures are not allowed. Please draw your signature."
 

@@ -15,8 +15,8 @@ import { type Recipient } from '@documenso/prisma/client';
 import type { FieldWithSignature } from '@documenso/prisma/types/field-with-signature';
 import { trpc } from '@documenso/trpc/react';
 import type {
-    TRemovedSignedFieldWithTokenMutationSchema,
-    TSignFieldWithTokenMutationSchema,
+  TRemovedSignedFieldWithTokenMutationSchema,
+  TSignFieldWithTokenMutationSchema,
 } from '@documenso/trpc/server/field-router/schema';
 import { Button } from '@documenso/ui/primitives/button';
 import { Dialog, DialogContent, DialogFooter, DialogTitle } from '@documenso/ui/primitives/dialog';
@@ -55,11 +55,12 @@ export const SignatureField = ({
   const containerRef = useRef<HTMLDivElement>(null);
   const [fontSize, setFontSize] = useState(2);
 
-  const [isSignatureValid, setIsSignatureValid] = useState(false);
-
-
-  const { signature: providedSignature, setSignature: setProvidedSignature } =
-    useRequiredSigningContext();
+  const {
+    signature: providedSignature,
+    setSignature: setProvidedSignature,
+    signatureValid,
+    setSignatureValid,
+  } = useRequiredSigningContext();
 
   const { executeActionAuthProcedure } = useRequiredDocumentAuthContext();
 
@@ -290,7 +291,9 @@ export const SignatureField = ({
               className="border-border mt-2 h-44 w-full rounded-md border"
               onChange={(value) => setLocalSignature(value)}
               allowTypedSignature={typedSignatureEnabled}
-              onValidityChange={(isValid) => setIsSignatureValid(isValid)}
+              onValidityChange={(isValid) => {
+                setSignatureValid(isValid);
+              }}
             />
           </div>
 
@@ -311,7 +314,7 @@ export const SignatureField = ({
               <Button
                 type="button"
                 className="flex-1"
-                disabled={!localSignature || !isSignatureValid}
+                disabled={!localSignature || !signatureValid}
                 onClick={() => onDialogSignClick()}
               >
                 <Trans>Sign</Trans>

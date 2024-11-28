@@ -500,11 +500,11 @@ msgstr "Aprobando"
 msgid "Before you get started, please confirm your email address by clicking the button below:"
 msgstr "Antes de comenzar, por favor confirma tu dirección de correo electrónico haciendo clic en el botón de abajo:"
 
-#: packages/ui/primitives/signature-pad/signature-pad.tsx:383
+#: packages/ui/primitives/signature-pad/signature-pad.tsx:410
 msgid "Black"
 msgstr "Negro"
 
-#: packages/ui/primitives/signature-pad/signature-pad.tsx:397
+#: packages/ui/primitives/signature-pad/signature-pad.tsx:424
 msgid "Blue"
 msgstr "Azul"
 
@@ -562,7 +562,7 @@ msgstr "Valores de Checkbox"
 msgid "Clear filters"
 msgstr "Limpiar filtros"
 
-#: packages/ui/primitives/signature-pad/signature-pad.tsx:417
+#: packages/ui/primitives/signature-pad/signature-pad.tsx:444
 msgid "Clear Signature"
 msgstr "Limpiar firma"
 
@@ -931,7 +931,7 @@ msgstr "Autenticación de acción de destinatario global"
 msgid "Go Back"
 msgstr "Regresar"
 
-#: packages/ui/primitives/signature-pad/signature-pad.tsx:404
+#: packages/ui/primitives/signature-pad/signature-pad.tsx:431
 msgid "Green"
 msgstr "Verde"
 
@@ -1218,7 +1218,7 @@ msgstr "Correo electrónico de destinatario eliminado"
 msgid "Recipient signing request email"
 msgstr "Correo electrónico de solicitud de firma de destinatario"
 
-#: packages/ui/primitives/signature-pad/signature-pad.tsx:390
+#: packages/ui/primitives/signature-pad/signature-pad.tsx:417
 msgid "Red"
 msgstr "Rojo"
 
