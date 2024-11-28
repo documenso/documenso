@@ -6,7 +6,7 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import { Caveat } from 'next/font/google';
 
 import { Trans } from '@lingui/macro';
-import { Undo2 } from 'lucide-react';
+import { Undo2, Upload } from 'lucide-react';
 import type { StrokeOptions } from 'perfect-freehand';
 import { getStroke } from 'perfect-freehand';
 
@@ -52,6 +52,7 @@ export const SignaturePad = ({
 }: SignaturePadProps) => {
   const $el = useRef<HTMLCanvasElement>(null);
   const $imageData = useRef<ImageData | null>(null);
+  const $fileInput = useRef<HTMLInputElement>(null);
 
   const [isPressed, setIsPressed] = useState(false);
   const [lines, setLines] = useState<Point[][]>([]);
@@ -191,6 +192,10 @@ export const SignaturePad = ({
 
       ctx?.clearRect(0, 0, $el.current.width, $el.current.height);
       $imageData.current = null;
+    }
+
+    if ($fileInput.current) {
+      $fileInput.current.value = '';
     }
 
     onChange?.(null);
@@ -369,6 +374,26 @@ export const SignaturePad = ({
           />
         </div>
       )}
+
+      <div className="text-foreground absolute left-3 top-3 filter">
+        <div
+          className="focus-visible:ring-ring ring-offset-background text-muted-foreground/60 hover:text-muted-foreground flex cursor-pointer flex-row gap-2 rounded-full p-0 text-[0.688rem] focus-visible:outline-none focus-visible:ring-2"
+          onClick={() => $fileInput.current?.click()}
+        >
+          <Input
+            ref={$fileInput}
+            type="file"
+            accept="image/*"
+            className="hidden"
+            onChange={handleImageUpload}
+            disabled={disabled}
+          />
+          <Upload className="h-4 w-4" />
+          <span>
+            <Trans>Upload Signature</Trans>
+          </span>
+        </div>
+      </div>
 
       <div className="text-foreground absolute right-2 top-2 filter">
         <Select defaultValue={selectedColor} onValueChange={(value) => setSelectedColor(value)}>
