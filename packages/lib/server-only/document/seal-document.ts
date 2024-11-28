@@ -101,7 +101,7 @@ export const sealDocument = async ({
   const pdfData = await getFile(documentData);
 
   const certificateData =
-    document.team?.teamGlobalSettings?.includeSigningCertificate ?? true
+    (document.team?.teamGlobalSettings?.includeSigningCertificate ?? true)
       ? await getCertificatePdf({
           documentId,
           language: document.documentMeta?.language,

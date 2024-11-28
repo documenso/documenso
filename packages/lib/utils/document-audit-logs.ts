@@ -290,6 +290,10 @@ export const formatDocumentAuditLogAction = (
       anonymous: msg`Document deleted`,
       identified: msg`${prefix} deleted the document`,
     }))
+    .with({ type: DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_RESTORED }, () => ({
+      anonymous: msg`Document restored`,
+      identified: msg`${prefix} restored the document`,
+    }))
     .with({ type: DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_FIELD_INSERTED }, () => ({
       anonymous: msg`Field signed`,
       identified: msg`${prefix} signed a field`,
