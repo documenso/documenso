@@ -341,7 +341,7 @@ msgstr "Un destinataire a été supprimé"
 msgid "A recipient was updated"
 msgstr "Un destinataire a été mis à jour"
 
-#: packages/lib/server-only/team/create-team-email-verification.ts:156
+#: packages/lib/server-only/team/create-team-email-verification.ts:159
 msgid "A request to use your email has been initiated by {0} on Documenso"
 msgstr "Une demande d'utilisation de votre e-mail a été initiée par {0} sur Documenso"
 
@@ -711,7 +711,7 @@ msgid "Document created"
 msgstr "Document créé"
 
 #: packages/email/templates/document-created-from-direct-template.tsx:32
-#: packages/lib/server-only/template/create-document-from-direct-template.ts:567
+#: packages/lib/server-only/template/create-document-from-direct-template.ts:573
 msgid "Document created from direct template"
 msgstr "Document créé à partir d'un modèle direct"
 
@@ -1774,7 +1774,7 @@ msgstr "Vous avez été invité à rejoindre {0} sur Documenso"
 msgid "You have been invited to join the following team"
 msgstr "Vous avez été invité à rejoindre l'équipe suivante"
 
-#: packages/lib/server-only/recipient/set-recipients-for-document.ts:329
+#: packages/lib/server-only/recipient/set-recipients-for-document.ts:327
 msgid "You have been removed from a document"
 msgstr "Vous avez été supprimé d'un document"
 
