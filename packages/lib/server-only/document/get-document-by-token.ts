@@ -81,6 +81,17 @@ export const getDocumentAndSenderByToken = async ({
           token,
         },
       },
+      team: {
+        select: {
+          name: true,
+          teamEmail: true,
+          teamGlobalSettings: {
+            select: {
+              includeSenderDetails: true,
+            },
+          },
+        },
+      },
     },
   });
 
