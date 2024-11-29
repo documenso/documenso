@@ -47,18 +47,18 @@ export const createTemplateDirectLink = async ({
   });
 
   if (!template) {
-    throw new AppError(AppErrorCode.NOT_FOUND, 'Template not found');
+    throw new AppError(AppErrorCode.NOT_FOUND, { message: 'Template not found' });
   }
 
   if (template.directLink) {
-    throw new AppError(AppErrorCode.ALREADY_EXISTS, 'Direct template already exists');
+    throw new AppError(AppErrorCode.ALREADY_EXISTS, { message: 'Direct template already exists' });
   }
 
   if (
     directRecipientId &&
     !template.Recipient.find((recipient) => recipient.id === directRecipientId)
   ) {
-    throw new AppError(AppErrorCode.NOT_FOUND, 'Recipient not found');
+    throw new AppError(AppErrorCode.NOT_FOUND, { message: 'Recipient not found' });
   }
 
   if (
@@ -67,7 +67,9 @@ export const createTemplateDirectLink = async ({
       (recipient) => recipient.email.toLowerCase() === DIRECT_TEMPLATE_RECIPIENT_EMAIL,
     )
   ) {
-    throw new AppError(AppErrorCode.INVALID_BODY, 'Cannot generate placeholder direct recipient');
+    throw new AppError(AppErrorCode.INVALID_BODY, {
+      message: 'Cannot generate placeholder direct recipient',
+    });
   }
 
   return await prisma.$transaction(async (tx) => {

@@ -101,7 +101,7 @@ export const createDocumentFromDirectTemplate = async ({
   });
 
   if (!template?.directLink?.enabled) {
-    throw new AppError(AppErrorCode.INVALID_REQUEST, 'Invalid or missing template');
+    throw new AppError(AppErrorCode.INVALID_REQUEST, { message: 'Invalid or missing template' });
   }
 
   const { Recipient: recipients, directLink, User: templateOwner } = template;
@@ -111,15 +111,19 @@ export const createDocumentFromDirectTemplate = async ({
   );
 
   if (!directTemplateRecipient || directTemplateRecipient.role === RecipientRole.CC) {
-    throw new AppError(AppErrorCode.INVALID_REQUEST, 'Invalid or missing direct recipient');
+    throw new AppError(AppErrorCode.INVALID_REQUEST, {
+      message: 'Invalid or missing direct recipient',
+    });
   }
 
   if (template.updatedAt.getTime() !== templateUpdatedAt.getTime()) {
-    throw new AppError(AppErrorCode.INVALID_REQUEST, 'Template no longer matches');
+    throw new AppError(AppErrorCode.INVALID_REQUEST, { message: 'Template no longer matches' });
   }
 
   if (user && user.email !== directRecipientEmail) {
-    throw new AppError(AppErrorCode.INVALID_REQUEST, 'Email must match if you are logged in');
+    throw new AppError(AppErrorCode.INVALID_REQUEST, {
+      message: 'Email must match if you are logged in',
+    });
   }
 
   const { derivedRecipientAccessAuth, documentAuthOption: templateAuthOptions } =
@@ -136,7 +140,7 @@ export const createDocumentFromDirectTemplate = async ({
     .exhaustive();
 
   if (!isAccessAuthValid) {
-    throw new AppError(AppErrorCode.UNAUTHORIZED, 'You must be logged in');
+    throw new AppError(AppErrorCode.UNAUTHORIZED, { message: 'You must be logged in' });
   }
 
   const directTemplateRecipientAuthOptions = ZRecipientAuthOptionsSchema.parse(
@@ -163,7 +167,9 @@ export const createDocumentFromDirectTemplate = async ({
       );
 
       if (!signedFieldValue) {
-        throw new AppError(AppErrorCode.INVALID_BODY, 'Invalid, missing or changed fields');
+        throw new AppError(AppErrorCode.INVALID_BODY, {
+          message: 'Invalid, missing or changed fields',
+        });
       }
 
       if (templateField.type === FieldType.NAME && directRecipientName === undefined) {

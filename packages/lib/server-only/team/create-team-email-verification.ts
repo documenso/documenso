@@ -55,10 +55,9 @@ export const createTeamEmailVerification = async ({
         });
 
         if (team.teamEmail || team.emailVerification) {
-          throw new AppError(
-            AppErrorCode.INVALID_REQUEST,
-            'Team already has an email or existing email verification.',
-          );
+          throw new AppError(AppErrorCode.INVALID_REQUEST, {
+            message: 'Team already has an email or existing email verification.',
+          });
         }
 
         const existingTeamEmail = await tx.teamEmail.findFirst({
@@ -68,7 +67,9 @@ export const createTeamEmailVerification = async ({
         });
 
         if (existingTeamEmail) {
-          throw new AppError(AppErrorCode.ALREADY_EXISTS, 'Email already taken by another team.');
+          throw new AppError(AppErrorCode.ALREADY_EXISTS, {
+            message: 'Email already taken by another team.',
+          });
         }
 
         const { token, expiresAt } = createTokenVerification({ hours: 1 });
@@ -97,7 +98,9 @@ export const createTeamEmailVerification = async ({
     const target = z.array(z.string()).safeParse(err.meta?.target);
 
     if (err.code === 'P2002' && target.success && target.data.includes('email')) {
-      throw new AppError(AppErrorCode.ALREADY_EXISTS, 'Email already taken by another team.');
+      throw new AppError(AppErrorCode.ALREADY_EXISTS, {
+        message: 'Email already taken by another team.',
+      });
     }
 
     throw err;

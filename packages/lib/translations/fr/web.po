@@ -18,7 +18,7 @@ msgstr ""
 "X-Crowdin-File: web.po\n"
 "X-Crowdin-File-ID: 8\n"
 
-#: apps/web/src/app/(teams)/t/[teamUrl]/settings/preferences/document-preferences.tsx:231
+#: apps/web/src/app/(teams)/t/[teamUrl]/settings/preferences/document-preferences.tsx:226
 msgid "\"{0}\" has invited you to sign \"example document\"."
 msgstr "\"{0}\" vous a invité à signer \"example document\"."
 
@@ -42,7 +42,7 @@ msgstr "\"{documentTitle}\" a été supprimé avec succès"
 #~ "\"{placeholderEmail}\" on behalf of \"{0}\" has invited you to sign \"example\n"
 #~ "document\"."
 
-#: apps/web/src/app/(teams)/t/[teamUrl]/settings/preferences/document-preferences.tsx:226
+#: apps/web/src/app/(teams)/t/[teamUrl]/settings/preferences/document-preferences.tsx:221
 msgid "\"{placeholderEmail}\" on behalf of \"{0}\" has invited you to sign \"example document\"."
 msgstr "\"{placeholderEmail}\" au nom de \"{0}\" vous a invité à signer \"exemple de document\"."
 
@@ -50,15 +50,15 @@ msgstr "\"{placeholderEmail}\" au nom de \"{0}\" vous a invité à signer \"exem
 #~ msgid "\"{teamUrl}\" has invited you to sign \"example document\"."
 #~ msgstr "\"{teamUrl}\" vous a invité à signer \"example document\"."
 
-#: apps/web/src/app/(signing)/sign/[token]/signing-page-view.tsx:80
+#: apps/web/src/app/(signing)/sign/[token]/signing-page-view.tsx:83
 msgid "({0}) has invited you to approve this document"
 msgstr "({0}) vous a invité à approuver ce document"
 
-#: apps/web/src/app/(signing)/sign/[token]/signing-page-view.tsx:77
+#: apps/web/src/app/(signing)/sign/[token]/signing-page-view.tsx:80
 msgid "({0}) has invited you to sign this document"
 msgstr "({0}) vous a invité à signer ce document"
 
-#: apps/web/src/app/(signing)/sign/[token]/signing-page-view.tsx:74
+#: apps/web/src/app/(signing)/sign/[token]/signing-page-view.tsx:77
 msgid "({0}) has invited you to view this document"
 msgstr "({0}) vous a invité à consulter ce document"
 
@@ -71,7 +71,7 @@ msgstr "{0, plural, one {(1 caractère de trop)} other {(# caractères de trop)}
 msgid "{0, plural, one {# character over the limit} other {# characters over the limit}}"
 msgstr "{0, plural, one {# caractère au-dessus de la limite} other {# caractères au-dessus de la limite}}"
 
-#: apps/web/src/app/(recipient)/d/[token]/page.tsx:82
+#: apps/web/src/app/(recipient)/d/[token]/page.tsx:84
 msgid "{0, plural, one {# recipient} other {# recipients}}"
 msgstr "{0, plural, one {# destinataire} other {# destinataires}}"
 
@@ -88,11 +88,11 @@ msgstr "{0, plural, one {<0>Vous avez <1>1</1> invitation d'équipe en attente</
 msgid "{0, plural, one {1 matching field} other {# matching fields}}"
 msgstr "{0, plural, one {1 champ correspondant} other {# champs correspondants}}"
 
-#: apps/web/src/app/(dashboard)/documents/[id]/edit/document-edit-page-view.tsx:129
+#: apps/web/src/app/(dashboard)/documents/[id]/edit/document-edit-page-view.tsx:132
 msgid "{0, plural, one {1 Recipient} other {# Recipients}}"
 msgstr "{0, plural, one {1 Destinataire} other {# Destinataires}}"
 
-#: apps/web/src/app/(dashboard)/documents/[id]/document-page-view.tsx:235
+#: apps/web/src/app/(dashboard)/documents/[id]/document-page-view.tsx:238
 msgid "{0, plural, one {Waiting on 1 recipient} other {Waiting on # recipients}}"
 msgstr "{0, plural, one {En attente d'1 destinataire} other {En attente de # destinataires}}"
 
@@ -116,7 +116,7 @@ msgstr "{0} modèles de signature directe"
 msgid "{0} of {1} documents remaining this month."
 msgstr "{0} des {1} documents restants ce mois-ci."
 
-#: apps/web/src/app/(dashboard)/documents/[id]/document-page-view.tsx:170
+#: apps/web/src/app/(dashboard)/documents/[id]/document-page-view.tsx:173
 msgid "{0} Recipient(s)"
 msgstr "{0} Destinataire(s)"
 
@@ -156,6 +156,18 @@ msgstr "<0>\"{0}\"</0> n'est plus disponible pour signer"
 #: apps/web/src/app/(dashboard)/documents/data-table-sender-filter.tsx:57
 msgid "<0>Sender:</0> All"
 msgstr "<0>Expéditeur :</0> Tous"
+
+#: apps/web/src/app/(signing)/sign/[token]/sign-dialog.tsx:104
+msgid "<0>You are about to complete approving <1>\"{documentTitle}\"</1>.</0><2/> Are you sure?"
+msgstr ""
+
+#: apps/web/src/app/(signing)/sign/[token]/sign-dialog.tsx:90
+msgid "<0>You are about to complete signing \"<1>{documentTitle}</1>\".</0><2/> Are you sure?"
+msgstr ""
+
+#: apps/web/src/app/(signing)/sign/[token]/sign-dialog.tsx:76
+msgid "<0>You are about to complete viewing \"<1>{documentTitle}</1>\".</0><2/> Are you sure?"
+msgstr ""
 
 #: apps/web/src/components/(dashboard)/settings/token/contants.ts:5
 msgid "1 month"
@@ -665,7 +677,7 @@ msgstr "Version de l'application"
 #: apps/web/src/app/(dashboard)/documents/[id]/document-page-view-button.tsx:89
 #: apps/web/src/app/(dashboard)/documents/data-table-action-button.tsx:120
 #: apps/web/src/app/(dashboard)/documents/data-table-action-dropdown.tsx:146
-#: apps/web/src/app/(signing)/sign/[token]/sign-dialog.tsx:125
+#: apps/web/src/app/(signing)/sign/[token]/sign-dialog.tsx:142
 msgid "Approve"
 msgstr "Approuver"
 
@@ -835,7 +847,7 @@ msgstr "En utilisant la fonctionnalité de signature électronique, vous consent
 #: apps/web/src/app/(signing)/sign/[token]/name-field.tsx:215
 #: apps/web/src/app/(signing)/sign/[token]/number-field.tsx:328
 #: apps/web/src/app/(signing)/sign/[token]/reject-document-dialog.tsx:153
-#: apps/web/src/app/(signing)/sign/[token]/sign-dialog.tsx:113
+#: apps/web/src/app/(signing)/sign/[token]/sign-dialog.tsx:130
 #: apps/web/src/app/(signing)/sign/[token]/signature-field.tsx:305
 #: apps/web/src/app/(signing)/sign/[token]/text-field.tsx:335
 #: apps/web/src/app/(teams)/t/[teamUrl]/settings/team-transfer-status.tsx:121
@@ -947,22 +959,22 @@ msgstr "Cliquez pour insérer le champ"
 msgid "Close"
 msgstr "Fermer"
 
-#: apps/web/src/app/(signing)/sign/[token]/sign-dialog.tsx:61
+#: apps/web/src/app/(signing)/sign/[token]/sign-dialog.tsx:60
 #: apps/web/src/app/embed/direct/[[...url]]/client.tsx:446
 #: apps/web/src/app/embed/sign/[[...url]]/client.tsx:325
 #: apps/web/src/components/forms/v2/signup.tsx:534
 msgid "Complete"
 msgstr "Compléter"
 
-#: apps/web/src/app/(signing)/sign/[token]/sign-dialog.tsx:70
+#: apps/web/src/app/(signing)/sign/[token]/sign-dialog.tsx:69
 msgid "Complete Approval"
 msgstr "Compléter l'approbation"
 
-#: apps/web/src/app/(signing)/sign/[token]/sign-dialog.tsx:69
+#: apps/web/src/app/(signing)/sign/[token]/sign-dialog.tsx:68
 msgid "Complete Signing"
 msgstr "Compléter la signature"
 
-#: apps/web/src/app/(signing)/sign/[token]/sign-dialog.tsx:68
+#: apps/web/src/app/(signing)/sign/[token]/sign-dialog.tsx:67
 msgid "Complete Viewing"
 msgstr "Compléter la visualisation"
 
@@ -1048,23 +1060,23 @@ msgstr "Continuer"
 msgid "Continue to login"
 msgstr "Continuer vers la connexion"
 
-#: apps/web/src/app/(teams)/t/[teamUrl]/settings/preferences/document-preferences.tsx:188
+#: apps/web/src/app/(teams)/t/[teamUrl]/settings/preferences/document-preferences.tsx:185
 msgid "Controls the default language of an uploaded document. This will be used as the language in email communications with the recipients."
 msgstr "Contrôle la langue par défaut d'un document téléchargé. Cela sera utilisé comme langue dans les communications par e-mail avec les destinataires."
 
-#: apps/web/src/app/(teams)/t/[teamUrl]/settings/preferences/document-preferences.tsx:154
+#: apps/web/src/app/(teams)/t/[teamUrl]/settings/preferences/document-preferences.tsx:153
 msgid "Controls the default visibility of an uploaded document."
 msgstr "Contrôle la visibilité par défaut d'un document téléchargé."
 
-#: apps/web/src/app/(teams)/t/[teamUrl]/settings/preferences/document-preferences.tsx:237
+#: apps/web/src/app/(teams)/t/[teamUrl]/settings/preferences/document-preferences.tsx:232
 msgid "Controls the formatting of the message that will be sent when inviting a recipient to sign a document. If a custom message has been provided while configuring the document, it will be used instead."
 msgstr "Contrôle le formatage du message qui sera envoyé lors de l'invitation d'un destinataire à signer un document. Si un message personnalisé a été fourni lors de la configuration du document, il sera utilisé à la place."
 
-#: apps/web/src/app/(teams)/t/[teamUrl]/settings/preferences/document-preferences.tsx:270
+#: apps/web/src/app/(teams)/t/[teamUrl]/settings/preferences/document-preferences.tsx:263
 msgid "Controls whether the recipients can sign the documents using a typed signature. Enable or disable the typed signature globally."
 msgstr ""
 
-#: apps/web/src/app/(teams)/t/[teamUrl]/settings/preferences/document-preferences.tsx:301
+#: apps/web/src/app/(teams)/t/[teamUrl]/settings/preferences/document-preferences.tsx:293
 msgid "Controls whether the signing certificate will be included in the document when it is downloaded. The signing certificate can still be downloaded from the logs page separately."
 msgstr ""
 
@@ -1185,7 +1197,7 @@ msgstr "Créer un webhook"
 msgid "Create Webhook"
 msgstr "Créer un Webhook"
 
-#: apps/web/src/app/(signing)/sign/[token]/complete/page.tsx:215
+#: apps/web/src/app/(signing)/sign/[token]/complete/page.tsx:213
 msgid "Create your account and start using state-of-the-art document signing."
 msgstr "Créez votre compte et commencez à utiliser la signature de documents à la pointe de la technologie."
 
@@ -1258,11 +1270,11 @@ msgstr "Décliner"
 msgid "Declined team invitation"
 msgstr "Invitation d'équipe refusée"
 
-#: apps/web/src/app/(teams)/t/[teamUrl]/settings/preferences/document-preferences.tsx:168
+#: apps/web/src/app/(teams)/t/[teamUrl]/settings/preferences/document-preferences.tsx:165
 msgid "Default Document Language"
 msgstr "Langue par défaut du document"
 
-#: apps/web/src/app/(teams)/t/[teamUrl]/settings/preferences/document-preferences.tsx:130
+#: apps/web/src/app/(teams)/t/[teamUrl]/settings/preferences/document-preferences.tsx:129
 msgid "Default Document Visibility"
 msgstr "Visibilité par défaut du document"
 
@@ -1461,7 +1473,7 @@ msgstr "Document"
 msgid "Document All"
 msgstr "Document Tout"
 
-#: apps/web/src/app/(signing)/sign/[token]/complete/page.tsx:134
+#: apps/web/src/app/(signing)/sign/[token]/complete/page.tsx:132
 msgid "Document Approved"
 msgstr "Document Approuvé"
 
@@ -1490,7 +1502,7 @@ msgid "Document created using a <0>direct link</0>"
 msgstr "Document créé en utilisant un <0>lien direct</0>"
 
 #: apps/web/src/app/(dashboard)/admin/documents/[id]/super-delete-document-dialog.tsx:51
-#: apps/web/src/app/(dashboard)/documents/[id]/document-page-view.tsx:178
+#: apps/web/src/app/(dashboard)/documents/[id]/document-page-view.tsx:181
 #: apps/web/src/app/(dashboard)/documents/delete-document-dialog.tsx:61
 msgid "Document deleted"
 msgstr "Document supprimé"
@@ -1503,7 +1515,7 @@ msgstr "Brouillon de document"
 msgid "Document Duplicated"
 msgstr "Document dupliqué"
 
-#: apps/web/src/app/(dashboard)/documents/[id]/document-page-view.tsx:189
+#: apps/web/src/app/(dashboard)/documents/[id]/document-page-view.tsx:192
 #: apps/web/src/components/document/document-history-sheet.tsx:104
 msgid "Document history"
 msgstr "Historique du document"
@@ -1529,7 +1541,7 @@ msgstr "Métriques du document"
 msgid "Document moved"
 msgstr "Document déplacé"
 
-#: apps/web/src/app/(signing)/sign/[token]/complete/page.tsx:158
+#: apps/web/src/app/(signing)/sign/[token]/complete/page.tsx:156
 msgid "Document no longer available to sign"
 msgstr "Document non disponible pour signature"
 
@@ -1561,7 +1573,7 @@ msgstr "Document envoyé"
 #~ msgid "Document Settings"
 #~ msgstr "Document Settings"
 
-#: apps/web/src/app/(signing)/sign/[token]/complete/page.tsx:132
+#: apps/web/src/app/(signing)/sign/[token]/complete/page.tsx:130
 msgid "Document Signed"
 msgstr "Document signé"
 
@@ -1585,7 +1597,7 @@ msgstr "Téléchargement du document désactivé en raison de factures impayées
 msgid "Document uploaded"
 msgstr "Document téléchargé"
 
-#: apps/web/src/app/(signing)/sign/[token]/complete/page.tsx:133
+#: apps/web/src/app/(signing)/sign/[token]/complete/page.tsx:131
 msgid "Document Viewed"
 msgstr "Document consulté"
 
@@ -1609,7 +1621,7 @@ msgstr "Le document sera supprimé de manière permanente"
 msgid "Documents"
 msgstr "Documents"
 
-#: apps/web/src/app/(dashboard)/templates/[id]/template-page-view.tsx:194
+#: apps/web/src/app/(dashboard)/templates/[id]/template-page-view.tsx:197
 msgid "Documents created from template"
 msgstr "Documents créés à partir du modèle"
 
@@ -1690,7 +1702,7 @@ msgstr "Dupliquer"
 msgid "Edit"
 msgstr "Modifier"
 
-#: apps/web/src/app/(dashboard)/templates/[id]/template-page-view.tsx:114
+#: apps/web/src/app/(dashboard)/templates/[id]/template-page-view.tsx:117
 msgid "Edit Template"
 msgstr "Modifier le modèle"
 
@@ -1778,7 +1790,7 @@ msgstr "Activer la signature par lien direct"
 msgid "Enable Direct Link Signing"
 msgstr "Activer la signature par lien direct"
 
-#: apps/web/src/app/(teams)/t/[teamUrl]/settings/preferences/document-preferences.tsx:255
+#: apps/web/src/app/(teams)/t/[teamUrl]/settings/preferences/document-preferences.tsx:248
 msgid "Enable Typed Signature"
 msgstr ""
 
@@ -1866,15 +1878,15 @@ msgstr "Erreur"
 #~ msgid "Error updating global team settings"
 #~ msgstr "Error updating global team settings"
 
-#: apps/web/src/app/(teams)/t/[teamUrl]/settings/preferences/document-preferences.tsx:141
+#: apps/web/src/app/(teams)/t/[teamUrl]/settings/preferences/document-preferences.tsx:140
 msgid "Everyone can access and view the document"
 msgstr "Tout le monde peut accéder et voir le document"
 
-#: apps/web/src/app/(signing)/sign/[token]/complete/page.tsx:142
+#: apps/web/src/app/(signing)/sign/[token]/complete/page.tsx:140
 msgid "Everyone has signed"
 msgstr "Tout le monde a signé"
 
-#: apps/web/src/app/(signing)/sign/[token]/complete/page.tsx:166
+#: apps/web/src/app/(signing)/sign/[token]/complete/page.tsx:164
 msgid "Everyone has signed! You will receive an Email copy of the signed document."
 msgstr "Tout le monde a signé ! Vous recevrez une copie par email du document signé."
 
@@ -1963,7 +1975,7 @@ msgstr "Retourner"
 msgid "Go back home"
 msgstr "Retourner à la maison"
 
-#: apps/web/src/app/(signing)/sign/[token]/complete/page.tsx:226
+#: apps/web/src/app/(signing)/sign/[token]/complete/page.tsx:224
 #: apps/web/src/app/(signing)/sign/[token]/no-longer-available.tsx:57
 msgid "Go Back Home"
 msgstr "Retourner à la maison"
@@ -2047,7 +2059,7 @@ msgstr "Documents de la boîte de réception"
 #~ msgid "Include Sender Details"
 #~ msgstr "Include Sender Details"
 
-#: apps/web/src/app/(teams)/t/[teamUrl]/settings/preferences/document-preferences.tsx:286
+#: apps/web/src/app/(teams)/t/[teamUrl]/settings/preferences/document-preferences.tsx:278
 msgid "Include the Signing Certificate in the Document"
 msgstr ""
 
@@ -2267,7 +2279,7 @@ msgstr "Gérer le profil de {0}"
 msgid "Manage all teams you are currently associated with."
 msgstr "Gérer toutes les équipes avec lesquelles vous êtes actuellement associé."
 
-#: apps/web/src/app/(dashboard)/templates/[id]/template-page-view.tsx:158
+#: apps/web/src/app/(dashboard)/templates/[id]/template-page-view.tsx:161
 msgid "Manage and view template"
 msgstr "Gérer et afficher le modèle"
 
@@ -2331,7 +2343,7 @@ msgstr "Gérer vos clés d'accès."
 msgid "Manage your site settings here"
 msgstr "Gérer les paramètres de votre site ici"
 
-#: apps/web/src/app/(signing)/sign/[token]/sign-dialog.tsx:123
+#: apps/web/src/app/(signing)/sign/[token]/sign-dialog.tsx:140
 msgid "Mark as Viewed"
 msgstr "Marquer comme vu"
 
@@ -2413,7 +2425,7 @@ msgstr "Mes modèles"
 msgid "Name"
 msgstr "Nom"
 
-#: apps/web/src/app/(signing)/sign/[token]/complete/page.tsx:211
+#: apps/web/src/app/(signing)/sign/[token]/complete/page.tsx:209
 msgid "Need to sign documents?"
 msgstr "Besoin de signer des documents ?"
 
@@ -2440,7 +2452,7 @@ msgstr "Nouveau modèle"
 msgid "Next"
 msgstr "Suivant"
 
-#: apps/web/src/app/(signing)/sign/[token]/sign-dialog.tsx:61
+#: apps/web/src/app/(signing)/sign/[token]/sign-dialog.tsx:60
 msgid "Next field"
 msgstr "Champ suivant"
 
@@ -2542,11 +2554,11 @@ msgstr "Une fois confirmé, les éléments suivants se produiront :"
 msgid "Once you have scanned the QR code or entered the code manually, enter the code provided by your authenticator app below."
 msgstr "Une fois que vous avez scanné le code QR ou saisi le code manuellement, entrez le code fourni par votre application d'authentification ci-dessous."
 
-#: apps/web/src/app/(teams)/t/[teamUrl]/settings/preferences/document-preferences.tsx:147
+#: apps/web/src/app/(teams)/t/[teamUrl]/settings/preferences/document-preferences.tsx:146
 msgid "Only admins can access and view the document"
 msgstr "Seules les administrateurs peuvent accéder et voir le document"
 
-#: apps/web/src/app/(teams)/t/[teamUrl]/settings/preferences/document-preferences.tsx:144
+#: apps/web/src/app/(teams)/t/[teamUrl]/settings/preferences/document-preferences.tsx:143
 msgid "Only managers and above can access and view the document"
 msgstr "Seuls les responsables et au-dessus peuvent accéder et voir le document"
 
@@ -2792,7 +2804,7 @@ msgstr "Veuillez taper <0>{0}</0> pour confirmer."
 msgid "Preferences"
 msgstr "Préférences"
 
-#: apps/web/src/app/(teams)/t/[teamUrl]/settings/preferences/document-preferences.tsx:221
+#: apps/web/src/app/(teams)/t/[teamUrl]/settings/preferences/document-preferences.tsx:216
 msgid "Preview"
 msgstr "Aperçu"
 
@@ -3078,7 +3090,7 @@ msgstr "Rôles"
 #: apps/web/src/app/(signing)/sign/[token]/number-field.tsx:337
 #: apps/web/src/app/(signing)/sign/[token]/text-field.tsx:344
 #: apps/web/src/app/(teams)/t/[teamUrl]/settings/preferences/branding-preferences.tsx:312
-#: apps/web/src/app/(teams)/t/[teamUrl]/settings/preferences/document-preferences.tsx:313
+#: apps/web/src/app/(teams)/t/[teamUrl]/settings/preferences/document-preferences.tsx:305
 msgid "Save"
 msgstr "Sauvegarder"
 
@@ -3153,7 +3165,7 @@ msgstr "Envoyer l'e-mail de confirmation"
 msgid "Send document"
 msgstr "Envoyer le document"
 
-#: apps/web/src/app/(teams)/t/[teamUrl]/settings/preferences/document-preferences.tsx:205
+#: apps/web/src/app/(teams)/t/[teamUrl]/settings/preferences/document-preferences.tsx:200
 msgid "Send on Behalf of Team"
 msgstr "Envoyer au nom de l'équipe"
 
@@ -3226,7 +3238,7 @@ msgstr "Afficher des modèles dans le profil public de votre équipe pour que vo
 #: apps/web/src/app/(signing)/sign/[token]/auto-sign.tsx:229
 #: apps/web/src/app/(signing)/sign/[token]/document-action-auth-2fa.tsx:182
 #: apps/web/src/app/(signing)/sign/[token]/name-field.tsx:224
-#: apps/web/src/app/(signing)/sign/[token]/sign-dialog.tsx:124
+#: apps/web/src/app/(signing)/sign/[token]/sign-dialog.tsx:141
 #: apps/web/src/app/(signing)/sign/[token]/signature-field.tsx:313
 #: apps/web/src/components/ui/user-profile-skeleton.tsx:75
 #: apps/web/src/components/ui/user-profile-timur.tsx:81
@@ -3317,7 +3329,7 @@ msgstr "ID de signature"
 msgid "Signatures Collected"
 msgstr "Signatures collectées"
 
-#: apps/web/src/app/(signing)/sign/[token]/complete/page.tsx:200
+#: apps/web/src/app/(signing)/sign/[token]/complete/page.tsx:198
 msgid "Signatures will appear once the document has been completed"
 msgstr "Les signatures apparaîtront une fois le document complété"
 
@@ -3649,7 +3661,7 @@ msgstr "Équipes restreintes"
 #: apps/web/src/app/(dashboard)/templates/[id]/template-page-view-documents-table.tsx:39
 #: apps/web/src/app/(dashboard)/templates/[id]/template-page-view-documents-table.tsx:148
 #: apps/web/src/app/(dashboard)/templates/[id]/template-page-view-documents-table.tsx:228
-#: apps/web/src/app/(dashboard)/templates/[id]/template-page-view.tsx:145
+#: apps/web/src/app/(dashboard)/templates/[id]/template-page-view.tsx:148
 #: apps/web/src/components/(teams)/dialogs/invite-team-member-dialog.tsx:408
 #: apps/web/src/components/templates/manage-public-template-dialog.tsx:271
 msgid "Template"
@@ -3883,7 +3895,7 @@ msgstr "Ce document n'a pas pu être dupliqué pour le moment. Veuillez réessay
 msgid "This document could not be re-sent at this time. Please try again."
 msgstr "Ce document n'a pas pu être renvoyé pour le moment. Veuillez réessayer."
 
-#: apps/web/src/app/(signing)/sign/[token]/complete/page.tsx:180
+#: apps/web/src/app/(signing)/sign/[token]/complete/page.tsx:178
 msgid "This document has been cancelled by the owner and is no longer available for others to sign."
 msgstr "Ce document a été annulé par le propriétaire et n'est plus disponible pour d'autres à signer."
 
@@ -3891,11 +3903,11 @@ msgstr "Ce document a été annulé par le propriétaire et n'est plus disponibl
 msgid "This document has been cancelled by the owner."
 msgstr "Ce document a été annulé par le propriétaire."
 
-#: apps/web/src/app/(dashboard)/documents/[id]/document-page-view.tsx:224
+#: apps/web/src/app/(dashboard)/documents/[id]/document-page-view.tsx:227
 msgid "This document has been signed by all recipients"
 msgstr "Ce document a été signé par tous les destinataires"
 
-#: apps/web/src/app/(dashboard)/documents/[id]/document-page-view.tsx:227
+#: apps/web/src/app/(dashboard)/documents/[id]/document-page-view.tsx:230
 msgid "This document is currently a draft and has not been sent"
 msgstr "Ce document est actuellement un brouillon et n'a pas été envoyé"
 
@@ -4346,7 +4358,7 @@ msgstr "Le fichier téléchargé est trop petit"
 msgid "Uploaded file not an allowed file type"
 msgstr "Le fichier téléchargé n'est pas un type de fichier autorisé"
 
-#: apps/web/src/app/(dashboard)/templates/[id]/template-page-view.tsx:169
+#: apps/web/src/app/(dashboard)/templates/[id]/template-page-view.tsx:172
 msgid "Use"
 msgstr "Utiliser"
 
@@ -4488,7 +4500,7 @@ msgstr "Vu"
 msgid "Waiting"
 msgstr "En attente"
 
-#: apps/web/src/app/(signing)/sign/[token]/complete/page.tsx:150
+#: apps/web/src/app/(signing)/sign/[token]/complete/page.tsx:148
 msgid "Waiting for others to sign"
 msgstr "En attente que d'autres signent"
 
@@ -4806,16 +4818,16 @@ msgid "You"
 msgstr "Vous"
 
 #: apps/web/src/app/(signing)/sign/[token]/sign-dialog.tsx:93
-msgid "You are about to complete approving \"{truncatedTitle}\".<0/> Are you sure?"
-msgstr "Vous êtes sur le point de terminer l'approbation de \"{truncatedTitle}\".<0/> Êtes-vous sûr?"
+#~ msgid "You are about to complete approving \"{truncatedTitle}\".<0/> Are you sure?"
+#~ msgstr "Vous êtes sur le point de terminer l'approbation de \"{truncatedTitle}\".<0/> Êtes-vous sûr?"
 
 #: apps/web/src/app/(signing)/sign/[token]/sign-dialog.tsx:85
-msgid "You are about to complete signing \"{truncatedTitle}\".<0/> Are you sure?"
-msgstr "Vous êtes sur le point de terminer la signature de \"{truncatedTitle}\".<0/> Êtes-vous sûr?"
+#~ msgid "You are about to complete signing \"{truncatedTitle}\".<0/> Are you sure?"
+#~ msgstr "Vous êtes sur le point de terminer la signature de \"{truncatedTitle}\".<0/> Êtes-vous sûr?"
 
 #: apps/web/src/app/(signing)/sign/[token]/sign-dialog.tsx:77
-msgid "You are about to complete viewing \"{truncatedTitle}\".<0/> Are you sure?"
-msgstr "Vous êtes sur le point de terminer la visualisation de \"{truncatedTitle}\".<0/> Êtes-vous sûr?"
+#~ msgid "You are about to complete viewing \"{truncatedTitle}\".<0/> Are you sure?"
+#~ msgstr "Vous êtes sur le point de terminer la visualisation de \"{truncatedTitle}\".<0/> Êtes-vous sûr?"
 
 #: apps/web/src/app/(dashboard)/documents/delete-document-dialog.tsx:105
 msgid "You are about to delete <0>\"{documentTitle}\"</0>"
@@ -5015,7 +5027,7 @@ msgstr "Vous serez notifié et pourrez configurer votre profil public Documenso 
 msgid "You will now be required to enter a code from your authenticator app when signing in."
 msgstr "Vous devrez maintenant entrer un code de votre application d'authentification lors de la connexion."
 
-#: apps/web/src/app/(signing)/sign/[token]/complete/page.tsx:173
+#: apps/web/src/app/(signing)/sign/[token]/complete/page.tsx:171
 msgid "You will receive an Email copy of the signed document once everyone has signed."
 msgstr "Vous recevrez une copie par e-mail du document signé une fois que tout le monde aura signé."
 

@@ -10,6 +10,7 @@ import {
   ZDocumentActionAuthTypesSchema,
   ZRecipientActionAuthTypesSchema,
 } from '@documenso/lib/types/document-auth';
+import { ZDocumentEmailSettingsSchema } from '@documenso/lib/types/document-email';
 import { ZFieldMetaSchema } from '@documenso/lib/types/field-meta';
 import {
   DocumentDataType,
@@ -133,8 +134,12 @@ export const ZCreateDocumentMutationSchema = z.object({
       signingOrder: z.nativeEnum(DocumentSigningOrder).optional(),
       language: z.enum(SUPPORTED_LANGUAGE_CODES).optional(),
       typedSignatureEnabled: z.boolean().optional().default(true),
+      distributionMethod: z.nativeEnum(DocumentDistributionMethod).optional(),
+      emailSettings: ZDocumentEmailSettingsSchema.optional(),
     })
-    .partial(),
+    .partial()
+    .optional()
+    .default({}),
   authOptions: z
     .object({
       globalAccessAuth: ZDocumentAccessAuthTypesSchema.optional(),
@@ -257,6 +262,7 @@ export const ZGenerateDocumentFromTemplateMutationSchema = z.object({
       language: z.enum(SUPPORTED_LANGUAGE_CODES),
       distributionMethod: z.nativeEnum(DocumentDistributionMethod),
       typedSignatureEnabled: z.boolean(),
+      emailSettings: ZDocumentEmailSettingsSchema,
     })
     .partial()
     .optional(),

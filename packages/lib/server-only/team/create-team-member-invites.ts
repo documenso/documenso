@@ -69,7 +69,9 @@ export const createTeamMemberInvites = async ({
   const currentTeamMember = team.members.find((member) => member.user.id === userId);
 
   if (!currentTeamMember) {
-    throw new AppError(AppErrorCode.UNAUTHORIZED, 'User not part of team.');
+    throw new AppError(AppErrorCode.UNAUTHORIZED, {
+      message: 'User not part of team.',
+    });
   }
 
   const usersToInvite = invitations.filter((invitation) => {
@@ -91,10 +93,9 @@ export const createTeamMemberInvites = async ({
   );
 
   if (unauthorizedRoleAccess) {
-    throw new AppError(
-      AppErrorCode.UNAUTHORIZED,
-      'User does not have permission to set high level roles',
-    );
+    throw new AppError(AppErrorCode.UNAUTHORIZED, {
+      message: 'User does not have permission to set high level roles',
+    });
   }
 
   const teamMemberInvites = usersToInvite.map(({ email, role }) => ({
@@ -127,11 +128,10 @@ export const createTeamMemberInvites = async ({
   if (sendEmailResultErrorList.length > 0) {
     console.error(JSON.stringify(sendEmailResultErrorList));
 
-    throw new AppError(
-      'EmailDeliveryFailed',
-      'Failed to send invite emails to one or more users.',
-      `Failed to send invites to ${sendEmailResultErrorList.length}/${teamMemberInvites.length} users.`,
-    );
+    throw new AppError('EmailDeliveryFailed', {
+      message: 'Failed to send invite emails to one or more users.',
+      userMessage: `Failed to send invites to ${sendEmailResultErrorList.length}/${teamMemberInvites.length} users.`,
+    });
   }
 };
 
