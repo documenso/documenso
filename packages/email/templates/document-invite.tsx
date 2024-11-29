@@ -42,7 +42,7 @@ export const DocumentInviteEmailTemplate = ({
 
   if (isTeamInvite) {
     previewText = includeSenderDetails
-      ? msg`${inviterName} on behalf of ${teamName} has invited you to ${action} ${documentName}`
+      ? msg`${inviterName} on behalf of "${teamName}" has invited you to ${action} ${documentName}`
       : msg`${teamName} has invited you to ${action} ${documentName}`;
   }
 

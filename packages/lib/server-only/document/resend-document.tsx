@@ -134,7 +134,7 @@ export const resendDocument = async ({
         emailMessage =
           customEmail?.message ||
           i18n._(
-            msg`${user.name} on behalf of ${document.team.name} has invited you to ${recipientActionVerb} the document "${document.title}".`,
+            msg`${user.name} on behalf of "${document.team.name}" has invited you to ${recipientActionVerb} the document "${document.title}".`,
           );
       }
 
