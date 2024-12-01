@@ -74,12 +74,11 @@ export const SigningPageView = ({
       </h1>
 
       <div className="mt-2.5 flex flex-wrap items-center justify-between gap-x-6">
-        <div>
-          <p className="text-muted-foreground truncate" title={senderName}>
+        <div className="max-w-[50ch]">
+          <span className="text-muted-foreground truncate" title={senderName}>
             {senderName} {senderEmail}
-          </p>
-
-          <p className="text-muted-foreground">
+          </span>{' '}
+          <span className="text-muted-foreground">
             {match(recipient.role)
               .with(RecipientRole.VIEWER, () =>
                 document.teamId && !shouldUseTeamDetails ? (
@@ -109,7 +108,7 @@ export const SigningPageView = ({
                 ),
               )
               .otherwise(() => null)}
-          </p>
+          </span>
         </div>
 
         <RejectDocumentDialog document={document} token={recipient.token} />
