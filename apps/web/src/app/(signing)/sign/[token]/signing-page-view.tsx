@@ -55,12 +55,14 @@ export const SigningPageView = ({
 
   const shouldUseTeamDetails =
     document.teamId && document.team?.teamGlobalSettings?.includeSenderDetails === false;
-  const senderName = shouldUseTeamDetails ? document.team?.name : (document.User.name ?? '');
-  const senderEmail = shouldUseTeamDetails
-    ? document.team?.teamEmail?.email
-      ? `(${document.team.teamEmail.email})`
-      : ''
-    : `(${document.User.email})`;
+
+  let senderName = document.User.name ?? '';
+  let senderEmail = `(${document.User.email})`;
+
+  if (shouldUseTeamDetails) {
+    senderName = document.team?.name ?? '';
+    senderEmail = document.team?.teamEmail?.email ? `(${document.team.teamEmail.email})` : '';
+  }
 
   return (
     <div className="mx-auto w-full max-w-screen-xl">
@@ -79,30 +81,33 @@ export const SigningPageView = ({
 
           <p className="text-muted-foreground">
             {match(recipient.role)
-              .with(RecipientRole.VIEWER, () => (
-                <Trans>
-                  {document.teamId && !shouldUseTeamDetails
-                    ? `on behalf of "${document.team?.name}" `
-                    : ''}
-                  has invited you to view this document
-                </Trans>
-              ))
-              .with(RecipientRole.SIGNER, () => (
-                <Trans>
-                  {document.teamId && !shouldUseTeamDetails
-                    ? `on behalf of "${document.team?.name}" `
-                    : ''}
-                  has invited you to sign this document
-                </Trans>
-              ))
-              .with(RecipientRole.APPROVER, () => (
-                <Trans>
-                  {document.teamId && !shouldUseTeamDetails
-                    ? `on behalf of "${document.team?.name}" `
-                    : ''}
-                  has invited you to approve this document
-                </Trans>
-              ))
+              .with(RecipientRole.VIEWER, () =>
+                document.teamId && !shouldUseTeamDetails ? (
+                  <Trans>
+                    on behalf of "{document.team?.name}" has invited you to view this document
+                  </Trans>
+                ) : (
+                  <Trans>has invited you to view this document</Trans>
+                ),
+              )
+              .with(RecipientRole.SIGNER, () =>
+                document.teamId && !shouldUseTeamDetails ? (
+                  <Trans>
+                    on behalf of "{document.team?.name}" has invited you to sign this document
+                  </Trans>
+                ) : (
+                  <Trans>has invited you to sign this document</Trans>
+                ),
+              )
+              .with(RecipientRole.APPROVER, () =>
+                document.teamId && !shouldUseTeamDetails ? (
+                  <Trans>
+                    on behalf of "{document.team?.name}" has invited you to approve this document
+                  </Trans>
+                ) : (
+                  <Trans>has invited you to approve this document</Trans>
+                ),
+              )
               .otherwise(() => null)}
           </p>
         </div>
