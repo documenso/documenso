@@ -260,6 +260,58 @@ export const SignaturePad = ({
     }
   };
 
+  const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const uploadedFile = event.target.files?.[0];
+
+    if (!uploadedFile) {
+      return;
+    }
+
+    if (!uploadedFile.type.startsWith('image/')) {
+      throw new Error('Invalid file type');
+    }
+
+    if (uploadedFile.size > 5 * 1024 * 1024) {
+      throw new Error('Image size should be less than 5MB');
+    }
+
+    const img = new Image();
+    const objectUrl = URL.createObjectURL(uploadedFile);
+
+    img.onload = () => {
+      if (!$el.current) return;
+
+      const ctx = $el.current.getContext('2d');
+      if (!ctx) return;
+
+      const canvasWidth = $el.current.width;
+      const canvasHeight = $el.current.height;
+      // Clear existing content
+      ctx.clearRect(0, 0, canvasWidth, canvasHeight);
+
+      // Calculate dimensions to maintain aspect ratio
+      const canvas = $el.current;
+      const scale = Math.min((canvas.width * 0.8) / img.width, (canvas.height * 0.8) / img.height);
+      const x = (canvas.width - img.width * scale) / 2;
+      const y = (canvas.height - img.height * scale) / 2;
+
+      // Draw image
+      ctx.drawImage(img, x, y, img.width * scale, img.height * scale);
+
+      // Save the image data and trigger onChange
+      $imageData.current = ctx.getImageData(0, 0, canvas.width, canvas.height);
+      onChange?.(canvas.toDataURL());
+
+      setLines([]);
+      setCurrentLine([]);
+      setTypedSignature('');
+
+      URL.revokeObjectURL(objectUrl);
+    };
+
+    img.src = objectUrl;
+  };
+
   useEffect(() => {
     if (typedSignature.trim() !== '') {
       renderTypedSignature();
