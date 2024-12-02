@@ -44,7 +44,7 @@ export const requestTeamOwnershipTransfer = async ({
   userName,
   teamId,
   newOwnerUserId,
-}: RequestTeamOwnershipTransferOptions) => {
+}: RequestTeamOwnershipTransferOptions): Promise<void> => {
   // Todo: Clear payment methods disabled for now.
   const clearPaymentMethods = false;
 

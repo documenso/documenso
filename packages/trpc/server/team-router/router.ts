@@ -1,9 +1,10 @@
 import { TRPCError } from '@trpc/server';
+import { z } from 'zod';
 
 import { getTeamPrices } from '@documenso/ee/server-only/stripe/get-team-prices';
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import { acceptTeamInvitation } from '@documenso/lib/server-only/team/accept-team-invitation';
-import { createTeam } from '@documenso/lib/server-only/team/create-team';
+import { ZCreateTeamResponseSchema, createTeam } from '@documenso/lib/server-only/team/create-team';
 import { createTeamBillingPortal } from '@documenso/lib/server-only/team/create-team-billing-portal';
 import { createTeamPendingCheckoutSession } from '@documenso/lib/server-only/team/create-team-checkout-session';
 import { createTeamEmailVerification } from '@documenso/lib/server-only/team/create-team-email-verification';
@@ -17,22 +18,43 @@ import { deleteTeamMembers } from '@documenso/lib/server-only/team/delete-team-m
 import { deleteTeamPending } from '@documenso/lib/server-only/team/delete-team-pending';
 import { deleteTeamTransferRequest } from '@documenso/lib/server-only/team/delete-team-transfer-request';
 import { findTeamInvoices } from '@documenso/lib/server-only/team/find-team-invoices';
-import { findTeamMemberInvites } from '@documenso/lib/server-only/team/find-team-member-invites';
-import { findTeamMembers } from '@documenso/lib/server-only/team/find-team-members';
+import {
+  ZFindTeamMemberInvitesResponseSchema,
+  findTeamMemberInvites,
+} from '@documenso/lib/server-only/team/find-team-member-invites';
+import {
+  ZFindTeamMembersResponseSchema,
+  findTeamMembers,
+} from '@documenso/lib/server-only/team/find-team-members';
 import { findTeams } from '@documenso/lib/server-only/team/find-teams';
-import { findTeamsPending } from '@documenso/lib/server-only/team/find-teams-pending';
-import { getTeamById } from '@documenso/lib/server-only/team/get-team';
+import {
+  ZFindTeamsPendingResponseSchema,
+  findTeamsPending,
+} from '@documenso/lib/server-only/team/find-teams-pending';
+import { ZGetTeamByIdResponseSchema, getTeamById } from '@documenso/lib/server-only/team/get-team';
 import { getTeamEmailByEmail } from '@documenso/lib/server-only/team/get-team-email-by-email';
-import { getTeamInvitations } from '@documenso/lib/server-only/team/get-team-invitations';
-import { getTeamMembers } from '@documenso/lib/server-only/team/get-team-members';
-import { getTeams } from '@documenso/lib/server-only/team/get-teams';
+import {
+  ZGetTeamInvitationsResponseSchema,
+  getTeamInvitations,
+} from '@documenso/lib/server-only/team/get-team-invitations';
+import {
+  ZGetTeamMembersResponseSchema,
+  getTeamMembers,
+} from '@documenso/lib/server-only/team/get-team-members';
+import { ZGetTeamsResponseSchema, getTeams } from '@documenso/lib/server-only/team/get-teams';
 import { leaveTeam } from '@documenso/lib/server-only/team/leave-team';
 import { requestTeamOwnershipTransfer } from '@documenso/lib/server-only/team/request-team-ownership-transfer';
 import { resendTeamEmailVerification } from '@documenso/lib/server-only/team/resend-team-email-verification';
 import { resendTeamMemberInvitation } from '@documenso/lib/server-only/team/resend-team-member-invitation';
 import { updateTeam } from '@documenso/lib/server-only/team/update-team';
-import { updateTeamBrandingSettings } from '@documenso/lib/server-only/team/update-team-branding-settings';
-import { updateTeamDocumentSettings } from '@documenso/lib/server-only/team/update-team-document-settings';
+import {
+  ZUpdateTeamBrandingSettingsResponseSchema,
+  updateTeamBrandingSettings,
+} from '@documenso/lib/server-only/team/update-team-branding-settings';
+import {
+  ZUpdateTeamDocumentSettingsResponseSchema,
+  updateTeamDocumentSettings,
+} from '@documenso/lib/server-only/team/update-team-document-settings';
 import { updateTeamEmail } from '@documenso/lib/server-only/team/update-team-email';
 import { updateTeamMember } from '@documenso/lib/server-only/team/update-team-member';
 import { updateTeamPublicProfile } from '@documenso/lib/server-only/team/update-team-public-profile';
@@ -73,6 +95,7 @@ import {
 } from './schema';
 
 export const teamRouter = router({
+  // Internal endpoint for now.
   acceptTeamInvitation: authenticatedProcedure
     .input(ZAcceptTeamInvitationMutationSchema)
     .mutation(async ({ input, ctx }) => {
@@ -82,6 +105,7 @@ export const teamRouter = router({
       });
     }),
 
+  // Internal endpoint for now.
   declineTeamInvitation: authenticatedProcedure
     .input(ZDeclineTeamInvitationMutationSchema)
     .mutation(async ({ input, ctx }) => {
@@ -91,6 +115,7 @@ export const teamRouter = router({
       });
     }),
 
+  // Internal endpoint for now.
   createBillingPortal: authenticatedProcedure
     .input(ZCreateTeamBillingPortalMutationSchema)
     .mutation(async ({ input, ctx }) => {
@@ -101,7 +126,9 @@ export const teamRouter = router({
     }),
 
   createTeam: authenticatedProcedure
+    .meta({ openapi: { method: 'POST', path: '/team' } })
     .input(ZCreateTeamMutationSchema)
+    .output(ZCreateTeamResponseSchema)
     .mutation(async ({ input, ctx }) => {
       return await createTeam({
         userId: ctx.user.id,
@@ -110,7 +137,9 @@ export const teamRouter = router({
     }),
 
   createTeamEmailVerification: authenticatedProcedure
+    .meta({ openapi: { method: 'POST', path: '/team/{teamId}/email' } })
     .input(ZCreateTeamEmailVerificationMutationSchema)
+    .output(z.void())
     .mutation(async ({ input, ctx }) => {
       return await createTeamEmailVerification({
         teamId: input.teamId,
@@ -123,7 +152,9 @@ export const teamRouter = router({
     }),
 
   createTeamMemberInvites: authenticatedProcedure
+    .meta({ openapi: { method: 'POST', path: '/team/{teamId}/member/invite' } })
     .input(ZCreateTeamMemberInvitesMutationSchema)
+    .output(z.void())
     .mutation(async ({ input, ctx }) => {
       return await createTeamMemberInvites({
         userId: ctx.user.id,
@@ -132,6 +163,7 @@ export const teamRouter = router({
       });
     }),
 
+  // Internal endpoint for now.
   createTeamPendingCheckout: authenticatedProcedure
     .input(ZCreateTeamPendingCheckoutMutationSchema)
     .mutation(async ({ input, ctx }) => {
@@ -142,6 +174,7 @@ export const teamRouter = router({
     }),
 
   deleteTeam: authenticatedProcedure
+    // .meta({ openapi: { method: 'DELETE', path: '/team/{teamId}' } })
     .input(ZDeleteTeamMutationSchema)
     .mutation(async ({ input, ctx }) => {
       return await deleteTeam({
@@ -151,6 +184,7 @@ export const teamRouter = router({
     }),
 
   deleteTeamEmail: authenticatedProcedure
+    // .meta({ openapi: { method: 'DELETE', path: '/team/{teamId}/email' } })
     .input(ZDeleteTeamEmailMutationSchema)
     .mutation(async ({ input, ctx }) => {
       return await deleteTeamEmail({
@@ -161,6 +195,7 @@ export const teamRouter = router({
     }),
 
   deleteTeamEmailVerification: authenticatedProcedure
+    // .meta({ openapi: { method: 'DELETE', path: '/team/{teamId}/email-verification' } })
     .input(ZDeleteTeamEmailVerificationMutationSchema)
     .mutation(async ({ input, ctx }) => {
       return await deleteTeamEmailVerification({
@@ -170,6 +205,7 @@ export const teamRouter = router({
     }),
 
   deleteTeamMemberInvitations: authenticatedProcedure
+    // .meta({ openapi: { method: 'DELETE', path: '/team/{teamId}/member/invite' } })
     .input(ZDeleteTeamMemberInvitationsMutationSchema)
     .mutation(async ({ input, ctx }) => {
       return await deleteTeamMemberInvitations({
@@ -179,6 +215,7 @@ export const teamRouter = router({
     }),
 
   deleteTeamMembers: authenticatedProcedure
+    // .meta({ openapi: { method: 'DELETE', path: '/team/{teamId}/member' } })
     .input(ZDeleteTeamMembersMutationSchema)
     .mutation(async ({ input, ctx }) => {
       return await deleteTeamMembers({
@@ -188,6 +225,7 @@ export const teamRouter = router({
     }),
 
   deleteTeamPending: authenticatedProcedure
+    // .meta({ openapi: { method: 'DELETE', path: '/team-pending/{pendingTeamId}' } })
     .input(ZDeleteTeamPendingMutationSchema)
     .mutation(async ({ input, ctx }) => {
       return await deleteTeamPending({
@@ -197,6 +235,7 @@ export const teamRouter = router({
     }),
 
   deleteTeamTransferRequest: authenticatedProcedure
+    // .meta({ openapi: { method: 'DELETE', path: '/team/{teamId}/transfer' } })
     .input(ZDeleteTeamTransferRequestMutationSchema)
     .mutation(async ({ input, ctx }) => {
       return await deleteTeamTransferRequest({
@@ -205,6 +244,7 @@ export const teamRouter = router({
       });
     }),
 
+  // Internal endpoint for now.
   findTeamInvoices: authenticatedProcedure
     .input(ZFindTeamInvoicesQuerySchema)
     .query(async ({ input, ctx }) => {
@@ -215,7 +255,9 @@ export const teamRouter = router({
     }),
 
   findTeamMemberInvites: authenticatedProcedure
+    .meta({ openapi: { method: 'GET', path: '/team/{teamId}/member/invite' } })
     .input(ZFindTeamMemberInvitesQuerySchema)
+    .output(ZFindTeamMemberInvitesResponseSchema)
     .query(async ({ input, ctx }) => {
       return await findTeamMemberInvites({
         userId: ctx.user.id,
@@ -224,7 +266,9 @@ export const teamRouter = router({
     }),
 
   findTeamMembers: authenticatedProcedure
+    .meta({ openapi: { method: 'GET', path: '/team/{teamId}/member' } })
     .input(ZFindTeamMembersQuerySchema)
+    .output(ZFindTeamMembersResponseSchema)
     .query(async ({ input, ctx }) => {
       return await findTeamMembers({
         userId: ctx.user.id,
@@ -232,6 +276,7 @@ export const teamRouter = router({
       });
     }),
 
+  // Todo: Refactor, seems to be a redundant endpoint.
   findTeams: authenticatedProcedure.input(ZFindTeamsQuerySchema).query(async ({ input, ctx }) => {
     return await findTeams({
       userId: ctx.user.id,
@@ -240,7 +285,9 @@ export const teamRouter = router({
   }),
 
   findTeamsPending: authenticatedProcedure
+    .meta({ openapi: { method: 'GET', path: '/team-pending' } })
     .input(ZFindTeamsPendingQuerySchema)
+    .output(ZFindTeamsPendingResponseSchema)
     .query(async ({ input, ctx }) => {
       return await findTeamsPending({
         userId: ctx.user.id,
@@ -248,34 +295,52 @@ export const teamRouter = router({
       });
     }),
 
-  getTeam: authenticatedProcedure.input(ZGetTeamQuerySchema).query(async ({ input, ctx }) => {
-    return await getTeamById({ teamId: input.teamId, userId: ctx.user.id });
-  }),
+  getTeam: authenticatedProcedure
+    .meta({ openapi: { method: 'GET', path: '/team/{teamId}' } })
+    .input(ZGetTeamQuerySchema)
+    .output(ZGetTeamByIdResponseSchema)
+    .query(async ({ input, ctx }) => {
+      return await getTeamById({ teamId: input.teamId, userId: ctx.user.id });
+    }),
 
+  // Todo
   getTeamEmailByEmail: authenticatedProcedure.query(async ({ ctx }) => {
     return await getTeamEmailByEmail({ email: ctx.user.email });
   }),
 
-  getTeamInvitations: authenticatedProcedure.query(async ({ ctx }) => {
-    return await getTeamInvitations({ email: ctx.user.email });
-  }),
+  getTeamInvitations: authenticatedProcedure
+    .meta({ openapi: { method: 'GET', path: '/team/invite' } })
+    .input(z.void())
+    .output(ZGetTeamInvitationsResponseSchema)
+    .query(async ({ ctx }) => {
+      return await getTeamInvitations({ email: ctx.user.email });
+    }),
 
   getTeamMembers: authenticatedProcedure
+    .meta({ openapi: { method: 'GET', path: '/team/member' } })
     .input(ZGetTeamMembersQuerySchema)
+    .output(ZGetTeamMembersResponseSchema)
     .query(async ({ input, ctx }) => {
       return await getTeamMembers({ teamId: input.teamId, userId: ctx.user.id });
     }),
 
+  // Internal endpoint for now.
   getTeamPrices: authenticatedProcedure.query(async () => {
     return await getTeamPrices();
   }),
 
-  getTeams: authenticatedProcedure.query(async ({ ctx }) => {
-    return await getTeams({ userId: ctx.user.id });
-  }),
+  getTeams: authenticatedProcedure
+    .meta({ openapi: { method: 'GET', path: '/team' } })
+    .input(z.void())
+    .output(ZGetTeamsResponseSchema)
+    .query(async ({ ctx }) => {
+      return await getTeams({ userId: ctx.user.id });
+    }),
 
   leaveTeam: authenticatedProcedure
+    .meta({ openapi: { method: 'POST', path: '/team/{teamId}/leave' } })
     .input(ZLeaveTeamMutationSchema)
+    .output(z.void())
     .mutation(async ({ input, ctx }) => {
       return await leaveTeam({
         userId: ctx.user.id,
@@ -284,7 +349,9 @@ export const teamRouter = router({
     }),
 
   updateTeam: authenticatedProcedure
+    .meta({ openapi: { method: 'PATCH', path: '/team/{teamId}' } })
     .input(ZUpdateTeamMutationSchema)
+    .output(z.void())
     .mutation(async ({ input, ctx }) => {
       return await updateTeam({
         userId: ctx.user.id,
@@ -293,7 +360,9 @@ export const teamRouter = router({
     }),
 
   updateTeamEmail: authenticatedProcedure
+    .meta({ openapi: { method: 'PATCH', path: '/team/{teamId}/email' } })
     .input(ZUpdateTeamEmailMutationSchema)
+    .output(z.void())
     .mutation(async ({ input, ctx }) => {
       return await updateTeamEmail({
         userId: ctx.user.id,
@@ -302,7 +371,9 @@ export const teamRouter = router({
     }),
 
   updateTeamMember: authenticatedProcedure
+    .meta({ openapi: { method: 'PATCH', path: '/team/{teamId}/member' } })
     .input(ZUpdateTeamMemberMutationSchema)
+    .output(z.void())
     .mutation(async ({ input, ctx }) => {
       return await updateTeamMember({
         userId: ctx.user.id,
@@ -311,12 +382,14 @@ export const teamRouter = router({
     }),
 
   updateTeamPublicProfile: authenticatedProcedure
+    .meta({ openapi: { method: 'PATCH', path: '/team/{teamId}/profile' } })
     .input(ZUpdateTeamPublicProfileMutationSchema)
+    .output(z.void())
     .mutation(async ({ input, ctx }) => {
       try {
         const { teamId, bio, enabled } = input;
 
-        const team = await updateTeamPublicProfile({
+        await updateTeamPublicProfile({
           userId: ctx.user.id,
           teamId,
           data: {
@@ -324,8 +397,6 @@ export const teamRouter = router({
             enabled,
           },
         });
-
-        return { success: true, url: team.url };
       } catch (err) {
         console.error(err);
 
@@ -344,7 +415,9 @@ export const teamRouter = router({
     }),
 
   requestTeamOwnershipTransfer: authenticatedProcedure
+    .meta({ openapi: { method: 'POST', path: '/team/{teamId}/transfer' } })
     .input(ZRequestTeamOwnerhsipTransferMutationSchema)
+    .output(z.void())
     .mutation(async ({ input, ctx }) => {
       return await requestTeamOwnershipTransfer({
         userId: ctx.user.id,
@@ -354,7 +427,9 @@ export const teamRouter = router({
     }),
 
   resendTeamEmailVerification: authenticatedProcedure
+    .meta({ openapi: { method: 'POST', path: '/team/{teamId}/email/resend' } })
     .input(ZResendTeamEmailVerificationMutationSchema)
+    .output(z.void())
     .mutation(async ({ input, ctx }) => {
       await resendTeamEmailVerification({
         userId: ctx.user.id,
@@ -363,7 +438,11 @@ export const teamRouter = router({
     }),
 
   resendTeamMemberInvitation: authenticatedProcedure
+    .meta({
+      openapi: { method: 'POST', path: '/team/{teamId}/member/invite/{invitationId}/resend' },
+    })
     .input(ZResendTeamMemberInvitationMutationSchema)
+    .output(z.void())
     .mutation(async ({ input, ctx }) => {
       await resendTeamMemberInvitation({
         userId: ctx.user.id,
@@ -373,7 +452,9 @@ export const teamRouter = router({
     }),
 
   updateTeamBrandingSettings: authenticatedProcedure
+    .meta({ openapi: { method: 'PATCH', path: '/team/{teamId}/branding' } })
     .input(ZUpdateTeamBrandingSettingsMutationSchema)
+    .output(ZUpdateTeamBrandingSettingsResponseSchema)
     .mutation(async ({ ctx, input }) => {
       const { teamId, settings } = input;
 
@@ -385,7 +466,9 @@ export const teamRouter = router({
     }),
 
   updateTeamDocumentSettings: authenticatedProcedure
+    .meta({ openapi: { method: 'PATCH', path: '/team/{teamId}/settings' } })
     .input(ZUpdateTeamDocumentSettingsMutationSchema)
+    .output(ZUpdateTeamDocumentSettingsResponseSchema)
     .mutation(async ({ ctx, input }) => {
       const { teamId, settings } = input;
 

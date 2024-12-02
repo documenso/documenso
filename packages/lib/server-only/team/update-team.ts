@@ -14,7 +14,7 @@ export type UpdateTeamOptions = {
   };
 };
 
-export const updateTeam = async ({ userId, teamId, data }: UpdateTeamOptions) => {
+export const updateTeam = async ({ userId, teamId, data }: UpdateTeamOptions): Promise<void> => {
   try {
     await prisma.$transaction(async (tx) => {
       const foundPendingTeamWithUrl = await tx.teamPending.findFirst({
