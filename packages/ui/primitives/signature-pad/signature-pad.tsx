@@ -33,6 +33,8 @@ const fontCaveat = Caveat({
 
 const DPI = 2;
 
+const isBase64Image = (value: string) => value.startsWith('data:image/png;base64,');
+
 export type SignaturePadProps = Omit<HTMLAttributes<HTMLCanvasElement>, 'onChange'> & {
   onChange?: (_signatureDataUrl: string | null) => void;
   containerClassName?: string;
@@ -58,7 +60,9 @@ export const SignaturePad = ({
   const [lines, setLines] = useState<Point[][]>([]);
   const [currentLine, setCurrentLine] = useState<Point[]>([]);
   const [selectedColor, setSelectedColor] = useState('black');
-  const [typedSignature, setTypedSignature] = useState(defaultValue ?? '');
+  const [typedSignature, setTypedSignature] = useState(
+    defaultValue && !isBase64Image(defaultValue) ? defaultValue : '',
+  );
 
   const perfectFreehandOptions = useMemo(() => {
     const size = $el.current ? Math.min($el.current.height, $el.current.width) * 0.03 : 10;
@@ -313,7 +317,7 @@ export const SignaturePad = ({
   };
 
   useEffect(() => {
-    if (typedSignature.trim() !== '') {
+    if (typedSignature.trim() !== '' && !isBase64Image(typedSignature)) {
       renderTypedSignature();
       onChange?.(typedSignature);
     } else {
