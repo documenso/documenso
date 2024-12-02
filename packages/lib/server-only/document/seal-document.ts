@@ -101,7 +101,7 @@ export const sealDocument = async ({
   const pdfData = await getFile(documentData);
 
   const certificateData =
-    document.team?.teamGlobalSettings?.includeSigningCertificate ?? true
+    (document.team?.teamGlobalSettings?.includeSigningCertificate ?? true)
       ? await getCertificatePdf({
           documentId,
           language: document.documentMeta?.language,
@@ -136,10 +136,10 @@ export const sealDocument = async ({
 
   const pdfBuffer = await signPdf({ pdf: Buffer.from(pdfBytes) });
 
-  const { name, ext } = path.parse(document.title);
+  const { name } = path.parse(document.title);
 
   const { data: newData } = await putPdfFile({
-    name: `${name}_signed${ext}`,
+    name: `${name}_signed.pdf`,
     type: 'application/pdf',
     arrayBuffer: async () => Promise.resolve(pdfBuffer),
   });
