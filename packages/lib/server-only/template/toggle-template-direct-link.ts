@@ -40,13 +40,17 @@ export const toggleTemplateDirectLink = async ({
   });
 
   if (!template) {
-    throw new AppError(AppErrorCode.NOT_FOUND, 'Template not found');
+    throw new AppError(AppErrorCode.NOT_FOUND, {
+      message: 'Template not found',
+    });
   }
 
   const { directLink } = template;
 
   if (!directLink) {
-    throw new AppError(AppErrorCode.NOT_FOUND, 'Direct template link not found');
+    throw new AppError(AppErrorCode.NOT_FOUND, {
+      message: 'Direct template link not found',
+    });
   }
 
   return await prisma.templateDirectLink.update({

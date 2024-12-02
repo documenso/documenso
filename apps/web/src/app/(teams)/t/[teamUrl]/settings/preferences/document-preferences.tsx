@@ -39,6 +39,7 @@ const ZTeamDocumentPreferencesFormSchema = z.object({
   documentVisibility: z.nativeEnum(DocumentVisibility),
   documentLanguage: z.enum(SUPPORTED_LANGUAGE_CODES),
   includeSenderDetails: z.boolean(),
+  typedSignatureEnabled: z.boolean(),
   includeSigningCertificate: z.boolean(),
 });
 
@@ -69,6 +70,7 @@ export const TeamDocumentPreferencesForm = ({
         ? settings?.documentLanguage
         : 'en',
       includeSenderDetails: settings?.includeSenderDetails ?? false,
+      typedSignatureEnabled: settings?.typedSignatureEnabled ?? true,
       includeSigningCertificate: settings?.includeSigningCertificate ?? true,
     },
     resolver: zodResolver(ZTeamDocumentPreferencesFormSchema),
@@ -83,6 +85,7 @@ export const TeamDocumentPreferencesForm = ({
         documentLanguage,
         includeSenderDetails,
         includeSigningCertificate,
+        typedSignatureEnabled,
       } = data;
 
       await updateTeamDocumentPreferences({
@@ -91,6 +94,7 @@ export const TeamDocumentPreferencesForm = ({
           documentVisibility,
           documentLanguage,
           includeSenderDetails,
+          typedSignatureEnabled,
           includeSigningCertificate,
         },
       });
@@ -113,7 +117,7 @@ export const TeamDocumentPreferencesForm = ({
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)}>
         <fieldset
-          className="flex h-full max-w-xl flex-col gap-y-4"
+          className="flex h-full max-w-xl flex-col gap-y-6"
           disabled={form.formState.isSubmitting}
         >
           <FormField
@@ -229,6 +233,36 @@ export const TeamDocumentPreferencesForm = ({
                     Controls the formatting of the message that will be sent when inviting a
                     recipient to sign a document. If a custom message has been provided while
                     configuring the document, it will be used instead.
+                  </Trans>
+                </FormDescription>
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={form.control}
+            name="typedSignatureEnabled"
+            render={({ field }) => (
+              <FormItem className="flex-1">
+                <FormLabel>
+                  <Trans>Enable Typed Signature</Trans>
+                </FormLabel>
+
+                <div>
+                  <FormControl className="block">
+                    <Switch
+                      ref={field.ref}
+                      name={field.name}
+                      checked={field.value}
+                      onCheckedChange={field.onChange}
+                    />
+                  </FormControl>
+                </div>
+
+                <FormDescription>
+                  <Trans>
+                    Controls whether the recipients can sign the documents using a typed signature.
+                    Enable or disable the typed signature globally.
                   </Trans>
                 </FormDescription>
               </FormItem>

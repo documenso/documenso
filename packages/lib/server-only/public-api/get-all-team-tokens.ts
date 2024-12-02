@@ -18,10 +18,9 @@ export const getTeamTokens = async ({ userId, teamId }: GetUserTokensOptions) =>
   });
 
   if (teamMember?.role !== TeamMemberRole.ADMIN) {
-    throw new AppError(
-      AppErrorCode.UNAUTHORIZED,
-      'You do not have the required permissions to view this page.',
-    );
+    throw new AppError(AppErrorCode.UNAUTHORIZED, {
+      message: 'You do not have the required permissions to view this page.',
+    });
   }
 
   return await prisma.apiToken.findMany({

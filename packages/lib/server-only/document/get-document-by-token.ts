@@ -81,6 +81,17 @@ export const getDocumentAndSenderByToken = async ({
           token,
         },
       },
+      team: {
+        select: {
+          name: true,
+          teamEmail: true,
+          teamGlobalSettings: {
+            select: {
+              includeSenderDetails: true,
+            },
+          },
+        },
+      },
     },
   });
 
@@ -107,7 +118,9 @@ export const getDocumentAndSenderByToken = async ({
   }
 
   if (!documentAccessValid) {
-    throw new AppError(AppErrorCode.UNAUTHORIZED, 'Invalid access values');
+    throw new AppError(AppErrorCode.UNAUTHORIZED, {
+      message: 'Invalid access values',
+    });
   }
 
   return {
@@ -167,7 +180,9 @@ export const getDocumentAndRecipientByToken = async ({
   }
 
   if (!documentAccessValid) {
-    throw new AppError(AppErrorCode.UNAUTHORIZED, 'Invalid access values');
+    throw new AppError(AppErrorCode.UNAUTHORIZED, {
+      message: 'Invalid access values',
+    });
   }
 
   return {

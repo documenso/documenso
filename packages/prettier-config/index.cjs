@@ -24,7 +24,8 @@ module.exports = {
 
   plugins: [
     '@trivago/prettier-plugin-sort-imports',
-    'prettier-plugin-sql',
+    // !: Disabled until Prettier 3.x is supported.
+    // 'prettier-plugin-sql',
     'prettier-plugin-tailwindcss',
   ],
 
