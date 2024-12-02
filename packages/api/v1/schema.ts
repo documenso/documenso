@@ -498,7 +498,6 @@ export const ZFieldSchema = z.object({
   height: z.unknown(),
   customText: z.string(),
   inserted: z.boolean(),
-  fieldMeta: ZFieldMetaSchema.nullable(),
 });
 
 export const ZTemplateWithDataSchema = ZTemplateSchema.extend({
@@ -523,7 +522,6 @@ export const ZTemplateWithDataSchema = ZTemplateSchema.extend({
     positionY: true,
     width: true,
     height: true,
-    fieldMeta: true,
   }).array(),
   Recipient: ZRecipientSchema.pick({
     id: true,
@@ -535,7 +533,9 @@ export const ZTemplateWithDataSchema = ZTemplateSchema.extend({
   }).array(),
 });
 
-export const ZSuccessfulGetTemplateResponseSchema = ZTemplateWithDataSchema;
+export const ZSuccessfulGetTemplateResponseSchema = ZTemplateWithDataSchema.extend({
+  Field: ZTemplateWithDataSchema.shape.Field.element.extend({ fieldMeta: z.unknown() }).array(),
+});
 
 export const ZSuccessfulDeleteTemplateResponseSchema = ZTemplateSchema;
 
