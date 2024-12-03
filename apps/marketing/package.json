@@ -46,8 +46,7 @@
     "react-icons": "^4.11.0",
     "recharts": "^2.7.2",
     "sharp": "0.32.6",
-    "typescript": "5.2.2",
-    "zod": "^3.22.4"
+    "typescript": "5.2.2"
   },
   "devDependencies": {
     "@lingui/loader": "^4.11.3",

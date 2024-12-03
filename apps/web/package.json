@@ -58,8 +58,7 @@
     "sharp": "0.32.6",
     "ts-pattern": "^5.0.5",
     "ua-parser-js": "^1.0.37",
-    "uqr": "^0.1.2",
-    "zod": "^3.22.4"
+    "uqr": "^0.1.2"
   },
   "devDependencies": {
     "@documenso/tailwind-config": "*",

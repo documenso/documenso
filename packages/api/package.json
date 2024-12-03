@@ -24,7 +24,6 @@
     "luxon": "^3.4.0",
     "superjson": "^1.13.1",
     "swagger-ui-react": "^5.11.0",
-    "ts-pattern": "^5.0.5",
-    "zod": "^3.22.4"
+    "ts-pattern": "^5.0.5"
   }
 }
