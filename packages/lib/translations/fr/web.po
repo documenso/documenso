@@ -51,16 +51,16 @@ msgstr "\"{placeholderEmail}\" au nom de \"{0}\" vous a invité à signer \"exem
 #~ msgstr "\"{teamUrl}\" vous a invité à signer \"example document\"."
 
 #: apps/web/src/app/(signing)/sign/[token]/signing-page-view.tsx:83
-msgid "({0}) has invited you to approve this document"
-msgstr "({0}) vous a invité à approuver ce document"
+#~ msgid "({0}) has invited you to approve this document"
+#~ msgstr "({0}) vous a invité à approuver ce document"
 
 #: apps/web/src/app/(signing)/sign/[token]/signing-page-view.tsx:80
-msgid "({0}) has invited you to sign this document"
-msgstr "({0}) vous a invité à signer ce document"
+#~ msgid "({0}) has invited you to sign this document"
+#~ msgstr "({0}) vous a invité à signer ce document"
 
 #: apps/web/src/app/(signing)/sign/[token]/signing-page-view.tsx:77
-msgid "({0}) has invited you to view this document"
-msgstr "({0}) vous a invité à consulter ce document"
+#~ msgid "({0}) has invited you to view this document"
+#~ msgstr "({0}) vous a invité à consulter ce document"
 
 #: apps/web/src/app/(signing)/sign/[token]/text-field.tsx:313
 msgid "{0, plural, one {(1 character over)} other {(# characters over)}}"
@@ -1989,6 +1989,18 @@ msgstr "Aller au propriétaire"
 msgid "Go to your <0>public profile settings</0> to add documents."
 msgstr "Allez à vos <0>paramètres de profil public</0> pour ajouter des documents."
 
+#: apps/web/src/app/(signing)/sign/[token]/signing-page-view.tsx:107
+msgid "has invited you to approve this document"
+msgstr ""
+
+#: apps/web/src/app/(signing)/sign/[token]/signing-page-view.tsx:98
+msgid "has invited you to sign this document"
+msgstr ""
+
+#: apps/web/src/app/(signing)/sign/[token]/signing-page-view.tsx:89
+msgid "has invited you to view this document"
+msgstr ""
+
 #: apps/web/src/app/(dashboard)/settings/profile/page.tsx:29
 msgid "Here you can edit your personal details."
 msgstr "Ici, vous pouvez modifier vos coordonnées personnelles."
@@ -2529,6 +2541,18 @@ msgstr "Rien à faire"
 #: apps/web/src/app/(signing)/sign/[token]/number-field.tsx:271
 msgid "Number"
 msgstr "Numéro"
+
+#: apps/web/src/app/(signing)/sign/[token]/signing-page-view.tsx:103
+msgid "on behalf of \"{0}\" has invited you to approve this document"
+msgstr ""
+
+#: apps/web/src/app/(signing)/sign/[token]/signing-page-view.tsx:94
+msgid "on behalf of \"{0}\" has invited you to sign this document"
+msgstr ""
+
+#: apps/web/src/app/(signing)/sign/[token]/signing-page-view.tsx:85
+msgid "on behalf of \"{0}\" has invited you to view this document"
+msgstr ""
 
 #: apps/web/src/components/(dashboard)/settings/webhooks/create-webhook-dialog.tsx:128
 msgid "On this page, you can create a new webhook."
