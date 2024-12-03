@@ -135,6 +135,14 @@ export const SignaturePad = ({
 
     setIsPressed(true);
 
+    if (typedSignature) {
+      setTypedSignature('');
+      if ($el.current) {
+        const ctx = $el.current.getContext('2d');
+        ctx?.clearRect(0, 0, $el.current.width, $el.current.height);
+      }
+    }
+
     const point = Point.fromEvent(event, DPI, $el.current);
 
     setCurrentLine([point]);
@@ -338,8 +346,6 @@ export const SignaturePad = ({
     if (typedSignature.trim() !== '' && !isBase64Image(typedSignature)) {
       renderTypedSignature();
       onChange?.(typedSignature);
-    } else {
-      onClearClick();
     }
   }, [typedSignature, selectedColor]);
 
