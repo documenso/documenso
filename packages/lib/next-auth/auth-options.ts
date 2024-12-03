@@ -26,7 +26,8 @@ import { extractNextAuthRequestMetadata } from '../universal/extract-request-met
 import { getAuthenticatorOptions } from '../utils/authenticator';
 import { ErrorCode } from './error-codes';
 
-const useSecureCookies = process.env.NODE_ENV === 'production';
+const useSecureCookies =
+  process.env.NODE_ENV === 'production' && String(process.env.NEXTAUTH_URL).startsWith('https://');
 const cookiePrefix = useSecureCookies ? '__Secure-' : '';
 
 export const NEXT_AUTH_OPTIONS: AuthOptions = {
