@@ -1,4 +1,4 @@
-import { TRPCError } from '@trpc/server';
+import type { TRPCError } from '@trpc/server';
 import { match } from 'ts-pattern';
 import { z } from 'zod';
 
@@ -8,45 +8,68 @@ import { TRPCClientError } from '@documenso/trpc/client';
  * Generic application error codes.
  */
 export enum AppErrorCode {
-  'ALREADY_EXISTS' = 'AlreadyExists',
-  'EXPIRED_CODE' = 'ExpiredCode',
-  'INVALID_BODY' = 'InvalidBody',
-  'INVALID_REQUEST' = 'InvalidRequest',
-  'LIMIT_EXCEEDED' = 'LimitExceeded',
-  'NOT_FOUND' = 'NotFound',
-  'NOT_SETUP' = 'NotSetup',
-  'UNAUTHORIZED' = 'Unauthorized',
-  'UNKNOWN_ERROR' = 'UnknownError',
-  'RETRY_EXCEPTION' = 'RetryException',
-  'SCHEMA_FAILED' = 'SchemaFailed',
-  'TOO_MANY_REQUESTS' = 'TooManyRequests',
-  'PROFILE_URL_TAKEN' = 'ProfileUrlTaken',
-  'PREMIUM_PROFILE_URL' = 'PremiumProfileUrl',
+  'ALREADY_EXISTS' = 'ALREADY_EXISTS',
+  'EXPIRED_CODE' = 'EXPIRED_CODE',
+  'INVALID_BODY' = 'INVALID_BODY',
+  'INVALID_REQUEST' = 'INVALID_REQUEST',
+  'LIMIT_EXCEEDED' = 'LIMIT_EXCEEDED',
+  'NOT_FOUND' = 'NOT_FOUND',
+  'NOT_SETUP' = 'NOT_SETUP',
+  'UNAUTHORIZED' = 'UNAUTHORIZED',
+  'UNKNOWN_ERROR' = 'UNKNOWN_ERROR',
+  'RETRY_EXCEPTION' = 'RETRY_EXCEPTION',
+  'SCHEMA_FAILED' = 'SCHEMA_FAILED',
+  'TOO_MANY_REQUESTS' = 'TOO_MANY_REQUESTS',
+  'PROFILE_URL_TAKEN' = 'PROFILE_URL_TAKEN',
+  'PREMIUM_PROFILE_URL' = 'PREMIUM_PROFILE_URL',
 }
 
-const genericErrorCodeToTrpcErrorCodeMap: Record<string, TRPCError['code']> = {
-  [AppErrorCode.ALREADY_EXISTS]: 'BAD_REQUEST',
-  [AppErrorCode.EXPIRED_CODE]: 'BAD_REQUEST',
-  [AppErrorCode.INVALID_BODY]: 'BAD_REQUEST',
-  [AppErrorCode.INVALID_REQUEST]: 'BAD_REQUEST',
-  [AppErrorCode.NOT_FOUND]: 'NOT_FOUND',
-  [AppErrorCode.NOT_SETUP]: 'BAD_REQUEST',
-  [AppErrorCode.UNAUTHORIZED]: 'UNAUTHORIZED',
-  [AppErrorCode.UNKNOWN_ERROR]: 'INTERNAL_SERVER_ERROR',
-  [AppErrorCode.RETRY_EXCEPTION]: 'INTERNAL_SERVER_ERROR',
-  [AppErrorCode.SCHEMA_FAILED]: 'INTERNAL_SERVER_ERROR',
-  [AppErrorCode.TOO_MANY_REQUESTS]: 'TOO_MANY_REQUESTS',
-  [AppErrorCode.PROFILE_URL_TAKEN]: 'BAD_REQUEST',
-  [AppErrorCode.PREMIUM_PROFILE_URL]: 'BAD_REQUEST',
+export const genericErrorCodeToTrpcErrorCodeMap: Record<
+  string,
+  { code: TRPCError['code']; status: number }
+> = {
+  [AppErrorCode.ALREADY_EXISTS]: { code: 'BAD_REQUEST', status: 400 },
+  [AppErrorCode.EXPIRED_CODE]: { code: 'BAD_REQUEST', status: 400 },
+  [AppErrorCode.INVALID_BODY]: { code: 'BAD_REQUEST', status: 400 },
+  [AppErrorCode.INVALID_REQUEST]: { code: 'BAD_REQUEST', status: 400 },
+  [AppErrorCode.NOT_FOUND]: { code: 'NOT_FOUND', status: 404 },
+  [AppErrorCode.NOT_SETUP]: { code: 'BAD_REQUEST', status: 400 },
+  [AppErrorCode.UNAUTHORIZED]: { code: 'UNAUTHORIZED', status: 401 },
+  [AppErrorCode.UNKNOWN_ERROR]: { code: 'INTERNAL_SERVER_ERROR', status: 500 },
+  [AppErrorCode.RETRY_EXCEPTION]: { code: 'INTERNAL_SERVER_ERROR', status: 500 },
+  [AppErrorCode.SCHEMA_FAILED]: { code: 'INTERNAL_SERVER_ERROR', status: 500 },
+  [AppErrorCode.TOO_MANY_REQUESTS]: { code: 'TOO_MANY_REQUESTS', status: 429 },
+  [AppErrorCode.PROFILE_URL_TAKEN]: { code: 'BAD_REQUEST', status: 400 },
+  [AppErrorCode.PREMIUM_PROFILE_URL]: { code: 'BAD_REQUEST', status: 400 },
 };
 
 export const ZAppErrorJsonSchema = z.object({
   code: z.string(),
   message: z.string().optional(),
   userMessage: z.string().optional(),
+  statusCode: z.number().optional(),
 });
 
 export type TAppErrorJsonSchema = z.infer<typeof ZAppErrorJsonSchema>;
+
+type AppErrorOptions = {
+  /**
+   * An internal message for logging.
+   */
+  message?: string;
+
+  /**
+   * A message which can be potientially displayed to the user.
+   */
+  userMessage?: string;
+
+  /**
+   * The status code to be associated with the error.
+   *
+   * Mainly used for API -> Frontend communication and logging filtering.
+   */
+  statusCode?: number;
+};
 
 export class AppError extends Error {
   /**
@@ -60,16 +83,23 @@ export class AppError extends Error {
   userMessage?: string;
 
   /**
+   * The status code to be associated with the error.
+   */
+  statusCode?: number;
+
+  /**
    * Create a new AppError.
    *
    * @param errorCode A string representing the error code.
    * @param message An internal error message.
    * @param userMessage A error message which can be displayed to the user.
    */
-  public constructor(errorCode: string, message?: string, userMessage?: string) {
-    super(message || errorCode);
+  public constructor(errorCode: string, options?: AppErrorOptions) {
+    super(options?.message || errorCode);
+
     this.code = errorCode;
-    this.userMessage = userMessage;
+    this.userMessage = options?.userMessage;
+    this.statusCode = options?.statusCode;
   }
 
   /**
@@ -84,16 +114,21 @@ export class AppError extends Error {
 
     // Handle TRPC errors.
     if (error instanceof TRPCClientError) {
-      const parsedJsonError = AppError.parseFromJSONString(error.message);
-      return parsedJsonError || new AppError('UnknownError', error.message);
+      const parsedJsonError = AppError.parseFromJSON(error.data?.appError);
+
+      const fallbackError = new AppError(AppErrorCode.UNKNOWN_ERROR, {
+        message: error.message,
+      });
+
+      return parsedJsonError || fallbackError;
     }
 
     // Handle completely unknown errors.
     // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
-    const { code, message, userMessage } = error as {
+    const { code, message, userMessage, statusCode } = error as {
       code: unknown;
       message: unknown;
-      status: unknown;
+      statusCode: unknown;
       userMessage: unknown;
     };
 
@@ -102,16 +137,15 @@ export class AppError extends Error {
     const validUserMessage: string | undefined =
       typeof userMessage === 'string' ? userMessage : undefined;
 
-    return new AppError(validCode, validMessage, validUserMessage);
-  }
+    const validStatusCode = typeof statusCode === 'number' ? statusCode : undefined;
 
-  static parseErrorToTRPCError(error: unknown): TRPCError {
-    const appError = AppError.parseError(error);
+    const options: AppErrorOptions = {
+      message: validMessage,
+      userMessage: validUserMessage,
+      statusCode: validStatusCode,
+    };
 
-    return new TRPCError({
-      code: genericErrorCodeToTrpcErrorCodeMap[appError.code] || 'BAD_REQUEST',
-      message: AppError.toJSONString(appError),
-    });
+    return new AppError(validCode, options);
   }
 
   /**
@@ -120,12 +154,26 @@ export class AppError extends Error {
    * @param appError The AppError to convert to JSON.
    * @returns A JSON object representing the AppError.
    */
-  static toJSON({ code, message, userMessage }: AppError): TAppErrorJsonSchema {
-    return {
+  static toJSON({ code, message, userMessage, statusCode }: AppError): TAppErrorJsonSchema {
+    const data: TAppErrorJsonSchema = {
       code,
-      message,
-      userMessage,
     };
+
+    // Explicity only set values if it exists, since TRPC will add meta for undefined
+    // values which clutters up API responses.
+    if (message) {
+      data.message = message;
+    }
+
+    if (userMessage) {
+      data.userMessage = userMessage;
+    }
+
+    if (statusCode) {
+      data.statusCode = statusCode;
+    }
+
+    return data;
   }
 
   /**
@@ -138,15 +186,21 @@ export class AppError extends Error {
     return JSON.stringify(AppError.toJSON(appError));
   }
 
-  static parseFromJSONString(jsonString: string): AppError | null {
+  static parseFromJSON(value: unknown): AppError | null {
     try {
-      const parsed = ZAppErrorJsonSchema.safeParse(JSON.parse(jsonString));
+      const parsed = ZAppErrorJsonSchema.safeParse(value);
 
       if (!parsed.success) {
         return null;
       }
 
-      return new AppError(parsed.data.code, parsed.data.message, parsed.data.userMessage);
+      const { message, userMessage, statusCode } = parsed.data;
+
+      return new AppError(parsed.data.code, {
+        message,
+        userMessage,
+        statusCode,
+      });
     } catch {
       return null;
     }

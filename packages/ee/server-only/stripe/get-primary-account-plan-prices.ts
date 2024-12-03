@@ -9,6 +9,7 @@ export const getPrimaryAccountPlanPrices = async () => {
   return await getPricesByPlan([
     STRIPE_PLAN_TYPE.REGULAR,
     STRIPE_PLAN_TYPE.COMMUNITY,
+    STRIPE_PLAN_TYPE.PLATFORM,
     STRIPE_PLAN_TYPE.ENTERPRISE,
   ]);
 };

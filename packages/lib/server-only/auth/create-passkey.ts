@@ -50,7 +50,9 @@ export const createPasskey = async ({
   });
 
   if (!verificationToken) {
-    throw new AppError(AppErrorCode.NOT_FOUND, 'Challenge token not found');
+    throw new AppError(AppErrorCode.NOT_FOUND, {
+      message: 'Challenge token not found',
+    });
   }
 
   await prisma.verificationToken.deleteMany({
@@ -61,7 +63,9 @@ export const createPasskey = async ({
   });
 
   if (verificationToken.expires < new Date()) {
-    throw new AppError(AppErrorCode.EXPIRED_CODE, 'Challenge token expired');
+    throw new AppError(AppErrorCode.EXPIRED_CODE, {
+      message: 'Challenge token expired',
+    });
   }
 
   const { rpId: expectedRPID, origin: expectedOrigin } = getAuthenticatorOptions();
@@ -74,7 +78,9 @@ export const createPasskey = async ({
   });
 
   if (!verification.verified || !verification.registrationInfo) {
-    throw new AppError(AppErrorCode.UNAUTHORIZED, 'Verification failed');
+    throw new AppError(AppErrorCode.UNAUTHORIZED, {
+      message: 'Verification failed',
+    });
   }
 
   const { credentialPublicKey, credentialID, counter, credentialDeviceType, credentialBackedUp } =

@@ -47,7 +47,9 @@ export const createDocument = async ({
     teamId !== undefined &&
     !user.teamMembers.some((teamMember) => teamMember.teamId === teamId)
   ) {
-    throw new AppError(AppErrorCode.NOT_FOUND, 'Team not found');
+    throw new AppError(AppErrorCode.NOT_FOUND, {
+      message: 'Team not found',
+    });
   }
 
   let team: (Team & { teamGlobalSettings: TeamGlobalSettings | null }) | null = null;
@@ -112,6 +114,7 @@ export const createDocument = async ({
         documentMeta: {
           create: {
             language: team?.teamGlobalSettings?.documentLanguage,
+            typedSignatureEnabled: team?.teamGlobalSettings?.typedSignatureEnabled,
           },
         },
       },

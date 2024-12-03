@@ -114,8 +114,14 @@ export const sendDocument = async ({
       formValues: document.formValues as Record<string, string | number | boolean>,
     });
 
+    let fileName = document.title;
+
+    if (!document.title.endsWith('.pdf')) {
+      fileName = `${document.title}.pdf`;
+    }
+
     const newDocumentData = await putPdfFile({
-      name: document.title,
+      name: fileName,
       type: 'application/pdf',
       arrayBuffer: async () => Promise.resolve(prefilled),
     });

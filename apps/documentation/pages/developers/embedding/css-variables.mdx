@@ -1,0 +1,120 @@
+---
+title: CSS Variables
+description: Learn about all available CSS variables for customizing your embedded signing experience
+---
+
+# CSS Variables
+
+Platform customers have access to a comprehensive set of CSS variables that can be used to customize the appearance of the embedded signing experience. These variables control everything from colors to spacing and can be used to match your application's design system.
+
+## Available Variables
+
+### Colors
+
+| Variable                | Description                        | Default        |
+| ----------------------- | ---------------------------------- | -------------- |
+| `background`            | Base background color              | System default |
+| `foreground`            | Base text color                    | System default |
+| `muted`                 | Muted/subtle background color      | System default |
+| `mutedForeground`       | Muted/subtle text color            | System default |
+| `popover`               | Popover/dropdown background color  | System default |
+| `popoverForeground`     | Popover/dropdown text color        | System default |
+| `card`                  | Card background color              | System default |
+| `cardBorder`            | Card border color                  | System default |
+| `cardBorderTint`        | Card border tint/highlight color   | System default |
+| `cardForeground`        | Card text color                    | System default |
+| `fieldCard`             | Field card background color        | System default |
+| `fieldCardBorder`       | Field card border color            | System default |
+| `fieldCardForeground`   | Field card text color              | System default |
+| `widget`                | Widget background color            | System default |
+| `widgetForeground`      | Widget text color                  | System default |
+| `border`                | Default border color               | System default |
+| `input`                 | Input field border color           | System default |
+| `primary`               | Primary action/button color        | System default |
+| `primaryForeground`     | Primary action/button text color   | System default |
+| `secondary`             | Secondary action/button color      | System default |
+| `secondaryForeground`   | Secondary action/button text color | System default |
+| `accent`                | Accent/highlight color             | System default |
+| `accentForeground`      | Accent/highlight text color        | System default |
+| `destructive`           | Destructive/danger action color    | System default |
+| `destructiveForeground` | Destructive/danger text color      | System default |
+| `ring`                  | Focus ring color                   | System default |
+| `warning`               | Warning/alert color                | System default |
+
+### Spacing and Layout
+
+| Variable | Description                     | Default        |
+| -------- | ------------------------------- | -------------- |
+| `radius` | Border radius size in REM units | System default |
+
+## Usage Example
+
+Here's how to use these variables in your embedding implementation:
+
+```jsx
+const cssVars = {
+  // Colors
+  background: '#ffffff',
+  foreground: '#000000',
+  primary: '#0000ff',
+  primaryForeground: '#ffffff',
+  accent: '#4f46e5',
+  destructive: '#ef4444',
+
+  // Spacing
+  radius: '0.5rem'
+};
+
+// React/Preact
+<EmbedDirectTemplate
+  token={token}
+  cssVars={cssVars}
+/>
+
+// Vue
+<EmbedDirectTemplate
+  :token="token"
+  :cssVars="cssVars"
+/>
+
+// Svelte
+<EmbedDirectTemplate
+  {token}
+  cssVars={cssVars}
+/>
+
+// Solid
+<EmbedDirectTemplate
+  token={token}
+  cssVars={cssVars}
+/>
+```
+
+## Color Format
+
+Colors can be specified in any valid CSS color format:
+
+- Hexadecimal: `#ff0000`
+- RGB: `rgb(255, 0, 0)`
+- HSL: `hsl(0, 100%, 50%)`
+- Named colors: `red`
+
+The colors will be automatically converted to the appropriate format internally.
+
+## Best Practices
+
+1. **Maintain Contrast**: When customizing colors, ensure there's sufficient contrast between background and foreground colors for accessibility.
+
+2. **Test Dark Mode**: If you haven't disabled dark mode, test your color variables in both light and dark modes.
+
+3. **Use Your Brand Colors**: Align the primary and accent colors with your brand's color scheme for a cohesive look.
+
+4. **Consistent Radius**: Use a consistent border radius value that matches your application's design system.
+
+## Related
+
+- [React Integration](/developers/embedding/react)
+- [Vue Integration](/developers/embedding/vue)
+- [Svelte Integration](/developers/embedding/svelte)
+- [Solid Integration](/developers/embedding/solid)
+- [Preact Integration](/developers/embedding/preact)

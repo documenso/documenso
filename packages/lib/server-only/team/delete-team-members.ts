@@ -60,11 +60,13 @@ export const deleteTeamMembers = async ({
       );
 
       if (!currentTeamMember) {
-        throw new AppError(AppErrorCode.NOT_FOUND, 'Team member record does not exist');
+        throw new AppError(AppErrorCode.NOT_FOUND, {
+          message: 'Team member record does not exist',
+        });
       }
 
       if (teamMembersToRemove.find((member) => member.userId === team.ownerUserId)) {
-        throw new AppError(AppErrorCode.UNAUTHORIZED, 'Cannot remove the team owner');
+        throw new AppError(AppErrorCode.UNAUTHORIZED, { message: 'Cannot remove the team owner' });
       }
 
       const isMemberToRemoveHigherRole = teamMembersToRemove.some(
@@ -72,7 +74,9 @@ export const deleteTeamMembers = async ({
       );
 
       if (isMemberToRemoveHigherRole) {
-        throw new AppError(AppErrorCode.UNAUTHORIZED, 'Cannot remove a member with a higher role');
+        throw new AppError(AppErrorCode.UNAUTHORIZED, {
+          message: 'Cannot remove a member with a higher role',
+        });
       }
 
       // Remove the team members.

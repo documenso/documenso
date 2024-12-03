@@ -34,7 +34,7 @@ const getCardClassNames = (
   const baseClasses = 'field-card-container relative z-20 h-full w-full transition-all';
 
   const insertedClasses =
-    'bg-documenso/20 border-documenso ring-documenso-200 ring-offset-documenso-200 ring-2 ring-offset-2 dark:shadow-none';
+    'bg-primary/20 border-primary ring-primary/20 ring-offset-primary/20 ring-2 ring-offset-2 dark:shadow-none';
   const nonRequiredClasses =
     'border-yellow-300 shadow-none ring-2 ring-yellow-100 ring-offset-2 ring-offset-yellow-100 dark:border-2';
   const validatingClasses = 'border-orange-300 ring-1 ring-orange-300';

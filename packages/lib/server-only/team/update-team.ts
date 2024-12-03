@@ -4,7 +4,6 @@ import { TEAM_MEMBER_ROLE_PERMISSIONS_MAP } from '@documenso/lib/constants/teams
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import { prisma } from '@documenso/prisma';
 import { Prisma } from '@documenso/prisma/client';
-import type { DocumentVisibility } from '@documenso/prisma/client';
 
 export type UpdateTeamOptions = {
   userId: number;
@@ -12,8 +11,6 @@ export type UpdateTeamOptions = {
   data: {
     name?: string;
     url?: string;
-    documentVisibility?: DocumentVisibility;
-    includeSenderDetails?: boolean;
   };
 };
 
@@ -27,7 +24,9 @@ export const updateTeam = async ({ userId, teamId, data }: UpdateTeamOptions) =>
       });
 
       if (foundPendingTeamWithUrl) {
-        throw new AppError(AppErrorCode.ALREADY_EXISTS, 'Team URL already exists.');
+        throw new AppError(AppErrorCode.ALREADY_EXISTS, {
+          message: 'Team URL already exists.',
+        });
       }
 
       const team = await tx.team.update({
@@ -45,18 +44,6 @@ export const updateTeam = async ({ userId, teamId, data }: UpdateTeamOptions) =>
         data: {
           url: data.url,
           name: data.name,
-          teamGlobalSettings: {
-            upsert: {
-              create: {
-                documentVisibility: data.documentVisibility,
-                includeSenderDetails: data.includeSenderDetails,
-              },
-              update: {
-                documentVisibility: data.documentVisibility,
-                includeSenderDetails: data.includeSenderDetails,
-              },
-            },
-          },
         },
       });
 
@@ -72,7 +59,9 @@ export const updateTeam = async ({ userId, teamId, data }: UpdateTeamOptions) =>
     const target = z.array(z.string()).safeParse(err.meta?.target);
 
     if (err.code === 'P2002' && target.success && target.data.includes('url')) {
-      throw new AppError(AppErrorCode.ALREADY_EXISTS, 'Team URL already exists.');
+      throw new AppError(AppErrorCode.ALREADY_EXISTS, {
+        message: 'Team URL already exists.',
+      });
     }
 
     throw err;

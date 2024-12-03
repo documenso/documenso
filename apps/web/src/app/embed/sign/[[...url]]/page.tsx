@@ -2,11 +2,14 @@ import { notFound } from 'next/navigation';
 
 import { match } from 'ts-pattern';
 
+import { isUserEnterprise } from '@documenso/ee/server-only/util/is-document-enterprise';
+import { isDocumentPlatform } from '@documenso/ee/server-only/util/is-document-platform';
 import { IS_BILLING_ENABLED } from '@documenso/lib/constants/app';
 import { getServerComponentSession } from '@documenso/lib/next-auth/get-server-component-session';
 import { getDocumentAndSenderByToken } from '@documenso/lib/server-only/document/get-document-by-token';
 import { getFieldsForToken } from '@documenso/lib/server-only/field/get-fields-for-token';
 import { getRecipientByToken } from '@documenso/lib/server-only/recipient/get-recipient-by-token';
+import { getTeamById } from '@documenso/lib/server-only/team/get-team';
 import { DocumentAccessAuth } from '@documenso/lib/types/document-auth';
 import { extractDocumentAuthMethods } from '@documenso/lib/utils/document-auth';
 import { DocumentStatus } from '@documenso/prisma/client';
@@ -56,6 +59,14 @@ export default async function EmbedSignDocumentPage({ params }: EmbedSignDocumen
     return <EmbedPaywall />;
   }
 
+  const [isPlatformDocument, isEnterpriseDocument] = await Promise.all([
+    isDocumentPlatform(document),
+    isUserEnterprise({
+      userId: document.userId,
+      teamId: document.teamId ?? undefined,
+    }),
+  ]);
+
   const { derivedRecipientAccessAuth } = extractDocumentAuthMethods({
     documentAuth: document.authOptions,
   });
@@ -73,6 +84,12 @@ export default async function EmbedSignDocumentPage({ params }: EmbedSignDocumen
       />
     );
   }
+
+  const team = document.teamId
+    ? await getTeamById({ teamId: document.teamId, userId: document.userId }).catch(() => null)
+    : null;
+
+  const hidePoweredBy = team?.teamGlobalSettings?.brandingHidePoweredBy ?? false;
 
   return (
     <SigningProvider
@@ -93,6 +110,8 @@ export default async function EmbedSignDocumentPage({ params }: EmbedSignDocumen
           fields={fields}
           metadata={document.documentMeta}
           isCompleted={document.status === DocumentStatus.COMPLETED}
+          hidePoweredBy={isPlatformDocument || isEnterpriseDocument || hidePoweredBy}
+          isPlatformOrEnterprise={isPlatformDocument || isEnterpriseDocument}
         />
       </DocumentAuthProvider>
     </SigningProvider>

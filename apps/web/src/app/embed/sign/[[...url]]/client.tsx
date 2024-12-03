@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useLayoutEffect, useState } from 'react';
 
 import { Trans, msg } from '@lingui/macro';
 import { useLingui } from '@lingui/react';
@@ -28,6 +28,7 @@ import { Logo } from '~/components/branding/logo';
 import { EmbedClientLoading } from '../../client-loading';
 import { EmbedDocumentCompleted } from '../../completed';
 import { EmbedDocumentFields } from '../../document-fields';
+import { injectCss } from '../../util';
 import { ZSignDocumentEmbedDataSchema } from './schema';
 
 export type EmbedSignDocumentClientPageProps = {
@@ -38,6 +39,8 @@ export type EmbedSignDocumentClientPageProps = {
   fields: Field[];
   metadata?: DocumentMeta | TemplateMeta | null;
   isCompleted?: boolean;
+  hidePoweredBy?: boolean;
+  isPlatformOrEnterprise?: boolean;
 };
 
 export const EmbedSignDocumentClientPage = ({
@@ -48,6 +51,8 @@ export const EmbedSignDocumentClientPage = ({
   fields,
   metadata,
   isCompleted,
+  hidePoweredBy = false,
+  isPlatformOrEnterprise = false,
 }: EmbedSignDocumentClientPageProps) => {
   const { _ } = useLingui();
   const { toast } = useToast();
@@ -131,7 +136,7 @@ export const EmbedSignDocumentClientPage = ({
     }
   };
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     const hash = window.location.hash.slice(1);
 
     try {
@@ -144,6 +149,17 @@ export const EmbedSignDocumentClientPage = ({
       // Since a recipient can be provided a name we can lock it without requiring
       // a to be provided by the parent application, unlike direct templates.
       setIsNameLocked(!!data.lockName);
+
+      if (data.darkModeDisabled) {
+        document.documentElement.classList.add('dark-mode-disabled');
+      }
+
+      if (isPlatformOrEnterprise) {
+        injectCss({
+          css: data.css,
+          cssVars: data.cssVars,
+        });
+      }
     } catch (err) {
       console.error(err);
     }
@@ -176,8 +192,8 @@ export const EmbedSignDocumentClientPage = ({
           fieldId: 1,
           recipientId: 1,
           created: new Date(),
-          typedSignature: null,
-          signatureImageAsBase64: signature,
+          signatureImageAsBase64: signature?.startsWith('data:') ? signature : null,
+          typedSignature: signature?.startsWith('data:') ? null : signature,
         }}
       />
     );
@@ -202,7 +218,7 @@ export const EmbedSignDocumentClientPage = ({
           className="group/document-widget fixed bottom-8 left-0 z-50 h-fit w-full flex-shrink-0 px-6 md:sticky md:top-4 md:z-auto md:w-[350px] md:px-0"
           data-expanded={isExpanded || undefined}
         >
-          <div className="border-border bg-widget flex w-full  flex-col rounded-xl border px-4 py-4 md:py-6">
+          <div className="border-border bg-widget flex w-full flex-col rounded-xl border px-4 py-4 md:py-6">
             {/* Header */}
             <div>
               <div className="flex items-center justify-between gap-x-2">
@@ -325,10 +341,12 @@ export const EmbedSignDocumentClientPage = ({
         <EmbedDocumentFields recipient={recipient} fields={fields} metadata={metadata} />
       </div>
 
-      <div className="bg-primary text-primary-foreground fixed bottom-0 left-0 z-40 rounded-tr px-2 py-1 text-xs font-medium opacity-60 hover:opacity-100">
-        <span>Powered by</span>
-        <Logo className="ml-2 inline-block h-[14px]" />
-      </div>
+      {!hidePoweredBy && (
+        <div className="bg-primary text-primary-foreground fixed bottom-0 left-0 z-40 rounded-tr px-2 py-1 text-xs font-medium opacity-60 hover:opacity-100">
+          <span>Powered by</span>
+          <Logo className="ml-2 inline-block h-[14px]" />
+        </div>
+      )}
     </div>
   );
 };

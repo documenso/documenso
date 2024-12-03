@@ -88,6 +88,8 @@ declare namespace NodeJS {
     NEXT_PRIVATE_INNGEST_APP_ID?: string;
     NEXT_PRIVATE_INNGEST_EVENT_KEY?: string;
 
+    NEXT_PRIVATE_LOGGER_HONEY_BADGER_API_KEY?: string;
+
     /**
      * Vercel environment variables
      */

@@ -7,15 +7,17 @@
   "scripts": {
     "test:dev": "NODE_OPTIONS=--experimental-require-module playwright test",
     "test-ui:dev": "NODE_OPTIONS=--experimental-require-module playwright test --ui",
-    "test:e2e": "NODE_OPTIONS=--experimental-require-module start-server-and-test \"npm run start -w @documenso/web\" http://localhost:3000 \"playwright test\""
+    "test:e2e": "NODE_OPTIONS=--experimental-require-module start-server-and-test \"npm run start -w @documenso/web\" http://localhost:3000 \"playwright test $E2E_TEST_PATH\""
   },
   "keywords": [],
   "author": "",
   "devDependencies": {
     "@playwright/test": "^1.18.1",
     "@types/node": "^20.8.2",
+    "@documenso/lib": "*",
     "@documenso/prisma": "*",
-    "@documenso/web": "*"
+    "@documenso/web": "*",
+    "pdf-lib": "^1.17.1"
   },
   "dependencies": {
     "start-server-and-test": "^2.0.1"

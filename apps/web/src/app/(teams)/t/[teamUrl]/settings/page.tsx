@@ -52,13 +52,7 @@ export default async function TeamsSettingsPage({ params }: TeamsSettingsPagePro
 
       <AvatarImageForm className="mb-8" team={team} user={session.user} />
 
-      <UpdateTeamForm
-        teamId={team.id}
-        teamName={team.name}
-        teamUrl={team.url}
-        documentVisibility={team.teamGlobalSettings?.documentVisibility}
-        includeSenderDetails={team.teamGlobalSettings?.includeSenderDetails}
-      />
+      <UpdateTeamForm teamId={team.id} teamName={team.name} teamUrl={team.url} />
 
       <section className="mt-6 space-y-6">
         {(team.teamEmail || team.emailVerification) && (
