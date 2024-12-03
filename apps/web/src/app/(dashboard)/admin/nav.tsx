@@ -6,7 +6,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 
 import { Trans } from '@lingui/macro';
-import { BarChart3, FileStack, Settings, Users, Wallet2 } from 'lucide-react';
+import { BarChart3, FileStack, Settings, Trophy, Users, Wallet2 } from 'lucide-react';
 
 import { cn } from '@documenso/ui/lib/utils';
 import { Button } from '@documenso/ui/primitives/button';
@@ -77,6 +77,20 @@ export const AdminNav = ({ className, ...props }: AdminNavProps) => {
         <Link href="/admin/subscriptions">
           <Wallet2 className="mr-2 h-5 w-5" />
           <Trans>Subscriptions</Trans>
+        </Link>
+      </Button>
+
+      <Button
+        variant="ghost"
+        className={cn(
+          'justify-start md:w-full',
+          pathname?.startsWith('/admin/leaderboard') && 'bg-secondary',
+        )}
+        asChild
+      >
+        <Link href="/admin/leaderboard">
+          <Trophy className="mr-2 h-5 w-5" />
+          <Trans>Leaderboard</Trans>
         </Link>
       </Button>
 

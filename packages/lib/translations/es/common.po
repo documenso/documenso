@@ -60,14 +60,19 @@ msgstr "{0} de {1} fila(s) seleccionada."
 
 #: packages/lib/jobs/definitions/emails/send-signing-email.ts:136
 #: packages/lib/server-only/document/resend-document.tsx:137
-msgid "{0} on behalf of {1} has invited you to {recipientActionVerb} the document \"{2}\"."
-msgstr "{0} en nombre de {1} te ha invitado a {recipientActionVerb} el documento \"{2}\"."
+msgid "{0} on behalf of \"{1}\" has invited you to {recipientActionVerb} the document \"{2}\"."
+msgstr ""
+
+#: packages/lib/jobs/definitions/emails/send-signing-email.ts:136
+#: packages/lib/server-only/document/resend-document.tsx:137
+#~ msgid "{0} on behalf of {1} has invited you to {recipientActionVerb} the document \"{2}\"."
+#~ msgstr "{0} en nombre de {1} te ha invitado a {recipientActionVerb} el documento \"{2}\"."
 
 #: packages/email/template-components/template-document-invite.tsx:51
 #~ msgid "{0}<0/>\"{documentName}\""
 #~ msgstr "{0}<0/>\"{documentName}\""
 
-#: packages/email/templates/document-invite.tsx:94
+#: packages/email/templates/document-invite.tsx:95
 msgid "{inviterName} <0>({inviterEmail})</0>"
 msgstr "{inviterName} <0>({inviterEmail})</0>"
 
@@ -87,7 +92,7 @@ msgstr "{inviterName} te ha invitado a {0}<0/>\"{documentName}\""
 msgid "{inviterName} has invited you to {action} {documentName}"
 msgstr "{inviterName} te ha invitado a {action} {documentName}"
 
-#: packages/email/templates/document-invite.tsx:106
+#: packages/email/templates/document-invite.tsx:108
 msgid "{inviterName} has invited you to {action} the document \"{documentName}\"."
 msgstr "{inviterName} te ha invitado a {action} el documento \"{documentName}\"."
 
@@ -100,16 +105,24 @@ msgid "{inviterName} has removed you from the document<0/>\"{documentName}\""
 msgstr "{inviterName} te ha eliminado del documento<0/>\"{documentName}\""
 
 #: packages/email/template-components/template-document-invite.tsx:63
-msgid "{inviterName} on behalf of {teamName} has invited you to {0}"
-msgstr "{inviterName} en nombre de {teamName} te ha invitado a {0}"
+msgid "{inviterName} on behalf of \"{teamName}\" has invited you to {0}"
+msgstr ""
+
+#: packages/email/templates/document-invite.tsx:45
+msgid "{inviterName} on behalf of \"{teamName}\" has invited you to {action} {documentName}"
+msgstr ""
+
+#: packages/email/template-components/template-document-invite.tsx:63
+#~ msgid "{inviterName} on behalf of {teamName} has invited you to {0}"
+#~ msgstr "{inviterName} en nombre de {teamName} te ha invitado a {0}"
 
 #: packages/email/template-components/template-document-invite.tsx:49
 #~ msgid "{inviterName} on behalf of {teamName} has invited you to {0}<0/>\"{documentName}\""
 #~ msgstr "{inviterName} on behalf of {teamName} has invited you to {0}<0/>\"{documentName}\""
 
 #: packages/email/templates/document-invite.tsx:45
-msgid "{inviterName} on behalf of {teamName} has invited you to {action} {documentName}"
-msgstr "{inviterName} en nombre de {teamName} te ha invitado a {action} {documentName}"
+#~ msgid "{inviterName} on behalf of {teamName} has invited you to {action} {documentName}"
+#~ msgstr "{inviterName} en nombre de {teamName} te ha invitado a {action} {documentName}"
 
 #: packages/email/templates/team-join.tsx:67
 msgid "{memberEmail} joined the following team"
