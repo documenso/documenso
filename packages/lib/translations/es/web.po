@@ -51,16 +51,16 @@ msgstr "\"{placeholderEmail}\" en nombre de \"{0}\" te ha invitado a firmar \"do
 #~ msgstr "\"{teamUrl}\" te ha invitado a firmar \"ejemplo de documento\"."
 
 #: apps/web/src/app/(signing)/sign/[token]/signing-page-view.tsx:83
-msgid "({0}) has invited you to approve this document"
-msgstr "({0}) te ha invitado a aprobar este documento"
+#~ msgid "({0}) has invited you to approve this document"
+#~ msgstr "({0}) te ha invitado a aprobar este documento"
 
 #: apps/web/src/app/(signing)/sign/[token]/signing-page-view.tsx:80
-msgid "({0}) has invited you to sign this document"
-msgstr "({0}) te ha invitado a firmar este documento"
+#~ msgid "({0}) has invited you to sign this document"
+#~ msgstr "({0}) te ha invitado a firmar este documento"
 
 #: apps/web/src/app/(signing)/sign/[token]/signing-page-view.tsx:77
-msgid "({0}) has invited you to view this document"
-msgstr "({0}) te ha invitado a ver este documento"
+#~ msgid "({0}) has invited you to view this document"
+#~ msgstr "({0}) te ha invitado a ver este documento"
 
 #: apps/web/src/app/(signing)/sign/[token]/text-field.tsx:313
 msgid "{0, plural, one {(1 character over)} other {(# characters over)}}"
@@ -1206,6 +1206,7 @@ msgid "Create your account and start using state-of-the-art document signing. Op
 msgstr "Crea tu cuenta y comienza a utilizar la firma de documentos de última generación. La firma abierta y hermosa está al alcance de tu mano."
 
 #: apps/web/src/app/(dashboard)/admin/documents/document-results.tsx:62
+#: apps/web/src/app/(dashboard)/admin/leaderboard/data-table-leaderboard.tsx:96
 #: apps/web/src/app/(dashboard)/documents/[id]/document-page-view-information.tsx:35
 #: apps/web/src/app/(dashboard)/documents/data-table.tsx:54
 #: apps/web/src/app/(dashboard)/settings/security/passkeys/user-passkeys-data-table.tsx:65
@@ -1988,6 +1989,18 @@ msgstr "Ir al propietario"
 msgid "Go to your <0>public profile settings</0> to add documents."
 msgstr "Ve a tu <0>configuración de perfil público</0> para agregar documentos."
 
+#: apps/web/src/app/(signing)/sign/[token]/signing-page-view.tsx:107
+msgid "has invited you to approve this document"
+msgstr ""
+
+#: apps/web/src/app/(signing)/sign/[token]/signing-page-view.tsx:98
+msgid "has invited you to sign this document"
+msgstr ""
+
+#: apps/web/src/app/(signing)/sign/[token]/signing-page-view.tsx:89
+msgid "has invited you to view this document"
+msgstr ""
+
 #: apps/web/src/app/(dashboard)/settings/profile/page.tsx:29
 msgid "Here you can edit your personal details."
 msgstr "Aquí puedes editar tus datos personales."
@@ -2204,6 +2217,10 @@ msgstr "Última actualización el"
 msgid "Last used"
 msgstr "Último uso"
 
+#: apps/web/src/app/(dashboard)/admin/nav.tsx:93
+msgid "Leaderboard"
+msgstr ""
+
 #: apps/web/src/components/(teams)/dialogs/leave-team-dialog.tsx:111
 #: apps/web/src/components/(teams)/tables/current-user-teams-data-table.tsx:117
 msgid "Leave"
@@ -2411,6 +2428,7 @@ msgid "My templates"
 msgstr "Mis plantillas"
 
 #: apps/web/src/app/(dashboard)/admin/documents/[id]/recipient-item.tsx:148
+#: apps/web/src/app/(dashboard)/admin/leaderboard/data-table-leaderboard.tsx:56
 #: apps/web/src/app/(dashboard)/admin/users/[id]/page.tsx:99
 #: apps/web/src/app/(dashboard)/admin/users/data-table-users.tsx:66
 #: apps/web/src/app/(dashboard)/settings/security/passkeys/user-passkeys-data-table-actions.tsx:144
@@ -2523,6 +2541,18 @@ msgstr "Nada que hacer"
 #: apps/web/src/app/(signing)/sign/[token]/number-field.tsx:271
 msgid "Number"
 msgstr "Número"
+
+#: apps/web/src/app/(signing)/sign/[token]/signing-page-view.tsx:103
+msgid "on behalf of \"{0}\" has invited you to approve this document"
+msgstr ""
+
+#: apps/web/src/app/(signing)/sign/[token]/signing-page-view.tsx:94
+msgid "on behalf of \"{0}\" has invited you to sign this document"
+msgstr ""
+
+#: apps/web/src/app/(signing)/sign/[token]/signing-page-view.tsx:85
+msgid "on behalf of \"{0}\" has invited you to view this document"
+msgstr ""
 
 #: apps/web/src/components/(dashboard)/settings/webhooks/create-webhook-dialog.tsx:128
 msgid "On this page, you can create a new webhook."
@@ -3105,6 +3135,7 @@ msgstr "Buscar"
 msgid "Search by document title"
 msgstr "Buscar por título del documento"
 
+#: apps/web/src/app/(dashboard)/admin/leaderboard/data-table-leaderboard.tsx:147
 #: apps/web/src/app/(dashboard)/admin/users/data-table-users.tsx:144
 msgid "Search by name or email"
 msgstr "Buscar por nombre o correo electrónico"
@@ -3369,6 +3400,11 @@ msgstr "Se han generado enlaces de firma para este documento."
 msgid "Signing up..."
 msgstr "Registrándose..."
 
+#: apps/web/src/app/(dashboard)/admin/leaderboard/data-table-leaderboard.tsx:82
+#: apps/web/src/app/(dashboard)/admin/leaderboard/page.tsx:46
+msgid "Signing Volume"
+msgstr ""
+
 #: apps/web/src/app/(profile)/p/[url]/page.tsx:109
 msgid "Since {0}"
 msgstr "Desde {0}"
@@ -3377,7 +3413,7 @@ msgstr "Desde {0}"
 msgid "Site Banner"
 msgstr "Banner del sitio"
 
-#: apps/web/src/app/(dashboard)/admin/nav.tsx:93
+#: apps/web/src/app/(dashboard)/admin/nav.tsx:107
 #: apps/web/src/app/(dashboard)/admin/site-settings/page.tsx:26
 msgid "Site Settings"
 msgstr "Configuraciones del sitio"
