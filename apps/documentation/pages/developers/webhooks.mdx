@@ -20,6 +20,7 @@ Documenso supports Webhooks and allows you to subscribe to the following events:
 - `document.opened`
 - `document.signed`
 - `document.completed`
+- `document.rejected`
 
 ## Create a webhook subscription
 
@@ -36,7 +37,7 @@ Clicking on the "**Create Webhook**" button opens a modal to create a new webhoo
 To create a new webhook subscription, you need to provide the following information:
 
 - Enter the webhook URL that will receive the event payload.
-- Select the event(s) you want to subscribe to: `document.created`, `document.sent`, `document.opened`, `document.signed`, `document.completed`.
+- Select the event(s) you want to subscribe to: `document.created`, `document.sent`, `document.opened`, `document.signed`, `document.completed`, `document.rejected`.
 - Optionally, you can provide a secret key that will be used to sign the payload. This key will be included in the `X-Documenso-Secret` header of the request.
 
 ![A screenshot of the Create Webhook modal that shows the URL input field and the event checkboxes](/webhook-images/webhooks-page-create-webhook-modal.webp)
@@ -53,45 +54,55 @@ You can edit or delete your webhook subscriptions by clicking the "**Edit**" or 
 
 The payload sent to the webhook URL contains the following fields:
 
-| Field                                        | Type      | Description                                          |
-| -------------------------------------------- | --------- | ---------------------------------------------------- |
-| `event`                                      | string    | The type of event that triggered the webhook.        |
-| `payload.id`                                 | number    | The id of the document.                              |
-| `payload.userId`                             | number    | The id of the user who owns the document.            |
-| `payload.authOptions`                        | json?     | Authentication options for the document.             |
-| `payload.formValues`                         | json?     | Form values for the document.                        |
-| `payload.title`                              | string    | The name of the document.                            |
-| `payload.status`                             | string    | The current status of the document.                  |
-| `payload.documentDataId`                     | string    | The identifier for the document data.                |
-| `payload.createdAt`                          | datetime  | The creation date and time of the document.          |
-| `payload.updatedAt`                          | datetime  | The last update date and time of the document.       |
-| `payload.completedAt`                        | datetime? | The completion date and time of the document.        |
-| `payload.deletedAt`                          | datetime? | The deletion date and time of the document.          |
-| `payload.teamId`                             | number?   | The id of the team.                                  |
-| `payload.documentData.id`                    | string    | The id of the document data.                         |
-| `payload.documentData.type`                  | string    | The type of the document data.                       |
-| `payload.documentData.data`                  | string    | The data of the document.                            |
-| `payload.documentData.initialData`           | string    | The initial data of the document.                    |
-| `payload.Recipient[].id`                     | number    | The id of the recipient.                             |
-| `payload.Recipient[].documentId`             | number?   | The id the document associated with the recipient.   |
-| `payload.Recipient[].templateId`             | number?   | The template identifier for the recipient.           |
-| `payload.Recipient[].email`                  | string    | The email address of the recipient.                  |
-| `payload.Recipient[].name`                   | string    | The name of the recipient.                           |
-| `payload.Recipient[].token`                  | string    | The token associated with the recipient.             |
-| `payload.Recipient[].expired`                | datetime? | The expiration status of the recipient.              |
-| `payload.Recipient[].signedAt`               | datetime? | The date and time the recipient signed the document. |
-| `payload.Recipient[].authOptions.accessAuth` | json?     | Access authentication options.                       |
-| `payload.Recipient[].authOptions.actionAuth` | json?     | Action authentication options.                       |
-| `payload.Recipient[].role`                   | string    | The role of the recipient.                           |
-| `payload.Recipient[].readStatus`             | string    | The read status of the document by the recipient.    |
-| `payload.Recipient[].signingStatus`          | string    | The signing status of the recipient.                 |
-| `payload.Recipient[].sendStatus`             | string    | The send status of the document to the recipient.    |
-| `createdAt`                                  | datetime  | The creation date and time of the webhook event.     |
-| `webhookEndpoint`                            | string    | The endpoint URL where the webhook is sent.          |
-
-## Webhook event payload example
-
-When an event that you have subscribed to occurs, Documenso will send a POST request to the specified webhook URL with a payload containing information about the event.
+| Field                                        | Type      | Description                                           |
+| -------------------------------------------- | --------- | ----------------------------------------------------- |
+| `event`                                      | string    | The type of event that triggered the webhook.         |
+| `payload.id`                                 | number    | The id of the document.                               |
+| `payload.externalId`                         | string?   | External identifier for the document.                 |
+| `payload.userId`                             | number    | The id of the user who owns the document.             |
+| `payload.authOptions`                        | json?     | Authentication options for the document.              |
+| `payload.formValues`                         | json?     | Form values for the document.                         |
+| `payload.visibility`                         | string    | Document visibility (e.g., EVERYONE).                 |
+| `payload.title`                              | string    | The title of the document.                            |
+| `payload.status`                             | string    | The current status of the document.                   |
+| `payload.documentDataId`                     | string    | The identifier for the document data.                 |
+| `payload.createdAt`                          | datetime  | The creation date and time of the document.           |
+| `payload.updatedAt`                          | datetime  | The last update date and time of the document.        |
+| `payload.completedAt`                        | datetime? | The completion date and time of the document.         |
+| `payload.deletedAt`                          | datetime? | The deletion date and time of the document.           |
+| `payload.teamId`                             | number?   | The id of the team if document belongs to a team.     |
+| `payload.templateId`                         | number?   | The id of the template if created from template.      |
+| `payload.source`                             | string    | The source of the document (e.g., DOCUMENT, TEMPLATE) |
+| `payload.documentMeta.id`                    | string    | The id of the document metadata.                      |
+| `payload.documentMeta.subject`               | string?   | The subject of the document.                          |
+| `payload.documentMeta.message`               | string?   | The message associated with the document.             |
+| `payload.documentMeta.timezone`              | string    | The timezone setting for the document.                |
+| `payload.documentMeta.password`              | string?   | The password protection if set.                       |
+| `payload.documentMeta.dateFormat`            | string    | The date format used in the document.                 |
+| `payload.documentMeta.redirectUrl`           | string?   | The URL to redirect after signing.                    |
+| `payload.documentMeta.signingOrder`          | string    | The signing order (e.g., PARALLEL, SEQUENTIAL).       |
+| `payload.documentMeta.typedSignatureEnabled` | boolean   | Whether typed signatures are enabled.                 |
+| `payload.documentMeta.language`              | string    | The language of the document.                         |
+| `payload.documentMeta.distributionMethod`    | string    | The method of distributing the document.              |
+| `payload.documentMeta.emailSettings`         | json?     | Email notification settings.                          |
+| `payload.Recipient[].id`                     | number    | The id of the recipient.                              |
+| `payload.Recipient[].documentId`             | number?   | The id of the document for this recipient.            |
+| `payload.Recipient[].templateId`             | number?   | The template id if from a template.                   |
+| `payload.Recipient[].email`                  | string    | The email address of the recipient.                   |
+| `payload.Recipient[].name`                   | string    | The name of the recipient.                            |
+| `payload.Recipient[].token`                  | string    | The unique token for this recipient.                  |
+| `payload.Recipient[].documentDeletedAt`      | datetime? | When the document was deleted for this recipient.     |
+| `payload.Recipient[].expired`                | datetime? | When the recipient's access expired.                  |
+| `payload.Recipient[].signedAt`               | datetime? | When the recipient signed the document.               |
+| `payload.Recipient[].authOptions`            | json?     | Authentication options for this recipient.            |
+| `payload.Recipient[].signingOrder`           | number?   | The order in which this recipient should sign.        |
+| `payload.Recipient[].rejectionReason`        | string?   | The reason if the recipient rejected the document.    |
+| `payload.Recipient[].role`                   | string    | The role of the recipient (e.g., SIGNER, VIEWER).     |
+| `payload.Recipient[].readStatus`             | string    | Whether the recipient has read the document.          |
+| `payload.Recipient[].signingStatus`          | string    | The signing status of this recipient.                 |
+| `payload.Recipient[].sendStatus`             | string    | The sending status for this recipient.                |
+| `createdAt`                                  | datetime  | The creation date and time of the webhook event.      |
+| `webhookEndpoint`                            | string    | The endpoint URL where the webhook is sent.           |
 
 ## Example payloads
 
@@ -104,9 +115,11 @@ Example payload for the `document.created` event:
   "event": "DOCUMENT_CREATED",
   "payload": {
     "id": 10,
+    "externalId": null,
     "userId": 1,
     "authOptions": null,
     "formValues": null,
+    "visibility": "EVERYONE",
     "title": "documenso.pdf",
     "status": "DRAFT",
     "documentDataId": "hs8qz1ktr9204jn7mg6c5dxy0",
@@ -114,7 +127,43 @@ Example payload for the `document.created` event:
     "updatedAt": "2024-04-22T11:44:43.341Z",
     "completedAt": null,
     "deletedAt": null,
-    "teamId": null
+    "teamId": null,
+    "templateId": null,
+    "source": "DOCUMENT",
+    "documentMeta": {
+      "id": "doc_meta_123",
+      "subject": "Please sign this document",
+      "message": "Hello, please review and sign this document.",
+      "timezone": "UTC",
+      "password": null,
+      "dateFormat": "MM/DD/YYYY",
+      "redirectUrl": null,
+      "signingOrder": "PARALLEL",
+      "typedSignatureEnabled": true,
+      "language": "en",
+      "distributionMethod": "EMAIL",
+      "emailSettings": null
+    },
+    "Recipient": [
+      {
+        "id": 52,
+        "documentId": 10,
+        "templateId": null,
+        "email": "signer@documenso.com",
+        "name": "John Doe",
+        "token": "vbT8hi3jKQmrFP_LN1WcS",
+        "documentDeletedAt": null,
+        "expired": null,
+        "signedAt": null,
+        "authOptions": null,
+        "signingOrder": 1,
+        "rejectionReason": null,
+        "role": "SIGNER",
+        "readStatus": "NOT_OPENED",
+        "signingStatus": "NOT_SIGNED",
+        "sendStatus": "NOT_SENT"
+      }
+    ]
   },
   "createdAt": "2024-04-22T11:44:44.779Z",
   "webhookEndpoint": "https://mywebhooksite.com/mywebhook"
@@ -128,9 +177,11 @@ Example payload for the `document.sent` event:
   "event": "DOCUMENT_SENT",
   "payload": {
     "id": 10,
+    "externalId": null,
     "userId": 1,
     "authOptions": null,
     "formValues": null,
+    "visibility": "EVERYONE",
     "title": "documenso.pdf",
     "status": "PENDING",
     "documentDataId": "hs8qz1ktr9204jn7mg6c5dxy0",
@@ -139,6 +190,22 @@ Example payload for the `document.sent` event:
     "completedAt": null,
     "deletedAt": null,
     "teamId": null,
+    "templateId": null,
+    "source": "DOCUMENT",
+    "documentMeta": {
+      "id": "doc_meta_123",
+      "subject": "Please sign this document",
+      "message": "Hello, please review and sign this document.",
+      "timezone": "UTC",
+      "password": null,
+      "dateFormat": "MM/DD/YYYY",
+      "redirectUrl": null,
+      "signingOrder": "PARALLEL",
+      "typedSignatureEnabled": true,
+      "language": "en",
+      "distributionMethod": "EMAIL",
+      "emailSettings": null
+    },
     "Recipient": [
       {
         "id": 52,
@@ -147,12 +214,12 @@ Example payload for the `document.sent` event:
         "email": "signer2@documenso.com",
         "name": "Signer 2",
         "token": "vbT8hi3jKQmrFP_LN1WcS",
+        "documentDeletedAt": null,
         "expired": null,
         "signedAt": null,
-        "authOptions": {
-          "accessAuth": null,
-          "actionAuth": null
-        },
+        "authOptions": null,
+        "signingOrder": 1,
+        "rejectionReason": null,
         "role": "VIEWER",
         "readStatus": "NOT_OPENED",
         "signingStatus": "NOT_SIGNED",
@@ -165,12 +232,12 @@ Example payload for the `document.sent` event:
         "email": "signer1@documenso.com",
         "name": "Signer 1",
         "token": "HkrptwS42ZBXdRKj1TyUo",
+        "documentDeletedAt": null,
         "expired": null,
         "signedAt": null,
-        "authOptions": {
-          "accessAuth": null,
-          "actionAuth": null
-        },
+        "authOptions": null,
+        "signingOrder": 2,
+        "rejectionReason": null,
         "role": "SIGNER",
         "readStatus": "NOT_OPENED",
         "signingStatus": "NOT_SIGNED",
@@ -190,9 +257,11 @@ Example payload for the `document.opened` event:
   "event": "DOCUMENT_OPENED",
   "payload": {
     "id": 10,
+    "externalId": null,
     "userId": 1,
     "authOptions": null,
     "formValues": null,
+    "visibility": "EVERYONE",
     "title": "documenso.pdf",
     "status": "PENDING",
     "documentDataId": "hs8qz1ktr9204jn7mg6c5dxy0",
@@ -201,6 +270,22 @@ Example payload for the `document.opened` event:
     "completedAt": null,
     "deletedAt": null,
     "teamId": null,
+    "templateId": null,
+    "source": "DOCUMENT",
+    "documentMeta": {
+      "id": "doc_meta_123",
+      "subject": "Please sign this document",
+      "message": "Hello, please review and sign this document.",
+      "timezone": "UTC",
+      "password": null,
+      "dateFormat": "MM/DD/YYYY",
+      "redirectUrl": null,
+      "signingOrder": "PARALLEL",
+      "typedSignatureEnabled": true,
+      "language": "en",
+      "distributionMethod": "EMAIL",
+      "emailSettings": null
+    },
     "Recipient": [
       {
         "id": 52,
@@ -209,24 +294,18 @@ Example payload for the `document.opened` event:
         "email": "signer2@documenso.com",
         "name": "Signer 2",
         "token": "vbT8hi3jKQmrFP_LN1WcS",
+        "documentDeletedAt": null,
         "expired": null,
         "signedAt": null,
-        "authOptions": {
-          "accessAuth": null,
-          "actionAuth": null
-        },
+        "authOptions": null,
+        "signingOrder": 1,
+        "rejectionReason": null,
         "role": "VIEWER",
         "readStatus": "OPENED",
         "signingStatus": "NOT_SIGNED",
         "sendStatus": "SENT"
       }
-    ],
-    "documentData": {
-      "id": "hs8qz1ktr9204jn7mg6c5dxy0",
-      "type": "S3_PATH",
-      "data": "9753/xzqrshtlpokm/documenso.pdf",
-      "initialData": "9753/xzqrshtlpokm/documenso.pdf"
-    }
+    ]
   },
   "createdAt": "2024-04-22T11:50:26.174Z",
   "webhookEndpoint": "https://mywebhooksite.com/mywebhook"
@@ -240,9 +319,11 @@ Example payload for the `document.signed` event:
   "event": "DOCUMENT_SIGNED",
   "payload": {
     "id": 10,
+    "externalId": null,
     "userId": 1,
     "authOptions": null,
     "formValues": null,
+    "visibility": "EVERYONE",
     "title": "documenso.pdf",
     "status": "COMPLETED",
     "documentDataId": "hs8qz1ktr9204jn7mg6c5dxy0",
@@ -251,6 +332,22 @@ Example payload for the `document.signed` event:
     "completedAt": "2024-04-22T11:52:05.707Z",
     "deletedAt": null,
     "teamId": null,
+    "templateId": null,
+    "source": "DOCUMENT",
+    "documentMeta": {
+      "id": "doc_meta_123",
+      "subject": "Please sign this document",
+      "message": "Hello, please review and sign this document.",
+      "timezone": "UTC",
+      "password": null,
+      "dateFormat": "MM/DD/YYYY",
+      "redirectUrl": null,
+      "signingOrder": "PARALLEL",
+      "typedSignatureEnabled": true,
+      "language": "en",
+      "distributionMethod": "EMAIL",
+      "emailSettings": null
+    },
     "Recipient": [
       {
         "id": 51,
@@ -259,12 +356,15 @@ Example payload for the `document.signed` event:
         "email": "signer1@documenso.com",
         "name": "Signer 1",
         "token": "HkrptwS42ZBXdRKj1TyUo",
+        "documentDeletedAt": null,
         "expired": null,
         "signedAt": "2024-04-22T11:52:05.688Z",
         "authOptions": {
           "accessAuth": null,
           "actionAuth": null
         },
+        "signingOrder": 1,
+        "rejectionReason": null,
         "role": "SIGNER",
         "readStatus": "OPENED",
         "signingStatus": "SIGNED",
@@ -284,9 +384,11 @@ Example payload for the `document.completed` event:
   "event": "DOCUMENT_COMPLETED",
   "payload": {
     "id": 10,
+    "externalId": null,
     "userId": 1,
     "authOptions": null,
     "formValues": null,
+    "visibility": "EVERYONE",
     "title": "documenso.pdf",
     "status": "COMPLETED",
     "documentDataId": "hs8qz1ktr9204jn7mg6c5dxy0",
@@ -295,11 +397,21 @@ Example payload for the `document.completed` event:
     "completedAt": "2024-04-22T11:52:05.707Z",
     "deletedAt": null,
     "teamId": null,
-    "documentData": {
-      "id": "hs8qz1ktr9204jn7mg6c5dxy0",
-      "type": "S3_PATH",
-      "data": "bk9p1h7x0s3m/documenso-signed.pdf",
-      "initialData": "9753/xzqrshtlpokm/documenso.pdf"
+    "templateId": null,
+    "source": "DOCUMENT",
+    "documentMeta": {
+      "id": "doc_meta_123",
+      "subject": "Please sign this document",
+      "message": "Hello, please review and sign this document.",
+      "timezone": "UTC",
+      "password": null,
+      "dateFormat": "MM/DD/YYYY",
+      "redirectUrl": null,
+      "signingOrder": "PARALLEL",
+      "typedSignatureEnabled": true,
+      "language": "en",
+      "distributionMethod": "EMAIL",
+      "emailSettings": null
     },
     "Recipient": [
       {
@@ -309,12 +421,15 @@ Example payload for the `document.completed` event:
         "email": "signer2@documenso.com",
         "name": "Signer 2",
         "token": "vbT8hi3jKQmrFP_LN1WcS",
+        "documentDeletedAt": null,
         "expired": null,
         "signedAt": "2024-04-22T11:51:10.055Z",
         "authOptions": {
           "accessAuth": null,
           "actionAuth": null
         },
+        "signingOrder": 1,
+        "rejectionReason": null,
         "role": "VIEWER",
         "readStatus": "OPENED",
         "signingStatus": "SIGNED",
@@ -327,12 +442,15 @@ Example payload for the `document.completed` event:
         "email": "signer1@documenso.com",
         "name": "Signer 1",
         "token": "HkrptwS42ZBXdRKj1TyUo",
+        "documentDeletedAt": null,
         "expired": null,
         "signedAt": "2024-04-22T11:52:05.688Z",
         "authOptions": {
           "accessAuth": null,
           "actionAuth": null
         },
+        "signingOrder": 2,
+        "rejectionReason": null,
         "role": "SIGNER",
         "readStatus": "OPENED",
         "signingStatus": "SIGNED",
@@ -341,6 +459,71 @@ Example payload for the `document.completed` event:
     ]
   },
   "createdAt": "2024-04-22T11:52:18.277Z",
+  "webhookEndpoint": "https://mywebhooksite.com/mywebhook"
+}
+```
+
+Example payload for the `document.rejected` event:
+
+```json
+{
+  "event": "DOCUMENT_REJECTED",
+  "payload": {
+    "id": 10,
+    "externalId": null,
+    "userId": 1,
+    "authOptions": null,
+    "formValues": null,
+    "visibility": "EVERYONE",
+    "title": "documenso.pdf",
+    "status": "PENDING",
+    "documentDataId": "hs8qz1ktr9204jn7mg6c5dxy0",
+    "createdAt": "2024-04-22T11:44:43.341Z",
+    "updatedAt": "2024-04-22T11:48:07.569Z",
+    "completedAt": null,
+    "deletedAt": null,
+    "teamId": null,
+    "templateId": null,
+    "source": "DOCUMENT",
+    "documentMeta": {
+      "id": "doc_meta_123",
+      "subject": "Please sign this document",
+      "message": "Hello, please review and sign this document.",
+      "timezone": "UTC",
+      "password": null,
+      "dateFormat": "MM/DD/YYYY",
+      "redirectUrl": null,
+      "signingOrder": "PARALLEL",
+      "typedSignatureEnabled": true,
+      "language": "en",
+      "distributionMethod": "EMAIL",
+      "emailSettings": null
+    },
+    "Recipient": [
+      {
+        "id": 52,
+        "documentId": 10,
+        "templateId": null,
+        "email": "signer@documenso.com",
+        "name": "Signer",
+        "token": "vbT8hi3jKQmrFP_LN1WcS",
+        "documentDeletedAt": null,
+        "expired": null,
+        "signedAt": "2024-04-22T11:48:07.569Z",
+        "authOptions": {
+          "accessAuth": null,
+          "actionAuth": null
+        },
+        "signingOrder": 1,
+        "rejectionReason": "I do not agree with the terms",
+        "role": "SIGNER",
+        "readStatus": "OPENED",
+        "signingStatus": "REJECTED",
+        "sendStatus": "SENT"
+      }
+    ]
+  },
+  "createdAt": "2024-04-22T11:48:07.945Z",
   "webhookEndpoint": "https://mywebhooksite.com/mywebhook"
 }
 ```

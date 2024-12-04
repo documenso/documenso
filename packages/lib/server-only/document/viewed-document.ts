@@ -6,8 +6,8 @@ import { ReadStatus } from '@documenso/prisma/client';
 import { WebhookTriggerEvents } from '@documenso/prisma/client';
 
 import type { TDocumentAccessAuthTypes } from '../../types/document-auth';
+import { ZWebhookDocumentSchema } from '../../types/webhook-payload';
 import { triggerWebhook } from '../webhooks/trigger/trigger-webhook';
-import { getDocumentAndRecipientByToken } from './get-document-by-token';
 
 export type ViewedDocumentOptions = {
   token: string;
@@ -63,11 +63,23 @@ export const viewedDocument = async ({
     });
   });
 
-  const document = await getDocumentAndRecipientByToken({ token, requireAccessAuth: false });
+  const document = await prisma.document.findFirst({
+    where: {
+      id: documentId,
+    },
+    include: {
+      documentMeta: true,
+      Recipient: true,
+    },
+  });
+
+  if (!document) {
+    throw new Error('Document not found');
+  }
 
   await triggerWebhook({
     event: WebhookTriggerEvents.DOCUMENT_OPENED,
-    data: document,
+    data: ZWebhookDocumentSchema.parse(document),
     userId: document.userId,
     teamId: document.teamId ?? undefined,
   });
