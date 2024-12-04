@@ -18,6 +18,7 @@ import { DOCUMENT_AUDIT_LOG_TYPE } from '../../types/document-audit-logs';
 import { ZRecipientAuthOptionsSchema } from '../../types/document-auth';
 import type { TDocumentEmailSettings } from '../../types/document-email';
 import { ZFieldMetaSchema } from '../../types/field-meta';
+import { ZWebhookDocumentSchema } from '../../types/webhook-payload';
 import type { RequestMetadata } from '../../universal/extract-request-metadata';
 import { createDocumentAuditLogData } from '../../utils/document-audit-logs';
 import {
@@ -291,9 +292,23 @@ export const createDocumentFromTemplate = async ({
       }),
     });
 
+    const createdDocument = await tx.document.findFirst({
+      where: {
+        id: document.id,
+      },
+      include: {
+        documentMeta: true,
+        Recipient: true,
+      },
+    });
+
+    if (!createdDocument) {
+      throw new Error('Document not found');
+    }
+
     await triggerWebhook({
       event: WebhookTriggerEvents.DOCUMENT_CREATED,
-      data: document,
+      data: ZWebhookDocumentSchema.parse(createdDocument),
       userId,
       teamId,
     });

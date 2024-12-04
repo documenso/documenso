@@ -31,6 +31,7 @@ import { DOCUMENT_AUDIT_LOG_TYPE } from '../../types/document-audit-logs';
 import type { TRecipientActionAuthTypes } from '../../types/document-auth';
 import { DocumentAccessAuth, ZRecipientAuthOptionsSchema } from '../../types/document-auth';
 import { ZFieldMetaSchema } from '../../types/field-meta';
+import { ZWebhookDocumentSchema } from '../../types/webhook-payload';
 import type { RequestMetadata } from '../../universal/extract-request-metadata';
 import type { CreateDocumentAuditLogDataResponse } from '../../utils/document-audit-logs';
 import { createDocumentAuditLogData } from '../../utils/document-audit-logs';
@@ -591,7 +592,7 @@ export const createDocumentFromDirectTemplate = async ({
       requestMetadata,
     });
 
-    const updatedDocument = await prisma.document.findFirstOrThrow({
+    const createdDocument = await prisma.document.findFirstOrThrow({
       where: {
         id: documentId,
       },
@@ -603,9 +604,9 @@ export const createDocumentFromDirectTemplate = async ({
 
     await triggerWebhook({
       event: WebhookTriggerEvents.DOCUMENT_SIGNED,
-      data: updatedDocument,
-      userId: updatedDocument.userId,
-      teamId: updatedDocument.teamId ?? undefined,
+      data: ZWebhookDocumentSchema.parse(createdDocument),
+      userId: template.userId,
+      teamId: template.teamId ?? undefined,
     });
   } catch (err) {
     console.error('[CREATE_DOCUMENT_FROM_DIRECT_TEMPLATE]:', err);
