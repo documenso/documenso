@@ -36,11 +36,17 @@ const DPI = 2;
 const isBase64Image = (value: string) => value.startsWith('data:image/png;base64,');
 
 const loadImage = async (file: File | undefined): Promise<HTMLImageElement> => {
-  if (!file) throw new Error('No file selected');
+  if (!file) {
+    throw new Error('No file selected');
+  }
 
-  if (!file.type.startsWith('image/')) throw new Error('Invalid file type');
+  if (!file.type.startsWith('image/')) {
+    throw new Error('Invalid file type');
+  }
 
-  if (file.size > 5 * 1024 * 1024) throw new Error('Image size should be less than 5MB');
+  if (file.size > 5 * 1024 * 1024) {
+    throw new Error('Image size should be less than 5MB');
+  }
 
   return new Promise((resolve, reject) => {
     const img = new Image();
