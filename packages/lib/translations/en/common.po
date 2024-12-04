@@ -719,7 +719,7 @@ msgid "Document created"
 msgstr "Document created"
 
 #: packages/email/templates/document-created-from-direct-template.tsx:32
-#: packages/lib/server-only/template/create-document-from-direct-template.ts:573
+#: packages/lib/server-only/template/create-document-from-direct-template.ts:574
 msgid "Document created from direct template"
 msgstr "Document created from direct template"
 

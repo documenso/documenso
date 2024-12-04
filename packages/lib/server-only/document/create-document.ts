@@ -9,6 +9,7 @@ import { DocumentSource, DocumentVisibility, WebhookTriggerEvents } from '@docum
 import type { Team, TeamGlobalSettings } from '@documenso/prisma/client';
 import { TeamMemberRole } from '@documenso/prisma/client';
 
+import { ZWebhookDocumentSchema } from '../../types/webhook-payload';
 import { triggerWebhook } from '../webhooks/trigger/trigger-webhook';
 
 export type CreateDocumentOptions = {
@@ -135,13 +136,27 @@ export const createDocument = async ({
       }),
     });
 
+    const createdDocument = await tx.document.findFirst({
+      where: {
+        id: document.id,
+      },
+      include: {
+        documentMeta: true,
+        Recipient: true,
+      },
+    });
+
+    if (!createdDocument) {
+      throw new Error('Document not found');
+    }
+
     await triggerWebhook({
       event: WebhookTriggerEvents.DOCUMENT_CREATED,
-      data: document,
+      data: ZWebhookDocumentSchema.parse(createdDocument),
       userId,
       teamId,
     });
 
-    return document;
+    return createdDocument;
   });
 };

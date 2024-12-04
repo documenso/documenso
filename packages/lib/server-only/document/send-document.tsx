@@ -14,6 +14,7 @@ import { WebhookTriggerEvents } from '@documenso/prisma/client';
 
 import { jobs } from '../../jobs/client';
 import { extractDerivedDocumentEmailSettings } from '../../types/document-email';
+import { ZWebhookDocumentSchema } from '../../types/webhook-payload';
 import { getFile } from '../../universal/upload/get-file';
 import { insertFormValuesInPdf } from '../pdf/insert-form-values-in-pdf';
 import { triggerWebhook } from '../webhooks/trigger/trigger-webhook';
@@ -236,6 +237,7 @@ export const sendDocument = async ({
         status: DocumentStatus.PENDING,
       },
       include: {
+        documentMeta: true,
         Recipient: true,
       },
     });
@@ -243,7 +245,7 @@ export const sendDocument = async ({
 
   await triggerWebhook({
     event: WebhookTriggerEvents.DOCUMENT_SENT,
-    data: updatedDocument,
+    data: ZWebhookDocumentSchema.parse(updatedDocument),
     userId,
     teamId,
   });

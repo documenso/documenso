@@ -26,7 +26,8 @@ import { extractNextAuthRequestMetadata } from '../universal/extract-request-met
 import { getAuthenticatorOptions } from '../utils/authenticator';
 import { ErrorCode } from './error-codes';
 
-const useSecureCookies = process.env.NODE_ENV === 'production';
+const useSecureCookies =
+  process.env.NODE_ENV === 'production' && String(process.env.NEXTAUTH_URL).startsWith('https://');
 const cookiePrefix = useSecureCookies ? '__Secure-' : '';
 
 export const NEXT_AUTH_OPTIONS: AuthOptions = {
@@ -439,7 +440,7 @@ export const NEXT_AUTH_OPTIONS: AuthOptions = {
       name: `${cookiePrefix}next-auth.session-token`,
       options: {
         httpOnly: true,
-        sameSite: 'none',
+        sameSite: useSecureCookies ? 'none' : 'lax',
         path: '/',
         secure: useSecureCookies,
       },
@@ -447,7 +448,7 @@ export const NEXT_AUTH_OPTIONS: AuthOptions = {
     callbackUrl: {
       name: `${cookiePrefix}next-auth.callback-url`,
       options: {
-        sameSite: 'none',
+        sameSite: useSecureCookies ? 'none' : 'lax',
         path: '/',
         secure: useSecureCookies,
       },
@@ -458,7 +459,7 @@ export const NEXT_AUTH_OPTIONS: AuthOptions = {
       name: `${cookiePrefix}next-auth.csrf-token`,
       options: {
         httpOnly: true,
-        sameSite: 'none',
+        sameSite: useSecureCookies ? 'none' : 'lax',
         path: '/',
         secure: useSecureCookies,
       },
@@ -467,7 +468,7 @@ export const NEXT_AUTH_OPTIONS: AuthOptions = {
       name: `${cookiePrefix}next-auth.pkce.code_verifier`,
       options: {
         httpOnly: true,
-        sameSite: 'none',
+        sameSite: useSecureCookies ? 'none' : 'lax',
         path: '/',
         secure: useSecureCookies,
       },
@@ -476,7 +477,7 @@ export const NEXT_AUTH_OPTIONS: AuthOptions = {
       name: `${cookiePrefix}next-auth.state`,
       options: {
         httpOnly: true,
-        sameSite: 'none',
+        sameSite: useSecureCookies ? 'none' : 'lax',
         path: '/',
         secure: useSecureCookies,
       },
