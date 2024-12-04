@@ -162,6 +162,7 @@ enum WebhookTriggerEvents {
   DOCUMENT_OPENED
   DOCUMENT_SIGNED
   DOCUMENT_COMPLETED
+  DOCUMENT_REJECTED
 }
 
 model Webhook {

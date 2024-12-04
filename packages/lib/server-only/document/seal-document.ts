@@ -10,6 +10,7 @@ import { DocumentStatus, RecipientRole, SigningStatus } from '@documenso/prisma/
 import { WebhookTriggerEvents } from '@documenso/prisma/client';
 import { signPdf } from '@documenso/signing';
 
+import { ZWebhookDocumentSchema } from '../../types/webhook-payload';
 import type { RequestMetadata } from '../../universal/extract-request-metadata';
 import { getFile } from '../../universal/upload/get-file';
 import { putPdfFile } from '../../universal/upload/put-file';
@@ -199,13 +200,14 @@ export const sealDocument = async ({
     },
     include: {
       documentData: true,
+      documentMeta: true,
       Recipient: true,
     },
   });
 
   await triggerWebhook({
     event: WebhookTriggerEvents.DOCUMENT_COMPLETED,
-    data: updatedDocument,
+    data: ZWebhookDocumentSchema.parse(updatedDocument),
     userId: document.userId,
     teamId: document.teamId ?? undefined,
   });
