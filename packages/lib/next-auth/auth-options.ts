@@ -440,7 +440,7 @@ export const NEXT_AUTH_OPTIONS: AuthOptions = {
       name: `${cookiePrefix}next-auth.session-token`,
       options: {
         httpOnly: true,
-        sameSite: 'none',
+        sameSite: useSecureCookies ? 'none' : 'lax',
         path: '/',
         secure: useSecureCookies,
       },
@@ -448,7 +448,7 @@ export const NEXT_AUTH_OPTIONS: AuthOptions = {
     callbackUrl: {
       name: `${cookiePrefix}next-auth.callback-url`,
       options: {
-        sameSite: 'none',
+        sameSite: useSecureCookies ? 'none' : 'lax',
         path: '/',
         secure: useSecureCookies,
       },
@@ -459,7 +459,7 @@ export const NEXT_AUTH_OPTIONS: AuthOptions = {
       name: `${cookiePrefix}next-auth.csrf-token`,
       options: {
         httpOnly: true,
-        sameSite: 'none',
+        sameSite: useSecureCookies ? 'none' : 'lax',
         path: '/',
         secure: useSecureCookies,
       },
@@ -468,7 +468,7 @@ export const NEXT_AUTH_OPTIONS: AuthOptions = {
       name: `${cookiePrefix}next-auth.pkce.code_verifier`,
       options: {
         httpOnly: true,
-        sameSite: 'none',
+        sameSite: useSecureCookies ? 'none' : 'lax',
         path: '/',
         secure: useSecureCookies,
       },
@@ -477,7 +477,7 @@ export const NEXT_AUTH_OPTIONS: AuthOptions = {
       name: `${cookiePrefix}next-auth.state`,
       options: {
         httpOnly: true,
-        sameSite: 'none',
+        sameSite: useSecureCookies ? 'none' : 'lax',
         path: '/',
         secure: useSecureCookies,
       },
