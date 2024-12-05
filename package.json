@@ -66,8 +66,7 @@
     "@lingui/core": "^4.11.3",
     "inngest-cli": "^0.29.1",
     "next-runtime-env": "^3.2.0",
-    "react": "^18",
-    "zod": "^3.23.8"
+    "react": "^18"
   },
   "overrides": {
     "next": "14.2.6"
