@@ -581,7 +581,7 @@ msgstr "Unterschrift löschen"
 
 #: packages/ui/primitives/document-flow/add-signature.tsx:394
 msgid "Click to insert field"
-msgstr "Klicken, um das Feld einzufügen"
+msgstr "Klicken, um das Feld auszufüllen"
 
 #: packages/ui/primitives/document-flow/missing-signature-field-dialog.tsx:44
 msgid "Close"

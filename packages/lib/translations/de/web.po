@@ -944,7 +944,7 @@ msgstr "Klicken Sie, um den Signatur-Link zu kopieren, um ihn an den Empfänger 
 #: apps/web/src/app/embed/direct/[[...url]]/client.tsx:456
 #: apps/web/src/app/embed/sign/[[...url]]/client.tsx:335
 msgid "Click to insert field"
-msgstr "Klicken Sie, um das Feld einzufügen"
+msgstr "Klicken Sie, um das Feld auszufüllen"
 
 #: apps/web/src/app/(dashboard)/templates/new-template-dialog.tsx:126
 #: apps/web/src/app/(dashboard)/templates/use-template-dialog.tsx:389
@@ -964,7 +964,7 @@ msgstr "Schließen"
 #: apps/web/src/app/embed/sign/[[...url]]/client.tsx:325
 #: apps/web/src/components/forms/v2/signup.tsx:534
 msgid "Complete"
-msgstr "Vollständig"
+msgstr "Abschließen"
 
 #: apps/web/src/app/(signing)/sign/[token]/sign-dialog.tsx:69
 msgid "Complete Approval"
