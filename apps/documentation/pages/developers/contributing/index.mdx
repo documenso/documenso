@@ -1,0 +1,117 @@
+---
+title: Getting started
+description: Learn how to contribute to Documenso and become part of our community.
+---
+
+import { Callout, Steps } from 'nextra/components';
+
+# Contributing to Documenso
+
+If you plan to contribute to Documenso, please take a moment to feel awesome. People like you are what open source is about. Any contributions, no matter how big or small, are highly appreciated.
+
+This guide will help you get started with contributing to Documenso.
+
+## Before Getting Started
+
+<Steps>
+
+### Check the Existing Issues and Pull Requests
+
+Search the existing [issues](https://github.com/documenso/documenso/issues) to see if someone else reported the same issue. Or, check the [existing PRs](https://github.com/documenso/documenso/pulls) to see if someone else is already working on the same thing.
+
+### Creating a New Issue
+
+If there is no issue or PR for the problem you are facing, feel free to create a new issue. Make sure to provide as much detail as possible, including the steps to reproduce the issue.
+
+### Picking an Existing Issue
+
+If you pick an existing issue, take into consideration the discussion on the issue.
+
+### Contributor License Agreement
+
+Accept the [Contributor License Agreement](https://documen.so/cla) to ensure we can accept your contributions.
+
+</Steps>
+
+## Taking Issues
+
+Before taking an issue, ensure that:
+
+- The issue has been assigned the public label.
+- The issue is clearly defined and understood.
+- No one has been assigned to the issue.
+- No one has expressed the intention to work on it.
+
+After that:
+
+1. Comment on the issue with your intention to work on it.
+2. Start working on the issue.
+
+Feel free to ask for help, clarification or guidance if needed. We are here to help you.
+
+## Developing
+
+The development branch is `main`, and all pull requests should be made against this branch. Here's how you can get started with developing:
+
+<Steps>
+
+### Set Up Documenso Locally
+
+To set up your local environment, check out the [local development](/developers/local-development) guide.
+
+### Pick a Task
+
+Find an issue to work on or create a new one.
+
+> Before working on an issue, ensure that no one else is working on it. If no one is assigned to the issue, you can pick it up by leaving a comment and asking to assign it to you.
+
+Before creating a new issue, check the existing issues to see if someone else has already reported it.
+
+### Create a New Branch
+
+After you're assigned an issue, you can start working on it. Create a new branch for your feature or bug fix.
+
+When creating a branch, make sure that the branch name:
+
+- starts with the correct prefix: `feat/` for new features, `fix/` for bug fixes, etc.
+- includes the issue ID you are working on (if applicable).
+- is descriptive.
+
+```sh
+git checkout -b feat/issue-id-your-branch-name
+
+## Example
+git checkout -b feat/1234-add-share-button-to-articles
+```
+
+In the pull request description, include `references #yyyy` or `fixes #yyyy` to link it to the issue you are working on.
+
+### Implement Your Changes
+
+Start working on the issue you picked up and implement the changes. Make sure to test your changes locally and ensure that they work as expected.
+
+### Open a Pull Request
+
+After implementing your changes, open a pull request against the `main` branch.
+
+</Steps>
+
+<Callout type="info">
+  If you need help getting started, [join us on Discord](https://documen.so/discord).
+</Callout>
+
+## Building
+
+Before pushing code or creating pull requests, please ensure you can successfully create a successful production build. You can build the project by running the following command in your terminal:
+
+```bash
+npm run build
+```
+
+Once the project builds successfully, you can push your code changes or create a pull request.
+
+<Callout type="info">
+  Remember to run tests and perform any necessary checks before finalizing your changes. As a
+  result, we can collaborate more effectively and maintain a high standard of code quality in our
+  project.
+</Callout>

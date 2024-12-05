@@ -1,4 +1,10 @@
+import { createElement } from 'react';
+
+import { msg } from '@lingui/macro';
+
 import { isUserEnterprise } from '@documenso/ee/server-only/util/is-document-enterprise';
+import { mailer } from '@documenso/email/mailer';
+import RecipientRemovedFromDocumentTemplate from '@documenso/email/templates/recipient-removed-from-document';
 import { DOCUMENT_AUDIT_LOG_TYPE } from '@documenso/lib/types/document-audit-logs';
 import {
   type TRecipientActionAuthTypes,
@@ -16,20 +22,20 @@ import type { Recipient } from '@documenso/prisma/client';
 import { RecipientRole } from '@documenso/prisma/client';
 import { SendStatus, SigningStatus } from '@documenso/prisma/client';
 
+import { getI18nInstance } from '../../client-only/providers/i18n.server';
+import { NEXT_PUBLIC_WEBAPP_URL } from '../../constants/app';
+import { FROM_ADDRESS, FROM_NAME } from '../../constants/email';
 import { AppError, AppErrorCode } from '../../errors/app-error';
+import { extractDerivedDocumentEmailSettings } from '../../types/document-email';
+import { canRecipientBeModified } from '../../utils/recipients';
+import { renderEmailWithI18N } from '../../utils/render-email-with-i18n';
+import { teamGlobalSettingsToBranding } from '../../utils/team-global-settings-to-branding';
 
 export interface SetRecipientsForDocumentOptions {
   userId: number;
   teamId?: number;
   documentId: number;
-  recipients: {
-    id?: number | null;
-    email: string;
-    name: string;
-    role: RecipientRole;
-    signingOrder?: number | null;
-    actionAuth?: TRecipientActionAuthTypes | null;
-  }[];
+  recipients: RecipientData[];
   requestMetadata?: RequestMetadata;
 }
 
@@ -58,6 +64,15 @@ export const setRecipientsForDocument = async ({
             userId,
             teamId: null,
           }),
+    },
+    include: {
+      Field: true,
+      documentMeta: true,
+      team: {
+        include: {
+          teamGlobalSettings: true,
+        },
+      },
     },
   });
 
@@ -90,10 +105,9 @@ export const setRecipientsForDocument = async ({
     });
 
     if (!isDocumentEnterprise) {
-      throw new AppError(
-        AppErrorCode.UNAUTHORIZED,
-        'You do not have permission to set the action auth',
-      );
+      throw new AppError(AppErrorCode.UNAUTHORIZED, {
+        message: 'You do not have permission to set the action auth',
+      });
     }
   }
 
@@ -116,25 +130,27 @@ export const setRecipientsForDocument = async ({
       ),
   );
 
-  const linkedRecipients = normalizedRecipients
-    .map((recipient) => {
-      const existing = existingRecipients.find(
-        (existingRecipient) =>
-          existingRecipient.id === recipient.id || existingRecipient.email === recipient.email,
-      );
+  const linkedRecipients = normalizedRecipients.map((recipient) => {
+    const existing = existingRecipients.find(
+      (existingRecipient) =>
+        existingRecipient.id === recipient.id || existingRecipient.email === recipient.email,
+    );
 
-      return {
-        ...recipient,
-        _persisted: existing,
-      };
-    })
-    .filter((recipient) => {
-      return (
-        recipient._persisted?.role === RecipientRole.CC ||
-        (recipient._persisted?.sendStatus !== SendStatus.SENT &&
-          recipient._persisted?.signingStatus !== SigningStatus.SIGNED)
-      );
-    });
+    if (
+      existing &&
+      hasRecipientBeenChanged(existing, recipient) &&
+      !canRecipientBeModified(existing, document.Field)
+    ) {
+      throw new AppError(AppErrorCode.INVALID_REQUEST, {
+        message: 'Cannot modify a recipient who has already interacted with the document',
+      });
+    }
+
+    return {
+      ...recipient,
+      _persisted: existing,
+    };
+  });
 
   const persistedRecipients = await prisma.$transaction(async (tx) => {
     return await Promise.all(
@@ -268,6 +284,52 @@ export const setRecipientsForDocument = async ({
         ),
       });
     });
+
+    const isRecipientRemovedEmailEnabled = extractDerivedDocumentEmailSettings(
+      document.documentMeta,
+    ).recipientRemoved;
+
+    // Send emails to deleted recipients.
+    await Promise.all(
+      removedRecipients.map(async (recipient) => {
+        if (recipient.sendStatus !== SendStatus.SENT || !isRecipientRemovedEmailEnabled) {
+          return;
+        }
+
+        const assetBaseUrl = NEXT_PUBLIC_WEBAPP_URL() || 'http://localhost:3000';
+
+        const template = createElement(RecipientRemovedFromDocumentTemplate, {
+          documentName: document.title,
+          inviterName: user.name || undefined,
+          assetBaseUrl,
+        });
+
+        const branding = document.team?.teamGlobalSettings
+          ? teamGlobalSettingsToBranding(document.team.teamGlobalSettings)
+          : undefined;
+
+        const [html, text] = await Promise.all([
+          renderEmailWithI18N(template, { lang: document.documentMeta?.language }),
+          renderEmailWithI18N(template, { lang: document.documentMeta?.language, plainText: true }),
+        ]);
+
+        const i18n = await getI18nInstance(document.documentMeta?.language);
+
+        await mailer.sendMail({
+          to: {
+            address: recipient.email,
+            name: recipient.name,
+          },
+          from: {
+            name: FROM_NAME,
+            address: FROM_ADDRESS,
+          },
+          subject: i18n._(msg`You have been removed from a document`),
+          html,
+          text,
+        });
+      }),
+    );
   }
 
   // Filter out recipients that have been removed or have been updated.
@@ -283,4 +345,28 @@ export const setRecipientsForDocument = async ({
   });
 
   return [...filteredRecipients, ...persistedRecipients];
+};
+
+/**
+ * If you change this you MUST update the `hasRecipientBeenChanged` function.
+ */
+type RecipientData = {
+  id?: number | null;
+  email: string;
+  name: string;
+  role: RecipientRole;
+  signingOrder?: number | null;
+  actionAuth?: TRecipientActionAuthTypes | null;
+};
+
+const hasRecipientBeenChanged = (recipient: Recipient, newRecipientData: RecipientData) => {
+  const authOptions = ZRecipientAuthOptionsSchema.parse(recipient.authOptions);
+
+  return (
+    recipient.email !== newRecipientData.email ||
+    recipient.name !== newRecipientData.name ||
+    recipient.role !== newRecipientData.role ||
+    recipient.signingOrder !== newRecipientData.signingOrder ||
+    authOptions.actionAuth !== newRecipientData.actionAuth
+  );
 };

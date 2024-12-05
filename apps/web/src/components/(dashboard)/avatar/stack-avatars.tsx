@@ -1,6 +1,9 @@
 import React from 'react';
 
-import { getRecipientType } from '@documenso/lib/client-only/recipient-type';
+import {
+  getExtraRecipientsType,
+  getRecipientType,
+} from '@documenso/lib/client-only/recipient-type';
 import { recipientAbbreviation } from '@documenso/lib/utils/recipient-formatter';
 import type { Recipient } from '@documenso/prisma/client';
 
@@ -13,20 +16,27 @@ export function StackAvatars({ recipients }: { recipients: Recipient[] }) {
     const remainingItems = recipients.length - itemsToRender.length;
 
     return itemsToRender.map((recipient: Recipient, index: number) => {
-      const first = index === 0 ? true : false;
+      const first = index === 0;
 
-      const lastItemText =
-        index === itemsToRender.length - 1 && remainingItems > 0
-          ? `+${remainingItems + 1}`
-          : undefined;
+      if (index === 4 && remainingItems > 0) {
+        return (
+          <StackAvatar
+            key="extra-recipient"
+            first={first}
+            zIndex={String(zIndex - index * 10)}
+            type={getExtraRecipientsType(recipients.slice(4))}
+            fallbackText={`+${remainingItems + 1}`}
+          />
+        );
+      }
 
       return (
         <StackAvatar
           key={recipient.id}
           first={first}
           zIndex={String(zIndex - index * 10)}
-          type={lastItemText && index === 4 ? 'unsigned' : getRecipientType(recipient)}
-          fallbackText={lastItemText ? lastItemText : recipientAbbreviation(recipient)}
+          type={getRecipientType(recipient)}
+          fallbackText={recipientAbbreviation(recipient)}
         />
       );
     });

@@ -4,6 +4,7 @@ import { prisma } from '@documenso/prisma';
 import type { Prisma } from '@documenso/prisma/client';
 import { TeamMemberRole } from '@documenso/prisma/client';
 
+import { AppError, AppErrorCode } from '../../errors/app-error';
 import { DocumentVisibility } from '../../types/document-visibility';
 import { getTeamById } from '../team/get-team';
 
@@ -20,7 +21,7 @@ export const getDocumentById = async ({ id, userId, teamId }: GetDocumentByIdOpt
     teamId,
   });
 
-  return await prisma.document.findFirstOrThrow({
+  const document = await prisma.document.findFirst({
     where: documentWhereInput,
     include: {
       documentData: true,
@@ -45,6 +46,14 @@ export const getDocumentById = async ({ id, userId, teamId }: GetDocumentByIdOpt
       },
     },
   });
+
+  if (!document) {
+    throw new AppError(AppErrorCode.NOT_FOUND, {
+      message: 'Document could not be found',
+    });
+  }
+
+  return document;
 };
 
 export type GetDocumentWhereInputOptions = {
@@ -143,11 +152,18 @@ export const getDocumentWhereInput = async ({
       ])
       .otherwise(() => [{ visibility: DocumentVisibility.EVERYONE }]),
     {
-      Recipient: {
-        some: {
-          email: user.email,
+      OR: [
+        {
+          Recipient: {
+            some: {
+              email: user.email,
+            },
+          },
         },
-      },
+        {
+          userId: user.id,
+        },
+      ],
     },
   ];
 

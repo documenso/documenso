@@ -40,7 +40,6 @@ type TUpdateTeamFormSchema = z.infer<typeof ZUpdateTeamFormSchema>;
 
 export const UpdateTeamForm = ({ teamId, teamName, teamUrl }: UpdateTeamDialogProps) => {
   const router = useRouter();
-
   const { _ } = useLingui();
   const { toast } = useToast();
 

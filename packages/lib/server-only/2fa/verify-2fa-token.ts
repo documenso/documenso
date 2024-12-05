@@ -1,21 +1,25 @@
 import { base32 } from '@scure/base';
-import { TOTPController } from 'oslo/otp';
+import { generateHOTP } from 'oslo/otp';
 
 import type { User } from '@documenso/prisma/client';
 
 import { DOCUMENSO_ENCRYPTION_KEY } from '../../constants/crypto';
 import { symmetricDecrypt } from '../../universal/crypto';
 
-const totp = new TOTPController();
-
 type VerifyTwoFactorAuthenticationTokenOptions = {
   user: User;
   totpCode: string;
+  // The number of windows to look back
+  window?: number;
+  // The duration that the token is valid for in seconds
+  period?: number;
 };
 
 export const verifyTwoFactorAuthenticationToken = async ({
   user,
   totpCode,
+  window = 1,
+  period = 30_000,
 }: VerifyTwoFactorAuthenticationTokenOptions) => {
   const key = DOCUMENSO_ENCRYPTION_KEY;
 
@@ -27,7 +31,21 @@ export const verifyTwoFactorAuthenticationToken = async ({
     'utf-8',
   );
 
-  const isValidToken = await totp.verify(totpCode, base32.decode(secret));
+  const decodedSecret = base32.decode(secret);
 
-  return isValidToken;
+  let now = Date.now();
+
+  for (let i = 0; i < window; i++) {
+    const counter = Math.floor(now / period);
+
+    const hotp = await generateHOTP(decodedSecret, counter);
+
+    if (totpCode === hotp) {
+      return true;
+    }
+
+    now -= period;
+  }
+
+  return false;
 };

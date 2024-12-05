@@ -16,7 +16,7 @@ export type LeaveTeamOptions = {
   teamId: number;
 };
 
-export const leaveTeam = async ({ userId, teamId }: LeaveTeamOptions) => {
+export const leaveTeam = async ({ userId, teamId }: LeaveTeamOptions): Promise<void> => {
   await prisma.$transaction(
     async (tx) => {
       const team = await tx.team.findFirstOrThrow({

@@ -58,6 +58,7 @@ export const EmbedDocumentFields = ({
               recipient={recipient}
               onSignField={onSignField}
               onUnsignField={onUnsignField}
+              typedSignatureEnabled={metadata?.typedSignatureEnabled}
             />
           ))
           .with(FieldType.INITIALS, () => (

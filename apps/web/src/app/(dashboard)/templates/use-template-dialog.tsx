@@ -1,3 +1,5 @@
+'use client';
+
 import { useEffect, useState } from 'react';
 
 import { useRouter } from 'next/navigation';
@@ -15,7 +17,9 @@ import {
 } from '@documenso/lib/constants/template';
 import { AppError } from '@documenso/lib/errors/app-error';
 import type { Recipient } from '@documenso/prisma/client';
+import { DocumentDistributionMethod, DocumentSigningOrder } from '@documenso/prisma/client';
 import { trpc } from '@documenso/trpc/react';
+import { cn } from '@documenso/ui/lib/utils';
 import { Button } from '@documenso/ui/primitives/button';
 import { Checkbox } from '@documenso/ui/primitives/checkbox';
 import {
@@ -45,12 +49,13 @@ import { useOptionalCurrentTeam } from '~/providers/team';
 
 const ZAddRecipientsForNewDocumentSchema = z
   .object({
-    sendDocument: z.boolean(),
+    distributeDocument: z.boolean(),
     recipients: z.array(
       z.object({
         id: z.number(),
         email: z.string().email(),
         name: z.string(),
+        signingOrder: z.number().optional(),
       }),
     ),
   })
@@ -86,14 +91,20 @@ type TAddRecipientsForNewDocumentSchema = z.infer<typeof ZAddRecipientsForNewDoc
 
 export type UseTemplateDialogProps = {
   templateId: number;
+  templateSigningOrder?: DocumentSigningOrder | null;
   recipients: Recipient[];
+  documentDistributionMethod?: DocumentDistributionMethod;
   documentRootPath: string;
+  trigger?: React.ReactNode;
 };
 
 export function UseTemplateDialog({
   recipients,
+  documentDistributionMethod = DocumentDistributionMethod.EMAIL,
   documentRootPath,
   templateId,
+  templateSigningOrder,
+  trigger,
 }: UseTemplateDialogProps) {
   const router = useRouter();
 
@@ -107,22 +118,25 @@ export function UseTemplateDialog({
   const form = useForm<TAddRecipientsForNewDocumentSchema>({
     resolver: zodResolver(ZAddRecipientsForNewDocumentSchema),
     defaultValues: {
-      sendDocument: false,
-      recipients: recipients.map((recipient) => {
-        const isRecipientEmailPlaceholder = recipient.email.match(
-          TEMPLATE_RECIPIENT_EMAIL_PLACEHOLDER_REGEX,
-        );
+      distributeDocument: false,
+      recipients: recipients
+        .sort((a, b) => (a.signingOrder || 0) - (b.signingOrder || 0))
+        .map((recipient) => {
+          const isRecipientEmailPlaceholder = recipient.email.match(
+            TEMPLATE_RECIPIENT_EMAIL_PLACEHOLDER_REGEX,
+          );
 
-        const isRecipientNamePlaceholder = recipient.name.match(
-          TEMPLATE_RECIPIENT_NAME_PLACEHOLDER_REGEX,
-        );
+          const isRecipientNamePlaceholder = recipient.name.match(
+            TEMPLATE_RECIPIENT_NAME_PLACEHOLDER_REGEX,
+          );
 
-        return {
-          id: recipient.id,
-          name: !isRecipientNamePlaceholder ? recipient.name : '',
-          email: !isRecipientEmailPlaceholder ? recipient.email : '',
-        };
-      }),
+          return {
+            id: recipient.id,
+            name: !isRecipientNamePlaceholder ? recipient.name : '',
+            email: !isRecipientEmailPlaceholder ? recipient.email : '',
+            signingOrder: recipient.signingOrder ?? undefined,
+          };
+        }),
     },
   });
 
@@ -135,7 +149,7 @@ export function UseTemplateDialog({
         templateId,
         teamId: team?.id,
         recipients: data.recipients,
-        sendDocument: data.sendDocument,
+        distributeDocument: data.distributeDocument,
       });
 
       toast({
@@ -144,7 +158,16 @@ export function UseTemplateDialog({
         duration: 5000,
       });
 
-      router.push(`${documentRootPath}/${id}`);
+      let documentPath = `${documentRootPath}/${id}`;
+
+      if (
+        data.distributeDocument &&
+        documentDistributionMethod === DocumentDistributionMethod.NONE
+      ) {
+        documentPath += '?action=view-signing-links';
+      }
+
+      router.push(documentPath);
     } catch (err) {
       const error = AppError.parseError(err);
 
@@ -178,10 +201,12 @@ export function UseTemplateDialog({
   return (
     <Dialog open={open} onOpenChange={(value) => !form.formState.isSubmitting && setOpen(value)}>
       <DialogTrigger asChild>
-        <Button variant="outline" className="bg-background">
-          <Plus className="-ml-1 mr-2 h-4 w-4" />
-          <Trans>Use Template</Trans>
-        </Button>
+        {trigger || (
+          <Button variant="outline" className="bg-background">
+            <Plus className="-ml-1 mr-2 h-4 w-4" />
+            <Trans>Use Template</Trans>
+          </Button>
+        )}
       </DialogTrigger>
       <DialogContent className="sm:max-w-lg">
         <DialogHeader>
@@ -203,6 +228,33 @@ export function UseTemplateDialog({
               <div className="custom-scrollbar -m-1 max-h-[60vh] space-y-4 overflow-y-auto p-1">
                 {formRecipients.map((recipient, index) => (
                   <div className="flex w-full flex-row space-x-4" key={recipient.id}>
+                    {templateSigningOrder === DocumentSigningOrder.SEQUENTIAL && (
+                      <FormField
+                        control={form.control}
+                        name={`recipients.${index}.signingOrder`}
+                        render={({ field }) => (
+                          <FormItem
+                            className={cn('w-20', {
+                              'mt-8': index === 0,
+                            })}
+                          >
+                            <FormControl>
+                              <Input
+                                {...field}
+                                disabled
+                                className="items-center justify-center"
+                                value={
+                                  field.value?.toString() ||
+                                  recipients[index]?.signingOrder?.toString()
+                                }
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    )}
+
                     <FormField
                       control={form.control}
                       name={`recipients.${index}.email`}
@@ -254,43 +306,76 @@ export function UseTemplateDialog({
                 <div className="mt-4 flex flex-row items-center">
                   <FormField
                     control={form.control}
-                    name="sendDocument"
+                    name="distributeDocument"
                     render={({ field }) => (
                       <FormItem>
                         <div className="flex flex-row items-center">
                           <Checkbox
-                            id="sendDocument"
+                            id="distributeDocument"
                             className="h-5 w-5"
                             checkClassName="dark:text-white text-primary"
                             checked={field.value}
                             onCheckedChange={field.onChange}
                           />
 
-                          <label
-                            className="text-muted-foreground ml-2 flex items-center text-sm"
-                            htmlFor="sendDocument"
-                          >
-                            <Trans>Send document</Trans>
-                            <Tooltip>
-                              <TooltipTrigger type="button">
-                                <InfoIcon className="mx-1 h-4 w-4" />
-                              </TooltipTrigger>
+                          {documentDistributionMethod === DocumentDistributionMethod.EMAIL && (
+                            <label
+                              className="text-muted-foreground ml-2 flex items-center text-sm"
+                              htmlFor="distributeDocument"
+                            >
+                              <Trans>Send document</Trans>
+                              <Tooltip>
+                                <TooltipTrigger type="button">
+                                  <InfoIcon className="mx-1 h-4 w-4" />
+                                </TooltipTrigger>
 
-                              <TooltipContent className="text-muted-foreground z-[99999] max-w-md space-y-2 p-4">
-                                <p>
-                                  <Trans>
-                                    {' '}
-                                    The document will be immediately sent to recipients if this is
-                                    checked.
-                                  </Trans>
-                                </p>
+                                <TooltipContent className="text-muted-foreground z-[99999] max-w-md space-y-2 p-4">
+                                  <p>
+                                    <Trans>
+                                      The document will be immediately sent to recipients if this is
+                                      checked.
+                                    </Trans>
+                                  </p>
 
-                                <p>
-                                  <Trans>Otherwise, the document will be created as a draft.</Trans>
-                                </p>
-                              </TooltipContent>
-                            </Tooltip>
-                          </label>
+                                  <p>
+                                    <Trans>
+                                      Otherwise, the document will be created as a draft.
+                                    </Trans>
+                                  </p>
+                                </TooltipContent>
+                              </Tooltip>
+                            </label>
+                          )}
+
+                          {documentDistributionMethod === DocumentDistributionMethod.NONE && (
+                            <label
+                              className="text-muted-foreground ml-2 flex items-center text-sm"
+                              htmlFor="distributeDocument"
+                            >
+                              <Trans>Create as pending</Trans>
+                              <Tooltip>
+                                <TooltipTrigger type="button">
+                                  <InfoIcon className="mx-1 h-4 w-4" />
+                                </TooltipTrigger>
+                                <TooltipContent className="text-muted-foreground z-[99999] max-w-md space-y-2 p-4">
+                                  <p>
+                                    <Trans>Create the document as pending and ready to sign.</Trans>
+                                  </p>
+
+                                  <p>
+                                    <Trans>We won't send anything to notify recipients.</Trans>
+                                  </p>
+
+                                  <p className="mt-2">
+                                    <Trans>
+                                      We will generate signing links for you, which you can send to
+                                      the recipients through your method of choice.
+                                    </Trans>
+                                  </p>
+                                </TooltipContent>
+                              </Tooltip>
+                            </label>
+                          )}
                         </div>
                       </FormItem>
                     )}
@@ -306,10 +391,12 @@ export function UseTemplateDialog({
                 </DialogClose>
 
                 <Button type="submit" loading={form.formState.isSubmitting}>
-                  {form.getValues('sendDocument') ? (
+                  {!form.getValues('distributeDocument') ? (
+                    <Trans>Create as draft</Trans>
+                  ) : documentDistributionMethod === DocumentDistributionMethod.EMAIL ? (
                     <Trans>Create and send</Trans>
                   ) : (
-                    <Trans>Create as draft</Trans>
+                    <Trans>Create signing links</Trans>
                   )}
                 </Button>
               </DialogFooter>

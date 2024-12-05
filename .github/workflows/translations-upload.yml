@@ -21,14 +21,12 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
         with:
-          ref: ${{ github.event.pull_request.head.ref }}
+          token: ${{ secrets.GH_PAT }}
 
       - uses: ./.github/actions/node-install
 
-      - name: Extract and compile translations
-        run: |
-          npm run translate:extract
-          npm run translate:compile
+      - name: Extract translations
+        run: npm run translate:extract
 
       - name: Check and commit any files created
         run: |

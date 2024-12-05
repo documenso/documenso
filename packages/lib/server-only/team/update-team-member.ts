@@ -18,7 +18,7 @@ export const updateTeamMember = async ({
   teamId,
   teamMemberId,
   data,
-}: UpdateTeamMemberOptions) => {
+}: UpdateTeamMemberOptions): Promise<void> => {
   await prisma.$transaction(async (tx) => {
     // Find the team and validate that the user is allowed to update members.
     const team = await tx.team.findFirstOrThrow({
@@ -48,11 +48,11 @@ export const updateTeamMember = async ({
     const teamMemberToUpdate = team.members.find((member) => member.id === teamMemberId);
 
     if (!teamMemberToUpdate || !currentTeamMember) {
-      throw new AppError(AppErrorCode.NOT_FOUND, 'Team member does not exist');
+      throw new AppError(AppErrorCode.NOT_FOUND, { message: 'Team member does not exist' });
     }
 
     if (teamMemberToUpdate.userId === team.ownerUserId) {
-      throw new AppError(AppErrorCode.UNAUTHORIZED, 'Cannot update the owner');
+      throw new AppError(AppErrorCode.UNAUTHORIZED, { message: 'Cannot update the owner' });
     }
 
     const isMemberToUpdateHigherRole = !isTeamRoleWithinUserHierarchy(
@@ -61,7 +61,9 @@ export const updateTeamMember = async ({
     );
 
     if (isMemberToUpdateHigherRole) {
-      throw new AppError(AppErrorCode.UNAUTHORIZED, 'Cannot update a member with a higher role');
+      throw new AppError(AppErrorCode.UNAUTHORIZED, {
+        message: 'Cannot update a member with a higher role',
+      });
     }
 
     const isNewMemberRoleHigherThanCurrentRole = !isTeamRoleWithinUserHierarchy(
@@ -70,10 +72,9 @@ export const updateTeamMember = async ({
     );
 
     if (isNewMemberRoleHigherThanCurrentRole) {
-      throw new AppError(
-        AppErrorCode.UNAUTHORIZED,
-        'Cannot give a member a role higher than the user initating the update',
-      );
+      throw new AppError(AppErrorCode.UNAUTHORIZED, {
+        message: 'Cannot give a member a role higher than the user initating the update',
+      });
     }
 
     return await tx.teamMember.update({

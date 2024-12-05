@@ -46,6 +46,9 @@ If you have a direct link template, you can simply provide the token for the tem
 | email               | string (optional)   | The email the signer that will be used by default for signing                              |
 | lockEmail           | boolean (optional)  | Whether or not the email field should be locked disallowing modifications                  |
 | externalId          | string (optional)   | The external ID to be used for the document that will be created upon completion           |
+| css                 | string (optional)   | Custom CSS to style the embedded component (Platform Plan only)                            |
+| cssVars             | object (optional)   | CSS variables for customizing colors, spacing, etc. (Platform Plan only)                   |
+| darkModeDisabled    | boolean (optional)  | Disable dark mode functionality (Platform Plan only)                                       |
 | onDocumentReady     | function (optional) | A callback function that will be called when the document is loaded and ready to be signed |
 | onDocumentCompleted | function (optional) | A callback function that will be called when the document has been completed               |
 | onDocumentError     | function (optional) | A callback function that will be called when an error occurs with the document             |
@@ -77,3 +80,35 @@ const MyEmbeddingComponent = () => {
 | onDocumentReady     | function (optional) | A callback function that will be called when the document is loaded and ready to be signed |
 | onDocumentCompleted | function (optional) | A callback function that will be called when the document has been completed               |
 | onDocumentError     | function (optional) | A callback function that will be called when an error occurs with the document             |
+
+### Styling and Theming (Platform Plan)
+
+Platform customers have access to advanced styling options:
+
+```html
+<script setup lang="ts">
+  import { EmbedDirectTemplate } from '@documenso/embed-vue';
+
+  const token = ref('your-token');
+  const customCss = `
+  .documenso-embed {
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  }
+`;
+  const cssVars = {
+    colorPrimary: '#0000FF',
+    colorBackground: '#F5F5F5',
+    borderRadius: '8px',
+  };
+</script>
+
+<template>
+  <EmbedDirectTemplate
+    :token="token"
+    :css="customCss"
+    :cssVars="cssVars"
+    :darkModeDisabled="true"
+  />
+</template>
+```

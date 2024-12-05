@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo, useState, useTransition } from 'react';
+import { useLayoutEffect, useMemo, useRef, useState, useTransition } from 'react';
 
 import { useRouter } from 'next/navigation';
 
@@ -31,12 +31,12 @@ import { useRequiredSigningContext } from './provider';
 import { SigningFieldContainer } from './signing-field-container';
 
 type SignatureFieldState = 'empty' | 'signed-image' | 'signed-text';
-
 export type SignatureFieldProps = {
   field: FieldWithSignature;
   recipient: Recipient;
   onSignField?: (value: TSignFieldWithTokenMutationSchema) => Promise<void> | void;
   onUnsignField?: (value: TRemovedSignedFieldWithTokenMutationSchema) => Promise<void> | void;
+  typedSignatureEnabled?: boolean;
 };
 
 export const SignatureField = ({
@@ -44,11 +44,16 @@ export const SignatureField = ({
   recipient,
   onSignField,
   onUnsignField,
+  typedSignatureEnabled,
 }: SignatureFieldProps) => {
   const router = useRouter();
 
   const { _ } = useLingui();
   const { toast } = useToast();
+
+  const signatureRef = useRef<HTMLParagraphElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [fontSize, setFontSize] = useState(2);
 
   const { signature: providedSignature, setSignature: setProvidedSignature } =
     useRequiredSigningContext();
@@ -92,14 +97,12 @@ export const SignatureField = ({
 
     return true;
   };
-
   /**
    * When the user clicks the sign button in the dialog where they enter their signature.
    */
   const onDialogSignClick = () => {
     setShowSignatureModal(false);
     setProvidedSignature(localSignature);
-
     if (!localSignature) {
       return;
     }
@@ -119,11 +122,23 @@ export const SignatureField = ({
         return;
       }
 
+      const isTypedSignature = !value.startsWith('data:image');
+
+      if (isTypedSignature && !typedSignatureEnabled) {
+        toast({
+          title: _(msg`Error`),
+          description: _(msg`Typed signatures are not allowed. Please draw your signature.`),
+          variant: 'destructive',
+        });
+
+        return;
+      }
+
       const payload: TSignFieldWithTokenMutationSchema = {
         token: recipient.token,
         fieldId: field.id,
         value,
-        isBase64: true,
+        isBase64: !isTypedSignature,
         authOptions,
       };
 
@@ -178,6 +193,41 @@ export const SignatureField = ({
     }
   };
 
+  useLayoutEffect(() => {
+    if (!signatureRef.current || !containerRef.current || !signature?.typedSignature) {
+      return;
+    }
+
+    const adjustTextSize = () => {
+      const container = containerRef.current;
+      const text = signatureRef.current;
+
+      if (!container || !text) {
+        return;
+      }
+
+      let size = 2;
+      text.style.fontSize = `${size}rem`;
+
+      while (
+        (text.scrollWidth > container.clientWidth || text.scrollHeight > container.clientHeight) &&
+        size > 0.8
+      ) {
+        size -= 0.1;
+        text.style.fontSize = `${size}rem`;
+      }
+
+      setFontSize(size);
+    };
+
+    const resizeObserver = new ResizeObserver(adjustTextSize);
+    resizeObserver.observe(containerRef.current);
+
+    adjustTextSize();
+
+    return () => resizeObserver.disconnect();
+  }, [signature?.typedSignature]);
+
   return (
     <SigningFieldContainer
       field={field}
@@ -193,7 +243,7 @@ export const SignatureField = ({
       )}
 
       {state === 'empty' && (
-        <p className="group-hover:text-primary font-signature text-muted-foreground text-xl duration-200 group-hover:text-yellow-300">
+        <p className="group-hover:text-primary font-signature text-muted-foreground text-[clamp(0.575rem,25cqw,1.2rem)] text-xl duration-200 group-hover:text-yellow-300">
           <Trans>Signature</Trans>
         </p>
       )}
@@ -207,10 +257,15 @@ export const SignatureField = ({
       )}
 
       {state === 'signed-text' && (
-        <p className="font-signature text-muted-foreground dark:text-background text-lg duration-200 sm:text-xl md:text-2xl lg:text-3xl">
-          {/* This optional chaining is intentional, we don't want to move the check into the condition above */}
-          {signature?.typedSignature}
-        </p>
+        <div ref={containerRef} className="flex h-full w-full items-center justify-center p-2">
+          <p
+            ref={signatureRef}
+            className="font-signature text-muted-foreground dark:text-background w-full overflow-hidden break-all text-center leading-tight duration-200"
+            style={{ fontSize: `${fontSize}rem` }}
+          >
+            {signature?.typedSignature}
+          </p>
+        </div>
       )}
 
       <Dialog open={showSignatureModal} onOpenChange={setShowSignatureModal}>
@@ -231,11 +286,11 @@ export const SignatureField = ({
               id="signature"
               className="border-border mt-2 h-44 w-full rounded-md border"
               onChange={(value) => setLocalSignature(value)}
+              allowTypedSignature={typedSignatureEnabled}
             />
           </div>
 
           <SigningDisclosure />
-
           <DialogFooter>
             <div className="flex w-full flex-1 flex-nowrap gap-4">
               <Button
@@ -249,7 +304,6 @@ export const SignatureField = ({
               >
                 <Trans>Cancel</Trans>
               </Button>
-
               <Button
                 type="button"
                 className="flex-1"

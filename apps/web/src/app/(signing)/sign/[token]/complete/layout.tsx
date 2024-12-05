@@ -8,8 +8,8 @@ export type SigningLayoutProps = {
   children: React.ReactNode;
 };
 
-export default function SigningLayout({ children }: SigningLayoutProps) {
-  setupI18nSSR();
+export default async function SigningLayout({ children }: SigningLayoutProps) {
+  await setupI18nSSR();
 
   return (
     <div>

@@ -1,15 +1,26 @@
 import type { ReadonlyRequestCookies } from 'next/dist/server/web/spec-extension/adapters/request-cookies';
 
-import type { I18n } from '@lingui/core';
+import type { I18n, MessageDescriptor } from '@lingui/core';
 
 import { IS_APP_WEB, IS_APP_WEB_I18N_ENABLED } from '../constants/app';
 import type { I18nLocaleData, SupportedLanguageCodes } from '../constants/i18n';
 import { APP_I18N_OPTIONS } from '../constants/i18n';
 
 export async function dynamicActivate(i18nInstance: I18n, locale: string) {
-  const { messages } = await import(
-    `../translations/${locale}/${IS_APP_WEB ? 'web' : 'marketing'}.js`
-  );
+  const extension = process.env.NODE_ENV === 'development' ? 'po' : 'js';
+  const context = IS_APP_WEB ? 'web' : 'marketing';
+
+  let { messages } = await import(`../translations/${locale}/${context}.${extension}`);
+
+  // Dirty way to load common messages for development since it's not compiled.
+  if (process.env.NODE_ENV === 'development') {
+    const commonMessages = await import(`../translations/${locale}/common.${extension}`);
+
+    messages = {
+      ...messages,
+      ...commonMessages.messages,
+    };
+  }
 
   i18nInstance.loadAndActivate({ locale, messages });
 }
@@ -90,8 +101,22 @@ export const extractLocaleData = ({
     lang = 'en';
   }
 
+  // Filter out locales that are not valid.
+  const locales = (langHeader?.locales ?? []).filter((locale) => {
+    try {
+      new Intl.Locale(locale);
+      return true;
+    } catch {
+      return false;
+    }
+  });
+
   return {
     lang: lang || APP_I18N_OPTIONS.sourceLang,
-    locales: langHeader.locales,
+    locales,
   };
+};
+
+export const parseMessageDescriptor = (_: I18n['_'], value: string | MessageDescriptor) => {
+  return typeof value === 'string' ? value : _(value);
 };

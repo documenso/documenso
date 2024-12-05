@@ -13,7 +13,7 @@ export type AdminSectionLayoutProps = {
 };
 
 export default async function AdminSectionLayout({ children }: AdminSectionLayoutProps) {
-  setupI18nSSR();
+  await setupI18nSSR();
 
   const { user } = await getRequiredServerComponentSession();
 

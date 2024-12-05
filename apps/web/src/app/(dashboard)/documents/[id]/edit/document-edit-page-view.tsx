@@ -55,7 +55,7 @@ export const DocumentEditPageView = async ({ params, team }: DocumentEditPageVie
   const isRecipient = document?.Recipient.find((recipient) => recipient.email === user.email);
   let canAccessDocument = true;
 
-  if (!isRecipient) {
+  if (!isRecipient && document?.userId !== user.id) {
     canAccessDocument = match([documentVisibility, currentTeamMemberRole])
       .with([DocumentVisibility.EVERYONE, TeamMemberRole.ADMIN], () => true)
       .with([DocumentVisibility.EVERYONE, TeamMemberRole.MANAGER], () => true)
@@ -109,7 +109,10 @@ export const DocumentEditPageView = async ({ params, team }: DocumentEditPageVie
         <Trans>Documents</Trans>
       </Link>
 
-      <h1 className="mt-4 truncate text-2xl font-semibold md:text-3xl" title={document.title}>
+      <h1
+        className="mt-4 block max-w-[20rem] truncate text-2xl font-semibold md:max-w-[30rem] md:text-3xl"
+        title={document.title}
+      >
         {document.title}
       </h1>
 

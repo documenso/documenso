@@ -1,6 +1,5 @@
 import { TRPCError } from '@trpc/server';
 
-import { AppError } from '@documenso/lib/errors/app-error';
 import { getFieldById } from '@documenso/lib/server-only/field/get-field-by-id';
 import { removeSignedFieldWithToken } from '@documenso/lib/server-only/field/remove-signed-field-with-token';
 import { setFieldsForDocument } from '@documenso/lib/server-only/field/set-fields-for-document';
@@ -96,7 +95,7 @@ export const fieldRouter = router({
       } catch (err) {
         console.error(err);
 
-        throw AppError.parseErrorToTRPCError(err);
+        throw err;
       }
     }),
 

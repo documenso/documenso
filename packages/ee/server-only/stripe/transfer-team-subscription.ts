@@ -43,7 +43,9 @@ export const transferTeamSubscription = async ({
   const teamCustomerId = team.customerId;
 
   if (!teamCustomerId) {
-    throw new AppError(AppErrorCode.NOT_FOUND, 'Missing customer ID.');
+    throw new AppError(AppErrorCode.NOT_FOUND, {
+      message: 'Missing customer ID.',
+    });
   }
 
   const [teamRelatedPlanPriceIds, teamSeatPrices] = await Promise.all([

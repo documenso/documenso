@@ -124,7 +124,7 @@ export const TemplatesDataTable = ({
         accessorKey: 'type',
         cell: ({ row }) => (
           <div className="flex flex-row items-center">
-            <TemplateType type="PRIVATE" />
+            <TemplateType type={row.original.type} />
 
             {row.original.directLink?.token && (
               <TemplateDirectLinkBadge
@@ -144,6 +144,8 @@ export const TemplatesDataTable = ({
             <div className="flex items-center gap-x-4">
               <UseTemplateDialog
                 templateId={row.original.id}
+                templateSigningOrder={row.original.templateMeta?.signingOrder}
+                documentDistributionMethod={row.original.templateMeta?.distributionMethod}
                 recipients={row.original.Recipient}
                 documentRootPath={documentRootPath}
               />

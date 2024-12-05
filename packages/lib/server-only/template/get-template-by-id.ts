@@ -42,11 +42,20 @@ export const getTemplateById = async ({ id, userId, teamId }: GetTemplateByIdOpt
       templateMeta: true,
       Recipient: true,
       Field: true,
+      User: {
+        select: {
+          id: true,
+          name: true,
+          email: true,
+        },
+      },
     },
   });
 
   if (!template) {
-    throw new AppError(AppErrorCode.NOT_FOUND, 'Template not found');
+    throw new AppError(AppErrorCode.NOT_FOUND, {
+      message: 'Template not found',
+    });
   }
 
   return template;

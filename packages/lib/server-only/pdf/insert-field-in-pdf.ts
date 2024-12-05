@@ -1,6 +1,7 @@
 // https://github.com/Hopding/pdf-lib/issues/20#issuecomment-412852821
 import fontkit from '@pdf-lib/fontkit';
-import { PDFDocument, RotationTypes, degrees, radiansToDegrees } from 'pdf-lib';
+import type { PDFDocument } from 'pdf-lib';
+import { RotationTypes, degrees, radiansToDegrees } from 'pdf-lib';
 import { P, match } from 'ts-pattern';
 
 import {
@@ -13,7 +14,16 @@ import { FieldType } from '@documenso/prisma/client';
 import { isSignatureFieldType } from '@documenso/prisma/guards/is-signature-field';
 import type { FieldWithSignature } from '@documenso/prisma/types/field-with-signature';
 
-import { ZCheckboxFieldMeta, ZRadioFieldMeta } from '../../types/field-meta';
+import {
+  ZCheckboxFieldMeta,
+  ZDateFieldMeta,
+  ZEmailFieldMeta,
+  ZInitialsFieldMeta,
+  ZNameFieldMeta,
+  ZNumberFieldMeta,
+  ZRadioFieldMeta,
+  ZTextFieldMeta,
+} from '../../types/field-meta';
 
 export const insertFieldInPDF = async (pdf: PDFDocument, field: FieldWithSignature) => {
   const fontCaveat = await fetch(process.env.FONT_CAVEAT_URI).then(async (res) =>
@@ -32,7 +42,6 @@ export const insertFieldInPDF = async (pdf: PDFDocument, field: FieldWithSignatu
 
   const minFontSize = isSignatureField ? MIN_HANDWRITING_FONT_SIZE : MIN_STANDARD_FONT_SIZE;
   const maxFontSize = isSignatureField ? DEFAULT_HANDWRITING_FONT_SIZE : DEFAULT_STANDARD_FONT_SIZE;
-  let fontSize = maxFontSize;
 
   const page = pages.at(field.page - 1);
 
@@ -73,7 +82,10 @@ export const insertFieldInPDF = async (pdf: PDFDocument, field: FieldWithSignatu
   const fieldX = pageWidth * (Number(field.positionX) / 100);
   const fieldY = pageHeight * (Number(field.positionY) / 100);
 
-  const font = await pdf.embedFont(isSignatureField ? fontCaveat : fontNoto);
+  const font = await pdf.embedFont(
+    isSignatureField ? fontCaveat : fontNoto,
+    isSignatureField ? { features: { calt: false } } : undefined,
+  );
 
   if (field.type === FieldType.SIGNATURE || field.type === FieldType.FREE_SIGNATURE) {
     await pdf.embedFont(fontCaveat);
@@ -83,45 +95,89 @@ export const insertFieldInPDF = async (pdf: PDFDocument, field: FieldWithSignatu
     .with(
       {
         type: P.union(FieldType.SIGNATURE, FieldType.FREE_SIGNATURE),
-        Signature: { signatureImageAsBase64: P.string },
       },
       async (field) => {
-        const image = await pdf.embedPng(field.Signature?.signatureImageAsBase64 ?? '');
+        if (field.Signature?.signatureImageAsBase64) {
+          const image = await pdf.embedPng(field.Signature?.signatureImageAsBase64 ?? '');
 
-        let imageWidth = image.width;
-        let imageHeight = image.height;
+          let imageWidth = image.width;
+          let imageHeight = image.height;
 
-        const scalingFactor = Math.min(fieldWidth / imageWidth, fieldHeight / imageHeight, 1);
+          const scalingFactor = Math.min(fieldWidth / imageWidth, fieldHeight / imageHeight, 1);
 
-        imageWidth = imageWidth * scalingFactor;
-        imageHeight = imageHeight * scalingFactor;
+          imageWidth = imageWidth * scalingFactor;
+          imageHeight = imageHeight * scalingFactor;
 
-        let imageX = fieldX + (fieldWidth - imageWidth) / 2;
-        let imageY = fieldY + (fieldHeight - imageHeight) / 2;
+          let imageX = fieldX + (fieldWidth - imageWidth) / 2;
+          let imageY = fieldY + (fieldHeight - imageHeight) / 2;
 
-        // Invert the Y axis since PDFs use a bottom-left coordinate system
-        imageY = pageHeight - imageY - imageHeight;
+          // Invert the Y axis since PDFs use a bottom-left coordinate system
+          imageY = pageHeight - imageY - imageHeight;
 
-        if (pageRotationInDegrees !== 0) {
-          const adjustedPosition = adjustPositionForRotation(
-            pageWidth,
-            pageHeight,
-            imageX,
-            imageY,
-            pageRotationInDegrees,
-          );
+          if (pageRotationInDegrees !== 0) {
+            const adjustedPosition = adjustPositionForRotation(
+              pageWidth,
+              pageHeight,
+              imageX,
+              imageY,
+              pageRotationInDegrees,
+            );
 
-          imageX = adjustedPosition.xPos;
-          imageY = adjustedPosition.yPos;
+            imageX = adjustedPosition.xPos;
+            imageY = adjustedPosition.yPos;
+          }
+
+          page.drawImage(image, {
+            x: imageX,
+            y: imageY,
+            width: imageWidth,
+            height: imageHeight,
+            rotate: degrees(pageRotationInDegrees),
+          });
+        } else {
+          const signatureText = field.Signature?.typedSignature ?? '';
+
+          const longestLineInTextForWidth = signatureText
+            .split('\n')
+            .sort((a, b) => b.length - a.length)[0];
+
+          let fontSize = maxFontSize;
+          let textWidth = font.widthOfTextAtSize(longestLineInTextForWidth, fontSize);
+          let textHeight = font.heightAtSize(fontSize);
+
+          const scalingFactor = Math.min(fieldWidth / textWidth, fieldHeight / textHeight, 1);
+          fontSize = Math.max(Math.min(fontSize * scalingFactor, maxFontSize), minFontSize);
+
+          textWidth = font.widthOfTextAtSize(longestLineInTextForWidth, fontSize);
+          textHeight = font.heightAtSize(fontSize);
+
+          let textX = fieldX + (fieldWidth - textWidth) / 2;
+          let textY = fieldY + (fieldHeight - textHeight) / 2;
+
+          // Invert the Y axis since PDFs use a bottom-left coordinate system
+          textY = pageHeight - textY - textHeight;
+
+          if (pageRotationInDegrees !== 0) {
+            const adjustedPosition = adjustPositionForRotation(
+              pageWidth,
+              pageHeight,
+              textX,
+              textY,
+              pageRotationInDegrees,
+            );
+
+            textX = adjustedPosition.xPos;
+            textY = adjustedPosition.yPos;
+          }
+
+          page.drawText(signatureText, {
+            x: textX,
+            y: textY,
+            size: fontSize,
+            font,
+            rotate: degrees(pageRotationInDegrees),
+          });
         }
-
-        page.drawImage(image, {
-          x: imageX,
-          y: imageY,
-          width: imageWidth,
-          height: imageHeight,
-          rotate: degrees(pageRotationInDegrees),
-        });
       },
     )
     .with({ type: FieldType.CHECKBOX }, (field) => {
@@ -207,16 +263,33 @@ export const insertFieldInPDF = async (pdf: PDFDocument, field: FieldWithSignatu
       }
     })
     .otherwise((field) => {
+      const fieldMetaParsers = {
+        [FieldType.TEXT]: ZTextFieldMeta,
+        [FieldType.NUMBER]: ZNumberFieldMeta,
+        [FieldType.DATE]: ZDateFieldMeta,
+        [FieldType.EMAIL]: ZEmailFieldMeta,
+        [FieldType.NAME]: ZNameFieldMeta,
+        [FieldType.INITIALS]: ZInitialsFieldMeta,
+      } as const;
+
+      // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
+      const Parser = fieldMetaParsers[field.type as keyof typeof fieldMetaParsers];
+      const meta = Parser ? Parser.safeParse(field.fieldMeta) : null;
+
+      const customFontSize = meta?.success && meta.data.fontSize ? meta.data.fontSize : null;
       const longestLineInTextForWidth = field.customText
         .split('\n')
         .sort((a, b) => b.length - a.length)[0];
 
+      let fontSize = customFontSize || maxFontSize;
       let textWidth = font.widthOfTextAtSize(longestLineInTextForWidth, fontSize);
       const textHeight = font.heightAtSize(fontSize);
 
-      const scalingFactor = Math.min(fieldWidth / textWidth, fieldHeight / textHeight, 1);
+      if (!customFontSize) {
+        const scalingFactor = Math.min(fieldWidth / textWidth, fieldHeight / textHeight, 1);
+        fontSize = Math.max(Math.min(fontSize * scalingFactor, maxFontSize), minFontSize);
+      }
 
-      fontSize = Math.max(Math.min(fontSize * scalingFactor, maxFontSize), minFontSize);
       textWidth = font.widthOfTextAtSize(longestLineInTextForWidth, fontSize);
 
       let textX = fieldX + (fieldWidth - textWidth) / 2;
@@ -248,17 +321,6 @@ export const insertFieldInPDF = async (pdf: PDFDocument, field: FieldWithSignatu
     });
 
   return pdf;
-};
-
-export const insertFieldInPDFBytes = async (
-  pdf: ArrayBuffer | Uint8Array | string,
-  field: FieldWithSignature,
-) => {
-  const pdfDoc = await PDFDocument.load(pdf);
-
-  await insertFieldInPDF(pdfDoc, field);
-
-  return await pdfDoc.save();
 };
 
 const adjustPositionForRotation = (

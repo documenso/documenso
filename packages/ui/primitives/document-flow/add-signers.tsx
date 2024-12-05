@@ -16,6 +16,7 @@ import { prop, sortBy } from 'remeda';
 import { useLimits } from '@documenso/ee/server-only/limits/provider/client';
 import { ZRecipientAuthOptionsSchema } from '@documenso/lib/types/document-auth';
 import { nanoid } from '@documenso/lib/universal/id';
+import { canRecipientBeModified as utilCanRecipientBeModified } from '@documenso/lib/utils/recipients';
 import type { Field, Recipient } from '@documenso/prisma/client';
 import { DocumentSigningOrder, RecipientRole, SendStatus } from '@documenso/prisma/client';
 import { AnimateGenericFadeInOut } from '@documenso/ui/components/animate/animate-generic-fade-in-out';
@@ -159,21 +160,19 @@ export const AddSignersFormPartial = ({
     (recipient) => recipient.sendStatus === SendStatus.SENT,
   );
 
-  const hasBeenSentToRecipientId = useCallback(
-    (id?: number) => {
-      if (!id) {
-        return false;
-      }
+  const canRecipientBeModified = (recipientId?: number) => {
+    if (recipientId === undefined) {
+      return true;
+    }
 
-      return recipients.some(
-        (recipient) =>
-          recipient.id === id &&
-          recipient.sendStatus === SendStatus.SENT &&
-          recipient.role !== RecipientRole.CC,
-      );
-    },
-    [recipients],
-  );
+    const recipient = recipients.find((recipient) => recipient.id === recipientId);
+
+    if (!recipient) {
+      return false;
+    }
+
+    return utilCanRecipientBeModified(recipient, fields);
+  };
 
   const onAddSigner = () => {
     appendSigner({
@@ -189,10 +188,10 @@ export const AddSignersFormPartial = ({
   const onRemoveSigner = (index: number) => {
     const signer = signers[index];
 
-    if (hasBeenSentToRecipientId(signer.nativeId)) {
+    if (!canRecipientBeModified(signer.nativeId)) {
       toast({
         title: _(msg`Cannot remove signer`),
-        description: _(msg`This signer has already received the document.`),
+        description: _(msg`This signer has already signed the document.`),
         variant: 'destructive',
       });
 
@@ -235,7 +234,7 @@ export const AddSignersFormPartial = ({
       const [reorderedSigner] = items.splice(result.source.index, 1);
 
       let insertIndex = result.destination.index;
-      while (insertIndex < items.length && hasBeenSentToRecipientId(items[insertIndex].nativeId)) {
+      while (insertIndex < items.length && !canRecipientBeModified(items[insertIndex].nativeId)) {
         insertIndex++;
       }
 
@@ -243,7 +242,7 @@ export const AddSignersFormPartial = ({
 
       const updatedSigners = items.map((item, index) => ({
         ...item,
-        signingOrder: hasBeenSentToRecipientId(item.nativeId) ? item.signingOrder : index + 1,
+        signingOrder: !canRecipientBeModified(item.nativeId) ? item.signingOrder : index + 1,
       }));
 
       updatedSigners.forEach((item, index) => {
@@ -270,7 +269,7 @@ export const AddSignersFormPartial = ({
 
       await form.trigger('signers');
     },
-    [form, hasBeenSentToRecipientId, watchedSigners],
+    [form, canRecipientBeModified, watchedSigners],
   );
 
   const triggerDragAndDrop = useCallback(
@@ -315,9 +314,19 @@ export const AddSignersFormPartial = ({
         if (index === oldIndex) {
           return { ...signer, signingOrder: newIndex + 1 };
         } else if (index >= newIndex && index < oldIndex) {
-          return { ...signer, signingOrder: (signer.signingOrder ?? index + 1) + 1 };
+          return {
+            ...signer,
+            signingOrder: !canRecipientBeModified(signer.nativeId)
+              ? signer.signingOrder
+              : (signer.signingOrder ?? index + 1) + 1,
+          };
         } else if (index <= newIndex && index > oldIndex) {
-          return { ...signer, signingOrder: Math.max(1, (signer.signingOrder ?? index + 1) - 1) };
+          return {
+            ...signer,
+            signingOrder: !canRecipientBeModified(signer.nativeId)
+              ? signer.signingOrder
+              : Math.max(1, (signer.signingOrder ?? index + 1) - 1),
+          };
         }
         return signer;
       });
@@ -326,7 +335,7 @@ export const AddSignersFormPartial = ({
         form.setValue(`signers.${index}.signingOrder`, signer.signingOrder);
       });
     },
-    [form],
+    [form, canRecipientBeModified],
   );
 
   const handleSigningOrderChange = useCallback(
@@ -417,7 +426,7 @@ export const AddSignersFormPartial = ({
                         isDragDisabled={
                           !isSigningOrderSequential ||
                           isSubmitting ||
-                          hasBeenSentToRecipientId(signer.nativeId) ||
+                          !canRecipientBeModified(signer.nativeId) ||
                           !signer.signingOrder
                         }
                       >
@@ -433,7 +442,7 @@ export const AddSignersFormPartial = ({
                           >
                             <motion.fieldset
                               data-native-id={signer.nativeId}
-                              disabled={isSubmitting || hasBeenSentToRecipientId(signer.nativeId)}
+                              disabled={isSubmitting || !canRecipientBeModified(signer.nativeId)}
                               className={cn('grid grid-cols-10 items-end gap-2 pb-2', {
                                 'border-b pt-2': showAdvancedSettings,
                                 'grid-cols-12 pr-3': isSigningOrderSequential,
@@ -444,7 +453,16 @@ export const AddSignersFormPartial = ({
                                   control={form.control}
                                   name={`signers.${index}.signingOrder`}
                                   render={({ field }) => (
-                                    <FormItem className="col-span-2 mt-auto flex items-center gap-x-1 space-y-0">
+                                    <FormItem
+                                      className={cn(
+                                        'col-span-2 mt-auto flex items-center gap-x-1 space-y-0',
+                                        {
+                                          'mb-6':
+                                            form.formState.errors.signers?.[index] &&
+                                            !form.formState.errors.signers[index]?.signingOrder,
+                                        },
+                                      )}
+                                    >
                                       <GripVerticalIcon className="h-5 w-5 flex-shrink-0 opacity-40" />
                                       <FormControl>
                                         <Input
@@ -466,7 +484,7 @@ export const AddSignersFormPartial = ({
                                           disabled={
                                             snapshot.isDragging ||
                                             isSubmitting ||
-                                            hasBeenSentToRecipientId(signer.nativeId)
+                                            !canRecipientBeModified(signer.nativeId)
                                           }
                                         />
                                       </FormControl>
@@ -482,6 +500,9 @@ export const AddSignersFormPartial = ({
                                 render={({ field }) => (
                                   <FormItem
                                     className={cn('relative', {
+                                      'mb-6':
+                                        form.formState.errors.signers?.[index] &&
+                                        !form.formState.errors.signers[index]?.email,
                                       'col-span-4': !showAdvancedSettings,
                                       'col-span-5': showAdvancedSettings,
                                     })}
@@ -495,12 +516,12 @@ export const AddSignersFormPartial = ({
                                     <FormControl>
                                       <Input
                                         type="email"
-                                        placeholder="Email"
+                                        placeholder={_(msg`Email`)}
                                         {...field}
                                         disabled={
                                           snapshot.isDragging ||
                                           isSubmitting ||
-                                          hasBeenSentToRecipientId(signer.nativeId)
+                                          !canRecipientBeModified(signer.nativeId)
                                         }
                                         onKeyDown={onKeyDown}
                                       />
@@ -517,6 +538,9 @@ export const AddSignersFormPartial = ({
                                 render={({ field }) => (
                                   <FormItem
                                     className={cn({
+                                      'mb-6':
+                                        form.formState.errors.signers?.[index] &&
+                                        !form.formState.errors.signers[index]?.name,
                                       'col-span-4': !showAdvancedSettings,
                                       'col-span-5': showAdvancedSettings,
                                     })}
@@ -534,7 +558,7 @@ export const AddSignersFormPartial = ({
                                         disabled={
                                           snapshot.isDragging ||
                                           isSubmitting ||
-                                          hasBeenSentToRecipientId(signer.nativeId)
+                                          !canRecipientBeModified(signer.nativeId)
                                         }
                                         onKeyDown={onKeyDown}
                                       />
@@ -552,6 +576,9 @@ export const AddSignersFormPartial = ({
                                   render={({ field }) => (
                                     <FormItem
                                       className={cn('col-span-8', {
+                                        'mb-6':
+                                          form.formState.errors.signers?.[index] &&
+                                          !form.formState.errors.signers[index]?.actionAuth,
                                         'col-span-10': isSigningOrderSequential,
                                       })}
                                     >
@@ -562,7 +589,7 @@ export const AddSignersFormPartial = ({
                                           disabled={
                                             snapshot.isDragging ||
                                             isSubmitting ||
-                                            hasBeenSentToRecipientId(signer.nativeId)
+                                            !canRecipientBeModified(signer.nativeId)
                                           }
                                         />
                                       </FormControl>
@@ -577,7 +604,13 @@ export const AddSignersFormPartial = ({
                                 <FormField
                                   name={`signers.${index}.role`}
                                   render={({ field }) => (
-                                    <FormItem className="mt-auto">
+                                    <FormItem
+                                      className={cn('mt-auto', {
+                                        'mb-6':
+                                          form.formState.errors.signers?.[index] &&
+                                          !form.formState.errors.signers[index]?.role,
+                                      })}
+                                    >
                                       <FormControl>
                                         <RecipientRoleSelect
                                           {...field}
@@ -585,7 +618,7 @@ export const AddSignersFormPartial = ({
                                           disabled={
                                             snapshot.isDragging ||
                                             isSubmitting ||
-                                            hasBeenSentToRecipientId(signer.nativeId)
+                                            !canRecipientBeModified(signer.nativeId)
                                           }
                                         />
                                       </FormControl>
@@ -597,11 +630,16 @@ export const AddSignersFormPartial = ({
 
                                 <button
                                   type="button"
-                                  className="mt-auto inline-flex h-10 w-10 items-center justify-center hover:opacity-80 disabled:cursor-not-allowed disabled:opacity-50"
+                                  className={cn(
+                                    'mt-auto inline-flex h-10 w-10 items-center justify-center hover:opacity-80 disabled:cursor-not-allowed disabled:opacity-50',
+                                    {
+                                      'mb-6': form.formState.errors.signers?.[index],
+                                    },
+                                  )}
                                   disabled={
                                     snapshot.isDragging ||
                                     isSubmitting ||
-                                    hasBeenSentToRecipientId(signer.nativeId) ||
+                                    !canRecipientBeModified(signer.nativeId) ||
                                     signers.length === 1
                                   }
                                   onClick={() => onRemoveSigner(index)}

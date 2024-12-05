@@ -4,7 +4,7 @@ import { useMemo } from 'react';
 
 import { Trans, msg } from '@lingui/macro';
 import { useLingui } from '@lingui/react';
-import { CheckCheckIcon, CheckIcon, Loader, MailOpen } from 'lucide-react';
+import { AlertTriangle, CheckCheckIcon, CheckIcon, Loader, MailOpen } from 'lucide-react';
 import { DateTime } from 'luxon';
 import { match } from 'ts-pattern';
 
@@ -133,6 +133,11 @@ export const DocumentPageViewRecentActivity = ({
                         <CheckIcon className="h-3 w-3" aria-hidden="true" />
                       </div>
                     ))
+                    .with(DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_RECIPIENT_REJECTED, () => (
+                      <div className="bg-widget rounded-full border border-gray-300 p-1 dark:border-neutral-600">
+                        <AlertTriangle className="h-3 w-3" aria-hidden="true" />
+                      </div>
+                    ))
                     .with(DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_OPENED, () => (
                       <div className="bg-widget rounded-full border border-gray-300 p-1 dark:border-neutral-600">
                         <MailOpen className="h-3 w-3" aria-hidden="true" />
@@ -143,17 +148,11 @@ export const DocumentPageViewRecentActivity = ({
                     ))}
                 </div>
 
-                {/* Todo: Translations. */}
                 <p
                   className="text-muted-foreground dark:text-muted-foreground/70 flex-auto truncate py-0.5 text-xs leading-5"
-                  title={`${formatDocumentAuditLogAction(auditLog, userId).prefix} ${
-                    formatDocumentAuditLogAction(auditLog, userId).description
-                  }`}
+                  title={formatDocumentAuditLogAction(_, auditLog, userId).description}
                 >
-                  <span className="text-foreground font-medium">
-                    {formatDocumentAuditLogAction(auditLog, userId).prefix}
-                  </span>{' '}
-                  {formatDocumentAuditLogAction(auditLog, userId).description}
+                  {formatDocumentAuditLogAction(_, auditLog, userId).description}
                 </p>
 
                 <time className="text-muted-foreground dark:text-muted-foreground/70 flex-none py-0.5 text-xs leading-5">

@@ -9,8 +9,8 @@ export const metadata: Metadata = {
   title: 'Blog',
 };
 
-export default function BlogPage() {
-  const { i18n } = setupI18nSSR();
+export default async function BlogPage() {
+  const { i18n } = await setupI18nSSR();
 
   const blogPosts = allBlogPosts.sort((a, b) => {
     const dateA = new Date(a.date);

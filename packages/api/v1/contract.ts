@@ -12,10 +12,12 @@ import {
   ZDeleteFieldMutationSchema,
   ZDeleteRecipientMutationSchema,
   ZDownloadDocumentSuccessfulSchema,
+  ZFindTeamMembersResponseSchema,
   ZGenerateDocumentFromTemplateMutationResponseSchema,
   ZGenerateDocumentFromTemplateMutationSchema,
   ZGetDocumentsQuerySchema,
   ZGetTemplatesQuerySchema,
+  ZInviteTeamMemberMutationSchema,
   ZNoBodyMutationSchema,
   ZResendDocumentForSigningMutationSchema,
   ZSendDocumentForSigningMutationSchema,
@@ -26,13 +28,17 @@ import {
   ZSuccessfulGetDocumentResponseSchema,
   ZSuccessfulGetTemplateResponseSchema,
   ZSuccessfulGetTemplatesResponseSchema,
+  ZSuccessfulInviteTeamMemberResponseSchema,
   ZSuccessfulRecipientResponseSchema,
+  ZSuccessfulRemoveTeamMemberResponseSchema,
   ZSuccessfulResendDocumentResponseSchema,
   ZSuccessfulResponseSchema,
   ZSuccessfulSigningResponseSchema,
+  ZSuccessfulUpdateTeamMemberResponseSchema,
   ZUnsuccessfulResponseSchema,
   ZUpdateFieldMutationSchema,
   ZUpdateRecipientMutationSchema,
+  ZUpdateTeamMemberMutationSchema,
 } from './schema';
 
 const c = initContract();
@@ -162,6 +168,9 @@ export const ApiContractV1 = c.router(
         500: ZUnsuccessfulResponseSchema,
       },
       summary: 'Send a document for signing',
+      // I'm aware this should be in the variable itself, which it is, however it's difficult for users to find in our current UI.
+      description:
+        'Notes\n\n`sendEmail` - Whether to send an email to the recipients asking them to action the document. If you disable this, you will need to manually distribute the document to the recipients using the generated signing links. Defaults to true',
     },
 
     resendDocument: {
@@ -272,6 +281,61 @@ export const ApiContractV1 = c.router(
         500: ZUnsuccessfulResponseSchema,
       },
       summary: 'Delete a field from a document',
+    },
+
+    findTeamMembers: {
+      method: 'GET',
+      path: '/api/v1/team/:id/members',
+      responses: {
+        200: ZFindTeamMembersResponseSchema,
+        400: ZUnsuccessfulResponseSchema,
+        401: ZUnsuccessfulResponseSchema,
+        404: ZUnsuccessfulResponseSchema,
+        500: ZUnsuccessfulResponseSchema,
+      },
+      summary: 'List team members',
+    },
+
+    inviteTeamMember: {
+      method: 'POST',
+      path: '/api/v1/team/:id/members/invite',
+      body: ZInviteTeamMemberMutationSchema,
+      responses: {
+        200: ZSuccessfulInviteTeamMemberResponseSchema,
+        400: ZUnsuccessfulResponseSchema,
+        401: ZUnsuccessfulResponseSchema,
+        404: ZUnsuccessfulResponseSchema,
+        500: ZUnsuccessfulResponseSchema,
+      },
+      summary: 'Invite a member to a team',
+    },
+
+    updateTeamMember: {
+      method: 'PUT',
+      path: '/api/v1/team/:id/members/:memberId',
+      body: ZUpdateTeamMemberMutationSchema,
+      responses: {
+        200: ZSuccessfulUpdateTeamMemberResponseSchema,
+        400: ZUnsuccessfulResponseSchema,
+        401: ZUnsuccessfulResponseSchema,
+        404: ZUnsuccessfulResponseSchema,
+        500: ZUnsuccessfulResponseSchema,
+      },
+      summary: 'Update a team member',
+    },
+
+    removeTeamMember: {
+      method: 'DELETE',
+      path: '/api/v1/team/:id/members/:memberId',
+      body: null,
+      responses: {
+        200: ZSuccessfulRemoveTeamMemberResponseSchema,
+        400: ZUnsuccessfulResponseSchema,
+        401: ZUnsuccessfulResponseSchema,
+        404: ZUnsuccessfulResponseSchema,
+        500: ZUnsuccessfulResponseSchema,
+      },
+      summary: 'Remove a member from a team',
     },
   },
   {

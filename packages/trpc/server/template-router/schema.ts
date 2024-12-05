@@ -1,12 +1,18 @@
 import { z } from 'zod';
 
+import { SUPPORTED_LANGUAGE_CODES } from '@documenso/lib/constants/i18n';
 import {
   ZDocumentAccessAuthTypesSchema,
   ZDocumentActionAuthTypesSchema,
 } from '@documenso/lib/types/document-auth';
+import { ZDocumentEmailSettingsSchema } from '@documenso/lib/types/document-email';
 import { ZBaseTableSearchParamsSchema } from '@documenso/lib/types/search-params';
 import { isValidRedirectUrl } from '@documenso/lib/utils/is-valid-redirect-url';
-import { DocumentSigningOrder, TemplateType } from '@documenso/prisma/client';
+import {
+  DocumentDistributionMethod,
+  DocumentSigningOrder,
+  TemplateType,
+} from '@documenso/prisma/client';
 
 import { ZSignFieldWithTokenMutationSchema } from '../field-router/schema';
 
@@ -40,7 +46,7 @@ export const ZCreateDocumentFromTemplateMutationSchema = z.object({
       const emails = recipients.map((signer) => signer.email);
       return new Set(emails).size === emails.length;
     }, 'Recipients must have unique emails'),
-  sendDocument: z.boolean().optional(),
+  distributeDocument: z.boolean().optional(),
 });
 
 export const ZDuplicateTemplateMutationSchema = z.object({
@@ -87,6 +93,10 @@ export const ZUpdateTemplateSettingsMutationSchema = z.object({
       .max(MAX_TEMPLATE_PUBLIC_DESCRIPTION_LENGTH)
       .optional(),
     type: z.nativeEnum(TemplateType).optional(),
+    language: z
+      .union([z.string(), z.enum(SUPPORTED_LANGUAGE_CODES)])
+      .optional()
+      .default('en'),
   }),
   meta: z
     .object({
@@ -94,6 +104,8 @@ export const ZUpdateTemplateSettingsMutationSchema = z.object({
       message: z.string(),
       timezone: z.string(),
       dateFormat: z.string(),
+      distributionMethod: z.nativeEnum(DocumentDistributionMethod),
+      emailSettings: ZDocumentEmailSettingsSchema,
       redirectUrl: z
         .string()
         .optional()
@@ -101,6 +113,8 @@ export const ZUpdateTemplateSettingsMutationSchema = z.object({
           message:
             'Please enter a valid URL, make sure you include http:// or https:// part of the url.',
         }),
+      language: z.enum(SUPPORTED_LANGUAGE_CODES).optional(),
+      typedSignatureEnabled: z.boolean().optional(),
     })
     .optional(),
 });
@@ -123,6 +137,12 @@ export const ZGetTemplateWithDetailsByIdQuerySchema = z.object({
 export const ZMoveTemplatesToTeamSchema = z.object({
   templateId: z.number(),
   teamId: z.number(),
+});
+
+export const ZUpdateTemplateTypedSignatureSettingsMutationSchema = z.object({
+  templateId: z.number(),
+  teamId: z.number().optional(),
+  typedSignatureEnabled: z.boolean(),
 });
 
 export type TCreateTemplateMutationSchema = z.infer<typeof ZCreateTemplateMutationSchema>;

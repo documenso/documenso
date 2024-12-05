@@ -30,8 +30,8 @@ export type PricingPageProps = {
   };
 };
 
-export default function PricingPage() {
-  setupI18nSSR();
+export default async function PricingPage() {
+  await setupI18nSSR();
 
   return (
     <div className="mt-6 sm:mt-12">

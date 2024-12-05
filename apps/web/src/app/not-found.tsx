@@ -9,7 +9,7 @@ import { Button } from '@documenso/ui/primitives/button';
 import NotFoundPartial from '~/components/partials/not-found';
 
 export default async function NotFound() {
-  setupI18nSSR();
+  await setupI18nSSR();
 
   const { session } = await getServerComponentSession();
 

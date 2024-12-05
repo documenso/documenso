@@ -70,7 +70,7 @@ export const RadioFieldAdvancedSettings = ({
     setReadOnly(readOnly);
     setRequired(required);
 
-    const errors = validateRadioField(String(value), { readOnly, required, values });
+    const errors = validateRadioField(String(value), { readOnly, required, values, type: 'radio' });
     handleErrors(errors);
 
     handleFieldChange(field, value);
@@ -95,7 +95,7 @@ export const RadioFieldAdvancedSettings = ({
   }, [fieldState.values]);
 
   useEffect(() => {
-    const errors = validateRadioField(undefined, { readOnly, required, values });
+    const errors = validateRadioField(undefined, { readOnly, required, values, type: 'radio' });
     handleErrors(errors);
   }, [values]);
 
@@ -141,7 +141,7 @@ export const RadioFieldAdvancedSettings = ({
           {values.map((value) => (
             <div key={value.id} className="mt-2 flex items-center gap-4">
               <Checkbox
-                className="data-[state=checked]:bg-documenso border-foreground/30 data-[state=checked]:ring-documenso dark:data-[state=checked]:ring-offset-background h-5 w-5 rounded-full data-[state=checked]:ring-1 data-[state=checked]:ring-offset-2 data-[state=checked]:ring-offset-white"
+                className="data-[state=checked]:bg-documenso border-foreground/30 data-[state=checked]:ring-primary dark:data-[state=checked]:ring-offset-background h-5 w-5 rounded-full data-[state=checked]:ring-1 data-[state=checked]:ring-offset-2 data-[state=checked]:ring-offset-white"
                 checked={value.checked}
                 onCheckedChange={(checked) => handleCheckedChange(Boolean(checked), value.id)}
               />

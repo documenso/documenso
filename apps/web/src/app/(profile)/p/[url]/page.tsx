@@ -42,7 +42,7 @@ const BADGE_DATA = {
 };
 
 export default async function PublicProfilePage({ params }: PublicProfilePageProps) {
-  setupI18nSSR();
+  await setupI18nSSR();
 
   const { url: profileUrl } = params;
 
