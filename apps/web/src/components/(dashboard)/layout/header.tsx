@@ -8,7 +8,7 @@ import { usePathname } from 'next/navigation';
 
 import { MenuIcon, SearchIcon } from 'lucide-react';
 
-import type { GetTeamsResponse } from '@documenso/lib/server-only/team/get-teams';
+import type { TGetTeamsResponse } from '@documenso/lib/server-only/team/get-teams';
 import { getRootHref } from '@documenso/lib/utils/params';
 import type { User } from '@documenso/prisma/client';
 import { cn } from '@documenso/ui/lib/utils';
@@ -22,7 +22,7 @@ import { MobileNavigation } from './mobile-navigation';
 
 export type HeaderProps = HTMLAttributes<HTMLDivElement> & {
   user: User;
-  teams: GetTeamsResponse;
+  teams: TGetTeamsResponse;
 };
 
 export const Header = ({ className, user, teams, ...props }: HeaderProps) => {
@@ -75,7 +75,7 @@ export const Header = ({ className, user, teams, ...props }: HeaderProps) => {
 
         <div
           className="flex gap-x-4 md:ml-8"
-          title={selectedTeam ? selectedTeam.name : user.name ?? ''}
+          title={selectedTeam ? selectedTeam.name : (user.name ?? '')}
         >
           <MenuSwitcher user={user} teams={teams} />
         </div>

@@ -1,6 +1,11 @@
+import type { z } from 'zod';
+
 import { prisma } from '@documenso/prisma';
 import type { Team } from '@documenso/prisma/client';
 import { Prisma } from '@documenso/prisma/client';
+import { TeamPendingSchema } from '@documenso/prisma/generated/zod';
+
+import { type FindResultSet, ZFindResultSet } from '../../types/find-result-set';
 
 export interface FindTeamsPendingOptions {
   userId: number;
@@ -13,13 +18,19 @@ export interface FindTeamsPendingOptions {
   };
 }
 
+export const ZFindTeamsPendingResponseSchema = ZFindResultSet.extend({
+  data: TeamPendingSchema.array(),
+});
+
+export type TFindTeamsPendingResponse = z.infer<typeof ZFindTeamsPendingResponseSchema>;
+
 export const findTeamsPending = async ({
   userId,
   term,
   page = 1,
   perPage = 10,
   orderBy,
-}: FindTeamsPendingOptions) => {
+}: FindTeamsPendingOptions): Promise<TFindTeamsPendingResponse> => {
   const orderByColumn = orderBy?.column ?? 'name';
   const orderByDirection = orderBy?.direction ?? 'desc';
 
@@ -54,5 +65,5 @@ export const findTeamsPending = async ({
     currentPage: Math.max(page, 1),
     perPage,
     totalPages: Math.ceil(count / perPage),
-  };
+  } satisfies FindResultSet<typeof data>;
 };

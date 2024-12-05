@@ -32,6 +32,7 @@
     "dotenv-cli": "^7.3.0",
     "prisma-kysely": "^1.8.0",
     "tsx": "^4.11.0",
-    "typescript": "5.2.2"
+    "typescript": "5.2.2",
+    "zod-prisma-types": "^3.1.8"
   }
 }

@@ -18,7 +18,7 @@ export const updateTeamMember = async ({
   teamId,
   teamMemberId,
   data,
-}: UpdateTeamMemberOptions) => {
+}: UpdateTeamMemberOptions): Promise<void> => {
   await prisma.$transaction(async (tx) => {
     // Find the team and validate that the user is allowed to update members.
     const team = await tx.team.findFirstOrThrow({

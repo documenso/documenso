@@ -1,6 +1,9 @@
+import type { z } from 'zod';
+
 import { prisma } from '@documenso/prisma';
 import type { DocumentVisibility } from '@documenso/prisma/client';
 import { TeamMemberRole } from '@documenso/prisma/client';
+import { TeamGlobalSettingsSchema } from '@documenso/prisma/generated/zod';
 
 import type { SupportedLanguageCodes } from '../../constants/i18n';
 
@@ -17,11 +20,17 @@ export type UpdateTeamDocumentSettingsOptions = {
   };
 };
 
+export const ZUpdateTeamDocumentSettingsResponseSchema = TeamGlobalSettingsSchema;
+
+export type TUpdateTeamDocumentSettingsResponse = z.infer<
+  typeof ZUpdateTeamDocumentSettingsResponseSchema
+>;
+
 export const updateTeamDocumentSettings = async ({
   userId,
   teamId,
   settings,
-}: UpdateTeamDocumentSettingsOptions) => {
+}: UpdateTeamDocumentSettingsOptions): Promise<TUpdateTeamDocumentSettingsResponse> => {
   const {
     documentVisibility,
     documentLanguage,

@@ -31,7 +31,7 @@ export const createTeamEmailVerification = async ({
   userId,
   teamId,
   data,
-}: CreateTeamEmailVerificationOptions) => {
+}: CreateTeamEmailVerificationOptions): Promise<void> => {
   try {
     await prisma.$transaction(
       async (tx) => {

@@ -14,7 +14,7 @@ import { signOut } from 'next-auth/react';
 import { NEXT_PUBLIC_WEBAPP_URL } from '@documenso/lib/constants/app';
 import { TEAM_MEMBER_ROLE_MAP, TEAM_URL_REGEX } from '@documenso/lib/constants/teams';
 import { isAdmin } from '@documenso/lib/next-auth/guards/is-admin';
-import type { GetTeamsResponse } from '@documenso/lib/server-only/team/get-teams';
+import type { TGetTeamsResponse } from '@documenso/lib/server-only/team/get-teams';
 import { extractInitials } from '@documenso/lib/utils/recipient-formatter';
 import { canExecuteTeamAction } from '@documenso/lib/utils/teams';
 import type { User } from '@documenso/prisma/client';
@@ -36,7 +36,7 @@ const MotionLink = motion(Link);
 
 export type MenuSwitcherProps = {
   user: User;
-  teams: GetTeamsResponse;
+  teams: TGetTeamsResponse;
 };
 
 export const MenuSwitcher = ({ user, teams: initialTeamsData }: MenuSwitcherProps) => {
