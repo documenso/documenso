@@ -30,37 +30,9 @@ msgstr "\"{0}\" wird im Dokument erscheinen, da es eine Zeitzone von \"{timezone
 msgid "\"{documentTitle}\" has been successfully deleted"
 msgstr "\"{documentTitle}\" wurde erfolgreich gelöscht"
 
-#: apps/web/src/components/(teams)/forms/update-team-form.tsx:234
-#~ msgid "\"{email}\" on behalf of \"{teamName}\" has invited you to sign \"example document\"."
-#~ msgstr "\"{email}\" im Namen von \"{teamName}\" hat Sie eingeladen, \"Beispieldokument\" zu unterschreiben."
-
-#: apps/web/src/app/(teams)/t/[teamUrl]/settings/preferences/document-preferences.tsx:209
-#~ msgid ""
-#~ "\"{placeholderEmail}\" on behalf of \"{0}\" has invited you to sign \"example\n"
-#~ "document\"."
-#~ msgstr ""
-#~ "\"{placeholderEmail}\" on behalf of \"{0}\" has invited you to sign \"example\n"
-#~ "document\"."
-
 #: apps/web/src/app/(teams)/t/[teamUrl]/settings/preferences/document-preferences.tsx:221
 msgid "\"{placeholderEmail}\" on behalf of \"{0}\" has invited you to sign \"example document\"."
 msgstr "\"{placeholderEmail}\" im Namen von \"{0}\" hat Sie eingeladen, \"Beispieldokument\" zu unterzeichnen."
-
-#: apps/web/src/components/(teams)/forms/update-team-form.tsx:241
-#~ msgid "\"{teamUrl}\" has invited you to sign \"example document\"."
-#~ msgstr "\"{teamUrl}\" hat Sie eingeladen, \"Beispieldokument\" zu unterschreiben."
-
-#: apps/web/src/app/(signing)/sign/[token]/signing-page-view.tsx:83
-#~ msgid "({0}) has invited you to approve this document"
-#~ msgstr "({0}) hat dich eingeladen, dieses Dokument zu genehmigen"
-
-#: apps/web/src/app/(signing)/sign/[token]/signing-page-view.tsx:80
-#~ msgid "({0}) has invited you to sign this document"
-#~ msgstr "({0}) hat dich eingeladen, dieses Dokument zu unterzeichnen"
-
-#: apps/web/src/app/(signing)/sign/[token]/signing-page-view.tsx:77
-#~ msgid "({0}) has invited you to view this document"
-#~ msgstr "({0}) hat dich eingeladen, dieses Dokument zu betrachten"
 
 #: apps/web/src/app/(signing)/sign/[token]/text-field.tsx:313
 msgid "{0, plural, one {(1 character over)} other {(# characters over)}}"
@@ -108,10 +80,6 @@ msgstr "{0}"
 msgid "{0} direct signing templates"
 msgstr "{0} direkte Signaturvorlagen"
 
-#: apps/web/src/app/(recipient)/d/[token]/direct-template.tsx:66
-#~ msgid "{0} document"
-#~ msgstr "{0} document"
-
 #: apps/web/src/app/(dashboard)/documents/upload-document.tsx:146
 msgid "{0} of {1} documents remaining this month."
 msgstr "{0} von {1} Dokumenten verbleibend in diesem Monat."
@@ -119,10 +87,6 @@ msgstr "{0} von {1} Dokumenten verbleibend in diesem Monat."
 #: apps/web/src/app/(dashboard)/documents/[id]/document-page-view.tsx:173
 msgid "{0} Recipient(s)"
 msgstr "{0} Empfänger(in)"
-
-#: apps/web/src/app/(recipient)/d/[token]/direct-template.tsx:67
-#~ msgid "{0} the document to complete the process."
-#~ msgstr "{0} the document to complete the process."
 
 #: apps/web/src/app/(signing)/sign/[token]/text-field.tsx:294
 msgid "{charactersRemaining, plural, one {1 character remaining} other {{charactersRemaining} characters remaining}}"
@@ -365,10 +329,6 @@ msgstr "Platzhalter hinzufügen"
 msgid "Add Signers"
 msgstr "Unterzeichner hinzufügen"
 
-#: apps/web/src/app/(dashboard)/documents/[id]/edit-document.tsx:180
-#~ msgid "Add Subject"
-#~ msgstr "Add Subject"
-
 #: apps/web/src/components/(teams)/dialogs/add-team-email-dialog.tsx:133
 msgid "Add team email"
 msgstr "Team-E-Mail hinzufügen"
@@ -380,10 +340,6 @@ msgstr "Fügen Sie die Personen hinzu, die das Dokument unterschreiben werden."
 #: apps/web/src/app/(dashboard)/templates/use-template-dialog.tsx:220
 msgid "Add the recipients to create the document with"
 msgstr "Fügen Sie die Empfänger hinzu, um das Dokument zu erstellen"
-
-#: apps/web/src/app/(dashboard)/documents/[id]/edit-document.tsx:181
-#~ msgid "Add the subject and message you wish to send to signers."
-#~ msgstr "Add the subject and message you wish to send to signers."
 
 #: apps/web/src/components/(teams)/dialogs/create-team-checkout-dialog.tsx:152
 msgid "Adding and removing seats will adjust your invoice accordingly."
@@ -588,10 +544,6 @@ msgstr "Ein Fehler ist aufgetreten, während versucht wurde, eine Checkout-Sitzu
 #: apps/web/src/app/(dashboard)/templates/[id]/edit/edit-template.tsx:187
 msgid "An error occurred while updating the document settings."
 msgstr "Ein Fehler ist aufgetreten, während die Dokumenteinstellungen aktualisiert wurden."
-
-#: apps/web/src/components/forms/team-document-settings.tsx:78
-#~ msgid "An error occurred while updating the global team settings."
-#~ msgstr "An error occurred while updating the global team settings."
 
 #: apps/web/src/app/(signing)/sign/[token]/checkbox-field.tsx:213
 msgid "An error occurred while updating the signature."
@@ -878,10 +830,6 @@ msgstr "Vom Benutzer abgebrochen"
 #: apps/web/src/app/(dashboard)/admin/stats/page.tsx:132
 msgid "Charts"
 msgstr "Diagramme"
-
-#: apps/web/src/app/(teams)/t/[teamUrl]/settings/documents/page.tsx:32
-#~ msgid "Check out the documentaton for the <0>global team settings</0>."
-#~ msgstr "Check out the documentaton for the <0>global team settings</0>."
 
 #: apps/web/src/components/(teams)/dialogs/create-team-checkout-dialog.tsx:179
 msgid "Checkout"
@@ -1246,11 +1194,6 @@ msgstr "Aktuelles Passwort"
 msgid "Current plan: {0}"
 msgstr "Aktueller Plan: {0}"
 
-#: apps/web/src/app/(dashboard)/admin/leaderboard/data-table-leaderboard.tsx:94
-#: apps/web/src/app/(dashboard)/admin/leaderboard/leaderboard-table.tsx:94
-#~ msgid "Customer Type"
-#~ msgstr ""
-
 #: apps/web/src/app/(dashboard)/settings/billing/billing-plans.tsx:28
 msgid "Daily"
 msgstr "Täglich"
@@ -1575,10 +1518,6 @@ msgstr "Dokument wieder versiegelt"
 msgid "Document sent"
 msgstr "Dokument gesendet"
 
-#: apps/web/src/app/(teams)/t/[teamUrl]/settings/documents/page.tsx:26
-#~ msgid "Document Settings"
-#~ msgstr "Document Settings"
-
 #: apps/web/src/app/(signing)/sign/[token]/complete/page.tsx:130
 msgid "Document Signed"
 msgstr "Dokument signiert"
@@ -1661,14 +1600,6 @@ msgstr "Auditprotokolle herunterladen"
 #: apps/web/src/app/(dashboard)/documents/[id]/logs/download-certificate-button.tsx:86
 msgid "Download Certificate"
 msgstr "Zertifikat herunterladen"
-
-#: apps/web/src/app/(dashboard)/documents/[id]/document-page-view-button.tsx:114
-#~ msgid "Download with Certificate"
-#~ msgstr ""
-
-#: apps/web/src/app/(dashboard)/documents/[id]/document-page-view-button.tsx:118
-#~ msgid "Download without Certificate"
-#~ msgstr ""
 
 #: apps/web/src/app/(dashboard)/templates/[id]/template-page-view-documents-table.tsx:214
 #: apps/web/src/components/formatter/document-status.tsx:34
@@ -1880,10 +1811,6 @@ msgstr "Geben Sie hier Ihren Text ein"
 msgid "Error"
 msgstr "Fehler"
 
-#: apps/web/src/components/forms/team-document-settings.tsx:77
-#~ msgid "Error updating global team settings"
-#~ msgstr "Error updating global team settings"
-
 #: apps/web/src/app/(teams)/t/[teamUrl]/settings/preferences/document-preferences.tsx:140
 msgid "Everyone can access and view the document"
 msgstr "Jeder kann auf das Dokument zugreifen und es anzeigen"
@@ -1956,15 +1883,6 @@ msgstr "Vollständiger Name"
 #: apps/web/src/components/(teams)/settings/layout/mobile-nav.tsx:52
 msgid "General"
 msgstr "Allgemein"
-
-#: apps/web/src/components/(teams)/settings/layout/desktop-nav.tsx:57
-#: apps/web/src/components/(teams)/settings/layout/mobile-nav.tsx:65
-#~ msgid "Global Settings"
-#~ msgstr "Global Settings"
-
-#: apps/web/src/components/forms/team-document-settings.tsx:69
-#~ msgid "Global Team Settings Updated"
-#~ msgstr "Global Team Settings Updated"
 
 #: apps/web/src/app/(profile)/p/[url]/not-found.tsx:30
 #: apps/web/src/app/(recipient)/d/[token]/not-found.tsx:33
@@ -2072,10 +1990,6 @@ msgstr "Posteingang"
 #: apps/web/src/components/(dashboard)/common/command-menu.tsx:52
 msgid "Inbox documents"
 msgstr "Posteingang Dokumente"
-
-#: apps/web/src/components/forms/team-document-settings.tsx:132
-#~ msgid "Include Sender Details"
-#~ msgstr "Include Sender Details"
 
 #: apps/web/src/app/(teams)/t/[teamUrl]/settings/preferences/document-preferences.tsx:278
 msgid "Include the Signing Certificate in the Document"
@@ -2846,10 +2760,6 @@ msgstr "Vorschau"
 #: apps/web/src/app/(recipient)/d/[token]/direct-template.tsx:63
 msgid "Preview and configure template."
 msgstr "Vorschau und Vorlagen konfigurieren."
-
-#: apps/web/src/app/(teams)/t/[teamUrl]/settings/preferences/document-preferences.tsx:130
-#~ msgid "Preview: {0}"
-#~ msgstr "Preview: {0}"
 
 #: apps/web/src/app/(dashboard)/templates/data-table-templates.tsx:105
 #: apps/web/src/components/formatter/template-type.tsx:22
@@ -3805,10 +3715,6 @@ msgstr "Das Dokument wird sofort an die Empfänger gesendet, wenn dies angehakt 
 msgid "The events that will trigger a webhook to be sent to your URL."
 msgstr "Die Ereignisse, die einen Webhook auslösen, der an Ihre URL gesendet wird."
 
-#: apps/web/src/app/(teams)/t/[teamUrl]/settings/documents/page.tsx:27
-#~ msgid "The global settings for the documents in your team account."
-#~ msgstr "The global settings for the documents in your team account."
-
 #: apps/web/src/app/(unauthenticated)/team/verify/transfer/[token]/page.tsx:114
 msgid "The ownership of team <0>{0}</0> has been successfully transferred to you."
 msgstr "Die Inhaberschaft des Teams <0>{0}</0> wurde erfolgreich auf Sie übertragen."
@@ -4186,10 +4092,6 @@ msgstr "Zwei-Faktor-Wiederauthentifizierung"
 #: apps/web/src/app/(dashboard)/templates/data-table-templates.tsx:67
 msgid "Type"
 msgstr "Typ"
-
-#: apps/web/src/app/(dashboard)/documents/delete-document-dialog.tsx:184
-#~ msgid "Type 'delete' to confirm"
-#~ msgstr "Geben Sie 'delete' ein, um zu bestätigen"
 
 #: apps/web/src/components/(dashboard)/common/command-menu.tsx:186
 msgid "Type a command or search..."
@@ -4858,18 +4760,6 @@ msgstr "Jährlich"
 msgid "You"
 msgstr "Sie"
 
-#: apps/web/src/app/(signing)/sign/[token]/sign-dialog.tsx:93
-#~ msgid "You are about to complete approving \"{truncatedTitle}\".<0/> Are you sure?"
-#~ msgstr "Sie stehen kurz davor, die Genehmigung für \"{truncatedTitle}\" abzuschließen.<0/> Sind Sie sicher?"
-
-#: apps/web/src/app/(signing)/sign/[token]/sign-dialog.tsx:85
-#~ msgid "You are about to complete signing \"{truncatedTitle}\".<0/> Are you sure?"
-#~ msgstr "Sie stehen kurz davor, \"{truncatedTitle}\" zu unterzeichnen.<0/> Sind Sie sicher?"
-
-#: apps/web/src/app/(signing)/sign/[token]/sign-dialog.tsx:77
-#~ msgid "You are about to complete viewing \"{truncatedTitle}\".<0/> Are you sure?"
-#~ msgstr "Sie stehen kurz davor, \"{truncatedTitle}\" anzusehen.<0/> Sind Sie sicher?"
-
 #: apps/web/src/app/(dashboard)/documents/delete-document-dialog.tsx:105
 msgid "You are about to delete <0>\"{documentTitle}\"</0>"
 msgstr "Sie sind dabei, <0>\"{documentTitle}\"</0> zu löschen"
@@ -5148,10 +5038,6 @@ msgstr "Ihre E-Mail wird derzeit von Team <0>{0}</0> ({1}) verwendet."
 #: apps/web/src/app/(teams)/t/[teamUrl]/settings/tokens/page.tsx:80
 msgid "Your existing tokens"
 msgstr "Ihre vorhandenen Tokens"
-
-#: apps/web/src/components/forms/team-document-settings.tsx:70
-#~ msgid "Your global team document settings has been updated successfully."
-#~ msgstr "Your global team document settings has been updated successfully."
 
 #: apps/web/src/components/forms/password.tsx:72
 #: apps/web/src/components/forms/reset-password.tsx:73

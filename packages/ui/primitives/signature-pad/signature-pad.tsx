@@ -116,6 +116,7 @@ export const SignaturePad = ({
   const [lines, setLines] = useState<Point[][]>([]);
   const [currentLine, setCurrentLine] = useState<Point[]>([]);
   const [selectedColor, setSelectedColor] = useState('black');
+  const [signatureMode, setSignatureMode] = useState<'draw' | 'type'>(defaultValue ? 'type' : 'draw');
   const [typedSignature, setTypedSignature] = useState(
     defaultValue && !isBase64Image(defaultValue) ? defaultValue : '',
   );
@@ -139,6 +140,11 @@ export const SignaturePad = ({
       event.preventDefault();
     }
 
+    if (signatureMode === 'type') {
+      setTypedSignature('');
+      setSignatureMode('draw');
+    }
+
     setIsPressed(true);
 
     if (typedSignature) {
@@ -159,13 +165,14 @@ export const SignaturePad = ({
       event.preventDefault();
     }
 
-    if (!isPressed) {
+    if (!isPressed || currentLine.length === 0) {
       return;
     }
 
     const point = Point.fromEvent(event, DPI, $el.current);
+    const lastPoint = currentLine[currentLine.length - 1];
 
-    if (point.distanceTo(currentLine[currentLine.length - 1]) > 5) {
+    if (lastPoint && point.distanceTo(lastPoint) > 5) {
       setCurrentLine([...currentLine, point]);
 
       // Update the canvas here to draw the lines
@@ -198,6 +205,10 @@ export const SignaturePad = ({
   const onMouseUp = (event: MouseEvent | PointerEvent | TouchEvent, addLine = true) => {
     if (event.cancelable) {
       event.preventDefault();
+    }
+
+    if (!isPressed && currentLine.length === 0) {
+      return;
     }
 
     setIsPressed(false);
@@ -271,6 +282,8 @@ export const SignaturePad = ({
     setTypedSignature('');
     setLines([]);
     setCurrentLine([]);
+    setSignatureMode('draw');
+    setIsPressed(false);
   };
 
   const renderTypedSignature = () => {
@@ -319,6 +332,12 @@ export const SignaturePad = ({
 
   const handleTypedSignatureChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const newValue = event.target.value;
+
+    if (signatureMode === 'draw' && lines.length > 0) {
+      onClearClick();
+    }
+
+    setSignatureMode('type');
     setTypedSignature(newValue);
 
     if (newValue.trim() !== '') {
