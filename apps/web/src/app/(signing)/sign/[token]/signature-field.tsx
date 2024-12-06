@@ -94,7 +94,7 @@ export const SignatureField = ({
   }, [field.inserted, signature?.signatureImageAsBase64]);
 
   const onPreSign = () => {
-    if (!providedSignature) {
+    if (!providedSignature || !signatureValid) {
       setShowSignatureModal(true);
       return false;
     }
@@ -121,7 +121,7 @@ export const SignatureField = ({
     try {
       const value = signature || providedSignature;
 
-      if (!value) {
+      if (!value || (signature && !signatureValid)) {
         setShowSignatureModal(true);
         return;
       }

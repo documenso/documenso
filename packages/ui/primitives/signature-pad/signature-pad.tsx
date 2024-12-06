@@ -175,7 +175,6 @@ export const SignaturePad = ({
 
       if (ctx) {
         ctx.restore();
-
         ctx.imageSmoothingEnabled = true;
         ctx.imageSmoothingQuality = 'high';
         ctx.fillStyle = selectedColor;
@@ -187,8 +186,11 @@ export const SignaturePad = ({
           ctx.fill(pathData);
         });
 
-        onChange?.($el.current.toDataURL());
-        checkSignatureValidity();
+        const isValidSignature = checkSignatureValidity();
+
+        if (isValidSignature) {
+          onChange?.($el.current.toDataURL());
+        }
         ctx.save();
       }
     }
