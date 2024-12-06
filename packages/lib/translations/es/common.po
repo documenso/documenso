@@ -30,14 +30,6 @@ msgstr "“{documentName}” ha sido firmado"
 msgid "“{documentName}” was signed by all signers"
 msgstr "\"{documentName}\" fue firmado por todos los firmantes"
 
-#: packages/lib/server-only/document/resend-document.tsx:109
-#~ msgid "{0}"
-#~ msgstr "{0}"
-
-#: packages/email/template-components/template-document-invite.tsx:80
-#~ msgid "{0} Document"
-#~ msgstr "{0} Document"
-
 #: packages/lib/jobs/definitions/emails/send-signing-email.ts:137
 msgid "{0} has invited you to {recipientActionVerb} the document \"{1}\"."
 msgstr "{0} te ha invitado a {recipientActionVerb} el documento \"{1}\"."
@@ -62,15 +54,6 @@ msgstr "{0} de {1} fila(s) seleccionada."
 #: packages/lib/server-only/document/resend-document.tsx:137
 msgid "{0} on behalf of \"{1}\" has invited you to {recipientActionVerb} the document \"{2}\"."
 msgstr ""
-
-#: packages/lib/jobs/definitions/emails/send-signing-email.ts:136
-#: packages/lib/server-only/document/resend-document.tsx:137
-#~ msgid "{0} on behalf of {1} has invited you to {recipientActionVerb} the document \"{2}\"."
-#~ msgstr "{0} en nombre de {1} te ha invitado a {recipientActionVerb} el documento \"{2}\"."
-
-#: packages/email/template-components/template-document-invite.tsx:51
-#~ msgid "{0}<0/>\"{documentName}\""
-#~ msgstr "{0}<0/>\"{documentName}\""
 
 #: packages/email/templates/document-invite.tsx:95
 msgid "{inviterName} <0>({inviterEmail})</0>"
@@ -111,18 +94,6 @@ msgstr ""
 #: packages/email/templates/document-invite.tsx:45
 msgid "{inviterName} on behalf of \"{teamName}\" has invited you to {action} {documentName}"
 msgstr ""
-
-#: packages/email/template-components/template-document-invite.tsx:63
-#~ msgid "{inviterName} on behalf of {teamName} has invited you to {0}"
-#~ msgstr "{inviterName} en nombre de {teamName} te ha invitado a {0}"
-
-#: packages/email/template-components/template-document-invite.tsx:49
-#~ msgid "{inviterName} on behalf of {teamName} has invited you to {0}<0/>\"{documentName}\""
-#~ msgstr "{inviterName} on behalf of {teamName} has invited you to {0}<0/>\"{documentName}\""
-
-#: packages/email/templates/document-invite.tsx:45
-#~ msgid "{inviterName} on behalf of {teamName} has invited you to {action} {documentName}"
-#~ msgstr "{inviterName} en nombre de {teamName} te ha invitado a {action} {documentName}"
 
 #: packages/email/templates/team-join.tsx:67
 msgid "{memberEmail} joined the following team"
@@ -268,10 +239,6 @@ msgstr "{userName} vio el documento"
 msgid "{visibleRows, plural, one {Showing # result.} other {Showing # results.}}"
 msgstr "{visibleRows, plural, one {Mostrando # resultado.} other {Mostrando # resultados.}}"
 
-#: packages/email/templates/document-invite.tsx:100
-#~ msgid "`${inviterName} has invited you to ${action} the document \"${documentName}\".`"
-#~ msgstr "`${inviterName} has invited you to ${action} the document \"${documentName}\".`"
-
 #: packages/email/templates/team-transfer-request.tsx:59
 msgid "<0>{senderName}</0> has requested that you take ownership of the following team"
 msgstr "<0>{senderName}</0> ha solicitado que asumas la propiedad del siguiente equipo"
@@ -357,10 +324,6 @@ msgstr "Se actualizó un destinatario"
 #: packages/lib/server-only/team/create-team-email-verification.ts:159
 msgid "A request to use your email has been initiated by {0} on Documenso"
 msgstr "Se ha iniciado una solicitud para usar tu correo electrónico por {0} en Documenso"
-
-#: packages/lib/server-only/team/create-team-email-verification.ts:142
-#~ msgid "A request to use your email has been initiated by {teamName} on Documenso"
-#~ msgstr "A request to use your email has been initiated by {teamName} on Documenso"
 
 #: packages/email/templates/team-join.tsx:31
 msgid "A team member has joined a team on Documenso"
@@ -489,10 +452,6 @@ msgstr "Aprobar"
 msgid "Approve Document"
 msgstr "Aprobar Documento"
 
-#: packages/lib/constants/recipient-roles.ts:68
-#~ msgid "APPROVE_REQUEST"
-#~ msgstr "APPROVE_REQUEST"
-
 #: packages/lib/constants/recipient-roles.ts:9
 msgid "Approved"
 msgstr "Aprobado"
@@ -513,11 +472,11 @@ msgstr "Aprobando"
 msgid "Before you get started, please confirm your email address by clicking the button below:"
 msgstr "Antes de comenzar, por favor confirma tu dirección de correo electrónico haciendo clic en el botón de abajo:"
 
-#: packages/ui/primitives/signature-pad/signature-pad.tsx:383
+#: packages/ui/primitives/signature-pad/signature-pad.tsx:494
 msgid "Black"
 msgstr "Negro"
 
-#: packages/ui/primitives/signature-pad/signature-pad.tsx:397
+#: packages/ui/primitives/signature-pad/signature-pad.tsx:508
 msgid "Blue"
 msgstr "Azul"
 
@@ -575,7 +534,7 @@ msgstr "Valores de Checkbox"
 msgid "Clear filters"
 msgstr "Limpiar filtros"
 
-#: packages/ui/primitives/signature-pad/signature-pad.tsx:417
+#: packages/ui/primitives/signature-pad/signature-pad.tsx:528
 msgid "Clear Signature"
 msgstr "Limpiar firma"
 
@@ -614,10 +573,6 @@ msgstr "Confirmar correo electrónico"
 #: packages/ui/primitives/document-flow/document-flow-root.tsx:141
 msgid "Continue"
 msgstr "Continuar"
-
-#: packages/email/template-components/template-document-invite.tsx:72
-#~ msgid "Continue by {0} the document."
-#~ msgstr "Continue by {0} the document."
 
 #: packages/email/template-components/template-document-invite.tsx:86
 msgid "Continue by approving the document."
@@ -768,9 +723,6 @@ msgstr "Correo electrónico de documento pendiente"
 #: packages/email/template-components/template-document-rejected.tsx:21
 msgid "Document Rejected"
 msgstr "Documento Rechazado"
-
-#~ msgid "Document Rejection Confirmed"
-#~ msgstr "Document Rejection Confirmed"
 
 #: packages/lib/utils/document-audit-logs.ts:330
 msgid "Document sent"
@@ -944,12 +896,9 @@ msgstr "Autenticación de acción de destinatario global"
 msgid "Go Back"
 msgstr "Regresar"
 
-#: packages/ui/primitives/signature-pad/signature-pad.tsx:404
+#: packages/ui/primitives/signature-pad/signature-pad.tsx:515
 msgid "Green"
 msgstr "Verde"
-
-#~ msgid "Hello {recipientName},"
-#~ msgstr "Hello {recipientName},"
 
 #: packages/email/templates/reset-password.tsx:56
 msgid "Hi, {userName} <0>({userEmail})</0>"
@@ -1231,7 +1180,7 @@ msgstr "Correo electrónico de destinatario eliminado"
 msgid "Recipient signing request email"
 msgstr "Correo electrónico de solicitud de firma de destinatario"
 
-#: packages/ui/primitives/signature-pad/signature-pad.tsx:390
+#: packages/ui/primitives/signature-pad/signature-pad.tsx:501
 msgid "Red"
 msgstr "Rojo"
 
@@ -1422,10 +1371,6 @@ msgstr "Firmando"
 msgid "Signing Complete!"
 msgstr "¡Firma completa!"
 
-#: packages/lib/constants/recipient-roles.ts:66
-#~ msgid "SIGNING_REQUEST"
-#~ msgstr "SIGNING_REQUEST"
-
 #: packages/ui/primitives/document-flow/missing-signature-field-dialog.tsx:34
 msgid "Some signers have not been assigned a signature field. Please assign at least 1 signature field to each signer before proceeding."
 msgstr "Algunos firmantes no han sido asignados a un campo de firma. Asigne al menos 1 campo de firma a cada firmante antes de continuar."
@@ -1497,9 +1442,6 @@ msgstr "La autenticación requerida para que los destinatarios firmen el campo d
 #: packages/ui/components/document/document-global-auth-access-select.tsx:67
 msgid "The authentication required for recipients to view the document."
 msgstr "La autenticación requerida para que los destinatarios vean el documento."
-
-#~ msgid "The document owner has been notified of this rejection. No further action is required from you at this time."
-#~ msgstr "The document owner has been notified of this rejection. No further action is required from you at this time."
 
 #: packages/email/template-components/template-document-rejection-confirmed.tsx:39
 msgid "The document owner has been notified of this rejection. No further action is required from you at this time. The document owner may contact you with any questions regarding this rejection."
@@ -1585,9 +1527,6 @@ msgstr "Este documento está protegido por contraseña. Por favor ingrese la con
 msgid "This document was sent using <0>Documenso.</0>"
 msgstr "Este documento fue enviado usando <0>Documenso.</0>"
 
-#~ msgid "This email confirms that you have rejected the document \"{documentName}\" sent by {documentOwnerName}."
-#~ msgstr "This email confirms that you have rejected the document \"{documentName}\" sent by {documentOwnerName}."
-
 #: packages/email/template-components/template-document-rejection-confirmed.tsx:26
 msgid "This email confirms that you have rejected the document <0>\"{documentName}\"</0> sent by {documentOwnerName}."
 msgstr "Este correo electrónico confirma que ha rechazado el documento <0>\"{documentName}\"</0> enviado por {documentOwnerName}."
@@ -1658,6 +1597,10 @@ msgstr "Actualizar el rol y agregar campos según sea necesario para el destinat
 msgid "Upgrade"
 msgstr "Actualizar"
 
+#: packages/ui/primitives/signature-pad/signature-pad.tsx:479
+msgid "Upload Signature"
+msgstr ""
+
 #: packages/ui/primitives/document-dropzone.tsx:70
 msgid "Upload Template Document"
 msgstr "Cargar Documento Plantilla"
@@ -1698,10 +1641,6 @@ msgstr "Ver Documento"
 #: packages/email/template-components/template-document-self-signed.tsx:79
 msgid "View plans"
 msgstr "Ver planes"
-
-#: packages/lib/constants/recipient-roles.ts:67
-#~ msgid "VIEW_REQUEST"
-#~ msgstr "VIEW_REQUEST"
 
 #: packages/lib/constants/recipient-roles.ts:30
 msgid "Viewed"
@@ -1807,9 +1746,6 @@ msgstr "Ha alcanzado su límite de documentos."
 #: packages/email/templates/document-rejection-confirmed.tsx:27
 msgid "You have rejected the document '{documentName}'"
 msgstr "Ha rechazado el documento '{documentName}'"
-
-#~ msgid "You have rejected the document \"{documentName}\""
-#~ msgstr "You have rejected the document \"{documentName}\""
 
 #: packages/email/template-components/template-document-self-signed.tsx:42
 msgid "You have signed “{documentName}”"
