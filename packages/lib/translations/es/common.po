@@ -419,7 +419,7 @@ msgstr "Admin"
 msgid "Advanced Options"
 msgstr "Opciones avanzadas"
 
-#: packages/ui/primitives/document-flow/add-fields.tsx:576
+#: packages/ui/primitives/document-flow/add-fields.tsx:590
 #: packages/ui/primitives/template-flow/add-template-fields.tsx:414
 msgid "Advanced settings"
 msgstr "Configuraciones avanzadas"
@@ -561,7 +561,7 @@ msgstr "Documento completado"
 msgid "Configure Direct Recipient"
 msgstr "Configurar destinatario directo"
 
-#: packages/ui/primitives/document-flow/add-fields.tsx:577
+#: packages/ui/primitives/document-flow/add-fields.tsx:591
 #: packages/ui/primitives/template-flow/add-template-fields.tsx:415
 msgid "Configure the {0} field"
 msgstr "Configurar el campo {0}"
@@ -619,7 +619,7 @@ msgstr "Crear cuenta"
 msgid "Custom Text"
 msgstr "Texto personalizado"
 
-#: packages/ui/primitives/document-flow/add-fields.tsx:934
+#: packages/ui/primitives/document-flow/add-fields.tsx:948
 #: packages/ui/primitives/document-flow/types.ts:53
 #: packages/ui/primitives/template-flow/add-template-fields.tsx:729
 msgid "Date"
@@ -757,7 +757,7 @@ msgstr "Borrador"
 msgid "Drag & drop your PDF here."
 msgstr "Arrastre y suelte su PDF aquí."
 
-#: packages/ui/primitives/document-flow/add-fields.tsx:1065
+#: packages/ui/primitives/document-flow/add-fields.tsx:1079
 #: packages/ui/primitives/template-flow/add-template-fields.tsx:860
 msgid "Dropdown"
 msgstr "Menú desplegable"
@@ -767,7 +767,7 @@ msgid "Dropdown options"
 msgstr "Opciones de menú desplegable"
 
 #: packages/lib/constants/document.ts:28
-#: packages/ui/primitives/document-flow/add-fields.tsx:882
+#: packages/ui/primitives/document-flow/add-fields.tsx:896
 #: packages/ui/primitives/document-flow/add-signature.tsx:272
 #: packages/ui/primitives/document-flow/add-signers.tsx:512
 #: packages/ui/primitives/document-flow/add-signers.tsx:519
@@ -794,7 +794,7 @@ msgstr "Correo electrónico reeenviado"
 msgid "Email sent"
 msgstr "Correo electrónico enviado"
 
-#: packages/ui/primitives/document-flow/add-fields.tsx:1130
+#: packages/ui/primitives/document-flow/add-fields.tsx:1144
 msgid "Empty field"
 msgstr "Campo vacío"
 
@@ -807,7 +807,7 @@ msgstr "Habilitar firma de enlace directo"
 msgid "Enable signing order"
 msgstr "Habilitar orden de firma"
 
-#: packages/ui/primitives/document-flow/add-fields.tsx:802
+#: packages/ui/primitives/document-flow/add-fields.tsx:816
 #: packages/ui/primitives/template-flow/add-template-fields.tsx:597
 msgid "Enable Typed Signatures"
 msgstr "Habilitar firmas escritas"
@@ -983,7 +983,7 @@ msgstr "Mensaje <0>(Opcional)</0>"
 msgid "Min"
 msgstr "Mín"
 
-#: packages/ui/primitives/document-flow/add-fields.tsx:908
+#: packages/ui/primitives/document-flow/add-fields.tsx:922
 #: packages/ui/primitives/document-flow/add-signature.tsx:298
 #: packages/ui/primitives/document-flow/add-signers.tsx:550
 #: packages/ui/primitives/document-flow/add-signers.tsx:556
@@ -1006,7 +1006,7 @@ msgstr "Necesita firmar"
 msgid "Needs to view"
 msgstr "Necesita ver"
 
-#: packages/ui/primitives/document-flow/add-fields.tsx:693
+#: packages/ui/primitives/document-flow/add-fields.tsx:707
 #: packages/ui/primitives/template-flow/add-template-fields.tsx:516
 msgid "No recipient matching this description was found."
 msgstr "No se encontró ningún destinatario que coincidiera con esta descripción."
@@ -1015,7 +1015,7 @@ msgstr "No se encontró ningún destinatario que coincidiera con esta descripci�
 msgid "No recipients"
 msgstr "Sin destinatarios"
 
-#: packages/ui/primitives/document-flow/add-fields.tsx:708
+#: packages/ui/primitives/document-flow/add-fields.tsx:722
 #: packages/ui/primitives/template-flow/add-template-fields.tsx:531
 msgid "No recipients with this role"
 msgstr "No hay destinatarios con este rol"
@@ -1044,7 +1044,7 @@ msgstr "No se encontró valor."
 msgid "None"
 msgstr "Ninguno"
 
-#: packages/ui/primitives/document-flow/add-fields.tsx:986
+#: packages/ui/primitives/document-flow/add-fields.tsx:1000
 #: packages/ui/primitives/document-flow/types.ts:56
 #: packages/ui/primitives/template-flow/add-template-fields.tsx:781
 msgid "Number"
@@ -1217,7 +1217,7 @@ msgstr "Recordatorio: Por favor {recipientActionVerb} este documento"
 msgid "Reminder: Please {recipientActionVerb} your document"
 msgstr "Recordatorio: Por favor {recipientActionVerb} tu documento"
 
-#: packages/ui/primitives/document-flow/add-fields.tsx:1117
+#: packages/ui/primitives/document-flow/add-fields.tsx:1131
 msgid "Remove"
 msgstr "Eliminar"
 
@@ -1338,7 +1338,7 @@ msgstr "Firmar Documento"
 msgid "Sign In"
 msgstr "Iniciar sesión"
 
-#: packages/ui/primitives/document-flow/add-fields.tsx:830
+#: packages/ui/primitives/document-flow/add-fields.tsx:844
 #: packages/ui/primitives/document-flow/add-signature.tsx:323
 #: packages/ui/primitives/document-flow/field-icon.tsx:52
 #: packages/ui/primitives/document-flow/types.ts:49
@@ -1421,7 +1421,7 @@ msgstr "Correo electrónico del equipo eliminado para {teamName} en Documenso"
 msgid "Template title"
 msgstr "Título de plantilla"
 
-#: packages/ui/primitives/document-flow/add-fields.tsx:960
+#: packages/ui/primitives/document-flow/add-fields.tsx:974
 #: packages/ui/primitives/document-flow/types.ts:52
 #: packages/ui/primitives/template-flow/add-template-fields.tsx:755
 msgid "Text"
@@ -1515,7 +1515,7 @@ msgstr "Esto se puede anular configurando los requisitos de autenticación direc
 msgid "This document can not be recovered, if you would like to dispute the reason for future documents please contact support."
 msgstr "Este documento no se puede recuperar, si deseas impugnar la razón para documentos futuros, por favor contacta con el soporte."
 
-#: packages/ui/primitives/document-flow/add-fields.tsx:764
+#: packages/ui/primitives/document-flow/add-fields.tsx:778
 msgid "This document has already been sent to this recipient. You can no longer edit this recipient."
 msgstr "Este documento ya ha sido enviado a este destinatario. Ya no puede editar a este destinatario."
 
@@ -1551,7 +1551,7 @@ msgstr "Este campo no se puede modificar ni eliminar. Cuando comparta el enlace 
 msgid "This is how the document will reach the recipients once the document is ready for signing."
 msgstr "Así es como el documento llegará a los destinatarios una vez que esté listo para firmarse."
 
-#: packages/ui/primitives/document-flow/add-fields.tsx:1097
+#: packages/ui/primitives/document-flow/add-fields.tsx:1111
 msgid "This recipient can no longer be modified as they have signed a field, or completed the document."
 msgstr "Este destinatario ya no puede ser modificado ya que ha firmado un campo o completado el documento."
 
@@ -1580,7 +1580,7 @@ msgstr "Zona horaria"
 msgid "Title"
 msgstr "Título"
 
-#: packages/ui/primitives/document-flow/add-fields.tsx:1080
+#: packages/ui/primitives/document-flow/add-fields.tsx:1094
 #: packages/ui/primitives/template-flow/add-template-fields.tsx:873
 msgid "To proceed further, please set at least one value for the {0} field."
 msgstr "Para continuar, por favor establezca al menos un valor para el campo {0}."

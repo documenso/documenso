@@ -82,6 +82,15 @@ const MIN_WIDTH_PX = 36;
 const DEFAULT_HEIGHT_PX = MIN_HEIGHT_PX * 2.5;
 const DEFAULT_WIDTH_PX = MIN_WIDTH_PX * 2.5;
 
+const fieldsWithAdvancedSettings: FieldType[] = [
+  FieldType.INITIALS,
+  FieldType.TEXT,
+  FieldType.NUMBER,
+  FieldType.CHECKBOX,
+  FieldType.RADIO,
+  FieldType.DROPDOWN,
+];
+
 export type FieldFormType = {
   nativeId?: number;
   formId: string;
@@ -351,6 +360,11 @@ export const AddFieldsFormPartial = ({
       };
 
       append(field);
+
+      if (fieldsWithAdvancedSettings.includes(selectedField)) {
+        setCurrentField(field);
+        setShowAdvancedSettings(true);
+      }
 
       setIsFieldWithinBounds(false);
       setSelectedField(null);
@@ -1082,8 +1096,8 @@ export const AddFieldsFormPartial = ({
                     {emptyCheckboxFields.length > 0
                       ? 'Checkbox'
                       : emptyRadioFields.length > 0
-                      ? 'Radio'
-                      : 'Select'}{' '}
+                        ? 'Radio'
+                        : 'Select'}{' '}
                     field.
                   </Trans>
                 </li>
