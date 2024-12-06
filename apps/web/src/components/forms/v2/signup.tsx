@@ -67,6 +67,7 @@ export const ZSignUpFormV2Schema = z
     },
     {
       message: 'Password should not be common or based on personal information',
+      path: ['password'],
     },
   );
 
