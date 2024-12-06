@@ -60,14 +60,19 @@ msgstr "{0} sur {1} ligne(s) sélectionnée(s)."
 
 #: packages/lib/jobs/definitions/emails/send-signing-email.ts:136
 #: packages/lib/server-only/document/resend-document.tsx:137
-msgid "{0} on behalf of {1} has invited you to {recipientActionVerb} the document \"{2}\"."
-msgstr "{0} au nom de {1} vous a invité à {recipientActionVerb} le document \"{2}\"."
+msgid "{0} on behalf of \"{1}\" has invited you to {recipientActionVerb} the document \"{2}\"."
+msgstr ""
+
+#: packages/lib/jobs/definitions/emails/send-signing-email.ts:136
+#: packages/lib/server-only/document/resend-document.tsx:137
+#~ msgid "{0} on behalf of {1} has invited you to {recipientActionVerb} the document \"{2}\"."
+#~ msgstr "{0} au nom de {1} vous a invité à {recipientActionVerb} le document \"{2}\"."
 
 #: packages/email/template-components/template-document-invite.tsx:51
 #~ msgid "{0}<0/>\"{documentName}\""
 #~ msgstr "{0}<0/>\"{documentName}\""
 
-#: packages/email/templates/document-invite.tsx:94
+#: packages/email/templates/document-invite.tsx:95
 msgid "{inviterName} <0>({inviterEmail})</0>"
 msgstr "{inviterName} <0>({inviterEmail})</0>"
 
@@ -87,7 +92,7 @@ msgstr "{inviterName} vous a invité à {0}<0/>\"{documentName}\""
 msgid "{inviterName} has invited you to {action} {documentName}"
 msgstr "{inviterName} vous a invité à {action} {documentName}"
 
-#: packages/email/templates/document-invite.tsx:106
+#: packages/email/templates/document-invite.tsx:108
 msgid "{inviterName} has invited you to {action} the document \"{documentName}\"."
 msgstr "{inviterName} vous a invité à {action} le document \"{documentName}\"."
 
@@ -100,16 +105,24 @@ msgid "{inviterName} has removed you from the document<0/>\"{documentName}\""
 msgstr "{inviterName} vous a retiré du document<0/>\"{documentName}\""
 
 #: packages/email/template-components/template-document-invite.tsx:63
-msgid "{inviterName} on behalf of {teamName} has invited you to {0}"
-msgstr "{inviterName} au nom de {teamName} vous a invité à {0}"
+msgid "{inviterName} on behalf of \"{teamName}\" has invited you to {0}"
+msgstr ""
+
+#: packages/email/templates/document-invite.tsx:45
+msgid "{inviterName} on behalf of \"{teamName}\" has invited you to {action} {documentName}"
+msgstr ""
+
+#: packages/email/template-components/template-document-invite.tsx:63
+#~ msgid "{inviterName} on behalf of {teamName} has invited you to {0}"
+#~ msgstr "{inviterName} au nom de {teamName} vous a invité à {0}"
 
 #: packages/email/template-components/template-document-invite.tsx:49
 #~ msgid "{inviterName} on behalf of {teamName} has invited you to {0}<0/>\"{documentName}\""
 #~ msgstr "{inviterName} on behalf of {teamName} has invited you to {0}<0/>\"{documentName}\""
 
 #: packages/email/templates/document-invite.tsx:45
-msgid "{inviterName} on behalf of {teamName} has invited you to {action} {documentName}"
-msgstr "{inviterName} au nom de {teamName} vous a invité à {action} {documentName}"
+#~ msgid "{inviterName} on behalf of {teamName} has invited you to {action} {documentName}"
+#~ msgstr "{inviterName} au nom de {teamName} vous a invité à {action} {documentName}"
 
 #: packages/email/templates/team-join.tsx:67
 msgid "{memberEmail} joined the following team"
@@ -341,7 +354,7 @@ msgstr "Un destinataire a été supprimé"
 msgid "A recipient was updated"
 msgstr "Un destinataire a été mis à jour"
 
-#: packages/lib/server-only/team/create-team-email-verification.ts:156
+#: packages/lib/server-only/team/create-team-email-verification.ts:159
 msgid "A request to use your email has been initiated by {0} on Documenso"
 msgstr "Une demande d'utilisation de votre e-mail a été initiée par {0} sur Documenso"
 
@@ -711,7 +724,7 @@ msgid "Document created"
 msgstr "Document créé"
 
 #: packages/email/templates/document-created-from-direct-template.tsx:32
-#: packages/lib/server-only/template/create-document-from-direct-template.ts:567
+#: packages/lib/server-only/template/create-document-from-direct-template.ts:574
 msgid "Document created from direct template"
 msgstr "Document créé à partir d'un modèle direct"
 
@@ -1774,7 +1787,7 @@ msgstr "Vous avez été invité à rejoindre {0} sur Documenso"
 msgid "You have been invited to join the following team"
 msgstr "Vous avez été invité à rejoindre l'équipe suivante"
 
-#: packages/lib/server-only/recipient/set-recipients-for-document.ts:329
+#: packages/lib/server-only/recipient/set-recipients-for-document.ts:327
 msgid "You have been removed from a document"
 msgstr "Vous avez été supprimé d'un document"
 

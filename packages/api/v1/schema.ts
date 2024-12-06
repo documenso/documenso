@@ -10,6 +10,7 @@ import {
   ZDocumentActionAuthTypesSchema,
   ZRecipientActionAuthTypesSchema,
 } from '@documenso/lib/types/document-auth';
+import { ZDocumentEmailSettingsSchema } from '@documenso/lib/types/document-email';
 import { ZFieldMetaSchema } from '@documenso/lib/types/field-meta';
 import {
   DocumentDataType,
@@ -57,6 +58,22 @@ export const ZSuccessfulDocumentResponseSchema = z.object({
 
 export const ZSuccessfulGetDocumentResponseSchema = ZSuccessfulDocumentResponseSchema.extend({
   recipients: z.lazy(() => z.array(ZSuccessfulRecipientResponseSchema)),
+  fields: z.lazy(() =>
+    ZFieldSchema.pick({
+      id: true,
+      recipientId: true,
+      type: true,
+      page: true,
+      positionX: true,
+      positionY: true,
+      width: true,
+      height: true,
+    })
+      .extend({
+        fieldMeta: ZFieldMetaSchema.nullish(),
+      })
+      .array(),
+  ),
 });
 
 export type TSuccessfulGetDocumentResponseSchema = z.infer<
@@ -133,8 +150,12 @@ export const ZCreateDocumentMutationSchema = z.object({
       signingOrder: z.nativeEnum(DocumentSigningOrder).optional(),
       language: z.enum(SUPPORTED_LANGUAGE_CODES).optional(),
       typedSignatureEnabled: z.boolean().optional().default(true),
+      distributionMethod: z.nativeEnum(DocumentDistributionMethod).optional(),
+      emailSettings: ZDocumentEmailSettingsSchema.optional(),
     })
-    .partial(),
+    .partial()
+    .optional()
+    .default({}),
   authOptions: z
     .object({
       globalAccessAuth: ZDocumentAccessAuthTypesSchema.optional(),
@@ -257,6 +278,7 @@ export const ZGenerateDocumentFromTemplateMutationSchema = z.object({
       language: z.enum(SUPPORTED_LANGUAGE_CODES),
       distributionMethod: z.nativeEnum(DocumentDistributionMethod),
       typedSignatureEnabled: z.boolean(),
+      emailSettings: ZDocumentEmailSettingsSchema,
     })
     .partial()
     .optional(),
@@ -418,7 +440,7 @@ export const ZSuccessfulSigningResponseSchema = z
   .object({
     message: z.string(),
   })
-  .and(ZSuccessfulGetDocumentResponseSchema);
+  .and(ZSuccessfulGetDocumentResponseSchema.omit({ fields: true }));
 
 export type TSuccessfulSigningResponseSchema = z.infer<typeof ZSuccessfulSigningResponseSchema>;
 

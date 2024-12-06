@@ -33,7 +33,9 @@ export const getTeamPublicProfile = async ({
   });
 
   if (!team) {
-    throw new AppError(AppErrorCode.NOT_FOUND, 'Team not found');
+    throw new AppError(AppErrorCode.NOT_FOUND, {
+      message: 'Team not found',
+    });
   }
 
   // Create and return the public profile.
@@ -47,7 +49,9 @@ export const getTeamPublicProfile = async ({
     });
 
     if (!profile) {
-      throw new AppError(AppErrorCode.NOT_FOUND, 'Failed to create public profile');
+      throw new AppError(AppErrorCode.NOT_FOUND, {
+        message: 'Failed to create public profile',
+      });
     }
 
     return {

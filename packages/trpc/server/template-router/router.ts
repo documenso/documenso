@@ -42,323 +42,214 @@ export const templateRouter = router({
   createTemplate: authenticatedProcedure
     .input(ZCreateTemplateMutationSchema)
     .mutation(async ({ input, ctx }) => {
-      try {
-        const { teamId, title, templateDocumentDataId } = input;
+      const { teamId, title, templateDocumentDataId } = input;
 
-        return await createTemplate({
-          userId: ctx.user.id,
-          teamId,
-          title,
-          templateDocumentDataId,
-        });
-      } catch (err) {
-        console.error(err);
-
-        throw new TRPCError({
-          code: 'BAD_REQUEST',
-          message: 'We were unable to create this template. Please try again later.',
-        });
-      }
+      return await createTemplate({
+        userId: ctx.user.id,
+        teamId,
+        title,
+        templateDocumentDataId,
+      });
     }),
 
   createDocumentFromDirectTemplate: maybeAuthenticatedProcedure
     .input(ZCreateDocumentFromDirectTemplateMutationSchema)
     .mutation(async ({ input, ctx }) => {
-      try {
-        const {
-          directRecipientName,
-          directRecipientEmail,
-          directTemplateToken,
-          directTemplateExternalId,
-          signedFieldValues,
-          templateUpdatedAt,
-        } = input;
+      const {
+        directRecipientName,
+        directRecipientEmail,
+        directTemplateToken,
+        directTemplateExternalId,
+        signedFieldValues,
+        templateUpdatedAt,
+      } = input;
 
-        const requestMetadata = extractNextApiRequestMetadata(ctx.req);
+      const requestMetadata = extractNextApiRequestMetadata(ctx.req);
 
-        return await createDocumentFromDirectTemplate({
-          directRecipientName,
-          directRecipientEmail,
-          directTemplateToken,
-          directTemplateExternalId,
-          signedFieldValues,
-          templateUpdatedAt,
-          user: ctx.user
-            ? {
-                id: ctx.user.id,
-                name: ctx.user.name || undefined,
-                email: ctx.user.email,
-              }
-            : undefined,
-          requestMetadata,
-        });
-      } catch (err) {
-        console.error(err);
-
-        throw AppError.parseErrorToTRPCError(err);
-      }
+      return await createDocumentFromDirectTemplate({
+        directRecipientName,
+        directRecipientEmail,
+        directTemplateToken,
+        directTemplateExternalId,
+        signedFieldValues,
+        templateUpdatedAt,
+        user: ctx.user
+          ? {
+              id: ctx.user.id,
+              name: ctx.user.name || undefined,
+              email: ctx.user.email,
+            }
+          : undefined,
+        requestMetadata,
+      });
     }),
 
   createDocumentFromTemplate: authenticatedProcedure
     .input(ZCreateDocumentFromTemplateMutationSchema)
     .mutation(async ({ input, ctx }) => {
-      try {
-        const { templateId, teamId, recipients } = input;
+      const { templateId, teamId, recipients } = input;
 
-        const limits = await getServerLimits({ email: ctx.user.email, teamId });
+      const limits = await getServerLimits({ email: ctx.user.email, teamId });
 
-        if (limits.remaining.documents === 0) {
-          throw new Error('You have reached your document limit.');
-        }
-
-        const requestMetadata = extractNextApiRequestMetadata(ctx.req);
-
-        let document: Document = await createDocumentFromTemplate({
-          templateId,
-          teamId,
-          userId: ctx.user.id,
-          recipients,
-          requestMetadata,
-        });
-
-        if (input.distributeDocument) {
-          document = await sendDocument({
-            documentId: document.id,
-            userId: ctx.user.id,
-            teamId,
-            requestMetadata,
-          }).catch((err) => {
-            console.error(err);
-
-            throw new AppError('DOCUMENT_SEND_FAILED');
-          });
-        }
-
-        return document;
-      } catch (err) {
-        console.error(err);
-
-        throw AppError.parseErrorToTRPCError(err);
+      if (limits.remaining.documents === 0) {
+        throw new Error('You have reached your document limit.');
       }
+
+      const requestMetadata = extractNextApiRequestMetadata(ctx.req);
+
+      let document: Document = await createDocumentFromTemplate({
+        templateId,
+        teamId,
+        userId: ctx.user.id,
+        recipients,
+        requestMetadata,
+      });
+
+      if (input.distributeDocument) {
+        document = await sendDocument({
+          documentId: document.id,
+          userId: ctx.user.id,
+          teamId,
+          requestMetadata,
+        }).catch((err) => {
+          console.error(err);
+
+          throw new AppError('DOCUMENT_SEND_FAILED');
+        });
+      }
+
+      return document;
     }),
 
   duplicateTemplate: authenticatedProcedure
     .input(ZDuplicateTemplateMutationSchema)
     .mutation(async ({ input, ctx }) => {
-      try {
-        const { teamId, templateId } = input;
+      const { teamId, templateId } = input;
 
-        return await duplicateTemplate({
-          userId: ctx.user.id,
-          teamId,
-          templateId,
-        });
-      } catch (err) {
-        console.error(err);
-
-        throw new TRPCError({
-          code: 'BAD_REQUEST',
-          message: 'We were unable to duplicate the template. Please try again later.',
-        });
-      }
+      return await duplicateTemplate({
+        userId: ctx.user.id,
+        teamId,
+        templateId,
+      });
     }),
 
   deleteTemplate: authenticatedProcedure
     .input(ZDeleteTemplateMutationSchema)
     .mutation(async ({ input, ctx }) => {
-      try {
-        const { id, teamId } = input;
+      const { id, teamId } = input;
 
-        const userId = ctx.user.id;
+      const userId = ctx.user.id;
 
-        return await deleteTemplate({ userId, id, teamId });
-      } catch (err) {
-        console.error(err);
-
-        throw new TRPCError({
-          code: 'BAD_REQUEST',
-          message: 'We were unable to delete this template. Please try again later.',
-        });
-      }
+      return await deleteTemplate({ userId, id, teamId });
     }),
 
   getTemplateWithDetailsById: authenticatedProcedure
     .input(ZGetTemplateWithDetailsByIdQuerySchema)
     .query(async ({ input, ctx }) => {
-      try {
-        return await getTemplateWithDetailsById({
-          id: input.id,
-          userId: ctx.user.id,
-        });
-      } catch (err) {
-        console.error(err);
-
-        throw new TRPCError({
-          code: 'BAD_REQUEST',
-          message: 'We were unable to find this template. Please try again later.',
-        });
-      }
+      return await getTemplateWithDetailsById({
+        id: input.id,
+        userId: ctx.user.id,
+      });
     }),
 
   // Todo: Add API
   updateTemplateSettings: authenticatedProcedure
     .input(ZUpdateTemplateSettingsMutationSchema)
     .mutation(async ({ input, ctx }) => {
-      try {
-        const { templateId, teamId, data, meta } = input;
+      const { templateId, teamId, data, meta } = input;
 
-        const userId = ctx.user.id;
+      const userId = ctx.user.id;
 
-        const requestMetadata = extractNextApiRequestMetadata(ctx.req);
+      const requestMetadata = extractNextApiRequestMetadata(ctx.req);
 
-        return await updateTemplateSettings({
-          userId,
-          teamId,
-          templateId,
-          data,
-          meta: {
-            ...meta,
-            language: isValidLanguageCode(meta?.language) ? meta?.language : undefined,
-          },
-          requestMetadata,
-        });
-      } catch (err) {
-        console.error(err);
-
-        throw new TRPCError({
-          code: 'BAD_REQUEST',
-          message:
-            'We were unable to update the settings for this template. Please try again later.',
-        });
-      }
+      return await updateTemplateSettings({
+        userId,
+        teamId,
+        templateId,
+        data,
+        meta: {
+          ...meta,
+          language: isValidLanguageCode(meta?.language) ? meta?.language : undefined,
+        },
+        requestMetadata,
+      });
     }),
 
   setSigningOrderForTemplate: authenticatedProcedure
     .input(ZSetSigningOrderForTemplateMutationSchema)
     .mutation(async ({ input, ctx }) => {
-      try {
-        const { templateId, teamId, signingOrder } = input;
+      const { templateId, teamId, signingOrder } = input;
 
-        return await updateTemplateSettings({
-          templateId,
-          teamId,
-          data: {},
-          meta: { signingOrder },
-          userId: ctx.user.id,
-          requestMetadata: extractNextApiRequestMetadata(ctx.req),
-        });
-      } catch (err) {
-        console.error(err);
-
-        throw new TRPCError({
-          code: 'BAD_REQUEST',
-          message:
-            'We were unable to update the settings for this document. Please try again later.',
-        });
-      }
+      return await updateTemplateSettings({
+        templateId,
+        teamId,
+        data: {},
+        meta: { signingOrder },
+        userId: ctx.user.id,
+        requestMetadata: extractNextApiRequestMetadata(ctx.req),
+      });
     }),
 
   findTemplates: authenticatedProcedure
     .input(ZFindTemplatesQuerySchema)
     .query(async ({ input, ctx }) => {
-      try {
-        return await findTemplates({
-          userId: ctx.user.id,
-          ...input,
-        });
-      } catch (err) {
-        console.error(err);
-
-        throw AppError.parseErrorToTRPCError(err);
-      }
+      return await findTemplates({
+        userId: ctx.user.id,
+        ...input,
+      });
     }),
 
   createTemplateDirectLink: authenticatedProcedure
     .input(ZCreateTemplateDirectLinkMutationSchema)
     .mutation(async ({ input, ctx }) => {
-      try {
-        const { templateId, teamId, directRecipientId } = input;
+      const { templateId, teamId, directRecipientId } = input;
 
-        const userId = ctx.user.id;
+      const userId = ctx.user.id;
 
-        const template = await getTemplateById({ id: templateId, teamId, userId: ctx.user.id });
+      const template = await getTemplateById({ id: templateId, teamId, userId: ctx.user.id });
 
-        const limits = await getServerLimits({ email: ctx.user.email, teamId: template.teamId });
+      const limits = await getServerLimits({ email: ctx.user.email, teamId: template.teamId });
 
-        if (limits.remaining.directTemplates === 0) {
-          throw new AppError(
-            AppErrorCode.LIMIT_EXCEEDED,
-            'You have reached your direct templates limit.',
-          );
-        }
-
-        return await createTemplateDirectLink({ userId, templateId, directRecipientId });
-      } catch (err) {
-        console.error(err);
-
-        const error = AppError.parseError(err);
-        throw AppError.parseErrorToTRPCError(error);
+      if (limits.remaining.directTemplates === 0) {
+        throw new AppError(AppErrorCode.LIMIT_EXCEEDED, {
+          message: 'You have reached your direct templates limit.',
+        });
       }
+
+      return await createTemplateDirectLink({ userId, templateId, directRecipientId });
     }),
 
   deleteTemplateDirectLink: authenticatedProcedure
     .input(ZDeleteTemplateDirectLinkMutationSchema)
     .mutation(async ({ input, ctx }) => {
-      try {
-        const { templateId } = input;
+      const { templateId } = input;
 
-        const userId = ctx.user.id;
+      const userId = ctx.user.id;
 
-        return await deleteTemplateDirectLink({ userId, templateId });
-      } catch (err) {
-        console.error(err);
-
-        const error = AppError.parseError(err);
-        throw AppError.parseErrorToTRPCError(error);
-      }
+      return await deleteTemplateDirectLink({ userId, templateId });
     }),
 
   toggleTemplateDirectLink: authenticatedProcedure
     .input(ZToggleTemplateDirectLinkMutationSchema)
     .mutation(async ({ input, ctx }) => {
-      try {
-        const { templateId, enabled } = input;
+      const { templateId, enabled } = input;
 
-        const userId = ctx.user.id;
+      const userId = ctx.user.id;
 
-        return await toggleTemplateDirectLink({ userId, templateId, enabled });
-      } catch (err) {
-        console.error(err);
-
-        const error = AppError.parseError(err);
-        throw AppError.parseErrorToTRPCError(error);
-      }
+      return await toggleTemplateDirectLink({ userId, templateId, enabled });
     }),
 
   moveTemplateToTeam: authenticatedProcedure
     .input(ZMoveTemplatesToTeamSchema)
     .mutation(async ({ input, ctx }) => {
-      try {
-        const { templateId, teamId } = input;
-        const userId = ctx.user.id;
+      const { templateId, teamId } = input;
+      const userId = ctx.user.id;
 
-        return await moveTemplateToTeam({
-          templateId,
-          teamId,
-          userId,
-        });
-      } catch (err) {
-        console.error(err);
-
-        if (err instanceof TRPCError) {
-          throw err;
-        }
-
-        throw new TRPCError({
-          code: 'BAD_REQUEST',
-          message: 'We were unable to move this template. Please try again later.',
-        });
-      }
+      return await moveTemplateToTeam({
+        templateId,
+        teamId,
+        userId,
+      });
     }),
 
   updateTemplateTypedSignatureSettings: authenticatedProcedure
