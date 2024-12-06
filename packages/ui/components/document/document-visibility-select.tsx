@@ -16,14 +16,17 @@ import { Tooltip, TooltipContent, TooltipTrigger } from '@documenso/ui/primitive
 
 export type DocumentVisibilitySelectType = SelectProps & {
   currentMemberRole?: string;
+  isTeamSettings?: boolean;
+  disabled?: boolean;
 };
 
 export const DocumentVisibilitySelect = forwardRef<HTMLButtonElement, DocumentVisibilitySelectType>(
-  ({ currentMemberRole, ...props }, ref) => {
-    const canUpdateVisibility = currentMemberRole === 'ADMIN' || currentMemberRole === 'MANAGER';
+  ({ currentMemberRole, isTeamSettings = false, disabled, ...props }, ref) => {
+    const canUpdateVisibility =
+      currentMemberRole === 'ADMIN' || currentMemberRole === 'MANAGER' || isTeamSettings;
 
     return (
-      <Select {...props} disabled={!canUpdateVisibility}>
+      <Select {...props} disabled={(!canUpdateVisibility && !isTeamSettings) || disabled}>
         <SelectTrigger ref={ref} className="bg-background text-muted-foreground">
           <SelectValue data-testid="documentVisibilitySelectValue" placeholder="Everyone" />
         </SelectTrigger>
@@ -32,18 +35,15 @@ export const DocumentVisibilitySelect = forwardRef<HTMLButtonElement, DocumentVi
           <SelectItem value={DocumentVisibility.EVERYONE}>
             {DOCUMENT_VISIBILITY.EVERYONE.value}
           </SelectItem>
-
-          {(currentMemberRole === 'ADMIN' || currentMemberRole === 'MANAGER') && (
-            <SelectItem value={DocumentVisibility.MANAGER_AND_ABOVE}>
-              {DOCUMENT_VISIBILITY.MANAGER_AND_ABOVE.value}
-            </SelectItem>
-          )}
-
-          {currentMemberRole === 'ADMIN' && (
-            <SelectItem value={DocumentVisibility.ADMIN}>
-              {DOCUMENT_VISIBILITY.ADMIN.value}
-            </SelectItem>
-          )}
+          <SelectItem value={DocumentVisibility.MANAGER_AND_ABOVE} disabled={!canUpdateVisibility}>
+            {DOCUMENT_VISIBILITY.MANAGER_AND_ABOVE.value}
+          </SelectItem>
+          <SelectItem
+            value={DocumentVisibility.ADMIN}
+            disabled={currentMemberRole !== 'ADMIN' && !isTeamSettings}
+          >
+            {DOCUMENT_VISIBILITY.ADMIN.value}
+          </SelectItem>
         </SelectContent>
       </Select>
     );

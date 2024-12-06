@@ -42,7 +42,16 @@ export const acceptTeamInvitation = async ({ userId, teamId }: AcceptTeamInvitat
       });
 
       if (teamMemberInvite.status === TeamMemberInviteStatus.ACCEPTED) {
-        return;
+        const memberExists = await tx.teamMember.findFirst({
+          where: {
+            teamId: teamMemberInvite.teamId,
+            userId: user.id,
+          },
+        });
+
+        if (memberExists) {
+          return;
+        }
       }
 
       const { team } = teamMemberInvite;
@@ -81,7 +90,7 @@ export const acceptTeamInvitation = async ({ userId, teamId }: AcceptTeamInvitat
       await jobs.triggerJob({
         name: 'send.team-member-joined.email',
         payload: {
-          teamId: team.id,
+          teamId: teamMember.teamId,
           memberId: teamMember.id,
         },
       });

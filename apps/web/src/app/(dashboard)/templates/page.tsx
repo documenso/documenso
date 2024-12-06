@@ -15,8 +15,8 @@ export const metadata: Metadata = {
   title: 'Templates',
 };
 
-export default function TemplatesPage({ searchParams = {} }: TemplatesPageProps) {
-  setupI18nSSR();
+export default async function TemplatesPage({ searchParams = {} }: TemplatesPageProps) {
+  await setupI18nSSR();
 
   return <TemplatesPageView searchParams={searchParams} />;
 }

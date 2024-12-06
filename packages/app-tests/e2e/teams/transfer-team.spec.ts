@@ -29,7 +29,7 @@ test('[TEAMS]: initiate and cancel team transfer', async ({ page }) => {
   await page.getByLabel('Confirm by typing transfer').fill('transfer');
   await page.getByRole('button', { name: 'Transfer' }).click();
 
-  await expect(page.locator('[id="\\:r2\\:-form-item-message"]')).toContainText(
+  await expect(page.locator('[id*="form-item-message"]').first()).toContainText(
     `You must enter 'transfer ${team.name}' to proceed`,
   );
 

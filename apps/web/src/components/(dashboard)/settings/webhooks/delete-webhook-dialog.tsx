@@ -51,7 +51,7 @@ export const DeleteWebhookDialog = ({ webhook, children }: DeleteWebhookDialogPr
 
   const [open, setOpen] = useState(false);
 
-  const deleteMessage = `delete ${webhook.webhookUrl}`;
+  const deleteMessage = _(msg`delete ${webhook.webhookUrl}`);
 
   const ZDeleteWebhookFormSchema = z.object({
     webhookUrl: z.literal(deleteMessage, {

@@ -8,8 +8,8 @@ export type DocumentPageProps = {
   };
 };
 
-export default function DocumentPage({ params }: DocumentPageProps) {
-  setupI18nSSR();
+export default async function DocumentPage({ params }: DocumentPageProps) {
+  await setupI18nSSR();
 
   return <DocumentPageView params={params} />;
 }

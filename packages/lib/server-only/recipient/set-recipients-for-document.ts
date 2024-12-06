@@ -1,8 +1,9 @@
 import { createElement } from 'react';
 
+import { msg } from '@lingui/macro';
+
 import { isUserEnterprise } from '@documenso/ee/server-only/util/is-document-enterprise';
 import { mailer } from '@documenso/email/mailer';
-import { render } from '@documenso/email/render';
 import RecipientRemovedFromDocumentTemplate from '@documenso/email/templates/recipient-removed-from-document';
 import { DOCUMENT_AUDIT_LOG_TYPE } from '@documenso/lib/types/document-audit-logs';
 import {
@@ -21,10 +22,14 @@ import type { Recipient } from '@documenso/prisma/client';
 import { RecipientRole } from '@documenso/prisma/client';
 import { SendStatus, SigningStatus } from '@documenso/prisma/client';
 
+import { getI18nInstance } from '../../client-only/providers/i18n.server';
 import { NEXT_PUBLIC_WEBAPP_URL } from '../../constants/app';
 import { FROM_ADDRESS, FROM_NAME } from '../../constants/email';
 import { AppError, AppErrorCode } from '../../errors/app-error';
+import { extractDerivedDocumentEmailSettings } from '../../types/document-email';
 import { canRecipientBeModified } from '../../utils/recipients';
+import { renderEmailWithI18N } from '../../utils/render-email-with-i18n';
+import { teamGlobalSettingsToBranding } from '../../utils/team-global-settings-to-branding';
 
 export interface SetRecipientsForDocumentOptions {
   userId: number;
@@ -62,6 +67,12 @@ export const setRecipientsForDocument = async ({
     },
     include: {
       Field: true,
+      documentMeta: true,
+      team: {
+        include: {
+          teamGlobalSettings: true,
+        },
+      },
     },
   });
 
@@ -94,10 +105,9 @@ export const setRecipientsForDocument = async ({
     });
 
     if (!isDocumentEnterprise) {
-      throw new AppError(
-        AppErrorCode.UNAUTHORIZED,
-        'You do not have permission to set the action auth',
-      );
+      throw new AppError(AppErrorCode.UNAUTHORIZED, {
+        message: 'You do not have permission to set the action auth',
+      });
     }
   }
 
@@ -131,10 +141,9 @@ export const setRecipientsForDocument = async ({
       hasRecipientBeenChanged(existing, recipient) &&
       !canRecipientBeModified(existing, document.Field)
     ) {
-      throw new AppError(
-        AppErrorCode.INVALID_REQUEST,
-        'Cannot modify a recipient who has already interacted with the document',
-      );
+      throw new AppError(AppErrorCode.INVALID_REQUEST, {
+        message: 'Cannot modify a recipient who has already interacted with the document',
+      });
     }
 
     return {
@@ -276,10 +285,14 @@ export const setRecipientsForDocument = async ({
       });
     });
 
+    const isRecipientRemovedEmailEnabled = extractDerivedDocumentEmailSettings(
+      document.documentMeta,
+    ).recipientRemoved;
+
     // Send emails to deleted recipients.
     await Promise.all(
       removedRecipients.map(async (recipient) => {
-        if (recipient.sendStatus !== SendStatus.SENT) {
+        if (recipient.sendStatus !== SendStatus.SENT || !isRecipientRemovedEmailEnabled) {
           return;
         }
 
@@ -291,6 +304,17 @@ export const setRecipientsForDocument = async ({
           assetBaseUrl,
         });
 
+        const branding = document.team?.teamGlobalSettings
+          ? teamGlobalSettingsToBranding(document.team.teamGlobalSettings)
+          : undefined;
+
+        const [html, text] = await Promise.all([
+          renderEmailWithI18N(template, { lang: document.documentMeta?.language }),
+          renderEmailWithI18N(template, { lang: document.documentMeta?.language, plainText: true }),
+        ]);
+
+        const i18n = await getI18nInstance(document.documentMeta?.language);
+
         await mailer.sendMail({
           to: {
             address: recipient.email,
@@ -300,9 +324,9 @@ export const setRecipientsForDocument = async ({
             name: FROM_NAME,
             address: FROM_ADDRESS,
           },
-          subject: 'You have been removed from a document',
-          html: render(template),
-          text: render(template, { plainText: true }),
+          subject: i18n._(msg`You have been removed from a document`),
+          html,
+          text,
         });
       }),
     );

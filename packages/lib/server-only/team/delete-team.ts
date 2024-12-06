@@ -1,16 +1,20 @@
 import { createElement } from 'react';
 
+import { msg } from '@lingui/macro';
+
 import { mailer } from '@documenso/email/mailer';
-import { render } from '@documenso/email/render';
-import type { TeamDeleteEmailProps } from '@documenso/email/templates/team-delete';
 import { TeamDeleteEmailTemplate } from '@documenso/email/templates/team-delete';
 import { WEBAPP_BASE_URL } from '@documenso/lib/constants/app';
 import { FROM_ADDRESS, FROM_NAME } from '@documenso/lib/constants/email';
 import { AppError } from '@documenso/lib/errors/app-error';
 import { stripe } from '@documenso/lib/server-only/stripe';
 import { prisma } from '@documenso/prisma';
+import type { Team, TeamGlobalSettings } from '@documenso/prisma/client';
 
+import { getI18nInstance } from '../../client-only/providers/i18n.server';
 import { jobs } from '../../jobs/client';
+import { renderEmailWithI18N } from '../../utils/render-email-with-i18n';
+import { teamGlobalSettingsToBranding } from '../../utils/team-global-settings-to-branding';
 
 export type DeleteTeamOptions = {
   userId: number;
@@ -38,6 +42,7 @@ export const deleteTeam = async ({ userId, teamId }: DeleteTeamOptions) => {
               },
             },
           },
+          teamGlobalSettings: true,
         },
       });
 
@@ -60,6 +65,7 @@ export const deleteTeam = async ({ userId, teamId }: DeleteTeamOptions) => {
             name: team.name,
             url: team.url,
             ownerUserId: team.ownerUserId,
+            teamGlobalSettings: team.teamGlobalSettings,
           },
           members: team.members.map((member) => ({
             id: member.user.id,
@@ -80,20 +86,34 @@ export const deleteTeam = async ({ userId, teamId }: DeleteTeamOptions) => {
   );
 };
 
-type SendTeamDeleteEmailOptions = Omit<TeamDeleteEmailProps, 'baseUrl' | 'assetBaseUrl'> & {
+type SendTeamDeleteEmailOptions = {
   email: string;
-  teamName: string;
+  team: Pick<Team, 'url' | 'name'> & {
+    teamGlobalSettings?: TeamGlobalSettings | null;
+  };
+  isOwner: boolean;
 };
 
-export const sendTeamDeleteEmail = async ({
-  email,
-  ...emailTemplateOptions
-}: SendTeamDeleteEmailOptions) => {
+export const sendTeamDeleteEmail = async ({ email, isOwner, team }: SendTeamDeleteEmailOptions) => {
   const template = createElement(TeamDeleteEmailTemplate, {
     assetBaseUrl: WEBAPP_BASE_URL,
     baseUrl: WEBAPP_BASE_URL,
-    ...emailTemplateOptions,
+    teamUrl: team.url,
+    isOwner,
   });
+
+  const branding = team.teamGlobalSettings
+    ? teamGlobalSettingsToBranding(team.teamGlobalSettings)
+    : undefined;
+
+  const lang = team.teamGlobalSettings?.documentLanguage;
+
+  const [html, text] = await Promise.all([
+    renderEmailWithI18N(template, { lang, branding }),
+    renderEmailWithI18N(template, { lang, branding, plainText: true }),
+  ]);
+
+  const i18n = await getI18nInstance(lang);
 
   await mailer.sendMail({
     to: email,
@@ -101,8 +121,8 @@ export const sendTeamDeleteEmail = async ({
       name: FROM_NAME,
       address: FROM_ADDRESS,
     },
-    subject: `Team "${emailTemplateOptions.teamName}" has been deleted on Documenso`,
-    html: render(template),
-    text: render(template, { plainText: true }),
+    subject: i18n._(msg`Team "${team.name}" has been deleted on Documenso`),
+    html,
+    text,
   });
 };

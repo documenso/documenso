@@ -23,7 +23,7 @@ export type PageProps = {
 };
 
 export default async function VerifyEmailPage({ params: { token } }: PageProps) {
-  setupI18nSSR();
+  await setupI18nSSR();
 
   if (!token) {
     return (

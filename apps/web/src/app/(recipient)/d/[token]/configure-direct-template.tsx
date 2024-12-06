@@ -1,7 +1,7 @@
 'use client';
 
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Trans } from '@lingui/macro';
+import { Trans, msg } from '@lingui/macro';
 import { useLingui } from '@lingui/react';
 import { useSession } from 'next-auth/react';
 import { useForm } from 'react-hook-form';
@@ -77,7 +77,7 @@ export const ConfigureDirectTemplateFormPartial = ({
         if (template.Recipient.map((recipient) => recipient.email).includes(items.email)) {
           ctx.addIssue({
             code: z.ZodIssueCode.custom,
-            message: 'Email cannot already exist in the template',
+            message: _(msg`Email cannot already exist in the template`),
             path: ['email'],
           });
         }

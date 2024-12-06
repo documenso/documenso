@@ -1,11 +1,12 @@
 import { createElement } from 'react';
 
+import { msg } from '@lingui/macro';
+
 import { mailer } from '@documenso/email/mailer';
-import { render } from '@documenso/email/render';
 import { DocumentInviteEmailTemplate } from '@documenso/email/templates/document-invite';
 import { FROM_ADDRESS, FROM_NAME } from '@documenso/lib/constants/email';
 import {
-  RECIPIENT_ROLES_DESCRIPTION_ENG,
+  RECIPIENT_ROLES_DESCRIPTION,
   RECIPIENT_ROLE_TO_EMAIL_TYPE,
 } from '@documenso/lib/constants/recipient-roles';
 import { DOCUMENT_AUDIT_LOG_TYPE } from '@documenso/lib/types/document-audit-logs';
@@ -16,7 +17,11 @@ import { prisma } from '@documenso/prisma';
 import { DocumentStatus, RecipientRole, SigningStatus } from '@documenso/prisma/client';
 import type { Prisma } from '@documenso/prisma/client';
 
+import { getI18nInstance } from '../../client-only/providers/i18n.server';
 import { NEXT_PUBLIC_WEBAPP_URL } from '../../constants/app';
+import { extractDerivedDocumentEmailSettings } from '../../types/document-email';
+import { renderEmailWithI18N } from '../../utils/render-email-with-i18n';
+import { teamGlobalSettingsToBranding } from '../../utils/team-global-settings-to-branding';
 import { getDocumentWhereInput } from './get-document-by-id';
 
 export type ResendDocumentOptions = {
@@ -62,6 +67,7 @@ export const resendDocument = async ({
         select: {
           teamEmail: true,
           name: true,
+          teamGlobalSettings: true,
         },
       },
     },
@@ -86,31 +92,50 @@ export const resendDocument = async ({
     throw new Error('Can not send completed document');
   }
 
+  const isRecipientSigningRequestEmailEnabled = extractDerivedDocumentEmailSettings(
+    document.documentMeta,
+  ).recipientSigningRequest;
+
+  if (!isRecipientSigningRequestEmailEnabled) {
+    return;
+  }
+
   await Promise.all(
     document.Recipient.map(async (recipient) => {
       if (recipient.role === RecipientRole.CC) {
         return;
       }
 
+      const i18n = await getI18nInstance(document.documentMeta?.language);
+
       const recipientEmailType = RECIPIENT_ROLE_TO_EMAIL_TYPE[recipient.role];
 
       const { email, name } = recipient;
       const selfSigner = email === user.email;
 
-      const recipientActionVerb =
-        RECIPIENT_ROLES_DESCRIPTION_ENG[recipient.role].actionVerb.toLowerCase();
+      const recipientActionVerb = i18n
+        ._(RECIPIENT_ROLES_DESCRIPTION[recipient.role].actionVerb)
+        .toLowerCase();
 
       let emailMessage = customEmail?.message || '';
-      let emailSubject = `Reminder: Please ${recipientActionVerb} this document`;
+      let emailSubject = i18n._(msg`Reminder: Please ${recipientActionVerb} this document`);
 
       if (selfSigner) {
-        emailMessage = `You have initiated the document ${`"${document.title}"`} that requires you to ${recipientActionVerb} it.`;
-        emailSubject = `Reminder: Please ${recipientActionVerb} your document`;
+        emailMessage = i18n._(
+          msg`You have initiated the document ${`"${document.title}"`} that requires you to ${recipientActionVerb} it.`,
+        );
+        emailSubject = i18n._(msg`Reminder: Please ${recipientActionVerb} your document`);
       }
 
       if (isTeamDocument && document.team) {
-        emailSubject = `Reminder: ${document.team.name} invited you to ${recipientActionVerb} a document`;
-        emailMessage = `${user.name} on behalf of ${document.team.name} has invited you to ${recipientActionVerb} the document "${document.title}".`;
+        emailSubject = i18n._(
+          msg`Reminder: ${document.team.name} invited you to ${recipientActionVerb} a document`,
+        );
+        emailMessage =
+          customEmail?.message ||
+          i18n._(
+            msg`${user.name} on behalf of "${document.team.name}" has invited you to ${recipientActionVerb} the document "${document.title}".`,
+          );
       }
 
       const customEmailTemplate = {
@@ -135,8 +160,24 @@ export const resendDocument = async ({
         teamName: document.team?.name,
       });
 
+      const branding = document.team?.teamGlobalSettings
+        ? teamGlobalSettingsToBranding(document.team.teamGlobalSettings)
+        : undefined;
+
       await prisma.$transaction(
         async (tx) => {
+          const [html, text] = await Promise.all([
+            renderEmailWithI18N(template, {
+              lang: document.documentMeta?.language,
+              branding,
+            }),
+            renderEmailWithI18N(template, {
+              lang: document.documentMeta?.language,
+              branding,
+              plainText: true,
+            }),
+          ]);
+
           await mailer.sendMail({
             to: {
               address: email,
@@ -147,10 +188,13 @@ export const resendDocument = async ({
               address: FROM_ADDRESS,
             },
             subject: customEmail?.subject
-              ? renderCustomEmailTemplate(`Reminder: ${customEmail.subject}`, customEmailTemplate)
+              ? renderCustomEmailTemplate(
+                  i18n._(msg`Reminder: ${customEmail.subject}`),
+                  customEmailTemplate,
+                )
               : emailSubject,
-            html: render(template),
-            text: render(template, { plainText: true }),
+            html,
+            text,
           });
 
           await tx.documentAuditLog.create({

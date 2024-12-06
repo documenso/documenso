@@ -2,10 +2,12 @@
 
 import { Caveat } from 'next/font/google';
 
+import { useLingui } from '@lingui/react';
 import type { Prisma } from '@prisma/client';
 import { createPortal } from 'react-dom';
 
 import { useFieldPageCoords } from '@documenso/lib/client-only/hooks/use-field-page-coords';
+import { parseMessageDescriptor } from '@documenso/lib/utils/i18n';
 import { FieldType } from '@documenso/prisma/client';
 
 import { cn } from '../../lib/utils';
@@ -25,6 +27,8 @@ export type ShowFieldItemProps = {
 };
 
 export const ShowFieldItem = ({ field, recipients }: ShowFieldItemProps) => {
+  const { _ } = useLingui();
+
   const coords = useFieldPageCoords(field);
 
   const signerEmail =
@@ -40,18 +44,18 @@ export const ShowFieldItem = ({ field, recipients }: ShowFieldItemProps) => {
         width: `${coords.width}px`,
       }}
     >
-      <Card className={cn('bg-background h-full w-full')}>
+      <Card className={cn('bg-background h-full w-full [container-type:size]')}>
         <CardContent
           className={cn(
-            'text-muted-foreground/50 flex h-full w-full flex-col items-center justify-center p-2 text-xl',
+            'text-muted-foreground/50 flex h-full w-full flex-col items-center justify-center p-0 text-[clamp(0.575rem,1.8cqw,1.2rem)] leading-none',
             field.type === FieldType.SIGNATURE && fontCaveat.className,
           )}
         >
-          {FRIENDLY_FIELD_TYPE[field.type]}
+          {parseMessageDescriptor(_, FRIENDLY_FIELD_TYPE[field.type])}
 
-          <p className="text-muted-foreground/50 w-full truncate text-center text-xs">
+          {/* <p className="text-muted-foreground/50 w-full truncate text-center text-xs">
             {signerEmail}
-          </p>
+          </p> */}
         </CardContent>
       </Card>
     </div>,

@@ -21,7 +21,7 @@ type AcceptInvitationPageProps = {
 export default async function AcceptInvitationPage({
   params: { token },
 }: AcceptInvitationPageProps) {
-  setupI18nSSR();
+  await setupI18nSSR();
 
   const session = await getServerComponentSession();
 

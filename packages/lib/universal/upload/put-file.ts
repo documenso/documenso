@@ -33,6 +33,10 @@ export const putPdfFile = async (file: File) => {
     });
   }
 
+  if (!file.name.endsWith('.pdf')) {
+    file.name = `${file.name}.pdf`;
+  }
+
   const { type, data } = await putFile(file);
 
   return await createDocumentData({ type, data });

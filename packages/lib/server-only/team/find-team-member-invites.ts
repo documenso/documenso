@@ -1,11 +1,13 @@
 import { P, match } from 'ts-pattern';
+import type { z } from 'zod';
 
 import { prisma } from '@documenso/prisma';
 import type { TeamMemberInvite } from '@documenso/prisma/client';
 import { Prisma } from '@documenso/prisma/client';
+import { TeamMemberInviteSchema } from '@documenso/prisma/generated/zod';
 
 import { TEAM_MEMBER_ROLE_PERMISSIONS_MAP } from '../../constants/teams';
-import type { FindResultSet } from '../../types/find-result-set';
+import { type FindResultSet, ZFindResultSet } from '../../types/find-result-set';
 
 export interface FindTeamMemberInvitesOptions {
   userId: number;
@@ -19,6 +21,18 @@ export interface FindTeamMemberInvitesOptions {
   };
 }
 
+export const ZFindTeamMemberInvitesResponseSchema = ZFindResultSet.extend({
+  data: TeamMemberInviteSchema.pick({
+    id: true,
+    teamId: true,
+    email: true,
+    role: true,
+    createdAt: true,
+  }).array(),
+});
+
+export type TFindTeamMemberInvitesResponse = z.infer<typeof ZFindTeamMemberInvitesResponseSchema>;
+
 export const findTeamMemberInvites = async ({
   userId,
   teamId,
@@ -26,7 +40,7 @@ export const findTeamMemberInvites = async ({
   page = 1,
   perPage = 10,
   orderBy,
-}: FindTeamMemberInvitesOptions) => {
+}: FindTeamMemberInvitesOptions): Promise<TFindTeamMemberInvitesResponse> => {
   const orderByColumn = orderBy?.column ?? 'email';
   const orderByDirection = orderBy?.direction ?? 'desc';
 

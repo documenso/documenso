@@ -24,8 +24,6 @@ import { SigningCard3D } from '@documenso/ui/components/signing-card';
 import { cn } from '@documenso/ui/lib/utils';
 import { Badge } from '@documenso/ui/primitives/badge';
 
-import { truncateTitle } from '~/helpers/truncate-title';
-
 import { SigningAuthPageView } from '../signing-auth-page';
 import { ClaimAccount } from './claim-account';
 import { DocumentPreviewButton } from './document-preview-button';
@@ -40,7 +38,7 @@ export type CompletedSigningPageProps = {
 export default async function CompletedSigningPage({
   params: { token },
 }: CompletedSigningPageProps) {
-  setupI18nSSR();
+  await setupI18nSSR();
 
   const { _ } = useLingui();
 
@@ -60,8 +58,6 @@ export default async function CompletedSigningPage({
   if (!document || !document.documentData) {
     return notFound();
   }
-
-  const truncatedTitle = truncateTitle(document.title);
 
   const { documentData } = document;
 
@@ -118,7 +114,9 @@ export default async function CompletedSigningPage({
           })}
         >
           <Badge variant="neutral" size="default" className="mb-6 rounded-xl border bg-transparent">
-            {truncatedTitle}
+            <span className="block max-w-[10rem] truncate font-medium hover:underline md:max-w-[20rem]">
+              {document.title}
+            </span>
           </Badge>
 
           {/* Card with recipient */}
@@ -222,7 +220,7 @@ export default async function CompletedSigningPage({
           )}
 
           {isLoggedIn && (
-            <Link href="/documents" className="text-documenso-700 hover:text-documenso-600">
+            <Link href="/documents" className="text-documenso-700 hover:text-documenso-600 mt-2">
               <Trans>Go Back Home</Trans>
             </Link>
           )}

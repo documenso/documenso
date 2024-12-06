@@ -11,8 +11,8 @@ export const metadata: Metadata = {
   title: 'Verify Email',
 };
 
-export default function EmailVerificationWithoutTokenPage() {
-  setupI18nSSR();
+export default async function EmailVerificationWithoutTokenPage() {
+  await setupI18nSSR();
 
   return (
     <div className="w-screen max-w-lg px-4">

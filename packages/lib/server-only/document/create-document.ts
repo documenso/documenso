@@ -5,8 +5,11 @@ import { DOCUMENT_AUDIT_LOG_TYPE } from '@documenso/lib/types/document-audit-log
 import type { RequestMetadata } from '@documenso/lib/universal/extract-request-metadata';
 import { createDocumentAuditLogData } from '@documenso/lib/utils/document-audit-logs';
 import { prisma } from '@documenso/prisma';
-import { DocumentSource, WebhookTriggerEvents } from '@documenso/prisma/client';
+import { DocumentSource, DocumentVisibility, WebhookTriggerEvents } from '@documenso/prisma/client';
+import type { Team, TeamGlobalSettings } from '@documenso/prisma/client';
+import { TeamMemberRole } from '@documenso/prisma/client';
 
+import { ZWebhookDocumentSchema } from '../../types/webhook-payload';
 import { triggerWebhook } from '../webhooks/trigger/trigger-webhook';
 
 export type CreateDocumentOptions = {
@@ -45,8 +48,55 @@ export const createDocument = async ({
     teamId !== undefined &&
     !user.teamMembers.some((teamMember) => teamMember.teamId === teamId)
   ) {
-    throw new AppError(AppErrorCode.NOT_FOUND, 'Team not found');
+    throw new AppError(AppErrorCode.NOT_FOUND, {
+      message: 'Team not found',
+    });
   }
+
+  let team: (Team & { teamGlobalSettings: TeamGlobalSettings | null }) | null = null;
+  let userTeamRole: TeamMemberRole | undefined;
+
+  if (teamId) {
+    const teamWithUserRole = await prisma.team.findFirstOrThrow({
+      where: {
+        id: teamId,
+      },
+      include: {
+        teamGlobalSettings: true,
+        members: {
+          where: {
+            userId: userId,
+          },
+          select: {
+            role: true,
+          },
+        },
+      },
+    });
+
+    team = teamWithUserRole;
+    userTeamRole = teamWithUserRole.members[0]?.role;
+  }
+
+  const determineVisibility = (
+    globalVisibility: DocumentVisibility | null | undefined,
+    userRole: TeamMemberRole,
+  ): DocumentVisibility => {
+    const defaultVisibility = globalVisibility ?? DocumentVisibility.EVERYONE;
+
+    if (userRole === TeamMemberRole.ADMIN) {
+      return defaultVisibility;
+    }
+
+    if (userRole === TeamMemberRole.MANAGER) {
+      if (defaultVisibility === DocumentVisibility.ADMIN) {
+        return DocumentVisibility.MANAGER_AND_ABOVE;
+      }
+      return defaultVisibility;
+    }
+
+    return DocumentVisibility.EVERYONE;
+  };
 
   return await prisma.$transaction(async (tx) => {
     const document = await tx.document.create({
@@ -56,8 +106,18 @@ export const createDocument = async ({
         documentDataId,
         userId,
         teamId,
+        visibility: determineVisibility(
+          team?.teamGlobalSettings?.documentVisibility,
+          userTeamRole ?? TeamMemberRole.MEMBER,
+        ),
         formValues,
         source: DocumentSource.DOCUMENT,
+        documentMeta: {
+          create: {
+            language: team?.teamGlobalSettings?.documentLanguage,
+            typedSignatureEnabled: team?.teamGlobalSettings?.typedSignatureEnabled,
+          },
+        },
       },
     });
 
@@ -76,13 +136,27 @@ export const createDocument = async ({
       }),
     });
 
+    const createdDocument = await tx.document.findFirst({
+      where: {
+        id: document.id,
+      },
+      include: {
+        documentMeta: true,
+        Recipient: true,
+      },
+    });
+
+    if (!createdDocument) {
+      throw new Error('Document not found');
+    }
+
     await triggerWebhook({
       event: WebhookTriggerEvents.DOCUMENT_CREATED,
-      data: document,
+      data: ZWebhookDocumentSchema.parse(createdDocument),
       userId,
       teamId,
     });
 
-    return document;
+    return createdDocument;
   });
 };
