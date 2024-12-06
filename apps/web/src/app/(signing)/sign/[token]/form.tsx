@@ -215,6 +215,14 @@ export const SigningForm = ({
                         />
                       </CardContent>
                     </Card>
+
+                    {!signatureValid && (
+                      <div className="text-destructive mt-2 text-sm">
+                        <Trans>
+                          Signature is too small. Please provide a more complete signature.
+                        </Trans>
+                      </div>
+                    )}
                   </div>
                 </div>
 

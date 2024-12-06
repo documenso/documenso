@@ -97,7 +97,6 @@ export type SignaturePadProps = Omit<HTMLAttributes<HTMLCanvasElement>, 'onChang
   disabled?: boolean;
   allowTypedSignature?: boolean;
   defaultValue?: string;
-
   onValidityChange: (isValid: boolean) => void;
 };
 
