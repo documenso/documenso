@@ -7,7 +7,6 @@ import { useLingui } from '@lingui/react';
 import { signOut } from 'next-auth/react';
 
 import type { User } from '@documenso/prisma/client';
-import { TRPCClientError } from '@documenso/trpc/client';
 import { trpc } from '@documenso/trpc/react';
 import { Alert, AlertDescription, AlertTitle } from '@documenso/ui/primitives/alert';
 import { Button } from '@documenso/ui/primitives/button';
@@ -52,30 +51,20 @@ export const DeleteAccountDialog = ({ className, user }: DeleteAccountDialogProp
 
       return await signOut({ callbackUrl: '/' });
     } catch (err) {
-      if (err instanceof TRPCClientError && err.data?.code === 'BAD_REQUEST') {
-        toast({
-          title: _(msg`An error occurred`),
-          description: err.message,
-          variant: 'destructive',
-        });
-      } else {
-        toast({
-          title: _(msg`An unknown error occurred`),
-          variant: 'destructive',
-          description:
-            err.message ??
-            _(
-              msg`We encountered an unknown error while attempting to delete your account. Please try again later.`,
-            ),
-        });
-      }
+      toast({
+        title: _(msg`An unknown error occurred`),
+        variant: 'destructive',
+        description: _(
+          msg`We encountered an unknown error while attempting to delete your account. Please try again later.`,
+        ),
+      });
     }
   };
 
   return (
     <div className={className}>
       <Alert
-        className="flex flex-col items-center justify-between gap-4 p-6 md:flex-row "
+        className="flex flex-col items-center justify-between gap-4 p-6 md:flex-row"
         variant="neutral"
       >
         <div>

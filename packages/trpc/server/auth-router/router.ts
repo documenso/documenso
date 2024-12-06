@@ -33,53 +33,30 @@ const NEXT_PUBLIC_DISABLE_SIGNUP = () => env('NEXT_PUBLIC_DISABLE_SIGNUP');
 
 export const authRouter = router({
   signup: procedure.input(ZSignUpMutationSchema).mutation(async ({ input }) => {
-    try {
-      if (NEXT_PUBLIC_DISABLE_SIGNUP() === 'true') {
-        throw new TRPCError({
-          code: 'BAD_REQUEST',
-          message: 'Signups are disabled.',
-        });
-      }
-
-      const { name, email, password, signature, url } = input;
-
-      if (IS_BILLING_ENABLED() && url && url.length < 6) {
-        throw new AppError(AppErrorCode.PREMIUM_PROFILE_URL, {
-          message: 'Only subscribers can have a username shorter than 6 characters',
-        });
-      }
-
-      const user = await createUser({ name, email, password, signature, url });
-
-      await jobsClient.triggerJob({
-        name: 'send.signup.confirmation.email',
-        payload: {
-          email: user.email,
-        },
-      });
-
-      return user;
-    } catch (err) {
-      console.error(err);
-
-      const error = AppError.parseError(err);
-
-      if (error.code !== AppErrorCode.UNKNOWN_ERROR) {
-        throw error;
-      }
-
-      let message =
-        'We were unable to create your account. Please review the information you provided and try again.';
-
-      if (err instanceof Error && err.message === 'User already exists') {
-        message = 'User with this email already exists. Please use a different email address.';
-      }
-
-      throw new TRPCError({
-        code: 'BAD_REQUEST',
-        message,
+    if (NEXT_PUBLIC_DISABLE_SIGNUP() === 'true') {
+      throw new AppError('SIGNUP_DISABLED', {
+        message: 'Signups are disabled.',
       });
     }
+
+    const { name, email, password, signature, url } = input;
+
+    if (IS_BILLING_ENABLED() && url && url.length < 6) {
+      throw new AppError(AppErrorCode.PREMIUM_PROFILE_URL, {
+        message: 'Only subscribers can have a username shorter than 6 characters',
+      });
+    }
+
+    const user = await createUser({ name, email, password, signature, url });
+
+    await jobsClient.triggerJob({
+      name: 'send.signup.confirmation.email',
+      payload: {
+        email: user.email,
+      },
+    });
+
+    return user;
   }),
 
   verifyPassword: authenticatedProcedure
@@ -104,56 +81,30 @@ export const authRouter = router({
   createPasskey: authenticatedProcedure
     .input(ZCreatePasskeyMutationSchema)
     .mutation(async ({ ctx, input }) => {
-      try {
-        // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
-        const verificationResponse = input.verificationResponse as RegistrationResponseJSON;
+      // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
+      const verificationResponse = input.verificationResponse as RegistrationResponseJSON;
 
-        return await createPasskey({
-          userId: ctx.user.id,
-          verificationResponse,
-          passkeyName: input.passkeyName,
-          requestMetadata: extractNextApiRequestMetadata(ctx.req),
-        });
-      } catch (err) {
-        console.error(err);
-
-        throw err;
-      }
+      return await createPasskey({
+        userId: ctx.user.id,
+        verificationResponse,
+        passkeyName: input.passkeyName,
+        requestMetadata: extractNextApiRequestMetadata(ctx.req),
+      });
     }),
 
   createPasskeyAuthenticationOptions: authenticatedProcedure
     .input(ZCreatePasskeyAuthenticationOptionsMutationSchema)
     .mutation(async ({ ctx, input }) => {
-      try {
-        return await createPasskeyAuthenticationOptions({
-          userId: ctx.user.id,
-          preferredPasskeyId: input?.preferredPasskeyId,
-        });
-      } catch (err) {
-        console.error(err);
-
-        throw new TRPCError({
-          code: 'BAD_REQUEST',
-          message:
-            'We were unable to create the authentication options for the passkey. Please try again later.',
-        });
-      }
+      return await createPasskeyAuthenticationOptions({
+        userId: ctx.user.id,
+        preferredPasskeyId: input?.preferredPasskeyId,
+      });
     }),
 
   createPasskeyRegistrationOptions: authenticatedProcedure.mutation(async ({ ctx }) => {
-    try {
-      return await createPasskeyRegistrationOptions({
-        userId: ctx.user.id,
-      });
-    } catch (err) {
-      console.error(err);
-
-      throw new TRPCError({
-        code: 'BAD_REQUEST',
-        message:
-          'We were unable to create the registration options for the passkey. Please try again later.',
-      });
-    }
+    return await createPasskeyRegistrationOptions({
+      userId: ctx.user.id,
+    });
   }),
 
   createPasskeySigninOptions: procedure.mutation(async ({ ctx }) => {
@@ -168,80 +119,44 @@ export const authRouter = router({
 
     const [sessionId] = decodeURI(sessionIdToken).split('|');
 
-    try {
-      return await createPasskeySigninOptions({ sessionId });
-    } catch (err) {
-      console.error(err);
-
-      throw new TRPCError({
-        code: 'BAD_REQUEST',
-        message: 'We were unable to create the options for passkey signin. Please try again later.',
-      });
-    }
+    return await createPasskeySigninOptions({ sessionId });
   }),
 
   deletePasskey: authenticatedProcedure
     .input(ZDeletePasskeyMutationSchema)
     .mutation(async ({ ctx, input }) => {
-      try {
-        const { passkeyId } = input;
+      const { passkeyId } = input;
 
-        await deletePasskey({
-          userId: ctx.user.id,
-          passkeyId,
-          requestMetadata: extractNextApiRequestMetadata(ctx.req),
-        });
-      } catch (err) {
-        console.error(err);
-
-        throw new TRPCError({
-          code: 'BAD_REQUEST',
-          message: 'We were unable to delete this passkey. Please try again later.',
-        });
-      }
+      await deletePasskey({
+        userId: ctx.user.id,
+        passkeyId,
+        requestMetadata: extractNextApiRequestMetadata(ctx.req),
+      });
     }),
 
   findPasskeys: authenticatedProcedure
     .input(ZFindPasskeysQuerySchema)
     .query(async ({ input, ctx }) => {
-      try {
-        const { page, perPage, orderBy } = input;
+      const { page, perPage, orderBy } = input;
 
-        return await findPasskeys({
-          page,
-          perPage,
-          orderBy,
-          userId: ctx.user.id,
-        });
-      } catch (err) {
-        console.error(err);
-
-        throw new TRPCError({
-          code: 'BAD_REQUEST',
-          message: 'We were unable to find passkeys. Please try again later.',
-        });
-      }
+      return await findPasskeys({
+        page,
+        perPage,
+        orderBy,
+        userId: ctx.user.id,
+      });
     }),
 
   updatePasskey: authenticatedProcedure
     .input(ZUpdatePasskeyMutationSchema)
     .mutation(async ({ ctx, input }) => {
-      try {
-        const { passkeyId, name } = input;
+      const { passkeyId, name } = input;
 
-        await updatePasskey({
-          userId: ctx.user.id,
-          passkeyId,
-          name,
-          requestMetadata: extractNextApiRequestMetadata(ctx.req),
-        });
-      } catch (err) {
-        console.error(err);
-
-        throw new TRPCError({
-          code: 'BAD_REQUEST',
-          message: 'We were unable to update this passkey. Please try again later.',
-        });
-      }
+      await updatePasskey({
+        userId: ctx.user.id,
+        passkeyId,
+        name,
+        requestMetadata: extractNextApiRequestMetadata(ctx.req),
+      });
     }),
 });

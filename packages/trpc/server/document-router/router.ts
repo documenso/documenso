@@ -51,145 +51,82 @@ export const documentRouter = router({
   getDocumentById: authenticatedProcedure
     .input(ZGetDocumentByIdQuerySchema)
     .query(async ({ input, ctx }) => {
-      try {
-        return await getDocumentById({
-          ...input,
-          userId: ctx.user.id,
-        });
-      } catch (err) {
-        console.error(err);
-
-        throw new TRPCError({
-          code: 'BAD_REQUEST',
-          message: 'We were unable to find this document. Please try again later.',
-        });
-      }
+      return await getDocumentById({
+        ...input,
+        userId: ctx.user.id,
+      });
     }),
 
   getDocumentByToken: procedure
     .input(ZGetDocumentByTokenQuerySchema)
     .query(async ({ input, ctx }) => {
-      try {
-        const { token } = input;
+      const { token } = input;
 
-        return await getDocumentAndSenderByToken({
-          token,
-          userId: ctx.user?.id,
-        });
-      } catch (err) {
-        console.error(err);
-
-        throw new TRPCError({
-          code: 'BAD_REQUEST',
-          message: 'We were unable to find this document. Please try again later.',
-        });
-      }
+      return await getDocumentAndSenderByToken({
+        token,
+        userId: ctx.user?.id,
+      });
     }),
 
   getDocumentWithDetailsById: authenticatedProcedure
     .input(ZGetDocumentWithDetailsByIdQuerySchema)
     .query(async ({ input, ctx }) => {
-      try {
-        return await getDocumentWithDetailsById({
-          ...input,
-          userId: ctx.user.id,
-        });
-      } catch (err) {
-        console.error(err);
-
-        throw new TRPCError({
-          code: 'BAD_REQUEST',
-          message: 'We were unable to find this document. Please try again later.',
-        });
-      }
+      return await getDocumentWithDetailsById({
+        ...input,
+        userId: ctx.user.id,
+      });
     }),
 
   createDocument: authenticatedProcedure
     .input(ZCreateDocumentMutationSchema)
     .mutation(async ({ input, ctx }) => {
-      try {
-        const { title, documentDataId, teamId } = input;
+      const { title, documentDataId, teamId } = input;
 
-        const { remaining } = await getServerLimits({ email: ctx.user.email, teamId });
+      const { remaining } = await getServerLimits({ email: ctx.user.email, teamId });
 
-        if (remaining.documents <= 0) {
-          throw new TRPCError({
-            code: 'BAD_REQUEST',
-            message:
-              'You have reached your document limit for this month. Please upgrade your plan.',
-          });
-        }
-
-        return await createDocument({
-          userId: ctx.user.id,
-          teamId,
-          title,
-          documentDataId,
-          requestMetadata: extractNextApiRequestMetadata(ctx.req),
-        });
-      } catch (err) {
-        console.error(err);
-
-        if (err instanceof TRPCError) {
-          throw err;
-        }
-
+      if (remaining.documents <= 0) {
         throw new TRPCError({
           code: 'BAD_REQUEST',
-          message: 'We were unable to create this document. Please try again later.',
+          message: 'You have reached your document limit for this month. Please upgrade your plan.',
         });
       }
+
+      return await createDocument({
+        userId: ctx.user.id,
+        teamId,
+        title,
+        documentDataId,
+        requestMetadata: extractNextApiRequestMetadata(ctx.req),
+      });
     }),
 
   deleteDocument: authenticatedProcedure
     .input(ZDeleteDocumentMutationSchema)
     .mutation(async ({ input, ctx }) => {
-      try {
-        const { id, teamId } = input;
+      const { id, teamId } = input;
 
-        const userId = ctx.user.id;
+      const userId = ctx.user.id;
 
-        return await deleteDocument({
-          id,
-          userId,
-          teamId,
-          requestMetadata: extractNextApiRequestMetadata(ctx.req),
-        });
-      } catch (err) {
-        console.error(err);
-
-        throw new TRPCError({
-          code: 'BAD_REQUEST',
-          message: 'We were unable to delete this document. Please try again later.',
-        });
-      }
+      return await deleteDocument({
+        id,
+        userId,
+        teamId,
+        requestMetadata: extractNextApiRequestMetadata(ctx.req),
+      });
     }),
 
   moveDocumentToTeam: authenticatedProcedure
     .input(ZMoveDocumentsToTeamSchema)
     .mutation(async ({ input, ctx }) => {
-      try {
-        const { documentId, teamId } = input;
-        const userId = ctx.user.id;
+      const { documentId, teamId } = input;
+      const userId = ctx.user.id;
 
-        return await moveDocumentToTeam({
-          documentId,
-          teamId,
-          userId,
-          requestMetadata: extractNextApiRequestMetadata(ctx.req),
-        });
-      } catch (err) {
-        console.error(err);
-
-        if (err instanceof TRPCError) {
-          throw err;
-        }
-
-        throw new TRPCError({
-          code: 'BAD_REQUEST',
-          message: 'We were unable to move this document. Please try again later.',
-        });
-      }
+      return await moveDocumentToTeam({
+        documentId,
+        teamId,
+        userId,
+        requestMetadata: extractNextApiRequestMetadata(ctx.req),
+      });
     }),
 
   findDocuments: authenticatedProcedure
@@ -199,94 +136,66 @@ export const documentRouter = router({
 
       const { search, teamId, templateId, page, perPage, orderBy, source, status } = input;
 
-      try {
-        const documents = await findDocuments({
-          userId: user.id,
-          teamId,
-          templateId,
-          search,
-          source,
-          status,
-          page,
-          perPage,
-          orderBy,
-        });
+      const documents = await findDocuments({
+        userId: user.id,
+        teamId,
+        templateId,
+        search,
+        source,
+        status,
+        page,
+        perPage,
+        orderBy,
+      });
 
-        return documents;
-      } catch (err) {
-        console.error(err);
-
-        throw new TRPCError({
-          code: 'BAD_REQUEST',
-          message: 'We are unable to search for documents. Please try again later.',
-        });
-      }
+      return documents;
     }),
 
   findDocumentAuditLogs: authenticatedProcedure
     .input(ZFindDocumentAuditLogsQuerySchema)
     .query(async ({ input, ctx }) => {
-      try {
-        const { page, perPage, documentId, cursor, filterForRecentActivity, orderBy } = input;
+      const { page, perPage, documentId, cursor, filterForRecentActivity, orderBy } = input;
 
-        return await findDocumentAuditLogs({
-          page,
-          perPage,
-          documentId,
-          cursor,
-          filterForRecentActivity,
-          orderBy,
-          userId: ctx.user.id,
-        });
-      } catch (err) {
-        console.error(err);
-
-        throw new TRPCError({
-          code: 'BAD_REQUEST',
-          message: 'We were unable to find audit logs for this document. Please try again later.',
-        });
-      }
+      return await findDocumentAuditLogs({
+        page,
+        perPage,
+        documentId,
+        cursor,
+        filterForRecentActivity,
+        orderBy,
+        userId: ctx.user.id,
+      });
     }),
 
   // Todo: Add API
   setSettingsForDocument: authenticatedProcedure
     .input(ZSetSettingsForDocumentMutationSchema)
     .mutation(async ({ input, ctx }) => {
-      try {
-        const { documentId, teamId, data, meta } = input;
+      const { documentId, teamId, data, meta } = input;
 
-        const userId = ctx.user.id;
+      const userId = ctx.user.id;
 
-        const requestMetadata = extractNextApiRequestMetadata(ctx.req);
+      const requestMetadata = extractNextApiRequestMetadata(ctx.req);
 
-        if (meta.timezone || meta.dateFormat || meta.redirectUrl) {
-          await upsertDocumentMeta({
-            documentId,
-            dateFormat: meta.dateFormat,
-            timezone: meta.timezone,
-            redirectUrl: meta.redirectUrl,
-            language: meta.language,
-            userId: ctx.user.id,
-            requestMetadata,
-          });
-        }
-
-        return await updateDocumentSettings({
-          userId,
-          teamId,
+      if (meta.timezone || meta.dateFormat || meta.redirectUrl) {
+        await upsertDocumentMeta({
           documentId,
-          data,
+          dateFormat: meta.dateFormat,
+          timezone: meta.timezone,
+          redirectUrl: meta.redirectUrl,
+          language: meta.language,
+          userId: ctx.user.id,
           requestMetadata,
         });
-      } catch (err) {
-        console.error(err);
-
-        throw new TRPCError({
-          code: 'BAD_REQUEST',
-          message:
-            'We were unable to update the settings for this document. Please try again later.',
-        });
       }
+
+      return await updateDocumentSettings({
+        userId,
+        teamId,
+        documentId,
+        data,
+        requestMetadata,
+      });
     }),
 
   setTitleForDocument: authenticatedProcedure
@@ -296,197 +205,131 @@ export const documentRouter = router({
 
       const userId = ctx.user.id;
 
-      try {
-        return await updateTitle({
-          title,
-          userId,
-          teamId,
-          documentId,
-          requestMetadata: extractNextApiRequestMetadata(ctx.req),
-        });
-      } catch (err) {
-        console.error(err);
-
-        throw err;
-      }
+      return await updateTitle({
+        title,
+        userId,
+        teamId,
+        documentId,
+        requestMetadata: extractNextApiRequestMetadata(ctx.req),
+      });
     }),
 
   setPasswordForDocument: authenticatedProcedure
     .input(ZSetPasswordForDocumentMutationSchema)
     .mutation(async ({ input, ctx }) => {
-      try {
-        const { documentId, password } = input;
+      const { documentId, password } = input;
 
-        const key = DOCUMENSO_ENCRYPTION_KEY;
+      const key = DOCUMENSO_ENCRYPTION_KEY;
 
-        if (!key) {
-          throw new Error('Missing encryption key');
-        }
-
-        const securePassword = symmetricEncrypt({
-          data: password,
-          key,
-        });
-
-        await upsertDocumentMeta({
-          documentId,
-          password: securePassword,
-          userId: ctx.user.id,
-          requestMetadata: extractNextApiRequestMetadata(ctx.req),
-        });
-      } catch (err) {
-        console.error(err);
-
-        throw new TRPCError({
-          code: 'BAD_REQUEST',
-          message: 'We were unable to set the password for this document. Please try again later.',
-        });
+      if (!key) {
+        throw new Error('Missing encryption key');
       }
+
+      const securePassword = symmetricEncrypt({
+        data: password,
+        key,
+      });
+
+      await upsertDocumentMeta({
+        documentId,
+        password: securePassword,
+        userId: ctx.user.id,
+        requestMetadata: extractNextApiRequestMetadata(ctx.req),
+      });
     }),
 
   setSigningOrderForDocument: authenticatedProcedure
     .input(ZSetSigningOrderForDocumentMutationSchema)
     .mutation(async ({ input, ctx }) => {
-      try {
-        const { documentId, signingOrder } = input;
+      const { documentId, signingOrder } = input;
 
-        return await upsertDocumentMeta({
-          documentId,
-          signingOrder,
-          userId: ctx.user.id,
-          requestMetadata: extractNextApiRequestMetadata(ctx.req),
-        });
-      } catch (err) {
-        console.error(err);
-
-        throw new TRPCError({
-          code: 'BAD_REQUEST',
-          message:
-            'We were unable to update the settings for this document. Please try again later.',
-        });
-      }
+      return await upsertDocumentMeta({
+        documentId,
+        signingOrder,
+        userId: ctx.user.id,
+        requestMetadata: extractNextApiRequestMetadata(ctx.req),
+      });
     }),
 
   updateTypedSignatureSettings: authenticatedProcedure
     .input(ZUpdateTypedSignatureSettingsMutationSchema)
     .mutation(async ({ input, ctx }) => {
-      try {
-        const { documentId, teamId, typedSignatureEnabled } = input;
+      const { documentId, teamId, typedSignatureEnabled } = input;
 
-        const document = await getDocumentById({
-          id: documentId,
-          teamId,
-          userId: ctx.user.id,
-        }).catch(() => null);
+      const document = await getDocumentById({
+        id: documentId,
+        teamId,
+        userId: ctx.user.id,
+      }).catch(() => null);
 
-        if (!document) {
-          throw new TRPCError({
-            code: 'NOT_FOUND',
-            message: 'Document not found',
-          });
-        }
-
-        return await upsertDocumentMeta({
-          documentId,
-          typedSignatureEnabled,
-          userId: ctx.user.id,
-          requestMetadata: extractNextApiRequestMetadata(ctx.req),
-        });
-      } catch (err) {
-        console.error(err);
-
-        if (err instanceof TRPCError) {
-          throw err;
-        }
-
+      if (!document) {
         throw new TRPCError({
-          code: 'BAD_REQUEST',
-          message:
-            'We were unable to update the settings for this document. Please try again later.',
+          code: 'NOT_FOUND',
+          message: 'Document not found',
         });
       }
+
+      return await upsertDocumentMeta({
+        documentId,
+        typedSignatureEnabled,
+        userId: ctx.user.id,
+        requestMetadata: extractNextApiRequestMetadata(ctx.req),
+      });
     }),
 
   sendDocument: authenticatedProcedure
     .input(ZSendDocumentMutationSchema)
     .mutation(async ({ input, ctx }) => {
-      try {
-        const { documentId, teamId, meta } = input;
+      const { documentId, teamId, meta } = input;
 
-        if (
-          meta.message ||
-          meta.subject ||
-          meta.timezone ||
-          meta.dateFormat ||
-          meta.redirectUrl ||
-          meta.distributionMethod ||
-          meta.emailSettings
-        ) {
-          await upsertDocumentMeta({
-            documentId,
-            subject: meta.subject,
-            message: meta.message,
-            dateFormat: meta.dateFormat,
-            timezone: meta.timezone,
-            redirectUrl: meta.redirectUrl,
-            distributionMethod: meta.distributionMethod,
-            userId: ctx.user.id,
-            emailSettings: meta.emailSettings,
-            requestMetadata: extractNextApiRequestMetadata(ctx.req),
-          });
-        }
-
-        return await sendDocument({
-          userId: ctx.user.id,
+      if (
+        meta.message ||
+        meta.subject ||
+        meta.timezone ||
+        meta.dateFormat ||
+        meta.redirectUrl ||
+        meta.distributionMethod ||
+        meta.emailSettings
+      ) {
+        await upsertDocumentMeta({
           documentId,
-          teamId,
+          subject: meta.subject,
+          message: meta.message,
+          dateFormat: meta.dateFormat,
+          timezone: meta.timezone,
+          redirectUrl: meta.redirectUrl,
+          distributionMethod: meta.distributionMethod,
+          userId: ctx.user.id,
+          emailSettings: meta.emailSettings,
           requestMetadata: extractNextApiRequestMetadata(ctx.req),
         });
-      } catch (err) {
-        console.error(err);
-
-        throw new TRPCError({
-          code: 'BAD_REQUEST',
-          message: 'We were unable to send this document. Please try again later.',
-        });
       }
+
+      return await sendDocument({
+        userId: ctx.user.id,
+        documentId,
+        teamId,
+        requestMetadata: extractNextApiRequestMetadata(ctx.req),
+      });
     }),
 
   resendDocument: authenticatedProcedure
     .input(ZResendDocumentMutationSchema)
     .mutation(async ({ input, ctx }) => {
-      try {
-        return await resendDocument({
-          userId: ctx.user.id,
-          ...input,
-          requestMetadata: extractNextApiRequestMetadata(ctx.req),
-        });
-      } catch (err) {
-        console.error(err);
-
-        throw new TRPCError({
-          code: 'BAD_REQUEST',
-          message: 'We were unable to resend this document. Please try again later.',
-        });
-      }
+      return await resendDocument({
+        userId: ctx.user.id,
+        ...input,
+        requestMetadata: extractNextApiRequestMetadata(ctx.req),
+      });
     }),
 
   duplicateDocument: authenticatedProcedure
     .input(ZGetDocumentByIdQuerySchema)
     .mutation(async ({ input, ctx }) => {
-      try {
-        return await duplicateDocumentById({
-          userId: ctx.user.id,
-          ...input,
-        });
-      } catch (err) {
-        console.log(err);
-
-        throw new TRPCError({
-          code: 'BAD_REQUEST',
-          message: 'We are unable to duplicate this document. Please try again later.',
-        });
-      }
+      return await duplicateDocumentById({
+        userId: ctx.user.id,
+        ...input,
+      });
     }),
 
   searchDocuments: authenticatedProcedure
@@ -494,93 +337,64 @@ export const documentRouter = router({
     .query(async ({ input, ctx }) => {
       const { query } = input;
 
-      try {
-        const documents = await searchDocumentsWithKeyword({
-          query,
-          userId: ctx.user.id,
-        });
+      const documents = await searchDocumentsWithKeyword({
+        query,
+        userId: ctx.user.id,
+      });
 
-        return documents;
-      } catch (err) {
-        console.error(err);
-
-        throw new TRPCError({
-          code: 'BAD_REQUEST',
-          message: 'We are unable to search for documents. Please try again later.',
-        });
-      }
+      return documents;
     }),
 
   downloadAuditLogs: authenticatedProcedure
     .input(ZDownloadAuditLogsMutationSchema)
     .mutation(async ({ input, ctx }) => {
-      try {
-        const { documentId, teamId } = input;
+      const { documentId, teamId } = input;
 
-        const document = await getDocumentById({
-          id: documentId,
-          userId: ctx.user.id,
-          teamId,
-        }).catch(() => null);
+      const document = await getDocumentById({
+        id: documentId,
+        userId: ctx.user.id,
+        teamId,
+      }).catch(() => null);
 
-        if (!document || (teamId && document.teamId !== teamId)) {
-          throw new TRPCError({
-            code: 'FORBIDDEN',
-            message: 'You do not have access to this document.',
-          });
-        }
-
-        const encrypted = encryptSecondaryData({
-          data: document.id.toString(),
-          expiresAt: DateTime.now().plus({ minutes: 5 }).toJSDate().valueOf(),
-        });
-
-        return {
-          url: `${NEXT_PUBLIC_WEBAPP_URL()}/__htmltopdf/audit-log?d=${encrypted}`,
-        };
-      } catch (err) {
-        console.error(err);
-
+      if (!document || (teamId && document.teamId !== teamId)) {
         throw new TRPCError({
-          code: 'BAD_REQUEST',
-          message:
-            'We were unable to download the audit logs for this document. Please try again later.',
+          code: 'FORBIDDEN',
+          message: 'You do not have access to this document.',
         });
       }
+
+      const encrypted = encryptSecondaryData({
+        data: document.id.toString(),
+        expiresAt: DateTime.now().plus({ minutes: 5 }).toJSDate().valueOf(),
+      });
+
+      return {
+        url: `${NEXT_PUBLIC_WEBAPP_URL()}/__htmltopdf/audit-log?d=${encrypted}`,
+      };
     }),
 
   downloadCertificate: authenticatedProcedure
     .input(ZDownloadCertificateMutationSchema)
     .mutation(async ({ input, ctx }) => {
-      try {
-        const { documentId, teamId } = input;
+      const { documentId, teamId } = input;
 
-        const document = await getDocumentById({
-          id: documentId,
-          userId: ctx.user.id,
-          teamId,
-        });
+      const document = await getDocumentById({
+        id: documentId,
+        userId: ctx.user.id,
+        teamId,
+      });
 
-        if (document.status !== DocumentStatus.COMPLETED) {
-          throw new AppError('DOCUMENT_NOT_COMPLETE');
-        }
-
-        const encrypted = encryptSecondaryData({
-          data: document.id.toString(),
-          expiresAt: DateTime.now().plus({ minutes: 5 }).toJSDate().valueOf(),
-        });
-
-        return {
-          url: `${NEXT_PUBLIC_WEBAPP_URL()}/__htmltopdf/certificate?d=${encrypted}`,
-        };
-      } catch (err) {
-        console.error(err);
-
-        throw new TRPCError({
-          code: 'BAD_REQUEST',
-          message:
-            'We were unable to download the audit logs for this document. Please try again later.',
-        });
+      if (document.status !== DocumentStatus.COMPLETED) {
+        throw new AppError('DOCUMENT_NOT_COMPLETE');
       }
+
+      const encrypted = encryptSecondaryData({
+        data: document.id.toString(),
+        expiresAt: DateTime.now().plus({ minutes: 5 }).toJSDate().valueOf(),
+      });
+
+      return {
+        url: `${NEXT_PUBLIC_WEBAPP_URL()}/__htmltopdf/certificate?d=${encrypted}`,
+      };
     }),
 });

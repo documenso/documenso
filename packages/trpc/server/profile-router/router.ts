@@ -1,5 +1,3 @@
-import { TRPCError } from '@trpc/server';
-
 import { IS_BILLING_ENABLED } from '@documenso/lib/constants/app';
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import { jobsClient } from '@documenso/lib/jobs/client';
@@ -33,246 +31,122 @@ export const profileRouter = router({
   findUserSecurityAuditLogs: authenticatedProcedure
     .input(ZFindUserSecurityAuditLogsSchema)
     .query(async ({ input, ctx }) => {
-      try {
-        return await findUserSecurityAuditLogs({
-          userId: ctx.user.id,
-          ...input,
-        });
-      } catch (err) {
-        console.error(err);
-
-        throw new TRPCError({
-          code: 'BAD_REQUEST',
-          message: 'We were unable to find user security audit logs. Please try again.',
-        });
-      }
+      return await findUserSecurityAuditLogs({
+        userId: ctx.user.id,
+        ...input,
+      });
     }),
 
   getUser: adminProcedure.input(ZRetrieveUserByIdQuerySchema).query(async ({ input }) => {
-    try {
-      const { id } = input;
+    const { id } = input;
 
-      return await getUserById({ id });
-    } catch (err) {
-      console.error(err);
-
-      throw new TRPCError({
-        code: 'BAD_REQUEST',
-        message: 'We were unable to retrieve the specified account. Please try again.',
-      });
-    }
+    return await getUserById({ id });
   }),
 
   updateProfile: authenticatedProcedure
     .input(ZUpdateProfileMutationSchema)
     .mutation(async ({ input, ctx }) => {
-      try {
-        const { name, signature } = input;
+      const { name, signature } = input;
 
-        return await updateProfile({
-          userId: ctx.user.id,
-          name,
-          signature,
-          requestMetadata: extractNextApiRequestMetadata(ctx.req),
-        });
-      } catch (err) {
-        console.error(err);
-
-        throw new TRPCError({
-          code: 'BAD_REQUEST',
-          message:
-            'We were unable to update your profile. Please review the information you provided and try again.',
-        });
-      }
+      return await updateProfile({
+        userId: ctx.user.id,
+        name,
+        signature,
+        requestMetadata: extractNextApiRequestMetadata(ctx.req),
+      });
     }),
 
   updatePublicProfile: authenticatedProcedure
     .input(ZUpdatePublicProfileMutationSchema)
     .mutation(async ({ input, ctx }) => {
-      try {
-        const { url, bio, enabled } = input;
+      const { url, bio, enabled } = input;
 
-        if (IS_BILLING_ENABLED() && url !== undefined && url.length < 6) {
-          const subscriptions = await getSubscriptionsByUserId({
-            userId: ctx.user.id,
-          }).then((subscriptions) =>
-            subscriptions.filter((s) => s.status === SubscriptionStatus.ACTIVE),
-          );
-
-          if (subscriptions.length === 0) {
-            throw new AppError(AppErrorCode.PREMIUM_PROFILE_URL, {
-              message: 'Only subscribers can have a username shorter than 6 characters',
-            });
-          }
-        }
-
-        const user = await updatePublicProfile({
+      if (IS_BILLING_ENABLED() && url !== undefined && url.length < 6) {
+        const subscriptions = await getSubscriptionsByUserId({
           userId: ctx.user.id,
-          data: {
-            url,
-            bio,
-            enabled,
-          },
-        });
+        }).then((subscriptions) =>
+          subscriptions.filter((s) => s.status === SubscriptionStatus.ACTIVE),
+        );
 
-        return { success: true, url: user.url };
-      } catch (err) {
-        console.error(err);
-
-        const error = AppError.parseError(err);
-
-        if (error.code !== AppErrorCode.UNKNOWN_ERROR) {
-          throw error;
+        if (subscriptions.length === 0) {
+          throw new AppError(AppErrorCode.PREMIUM_PROFILE_URL, {
+            message: 'Only subscribers can have a username shorter than 6 characters',
+          });
         }
-
-        throw new TRPCError({
-          code: 'BAD_REQUEST',
-          message:
-            'We were unable to update your public profile. Please review the information you provided and try again.',
-        });
       }
+
+      const user = await updatePublicProfile({
+        userId: ctx.user.id,
+        data: {
+          url,
+          bio,
+          enabled,
+        },
+      });
+
+      return { success: true, url: user.url };
     }),
 
   updatePassword: authenticatedProcedure
     .input(ZUpdatePasswordMutationSchema)
     .mutation(async ({ input, ctx }) => {
-      try {
-        const { password, currentPassword } = input;
+      const { password, currentPassword } = input;
 
-        return await updatePassword({
-          userId: ctx.user.id,
-          password,
-          currentPassword,
-          requestMetadata: extractNextApiRequestMetadata(ctx.req),
-        });
-      } catch (err) {
-        console.error(err);
-
-        let message =
-          'We were unable to update your profile. Please review the information you provided and try again.';
-
-        if (err instanceof Error) {
-          message = err.message;
-        }
-
-        throw new TRPCError({
-          code: 'BAD_REQUEST',
-          message,
-        });
-      }
+      return await updatePassword({
+        userId: ctx.user.id,
+        password,
+        currentPassword,
+        requestMetadata: extractNextApiRequestMetadata(ctx.req),
+      });
     }),
 
   forgotPassword: procedure.input(ZForgotPasswordFormSchema).mutation(async ({ input }) => {
-    try {
-      const { email } = input;
+    const { email } = input;
 
-      return await forgotPassword({
-        email,
-      });
-    } catch (err) {
-      console.error(err);
-    }
+    return await forgotPassword({
+      email,
+    });
   }),
 
   resetPassword: procedure.input(ZResetPasswordFormSchema).mutation(async ({ input, ctx }) => {
-    try {
-      const { password, token } = input;
+    const { password, token } = input;
 
-      return await resetPassword({
-        token,
-        password,
-        requestMetadata: extractNextApiRequestMetadata(ctx.req),
-      });
-    } catch (err) {
-      console.error(err);
-
-      let message = 'We were unable to reset your password. Please try again.';
-
-      if (err instanceof Error) {
-        message = err.message;
-      }
-
-      throw new TRPCError({
-        code: 'BAD_REQUEST',
-        message,
-      });
-    }
+    return await resetPassword({
+      token,
+      password,
+      requestMetadata: extractNextApiRequestMetadata(ctx.req),
+    });
   }),
 
   sendConfirmationEmail: procedure
     .input(ZConfirmEmailMutationSchema)
     .mutation(async ({ input }) => {
-      try {
-        const { email } = input;
+      const { email } = input;
 
-        await jobsClient.triggerJob({
-          name: 'send.signup.confirmation.email',
-          payload: {
-            email,
-          },
-        });
-      } catch (err) {
-        console.error(err);
-
-        let message = 'We were unable to send a confirmation email. Please try again.';
-
-        if (err instanceof Error) {
-          message = err.message;
-        }
-
-        throw new TRPCError({
-          code: 'BAD_REQUEST',
-          message,
-        });
-      }
+      await jobsClient.triggerJob({
+        name: 'send.signup.confirmation.email',
+        payload: {
+          email,
+        },
+      });
     }),
 
   deleteAccount: authenticatedProcedure.mutation(async ({ ctx }) => {
-    try {
-      return await deleteUser({
-        id: ctx.user.id,
-      });
-    } catch (err) {
-      console.error(err);
-
-      let message = 'We were unable to delete your account. Please try again.';
-
-      if (err instanceof Error) {
-        message = err.message;
-      }
-
-      throw new TRPCError({
-        code: 'BAD_REQUEST',
-        message,
-      });
-    }
+    return await deleteUser({
+      id: ctx.user.id,
+    });
   }),
 
   setProfileImage: authenticatedProcedure
     .input(ZSetProfileImageMutationSchema)
     .mutation(async ({ input, ctx }) => {
-      try {
-        const { bytes, teamId } = input;
+      const { bytes, teamId } = input;
 
-        return await setAvatarImage({
-          userId: ctx.user.id,
-          teamId,
-          bytes,
-          requestMetadata: extractNextApiRequestMetadata(ctx.req),
-        });
-      } catch (err) {
-        console.error(err);
-
-        let message = 'We were unable to update your profile image. Please try again.';
-
-        if (err instanceof Error) {
-          message = err.message;
-        }
-
-        throw new TRPCError({
-          code: 'BAD_REQUEST',
-          message,
-        });
-      }
+      return await setAvatarImage({
+        userId: ctx.user.id,
+        teamId,
+        bytes,
+        requestMetadata: extractNextApiRequestMetadata(ctx.req),
+      });
     }),
 });
