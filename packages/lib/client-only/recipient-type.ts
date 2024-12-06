@@ -7,6 +7,7 @@ export enum RecipientStatusType {
   WAITING = 'waiting',
   UNSIGNED = 'unsigned',
   REJECTED = 'rejected',
+  EXPIRED = 'expired',
 }
 
 export const getRecipientType = (recipient: Recipient) => {
@@ -36,6 +37,10 @@ export const getRecipientType = (recipient: Recipient) => {
     return RecipientStatusType.WAITING;
   }
 
+  if (recipient.signingStatus === SigningStatus.EXPIRED) {
+    return RecipientStatusType.EXPIRED;
+  }
+
   return RecipientStatusType.UNSIGNED;
 };
 
@@ -52,6 +57,10 @@ export const getExtraRecipientsType = (extraRecipients: Recipient[]) => {
 
   if (types.includes(RecipientStatusType.WAITING)) {
     return RecipientStatusType.WAITING;
+  }
+
+  if (types.includes(RecipientStatusType.EXPIRED)) {
+    return RecipientStatusType.EXPIRED;
   }
 
   return RecipientStatusType.COMPLETED;
