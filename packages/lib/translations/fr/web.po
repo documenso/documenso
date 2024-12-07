@@ -506,7 +506,7 @@ msgstr "Une erreur est survenue lors de la suppression du champ."
 #: apps/web/src/app/(signing)/sign/[token]/name-field.tsx:148
 #: apps/web/src/app/(signing)/sign/[token]/number-field.tsx:195
 #: apps/web/src/app/(signing)/sign/[token]/radio-field.tsx:129
-#: apps/web/src/app/(signing)/sign/[token]/signature-field.tsx:193
+#: apps/web/src/app/(signing)/sign/[token]/signature-field.tsx:194
 msgid "An error occurred while removing the signature."
 msgstr "Une erreur est survenue lors de la suppression de la signature."
 
@@ -530,7 +530,7 @@ msgstr "Une erreur est survenue lors de l'envoi de votre e-mail de confirmation"
 #: apps/web/src/app/(signing)/sign/[token]/name-field.tsx:122
 #: apps/web/src/app/(signing)/sign/[token]/number-field.tsx:150
 #: apps/web/src/app/(signing)/sign/[token]/radio-field.tsx:102
-#: apps/web/src/app/(signing)/sign/[token]/signature-field.tsx:167
+#: apps/web/src/app/(signing)/sign/[token]/signature-field.tsx:168
 #: apps/web/src/app/(signing)/sign/[token]/text-field.tsx:168
 msgid "An error occurred while signing the document."
 msgstr "Une erreur est survenue lors de la signature du document."
@@ -626,7 +626,7 @@ msgstr "Version de l'application"
 msgid "Approve"
 msgstr "Approuver"
 
-#: apps/web/src/app/(signing)/sign/[token]/form.tsx:129
+#: apps/web/src/app/(signing)/sign/[token]/form.tsx:134
 msgid "Approve Document"
 msgstr "Approuver le document"
 
@@ -787,18 +787,13 @@ msgstr "En utilisant la fonctionnalité de signature électronique, vous consent
 #: apps/web/src/app/(signing)/sign/[token]/document-action-auth-account.tsx:71
 #: apps/web/src/app/(signing)/sign/[token]/document-action-auth-passkey.tsx:164
 #: apps/web/src/app/(signing)/sign/[token]/document-action-auth-passkey.tsx:189
-#: apps/web/src/app/(signing)/sign/[token]/form.tsx:151
-#: apps/web/src/app/(signing)/sign/[token]/form.tsx:220
+#: apps/web/src/app/(signing)/sign/[token]/form.tsx:156
+#: apps/web/src/app/(signing)/sign/[token]/form.tsx:238
 #: apps/web/src/app/(signing)/sign/[token]/name-field.tsx:215
 #: apps/web/src/app/(signing)/sign/[token]/number-field.tsx:328
 #: apps/web/src/app/(signing)/sign/[token]/reject-document-dialog.tsx:153
-<<<<<<< HEAD
-#: apps/web/src/app/(signing)/sign/[token]/sign-dialog.tsx:113
-#: apps/web/src/app/(signing)/sign/[token]/signature-field.tsx:309
-=======
 #: apps/web/src/app/(signing)/sign/[token]/sign-dialog.tsx:130
-#: apps/web/src/app/(signing)/sign/[token]/signature-field.tsx:305
->>>>>>> main
+#: apps/web/src/app/(signing)/sign/[token]/signature-field.tsx:312
 #: apps/web/src/app/(signing)/sign/[token]/text-field.tsx:335
 #: apps/web/src/app/(teams)/t/[teamUrl]/settings/team-transfer-status.tsx:121
 #: apps/web/src/components/(dashboard)/settings/token/delete-token-dialog.tsx:176
@@ -886,7 +881,7 @@ msgid "Click to copy signing link for sending to recipient"
 msgstr "Cliquez pour copier le lien de signature à envoyer au destinataire"
 
 #: apps/web/src/app/(recipient)/d/[token]/sign-direct-template.tsx:175
-#: apps/web/src/app/(signing)/sign/[token]/form.tsx:115
+#: apps/web/src/app/(signing)/sign/[token]/form.tsx:120
 #: apps/web/src/app/embed/direct/[[...url]]/client.tsx:456
 #: apps/web/src/app/embed/sign/[[...url]]/client.tsx:335
 msgid "Click to insert field"
@@ -1803,9 +1798,9 @@ msgstr "Entrez votre texte ici"
 #: apps/web/src/app/(signing)/sign/[token]/number-field.tsx:194
 #: apps/web/src/app/(signing)/sign/[token]/radio-field.tsx:101
 #: apps/web/src/app/(signing)/sign/[token]/radio-field.tsx:128
-#: apps/web/src/app/(signing)/sign/[token]/signature-field.tsx:132
-#: apps/web/src/app/(signing)/sign/[token]/signature-field.tsx:166
-#: apps/web/src/app/(signing)/sign/[token]/signature-field.tsx:192
+#: apps/web/src/app/(signing)/sign/[token]/signature-field.tsx:133
+#: apps/web/src/app/(signing)/sign/[token]/signature-field.tsx:167
+#: apps/web/src/app/(signing)/sign/[token]/signature-field.tsx:193
 #: apps/web/src/app/(signing)/sign/[token]/text-field.tsx:167
 #: apps/web/src/app/(signing)/sign/[token]/text-field.tsx:195
 #: apps/web/src/components/(dashboard)/layout/verify-email-banner.tsx:54
@@ -1869,7 +1864,7 @@ msgid "Forgot your password?"
 msgstr "Mot de passe oublié ?"
 
 #: apps/web/src/app/(recipient)/d/[token]/sign-direct-template.tsx:326
-#: apps/web/src/app/(signing)/sign/[token]/form.tsx:178
+#: apps/web/src/app/(signing)/sign/[token]/form.tsx:183
 #: apps/web/src/app/(signing)/sign/[token]/name-field.tsx:193
 #: apps/web/src/app/embed/direct/[[...url]]/client.tsx:378
 #: apps/web/src/app/embed/sign/[[...url]]/client.tsx:258
@@ -2699,7 +2694,7 @@ msgstr "Veuillez entrer un nom significatif pour votre jeton. Cela vous aidera �
 msgid "Please enter a valid name."
 msgstr ""
 
-#: apps/web/src/app/(signing)/sign/[token]/form.tsx:135
+#: apps/web/src/app/(signing)/sign/[token]/form.tsx:140
 msgid "Please mark as viewed to complete"
 msgstr "Veuillez marquer comme vu pour terminer"
 
@@ -2743,7 +2738,7 @@ msgstr "Veuillez fournir un jeton de l'authentificateur, ou un code de secours. 
 msgid "Please provide a token from your authenticator, or a backup code."
 msgstr "Veuillez fournir un jeton de votre authentificateur, ou un code de secours."
 
-#: apps/web/src/app/(signing)/sign/[token]/form.tsx:169
+#: apps/web/src/app/(signing)/sign/[token]/form.tsx:174
 msgid "Please review the document before signing."
 msgstr "Veuillez examiner le document avant de signer."
 
@@ -3204,19 +3199,14 @@ msgstr "Afficher des modèles dans le profil public de votre équipe pour que vo
 #: apps/web/src/app/(signing)/sign/[token]/auto-sign.tsx:229
 #: apps/web/src/app/(signing)/sign/[token]/document-action-auth-2fa.tsx:182
 #: apps/web/src/app/(signing)/sign/[token]/name-field.tsx:224
-<<<<<<< HEAD
-#: apps/web/src/app/(signing)/sign/[token]/sign-dialog.tsx:124
-#: apps/web/src/app/(signing)/sign/[token]/signature-field.tsx:317
-=======
 #: apps/web/src/app/(signing)/sign/[token]/sign-dialog.tsx:141
-#: apps/web/src/app/(signing)/sign/[token]/signature-field.tsx:313
->>>>>>> main
+#: apps/web/src/app/(signing)/sign/[token]/signature-field.tsx:320
 #: apps/web/src/components/ui/user-profile-skeleton.tsx:75
 #: apps/web/src/components/ui/user-profile-timur.tsx:81
 msgid "Sign"
 msgstr "Signer"
 
-#: apps/web/src/app/(signing)/sign/[token]/signature-field.tsx:277
+#: apps/web/src/app/(signing)/sign/[token]/signature-field.tsx:278
 msgid "Sign as {0} <0>({1})</0>"
 msgstr "Signer comme {0} <0>({1})</0>"
 
@@ -3229,7 +3219,7 @@ msgstr "Signer comme<0>{0} <1>({1})</1></0>"
 msgid "Sign document"
 msgstr "Signer le document"
 
-#: apps/web/src/app/(signing)/sign/[token]/form.tsx:128
+#: apps/web/src/app/(signing)/sign/[token]/form.tsx:133
 msgid "Sign Document"
 msgstr "Signer le document"
 
@@ -3283,9 +3273,9 @@ msgstr "S'inscrire avec OIDC"
 #: apps/web/src/app/(dashboard)/admin/documents/[id]/recipient-item.tsx:88
 #: apps/web/src/app/(internal)/%5F%5Fhtmltopdf/certificate/page.tsx:177
 #: apps/web/src/app/(recipient)/d/[token]/sign-direct-template.tsx:338
-#: apps/web/src/app/(signing)/sign/[token]/form.tsx:192
-#: apps/web/src/app/(signing)/sign/[token]/signature-field.tsx:250
-#: apps/web/src/app/(signing)/sign/[token]/signature-field.tsx:285
+#: apps/web/src/app/(signing)/sign/[token]/form.tsx:197
+#: apps/web/src/app/(signing)/sign/[token]/signature-field.tsx:251
+#: apps/web/src/app/(signing)/sign/[token]/signature-field.tsx:286
 #: apps/web/src/app/embed/direct/[[...url]]/client.tsx:408
 #: apps/web/src/app/embed/sign/[[...url]]/client.tsx:287
 #: apps/web/src/components/forms/profile.tsx:132
@@ -3295,6 +3285,10 @@ msgstr "Signature"
 #: apps/web/src/app/(internal)/%5F%5Fhtmltopdf/certificate/page.tsx:228
 msgid "Signature ID"
 msgstr "ID de signature"
+
+#: apps/web/src/app/(signing)/sign/[token]/form.tsx:221
+msgid "Signature is too small. Please provide a more complete signature."
+msgstr ""
 
 #: apps/web/src/app/(dashboard)/admin/stats/page.tsx:123
 msgid "Signatures Collected"
@@ -4130,7 +4124,7 @@ msgstr "Type"
 msgid "Type a command or search..."
 msgstr "Tapez une commande ou recherchez..."
 
-#: apps/web/src/app/(signing)/sign/[token]/signature-field.tsx:133
+#: apps/web/src/app/(signing)/sign/[token]/signature-field.tsx:134
 msgid "Typed signatures are not allowed. Please draw your signature."
 msgstr ""
 
@@ -4450,7 +4444,7 @@ msgstr "Voir toute l'activité de sécurité liée à votre compte."
 msgid "View Codes"
 msgstr "Voir les codes"
 
-#: apps/web/src/app/(signing)/sign/[token]/form.tsx:127
+#: apps/web/src/app/(signing)/sign/[token]/form.tsx:132
 msgid "View Document"
 msgstr "Voir le document"
 
