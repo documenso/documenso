@@ -67,8 +67,16 @@ export const EmbedDirectTemplateClientPage = ({
 
   const searchParams = useSearchParams();
 
-  const { fullName, email, signature, setFullName, setEmail, setSignature } =
-    useRequiredSigningContext();
+  const {
+    fullName,
+    email,
+    signature,
+    signatureValid,
+    setFullName,
+    setEmail,
+    setSignature,
+    setSignatureValid,
+  } = useRequiredSigningContext();
 
   const [hasFinishedInit, setHasFinishedInit] = useState(false);
   const [hasDocumentLoaded, setHasDocumentLoaded] = useState(false);
@@ -89,6 +97,8 @@ export const EmbedDirectTemplateClientPage = ({
     localFields.filter((field) => !field.inserted),
     localFields.filter((field) => field.inserted),
   ];
+
+  const hasSignatureField = localFields.some((field) => field.type === FieldType.SIGNATURE);
 
   const { mutateAsync: createDocumentFromDirectTemplate, isLoading: isSubmitting } =
     trpc.template.createDocumentFromDirectTemplate.useMutation();
@@ -180,6 +190,10 @@ export const EmbedDirectTemplateClientPage = ({
 
   const onCompleteClick = async () => {
     try {
+      if (hasSignatureField && !signatureValid) {
+        return;
+      }
+
       const valid = validateFieldsInserted(localFields);
 
       if (!valid) {
@@ -417,6 +431,9 @@ export const EmbedDirectTemplateClientPage = ({
                         onChange={(value) => {
                           setSignature(value);
                         }}
+                        onValidityChange={(isValid) => {
+                          setSignatureValid(isValid);
+                        }}
                         allowTypedSignature={Boolean(
                           metadata &&
                             'typedSignatureEnabled' in metadata &&
@@ -425,6 +442,14 @@ export const EmbedDirectTemplateClientPage = ({
                       />
                     </CardContent>
                   </Card>
+
+                  {hasSignatureField && !signatureValid && (
+                    <div className="text-destructive mt-2 text-sm">
+                      <Trans>
+                        Signature is too small. Please provide a more complete signature.
+                      </Trans>
+                    </div>
+                  )}
                 </div>
               </div>
             </div>

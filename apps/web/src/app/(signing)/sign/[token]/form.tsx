@@ -12,7 +12,7 @@ import { useAnalytics } from '@documenso/lib/client-only/hooks/use-analytics';
 import type { DocumentAndSender } from '@documenso/lib/server-only/document/get-document-by-token';
 import type { TRecipientActionAuth } from '@documenso/lib/types/document-auth';
 import { sortFieldsByPosition, validateFieldsInserted } from '@documenso/lib/utils/fields';
-import { type Field, type Recipient, RecipientRole } from '@documenso/prisma/client';
+import { type Field, FieldType, type Recipient, RecipientRole } from '@documenso/prisma/client';
 import { trpc } from '@documenso/trpc/react';
 import { FieldToolTip } from '@documenso/ui/components/field/field-tooltip';
 import { cn } from '@documenso/ui/lib/utils';
@@ -57,6 +57,8 @@ export const SigningForm = ({
   // Keep the loading state going if successful since the redirect may take some time.
   const isSubmitting = formState.isSubmitting || formState.isSubmitSuccessful;
 
+  const hasSignatureField = fields.some((field) => field.type === FieldType.SIGNATURE);
+
   const uninsertedFields = useMemo(() => {
     return sortFieldsByPosition(fields.filter((field) => !field.inserted));
   }, [fields]);
@@ -69,7 +71,7 @@ export const SigningForm = ({
   const onFormSubmit = async () => {
     setValidateUninsertedFields(true);
 
-    if (!signatureValid) {
+    if (hasSignatureField && !signatureValid) {
       return;
     }
 
@@ -216,7 +218,7 @@ export const SigningForm = ({
                       </CardContent>
                     </Card>
 
-                    {!signatureValid && (
+                    {hasSignatureField && !signatureValid && (
                       <div className="text-destructive mt-2 text-sm">
                         <Trans>
                           Signature is too small. Please provide a more complete signature.

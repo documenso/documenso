@@ -286,15 +286,23 @@ export const SignatureField = ({
               <Trans>Signature</Trans>
             </Label>
 
-            <SignaturePad
-              id="signature"
-              className="border-border mt-2 h-44 w-full rounded-md border"
-              onChange={(value) => setLocalSignature(value)}
-              allowTypedSignature={typedSignatureEnabled}
-              onValidityChange={(isValid) => {
-                setSignatureValid(isValid);
-              }}
-            />
+            <div className="border-border mt-2 rounded-md border">
+              <SignaturePad
+                id="signature"
+                className="h-44 w-full"
+                onChange={(value) => setLocalSignature(value)}
+                allowTypedSignature={typedSignatureEnabled}
+                onValidityChange={(isValid) => {
+                  setSignatureValid(isValid);
+                }}
+              />
+            </div>
+
+            {!signatureValid && (
+              <div className="text-destructive mt-2 text-sm">
+                <Trans>Signature is too small. Please provide a more complete signature.</Trans>
+              </div>
+            )}
           </div>
 
           <SigningDisclosure />

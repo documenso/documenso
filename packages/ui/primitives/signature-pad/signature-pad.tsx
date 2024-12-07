@@ -97,7 +97,8 @@ export type SignaturePadProps = Omit<HTMLAttributes<HTMLCanvasElement>, 'onChang
   disabled?: boolean;
   allowTypedSignature?: boolean;
   defaultValue?: string;
-  onValidityChange: (isValid: boolean) => void;
+  onValidityChange?: (isValid: boolean) => void;
+  minCoverageThreshold?: number;
 };
 
 export const SignaturePad = ({
@@ -108,6 +109,7 @@ export const SignaturePad = ({
   disabled = false,
   allowTypedSignature,
   onValidityChange,
+  minCoverageThreshold = 0.01,
   ...props
 }: SignaturePadProps) => {
   const $el = useRef<HTMLCanvasElement>(null);
@@ -151,7 +153,7 @@ export const SignaturePad = ({
         }
 
         const filledPercentage = filledPixels / totalPixels;
-        const isValid = filledPercentage > 0.01; // 1%
+        const isValid = filledPercentage > minCoverageThreshold;
         onValidityChange?.(isValid);
 
         return isValid;
