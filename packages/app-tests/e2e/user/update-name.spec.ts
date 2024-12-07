@@ -14,11 +14,10 @@ test('[USER] update full name', async ({ page }) => {
 
   const canvas = page.locator('canvas').first();
   const box = await canvas.boundingBox();
-
   if (box) {
-    await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2);
+    await page.mouse.move(box.x + 40, box.y + 40);
     await page.mouse.down();
-    await page.mouse.move(box.x + box.width / 4, box.y + box.height / 4);
+    await page.mouse.move(box.x + box.width - 2, box.y + box.height - 2);
     await page.mouse.up();
   }
 

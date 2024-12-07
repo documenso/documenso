@@ -369,9 +369,9 @@ test('[DOCUMENT_FLOW]: should be able to approve a document', async ({ page }) =
     const canvas = page.locator('canvas');
     const box = await canvas.boundingBox();
     if (box) {
-      await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2);
+      await page.mouse.move(box.x + 40, box.y + 40);
       await page.mouse.down();
-      await page.mouse.move(box.x + box.width / 4, box.y + box.height / 4);
+      await page.mouse.move(box.x + box.width - 2, box.y + box.height - 2);
       await page.mouse.up();
     }
 
@@ -608,9 +608,9 @@ test('[DOCUMENT_FLOW]: should be able to create and sign a document with 3 recip
     const canvas = page.locator('canvas#signature');
     const box = await canvas.boundingBox();
     if (box) {
-      await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2);
+      await page.mouse.move(box.x + 40, box.y + 40);
       await page.mouse.down();
-      await page.mouse.move(box.x + box.width / 4, box.y + box.height / 4);
+      await page.mouse.move(box.x + box.width - 2, box.y + box.height - 2);
       await page.mouse.up();
     }
 

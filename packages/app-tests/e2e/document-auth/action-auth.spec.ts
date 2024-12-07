@@ -39,9 +39,9 @@ test('[DOCUMENT_AUTH]: should allow signing when no auth setup', async ({ page }
     const canvas = page.locator('canvas').first();
     const box = await canvas.boundingBox();
     if (box) {
-      await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2);
+      await page.mouse.move(box.x + 40, box.y + 40);
       await page.mouse.down();
-      await page.mouse.move(box.x + box.width / 4, box.y + box.height / 4);
+      await page.mouse.move(box.x + box.width - 2, box.y + box.height - 2);
       await page.mouse.up();
     }
 
@@ -96,9 +96,9 @@ test('[DOCUMENT_AUTH]: should allow signing with valid global auth', async ({ pa
   const canvas = page.locator('canvas').first();
   const box = await canvas.boundingBox();
   if (box) {
-    await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2);
+    await page.mouse.move(box.x + 40, box.y + 40);
     await page.mouse.down();
-    await page.mouse.move(box.x + box.width / 4, box.y + box.height / 4);
+    await page.mouse.move(box.x + box.width - 2, box.y + box.height - 2);
     await page.mouse.up();
   }
 
@@ -265,9 +265,9 @@ test('[DOCUMENT_AUTH]: should allow field signing when required for recipient au
     const canvas = page.locator('canvas').first();
     const box = await canvas.boundingBox();
     if (box) {
-      await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2);
+      await page.mouse.move(box.x + 40, box.y + 40);
       await page.mouse.down();
-      await page.mouse.move(box.x + box.width / 4, box.y + box.height / 4);
+      await page.mouse.move(box.x + box.width - 2, box.y + box.height - 2);
       await page.mouse.up();
     }
 
@@ -376,9 +376,9 @@ test('[DOCUMENT_AUTH]: should allow field signing when required for recipient an
     const canvas = page.locator('canvas').first();
     const box = await canvas.boundingBox();
     if (box) {
-      await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2);
+      await page.mouse.move(box.x + 40, box.y + 40);
       await page.mouse.down();
-      await page.mouse.move(box.x + box.width / 4, box.y + box.height / 4);
+      await page.mouse.move(box.x + box.width - 2, box.y + box.height - 2);
       await page.mouse.up();
     }
 

@@ -467,11 +467,11 @@ msgstr "Approving"
 msgid "Before you get started, please confirm your email address by clicking the button below:"
 msgstr "Before you get started, please confirm your email address by clicking the button below:"
 
-#: packages/ui/primitives/signature-pad/signature-pad.tsx:522
+#: packages/ui/primitives/signature-pad/signature-pad.tsx:524
 msgid "Black"
 msgstr "Black"
 
-#: packages/ui/primitives/signature-pad/signature-pad.tsx:536
+#: packages/ui/primitives/signature-pad/signature-pad.tsx:538
 msgid "Blue"
 msgstr "Blue"
 
@@ -529,7 +529,7 @@ msgstr "Checkbox values"
 msgid "Clear filters"
 msgstr "Clear filters"
 
-#: packages/ui/primitives/signature-pad/signature-pad.tsx:556
+#: packages/ui/primitives/signature-pad/signature-pad.tsx:558
 msgid "Clear Signature"
 msgstr "Clear Signature"
 
@@ -891,7 +891,7 @@ msgstr "Global recipient action authentication"
 msgid "Go Back"
 msgstr "Go Back"
 
-#: packages/ui/primitives/signature-pad/signature-pad.tsx:543
+#: packages/ui/primitives/signature-pad/signature-pad.tsx:545
 msgid "Green"
 msgstr "Green"
 
@@ -1175,7 +1175,7 @@ msgstr "Recipient removed email"
 msgid "Recipient signing request email"
 msgstr "Recipient signing request email"
 
-#: packages/ui/primitives/signature-pad/signature-pad.tsx:529
+#: packages/ui/primitives/signature-pad/signature-pad.tsx:531
 msgid "Red"
 msgstr "Red"
 
@@ -1592,7 +1592,7 @@ msgstr "Update the role and add fields as required for the direct recipient. The
 msgid "Upgrade"
 msgstr "Upgrade"
 
-#: packages/ui/primitives/signature-pad/signature-pad.tsx:507
+#: packages/ui/primitives/signature-pad/signature-pad.tsx:509
 msgid "Upload Signature"
 msgstr "Upload Signature"
 
