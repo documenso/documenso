@@ -221,7 +221,7 @@ export const DocumentPageView = async ({ params, team }: DocumentPageViewProps) 
                 <DocumentPageViewDropdown document={documentWithRecipients} team={team} />
               </div>
 
-              <p className="text-muted-foreground mt-2 px-4 text-sm ">
+              <p className="text-muted-foreground mt-2 px-4 text-sm">
                 {match(document.status)
                   .with(DocumentStatus.COMPLETED, () => (
                     <Trans>This document has been signed by all recipients</Trans>

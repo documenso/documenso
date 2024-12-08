@@ -9,6 +9,8 @@ export type SigningContextValue = {
   setEmail: (_value: string) => void;
   signature: string | null;
   setSignature: (_value: string | null) => void;
+  signatureValid: boolean;
+  setSignatureValid: (_valid: boolean) => void;
 };
 
 const SigningContext = createContext<SigningContextValue | null>(null);
@@ -43,6 +45,7 @@ export const SigningProvider = ({
   const [fullName, setFullName] = useState(initialFullName || '');
   const [email, setEmail] = useState(initialEmail || '');
   const [signature, setSignature] = useState(initialSignature || null);
+  const [signatureValid, setSignatureValid] = useState(true);
 
   useEffect(() => {
     if (initialSignature) {
@@ -59,6 +62,8 @@ export const SigningProvider = ({
         setEmail,
         signature,
         setSignature,
+        signatureValid,
+        setSignatureValid,
       }}
     >
       {children}

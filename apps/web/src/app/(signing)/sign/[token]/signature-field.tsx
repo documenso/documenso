@@ -55,8 +55,12 @@ export const SignatureField = ({
   const containerRef = useRef<HTMLDivElement>(null);
   const [fontSize, setFontSize] = useState(2);
 
-  const { signature: providedSignature, setSignature: setProvidedSignature } =
-    useRequiredSigningContext();
+  const {
+    signature: providedSignature,
+    setSignature: setProvidedSignature,
+    signatureValid,
+    setSignatureValid,
+  } = useRequiredSigningContext();
 
   const { executeActionAuthProcedure } = useRequiredDocumentAuthContext();
 
@@ -90,7 +94,7 @@ export const SignatureField = ({
   }, [field.inserted, signature?.signatureImageAsBase64]);
 
   const onPreSign = () => {
-    if (!providedSignature) {
+    if (!providedSignature || !signatureValid) {
       setShowSignatureModal(true);
       return false;
     }
@@ -117,7 +121,7 @@ export const SignatureField = ({
     try {
       const value = signature || providedSignature;
 
-      if (!value) {
+      if (!value || (signature && !signatureValid)) {
         setShowSignatureModal(true);
         return;
       }
@@ -282,12 +286,23 @@ export const SignatureField = ({
               <Trans>Signature</Trans>
             </Label>
 
-            <SignaturePad
-              id="signature"
-              className="border-border mt-2 h-44 w-full rounded-md border"
-              onChange={(value) => setLocalSignature(value)}
-              allowTypedSignature={typedSignatureEnabled}
-            />
+            <div className="border-border mt-2 rounded-md border">
+              <SignaturePad
+                id="signature"
+                className="h-44 w-full"
+                onChange={(value) => setLocalSignature(value)}
+                allowTypedSignature={typedSignatureEnabled}
+                onValidityChange={(isValid) => {
+                  setSignatureValid(isValid);
+                }}
+              />
+            </div>
+
+            {!signatureValid && (
+              <div className="text-destructive mt-2 text-sm">
+                <Trans>Signature is too small. Please provide a more complete signature.</Trans>
+              </div>
+            )}
           </div>
 
           <SigningDisclosure />
@@ -307,7 +322,7 @@ export const SignatureField = ({
               <Button
                 type="button"
                 className="flex-1"
-                disabled={!localSignature}
+                disabled={!localSignature || !signatureValid}
                 onClick={() => onDialogSignClick()}
               >
                 <Trans>Sign</Trans>
