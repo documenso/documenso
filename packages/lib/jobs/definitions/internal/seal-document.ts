@@ -25,6 +25,7 @@ import { ZWebhookDocumentSchema } from '../../../types/webhook-payload';
 import { ZRequestMetadataSchema } from '../../../universal/extract-request-metadata';
 import { getFile } from '../../../universal/upload/get-file';
 import { putPdfFile } from '../../../universal/upload/put-file';
+import { isAdvancedField, isRequiredField } from '../../../utils/advanced-fields-helpers';
 import { createDocumentAuditLogData } from '../../../utils/document-audit-logs';
 import { type JobDefinition } from '../../client/_internal/job';
 
@@ -117,8 +118,16 @@ export const SEAL_DOCUMENT_JOB_DEFINITION = {
       },
     });
 
-    if (fields.some((field) => !field.inserted)) {
-      throw new Error(`Document ${document.id} has unsigned fields`);
+    const hasUnsignedRequiredFields = fields.some((field) => {
+      if (!isAdvancedField(field.type) || isRequiredField(field)) {
+        return !field.inserted;
+      }
+
+      return false;
+    });
+
+    if (hasUnsignedRequiredFields) {
+      throw new Error(`Recipient ${document.id} has unsigned fields`);
     }
 
     if (isResealing) {
@@ -158,7 +167,9 @@ export const SEAL_DOCUMENT_JOB_DEFINITION = {
       }
 
       for (const field of fields) {
-        await insertFieldInPDF(pdfDoc, field);
+        if (field.inserted) {
+          await insertFieldInPDF(pdfDoc, field);
+        }
       }
 
       // Re-flatten the form to handle our checkbox and radio fields that

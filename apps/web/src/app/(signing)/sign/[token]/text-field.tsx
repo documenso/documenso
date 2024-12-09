@@ -214,15 +214,15 @@ export const TextField = ({ field, recipient, onSignField, onUnsignField }: Text
     parsedField?.label && parsedField.label.length < 20
       ? parsedField.label
       : parsedField?.label
-      ? parsedField?.label.substring(0, 20) + '...'
-      : undefined;
+        ? parsedField?.label.substring(0, 20) + '...'
+        : undefined;
 
   const textDisplay =
     parsedField?.text && parsedField.text.length < 20
       ? parsedField.text
       : parsedField?.text
-      ? parsedField?.text.substring(0, 20) + '...'
-      : undefined;
+        ? parsedField?.text.substring(0, 20) + '...'
+        : undefined;
 
   const fieldDisplayName = labelDisplay ? labelDisplay : textDisplay;
   const charactersRemaining = (parsedFieldMeta?.characterLimit ?? 0) - (localText.length ?? 0);
@@ -325,7 +325,7 @@ export const TextField = ({ field, recipient, onSignField, onUnsignField }: Text
             <div className="mt-4 flex w-full flex-1 flex-nowrap gap-4">
               <Button
                 type="button"
-                className="dark:bg-muted dark:hover:bg-muted/80 flex-1  bg-black/5 hover:bg-black/10"
+                className="dark:bg-muted dark:hover:bg-muted/80 flex-1 bg-black/5 hover:bg-black/10"
                 variant="secondary"
                 onClick={() => {
                   setShowCustomTextModal(false);
