@@ -1,6 +1,3 @@
-import { TRPCError } from '@trpc/server';
-
-import { AppError } from '@documenso/lib/errors/app-error';
 import { disableTwoFactorAuthentication } from '@documenso/lib/server-only/2fa/disable-2fa';
 import { enableTwoFactorAuthentication } from '@documenso/lib/server-only/2fa/enable-2fa';
 import { setupTwoFactorAuthentication } from '@documenso/lib/server-only/2fa/setup-2fa';
@@ -16,89 +13,44 @@ import {
 
 export const twoFactorAuthenticationRouter = router({
   setup: authenticatedProcedure.mutation(async ({ ctx }) => {
-    try {
-      return await setupTwoFactorAuthentication({
-        user: ctx.user,
-      });
-    } catch (err) {
-      console.error(err);
-
-      throw new TRPCError({
-        code: 'BAD_REQUEST',
-        message: 'We were unable to setup two-factor authentication. Please try again later.',
-      });
-    }
+    return await setupTwoFactorAuthentication({
+      user: ctx.user,
+    });
   }),
 
   enable: authenticatedProcedure
     .input(ZEnableTwoFactorAuthenticationMutationSchema)
     .mutation(async ({ ctx, input }) => {
-      try {
-        const user = ctx.user;
+      const user = ctx.user;
 
-        const { code } = input;
+      const { code } = input;
 
-        return await enableTwoFactorAuthentication({
-          user,
-          code,
-          requestMetadata: extractNextApiRequestMetadata(ctx.req),
-        });
-      } catch (err) {
-        const error = AppError.parseError(err);
-
-        if (error.code !== 'INCORRECT_TWO_FACTOR_CODE') {
-          console.error(err);
-        }
-
-        throw new TRPCError({
-          code: 'BAD_REQUEST',
-          message: 'We were unable to enable two-factor authentication. Please try again later.',
-        });
-      }
+      return await enableTwoFactorAuthentication({
+        user,
+        code,
+        requestMetadata: extractNextApiRequestMetadata(ctx.req),
+      });
     }),
 
   disable: authenticatedProcedure
     .input(ZDisableTwoFactorAuthenticationMutationSchema)
     .mutation(async ({ ctx, input }) => {
-      try {
-        const user = ctx.user;
+      const user = ctx.user;
 
-        return await disableTwoFactorAuthentication({
-          user,
-          totpCode: input.totpCode,
-          backupCode: input.backupCode,
-          requestMetadata: extractNextApiRequestMetadata(ctx.req),
-        });
-      } catch (err) {
-        const error = AppError.parseError(err);
-
-        if (error.code !== 'INCORRECT_TWO_FACTOR_CODE') {
-          console.error(err);
-        }
-
-        throw new TRPCError({
-          code: 'BAD_REQUEST',
-          message: 'We were unable to disable two-factor authentication. Please try again later.',
-        });
-      }
+      return await disableTwoFactorAuthentication({
+        user,
+        totpCode: input.totpCode,
+        backupCode: input.backupCode,
+        requestMetadata: extractNextApiRequestMetadata(ctx.req),
+      });
     }),
 
   viewRecoveryCodes: authenticatedProcedure
     .input(ZViewRecoveryCodesMutationSchema)
     .mutation(async ({ ctx, input }) => {
-      try {
-        return await viewBackupCodes({
-          user: ctx.user,
-          token: input.token,
-        });
-      } catch (err) {
-        const error = AppError.parseError(err);
-
-        if (error.code !== 'INCORRECT_TWO_FACTOR_CODE') {
-          console.error(err);
-        }
-
-        throw error;
-      }
+      return await viewBackupCodes({
+        user: ctx.user,
+        token: input.token,
+      });
     }),
 });

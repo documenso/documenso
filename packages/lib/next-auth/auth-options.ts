@@ -26,6 +26,10 @@ import { extractNextAuthRequestMetadata } from '../universal/extract-request-met
 import { getAuthenticatorOptions } from '../utils/authenticator';
 import { ErrorCode } from './error-codes';
 
+const useSecureCookies =
+  process.env.NODE_ENV === 'production' && String(process.env.NEXTAUTH_URL).startsWith('https://');
+const cookiePrefix = useSecureCookies ? '__Secure-' : '';
+
 export const NEXT_AUTH_OPTIONS: AuthOptions = {
   adapter: PrismaAdapter(prisma),
   secret: process.env.NEXTAUTH_SECRET ?? 'secret',
@@ -429,6 +433,54 @@ export const NEXT_AUTH_OPTIONS: AuthOptions = {
       }
 
       return true;
+    },
+  },
+  cookies: {
+    sessionToken: {
+      name: `${cookiePrefix}next-auth.session-token`,
+      options: {
+        httpOnly: true,
+        sameSite: useSecureCookies ? 'none' : 'lax',
+        path: '/',
+        secure: useSecureCookies,
+      },
+    },
+    callbackUrl: {
+      name: `${cookiePrefix}next-auth.callback-url`,
+      options: {
+        sameSite: useSecureCookies ? 'none' : 'lax',
+        path: '/',
+        secure: useSecureCookies,
+      },
+    },
+    csrfToken: {
+      // Default to __Host- for CSRF token for additional protection if using useSecureCookies
+      // NB: The `__Host-` prefix is stricter than the `__Secure-` prefix.
+      name: `${cookiePrefix}next-auth.csrf-token`,
+      options: {
+        httpOnly: true,
+        sameSite: useSecureCookies ? 'none' : 'lax',
+        path: '/',
+        secure: useSecureCookies,
+      },
+    },
+    pkceCodeVerifier: {
+      name: `${cookiePrefix}next-auth.pkce.code_verifier`,
+      options: {
+        httpOnly: true,
+        sameSite: useSecureCookies ? 'none' : 'lax',
+        path: '/',
+        secure: useSecureCookies,
+      },
+    },
+    state: {
+      name: `${cookiePrefix}next-auth.state`,
+      options: {
+        httpOnly: true,
+        sameSite: useSecureCookies ? 'none' : 'lax',
+        path: '/',
+        secure: useSecureCookies,
+      },
     },
   },
   // Note: `events` are handled in `apps/web/src/pages/api/auth/[...nextauth].ts` to allow access to the request.

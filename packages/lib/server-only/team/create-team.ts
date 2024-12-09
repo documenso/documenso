@@ -31,14 +31,17 @@ export type CreateTeamOptions = {
   teamUrl: string;
 };
 
-export type CreateTeamResponse =
-  | {
-      paymentRequired: false;
-    }
-  | {
-      paymentRequired: true;
-      pendingTeamId: number;
-    };
+export const ZCreateTeamResponseSchema = z.union([
+  z.object({
+    paymentRequired: z.literal(false),
+  }),
+  z.object({
+    paymentRequired: z.literal(true),
+    pendingTeamId: z.number(),
+  }),
+]);
+
+export type TCreateTeamResponse = z.infer<typeof ZCreateTeamResponseSchema>;
 
 /**
  * Create a team or pending team depending on the user's subscription or application's billing settings.
@@ -47,7 +50,7 @@ export const createTeam = async ({
   userId,
   teamName,
   teamUrl,
-}: CreateTeamOptions): Promise<CreateTeamResponse> => {
+}: CreateTeamOptions): Promise<TCreateTeamResponse> => {
   const user = await prisma.user.findUniqueOrThrow({
     where: {
       id: userId,

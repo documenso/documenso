@@ -34,7 +34,7 @@ export const resendTeamMemberInvitation = async ({
   userName,
   teamId,
   invitationId,
-}: ResendTeamMemberInvitationOptions) => {
+}: ResendTeamMemberInvitationOptions): Promise<void> => {
   await prisma.$transaction(
     async (tx) => {
       const team = await tx.team.findUniqueOrThrow({

@@ -21,8 +21,7 @@ export default trpcNext.createNextApiHandler({
   onError(opts) {
     const { error, path } = opts;
 
-    // Currently trialing changes with template and team router only.
-    if (!path || (!path.startsWith('template') && !path.startsWith('team'))) {
+    if (!path) {
       return;
     }
 

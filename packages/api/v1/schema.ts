@@ -58,6 +58,22 @@ export const ZSuccessfulDocumentResponseSchema = z.object({
 
 export const ZSuccessfulGetDocumentResponseSchema = ZSuccessfulDocumentResponseSchema.extend({
   recipients: z.lazy(() => z.array(ZSuccessfulRecipientResponseSchema)),
+  fields: z.lazy(() =>
+    ZFieldSchema.pick({
+      id: true,
+      recipientId: true,
+      type: true,
+      page: true,
+      positionX: true,
+      positionY: true,
+      width: true,
+      height: true,
+    })
+      .extend({
+        fieldMeta: ZFieldMetaSchema.nullish(),
+      })
+      .array(),
+  ),
 });
 
 export type TSuccessfulGetDocumentResponseSchema = z.infer<
@@ -424,7 +440,7 @@ export const ZSuccessfulSigningResponseSchema = z
   .object({
     message: z.string(),
   })
-  .and(ZSuccessfulGetDocumentResponseSchema);
+  .and(ZSuccessfulGetDocumentResponseSchema.omit({ fields: true }));
 
 export type TSuccessfulSigningResponseSchema = z.infer<typeof ZSuccessfulSigningResponseSchema>;
 

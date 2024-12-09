@@ -6,7 +6,7 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import { Caveat } from 'next/font/google';
 
 import { Trans } from '@lingui/macro';
-import { Undo2 } from 'lucide-react';
+import { Undo2, Upload } from 'lucide-react';
 import type { StrokeOptions } from 'perfect-freehand';
 import { getStroke } from 'perfect-freehand';
 
@@ -33,12 +33,72 @@ const fontCaveat = Caveat({
 
 const DPI = 2;
 
+const isBase64Image = (value: string) => value.startsWith('data:image/png;base64,');
+
+const loadImage = async (file: File | undefined): Promise<HTMLImageElement> => {
+  if (!file) {
+    throw new Error('No file selected');
+  }
+
+  if (!file.type.startsWith('image/')) {
+    throw new Error('Invalid file type');
+  }
+
+  if (file.size > 5 * 1024 * 1024) {
+    throw new Error('Image size should be less than 5MB');
+  }
+
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+    const objectUrl = URL.createObjectURL(file);
+
+    img.onload = () => {
+      URL.revokeObjectURL(objectUrl);
+      resolve(img);
+    };
+
+    img.onerror = () => {
+      URL.revokeObjectURL(objectUrl);
+      reject(new Error('Failed to load image'));
+    };
+
+    img.src = objectUrl;
+  });
+};
+
+const loadImageOntoCanvas = (
+  image: HTMLImageElement,
+  canvas: HTMLCanvasElement,
+  ctx: CanvasRenderingContext2D,
+): ImageData => {
+  const scale = Math.min((canvas.width * 0.8) / image.width, (canvas.height * 0.8) / image.height);
+
+  const x = (canvas.width - image.width * scale) / 2;
+  const y = (canvas.height - image.height * scale) / 2;
+
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+  ctx.save();
+  ctx.imageSmoothingEnabled = true;
+  ctx.imageSmoothingQuality = 'high';
+
+  ctx.drawImage(image, x, y, image.width * scale, image.height * scale);
+
+  ctx.restore();
+
+  const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+
+  return imageData;
+};
+
 export type SignaturePadProps = Omit<HTMLAttributes<HTMLCanvasElement>, 'onChange'> & {
   onChange?: (_signatureDataUrl: string | null) => void;
   containerClassName?: string;
   disabled?: boolean;
   allowTypedSignature?: boolean;
   defaultValue?: string;
+  onValidityChange?: (isValid: boolean) => void;
+  minCoverageThreshold?: number;
 };
 
 export const SignaturePad = ({
@@ -48,16 +108,21 @@ export const SignaturePad = ({
   onChange,
   disabled = false,
   allowTypedSignature,
+  onValidityChange,
+  minCoverageThreshold = 0.01,
   ...props
 }: SignaturePadProps) => {
   const $el = useRef<HTMLCanvasElement>(null);
   const $imageData = useRef<ImageData | null>(null);
+  const $fileInput = useRef<HTMLInputElement>(null);
 
   const [isPressed, setIsPressed] = useState(false);
   const [lines, setLines] = useState<Point[][]>([]);
   const [currentLine, setCurrentLine] = useState<Point[]>([]);
   const [selectedColor, setSelectedColor] = useState('black');
-  const [typedSignature, setTypedSignature] = useState(defaultValue ?? '');
+  const [typedSignature, setTypedSignature] = useState(
+    defaultValue && !isBase64Image(defaultValue) ? defaultValue : '',
+  );
 
   const perfectFreehandOptions = useMemo(() => {
     const size = $el.current ? Math.min($el.current.height, $el.current.width) * 0.03 : 10;
@@ -73,12 +138,43 @@ export const SignaturePad = ({
     } satisfies StrokeOptions;
   }, []);
 
+  const checkSignatureValidity = () => {
+    if ($el.current) {
+      const ctx = $el.current.getContext('2d');
+
+      if (ctx) {
+        const imageData = ctx.getImageData(0, 0, $el.current.width, $el.current.height);
+        const data = imageData.data;
+        let filledPixels = 0;
+        const totalPixels = data.length / 4;
+
+        for (let i = 0; i < data.length; i += 4) {
+          if (data[i + 3] > 0) filledPixels++;
+        }
+
+        const filledPercentage = filledPixels / totalPixels;
+        const isValid = filledPercentage > minCoverageThreshold;
+        onValidityChange?.(isValid);
+
+        return isValid;
+      }
+    }
+  };
+
   const onMouseDown = (event: MouseEvent | PointerEvent | TouchEvent) => {
     if (event.cancelable) {
       event.preventDefault();
     }
 
     setIsPressed(true);
+
+    if (typedSignature) {
+      setTypedSignature('');
+      if ($el.current) {
+        const ctx = $el.current.getContext('2d');
+        ctx?.clearRect(0, 0, $el.current.width, $el.current.height);
+      }
+    }
 
     const point = Point.fromEvent(event, DPI, $el.current);
 
@@ -149,7 +245,6 @@ export const SignaturePad = ({
 
       if (ctx) {
         ctx.restore();
-
         ctx.imageSmoothingEnabled = true;
         ctx.imageSmoothingQuality = 'high';
         ctx.fillStyle = selectedColor;
@@ -161,7 +256,11 @@ export const SignaturePad = ({
           ctx.fill(pathData);
         });
 
-        onChange?.($el.current.toDataURL());
+        const isValidSignature = checkSignatureValidity();
+
+        if (isValidSignature) {
+          onChange?.($el.current.toDataURL());
+        }
         ctx.save();
       }
     }
@@ -191,6 +290,10 @@ export const SignaturePad = ({
 
       ctx?.clearRect(0, 0, $el.current.width, $el.current.height);
       $imageData.current = null;
+    }
+
+    if ($fileInput.current) {
+      $fileInput.current.value = '';
     }
 
     onChange?.(null);
@@ -255,12 +358,30 @@ export const SignaturePad = ({
     }
   };
 
+  const handleImageUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    try {
+      const img = await loadImage(event.target.files?.[0]);
+
+      if (!$el.current) return;
+
+      const ctx = $el.current.getContext('2d');
+      if (!ctx) return;
+
+      $imageData.current = loadImageOntoCanvas(img, $el.current, ctx);
+      onChange?.($el.current.toDataURL());
+
+      setLines([]);
+      setCurrentLine([]);
+      setTypedSignature('');
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
   useEffect(() => {
-    if (typedSignature.trim() !== '') {
+    if (typedSignature.trim() !== '' && !isBase64Image(typedSignature)) {
       renderTypedSignature();
       onChange?.(typedSignature);
-    } else {
-      onClearClick();
     }
   }, [typedSignature, selectedColor]);
 
@@ -369,6 +490,26 @@ export const SignaturePad = ({
           />
         </div>
       )}
+
+      <div className="text-foreground absolute left-3 top-3 filter">
+        <div
+          className="focus-visible:ring-ring ring-offset-background text-muted-foreground/60 hover:text-muted-foreground flex cursor-pointer flex-row gap-2 rounded-full p-0 text-[0.688rem] focus-visible:outline-none focus-visible:ring-2"
+          onClick={() => $fileInput.current?.click()}
+        >
+          <Input
+            ref={$fileInput}
+            type="file"
+            accept="image/*"
+            className="hidden"
+            onChange={handleImageUpload}
+            disabled={disabled}
+          />
+          <Upload className="h-4 w-4" />
+          <span>
+            <Trans>Upload Signature</Trans>
+          </span>
+        </div>
+      </div>
 
       <div className="text-foreground absolute right-2 top-2 filter">
         <Select defaultValue={selectedColor} onValueChange={(value) => setSelectedColor(value)}>

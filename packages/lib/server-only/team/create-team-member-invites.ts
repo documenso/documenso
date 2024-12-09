@@ -34,7 +34,7 @@ export const createTeamMemberInvites = async ({
   userName,
   teamId,
   invitations,
-}: CreateTeamMemberInvitesOptions) => {
+}: CreateTeamMemberInvitesOptions): Promise<void> => {
   const team = await prisma.team.findFirstOrThrow({
     where: {
       id: teamId,
