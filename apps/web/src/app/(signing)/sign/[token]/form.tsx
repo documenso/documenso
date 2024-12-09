@@ -11,9 +11,8 @@ import { useForm } from 'react-hook-form';
 import { useAnalytics } from '@documenso/lib/client-only/hooks/use-analytics';
 import type { DocumentAndSender } from '@documenso/lib/server-only/document/get-document-by-token';
 import type { TRecipientActionAuth } from '@documenso/lib/types/document-auth';
-import { ZFieldMetaSchema } from '@documenso/lib/types/field-meta';
+import { isAdvancedField, isRequiredField } from '@documenso/lib/utils/advanced-fields-helpers';
 import { sortFieldsByPosition, validateFieldsInserted } from '@documenso/lib/utils/fields';
-import { isAdvancedField } from '@documenso/lib/utils/is-advanced-field';
 import { type Field, FieldType, type Recipient, RecipientRole } from '@documenso/prisma/client';
 import { trpc } from '@documenso/trpc/react';
 import { FieldToolTip } from '@documenso/ui/components/field/field-tooltip';
@@ -62,9 +61,7 @@ export const SigningForm = ({
   const fieldsRequiringValidation = useMemo(
     () =>
       fields.filter((field) => {
-        const isRequired = field.fieldMeta && ZFieldMetaSchema.parse(field.fieldMeta)?.required;
-
-        if (isAdvancedField(field.type) && !isRequired) {
+        if (isAdvancedField(field.type) && !isRequiredField(field)) {
           return false;
         }
 

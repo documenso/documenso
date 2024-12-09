@@ -2,8 +2,7 @@ import { useState } from 'react';
 
 import { Trans } from '@lingui/macro';
 
-import { ZFieldMetaSchema } from '@documenso/lib/types/field-meta';
-import { isAdvancedField } from '@documenso/lib/utils/is-advanced-field';
+import { isOptionalAdvancedField } from '@documenso/lib/utils/advanced-fields-helpers';
 import type { Field } from '@documenso/prisma/client';
 import { RecipientRole } from '@documenso/prisma/client';
 import { Button } from '@documenso/ui/primitives/button';
@@ -39,11 +38,7 @@ export const SignDialog = ({
   const [showDialog, setShowDialog] = useState(false);
 
   const isComplete = fields.every((field) => {
-    const isOptionalAdvancedField =
-      isAdvancedField(field.type) &&
-      (!field.fieldMeta || !ZFieldMetaSchema.parse(field.fieldMeta)?.required);
-
-    if (isOptionalAdvancedField) {
+    if (isOptionalAdvancedField(field)) {
       return true;
     }
 
