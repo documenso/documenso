@@ -43,106 +43,105 @@ export async function getSigningVolume({
     ],
   });
 
-  const orderByClause = getOrderByClause({ sortBy, sortOrder });
-
-  const [subscriptions, totalCount] = await Promise.all([
-    prisma.subscription.findMany({
-      where: whereClause,
-      include: {
-        User: {
-          include: {
-            Document: {
-              where: {
-                status: 'COMPLETED',
-                deletedAt: null,
-              },
+  const subscriptionsWithVolume = await prisma.subscription.findMany({
+    where: whereClause,
+    select: {
+      id: true,
+      createdAt: true,
+      planId: true,
+      User: {
+        select: {
+          name: true,
+          email: true,
+          Document: {
+            where: {
+              status: 'COMPLETED',
+              deletedAt: null,
+            },
+            select: {
+              id: true,
             },
           },
-        },
-        team: {
-          include: {
-            document: {
-              where: {
-                status: 'COMPLETED',
-                deletedAt: null,
+          teamMembers: {
+            select: {
+              team: {
+                select: {
+                  document: {
+                    where: {
+                      status: 'COMPLETED',
+                      deletedAt: null,
+                    },
+                    select: {
+                      id: true,
+                    },
+                  },
+                },
               },
             },
           },
         },
       },
-      orderBy: orderByClause,
-      skip: Math.max(page - 1, 0) * perPage,
-      take: perPage,
-    }),
-    prisma.subscription.count({
-      where: whereClause,
-    }),
-  ]);
+      team: {
+        select: {
+          name: true,
+          document: {
+            where: {
+              status: 'COMPLETED',
+              deletedAt: null,
+            },
+            select: {
+              id: true,
+            },
+          },
+        },
+      },
+    },
+  });
 
-  const leaderboardWithVolume: SigningVolume[] = subscriptions.map((subscription) => {
+  const totalCount = await prisma.subscription.count({
+    where: whereClause,
+  });
+
+  const leaderboard = subscriptionsWithVolume.map((subscription): SigningVolume => {
     const name =
       subscription.User?.name || subscription.team?.name || subscription.User?.email || 'Unknown';
 
-    const userSignedDocs = subscription.User?.Document?.length || 0;
-    const teamSignedDocs = subscription.team?.document?.length || 0;
+    const personalDocs = subscription.User?.Document?.length ?? 0;
+    const teamDocs = subscription.team?.document?.length ?? 0;
+    const teamMemberDocs = (subscription.User?.teamMembers ?? []).reduce(
+      (acc, member) => acc + (member.team.document?.length ?? 0),
+      0,
+    );
 
     return {
       id: subscription.id,
       name,
-      signingVolume: userSignedDocs + teamSignedDocs,
+      signingVolume: personalDocs + teamDocs + teamMemberDocs,
       createdAt: subscription.createdAt,
       planId: subscription.planId,
     };
   });
 
+  const sortedLeaderboard = [...leaderboard].sort((a, b) => {
+    if (sortBy === 'name') {
+      return sortOrder === 'desc' ? b.name.localeCompare(a.name) : a.name.localeCompare(b.name);
+    }
+
+    if (sortBy === 'createdAt') {
+      return sortOrder === 'desc'
+        ? b.createdAt.getTime() - a.createdAt.getTime()
+        : a.createdAt.getTime() - b.createdAt.getTime();
+    }
+
+    return sortOrder === 'desc'
+      ? b.signingVolume - a.signingVolume
+      : a.signingVolume - b.signingVolume;
+  });
+
+  const paginatedLeaderboard = sortedLeaderboard.slice((page - 1) * perPage, page * perPage);
+
   return {
-    leaderboard: leaderboardWithVolume,
+    leaderboard: paginatedLeaderboard,
     totalPages: Math.ceil(totalCount / perPage),
   };
-}
-
-function getOrderByClause(options: {
-  sortBy: string;
-  sortOrder: 'asc' | 'desc';
-}): Prisma.SubscriptionOrderByWithRelationInput | Prisma.SubscriptionOrderByWithRelationInput[] {
-  const { sortBy, sortOrder } = options;
-
-  if (sortBy === 'name') {
-    return [
-      {
-        User: {
-          name: sortOrder,
-        },
-      },
-      {
-        team: {
-          name: sortOrder,
-        },
-      },
-    ];
-  }
-
-  if (sortBy === 'createdAt') {
-    return {
-      createdAt: sortOrder,
-    };
-  }
-
-  // Default: sort by signing volume
-  return [
-    {
-      User: {
-        Document: {
-          _count: sortOrder,
-        },
-      },
-    },
-    {
-      team: {
-        document: {
-          _count: sortOrder,
-        },
-      },
-    },
-  ];
 }
