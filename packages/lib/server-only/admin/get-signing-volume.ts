@@ -43,8 +43,6 @@ export async function getSigningVolume({
     ],
   });
 
-  const orderByClause = getOrderByClause({ sortBy, sortOrder });
-
   const [subscriptions, totalCount] = await Promise.all([
     prisma.subscription.findMany({
       where: whereClause,
@@ -56,6 +54,9 @@ export async function getSigningVolume({
                 status: 'COMPLETED',
                 deletedAt: null,
               },
+              orderBy: {
+                id: sortOrder,
+              },
             },
           },
         },
@@ -66,11 +67,34 @@ export async function getSigningVolume({
                 status: 'COMPLETED',
                 deletedAt: null,
               },
+              orderBy: {
+                id: sortOrder,
+              },
             },
           },
         },
       },
-      orderBy: orderByClause,
+      orderBy:
+        sortBy === 'name'
+          ? [{ User: { name: sortOrder } }, { team: { name: sortOrder } }, { createdAt: 'desc' }]
+          : sortBy === 'createdAt'
+            ? [{ createdAt: sortOrder }]
+            : [
+                {
+                  User: {
+                    Document: {
+                      _count: sortOrder,
+                    },
+                  },
+                },
+                {
+                  team: {
+                    document: {
+                      _count: sortOrder,
+                    },
+                  },
+                },
+              ],
       skip: Math.max(page - 1, 0) * perPage,
       take: perPage,
     }),
@@ -95,54 +119,16 @@ export async function getSigningVolume({
     };
   });
 
+  if (sortBy === 'signingVolume') {
+    leaderboardWithVolume.sort((a, b) => {
+      return sortOrder === 'desc'
+        ? b.signingVolume - a.signingVolume
+        : a.signingVolume - b.signingVolume;
+    });
+  }
+
   return {
     leaderboard: leaderboardWithVolume,
     totalPages: Math.ceil(totalCount / perPage),
   };
-}
-
-function getOrderByClause(options: {
-  sortBy: string;
-  sortOrder: 'asc' | 'desc';
-}): Prisma.SubscriptionOrderByWithRelationInput | Prisma.SubscriptionOrderByWithRelationInput[] {
-  const { sortBy, sortOrder } = options;
-
-  if (sortBy === 'name') {
-    return [
-      {
-        User: {
-          name: sortOrder,
-        },
-      },
-      {
-        team: {
-          name: sortOrder,
-        },
-      },
-    ];
-  }
-
-  if (sortBy === 'createdAt') {
-    return {
-      createdAt: sortOrder,
-    };
-  }
-
-  // Default: sort by signing volume
-  return [
-    {
-      User: {
-        Document: {
-          _count: sortOrder,
-        },
-      },
-    },
-    {
-      team: {
-        document: {
-          _count: sortOrder,
-        },
-      },
-    },
-  ];
 }
