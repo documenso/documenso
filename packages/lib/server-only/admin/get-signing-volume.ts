@@ -43,92 +43,105 @@ export async function getSigningVolume({
     ],
   });
 
-  const [subscriptions, totalCount] = await Promise.all([
-    prisma.subscription.findMany({
-      where: whereClause,
-      include: {
-        User: {
-          include: {
-            Document: {
-              where: {
-                status: 'COMPLETED',
-                deletedAt: null,
-              },
-              orderBy: {
-                id: sortOrder,
-              },
+  const subscriptionsWithVolume = await prisma.subscription.findMany({
+    where: whereClause,
+    select: {
+      id: true,
+      createdAt: true,
+      planId: true,
+      User: {
+        select: {
+          name: true,
+          email: true,
+          Document: {
+            where: {
+              status: 'COMPLETED',
+              deletedAt: null,
+            },
+            select: {
+              id: true,
             },
           },
-        },
-        team: {
-          include: {
-            document: {
-              where: {
-                status: 'COMPLETED',
-                deletedAt: null,
-              },
-              orderBy: {
-                id: sortOrder,
+          teamMembers: {
+            select: {
+              team: {
+                select: {
+                  document: {
+                    where: {
+                      status: 'COMPLETED',
+                      deletedAt: null,
+                    },
+                    select: {
+                      id: true,
+                    },
+                  },
+                },
               },
             },
           },
         },
       },
-      orderBy:
-        sortBy === 'name'
-          ? [{ User: { name: sortOrder } }, { team: { name: sortOrder } }, { createdAt: 'desc' }]
-          : sortBy === 'createdAt'
-            ? [{ createdAt: sortOrder }]
-            : [
-                {
-                  User: {
-                    Document: {
-                      _count: sortOrder,
-                    },
-                  },
-                },
-                {
-                  team: {
-                    document: {
-                      _count: sortOrder,
-                    },
-                  },
-                },
-              ],
-      skip: Math.max(page - 1, 0) * perPage,
-      take: perPage,
-    }),
-    prisma.subscription.count({
-      where: whereClause,
-    }),
-  ]);
+      team: {
+        select: {
+          name: true,
+          document: {
+            where: {
+              status: 'COMPLETED',
+              deletedAt: null,
+            },
+            select: {
+              id: true,
+            },
+          },
+        },
+      },
+    },
+  });
 
-  const leaderboardWithVolume: SigningVolume[] = subscriptions.map((subscription) => {
+  const totalCount = await prisma.subscription.count({
+    where: whereClause,
+  });
+
+  const leaderboard = subscriptionsWithVolume.map((subscription): SigningVolume => {
     const name =
       subscription.User?.name || subscription.team?.name || subscription.User?.email || 'Unknown';
 
-    const userSignedDocs = subscription.User?.Document?.length || 0;
-    const teamSignedDocs = subscription.team?.document?.length || 0;
+    const personalDocs = subscription.User?.Document?.length ?? 0;
+    const teamDocs = subscription.team?.document?.length ?? 0;
+    const teamMemberDocs = (subscription.User?.teamMembers ?? []).reduce(
+      (acc, member) => acc + (member.team.document?.length ?? 0),
+      0,
+    );
 
     return {
       id: subscription.id,
       name,
-      signingVolume: userSignedDocs + teamSignedDocs,
+      signingVolume: personalDocs + teamDocs + teamMemberDocs,
       createdAt: subscription.createdAt,
       planId: subscription.planId,
     };
   });
 
-  if (sortBy === 'signingVolume') {
-    leaderboardWithVolume.sort((a, b) => {
+  const sortedLeaderboard = [...leaderboard].sort((a, b) => {
+    if (sortBy === 'name') {
+      return sortOrder === 'desc' ? b.name.localeCompare(a.name) : a.name.localeCompare(b.name);
+    }
+
+    if (sortBy === 'createdAt') {
       return sortOrder === 'desc'
-        ? b.signingVolume - a.signingVolume
-        : a.signingVolume - b.signingVolume;
-    });
-  }
+        ? b.createdAt.getTime() - a.createdAt.getTime()
+        : a.createdAt.getTime() - b.createdAt.getTime();
+    }
+
+    return sortOrder === 'desc'
+      ? b.signingVolume - a.signingVolume
+      : a.signingVolume - b.signingVolume;
+  });
+
+  const paginatedLeaderboard = sortedLeaderboard.slice((page - 1) * perPage, page * perPage);
 
   return {
-    leaderboard: leaderboardWithVolume,
+    leaderboard: paginatedLeaderboard,
     totalPages: Math.ceil(totalCount / perPage),
   };
 }
