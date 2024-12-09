@@ -328,7 +328,10 @@ export const ZCreateRecipientMutationSchema = z.object({
     .object({
       actionAuth: ZRecipientActionAuthTypesSchema.optional(),
     })
-    .optional(),
+    .optional()
+    .openapi({
+      description: 'The authOptions property is only available for Enterprise accounts.',
+    }),
 });
 
 /**
