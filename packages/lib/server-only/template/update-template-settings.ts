@@ -34,7 +34,9 @@ export const updateTemplateSettings = async ({
   data,
 }: UpdateTemplateSettingsOptions) => {
   if (Object.values(data).length === 0 && Object.keys(meta ?? {}).length === 0) {
-    throw new AppError(AppErrorCode.INVALID_BODY, 'Missing data to update');
+    throw new AppError(AppErrorCode.INVALID_BODY, {
+      message: 'Missing data to update',
+    });
   }
 
   const template = await prisma.template.findFirstOrThrow({
@@ -82,10 +84,9 @@ export const updateTemplateSettings = async ({
     });
 
     if (!isDocumentEnterprise) {
-      throw new AppError(
-        AppErrorCode.UNAUTHORIZED,
-        'You do not have permission to set the action auth',
-      );
+      throw new AppError(AppErrorCode.UNAUTHORIZED, {
+        message: 'You do not have permission to set the action auth',
+      });
     }
   }
 

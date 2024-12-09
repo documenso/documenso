@@ -500,8 +500,35 @@ Now you can make a `POST` request to the `/api/v1/documents/{documentId}/fields`
   value, this is the value that will be used to sign the field.
 </Callout>
 
+<Callout type="warning">
+  It's important to pass the `type` in the `fieldMeta` property for the advanced fields. [Read more
+  here](#a-note-on-advanced-fields)
+</Callout>
+
 A successful request will return a JSON response with the newly added fields. The image below illustrates the fields added to the document via the API.
 
 ![A screenshot of the document in the Documenso editor](/api-reference/fields-added-via-api.webp)
 
 </Steps>
+
+#### A Note on Advanced Fields
+
+The advanced fields are: text, checkbox, radio, number, and select. Whenever you append any of these advanced fields to a document, you need to pass the `type` in the `fieldMeta` property:
+
+```json
+...
+"fieldMeta": {
+  "type": "text",
+}
+...
+```
+
+Replace the `text` value with the corresponding field type:
+
+- For the `TEXT` field it should be `text`.
+- For the `CHECKBOX` field it should be `checkbox`.
+- For the `RADIO` field it should be `radio`.
+- For the `NUMBER` field it should be `number`.
+- For the `SELECT` field it should be `select`. (check this before merge)
+
+You must pass this property at all times, even if you don't need to set any other properties. If you don't, the endpoint will throw an error.

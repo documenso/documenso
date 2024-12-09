@@ -14,7 +14,7 @@ import type { TRecipientActionAuth } from '@documenso/lib/types/document-auth';
 import { ZFieldMetaSchema } from '@documenso/lib/types/field-meta';
 import { sortFieldsByPosition, validateFieldsInserted } from '@documenso/lib/utils/fields';
 import { isAdvancedField } from '@documenso/lib/utils/is-advanced-field';
-import { type Field, type Recipient, RecipientRole } from '@documenso/prisma/client';
+import { type Field, FieldType, type Recipient, RecipientRole } from '@documenso/prisma/client';
 import { trpc } from '@documenso/trpc/react';
 import { FieldToolTip } from '@documenso/ui/components/field/field-tooltip';
 import { cn } from '@documenso/ui/lib/utils';
@@ -46,7 +46,8 @@ export const SigningForm = ({
   const analytics = useAnalytics();
   const { data: session } = useSession();
 
-  const { fullName, signature, setFullName, setSignature } = useRequiredSigningContext();
+  const { fullName, signature, setFullName, setSignature, signatureValid, setSignatureValid } =
+    useRequiredSigningContext();
 
   const [validateUninsertedFields, setValidateUninsertedFields] = useState(false);
 
@@ -71,6 +72,7 @@ export const SigningForm = ({
       }),
     [fields],
   );
+  const hasSignatureField = fields.some((field) => field.type === FieldType.SIGNATURE);
 
   const uninsertedFields = useMemo(() => {
     return sortFieldsByPosition(fieldsRequiringValidation.filter((field) => !field.inserted));
@@ -85,6 +87,10 @@ export const SigningForm = ({
     setValidateUninsertedFields(true);
 
     const isFieldsValid = validateFieldsInserted(fieldsRequiringValidation);
+
+    if (hasSignatureField && !signatureValid) {
+      return;
+    }
 
     if (!isFieldsValid) {
       return;
@@ -158,7 +164,7 @@ export const SigningForm = ({
                 <div className="flex flex-col gap-4 md:flex-row">
                   <Button
                     type="button"
-                    className="dark:bg-muted dark:hover:bg-muted/80 w-full  bg-black/5 hover:bg-black/10"
+                    className="dark:bg-muted dark:hover:bg-muted/80 w-full bg-black/5 hover:bg-black/10"
                     variant="secondary"
                     size="lg"
                     disabled={typeof window !== 'undefined' && window.history.length <= 1}
@@ -214,20 +220,33 @@ export const SigningForm = ({
                           className="h-44 w-full"
                           disabled={isSubmitting}
                           defaultValue={signature ?? undefined}
+                          onValidityChange={(isValid) => {
+                            setSignatureValid(isValid);
+                          }}
                           onChange={(value) => {
-                            setSignature(value);
+                            if (signatureValid) {
+                              setSignature(value);
+                            }
                           }}
                           allowTypedSignature={document.documentMeta?.typedSignatureEnabled}
                         />
                       </CardContent>
                     </Card>
+
+                    {hasSignatureField && !signatureValid && (
+                      <div className="text-destructive mt-2 text-sm">
+                        <Trans>
+                          Signature is too small. Please provide a more complete signature.
+                        </Trans>
+                      </div>
+                    )}
                   </div>
                 </div>
 
                 <div className="flex flex-col gap-4 md:flex-row">
                   <Button
                     type="button"
-                    className="dark:bg-muted dark:hover:bg-muted/80 w-full  bg-black/5 hover:bg-black/10"
+                    className="dark:bg-muted dark:hover:bg-muted/80 w-full bg-black/5 hover:bg-black/10"
                     variant="secondary"
                     size="lg"
                     disabled={typeof window !== 'undefined' && window.history.length <= 1}

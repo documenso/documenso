@@ -16,7 +16,9 @@ import type { SupportedLanguageCodes } from '../../constants/i18n';
 import { AppError, AppErrorCode } from '../../errors/app-error';
 import { DOCUMENT_AUDIT_LOG_TYPE } from '../../types/document-audit-logs';
 import { ZRecipientAuthOptionsSchema } from '../../types/document-auth';
+import type { TDocumentEmailSettings } from '../../types/document-email';
 import { ZFieldMetaSchema } from '../../types/field-meta';
+import { ZWebhookDocumentSchema } from '../../types/webhook-payload';
 import type { RequestMetadata } from '../../universal/extract-request-metadata';
 import { createDocumentAuditLogData } from '../../utils/document-audit-logs';
 import {
@@ -64,6 +66,8 @@ export type CreateDocumentFromTemplateOptions = {
     signingOrder?: DocumentSigningOrder;
     language?: SupportedLanguageCodes;
     distributionMethod?: DocumentDistributionMethod;
+    typedSignatureEnabled?: boolean;
+    emailSettings?: TDocumentEmailSettings;
   };
   requestMetadata?: RequestMetadata;
 };
@@ -119,7 +123,9 @@ export const createDocumentFromTemplate = async ({
   });
 
   if (!template) {
-    throw new AppError(AppErrorCode.NOT_FOUND, 'Template not found');
+    throw new AppError(AppErrorCode.NOT_FOUND, {
+      message: 'Template not found',
+    });
   }
 
   // Check that all the passed in recipient IDs can be associated with a template recipient.
@@ -129,10 +135,9 @@ export const createDocumentFromTemplate = async ({
     );
 
     if (!foundRecipient) {
-      throw new AppError(
-        AppErrorCode.INVALID_BODY,
-        `Recipient with ID ${recipient.id} not found in the template.`,
-      );
+      throw new AppError(AppErrorCode.INVALID_BODY, {
+        message: `Recipient with ID ${recipient.id} not found in the template.`,
+      });
     }
   });
 
@@ -146,7 +151,7 @@ export const createDocumentFromTemplate = async ({
     return {
       templateRecipientId: templateRecipient.id,
       fields: templateRecipient.Field,
-      name: foundRecipient ? foundRecipient.name ?? '' : templateRecipient.name,
+      name: foundRecipient ? (foundRecipient.name ?? '') : templateRecipient.name,
       email: foundRecipient ? foundRecipient.email : templateRecipient.email,
       role: templateRecipient.role,
       signingOrder: foundRecipient?.signingOrder ?? templateRecipient.signingOrder,
@@ -187,7 +192,9 @@ export const createDocumentFromTemplate = async ({
             redirectUrl: override?.redirectUrl || template.templateMeta?.redirectUrl,
             distributionMethod:
               override?.distributionMethod || template.templateMeta?.distributionMethod,
-            emailSettings: template.templateMeta?.emailSettings || undefined,
+            // last `undefined` is due to JsonValue's
+            emailSettings:
+              override?.emailSettings || template.templateMeta?.emailSettings || undefined,
             signingOrder:
               override?.signingOrder ||
               template.templateMeta?.signingOrder ||
@@ -196,6 +203,8 @@ export const createDocumentFromTemplate = async ({
               override?.language ||
               template.templateMeta?.language ||
               template.team?.teamGlobalSettings?.documentLanguage,
+            typedSignatureEnabled:
+              override?.typedSignatureEnabled ?? template.templateMeta?.typedSignatureEnabled,
           },
         },
         Recipient: {
@@ -283,9 +292,23 @@ export const createDocumentFromTemplate = async ({
       }),
     });
 
+    const createdDocument = await tx.document.findFirst({
+      where: {
+        id: document.id,
+      },
+      include: {
+        documentMeta: true,
+        Recipient: true,
+      },
+    });
+
+    if (!createdDocument) {
+      throw new Error('Document not found');
+    }
+
     await triggerWebhook({
       event: WebhookTriggerEvents.DOCUMENT_CREATED,
-      data: document,
+      data: ZWebhookDocumentSchema.parse(createdDocument),
       userId,
       teamId,
     });

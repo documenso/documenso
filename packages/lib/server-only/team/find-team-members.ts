@@ -1,10 +1,12 @@
 import { P, match } from 'ts-pattern';
+import type { z } from 'zod';
 
 import { prisma } from '@documenso/prisma';
 import type { TeamMember } from '@documenso/prisma/client';
 import { Prisma } from '@documenso/prisma/client';
+import { TeamMemberSchema, UserSchema } from '@documenso/prisma/generated/zod';
 
-import type { FindResultSet } from '../../types/find-result-set';
+import { type FindResultSet, ZFindResultSet } from '../../types/find-result-set';
 
 export interface FindTeamMembersOptions {
   userId: number;
@@ -18,6 +20,17 @@ export interface FindTeamMembersOptions {
   };
 }
 
+export const ZFindTeamMembersResponseSchema = ZFindResultSet.extend({
+  data: TeamMemberSchema.extend({
+    user: UserSchema.pick({
+      name: true,
+      email: true,
+    }),
+  }).array(),
+});
+
+export type TFindTeamMembersResponse = z.infer<typeof ZFindTeamMembersResponseSchema>;
+
 export const findTeamMembers = async ({
   userId,
   teamId,
@@ -25,7 +38,7 @@ export const findTeamMembers = async ({
   page = 1,
   perPage = 10,
   orderBy,
-}: FindTeamMembersOptions) => {
+}: FindTeamMembersOptions): Promise<TFindTeamMembersResponse> => {
   const orderByColumn = orderBy?.column ?? 'name';
   const orderByDirection = orderBy?.direction ?? 'desc';
 

@@ -106,12 +106,15 @@ export const isRecipientAuthorized = async ({
 
       // Should not be possible.
       if (!user) {
-        throw new AppError(AppErrorCode.NOT_FOUND, 'User not found');
+        throw new AppError(AppErrorCode.NOT_FOUND, {
+          message: 'User not found',
+        });
       }
 
       return await verifyTwoFactorAuthenticationToken({
         user,
         totpCode: token,
+        window: 10, // 5 minutes worth of tokens
       });
     })
     .exhaustive();
@@ -163,7 +166,9 @@ const verifyPasskey = async ({
   });
 
   if (!passkey) {
-    throw new AppError(AppErrorCode.NOT_FOUND, 'Passkey not found');
+    throw new AppError(AppErrorCode.NOT_FOUND, {
+      message: 'Passkey not found',
+    });
   }
 
   const verificationToken = await prisma.verificationToken
@@ -176,11 +181,15 @@ const verifyPasskey = async ({
     .catch(() => null);
 
   if (!verificationToken) {
-    throw new AppError(AppErrorCode.NOT_FOUND, 'Token not found');
+    throw new AppError(AppErrorCode.NOT_FOUND, {
+      message: 'Token not found',
+    });
   }
 
   if (verificationToken.expires < new Date()) {
-    throw new AppError(AppErrorCode.EXPIRED_CODE, 'Token expired');
+    throw new AppError(AppErrorCode.EXPIRED_CODE, {
+      message: 'Token expired',
+    });
   }
 
   const { rpId, origin } = getAuthenticatorOptions();
@@ -198,7 +207,9 @@ const verifyPasskey = async ({
   }).catch(() => null); // May want to log this for insights.
 
   if (verification?.verified !== true) {
-    throw new AppError(AppErrorCode.UNAUTHORIZED, 'User is not authorized');
+    throw new AppError(AppErrorCode.UNAUTHORIZED, {
+      message: 'User is not authorized',
+    });
   }
 
   await prisma.passkey.update({

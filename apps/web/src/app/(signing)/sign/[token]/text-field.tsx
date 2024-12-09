@@ -214,15 +214,15 @@ export const TextField = ({ field, recipient, onSignField, onUnsignField }: Text
     parsedField?.label && parsedField.label.length < 20
       ? parsedField.label
       : parsedField?.label
-      ? parsedField?.label.substring(0, 20) + '...'
-      : undefined;
+        ? parsedField?.label.substring(0, 20) + '...'
+        : undefined;
 
   const textDisplay =
     parsedField?.text && parsedField.text.length < 20
       ? parsedField.text
       : parsedField?.text
-      ? parsedField?.text.substring(0, 20) + '...'
-      : undefined;
+        ? parsedField?.text.substring(0, 20) + '...'
+        : undefined;
 
   const fieldDisplayName = labelDisplay ? labelDisplay : textDisplay;
   const charactersRemaining = (parsedFieldMeta?.characterLimit ?? 0) - (localText.length ?? 0);
@@ -252,14 +252,16 @@ export const TextField = ({ field, recipient, onSignField, onUnsignField }: Text
           )}
         >
           <span className="flex items-center justify-center gap-x-1">
-            <Type />
-            {fieldDisplayName || <Trans>Text</Trans>}
+            <Type className="h-[clamp(0.625rem,20cqw,0.925rem)] w-[clamp(0.625rem,20cqw,0.925rem)]" />
+            <span className="text-[clamp(0.425rem,25cqw,0.825rem)]">
+              {fieldDisplayName || <Trans>Text</Trans>}
+            </span>
           </span>
         </p>
       )}
 
       {field.inserted && (
-        <p className="text-muted-foreground dark:text-background/80 flex items-center justify-center gap-x-1 duration-200">
+        <p className="text-muted-foreground dark:text-background/80 flex items-center justify-center gap-x-1 text-[clamp(0.425rem,25cqw,0.825rem)] duration-200">
           {field.customText.length < 20
             ? field.customText
             : field.customText.substring(0, 15) + '...'}
@@ -323,7 +325,7 @@ export const TextField = ({ field, recipient, onSignField, onUnsignField }: Text
             <div className="mt-4 flex w-full flex-1 flex-nowrap gap-4">
               <Button
                 type="button"
-                className="dark:bg-muted dark:hover:bg-muted/80 flex-1  bg-black/5 hover:bg-black/10"
+                className="dark:bg-muted dark:hover:bg-muted/80 flex-1 bg-black/5 hover:bg-black/10"
                 variant="secondary"
                 onClick={() => {
                   setShowCustomTextModal(false);

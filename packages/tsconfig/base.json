@@ -16,6 +16,7 @@
     "preserveWatchOutput": true,
     "skipLibCheck": true,
     "strict": true,
+    "strictNullChecks": true,
     "target": "ES2018"
   },
   "include": ["**/*.ts", "**/*.tsx", "**/.d.ts"],

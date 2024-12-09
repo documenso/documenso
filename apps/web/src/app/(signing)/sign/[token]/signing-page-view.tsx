@@ -22,6 +22,7 @@ import { LazyPDFViewer } from '@documenso/ui/primitives/lazy-pdf-viewer';
 
 import { DocumentReadOnlyFields } from '~/components/document/document-read-only-fields';
 
+import { AutoSign } from './auto-sign';
 import { CheckboxField } from './checkbox-field';
 import { DateField } from './date-field';
 import { DropdownField } from './dropdown-field';
@@ -52,34 +53,62 @@ export const SigningPageView = ({
 }: SigningPageViewProps) => {
   const { documentData, documentMeta } = document;
 
+  const shouldUseTeamDetails =
+    document.teamId && document.team?.teamGlobalSettings?.includeSenderDetails === false;
+
+  let senderName = document.User.name ?? '';
+  let senderEmail = `(${document.User.email})`;
+
+  if (shouldUseTeamDetails) {
+    senderName = document.team?.name ?? '';
+    senderEmail = document.team?.teamEmail?.email ? `(${document.team.teamEmail.email})` : '';
+  }
+
   return (
     <div className="mx-auto w-full max-w-screen-xl">
-      <h1 className="mt-4 truncate text-2xl font-semibold md:text-3xl" title={document.title}>
+      <h1
+        className="mt-4 block max-w-[20rem] truncate text-2xl font-semibold md:max-w-[30rem] md:text-3xl"
+        title={document.title}
+      >
         {document.title}
       </h1>
 
       <div className="mt-2.5 flex flex-wrap items-center justify-between gap-x-6">
-        <div>
-          <p
-            className="text-muted-foreground truncate"
-            title={document.User.name ? document.User.name : ''}
-          >
-            {document.User.name}
-          </p>
-
-          <p className="text-muted-foreground">
+        <div className="max-w-[50ch]">
+          <span className="text-muted-foreground truncate" title={senderName}>
+            {senderName} {senderEmail}
+          </span>{' '}
+          <span className="text-muted-foreground">
             {match(recipient.role)
-              .with(RecipientRole.VIEWER, () => (
-                <Trans>({document.User.email}) has invited you to view this document</Trans>
-              ))
-              .with(RecipientRole.SIGNER, () => (
-                <Trans>({document.User.email}) has invited you to sign this document</Trans>
-              ))
-              .with(RecipientRole.APPROVER, () => (
-                <Trans>({document.User.email}) has invited you to approve this document</Trans>
-              ))
+              .with(RecipientRole.VIEWER, () =>
+                document.teamId && !shouldUseTeamDetails ? (
+                  <Trans>
+                    on behalf of "{document.team?.name}" has invited you to view this document
+                  </Trans>
+                ) : (
+                  <Trans>has invited you to view this document</Trans>
+                ),
+              )
+              .with(RecipientRole.SIGNER, () =>
+                document.teamId && !shouldUseTeamDetails ? (
+                  <Trans>
+                    on behalf of "{document.team?.name}" has invited you to sign this document
+                  </Trans>
+                ) : (
+                  <Trans>has invited you to sign this document</Trans>
+                ),
+              )
+              .with(RecipientRole.APPROVER, () =>
+                document.teamId && !shouldUseTeamDetails ? (
+                  <Trans>
+                    on behalf of "{document.team?.name}" has invited you to approve this document
+                  </Trans>
+                ) : (
+                  <Trans>has invited you to approve this document</Trans>
+                ),
+              )
               .otherwise(() => null)}
-          </p>
+          </span>
         </div>
 
         <RejectDocumentDialog document={document} token={recipient.token} />
@@ -112,6 +141,8 @@ export const SigningPageView = ({
       </div>
 
       <DocumentReadOnlyFields fields={completedFields} />
+
+      <AutoSign recipient={recipient} fields={fields} />
 
       <ElementVisible target={PDF_VIEWER_PAGE_SELECTOR}>
         {fields.map((field) =>

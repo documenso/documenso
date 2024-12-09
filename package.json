@@ -1,6 +1,6 @@
 {
   "private": true,
-  "version": "1.8.0-rc.2",
+  "version": "1.8.1",
   "scripts": {
     "build": "turbo run build",
     "build:web": "turbo run build --filter=@documenso/web",
@@ -32,7 +32,7 @@
     "trigger:dev": "npm run with:env -- npx trigger-cli dev --handler-path=\"/api/jobs\"",
     "inngest:dev": "inngest dev -u http://localhost:3000/api/jobs",
     "make:version": " npm version --workspace @documenso/web --workspace @documenso/marketing --include-workspace-root --no-git-tag-version -m \"v%s\"",
-    "translate:extract": "lingui extract",
+    "translate:extract": "lingui extract --clean",
     "translate:compile": "turbo run translate:compile --filter=@documenso/web --filter=@documenso/marketing --filter=@documenso/ui"
   },
   "packageManager": "npm@10.7.0",
@@ -52,7 +52,7 @@
     "husky": "^9.0.11",
     "lint-staged": "^15.2.2",
     "playwright": "1.43.0",
-    "prettier": "^2.5.1",
+    "prettier": "^3.3.3",
     "rimraf": "^5.0.1",
     "turbo": "^1.9.3"
   },
