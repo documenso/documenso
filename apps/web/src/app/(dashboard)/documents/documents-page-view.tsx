@@ -4,8 +4,8 @@ import { Trans } from '@lingui/macro';
 
 import { NEXT_PUBLIC_WEBAPP_URL } from '@documenso/lib/constants/app';
 import { getRequiredServerComponentSession } from '@documenso/lib/next-auth/get-server-component-session';
-import { findDocuments } from '@documenso/lib/server-only/document/find-documents';
 import type { PeriodSelectorValue } from '@documenso/lib/server-only/document/find-documents';
+import { findDocuments } from '@documenso/lib/server-only/document/find-documents';
 import type { GetStatsInput } from '@documenso/lib/server-only/document/get-stats';
 import { getStats } from '@documenso/lib/server-only/document/get-stats';
 import { parseToIntegerArray } from '@documenso/lib/utils/params';

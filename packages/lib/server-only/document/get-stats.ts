@@ -1,12 +1,16 @@
 import { DateTime } from 'luxon';
 import { match } from 'ts-pattern';
 
+// eslint-disable-next-line import/no-extraneous-dependencies
 import type { PeriodSelectorValue } from '@documenso/lib/server-only/document/find-documents';
 import { prisma } from '@documenso/prisma';
-import { TeamMemberRole } from '@documenso/prisma/client';
 import type { Prisma, User } from '@documenso/prisma/client';
-import { SigningStatus } from '@documenso/prisma/client';
-import { DocumentVisibility } from '@documenso/prisma/client';
+import {
+  DocumentVisibility,
+  RecipientRole,
+  SigningStatus,
+  TeamMemberRole,
+} from '@documenso/prisma/client';
 import { isExtendedDocumentStatus } from '@documenso/prisma/guards/is-extended-document-status';
 import { ExtendedDocumentStatus } from '@documenso/prisma/types/extended-document-status';
 
@@ -103,25 +107,52 @@ const getCounts = async ({ user, createdAt, search }: GetCountsOption) => {
         _all: true,
       },
       where: {
-        userId: user.id,
+        OR: [
+          {
+            userId: user.id,
+            teamId: null,
+            deletedAt: null,
+          },
+          {
+            status: ExtendedDocumentStatus.COMPLETED,
+            Recipient: {
+              some: {
+                email: user.email,
+                documentDeletedAt: null,
+              },
+            },
+          },
+          {
+            status: ExtendedDocumentStatus.PENDING,
+            Recipient: {
+              some: {
+                email: user.email,
+                documentDeletedAt: null,
+              },
+            },
+          },
+        ],
         createdAt,
-        teamId: null,
-        deletedAt: null,
         AND: [searchFilter],
       },
     }),
-    // Not signed counts.
+    // Not signed counts (Inbox).
     prisma.document.groupBy({
       by: ['status'],
       _count: {
         _all: true,
       },
       where: {
-        status: ExtendedDocumentStatus.PENDING,
+        status: {
+          not: ExtendedDocumentStatus.DRAFT,
+        },
         Recipient: {
           some: {
             email: user.email,
             signingStatus: SigningStatus.NOT_SIGNED,
+            role: {
+              not: 'CC',
+            },
             documentDeletedAt: null,
           },
         },
@@ -136,34 +167,43 @@ const getCounts = async ({ user, createdAt, search }: GetCountsOption) => {
         _all: true,
       },
       where: {
-        createdAt,
-        User: {
-          email: {
-            not: user.email,
-          },
-        },
         OR: [
+          {
+            userId: user.id,
+            teamId: null,
+            status: ExtendedDocumentStatus.PENDING,
+            deletedAt: null,
+          },
           {
             status: ExtendedDocumentStatus.PENDING,
             Recipient: {
               some: {
                 email: user.email,
                 signingStatus: SigningStatus.SIGNED,
+                role: {
+                  not: 'CC',
+                },
                 documentDeletedAt: null,
               },
             },
+          },
+          {
+            userId: user.id,
+            teamId: null,
+            status: ExtendedDocumentStatus.COMPLETED,
+            deletedAt: null,
           },
           {
             status: ExtendedDocumentStatus.COMPLETED,
             Recipient: {
               some: {
                 email: user.email,
-                signingStatus: SigningStatus.SIGNED,
                 documentDeletedAt: null,
               },
             },
           },
         ],
+        createdAt,
         AND: [searchFilter],
       },
     }),
@@ -199,7 +239,6 @@ const getCounts = async ({ user, createdAt, search }: GetCountsOption) => {
             Recipient: {
               some: {
                 email: user.email,
-                signingStatus: SigningStatus.SIGNED,
                 documentDeletedAt: {
                   gte: DateTime.now().minus({ days: 30 }).startOf('day').toJSDate(),
                 },
@@ -207,6 +246,7 @@ const getCounts = async ({ user, createdAt, search }: GetCountsOption) => {
             },
           },
         ],
+        AND: [searchFilter],
       },
     }),
   ]);
@@ -224,15 +264,7 @@ type GetTeamCountsOption = {
 };
 
 const getTeamCounts = async (options: GetTeamCountsOption) => {
-  const {
-    createdAt,
-    teamId,
-    teamEmail,
-    senderIds = [],
-    currentUserEmail,
-    currentTeamMemberRole,
-    search,
-  } = options;
+  const { createdAt, teamId, teamEmail, senderIds = [], currentTeamMemberRole, search } = options;
 
   const userIdWhereClause: Prisma.DocumentWhereInput['userId'] =
     senderIds.length > 0
@@ -241,113 +273,171 @@ const getTeamCounts = async (options: GetTeamCountsOption) => {
         }
       : undefined;
 
-  const searchFilter: Prisma.DocumentWhereInput = {
-    OR: [
-      { title: { contains: search, mode: 'insensitive' } },
-      { Recipient: { some: { name: { contains: search, mode: 'insensitive' } } } },
-      { Recipient: { some: { email: { contains: search, mode: 'insensitive' } } } },
-    ],
-  };
+  const searchFilter: Prisma.DocumentWhereInput = search
+    ? {
+        OR: [
+          { title: { contains: search, mode: 'insensitive' } },
+          { Recipient: { some: { name: { contains: search, mode: 'insensitive' } } } },
+          { Recipient: { some: { email: { contains: search, mode: 'insensitive' } } } },
+        ],
+      }
+    : {};
 
   const visibilityFilters = [
-    ...match(currentTeamMemberRole)
-      .with(TeamMemberRole.ADMIN, () => [
-        { visibility: DocumentVisibility.EVERYONE },
-        { visibility: DocumentVisibility.MANAGER_AND_ABOVE },
-        { visibility: DocumentVisibility.ADMIN },
-      ])
-      .with(TeamMemberRole.MANAGER, () => [
-        { visibility: DocumentVisibility.EVERYONE },
-        { visibility: DocumentVisibility.MANAGER_AND_ABOVE },
-      ])
-      .otherwise(() => [{ visibility: DocumentVisibility.EVERYONE }]),
+    match(currentTeamMemberRole)
+      .with(TeamMemberRole.ADMIN, () => ({
+        visibility: {
+          in: [
+            DocumentVisibility.EVERYONE,
+            DocumentVisibility.MANAGER_AND_ABOVE,
+            DocumentVisibility.ADMIN,
+          ],
+        },
+      }))
+      .with(TeamMemberRole.MANAGER, () => ({
+        visibility: {
+          in: [DocumentVisibility.EVERYONE, DocumentVisibility.MANAGER_AND_ABOVE],
+        },
+      }))
+      .otherwise(() => ({ visibility: DocumentVisibility.EVERYONE })),
   ];
 
+  // Owner counts (ALL)
   const ownerCountsWhereInput: Prisma.DocumentWhereInput = {
     userId: userIdWhereClause,
     createdAt,
     OR: [
-      { teamId },
-      ...(teamEmail ? [{ User: { email: teamEmail } }] : []),
       {
-        AND: [
-          {
-            visibility: {
-              in: visibilityFilters.map((filter) => filter.visibility),
-            },
-          },
-          {
-            Recipient: {
-              none: {
-                email: currentUserEmail,
-              },
-            },
-          },
-        ],
+        teamId,
+        deletedAt: null,
+        OR: visibilityFilters,
       },
-      {
-        Recipient: {
-          some: {
-            email: currentUserEmail,
-          },
-        },
-      },
-    ],
-    deletedAt: null,
-    ...searchFilter,
-  };
-
-  const notSignedCountsWhereInput: Prisma.DocumentWhereInput = {
-    userId: userIdWhereClause,
-    createdAt,
-    status: ExtendedDocumentStatus.PENDING,
-    OR: [
-      { teamId },
       ...(teamEmail
         ? [
             {
+              status: {
+                not: ExtendedDocumentStatus.DRAFT,
+              },
               Recipient: {
                 some: {
                   email: teamEmail,
-                  signingStatus: SigningStatus.NOT_SIGNED,
-                  documentDeletedAt: null,
                 },
               },
+              deletedAt: null,
+              OR: visibilityFilters,
+            },
+            {
+              User: {
+                email: teamEmail,
+              },
+              deletedAt: null,
+              OR: visibilityFilters,
             },
           ]
         : []),
     ],
-    deletedAt: null,
+    ...searchFilter,
   };
 
+  // Not signed counts (INBOX)
+  const notSignedCountsWhereInput: Prisma.DocumentWhereInput = teamEmail
+    ? {
+        userId: userIdWhereClause,
+        createdAt,
+        status: {
+          not: ExtendedDocumentStatus.DRAFT,
+        },
+        Recipient: {
+          some: {
+            email: teamEmail,
+            signingStatus: SigningStatus.NOT_SIGNED,
+            role: {
+              not: RecipientRole.CC,
+            },
+          },
+        },
+        deletedAt: null,
+        OR: visibilityFilters,
+        ...searchFilter,
+      }
+    : {
+        userId: userIdWhereClause,
+        createdAt,
+        AND: [
+          {
+            OR: [{ id: -1 }], // Empty set if no team email
+          },
+          searchFilter,
+        ],
+      };
+
+  // Has signed counts (PENDING + COMPLETED)
   const hasSignedCountsWhereInput: Prisma.DocumentWhereInput = {
     userId: userIdWhereClause,
     createdAt,
     OR: [
       {
         teamId,
-        status: {
-          in: [ExtendedDocumentStatus.PENDING, ExtendedDocumentStatus.COMPLETED],
-        },
+        status: ExtendedDocumentStatus.PENDING,
+        deletedAt: null,
+        OR: visibilityFilters,
+      },
+      {
+        teamId,
+        status: ExtendedDocumentStatus.COMPLETED,
+        deletedAt: null,
+        OR: visibilityFilters,
       },
       ...(teamEmail
         ? [
             {
-              Recipient: {
-                some: {
-                  email: teamEmail,
-                  signingStatus: SigningStatus.SIGNED,
-                  documentDeletedAt: null,
+              status: ExtendedDocumentStatus.PENDING,
+              OR: [
+                {
+                  Recipient: {
+                    some: {
+                      email: teamEmail,
+                      signingStatus: SigningStatus.SIGNED,
+                      role: {
+                        not: RecipientRole.CC,
+                      },
+                    },
+                  },
+                  OR: visibilityFilters,
                 },
-              },
-              status: {
-                in: [ExtendedDocumentStatus.PENDING, ExtendedDocumentStatus.COMPLETED],
-              },
+                {
+                  User: {
+                    email: teamEmail,
+                  },
+                  OR: visibilityFilters,
+                },
+              ],
+              deletedAt: null,
+            },
+            {
+              status: ExtendedDocumentStatus.COMPLETED,
+              OR: [
+                {
+                  Recipient: {
+                    some: {
+                      email: teamEmail,
+                    },
+                  },
+                  OR: visibilityFilters,
+                },
+                {
+                  User: {
+                    email: teamEmail,
+                  },
+                  OR: visibilityFilters,
+                },
+              ],
+              deletedAt: null,
             },
           ]
         : []),
     ],
-    deletedAt: null,
+    ...searchFilter,
   };
 
   const deletedCountsWhereInput: Prisma.DocumentWhereInput = {
@@ -373,6 +463,7 @@ const getTeamCounts = async (options: GetTeamCountsOption) => {
           ]
         : []),
     ],
+    ...searchFilter,
   };
 
   return Promise.all([
