@@ -87,27 +87,40 @@ export const updateDocumentSettings = async ({
     const currentUserRole = document.team?.members[0]?.role;
     const isDocumentOwner = document.userId === userId;
 
-    if (!isDocumentOwner) {
-      match(currentUserRole)
-        .with(TeamMemberRole.ADMIN, () => true)
-        .with(TeamMemberRole.MANAGER, () => {
-          if (
-            document.visibility === DocumentVisibility.EVERYONE ||
-            document.visibility === DocumentVisibility.MANAGER_AND_ABOVE
-          ) {
-            return true;
-          }
+    if (isDocumentOwner) {
+      return true;
+    }
 
+    match(currentUserRole)
+      .with(TeamMemberRole.ADMIN, () => true)
+      .with(TeamMemberRole.MANAGER, () => {
+        const allowedVisibilities: DocumentVisibility[] = [
+          DocumentVisibility.EVERYONE,
+          DocumentVisibility.MANAGER_AND_ABOVE,
+        ];
+
+        if (!allowedVisibilities.includes(document.visibility)) {
           throw new AppError(AppErrorCode.UNAUTHORIZED, {
             message: 'You do not have permission to update the document visibility',
           });
-        })
-        .otherwise(() => {
+        }
+
+        return true;
+      })
+      .with(TeamMemberRole.MEMBER, () => {
+        if (document.visibility !== DocumentVisibility.EVERYONE) {
           throw new AppError(AppErrorCode.UNAUTHORIZED, {
-            message: 'You do not have permission to update the document',
+            message: 'You do not have permission to update the document visibility',
           });
+        }
+
+        return true;
+      })
+      .otherwise(() => {
+        throw new AppError(AppErrorCode.UNAUTHORIZED, {
+          message: 'You do not have permission to update the document',
         });
-    }
+      });
   }
 
   const { documentAuthOption } = extractDocumentAuthMethods({
