@@ -88,7 +88,7 @@ export const ApiContractV1Implementation = createNextRoute(ApiContractV1, {
 
     try {
       const document = await getDocumentById({
-        id: Number(documentId),
+        documentId: Number(documentId),
         userId: user.id,
         teamId: team?.id,
       });
@@ -158,7 +158,7 @@ export const ApiContractV1Implementation = createNextRoute(ApiContractV1, {
       }
 
       const document = await getDocumentById({
-        id: Number(documentId),
+        documentId: Number(documentId),
         userId: user.id,
         teamId: team?.id,
       });
@@ -211,7 +211,7 @@ export const ApiContractV1Implementation = createNextRoute(ApiContractV1, {
 
     try {
       const document = await getDocumentById({
-        id: Number(documentId),
+        documentId: Number(documentId),
         userId: user.id,
         teamId: team?.id,
       });
@@ -640,7 +640,11 @@ export const ApiContractV1Implementation = createNextRoute(ApiContractV1, {
     const { id } = args.params;
     const { sendEmail = true } = args.body ?? {};
 
-    const document = await getDocumentById({ id: Number(id), userId: user.id, teamId: team?.id });
+    const document = await getDocumentById({
+      documentId: Number(id),
+      userId: user.id,
+      teamId: team?.id,
+    });
 
     if (!document) {
       return {
@@ -757,7 +761,7 @@ export const ApiContractV1Implementation = createNextRoute(ApiContractV1, {
     const { name, email, role, authOptions, signingOrder } = args.body;
 
     const document = await getDocumentById({
-      id: Number(documentId),
+      documentId: Number(documentId),
       userId: user.id,
       teamId: team?.id,
     });
@@ -848,7 +852,7 @@ export const ApiContractV1Implementation = createNextRoute(ApiContractV1, {
     const { name, email, role, authOptions, signingOrder } = args.body;
 
     const document = await getDocumentById({
-      id: Number(documentId),
+      documentId: Number(documentId),
       userId: user.id,
       teamId: team?.id,
     });
@@ -907,7 +911,7 @@ export const ApiContractV1Implementation = createNextRoute(ApiContractV1, {
     const { id: documentId, recipientId } = args.params;
 
     const document = await getDocumentById({
-      id: Number(documentId),
+      documentId: Number(documentId),
       userId: user.id,
       teamId: team?.id,
     });
@@ -1134,7 +1138,7 @@ export const ApiContractV1Implementation = createNextRoute(ApiContractV1, {
       args.body;
 
     const document = await getDocumentById({
-      id: Number(documentId),
+      documentId: Number(documentId),
       userId: user.id,
       teamId: team?.id,
     });
@@ -1223,7 +1227,7 @@ export const ApiContractV1Implementation = createNextRoute(ApiContractV1, {
     const { id: documentId, fieldId } = args.params;
 
     const document = await getDocumentById({
-      id: Number(documentId),
+      documentId: Number(documentId),
       userId: user.id,
     });
 

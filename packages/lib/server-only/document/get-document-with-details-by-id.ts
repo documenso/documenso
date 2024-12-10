@@ -4,18 +4,18 @@ import type { DocumentWithDetails } from '@documenso/prisma/types/document';
 import { getDocumentWhereInput } from './get-document-by-id';
 
 export type GetDocumentWithDetailsByIdOptions = {
-  id: number;
+  documentId: number;
   userId: number;
   teamId?: number;
 };
 
 export const getDocumentWithDetailsById = async ({
-  id,
+  documentId,
   userId,
   teamId,
 }: GetDocumentWithDetailsByIdOptions): Promise<DocumentWithDetails> => {
   const documentWhereInput = await getDocumentWhereInput({
-    documentId: id,
+    documentId,
     userId,
     teamId,
   });

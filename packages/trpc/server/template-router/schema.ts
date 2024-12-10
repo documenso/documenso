@@ -70,7 +70,7 @@ export const ZToggleTemplateDirectLinkMutationSchema = z.object({
 });
 
 export const ZDeleteTemplateMutationSchema = z.object({
-  id: z.number().min(1),
+  templateId: z.number().min(1),
   teamId: z.number().optional(),
 });
 
@@ -130,8 +130,9 @@ export const ZFindTemplatesQuerySchema = ZBaseTableSearchParamsSchema.extend({
   type: z.nativeEnum(TemplateType).optional(),
 });
 
-export const ZGetTemplateWithDetailsByIdQuerySchema = z.object({
-  id: z.number().min(1),
+export const ZGetTemplateByIdQuerySchema = z.object({
+  templateId: z.number().min(1),
+  teamId: z.number().optional(),
 });
 
 export const ZMoveTemplatesToTeamSchema = z.object({
@@ -151,7 +152,5 @@ export type TCreateDocumentFromTemplateMutationSchema = z.infer<
 >;
 export type TDuplicateTemplateMutationSchema = z.infer<typeof ZDuplicateTemplateMutationSchema>;
 export type TDeleteTemplateMutationSchema = z.infer<typeof ZDeleteTemplateMutationSchema>;
-export type TGetTemplateWithDetailsByIdQuerySchema = z.infer<
-  typeof ZGetTemplateWithDetailsByIdQuerySchema
->;
+export type TGetTemplateByIdQuerySchema = z.infer<typeof ZGetTemplateByIdQuerySchema>;
 export type TMoveTemplatesToSchema = z.infer<typeof ZMoveTemplatesToTeamSchema>;

@@ -4,18 +4,18 @@ import { DocumentSource, type Prisma } from '@documenso/prisma/client';
 import { getDocumentWhereInput } from './get-document-by-id';
 
 export interface DuplicateDocumentByIdOptions {
-  id: number;
+  documentId: number;
   userId: number;
   teamId?: number;
 }
 
 export const duplicateDocumentById = async ({
-  id,
+  documentId,
   userId,
   teamId,
 }: DuplicateDocumentByIdOptions) => {
   const documentWhereInput = await getDocumentWhereInput({
-    documentId: id,
+    documentId,
     userId,
     teamId,
   });

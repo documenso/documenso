@@ -85,7 +85,7 @@ export const DeleteTemplateDialog = ({
             type="button"
             variant="destructive"
             loading={isLoading}
-            onClick={async () => deleteTemplate({ id, teamId })}
+            onClick={async () => deleteTemplate({ templateId: id, teamId })}
           >
             <Trans>Delete</Trans>
           </Button>

@@ -48,7 +48,7 @@ export const ZFindDocumentAuditLogsQuerySchema = ZBaseTableSearchParamsSchema.ex
 });
 
 export const ZGetDocumentByIdQuerySchema = z.object({
-  id: z.number().min(1),
+  documentId: z.number().min(1),
   teamId: z.number().min(1).optional(),
 });
 
@@ -61,7 +61,7 @@ export const ZGetDocumentByTokenQuerySchema = z.object({
 export type TGetDocumentByTokenQuerySchema = z.infer<typeof ZGetDocumentByTokenQuerySchema>;
 
 export const ZGetDocumentWithDetailsByIdQuerySchema = z.object({
-  id: z.number().min(1),
+  documentId: z.number().min(1),
   teamId: z.number().min(1).optional(),
 });
 
@@ -206,12 +206,12 @@ export const ZResendDocumentMutationSchema = z.object({
 
 export type TSendDocumentMutationSchema = z.infer<typeof ZSendDocumentMutationSchema>;
 
-export const ZDeleteDraftDocumentMutationSchema = z.object({
-  id: z.number().min(1),
+export const ZDeleteDocumentMutationSchema = z.object({
+  documentId: z.number().min(1),
   teamId: z.number().min(1).optional(),
 });
 
-export type TDeleteDraftDocumentMutationSchema = z.infer<typeof ZDeleteDraftDocumentMutationSchema>;
+export type TDeleteDocumentMutationSchema = z.infer<typeof ZDeleteDocumentMutationSchema>;
 
 export const ZSearchDocumentsMutationSchema = z.object({
   query: z.string(),
