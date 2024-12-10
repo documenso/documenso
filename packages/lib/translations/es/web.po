@@ -8,7 +8,7 @@ msgstr ""
 "Language: es\n"
 "Project-Id-Version: documenso-app\n"
 "Report-Msgid-Bugs-To: \n"
-"PO-Revision-Date: 2024-11-20 11:56\n"
+"PO-Revision-Date: 2024-12-08 04:04\n"
 "Last-Translator: \n"
 "Language-Team: Spanish\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
@@ -123,15 +123,15 @@ msgstr "<0>Remitente:</0> Todos"
 
 #: apps/web/src/app/(signing)/sign/[token]/sign-dialog.tsx:104
 msgid "<0>You are about to complete approving <1>\"{documentTitle}\"</1>.</0><2/> Are you sure?"
-msgstr ""
+msgstr "<0>Está a punto de completar la aprobación de <1>\"{documentTitle}\"</1>.</0><2/> ¿Está seguro?"
 
 #: apps/web/src/app/(signing)/sign/[token]/sign-dialog.tsx:90
 msgid "<0>You are about to complete signing \"<1>{documentTitle}</1>\".</0><2/> Are you sure?"
-msgstr ""
+msgstr "<0>Está a punto de completar la firma de \"<1>{documentTitle}</1>\".</0><2/> ¿Está seguro?"
 
 #: apps/web/src/app/(signing)/sign/[token]/sign-dialog.tsx:76
 msgid "<0>You are about to complete viewing \"<1>{documentTitle}</1>\".</0><2/> Are you sure?"
-msgstr ""
+msgstr "<0>Está a punto de completar la visualización de \"<1>{documentTitle}</1>\".</0><2/> ¿Está seguro?"
 
 #: apps/web/src/components/(dashboard)/settings/token/contants.ts:5
 msgid "1 month"
@@ -441,7 +441,7 @@ msgstr "Ocurrió un error"
 
 #: apps/web/src/app/(dashboard)/templates/[id]/edit/edit-template.tsx:257
 msgid "An error occurred while adding fields."
-msgstr ""
+msgstr "Ocurrió un error al agregar campos."
 
 #: apps/web/src/app/(dashboard)/documents/[id]/edit-document.tsx:269
 #: apps/web/src/app/(dashboard)/templates/[id]/edit/edit-template.tsx:218
@@ -1015,11 +1015,11 @@ msgstr "Controla el formato del mensaje que se enviará al invitar a un destinat
 
 #: apps/web/src/app/(teams)/t/[teamUrl]/settings/preferences/document-preferences.tsx:263
 msgid "Controls whether the recipients can sign the documents using a typed signature. Enable or disable the typed signature globally."
-msgstr ""
+msgstr "Controla si los destinatarios pueden firmar los documentos utilizando una firma mecanografiada. Habilitar o deshabilitar la firma mecanografiada globalmente."
 
 #: apps/web/src/app/(teams)/t/[teamUrl]/settings/preferences/document-preferences.tsx:293
 msgid "Controls whether the signing certificate will be included in the document when it is downloaded. The signing certificate can still be downloaded from the logs page separately."
-msgstr ""
+msgstr "Controla si el certificado de firma se incluirá en el documento cuando se descargue. El certificado de firma aún puede descargarse por separado desde la página de registros."
 
 #: apps/web/src/components/document/document-recipient-link-copy-dialog.tsx:128
 msgid "Copied"
@@ -1185,7 +1185,7 @@ msgstr "Contraseña actual"
 
 #: apps/web/src/components/forms/password.tsx:81
 msgid "Current password is incorrect."
-msgstr ""
+msgstr "La contraseña actual es incorrecta."
 
 #: apps/web/src/app/(teams)/t/[teamUrl]/settings/billing/page.tsx:69
 msgid "Current plan: {0}"
@@ -1726,7 +1726,7 @@ msgstr "Habilitar firma de enlace directo"
 
 #: apps/web/src/app/(teams)/t/[teamUrl]/settings/preferences/document-preferences.tsx:248
 msgid "Enable Typed Signature"
-msgstr ""
+msgstr "Habilitar firma mecanografiada"
 
 #: apps/web/src/app/(dashboard)/admin/site-settings/banner-form.tsx:123
 #: apps/web/src/app/(dashboard)/settings/webhooks/[id]/page.tsx:138
@@ -1911,15 +1911,15 @@ msgstr "Ve a tu <0>configuración de perfil público</0> para agregar documentos
 
 #: apps/web/src/app/(signing)/sign/[token]/signing-page-view.tsx:107
 msgid "has invited you to approve this document"
-msgstr ""
+msgstr "te ha invitado a aprobar este documento"
 
 #: apps/web/src/app/(signing)/sign/[token]/signing-page-view.tsx:98
 msgid "has invited you to sign this document"
-msgstr ""
+msgstr "te ha invitado a firmar este documento"
 
 #: apps/web/src/app/(signing)/sign/[token]/signing-page-view.tsx:89
 msgid "has invited you to view this document"
-msgstr ""
+msgstr "te ha invitado a ver este documento"
 
 #: apps/web/src/app/(dashboard)/settings/profile/page.tsx:29
 msgid "Here you can edit your personal details."
@@ -1990,7 +1990,7 @@ msgstr "Documentos en bandeja de entrada"
 
 #: apps/web/src/app/(teams)/t/[teamUrl]/settings/preferences/document-preferences.tsx:278
 msgid "Include the Signing Certificate in the Document"
-msgstr ""
+msgstr "Incluir el certificado de firma en el documento"
 
 #: apps/web/src/app/(dashboard)/documents/[id]/document-page-view-information.tsx:53
 #: apps/web/src/app/(dashboard)/templates/[id]/template-page-view-information.tsx:50
@@ -2029,7 +2029,7 @@ msgstr "Token inválido"
 
 #: apps/web/src/components/forms/reset-password.tsx:84
 msgid "Invalid token provided. Please try again."
-msgstr ""
+msgstr "Token inválido proporcionado. Por favor, inténtelo nuevamente."
 
 #: apps/web/src/app/(unauthenticated)/team/invite/[token]/page.tsx:123
 msgid "Invitation accepted!"
@@ -2139,7 +2139,7 @@ msgstr "Último uso"
 
 #: apps/web/src/app/(dashboard)/admin/nav.tsx:93
 msgid "Leaderboard"
-msgstr ""
+msgstr "Tabla de clasificación"
 
 #: apps/web/src/components/(teams)/dialogs/leave-team-dialog.tsx:111
 #: apps/web/src/components/(teams)/tables/current-user-teams-data-table.tsx:117
@@ -2464,15 +2464,15 @@ msgstr "Número"
 
 #: apps/web/src/app/(signing)/sign/[token]/signing-page-view.tsx:103
 msgid "on behalf of \"{0}\" has invited you to approve this document"
-msgstr ""
+msgstr "en nombre de \"{0}\" te ha invitado a aprobar este documento"
 
 #: apps/web/src/app/(signing)/sign/[token]/signing-page-view.tsx:94
 msgid "on behalf of \"{0}\" has invited you to sign this document"
-msgstr ""
+msgstr "en nombre de \"{0}\" te ha invitado a firmar este documento"
 
 #: apps/web/src/app/(signing)/sign/[token]/signing-page-view.tsx:85
 msgid "on behalf of \"{0}\" has invited you to view this document"
-msgstr ""
+msgstr "en nombre de \"{0}\" te ha invitado a ver este documento"
 
 #: apps/web/src/components/(dashboard)/settings/webhooks/create-webhook-dialog.tsx:128
 msgid "On this page, you can create a new webhook."
@@ -2514,7 +2514,7 @@ msgstr "Solo los gerentes y superiores pueden acceder y ver el documento"
 
 #: apps/web/src/components/forms/v2/signup.tsx:81
 msgid "Only subscribers can have a username shorter than 6 characters"
-msgstr ""
+msgstr "Solo los suscriptores pueden tener un nombre de usuario de menos de 6 caracteres"
 
 #: apps/web/src/app/(profile)/p/[url]/not-found.tsx:19
 #: apps/web/src/app/(recipient)/d/[token]/not-found.tsx:19
@@ -2608,7 +2608,7 @@ msgstr "Contraseña"
 #: apps/web/src/app/(signing)/sign/[token]/complete/claim-account.tsx:51
 #: apps/web/src/components/forms/v2/signup.tsx:72
 msgid "Password should not be common or based on personal information"
-msgstr ""
+msgstr "La contraseña no debe ser común ni basarse en información personal"
 
 #: apps/web/src/components/forms/password.tsx:72
 #: apps/web/src/components/forms/reset-password.tsx:73
@@ -2692,7 +2692,7 @@ msgstr "Por favor, ingresa un nombre significativo para tu token. Esto te ayudar
 #: apps/web/src/app/(signing)/sign/[token]/complete/claim-account.tsx:41
 #: apps/web/src/components/forms/v2/signup.tsx:53
 msgid "Please enter a valid name."
-msgstr ""
+msgstr "Por favor, introduce un nombre válido."
 
 #: apps/web/src/app/(signing)/sign/[token]/form.tsx:142
 msgid "Please mark as viewed to complete"
@@ -2756,7 +2756,7 @@ msgstr "Por favor, intenta de nuevo más tarde."
 
 #: apps/web/src/app/(dashboard)/documents/delete-document-dialog.tsx:186
 msgid "Please type {0} to confirm"
-msgstr ""
+msgstr "Por favor, escriba {0} para confirmar"
 
 #: apps/web/src/app/(dashboard)/settings/profile/delete-account-dialog.tsx:123
 msgid "Please type <0>{0}</0> to confirm."
@@ -3291,7 +3291,7 @@ msgstr "ID de Firma"
 #: apps/web/src/app/embed/direct/[[...url]]/client.tsx:448
 #: apps/web/src/app/embed/sign/[[...url]]/client.tsx:327
 msgid "Signature is too small. Please provide a more complete signature."
-msgstr ""
+msgstr "La firma es demasiado pequeña. Proporcione una firma más completa."
 
 #: apps/web/src/app/(dashboard)/admin/stats/page.tsx:123
 msgid "Signatures Collected"
@@ -3340,11 +3340,11 @@ msgstr "Registrándose..."
 #: apps/web/src/app/(dashboard)/admin/leaderboard/data-table-leaderboard.tsx:82
 #: apps/web/src/app/(dashboard)/admin/leaderboard/page.tsx:46
 msgid "Signing Volume"
-msgstr ""
+msgstr "Volumen de firmas"
 
 #: apps/web/src/components/forms/v2/signup.tsx:77
 msgid "Signups are disabled."
-msgstr ""
+msgstr "Las inscripciones están deshabilitadas."
 
 #: apps/web/src/app/(profile)/p/[url]/page.tsx:109
 msgid "Since {0}"
@@ -4044,7 +4044,7 @@ msgstr "Fecha de expiración del token"
 
 #: apps/web/src/components/forms/reset-password.tsx:83
 msgid "Token has expired. Please try again."
-msgstr ""
+msgstr "El token ha expirado. Por favor, inténtelo de nuevo."
 
 #: apps/web/src/components/forms/token.tsx:165
 msgid "Token name"
@@ -4129,7 +4129,7 @@ msgstr "Escribe un comando o busca..."
 
 #: apps/web/src/app/(signing)/sign/[token]/signature-field.tsx:134
 msgid "Typed signatures are not allowed. Please draw your signature."
-msgstr ""
+msgstr "No se permiten firmas mecanografiadas. Por favor, dibuje su firma."
 
 #: apps/web/src/app/(unauthenticated)/verify-email/page.tsx:26
 msgid "Uh oh! Looks like you're missing a token"
@@ -4356,7 +4356,7 @@ msgstr "Usuario"
 
 #: apps/web/src/components/forms/password.tsx:80
 msgid "User has no password."
-msgstr ""
+msgstr "El usuario no tiene contraseña."
 
 #: apps/web/src/app/(dashboard)/admin/subscriptions/page.tsx:41
 msgid "User ID"
@@ -4372,11 +4372,11 @@ msgstr "Configuraciones del usuario"
 
 #: apps/web/src/components/forms/v2/signup.tsx:78
 msgid "User with this email already exists. Please use a different email address."
-msgstr ""
+msgstr "Un usuario con este correo electrónico ya existe. Por favor, use una dirección de correo diferente."
 
 #: apps/web/src/components/forms/v2/signup.tsx:63
 msgid "Username can only container alphanumeric characters and dashes."
-msgstr ""
+msgstr "El nombre de usuario solo puede contener caracteres alfanuméricos y guiones."
 
 #: apps/web/src/app/(dashboard)/admin/nav.tsx:51
 msgid "Users"
@@ -4642,11 +4642,11 @@ msgstr "Hemos enviado un correo electrónico de confirmación para la verificaci
 
 #: apps/web/src/components/forms/v2/signup.tsx:61
 msgid "We need a username to create your profile"
-msgstr ""
+msgstr "Necesitamos un nombre de usuario para crear tu perfil"
 
 #: apps/web/src/components/forms/v2/signup.tsx:56
 msgid "We need your signature to sign documents"
-msgstr ""
+msgstr "Necesitamos su firma para firmar documentos"
 
 #: apps/web/src/components/forms/token.tsx:111
 msgid "We were unable to copy the token to your clipboard. Please try again."
@@ -4662,7 +4662,7 @@ msgstr "No pudimos crear una sesión de pago. Por favor, inténtalo de nuevo o c
 
 #: apps/web/src/components/forms/v2/signup.tsx:79
 msgid "We were unable to create your account. Please review the information you provided and try again."
-msgstr ""
+msgstr "No pudimos crear su cuenta. Revise la información que proporcionó e inténtelo de nuevo."
 
 #: apps/web/src/components/forms/2fa/disable-authenticator-app-dialog.tsx:105
 msgid "We were unable to disable two-factor authentication for your account. Please ensure that you have entered your password and backup code correctly and try again."
@@ -5087,7 +5087,7 @@ msgstr "Tus tokens existentes"
 #: apps/web/src/components/forms/password.tsx:84
 #: apps/web/src/components/forms/reset-password.tsx:87
 msgid "Your new password cannot be the same as your old password."
-msgstr ""
+msgstr "Tu nueva contraseña no puede ser la misma que tu antigua contraseña."
 
 #: apps/web/src/components/forms/password.tsx:73
 #: apps/web/src/components/forms/reset-password.tsx:74
@@ -5163,3 +5163,4 @@ msgstr "¡Tu token se creó con éxito! ¡Asegúrate de copiarlo porque no podr�
 #: apps/web/src/app/(teams)/t/[teamUrl]/settings/tokens/page.tsx:86
 msgid "Your tokens will be shown here once you create them."
 msgstr "Tus tokens se mostrarán aquí una vez que los crees."
+
