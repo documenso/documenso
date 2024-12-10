@@ -40,7 +40,7 @@ export type TConfigureDirectTemplateFormSchema = z.infer<typeof ZConfigureDirect
 export type ConfigureDirectTemplateFormProps = {
   flowStep: DocumentFlowStep;
   isDocumentPdfLoaded: boolean;
-  template: TemplateWithDetails;
+  template: Omit<TemplateWithDetails, 'User'>;
   directTemplateRecipient: Recipient & { Field: Field[] };
   initialEmail?: string;
   onSubmit: (_data: TConfigureDirectTemplateFormSchema) => void;

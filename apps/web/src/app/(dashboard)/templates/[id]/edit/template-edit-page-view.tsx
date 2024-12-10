@@ -8,7 +8,7 @@ import { ChevronLeft } from 'lucide-react';
 
 import { isUserEnterprise } from '@documenso/ee/server-only/util/is-document-enterprise';
 import { getRequiredServerComponentSession } from '@documenso/lib/next-auth/get-server-component-session';
-import { getTemplateWithDetailsById } from '@documenso/lib/server-only/template/get-template-with-details-by-id';
+import { getTemplateById } from '@documenso/lib/server-only/template/get-template-by-id';
 import { formatTemplatesPath } from '@documenso/lib/utils/teams';
 import type { Team } from '@documenso/prisma/client';
 
@@ -37,9 +37,10 @@ export const TemplateEditPageView = async ({ params, team }: TemplateEditPageVie
 
   const { user } = await getRequiredServerComponentSession();
 
-  const template = await getTemplateWithDetailsById({
+  const template = await getTemplateById({
     id: templateId,
     userId: user.id,
+    teamId: team?.id,
   }).catch(() => null);
 
   if (!template || !template.templateDocumentData) {

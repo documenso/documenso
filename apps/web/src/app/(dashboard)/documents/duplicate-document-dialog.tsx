@@ -36,7 +36,7 @@ export const DuplicateDocumentDialog = ({
   const { _ } = useLingui();
 
   const { data: document, isLoading } = trpcReact.document.getDocumentById.useQuery({
-    id,
+    documentId: id,
     teamId: team?.id,
   });
 
@@ -66,7 +66,7 @@ export const DuplicateDocumentDialog = ({
 
   const onDuplicate = async () => {
     try {
-      await duplicateDocument({ id, teamId: team?.id });
+      await duplicateDocument({ documentId: id, teamId: team?.id });
     } catch {
       toast({
         title: _(msg`Something went wrong`),
@@ -92,7 +92,7 @@ export const DuplicateDocumentDialog = ({
             </h1>
           </div>
         ) : (
-          <div className="p-2 [&>div]:h-[50vh] [&>div]:overflow-y-scroll  ">
+          <div className="p-2 [&>div]:h-[50vh] [&>div]:overflow-y-scroll">
             <LazyPDFViewer key={document?.id} documentData={documentData} />
           </div>
         )}
