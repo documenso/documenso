@@ -161,7 +161,10 @@ export const ZCreateDocumentMutationSchema = z.object({
       globalAccessAuth: ZDocumentAccessAuthTypesSchema.optional(),
       globalActionAuth: ZDocumentActionAuthTypesSchema.optional(),
     })
-    .optional(),
+    .optional()
+    .openapi({
+      description: 'The globalActionAuth property is only available for Enterprise accounts.',
+    }),
   formValues: z.record(z.string(), z.union([z.string(), z.boolean(), z.number()])).optional(),
 });
 
@@ -325,7 +328,10 @@ export const ZCreateRecipientMutationSchema = z.object({
     .object({
       actionAuth: ZRecipientActionAuthTypesSchema.optional(),
     })
-    .optional(),
+    .optional()
+    .openapi({
+      description: 'The authOptions property is only available for Enterprise accounts.',
+    }),
 });
 
 /**
