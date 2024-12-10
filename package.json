@@ -8,7 +8,8 @@
     "dev:web": "turbo run dev --filter=@documenso/web",
     "dev:marketing": "turbo run dev --filter=@documenso/marketing",
     "dev:docs": "turbo run dev --filter=@documenso/documentation",
-    "start": "turbo run start --filter=@documenso/web --filter=@documenso/marketing --filter=@documenso/documentation",
+    "dev:openpage-api": "turbo run dev --filter=@documenso/openpage-api",
+    "start": "turbo run start --filter=@documenso/web --filter=@documenso/marketing --filter=@documenso/documentation --filter=@documenso/openpage-api",
     "lint": "turbo run lint",
     "lint:fix": "turbo run lint:fix",
     "format": "prettier --write \"**/*.{js,jsx,cjs,mjs,ts,tsx,cts,mts,mdx}\"",
@@ -63,8 +64,10 @@
   ],
   "dependencies": {
     "@documenso/pdf-sign": "^0.1.0",
+    "@documenso/prisma": "^0.0.0",
     "@lingui/core": "^4.11.3",
     "inngest-cli": "^0.29.1",
+    "luxon": "^3.5.0",
     "next-runtime-env": "^3.2.0",
     "react": "^18"
   },
