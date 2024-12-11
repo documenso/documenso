@@ -6,7 +6,7 @@ import {
   ZDocumentActionAuthTypesSchema,
 } from '@documenso/lib/types/document-auth';
 import { ZDocumentEmailSettingsSchema } from '@documenso/lib/types/document-email';
-import { ZBaseTableSearchParamsSchema } from '@documenso/lib/types/search-params';
+import { ZFindSearchParamsSchema } from '@documenso/lib/types/search-params';
 import { isValidRedirectUrl } from '@documenso/lib/utils/is-valid-redirect-url';
 import {
   DocumentDistributionMethod,
@@ -125,7 +125,7 @@ export const ZSetSigningOrderForTemplateMutationSchema = z.object({
   signingOrder: z.nativeEnum(DocumentSigningOrder),
 });
 
-export const ZFindTemplatesQuerySchema = ZBaseTableSearchParamsSchema.extend({
+export const ZFindTemplatesQuerySchema = ZFindSearchParamsSchema.extend({
   teamId: z.number().optional(),
   type: z.nativeEnum(TemplateType).optional(),
 });

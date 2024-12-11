@@ -1,6 +1,8 @@
 import { prisma } from '@documenso/prisma';
 import type { Prisma, Template } from '@documenso/prisma/client';
 
+import type { FindResultResponse } from '../../types/search-params';
+
 export type FindTemplatesOptions = {
   userId: number;
   teamId?: number;
@@ -10,7 +12,7 @@ export type FindTemplatesOptions = {
 };
 
 export type FindTemplatesResponse = Awaited<ReturnType<typeof findTemplates>>;
-export type FindTemplateRow = FindTemplatesResponse['templates'][number];
+export type FindTemplateRow = FindTemplatesResponse['data'][number];
 
 export const findTemplates = async ({
   userId,
@@ -38,7 +40,7 @@ export const findTemplates = async ({
     };
   }
 
-  const [templates, count] = await Promise.all([
+  const [data, count] = await Promise.all([
     prisma.template.findMany({
       where: whereFilter,
       include: {
@@ -75,7 +77,10 @@ export const findTemplates = async ({
   ]);
 
   return {
-    templates,
+    data,
+    count,
+    currentPage: Math.max(page, 1),
+    perPage,
     totalPages: Math.ceil(count / perPage),
-  };
+  } satisfies FindResultResponse<typeof data>;
 };

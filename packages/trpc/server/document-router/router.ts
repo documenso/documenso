@@ -86,13 +86,13 @@ export const documentRouter = router({
     .query(async ({ input, ctx }) => {
       const { user } = ctx;
 
-      const { search, teamId, templateId, page, perPage, orderBy, source, status } = input;
+      const { query, teamId, templateId, page, perPage, orderBy, source, status } = input;
 
       const documents = await findDocuments({
         userId: user.id,
         teamId,
         templateId,
-        search,
+        query,
         source,
         status,
         page,

@@ -24,9 +24,9 @@ import {
 
 export const adminRouter = router({
   findDocuments: adminProcedure.input(ZAdminFindDocumentsQuerySchema).query(async ({ input }) => {
-    const { term, page, perPage } = input;
+    const { query, page, perPage } = input;
 
-    return await findDocuments({ term, page, perPage });
+    return await findDocuments({ query, page, perPage });
   }),
 
   updateUser: adminProcedure
