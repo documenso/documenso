@@ -399,6 +399,7 @@ enum SigningStatus {
   NOT_SIGNED
   SIGNED
   REJECTED
+  EXPIRED
 }
 
 enum RecipientRole {

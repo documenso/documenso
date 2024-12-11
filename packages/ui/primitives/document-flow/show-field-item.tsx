@@ -36,7 +36,7 @@ export const ShowFieldItem = ({ field, recipients }: ShowFieldItemProps) => {
 
   return createPortal(
     <div
-      className={cn('pointer-events-none absolute z-10 opacity-75')}
+      className={cn('pointer-events-none absolute opacity-75')}
       style={{
         top: `${coords.y}px`,
         left: `${coords.x}px`,

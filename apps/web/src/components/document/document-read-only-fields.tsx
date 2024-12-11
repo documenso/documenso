@@ -4,7 +4,7 @@ import { useState } from 'react';
 
 import { Trans } from '@lingui/macro';
 import { useLingui } from '@lingui/react';
-import { Clock, EyeOffIcon } from 'lucide-react';
+import { AlertTriangle, Clock, EyeOffIcon, Timer } from 'lucide-react';
 import { P, match } from 'ts-pattern';
 
 import {
@@ -75,6 +75,9 @@ export const DocumentReadOnlyFields = ({
                       variant={
                         field.Recipient.signingStatus === SigningStatus.SIGNED
                           ? 'default'
+                          : field.Recipient.signingStatus === SigningStatus.REJECTED ||
+                            field.Recipient.signingStatus === SigningStatus.EXPIRED
+                          ? 'destructive'
                           : 'secondary'
                       }
                     >
@@ -82,6 +85,16 @@ export const DocumentReadOnlyFields = ({
                         <>
                           <SignatureIcon className="mr-1 h-3 w-3" />
                           <Trans>Signed</Trans>
+                        </>
+                      ) : field.Recipient.signingStatus === SigningStatus.REJECTED ? (
+                        <>
+                          <AlertTriangle className="mr-1 h-3 w-3" />
+                          <Trans>Rejected</Trans>
+                        </>
+                      ) : field.Recipient.signingStatus === SigningStatus.EXPIRED ? (
+                        <>
+                          <Timer className="mr-1 h-3 w-3" />
+                          <Trans>Expired</Trans>
                         </>
                       ) : (
                         <>

@@ -8,7 +8,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { Trans, msg } from '@lingui/macro';
 import { useLingui } from '@lingui/react';
 import { motion } from 'framer-motion';
-import { GripVerticalIcon, Plus, Trash } from 'lucide-react';
+import { GripVerticalIcon, Plus } from 'lucide-react';
 import { useSession } from 'next-auth/react';
 import { useFieldArray, useForm } from 'react-hook-form';
 import { prop, sortBy } from 'remeda';
@@ -41,6 +41,7 @@ import {
   DocumentFlowFormContainerStep,
 } from './document-flow-root';
 import { ShowFieldItem } from './show-field-item';
+import { SignerActionDropdown } from './signer-action-dropdown';
 import type { DocumentFlowStep } from './types';
 
 export type AddSignersFormProps = {
@@ -51,6 +52,7 @@ export type AddSignersFormProps = {
   isDocumentEnterprise: boolean;
   onSubmit: (_data: TAddSignersFormSchema) => void;
   isDocumentPdfLoaded: boolean;
+  documentId: number;
 };
 
 export const AddSignersFormPartial = ({
@@ -61,6 +63,7 @@ export const AddSignersFormPartial = ({
   isDocumentEnterprise,
   onSubmit,
   isDocumentPdfLoaded,
+  documentId,
 }: AddSignersFormProps) => {
   const { _ } = useLingui();
   const { toast } = useToast();
@@ -81,6 +84,7 @@ export const AddSignersFormPartial = ({
       email: '',
       role: RecipientRole.SIGNER,
       signingOrder: 1,
+      expiry: undefined,
       actionAuth: undefined,
     },
   ];
@@ -97,6 +101,7 @@ export const AddSignersFormPartial = ({
                 name: recipient.name,
                 email: recipient.email,
                 role: recipient.role,
+                expiry: recipient.expired ?? undefined,
                 signingOrder: recipient.signingOrder ?? index + 1,
                 actionAuth:
                   ZRecipientAuthOptionsSchema.parse(recipient.authOptions)?.actionAuth ?? undefined,
@@ -181,6 +186,7 @@ export const AddSignersFormPartial = ({
       email: '',
       role: RecipientRole.SIGNER,
       actionAuth: undefined,
+      expiry: undefined,
       signingOrder: signers.length > 0 ? (signers[signers.length - 1]?.signingOrder ?? 0) + 1 : 1,
     });
   };
@@ -215,6 +221,7 @@ export const AddSignersFormPartial = ({
         email: user?.email ?? '',
         role: RecipientRole.SIGNER,
         actionAuth: undefined,
+        expiry: undefined,
         signingOrder: signers.length > 0 ? (signers[signers.length - 1]?.signingOrder ?? 0) + 1 : 1,
       });
     }
@@ -252,6 +259,7 @@ export const AddSignersFormPartial = ({
           'email',
           'name',
           'role',
+          'expiry',
           'signingOrder',
           'actionAuth',
         ];
@@ -628,24 +636,20 @@ export const AddSignersFormPartial = ({
                                   )}
                                 />
 
-                                <button
-                                  type="button"
-                                  className={cn(
-                                    'mt-auto inline-flex h-10 w-10 items-center justify-center hover:opacity-80 disabled:cursor-not-allowed disabled:opacity-50',
-                                    {
-                                      'mb-6': form.formState.errors.signers?.[index],
-                                    },
-                                  )}
-                                  disabled={
+                                <SignerActionDropdown
+                                  className={cn({
+                                    'mb-6': form.formState.errors.signers?.[index],
+                                  })}
+                                  onDelete={() => onRemoveSigner(index)}
+                                  signer={signer}
+                                  documentId={documentId}
+                                  deleteDisabled={
                                     snapshot.isDragging ||
                                     isSubmitting ||
                                     !canRecipientBeModified(signer.nativeId) ||
                                     signers.length === 1
                                   }
-                                  onClick={() => onRemoveSigner(index)}
-                                >
-                                  <Trash className="h-4 w-4" />
-                                </button>
+                                />
                               </div>
                             </motion.fieldset>
                           </div>
