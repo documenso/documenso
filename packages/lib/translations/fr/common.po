@@ -492,7 +492,7 @@ msgstr "En acceptant cette demande, vous accorderez à <0>{teamName}</0> l'accè
 msgid "By accepting this request, you will take responsibility for any billing items associated with this team."
 msgstr "En acceptant cette demande, vous serez responsable de tous les éléments de facturation associés à cette équipe."
 
-#: packages/ui/primitives/document-flow/field-item-advanced-settings.tsx:356
+#: packages/ui/primitives/document-flow/field-item-advanced-settings.tsx:357
 #: packages/ui/primitives/document-flow/send-document-action-dialog.tsx:58
 msgid "Cancel"
 msgstr "Annuler"
@@ -816,7 +816,7 @@ msgstr "Activer les signatures tapées"
 msgid "Enter password"
 msgstr "Entrez le mot de passe"
 
-#: packages/ui/primitives/document-flow/field-item-advanced-settings.tsx:257
+#: packages/ui/primitives/document-flow/field-item-advanced-settings.tsx:258
 #: packages/ui/primitives/pdf-viewer.tsx:166
 msgid "Error"
 msgstr "Erreur"
@@ -826,7 +826,7 @@ msgstr "Erreur"
 msgid "External ID"
 msgstr "ID externe"
 
-#: packages/ui/primitives/document-flow/field-item-advanced-settings.tsx:258
+#: packages/ui/primitives/document-flow/field-item-advanced-settings.tsx:259
 msgid "Failed to save settings."
 msgstr "Échec de l'enregistrement des paramètres."
 
@@ -1245,7 +1245,7 @@ msgstr "Soyez assuré, votre document eststrictement confidentiel et ne sera jam
 msgid "Rows per page"
 msgstr "Lignes par page"
 
-#: packages/ui/primitives/document-flow/field-item-advanced-settings.tsx:355
+#: packages/ui/primitives/document-flow/field-item-advanced-settings.tsx:356
 msgid "Save"
 msgstr "Sauvegarder"
 

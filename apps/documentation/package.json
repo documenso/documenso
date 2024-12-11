@@ -16,7 +16,7 @@
     "@documenso/tailwind-config": "*",
     "@documenso/trpc": "*",
     "@documenso/ui": "*",
-    "next": "14.2.6",
+    "next": "14.2.20",
     "next-plausible": "^3.12.0",
     "nextra": "^2.13.4",
     "nextra-theme-docs": "^2.13.4",
@@ -27,6 +27,6 @@
     "@types/node": "^20",
     "@types/react": "^18",
     "@types/react-dom": "^18",
-    "typescript": "^5"
+    "typescript": "5.2.2"
   }
 }
