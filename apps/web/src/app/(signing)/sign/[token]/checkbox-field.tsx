@@ -267,14 +267,14 @@ export const CheckboxField = ({
       )}
 
       {field.inserted && (
-        <div className="flex flex-col gap-y-1">
+        <div className="flex flex-col gap-y-1 text-slate-700">
           {values?.map((item: { id: number; value: string; checked: boolean }, index: number) => {
             const itemValue = item.value || `empty-value-${item.id}`;
 
             return (
               <div key={index} className="flex items-center gap-x-1.5">
                 <Checkbox
-                  className="h-3 w-3"
+                  className="h-3 w-3 border-slate-700 bg-white"
                   checkClassName="text-white"
                   id={`checkbox-${index}`}
                   checked={field.customText

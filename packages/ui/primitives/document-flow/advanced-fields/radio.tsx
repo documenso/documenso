@@ -26,7 +26,7 @@ export const RadioField = ({ field }: RadioFieldProps) => {
   }
 
   return (
-    <div className="flex flex-col gap-y-2">
+    <div className="flex flex-col gap-y-2 text-slate-700">
       {!parsedFieldMeta?.values ? (
         <FieldIcon fieldMeta={field.fieldMeta} type={field.type} signerEmail={field.signerEmail} />
       ) : (
@@ -34,7 +34,7 @@ export const RadioField = ({ field }: RadioFieldProps) => {
           {parsedFieldMeta.values?.map((item, index) => (
             <div key={index} className="flex items-center gap-x-1.5">
               <RadioGroupItem
-                className="pointer-events-none h-3 w-3"
+                className="pointer-events-none h-3 w-3 border-slate-700"
                 value={item.value}
                 id={`option-${index}`}
                 checked={item.checked}

@@ -173,11 +173,11 @@ export const RadioField = ({ field, recipient, onSignField, onUnsignField }: Rad
       )}
 
       {field.inserted && (
-        <RadioGroup className="gap-y-1">
+        <RadioGroup className="gap-y-1 text-slate-700">
           {values?.map((item, index) => (
             <div key={index} className="flex items-center gap-x-1.5">
               <RadioGroupItem
-                className="h-3 w-3"
+                className="h-3 w-3 border-slate-700"
                 value={item.value}
                 id={`option-${index}`}
                 checked={item.value === field.customText}
