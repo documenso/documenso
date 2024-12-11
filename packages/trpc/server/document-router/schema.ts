@@ -6,7 +6,7 @@ import {
   ZDocumentActionAuthTypesSchema,
 } from '@documenso/lib/types/document-auth';
 import { ZDocumentEmailSettingsSchema } from '@documenso/lib/types/document-email';
-import { ZBaseTableSearchParamsSchema } from '@documenso/lib/types/search-params';
+import { ZFindSearchParamsSchema } from '@documenso/lib/types/search-params';
 import { isValidRedirectUrl } from '@documenso/lib/utils/is-valid-redirect-url';
 import {
   DocumentDistributionMethod,
@@ -18,13 +18,9 @@ import {
   RecipientRole,
 } from '@documenso/prisma/client';
 
-export const ZFindDocumentsQuerySchema = ZBaseTableSearchParamsSchema.extend({
+export const ZFindDocumentsQuerySchema = ZFindSearchParamsSchema.extend({
   teamId: z.number().min(1).optional(),
   templateId: z.number().min(1).optional(),
-  search: z
-    .string()
-    .optional()
-    .catch(() => undefined),
   source: z.nativeEnum(DocumentSource).optional(),
   status: z.nativeEnum(DocumentStatus).optional(),
   orderBy: z
@@ -33,9 +29,9 @@ export const ZFindDocumentsQuerySchema = ZBaseTableSearchParamsSchema.extend({
       direction: z.enum(['asc', 'desc']),
     })
     .optional(),
-}).omit({ query: true });
+});
 
-export const ZFindDocumentAuditLogsQuerySchema = ZBaseTableSearchParamsSchema.extend({
+export const ZFindDocumentAuditLogsQuerySchema = ZFindSearchParamsSchema.extend({
   documentId: z.number().min(1),
   cursor: z.string().optional(),
   filterForRecentActivity: z.boolean().optional(),

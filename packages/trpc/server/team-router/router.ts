@@ -74,20 +74,28 @@ import {
 } from './schema';
 
 export const teamRouter = router({
-  getTeams: authenticatedProcedure
+  // Internal endpoint for now.
+  getTeams: authenticatedProcedure.query(async ({ ctx }) => {
+    return await getTeams({ userId: ctx.user.id });
+  }),
+
+  findTeams: authenticatedProcedure
     .meta({
       openapi: {
         method: 'GET',
         path: '/team',
-        summary: 'Get teams',
-        description: 'Returns all teams that you are a member of',
+        summary: 'Find teams',
+        description: 'Find your teams based on a search criteria',
         tags: ['Teams'],
       },
     })
-    .input(z.void())
+    .input(ZFindTeamsQuerySchema)
     .output(z.unknown())
-    .query(async ({ ctx }) => {
-      return await getTeams({ userId: ctx.user.id });
+    .query(async ({ input, ctx }) => {
+      return await findTeams({
+        userId: ctx.user.id,
+        ...input,
+      });
     }),
 
   getTeam: authenticatedProcedure
@@ -326,14 +334,6 @@ export const teamRouter = router({
         ...input,
       });
     }),
-
-  // Todo: Refactor, seems to be a redundant endpoint.
-  findTeams: authenticatedProcedure.input(ZFindTeamsQuerySchema).query(async ({ input, ctx }) => {
-    return await findTeams({
-      userId: ctx.user.id,
-      ...input,
-    });
-  }),
 
   // Internal endpoint for now.
   createTeamEmailVerification: authenticatedProcedure

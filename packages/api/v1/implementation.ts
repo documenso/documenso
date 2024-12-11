@@ -427,7 +427,7 @@ export const ApiContractV1Implementation = createNextRoute(ApiContractV1, {
     const perPage = Number(args.query.perPage) || 10;
 
     try {
-      const { templates, totalPages } = await findTemplates({
+      const { data: templates, totalPages } = await findTemplates({
         page,
         perPage,
         userId: user.id,
