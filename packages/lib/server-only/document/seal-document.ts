@@ -6,8 +6,12 @@ import PostHogServerClient from '@documenso/lib/server-only/feature-flags/get-po
 import { DOCUMENT_AUDIT_LOG_TYPE } from '@documenso/lib/types/document-audit-logs';
 import { createDocumentAuditLogData } from '@documenso/lib/utils/document-audit-logs';
 import { prisma } from '@documenso/prisma';
-import { DocumentStatus, RecipientRole, SigningStatus } from '@documenso/prisma/client';
-import { WebhookTriggerEvents } from '@documenso/prisma/client';
+import {
+  DocumentStatus,
+  RecipientRole,
+  SigningStatus,
+  WebhookTriggerEvents,
+} from '@documenso/prisma/client';
 import { signPdf } from '@documenso/signing';
 
 import { ZWebhookDocumentSchema } from '../../types/webhook-payload';

@@ -1,6 +1,6 @@
 import { base64 } from '@scure/base';
 import { env } from 'next-runtime-env';
-import { PDFDocument } from 'pdf-lib';
+import { PDFDocument, PDFName } from 'pdf-lib';
 import { match } from 'ts-pattern';
 
 import { getFlag } from '@documenso/lib/universal/get-feature-flag';
@@ -26,11 +26,18 @@ export const putPdfFile = async (file: File) => {
 
   // This will prevent uploading encrypted PDFs or anything that can't be opened.
   if (!isEncryptedDocumentsAllowed) {
-    await PDFDocument.load(await file.arrayBuffer()).catch((e) => {
+    const pdfDoc = await PDFDocument.load(await file.arrayBuffer()).catch((e) => {
       console.error(`PDF upload parse error: ${e.message}`);
 
       throw new AppError('INVALID_DOCUMENT_FILE');
     });
+
+    if (pdfDoc.catalog.has(PDFName.of('OCProperties'))) {
+      pdfDoc.catalog.delete(PDFName.of('OCProperties'));
+
+      const modifiedPdfBytes = await pdfDoc.save();
+      file = new File([modifiedPdfBytes], file.name, { type: file.type });
+    }
   }
 
   if (!file.name.endsWith('.pdf')) {
