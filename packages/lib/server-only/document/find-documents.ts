@@ -2,9 +2,8 @@ import { DateTime } from 'luxon';
 import { P, match } from 'ts-pattern';
 
 import { prisma } from '@documenso/prisma';
-import { RecipientRole, SigningStatus, TeamMemberRole } from '@documenso/prisma/client';
 import type { Document, DocumentSource, Team, TeamEmail, User } from '@documenso/prisma/client';
-import { Prisma } from '@documenso/prisma/client';
+import { Prisma, RecipientRole, SigningStatus, TeamMemberRole } from '@documenso/prisma/client';
 import { ExtendedDocumentStatus } from '@documenso/prisma/types/extended-document-status';
 
 import { DocumentVisibility } from '../../types/document-visibility';
@@ -132,6 +131,8 @@ export const findDocuments = async ({
   ];
 
   let filters: Prisma.DocumentWhereInput | null = findDocumentsFilter(status, user);
+
+  console.log('find documets team', team);
 
   if (team) {
     filters = findTeamDocumentsFilter(status, team, visibilityFilters);
@@ -285,7 +286,7 @@ export const findDocuments = async ({
   } satisfies FindResultSet<typeof data>;
 };
 
-const findDocumentsFilter = (status: ExtendedDocumentStatus, user: User) => {
+export const findDocumentsFilter = (status: ExtendedDocumentStatus, user: User) => {
   return match<ExtendedDocumentStatus, Prisma.DocumentWhereInput>(status)
     .with(ExtendedDocumentStatus.ALL, () => ({
       OR: [
@@ -443,7 +444,7 @@ const findDocumentsFilter = (status: ExtendedDocumentStatus, user: User) => {
  * @param team The team to find the documents for.
  * @returns A filter which can be applied to the Prisma Document schema.
  */
-const findTeamDocumentsFilter = (
+export const findTeamDocumentsFilter = (
   status: ExtendedDocumentStatus,
   team: Team & { teamEmail: TeamEmail | null },
   visibilityFilters: Prisma.DocumentWhereInput[],

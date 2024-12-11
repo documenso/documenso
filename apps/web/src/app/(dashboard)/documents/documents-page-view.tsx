@@ -6,8 +6,8 @@ import { NEXT_PUBLIC_WEBAPP_URL } from '@documenso/lib/constants/app';
 import { getRequiredServerComponentSession } from '@documenso/lib/next-auth/get-server-component-session';
 import type { PeriodSelectorValue } from '@documenso/lib/server-only/document/find-documents';
 import { findDocuments } from '@documenso/lib/server-only/document/find-documents';
-import type { GetStatsInput } from '@documenso/lib/server-only/document/get-stats';
-import { getStats } from '@documenso/lib/server-only/document/get-stats';
+import type { GetStatsInput } from '@documenso/lib/server-only/document/get-stats-new';
+import { getStats } from '@documenso/lib/server-only/document/get-stats-new';
 import { parseToIntegerArray } from '@documenso/lib/utils/params';
 import { formatDocumentsPath } from '@documenso/lib/utils/teams';
 import type { Team, TeamEmail, TeamMemberRole } from '@documenso/prisma/client';
@@ -35,7 +35,7 @@ export interface DocumentsPageViewProps {
     senderIds?: string;
     search?: string;
   };
-  team?: Team & { teamEmail?: TeamEmail | null } & { currentTeamMember?: { role: TeamMemberRole } };
+  team?: Team & { teamEmail: TeamEmail | null } & { currentTeamMember?: { role: TeamMemberRole } };
 }
 
 export const DocumentsPageView = async ({ searchParams = {}, team }: DocumentsPageViewProps) => {
@@ -50,24 +50,13 @@ export const DocumentsPageView = async ({ searchParams = {}, team }: DocumentsPa
   const currentTeam = team
     ? { id: team.id, url: team.url, teamEmail: team.teamEmail?.email }
     : undefined;
-  const currentTeamMemberRole = team?.currentTeamMember?.role;
 
   const getStatOptions: GetStatsInput = {
     user,
     period,
+    team,
     search,
   };
-
-  if (team) {
-    getStatOptions.team = {
-      teamId: team.id,
-      teamEmail: team.teamEmail?.email,
-      senderIds,
-      currentTeamMemberRole,
-      currentUserEmail: user.email,
-      userId: user.id,
-    };
-  }
 
   const stats = await getStats(getStatOptions);
 
