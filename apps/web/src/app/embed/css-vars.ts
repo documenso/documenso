@@ -1,5 +1,4 @@
 import { colord } from 'colord';
-import { toSnakeCase } from 'remeda';
 import { z } from 'zod';
 
 export const ZCssVarsSchema = z
@@ -47,7 +46,9 @@ export const toNativeCssVars = (vars: TCssVarsSchema) => {
       const color = colord(value);
       const { h, s, l } = color.toHsl();
 
-      cssVars[`--${toSnakeCase(key)}`] = `${h}deg ${s}% ${l}%`;
+      // Convert camelCase to kebab-case (e.g., mutedForeground -> muted-foreground)
+      const kebabKey = key.replace(/([a-z0-9])([A-Z])/g, '$1-$2').toLowerCase();
+      cssVars[`--${kebabKey}`] = `${h} ${s} ${l}`;
     }
   }
 
