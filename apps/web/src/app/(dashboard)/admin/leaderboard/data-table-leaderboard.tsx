@@ -134,7 +134,7 @@ export const LeaderboardTable = ({
     startTransition(() => {
       updateSearchParams({
         sortBy: column,
-        sortOrder: sortOrder === 'asc' ? 'desc' : 'asc',
+        sortOrder: sortBy === column && sortOrder === 'asc' ? 'desc' : 'asc',
       });
     });
   };
