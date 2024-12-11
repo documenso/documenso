@@ -238,6 +238,7 @@ export const AddSettingsFormPartial = ({
                     <FormControl>
                       <DocumentVisibilitySelect
                         currentMemberRole={currentTeamMemberRole}
+                        visibility={document.visibility}
                         {...field}
                         onValueChange={field.onChange}
                       />
@@ -273,7 +274,7 @@ export const AddSettingsFormPartial = ({
                 </AccordionTrigger>
 
                 <AccordionContent className="text-muted-foreground -mx-1 px-1 pt-2 text-sm leading-relaxed">
-                  <div className="flex flex-col space-y-6 ">
+                  <div className="flex flex-col space-y-6">
                     <FormField
                       control={form.control}
                       name="externalId"
