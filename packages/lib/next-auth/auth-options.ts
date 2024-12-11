@@ -13,6 +13,7 @@ import { env } from 'next-runtime-env';
 import { prisma } from '@documenso/prisma';
 import { IdentityProvider, UserSecurityAuditLogType } from '@documenso/prisma/client';
 
+import { formatSecureCookieName, useSecureCookies } from '../constants/auth';
 import { AppError, AppErrorCode } from '../errors/app-error';
 import { jobsClient } from '../jobs/client';
 import { isTwoFactorAuthenticationEnabled } from '../server-only/2fa/is-2fa-availble';
@@ -25,10 +26,6 @@ import { ZAuthenticationResponseJSONSchema } from '../types/webauthn';
 import { extractNextAuthRequestMetadata } from '../universal/extract-request-metadata';
 import { getAuthenticatorOptions } from '../utils/authenticator';
 import { ErrorCode } from './error-codes';
-
-const useSecureCookies =
-  process.env.NODE_ENV === 'production' && String(process.env.NEXTAUTH_URL).startsWith('https://');
-const cookiePrefix = useSecureCookies ? '__Secure-' : '';
 
 export const NEXT_AUTH_OPTIONS: AuthOptions = {
   adapter: PrismaAdapter(prisma),
@@ -437,7 +434,7 @@ export const NEXT_AUTH_OPTIONS: AuthOptions = {
   },
   cookies: {
     sessionToken: {
-      name: `${cookiePrefix}next-auth.session-token`,
+      name: formatSecureCookieName('next-auth.session-token'),
       options: {
         httpOnly: true,
         sameSite: useSecureCookies ? 'none' : 'lax',
@@ -446,7 +443,7 @@ export const NEXT_AUTH_OPTIONS: AuthOptions = {
       },
     },
     callbackUrl: {
-      name: `${cookiePrefix}next-auth.callback-url`,
+      name: formatSecureCookieName('next-auth.callback-url'),
       options: {
         sameSite: useSecureCookies ? 'none' : 'lax',
         path: '/',
@@ -456,7 +453,7 @@ export const NEXT_AUTH_OPTIONS: AuthOptions = {
     csrfToken: {
       // Default to __Host- for CSRF token for additional protection if using useSecureCookies
       // NB: The `__Host-` prefix is stricter than the `__Secure-` prefix.
-      name: `${cookiePrefix}next-auth.csrf-token`,
+      name: formatSecureCookieName('next-auth.csrf-token'),
       options: {
         httpOnly: true,
         sameSite: useSecureCookies ? 'none' : 'lax',
@@ -465,7 +462,7 @@ export const NEXT_AUTH_OPTIONS: AuthOptions = {
       },
     },
     pkceCodeVerifier: {
-      name: `${cookiePrefix}next-auth.pkce.code_verifier`,
+      name: formatSecureCookieName('next-auth.pkce.code_verifier'),
       options: {
         httpOnly: true,
         sameSite: useSecureCookies ? 'none' : 'lax',
@@ -474,7 +471,7 @@ export const NEXT_AUTH_OPTIONS: AuthOptions = {
       },
     },
     state: {
-      name: `${cookiePrefix}next-auth.state`,
+      name: formatSecureCookieName('next-auth.state'),
       options: {
         httpOnly: true,
         sameSite: useSecureCookies ? 'none' : 'lax',
