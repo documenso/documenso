@@ -47,7 +47,7 @@ export const toNativeCssVars = (vars: TCssVarsSchema) => {
       const color = colord(value);
       const { h, s, l } = color.toHsl();
 
-      cssVars[`--${toSnakeCase(key)}`] = `${h} ${s} ${l}`;
+      cssVars[`--${toSnakeCase(key)}`] = `${h}deg ${s}% ${l}%`;
     }
   }
 
