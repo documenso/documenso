@@ -1,6 +1,7 @@
 import { expect, test } from '@playwright/test';
 
-import { DocumentStatus, TeamMemberRole } from '@documenso/prisma/client';
+import { DocumentStatus, DocumentVisibility, TeamMemberRole } from '@documenso/prisma/client';
+import { seedBlankDocument } from '@documenso/prisma/seed/documents';
 import { seedDocuments, seedTeamDocuments } from '@documenso/prisma/seed/documents';
 import { seedTeam, seedTeamEmail, seedTeamMember } from '@documenso/prisma/seed/teams';
 import { seedUser } from '@documenso/prisma/seed/users';
@@ -647,6 +648,152 @@ test('[TEAMS]: check that admin can see MANAGER_AND_ABOVE documents', async ({ p
   ).toBeVisible();
 
   await apiSignout({ page });
+});
+
+test('[TEAMS]: check that ADMIN role can change document visibility', async ({ page }) => {
+  const team = await seedTeam({
+    createTeamOptions: {
+      teamGlobalSettings: {
+        create: {
+          documentVisibility: DocumentVisibility.MANAGER_AND_ABOVE,
+        },
+      },
+    },
+  });
+
+  const adminUser = await seedTeamMember({
+    teamId: team.id,
+    role: TeamMemberRole.ADMIN,
+  });
+
+  const document = await seedBlankDocument(adminUser, {
+    createDocumentOptions: {
+      teamId: team.id,
+      visibility: team.teamGlobalSettings?.documentVisibility,
+    },
+  });
+
+  await apiSignin({
+    page,
+    email: adminUser.email,
+    redirectPath: `/t/${team.url}/documents/${document.id}/edit`,
+  });
+
+  await page.getByTestId('documentVisibilitySelectValue').click();
+  await page.getByLabel('Admins only').click();
+
+  await page.getByRole('button', { name: 'Continue' }).click();
+  await expect(page.getByRole('heading', { name: 'Add Signers' })).toBeVisible();
+
+  await page.getByRole('button', { name: 'Go Back' }).click();
+  await expect(page.getByRole('heading', { name: 'General' })).toBeVisible();
+
+  await expect(page.getByTestId('documentVisibilitySelectValue')).toContainText('Admins only');
+});
+
+test('[TEAMS]: check that MEMBER role cannot change visibility of documents with EVERYONE visibility', async ({
+  page,
+}) => {
+  const team = await seedTeam({
+    createTeamOptions: {
+      teamGlobalSettings: {
+        create: {
+          documentVisibility: DocumentVisibility.EVERYONE,
+        },
+      },
+    },
+  });
+
+  const teamMember = await seedTeamMember({
+    teamId: team.id,
+    role: TeamMemberRole.MEMBER,
+  });
+
+  const document = await seedBlankDocument(teamMember, {
+    createDocumentOptions: {
+      teamId: team.id,
+      visibility: team.teamGlobalSettings?.documentVisibility,
+    },
+  });
+
+  await apiSignin({
+    page,
+    email: teamMember.email,
+    redirectPath: `/t/${team.url}/documents/${document.id}/edit`,
+  });
+
+  await expect(page.getByTestId('documentVisibilitySelectValue')).toHaveText('Everyone');
+  await expect(page.getByTestId('documentVisibilitySelectValue')).toBeDisabled();
+});
+
+test('[TEAMS]: check that MEMBER role cannot change visibility of documents with MANAGER_AND_ABOVE visibility', async ({
+  page,
+}) => {
+  const team = await seedTeam({
+    createTeamOptions: {
+      teamGlobalSettings: {
+        create: {
+          documentVisibility: DocumentVisibility.MANAGER_AND_ABOVE,
+        },
+      },
+    },
+  });
+
+  const teamMember = await seedTeamMember({
+    teamId: team.id,
+    role: TeamMemberRole.MEMBER,
+  });
+
+  const document = await seedBlankDocument(teamMember, {
+    createDocumentOptions: {
+      teamId: team.id,
+      visibility: team.teamGlobalSettings?.documentVisibility,
+    },
+  });
+
+  await apiSignin({
+    page,
+    email: teamMember.email,
+    redirectPath: `/t/${team.url}/documents/${document.id}/edit`,
+  });
+
+  await expect(page.getByTestId('documentVisibilitySelectValue')).toHaveText('Managers and above');
+  await expect(page.getByTestId('documentVisibilitySelectValue')).toBeDisabled();
+});
+
+test('[TEAMS]: check that MEMBER role cannot change visibility of documents with ADMIN visibility', async ({
+  page,
+}) => {
+  const team = await seedTeam({
+    createTeamOptions: {
+      teamGlobalSettings: {
+        create: {
+          documentVisibility: DocumentVisibility.ADMIN,
+        },
+      },
+    },
+  });
+
+  const teamMember = await seedTeamMember({
+    teamId: team.id,
+    role: TeamMemberRole.MEMBER,
+  });
+
+  const document = await seedBlankDocument(teamMember, {
+    createDocumentOptions: {
+      teamId: team.id,
+      visibility: team.teamGlobalSettings?.documentVisibility,
+    },
+  });
+
+  await apiSignin({
+    page,
+    email: teamMember.email,
+    redirectPath: `/t/${team.url}/documents/${document.id}/edit`,
+  });
+
+  await expect(page.getByTestId('documentVisibilitySelectValue')).toHaveText('Admins only');
+  await expect(page.getByTestId('documentVisibilitySelectValue')).toBeDisabled();
 });
 
 test('[TEAMS]: users cannot see documents from other teams', async ({ page }) => {
