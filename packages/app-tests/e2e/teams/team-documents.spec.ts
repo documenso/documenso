@@ -539,7 +539,7 @@ test('[TEAMS]: ensure recipient can see document regardless of visibility', asyn
   await apiSignout({ page });
 });
 
-test('[TEAMS]: check that members cannot see ADMIN-only documents', async ({ page }) => {
+test('[TEAMS]: check that MEMBER role cannot see ADMIN-only documents', async ({ page }) => {
   const team = await seedTeam();
 
   // Seed a member user
@@ -576,7 +576,46 @@ test('[TEAMS]: check that members cannot see ADMIN-only documents', async ({ pag
   await apiSignout({ page });
 });
 
-test('[TEAMS]: check that managers cannot see ADMIN-only documents', async ({ page }) => {
+test('[TEAMS]: check that MEMBER role cannot see MANAGER_AND_ABOVE-only documents', async ({
+  page,
+}) => {
+  const team = await seedTeam();
+
+  // Seed a member user
+  const memberUser = await seedTeamMember({
+    teamId: team.id,
+    role: TeamMemberRole.MEMBER,
+  });
+
+  // Seed an ADMIN-only document
+  await seedDocuments([
+    {
+      sender: team.owner,
+      recipients: [],
+      type: DocumentStatus.COMPLETED,
+      documentOptions: {
+        teamId: team.id,
+        visibility: 'MANAGER_AND_ABOVE',
+        title: 'Manager and Above Only Document',
+      },
+    },
+  ]);
+
+  await apiSignin({
+    page,
+    email: memberUser.email,
+    redirectPath: `/t/${team.url}/documents?status=COMPLETED`,
+  });
+
+  // Check that the member user cannot see the ADMIN-only document
+  await expect(
+    page.getByRole('link', { name: 'Admin Only Document', exact: true }),
+  ).not.toBeVisible();
+
+  await apiSignout({ page });
+});
+
+test('[TEAMS]: check that MANAGER role cannot see ADMIN-only documents', async ({ page }) => {
   const team = await seedTeam();
 
   // Seed a manager user
@@ -613,7 +652,7 @@ test('[TEAMS]: check that managers cannot see ADMIN-only documents', async ({ pa
   await apiSignout({ page });
 });
 
-test('[TEAMS]: check that admin can see MANAGER_AND_ABOVE documents', async ({ page }) => {
+test('[TEAMS]: check that ADMIN role can see MANAGER_AND_ABOVE documents', async ({ page }) => {
   const team = await seedTeam();
 
   // Seed an admin user
@@ -691,7 +730,7 @@ test('[TEAMS]: check that ADMIN role can change document visibility', async ({ p
   await expect(page.getByTestId('documentVisibilitySelectValue')).toContainText('Admins only');
 });
 
-test('[TEAMS]: check that MEMBER role cannot change visibility of documents with EVERYONE visibility', async ({
+test('[TEAMS]: check that MEMBER role cannot change visibility of EVERYONE documents', async ({
   page,
 }) => {
   const team = await seedTeam({
@@ -726,7 +765,7 @@ test('[TEAMS]: check that MEMBER role cannot change visibility of documents with
   await expect(page.getByTestId('documentVisibilitySelectValue')).toBeDisabled();
 });
 
-test('[TEAMS]: check that MEMBER role cannot change visibility of documents with MANAGER_AND_ABOVE visibility', async ({
+test('[TEAMS]: check that MEMBER role cannot change visibility of MANAGER_AND_ABOVE documents', async ({
   page,
 }) => {
   const team = await seedTeam({
@@ -761,7 +800,7 @@ test('[TEAMS]: check that MEMBER role cannot change visibility of documents with
   await expect(page.getByTestId('documentVisibilitySelectValue')).toBeDisabled();
 });
 
-test('[TEAMS]: check that MEMBER role cannot change visibility of documents with ADMIN visibility', async ({
+test('[TEAMS]: check that MEMBER role cannot change visibility of ADMIN documents', async ({
   page,
 }) => {
   const team = await seedTeam({
@@ -789,6 +828,41 @@ test('[TEAMS]: check that MEMBER role cannot change visibility of documents with
   await apiSignin({
     page,
     email: teamMember.email,
+    redirectPath: `/t/${team.url}/documents/${document.id}/edit`,
+  });
+
+  await expect(page.getByTestId('documentVisibilitySelectValue')).toHaveText('Admins only');
+  await expect(page.getByTestId('documentVisibilitySelectValue')).toBeDisabled();
+});
+
+test('[TEAMS]: check that MANAGER role cannot change visibility of ADMIN documents', async ({
+  page,
+}) => {
+  const team = await seedTeam({
+    createTeamOptions: {
+      teamGlobalSettings: {
+        create: {
+          documentVisibility: DocumentVisibility.ADMIN,
+        },
+      },
+    },
+  });
+
+  const teamManager = await seedTeamMember({
+    teamId: team.id,
+    role: TeamMemberRole.MANAGER,
+  });
+
+  const document = await seedBlankDocument(teamManager, {
+    createDocumentOptions: {
+      teamId: team.id,
+      visibility: team.teamGlobalSettings?.documentVisibility,
+    },
+  });
+
+  await apiSignin({
+    page,
+    email: teamManager.email,
     redirectPath: `/t/${team.url}/documents/${document.id}/edit`,
   });
 
