@@ -60,7 +60,7 @@ export const DocumentPageView = async ({ params, team }: DocumentPageViewProps) 
   const { user } = await getRequiredServerComponentSession();
 
   const document = await getDocumentById({
-    id: documentId,
+    documentId,
     userId: user.id,
     teamId: team?.id,
   }).catch(() => null);

@@ -9,7 +9,7 @@ import { DateTime } from 'luxon';
 import { useSession } from 'next-auth/react';
 
 import { useUpdateSearchParams } from '@documenso/lib/client-only/hooks/use-update-search-params';
-import type { FindResultSet } from '@documenso/lib/types/find-result-set';
+import type { FindResultResponse } from '@documenso/lib/types/search-params';
 import type { Document, Recipient, Team, User } from '@documenso/prisma/client';
 import { ExtendedDocumentStatus } from '@documenso/prisma/types/extended-document-status';
 import type { DataTableColumnDef } from '@documenso/ui/primitives/data-table';
@@ -24,7 +24,7 @@ import { DataTableActionDropdown } from './data-table-action-dropdown';
 import { DataTableTitle } from './data-table-title';
 
 export type DocumentsDataTableProps = {
-  results: FindResultSet<
+  results: FindResultResponse<
     Document & {
       Recipient: Recipient[];
       User: Pick<User, 'id' | 'name' | 'email'>;
