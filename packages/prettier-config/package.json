@@ -7,10 +7,9 @@
     "clean": "rimraf node_modules"
   },
   "dependencies": {
-    "@trivago/prettier-plugin-sort-imports": "^4.1.1",
-    "prettier": "^2.8.8",
-    "prettier-plugin-sql": "^0.14.0",
-    "prettier-plugin-tailwindcss": "^0.2.8"
+    "@trivago/prettier-plugin-sort-imports": "^4.3.0",
+    "prettier": "^3.3.3",
+    "prettier-plugin-tailwindcss": "^0.6.9"
   },
   "devDependencies": {}
 }

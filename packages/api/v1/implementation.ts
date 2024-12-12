@@ -19,6 +19,7 @@ import { updateDocument } from '@documenso/lib/server-only/document/update-docum
 import { updateDocumentSettings } from '@documenso/lib/server-only/document/update-document-settings';
 import { deleteField } from '@documenso/lib/server-only/field/delete-field';
 import { getFieldById } from '@documenso/lib/server-only/field/get-field-by-id';
+import { getFieldsForDocument } from '@documenso/lib/server-only/field/get-fields-for-document';
 import { updateField } from '@documenso/lib/server-only/field/update-field';
 import { insertFormValuesInPdf } from '@documenso/lib/server-only/pdf/insert-form-values-in-pdf';
 import { deleteRecipient } from '@documenso/lib/server-only/recipient/delete-recipient';
@@ -34,6 +35,7 @@ import { createDocumentFromTemplateLegacy } from '@documenso/lib/server-only/tem
 import { deleteTemplate } from '@documenso/lib/server-only/template/delete-template';
 import { findTemplates } from '@documenso/lib/server-only/template/find-templates';
 import { getTemplateById } from '@documenso/lib/server-only/template/get-template-by-id';
+import { extractDerivedDocumentEmailSettings } from '@documenso/lib/types/document-email';
 import { ZFieldMetaSchema } from '@documenso/lib/types/field-meta';
 import {
   ZCheckboxFieldMeta,
@@ -87,7 +89,7 @@ export const ApiContractV1Implementation = createNextRoute(ApiContractV1, {
 
     try {
       const document = await getDocumentById({
-        id: Number(documentId),
+        documentId: Number(documentId),
         userId: user.id,
         teamId: team?.id,
       });
@@ -98,6 +100,30 @@ export const ApiContractV1Implementation = createNextRoute(ApiContractV1, {
         userId: user.id,
       });
 
+      const fields = await getFieldsForDocument({
+        documentId: Number(documentId),
+        userId: user.id,
+      });
+
+      const parsedMetaFields = fields.map((field) => {
+        let parsedMetaOrNull = null;
+
+        if (field.fieldMeta) {
+          const result = ZFieldMetaSchema.safeParse(field.fieldMeta);
+
+          if (!result.success) {
+            throw new Error('Field meta parsing failed for field ' + field.id);
+          }
+
+          parsedMetaOrNull = result.data;
+        }
+
+        return {
+          ...field,
+          fieldMeta: parsedMetaOrNull,
+        };
+      });
+
       return {
         status: 200,
         body: {
@@ -106,6 +132,7 @@ export const ApiContractV1Implementation = createNextRoute(ApiContractV1, {
             ...recipient,
             signingUrl: `${NEXT_PUBLIC_WEBAPP_URL()}/sign/${recipient.token}`,
           })),
+          fields: parsedMetaFields,
         },
       };
     } catch (err) {
@@ -132,7 +159,7 @@ export const ApiContractV1Implementation = createNextRoute(ApiContractV1, {
       }
 
       const document = await getDocumentById({
-        id: Number(documentId),
+        documentId: Number(documentId),
         userId: user.id,
         teamId: team?.id,
       });
@@ -185,7 +212,7 @@ export const ApiContractV1Implementation = createNextRoute(ApiContractV1, {
 
     try {
       const document = await getDocumentById({
-        id: Number(documentId),
+        documentId: Number(documentId),
         userId: user.id,
         teamId: team?.id,
       });
@@ -244,18 +271,10 @@ export const ApiContractV1Implementation = createNextRoute(ApiContractV1, {
       }
 
       const dateFormat = body.meta.dateFormat
-        ? DATE_FORMATS.find((format) => format.label === body.meta.dateFormat)
+        ? DATE_FORMATS.find((format) => format.value === body.meta.dateFormat)
         : DATE_FORMATS.find((format) => format.value === DEFAULT_DOCUMENT_DATE_FORMAT);
-      const timezone = body.meta.timezone
-        ? TIME_ZONES.find((tz) => tz === body.meta.timezone)
-        : DEFAULT_DOCUMENT_TIME_ZONE;
 
-      const isDateFormatValid = body.meta.dateFormat
-        ? DATE_FORMATS.some((format) => format.label === dateFormat?.label)
-        : true;
-      const isTimeZoneValid = body.meta.timezone ? TIME_ZONES.includes(String(timezone)) : true;
-
-      if (!isDateFormatValid) {
+      if (body.meta.dateFormat && !dateFormat) {
         return {
           status: 400,
           body: {
@@ -263,6 +282,12 @@ export const ApiContractV1Implementation = createNextRoute(ApiContractV1, {
           },
         };
       }
+
+      const timezone = body.meta.timezone
+        ? TIME_ZONES.find((tz) => tz === body.meta.timezone)
+        : DEFAULT_DOCUMENT_TIME_ZONE;
+
+      const isTimeZoneValid = body.meta.timezone ? TIME_ZONES.includes(String(timezone)) : true;
 
       if (!isTimeZoneValid) {
         return {
@@ -302,6 +327,9 @@ export const ApiContractV1Implementation = createNextRoute(ApiContractV1, {
         redirectUrl: body.meta.redirectUrl,
         signingOrder: body.meta.signingOrder,
         language: body.meta.language,
+        typedSignatureEnabled: body.meta.typedSignatureEnabled,
+        distributionMethod: body.meta.distributionMethod,
+        emailSettings: body.meta.emailSettings,
         requestMetadata: extractNextApiRequestMetadata(args.req),
       });
 
@@ -400,7 +428,7 @@ export const ApiContractV1Implementation = createNextRoute(ApiContractV1, {
     const perPage = Number(args.query.perPage) || 10;
 
     try {
-      const { templates, totalPages } = await findTemplates({
+      const { data: templates, totalPages } = await findTemplates({
         page,
         perPage,
         userId: user.id,
@@ -610,65 +638,52 @@ export const ApiContractV1Implementation = createNextRoute(ApiContractV1, {
   }),
 
   sendDocument: authenticatedMiddleware(async (args, user, team) => {
-    const { id } = args.params;
-    const { sendEmail = true } = args.body ?? {};
-
-    const document = await getDocumentById({ id: Number(id), userId: user.id, teamId: team?.id });
-
-    if (!document) {
-      return {
-        status: 404,
-        body: {
-          message: 'Document not found',
-        },
-      };
-    }
-
-    if (document.status === DocumentStatus.COMPLETED) {
-      return {
-        status: 400,
-        body: {
-          message: 'Document is already complete',
-        },
-      };
-    }
+    const { id: documentId } = args.params;
+    const { sendEmail, sendCompletionEmails } = args.body;
 
     try {
-      //   await setRecipientsForDocument({
-      //     userId: user.id,
-      //     documentId: Number(id),
-      //     recipients: [
-      //       {
-      //         email: body.signerEmail,
-      //         name: body.signerName ?? '',
-      //       },
-      //     ],
-      //   });
+      const document = await getDocumentById({
+        documentId: Number(documentId),
+        userId: user.id,
+        teamId: team?.id,
+      });
 
-      //   await setFieldsForDocument({
-      //     documentId: Number(id),
-      //     userId: user.id,
-      //     fields: body.fields.map((field) => ({
-      //       signerEmail: body.signerEmail,
-      //       type: field.fieldType,
-      //       pageNumber: field.pageNumber,
-      //       pageX: field.pageX,
-      //       pageY: field.pageY,
-      //       pageWidth: field.pageWidth,
-      //       pageHeight: field.pageHeight,
-      //     })),
-      //   });
+      if (!document) {
+        return {
+          status: 404,
+          body: {
+            message: 'Document not found',
+          },
+        };
+      }
 
-      //   if (body.emailBody || body.emailSubject) {
-      //     await upsertDocumentMeta({
-      //       documentId: Number(id),
-      //       subject: body.emailSubject ?? '',
-      //       message: body.emailBody ?? '',
-      //     });
-      //   }
+      if (document.status === DocumentStatus.COMPLETED) {
+        return {
+          status: 400,
+          body: {
+            message: 'Document is already complete',
+          },
+        };
+      }
+
+      const emailSettings = extractDerivedDocumentEmailSettings(document.documentMeta);
+
+      // Update document email settings if sendCompletionEmails is provided
+      if (typeof sendCompletionEmails === 'boolean') {
+        await upsertDocumentMeta({
+          documentId: document.id,
+          userId: user.id,
+          emailSettings: {
+            ...emailSettings,
+            documentCompleted: sendCompletionEmails,
+            ownerDocumentCompleted: sendCompletionEmails,
+          },
+          requestMetadata: extractNextApiRequestMetadata(args.req),
+        });
+      }
 
       const { Recipient: recipients, ...sentDocument } = await sendDocument({
-        documentId: Number(id),
+        documentId: document.id,
         userId: user.id,
         teamId: team?.id,
         sendEmail,
@@ -730,7 +745,7 @@ export const ApiContractV1Implementation = createNextRoute(ApiContractV1, {
     const { name, email, role, authOptions, signingOrder } = args.body;
 
     const document = await getDocumentById({
-      id: Number(documentId),
+      documentId: Number(documentId),
       userId: user.id,
       teamId: team?.id,
     });
@@ -821,7 +836,7 @@ export const ApiContractV1Implementation = createNextRoute(ApiContractV1, {
     const { name, email, role, authOptions, signingOrder } = args.body;
 
     const document = await getDocumentById({
-      id: Number(documentId),
+      documentId: Number(documentId),
       userId: user.id,
       teamId: team?.id,
     });
@@ -880,7 +895,7 @@ export const ApiContractV1Implementation = createNextRoute(ApiContractV1, {
     const { id: documentId, recipientId } = args.params;
 
     const document = await getDocumentById({
-      id: Number(documentId),
+      documentId: Number(documentId),
       userId: user.id,
       teamId: team?.id,
     });
@@ -1107,7 +1122,7 @@ export const ApiContractV1Implementation = createNextRoute(ApiContractV1, {
       args.body;
 
     const document = await getDocumentById({
-      id: Number(documentId),
+      documentId: Number(documentId),
       userId: user.id,
       teamId: team?.id,
     });
@@ -1196,7 +1211,7 @@ export const ApiContractV1Implementation = createNextRoute(ApiContractV1, {
     const { id: documentId, fieldId } = args.params;
 
     const document = await getDocumentById({
-      id: Number(documentId),
+      documentId: Number(documentId),
       userId: user.id,
     });
 

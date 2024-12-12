@@ -1,5 +1,8 @@
+import type { z } from 'zod';
+
 import { prisma } from '@documenso/prisma';
 import { TeamMemberRole } from '@documenso/prisma/client';
+import { TeamGlobalSettingsSchema } from '@documenso/prisma/generated/zod';
 
 export type UpdateTeamBrandingSettingsOptions = {
   userId: number;
@@ -13,11 +16,17 @@ export type UpdateTeamBrandingSettingsOptions = {
   };
 };
 
+export const ZUpdateTeamBrandingSettingsResponseSchema = TeamGlobalSettingsSchema;
+
+export type TUpdateTeamBrandingSettingsResponse = z.infer<
+  typeof ZUpdateTeamBrandingSettingsResponseSchema
+>;
+
 export const updateTeamBrandingSettings = async ({
   userId,
   teamId,
   settings,
-}: UpdateTeamBrandingSettingsOptions) => {
+}: UpdateTeamBrandingSettingsOptions): Promise<TUpdateTeamBrandingSettingsResponse> => {
   const { brandingEnabled, brandingLogo, brandingUrl, brandingCompanyDetails } = settings;
 
   const member = await prisma.teamMember.findFirst({

@@ -4,23 +4,24 @@ import { prisma } from '@documenso/prisma';
 import type { Prisma } from '@documenso/prisma/client';
 import { TeamMemberRole } from '@documenso/prisma/client';
 
+import { AppError, AppErrorCode } from '../../errors/app-error';
 import { DocumentVisibility } from '../../types/document-visibility';
 import { getTeamById } from '../team/get-team';
 
 export type GetDocumentByIdOptions = {
-  id: number;
+  documentId: number;
   userId: number;
   teamId?: number;
 };
 
-export const getDocumentById = async ({ id, userId, teamId }: GetDocumentByIdOptions) => {
+export const getDocumentById = async ({ documentId, userId, teamId }: GetDocumentByIdOptions) => {
   const documentWhereInput = await getDocumentWhereInput({
-    documentId: id,
+    documentId,
     userId,
     teamId,
   });
 
-  return await prisma.document.findFirstOrThrow({
+  const document = await prisma.document.findFirst({
     where: documentWhereInput,
     include: {
       documentData: true,
@@ -45,6 +46,14 @@ export const getDocumentById = async ({ id, userId, teamId }: GetDocumentByIdOpt
       },
     },
   });
+
+  if (!document) {
+    throw new AppError(AppErrorCode.NOT_FOUND, {
+      message: 'Document could not be found',
+    });
+  }
+
+  return document;
 };
 
 export type GetDocumentWhereInputOptions = {

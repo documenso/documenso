@@ -13,6 +13,7 @@ import { env } from 'next-runtime-env';
 import { prisma } from '@documenso/prisma';
 import { IdentityProvider, UserSecurityAuditLogType } from '@documenso/prisma/client';
 
+import { formatSecureCookieName, useSecureCookies } from '../constants/auth';
 import { AppError, AppErrorCode } from '../errors/app-error';
 import { jobsClient } from '../jobs/client';
 import { isTwoFactorAuthenticationEnabled } from '../server-only/2fa/is-2fa-availble';
@@ -429,6 +430,54 @@ export const NEXT_AUTH_OPTIONS: AuthOptions = {
       }
 
       return true;
+    },
+  },
+  cookies: {
+    sessionToken: {
+      name: formatSecureCookieName('next-auth.session-token'),
+      options: {
+        httpOnly: true,
+        sameSite: useSecureCookies ? 'none' : 'lax',
+        path: '/',
+        secure: useSecureCookies,
+      },
+    },
+    callbackUrl: {
+      name: formatSecureCookieName('next-auth.callback-url'),
+      options: {
+        sameSite: useSecureCookies ? 'none' : 'lax',
+        path: '/',
+        secure: useSecureCookies,
+      },
+    },
+    csrfToken: {
+      // Default to __Host- for CSRF token for additional protection if using useSecureCookies
+      // NB: The `__Host-` prefix is stricter than the `__Secure-` prefix.
+      name: formatSecureCookieName('next-auth.csrf-token'),
+      options: {
+        httpOnly: true,
+        sameSite: useSecureCookies ? 'none' : 'lax',
+        path: '/',
+        secure: useSecureCookies,
+      },
+    },
+    pkceCodeVerifier: {
+      name: formatSecureCookieName('next-auth.pkce.code_verifier'),
+      options: {
+        httpOnly: true,
+        sameSite: useSecureCookies ? 'none' : 'lax',
+        path: '/',
+        secure: useSecureCookies,
+      },
+    },
+    state: {
+      name: formatSecureCookieName('next-auth.state'),
+      options: {
+        httpOnly: true,
+        sameSite: useSecureCookies ? 'none' : 'lax',
+        path: '/',
+        secure: useSecureCookies,
+      },
     },
   },
   // Note: `events` are handled in `apps/web/src/pages/api/auth/[...nextauth].ts` to allow access to the request.

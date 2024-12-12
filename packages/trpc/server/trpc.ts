@@ -1,12 +1,37 @@
 import { TRPCError, initTRPC } from '@trpc/server';
 import SuperJSON from 'superjson';
 
+import { AppError, genericErrorCodeToTrpcErrorCodeMap } from '@documenso/lib/errors/app-error';
 import { isAdmin } from '@documenso/lib/next-auth/guards/is-admin';
 
 import type { TrpcContext } from './context';
 
 const t = initTRPC.context<TrpcContext>().create({
   transformer: SuperJSON,
+  errorFormatter(opts) {
+    const { shape, error } = opts;
+
+    const originalError = error.cause;
+
+    let data: Record<string, unknown> = shape.data;
+
+    if (originalError instanceof AppError) {
+      data = {
+        ...data,
+        appError: AppError.toJSON(originalError),
+        code: originalError.code,
+        httpStatus:
+          originalError.statusCode ??
+          genericErrorCodeToTrpcErrorCodeMap[originalError.code]?.status ??
+          500,
+      };
+    }
+
+    return {
+      ...shape,
+      data,
+    };
+  },
 });
 
 /**

@@ -52,7 +52,7 @@ export const PublicTemplatesDataTable = () => {
   );
 
   const { directTemplates, publicDirectTemplates, privateDirectTemplates } = useMemo(() => {
-    const directTemplates = (data?.templates ?? []).filter(
+    const directTemplates = (data?.data ?? []).filter(
       (template): template is DirectTemplate => template.directLink?.enabled === true,
     );
 

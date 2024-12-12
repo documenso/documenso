@@ -61,7 +61,7 @@ export const TemplateDocumentInvite = ({
             <>
               {includeSenderDetails ? (
                 <Trans>
-                  {inviterName} on behalf of {teamName} has invited you to{' '}
+                  {inviterName} on behalf of "{teamName}" has invited you to{' '}
                   {_(actionVerb).toLowerCase()}
                 </Trans>
               ) : (

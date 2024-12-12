@@ -3,10 +3,13 @@ import { TRPCError } from '@trpc/server';
 
 import { jobs } from '@documenso/lib/jobs/client';
 import { prisma } from '@documenso/prisma';
+import { WebhookTriggerEvents } from '@documenso/prisma/client';
 
 import { DOCUMENT_AUDIT_LOG_TYPE } from '../../types/document-audit-logs';
+import { ZWebhookDocumentSchema } from '../../types/webhook-payload';
 import type { RequestMetadata } from '../../universal/extract-request-metadata';
 import { createDocumentAuditLogData } from '../../utils/document-audit-logs';
+import { triggerWebhook } from '../webhooks/trigger/trigger-webhook';
 
 export type RejectDocumentWithTokenOptions = {
   token: string;
@@ -31,6 +34,8 @@ export async function rejectDocumentWithToken({
       Document: {
         include: {
           User: true,
+          Recipient: true,
+          documentMeta: true,
         },
       },
     },
@@ -44,8 +49,6 @@ export async function rejectDocumentWithToken({
       message: 'Document or recipient not found',
     });
   }
-
-  // Add the audit log entry before updating the recipient
 
   // Update the recipient status to rejected
   const [updatedRecipient] = await prisma.$transaction([
@@ -86,6 +89,29 @@ export async function rejectDocumentWithToken({
       recipientId: recipient.id,
       documentId,
     },
+  });
+
+  // Get the updated document with all recipients
+  const updatedDocument = await prisma.document.findFirst({
+    where: {
+      id: document.id,
+    },
+    include: {
+      Recipient: true,
+      documentMeta: true,
+    },
+  });
+
+  if (!updatedDocument) {
+    throw new Error('Document not found after update');
+  }
+
+  // Trigger webhook for document rejection
+  await triggerWebhook({
+    event: WebhookTriggerEvents.DOCUMENT_REJECTED,
+    data: ZWebhookDocumentSchema.parse(updatedDocument),
+    userId: document.userId,
+    teamId: document.teamId ?? undefined,
   });
 
   return updatedRecipient;
