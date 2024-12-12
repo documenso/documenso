@@ -1,5 +1,5 @@
 import { colord } from 'colord';
-import { toSnakeCase } from 'remeda';
+import { toKebabCase } from 'remeda';
 import { z } from 'zod';
 
 export const ZCssVarsSchema = z
@@ -47,7 +47,7 @@ export const toNativeCssVars = (vars: TCssVarsSchema) => {
       const color = colord(value);
       const { h, s, l } = color.toHsl();
 
-      cssVars[`--${toSnakeCase(key)}`] = `${h} ${s} ${l}`;
+      cssVars[`--${toKebabCase(key)}`] = `${h} ${s} ${l}`;
     }
   }
 

@@ -48,7 +48,7 @@ export default async function WaitingForTurnToSignPage({
 
   if (user) {
     isOwnerOrTeamMember = await getDocumentById({
-      id: document.id,
+      documentId: document.id,
       userId: user.id,
       teamId: document.teamId ?? undefined,
     })

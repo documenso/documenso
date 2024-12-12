@@ -1,3 +1,5 @@
+import { z } from 'zod';
+
 import { completeDocumentWithToken } from '@documenso/lib/server-only/document/complete-document-with-token';
 import { rejectDocumentWithToken } from '@documenso/lib/server-only/document/reject-document-with-token';
 import { setRecipientsForDocument } from '@documenso/lib/server-only/recipient/set-recipients-for-document';
@@ -14,7 +16,16 @@ import {
 
 export const recipientRouter = router({
   addSigners: authenticatedProcedure
+    .meta({
+      openapi: {
+        method: 'POST',
+        path: '/document/{documentId}/recipient/set',
+        summary: 'Set document recipients',
+        tags: ['Recipients'],
+      },
+    })
     .input(ZAddSignersMutationSchema)
+    .output(z.unknown())
     .mutation(async ({ input, ctx }) => {
       const { documentId, teamId, signers } = input;
 
@@ -35,7 +46,16 @@ export const recipientRouter = router({
     }),
 
   addTemplateSigners: authenticatedProcedure
+    .meta({
+      openapi: {
+        method: 'POST',
+        path: '/template/{templateId}/recipient/set',
+        summary: 'Set template recipients',
+        tags: ['Recipients'],
+      },
+    })
     .input(ZAddTemplateSignersMutationSchema)
+    .output(z.unknown())
     .mutation(async ({ input, ctx }) => {
       const { templateId, signers, teamId } = input;
 
@@ -54,6 +74,7 @@ export const recipientRouter = router({
       });
     }),
 
+  // Internal endpoint for now.
   completeDocumentWithToken: procedure
     .input(ZCompleteDocumentWithTokenMutationSchema)
     .mutation(async ({ input, ctx }) => {
@@ -68,6 +89,7 @@ export const recipientRouter = router({
       });
     }),
 
+  // Internal endpoint for now.
   rejectDocumentWithToken: procedure
     .input(ZRejectDocumentWithTokenMutationSchema)
     .mutation(async ({ input, ctx }) => {

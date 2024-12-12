@@ -85,7 +85,7 @@ export const DataTableActionDropdown = ({ row, team }: DataTableActionDropdownPr
 
       if (!recipient) {
         document = await trpcClient.document.getDocumentById.query({
-          id: row.id,
+          documentId: row.id,
           teamId: team?.id,
         });
       } else {

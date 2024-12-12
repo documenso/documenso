@@ -47,7 +47,7 @@ export const DocumentLogsPageView = async ({ params, team }: DocumentLogsPageVie
 
   const [document, recipients] = await Promise.all([
     getDocumentById({
-      id: documentId,
+      documentId,
       userId: user.id,
       teamId: team?.id,
     }).catch(() => null),

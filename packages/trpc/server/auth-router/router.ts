@@ -4,6 +4,7 @@ import { parse } from 'cookie-es';
 import { env } from 'next-runtime-env';
 
 import { IS_BILLING_ENABLED } from '@documenso/lib/constants/app';
+import { formatSecureCookieName } from '@documenso/lib/constants/auth';
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import { jobsClient } from '@documenso/lib/jobs/client';
 import { ErrorCode } from '@documenso/lib/next-auth/error-codes';
@@ -111,7 +112,8 @@ export const authRouter = router({
     const cookies = parse(ctx.req.headers.cookie ?? '');
 
     const sessionIdToken =
-      cookies['__Host-next-auth.csrf-token'] || cookies['next-auth.csrf-token'];
+      cookies[formatSecureCookieName('__Host-next-auth.csrf-token')] ||
+      cookies[formatSecureCookieName('next-auth.csrf-token')];
 
     if (!sessionIdToken) {
       throw new Error('Missing CSRF token');

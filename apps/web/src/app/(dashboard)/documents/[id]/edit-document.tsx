@@ -63,7 +63,7 @@ export const EditDocumentForm = ({
   const { data: document, refetch: refetchDocument } =
     trpc.document.getDocumentWithDetailsById.useQuery(
       {
-        id: initialDocument.id,
+        documentId: initialDocument.id,
         teamId: team?.id,
       },
       {
@@ -79,7 +79,7 @@ export const EditDocumentForm = ({
     onSuccess: (newData) => {
       utils.document.getDocumentWithDetailsById.setData(
         {
-          id: initialDocument.id,
+          documentId: initialDocument.id,
           teamId: team?.id,
         },
         (oldData) => ({ ...(oldData || initialDocument), ...newData }),
@@ -93,7 +93,7 @@ export const EditDocumentForm = ({
       onSuccess: (newData) => {
         utils.document.getDocumentWithDetailsById.setData(
           {
-            id: initialDocument.id,
+            documentId: initialDocument.id,
             teamId: team?.id,
           },
           (oldData) => ({ ...(oldData || initialDocument), ...newData, id: Number(newData.id) }),
@@ -106,7 +106,7 @@ export const EditDocumentForm = ({
     onSuccess: (newFields) => {
       utils.document.getDocumentWithDetailsById.setData(
         {
-          id: initialDocument.id,
+          documentId: initialDocument.id,
           teamId: team?.id,
         },
         (oldData) => ({ ...(oldData || initialDocument), Field: newFields }),
@@ -120,7 +120,7 @@ export const EditDocumentForm = ({
       onSuccess: (newData) => {
         utils.document.getDocumentWithDetailsById.setData(
           {
-            id: initialDocument.id,
+            documentId: initialDocument.id,
             teamId: team?.id,
           },
           (oldData) => ({
@@ -137,7 +137,7 @@ export const EditDocumentForm = ({
     onSuccess: (newRecipients) => {
       utils.document.getDocumentWithDetailsById.setData(
         {
-          id: initialDocument.id,
+          documentId: initialDocument.id,
           teamId: team?.id,
         },
         (oldData) => ({ ...(oldData || initialDocument), Recipient: newRecipients }),
@@ -150,7 +150,7 @@ export const EditDocumentForm = ({
     onSuccess: (newData) => {
       utils.document.getDocumentWithDetailsById.setData(
         {
-          id: initialDocument.id,
+          documentId: initialDocument.id,
           teamId: team?.id,
         },
         (oldData) => ({ ...(oldData || initialDocument), ...newData }),

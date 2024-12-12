@@ -1,4 +1,5 @@
 import { TRPCError } from '@trpc/server';
+import { z } from 'zod';
 
 import { getServerLimits } from '@documenso/ee/server-only/limits/server';
 import { isValidLanguageCode } from '@documenso/lib/constants/i18n';
@@ -13,7 +14,6 @@ import { deleteTemplateDirectLink } from '@documenso/lib/server-only/template/de
 import { duplicateTemplate } from '@documenso/lib/server-only/template/duplicate-template';
 import { findTemplates } from '@documenso/lib/server-only/template/find-templates';
 import { getTemplateById } from '@documenso/lib/server-only/template/get-template-by-id';
-import { getTemplateWithDetailsById } from '@documenso/lib/server-only/template/get-template-with-details-by-id';
 import { moveTemplateToTeam } from '@documenso/lib/server-only/template/move-template-to-team';
 import { toggleTemplateDirectLink } from '@documenso/lib/server-only/template/toggle-template-direct-link';
 import { updateTemplateSettings } from '@documenso/lib/server-only/template/update-template-settings';
@@ -30,7 +30,7 @@ import {
   ZDeleteTemplateMutationSchema,
   ZDuplicateTemplateMutationSchema,
   ZFindTemplatesQuerySchema,
-  ZGetTemplateWithDetailsByIdQuerySchema,
+  ZGetTemplateByIdQuerySchema,
   ZMoveTemplatesToTeamSchema,
   ZSetSigningOrderForTemplateMutationSchema,
   ZToggleTemplateDirectLinkMutationSchema,
@@ -39,8 +39,58 @@ import {
 } from './schema';
 
 export const templateRouter = router({
+  findTemplates: authenticatedProcedure
+    .meta({
+      openapi: {
+        method: 'GET',
+        path: '/template/find',
+        summary: 'Find templates',
+        description: 'Find templates based on a search criteria',
+        tags: ['Template'],
+      },
+    })
+    .input(ZFindTemplatesQuerySchema)
+    .output(z.unknown())
+    .query(async ({ input, ctx }) => {
+      return await findTemplates({
+        userId: ctx.user.id,
+        ...input,
+      });
+    }),
+
+  getTemplateById: authenticatedProcedure
+    .meta({
+      openapi: {
+        method: 'GET',
+        path: '/template/{templateId}',
+        summary: 'Get template',
+        tags: ['Template'],
+      },
+    })
+    .input(ZGetTemplateByIdQuerySchema)
+    .output(z.unknown())
+    .query(async ({ input, ctx }) => {
+      const { templateId, teamId } = input;
+
+      return await getTemplateById({
+        id: templateId,
+        userId: ctx.user.id,
+        teamId,
+      });
+    }),
+
   createTemplate: authenticatedProcedure
+    .meta({
+      openapi: {
+        method: 'POST',
+        path: '/template/create',
+        summary: 'Create template',
+        description: 'Create a new template',
+        tags: ['Template'],
+      },
+    })
     .input(ZCreateTemplateMutationSchema)
+    .output(z.unknown())
     .mutation(async ({ input, ctx }) => {
       const { teamId, title, templateDocumentDataId } = input;
 
@@ -52,40 +102,89 @@ export const templateRouter = router({
       });
     }),
 
-  createDocumentFromDirectTemplate: maybeAuthenticatedProcedure
-    .input(ZCreateDocumentFromDirectTemplateMutationSchema)
+  updateTemplate: authenticatedProcedure
+    .meta({
+      openapi: {
+        method: 'POST',
+        path: '/template/{templateId}',
+        summary: 'Update template',
+        tags: ['Template'],
+      },
+    })
+    .input(ZUpdateTemplateSettingsMutationSchema)
+    .output(z.unknown())
     .mutation(async ({ input, ctx }) => {
-      const {
-        directRecipientName,
-        directRecipientEmail,
-        directTemplateToken,
-        directTemplateExternalId,
-        signedFieldValues,
-        templateUpdatedAt,
-      } = input;
+      const { templateId, teamId, data, meta } = input;
+
+      const userId = ctx.user.id;
 
       const requestMetadata = extractNextApiRequestMetadata(ctx.req);
 
-      return await createDocumentFromDirectTemplate({
-        directRecipientName,
-        directRecipientEmail,
-        directTemplateToken,
-        directTemplateExternalId,
-        signedFieldValues,
-        templateUpdatedAt,
-        user: ctx.user
-          ? {
-              id: ctx.user.id,
-              name: ctx.user.name || undefined,
-              email: ctx.user.email,
-            }
-          : undefined,
+      return await updateTemplateSettings({
+        userId,
+        teamId,
+        templateId,
+        data,
+        meta: {
+          ...meta,
+          language: isValidLanguageCode(meta?.language) ? meta?.language : undefined,
+        },
         requestMetadata,
       });
     }),
 
+  duplicateTemplate: authenticatedProcedure
+    .meta({
+      openapi: {
+        method: 'POST',
+        path: '/template/{templateId}/duplicate',
+        summary: 'Duplicate template',
+        tags: ['Template'],
+      },
+    })
+    .input(ZDuplicateTemplateMutationSchema)
+    .output(z.unknown())
+    .mutation(async ({ input, ctx }) => {
+      const { teamId, templateId } = input;
+
+      return await duplicateTemplate({
+        userId: ctx.user.id,
+        teamId,
+        templateId,
+      });
+    }),
+
+  deleteTemplate: authenticatedProcedure
+    .meta({
+      openapi: {
+        method: 'POST',
+        path: '/template/{templateId}/delete',
+        summary: 'Delete template',
+        tags: ['Template'],
+      },
+    })
+    .input(ZDeleteTemplateMutationSchema)
+    .output(z.unknown())
+    .mutation(async ({ input, ctx }) => {
+      const { templateId, teamId } = input;
+
+      const userId = ctx.user.id;
+
+      await deleteTemplate({ userId, id: templateId, teamId });
+    }),
+
   createDocumentFromTemplate: authenticatedProcedure
+    .meta({
+      openapi: {
+        method: 'POST',
+        path: '/template/{templateId}/use',
+        summary: 'Use template',
+        description: 'Use the template to create a document',
+        tags: ['Template'],
+      },
+    })
     .input(ZCreateDocumentFromTemplateMutationSchema)
+    .output(z.unknown())
     .mutation(async ({ input, ctx }) => {
       const { templateId, teamId, recipients } = input;
 
@@ -121,60 +220,49 @@ export const templateRouter = router({
       return document;
     }),
 
-  duplicateTemplate: authenticatedProcedure
-    .input(ZDuplicateTemplateMutationSchema)
+  createDocumentFromDirectTemplate: maybeAuthenticatedProcedure
+    .meta({
+      openapi: {
+        method: 'POST',
+        path: '/template/use',
+        summary: 'Use direct template',
+        description: 'Use a direct template to create a document',
+        tags: ['Template'],
+      },
+    })
+    .input(ZCreateDocumentFromDirectTemplateMutationSchema)
+    .output(z.unknown())
     .mutation(async ({ input, ctx }) => {
-      const { teamId, templateId } = input;
-
-      return await duplicateTemplate({
-        userId: ctx.user.id,
-        teamId,
-        templateId,
-      });
-    }),
-
-  deleteTemplate: authenticatedProcedure
-    .input(ZDeleteTemplateMutationSchema)
-    .mutation(async ({ input, ctx }) => {
-      const { id, teamId } = input;
-
-      const userId = ctx.user.id;
-
-      return await deleteTemplate({ userId, id, teamId });
-    }),
-
-  getTemplateWithDetailsById: authenticatedProcedure
-    .input(ZGetTemplateWithDetailsByIdQuerySchema)
-    .query(async ({ input, ctx }) => {
-      return await getTemplateWithDetailsById({
-        id: input.id,
-        userId: ctx.user.id,
-      });
-    }),
-
-  // Todo: Add API
-  updateTemplateSettings: authenticatedProcedure
-    .input(ZUpdateTemplateSettingsMutationSchema)
-    .mutation(async ({ input, ctx }) => {
-      const { templateId, teamId, data, meta } = input;
-
-      const userId = ctx.user.id;
+      const {
+        directRecipientName,
+        directRecipientEmail,
+        directTemplateToken,
+        directTemplateExternalId,
+        signedFieldValues,
+        templateUpdatedAt,
+      } = input;
 
       const requestMetadata = extractNextApiRequestMetadata(ctx.req);
 
-      return await updateTemplateSettings({
-        userId,
-        teamId,
-        templateId,
-        data,
-        meta: {
-          ...meta,
-          language: isValidLanguageCode(meta?.language) ? meta?.language : undefined,
-        },
+      return await createDocumentFromDirectTemplate({
+        directRecipientName,
+        directRecipientEmail,
+        directTemplateToken,
+        directTemplateExternalId,
+        signedFieldValues,
+        templateUpdatedAt,
+        user: ctx.user
+          ? {
+              id: ctx.user.id,
+              name: ctx.user.name || undefined,
+              email: ctx.user.email,
+            }
+          : undefined,
         requestMetadata,
       });
     }),
 
+  // Internal endpoint for now.
   setSigningOrderForTemplate: authenticatedProcedure
     .input(ZSetSigningOrderForTemplateMutationSchema)
     .mutation(async ({ input, ctx }) => {
@@ -190,17 +278,18 @@ export const templateRouter = router({
       });
     }),
 
-  findTemplates: authenticatedProcedure
-    .input(ZFindTemplatesQuerySchema)
-    .query(async ({ input, ctx }) => {
-      return await findTemplates({
-        userId: ctx.user.id,
-        ...input,
-      });
-    }),
-
   createTemplateDirectLink: authenticatedProcedure
+    .meta({
+      openapi: {
+        method: 'POST',
+        path: '/template/{templateId}/direct/create',
+        summary: 'Create direct link',
+        description: 'Create a direct link for a template',
+        tags: ['Template'],
+      },
+    })
     .input(ZCreateTemplateDirectLinkMutationSchema)
+    .output(z.unknown())
     .mutation(async ({ input, ctx }) => {
       const { templateId, teamId, directRecipientId } = input;
 
@@ -220,17 +309,37 @@ export const templateRouter = router({
     }),
 
   deleteTemplateDirectLink: authenticatedProcedure
+    .meta({
+      openapi: {
+        method: 'POST',
+        path: '/template/{templateId}/direct/delete',
+        summary: 'Delete direct link',
+        description: 'Delete a direct link for a template',
+        tags: ['Template'],
+      },
+    })
     .input(ZDeleteTemplateDirectLinkMutationSchema)
+    .output(z.unknown())
     .mutation(async ({ input, ctx }) => {
       const { templateId } = input;
 
       const userId = ctx.user.id;
 
-      return await deleteTemplateDirectLink({ userId, templateId });
+      await deleteTemplateDirectLink({ userId, templateId });
     }),
 
   toggleTemplateDirectLink: authenticatedProcedure
+    .meta({
+      openapi: {
+        method: 'POST',
+        path: '/template/{templateId}/direct/toggle',
+        summary: 'Toggle direct link',
+        description: 'Enable or disable a direct link for a template',
+        tags: ['Template'],
+      },
+    })
     .input(ZToggleTemplateDirectLinkMutationSchema)
+    .output(z.unknown())
     .mutation(async ({ input, ctx }) => {
       const { templateId, enabled } = input;
 
@@ -240,7 +349,17 @@ export const templateRouter = router({
     }),
 
   moveTemplateToTeam: authenticatedProcedure
+    .meta({
+      openapi: {
+        method: 'POST',
+        path: '/template/{templateId}/move',
+        summary: 'Move template',
+        description: 'Move a template to a team',
+        tags: ['Template'],
+      },
+    })
     .input(ZMoveTemplatesToTeamSchema)
+    .output(z.unknown())
     .mutation(async ({ input, ctx }) => {
       const { templateId, teamId } = input;
       const userId = ctx.user.id;
@@ -252,47 +371,34 @@ export const templateRouter = router({
       });
     }),
 
+  // Internal endpoint for now.
   updateTemplateTypedSignatureSettings: authenticatedProcedure
     .input(ZUpdateTemplateTypedSignatureSettingsMutationSchema)
     .mutation(async ({ input, ctx }) => {
-      try {
-        const { templateId, teamId, typedSignatureEnabled } = input;
+      const { templateId, teamId, typedSignatureEnabled } = input;
 
-        const template = await getTemplateById({
-          id: templateId,
-          teamId,
-          userId: ctx.user.id,
-        }).catch(() => null);
+      const template = await getTemplateById({
+        id: templateId,
+        userId: ctx.user.id,
+        teamId,
+      }).catch(() => null);
 
-        if (!template) {
-          throw new TRPCError({
-            code: 'NOT_FOUND',
-            message: 'Template not found',
-          });
-        }
-
-        return await updateTemplateSettings({
-          templateId,
-          teamId,
-          userId: ctx.user.id,
-          data: {},
-          meta: {
-            typedSignatureEnabled,
-          },
-          requestMetadata: extractNextApiRequestMetadata(ctx.req),
-        });
-      } catch (err) {
-        console.error(err);
-
-        if (err instanceof TRPCError) {
-          throw err;
-        }
-
+      if (!template) {
         throw new TRPCError({
-          code: 'BAD_REQUEST',
-          message:
-            'We were unable to update the settings for this template. Please try again later.',
+          code: 'NOT_FOUND',
+          message: 'Template not found',
         });
       }
+
+      return await updateTemplateSettings({
+        templateId,
+        teamId,
+        userId: ctx.user.id,
+        data: {},
+        meta: {
+          typedSignatureEnabled,
+        },
+        requestMetadata: extractNextApiRequestMetadata(ctx.req),
+      });
     }),
 });

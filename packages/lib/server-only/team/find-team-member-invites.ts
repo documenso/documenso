@@ -7,12 +7,12 @@ import { Prisma } from '@documenso/prisma/client';
 import { TeamMemberInviteSchema } from '@documenso/prisma/generated/zod';
 
 import { TEAM_MEMBER_ROLE_PERMISSIONS_MAP } from '../../constants/teams';
-import { type FindResultSet, ZFindResultSet } from '../../types/find-result-set';
+import { type FindResultResponse, ZFindResultResponse } from '../../types/search-params';
 
 export interface FindTeamMemberInvitesOptions {
   userId: number;
   teamId: number;
-  term?: string;
+  query?: string;
   page?: number;
   perPage?: number;
   orderBy?: {
@@ -21,7 +21,7 @@ export interface FindTeamMemberInvitesOptions {
   };
 }
 
-export const ZFindTeamMemberInvitesResponseSchema = ZFindResultSet.extend({
+export const ZFindTeamMemberInvitesResponseSchema = ZFindResultResponse.extend({
   data: TeamMemberInviteSchema.pick({
     id: true,
     teamId: true,
@@ -36,7 +36,7 @@ export type TFindTeamMemberInvitesResponse = z.infer<typeof ZFindTeamMemberInvit
 export const findTeamMemberInvites = async ({
   userId,
   teamId,
-  term,
+  query,
   page = 1,
   perPage = 10,
   orderBy,
@@ -59,10 +59,10 @@ export const findTeamMemberInvites = async ({
     },
   });
 
-  const termFilters: Prisma.TeamMemberInviteWhereInput | undefined = match(term)
+  const termFilters: Prisma.TeamMemberInviteWhereInput | undefined = match(query)
     .with(P.string.minLength(1), () => ({
       email: {
-        contains: term,
+        contains: query,
         mode: Prisma.QueryMode.insensitive,
       },
     }))
@@ -101,5 +101,5 @@ export const findTeamMemberInvites = async ({
     currentPage: Math.max(page, 1),
     perPage,
     totalPages: Math.ceil(count / perPage),
-  } satisfies FindResultSet<typeof data>;
+  } satisfies FindResultResponse<typeof data>;
 };

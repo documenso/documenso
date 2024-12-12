@@ -9,14 +9,14 @@ import { DocumentVisibility } from '../../types/document-visibility';
 import { getTeamById } from '../team/get-team';
 
 export type GetDocumentByIdOptions = {
-  id: number;
+  documentId: number;
   userId: number;
   teamId?: number;
 };
 
-export const getDocumentById = async ({ id, userId, teamId }: GetDocumentByIdOptions) => {
+export const getDocumentById = async ({ documentId, userId, teamId }: GetDocumentByIdOptions) => {
   const documentWhereInput = await getDocumentWhereInput({
-    documentId: id,
+    documentId,
     userId,
     teamId,
   });

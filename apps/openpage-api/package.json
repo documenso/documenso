@@ -1,0 +1,23 @@
+{
+  "name": "@documenso/openpage-api",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev -p 3003",
+    "build": "next build",
+    "start": "next start",
+    "lint:fix": "next lint --fix",
+    "clean": "rimraf .next && rimraf node_modules",
+    "copy:pdfjs": "node ../../scripts/copy-pdfjs.cjs"
+  },
+  "dependencies": {
+    "@documenso/prisma": "*",
+    "luxon": "^3.5.0",
+    "next": "14.2.6"
+  },
+  "devDependencies": {
+    "@types/node": "20.16.5",
+    "@types/react": "18.3.5",
+    "typescript": "5.5.4"
+  }
+}
