@@ -54,6 +54,7 @@ export const CheckboxField = ({
     ...item,
     value: item.value.length > 0 ? item.value : `empty-value-${item.id}`,
   }));
+
   const [checkedValues, setCheckedValues] = useState(
     values
       ?.map((item) =>
@@ -97,7 +98,7 @@ export const CheckboxField = ({
       const payload: TSignFieldWithTokenMutationSchema = {
         token: recipient.token,
         fieldId: field.id,
-        value: checkedValues.join(','),
+        value: JSON.stringify(checkedValues),
         isBase64: true,
         authOptions,
       };
@@ -191,7 +192,7 @@ export const CheckboxField = ({
           await signFieldWithToken({
             token: recipient.token,
             fieldId: field.id,
-            value: updatedValues.join(','),
+            value: JSON.stringify(checkedValues),
             isBase64: true,
           });
         }

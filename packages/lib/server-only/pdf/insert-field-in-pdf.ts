@@ -194,7 +194,7 @@ export const insertFieldInPDF = async (pdf: PDFDocument, field: FieldWithSignatu
         value: item.value.length > 0 ? item.value : `empty-value-${item.id}`,
       }));
 
-      const selected = field.customText.split(',');
+      const selected = field.customText ? JSON.parse(field.customText) : [];
 
       for (const [index, item] of (values ?? []).entries()) {
         const offsetY = index * 16;
