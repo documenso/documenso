@@ -1,5 +1,5 @@
 import { prisma } from '@documenso/prisma';
-import { Prisma } from '@documenso/prisma/client';
+import { DocumentStatus, Prisma } from '@documenso/prisma/client';
 
 export type SigningVolume = {
   id: number;
@@ -43,34 +43,41 @@ export async function getSigningVolume({
     ],
   });
 
-  const orderByClause = getOrderByClause({ sortBy, sortOrder });
-
   const [subscriptions, totalCount] = await Promise.all([
     prisma.subscription.findMany({
       where: whereClause,
       include: {
         User: {
-          include: {
+          select: {
+            name: true,
+            email: true,
             Document: {
               where: {
-                status: 'COMPLETED',
+                status: DocumentStatus.COMPLETED,
                 deletedAt: null,
+                teamId: null,
               },
             },
           },
         },
         team: {
-          include: {
+          select: {
+            name: true,
             document: {
               where: {
-                status: 'COMPLETED',
+                status: DocumentStatus.COMPLETED,
                 deletedAt: null,
               },
             },
           },
         },
       },
-      orderBy: orderByClause,
+      orderBy:
+        sortBy === 'name'
+          ? [{ User: { name: sortOrder } }, { team: { name: sortOrder } }, { createdAt: 'desc' }]
+          : sortBy === 'createdAt'
+            ? [{ createdAt: sortOrder }]
+            : undefined,
       skip: Math.max(page - 1, 0) * perPage,
       take: perPage,
     }),
@@ -82,10 +89,8 @@ export async function getSigningVolume({
   const leaderboardWithVolume: SigningVolume[] = subscriptions.map((subscription) => {
     const name =
       subscription.User?.name || subscription.team?.name || subscription.User?.email || 'Unknown';
-
     const userSignedDocs = subscription.User?.Document?.length || 0;
     const teamSignedDocs = subscription.team?.document?.length || 0;
-
     return {
       id: subscription.id,
       name,
@@ -95,54 +100,16 @@ export async function getSigningVolume({
     };
   });
 
+  if (sortBy === 'signingVolume') {
+    leaderboardWithVolume.sort((a, b) => {
+      return sortOrder === 'desc'
+        ? b.signingVolume - a.signingVolume
+        : a.signingVolume - b.signingVolume;
+    });
+  }
+
   return {
     leaderboard: leaderboardWithVolume,
     totalPages: Math.ceil(totalCount / perPage),
   };
-}
-
-function getOrderByClause(options: {
-  sortBy: string;
-  sortOrder: 'asc' | 'desc';
-}): Prisma.SubscriptionOrderByWithRelationInput | Prisma.SubscriptionOrderByWithRelationInput[] {
-  const { sortBy, sortOrder } = options;
-
-  if (sortBy === 'name') {
-    return [
-      {
-        User: {
-          name: sortOrder,
-        },
-      },
-      {
-        team: {
-          name: sortOrder,
-        },
-      },
-    ];
-  }
-
-  if (sortBy === 'createdAt') {
-    return {
-      createdAt: sortOrder,
-    };
-  }
-
-  // Default: sort by signing volume
-  return [
-    {
-      User: {
-        Document: {
-          _count: sortOrder,
-        },
-      },
-    },
-    {
-      team: {
-        document: {
-          _count: sortOrder,
-        },
-      },
-    },
-  ];
 }

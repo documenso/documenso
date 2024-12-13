@@ -351,10 +351,17 @@ export const SignaturePad = ({
     const newValue = event.target.value;
     setTypedSignature(newValue);
 
+    if ($el.current) {
+      const ctx = $el.current.getContext('2d');
+      ctx?.clearRect(0, 0, $el.current.width, $el.current.height);
+    }
+
     if (newValue.trim() !== '') {
       onChange?.(newValue);
+      onValidityChange?.(true);
     } else {
       onChange?.(null);
+      onValidityChange?.(false);
     }
   };
 
@@ -454,7 +461,7 @@ export const SignaturePad = ({
 
   return (
     <div
-      className={cn('relative block', containerClassName, {
+      className={cn('relative block select-none', containerClassName, {
         'pointer-events-none opacity-50': disabled,
       })}
     >
