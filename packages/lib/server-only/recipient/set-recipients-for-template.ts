@@ -1,3 +1,5 @@
+import { z } from 'zod';
+
 import { isUserEnterprise } from '@documenso/ee/server-only/util/is-document-enterprise';
 import {
   DIRECT_TEMPLATE_RECIPIENT_EMAIL,
@@ -6,6 +8,7 @@ import {
 import { prisma } from '@documenso/prisma';
 import type { Recipient } from '@documenso/prisma/client';
 import { RecipientRole } from '@documenso/prisma/client';
+import { RecipientSchema } from '@documenso/prisma/generated/zod';
 
 import { AppError, AppErrorCode } from '../../errors/app-error';
 import {
@@ -29,12 +32,20 @@ export type SetRecipientsForTemplateOptions = {
   }[];
 };
 
+export const ZSetRecipientsForTemplateResponseSchema = z.object({
+  recipients: RecipientSchema.array(),
+});
+
+export type TSetRecipientsForTemplateResponse = z.infer<
+  typeof ZSetRecipientsForTemplateResponseSchema
+>;
+
 export const setRecipientsForTemplate = async ({
   userId,
   teamId,
   templateId,
   recipients,
-}: SetRecipientsForTemplateOptions) => {
+}: SetRecipientsForTemplateOptions): Promise<TSetRecipientsForTemplateResponse> => {
   const template = await prisma.template.findFirst({
     where: {
       id: templateId,
@@ -220,5 +231,7 @@ export const setRecipientsForTemplate = async ({
     return !isRemoved && !isUpdated;
   });
 
-  return [...filteredRecipients, ...persistedRecipients];
+  return {
+    recipients: [...filteredRecipients, ...persistedRecipients],
+  };
 };

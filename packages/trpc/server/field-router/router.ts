@@ -1,9 +1,16 @@
-import { z } from 'zod';
-
-import { getFieldById } from '@documenso/lib/server-only/field/get-field-by-id';
+import {
+  ZGetFieldByIdResponseSchema,
+  getFieldById,
+} from '@documenso/lib/server-only/field/get-field-by-id';
 import { removeSignedFieldWithToken } from '@documenso/lib/server-only/field/remove-signed-field-with-token';
-import { setFieldsForDocument } from '@documenso/lib/server-only/field/set-fields-for-document';
-import { setFieldsForTemplate } from '@documenso/lib/server-only/field/set-fields-for-template';
+import {
+  ZSetFieldsForDocumentResponseSchema,
+  setFieldsForDocument,
+} from '@documenso/lib/server-only/field/set-fields-for-document';
+import {
+  ZSetFieldsForTemplateResponseSchema,
+  setFieldsForTemplate,
+} from '@documenso/lib/server-only/field/set-fields-for-template';
 import { signFieldWithToken } from '@documenso/lib/server-only/field/sign-field-with-token';
 import { extractNextApiRequestMetadata } from '@documenso/lib/universal/extract-request-metadata';
 
@@ -17,6 +24,9 @@ import {
 } from './schema';
 
 export const fieldRouter = router({
+  /**
+   * @public
+   */
   getField: authenticatedProcedure
     .meta({
       openapi: {
@@ -28,7 +38,7 @@ export const fieldRouter = router({
       },
     })
     .input(ZGetFieldQuerySchema)
-    .output(z.unknown())
+    .output(ZGetFieldByIdResponseSchema)
     .query(async ({ input, ctx }) => {
       const { fieldId, teamId } = input;
 
@@ -39,6 +49,9 @@ export const fieldRouter = router({
       });
     }),
 
+  /**
+   * @public
+   */
   addFields: authenticatedProcedure
     .meta({
       openapi: {
@@ -49,7 +62,7 @@ export const fieldRouter = router({
       },
     })
     .input(ZAddFieldsMutationSchema)
-    .output(z.unknown())
+    .output(ZSetFieldsForDocumentResponseSchema)
     .mutation(async ({ input, ctx }) => {
       const { documentId, fields } = input;
 
@@ -71,6 +84,9 @@ export const fieldRouter = router({
       });
     }),
 
+  /**
+   * @public
+   */
   addTemplateFields: authenticatedProcedure
     .meta({
       openapi: {
@@ -81,7 +97,7 @@ export const fieldRouter = router({
       },
     })
     .input(ZAddTemplateFieldsMutationSchema)
-    .output(z.unknown())
+    .output(ZSetFieldsForTemplateResponseSchema)
     .mutation(async ({ input, ctx }) => {
       const { templateId, fields } = input;
 
@@ -102,7 +118,9 @@ export const fieldRouter = router({
       });
     }),
 
-  // Internal endpoint for now.
+  /**
+   * @internal
+   */
   signFieldWithToken: procedure
     .input(ZSignFieldWithTokenMutationSchema)
     .mutation(async ({ input, ctx }) => {
@@ -119,7 +137,9 @@ export const fieldRouter = router({
       });
     }),
 
-  // Internal endpoint for now.
+  /**
+   * @internal
+   */
   removeSignedFieldWithToken: procedure
     .input(ZRemovedSignedFieldWithTokenMutationSchema)
     .mutation(async ({ input, ctx }) => {

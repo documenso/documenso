@@ -1,3 +1,5 @@
+import type { z } from 'zod';
+
 import { DOCUMENT_AUDIT_LOG_TYPE } from '@documenso/lib/types/document-audit-logs';
 import type { RequestMetadata } from '@documenso/lib/universal/extract-request-metadata';
 import { putPdfFile } from '@documenso/lib/universal/upload/put-file';
@@ -11,6 +13,11 @@ import {
   SigningStatus,
   WebhookTriggerEvents,
 } from '@documenso/prisma/client';
+import {
+  DocumentMetaSchema,
+  DocumentSchema,
+  RecipientSchema,
+} from '@documenso/prisma/generated/zod';
 
 import { jobs } from '../../jobs/client';
 import { extractDerivedDocumentEmailSettings } from '../../types/document-email';
@@ -27,13 +34,20 @@ export type SendDocumentOptions = {
   requestMetadata?: RequestMetadata;
 };
 
+export const ZSendDocumentResponseSchema = DocumentSchema.extend({
+  documentMeta: DocumentMetaSchema.nullable(),
+  Recipient: RecipientSchema.array(),
+});
+
+export type TSendDocumentResponse = z.infer<typeof ZSendDocumentResponseSchema>;
+
 export const sendDocument = async ({
   documentId,
   userId,
   teamId,
   sendEmail,
   requestMetadata,
-}: SendDocumentOptions) => {
+}: SendDocumentOptions): Promise<TSendDocumentResponse> => {
   const user = await prisma.user.findFirstOrThrow({
     where: {
       id: userId,
@@ -211,6 +225,7 @@ export const sendDocument = async ({
         id: documentId,
       },
       include: {
+        documentMeta: true,
         Recipient: true,
       },
     });

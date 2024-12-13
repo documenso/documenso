@@ -23,27 +23,24 @@ export const ZFindDocumentsQuerySchema = ZFindSearchParamsSchema.extend({
   templateId: z.number().min(1).optional(),
   source: z.nativeEnum(DocumentSource).optional(),
   status: z.nativeEnum(DocumentStatus).optional(),
-  orderBy: z
-    .object({
-      column: z.enum(['createdAt']),
-      direction: z.enum(['asc', 'desc']),
-    })
-    .optional(),
+  orderByColumn: z.enum(['createdAt']).optional(),
+  orderByDirection: z.enum(['asc', 'desc']).default('desc'),
 });
 
 export const ZFindDocumentAuditLogsQuerySchema = ZFindSearchParamsSchema.extend({
   documentId: z.number().min(1),
   cursor: z.string().optional(),
   filterForRecentActivity: z.boolean().optional(),
-  orderBy: z
-    .object({
-      column: z.enum(['createdAt', 'type']),
-      direction: z.enum(['asc', 'desc']),
-    })
-    .optional(),
+  orderByColumn: z.enum(['createdAt', 'type']).optional(),
+  orderByDirection: z.enum(['asc', 'desc']).default('desc'),
 });
 
 export const ZGetDocumentByIdQuerySchema = z.object({
+  documentId: z.number().min(1),
+  teamId: z.number().min(1).optional(),
+});
+
+export const ZDuplicateDocumentMutationSchema = z.object({
   documentId: z.number().min(1),
   teamId: z.number().min(1).optional(),
 });
@@ -223,7 +220,7 @@ export const ZDownloadCertificateMutationSchema = z.object({
   teamId: z.number().optional(),
 });
 
-export const ZMoveDocumentsToTeamSchema = z.object({
+export const ZMoveDocumentToTeamSchema = z.object({
   documentId: z.number(),
   teamId: z.number(),
 });

@@ -29,7 +29,7 @@ import { setRecipientsForDocument } from '@documenso/lib/server-only/recipient/s
 import { updateRecipient } from '@documenso/lib/server-only/recipient/update-recipient';
 import { createTeamMemberInvites } from '@documenso/lib/server-only/team/create-team-member-invites';
 import { deleteTeamMembers } from '@documenso/lib/server-only/team/delete-team-members';
-import type { CreateDocumentFromTemplateResponse } from '@documenso/lib/server-only/template/create-document-from-template';
+import type { TCreateDocumentFromTemplateResponse } from '@documenso/lib/server-only/template/create-document-from-template';
 import { createDocumentFromTemplate } from '@documenso/lib/server-only/template/create-document-from-template';
 import { createDocumentFromTemplateLegacy } from '@documenso/lib/server-only/template/create-document-from-template-legacy';
 import { deleteTemplate } from '@documenso/lib/server-only/template/delete-template';
@@ -345,7 +345,7 @@ export const ApiContractV1Implementation = createNextRoute(ApiContractV1, {
         });
       }
 
-      const recipients = await setRecipientsForDocument({
+      const { recipients } = await setRecipientsForDocument({
         userId: user.id,
         teamId: team?.id,
         documentId: document.id,
@@ -560,7 +560,7 @@ export const ApiContractV1Implementation = createNextRoute(ApiContractV1, {
 
     const templateId = Number(params.templateId);
 
-    let document: CreateDocumentFromTemplateResponse | null = null;
+    let document: TCreateDocumentFromTemplateResponse | null = null;
 
     try {
       document = await createDocumentFromTemplate({
@@ -630,7 +630,6 @@ export const ApiContractV1Implementation = createNextRoute(ApiContractV1, {
           token: recipient.token,
           role: recipient.role,
           signingOrder: recipient.signingOrder,
-
           signingUrl: `${NEXT_PUBLIC_WEBAPP_URL()}/sign/${recipient.token}`,
         })),
       },
@@ -786,7 +785,7 @@ export const ApiContractV1Implementation = createNextRoute(ApiContractV1, {
     }
 
     try {
-      const newRecipients = await setRecipientsForDocument({
+      const { recipients: newRecipients } = await setRecipientsForDocument({
         documentId: Number(documentId),
         userId: user.id,
         teamId: team?.id,

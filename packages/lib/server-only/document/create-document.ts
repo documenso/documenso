@@ -1,5 +1,7 @@
 'use server';
 
+import type { z } from 'zod';
+
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import { DOCUMENT_AUDIT_LOG_TYPE } from '@documenso/lib/types/document-audit-logs';
 import type { RequestMetadata } from '@documenso/lib/universal/extract-request-metadata';
@@ -8,6 +10,7 @@ import { prisma } from '@documenso/prisma';
 import { DocumentSource, DocumentVisibility, WebhookTriggerEvents } from '@documenso/prisma/client';
 import type { Team, TeamGlobalSettings } from '@documenso/prisma/client';
 import { TeamMemberRole } from '@documenso/prisma/client';
+import { DocumentSchema } from '@documenso/prisma/generated/zod';
 
 import { ZWebhookDocumentSchema } from '../../types/webhook-payload';
 import { triggerWebhook } from '../webhooks/trigger/trigger-webhook';
@@ -22,6 +25,10 @@ export type CreateDocumentOptions = {
   requestMetadata?: RequestMetadata;
 };
 
+export const ZCreateDocumentResponseSchema = DocumentSchema;
+
+export type TCreateDocumentResponse = z.infer<typeof ZCreateDocumentResponseSchema>;
+
 export const createDocument = async ({
   userId,
   title,
@@ -30,7 +37,7 @@ export const createDocument = async ({
   teamId,
   formValues,
   requestMetadata,
-}: CreateDocumentOptions) => {
+}: CreateDocumentOptions): Promise<TCreateDocumentResponse> => {
   const user = await prisma.user.findFirstOrThrow({
     where: {
       id: userId,

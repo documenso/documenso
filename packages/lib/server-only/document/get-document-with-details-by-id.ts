@@ -1,6 +1,15 @@
-import { prisma } from '@documenso/prisma';
-import type { DocumentWithDetails } from '@documenso/prisma/types/document';
+import type { z } from 'zod';
 
+import { prisma } from '@documenso/prisma';
+import {
+  DocumentDataSchema,
+  DocumentMetaSchema,
+  DocumentSchema,
+  FieldSchema,
+  RecipientSchema,
+} from '@documenso/prisma/generated/zod';
+
+import { AppError, AppErrorCode } from '../../errors/app-error';
 import { getDocumentWhereInput } from './get-document-by-id';
 
 export type GetDocumentWithDetailsByIdOptions = {
@@ -9,18 +18,29 @@ export type GetDocumentWithDetailsByIdOptions = {
   teamId?: number;
 };
 
+export const ZGetDocumentWithDetailsByIdResponseSchema = DocumentSchema.extend({
+  documentData: DocumentDataSchema,
+  documentMeta: DocumentMetaSchema.nullable(),
+  Recipient: RecipientSchema.array(),
+  Field: FieldSchema.array(),
+});
+
+export type TGetDocumentWithDetailsByIdResponse = z.infer<
+  typeof ZGetDocumentWithDetailsByIdResponseSchema
+>;
+
 export const getDocumentWithDetailsById = async ({
   documentId,
   userId,
   teamId,
-}: GetDocumentWithDetailsByIdOptions): Promise<DocumentWithDetails> => {
+}: GetDocumentWithDetailsByIdOptions): Promise<TGetDocumentWithDetailsByIdResponse> => {
   const documentWhereInput = await getDocumentWhereInput({
     documentId,
     userId,
     teamId,
   });
 
-  return await prisma.document.findFirstOrThrow({
+  const document = await prisma.document.findFirst({
     where: documentWhereInput,
     include: {
       documentData: true,
@@ -29,4 +49,12 @@ export const getDocumentWithDetailsById = async ({
       Field: true,
     },
   });
+
+  if (!document) {
+    throw new AppError(AppErrorCode.NOT_FOUND, {
+      message: 'Document not found',
+    });
+  }
+
+  return document;
 };

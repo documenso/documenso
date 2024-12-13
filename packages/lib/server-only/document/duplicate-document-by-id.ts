@@ -1,19 +1,27 @@
+import { z } from 'zod';
+
 import { prisma } from '@documenso/prisma';
 import { DocumentSource, type Prisma } from '@documenso/prisma/client';
 
 import { getDocumentWhereInput } from './get-document-by-id';
 
-export interface DuplicateDocumentByIdOptions {
+export interface DuplicateDocumentOptions {
   documentId: number;
   userId: number;
   teamId?: number;
 }
 
-export const duplicateDocumentById = async ({
+export const ZDuplicateDocumentResponseSchema = z.object({
+  documentId: z.number(),
+});
+
+export type TDuplicateDocumentResponse = z.infer<typeof ZDuplicateDocumentResponseSchema>;
+
+export const duplicateDocument = async ({
   documentId,
   userId,
   teamId,
-}: DuplicateDocumentByIdOptions) => {
+}: DuplicateDocumentOptions): Promise<TDuplicateDocumentResponse> => {
   const documentWhereInput = await getDocumentWhereInput({
     documentId,
     userId,
@@ -78,5 +86,7 @@ export const duplicateDocumentById = async ({
 
   const createdDocument = await prisma.document.create(createDocumentArguments);
 
-  return createdDocument.id;
+  return {
+    documentId: createdDocument.id,
+  };
 };
