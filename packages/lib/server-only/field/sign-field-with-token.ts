@@ -119,7 +119,14 @@ export const signFieldWithToken = async ({
 
   if (field.type === FieldType.CHECKBOX && field.fieldMeta) {
     const checkboxFieldParsedMeta = ZCheckboxFieldMeta.parse(field.fieldMeta);
-    const checkboxFieldValues = JSON.parse(value);
+    let checkboxFieldValues: string[];
+
+    try {
+      const parsed = JSON.parse(value);
+      checkboxFieldValues = Array.isArray(parsed) ? parsed : value.split(',');
+    } catch {
+      checkboxFieldValues = value.split(',');
+    }
 
     const errors = validateCheckboxField(checkboxFieldValues, checkboxFieldParsedMeta, true);
 
