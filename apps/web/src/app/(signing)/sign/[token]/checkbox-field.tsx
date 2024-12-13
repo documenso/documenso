@@ -35,6 +35,17 @@ export type CheckboxFieldProps = {
   onUnsignField?: (value: TRemovedSignedFieldWithTokenMutationSchema) => Promise<void> | void;
 };
 
+const parseCheckedValues = (customText: string): string[] => {
+  try {
+    if (!customText) return [];
+
+    const parsed = JSON.parse(customText);
+    return Array.isArray(parsed) ? parsed : [];
+  } catch {
+    return customText.split(',').filter(Boolean);
+  }
+};
+
 export const CheckboxField = ({
   field,
   recipient,
@@ -229,6 +240,11 @@ export const CheckboxField = ({
     }
   }, [checkedValues, isLengthConditionMet, field.inserted]);
 
+  const parsedCheckedValues = useMemo(
+    () => parseCheckedValues(field.customText),
+    [field.customText],
+  );
+
   return (
     <SigningFieldContainer field={field} onSign={onSign} onRemove={onRemove} type="Checkbox">
       {isLoading && (
@@ -278,9 +294,7 @@ export const CheckboxField = ({
                   className="h-3 w-3"
                   checkClassName="text-white"
                   id={`checkbox-${index}`}
-                  checked={field.customText
-                    .split(',')
-                    .some((customValue) => customValue === itemValue)}
+                  checked={parsedCheckedValues.includes(itemValue)}
                   disabled={isLoading}
                   onCheckedChange={() => void handleCheckboxOptionClick(item)}
                 />
