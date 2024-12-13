@@ -8,6 +8,7 @@ import { DocumentDataType } from '@documenso/prisma/client';
 
 import { AppError } from '../../errors/app-error';
 import { createDocumentData } from '../../server-only/document-data/create-document-data';
+import { removeOptionalContentGroups } from '../../server-only/pdf/flatten-form';
 
 type File = {
   name: string;
@@ -24,20 +25,25 @@ export const putPdfFile = async (file: File) => {
     () => false,
   );
 
-  // This will prevent uploading encrypted PDFs or anything that can't be opened.
-  if (!isEncryptedDocumentsAllowed) {
-    await PDFDocument.load(await file.arrayBuffer()).catch((e) => {
-      console.error(`PDF upload parse error: ${e.message}`);
+  const pdf = await PDFDocument.load(await file.arrayBuffer()).catch((e) => {
+    console.error(`PDF upload parse error: ${e.message}`);
 
-      throw new AppError('INVALID_DOCUMENT_FILE');
-    });
+    throw new AppError('INVALID_DOCUMENT_FILE');
+  });
+
+  if (!isEncryptedDocumentsAllowed && pdf.isEncrypted) {
+    throw new AppError('INVALID_DOCUMENT_FILE');
   }
 
   if (!file.name.endsWith('.pdf')) {
     file.name = `${file.name}.pdf`;
   }
 
-  const { type, data } = await putFile(file);
+  removeOptionalContentGroups(pdf);
+
+  const bytes = await pdf.save();
+
+  const { type, data } = await putFile(new File([bytes], file.name, { type: 'application/pdf' }));
 
   return await createDocumentData({ type, data });
 };
