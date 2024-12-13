@@ -1,6 +1,7 @@
 'use server';
 
 import { match } from 'ts-pattern';
+import type { z } from 'zod';
 
 import { isUserEnterprise } from '@documenso/ee/server-only/util/is-document-enterprise';
 import { DOCUMENT_AUDIT_LOG_TYPE } from '@documenso/lib/types/document-audit-logs';
@@ -10,6 +11,7 @@ import { createDocumentAuditLogData } from '@documenso/lib/utils/document-audit-
 import { prisma } from '@documenso/prisma';
 import { DocumentVisibility } from '@documenso/prisma/client';
 import { DocumentStatus, TeamMemberRole } from '@documenso/prisma/client';
+import { DocumentSchema } from '@documenso/prisma/generated/zod';
 
 import { AppError, AppErrorCode } from '../../errors/app-error';
 import type { TDocumentAccessAuthTypes, TDocumentActionAuthTypes } from '../../types/document-auth';
@@ -29,13 +31,17 @@ export type UpdateDocumentSettingsOptions = {
   requestMetadata?: RequestMetadata;
 };
 
+export const ZUpdateDocumentSettingsResponseSchema = DocumentSchema;
+
+export type TUpdateDocumentSettingsResponse = z.infer<typeof ZUpdateDocumentSettingsResponseSchema>;
+
 export const updateDocumentSettings = async ({
   userId,
   teamId,
   documentId,
   data,
   requestMetadata,
-}: UpdateDocumentSettingsOptions) => {
+}: UpdateDocumentSettingsOptions): Promise<TUpdateDocumentSettingsResponse> => {
   if (!data.title && !data.globalAccessAuth && !data.globalActionAuth) {
     throw new AppError(AppErrorCode.INVALID_BODY, {
       message: 'Missing data to update',

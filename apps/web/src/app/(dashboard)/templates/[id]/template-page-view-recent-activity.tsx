@@ -26,10 +26,8 @@ export const TemplatePageViewRecentActivity = ({
   const { data, isLoading, isLoadingError, refetch } = trpc.document.findDocuments.useQuery({
     templateId,
     teamId,
-    orderBy: {
-      column: 'createdAt',
-      direction: 'asc',
-    },
+    orderByColumn: 'createdAt',
+    orderByDirection: 'asc',
     perPage: 5,
   });
 

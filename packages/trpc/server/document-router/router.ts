@@ -8,19 +8,40 @@ import { DOCUMENSO_ENCRYPTION_KEY } from '@documenso/lib/constants/crypto';
 import { AppError } from '@documenso/lib/errors/app-error';
 import { encryptSecondaryData } from '@documenso/lib/server-only/crypto/encrypt';
 import { upsertDocumentMeta } from '@documenso/lib/server-only/document-meta/upsert-document-meta';
-import { createDocument } from '@documenso/lib/server-only/document/create-document';
+import {
+  ZCreateDocumentResponseSchema,
+  createDocument,
+} from '@documenso/lib/server-only/document/create-document';
 import { deleteDocument } from '@documenso/lib/server-only/document/delete-document';
-import { duplicateDocumentById } from '@documenso/lib/server-only/document/duplicate-document-by-id';
+import {
+  ZDuplicateDocumentResponseSchema,
+  duplicateDocument,
+} from '@documenso/lib/server-only/document/duplicate-document-by-id';
 import { findDocumentAuditLogs } from '@documenso/lib/server-only/document/find-document-audit-logs';
-import { findDocuments } from '@documenso/lib/server-only/document/find-documents';
+import {
+  ZFindDocumentsResponseSchema,
+  findDocuments,
+} from '@documenso/lib/server-only/document/find-documents';
 import { getDocumentById } from '@documenso/lib/server-only/document/get-document-by-id';
 import { getDocumentAndSenderByToken } from '@documenso/lib/server-only/document/get-document-by-token';
-import { getDocumentWithDetailsById } from '@documenso/lib/server-only/document/get-document-with-details-by-id';
-import { moveDocumentToTeam } from '@documenso/lib/server-only/document/move-document-to-team';
+import {
+  ZGetDocumentWithDetailsByIdResponseSchema,
+  getDocumentWithDetailsById,
+} from '@documenso/lib/server-only/document/get-document-with-details-by-id';
+import {
+  ZMoveDocumentToTeamResponseSchema,
+  moveDocumentToTeam,
+} from '@documenso/lib/server-only/document/move-document-to-team';
 import { resendDocument } from '@documenso/lib/server-only/document/resend-document';
 import { searchDocumentsWithKeyword } from '@documenso/lib/server-only/document/search-documents-with-keyword';
-import { sendDocument } from '@documenso/lib/server-only/document/send-document';
-import { updateDocumentSettings } from '@documenso/lib/server-only/document/update-document-settings';
+import {
+  ZSendDocumentResponseSchema,
+  sendDocument,
+} from '@documenso/lib/server-only/document/send-document';
+import {
+  ZUpdateDocumentSettingsResponseSchema,
+  updateDocumentSettings,
+} from '@documenso/lib/server-only/document/update-document-settings';
 import { updateTitle } from '@documenso/lib/server-only/document/update-title';
 import { symmetricEncrypt } from '@documenso/lib/universal/crypto';
 import { extractNextApiRequestMetadata } from '@documenso/lib/universal/extract-request-metadata';
@@ -32,12 +53,13 @@ import {
   ZDeleteDocumentMutationSchema,
   ZDownloadAuditLogsMutationSchema,
   ZDownloadCertificateMutationSchema,
+  ZDuplicateDocumentMutationSchema,
   ZFindDocumentAuditLogsQuerySchema,
   ZFindDocumentsQuerySchema,
   ZGetDocumentByIdQuerySchema,
   ZGetDocumentByTokenQuerySchema,
   ZGetDocumentWithDetailsByIdQuerySchema,
-  ZMoveDocumentsToTeamSchema,
+  ZMoveDocumentToTeamSchema,
   ZResendDocumentMutationSchema,
   ZSearchDocumentsMutationSchema,
   ZSendDocumentMutationSchema,
@@ -49,7 +71,9 @@ import {
 } from './schema';
 
 export const documentRouter = router({
-  // Internal endpoint for now.
+  /**
+   * @private
+   */
   getDocumentById: authenticatedProcedure
     .input(ZGetDocumentByIdQuerySchema)
     .query(async ({ input, ctx }) => {
@@ -59,7 +83,9 @@ export const documentRouter = router({
       });
     }),
 
-  // Internal endpoint for now.
+  /**
+   * @private
+   */
   getDocumentByToken: procedure
     .input(ZGetDocumentByTokenQuerySchema)
     .query(async ({ input, ctx }) => {
@@ -71,6 +97,9 @@ export const documentRouter = router({
       });
     }),
 
+  /**
+   * @public
+   */
   findDocuments: authenticatedProcedure
     .meta({
       openapi: {
@@ -82,11 +111,21 @@ export const documentRouter = router({
       },
     })
     .input(ZFindDocumentsQuerySchema)
-    .output(z.unknown())
+    .output(ZFindDocumentsResponseSchema)
     .query(async ({ input, ctx }) => {
       const { user } = ctx;
 
-      const { query, teamId, templateId, page, perPage, orderBy, source, status } = input;
+      const {
+        query,
+        teamId,
+        templateId,
+        page,
+        perPage,
+        orderByDirection,
+        orderByColumn,
+        source,
+        status,
+      } = input;
 
       const documents = await findDocuments({
         userId: user.id,
@@ -97,12 +136,17 @@ export const documentRouter = router({
         status,
         page,
         perPage,
-        orderBy,
+        orderBy: orderByColumn ? { column: orderByColumn, direction: orderByDirection } : undefined,
       });
 
       return documents;
     }),
 
+  /**
+   * @public
+   *
+   * Todo: Refactor to getDocumentById.
+   */
   getDocumentWithDetailsById: authenticatedProcedure
     .meta({
       openapi: {
@@ -114,7 +158,7 @@ export const documentRouter = router({
       },
     })
     .input(ZGetDocumentWithDetailsByIdQuerySchema)
-    .output(z.unknown())
+    .output(ZGetDocumentWithDetailsByIdResponseSchema)
     .query(async ({ input, ctx }) => {
       return await getDocumentWithDetailsById({
         ...input,
@@ -122,6 +166,9 @@ export const documentRouter = router({
       });
     }),
 
+  /**
+   * @public
+   */
   createDocument: authenticatedProcedure
     .meta({
       openapi: {
@@ -132,7 +179,7 @@ export const documentRouter = router({
       },
     })
     .input(ZCreateDocumentMutationSchema)
-    .output(z.unknown())
+    .output(ZCreateDocumentResponseSchema)
     .mutation(async ({ input, ctx }) => {
       const { title, documentDataId, teamId } = input;
 
@@ -154,7 +201,11 @@ export const documentRouter = router({
       });
     }),
 
-  // Todo: Refactor to updateDocument.
+  /**
+   * @public
+   *
+   * Todo: Refactor to updateDocument.
+   */
   setSettingsForDocument: authenticatedProcedure
     .meta({
       openapi: {
@@ -165,7 +216,7 @@ export const documentRouter = router({
       },
     })
     .input(ZSetSettingsForDocumentMutationSchema)
-    .output(z.unknown())
+    .output(ZUpdateDocumentSettingsResponseSchema)
     .mutation(async ({ input, ctx }) => {
       const { documentId, teamId, data, meta } = input;
 
@@ -194,6 +245,9 @@ export const documentRouter = router({
       });
     }),
 
+  /**
+   * @public
+   */
   deleteDocument: authenticatedProcedure
     .meta({
       openapi: {
@@ -204,13 +258,13 @@ export const documentRouter = router({
       },
     })
     .input(ZDeleteDocumentMutationSchema)
-    .output(z.unknown())
+    .output(z.void())
     .mutation(async ({ input, ctx }) => {
       const { documentId, teamId } = input;
 
       const userId = ctx.user.id;
 
-      return await deleteDocument({
+      await deleteDocument({
         id: documentId,
         userId,
         teamId,
@@ -218,6 +272,9 @@ export const documentRouter = router({
       });
     }),
 
+  /**
+   * @public
+   */
   moveDocumentToTeam: authenticatedProcedure
     .meta({
       openapi: {
@@ -228,8 +285,8 @@ export const documentRouter = router({
         tags: ['Documents'],
       },
     })
-    .input(ZMoveDocumentsToTeamSchema)
-    .output(z.unknown())
+    .input(ZMoveDocumentToTeamSchema)
+    .output(ZMoveDocumentToTeamResponseSchema)
     .mutation(async ({ input, ctx }) => {
       const { documentId, teamId } = input;
       const userId = ctx.user.id;
@@ -242,7 +299,9 @@ export const documentRouter = router({
       });
     }),
 
-  // Internal endpoint for now.
+  /**
+   * @private
+   */
   // Should probably use `updateDocument`
   setTitleForDocument: authenticatedProcedure
     .input(ZSetTitleForDocumentMutationSchema)
@@ -260,7 +319,9 @@ export const documentRouter = router({
       });
     }),
 
-  // Internal endpoint for now.
+  /**
+   * @private
+   */
   setPasswordForDocument: authenticatedProcedure
     .input(ZSetPasswordForDocumentMutationSchema)
     .mutation(async ({ input, ctx }) => {
@@ -285,7 +346,9 @@ export const documentRouter = router({
       });
     }),
 
-  // Internal endpoint for now.
+  /**
+   * @private
+   */
   setSigningOrderForDocument: authenticatedProcedure
     .input(ZSetSigningOrderForDocumentMutationSchema)
     .mutation(async ({ input, ctx }) => {
@@ -299,7 +362,9 @@ export const documentRouter = router({
       });
     }),
 
-  // Internal endpoint for now.
+  /**
+   * @private
+   */
   updateTypedSignatureSettings: authenticatedProcedure
     .input(ZUpdateTypedSignatureSettingsMutationSchema)
     .mutation(async ({ input, ctx }) => {
@@ -326,8 +391,12 @@ export const documentRouter = router({
       });
     }),
 
-  // Todo: Refactor to distributeDocument.
-  // Todo: Rework before releasing API.
+  /**
+   * @public
+   *
+   * Todo: Refactor to distributeDocument.
+   * Todo: Rework before releasing API.
+   */
   sendDocument: authenticatedProcedure
     .meta({
       openapi: {
@@ -339,7 +408,7 @@ export const documentRouter = router({
       },
     })
     .input(ZSendDocumentMutationSchema)
-    .output(z.unknown())
+    .output(ZSendDocumentResponseSchema)
     .mutation(async ({ input, ctx }) => {
       const { documentId, teamId, meta } = input;
 
@@ -374,6 +443,9 @@ export const documentRouter = router({
       });
     }),
 
+  /**
+   * @public
+   */
   resendDocument: authenticatedProcedure
     .meta({
       openapi: {
@@ -386,7 +458,7 @@ export const documentRouter = router({
       },
     })
     .input(ZResendDocumentMutationSchema)
-    .output(z.unknown())
+    .output(z.void())
     .mutation(async ({ input, ctx }) => {
       return await resendDocument({
         userId: ctx.user.id,
@@ -395,6 +467,9 @@ export const documentRouter = router({
       });
     }),
 
+  /**
+   * @public
+   */
   duplicateDocument: authenticatedProcedure
     .meta({
       openapi: {
@@ -404,16 +479,18 @@ export const documentRouter = router({
         tags: ['Documents'],
       },
     })
-    .input(ZGetDocumentByIdQuerySchema)
-    .output(z.unknown())
+    .input(ZDuplicateDocumentMutationSchema)
+    .output(ZDuplicateDocumentResponseSchema)
     .mutation(async ({ input, ctx }) => {
-      return await duplicateDocumentById({
+      return await duplicateDocument({
         userId: ctx.user.id,
         ...input,
       });
     }),
 
-  // Internal endpoint for now.
+  /**
+   * @private
+   */
   searchDocuments: authenticatedProcedure
     .input(ZSearchDocumentsMutationSchema)
     .query(async ({ input, ctx }) => {
@@ -427,11 +504,21 @@ export const documentRouter = router({
       return documents;
     }),
 
-  // Internal endpoint for now.
+  /**
+   * @private
+   */
   findDocumentAuditLogs: authenticatedProcedure
     .input(ZFindDocumentAuditLogsQuerySchema)
     .query(async ({ input, ctx }) => {
-      const { page, perPage, documentId, cursor, filterForRecentActivity, orderBy } = input;
+      const {
+        page,
+        perPage,
+        documentId,
+        cursor,
+        filterForRecentActivity,
+        orderByColumn,
+        orderByDirection,
+      } = input;
 
       return await findDocumentAuditLogs({
         page,
@@ -439,12 +526,14 @@ export const documentRouter = router({
         documentId,
         cursor,
         filterForRecentActivity,
-        orderBy,
+        orderBy: orderByColumn ? { column: orderByColumn, direction: orderByDirection } : undefined,
         userId: ctx.user.id,
       });
     }),
 
-  // Internal endpoint for now.
+  /**
+   * @private
+   */
   downloadAuditLogs: authenticatedProcedure
     .input(ZDownloadAuditLogsMutationSchema)
     .mutation(async ({ input, ctx }) => {
@@ -473,7 +562,9 @@ export const documentRouter = router({
       };
     }),
 
-  // Internal endpoint for now.
+  /**
+   * @private
+   */
   downloadCertificate: authenticatedProcedure
     .input(ZDownloadCertificateMutationSchema)
     .mutation(async ({ input, ctx }) => {

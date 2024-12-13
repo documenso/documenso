@@ -12,8 +12,8 @@ import {
   DO_NOT_INVALIDATE_QUERY_ON_MUTATION,
   SKIP_QUERY_BATCH_META,
 } from '@documenso/lib/constants/trpc';
+import type { TGetDocumentWithDetailsByIdResponse } from '@documenso/lib/server-only/document/get-document-with-details-by-id';
 import { DocumentDistributionMethod, DocumentStatus } from '@documenso/prisma/client';
-import type { DocumentWithDetails } from '@documenso/prisma/types/document';
 import { trpc } from '@documenso/trpc/react';
 import { cn } from '@documenso/ui/lib/utils';
 import { Card, CardContent } from '@documenso/ui/primitives/card';
@@ -35,7 +35,7 @@ import { useOptionalCurrentTeam } from '~/providers/team';
 
 export type EditDocumentFormProps = {
   className?: string;
-  initialDocument: DocumentWithDetails;
+  initialDocument: TGetDocumentWithDetailsByIdResponse;
   documentRootPath: string;
   isDocumentEnterprise: boolean;
 };
@@ -103,7 +103,7 @@ export const EditDocumentForm = ({
 
   const { mutateAsync: addFields } = trpc.field.addFields.useMutation({
     ...DO_NOT_INVALIDATE_QUERY_ON_MUTATION,
-    onSuccess: (newFields) => {
+    onSuccess: ({ fields: newFields }) => {
       utils.document.getDocumentWithDetailsById.setData(
         {
           documentId: initialDocument.id,
@@ -134,7 +134,7 @@ export const EditDocumentForm = ({
 
   const { mutateAsync: addSigners } = trpc.recipient.addSigners.useMutation({
     ...DO_NOT_INVALIDATE_QUERY_ON_MUTATION,
-    onSuccess: (newRecipients) => {
+    onSuccess: ({ recipients: newRecipients }) => {
       utils.document.getDocumentWithDetailsById.setData(
         {
           documentId: initialDocument.id,
