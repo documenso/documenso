@@ -461,7 +461,7 @@ export const SignaturePad = ({
 
   return (
     <div
-      className={cn('relative block', containerClassName, {
+      className={cn('relative block select-none', containerClassName, {
         'pointer-events-none opacity-50': disabled,
       })}
     >
