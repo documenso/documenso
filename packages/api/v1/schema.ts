@@ -388,6 +388,12 @@ export const ZUpdateFieldMutationSchema = ZCreateFieldSchema.partial();
 
 export type TUpdateFieldMutationSchema = z.infer<typeof ZUpdateFieldMutationSchema>;
 
+export const ZUpdateFieldsMutationSchema = z
+  .array(ZUpdateFieldMutationSchema.extend({ id: z.number() }))
+  .min(1);
+
+export type TUpdateFieldsMutationSchema = z.infer<typeof ZUpdateFieldsMutationSchema>;
+
 export const ZDeleteFieldMutationSchema = null;
 
 export type TDeleteFieldMutationSchema = typeof ZDeleteFieldMutationSchema;

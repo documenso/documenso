@@ -37,6 +37,7 @@ import {
   ZSuccessfulUpdateTeamMemberResponseSchema,
   ZUnsuccessfulResponseSchema,
   ZUpdateFieldMutationSchema,
+  ZUpdateFieldsMutationSchema,
   ZUpdateRecipientMutationSchema,
   ZUpdateTeamMemberMutationSchema,
 } from './schema';
@@ -267,6 +268,20 @@ export const ApiContractV1 = c.router(
         500: ZUnsuccessfulResponseSchema,
       },
       summary: 'Update a field for a document',
+    },
+
+    updateFields: {
+      method: 'PATCH',
+      path: '/api/v1/documents/:id/fields',
+      body: ZUpdateFieldsMutationSchema,
+      responses: {
+        200: ZSuccessfulFieldResponseSchema.array(),
+        400: ZUnsuccessfulResponseSchema,
+        401: ZUnsuccessfulResponseSchema,
+        404: ZUnsuccessfulResponseSchema,
+        500: ZUnsuccessfulResponseSchema,
+      },
+      summary: 'Update many fields for a document',
     },
 
     deleteField: {

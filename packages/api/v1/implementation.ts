@@ -1219,6 +1219,100 @@ export const ApiContractV1Implementation = createNextRoute(ApiContractV1, {
     };
   }),
 
+  updateFields: authenticatedMiddleware(async (args, user, team) => {
+    const { id: documentId } = args.params;
+
+    const document = await getDocumentById({
+      id: Number(documentId),
+      userId: user.id,
+      teamId: team?.id,
+    });
+
+    if (!document) {
+      return {
+        status: 404,
+        body: {
+          message: 'Document not found',
+        },
+      };
+    }
+
+    if (document.status === DocumentStatus.COMPLETED) {
+      return {
+        status: 400,
+        body: {
+          message: 'Document is already completed',
+        },
+      };
+    }
+
+    const FieldRecipients = [...new Set(args.body.map((field) => field.recipientId))];
+    const documentRecipients = await getRecipientsForDocument({
+      documentId: Number(documentId),
+      userId: user.id,
+      teamId: team?.id,
+    });
+
+    if (
+      !FieldRecipients.every((recipientId) => documentRecipients.some((r) => r.id === recipientId))
+    ) {
+      return {
+        status: 404,
+        body: {
+          message: 'One or more Recipients not found',
+        },
+      };
+    }
+
+    if (documentRecipients.some((recipient) => recipient.signingStatus === SigningStatus.SIGNED)) {
+      return {
+        status: 400,
+        body: {
+          message: 'One or more Recipients have already signed the document',
+        },
+      };
+    }
+
+    const allUpdatedFields = await Promise.all(
+      args.body.map(async (field) => {
+        const updatedField = await updateField({
+          fieldId: Number(field.id),
+          userId: user.id,
+          teamId: team?.id,
+          documentId: Number(documentId),
+          recipientId: field.recipientId ? Number(field.recipientId) : undefined,
+          type: field.type,
+          pageNumber: field.pageNumber,
+          pageX: field.pageX,
+          pageY: field.pageY,
+          pageWidth: field.pageWidth,
+          pageHeight: field.pageHeight,
+          requestMetadata: extractNextApiRequestMetadata(args.req),
+          fieldMeta: field.fieldMeta ? ZFieldMetaSchema.parse(field.fieldMeta) : undefined,
+        });
+
+        return {
+          id: updatedField.id,
+          documentId: Number(updatedField.documentId),
+          recipientId: updatedField.recipientId ?? -1,
+          type: updatedField.type,
+          pageNumber: updatedField.page,
+          pageX: Number(updatedField.positionX),
+          pageY: Number(updatedField.positionY),
+          pageWidth: Number(updatedField.width),
+          pageHeight: Number(updatedField.height),
+          customText: updatedField.customText,
+          inserted: updatedField.inserted,
+        };
+      }),
+    );
+
+    return {
+      status: 200,
+      body: allUpdatedFields,
+    };
+  }),
+
   deleteField: authenticatedMiddleware(async (args, user, team) => {
     const { id: documentId, fieldId } = args.params;
 
