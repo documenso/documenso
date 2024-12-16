@@ -274,7 +274,7 @@ export const DocumentEmailCheckboxes = ({
           className="text-muted-foreground ml-2 flex flex-row items-center text-sm"
           htmlFor={DocumentEmailEvents.RecipientSigned}
         >
-          <Trans>Send document completed for each recipient</Trans>
+          <Trans>Send document completed email to owner for each recipient</Trans>
 
           <Tooltip>
             <TooltipTrigger>
