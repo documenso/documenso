@@ -144,7 +144,6 @@ export const completeDocumentWithToken = async ({
     payload: {
       documentId: document.id,
       recipientId: recipient.id,
-      requestMetadata,
     },
   });
 

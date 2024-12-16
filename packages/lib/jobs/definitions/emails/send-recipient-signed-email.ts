@@ -10,10 +10,7 @@ import { prisma } from '@documenso/prisma';
 import { getI18nInstance } from '../../../client-only/providers/i18n.server';
 import { NEXT_PUBLIC_WEBAPP_URL } from '../../../constants/app';
 import { FROM_ADDRESS, FROM_NAME } from '../../../constants/email';
-import { DOCUMENT_AUDIT_LOG_TYPE } from '../../../types/document-audit-logs';
 import { extractDerivedDocumentEmailSettings } from '../../../types/document-email';
-import { ZRequestMetadataSchema } from '../../../universal/extract-request-metadata';
-import { createDocumentAuditLogData } from '../../../utils/document-audit-logs';
 import { renderEmailWithI18N } from '../../../utils/render-email-with-i18n';
 import { teamGlobalSettingsToBranding } from '../../../utils/team-global-settings-to-branding';
 import { type JobDefinition } from '../../client/_internal/job';
@@ -23,7 +20,6 @@ const SEND_RECIPIENT_SIGNED_EMAIL_JOB_DEFINITION_ID = 'send.recipient.signed.ema
 const SEND_RECIPIENT_SIGNED_EMAIL_JOB_DEFINITION_SCHEMA = z.object({
   documentId: z.number(),
   recipientId: z.number(),
-  requestMetadata: ZRequestMetadataSchema.optional(),
 });
 
 export const SEND_RECIPIENT_SIGNED_EMAIL_JOB_DEFINITION = {
@@ -35,7 +31,7 @@ export const SEND_RECIPIENT_SIGNED_EMAIL_JOB_DEFINITION = {
     schema: SEND_RECIPIENT_SIGNED_EMAIL_JOB_DEFINITION_SCHEMA,
   },
   handler: async ({ payload, io }) => {
-    const { documentId, recipientId, requestMetadata } = payload;
+    const { documentId, recipientId } = payload;
 
     const document = await prisma.document.findFirst({
       where: {
@@ -123,26 +119,6 @@ export const SEND_RECIPIENT_SIGNED_EMAIL_JOB_DEFINITION = {
         subject: i18n._(msg`${recipientName} has signed "${document.title}"`),
         html,
         text,
-      });
-    });
-
-    await io.runTask('store-audit-log', async () => {
-      await prisma.documentAuditLog.create({
-        data: createDocumentAuditLogData({
-          type: DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_RECIPIENT_COMPLETED,
-          user: {
-            name: recipient.name,
-            email: recipient.email,
-          },
-          documentId: document.id,
-          requestMetadata,
-          data: {
-            recipientId: recipient.id,
-            recipientName: recipient.name,
-            recipientEmail: recipient.email,
-            recipientRole: recipient.role,
-          },
-        }),
       });
     });
   },
