@@ -21,6 +21,7 @@ export const ZDocumentAuditLogTypeSchema = z.enum([
   'RECIPIENT_CREATED',
   'RECIPIENT_DELETED',
   'RECIPIENT_UPDATED',
+  'RECIPIENT_SIGNED',
 
   // Document events.
   'DOCUMENT_COMPLETED', // When the document is sealed and fully completed.
@@ -47,6 +48,7 @@ export const ZDocumentAuditLogEmailTypeSchema = z.enum([
   'APPROVE_REQUEST',
   'CC',
   'DOCUMENT_COMPLETED',
+  'RECIPIENT_SIGNED',
 ]);
 
 export const ZDocumentMetaDiffTypeSchema = z.enum([
