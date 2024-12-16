@@ -10,7 +10,7 @@ import { useThrottleFn } from '@documenso/lib/client-only/hooks/use-throttle-fn'
 import { PDF_VIEWER_PAGE_SELECTOR } from '@documenso/lib/constants/pdf-viewer';
 import { validateFieldsInserted } from '@documenso/lib/utils/fields';
 import type { DocumentMeta, Recipient, TemplateMeta } from '@documenso/prisma/client';
-import { type DocumentData, type Field } from '@documenso/prisma/client';
+import { type DocumentData, type Field, FieldType } from '@documenso/prisma/client';
 import { trpc } from '@documenso/trpc/react';
 import { FieldToolTip } from '@documenso/ui/components/field/field-tooltip';
 import { Button } from '@documenso/ui/primitives/button';
@@ -57,7 +57,15 @@ export const EmbedSignDocumentClientPage = ({
   const { _ } = useLingui();
   const { toast } = useToast();
 
-  const { fullName, email, signature, setFullName, setSignature } = useRequiredSigningContext();
+  const {
+    fullName,
+    email,
+    signature,
+    signatureValid,
+    setFullName,
+    setSignature,
+    setSignatureValid,
+  } = useRequiredSigningContext();
 
   const [hasFinishedInit, setHasFinishedInit] = useState(false);
   const [hasDocumentLoaded, setHasDocumentLoaded] = useState(false);
@@ -79,6 +87,8 @@ export const EmbedSignDocumentClientPage = ({
   const { mutateAsync: completeDocumentWithToken, isLoading: isSubmitting } =
     trpc.recipient.completeDocumentWithToken.useMutation();
 
+  const hasSignatureField = fields.some((field) => field.type === FieldType.SIGNATURE);
+
   const onNextFieldClick = () => {
     validateFieldsInserted(fields);
 
@@ -88,6 +98,10 @@ export const EmbedSignDocumentClientPage = ({
 
   const onCompleteClick = async () => {
     try {
+      if (hasSignatureField && !signatureValid) {
+        return;
+      }
+
       const valid = validateFieldsInserted(fields);
 
       if (!valid) {
@@ -296,6 +310,9 @@ export const EmbedSignDocumentClientPage = ({
                         onChange={(value) => {
                           setSignature(value);
                         }}
+                        onValidityChange={(isValid) => {
+                          setSignatureValid(isValid);
+                        }}
                         allowTypedSignature={Boolean(
                           metadata &&
                             'typedSignatureEnabled' in metadata &&
@@ -304,6 +321,14 @@ export const EmbedSignDocumentClientPage = ({
                       />
                     </CardContent>
                   </Card>
+
+                  {hasSignatureField && !signatureValid && (
+                    <div className="text-destructive mt-2 text-sm">
+                      <Trans>
+                        Signature is too small. Please provide a more complete signature.
+                      </Trans>
+                    </div>
+                  )}
                 </div>
               </div>
             </div>
@@ -318,7 +343,7 @@ export const EmbedSignDocumentClientPage = ({
               ) : (
                 <Button
                   className="col-start-2"
-                  disabled={isThrottled}
+                  disabled={isThrottled || (hasSignatureField && !signatureValid)}
                   loading={isSubmitting}
                   onClick={() => throttledOnCompleteClick()}
                 >

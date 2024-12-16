@@ -1,9 +1,11 @@
 import type { PDFField, PDFWidgetAnnotation } from 'pdf-lib';
-import { PDFCheckBox, PDFRadioGroup, PDFRef } from 'pdf-lib';
 import {
+  PDFCheckBox,
   PDFDict,
   type PDFDocument,
   PDFName,
+  PDFRadioGroup,
+  PDFRef,
   drawObject,
   popGraphicsState,
   pushGraphicsState,
@@ -11,7 +13,18 @@ import {
   translate,
 } from 'pdf-lib';
 
+export const removeOptionalContentGroups = (document: PDFDocument) => {
+  const context = document.context;
+  const catalog = context.lookup(context.trailerInfo.Root);
+
+  if (catalog instanceof PDFDict) {
+    catalog.delete(PDFName.of('OCProperties'));
+  }
+};
+
 export const flattenForm = (document: PDFDocument) => {
+  removeOptionalContentGroups(document);
+
   const form = document.getForm();
 
   form.updateFieldAppearances();

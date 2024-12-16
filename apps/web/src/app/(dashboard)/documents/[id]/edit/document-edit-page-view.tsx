@@ -41,7 +41,7 @@ export const DocumentEditPageView = async ({ params, team }: DocumentEditPageVie
   const { user } = await getRequiredServerComponentSession();
 
   const document = await getDocumentWithDetailsById({
-    id: documentId,
+    documentId,
     userId: user.id,
     teamId: team?.id,
   }).catch(() => null);

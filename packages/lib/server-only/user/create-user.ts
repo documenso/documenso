@@ -8,6 +8,7 @@ import { IdentityProvider, TeamMemberInviteStatus } from '@documenso/prisma/clie
 import { IS_BILLING_ENABLED } from '../../constants/app';
 import { SALT_ROUNDS } from '../../constants/auth';
 import { AppError, AppErrorCode } from '../../errors/app-error';
+import { buildLogger } from '../../utils/logger';
 
 export interface CreateUserOptions {
   name: string;
@@ -27,7 +28,7 @@ export const createUser = async ({ name, email, password, signature, url }: Crea
   });
 
   if (userExists) {
-    throw new Error('User already exists');
+    throw new AppError(AppErrorCode.ALREADY_EXISTS);
   }
 
   if (url) {
@@ -134,6 +135,18 @@ export const createUser = async ({ name, email, password, signature, url }: Crea
       return await getStripeCustomerByUser(user).then((session) => session.user);
     } catch (err) {
       console.error(err);
+
+      const error = AppError.parseError(err);
+
+      const logger = buildLogger();
+
+      logger.error(error, {
+        method: 'createUser',
+        context: {
+          appError: AppError.toJSON(error),
+          userId: user.id,
+        },
+      });
     }
   }
 

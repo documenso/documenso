@@ -168,9 +168,10 @@ export const FieldAdvancedSettings = forwardRef<HTMLDivElement, FieldAdvancedSet
     const isDocumentPage = pathname?.includes('document');
     const [errors, setErrors] = useState<string[]>([]);
 
-    const { data: template } = trpc.template.getTemplateWithDetailsById.useQuery(
+    const { data: template } = trpc.template.getTemplateById.useQuery(
       {
-        id: Number(id),
+        templateId: Number(id),
+        teamId,
       },
       {
         enabled: isTemplatePage,
@@ -179,7 +180,7 @@ export const FieldAdvancedSettings = forwardRef<HTMLDivElement, FieldAdvancedSet
 
     const { data: document } = trpc.document.getDocumentById.useQuery(
       {
-        id: Number(id),
+        documentId: Number(id),
         teamId,
       },
       {

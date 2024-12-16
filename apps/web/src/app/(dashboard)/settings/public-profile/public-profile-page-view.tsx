@@ -75,7 +75,7 @@ export const PublicProfilePageView = ({ user, team, profile }: PublicProfilePage
 
   const enabledPrivateDirectTemplates = useMemo(
     () =>
-      (data?.templates ?? []).filter(
+      (data?.data ?? []).filter(
         (template): template is DirectTemplate =>
           template.directLink?.enabled === true && template.type !== TemplateType.PUBLIC,
       ),

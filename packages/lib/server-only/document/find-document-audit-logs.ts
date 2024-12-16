@@ -1,9 +1,9 @@
-import type { FindResultSet } from '@documenso/lib/types/find-result-set';
 import { prisma } from '@documenso/prisma';
-import type { DocumentAuditLog } from '@documenso/prisma/client';
-import type { Prisma } from '@documenso/prisma/client';
+import type { DocumentAuditLog, Prisma } from '@documenso/prisma/client';
 
+import { AppError, AppErrorCode } from '../../errors/app-error';
 import { DOCUMENT_AUDIT_LOG_TYPE } from '../../types/document-audit-logs';
+import type { FindResultResponse } from '../../types/search-params';
 import { parseDocumentAuditLogData } from '../../utils/document-audit-logs';
 
 export interface FindDocumentAuditLogsOptions {
@@ -31,7 +31,7 @@ export const findDocumentAuditLogs = async ({
   const orderByColumn = orderBy?.column ?? 'createdAt';
   const orderByDirection = orderBy?.direction ?? 'desc';
 
-  const documentFilter = await prisma.document.findFirstOrThrow({
+  const document = await prisma.document.findFirst({
     where: {
       id: documentId,
       OR: [
@@ -50,6 +50,10 @@ export const findDocumentAuditLogs = async ({
       ],
     },
   });
+
+  if (!document) {
+    throw new AppError(AppErrorCode.NOT_FOUND);
+  }
 
   const whereClause: Prisma.DocumentAuditLogWhereInput = {
     documentId,
@@ -113,5 +117,5 @@ export const findDocumentAuditLogs = async ({
     perPage,
     totalPages: Math.ceil(count / perPage),
     nextCursor,
-  } satisfies FindResultSet<typeof parsedData> & { nextCursor?: string };
+  } satisfies FindResultResponse<typeof parsedData> & { nextCursor?: string };
 };

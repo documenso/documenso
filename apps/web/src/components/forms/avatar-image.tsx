@@ -13,10 +13,10 @@ import { match } from 'ts-pattern';
 import { z } from 'zod';
 
 import { NEXT_PUBLIC_WEBAPP_URL } from '@documenso/lib/constants/app';
+import { AppError } from '@documenso/lib/errors/app-error';
 import { base64 } from '@documenso/lib/universal/base64';
 import { extractInitials } from '@documenso/lib/utils/recipient-formatter';
 import type { Team, User } from '@documenso/prisma/client';
-import { TRPCClientError } from '@documenso/trpc/client';
 import { trpc } from '@documenso/trpc/react';
 import { cn } from '@documenso/ui/lib/utils';
 import { Avatar, AvatarFallback, AvatarImage } from '@documenso/ui/primitives/avatar';
@@ -111,21 +111,18 @@ export const AvatarImageForm = ({ className, user, team }: AvatarImageFormProps)
 
       router.refresh();
     } catch (err) {
-      if (err instanceof TRPCClientError && err.data?.code === 'BAD_REQUEST') {
-        toast({
-          title: _(msg`An error occurred`),
-          description: err.message,
-          variant: 'destructive',
-        });
-      } else {
-        toast({
-          title: _(msg`An unknown error occurred`),
-          description: _(
-            msg`We encountered an unknown error while attempting to update the avatar. Please try again later.`,
-          ),
-          variant: 'destructive',
-        });
-      }
+      const error = AppError.parseError(err);
+
+      const errorMessage = match(error.code).otherwise(
+        () =>
+          msg`We encountered an unknown error while attempting to update your password. Please try again later.`,
+      );
+
+      toast({
+        title: _(msg`An error occurred`),
+        description: _(errorMessage),
+        variant: 'destructive',
+      });
     }
   };
 

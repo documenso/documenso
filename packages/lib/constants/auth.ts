@@ -46,3 +46,10 @@ export const PASSKEY_TIMEOUT = 60000;
  * The maximum number of passkeys are user can have.
  */
 export const MAXIMUM_PASSKEYS = 50;
+
+export const useSecureCookies =
+  process.env.NODE_ENV === 'production' && String(process.env.NEXTAUTH_URL).startsWith('https://');
+
+const secureCookiePrefix = useSecureCookies ? '__Secure-' : '';
+
+export const formatSecureCookieName = (name: string) => `${secureCookiePrefix}${name}`;

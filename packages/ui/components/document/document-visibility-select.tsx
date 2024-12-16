@@ -1,7 +1,9 @@
 import React, { forwardRef } from 'react';
 
+import { TeamMemberRole } from '@prisma/client';
 import type { SelectProps } from '@radix-ui/react-select';
 import { InfoIcon } from 'lucide-react';
+import { match } from 'ts-pattern';
 
 import { DOCUMENT_VISIBILITY } from '@documenso/lib/constants/document-visibility';
 import { DocumentVisibility } from '@documenso/lib/types/document-visibility';
@@ -18,15 +20,27 @@ export type DocumentVisibilitySelectType = SelectProps & {
   currentMemberRole?: string;
   isTeamSettings?: boolean;
   disabled?: boolean;
+  visibility?: string;
 };
 
 export const DocumentVisibilitySelect = forwardRef<HTMLButtonElement, DocumentVisibilitySelectType>(
-  ({ currentMemberRole, isTeamSettings = false, disabled, ...props }, ref) => {
-    const canUpdateVisibility =
-      currentMemberRole === 'ADMIN' || currentMemberRole === 'MANAGER' || isTeamSettings;
+  ({ currentMemberRole, isTeamSettings = false, disabled, visibility, ...props }, ref) => {
+    const canUpdateVisibility = match(currentMemberRole)
+      .with(TeamMemberRole.ADMIN, () => true)
+      .with(
+        TeamMemberRole.MANAGER,
+        () =>
+          visibility === DocumentVisibility.EVERYONE ||
+          visibility === DocumentVisibility.MANAGER_AND_ABOVE,
+      )
+      .otherwise(() => false);
+
+    const isAdmin = currentMemberRole === TeamMemberRole.ADMIN;
+    const isManager = currentMemberRole === TeamMemberRole.MANAGER;
+    const canEdit = isTeamSettings || canUpdateVisibility;
 
     return (
-      <Select {...props} disabled={(!canUpdateVisibility && !isTeamSettings) || disabled}>
+      <Select {...props} disabled={!canEdit || disabled}>
         <SelectTrigger ref={ref} className="bg-background text-muted-foreground">
           <SelectValue data-testid="documentVisibilitySelectValue" placeholder="Everyone" />
         </SelectTrigger>
@@ -35,13 +49,13 @@ export const DocumentVisibilitySelect = forwardRef<HTMLButtonElement, DocumentVi
           <SelectItem value={DocumentVisibility.EVERYONE}>
             {DOCUMENT_VISIBILITY.EVERYONE.value}
           </SelectItem>
-          <SelectItem value={DocumentVisibility.MANAGER_AND_ABOVE} disabled={!canUpdateVisibility}>
+          <SelectItem
+            value={DocumentVisibility.MANAGER_AND_ABOVE}
+            disabled={!isAdmin && (!isManager || visibility === DocumentVisibility.ADMIN)}
+          >
             {DOCUMENT_VISIBILITY.MANAGER_AND_ABOVE.value}
           </SelectItem>
-          <SelectItem
-            value={DocumentVisibility.ADMIN}
-            disabled={currentMemberRole !== 'ADMIN' && !isTeamSettings}
-          >
+          <SelectItem value={DocumentVisibility.ADMIN} disabled={!isAdmin}>
             {DOCUMENT_VISIBILITY.ADMIN.value}
           </SelectItem>
         </SelectContent>

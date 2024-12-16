@@ -16,6 +16,7 @@ module.exports = {
       },
       colors: {
         border: 'hsl(var(--border))',
+        'field-border': 'hsl(var(--field-border))',
         input: 'hsl(var(--input))',
         ring: 'hsl(var(--ring))',
         background: 'hsl(var(--background))',

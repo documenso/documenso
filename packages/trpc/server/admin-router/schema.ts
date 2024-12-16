@@ -2,10 +2,9 @@ import { Role } from '@prisma/client';
 import z from 'zod';
 
 import { ZSiteSettingSchema } from '@documenso/lib/server-only/site-settings/schema';
+import { ZFindSearchParamsSchema } from '@documenso/lib/types/search-params';
 
-export const ZAdminFindDocumentsQuerySchema = z.object({
-  term: z.string().optional(),
-  page: z.number().optional().default(1),
+export const ZAdminFindDocumentsQuerySchema = ZFindSearchParamsSchema.extend({
   perPage: z.number().optional().default(20),
 });
 

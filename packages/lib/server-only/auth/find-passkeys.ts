@@ -1,11 +1,12 @@
-import type { FindResultSet } from '@documenso/lib/types/find-result-set';
 import { prisma } from '@documenso/prisma';
 import type { Passkey } from '@documenso/prisma/client';
 import { Prisma } from '@documenso/prisma/client';
 
+import type { FindResultResponse } from '../../types/search-params';
+
 export interface FindPasskeysOptions {
   userId: number;
-  term?: string;
+  query?: string;
   page?: number;
   perPage?: number;
   orderBy?: {
@@ -17,7 +18,7 @@ export interface FindPasskeysOptions {
 
 export const findPasskeys = async ({
   userId,
-  term = '',
+  query = '',
   page = 1,
   perPage = 10,
   orderBy,
@@ -30,9 +31,9 @@ export const findPasskeys = async ({
     userId,
   };
 
-  if (term.length > 0) {
+  if (query.length > 0) {
     whereClause.name = {
-      contains: term,
+      contains: query,
       mode: Prisma.QueryMode.insensitive,
     };
   }
@@ -72,5 +73,5 @@ export const findPasskeys = async ({
     currentPage: Math.max(page, 1),
     perPage,
     totalPages: Math.ceil(count / perPage),
-  } satisfies FindResultSet<typeof data>;
+  } satisfies FindResultResponse<typeof data>;
 };

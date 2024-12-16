@@ -1,3 +1,5 @@
+import type { z } from 'zod';
+
 import { nanoid } from '@documenso/lib/universal/id';
 import { prisma } from '@documenso/prisma';
 import type { DocumentDistributionMethod } from '@documenso/prisma/client';
@@ -11,6 +13,11 @@ import {
   SigningStatus,
   WebhookTriggerEvents,
 } from '@documenso/prisma/client';
+import {
+  DocumentDataSchema,
+  DocumentSchema,
+  RecipientSchema,
+} from '@documenso/prisma/generated/zod';
 
 import type { SupportedLanguageCodes } from '../../constants/i18n';
 import { AppError, AppErrorCode } from '../../errors/app-error';
@@ -35,10 +42,6 @@ type FinalRecipient = Pick<
   templateRecipientId: number;
   fields: Field[];
 };
-
-export type CreateDocumentFromTemplateResponse = Awaited<
-  ReturnType<typeof createDocumentFromTemplate>
->;
 
 export type CreateDocumentFromTemplateOptions = {
   templateId: number;
@@ -72,6 +75,15 @@ export type CreateDocumentFromTemplateOptions = {
   requestMetadata?: RequestMetadata;
 };
 
+export const ZCreateDocumentFromTemplateResponseSchema = DocumentSchema.extend({
+  documentData: DocumentDataSchema,
+  Recipient: RecipientSchema.array(),
+});
+
+export type TCreateDocumentFromTemplateResponse = z.infer<
+  typeof ZCreateDocumentFromTemplateResponseSchema
+>;
+
 export const createDocumentFromTemplate = async ({
   templateId,
   externalId,
@@ -80,7 +92,7 @@ export const createDocumentFromTemplate = async ({
   recipients,
   override,
   requestMetadata,
-}: CreateDocumentFromTemplateOptions) => {
+}: CreateDocumentFromTemplateOptions): Promise<TCreateDocumentFromTemplateResponse> => {
   const user = await prisma.user.findFirstOrThrow({
     where: {
       id: userId,

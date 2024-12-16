@@ -40,7 +40,7 @@ export const AdminDocumentResults = () => {
   const { data: findDocumentsData, isLoading: isFindDocumentsLoading } =
     trpc.admin.findDocuments.useQuery(
       {
-        term: debouncedTerm,
+        query: debouncedTerm,
         page: page || 1,
         perPage: perPage || 20,
       },

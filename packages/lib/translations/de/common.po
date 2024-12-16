@@ -472,11 +472,19 @@ msgstr "Genehmigung"
 msgid "Before you get started, please confirm your email address by clicking the button below:"
 msgstr "Bitte bestätige vor dem Start deine E-Mail-Adresse, indem du auf den Button unten klickst:"
 
+<<<<<<< HEAD
 #: packages/ui/primitives/signature-pad/signature-pad.tsx:513
 msgid "Black"
 msgstr "Schwarz"
 
 #: packages/ui/primitives/signature-pad/signature-pad.tsx:527
+=======
+#: packages/ui/primitives/signature-pad/signature-pad.tsx:524
+msgid "Black"
+msgstr "Schwarz"
+
+#: packages/ui/primitives/signature-pad/signature-pad.tsx:538
+>>>>>>> main
 msgid "Blue"
 msgstr "Blau"
 
@@ -534,11 +542,15 @@ msgstr "Checkbox-Werte"
 msgid "Clear filters"
 msgstr "Filter löschen"
 
+<<<<<<< HEAD
 #: packages/ui/primitives/signature-pad/signature-pad.tsx:547
+=======
+#: packages/ui/primitives/signature-pad/signature-pad.tsx:558
+>>>>>>> main
 msgid "Clear Signature"
 msgstr "Unterschrift löschen"
 
-#: packages/ui/primitives/document-flow/add-signature.tsx:394
+#: packages/ui/primitives/document-flow/add-signature.tsx:403
 msgid "Click to insert field"
 msgstr "Klicken, um das Feld auszufüllen"
 
@@ -615,7 +627,7 @@ msgstr "Erstelle ein <0>kostenfreies Konto</0>, um jederzeit auf deine unterzeic
 msgid "Create account"
 msgstr "Konto erstellen"
 
-#: packages/ui/primitives/document-flow/add-signature.tsx:360
+#: packages/ui/primitives/document-flow/add-signature.tsx:369
 msgid "Custom Text"
 msgstr "Benutzerdefinierter Text"
 
@@ -768,7 +780,7 @@ msgstr "Dropdown-Optionen"
 
 #: packages/lib/constants/document.ts:28
 #: packages/ui/primitives/document-flow/add-fields.tsx:882
-#: packages/ui/primitives/document-flow/add-signature.tsx:272
+#: packages/ui/primitives/document-flow/add-signature.tsx:273
 #: packages/ui/primitives/document-flow/add-signers.tsx:512
 #: packages/ui/primitives/document-flow/add-signers.tsx:519
 #: packages/ui/primitives/document-flow/types.ts:54
@@ -896,7 +908,11 @@ msgstr "Globale Empfängerauthentifizierung"
 msgid "Go Back"
 msgstr "Zurück"
 
+<<<<<<< HEAD
 #: packages/ui/primitives/signature-pad/signature-pad.tsx:534
+=======
+#: packages/ui/primitives/signature-pad/signature-pad.tsx:545
+>>>>>>> main
 msgid "Green"
 msgstr "Grün"
 
@@ -984,7 +1000,7 @@ msgid "Min"
 msgstr "Min"
 
 #: packages/ui/primitives/document-flow/add-fields.tsx:908
-#: packages/ui/primitives/document-flow/add-signature.tsx:298
+#: packages/ui/primitives/document-flow/add-signature.tsx:299
 #: packages/ui/primitives/document-flow/add-signers.tsx:550
 #: packages/ui/primitives/document-flow/add-signers.tsx:556
 #: packages/ui/primitives/document-flow/types.ts:55
@@ -1180,7 +1196,11 @@ msgstr "E-Mail des entfernten Empfängers"
 msgid "Recipient signing request email"
 msgstr "E-Mail zur Unterzeichnungsanfrage des Empfängers"
 
+<<<<<<< HEAD
 #: packages/ui/primitives/signature-pad/signature-pad.tsx:520
+=======
+#: packages/ui/primitives/signature-pad/signature-pad.tsx:531
+>>>>>>> main
 msgid "Red"
 msgstr "Rot"
 
@@ -1339,7 +1359,7 @@ msgid "Sign In"
 msgstr "Anmelden"
 
 #: packages/ui/primitives/document-flow/add-fields.tsx:830
-#: packages/ui/primitives/document-flow/add-signature.tsx:323
+#: packages/ui/primitives/document-flow/add-signature.tsx:324
 #: packages/ui/primitives/document-flow/field-icon.tsx:52
 #: packages/ui/primitives/document-flow/types.ts:49
 #: packages/ui/primitives/template-flow/add-template-fields.tsx:625
@@ -1597,7 +1617,11 @@ msgstr "Aktualisieren Sie die Rolle und fügen Sie Felder nach Bedarf für den d
 msgid "Upgrade"
 msgstr "Upgrade"
 
+<<<<<<< HEAD
 #: packages/ui/primitives/signature-pad/signature-pad.tsx:498
+=======
+#: packages/ui/primitives/signature-pad/signature-pad.tsx:509
+>>>>>>> main
 msgid "Upload Signature"
 msgstr ""
 

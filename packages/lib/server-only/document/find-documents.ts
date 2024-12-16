@@ -1,8 +1,8 @@
 import { DateTime } from 'luxon';
-import { P, match } from 'ts-pattern';
+import { match } from 'ts-pattern';
+import type { z } from 'zod';
 
 import { prisma } from '@documenso/prisma';
-import { RecipientRole, SigningStatus, TeamMemberRole } from '@documenso/prisma/client';
 import type {
   Document,
   DocumentSource,
@@ -11,10 +11,17 @@ import type {
   TeamEmail,
   User,
 } from '@documenso/prisma/client';
+import { RecipientRole, SigningStatus, TeamMemberRole } from '@documenso/prisma/client';
+import {
+  DocumentSchema,
+  RecipientSchema,
+  TeamSchema,
+  UserSchema,
+} from '@documenso/prisma/generated/zod';
 import { ExtendedDocumentStatus } from '@documenso/prisma/types/extended-document-status';
 
 import { DocumentVisibility } from '../../types/document-visibility';
-import type { FindResultSet } from '../../types/find-result-set';
+import { type FindResultResponse, ZFindResultResponse } from '../../types/search-params';
 import { maskRecipientTokensForDocument } from '../../utils/mask-recipient-tokens-for-document';
 
 export type PeriodSelectorValue = '' | '7d' | '14d' | '30d';
@@ -22,7 +29,6 @@ export type PeriodSelectorValue = '' | '7d' | '14d' | '30d';
 export type FindDocumentsOptions = {
   userId: number;
   teamId?: number;
-  term?: string;
   templateId?: number;
   source?: DocumentSource;
   status?: ExtendedDocumentStatus;
@@ -34,13 +40,29 @@ export type FindDocumentsOptions = {
   };
   period?: PeriodSelectorValue;
   senderIds?: number[];
-  search?: string;
+  query?: string;
 };
+
+export const ZFindDocumentsResponseSchema = ZFindResultResponse.extend({
+  data: DocumentSchema.extend({
+    User: UserSchema.pick({
+      id: true,
+      name: true,
+      email: true,
+    }),
+    Recipient: RecipientSchema.array(),
+    team: TeamSchema.pick({
+      id: true,
+      url: true,
+    }).nullable(),
+  }).array(), // Todo: openapi remap.
+});
+
+export type TFindDocumentsResponse = z.infer<typeof ZFindDocumentsResponseSchema>;
 
 export const findDocuments = async ({
   userId,
   teamId,
-  term,
   templateId,
   source,
   status = ExtendedDocumentStatus.ALL,
@@ -49,8 +71,8 @@ export const findDocuments = async ({
   orderBy,
   period,
   senderIds,
-  search,
-}: FindDocumentsOptions) => {
+  query,
+}: FindDocumentsOptions): Promise<TFindDocumentsResponse> => {
   const user = await prisma.user.findFirstOrThrow({
     where: {
       id: userId,
@@ -87,22 +109,11 @@ export const findDocuments = async ({
   const orderByDirection = orderBy?.direction ?? 'desc';
   const teamMemberRole = team?.members[0].role ?? null;
 
-  const termFilters = match(term)
-    .with(P.string.minLength(1), () => {
-      return {
-        title: {
-          contains: term,
-          mode: 'insensitive',
-        },
-      } as const;
-    })
-    .otherwise(() => undefined);
-
   const searchFilter: Prisma.DocumentWhereInput = {
     OR: [
-      { title: { contains: search, mode: 'insensitive' } },
-      { Recipient: { some: { name: { contains: search, mode: 'insensitive' } } } },
-      { Recipient: { some: { email: { contains: search, mode: 'insensitive' } } } },
+      { title: { contains: query, mode: 'insensitive' } },
+      { Recipient: { some: { name: { contains: query, mode: 'insensitive' } } } },
+      { Recipient: { some: { email: { contains: query, mode: 'insensitive' } } } },
     ],
   };
 
@@ -209,7 +220,6 @@ export const findDocuments = async ({
   }
 
   const whereAndClause: Prisma.DocumentWhereInput['AND'] = [
-    { ...termFilters },
     { ...filters },
     { ...deletedFilter },
     { ...searchFilter },
@@ -290,7 +300,7 @@ export const findDocuments = async ({
     currentPage: Math.max(page, 1),
     perPage,
     totalPages: Math.ceil(count / perPage),
-  } satisfies FindResultSet<typeof data>;
+  } satisfies FindResultResponse<typeof data>;
 };
 
 const findDocumentsFilter = (status: ExtendedDocumentStatus, user: User) => {

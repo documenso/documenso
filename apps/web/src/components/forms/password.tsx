@@ -4,10 +4,11 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { Trans, msg } from '@lingui/macro';
 import { useLingui } from '@lingui/react';
 import { useForm } from 'react-hook-form';
+import { match } from 'ts-pattern';
 import { z } from 'zod';
 
+import { AppError } from '@documenso/lib/errors/app-error';
 import type { User } from '@documenso/prisma/client';
-import { TRPCClientError } from '@documenso/trpc/client';
 import { trpc } from '@documenso/trpc/react';
 import { ZCurrentPasswordSchema, ZPasswordSchema } from '@documenso/trpc/server/auth-router/schema';
 import { cn } from '@documenso/ui/lib/utils';
@@ -73,21 +74,25 @@ export const PasswordForm = ({ className }: PasswordFormProps) => {
         duration: 5000,
       });
     } catch (err) {
-      if (err instanceof TRPCClientError && err.data?.code === 'BAD_REQUEST') {
-        toast({
-          title: _(msg`An error occurred`),
-          description: err.message,
-          variant: 'destructive',
-        });
-      } else {
-        toast({
-          title: _(msg`An unknown error occurred`),
-          description: _(
+      const error = AppError.parseError(err);
+
+      const errorMessage = match(error.code)
+        .with('NO_PASSWORD', () => msg`User has no password.`)
+        .with('INCORRECT_PASSWORD', () => msg`Current password is incorrect.`)
+        .with(
+          'SAME_PASSWORD',
+          () => msg`Your new password cannot be the same as your old password.`,
+        )
+        .otherwise(
+          () =>
             msg`We encountered an unknown error while attempting to update your password. Please try again later.`,
-          ),
-          variant: 'destructive',
-        });
-      }
+        );
+
+      toast({
+        title: _(msg`An error occurred`),
+        description: _(errorMessage),
+        variant: 'destructive',
+      });
     }
   };
 

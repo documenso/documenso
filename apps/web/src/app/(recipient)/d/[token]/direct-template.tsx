@@ -28,7 +28,7 @@ import type { DirectTemplateLocalField } from './sign-direct-template';
 import { SignDirectTemplateForm } from './sign-direct-template';
 
 export type TemplatesDirectPageViewProps = {
-  template: TemplateWithDetails;
+  template: Omit<TemplateWithDetails, 'User'>;
   directTemplateToken: string;
   directTemplateRecipient: Recipient & { Field: Field[] };
 };

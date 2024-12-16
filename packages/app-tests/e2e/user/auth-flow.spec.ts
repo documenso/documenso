@@ -20,11 +20,10 @@ test('[USER] can sign up with email and password', async ({ page }: { page: Page
 
   const canvas = page.locator('canvas').first();
   const box = await canvas.boundingBox();
-
   if (box) {
-    await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2);
+    await page.mouse.move(box.x + 40, box.y + 40);
     await page.mouse.down();
-    await page.mouse.move(box.x + box.width / 4, box.y + box.height / 4);
+    await page.mouse.move(box.x + box.width - 2, box.y + box.height - 2);
     await page.mouse.up();
   }
 

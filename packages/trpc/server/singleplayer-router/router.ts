@@ -30,159 +30,153 @@ export const singleplayerRouter = router({
   createSinglePlayerDocument: procedure
     .input(ZCreateSinglePlayerDocumentMutationSchema)
     .mutation(async ({ input }) => {
-      try {
-        const { signer, fields, documentData, documentName, fieldMeta } = input;
+      const { signer, fields, documentData, documentName, fieldMeta } = input;
 
-        const document = await getFile({
-          data: documentData.data,
-          type: documentData.type,
+      const document = await getFile({
+        data: documentData.data,
+        type: documentData.type,
+      });
+
+      const doc = await PDFDocument.load(document);
+
+      const createdAt = new Date();
+
+      const isBase64 = signer.signature.startsWith('data:image/png;base64,');
+      const signatureImageAsBase64 = isBase64 ? signer.signature : null;
+      const typedSignature = !isBase64 ? signer.signature : null;
+
+      // Update the document with the fields inserted.
+      for (const field of fields) {
+        const isSignatureField = field.type === FieldType.SIGNATURE;
+
+        await insertFieldInPDF(doc, {
+          ...mapField(field, signer),
+          Signature: isSignatureField
+            ? {
+                created: createdAt,
+                signatureImageAsBase64,
+                typedSignature,
+                // Dummy data.
+                id: -1,
+                recipientId: -1,
+                fieldId: -1,
+              }
+            : null,
+          // Dummy data.
+          id: -1,
+          secondaryId: '-1',
+          documentId: -1,
+          templateId: null,
+          recipientId: -1,
+          fieldMeta: fieldMeta || null,
         });
+      }
 
-        const doc = await PDFDocument.load(document);
+      const unsignedPdfBytes = await doc.save();
 
-        const createdAt = new Date();
+      const signedPdfBuffer = await signPdf({ pdf: Buffer.from(unsignedPdfBytes) });
 
-        const isBase64 = signer.signature.startsWith('data:image/png;base64,');
-        const signatureImageAsBase64 = isBase64 ? signer.signature : null;
-        const typedSignature = !isBase64 ? signer.signature : null;
+      const { token } = await prisma.$transaction(
+        async (tx) => {
+          const token = alphaid();
 
-        // Update the document with the fields inserted.
-        for (const field of fields) {
-          const isSignatureField = field.type === FieldType.SIGNATURE;
-
-          await insertFieldInPDF(doc, {
-            ...mapField(field, signer),
-            Signature: isSignatureField
-              ? {
-                  created: createdAt,
-                  signatureImageAsBase64,
-                  typedSignature,
-                  // Dummy data.
-                  id: -1,
-                  recipientId: -1,
-                  fieldId: -1,
-                }
-              : null,
-            // Dummy data.
-            id: -1,
-            secondaryId: '-1',
-            documentId: -1,
-            templateId: null,
-            recipientId: -1,
-            fieldMeta: fieldMeta || null,
+          // Fetch service user who will be the owner of the document.
+          const serviceUser = await tx.user.findFirstOrThrow({
+            where: {
+              email: SERVICE_USER_EMAIL,
+            },
           });
-        }
 
-        const unsignedPdfBytes = await doc.save();
+          const { id: documentDataId } = await putPdfFile({
+            name: `${documentName}.pdf`,
+            type: 'application/pdf',
+            arrayBuffer: async () => Promise.resolve(signedPdfBuffer),
+          });
 
-        const signedPdfBuffer = await signPdf({ pdf: Buffer.from(unsignedPdfBytes) });
+          // Create document.
+          const document = await tx.document.create({
+            data: {
+              source: DocumentSource.DOCUMENT,
+              title: documentName,
+              status: DocumentStatus.COMPLETED,
+              documentDataId,
+              userId: serviceUser.id,
+              createdAt,
+            },
+          });
 
-        const { token } = await prisma.$transaction(
-          async (tx) => {
-            const token = alphaid();
+          // Create recipient.
+          const recipient = await tx.recipient.create({
+            data: {
+              documentId: document.id,
+              name: signer.name,
+              email: signer.email,
+              token,
+              signedAt: createdAt,
+              readStatus: ReadStatus.OPENED,
+              signingStatus: SigningStatus.SIGNED,
+              sendStatus: SendStatus.SENT,
+            },
+          });
 
-            // Fetch service user who will be the owner of the document.
-            const serviceUser = await tx.user.findFirstOrThrow({
-              where: {
-                email: SERVICE_USER_EMAIL,
-              },
-            });
+          // Create fields and signatures.
+          await Promise.all(
+            fields.map(async (field) => {
+              const insertedField = await tx.field.create({
+                data: {
+                  documentId: document.id,
+                  recipientId: recipient.id,
+                  ...mapField(field, signer),
+                },
+              });
 
-            const { id: documentDataId } = await putPdfFile({
-              name: `${documentName}.pdf`,
-              type: 'application/pdf',
-              arrayBuffer: async () => Promise.resolve(signedPdfBuffer),
-            });
-
-            // Create document.
-            const document = await tx.document.create({
-              data: {
-                source: DocumentSource.DOCUMENT,
-                title: documentName,
-                status: DocumentStatus.COMPLETED,
-                documentDataId,
-                userId: serviceUser.id,
-                createdAt,
-              },
-            });
-
-            // Create recipient.
-            const recipient = await tx.recipient.create({
-              data: {
-                documentId: document.id,
-                name: signer.name,
-                email: signer.email,
-                token,
-                signedAt: createdAt,
-                readStatus: ReadStatus.OPENED,
-                signingStatus: SigningStatus.SIGNED,
-                sendStatus: SendStatus.SENT,
-              },
-            });
-
-            // Create fields and signatures.
-            await Promise.all(
-              fields.map(async (field) => {
-                const insertedField = await tx.field.create({
+              if (field.type === FieldType.SIGNATURE || field.type === FieldType.FREE_SIGNATURE) {
+                await tx.signature.create({
                   data: {
-                    documentId: document.id,
+                    fieldId: insertedField.id,
+                    signatureImageAsBase64,
+                    typedSignature,
                     recipientId: recipient.id,
-                    ...mapField(field, signer),
                   },
                 });
+              }
+            }),
+          );
 
-                if (field.type === FieldType.SIGNATURE || field.type === FieldType.FREE_SIGNATURE) {
-                  await tx.signature.create({
-                    data: {
-                      fieldId: insertedField.id,
-                      signatureImageAsBase64,
-                      typedSignature,
-                      recipientId: recipient.id,
-                    },
-                  });
-                }
-              }),
-            );
+          return { document, token };
+        },
+        {
+          maxWait: 5000,
+          timeout: 30000,
+        },
+      );
 
-            return { document, token };
-          },
-          {
-            maxWait: 5000,
-            timeout: 30000,
-          },
-        );
+      const template = createElement(DocumentSelfSignedEmailTemplate, {
+        documentName: documentName,
+        assetBaseUrl: NEXT_PUBLIC_WEBAPP_URL() || 'http://localhost:3000',
+      });
 
-        const template = createElement(DocumentSelfSignedEmailTemplate, {
-          documentName: documentName,
-          assetBaseUrl: NEXT_PUBLIC_WEBAPP_URL() || 'http://localhost:3000',
-        });
+      const [html, text] = await Promise.all([
+        renderEmailWithI18N(template),
+        renderEmailWithI18N(template, { plainText: true }),
+      ]);
 
-        const [html, text] = await Promise.all([
-          renderEmailWithI18N(template),
-          renderEmailWithI18N(template, { plainText: true }),
-        ]);
+      // Send email to signer.
+      await mailer.sendMail({
+        to: {
+          address: signer.email,
+          name: signer.name,
+        },
+        from: {
+          name: FROM_NAME,
+          address: FROM_ADDRESS,
+        },
+        subject: 'Document signed',
+        html,
+        text,
+        attachments: [{ content: signedPdfBuffer, filename: documentName }],
+      });
 
-        // Send email to signer.
-        await mailer.sendMail({
-          to: {
-            address: signer.email,
-            name: signer.name,
-          },
-          from: {
-            name: FROM_NAME,
-            address: FROM_ADDRESS,
-          },
-          subject: 'Document signed',
-          html,
-          text,
-          attachments: [{ content: signedPdfBuffer, filename: documentName }],
-        });
-
-        return token;
-      } catch (err) {
-        console.error(err);
-
-        throw err;
-      }
+      return token;
     }),
 });

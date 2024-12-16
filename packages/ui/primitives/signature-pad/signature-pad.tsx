@@ -97,6 +97,8 @@ export type SignaturePadProps = Omit<HTMLAttributes<HTMLCanvasElement>, 'onChang
   disabled?: boolean;
   allowTypedSignature?: boolean;
   defaultValue?: string;
+  onValidityChange?: (isValid: boolean) => void;
+  minCoverageThreshold?: number;
 };
 
 export const SignaturePad = ({
@@ -106,6 +108,8 @@ export const SignaturePad = ({
   onChange,
   disabled = false,
   allowTypedSignature,
+  onValidityChange,
+  minCoverageThreshold = 0.01,
   ...props
 }: SignaturePadProps) => {
   const $el = useRef<HTMLCanvasElement>(null);
@@ -116,7 +120,9 @@ export const SignaturePad = ({
   const [lines, setLines] = useState<Point[][]>([]);
   const [currentLine, setCurrentLine] = useState<Point[]>([]);
   const [selectedColor, setSelectedColor] = useState('black');
-  const [signatureMode, setSignatureMode] = useState<'draw' | 'type'>(defaultValue ? 'type' : 'draw');
+  const [signatureMode, setSignatureMode] = useState<'draw' | 'type'>(
+    defaultValue ? 'type' : 'draw',
+  );
   const [typedSignature, setTypedSignature] = useState(
     defaultValue && !isBase64Image(defaultValue) ? defaultValue : '',
   );
@@ -134,6 +140,29 @@ export const SignaturePad = ({
       },
     } satisfies StrokeOptions;
   }, []);
+
+  const checkSignatureValidity = () => {
+    if ($el.current) {
+      const ctx = $el.current.getContext('2d');
+
+      if (ctx) {
+        const imageData = ctx.getImageData(0, 0, $el.current.width, $el.current.height);
+        const data = imageData.data;
+        let filledPixels = 0;
+        const totalPixels = data.length / 4;
+
+        for (let i = 0; i < data.length; i += 4) {
+          if (data[i + 3] > 0) filledPixels++;
+        }
+
+        const filledPercentage = filledPixels / totalPixels;
+        const isValid = filledPercentage > minCoverageThreshold;
+        onValidityChange?.(isValid);
+
+        return isValid;
+      }
+    }
+  };
 
   const onMouseDown = (event: MouseEvent | PointerEvent | TouchEvent) => {
     if (event.cancelable) {
@@ -229,7 +258,6 @@ export const SignaturePad = ({
 
       if (ctx) {
         ctx.restore();
-
         ctx.imageSmoothingEnabled = true;
         ctx.imageSmoothingQuality = 'high';
         ctx.fillStyle = selectedColor;
@@ -241,7 +269,11 @@ export const SignaturePad = ({
           ctx.fill(pathData);
         });
 
-        onChange?.($el.current.toDataURL());
+        const isValidSignature = checkSignatureValidity();
+
+        if (isValidSignature) {
+          onChange?.($el.current.toDataURL());
+        }
         ctx.save();
       }
     }
@@ -340,10 +372,17 @@ export const SignaturePad = ({
     setSignatureMode('type');
     setTypedSignature(newValue);
 
+    if ($el.current) {
+      const ctx = $el.current.getContext('2d');
+      ctx?.clearRect(0, 0, $el.current.width, $el.current.height);
+    }
+
     if (newValue.trim() !== '') {
       onChange?.(newValue);
+      onValidityChange?.(true);
     } else {
       onChange?.(null);
+      onValidityChange?.(false);
     }
   };
 
@@ -443,7 +482,7 @@ export const SignaturePad = ({
 
   return (
     <div
-      className={cn('relative block', containerClassName, {
+      className={cn('relative block select-none', containerClassName, {
         'pointer-events-none opacity-50': disabled,
       })}
     >

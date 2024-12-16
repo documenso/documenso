@@ -29,12 +29,13 @@ import { setRecipientsForDocument } from '@documenso/lib/server-only/recipient/s
 import { updateRecipient } from '@documenso/lib/server-only/recipient/update-recipient';
 import { createTeamMemberInvites } from '@documenso/lib/server-only/team/create-team-member-invites';
 import { deleteTeamMembers } from '@documenso/lib/server-only/team/delete-team-members';
-import type { CreateDocumentFromTemplateResponse } from '@documenso/lib/server-only/template/create-document-from-template';
+import type { TCreateDocumentFromTemplateResponse } from '@documenso/lib/server-only/template/create-document-from-template';
 import { createDocumentFromTemplate } from '@documenso/lib/server-only/template/create-document-from-template';
 import { createDocumentFromTemplateLegacy } from '@documenso/lib/server-only/template/create-document-from-template-legacy';
 import { deleteTemplate } from '@documenso/lib/server-only/template/delete-template';
 import { findTemplates } from '@documenso/lib/server-only/template/find-templates';
 import { getTemplateById } from '@documenso/lib/server-only/template/get-template-by-id';
+import { extractDerivedDocumentEmailSettings } from '@documenso/lib/types/document-email';
 import { ZFieldMetaSchema } from '@documenso/lib/types/field-meta';
 import {
   ZCheckboxFieldMeta,
@@ -88,7 +89,7 @@ export const ApiContractV1Implementation = createNextRoute(ApiContractV1, {
 
     try {
       const document = await getDocumentById({
-        id: Number(documentId),
+        documentId: Number(documentId),
         userId: user.id,
         teamId: team?.id,
       });
@@ -158,7 +159,7 @@ export const ApiContractV1Implementation = createNextRoute(ApiContractV1, {
       }
 
       const document = await getDocumentById({
-        id: Number(documentId),
+        documentId: Number(documentId),
         userId: user.id,
         teamId: team?.id,
       });
@@ -211,7 +212,7 @@ export const ApiContractV1Implementation = createNextRoute(ApiContractV1, {
 
     try {
       const document = await getDocumentById({
-        id: Number(documentId),
+        documentId: Number(documentId),
         userId: user.id,
         teamId: team?.id,
       });
@@ -344,7 +345,7 @@ export const ApiContractV1Implementation = createNextRoute(ApiContractV1, {
         });
       }
 
-      const recipients = await setRecipientsForDocument({
+      const { recipients } = await setRecipientsForDocument({
         userId: user.id,
         teamId: team?.id,
         documentId: document.id,
@@ -427,7 +428,7 @@ export const ApiContractV1Implementation = createNextRoute(ApiContractV1, {
     const perPage = Number(args.query.perPage) || 10;
 
     try {
-      const { templates, totalPages } = await findTemplates({
+      const { data: templates, totalPages } = await findTemplates({
         page,
         perPage,
         userId: user.id,
@@ -559,7 +560,7 @@ export const ApiContractV1Implementation = createNextRoute(ApiContractV1, {
 
     const templateId = Number(params.templateId);
 
-    let document: CreateDocumentFromTemplateResponse | null = null;
+    let document: TCreateDocumentFromTemplateResponse | null = null;
 
     try {
       document = await createDocumentFromTemplate({
@@ -629,7 +630,6 @@ export const ApiContractV1Implementation = createNextRoute(ApiContractV1, {
           token: recipient.token,
           role: recipient.role,
           signingOrder: recipient.signingOrder,
-
           signingUrl: `${NEXT_PUBLIC_WEBAPP_URL()}/sign/${recipient.token}`,
         })),
       },
@@ -637,65 +637,52 @@ export const ApiContractV1Implementation = createNextRoute(ApiContractV1, {
   }),
 
   sendDocument: authenticatedMiddleware(async (args, user, team) => {
-    const { id } = args.params;
-    const { sendEmail = true } = args.body ?? {};
-
-    const document = await getDocumentById({ id: Number(id), userId: user.id, teamId: team?.id });
-
-    if (!document) {
-      return {
-        status: 404,
-        body: {
-          message: 'Document not found',
-        },
-      };
-    }
-
-    if (document.status === DocumentStatus.COMPLETED) {
-      return {
-        status: 400,
-        body: {
-          message: 'Document is already complete',
-        },
-      };
-    }
+    const { id: documentId } = args.params;
+    const { sendEmail, sendCompletionEmails } = args.body;
 
     try {
-      //   await setRecipientsForDocument({
-      //     userId: user.id,
-      //     documentId: Number(id),
-      //     recipients: [
-      //       {
-      //         email: body.signerEmail,
-      //         name: body.signerName ?? '',
-      //       },
-      //     ],
-      //   });
+      const document = await getDocumentById({
+        documentId: Number(documentId),
+        userId: user.id,
+        teamId: team?.id,
+      });
 
-      //   await setFieldsForDocument({
-      //     documentId: Number(id),
-      //     userId: user.id,
-      //     fields: body.fields.map((field) => ({
-      //       signerEmail: body.signerEmail,
-      //       type: field.fieldType,
-      //       pageNumber: field.pageNumber,
-      //       pageX: field.pageX,
-      //       pageY: field.pageY,
-      //       pageWidth: field.pageWidth,
-      //       pageHeight: field.pageHeight,
-      //     })),
-      //   });
+      if (!document) {
+        return {
+          status: 404,
+          body: {
+            message: 'Document not found',
+          },
+        };
+      }
 
-      //   if (body.emailBody || body.emailSubject) {
-      //     await upsertDocumentMeta({
-      //       documentId: Number(id),
-      //       subject: body.emailSubject ?? '',
-      //       message: body.emailBody ?? '',
-      //     });
-      //   }
+      if (document.status === DocumentStatus.COMPLETED) {
+        return {
+          status: 400,
+          body: {
+            message: 'Document is already complete',
+          },
+        };
+      }
+
+      const emailSettings = extractDerivedDocumentEmailSettings(document.documentMeta);
+
+      // Update document email settings if sendCompletionEmails is provided
+      if (typeof sendCompletionEmails === 'boolean') {
+        await upsertDocumentMeta({
+          documentId: document.id,
+          userId: user.id,
+          emailSettings: {
+            ...emailSettings,
+            documentCompleted: sendCompletionEmails,
+            ownerDocumentCompleted: sendCompletionEmails,
+          },
+          requestMetadata: extractNextApiRequestMetadata(args.req),
+        });
+      }
 
       const { Recipient: recipients, ...sentDocument } = await sendDocument({
-        documentId: Number(id),
+        documentId: document.id,
         userId: user.id,
         teamId: team?.id,
         sendEmail,
@@ -757,7 +744,7 @@ export const ApiContractV1Implementation = createNextRoute(ApiContractV1, {
     const { name, email, role, authOptions, signingOrder } = args.body;
 
     const document = await getDocumentById({
-      id: Number(documentId),
+      documentId: Number(documentId),
       userId: user.id,
       teamId: team?.id,
     });
@@ -798,7 +785,7 @@ export const ApiContractV1Implementation = createNextRoute(ApiContractV1, {
     }
 
     try {
-      const newRecipients = await setRecipientsForDocument({
+      const { recipients: newRecipients } = await setRecipientsForDocument({
         documentId: Number(documentId),
         userId: user.id,
         teamId: team?.id,
@@ -848,7 +835,7 @@ export const ApiContractV1Implementation = createNextRoute(ApiContractV1, {
     const { name, email, role, authOptions, signingOrder } = args.body;
 
     const document = await getDocumentById({
-      id: Number(documentId),
+      documentId: Number(documentId),
       userId: user.id,
       teamId: team?.id,
     });
@@ -907,7 +894,7 @@ export const ApiContractV1Implementation = createNextRoute(ApiContractV1, {
     const { id: documentId, recipientId } = args.params;
 
     const document = await getDocumentById({
-      id: Number(documentId),
+      documentId: Number(documentId),
       userId: user.id,
       teamId: team?.id,
     });
@@ -1134,7 +1121,7 @@ export const ApiContractV1Implementation = createNextRoute(ApiContractV1, {
       args.body;
 
     const document = await getDocumentById({
-      id: Number(documentId),
+      documentId: Number(documentId),
       userId: user.id,
       teamId: team?.id,
     });
@@ -1223,7 +1210,7 @@ export const ApiContractV1Implementation = createNextRoute(ApiContractV1, {
     const { id: documentId, fieldId } = args.params;
 
     const document = await getDocumentById({
-      id: Number(documentId),
+      documentId: Number(documentId),
       userId: user.id,
     });
 

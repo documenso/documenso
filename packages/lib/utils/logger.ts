@@ -78,7 +78,9 @@ class HoneybadgerLogger implements Logger {
   error(error: Error, options?: LoggerDescriptionOptions): void {
     const { context = {}, level = 'error', method, path } = options || {};
 
-    const tags = [`level:${level}`];
+    // const tags = [`level:${level}`];
+    const tags = [];
+
     let errorMessage = error.message;
 
     if (method) {

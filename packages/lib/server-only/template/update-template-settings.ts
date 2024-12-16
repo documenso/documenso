@@ -1,9 +1,12 @@
 'use server';
 
+import type { z } from 'zod';
+
 import { isUserEnterprise } from '@documenso/ee/server-only/util/is-document-enterprise';
 import type { RequestMetadata } from '@documenso/lib/universal/extract-request-metadata';
 import { prisma } from '@documenso/prisma';
 import type { Template, TemplateMeta } from '@documenso/prisma/client';
+import { TemplateSchema } from '@documenso/prisma/generated/zod';
 
 import { AppError, AppErrorCode } from '../../errors/app-error';
 import type { TDocumentAccessAuthTypes, TDocumentActionAuthTypes } from '../../types/document-auth';
@@ -26,13 +29,17 @@ export type UpdateTemplateSettingsOptions = {
   requestMetadata?: RequestMetadata;
 };
 
+export const ZUpdateTemplateSettingsResponseSchema = TemplateSchema;
+
+export type TUpdateTemplateSettingsResponse = z.infer<typeof ZUpdateTemplateSettingsResponseSchema>;
+
 export const updateTemplateSettings = async ({
   userId,
   teamId,
   templateId,
   meta,
   data,
-}: UpdateTemplateSettingsOptions) => {
+}: UpdateTemplateSettingsOptions): Promise<TUpdateTemplateSettingsResponse> => {
   if (Object.values(data).length === 0 && Object.keys(meta ?? {}).length === 0) {
     throw new AppError(AppErrorCode.INVALID_BODY, {
       message: 'Missing data to update',

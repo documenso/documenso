@@ -7,6 +7,7 @@ import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 
 import { zodResolver } from '@hookform/resolvers/zod';
+import type { MessageDescriptor } from '@lingui/core';
 import { Trans, msg } from '@lingui/macro';
 import { useLingui } from '@lingui/react';
 import { AnimatePresence, motion } from 'framer-motion';
@@ -20,7 +21,6 @@ import communityCardsImage from '@documenso/assets/images/community-cards.png';
 import { useAnalytics } from '@documenso/lib/client-only/hooks/use-analytics';
 import { NEXT_PUBLIC_WEBAPP_URL } from '@documenso/lib/constants/app';
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
-import { TRPCClientError } from '@documenso/trpc/client';
 import { trpc } from '@documenso/trpc/react';
 import { ZPasswordSchema } from '@documenso/trpc/server/auth-router/schema';
 import { cn } from '@documenso/ui/lib/utils';
@@ -47,17 +47,20 @@ type SignUpStep = 'BASIC_DETAILS' | 'CLAIM_USERNAME';
 
 export const ZSignUpFormV2Schema = z
   .object({
-    name: z.string().trim().min(1, { message: 'Please enter a valid name.' }),
+    name: z
+      .string()
+      .trim()
+      .min(1, { message: msg`Please enter a valid name.`.id }),
     email: z.string().email().min(1),
     password: ZPasswordSchema,
-    signature: z.string().min(1, { message: 'We need your signature to sign documents' }),
+    signature: z.string().min(1, { message: msg`We need your signature to sign documents`.id }),
     url: z
       .string()
       .trim()
       .toLowerCase()
-      .min(1, { message: 'We need a username to create your profile' })
+      .min(1, { message: msg`We need a username to create your profile`.id })
       .regex(/^[a-z0-9-]+$/, {
-        message: 'Username can only container alphanumeric characters and dashes.',
+        message: msg`Username can only container alphanumeric characters and dashes.`.id,
       }),
   })
   .refine(
@@ -66,9 +69,17 @@ export const ZSignUpFormV2Schema = z
       return !password.includes(name) && !password.includes(email.split('@')[0]);
     },
     {
-      message: 'Password should not be common or based on personal information',
+      message: msg`Password should not be common or based on personal information`.id,
     },
   );
+
+export const signupErrorMessages: Record<string, MessageDescriptor> = {
+  SIGNUP_DISABLED: msg`Signups are disabled.`,
+  [AppErrorCode.ALREADY_EXISTS]: msg`User with this email already exists. Please use a different email address.`,
+  [AppErrorCode.INVALID_REQUEST]: msg`We were unable to create your account. Please review the information you provided and try again.`,
+  [AppErrorCode.PROFILE_URL_TAKEN]: msg`This username has already been taken`,
+  [AppErrorCode.PREMIUM_PROFILE_URL]: msg`Only subscribers can have a username shorter than 6 characters`,
+};
 
 export type TSignUpFormV2Schema = z.infer<typeof ZSignUpFormV2Schema>;
 
@@ -139,28 +150,20 @@ export const SignUpFormV2 = ({
     } catch (err) {
       const error = AppError.parseError(err);
 
-      if (error.code === AppErrorCode.PROFILE_URL_TAKEN) {
+      const errorMessage = signupErrorMessages[error.code] ?? signupErrorMessages.INVALID_REQUEST;
+
+      if (
+        error.code === AppErrorCode.PROFILE_URL_TAKEN ||
+        error.code === AppErrorCode.PREMIUM_PROFILE_URL
+      ) {
         form.setError('url', {
           type: 'manual',
-          message: _(msg`This username has already been taken`),
-        });
-      } else if (error.code === AppErrorCode.PREMIUM_PROFILE_URL) {
-        form.setError('url', {
-          type: 'manual',
-          message: error.message,
-        });
-      } else if (err instanceof TRPCClientError && err.data?.code === 'BAD_REQUEST') {
-        toast({
-          title: _(msg`An error occurred`),
-          description: err.message,
-          variant: 'destructive',
+          message: _(errorMessage),
         });
       } else {
         toast({
-          title: _(msg`An unknown error occurred`),
-          description: _(
-            msg`We encountered an unknown error while attempting to sign you up. Please try again later.`,
-          ),
+          title: _(msg`An error occurred`),
+          description: _(errorMessage),
           variant: 'destructive',
         });
       }

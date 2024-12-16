@@ -9,6 +9,7 @@ export enum DocumentEmailEvents {
   DocumentPending = 'documentPending',
   DocumentCompleted = 'documentCompleted',
   DocumentDeleted = 'documentDeleted',
+  OwnerDocumentCompleted = 'ownerDocumentCompleted',
 }
 
 export const ZDocumentEmailSettingsSchema = z
@@ -18,6 +19,7 @@ export const ZDocumentEmailSettingsSchema = z
     documentPending: z.boolean().default(true),
     documentCompleted: z.boolean().default(true),
     documentDeleted: z.boolean().default(true),
+    ownerDocumentCompleted: z.boolean().default(true),
   })
   .strip()
   .catch(() => ({
@@ -26,6 +28,7 @@ export const ZDocumentEmailSettingsSchema = z
     documentPending: true,
     documentCompleted: true,
     documentDeleted: true,
+    ownerDocumentCompleted: true,
   }));
 
 export type TDocumentEmailSettings = z.infer<typeof ZDocumentEmailSettingsSchema>;
@@ -48,5 +51,6 @@ export const extractDerivedDocumentEmailSettings = (
     documentPending: false,
     documentCompleted: false,
     documentDeleted: false,
+    ownerDocumentCompleted: emailSettings.ownerDocumentCompleted,
   };
 };

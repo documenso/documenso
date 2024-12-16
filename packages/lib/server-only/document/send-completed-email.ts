@@ -72,14 +72,19 @@ export const sendCompletedEmail = async ({ documentId, requestMetadata }: SendDo
 
   const i18n = await getI18nInstance(document.documentMeta?.language);
 
-  const isDocumentCompletedEmailEnabled = extractDerivedDocumentEmailSettings(
-    document.documentMeta,
-  ).documentCompleted;
+  const emailSettings = extractDerivedDocumentEmailSettings(document.documentMeta);
+  const isDocumentCompletedEmailEnabled = emailSettings.documentCompleted;
+  const isOwnerDocumentCompletedEmailEnabled = emailSettings.ownerDocumentCompleted;
 
-  // If the document owner is not a recipient, OR recipient emails are disabled, then send the email to them separately.
+  // Send email to document owner if:
+  // 1. Owner document completed emails are enabled AND
+  // 2. Either:
+  //    - The owner is not a recipient, OR
+  //    - Recipient emails are disabled
   if (
-    !document.Recipient.find((recipient) => recipient.email === owner.email) ||
-    !isDocumentCompletedEmailEnabled
+    isOwnerDocumentCompletedEmailEnabled &&
+    (!document.Recipient.find((recipient) => recipient.email === owner.email) ||
+      !isDocumentCompletedEmailEnabled)
   ) {
     const template = createElement(DocumentCompletedEmailTemplate, {
       documentName: document.title,

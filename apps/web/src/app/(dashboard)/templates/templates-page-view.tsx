@@ -29,7 +29,7 @@ export const TemplatesPageView = async ({ searchParams = {}, team }: TemplatesPa
   const documentRootPath = formatDocumentsPath(team?.url);
   const templateRootPath = formatTemplatesPath(team?.url);
 
-  const { templates, totalPages } = await findTemplates({
+  const { data: templates, totalPages } = await findTemplates({
     userId: user.id,
     teamId: team?.id,
     page: page,

@@ -88,8 +88,12 @@ export const ZSendDocumentForSigningMutationSchema = z
       description:
         'Whether to send an email to the recipients asking them to action the document. If you disable this, you will need to manually distribute the document to the recipients using the generated signing links.',
     }),
+    sendCompletionEmails: z.boolean().optional().openapi({
+      description:
+        'Whether to send completion emails when the document is fully signed. This will override the document email settings.',
+    }),
   })
-  .or(z.literal('').transform(() => ({ sendEmail: true })));
+  .or(z.literal('').transform(() => ({ sendEmail: true, sendCompletionEmails: undefined })));
 
 export type TSendDocumentForSigningMutationSchema = typeof ZSendDocumentForSigningMutationSchema;
 
@@ -161,7 +165,10 @@ export const ZCreateDocumentMutationSchema = z.object({
       globalAccessAuth: ZDocumentAccessAuthTypesSchema.optional(),
       globalActionAuth: ZDocumentActionAuthTypesSchema.optional(),
     })
-    .optional(),
+    .optional()
+    .openapi({
+      description: 'The globalActionAuth property is only available for Enterprise accounts.',
+    }),
   formValues: z.record(z.string(), z.union([z.string(), z.boolean(), z.number()])).optional(),
 });
 
@@ -325,7 +332,10 @@ export const ZCreateRecipientMutationSchema = z.object({
     .object({
       actionAuth: ZRecipientActionAuthTypesSchema.optional(),
     })
-    .optional(),
+    .optional()
+    .openapi({
+      description: 'The authOptions property is only available for Enterprise accounts.',
+    }),
 });
 
 /**

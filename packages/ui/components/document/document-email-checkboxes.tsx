@@ -1,13 +1,14 @@
 import { Trans } from '@lingui/macro';
 import { InfoIcon } from 'lucide-react';
 
+import type { TDocumentEmailSettings } from '@documenso/lib/types/document-email';
 import { DocumentEmailEvents } from '@documenso/lib/types/document-email';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@documenso/ui/primitives/tooltip';
 
 import { cn } from '../../lib/utils';
 import { Checkbox } from '../../primitives/checkbox';
 
-type Value = Record<DocumentEmailEvents, boolean>;
+type Value = TDocumentEmailSettings;
 
 type DocumentEmailCheckboxesProps = {
   value: Value;
@@ -211,6 +212,46 @@ export const DocumentEmailCheckboxes = ({
               <p>
                 <Trans>
                   This will be sent to all recipients if a pending document has been deleted.
+                </Trans>
+              </p>
+            </TooltipContent>
+          </Tooltip>
+        </label>
+      </div>
+
+      <div className="flex flex-row items-center">
+        <Checkbox
+          id={DocumentEmailEvents.OwnerDocumentCompleted}
+          className="h-5 w-5"
+          checkClassName="dark:text-white text-primary"
+          checked={value.ownerDocumentCompleted}
+          onCheckedChange={(checked) =>
+            onChange({ ...value, [DocumentEmailEvents.OwnerDocumentCompleted]: Boolean(checked) })
+          }
+        />
+
+        <label
+          className="text-muted-foreground ml-2 flex flex-row items-center text-sm"
+          htmlFor={DocumentEmailEvents.OwnerDocumentCompleted}
+        >
+          <Trans>Send document completed email to the owner</Trans>
+
+          <Tooltip>
+            <TooltipTrigger>
+              <InfoIcon className="mx-2 h-4 w-4" />
+            </TooltipTrigger>
+
+            <TooltipContent className="text-foreground max-w-md space-y-2 p-4">
+              <h2>
+                <strong>
+                  <Trans>Document completed email to the owner</Trans>
+                </strong>
+              </h2>
+
+              <p>
+                <Trans>
+                  This will be sent to the document owner once the document has been fully
+                  completed.
                 </Trans>
               </p>
             </TooltipContent>

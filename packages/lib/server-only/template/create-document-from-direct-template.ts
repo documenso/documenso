@@ -3,6 +3,7 @@ import { createElement } from 'react';
 import { msg } from '@lingui/macro';
 import { DateTime } from 'luxon';
 import { match } from 'ts-pattern';
+import { z } from 'zod';
 
 import { mailer } from '@documenso/email/mailer';
 import { DocumentCreatedFromDirectTemplateEmailTemplate } from '@documenso/email/templates/document-created-from-direct-template';
@@ -67,6 +68,16 @@ type CreatedDirectRecipientField = {
   derivedRecipientActionAuth: TRecipientActionAuthTypes | null;
 };
 
+export const ZCreateDocumentFromDirectTemplateResponseSchema = z.object({
+  token: z.string(),
+  documentId: z.number(),
+  recipientId: z.number(),
+});
+
+export type TCreateDocumentFromDirectTemplateResponse = z.infer<
+  typeof ZCreateDocumentFromDirectTemplateResponseSchema
+>;
+
 export const createDocumentFromDirectTemplate = async ({
   directRecipientName: initialDirectRecipientName,
   directRecipientEmail,
@@ -76,7 +87,7 @@ export const createDocumentFromDirectTemplate = async ({
   templateUpdatedAt,
   requestMetadata,
   user,
-}: CreateDocumentFromDirectTemplateOptions) => {
+}: CreateDocumentFromDirectTemplateOptions): Promise<TCreateDocumentFromDirectTemplateResponse> => {
   const template = await prisma.template.findFirst({
     where: {
       directLink: {

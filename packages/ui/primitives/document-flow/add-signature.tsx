@@ -61,6 +61,7 @@ export const AddSignatureFormPartial = ({
 }: AddSignatureFormProps) => {
   const { currentStep, totalSteps } = useStep();
   const [validateUninsertedFields, setValidateUninsertedFields] = useState(false);
+  const [isSignatureValid, setIsSignatureValid] = useState(false);
 
   // Refined schema which takes into account whether to allow an empty name or signature.
   const refinedSchema = ZAddSignatureFormSchema.superRefine((val, ctx) => {
@@ -336,9 +337,17 @@ export const AddSignatureFormPartial = ({
                               className="h-44 w-full"
                               defaultValue={field.value}
                               onBlur={field.onBlur}
+                              onValidityChange={(isValid) => {
+                                setIsSignatureValid(isValid);
+                                if (!isValid) {
+                                  field.onChange(null);
+                                }
+                              }}
                               onChange={(value) => {
-                                onFormValueChange(FieldType.SIGNATURE);
-                                field.onChange(value);
+                                if (isSignatureValid) {
+                                  onFormValueChange(FieldType.SIGNATURE);
+                                  field.onChange(value);
+                                }
                               }}
                             />
                           </CardContent>

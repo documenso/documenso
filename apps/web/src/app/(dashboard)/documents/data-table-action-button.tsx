@@ -54,7 +54,7 @@ export const DataTableActionButton = ({ row, team }: DataTableActionButtonProps)
 
       if (!recipient) {
         document = await trpcClient.document.getDocumentById.query({
-          id: row.id,
+          documentId: row.id,
           teamId: team?.id,
         });
       } else {

@@ -1,6 +1,7 @@
-import type { FindResultSet } from '@documenso/lib/types/find-result-set';
 import { prisma } from '@documenso/prisma';
 import type { UserSecurityAuditLog, UserSecurityAuditLogType } from '@documenso/prisma/client';
+
+import type { FindResultResponse } from '../../types/search-params';
 
 export type FindUserSecurityAuditLogsOptions = {
   userId: number;
@@ -48,5 +49,5 @@ export const findUserSecurityAuditLogs = async ({
     currentPage: Math.max(page, 1),
     perPage,
     totalPages: Math.ceil(count / perPage),
-  } satisfies FindResultSet<typeof data>;
+  } satisfies FindResultResponse<typeof data>;
 };

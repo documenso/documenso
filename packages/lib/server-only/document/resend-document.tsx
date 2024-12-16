@@ -38,7 +38,7 @@ export const resendDocument = async ({
   recipients,
   teamId,
   requestMetadata,
-}: ResendDocumentOptions) => {
+}: ResendDocumentOptions): Promise<void> => {
   const user = await prisma.user.findFirstOrThrow({
     where: {
       id: userId,
