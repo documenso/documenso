@@ -258,6 +258,43 @@ export const DocumentEmailCheckboxes = ({
           </Tooltip>
         </label>
       </div>
+
+      <div className="flex flex-row items-center">
+        <Checkbox
+          id={DocumentEmailEvents.RecipientSigned}
+          className="h-5 w-5"
+          checkClassName="dark:text-white text-primary"
+          checked={value.recipientSigned}
+          onCheckedChange={(checked) =>
+            onChange({ ...value, [DocumentEmailEvents.RecipientSigned]: Boolean(checked) })
+          }
+        />
+
+        <label
+          className="text-muted-foreground ml-2 flex flex-row items-center text-sm"
+          htmlFor={DocumentEmailEvents.RecipientSigned}
+        >
+          <Trans>Send document completed for each recipient</Trans>
+
+          <Tooltip>
+            <TooltipTrigger>
+              <InfoIcon className="mx-2 h-4 w-4" />
+            </TooltipTrigger>
+
+            <TooltipContent className="text-foreground max-w-md space-y-2 p-4">
+              <h2>
+                <strong>
+                  <Trans>Document completed when a recipient signs</Trans>
+                </strong>
+              </h2>
+
+              <p>
+                <Trans>This will be sent to the document owner once a recipient has signed.</Trans>
+              </p>
+            </TooltipContent>
+          </Tooltip>
+        </label>
+      </div>
     </div>
   );
 };
