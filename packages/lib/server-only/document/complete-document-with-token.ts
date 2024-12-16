@@ -17,7 +17,6 @@ import { ZWebhookDocumentSchema } from '../../types/webhook-payload';
 import { getIsRecipientsTurnToSign } from '../recipient/get-is-recipient-turn';
 import { triggerWebhook } from '../webhooks/trigger/trigger-webhook';
 import { sendPendingEmail } from './send-pending-email';
-import { sendRecipientSignedEmail } from './send-recipient-signed-email';
 
 export type CompleteDocumentWithTokenOptions = {
   token: string;
@@ -140,10 +139,13 @@ export const completeDocumentWithToken = async ({
     });
   });
 
-  await sendRecipientSignedEmail({
-    documentId: document.id,
-    recipientId: recipient.id,
-    requestMetadata,
+  await jobs.triggerJob({
+    name: 'send.recipient.signed.email',
+    payload: {
+      documentId: document.id,
+      recipientId: recipient.id,
+      requestMetadata,
+    },
   });
 
   const pendingRecipients = await prisma.recipient.findMany({
