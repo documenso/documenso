@@ -1,6 +1,7 @@
 import { customAlphabet } from 'nanoid';
 
 import { prisma } from '..';
+import type { Prisma } from '../client';
 import { TeamMemberInviteStatus, TeamMemberRole } from '../client';
 import { seedUser } from './users';
 
@@ -10,11 +11,13 @@ const nanoid = customAlphabet('1234567890abcdef', 10);
 type SeedTeamOptions = {
   createTeamMembers?: number;
   createTeamEmail?: true | string;
+  createTeamOptions?: Partial<Prisma.TeamUncheckedCreateInput>;
 };
 
 export const seedTeam = async ({
   createTeamMembers = 0,
   createTeamEmail,
+  createTeamOptions = {},
 }: SeedTeamOptions = {}) => {
   const teamUrl = `team-${nanoid()}`;
   const teamEmail = createTeamEmail === true ? `${teamUrl}@${EMAIL_DOMAIN}` : createTeamEmail;
@@ -54,6 +57,7 @@ export const seedTeam = async ({
             },
           }
         : undefined,
+      ...createTeamOptions,
     },
   });
 
@@ -69,6 +73,7 @@ export const seedTeam = async ({
         },
       },
       teamEmail: true,
+      teamGlobalSettings: true,
     },
   });
 };

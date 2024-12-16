@@ -89,17 +89,16 @@ export const createDocument = async ({
     globalVisibility: DocumentVisibility | null | undefined,
     userRole: TeamMemberRole,
   ): DocumentVisibility => {
-    const defaultVisibility = globalVisibility ?? DocumentVisibility.EVERYONE;
+    if (globalVisibility) {
+      return globalVisibility;
+    }
 
     if (userRole === TeamMemberRole.ADMIN) {
-      return defaultVisibility;
+      return DocumentVisibility.ADMIN;
     }
 
     if (userRole === TeamMemberRole.MANAGER) {
-      if (defaultVisibility === DocumentVisibility.ADMIN) {
-        return DocumentVisibility.MANAGER_AND_ABOVE;
-      }
-      return defaultVisibility;
+      return DocumentVisibility.MANAGER_AND_ABOVE;
     }
 
     return DocumentVisibility.EVERYONE;
