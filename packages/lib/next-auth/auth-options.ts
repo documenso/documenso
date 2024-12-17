@@ -393,13 +393,32 @@ export const NEXT_AUTH_OPTIONS: AuthOptions = {
         });
       }
 
-      return {
-        id: merged.id,
-        name: merged.name,
-        email: merged.email,
-        lastSignedIn: merged.lastSignedIn,
-        emailVerified: merged.emailVerified,
-      } satisfies JWT;
+      const userId = Number(merged.id ?? token.sub);
+
+      // TODO: Works but not the right approach. Fix later
+      const usr = await prisma.user.findFirst({
+        where: {
+          id: userId,
+        },
+      });
+
+      if (!usr?.disabled) {
+        return {
+          id: merged.id,
+          name: merged.name,
+          email: merged.email,
+          lastSignedIn: merged.lastSignedIn,
+          emailVerified: merged.emailVerified,
+        } satisfies JWT;
+      } else {
+        return {
+          id: '',
+          name: '',
+          email: '',
+          lastSignedIn: '',
+          emailVerified: '',
+        } satisfies JWT;
+      }
     },
 
     session({ token, session }) {
