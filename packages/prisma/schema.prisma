@@ -42,6 +42,7 @@ model User {
   roles            Role[]           @default([USER])
   identityProvider IdentityProvider @default(DOCUMENSO)
   avatarImageId    String?
+  disabled         Boolean          @default(false)
 
   accounts             Account[]
   sessions             Session[]
