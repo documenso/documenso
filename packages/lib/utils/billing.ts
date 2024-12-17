@@ -1,6 +1,3 @@
-import { env } from 'next-runtime-env';
-
-import { IS_BILLING_ENABLED } from '../constants/app';
 import type { Subscription } from '.prisma/client';
 import { SubscriptionStatus } from '.prisma/client';
 
@@ -10,10 +7,18 @@ import { SubscriptionStatus } from '.prisma/client';
 export const subscriptionsContainsActivePlan = (
   subscriptions: Subscription[],
   priceIds: string[],
+  allowPastDue?: boolean,
 ) => {
+  const allowedSubscriptionStatuses: SubscriptionStatus[] = [SubscriptionStatus.ACTIVE];
+
+  if (allowPastDue) {
+    allowedSubscriptionStatuses.push(SubscriptionStatus.PAST_DUE);
+  }
+
   return subscriptions.some(
     (subscription) =>
-      subscription.status === SubscriptionStatus.ACTIVE && priceIds.includes(subscription.priceId),
+      allowedSubscriptionStatuses.includes(subscription.status) &&
+      priceIds.includes(subscription.priceId),
   );
 };
 
@@ -27,25 +32,5 @@ export const subscriptionsContainsActiveProductId = (
   return subscriptions.some(
     (subscription) =>
       subscription.status === SubscriptionStatus.ACTIVE && productId.includes(subscription.planId),
-  );
-};
-
-export const subscriptionsContainActiveEnterprisePlan = (
-  subscriptions?: Subscription[],
-): boolean => {
-  const enterprisePlanId = env('NEXT_PUBLIC_STRIPE_ENTERPRISE_PLAN_MONTHLY_PRICE_ID');
-
-  if (!enterprisePlanId || !subscriptions || !IS_BILLING_ENABLED()) {
-    return false;
-  }
-
-  const acceptableStatuses: SubscriptionStatus[] = [
-    SubscriptionStatus.ACTIVE,
-    SubscriptionStatus.PAST_DUE,
-  ];
-
-  return subscriptions.some(
-    (subscription) =>
-      acceptableStatuses.includes(subscription.status) && enterprisePlanId === subscription.priceId,
   );
 };

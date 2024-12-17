@@ -79,16 +79,17 @@ export const teamRouter = router({
     return await getTeams({ userId: ctx.user.id });
   }),
 
+  // Todo: Public endpoint.
   findTeams: authenticatedProcedure
-    .meta({
-      openapi: {
-        method: 'GET',
-        path: '/team',
-        summary: 'Find teams',
-        description: 'Find your teams based on a search criteria',
-        tags: ['Teams'],
-      },
-    })
+    // .meta({
+    //   openapi: {
+    //     method: 'GET',
+    //     path: '/team',
+    //     summary: 'Find teams',
+    //     description: 'Find your teams based on a search criteria',
+    //     tags: ['Teams'],
+    //   },
+    // })
     .input(ZFindTeamsQuerySchema)
     .output(z.unknown())
     .query(async ({ input, ctx }) => {
@@ -98,30 +99,32 @@ export const teamRouter = router({
       });
     }),
 
+  // Todo: Public endpoint.
   getTeam: authenticatedProcedure
-    .meta({
-      openapi: {
-        method: 'GET',
-        path: '/team/{teamId}',
-        summary: 'Get team',
-        tags: ['Teams'],
-      },
-    })
+    // .meta({
+    //   openapi: {
+    //     method: 'GET',
+    //     path: '/team/{teamId}',
+    //     summary: 'Get team',
+    //     tags: ['Teams'],
+    //   },
+    // })
     .input(ZGetTeamQuerySchema)
     .output(z.unknown())
     .query(async ({ input, ctx }) => {
       return await getTeamById({ teamId: input.teamId, userId: ctx.user.id });
     }),
 
+  // Todo: Public endpoint.
   createTeam: authenticatedProcedure
-    .meta({
-      openapi: {
-        method: 'POST',
-        path: '/team/create',
-        summary: 'Create team',
-        tags: ['Teams'],
-      },
-    })
+    // .meta({
+    //   openapi: {
+    //     method: 'POST',
+    //     path: '/team/create',
+    //     summary: 'Create team',
+    //     tags: ['Teams'],
+    //   },
+    // })
     .input(ZCreateTeamMutationSchema)
     .output(z.unknown())
     .mutation(async ({ input, ctx }) => {
@@ -131,15 +134,16 @@ export const teamRouter = router({
       });
     }),
 
+  // Todo: Public endpoint.
   updateTeam: authenticatedProcedure
-    .meta({
-      openapi: {
-        method: 'POST',
-        path: '/team/{teamId}',
-        summary: 'Update team',
-        tags: ['Teams'],
-      },
-    })
+    // .meta({
+    //   openapi: {
+    //     method: 'POST',
+    //     path: '/team/{teamId}',
+    //     summary: 'Update team',
+    //     tags: ['Teams'],
+    //   },
+    // })
     .input(ZUpdateTeamMutationSchema)
     .output(z.unknown())
     .mutation(async ({ input, ctx }) => {
@@ -149,15 +153,16 @@ export const teamRouter = router({
       });
     }),
 
+  // Todo: Public endpoint.
   deleteTeam: authenticatedProcedure
-    .meta({
-      openapi: {
-        method: 'POST',
-        path: '/team/{teamId}/delete',
-        summary: 'Delete team',
-        tags: ['Teams'],
-      },
-    })
+    // .meta({
+    //   openapi: {
+    //     method: 'POST',
+    //     path: '/team/{teamId}/delete',
+    //     summary: 'Delete team',
+    //     tags: ['Teams'],
+    //   },
+    // })
     .input(ZDeleteTeamMutationSchema)
     .output(z.unknown())
     .mutation(async ({ input, ctx }) => {
@@ -167,16 +172,17 @@ export const teamRouter = router({
       });
     }),
 
+  // Todo: Public endpoint.
   leaveTeam: authenticatedProcedure
-    .meta({
-      openapi: {
-        method: 'POST',
-        path: '/team/{teamId}/leave',
-        summary: 'Leave a team',
-        description: '',
-        tags: ['Teams'],
-      },
-    })
+    // .meta({
+    //   openapi: {
+    //     method: 'POST',
+    //     path: '/team/{teamId}/leave',
+    //     summary: 'Leave a team',
+    //     description: '',
+    //     tags: ['Teams'],
+    //   },
+    // })
     .input(ZLeaveTeamMutationSchema)
     .output(z.unknown())
     .mutation(async ({ input, ctx }) => {
@@ -186,16 +192,17 @@ export const teamRouter = router({
       });
     }),
 
+  // Todo: Public endpoint.
   findTeamMemberInvites: authenticatedProcedure
-    .meta({
-      openapi: {
-        method: 'GET',
-        path: '/team/{teamId}/member/invite',
-        summary: 'Find member invites',
-        description: 'Returns pending team member invites',
-        tags: ['Teams'],
-      },
-    })
+    // .meta({
+    //   openapi: {
+    //     method: 'GET',
+    //     path: '/team/{teamId}/member/invite',
+    //     summary: 'Find member invites',
+    //     description: 'Returns pending team member invites',
+    //     tags: ['Teams'],
+    //   },
+    // })
     .input(ZFindTeamMemberInvitesQuerySchema)
     .output(z.unknown())
     .query(async ({ input, ctx }) => {
@@ -205,16 +212,17 @@ export const teamRouter = router({
       });
     }),
 
+  // Todo: Public endpoint.
   createTeamMemberInvites: authenticatedProcedure
-    .meta({
-      openapi: {
-        method: 'POST',
-        path: '/team/{teamId}/member/invite',
-        summary: 'Invite members',
-        description: 'Send email invitations to users to join the team',
-        tags: ['Teams'],
-      },
-    })
+    // .meta({
+    //   openapi: {
+    //     method: 'POST',
+    //     path: '/team/{teamId}/member/invite',
+    //     summary: 'Invite members',
+    //     description: 'Send email invitations to users to join the team',
+    //     tags: ['Teams'],
+    //   },
+    // })
     .input(ZCreateTeamMemberInvitesMutationSchema)
     .output(z.unknown())
     .mutation(async ({ input, ctx }) => {
@@ -225,16 +233,17 @@ export const teamRouter = router({
       });
     }),
 
+  // Todo: Public endpoint.
   resendTeamMemberInvitation: authenticatedProcedure
-    .meta({
-      openapi: {
-        method: 'POST',
-        path: '/team/{teamId}/member/invite/{invitationId}/resend',
-        summary: 'Resend member invite',
-        description: 'Resend an email invitation to a user to join the team',
-        tags: ['Teams'],
-      },
-    })
+    // .meta({
+    //   openapi: {
+    //     method: 'POST',
+    //     path: '/team/{teamId}/member/invite/{invitationId}/resend',
+    //     summary: 'Resend member invite',
+    //     description: 'Resend an email invitation to a user to join the team',
+    //     tags: ['Teams'],
+    //   },
+    // })
     .input(ZResendTeamMemberInvitationMutationSchema)
     .output(z.unknown())
     .mutation(async ({ input, ctx }) => {
@@ -245,16 +254,17 @@ export const teamRouter = router({
       });
     }),
 
+  // Todo: Public endpoint.
   deleteTeamMemberInvitations: authenticatedProcedure
-    .meta({
-      openapi: {
-        method: 'POST',
-        path: '/team/{teamId}/member/invite/delete',
-        summary: 'Delete member invite',
-        description: 'Delete a pending team member invite',
-        tags: ['Teams'],
-      },
-    })
+    // .meta({
+    //   openapi: {
+    //     method: 'POST',
+    //     path: '/team/{teamId}/member/invite/delete',
+    //     summary: 'Delete member invite',
+    //     description: 'Delete a pending team member invite',
+    //     tags: ['Teams'],
+    //   },
+    // })
     .input(ZDeleteTeamMemberInvitationsMutationSchema)
     .output(z.unknown())
     .mutation(async ({ input, ctx }) => {
@@ -264,31 +274,33 @@ export const teamRouter = router({
       });
     }),
 
+  // Todo: Public endpoint.
   getTeamMembers: authenticatedProcedure
-    .meta({
-      openapi: {
-        method: 'GET',
-        path: '/team/{teamId}/member',
-        summary: 'Get members',
-        tags: ['Teams'],
-      },
-    })
+    // .meta({
+    //   openapi: {
+    //     method: 'GET',
+    //     path: '/team/{teamId}/member',
+    //     summary: 'Get members',
+    //     tags: ['Teams'],
+    //   },
+    // })
     .input(ZGetTeamMembersQuerySchema)
     .output(z.unknown())
     .query(async ({ input, ctx }) => {
       return await getTeamMembers({ teamId: input.teamId, userId: ctx.user.id });
     }),
 
+  // Todo: Public endpoint.
   findTeamMembers: authenticatedProcedure
-    .meta({
-      openapi: {
-        method: 'GET',
-        path: '/team/{teamId}/member/find',
-        summary: 'Find members',
-        description: 'Find team members based on a search criteria',
-        tags: ['Teams'],
-      },
-    })
+    // .meta({
+    //   openapi: {
+    //     method: 'GET',
+    //     path: '/team/{teamId}/member/find',
+    //     summary: 'Find members',
+    //     description: 'Find team members based on a search criteria',
+    //     tags: ['Teams'],
+    //   },
+    // })
     .input(ZFindTeamMembersQuerySchema)
     .output(z.unknown())
     .query(async ({ input, ctx }) => {
@@ -298,15 +310,16 @@ export const teamRouter = router({
       });
     }),
 
+  // Todo: Public endpoint.
   updateTeamMember: authenticatedProcedure
-    .meta({
-      openapi: {
-        method: 'POST',
-        path: '/team/{teamId}/member/{teamMemberId}',
-        summary: 'Update member',
-        tags: ['Teams'],
-      },
-    })
+    // .meta({
+    //   openapi: {
+    //     method: 'POST',
+    //     path: '/team/{teamId}/member/{teamMemberId}',
+    //     summary: 'Update member',
+    //     tags: ['Teams'],
+    //   },
+    // })
     .input(ZUpdateTeamMemberMutationSchema)
     .output(z.unknown())
     .mutation(async ({ input, ctx }) => {
@@ -316,16 +329,17 @@ export const teamRouter = router({
       });
     }),
 
+  // Todo: Public endpoint.
   deleteTeamMembers: authenticatedProcedure
-    .meta({
-      openapi: {
-        method: 'POST',
-        path: '/team/{teamId}/member/delete',
-        summary: 'Delete members',
-        description: '',
-        tags: ['Teams'],
-      },
-    })
+    // .meta({
+    //   openapi: {
+    //     method: 'POST',
+    //     path: '/team/{teamId}/member/delete',
+    //     summary: 'Delete members',
+    //     description: '',
+    //     tags: ['Teams'],
+    //   },
+    // })
     .input(ZDeleteTeamMembersMutationSchema)
     .output(z.unknown())
     .mutation(async ({ input, ctx }) => {
@@ -374,16 +388,17 @@ export const teamRouter = router({
       return await getTeamInvitations({ email: ctx.user.email });
     }),
 
+  // Todo: Public endpoint.
   updateTeamPublicProfile: authenticatedProcedure
-    .meta({
-      openapi: {
-        method: 'POST',
-        path: '/team/{teamId}/profile',
-        summary: 'Update a team public profile',
-        description: '',
-        tags: ['Teams'],
-      },
-    })
+    // .meta({
+    //   openapi: {
+    //     method: 'POST',
+    //     path: '/team/{teamId}/profile',
+    //     summary: 'Update a team public profile',
+    //     description: '',
+    //     tags: ['Teams'],
+    //   },
+    // })
     .input(ZUpdateTeamPublicProfileMutationSchema)
     .output(z.unknown())
     .mutation(async ({ input, ctx }) => {

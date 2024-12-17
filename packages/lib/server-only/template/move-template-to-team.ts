@@ -1,6 +1,9 @@
-import { TRPCError } from '@trpc/server';
+import type { z } from 'zod';
 
 import { prisma } from '@documenso/prisma';
+import { TemplateSchema } from '@documenso/prisma/generated/zod';
+
+import { AppError, AppErrorCode } from '../../errors/app-error';
 
 export type MoveTemplateToTeamOptions = {
   templateId: number;
@@ -8,11 +11,15 @@ export type MoveTemplateToTeamOptions = {
   userId: number;
 };
 
+export const ZMoveTemplateToTeamResponseSchema = TemplateSchema;
+
+export type TMoveTemplateToTeamResponse = z.infer<typeof ZMoveTemplateToTeamResponseSchema>;
+
 export const moveTemplateToTeam = async ({
   templateId,
   teamId,
   userId,
-}: MoveTemplateToTeamOptions) => {
+}: MoveTemplateToTeamOptions): Promise<TMoveTemplateToTeamResponse> => {
   return await prisma.$transaction(async (tx) => {
     const template = await tx.template.findFirst({
       where: {
@@ -23,8 +30,7 @@ export const moveTemplateToTeam = async ({
     });
 
     if (!template) {
-      throw new TRPCError({
-        code: 'NOT_FOUND',
+      throw new AppError(AppErrorCode.NOT_FOUND, {
         message: 'Template not found or already associated with a team.',
       });
     }
@@ -41,9 +47,8 @@ export const moveTemplateToTeam = async ({
     });
 
     if (!team) {
-      throw new TRPCError({
-        code: 'FORBIDDEN',
-        message: 'You are not a member of this team.',
+      throw new AppError(AppErrorCode.UNAUTHORIZED, {
+        message: 'Team does not exist or you are not a member of this team.',
       });
     }
 

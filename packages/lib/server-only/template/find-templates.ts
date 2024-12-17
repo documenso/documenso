@@ -1,7 +1,18 @@
+import type { z } from 'zod';
+
 import { prisma } from '@documenso/prisma';
 import type { Prisma, Template } from '@documenso/prisma/client';
+import {
+  DocumentDataSchema,
+  FieldSchema,
+  RecipientSchema,
+  TeamSchema,
+  TemplateDirectLinkSchema,
+  TemplateMetaSchema,
+  TemplateSchema,
+} from '@documenso/prisma/generated/zod';
 
-import type { FindResultResponse } from '../../types/search-params';
+import { type FindResultResponse, ZFindResultResponse } from '../../types/search-params';
 
 export type FindTemplatesOptions = {
   userId: number;
@@ -11,8 +22,28 @@ export type FindTemplatesOptions = {
   perPage?: number;
 };
 
-export type FindTemplatesResponse = Awaited<ReturnType<typeof findTemplates>>;
-export type FindTemplateRow = FindTemplatesResponse['data'][number];
+export const ZFindTemplatesResponseSchema = ZFindResultResponse.extend({
+  data: TemplateSchema.extend({
+    templateDocumentData: DocumentDataSchema,
+    team: TeamSchema.pick({
+      id: true,
+      url: true,
+    }).nullable(),
+    Field: FieldSchema.array(),
+    Recipient: RecipientSchema.array(),
+    templateMeta: TemplateMetaSchema.pick({
+      signingOrder: true,
+      distributionMethod: true,
+    }).nullable(),
+    directLink: TemplateDirectLinkSchema.pick({
+      token: true,
+      enabled: true,
+    }).nullable(),
+  }).array(), // Todo: openapi.
+});
+
+export type TFindTemplatesResponse = z.infer<typeof ZFindTemplatesResponseSchema>;
+export type FindTemplateRow = TFindTemplatesResponse['data'][number];
 
 export const findTemplates = async ({
   userId,
@@ -20,7 +51,7 @@ export const findTemplates = async ({
   type,
   page = 1,
   perPage = 10,
-}: FindTemplatesOptions) => {
+}: FindTemplatesOptions): Promise<TFindTemplatesResponse> => {
   let whereFilter: Prisma.TemplateWhereInput = {
     userId,
     teamId: null,

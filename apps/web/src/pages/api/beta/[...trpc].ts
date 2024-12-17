@@ -1,32 +1,22 @@
+import type { NextApiRequest, NextApiResponse } from 'next';
+
+import { createOpenApiNextHandler } from 'trpc-openapi';
+
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import { buildLogger } from '@documenso/lib/utils/logger';
-import * as trpcNext from '@documenso/trpc/server/adapters/next';
+import type { TRPCError } from '@documenso/trpc/server';
 import { createTrpcContext } from '@documenso/trpc/server/context';
 import { appRouter } from '@documenso/trpc/server/router';
 
-export const config = {
-  maxDuration: 120,
-  api: {
-    bodyParser: {
-      sizeLimit: '50mb',
-    },
-  },
-};
-
 const logger = buildLogger();
 
-export default trpcNext.createNextApiHandler({
+export default createOpenApiNextHandler<typeof appRouter>({
   router: appRouter,
-  createContext: async ({ req, res }) => createTrpcContext({ req, res }),
-  onError(opts) {
-    const { error, path } = opts;
-
-    if (!path) {
-      return;
-    }
-
+  createContext: async ({ req, res }: { req: NextApiRequest; res: NextApiResponse }) =>
+    createTrpcContext({ req, res }),
+  onError: ({ error, path }: { error: TRPCError; path?: string }) => {
     // Always log the error for now.
-    console.error(error);
+    console.error(error.message);
 
     const appError = AppError.parseError(error.cause || error);
 
@@ -45,12 +35,13 @@ export default trpcNext.createNextApiHandler({
       logger.error(error, {
         method: path,
         context: {
-          source: 'trpc',
+          source: '/v2/api',
           appError: AppError.toJSON(appError),
         },
       });
     }
   },
+  responseMeta: () => {},
 });
 
 const errorCodesToAlertOn = [AppErrorCode.UNKNOWN_ERROR, 'INTERNAL_SERVER_ERROR'];
