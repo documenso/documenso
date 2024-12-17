@@ -8,6 +8,7 @@ import { validateDropdownField } from '@documenso/lib/advanced-fields-validation
 import { validateNumberField } from '@documenso/lib/advanced-fields-validation/validate-number';
 import { validateRadioField } from '@documenso/lib/advanced-fields-validation/validate-radio';
 import { validateTextField } from '@documenso/lib/advanced-fields-validation/validate-text';
+import { fromCheckboxValue } from '@documenso/lib/universal/field-checkbox';
 import { prisma } from '@documenso/prisma';
 import { DocumentStatus, FieldType, SigningStatus } from '@documenso/prisma/client';
 
@@ -119,14 +120,7 @@ export const signFieldWithToken = async ({
 
   if (field.type === FieldType.CHECKBOX && field.fieldMeta) {
     const checkboxFieldParsedMeta = ZCheckboxFieldMeta.parse(field.fieldMeta);
-    let checkboxFieldValues: string[];
-
-    try {
-      const parsed = JSON.parse(value);
-      checkboxFieldValues = Array.isArray(parsed) ? parsed : value.split(',');
-    } catch {
-      checkboxFieldValues = value.split(',');
-    }
+    const checkboxFieldValues: string[] = fromCheckboxValue(value);
 
     const errors = validateCheckboxField(checkboxFieldValues, checkboxFieldParsedMeta, true);
 

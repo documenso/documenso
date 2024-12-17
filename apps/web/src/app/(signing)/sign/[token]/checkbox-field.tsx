@@ -12,6 +12,7 @@ import { DO_NOT_INVALIDATE_QUERY_ON_MUTATION } from '@documenso/lib/constants/tr
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import type { TRecipientActionAuth } from '@documenso/lib/types/document-auth';
 import { ZCheckboxFieldMeta } from '@documenso/lib/types/field-meta';
+import { fromCheckboxValue, toCheckboxValue } from '@documenso/lib/universal/field-checkbox';
 import type { Recipient } from '@documenso/prisma/client';
 import type { FieldWithSignatureAndFieldMeta } from '@documenso/prisma/types/field-with-signature-and-fieldmeta';
 import { trpc } from '@documenso/trpc/react';
@@ -33,17 +34,6 @@ export type CheckboxFieldProps = {
   recipient: Recipient;
   onSignField?: (value: TSignFieldWithTokenMutationSchema) => Promise<void> | void;
   onUnsignField?: (value: TRemovedSignedFieldWithTokenMutationSchema) => Promise<void> | void;
-};
-
-const parseCheckedValues = (customText: string): string[] => {
-  try {
-    if (!customText) return [];
-
-    const parsed = JSON.parse(customText);
-    return Array.isArray(parsed) ? parsed : [];
-  } catch {
-    return customText.split(',').filter(Boolean);
-  }
 };
 
 export const CheckboxField = ({
@@ -109,7 +99,7 @@ export const CheckboxField = ({
       const payload: TSignFieldWithTokenMutationSchema = {
         token: recipient.token,
         fieldId: field.id,
-        value: JSON.stringify(checkedValues),
+        value: toCheckboxValue(checkedValues),
         isBase64: true,
         authOptions,
       };
@@ -203,7 +193,7 @@ export const CheckboxField = ({
           await signFieldWithToken({
             token: recipient.token,
             fieldId: field.id,
-            value: JSON.stringify(checkedValues),
+            value: toCheckboxValue(checkedValues),
             isBase64: true,
           });
         }
@@ -241,7 +231,7 @@ export const CheckboxField = ({
   }, [checkedValues, isLengthConditionMet, field.inserted]);
 
   const parsedCheckedValues = useMemo(
-    () => parseCheckedValues(field.customText),
+    () => fromCheckboxValue(field.customText),
     [field.customText],
   );
 

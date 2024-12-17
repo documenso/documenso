@@ -10,6 +10,7 @@ import {
   MIN_HANDWRITING_FONT_SIZE,
   MIN_STANDARD_FONT_SIZE,
 } from '@documenso/lib/constants/pdf';
+import { fromCheckboxValue } from '@documenso/lib/universal/field-checkbox';
 import { FieldType } from '@documenso/prisma/client';
 import { isSignatureFieldType } from '@documenso/prisma/guards/is-signature-field';
 import type { FieldWithSignature } from '@documenso/prisma/types/field-with-signature';
@@ -194,13 +195,7 @@ export const insertFieldInPDF = async (pdf: PDFDocument, field: FieldWithSignatu
         value: item.value.length > 0 ? item.value : `empty-value-${item.id}`,
       }));
 
-      let selected: string[] = [];
-      try {
-        const parsed = JSON.parse(field.customText);
-        selected = Array.isArray(parsed) ? parsed : field.customText.split(',');
-      } catch {
-        selected = field.customText.split(',');
-      }
+      const selected: string[] = fromCheckboxValue(field.customText);
 
       for (const [index, item] of (values ?? []).entries()) {
         const offsetY = index * 16;
