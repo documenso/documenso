@@ -16,7 +16,6 @@ import {
 export const removeOptionalContentGroups = (document: PDFDocument) => {
   const context = document.context;
   const catalog = context.lookup(context.trailerInfo.Root);
-
   if (catalog instanceof PDFDict) {
     catalog.delete(PDFName.of('OCProperties'));
   }
