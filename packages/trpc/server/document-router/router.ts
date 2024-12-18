@@ -197,6 +197,7 @@ export const documentRouter = router({
         teamId,
         title,
         documentDataId,
+        normalizePdf: true,
         requestMetadata: extractNextApiRequestMetadata(ctx.req),
       });
     }),
