@@ -11,13 +11,11 @@ export const disableUser = async ({ id }: DisableUserOptions) => {
       id,
     },
     include: {
-      ownedTeams: true,
       ApiToken: true,
       Webhooks: true,
       passkeys: true,
       VerificationToken: true,
       PasswordResetToken: true,
-      Subscription: true,
     },
   });
 
@@ -60,9 +58,9 @@ export const disableUser = async ({ id }: DisableUserOptions) => {
         },
       });
 
-      // await tx.passkey.deleteMany({
-      //   where: { userId: id },
-      // });
+      await tx.passkey.deleteMany({
+        where: { userId: id },
+      });
     });
   } catch (error) {
     console.error('Error disabling user', error);
