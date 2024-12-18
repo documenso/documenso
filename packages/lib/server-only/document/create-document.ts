@@ -3,6 +3,7 @@
 import type { z } from 'zod';
 
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
+import { normalizePdf as makeNormalizedPdf } from '@documenso/lib/server-only/pdf/normalize-pdf';
 import { DOCUMENT_AUDIT_LOG_TYPE } from '@documenso/lib/types/document-audit-logs';
 import type { RequestMetadata } from '@documenso/lib/universal/extract-request-metadata';
 import { createDocumentAuditLogData } from '@documenso/lib/utils/document-audit-logs';
@@ -13,6 +14,8 @@ import { TeamMemberRole } from '@documenso/prisma/client';
 import { DocumentSchema } from '@documenso/prisma/generated/zod';
 
 import { ZWebhookDocumentSchema } from '../../types/webhook-payload';
+import { getFile } from '../../universal/upload/get-file';
+import { putPdfFile } from '../../universal/upload/put-file';
 import { triggerWebhook } from '../webhooks/trigger/trigger-webhook';
 
 export type CreateDocumentOptions = {
@@ -22,6 +25,7 @@ export type CreateDocumentOptions = {
   teamId?: number;
   documentDataId: string;
   formValues?: Record<string, string | number | boolean>;
+  normalizePdf?: boolean;
   requestMetadata?: RequestMetadata;
 };
 
@@ -35,6 +39,7 @@ export const createDocument = async ({
   externalId,
   documentDataId,
   teamId,
+  normalizePdf,
   formValues,
   requestMetadata,
 }: CreateDocumentOptions): Promise<TCreateDocumentResponse> => {
@@ -103,6 +108,29 @@ export const createDocument = async ({
 
     return DocumentVisibility.EVERYONE;
   };
+
+  if (normalizePdf) {
+    const documentData = await prisma.documentData.findFirst({
+      where: {
+        id: documentDataId,
+      },
+    });
+
+    if (documentData) {
+      const buffer = await getFile(documentData);
+
+      const normalizedPdf = await makeNormalizedPdf(Buffer.from(buffer));
+
+      const newDocumentData = await putPdfFile({
+        name: title.endsWith('.pdf') ? title : `${title}.pdf`,
+        type: 'application/pdf',
+        arrayBuffer: async () => Promise.resolve(normalizedPdf),
+      });
+
+      // eslint-disable-next-line require-atomic-updates
+      documentDataId = newDocumentData.id;
+    }
+  }
 
   return await prisma.$transaction(async (tx) => {
     const document = await tx.document.create({
