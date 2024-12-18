@@ -47,7 +47,7 @@
     "recharts": "^2.7.2",
     "sharp": "0.32.6",
     "typescript": "5.2.2",
-    "zod": "^3.23.8"
+    "zod": "3.24.1"
   },
   "devDependencies": {
     "@lingui/loader": "^4.11.3",
