@@ -472,11 +472,19 @@ msgstr "En attente d'approbation"
 msgid "Before you get started, please confirm your email address by clicking the button below:"
 msgstr "Avant de commencer, veuillez confirmer votre adresse email en cliquant sur le bouton ci-dessous :"
 
+<<<<<<< HEAD
+#: packages/ui/primitives/signature-pad/signature-pad.tsx:513
+msgid "Black"
+msgstr "Noir"
+
+#: packages/ui/primitives/signature-pad/signature-pad.tsx:527
+=======
 #: packages/ui/primitives/signature-pad/signature-pad.tsx:524
 msgid "Black"
 msgstr "Noir"
 
 #: packages/ui/primitives/signature-pad/signature-pad.tsx:538
+>>>>>>> main
 msgid "Blue"
 msgstr "Bleu"
 
@@ -534,7 +542,11 @@ msgstr "Valeurs de case à cocher"
 msgid "Clear filters"
 msgstr "Effacer les filtres"
 
+<<<<<<< HEAD
+#: packages/ui/primitives/signature-pad/signature-pad.tsx:547
+=======
 #: packages/ui/primitives/signature-pad/signature-pad.tsx:558
+>>>>>>> main
 msgid "Clear Signature"
 msgstr "Effacer la signature"
 
@@ -896,7 +908,11 @@ msgstr "Authentification d'action de destinataire globale"
 msgid "Go Back"
 msgstr "Retourner"
 
+<<<<<<< HEAD
+#: packages/ui/primitives/signature-pad/signature-pad.tsx:534
+=======
 #: packages/ui/primitives/signature-pad/signature-pad.tsx:545
+>>>>>>> main
 msgid "Green"
 msgstr "Vert"
 
@@ -1180,7 +1196,11 @@ msgstr "E-mail de destinataire supprimé"
 msgid "Recipient signing request email"
 msgstr "E-mail de demande de signature de destinataire"
 
+<<<<<<< HEAD
+#: packages/ui/primitives/signature-pad/signature-pad.tsx:520
+=======
 #: packages/ui/primitives/signature-pad/signature-pad.tsx:531
+>>>>>>> main
 msgid "Red"
 msgstr "Rouge"
 
@@ -1597,7 +1617,11 @@ msgstr "Mettez à jour le rôle et ajoutez des champs selon les besoins pour le 
 msgid "Upgrade"
 msgstr "Améliorer"
 
+<<<<<<< HEAD
+#: packages/ui/primitives/signature-pad/signature-pad.tsx:498
+=======
 #: packages/ui/primitives/signature-pad/signature-pad.tsx:509
+>>>>>>> main
 msgid "Upload Signature"
 msgstr ""
 
