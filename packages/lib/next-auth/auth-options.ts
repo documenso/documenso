@@ -121,6 +121,10 @@ export const NEXT_AUTH_OPTIONS: AuthOptions = {
           throw new Error(ErrorCode.UNVERIFIED_EMAIL);
         }
 
+        if (user.disabled) {
+          throw new Error(ErrorCode.ACCOUNT_DISABLED);
+        }
+
         return {
           id: Number(user.id),
           email: user.email,
