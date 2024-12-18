@@ -18,7 +18,6 @@ export const disableUser = async ({ id }: DisableUserOptions) => {
       VerificationToken: true,
       PasswordResetToken: true,
       Subscription: true,
-      sessions: true,
     },
   });
 
@@ -27,9 +26,43 @@ export const disableUser = async ({ id }: DisableUserOptions) => {
   }
 
   try {
-    await prisma.user.update({
-      where: { id },
-      data: { disabled: true },
+    await prisma.$transaction(async (tx) => {
+      await tx.user.update({
+        where: { id },
+        data: { disabled: true },
+      });
+
+      await tx.apiToken.updateMany({
+        where: { userId: id },
+        data: {
+          expires: new Date(),
+        },
+      });
+
+      await tx.webhook.updateMany({
+        where: { userId: id },
+        data: {
+          enabled: false,
+        },
+      });
+
+      await tx.verificationToken.updateMany({
+        where: { userId: id },
+        data: {
+          expires: new Date(),
+        },
+      });
+
+      await tx.passwordResetToken.updateMany({
+        where: { userId: id },
+        data: {
+          expiry: new Date(),
+        },
+      });
+
+      // await tx.passkey.deleteMany({
+      //   where: { userId: id },
+      // });
     });
   } catch (error) {
     console.error('Error disabling user', error);
