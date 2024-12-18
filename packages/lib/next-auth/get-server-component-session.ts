@@ -21,6 +21,10 @@ export const getServerComponentSession = cache(async () => {
     },
   });
 
+  if (user.disabled) {
+    return { user: null, session: null };
+  }
+
   return { user, session };
 });
 

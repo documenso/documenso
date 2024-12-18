@@ -121,10 +121,6 @@ export const NEXT_AUTH_OPTIONS: AuthOptions = {
           throw new Error(ErrorCode.UNVERIFIED_EMAIL);
         }
 
-        if (user.disabled) {
-          throw new Error(ErrorCode.ACCOUNT_DISABLED);
-        }
-
         return {
           id: Number(user.id),
           email: user.email,
@@ -393,32 +389,13 @@ export const NEXT_AUTH_OPTIONS: AuthOptions = {
         });
       }
 
-      const userId = Number(merged.id ?? token.sub);
-
-      // TODO: Works but not the right approach. Fix later
-      const usr = await prisma.user.findFirst({
-        where: {
-          id: userId,
-        },
-      });
-
-      if (!usr?.disabled) {
-        return {
-          id: merged.id,
-          name: merged.name,
-          email: merged.email,
-          lastSignedIn: merged.lastSignedIn,
-          emailVerified: merged.emailVerified,
-        } satisfies JWT;
-      } else {
-        return {
-          id: '',
-          name: '',
-          email: '',
-          lastSignedIn: '',
-          emailVerified: '',
-        } satisfies JWT;
-      }
+      return {
+        id: merged.id,
+        name: merged.name,
+        email: merged.email,
+        lastSignedIn: merged.lastSignedIn,
+        emailVerified: merged.emailVerified,
+      } satisfies JWT;
     },
 
     session({ token, session }) {
