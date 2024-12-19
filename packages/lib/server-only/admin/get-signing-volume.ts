@@ -1,5 +1,5 @@
-import { kyselyPrisma, sql } from '@documenso/prisma';
-import { DocumentStatus } from '@documenso/prisma/client';
+import { kyselyPrisma,sql } from '@documenso/prisma';
+import { DocumentStatus, SubscriptionStatus } from '@documenso/prisma/client';
 
 export type SigningVolume = {
   id: number;
@@ -43,7 +43,8 @@ export async function getSigningVolume({
         .on('td.status', '=', sql.lit(DocumentStatus.COMPLETED))
         .on('td.deletedAt', 'is', null),
     )
-    .where('s.status', '=', 'ACTIVE')
+    // @ts-expect-error
+    .where(sql`s.status = ${SubscriptionStatus.ACTIVE}::"SubscriptionStatus"`)
     .where((eb) =>
       eb.or([
         eb('u.name', 'ilike', `%${search}%`),
@@ -79,7 +80,8 @@ export async function getSigningVolume({
     .selectFrom('Subscription as s')
     .leftJoin('User as u', 's.userId', 'u.id')
     .leftJoin('Team as t', 's.teamId', 't.id')
-    .where('s.status', '=', 'ACTIVE')
+    // @ts-expect-error
+    .where(sql`s.status = ${SubscriptionStatus.ACTIVE}::"SubscriptionStatus"`)
     .where((eb) =>
       eb.or([
         eb('u.name', 'ilike', `%${search}%`),
