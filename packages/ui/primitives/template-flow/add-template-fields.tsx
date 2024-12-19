@@ -100,6 +100,7 @@ export const AddTemplateFieldsFormPartial = ({
   const { currentStep, totalSteps, previousStep } = useStep();
   const [showAdvancedSettings, setShowAdvancedSettings] = useState(false);
   const [currentField, setCurrentField] = useState<FieldFormType>();
+  const [activeFieldId, setActiveFieldId] = useState<string | null>(null);
 
   const form = useForm<TAddTemplateFieldsFormSchema>({
     defaultValues: {
@@ -475,6 +476,9 @@ export const AddTemplateFieldsFormPartial = ({
                       handleAdvancedSettings();
                     }}
                     hideRecipients={hideRecipients}
+                    active={activeFieldId === field.formId}
+                    onFieldActivate={() => setActiveFieldId(field.formId)}
+                    onFieldDeactivate={() => setActiveFieldId(null)}
                   />
                 );
               })}

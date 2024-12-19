@@ -3,7 +3,6 @@ import React, { forwardRef } from 'react';
 import { TeamMemberRole } from '@prisma/client';
 import type { SelectProps } from '@radix-ui/react-select';
 import { InfoIcon } from 'lucide-react';
-import { match } from 'ts-pattern';
 
 import { DOCUMENT_VISIBILITY } from '@documenso/lib/constants/document-visibility';
 import { DocumentVisibility } from '@documenso/lib/types/document-visibility';
@@ -17,26 +16,19 @@ import {
 import { Tooltip, TooltipContent, TooltipTrigger } from '@documenso/ui/primitives/tooltip';
 
 export type DocumentVisibilitySelectType = SelectProps & {
-  currentMemberRole?: string;
+  currentTeamMemberRole?: string;
   isTeamSettings?: boolean;
   disabled?: boolean;
-  visibility?: string;
+  canUpdateVisibility?: boolean;
 };
 
 export const DocumentVisibilitySelect = forwardRef<HTMLButtonElement, DocumentVisibilitySelectType>(
-  ({ currentMemberRole, isTeamSettings = false, disabled, visibility, ...props }, ref) => {
-    const canUpdateVisibility = match(currentMemberRole)
-      .with(TeamMemberRole.ADMIN, () => true)
-      .with(
-        TeamMemberRole.MANAGER,
-        () =>
-          visibility === DocumentVisibility.EVERYONE ||
-          visibility === DocumentVisibility.MANAGER_AND_ABOVE,
-      )
-      .otherwise(() => false);
-
-    const isAdmin = currentMemberRole === TeamMemberRole.ADMIN;
-    const isManager = currentMemberRole === TeamMemberRole.MANAGER;
+  (
+    { currentTeamMemberRole, isTeamSettings = false, disabled, canUpdateVisibility, ...props },
+    ref,
+  ) => {
+    const isAdmin = currentTeamMemberRole === TeamMemberRole.ADMIN;
+    const isManager = currentTeamMemberRole === TeamMemberRole.MANAGER;
     const canEdit = isTeamSettings || canUpdateVisibility;
 
     return (
@@ -51,7 +43,7 @@ export const DocumentVisibilitySelect = forwardRef<HTMLButtonElement, DocumentVi
           </SelectItem>
           <SelectItem
             value={DocumentVisibility.MANAGER_AND_ABOVE}
-            disabled={!isAdmin && (!isManager || visibility === DocumentVisibility.ADMIN)}
+            disabled={!isAdmin && !isManager}
           >
             {DOCUMENT_VISIBILITY.MANAGER_AND_ABOVE.value}
           </SelectItem>
