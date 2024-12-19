@@ -47,7 +47,6 @@ export const ZDocumentAuditLogEmailTypeSchema = z.enum([
   'APPROVE_REQUEST',
   'CC',
   'DOCUMENT_COMPLETED',
-  'RECIPIENT_SIGNED',
 ]);
 
 export const ZDocumentMetaDiffTypeSchema = z.enum([
