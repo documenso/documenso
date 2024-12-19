@@ -129,6 +129,7 @@ export const AddFieldsFormPartial = ({
     currentStep === 1 && typeof documentFlow.onBackStep === 'function' && canGoBack;
   const [showAdvancedSettings, setShowAdvancedSettings] = useState(false);
   const [currentField, setCurrentField] = useState<FieldFormType>();
+  const [activeFieldId, setActiveFieldId] = useState<string | null>(null);
 
   const form = useForm<TAddFieldsFormSchema>({
     defaultValues: {
@@ -652,6 +653,9 @@ export const AddFieldsFormPartial = ({
                       }}
                       hideRecipients={hideRecipients}
                       hasErrors={!!hasFieldError}
+                      active={activeFieldId === field.formId}
+                      onFieldActivate={() => setActiveFieldId(field.formId)}
+                      onFieldDeactivate={() => setActiveFieldId(null)}
                     />
                   );
                 })}

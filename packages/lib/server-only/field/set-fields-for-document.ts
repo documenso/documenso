@@ -1,4 +1,5 @@
 import { isDeepEqual } from 'remeda';
+import { z } from 'zod';
 
 import { validateCheckboxField } from '@documenso/lib/advanced-fields-validation/validate-checkbox';
 import { validateDropdownField } from '@documenso/lib/advanced-fields-validation/validate-dropdown';
@@ -23,6 +24,7 @@ import {
 import { prisma } from '@documenso/prisma';
 import type { Field } from '@documenso/prisma/client';
 import { FieldType } from '@documenso/prisma/client';
+import { FieldSchema } from '@documenso/prisma/generated/zod';
 
 import { AppError, AppErrorCode } from '../../errors/app-error';
 import { canRecipientFieldsBeModified } from '../../utils/recipients';
@@ -34,12 +36,18 @@ export interface SetFieldsForDocumentOptions {
   requestMetadata?: RequestMetadata;
 }
 
+export const ZSetFieldsForDocumentResponseSchema = z.object({
+  fields: z.array(FieldSchema),
+});
+
+export type TSetFieldsForDocumentResponse = z.infer<typeof ZSetFieldsForDocumentResponseSchema>;
+
 export const setFieldsForDocument = async ({
   userId,
   documentId,
   fields,
   requestMetadata,
-}: SetFieldsForDocumentOptions): Promise<Field[]> => {
+}: SetFieldsForDocumentOptions): Promise<TSetFieldsForDocumentResponse> => {
   const document = await prisma.document.findFirst({
     where: {
       id: documentId,
@@ -75,11 +83,15 @@ export const setFieldsForDocument = async ({
   });
 
   if (!document) {
-    throw new Error('Document not found');
+    throw new AppError(AppErrorCode.NOT_FOUND, {
+      message: 'Document not found',
+    });
   }
 
   if (document.completedAt) {
-    throw new Error('Document already complete');
+    throw new AppError(AppErrorCode.INVALID_REQUEST, {
+      message: 'Document already complete',
+    });
   }
 
   const existingFields = await prisma.field.findMany({
@@ -335,7 +347,9 @@ export const setFieldsForDocument = async ({
     return !isRemoved && !isUpdated;
   });
 
-  return [...filteredFields, ...persistedFields];
+  return {
+    fields: [...filteredFields, ...persistedFields],
+  };
 };
 
 /**

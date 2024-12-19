@@ -1,7 +1,16 @@
-import { getFieldById } from '@documenso/lib/server-only/field/get-field-by-id';
+import {
+  ZGetFieldByIdResponseSchema,
+  getFieldById,
+} from '@documenso/lib/server-only/field/get-field-by-id';
 import { removeSignedFieldWithToken } from '@documenso/lib/server-only/field/remove-signed-field-with-token';
-import { setFieldsForDocument } from '@documenso/lib/server-only/field/set-fields-for-document';
-import { setFieldsForTemplate } from '@documenso/lib/server-only/field/set-fields-for-template';
+import {
+  ZSetFieldsForDocumentResponseSchema,
+  setFieldsForDocument,
+} from '@documenso/lib/server-only/field/set-fields-for-document';
+import {
+  ZSetFieldsForTemplateResponseSchema,
+  setFieldsForTemplate,
+} from '@documenso/lib/server-only/field/set-fields-for-template';
 import { signFieldWithToken } from '@documenso/lib/server-only/field/sign-field-with-token';
 import { extractNextApiRequestMetadata } from '@documenso/lib/universal/extract-request-metadata';
 
@@ -15,8 +24,45 @@ import {
 } from './schema';
 
 export const fieldRouter = router({
+  /**
+   * @public
+   */
+  getField: authenticatedProcedure
+    .meta({
+      openapi: {
+        method: 'GET',
+        path: '/field/{fieldId}',
+        summary: 'Get field',
+        description: 'Returns a document or template field',
+        tags: ['Fields'],
+      },
+    })
+    .input(ZGetFieldQuerySchema)
+    .output(ZGetFieldByIdResponseSchema)
+    .query(async ({ input, ctx }) => {
+      const { fieldId, teamId } = input;
+
+      return await getFieldById({
+        userId: ctx.user.id,
+        teamId,
+        fieldId,
+      });
+    }),
+
+  /**
+   * @public
+   */
   addFields: authenticatedProcedure
+    .meta({
+      openapi: {
+        method: 'POST',
+        path: '/document/{documentId}/field',
+        summary: 'Set document fields',
+        tags: ['Fields'],
+      },
+    })
     .input(ZAddFieldsMutationSchema)
+    .output(ZSetFieldsForDocumentResponseSchema)
     .mutation(async ({ input, ctx }) => {
       const { documentId, fields } = input;
 
@@ -38,8 +84,20 @@ export const fieldRouter = router({
       });
     }),
 
+  /**
+   * @public
+   */
   addTemplateFields: authenticatedProcedure
+    .meta({
+      openapi: {
+        method: 'POST',
+        path: '/template/{templateId}/field',
+        summary: 'Set template fields',
+        tags: ['Fields'],
+      },
+    })
     .input(ZAddTemplateFieldsMutationSchema)
+    .output(ZSetFieldsForTemplateResponseSchema)
     .mutation(async ({ input, ctx }) => {
       const { templateId, fields } = input;
 
@@ -60,6 +118,9 @@ export const fieldRouter = router({
       });
     }),
 
+  /**
+   * @internal
+   */
   signFieldWithToken: procedure
     .input(ZSignFieldWithTokenMutationSchema)
     .mutation(async ({ input, ctx }) => {
@@ -76,6 +137,9 @@ export const fieldRouter = router({
       });
     }),
 
+  /**
+   * @internal
+   */
   removeSignedFieldWithToken: procedure
     .input(ZRemovedSignedFieldWithTokenMutationSchema)
     .mutation(async ({ input, ctx }) => {
@@ -87,40 +151,4 @@ export const fieldRouter = router({
         requestMetadata: extractNextApiRequestMetadata(ctx.req),
       });
     }),
-
-  getField: authenticatedProcedure.input(ZGetFieldQuerySchema).query(async ({ input, ctx }) => {
-    const { fieldId, teamId } = input;
-
-    return await getFieldById({
-      userId: ctx.user.id,
-      teamId,
-      fieldId,
-    });
-  }),
-
-  // This doesn't appear to be used anywhere, and it doesn't seem to support updating template fields
-  // so commenting this out for now.
-  // updateField: authenticatedProcedure
-  //   .input(ZUpdateFieldMutationSchema)
-  //   .mutation(async ({ input, ctx }) => {
-  //     try {
-  //       const { documentId, fieldId, fieldMeta, teamId } = input;
-
-  //       return await updateField({
-  //         userId: ctx.user.id,
-  //         teamId,
-  //         fieldId,
-  //         documentId,
-  //         requestMetadata: extractNextApiRequestMetadata(ctx.req),
-  //         fieldMeta: fieldMeta,
-  //       });
-  //     } catch (err) {
-  //       console.error(err);
-
-  //       throw new TRPCError({
-  //         code: 'BAD_REQUEST',
-  //         message: 'We were unable to set this field. Please try again later.',
-  //       });
-  //     }
-  //   }),
 });

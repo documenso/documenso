@@ -45,6 +45,7 @@ export default trpcNext.createNextApiHandler({
       logger.error(error, {
         method: path,
         context: {
+          source: 'trpc',
           appError: AppError.toJSON(appError),
         },
       });

@@ -37,10 +37,8 @@ export const DocumentPageViewRecentActivity = ({
     {
       documentId,
       filterForRecentActivity: true,
-      orderBy: {
-        column: 'createdAt',
-        direction: 'asc',
-      },
+      orderByColumn: 'createdAt',
+      orderByDirection: 'asc',
       perPage: 10,
     },
     {

@@ -1,7 +1,9 @@
 import { TRPCError } from '@trpc/server';
+import type { z } from 'zod';
 
 import type { RequestMetadata } from '@documenso/lib/universal/extract-request-metadata';
 import { prisma } from '@documenso/prisma';
+import { DocumentSchema } from '@documenso/prisma/generated/zod';
 
 import { DOCUMENT_AUDIT_LOG_TYPE } from '../../types/document-audit-logs';
 import { createDocumentAuditLogData } from '../../utils/document-audit-logs';
@@ -13,12 +15,16 @@ export type MoveDocumentToTeamOptions = {
   requestMetadata?: RequestMetadata;
 };
 
+export const ZMoveDocumentToTeamResponseSchema = DocumentSchema;
+
+export type TMoveDocumentToTeamResponse = z.infer<typeof ZMoveDocumentToTeamResponseSchema>;
+
 export const moveDocumentToTeam = async ({
   documentId,
   teamId,
   userId,
   requestMetadata,
-}: MoveDocumentToTeamOptions) => {
+}: MoveDocumentToTeamOptions): Promise<TMoveDocumentToTeamResponse> => {
   return await prisma.$transaction(async (tx) => {
     const user = await tx.user.findUniqueOrThrow({
       where: { id: userId },

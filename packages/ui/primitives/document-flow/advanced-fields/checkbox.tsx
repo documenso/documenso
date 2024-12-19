@@ -33,12 +33,12 @@ export const CheckboxField = ({ field }: CheckboxFieldProps) => {
         parsedFieldMeta.values.map((item: { value: string; checked: boolean }, index: number) => (
           <div key={index} className="flex items-center gap-x-1.5">
             <Checkbox
-              className="h-3 w-3"
+              className="dark:border-field-border h-3 w-3 bg-white"
               checkClassName="text-white"
               id={`checkbox-${index}`}
               checked={item.checked}
             />
-            <Label htmlFor={`checkbox-${index}`} className="text-xs">
+            <Label htmlFor={`checkbox-${index}`} className="text-xs font-normal text-black">
               {item.value}
             </Label>
           </div>

@@ -55,7 +55,7 @@ export type SignDirectTemplateFormProps = {
   flowStep: DocumentFlowStep;
   directRecipient: Recipient;
   directRecipientFields: Field[];
-  template: TemplateWithDetails;
+  template: Omit<TemplateWithDetails, 'User'>;
   onSubmit: (_data: DirectTemplateLocalField[]) => Promise<void>;
 };
 

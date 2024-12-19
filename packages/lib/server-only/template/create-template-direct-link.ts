@@ -1,13 +1,15 @@
 'use server';
 
 import { nanoid } from 'nanoid';
+import type { z } from 'zod';
 
 import {
   DIRECT_TEMPLATE_RECIPIENT_EMAIL,
   DIRECT_TEMPLATE_RECIPIENT_NAME,
 } from '@documenso/lib/constants/direct-templates';
 import { prisma } from '@documenso/prisma';
-import type { Recipient, TemplateDirectLink } from '@documenso/prisma/client';
+import type { Recipient } from '@documenso/prisma/client';
+import { TemplateDirectLinkSchema } from '@documenso/prisma/generated/zod';
 
 import { AppError, AppErrorCode } from '../../errors/app-error';
 
@@ -17,11 +19,17 @@ export type CreateTemplateDirectLinkOptions = {
   directRecipientId?: number;
 };
 
+export const ZCreateTemplateDirectLinkResponseSchema = TemplateDirectLinkSchema;
+
+export type TCreateTemplateDirectLinkResponse = z.infer<
+  typeof ZCreateTemplateDirectLinkResponseSchema
+>;
+
 export const createTemplateDirectLink = async ({
   templateId,
   userId,
   directRecipientId,
-}: CreateTemplateDirectLinkOptions): Promise<TemplateDirectLink> => {
+}: CreateTemplateDirectLinkOptions): Promise<TCreateTemplateDirectLinkResponse> => {
   const template = await prisma.template.findFirst({
     where: {
       id: templateId,

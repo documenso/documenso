@@ -2,16 +2,10 @@ import { z } from 'zod';
 
 import { SUPPORTED_LANGUAGE_CODES } from '@documenso/lib/constants/i18n';
 import { PROTECTED_TEAM_URLS } from '@documenso/lib/constants/teams';
+import { ZFindSearchParamsSchema } from '@documenso/lib/types/search-params';
 import { DocumentVisibility, TeamMemberRole } from '@documenso/prisma/client';
 
 import { ZUpdatePublicProfileMutationSchema } from '../profile-router/schema';
-
-// Consider refactoring to use ZBaseTableSearchParamsSchema.
-const GenericFindQuerySchema = z.object({
-  term: z.string().optional(),
-  page: z.number().min(1).optional(),
-  perPage: z.number().min(1).optional(),
-});
 
 /**
  * Restrict team URLs schema.
@@ -122,17 +116,17 @@ export const ZFindTeamInvoicesQuerySchema = z.object({
   teamId: z.number(),
 });
 
-export const ZFindTeamMemberInvitesQuerySchema = GenericFindQuerySchema.extend({
+export const ZFindTeamMemberInvitesQuerySchema = ZFindSearchParamsSchema.extend({
   teamId: z.number(),
 });
 
-export const ZFindTeamMembersQuerySchema = GenericFindQuerySchema.extend({
+export const ZFindTeamMembersQuerySchema = ZFindSearchParamsSchema.extend({
   teamId: z.number(),
 });
 
-export const ZFindTeamsQuerySchema = GenericFindQuerySchema;
+export const ZFindTeamsQuerySchema = ZFindSearchParamsSchema;
 
-export const ZFindTeamsPendingQuerySchema = GenericFindQuerySchema;
+export const ZFindTeamsPendingQuerySchema = ZFindSearchParamsSchema;
 
 export const ZGetTeamQuerySchema = z.object({
   teamId: z.number(),
