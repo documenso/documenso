@@ -57,27 +57,75 @@ export async function getSigningVolume({
                 deletedAt: null,
                 teamId: null,
               },
+              select: {
+                id: true,
+              },
+            },
+            _count: {
+              select: {
+                Document: {
+                  where: {
+                    status: DocumentStatus.COMPLETED,
+                    deletedAt: null,
+                    teamId: null,
+                  },
+                },
+              },
             },
           },
         },
         team: {
           select: {
             name: true,
-            document: {
-              where: {
-                status: DocumentStatus.COMPLETED,
-                deletedAt: null,
+            _count: {
+              select: {
+                document: {
+                  where: {
+                    status: DocumentStatus.COMPLETED,
+                    deletedAt: null,
+                  },
+                },
               },
             },
           },
         },
       },
-      orderBy:
-        sortBy === 'name'
-          ? [{ User: { name: sortOrder } }, { team: { name: sortOrder } }, { createdAt: 'desc' }]
-          : sortBy === 'createdAt'
-            ? [{ createdAt: sortOrder }]
-            : undefined,
+      orderBy: [
+        ...(sortBy === 'name'
+          ? [
+              {
+                User: {
+                  name: sortOrder as Prisma.SortOrder,
+                },
+              },
+              {
+                team: {
+                  name: sortOrder as Prisma.SortOrder,
+                },
+              },
+              { createdAt: 'desc' as Prisma.SortOrder },
+            ]
+          : []),
+        ...(sortBy === 'createdAt' ? [{ createdAt: sortOrder as Prisma.SortOrder }] : []),
+        ...(sortBy === 'signingVolume'
+          ? [
+              {
+                User: {
+                  Document: {
+                    _count: sortOrder as Prisma.SortOrder,
+                  },
+                },
+              },
+              {
+                team: {
+                  document: {
+                    _count: sortOrder as Prisma.SortOrder,
+                  },
+                },
+              },
+            ]
+          : []),
+      ] as Prisma.SubscriptionOrderByWithRelationInput[],
       skip: Math.max(page - 1, 0) * perPage,
       take: perPage,
     }),
@@ -89,8 +137,8 @@ export async function getSigningVolume({
   const leaderboardWithVolume: SigningVolume[] = subscriptions.map((subscription) => {
     const name =
       subscription.User?.name || subscription.team?.name || subscription.User?.email || 'Unknown';
-    const userSignedDocs = subscription.User?.Document?.length || 0;
-    const teamSignedDocs = subscription.team?.document?.length || 0;
+    const userSignedDocs = subscription.User?._count?.Document || 0;
+    const teamSignedDocs = subscription.team?._count?.document || 0;
     return {
       id: subscription.id,
       name,
@@ -99,14 +147,6 @@ export async function getSigningVolume({
       planId: subscription.planId,
     };
   });
-
-  if (sortBy === 'signingVolume') {
-    leaderboardWithVolume.sort((a, b) => {
-      return sortOrder === 'desc'
-        ? b.signingVolume - a.signingVolume
-        : a.signingVolume - b.signingVolume;
-    });
-  }
 
   return {
     leaderboard: leaderboardWithVolume,
