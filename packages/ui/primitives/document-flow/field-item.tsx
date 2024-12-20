@@ -192,17 +192,6 @@ export const FieldItem = ({
 
   const fixedSize = checkBoxHasValues || radioHasValues;
 
-  const resizeHandleStyles = {
-    bottom: { height: 8, bottom: -4, cursor: 'ns-resize' },
-    bottomLeft: { height: 8, width: 8, bottom: -4, left: -4, cursor: 'sw-resize' },
-    bottomRight: { height: 8, width: 8, bottom: -4, right: -4, cursor: 'se-resize' },
-    left: { width: 8, left: -4, cursor: 'ew-resize' },
-    right: { width: 8, right: -4, cursor: 'ew-resize' },
-    top: { height: 8, top: -4, cursor: 'ns-resize' },
-    topLeft: { height: 8, width: 8, top: -4, left: -4, cursor: 'nw-resize' },
-    topRight: { height: 8, width: 8, top: -4, right: -4, cursor: 'ne-resize' },
-  };
-
   return createPortal(
     <Rnd
       key={coords.pageX + coords.pageY + coords.pageHeight + coords.pageWidth}
@@ -225,7 +214,16 @@ export const FieldItem = ({
       onDragStart={() => onFieldActivate?.()}
       onResizeStart={() => onFieldActivate?.()}
       enableResizing={!fixedSize}
-      resizeHandleStyles={resizeHandleStyles}
+      resizeHandleStyles={{
+        bottom: { width: '100%', height: 8, bottom: -8, left: 0, cursor: 'ns-resize' },
+        bottomLeft: { width: 8, height: 8, left: -4, bottom: -4, cursor: 'sw-resize' },
+        bottomRight: { width: 8, height: 8, right: -4, bottom: -4, cursor: 'se-resize' },
+        left: { width: 8, height: '100%', top: 0, left: -4, cursor: 'ew-resize' },
+        right: { width: 8, height: '100%', top: 0, right: -4, cursor: 'ew-resize' },
+        top: { width: '100%', height: 8, top: -8, left: 0, cursor: 'ns-resize' },
+        topLeft: { width: 8, height: 8, left: -4, top: -4, cursor: 'nw-resize' },
+        topRight: { width: 8, height: 8, right: -4, top: -4, cursor: 'ne-resize' },
+      }}
       cancel=".resize-handle"
       onResizeStop={(_e, _d, ref) => {
         onFieldDeactivate?.();
