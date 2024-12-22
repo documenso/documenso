@@ -1,7 +1,7 @@
 import type { z } from 'zod';
 
 import { prisma } from '@documenso/prisma';
-import { RecipientSchema } from '@documenso/prisma/generated/zod';
+import { FieldSchema, RecipientSchema } from '@documenso/prisma/generated/zod';
 
 import { AppError, AppErrorCode } from '../../errors/app-error';
 
@@ -11,7 +11,9 @@ export type GetRecipientByIdOptions = {
   teamId?: number;
 };
 
-export const ZGetRecipientByIdResponseSchema = RecipientSchema;
+export const ZGetRecipientByIdResponseSchema = RecipientSchema.extend({
+  Field: FieldSchema.array(),
+});
 
 export type TGetRecipientByIdResponse = z.infer<typeof ZGetRecipientByIdResponseSchema>;
 
@@ -46,6 +48,9 @@ export const getRecipientById = async ({
               },
         ],
       },
+    },
+    include: {
+      Field: true,
     },
   });
 
