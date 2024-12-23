@@ -2,6 +2,7 @@ import { Plural, Trans, msg } from '@lingui/macro';
 import { useLingui } from '@lingui/react';
 import { DateTime } from 'luxon';
 import type Stripe from 'stripe';
+import { match } from 'ts-pattern';
 
 import { setupI18nSSR } from '@documenso/lib/client-only/providers/i18n.server';
 import { getRequiredServerComponentSession } from '@documenso/lib/next-auth/get-server-component-session';
@@ -44,15 +45,24 @@ export default async function TeamsSettingBillingPage({ params }: TeamsSettingsB
 
     const numberOfSeats = subscription.items.data[0].quantity ?? 0;
 
-    const formattedTeamMemberQuanity = (
-      <Plural value={numberOfSeats} one="# member" other="# members" />
-    );
-
     const formattedDate = DateTime.fromSeconds(subscription.current_period_end).toFormat(
       'LLL dd, yyyy',
     );
 
-    return _(msg`${formattedTeamMemberQuanity} • Monthly • Renews: ${formattedDate}`);
+    const subscriptionInterval = match(subscription?.items.data[0].plan.interval)
+      .with('year', () => _(msg`Yearly`))
+      .with('month', () => _(msg`Monthly`))
+      .otherwise(() => _(msg`Unknown`));
+
+    return (
+      <span>
+        <Plural value={numberOfSeats} one="# member" other="# members" />
+        {' • '}
+        <span>{subscriptionInterval}</span>
+        {' • '}
+        <Trans>Renews: {formattedDate}</Trans>
+      </span>
+    );
   };
 
   return (
@@ -66,10 +76,6 @@ export default async function TeamsSettingBillingPage({ params }: TeamsSettingsB
         <CardContent className="flex flex-row items-center justify-between p-4">
           <div className="flex flex-col text-sm">
             <p className="text-foreground font-semibold">
-              <Trans>Current plan: {teamSubscription ? 'Team' : 'Early Adopter Team'}</Trans>
-            </p>
-
-            <p className="text-muted-foreground mt-0.5">
               {formatTeamSubscriptionDetails(teamSubscription)}
             </p>
           </div>
