@@ -96,11 +96,11 @@ msgstr "Communauté"
 
 #: apps/marketing/src/app/(marketing)/open/monthly-completed-documents-chart.tsx:55
 msgid "Completed Documents"
-msgstr "Documents complets"
+msgstr "Documents finalisés"
 
 #: apps/marketing/src/app/(marketing)/open/monthly-completed-documents-chart.tsx:33
 msgid "Completed Documents per Month"
-msgstr "Documents complets par mois"
+msgstr "Documents finalisés par mois"
 
 #: apps/marketing/src/components/(marketing)/share-connect-paid-widget-bento.tsx:65
 msgid "Connections"
@@ -140,7 +140,7 @@ msgstr "Lien Direct"
 
 #: apps/marketing/src/app/(marketing)/pricing/page.tsx:181
 msgid "Documenso is a community effort to create an open and vibrant ecosystem around a tool, everybody is free to use and adapt. By being truly open we want to create trusted infrastructure for the future of the internet."
-msgstr "Documenso est un effort collectif pour créer un écosystème ouvert et dynamique autour d'un outil, tout le monde est libre de l'utiliser et de l'adapter. En étant vraiment ouvert, nous voulons créer une infrastructure de confiance pour l'avenir d'Internet."
+msgstr "Documenso est un projet communautaire pour créer un écosystème ouvert et dynamique autour d'un outil, tout le monde est libre de l'utiliser et de l'adapter. En étant vraiment ouvert, nous voulons créer une infrastructure de confiance pour l'avenir d'Internet."
 
 #: apps/marketing/src/app/(marketing)/open/typefully.tsx:28
 msgid "Documenso on X"
@@ -175,7 +175,7 @@ msgstr "Engagement"
 
 #: apps/marketing/src/app/(marketing)/singleplayer/client.tsx:64
 msgid "Enter your details."
-msgstr "Entrez vos détails."
+msgstr "Entrez vos informations."
 
 #: apps/marketing/src/components/(marketing)/enterprise.tsx:16
 msgid "Enterprise Compliance, License or Technical Needs?"
@@ -207,7 +207,7 @@ msgstr "Pour les entreprises cherchant à se développer au sein de plusieurs é
 
 #: apps/marketing/src/components/(marketing)/pricing-table.tsx:85
 msgid "For small teams and individuals with basic needs."
-msgstr "Pour les petites équipes et les individus ayant des besoins de base."
+msgstr "Pour les petites équipes et les particuliers ayant des besoins simples."
 
 #: apps/marketing/src/components/(marketing)/pricing-table.tsx:80
 msgid "Free"
@@ -248,19 +248,19 @@ msgstr "Obtenez les dernières nouvelles de Documenso, y compris les mises à jo
 
 #: apps/marketing/src/app/(marketing)/open/page.tsx:233
 msgid "GitHub: Total Merged PRs"
-msgstr "GitHub : Total des PRs fusionnées"
+msgstr "GitHub : Nombre total des PRs fusionnées"
 
 #: apps/marketing/src/app/(marketing)/open/page.tsx:251
 msgid "GitHub: Total Open Issues"
-msgstr "GitHub : Total des problèmes ouverts"
+msgstr "GitHub : Nombre total d'issues ouvertes"
 
 #: apps/marketing/src/app/(marketing)/open/page.tsx:225
 msgid "GitHub: Total Stars"
-msgstr "GitHub : Nombre total d'étoiles"
+msgstr "GitHub : Nombre total de stars"
 
 #: apps/marketing/src/app/(marketing)/open/salary-bands.tsx:23
 msgid "Global Salary Bands"
-msgstr "Bandes de salaire globales"
+msgstr "Fourchettes salariales mondiales"
 
 #: apps/marketing/src/app/(marketing)/open/page.tsx:261
 msgid "Growth"
@@ -420,7 +420,7 @@ msgstr "Économisez 60 $ ou 120 $"
 
 #: apps/marketing/src/app/(marketing)/pricing/page.tsx:109
 msgid "Securely. Our data centers are located in Frankfurt (Germany), giving us the best local privacy laws. We are very aware of the sensitive nature of our data and follow best practices to ensure the security and integrity of the data entrusted to us."
-msgstr "De manière sécurisée. Nos centres de données sont situés à Francfort (Allemagne), ce qui nous permet de bénéficier des meilleures lois locales sur la confidentialité. Nous sommes très conscients de la nature sensible de nos données et suivons les meilleures pratiques pour garantir la sécurité et l'intégrité des données qui nous sont confiées."
+msgstr "En toute sécurité. Nos centres de données sont situés à Francfort (Allemagne), ce qui nous permet de bénéficier des meilleures lois locales sur la confidentialité. Nous sommes très conscients de la nature sensible de nos données et suivons les meilleures pratiques pour garantir la sécurité et l'intégrité des données qui nous sont confiées."
 
 #: apps/marketing/src/components/(marketing)/share-connect-paid-widget-bento.tsx:37
 msgid "Send, connect, receive and embed everywhere."
@@ -464,11 +464,11 @@ msgstr "Intelligent."
 
 #: apps/marketing/src/components/(marketing)/hero.tsx:132
 msgid "Star on GitHub"
-msgstr "Étoile sur GitHub"
+msgstr "Star sur GitHub"
 
 #: apps/marketing/src/app/(marketing)/open/page.tsx:226
 msgid "Stars"
-msgstr "Étoiles"
+msgstr "Stars"
 
 #: apps/marketing/src/components/(marketing)/footer.tsx:40
 #: apps/marketing/src/components/(marketing)/mobile-navigation.tsx:44
@@ -499,7 +499,7 @@ msgstr "Boutique de modèles (Bientôt)."
 
 #: apps/marketing/src/app/(marketing)/pricing/page.tsx:138
 msgid "That's awesome. You can take a look at the current <0>Issues</0> and join our <1>Discord Community</1> to keep up to date, on what the current priorities are. In any case, we are an open community and welcome all input, technical and non-technical ❤️"
-msgstr "C'est génial. Vous pouvez consulter les <0>Problèmes</0> actuels et rejoindre notre <1>Communauté Discord</1> pour rester à jour sur ce qui est actuellement prioritaire. Dans tous les cas, nous sommes une communauté ouverte et accueillons toutes les contributions, techniques et non techniques ❤️"
+msgstr "C'est génial. Vous pouvez consulter les <0>Issues</0> actuelles et rejoindre notre <1>Communauté Discord</1> pour rester à jour sur ce qui est actuellement prioritaire. Dans tous les cas, nous sommes une communauté ouverte et accueillons toutes les contributions, techniques et non techniques ❤️"
 
 #: apps/marketing/src/app/(marketing)/open/page.tsx:293
 msgid "This page is evolving as we learn what makes a great signing company. We'll update it when we have more to share."
@@ -512,12 +512,12 @@ msgstr "Titre"
 #: apps/marketing/src/app/(marketing)/open/total-signed-documents-chart.tsx:30
 #: apps/marketing/src/app/(marketing)/open/total-signed-documents-chart.tsx:55
 msgid "Total Completed Documents"
-msgstr "Documents totalisés complétés"
+msgstr "Nombre total de documents finalisés"
 
 #: apps/marketing/src/app/(marketing)/open/page.tsx:267
 #: apps/marketing/src/app/(marketing)/open/page.tsx:268
 msgid "Total Customers"
-msgstr "Total des clients"
+msgstr "Nombre total de clients"
 
 #: apps/marketing/src/app/(marketing)/open/funding-raised.tsx:29
 msgid "Total Funding Raised"
@@ -527,7 +527,7 @@ msgstr "Total des fonds levés"
 #: apps/marketing/src/app/(marketing)/open/monthly-total-users-chart.tsx:43
 #: apps/marketing/src/app/(marketing)/open/monthly-total-users-chart.tsx:52
 msgid "Total Users"
-msgstr "Total des utilisateurs"
+msgstr "Nombre total d'utilisateurs"
 
 #: apps/marketing/src/components/(marketing)/open-build-template-bento.tsx:31
 msgid "Truly your own."
@@ -536,7 +536,7 @@ msgstr "Vraiment le vôtre."
 #: apps/marketing/src/components/(marketing)/callout.tsx:27
 #: apps/marketing/src/components/(marketing)/hero.tsx:123
 msgid "Try our Free Plan"
-msgstr "Essayez notre plan gratuit"
+msgstr "Essayez notre abonnement gratuit"
 
 #: apps/marketing/src/app/(marketing)/open/typefully.tsx:20
 msgid "Twitter Stats"
@@ -569,7 +569,7 @@ msgstr "Nous sommes heureux de vous aider à <0>support@documenso.com</0> ou <1>
 
 #: apps/marketing/src/app/(marketing)/pricing/page.tsx:89
 msgid "What is the difference between the plans?"
-msgstr "Quelle est la différence entre les plans ?"
+msgstr "Quelle est la différence entre les abonnements ?"
 
 #: apps/marketing/src/components/(marketing)/faster-smarter-beautiful-bento.tsx:47
 msgid "When it comes to sending or receiving a contract, you can count on lightning-fast speeds."
@@ -577,7 +577,7 @@ msgstr "En ce qui concerne l'envoi ou la réception d'un contrat, vous pouvez co
 
 #: apps/marketing/src/app/(marketing)/pricing/page.tsx:191
 msgid "Where can I get support?"
-msgstr "Où puis-je obtenir du support ?"
+msgstr "Où puis-je obtenir de l'aide ?"
 
 #: apps/marketing/src/app/(marketing)/pricing/page.tsx:177
 msgid "Why should I prefer Documenso over DocuSign or some other signing tool?"
@@ -597,7 +597,7 @@ msgstr "Oui ! Documenso est proposé sous la licence open source GNU AGPL V3. Ce
 
 #: apps/marketing/src/app/(marketing)/pricing/page.tsx:93
 msgid "You can self-host Documenso for free or use our ready-to-use hosted version. The hosted version comes with additional support, painless scalability and more. Early adopters will get access to all features we build this year, for no additional cost! Forever! Yes, that includes multiple users per account later. If you want Documenso for your enterprise, we are happy to talk about your needs."
-msgstr "Vous pouvez auto-héberger Documenso gratuitement ou utiliser notre version hébergée prête à l'emploi. La version hébergée est accompagnée d'une assistance supplémentaire, d'une montée en charge sans effort et d'autres avantages. Les premiers adoptants auront accès à toutes les fonctionnalités que nous construirons cette année, sans coût supplémentaire ! Pour toujours ! Oui, cela inclut plusieurs utilisateurs par compte à l'avenir. Si vous souhaitez Documenso pour votre entreprise, nous serons heureux de discuter de vos besoins."
+msgstr "Vous pouvez auto-héberger Documenso gratuitement ou utiliser notre version hébergée prête à l'emploi. La version hébergée est accompagnée d'une assistance supplémentaire, d'une montée en charge sans effort et d'autres avantages. Les premiers utilisateurs auront accès à toutes les fonctionnalités que nous construirons cette année, sans coût supplémentaire ! Pour toujours ! Oui, cela inclut plusieurs utilisateurs par compte à l'avenir. Si vous souhaitez Documenso pour votre entreprise, nous serons heureux de discuter de vos besoins."
 
 #: apps/marketing/src/components/(marketing)/carousel.tsx:272
 msgid "Your browser does not support the video tag."
