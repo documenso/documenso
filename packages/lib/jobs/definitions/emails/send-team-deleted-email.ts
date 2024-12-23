@@ -2,7 +2,6 @@ import { z } from 'zod';
 
 import { DocumentVisibility } from '@documenso/prisma/client';
 
-import { sendTeamDeleteEmail } from '../../../server-only/team/delete-team';
 import type { JobDefinition } from '../../client/_internal/job';
 
 const SEND_TEAM_DELETED_EMAIL_JOB_DEFINITION_ID = 'send.team-deleted.email';
@@ -37,6 +36,10 @@ const SEND_TEAM_DELETED_EMAIL_JOB_DEFINITION_SCHEMA = z.object({
   ),
 });
 
+export type TSendTeamDeletedEmailJobDefinition = z.infer<
+  typeof SEND_TEAM_DELETED_EMAIL_JOB_DEFINITION_SCHEMA
+>;
+
 export const SEND_TEAM_DELETED_EMAIL_JOB_DEFINITION = {
   id: SEND_TEAM_DELETED_EMAIL_JOB_DEFINITION_ID,
   name: 'Send Team Deleted Email',
@@ -46,19 +49,11 @@ export const SEND_TEAM_DELETED_EMAIL_JOB_DEFINITION = {
     schema: SEND_TEAM_DELETED_EMAIL_JOB_DEFINITION_SCHEMA,
   },
   handler: async ({ payload, io }) => {
-    const { team, members } = payload;
+    const handler = await import('./send-team-deleted-email.handler');
 
-    for (const member of members) {
-      await io.runTask(`send-team-deleted-email--${team.url}_${member.id}`, async () => {
-        await sendTeamDeleteEmail({
-          email: member.email,
-          team,
-          isOwner: member.id === team.ownerUserId,
-        });
-      });
-    }
+    await handler.run({ payload, io });
   },
 } as const satisfies JobDefinition<
   typeof SEND_TEAM_DELETED_EMAIL_JOB_DEFINITION_ID,
-  z.infer<typeof SEND_TEAM_DELETED_EMAIL_JOB_DEFINITION_SCHEMA>
+  TSendTeamDeletedEmailJobDefinition
 >;
