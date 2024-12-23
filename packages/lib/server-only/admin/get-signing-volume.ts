@@ -1,5 +1,5 @@
-import { prisma } from '@documenso/prisma';
-import { DocumentStatus, Prisma } from '@documenso/prisma/client';
+import { kyselyPrisma,sql } from '@documenso/prisma';
+import { DocumentStatus, SubscriptionStatus } from '@documenso/prisma/client';
 
 export type SigningVolume = {
   id: number;
@@ -24,92 +24,77 @@ export async function getSigningVolume({
   sortBy = 'signingVolume',
   sortOrder = 'desc',
 }: GetSigningVolumeOptions) {
-  const whereClause = Prisma.validator<Prisma.SubscriptionWhereInput>()({
-    status: 'ACTIVE',
-    OR: [
-      {
-        User: {
-          OR: [
-            { name: { contains: search, mode: 'insensitive' } },
-            { email: { contains: search, mode: 'insensitive' } },
-          ],
-        },
-      },
-      {
-        team: {
-          name: { contains: search, mode: 'insensitive' },
-        },
-      },
-    ],
-  });
+  const offset = Math.max(page - 1, 0) * perPage;
 
-  const [subscriptions, totalCount] = await Promise.all([
-    prisma.subscription.findMany({
-      where: whereClause,
-      include: {
-        User: {
-          select: {
-            name: true,
-            email: true,
-            Document: {
-              where: {
-                status: DocumentStatus.COMPLETED,
-                deletedAt: null,
-                teamId: null,
-              },
-            },
-          },
-        },
-        team: {
-          select: {
-            name: true,
-            document: {
-              where: {
-                status: DocumentStatus.COMPLETED,
-                deletedAt: null,
-              },
-            },
-          },
-        },
-      },
-      orderBy:
-        sortBy === 'name'
-          ? [{ User: { name: sortOrder } }, { team: { name: sortOrder } }, { createdAt: 'desc' }]
-          : sortBy === 'createdAt'
-            ? [{ createdAt: sortOrder }]
-            : undefined,
-      skip: Math.max(page - 1, 0) * perPage,
-      take: perPage,
-    }),
-    prisma.subscription.count({
-      where: whereClause,
-    }),
-  ]);
+  const baseQuery = kyselyPrisma.$kysely
+    .selectFrom('Subscription as s')
+    .leftJoin('User as u', 's.userId', 'u.id')
+    .leftJoin('Team as t', 's.teamId', 't.id')
+    .leftJoin('Document as ud', (join) =>
+      join
+        .onRef('u.id', '=', 'ud.userId')
+        .on('ud.status', '=', sql.lit(DocumentStatus.COMPLETED))
+        .on('ud.deletedAt', 'is', null)
+        .on('ud.teamId', 'is', null),
+    )
+    .leftJoin('Document as td', (join) =>
+      join
+        .onRef('t.id', '=', 'td.teamId')
+        .on('td.status', '=', sql.lit(DocumentStatus.COMPLETED))
+        .on('td.deletedAt', 'is', null),
+    )
+    // @ts-expect-error
+    .where(sql`s.status = ${SubscriptionStatus.ACTIVE}::"SubscriptionStatus"`)
+    .where((eb) =>
+      eb.or([
+        eb('u.name', 'ilike', `%${search}%`),
+        eb('u.email', 'ilike', `%${search}%`),
+        eb('t.name', 'ilike', `%${search}%`),
+      ]),
+    )
+    .select([
+      's.id as id',
+      's.createdAt as createdAt',
+      's.planId as planId',
+      sql<string>`COALESCE(u.name, t.name, u.email, 'Unknown')`.as('name'),
+      sql<number>`COUNT(DISTINCT ud.id) + COUNT(DISTINCT td.id)`.as('signingVolume'),
+    ])
+    .groupBy(['s.id', 'u.name', 't.name', 'u.email']);
 
-  const leaderboardWithVolume: SigningVolume[] = subscriptions.map((subscription) => {
-    const name =
-      subscription.User?.name || subscription.team?.name || subscription.User?.email || 'Unknown';
-    const userSignedDocs = subscription.User?.Document?.length || 0;
-    const teamSignedDocs = subscription.team?.document?.length || 0;
-    return {
-      id: subscription.id,
-      name,
-      signingVolume: userSignedDocs + teamSignedDocs,
-      createdAt: subscription.createdAt,
-      planId: subscription.planId,
-    };
-  });
+  const sortQuery = (() => {
+    switch (sortBy) {
+      case 'name':
+        return baseQuery.orderBy('name', sortOrder);
+      case 'createdAt':
+        return baseQuery.orderBy('createdAt', sortOrder);
+      case 'signingVolume':
+        return baseQuery.orderBy('signingVolume', sortOrder);
+      default:
+        return baseQuery.orderBy('signingVolume', 'desc');
+    }
+  })();
 
-  if (sortBy === 'signingVolume') {
-    leaderboardWithVolume.sort((a, b) => {
-      return sortOrder === 'desc'
-        ? b.signingVolume - a.signingVolume
-        : a.signingVolume - b.signingVolume;
-    });
-  }
+  const finalQuery = sortQuery.limit(perPage).offset(offset);
+
+  const countQuery = kyselyPrisma.$kysely
+    .selectFrom('Subscription as s')
+    .leftJoin('User as u', 's.userId', 'u.id')
+    .leftJoin('Team as t', 's.teamId', 't.id')
+    // @ts-expect-error
+    .where(sql`s.status = ${SubscriptionStatus.ACTIVE}::"SubscriptionStatus"`)
+    .where((eb) =>
+      eb.or([
+        eb('u.name', 'ilike', `%${search}%`),
+        eb('u.email', 'ilike', `%${search}%`),
+        eb('t.name', 'ilike', `%${search}%`),
+      ]),
+    )
+    .select(({ fn }) => [fn.countAll().as('count')]);
+
+  const [results, [{ count }]] = await Promise.all([finalQuery.execute(), countQuery.execute()]);
 
   return {
-    leaderboard: leaderboardWithVolume,
-    totalPages: Math.ceil(totalCount / perPage),
+    leaderboard: results,
+    totalPages: Math.ceil(Number(count) / perPage),
   };
 }

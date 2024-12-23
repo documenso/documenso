@@ -4,7 +4,7 @@ import { useEffect, useMemo, useState, useTransition } from 'react';
 
 import { msg } from '@lingui/macro';
 import { useLingui } from '@lingui/react';
-import { ChevronDownIcon as CaretSortIcon, Loader } from 'lucide-react';
+import { ChevronDownIcon, ChevronUpIcon, ChevronsUpDown, Loader } from 'lucide-react';
 
 import { useDebouncedValue } from '@documenso/lib/client-only/hooks/use-debounced-value';
 import { useUpdateSearchParams } from '@documenso/lib/client-only/hooks/use-update-search-params';
@@ -54,7 +54,15 @@ export const LeaderboardTable = ({
             onClick={() => handleColumnSort('name')}
           >
             {_(msg`Name`)}
-            <CaretSortIcon className="ml-2 h-4 w-4" />
+            {sortBy === 'name' ? (
+              sortOrder === 'asc' ? (
+                <ChevronUpIcon className="ml-2 h-4 w-4" />
+              ) : (
+                <ChevronDownIcon className="ml-2 h-4 w-4" />
+              )
+            ) : (
+              <ChevronsUpDown className="ml-2 h-4 w-4" />
+            )}
           </div>
         ),
         accessorKey: 'name',
@@ -80,7 +88,15 @@ export const LeaderboardTable = ({
             onClick={() => handleColumnSort('signingVolume')}
           >
             {_(msg`Signing Volume`)}
-            <CaretSortIcon className="ml-2 h-4 w-4" />
+            {sortBy === 'signingVolume' ? (
+              sortOrder === 'asc' ? (
+                <ChevronUpIcon className="ml-2 h-4 w-4" />
+              ) : (
+                <ChevronDownIcon className="ml-2 h-4 w-4" />
+              )
+            ) : (
+              <ChevronsUpDown className="ml-2 h-4 w-4" />
+            )}
           </div>
         ),
         accessorKey: 'signingVolume',
@@ -94,7 +110,15 @@ export const LeaderboardTable = ({
               onClick={() => handleColumnSort('createdAt')}
             >
               {_(msg`Created`)}
-              <CaretSortIcon className="ml-2 h-4 w-4" />
+              {sortBy === 'createdAt' ? (
+                sortOrder === 'asc' ? (
+                  <ChevronUpIcon className="ml-2 h-4 w-4" />
+                ) : (
+                  <ChevronDownIcon className="ml-2 h-4 w-4" />
+                )
+              ) : (
+                <ChevronsUpDown className="ml-2 h-4 w-4" />
+              )}
             </div>
           );
         },
@@ -102,7 +126,7 @@ export const LeaderboardTable = ({
         cell: ({ row }) => i18n.date(row.original.createdAt),
       },
     ] satisfies DataTableColumnDef<SigningVolume>[];
-  }, [sortOrder]);
+  }, [sortOrder, sortBy]);
 
   useEffect(() => {
     startTransition(() => {
