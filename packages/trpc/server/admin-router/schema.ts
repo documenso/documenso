@@ -48,6 +48,13 @@ export const ZAdminDeleteUserMutationSchema = z.object({
 
 export type TAdminDeleteUserMutationSchema = z.infer<typeof ZAdminDeleteUserMutationSchema>;
 
+export const ZAdminEnableUserMutationSchema = z.object({
+  id: z.number().min(1),
+  email: z.string().email(),
+});
+
+export type TAdminEnableUserMutationSchema = z.infer<typeof ZAdminEnableUserMutationSchema>;
+
 export const ZAdminDisableUserMutationSchema = z.object({
   id: z.number().min(1),
   email: z.string().email(),

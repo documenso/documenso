@@ -24,6 +24,7 @@ import { useToast } from '@documenso/ui/primitives/use-toast';
 
 import { DeleteUserDialog } from './delete-user-dialog';
 import { DisableUserDialog } from './disable-user-dialog';
+import { EnableUserDialog } from './enable-user-dialog';
 import { MultiSelectRoleCombobox } from './multiselect-role-combobox';
 
 const ZUserFormSchema = ZAdminUpdateProfileMutationSchema.omit({ id: true });
@@ -155,8 +156,12 @@ export default function UserPage({ params }: { params: { id: number } }) {
       <hr className="my-4" />
 
       <div className="flex flex-col items-center gap-4">
-        {user && <DeleteUserDialog user={user} />}
-        {user && <DisableUserDialog user={user} />}
+        {user && (
+          <>
+            <DeleteUserDialog user={user} />
+            {!user.disabled ? <DisableUserDialog user={user} /> : <EnableUserDialog user={user} />}
+          </>
+        )}
       </div>
     </div>
   );

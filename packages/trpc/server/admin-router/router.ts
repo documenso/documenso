@@ -8,6 +8,7 @@ import { superDeleteDocument } from '@documenso/lib/server-only/document/super-d
 import { upsertSiteSetting } from '@documenso/lib/server-only/site-settings/upsert-site-setting';
 import { deleteUser } from '@documenso/lib/server-only/user/delete-user';
 import { disableUser } from '@documenso/lib/server-only/user/disable-user';
+import { enableUser } from '@documenso/lib/server-only/user/enable-user';
 import { getUserById } from '@documenso/lib/server-only/user/get-user-by-id';
 import { extractNextApiRequestMetadata } from '@documenso/lib/universal/extract-request-metadata';
 import { DocumentStatus } from '@documenso/prisma/client';
@@ -17,6 +18,7 @@ import {
   ZAdminDeleteDocumentMutationSchema,
   ZAdminDeleteUserMutationSchema,
   ZAdminDisableUserMutationSchema,
+  ZAdminEnableUserMutationSchema,
   ZAdminFindDocumentsQuerySchema,
   ZAdminResealDocumentMutationSchema,
   ZAdminUpdateProfileMutationSchema,
@@ -71,6 +73,18 @@ export const adminRouter = router({
 
       return await sealDocument({ documentId: id, isResealing });
     }),
+
+  enableUser: adminProcedure.input(ZAdminEnableUserMutationSchema).mutation(async ({ input }) => {
+    const { id, email } = input;
+
+    const user = await getUserById({ id });
+
+    if (user.email !== email) {
+      throw new Error('Email does not match');
+    }
+
+    return await enableUser({ id });
+  }),
 
   disableUser: adminProcedure.input(ZAdminDisableUserMutationSchema).mutation(async ({ input }) => {
     const { id, email } = input;
