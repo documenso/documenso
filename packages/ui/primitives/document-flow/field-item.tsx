@@ -215,14 +215,10 @@ export const FieldItem = ({
       onResizeStart={() => onFieldActivate?.()}
       enableResizing={!fixedSize}
       resizeHandleStyles={{
-        bottom: { width: '100%', height: 8, bottom: -8, left: 0, cursor: 'ns-resize' },
-        bottomLeft: { width: 8, height: 8, left: -4, bottom: -4, cursor: 'sw-resize' },
-        bottomRight: { width: 8, height: 8, right: -4, bottom: -4, cursor: 'se-resize' },
-        left: { width: 8, height: '100%', top: 0, left: -4, cursor: 'ew-resize' },
-        right: { width: 8, height: '100%', top: 0, right: -4, cursor: 'ew-resize' },
-        top: { width: '100%', height: 8, top: -8, left: 0, cursor: 'ns-resize' },
-        topLeft: { width: 8, height: 8, left: -4, top: -4, cursor: 'nw-resize' },
-        topRight: { width: 8, height: 8, right: -4, top: -4, cursor: 'ne-resize' },
+        bottom: { bottom: -8, cursor: 'ns-resize' },
+        top: { top: -8, cursor: 'ns-resize' },
+        left: { cursor: 'ew-resize' },
+        right: { cursor: 'ew-resize' },
       }}
       cancel=".resize-handle"
       onResizeStop={(_e, _d, ref) => {
