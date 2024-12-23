@@ -23,7 +23,7 @@ import { getFieldsForDocument } from '@documenso/lib/server-only/field/get-field
 import { updateField } from '@documenso/lib/server-only/field/update-field';
 import { insertFormValuesInPdf } from '@documenso/lib/server-only/pdf/insert-form-values-in-pdf';
 import { deleteRecipient } from '@documenso/lib/server-only/recipient/delete-recipient';
-import { getRecipientById } from '@documenso/lib/server-only/recipient/get-recipient-by-id';
+import { getRecipientByIdV1Api } from '@documenso/lib/server-only/recipient/get-recipient-by-id-v1-api';
 import { getRecipientsForDocument } from '@documenso/lib/server-only/recipient/get-recipients-for-document';
 import { setRecipientsForDocument } from '@documenso/lib/server-only/recipient/set-recipients-for-document';
 import { updateRecipient } from '@documenso/lib/server-only/recipient/update-recipient';
@@ -999,7 +999,7 @@ export const ApiContractV1Implementation = createNextRoute(ApiContractV1, {
               throw new Error('Invalid page number');
             }
 
-            const recipient = await getRecipientById({
+            const recipient = await getRecipientByIdV1Api({
               id: Number(recipientId),
               documentId: Number(documentId),
             }).catch(() => null);
@@ -1144,7 +1144,7 @@ export const ApiContractV1Implementation = createNextRoute(ApiContractV1, {
       };
     }
 
-    const recipient = await getRecipientById({
+    const recipient = await getRecipientByIdV1Api({
       id: Number(recipientId),
       documentId: Number(documentId),
     }).catch(() => null);
@@ -1248,7 +1248,7 @@ export const ApiContractV1Implementation = createNextRoute(ApiContractV1, {
       };
     }
 
-    const recipient = await getRecipientById({
+    const recipient = await getRecipientByIdV1Api({
       id: Number(field.recipientId),
       documentId: Number(documentId),
     }).catch(() => null);

@@ -33,7 +33,8 @@ export const fieldRouter = router({
         method: 'GET',
         path: '/field/{fieldId}',
         summary: 'Get field',
-        description: 'Returns a document or template field',
+        description:
+          'Returns a single field. If you want to retrieve all the fields for a document or template, use the "Get Document" or "Get Template" request.',
         tags: ['Fields'],
       },
     })
@@ -119,7 +120,7 @@ export const fieldRouter = router({
     }),
 
   /**
-   * @internal
+   * @private
    */
   signFieldWithToken: procedure
     .input(ZSignFieldWithTokenMutationSchema)
@@ -138,7 +139,7 @@ export const fieldRouter = router({
     }),
 
   /**
-   * @internal
+   * @private
    */
   removeSignedFieldWithToken: procedure
     .input(ZRemovedSignedFieldWithTokenMutationSchema)

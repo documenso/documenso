@@ -445,7 +445,7 @@ export const templateRouter = router({
     }),
 
   /**
-   * @internal
+   * @private
    */
   updateTemplateTypedSignatureSettings: authenticatedProcedure
     .input(ZUpdateTemplateTypedSignatureSettingsMutationSchema)

@@ -6,6 +6,11 @@ import {
 } from '@documenso/lib/types/document-auth';
 import { RecipientRole } from '@documenso/prisma/client';
 
+export const ZGetRecipientQuerySchema = z.object({
+  recipientId: z.number(),
+  teamId: z.number().optional(),
+});
+
 export const ZAddSignersMutationSchema = z
   .object({
     documentId: z.number(),
