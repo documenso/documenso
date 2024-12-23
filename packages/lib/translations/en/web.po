@@ -5079,6 +5079,10 @@ msgstr "Your email is currently being used by team <0>{0}</0> ({1})."
 msgid "Your existing tokens"
 msgstr "Your existing tokens"
 
+<<<<<<< HEAD
+#: apps/web/src/components/forms/password.tsx:72
+#: apps/web/src/components/forms/reset-password.tsx:73
+=======
 #: apps/web/src/components/forms/password.tsx:84
 #: apps/web/src/components/forms/reset-password.tsx:87
 msgid "Your new password cannot be the same as your old password."
@@ -5086,6 +5090,7 @@ msgstr "Your new password cannot be the same as your old password."
 
 #: apps/web/src/components/forms/password.tsx:73
 #: apps/web/src/components/forms/reset-password.tsx:74
+>>>>>>> main
 msgid "Your password has been updated successfully."
 msgstr "Your password has been updated successfully."
 
