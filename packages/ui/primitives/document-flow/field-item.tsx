@@ -220,7 +220,6 @@ export const FieldItem = ({
         left: { cursor: 'ew-resize' },
         right: { cursor: 'ew-resize' },
       }}
-      cancel=".resize-handle"
       onResizeStop={(_e, _d, ref) => {
         onFieldDeactivate?.();
         onResize?.(ref);
