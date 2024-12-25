@@ -8,7 +8,7 @@ msgstr ""
 "Language: es\n"
 "Project-Id-Version: documenso-app\n"
 "Report-Msgid-Bugs-To: \n"
-"PO-Revision-Date: 2024-11-20 11:56\n"
+"PO-Revision-Date: 2024-12-08 04:04\n"
 "Last-Translator: \n"
 "Language-Team: Spanish\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
@@ -53,7 +53,7 @@ msgstr "{0} de {1} fila(s) seleccionada."
 #: packages/lib/jobs/definitions/emails/send-signing-email.ts:136
 #: packages/lib/server-only/document/resend-document.tsx:137
 msgid "{0} on behalf of \"{1}\" has invited you to {recipientActionVerb} the document \"{2}\"."
-msgstr ""
+msgstr "{0} en nombre de \"{1}\" te ha invitado a {recipientActionVerb} el documento \"{2}\"."
 
 #: packages/email/templates/document-invite.tsx:95
 msgid "{inviterName} <0>({inviterEmail})</0>"
@@ -89,11 +89,11 @@ msgstr "{inviterName} te ha eliminado del documento<0/>\"{documentName}\""
 
 #: packages/email/template-components/template-document-invite.tsx:63
 msgid "{inviterName} on behalf of \"{teamName}\" has invited you to {0}"
-msgstr ""
+msgstr "{inviterName} en nombre de \"{teamName}\" te ha invitado a {0}"
 
 #: packages/email/templates/document-invite.tsx:45
 msgid "{inviterName} on behalf of \"{teamName}\" has invited you to {action} {documentName}"
-msgstr ""
+msgstr "{inviterName} en nombre de \"{teamName}\" te ha invitado a {action} {documentName}"
 
 #: packages/email/templates/team-join.tsx:67
 msgid "{memberEmail} joined the following team"
@@ -1599,7 +1599,7 @@ msgstr "Actualizar"
 
 #: packages/ui/primitives/signature-pad/signature-pad.tsx:509
 msgid "Upload Signature"
-msgstr ""
+msgstr "Subir firma"
 
 #: packages/ui/primitives/document-dropzone.tsx:70
 msgid "Upload Template Document"
@@ -1763,3 +1763,4 @@ msgstr "Tu contraseña ha sido actualizada."
 #: packages/email/templates/team-delete.tsx:32
 msgid "Your team has been deleted"
 msgstr "Tu equipo ha sido eliminado"
+

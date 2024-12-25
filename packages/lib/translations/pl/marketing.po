@@ -8,7 +8,7 @@ msgstr ""
 "Language: pl\n"
 "Project-Id-Version: documenso-app\n"
 "Report-Msgid-Bugs-To: \n"
-"PO-Revision-Date: 2024-11-20 11:56\n"
+"PO-Revision-Date: 2024-12-08 04:04\n"
 "Last-Translator: \n"
 "Language-Team: Polish\n"
 "Plural-Forms: nplurals=4; plural=(n==1 ? 0 : (n%10>=2 && n%10<=4) && (n%100<12 || n%100>14) ? 1 : n!=1 && (n%10>=0 && n%10<=1) || (n%10>=5 && n%10<=9) || (n%100>=12 && n%100<=14) ? 2 : 3);\n"
@@ -24,7 +24,7 @@ msgstr "{0}"
 
 #: apps/marketing/src/components/(marketing)/pricing-table.tsx:100
 msgid "5 standard documents per month"
-msgstr "5 standard documents per month"
+msgstr "5 standardowych dokumentów miesięcznie"
 
 #: apps/marketing/src/components/(marketing)/pricing-table.tsx:198
 msgid "5 Users Included"
@@ -32,7 +32,7 @@ msgstr "5 użytkowników w cenie"
 
 #: apps/marketing/src/components/(marketing)/faster-smarter-beautiful-bento.tsx:34
 msgid "A 10x better signing experience."
-msgstr "10 razy lepsze doświadczenie podpisywania."
+msgstr "A 10x better signing experience."
 
 #: apps/marketing/src/app/(marketing)/singleplayer/client.tsx:51
 msgid "Add document"
@@ -100,7 +100,7 @@ msgstr "Zakończone dokumenty"
 
 #: apps/marketing/src/app/(marketing)/open/monthly-completed-documents-chart.tsx:33
 msgid "Completed Documents per Month"
-msgstr "Zakończone dokumenty na miesiąc"
+msgstr "Zakończone dokumenty miesięcznie"
 
 #: apps/marketing/src/components/(marketing)/share-connect-paid-widget-bento.tsx:65
 msgid "Connections"
@@ -460,7 +460,7 @@ msgstr "Zapisz się teraz"
 
 #: apps/marketing/src/components/(marketing)/faster-smarter-beautiful-bento.tsx:89
 msgid "Smart."
-msgstr "Inteligentny."
+msgstr "Inteligentnie."
 
 #: apps/marketing/src/components/(marketing)/hero.tsx:132
 msgid "Star on GitHub"
@@ -486,7 +486,7 @@ msgstr "Zespół"
 
 #: apps/marketing/src/components/(marketing)/pricing-table.tsx:195
 msgid "Team Inbox"
-msgstr "Skrzynka zespołowa"
+msgstr "Skrzynka odbiorcza zespołu"
 
 #: apps/marketing/src/components/(marketing)/carousel.tsx:28
 #: apps/marketing/src/components/(marketing)/pricing-table.tsx:162
