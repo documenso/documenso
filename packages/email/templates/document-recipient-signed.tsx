@@ -22,7 +22,9 @@ export const DocumentRecipientSignedEmailTemplate = ({
   const { _ } = useLingui();
   const branding = useBranding();
 
-  const previewText = msg`${recipientName} has signed ${documentName}`;
+  const recipientReference = recipientName || recipientEmail;
+
+  const previewText = msg`${recipientReference} has signed ${documentName}`;
 
   const getAssetUrl = (path: string) => {
     return new URL(path, assetBaseUrl).toString();

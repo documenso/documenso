@@ -78,6 +78,8 @@ export const SEND_RECIPIENT_SIGNED_EMAIL_JOB_DEFINITION = {
     const { email: recipientEmail, name: recipientName } = recipient;
     const { User: owner } = document;
 
+    const recipientReference = recipientName || recipientEmail;
+
     // Don't send notification if the owner is the one who signed
     if (owner.email === recipientEmail) {
       return;
@@ -116,7 +118,7 @@ export const SEND_RECIPIENT_SIGNED_EMAIL_JOB_DEFINITION = {
           name: FROM_NAME,
           address: FROM_ADDRESS,
         },
-        subject: i18n._(msg`${recipientName} has signed "${document.title}"`),
+        subject: i18n._(msg`${recipientReference} has signed "${document.title}"`),
         html,
         text,
       });

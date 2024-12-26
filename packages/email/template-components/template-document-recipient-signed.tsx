@@ -20,6 +20,8 @@ export const TemplateDocumentRecipientSigned = ({
     return new URL(path, assetBaseUrl).toString();
   };
 
+  const recipientReference = recipientName || recipientEmail;
+
   return (
     <>
       <TemplateDocumentImage className="mt-6" assetBaseUrl={assetBaseUrl} />
@@ -39,14 +41,12 @@ export const TemplateDocumentRecipientSigned = ({
 
         <Text className="text-primary mb-0 text-center text-lg font-semibold">
           <Trans>
-            {recipientName ? recipientName : recipientEmail} has signed "{documentName}"
+            {recipientReference} has signed "{documentName}"
           </Trans>
         </Text>
 
         <Text className="mx-auto mb-6 mt-1 max-w-[80%] text-center text-base text-slate-400">
-          <Trans>
-            {recipientName ? recipientName : recipientEmail} has completed signing the document.
-          </Trans>
+          <Trans>{recipientReference} has completed signing the document.</Trans>
         </Text>
       </Section>
     </>
