@@ -1,6 +1,10 @@
 import { completeDocumentWithToken } from '@documenso/lib/server-only/document/complete-document-with-token';
 import { rejectDocumentWithToken } from '@documenso/lib/server-only/document/reject-document-with-token';
 import {
+  ZGetRecipientByIdResponseSchema,
+  getRecipientById,
+} from '@documenso/lib/server-only/recipient/get-recipient-by-id';
+import {
   ZSetRecipientsForDocumentResponseSchema,
   setRecipientsForDocument,
 } from '@documenso/lib/server-only/recipient/set-recipients-for-document';
@@ -15,12 +19,39 @@ import {
   ZAddSignersMutationSchema,
   ZAddTemplateSignersMutationSchema,
   ZCompleteDocumentWithTokenMutationSchema,
+  ZGetRecipientQuerySchema,
   ZRejectDocumentWithTokenMutationSchema,
 } from './schema';
 
 export const recipientRouter = router({
   /**
-   * @internal
+   * @public
+   */
+  getRecipient: authenticatedProcedure
+    .meta({
+      openapi: {
+        method: 'GET',
+        path: '/recipient/{recipientId}',
+        summary: 'Get recipient',
+        description:
+          'Returns a single recipient. If you want to retrieve all the recipients for a document or template, use the "Get Document" or "Get Template" request.',
+        tags: ['Recipients'],
+      },
+    })
+    .input(ZGetRecipientQuerySchema)
+    .output(ZGetRecipientByIdResponseSchema)
+    .query(async ({ input, ctx }) => {
+      const { recipientId, teamId } = input;
+
+      return await getRecipientById({
+        userId: ctx.user.id,
+        teamId,
+        recipientId,
+      });
+    }),
+
+  /**
+   * @public
    */
   addSigners: authenticatedProcedure
     .meta({
@@ -53,7 +84,7 @@ export const recipientRouter = router({
     }),
 
   /**
-   * @internal
+   * @public
    */
   addTemplateSigners: authenticatedProcedure
     .meta({
@@ -85,7 +116,7 @@ export const recipientRouter = router({
     }),
 
   /**
-   * @internal
+   * @private
    */
   completeDocumentWithToken: procedure
     .input(ZCompleteDocumentWithTokenMutationSchema)
@@ -102,7 +133,7 @@ export const recipientRouter = router({
     }),
 
   /**
-   * @internal
+   * @private
    */
   rejectDocumentWithToken: procedure
     .input(ZRejectDocumentWithTokenMutationSchema)
