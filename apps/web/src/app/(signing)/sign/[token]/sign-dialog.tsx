@@ -1,8 +1,8 @@
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 
 import { Trans } from '@lingui/macro';
 
-import { isOptionalAdvancedField } from '@documenso/lib/utils/advanced-fields-helpers';
+import { fieldsContainUnsignedRequiredField } from '@documenso/lib/utils/advanced-fields-helpers';
 import type { Field } from '@documenso/prisma/client';
 import { RecipientRole } from '@documenso/prisma/client';
 import { Button } from '@documenso/ui/primitives/button';
@@ -37,13 +37,7 @@ export const SignDialog = ({
 }: SignDialogProps) => {
   const [showDialog, setShowDialog] = useState(false);
 
-  const isComplete = fields.every((field) => {
-    if (isOptionalAdvancedField(field)) {
-      return true;
-    }
-
-    return field.inserted;
-  });
+  const isComplete = useMemo(() => !fieldsContainUnsignedRequiredField(fields), [fields]);
 
   const handleOpenChange = (open: boolean) => {
     if (isSubmitting || !isComplete) {

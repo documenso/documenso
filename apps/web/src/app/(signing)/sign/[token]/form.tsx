@@ -11,7 +11,7 @@ import { useForm } from 'react-hook-form';
 import { useAnalytics } from '@documenso/lib/client-only/hooks/use-analytics';
 import type { DocumentAndSender } from '@documenso/lib/server-only/document/get-document-by-token';
 import type { TRecipientActionAuth } from '@documenso/lib/types/document-auth';
-import { isAdvancedField, isRequiredField } from '@documenso/lib/utils/advanced-fields-helpers';
+import { isFieldUnsignedAndRequired } from '@documenso/lib/utils/advanced-fields-helpers';
 import { sortFieldsByPosition, validateFieldsInserted } from '@documenso/lib/utils/fields';
 import { type Field, FieldType, type Recipient, RecipientRole } from '@documenso/prisma/client';
 import { trpc } from '@documenso/trpc/react';
@@ -59,16 +59,10 @@ export const SigningForm = ({
   const isSubmitting = formState.isSubmitting || formState.isSubmitSuccessful;
 
   const fieldsRequiringValidation = useMemo(
-    () =>
-      fields.filter((field) => {
-        if (isAdvancedField(field.type) && !isRequiredField(field)) {
-          return false;
-        }
-
-        return !field.inserted;
-      }),
+    () => fields.filter(isFieldUnsignedAndRequired),
     [fields],
   );
+
   const hasSignatureField = fields.some((field) => field.type === FieldType.SIGNATURE);
 
   const uninsertedFields = useMemo(() => {

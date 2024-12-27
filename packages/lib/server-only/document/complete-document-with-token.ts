@@ -1,6 +1,6 @@
 import { DOCUMENT_AUDIT_LOG_TYPE } from '@documenso/lib/types/document-audit-logs';
 import type { RequestMetadata } from '@documenso/lib/universal/extract-request-metadata';
-import { isAdvancedField, isRequiredField } from '@documenso/lib/utils/advanced-fields-helpers';
+import { fieldsContainUnsignedRequiredField } from '@documenso/lib/utils/advanced-fields-helpers';
 import { createDocumentAuditLogData } from '@documenso/lib/utils/document-audit-logs';
 import { prisma } from '@documenso/prisma';
 import {
@@ -86,15 +86,7 @@ export const completeDocumentWithToken = async ({
     },
   });
 
-  const hasUnsignedRequiredFields = fields.some((field) => {
-    if (!isAdvancedField(field.type) || isRequiredField(field)) {
-      return !field.inserted;
-    }
-
-    return false;
-  });
-
-  if (hasUnsignedRequiredFields) {
+  if (fieldsContainUnsignedRequiredField(fields)) {
     throw new Error(`Recipient ${recipient.id} has unsigned fields`);
   }
 
