@@ -23,6 +23,7 @@ import { DOCUMENT_AUDIT_LOG_TYPE } from '../../../types/document-audit-logs';
 import { ZWebhookDocumentSchema } from '../../../types/webhook-payload';
 import { getFile } from '../../../universal/upload/get-file';
 import { putPdfFile } from '../../../universal/upload/put-file';
+import { fieldsContainUnsignedRequiredField } from '../../../utils/advanced-fields-helpers';
 import { createDocumentAuditLogData } from '../../../utils/document-audit-logs';
 import type { JobRunIO } from '../../client/_internal/job';
 import type { TSealDocumentJobDefinition } from './seal-document';
@@ -105,8 +106,8 @@ export const run = async ({
     },
   });
 
-  if (fields.some((field) => !field.inserted)) {
-    throw new Error(`Document ${document.id} has unsigned fields`);
+  if (fieldsContainUnsignedRequiredField(fields)) {
+    throw new Error(`Document ${document.id} has unsigned required fields`);
   }
 
   if (isResealing) {
@@ -147,7 +148,9 @@ export const run = async ({
     }
 
     for (const field of fields) {
-      await insertFieldInPDF(pdfDoc, field);
+      if (field.inserted) {
+        await insertFieldInPDF(pdfDoc, field);
+      }
     }
 
     // Re-flatten the form to handle our checkbox and radio fields that
