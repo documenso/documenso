@@ -119,15 +119,15 @@ msgstr "<0>Expéditeur :</0> Tous"
 
 #: apps/web/src/app/(signing)/sign/[token]/sign-dialog.tsx:104
 msgid "<0>You are about to complete approving <1>\"{documentTitle}\"</1>.</0><2/> Are you sure?"
-msgstr ""
+msgstr "<0>Vous êtes sur le point de terminer l'approbation de <1>\"{documentTitle}\"</1>.</0><2/> Êtes-vous sûr ?"
 
 #: apps/web/src/app/(signing)/sign/[token]/sign-dialog.tsx:90
 msgid "<0>You are about to complete signing \"<1>{documentTitle}</1>\".</0><2/> Are you sure?"
-msgstr ""
+msgstr "<0>Vous êtes sur le point de terminer la signature de \"<1>{documentTitle}</1>\".</0><2/> Êtes-vous sûr ?"
 
 #: apps/web/src/app/(signing)/sign/[token]/sign-dialog.tsx:76
 msgid "<0>You are about to complete viewing \"<1>{documentTitle}</1>\".</0><2/> Are you sure?"
-msgstr ""
+msgstr "<0>Vous êtes sur le point de terminer la visualisation de \"<1>{documentTitle}</1>\".</0><2/> Êtes-vous sûr ?"
 
 #: apps/web/src/components/(dashboard)/settings/token/contants.ts:5
 msgid "1 month"
@@ -183,7 +183,7 @@ msgstr "Un moyen d'imprimer ou de télécharger des documents pour vos dossiers"
 
 #: apps/web/src/components/forms/token.tsx:127
 msgid "A new token was created successfully."
-msgstr "Un nouveau jeton a été créé avec succès."
+msgstr "Un nouveau token a été créé avec succès."
 
 #: apps/web/src/app/(unauthenticated)/check-email/page.tsx:24
 #: apps/web/src/components/forms/forgot-password.tsx:58
@@ -391,7 +391,7 @@ msgstr "Tous les modèles"
 
 #: apps/web/src/components/(dashboard)/period-selector/period-selector.tsx:55
 msgid "All Time"
-msgstr "Tout le temps"
+msgstr "Depuis toujours"
 
 #: apps/web/src/app/(dashboard)/settings/security/page.tsx:110
 msgid "Allows authenticating using biometrics, password managers, hardware keys, etc."
@@ -437,7 +437,7 @@ msgstr "Une erreur est survenue"
 
 #: apps/web/src/app/(dashboard)/templates/[id]/edit/edit-template.tsx:257
 msgid "An error occurred while adding fields."
-msgstr ""
+msgstr "Une erreur est survenue lors de l'ajout des champs."
 
 #: apps/web/src/app/(dashboard)/documents/[id]/edit-document.tsx:269
 #: apps/web/src/app/(dashboard)/templates/[id]/edit/edit-template.tsx:218
@@ -609,7 +609,7 @@ msgstr "Tout statut"
 #: apps/web/src/components/(teams)/settings/layout/desktop-nav.tsx:96
 #: apps/web/src/components/(teams)/settings/layout/mobile-nav.tsx:105
 msgid "API Tokens"
-msgstr "Jetons API"
+msgstr "Tokens API"
 
 #: apps/web/src/app/(dashboard)/admin/stats/page.tsx:74
 msgid "App Version"
@@ -632,7 +632,7 @@ msgstr "Approuvé"
 
 #: apps/web/src/components/(dashboard)/settings/token/delete-token-dialog.tsx:129
 msgid "Are you sure you want to delete this token?"
-msgstr "Êtes-vous sûr de vouloir supprimer ce jeton ?"
+msgstr "Êtes-vous sûr de vouloir supprimer ce token ?"
 
 #: apps/web/src/app/(signing)/sign/[token]/reject-document-dialog.tsx:120
 msgid "Are you sure you want to reject this document? This action cannot be undone."
@@ -1011,11 +1011,11 @@ msgstr "Contrôle le formatage du message qui sera envoyé lors de l'invitation 
 
 #: apps/web/src/app/(teams)/t/[teamUrl]/settings/preferences/document-preferences.tsx:263
 msgid "Controls whether the recipients can sign the documents using a typed signature. Enable or disable the typed signature globally."
-msgstr ""
+msgstr "Contrôle si les destinataires peuvent signer les documents à l'aide d'une signature dactylographiée. Active ou désactive globalement la signature dactylographiée."
 
 #: apps/web/src/app/(teams)/t/[teamUrl]/settings/preferences/document-preferences.tsx:293
 msgid "Controls whether the signing certificate will be included in the document when it is downloaded. The signing certificate can still be downloaded from the logs page separately."
-msgstr ""
+msgstr "Contrôle si le certificat de signature sera inclus dans le document lorsqu'il sera téléchargé. Le certificat de signature peut toujours être téléchargé séparément à partir de la page d'historique'."
 
 #: apps/web/src/components/document/document-recipient-link-copy-dialog.tsx:128
 msgid "Copied"
@@ -1050,7 +1050,7 @@ msgstr "Copier les liens de signature"
 
 #: apps/web/src/components/forms/token.tsx:288
 msgid "Copy token"
-msgstr "Copier le jeton"
+msgstr "Copier le token"
 
 #: apps/web/src/app/(profile)/profile-header.tsx:83
 #: apps/web/src/components/(dashboard)/settings/webhooks/create-webhook-dialog.tsx:245
@@ -1124,7 +1124,7 @@ msgstr "Créer le document comme en attente et prêt à signer."
 #: apps/web/src/components/forms/token.tsx:250
 #: apps/web/src/components/forms/token.tsx:259
 msgid "Create token"
-msgstr "Créer un jeton"
+msgstr "Créer un token"
 
 #: apps/web/src/components/(dashboard)/settings/webhooks/create-webhook-dialog.tsx:125
 msgid "Create webhook"
@@ -1181,7 +1181,7 @@ msgstr "Mot de passe actuel"
 
 #: apps/web/src/components/forms/password.tsx:81
 msgid "Current password is incorrect."
-msgstr ""
+msgstr "Le mot de passe actuel est incorrect."
 
 #: apps/web/src/app/(dashboard)/settings/billing/billing-plans.tsx:28
 msgid "Daily"
@@ -1284,11 +1284,11 @@ msgstr "Supprimer le membre de l'équipe"
 
 #: apps/web/src/app/(dashboard)/admin/documents/[id]/super-delete-document-dialog.tsx:88
 msgid "Delete the document. This action is irreversible so proceed with caution."
-msgstr "Supprimez le document. Cette action est irréversible, alors procédez avec prudence."
+msgstr "Supprimez le document. Cette action est irréversible, soyez prudent."
 
 #: apps/web/src/app/(dashboard)/admin/users/[id]/delete-user-dialog.tsx:87
 msgid "Delete the users account and all its contents. This action is irreversible and will cancel their subscription, so proceed with caution."
-msgstr "Supprimez le compte de l'utilisateur et tout son contenu. Cette action est irréversible et annulera son abonnement, alors procédez avec prudence."
+msgstr "Supprimez le compte de l'utilisateur et tout son contenu. Cette action est irréversible et annulera son abonnement, soyez prudent."
 
 #: apps/web/src/components/(dashboard)/settings/webhooks/delete-webhook-dialog.tsx:117
 msgid "Delete Webhook"
@@ -1296,7 +1296,7 @@ msgstr "Supprimer le Webhook"
 
 #: apps/web/src/app/(dashboard)/settings/profile/delete-account-dialog.tsx:75
 msgid "Delete your account and all its contents, including completed documents. This action is irreversible and will cancel your subscription, so proceed with caution."
-msgstr "Supprimez votre compte et tout son contenu, y compris les documents complétés. Cette action est irréversible et annulera votre abonnement, alors procédez avec prudence."
+msgstr "Supprimez votre compte et tout son contenu, y compris les documents complétés. Cette action est irréversible et annulera votre abonnement, soyez prudent."
 
 #: apps/web/src/app/(dashboard)/admin/documents/[id]/page.tsx:41
 #: apps/web/src/app/(internal)/%5F%5Fhtmltopdf/audit-log/page.tsx:97
@@ -1718,7 +1718,7 @@ msgstr "Activer la signature par lien direct"
 
 #: apps/web/src/app/(teams)/t/[teamUrl]/settings/preferences/document-preferences.tsx:248
 msgid "Enable Typed Signature"
-msgstr ""
+msgstr "Activer la signature dactylographiée"
 
 #: apps/web/src/app/(dashboard)/admin/site-settings/banner-form.tsx:123
 #: apps/web/src/app/(dashboard)/settings/webhooks/[id]/page.tsx:138
@@ -1739,7 +1739,7 @@ msgstr "Se termine le"
 
 #: apps/web/src/app/(teams)/t/[teamUrl]/settings/preferences/branding-preferences.tsx:295
 msgid "Enter your brand details"
-msgstr "Entrez les détails de votre marque"
+msgstr "Entrez les informations de votre marque"
 
 #: apps/web/src/app/(signing)/sign/[token]/complete/claim-account.tsx:136
 msgid "Enter your email"
@@ -1886,12 +1886,12 @@ msgstr "Retourner"
 #: apps/web/src/app/(unauthenticated)/verify-email/[token]/page.tsx:101
 #: apps/web/src/app/(unauthenticated)/verify-email/page.tsx:38
 msgid "Go back home"
-msgstr "Retourner à la maison"
+msgstr "Revenir au tableau de bord"
 
 #: apps/web/src/app/(signing)/sign/[token]/complete/page.tsx:224
 #: apps/web/src/app/(signing)/sign/[token]/no-longer-available.tsx:57
 msgid "Go Back Home"
-msgstr "Retourner à la maison"
+msgstr "Revenir au tableau de bord"
 
 #: apps/web/src/app/(dashboard)/admin/documents/[id]/admin-actions.tsx:76
 msgid "Go to owner"
@@ -1903,19 +1903,19 @@ msgstr "Allez à vos <0>paramètres de profil public</0> pour ajouter des docume
 
 #: apps/web/src/app/(signing)/sign/[token]/signing-page-view.tsx:107
 msgid "has invited you to approve this document"
-msgstr ""
+msgstr "t'a invité à approuver ce document"
 
 #: apps/web/src/app/(signing)/sign/[token]/signing-page-view.tsx:98
 msgid "has invited you to sign this document"
-msgstr ""
+msgstr "t'a invité à signer ce document"
 
 #: apps/web/src/app/(signing)/sign/[token]/signing-page-view.tsx:89
 msgid "has invited you to view this document"
-msgstr ""
+msgstr "t'a invité à voir ce document"
 
 #: apps/web/src/app/(dashboard)/settings/profile/page.tsx:29
 msgid "Here you can edit your personal details."
-msgstr "Ici, vous pouvez modifier vos coordonnées personnelles."
+msgstr "Ici, vous pouvez modifier vos informations personnelles."
 
 #: apps/web/src/app/(dashboard)/settings/security/page.tsx:35
 msgid "Here you can manage your password and security settings."
@@ -1982,7 +1982,7 @@ msgstr "Documents de la boîte de réception"
 
 #: apps/web/src/app/(teams)/t/[teamUrl]/settings/preferences/document-preferences.tsx:278
 msgid "Include the Signing Certificate in the Document"
-msgstr ""
+msgstr "Includez le certificat de signature dans le document"
 
 #: apps/web/src/app/(dashboard)/documents/[id]/document-page-view-information.tsx:53
 #: apps/web/src/app/(dashboard)/templates/[id]/template-page-view-information.tsx:50
@@ -2021,7 +2021,7 @@ msgstr "Token invalide"
 
 #: apps/web/src/components/forms/reset-password.tsx:84
 msgid "Invalid token provided. Please try again."
-msgstr ""
+msgstr "Le token fourni est invalide. Veuillez réessayer."
 
 #: apps/web/src/app/(unauthenticated)/team/invite/[token]/page.tsx:123
 msgid "Invitation accepted!"
@@ -2098,15 +2098,15 @@ msgstr "Langue"
 
 #: apps/web/src/components/(dashboard)/period-selector/period-selector.tsx:61
 msgid "Last 14 days"
-msgstr "Derniers 14 jours"
+msgstr "14 derniers jours"
 
 #: apps/web/src/components/(dashboard)/period-selector/period-selector.tsx:64
 msgid "Last 30 days"
-msgstr "Derniers 30 jours"
+msgstr "30 derniers jours"
 
 #: apps/web/src/components/(dashboard)/period-selector/period-selector.tsx:58
 msgid "Last 7 days"
-msgstr "Derniers 7 jours"
+msgstr "7 derniers jours"
 
 #: apps/web/src/app/(dashboard)/documents/[id]/document-page-view-information.tsx:41
 #: apps/web/src/app/(dashboard)/templates/[id]/template-page-view-information.tsx:38
@@ -2131,7 +2131,7 @@ msgstr "Dernière utilisation"
 
 #: apps/web/src/app/(dashboard)/admin/nav.tsx:93
 msgid "Leaderboard"
-msgstr ""
+msgstr "Classement"
 
 #: apps/web/src/components/(teams)/dialogs/leave-team-dialog.tsx:111
 #: apps/web/src/components/(teams)/tables/current-user-teams-data-table.tsx:115
@@ -2423,7 +2423,7 @@ msgstr "Aucun résultat trouvé."
 
 #: apps/web/src/app/(unauthenticated)/verify-email/[token]/page.tsx:37
 msgid "No token provided"
-msgstr "Aucun jeton fourni"
+msgstr "Aucun token fourni"
 
 #: apps/web/src/components/templates/manage-public-template-dialog.tsx:284
 msgid "No valid direct templates found"
@@ -2457,15 +2457,15 @@ msgstr "Numéro"
 
 #: apps/web/src/app/(signing)/sign/[token]/signing-page-view.tsx:103
 msgid "on behalf of \"{0}\" has invited you to approve this document"
-msgstr ""
+msgstr "au nom de \"{0}\" vous a invité à approuver ce document"
 
 #: apps/web/src/app/(signing)/sign/[token]/signing-page-view.tsx:94
 msgid "on behalf of \"{0}\" has invited you to sign this document"
-msgstr ""
+msgstr "au nom de \"{0}\" vous a invité à signer ce document"
 
 #: apps/web/src/app/(signing)/sign/[token]/signing-page-view.tsx:85
 msgid "on behalf of \"{0}\" has invited you to view this document"
-msgstr ""
+msgstr "au nom de \"{0}\" vous a invité à voir ce document"
 
 #: apps/web/src/components/(dashboard)/settings/webhooks/create-webhook-dialog.tsx:128
 msgid "On this page, you can create a new webhook."
@@ -2473,11 +2473,11 @@ msgstr "Sur cette page, vous pouvez créer un nouveau webhook."
 
 #: apps/web/src/app/(dashboard)/settings/tokens/page.tsx:26
 msgid "On this page, you can create new API tokens and manage the existing ones. <0/>Also see our <1>Documentation</1>."
-msgstr "Sur cette page, vous pouvez créer de nouveaux jetons API et gérer les existants. <0/>Voir aussi notre <1>Documentation</1>."
+msgstr "Sur cette page, vous pouvez créer de nouveaux tokens API et gérer les existants. <0/>Voir aussi notre <1>Documentation</1>."
 
 #: apps/web/src/app/(teams)/t/[teamUrl]/settings/tokens/page.tsx:60
 msgid "On this page, you can create new API tokens and manage the existing ones. <0/>You can view our swagger docs <1>here</1>"
-msgstr "Sur cette page, vous pouvez créer de nouveaux jetons API et gérer les existants. <0/>Vous pouvez voir notre documentation swagger <1>ici</1>"
+msgstr "Sur cette page, vous pouvez créer de nouveaux tokens API et gérer les existants. <0/>Vous pouvez voir notre documentation swagger <1>ici</1>"
 
 #: apps/web/src/app/(dashboard)/settings/webhooks/page.tsx:29
 #: apps/web/src/app/(teams)/t/[teamUrl]/settings/webhooks/page.tsx:34
@@ -2507,7 +2507,7 @@ msgstr "Seuls les responsables et au-dessus peuvent accéder et voir le document
 
 #: apps/web/src/components/forms/v2/signup.tsx:81
 msgid "Only subscribers can have a username shorter than 6 characters"
-msgstr ""
+msgstr "Seuls les abonnés peuvent avoir un nom d'utilisateur de moins de 6 caractères"
 
 #: apps/web/src/app/(profile)/p/[url]/not-found.tsx:19
 #: apps/web/src/app/(recipient)/d/[token]/not-found.tsx:19
@@ -2601,7 +2601,7 @@ msgstr "Mot de passe"
 #: apps/web/src/app/(signing)/sign/[token]/complete/claim-account.tsx:51
 #: apps/web/src/components/forms/v2/signup.tsx:72
 msgid "Password should not be common or based on personal information"
-msgstr ""
+msgstr "Le mot de passe ne doit pas être commun ou basé sur des informations personnelles"
 
 #: apps/web/src/components/forms/password.tsx:72
 #: apps/web/src/components/forms/reset-password.tsx:73
@@ -2680,12 +2680,12 @@ msgstr "Veuillez contacter le support si vous souhaitez annuler cette action."
 
 #: apps/web/src/components/forms/token.tsx:175
 msgid "Please enter a meaningful name for your token. This will help you identify it later."
-msgstr "Veuillez entrer un nom significatif pour votre jeton. Cela vous aidera à l'identifier plus tard."
+msgstr "Veuillez entrer un nom significatif pour votre token. Cela vous aidera à l'identifier plus tard."
 
 #: apps/web/src/app/(signing)/sign/[token]/complete/claim-account.tsx:41
 #: apps/web/src/components/forms/v2/signup.tsx:53
 msgid "Please enter a valid name."
-msgstr ""
+msgstr "Veuiillez entrer un nom valide."
 
 #: apps/web/src/app/(signing)/sign/[token]/form.tsx:142
 msgid "Please mark as viewed to complete"
@@ -2709,7 +2709,7 @@ msgstr "Veuillez noter que cette action est irréversible. Une fois confirmée, 
 
 #: apps/web/src/components/(dashboard)/settings/token/delete-token-dialog.tsx:133
 msgid "Please note that this action is irreversible. Once confirmed, your token will be permanently deleted."
-msgstr "Veuillez noter que cette action est irréversible. Une fois confirmée, votre jeton sera définitivement supprimé."
+msgstr "Veuillez noter que cette action est irréversible. Une fois confirmée, votre token sera définitivement supprimé."
 
 #: apps/web/src/components/(dashboard)/settings/webhooks/delete-webhook-dialog.tsx:121
 msgid "Please note that this action is irreversible. Once confirmed, your webhook will be permanently deleted."
@@ -2725,11 +2725,11 @@ msgstr "Veuillez fournir une raison"
 
 #: apps/web/src/components/forms/2fa/disable-authenticator-app-dialog.tsx:127
 msgid "Please provide a token from the authenticator, or a backup code. If you do not have a backup code available, please contact support."
-msgstr "Veuillez fournir un jeton de l'authentificateur, ou un code de secours. Si vous n'avez pas de code de secours disponible, veuillez contacter le support."
+msgstr "Veuillez fournir un token de l'authentificateur, ou un code de secours. Si vous n'avez pas de code de secours disponible, veuillez contacter le support."
 
 #: apps/web/src/components/forms/2fa/view-recovery-codes-dialog.tsx:120
 msgid "Please provide a token from your authenticator, or a backup code."
-msgstr "Veuillez fournir un jeton de votre authentificateur, ou un code de secours."
+msgstr "Veuillez fournir un token de votre authentificateur, ou un code de secours."
 
 #: apps/web/src/app/(signing)/sign/[token]/form.tsx:176
 msgid "Please review the document before signing."
@@ -2749,7 +2749,7 @@ msgstr "Veuillez réessayer plus tard."
 
 #: apps/web/src/app/(dashboard)/documents/delete-document-dialog.tsx:186
 msgid "Please type {0} to confirm"
-msgstr ""
+msgstr "Veuiillez taper {0} pour confirmer"
 
 #: apps/web/src/app/(dashboard)/settings/profile/delete-account-dialog.tsx:123
 msgid "Please type <0>{0}</0> to confirm."
@@ -2926,7 +2926,7 @@ msgstr "Vous vous souvenez de votre mot de passe ? <0>Connectez-vous</0>"
 #: apps/web/src/components/(teams)/tables/team-members-data-table.tsx:165
 #: apps/web/src/components/forms/avatar-image.tsx:166
 msgid "Remove"
-msgstr "Retirer"
+msgstr "Supprimer"
 
 #: apps/web/src/components/(teams)/dialogs/remove-team-email-dialog.tsx:108
 msgid "Remove team email"
@@ -3288,7 +3288,7 @@ msgstr "ID de signature"
 #: apps/web/src/app/embed/direct/[[...url]]/client.tsx:448
 #: apps/web/src/app/embed/sign/[[...url]]/client.tsx:327
 msgid "Signature is too small. Please provide a more complete signature."
-msgstr ""
+msgstr "La signature est trop petite. Veuillez fournir une signature plus grande."
 
 #: apps/web/src/app/(dashboard)/admin/stats/page.tsx:123
 msgid "Signatures Collected"
@@ -3337,11 +3337,11 @@ msgstr "Inscription en cours..."
 #: apps/web/src/app/(dashboard)/admin/leaderboard/data-table-leaderboard.tsx:82
 #: apps/web/src/app/(dashboard)/admin/leaderboard/page.tsx:46
 msgid "Signing Volume"
-msgstr ""
+msgstr "Volume de signatures"
 
 #: apps/web/src/components/forms/v2/signup.tsx:77
 msgid "Signups are disabled."
-msgstr ""
+msgstr "Les inscriptions sont désactivées."
 
 #: apps/web/src/app/(profile)/p/[url]/page.tsx:109
 msgid "Since {0}"
@@ -3810,15 +3810,15 @@ msgstr "Le modèle que vous recherchez a peut-être été désactivé, supprimé
 
 #: apps/web/src/components/forms/token.tsx:106
 msgid "The token was copied to your clipboard."
-msgstr "Le jeton a été copié dans votre presse-papiers."
+msgstr "Le token a été copié dans votre presse-papiers."
 
 #: apps/web/src/components/(dashboard)/settings/token/delete-token-dialog.tsx:88
 msgid "The token was deleted successfully."
-msgstr "Le jeton a été supprimé avec succès."
+msgstr "Le token a été supprimé avec succès."
 
 #: apps/web/src/app/(unauthenticated)/reset-password/page.tsx:24
 msgid "The token you have used to reset your password is either expired or it never existed. If you have still forgotten your password, please request a new reset link."
-msgstr "Le jeton que vous avez utilisé pour réinitialiser votre mot de passe a expiré ou n'a jamais existé. Si vous avez toujours oublié votre mot de passe, veuillez demander un nouveau lien de réinitialisation."
+msgstr "Le token que vous avez utilisé pour réinitialiser votre mot de passe a expiré ou n'a jamais existé. Si vous avez toujours oublié votre mot de passe, veuillez demander un nouveau lien de réinitialisation."
 
 #: apps/web/src/app/(dashboard)/settings/webhooks/[id]/page.tsx:124
 #: apps/web/src/app/(teams)/t/[teamUrl]/settings/webhooks/[id]/page.tsx:128
@@ -3931,11 +3931,11 @@ msgstr "Ce modèle n'a pas pu être supprimé pour le moment. Veuillez réessaye
 
 #: apps/web/src/app/(unauthenticated)/team/decline/[token]/page.tsx:43
 msgid "This token is invalid or has expired. No action is needed."
-msgstr "Ce jeton est invalide ou a expiré. Aucune action n'est nécessaire."
+msgstr "Ce token est invalide ou a expiré. Aucune action n'est nécessaire."
 
 #: apps/web/src/app/(unauthenticated)/team/invite/[token]/page.tsx:43
 msgid "This token is invalid or has expired. Please contact your team for a new invitation."
-msgstr "Ce jeton est invalide ou a expiré. Veuillez contacter votre équipe pour une nouvelle invitation."
+msgstr "Ce token est invalide ou a expiré. Veuillez contacter votre équipe pour une nouvelle invitation."
 
 #: apps/web/src/components/(teams)/dialogs/create-team-dialog.tsx:98
 #: apps/web/src/components/(teams)/forms/update-team-form.tsx:86
@@ -4020,36 +4020,36 @@ msgstr "Basculer l'interrupteur pour afficher votre profil au public."
 
 #: apps/web/src/components/forms/2fa/enable-authenticator-app-dialog.tsx:236
 msgid "Token"
-msgstr "Jeton"
+msgstr "Token"
 
 #: apps/web/src/components/forms/token.tsx:105
 msgid "Token copied to clipboard"
-msgstr "Jeton copié dans le presse-papiers"
+msgstr "Token copié dans le presse-papiers"
 
 #: apps/web/src/components/forms/token.tsx:126
 msgid "Token created"
-msgstr "Jeton créé"
+msgstr "Token créé"
 
 #: apps/web/src/components/(dashboard)/settings/token/delete-token-dialog.tsx:87
 msgid "Token deleted"
-msgstr "Jeton supprimé"
+msgstr "Token supprimé"
 
 #: apps/web/src/app/(dashboard)/settings/tokens/page.tsx:75
 #: apps/web/src/app/(teams)/t/[teamUrl]/settings/tokens/page.tsx:108
 msgid "Token doesn't have an expiration date"
-msgstr "Le jeton n'a pas de date d'expiration"
+msgstr "Le token n'a pas de date d'expiration"
 
 #: apps/web/src/components/forms/token.tsx:193
 msgid "Token expiration date"
-msgstr "Date d'expiration du jeton"
+msgstr "Date d'expiration du token"
 
 #: apps/web/src/components/forms/reset-password.tsx:83
 msgid "Token has expired. Please try again."
-msgstr ""
+msgstr "Le token a expiré. Veuillez réessayer."
 
 #: apps/web/src/components/forms/token.tsx:165
 msgid "Token name"
-msgstr "Nom du jeton"
+msgstr "Nom du token"
 
 #: apps/web/src/app/(dashboard)/admin/stats/page.tsx:65
 msgid "Total Documents"
@@ -4130,11 +4130,11 @@ msgstr "Tapez une commande ou recherchez..."
 
 #: apps/web/src/app/(signing)/sign/[token]/signature-field.tsx:134
 msgid "Typed signatures are not allowed. Please draw your signature."
-msgstr ""
+msgstr "Les signatures dactylographiées ne sont pas autorisées. Veuillez dessiner votre signature."
 
 #: apps/web/src/app/(unauthenticated)/verify-email/page.tsx:26
 msgid "Uh oh! Looks like you're missing a token"
-msgstr "Oh oh ! On dirait que vous manquez un jeton"
+msgstr "Oh oh ! On dirait qu'il vous manque un token"
 
 #: apps/web/src/components/(dashboard)/common/command-menu.tsx:303
 msgid "Unable to change the language at this time. Please try again later."
@@ -4146,7 +4146,7 @@ msgstr "Impossible de copier le code de récupération"
 
 #: apps/web/src/components/forms/token.tsx:110
 msgid "Unable to copy token"
-msgstr "Impossible de copier le jeton"
+msgstr "Impossible de copier le token"
 
 #: apps/web/src/app/(dashboard)/templates/template-direct-link-dialog.tsx:105
 msgid "Unable to create direct template access. Please try again later."
@@ -4358,7 +4358,7 @@ msgstr "Utilisateur"
 
 #: apps/web/src/components/forms/password.tsx:80
 msgid "User has no password."
-msgstr ""
+msgstr "L'utilisateur n'a pas de mot de passe."
 
 #: apps/web/src/app/(dashboard)/admin/subscriptions/page.tsx:41
 msgid "User ID"
@@ -4374,11 +4374,11 @@ msgstr "Paramètres de l'utilisateur"
 
 #: apps/web/src/components/forms/v2/signup.tsx:78
 msgid "User with this email already exists. Please use a different email address."
-msgstr ""
+msgstr "Un utilisateur avec cet e-mail existe déjà. Veuillez utiliser une adresse e-mail différente."
 
 #: apps/web/src/components/forms/v2/signup.tsx:63
 msgid "Username can only container alphanumeric characters and dashes."
-msgstr ""
+msgstr "Le nom d'utilisateur ne peut contenir que des caractères alphanumériques et des tirets."
 
 #: apps/web/src/app/(dashboard)/admin/nav.tsx:51
 msgid "Users"
@@ -4644,11 +4644,11 @@ msgstr "Nous avons envoyé un e-mail de confirmation pour vérification."
 
 #: apps/web/src/components/forms/v2/signup.tsx:61
 msgid "We need a username to create your profile"
-msgstr ""
+msgstr "Nous avons besoin d'un nom d'utilisateur pour créer votre profil"
 
 #: apps/web/src/components/forms/v2/signup.tsx:56
 msgid "We need your signature to sign documents"
-msgstr ""
+msgstr "Nous avons besoin de votre signature pour signer des documents"
 
 #: apps/web/src/components/forms/token.tsx:111
 msgid "We were unable to copy the token to your clipboard. Please try again."
@@ -4664,7 +4664,7 @@ msgstr "Nous n'avons pas pu créer de session de paiement. Veuillez réessayer o
 
 #: apps/web/src/components/forms/v2/signup.tsx:79
 msgid "We were unable to create your account. Please review the information you provided and try again."
-msgstr ""
+msgstr "Nous n'avons pas pu créer votre compte. Veuillez vérifier les informations que vous avez fournies et réessayer."
 
 #: apps/web/src/components/forms/2fa/disable-authenticator-app-dialog.tsx:105
 msgid "We were unable to disable two-factor authentication for your account. Please ensure that you have entered your password and backup code correctly and try again."
@@ -5089,12 +5089,12 @@ msgstr "Votre e-mail est actuellement utilisé par l'équipe <0>{0}</0> ({1})."
 #: apps/web/src/app/(dashboard)/settings/tokens/page.tsx:47
 #: apps/web/src/app/(teams)/t/[teamUrl]/settings/tokens/page.tsx:80
 msgid "Your existing tokens"
-msgstr "Vos jetons existants"
+msgstr "Vos tokens existants"
 
 #: apps/web/src/components/forms/password.tsx:84
 #: apps/web/src/components/forms/reset-password.tsx:87
 msgid "Your new password cannot be the same as your old password."
-msgstr ""
+msgstr "Ton nouveau mot de passe ne peut pas être le même que l'ancien."
 
 #: apps/web/src/components/forms/password.tsx:73
 #: apps/web/src/components/forms/reset-password.tsx:74
@@ -5160,13 +5160,13 @@ msgstr "Vos modèles ont été enregistrés avec succès."
 
 #: apps/web/src/app/(unauthenticated)/verify-email/[token]/page.tsx:89
 msgid "Your token has expired!"
-msgstr "Votre jeton a expiré !"
+msgstr "Votre token a expiré !"
 
 #: apps/web/src/components/forms/token.tsx:277
 msgid "Your token was created successfully! Make sure to copy it because you won't be able to see it again!"
-msgstr "Votre jeton a été créé avec succès ! Assurez-vous de le copier car vous ne pourrez plus le voir !"
+msgstr "Votre token a été créé avec succès ! Assurez-vous de le copier car vous ne pourrez plus le voir !"
 
 #: apps/web/src/app/(dashboard)/settings/tokens/page.tsx:53
 #: apps/web/src/app/(teams)/t/[teamUrl]/settings/tokens/page.tsx:86
 msgid "Your tokens will be shown here once you create them."
-msgstr "Vos jetons seront affichés ici une fois que vous les aurez créés."
+msgstr "Vos tokens seront affichés ici une fois que vous les aurez créés."
