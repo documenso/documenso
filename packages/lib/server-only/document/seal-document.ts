@@ -18,6 +18,7 @@ import { ZWebhookDocumentSchema } from '../../types/webhook-payload';
 import type { RequestMetadata } from '../../universal/extract-request-metadata';
 import { getFile } from '../../universal/upload/get-file';
 import { putPdfFile } from '../../universal/upload/put-file';
+import { fieldsContainUnsignedRequiredField } from '../../utils/advanced-fields-helpers';
 import { getCertificatePdf } from '../htmltopdf/get-certificate-pdf';
 import { flattenAnnotations } from '../pdf/flatten-annotations';
 import { flattenForm } from '../pdf/flatten-form';
@@ -92,8 +93,8 @@ export const sealDocument = async ({
     },
   });
 
-  if (fields.some((field) => !field.inserted)) {
-    throw new Error(`Document ${document.id} has unsigned fields`);
+  if (fieldsContainUnsignedRequiredField(fields)) {
+    throw new Error(`Document ${document.id} has unsigned required fields`);
   }
 
   if (isResealing) {
