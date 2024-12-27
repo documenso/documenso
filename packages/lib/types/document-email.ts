@@ -6,6 +6,7 @@ import { DocumentDistributionMethod } from '@documenso/prisma/client';
 export enum DocumentEmailEvents {
   RecipientSigningRequest = 'recipientSigningRequest',
   RecipientRemoved = 'recipientRemoved',
+  RecipientSigned = 'recipientSigned',
   DocumentPending = 'documentPending',
   DocumentCompleted = 'documentCompleted',
   DocumentDeleted = 'documentDeleted',
@@ -16,6 +17,7 @@ export const ZDocumentEmailSettingsSchema = z
   .object({
     recipientSigningRequest: z.boolean().default(true),
     recipientRemoved: z.boolean().default(true),
+    recipientSigned: z.boolean().default(true),
     documentPending: z.boolean().default(true),
     documentCompleted: z.boolean().default(true),
     documentDeleted: z.boolean().default(true),
@@ -25,6 +27,7 @@ export const ZDocumentEmailSettingsSchema = z
   .catch(() => ({
     recipientSigningRequest: true,
     recipientRemoved: true,
+    recipientSigned: true,
     documentPending: true,
     documentCompleted: true,
     documentDeleted: true,
@@ -48,6 +51,7 @@ export const extractDerivedDocumentEmailSettings = (
   return {
     recipientSigningRequest: false,
     recipientRemoved: false,
+    recipientSigned: false,
     documentPending: false,
     documentCompleted: false,
     documentDeleted: false,

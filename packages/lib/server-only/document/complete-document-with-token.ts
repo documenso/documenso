@@ -9,8 +9,8 @@ import {
   RecipientRole,
   SendStatus,
   SigningStatus,
+  WebhookTriggerEvents,
 } from '@documenso/prisma/client';
-import { WebhookTriggerEvents } from '@documenso/prisma/client';
 
 import { jobs } from '../../jobs/client';
 import type { TRecipientActionAuth } from '../../types/document-auth';
@@ -146,6 +146,14 @@ export const completeDocumentWithToken = async ({
         },
       }),
     });
+  });
+
+  await jobs.triggerJob({
+    name: 'send.recipient.signed.email',
+    payload: {
+      documentId: document.id,
+      recipientId: recipient.id,
+    },
   });
 
   const pendingRecipients = await prisma.recipient.findMany({
