@@ -1,7 +1,6 @@
 import { useMemo, useState } from 'react';
 
 import { Trans } from '@lingui/macro';
-import { useLingui } from '@lingui/react';
 import { DateTime } from 'luxon';
 import { match } from 'ts-pattern';
 
@@ -56,7 +55,7 @@ export type SignDirectTemplateFormProps = {
   flowStep: DocumentFlowStep;
   directRecipient: Recipient;
   directRecipientFields: Field[];
-  template: TemplateWithDetails;
+  template: Omit<TemplateWithDetails, 'User'>;
   onSubmit: (_data: DirectTemplateLocalField[]) => Promise<void>;
 };
 
@@ -72,9 +71,8 @@ export const SignDirectTemplateForm = ({
   template,
   onSubmit,
 }: SignDirectTemplateFormProps) => {
-  const { _ } = useLingui();
-
-  const { fullName, signature, setFullName, setSignature } = useRequiredSigningContext();
+  const { fullName, signature, signatureValid, setFullName, setSignature } =
+    useRequiredSigningContext();
 
   const [localFields, setLocalFields] = useState<DirectTemplateLocalField[]>(directRecipientFields);
   const [validateUninsertedFields, setValidateUninsertedFields] = useState(false);
@@ -102,9 +100,9 @@ export const SignDirectTemplateForm = ({
             created: new Date(),
             recipientId: 1,
             fieldId: 1,
-            signatureImageAsBase64: value.value,
-            typedSignature: null,
-          };
+            signatureImageAsBase64: value.value.startsWith('data:') ? value.value : null,
+            typedSignature: value.value.startsWith('data:') ? null : value.value,
+          } satisfies Signature;
         }
 
         if (field.type === FieldType.DATE) {
@@ -135,6 +133,8 @@ export const SignDirectTemplateForm = ({
     );
   };
 
+  const hasSignatureField = localFields.some((field) => field.type === FieldType.SIGNATURE);
+
   const uninsertedFields = useMemo(() => {
     return sortFieldsByPosition(localFields.filter((field) => !field.inserted));
   }, [localFields]);
@@ -146,6 +146,10 @@ export const SignDirectTemplateForm = ({
 
   const handleSubmit = async () => {
     setValidateUninsertedFields(true);
+
+    if (hasSignatureField && !signatureValid) {
+      return;
+    }
 
     const isFieldsValid = validateFieldsInserted(localFields);
 

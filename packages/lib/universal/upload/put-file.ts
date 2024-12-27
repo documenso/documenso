@@ -24,13 +24,20 @@ export const putPdfFile = async (file: File) => {
     () => false,
   );
 
-  // This will prevent uploading encrypted PDFs or anything that can't be opened.
-  if (!isEncryptedDocumentsAllowed) {
-    await PDFDocument.load(await file.arrayBuffer()).catch((e) => {
-      console.error(`PDF upload parse error: ${e.message}`);
+  const arrayBuffer = await file.arrayBuffer();
 
-      throw new AppError('INVALID_DOCUMENT_FILE');
-    });
+  const pdf = await PDFDocument.load(arrayBuffer).catch((e) => {
+    console.error(`PDF upload parse error: ${e.message}`);
+
+    throw new AppError('INVALID_DOCUMENT_FILE');
+  });
+
+  if (!isEncryptedDocumentsAllowed && pdf.isEncrypted) {
+    throw new AppError('INVALID_DOCUMENT_FILE');
+  }
+
+  if (!file.name.endsWith('.pdf')) {
+    file.name = `${file.name}.pdf`;
   }
 
   const { type, data } = await putFile(file);

@@ -6,6 +6,11 @@ import {
 } from '@documenso/lib/types/document-auth';
 import { RecipientRole } from '@documenso/prisma/client';
 
+export const ZGetRecipientQuerySchema = z.object({
+  recipientId: z.number(),
+  teamId: z.number().optional(),
+});
+
 export const ZAddSignersMutationSchema = z
   .object({
     documentId: z.number(),
@@ -68,4 +73,15 @@ export const ZCompleteDocumentWithTokenMutationSchema = z.object({
 
 export type TCompleteDocumentWithTokenMutationSchema = z.infer<
   typeof ZCompleteDocumentWithTokenMutationSchema
+>;
+
+export const ZRejectDocumentWithTokenMutationSchema = z.object({
+  token: z.string(),
+  documentId: z.number(),
+  reason: z.string(),
+  authOptions: ZRecipientActionAuthSchema.optional(),
+});
+
+export type TRejectDocumentWithTokenMutationSchema = z.infer<
+  typeof ZRejectDocumentWithTokenMutationSchema
 >;

@@ -1,3 +1,5 @@
+import { z } from 'zod';
+
 import { isUserEnterprise } from '@documenso/ee/server-only/util/is-document-enterprise';
 import {
   DIRECT_TEMPLATE_RECIPIENT_EMAIL,
@@ -6,6 +8,7 @@ import {
 import { prisma } from '@documenso/prisma';
 import type { Recipient } from '@documenso/prisma/client';
 import { RecipientRole } from '@documenso/prisma/client';
+import { RecipientSchema } from '@documenso/prisma/generated/zod';
 
 import { AppError, AppErrorCode } from '../../errors/app-error';
 import {
@@ -29,12 +32,20 @@ export type SetRecipientsForTemplateOptions = {
   }[];
 };
 
+export const ZSetRecipientsForTemplateResponseSchema = z.object({
+  recipients: RecipientSchema.array(),
+});
+
+export type TSetRecipientsForTemplateResponse = z.infer<
+  typeof ZSetRecipientsForTemplateResponseSchema
+>;
+
 export const setRecipientsForTemplate = async ({
   userId,
   teamId,
   templateId,
   recipients,
-}: SetRecipientsForTemplateOptions) => {
+}: SetRecipientsForTemplateOptions): Promise<TSetRecipientsForTemplateResponse> => {
   const template = await prisma.template.findFirst({
     where: {
       id: templateId,
@@ -72,10 +83,9 @@ export const setRecipientsForTemplate = async ({
     });
 
     if (!isDocumentEnterprise) {
-      throw new AppError(
-        AppErrorCode.UNAUTHORIZED,
-        'You do not have permission to set the action auth',
-      );
+      throw new AppError(AppErrorCode.UNAUTHORIZED, {
+        message: 'You do not have permission to set the action auth',
+      });
     }
   }
 
@@ -119,14 +129,15 @@ export const setRecipientsForTemplate = async ({
     );
 
     if (updatedDirectRecipient?.role === RecipientRole.CC) {
-      throw new AppError(AppErrorCode.INVALID_BODY, 'Cannot set direct recipient as CC');
+      throw new AppError(AppErrorCode.INVALID_BODY, {
+        message: 'Cannot set direct recipient as CC',
+      });
     }
 
     if (deletedDirectRecipient) {
-      throw new AppError(
-        AppErrorCode.INVALID_BODY,
-        'Cannot delete direct recipient while direct template exists',
-      );
+      throw new AppError(AppErrorCode.INVALID_BODY, {
+        message: 'Cannot delete direct recipient while direct template exists',
+      });
     }
   }
 
@@ -220,5 +231,7 @@ export const setRecipientsForTemplate = async ({
     return !isRemoved && !isUpdated;
   });
 
-  return [...filteredRecipients, ...persistedRecipients];
+  return {
+    recipients: [...filteredRecipients, ...persistedRecipients],
+  };
 };

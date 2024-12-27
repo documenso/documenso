@@ -117,7 +117,7 @@ export const ManagePublicTemplateDialog = ({
   });
 
   const { mutateAsync: updateTemplateSettings, isLoading: isUpdatingTemplateSettings } =
-    trpc.template.updateTemplateSettings.useMutation();
+    trpc.template.updateTemplate.useMutation();
 
   const setTemplateToPrivate = async (templateId: number) => {
     try {

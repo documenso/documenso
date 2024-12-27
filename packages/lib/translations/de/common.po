@@ -8,7 +8,7 @@ msgstr ""
 "Language: de\n"
 "Project-Id-Version: documenso-app\n"
 "Report-Msgid-Bugs-To: \n"
-"PO-Revision-Date: 2024-11-12 05:45\n"
+"PO-Revision-Date: 2024-11-20 11:56\n"
 "Last-Translator: \n"
 "Language-Team: German\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
@@ -30,19 +30,11 @@ msgstr "„{documentName}“ wurde unterschrieben"
 msgid "“{documentName}” was signed by all signers"
 msgstr "„{documentName}“ wurde von allen Unterzeichnern signiert"
 
-#: packages/lib/server-only/document/resend-document.tsx:109
-#~ msgid "{0}"
-#~ msgstr "{0}"
-
-#: packages/email/template-components/template-document-invite.tsx:80
-#~ msgid "{0} Document"
-#~ msgstr "{0} Document"
-
-#: packages/lib/jobs/definitions/emails/send-signing-email.ts:137
+#: packages/lib/jobs/definitions/emails/send-signing-email.handler.ts:125
 msgid "{0} has invited you to {recipientActionVerb} the document \"{1}\"."
 msgstr "{0} hat Sie eingeladen, das Dokument \"{1}\" {recipientActionVerb}."
 
-#: packages/lib/jobs/definitions/emails/send-signing-email.ts:130
+#: packages/lib/jobs/definitions/emails/send-signing-email.handler.ts:118
 msgid "{0} invited you to {recipientActionVerb} a document"
 msgstr "{0} hat dich eingeladen, ein Dokument {recipientActionVerb}"
 
@@ -58,16 +50,12 @@ msgstr "{0} hat das Team {teamName} bei Documenso verlassen"
 msgid "{0} of {1} row(s) selected."
 msgstr "{0} von {1} Zeile(n) ausgewählt."
 
-#: packages/lib/jobs/definitions/emails/send-signing-email.ts:136
+#: packages/lib/jobs/definitions/emails/send-signing-email.handler.ts:124
 #: packages/lib/server-only/document/resend-document.tsx:137
-msgid "{0} on behalf of {1} has invited you to {recipientActionVerb} the document \"{2}\"."
-msgstr "{0} hat dich im Namen von {1} eingeladen, das Dokument \"{2}\" {recipientActionVerb}."
+msgid "{0} on behalf of \"{1}\" has invited you to {recipientActionVerb} the document \"{2}\"."
+msgstr ""
 
-#: packages/email/template-components/template-document-invite.tsx:51
-#~ msgid "{0}<0/>\"{documentName}\""
-#~ msgstr "{0}<0/>\"{documentName}\""
-
-#: packages/email/templates/document-invite.tsx:94
+#: packages/email/templates/document-invite.tsx:95
 msgid "{inviterName} <0>({inviterEmail})</0>"
 msgstr "{inviterName} <0>({inviterEmail})</0>"
 
@@ -79,7 +67,7 @@ msgstr "{inviterName} hat das Dokument {documentName} storniert, du musst es nic
 msgid "{inviterName} has cancelled the document<0/>\"{documentName}\""
 msgstr "{inviterName} hat das Dokument<0/>\"{documentName}\" storniert"
 
-#: packages/email/template-components/template-document-invite.tsx:65
+#: packages/email/template-components/template-document-invite.tsx:75
 msgid "{inviterName} has invited you to {0}<0/>\"{documentName}\""
 msgstr "{inviterName} hat dich eingeladen, {0}<0/>\"{documentName}\""
 
@@ -87,7 +75,7 @@ msgstr "{inviterName} hat dich eingeladen, {0}<0/>\"{documentName}\""
 msgid "{inviterName} has invited you to {action} {documentName}"
 msgstr "{inviterName} hat dich eingeladen, {action} {documentName}"
 
-#: packages/email/templates/document-invite.tsx:106
+#: packages/email/templates/document-invite.tsx:108
 msgid "{inviterName} has invited you to {action} the document \"{documentName}\"."
 msgstr "{inviterName} hat Sie eingeladen, das Dokument \"{documentName}\" {action}."
 
@@ -99,17 +87,13 @@ msgstr "{inviterName} hat dich aus dem Dokument {documentName} entfernt."
 msgid "{inviterName} has removed you from the document<0/>\"{documentName}\""
 msgstr "{inviterName} hat dich aus dem Dokument<0/>\"{documentName}\" entfernt"
 
-#: packages/email/template-components/template-document-invite.tsx:53
-msgid "{inviterName} on behalf of {teamName} has invited you to {0}"
-msgstr "{inviterName} im Namen von {teamName} hat Sie eingeladen, {0}"
-
-#: packages/email/template-components/template-document-invite.tsx:49
-#~ msgid "{inviterName} on behalf of {teamName} has invited you to {0}<0/>\"{documentName}\""
-#~ msgstr "{inviterName} on behalf of {teamName} has invited you to {0}<0/>\"{documentName}\""
+#: packages/email/template-components/template-document-invite.tsx:63
+msgid "{inviterName} on behalf of \"{teamName}\" has invited you to {0}"
+msgstr ""
 
 #: packages/email/templates/document-invite.tsx:45
-msgid "{inviterName} on behalf of {teamName} has invited you to {action} {documentName}"
-msgstr "{inviterName} hat dich im Namen von {teamName} eingeladen, {action} {documentName}"
+msgid "{inviterName} on behalf of \"{teamName}\" has invited you to {action} {documentName}"
+msgstr ""
 
 #: packages/email/templates/team-join.tsx:67
 msgid "{memberEmail} joined the following team"
@@ -151,11 +135,11 @@ msgstr "{prefix} hat ein Feld entfernt"
 msgid "{prefix} removed a recipient"
 msgstr "{prefix} hat einen Empfänger entfernt"
 
-#: packages/lib/utils/document-audit-logs.ts:355
+#: packages/lib/utils/document-audit-logs.ts:365
 msgid "{prefix} resent an email to {0}"
 msgstr "{prefix} hat eine E-Mail an {0} erneut gesendet"
 
-#: packages/lib/utils/document-audit-logs.ts:356
+#: packages/lib/utils/document-audit-logs.ts:366
 msgid "{prefix} sent an email to {0}"
 msgstr "{prefix} hat eine E-Mail an {0} gesendet"
 
@@ -207,7 +191,31 @@ msgstr "{prefix} hat die Sichtbarkeit des Dokuments aktualisiert"
 msgid "{recipientName} {action} a document by using one of your direct links"
 msgstr "{recipientName} {action} ein Dokument, indem Sie einen Ihrer direkten Links verwenden"
 
-#: packages/email/template-components/template-document-invite.tsx:58
+#: packages/email/templates/document-rejected.tsx:27
+msgid "{recipientName} has rejected the document '{documentName}'"
+msgstr "{recipientName} hat das Dokument '{documentName}' abgelehnt"
+
+#: packages/email/template-components/template-document-recipient-signed.tsx:49
+msgid "{recipientReference} has completed signing the document."
+msgstr ""
+
+#: packages/lib/jobs/definitions/emails/send-recipient-signed-email.ts:121
+msgid "{recipientReference} has signed \"{0}\""
+msgstr ""
+
+#: packages/email/template-components/template-document-recipient-signed.tsx:43
+msgid "{recipientReference} has signed \"{documentName}\""
+msgstr ""
+
+#: packages/email/templates/document-recipient-signed.tsx:27
+msgid "{recipientReference} has signed {documentName}"
+msgstr ""
+
+#: packages/email/template-components/template-document-rejected.tsx:25
+msgid "{signerName} has rejected the document \"{documentName}\"."
+msgstr "{signerName} hat das Dokument \"{documentName}\" abgelehnt."
+
+#: packages/email/template-components/template-document-invite.tsx:68
 msgid "{teamName} has invited you to {0}"
 msgstr "{teamName} hat Sie eingeladen, {0}"
 
@@ -231,6 +239,10 @@ msgstr "{userName} hat das Dokument in CC gesetzt"
 msgid "{userName} completed their task"
 msgstr "{userName} hat ihre Aufgabe abgeschlossen"
 
+#: packages/lib/utils/document-audit-logs.ts:355
+msgid "{userName} rejected the document"
+msgstr "{userName} hat das Dokument abgelehnt"
+
 #: packages/lib/utils/document-audit-logs.ts:341
 msgid "{userName} signed the document"
 msgstr "{userName} hat das Dokument unterschrieben"
@@ -242,10 +254,6 @@ msgstr "{userName} hat das Dokument angesehen"
 #: packages/ui/primitives/data-table-pagination.tsx:41
 msgid "{visibleRows, plural, one {Showing # result.} other {Showing # results.}}"
 msgstr "{visibleRows, plural, one {Eine # Ergebnis wird angezeigt.} other {# Ergebnisse werden angezeigt.}}"
-
-#: packages/email/templates/document-invite.tsx:100
-#~ msgid "`${inviterName} has invited you to ${action} the document \"${documentName}\".`"
-#~ msgstr "`${inviterName} has invited you to ${action} the document \"${documentName}\".`"
 
 #: packages/email/templates/team-transfer-request.tsx:59
 msgid "<0>{senderName}</0> has requested that you take ownership of the following team"
@@ -297,7 +305,7 @@ msgstr "<0>Konto erforderlich</0> - Der Empfänger muss angemeldet sein, um das 
 msgid "<0>Require passkey</0> - The recipient must have an account and passkey configured via their settings"
 msgstr "<0>Passkey erforderlich</0> - Der Empfänger muss ein Konto haben und den Passkey über seine Einstellungen konfiguriert haben"
 
-#: packages/lib/jobs/definitions/emails/send-signing-email.ts:122
+#: packages/lib/jobs/definitions/emails/send-signing-email.handler.ts:110
 msgid "A document was created by your direct template that requires you to {recipientActionVerb} it."
 msgstr "Ein Dokument wurde von deiner direkten Vorlage erstellt, das erfordert, dass du {recipientActionVerb}."
 
@@ -313,7 +321,7 @@ msgstr "Ein Feld wurde entfernt"
 msgid "A field was updated"
 msgstr "Ein Feld wurde aktualisiert"
 
-#: packages/lib/jobs/definitions/emails/send-team-member-joined-email.ts:107
+#: packages/lib/jobs/definitions/emails/send-team-member-joined-email.handler.ts:98
 msgid "A new member has joined your team"
 msgstr "Ein neues Mitglied ist deinem Team beigetreten"
 
@@ -329,19 +337,15 @@ msgstr "Ein Empfänger wurde entfernt"
 msgid "A recipient was updated"
 msgstr "Ein Empfänger wurde aktualisiert"
 
-#: packages/lib/server-only/team/create-team-email-verification.ts:156
+#: packages/lib/server-only/team/create-team-email-verification.ts:159
 msgid "A request to use your email has been initiated by {0} on Documenso"
 msgstr "Eine Anfrage zur Verwendung Ihrer E-Mail wurde von {0} auf Documenso initiiert"
-
-#: packages/lib/server-only/team/create-team-email-verification.ts:142
-#~ msgid "A request to use your email has been initiated by {teamName} on Documenso"
-#~ msgstr "A request to use your email has been initiated by {teamName} on Documenso"
 
 #: packages/email/templates/team-join.tsx:31
 msgid "A team member has joined a team on Documenso"
 msgstr "Ein Teammitglied ist einem Team bei Documenso beigetreten"
 
-#: packages/lib/jobs/definitions/emails/send-team-member-left-email.ts:96
+#: packages/lib/jobs/definitions/emails/send-team-member-left-email.handler.ts:87
 msgid "A team member has left {0}"
 msgstr "Ein Teammitglied hat {0} verlassen"
 
@@ -376,12 +380,12 @@ msgstr "Übertragungsanfrage des Teams auf Documenso annehmen"
 msgid "Add a document"
 msgstr "Dokument hinzufügen"
 
-#: packages/ui/primitives/document-flow/add-settings.tsx:378
+#: packages/ui/primitives/document-flow/add-settings.tsx:390
 #: packages/ui/primitives/template-flow/add-template-settings.tsx:468
 msgid "Add a URL to redirect the user to once the document is signed"
 msgstr "Fügen Sie eine URL hinzu, um den Benutzer nach der Unterzeichnung des Dokuments weiterzuleiten"
 
-#: packages/ui/primitives/document-flow/add-settings.tsx:290
+#: packages/ui/primitives/document-flow/add-settings.tsx:302
 msgid "Add an external ID to the document. This can be used to identify the document in external systems."
 msgstr "Fügen Sie dem Dokument eine externe ID hinzu. Diese kann verwendet werden, um das Dokument in externen Systemen zu identifizieren."
 
@@ -398,19 +402,19 @@ msgstr "Weitere Option hinzufügen"
 msgid "Add another value"
 msgstr "Weiteren Wert hinzufügen"
 
-#: packages/ui/primitives/document-flow/add-signers.tsx:662
+#: packages/ui/primitives/document-flow/add-signers.tsx:691
 msgid "Add myself"
 msgstr "Mich selbst hinzufügen"
 
-#: packages/ui/primitives/template-flow/add-template-placeholder-recipients.tsx:637
+#: packages/ui/primitives/template-flow/add-template-placeholder-recipients.tsx:645
 msgid "Add Myself"
 msgstr "Mich hinzufügen"
 
-#: packages/ui/primitives/template-flow/add-template-placeholder-recipients.tsx:623
+#: packages/ui/primitives/template-flow/add-template-placeholder-recipients.tsx:631
 msgid "Add Placeholder Recipient"
 msgstr "Platzhalterempfänger hinzufügen"
 
-#: packages/ui/primitives/document-flow/add-signers.tsx:651
+#: packages/ui/primitives/document-flow/add-signers.tsx:680
 msgid "Add Signer"
 msgstr "Unterzeichner hinzufügen"
 
@@ -426,13 +430,13 @@ msgstr "Text zum Feld hinzufügen"
 msgid "Admin"
 msgstr "Admin"
 
-#: packages/ui/primitives/document-flow/add-settings.tsx:272
+#: packages/ui/primitives/document-flow/add-settings.tsx:284
 #: packages/ui/primitives/template-flow/add-template-settings.tsx:367
 msgid "Advanced Options"
 msgstr "Erweiterte Optionen"
 
-#: packages/ui/primitives/document-flow/add-fields.tsx:573
-#: packages/ui/primitives/template-flow/add-template-fields.tsx:406
+#: packages/ui/primitives/document-flow/add-fields.tsx:577
+#: packages/ui/primitives/template-flow/add-template-fields.tsx:415
 msgid "Advanced settings"
 msgstr "Erweiterte Einstellungen"
 
@@ -460,13 +464,9 @@ msgstr "Ein Fehler ist beim Laden des Dokuments aufgetreten."
 msgid "Approve"
 msgstr "Genehmigen"
 
-#: packages/email/template-components/template-document-invite.tsx:89
+#: packages/email/template-components/template-document-invite.tsx:106
 msgid "Approve Document"
 msgstr "Dokument genehmigen"
-
-#: packages/lib/constants/recipient-roles.ts:68
-#~ msgid "APPROVE_REQUEST"
-#~ msgstr "APPROVE_REQUEST"
 
 #: packages/lib/constants/recipient-roles.ts:9
 msgid "Approved"
@@ -488,11 +488,11 @@ msgstr "Genehmigung"
 msgid "Before you get started, please confirm your email address by clicking the button below:"
 msgstr "Bitte bestätige vor dem Start deine E-Mail-Adresse, indem du auf den Button unten klickst:"
 
-#: packages/ui/primitives/signature-pad/signature-pad.tsx:377
+#: packages/ui/primitives/signature-pad/signature-pad.tsx:531
 msgid "Black"
 msgstr "Schwarz"
 
-#: packages/ui/primitives/signature-pad/signature-pad.tsx:391
+#: packages/ui/primitives/signature-pad/signature-pad.tsx:545
 msgid "Blue"
 msgstr "Blau"
 
@@ -508,7 +508,7 @@ msgstr "Durch die Annahme dieser Anfrage gewähren Sie <0>{teamName}</0> Zugriff
 msgid "By accepting this request, you will take responsibility for any billing items associated with this team."
 msgstr "Indem du diese Anfrage annimmst, übernimmst du die Verantwortung für alle Abrechnungspunkte, die mit diesem Team verbunden sind."
 
-#: packages/ui/primitives/document-flow/field-item-advanced-settings.tsx:356
+#: packages/ui/primitives/document-flow/field-item-advanced-settings.tsx:357
 #: packages/ui/primitives/document-flow/send-document-action-dialog.tsx:58
 msgid "Cancel"
 msgstr "Abbrechen"
@@ -538,6 +538,10 @@ msgstr "Ccers"
 msgid "Character Limit"
 msgstr "Zeichenbeschränkung"
 
+#: packages/ui/primitives/document-flow/types.ts:58
+msgid "Checkbox"
+msgstr "Checkbox"
+
 #: packages/ui/primitives/document-flow/field-items-advanced-settings/checkbox-field.tsx:197
 msgid "Checkbox values"
 msgstr "Checkbox-Werte"
@@ -546,19 +550,20 @@ msgstr "Checkbox-Werte"
 msgid "Clear filters"
 msgstr "Filter löschen"
 
-#: packages/ui/primitives/signature-pad/signature-pad.tsx:411
+#: packages/ui/primitives/signature-pad/signature-pad.tsx:565
 msgid "Clear Signature"
 msgstr "Unterschrift löschen"
 
-#: packages/ui/primitives/document-flow/add-signature.tsx:394
+#: packages/ui/primitives/document-flow/add-signature.tsx:403
 msgid "Click to insert field"
-msgstr "Klicken, um das Feld einzufügen"
+msgstr "Klicken, um das Feld auszufüllen"
 
 #: packages/ui/primitives/document-flow/missing-signature-field-dialog.tsx:44
 msgid "Close"
 msgstr "Schließen"
 
 #: packages/email/template-components/template-document-completed.tsx:35
+#: packages/email/template-components/template-document-recipient-signed.tsx:37
 #: packages/email/template-components/template-document-self-signed.tsx:36
 #: packages/lib/constants/document.ts:10
 msgid "Completed"
@@ -573,8 +578,8 @@ msgstr "Abgeschlossenes Dokument"
 msgid "Configure Direct Recipient"
 msgstr "Direkten Empfänger konfigurieren"
 
-#: packages/ui/primitives/document-flow/add-fields.tsx:574
-#: packages/ui/primitives/template-flow/add-template-fields.tsx:407
+#: packages/ui/primitives/document-flow/add-fields.tsx:578
+#: packages/ui/primitives/template-flow/add-template-fields.tsx:416
 msgid "Configure the {0} field"
 msgstr "Konfigurieren Sie das Feld {0}"
 
@@ -586,11 +591,7 @@ msgstr "E-Mail bestätigen"
 msgid "Continue"
 msgstr "Fortsetzen"
 
-#: packages/email/template-components/template-document-invite.tsx:72
-#~ msgid "Continue by {0} the document."
-#~ msgstr "Continue by {0} the document."
-
-#: packages/email/template-components/template-document-invite.tsx:76
+#: packages/email/template-components/template-document-invite.tsx:86
 msgid "Continue by approving the document."
 msgstr "Fahre fort, indem du das Dokument genehmigst."
 
@@ -598,11 +599,11 @@ msgstr "Fahre fort, indem du das Dokument genehmigst."
 msgid "Continue by downloading the document."
 msgstr "Fahre fort, indem du das Dokument herunterlädst."
 
-#: packages/email/template-components/template-document-invite.tsx:74
+#: packages/email/template-components/template-document-invite.tsx:84
 msgid "Continue by signing the document."
 msgstr "Fahre fort, indem du das Dokument signierst."
 
-#: packages/email/template-components/template-document-invite.tsx:75
+#: packages/email/template-components/template-document-invite.tsx:85
 msgid "Continue by viewing the document."
 msgstr "Fahre fort, indem du das Dokument ansiehst."
 
@@ -631,17 +632,17 @@ msgstr "Erstelle ein <0>kostenfreies Konto</0>, um jederzeit auf deine unterzeic
 msgid "Create account"
 msgstr "Konto erstellen"
 
-#: packages/ui/primitives/document-flow/add-signature.tsx:360
+#: packages/ui/primitives/document-flow/add-signature.tsx:369
 msgid "Custom Text"
 msgstr "Benutzerdefinierter Text"
 
-#: packages/ui/primitives/document-flow/add-fields.tsx:927
+#: packages/ui/primitives/document-flow/add-fields.tsx:938
 #: packages/ui/primitives/document-flow/types.ts:53
-#: packages/ui/primitives/template-flow/add-template-fields.tsx:690
+#: packages/ui/primitives/template-flow/add-template-fields.tsx:733
 msgid "Date"
 msgstr "Datum"
 
-#: packages/ui/primitives/document-flow/add-settings.tsx:313
+#: packages/ui/primitives/document-flow/add-settings.tsx:325
 #: packages/ui/primitives/template-flow/add-template-settings.tsx:408
 msgid "Date Format"
 msgstr "Datumsformat"
@@ -654,12 +655,20 @@ msgstr "Ablehnen"
 msgid "Didn't request a password change? We are here to help you secure your account, just <0>contact us.</0>"
 msgstr "Hast du keinen Passwortwechsel angefordert? Wir helfen dir, dein Konto abzusichern, kontaktiere uns einfach <0>hier.</0>"
 
-#: packages/ui/primitives/template-flow/add-template-placeholder-recipients.tsx:570
+#: packages/ui/primitives/template-flow/add-template-placeholder-recipients.tsx:578
 msgid "Direct link receiver"
 msgstr "Empfänger des direkten Links"
 
+#: packages/lib/jobs/definitions/emails/send-rejection-emails.handler.ts:140
+msgid "Document \"{0}\" - Rejected by {1}"
+msgstr "Dokument \"{0}\" - Abgelehnt von {1}"
+
+#: packages/lib/jobs/definitions/emails/send-rejection-emails.handler.ts:100
+msgid "Document \"{0}\" - Rejection Confirmed"
+msgstr "Dokument \"{0}\" - Ablehnung Bestätigt"
+
 #: packages/ui/components/document/document-global-auth-access-select.tsx:62
-#: packages/ui/primitives/document-flow/add-settings.tsx:216
+#: packages/ui/primitives/document-flow/add-settings.tsx:227
 #: packages/ui/primitives/template-flow/add-template-settings.tsx:202
 msgid "Document access"
 msgstr "Dokumentenzugriff"
@@ -673,12 +682,13 @@ msgstr "Die Authentifizierung für den Dokumentenzugriff wurde aktualisiert"
 msgid "Document Cancelled"
 msgstr "Dokument storniert"
 
-#: packages/lib/utils/document-audit-logs.ts:359
-#: packages/lib/utils/document-audit-logs.ts:360
+#: packages/lib/utils/document-audit-logs.ts:369
+#: packages/lib/utils/document-audit-logs.ts:370
 msgid "Document completed"
 msgstr "Dokument abgeschlossen"
 
-#: packages/ui/components/document/document-email-checkboxes.tsx:168
+#: packages/ui/components/document/document-email-checkboxes.tsx:208
+#: packages/ui/components/document/document-email-checkboxes.tsx:286
 msgid "Document completed email"
 msgstr "E-Mail zum Abschluss des Dokuments"
 
@@ -687,7 +697,7 @@ msgid "Document created"
 msgstr "Dokument erstellt"
 
 #: packages/email/templates/document-created-from-direct-template.tsx:32
-#: packages/lib/server-only/template/create-document-from-direct-template.ts:567
+#: packages/lib/server-only/template/create-document-from-direct-template.ts:585
 msgid "Document created from direct template"
 msgstr "Dokument erstellt aus direkter Vorlage"
 
@@ -699,7 +709,7 @@ msgstr "Dokumenterstellung"
 msgid "Document deleted"
 msgstr "Dokument gelöscht"
 
-#: packages/ui/components/document/document-email-checkboxes.tsx:207
+#: packages/ui/components/document/document-email-checkboxes.tsx:247
 msgid "Document deleted email"
 msgstr "E-Mail zum Löschen des Dokuments"
 
@@ -724,9 +734,13 @@ msgstr "Dokument ins Team verschoben"
 msgid "Document opened"
 msgstr "Dokument geöffnet"
 
-#: packages/ui/components/document/document-email-checkboxes.tsx:128
+#: packages/ui/components/document/document-email-checkboxes.tsx:168
 msgid "Document pending email"
 msgstr "E-Mail über ausstehende Dokumente"
+
+#: packages/email/template-components/template-document-rejected.tsx:21
+msgid "Document Rejected"
+msgstr "Dokument Abgelehnt"
 
 #: packages/lib/utils/document-audit-logs.ts:330
 msgid "Document sent"
@@ -761,8 +775,8 @@ msgstr "Entwurf"
 msgid "Drag & drop your PDF here."
 msgstr "Ziehen Sie Ihr PDF hierher."
 
-#: packages/ui/primitives/document-flow/add-fields.tsx:1058
-#: packages/ui/primitives/template-flow/add-template-fields.tsx:820
+#: packages/ui/primitives/document-flow/add-fields.tsx:1069
+#: packages/ui/primitives/template-flow/add-template-fields.tsx:864
 msgid "Dropdown"
 msgstr "Dropdown"
 
@@ -771,14 +785,14 @@ msgid "Dropdown options"
 msgstr "Dropdown-Optionen"
 
 #: packages/lib/constants/document.ts:28
-#: packages/ui/primitives/document-flow/add-fields.tsx:875
-#: packages/ui/primitives/document-flow/add-signature.tsx:272
-#: packages/ui/primitives/document-flow/add-signers.tsx:500
-#: packages/ui/primitives/document-flow/add-signers.tsx:507
+#: packages/ui/primitives/document-flow/add-fields.tsx:886
+#: packages/ui/primitives/document-flow/add-signature.tsx:273
+#: packages/ui/primitives/document-flow/add-signers.tsx:512
+#: packages/ui/primitives/document-flow/add-signers.tsx:519
 #: packages/ui/primitives/document-flow/types.ts:54
-#: packages/ui/primitives/template-flow/add-template-fields.tsx:638
-#: packages/ui/primitives/template-flow/add-template-placeholder-recipients.tsx:463
-#: packages/ui/primitives/template-flow/add-template-placeholder-recipients.tsx:470
+#: packages/ui/primitives/template-flow/add-template-fields.tsx:681
+#: packages/ui/primitives/template-flow/add-template-placeholder-recipients.tsx:471
+#: packages/ui/primitives/template-flow/add-template-placeholder-recipients.tsx:478
 msgid "Email"
 msgstr "E-Mail"
 
@@ -790,15 +804,15 @@ msgstr "E-Mail ist erforderlich"
 msgid "Email Options"
 msgstr "E-Mail-Optionen"
 
-#: packages/lib/utils/document-audit-logs.ts:353
+#: packages/lib/utils/document-audit-logs.ts:363
 msgid "Email resent"
 msgstr "E-Mail erneut gesendet"
 
-#: packages/lib/utils/document-audit-logs.ts:353
+#: packages/lib/utils/document-audit-logs.ts:363
 msgid "Email sent"
 msgstr "E-Mail gesendet"
 
-#: packages/ui/primitives/document-flow/add-fields.tsx:1123
+#: packages/ui/primitives/document-flow/add-fields.tsx:1134
 msgid "Empty field"
 msgstr "Leeres Feld"
 
@@ -807,11 +821,12 @@ msgid "Enable Direct Link Signing"
 msgstr "Direktlink-Signierung aktivieren"
 
 #: packages/ui/primitives/document-flow/add-signers.tsx:401
-#: packages/ui/primitives/template-flow/add-template-placeholder-recipients.tsx:362
+#: packages/ui/primitives/template-flow/add-template-placeholder-recipients.tsx:370
 msgid "Enable signing order"
 msgstr "Aktiviere die Signaturreihenfolge"
 
-#: packages/ui/primitives/document-flow/add-fields.tsx:795
+#: packages/ui/primitives/document-flow/add-fields.tsx:806
+#: packages/ui/primitives/template-flow/add-template-fields.tsx:601
 msgid "Enable Typed Signatures"
 msgstr "Aktivieren Sie getippte Unterschriften"
 
@@ -819,17 +834,17 @@ msgstr "Aktivieren Sie getippte Unterschriften"
 msgid "Enter password"
 msgstr "Passwort eingeben"
 
-#: packages/ui/primitives/document-flow/field-item-advanced-settings.tsx:257
+#: packages/ui/primitives/document-flow/field-item-advanced-settings.tsx:258
 #: packages/ui/primitives/pdf-viewer.tsx:166
 msgid "Error"
 msgstr "Fehler"
 
-#: packages/ui/primitives/document-flow/add-settings.tsx:283
+#: packages/ui/primitives/document-flow/add-settings.tsx:295
 #: packages/ui/primitives/template-flow/add-template-settings.tsx:378
 msgid "External ID"
 msgstr "Externe ID"
 
-#: packages/ui/primitives/document-flow/field-item-advanced-settings.tsx:258
+#: packages/ui/primitives/document-flow/field-item-advanced-settings.tsx:259
 msgid "Failed to save settings."
 msgstr "Einstellungen konnten nicht gespeichert werden."
 
@@ -899,7 +914,7 @@ msgstr "Globale Empfängerauthentifizierung"
 msgid "Go Back"
 msgstr "Zurück"
 
-#: packages/ui/primitives/signature-pad/signature-pad.tsx:398
+#: packages/ui/primitives/signature-pad/signature-pad.tsx:552
 msgid "Green"
 msgstr "Grün"
 
@@ -950,7 +965,7 @@ msgstr "Tritt {teamName} auf Documenso bei"
 msgid "Label"
 msgstr "Beschriftung"
 
-#: packages/ui/primitives/document-flow/add-settings.tsx:176
+#: packages/ui/primitives/document-flow/add-settings.tsx:187
 #: packages/ui/primitives/template-flow/add-template-settings.tsx:162
 msgid "Language"
 msgstr "Sprache"
@@ -986,14 +1001,14 @@ msgstr "Nachricht <0>(Optional)</0>"
 msgid "Min"
 msgstr "Min"
 
-#: packages/ui/primitives/document-flow/add-fields.tsx:901
-#: packages/ui/primitives/document-flow/add-signature.tsx:298
-#: packages/ui/primitives/document-flow/add-signers.tsx:535
-#: packages/ui/primitives/document-flow/add-signers.tsx:541
+#: packages/ui/primitives/document-flow/add-fields.tsx:912
+#: packages/ui/primitives/document-flow/add-signature.tsx:299
+#: packages/ui/primitives/document-flow/add-signers.tsx:550
+#: packages/ui/primitives/document-flow/add-signers.tsx:556
 #: packages/ui/primitives/document-flow/types.ts:55
-#: packages/ui/primitives/template-flow/add-template-fields.tsx:664
-#: packages/ui/primitives/template-flow/add-template-placeholder-recipients.tsx:498
-#: packages/ui/primitives/template-flow/add-template-placeholder-recipients.tsx:504
+#: packages/ui/primitives/template-flow/add-template-fields.tsx:707
+#: packages/ui/primitives/template-flow/add-template-placeholder-recipients.tsx:506
+#: packages/ui/primitives/template-flow/add-template-placeholder-recipients.tsx:512
 msgid "Name"
 msgstr "Name"
 
@@ -1009,8 +1024,8 @@ msgstr "Muss unterzeichnen"
 msgid "Needs to view"
 msgstr "Muss sehen"
 
-#: packages/ui/primitives/document-flow/add-fields.tsx:686
-#: packages/ui/primitives/template-flow/add-template-fields.tsx:504
+#: packages/ui/primitives/document-flow/add-fields.tsx:697
+#: packages/ui/primitives/template-flow/add-template-fields.tsx:520
 msgid "No recipient matching this description was found."
 msgstr "Kein passender Empfänger mit dieser Beschreibung gefunden."
 
@@ -1018,8 +1033,8 @@ msgstr "Kein passender Empfänger mit dieser Beschreibung gefunden."
 msgid "No recipients"
 msgstr "Keine Empfänger"
 
-#: packages/ui/primitives/document-flow/add-fields.tsx:701
-#: packages/ui/primitives/template-flow/add-template-fields.tsx:519
+#: packages/ui/primitives/document-flow/add-fields.tsx:712
+#: packages/ui/primitives/template-flow/add-template-fields.tsx:535
 msgid "No recipients with this role"
 msgstr "Keine Empfänger mit dieser Rolle"
 
@@ -1047,9 +1062,9 @@ msgstr "Kein Wert gefunden."
 msgid "None"
 msgstr "Keine"
 
-#: packages/ui/primitives/document-flow/add-fields.tsx:979
+#: packages/ui/primitives/document-flow/add-fields.tsx:990
 #: packages/ui/primitives/document-flow/types.ts:56
-#: packages/ui/primitives/template-flow/add-template-fields.tsx:742
+#: packages/ui/primitives/template-flow/add-template-fields.tsx:785
 msgid "Number"
 msgstr "Nummer"
 
@@ -1107,7 +1122,7 @@ msgstr "Wählen Sie eine Zahl"
 msgid "Placeholder"
 msgstr "Platzhalter"
 
-#: packages/email/template-components/template-document-invite.tsx:46
+#: packages/email/template-components/template-document-invite.tsx:56
 msgid "Please {0} your document<0/>\"{documentName}\""
 msgstr "Bitte {0} dein Dokument<0/>\"{documentName}\""
 
@@ -1115,15 +1130,15 @@ msgstr "Bitte {0} dein Dokument<0/>\"{documentName}\""
 msgid "Please {action} your document {documentName}"
 msgstr "Bitte {action} dein Dokument {documentName}"
 
-#: packages/lib/jobs/definitions/emails/send-signing-email.ts:111
+#: packages/lib/jobs/definitions/emails/send-signing-email.handler.ts:99
 msgid "Please {recipientActionVerb} this document"
 msgstr "Bitte {recipientActionVerb} dieses Dokument"
 
-#: packages/lib/jobs/definitions/emails/send-signing-email.ts:125
+#: packages/lib/jobs/definitions/emails/send-signing-email.handler.ts:113
 msgid "Please {recipientActionVerb} this document created by your direct template"
 msgstr "Bitte {recipientActionVerb} dieses Dokument, das von deiner direkten Vorlage erstellt wurde"
 
-#: packages/lib/jobs/definitions/emails/send-signing-email.ts:117
+#: packages/lib/jobs/definitions/emails/send-signing-email.handler.ts:105
 msgid "Please {recipientActionVerb} your document"
 msgstr "Bitte {recipientActionVerb} dein Dokument"
 
@@ -1140,7 +1155,7 @@ msgstr "Bitte bestätige deine E-Mail-Adresse"
 msgid "Please try again or contact our support."
 msgstr "Bitte versuchen Sie es erneut oder kontaktieren Sie unseren Support."
 
-#: packages/ui/primitives/template-flow/add-template-fields.tsx:768
+#: packages/ui/primitives/document-flow/types.ts:57
 msgid "Radio"
 msgstr "Radio"
 
@@ -1156,36 +1171,57 @@ msgstr "Radio-Werte"
 msgid "Read only"
 msgstr "Nur lesen"
 
+#: packages/email/template-components/template-document-rejected.tsx:32
+msgid "Reason for rejection: {rejectionReason}"
+msgstr "Grund für die Ablehnung: {rejectionReason}"
+
 #: packages/ui/components/recipient/recipient-role-select.tsx:95
 msgid "Receives copy"
 msgstr "Erhält Kopie"
 
 #: packages/lib/utils/document-audit-logs.ts:338
+#: packages/lib/utils/document-audit-logs.ts:353
 msgid "Recipient"
 msgstr "Empfänger"
 
 #: packages/ui/components/recipient/recipient-action-auth-select.tsx:39
-#: packages/ui/primitives/document-flow/add-settings.tsx:257
+#: packages/ui/primitives/document-flow/add-settings.tsx:269
 #: packages/ui/primitives/template-flow/add-template-settings.tsx:291
 msgid "Recipient action authentication"
 msgstr "Empfängeraktion Authentifizierung"
 
-#: packages/ui/components/document/document-email-checkboxes.tsx:89
+#: packages/ui/components/document/document-email-checkboxes.tsx:129
 msgid "Recipient removed email"
 msgstr "E-Mail des entfernten Empfängers"
 
-#: packages/ui/components/document/document-email-checkboxes.tsx:50
+#: packages/ui/components/document/document-email-checkboxes.tsx:51
+msgid "Recipient signed email"
+msgstr ""
+
+#: packages/ui/components/document/document-email-checkboxes.tsx:90
 msgid "Recipient signing request email"
 msgstr "E-Mail zur Unterzeichnungsanfrage des Empfängers"
 
-#: packages/ui/primitives/signature-pad/signature-pad.tsx:384
+#: packages/ui/primitives/signature-pad/signature-pad.tsx:538
 msgid "Red"
 msgstr "Rot"
 
-#: packages/ui/primitives/document-flow/add-settings.tsx:371
+#: packages/ui/primitives/document-flow/add-settings.tsx:383
 #: packages/ui/primitives/template-flow/add-template-settings.tsx:461
 msgid "Redirect URL"
 msgstr "Weiterleitungs-URL"
+
+#: packages/email/template-components/template-document-invite.tsx:96
+msgid "Reject Document"
+msgstr "Dokument Ablehnen"
+
+#: packages/email/template-components/template-document-rejection-confirmed.tsx:22
+msgid "Rejection Confirmed"
+msgstr "Ablehnung Bestätigt"
+
+#: packages/email/template-components/template-document-rejection-confirmed.tsx:34
+msgid "Rejection reason: {reason}"
+msgstr "Ablehnungsgrund: {reason}"
 
 #: packages/lib/server-only/document/resend-document.tsx:192
 msgid "Reminder: {0}"
@@ -1203,7 +1239,7 @@ msgstr "Erinnerung: Bitte {recipientActionVerb} dieses Dokument"
 msgid "Reminder: Please {recipientActionVerb} your document"
 msgstr "Erinnerung: Bitte {recipientActionVerb} dein Dokument"
 
-#: packages/ui/primitives/document-flow/add-fields.tsx:1110
+#: packages/ui/primitives/document-flow/add-fields.tsx:1121
 msgid "Remove"
 msgstr "Entfernen"
 
@@ -1231,11 +1267,11 @@ msgstr "Seien Sie versichert, Ihr Dokument ist streng vertraulich und wird niema
 msgid "Rows per page"
 msgstr "Zeilen pro Seite"
 
-#: packages/ui/primitives/document-flow/field-item-advanced-settings.tsx:355
+#: packages/ui/primitives/document-flow/field-item-advanced-settings.tsx:356
 msgid "Save"
 msgstr "Speichern"
 
-#: packages/ui/primitives/template-flow/add-template-fields.tsx:854
+#: packages/ui/primitives/template-flow/add-template-fields.tsx:897
 msgid "Save Template"
 msgstr "Vorlage speichern"
 
@@ -1244,6 +1280,7 @@ msgid "Search languages..."
 msgstr "Sprachen suchen..."
 
 #: packages/ui/primitives/document-flow/field-items-advanced-settings/dropdown-field.tsx:115
+#: packages/ui/primitives/document-flow/types.ts:59
 msgid "Select"
 msgstr "Auswählen"
 
@@ -1270,15 +1307,19 @@ msgstr "Senden"
 msgid "Send Document"
 msgstr "Dokument senden"
 
-#: packages/ui/components/document/document-email-checkboxes.tsx:158
+#: packages/ui/components/document/document-email-checkboxes.tsx:198
 msgid "Send document completed email"
 msgstr "E-Mail über den Abschluss des Dokuments senden"
 
-#: packages/ui/components/document/document-email-checkboxes.tsx:197
+#: packages/ui/components/document/document-email-checkboxes.tsx:276
+msgid "Send document completed email to the owner"
+msgstr ""
+
+#: packages/ui/components/document/document-email-checkboxes.tsx:237
 msgid "Send document deleted email"
 msgstr "E-Mail über das Löschen des Dokuments senden"
 
-#: packages/ui/components/document/document-email-checkboxes.tsx:118
+#: packages/ui/components/document/document-email-checkboxes.tsx:158
 msgid "Send document pending email"
 msgstr "E-Mail über ausstehende Dokumente senden"
 
@@ -1286,11 +1327,15 @@ msgstr "E-Mail über ausstehende Dokumente senden"
 msgid "Send documents on behalf of the team using the email address"
 msgstr "Dokumente im Namen des Teams über die E-Mail-Adresse senden"
 
-#: packages/ui/components/document/document-email-checkboxes.tsx:79
+#: packages/ui/components/document/document-email-checkboxes.tsx:119
 msgid "Send recipient removed email"
 msgstr "E-Mail über entfernten Empfänger senden"
 
-#: packages/ui/components/document/document-email-checkboxes.tsx:40
+#: packages/ui/components/document/document-email-checkboxes.tsx:41
+msgid "Send recipient signed email"
+msgstr ""
+
+#: packages/ui/components/document/document-email-checkboxes.tsx:80
 msgid "Send recipient signing request email"
 msgstr "E-Mail über Unterzeichnungsanfrage des Empfängers senden"
 
@@ -1306,8 +1351,8 @@ msgstr "Link teilen"
 msgid "Share your signing experience!"
 msgstr "Teilen Sie Ihre Unterzeichnungserfahrung!"
 
-#: packages/ui/primitives/document-flow/add-signers.tsx:680
-#: packages/ui/primitives/template-flow/add-template-placeholder-recipients.tsx:655
+#: packages/ui/primitives/document-flow/add-signers.tsx:709
+#: packages/ui/primitives/template-flow/add-template-placeholder-recipients.tsx:663
 msgid "Show advanced settings"
 msgstr "Erweiterte Einstellungen anzeigen"
 
@@ -1315,7 +1360,7 @@ msgstr "Erweiterte Einstellungen anzeigen"
 msgid "Sign"
 msgstr "Unterschreiben"
 
-#: packages/email/template-components/template-document-invite.tsx:87
+#: packages/email/template-components/template-document-invite.tsx:104
 msgid "Sign Document"
 msgstr "Dokument signieren"
 
@@ -1323,11 +1368,11 @@ msgstr "Dokument signieren"
 msgid "Sign In"
 msgstr "Anmelden"
 
-#: packages/ui/primitives/document-flow/add-fields.tsx:823
-#: packages/ui/primitives/document-flow/add-signature.tsx:323
+#: packages/ui/primitives/document-flow/add-fields.tsx:834
+#: packages/ui/primitives/document-flow/add-signature.tsx:324
 #: packages/ui/primitives/document-flow/field-icon.tsx:52
 #: packages/ui/primitives/document-flow/types.ts:49
-#: packages/ui/primitives/template-flow/add-template-fields.tsx:586
+#: packages/ui/primitives/template-flow/add-template-fields.tsx:629
 msgid "Signature"
 msgstr "Unterschrift"
 
@@ -1351,14 +1396,10 @@ msgstr "Unterzeichner müssen eindeutige E-Mails haben"
 msgid "Signing"
 msgstr "Unterzeichnung"
 
-#: packages/lib/server-only/document/send-completed-email.ts:111
-#: packages/lib/server-only/document/send-completed-email.ts:191
+#: packages/lib/server-only/document/send-completed-email.ts:119
+#: packages/lib/server-only/document/send-completed-email.ts:199
 msgid "Signing Complete!"
 msgstr "Unterzeichnung abgeschlossen!"
-
-#: packages/lib/constants/recipient-roles.ts:66
-#~ msgid "SIGNING_REQUEST"
-#~ msgstr "SIGNING_REQUEST"
 
 #: packages/ui/primitives/document-flow/missing-signature-field-dialog.tsx:34
 msgid "Some signers have not been assigned a signature field. Please assign at least 1 signature field to each signer before proceeding."
@@ -1410,9 +1451,9 @@ msgstr "Team-E-Mail für {teamName} auf Documenso entfernt"
 msgid "Template title"
 msgstr "Vorlagentitel"
 
-#: packages/ui/primitives/document-flow/add-fields.tsx:953
+#: packages/ui/primitives/document-flow/add-fields.tsx:964
 #: packages/ui/primitives/document-flow/types.ts:52
-#: packages/ui/primitives/template-flow/add-template-fields.tsx:716
+#: packages/ui/primitives/template-flow/add-template-fields.tsx:759
 msgid "Text"
 msgstr "Text"
 
@@ -1431,6 +1472,10 @@ msgstr "Die Authentifizierung, die erforderlich ist, damit Empfänger das Signat
 #: packages/ui/components/document/document-global-auth-access-select.tsx:67
 msgid "The authentication required for recipients to view the document."
 msgstr "Die Authentifizierung, die erforderlich ist, damit Empfänger das Dokument anzeigen können."
+
+#: packages/email/template-components/template-document-rejection-confirmed.tsx:39
+msgid "The document owner has been notified of this rejection. No further action is required from you at this time. The document owner may contact you with any questions regarding this rejection."
+msgstr "Der Dokumenteninhaber wurde über diese Ablehnung informiert. Es sind derzeit keine weiteren Maßnahmen von Ihnen erforderlich. Der Dokumenteninhaber kann Sie bei Fragen zu dieser Ablehnung kontaktieren."
 
 #: packages/ui/components/document/document-send-email-message-helper.tsx:31
 msgid "The document's name"
@@ -1500,7 +1545,7 @@ msgstr "Dies kann überschrieben werden, indem die Authentifizierungsanforderung
 msgid "This document can not be recovered, if you would like to dispute the reason for future documents please contact support."
 msgstr "Dieses Dokument kann nicht wiederhergestellt werden. Wenn du den Grund für zukünftige Dokumente anfechten möchtest, kontaktiere bitte den Support."
 
-#: packages/ui/primitives/document-flow/add-fields.tsx:757
+#: packages/ui/primitives/document-flow/add-fields.tsx:768
 msgid "This document has already been sent to this recipient. You can no longer edit this recipient."
 msgstr "Dieses Dokument wurde bereits an diesen Empfänger gesendet. Sie können diesen Empfänger nicht mehr bearbeiten."
 
@@ -1512,19 +1557,27 @@ msgstr "Dieses Dokument ist durch ein Passwort geschützt. Bitte geben Sie das P
 msgid "This document was sent using <0>Documenso.</0>"
 msgstr "Dieses Dokument wurde mit <0>Documenso.</0> gesendet"
 
-#: packages/ui/components/document/document-email-checkboxes.tsx:94
+#: packages/email/template-components/template-document-rejection-confirmed.tsx:26
+msgid "This email confirms that you have rejected the document <0>\"{documentName}\"</0> sent by {documentOwnerName}."
+msgstr "Diese E-Mail bestätigt, dass Sie das Dokument <0>\"{documentName}\"</0> abgelehnt haben, das von {documentOwnerName} gesendet wurde."
+
+#: packages/ui/components/document/document-email-checkboxes.tsx:56
+msgid "This email is sent to the document owner when a recipient has signed the document."
+msgstr ""
+
+#: packages/ui/components/document/document-email-checkboxes.tsx:134
 msgid "This email is sent to the recipient if they are removed from a pending document."
 msgstr "Diese E-Mail wird an den Empfänger gesendet, wenn er von einem ausstehenden Dokument entfernt wird."
 
-#: packages/ui/components/document/document-email-checkboxes.tsx:55
+#: packages/ui/components/document/document-email-checkboxes.tsx:95
 msgid "This email is sent to the recipient requesting them to sign the document."
 msgstr "Diese E-Mail wird an den Empfänger gesendet und fordert ihn auf, das Dokument zu unterschreiben."
 
-#: packages/ui/components/document/document-email-checkboxes.tsx:133
+#: packages/ui/components/document/document-email-checkboxes.tsx:173
 msgid "This email will be sent to the recipient who has just signed the document, if there are still other recipients who have not signed yet."
 msgstr "Diese E-Mail wird an den Empfänger gesendet, der das Dokument gerade unterschrieben hat, wenn es noch andere Empfänger gibt, die noch nicht unterschrieben haben."
 
-#: packages/ui/primitives/template-flow/add-template-placeholder-recipients.tsx:573
+#: packages/ui/primitives/template-flow/add-template-placeholder-recipients.tsx:581
 msgid "This field cannot be modified or deleted. When you share this template's direct link or add it to your public profile, anyone who accesses it can input their name and email, and fill in the fields assigned to them."
 msgstr "Dieses Feld kann nicht geändert oder gelöscht werden. Wenn Sie den direkten Link dieser Vorlage teilen oder zu Ihrem öffentlichen Profil hinzufügen, kann jeder, der darauf zugreift, seinen Namen und seine E-Mail-Adresse eingeben und die ihm zugewiesenen Felder ausfüllen."
 
@@ -1532,7 +1585,7 @@ msgstr "Dieses Feld kann nicht geändert oder gelöscht werden. Wenn Sie den dir
 msgid "This is how the document will reach the recipients once the document is ready for signing."
 msgstr "So wird das Dokument die Empfänger erreichen, sobald es zum Unterschreiben bereit ist."
 
-#: packages/ui/primitives/document-flow/add-fields.tsx:1090
+#: packages/ui/primitives/document-flow/add-fields.tsx:1101
 msgid "This recipient can no longer be modified as they have signed a field, or completed the document."
 msgstr "Dieser Empfänger kann nicht mehr bearbeitet werden, da er ein Feld unterschrieben oder das Dokument abgeschlossen hat."
 
@@ -1540,29 +1593,33 @@ msgstr "Dieser Empfänger kann nicht mehr bearbeitet werden, da er ein Feld unte
 msgid "This signer has already signed the document."
 msgstr "Dieser Unterzeichner hat das Dokument bereits unterschrieben."
 
-#: packages/ui/components/document/document-email-checkboxes.tsx:212
+#: packages/ui/components/document/document-email-checkboxes.tsx:252
 msgid "This will be sent to all recipients if a pending document has been deleted."
 msgstr "Dies wird an alle Empfänger gesendet, wenn ein ausstehendes Dokument gelöscht wurde."
 
-#: packages/ui/components/document/document-email-checkboxes.tsx:173
+#: packages/ui/components/document/document-email-checkboxes.tsx:213
 msgid "This will be sent to all recipients once the document has been fully completed."
 msgstr "Dies wird an alle Empfänger gesendet, sobald das Dokument vollständig abgeschlossen ist."
+
+#: packages/ui/components/document/document-email-checkboxes.tsx:291
+msgid "This will be sent to the document owner once the document has been fully completed."
+msgstr ""
 
 #: packages/ui/components/recipient/recipient-action-auth-select.tsx:48
 msgid "This will override any global settings."
 msgstr "Dies überschreibt alle globalen Einstellungen."
 
-#: packages/ui/primitives/document-flow/add-settings.tsx:347
+#: packages/ui/primitives/document-flow/add-settings.tsx:359
 #: packages/ui/primitives/template-flow/add-template-settings.tsx:438
 msgid "Time Zone"
 msgstr "Zeitzone"
 
-#: packages/ui/primitives/document-flow/add-settings.tsx:155
+#: packages/ui/primitives/document-flow/add-settings.tsx:166
 msgid "Title"
 msgstr "Titel"
 
-#: packages/ui/primitives/document-flow/add-fields.tsx:1073
-#: packages/ui/primitives/template-flow/add-template-fields.tsx:834
+#: packages/ui/primitives/document-flow/add-fields.tsx:1084
+#: packages/ui/primitives/template-flow/add-template-fields.tsx:877
 msgid "To proceed further, please set at least one value for the {0} field."
 msgstr "Um fortzufahren, legen Sie bitte mindestens einen Wert für das Feld {0} fest."
 
@@ -1577,6 +1634,10 @@ msgstr "Aktualisieren Sie die Rolle und fügen Sie Felder nach Bedarf für den d
 #: packages/ui/primitives/document-dropzone.tsx:168
 msgid "Upgrade"
 msgstr "Upgrade"
+
+#: packages/ui/primitives/signature-pad/signature-pad.tsx:516
+msgid "Upload Signature"
+msgstr ""
 
 #: packages/ui/primitives/document-dropzone.tsx:70
 msgid "Upload Template Document"
@@ -1608,7 +1669,8 @@ msgstr "Sehen Sie sich alle Dokumente an, die an diese E-Mail-Adresse gesendet w
 msgid "View document"
 msgstr "Dokument anzeigen"
 
-#: packages/email/template-components/template-document-invite.tsx:88
+#: packages/email/template-components/template-document-invite.tsx:105
+#: packages/email/template-components/template-document-rejected.tsx:44
 #: packages/ui/primitives/document-flow/add-subject.tsx:90
 #: packages/ui/primitives/document-flow/add-subject.tsx:91
 msgid "View Document"
@@ -1617,10 +1679,6 @@ msgstr "Dokument ansehen"
 #: packages/email/template-components/template-document-self-signed.tsx:79
 msgid "View plans"
 msgstr "Pläne anzeigen"
-
-#: packages/lib/constants/recipient-roles.ts:67
-#~ msgid "VIEW_REQUEST"
-#~ msgstr "VIEW_REQUEST"
 
 #: packages/lib/constants/recipient-roles.ts:30
 msgid "Viewed"
@@ -1686,6 +1744,10 @@ msgstr "Sie können den Zugriff jederzeit in Ihren Teameinstellungen auf Documen
 msgid "You can use the following variables in your message:"
 msgstr "Sie können die folgenden Variablen in Ihrer Nachricht verwenden:"
 
+#: packages/email/template-components/template-document-rejected.tsx:37
+msgid "You can view the document and its status by clicking the button below."
+msgstr "Sie können das Dokument und seinen Status einsehen, indem Sie auf die Schaltfläche unten klicken."
+
 #: packages/ui/primitives/document-dropzone.tsx:43
 msgid "You cannot upload documents at this time."
 msgstr "Sie können derzeit keine Dokumente hochladen."
@@ -1702,7 +1764,7 @@ msgstr "Du wurdest eingeladen, {0} auf Documenso beizutreten"
 msgid "You have been invited to join the following team"
 msgstr "Du wurdest eingeladen, dem folgenden Team beizutreten"
 
-#: packages/lib/server-only/recipient/set-recipients-for-document.ts:329
+#: packages/lib/server-only/recipient/set-recipients-for-document.ts:337
 msgid "You have been removed from a document"
 msgstr "Du wurdest von einem Dokument entfernt"
 
@@ -1710,7 +1772,7 @@ msgstr "Du wurdest von einem Dokument entfernt"
 msgid "You have been requested to take ownership of team {0} on Documenso"
 msgstr "Du wurdest gebeten, das Team {0} auf Documenso zu übernehmen"
 
-#: packages/lib/jobs/definitions/emails/send-signing-email.ts:115
+#: packages/lib/jobs/definitions/emails/send-signing-email.handler.ts:103
 #: packages/lib/server-only/document/resend-document.tsx:125
 msgid "You have initiated the document {0} that requires you to {recipientActionVerb} it."
 msgstr "Du hast das Dokument {0} initiiert, das erfordert, dass du {recipientActionVerb}."
@@ -1718,6 +1780,10 @@ msgstr "Du hast das Dokument {0} initiiert, das erfordert, dass du {recipientAct
 #: packages/ui/primitives/document-dropzone.tsx:69
 msgid "You have reached your document limit."
 msgstr "Sie haben Ihr Dokumentenlimit erreicht."
+
+#: packages/email/templates/document-rejection-confirmed.tsx:27
+msgid "You have rejected the document '{documentName}'"
+msgstr "Sie haben das Dokument '{documentName}' abgelehnt"
 
 #: packages/email/template-components/template-document-self-signed.tsx:42
 msgid "You have signed “{documentName}”"
@@ -1735,4 +1801,3 @@ msgstr "Dein Passwort wurde aktualisiert."
 #: packages/email/templates/team-delete.tsx:32
 msgid "Your team has been deleted"
 msgstr "Dein Team wurde gelöscht"
-

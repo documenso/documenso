@@ -24,7 +24,9 @@ export const findTeamInvoices = async ({ userId, teamId }: FindTeamInvoicesOptio
   });
 
   if (!team.customerId) {
-    throw new AppError(AppErrorCode.NOT_FOUND, 'Team has no customer ID.');
+    throw new AppError(AppErrorCode.NOT_FOUND, {
+      message: 'Team has no customer ID.',
+    });
   }
 
   const results = await getInvoices({ customerId: team.customerId });

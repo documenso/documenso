@@ -9,7 +9,7 @@ import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 
 import { useAnalytics } from '@documenso/lib/client-only/hooks/use-analytics';
-import { TRPCClientError } from '@documenso/trpc/client';
+import { AppError } from '@documenso/lib/errors/app-error';
 import { trpc } from '@documenso/trpc/react';
 import { ZPasswordSchema } from '@documenso/trpc/server/auth-router/schema';
 import { Button } from '@documenso/ui/primitives/button';
@@ -25,6 +25,8 @@ import { Input } from '@documenso/ui/primitives/input';
 import { PasswordInput } from '@documenso/ui/primitives/password-input';
 import { useToast } from '@documenso/ui/primitives/use-toast';
 
+import { signupErrorMessages } from '~/components/forms/v2/signup';
+
 export type ClaimAccountProps = {
   defaultName: string;
   defaultEmail: string;
@@ -33,7 +35,10 @@ export type ClaimAccountProps = {
 
 export const ZClaimAccountFormSchema = z
   .object({
-    name: z.string().trim().min(1, { message: 'Please enter a valid name.' }),
+    name: z
+      .string()
+      .trim()
+      .min(1, { message: msg`Please enter a valid name.`.id }),
     email: z.string().email().min(1),
     password: ZPasswordSchema,
   })
@@ -43,7 +48,7 @@ export const ZClaimAccountFormSchema = z
       return !password.includes(name) && !password.includes(email.split('@')[0]);
     },
     {
-      message: 'Password should not be common or based on personal information',
+      message: msg`Password should not be common or based on personal information`.id,
       path: ['password'],
     },
   );
@@ -86,22 +91,16 @@ export const ClaimAccount = ({ defaultName, defaultEmail }: ClaimAccountProps) =
         email,
         timestamp: new Date().toISOString(),
       });
-    } catch (error) {
-      if (error instanceof TRPCClientError && error.data?.code === 'BAD_REQUEST') {
-        toast({
-          title: _(msg`An error occurred`),
-          description: error.message,
-          variant: 'destructive',
-        });
-      } else {
-        toast({
-          title: _(msg`An unknown error occurred`),
-          description: _(
-            msg`We encountered an unknown error while attempting to sign you up. Please try again later.`,
-          ),
-          variant: 'destructive',
-        });
-      }
+    } catch (err) {
+      const error = AppError.parseError(err);
+
+      const errorMessage = signupErrorMessages[error.code] ?? signupErrorMessages.INVALID_REQUEST;
+
+      toast({
+        title: _(msg`An error occurred`),
+        description: _(errorMessage),
+        variant: 'destructive',
+      });
     }
   };
 

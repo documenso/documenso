@@ -138,7 +138,7 @@
     --new-surface-white: 0, 0%, 91%;
   }
 
-  .dark {
+  .dark:not(.dark-mode-disabled) {
     --background: 0 0% 14.9%;
     --foreground: 0 0% 97%;
 
@@ -158,6 +158,8 @@
 
     --border: 0 0% 27.9%;
     --input: 0 0% 27.9%;
+
+    --field-border: 214.3 31.8% 91.4%;
 
     --primary: 95.08 71.08% 67.45%;
     --primary-foreground: 95.08 71.08% 10%;

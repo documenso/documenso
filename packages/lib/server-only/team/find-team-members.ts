@@ -1,15 +1,18 @@
 import { P, match } from 'ts-pattern';
+import type { z } from 'zod';
 
 import { prisma } from '@documenso/prisma';
 import type { TeamMember } from '@documenso/prisma/client';
 import { Prisma } from '@documenso/prisma/client';
+import { TeamMemberSchema, UserSchema } from '@documenso/prisma/generated/zod';
 
-import type { FindResultSet } from '../../types/find-result-set';
+import type { FindResultResponse } from '../../types/search-params';
+import { ZFindResultResponse } from '../../types/search-params';
 
 export interface FindTeamMembersOptions {
   userId: number;
   teamId: number;
-  term?: string;
+  query?: string;
   page?: number;
   perPage?: number;
   orderBy?: {
@@ -18,14 +21,25 @@ export interface FindTeamMembersOptions {
   };
 }
 
+export const ZFindTeamMembersResponseSchema = ZFindResultResponse.extend({
+  data: TeamMemberSchema.extend({
+    user: UserSchema.pick({
+      name: true,
+      email: true,
+    }),
+  }).array(),
+});
+
+export type TFindTeamMembersResponse = z.infer<typeof ZFindTeamMembersResponseSchema>;
+
 export const findTeamMembers = async ({
   userId,
   teamId,
-  term,
+  query,
   page = 1,
   perPage = 10,
   orderBy,
-}: FindTeamMembersOptions) => {
+}: FindTeamMembersOptions): Promise<TFindTeamMembersResponse> => {
   const orderByColumn = orderBy?.column ?? 'name';
   const orderByDirection = orderBy?.direction ?? 'desc';
 
@@ -41,11 +55,11 @@ export const findTeamMembers = async ({
     },
   });
 
-  const termFilters: Prisma.TeamMemberWhereInput | undefined = match(term)
+  const termFilters: Prisma.TeamMemberWhereInput | undefined = match(query)
     .with(P.string.minLength(1), () => ({
       user: {
         name: {
-          contains: term,
+          contains: query,
           mode: Prisma.QueryMode.insensitive,
         },
       },
@@ -96,5 +110,5 @@ export const findTeamMembers = async ({
     currentPage: Math.max(page, 1),
     perPage,
     totalPages: Math.ceil(count / perPage),
-  } satisfies FindResultSet<typeof data>;
+  } satisfies FindResultResponse<typeof data>;
 };

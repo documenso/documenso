@@ -1,10 +1,16 @@
-import { TRPCError } from '@trpc/server';
-
-import { AppError } from '@documenso/lib/errors/app-error';
-import { getFieldById } from '@documenso/lib/server-only/field/get-field-by-id';
+import {
+  ZGetFieldByIdResponseSchema,
+  getFieldById,
+} from '@documenso/lib/server-only/field/get-field-by-id';
 import { removeSignedFieldWithToken } from '@documenso/lib/server-only/field/remove-signed-field-with-token';
-import { setFieldsForDocument } from '@documenso/lib/server-only/field/set-fields-for-document';
-import { setFieldsForTemplate } from '@documenso/lib/server-only/field/set-fields-for-template';
+import {
+  ZSetFieldsForDocumentResponseSchema,
+  setFieldsForDocument,
+} from '@documenso/lib/server-only/field/set-fields-for-document';
+import {
+  ZSetFieldsForTemplateResponseSchema,
+  setFieldsForTemplate,
+} from '@documenso/lib/server-only/field/set-fields-for-template';
 import { signFieldWithToken } from '@documenso/lib/server-only/field/sign-field-with-token';
 import { extractNextApiRequestMetadata } from '@documenso/lib/universal/extract-request-metadata';
 
@@ -18,111 +24,23 @@ import {
 } from './schema';
 
 export const fieldRouter = router({
-  addFields: authenticatedProcedure
-    .input(ZAddFieldsMutationSchema)
-    .mutation(async ({ input, ctx }) => {
-      try {
-        const { documentId, fields } = input;
-
-        return await setFieldsForDocument({
-          documentId,
-          userId: ctx.user.id,
-          fields: fields.map((field) => ({
-            id: field.nativeId,
-            signerEmail: field.signerEmail,
-            type: field.type,
-            pageNumber: field.pageNumber,
-            pageX: field.pageX,
-            pageY: field.pageY,
-            pageWidth: field.pageWidth,
-            pageHeight: field.pageHeight,
-            fieldMeta: field.fieldMeta,
-          })),
-          requestMetadata: extractNextApiRequestMetadata(ctx.req),
-        });
-      } catch (err) {
-        console.error(err);
-
-        throw new TRPCError({
-          code: 'BAD_REQUEST',
-          message: 'We were unable to set this field. Please try again later.',
-        });
-      }
-    }),
-
-  addTemplateFields: authenticatedProcedure
-    .input(ZAddTemplateFieldsMutationSchema)
-    .mutation(async ({ input, ctx }) => {
-      const { templateId, fields } = input;
-
-      try {
-        return await setFieldsForTemplate({
-          userId: ctx.user.id,
-          templateId,
-          fields: fields.map((field) => ({
-            id: field.nativeId,
-            signerEmail: field.signerEmail,
-            type: field.type,
-            pageNumber: field.pageNumber,
-            pageX: field.pageX,
-            pageY: field.pageY,
-            pageWidth: field.pageWidth,
-            pageHeight: field.pageHeight,
-            fieldMeta: field.fieldMeta,
-          })),
-        });
-      } catch (err) {
-        console.error(err);
-
-        throw err;
-      }
-    }),
-
-  signFieldWithToken: procedure
-    .input(ZSignFieldWithTokenMutationSchema)
-    .mutation(async ({ input, ctx }) => {
-      try {
-        const { token, fieldId, value, isBase64, authOptions } = input;
-
-        return await signFieldWithToken({
-          token,
-          fieldId,
-          value,
-          isBase64,
-          userId: ctx.user?.id,
-          authOptions,
-          requestMetadata: extractNextApiRequestMetadata(ctx.req),
-        });
-      } catch (err) {
-        console.error(err);
-
-        throw AppError.parseErrorToTRPCError(err);
-      }
-    }),
-
-  removeSignedFieldWithToken: procedure
-    .input(ZRemovedSignedFieldWithTokenMutationSchema)
-    .mutation(async ({ input, ctx }) => {
-      try {
-        const { token, fieldId } = input;
-
-        return await removeSignedFieldWithToken({
-          token,
-          fieldId,
-          requestMetadata: extractNextApiRequestMetadata(ctx.req),
-        });
-      } catch (err) {
-        console.error(err);
-
-        throw new TRPCError({
-          code: 'BAD_REQUEST',
-          message: 'We were unable to remove the signature for this field. Please try again later.',
-        });
-      }
-    }),
-
-  getField: authenticatedProcedure.input(ZGetFieldQuerySchema).query(async ({ input, ctx }) => {
-    try {
+  /**
+   * @public
+   */
+  getField: authenticatedProcedure
+    .meta({
+      openapi: {
+        method: 'GET',
+        path: '/field/{fieldId}',
+        summary: 'Get field',
+        description:
+          'Returns a single field. If you want to retrieve all the fields for a document or template, use the "Get Document" or "Get Template" request.',
+        tags: ['Fields'],
+      },
+    })
+    .input(ZGetFieldQuerySchema)
+    .output(ZGetFieldByIdResponseSchema)
+    .query(async ({ input, ctx }) => {
       const { fieldId, teamId } = input;
 
       return await getFieldById({
@@ -130,39 +48,108 @@ export const fieldRouter = router({
         teamId,
         fieldId,
       });
-    } catch (err) {
-      console.error(err);
+    }),
 
-      throw new TRPCError({
-        code: 'BAD_REQUEST',
-        message: 'We were unable to find this field. Please try again.',
+  /**
+   * @public
+   */
+  addFields: authenticatedProcedure
+    .meta({
+      openapi: {
+        method: 'POST',
+        path: '/document/{documentId}/field',
+        summary: 'Set document fields',
+        tags: ['Fields'],
+      },
+    })
+    .input(ZAddFieldsMutationSchema)
+    .output(ZSetFieldsForDocumentResponseSchema)
+    .mutation(async ({ input, ctx }) => {
+      const { documentId, fields } = input;
+
+      return await setFieldsForDocument({
+        documentId,
+        userId: ctx.user.id,
+        fields: fields.map((field) => ({
+          id: field.nativeId,
+          signerEmail: field.signerEmail,
+          type: field.type,
+          pageNumber: field.pageNumber,
+          pageX: field.pageX,
+          pageY: field.pageY,
+          pageWidth: field.pageWidth,
+          pageHeight: field.pageHeight,
+          fieldMeta: field.fieldMeta,
+        })),
+        requestMetadata: extractNextApiRequestMetadata(ctx.req),
       });
-    }
-  }),
+    }),
 
-  // This doesn't appear to be used anywhere, and it doesn't seem to support updating template fields
-  // so commenting this out for now.
-  // updateField: authenticatedProcedure
-  //   .input(ZUpdateFieldMutationSchema)
-  //   .mutation(async ({ input, ctx }) => {
-  //     try {
-  //       const { documentId, fieldId, fieldMeta, teamId } = input;
+  /**
+   * @public
+   */
+  addTemplateFields: authenticatedProcedure
+    .meta({
+      openapi: {
+        method: 'POST',
+        path: '/template/{templateId}/field',
+        summary: 'Set template fields',
+        tags: ['Fields'],
+      },
+    })
+    .input(ZAddTemplateFieldsMutationSchema)
+    .output(ZSetFieldsForTemplateResponseSchema)
+    .mutation(async ({ input, ctx }) => {
+      const { templateId, fields } = input;
 
-  //       return await updateField({
-  //         userId: ctx.user.id,
-  //         teamId,
-  //         fieldId,
-  //         documentId,
-  //         requestMetadata: extractNextApiRequestMetadata(ctx.req),
-  //         fieldMeta: fieldMeta,
-  //       });
-  //     } catch (err) {
-  //       console.error(err);
+      return await setFieldsForTemplate({
+        userId: ctx.user.id,
+        templateId,
+        fields: fields.map((field) => ({
+          id: field.nativeId,
+          signerEmail: field.signerEmail,
+          type: field.type,
+          pageNumber: field.pageNumber,
+          pageX: field.pageX,
+          pageY: field.pageY,
+          pageWidth: field.pageWidth,
+          pageHeight: field.pageHeight,
+          fieldMeta: field.fieldMeta,
+        })),
+      });
+    }),
 
-  //       throw new TRPCError({
-  //         code: 'BAD_REQUEST',
-  //         message: 'We were unable to set this field. Please try again later.',
-  //       });
-  //     }
-  //   }),
+  /**
+   * @private
+   */
+  signFieldWithToken: procedure
+    .input(ZSignFieldWithTokenMutationSchema)
+    .mutation(async ({ input, ctx }) => {
+      const { token, fieldId, value, isBase64, authOptions } = input;
+
+      return await signFieldWithToken({
+        token,
+        fieldId,
+        value,
+        isBase64,
+        userId: ctx.user?.id,
+        authOptions,
+        requestMetadata: extractNextApiRequestMetadata(ctx.req),
+      });
+    }),
+
+  /**
+   * @private
+   */
+  removeSignedFieldWithToken: procedure
+    .input(ZRemovedSignedFieldWithTokenMutationSchema)
+    .mutation(async ({ input, ctx }) => {
+      const { token, fieldId } = input;
+
+      return await removeSignedFieldWithToken({
+        token,
+        fieldId,
+        requestMetadata: extractNextApiRequestMetadata(ctx.req),
+      });
+    }),
 });

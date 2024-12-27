@@ -169,6 +169,7 @@ export const DocumentHistorySheet = ({
                     { type: DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_DELETED },
                     { type: DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_OPENED },
                     { type: DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_RECIPIENT_COMPLETED },
+                    { type: DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_RECIPIENT_REJECTED },
                     { type: DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_SENT },
                     { type: DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_MOVED_TO_TEAM },
                     () => null,

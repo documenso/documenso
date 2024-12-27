@@ -107,6 +107,7 @@ test('[DOCUMENT_FLOW]: should be able to create a document', async ({ page }) =>
 
   // Add subject and send
   await expect(page.getByRole('heading', { name: 'Distribute Document' })).toBeVisible();
+  await page.waitForTimeout(2500);
   await page.getByRole('button', { name: 'Send' }).click();
 
   await page.waitForURL('/documents');
@@ -191,6 +192,7 @@ test('[DOCUMENT_FLOW]: should be able to create a document with multiple recipie
 
   // Add subject and send
   await expect(page.getByRole('heading', { name: 'Distribute Document' })).toBeVisible();
+  await page.waitForTimeout(2500);
   await page.getByRole('button', { name: 'Send' }).click();
 
   await page.waitForURL('/documents');
@@ -288,6 +290,7 @@ test('[DOCUMENT_FLOW]: should be able to create a document with multiple recipie
 
   // Add subject and send
   await expect(page.getByRole('heading', { name: 'Distribute Document' })).toBeVisible();
+  await page.waitForTimeout(2500);
   await page.getByRole('button', { name: 'Send' }).click();
 
   await page.waitForURL('/documents');
@@ -369,9 +372,9 @@ test('[DOCUMENT_FLOW]: should be able to approve a document', async ({ page }) =
     const canvas = page.locator('canvas');
     const box = await canvas.boundingBox();
     if (box) {
-      await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2);
+      await page.mouse.move(box.x + 40, box.y + 40);
       await page.mouse.down();
-      await page.mouse.move(box.x + box.width / 4, box.y + box.height / 4);
+      await page.mouse.move(box.x + box.width - 2, box.y + box.height - 2);
       await page.mouse.up();
     }
 
@@ -426,6 +429,7 @@ test('[DOCUMENT_FLOW]: should be able to create, send with redirect url, sign a 
   await expect(page.getByRole('heading', { name: 'Add Fields' })).toBeVisible();
   await page.getByRole('button', { name: 'Continue' }).click();
 
+  await page.waitForTimeout(2500);
   await page.getByRole('button', { name: 'Send' }).click();
 
   await page.waitForURL('/documents');
@@ -567,6 +571,7 @@ test('[DOCUMENT_FLOW]: should be able to create and sign a document with 3 recip
   await page.getByRole('button', { name: 'Continue' }).click();
 
   await expect(page.getByRole('heading', { name: 'Distribute Document' })).toBeVisible();
+  await page.waitForTimeout(2500);
   await page.getByRole('button', { name: 'Send' }).click();
 
   await page.waitForURL('/documents');
@@ -608,9 +613,9 @@ test('[DOCUMENT_FLOW]: should be able to create and sign a document with 3 recip
     const canvas = page.locator('canvas#signature');
     const box = await canvas.boundingBox();
     if (box) {
-      await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2);
+      await page.mouse.move(box.x + 40, box.y + 40);
       await page.mouse.down();
-      await page.mouse.move(box.x + box.width / 4, box.y + box.height / 4);
+      await page.mouse.move(box.x + box.width - 2, box.y + box.height - 2);
       await page.mouse.up();
     }
 

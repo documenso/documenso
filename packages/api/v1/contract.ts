@@ -168,6 +168,9 @@ export const ApiContractV1 = c.router(
         500: ZUnsuccessfulResponseSchema,
       },
       summary: 'Send a document for signing',
+      // I'm aware this should be in the variable itself, which it is, however it's difficult for users to find in our current UI.
+      description:
+        'Notes\n\n`sendEmail` - Whether to send an email to the recipients asking them to action the document. If you disable this, you will need to manually distribute the document to the recipients using the generated signing links. Defaults to true',
     },
 
     resendDocument: {
