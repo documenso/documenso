@@ -34,6 +34,7 @@ import {
   ZFieldMetaSchema,
 } from '@documenso/lib/types/field-meta';
 import { nanoid } from '@documenso/lib/universal/id';
+import { ADVANCED_FIELD_TYPES_WITH_OPTIONAL_SETTING } from '@documenso/lib/utils/advanced-fields-helpers';
 import { validateFieldsUninserted } from '@documenso/lib/utils/fields';
 import { parseMessageDescriptor } from '@documenso/lib/utils/i18n';
 import {
@@ -81,15 +82,6 @@ const MIN_WIDTH_PX = 36;
 
 const DEFAULT_HEIGHT_PX = MIN_HEIGHT_PX * 2.5;
 const DEFAULT_WIDTH_PX = MIN_WIDTH_PX * 2.5;
-
-const fieldsWithAdvancedSettings: FieldType[] = [
-  FieldType.INITIALS,
-  FieldType.TEXT,
-  FieldType.NUMBER,
-  FieldType.CHECKBOX,
-  FieldType.RADIO,
-  FieldType.DROPDOWN,
-];
 
 export type FieldFormType = {
   nativeId?: number;
@@ -362,7 +354,9 @@ export const AddFieldsFormPartial = ({
 
       append(field);
 
-      if (fieldsWithAdvancedSettings.includes(selectedField)) {
+      // Only open fields with significant amount of settings (instead of just a font setting) to
+      // reduce friction when adding fields.
+      if (ADVANCED_FIELD_TYPES_WITH_OPTIONAL_SETTING.includes(selectedField)) {
         setCurrentField(field);
         setShowAdvancedSettings(true);
       }
