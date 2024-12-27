@@ -1086,8 +1086,8 @@ export const AddFieldsFormPartial = ({
                     {emptyCheckboxFields.length > 0
                       ? 'Checkbox'
                       : emptyRadioFields.length > 0
-                      ? 'Radio'
-                      : 'Select'}{' '}
+                        ? 'Radio'
+                        : 'Select'}{' '}
                     field.
                   </Trans>
                 </li>
