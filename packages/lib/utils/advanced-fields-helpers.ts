@@ -4,7 +4,7 @@ import { ZFieldMetaSchema } from '../types/field-meta';
 
 // Currently it seems that the majority of fields have advanced fields for font reasons.
 // This array should only contain fields that have an optional setting in the fieldMeta.
-const ADVANCED_FIELD_TYPES_WITH_OPTIONAL_SETTING: FieldType[] = [
+export const ADVANCED_FIELD_TYPES_WITH_OPTIONAL_SETTING: FieldType[] = [
   FieldType.NUMBER,
   FieldType.TEXT,
   FieldType.DROPDOWN,
