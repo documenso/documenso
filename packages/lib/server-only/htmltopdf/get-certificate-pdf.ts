@@ -2,13 +2,16 @@ import { DateTime } from 'luxon';
 import type { Browser } from 'playwright';
 
 import { NEXT_PUBLIC_WEBAPP_URL } from '../../constants/app';
+import { type SupportedLanguageCodes, isValidLanguageCode } from '../../constants/i18n';
 import { encryptSecondaryData } from '../crypto/encrypt';
 
 export type GetCertificatePdfOptions = {
   documentId: number;
+  // eslint-disable-next-line @typescript-eslint/ban-types
+  language?: SupportedLanguageCodes | (string & {});
 };
 
-export const getCertificatePdf = async ({ documentId }: GetCertificatePdfOptions) => {
+export const getCertificatePdf = async ({ documentId, language }: GetCertificatePdfOptions) => {
   const { chromium } = await import('playwright');
 
   const encryptedId = encryptSecondaryData({
@@ -32,7 +35,19 @@ export const getCertificatePdf = async ({ documentId }: GetCertificatePdfOptions
     );
   }
 
-  const page = await browser.newPage();
+  const browserContext = await browser.newContext();
+
+  const page = await browserContext.newPage();
+
+  const lang = isValidLanguageCode(language) ? language : 'en';
+
+  await page.context().addCookies([
+    {
+      name: 'language',
+      value: lang,
+      url: NEXT_PUBLIC_WEBAPP_URL(),
+    },
+  ]);
 
   await page.goto(`${NEXT_PUBLIC_WEBAPP_URL()}/__htmltopdf/certificate?d=${encryptedId}`, {
     waitUntil: 'networkidle',
@@ -42,6 +57,8 @@ export const getCertificatePdf = async ({ documentId }: GetCertificatePdfOptions
   const result = await page.pdf({
     format: 'A4',
   });
+
+  await browserContext.close();
 
   void browser.close();
 

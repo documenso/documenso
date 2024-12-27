@@ -3,6 +3,7 @@ import { createElement } from 'react';
 import { msg } from '@lingui/macro';
 import { DateTime } from 'luxon';
 import { match } from 'ts-pattern';
+import { z } from 'zod';
 
 import { mailer } from '@documenso/email/mailer';
 import { DocumentCreatedFromDirectTemplateEmailTemplate } from '@documenso/email/templates/document-created-from-direct-template';
@@ -31,6 +32,7 @@ import { DOCUMENT_AUDIT_LOG_TYPE } from '../../types/document-audit-logs';
 import type { TRecipientActionAuthTypes } from '../../types/document-auth';
 import { DocumentAccessAuth, ZRecipientAuthOptionsSchema } from '../../types/document-auth';
 import { ZFieldMetaSchema } from '../../types/field-meta';
+import { ZWebhookDocumentSchema } from '../../types/webhook-payload';
 import type { RequestMetadata } from '../../universal/extract-request-metadata';
 import type { CreateDocumentAuditLogDataResponse } from '../../utils/document-audit-logs';
 import { createDocumentAuditLogData } from '../../utils/document-audit-logs';
@@ -66,6 +68,16 @@ type CreatedDirectRecipientField = {
   derivedRecipientActionAuth: TRecipientActionAuthTypes | null;
 };
 
+export const ZCreateDocumentFromDirectTemplateResponseSchema = z.object({
+  token: z.string(),
+  documentId: z.number(),
+  recipientId: z.number(),
+});
+
+export type TCreateDocumentFromDirectTemplateResponse = z.infer<
+  typeof ZCreateDocumentFromDirectTemplateResponseSchema
+>;
+
 export const createDocumentFromDirectTemplate = async ({
   directRecipientName: initialDirectRecipientName,
   directRecipientEmail,
@@ -75,7 +87,7 @@ export const createDocumentFromDirectTemplate = async ({
   templateUpdatedAt,
   requestMetadata,
   user,
-}: CreateDocumentFromDirectTemplateOptions) => {
+}: CreateDocumentFromDirectTemplateOptions): Promise<TCreateDocumentFromDirectTemplateResponse> => {
   const template = await prisma.template.findFirst({
     where: {
       directLink: {
@@ -101,7 +113,7 @@ export const createDocumentFromDirectTemplate = async ({
   });
 
   if (!template?.directLink?.enabled) {
-    throw new AppError(AppErrorCode.INVALID_REQUEST, 'Invalid or missing template');
+    throw new AppError(AppErrorCode.INVALID_REQUEST, { message: 'Invalid or missing template' });
   }
 
   const { Recipient: recipients, directLink, User: templateOwner } = template;
@@ -111,15 +123,19 @@ export const createDocumentFromDirectTemplate = async ({
   );
 
   if (!directTemplateRecipient || directTemplateRecipient.role === RecipientRole.CC) {
-    throw new AppError(AppErrorCode.INVALID_REQUEST, 'Invalid or missing direct recipient');
+    throw new AppError(AppErrorCode.INVALID_REQUEST, {
+      message: 'Invalid or missing direct recipient',
+    });
   }
 
   if (template.updatedAt.getTime() !== templateUpdatedAt.getTime()) {
-    throw new AppError(AppErrorCode.INVALID_REQUEST, 'Template no longer matches');
+    throw new AppError(AppErrorCode.INVALID_REQUEST, { message: 'Template no longer matches' });
   }
 
   if (user && user.email !== directRecipientEmail) {
-    throw new AppError(AppErrorCode.INVALID_REQUEST, 'Email must match if you are logged in');
+    throw new AppError(AppErrorCode.INVALID_REQUEST, {
+      message: 'Email must match if you are logged in',
+    });
   }
 
   const { derivedRecipientAccessAuth, documentAuthOption: templateAuthOptions } =
@@ -136,7 +152,7 @@ export const createDocumentFromDirectTemplate = async ({
     .exhaustive();
 
   if (!isAccessAuthValid) {
-    throw new AppError(AppErrorCode.UNAUTHORIZED, 'You must be logged in');
+    throw new AppError(AppErrorCode.UNAUTHORIZED, { message: 'You must be logged in' });
   }
 
   const directTemplateRecipientAuthOptions = ZRecipientAuthOptionsSchema.parse(
@@ -163,7 +179,9 @@ export const createDocumentFromDirectTemplate = async ({
       );
 
       if (!signedFieldValue) {
-        throw new AppError(AppErrorCode.INVALID_BODY, 'Invalid, missing or changed fields');
+        throw new AppError(AppErrorCode.INVALID_BODY, {
+          message: 'Invalid, missing or changed fields',
+        });
       }
 
       if (templateField.type === FieldType.NAME && directRecipientName === undefined) {
@@ -585,7 +603,7 @@ export const createDocumentFromDirectTemplate = async ({
       requestMetadata,
     });
 
-    const updatedDocument = await prisma.document.findFirstOrThrow({
+    const createdDocument = await prisma.document.findFirstOrThrow({
       where: {
         id: documentId,
       },
@@ -597,9 +615,9 @@ export const createDocumentFromDirectTemplate = async ({
 
     await triggerWebhook({
       event: WebhookTriggerEvents.DOCUMENT_SIGNED,
-      data: updatedDocument,
-      userId: updatedDocument.userId,
-      teamId: updatedDocument.teamId ?? undefined,
+      data: ZWebhookDocumentSchema.parse(createdDocument),
+      userId: template.userId,
+      teamId: template.teamId ?? undefined,
     });
   } catch (err) {
     console.error('[CREATE_DOCUMENT_FROM_DIRECT_TEMPLATE]:', err);

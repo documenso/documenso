@@ -6,6 +6,10 @@ generator client {
   provider = "prisma-client-js"
 }
 
+generator zod {
+  provider = "zod-prisma-types"
+}
+
 datasource db {
   provider  = "postgresql"
   url       = env("NEXT_PRIVATE_DATABASE_URL")
@@ -38,6 +42,7 @@ model User {
   roles            Role[]           @default([USER])
   identityProvider IdentityProvider @default(DOCUMENSO)
   avatarImageId    String?
+  disabled         Boolean          @default(false)
 
   accounts             Account[]
   sessions             Session[]
@@ -162,6 +167,7 @@ enum WebhookTriggerEvents {
   DOCUMENT_OPENED
   DOCUMENT_SIGNED
   DOCUMENT_COMPLETED
+  DOCUMENT_REJECTED
 }
 
 model Webhook {
@@ -374,7 +380,7 @@ model DocumentMeta {
   document              Document                   @relation(fields: [documentId], references: [id], onDelete: Cascade)
   redirectUrl           String?
   signingOrder          DocumentSigningOrder       @default(PARALLEL)
-  typedSignatureEnabled Boolean                    @default(false)
+  typedSignatureEnabled Boolean                    @default(true)
   language              String                     @default("en")
   distributionMethod    DocumentDistributionMethod @default(EMAIL)
   emailSettings         Json?
@@ -393,6 +399,7 @@ enum SendStatus {
 enum SigningStatus {
   NOT_SIGNED
   SIGNED
+  REJECTED
 }
 
 enum RecipientRole {
@@ -414,6 +421,7 @@ model Recipient {
   signedAt          DateTime?
   authOptions       Json?
   signingOrder      Int?
+  rejectionReason   String?
   role              RecipientRole @default(SIGNER)
   readStatus        ReadStatus    @default(NOT_OPENED)
   signingStatus     SigningStatus @default(NOT_SIGNED)
@@ -509,10 +517,12 @@ enum TeamMemberInviteStatus {
 }
 
 model TeamGlobalSettings {
-  teamId               Int                @unique
-  documentVisibility   DocumentVisibility @default(EVERYONE)
-  documentLanguage     String             @default("en")
-  includeSenderDetails Boolean            @default(true)
+  teamId                    Int                @unique
+  documentVisibility        DocumentVisibility @default(EVERYONE)
+  documentLanguage          String             @default("en")
+  includeSenderDetails      Boolean            @default(true)
+  typedSignatureEnabled     Boolean            @default(true)
+  includeSigningCertificate Boolean            @default(true)
 
   brandingEnabled        Boolean @default(false)
   brandingLogo           String  @default("")
@@ -626,19 +636,21 @@ enum TemplateType {
 }
 
 model TemplateMeta {
-  id                 String                     @id @default(cuid())
-  subject            String?
-  message            String?
-  timezone           String?                    @default("Etc/UTC") @db.Text
-  password           String?
-  dateFormat         String?                    @default("yyyy-MM-dd hh:mm a") @db.Text
-  signingOrder       DocumentSigningOrder?      @default(PARALLEL)
-  templateId         Int                        @unique
-  template           Template                   @relation(fields: [templateId], references: [id], onDelete: Cascade)
-  redirectUrl        String?
-  language           String                     @default("en")
-  distributionMethod DocumentDistributionMethod @default(EMAIL)
-  emailSettings      Json?
+  id                    String                     @id @default(cuid())
+  subject               String?
+  message               String?
+  timezone              String?                    @default("Etc/UTC") @db.Text
+  password              String?
+  dateFormat            String?                    @default("yyyy-MM-dd hh:mm a") @db.Text
+  signingOrder          DocumentSigningOrder?      @default(PARALLEL)
+  typedSignatureEnabled Boolean                    @default(true)
+  distributionMethod    DocumentDistributionMethod @default(EMAIL)
+
+  templateId    Int      @unique
+  template      Template @relation(fields: [templateId], references: [id], onDelete: Cascade)
+  redirectUrl   String?
+  language      String   @default("en")
+  emailSettings Json?
 }
 
 model Template {

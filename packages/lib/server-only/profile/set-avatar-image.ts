@@ -2,6 +2,7 @@ import sharp from 'sharp';
 
 import { prisma } from '@documenso/prisma';
 
+import { AppError, AppErrorCode } from '../../errors/app-error';
 import type { RequestMetadata } from '../../universal/extract-request-metadata';
 
 export type SetAvatarImageOptions = {
@@ -29,7 +30,9 @@ export const setAvatarImage = async ({
   });
 
   if (!user) {
-    throw new Error('User not found');
+    throw new AppError(AppErrorCode.NOT_FOUND, {
+      message: 'User not found',
+    });
   }
 
   oldAvatarImageId = user.avatarImageId;
@@ -47,7 +50,9 @@ export const setAvatarImage = async ({
     });
 
     if (!team) {
-      throw new Error('Team not found');
+      throw new AppError('TEAM_NOT_FOUND', {
+        statusCode: 404,
+      });
     }
 
     oldAvatarImageId = team.avatarImageId;

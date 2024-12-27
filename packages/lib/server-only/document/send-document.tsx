@@ -1,3 +1,5 @@
+import type { z } from 'zod';
+
 import { DOCUMENT_AUDIT_LOG_TYPE } from '@documenso/lib/types/document-audit-logs';
 import type { RequestMetadata } from '@documenso/lib/universal/extract-request-metadata';
 import { putPdfFile } from '@documenso/lib/universal/upload/put-file';
@@ -9,11 +11,17 @@ import {
   RecipientRole,
   SendStatus,
   SigningStatus,
+  WebhookTriggerEvents,
 } from '@documenso/prisma/client';
-import { WebhookTriggerEvents } from '@documenso/prisma/client';
+import {
+  DocumentMetaSchema,
+  DocumentSchema,
+  RecipientSchema,
+} from '@documenso/prisma/generated/zod';
 
 import { jobs } from '../../jobs/client';
 import { extractDerivedDocumentEmailSettings } from '../../types/document-email';
+import { ZWebhookDocumentSchema } from '../../types/webhook-payload';
 import { getFile } from '../../universal/upload/get-file';
 import { insertFormValuesInPdf } from '../pdf/insert-form-values-in-pdf';
 import { triggerWebhook } from '../webhooks/trigger/trigger-webhook';
@@ -26,13 +34,20 @@ export type SendDocumentOptions = {
   requestMetadata?: RequestMetadata;
 };
 
+export const ZSendDocumentResponseSchema = DocumentSchema.extend({
+  documentMeta: DocumentMetaSchema.nullable(),
+  Recipient: RecipientSchema.array(),
+});
+
+export type TSendDocumentResponse = z.infer<typeof ZSendDocumentResponseSchema>;
+
 export const sendDocument = async ({
   documentId,
   userId,
   teamId,
   sendEmail,
   requestMetadata,
-}: SendDocumentOptions) => {
+}: SendDocumentOptions): Promise<TSendDocumentResponse> => {
   const user = await prisma.user.findFirstOrThrow({
     where: {
       id: userId,
@@ -114,8 +129,14 @@ export const sendDocument = async ({
       formValues: document.formValues as Record<string, string | number | boolean>,
     });
 
+    let fileName = document.title;
+
+    if (!document.title.endsWith('.pdf')) {
+      fileName = `${document.title}.pdf`;
+    }
+
     const newDocumentData = await putPdfFile({
-      name: document.title,
+      name: fileName,
       type: 'application/pdf',
       arrayBuffer: async () => Promise.resolve(prefilled),
     });
@@ -204,6 +225,7 @@ export const sendDocument = async ({
         id: documentId,
       },
       include: {
+        documentMeta: true,
         Recipient: true,
       },
     });
@@ -230,6 +252,7 @@ export const sendDocument = async ({
         status: DocumentStatus.PENDING,
       },
       include: {
+        documentMeta: true,
         Recipient: true,
       },
     });
@@ -237,7 +260,7 @@ export const sendDocument = async ({
 
   await triggerWebhook({
     event: WebhookTriggerEvents.DOCUMENT_SENT,
-    data: updatedDocument,
+    data: ZWebhookDocumentSchema.parse(updatedDocument),
     userId,
     teamId,
   });

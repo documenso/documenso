@@ -38,7 +38,7 @@ export const resendDocument = async ({
   recipients,
   teamId,
   requestMetadata,
-}: ResendDocumentOptions) => {
+}: ResendDocumentOptions): Promise<void> => {
   const user = await prisma.user.findFirstOrThrow({
     where: {
       id: userId,
@@ -134,7 +134,7 @@ export const resendDocument = async ({
         emailMessage =
           customEmail?.message ||
           i18n._(
-            msg`${user.name} on behalf of ${document.team.name} has invited you to ${recipientActionVerb} the document "${document.title}".`,
+            msg`${user.name} on behalf of "${document.team.name}" has invited you to ${recipientActionVerb} the document "${document.title}".`,
           );
       }
 

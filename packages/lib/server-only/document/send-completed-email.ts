@@ -17,6 +17,7 @@ import { createDocumentAuditLogData } from '../../utils/document-audit-logs';
 import { renderCustomEmailTemplate } from '../../utils/render-custom-email-template';
 import { renderEmailWithI18N } from '../../utils/render-email-with-i18n';
 import { teamGlobalSettingsToBranding } from '../../utils/team-global-settings-to-branding';
+import { formatDocumentsPath } from '../../utils/teams';
 
 export interface SendDocumentOptions {
   documentId: number;
@@ -59,7 +60,9 @@ export const sendCompletedEmail = async ({ documentId, requestMetadata }: SendDo
 
   const assetBaseUrl = NEXT_PUBLIC_WEBAPP_URL() || 'http://localhost:3000';
 
-  let documentOwnerDownloadLink = `${NEXT_PUBLIC_WEBAPP_URL()}/documents/${document.id}`;
+  let documentOwnerDownloadLink = `${NEXT_PUBLIC_WEBAPP_URL()}${formatDocumentsPath(
+    document.team?.url,
+  )}/${document.id}`;
 
   if (document.team?.url) {
     documentOwnerDownloadLink = `${NEXT_PUBLIC_WEBAPP_URL()}/t/${document.team.url}/documents/${
@@ -69,14 +72,19 @@ export const sendCompletedEmail = async ({ documentId, requestMetadata }: SendDo
 
   const i18n = await getI18nInstance(document.documentMeta?.language);
 
-  const isDocumentCompletedEmailEnabled = extractDerivedDocumentEmailSettings(
-    document.documentMeta,
-  ).documentCompleted;
+  const emailSettings = extractDerivedDocumentEmailSettings(document.documentMeta);
+  const isDocumentCompletedEmailEnabled = emailSettings.documentCompleted;
+  const isOwnerDocumentCompletedEmailEnabled = emailSettings.ownerDocumentCompleted;
 
-  // If the document owner is not a recipient, OR recipient emails are disabled, then send the email to them separately.
+  // Send email to document owner if:
+  // 1. Owner document completed emails are enabled AND
+  // 2. Either:
+  //    - The owner is not a recipient, OR
+  //    - Recipient emails are disabled
   if (
-    !document.Recipient.find((recipient) => recipient.email === owner.email) ||
-    !isDocumentCompletedEmailEnabled
+    isOwnerDocumentCompletedEmailEnabled &&
+    (!document.Recipient.find((recipient) => recipient.email === owner.email) ||
+      !isDocumentCompletedEmailEnabled)
   ) {
     const template = createElement(DocumentCompletedEmailTemplate, {
       documentName: document.title,

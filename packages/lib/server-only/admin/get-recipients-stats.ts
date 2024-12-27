@@ -13,6 +13,7 @@ export const getRecipientsStats = async () => {
     [ReadStatus.NOT_OPENED]: 0,
     [SigningStatus.SIGNED]: 0,
     [SigningStatus.NOT_SIGNED]: 0,
+    [SigningStatus.REJECTED]: 0,
     [SendStatus.SENT]: 0,
     [SendStatus.NOT_SENT]: 0,
   };

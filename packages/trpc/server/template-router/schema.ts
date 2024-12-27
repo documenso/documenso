@@ -6,7 +6,7 @@ import {
   ZDocumentActionAuthTypesSchema,
 } from '@documenso/lib/types/document-auth';
 import { ZDocumentEmailSettingsSchema } from '@documenso/lib/types/document-email';
-import { ZBaseTableSearchParamsSchema } from '@documenso/lib/types/search-params';
+import { ZFindSearchParamsSchema } from '@documenso/lib/types/search-params';
 import { isValidRedirectUrl } from '@documenso/lib/utils/is-valid-redirect-url';
 import {
   DocumentDistributionMethod,
@@ -70,7 +70,7 @@ export const ZToggleTemplateDirectLinkMutationSchema = z.object({
 });
 
 export const ZDeleteTemplateMutationSchema = z.object({
-  id: z.number().min(1),
+  templateId: z.number().min(1),
   teamId: z.number().optional(),
 });
 
@@ -114,6 +114,7 @@ export const ZUpdateTemplateSettingsMutationSchema = z.object({
             'Please enter a valid URL, make sure you include http:// or https:// part of the url.',
         }),
       language: z.enum(SUPPORTED_LANGUAGE_CODES).optional(),
+      typedSignatureEnabled: z.boolean().optional(),
     })
     .optional(),
 });
@@ -124,18 +125,25 @@ export const ZSetSigningOrderForTemplateMutationSchema = z.object({
   signingOrder: z.nativeEnum(DocumentSigningOrder),
 });
 
-export const ZFindTemplatesQuerySchema = ZBaseTableSearchParamsSchema.extend({
+export const ZFindTemplatesQuerySchema = ZFindSearchParamsSchema.extend({
   teamId: z.number().optional(),
   type: z.nativeEnum(TemplateType).optional(),
 });
 
-export const ZGetTemplateWithDetailsByIdQuerySchema = z.object({
-  id: z.number().min(1),
+export const ZGetTemplateByIdQuerySchema = z.object({
+  templateId: z.number().min(1),
+  teamId: z.number().optional(),
 });
 
 export const ZMoveTemplatesToTeamSchema = z.object({
   templateId: z.number(),
   teamId: z.number(),
+});
+
+export const ZUpdateTemplateTypedSignatureSettingsMutationSchema = z.object({
+  templateId: z.number(),
+  teamId: z.number().optional(),
+  typedSignatureEnabled: z.boolean(),
 });
 
 export type TCreateTemplateMutationSchema = z.infer<typeof ZCreateTemplateMutationSchema>;
@@ -144,7 +152,5 @@ export type TCreateDocumentFromTemplateMutationSchema = z.infer<
 >;
 export type TDuplicateTemplateMutationSchema = z.infer<typeof ZDuplicateTemplateMutationSchema>;
 export type TDeleteTemplateMutationSchema = z.infer<typeof ZDeleteTemplateMutationSchema>;
-export type TGetTemplateWithDetailsByIdQuerySchema = z.infer<
-  typeof ZGetTemplateWithDetailsByIdQuerySchema
->;
+export type TGetTemplateByIdQuerySchema = z.infer<typeof ZGetTemplateByIdQuerySchema>;
 export type TMoveTemplatesToSchema = z.infer<typeof ZMoveTemplatesToTeamSchema>;

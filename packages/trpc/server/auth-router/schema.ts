@@ -1,6 +1,6 @@
 import { z } from 'zod';
 
-import { ZBaseTableSearchParamsSchema } from '@documenso/lib/types/search-params';
+import { ZFindSearchParamsSchema } from '@documenso/lib/types/search-params';
 import { ZRegistrationResponseJSONSchema } from '@documenso/lib/types/webauthn';
 
 export const ZCurrentPasswordSchema = z
@@ -61,7 +61,7 @@ export const ZUpdatePasskeyMutationSchema = z.object({
   name: z.string().trim().min(1),
 });
 
-export const ZFindPasskeysQuerySchema = ZBaseTableSearchParamsSchema.extend({
+export const ZFindPasskeysQuerySchema = ZFindSearchParamsSchema.extend({
   orderBy: z
     .object({
       column: z.enum(['createdAt', 'updatedAt', 'name']),

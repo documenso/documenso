@@ -1,19 +1,38 @@
+import type { z } from 'zod';
+
 import { prisma } from '@documenso/prisma';
 import type { Prisma } from '@documenso/prisma/client';
+import {
+  TeamEmailSchema,
+  TeamGlobalSettingsSchema,
+  TeamSchema,
+} from '@documenso/prisma/generated/zod';
+import { TeamMemberSchema } from '@documenso/prisma/generated/zod';
 
 export type GetTeamByIdOptions = {
   userId?: number;
   teamId: number;
 };
 
-export type GetTeamResponse = Awaited<ReturnType<typeof getTeamById>>;
+export const ZGetTeamByIdResponseSchema = TeamSchema.extend({
+  teamEmail: TeamEmailSchema.nullable(),
+  teamGlobalSettings: TeamGlobalSettingsSchema.nullable(),
+  currentTeamMember: TeamMemberSchema.pick({
+    role: true,
+  }).nullable(),
+});
+
+export type TGetTeamByIdResponse = z.infer<typeof ZGetTeamByIdResponseSchema>;
 
 /**
  * Get a team given a teamId.
  *
  * Provide an optional userId to check that the user is a member of the team.
  */
-export const getTeamById = async ({ userId, teamId }: GetTeamByIdOptions) => {
+export const getTeamById = async ({
+  userId,
+  teamId,
+}: GetTeamByIdOptions): Promise<TGetTeamByIdResponse> => {
   const whereFilter: Prisma.TeamWhereUniqueInput = {
     id: teamId,
   };

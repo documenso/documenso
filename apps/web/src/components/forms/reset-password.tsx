@@ -6,9 +6,10 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { Trans, msg } from '@lingui/macro';
 import { useLingui } from '@lingui/react';
 import { useForm } from 'react-hook-form';
+import { match } from 'ts-pattern';
 import { z } from 'zod';
 
-import { TRPCClientError } from '@documenso/trpc/client';
+import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import { trpc } from '@documenso/trpc/react';
 import { ZPasswordSchema } from '@documenso/trpc/server/auth-router/schema';
 import { cn } from '@documenso/ui/lib/utils';
@@ -76,21 +77,25 @@ export const ResetPasswordForm = ({ className, token }: ResetPasswordFormProps) 
 
       router.push('/signin');
     } catch (err) {
-      if (err instanceof TRPCClientError && err.data?.code === 'BAD_REQUEST') {
-        toast({
-          title: _(msg`An error occurred`),
-          description: err.message,
-          variant: 'destructive',
-        });
-      } else {
-        toast({
-          title: _(msg`An unknown error occurred`),
-          description: _(
+      const error = AppError.parseError(err);
+
+      const errorMessage = match(error.code)
+        .with(AppErrorCode.EXPIRED_CODE, () => msg`Token has expired. Please try again.`)
+        .with('INVALID_TOKEN', () => msg`Invalid token provided. Please try again.`)
+        .with(
+          'SAME_PASSWORD',
+          () => msg`Your new password cannot be the same as your old password.`,
+        )
+        .otherwise(
+          () =>
             msg`We encountered an unknown error while attempting to reset your password. Please try again later.`,
-          ),
-          variant: 'destructive',
-        });
-      }
+        );
+
+      toast({
+        title: _(msg`An error occurred`),
+        description: _(errorMessage),
+        variant: 'destructive',
+      });
     }
   };
 

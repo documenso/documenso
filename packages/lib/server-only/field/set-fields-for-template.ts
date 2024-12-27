@@ -1,3 +1,5 @@
+import { z } from 'zod';
+
 import { validateCheckboxField } from '@documenso/lib/advanced-fields-validation/validate-checkbox';
 import { validateDropdownField } from '@documenso/lib/advanced-fields-validation/validate-dropdown';
 import { validateNumberField } from '@documenso/lib/advanced-fields-validation/validate-number';
@@ -14,6 +16,7 @@ import {
 } from '@documenso/lib/types/field-meta';
 import { prisma } from '@documenso/prisma';
 import { FieldType } from '@documenso/prisma/client';
+import { FieldSchema } from '@documenso/prisma/generated/zod';
 
 export type SetFieldsForTemplateOptions = {
   userId: number;
@@ -31,11 +34,17 @@ export type SetFieldsForTemplateOptions = {
   }[];
 };
 
+export const ZSetFieldsForTemplateResponseSchema = z.object({
+  fields: z.array(FieldSchema),
+});
+
+export type TSetFieldsForTemplateResponse = z.infer<typeof ZSetFieldsForTemplateResponseSchema>;
+
 export const setFieldsForTemplate = async ({
   userId,
   templateId,
   fields,
-}: SetFieldsForTemplateOptions) => {
+}: SetFieldsForTemplateOptions): Promise<TSetFieldsForTemplateResponse> => {
   const template = await prisma.template.findFirst({
     where: {
       id: templateId,
@@ -206,5 +215,7 @@ export const setFieldsForTemplate = async ({
     return !isRemoved && !isUpdated;
   });
 
-  return [...filteredFields, ...persistedFields];
+  return {
+    fields: [...filteredFields, ...persistedFields],
+  };
 };

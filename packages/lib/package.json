@@ -25,6 +25,7 @@
     "@documenso/email": "*",
     "@documenso/prisma": "*",
     "@documenso/signing": "*",
+    "@honeybadger-io/js": "^6.10.1",
     "@lingui/core": "^4.11.3",
     "@lingui/macro": "^4.11.3",
     "@lingui/react": "^4.11.3",
@@ -51,11 +52,11 @@
     "pg": "^8.11.3",
     "playwright": "1.43.0",
     "react": "^18",
-    "remeda": "^2.12.1",
+    "remeda": "^2.17.3",
     "sharp": "0.32.6",
     "stripe": "^12.7.0",
     "ts-pattern": "^5.0.5",
-    "zod": "^3.22.4"
+    "zod": "3.24.1"
   },
   "devDependencies": {
     "@playwright/browser-chromium": "1.43.0",

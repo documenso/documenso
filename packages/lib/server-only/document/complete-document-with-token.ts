@@ -8,11 +8,12 @@ import {
   RecipientRole,
   SendStatus,
   SigningStatus,
+  WebhookTriggerEvents,
 } from '@documenso/prisma/client';
-import { WebhookTriggerEvents } from '@documenso/prisma/client';
 
 import { jobs } from '../../jobs/client';
 import type { TRecipientActionAuth } from '../../types/document-auth';
+import { ZWebhookDocumentSchema } from '../../types/webhook-payload';
 import { getIsRecipientsTurnToSign } from '../recipient/get-is-recipient-turn';
 import { triggerWebhook } from '../webhooks/trigger/trigger-webhook';
 import { sendPendingEmail } from './send-pending-email';
@@ -138,6 +139,14 @@ export const completeDocumentWithToken = async ({
     });
   });
 
+  await jobs.triggerJob({
+    name: 'send.recipient.signed.email',
+    payload: {
+      documentId: document.id,
+      recipientId: recipient.id,
+    },
+  });
+
   const pendingRecipients = await prisma.recipient.findMany({
     select: {
       id: true,
@@ -203,11 +212,19 @@ export const completeDocumentWithToken = async ({
     });
   }
 
-  const updatedDocument = await getDocument({ token, documentId });
+  const updatedDocument = await prisma.document.findFirstOrThrow({
+    where: {
+      id: document.id,
+    },
+    include: {
+      documentMeta: true,
+      Recipient: true,
+    },
+  });
 
   await triggerWebhook({
     event: WebhookTriggerEvents.DOCUMENT_SIGNED,
-    data: updatedDocument,
+    data: ZWebhookDocumentSchema.parse(updatedDocument),
     userId: updatedDocument.userId,
     teamId: updatedDocument.teamId ?? undefined,
   });

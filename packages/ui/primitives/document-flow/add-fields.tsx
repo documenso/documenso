@@ -76,8 +76,11 @@ const fontCaveat = Caveat({
   variable: '--font-caveat',
 });
 
-const MIN_HEIGHT_PX = 20;
-const MIN_WIDTH_PX = 80;
+const MIN_HEIGHT_PX = 12;
+const MIN_WIDTH_PX = 36;
+
+const DEFAULT_HEIGHT_PX = MIN_HEIGHT_PX * 2.5;
+const DEFAULT_WIDTH_PX = MIN_WIDTH_PX * 2.5;
 
 export type FieldFormType = {
   nativeId?: number;
@@ -126,6 +129,7 @@ export const AddFieldsFormPartial = ({
     currentStep === 1 && typeof documentFlow.onBackStep === 'function' && canGoBack;
   const [showAdvancedSettings, setShowAdvancedSettings] = useState(false);
   const [currentField, setCurrentField] = useState<FieldFormType>();
+  const [activeFieldId, setActiveFieldId] = useState<string | null>(null);
 
   const form = useForm<TAddFieldsFormSchema>({
     defaultValues: {
@@ -480,8 +484,8 @@ export const AddFieldsFormPartial = ({
       }
 
       fieldBounds.current = {
-        height: Math.max(MIN_HEIGHT_PX),
-        width: Math.max(MIN_WIDTH_PX),
+        height: Math.max(DEFAULT_HEIGHT_PX),
+        width: Math.max(DEFAULT_WIDTH_PX),
       };
     });
 
@@ -594,7 +598,7 @@ export const AddFieldsFormPartial = ({
               {selectedField && (
                 <div
                   className={cn(
-                    'text-muted-foreground dark:text-muted-background pointer-events-none fixed z-50 flex cursor-pointer flex-col items-center justify-center bg-white transition duration-200',
+                    'text-muted-foreground dark:text-muted-background pointer-events-none fixed z-50 flex cursor-pointer flex-col items-center justify-center bg-white transition duration-200 [container-type:size]',
                     selectedSignerStyles.default.base,
                     {
                       '-rotate-6 scale-90 opacity-50 dark:bg-black/20': !isFieldWithinBounds,
@@ -609,7 +613,9 @@ export const AddFieldsFormPartial = ({
                     width: fieldBounds.current.width,
                   }}
                 >
-                  {parseMessageDescriptor(_, FRIENDLY_FIELD_TYPE[selectedField])}
+                  <span className="text-[clamp(0.425rem,25cqw,0.825rem)]">
+                    {parseMessageDescriptor(_, FRIENDLY_FIELD_TYPE[selectedField])}
+                  </span>
                 </div>
               )}
 
@@ -630,8 +636,10 @@ export const AddFieldsFormPartial = ({
                         selectedSigner?.email !== field.signerEmail ||
                         !canRecipientBeModified(selectedSigner, fields)
                       }
-                      minHeight={fieldBounds.current.height}
-                      minWidth={fieldBounds.current.width}
+                      minHeight={MIN_HEIGHT_PX}
+                      minWidth={MIN_WIDTH_PX}
+                      defaultHeight={DEFAULT_HEIGHT_PX}
+                      defaultWidth={DEFAULT_WIDTH_PX}
                       passive={isFieldWithinBounds && !!selectedField}
                       onFocus={() => setLastActiveField(field)}
                       onBlur={() => setLastActiveField(null)}
@@ -645,6 +653,9 @@ export const AddFieldsFormPartial = ({
                       }}
                       hideRecipients={hideRecipients}
                       hasErrors={!!hasFieldError}
+                      active={activeFieldId === field.formId}
+                      onFieldActivate={() => setActiveFieldId(field.formId)}
+                      onFieldDeactivate={() => setActiveFieldId(null)}
                     />
                   );
                 })}
@@ -1075,8 +1086,8 @@ export const AddFieldsFormPartial = ({
                     {emptyCheckboxFields.length > 0
                       ? 'Checkbox'
                       : emptyRadioFields.length > 0
-                      ? 'Radio'
-                      : 'Select'}{' '}
+                        ? 'Radio'
+                        : 'Select'}{' '}
                     field.
                   </Trans>
                 </li>

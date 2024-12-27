@@ -34,7 +34,7 @@ export const resendTeamMemberInvitation = async ({
   userName,
   teamId,
   invitationId,
-}: ResendTeamMemberInvitationOptions) => {
+}: ResendTeamMemberInvitationOptions): Promise<void> => {
   await prisma.$transaction(
     async (tx) => {
       const team = await tx.team.findUniqueOrThrow({
@@ -55,7 +55,7 @@ export const resendTeamMemberInvitation = async ({
       });
 
       if (!team) {
-        throw new AppError('TeamNotFound', 'User is not a valid member of the team.');
+        throw new AppError('TeamNotFound', { message: 'User is not a valid member of the team.' });
       }
 
       const teamMemberInvite = await tx.teamMemberInvite.findUniqueOrThrow({
@@ -66,7 +66,7 @@ export const resendTeamMemberInvitation = async ({
       });
 
       if (!teamMemberInvite) {
-        throw new AppError('InviteNotFound', 'No invite exists for this user.');
+        throw new AppError('InviteNotFound', { message: 'No invite exists for this user.' });
       }
 
       await sendTeamMemberInviteEmail({

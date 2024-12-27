@@ -4,7 +4,15 @@ import Link from 'next/link';
 
 import { Trans, msg } from '@lingui/macro';
 import { useLingui } from '@lingui/react';
-import { CheckIcon, Clock, MailIcon, MailOpenIcon, PenIcon, PlusIcon } from 'lucide-react';
+import {
+  AlertTriangle,
+  CheckIcon,
+  Clock,
+  MailIcon,
+  MailOpenIcon,
+  PenIcon,
+  PlusIcon,
+} from 'lucide-react';
 import { match } from 'ts-pattern';
 
 import { RECIPIENT_ROLES_DESCRIPTION } from '@documenso/lib/constants/recipient-roles';
@@ -15,6 +23,7 @@ import { CopyTextButton } from '@documenso/ui/components/common/copy-text-button
 import { SignatureIcon } from '@documenso/ui/icons/signature';
 import { AvatarWithText } from '@documenso/ui/primitives/avatar';
 import { Badge } from '@documenso/ui/primitives/badge';
+import { PopoverHover } from '@documenso/ui/primitives/popover';
 import { useToast } from '@documenso/ui/primitives/use-toast';
 
 export type DocumentPageViewRecipientsProps = {
@@ -121,6 +130,26 @@ export const DocumentPageViewRecipients = ({
                     <Clock className="mr-1 h-3 w-3" />
                     <Trans>Pending</Trans>
                   </Badge>
+                )}
+
+              {document.status !== DocumentStatus.DRAFT &&
+                recipient.signingStatus === SigningStatus.REJECTED && (
+                  <PopoverHover
+                    trigger={
+                      <Badge variant="destructive">
+                        <AlertTriangle className="mr-1 h-3 w-3" />
+                        <Trans>Rejected</Trans>
+                      </Badge>
+                    }
+                  >
+                    <p className="text-sm">
+                      <Trans>Reason for rejection: </Trans>
+                    </p>
+
+                    <p className="text-muted-foreground mt-1 text-sm">
+                      {recipient.rejectionReason}
+                    </p>
+                  </PopoverHover>
                 )}
 
               {document.status === DocumentStatus.PENDING &&
