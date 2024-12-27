@@ -178,7 +178,7 @@ export const DropdownField = ({
         )}
 
         {!field.inserted && (
-          <p className="group-hover:text-primary text-muted-foreground flex flex-col items-center justify-center duration-200 ">
+          <p className="group-hover:text-primary text-muted-foreground flex flex-col items-center justify-center duration-200">
             <Select value={localChoice} onValueChange={handleSelectItem}>
               <SelectTrigger
                 className={cn(

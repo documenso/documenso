@@ -214,6 +214,12 @@ export const FieldItem = ({
       onDragStart={() => onFieldActivate?.()}
       onResizeStart={() => onFieldActivate?.()}
       enableResizing={!fixedSize}
+      resizeHandleStyles={{
+        bottom: { bottom: -8, cursor: 'ns-resize' },
+        top: { top: -8, cursor: 'ns-resize' },
+        left: { cursor: 'ew-resize' },
+        right: { cursor: 'ew-resize' },
+      }}
       onResizeStop={(_e, _d, ref) => {
         onFieldDeactivate?.();
         onResize?.(ref);

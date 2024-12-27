@@ -11,6 +11,7 @@ import { useForm } from 'react-hook-form';
 import { useAnalytics } from '@documenso/lib/client-only/hooks/use-analytics';
 import type { DocumentAndSender } from '@documenso/lib/server-only/document/get-document-by-token';
 import type { TRecipientActionAuth } from '@documenso/lib/types/document-auth';
+import { isFieldUnsignedAndRequired } from '@documenso/lib/utils/advanced-fields-helpers';
 import { sortFieldsByPosition, validateFieldsInserted } from '@documenso/lib/utils/fields';
 import { type Field, FieldType, type Recipient, RecipientRole } from '@documenso/prisma/client';
 import { trpc } from '@documenso/trpc/react';
@@ -57,25 +58,30 @@ export const SigningForm = ({
   // Keep the loading state going if successful since the redirect may take some time.
   const isSubmitting = formState.isSubmitting || formState.isSubmitSuccessful;
 
+  const fieldsRequiringValidation = useMemo(
+    () => fields.filter(isFieldUnsignedAndRequired),
+    [fields],
+  );
+
   const hasSignatureField = fields.some((field) => field.type === FieldType.SIGNATURE);
 
   const uninsertedFields = useMemo(() => {
-    return sortFieldsByPosition(fields.filter((field) => !field.inserted));
+    return sortFieldsByPosition(fieldsRequiringValidation.filter((field) => !field.inserted));
   }, [fields]);
 
   const fieldsValidated = () => {
     setValidateUninsertedFields(true);
-    validateFieldsInserted(fields);
+    validateFieldsInserted(fieldsRequiringValidation);
   };
 
   const onFormSubmit = async () => {
     setValidateUninsertedFields(true);
 
+    const isFieldsValid = validateFieldsInserted(fieldsRequiringValidation);
+
     if (hasSignatureField && !signatureValid) {
       return;
     }
-
-    const isFieldsValid = validateFieldsInserted(fields);
 
     if (!isFieldsValid) {
       return;
