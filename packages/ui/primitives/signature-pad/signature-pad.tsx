@@ -191,8 +191,9 @@ export const SignaturePad = ({
     }
 
     const point = Point.fromEvent(event, DPI, $el.current);
+    const lastPoint = currentLine[currentLine.length - 1];
 
-    if (point.distanceTo(currentLine[currentLine.length - 1]) > 5) {
+    if (lastPoint && point.distanceTo(lastPoint) > 5) {
       setCurrentLine([...currentLine, point]);
 
       // Update the canvas here to draw the lines
@@ -301,6 +302,7 @@ export const SignaturePad = ({
     setTypedSignature('');
     setLines([]);
     setCurrentLine([]);
+    setIsPressed(false);
   };
 
   const renderTypedSignature = () => {
@@ -349,6 +351,17 @@ export const SignaturePad = ({
 
   const handleTypedSignatureChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const newValue = event.target.value;
+
+    // Deny input while drawing.
+    if (isPressed) {
+      return;
+    }
+
+    if (lines.length > 0) {
+      setLines([]);
+      setCurrentLine([]);
+    }
+
     setTypedSignature(newValue);
 
     if ($el.current) {
