@@ -1,10 +1,10 @@
+import { AppError } from '@documenso/lib/errors/app-error';
 import { prisma } from '@documenso/prisma';
 
 export type DisableUserOptions = {
   id: number;
 };
 
-// TODO: Do this properly
 export const disableUser = async ({ id }: DisableUserOptions) => {
   const user = await prisma.user.findFirst({
     where: {
@@ -20,7 +20,7 @@ export const disableUser = async ({ id }: DisableUserOptions) => {
   });
 
   if (!user) {
-    throw new Error('There was an error disabling the user');
+    throw new AppError('There was an error disabling the user');
   }
 
   try {

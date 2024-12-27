@@ -1,3 +1,4 @@
+import { AppError } from '@documenso/lib/errors/app-error';
 import { prisma } from '@documenso/prisma';
 
 export type EnableUserOptions = {
@@ -12,7 +13,7 @@ export const enableUser = async ({ id }: EnableUserOptions) => {
   });
 
   if (!user) {
-    throw new Error('There was an error enabling the user');
+    throw new AppError('There was an error enabling the user');
   }
 
   await prisma.user.update({

@@ -2,13 +2,12 @@
 
 import { useState } from 'react';
 
-import { useRouter } from 'next/navigation';
-
 import { Trans, msg } from '@lingui/macro';
 import { useLingui } from '@lingui/react';
+import { match } from 'ts-pattern';
 
+import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import type { User } from '@documenso/prisma/client';
-import { TRPCClientError } from '@documenso/trpc/client';
 import { trpc } from '@documenso/trpc/react';
 import { Alert, AlertDescription, AlertTitle } from '@documenso/ui/primitives/alert';
 import { Button } from '@documenso/ui/primitives/button';
@@ -26,14 +25,12 @@ import { useToast } from '@documenso/ui/primitives/use-toast';
 
 export type EnableUserDialogProps = {
   className?: string;
-  user: User;
+  userToEnable: User;
 };
 
-export const EnableUserDialog = ({ className, user }: EnableUserDialogProps) => {
+export const EnableUserDialog = ({ className, userToEnable }: EnableUserDialogProps) => {
   const { toast } = useToast();
   const { _ } = useLingui();
-
-  const router = useRouter();
 
   const [email, setEmail] = useState('');
 
@@ -43,7 +40,7 @@ export const EnableUserDialog = ({ className, user }: EnableUserDialogProps) => 
   const onEnableAccount = async () => {
     try {
       await enableUser({
-        id: user.id,
+        id: userToEnable.id,
         email,
       });
 
@@ -52,26 +49,20 @@ export const EnableUserDialog = ({ className, user }: EnableUserDialogProps) => 
         description: _(msg`The account has been enabled successfully.`),
         duration: 5000,
       });
-
-      router.push('/admin/users');
     } catch (err) {
-      if (err instanceof TRPCClientError && err.data?.code === 'BAD_REQUEST') {
-        toast({
-          title: _(msg`An error occurred`),
-          description: err.message,
-          variant: 'destructive',
-        });
-      } else {
-        toast({
-          title: _(msg`An unknown error occurred`),
-          variant: 'destructive',
-          description:
-            err.message ??
-            _(
-              msg`We encountered an unknown error while attempting to disable the account. Please try again later.`,
-            ),
-        });
-      }
+      const error = AppError.parseError(err);
+
+      const errorMessage = match(error.code)
+        .with(AppErrorCode.NOT_FOUND, () => msg`User not found.`)
+        .with(AppErrorCode.UNAUTHORIZED, () => msg`You are not authorized to enable this user.`)
+        .otherwise(() => msg`An error occurred while enabling the user.`);
+
+      toast({
+        title: _(msg`Error`),
+        description: _(errorMessage),
+        variant: 'destructive',
+        duration: 7500,
+      });
     }
   };
 
@@ -109,7 +100,8 @@ export const EnableUserDialog = ({ className, user }: EnableUserDialogProps) => 
               <div>
                 <DialogDescription>
                   <Trans>
-                    To confirm, please enter the accounts email address <br />({user.email}).
+                    To confirm, please enter the accounts email address <br />({userToEnable.email}
+                    ).
                   </Trans>
                 </DialogDescription>
 
@@ -125,7 +117,7 @@ export const EnableUserDialog = ({ className, user }: EnableUserDialogProps) => 
                 <Button
                   onClick={onEnableAccount}
                   loading={isEnablingUser}
-                  disabled={email !== user.email}
+                  disabled={email !== userToEnable.email}
                 >
                   <Trans>Enable account</Trans>
                 </Button>
