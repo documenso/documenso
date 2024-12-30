@@ -12,6 +12,7 @@ import { useSession } from 'next-auth/react';
 import { useLimits } from '@documenso/ee/server-only/limits/provider/client';
 import { useAnalytics } from '@documenso/lib/client-only/hooks/use-analytics';
 import { APP_DOCUMENT_UPLOAD_SIZE_LIMIT } from '@documenso/lib/constants/app';
+import { DEFAULT_DOCUMENT_TIME_ZONE, TIME_ZONES } from '@documenso/lib/constants/time-zones';
 import { AppError } from '@documenso/lib/errors/app-error';
 import { createDocumentData } from '@documenso/lib/server-only/document-data/create-document-data';
 import { putPdfFile } from '@documenso/lib/universal/upload/put-file';
@@ -33,7 +34,9 @@ export type UploadDocumentProps = {
 export const UploadDocument = ({ className, team }: UploadDocumentProps) => {
   const router = useRouter();
   const analytics = useAnalytics();
-  const userTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+  const userTimezone =
+    TIME_ZONES.find((timezone) => timezone === Intl.DateTimeFormat().resolvedOptions().timeZone) ??
+    DEFAULT_DOCUMENT_TIME_ZONE;
 
   const { data: session } = useSession();
 
