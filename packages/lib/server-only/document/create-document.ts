@@ -26,6 +26,7 @@ export type CreateDocumentOptions = {
   documentDataId: string;
   formValues?: Record<string, string | number | boolean>;
   normalizePdf?: boolean;
+  timezone?: string;
   requestMetadata?: RequestMetadata;
 };
 
@@ -42,6 +43,7 @@ export const createDocument = async ({
   normalizePdf,
   formValues,
   requestMetadata,
+  timezone,
 }: CreateDocumentOptions): Promise<TCreateDocumentResponse> => {
   const user = await prisma.user.findFirstOrThrow({
     where: {
@@ -150,6 +152,7 @@ export const createDocument = async ({
           create: {
             language: team?.teamGlobalSettings?.documentLanguage,
             typedSignatureEnabled: team?.teamGlobalSettings?.typedSignatureEnabled,
+            timezone: timezone,
           },
         },
       },
