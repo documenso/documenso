@@ -1,16 +1,5 @@
-import type { z } from 'zod';
-
 import { prisma } from '@documenso/prisma';
 import type { Prisma } from '@documenso/prisma/client';
-import {
-  DocumentDataSchema,
-  FieldSchema,
-  RecipientSchema,
-  TemplateDirectLinkSchema,
-  TemplateMetaSchema,
-  TemplateSchema,
-  UserSchema,
-} from '@documenso/prisma/generated/zod';
 
 import { AppError, AppErrorCode } from '../../errors/app-error';
 
@@ -20,26 +9,7 @@ export type GetTemplateByIdOptions = {
   teamId?: number;
 };
 
-export const ZGetTemplateByIdResponseSchema = TemplateSchema.extend({
-  directLink: TemplateDirectLinkSchema.nullable(),
-  templateDocumentData: DocumentDataSchema,
-  templateMeta: TemplateMetaSchema.nullable(),
-  Recipient: RecipientSchema.array(),
-  Field: FieldSchema.array(),
-  User: UserSchema.pick({
-    id: true,
-    name: true,
-    email: true,
-  }),
-});
-
-export type TGetTemplateByIdResponse = z.infer<typeof ZGetTemplateByIdResponseSchema>;
-
-export const getTemplateById = async ({
-  id,
-  userId,
-  teamId,
-}: GetTemplateByIdOptions): Promise<TGetTemplateByIdResponse> => {
+export const getTemplateById = async ({ id, userId, teamId }: GetTemplateByIdOptions) => {
   const whereFilter: Prisma.TemplateWhereInput = {
     id,
     OR:

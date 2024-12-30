@@ -10,16 +10,13 @@ import { msg } from '@lingui/macro';
 import { useAnalytics } from '@documenso/lib/client-only/hooks/use-analytics';
 import { NEXT_PUBLIC_WEBAPP_URL } from '@documenso/lib/constants/app';
 import { base64 } from '@documenso/lib/universal/base64';
-import { putPdfFile } from '@documenso/lib/universal/upload/put-file';
 import type { Field, Recipient } from '@documenso/prisma/client';
 import { DocumentDataType, Prisma } from '@documenso/prisma/client';
-import { trpc } from '@documenso/trpc/react';
 import { Card, CardContent } from '@documenso/ui/primitives/card';
 import { DocumentDropzone } from '@documenso/ui/primitives/document-dropzone';
 import { AddFieldsFormPartial } from '@documenso/ui/primitives/document-flow/add-fields';
 import type { TAddFieldsFormSchema } from '@documenso/ui/primitives/document-flow/add-fields.types';
 import { AddSignatureFormPartial } from '@documenso/ui/primitives/document-flow/add-signature';
-import type { TAddSignatureFormSchema } from '@documenso/ui/primitives/document-flow/add-signature.types';
 import { DocumentFlowFormContainer } from '@documenso/ui/primitives/document-flow/document-flow-root';
 import type { DocumentFlowStep } from '@documenso/ui/primitives/document-flow/types';
 import { LazyPDFViewer } from '@documenso/ui/primitives/lazy-pdf-viewer';
@@ -42,9 +39,6 @@ export const SinglePlayerClient = () => {
 
   const [step, setStep] = useState<SinglePlayerModeStep>('fields');
   const [fields, setFields] = useState<Field[]>([]);
-
-  const { mutateAsync: createSinglePlayerDocument } =
-    trpc.singleplayer.createSinglePlayerDocument.useMutation();
 
   const documentFlow: Record<SinglePlayerModeStep, DocumentFlowStep> = {
     fields: {
@@ -112,38 +106,35 @@ export const SinglePlayerClient = () => {
   /**
    * Upload, create, sign and send the document.
    */
-  const onSignSubmit = async (data: TAddSignatureFormSchema) => {
+  const onSignSubmit = (data: unknown) => {
     if (!uploadedFile) {
       return;
     }
 
     try {
-      const putFileData = await putPdfFile(uploadedFile.file);
-
-      const documentToken = await createSinglePlayerDocument({
-        documentData: {
-          type: putFileData.type,
-          data: putFileData.data,
-        },
-        documentName: uploadedFile.file.name,
-        signer: data,
-        fields: fields.map((field) => ({
-          page: field.page,
-          type: field.type,
-          positionX: field.positionX.toNumber(),
-          positionY: field.positionY.toNumber(),
-          width: field.width.toNumber(),
-          height: field.height.toNumber(),
-          fieldMeta: field.fieldMeta,
-        })),
-        fieldMeta: { type: undefined },
-      });
-
-      analytics.capture('Marketing: SPM - Document signed', {
-        signer: data.email,
-      });
-
-      router.push(`/singleplayer/${documentToken}/success`);
+      // const putFileData = await putPdfFile(uploadedFile.file);
+      // const documentToken = await createSinglePlayerDocument({
+      //   documentData: {
+      //     type: putFileData.type,
+      //     data: putFileData.data,
+      //   },
+      //   documentName: uploadedFile.file.name,
+      //   signer: data,
+      //   fields: fields.map((field) => ({
+      //     page: field.page,
+      //     type: field.type,
+      //     positionX: field.positionX.toNumber(),
+      //     positionY: field.positionY.toNumber(),
+      //     width: field.width.toNumber(),
+      //     height: field.height.toNumber(),
+      //     fieldMeta: field.fieldMeta,
+      //   })),
+      //   fieldMeta: { type: undefined },
+      // });
+      // analytics.capture('Marketing: SPM - Document signed', {
+      //   signer: data.email,
+      // });
+      // router.push(`/singleplayer/${documentToken}/success`);
     } catch {
       toast({
         title: 'Something went wrong',

@@ -15,7 +15,7 @@ import { downloadFile } from '@documenso/lib/client-only/download-file';
 import { TEAM_MEMBER_ROLE_HIERARCHY, TEAM_MEMBER_ROLE_MAP } from '@documenso/lib/constants/teams';
 import { TeamMemberRole } from '@documenso/prisma/client';
 import { trpc } from '@documenso/trpc/react';
-import { ZCreateTeamMemberInvitesMutationSchema } from '@documenso/trpc/server/team-router/schema';
+import { ZCreateTeamMemberInvitesRequestSchema } from '@documenso/trpc/server/team-router/create-team-member-invites-route';
 import { cn } from '@documenso/ui/lib/utils';
 import { Button } from '@documenso/ui/primitives/button';
 import { Card, CardContent } from '@documenso/ui/primitives/card';
@@ -55,7 +55,7 @@ export type InviteTeamMembersDialogProps = {
 
 const ZInviteTeamMembersFormSchema = z
   .object({
-    invitations: ZCreateTeamMemberInvitesMutationSchema.shape.invitations,
+    invitations: ZCreateTeamMemberInvitesRequestSchema.shape.invitations,
   })
   // Display exactly which rows are duplicates.
   .superRefine((items, ctx) => {

@@ -27,11 +27,21 @@ import {
   ZAdminUpdateSiteSettingMutationSchema,
 } from './schema';
 
+export const ZRetrieveUserByIdQuerySchema = z.object({
+  id: z.number().min(1),
+});
+
 export const adminRouter = router({
   findDocuments: adminProcedure.input(ZAdminFindDocumentsQuerySchema).query(async ({ input }) => {
     const { query, page, perPage } = input;
 
     return await findDocuments({ query, page, perPage });
+  }),
+
+  getUser: adminProcedure.input(ZRetrieveUserByIdQuerySchema).query(async ({ input }) => {
+    const { id } = input;
+
+    return await getUserById({ id });
   }),
 
   updateUser: adminProcedure

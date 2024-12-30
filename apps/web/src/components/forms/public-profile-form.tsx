@@ -17,8 +17,8 @@ import { formatUserProfilePath } from '@documenso/lib/utils/public-profiles';
 import type { TeamProfile, UserProfile } from '@documenso/prisma/client';
 import {
   MAX_PROFILE_BIO_LENGTH,
-  ZUpdatePublicProfileMutationSchema,
-} from '@documenso/trpc/server/profile-router/schema';
+  ZUpdatePublicProfileRequestSchema,
+} from '@documenso/trpc/server/profile-router/update-public-profile-route';
 import { cn } from '@documenso/ui/lib/utils';
 import { Button } from '@documenso/ui/primitives/button';
 import {
@@ -33,7 +33,7 @@ import { Input } from '@documenso/ui/primitives/input';
 import { Textarea } from '@documenso/ui/primitives/textarea';
 import { useToast } from '@documenso/ui/primitives/use-toast';
 
-export const ZPublicProfileFormSchema = ZUpdatePublicProfileMutationSchema.pick({
+export const ZPublicProfileFormSchema = ZUpdatePublicProfileRequestSchema.pick({
   bio: true,
   enabled: true,
   url: true,

@@ -15,7 +15,7 @@ import { useUpdateSearchParams } from '@documenso/lib/client-only/hooks/use-upda
 import { WEBAPP_BASE_URL } from '@documenso/lib/constants/app';
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import { trpc } from '@documenso/trpc/react';
-import { ZCreateTeamMutationSchema } from '@documenso/trpc/server/team-router/schema';
+import { ZCreateTeamRequestSchema } from '@documenso/trpc/server/team-router/create-team-route';
 import { Button } from '@documenso/ui/primitives/button';
 import {
   Dialog,
@@ -41,7 +41,7 @@ export type CreateTeamDialogProps = {
   trigger?: React.ReactNode;
 } & Omit<DialogPrimitive.DialogProps, 'children'>;
 
-const ZCreateTeamFormSchema = ZCreateTeamMutationSchema.pick({
+const ZCreateTeamFormSchema = ZCreateTeamRequestSchema.pick({
   teamName: true,
   teamUrl: true,
 });

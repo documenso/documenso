@@ -132,7 +132,7 @@ export const EditDocumentForm = ({
       },
     });
 
-  const { mutateAsync: addSigners } = trpc.recipient.addSigners.useMutation({
+  const { mutateAsync: addSigners } = trpc.recipient.setDocumentRecipients.useMutation({
     ...DO_NOT_INVALIDATE_QUERY_ON_MUTATION,
     onSuccess: ({ recipients: newRecipients }) => {
       utils.document.getDocumentWithDetailsById.setData(

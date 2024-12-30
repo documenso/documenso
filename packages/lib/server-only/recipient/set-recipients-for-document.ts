@@ -1,7 +1,6 @@
 import { createElement } from 'react';
 
 import { msg } from '@lingui/macro';
-import { z } from 'zod';
 
 import { isUserEnterprise } from '@documenso/ee/server-only/util/is-document-enterprise';
 import { mailer } from '@documenso/email/mailer';
@@ -22,7 +21,6 @@ import { prisma } from '@documenso/prisma';
 import type { Recipient } from '@documenso/prisma/client';
 import { RecipientRole } from '@documenso/prisma/client';
 import { SendStatus, SigningStatus } from '@documenso/prisma/client';
-import { RecipientSchema } from '@documenso/prisma/generated/zod';
 
 import { getI18nInstance } from '../../client-only/providers/i18n.server';
 import { NEXT_PUBLIC_WEBAPP_URL } from '../../constants/app';
@@ -41,21 +39,13 @@ export interface SetRecipientsForDocumentOptions {
   requestMetadata?: RequestMetadata;
 }
 
-export const ZSetRecipientsForDocumentResponseSchema = z.object({
-  recipients: RecipientSchema.array(),
-});
-
-export type TSetRecipientsForDocumentResponse = z.infer<
-  typeof ZSetRecipientsForDocumentResponseSchema
->;
-
 export const setRecipientsForDocument = async ({
   userId,
   teamId,
   documentId,
   recipients,
   requestMetadata,
-}: SetRecipientsForDocumentOptions): Promise<TSetRecipientsForDocumentResponse> => {
+}: SetRecipientsForDocumentOptions) => {
   const document = await prisma.document.findFirst({
     where: {
       id: documentId,

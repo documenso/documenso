@@ -12,7 +12,7 @@ import type { z } from 'zod';
 import { WEBAPP_BASE_URL } from '@documenso/lib/constants/app';
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import { trpc } from '@documenso/trpc/react';
-import { ZUpdateTeamMutationSchema } from '@documenso/trpc/server/team-router/schema';
+import { ZUpdateTeamRequestSchema } from '@documenso/trpc/server/team-router/update-team-route';
 import { Button } from '@documenso/ui/primitives/button';
 import {
   Form,
@@ -31,7 +31,7 @@ export type UpdateTeamDialogProps = {
   teamUrl: string;
 };
 
-const ZUpdateTeamFormSchema = ZUpdateTeamMutationSchema.shape.data.pick({
+const ZUpdateTeamFormSchema = ZUpdateTeamRequestSchema.shape.data.pick({
   name: true,
   url: true,
 });
