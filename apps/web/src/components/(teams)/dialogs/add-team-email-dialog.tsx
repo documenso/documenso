@@ -14,7 +14,7 @@ import type { z } from 'zod';
 
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import { trpc } from '@documenso/trpc/react';
-import { ZCreateTeamEmailVerificationMutationSchema } from '@documenso/trpc/server/team-router/schema';
+import { ZCreateTeamEmailVerificationRequestSchema } from '@documenso/trpc/server/team-router/create-team-email-verification-route';
 import { Button } from '@documenso/ui/primitives/button';
 import {
   Dialog,
@@ -41,7 +41,7 @@ export type AddTeamEmailDialogProps = {
   trigger?: React.ReactNode;
 } & Omit<DialogPrimitive.DialogProps, 'children'>;
 
-const ZCreateTeamEmailFormSchema = ZCreateTeamEmailVerificationMutationSchema.pick({
+const ZCreateTeamEmailFormSchema = ZCreateTeamEmailVerificationRequestSchema.pick({
   name: true,
   email: true,
 });

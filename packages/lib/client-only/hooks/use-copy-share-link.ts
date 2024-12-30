@@ -12,7 +12,7 @@ export function useCopyShareLink({ onSuccess, onError }: UseCopyShareLinkOptions
   const [, copyToClipboard] = useCopyToClipboard();
 
   const { mutateAsync: createOrGetShareLink, isLoading: isCreatingShareLink } =
-    trpc.shareLink.createOrGetShareLink.useMutation();
+    trpc.document.createOrGetShareLink.useMutation();
 
   /**
    * Copy a newly created, or pre-existing share link to the user's clipboard.

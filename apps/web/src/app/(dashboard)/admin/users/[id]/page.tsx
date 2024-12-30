@@ -37,7 +37,7 @@ export default function UserPage({ params }: { params: { id: number } }) {
 
   const router = useRouter();
 
-  const { data: user } = trpc.profile.getUser.useQuery(
+  const { data: user } = trpc.admin.getUser.useQuery(
     {
       id: Number(params.id),
     },

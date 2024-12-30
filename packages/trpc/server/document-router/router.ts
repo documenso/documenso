@@ -43,6 +43,7 @@ import {
   updateDocumentSettings,
 } from '@documenso/lib/server-only/document/update-document-settings';
 import { updateTitle } from '@documenso/lib/server-only/document/update-title';
+import { createOrGetShareLink } from '@documenso/lib/server-only/share/create-or-get-share-link';
 import { symmetricEncrypt } from '@documenso/lib/universal/crypto';
 import { extractNextApiRequestMetadata } from '@documenso/lib/universal/extract-request-metadata';
 import { DocumentStatus } from '@documenso/prisma/client';
@@ -70,6 +71,10 @@ import {
   ZUpdateTypedSignatureSettingsMutationSchema,
 } from './schema';
 
+export const ZCreateOrGetShareLinkMutationSchema = z.object({
+  documentId: z.number(),
+  token: z.string().optional(),
+});
 export const documentRouter = router({
   /**
    * @private
@@ -95,6 +100,24 @@ export const documentRouter = router({
         token,
         userId: ctx.user?.id,
       });
+    }),
+
+  createOrGetShareLink: procedure
+    .input(ZCreateOrGetShareLinkMutationSchema)
+    .mutation(async ({ ctx, input }) => {
+      const { documentId, token } = input;
+
+      if (token) {
+        return await createOrGetShareLink({ documentId, token });
+      }
+
+      if (!ctx.user?.id) {
+        throw new Error(
+          'You must either provide a token or be logged in to create a sharing link.',
+        );
+      }
+
+      return await createOrGetShareLink({ documentId, userId: ctx.user.id });
     }),
 
   /**

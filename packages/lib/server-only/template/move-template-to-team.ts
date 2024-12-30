@@ -1,7 +1,4 @@
-import type { z } from 'zod';
-
 import { prisma } from '@documenso/prisma';
-import { TemplateSchema } from '@documenso/prisma/generated/zod';
 
 import { AppError, AppErrorCode } from '../../errors/app-error';
 
@@ -11,15 +8,11 @@ export type MoveTemplateToTeamOptions = {
   userId: number;
 };
 
-export const ZMoveTemplateToTeamResponseSchema = TemplateSchema;
-
-export type TMoveTemplateToTeamResponse = z.infer<typeof ZMoveTemplateToTeamResponseSchema>;
-
 export const moveTemplateToTeam = async ({
   templateId,
   teamId,
   userId,
-}: MoveTemplateToTeamOptions): Promise<TMoveTemplateToTeamResponse> => {
+}: MoveTemplateToTeamOptions) => {
   return await prisma.$transaction(async (tx) => {
     const template = await tx.template.findFirst({
       where: {
