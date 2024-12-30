@@ -29,8 +29,8 @@ export type DisableUserDialogProps = {
 };
 
 export const DisableUserDialog = ({ className, userToDisable }: DisableUserDialogProps) => {
-  const { toast } = useToast();
   const { _ } = useLingui();
+  const { toast } = useToast();
 
   const [email, setEmail] = useState('');
 
@@ -41,7 +41,6 @@ export const DisableUserDialog = ({ className, userToDisable }: DisableUserDialo
     try {
       await disableUser({
         id: userToDisable.id,
-        email,
       });
 
       toast({

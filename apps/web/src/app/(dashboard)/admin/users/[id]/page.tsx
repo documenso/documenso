@@ -156,12 +156,9 @@ export default function UserPage({ params }: { params: { id: number } }) {
       <hr className="my-4" />
 
       <div className="flex flex-col items-center gap-4">
-        {user && (
-          <>
-            <DeleteUserDialog user={user} />
-            {!user.disabled ? <DisableUserDialog user={user} /> : <EnableUserDialog user={user} />}
-          </>
-        )}
+        {user && <DeleteUserDialog user={user} />}
+        {user && user.disabled && <EnableUserDialog userToEnable={user} />}
+        {user && !user.disabled && <DisableUserDialog userToDisable={user} />}
       </div>
     </div>
   );

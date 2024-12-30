@@ -1,3 +1,4 @@
+import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import { findDocuments } from '@documenso/lib/server-only/admin/get-all-documents';
 import { getEntireDocument } from '@documenso/lib/server-only/admin/get-entire-document';
 import { updateRecipient } from '@documenso/lib/server-only/admin/update-recipient';
@@ -75,36 +76,42 @@ export const adminRouter = router({
     }),
 
   enableUser: adminProcedure.input(ZAdminEnableUserMutationSchema).mutation(async ({ input }) => {
-    const { id, email } = input;
+    const { id } = input;
 
-    const user = await getUserById({ id });
+    const user = await getUserById({ id }).catch(() => null);
 
-    if (user.email !== email) {
-      throw new Error('Email does not match');
+    if (!user) {
+      throw new AppError(AppErrorCode.NOT_FOUND, {
+        message: 'User not found',
+      });
     }
 
     return await enableUser({ id });
   }),
 
   disableUser: adminProcedure.input(ZAdminDisableUserMutationSchema).mutation(async ({ input }) => {
-    const { id, email } = input;
+    const { id } = input;
 
-    const user = await getUserById({ id });
+    const user = await getUserById({ id }).catch(() => null);
 
-    if (user.email !== email) {
-      throw new Error('Email does not match');
+    if (!user) {
+      throw new AppError(AppErrorCode.NOT_FOUND, {
+        message: 'User not found',
+      });
     }
 
     return await disableUser({ id });
   }),
 
   deleteUser: adminProcedure.input(ZAdminDeleteUserMutationSchema).mutation(async ({ input }) => {
-    const { id, email } = input;
+    const { id } = input;
 
-    const user = await getUserById({ id });
+    const user = await getUserById({ id }).catch(() => null);
 
-    if (user.email !== email) {
-      throw new Error('Email does not match');
+    if (!user) {
+      throw new AppError(AppErrorCode.NOT_FOUND, {
+        message: 'User not found',
+      });
     }
 
     return await deleteUser({ id });

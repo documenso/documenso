@@ -41,7 +41,6 @@ export const EnableUserDialog = ({ className, userToEnable }: EnableUserDialogPr
     try {
       await enableUser({
         id: userToEnable.id,
-        email,
       });
 
       toast({

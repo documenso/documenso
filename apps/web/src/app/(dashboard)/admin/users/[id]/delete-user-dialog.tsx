@@ -30,8 +30,8 @@ export type DeleteUserDialogProps = {
 };
 
 export const DeleteUserDialog = ({ className, user }: DeleteUserDialogProps) => {
-  const { toast } = useToast();
   const { _ } = useLingui();
+  const { toast } = useToast();
 
   const router = useRouter();
 
@@ -44,7 +44,6 @@ export const DeleteUserDialog = ({ className, user }: DeleteUserDialogProps) => 
     try {
       await deleteUser({
         id: user.id,
-        email,
       });
 
       toast({
@@ -78,7 +77,7 @@ export const DeleteUserDialog = ({ className, user }: DeleteUserDialogProps) => 
   return (
     <div className={className}>
       <Alert
-        className="flex flex-col items-center justify-between gap-4 p-6 md:flex-row "
+        className="flex flex-col items-center justify-between gap-4 p-6 md:flex-row"
         variant="neutral"
       >
         <div>
