@@ -33,6 +33,7 @@ export type UploadDocumentProps = {
 export const UploadDocument = ({ className, team }: UploadDocumentProps) => {
   const router = useRouter();
   const analytics = useAnalytics();
+  const userTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
 
   const { data: session } = useSession();
 
@@ -73,6 +74,7 @@ export const UploadDocument = ({ className, team }: UploadDocumentProps) => {
         title: file.name,
         documentDataId,
         teamId: team?.id,
+        timezone: userTimezone,
       });
 
       void refreshLimits();
