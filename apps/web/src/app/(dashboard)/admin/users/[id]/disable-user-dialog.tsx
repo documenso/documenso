@@ -2,13 +2,12 @@
 
 import { useState } from 'react';
 
-import { useRouter } from 'next/navigation';
-
 import { Trans, msg } from '@lingui/macro';
 import { useLingui } from '@lingui/react';
+import { match } from 'ts-pattern';
 
+import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import type { User } from '@documenso/prisma/client';
-import { TRPCClientError } from '@documenso/trpc/client';
 import { trpc } from '@documenso/trpc/react';
 import { Alert, AlertDescription, AlertTitle } from '@documenso/ui/primitives/alert';
 import { Button } from '@documenso/ui/primitives/button';
@@ -24,53 +23,45 @@ import {
 import { Input } from '@documenso/ui/primitives/input';
 import { useToast } from '@documenso/ui/primitives/use-toast';
 
-export type DeleteUserDialogProps = {
+export type DisableUserDialogProps = {
   className?: string;
-  user: User;
+  userToDisable: User;
 };
 
-export const DeleteUserDialog = ({ className, user }: DeleteUserDialogProps) => {
+export const DisableUserDialog = ({ className, userToDisable }: DisableUserDialogProps) => {
   const { _ } = useLingui();
   const { toast } = useToast();
 
-  const router = useRouter();
-
   const [email, setEmail] = useState('');
 
-  const { mutateAsync: deleteUser, isLoading: isDeletingUser } =
-    trpc.admin.deleteUser.useMutation();
+  const { mutateAsync: disableUser, isLoading: isDisablingUser } =
+    trpc.admin.disableUser.useMutation();
 
-  const onDeleteAccount = async () => {
+  const onDisableAccount = async () => {
     try {
-      await deleteUser({
-        id: user.id,
+      await disableUser({
+        id: userToDisable.id,
       });
 
       toast({
-        title: _(msg`Account deleted`),
-        description: _(msg`The account has been deleted successfully.`),
+        title: _(msg`Account disabled`),
+        description: _(msg`The account has been disabled successfully.`),
         duration: 5000,
       });
-
-      router.push('/admin/users');
     } catch (err) {
-      if (err instanceof TRPCClientError && err.data?.code === 'BAD_REQUEST') {
-        toast({
-          title: _(msg`An error occurred`),
-          description: err.message,
-          variant: 'destructive',
-        });
-      } else {
-        toast({
-          title: _(msg`An unknown error occurred`),
-          variant: 'destructive',
-          description:
-            err.message ??
-            _(
-              msg`We encountered an unknown error while attempting to delete your account. Please try again later.`,
-            ),
-        });
-      }
+      const error = AppError.parseError(err);
+
+      const errorMessage = match(error.code)
+        .with(AppErrorCode.NOT_FOUND, () => msg`User not found.`)
+        .with(AppErrorCode.UNAUTHORIZED, () => msg`You are not authorized to disable this user.`)
+        .otherwise(() => msg`An error occurred while disabling the user.`);
+
+      toast({
+        title: _(msg`Error`),
+        description: _(errorMessage),
+        variant: 'destructive',
+        duration: 7500,
+      });
     }
   };
 
@@ -81,11 +72,11 @@ export const DeleteUserDialog = ({ className, user }: DeleteUserDialogProps) => 
         variant="neutral"
       >
         <div>
-          <AlertTitle>Delete Account</AlertTitle>
+          <AlertTitle>Disable Account</AlertTitle>
           <AlertDescription className="mr-2">
             <Trans>
-              Delete the users account and all its contents. This action is irreversible and will
-              cancel their subscription, so proceed with caution.
+              Disabling the user results in the user not being able to use the account. It also
+              disables all the related contents such as subscription, webhooks, teams, and API keys.
             </Trans>
           </AlertDescription>
         </div>
@@ -94,19 +85,23 @@ export const DeleteUserDialog = ({ className, user }: DeleteUserDialogProps) => 
           <Dialog>
             <DialogTrigger asChild>
               <Button variant="destructive">
-                <Trans>Delete Account</Trans>
+                <Trans>Disable Account</Trans>
               </Button>
             </DialogTrigger>
 
             <DialogContent>
               <DialogHeader className="space-y-4">
                 <DialogTitle>
-                  <Trans>Delete Account</Trans>
+                  <Trans>Disable Account</Trans>
                 </DialogTitle>
 
                 <Alert variant="destructive">
                   <AlertDescription className="selection:bg-red-100">
-                    <Trans>This action is not reversible. Please be certain.</Trans>
+                    <Trans>
+                      This action is reversible, but please be careful as the account may be
+                      affected permanently (e.g. their settings and contents not being restored
+                      properly).
+                    </Trans>
                   </AlertDescription>
                 </Alert>
               </DialogHeader>
@@ -114,7 +109,8 @@ export const DeleteUserDialog = ({ className, user }: DeleteUserDialogProps) => 
               <div>
                 <DialogDescription>
                   <Trans>
-                    To confirm, please enter the accounts email address <br />({user.email}).
+                    To confirm, please enter the accounts email address <br />({userToDisable.email}
+                    ).
                   </Trans>
                 </DialogDescription>
 
@@ -128,12 +124,12 @@ export const DeleteUserDialog = ({ className, user }: DeleteUserDialogProps) => 
 
               <DialogFooter>
                 <Button
-                  onClick={onDeleteAccount}
-                  loading={isDeletingUser}
+                  onClick={onDisableAccount}
+                  loading={isDisablingUser}
                   variant="destructive"
-                  disabled={email !== user.email}
+                  disabled={email !== userToDisable.email}
                 >
-                  <Trans>Delete account</Trans>
+                  <Trans>Disable account</Trans>
                 </Button>
               </DialogFooter>
             </DialogContent>

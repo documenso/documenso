@@ -1,3 +1,4 @@
+import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import { findDocuments } from '@documenso/lib/server-only/admin/get-all-documents';
 import { getEntireDocument } from '@documenso/lib/server-only/admin/get-entire-document';
 import { updateRecipient } from '@documenso/lib/server-only/admin/update-recipient';
@@ -7,6 +8,8 @@ import { sendDeleteEmail } from '@documenso/lib/server-only/document/send-delete
 import { superDeleteDocument } from '@documenso/lib/server-only/document/super-delete-document';
 import { upsertSiteSetting } from '@documenso/lib/server-only/site-settings/upsert-site-setting';
 import { deleteUser } from '@documenso/lib/server-only/user/delete-user';
+import { disableUser } from '@documenso/lib/server-only/user/disable-user';
+import { enableUser } from '@documenso/lib/server-only/user/enable-user';
 import { getUserById } from '@documenso/lib/server-only/user/get-user-by-id';
 import { extractNextApiRequestMetadata } from '@documenso/lib/universal/extract-request-metadata';
 import { DocumentStatus } from '@documenso/prisma/client';
@@ -15,6 +18,8 @@ import { adminProcedure, router } from '../trpc';
 import {
   ZAdminDeleteDocumentMutationSchema,
   ZAdminDeleteUserMutationSchema,
+  ZAdminDisableUserMutationSchema,
+  ZAdminEnableUserMutationSchema,
   ZAdminFindDocumentsQuerySchema,
   ZAdminResealDocumentMutationSchema,
   ZAdminUpdateProfileMutationSchema,
@@ -70,13 +75,43 @@ export const adminRouter = router({
       return await sealDocument({ documentId: id, isResealing });
     }),
 
+  enableUser: adminProcedure.input(ZAdminEnableUserMutationSchema).mutation(async ({ input }) => {
+    const { id } = input;
+
+    const user = await getUserById({ id }).catch(() => null);
+
+    if (!user) {
+      throw new AppError(AppErrorCode.NOT_FOUND, {
+        message: 'User not found',
+      });
+    }
+
+    return await enableUser({ id });
+  }),
+
+  disableUser: adminProcedure.input(ZAdminDisableUserMutationSchema).mutation(async ({ input }) => {
+    const { id } = input;
+
+    const user = await getUserById({ id }).catch(() => null);
+
+    if (!user) {
+      throw new AppError(AppErrorCode.NOT_FOUND, {
+        message: 'User not found',
+      });
+    }
+
+    return await disableUser({ id });
+  }),
+
   deleteUser: adminProcedure.input(ZAdminDeleteUserMutationSchema).mutation(async ({ input }) => {
-    const { id, email } = input;
+    const { id } = input;
 
-    const user = await getUserById({ id });
+    const user = await getUserById({ id }).catch(() => null);
 
-    if (user.email !== email) {
-      throw new Error('Email does not match');
+    if (!user) {
+      throw new AppError(AppErrorCode.NOT_FOUND, {
+        message: 'User not found',
+      });
     }
 
     return await deleteUser({ id });
