@@ -26,6 +26,18 @@ msgstr "\"{0}\" te ha invitado a firmar \"ejemplo de documento\"."
 msgid "\"{0}\" will appear on the document as it has a timezone of \"{timezone}\"."
 msgstr "\"{0}\" aparecerá en el documento ya que tiene un huso horario de \"{timezone}\"."
 
+#: packages/email/template-components/template-document-super-delete.tsx:27
+msgid "\"{documentName}\" has been deleted by an admin."
+msgstr "\"{documentName}\" ha sido eliminado por un admin."
+
+#: packages/email/template-components/template-document-pending.tsx:37
+msgid "“{documentName}” has been signed"
+msgstr "“{documentName}” ha sido firmado"
+
+#: packages/email/template-components/template-document-completed.tsx:41
+msgid "“{documentName}” was signed by all signers"
+msgstr "\"{documentName}\" fue firmado por todos los firmantes"
+
 #: apps/web/src/app/(dashboard)/documents/delete-document-dialog.tsx:62
 msgid "\"{documentTitle}\" has been successfully deleted"
 msgstr "\"{documentTitle}\" ha sido eliminado con éxito"
@@ -80,9 +92,34 @@ msgstr "{0}"
 msgid "{0} direct signing templates"
 msgstr "{0} plantillas de firma directa"
 
-#: apps/web/src/app/(dashboard)/documents/upload-document.tsx:146
+#: packages/lib/jobs/definitions/emails/send-signing-email.handler.ts:125
+msgid "{0} has invited you to {recipientActionVerb} the document \"{1}\"."
+msgstr "{0} te ha invitado a {recipientActionVerb} el documento \"{1}\"."
+
+#: packages/lib/jobs/definitions/emails/send-signing-email.handler.ts:118
+msgid "{0} invited you to {recipientActionVerb} a document"
+msgstr "{0} te invitó a {recipientActionVerb} un documento"
+
+#: packages/email/templates/team-join.tsx:61
+msgid "{0} joined the team {teamName} on Documenso"
+msgstr "{0} se unió al equipo {teamName} en Documenso"
+
+#: packages/email/templates/team-leave.tsx:61
+msgid "{0} left the team {teamName} on Documenso"
+msgstr "{0} dejó el equipo {teamName} en Documenso"
+
+#: apps/web/src/app/(dashboard)/documents/upload-document.tsx:151
 msgid "{0} of {1} documents remaining this month."
 msgstr "{0} de {1} documentos restantes este mes."
+
+#: packages/ui/primitives/data-table-pagination.tsx:30
+msgid "{0} of {1} row(s) selected."
+msgstr "{0} de {1} fila(s) seleccionada."
+
+#: packages/lib/jobs/definitions/emails/send-signing-email.handler.ts:124
+#: packages/lib/server-only/document/resend-document.tsx:137
+msgid "{0} on behalf of \"{1}\" has invited you to {recipientActionVerb} the document \"{2}\"."
+msgstr ""
 
 #: apps/web/src/app/(dashboard)/documents/[id]/document-page-view.tsx:173
 msgid "{0} Recipient(s)"
@@ -92,9 +129,141 @@ msgstr "{0} Destinatario(s)"
 msgid "{charactersRemaining, plural, one {1 character remaining} other {{charactersRemaining} characters remaining}}"
 msgstr "{charactersRemaining, plural, one {1 carácter restante} other {{charactersRemaining} caracteres restantes}}"
 
+#: packages/email/templates/document-invite.tsx:95
+msgid "{inviterName} <0>({inviterEmail})</0>"
+msgstr "{inviterName} <0>({inviterEmail})</0>"
+
+#: packages/email/templates/document-cancel.tsx:21
+msgid "{inviterName} has cancelled the document {documentName}, you don't need to sign it anymore."
+msgstr "{inviterName} ha cancelado el documento {documentName}, ya no necesitas firmarlo."
+
+#: packages/email/template-components/template-document-cancel.tsx:24
+msgid "{inviterName} has cancelled the document<0/>\"{documentName}\""
+msgstr "{inviterName} ha cancelado el documento<0/>\"{documentName}\""
+
+#: packages/email/template-components/template-document-invite.tsx:75
+msgid "{inviterName} has invited you to {0}<0/>\"{documentName}\""
+msgstr "{inviterName} te ha invitado a {0}<0/>\"{documentName}\""
+
+#: packages/email/templates/document-invite.tsx:41
+msgid "{inviterName} has invited you to {action} {documentName}"
+msgstr "{inviterName} te ha invitado a {action} {documentName}"
+
+#: packages/email/templates/document-invite.tsx:108
+msgid "{inviterName} has invited you to {action} the document \"{documentName}\"."
+msgstr "{inviterName} te ha invitado a {action} el documento \"{documentName}\"."
+
+#: packages/email/templates/recipient-removed-from-document.tsx:20
+msgid "{inviterName} has removed you from the document {documentName}."
+msgstr "{inviterName} te ha eliminado del documento {documentName}."
+
+#: packages/email/templates/recipient-removed-from-document.tsx:49
+msgid "{inviterName} has removed you from the document<0/>\"{documentName}\""
+msgstr "{inviterName} te ha eliminado del documento<0/>\"{documentName}\""
+
+#: packages/email/template-components/template-document-invite.tsx:63
+msgid "{inviterName} on behalf of \"{teamName}\" has invited you to {0}"
+msgstr ""
+
+#: packages/email/templates/document-invite.tsx:45
+msgid "{inviterName} on behalf of \"{teamName}\" has invited you to {action} {documentName}"
+msgstr ""
+
+#: packages/email/templates/team-join.tsx:67
+msgid "{memberEmail} joined the following team"
+msgstr "{memberEmail} se unió al siguiente equipo"
+
+#: packages/email/templates/team-leave.tsx:67
+msgid "{memberEmail} left the following team"
+msgstr "{memberEmail} dejó el siguiente equipo"
+
 #: apps/web/src/app/(teams)/t/[teamUrl]/settings/billing/page.tsx:59
 msgid "{numberOfSeats, plural, one {# member} other {# members}}"
 msgstr "{numberOfSeats, plural, one {# miembro} other {# miembros}}"
+
+#: packages/lib/utils/document-audit-logs.ts:263
+msgid "{prefix} added a field"
+msgstr "{prefix} agregó un campo"
+
+#: packages/lib/utils/document-audit-logs.ts:275
+msgid "{prefix} added a recipient"
+msgstr "{prefix} agregó un destinatario"
+
+#: packages/lib/utils/document-audit-logs.ts:287
+msgid "{prefix} created the document"
+msgstr "{prefix} creó el documento"
+
+#: packages/lib/utils/document-audit-logs.ts:291
+msgid "{prefix} deleted the document"
+msgstr "{prefix} eliminó el documento"
+
+#: packages/lib/utils/document-audit-logs.ts:335
+msgid "{prefix} moved the document to team"
+msgstr "{prefix} movió el documento al equipo"
+
+#: packages/lib/utils/document-audit-logs.ts:319
+msgid "{prefix} opened the document"
+msgstr "{prefix} abrió el documento"
+
+#: packages/lib/utils/document-audit-logs.ts:267
+msgid "{prefix} removed a field"
+msgstr "{prefix} eliminó un campo"
+
+#: packages/lib/utils/document-audit-logs.ts:279
+msgid "{prefix} removed a recipient"
+msgstr "{prefix} eliminó un destinatario"
+
+#: packages/lib/utils/document-audit-logs.ts:365
+msgid "{prefix} resent an email to {0}"
+msgstr "{prefix} reenviaron un correo electrónico a {0}"
+
+#: packages/lib/utils/document-audit-logs.ts:366
+msgid "{prefix} sent an email to {0}"
+msgstr "{prefix} envió un correo electrónico a {0}"
+
+#: packages/lib/utils/document-audit-logs.ts:331
+msgid "{prefix} sent the document"
+msgstr "{prefix} envió el documento"
+
+#: packages/lib/utils/document-audit-logs.ts:295
+msgid "{prefix} signed a field"
+msgstr "{prefix} firmó un campo"
+
+#: packages/lib/utils/document-audit-logs.ts:299
+msgid "{prefix} unsigned a field"
+msgstr "{prefix} no firmó un campo"
+
+#: packages/lib/utils/document-audit-logs.ts:271
+msgid "{prefix} updated a field"
+msgstr "{prefix} actualizó un campo"
+
+#: packages/lib/utils/document-audit-logs.ts:283
+msgid "{prefix} updated a recipient"
+msgstr "{prefix} actualizó un destinatario"
+
+#: packages/lib/utils/document-audit-logs.ts:315
+msgid "{prefix} updated the document"
+msgstr "{prefix} actualizó el documento"
+
+#: packages/lib/utils/document-audit-logs.ts:307
+msgid "{prefix} updated the document access auth requirements"
+msgstr "{prefix} actualizó los requisitos de autorización de acceso al documento"
+
+#: packages/lib/utils/document-audit-logs.ts:327
+msgid "{prefix} updated the document external ID"
+msgstr "{prefix} actualizó el ID externo del documento"
+
+#: packages/lib/utils/document-audit-logs.ts:311
+msgid "{prefix} updated the document signing auth requirements"
+msgstr "{prefix} actualizó los requisitos de autenticación para la firma del documento"
+
+#: packages/lib/utils/document-audit-logs.ts:323
+msgid "{prefix} updated the document title"
+msgstr "{prefix} actualizó el título del documento"
+
+#: packages/lib/utils/document-audit-logs.ts:303
+msgid "{prefix} updated the document visibility"
+msgstr "{prefix} actualizó la visibilidad del documento"
 
 #: apps/web/src/app/(recipient)/d/[token]/direct-template.tsx:67
 msgid "{recipientActionVerb} document"
@@ -104,28 +273,146 @@ msgstr "{recipientActionVerb} documento"
 msgid "{recipientActionVerb} the document to complete the process."
 msgstr "{recipientActionVerb} el documento para completar el proceso."
 
+#: packages/email/templates/document-created-from-direct-template.tsx:61
+msgid "{recipientName} {action} a document by using one of your direct links"
+msgstr "{recipientName} {action} un documento utilizando uno de tus enlaces directos"
+
+#: packages/email/templates/document-rejected.tsx:27
+msgid "{recipientName} has rejected the document '{documentName}'"
+msgstr "{recipientName} ha rechazado el documento '{documentName}'"
+
+#: packages/email/template-components/template-document-recipient-signed.tsx:49
+msgid "{recipientReference} has completed signing the document."
+msgstr ""
+
+#: packages/lib/jobs/definitions/emails/send-recipient-signed-email.ts:121
+msgid "{recipientReference} has signed \"{0}\""
+msgstr ""
+
+#: packages/email/template-components/template-document-recipient-signed.tsx:43
+msgid "{recipientReference} has signed \"{documentName}\""
+msgstr ""
+
+#: packages/email/templates/document-recipient-signed.tsx:27
+msgid "{recipientReference} has signed {documentName}"
+msgstr ""
+
 #: apps/web/src/components/forms/public-profile-form.tsx:231
 #: apps/web/src/components/templates/manage-public-template-dialog.tsx:389
 msgid "{remaningLength, plural, one {# character remaining} other {# characters remaining}}"
 msgstr "{remaningLength, plural, one {# carácter restante} other {# caracteres restantes}}"
 
+#: packages/email/template-components/template-document-rejected.tsx:25
+msgid "{signerName} has rejected the document \"{documentName}\"."
+msgstr "{signerName} ha rechazado el documento \"{documentName}\"."
+
+#: packages/email/template-components/template-document-invite.tsx:68
+msgid "{teamName} has invited you to {0}"
+msgstr "{teamName} te ha invitado a {0}"
+
+#: packages/email/templates/document-invite.tsx:46
+msgid "{teamName} has invited you to {action} {documentName}"
+msgstr "{teamName} te ha invitado a {action} {documentName}"
+
+#: packages/email/templates/team-transfer-request.tsx:55
+msgid "{teamName} ownership transfer request"
+msgstr "solicitud de transferencia de propiedad de {teamName}"
+
+#: packages/lib/utils/document-audit-logs.ts:343
+msgid "{userName} approved the document"
+msgstr "{userName} aprobó el documento"
+
+#: packages/lib/utils/document-audit-logs.ts:344
+msgid "{userName} CC'd the document"
+msgstr "{userName} envió una copia del documento"
+
+#: packages/lib/utils/document-audit-logs.ts:345
+msgid "{userName} completed their task"
+msgstr "{userName} completó su tarea"
+
+#: packages/lib/utils/document-audit-logs.ts:355
+msgid "{userName} rejected the document"
+msgstr "{userName} rechazó el documento"
+
+#: packages/lib/utils/document-audit-logs.ts:341
+msgid "{userName} signed the document"
+msgstr "{userName} firmó el documento"
+
+#: packages/lib/utils/document-audit-logs.ts:342
+msgid "{userName} viewed the document"
+msgstr "{userName} vio el documento"
+
+#: packages/ui/primitives/data-table-pagination.tsx:41
+msgid "{visibleRows, plural, one {Showing # result.} other {Showing # results.}}"
+msgstr "{visibleRows, plural, one {Mostrando # resultado.} other {Mostrando # resultados.}}"
+
 #: apps/web/src/app/(signing)/sign/[token]/no-longer-available.tsx:45
 msgid "<0>\"{0}\"</0>is no longer available to sign"
 msgstr "<0>\"{0}\"</0> ya no está disponible para firmar"
+
+#: packages/email/templates/team-transfer-request.tsx:59
+msgid "<0>{senderName}</0> has requested that you take ownership of the following team"
+msgstr "<0>{senderName}</0> ha solicitado que asumas la propiedad del siguiente equipo"
+
+#: packages/email/templates/confirm-team-email.tsx:75
+msgid "<0>{teamName}</0> has requested to use your email address for their team on Documenso."
+msgstr "<0>{teamName}</0> ha solicitado usar tu dirección de correo electrónico para su equipo en Documenso."
+
+#: packages/ui/primitives/template-flow/add-template-settings.tsx:241
+msgid "<0>Email</0> - The recipient will be emailed the document to sign, approve, etc."
+msgstr "<0>Correo electrónico</0> - Al destinatario se le enviará el documento para firmar, aprobar, etc."
+
+#: packages/ui/components/recipient/recipient-action-auth-select.tsx:53
+msgid "<0>Inherit authentication method</0> - Use the global action signing authentication method configured in the \"General Settings\" step"
+msgstr "<0>Heredar método de autenticación</0> - Use el método de autenticación de firma de acción global configurado en el paso \"Configuración General\""
+
+#: packages/ui/components/document/document-global-auth-action-select.tsx:95
+msgid "<0>No restrictions</0> - No authentication required"
+msgstr "<0>Sin restricciones</0> - No se requiere autenticación"
+
+#: packages/ui/components/document/document-global-auth-access-select.tsx:77
+msgid "<0>No restrictions</0> - The document can be accessed directly by the URL sent to the recipient"
+msgstr "<0>Sin restricciones</0> - El documento se puede acceder directamente a través de la URL enviada al destinatario"
+
+#: packages/ui/components/recipient/recipient-action-auth-select.tsx:75
+msgid "<0>None</0> - No authentication required"
+msgstr "<0>Ninguno</0> - No se requiere autenticación"
+
+#: packages/ui/primitives/template-flow/add-template-settings.tsx:247
+msgid "<0>None</0> - We will generate links which you can send to the recipients manually."
+msgstr ""
+
+#: packages/ui/primitives/template-flow/add-template-settings.tsx:254
+msgid "<0>Note</0> - If you use Links in combination with direct templates, you will need to manually send the links to the remaining recipients."
+msgstr "<0>Nota</0> - Si usas Enlaces en combinación con plantillas directas, necesitarás enviar manualmente los enlaces a los destinatarios restantes."
+
+#: packages/ui/components/document/document-global-auth-action-select.tsx:89
+#: packages/ui/components/recipient/recipient-action-auth-select.tsx:69
+msgid "<0>Require 2FA</0> - The recipient must have an account and 2FA enabled via their settings"
+msgstr "<0>Requerir 2FA</0> - El destinatario debe tener una cuenta y 2FA habilitado a través de sus configuraciones"
+
+#: packages/ui/components/document/document-global-auth-access-select.tsx:72
+msgid "<0>Require account</0> - The recipient must be signed in to view the document"
+msgstr "<0>Requerir cuenta</0> - El destinatario debe haber iniciado sesión para ver el documento"
+
+#: packages/ui/components/document/document-global-auth-action-select.tsx:83
+#: packages/ui/components/recipient/recipient-action-auth-select.tsx:63
+msgid "<0>Require passkey</0> - The recipient must have an account and passkey configured via their settings"
+msgstr "<0>Requerir clave de acceso</0> - El destinatario debe tener una cuenta y clave de acceso configurada a través de sus configuraciones"
 
 #: apps/web/src/app/(dashboard)/documents/data-table-sender-filter.tsx:57
 msgid "<0>Sender:</0> All"
 msgstr "<0>Remitente:</0> Todos"
 
-#: apps/web/src/app/(signing)/sign/[token]/sign-dialog.tsx:104
+#: apps/web/src/app/(signing)/sign/[token]/sign-dialog.tsx:105
 msgid "<0>You are about to complete approving <1>\"{documentTitle}\"</1>.</0><2/> Are you sure?"
 msgstr ""
 
-#: apps/web/src/app/(signing)/sign/[token]/sign-dialog.tsx:90
+#: apps/web/src/app/(signing)/sign/[token]/sign-dialog.tsx:91
 msgid "<0>You are about to complete signing \"<1>{documentTitle}</1>\".</0><2/> Are you sure?"
 msgstr ""
 
-#: apps/web/src/app/(signing)/sign/[token]/sign-dialog.tsx:76
+#: apps/web/src/app/(signing)/sign/[token]/sign-dialog.tsx:77
 msgid "<0>You are about to complete viewing \"<1>{documentTitle}</1>\".</0><2/> Are you sure?"
 msgstr ""
 
@@ -173,13 +460,33 @@ msgstr "Se ha enviado un correo electrónico de confirmación y debería llegar 
 msgid "A device capable of accessing, opening, and reading documents"
 msgstr "Un dispositivo capaz de acceder, abrir y leer documentos"
 
+#: packages/lib/jobs/definitions/emails/send-signing-email.handler.ts:110
+msgid "A document was created by your direct template that requires you to {recipientActionVerb} it."
+msgstr "Se creó un documento a partir de tu plantilla directa que requiere que {recipientActionVerb}."
+
 #: apps/web/src/app/(dashboard)/templates/use-template-dialog.tsx:218
 msgid "A draft document will be created"
 msgstr "Se creará un documento borrador"
 
+#: packages/lib/utils/document-audit-logs.ts:262
+msgid "A field was added"
+msgstr "Se añadió un campo"
+
+#: packages/lib/utils/document-audit-logs.ts:266
+msgid "A field was removed"
+msgstr "Se eliminó un campo"
+
+#: packages/lib/utils/document-audit-logs.ts:270
+msgid "A field was updated"
+msgstr "Se actualizó un campo"
+
 #: apps/web/src/app/(unauthenticated)/articles/signature-disclosure/page.tsx:73
 msgid "A means to print or download documents for your records"
 msgstr "Un medio para imprimir o descargar documentos para sus registros"
+
+#: packages/lib/jobs/definitions/emails/send-team-member-joined-email.handler.ts:98
+msgid "A new member has joined your team"
+msgstr "Un nuevo miembro se ha unido a tu equipo"
 
 #: apps/web/src/components/forms/token.tsx:127
 msgid "A new token was created successfully."
@@ -190,9 +497,25 @@ msgstr "Un nuevo token se ha creado con éxito."
 msgid "A password reset email has been sent, if you have an account you should see it in your inbox shortly."
 msgstr "Se ha enviado un correo electrónico para restablecer la contraseña, si tienes una cuenta deberías verlo en tu bandeja de entrada en breve."
 
+#: packages/lib/utils/document-audit-logs.ts:274
+msgid "A recipient was added"
+msgstr "Se añadió un destinatario"
+
+#: packages/lib/utils/document-audit-logs.ts:278
+msgid "A recipient was removed"
+msgstr "Se eliminó un destinatario"
+
+#: packages/lib/utils/document-audit-logs.ts:282
+msgid "A recipient was updated"
+msgstr "Se actualizó un destinatario"
+
 #: apps/web/src/app/(teams)/t/[teamUrl]/settings/team-transfer-status.tsx:94
 msgid "A request to transfer the ownership of this team has been sent to <0>{0} ({1})</0>"
 msgstr "Se ha enviado una solicitud para transferir la propiedad de este equipo a <0>{0} ({1})</0>"
+
+#: packages/lib/server-only/team/create-team-email-verification.ts:159
+msgid "A request to use your email has been initiated by {0} on Documenso"
+msgstr "Se ha iniciado una solicitud para usar tu correo electrónico por {0} en Documenso"
 
 #: apps/web/src/components/(dashboard)/settings/webhooks/create-webhook-dialog.tsx:228
 msgid "A secret that will be sent to your URL so you can verify that the request has been sent by Documenso"
@@ -206,6 +529,23 @@ msgstr "Un secreto que se enviará a tu URL para que puedas verificar que la sol
 #: apps/web/src/app/(unauthenticated)/articles/signature-disclosure/page.tsx:64
 msgid "A stable internet connection"
 msgstr "Una conexión a Internet estable"
+
+#: packages/email/templates/team-join.tsx:31
+msgid "A team member has joined a team on Documenso"
+msgstr "Un miembro del equipo se ha unido a un equipo en Documenso"
+
+#: packages/lib/jobs/definitions/emails/send-team-member-left-email.handler.ts:87
+msgid "A team member has left {0}"
+msgstr "Un miembro del equipo ha dejado {0}"
+
+#: packages/email/templates/team-leave.tsx:31
+msgid "A team member has left a team on Documenso"
+msgstr "Un miembro del equipo ha dejado un equipo en Documenso"
+
+#: packages/email/templates/team-delete.tsx:29
+#: packages/email/templates/team-delete.tsx:33
+msgid "A team you were a part of has been deleted"
+msgstr "Un equipo del que formabas parte ha sido eliminado"
 
 #: apps/web/src/components/forms/public-profile-form.tsx:198
 msgid "A unique URL to access your profile"
@@ -221,8 +561,23 @@ msgid "A verification email will be sent to the provided email."
 msgstr "Se enviará un correo electrónico de verificación a la dirección proporcionada."
 
 #: apps/web/src/app/(dashboard)/settings/teams/accept-team-invitation-button.tsx:46
+#: packages/email/templates/confirm-team-email.tsx:118
+#: packages/email/templates/team-invite.tsx:94
+#: packages/email/templates/team-transfer-request.tsx:81
 msgid "Accept"
 msgstr "Aceptar"
+
+#: packages/email/templates/team-invite.tsx:42
+msgid "Accept invitation to join a team on Documenso"
+msgstr "Aceptar invitación para unirse a un equipo en Documenso"
+
+#: packages/email/templates/confirm-team-email.tsx:41
+msgid "Accept team email request for {teamName} on Documenso"
+msgstr "Aceptar la solicitud de correo electrónico del equipo para {teamName} en Documenso"
+
+#: packages/email/templates/team-transfer-request.tsx:29
+msgid "Accept team transfer request on Documenso"
+msgstr "Aceptar solicitud de transferencia de equipo en Documenso"
 
 #: apps/web/src/app/(unauthenticated)/articles/signature-disclosure/page.tsx:33
 msgid "Acceptance and Consent"
@@ -236,10 +591,18 @@ msgstr "Invitación de equipo aceptada"
 msgid "Account Authentication"
 msgstr "Autenticación de Cuenta"
 
-#: apps/web/src/app/(dashboard)/admin/users/[id]/delete-user-dialog.tsx:51
+#: apps/web/src/app/(dashboard)/admin/users/[id]/delete-user-dialog.tsx:50
 #: apps/web/src/app/(dashboard)/settings/profile/delete-account-dialog.tsx:47
 msgid "Account deleted"
 msgstr "Cuenta eliminada"
+
+#: apps/web/src/app/(dashboard)/admin/users/[id]/disable-user-dialog.tsx:47
+msgid "Account disabled"
+msgstr ""
+
+#: apps/web/src/app/(dashboard)/admin/users/[id]/enable-user-dialog.tsx:47
+msgid "Account enabled"
+msgstr ""
 
 #: apps/web/src/app/(internal)/%5F%5Fhtmltopdf/certificate/page.tsx:119
 msgid "Account Re-Authentication"
@@ -282,6 +645,15 @@ msgstr "Suscripciones Activas"
 msgid "Add"
 msgstr "Agregar"
 
+#: packages/ui/primitives/document-dropzone.tsx:69
+msgid "Add a document"
+msgstr "Agregar un documento"
+
+#: packages/ui/primitives/document-flow/add-settings.tsx:390
+#: packages/ui/primitives/template-flow/add-template-settings.tsx:468
+msgid "Add a URL to redirect the user to once the document is signed"
+msgstr "Agregue una URL para redirigir al usuario una vez que se firme el documento"
+
 #: apps/web/src/app/(dashboard)/documents/[id]/edit-document.tsx:177
 #: apps/web/src/app/(dashboard)/templates/[id]/edit/edit-template.tsx:88
 msgid "Add all relevant fields for each recipient."
@@ -299,6 +671,23 @@ msgstr "Agrega un autenticador para servir como método de autenticación secund
 msgid "Add an authenticator to serve as a secondary authentication method when signing in, or when signing documents."
 msgstr "Agrega un autenticador para servir como método de autenticación secundario al iniciar sesión o al firmar documentos."
 
+#: packages/ui/primitives/document-flow/add-settings.tsx:302
+msgid "Add an external ID to the document. This can be used to identify the document in external systems."
+msgstr "Agregue un ID externo al documento. Esto se puede usar para identificar el documento en sistemas externos."
+
+#: packages/ui/primitives/template-flow/add-template-settings.tsx:385
+msgid "Add an external ID to the template. This can be used to identify in external systems."
+msgstr "Agregue un ID externo a la plantilla. Esto se puede usar para identificar en sistemas externos."
+
+#: packages/ui/primitives/document-flow/field-items-advanced-settings/dropdown-field.tsx:187
+msgid "Add another option"
+msgstr "Agregar otra opción"
+
+#: packages/ui/primitives/document-flow/field-items-advanced-settings/checkbox-field.tsx:231
+#: packages/ui/primitives/document-flow/field-items-advanced-settings/radio-field.tsx:167
+msgid "Add another value"
+msgstr "Agregar otro valor"
+
 #: apps/web/src/components/(teams)/dialogs/add-team-email-dialog.tsx:125
 msgid "Add email"
 msgstr "Agregar correo electrónico"
@@ -312,14 +701,30 @@ msgstr "Agregar Campos"
 msgid "Add more"
 msgstr "Agregar más"
 
+#: packages/ui/primitives/document-flow/add-signers.tsx:690
+msgid "Add myself"
+msgstr "Agregame"
+
+#: packages/ui/primitives/template-flow/add-template-placeholder-recipients.tsx:644
+msgid "Add Myself"
+msgstr "Agregame"
+
 #: apps/web/src/app/(dashboard)/settings/security/passkeys/create-passkey-dialog.tsx:146
 #: apps/web/src/app/(dashboard)/settings/security/passkeys/create-passkey-dialog.tsx:154
 msgid "Add passkey"
 msgstr "Agregar clave"
 
+#: packages/ui/primitives/template-flow/add-template-placeholder-recipients.tsx:630
+msgid "Add Placeholder Recipient"
+msgstr "Agregar destinatario de marcador de posición"
+
 #: apps/web/src/app/(dashboard)/templates/[id]/edit/edit-template.tsx:82
 msgid "Add Placeholders"
 msgstr "Agregar Marcadores de posición"
+
+#: packages/ui/primitives/document-flow/add-signers.tsx:679
+msgid "Add Signer"
+msgstr "Agregar firmante"
 
 #: apps/web/src/app/(dashboard)/documents/[id]/edit-document.tsx:171
 msgid "Add Signers"
@@ -328,6 +733,14 @@ msgstr "Agregar Firmantes"
 #: apps/web/src/components/(teams)/dialogs/add-team-email-dialog.tsx:133
 msgid "Add team email"
 msgstr "Agregar correo electrónico del equipo"
+
+#: packages/ui/primitives/document-flow/field-items-advanced-settings/text-field.tsx:73
+msgid "Add text"
+msgstr "Agregar texto"
+
+#: packages/ui/primitives/document-flow/field-items-advanced-settings/text-field.tsx:78
+msgid "Add text to the field"
+msgstr "Agregar texto al campo"
 
 #: apps/web/src/app/(dashboard)/documents/[id]/edit-document.tsx:172
 msgid "Add the people who will sign the document."
@@ -345,6 +758,10 @@ msgstr "Agregar y eliminar asientos ajustará tu factura en consecuencia."
 msgid "Additional brand information to display at the bottom of emails"
 msgstr "Información adicional de la marca para mostrar al final de los correos electrónicos"
 
+#: packages/lib/constants/teams.ts:10
+msgid "Admin"
+msgstr "Admin"
+
 #: apps/web/src/app/(dashboard)/admin/documents/[id]/page.tsx:59
 msgid "Admin Actions"
 msgstr "Acciones Administrativas"
@@ -353,9 +770,23 @@ msgstr "Acciones Administrativas"
 msgid "Admin panel"
 msgstr "Panel administrativo"
 
+#: packages/ui/primitives/document-flow/add-settings.tsx:284
+#: packages/ui/primitives/template-flow/add-template-settings.tsx:367
+msgid "Advanced Options"
+msgstr "Opciones avanzadas"
+
+#: packages/ui/primitives/document-flow/add-fields.tsx:585
+#: packages/ui/primitives/template-flow/add-template-fields.tsx:415
+msgid "Advanced settings"
+msgstr "Configuraciones avanzadas"
+
 #: apps/web/src/app/(unauthenticated)/articles/signature-disclosure/page.tsx:129
 msgid "After signing a document electronically, you will be provided the opportunity to view, download, and print the document for your records. It is highly recommended that you retain a copy of all electronically signed documents for your personal records. We will also retain a copy of the signed document for our records however we may not be able to provide you with a copy of the signed document after a certain period of time."
 msgstr "Después de firmar un documento electrónicamente, se le dará la oportunidad de ver, descargar e imprimir el documento para sus registros. Se recomienda encarecidamente que conserve una copia de todos los documentos firmados electrónicamente para sus registros personales. También mantendremos una copia del documento firmado para nuestros registros, sin embargo, es posible que no podamos proporcionarle una copia del documento firmado después de un cierto período de tiempo."
+
+#: packages/lib/constants/template.ts:21
+msgid "After submission, a document will be automatically generated and added to your documents page. You will also receive a notification via email."
+msgstr "Después de la presentación, se generará automáticamente un documento y se agregará a su página de documentos. También recibirá una notificación por correo electrónico."
 
 #: apps/web/src/components/formatter/document-status.tsx:46
 msgid "All"
@@ -381,6 +812,10 @@ msgstr "Todas las firmas insertadas serán anuladas"
 msgid "All recipients will be notified"
 msgstr "Todos los destinatarios serán notificados"
 
+#: packages/email/template-components/template-document-cancel.tsx:31
+msgid "All signatures have been voided."
+msgstr "Todas las firmas han sido anuladas."
+
 #: apps/web/src/components/document/document-recipient-link-copy-dialog.tsx:62
 msgid "All signing links have been copied to your clipboard."
 msgstr "Todos los enlaces de firma se han copiado en su portapapeles."
@@ -393,17 +828,25 @@ msgstr "Todas las plantillas"
 msgid "All Time"
 msgstr "Todo el Tiempo"
 
+#: packages/email/templates/confirm-team-email.tsx:98
+msgid "Allow document recipients to reply directly to this email address"
+msgstr "Permitir que los destinatarios del documento respondan directamente a esta dirección de correo electrónico"
+
 #: apps/web/src/app/(dashboard)/settings/security/page.tsx:110
 msgid "Allows authenticating using biometrics, password managers, hardware keys, etc."
 msgstr "Permite autenticarse usando biometría, administradores de contraseñas, claves de hardware, etc."
 
-#: apps/web/src/components/forms/v2/signup.tsx:426
+#: apps/web/src/components/forms/v2/signup.tsx:427
 msgid "Already have an account? <0>Sign in instead</0>"
 msgstr "¿Ya tienes una cuenta? <0>Iniciar sesión en su lugar</0>"
 
 #: apps/web/src/components/(teams)/tables/team-billing-invoices-data-table.tsx:86
 msgid "Amount"
 msgstr "Cantidad"
+
+#: packages/email/templates/document-super-delete.tsx:22
+msgid "An admin has deleted your document \"{documentName}\"."
+msgstr "Un administrador ha eliminado tu documento \"{documentName}\"."
 
 #: apps/web/src/app/(unauthenticated)/articles/signature-disclosure/page.tsx:48
 msgid "An electronic signature provided by you on our platform, achieved through clicking through to a document and entering your name, or any other electronic signing method we provide, is legally binding. It carries the same weight and enforceability as a manual signature written with ink on paper."
@@ -423,7 +866,7 @@ msgstr "Se ha enviado un correo electrónico solicitando la transferencia de est
 
 #: apps/web/src/app/(dashboard)/admin/documents/[id]/super-delete-document-dialog.tsx:60
 #: apps/web/src/app/(dashboard)/admin/site-settings/banner-form.tsx:83
-#: apps/web/src/app/(dashboard)/admin/users/[id]/delete-user-dialog.tsx:60
+#: apps/web/src/app/(dashboard)/admin/users/[id]/delete-user-dialog.tsx:59
 #: apps/web/src/app/(signing)/sign/[token]/complete/claim-account.tsx:100
 #: apps/web/src/components/forms/avatar-image.tsx:122
 #: apps/web/src/components/forms/password.tsx:92
@@ -431,7 +874,7 @@ msgstr "Se ha enviado un correo electrónico solicitando la transferencia de est
 #: apps/web/src/components/forms/reset-password.tsx:95
 #: apps/web/src/components/forms/signup.tsx:112
 #: apps/web/src/components/forms/token.tsx:137
-#: apps/web/src/components/forms/v2/signup.tsx:165
+#: apps/web/src/components/forms/v2/signup.tsx:166
 msgid "An error occurred"
 msgstr "Ocurrió un error"
 
@@ -464,6 +907,10 @@ msgstr "Ocurrió un error al crear el webhook. Por favor, intenta de nuevo."
 msgid "An error occurred while disabling direct link signing."
 msgstr "Ocurrió un error al desactivar la firma de enlace directo."
 
+#: apps/web/src/app/(dashboard)/admin/users/[id]/disable-user-dialog.tsx:57
+msgid "An error occurred while disabling the user."
+msgstr ""
+
 #: apps/web/src/app/(dashboard)/documents/[id]/document-page-view-button.tsx:64
 #: apps/web/src/app/(dashboard)/documents/[id]/document-page-view-dropdown.tsx:92
 #: apps/web/src/app/(dashboard)/documents/data-table-action-button.tsx:76
@@ -479,9 +926,17 @@ msgstr "Ocurrió un error al duplicar la plantilla."
 msgid "An error occurred while enabling direct link signing."
 msgstr "Ocurrió un error al habilitar la firma de enlace directo."
 
-#: apps/web/src/components/(teams)/dialogs/transfer-team-dialog.tsx:299
+#: apps/web/src/app/(dashboard)/admin/users/[id]/enable-user-dialog.tsx:57
+msgid "An error occurred while enabling the user."
+msgstr ""
+
+#: apps/web/src/components/(teams)/dialogs/transfer-team-dialog.tsx:264
 msgid "An error occurred while loading team members. Please try again later."
 msgstr "Ocurrió un error al cargar los miembros del equipo. Por favor intenta de nuevo más tarde."
+
+#: packages/ui/primitives/pdf-viewer.tsx:167
+msgid "An error occurred while loading the document."
+msgstr "Se produjo un error al cargar el documento."
 
 #: apps/web/src/app/(dashboard)/documents/move-document-dialog.tsx:58
 msgid "An error occurred while moving the document."
@@ -544,17 +999,17 @@ msgstr "Ocurrió un error al actualizar la configuración del documento."
 msgid "An error occurred while updating the signature."
 msgstr "Ocurrió un error al actualizar la firma."
 
-#: apps/web/src/app/(dashboard)/admin/users/[id]/page.tsx:79
+#: apps/web/src/app/(dashboard)/admin/users/[id]/page.tsx:81
 msgid "An error occurred while updating your profile."
 msgstr "Ocurrió un error al actualizar tu perfil."
 
-#: apps/web/src/app/(dashboard)/documents/upload-document.tsx:113
+#: apps/web/src/app/(dashboard)/documents/upload-document.tsx:118
 msgid "An error occurred while uploading your document."
 msgstr "Ocurrió un error al subir tu documento."
 
 #: apps/web/src/app/(dashboard)/admin/documents/[id]/super-delete-document-dialog.tsx:66
 #: apps/web/src/app/(dashboard)/admin/site-settings/banner-form.tsx:89
-#: apps/web/src/app/(dashboard)/admin/users/[id]/delete-user-dialog.tsx:66
+#: apps/web/src/app/(dashboard)/admin/users/[id]/delete-user-dialog.tsx:65
 #: apps/web/src/app/(dashboard)/settings/profile/delete-account-dialog.tsx:55
 #: apps/web/src/app/(teams)/t/[teamUrl]/settings/team-transfer-status.tsx:54
 #: apps/web/src/components/(dashboard)/common/command-menu.tsx:301
@@ -582,14 +1037,14 @@ msgstr "Ocurrió un error al subir tu documento."
 #: apps/web/src/components/forms/signup.tsx:124
 #: apps/web/src/components/forms/signup.tsx:138
 #: apps/web/src/components/forms/token.tsx:143
-#: apps/web/src/components/forms/v2/signup.tsx:186
-#: apps/web/src/components/forms/v2/signup.tsx:200
+#: apps/web/src/components/forms/v2/signup.tsx:187
+#: apps/web/src/components/forms/v2/signup.tsx:201
 #: apps/web/src/components/templates/manage-public-template-dialog.tsx:141
 #: apps/web/src/components/templates/manage-public-template-dialog.tsx:178
 msgid "An unknown error occurred"
 msgstr "Ocurrió un error desconocido"
 
-#: apps/web/src/components/(teams)/dialogs/transfer-team-dialog.tsx:260
+#: apps/web/src/components/(teams)/dialogs/transfer-team-dialog.tsx:225
 msgid "Any payment methods attached to this team will remain attached to this team. Please contact us if you need to update this information."
 msgstr "Cualquier método de pago adjunto a este equipo permanecerá adjunto a este equipo. Por favor, contáctanos si necesitas actualizar esta información."
 
@@ -618,17 +1073,32 @@ msgstr "Versión de la Aplicación"
 #: apps/web/src/app/(dashboard)/documents/[id]/document-page-view-button.tsx:89
 #: apps/web/src/app/(dashboard)/documents/data-table-action-button.tsx:120
 #: apps/web/src/app/(dashboard)/documents/data-table-action-dropdown.tsx:146
-#: apps/web/src/app/(signing)/sign/[token]/sign-dialog.tsx:142
+#: apps/web/src/app/(signing)/sign/[token]/sign-dialog.tsx:143
+#: packages/lib/constants/recipient-roles.ts:8
 msgid "Approve"
 msgstr "Aprobar"
 
-#: apps/web/src/app/(signing)/sign/[token]/form.tsx:136
+#: apps/web/src/app/(signing)/sign/[token]/form.tsx:142
+#: packages/email/template-components/template-document-invite.tsx:106
 msgid "Approve Document"
 msgstr "Aprobar Documento"
 
 #: apps/web/src/app/(dashboard)/documents/[id]/document-page-view-recipients.tsx:94
+#: packages/lib/constants/recipient-roles.ts:9
 msgid "Approved"
 msgstr "Aprobado"
+
+#: packages/lib/constants/recipient-roles.ts:11
+msgid "Approver"
+msgstr "Aprobador"
+
+#: packages/lib/constants/recipient-roles.ts:12
+msgid "Approvers"
+msgstr "Aprobadores"
+
+#: packages/lib/constants/recipient-roles.ts:10
+msgid "Approving"
+msgstr "Aprobando"
 
 #: apps/web/src/components/(dashboard)/settings/token/delete-token-dialog.tsx:129
 msgid "Are you sure you want to delete this token?"
@@ -687,7 +1157,7 @@ msgstr "Esperando confirmación de correo electrónico"
 
 #: apps/web/src/app/(recipient)/d/[token]/sign-direct-template.tsx:373
 #: apps/web/src/components/(dashboard)/settings/layout/activity-back.tsx:20
-#: apps/web/src/components/forms/v2/signup.tsx:512
+#: apps/web/src/components/forms/v2/signup.tsx:513
 msgid "Back"
 msgstr "Atrás"
 
@@ -712,9 +1182,13 @@ msgstr "Códigos de respaldo"
 msgid "Banner Updated"
 msgstr "Banner actualizado"
 
-#: apps/web/src/components/forms/v2/signup.tsx:475
+#: apps/web/src/components/forms/v2/signup.tsx:476
 msgid "Basic details"
 msgstr "Detalles básicos"
+
+#: packages/email/template-components/template-confirmation-email.tsx:25
+msgid "Before you get started, please confirm your email address by clicking the button below:"
+msgstr "Antes de comenzar, por favor confirma tu dirección de correo electrónico haciendo clic en el botón de abajo:"
 
 #: apps/web/src/app/(dashboard)/settings/billing/page.tsx:74
 #: apps/web/src/app/(teams)/t/[teamUrl]/settings/billing/page.tsx:71
@@ -724,6 +1198,14 @@ msgstr "Detalles básicos"
 #: apps/web/src/components/(teams)/settings/layout/mobile-nav.tsx:132
 msgid "Billing"
 msgstr "Facturación"
+
+#: packages/ui/primitives/signature-pad/signature-pad.tsx:544
+msgid "Black"
+msgstr "Negro"
+
+#: packages/ui/primitives/signature-pad/signature-pad.tsx:558
+msgid "Blue"
+msgstr "Azul"
 
 #: apps/web/src/app/(teams)/t/[teamUrl]/settings/preferences/page.tsx:42
 msgid "Branding Preferences"
@@ -746,6 +1228,18 @@ msgstr "Copia masiva"
 msgid "Bulk Import"
 msgstr "Importación masiva"
 
+#: packages/email/templates/team-invite.tsx:84
+msgid "by <0>{senderName}</0>"
+msgstr "por <0>{senderName}</0>"
+
+#: packages/email/templates/confirm-team-email.tsx:87
+msgid "By accepting this request, you will be granting <0>{teamName}</0> access to:"
+msgstr "Al aceptar esta solicitud, estarás concediendo a <0>{teamName}</0> acceso a:"
+
+#: packages/email/templates/team-transfer-request.tsx:70
+msgid "By accepting this request, you will take responsibility for any billing items associated with this team."
+msgstr "Al aceptar esta solicitud, asumirás la responsabilidad de cualquier ítem de facturación asociado con este equipo."
+
 #: apps/web/src/app/(dashboard)/documents/delete-document-dialog.tsx:158
 msgid "By deleting this document, the following will occur:"
 msgstr "Al eliminar este documento, ocurrirá lo siguiente:"
@@ -766,7 +1260,7 @@ msgstr "Al continuar con su firma electrónica, usted reconoce y consiente que s
 msgid "By using the electronic signature feature, you are consenting to conduct transactions and receive disclosures electronically. You acknowledge that your electronic signature on documents is binding and that you accept the terms outlined in the documents you are signing."
 msgstr "Al utilizar la función de firma electrónica, usted está consintiendo realizar transacciones y recibir divulgaciones electrónicamente. Reconoce que su firma electrónica en los documentos es vinculante y que acepta los términos esbozados en los documentos que está firmando."
 
-#: apps/web/src/app/(dashboard)/documents/_action-items/resend-document.tsx:186
+#: apps/web/src/app/(dashboard)/documents/_action-items/resend-document.tsx:185
 #: apps/web/src/app/(dashboard)/documents/delete-document-dialog.tsx:192
 #: apps/web/src/app/(dashboard)/documents/duplicate-document-dialog.tsx:108
 #: apps/web/src/app/(dashboard)/documents/move-document-dialog.tsx:120
@@ -783,12 +1277,12 @@ msgstr "Al utilizar la función de firma electrónica, usted está consintiendo 
 #: apps/web/src/app/(signing)/sign/[token]/document-action-auth-account.tsx:71
 #: apps/web/src/app/(signing)/sign/[token]/document-action-auth-passkey.tsx:164
 #: apps/web/src/app/(signing)/sign/[token]/document-action-auth-passkey.tsx:189
-#: apps/web/src/app/(signing)/sign/[token]/form.tsx:158
-#: apps/web/src/app/(signing)/sign/[token]/form.tsx:240
+#: apps/web/src/app/(signing)/sign/[token]/form.tsx:164
+#: apps/web/src/app/(signing)/sign/[token]/form.tsx:246
 #: apps/web/src/app/(signing)/sign/[token]/name-field.tsx:215
 #: apps/web/src/app/(signing)/sign/[token]/number-field.tsx:328
 #: apps/web/src/app/(signing)/sign/[token]/reject-document-dialog.tsx:153
-#: apps/web/src/app/(signing)/sign/[token]/sign-dialog.tsx:130
+#: apps/web/src/app/(signing)/sign/[token]/sign-dialog.tsx:131
 #: apps/web/src/app/(signing)/sign/[token]/signature-field.tsx:320
 #: apps/web/src/app/(signing)/sign/[token]/text-field.tsx:335
 #: apps/web/src/app/(teams)/t/[teamUrl]/settings/team-transfer-status.tsx:121
@@ -803,12 +1297,14 @@ msgstr "Al utilizar la función de firma electrónica, usted está consintiendo 
 #: apps/web/src/components/(teams)/dialogs/invite-team-member-dialog.tsx:369
 #: apps/web/src/components/(teams)/dialogs/leave-team-dialog.tsx:102
 #: apps/web/src/components/(teams)/dialogs/remove-team-email-dialog.tsx:150
-#: apps/web/src/components/(teams)/dialogs/transfer-team-dialog.tsx:278
+#: apps/web/src/components/(teams)/dialogs/transfer-team-dialog.tsx:243
 #: apps/web/src/components/(teams)/dialogs/update-team-email-dialog.tsx:162
 #: apps/web/src/components/(teams)/dialogs/update-team-member-dialog.tsx:187
 #: apps/web/src/components/forms/2fa/enable-authenticator-app-dialog.tsx:257
 #: apps/web/src/components/forms/2fa/view-recovery-codes-dialog.tsx:163
 #: apps/web/src/components/templates/manage-public-template-dialog.tsx:450
+#: packages/ui/primitives/document-flow/field-item-advanced-settings.tsx:357
+#: packages/ui/primitives/document-flow/send-document-action-dialog.tsx:58
 msgid "Cancel"
 msgstr "Cancelar"
 
@@ -816,9 +1312,42 @@ msgstr "Cancelar"
 msgid "Cancelled by user"
 msgstr "Cancelado por el usuario"
 
+#: packages/ui/primitives/document-flow/add-signers.tsx:193
+msgid "Cannot remove signer"
+msgstr "No se puede eliminar el firmante"
+
+#: packages/lib/constants/recipient-roles.ts:18
+msgid "Cc"
+msgstr "Cc"
+
+#: packages/lib/constants/recipient-roles.ts:15
+#: packages/lib/constants/recipient-roles.ts:17
+msgid "CC"
+msgstr "CC"
+
+#: packages/lib/constants/recipient-roles.ts:16
+msgid "CC'd"
+msgstr "CC'd"
+
+#: packages/lib/constants/recipient-roles.ts:19
+msgid "Ccers"
+msgstr "Ccers"
+
+#: packages/ui/primitives/document-flow/field-items-advanced-settings/text-field.tsx:86
+msgid "Character Limit"
+msgstr "Límite de caracteres"
+
 #: apps/web/src/app/(dashboard)/admin/stats/page.tsx:132
 msgid "Charts"
 msgstr "Gráficas"
+
+#: packages/ui/primitives/document-flow/types.ts:58
+msgid "Checkbox"
+msgstr "Checkbox"
+
+#: packages/ui/primitives/document-flow/field-items-advanced-settings/checkbox-field.tsx:197
+msgid "Checkbox values"
+msgstr "Valores de Checkbox"
 
 #: apps/web/src/components/(teams)/dialogs/create-team-checkout-dialog.tsx:179
 msgid "Checkout"
@@ -844,7 +1373,7 @@ msgstr "Elija..."
 msgid "Claim account"
 msgstr "Reclamar cuenta"
 
-#: apps/web/src/components/forms/v2/signup.tsx:484
+#: apps/web/src/components/forms/v2/signup.tsx:485
 msgid "Claim username"
 msgstr "Reclamar nombre de usuario"
 
@@ -852,9 +1381,17 @@ msgstr "Reclamar nombre de usuario"
 msgid "Claim your profile later"
 msgstr "Reclame su perfil más tarde"
 
-#: apps/web/src/components/forms/v2/signup.tsx:282
+#: apps/web/src/components/forms/v2/signup.tsx:283
 msgid "Claim your username now"
 msgstr "Reclame su nombre de usuario ahora"
+
+#: packages/ui/primitives/data-table.tsx:156
+msgid "Clear filters"
+msgstr "Limpiar filtros"
+
+#: packages/ui/primitives/signature-pad/signature-pad.tsx:578
+msgid "Clear Signature"
+msgstr "Limpiar firma"
 
 #: apps/web/src/app/(dashboard)/settings/public-profile/public-templates-data-table.tsx:130
 msgid "Click here to get started"
@@ -877,14 +1414,14 @@ msgid "Click to copy signing link for sending to recipient"
 msgstr "Haga clic para copiar el enlace de firma para enviar al destinatario"
 
 #: apps/web/src/app/(recipient)/d/[token]/sign-direct-template.tsx:179
-#: apps/web/src/app/(signing)/sign/[token]/form.tsx:122
+#: apps/web/src/app/(signing)/sign/[token]/form.tsx:128
 #: apps/web/src/app/embed/direct/[[...url]]/client.tsx:481
 #: apps/web/src/app/embed/sign/[[...url]]/client.tsx:360
 msgid "Click to insert field"
 msgstr "Haga clic para insertar campo"
 
 #: apps/web/src/app/(dashboard)/templates/new-template-dialog.tsx:126
-#: apps/web/src/app/(dashboard)/templates/use-template-dialog.tsx:389
+#: apps/web/src/app/(dashboard)/templates/use-template-dialog.tsx:388
 #: apps/web/src/app/(signing)/sign/[token]/document-action-auth-2fa.tsx:125
 #: apps/web/src/app/(signing)/sign/[token]/document-action-auth-passkey.tsx:138
 #: apps/web/src/app/(teams)/t/[teamUrl]/settings/team-transfer-status.tsx:121
@@ -893,33 +1430,43 @@ msgstr "Haga clic para insertar campo"
 #: apps/web/src/components/forms/2fa/view-recovery-codes-dialog.tsx:102
 #: apps/web/src/components/templates/manage-public-template-dialog.tsx:319
 #: apps/web/src/components/templates/manage-public-template-dialog.tsx:423
+#: packages/ui/primitives/document-flow/missing-signature-field-dialog.tsx:44
 msgid "Close"
 msgstr "Cerrar"
 
-#: apps/web/src/app/(signing)/sign/[token]/sign-dialog.tsx:60
+#: apps/web/src/app/(signing)/sign/[token]/sign-dialog.tsx:61
 #: apps/web/src/app/embed/direct/[[...url]]/client.tsx:471
 #: apps/web/src/app/embed/sign/[[...url]]/client.tsx:350
-#: apps/web/src/components/forms/v2/signup.tsx:537
+#: apps/web/src/components/forms/v2/signup.tsx:538
 msgid "Complete"
 msgstr "Completo"
 
-#: apps/web/src/app/(signing)/sign/[token]/sign-dialog.tsx:69
+#: apps/web/src/app/(signing)/sign/[token]/sign-dialog.tsx:70
 msgid "Complete Approval"
 msgstr "Completar Aprobación"
 
-#: apps/web/src/app/(signing)/sign/[token]/sign-dialog.tsx:68
+#: apps/web/src/app/(signing)/sign/[token]/sign-dialog.tsx:69
 msgid "Complete Signing"
 msgstr "Completar Firmado"
 
-#: apps/web/src/app/(signing)/sign/[token]/sign-dialog.tsx:67
+#: apps/web/src/app/(signing)/sign/[token]/sign-dialog.tsx:68
 msgid "Complete Viewing"
 msgstr "Completar Visualización"
 
 #: apps/web/src/app/(dashboard)/templates/[id]/template-page-view-documents-table.tsx:204
 #: apps/web/src/components/(dashboard)/avatar/stack-avatars-with-tooltip.tsx:77
 #: apps/web/src/components/formatter/document-status.tsx:28
+#: packages/email/template-components/template-document-completed.tsx:35
+#: packages/email/template-components/template-document-recipient-signed.tsx:37
+#: packages/email/template-components/template-document-self-signed.tsx:36
+#: packages/lib/constants/document.ts:10
 msgid "Completed"
 msgstr "Completado"
+
+#: packages/email/templates/document-completed.tsx:23
+#: packages/email/templates/document-self-signed.tsx:19
+msgid "Completed Document"
+msgstr "Documento completado"
 
 #: apps/web/src/components/(dashboard)/common/command-menu.tsx:48
 msgid "Completed documents"
@@ -928,6 +1475,10 @@ msgstr "Documentos completados"
 #: apps/web/src/app/(dashboard)/admin/stats/page.tsx:94
 msgid "Completed Documents"
 msgstr "Documentos Completados"
+
+#: packages/lib/constants/template.ts:12
+msgid "Configure Direct Recipient"
+msgstr "Configurar destinatario directo"
 
 #: apps/web/src/app/(dashboard)/documents/[id]/edit-document.tsx:167
 msgid "Configure general settings for the document."
@@ -940,6 +1491,11 @@ msgstr "Configurar ajustes generales para la plantilla."
 #: apps/web/src/components/templates/manage-public-template-dialog.tsx:337
 msgid "Configure template"
 msgstr "Configurar plantilla"
+
+#: packages/ui/primitives/document-flow/add-fields.tsx:586
+#: packages/ui/primitives/template-flow/add-template-fields.tsx:416
+msgid "Configure the {0} field"
+msgstr "Configurar el campo {0}"
 
 #: apps/web/src/app/(dashboard)/templates/template-direct-link-dialog.tsx:481
 #: apps/web/src/components/templates/manage-public-template-dialog.tsx:460
@@ -964,6 +1520,7 @@ msgid "Confirm Deletion"
 msgstr "Confirmar Eliminación"
 
 #: apps/web/src/app/(unauthenticated)/unverified-account/page.tsx:19
+#: packages/email/template-components/template-confirmation-email.tsx:35
 msgid "Confirm email"
 msgstr "Confirmar correo electrónico"
 
@@ -990,8 +1547,25 @@ msgstr "Contenido"
 #: apps/web/src/app/(unauthenticated)/team/verify/transfer/[token]/page.tsx:72
 #: apps/web/src/app/(unauthenticated)/team/verify/transfer/[token]/page.tsx:122
 #: apps/web/src/components/templates/manage-public-template-dialog.tsx:328
+#: packages/ui/primitives/document-flow/document-flow-root.tsx:141
 msgid "Continue"
 msgstr "Continuar"
+
+#: packages/email/template-components/template-document-invite.tsx:86
+msgid "Continue by approving the document."
+msgstr "Continúa aprobando el documento."
+
+#: packages/email/template-components/template-document-completed.tsx:45
+msgid "Continue by downloading the document."
+msgstr "Continúa descargando el documento."
+
+#: packages/email/template-components/template-document-invite.tsx:84
+msgid "Continue by signing the document."
+msgstr "Continúa firmando el documento."
+
+#: packages/email/template-components/template-document-invite.tsx:85
+msgid "Continue by viewing the document."
+msgstr "Continúa viendo el documento."
 
 #: apps/web/src/app/(unauthenticated)/team/invite/[token]/page.tsx:141
 msgid "Continue to login"
@@ -1018,6 +1592,7 @@ msgid "Controls whether the signing certificate will be included in the document
 msgstr ""
 
 #: apps/web/src/components/document/document-recipient-link-copy-dialog.tsx:128
+#: packages/ui/primitives/document-flow/add-subject.tsx:254
 msgid "Copied"
 msgstr "Copiado"
 
@@ -1029,12 +1604,19 @@ msgstr "Copiado"
 #: apps/web/src/components/document/document-recipient-link-copy-dialog.tsx:61
 #: apps/web/src/components/document/document-recipient-link-copy-dialog.tsx:117
 #: apps/web/src/components/forms/public-profile-form.tsx:117
+#: packages/ui/components/document/document-share-button.tsx:46
+#: packages/ui/primitives/document-flow/add-subject.tsx:241
 msgid "Copied to clipboard"
 msgstr "Copiado al portapapeles"
 
 #: apps/web/src/components/document/document-recipient-link-copy-dialog.tsx:123
+#: packages/ui/primitives/document-flow/add-subject.tsx:249
 msgid "Copy"
 msgstr "Copiar"
+
+#: packages/ui/components/document/document-share-button.tsx:194
+msgid "Copy Link"
+msgstr "Copiar enlace"
 
 #: apps/web/src/app/(dashboard)/settings/public-profile/public-templates-data-table.tsx:169
 msgid "Copy sharable link"
@@ -1057,7 +1639,11 @@ msgstr "Copiar token"
 msgid "Create"
 msgstr "Crear"
 
-#: apps/web/src/components/forms/v2/signup.tsx:267
+#: packages/email/template-components/template-document-self-signed.tsx:46
+msgid "Create a <0>free account</0> to access your signed documents at any time."
+msgstr "Crea una <0>cuenta gratuita</0> para acceder a tus documentos firmados en cualquier momento."
+
+#: apps/web/src/components/forms/v2/signup.tsx:268
 msgid "Create a new account"
 msgstr "Crear una nueva cuenta"
 
@@ -1067,18 +1653,19 @@ msgstr "Crea un equipo para colaborar con los miembros de tu equipo."
 
 #: apps/web/src/app/(unauthenticated)/team/decline/[token]/page.tsx:106
 #: apps/web/src/app/(unauthenticated)/team/invite/[token]/page.tsx:111
+#: packages/email/template-components/template-document-self-signed.tsx:68
 msgid "Create account"
 msgstr "Crear cuenta"
 
-#: apps/web/src/app/(dashboard)/templates/use-template-dialog.tsx:397
+#: apps/web/src/app/(dashboard)/templates/use-template-dialog.tsx:396
 msgid "Create and send"
 msgstr "Crear y enviar"
 
-#: apps/web/src/app/(dashboard)/templates/use-template-dialog.tsx:395
+#: apps/web/src/app/(dashboard)/templates/use-template-dialog.tsx:394
 msgid "Create as draft"
 msgstr "Crear como borrador"
 
-#: apps/web/src/app/(dashboard)/templates/use-template-dialog.tsx:355
+#: apps/web/src/app/(dashboard)/templates/use-template-dialog.tsx:354
 msgid "Create as pending"
 msgstr "Crear como pendiente"
 
@@ -1102,7 +1689,7 @@ msgstr "Crear ahora"
 msgid "Create one automatically"
 msgstr "Crear uno automáticamente"
 
-#: apps/web/src/app/(dashboard)/templates/use-template-dialog.tsx:399
+#: apps/web/src/app/(dashboard)/templates/use-template-dialog.tsx:398
 msgid "Create signing links"
 msgstr "Crear enlaces de firma"
 
@@ -1117,7 +1704,7 @@ msgstr "Crear equipo"
 msgid "Create Team"
 msgstr "Crear Equipo"
 
-#: apps/web/src/app/(dashboard)/templates/use-template-dialog.tsx:362
+#: apps/web/src/app/(dashboard)/templates/use-template-dialog.tsx:361
 msgid "Create the document as pending and ready to sign."
 msgstr "Crear el documento como pendiente y listo para firmar."
 
@@ -1138,7 +1725,7 @@ msgstr "Crear Webhook"
 msgid "Create your account and start using state-of-the-art document signing."
 msgstr "Crea tu cuenta y comienza a utilizar la firma de documentos de última generación."
 
-#: apps/web/src/components/forms/v2/signup.tsx:271
+#: apps/web/src/components/forms/v2/signup.tsx:272
 msgid "Create your account and start using state-of-the-art document signing. Open and beautiful signing is within your grasp."
 msgstr "Crea tu cuenta y comienza a utilizar la firma de documentos de última generación. La firma abierta y hermosa está al alcance de tu mano."
 
@@ -1193,6 +1780,9 @@ msgstr "Modo Oscuro"
 
 #: apps/web/src/app/(dashboard)/settings/security/activity/user-security-activity-data-table.tsx:68
 #: apps/web/src/app/(signing)/sign/[token]/date-field.tsx:148
+#: packages/ui/primitives/document-flow/add-fields.tsx:945
+#: packages/ui/primitives/document-flow/types.ts:53
+#: packages/ui/primitives/template-flow/add-template-fields.tsx:732
 msgid "Date"
 msgstr "Fecha"
 
@@ -1200,7 +1790,13 @@ msgstr "Fecha"
 msgid "Date created"
 msgstr "Fecha de creación"
 
+#: packages/ui/primitives/document-flow/add-settings.tsx:325
+#: packages/ui/primitives/template-flow/add-template-settings.tsx:408
+msgid "Date Format"
+msgstr "Formato de fecha"
+
 #: apps/web/src/app/(dashboard)/settings/teams/decline-team-invitation-button.tsx:47
+#: packages/email/templates/team-invite.tsx:100
 msgid "Decline"
 msgstr "Rechazar"
 
@@ -1247,12 +1843,12 @@ msgstr "eliminar {0}"
 msgid "delete {teamName}"
 msgstr "eliminar {teamName}"
 
-#: apps/web/src/app/(dashboard)/admin/users/[id]/delete-user-dialog.tsx:137
+#: apps/web/src/app/(dashboard)/admin/users/[id]/delete-user-dialog.tsx:136
 msgid "Delete account"
 msgstr "Eliminar cuenta"
 
-#: apps/web/src/app/(dashboard)/admin/users/[id]/delete-user-dialog.tsx:98
-#: apps/web/src/app/(dashboard)/admin/users/[id]/delete-user-dialog.tsx:105
+#: apps/web/src/app/(dashboard)/admin/users/[id]/delete-user-dialog.tsx:97
+#: apps/web/src/app/(dashboard)/admin/users/[id]/delete-user-dialog.tsx:104
 #: apps/web/src/app/(dashboard)/settings/profile/delete-account-dialog.tsx:72
 #: apps/web/src/app/(dashboard)/settings/profile/delete-account-dialog.tsx:86
 #: apps/web/src/app/(dashboard)/settings/profile/delete-account-dialog.tsx:93
@@ -1286,7 +1882,7 @@ msgstr "Eliminar miembro del equipo"
 msgid "Delete the document. This action is irreversible so proceed with caution."
 msgstr "Eliminar el documento. Esta acción es irreversible, así que proceda con precaución."
 
-#: apps/web/src/app/(dashboard)/admin/users/[id]/delete-user-dialog.tsx:87
+#: apps/web/src/app/(dashboard)/admin/users/[id]/delete-user-dialog.tsx:86
 msgid "Delete the users account and all its contents. This action is irreversible and will cancel their subscription, so proceed with caution."
 msgstr "Eliminar la cuenta de usuario y todo su contenido. Esta acción es irreversible y cancelará su suscripción, así que proceda con cautela."
 
@@ -1316,6 +1912,10 @@ msgstr "Detalles"
 msgid "Device"
 msgstr "Dispositivo"
 
+#: packages/email/templates/reset-password.tsx:71
+msgid "Didn't request a password change? We are here to help you secure your account, just <0>contact us.</0>"
+msgstr "¿No solicitaste un cambio de contraseña? Estamos aquí para ayudarte a asegurar tu cuenta, solo <0>contáctanos.</0>"
+
 #: apps/web/src/app/(dashboard)/templates/data-table-templates.tsx:91
 #: apps/web/src/app/(dashboard)/templates/template-direct-link-badge.tsx:46
 msgid "direct link"
@@ -1334,6 +1934,10 @@ msgstr "Enlace directo"
 #: apps/web/src/app/(dashboard)/templates/template-direct-link-badge.tsx:46
 msgid "direct link disabled"
 msgstr "enlace directo deshabilitado"
+
+#: packages/ui/primitives/template-flow/add-template-placeholder-recipients.tsx:577
+msgid "Direct link receiver"
+msgstr "Receptor de enlace directo"
 
 #: apps/web/src/app/(dashboard)/templates/template-direct-link-dialog.tsx:363
 msgid "Direct Link Signing"
@@ -1369,6 +1973,15 @@ msgstr "Deshabilitar"
 msgid "Disable 2FA"
 msgstr "Deshabilitar 2FA"
 
+#: apps/web/src/app/(dashboard)/admin/users/[id]/disable-user-dialog.tsx:132
+msgid "Disable account"
+msgstr ""
+
+#: apps/web/src/app/(dashboard)/admin/users/[id]/disable-user-dialog.tsx:88
+#: apps/web/src/app/(dashboard)/admin/users/[id]/disable-user-dialog.tsx:95
+msgid "Disable Account"
+msgstr ""
+
 #: apps/web/src/app/(dashboard)/settings/profile/delete-account-dialog.tsx:105
 msgid "Disable Two Factor Authentication before deleting your account."
 msgstr "Deshabilite la Autenticación de Dos Factores antes de eliminar su cuenta."
@@ -1381,6 +1994,10 @@ msgstr "Deshabilitado"
 #: apps/web/src/app/(dashboard)/templates/template-direct-link-dialog.tsx:380
 msgid "Disabling direct link signing will prevent anyone from accessing the link."
 msgstr "Deshabilitar la firma de enlace directo evitará que cualquiera acceda al enlace."
+
+#: apps/web/src/app/(dashboard)/admin/users/[id]/disable-user-dialog.tsx:77
+msgid "Disabling the user results in the user not being able to use the account. It also disables all the related contents such as subscription, webhooks, teams, and API keys."
+msgstr ""
 
 #: apps/web/src/app/(dashboard)/settings/teams/team-email-usage.tsx:75
 msgid "Display your name and email in documents"
@@ -1407,6 +2024,24 @@ msgstr "Documenso eliminará <0>todos sus documentos</0>, junto con todos sus do
 msgid "Document"
 msgstr "Documento"
 
+#: packages/lib/jobs/definitions/emails/send-rejection-emails.handler.ts:140
+msgid "Document \"{0}\" - Rejected by {1}"
+msgstr "Documento \"{0}\" - Rechazado por {1}"
+
+#: packages/lib/jobs/definitions/emails/send-rejection-emails.handler.ts:100
+msgid "Document \"{0}\" - Rejection Confirmed"
+msgstr "Documento \"{0}\" - Rechazo confirmado"
+
+#: packages/ui/components/document/document-global-auth-access-select.tsx:62
+#: packages/ui/primitives/document-flow/add-settings.tsx:227
+#: packages/ui/primitives/template-flow/add-template-settings.tsx:202
+msgid "Document access"
+msgstr "Acceso al documento"
+
+#: packages/lib/utils/document-audit-logs.ts:306
+msgid "Document access auth updated"
+msgstr "Se actualizó la autenticación de acceso al documento"
+
 #: apps/web/src/components/formatter/document-status.tsx:47
 msgid "Document All"
 msgstr "Documentar Todo"
@@ -1416,18 +2051,28 @@ msgid "Document Approved"
 msgstr "Documento Aprobado"
 
 #: apps/web/src/app/(signing)/sign/[token]/no-longer-available.tsx:40
+#: packages/lib/server-only/document/delete-document.ts:246
+#: packages/lib/server-only/document/super-delete-document.ts:98
 msgid "Document Cancelled"
-msgstr "Documento Cancelado"
+msgstr "Documento cancelado"
 
 #: apps/web/src/components/formatter/document-status.tsx:29
+#: packages/lib/utils/document-audit-logs.ts:369
+#: packages/lib/utils/document-audit-logs.ts:370
 msgid "Document completed"
 msgstr "Documento completado"
+
+#: packages/ui/components/document/document-email-checkboxes.tsx:203
+#: packages/ui/components/document/document-email-checkboxes.tsx:279
+msgid "Document completed email"
+msgstr "Correo electrónico de documento completado"
 
 #: apps/web/src/app/embed/completed.tsx:17
 msgid "Document Completed!"
 msgstr "¡Documento completado!"
 
 #: apps/web/src/app/(dashboard)/templates/use-template-dialog.tsx:156
+#: packages/lib/utils/document-audit-logs.ts:286
 msgid "Document created"
 msgstr "Documento creado"
 
@@ -1435,15 +2080,38 @@ msgstr "Documento creado"
 msgid "Document created by <0>{0}</0>"
 msgstr "Documento creado por <0>{0}</0>"
 
+#: packages/email/templates/document-created-from-direct-template.tsx:32
+#: packages/lib/server-only/template/create-document-from-direct-template.ts:585
+msgid "Document created from direct template"
+msgstr "Documento creado a partir de plantilla directa"
+
 #: apps/web/src/app/(dashboard)/templates/[id]/template-page-view-recent-activity.tsx:132
 msgid "Document created using a <0>direct link</0>"
 msgstr "Documento creado usando un <0>enlace directo</0>"
 
+#: packages/lib/constants/template.ts:20
+msgid "Document Creation"
+msgstr "Creación de documento"
+
 #: apps/web/src/app/(dashboard)/admin/documents/[id]/super-delete-document-dialog.tsx:51
 #: apps/web/src/app/(dashboard)/documents/[id]/document-page-view.tsx:181
 #: apps/web/src/app/(dashboard)/documents/delete-document-dialog.tsx:61
+#: packages/lib/utils/document-audit-logs.ts:290
 msgid "Document deleted"
 msgstr "Documento eliminado"
+
+#: packages/ui/components/document/document-email-checkboxes.tsx:241
+msgid "Document deleted email"
+msgstr "Correo electrónico de documento eliminado"
+
+#: packages/lib/server-only/document/send-delete-email.ts:82
+msgid "Document Deleted!"
+msgstr "¡Documento eliminado!"
+
+#: packages/ui/primitives/template-flow/add-template-settings.tsx:219
+#: packages/ui/primitives/template-flow/add-template-settings.tsx:228
+msgid "Document Distribution Method"
+msgstr "Método de distribución de documentos"
 
 #: apps/web/src/components/formatter/document-status.tsx:35
 msgid "Document draft"
@@ -1452,6 +2120,10 @@ msgstr "Borrador de documento"
 #: apps/web/src/app/(dashboard)/documents/duplicate-document-dialog.tsx:58
 msgid "Document Duplicated"
 msgstr "Documento duplicado"
+
+#: packages/lib/utils/document-audit-logs.ts:326
+msgid "Document external ID updated"
+msgstr "ID externo del documento actualizado"
 
 #: apps/web/src/app/(dashboard)/documents/[id]/document-page-view.tsx:192
 #: apps/web/src/components/document/document-history-sheet.tsx:104
@@ -1479,13 +2151,25 @@ msgstr "Métricas de documento"
 msgid "Document moved"
 msgstr "Documento movido"
 
+#: packages/lib/utils/document-audit-logs.ts:334
+msgid "Document moved to team"
+msgstr "Documento movido al equipo"
+
 #: apps/web/src/app/(signing)/sign/[token]/complete/page.tsx:156
 msgid "Document no longer available to sign"
 msgstr "El documento ya no está disponible para firmar"
 
+#: packages/lib/utils/document-audit-logs.ts:318
+msgid "Document opened"
+msgstr "Documento abierto"
+
 #: apps/web/src/components/formatter/document-status.tsx:23
 msgid "Document pending"
 msgstr "Documento pendiente"
+
+#: packages/ui/components/document/document-email-checkboxes.tsx:164
+msgid "Document pending email"
+msgstr "Correo electrónico de documento pendiente"
 
 #: apps/web/src/app/(teams)/t/[teamUrl]/settings/preferences/document-preferences.tsx:103
 msgid "Document preferences updated"
@@ -1496,20 +2180,26 @@ msgid "Document re-sent"
 msgstr "Documento reenviado"
 
 #: apps/web/src/app/(signing)/sign/[token]/rejected/page.tsx:83
+#: packages/email/template-components/template-document-rejected.tsx:21
 msgid "Document Rejected"
-msgstr "Document Rejected"
+msgstr "Documento Rechazado"
 
 #: apps/web/src/app/(dashboard)/admin/documents/[id]/admin-actions.tsx:36
 msgid "Document resealed"
 msgstr "Documento sellado nuevamente"
 
 #: apps/web/src/app/(dashboard)/documents/[id]/edit-document.tsx:327
+#: packages/lib/utils/document-audit-logs.ts:330
 msgid "Document sent"
 msgstr "Documento enviado"
 
 #: apps/web/src/app/(signing)/sign/[token]/complete/page.tsx:130
 msgid "Document Signed"
 msgstr "Documento firmado"
+
+#: packages/lib/utils/document-audit-logs.ts:310
+msgid "Document signing auth updated"
+msgstr "Se actualizó la autenticación de firma del documento"
 
 #: apps/web/src/app/(dashboard)/documents/delete-document-dialog.tsx:144
 msgid "Document signing process will be cancelled"
@@ -1523,17 +2213,29 @@ msgstr "Estado del documento"
 msgid "Document title"
 msgstr "Título del documento"
 
-#: apps/web/src/app/(dashboard)/documents/upload-document.tsx:51
+#: packages/lib/utils/document-audit-logs.ts:322
+msgid "Document title updated"
+msgstr "Título del documento actualizado"
+
+#: packages/lib/utils/document-audit-logs.ts:314
+msgid "Document updated"
+msgstr "Documento actualizado"
+
+#: apps/web/src/app/(dashboard)/documents/upload-document.tsx:55
 msgid "Document upload disabled due to unpaid invoices"
 msgstr "La carga de documentos está deshabilitada debido a facturas impagadas"
 
-#: apps/web/src/app/(dashboard)/documents/upload-document.tsx:81
+#: apps/web/src/app/(dashboard)/documents/upload-document.tsx:86
 msgid "Document uploaded"
 msgstr "Documento subido"
 
 #: apps/web/src/app/(signing)/sign/[token]/complete/page.tsx:131
 msgid "Document Viewed"
 msgstr "Documento visto"
+
+#: packages/lib/utils/document-audit-logs.ts:302
+msgid "Document visibility updated"
+msgstr "Visibilidad del documento actualizada"
 
 #: apps/web/src/app/(dashboard)/documents/delete-document-dialog.tsx:141
 msgid "Document will be permanently deleted"
@@ -1579,6 +2281,8 @@ msgstr "¿No tienes una cuenta? <0>Regístrate</0>"
 #: apps/web/src/components/(teams)/tables/team-billing-invoices-data-table.tsx:110
 #: apps/web/src/components/forms/2fa/enable-authenticator-app-dialog.tsx:185
 #: apps/web/src/components/forms/2fa/view-recovery-codes-dialog.tsx:107
+#: packages/email/template-components/template-document-completed.tsx:57
+#: packages/ui/components/document/document-download-button.tsx:68
 msgid "Download"
 msgstr "Descargar"
 
@@ -1592,6 +2296,7 @@ msgstr "Descargar certificado"
 
 #: apps/web/src/app/(dashboard)/templates/[id]/template-page-view-documents-table.tsx:210
 #: apps/web/src/components/formatter/document-status.tsx:34
+#: packages/lib/constants/document.ts:13
 msgid "Draft"
 msgstr "Borrador"
 
@@ -1602,6 +2307,19 @@ msgstr "Documentos en borrador"
 #: apps/web/src/app/(dashboard)/admin/stats/page.tsx:86
 msgid "Drafted Documents"
 msgstr "Documentos redactados"
+
+#: packages/ui/primitives/document-dropzone.tsx:162
+msgid "Drag & drop your PDF here."
+msgstr "Arrastre y suelte su PDF aquí."
+
+#: packages/ui/primitives/document-flow/add-fields.tsx:1076
+#: packages/ui/primitives/template-flow/add-template-fields.tsx:863
+msgid "Dropdown"
+msgstr "Menú desplegable"
+
+#: packages/ui/primitives/document-flow/field-items-advanced-settings/dropdown-field.tsx:158
+msgid "Dropdown options"
+msgstr "Opciones de menú desplegable"
 
 #: apps/web/src/app/(teams)/t/[teamUrl]/layout-billing-banner.tsx:121
 msgid "Due to an unpaid invoice, your team has been restricted. Please settle the payment to restore full access to your team."
@@ -1646,7 +2364,7 @@ msgid "Electronic Signature Disclosure"
 msgstr "Divulgación de Firma Electrónica"
 
 #: apps/web/src/app/(dashboard)/admin/documents/[id]/recipient-item.tsx:166
-#: apps/web/src/app/(dashboard)/admin/users/[id]/page.tsx:114
+#: apps/web/src/app/(dashboard)/admin/users/[id]/page.tsx:116
 #: apps/web/src/app/(dashboard)/admin/users/data-table-users.tsx:71
 #: apps/web/src/app/(dashboard)/templates/use-template-dialog.tsx:265
 #: apps/web/src/app/(dashboard)/templates/use-template-dialog.tsx:272
@@ -1662,6 +2380,14 @@ msgstr "Divulgación de Firma Electrónica"
 #: apps/web/src/components/forms/profile.tsx:122
 #: apps/web/src/components/forms/signin.tsx:339
 #: apps/web/src/components/forms/signup.tsx:176
+#: packages/lib/constants/document.ts:28
+#: packages/ui/primitives/document-flow/add-fields.tsx:893
+#: packages/ui/primitives/document-flow/add-signers.tsx:511
+#: packages/ui/primitives/document-flow/add-signers.tsx:518
+#: packages/ui/primitives/document-flow/types.ts:54
+#: packages/ui/primitives/template-flow/add-template-fields.tsx:680
+#: packages/ui/primitives/template-flow/add-template-placeholder-recipients.tsx:470
+#: packages/ui/primitives/template-flow/add-template-placeholder-recipients.tsx:477
 msgid "Email"
 msgstr "Correo electrónico"
 
@@ -1671,7 +2397,7 @@ msgstr "Correo electrónico"
 msgid "Email address"
 msgstr "Dirección de correo electrónico"
 
-#: apps/web/src/components/forms/v2/signup.tsx:331
+#: apps/web/src/components/forms/v2/signup.tsx:332
 msgid "Email Address"
 msgstr "Dirección de correo electrónico"
 
@@ -1682,6 +2408,18 @@ msgstr "El correo electrónico no puede existir ya en la plantilla"
 #: apps/web/src/app/(unauthenticated)/verify-email/[token]/client.tsx:36
 msgid "Email Confirmed!"
 msgstr "¡Correo electrónico confirmado!"
+
+#: packages/ui/primitives/template-flow/add-template-settings.tsx:307
+msgid "Email Options"
+msgstr "Opciones de correo electrónico"
+
+#: packages/lib/utils/document-audit-logs.ts:363
+msgid "Email resent"
+msgstr "Correo electrónico reeenviado"
+
+#: packages/lib/utils/document-audit-logs.ts:363
+msgid "Email sent"
+msgstr "Correo electrónico enviado"
 
 #: apps/web/src/app/(unauthenticated)/check-email/page.tsx:20
 msgid "Email sent!"
@@ -1695,10 +2433,23 @@ msgstr "La verificación de correo electrónico ha sido eliminada"
 msgid "Email verification has been resent"
 msgstr "La verificación de correo electrónico ha sido reenviada"
 
+#: packages/ui/primitives/document-flow/add-fields.tsx:1141
+msgid "Empty field"
+msgstr "Campo vacío"
+
 #: apps/web/src/components/forms/2fa/enable-authenticator-app-dialog.tsx:153
 #: apps/web/src/components/forms/2fa/enable-authenticator-app-dialog.tsx:262
 msgid "Enable 2FA"
 msgstr "Habilitar 2FA"
+
+#: apps/web/src/app/(dashboard)/admin/users/[id]/enable-user-dialog.tsx:121
+msgid "Enable account"
+msgstr ""
+
+#: apps/web/src/app/(dashboard)/admin/users/[id]/enable-user-dialog.tsx:88
+#: apps/web/src/app/(dashboard)/admin/users/[id]/enable-user-dialog.tsx:95
+msgid "Enable Account"
+msgstr ""
 
 #: apps/web/src/components/forms/2fa/enable-authenticator-app-dialog.tsx:194
 msgid "Enable Authenticator App"
@@ -1713,12 +2464,23 @@ msgid "Enable direct link signing"
 msgstr "Habilitar firma de enlace directo"
 
 #: apps/web/src/app/(dashboard)/templates/template-direct-link-dialog.tsx:374
+#: packages/lib/constants/template.ts:8
 msgid "Enable Direct Link Signing"
 msgstr "Habilitar firma de enlace directo"
+
+#: packages/ui/primitives/document-flow/add-signers.tsx:400
+#: packages/ui/primitives/template-flow/add-template-placeholder-recipients.tsx:369
+msgid "Enable signing order"
+msgstr "Habilitar orden de firma"
 
 #: apps/web/src/app/(teams)/t/[teamUrl]/settings/preferences/document-preferences.tsx:248
 msgid "Enable Typed Signature"
 msgstr ""
+
+#: packages/ui/primitives/document-flow/add-fields.tsx:813
+#: packages/ui/primitives/template-flow/add-template-fields.tsx:600
+msgid "Enable Typed Signatures"
+msgstr "Habilitar firmas escritas"
 
 #: apps/web/src/app/(dashboard)/admin/site-settings/banner-form.tsx:123
 #: apps/web/src/app/(dashboard)/settings/webhooks/[id]/page.tsx:138
@@ -1729,6 +2491,10 @@ msgstr ""
 msgid "Enabled"
 msgstr "Habilitado"
 
+#: apps/web/src/app/(dashboard)/admin/users/[id]/enable-user-dialog.tsx:77
+msgid "Enabling the account results in the user being able to use the account again, and all the related features such as webhooks, teams, and API keys for example."
+msgstr ""
+
 #: apps/web/src/app/(internal)/%5F%5Fhtmltopdf/audit-log/page.tsx:87
 msgid "Enclosed Document"
 msgstr "Documento Adjunto"
@@ -1736,6 +2502,10 @@ msgstr "Documento Adjunto"
 #: apps/web/src/app/(dashboard)/admin/subscriptions/page.tsx:38
 msgid "Ends On"
 msgstr "Termina en"
+
+#: packages/ui/primitives/document-password-dialog.tsx:84
+msgid "Enter password"
+msgstr "Ingrese la contraseña"
 
 #: apps/web/src/app/(teams)/t/[teamUrl]/settings/preferences/branding-preferences.tsx:295
 msgid "Enter your brand details"
@@ -1758,14 +2528,16 @@ msgid "Enter your text here"
 msgstr "Ingresa tu texto aquí"
 
 #: apps/web/src/app/(dashboard)/admin/documents/[id]/admin-actions.tsx:41
-#: apps/web/src/app/(dashboard)/admin/users/[id]/page.tsx:78
+#: apps/web/src/app/(dashboard)/admin/users/[id]/disable-user-dialog.tsx:60
+#: apps/web/src/app/(dashboard)/admin/users/[id]/enable-user-dialog.tsx:60
+#: apps/web/src/app/(dashboard)/admin/users/[id]/page.tsx:80
 #: apps/web/src/app/(dashboard)/documents/[id]/edit-document.tsx:234
 #: apps/web/src/app/(dashboard)/documents/[id]/edit-document.tsx:268
 #: apps/web/src/app/(dashboard)/documents/[id]/edit-document.tsx:303
 #: apps/web/src/app/(dashboard)/documents/[id]/edit-document.tsx:349
 #: apps/web/src/app/(dashboard)/documents/move-document-dialog.tsx:57
-#: apps/web/src/app/(dashboard)/documents/upload-document.tsx:106
-#: apps/web/src/app/(dashboard)/documents/upload-document.tsx:112
+#: apps/web/src/app/(dashboard)/documents/upload-document.tsx:111
+#: apps/web/src/app/(dashboard)/documents/upload-document.tsx:117
 #: apps/web/src/app/(dashboard)/templates/[id]/edit/edit-template.tsx:186
 #: apps/web/src/app/(dashboard)/templates/[id]/edit/edit-template.tsx:217
 #: apps/web/src/app/(dashboard)/templates/[id]/edit/edit-template.tsx:256
@@ -1797,6 +2569,8 @@ msgstr "Ingresa tu texto aquí"
 #: apps/web/src/app/(signing)/sign/[token]/text-field.tsx:195
 #: apps/web/src/components/(dashboard)/layout/verify-email-banner.tsx:54
 #: apps/web/src/components/(dashboard)/settings/webhooks/create-webhook-dialog.tsx:101
+#: packages/ui/primitives/document-flow/field-item-advanced-settings.tsx:258
+#: packages/ui/primitives/pdf-viewer.tsx:166
 msgid "Error"
 msgstr "Error"
 
@@ -1825,9 +2599,18 @@ msgstr "Expirado"
 msgid "Expires on {0}"
 msgstr "Expira el {0}"
 
+#: packages/ui/primitives/document-flow/add-settings.tsx:295
+#: packages/ui/primitives/template-flow/add-template-settings.tsx:378
+msgid "External ID"
+msgstr "ID externo"
+
 #: apps/web/src/app/(dashboard)/admin/documents/[id]/admin-actions.tsx:42
 msgid "Failed to reseal document"
 msgstr "Falló al volver a sellar el documento"
+
+#: packages/ui/primitives/document-flow/field-item-advanced-settings.tsx:259
+msgid "Failed to save settings."
+msgstr "Fallo al guardar configuraciones."
 
 #: apps/web/src/app/(dashboard)/admin/documents/[id]/recipient-item.tsx:125
 msgid "Failed to update recipient"
@@ -1838,30 +2621,81 @@ msgstr "Falló al actualizar el destinatario"
 msgid "Failed to update webhook"
 msgstr "Falló al actualizar el webhook"
 
+#: packages/ui/primitives/document-flow/field-items-advanced-settings/text-field.tsx:93
+msgid "Field character limit"
+msgstr "Límite de caracteres del campo"
+
+#: packages/ui/primitives/document-flow/field-items-advanced-settings/date-field.tsx:62
+#: packages/ui/primitives/document-flow/field-items-advanced-settings/email-field.tsx:44
+#: packages/ui/primitives/document-flow/field-items-advanced-settings/initials-field.tsx:44
+#: packages/ui/primitives/document-flow/field-items-advanced-settings/name-field.tsx:44
+#: packages/ui/primitives/document-flow/field-items-advanced-settings/number-field.tsx:130
+#: packages/ui/primitives/document-flow/field-items-advanced-settings/text-field.tsx:107
+msgid "Field font size"
+msgstr "Tamaño de fuente del campo"
+
+#: packages/ui/primitives/document-flow/field-items-advanced-settings/number-field.tsx:110
+msgid "Field format"
+msgstr "Formato de campo"
+
+#: packages/ui/primitives/document-flow/field-items-advanced-settings/text-field.tsx:53
+msgid "Field label"
+msgstr "Etiqueta de campo"
+
+#: packages/ui/primitives/document-flow/field-items-advanced-settings/text-field.tsx:65
+msgid "Field placeholder"
+msgstr "Marcador de posición de campo"
+
+#: packages/lib/utils/document-audit-logs.ts:294
+msgid "Field signed"
+msgstr "Campo firmado"
+
+#: packages/lib/utils/document-audit-logs.ts:298
+msgid "Field unsigned"
+msgstr "Campo no firmado"
+
 #: apps/web/src/app/(dashboard)/admin/documents/[id]/recipient-item.tsx:190
 msgid "Fields"
 msgstr "Campos"
 
-#: apps/web/src/app/(dashboard)/documents/upload-document.tsx:125
+#: apps/web/src/app/(dashboard)/documents/upload-document.tsx:130
 msgid "File cannot be larger than {APP_DOCUMENT_UPLOAD_SIZE_LIMIT}MB"
 msgstr "El archivo no puede ser mayor a {APP_DOCUMENT_UPLOAD_SIZE_LIMIT}MB"
+
+#: packages/ui/primitives/document-flow/field-items-advanced-settings/date-field.tsx:56
+#: packages/ui/primitives/document-flow/field-items-advanced-settings/email-field.tsx:38
+#: packages/ui/primitives/document-flow/field-items-advanced-settings/initials-field.tsx:38
+#: packages/ui/primitives/document-flow/field-items-advanced-settings/name-field.tsx:38
+#: packages/ui/primitives/document-flow/field-items-advanced-settings/number-field.tsx:124
+#: packages/ui/primitives/document-flow/field-items-advanced-settings/text-field.tsx:101
+msgid "Font Size"
+msgstr "Tamaño de fuente"
 
 #: apps/web/src/app/(unauthenticated)/articles/signature-disclosure/page.tsx:154
 msgid "For any questions regarding this disclosure, electronic signatures, or any related process, please contact us at: <0>{SUPPORT_EMAIL}</0>"
 msgstr "Si tiene alguna pregunta sobre esta divulgación, firmas electrónicas o cualquier proceso relacionado, comuníquese con nosotros en: <0>{SUPPORT_EMAIL}</0>"
 
+#: packages/lib/server-only/auth/send-forgot-password.ts:61
+msgid "Forgot Password?"
+msgstr "¿Olvidaste tu contraseña?"
+
 #: apps/web/src/app/(unauthenticated)/forgot-password/page.tsx:21
 #: apps/web/src/components/forms/signin.tsx:371
+#: packages/email/template-components/template-forgot-password.tsx:21
 msgid "Forgot your password?"
 msgstr "¿Olvidaste tu contraseña?"
 
+#: packages/ui/primitives/document-flow/types.ts:50
+msgid "Free Signature"
+msgstr "Firma gratuita"
+
 #: apps/web/src/app/(recipient)/d/[token]/sign-direct-template.tsx:330
-#: apps/web/src/app/(signing)/sign/[token]/form.tsx:185
+#: apps/web/src/app/(signing)/sign/[token]/form.tsx:191
 #: apps/web/src/app/(signing)/sign/[token]/name-field.tsx:193
 #: apps/web/src/app/embed/direct/[[...url]]/client.tsx:392
 #: apps/web/src/app/embed/sign/[[...url]]/client.tsx:272
 #: apps/web/src/components/forms/profile.tsx:110
-#: apps/web/src/components/forms/v2/signup.tsx:315
+#: apps/web/src/components/forms/v2/signup.tsx:316
 msgid "Full Name"
 msgstr "Nombre completo"
 
@@ -1873,11 +2707,20 @@ msgstr "Nombre completo"
 msgid "General"
 msgstr "General"
 
+#: packages/ui/primitives/document-flow/add-subject.tsx:89
+msgid "Generate Links"
+msgstr "Generar enlaces"
+
+#: packages/ui/components/document/document-global-auth-action-select.tsx:64
+msgid "Global recipient action authentication"
+msgstr "Autenticación de acción de destinatario global"
+
 #: apps/web/src/app/(profile)/p/[url]/not-found.tsx:30
 #: apps/web/src/app/(recipient)/d/[token]/not-found.tsx:33
 #: apps/web/src/app/(teams)/t/[teamUrl]/error.tsx:51
 #: apps/web/src/app/(teams)/t/[teamUrl]/not-found.tsx:32
 #: apps/web/src/components/partials/not-found.tsx:67
+#: packages/ui/primitives/document-flow/document-flow-root.tsx:142
 msgid "Go Back"
 msgstr "Regresar"
 
@@ -1900,6 +2743,10 @@ msgstr "Ir al propietario"
 #: apps/web/src/app/(profile)/p/[url]/page.tsx:147
 msgid "Go to your <0>public profile settings</0> to add documents."
 msgstr "Ve a tu <0>configuración de perfil público</0> para agregar documentos."
+
+#: packages/ui/primitives/signature-pad/signature-pad.tsx:565
+msgid "Green"
+msgstr "Verde"
 
 #: apps/web/src/app/(signing)/sign/[token]/signing-page-view.tsx:107
 msgid "has invited you to approve this document"
@@ -1937,6 +2784,10 @@ msgstr "Así es como funciona:"
 msgid "Hey I’m Timur"
 msgstr "Hola, soy Timur"
 
+#: packages/email/templates/reset-password.tsx:56
+msgid "Hi, {userName} <0>({userEmail})</0>"
+msgstr "Hola, {userName} <0>({userEmail})</0>"
+
 #: apps/web/src/app/(dashboard)/documents/data-table-action-dropdown.tsx:189
 #: apps/web/src/app/(dashboard)/documents/delete-document-dialog.tsx:202
 #: apps/web/src/app/(dashboard)/settings/public-profile/public-profile-page-view.tsx:155
@@ -1946,6 +2797,22 @@ msgstr "Ocultar"
 #: apps/web/src/components/document/document-history-sheet.tsx:111
 msgid "Hide additional information"
 msgstr "Ocultar información adicional"
+
+#: packages/lib/constants/recipient-roles.ts:44
+msgid "I am a signer of this document"
+msgstr "Soy un firmante de este documento"
+
+#: packages/lib/constants/recipient-roles.ts:47
+msgid "I am a viewer of this document"
+msgstr "Soy un visualizador de este documento"
+
+#: packages/lib/constants/recipient-roles.ts:45
+msgid "I am an approver of this document"
+msgstr "Soy un aprobador de este documento"
+
+#: packages/lib/constants/recipient-roles.ts:46
+msgid "I am required to receive a copy of this document"
+msgstr "Se me requiere recibir una copia de este documento"
 
 #: apps/web/src/app/(internal)/%5F%5Fhtmltopdf/certificate/page.tsx:43
 msgid "I am the owner of this document"
@@ -1989,7 +2856,13 @@ msgstr ""
 msgid "Information"
 msgstr "Información"
 
+#: packages/ui/components/recipient/recipient-action-auth-select.tsx:29
+#: packages/ui/components/recipient/recipient-action-auth-select.tsx:87
+msgid "Inherit authentication method"
+msgstr "Heredar método de autenticación"
+
 #: apps/web/src/app/(signing)/sign/[token]/initials-field.tsx:132
+#: packages/ui/primitives/document-flow/types.ts:51
 msgid "Initials"
 msgstr "Iniciales"
 
@@ -2005,7 +2878,11 @@ msgstr "Estadísticas de instancia"
 msgid "Invalid code. Please try again."
 msgstr "Código inválido. Por favor, intenta nuevamente."
 
-#: apps/web/src/app/(dashboard)/documents/upload-document.tsx:100
+#: packages/ui/primitives/document-flow/add-signers.types.ts:17
+msgid "Invalid email"
+msgstr "Email inválido"
+
+#: apps/web/src/app/(dashboard)/documents/upload-document.tsx:105
 msgid "Invalid file"
 msgstr "Archivo inválido"
 
@@ -2092,7 +2969,19 @@ msgstr "Parece que no se ha proporcionado un token. Por favor revisa tu correo e
 msgid "It's currently not your turn to sign. You will receive an email with instructions once it's your turn to sign the document."
 msgstr "Actualmente no es tu turno para firmar. Recibirás un correo electrónico con instrucciones una vez sea tu turno para firmar el documento."
 
+#: packages/email/templates/team-invite.tsx:72
+msgid "Join {teamName} on Documenso"
+msgstr "Únete a {teamName} en Documenso"
+
+#: packages/ui/primitives/document-flow/field-items-advanced-settings/number-field.tsx:67
+#: packages/ui/primitives/document-flow/field-items-advanced-settings/number-field.tsx:72
+#: packages/ui/primitives/document-flow/field-items-advanced-settings/text-field.tsx:48
+msgid "Label"
+msgstr "Etiqueta"
+
 #: apps/web/src/components/(dashboard)/layout/menu-switcher.tsx:286
+#: packages/ui/primitives/document-flow/add-settings.tsx:187
+#: packages/ui/primitives/template-flow/add-template-settings.tsx:162
 msgid "Language"
 msgstr "Idioma"
 
@@ -2154,6 +3043,11 @@ msgstr "Modo claro"
 msgid "Like to have your own public profile with agreements?"
 msgstr "¿Te gustaría tener tu propio perfil público con acuerdos?"
 
+#: packages/email/templates/confirm-team-email.tsx:124
+#: packages/email/templates/team-transfer-request.tsx:87
+msgid "Link expires in 1 hour."
+msgstr "El enlace expira en 1 hora."
+
 #: apps/web/src/app/(dashboard)/settings/public-profile/public-profile-page-view.tsx:216
 msgid "Link template"
 msgstr "Enlace de plantilla"
@@ -2172,6 +3066,8 @@ msgid "Load older activity"
 msgstr "Cargar actividad anterior"
 
 #: apps/web/src/app/(dashboard)/documents/[id]/loading.tsx:33
+#: packages/ui/primitives/lazy-pdf-viewer.tsx:15
+#: packages/ui/primitives/pdf-viewer.tsx:44
 msgid "Loading document..."
 msgstr "Cargando documento..."
 
@@ -2200,7 +3096,7 @@ msgstr "Iniciar sesión"
 msgid "Manage"
 msgstr "Gestionar"
 
-#: apps/web/src/app/(dashboard)/admin/users/[id]/page.tsx:88
+#: apps/web/src/app/(dashboard)/admin/users/[id]/page.tsx:90
 msgid "Manage {0}'s profile"
 msgstr "Gestionar el perfil de {0}"
 
@@ -2272,7 +3168,11 @@ msgstr "Gestionar tus claves de acceso."
 msgid "Manage your site settings here"
 msgstr "Gestionar la configuración de tu sitio aquí"
 
-#: apps/web/src/app/(signing)/sign/[token]/sign-dialog.tsx:140
+#: packages/lib/constants/teams.ts:11
+msgid "Manager"
+msgstr "Gerente"
+
+#: apps/web/src/app/(signing)/sign/[token]/sign-dialog.tsx:141
 msgid "Mark as Viewed"
 msgstr "Marcar como visto"
 
@@ -2284,6 +3184,14 @@ msgstr "MAU (documento creado)"
 msgid "MAU (had document completed)"
 msgstr "MAU (documento completado)"
 
+#: packages/ui/primitives/document-flow/field-items-advanced-settings/number-field.tsx:188
+msgid "Max"
+msgstr "Máx"
+
+#: packages/lib/constants/teams.ts:12
+msgid "Member"
+msgstr "Miembro"
+
 #: apps/web/src/components/(teams)/tables/current-user-teams-data-table.tsx:88
 #: apps/web/src/components/(teams)/tables/team-members-data-table.tsx:111
 msgid "Member Since"
@@ -2294,6 +3202,15 @@ msgstr "Miembro desde"
 #: apps/web/src/components/(teams)/settings/layout/mobile-nav.tsx:95
 msgid "Members"
 msgstr "Miembros"
+
+#: packages/ui/primitives/document-flow/add-subject.tsx:160
+#: packages/ui/primitives/template-flow/add-template-settings.tsx:338
+msgid "Message <0>(Optional)</0>"
+msgstr "Mensaje <0>(Opcional)</0>"
+
+#: packages/ui/primitives/document-flow/field-items-advanced-settings/number-field.tsx:176
+msgid "Min"
+msgstr "Mín"
 
 #: apps/web/src/app/(dashboard)/documents/[id]/document-page-view-recipients.tsx:55
 #: apps/web/src/app/(dashboard)/templates/[id]/template-page-view-recipients.tsx:35
@@ -2342,7 +3259,7 @@ msgstr "Mis plantillas"
 
 #: apps/web/src/app/(dashboard)/admin/documents/[id]/recipient-item.tsx:148
 #: apps/web/src/app/(dashboard)/admin/leaderboard/data-table-leaderboard.tsx:56
-#: apps/web/src/app/(dashboard)/admin/users/[id]/page.tsx:99
+#: apps/web/src/app/(dashboard)/admin/users/[id]/page.tsx:101
 #: apps/web/src/app/(dashboard)/admin/users/data-table-users.tsx:66
 #: apps/web/src/app/(dashboard)/settings/security/passkeys/user-passkeys-data-table-actions.tsx:144
 #: apps/web/src/app/(dashboard)/settings/security/passkeys/user-passkeys-data-table.tsx:59
@@ -2353,12 +3270,31 @@ msgstr "Mis plantillas"
 #: apps/web/src/components/(teams)/dialogs/add-team-email-dialog.tsx:153
 #: apps/web/src/components/(teams)/dialogs/update-team-email-dialog.tsx:141
 #: apps/web/src/components/forms/signup.tsx:160
+#: packages/ui/primitives/document-flow/add-fields.tsx:919
+#: packages/ui/primitives/document-flow/add-signers.tsx:549
+#: packages/ui/primitives/document-flow/add-signers.tsx:555
+#: packages/ui/primitives/document-flow/types.ts:55
+#: packages/ui/primitives/template-flow/add-template-fields.tsx:706
+#: packages/ui/primitives/template-flow/add-template-placeholder-recipients.tsx:505
+#: packages/ui/primitives/template-flow/add-template-placeholder-recipients.tsx:511
 msgid "Name"
 msgstr "Nombre"
 
 #: apps/web/src/app/(signing)/sign/[token]/complete/page.tsx:209
 msgid "Need to sign documents?"
 msgstr "¿Necesitas firmar documentos?"
+
+#: packages/ui/components/recipient/recipient-role-select.tsx:52
+msgid "Needs to approve"
+msgstr "Necesita aprobar"
+
+#: packages/ui/components/recipient/recipient-role-select.tsx:31
+msgid "Needs to sign"
+msgstr "Necesita firmar"
+
+#: packages/ui/components/recipient/recipient-role-select.tsx:73
+msgid "Needs to view"
+msgstr "Necesita ver"
 
 #: apps/web/src/app/(dashboard)/settings/security/passkeys/user-passkeys-data-table.tsx:74
 msgid "Never"
@@ -2379,11 +3315,11 @@ msgstr "Nueva plantilla"
 
 #: apps/web/src/app/embed/direct/[[...url]]/client.tsx:462
 #: apps/web/src/app/embed/sign/[[...url]]/client.tsx:341
-#: apps/web/src/components/forms/v2/signup.tsx:524
+#: apps/web/src/components/forms/v2/signup.tsx:525
 msgid "Next"
 msgstr "Siguiente"
 
-#: apps/web/src/app/(signing)/sign/[token]/sign-dialog.tsx:60
+#: apps/web/src/app/(signing)/sign/[token]/sign-dialog.tsx:61
 msgid "Next field"
 msgstr "Siguiente campo"
 
@@ -2411,15 +3347,41 @@ msgstr "No hay actividad reciente"
 msgid "No recent documents"
 msgstr "No hay documentos recientes"
 
+#: packages/ui/primitives/document-flow/add-fields.tsx:705
+#: packages/ui/primitives/template-flow/add-template-fields.tsx:520
+msgid "No recipient matching this description was found."
+msgstr "No se encontró ningún destinatario que coincidiera con esta descripción."
+
 #: apps/web/src/app/(dashboard)/documents/[id]/document-page-view-recipients.tsx:70
 #: apps/web/src/app/(dashboard)/templates/[id]/template-page-view-recipients.tsx:49
 #: apps/web/src/components/document/document-recipient-link-copy-dialog.tsx:96
+#: packages/ui/primitives/document-flow/add-subject.tsx:215
 msgid "No recipients"
-msgstr "No hay destinatarios"
+msgstr "Sin destinatarios"
+
+#: packages/ui/primitives/document-flow/add-fields.tsx:720
+#: packages/ui/primitives/template-flow/add-template-fields.tsx:535
+msgid "No recipients with this role"
+msgstr "No hay destinatarios con este rol"
+
+#: packages/ui/components/document/document-global-auth-access-select.tsx:30
+#: packages/ui/components/document/document-global-auth-access-select.tsx:43
+#: packages/ui/components/document/document-global-auth-action-select.tsx:31
+#: packages/ui/components/document/document-global-auth-action-select.tsx:46
+msgid "No restrictions"
+msgstr "Sin restricciones"
+
+#: packages/ui/primitives/data-table.tsx:148
+msgid "No results found"
+msgstr "No se encontraron resultados"
 
 #: apps/web/src/components/(dashboard)/common/command-menu.tsx:200
 msgid "No results found."
 msgstr "No se encontraron resultados."
+
+#: packages/ui/primitives/document-flow/missing-signature-field-dialog.tsx:30
+msgid "No signature field found"
+msgstr "No se encontró campo de firma"
 
 #: apps/web/src/app/(unauthenticated)/verify-email/[token]/page.tsx:37
 msgid "No token provided"
@@ -2435,12 +3397,18 @@ msgstr "No se encontraron destinatarios válidos"
 
 #: apps/web/src/app/(dashboard)/admin/users/[id]/multiselect-role-combobox.tsx:64
 #: apps/web/src/components/(dashboard)/settings/webhooks/trigger-multiselect-combobox.tsx:77
+#: packages/ui/primitives/combobox.tsx:60
+#: packages/ui/primitives/multi-select-combobox.tsx:153
 msgid "No value found."
 msgstr "No se encontró valor."
 
 #: apps/web/src/app/(unauthenticated)/forgot-password/page.tsx:25
 msgid "No worries, it happens! Enter your email and we'll email you a special link to reset your password."
 msgstr "¡No te preocupes, sucede! Ingresa tu correo electrónico y te enviaremos un enlace especial para restablecer tu contraseña."
+
+#: packages/lib/constants/document.ts:32
+msgid "None"
+msgstr "Ninguno"
 
 #: apps/web/src/components/forms/signin.tsx:161
 msgid "Not supported"
@@ -2452,8 +3420,15 @@ msgid "Nothing to do"
 msgstr "Nada que hacer"
 
 #: apps/web/src/app/(signing)/sign/[token]/number-field.tsx:271
+#: packages/ui/primitives/document-flow/add-fields.tsx:997
+#: packages/ui/primitives/document-flow/types.ts:56
+#: packages/ui/primitives/template-flow/add-template-fields.tsx:784
 msgid "Number"
 msgstr "Número"
+
+#: packages/ui/primitives/document-flow/field-items-advanced-settings/number-field.tsx:103
+msgid "Number format"
+msgstr "Formato de número"
 
 #: apps/web/src/app/(signing)/sign/[token]/signing-page-view.tsx:103
 msgid "on behalf of \"{0}\" has invited you to approve this document"
@@ -2493,9 +3468,17 @@ msgstr "En esta página, puedes editar el webhook y su configuración."
 msgid "Once confirmed, the following will occur:"
 msgstr "Una vez confirmado, ocurrirá lo siguiente:"
 
+#: packages/lib/constants/template.ts:9
+msgid "Once enabled, you can select any active recipient to be a direct link signing recipient, or create a new one. This recipient type cannot be edited or deleted."
+msgstr "Una vez habilitado, puede seleccionar cualquier destinatario activo para que sea un destinatario de firma por enlace directo, o crear uno nuevo. Este tipo de destinatario no puede ser editado ni eliminado."
+
 #: apps/web/src/components/forms/2fa/enable-authenticator-app-dialog.tsx:224
 msgid "Once you have scanned the QR code or entered the code manually, enter the code provided by your authenticator app below."
 msgstr "Una vez que hayas escaneado el código QR o ingresado el código manualmente, ingresa el código proporcionado por tu aplicación de autenticación a continuación."
+
+#: packages/lib/constants/template.ts:17
+msgid "Once your template is set up, share the link anywhere you want. The person who opens the link will be able to enter their information in the direct link recipient field and complete any other fields assigned to them."
+msgstr "Una vez que su plantilla esté configurada, comparta el enlace donde desee. La persona que abra el enlace podrá ingresar su información en el campo de destinatario de enlace directo y completar cualquier otro campo que se le haya asignado."
 
 #: apps/web/src/app/(teams)/t/[teamUrl]/settings/preferences/document-preferences.tsx:146
 msgid "Only admins can access and view the document"
@@ -2505,7 +3488,7 @@ msgstr "Solo los administradores pueden acceder y ver el documento"
 msgid "Only managers and above can access and view the document"
 msgstr "Solo los gerentes y superiores pueden acceder y ver el documento"
 
-#: apps/web/src/components/forms/v2/signup.tsx:81
+#: apps/web/src/components/forms/v2/signup.tsx:82
 msgid "Only subscribers can have a username shorter than 6 characters"
 msgstr ""
 
@@ -2524,7 +3507,7 @@ msgstr "Abierto"
 #: apps/web/src/app/(dashboard)/templates/template-direct-link-dialog.tsx:337
 #: apps/web/src/components/forms/signup.tsx:239
 #: apps/web/src/components/forms/signup.tsx:263
-#: apps/web/src/components/forms/v2/signup.tsx:386
+#: apps/web/src/components/forms/v2/signup.tsx:387
 msgid "Or"
 msgstr "O"
 
@@ -2532,7 +3515,7 @@ msgstr "O"
 msgid "Or continue with"
 msgstr "O continúa con"
 
-#: apps/web/src/app/(dashboard)/templates/use-template-dialog.tsx:341
+#: apps/web/src/app/(dashboard)/templates/use-template-dialog.tsx:340
 msgid "Otherwise, the document will be created as a draft."
 msgstr "De lo contrario, el documento se creará como un borrador."
 
@@ -2543,6 +3526,14 @@ msgstr "De lo contrario, el documento se creará como un borrador."
 #: apps/web/src/components/(teams)/tables/team-members-data-table.tsx:107
 msgid "Owner"
 msgstr "Propietario"
+
+#: packages/ui/primitives/data-table-pagination.tsx:77
+msgid "Page {0} of {1}"
+msgstr "Página {0} de {1}"
+
+#: packages/ui/primitives/pdf-viewer.tsx:259
+msgid "Page {0} of {numPages}"
+msgstr "Página {0} de {numPages}"
 
 #: apps/web/src/components/(teams)/tables/team-billing-invoices-data-table.tsx:79
 msgid "Paid"
@@ -2594,9 +3585,21 @@ msgstr "Las claves de acceso no están soportadas en este navegador"
 #: apps/web/src/components/forms/reset-password.tsx:115
 #: apps/web/src/components/forms/signin.tsx:357
 #: apps/web/src/components/forms/signup.tsx:192
-#: apps/web/src/components/forms/v2/signup.tsx:347
+#: apps/web/src/components/forms/v2/signup.tsx:348
 msgid "Password"
 msgstr "Contraseña"
+
+#: packages/ui/primitives/document-password-dialog.tsx:62
+msgid "Password Required"
+msgstr "Se requiere contraseña"
+
+#: packages/email/templates/forgot-password.tsx:19
+msgid "Password Reset Requested"
+msgstr "Solicitud de restablecimiento de contraseña"
+
+#: packages/email/templates/reset-password.tsx:20
+msgid "Password Reset Successful"
+msgstr "Restablecimiento de contraseña exitoso"
 
 #: apps/web/src/app/(signing)/sign/[token]/complete/claim-account.tsx:51
 #: apps/web/src/components/forms/v2/signup.tsx:72
@@ -2607,6 +3610,10 @@ msgstr ""
 #: apps/web/src/components/forms/reset-password.tsx:73
 msgid "Password updated"
 msgstr "Contraseña actualizada"
+
+#: packages/email/template-components/template-reset-password.tsx:22
+msgid "Password updated!"
+msgstr "¡Contraseña actualizada!"
 
 #: apps/web/src/components/(teams)/tables/pending-user-teams-data-table-actions.tsx:46
 msgid "Pay"
@@ -2627,8 +3634,13 @@ msgstr "Pago atrasado"
 #: apps/web/src/components/(teams)/tables/user-settings-teams-page-data-table.tsx:77
 #: apps/web/src/components/document/document-read-only-fields.tsx:89
 #: apps/web/src/components/formatter/document-status.tsx:22
+#: packages/lib/constants/document.ts:16
 msgid "Pending"
 msgstr "Pendiente"
+
+#: packages/email/templates/document-pending.tsx:19
+msgid "Pending Document"
+msgstr "Documento pendiente"
 
 #: apps/web/src/components/(dashboard)/common/command-menu.tsx:51
 msgid "Pending documents"
@@ -2654,6 +3666,10 @@ msgstr "Personal"
 msgid "Personal Account"
 msgstr "Cuenta personal"
 
+#: packages/ui/primitives/document-flow/field-items-advanced-settings/checkbox-field.tsx:156
+msgid "Pick a number"
+msgstr "Seleccione un número"
+
 #: apps/web/src/app/(signing)/sign/[token]/complete/claim-account.tsx:151
 msgid "Pick a password"
 msgstr "Elige una contraseña"
@@ -2661,6 +3677,32 @@ msgstr "Elige una contraseña"
 #: apps/web/src/components/ui/user-profile-timur.tsx:53
 msgid "Pick any of the following agreements below and start signing to get started"
 msgstr "Elige cualquiera de los siguientes acuerdos a continuación y comience a firmar para empezar"
+
+#: packages/ui/primitives/document-flow/field-items-advanced-settings/number-field.tsx:79
+#: packages/ui/primitives/document-flow/field-items-advanced-settings/number-field.tsx:84
+#: packages/ui/primitives/document-flow/field-items-advanced-settings/text-field.tsx:60
+msgid "Placeholder"
+msgstr "Marcador de posición"
+
+#: packages/email/template-components/template-document-invite.tsx:56
+msgid "Please {0} your document<0/>\"{documentName}\""
+msgstr "Por favor {0} tu documento<0/>\"{documentName}\""
+
+#: packages/email/templates/document-invite.tsx:50
+msgid "Please {action} your document {documentName}"
+msgstr "Por favor {action} tu documento {documentName}"
+
+#: packages/lib/jobs/definitions/emails/send-signing-email.handler.ts:99
+msgid "Please {recipientActionVerb} this document"
+msgstr "Por favor {recipientActionVerb} este documento"
+
+#: packages/lib/jobs/definitions/emails/send-signing-email.handler.ts:113
+msgid "Please {recipientActionVerb} this document created by your direct template"
+msgstr "Por favor {recipientActionVerb} este documento creado a partir de tu plantilla directa"
+
+#: packages/lib/jobs/definitions/emails/send-signing-email.handler.ts:105
+msgid "Please {recipientActionVerb} your document"
+msgstr "Por favor {recipientActionVerb} tu documento"
 
 #: apps/web/src/components/(teams)/dialogs/invite-team-member-dialog.tsx:212
 msgid "Please check the CSV file and make sure it is according to our format"
@@ -2673,6 +3715,14 @@ msgstr "Por favor, revisa tu correo electrónico para actualizaciones."
 #: apps/web/src/app/(unauthenticated)/reset-password/[token]/page.tsx:34
 msgid "Please choose your new password"
 msgstr "Por favor, elige tu nueva contraseña"
+
+#: packages/lib/server-only/auth/send-confirmation-email.ts:67
+msgid "Please confirm your email"
+msgstr "Por favor confirma tu correo electrónico"
+
+#: packages/email/templates/confirm-email.tsx:17
+msgid "Please confirm your email address"
+msgstr "Por favor confirma tu dirección de correo electrónico"
 
 #: apps/web/src/app/(dashboard)/documents/delete-document-dialog.tsx:176
 msgid "Please contact support if you would like to revert this action."
@@ -2687,7 +3737,7 @@ msgstr "Por favor, ingresa un nombre significativo para tu token. Esto te ayudar
 msgid "Please enter a valid name."
 msgstr ""
 
-#: apps/web/src/app/(signing)/sign/[token]/form.tsx:142
+#: apps/web/src/app/(signing)/sign/[token]/form.tsx:148
 msgid "Please mark as viewed to complete"
 msgstr "Por favor, marca como visto para completar"
 
@@ -2731,7 +3781,7 @@ msgstr "Por favor, proporciona un token del autenticador o un código de respald
 msgid "Please provide a token from your authenticator, or a backup code."
 msgstr "Por favor, proporciona un token de tu autenticador, o un código de respaldo."
 
-#: apps/web/src/app/(signing)/sign/[token]/form.tsx:176
+#: apps/web/src/app/(signing)/sign/[token]/form.tsx:182
 msgid "Please review the document before signing."
 msgstr "Por favor, revise el documento antes de firmar."
 
@@ -2746,6 +3796,11 @@ msgstr "Por favor, intenta de nuevo más tarde o inicia sesión utilizando tus d
 #: apps/web/src/app/(dashboard)/templates/new-template-dialog.tsx:80
 msgid "Please try again later."
 msgstr "Por favor, intenta de nuevo más tarde."
+
+#: packages/ui/primitives/pdf-viewer.tsx:223
+#: packages/ui/primitives/pdf-viewer.tsx:238
+msgid "Please try again or contact our support."
+msgstr "Por favor, inténtalo de nuevo o contacta a nuestro soporte."
 
 #: apps/web/src/app/(dashboard)/documents/delete-document-dialog.tsx:186
 msgid "Please type {0} to confirm"
@@ -2793,7 +3848,7 @@ msgstr "El perfil está actualmente <0>oculto</0>."
 msgid "Profile is currently <0>visible</0>."
 msgstr "El perfil está actualmente <0>visible</0>."
 
-#: apps/web/src/app/(dashboard)/admin/users/[id]/page.tsx:72
+#: apps/web/src/app/(dashboard)/admin/users/[id]/page.tsx:74
 #: apps/web/src/components/forms/profile.tsx:72
 msgid "Profile updated"
 msgstr "Perfil actualizado"
@@ -2815,13 +3870,29 @@ msgstr "Perfil Público"
 msgid "Public profile URL"
 msgstr "URL del perfil público"
 
-#: apps/web/src/components/forms/v2/signup.tsx:453
+#: apps/web/src/components/forms/v2/signup.tsx:454
 msgid "Public profile username"
 msgstr "Nombre de usuario del perfil público"
 
 #: apps/web/src/app/(dashboard)/templates/data-table-templates.tsx:82
 msgid "Public templates are connected to your public profile. Any modifications to public templates will also appear in your public profile."
 msgstr "Las plantillas públicas están conectadas a tu perfil público. Cualquier modificación a las plantillas públicas también aparecerá en tu perfil público."
+
+#: packages/ui/primitives/document-flow/types.ts:57
+msgid "Radio"
+msgstr "Radio"
+
+#: packages/ui/primitives/document-flow/field-items-advanced-settings/radio-field.tsx:133
+msgid "Radio values"
+msgstr "Valores de radio"
+
+#: packages/ui/primitives/document-flow/field-items-advanced-settings/checkbox-field.tsx:186
+#: packages/ui/primitives/document-flow/field-items-advanced-settings/dropdown-field.tsx:147
+#: packages/ui/primitives/document-flow/field-items-advanced-settings/number-field.tsx:156
+#: packages/ui/primitives/document-flow/field-items-advanced-settings/radio-field.tsx:122
+#: packages/ui/primitives/document-flow/field-items-advanced-settings/text-field.tsx:133
+msgid "Read only"
+msgstr "Solo lectura"
 
 #: apps/web/src/app/(signing)/sign/[token]/signing-field-container.tsx:144
 msgid "Read only field"
@@ -2843,6 +3914,10 @@ msgstr "Razón"
 msgid "Reason for rejection:"
 msgstr "Reason for rejection:"
 
+#: packages/email/template-components/template-document-rejected.tsx:32
+msgid "Reason for rejection: {rejectionReason}"
+msgstr "Razón del rechazo: {rejectionReason}"
+
 #: apps/web/src/app/(signing)/sign/[token]/reject-document-dialog.tsx:38
 msgid "Reason must be less than 500 characters"
 msgstr "Reason must be less than 500 characters"
@@ -2850,6 +3925,10 @@ msgstr "Reason must be less than 500 characters"
 #: apps/web/src/app/(signing)/sign/[token]/document-action-auth-dialog.tsx:62
 msgid "Reauthentication is required to sign this field"
 msgstr "Se requiere reautenticación para firmar este campo"
+
+#: packages/ui/components/recipient/recipient-role-select.tsx:95
+msgid "Receives copy"
+msgstr "Recibe copia"
 
 #: apps/web/src/app/(dashboard)/documents/[id]/document-page-view-recent-activity.tsx:55
 #: apps/web/src/app/(dashboard)/settings/security/page.tsx:130
@@ -2863,8 +3942,28 @@ msgstr "Documentos recientes"
 #: apps/web/src/app/(dashboard)/documents/data-table.tsx:63
 #: apps/web/src/app/(dashboard)/templates/[id]/template-page-view-documents-table.tsx:116
 #: apps/web/src/app/(dashboard)/templates/template-direct-link-dialog.tsx:280
+#: packages/lib/utils/document-audit-logs.ts:338
+#: packages/lib/utils/document-audit-logs.ts:353
 msgid "Recipient"
 msgstr "Destinatario"
+
+#: packages/ui/components/recipient/recipient-action-auth-select.tsx:39
+#: packages/ui/primitives/document-flow/add-settings.tsx:269
+#: packages/ui/primitives/template-flow/add-template-settings.tsx:291
+msgid "Recipient action authentication"
+msgstr "Autenticación de acción de destinatario"
+
+#: packages/ui/components/document/document-email-checkboxes.tsx:126
+msgid "Recipient removed email"
+msgstr "Correo electrónico de destinatario eliminado"
+
+#: packages/ui/components/document/document-email-checkboxes.tsx:50
+msgid "Recipient signed email"
+msgstr ""
+
+#: packages/ui/components/document/document-email-checkboxes.tsx:88
+msgid "Recipient signing request email"
+msgstr "Correo electrónico de solicitud de firma de destinatario"
 
 #: apps/web/src/app/(dashboard)/admin/documents/[id]/recipient-item.tsx:118
 msgid "Recipient updated"
@@ -2893,26 +3992,60 @@ msgstr "Código de recuperación copiado"
 msgid "Recovery codes"
 msgstr "Códigos de recuperación"
 
+#: packages/ui/primitives/signature-pad/signature-pad.tsx:551
+msgid "Red"
+msgstr "Rojo"
+
+#: packages/ui/primitives/document-flow/add-settings.tsx:383
+#: packages/ui/primitives/template-flow/add-template-settings.tsx:461
+msgid "Redirect URL"
+msgstr "URL de redirección"
+
 #: apps/web/src/app/(signing)/sign/[token]/complete/claim-account.tsx:83
 #: apps/web/src/components/forms/signup.tsx:95
-#: apps/web/src/components/forms/v2/signup.tsx:138
+#: apps/web/src/components/forms/v2/signup.tsx:139
 msgid "Registration Successful"
 msgstr "Registro exitoso"
 
 #: apps/web/src/app/(signing)/sign/[token]/reject-document-dialog.tsx:109
 #: apps/web/src/app/(signing)/sign/[token]/reject-document-dialog.tsx:116
 #: apps/web/src/app/(signing)/sign/[token]/reject-document-dialog.tsx:162
+#: packages/email/template-components/template-document-invite.tsx:96
 msgid "Reject Document"
-msgstr "Reject Document"
+msgstr "Rechazar Documento"
 
 #: apps/web/src/app/(dashboard)/documents/[id]/document-page-view-recipients.tsx:141
 #: apps/web/src/components/(dashboard)/avatar/stack-avatars-with-tooltip.tsx:101
 msgid "Rejected"
 msgstr "Rejected"
 
+#: packages/email/template-components/template-document-rejection-confirmed.tsx:22
+msgid "Rejection Confirmed"
+msgstr "Rechazo Confirmado"
+
+#: packages/email/template-components/template-document-rejection-confirmed.tsx:34
+msgid "Rejection reason: {reason}"
+msgstr "Razón del rechazo: {reason}"
+
 #: apps/web/src/app/(unauthenticated)/forgot-password/page.tsx:34
 msgid "Remembered your password? <0>Sign In</0>"
 msgstr "¿Recordaste tu contraseña? <0>Iniciar sesión</0>"
+
+#: packages/lib/server-only/document/resend-document.tsx:192
+msgid "Reminder: {0}"
+msgstr "Recordatorio: {0}"
+
+#: packages/lib/server-only/document/resend-document.tsx:132
+msgid "Reminder: {0} invited you to {recipientActionVerb} a document"
+msgstr "Recordatorio: {0} te invitó a {recipientActionVerb} un documento"
+
+#: packages/lib/server-only/document/resend-document.tsx:121
+msgid "Reminder: Please {recipientActionVerb} this document"
+msgstr "Recordatorio: Por favor {recipientActionVerb} este documento"
+
+#: packages/lib/server-only/document/resend-document.tsx:127
+msgid "Reminder: Please {recipientActionVerb} your document"
+msgstr "Recordatorio: Por favor {recipientActionVerb} tu documento"
 
 #: apps/web/src/app/(dashboard)/settings/public-profile/public-templates-data-table.tsx:193
 #: apps/web/src/app/(dashboard)/templates/template-direct-link-dialog.tsx:431
@@ -2925,6 +4058,7 @@ msgstr "¿Recordaste tu contraseña? <0>Iniciar sesión</0>"
 #: apps/web/src/components/(teams)/tables/team-member-invites-data-table.tsx:164
 #: apps/web/src/components/(teams)/tables/team-members-data-table.tsx:165
 #: apps/web/src/components/forms/avatar-image.tsx:166
+#: packages/ui/primitives/document-flow/add-fields.tsx:1128
 msgid "Remove"
 msgstr "Eliminar"
 
@@ -2945,9 +4079,17 @@ msgstr ""
 msgid "Repeat Password"
 msgstr "Repetir contraseña"
 
-#: apps/web/src/components/(teams)/dialogs/transfer-team-dialog.tsx:282
+#: apps/web/src/components/(teams)/dialogs/transfer-team-dialog.tsx:247
 msgid "Request transfer"
 msgstr "Solicitar transferencia"
+
+#: packages/ui/primitives/document-flow/field-items-advanced-settings/checkbox-field.tsx:176
+#: packages/ui/primitives/document-flow/field-items-advanced-settings/dropdown-field.tsx:137
+#: packages/ui/primitives/document-flow/field-items-advanced-settings/number-field.tsx:146
+#: packages/ui/primitives/document-flow/field-items-advanced-settings/radio-field.tsx:112
+#: packages/ui/primitives/document-flow/field-items-advanced-settings/text-field.tsx:123
+msgid "Required field"
+msgstr "Campo obligatorio"
 
 #: apps/web/src/app/(dashboard)/admin/documents/[id]/admin-actions.tsx:61
 msgid "Reseal document"
@@ -2955,6 +4097,7 @@ msgstr "Re-sellar documento"
 
 #: apps/web/src/app/(dashboard)/documents/_action-items/resend-document.tsx:118
 #: apps/web/src/components/(teams)/tables/team-member-invites-data-table.tsx:152
+#: packages/ui/primitives/document-flow/add-subject.tsx:84
 msgid "Resend"
 msgstr "Reenviar"
 
@@ -2978,6 +4121,7 @@ msgstr "Correo de restablecimiento enviado"
 #: apps/web/src/app/(unauthenticated)/reset-password/[token]/page.tsx:30
 #: apps/web/src/components/forms/forgot-password.tsx:93
 #: apps/web/src/components/forms/reset-password.tsx:143
+#: packages/email/template-components/template-forgot-password.tsx:33
 msgid "Reset Password"
 msgstr "Restablecer contraseña"
 
@@ -2992,6 +4136,10 @@ msgstr "Resolver"
 #: apps/web/src/app/(teams)/t/[teamUrl]/layout-billing-banner.tsx:132
 msgid "Resolve payment"
 msgstr "Resolver pago"
+
+#: packages/ui/components/document/document-share-button.tsx:147
+msgid "Rest assured, your document is strictly confidential and will never be shared. Only your signing experience will be highlighted. Share your personalized signing card to showcase your signature!"
+msgstr "Ten la seguridad de que tu documento es estrictamente confidencial y nunca será compartido. Solo se destacará tu experiencia de firma. ¡Comparte tu tarjeta de firma personalizada para mostrar tu firma!"
 
 #: apps/web/src/app/(unauthenticated)/articles/signature-disclosure/page.tsx:126
 msgid "Retention of Documents"
@@ -3038,18 +4186,27 @@ msgstr "Revocar acceso"
 msgid "Role"
 msgstr "Rol"
 
-#: apps/web/src/app/(dashboard)/admin/users/[id]/page.tsx:131
+#: apps/web/src/app/(dashboard)/admin/users/[id]/page.tsx:133
 #: apps/web/src/app/(dashboard)/admin/users/data-table-users.tsx:76
 msgid "Roles"
 msgstr "Roles"
+
+#: packages/ui/primitives/data-table-pagination.tsx:55
+msgid "Rows per page"
+msgstr "Filas por página"
 
 #: apps/web/src/app/(dashboard)/templates/template-direct-link-dialog.tsx:446
 #: apps/web/src/app/(signing)/sign/[token]/number-field.tsx:337
 #: apps/web/src/app/(signing)/sign/[token]/text-field.tsx:344
 #: apps/web/src/app/(teams)/t/[teamUrl]/settings/preferences/branding-preferences.tsx:312
 #: apps/web/src/app/(teams)/t/[teamUrl]/settings/preferences/document-preferences.tsx:305
+#: packages/ui/primitives/document-flow/field-item-advanced-settings.tsx:356
 msgid "Save"
 msgstr "Guardar"
+
+#: packages/ui/primitives/template-flow/add-template-fields.tsx:896
+msgid "Save Template"
+msgstr "Guardar plantilla"
 
 #: apps/web/src/app/(dashboard)/documents/data-table-sender-filter.tsx:63
 #: apps/web/src/components/(dashboard)/layout/desktop-nav.tsx:81
@@ -3071,6 +4228,10 @@ msgstr "Buscar por nombre o correo electrónico"
 msgid "Search documents..."
 msgstr "Buscar documentos..."
 
+#: packages/ui/components/common/language-switcher-dialog.tsx:34
+msgid "Search languages..."
+msgstr "Buscar idiomas..."
+
 #: apps/web/src/app/(dashboard)/settings/webhooks/[id]/page.tsx:189
 #: apps/web/src/components/(dashboard)/settings/webhooks/create-webhook-dialog.tsx:217
 msgid "Secret"
@@ -3087,6 +4248,8 @@ msgid "Security activity"
 msgstr "Actividad de seguridad"
 
 #: apps/web/src/app/(signing)/sign/[token]/dropdown-field.tsx:194
+#: packages/ui/primitives/document-flow/field-items-advanced-settings/dropdown-field.tsx:115
+#: packages/ui/primitives/document-flow/types.ts:59
 msgid "Select"
 msgstr "Seleccionar"
 
@@ -3111,23 +4274,78 @@ msgstr "Seleccionar una plantilla que te gustaría mostrar en tu perfil público
 msgid "Select a template you'd like to display on your team's public profile"
 msgstr "Seleccionar una plantilla que te gustaría mostrar en el perfil público de tu equipo"
 
+#: packages/ui/primitives/combobox.tsx:38
+msgid "Select an option"
+msgstr "Seleccionar una opción"
+
+#: packages/ui/primitives/document-flow/field-items-advanced-settings/checkbox-field.tsx:139
+msgid "Select at least"
+msgstr "Seleccionar al menos"
+
+#: packages/ui/primitives/document-flow/field-items-advanced-settings/dropdown-field.tsx:105
+msgid "Select default option"
+msgstr "Seleccionar opción predeterminada"
+
 #: apps/web/src/app/(signing)/sign/[token]/document-action-auth-passkey.tsx:222
 msgid "Select passkey"
 msgstr "Seleccionar clave de acceso"
+
+#: packages/ui/primitives/document-flow/add-subject.tsx:82
+#: packages/ui/primitives/document-flow/add-subject.tsx:85
+#: packages/ui/primitives/document-flow/send-document-action-dialog.tsx:34
+#: packages/ui/primitives/document-flow/send-document-action-dialog.tsx:64
+msgid "Send"
+msgstr "Enviar"
 
 #: apps/web/src/components/forms/send-confirmation-email.tsx:94
 msgid "Send confirmation email"
 msgstr "Enviar correo de confirmación"
 
-#: apps/web/src/app/(dashboard)/templates/use-template-dialog.tsx:326
+#: apps/web/src/app/(dashboard)/templates/use-template-dialog.tsx:325
 msgid "Send document"
 msgstr "Enviar documento"
+
+#: packages/ui/primitives/document-flow/send-document-action-dialog.tsx:41
+msgid "Send Document"
+msgstr "Enviar documento"
+
+#: packages/ui/components/document/document-email-checkboxes.tsx:193
+msgid "Send document completed email"
+msgstr "Enviar correo electrónico de documento completado"
+
+#: packages/ui/components/document/document-email-checkboxes.tsx:269
+msgid "Send document completed email to the owner"
+msgstr ""
+
+#: packages/ui/components/document/document-email-checkboxes.tsx:231
+msgid "Send document deleted email"
+msgstr "Enviar correo electrónico de documento eliminado"
+
+#: packages/ui/components/document/document-email-checkboxes.tsx:154
+msgid "Send document pending email"
+msgstr "Enviar correo electrónico de documento pendiente"
+
+#: packages/email/templates/confirm-team-email.tsx:101
+msgid "Send documents on behalf of the team using the email address"
+msgstr "Enviar documentos en nombre del equipo usando la dirección de correo electrónico"
 
 #: apps/web/src/app/(teams)/t/[teamUrl]/settings/preferences/document-preferences.tsx:200
 msgid "Send on Behalf of Team"
 msgstr "Enviar en nombre del equipo"
 
-#: apps/web/src/app/(dashboard)/documents/_action-items/resend-document.tsx:191
+#: packages/ui/components/document/document-email-checkboxes.tsx:116
+msgid "Send recipient removed email"
+msgstr "Enviar correo electrónico de destinatario eliminado"
+
+#: packages/ui/components/document/document-email-checkboxes.tsx:40
+msgid "Send recipient signed email"
+msgstr ""
+
+#: packages/ui/components/document/document-email-checkboxes.tsx:78
+msgid "Send recipient signing request email"
+msgstr "Enviar correo electrónico de solicitud de firma de destinatario"
+
+#: apps/web/src/app/(dashboard)/documents/_action-items/resend-document.tsx:190
 msgid "Send reminder"
 msgstr "Enviar recordatorio"
 
@@ -3168,10 +4386,22 @@ msgstr "Configuración"
 msgid "Share"
 msgstr "Compartir"
 
+#: packages/ui/components/document/document-share-button.tsx:135
+msgid "Share Signature Card"
+msgstr "Compartir tarjeta de firma"
+
 #: apps/web/src/app/(dashboard)/documents/[id]/document-page-view-dropdown.tsx:179
 #: apps/web/src/app/(dashboard)/documents/data-table-action-dropdown.tsx:219
 msgid "Share Signing Card"
 msgstr "Compartir tarjeta de firma"
+
+#: packages/lib/constants/template.ts:16
+msgid "Share the Link"
+msgstr "Compartir el enlace"
+
+#: packages/ui/components/document/document-share-button.tsx:143
+msgid "Share your signing experience!"
+msgstr "¡Comparte tu experiencia de firma!"
 
 #: apps/web/src/app/(dashboard)/settings/public-profile/public-profile-page-view.tsx:163
 msgid "Show"
@@ -3180,6 +4410,11 @@ msgstr "Mostrar"
 #: apps/web/src/components/document/document-history-sheet.tsx:113
 msgid "Show additional information"
 msgstr "Mostrar información adicional"
+
+#: packages/ui/primitives/document-flow/add-signers.tsx:707
+#: packages/ui/primitives/template-flow/add-template-placeholder-recipients.tsx:661
+msgid "Show advanced settings"
+msgstr "Mostrar configuraciones avanzadas"
 
 #: apps/web/src/app/(dashboard)/settings/public-profile/public-profile-page-view.tsx:45
 msgid "Show templates in your public profile for your audience to sign and get started quickly"
@@ -3196,10 +4431,11 @@ msgstr "Mostrar plantillas en el perfil público de tu equipo para que tu audien
 #: apps/web/src/app/(signing)/sign/[token]/auto-sign.tsx:229
 #: apps/web/src/app/(signing)/sign/[token]/document-action-auth-2fa.tsx:182
 #: apps/web/src/app/(signing)/sign/[token]/name-field.tsx:224
-#: apps/web/src/app/(signing)/sign/[token]/sign-dialog.tsx:141
+#: apps/web/src/app/(signing)/sign/[token]/sign-dialog.tsx:142
 #: apps/web/src/app/(signing)/sign/[token]/signature-field.tsx:328
 #: apps/web/src/components/ui/user-profile-skeleton.tsx:75
 #: apps/web/src/components/ui/user-profile-timur.tsx:81
+#: packages/lib/constants/recipient-roles.ts:22
 msgid "Sign"
 msgstr "Firmar"
 
@@ -3216,7 +4452,8 @@ msgstr "Firmar como<0>{0} <1>({1})</1></0>"
 msgid "Sign document"
 msgstr "Firmar documento"
 
-#: apps/web/src/app/(signing)/sign/[token]/form.tsx:135
+#: apps/web/src/app/(signing)/sign/[token]/form.tsx:141
+#: packages/email/template-components/template-document-invite.tsx:104
 msgid "Sign Document"
 msgstr "Firmar Documento"
 
@@ -3225,13 +4462,14 @@ msgid "Sign field"
 msgstr "Campo de firma"
 
 #: apps/web/src/components/forms/signup.tsx:208
-#: apps/web/src/components/forms/v2/signup.tsx:365
+#: apps/web/src/components/forms/v2/signup.tsx:366
 msgid "Sign Here"
 msgstr "Firmar aquí"
 
 #: apps/web/src/app/not-found.tsx:29
 #: apps/web/src/components/forms/signin.tsx:384
 #: apps/web/src/components/forms/signin.tsx:511
+#: packages/email/template-components/template-reset-password.tsx:34
 msgid "Sign In"
 msgstr "Iniciar sesión"
 
@@ -3258,24 +4496,28 @@ msgid "Sign Up"
 msgstr "Regístrate"
 
 #: apps/web/src/components/forms/signup.tsx:253
-#: apps/web/src/components/forms/v2/signup.tsx:404
+#: apps/web/src/components/forms/v2/signup.tsx:405
 msgid "Sign Up with Google"
 msgstr "Regístrate con Google"
 
 #: apps/web/src/components/forms/signup.tsx:277
-#: apps/web/src/components/forms/v2/signup.tsx:420
+#: apps/web/src/components/forms/v2/signup.tsx:421
 msgid "Sign Up with OIDC"
 msgstr "Regístrate con OIDC"
 
 #: apps/web/src/app/(dashboard)/admin/documents/[id]/recipient-item.tsx:88
 #: apps/web/src/app/(internal)/%5F%5Fhtmltopdf/certificate/page.tsx:177
 #: apps/web/src/app/(recipient)/d/[token]/sign-direct-template.tsx:342
-#: apps/web/src/app/(signing)/sign/[token]/form.tsx:199
+#: apps/web/src/app/(signing)/sign/[token]/form.tsx:205
 #: apps/web/src/app/(signing)/sign/[token]/signature-field.tsx:251
 #: apps/web/src/app/(signing)/sign/[token]/signature-field.tsx:286
 #: apps/web/src/app/embed/direct/[[...url]]/client.tsx:422
 #: apps/web/src/app/embed/sign/[[...url]]/client.tsx:301
 #: apps/web/src/components/forms/profile.tsx:132
+#: packages/ui/primitives/document-flow/add-fields.tsx:841
+#: packages/ui/primitives/document-flow/field-icon.tsx:52
+#: packages/ui/primitives/document-flow/types.ts:49
+#: packages/ui/primitives/template-flow/add-template-fields.tsx:628
 msgid "Signature"
 msgstr "Firma"
 
@@ -3283,7 +4525,7 @@ msgstr "Firma"
 msgid "Signature ID"
 msgstr "ID de Firma"
 
-#: apps/web/src/app/(signing)/sign/[token]/form.tsx:223
+#: apps/web/src/app/(signing)/sign/[token]/form.tsx:229
 #: apps/web/src/app/(signing)/sign/[token]/signature-field.tsx:303
 #: apps/web/src/app/embed/direct/[[...url]]/client.tsx:448
 #: apps/web/src/app/embed/sign/[[...url]]/client.tsx:327
@@ -3301,12 +4543,29 @@ msgstr "Las firmas aparecerán una vez que el documento se haya completado"
 #: apps/web/src/app/(dashboard)/documents/[id]/document-page-view-recipients.tsx:114
 #: apps/web/src/app/(internal)/%5F%5Fhtmltopdf/certificate/page.tsx:278
 #: apps/web/src/components/document/document-read-only-fields.tsx:84
+#: packages/lib/constants/recipient-roles.ts:23
 msgid "Signed"
 msgstr "Firmado"
+
+#: packages/lib/constants/recipient-roles.ts:25
+msgid "Signer"
+msgstr "Firmante"
 
 #: apps/web/src/app/(internal)/%5F%5Fhtmltopdf/certificate/page.tsx:176
 msgid "Signer Events"
 msgstr "Eventos del Firmante"
+
+#: packages/lib/constants/recipient-roles.ts:26
+msgid "Signers"
+msgstr "Firmantes"
+
+#: packages/ui/primitives/document-flow/add-signers.types.ts:36
+msgid "Signers must have unique emails"
+msgstr "Los firmantes deben tener correos electrónicos únicos"
+
+#: packages/lib/constants/recipient-roles.ts:24
+msgid "Signing"
+msgstr "Firmando"
 
 #: apps/web/src/app/(internal)/%5F%5Fhtmltopdf/certificate/page.tsx:168
 msgid "Signing Certificate"
@@ -3315,6 +4574,11 @@ msgstr "Certificado de Firma"
 #: apps/web/src/app/(internal)/%5F%5Fhtmltopdf/certificate/page.tsx:311
 msgid "Signing certificate provided by"
 msgstr "Certificado de firma proporcionado por"
+
+#: packages/lib/server-only/document/send-completed-email.ts:119
+#: packages/lib/server-only/document/send-completed-email.ts:199
+msgid "Signing Complete!"
+msgstr "¡Firma completa!"
 
 #: apps/web/src/components/forms/signin.tsx:384
 #: apps/web/src/components/forms/signin.tsx:511
@@ -3339,7 +4603,7 @@ msgstr "Registrándose..."
 msgid "Signing Volume"
 msgstr ""
 
-#: apps/web/src/components/forms/v2/signup.tsx:77
+#: apps/web/src/components/forms/v2/signup.tsx:78
 msgid "Signups are disabled."
 msgstr ""
 
@@ -3355,6 +4619,10 @@ msgstr "Banner del sitio"
 #: apps/web/src/app/(dashboard)/admin/site-settings/page.tsx:26
 msgid "Site Settings"
 msgstr "Configuraciones del sitio"
+
+#: packages/ui/primitives/document-flow/missing-signature-field-dialog.tsx:34
+msgid "Some signers have not been assigned a signature field. Please assign at least 1 signature field to each signer before proceeding."
+msgstr "Algunos firmantes no han sido asignados a un campo de firma. Asigne al menos 1 campo de firma a cada firmante antes de continuar."
 
 #: apps/web/src/app/(dashboard)/documents/_action-items/resend-document.tsx:105
 #: apps/web/src/app/(dashboard)/documents/[id]/document-page-view-button.tsx:63
@@ -3396,6 +4664,7 @@ msgstr "Configuraciones del sitio"
 #: apps/web/src/components/(teams)/tables/team-member-invites-data-table.tsx:66
 #: apps/web/src/components/(teams)/tables/team-member-invites-data-table.tsx:83
 #: apps/web/src/components/(teams)/team-billing-portal-button.tsx:29
+#: packages/ui/components/document/document-share-button.tsx:51
 msgid "Something went wrong"
 msgstr "Algo salió mal"
 
@@ -3406,6 +4675,11 @@ msgstr "Algo salió mal al intentar transferir la propiedad del equipo <0>{0}</0
 #: apps/web/src/app/(unauthenticated)/team/verify/email/[token]/page.tsx:120
 msgid "Something went wrong while attempting to verify your email address for <0>{0}</0>. Please try again later."
 msgstr "Algo salió mal al intentar verificar tu dirección de correo electrónico para <0>{0}</0>. Por favor, intenta de nuevo más tarde."
+
+#: packages/ui/primitives/pdf-viewer.tsx:220
+#: packages/ui/primitives/pdf-viewer.tsx:235
+msgid "Something went wrong while loading the document."
+msgstr "Algo salió mal al cargar el documento."
 
 #: apps/web/src/app/(signing)/sign/[token]/document-action-auth-passkey.tsx:158
 msgid "Something went wrong while loading your passkeys."
@@ -3422,6 +4696,10 @@ msgstr "Algo salió mal al actualizar la suscripción de facturación del equipo
 #: apps/web/src/app/(teams)/t/[teamUrl]/settings/preferences/document-preferences.tsx:108
 msgid "Something went wrong!"
 msgstr "¡Algo salió mal!"
+
+#: packages/ui/primitives/data-table.tsx:136
+msgid "Something went wrong."
+msgstr "Algo salió mal."
 
 #: apps/web/src/app/(dashboard)/settings/security/passkeys/create-passkey-dialog.tsx:240
 #: apps/web/src/components/forms/2fa/view-recovery-codes-dialog.tsx:154
@@ -3452,6 +4730,19 @@ msgstr "Estadísticas"
 #: apps/web/src/components/(teams)/tables/team-billing-invoices-data-table.tsx:73
 msgid "Status"
 msgstr "Estado"
+
+#: packages/ui/primitives/document-flow/document-flow-root.tsx:107
+msgid "Step <0>{step} of {maxStep}</0>"
+msgstr "Paso <0>{step} de {maxStep}</0>"
+
+#: packages/ui/primitives/document-flow/add-subject.tsx:143
+#: packages/ui/primitives/template-flow/add-template-settings.tsx:318
+msgid "Subject <0>(Optional)</0>"
+msgstr "Asunto <0>(Opcional)</0>"
+
+#: packages/ui/primitives/document-password-dialog.tsx:97
+msgid "Submit"
+msgstr "Enviar"
 
 #: apps/web/src/app/(dashboard)/settings/billing/billing-plans.tsx:129
 msgid "Subscribe"
@@ -3514,6 +4805,10 @@ msgstr "Tema del sistema"
 msgid "Team"
 msgstr "Equipo"
 
+#: packages/lib/server-only/team/delete-team.ts:124
+msgid "Team \"{0}\" has been deleted on Documenso"
+msgstr "El equipo \"{0}\" ha sido eliminado en Documenso"
+
 #: apps/web/src/components/(teams)/dialogs/create-team-checkout-dialog.tsx:85
 msgid "Team checkout"
 msgstr "Checkout del equipo"
@@ -3534,6 +4829,18 @@ msgstr "¡Correo electrónico del equipo ya verificado!"
 #: apps/web/src/components/(teams)/dialogs/remove-team-email-dialog.tsx:58
 msgid "Team email has been removed"
 msgstr "El correo del equipo ha sido eliminado"
+
+#: packages/lib/server-only/team/delete-team-email.ts:104
+msgid "Team email has been revoked for {0}"
+msgstr "El correo electrónico del equipo ha sido revocado para {0}"
+
+#: packages/email/templates/team-email-removed.tsx:59
+msgid "Team email removed"
+msgstr "Correo electrónico del equipo eliminado"
+
+#: packages/email/templates/team-email-removed.tsx:29
+msgid "Team email removed for {teamName} on Documenso"
+msgstr "Correo electrónico del equipo eliminado para {teamName} en Documenso"
 
 #: apps/web/src/app/(unauthenticated)/team/verify/email/[token]/page.tsx:116
 msgid "Team email verification"
@@ -3673,6 +4980,10 @@ msgstr ""
 msgid "Template saved"
 msgstr "Plantilla guardada"
 
+#: packages/ui/primitives/template-flow/add-template-settings.tsx:145
+msgid "Template title"
+msgstr "Título de plantilla"
+
 #: apps/web/src/app/(dashboard)/templates/[id]/template-page-view.tsx:86
 #: apps/web/src/app/(dashboard)/templates/templates-page-view.tsx:55
 #: apps/web/src/components/(dashboard)/common/command-menu.tsx:208
@@ -3687,6 +4998,9 @@ msgstr "Las plantillas te permiten generar documentos rápidamente con destinata
 
 #: apps/web/src/app/(signing)/sign/[token]/text-field.tsx:257
 #: apps/web/src/app/(signing)/sign/[token]/text-field.tsx:274
+#: packages/ui/primitives/document-flow/add-fields.tsx:971
+#: packages/ui/primitives/document-flow/types.ts:52
+#: packages/ui/primitives/template-flow/add-template-fields.tsx:758
 msgid "Text"
 msgstr "Texto"
 
@@ -3698,9 +5012,33 @@ msgstr "Color de texto"
 msgid "Thank you for using Documenso to perform your electronic document signing. The purpose of this disclosure is to inform you about the process, legality, and your rights regarding the use of electronic signatures on our platform. By opting to use an electronic signature, you are agreeing to the terms and conditions outlined below."
 msgstr "Gracias por usar Documenso para realizar su firma electrónica de documentos. El propósito de esta divulgación es informarle sobre el proceso, la legalidad y sus derechos con respecto al uso de firmas electrónicas en nuestra plataforma. Al optar por usar una firma electrónica, usted está aceptando los términos y condiciones descritos a continuación."
 
-#: apps/web/src/app/(dashboard)/admin/users/[id]/delete-user-dialog.tsx:52
+#: packages/email/template-components/template-forgot-password.tsx:25
+msgid "That's okay, it happens! Click the button below to reset your password."
+msgstr "Está bien, ¡sucede! Haz clic en el botón de abajo para restablecer tu contraseña."
+
+#: apps/web/src/app/(dashboard)/admin/users/[id]/delete-user-dialog.tsx:51
 msgid "The account has been deleted successfully."
 msgstr "La cuenta ha sido eliminada con éxito."
+
+#: apps/web/src/app/(dashboard)/admin/users/[id]/disable-user-dialog.tsx:48
+msgid "The account has been disabled successfully."
+msgstr ""
+
+#: apps/web/src/app/(dashboard)/admin/users/[id]/enable-user-dialog.tsx:48
+msgid "The account has been enabled successfully."
+msgstr ""
+
+#: packages/ui/components/recipient/recipient-action-auth-select.tsx:44
+msgid "The authentication required for recipients to sign fields"
+msgstr "La autenticación requerida para que los destinatarios firmen campos"
+
+#: packages/ui/components/document/document-global-auth-action-select.tsx:68
+msgid "The authentication required for recipients to sign the signature field."
+msgstr "La autenticación requerida para que los destinatarios firmen el campo de firma."
+
+#: packages/ui/components/document/document-global-auth-access-select.tsx:67
+msgid "The authentication required for recipients to view the document."
+msgstr "La autenticación requerida para que los destinatarios vean el documento."
 
 #: apps/web/src/app/(dashboard)/admin/site-settings/banner-form.tsx:197
 msgid "The content to show in the banner, HTML is allowed"
@@ -3720,6 +5058,10 @@ msgstr "El documento ha sido movido con éxito al equipo seleccionado."
 msgid "The document is now completed, please follow any instructions provided within the parent application."
 msgstr "El documento ahora está completado, por favor sigue cualquier instrucción proporcionada dentro de la aplicación principal."
 
+#: packages/email/template-components/template-document-rejection-confirmed.tsx:39
+msgid "The document owner has been notified of this rejection. No further action is required from you at this time. The document owner may contact you with any questions regarding this rejection."
+msgstr "El propietario del documento ha sido notificado de este rechazo. No se requiere ninguna acción adicional de su parte en este momento. El propietario del documento puede contactarlo con cualquier pregunta relacionada con este rechazo."
+
 #: apps/web/src/app/(signing)/sign/[token]/rejected/page.tsx:92
 msgid "The document owner has been notified of your decision. They may contact you with further instructions if necessary."
 msgstr "The document owner has been notified of your decision. They may contact you with further instructions if necessary."
@@ -3732,15 +5074,27 @@ msgstr "El documento fue creado pero no se pudo enviar a los destinatarios."
 msgid "The document will be hidden from your account"
 msgstr "El documento será ocultado de tu cuenta"
 
-#: apps/web/src/app/(dashboard)/templates/use-template-dialog.tsx:334
+#: apps/web/src/app/(dashboard)/templates/use-template-dialog.tsx:333
 msgid "The document will be immediately sent to recipients if this is checked."
 msgstr "El documento se enviará inmediatamente a los destinatarios si esto está marcado."
+
+#: packages/ui/components/document/document-send-email-message-helper.tsx:31
+msgid "The document's name"
+msgstr "El nombre del documento"
 
 #: apps/web/src/app/(dashboard)/settings/webhooks/[id]/page.tsx:175
 #: apps/web/src/app/(teams)/t/[teamUrl]/settings/webhooks/[id]/page.tsx:179
 #: apps/web/src/components/(dashboard)/settings/webhooks/create-webhook-dialog.tsx:203
 msgid "The events that will trigger a webhook to be sent to your URL."
 msgstr "Los eventos que activarán un webhook para ser enviado a tu URL."
+
+#: packages/email/templates/team-delete.tsx:37
+msgid "The following team has been deleted by its owner. You will no longer be able to access this team and its documents"
+msgstr "El siguiente equipo ha sido eliminado por su propietario. Ya no podrás acceder a este equipo y sus documentos"
+
+#: packages/email/templates/team-delete.tsx:36
+msgid "The following team has been deleted by you"
+msgstr "El siguiente equipo ha sido eliminado por ti"
 
 #: apps/web/src/app/(unauthenticated)/team/verify/transfer/[token]/page.tsx:114
 msgid "The ownership of team <0>{0}</0> has been successfully transferred to you."
@@ -3749,6 +5103,10 @@ msgstr "La propiedad del equipo <0>{0}</0> ha sido transferida con éxito a ti."
 #: apps/web/src/components/partials/not-found.tsx:53
 msgid "The page you are looking for was moved, removed, renamed or might never have existed."
 msgstr "La página que buscas fue movida, eliminada, renombrada o puede que nunca haya existido."
+
+#: packages/ui/primitives/document-password-dialog.tsx:52
+msgid "The password you have entered is incorrect. Please try again."
+msgstr "La contraseña que ha ingresado es incorrecta. Por favor, inténtelo de nuevo."
 
 #: apps/web/src/components/forms/public-profile-form.tsx:118
 msgid "The profile link has been copied to your clipboard"
@@ -3766,23 +5124,64 @@ msgstr "La descripción pública que se mostrará con esta plantilla"
 msgid "The public name for your template"
 msgstr "El nombre público de tu plantilla"
 
+#: packages/email/template-components/template-document-super-delete.tsx:38
+msgid "The reason provided for deletion is the following:"
+msgstr "La razón proporcionada para la eliminación es la siguiente:"
+
 #: apps/web/src/app/(dashboard)/admin/documents/[id]/recipient-item.tsx:119
 msgid "The recipient has been updated successfully"
 msgstr "El destinatario ha sido actualizado con éxito"
 
-#: apps/web/src/components/(teams)/dialogs/transfer-team-dialog.tsx:267
+#: packages/ui/components/recipient/recipient-role-select.tsx:103
+msgid "The recipient is not required to take any action and receives a copy of the document after it is completed."
+msgstr "El destinatario no está obligado a tomar ninguna acción y recibe una copia del documento una vez completado."
+
+#: packages/ui/components/recipient/recipient-role-select.tsx:60
+msgid "The recipient is required to approve the document for it to be completed."
+msgstr "El destinatario debe aprobar el documento para que se complete."
+
+#: packages/ui/components/recipient/recipient-role-select.tsx:39
+msgid "The recipient is required to sign the document for it to be completed."
+msgstr "El destinatario debe firmar el documento para que se complete."
+
+#: packages/ui/components/recipient/recipient-role-select.tsx:81
+msgid "The recipient is required to view the document for it to be completed."
+msgstr "El destinatario debe ver el documento para que se complete."
+
+#: apps/web/src/components/(teams)/dialogs/transfer-team-dialog.tsx:232
 msgid "The selected team member will receive an email which they must accept before the team is transferred"
 msgstr "El miembro del equipo seleccionado recibirá un correo electrónico que debe aceptar antes de que se transfiera el equipo"
+
+#: packages/ui/components/document/document-share-button.tsx:52
+msgid "The sharing link could not be created at this time. Please try again."
+msgstr "El enlace de compartición no se pudo crear en este momento. Por favor, inténtelo de nuevo."
+
+#: packages/ui/components/document/document-share-button.tsx:47
+msgid "The sharing link has been copied to your clipboard."
+msgstr "El enlace de compartición ha sido copiado a su portapapeles."
+
+#: packages/ui/components/document/document-send-email-message-helper.tsx:25
+msgid "The signer's email"
+msgstr "El correo electrónico del firmante"
+
+#: packages/ui/components/document/document-send-email-message-helper.tsx:19
+msgid "The signer's name"
+msgstr "El nombre del firmante"
 
 #: apps/web/src/app/(dashboard)/documents/[id]/document-page-view-recipients.tsx:163
 #: apps/web/src/components/(dashboard)/avatar/avatar-with-recipient.tsx:41
 #: apps/web/src/components/document/document-recipient-link-copy-dialog.tsx:118
+#: packages/ui/primitives/document-flow/add-subject.tsx:243
 msgid "The signing link has been copied to your clipboard."
 msgstr "El enlace de firma ha sido copiado a tu portapapeles."
 
 #: apps/web/src/app/(dashboard)/admin/site-settings/banner-form.tsx:105
 msgid "The site banner is a message that is shown at the top of the site. It can be used to display important information to your users."
 msgstr "El banner del sitio es un mensaje que se muestra en la parte superior del sitio. Se puede usar para mostrar información importante a tus usuarios."
+
+#: packages/email/templates/team-email-removed.tsx:63
+msgid "The team email <0>{teamEmail}</0> has been removed from the following team"
+msgstr "El correo electrónico del equipo <0>{teamEmail}</0> ha sido eliminado del siguiente equipo"
 
 #: apps/web/src/app/(teams)/t/[teamUrl]/settings/team-transfer-status.tsx:45
 msgid "The team transfer invitation has been successfully deleted."
@@ -3852,10 +5251,22 @@ msgid "They have permission on your behalf to:"
 msgstr "Tienen permiso en tu nombre para:"
 
 #: apps/web/src/app/(dashboard)/admin/documents/[id]/super-delete-document-dialog.tsx:110
-#: apps/web/src/app/(dashboard)/admin/users/[id]/delete-user-dialog.tsx:110
+#: apps/web/src/app/(dashboard)/admin/users/[id]/delete-user-dialog.tsx:109
 #: apps/web/src/app/(dashboard)/settings/profile/delete-account-dialog.tsx:98
 msgid "This action is not reversible. Please be certain."
 msgstr "Esta acción no es reversible. Por favor, asegúrate."
+
+#: apps/web/src/app/(dashboard)/admin/users/[id]/disable-user-dialog.tsx:100
+msgid "This action is reversible, but please be careful as the account may be affected permanently (e.g. their settings and contents not being restored properly)."
+msgstr ""
+
+#: packages/ui/components/document/document-global-auth-action-select.tsx:72
+msgid "This can be overriden by setting the authentication requirements directly on each recipient in the next step."
+msgstr "Esto se puede anular configurando los requisitos de autenticación directamente en cada destinatario en el siguiente paso."
+
+#: packages/email/template-components/template-document-super-delete.tsx:31
+msgid "This document can not be recovered, if you would like to dispute the reason for future documents please contact support."
+msgstr "Este documento no se puede recuperar, si deseas impugnar la razón para documentos futuros, por favor contacta con el soporte."
 
 #: apps/web/src/app/(dashboard)/documents/delete-document-dialog.tsx:83
 msgid "This document could not be deleted at this time. Please try again."
@@ -3868,6 +5279,10 @@ msgstr "Este documento no se pudo duplicar en este momento. Por favor, inténtal
 #: apps/web/src/app/(dashboard)/documents/_action-items/resend-document.tsx:106
 msgid "This document could not be re-sent at this time. Please try again."
 msgstr "Este documento no se pudo reenviar en este momento. Por favor, inténtalo de nuevo."
+
+#: packages/ui/primitives/document-flow/add-fields.tsx:776
+msgid "This document has already been sent to this recipient. You can no longer edit this recipient."
+msgstr "Este documento ya ha sido enviado a este destinatario. Ya no puede editar a este destinatario."
 
 #: apps/web/src/app/(signing)/sign/[token]/complete/page.tsx:178
 msgid "This document has been cancelled by the owner and is no longer available for others to sign."
@@ -3885,6 +5300,10 @@ msgstr "Este documento ha sido firmado por todos los destinatarios"
 msgid "This document is currently a draft and has not been sent"
 msgstr "Este documento es actualmente un borrador y no ha sido enviado"
 
+#: packages/ui/primitives/document-password-dialog.tsx:66
+msgid "This document is password protected. Please enter the password to view the document."
+msgstr "Este documento está protegido por contraseña. Por favor ingrese la contraseña para ver el documento."
+
 #: apps/web/src/app/(dashboard)/templates/[id]/template-page-view-documents-table.tsx:148
 msgid "This document was created by you or a team member using the template above."
 msgstr "Este documento fue creado por ti o un miembro del equipo usando la plantilla anterior."
@@ -3893,9 +5312,41 @@ msgstr "Este documento fue creado por ti o un miembro del equipo usando la plant
 msgid "This document was created using a direct link."
 msgstr "Este documento fue creado usando un enlace directo."
 
+#: packages/email/template-components/template-footer.tsx:17
+msgid "This document was sent using <0>Documenso.</0>"
+msgstr "Este documento fue enviado usando <0>Documenso.</0>"
+
+#: packages/email/template-components/template-document-rejection-confirmed.tsx:26
+msgid "This email confirms that you have rejected the document <0>\"{documentName}\"</0> sent by {documentOwnerName}."
+msgstr "Este correo electrónico confirma que ha rechazado el documento <0>\"{documentName}\"</0> enviado por {documentOwnerName}."
+
 #: apps/web/src/components/(teams)/dialogs/add-team-email-dialog.tsx:93
 msgid "This email is already being used by another team."
 msgstr "Este correo electrónico ya está siendo utilizado por otro equipo."
+
+#: packages/ui/components/document/document-email-checkboxes.tsx:55
+msgid "This email is sent to the document owner when a recipient has signed the document."
+msgstr ""
+
+#: packages/ui/components/document/document-email-checkboxes.tsx:131
+msgid "This email is sent to the recipient if they are removed from a pending document."
+msgstr "Este correo electrónico se envía al destinatario si es eliminado de un documento pendiente."
+
+#: packages/ui/components/document/document-email-checkboxes.tsx:93
+msgid "This email is sent to the recipient requesting them to sign the document."
+msgstr "Este correo electrónico se envía al destinatario solicitando que firme el documento."
+
+#: packages/ui/components/document/document-email-checkboxes.tsx:169
+msgid "This email will be sent to the recipient who has just signed the document, if there are still other recipients who have not signed yet."
+msgstr "Este correo electrónico se enviará al destinatario que acaba de firmar el documento, si todavía hay otros destinatarios que no han firmado."
+
+#: packages/ui/primitives/template-flow/add-template-placeholder-recipients.tsx:580
+msgid "This field cannot be modified or deleted. When you share this template's direct link or add it to your public profile, anyone who accesses it can input their name and email, and fill in the fields assigned to them."
+msgstr "Este campo no se puede modificar ni eliminar. Cuando comparta el enlace directo de esta plantilla o lo agregue a su perfil público, cualquiera que acceda podrá ingresar su nombre y correo electrónico, y completar los campos que se le hayan asignado."
+
+#: packages/ui/primitives/template-flow/add-template-settings.tsx:233
+msgid "This is how the document will reach the recipients once the document is ready for signing."
+msgstr "Así es como el documento llegará a los destinatarios una vez que esté listo para firmarse."
 
 #: apps/web/src/app/(unauthenticated)/team/verify/transfer/[token]/page.tsx:40
 msgid "This link is invalid or has expired. Please contact your team to resend a transfer request."
@@ -3917,9 +5368,17 @@ msgstr "Esta clave de acceso no está configurada para esta aplicación. Por fav
 msgid "This price includes minimum 5 seats."
 msgstr "Este precio incluye un mínimo de 5 asientos."
 
+#: packages/ui/primitives/document-flow/add-fields.tsx:1108
+msgid "This recipient can no longer be modified as they have signed a field, or completed the document."
+msgstr "Este destinatario ya no puede ser modificado ya que ha firmado un campo o completado el documento."
+
 #: apps/web/src/components/forms/signin.tsx:203
 msgid "This session has expired. Please try again."
 msgstr "Esta sesión ha expirado. Por favor, inténtalo de nuevo."
+
+#: packages/ui/primitives/document-flow/add-signers.tsx:194
+msgid "This signer has already signed the document."
+msgstr "Este firmante ya ha firmado el documento."
 
 #: apps/web/src/app/(teams)/t/[teamUrl]/settings/page.tsx:195
 msgid "This team, and any associated data excluding billing invoices will be permanently deleted."
@@ -3942,13 +5401,29 @@ msgstr "Este token es inválido o ha expirado. Por favor, contacta a tu equipo p
 msgid "This URL is already in use."
 msgstr "Esta URL ya está en uso."
 
-#: apps/web/src/components/forms/v2/signup.tsx:80
+#: apps/web/src/components/forms/v2/signup.tsx:81
 msgid "This username has already been taken"
 msgstr "Este nombre de usuario ya ha sido tomado"
 
 #: apps/web/src/components/forms/public-profile-claim-dialog.tsx:98
 msgid "This username is already taken"
 msgstr "Este nombre de usuario ya está tomado"
+
+#: packages/ui/components/document/document-email-checkboxes.tsx:246
+msgid "This will be sent to all recipients if a pending document has been deleted."
+msgstr "Esto se enviará a todos los destinatarios si un documento pendiente ha sido eliminado."
+
+#: packages/ui/components/document/document-email-checkboxes.tsx:208
+msgid "This will be sent to all recipients once the document has been fully completed."
+msgstr "Esto se enviará a todos los destinatarios una vez que el documento esté completamente completado."
+
+#: packages/ui/components/document/document-email-checkboxes.tsx:284
+msgid "This will be sent to the document owner once the document has been fully completed."
+msgstr ""
+
+#: packages/ui/components/recipient/recipient-action-auth-select.tsx:48
+msgid "This will override any global settings."
+msgstr "Esto anulará cualquier configuración global."
 
 #: apps/web/src/app/(dashboard)/documents/[id]/logs/document-logs-data-table.tsx:71
 #: apps/web/src/app/(internal)/%5F%5Fhtmltopdf/audit-log/data-table.tsx:44
@@ -3960,13 +5435,16 @@ msgid "Time zone"
 msgstr "Zona horaria"
 
 #: apps/web/src/app/(internal)/%5F%5Fhtmltopdf/audit-log/page.tsx:131
+#: packages/ui/primitives/document-flow/add-settings.tsx:359
+#: packages/ui/primitives/template-flow/add-template-settings.tsx:438
 msgid "Time Zone"
-msgstr "Zona Horaria"
+msgstr "Zona horaria"
 
 #: apps/web/src/app/(dashboard)/admin/documents/document-results.tsx:67
 #: apps/web/src/app/(dashboard)/documents/data-table.tsx:54
 #: apps/web/src/app/(dashboard)/templates/[id]/template-page-view-documents-table.tsx:111
 #: apps/web/src/app/(dashboard)/templates/data-table-templates.tsx:61
+#: packages/ui/primitives/document-flow/add-settings.tsx:166
 msgid "Title"
 msgstr "Título"
 
@@ -3978,7 +5456,9 @@ msgstr "Para aceptar esta invitación debes crear una cuenta."
 msgid "To change the email you must remove and add a new email address."
 msgstr "Para cambiar el correo electrónico debes eliminar y añadir una nueva dirección de correo electrónico."
 
-#: apps/web/src/app/(dashboard)/admin/users/[id]/delete-user-dialog.tsx:117
+#: apps/web/src/app/(dashboard)/admin/users/[id]/delete-user-dialog.tsx:116
+#: apps/web/src/app/(dashboard)/admin/users/[id]/disable-user-dialog.tsx:111
+#: apps/web/src/app/(dashboard)/admin/users/[id]/enable-user-dialog.tsx:101
 msgid "To confirm, please enter the accounts email address <0/>({0})."
 msgstr "Para confirmar, por favor ingresa la dirección de correo electrónico de la cuenta <0/>({0})."
 
@@ -4001,6 +5481,11 @@ msgstr "Para acceder a tu cuenta, por favor confirma tu dirección de correo ele
 #: apps/web/src/app/(signing)/sign/[token]/document-action-auth-account.tsx:54
 msgid "To mark this document as viewed, you need to be logged in as <0>{0}</0>"
 msgstr "Para marcar este documento como visto, debes iniciar sesión como <0>{0}</0>"
+
+#: packages/ui/primitives/document-flow/add-fields.tsx:1091
+#: packages/ui/primitives/template-flow/add-template-fields.tsx:876
+msgid "To proceed further, please set at least one value for the {0} field."
+msgstr "Para continuar, por favor establezca al menos un valor para el campo {0}."
 
 #: apps/web/src/app/(unauthenticated)/articles/signature-disclosure/page.tsx:60
 msgid "To use our electronic signature service, you must have access to:"
@@ -4246,6 +5731,7 @@ msgstr "No pagado"
 #: apps/web/src/components/(teams)/dialogs/update-team-member-dialog.tsx:191
 #: apps/web/src/components/forms/public-profile-form.tsx:279
 #: apps/web/src/components/templates/manage-public-template-dialog.tsx:428
+#: packages/ui/primitives/document-flow/add-subject.tsx:86
 msgid "Update"
 msgstr "Actualizar"
 
@@ -4287,7 +5773,11 @@ msgstr "Actualizar correo electrónico del equipo"
 msgid "Update team member"
 msgstr "Actualizar miembro del equipo"
 
-#: apps/web/src/app/(dashboard)/admin/users/[id]/page.tsx:147
+#: packages/lib/constants/template.ts:13
+msgid "Update the role and add fields as required for the direct recipient. The individual who uses the direct link will sign the document as the direct recipient."
+msgstr "Actualizar el rol y agregar campos según sea necesario para el destinatario directo. La persona que utilice el enlace directo firmará el documento como destinatario directo."
+
+#: apps/web/src/app/(dashboard)/admin/users/[id]/page.tsx:149
 msgid "Update user"
 msgstr "Actualizar usuario"
 
@@ -4308,9 +5798,21 @@ msgstr "Actualizando perfil..."
 msgid "Updating Your Information"
 msgstr "Actualizando Su Información"
 
+#: packages/ui/primitives/document-dropzone.tsx:168
+msgid "Upgrade"
+msgstr "Actualizar"
+
 #: apps/web/src/components/forms/avatar-image.tsx:179
 msgid "Upload Avatar"
 msgstr "Subir avatar"
+
+#: packages/ui/primitives/signature-pad/signature-pad.tsx:529
+msgid "Upload Signature"
+msgstr ""
+
+#: packages/ui/primitives/document-dropzone.tsx:70
+msgid "Upload Template Document"
+msgstr "Cargar Documento Plantilla"
 
 #: apps/web/src/app/(teams)/t/[teamUrl]/settings/preferences/branding-preferences.tsx:256
 msgid "Upload your brand logo (max 5MB, JPG, PNG, or WebP)"
@@ -4364,7 +5866,12 @@ msgstr ""
 msgid "User ID"
 msgstr "ID de Usuario"
 
-#: apps/web/src/components/forms/v2/signup.tsx:237
+#: apps/web/src/app/(dashboard)/admin/users/[id]/disable-user-dialog.tsx:55
+#: apps/web/src/app/(dashboard)/admin/users/[id]/enable-user-dialog.tsx:55
+msgid "User not found."
+msgstr ""
+
+#: apps/web/src/components/forms/v2/signup.tsx:238
 msgid "User profiles are here!"
 msgstr "¡Los perfiles de usuario están aquí!"
 
@@ -4372,7 +5879,7 @@ msgstr "¡Los perfiles de usuario están aquí!"
 msgid "User settings"
 msgstr "Configuraciones del usuario"
 
-#: apps/web/src/components/forms/v2/signup.tsx:78
+#: apps/web/src/components/forms/v2/signup.tsx:79
 msgid "User with this email already exists. Please use a different email address."
 msgstr ""
 
@@ -4384,7 +5891,14 @@ msgstr ""
 msgid "Users"
 msgstr "Usuarios"
 
+#: packages/ui/primitives/document-flow/field-items-advanced-settings/checkbox-field.tsx:132
+#: packages/ui/primitives/document-flow/field-items-advanced-settings/number-field.tsx:167
+msgid "Validation"
+msgstr "Validación"
+
 #: apps/web/src/app/(dashboard)/admin/documents/[id]/recipient-item.tsx:83
+#: packages/ui/primitives/document-flow/field-items-advanced-settings/number-field.tsx:91
+#: packages/ui/primitives/document-flow/field-items-advanced-settings/number-field.tsx:96
 msgid "Value"
 msgstr "Valor"
 
@@ -4408,9 +5922,13 @@ msgstr "Verifica tu dirección de correo electrónico"
 msgid "Verify your email address to unlock all features."
 msgstr "Verifica tu dirección de correo electrónico para desbloquear todas las funciones."
 
-#: apps/web/src/app/(dashboard)/documents/upload-document.tsx:56
+#: apps/web/src/app/(dashboard)/documents/upload-document.tsx:60
 msgid "Verify your email to upload documents."
 msgstr "Verifica tu correo electrónico para subir documentos."
+
+#: packages/email/templates/confirm-team-email.tsx:71
+msgid "Verify your team email address"
+msgstr "Verifica tu dirección de correo electrónico del equipo"
 
 #: apps/web/src/app/(internal)/%5F%5Fhtmltopdf/audit-log/page.tsx:75
 msgid "Version History"
@@ -4422,12 +5940,17 @@ msgstr "Historial de Versiones"
 #: apps/web/src/app/(dashboard)/documents/data-table-action-dropdown.tsx:132
 #: apps/web/src/components/(teams)/tables/team-billing-invoices-data-table.tsx:100
 #: apps/web/src/components/forms/2fa/view-recovery-codes-dialog.tsx:168
+#: packages/lib/constants/recipient-roles.ts:29
 msgid "View"
 msgstr "Ver"
 
 #: apps/web/src/app/(dashboard)/settings/security/page.tsx:140
 msgid "View activity"
 msgstr "Ver actividad"
+
+#: packages/email/templates/confirm-team-email.tsx:95
+msgid "View all documents sent to and from this email address"
+msgstr "Ver todos los documentos enviados hacia y desde esta dirección de correo electrónico"
 
 #: apps/web/src/app/(dashboard)/settings/teams/team-email-usage.tsx:78
 msgid "View all documents sent to your account"
@@ -4449,7 +5972,15 @@ msgstr "Ver toda la actividad de seguridad relacionada con tu cuenta."
 msgid "View Codes"
 msgstr "Ver Códigos"
 
-#: apps/web/src/app/(signing)/sign/[token]/form.tsx:134
+#: packages/email/templates/document-created-from-direct-template.tsx:75
+msgid "View document"
+msgstr "Ver documento"
+
+#: apps/web/src/app/(signing)/sign/[token]/form.tsx:140
+#: packages/email/template-components/template-document-invite.tsx:105
+#: packages/email/template-components/template-document-rejected.tsx:44
+#: packages/ui/primitives/document-flow/add-subject.tsx:90
+#: packages/ui/primitives/document-flow/add-subject.tsx:91
 msgid "View Document"
 msgstr "Ver Documento"
 
@@ -4469,6 +6000,10 @@ msgstr "Ver más"
 msgid "View Original Document"
 msgstr "Ver Documento Original"
 
+#: packages/email/template-components/template-document-self-signed.tsx:79
+msgid "View plans"
+msgstr "Ver planes"
+
 #: apps/web/src/components/forms/2fa/view-recovery-codes-dialog.tsx:87
 #: apps/web/src/components/forms/2fa/view-recovery-codes-dialog.tsx:116
 msgid "View Recovery Codes"
@@ -4480,12 +6015,33 @@ msgstr "Ver equipos"
 
 #: apps/web/src/app/(dashboard)/documents/[id]/document-page-view-recipients.tsx:120
 #: apps/web/src/app/(internal)/%5F%5Fhtmltopdf/certificate/page.tsx:267
+#: packages/lib/constants/recipient-roles.ts:30
 msgid "Viewed"
 msgstr "Visto"
+
+#: packages/lib/constants/recipient-roles.ts:32
+msgid "Viewer"
+msgstr "Visor"
+
+#: packages/lib/constants/recipient-roles.ts:33
+msgid "Viewers"
+msgstr "Espectadores"
+
+#: packages/lib/constants/recipient-roles.ts:31
+msgid "Viewing"
+msgstr "Viendo"
 
 #: apps/web/src/components/(dashboard)/avatar/stack-avatars-with-tooltip.tsx:125
 msgid "Waiting"
 msgstr "Esperando"
+
+#: packages/email/template-components/template-document-pending.tsx:31
+msgid "Waiting for others"
+msgstr "Esperando a otros"
+
+#: packages/lib/server-only/document/send-pending-email.ts:96
+msgid "Waiting for others to complete signing."
+msgstr "Esperando a que otros completen la firma."
 
 #: apps/web/src/app/(signing)/sign/[token]/complete/page.tsx:148
 msgid "Waiting for others to sign"
@@ -4554,7 +6110,7 @@ msgstr "Encontramos un error desconocido al intentar eliminar este equipo. Por f
 msgid "We encountered an unknown error while attempting to delete this token. Please try again later."
 msgstr "Encontramos un error desconocido al intentar eliminar este token. Por favor, inténtalo de nuevo más tarde."
 
-#: apps/web/src/app/(dashboard)/admin/users/[id]/delete-user-dialog.tsx:71
+#: apps/web/src/app/(dashboard)/admin/users/[id]/delete-user-dialog.tsx:70
 #: apps/web/src/app/(dashboard)/settings/profile/delete-account-dialog.tsx:58
 msgid "We encountered an unknown error while attempting to delete your account. Please try again later."
 msgstr "Encontramos un error desconocido al intentar eliminar tu cuenta. Por favor, inténtalo de nuevo más tarde."
@@ -4604,8 +6160,8 @@ msgstr "Encontramos un error desconocido al intentar iniciar sesión. Por favor,
 
 #: apps/web/src/components/forms/signup.tsx:126
 #: apps/web/src/components/forms/signup.tsx:140
-#: apps/web/src/components/forms/v2/signup.tsx:188
-#: apps/web/src/components/forms/v2/signup.tsx:202
+#: apps/web/src/components/forms/v2/signup.tsx:189
+#: apps/web/src/components/forms/v2/signup.tsx:203
 msgid "We encountered an unknown error while attempting to sign you Up. Please try again later."
 msgstr "Encontramos un error desconocido al intentar registrarte. Por favor, inténtalo de nuevo más tarde."
 
@@ -4662,7 +6218,7 @@ msgstr "No pudimos copiar tu código de recuperación en tu portapapeles. Por fa
 msgid "We were unable to create a checkout session. Please try again, or contact support"
 msgstr "No pudimos crear una sesión de pago. Por favor, inténtalo de nuevo o contacta con soporte"
 
-#: apps/web/src/components/forms/v2/signup.tsx:79
+#: apps/web/src/components/forms/v2/signup.tsx:80
 msgid "We were unable to create your account. Please review the information you provided and try again."
 msgstr ""
 
@@ -4706,11 +6262,16 @@ msgstr "No pudimos verificar tus datos. Por favor, inténtalo de nuevo o contact
 msgid "We were unable to verify your email. If your email is not verified already, please try again."
 msgstr "No pudimos verificar tu correo electrónico. Si tu correo electrónico no está verificado ya, por favor inténtalo de nuevo."
 
-#: apps/web/src/app/(dashboard)/templates/use-template-dialog.tsx:370
+#: packages/ui/primitives/document-flow/add-subject.tsx:205
+msgid "We will generate signing links for with you, which you can send to the recipients through your method of choice."
+msgstr "Generaremos enlaces de firma para ti, que podrás enviar a los destinatarios a través de tu método preferido."
+
+#: apps/web/src/app/(dashboard)/templates/use-template-dialog.tsx:369
 msgid "We will generate signing links for you, which you can send to the recipients through your method of choice."
 msgstr "Generaremos enlaces de firma para ti, que podrás enviar a los destinatarios a través de tu método preferido."
 
-#: apps/web/src/app/(dashboard)/templates/use-template-dialog.tsx:366
+#: apps/web/src/app/(dashboard)/templates/use-template-dialog.tsx:365
+#: packages/ui/primitives/document-flow/add-subject.tsx:201
 msgid "We won't send anything to notify recipients."
 msgstr "No enviaremos nada para notificar a los destinatarios."
 
@@ -4718,6 +6279,14 @@ msgstr "No enviaremos nada para notificar a los destinatarios."
 #: apps/web/src/app/(dashboard)/templates/empty-state.tsx:11
 msgid "We're all empty"
 msgstr "No hay nada aquí"
+
+#: packages/email/template-components/template-document-pending.tsx:41
+msgid "We're still waiting for other signers to sign this document.<0/>We'll notify you as soon as it's ready."
+msgstr "Aún estamos esperando a que otros firmantes firmen este documento.<0/>Te notificaremos tan pronto como esté listo."
+
+#: packages/email/templates/reset-password.tsx:65
+msgid "We've changed your password as you asked. You can now sign in with your new password."
+msgstr "Hemos cambiado tu contraseña como solicitaste. Ahora puedes iniciar sesión con tu nueva contraseña."
 
 #: apps/web/src/components/(dashboard)/layout/verify-email-banner.tsx:116
 msgid "We've sent a confirmation email to <0>{email}</0>. Please check your inbox and click the link in the email to verify your account."
@@ -4762,6 +6331,10 @@ msgstr "Bienvenido"
 msgid "Welcome back, we are lucky to have you."
 msgstr "Bienvenido de nuevo, somos afortunados de tenerte."
 
+#: packages/email/template-components/template-confirmation-email.tsx:21
+msgid "Welcome to Documenso!"
+msgstr "¡Bienvenido a Documenso!"
+
 #: apps/web/src/app/(signing)/sign/[token]/waiting/page.tsx:88
 msgid "Were you trying to edit this document instead?"
 msgstr "¿Estabas intentando editar este documento en su lugar?"
@@ -4805,6 +6378,7 @@ msgstr "Anual"
 
 #: apps/web/src/app/(dashboard)/documents/[id]/document-page-view-information.tsx:32
 #: apps/web/src/app/(dashboard)/templates/[id]/template-page-view-information.tsx:31
+#: packages/lib/utils/document-audit-logs.ts:258
 msgid "You"
 msgstr "Tú"
 
@@ -4832,6 +6406,10 @@ msgstr "Estás a punto de eliminar al siguiente usuario de <0>{teamName}</0>."
 msgid "You are about to revoke access for team <0>{0}</0> ({1}) to use your email."
 msgstr "Estás a punto de revocar el acceso para el equipo <0>{0}</0> ({1}) para usar tu correo electrónico."
 
+#: packages/ui/primitives/document-flow/send-document-action-dialog.tsx:44
+msgid "You are about to send this document to the recipients. Are you sure you want to continue?"
+msgstr "Está a punto de enviar este documento a los destinatarios. ¿Está seguro de que desea continuar?"
+
 #: apps/web/src/app/(dashboard)/settings/billing/page.tsx:80
 msgid "You are currently on the <0>Free Plan</0>."
 msgstr "Actualmente estás en el <0>Plan Gratuito</0>."
@@ -4848,9 +6426,21 @@ msgstr "Actualmente estás actualizando la clave <0>{passkeyName}</0>."
 msgid "You are not a member of this team."
 msgstr ""
 
+#: apps/web/src/app/(dashboard)/admin/users/[id]/disable-user-dialog.tsx:56
+msgid "You are not authorized to disable this user."
+msgstr ""
+
+#: apps/web/src/app/(dashboard)/admin/users/[id]/enable-user-dialog.tsx:56
+msgid "You are not authorized to enable this user."
+msgstr ""
+
 #: apps/web/src/app/(teams)/t/[teamUrl]/error.tsx:28
 msgid "You are not authorized to view this page."
 msgstr "No estás autorizado para ver esta página."
+
+#: packages/email/template-components/template-confirmation-email.tsx:38
+msgid "You can also copy and paste this link into your browser: {confirmationLink} (link expires in 1 hour)"
+msgstr "También puedes copiar y pegar este enlace en tu navegador: {confirmationLink} (el enlace expira en 1 hora)"
 
 #: apps/web/src/app/(dashboard)/settings/public-profile/public-profile-page-view.tsx:43
 msgid "You can choose to enable or disable your profile for public view."
@@ -4868,13 +6458,25 @@ msgstr "¡Puedes reclamar tu perfil más tarde yendo a la configuración de tu p
 msgid "You can copy and share these links to recipients so they can action the document."
 msgstr "Puede copiar y compartir estos enlaces con los destinatarios para que puedan gestionar el documento."
 
+#: packages/email/templates/confirm-team-email.tsx:106
+msgid "You can revoke access at any time in your team settings on Documenso <0>here.</0>"
+msgstr "Puedes revocar el acceso en cualquier momento en la configuración de tu equipo en Documenso <0>aquí.</0>"
+
 #: apps/web/src/components/forms/public-profile-form.tsx:154
 msgid "You can update the profile URL by updating the team URL in the general settings page."
 msgstr "Puedes actualizar la URL del perfil actualizando la URL del equipo en la página de configuración general."
 
+#: packages/ui/components/document/document-send-email-message-helper.tsx:11
+msgid "You can use the following variables in your message:"
+msgstr "Puede usar las siguientes variables en su mensaje:"
+
 #: apps/web/src/app/(teams)/t/[teamUrl]/settings/page.tsx:65
 msgid "You can view documents associated with this email and use this identity when sending documents."
 msgstr "Puedes ver documentos asociados a este correo electrónico y usar esta identidad al enviar documentos."
+
+#: packages/email/template-components/template-document-rejected.tsx:37
+msgid "You can view the document and its status by clicking the button below."
+msgstr "Puede ver el documento y su estado haciendo clic en el botón de abajo."
 
 #: apps/web/src/app/(dashboard)/settings/security/passkeys/create-passkey-dialog.tsx:213
 msgid "You cannot have more than {MAXIMUM_PASSKEYS} passkeys."
@@ -4884,13 +6486,21 @@ msgstr "No puedes tener más de {MAXIMUM_PASSKEYS} claves de acceso."
 msgid "You cannot modify a team member who has a higher role than you."
 msgstr "No puedes modificar a un miembro del equipo que tenga un rol más alto que tú."
 
-#: apps/web/src/app/(dashboard)/documents/upload-document.tsx:101
+#: packages/ui/primitives/document-dropzone.tsx:43
+msgid "You cannot upload documents at this time."
+msgstr "No puede cargar documentos en este momento."
+
+#: apps/web/src/app/(dashboard)/documents/upload-document.tsx:106
 msgid "You cannot upload encrypted PDFs"
 msgstr "No puedes subir PDFs encriptados"
 
 #: apps/web/src/app/(dashboard)/settings/billing/billing-portal-button.tsx:46
 msgid "You do not currently have a customer record, this should not happen. Please contact support for assistance."
 msgstr "Actualmente no tienes un registro de cliente, esto no debería suceder. Por favor contacta a soporte para obtener asistencia."
+
+#: packages/email/template-components/template-document-cancel.tsx:35
+msgid "You don't need to sign it anymore."
+msgstr "Ya no necesitas firmarlo."
 
 #: apps/web/src/app/(unauthenticated)/team/invite/[token]/page.tsx:127
 msgid "You have accepted an invitation from <0>{0}</0> to join their team."
@@ -4909,9 +6519,30 @@ msgstr "Ya has verificado tu dirección de correo electrónico para <0>{0}</0>."
 msgid "You have been invited by <0>{0}</0> to join their team."
 msgstr "Has sido invitado por <0>{0}</0> para unirte a su equipo."
 
+#: packages/lib/server-only/team/create-team-member-invites.ts:186
+msgid "You have been invited to join {0} on Documenso"
+msgstr "Te han invitado a unirte a {0} en Documenso"
+
+#: packages/email/templates/team-invite.tsx:76
+msgid "You have been invited to join the following team"
+msgstr "Te han invitado a unirte al siguiente equipo"
+
+#: packages/lib/server-only/recipient/set-recipients-for-document.ts:337
+msgid "You have been removed from a document"
+msgstr "Te han eliminado de un documento"
+
+#: packages/lib/server-only/team/request-team-ownership-transfer.ts:114
+msgid "You have been requested to take ownership of team {0} on Documenso"
+msgstr "Se te ha solicitado asumir la propiedad del equipo {0} en Documenso"
+
 #: apps/web/src/app/(unauthenticated)/team/decline/[token]/page.tsx:122
 msgid "You have declined the invitation from <0>{0}</0> to join their team."
 msgstr "Has rechazado la invitación de <0>{0}</0> para unirte a su equipo."
+
+#: packages/lib/jobs/definitions/emails/send-signing-email.handler.ts:103
+#: packages/lib/server-only/document/resend-document.tsx:125
+msgid "You have initiated the document {0} that requires you to {recipientActionVerb} it."
+msgstr "Has iniciado el documento {0} que requiere que {recipientActionVerb}."
 
 #: apps/web/src/app/(dashboard)/settings/webhooks/page.tsx:44
 #: apps/web/src/app/(teams)/t/[teamUrl]/settings/webhooks/page.tsx:49
@@ -4930,17 +6561,26 @@ msgstr "Aún no has creado ni recibido documentos. Para crear un documento, por 
 msgid "You have reached the maximum limit of {0} direct templates. <0>Upgrade your account to continue!</0>"
 msgstr "Has alcanzado el límite máximo de {0} plantillas directas. <0>¡Actualiza tu cuenta para continuar!</0>"
 
-#: apps/web/src/app/(dashboard)/documents/upload-document.tsx:52
+#: apps/web/src/app/(dashboard)/documents/upload-document.tsx:56
+#: packages/ui/primitives/document-dropzone.tsx:69
 msgid "You have reached your document limit."
-msgstr "Has alcanzado tu límite de documentos."
+msgstr "Ha alcanzado su límite de documentos."
 
 #: apps/web/src/app/(dashboard)/templates/data-table-templates.tsx:183
 msgid "You have reached your document limit. <0>Upgrade your account to continue!</0>"
 msgstr "Has alcanzado tu límite de documentos. <0>¡Actualiza tu cuenta para continuar!</0>"
 
+#: packages/email/templates/document-rejection-confirmed.tsx:27
+msgid "You have rejected the document '{documentName}'"
+msgstr "Ha rechazado el documento '{documentName}'"
+
 #: apps/web/src/app/(signing)/sign/[token]/rejected/page.tsx:88
 msgid "You have rejected this document"
 msgstr "You have rejected this document"
+
+#: packages/email/template-components/template-document-self-signed.tsx:42
+msgid "You have signed “{documentName}”"
+msgstr "Has firmado “{documentName}”"
 
 #: apps/web/src/components/(teams)/dialogs/leave-team-dialog.tsx:50
 msgid "You have successfully left this team."
@@ -4948,7 +6588,7 @@ msgstr "Has salido de este equipo con éxito."
 
 #: apps/web/src/app/(signing)/sign/[token]/complete/claim-account.tsx:85
 #: apps/web/src/components/forms/signup.tsx:97
-#: apps/web/src/components/forms/v2/signup.tsx:140
+#: apps/web/src/components/forms/v2/signup.tsx:141
 msgid "You have successfully registered. Please verify your account by clicking on the link you received in the email."
 msgstr "Te has registrado con éxito. Por favor verifica tu cuenta haciendo clic en el enlace que recibiste en el correo electrónico."
 
@@ -4982,7 +6622,7 @@ msgstr "Debes ser un administrador de este equipo para gestionar la facturación
 msgid "You must enter '{deleteMessage}' to proceed"
 msgstr "Debes ingresar '{deleteMessage}' para continuar"
 
-#: apps/web/src/components/(teams)/dialogs/transfer-team-dialog.tsx:301
+#: apps/web/src/components/(teams)/dialogs/transfer-team-dialog.tsx:266
 msgid "You must have at least one other team member to transfer ownership."
 msgstr "Debes tener al menos otro miembro del equipo para transferir la propiedad."
 
@@ -5002,7 +6642,7 @@ msgstr "Debes iniciar sesión para ver esta página."
 msgid "You need to setup 2FA to mark this document as viewed."
 msgstr "Debes configurar 2FA para marcar este documento como visto."
 
-#: apps/web/src/components/forms/v2/signup.tsx:286
+#: apps/web/src/components/forms/v2/signup.tsx:287
 msgid "You will get notified & be able to set up your documenso public profile when we launch the feature."
 msgstr "Recibirás una notificación y podrás configurar tu perfil público de Documenso cuando lanzemos la función."
 
@@ -5042,13 +6682,17 @@ msgstr "Tu plan actual está vencido. Por favor actualiza tu información de pag
 msgid "Your direct signing templates"
 msgstr "Tus {0} plantillas de firma directa"
 
-#: apps/web/src/app/(dashboard)/documents/upload-document.tsx:124
+#: apps/web/src/app/(dashboard)/documents/upload-document.tsx:129
 msgid "Your document failed to upload."
 msgstr "Tu documento no se pudo cargar."
 
 #: apps/web/src/app/(dashboard)/templates/use-template-dialog.tsx:157
 msgid "Your document has been created from the template successfully."
 msgstr "Tu documento se ha creado exitosamente a partir de la plantilla."
+
+#: packages/email/template-components/template-document-super-delete.tsx:23
+msgid "Your document has been deleted by an admin!"
+msgstr "¡Tu documento ha sido eliminado por un administrador!"
 
 #: apps/web/src/app/(dashboard)/documents/_action-items/resend-document.tsx:98
 msgid "Your document has been re-sent successfully."
@@ -5062,7 +6706,7 @@ msgstr "Tu documento ha sido enviado con éxito."
 msgid "Your document has been successfully duplicated."
 msgstr "Tu documento ha sido duplicado con éxito."
 
-#: apps/web/src/app/(dashboard)/documents/upload-document.tsx:82
+#: apps/web/src/app/(dashboard)/documents/upload-document.tsx:87
 msgid "Your document has been uploaded successfully."
 msgstr "Tu documento ha sido subido con éxito."
 
@@ -5101,6 +6745,10 @@ msgstr ""
 msgid "Your password has been updated successfully."
 msgstr "Tu contraseña ha sido actualizada con éxito."
 
+#: packages/email/template-components/template-reset-password.tsx:26
+msgid "Your password has been updated."
+msgstr "Tu contraseña ha sido actualizada."
+
 #: apps/web/src/app/(teams)/t/[teamUrl]/layout-billing-banner.tsx:113
 msgid "Your payment for teams is overdue. Please settle the payment to avoid any service disruptions."
 msgstr "Tu pago por equipos está vencido. Por favor, salda el pago para evitar interrupciones en el servicio."
@@ -5109,7 +6757,7 @@ msgstr "Tu pago por equipos está vencido. Por favor, salda el pago para evitar 
 msgid "Your profile has been updated successfully."
 msgstr "Tu perfil ha sido actualizado con éxito."
 
-#: apps/web/src/app/(dashboard)/admin/users/[id]/page.tsx:73
+#: apps/web/src/app/(dashboard)/admin/users/[id]/page.tsx:75
 msgid "Your profile has been updated."
 msgstr "Tu perfil ha sido actualizado."
 
@@ -5133,6 +6781,11 @@ msgstr "Tu suscripción está actualmente activa."
 #: apps/web/src/components/(teams)/dialogs/create-team-dialog.tsx:89
 msgid "Your team has been created."
 msgstr "Tu equipo ha sido creado."
+
+#: packages/email/templates/team-delete.tsx:28
+#: packages/email/templates/team-delete.tsx:32
+msgid "Your team has been deleted"
+msgstr "Tu equipo ha sido eliminado"
 
 #: apps/web/src/components/(teams)/dialogs/delete-team-dialog.tsx:73
 msgid "Your team has been successfully deleted."
