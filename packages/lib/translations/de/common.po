@@ -8,7 +8,7 @@ msgstr ""
 "Language: de\n"
 "Project-Id-Version: documenso-app\n"
 "Report-Msgid-Bugs-To: \n"
-"PO-Revision-Date: 2024-11-20 11:56\n"
+"PO-Revision-Date: 2024-12-26 12:04\n"
 "Last-Translator: \n"
 "Language-Team: German\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
@@ -53,7 +53,7 @@ msgstr "{0} von {1} Zeile(n) ausgewählt."
 #: packages/lib/jobs/definitions/emails/send-signing-email.handler.ts:124
 #: packages/lib/server-only/document/resend-document.tsx:137
 msgid "{0} on behalf of \"{1}\" has invited you to {recipientActionVerb} the document \"{2}\"."
-msgstr ""
+msgstr "{0} im Namen von \"{1}\" hat Sie eingeladen, das Dokument \"{2}\" {recipientActionVerb}."
 
 #: packages/email/templates/document-invite.tsx:95
 msgid "{inviterName} <0>({inviterEmail})</0>"
@@ -77,7 +77,7 @@ msgstr "{inviterName} hat dich eingeladen, {action} {documentName}"
 
 #: packages/email/templates/document-invite.tsx:108
 msgid "{inviterName} has invited you to {action} the document \"{documentName}\"."
-msgstr "{inviterName} hat Sie eingeladen, das Dokument \"{documentName}\" {action}."
+msgstr "{inviterName} Hat sie eingeladen, das Dokument\"{documentName}\" {action}."
 
 #: packages/email/templates/recipient-removed-from-document.tsx:20
 msgid "{inviterName} has removed you from the document {documentName}."
@@ -89,11 +89,11 @@ msgstr "{inviterName} hat dich aus dem Dokument<0/>\"{documentName}\" entfernt"
 
 #: packages/email/template-components/template-document-invite.tsx:63
 msgid "{inviterName} on behalf of \"{teamName}\" has invited you to {0}"
-msgstr ""
+msgstr "{inviterName} im Namen von \"{teamName}\" hat Sie eingeladen, {0}"
 
 #: packages/email/templates/document-invite.tsx:45
 msgid "{inviterName} on behalf of \"{teamName}\" has invited you to {action} {documentName}"
-msgstr ""
+msgstr "{inviterName} im Namen von \"{teamName}\" hat Sie eingeladen, {action} {documentName}"
 
 #: packages/email/templates/team-join.tsx:67
 msgid "{memberEmail} joined the following team"
@@ -197,19 +197,19 @@ msgstr "{recipientName} hat das Dokument '{documentName}' abgelehnt"
 
 #: packages/email/template-components/template-document-recipient-signed.tsx:49
 msgid "{recipientReference} has completed signing the document."
-msgstr ""
+msgstr "{recipientReference} hat das Dokument unterschrieben."
 
 #: packages/lib/jobs/definitions/emails/send-recipient-signed-email.ts:121
 msgid "{recipientReference} has signed \"{0}\""
-msgstr ""
+msgstr "{recipientReference} hat „{0}“ unterschrieben"
 
 #: packages/email/template-components/template-document-recipient-signed.tsx:43
 msgid "{recipientReference} has signed \"{documentName}\""
-msgstr ""
+msgstr "{recipientReference} hat „{documentName}“ unterschrieben"
 
 #: packages/email/templates/document-recipient-signed.tsx:27
 msgid "{recipientReference} has signed {documentName}"
-msgstr ""
+msgstr "{recipientReference} hat {documentName} unterschrieben"
 
 #: packages/email/template-components/template-document-rejected.tsx:25
 msgid "{signerName} has rejected the document \"{documentName}\"."
@@ -1196,7 +1196,7 @@ msgstr "E-Mail des entfernten Empfängers"
 
 #: packages/ui/components/document/document-email-checkboxes.tsx:51
 msgid "Recipient signed email"
-msgstr ""
+msgstr "Empfänger hat E-Mail unterschrieben"
 
 #: packages/ui/components/document/document-email-checkboxes.tsx:90
 msgid "Recipient signing request email"
@@ -1313,7 +1313,7 @@ msgstr "E-Mail über den Abschluss des Dokuments senden"
 
 #: packages/ui/components/document/document-email-checkboxes.tsx:276
 msgid "Send document completed email to the owner"
-msgstr ""
+msgstr "E-Mail über abgeschlossenes Dokument an den Eigentümer senden"
 
 #: packages/ui/components/document/document-email-checkboxes.tsx:237
 msgid "Send document deleted email"
@@ -1333,7 +1333,7 @@ msgstr "E-Mail über entfernten Empfänger senden"
 
 #: packages/ui/components/document/document-email-checkboxes.tsx:41
 msgid "Send recipient signed email"
-msgstr ""
+msgstr "Empfänger unterschriebene E-Mail senden"
 
 #: packages/ui/components/document/document-email-checkboxes.tsx:80
 msgid "Send recipient signing request email"
@@ -1563,7 +1563,7 @@ msgstr "Diese E-Mail bestätigt, dass Sie das Dokument <0>\"{documentName}\"</0>
 
 #: packages/ui/components/document/document-email-checkboxes.tsx:56
 msgid "This email is sent to the document owner when a recipient has signed the document."
-msgstr ""
+msgstr "Diese E-Mail wird an den Dokumenteneigentümer gesendet, wenn ein Empfänger das Dokument unterschrieben hat."
 
 #: packages/ui/components/document/document-email-checkboxes.tsx:134
 msgid "This email is sent to the recipient if they are removed from a pending document."
@@ -1603,7 +1603,7 @@ msgstr "Dies wird an alle Empfänger gesendet, sobald das Dokument vollständig 
 
 #: packages/ui/components/document/document-email-checkboxes.tsx:291
 msgid "This will be sent to the document owner once the document has been fully completed."
-msgstr ""
+msgstr "Dies wird an den Dokumenteneigentümer gesendet, sobald das Dokument vollständig abgeschlossen ist."
 
 #: packages/ui/components/recipient/recipient-action-auth-select.tsx:48
 msgid "This will override any global settings."
@@ -1637,7 +1637,7 @@ msgstr "Upgrade"
 
 #: packages/ui/primitives/signature-pad/signature-pad.tsx:516
 msgid "Upload Signature"
-msgstr ""
+msgstr "Signatur hochladen"
 
 #: packages/ui/primitives/document-dropzone.tsx:70
 msgid "Upload Template Document"
@@ -1801,3 +1801,4 @@ msgstr "Dein Passwort wurde aktualisiert."
 #: packages/email/templates/team-delete.tsx:32
 msgid "Your team has been deleted"
 msgstr "Dein Team wurde gelöscht"
+

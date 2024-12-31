@@ -8,7 +8,7 @@ msgstr ""
 "Language: es\n"
 "Project-Id-Version: documenso-app\n"
 "Report-Msgid-Bugs-To: \n"
-"PO-Revision-Date: 2024-11-20 11:56\n"
+"PO-Revision-Date: 2024-12-26 12:04\n"
 "Last-Translator: \n"
 "Language-Team: Spanish\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
@@ -53,7 +53,7 @@ msgstr "{0} de {1} fila(s) seleccionada."
 #: packages/lib/jobs/definitions/emails/send-signing-email.handler.ts:124
 #: packages/lib/server-only/document/resend-document.tsx:137
 msgid "{0} on behalf of \"{1}\" has invited you to {recipientActionVerb} the document \"{2}\"."
-msgstr ""
+msgstr "{0} en nombre de \"{1}\" te ha invitado a {recipientActionVerb} el documento \"{2}\"."
 
 #: packages/email/templates/document-invite.tsx:95
 msgid "{inviterName} <0>({inviterEmail})</0>"
@@ -89,11 +89,11 @@ msgstr "{inviterName} te ha eliminado del documento<0/>\"{documentName}\""
 
 #: packages/email/template-components/template-document-invite.tsx:63
 msgid "{inviterName} on behalf of \"{teamName}\" has invited you to {0}"
-msgstr ""
+msgstr "{inviterName} en nombre de \"{teamName}\" te ha invitado a {0}"
 
 #: packages/email/templates/document-invite.tsx:45
 msgid "{inviterName} on behalf of \"{teamName}\" has invited you to {action} {documentName}"
-msgstr ""
+msgstr "{inviterName} en nombre de \"{teamName}\" te ha invitado a {action} {documentName}"
 
 #: packages/email/templates/team-join.tsx:67
 msgid "{memberEmail} joined the following team"
@@ -197,19 +197,19 @@ msgstr "{recipientName} ha rechazado el documento '{documentName}'"
 
 #: packages/email/template-components/template-document-recipient-signed.tsx:49
 msgid "{recipientReference} has completed signing the document."
-msgstr ""
+msgstr "{recipientReference} ha completado la firma del documento."
 
 #: packages/lib/jobs/definitions/emails/send-recipient-signed-email.ts:121
 msgid "{recipientReference} has signed \"{0}\""
-msgstr ""
+msgstr "{recipientReference} ha firmado \"{0}\""
 
 #: packages/email/template-components/template-document-recipient-signed.tsx:43
 msgid "{recipientReference} has signed \"{documentName}\""
-msgstr ""
+msgstr "{recipientReference} ha firmado \"{documentName}\""
 
 #: packages/email/templates/document-recipient-signed.tsx:27
 msgid "{recipientReference} has signed {documentName}"
-msgstr ""
+msgstr "{recipientReference} ha firmado {documentName}"
 
 #: packages/email/template-components/template-document-rejected.tsx:25
 msgid "{signerName} has rejected the document \"{documentName}\"."
@@ -1196,7 +1196,7 @@ msgstr "Correo electrónico de destinatario eliminado"
 
 #: packages/ui/components/document/document-email-checkboxes.tsx:51
 msgid "Recipient signed email"
-msgstr ""
+msgstr "Correo electrónico firmado por el destinatario"
 
 #: packages/ui/components/document/document-email-checkboxes.tsx:90
 msgid "Recipient signing request email"
@@ -1313,7 +1313,7 @@ msgstr "Enviar correo electrónico de documento completado"
 
 #: packages/ui/components/document/document-email-checkboxes.tsx:276
 msgid "Send document completed email to the owner"
-msgstr ""
+msgstr "Enviar correo electrónico de documento completado al propietario"
 
 #: packages/ui/components/document/document-email-checkboxes.tsx:237
 msgid "Send document deleted email"
@@ -1333,7 +1333,7 @@ msgstr "Enviar correo electrónico de destinatario eliminado"
 
 #: packages/ui/components/document/document-email-checkboxes.tsx:41
 msgid "Send recipient signed email"
-msgstr ""
+msgstr "Enviar correo electrónico de firma del destinatario"
 
 #: packages/ui/components/document/document-email-checkboxes.tsx:80
 msgid "Send recipient signing request email"
@@ -1563,7 +1563,7 @@ msgstr "Este correo electrónico confirma que ha rechazado el documento <0>\"{do
 
 #: packages/ui/components/document/document-email-checkboxes.tsx:56
 msgid "This email is sent to the document owner when a recipient has signed the document."
-msgstr ""
+msgstr "Este correo electrónico se envía al propietario del documento cuando un destinatario ha firmado el documento."
 
 #: packages/ui/components/document/document-email-checkboxes.tsx:134
 msgid "This email is sent to the recipient if they are removed from a pending document."
@@ -1603,7 +1603,7 @@ msgstr "Esto se enviará a todos los destinatarios una vez que el documento est�
 
 #: packages/ui/components/document/document-email-checkboxes.tsx:291
 msgid "This will be sent to the document owner once the document has been fully completed."
-msgstr ""
+msgstr "Esto se enviará al propietario del documento una vez que el documento se haya completado por completo."
 
 #: packages/ui/components/recipient/recipient-action-auth-select.tsx:48
 msgid "This will override any global settings."
@@ -1637,7 +1637,7 @@ msgstr "Actualizar"
 
 #: packages/ui/primitives/signature-pad/signature-pad.tsx:516
 msgid "Upload Signature"
-msgstr ""
+msgstr "Subir firma"
 
 #: packages/ui/primitives/document-dropzone.tsx:70
 msgid "Upload Template Document"
@@ -1801,3 +1801,4 @@ msgstr "Tu contraseña ha sido actualizada."
 #: packages/email/templates/team-delete.tsx:32
 msgid "Your team has been deleted"
 msgstr "Tu equipo ha sido eliminado"
+
