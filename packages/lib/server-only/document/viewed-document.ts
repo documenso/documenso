@@ -2,7 +2,7 @@ import { DOCUMENT_AUDIT_LOG_TYPE } from '@documenso/lib/types/document-audit-log
 import type { RequestMetadata } from '@documenso/lib/universal/extract-request-metadata';
 import { createDocumentAuditLogData } from '@documenso/lib/utils/document-audit-logs';
 import { prisma } from '@documenso/prisma';
-import { ReadStatus } from '@documenso/prisma/client';
+import { ReadStatus, SendStatus } from '@documenso/prisma/client';
 import { WebhookTriggerEvents } from '@documenso/prisma/client';
 
 import type { TDocumentAccessAuthTypes } from '../../types/document-auth';
@@ -39,6 +39,8 @@ export const viewedDocument = async ({
         id: recipient.id,
       },
       data: {
+        // This handles cases where distribution is done manually
+        sendStatus: SendStatus.SENT,
         readStatus: ReadStatus.OPENED,
       },
     });
