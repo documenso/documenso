@@ -9,12 +9,7 @@ const config: LinguiConfig = {
   catalogs: [
     {
       path: '<rootDir>/packages/lib/translations/{locale}/web',
-      include: ['apps/web/src'],
-      exclude: ['**/node_modules/**'],
-    },
-    {
-      path: '<rootDir>/packages/lib/translations/{locale}/common',
-      include: ['packages/ui', 'packages/lib', 'packages/email'],
+      include: ['apps/web/src', 'packages/ui', 'packages/lib', 'packages/email'],
       exclude: ['**/node_modules/**'],
     },
   ],
