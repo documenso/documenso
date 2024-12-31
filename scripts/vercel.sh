@@ -37,24 +37,6 @@ function remap_webapp_env() {
   fi
 }
 
-function build_marketing() {
-  log "Building marketing for $VERCEL_ENV"
-
-  remap_marketing_env
-  remap_database_integration
-
-  npm run prisma:generate --workspace=@documenso/prisma
-  npm run build -- --filter @documenso/marketing
-}
-
-function remap_marketing_env() {
-  if [[ "$VERCEL_ENV" != "production" ]]; then
-    log "Remapping marketing environment variables for $VERCEL_ENV"
-
-    export NEXT_PUBLIC_MARKETING_URL="https://$VERCEL_URL"
-  fi
-}
-
 function remap_database_integration() {
   log "Remapping Supabase integration for $VERCEL_ENV"
 
@@ -94,12 +76,9 @@ case "$DEPLOYMENT_TARGET" in
   "webapp")
     build_webapp
     ;;
-  "marketing")
-    build_marketing
-    ;;
   *)
     log "ERROR - Missing or invalid DEPLOYMENT_TARGET environment variable."
-    log "ERROR - DEPLOYMENT_TARGET must be either 'webapp' or 'marketing'."
+    log "ERROR - DEPLOYMENT_TARGET must be 'webapp'."
     exit 1
     ;;
 esac

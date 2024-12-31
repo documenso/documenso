@@ -6,10 +6,9 @@
     "build:web": "turbo run build --filter=@documenso/web",
     "dev": "turbo run dev --filter=@documenso/web",
     "dev:web": "turbo run dev --filter=@documenso/web",
-    "dev:marketing": "turbo run dev --filter=@documenso/marketing",
     "dev:docs": "turbo run dev --filter=@documenso/documentation",
     "dev:openpage-api": "turbo run dev --filter=@documenso/openpage-api",
-    "start": "turbo run start --filter=@documenso/web --filter=@documenso/marketing --filter=@documenso/documentation --filter=@documenso/openpage-api",
+    "start": "turbo run start --filter=@documenso/web --filter=@documenso/documentation --filter=@documenso/openpage-api",
     "lint": "turbo run lint",
     "lint:fix": "turbo run lint:fix",
     "format": "prettier --write \"**/*.{js,jsx,cjs,mjs,ts,tsx,cts,mts,mdx}\"",
@@ -32,9 +31,9 @@
     "precommit": "npm install && git add package.json package-lock.json",
     "trigger:dev": "npm run with:env -- npx trigger-cli dev --handler-path=\"/api/jobs\"",
     "inngest:dev": "inngest dev -u http://localhost:3000/api/jobs",
-    "make:version": " npm version --workspace @documenso/web --workspace @documenso/marketing --include-workspace-root --no-git-tag-version -m \"v%s\"",
+    "make:version": " npm version --workspace @documenso/web --include-workspace-root --no-git-tag-version -m \"v%s\"",
     "translate:extract": "lingui extract --clean",
-    "translate:compile": "turbo run translate:compile --filter=@documenso/web --filter=@documenso/marketing --filter=@documenso/ui"
+    "translate:compile": "turbo run translate:compile --filter=@documenso/web --filter=@documenso/ui"
   },
   "packageManager": "npm@10.7.0",
   "engines": {

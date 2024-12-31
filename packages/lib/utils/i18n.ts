@@ -8,9 +8,8 @@ import { APP_I18N_OPTIONS } from '../constants/i18n';
 
 export async function dynamicActivate(i18nInstance: I18n, locale: string) {
   const extension = process.env.NODE_ENV === 'development' ? 'po' : 'js';
-  const context = IS_APP_WEB ? 'web' : 'marketing';
 
-  let { messages } = await import(`../translations/${locale}/${context}.${extension}`);
+  let { messages } = await import(`../translations/${locale}/web.${extension}`);
 
   // Dirty way to load common messages for development since it's not compiled.
   if (process.env.NODE_ENV === 'development') {
