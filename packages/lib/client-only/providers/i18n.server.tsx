@@ -6,7 +6,6 @@ import type { I18n, Messages } from '@lingui/core';
 import { setupI18n } from '@lingui/core';
 import { setI18n } from '@lingui/react/server';
 
-import { IS_APP_WEB } from '../../constants/app';
 import {
   APP_I18N_OPTIONS,
   SUPPORTED_LANGUAGE_CODES,
@@ -21,9 +20,8 @@ export async function loadCatalog(lang: SupportedLanguages): Promise<{
   [k: string]: Messages;
 }> {
   const extension = process.env.NODE_ENV === 'development' ? 'po' : 'js';
-  const context = IS_APP_WEB ? 'web' : 'marketing';
 
-  let { messages } = await import(`../../translations/${lang}/${context}.${extension}`);
+  let { messages } = await import(`../../translations/${lang}/web.${extension}`);
 
   if (extension === 'po') {
     const { messages: commonMessages } = await import(
