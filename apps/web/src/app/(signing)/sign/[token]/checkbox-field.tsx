@@ -258,7 +258,6 @@ export const CheckboxField = ({
                 <div key={index} className="flex items-center gap-x-1.5">
                   <Checkbox
                     className="h-4 w-4"
-                    checkClassName="text-white"
                     id={`checkbox-${index}`}
                     checked={checkedValues.includes(itemValue)}
                     onCheckedChange={() => handleCheckboxChange(item.value, item.id)}
@@ -282,7 +281,6 @@ export const CheckboxField = ({
               <div key={index} className="flex items-center gap-x-1.5">
                 <Checkbox
                   className="h-3 w-3"
-                  checkClassName="text-white"
                   id={`checkbox-${index}`}
                   checked={parsedCheckedValues.includes(itemValue)}
                   disabled={isLoading}

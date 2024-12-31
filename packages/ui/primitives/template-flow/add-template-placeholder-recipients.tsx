@@ -352,7 +352,6 @@ export const AddTemplatePlaceholderRecipientsFormPartial = ({
                     <Checkbox
                       {...field}
                       id="signingOrder"
-                      checkClassName="text-white"
                       checked={field.value === DocumentSigningOrder.SEQUENTIAL}
                       onCheckedChange={(checked) =>
                         field.onChange(
@@ -651,7 +650,6 @@ export const AddTemplatePlaceholderRecipientsFormPartial = ({
                 <Checkbox
                   id="showAdvancedRecipientSettings"
                   className="h-5 w-5"
-                  checkClassName="dark:text-white text-primary"
                   checked={showAdvancedSettings}
                   onCheckedChange={(value) => setShowAdvancedSettings(Boolean(value))}
                 />
