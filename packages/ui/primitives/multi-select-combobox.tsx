@@ -1,10 +1,8 @@
-'use client';
-
 import * as React from 'react';
 
 import type { MessageDescriptor } from '@lingui/core';
-import { Trans } from '@lingui/macro';
 import { useLingui } from '@lingui/react';
+import { Trans } from '@lingui/react/macro';
 import { AnimatePresence } from 'framer-motion';
 import { Check, ChevronsUpDown, Loader, XIcon } from 'lucide-react';
 
@@ -24,7 +22,7 @@ type ComboBoxOption<T = OptionValue> = {
 };
 
 type MultiSelectComboboxProps<T = OptionValue> = {
-  emptySelectionPlaceholder?: React.ReactNode | string;
+  emptySelectionPlaceholder?: React.ReactElement | string;
   enableClearAllButton?: boolean;
   loading?: boolean;
   inputPlaceholder?: MessageDescriptor;

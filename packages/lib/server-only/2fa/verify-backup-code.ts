@@ -1,14 +1,14 @@
-import { User } from '@documenso/prisma/client';
+import type { User } from '@prisma/client';
 
 import { getBackupCodes } from './get-backup-code';
 
 type VerifyBackupCodeParams = {
-  user: User;
+  user: Pick<User, 'id' | 'twoFactorEnabled' | 'twoFactorBackupCodes'>;
   backupCode: string;
 };
 
-export const verifyBackupCode = async ({ user, backupCode }: VerifyBackupCodeParams) => {
-  const userBackupCodes = await getBackupCodes({ user });
+export const verifyBackupCode = ({ user, backupCode }: VerifyBackupCodeParams) => {
+  const userBackupCodes = getBackupCodes({ user });
 
   if (!userBackupCodes) {
     throw new Error('User has no backup codes');

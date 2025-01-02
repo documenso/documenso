@@ -1,20 +1,18 @@
-import type { NextApiRequest, NextApiResponse } from 'next';
-
-import { getToken } from 'next-auth/jwt';
 import { match } from 'ts-pattern';
 
+import { getSession } from '@documenso/auth/server/lib/utils/get-session';
+
 import { ERROR_CODES } from './errors';
-import type { TLimitsErrorResponseSchema, TLimitsResponseSchema } from './schema';
 import { getServerLimits } from './server';
 
-export const limitsHandler = async (
-  req: NextApiRequest,
-  res: NextApiResponse<TLimitsResponseSchema | TLimitsErrorResponseSchema>,
-) => {
-  try {
-    const token = await getToken({ req });
+// res: NextApiResponse<TLimitsResponseSchema | TLimitsErrorResponseSchema>,
 
-    const rawTeamId = req.headers['team-id'];
+export const limitsHandler = async (req: Request) => {
+  try {
+    // Todo: Check
+    const { user } = await getSession(req);
+
+    const rawTeamId = req.headers.get('team-id');
 
     let teamId: number | null = null;
 
@@ -26,9 +24,11 @@ export const limitsHandler = async (
       throw new Error(ERROR_CODES.INVALID_TEAM_ID);
     }
 
-    const limits = await getServerLimits({ email: token?.email, teamId });
+    const limits = await getServerLimits({ email: user?.email, teamId });
 
-    return res.status(200).json(limits);
+    return Response.json(limits, {
+      status: 200,
+    });
   } catch (err) {
     console.error('error', err);
 
@@ -37,13 +37,23 @@ export const limitsHandler = async (
         .with(ERROR_CODES.UNAUTHORIZED, () => 401)
         .otherwise(() => 500);
 
-      return res.status(status).json({
-        error: ERROR_CODES[err.message] ?? ERROR_CODES.UNKNOWN,
-      });
+      return Response.json(
+        {
+          error: ERROR_CODES[err.message] ?? ERROR_CODES.UNKNOWN,
+        },
+        {
+          status,
+        },
+      );
     }
 
-    return res.status(500).json({
-      error: ERROR_CODES.UNKNOWN,
-    });
+    return Response.json(
+      {
+        error: ERROR_CODES.UNKNOWN,
+      },
+      {
+        status: 500,
+      },
+    );
   }
 };

@@ -1,5 +1,6 @@
+import type { Team } from '@prisma/client';
+
 import { prisma } from '@documenso/prisma';
-import type { Team } from '@documenso/prisma/client';
 
 import type { RequestMetadata } from '../../universal/extract-request-metadata';
 import { createDocumentAuditLogData } from '../../utils/document-audit-logs';

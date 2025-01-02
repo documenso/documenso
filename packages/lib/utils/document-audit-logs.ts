@@ -1,9 +1,8 @@
 import type { I18n } from '@lingui/core';
-import { msg } from '@lingui/macro';
+import { msg } from '@lingui/core/macro';
+import type { DocumentAuditLog, DocumentMeta, Field, Recipient } from '@prisma/client';
+import { RecipientRole } from '@prisma/client';
 import { match } from 'ts-pattern';
-
-import type { DocumentAuditLog, DocumentMeta, Field, Recipient } from '@documenso/prisma/client';
-import { RecipientRole } from '@documenso/prisma/client';
 
 import type {
   TDocumentAuditLog,

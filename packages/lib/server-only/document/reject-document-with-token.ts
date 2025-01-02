@@ -1,8 +1,8 @@
 import { SigningStatus } from '@prisma/client';
+import { WebhookTriggerEvents } from '@prisma/client';
 
 import { jobs } from '@documenso/lib/jobs/client';
 import { prisma } from '@documenso/prisma';
-import { WebhookTriggerEvents } from '@documenso/prisma/client';
 
 import { AppError, AppErrorCode } from '../../errors/app-error';
 import { DOCUMENT_AUDIT_LOG_TYPE } from '../../types/document-audit-logs';

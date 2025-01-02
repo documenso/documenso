@@ -1,6 +1,6 @@
 import { test } from '@playwright/test';
 
-import { WEBAPP_BASE_URL } from '@documenso/lib/constants/app';
+import { NEXT_PUBLIC_WEBAPP_URL } from '@documenso/lib/constants/app';
 import { seedTeam } from '@documenso/prisma/seed/teams';
 import { seedUser } from '@documenso/prisma/seed/users';
 
@@ -50,7 +50,7 @@ test('[TEAMS]: delete team', async ({ page }) => {
   await page.getByRole('button', { name: 'Delete' }).click();
 
   // Check that we have been redirected to the teams page.
-  await page.waitForURL(`${WEBAPP_BASE_URL}/settings/teams`);
+  await page.waitForURL(`${NEXT_PUBLIC_WEBAPP_URL()}/settings/teams`);
 });
 
 test('[TEAMS]: update team', async ({ page }) => {
@@ -81,5 +81,5 @@ test('[TEAMS]: update team', async ({ page }) => {
   await page.getByRole('button', { name: 'Update team' }).click();
 
   // Check we have been redirected to the new team URL and the name is updated.
-  await page.waitForURL(`${WEBAPP_BASE_URL}/t/${updatedTeamId}/settings`);
+  await page.waitForURL(`${NEXT_PUBLIC_WEBAPP_URL()}/t/${updatedTeamId}/settings`);
 });

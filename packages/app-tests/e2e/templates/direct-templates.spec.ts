@@ -1,7 +1,7 @@
 import { expect, test } from '@playwright/test';
 import { customAlphabet } from 'nanoid';
 
-import { WEBAPP_BASE_URL } from '@documenso/lib/constants/app';
+import { NEXT_PUBLIC_WEBAPP_URL } from '@documenso/lib/constants/app';
 import {
   DIRECT_TEMPLATE_RECIPIENT_EMAIL,
   DIRECT_TEMPLATE_RECIPIENT_NAME,
@@ -52,8 +52,8 @@ test('[DIRECT_TEMPLATES]: create direct link for template', async ({ page }) => 
   });
 
   const urls = [
-    `${WEBAPP_BASE_URL}/t/${team.url}/templates/${teamTemplate.id}`,
-    `${WEBAPP_BASE_URL}/templates/${personalTemplate.id}`,
+    `${NEXT_PUBLIC_WEBAPP_URL()}/t/${team.url}/templates/${teamTemplate.id}`,
+    `${NEXT_PUBLIC_WEBAPP_URL()}/templates/${personalTemplate.id}`,
   ];
 
   // Run test for personal and team templates.
@@ -108,7 +108,7 @@ test('[DIRECT_TEMPLATES]: toggle direct template link', async ({ page }) => {
     await expect(page.getByRole('heading', { name: 'General' })).toBeVisible();
 
     // Navigate to template settings and disable access.
-    await page.goto(`${WEBAPP_BASE_URL}${formatTemplatesPath(template.team?.url)}`);
+    await page.goto(`${NEXT_PUBLIC_WEBAPP_URL()}${formatTemplatesPath(template.team?.url)}`);
     await page.getByRole('cell', { name: 'Use Template' }).getByRole('button').nth(1).click();
     await page.getByRole('menuitem', { name: 'Direct link' }).click();
     await page.getByRole('switch').click();
@@ -117,7 +117,7 @@ test('[DIRECT_TEMPLATES]: toggle direct template link', async ({ page }) => {
 
     // Check that the direct template link is no longer accessible.
     await page.goto(formatDirectTemplatePath(template.directLink?.token || ''));
-    await expect(page.getByText('Template not found')).toBeVisible();
+    await expect(page.getByText('404 not found')).toBeVisible();
   }
 });
 
@@ -153,7 +153,7 @@ test('[DIRECT_TEMPLATES]: delete direct template link', async ({ page }) => {
     await expect(page.getByRole('heading', { name: 'General' })).toBeVisible();
 
     // Navigate to template settings and delete the access.
-    await page.goto(`${WEBAPP_BASE_URL}${formatTemplatesPath(template.team?.url)}`);
+    await page.goto(`${NEXT_PUBLIC_WEBAPP_URL()}${formatTemplatesPath(template.team?.url)}`);
     await page.getByRole('cell', { name: 'Use Template' }).getByRole('button').nth(1).click();
     await page.getByRole('menuitem', { name: 'Direct link' }).click();
     await page.getByRole('button', { name: 'Remove' }).click();
@@ -162,7 +162,7 @@ test('[DIRECT_TEMPLATES]: delete direct template link', async ({ page }) => {
 
     // Check that the direct template link is no longer accessible.
     await page.goto(formatDirectTemplatePath(template.directLink?.token || ''));
-    await expect(page.getByText('Template not found')).toBeVisible();
+    await expect(page.getByText('404 not found')).toBeVisible();
   }
 });
 
@@ -241,7 +241,7 @@ test('[DIRECT_TEMPLATES]: use direct template link with 1 recipient', async ({ p
 
   // Check that the owner has the documents.
   for (const template of [personalDirectTemplate, teamDirectTemplate]) {
-    await page.goto(`${WEBAPP_BASE_URL}${formatDocumentsPath(template.team?.url)}`);
+    await page.goto(`${NEXT_PUBLIC_WEBAPP_URL()}${formatDocumentsPath(template.team?.url)}`);
 
     await expect(async () => {
       // Check that the document is in the 'All' tab.
@@ -314,7 +314,7 @@ test('[DIRECT_TEMPLATES]: use direct template link with 2 recipients', async ({ 
 
   // Check that the owner has the documents.
   for (const template of [personalDirectTemplate, teamDirectTemplate]) {
-    await page.goto(`${WEBAPP_BASE_URL}${formatDocumentsPath(template.team?.url)}`);
+    await page.goto(`${NEXT_PUBLIC_WEBAPP_URL()}${formatDocumentsPath(template.team?.url)}`);
 
     // Check that the document is in the 'All' tab.
     await checkDocumentTabCount(page, 'All', 1);

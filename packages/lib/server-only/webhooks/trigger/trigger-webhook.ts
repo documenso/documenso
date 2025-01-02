@@ -1,4 +1,4 @@
-import type { WebhookTriggerEvents } from '@documenso/prisma/client';
+import type { WebhookTriggerEvents } from '@prisma/client';
 
 import { NEXT_PRIVATE_INTERNAL_WEBAPP_URL } from '../../../constants/app';
 import { sign } from '../../crypto/sign';

@@ -1,15 +1,7 @@
 import { createElement } from 'react';
 
-import { msg } from '@lingui/macro';
-import { DateTime } from 'luxon';
-import { match } from 'ts-pattern';
-import { z } from 'zod';
-
-import { mailer } from '@documenso/email/mailer';
-import { DocumentCreatedFromDirectTemplateEmailTemplate } from '@documenso/email/templates/document-created-from-direct-template';
-import { nanoid } from '@documenso/lib/universal/id';
-import { prisma } from '@documenso/prisma';
-import type { Field, Signature } from '@documenso/prisma/client';
+import { msg } from '@lingui/core/macro';
+import type { Field, Signature } from '@prisma/client';
 import {
   DocumentSigningOrder,
   DocumentSource,
@@ -20,10 +12,18 @@ import {
   SendStatus,
   SigningStatus,
   WebhookTriggerEvents,
-} from '@documenso/prisma/client';
+} from '@prisma/client';
+import { DateTime } from 'luxon';
+import { match } from 'ts-pattern';
+import { z } from 'zod';
+
+import { mailer } from '@documenso/email/mailer';
+import { DocumentCreatedFromDirectTemplateEmailTemplate } from '@documenso/email/templates/document-created-from-direct-template';
+import { nanoid } from '@documenso/lib/universal/id';
+import { prisma } from '@documenso/prisma';
 import type { TSignFieldWithTokenMutationSchema } from '@documenso/trpc/server/field-router/schema';
 
-import { getI18nInstance } from '../../client-only/providers/i18n.server';
+import { getI18nInstance } from '../../client-only/providers/i18n-server';
 import { NEXT_PUBLIC_WEBAPP_URL } from '../../constants/app';
 import { DEFAULT_DOCUMENT_DATE_FORMAT } from '../../constants/date-formats';
 import { DEFAULT_DOCUMENT_TIME_ZONE } from '../../constants/time-zones';
@@ -44,6 +44,7 @@ import {
   createRecipientAuthOptions,
   extractDocumentAuthMethods,
 } from '../../utils/document-auth';
+import { env } from '../../utils/env';
 import { renderEmailWithI18N } from '../../utils/render-email-with-i18n';
 import { teamGlobalSettingsToBranding } from '../../utils/team-global-settings-to-branding';
 import { formatDocumentsPath } from '../../utils/teams';
@@ -582,8 +583,8 @@ export const createDocumentFromDirectTemplate = async ({
         },
       ],
       from: {
-        name: process.env.NEXT_PRIVATE_SMTP_FROM_NAME || 'Documenso',
-        address: process.env.NEXT_PRIVATE_SMTP_FROM_ADDRESS || 'noreply@documenso.com',
+        name: env('NEXT_PRIVATE_SMTP_FROM_NAME') || 'Documenso',
+        address: env('NEXT_PRIVATE_SMTP_FROM_ADDRESS') || 'noreply@documenso.com',
       },
       subject: i18n._(msg`Document created from direct template`),
       html,

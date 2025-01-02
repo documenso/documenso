@@ -9,6 +9,9 @@ export type RenderOptions = ReactEmail.Options & {
   branding?: BrandingSettings;
 };
 
+// eslint-disable-next-line @typescript-eslint/consistent-type-assertions
+const colors = (config.theme?.extend?.colors || {}) as Record<string, string>;
+
 export const render = (element: React.ReactNode, options?: RenderOptions) => {
   const { branding, ...otherOptions } = options ?? {};
 
@@ -17,7 +20,7 @@ export const render = (element: React.ReactNode, options?: RenderOptions) => {
       config={{
         theme: {
           extend: {
-            colors: config.theme.extend.colors,
+            colors,
           },
         },
       }}
@@ -36,7 +39,7 @@ export const renderAsync = async (element: React.ReactNode, options?: RenderOpti
       config={{
         theme: {
           extend: {
-            colors: config.theme.extend.colors,
+            colors,
           },
         },
       }}

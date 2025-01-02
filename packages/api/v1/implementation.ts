@@ -1,4 +1,4 @@
-import { createNextRoute } from '@ts-rest/next';
+import { tsr } from '@ts-rest/serverless/fetch';
 import { match } from 'ts-pattern';
 
 import { getServerLimits } from '@documenso/ee/server-only/limits/server';
@@ -42,9 +42,8 @@ import {
   ZRadioFieldMeta,
   ZTextFieldMeta,
 } from '@documenso/lib/types/field-meta';
-import { extractNextApiRequestMetadata } from '@documenso/lib/universal/extract-request-metadata';
-import { getFile } from '@documenso/lib/universal/upload/get-file';
-import { putPdfFile } from '@documenso/lib/universal/upload/put-file';
+import { getFileServerSide } from '@documenso/lib/universal/upload/get-file.server';
+import { putPdfFileServerSide } from '@documenso/lib/universal/upload/put-file.server';
 import {
   getPresignGetUrl,
   getPresignPostUrl,
@@ -62,7 +61,7 @@ import {
 import { ApiContractV1 } from './contract';
 import { authenticatedMiddleware } from './middleware/authenticated';
 
-export const ApiContractV1Implementation = createNextRoute(ApiContractV1, {
+export const ApiContractV1Implementation = tsr.router(ApiContractV1, {
   getDocuments: authenticatedMiddleware(async (args, user, team) => {
     const page = Number(args.query.page) || 1;
     const perPage = Number(args.query.perPage) || 10;
@@ -491,14 +490,14 @@ export const ApiContractV1Implementation = createNextRoute(ApiContractV1, {
     let documentDataId = document.documentDataId;
 
     if (body.formValues) {
-      const pdf = await getFile(document.documentData);
+      const pdf = await getFileServerSide(document.documentData);
 
       const prefilled = await insertFormValuesInPdf({
         pdf: Buffer.from(pdf),
         formValues: body.formValues,
       });
 
-      const newDocumentData = await putPdfFile({
+      const newDocumentData = await putPdfFileServerSide({
         name: fileName,
         type: 'application/pdf',
         arrayBuffer: async () => Promise.resolve(prefilled),
@@ -599,14 +598,14 @@ export const ApiContractV1Implementation = createNextRoute(ApiContractV1, {
     if (body.formValues) {
       const fileName = document.title.endsWith('.pdf') ? document.title : `${document.title}.pdf`;
 
-      const pdf = await getFile(document.documentData);
+      const pdf = await getFileServerSide(document.documentData);
 
       const prefilled = await insertFormValuesInPdf({
         pdf: Buffer.from(pdf),
         formValues: body.formValues,
       });
 
-      const newDocumentData = await putPdfFile({
+      const newDocumentData = await putPdfFileServerSide({
         name: fileName,
         type: 'application/pdf',
         arrayBuffer: async () => Promise.resolve(prefilled),
@@ -849,7 +848,7 @@ export const ApiContractV1Implementation = createNextRoute(ApiContractV1, {
     }
   }),
 
-  updateRecipient: authenticatedMiddleware(async (args, user, team) => {
+  updateRecipient: authenticatedMiddleware(async (args, user, team, { metadata }) => {
     const { id: documentId, recipientId } = args.params;
     const { name, email, role, authOptions, signingOrder } = args.body;
 
@@ -887,7 +886,7 @@ export const ApiContractV1Implementation = createNextRoute(ApiContractV1, {
       role,
       signingOrder,
       actionAuth: authOptions?.actionAuth,
-      requestMetadata: extractNextApiRequestMetadata(args.req),
+      requestMetadata: metadata.requestMetadata,
     }).catch(() => null);
 
     if (!updatedRecipient) {
@@ -909,7 +908,7 @@ export const ApiContractV1Implementation = createNextRoute(ApiContractV1, {
     };
   }),
 
-  deleteRecipient: authenticatedMiddleware(async (args, user, team) => {
+  deleteRecipient: authenticatedMiddleware(async (args, user, team, { metadata }) => {
     const { id: documentId, recipientId } = args.params;
 
     const document = await getDocumentById({
@@ -941,7 +940,7 @@ export const ApiContractV1Implementation = createNextRoute(ApiContractV1, {
       recipientId: Number(recipientId),
       userId: user.id,
       teamId: team?.id,
-      requestMetadata: extractNextApiRequestMetadata(args.req),
+      requestMetadata: metadata.requestMetadata,
     }).catch(() => null);
 
     if (!deletedRecipient) {
@@ -963,7 +962,7 @@ export const ApiContractV1Implementation = createNextRoute(ApiContractV1, {
     };
   }),
 
-  createField: authenticatedMiddleware(async (args, user, team) => {
+  createField: authenticatedMiddleware(async (args, user, team, { metadata }) => {
     const { id: documentId } = args.params;
     const fields = Array.isArray(args.body) ? args.body : [args.body];
 
@@ -1100,7 +1099,7 @@ export const ApiContractV1Implementation = createNextRoute(ApiContractV1, {
                   fieldRecipientId: recipientId,
                   fieldType: field.type,
                 },
-                requestMetadata: extractNextApiRequestMetadata(args.req),
+                requestMetadata: metadata.requestMetadata,
               }),
             });
 
@@ -1134,7 +1133,7 @@ export const ApiContractV1Implementation = createNextRoute(ApiContractV1, {
     }
   }),
 
-  updateField: authenticatedMiddleware(async (args, user, team) => {
+  updateField: authenticatedMiddleware(async (args, user, team, { metadata }) => {
     const { id: documentId, fieldId } = args.params;
     const { recipientId, type, pageNumber, pageWidth, pageHeight, pageX, pageY, fieldMeta } =
       args.body;
@@ -1198,7 +1197,7 @@ export const ApiContractV1Implementation = createNextRoute(ApiContractV1, {
       pageY,
       pageWidth,
       pageHeight,
-      requestMetadata: extractNextApiRequestMetadata(args.req),
+      requestMetadata: metadata.requestMetadata,
       fieldMeta: fieldMeta ? ZFieldMetaSchema.parse(fieldMeta) : undefined,
     });
 
@@ -1225,7 +1224,7 @@ export const ApiContractV1Implementation = createNextRoute(ApiContractV1, {
     };
   }),
 
-  deleteField: authenticatedMiddleware(async (args, user, team) => {
+  deleteField: authenticatedMiddleware(async (args, user, team, { metadata }) => {
     const { id: documentId, fieldId } = args.params;
 
     const document = await getDocumentById({
@@ -1286,7 +1285,7 @@ export const ApiContractV1Implementation = createNextRoute(ApiContractV1, {
       fieldId: Number(fieldId),
       userId: user.id,
       teamId: team?.id,
-      requestMetadata: extractNextApiRequestMetadata(args.req),
+      requestMetadata: metadata.requestMetadata,
     }).catch(() => null);
 
     if (!deletedField) {

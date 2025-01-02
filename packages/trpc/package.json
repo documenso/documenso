@@ -14,7 +14,6 @@
     "@documenso/prisma": "*",
     "@tanstack/react-query": "5.59.15",
     "@trpc/client": "11.0.0-rc.648",
-    "@trpc/next": "11.0.0-rc.648",
     "@trpc/react-query": "11.0.0-rc.648",
     "@trpc/server": "11.0.0-rc.648",
     "@ts-rest/core": "^3.30.5",

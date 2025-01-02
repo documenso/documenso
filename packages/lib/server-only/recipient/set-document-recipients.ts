@@ -1,6 +1,9 @@
 import { createElement } from 'react';
 
-import { msg } from '@lingui/macro';
+import { msg } from '@lingui/core/macro';
+import type { Recipient } from '@prisma/client';
+import { RecipientRole } from '@prisma/client';
+import { SendStatus, SigningStatus } from '@prisma/client';
 
 import { isUserEnterprise } from '@documenso/ee/server-only/util/is-document-enterprise';
 import { mailer } from '@documenso/email/mailer';
@@ -19,11 +22,8 @@ import {
 } from '@documenso/lib/utils/document-audit-logs';
 import { createRecipientAuthOptions } from '@documenso/lib/utils/document-auth';
 import { prisma } from '@documenso/prisma';
-import type { Recipient } from '@documenso/prisma/client';
-import { RecipientRole } from '@documenso/prisma/client';
-import { SendStatus, SigningStatus } from '@documenso/prisma/client';
 
-import { getI18nInstance } from '../../client-only/providers/i18n.server';
+import { getI18nInstance } from '../../client-only/providers/i18n-server';
 import { NEXT_PUBLIC_WEBAPP_URL } from '../../constants/app';
 import { FROM_ADDRESS, FROM_NAME } from '../../constants/email';
 import { AppError, AppErrorCode } from '../../errors/app-error';

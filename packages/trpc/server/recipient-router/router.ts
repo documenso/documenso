@@ -9,7 +9,6 @@ import { setDocumentRecipients } from '@documenso/lib/server-only/recipient/set-
 import { setTemplateRecipients } from '@documenso/lib/server-only/recipient/set-template-recipients';
 import { updateDocumentRecipients } from '@documenso/lib/server-only/recipient/update-document-recipients';
 import { updateTemplateRecipients } from '@documenso/lib/server-only/recipient/update-template-recipients';
-import { extractNextApiRequestMetadata } from '@documenso/lib/universal/extract-request-metadata';
 
 import { ZGenericSuccessResponse, ZSuccessResponseSchema } from '../document-router/schema';
 import { authenticatedProcedure, procedure, router } from '../trpc';
@@ -444,7 +443,7 @@ export const recipientRouter = router({
         documentId,
         authOptions,
         userId: ctx.user?.id,
-        requestMetadata: extractNextApiRequestMetadata(ctx.req),
+        requestMetadata: ctx.metadata.requestMetadata,
       });
     }),
 
@@ -460,7 +459,7 @@ export const recipientRouter = router({
         token,
         documentId,
         reason,
-        requestMetadata: extractNextApiRequestMetadata(ctx.req),
+        requestMetadata: ctx.metadata.requestMetadata,
       });
     }),
 });

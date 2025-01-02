@@ -1,12 +1,11 @@
 import crypto from 'crypto';
 
 import { prisma } from '@documenso/prisma';
-import { TForgotPasswordFormSchema } from '@documenso/trpc/server/profile-router/schema';
 
-import { ONE_DAY, ONE_HOUR } from '../../constants/time';
+import { ONE_DAY } from '../../constants/time';
 import { sendForgotPassword } from '../auth/send-forgot-password';
 
-export const forgotPassword = async ({ email }: TForgotPasswordFormSchema) => {
+export const forgotPassword = async ({ email }: { email: string }) => {
   const user = await prisma.user.findFirst({
     where: {
       email: {
@@ -21,21 +20,21 @@ export const forgotPassword = async ({ email }: TForgotPasswordFormSchema) => {
   }
 
   // Find a token that was created in the last hour and hasn't expired
-  const existingToken = await prisma.passwordResetToken.findFirst({
-    where: {
-      userId: user.id,
-      expiry: {
-        gt: new Date(),
-      },
-      createdAt: {
-        gt: new Date(Date.now() - ONE_HOUR),
-      },
-    },
-  });
+  // const existingToken = await prisma.passwordResetToken.findFirst({
+  //   where: {
+  //     userId: user.id,
+  //     expiry: {
+  //       gt: new Date(),
+  //     },
+  //     createdAt: {
+  //       gt: new Date(Date.now() - ONE_HOUR),
+  //     },
+  //   },
+  // });
 
-  if (existingToken) {
-    return;
-  }
+  // if (existingToken) {
+  //   return;
+  // }
 
   const token = crypto.randomBytes(18).toString('hex');
 

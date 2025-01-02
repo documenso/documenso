@@ -1,5 +1,6 @@
-import { Trans } from '@lingui/macro';
-import { env } from 'next-runtime-env';
+import { Trans } from '@lingui/react/macro';
+
+import { env } from '@documenso/lib/utils/env';
 
 import { Button, Column, Img, Link, Section, Text } from '../components';
 import { TemplateDocumentImage } from './template-document-image';

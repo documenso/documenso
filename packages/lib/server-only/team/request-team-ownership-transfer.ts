@@ -1,15 +1,15 @@
 import { createElement } from 'react';
 
-import { msg } from '@lingui/macro';
+import { msg } from '@lingui/core/macro';
 
 import { mailer } from '@documenso/email/mailer';
 import { TeamTransferRequestTemplate } from '@documenso/email/templates/team-transfer-request';
-import { WEBAPP_BASE_URL } from '@documenso/lib/constants/app';
+import { NEXT_PUBLIC_WEBAPP_URL } from '@documenso/lib/constants/app';
 import { FROM_ADDRESS, FROM_NAME } from '@documenso/lib/constants/email';
 import { createTokenVerification } from '@documenso/lib/utils/token-verification';
 import { prisma } from '@documenso/prisma';
 
-import { getI18nInstance } from '../../client-only/providers/i18n.server';
+import { getI18nInstance } from '../../client-only/providers/i18n-server';
 import { renderEmailWithI18N } from '../../utils/render-email-with-i18n';
 
 export type RequestTeamOwnershipTransferOptions = {
@@ -89,8 +89,8 @@ export const requestTeamOwnershipTransfer = async ({
       });
 
       const template = createElement(TeamTransferRequestTemplate, {
-        assetBaseUrl: WEBAPP_BASE_URL,
-        baseUrl: WEBAPP_BASE_URL,
+        assetBaseUrl: NEXT_PUBLIC_WEBAPP_URL(),
+        baseUrl: NEXT_PUBLIC_WEBAPP_URL(),
         senderName: userName,
         teamName: team.name,
         teamUrl: team.url,

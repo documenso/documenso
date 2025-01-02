@@ -13,7 +13,7 @@ generator json {
 generator zod {
   provider         = "zod-prisma-types"
   createInputTypes = false
-  writeBarrelFiles = true
+  writeBarrelFiles = false
   useMultipleFiles = true
 }
 
@@ -23,6 +23,7 @@ datasource db {
   directUrl = env("NEXT_PRIVATE_DIRECT_DATABASE_URL")
 }
 
+// Todo: Remove after RR7 migration.
 enum IdentityProvider {
   DOCUMENSO
   GOOGLE
@@ -40,14 +41,14 @@ model User {
   customerId       String?          @unique
   email            String           @unique
   emailVerified    DateTime?
-  password         String?
+  password         String? // Todo: Remove after RR7 migration.
   source           String?
   signature        String?
   createdAt        DateTime         @default(now())
   updatedAt        DateTime         @default(now()) @updatedAt
   lastSignedIn     DateTime         @default(now())
   roles            Role[]           @default([USER])
-  identityProvider IdentityProvider @default(DOCUMENSO)
+  identityProvider IdentityProvider @default(DOCUMENSO) // Todo: Remove after RR7 migration.
   avatarImageId    String?
   disabled         Boolean          @default(false)
 
@@ -269,18 +270,25 @@ model Account {
   scope             String?
   id_token          String? @db.Text
   session_state     String?
+  password          String?
 
-  user User? @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([provider, providerAccountId])
 }
 
 model Session {
-  id           String   @id @default(cuid())
-  sessionToken String   @unique
+  id           String @id @default(cuid())
+  sessionToken String @unique
   userId       Int
-  expires      DateTime
-  user         User?    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  ipAddress String?
+  userAgent String?
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user User? @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 enum DocumentStatus {

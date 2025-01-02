@@ -1,5 +1,3 @@
-'use client';
-
 import * as React from 'react';
 
 import type { DialogProps } from '@radix-ui/react-dialog';
@@ -96,7 +94,7 @@ const CommandGroup = React.forwardRef<
   <CommandPrimitive.Group
     ref={ref}
     className={cn(
-      'text-foreground [&_[cmdk-group-heading]]:text-muted-foreground overflow-hidden border-b p-1 last:border-0 [&_[cmdk-group-heading]]:mt-2 [&_[cmdk-group-heading]]:px-0 [&_[cmdk-group-heading]]:py-2 [&_[cmdk-group-heading]]:text-xs [&_[cmdk-group-heading]]:font-normal [&_[cmdk-group-heading]]:opacity-50 ',
+      'text-foreground [&_[cmdk-group-heading]]:text-muted-foreground overflow-hidden border-b p-1 last:border-0 [&_[cmdk-group-heading]]:mt-2 [&_[cmdk-group-heading]]:px-0 [&_[cmdk-group-heading]]:py-2 [&_[cmdk-group-heading]]:text-xs [&_[cmdk-group-heading]]:font-normal [&_[cmdk-group-heading]]:opacity-50',
       className,
     )}
     {...props}

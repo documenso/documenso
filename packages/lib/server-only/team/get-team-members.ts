@@ -1,7 +1,8 @@
 import type { z } from 'zod';
 
 import { prisma } from '@documenso/prisma';
-import { TeamMemberSchema, UserSchema } from '@documenso/prisma/generated/zod';
+import { TeamMemberSchema } from '@documenso/prisma/generated/zod/modelSchema/TeamMemberSchema';
+import { UserSchema } from '@documenso/prisma/generated/zod/modelSchema/UserSchema';
 
 export type GetTeamMembersOptions = {
   userId: number;

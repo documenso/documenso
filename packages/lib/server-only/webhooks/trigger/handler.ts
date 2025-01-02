@@ -1,5 +1,3 @@
-import type { NextApiRequest, NextApiResponse } from 'next';
-
 import { verify } from '../../crypto/verify';
 import { getAllWebhooksByEventTrigger } from '../get-all-webhooks-by-event-trigger';
 import { executeWebhook } from './execute-webhook';
@@ -15,29 +13,26 @@ export type HandlerTriggerWebhooksResponse =
       error: string;
     };
 
-export const handlerTriggerWebhooks = async (
-  req: NextApiRequest,
-  res: NextApiResponse<HandlerTriggerWebhooksResponse>,
-) => {
-  const signature = req.headers['x-webhook-signature'];
+export const handlerTriggerWebhooks = async (req: Request) => {
+  const signature = req.headers.get('x-webhook-signature');
 
   if (typeof signature !== 'string') {
     console.log('Missing signature');
-    return res.status(400).json({ success: false, error: 'Missing signature' });
+    return Response.json({ success: false, error: 'Missing signature' }, { status: 400 });
   }
 
   const valid = verify(req.body, signature);
 
   if (!valid) {
     console.log('Invalid signature');
-    return res.status(400).json({ success: false, error: 'Invalid signature' });
+    return Response.json({ success: false, error: 'Invalid signature' }, { status: 400 });
   }
 
   const result = ZTriggerWebhookBodySchema.safeParse(req.body);
 
   if (!result.success) {
     console.log('Invalid request body');
-    return res.status(400).json({ success: false, error: 'Invalid request body' });
+    return Response.json({ success: false, error: 'Invalid request body' }, { status: 400 });
   }
 
   const { event, data, userId, teamId } = result.data;
@@ -54,5 +49,8 @@ export const handlerTriggerWebhooks = async (
     ),
   );
 
-  return res.status(200).json({ success: true, message: 'Webhooks executed successfully' });
+  return Response.json(
+    { success: true, message: 'Webhooks executed successfully' },
+    { status: 200 },
+  );
 };

@@ -1,13 +1,15 @@
+import { DocumentDataType } from '@prisma/client';
 import { base64 } from '@scure/base';
-import { env } from 'next-runtime-env';
-import { PDFDocument } from 'pdf-lib';
 import { match } from 'ts-pattern';
 
-import { getFlag } from '@documenso/lib/universal/get-feature-flag';
-import { DocumentDataType } from '@documenso/prisma/client';
+import { env } from '@documenso/lib/utils/env';
+import type {
+  TGetPresignedPostUrlResponse,
+  TUploadPdfResponse,
+} from '@documenso/remix/server/api/files.types';
 
+import { NEXT_PUBLIC_WEBAPP_URL } from '../../constants/app';
 import { AppError } from '../../errors/app-error';
-import { createDocumentData } from '../../server-only/document-data/create-document-data';
 
 type File = {
   name: string;
@@ -15,34 +17,29 @@ type File = {
   arrayBuffer: () => Promise<ArrayBuffer>;
 };
 
-/**
- * Uploads a document file to the appropriate storage location and creates
- * a document data record.
- */
 export const putPdfFile = async (file: File) => {
-  const isEncryptedDocumentsAllowed = await getFlag('app_allow_encrypted_documents').catch(
-    () => false,
-  );
+  const formData = new FormData();
 
-  const arrayBuffer = await file.arrayBuffer();
+  // Create a proper File object from the data
+  const buffer = await file.arrayBuffer();
+  const blob = new Blob([buffer], { type: file.type });
+  const properFile = new File([blob], file.name, { type: file.type });
 
-  const pdf = await PDFDocument.load(arrayBuffer).catch((e) => {
-    console.error(`PDF upload parse error: ${e.message}`);
+  formData.append('file', properFile);
 
-    throw new AppError('INVALID_DOCUMENT_FILE');
+  const response = await fetch('/api/files/upload-pdf', {
+    method: 'POST',
+    body: formData,
   });
 
-  if (!isEncryptedDocumentsAllowed && pdf.isEncrypted) {
-    throw new AppError('INVALID_DOCUMENT_FILE');
+  if (!response.ok) {
+    console.error('Upload failed:', response.statusText);
+    throw new AppError('UPLOAD_FAILED');
   }
 
-  if (!file.name.endsWith('.pdf')) {
-    file.name = `${file.name}.pdf`;
-  }
+  const result: TUploadPdfResponse = await response.json();
 
-  const { type, data } = await putFile(file);
-
-  return await createDocumentData({ type, data });
+  return result;
 };
 
 /**
@@ -70,9 +67,27 @@ const putFileInDatabase = async (file: File) => {
 };
 
 const putFileInS3 = async (file: File) => {
-  const { getPresignPostUrl } = await import('./server-actions');
+  const getPresignedUrlResponse = await fetch(
+    `${NEXT_PUBLIC_WEBAPP_URL()}/api/files/presigned-post-url`,
+    {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        fileName: file.name,
+        contentType: file.type,
+      }),
+    },
+  );
 
-  const { url, key } = await getPresignPostUrl(file.name, file.type);
+  if (!getPresignedUrlResponse.ok) {
+    throw new Error(
+      `Failed to get presigned post url, failed with status code ${getPresignedUrlResponse.status}`,
+    );
+  }
+
+  const { url, key }: TGetPresignedPostUrlResponse = await getPresignedUrlResponse.json();
 
   const body = await file.arrayBuffer();
 

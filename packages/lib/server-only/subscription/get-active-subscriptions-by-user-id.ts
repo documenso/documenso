@@ -1,7 +1,6 @@
-'use server';
+import { SubscriptionStatus } from '@prisma/client';
 
 import { prisma } from '@documenso/prisma';
-import { SubscriptionStatus } from '@documenso/prisma/client';
 
 export type GetActiveSubscriptionsByUserIdOptions = {
   userId: number;

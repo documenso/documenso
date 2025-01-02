@@ -1,9 +1,9 @@
-import { usePathname, useRouter, useSearchParams } from 'next/navigation';
+import { useLocation, useNavigate, useSearchParams } from 'react-router';
 
 export const useUpdateSearchParams = () => {
-  const router = useRouter();
-  const pathname = usePathname();
-  const searchParams = useSearchParams();
+  const navigate = useNavigate();
+  const { pathname } = useLocation();
+  const [searchParams] = useSearchParams();
 
   return (params: Record<string, string | number | boolean | null | undefined>) => {
     const nextSearchParams = new URLSearchParams(searchParams?.toString() ?? '');
@@ -16,6 +16,6 @@ export const useUpdateSearchParams = () => {
       }
     });
 
-    router.push(`${pathname}?${nextSearchParams.toString()}`);
+    void navigate(`${pathname}?${nextSearchParams.toString()}`);
   };
 };

@@ -1,3 +1,5 @@
+import { DocumentDistributionMethod } from '@prisma/client';
+import { DocumentVisibility } from '@prisma/client';
 import { z } from 'zod';
 
 import { DEFAULT_DOCUMENT_DATE_FORMAT } from '@documenso/lib/constants/date-formats';
@@ -9,14 +11,12 @@ import {
 } from '@documenso/lib/types/document-auth';
 import { ZDocumentEmailSettingsSchema } from '@documenso/lib/types/document-email';
 import { isValidRedirectUrl } from '@documenso/lib/utils/is-valid-redirect-url';
-import { DocumentVisibility } from '@documenso/prisma/client';
 import {
   ZDocumentMetaDateFormatSchema,
   ZDocumentMetaTimezoneSchema,
 } from '@documenso/trpc/server/document-router/schema';
 
 import { ZMapNegativeOneToUndefinedSchema } from '../document-flow/add-settings.types';
-import { DocumentDistributionMethod } from '.prisma/client';
 
 export const ZAddTemplateSettingsFormSchema = z.object({
   title: z.string().trim().min(1, { message: "Title can't be empty" }),

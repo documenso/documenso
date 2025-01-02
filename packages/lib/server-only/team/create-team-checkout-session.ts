@@ -1,6 +1,6 @@
 import { getCheckoutSession } from '@documenso/ee/server-only/stripe/get-checkout-session';
 import { getTeamPrices } from '@documenso/ee/server-only/stripe/get-team-prices';
-import { WEBAPP_BASE_URL } from '@documenso/lib/constants/app';
+import { NEXT_PUBLIC_WEBAPP_URL } from '@documenso/lib/constants/app';
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import { prisma } from '@documenso/prisma';
 
@@ -32,7 +32,7 @@ export const createTeamPendingCheckoutSession = async ({
     const stripeCheckoutSession = await getCheckoutSession({
       customerId: teamPendingCreation.customerId,
       priceId,
-      returnUrl: `${WEBAPP_BASE_URL}/settings/teams`,
+      returnUrl: `${NEXT_PUBLIC_WEBAPP_URL()}/settings/teams`,
       subscriptionMetadata: {
         pendingTeamId: pendingTeamId.toString(),
       },

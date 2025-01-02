@@ -113,7 +113,7 @@ test('[TEAMS]: check team documents count with internal team email', async ({ pa
     await apiSignin({
       page,
       email: user.email,
-      redirectPath: `/t/${team.url}/documents`,
+      redirectPath: `/t/${team.url}/documents?perPage=20`,
     });
 
     // Check document counts.
@@ -422,10 +422,13 @@ test('[TEAMS]: check document visibility based on team member role', async ({ pa
     },
   ]);
 
+  const teamUrlRedirect = `/t/${team.url}/documents?status=COMPLETED`;
+
   // Test cases for each role
   const testCases = [
     {
       user: adminUser,
+      path: teamUrlRedirect,
       expectedDocuments: [
         'Document Visible to Everyone',
         'Document Visible to Manager and Above',
@@ -435,14 +438,17 @@ test('[TEAMS]: check document visibility based on team member role', async ({ pa
     },
     {
       user: managerUser,
+      path: teamUrlRedirect,
       expectedDocuments: ['Document Visible to Everyone', 'Document Visible to Manager and Above'],
     },
     {
       user: memberUser,
+      path: teamUrlRedirect,
       expectedDocuments: ['Document Visible to Everyone'],
     },
     {
       user: outsideUser,
+      path: '/documents',
       expectedDocuments: ['Document Visible to Admin with Recipient'],
     },
   ];
@@ -451,7 +457,7 @@ test('[TEAMS]: check document visibility based on team member role', async ({ pa
     await apiSignin({
       page,
       email: testCase.user.email,
-      redirectPath: `/t/${team.url}/documents?status=COMPLETED`,
+      redirectPath: testCase.path,
     });
 
     // Check that the user sees the expected documents

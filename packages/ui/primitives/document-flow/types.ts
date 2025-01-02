@@ -1,9 +1,9 @@
 import type { MessageDescriptor } from '@lingui/core';
-import { msg } from '@lingui/macro';
+import { msg } from '@lingui/core/macro';
+import { FieldType } from '@prisma/client';
 import { z } from 'zod';
 
 import { ZFieldMetaSchema } from '@documenso/lib/types/field-meta';
-import { FieldType } from '@documenso/prisma/client';
 
 export const ZDocumentFlowFormSchema = z.object({
   title: z.string().min(1),

@@ -1,14 +1,14 @@
 import { createElement } from 'react';
 
-import { msg } from '@lingui/macro';
+import { msg } from '@lingui/core/macro';
+import { SendStatus, SigningStatus } from '@prisma/client';
 
 import { mailer } from '@documenso/email/mailer';
 import DocumentRejectedEmail from '@documenso/email/templates/document-rejected';
 import DocumentRejectionConfirmedEmail from '@documenso/email/templates/document-rejection-confirmed';
 import { prisma } from '@documenso/prisma';
-import { SendStatus, SigningStatus } from '@documenso/prisma/client';
 
-import { getI18nInstance } from '../../../client-only/providers/i18n.server';
+import { getI18nInstance } from '../../../client-only/providers/i18n-server';
 import { NEXT_PUBLIC_WEBAPP_URL } from '../../../constants/app';
 import { FROM_ADDRESS, FROM_NAME } from '../../../constants/email';
 import { extractDerivedDocumentEmailSettings } from '../../../types/document-email';

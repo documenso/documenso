@@ -1,5 +1,6 @@
-import { Trans, msg } from '@lingui/macro';
+import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
+import { Trans } from '@lingui/react/macro';
 
 import { validateFields as validateDateFields } from '@documenso/lib/advanced-fields-validation/validate-fields';
 import { type TDateFieldMeta as DateFieldMeta } from '@documenso/lib/types/field-meta';

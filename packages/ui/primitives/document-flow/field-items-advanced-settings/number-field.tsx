@@ -1,9 +1,8 @@
-'use client';
-
 import { useState } from 'react';
 
-import { Trans, msg } from '@lingui/macro';
+import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
+import { Trans } from '@lingui/react/macro';
 import { ChevronDown, ChevronUp } from 'lucide-react';
 
 import { validateNumberField } from '@documenso/lib/advanced-fields-validation/validate-number';
@@ -38,12 +37,12 @@ export const NumberFieldAdvancedSettings = ({
   const [showValidation, setShowValidation] = useState(false);
 
   const handleInput = (field: keyof NumberFieldMeta, value: string | boolean) => {
-    const userValue = field === 'value' ? value : fieldState.value ?? 0;
+    const userValue = field === 'value' ? value : (fieldState.value ?? 0);
     const userMinValue = field === 'minValue' ? Number(value) : Number(fieldState.minValue ?? 0);
     const userMaxValue = field === 'maxValue' ? Number(value) : Number(fieldState.maxValue ?? 0);
     const readOnly = field === 'readOnly' ? Boolean(value) : Boolean(fieldState.readOnly);
     const required = field === 'required' ? Boolean(value) : Boolean(fieldState.required);
-    const numberFormat = field === 'numberFormat' ? String(value) : fieldState.numberFormat ?? '';
+    const numberFormat = field === 'numberFormat' ? String(value) : (fieldState.numberFormat ?? '');
     const fontSize = field === 'fontSize' ? Number(value) : Number(fieldState.fontSize ?? 14);
 
     const valueErrors = validateNumberField(String(userValue), {

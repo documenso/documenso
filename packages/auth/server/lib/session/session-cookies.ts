@@ -1,0 +1,113 @@
+import type { Context } from 'hono';
+import { deleteCookie, getSignedCookie, setSignedCookie } from 'hono/cookie';
+
+import { NEXT_PUBLIC_WEBAPP_URL } from '@documenso/lib/constants/app';
+import { useSecureCookies } from '@documenso/lib/constants/auth';
+import { appLog } from '@documenso/lib/utils/debugger';
+import { env } from '@documenso/lib/utils/env';
+
+import { generateSessionToken } from './session';
+
+export const sessionCookieName = 'sessionId';
+
+const getAuthSecret = () => {
+  const authSecret = env('NEXTAUTH_SECRET');
+
+  if (!authSecret) {
+    throw new Error('NEXTAUTH_SECRET is not set');
+  }
+
+  return authSecret;
+};
+
+const getAuthDomain = () => {
+  const url = new URL(NEXT_PUBLIC_WEBAPP_URL());
+
+  return url.hostname;
+};
+
+/**
+ * Generic auth session cookie options.
+ */
+export const sessionCookieOptions = {
+  httpOnly: true,
+  path: '/',
+  sameSite: useSecureCookies ? 'none' : 'lax', // Todo: This feels wrong?
+  secure: useSecureCookies,
+  domain: getAuthDomain(),
+  // Todo: Max age for specific auth cookies.
+} as const;
+
+export const extractSessionCookieFromHeaders = (headers: Headers): string | null => {
+  const cookieHeader = headers.get('cookie') || '';
+  const cookiePairs = cookieHeader.split(';');
+  const sessionCookie = cookiePairs.find((pair) => pair.trim().startsWith(sessionCookieName));
+
+  if (!sessionCookie) {
+    return null;
+  }
+
+  return sessionCookie.split('=')[1].trim();
+};
+
+/**
+ * Get the session cookie attached to the request headers.
+ *
+ * @param c - The Hono context.
+ * @returns The session ID or null if no session cookie is found.
+ */
+export const getSessionCookie = async (c: Context): Promise<string | null> => {
+  const sessionId = await getSignedCookie(c, getAuthSecret(), sessionCookieName);
+
+  return sessionId || null;
+};
+
+/**
+ * Set the session cookie into the Hono context.
+ *
+ * @param c - The Hono context.
+ * @param sessionToken - The session token to set.
+ */
+export const setSessionCookie = async (c: Context, sessionToken: string) => {
+  await setSignedCookie(
+    c,
+    sessionCookieName,
+    sessionToken,
+    getAuthSecret(),
+    sessionCookieOptions,
+  ).catch((err) => {
+    appLog('SetSessionCookie', `Error setting signed cookie: ${err}`);
+
+    throw err;
+  });
+};
+
+/**
+ * Set the session cookie into the Hono context.
+ *
+ * @param c - The Hono context.
+ * @param sessionToken - The session token to set.
+ */
+export const deleteSessionCookie = (c: Context) => {
+  deleteCookie(c, sessionCookieName, sessionCookieOptions);
+};
+
+export const getCsrfCookie = async (c: Context) => {
+  const csrfToken = await getSignedCookie(c, getAuthSecret(), 'csrfToken');
+
+  return csrfToken || null;
+};
+
+export const setCsrfCookie = async (c: Context) => {
+  const csrfToken = generateSessionToken();
+
+  await setSignedCookie(c, 'csrfToken', csrfToken, getAuthSecret(), {
+    ...sessionCookieOptions,
+
+    // Explicity set to undefined for session lived cookie.
+    expires: undefined,
+    maxAge: undefined,
+  });
+
+  return csrfToken;
+};

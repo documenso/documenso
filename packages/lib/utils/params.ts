@@ -19,7 +19,7 @@ type GetRootHrefOptions = {
 };
 
 export const getRootHref = (
-  params: Record<string, string | string[]> | null,
+  params: Record<string, string | string[] | undefined> | null,
   options: GetRootHrefOptions = {},
 ) => {
   if (typeof params?.teamUrl === 'string') {

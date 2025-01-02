@@ -1,4 +1,4 @@
-import { Plural, Trans } from '@lingui/macro';
+import { Plural, Trans } from '@lingui/react/macro';
 import type { Table } from '@tanstack/react-table';
 import { ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight } from 'lucide-react';
 import { match } from 'ts-pattern';

@@ -1,4 +1,4 @@
-import { Trans } from '@lingui/macro';
+import { Trans } from '@lingui/react/macro';
 
 import { Link, Section, Text } from '../components';
 import { useBranding } from '../providers/branding';

@@ -1,17 +1,17 @@
 import { createElement } from 'react';
 
-import { msg } from '@lingui/macro';
+import { msg } from '@lingui/core/macro';
+import type { Team, TeamGlobalSettings } from '@prisma/client';
 
 import { mailer } from '@documenso/email/mailer';
 import { TeamDeleteEmailTemplate } from '@documenso/email/templates/team-delete';
-import { WEBAPP_BASE_URL } from '@documenso/lib/constants/app';
+import { NEXT_PUBLIC_WEBAPP_URL } from '@documenso/lib/constants/app';
 import { FROM_ADDRESS, FROM_NAME } from '@documenso/lib/constants/email';
 import { AppError } from '@documenso/lib/errors/app-error';
 import { stripe } from '@documenso/lib/server-only/stripe';
 import { prisma } from '@documenso/prisma';
-import type { Team, TeamGlobalSettings } from '@documenso/prisma/client';
 
-import { getI18nInstance } from '../../client-only/providers/i18n.server';
+import { getI18nInstance } from '../../client-only/providers/i18n-server';
 import { jobs } from '../../jobs/client';
 import { renderEmailWithI18N } from '../../utils/render-email-with-i18n';
 import { teamGlobalSettingsToBranding } from '../../utils/team-global-settings-to-branding';
@@ -96,8 +96,8 @@ type SendTeamDeleteEmailOptions = {
 
 export const sendTeamDeleteEmail = async ({ email, isOwner, team }: SendTeamDeleteEmailOptions) => {
   const template = createElement(TeamDeleteEmailTemplate, {
-    assetBaseUrl: WEBAPP_BASE_URL,
-    baseUrl: WEBAPP_BASE_URL,
+    assetBaseUrl: NEXT_PUBLIC_WEBAPP_URL(),
+    baseUrl: NEXT_PUBLIC_WEBAPP_URL(),
     teamUrl: team.url,
     isOwner,
   });

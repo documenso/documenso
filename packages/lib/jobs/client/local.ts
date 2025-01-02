@@ -1,10 +1,8 @@
-import type { NextApiRequest, NextApiResponse } from 'next';
-
 import { sha256 } from '@noble/hashes/sha256';
-import { json } from 'micro';
+import { BackgroundJobStatus, Prisma } from '@prisma/client';
+import type { Context as HonoContext } from 'hono';
 
 import { prisma } from '@documenso/prisma';
-import { BackgroundJobStatus, Prisma } from '@documenso/prisma/client';
 
 import { NEXT_PRIVATE_INTERNAL_WEBAPP_URL } from '../../constants/app';
 import { sign } from '../../server-only/crypto/sign';
@@ -70,26 +68,27 @@ export class LocalJobProvider extends BaseJobProvider {
     );
   }
 
-  public getApiHandler() {
-    return async (req: NextApiRequest, res: NextApiResponse) => {
+  public getApiHandler(): (c: HonoContext) => Promise<Response | void> {
+    return async (c: HonoContext) => {
+      const req = c.req;
+
       if (req.method !== 'POST') {
-        res.status(405).send('Method not allowed');
+        return c.text('Method not allowed', 405);
       }
 
-      const jobId = req.headers['x-job-id'];
-      const signature = req.headers['x-job-signature'];
-      const isRetry = req.headers['x-job-retry'] !== undefined;
+      const jobId = req.header('x-job-id');
+      const signature = req.header('x-job-signature');
+      const isRetry = req.header('x-job-retry') !== undefined;
 
-      // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
-      const options = await json(req)
+      const options = await req
+        .json()
         .then(async (data) => ZSimpleTriggerJobOptionsSchema.parseAsync(data))
         // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
         .then((data) => data as SimpleTriggerJobOptions)
         .catch(() => null);
 
       if (!options) {
-        res.status(400).send('Bad request');
-        return;
+        return c.text('Bad request', 400);
       }
 
       const definition = this._jobDefinitions[options.name];
@@ -99,33 +98,28 @@ export class LocalJobProvider extends BaseJobProvider {
         typeof signature !== 'string' ||
         typeof options !== 'object'
       ) {
-        res.status(400).send('Bad request');
-        return;
+        return c.text('Bad request', 400);
       }
 
       if (!definition) {
-        res.status(404).send('Job not found');
-        return;
+        return c.text('Job not found', 404);
       }
 
       if (definition && !definition.enabled) {
         console.log('Attempted to trigger a disabled job', options.name);
 
-        res.status(404).send('Job not found');
-        return;
+        return c.text('Job not found', 404);
       }
 
       if (!signature || !verify(options, signature)) {
-        res.status(401).send('Unauthorized');
-        return;
+        return c.text('Unauthorized', 401);
       }
 
       if (definition.trigger.schema) {
         const result = definition.trigger.schema.safeParse(options.payload);
 
         if (!result.success) {
-          res.status(400).send('Bad request');
-          return;
+          return c.text('Bad request', 400);
         }
       }
 
@@ -148,8 +142,7 @@ export class LocalJobProvider extends BaseJobProvider {
         .catch(() => null);
 
       if (!backgroundJob) {
-        res.status(404).send('Job not found');
-        return;
+        return c.text('Job not found', 404);
       }
 
       try {
@@ -188,8 +181,7 @@ export class LocalJobProvider extends BaseJobProvider {
             },
           });
 
-          res.status(500).send('Task exceeded retries');
-          return;
+          return c.text('Task exceeded retries', 500);
         }
 
         backgroundJob = await prisma.backgroundJob.update({
@@ -209,7 +201,7 @@ export class LocalJobProvider extends BaseJobProvider {
         });
       }
 
-      res.status(200).send('OK');
+      return c.text('OK', 200);
     };
   }
 

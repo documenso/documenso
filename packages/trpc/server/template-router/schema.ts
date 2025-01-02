@@ -1,3 +1,4 @@
+import { DocumentSigningOrder, DocumentVisibility, TemplateType } from '@prisma/client';
 import { z } from 'zod';
 
 import { ZDocumentSchema } from '@documenso/lib/types/document';
@@ -12,8 +13,7 @@ import {
   ZTemplateManySchema,
   ZTemplateSchema,
 } from '@documenso/lib/types/template';
-import { DocumentSigningOrder, DocumentVisibility, TemplateType } from '@documenso/prisma/client';
-import { TemplateDirectLinkSchema } from '@documenso/prisma/generated/zod';
+import { TemplateDirectLinkSchema } from '@documenso/prisma/generated/zod/modelSchema/TemplateDirectLinkSchema';
 
 import {
   ZDocumentMetaDateFormatSchema,

@@ -1,6 +1,5 @@
+import { FieldType } from '@prisma/client';
 import { z } from 'zod';
-
-import { FieldType } from '@documenso/prisma/client';
 
 export const ZBaseFieldMeta = z.object({
   label: z.string().optional(),

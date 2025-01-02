@@ -1,9 +1,9 @@
+import type { Team } from '@prisma/client';
+import { Prisma } from '@prisma/client';
 import type { z } from 'zod';
 
 import { prisma } from '@documenso/prisma';
-import type { Team } from '@documenso/prisma/client';
-import { Prisma } from '@documenso/prisma/client';
-import { TeamPendingSchema } from '@documenso/prisma/generated/zod';
+import { TeamPendingSchema } from '@documenso/prisma/generated/zod/modelSchema/TeamPendingSchema';
 
 import { type FindResultResponse, ZFindResultResponse } from '../../types/search-params';
 

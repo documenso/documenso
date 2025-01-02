@@ -10,6 +10,7 @@ import { seedTeam } from '@documenso/prisma/seed/teams';
 import { seedUser } from '@documenso/prisma/seed/users';
 
 import { apiSignin } from '../fixtures/authentication';
+import { signSignaturePad } from '../fixtures/signature';
 
 test.describe('Signing Certificate Tests', () => {
   test('individual document should always include signing certificate', async ({ page }) => {
@@ -36,14 +37,7 @@ test.describe('Signing Certificate Tests', () => {
     // Sign the document
     await page.goto(`/sign/${recipient.token}`);
 
-    const canvas = page.locator('canvas');
-    const box = await canvas.boundingBox();
-    if (box) {
-      await page.mouse.move(box.x + 40, box.y + 40);
-      await page.mouse.down();
-      await page.mouse.move(box.x + box.width - 2, box.y + box.height - 2);
-      await page.mouse.up();
-    }
+    await signSignaturePad(page);
 
     for (const field of recipient.fields) {
       await page.locator(`#field-${field.id}`).getByRole('button').click();
@@ -113,14 +107,7 @@ test.describe('Signing Certificate Tests', () => {
     // Sign the document
     await page.goto(`/sign/${recipient.token}`);
 
-    const canvas = page.locator('canvas');
-    const box = await canvas.boundingBox();
-    if (box) {
-      await page.mouse.move(box.x + 40, box.y + 40);
-      await page.mouse.down();
-      await page.mouse.move(box.x + box.width - 2, box.y + box.height - 2);
-      await page.mouse.up();
-    }
+    await signSignaturePad(page);
 
     for (const field of recipient.fields) {
       await page.locator(`#field-${field.id}`).getByRole('button').click();
@@ -190,14 +177,7 @@ test.describe('Signing Certificate Tests', () => {
     // Sign the document
     await page.goto(`/sign/${recipient.token}`);
 
-    const canvas = page.locator('canvas');
-    const box = await canvas.boundingBox();
-    if (box) {
-      await page.mouse.move(box.x + 40, box.y + 40);
-      await page.mouse.down();
-      await page.mouse.move(box.x + box.width - 2, box.y + box.height - 2);
-      await page.mouse.up();
-    }
+    await signSignaturePad(page);
 
     for (const field of recipient.fields) {
       await page.locator(`#field-${field.id}`).getByRole('button').click();

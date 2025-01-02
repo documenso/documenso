@@ -1,3 +1,4 @@
+import type { Field } from '@prisma/client';
 import { TooltipArrow } from '@radix-ui/react-tooltip';
 import type { VariantProps } from 'class-variance-authority';
 import { cva } from 'class-variance-authority';
@@ -12,7 +13,6 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from '../..//primitives/tooltip';
-import type { Field } from '.prisma/client';
 
 const tooltipVariants = cva('font-semibold', {
   variants: {

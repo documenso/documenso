@@ -1,5 +1,6 @@
+import { DocumentSource, type Prisma } from '@prisma/client';
+
 import { prisma } from '@documenso/prisma';
-import { DocumentSource, type Prisma } from '@documenso/prisma/client';
 
 import { AppError, AppErrorCode } from '../../errors/app-error';
 import { getDocumentWhereInput } from './get-document-by-id';

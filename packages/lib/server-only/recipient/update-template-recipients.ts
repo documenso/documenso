@@ -1,3 +1,6 @@
+import { RecipientRole } from '@prisma/client';
+import { SendStatus, SigningStatus } from '@prisma/client';
+
 import { isUserEnterprise } from '@documenso/ee/server-only/util/is-document-enterprise';
 import type { TRecipientAccessAuthTypes } from '@documenso/lib/types/document-auth';
 import {
@@ -6,8 +9,6 @@ import {
 } from '@documenso/lib/types/document-auth';
 import { createRecipientAuthOptions } from '@documenso/lib/utils/document-auth';
 import { prisma } from '@documenso/prisma';
-import { RecipientRole } from '@documenso/prisma/client';
-import { SendStatus, SigningStatus } from '@documenso/prisma/client';
 
 import { AppError, AppErrorCode } from '../../errors/app-error';
 

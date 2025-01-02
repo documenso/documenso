@@ -1,9 +1,9 @@
-import type { Recipient } from '@documenso/prisma/client';
+import type { Recipient } from '@prisma/client';
 
-import { WEBAPP_BASE_URL } from '../constants/app';
+import { NEXT_PUBLIC_WEBAPP_URL } from '../constants/app';
 
 export const formatDirectTemplatePath = (token: string) => {
-  return `${WEBAPP_BASE_URL}/d/${token}`;
+  return `${NEXT_PUBLIC_WEBAPP_URL()}/d/${token}`;
 };
 
 /**

@@ -1,6 +1,4 @@
-import { nanoid } from '@documenso/lib/universal/id';
-import { prisma } from '@documenso/prisma';
-import type { DocumentDistributionMethod } from '@documenso/prisma/client';
+import type { DocumentDistributionMethod } from '@prisma/client';
 import {
   DocumentSigningOrder,
   DocumentSource,
@@ -10,7 +8,10 @@ import {
   SendStatus,
   SigningStatus,
   WebhookTriggerEvents,
-} from '@documenso/prisma/client';
+} from '@prisma/client';
+
+import { nanoid } from '@documenso/lib/universal/id';
+import { prisma } from '@documenso/prisma';
 
 import type { SupportedLanguageCodes } from '../../constants/i18n';
 import { AppError, AppErrorCode } from '../../errors/app-error';

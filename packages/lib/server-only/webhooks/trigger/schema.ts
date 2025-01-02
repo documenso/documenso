@@ -1,6 +1,5 @@
+import { WebhookTriggerEvents } from '@prisma/client';
 import { z } from 'zod';
-
-import { WebhookTriggerEvents } from '@documenso/prisma/client';
 
 export const ZTriggerWebhookBodySchema = z.object({
   event: z.nativeEnum(WebhookTriggerEvents),

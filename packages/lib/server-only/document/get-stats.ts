@@ -1,12 +1,12 @@
+import { TeamMemberRole } from '@prisma/client';
+import type { Prisma, User } from '@prisma/client';
+import { SigningStatus } from '@prisma/client';
+import { DocumentVisibility } from '@prisma/client';
 import { DateTime } from 'luxon';
 import { match } from 'ts-pattern';
 
 import type { PeriodSelectorValue } from '@documenso/lib/server-only/document/find-documents';
 import { prisma } from '@documenso/prisma';
-import { TeamMemberRole } from '@documenso/prisma/client';
-import type { Prisma, User } from '@documenso/prisma/client';
-import { SigningStatus } from '@documenso/prisma/client';
-import { DocumentVisibility } from '@documenso/prisma/client';
 import { isExtendedDocumentStatus } from '@documenso/prisma/guards/is-extended-document-status';
 import { ExtendedDocumentStatus } from '@documenso/prisma/types/extended-document-status';
 
@@ -17,7 +17,7 @@ export type GetStatsInput = {
   search?: string;
 };
 
-export const getStats = async ({ user, period, search, ...options }: GetStatsInput) => {
+export const getStats = async ({ user, period, search = '', ...options }: GetStatsInput) => {
   let createdAt: Prisma.DocumentWhereInput['createdAt'];
 
   if (period) {

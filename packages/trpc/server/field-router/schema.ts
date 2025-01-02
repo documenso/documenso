@@ -1,3 +1,4 @@
+import { FieldType } from '@prisma/client';
 import { z } from 'zod';
 
 import { ZRecipientActionAuthSchema } from '@documenso/lib/types/document-auth';
@@ -10,7 +11,6 @@ import {
   ZFieldWidthSchema,
 } from '@documenso/lib/types/field';
 import { ZFieldAndMetaSchema, ZFieldMetaSchema } from '@documenso/lib/types/field-meta';
-import { FieldType } from '@documenso/prisma/client';
 
 const ZCreateFieldSchema = ZFieldAndMetaSchema.and(
   z.object({

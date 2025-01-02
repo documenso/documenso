@@ -1,4 +1,6 @@
-'use server';
+import { DocumentSource, WebhookTriggerEvents } from '@prisma/client';
+import type { Team, TeamGlobalSettings } from '@prisma/client';
+import { TeamMemberRole } from '@prisma/client';
 
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import { normalizePdf as makeNormalizedPdf } from '@documenso/lib/server-only/pdf/normalize-pdf';
@@ -6,16 +8,13 @@ import { DOCUMENT_AUDIT_LOG_TYPE } from '@documenso/lib/types/document-audit-log
 import type { ApiRequestMetadata } from '@documenso/lib/universal/extract-request-metadata';
 import { createDocumentAuditLogData } from '@documenso/lib/utils/document-audit-logs';
 import { prisma } from '@documenso/prisma';
-import { DocumentSource, WebhookTriggerEvents } from '@documenso/prisma/client';
-import type { Team, TeamGlobalSettings } from '@documenso/prisma/client';
-import { TeamMemberRole } from '@documenso/prisma/client';
 
 import {
   ZWebhookDocumentSchema,
   mapDocumentToWebhookDocumentPayload,
 } from '../../types/webhook-payload';
-import { getFile } from '../../universal/upload/get-file';
-import { putPdfFile } from '../../universal/upload/put-file';
+import { getFileServerSide } from '../../universal/upload/get-file.server';
+import { putPdfFileServerSide } from '../../universal/upload/put-file.server';
 import { determineDocumentVisibility } from '../../utils/document-visibility';
 import { triggerWebhook } from '../webhooks/trigger/trigger-webhook';
 
@@ -97,11 +96,11 @@ export const createDocument = async ({
     });
 
     if (documentData) {
-      const buffer = await getFile(documentData);
+      const buffer = await getFileServerSide(documentData);
 
       const normalizedPdf = await makeNormalizedPdf(Buffer.from(buffer));
 
-      const newDocumentData = await putPdfFile({
+      const newDocumentData = await putPdfFileServerSide({
         name: title.endsWith('.pdf') ? title : `${title}.pdf`,
         type: 'application/pdf',
         arrayBuffer: async () => Promise.resolve(normalizedPdf),
