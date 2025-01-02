@@ -5,6 +5,7 @@
     "build": "turbo run build",
     "build:web": "turbo run build --filter=@documenso/web",
     "dev": "turbo run dev --filter=@documenso/web",
+    "dev:remix": "turbo run dev --filter=@documenso/remix",
     "dev:web": "turbo run dev --filter=@documenso/web",
     "dev:docs": "turbo run dev --filter=@documenso/documentation",
     "dev:openpage-api": "turbo run dev --filter=@documenso/openpage-api",
@@ -71,6 +72,7 @@
     "mupdf": "^1.0.0",
     "next-runtime-env": "^3.2.0",
     "react": "^18",
+    "typescript": "5.7.2",
     "zod": "3.24.1"
   },
   "overrides": {
