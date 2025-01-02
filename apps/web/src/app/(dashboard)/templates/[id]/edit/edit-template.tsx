@@ -296,6 +296,7 @@ export const EditTemplateForm = ({
             <AddTemplateSettingsFormPartial
               key={recipients.length}
               template={template}
+              currentTeamMemberRole={team?.currentTeamMember?.role}
               documentFlow={documentFlow.settings}
               recipients={recipients}
               fields={fields}

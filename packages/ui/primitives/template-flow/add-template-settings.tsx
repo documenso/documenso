@@ -7,6 +7,7 @@ import { Trans } from '@lingui/macro';
 import { useLingui } from '@lingui/react';
 import { InfoIcon } from 'lucide-react';
 import { useForm } from 'react-hook-form';
+import { match } from 'ts-pattern';
 
 import { DATE_FORMATS, DEFAULT_DOCUMENT_DATE_FORMAT } from '@documenso/lib/constants/date-formats';
 import { DOCUMENT_DISTRIBUTION_METHODS } from '@documenso/lib/constants/document';
@@ -14,6 +15,7 @@ import { SUPPORTED_LANGUAGES } from '@documenso/lib/constants/i18n';
 import { DEFAULT_DOCUMENT_TIME_ZONE, TIME_ZONES } from '@documenso/lib/constants/time-zones';
 import { ZDocumentEmailSettingsSchema } from '@documenso/lib/types/document-email';
 import { extractDocumentAuthMethods } from '@documenso/lib/utils/document-auth';
+import { DocumentVisibility, TeamMemberRole } from '@documenso/prisma/client';
 import { DocumentDistributionMethod, type Field, type Recipient } from '@documenso/prisma/client';
 import type { TemplateWithData } from '@documenso/prisma/types/template';
 import {
@@ -25,6 +27,10 @@ import {
   DocumentGlobalAuthActionTooltip,
 } from '@documenso/ui/components/document/document-global-auth-action-select';
 import { DocumentSendEmailMessageHelper } from '@documenso/ui/components/document/document-send-email-message-helper';
+import {
+  DocumentVisibilitySelect,
+  DocumentVisibilityTooltip,
+} from '@documenso/ui/components/document/document-visibility-select';
 import {
   Accordion,
   AccordionContent,
@@ -66,6 +72,7 @@ export type AddTemplateSettingsFormProps = {
   isEnterprise: boolean;
   isDocumentPdfLoaded: boolean;
   template: TemplateWithData;
+  currentTeamMemberRole?: TeamMemberRole;
   onSubmit: (_data: TAddTemplateSettingsFormSchema) => void;
 };
 
@@ -76,6 +83,7 @@ export const AddTemplateSettingsFormPartial = ({
   isEnterprise,
   isDocumentPdfLoaded,
   template,
+  currentTeamMemberRole,
   onSubmit,
 }: AddTemplateSettingsFormProps) => {
   const { _ } = useLingui();
@@ -89,6 +97,7 @@ export const AddTemplateSettingsFormPartial = ({
     defaultValues: {
       title: template.title,
       externalId: template.externalId || undefined,
+      visibility: template.visibility || '',
       globalAccessAuth: documentAuthOption?.globalAccessAuth || undefined,
       globalActionAuth: documentAuthOption?.globalActionAuth || undefined,
       meta: {
@@ -109,6 +118,16 @@ export const AddTemplateSettingsFormPartial = ({
 
   const distributionMethod = form.watch('meta.distributionMethod');
   const emailSettings = form.watch('meta.emailSettings');
+
+  const canUpdateVisibility = match(currentTeamMemberRole)
+    .with(TeamMemberRole.ADMIN, () => true)
+    .with(
+      TeamMemberRole.MANAGER,
+      () =>
+        template.visibility === DocumentVisibility.EVERYONE ||
+        template.visibility === DocumentVisibility.MANAGER_AND_ABOVE,
+    )
+    .otherwise(() => false);
 
   // We almost always want to set the timezone to the user's local timezone to avoid confusion
   // when the document is signed.
@@ -209,6 +228,30 @@ export const AddTemplateSettingsFormPartial = ({
                 </FormItem>
               )}
             />
+
+            {currentTeamMemberRole && (
+              <FormField
+                control={form.control}
+                name="visibility"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="flex flex-row items-center">
+                      Document visibility
+                      <DocumentVisibilityTooltip />
+                    </FormLabel>
+
+                    <FormControl>
+                      <DocumentVisibilitySelect
+                        canUpdateVisibility={canUpdateVisibility}
+                        currentTeamMemberRole={currentTeamMemberRole}
+                        {...field}
+                        onValueChange={field.onChange}
+                      />
+                    </FormControl>
+                  </FormItem>
+                )}
+              />
+            )}
 
             <FormField
               control={form.control}

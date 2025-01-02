@@ -9,6 +9,7 @@ import {
 } from '@documenso/lib/types/document-auth';
 import { ZDocumentEmailSettingsSchema } from '@documenso/lib/types/document-email';
 import { isValidRedirectUrl } from '@documenso/lib/utils/is-valid-redirect-url';
+import { DocumentVisibility } from '@documenso/prisma/client';
 
 import { ZMapNegativeOneToUndefinedSchema } from '../document-flow/add-settings.types';
 import { DocumentDistributionMethod } from '.prisma/client';
@@ -16,6 +17,7 @@ import { DocumentDistributionMethod } from '.prisma/client';
 export const ZAddTemplateSettingsFormSchema = z.object({
   title: z.string().trim().min(1, { message: "Title can't be empty" }),
   externalId: z.string().optional(),
+  visibility: z.nativeEnum(DocumentVisibility).optional(),
   globalAccessAuth: ZMapNegativeOneToUndefinedSchema.pipe(
     ZDocumentAccessAuthTypesSchema.optional(),
   ),

@@ -654,19 +654,20 @@ model TemplateMeta {
 }
 
 model Template {
-  id                     Int           @id @default(autoincrement())
+  id                     Int                @id @default(autoincrement())
   externalId             String?
-  type                   TemplateType  @default(PRIVATE)
+  type                   TemplateType       @default(PRIVATE)
   title                  String
   userId                 Int
   teamId                 Int?
+  visibility             DocumentVisibility @default(EVERYONE)
   authOptions            Json?
   templateMeta           TemplateMeta?
   templateDocumentDataId String
-  createdAt              DateTime      @default(now())
-  updatedAt              DateTime      @default(now()) @updatedAt
-  publicTitle            String        @default("")
-  publicDescription      String        @default("")
+  createdAt              DateTime           @default(now())
+  updatedAt              DateTime           @default(now()) @updatedAt
+  publicTitle            String             @default("")
+  publicDescription      String             @default("")
 
   team                 Team?               @relation(fields: [teamId], references: [id], onDelete: Cascade)
   templateDocumentData DocumentData        @relation(fields: [templateDocumentDataId], references: [id], onDelete: Cascade)
