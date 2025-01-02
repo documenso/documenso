@@ -1,9 +1,9 @@
 import { hash } from '@node-rs/bcrypt';
+import { TeamMemberInviteStatus } from '@prisma/client';
 
 import { getStripeCustomerByUser } from '@documenso/ee/server-only/stripe/get-customer';
 import { updateSubscriptionItemQuantity } from '@documenso/ee/server-only/stripe/update-subscription-item-quantity';
 import { prisma } from '@documenso/prisma';
-import { IdentityProvider, TeamMemberInviteStatus } from '@documenso/prisma/client';
 
 import { IS_BILLING_ENABLED } from '../../constants/app';
 import { SALT_ROUNDS } from '../../constants/auth';
@@ -39,22 +39,35 @@ export const createUser = async ({ name, email, password, signature, url }: Crea
     });
 
     if (urlExists) {
-      throw new AppError(AppErrorCode.PROFILE_URL_TAKEN, {
+      throw new AppError('PROFILE_URL_TAKEN', {
         message: 'Profile username is taken',
         userMessage: 'The profile username is already taken',
       });
     }
   }
 
-  const user = await prisma.user.create({
-    data: {
-      name,
-      email: email.toLowerCase(),
-      password: hashedPassword,
-      signature,
-      identityProvider: IdentityProvider.DOCUMENSO,
-      url,
-    },
+  const user = await prisma.$transaction(async (tx) => {
+    const user = await tx.user.create({
+      data: {
+        name,
+        email: email.toLowerCase(),
+        password: hashedPassword, // Todo: Drop password.
+        signature,
+        url,
+      },
+    });
+
+    await tx.account.create({
+      data: {
+        userId: user.id,
+        type: 'emailPassword', // Todo
+        provider: 'DOCUMENSO', // Todo: Enums
+        providerAccountId: user.id.toString(),
+        password: hashedPassword,
+      },
+    });
+
+    return user;
   });
 
   const acceptedTeamInvites = await prisma.teamMemberInvite.findMany({

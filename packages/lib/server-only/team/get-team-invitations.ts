@@ -1,7 +1,8 @@
 import type { z } from 'zod';
 
 import { prisma } from '@documenso/prisma';
-import { TeamMemberInviteSchema, TeamSchema } from '@documenso/prisma/generated/zod';
+import { TeamMemberInviteSchema } from '@documenso/prisma/generated/zod/modelSchema/TeamMemberInviteSchema';
+import { TeamSchema } from '@documenso/prisma/generated/zod/modelSchema/TeamSchema';
 
 export type GetTeamInvitationsOptions = {
   email: string;

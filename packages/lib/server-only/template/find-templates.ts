@@ -1,12 +1,7 @@
+import { DocumentVisibility, type Prisma, TeamMemberRole, type Template } from '@prisma/client';
 import { match } from 'ts-pattern';
 
 import { prisma } from '@documenso/prisma';
-import {
-  DocumentVisibility,
-  type Prisma,
-  TeamMemberRole,
-  type Template,
-} from '@documenso/prisma/client';
 
 import { AppError, AppErrorCode } from '../../errors/app-error';
 import { type FindResultResponse } from '../../types/search-params';

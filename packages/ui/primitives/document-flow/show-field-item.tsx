@@ -1,38 +1,23 @@
-'use client';
-
-import { Caveat } from 'next/font/google';
-
 import { useLingui } from '@lingui/react';
-import type { Prisma } from '@prisma/client';
+import { FieldType, type Prisma } from '@prisma/client';
 import { createPortal } from 'react-dom';
 
 import { useFieldPageCoords } from '@documenso/lib/client-only/hooks/use-field-page-coords';
 import { parseMessageDescriptor } from '@documenso/lib/utils/i18n';
-import { FieldType } from '@documenso/prisma/client';
 
 import { cn } from '../../lib/utils';
 import { Card, CardContent } from '../card';
 import { FRIENDLY_FIELD_TYPE } from './types';
-
-const fontCaveat = Caveat({
-  weight: ['500'],
-  subsets: ['latin'],
-  display: 'swap',
-  variable: '--font-caveat',
-});
 
 export type ShowFieldItemProps = {
   field: Prisma.FieldGetPayload<null>;
   recipients: Prisma.RecipientGetPayload<null>[];
 };
 
-export const ShowFieldItem = ({ field, recipients }: ShowFieldItemProps) => {
+export const ShowFieldItem = ({ field }: ShowFieldItemProps) => {
   const { _ } = useLingui();
 
   const coords = useFieldPageCoords(field);
-
-  const signerEmail =
-    recipients.find((recipient) => recipient.id === field.recipientId)?.email ?? '';
 
   return createPortal(
     <div
@@ -48,7 +33,7 @@ export const ShowFieldItem = ({ field, recipients }: ShowFieldItemProps) => {
         <CardContent
           className={cn(
             'text-muted-foreground/50 flex h-full w-full flex-col items-center justify-center p-0 text-[clamp(0.575rem,1.8cqw,1.2rem)] leading-none',
-            field.type === FieldType.SIGNATURE && fontCaveat.className,
+            field.type === FieldType.SIGNATURE && 'font-signature',
           )}
         >
           {parseMessageDescriptor(_, FRIENDLY_FIELD_TYPE[field.type])}

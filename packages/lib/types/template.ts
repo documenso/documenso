@@ -1,13 +1,11 @@
 import type { z } from 'zod';
 
-import {
-  DocumentDataSchema,
-  TeamSchema,
-  TemplateDirectLinkSchema,
-  TemplateMetaSchema,
-  TemplateSchema,
-  UserSchema,
-} from '@documenso/prisma/generated/zod';
+import { DocumentDataSchema } from '@documenso/prisma/generated/zod/modelSchema/DocumentDataSchema';
+import TeamSchema from '@documenso/prisma/generated/zod/modelSchema/TeamSchema';
+import { TemplateDirectLinkSchema } from '@documenso/prisma/generated/zod/modelSchema/TemplateDirectLinkSchema';
+import { TemplateMetaSchema } from '@documenso/prisma/generated/zod/modelSchema/TemplateMetaSchema';
+import { TemplateSchema } from '@documenso/prisma/generated/zod/modelSchema/TemplateSchema';
+import { UserSchema } from '@documenso/prisma/generated/zod/modelSchema/UserSchema';
 
 import { ZFieldSchema } from './field';
 import { ZRecipientLiteSchema } from './recipient';

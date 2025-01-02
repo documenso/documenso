@@ -1,4 +1,4 @@
-import { DocumentVisibility, TeamMemberRole } from '@documenso/prisma/client';
+import { DocumentVisibility, TeamMemberRole } from '@prisma/client';
 
 export const determineDocumentVisibility = (
   globalVisibility: DocumentVisibility | null | undefined,

@@ -20,15 +20,13 @@ export const RadioField = ({ field }: RadioFieldProps) => {
   }
 
   if (parsedFieldMeta && (!parsedFieldMeta.values || parsedFieldMeta.values.length === 0)) {
-    return (
-      <FieldIcon fieldMeta={field.fieldMeta} type={field.type} signerEmail={field.signerEmail} />
-    );
+    return <FieldIcon fieldMeta={field.fieldMeta} type={field.type} />;
   }
 
   return (
     <div className="flex flex-col gap-y-2">
       {!parsedFieldMeta?.values ? (
-        <FieldIcon fieldMeta={field.fieldMeta} type={field.type} signerEmail={field.signerEmail} />
+        <FieldIcon fieldMeta={field.fieldMeta} type={field.type} />
       ) : (
         <RadioGroup className="gap-y-1">
           {parsedFieldMeta.values?.map((item, index) => (

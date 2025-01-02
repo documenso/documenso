@@ -1,8 +1,8 @@
+import type { Document, Recipient } from '@prisma/client';
 import { verifyAuthenticationResponse } from '@simplewebauthn/server';
 import { match } from 'ts-pattern';
 
 import { prisma } from '@documenso/prisma';
-import type { Document, Recipient } from '@documenso/prisma/client';
 
 import { verifyTwoFactorAuthenticationToken } from '../2fa/verify-2fa-token';
 import { AppError, AppErrorCode } from '../../errors/app-error';

@@ -1,13 +1,12 @@
+import type { User } from '@prisma/client';
 import { base32 } from '@scure/base';
 import { generateHOTP } from 'oslo/otp';
-
-import type { User } from '@documenso/prisma/client';
 
 import { DOCUMENSO_ENCRYPTION_KEY } from '../../constants/crypto';
 import { symmetricDecrypt } from '../../universal/crypto';
 
 type VerifyTwoFactorAuthenticationTokenOptions = {
-  user: User;
+  user: Pick<User, 'id' | 'twoFactorSecret'>;
   totpCode: string;
   // The number of windows to look back
   window?: number;
@@ -22,6 +21,10 @@ export const verifyTwoFactorAuthenticationToken = async ({
   period = 30_000,
 }: VerifyTwoFactorAuthenticationTokenOptions) => {
   const key = DOCUMENSO_ENCRYPTION_KEY;
+
+  if (!key) {
+    throw new Error('Missing DOCUMENSO_ENCRYPTION_KEY');
+  }
 
   if (!user.twoFactorSecret) {
     throw new Error('user missing 2fa secret');

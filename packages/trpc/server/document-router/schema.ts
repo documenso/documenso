@@ -1,3 +1,11 @@
+import {
+  DocumentDistributionMethod,
+  DocumentSigningOrder,
+  DocumentSource,
+  DocumentStatus,
+  DocumentVisibility,
+  FieldType,
+} from '@prisma/client';
 import { z } from 'zod';
 
 import { VALID_DATE_FORMAT_VALUES } from '@documenso/lib/constants/date-formats';
@@ -23,14 +31,7 @@ import {
 import { ZFieldAndMetaSchema } from '@documenso/lib/types/field-meta';
 import { ZFindResultResponse, ZFindSearchParamsSchema } from '@documenso/lib/types/search-params';
 import { isValidRedirectUrl } from '@documenso/lib/utils/is-valid-redirect-url';
-import {
-  DocumentDistributionMethod,
-  DocumentSigningOrder,
-  DocumentSource,
-  DocumentStatus,
-  DocumentVisibility,
-  FieldType,
-} from '@documenso/prisma/client';
+import { ExtendedDocumentStatus } from '@documenso/prisma/types/extended-document-status';
 
 import { ZCreateRecipientSchema } from '../recipient-router/schema';
 
@@ -130,6 +131,25 @@ export const ZFindDocumentsResponseSchema = ZFindResultResponse.extend({
 });
 
 export type TFindDocumentsResponse = z.infer<typeof ZFindDocumentsResponseSchema>;
+
+export const ZFindDocumentsInternalRequestSchema = ZFindDocumentsRequestSchema.extend({
+  period: z.enum(['7d', '14d', '30d']).optional(),
+  senderIds: z.array(z.number()).optional(),
+  status: z.nativeEnum(ExtendedDocumentStatus).optional(),
+});
+
+export const ZFindDocumentsInternalResponseSchema = ZFindResultResponse.extend({
+  data: ZDocumentManySchema.array(),
+  stats: z.object({
+    [ExtendedDocumentStatus.DRAFT]: z.number(),
+    [ExtendedDocumentStatus.PENDING]: z.number(),
+    [ExtendedDocumentStatus.COMPLETED]: z.number(),
+    [ExtendedDocumentStatus.INBOX]: z.number(),
+    [ExtendedDocumentStatus.ALL]: z.number(),
+  }),
+});
+
+export type TFindDocumentsInternalResponse = z.infer<typeof ZFindDocumentsInternalResponseSchema>;
 
 export const ZFindDocumentAuditLogsQuerySchema = ZFindSearchParamsSchema.extend({
   documentId: z.number().min(1),

@@ -1,4 +1,4 @@
-import { type Field, FieldType } from '@documenso/prisma/client';
+import { type Field, FieldType } from '@prisma/client';
 
 import { ZFieldMetaSchema } from '../types/field-meta';
 

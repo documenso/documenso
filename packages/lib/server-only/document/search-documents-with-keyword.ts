@@ -1,10 +1,10 @@
+import { DocumentStatus } from '@prisma/client';
+import type { Document, Recipient, User } from '@prisma/client';
+import { DocumentVisibility, TeamMemberRole } from '@prisma/client';
 import { match } from 'ts-pattern';
 
 import { formatDocumentsPath } from '@documenso/lib/utils/teams';
 import { prisma } from '@documenso/prisma';
-import { DocumentStatus } from '@documenso/prisma/client';
-import type { Document, Recipient, User } from '@documenso/prisma/client';
-import { DocumentVisibility, TeamMemberRole } from '@documenso/prisma/client';
 
 export type SearchDocumentsWithKeywordOptions = {
   query: string;

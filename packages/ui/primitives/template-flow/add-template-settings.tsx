@@ -1,10 +1,10 @@
-'use client';
-
 import { useEffect } from 'react';
 
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Trans } from '@lingui/macro';
 import { useLingui } from '@lingui/react';
+import { Trans } from '@lingui/react/macro';
+import { DocumentVisibility, TeamMemberRole } from '@prisma/client';
+import { DocumentDistributionMethod, type Field, type Recipient } from '@prisma/client';
 import { InfoIcon } from 'lucide-react';
 import { useForm } from 'react-hook-form';
 import { match } from 'ts-pattern';
@@ -16,8 +16,6 @@ import { DEFAULT_DOCUMENT_TIME_ZONE, TIME_ZONES } from '@documenso/lib/constants
 import { ZDocumentEmailSettingsSchema } from '@documenso/lib/types/document-email';
 import type { TTemplate } from '@documenso/lib/types/template';
 import { extractDocumentAuthMethods } from '@documenso/lib/utils/document-auth';
-import { DocumentVisibility, TeamMemberRole } from '@documenso/prisma/client';
-import { DocumentDistributionMethod, type Field, type Recipient } from '@documenso/prisma/client';
 import type { TDocumentMetaDateFormat } from '@documenso/trpc/server/document-router/schema';
 import {
   DocumentGlobalAuthAccessSelect,

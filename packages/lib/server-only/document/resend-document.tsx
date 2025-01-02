@@ -1,6 +1,8 @@
 import { createElement } from 'react';
 
-import { msg } from '@lingui/macro';
+import { msg } from '@lingui/core/macro';
+import { DocumentStatus, RecipientRole, SigningStatus } from '@prisma/client';
+import type { Prisma } from '@prisma/client';
 
 import { mailer } from '@documenso/email/mailer';
 import { DocumentInviteEmailTemplate } from '@documenso/email/templates/document-invite';
@@ -14,10 +16,8 @@ import type { ApiRequestMetadata } from '@documenso/lib/universal/extract-reques
 import { createDocumentAuditLogData } from '@documenso/lib/utils/document-audit-logs';
 import { renderCustomEmailTemplate } from '@documenso/lib/utils/render-custom-email-template';
 import { prisma } from '@documenso/prisma';
-import { DocumentStatus, RecipientRole, SigningStatus } from '@documenso/prisma/client';
-import type { Prisma } from '@documenso/prisma/client';
 
-import { getI18nInstance } from '../../client-only/providers/i18n.server';
+import { getI18nInstance } from '../../client-only/providers/i18n-server';
 import { NEXT_PUBLIC_WEBAPP_URL } from '../../constants/app';
 import { extractDerivedDocumentEmailSettings } from '../../types/document-email';
 import { renderEmailWithI18N } from '../../utils/render-email-with-i18n';
@@ -134,7 +134,7 @@ export const resendDocument = async ({
         emailMessage =
           customEmail?.message ||
           i18n._(
-            msg`${user.name} on behalf of "${document.team.name}" has invited you to ${recipientActionVerb} the document "${document.title}".`,
+            msg`${user.name || user.email} on behalf of "${document.team.name}" has invited you to ${recipientActionVerb} the document "${document.title}".`,
           );
       }
 
@@ -164,20 +164,20 @@ export const resendDocument = async ({
         ? teamGlobalSettingsToBranding(document.team.teamGlobalSettings)
         : undefined;
 
+      const [html, text] = await Promise.all([
+        renderEmailWithI18N(template, {
+          lang: document.documentMeta?.language,
+          branding,
+        }),
+        renderEmailWithI18N(template, {
+          lang: document.documentMeta?.language,
+          branding,
+          plainText: true,
+        }),
+      ]);
+
       await prisma.$transaction(
         async (tx) => {
-          const [html, text] = await Promise.all([
-            renderEmailWithI18N(template, {
-              lang: document.documentMeta?.language,
-              branding,
-            }),
-            renderEmailWithI18N(template, {
-              lang: document.documentMeta?.language,
-              branding,
-              plainText: true,
-            }),
-          ]);
-
           await mailer.sendMail({
             to: {
               address: email,

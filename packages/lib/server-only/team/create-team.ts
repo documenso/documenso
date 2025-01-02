@@ -1,3 +1,4 @@
+import { Prisma, TeamMemberRole } from '@prisma/client';
 import type Stripe from 'stripe';
 import { z } from 'zod';
 
@@ -8,7 +9,6 @@ import { IS_BILLING_ENABLED } from '@documenso/lib/constants/app';
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import { subscriptionsContainsActivePlan } from '@documenso/lib/utils/billing';
 import { prisma } from '@documenso/prisma';
-import { Prisma, TeamMemberRole } from '@documenso/prisma/client';
 
 import { stripe } from '../stripe';
 

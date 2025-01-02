@@ -1,5 +1,3 @@
-'use client';
-
 import { useCallback } from 'react';
 
 import { getBoundingClientRect } from '@documenso/lib/client-only/get-bounding-client-rect';

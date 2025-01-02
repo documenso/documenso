@@ -1,5 +1,3 @@
-'use server';
-
 import { prisma } from '@documenso/prisma';
 
 import { AppError, AppErrorCode } from '../../errors/app-error';

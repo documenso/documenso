@@ -1,8 +1,6 @@
-'use client';
-
 import React, { useMemo } from 'react';
 
-import { Trans } from '@lingui/macro';
+import { Trans } from '@lingui/react/macro';
 import type {
   ColumnDef,
   PaginationState,

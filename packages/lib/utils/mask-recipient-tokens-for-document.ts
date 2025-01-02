@@ -1,4 +1,5 @@
-import type { User } from '@documenso/prisma/client';
+import type { User } from '@prisma/client';
+
 import type { DocumentWithRecipients } from '@documenso/prisma/types/document-with-recipient';
 
 export type MaskRecipientTokensForDocumentOptions<T extends DocumentWithRecipients> = {

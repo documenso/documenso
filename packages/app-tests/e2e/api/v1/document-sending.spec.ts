@@ -1,6 +1,6 @@
 import { expect, test } from '@playwright/test';
 
-import { WEBAPP_BASE_URL } from '@documenso/lib/constants/app';
+import { NEXT_PUBLIC_WEBAPP_URL } from '@documenso/lib/constants/app';
 import { createApiToken } from '@documenso/lib/server-only/public-api/create-api-token';
 import { prisma } from '@documenso/prisma';
 import { seedPendingDocumentWithFullFields } from '@documenso/prisma/seed/documents';
@@ -22,15 +22,18 @@ test.describe('Document API', () => {
     });
 
     // Test with sendCompletionEmails: false
-    const response = await request.post(`${WEBAPP_BASE_URL}/api/v1/documents/${document.id}/send`, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-        'Content-Type': 'application/json',
+    const response = await request.post(
+      `${NEXT_PUBLIC_WEBAPP_URL()}/api/v1/documents/${document.id}/send`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+        data: {
+          sendCompletionEmails: false,
+        },
       },
-      data: {
-        sendCompletionEmails: false,
-      },
-    });
+    );
 
     expect(response.ok()).toBeTruthy();
     expect(response.status()).toBe(200);
@@ -48,7 +51,7 @@ test.describe('Document API', () => {
 
     // Test with sendCompletionEmails: true
     const response2 = await request.post(
-      `${WEBAPP_BASE_URL}/api/v1/documents/${document.id}/send`,
+      `${NEXT_PUBLIC_WEBAPP_URL()}/api/v1/documents/${document.id}/send`,
       {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -110,15 +113,18 @@ test.describe('Document API', () => {
       expiresIn: null,
     });
 
-    const response = await request.post(`${WEBAPP_BASE_URL}/api/v1/documents/${document.id}/send`, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-        'Content-Type': 'application/json',
+    const response = await request.post(
+      `${NEXT_PUBLIC_WEBAPP_URL()}/api/v1/documents/${document.id}/send`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+        data: {
+          sendEmail: true,
+        },
       },
-      data: {
-        sendEmail: true,
-      },
-    });
+    );
 
     expect(response.ok()).toBeTruthy();
     expect(response.status()).toBe(200);

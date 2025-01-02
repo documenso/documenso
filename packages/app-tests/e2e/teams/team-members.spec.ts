@@ -1,6 +1,6 @@
 import { expect, test } from '@playwright/test';
 
-import { WEBAPP_BASE_URL } from '@documenso/lib/constants/app';
+import { NEXT_PUBLIC_WEBAPP_URL } from '@documenso/lib/constants/app';
 import { seedTeam, seedTeamInvite } from '@documenso/prisma/seed/teams';
 import { seedUser } from '@documenso/prisma/seed/users';
 
@@ -33,7 +33,6 @@ test('[TEAMS]: update team member role', async ({ page }) => {
   await page.getByLabel('Manager').click();
   await page.getByRole('button', { name: 'Update' }).click();
 
-  // TODO: Remove me, but i don't care for now
   await page.reload();
 
   await expect(
@@ -49,7 +48,7 @@ test('[TEAMS]: accept team invitation without account', async ({ page }) => {
     teamId: team.id,
   });
 
-  await page.goto(`${WEBAPP_BASE_URL}/team/invite/${teamInvite.token}`);
+  await page.goto(`${NEXT_PUBLIC_WEBAPP_URL()}/team/invite/${teamInvite.token}`);
   await expect(page.getByRole('heading')).toContainText('Team invitation');
 });
 
@@ -62,7 +61,7 @@ test('[TEAMS]: accept team invitation with account', async ({ page }) => {
     teamId: team.id,
   });
 
-  await page.goto(`${WEBAPP_BASE_URL}/team/invite/${teamInvite.token}`);
+  await page.goto(`${NEXT_PUBLIC_WEBAPP_URL()}/team/invite/${teamInvite.token}`);
   await expect(page.getByRole('heading')).toContainText('Invitation accepted!');
 });
 

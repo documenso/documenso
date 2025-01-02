@@ -1,14 +1,22 @@
-import type { NextApiRequest } from 'next';
+import type { TsRestRequest } from '@ts-rest/serverless';
 
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import { getApiTokenByToken } from '@documenso/lib/server-only/public-api/get-api-token-by-token';
 import type { ApiRequestMetadata } from '@documenso/lib/universal/extract-request-metadata';
-import { extractNextApiRequestMetadata } from '@documenso/lib/universal/extract-request-metadata';
+import { extractRequestMetadata } from '@documenso/lib/universal/extract-request-metadata';
 import type { Team, User } from '@documenso/prisma/client';
+
+type B = {
+  // appRoute: any;
+  request: TsRestRequest;
+  responseHeaders: Headers;
+};
 
 export const authenticatedMiddleware = <
   T extends {
-    req: NextApiRequest;
+    headers: {
+      authorization: string;
+    };
   },
   R extends {
     status: number;
@@ -16,15 +24,15 @@ export const authenticatedMiddleware = <
   },
 >(
   handler: (
-    args: T,
+    args: T & { req: TsRestRequest },
     user: User,
     team: Team | null | undefined,
     options: { metadata: ApiRequestMetadata },
   ) => Promise<R>,
 ) => {
-  return async (args: T) => {
+  return async (args: T, { request }: B) => {
     try {
-      const { authorization } = args.req.headers;
+      const { authorization } = args.headers;
 
       // Support for both "Authorization: Bearer api_xxx" and "Authorization: api_xxx"
       const [token] = (authorization || '').split('Bearer ').filter((s) => s.length > 0);
@@ -44,7 +52,7 @@ export const authenticatedMiddleware = <
       }
 
       const metadata: ApiRequestMetadata = {
-        requestMetadata: extractNextApiRequestMetadata(args.req),
+        requestMetadata: extractRequestMetadata(request), // Todo: Test
         source: 'apiV1',
         auth: 'api',
         auditUser: {
@@ -54,7 +62,15 @@ export const authenticatedMiddleware = <
         },
       };
 
-      return await handler(args, apiToken.user, apiToken.team, { metadata });
+      return await handler(
+        {
+          ...args,
+          req: request,
+        },
+        apiToken.user,
+        apiToken.team,
+        { metadata },
+      );
     } catch (err) {
       console.log({ err: err });
 

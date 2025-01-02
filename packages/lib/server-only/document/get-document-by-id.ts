@@ -1,8 +1,8 @@
+import type { Prisma } from '@prisma/client';
+import { TeamMemberRole } from '@prisma/client';
 import { match } from 'ts-pattern';
 
 import { prisma } from '@documenso/prisma';
-import type { Prisma } from '@documenso/prisma/client';
-import { TeamMemberRole } from '@documenso/prisma/client';
 
 import { AppError, AppErrorCode } from '../../errors/app-error';
 import { DocumentVisibility } from '../../types/document-visibility';

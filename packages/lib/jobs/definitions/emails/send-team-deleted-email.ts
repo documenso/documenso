@@ -1,6 +1,5 @@
+import { DocumentVisibility } from '@prisma/client';
 import { z } from 'zod';
-
-import { DocumentVisibility } from '@documenso/prisma/client';
 
 import type { JobDefinition } from '../../client/_internal/job';
 

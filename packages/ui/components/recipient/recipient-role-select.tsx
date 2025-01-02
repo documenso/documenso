@@ -1,12 +1,10 @@
-'use client';
-
 import React, { forwardRef } from 'react';
 
-import { Trans } from '@lingui/macro';
+import { Trans } from '@lingui/react/macro';
+import { RecipientRole } from '@prisma/client';
 import type { SelectProps } from '@radix-ui/react-select';
 import { InfoIcon } from 'lucide-react';
 
-import { RecipientRole } from '@documenso/prisma/client';
 import { ROLE_ICONS } from '@documenso/ui/primitives/recipient-role-icons';
 import { Select, SelectContent, SelectItem, SelectTrigger } from '@documenso/ui/primitives/select';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@documenso/ui/primitives/tooltip';

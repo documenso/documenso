@@ -1,5 +1,3 @@
-'use server';
-
 import { prisma } from '@documenso/prisma';
 
 export type DeleteTemplateOptions = {

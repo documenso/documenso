@@ -1,9 +1,8 @@
-'use client';
-
 import { useEffect, useState } from 'react';
 
-import { Trans, msg } from '@lingui/macro';
+import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
+import { Trans } from '@lingui/react/macro';
 import { ChevronDown, ChevronUp, Trash } from 'lucide-react';
 
 import { validateDropdownField } from '@documenso/lib/advanced-fields-validation/validate-dropdown';
@@ -172,7 +171,7 @@ export const DropdownFieldAdvancedSettings = ({
               />
               <button
                 type="button"
-                className="col-span-1 mt-auto inline-flex h-10 w-10 items-center  text-slate-500 hover:opacity-80 disabled:cursor-not-allowed disabled:opacity-50"
+                className="col-span-1 mt-auto inline-flex h-10 w-10 items-center text-slate-500 hover:opacity-80 disabled:cursor-not-allowed disabled:opacity-50"
                 onClick={() => removeValue(index)}
               >
                 <Trash className="h-5 w-5" />

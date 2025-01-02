@@ -1,15 +1,13 @@
-'use server';
-
 import { createElement } from 'react';
 
-import { msg } from '@lingui/macro';
+import { msg } from '@lingui/core/macro';
+import { DocumentStatus, SendStatus } from '@prisma/client';
 
 import { mailer } from '@documenso/email/mailer';
 import DocumentCancelTemplate from '@documenso/email/templates/document-cancel';
 import { prisma } from '@documenso/prisma';
-import { DocumentStatus, SendStatus } from '@documenso/prisma/client';
 
-import { getI18nInstance } from '../../client-only/providers/i18n.server';
+import { getI18nInstance } from '../../client-only/providers/i18n-server';
 import { NEXT_PUBLIC_WEBAPP_URL } from '../../constants/app';
 import { FROM_ADDRESS, FROM_NAME } from '../../constants/email';
 import { AppError, AppErrorCode } from '../../errors/app-error';

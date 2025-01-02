@@ -1,11 +1,11 @@
-import type { Recipient } from '@documenso/prisma/client';
+import type { Recipient } from '@prisma/client';
 import {
   DocumentDistributionMethod,
   ReadStatus,
   RecipientRole,
   SendStatus,
   SigningStatus,
-} from '@documenso/prisma/client';
+} from '@prisma/client';
 
 export enum RecipientStatusType {
   COMPLETED = 'completed',

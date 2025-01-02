@@ -1,3 +1,5 @@
+import type { Field } from '@prisma/client';
+import { FieldType } from '@prisma/client';
 import { isDeepEqual } from 'remeda';
 
 import { validateCheckboxField } from '@documenso/lib/advanced-fields-validation/validate-checkbox';
@@ -21,8 +23,6 @@ import {
   diffFieldChanges,
 } from '@documenso/lib/utils/document-audit-logs';
 import { prisma } from '@documenso/prisma';
-import type { Field } from '@documenso/prisma/client';
-import { FieldType } from '@documenso/prisma/client';
 
 import { AppError, AppErrorCode } from '../../errors/app-error';
 import { canRecipientFieldsBeModified } from '../../utils/recipients';

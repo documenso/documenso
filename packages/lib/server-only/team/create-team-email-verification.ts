@@ -1,20 +1,21 @@
 import { createElement } from 'react';
 
-import { msg } from '@lingui/macro';
+import { msg } from '@lingui/core/macro';
+import type { Team, TeamGlobalSettings } from '@prisma/client';
+import { Prisma } from '@prisma/client';
 import { z } from 'zod';
 
 import { mailer } from '@documenso/email/mailer';
 import { ConfirmTeamEmailTemplate } from '@documenso/email/templates/confirm-team-email';
-import { WEBAPP_BASE_URL } from '@documenso/lib/constants/app';
+import { NEXT_PUBLIC_WEBAPP_URL } from '@documenso/lib/constants/app';
 import { FROM_ADDRESS, FROM_NAME } from '@documenso/lib/constants/email';
 import { TEAM_MEMBER_ROLE_PERMISSIONS_MAP } from '@documenso/lib/constants/teams';
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import { createTokenVerification } from '@documenso/lib/utils/token-verification';
 import { prisma } from '@documenso/prisma';
-import type { Team, TeamGlobalSettings } from '@documenso/prisma/client';
-import { Prisma } from '@documenso/prisma/client';
 
-import { getI18nInstance } from '../../client-only/providers/i18n.server';
+import { getI18nInstance } from '../../client-only/providers/i18n-server';
+import { env } from '../../utils/env';
 import { renderEmailWithI18N } from '../../utils/render-email-with-i18n';
 import { teamGlobalSettingsToBranding } from '../../utils/team-global-settings-to-branding';
 
@@ -122,11 +123,11 @@ export const sendTeamEmailVerificationEmail = async (
     teamGlobalSettings?: TeamGlobalSettings | null;
   },
 ) => {
-  const assetBaseUrl = process.env.NEXT_PUBLIC_WEBAPP_URL || 'http://localhost:3000';
+  const assetBaseUrl = env('NEXT_PUBLIC_WEBAPP_URL') || 'http://localhost:3000';
 
   const template = createElement(ConfirmTeamEmailTemplate, {
     assetBaseUrl,
-    baseUrl: WEBAPP_BASE_URL,
+    baseUrl: NEXT_PUBLIC_WEBAPP_URL(),
     teamName: team.name,
     teamUrl: team.url,
     token,

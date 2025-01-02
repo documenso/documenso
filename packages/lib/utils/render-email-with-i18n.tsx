@@ -3,7 +3,7 @@ import { I18nProvider } from '@lingui/react';
 import type { RenderOptions } from '@documenso/email/render';
 import { render } from '@documenso/email/render';
 
-import { getI18nInstance } from '../client-only/providers/i18n.server';
+import { getI18nInstance } from '../client-only/providers/i18n-server';
 import {
   APP_I18N_OPTIONS,
   type SupportedLanguageCodes,

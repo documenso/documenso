@@ -1,6 +1,6 @@
 import { type Page } from '@playwright/test';
 
-import { WEBAPP_BASE_URL } from '@documenso/lib/constants/app';
+import { NEXT_PUBLIC_WEBAPP_URL } from '@documenso/lib/constants/app';
 
 type LoginOptions = {
   page: Page;
@@ -23,41 +23,35 @@ export const apiSignin = async ({
 
   const csrfToken = await getCsrfToken(page);
 
-  await request.post(`${WEBAPP_BASE_URL}/api/auth/callback/credentials`, {
-    form: {
+  await request.post(`${NEXT_PUBLIC_WEBAPP_URL()}/api/auth/email-password/authorize`, {
+    data: {
       email,
       password,
-      json: true,
       csrfToken,
     },
   });
 
-  await page.goto(`${WEBAPP_BASE_URL}${redirectPath}`);
+  await page.goto(`${NEXT_PUBLIC_WEBAPP_URL()}${redirectPath}`);
+  await page.waitForTimeout(500);
 };
 
 export const apiSignout = async ({ page }: { page: Page }) => {
   const { request } = page.context();
 
-  const csrfToken = await getCsrfToken(page);
+  await request.post(`${NEXT_PUBLIC_WEBAPP_URL()}/api/auth/signout`);
 
-  await request.post(`${WEBAPP_BASE_URL}/api/auth/signout`, {
-    form: {
-      csrfToken,
-      json: true,
-    },
-  });
-
-  await page.goto(`${WEBAPP_BASE_URL}/signin`);
+  await page.goto(`${NEXT_PUBLIC_WEBAPP_URL()}/signin`);
 };
 
 const getCsrfToken = async (page: Page) => {
   const { request } = page.context();
 
-  const response = await request.fetch(`${WEBAPP_BASE_URL}/api/auth/csrf`, {
+  const response = await request.fetch(`${NEXT_PUBLIC_WEBAPP_URL()}/api/auth/csrf`, {
     method: 'get',
   });
 
   const { csrfToken } = await response.json();
+
   if (!csrfToken) {
     throw new Error('Invalid session');
   }

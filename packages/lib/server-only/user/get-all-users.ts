@@ -1,5 +1,6 @@
+import { Prisma } from '@prisma/client';
+
 import { prisma } from '@documenso/prisma';
-import { Prisma } from '@documenso/prisma/client';
 
 type GetAllUsersProps = {
   username: string;

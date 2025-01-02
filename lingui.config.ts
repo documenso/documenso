@@ -9,10 +9,11 @@ const config: LinguiConfig = {
   catalogs: [
     {
       path: '<rootDir>/packages/lib/translations/{locale}/web',
-      include: ['apps/web/src', 'packages/ui', 'packages/lib', 'packages/email'],
+      include: ['apps/remix/app', 'packages/ui', 'packages/lib', 'packages/email'],
       exclude: ['**/node_modules/**'],
     },
   ],
+  compileNamespace: 'es',
 };
 
 export default config;

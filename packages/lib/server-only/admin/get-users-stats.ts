@@ -1,7 +1,7 @@
+import { DocumentStatus, SubscriptionStatus } from '@prisma/client';
 import { DateTime } from 'luxon';
 
 import { prisma } from '@documenso/prisma';
-import { DocumentStatus, SubscriptionStatus } from '@documenso/prisma/client';
 
 export const getUsersCount = async () => {
   return await prisma.user.count();

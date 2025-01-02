@@ -1,7 +1,5 @@
 import { z } from 'zod';
 
-import { ZCurrentPasswordSchema, ZPasswordSchema } from '../auth-router/schema';
-
 export const MAX_PROFILE_BIO_LENGTH = 256;
 
 export const ZFindUserSecurityAuditLogsSchema = z.object({
@@ -44,32 +42,6 @@ export const ZUpdatePublicProfileMutationSchema = z.object({
 });
 
 export type TUpdatePublicProfileMutationSchema = z.infer<typeof ZUpdatePublicProfileMutationSchema>;
-
-export const ZUpdatePasswordMutationSchema = z.object({
-  currentPassword: ZCurrentPasswordSchema,
-  password: ZPasswordSchema,
-});
-
-export type TUpdatePasswordMutationSchema = z.infer<typeof ZUpdatePasswordMutationSchema>;
-
-export const ZForgotPasswordFormSchema = z.object({
-  email: z.string().email().min(1),
-});
-
-export type TForgotPasswordFormSchema = z.infer<typeof ZForgotPasswordFormSchema>;
-
-export const ZResetPasswordFormSchema = z.object({
-  password: ZPasswordSchema,
-  token: z.string().min(1),
-});
-
-export type TResetPasswordFormSchema = z.infer<typeof ZResetPasswordFormSchema>;
-
-export const ZConfirmEmailMutationSchema = z.object({
-  email: z.string().email().min(1),
-});
-
-export type TConfirmEmailMutationSchema = z.infer<typeof ZConfirmEmailMutationSchema>;
 
 export const ZSetProfileImageMutationSchema = z.object({
   bytes: z.string().nullish(),

@@ -1,4 +1,4 @@
-import {
+import type {
   MouseEvent as ReactMouseEvent,
   PointerEvent as ReactPointerEvent,
   TouchEvent as ReactTouchEvent,

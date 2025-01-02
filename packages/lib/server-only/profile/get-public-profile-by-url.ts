@@ -1,12 +1,13 @@
-import { getCommunityPlanPriceIds } from '@documenso/ee/server-only/stripe/get-community-plan-prices';
-import { prisma } from '@documenso/prisma';
-import type { Template, TemplateDirectLink } from '@documenso/prisma/client';
+import type { Template, TemplateDirectLink } from '@prisma/client';
 import {
   SubscriptionStatus,
   type TeamProfile,
   TemplateType,
   type UserProfile,
-} from '@documenso/prisma/client';
+} from '@prisma/client';
+
+import { getCommunityPlanPriceIds } from '@documenso/ee/server-only/stripe/get-community-plan-prices';
+import { prisma } from '@documenso/prisma';
 
 import { IS_BILLING_ENABLED } from '../../constants/app';
 import { AppError, AppErrorCode } from '../../errors/app-error';

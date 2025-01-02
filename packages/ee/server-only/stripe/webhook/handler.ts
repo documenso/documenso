@@ -1,13 +1,11 @@
-import type { NextApiRequest, NextApiResponse } from 'next';
-
-import { buffer } from 'micro';
 import { match } from 'ts-pattern';
 
+import { IS_BILLING_ENABLED } from '@documenso/lib/constants/app';
 import { STRIPE_PLAN_TYPE } from '@documenso/lib/constants/billing';
 import type { Stripe } from '@documenso/lib/server-only/stripe';
 import { stripe } from '@documenso/lib/server-only/stripe';
 import { createTeamFromPendingTeam } from '@documenso/lib/server-only/team/create-team';
-import { getFlag } from '@documenso/lib/universal/get-feature-flag';
+import { env } from '@documenso/lib/utils/env';
 import { prisma } from '@documenso/prisma';
 
 import { onSubscriptionDeleted } from './on-subscription-deleted';
@@ -18,37 +16,50 @@ type StripeWebhookResponse = {
   message: string;
 };
 
-export const stripeWebhookHandler = async (
-  req: NextApiRequest,
-  res: NextApiResponse<StripeWebhookResponse>,
-) => {
+export const stripeWebhookHandler = async (req: Request) => {
   try {
-    const isBillingEnabled = await getFlag('app_billing');
+    const isBillingEnabled = IS_BILLING_ENABLED();
+
+    const webhookSecret = env('NEXT_PRIVATE_STRIPE_WEBHOOK_SECRET');
+
+    if (!webhookSecret) {
+      throw new Error('Missing Stripe webhook secret');
+    }
 
     if (!isBillingEnabled) {
-      return res.status(500).json({
-        success: false,
-        message: 'Billing is disabled',
-      });
+      return Response.json(
+        {
+          success: false,
+          message: 'Billing is disabled',
+        } satisfies StripeWebhookResponse,
+        { status: 500 },
+      );
     }
 
     const signature =
-      typeof req.headers['stripe-signature'] === 'string' ? req.headers['stripe-signature'] : '';
+      typeof req.headers.get('stripe-signature') === 'string'
+        ? req.headers.get('stripe-signature')
+        : '';
 
     if (!signature) {
-      return res.status(400).json({
-        success: false,
-        message: 'No signature found in request',
-      });
+      return Response.json(
+        {
+          success: false,
+          message: 'No signature found in request',
+        } satisfies StripeWebhookResponse,
+        { status: 400 },
+      );
     }
 
-    const body = await buffer(req);
+    // Todo: I'm not sure about this.
+    const clonedReq = req.clone();
+    const rawBody = await clonedReq.arrayBuffer();
+    const body = Buffer.from(rawBody);
 
-    const event = stripe.webhooks.constructEvent(
-      body,
-      signature,
-      process.env.NEXT_PRIVATE_STRIPE_WEBHOOK_SECRET,
-    );
+    // It was this:
+    // const body = await buffer(req);
+
+    const event = stripe.webhooks.constructEvent(body, signature, webhookSecret);
 
     await match(event.type)
       .with('checkout.session.completed', async () => {
@@ -92,10 +103,10 @@ export const stripeWebhookHandler = async (
             : session.subscription?.id;
 
         if (!subscriptionId) {
-          return res.status(500).json({
-            success: false,
-            message: 'Invalid session',
-          });
+          return Response.json(
+            { success: false, message: 'Invalid session' } satisfies StripeWebhookResponse,
+            { status: 500 },
+          );
         }
 
         const subscription = await stripe.subscriptions.retrieve(subscriptionId);
@@ -104,26 +115,29 @@ export const stripeWebhookHandler = async (
         if (subscription.items.data[0].price.metadata.plan === STRIPE_PLAN_TYPE.TEAM) {
           await handleTeamSeatCheckout({ subscription });
 
-          return res.status(200).json({
-            success: true,
-            message: 'Webhook received',
-          });
+          return Response.json(
+            { success: true, message: 'Webhook received' } satisfies StripeWebhookResponse,
+            { status: 200 },
+          );
         }
 
         // Validate user ID.
         if (!userId || Number.isNaN(userId)) {
-          return res.status(500).json({
-            success: false,
-            message: 'Invalid session or missing user ID',
-          });
+          return Response.json(
+            {
+              success: false,
+              message: 'Invalid session or missing user ID',
+            } satisfies StripeWebhookResponse,
+            { status: 500 },
+          );
         }
 
         await onSubscriptionUpdated({ userId, subscription });
 
-        return res.status(200).json({
-          success: true,
-          message: 'Webhook received',
-        });
+        return Response.json(
+          { success: true, message: 'Webhook received' } satisfies StripeWebhookResponse,
+          { status: 200 },
+        );
       })
       .with('customer.subscription.updated', async () => {
         // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
@@ -142,18 +156,21 @@ export const stripeWebhookHandler = async (
           });
 
           if (!team) {
-            return res.status(500).json({
-              success: false,
-              message: 'No team associated with subscription found',
-            });
+            return Response.json(
+              {
+                success: false,
+                message: 'No team associated with subscription found',
+              } satisfies StripeWebhookResponse,
+              { status: 500 },
+            );
           }
 
           await onSubscriptionUpdated({ teamId: team.id, subscription });
 
-          return res.status(200).json({
-            success: true,
-            message: 'Webhook received',
-          });
+          return Response.json(
+            { success: true, message: 'Webhook received' } satisfies StripeWebhookResponse,
+            { status: 200 },
+          );
         }
 
         const result = await prisma.user.findFirst({
@@ -166,28 +183,37 @@ export const stripeWebhookHandler = async (
         });
 
         if (!result?.id) {
-          return res.status(500).json({
-            success: false,
-            message: 'User not found',
-          });
+          return Response.json(
+            {
+              success: false,
+              message: 'User not found',
+            } satisfies StripeWebhookResponse,
+            { status: 500 },
+          );
         }
 
         await onSubscriptionUpdated({ userId: result.id, subscription });
 
-        return res.status(200).json({
-          success: true,
-          message: 'Webhook received',
-        });
+        return Response.json(
+          {
+            success: true,
+            message: 'Webhook received',
+          } satisfies StripeWebhookResponse,
+          { status: 200 },
+        );
       })
       .with('invoice.payment_succeeded', async () => {
         // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
         const invoice = event.data.object as Stripe.Invoice;
 
         if (invoice.billing_reason !== 'subscription_cycle') {
-          return res.status(200).json({
-            success: true,
-            message: 'Webhook received',
-          });
+          return Response.json(
+            {
+              success: true,
+              message: 'Webhook received',
+            } satisfies StripeWebhookResponse,
+            { status: 200 },
+          );
         }
 
         const customerId =
@@ -199,19 +225,25 @@ export const stripeWebhookHandler = async (
             : invoice.subscription?.id;
 
         if (!customerId || !subscriptionId) {
-          return res.status(500).json({
-            success: false,
-            message: 'Invalid invoice',
-          });
+          return Response.json(
+            {
+              success: false,
+              message: 'Invalid invoice',
+            } satisfies StripeWebhookResponse,
+            { status: 500 },
+          );
         }
 
         const subscription = await stripe.subscriptions.retrieve(subscriptionId);
 
         if (subscription.status === 'incomplete_expired') {
-          return res.status(200).json({
-            success: true,
-            message: 'Webhook received',
-          });
+          return Response.json(
+            {
+              success: true,
+              message: 'Webhook received',
+            } satisfies StripeWebhookResponse,
+            { status: 200 },
+          );
         }
 
         if (subscription.items.data[0].price.metadata.plan === STRIPE_PLAN_TYPE.TEAM) {
@@ -222,18 +254,24 @@ export const stripeWebhookHandler = async (
           });
 
           if (!team) {
-            return res.status(500).json({
-              success: false,
-              message: 'No team associated with subscription found',
-            });
+            return Response.json(
+              {
+                success: false,
+                message: 'No team associated with subscription found',
+              } satisfies StripeWebhookResponse,
+              { status: 500 },
+            );
           }
 
           await onSubscriptionUpdated({ teamId: team.id, subscription });
 
-          return res.status(200).json({
-            success: true,
-            message: 'Webhook received',
-          });
+          return Response.json(
+            {
+              success: true,
+              message: 'Webhook received',
+            } satisfies StripeWebhookResponse,
+            { status: 200 },
+          );
         }
 
         const result = await prisma.user.findFirst({
@@ -246,18 +284,24 @@ export const stripeWebhookHandler = async (
         });
 
         if (!result?.id) {
-          return res.status(500).json({
-            success: false,
-            message: 'User not found',
-          });
+          return Response.json(
+            {
+              success: false,
+              message: 'User not found',
+            } satisfies StripeWebhookResponse,
+            { status: 500 },
+          );
         }
 
         await onSubscriptionUpdated({ userId: result.id, subscription });
 
-        return res.status(200).json({
-          success: true,
-          message: 'Webhook received',
-        });
+        return Response.json(
+          {
+            success: true,
+            message: 'Webhook received',
+          } satisfies StripeWebhookResponse,
+          { status: 200 },
+        );
       })
       .with('invoice.payment_failed', async () => {
         // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
@@ -272,19 +316,25 @@ export const stripeWebhookHandler = async (
             : invoice.subscription?.id;
 
         if (!customerId || !subscriptionId) {
-          return res.status(500).json({
-            success: false,
-            message: 'Invalid invoice',
-          });
+          return Response.json(
+            {
+              success: false,
+              message: 'Invalid invoice',
+            } satisfies StripeWebhookResponse,
+            { status: 500 },
+          );
         }
 
         const subscription = await stripe.subscriptions.retrieve(subscriptionId);
 
         if (subscription.status === 'incomplete_expired') {
-          return res.status(200).json({
-            success: true,
-            message: 'Webhook received',
-          });
+          return Response.json(
+            {
+              success: true,
+              message: 'Webhook received',
+            } satisfies StripeWebhookResponse,
+            { status: 200 },
+          );
         }
 
         if (subscription.items.data[0].price.metadata.plan === STRIPE_PLAN_TYPE.TEAM) {
@@ -295,18 +345,24 @@ export const stripeWebhookHandler = async (
           });
 
           if (!team) {
-            return res.status(500).json({
-              success: false,
-              message: 'No team associated with subscription found',
-            });
+            return Response.json(
+              {
+                success: false,
+                message: 'No team associated with subscription found',
+              } satisfies StripeWebhookResponse,
+              { status: 500 },
+            );
           }
 
           await onSubscriptionUpdated({ teamId: team.id, subscription });
 
-          return res.status(200).json({
-            success: true,
-            message: 'Webhook received',
-          });
+          return Response.json(
+            {
+              success: true,
+              message: 'Webhook received',
+            } satisfies StripeWebhookResponse,
+            { status: 200 },
+          );
         }
 
         const result = await prisma.user.findFirst({
@@ -319,18 +375,24 @@ export const stripeWebhookHandler = async (
         });
 
         if (!result?.id) {
-          return res.status(500).json({
-            success: false,
-            message: 'User not found',
-          });
+          return Response.json(
+            {
+              success: false,
+              message: 'User not found',
+            } satisfies StripeWebhookResponse,
+            { status: 500 },
+          );
         }
 
         await onSubscriptionUpdated({ userId: result.id, subscription });
 
-        return res.status(200).json({
-          success: true,
-          message: 'Webhook received',
-        });
+        return Response.json(
+          {
+            success: true,
+            message: 'Webhook received',
+          } satisfies StripeWebhookResponse,
+          { status: 200 },
+        );
       })
       .with('customer.subscription.deleted', async () => {
         // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
@@ -338,24 +400,33 @@ export const stripeWebhookHandler = async (
 
         await onSubscriptionDeleted({ subscription });
 
-        return res.status(200).json({
-          success: true,
-          message: 'Webhook received',
-        });
+        return Response.json(
+          {
+            success: true,
+            message: 'Webhook received',
+          } satisfies StripeWebhookResponse,
+          { status: 200 },
+        );
       })
       .otherwise(() => {
-        return res.status(200).json({
-          success: true,
-          message: 'Webhook received',
-        });
+        return Response.json(
+          {
+            success: true,
+            message: 'Webhook received',
+          } satisfies StripeWebhookResponse,
+          { status: 200 },
+        );
       });
   } catch (err) {
     console.error(err);
 
-    res.status(500).json({
-      success: false,
-      message: 'Unknown error',
-    });
+    return Response.json(
+      {
+        success: false,
+        message: 'Unknown error',
+      } satisfies StripeWebhookResponse,
+      { status: 500 },
+    );
   }
 };
 

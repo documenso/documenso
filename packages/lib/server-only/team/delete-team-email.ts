@@ -1,15 +1,16 @@
 import { createElement } from 'react';
 
-import { msg } from '@lingui/macro';
+import { msg } from '@lingui/core/macro';
 
 import { mailer } from '@documenso/email/mailer';
 import { TeamEmailRemovedTemplate } from '@documenso/email/templates/team-email-removed';
-import { WEBAPP_BASE_URL } from '@documenso/lib/constants/app';
+import { NEXT_PUBLIC_WEBAPP_URL } from '@documenso/lib/constants/app';
 import { FROM_ADDRESS, FROM_NAME } from '@documenso/lib/constants/email';
 import { TEAM_MEMBER_ROLE_PERMISSIONS_MAP } from '@documenso/lib/constants/teams';
 import { prisma } from '@documenso/prisma';
 
-import { getI18nInstance } from '../../client-only/providers/i18n.server';
+import { getI18nInstance } from '../../client-only/providers/i18n-server';
+import { env } from '../../utils/env';
 import { renderEmailWithI18N } from '../../utils/render-email-with-i18n';
 import { teamGlobalSettingsToBranding } from '../../utils/team-global-settings-to-branding';
 
@@ -69,11 +70,11 @@ export const deleteTeamEmail = async ({ userId, userEmail, teamId }: DeleteTeamE
   });
 
   try {
-    const assetBaseUrl = process.env.NEXT_PUBLIC_WEBAPP_URL || 'http://localhost:3000';
+    const assetBaseUrl = env('NEXT_PUBLIC_WEBAPP_URL') || 'http://localhost:3000';
 
     const template = createElement(TeamEmailRemovedTemplate, {
       assetBaseUrl,
-      baseUrl: WEBAPP_BASE_URL,
+      baseUrl: NEXT_PUBLIC_WEBAPP_URL(),
       teamEmail: team.teamEmail?.email ?? '',
       teamName: team.name,
       teamUrl: team.url,

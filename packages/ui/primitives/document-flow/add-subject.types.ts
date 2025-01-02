@@ -1,8 +1,7 @@
+import { DocumentDistributionMethod } from '@prisma/client';
 import { z } from 'zod';
 
 import { ZDocumentEmailSettingsSchema } from '@documenso/lib/types/document-email';
-
-import { DocumentDistributionMethod } from '.prisma/client';
 
 export const ZAddSubjectFormSchema = z.object({
   meta: z.object({

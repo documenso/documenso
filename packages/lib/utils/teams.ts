@@ -1,9 +1,9 @@
-import { WEBAPP_BASE_URL } from '../constants/app';
+import { NEXT_PUBLIC_WEBAPP_URL } from '../constants/app';
 import type { TEAM_MEMBER_ROLE_MAP } from '../constants/teams';
 import { TEAM_MEMBER_ROLE_HIERARCHY, TEAM_MEMBER_ROLE_PERMISSIONS_MAP } from '../constants/teams';
 
 export const formatTeamUrl = (teamUrl: string, baseUrl?: string) => {
-  const formattedBaseUrl = (baseUrl ?? WEBAPP_BASE_URL).replace(/https?:\/\//, '');
+  const formattedBaseUrl = (baseUrl ?? NEXT_PUBLIC_WEBAPP_URL()).replace(/https?:\/\//, '');
 
   return `${formattedBaseUrl}/t/${teamUrl}`;
 };

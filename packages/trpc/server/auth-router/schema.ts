@@ -71,5 +71,3 @@ export const ZFindPasskeysQuerySchema = ZFindSearchParamsSchema.extend({
 });
 
 export type TSignUpMutationSchema = z.infer<typeof ZSignUpMutationSchema>;
-
-export const ZVerifyPasswordMutationSchema = ZSignUpMutationSchema.pick({ password: true });

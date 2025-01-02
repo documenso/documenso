@@ -1,5 +1,4 @@
-'use server';
-
+import { DocumentStatus, FieldType, SigningStatus } from '@prisma/client';
 import { DateTime } from 'luxon';
 import { match } from 'ts-pattern';
 
@@ -10,7 +9,6 @@ import { validateRadioField } from '@documenso/lib/advanced-fields-validation/va
 import { validateTextField } from '@documenso/lib/advanced-fields-validation/validate-text';
 import { fromCheckboxValue } from '@documenso/lib/universal/field-checkbox';
 import { prisma } from '@documenso/prisma';
-import { DocumentStatus, FieldType, SigningStatus } from '@documenso/prisma/client';
 
 import { DEFAULT_DOCUMENT_DATE_FORMAT } from '../../constants/date-formats';
 import { DEFAULT_DOCUMENT_TIME_ZONE } from '../../constants/time-zones';

@@ -1,7 +1,6 @@
 import type { MessageDescriptor } from '@lingui/core';
-import { msg } from '@lingui/macro';
-
-import { RecipientRole } from '@documenso/prisma/client';
+import { msg } from '@lingui/core/macro';
+import { RecipientRole } from '@prisma/client';
 
 export const RECIPIENT_ROLES_DESCRIPTION = {
   [RecipientRole.APPROVER]: {

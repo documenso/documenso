@@ -1,6 +1,7 @@
+import { TeamMemberRole } from '@prisma/client';
+
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import { prisma } from '@documenso/prisma';
-import { TeamMemberRole } from '@documenso/prisma/client';
 
 export type GetUserTokensOptions = {
   userId: number;

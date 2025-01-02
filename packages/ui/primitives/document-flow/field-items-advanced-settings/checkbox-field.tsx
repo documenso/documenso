@@ -1,9 +1,8 @@
-'use client';
-
 import { useEffect, useState } from 'react';
 
-import { Trans, msg } from '@lingui/macro';
+import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
+import { Trans } from '@lingui/react/macro';
 import { ChevronDown, ChevronUp, Trash } from 'lucide-react';
 
 import { validateCheckboxField } from '@documenso/lib/advanced-fields-validation/validate-checkbox';

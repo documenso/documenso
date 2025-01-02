@@ -1,5 +1,3 @@
-'use server';
-
 import type Stripe from 'stripe';
 
 import { stripe } from '@documenso/lib/server-only/stripe';
@@ -17,8 +15,6 @@ export const getCheckoutSession = async ({
   returnUrl,
   subscriptionMetadata,
 }: GetCheckoutSessionOptions) => {
-  'use server';
-
   const session = await stripe.checkout.sessions.create({
     customer: customerId,
     mode: 'subscription',

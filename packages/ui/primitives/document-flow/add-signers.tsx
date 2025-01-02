@@ -1,24 +1,23 @@
-'use client';
-
 import React, { useCallback, useId, useMemo, useRef, useState } from 'react';
 
 import type { DropResult, SensorAPI } from '@hello-pangea/dnd';
 import { DragDropContext, Draggable, Droppable } from '@hello-pangea/dnd';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Trans, msg } from '@lingui/macro';
+import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
+import { Trans } from '@lingui/react/macro';
+import type { Field, Recipient } from '@prisma/client';
+import { DocumentSigningOrder, RecipientRole, SendStatus } from '@prisma/client';
 import { motion } from 'framer-motion';
 import { GripVerticalIcon, Plus, Trash } from 'lucide-react';
-import { useSession } from 'next-auth/react';
 import { useFieldArray, useForm } from 'react-hook-form';
 import { prop, sortBy } from 'remeda';
 
 import { useLimits } from '@documenso/ee/server-only/limits/provider/client';
+import { useSession } from '@documenso/lib/client-only/providers/session';
 import { ZRecipientAuthOptionsSchema } from '@documenso/lib/types/document-auth';
 import { nanoid } from '@documenso/lib/universal/id';
 import { canRecipientBeModified as utilCanRecipientBeModified } from '@documenso/lib/utils/recipients';
-import type { Field, Recipient } from '@documenso/prisma/client';
-import { DocumentSigningOrder, RecipientRole, SendStatus } from '@documenso/prisma/client';
 import { AnimateGenericFadeInOut } from '@documenso/ui/components/animate/animate-generic-fade-in-out';
 import { RecipientActionAuthSelect } from '@documenso/ui/components/recipient/recipient-action-auth-select';
 import { RecipientRoleSelect } from '@documenso/ui/components/recipient/recipient-role-select';
@@ -65,9 +64,7 @@ export const AddSignersFormPartial = ({
   const { _ } = useLingui();
   const { toast } = useToast();
   const { remaining } = useLimits();
-  const { data: session } = useSession();
-
-  const user = session?.user;
+  const { user } = useSession();
 
   const initialId = useId();
   const $sensorApi = useRef<SensorAPI | null>(null);

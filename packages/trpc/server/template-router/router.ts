@@ -1,3 +1,5 @@
+import type { Document } from '@prisma/client';
+
 import { getServerLimits } from '@documenso/ee/server-only/limits/server';
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import { getDocumentWithDetailsById } from '@documenso/lib/server-only/document/get-document-with-details-by-id';
@@ -20,7 +22,6 @@ import { getTemplateById } from '@documenso/lib/server-only/template/get-templat
 import { moveTemplateToTeam } from '@documenso/lib/server-only/template/move-template-to-team';
 import { toggleTemplateDirectLink } from '@documenso/lib/server-only/template/toggle-template-direct-link';
 import { updateTemplate } from '@documenso/lib/server-only/template/update-template';
-import type { Document } from '@documenso/prisma/client';
 
 import { ZGenericSuccessResponse, ZSuccessResponseSchema } from '../document-router/schema';
 import { authenticatedProcedure, maybeAuthenticatedProcedure, router } from '../trpc';

@@ -2,14 +2,8 @@ import { DateTime } from 'luxon';
 
 import { prisma } from '@documenso/prisma';
 
+import { EMAIL_VERIFICATION_STATE } from '../../constants/email';
 import { jobsClient } from '../../jobs/client';
-
-export const EMAIL_VERIFICATION_STATE = {
-  NOT_FOUND: 'NOT_FOUND',
-  VERIFIED: 'VERIFIED',
-  EXPIRED: 'EXPIRED',
-  ALREADY_VERIFIED: 'ALREADY_VERIFIED',
-} as const;
 
 export type VerifyEmailProps = {
   token: string;
@@ -26,7 +20,10 @@ export const verifyEmail = async ({ token }: VerifyEmailProps) => {
   });
 
   if (!verificationToken) {
-    return EMAIL_VERIFICATION_STATE.NOT_FOUND;
+    return {
+      state: EMAIL_VERIFICATION_STATE.NOT_FOUND,
+      userId: null,
+    };
   }
 
   // check if the token is valid or expired
@@ -55,11 +52,17 @@ export const verifyEmail = async ({ token }: VerifyEmailProps) => {
       });
     }
 
-    return EMAIL_VERIFICATION_STATE.EXPIRED;
+    return {
+      state: EMAIL_VERIFICATION_STATE.EXPIRED,
+      userId: null,
+    };
   }
 
   if (verificationToken.completed) {
-    return EMAIL_VERIFICATION_STATE.ALREADY_VERIFIED;
+    return {
+      state: EMAIL_VERIFICATION_STATE.ALREADY_VERIFIED,
+      userId: null,
+    };
   }
 
   const [updatedUser] = await prisma.$transaction([
@@ -94,5 +97,8 @@ export const verifyEmail = async ({ token }: VerifyEmailProps) => {
     throw new Error('Something went wrong while verifying your email. Please try again.');
   }
 
-  return EMAIL_VERIFICATION_STATE.VERIFIED;
+  return {
+    state: EMAIL_VERIFICATION_STATE.VERIFIED,
+    userId: updatedUser.id,
+  };
 };

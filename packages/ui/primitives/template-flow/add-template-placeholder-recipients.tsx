@@ -1,27 +1,21 @@
-'use client';
-
 import { useCallback, useEffect, useId, useMemo, useRef, useState } from 'react';
 
 import type { DropResult, SensorAPI } from '@hello-pangea/dnd';
 import { DragDropContext, Draggable, Droppable } from '@hello-pangea/dnd';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Trans, msg } from '@lingui/macro';
+import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
+import { Trans } from '@lingui/react/macro';
+import type { TemplateDirectLink } from '@prisma/client';
+import { DocumentSigningOrder, type Field, type Recipient, RecipientRole } from '@prisma/client';
 import { motion } from 'framer-motion';
 import { GripVerticalIcon, Link2Icon, Plus, Trash } from 'lucide-react';
-import { useSession } from 'next-auth/react';
 import { useFieldArray, useForm } from 'react-hook-form';
 
+import { useSession } from '@documenso/lib/client-only/providers/session';
 import { ZRecipientAuthOptionsSchema } from '@documenso/lib/types/document-auth';
 import { nanoid } from '@documenso/lib/universal/id';
 import { generateRecipientPlaceholder } from '@documenso/lib/utils/templates';
-import type { TemplateDirectLink } from '@documenso/prisma/client';
-import {
-  DocumentSigningOrder,
-  type Field,
-  type Recipient,
-  RecipientRole,
-} from '@documenso/prisma/client';
 import { AnimateGenericFadeInOut } from '@documenso/ui/components/animate/animate-generic-fade-in-out';
 import { RecipientActionAuthSelect } from '@documenso/ui/components/recipient/recipient-action-auth-select';
 import { RecipientRoleSelect } from '@documenso/ui/components/recipient/recipient-role-select';
@@ -71,9 +65,7 @@ export const AddTemplatePlaceholderRecipientsFormPartial = ({
   const $sensorApi = useRef<SensorAPI | null>(null);
 
   const { _ } = useLingui();
-  const { data: session } = useSession();
-
-  const user = session?.user;
+  const { user } = useSession();
 
   const [placeholderRecipientCount, setPlaceholderRecipientCount] = useState(() =>
     recipients.length > 1 ? recipients.length + 1 : 2,
@@ -174,8 +166,8 @@ export const AddTemplatePlaceholderRecipientsFormPartial = ({
   const onAddPlaceholderSelfRecipient = () => {
     appendSigner({
       formId: nanoid(12),
-      name: user?.name ?? '',
-      email: user?.email ?? '',
+      name: user.name ?? '',
+      email: user.email ?? '',
       role: RecipientRole.SIGNER,
       signingOrder: signers.length > 0 ? (signers[signers.length - 1]?.signingOrder ?? 0) + 1 : 1,
     });

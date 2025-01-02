@@ -1,19 +1,24 @@
-import type { NextApiRequest, NextApiResponse } from 'next';
-
 import { validateApiToken } from '@documenso/lib/server-only/webhooks/zapier/validateApiToken';
 
-export const testCredentialsHandler = async (req: NextApiRequest, res: NextApiResponse) => {
+export const testCredentialsHandler = async (req: Request) => {
   try {
-    const { authorization } = req.headers;
+    const authorization = req.headers.get('authorization');
+
+    if (!authorization) {
+      throw new Error('Missing authorization header');
+    }
 
     const result = await validateApiToken({ authorization });
 
-    return res.status(200).json({
+    return Response.json({
       name: result.team?.name ?? result.user.name,
     });
   } catch (err) {
-    return res.status(500).json({
-      message: 'Internal Server Error',
-    });
+    return Response.json(
+      {
+        message: 'Internal Server Error',
+      },
+      { status: 500 },
+    );
   }
 };

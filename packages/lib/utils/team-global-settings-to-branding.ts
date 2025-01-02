@@ -1,4 +1,4 @@
-import type { TeamGlobalSettings } from '@documenso/prisma/client';
+import type { TeamGlobalSettings } from '@prisma/client';
 
 import { NEXT_PUBLIC_WEBAPP_URL } from '../constants/app';
 

@@ -1,6 +1,7 @@
+import type { FieldType, Team } from '@prisma/client';
+
 import { type TFieldMetaSchema as FieldMeta } from '@documenso/lib/types/field-meta';
 import { prisma } from '@documenso/prisma';
-import type { FieldType, Team } from '@documenso/prisma/client';
 
 import { DOCUMENT_AUDIT_LOG_TYPE } from '../../types/document-audit-logs';
 import type { RequestMetadata } from '../../universal/extract-request-metadata';

@@ -1,5 +1,6 @@
+import { DocumentStatus } from '@prisma/client';
+
 import { prisma } from '@documenso/prisma';
-import { DocumentStatus } from '@documenso/prisma/client';
 
 import { AppError, AppErrorCode } from '../../errors/app-error';
 import { deletedAccountServiceAccount } from './service-accounts/deleted-account';

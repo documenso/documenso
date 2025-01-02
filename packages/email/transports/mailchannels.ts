@@ -1,6 +1,8 @@
-import { SentMessageInfo, Transport } from 'nodemailer';
+import type { SentMessageInfo, Transport } from 'nodemailer';
 import type { Address } from 'nodemailer/lib/mailer';
 import type MailMessage from 'nodemailer/lib/mailer/mail-message';
+
+import { env } from '@documenso/lib/utils/env';
 
 const VERSION = '1.0.0';
 
@@ -79,9 +81,9 @@ export class MailChannelsTransport implements Transport<SentMessageInfo> {
             to: mailTo,
             cc: mailCc.length > 0 ? mailCc : undefined,
             bcc: mailBcc.length > 0 ? mailBcc : undefined,
-            dkim_domain: process.env.NEXT_PRIVATE_MAILCHANNELS_DKIM_DOMAIN || undefined,
-            dkim_selector: process.env.NEXT_PRIVATE_MAILCHANNELS_DKIM_SELECTOR || undefined,
-            dkim_private_key: process.env.NEXT_PRIVATE_MAILCHANNELS_DKIM_PRIVATE_KEY || undefined,
+            dkim_domain: env('NEXT_PRIVATE_MAILCHANNELS_DKIM_DOMAIN') || undefined,
+            dkim_selector: env('NEXT_PRIVATE_MAILCHANNELS_DKIM_SELECTOR') || undefined,
+            dkim_private_key: env('NEXT_PRIVATE_MAILCHANNELS_DKIM_PRIVATE_KEY') || undefined,
           },
         ],
         content: [

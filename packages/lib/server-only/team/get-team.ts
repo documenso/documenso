@@ -1,13 +1,13 @@
+import type { Prisma } from '@prisma/client';
 import type { z } from 'zod';
 
 import { prisma } from '@documenso/prisma';
-import type { Prisma } from '@documenso/prisma/client';
-import {
-  TeamEmailSchema,
-  TeamGlobalSettingsSchema,
-  TeamSchema,
-} from '@documenso/prisma/generated/zod';
-import { TeamMemberSchema } from '@documenso/prisma/generated/zod';
+import { TeamEmailSchema } from '@documenso/prisma/generated/zod/modelSchema/TeamEmailSchema';
+import { TeamGlobalSettingsSchema } from '@documenso/prisma/generated/zod/modelSchema/TeamGlobalSettingsSchema';
+import { TeamMemberSchema } from '@documenso/prisma/generated/zod/modelSchema/TeamMemberSchema';
+import { TeamSchema } from '@documenso/prisma/generated/zod/modelSchema/TeamSchema';
+
+import { AppError, AppErrorCode } from '../../errors/app-error';
 
 export type GetTeamByIdOptions = {
   userId?: number;
@@ -74,6 +74,8 @@ export type GetTeamByUrlOptions = {
   teamUrl: string;
 };
 
+export type TGetTeamByUrlResponse = Awaited<ReturnType<typeof getTeamByUrl>>;
+
 /**
  * Get a team given a team URL.
  */
@@ -90,7 +92,7 @@ export const getTeamByUrl = async ({ userId, teamUrl }: GetTeamByUrlOptions) => 
     };
   }
 
-  const result = await prisma.team.findUniqueOrThrow({
+  const result = await prisma.team.findFirst({
     where: whereFilter,
     include: {
       teamEmail: true,
@@ -120,6 +122,10 @@ export const getTeamByUrl = async ({ userId, teamUrl }: GetTeamByUrlOptions) => 
       },
     },
   });
+
+  if (!result) {
+    throw new AppError(AppErrorCode.NOT_FOUND);
+  }
 
   const { members, ...team } = result;
 

@@ -1,3 +1,13 @@
+import type { DocumentVisibility, TemplateMeta } from '@prisma/client';
+import {
+  DocumentSource,
+  RecipientRole,
+  SendStatus,
+  SigningStatus,
+  WebhookTriggerEvents,
+} from '@prisma/client';
+import { TeamMemberRole } from '@prisma/client';
+
 import { isUserEnterprise } from '@documenso/ee/server-only/util/is-document-enterprise';
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import { normalizePdf as makeNormalizedPdf } from '@documenso/lib/server-only/pdf/normalize-pdf';
@@ -6,15 +16,6 @@ import type { ApiRequestMetadata } from '@documenso/lib/universal/extract-reques
 import { nanoid } from '@documenso/lib/universal/id';
 import { createDocumentAuditLogData } from '@documenso/lib/utils/document-audit-logs';
 import { prisma } from '@documenso/prisma';
-import type { DocumentVisibility, TemplateMeta } from '@documenso/prisma/client';
-import {
-  DocumentSource,
-  RecipientRole,
-  SendStatus,
-  SigningStatus,
-  WebhookTriggerEvents,
-} from '@documenso/prisma/client';
-import { TeamMemberRole } from '@documenso/prisma/client';
 import type { TCreateDocumentV2Request } from '@documenso/trpc/server/document-router/schema';
 
 import type { TDocumentAccessAuthTypes, TDocumentActionAuthTypes } from '../../types/document-auth';
@@ -23,8 +24,8 @@ import {
   ZWebhookDocumentSchema,
   mapDocumentToWebhookDocumentPayload,
 } from '../../types/webhook-payload';
-import { getFile } from '../../universal/upload/get-file';
-import { putPdfFile } from '../../universal/upload/put-file';
+import { getFileServerSide } from '../../universal/upload/get-file.server';
+import { putPdfFileServerSide } from '../../universal/upload/put-file.server';
 import { createDocumentAuthOptions, createRecipientAuthOptions } from '../../utils/document-auth';
 import { determineDocumentVisibility } from '../../utils/document-visibility';
 import { triggerWebhook } from '../webhooks/trigger/trigger-webhook';
@@ -96,11 +97,11 @@ export const createDocumentV2 = async ({
     });
 
     if (documentData) {
-      const buffer = await getFile(documentData);
+      const buffer = await getFileServerSide(documentData);
 
       const normalizedPdf = await makeNormalizedPdf(Buffer.from(buffer));
 
-      const newDocumentData = await putPdfFile({
+      const newDocumentData = await putPdfFileServerSide({
         name: title.endsWith('.pdf') ? title : `${title}.pdf`,
         type: 'application/pdf',
         arrayBuffer: async () => Promise.resolve(normalizedPdf),

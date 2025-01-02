@@ -1,4 +1,4 @@
-import type { DocumentData } from '@documenso/prisma/client';
+import type { DocumentData } from '@prisma/client';
 
 import { getFile } from '../universal/upload/get-file';
 import { downloadFile } from './download-file';

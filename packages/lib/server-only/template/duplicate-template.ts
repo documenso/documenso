@@ -1,8 +1,8 @@
+import type { Prisma } from '@prisma/client';
 import { omit } from 'remeda';
 
 import { nanoid } from '@documenso/lib/universal/id';
 import { prisma } from '@documenso/prisma';
-import type { Prisma } from '@documenso/prisma/client';
 import type { TDuplicateTemplateMutationSchema } from '@documenso/trpc/server/template-router/schema';
 
 export type DuplicateTemplateOptions = TDuplicateTemplateMutationSchema & {

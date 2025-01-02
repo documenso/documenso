@@ -1,8 +1,7 @@
-'use server';
+import type { DocumentVisibility, Template, TemplateMeta } from '@prisma/client';
 
 import { isUserEnterprise } from '@documenso/ee/server-only/util/is-document-enterprise';
 import { prisma } from '@documenso/prisma';
-import type { DocumentVisibility, Template, TemplateMeta } from '@documenso/prisma/client';
 
 import { AppError, AppErrorCode } from '../../errors/app-error';
 import type { TDocumentAccessAuthTypes, TDocumentActionAuthTypes } from '../../types/document-auth';

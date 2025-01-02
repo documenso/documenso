@@ -1,7 +1,7 @@
+import type { FieldType, Team } from '@prisma/client';
 import { match } from 'ts-pattern';
 
 import { prisma } from '@documenso/prisma';
-import type { FieldType, Team } from '@documenso/prisma/client';
 
 import {
   ZCheckboxFieldMeta,

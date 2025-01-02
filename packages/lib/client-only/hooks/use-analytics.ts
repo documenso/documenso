@@ -1,13 +1,9 @@
 import { posthog } from 'posthog-js';
 
-import { useFeatureFlags } from '@documenso/lib/client-only/providers/feature-flag';
-import {
-  FEATURE_FLAG_GLOBAL_SESSION_RECORDING,
-  extractPostHogConfig,
-} from '@documenso/lib/constants/feature-flags';
+import { extractPostHogConfig } from '@documenso/lib/constants/feature-flags';
 
 export function useAnalytics() {
-  const featureFlags = useFeatureFlags();
+  // const featureFlags = useFeatureFlags();
   const isPostHogEnabled = extractPostHogConfig();
 
   /**
@@ -30,27 +26,29 @@ export function useAnalytics() {
    * @param eventFlag The event to check against feature flags to determine whether tracking is enabled.
    */
   const startSessionRecording = (eventFlag?: string) => {
-    const isSessionRecordingEnabled = featureFlags.getFlag(FEATURE_FLAG_GLOBAL_SESSION_RECORDING);
-    const isSessionRecordingEnabledForEvent = Boolean(eventFlag && featureFlags.getFlag(eventFlag));
+    return;
+    // const isSessionRecordingEnabled = featureFlags.getFlag(FEATURE_FLAG_GLOBAL_SESSION_RECORDING);
+    // const isSessionRecordingEnabledForEvent = Boolean(eventFlag && featureFlags.getFlag(eventFlag));
 
-    if (!isPostHogEnabled || !isSessionRecordingEnabled || !isSessionRecordingEnabledForEvent) {
-      return;
-    }
+    // if (!isPostHogEnabled || !isSessionRecordingEnabled || !isSessionRecordingEnabledForEvent) {
+    //   return;
+    // }
 
-    posthog.startSessionRecording();
+    // posthog.startSessionRecording();
   };
 
   /**
    * Stop the current session recording.
    */
   const stopSessionRecording = () => {
-    const isSessionRecordingEnabled = featureFlags.getFlag(FEATURE_FLAG_GLOBAL_SESSION_RECORDING);
+    return;
+    // const isSessionRecordingEnabled = featureFlags.getFlag(FEATURE_FLAG_GLOBAL_SESSION_RECORDING);
 
-    if (!isPostHogEnabled || !isSessionRecordingEnabled) {
-      return;
-    }
+    // if (!isPostHogEnabled || !isSessionRecordingEnabled) {
+    //   return;
+    // }
 
-    posthog.stopSessionRecording();
+    // posthog.stopSessionRecording();
   };
 
   return {

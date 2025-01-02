@@ -1,14 +1,16 @@
-import type { NextApiRequest, NextApiResponse } from 'next';
-
 import { prisma } from '@documenso/prisma';
 
 import { validateApiToken } from './validateApiToken';
 
-export const subscribeHandler = async (req: NextApiRequest, res: NextApiResponse) => {
+export const subscribeHandler = async (req: Request) => {
   try {
-    const { authorization } = req.headers;
+    const authorization = req.headers.get('authorization');
 
-    const { webhookUrl, eventTrigger } = req.body;
+    if (!authorization) {
+      return new Response('Unauthorized', { status: 401 });
+    }
+
+    const { webhookUrl, eventTrigger } = await req.json();
 
     const result = await validateApiToken({ authorization });
 
@@ -23,10 +25,13 @@ export const subscribeHandler = async (req: NextApiRequest, res: NextApiResponse
       },
     });
 
-    return res.status(200).json(createdWebhook);
+    return Response.json(createdWebhook);
   } catch (err) {
-    return res.status(500).json({
-      message: 'Internal Server Error',
-    });
+    return Response.json(
+      {
+        message: 'Internal Server Error',
+      },
+      { status: 500 },
+    );
   }
 };

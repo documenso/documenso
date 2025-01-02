@@ -6,7 +6,6 @@ import { AppError, genericErrorCodeToTrpcErrorCodeMap } from '@documenso/lib/err
 import { isAdmin } from '@documenso/lib/next-auth/guards/is-admin';
 import { getApiTokenByToken } from '@documenso/lib/server-only/public-api/get-api-token-by-token';
 import type { ApiRequestMetadata } from '@documenso/lib/universal/extract-request-metadata';
-import { extractNextApiRequestMetadata } from '@documenso/lib/universal/extract-request-metadata';
 
 import type { TrpcContext } from './context';
 
@@ -67,7 +66,7 @@ const t = initTRPC
  * Middlewares
  */
 export const authenticatedMiddleware = t.middleware(async ({ ctx, next }) => {
-  const authorizationHeader = ctx.req.headers.authorization;
+  const authorizationHeader = ctx.req.headers.get('authorization');
 
   // Taken from `authenticatedMiddleware` in `@documenso/api/v1/middleware/authenticated.ts`.
   if (authorizationHeader) {
@@ -131,8 +130,6 @@ export const authenticatedMiddleware = t.middleware(async ({ ctx, next }) => {
 });
 
 export const maybeAuthenticatedMiddleware = t.middleware(async ({ ctx, next }) => {
-  const requestMetadata = extractNextApiRequestMetadata(ctx.req);
-
   return await next({
     ctx: {
       ...ctx,
@@ -147,7 +144,6 @@ export const maybeAuthenticatedMiddleware = t.middleware(async ({ ctx, next }) =
               email: ctx.user.email,
             }
           : undefined,
-        requestMetadata,
         auth: ctx.session ? 'session' : null,
       } satisfies ApiRequestMetadata,
     },

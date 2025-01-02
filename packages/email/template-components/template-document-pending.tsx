@@ -1,4 +1,4 @@
-import { Trans } from '@lingui/macro';
+import { Trans } from '@lingui/react/macro';
 
 import { Column, Img, Section, Text } from '../components';
 import { TemplateDocumentImage } from './template-document-image';

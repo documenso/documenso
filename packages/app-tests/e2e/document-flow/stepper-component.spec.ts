@@ -18,6 +18,7 @@ import {
 import { seedUser } from '@documenso/prisma/seed/users';
 
 import { apiSignin } from '../fixtures/authentication';
+import { signSignaturePad } from '../fixtures/signature';
 
 // Can't use the function in server-only/document due to it indirectly using
 // require imports.
@@ -368,15 +369,7 @@ test('[DOCUMENT_FLOW]: should be able to approve a document', async ({ page }) =
       }),
     ).toBeVisible();
 
-    // Add signature.
-    const canvas = page.locator('canvas');
-    const box = await canvas.boundingBox();
-    if (box) {
-      await page.mouse.move(box.x + 40, box.y + 40);
-      await page.mouse.down();
-      await page.mouse.move(box.x + box.width - 2, box.y + box.height - 2);
-      await page.mouse.up();
-    }
+    await signSignaturePad(page);
 
     for (const field of fields) {
       await page.locator(`#field-${field.id}`).getByRole('button').click();
@@ -607,19 +600,10 @@ test('[DOCUMENT_FLOW]: should be able to create and sign a document with 3 recip
 
     await page.goto(`/sign/${recipient?.token}`);
     await expect(page.getByRole('heading', { name: 'Sign Document' })).toBeVisible();
+    await signSignaturePad(page);
 
     await page.locator(`#field-${recipientField.id}`).getByRole('button').click();
 
-    const canvas = page.locator('canvas#signature');
-    const box = await canvas.boundingBox();
-    if (box) {
-      await page.mouse.move(box.x + 40, box.y + 40);
-      await page.mouse.down();
-      await page.mouse.move(box.x + box.width - 2, box.y + box.height - 2);
-      await page.mouse.up();
-    }
-
-    await page.getByRole('button', { name: 'Sign', exact: true }).click();
     await page.getByRole('button', { name: 'Complete' }).click();
     await page.getByRole('button', { name: 'Sign' }).click();
 

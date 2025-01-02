@@ -1,9 +1,10 @@
+import { ReadStatus, SendStatus } from '@prisma/client';
+import { WebhookTriggerEvents } from '@prisma/client';
+
 import { DOCUMENT_AUDIT_LOG_TYPE } from '@documenso/lib/types/document-audit-logs';
 import type { RequestMetadata } from '@documenso/lib/universal/extract-request-metadata';
 import { createDocumentAuditLogData } from '@documenso/lib/utils/document-audit-logs';
 import { prisma } from '@documenso/prisma';
-import { ReadStatus, SendStatus } from '@documenso/prisma/client';
-import { WebhookTriggerEvents } from '@documenso/prisma/client';
 
 import type { TDocumentAccessAuthTypes } from '../../types/document-auth';
 import {

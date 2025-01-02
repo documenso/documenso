@@ -1,4 +1,4 @@
-import type { Document, Recipient } from '@documenso/prisma/client';
+import type { Document, Recipient } from '@prisma/client';
 
 import type {
   TDocumentAuthOptions,

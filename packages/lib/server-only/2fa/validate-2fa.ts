@@ -1,13 +1,16 @@
-import type { User } from '@documenso/prisma/client';
+import type { User } from '@prisma/client';
 
-import { ErrorCode } from '../../next-auth/error-codes';
+import { AppError } from '../../errors/app-error';
 import { verifyTwoFactorAuthenticationToken } from './verify-2fa-token';
 import { verifyBackupCode } from './verify-backup-code';
 
 type ValidateTwoFactorAuthenticationOptions = {
   totpCode?: string;
   backupCode?: string;
-  user: User;
+  user: Pick<
+    User,
+    'id' | 'email' | 'twoFactorEnabled' | 'twoFactorSecret' | 'twoFactorBackupCodes'
+  >;
 };
 
 export const validateTwoFactorAuthentication = async ({
@@ -16,11 +19,11 @@ export const validateTwoFactorAuthentication = async ({
   user,
 }: ValidateTwoFactorAuthenticationOptions) => {
   if (!user.twoFactorEnabled) {
-    throw new Error(ErrorCode.TWO_FACTOR_SETUP_REQUIRED);
+    throw new AppError('TWO_FACTOR_SETUP_REQUIRED');
   }
 
   if (!user.twoFactorSecret) {
-    throw new Error(ErrorCode.TWO_FACTOR_MISSING_SECRET);
+    throw new AppError('TWO_FACTOR_MISSING_SECRET');
   }
 
   if (totpCode) {
@@ -28,8 +31,8 @@ export const validateTwoFactorAuthentication = async ({
   }
 
   if (backupCode) {
-    return await verifyBackupCode({ user, backupCode });
+    return verifyBackupCode({ user, backupCode });
   }
 
-  throw new Error(ErrorCode.TWO_FACTOR_MISSING_CREDENTIALS);
+  throw new AppError('TWO_FACTOR_MISSING_CREDENTIALS');
 };

@@ -1,8 +1,9 @@
-'use client';
-
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Trans, msg } from '@lingui/macro';
+import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
+import { Trans } from '@lingui/react/macro';
+import type { Field, Recipient } from '@prisma/client';
+import { DocumentDistributionMethod, DocumentStatus, RecipientRole } from '@prisma/client';
 import { AnimatePresence, motion } from 'framer-motion';
 import { useForm } from 'react-hook-form';
 
@@ -10,12 +11,6 @@ import { RECIPIENT_ROLES_DESCRIPTION } from '@documenso/lib/constants/recipient-
 import type { TDocument } from '@documenso/lib/types/document';
 import { ZDocumentEmailSettingsSchema } from '@documenso/lib/types/document-email';
 import { formatSigningLink } from '@documenso/lib/utils/recipients';
-import type { Field, Recipient } from '@documenso/prisma/client';
-import {
-  DocumentDistributionMethod,
-  DocumentStatus,
-  RecipientRole,
-} from '@documenso/prisma/client';
 import { DocumentSendEmailMessageHelper } from '@documenso/ui/components/document/document-send-email-message-helper';
 import { Tabs, TabsList, TabsTrigger } from '@documenso/ui/primitives/tabs';
 

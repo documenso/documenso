@@ -1,9 +1,9 @@
+import { DocumentVisibility, TeamMemberRole } from '@prisma/client';
 import { z } from 'zod';
 
 import { SUPPORTED_LANGUAGE_CODES } from '@documenso/lib/constants/i18n';
 import { PROTECTED_TEAM_URLS } from '@documenso/lib/constants/teams';
 import { ZFindSearchParamsSchema } from '@documenso/lib/types/search-params';
-import { DocumentVisibility, TeamMemberRole } from '@documenso/prisma/client';
 
 import { ZUpdatePublicProfileMutationSchema } from '../profile-router/schema';
 

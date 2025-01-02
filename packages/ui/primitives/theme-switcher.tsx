@@ -1,22 +1,20 @@
 import { motion } from 'framer-motion';
 import { Monitor, MoonStar, Sun } from 'lucide-react';
-import { useTheme } from 'next-themes';
+import { Theme, useTheme } from 'remix-themes';
 
 import { useIsMounted } from '@documenso/lib/client-only/hooks/use-is-mounted';
 
-import { THEMES_TYPE } from './constants';
-
 export const ThemeSwitcher = () => {
-  const { theme, setTheme } = useTheme();
+  const [theme, setTheme] = useTheme();
   const isMounted = useIsMounted();
 
   return (
     <div className="bg-muted flex items-center gap-x-1 rounded-full p-1">
       <button
         className="text-muted-foreground relative z-10 flex h-8 w-8 items-center justify-center rounded-full"
-        onClick={() => setTheme(THEMES_TYPE.LIGHT)}
+        onClick={() => setTheme(Theme.LIGHT)}
       >
-        {isMounted && theme === THEMES_TYPE.LIGHT && (
+        {isMounted && theme === Theme.LIGHT && (
           <motion.div
             className="bg-background absolute inset-0 rounded-full mix-blend-color-burn"
             layoutId="selected-theme"
@@ -27,9 +25,9 @@ export const ThemeSwitcher = () => {
 
       <button
         className="text-muted-foreground relative z-10 flex h-8 w-8 items-center justify-center rounded-full"
-        onClick={() => setTheme(THEMES_TYPE.DARK)}
+        onClick={() => setTheme(Theme.DARK)}
       >
-        {isMounted && theme === THEMES_TYPE.DARK && (
+        {isMounted && theme === Theme.DARK && (
           <motion.div
             className="bg-background absolute inset-0 rounded-full mix-blend-exclusion"
             layoutId="selected-theme"
@@ -41,9 +39,9 @@ export const ThemeSwitcher = () => {
 
       <button
         className="text-muted-foreground relative z-10 flex h-8 w-8 items-center justify-center rounded-full"
-        onClick={() => setTheme(THEMES_TYPE.SYSTEM)}
+        onClick={() => setTheme(null)}
       >
-        {isMounted && theme === THEMES_TYPE.SYSTEM && (
+        {isMounted && theme === null && (
           <motion.div
             className="bg-background absolute inset-0 rounded-full mix-blend-exclusion"
             layoutId="selected-theme"

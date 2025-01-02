@@ -61,7 +61,7 @@ test('[TEAMS]: search respects team document visibility', async ({ page }) => {
     });
 
     await page.getByPlaceholder('Search documents...').fill('Searchable');
-    await page.waitForURL(/search=Searchable/);
+    await page.waitForURL(/query=Searchable/);
 
     await checkDocumentTabCount(page, 'All', visibleDocs);
 
@@ -103,7 +103,7 @@ test('[TEAMS]: search does not reveal documents from other teams', async ({ page
   });
 
   await page.getByPlaceholder('Search documents...').fill('Unique');
-  await page.waitForURL(/search=Unique/);
+  await page.waitForURL(/query=Unique/);
 
   await checkDocumentTabCount(page, 'All', 1);
   await expect(page.getByRole('link', { name: 'Unique Team A Document' })).toBeVisible();
@@ -144,7 +144,7 @@ test('[PERSONAL]: search does not reveal team documents in personal account', as
   });
 
   await page.getByPlaceholder('Search documents...').fill('Unique');
-  await page.waitForURL(/search=Unique/);
+  await page.waitForURL(/query=Unique/);
 
   await checkDocumentTabCount(page, 'All', 1);
   await expect(page.getByRole('link', { name: 'Personal Unique Document' })).toBeVisible();
@@ -179,7 +179,7 @@ test('[TEAMS]: search respects recipient visibility regardless of team visibilit
   });
 
   await page.getByPlaceholder('Search documents...').fill('Admin Document');
-  await page.waitForURL(/search=Admin(%20|\+|\s)Document/);
+  await page.waitForURL(/query=Admin(%20|\+|\s)Document/);
 
   await checkDocumentTabCount(page, 'All', 1);
   await expect(
@@ -221,7 +221,7 @@ test('[TEAMS]: search by recipient name respects visibility', async ({ page }) =
   });
 
   await page.getByPlaceholder('Search documents...').fill('Unique Recipient');
-  await page.waitForURL(/search=Unique(%20|\+|\s)Recipient/);
+  await page.waitForURL(/query=Unique(%20|\+|\s)Recipient/);
 
   await checkDocumentTabCount(page, 'All', 1);
   await expect(
@@ -238,7 +238,7 @@ test('[TEAMS]: search by recipient name respects visibility', async ({ page }) =
   });
 
   await page.getByPlaceholder('Search documents...').fill('Unique Recipient');
-  await page.waitForURL(/search=Unique(%20|\+|\s)Recipient/);
+  await page.waitForURL(/query=Unique(%20|\+|\s)Recipient/);
 
   await checkDocumentTabCount(page, 'All', 0);
   await expect(

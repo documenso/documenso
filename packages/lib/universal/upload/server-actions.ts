@@ -1,8 +1,3 @@
-'use server';
-
-import { headers } from 'next/headers';
-import { NextRequest } from 'next/server';
-
 import {
   DeleteObjectCommand,
   GetObjectCommand,
@@ -10,44 +5,29 @@ import {
   S3Client,
 } from '@aws-sdk/client-s3';
 import slugify from '@sindresorhus/slugify';
-import { type JWT, getToken } from 'next-auth/jwt';
-import { env } from 'next-runtime-env';
 import path from 'node:path';
 
-import { APP_BASE_URL } from '../../constants/app';
+import { env } from '@documenso/lib/utils/env';
+
 import { ONE_HOUR, ONE_SECOND } from '../../constants/time';
 import { alphaid } from '../id';
 
-export const getPresignPostUrl = async (fileName: string, contentType: string) => {
+export const getPresignPostUrl = async (fileName: string, contentType: string, userId?: number) => {
   const client = getS3Client();
 
   const { getSignedUrl } = await import('@aws-sdk/s3-request-presigner');
-
-  let token: JWT | null = null;
-
-  try {
-    const baseUrl = APP_BASE_URL() ?? 'http://localhost:3000';
-
-    token = await getToken({
-      req: new NextRequest(baseUrl, {
-        headers: headers(),
-      }),
-    });
-  } catch (err) {
-    // Non server-component environment
-  }
 
   // Get the basename and extension for the file
   const { name, ext } = path.parse(fileName);
 
   let key = `${alphaid(12)}/${slugify(name)}${ext}`;
 
-  if (token) {
-    key = `${token.id}/${key}`;
+  if (userId) {
+    key = `${userId}/${key}`;
   }
 
   const putObjectCommand = new PutObjectCommand({
-    Bucket: process.env.NEXT_PRIVATE_UPLOAD_BUCKET,
+    Bucket: env('NEXT_PRIVATE_UPLOAD_BUCKET'),
     Key: key,
     ContentType: contentType,
   });
@@ -65,7 +45,7 @@ export const getAbsolutePresignPostUrl = async (key: string) => {
   const { getSignedUrl: getS3SignedUrl } = await import('@aws-sdk/s3-request-presigner');
 
   const putObjectCommand = new PutObjectCommand({
-    Bucket: process.env.NEXT_PRIVATE_UPLOAD_BUCKET,
+    Bucket: env('NEXT_PRIVATE_UPLOAD_BUCKET'),
     Key: key,
   });
 
@@ -77,15 +57,15 @@ export const getAbsolutePresignPostUrl = async (key: string) => {
 };
 
 export const getPresignGetUrl = async (key: string) => {
-  if (process.env.NEXT_PRIVATE_UPLOAD_DISTRIBUTION_DOMAIN) {
-    const distributionUrl = new URL(key, `${process.env.NEXT_PRIVATE_UPLOAD_DISTRIBUTION_DOMAIN}`);
+  if (env('NEXT_PRIVATE_UPLOAD_DISTRIBUTION_DOMAIN')) {
+    const distributionUrl = new URL(key, `${env('NEXT_PRIVATE_UPLOAD_DISTRIBUTION_DOMAIN')}`);
 
     const { getSignedUrl: getCloudfrontSignedUrl } = await import('@aws-sdk/cloudfront-signer');
 
     const url = getCloudfrontSignedUrl({
       url: distributionUrl.toString(),
-      keyPairId: `${process.env.NEXT_PRIVATE_UPLOAD_DISTRIBUTION_KEY_ID}`,
-      privateKey: `${process.env.NEXT_PRIVATE_UPLOAD_DISTRIBUTION_KEY_CONTENTS}`,
+      keyPairId: `${env('NEXT_PRIVATE_UPLOAD_DISTRIBUTION_KEY_ID')}`,
+      privateKey: `${env('NEXT_PRIVATE_UPLOAD_DISTRIBUTION_KEY_CONTENTS')}`,
       dateLessThan: new Date(Date.now() + ONE_HOUR).toISOString(),
     });
 
@@ -97,7 +77,7 @@ export const getPresignGetUrl = async (key: string) => {
   const { getSignedUrl: getS3SignedUrl } = await import('@aws-sdk/s3-request-presigner');
 
   const getObjectCommand = new GetObjectCommand({
-    Bucket: process.env.NEXT_PRIVATE_UPLOAD_BUCKET,
+    Bucket: env('NEXT_PRIVATE_UPLOAD_BUCKET'),
     Key: key,
   });
 
@@ -108,12 +88,37 @@ export const getPresignGetUrl = async (key: string) => {
   return { key, url };
 };
 
+/**
+ * Uploads a file to S3.
+ */
+export const uploadS3File = async (file: File) => {
+  const client = getS3Client();
+
+  // Get the basename and extension for the file
+  const { name, ext } = path.parse(file.name);
+
+  const key = `${alphaid(12)}/${slugify(name)}${ext}`;
+
+  const fileBuffer = await file.arrayBuffer();
+
+  const response = await client.send(
+    new PutObjectCommand({
+      Bucket: env('NEXT_PRIVATE_UPLOAD_BUCKET'),
+      Key: key,
+      Body: Buffer.from(fileBuffer),
+      ContentType: file.type,
+    }),
+  );
+
+  return { key, response };
+};
+
 export const deleteS3File = async (key: string) => {
   const client = getS3Client();
 
   await client.send(
     new DeleteObjectCommand({
-      Bucket: process.env.NEXT_PRIVATE_UPLOAD_BUCKET,
+      Bucket: env('NEXT_PRIVATE_UPLOAD_BUCKET'),
       Key: key,
     }),
   );
@@ -127,17 +132,16 @@ const getS3Client = () => {
   }
 
   const hasCredentials =
-    process.env.NEXT_PRIVATE_UPLOAD_ACCESS_KEY_ID &&
-    process.env.NEXT_PRIVATE_UPLOAD_SECRET_ACCESS_KEY;
+    env('NEXT_PRIVATE_UPLOAD_ACCESS_KEY_ID') && env('NEXT_PRIVATE_UPLOAD_SECRET_ACCESS_KEY');
 
   return new S3Client({
-    endpoint: process.env.NEXT_PRIVATE_UPLOAD_ENDPOINT || undefined,
-    forcePathStyle: process.env.NEXT_PRIVATE_UPLOAD_FORCE_PATH_STYLE === 'true',
-    region: process.env.NEXT_PRIVATE_UPLOAD_REGION || 'us-east-1',
+    endpoint: env('NEXT_PRIVATE_UPLOAD_ENDPOINT') || undefined,
+    forcePathStyle: env('NEXT_PRIVATE_UPLOAD_FORCE_PATH_STYLE') === 'true',
+    region: env('NEXT_PRIVATE_UPLOAD_REGION') || 'us-east-1',
     credentials: hasCredentials
       ? {
-          accessKeyId: String(process.env.NEXT_PRIVATE_UPLOAD_ACCESS_KEY_ID),
-          secretAccessKey: String(process.env.NEXT_PRIVATE_UPLOAD_SECRET_ACCESS_KEY),
+          accessKeyId: String(env('NEXT_PRIVATE_UPLOAD_ACCESS_KEY_ID')),
+          secretAccessKey: String(env('NEXT_PRIVATE_UPLOAD_SECRET_ACCESS_KEY')),
         }
       : undefined,
   });

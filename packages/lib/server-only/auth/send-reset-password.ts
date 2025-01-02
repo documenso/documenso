@@ -5,6 +5,7 @@ import { ResetPasswordTemplate } from '@documenso/email/templates/reset-password
 import { prisma } from '@documenso/prisma';
 
 import { NEXT_PUBLIC_WEBAPP_URL } from '../../constants/app';
+import { env } from '../../utils/env';
 import { renderEmailWithI18N } from '../../utils/render-email-with-i18n';
 
 export interface SendResetPasswordOptions {
@@ -37,8 +38,8 @@ export const sendResetPassword = async ({ userId }: SendResetPasswordOptions) =>
       name: user.name || '',
     },
     from: {
-      name: process.env.NEXT_PRIVATE_SMTP_FROM_NAME || 'Documenso',
-      address: process.env.NEXT_PRIVATE_SMTP_FROM_ADDRESS || 'noreply@documenso.com',
+      name: env('NEXT_PRIVATE_SMTP_FROM_NAME') || 'Documenso',
+      address: env('NEXT_PRIVATE_SMTP_FROM_ADDRESS') || 'noreply@documenso.com',
     },
     subject: 'Password Reset Success!',
     html,

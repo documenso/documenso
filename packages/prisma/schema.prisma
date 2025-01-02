@@ -13,7 +13,7 @@ generator json {
 generator zod {
   provider         = "zod-prisma-types"
   createInputTypes = false
-  writeBarrelFiles = true
+  writeBarrelFiles = false
   useMultipleFiles = true
 }
 
@@ -23,33 +23,26 @@ datasource db {
   directUrl = env("NEXT_PRIVATE_DIRECT_DATABASE_URL")
 }
 
-enum IdentityProvider {
-  DOCUMENSO
-  GOOGLE
-  OIDC
-}
-
 enum Role {
   ADMIN
   USER
 }
 
 model User {
-  id               Int              @id @default(autoincrement())
-  name             String?
-  customerId       String?          @unique
-  email            String           @unique
-  emailVerified    DateTime?
-  password         String?
-  source           String?
-  signature        String?
-  createdAt        DateTime         @default(now())
-  updatedAt        DateTime         @default(now()) @updatedAt
-  lastSignedIn     DateTime         @default(now())
-  roles            Role[]           @default([USER])
-  identityProvider IdentityProvider @default(DOCUMENSO)
-  avatarImageId    String?
-  disabled         Boolean          @default(false)
+  id            Int       @id @default(autoincrement())
+  name          String?
+  customerId    String?   @unique
+  email         String    @unique
+  emailVerified DateTime?
+  password      String?
+  source        String?
+  signature     String?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @default(now()) @updatedAt
+  lastSignedIn  DateTime  @default(now())
+  roles         Role[]    @default([USER])
+  avatarImageId String?
+  disabled      Boolean   @default(false)
 
   accounts             Account[]
   sessions             Session[]
@@ -269,18 +262,25 @@ model Account {
   scope             String?
   id_token          String? @db.Text
   session_state     String?
+  password          String?
 
-  user User? @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([provider, providerAccountId])
 }
 
 model Session {
-  id           String   @id @default(cuid())
-  sessionToken String   @unique
+  id           String @id @default(cuid())
+  sessionToken String @unique
   userId       Int
-  expires      DateTime
-  user         User?    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  ipAddress String?
+  userAgent String?
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user User? @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 enum DocumentStatus {

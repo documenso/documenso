@@ -1,7 +1,7 @@
+import { DocumentStatus } from '@prisma/client';
 import { DateTime } from 'luxon';
 
 import { kyselyPrisma, sql } from '@documenso/prisma';
-import { DocumentStatus } from '@documenso/prisma/client';
 
 export const getCompletedDocumentsMonthly = async () => {
   const qb = kyselyPrisma.$kysely

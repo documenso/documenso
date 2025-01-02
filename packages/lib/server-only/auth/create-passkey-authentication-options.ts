@@ -1,9 +1,9 @@
+import type { Passkey } from '@prisma/client';
 import { generateAuthenticationOptions } from '@simplewebauthn/server';
 import type { AuthenticatorTransportFuture } from '@simplewebauthn/types';
 import { DateTime } from 'luxon';
 
 import { prisma } from '@documenso/prisma';
-import type { Passkey } from '@documenso/prisma/client';
 
 import { AppError, AppErrorCode } from '../../errors/app-error';
 import { getAuthenticatorOptions } from '../../utils/authenticator';

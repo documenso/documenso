@@ -1,19 +1,20 @@
 import { createElement } from 'react';
 
-import { msg } from '@lingui/macro';
+import { msg } from '@lingui/core/macro';
+import { DocumentSource } from '@prisma/client';
 
 import { mailer } from '@documenso/email/mailer';
 import { DocumentCompletedEmailTemplate } from '@documenso/email/templates/document-completed';
 import { prisma } from '@documenso/prisma';
-import { DocumentSource } from '@documenso/prisma/client';
 
-import { getI18nInstance } from '../../client-only/providers/i18n.server';
+import { getI18nInstance } from '../../client-only/providers/i18n-server';
 import { NEXT_PUBLIC_WEBAPP_URL } from '../../constants/app';
 import { DOCUMENT_AUDIT_LOG_TYPE } from '../../types/document-audit-logs';
 import { extractDerivedDocumentEmailSettings } from '../../types/document-email';
 import type { RequestMetadata } from '../../universal/extract-request-metadata';
-import { getFile } from '../../universal/upload/get-file';
+import { getFileServerSide } from '../../universal/upload/get-file.server';
 import { createDocumentAuditLogData } from '../../utils/document-audit-logs';
+import { env } from '../../utils/env';
 import { renderCustomEmailTemplate } from '../../utils/render-custom-email-template';
 import { renderEmailWithI18N } from '../../utils/render-email-with-i18n';
 import { teamGlobalSettingsToBranding } from '../../utils/team-global-settings-to-branding';
@@ -56,7 +57,7 @@ export const sendCompletedEmail = async ({ documentId, requestMetadata }: SendDo
 
   const { user: owner } = document;
 
-  const completedDocument = await getFile(document.documentData);
+  const completedDocument = await getFileServerSide(document.documentData);
 
   const assetBaseUrl = NEXT_PUBLIC_WEBAPP_URL() || 'http://localhost:3000';
 
@@ -113,8 +114,8 @@ export const sendCompletedEmail = async ({ documentId, requestMetadata }: SendDo
         },
       ],
       from: {
-        name: process.env.NEXT_PRIVATE_SMTP_FROM_NAME || 'Documenso',
-        address: process.env.NEXT_PRIVATE_SMTP_FROM_ADDRESS || 'noreply@documenso.com',
+        name: env('NEXT_PRIVATE_SMTP_FROM_NAME') || 'Documenso',
+        address: env('NEXT_PRIVATE_SMTP_FROM_ADDRESS') || 'noreply@documenso.com',
       },
       subject: i18n._(msg`Signing Complete!`),
       html,
@@ -190,8 +191,8 @@ export const sendCompletedEmail = async ({ documentId, requestMetadata }: SendDo
           },
         ],
         from: {
-          name: process.env.NEXT_PRIVATE_SMTP_FROM_NAME || 'Documenso',
-          address: process.env.NEXT_PRIVATE_SMTP_FROM_ADDRESS || 'noreply@documenso.com',
+          name: env('NEXT_PRIVATE_SMTP_FROM_NAME') || 'Documenso',
+          address: env('NEXT_PRIVATE_SMTP_FROM_ADDRESS') || 'noreply@documenso.com',
         },
         subject:
           isDirectTemplate && document.documentMeta?.subject

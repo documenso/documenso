@@ -1,9 +1,9 @@
-'use client';
-
 import { useEffect } from 'react';
 
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Trans } from '@lingui/macro';
+import { Trans } from '@lingui/react/macro';
+import { DocumentVisibility, TeamMemberRole } from '@prisma/client';
+import { DocumentStatus, type Field, type Recipient, SendStatus } from '@prisma/client';
 import { InfoIcon } from 'lucide-react';
 import { useForm } from 'react-hook-form';
 import { match } from 'ts-pattern';
@@ -13,8 +13,6 @@ import { SUPPORTED_LANGUAGES } from '@documenso/lib/constants/i18n';
 import { DEFAULT_DOCUMENT_TIME_ZONE, TIME_ZONES } from '@documenso/lib/constants/time-zones';
 import type { TDocument } from '@documenso/lib/types/document';
 import { extractDocumentAuthMethods } from '@documenso/lib/utils/document-auth';
-import { DocumentVisibility, TeamMemberRole } from '@documenso/prisma/client';
-import { DocumentStatus, type Field, type Recipient, SendStatus } from '@documenso/prisma/client';
 import {
   DocumentGlobalAuthAccessSelect,
   DocumentGlobalAuthAccessTooltip,

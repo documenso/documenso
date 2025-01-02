@@ -1,5 +1,6 @@
 import fs from 'node:fs';
 
+import { env } from '@documenso/lib/utils/env';
 import { signWithP12 } from '@documenso/pdf-sign';
 
 import { addSigningPlaceholder } from '../helpers/add-signing-placeholder';
@@ -23,20 +24,22 @@ export const signWithLocalCert = async ({ pdf }: SignWithLocalCertOptions) => {
 
   let cert: Buffer | null = null;
 
-  if (process.env.NEXT_PRIVATE_SIGNING_LOCAL_FILE_CONTENTS) {
-    cert = Buffer.from(process.env.NEXT_PRIVATE_SIGNING_LOCAL_FILE_CONTENTS, 'base64');
+  const localFileContents = env('NEXT_PRIVATE_SIGNING_LOCAL_FILE_CONTENTS');
+
+  if (localFileContents) {
+    cert = Buffer.from(localFileContents, 'base64');
   }
 
   if (!cert) {
-    let certPath = process.env.NEXT_PRIVATE_SIGNING_LOCAL_FILE_PATH || '/opt/documenso/cert.p12';
+    let certPath = env('NEXT_PRIVATE_SIGNING_LOCAL_FILE_PATH') || '/opt/documenso/cert.p12';
 
     // We don't want to make the development server suddenly crash when using the `dx` script
     // so we retain this when NODE_ENV isn't set to production which it should be in most production
     // deployments.
     //
     // Our docker image automatically sets this so it shouldn't be an issue for self-hosters.
-    if (process.env.NODE_ENV !== 'production') {
-      certPath = process.env.NEXT_PRIVATE_SIGNING_LOCAL_FILE_PATH || './example/cert.p12';
+    if (env('NODE_ENV') !== 'production') {
+      certPath = env('NEXT_PRIVATE_SIGNING_LOCAL_FILE_PATH') || './example/cert.p12';
     }
 
     cert = Buffer.from(fs.readFileSync(certPath));
@@ -45,7 +48,7 @@ export const signWithLocalCert = async ({ pdf }: SignWithLocalCertOptions) => {
   const signature = signWithP12({
     cert,
     content: pdfWithoutSignature,
-    password: process.env.NEXT_PRIVATE_SIGNING_PASSPHRASE || undefined,
+    password: env('NEXT_PRIVATE_SIGNING_PASSPHRASE') || undefined,
   });
 
   const signatureAsHex = signature.toString('hex');
