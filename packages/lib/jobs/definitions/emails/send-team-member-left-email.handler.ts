@@ -1,13 +1,13 @@
 import { createElement } from 'react';
 
 import { msg } from '@lingui/macro';
+import { TeamMemberRole } from '@prisma/client';
 
 import { mailer } from '@documenso/email/mailer';
 import TeamJoinEmailTemplate from '@documenso/email/templates/team-join';
 import { prisma } from '@documenso/prisma';
-import { TeamMemberRole } from '@documenso/prisma/client';
 
-import { getI18nInstance } from '../../../client-only/providers/i18n.server';
+import { getI18nInstance } from '../../../client-only/providers/i18n-server';
 import { WEBAPP_BASE_URL } from '../../../constants/app';
 import { FROM_ADDRESS, FROM_NAME } from '../../../constants/email';
 import { renderEmailWithI18N } from '../../../utils/render-email-with-i18n';

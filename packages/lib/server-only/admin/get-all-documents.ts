@@ -1,5 +1,6 @@
+import type { Prisma } from '@prisma/client';
+
 import { prisma } from '@documenso/prisma';
-import type { Prisma } from '@documenso/prisma/client';
 
 import type { FindResultResponse } from '../../types/search-params';
 

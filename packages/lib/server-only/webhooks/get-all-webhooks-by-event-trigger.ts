@@ -1,5 +1,6 @@
+import type { WebhookTriggerEvents } from '@prisma/client';
+
 import { prisma } from '@documenso/prisma';
-import type { WebhookTriggerEvents } from '@documenso/prisma/client';
 
 export type GetAllWebhooksByEventTriggerOptions = {
   event: WebhookTriggerEvents;

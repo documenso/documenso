@@ -1,8 +1,10 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import type { NextRequest } from 'next/server';
 
+import type { Context as HonoContext } from 'hono';
 import type { Context, Handler, InngestFunction } from 'inngest';
 import { Inngest as InngestClient } from 'inngest';
+import { serve as createHonoPagesRoute } from 'inngest/hono';
 import type { Logger } from 'inngest/middleware/logger';
 import { serve as createPagesRoute } from 'inngest/next';
 import { json } from 'micro';
@@ -91,6 +93,18 @@ export class InngestJobProvider extends BaseJobProvider {
       const nextReq = req as unknown as NextRequest;
 
       return await handler(nextReq, res);
+    };
+  }
+
+  // Todo: Do we need to handle the above?
+  public getHonoApiHandler() {
+    return async (context: HonoContext) => {
+      const handler = createHonoPagesRoute({
+        client: this._client,
+        functions: this._functions,
+      });
+
+      return await handler(context);
     };
   }
 

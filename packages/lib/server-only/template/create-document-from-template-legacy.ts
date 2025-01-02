@@ -1,6 +1,7 @@
+import { DocumentSource, type RecipientRole } from '@prisma/client';
+
 import { nanoid } from '@documenso/lib/universal/id';
 import { prisma } from '@documenso/prisma';
-import { DocumentSource, type RecipientRole } from '@documenso/prisma/client';
 
 export type CreateDocumentFromTemplateLegacyOptions = {
   templateId: number;

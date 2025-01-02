@@ -1,9 +1,9 @@
 import { hash } from '@node-rs/bcrypt';
+import { IdentityProvider, TeamMemberInviteStatus } from '@prisma/client';
 
 import { getStripeCustomerByUser } from '@documenso/ee/server-only/stripe/get-customer';
 import { updateSubscriptionItemQuantity } from '@documenso/ee/server-only/stripe/update-subscription-item-quantity';
 import { prisma } from '@documenso/prisma';
-import { IdentityProvider, TeamMemberInviteStatus } from '@documenso/prisma/client';
 
 import { IS_BILLING_ENABLED } from '../../constants/app';
 import { SALT_ROUNDS } from '../../constants/auth';

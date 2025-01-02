@@ -1,6 +1,7 @@
 import { createElement } from 'react';
 
 import { msg } from '@lingui/macro';
+import type { Team, TeamGlobalSettings } from '@prisma/client';
 
 import { mailer } from '@documenso/email/mailer';
 import { TeamDeleteEmailTemplate } from '@documenso/email/templates/team-delete';
@@ -9,9 +10,8 @@ import { FROM_ADDRESS, FROM_NAME } from '@documenso/lib/constants/email';
 import { AppError } from '@documenso/lib/errors/app-error';
 import { stripe } from '@documenso/lib/server-only/stripe';
 import { prisma } from '@documenso/prisma';
-import type { Team, TeamGlobalSettings } from '@documenso/prisma/client';
 
-import { getI18nInstance } from '../../client-only/providers/i18n.server';
+import { getI18nInstance } from '../../client-only/providers/i18n-server';
 import { jobs } from '../../jobs/client';
 import { renderEmailWithI18N } from '../../utils/render-email-with-i18n';
 import { teamGlobalSettingsToBranding } from '../../utils/team-global-settings-to-branding';

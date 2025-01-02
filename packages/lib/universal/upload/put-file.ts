@@ -1,10 +1,8 @@
+import { DocumentDataType } from '@prisma/client';
 import { base64 } from '@scure/base';
 import { env } from 'next-runtime-env';
 import { PDFDocument } from 'pdf-lib';
 import { match } from 'ts-pattern';
-
-import { getFlag } from '@documenso/lib/universal/get-feature-flag';
-import { DocumentDataType } from '@documenso/prisma/client';
 
 import { AppError } from '../../errors/app-error';
 import { createDocumentData } from '../../server-only/document-data/create-document-data';
@@ -20,9 +18,7 @@ type File = {
  * a document data record.
  */
 export const putPdfFile = async (file: File) => {
-  const isEncryptedDocumentsAllowed = await getFlag('app_allow_encrypted_documents').catch(
-    () => false,
-  );
+  const isEncryptedDocumentsAllowed = false; // Was feature flag.
 
   const arrayBuffer = await file.arrayBuffer();
 

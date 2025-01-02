@@ -1,6 +1,8 @@
 import { createElement } from 'react';
 
 import { msg } from '@lingui/macro';
+import type { Team, TeamGlobalSettings } from '@prisma/client';
+import { TeamMemberInviteStatus } from '@prisma/client';
 import { nanoid } from 'nanoid';
 
 import { mailer } from '@documenso/email/mailer';
@@ -11,11 +13,9 @@ import { TEAM_MEMBER_ROLE_PERMISSIONS_MAP } from '@documenso/lib/constants/teams
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import { isTeamRoleWithinUserHierarchy } from '@documenso/lib/utils/teams';
 import { prisma } from '@documenso/prisma';
-import type { Team, TeamGlobalSettings } from '@documenso/prisma/client';
-import { TeamMemberInviteStatus } from '@documenso/prisma/client';
 import type { TCreateTeamMemberInvitesMutationSchema } from '@documenso/trpc/server/team-router/schema';
 
-import { getI18nInstance } from '../../client-only/providers/i18n.server';
+import { getI18nInstance } from '../../client-only/providers/i18n-server';
 import { renderEmailWithI18N } from '../../utils/render-email-with-i18n';
 import { teamGlobalSettingsToBranding } from '../../utils/team-global-settings-to-branding';
 

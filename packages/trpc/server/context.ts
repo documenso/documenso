@@ -1,20 +1,24 @@
+import type { User } from '@prisma/client';
 import { z } from 'zod';
 
 import { getServerSession } from '@documenso/lib/next-auth/get-server-session';
 import type { ApiRequestMetadata } from '@documenso/lib/universal/extract-request-metadata';
 import { extractNextApiRequestMetadata } from '@documenso/lib/universal/extract-request-metadata';
 
-import type { CreateNextContextOptions } from './adapters/next';
+import type { CreateNextContextOptions, NextApiRequest } from './adapters/next';
 
 type CreateTrpcContext = CreateNextContextOptions & {
   requestSource: 'apiV1' | 'apiV2' | 'app';
 };
 
+/**
+ * Todo: Delete
+ */
 export const createTrpcContext = async ({
   req,
   res,
   requestSource,
-}: Omit<CreateTrpcContext, 'info'>) => {
+}: Omit<CreateTrpcContext, 'info'>): Promise<TrpcContext> => {
   const { session, user } = await getServerSession({ req, res });
 
   const metadata: ApiRequestMetadata = {
@@ -58,4 +62,17 @@ export const createTrpcContext = async ({
   };
 };
 
-export type TrpcContext = Awaited<ReturnType<typeof createTrpcContext>>;
+export type TrpcContext = (
+  | {
+      session: null;
+      user: null;
+    }
+  | {
+      session: unknown;
+      user: User;
+    }
+) & {
+  teamId: number | undefined;
+  req: Request | NextApiRequest;
+  metadata: ApiRequestMetadata;
+};

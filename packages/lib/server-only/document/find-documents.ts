@@ -1,16 +1,9 @@
+import type { Document, DocumentSource, Prisma, Team, TeamEmail, User } from '@prisma/client';
+import { RecipientRole, SigningStatus, TeamMemberRole } from '@prisma/client';
 import { DateTime } from 'luxon';
 import { match } from 'ts-pattern';
 
 import { prisma } from '@documenso/prisma';
-import type {
-  Document,
-  DocumentSource,
-  Prisma,
-  Team,
-  TeamEmail,
-  User,
-} from '@documenso/prisma/client';
-import { RecipientRole, SigningStatus, TeamMemberRole } from '@documenso/prisma/client';
 import { ExtendedDocumentStatus } from '@documenso/prisma/types/extended-document-status';
 
 import { DocumentVisibility } from '../../types/document-visibility';

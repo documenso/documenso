@@ -1,6 +1,5 @@
+import { DocumentDataType } from '@prisma/client';
 import { match } from 'ts-pattern';
-
-import { DocumentDataType } from '@documenso/prisma/client';
 
 import { deleteS3File } from './server-actions';
 

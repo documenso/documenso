@@ -6,7 +6,7 @@ import { mailer } from '@documenso/email/mailer';
 import { ConfirmEmailTemplate } from '@documenso/email/templates/confirm-email';
 import { prisma } from '@documenso/prisma';
 
-import { getI18nInstance } from '../../client-only/providers/i18n.server';
+import { getI18nInstance } from '../../client-only/providers/i18n-server';
 import { NEXT_PUBLIC_WEBAPP_URL } from '../../constants/app';
 import { renderEmailWithI18N } from '../../utils/render-email-with-i18n';
 

@@ -2,6 +2,7 @@
 import { PrismaAdapter } from '@next-auth/prisma-adapter';
 import { compare } from '@node-rs/bcrypt';
 import { Prisma } from '@prisma/client';
+import { IdentityProvider, UserSecurityAuditLogType } from '@prisma/client';
 import { verifyAuthenticationResponse } from '@simplewebauthn/server';
 import { DateTime } from 'luxon';
 import type { AuthOptions, Session, User } from 'next-auth';
@@ -12,7 +13,6 @@ import GoogleProvider from 'next-auth/providers/google';
 import { env } from 'next-runtime-env';
 
 import { prisma } from '@documenso/prisma';
-import { IdentityProvider, UserSecurityAuditLogType } from '@documenso/prisma/client';
 
 import { formatSecureCookieName, useSecureCookies } from '../constants/auth';
 import { AppError, AppErrorCode } from '../errors/app-error';

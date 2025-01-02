@@ -58,6 +58,11 @@ export class TriggerJobProvider extends BaseJobProvider {
     return handler;
   }
 
+  // Hono v2 is being deprecated so not sure if we will be required.
+  // public getHonoApiHandler(): (req: HonoContext) => Promise<Response | void> {
+  //   throw new Error('Not implemented');
+  // }
+
   private convertTriggerIoToJobRunIo(io: IO) {
     return {
       wait: io.wait,

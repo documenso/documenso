@@ -1,7 +1,6 @@
 import type { MessageDescriptor } from '@lingui/core';
 import { msg } from '@lingui/macro';
-
-import { DocumentDistributionMethod, DocumentStatus } from '@documenso/prisma/client';
+import { DocumentDistributionMethod, DocumentStatus } from '@prisma/client';
 
 export const DOCUMENT_STATUS: {
   [status in DocumentStatus]: { description: MessageDescriptor };

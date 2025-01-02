@@ -1,9 +1,9 @@
+import type { TeamMemberInvite } from '@prisma/client';
+import { Prisma } from '@prisma/client';
 import { P, match } from 'ts-pattern';
 import type { z } from 'zod';
 
 import { prisma } from '@documenso/prisma';
-import type { TeamMemberInvite } from '@documenso/prisma/client';
-import { Prisma } from '@documenso/prisma/client';
 import { TeamMemberInviteSchema } from '@documenso/prisma/generated/zod';
 
 import { TEAM_MEMBER_ROLE_PERMISSIONS_MAP } from '../../constants/teams';

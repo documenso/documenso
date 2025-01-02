@@ -1,14 +1,9 @@
+import { DocumentStatus, RecipientRole, SigningStatus, WebhookTriggerEvents } from '@prisma/client';
 import { nanoid } from 'nanoid';
 import path from 'node:path';
 import { PDFDocument } from 'pdf-lib';
 
 import { prisma } from '@documenso/prisma';
-import {
-  DocumentStatus,
-  RecipientRole,
-  SigningStatus,
-  WebhookTriggerEvents,
-} from '@documenso/prisma/client';
 import { signPdf } from '@documenso/signing';
 
 import { sendCompletedEmail } from '../../../server-only/document/send-completed-email';

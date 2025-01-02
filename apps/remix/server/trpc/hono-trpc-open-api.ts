@@ -1,0 +1,33 @@
+import type { Context } from 'hono';
+import { createOpenApiFetchHandler } from 'trpc-to-openapi';
+
+import { AppError, genericErrorCodeToTrpcErrorCodeMap } from '@documenso/lib/errors/app-error';
+import { appRouter } from '@documenso/trpc/server/router';
+import { handleTrpcRouterError } from '@documenso/trpc/utils/trpc-error-handler';
+
+import { createHonoTrpcContext } from './trpc-context';
+
+export const openApiTrpcServerHandler = async (c: Context) => {
+  return createOpenApiFetchHandler<typeof appRouter>({
+    endpoint: '/v2/api',
+    router: appRouter,
+    // Todo: Test this, since it's not using the createContext params.
+    createContext: async () => createHonoTrpcContext({ c, requestSource: 'apiV2' }),
+    req: c.req.raw,
+    onError: (opts) => handleTrpcRouterError(opts, 'apiV2'),
+    // Not sure why we need to do this since we handle it in errorFormatter which runs after this.
+    responseMeta: (opts) => {
+      if (opts.errors[0]?.cause instanceof AppError) {
+        const appError = AppError.parseError(opts.errors[0].cause);
+
+        const httpStatus = genericErrorCodeToTrpcErrorCodeMap[appError.code]?.status ?? 400;
+
+        return {
+          status: httpStatus,
+        };
+      }
+
+      return {};
+    },
+  });
+};

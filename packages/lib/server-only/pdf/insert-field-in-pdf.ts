@@ -1,5 +1,6 @@
 // https://github.com/Hopding/pdf-lib/issues/20#issuecomment-412852821
 import fontkit from '@pdf-lib/fontkit';
+import { FieldType } from '@prisma/client';
 import type { PDFDocument } from 'pdf-lib';
 import { RotationTypes, degrees, radiansToDegrees } from 'pdf-lib';
 import { P, match } from 'ts-pattern';
@@ -11,7 +12,6 @@ import {
   MIN_STANDARD_FONT_SIZE,
 } from '@documenso/lib/constants/pdf';
 import { fromCheckboxValue } from '@documenso/lib/universal/field-checkbox';
-import { FieldType } from '@documenso/prisma/client';
 import { isSignatureFieldType } from '@documenso/prisma/guards/is-signature-field';
 import type { FieldWithSignature } from '@documenso/prisma/types/field-with-signature';
 

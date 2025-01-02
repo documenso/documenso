@@ -1,9 +1,9 @@
+import type { TeamMember } from '@prisma/client';
+import { Prisma } from '@prisma/client';
 import { P, match } from 'ts-pattern';
 import type { z } from 'zod';
 
 import { prisma } from '@documenso/prisma';
-import type { TeamMember } from '@documenso/prisma/client';
-import { Prisma } from '@documenso/prisma/client';
 import { TeamMemberSchema, UserSchema } from '@documenso/prisma/generated/zod';
 
 import type { FindResultResponse } from '../../types/search-params';

@@ -1,7 +1,7 @@
+import type { Prisma } from '@prisma/client';
 import type { z } from 'zod';
 
 import { prisma } from '@documenso/prisma';
-import type { Prisma } from '@documenso/prisma/client';
 import {
   TeamEmailSchema,
   TeamGlobalSettingsSchema,

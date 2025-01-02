@@ -1,9 +1,9 @@
 import { compare, hash } from '@node-rs/bcrypt';
+import { UserSecurityAuditLogType } from '@prisma/client';
 
 import { SALT_ROUNDS } from '@documenso/lib/constants/auth';
 import type { RequestMetadata } from '@documenso/lib/universal/extract-request-metadata';
 import { prisma } from '@documenso/prisma';
-import { UserSecurityAuditLogType } from '@documenso/prisma/client';
 
 import { AppError } from '../../errors/app-error';
 

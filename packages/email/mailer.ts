@@ -89,7 +89,7 @@ const getTransport = (): Transporter => {
   }
 
   return createTransport({
-    host: process.env.NEXT_PRIVATE_SMTP_HOST ?? 'localhost:2500',
+    host: process.env.NEXT_PRIVATE_SMTP_HOST ?? '127.0.0.1:2500',
     port: Number(process.env.NEXT_PRIVATE_SMTP_PORT) || 587,
     secure: process.env.NEXT_PRIVATE_SMTP_SECURE === 'true',
     ignoreTLS: process.env.NEXT_PRIVATE_SMTP_UNSAFE_IGNORE_TLS === 'true',

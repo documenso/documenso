@@ -42,6 +42,18 @@ export type ApiRequestMetadata = {
   };
 };
 
+export const extractRequestMetadata = (req: Request): RequestMetadata => {
+  const parsedIp = ZIpSchema.safeParse(req.headers.get('x-forwarded-for'));
+
+  const ipAddress = parsedIp.success ? parsedIp.data : undefined;
+  const userAgent = req.headers.get('user-agent');
+
+  return {
+    ipAddress,
+    userAgent: userAgent ?? undefined,
+  };
+};
+
 export const extractNextApiRequestMetadata = (req: NextApiRequest): RequestMetadata => {
   const parsedIp = ZIpSchema.safeParse(req.headers['x-forwarded-for'] || req.socket.remoteAddress);
 

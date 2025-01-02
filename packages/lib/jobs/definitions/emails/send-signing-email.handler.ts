@@ -1,18 +1,13 @@
 import { createElement } from 'react';
 
 import { msg } from '@lingui/macro';
+import { DocumentSource, DocumentStatus, RecipientRole, SendStatus } from '@prisma/client';
 
 import { mailer } from '@documenso/email/mailer';
 import DocumentInviteEmailTemplate from '@documenso/email/templates/document-invite';
 import { prisma } from '@documenso/prisma';
-import {
-  DocumentSource,
-  DocumentStatus,
-  RecipientRole,
-  SendStatus,
-} from '@documenso/prisma/client';
 
-import { getI18nInstance } from '../../../client-only/providers/i18n.server';
+import { getI18nInstance } from '../../../client-only/providers/i18n-server';
 import { NEXT_PUBLIC_WEBAPP_URL } from '../../../constants/app';
 import { FROM_ADDRESS, FROM_NAME } from '../../../constants/email';
 import {

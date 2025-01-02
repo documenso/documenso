@@ -9,7 +9,9 @@ import { APP_I18N_OPTIONS } from '../constants/i18n';
 export async function dynamicActivate(i18nInstance: I18n, locale: string) {
   const extension = process.env.NODE_ENV === 'development' ? 'po' : 'js';
 
-  const { messages } = await import(`../translations/${locale}/web.${extension}`);
+  // const { messages } = await import(`../translations/${locale}/web.${extension}`);
+  // todo
+  const messages = {};
 
   i18nInstance.loadAndActivate({ locale, messages });
 }

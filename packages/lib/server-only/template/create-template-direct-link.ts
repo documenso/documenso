@@ -1,5 +1,6 @@
 'use server';
 
+import type { Recipient } from '@prisma/client';
 import { nanoid } from 'nanoid';
 
 import {
@@ -7,7 +8,6 @@ import {
   DIRECT_TEMPLATE_RECIPIENT_NAME,
 } from '@documenso/lib/constants/direct-templates';
 import { prisma } from '@documenso/prisma';
-import type { Recipient } from '@documenso/prisma/client';
 
 import { AppError, AppErrorCode } from '../../errors/app-error';
 

@@ -1,10 +1,10 @@
+import { TeamMemberRole } from '@prisma/client';
 import type Stripe from 'stripe';
 
 import { transferTeamSubscription } from '@documenso/ee/server-only/stripe/transfer-team-subscription';
 import { mapStripeSubscriptionToPrismaUpsertAction } from '@documenso/ee/server-only/stripe/webhook/on-subscription-updated';
 import { IS_BILLING_ENABLED } from '@documenso/lib/constants/app';
 import { prisma } from '@documenso/prisma';
-import { TeamMemberRole } from '@documenso/prisma/client';
 
 export type TransferTeamOwnershipOptions = {
   token: string;

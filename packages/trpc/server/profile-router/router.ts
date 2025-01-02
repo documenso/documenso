@@ -1,3 +1,5 @@
+import { SubscriptionStatus } from '@prisma/client';
+
 import { IS_BILLING_ENABLED } from '@documenso/lib/constants/app';
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import { jobsClient } from '@documenso/lib/jobs/client';
@@ -11,8 +13,6 @@ import { resetPassword } from '@documenso/lib/server-only/user/reset-password';
 import { updatePassword } from '@documenso/lib/server-only/user/update-password';
 import { updateProfile } from '@documenso/lib/server-only/user/update-profile';
 import { updatePublicProfile } from '@documenso/lib/server-only/user/update-public-profile';
-import { extractNextApiRequestMetadata } from '@documenso/lib/universal/extract-request-metadata';
-import { SubscriptionStatus } from '@documenso/prisma/client';
 
 import { adminProcedure, authenticatedProcedure, procedure, router } from '../trpc';
 import {
@@ -114,7 +114,7 @@ export const profileRouter = router({
     return await resetPassword({
       token,
       password,
-      requestMetadata: extractNextApiRequestMetadata(ctx.req),
+      requestMetadata: ctx.metadata.requestMetadata,
     });
   }),
 

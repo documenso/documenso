@@ -1,3 +1,4 @@
+import { DocumentDataType, DocumentStatus } from '@prisma/client';
 import { TRPCError } from '@trpc/server';
 import { DateTime } from 'luxon';
 
@@ -24,7 +25,6 @@ import { sendDocument } from '@documenso/lib/server-only/document/send-document'
 import { updateDocument } from '@documenso/lib/server-only/document/update-document';
 import { symmetricEncrypt } from '@documenso/lib/universal/crypto';
 import { getPresignPostUrl } from '@documenso/lib/universal/upload/server-actions';
-import { DocumentDataType, DocumentStatus } from '@documenso/prisma/client';
 
 import { authenticatedProcedure, procedure, router } from '../trpc';
 import {

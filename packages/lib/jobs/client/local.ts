@@ -1,10 +1,11 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 
 import { sha256 } from '@noble/hashes/sha256';
+import { BackgroundJobStatus, Prisma } from '@prisma/client';
+import type { Context as HonoContext } from 'hono';
 import { json } from 'micro';
 
 import { prisma } from '@documenso/prisma';
-import { BackgroundJobStatus, Prisma } from '@documenso/prisma/client';
 
 import { NEXT_PRIVATE_INTERNAL_WEBAPP_URL } from '../../constants/app';
 import { sign } from '../../server-only/crypto/sign';
@@ -210,6 +211,152 @@ export class LocalJobProvider extends BaseJobProvider {
       }
 
       res.status(200).send('OK');
+    };
+  }
+
+  public getHonoApiHandler(): (context: HonoContext) => Promise<Response | void> {
+    return async (context: HonoContext) => {
+      const req = context.req;
+
+      if (req.method !== 'POST') {
+        context.text('Method not allowed', 405);
+        return;
+      }
+
+      const jobId = req.header('x-job-id');
+      const signature = req.header('x-job-signature');
+      const isRetry = req.header('x-job-retry') !== undefined;
+
+      const options = await req
+        .json()
+        .then(async (data) => ZSimpleTriggerJobOptionsSchema.parseAsync(data))
+        // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
+        .then((data) => data as SimpleTriggerJobOptions)
+        .catch(() => null);
+
+      if (!options) {
+        context.text('Bad request', 400);
+        return;
+      }
+
+      const definition = this._jobDefinitions[options.name];
+
+      if (
+        typeof jobId !== 'string' ||
+        typeof signature !== 'string' ||
+        typeof options !== 'object'
+      ) {
+        context.text('Bad request', 400);
+        return;
+      }
+
+      if (!definition) {
+        context.text('Job not found', 404);
+        return;
+      }
+
+      if (definition && !definition.enabled) {
+        console.log('Attempted to trigger a disabled job', options.name);
+
+        context.text('Job not found', 404);
+        return;
+      }
+
+      if (!signature || !verify(options, signature)) {
+        context.text('Unauthorized', 401);
+        return;
+      }
+
+      if (definition.trigger.schema) {
+        const result = definition.trigger.schema.safeParse(options.payload);
+
+        if (!result.success) {
+          context.text('Bad request', 400);
+          return;
+        }
+      }
+
+      console.log(`[JOBS]: Triggering job ${options.name} with payload`, options.payload);
+
+      let backgroundJob = await prisma.backgroundJob
+        .update({
+          where: {
+            id: jobId,
+            status: BackgroundJobStatus.PENDING,
+          },
+          data: {
+            status: BackgroundJobStatus.PROCESSING,
+            retried: {
+              increment: isRetry ? 1 : 0,
+            },
+            lastRetriedAt: isRetry ? new Date() : undefined,
+          },
+        })
+        .catch(() => null);
+
+      if (!backgroundJob) {
+        context.text('Job not found', 404);
+        return;
+      }
+
+      try {
+        await definition.handler({
+          payload: options.payload,
+          io: this.createJobRunIO(jobId),
+        });
+
+        backgroundJob = await prisma.backgroundJob.update({
+          where: {
+            id: jobId,
+            status: BackgroundJobStatus.PROCESSING,
+          },
+          data: {
+            status: BackgroundJobStatus.COMPLETED,
+            completedAt: new Date(),
+          },
+        });
+      } catch (error) {
+        console.log(`[JOBS]: Job ${options.name} failed`, error);
+
+        const taskHasExceededRetries = error instanceof BackgroundTaskExceededRetriesError;
+        const jobHasExceededRetries =
+          backgroundJob.retried >= backgroundJob.maxRetries &&
+          !(error instanceof BackgroundTaskFailedError);
+
+        if (taskHasExceededRetries || jobHasExceededRetries) {
+          backgroundJob = await prisma.backgroundJob.update({
+            where: {
+              id: jobId,
+              status: BackgroundJobStatus.PROCESSING,
+            },
+            data: {
+              status: BackgroundJobStatus.FAILED,
+              completedAt: new Date(),
+            },
+          });
+
+          context.text('Task exceeded retries', 500);
+          return;
+        }
+
+        backgroundJob = await prisma.backgroundJob.update({
+          where: {
+            id: jobId,
+            status: BackgroundJobStatus.PROCESSING,
+          },
+          data: {
+            status: BackgroundJobStatus.PENDING,
+          },
+        });
+
+        await this.submitJobToEndpoint({
+          jobId,
+          jobDefinitionId: backgroundJob.jobId,
+          data: options,
+        });
+      }
+
+      context.text('OK', 200);
     };
   }
 

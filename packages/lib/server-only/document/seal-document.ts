@@ -1,3 +1,4 @@
+import { DocumentStatus, RecipientRole, SigningStatus, WebhookTriggerEvents } from '@prisma/client';
 import { nanoid } from 'nanoid';
 import path from 'node:path';
 import { PDFDocument } from 'pdf-lib';
@@ -6,12 +7,6 @@ import PostHogServerClient from '@documenso/lib/server-only/feature-flags/get-po
 import { DOCUMENT_AUDIT_LOG_TYPE } from '@documenso/lib/types/document-audit-logs';
 import { createDocumentAuditLogData } from '@documenso/lib/utils/document-audit-logs';
 import { prisma } from '@documenso/prisma';
-import {
-  DocumentStatus,
-  RecipientRole,
-  SigningStatus,
-  WebhookTriggerEvents,
-} from '@documenso/prisma/client';
 import { signPdf } from '@documenso/signing';
 
 import {

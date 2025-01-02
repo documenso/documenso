@@ -1,14 +1,15 @@
 'use server';
 
+import { DocumentSource, WebhookTriggerEvents } from '@prisma/client';
+import type { Team, TeamGlobalSettings } from '@prisma/client';
+import { TeamMemberRole } from '@prisma/client';
+
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import { normalizePdf as makeNormalizedPdf } from '@documenso/lib/server-only/pdf/normalize-pdf';
 import { DOCUMENT_AUDIT_LOG_TYPE } from '@documenso/lib/types/document-audit-logs';
 import type { ApiRequestMetadata } from '@documenso/lib/universal/extract-request-metadata';
 import { createDocumentAuditLogData } from '@documenso/lib/utils/document-audit-logs';
 import { prisma } from '@documenso/prisma';
-import { DocumentSource, WebhookTriggerEvents } from '@documenso/prisma/client';
-import type { Team, TeamGlobalSettings } from '@documenso/prisma/client';
-import { TeamMemberRole } from '@documenso/prisma/client';
 
 import {
   ZWebhookDocumentSchema,

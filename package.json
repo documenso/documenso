@@ -5,6 +5,7 @@
     "build": "turbo run build",
     "build:web": "turbo run build --filter=@documenso/web",
     "dev": "turbo run dev --filter=@documenso/web",
+    "dev:remix": "turbo run dev --filter=@documenso/remix",
     "dev:web": "turbo run dev --filter=@documenso/web",
     "dev:docs": "turbo run dev --filter=@documenso/documentation",
     "dev:openpage-api": "turbo run dev --filter=@documenso/openpage-api",
@@ -55,7 +56,8 @@
     "playwright": "1.43.0",
     "prettier": "^3.3.3",
     "rimraf": "^5.0.1",
-    "turbo": "^1.9.3"
+    "turbo": "^1.9.3",
+    "vite": "^6.0.11"
   },
   "name": "@documenso/root",
   "workspaces": [

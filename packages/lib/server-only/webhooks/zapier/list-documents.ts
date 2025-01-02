@@ -1,8 +1,9 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 
+import type { Webhook } from '@prisma/client';
+
 import { findDocuments } from '@documenso/lib/server-only/document/find-documents';
 import { getRecipientsForDocument } from '@documenso/lib/server-only/recipient/get-recipients-for-document';
-import type { Webhook } from '@documenso/prisma/client';
 
 import { getWebhooksByTeamId } from '../get-webhooks-by-team-id';
 import { getWebhooksByUserId } from '../get-webhooks-by-user-id';

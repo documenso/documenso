@@ -1,17 +1,11 @@
-import 'server-only';
-
-import { cookies, headers } from 'next/headers';
-
 import type { I18n, Messages } from '@lingui/core';
 import { setupI18n } from '@lingui/core';
-import { setI18n } from '@lingui/react/server';
 
 import {
   APP_I18N_OPTIONS,
   SUPPORTED_LANGUAGE_CODES,
   isValidLanguageCode,
 } from '../../constants/i18n';
-import { extractLocaleData } from '../../utils/i18n';
 import { remember } from '../../utils/remember';
 
 type SupportedLanguages = (typeof SUPPORTED_LANGUAGE_CODES)[number];
@@ -21,7 +15,8 @@ export async function loadCatalog(lang: SupportedLanguages): Promise<{
 }> {
   const extension = process.env.NODE_ENV === 'development' ? 'po' : 'js';
 
-  const { messages } = await import(`../../translations/${lang}/web.${extension}`);
+  // const { messages } = await import(`../../translations/${lang}/web.${extension}`);
+  const messages = {};
 
   return {
     [lang]: messages,
@@ -70,30 +65,4 @@ export const getI18nInstance = async (lang?: SupportedLanguages | (string & {}))
   }
 
   return instances[lang] ?? instances[APP_I18N_OPTIONS.sourceLang];
-};
-
-/**
- * This needs to be run in all layouts and page server components that require i18n.
- *
- * https://lingui.dev/tutorials/react-rsc#pages-layouts-and-lingui
- */
-export const setupI18nSSR = async () => {
-  const { lang, locales } = extractLocaleData({
-    cookies: cookies(),
-    headers: headers(),
-  });
-
-  // Get and set a ready-made i18n instance for the given language.
-  const i18n = await getI18nInstance(lang);
-
-  // Reactivate the i18n instance with the locale for date and number formatting.
-  i18n.activate(lang, locales);
-
-  setI18n(i18n);
-
-  return {
-    lang,
-    locales,
-    i18n,
-  };
 };

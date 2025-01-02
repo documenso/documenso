@@ -1,13 +1,10 @@
-'use client';
-
-import Link from 'next/link';
-
 import type { MessageDescriptor } from '@lingui/core';
 import { Trans, msg } from '@lingui/macro';
 import { useLingui } from '@lingui/react';
 import { motion } from 'framer-motion';
 import { AlertTriangle, Plus } from 'lucide-react';
 import { useDropzone } from 'react-dropzone';
+import { Link } from 'react-router';
 
 import { APP_DOCUMENT_UPLOAD_SIZE_LIMIT, IS_BILLING_ENABLED } from '@documenso/lib/constants/app';
 import { megabytesToBytes } from '@documenso/lib/universal/unit-convertions';
@@ -164,7 +161,7 @@ export const DocumentDropzone = ({
 
           {disabled && IS_BILLING_ENABLED() && (
             <Button className="hover:bg-warning/80 bg-warning mt-4 w-32" asChild>
-              <Link href="/settings/billing">
+              <Link to="/settings/billing">
                 <Trans>Upgrade</Trans>
               </Link>
             </Button>

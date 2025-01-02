@@ -1,3 +1,11 @@
+import {
+  DocumentDistributionMethod,
+  DocumentSigningOrder,
+  DocumentSource,
+  DocumentStatus,
+  DocumentVisibility,
+  FieldType,
+} from '@prisma/client';
 import { z } from 'zod';
 
 import { VALID_DATE_FORMAT_VALUES } from '@documenso/lib/constants/date-formats';
@@ -23,14 +31,6 @@ import {
 import { ZFieldAndMetaSchema } from '@documenso/lib/types/field-meta';
 import { ZFindResultResponse, ZFindSearchParamsSchema } from '@documenso/lib/types/search-params';
 import { isValidRedirectUrl } from '@documenso/lib/utils/is-valid-redirect-url';
-import {
-  DocumentDistributionMethod,
-  DocumentSigningOrder,
-  DocumentSource,
-  DocumentStatus,
-  DocumentVisibility,
-  FieldType,
-} from '@documenso/prisma/client';
 
 import { ZCreateRecipientSchema } from '../recipient-router/schema';
 

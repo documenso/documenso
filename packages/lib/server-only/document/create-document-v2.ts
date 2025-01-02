@@ -1,3 +1,13 @@
+import type { DocumentVisibility, TemplateMeta } from '@prisma/client';
+import {
+  DocumentSource,
+  RecipientRole,
+  SendStatus,
+  SigningStatus,
+  WebhookTriggerEvents,
+} from '@prisma/client';
+import { TeamMemberRole } from '@prisma/client';
+
 import { isUserEnterprise } from '@documenso/ee/server-only/util/is-document-enterprise';
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import { normalizePdf as makeNormalizedPdf } from '@documenso/lib/server-only/pdf/normalize-pdf';
@@ -6,15 +16,6 @@ import type { ApiRequestMetadata } from '@documenso/lib/universal/extract-reques
 import { nanoid } from '@documenso/lib/universal/id';
 import { createDocumentAuditLogData } from '@documenso/lib/utils/document-audit-logs';
 import { prisma } from '@documenso/prisma';
-import type { DocumentVisibility, TemplateMeta } from '@documenso/prisma/client';
-import {
-  DocumentSource,
-  RecipientRole,
-  SendStatus,
-  SigningStatus,
-  WebhookTriggerEvents,
-} from '@documenso/prisma/client';
-import { TeamMemberRole } from '@documenso/prisma/client';
 import type { TCreateDocumentV2Request } from '@documenso/trpc/server/document-router/schema';
 
 import type { TDocumentAccessAuthTypes, TDocumentActionAuthTypes } from '../../types/document-auth';

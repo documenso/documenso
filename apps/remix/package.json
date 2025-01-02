@@ -1,0 +1,51 @@
+{
+  "name": "@documenso/remix",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "cross-env NODE_ENV=production react-router build",
+    "dev": "react-router dev",
+    "start": "cross-env NODE_ENV=production node dist/server/index.js",
+    "clean": "rimraf .react-router && rimraf node_modules",
+    "typecheck": "react-router typegen && tsc"
+  },
+  "dependencies": {
+    "@epic-web/remember": "^1.1.0",
+    "@hono/node-server": "^1.13.7",
+    "@hono/trpc-server": "^0.3.4",
+    "@hono/zod-validator": "^0.4.2",
+    "@lingui/macro": "^4.11.3",
+    "@lingui/react": "^4.11.3",
+    "@oslojs/crypto": "^1.0.1",
+    "@oslojs/encoding": "^1.1.0",
+    "@react-router/node": "^7.1.3",
+    "@react-router/serve": "^7.1.3",
+    "autoprefixer": "^10.4.13",
+    "framer-motion": "^10.12.8",
+    "hono": "4.6.15",
+    "hono-react-router-adapter": "^0.6.2",
+    "isbot": "^5.1.17",
+    "jsonwebtoken": "^9.0.2",
+    "react": "^18",
+    "react-dom": "^18",
+    "react-router": "^7.1.3",
+    "remix-hono": "^0.0.18",
+    "tailwindcss": "^3.4.15",
+    "ts-pattern": "^5.0.5"
+  },
+  "devDependencies": {
+    "@lingui/vite-plugin": "^5.1.2",
+    "@react-router/dev": "^7.1.1",
+    "@react-router/remix-routes-option-adapter": "^7.1.3",
+    "@types/node": "^20",
+    "@types/react": "^18",
+    "@types/react-dom": "^18",
+    "cross-env": "^7.0.3",
+    "remix-flat-routes": "^0.7.2",
+    "tsx": "^4.11.0",
+    "typescript": "5.6.2",
+    "vite": "^6.0.11",
+    "vite-plugin-babel-macros": "^1.0.6",
+    "vite-tsconfig-paths": "^5.1.4"
+  }
+}

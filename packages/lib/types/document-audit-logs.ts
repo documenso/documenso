@@ -4,9 +4,8 @@
 // data in Prisma.
 //
 /////////////////////////////////////////////////////////////////////////////////////////////
+import { DocumentSource, FieldType } from '@prisma/client';
 import { z } from 'zod';
-
-import { DocumentSource, FieldType } from '@documenso/prisma/client';
 
 import { ZRecipientAccessAuthTypesSchema, ZRecipientActionAuthTypesSchema } from './document-auth';
 

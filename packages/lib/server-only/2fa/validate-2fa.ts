@@ -1,4 +1,4 @@
-import type { User } from '@documenso/prisma/client';
+import type { User } from '@prisma/client';
 
 import { ErrorCode } from '../../next-auth/error-codes';
 import { verifyTwoFactorAuthenticationToken } from './verify-2fa-token';
@@ -7,7 +7,7 @@ import { verifyBackupCode } from './verify-backup-code';
 type ValidateTwoFactorAuthenticationOptions = {
   totpCode?: string;
   backupCode?: string;
-  user: User;
+  user: Pick<User, 'id' | 'email' | 'twoFactorEnabled' | 'twoFactorSecret'>;
 };
 
 export const validateTwoFactorAuthentication = async ({

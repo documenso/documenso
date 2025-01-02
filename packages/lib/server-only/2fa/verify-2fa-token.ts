@@ -1,7 +1,6 @@
+import type { User } from '@prisma/client';
 import { base32 } from '@scure/base';
 import { generateHOTP } from 'oslo/otp';
-
-import type { User } from '@documenso/prisma/client';
 
 import { DOCUMENSO_ENCRYPTION_KEY } from '../../constants/crypto';
 import { symmetricDecrypt } from '../../universal/crypto';

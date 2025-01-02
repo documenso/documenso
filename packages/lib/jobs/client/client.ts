@@ -27,4 +27,8 @@ export class JobClient<T extends ReadonlyArray<JobDefinition> = []> {
   public getApiHandler() {
     return this._provider.getApiHandler();
   }
+
+  public getHonoApiHandler() {
+    return this._provider.getHonoApiHandler();
+  }
 }

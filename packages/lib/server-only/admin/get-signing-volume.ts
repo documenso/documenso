@@ -1,5 +1,6 @@
+import { DocumentStatus, Prisma } from '@prisma/client';
+
 import { prisma } from '@documenso/prisma';
-import { DocumentStatus, Prisma } from '@documenso/prisma/client';
 
 export type SigningVolume = {
   id: number;

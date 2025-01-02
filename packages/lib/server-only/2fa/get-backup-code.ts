@@ -1,12 +1,11 @@
+import type { User } from '@prisma/client';
 import { z } from 'zod';
-
-import { User } from '@documenso/prisma/client';
 
 import { DOCUMENSO_ENCRYPTION_KEY } from '../../constants/crypto';
 import { symmetricDecrypt } from '../../universal/crypto';
 
 interface GetBackupCodesOptions {
-  user: User;
+  user: Pick<User, 'id' | 'twoFactorEnabled' | 'twoFactorBackupCodes'>;
 }
 
 const ZBackupCodeSchema = z.array(z.string());

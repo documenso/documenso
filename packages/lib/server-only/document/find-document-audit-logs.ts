@@ -1,5 +1,6 @@
+import type { DocumentAuditLog, Prisma } from '@prisma/client';
+
 import { prisma } from '@documenso/prisma';
-import type { DocumentAuditLog, Prisma } from '@documenso/prisma/client';
 
 import { AppError, AppErrorCode } from '../../errors/app-error';
 import { DOCUMENT_AUDIT_LOG_TYPE } from '../../types/document-audit-logs';
