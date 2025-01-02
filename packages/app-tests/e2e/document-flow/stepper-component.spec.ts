@@ -1,16 +1,16 @@
 import { expect, test } from '@playwright/test';
-import { DateTime } from 'luxon';
-import path from 'node:path';
-
-import { getRecipientByEmail } from '@documenso/lib/server-only/recipient/get-recipient-by-email';
-import { prisma } from '@documenso/prisma';
 import {
   DocumentSigningOrder,
   DocumentStatus,
   FieldType,
   RecipientRole,
   SigningStatus,
-} from '@documenso/prisma/client';
+} from '@prisma/client';
+import { DateTime } from 'luxon';
+import path from 'node:path';
+
+import { getRecipientByEmail } from '@documenso/lib/server-only/recipient/get-recipient-by-email';
+import { prisma } from '@documenso/prisma';
 import {
   seedBlankDocument,
   seedPendingDocumentWithFullFields,
@@ -18,6 +18,7 @@ import {
 import { seedUser } from '@documenso/prisma/seed/users';
 
 import { apiSignin } from '../fixtures/authentication';
+import { signSignaturePad } from '../fixtures/signature';
 
 // Can't use the function in server-only/document due to it indirectly using
 // require imports.
@@ -368,15 +369,7 @@ test('[DOCUMENT_FLOW]: should be able to approve a document', async ({ page }) =
       }),
     ).toBeVisible();
 
-    // Add signature.
-    const canvas = page.locator('canvas');
-    const box = await canvas.boundingBox();
-    if (box) {
-      await page.mouse.move(box.x + 40, box.y + 40);
-      await page.mouse.down();
-      await page.mouse.move(box.x + box.width - 2, box.y + box.height - 2);
-      await page.mouse.up();
-    }
+    await signSignaturePad(page);
 
     for (const field of fields) {
       await page.locator(`#field-${field.id}`).getByRole('button').click();
@@ -384,7 +377,9 @@ test('[DOCUMENT_FLOW]: should be able to approve a document', async ({ page }) =
       await expect(page.locator(`#field-${field.id}`)).toHaveAttribute('data-inserted', 'true');
     }
 
-    await page.getByRole('button', { name: 'Complete' }).click();
+    await page
+      .getByRole('button', { name: role === RecipientRole.SIGNER ? 'Complete' : 'Approve' })
+      .click();
     await page
       .getByRole('button', { name: role === RecipientRole.SIGNER ? 'Sign' : 'Approve' })
       .click();
@@ -454,7 +449,7 @@ test('[DOCUMENT_FLOW]: should be able to create, send with redirect url, sign a 
   const { status } = await getDocumentByToken(token);
   expect(status).toBe(DocumentStatus.PENDING);
 
-  await page.getByRole('button', { name: 'Complete' }).click();
+  await page.getByRole('button', { name: 'Approve' }).click();
   await expect(page.getByRole('dialog').getByText('Complete Approval').first()).toBeVisible();
   await page.getByRole('button', { name: 'Approve' }).click();
 
@@ -540,12 +535,19 @@ test('[DOCUMENT_FLOW]: should be able to create and sign a document with 3 recip
     if (i > 1) {
       await page.getByRole('button', { name: 'Add Signer' }).click();
     }
+
     await page
-      .getByPlaceholder('Email')
+      .getByLabel('Email')
+      .nth(i - 1)
+      .focus();
+
+    await page
+      .getByLabel('Email')
       .nth(i - 1)
       .fill(`user${i}@example.com`);
+
     await page
-      .getByPlaceholder('Name')
+      .getByLabel('Name')
       .nth(i - 1)
       .fill(`User ${i}`);
   }
@@ -607,19 +609,10 @@ test('[DOCUMENT_FLOW]: should be able to create and sign a document with 3 recip
 
     await page.goto(`/sign/${recipient?.token}`);
     await expect(page.getByRole('heading', { name: 'Sign Document' })).toBeVisible();
+    await signSignaturePad(page);
 
     await page.locator(`#field-${recipientField.id}`).getByRole('button').click();
 
-    const canvas = page.locator('canvas#signature');
-    const box = await canvas.boundingBox();
-    if (box) {
-      await page.mouse.move(box.x + 40, box.y + 40);
-      await page.mouse.down();
-      await page.mouse.move(box.x + box.width - 2, box.y + box.height - 2);
-      await page.mouse.up();
-    }
-
-    await page.getByRole('button', { name: 'Sign', exact: true }).click();
     await page.getByRole('button', { name: 'Complete' }).click();
     await page.getByRole('button', { name: 'Sign' }).click();
 

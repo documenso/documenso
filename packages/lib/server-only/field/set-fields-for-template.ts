@@ -1,3 +1,5 @@
+import { FieldType } from '@prisma/client';
+
 import { validateCheckboxField } from '@documenso/lib/advanced-fields-validation/validate-checkbox';
 import { validateDropdownField } from '@documenso/lib/advanced-fields-validation/validate-dropdown';
 import { validateNumberField } from '@documenso/lib/advanced-fields-validation/validate-number';
@@ -13,7 +15,6 @@ import {
   ZTextFieldMeta,
 } from '@documenso/lib/types/field-meta';
 import { prisma } from '@documenso/prisma';
-import { FieldType } from '@documenso/prisma/client';
 
 export type SetFieldsForTemplateOptions = {
   userId: number;

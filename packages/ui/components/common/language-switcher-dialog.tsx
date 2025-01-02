@@ -1,9 +1,8 @@
-import { msg } from '@lingui/macro';
+import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
 import { CheckIcon } from 'lucide-react';
 
 import { SUPPORTED_LANGUAGES } from '@documenso/lib/constants/i18n';
-import { switchI18NLanguage } from '@documenso/lib/server-only/i18n/switch-i18n-language';
 import { dynamicActivate } from '@documenso/lib/utils/i18n';
 import { cn } from '@documenso/ui/lib/utils';
 import {
@@ -25,8 +24,16 @@ export const LanguageSwitcherDialog = ({ open, setOpen }: LanguageSwitcherDialog
   const setLanguage = async (lang: string) => {
     setOpen(false);
 
-    await dynamicActivate(i18n, lang);
-    await switchI18NLanguage(lang);
+    await dynamicActivate(lang);
+
+    const formData = new FormData();
+
+    formData.append('lang', lang);
+
+    await fetch('/api/locale', {
+      method: 'post',
+      body: formData,
+    });
   };
 
   return (

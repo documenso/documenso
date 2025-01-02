@@ -1,7 +1,9 @@
 import Honeybadger from '@honeybadger-io/js';
 
+import { env } from './env';
+
 export const buildLogger = () => {
-  if (process.env.NEXT_PRIVATE_LOGGER_HONEY_BADGER_API_KEY) {
+  if (env('NEXT_PRIVATE_LOGGER_HONEY_BADGER_API_KEY')) {
     return new HoneybadgerLogger();
   }
 
@@ -45,12 +47,12 @@ class DefaultLogger implements Logger {
 
 class HoneybadgerLogger implements Logger {
   constructor() {
-    if (!process.env.NEXT_PRIVATE_LOGGER_HONEY_BADGER_API_KEY) {
+    if (!env('NEXT_PRIVATE_LOGGER_HONEY_BADGER_API_KEY')) {
       throw new Error('NEXT_PRIVATE_LOGGER_HONEY_BADGER_API_KEY is not set');
     }
 
     Honeybadger.configure({
-      apiKey: process.env.NEXT_PRIVATE_LOGGER_HONEY_BADGER_API_KEY,
+      apiKey: env('NEXT_PRIVATE_LOGGER_HONEY_BADGER_API_KEY'),
     });
   }
 

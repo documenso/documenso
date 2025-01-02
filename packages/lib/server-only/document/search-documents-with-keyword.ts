@@ -1,10 +1,10 @@
+import { DocumentStatus } from '@prisma/client';
+import type { Document, Recipient, User } from '@prisma/client';
+import { DocumentVisibility, TeamMemberRole } from '@prisma/client';
 import { match } from 'ts-pattern';
 
 import { formatDocumentsPath } from '@documenso/lib/utils/teams';
 import { prisma } from '@documenso/prisma';
-import { DocumentStatus } from '@documenso/prisma/client';
-import type { Document, Recipient, User } from '@documenso/prisma/client';
-import { DocumentVisibility, TeamMemberRole } from '@documenso/prisma/client';
 
 export type SearchDocumentsWithKeywordOptions = {
   query: string;
@@ -28,6 +28,14 @@ export const searchDocumentsWithKeyword = async ({
       OR: [
         {
           title: {
+            contains: query,
+            mode: 'insensitive',
+          },
+          userId: userId,
+          deletedAt: null,
+        },
+        {
+          externalId: {
             contains: query,
             mode: 'insensitive',
           },
@@ -73,6 +81,23 @@ export const searchDocumentsWithKeyword = async ({
         },
         {
           title: {
+            contains: query,
+            mode: 'insensitive',
+          },
+          teamId: {
+            not: null,
+          },
+          team: {
+            members: {
+              some: {
+                userId: userId,
+              },
+            },
+          },
+          deletedAt: null,
+        },
+        {
+          externalId: {
             contains: query,
             mode: 'insensitive',
           },

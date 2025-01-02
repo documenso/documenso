@@ -1,8 +1,8 @@
+import { TeamMemberRole } from '@prisma/client';
 import type { Duration } from 'luxon';
 import { DateTime } from 'luxon';
 
 import { prisma } from '@documenso/prisma';
-import { TeamMemberRole } from '@documenso/prisma/client';
 
 // temporary choice for testing only
 import * as timeConstants from '../../constants/time';

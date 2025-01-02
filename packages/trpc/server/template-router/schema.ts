@@ -1,3 +1,4 @@
+import { DocumentSigningOrder, DocumentVisibility, TemplateType } from '@prisma/client';
 import { z } from 'zod';
 
 import { ZDocumentSchema } from '@documenso/lib/types/document';
@@ -6,14 +7,14 @@ import {
   ZDocumentActionAuthTypesSchema,
 } from '@documenso/lib/types/document-auth';
 import { ZDocumentEmailSettingsSchema } from '@documenso/lib/types/document-email';
+import { ZFieldMetaPrefillFieldsSchema } from '@documenso/lib/types/field-meta';
 import { ZFindResultResponse, ZFindSearchParamsSchema } from '@documenso/lib/types/search-params';
 import {
   ZTemplateLiteSchema,
   ZTemplateManySchema,
   ZTemplateSchema,
 } from '@documenso/lib/types/template';
-import { DocumentSigningOrder, DocumentVisibility, TemplateType } from '@documenso/prisma/client';
-import { TemplateDirectLinkSchema } from '@documenso/prisma/generated/zod';
+import { TemplateDirectLinkSchema } from '@documenso/prisma/generated/zod/modelSchema/TemplateDirectLinkSchema';
 
 import {
   ZDocumentMetaDateFormatSchema,
@@ -65,6 +66,12 @@ export const ZCreateDocumentFromTemplateRequestSchema = z.object({
     .string()
     .describe(
       'The data ID of an alternative PDF to use when creating the document. If not provided, the PDF attached to the template will be used.',
+    )
+    .optional(),
+  prefillFields: z
+    .array(ZFieldMetaPrefillFieldsSchema)
+    .describe(
+      'The fields to prefill on the document before sending it out. Useful when you want to create a document from an existing template and pre-fill the fields with specific values.',
     )
     .optional(),
 });
@@ -188,6 +195,14 @@ export const ZMoveTemplateToTeamRequestSchema = z.object({
 
 export const ZMoveTemplateToTeamResponseSchema = ZTemplateLiteSchema;
 
+export const ZBulkSendTemplateMutationSchema = z.object({
+  templateId: z.number(),
+  teamId: z.number().optional(),
+  csv: z.string().min(1),
+  sendImmediately: z.boolean(),
+});
+
 export type TCreateTemplateMutationSchema = z.infer<typeof ZCreateTemplateMutationSchema>;
 export type TDuplicateTemplateMutationSchema = z.infer<typeof ZDuplicateTemplateMutationSchema>;
 export type TDeleteTemplateMutationSchema = z.infer<typeof ZDeleteTemplateMutationSchema>;
+export type TBulkSendTemplateMutationSchema = z.infer<typeof ZBulkSendTemplateMutationSchema>;

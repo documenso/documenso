@@ -9,7 +9,6 @@ import { setFieldsForTemplate } from '@documenso/lib/server-only/field/set-field
 import { signFieldWithToken } from '@documenso/lib/server-only/field/sign-field-with-token';
 import { updateDocumentFields } from '@documenso/lib/server-only/field/update-document-fields';
 import { updateTemplateFields } from '@documenso/lib/server-only/field/update-template-fields';
-import { extractNextApiRequestMetadata } from '@documenso/lib/universal/extract-request-metadata';
 
 import { ZGenericSuccessResponse, ZSuccessResponseSchema } from '../document-router/schema';
 import { authenticatedProcedure, procedure, router } from '../trpc';
@@ -452,11 +451,11 @@ export const fieldRouter = router({
       return await signFieldWithToken({
         token,
         fieldId,
-        value,
+        value: value ?? '',
         isBase64,
         userId: ctx.user?.id,
         authOptions,
-        requestMetadata: extractNextApiRequestMetadata(ctx.req),
+        requestMetadata: ctx.metadata.requestMetadata,
       });
     }),
 
@@ -471,7 +470,7 @@ export const fieldRouter = router({
       return await removeSignedFieldWithToken({
         token,
         fieldId,
-        requestMetadata: extractNextApiRequestMetadata(ctx.req),
+        requestMetadata: ctx.metadata.requestMetadata,
       });
     }),
 });

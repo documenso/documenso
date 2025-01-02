@@ -1,3 +1,4 @@
+import { Prisma, TeamMemberRole } from '@prisma/client';
 import type Stripe from 'stripe';
 import { z } from 'zod';
 
@@ -8,7 +9,6 @@ import { IS_BILLING_ENABLED } from '@documenso/lib/constants/app';
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import { subscriptionsContainsActivePlan } from '@documenso/lib/utils/billing';
 import { prisma } from '@documenso/prisma';
-import { Prisma, TeamMemberRole } from '@documenso/prisma/client';
 
 import { stripe } from '../stripe';
 
@@ -95,7 +95,7 @@ export const createTeam = async ({
           });
         }
 
-        await tx.team.create({
+        const team = await tx.team.create({
           data: {
             name: teamName,
             url: teamUrl,
@@ -104,11 +104,21 @@ export const createTeam = async ({
             members: {
               create: [
                 {
-                  userId,
+                  userId: user.id,
                   role: TeamMemberRole.ADMIN,
                 },
               ],
             },
+          },
+        });
+
+        await tx.teamGlobalSettings.upsert({
+          where: {
+            teamId: team.id,
+          },
+          update: {},
+          create: {
+            teamId: team.id,
           },
         });
       });
@@ -195,7 +205,7 @@ export const createTeamFromPendingTeam = async ({
   pendingTeamId,
   subscription,
 }: CreateTeamFromPendingTeamOptions) => {
-  return await prisma.$transaction(async (tx) => {
+  const createdTeam = await prisma.$transaction(async (tx) => {
     const pendingTeam = await tx.teamPending.findUniqueOrThrow({
       where: {
         id: pendingTeamId,
@@ -225,23 +235,35 @@ export const createTeamFromPendingTeam = async ({
       },
     });
 
+    await tx.teamGlobalSettings.upsert({
+      where: {
+        teamId: team.id,
+      },
+      update: {},
+      create: {
+        teamId: team.id,
+      },
+    });
+
     await tx.subscription.upsert(
       mapStripeSubscriptionToPrismaUpsertAction(subscription, undefined, team.id),
     );
 
-    // Attach the team ID to the subscription metadata for sanity reasons.
-    await stripe.subscriptions
-      .update(subscription.id, {
-        metadata: {
-          teamId: team.id.toString(),
-        },
-      })
-      .catch((e) => {
-        console.error(e);
-        // Non-critical error, but we want to log it so we can rectify it.
-        // Todo: Teams - Alert us.
-      });
-
     return team;
   });
+
+  // Attach the team ID to the subscription metadata for sanity reasons.
+  await stripe.subscriptions
+    .update(subscription.id, {
+      metadata: {
+        teamId: createdTeam.id.toString(),
+      },
+    })
+    .catch((e) => {
+      console.error(e);
+      // Non-critical error, but we want to log it so we can rectify it.
+      // Todo: Teams - Alert us.
+    });
+
+  return createdTeam;
 };

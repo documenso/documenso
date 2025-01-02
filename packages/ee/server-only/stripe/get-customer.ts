@@ -1,7 +1,8 @@
+import type { User } from '@prisma/client';
+
 import { STRIPE_CUSTOMER_TYPE } from '@documenso/lib/constants/billing';
 import { stripe } from '@documenso/lib/server-only/stripe';
 import { prisma } from '@documenso/prisma';
-import type { User } from '@documenso/prisma/client';
 
 import { onSubscriptionUpdated } from './webhook/on-subscription-updated';
 
@@ -31,7 +32,9 @@ export const getStripeCustomerById = async (stripeCustomerId: string) => {
  *
  * Will create a Stripe customer and update the relevant user if one does not exist.
  */
-export const getStripeCustomerByUser = async (user: User) => {
+export const getStripeCustomerByUser = async (
+  user: Pick<User, 'id' | 'customerId' | 'email' | 'name'>,
+) => {
   if (user.customerId) {
     const stripeCustomer = await getStripeCustomerById(user.customerId);
 

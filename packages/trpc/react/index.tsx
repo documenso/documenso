@@ -1,8 +1,5 @@
-'use client';
+import { useMemo, useState } from 'react';
 
-import { useState } from 'react';
-
-import type { QueryClientConfig } from '@tanstack/react-query';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { httpBatchLink, httpLink, splitLink } from '@trpc/client';
 import { createTRPCReact } from '@trpc/react-query';
@@ -39,46 +36,29 @@ export interface TrpcProviderProps {
 }
 
 export function TrpcProvider({ children, headers }: TrpcProviderProps) {
-  let queryClientConfig: QueryClientConfig | undefined;
+  const [queryClient] = useState(() => new QueryClient());
 
-  const isDevelopingOffline =
-    typeof window !== 'undefined' &&
-    window.location.hostname === 'localhost' &&
-    !window.navigator.onLine;
-
-  if (isDevelopingOffline) {
-    queryClientConfig = {
-      defaultOptions: {
-        queries: {
-          networkMode: 'always',
-        },
-        mutations: {
-          networkMode: 'always',
-        },
-      },
-    };
-  }
-
-  const [queryClient] = useState(() => new QueryClient(queryClientConfig));
-
-  const [trpcClient] = useState(() =>
-    trpc.createClient({
-      links: [
-        splitLink({
-          condition: (op) => op.context.skipBatch === true,
-          true: httpLink({
-            url: `${getBaseUrl()}/api/trpc`,
-            headers,
-            transformer: SuperJSON,
+  // May cause remounting issues.
+  const trpcClient = useMemo(
+    () =>
+      trpc.createClient({
+        links: [
+          splitLink({
+            condition: (op) => op.context.skipBatch === true,
+            true: httpLink({
+              url: `${getBaseUrl()}/api/trpc`,
+              headers,
+              transformer: SuperJSON,
+            }),
+            false: httpBatchLink({
+              url: `${getBaseUrl()}/api/trpc`,
+              headers,
+              transformer: SuperJSON,
+            }),
           }),
-          false: httpBatchLink({
-            url: `${getBaseUrl()}/api/trpc`,
-            headers,
-            transformer: SuperJSON,
-          }),
-        }),
-      ],
-    }),
+        ],
+      }),
+    [headers],
   );
 
   return (

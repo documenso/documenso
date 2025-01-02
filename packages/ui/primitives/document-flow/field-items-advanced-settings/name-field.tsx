@@ -1,10 +1,18 @@
-import { Trans, msg } from '@lingui/macro';
+import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
+import { Trans } from '@lingui/react/macro';
 
 import { validateFields as validateNameFields } from '@documenso/lib/advanced-fields-validation/validate-fields';
 import { type TNameFieldMeta as NameFieldMeta } from '@documenso/lib/types/field-meta';
 import { Input } from '@documenso/ui/primitives/input';
 import { Label } from '@documenso/ui/primitives/label';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@documenso/ui/primitives/select';
 
 type NameFieldAdvancedSettingsProps = {
   fieldState: NameFieldMeta;
@@ -47,6 +55,27 @@ export const NameFieldAdvancedSettings = ({
           min={8}
           max={96}
         />
+      </div>
+
+      <div>
+        <Label>
+          <Trans>Text Align</Trans>
+        </Label>
+
+        <Select
+          value={fieldState.textAlign}
+          onValueChange={(value) => handleInput('textAlign', value)}
+        >
+          <SelectTrigger className="bg-background mt-2">
+            <SelectValue placeholder="Select text align" />
+          </SelectTrigger>
+
+          <SelectContent>
+            <SelectItem value="left">Left</SelectItem>
+            <SelectItem value="center">Center</SelectItem>
+            <SelectItem value="right">Right</SelectItem>
+          </SelectContent>
+        </Select>
       </div>
     </div>
   );

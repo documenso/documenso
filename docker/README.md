@@ -69,7 +69,6 @@ docker pull ghcr.io/documenso/documenso
 ```
 docker run -d \
   -p 3000:3000 \
-  -e NEXTAUTH_URL="<your-nextauth-url>"
   -e NEXTAUTH_SECRET="<your-nextauth-secret>"
   -e NEXT_PRIVATE_ENCRYPTION_KEY="<your-next-private-encryption-key>"
   -e NEXT_PRIVATE_ENCRYPTION_SECONDARY_KEY="<your-next-private-encryption-secondary-key>"
@@ -101,7 +100,6 @@ Here's a markdown table documenting all the provided environment variables:
 | Variable                                     | Description                                                                                         |
 | -------------------------------------------- | --------------------------------------------------------------------------------------------------- |
 | `PORT`                                       | The port to run the Documenso application on, defaults to `3000`.                                   |
-| `NEXTAUTH_URL`                               | The URL for the NextAuth.js authentication service.                                                 |
 | `NEXTAUTH_SECRET`                            | The secret key used by NextAuth.js for encryption and signing.                                      |
 | `NEXT_PRIVATE_ENCRYPTION_KEY`                | The primary encryption key for symmetric encryption and decryption (at least 32 characters).        |
 | `NEXT_PRIVATE_ENCRYPTION_SECONDARY_KEY`      | The secondary encryption key for symmetric encryption and decryption (at least 32 characters).      |

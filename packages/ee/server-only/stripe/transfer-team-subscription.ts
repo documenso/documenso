@@ -1,10 +1,10 @@
+import { type Subscription, type Team, type User } from '@prisma/client';
 import type Stripe from 'stripe';
 
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import { stripe } from '@documenso/lib/server-only/stripe';
 import { subscriptionsContainsActivePlan } from '@documenso/lib/utils/billing';
 import { prisma } from '@documenso/prisma';
-import { type Subscription, type Team, type User } from '@documenso/prisma/client';
 
 import { deleteCustomerPaymentMethods } from './delete-customer-payment-methods';
 import { getTeamPrices } from './get-team-prices';

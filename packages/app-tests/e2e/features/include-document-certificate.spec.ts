@@ -1,15 +1,16 @@
 import { expect, test } from '@playwright/test';
+import { DocumentStatus, FieldType } from '@prisma/client';
 import { PDFDocument } from 'pdf-lib';
 
 import { getDocumentByToken } from '@documenso/lib/server-only/document/get-document-by-token';
 import { getFile } from '@documenso/lib/universal/upload/get-file';
 import { prisma } from '@documenso/prisma';
-import { DocumentStatus, FieldType } from '@documenso/prisma/client';
 import { seedPendingDocumentWithFullFields } from '@documenso/prisma/seed/documents';
 import { seedTeam } from '@documenso/prisma/seed/teams';
 import { seedUser } from '@documenso/prisma/seed/users';
 
 import { apiSignin } from '../fixtures/authentication';
+import { signSignaturePad } from '../fixtures/signature';
 
 test.describe('Signing Certificate Tests', () => {
   test('individual document should always include signing certificate', async ({ page }) => {
@@ -36,14 +37,7 @@ test.describe('Signing Certificate Tests', () => {
     // Sign the document
     await page.goto(`/sign/${recipient.token}`);
 
-    const canvas = page.locator('canvas');
-    const box = await canvas.boundingBox();
-    if (box) {
-      await page.mouse.move(box.x + 40, box.y + 40);
-      await page.mouse.down();
-      await page.mouse.move(box.x + box.width - 2, box.y + box.height - 2);
-      await page.mouse.up();
-    }
+    await signSignaturePad(page);
 
     for (const field of recipient.fields) {
       await page.locator(`#field-${field.id}`).getByRole('button').click();
@@ -113,14 +107,7 @@ test.describe('Signing Certificate Tests', () => {
     // Sign the document
     await page.goto(`/sign/${recipient.token}`);
 
-    const canvas = page.locator('canvas');
-    const box = await canvas.boundingBox();
-    if (box) {
-      await page.mouse.move(box.x + 40, box.y + 40);
-      await page.mouse.down();
-      await page.mouse.move(box.x + box.width - 2, box.y + box.height - 2);
-      await page.mouse.up();
-    }
+    await signSignaturePad(page);
 
     for (const field of recipient.fields) {
       await page.locator(`#field-${field.id}`).getByRole('button').click();
@@ -190,14 +177,7 @@ test.describe('Signing Certificate Tests', () => {
     // Sign the document
     await page.goto(`/sign/${recipient.token}`);
 
-    const canvas = page.locator('canvas');
-    const box = await canvas.boundingBox();
-    if (box) {
-      await page.mouse.move(box.x + 40, box.y + 40);
-      await page.mouse.down();
-      await page.mouse.move(box.x + box.width - 2, box.y + box.height - 2);
-      await page.mouse.up();
-    }
+    await signSignaturePad(page);
 
     for (const field of recipient.fields) {
       await page.locator(`#field-${field.id}`).getByRole('button').click();

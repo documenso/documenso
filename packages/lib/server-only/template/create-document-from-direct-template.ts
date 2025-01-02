@@ -1,15 +1,7 @@
 import { createElement } from 'react';
 
-import { msg } from '@lingui/macro';
-import { DateTime } from 'luxon';
-import { match } from 'ts-pattern';
-import { z } from 'zod';
-
-import { mailer } from '@documenso/email/mailer';
-import { DocumentCreatedFromDirectTemplateEmailTemplate } from '@documenso/email/templates/document-created-from-direct-template';
-import { nanoid } from '@documenso/lib/universal/id';
-import { prisma } from '@documenso/prisma';
-import type { Field, Signature } from '@documenso/prisma/client';
+import { msg } from '@lingui/core/macro';
+import type { Field, Signature } from '@prisma/client';
 import {
   DocumentSigningOrder,
   DocumentSource,
@@ -20,10 +12,18 @@ import {
   SendStatus,
   SigningStatus,
   WebhookTriggerEvents,
-} from '@documenso/prisma/client';
+} from '@prisma/client';
+import { DateTime } from 'luxon';
+import { match } from 'ts-pattern';
+import { z } from 'zod';
+
+import { mailer } from '@documenso/email/mailer';
+import { DocumentCreatedFromDirectTemplateEmailTemplate } from '@documenso/email/templates/document-created-from-direct-template';
+import { nanoid } from '@documenso/lib/universal/id';
+import { prisma } from '@documenso/prisma';
 import type { TSignFieldWithTokenMutationSchema } from '@documenso/trpc/server/field-router/schema';
 
-import { getI18nInstance } from '../../client-only/providers/i18n.server';
+import { getI18nInstance } from '../../client-only/providers/i18n-server';
 import { NEXT_PUBLIC_WEBAPP_URL } from '../../constants/app';
 import { DEFAULT_DOCUMENT_DATE_FORMAT } from '../../constants/date-formats';
 import { DEFAULT_DOCUMENT_TIME_ZONE } from '../../constants/time-zones';
@@ -37,6 +37,7 @@ import {
   mapDocumentToWebhookDocumentPayload,
 } from '../../types/webhook-payload';
 import type { ApiRequestMetadata } from '../../universal/extract-request-metadata';
+import { isRequiredField } from '../../utils/advanced-fields-helpers';
 import type { CreateDocumentAuditLogDataResponse } from '../../utils/document-audit-logs';
 import { createDocumentAuditLogData } from '../../utils/document-audit-logs';
 import {
@@ -44,6 +45,7 @@ import {
   createRecipientAuthOptions,
   extractDocumentAuthMethods,
 } from '../../utils/document-auth';
+import { env } from '../../utils/env';
 import { renderEmailWithI18N } from '../../utils/render-email-with-i18n';
 import { teamGlobalSettingsToBranding } from '../../utils/team-global-settings-to-branding';
 import { formatDocumentsPath } from '../../utils/teams';
@@ -175,20 +177,28 @@ export const createDocumentFromDirectTemplate = async ({
   const metaSigningOrder = template.templateMeta?.signingOrder || DocumentSigningOrder.PARALLEL;
 
   // Associate, validate and map to a query every direct template recipient field with the provided fields.
+  // Only process fields that are either required or have been signed by the user
+  const fieldsToProcess = directTemplateRecipient.fields.filter((templateField) => {
+    const signedFieldValue = signedFieldValues.find((value) => value.fieldId === templateField.id);
+
+    // Include if it's required or has a signed value
+    return isRequiredField(templateField) || signedFieldValue !== undefined;
+  });
+
   const createDirectRecipientFieldArgs = await Promise.all(
-    directTemplateRecipient.fields.map(async (templateField) => {
+    fieldsToProcess.map(async (templateField) => {
       const signedFieldValue = signedFieldValues.find(
         (value) => value.fieldId === templateField.id,
       );
 
-      if (!signedFieldValue) {
+      if (isRequiredField(templateField) && !signedFieldValue) {
         throw new AppError(AppErrorCode.INVALID_BODY, {
           message: 'Invalid, missing or changed fields',
         });
       }
 
       if (templateField.type === FieldType.NAME && directRecipientName === undefined) {
-        directRecipientName === signedFieldValue.value;
+        directRecipientName === signedFieldValue?.value;
       }
 
       const derivedRecipientActionAuth = await validateFieldAuth({
@@ -199,8 +209,17 @@ export const createDocumentFromDirectTemplate = async ({
         },
         field: templateField,
         userId: user?.id,
-        authOptions: signedFieldValue.authOptions,
+        authOptions: signedFieldValue?.authOptions,
       });
+
+      if (!signedFieldValue) {
+        return {
+          templateField,
+          customText: '',
+          derivedRecipientActionAuth,
+          signature: null,
+        };
+      }
 
       const { value, isBase64 } = signedFieldValue;
 
@@ -379,7 +398,7 @@ export const createDocumentFromDirectTemplate = async ({
               positionY: templateField.positionY,
               width: templateField.width,
               height: templateField.height,
-              customText,
+              customText: customText ?? '',
               inserted: true,
               fieldMeta: templateField.fieldMeta || Prisma.JsonNull,
             })),
@@ -582,8 +601,8 @@ export const createDocumentFromDirectTemplate = async ({
         },
       ],
       from: {
-        name: process.env.NEXT_PRIVATE_SMTP_FROM_NAME || 'Documenso',
-        address: process.env.NEXT_PRIVATE_SMTP_FROM_ADDRESS || 'noreply@documenso.com',
+        name: env('NEXT_PRIVATE_SMTP_FROM_NAME') || 'Documenso',
+        address: env('NEXT_PRIVATE_SMTP_FROM_ADDRESS') || 'noreply@documenso.com',
       },
       subject: i18n._(msg`Document created from direct template`),
       html,

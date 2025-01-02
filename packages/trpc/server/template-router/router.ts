@@ -1,5 +1,9 @@
+import type { Document } from '@prisma/client';
+import { TRPCError } from '@trpc/server';
+
 import { getServerLimits } from '@documenso/ee/server-only/limits/server';
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
+import { jobs } from '@documenso/lib/jobs/client';
 import { getDocumentWithDetailsById } from '@documenso/lib/server-only/document/get-document-with-details-by-id';
 import { sendDocument } from '@documenso/lib/server-only/document/send-document';
 import {
@@ -20,11 +24,11 @@ import { getTemplateById } from '@documenso/lib/server-only/template/get-templat
 import { moveTemplateToTeam } from '@documenso/lib/server-only/template/move-template-to-team';
 import { toggleTemplateDirectLink } from '@documenso/lib/server-only/template/toggle-template-direct-link';
 import { updateTemplate } from '@documenso/lib/server-only/template/update-template';
-import type { Document } from '@documenso/prisma/client';
 
 import { ZGenericSuccessResponse, ZSuccessResponseSchema } from '../document-router/schema';
 import { authenticatedProcedure, maybeAuthenticatedProcedure, router } from '../trpc';
 import {
+  ZBulkSendTemplateMutationSchema,
   ZCreateDocumentFromDirectTemplateRequestSchema,
   ZCreateDocumentFromTemplateRequestSchema,
   ZCreateDocumentFromTemplateResponseSchema,
@@ -223,7 +227,8 @@ export const templateRouter = router({
     .output(ZCreateDocumentFromTemplateResponseSchema)
     .mutation(async ({ ctx, input }) => {
       const { teamId } = ctx;
-      const { templateId, recipients, distributeDocument, customDocumentDataId } = input;
+      const { templateId, recipients, distributeDocument, customDocumentDataId, prefillFields } =
+        input;
 
       const limits = await getServerLimits({ email: ctx.user.email, teamId });
 
@@ -238,6 +243,7 @@ export const templateRouter = router({
         recipients,
         customDocumentDataId,
         requestMetadata: ctx.metadata,
+        prefillFields,
       });
 
       if (distributeDocument) {
@@ -413,5 +419,49 @@ export const templateRouter = router({
         teamId,
         userId,
       });
+    }),
+
+  /**
+   * @private
+   */
+  uploadBulkSend: authenticatedProcedure
+    .input(ZBulkSendTemplateMutationSchema)
+    .mutation(async ({ ctx, input }) => {
+      const { templateId, teamId, csv, sendImmediately } = input;
+      const { user } = ctx;
+
+      if (csv.length > 4 * 1024 * 1024) {
+        throw new TRPCError({
+          code: 'BAD_REQUEST',
+          message: 'File size exceeds 4MB limit',
+        });
+      }
+
+      const template = await getTemplateById({
+        id: templateId,
+        teamId,
+        userId: user.id,
+      });
+
+      if (!template) {
+        throw new TRPCError({
+          code: 'NOT_FOUND',
+          message: 'Template not found',
+        });
+      }
+
+      await jobs.triggerJob({
+        name: 'internal.bulk-send-template',
+        payload: {
+          userId: user.id,
+          teamId,
+          templateId,
+          csvContent: csv,
+          sendImmediately,
+          requestMetadata: ctx.metadata.requestMetadata,
+        },
+      });
+
+      return { success: true };
     }),
 });

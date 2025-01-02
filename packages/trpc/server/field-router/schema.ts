@@ -1,3 +1,4 @@
+import { FieldType } from '@prisma/client';
 import { z } from 'zod';
 
 import { ZRecipientActionAuthSchema } from '@documenso/lib/types/document-auth';
@@ -10,7 +11,6 @@ import {
   ZFieldWidthSchema,
 } from '@documenso/lib/types/field';
 import { ZFieldAndMetaSchema, ZFieldMetaSchema } from '@documenso/lib/types/field-meta';
-import { FieldType } from '@documenso/prisma/client';
 
 const ZCreateFieldSchema = ZFieldAndMetaSchema.and(
   z.object({
@@ -153,7 +153,7 @@ export const ZSetFieldsForTemplateResponseSchema = z.object({
 export const ZSignFieldWithTokenMutationSchema = z.object({
   token: z.string(),
   fieldId: z.number(),
-  value: z.string().trim(),
+  value: z.string().trim().optional(),
   isBase64: z.boolean().optional(),
   authOptions: ZRecipientActionAuthSchema.optional(),
 });

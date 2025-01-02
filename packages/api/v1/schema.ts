@@ -1,4 +1,16 @@
 import { extendZodWithOpenApi } from '@anatine/zod-openapi';
+import {
+  DocumentDataType,
+  DocumentDistributionMethod,
+  DocumentSigningOrder,
+  FieldType,
+  ReadStatus,
+  RecipientRole,
+  SendStatus,
+  SigningStatus,
+  TeamMemberRole,
+  TemplateType,
+} from '@prisma/client';
 import { z } from 'zod';
 
 import { DATE_FORMATS, DEFAULT_DOCUMENT_DATE_FORMAT } from '@documenso/lib/constants/date-formats';
@@ -11,19 +23,7 @@ import {
   ZRecipientActionAuthTypesSchema,
 } from '@documenso/lib/types/document-auth';
 import { ZDocumentEmailSettingsSchema } from '@documenso/lib/types/document-email';
-import { ZFieldMetaSchema } from '@documenso/lib/types/field-meta';
-import {
-  DocumentDataType,
-  DocumentDistributionMethod,
-  DocumentSigningOrder,
-  FieldType,
-  ReadStatus,
-  RecipientRole,
-  SendStatus,
-  SigningStatus,
-  TeamMemberRole,
-  TemplateType,
-} from '@documenso/prisma/client';
+import { ZFieldMetaPrefillFieldsSchema, ZFieldMetaSchema } from '@documenso/lib/types/field-meta';
 
 extendZodWithOpenApi(z);
 
@@ -96,7 +96,7 @@ export const ZSendDocumentForSigningMutationSchema = z
         'Whether to send completion emails when the document is fully signed. This will override the document email settings.',
     }),
   })
-  .or(z.literal('').transform(() => ({ sendEmail: true, sendCompletionEmails: undefined })));
+  .or(z.any().transform(() => ({ sendEmail: true, sendCompletionEmails: undefined })));
 
 export type TSendDocumentForSigningMutationSchema = typeof ZSendDocumentForSigningMutationSchema;
 
@@ -299,6 +299,7 @@ export const ZGenerateDocumentFromTemplateMutationSchema = z.object({
     })
     .optional(),
   formValues: z.record(z.string(), z.union([z.string(), z.boolean(), z.number()])).optional(),
+  prefillFields: z.array(ZFieldMetaPrefillFieldsSchema).optional(),
 });
 
 export type TGenerateDocumentFromTemplateMutationSchema = z.infer<

@@ -17,8 +17,6 @@ export enum AppErrorCode {
   'RETRY_EXCEPTION' = 'RETRY_EXCEPTION',
   'SCHEMA_FAILED' = 'SCHEMA_FAILED',
   'TOO_MANY_REQUESTS' = 'TOO_MANY_REQUESTS',
-  'PROFILE_URL_TAKEN' = 'PROFILE_URL_TAKEN',
-  'PREMIUM_PROFILE_URL' = 'PREMIUM_PROFILE_URL',
 }
 
 export const genericErrorCodeToTrpcErrorCodeMap: Record<string, { code: string; status: number }> =
@@ -34,8 +32,6 @@ export const genericErrorCodeToTrpcErrorCodeMap: Record<string, { code: string; 
     [AppErrorCode.RETRY_EXCEPTION]: { code: 'INTERNAL_SERVER_ERROR', status: 500 },
     [AppErrorCode.SCHEMA_FAILED]: { code: 'INTERNAL_SERVER_ERROR', status: 500 },
     [AppErrorCode.TOO_MANY_REQUESTS]: { code: 'TOO_MANY_REQUESTS', status: 429 },
-    [AppErrorCode.PROFILE_URL_TAKEN]: { code: 'BAD_REQUEST', status: 400 },
-    [AppErrorCode.PREMIUM_PROFILE_URL]: { code: 'BAD_REQUEST', status: 400 },
   };
 
 export const ZAppErrorJsonSchema = z.object({

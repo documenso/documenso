@@ -1,9 +1,7 @@
-import { usePathname, useRouter, useSearchParams } from 'next/navigation';
+import { useSearchParams } from 'react-router';
 
 export const useUpdateSearchParams = () => {
-  const router = useRouter();
-  const pathname = usePathname();
-  const searchParams = useSearchParams();
+  const [searchParams, setSearchParams] = useSearchParams();
 
   return (params: Record<string, string | number | boolean | null | undefined>) => {
     const nextSearchParams = new URLSearchParams(searchParams?.toString() ?? '');
@@ -16,6 +14,6 @@ export const useUpdateSearchParams = () => {
       }
     });
 
-    router.push(`${pathname}?${nextSearchParams.toString()}`);
+    setSearchParams(nextSearchParams);
   };
 };

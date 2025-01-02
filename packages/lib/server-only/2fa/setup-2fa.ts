@@ -1,16 +1,15 @@
+import { type User } from '@prisma/client';
 import { base32 } from '@scure/base';
 import crypto from 'crypto';
 import { createTOTPKeyURI } from 'oslo/otp';
 
-import { ErrorCode } from '@documenso/lib/next-auth/error-codes';
 import { prisma } from '@documenso/prisma';
-import { type User } from '@documenso/prisma/client';
 
 import { DOCUMENSO_ENCRYPTION_KEY } from '../../constants/crypto';
 import { symmetricEncrypt } from '../../universal/crypto';
 
 type SetupTwoFactorAuthenticationOptions = {
-  user: User;
+  user: Pick<User, 'id' | 'email'>;
 };
 
 const ISSUER = 'Documenso';
@@ -21,7 +20,7 @@ export const setupTwoFactorAuthentication = async ({
   const key = DOCUMENSO_ENCRYPTION_KEY;
 
   if (!key) {
-    throw new Error(ErrorCode.MISSING_ENCRYPTION_KEY);
+    throw new Error('MISSING_ENCRYPTION_KEY');
   }
 
   const secret = crypto.randomBytes(10);

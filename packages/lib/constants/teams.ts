@@ -1,9 +1,8 @@
 import type { MessageDescriptor } from '@lingui/core';
-import { msg } from '@lingui/macro';
+import { msg } from '@lingui/core/macro';
+import { TeamMemberRole } from '@prisma/client';
 
-import { TeamMemberRole } from '@documenso/prisma/client';
-
-export const TEAM_URL_ROOT_REGEX = new RegExp('^/t/[^/]+$');
+export const TEAM_URL_ROOT_REGEX = new RegExp('^/t/[^/]+/?$');
 export const TEAM_URL_REGEX = new RegExp('^/t/[^/]+');
 
 export const TEAM_MEMBER_ROLE_MAP: Record<keyof typeof TeamMemberRole, MessageDescriptor> = {

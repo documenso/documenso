@@ -1,24 +1,22 @@
-'use client';
-
 import { useState } from 'react';
 
+import type { DocumentData } from '@prisma/client';
 import * as DialogPrimitive from '@radix-ui/react-dialog';
 import { X } from 'lucide-react';
 
-import type { DocumentData } from '@documenso/prisma/client';
-
 import { cn } from '../../lib/utils';
-import { Dialog, DialogOverlay, DialogPortal } from '../../primitives/dialog';
-import { LazyPDFViewerNoLoader } from '../../primitives/lazy-pdf-viewer';
+import { Dialog, DialogOverlay, DialogPortal, DialogTrigger } from '../../primitives/dialog';
+import PDFViewer from '../../primitives/pdf-viewer';
 
 export type DocumentDialogProps = {
+  trigger?: React.ReactNode;
   documentData: DocumentData;
 } & Omit<DialogPrimitive.DialogProps, 'children'>;
 
 /**
  * A dialog which renders the provided document.
  */
-export default function DocumentDialog({ documentData, ...props }: DocumentDialogProps) {
+export default function DocumentDialog({ trigger, documentData, ...props }: DocumentDialogProps) {
   const [documentLoaded, setDocumentLoaded] = useState(false);
 
   const onDocumentLoad = () => {
@@ -30,6 +28,12 @@ export default function DocumentDialog({ documentData, ...props }: DocumentDialo
       <DialogPortal>
         <DialogOverlay className="bg-black/80" />
 
+        {trigger && (
+          <DialogTrigger onClick={(e) => e.stopPropagation()} asChild={true}>
+            {trigger}
+          </DialogTrigger>
+        )}
+
         <DialogPrimitive.Content
           className={cn(
             'animate-in data-[state=open]:fade-in-90 sm:zoom-in-90 pointer-events-none fixed z-50 h-screen w-screen overflow-y-auto px-2 py-14 opacity-0 transition-opacity lg:py-32',
@@ -39,7 +43,7 @@ export default function DocumentDialog({ documentData, ...props }: DocumentDialo
           )}
           onClick={() => props.onOpenChange?.(false)}
         >
-          <LazyPDFViewerNoLoader
+          <PDFViewer
             className="mx-auto w-full max-w-3xl xl:max-w-5xl"
             documentData={documentData}
             onClick={(e) => e.stopPropagation()}

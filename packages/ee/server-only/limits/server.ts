@@ -1,8 +1,8 @@
+import { DocumentSource, SubscriptionStatus } from '@prisma/client';
 import { DateTime } from 'luxon';
 
 import { IS_BILLING_ENABLED } from '@documenso/lib/constants/app';
 import { prisma } from '@documenso/prisma';
-import { DocumentSource, SubscriptionStatus } from '@documenso/prisma/client';
 
 import { getDocumentRelatedPrices } from '../stripe/get-document-related-prices.ts';
 import { FREE_PLAN_LIMITS, SELFHOSTED_PLAN_LIMITS, TEAM_PLAN_LIMITS } from './constants';
@@ -11,7 +11,7 @@ import type { TLimitsResponseSchema } from './schema';
 import { ZLimitsSchema } from './schema';
 
 export type GetServerLimitsOptions = {
-  email?: string | null;
+  email: string;
   teamId?: number | null;
 };
 

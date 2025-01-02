@@ -1,10 +1,9 @@
-'use client';
-
 import { forwardRef, useEffect, useState } from 'react';
 
 import type { MessageDescriptor } from '@lingui/core';
-import { msg } from '@lingui/macro';
+import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
+import { FieldType } from '@prisma/client';
 import { match } from 'ts-pattern';
 
 import {
@@ -21,7 +20,6 @@ import {
   type TTextFieldMeta as TextFieldMeta,
   ZFieldMetaSchema,
 } from '@documenso/lib/types/field-meta';
-import { FieldType } from '@documenso/prisma/client';
 import { useToast } from '@documenso/ui/primitives/use-toast';
 
 import type { FieldFormType } from './add-fields';
@@ -71,21 +69,25 @@ const getDefaultState = (fieldType: FieldType): FieldMeta => {
       return {
         type: 'initials',
         fontSize: 14,
+        textAlign: 'left',
       };
     case FieldType.NAME:
       return {
         type: 'name',
         fontSize: 14,
+        textAlign: 'left',
       };
     case FieldType.EMAIL:
       return {
         type: 'email',
         fontSize: 14,
+        textAlign: 'left',
       };
     case FieldType.DATE:
       return {
         type: 'date',
         fontSize: 14,
+        textAlign: 'left',
       };
     case FieldType.TEXT:
       return {
@@ -97,6 +99,7 @@ const getDefaultState = (fieldType: FieldType): FieldMeta => {
         fontSize: 14,
         required: false,
         readOnly: false,
+        textAlign: 'left',
       };
     case FieldType.NUMBER:
       return {
@@ -110,6 +113,7 @@ const getDefaultState = (fieldType: FieldType): FieldMeta => {
         required: false,
         readOnly: false,
         fontSize: 14,
+        textAlign: 'left',
       };
     case FieldType.RADIO:
       return {

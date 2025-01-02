@@ -1,5 +1,7 @@
-import { Trans, msg } from '@lingui/macro';
+import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
+import { Trans } from '@lingui/react/macro';
+import { RecipientRole } from '@prisma/client';
 
 import { RECIPIENT_ROLES_DESCRIPTION } from '@documenso/lib/constants/recipient-roles';
 
@@ -7,7 +9,6 @@ import { Body, Button, Container, Head, Html, Img, Preview, Section, Text } from
 import { useBranding } from '../providers/branding';
 import TemplateDocumentImage from '../template-components/template-document-image';
 import { TemplateFooter } from '../template-components/template-footer';
-import { RecipientRole } from '.prisma/client';
 
 export type DocumentCompletedEmailTemplateProps = {
   recipientName?: string;

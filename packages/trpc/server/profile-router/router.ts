@@ -1,28 +1,23 @@
+import { SubscriptionStatus } from '@prisma/client';
+
 import { IS_BILLING_ENABLED } from '@documenso/lib/constants/app';
-import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
-import { jobsClient } from '@documenso/lib/jobs/client';
+import { AppError } from '@documenso/lib/errors/app-error';
 import { setAvatarImage } from '@documenso/lib/server-only/profile/set-avatar-image';
 import { getSubscriptionsByUserId } from '@documenso/lib/server-only/subscription/get-subscriptions-by-user-id';
+import { createBillingPortal } from '@documenso/lib/server-only/user/create-billing-portal';
+import { createCheckoutSession } from '@documenso/lib/server-only/user/create-checkout-session';
 import { deleteUser } from '@documenso/lib/server-only/user/delete-user';
 import { findUserSecurityAuditLogs } from '@documenso/lib/server-only/user/find-user-security-audit-logs';
-import { forgotPassword } from '@documenso/lib/server-only/user/forgot-password';
 import { getUserById } from '@documenso/lib/server-only/user/get-user-by-id';
-import { resetPassword } from '@documenso/lib/server-only/user/reset-password';
-import { updatePassword } from '@documenso/lib/server-only/user/update-password';
 import { updateProfile } from '@documenso/lib/server-only/user/update-profile';
 import { updatePublicProfile } from '@documenso/lib/server-only/user/update-public-profile';
-import { extractNextApiRequestMetadata } from '@documenso/lib/universal/extract-request-metadata';
-import { SubscriptionStatus } from '@documenso/prisma/client';
 
-import { adminProcedure, authenticatedProcedure, procedure, router } from '../trpc';
+import { adminProcedure, authenticatedProcedure, router } from '../trpc';
 import {
-  ZConfirmEmailMutationSchema,
+  ZCreateCheckoutSessionRequestSchema,
   ZFindUserSecurityAuditLogsSchema,
-  ZForgotPasswordFormSchema,
-  ZResetPasswordFormSchema,
   ZRetrieveUserByIdQuerySchema,
   ZSetProfileImageMutationSchema,
-  ZUpdatePasswordMutationSchema,
   ZUpdateProfileMutationSchema,
   ZUpdatePublicProfileMutationSchema,
 } from './schema';
@@ -42,6 +37,31 @@ export const profileRouter = router({
 
     return await getUserById({ id });
   }),
+
+  createBillingPortal: authenticatedProcedure.mutation(async ({ ctx }) => {
+    return await createBillingPortal({
+      user: {
+        id: ctx.user.id,
+        customerId: ctx.user.customerId,
+        email: ctx.user.email,
+        name: ctx.user.name,
+      },
+    });
+  }),
+
+  createCheckoutSession: authenticatedProcedure
+    .input(ZCreateCheckoutSessionRequestSchema)
+    .mutation(async ({ ctx, input }) => {
+      return await createCheckoutSession({
+        user: {
+          id: ctx.user.id,
+          customerId: ctx.user.customerId,
+          email: ctx.user.email,
+          name: ctx.user.name,
+        },
+        priceId: input.priceId,
+      });
+    }),
 
   updateProfile: authenticatedProcedure
     .input(ZUpdateProfileMutationSchema)
@@ -69,7 +89,7 @@ export const profileRouter = router({
         );
 
         if (subscriptions.length === 0) {
-          throw new AppError(AppErrorCode.PREMIUM_PROFILE_URL, {
+          throw new AppError('PREMIUM_PROFILE_URL', {
             message: 'Only subscribers can have a username shorter than 6 characters',
           });
         }
@@ -85,50 +105,6 @@ export const profileRouter = router({
       });
 
       return { success: true, url: user.url };
-    }),
-
-  updatePassword: authenticatedProcedure
-    .input(ZUpdatePasswordMutationSchema)
-    .mutation(async ({ input, ctx }) => {
-      const { password, currentPassword } = input;
-
-      return await updatePassword({
-        userId: ctx.user.id,
-        password,
-        currentPassword,
-        requestMetadata: ctx.metadata.requestMetadata,
-      });
-    }),
-
-  forgotPassword: procedure.input(ZForgotPasswordFormSchema).mutation(async ({ input }) => {
-    const { email } = input;
-
-    return await forgotPassword({
-      email,
-    });
-  }),
-
-  resetPassword: procedure.input(ZResetPasswordFormSchema).mutation(async ({ input, ctx }) => {
-    const { password, token } = input;
-
-    return await resetPassword({
-      token,
-      password,
-      requestMetadata: extractNextApiRequestMetadata(ctx.req),
-    });
-  }),
-
-  sendConfirmationEmail: procedure
-    .input(ZConfirmEmailMutationSchema)
-    .mutation(async ({ input }) => {
-      const { email } = input;
-
-      await jobsClient.triggerJob({
-        name: 'send.signup.confirmation.email',
-        payload: {
-          email,
-        },
-      });
     }),
 
   deleteAccount: authenticatedProcedure.mutation(async ({ ctx }) => {

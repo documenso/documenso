@@ -22,7 +22,7 @@ RUN npm install -g "turbo@^1.9.3"
 
 # Outputs to the /out folder
 # source: https://turbo.build/repo/docs/reference/command-line-reference/prune#--docker
-RUN turbo prune --scope=@documenso/web --docker
+RUN turbo prune --scope=@documenso/remix --docker
 
 ###########################
 #   INSTALLER CONTAINER   #
@@ -72,42 +72,46 @@ COPY turbo.json turbo.json
 
 RUN npm install -g "turbo@^1.9.3"
 
-RUN turbo run build --filter=@documenso/web...
+RUN turbo run build --filter=@documenso/remix...
 
 ###########################
 #     RUNNER CONTAINER    #
 ###########################
 FROM base AS runner
 
-WORKDIR /app
+ENV HUSKY 0
+ENV DOCKER_OUTPUT 1
 
 # Don't run production as root
 RUN addgroup --system --gid 1001 nodejs
-RUN adduser --system --uid 1001 nextjs
+RUN adduser --system --uid 1001 nodejs
 
-USER nextjs
+USER nodejs
 
-COPY --from=installer /app/apps/web/next.config.js .
-COPY --from=installer /app/apps/web/package.json .
+WORKDIR /app
+
+COPY --from=builder --chown=nodejs:nodejs /app/out/json/ .
+# Copy the tailwind config files across
+COPY --from=builder --chown=nodejs:nodejs /app/out/full/packages/tailwind-config ./packages/tailwind-config
+
+RUN npm ci --only=production
 
 # Automatically leverage output traces to reduce image size
-# https://nextjs.org/docs/advanced-features/output-file-tracing
-COPY --from=installer --chown=nextjs:nodejs /app/apps/web/.next/standalone ./
-COPY --from=installer --chown=nextjs:nodejs /app/apps/web/.next/static ./apps/web/.next/static
-COPY --from=installer --chown=nextjs:nodejs /app/apps/web/public ./apps/web/public
+# https://nodejs.org/docs/advanced-features/output-file-tracing
+COPY --from=installer --chown=nodejs:nodejs /app/apps/remix/build ./apps/remix/build
+COPY --from=installer --chown=nodejs:nodejs /app/apps/remix/public ./apps/remix/public
 
 # Copy the prisma binary, schema and migrations
-COPY --from=installer --chown=nextjs:nodejs /app/packages/prisma/schema.prisma ./packages/prisma/schema.prisma
-COPY --from=installer --chown=nextjs:nodejs /app/packages/prisma/migrations ./packages/prisma/migrations
-COPY --from=installer --chown=nextjs:nodejs /app/node_modules/prisma/ ./node_modules/prisma/
-COPY --from=installer --chown=nextjs:nodejs /app/node_modules/@prisma/ ./node_modules/@prisma/
+COPY --from=installer --chown=nodejs:nodejs /app/packages/prisma/schema.prisma ./packages/prisma/schema.prisma
+COPY --from=installer --chown=nodejs:nodejs /app/packages/prisma/migrations ./packages/prisma/migrations
 
-# Symlink the prisma binary
-RUN mkdir node_modules/.bin
-RUN ln -s /app/node_modules/prisma/build/index.js ./node_modules/.bin/prisma
+# Generate the prisma client again
+RUN npx prisma generate --schema ./packages/prisma/schema.prisma
 
 
 # Get the start script from docker/start.sh
-COPY --chown=nextjs:nodejs ./docker/start.sh ./start.sh
+COPY --chown=nodejs:nodejs ./docker/start.sh /app/apps/remix/start.sh
+
+WORKDIR /app/apps/remix
 
 CMD ["sh", "start.sh"]

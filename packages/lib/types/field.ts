@@ -1,6 +1,6 @@
 import { z } from 'zod';
 
-import { FieldSchema } from '@documenso/prisma/generated/zod';
+import { FieldSchema } from '@documenso/prisma/generated/zod/modelSchema/FieldSchema';
 
 /**
  * The full field response schema.

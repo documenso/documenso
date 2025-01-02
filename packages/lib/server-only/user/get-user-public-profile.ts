@@ -1,5 +1,6 @@
+import type { UserProfile } from '@prisma/client';
+
 import { prisma } from '@documenso/prisma';
-import type { UserProfile } from '@documenso/prisma/client';
 
 import { AppError, AppErrorCode } from '../../errors/app-error';
 import { updatePublicProfile } from './update-public-profile';

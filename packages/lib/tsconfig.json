@@ -1,7 +1,7 @@
 {
   "extends": "@documenso/tsconfig/react-library.json",
   "compilerOptions": {
-    "types": ["@documenso/tsconfig/process-env.d.ts"],
+    "types": ["@documenso/tsconfig/process-env.d.ts", "vite/client"],
     "moduleResolution": "Bundler"
   },
   "include": ["**/*.ts", "**/*.tsx", "**/*.d.ts"],

@@ -1,9 +1,9 @@
+import { DocumentDataType } from '@prisma/client';
 import { TRPCError } from '@trpc/server';
 import { DateTime } from 'luxon';
 
 import { getServerLimits } from '@documenso/ee/server-only/limits/server';
 import { NEXT_PUBLIC_WEBAPP_URL } from '@documenso/lib/constants/app';
-import { DOCUMENSO_ENCRYPTION_KEY } from '@documenso/lib/constants/crypto';
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import { encryptSecondaryData } from '@documenso/lib/server-only/crypto/encrypt';
 import { createDocumentData } from '@documenso/lib/server-only/document-data/create-document-data';
@@ -17,14 +17,16 @@ import { findDocuments } from '@documenso/lib/server-only/document/find-document
 import { getDocumentById } from '@documenso/lib/server-only/document/get-document-by-id';
 import { getDocumentAndSenderByToken } from '@documenso/lib/server-only/document/get-document-by-token';
 import { getDocumentWithDetailsById } from '@documenso/lib/server-only/document/get-document-with-details-by-id';
+import type { GetStatsInput } from '@documenso/lib/server-only/document/get-stats';
+import { getStats } from '@documenso/lib/server-only/document/get-stats';
 import { moveDocumentToTeam } from '@documenso/lib/server-only/document/move-document-to-team';
 import { resendDocument } from '@documenso/lib/server-only/document/resend-document';
 import { searchDocumentsWithKeyword } from '@documenso/lib/server-only/document/search-documents-with-keyword';
 import { sendDocument } from '@documenso/lib/server-only/document/send-document';
 import { updateDocument } from '@documenso/lib/server-only/document/update-document';
-import { symmetricEncrypt } from '@documenso/lib/universal/crypto';
+import { getTeamById } from '@documenso/lib/server-only/team/get-team';
 import { getPresignPostUrl } from '@documenso/lib/universal/upload/server-actions';
-import { DocumentDataType, DocumentStatus } from '@documenso/prisma/client';
+import { isDocumentCompleted } from '@documenso/lib/utils/document';
 
 import { authenticatedProcedure, procedure, router } from '../trpc';
 import {
@@ -39,6 +41,8 @@ import {
   ZDuplicateDocumentRequestSchema,
   ZDuplicateDocumentResponseSchema,
   ZFindDocumentAuditLogsQuerySchema,
+  ZFindDocumentsInternalRequestSchema,
+  ZFindDocumentsInternalResponseSchema,
   ZFindDocumentsRequestSchema,
   ZFindDocumentsResponseSchema,
   ZGenericSuccessResponse,
@@ -50,7 +54,6 @@ import {
   ZMoveDocumentToTeamSchema,
   ZResendDocumentMutationSchema,
   ZSearchDocumentsMutationSchema,
-  ZSetPasswordForDocumentMutationSchema,
   ZSetSigningOrderForDocumentMutationSchema,
   ZSuccessResponseSchema,
   ZUpdateDocumentRequestSchema,
@@ -122,6 +125,74 @@ export const documentRouter = router({
       });
 
       return documents;
+    }),
+
+  /**
+   * Internal endpoint for /documents page to additionally return getStats.
+   *
+   * @private
+   */
+  findDocumentsInternal: authenticatedProcedure
+    .input(ZFindDocumentsInternalRequestSchema)
+    .output(ZFindDocumentsInternalResponseSchema)
+    .query(async ({ input, ctx }) => {
+      const { user, teamId } = ctx;
+
+      const {
+        query,
+        templateId,
+        page,
+        perPage,
+        orderByDirection,
+        orderByColumn,
+        source,
+        status,
+        period,
+        senderIds,
+      } = input;
+
+      const getStatOptions: GetStatsInput = {
+        user,
+        period,
+        search: query,
+      };
+
+      if (teamId) {
+        const team = await getTeamById({ userId: user.id, teamId });
+
+        getStatOptions.team = {
+          teamId: team.id,
+          teamEmail: team.teamEmail?.email,
+          senderIds,
+          currentTeamMemberRole: team.currentTeamMember?.role,
+          currentUserEmail: user.email,
+          userId: user.id,
+        };
+      }
+
+      const [stats, documents] = await Promise.all([
+        getStats(getStatOptions),
+        findDocuments({
+          userId: user.id,
+          teamId,
+          query,
+          templateId,
+          page,
+          perPage,
+          source,
+          status,
+          period,
+          senderIds,
+          orderBy: orderByColumn
+            ? { column: orderByColumn, direction: orderByDirection }
+            : undefined,
+        }),
+      ]);
+
+      return {
+        ...documents,
+        stats,
+      };
     }),
 
   /**
@@ -373,35 +444,6 @@ export const documentRouter = router({
 
   /**
    * @private
-   */
-  setPasswordForDocument: authenticatedProcedure
-    .input(ZSetPasswordForDocumentMutationSchema)
-    .mutation(async ({ input, ctx }) => {
-      const { teamId } = ctx;
-      const { documentId, password } = input;
-
-      const key = DOCUMENSO_ENCRYPTION_KEY;
-
-      if (!key) {
-        throw new Error('Missing encryption key');
-      }
-
-      const securePassword = symmetricEncrypt({
-        data: password,
-        key,
-      });
-
-      await upsertDocumentMeta({
-        userId: ctx.user.id,
-        teamId,
-        documentId,
-        password: securePassword,
-        requestMetadata: ctx.metadata,
-      });
-    }),
-
-  /**
-   * @private
    *
    * Todo: Remove and use `updateDocument` endpoint instead.
    */
@@ -618,7 +660,7 @@ export const documentRouter = router({
         teamId,
       });
 
-      if (document.status !== DocumentStatus.COMPLETED) {
+      if (!isDocumentCompleted(document.status)) {
         throw new AppError('DOCUMENT_NOT_COMPLETE');
       }
 

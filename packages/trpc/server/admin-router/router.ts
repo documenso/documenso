@@ -11,8 +11,7 @@ import { deleteUser } from '@documenso/lib/server-only/user/delete-user';
 import { disableUser } from '@documenso/lib/server-only/user/disable-user';
 import { enableUser } from '@documenso/lib/server-only/user/enable-user';
 import { getUserById } from '@documenso/lib/server-only/user/get-user-by-id';
-import { extractNextApiRequestMetadata } from '@documenso/lib/universal/extract-request-metadata';
-import { DocumentStatus } from '@documenso/prisma/client';
+import { isDocumentCompleted } from '@documenso/lib/utils/document';
 
 import { adminProcedure, router } from '../trpc';
 import {
@@ -70,7 +69,7 @@ export const adminRouter = router({
 
       const document = await getEntireDocument({ id });
 
-      const isResealing = document.status === DocumentStatus.COMPLETED;
+      const isResealing = isDocumentCompleted(document.status);
 
       return await sealDocument({ documentId: id, isResealing });
     }),
@@ -117,7 +116,7 @@ export const adminRouter = router({
 
       return await superDeleteDocument({
         id,
-        requestMetadata: extractNextApiRequestMetadata(ctx.req),
+        requestMetadata: ctx.metadata.requestMetadata,
       });
     }),
 });

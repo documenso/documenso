@@ -1,7 +1,8 @@
+import { DocumentDataType } from '@prisma/client';
 import { base64 } from '@scure/base';
 import { match } from 'ts-pattern';
 
-import { DocumentDataType } from '@documenso/prisma/client';
+import { getAbsolutePresignPostUrl } from './server-actions';
 
 export type UpdateFileOptions = {
   type: DocumentDataType;
@@ -38,8 +39,6 @@ const updateFileWithBytes64 = (data: string) => {
 };
 
 const updateFileWithS3 = async (key: string, data: string) => {
-  const { getAbsolutePresignPostUrl } = await import('./server-actions');
-
   const { url } = await getAbsolutePresignPostUrl(key);
 
   const response = await fetch(url, {

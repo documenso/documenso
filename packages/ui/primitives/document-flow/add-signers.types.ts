@@ -1,10 +1,10 @@
-import { msg } from '@lingui/macro';
+import { msg } from '@lingui/core/macro';
+import { DocumentSigningOrder, RecipientRole } from '@prisma/client';
 import { z } from 'zod';
 
 import { ZRecipientActionAuthTypesSchema } from '@documenso/lib/types/document-auth';
 
 import { ZMapNegativeOneToUndefinedSchema } from './add-settings.types';
-import { DocumentSigningOrder, RecipientRole } from '.prisma/client';
 
 export const ZAddSignersFormSchema = z
   .object({

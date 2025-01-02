@@ -1,7 +1,6 @@
+import { DocumentDataType } from '@prisma/client';
 import { base64 } from '@scure/base';
 import { match } from 'ts-pattern';
-
-import { DocumentDataType } from '@documenso/prisma/client';
 
 export type GetFileOptions = {
   type: DocumentDataType;
@@ -31,9 +30,23 @@ const getFileFromBytes64 = (data: string) => {
 };
 
 const getFileFromS3 = async (key: string) => {
-  const { getPresignGetUrl } = await import('./server-actions');
+  const getPresignedUrlResponse = await fetch(`/api/files/presigned-get-url`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      key,
+    }),
+  });
 
-  const { url } = await getPresignGetUrl(key);
+  if (!getPresignedUrlResponse.ok) {
+    throw new Error(
+      `Failed to get presigned url with key "${key}", failed with status code ${getPresignedUrlResponse.status}`,
+    );
+  }
+
+  const { url } = await getPresignedUrlResponse.json();
 
   const response = await fetch(url, {
     method: 'GET',

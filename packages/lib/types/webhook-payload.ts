@@ -1,6 +1,4 @@
-import { z } from 'zod';
-
-import type { Document, DocumentMeta, Recipient } from '@documenso/prisma/client';
+import type { Document, DocumentMeta, Recipient } from '@prisma/client';
 import {
   DocumentDistributionMethod,
   DocumentSigningOrder,
@@ -11,7 +9,8 @@ import {
   RecipientRole,
   SendStatus,
   SigningStatus,
-} from '@documenso/prisma/client';
+} from '@prisma/client';
+import { z } from 'zod';
 
 /**
  * Schema for recipient data in webhook payloads.

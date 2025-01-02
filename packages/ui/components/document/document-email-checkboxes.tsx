@@ -1,4 +1,4 @@
-import { Trans } from '@lingui/macro';
+import { Trans } from '@lingui/react/macro';
 import { InfoIcon } from 'lucide-react';
 
 import type { TDocumentEmailSettings } from '@documenso/lib/types/document-email';

@@ -1,11 +1,10 @@
-'use client';
-
 import type { HTMLAttributes } from 'react';
 import React from 'react';
 
 import type { MessageDescriptor } from '@lingui/core';
-import { Trans, msg } from '@lingui/macro';
+import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
+import { Trans } from '@lingui/react/macro';
 import { motion } from 'framer-motion';
 
 import { cn } from '../../lib/utils';

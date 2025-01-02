@@ -1,9 +1,8 @@
-'use client';
-
 import { useEffect, useState } from 'react';
 
-import { Trans, msg } from '@lingui/macro';
+import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
+import { Trans } from '@lingui/react/macro';
 import { ChevronDown, ChevronUp, Trash } from 'lucide-react';
 
 import { validateCheckboxField } from '@documenso/lib/advanced-fields-validation/validate-checkbox';
@@ -126,6 +125,18 @@ export const CheckboxFieldAdvancedSettings = ({
 
   return (
     <div className="flex flex-col gap-4">
+      <div className="mb-2">
+        <Label>
+          <Trans>Label</Trans>
+        </Label>
+        <Input
+          id="label"
+          className="bg-background mt-2"
+          placeholder={_(msg`Field label`)}
+          value={fieldState.label}
+          onChange={(e) => handleFieldChange('label', e.target.value)}
+        />
+      </div>
       <div className="flex flex-row items-center gap-x-4">
         <div className="flex w-2/3 flex-col">
           <Label>

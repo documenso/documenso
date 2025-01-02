@@ -1,9 +1,10 @@
 import { hash } from '@node-rs/bcrypt';
+import type { User } from '@prisma/client';
+import { TeamMemberInviteStatus } from '@prisma/client';
 
 import { getStripeCustomerByUser } from '@documenso/ee/server-only/stripe/get-customer';
 import { updateSubscriptionItemQuantity } from '@documenso/ee/server-only/stripe/update-subscription-item-quantity';
 import { prisma } from '@documenso/prisma';
-import { IdentityProvider, TeamMemberInviteStatus } from '@documenso/prisma/client';
 
 import { IS_BILLING_ENABLED } from '../../constants/app';
 import { SALT_ROUNDS } from '../../constants/auth';
@@ -39,23 +40,53 @@ export const createUser = async ({ name, email, password, signature, url }: Crea
     });
 
     if (urlExists) {
-      throw new AppError(AppErrorCode.PROFILE_URL_TAKEN, {
+      throw new AppError('PROFILE_URL_TAKEN', {
         message: 'Profile username is taken',
         userMessage: 'The profile username is already taken',
       });
     }
   }
 
-  const user = await prisma.user.create({
-    data: {
-      name,
-      email: email.toLowerCase(),
-      password: hashedPassword,
-      signature,
-      identityProvider: IdentityProvider.DOCUMENSO,
-      url,
-    },
+  const user = await prisma.$transaction(async (tx) => {
+    const user = await tx.user.create({
+      data: {
+        name,
+        email: email.toLowerCase(),
+        password: hashedPassword, // Todo: (RR7) Drop password.
+        signature,
+        url,
+      },
+    });
+
+    // Todo: (RR7) Migrate to use this after RR7.
+    // await tx.account.create({
+    //   data: {
+    //     userId: user.id,
+    //     type: 'emailPassword', // Todo: (RR7)
+    //     provider: 'DOCUMENSO', // Todo: (RR7) Enums
+    //     providerAccountId: user.id.toString(),
+    //     password: hashedPassword,
+    //   },
+    // });
+
+    return user;
   });
+
+  await onCreateUserHook(user).catch((err) => {
+    // Todo: (RR7) Add logging.
+    console.error(err);
+  });
+
+  return user;
+};
+
+/**
+ * Should be run after a user is created.
+ *
+ * @returns User
+ */
+export const onCreateUserHook = async (user: User) => {
+  const { email } = user;
 
   const acceptedTeamInvites = await prisma.teamMemberInvite.findMany({
     where: {

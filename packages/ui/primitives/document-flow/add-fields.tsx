@@ -1,12 +1,11 @@
-'use client';
-
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
-import { Caveat } from 'next/font/google';
-
-import { Trans, msg } from '@lingui/macro';
+import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
+import { Trans } from '@lingui/react/macro';
 import { Prisma } from '@prisma/client';
+import type { Field, Recipient } from '@prisma/client';
+import { FieldType, RecipientRole, SendStatus } from '@prisma/client';
 import {
   CalendarDays,
   Check,
@@ -41,8 +40,6 @@ import {
   canRecipientBeModified,
   canRecipientFieldsBeModified,
 } from '@documenso/lib/utils/recipients';
-import type { Field, Recipient } from '@documenso/prisma/client';
-import { FieldType, RecipientRole, SendStatus } from '@documenso/prisma/client';
 
 import { FieldToolTip } from '../../components/field/field-tooltip';
 import { getSignerColorStyles, useSignerColors } from '../../lib/signer-colors';
@@ -69,13 +66,6 @@ import { FieldItem } from './field-item';
 import { FieldAdvancedSettings } from './field-item-advanced-settings';
 import { MissingSignatureFieldDialog } from './missing-signature-field-dialog';
 import { type DocumentFlowStep, FRIENDLY_FIELD_TYPE } from './types';
-
-const fontCaveat = Caveat({
-  weight: ['500'],
-  subsets: ['latin'],
-  display: 'swap',
-  variable: '--font-caveat',
-});
 
 const MIN_HEIGHT_PX = 12;
 const MIN_WIDTH_PX = 36;
@@ -508,7 +498,15 @@ export const AddFieldsFormPartial = ({
   }, []);
 
   useEffect(() => {
-    setSelectedSigner(recipients.find((r) => r.sendStatus !== SendStatus.SENT) ?? recipients[0]);
+    const recipientsByRoleToDisplay = recipients.filter(
+      (recipient) =>
+        recipient.role !== RecipientRole.CC && recipient.role !== RecipientRole.ASSISTANT,
+    );
+
+    setSelectedSigner(
+      recipientsByRoleToDisplay.find((r) => r.sendStatus !== SendStatus.SENT) ??
+        recipientsByRoleToDisplay[0],
+    );
   }, [recipients]);
 
   const recipientsByRole = useMemo(() => {
@@ -517,6 +515,7 @@ export const AddFieldsFormPartial = ({
       VIEWER: [],
       SIGNER: [],
       APPROVER: [],
+      ASSISTANT: [],
     };
 
     recipients.forEach((recipient) => {
@@ -529,7 +528,12 @@ export const AddFieldsFormPartial = ({
   const recipientsByRoleToDisplay = useMemo(() => {
     // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
     return (Object.entries(recipientsByRole) as [RecipientRole, Recipient[]][])
-      .filter(([role]) => role !== RecipientRole.CC && role !== RecipientRole.VIEWER)
+      .filter(
+        ([role]) =>
+          role !== RecipientRole.CC &&
+          role !== RecipientRole.VIEWER &&
+          role !== RecipientRole.ASSISTANT,
+      )
       .map(
         ([role, roleRecipients]) =>
           // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
@@ -543,12 +547,6 @@ export const AddFieldsFormPartial = ({
           ] as [RecipientRole, Recipient[]],
       );
   }, [recipientsByRole]);
-
-  const isTypedSignatureEnabled = form.watch('typedSignatureEnabled');
-
-  const handleTypedSignatureChange = (value: boolean) => {
-    form.setValue('typedSignatureEnabled', value, { shouldDirty: true });
-  };
 
   const handleAdvancedSettings = () => {
     setShowAdvancedSettings((prev) => !prev);
@@ -612,7 +610,7 @@ export const AddFieldsFormPartial = ({
                       '-rotate-6 scale-90 opacity-50 dark:bg-black/20': !isFieldWithinBounds,
                       'dark:text-black/60': isFieldWithinBounds,
                     },
-                    selectedField === FieldType.SIGNATURE && fontCaveat.className,
+                    // selectedField === FieldType.SIGNATURE && fontCaveat.className,
                   )}
                   style={{
                     top: coords.y,
@@ -687,9 +685,7 @@ export const AddFieldsFormPartial = ({
                       )}
 
                       {!selectedSigner?.email && (
-                        <span className="gradie flex-1 truncate text-left">
-                          {selectedSigner?.email}
-                        </span>
+                        <span className="flex-1 truncate text-left">{selectedSigner?.email}</span>
                       )}
 
                       <ChevronsUpDown className="ml-2 h-4 w-4" />
@@ -834,8 +830,7 @@ export const AddFieldsFormPartial = ({
                         <CardContent className="flex flex-col items-center justify-center px-6 py-4">
                           <p
                             className={cn(
-                              'text-muted-foreground group-data-[selected]:text-foreground flex items-center justify-center gap-x-1.5 text-lg font-normal',
-                              fontCaveat.className,
+                              'text-muted-foreground group-data-[selected]:text-foreground font-signature flex items-center justify-center gap-x-1.5 text-lg font-normal',
                             )}
                           >
                             <Trans>Signature</Trans>

@@ -1,7 +1,7 @@
+import { DocumentSigningOrder, RecipientRole } from '@prisma/client';
 import { z } from 'zod';
 
 import { ZRecipientActionAuthTypesSchema } from '@documenso/lib/types/document-auth';
-import { DocumentSigningOrder, RecipientRole } from '@documenso/prisma/client';
 
 import { ZMapNegativeOneToUndefinedSchema } from '../document-flow/add-settings.types';
 

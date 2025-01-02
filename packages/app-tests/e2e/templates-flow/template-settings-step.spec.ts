@@ -1,7 +1,7 @@
 import { expect, test } from '@playwright/test';
+import { TeamMemberRole } from '@prisma/client';
 
 import { prisma } from '@documenso/prisma';
-import { TeamMemberRole } from '@documenso/prisma/client';
 import { seedUserSubscription } from '@documenso/prisma/seed/subscriptions';
 import { seedTeam } from '@documenso/prisma/seed/teams';
 import { seedBlankTemplate } from '@documenso/prisma/seed/templates';
@@ -12,7 +12,7 @@ import { apiSignin } from '../fixtures/authentication';
 test.describe.configure({ mode: 'parallel' });
 
 test.describe('[EE_ONLY]', () => {
-  const enterprisePriceId = process.env.NEXT_PUBLIC_STRIPE_ENTERPRISE_PLAN_MONTHLY_PRICE_ID || '';
+  const enterprisePriceId = '';
 
   test.beforeEach(() => {
     test.skip(

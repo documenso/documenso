@@ -1,3 +1,5 @@
+import { DocumentVisibility } from '@prisma/client';
+import { DocumentStatus, TeamMemberRole } from '@prisma/client';
 import { match } from 'ts-pattern';
 
 import { isUserEnterprise } from '@documenso/ee/server-only/util/is-document-enterprise';
@@ -6,8 +8,6 @@ import type { ApiRequestMetadata } from '@documenso/lib/universal/extract-reques
 import type { CreateDocumentAuditLogDataResponse } from '@documenso/lib/utils/document-audit-logs';
 import { createDocumentAuditLogData } from '@documenso/lib/utils/document-audit-logs';
 import { prisma } from '@documenso/prisma';
-import { DocumentVisibility } from '@documenso/prisma/client';
-import { DocumentStatus, TeamMemberRole } from '@documenso/prisma/client';
 
 import { AppError, AppErrorCode } from '../../errors/app-error';
 import type { TDocumentAccessAuthTypes, TDocumentActionAuthTypes } from '../../types/document-auth';

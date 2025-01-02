@@ -1,13 +1,11 @@
-'use client';
-
 import React, { useEffect, useMemo, useState } from 'react';
 
+import type { Field } from '@prisma/client';
 import { createPortal } from 'react-dom';
 
 import { useFieldPageCoords } from '@documenso/lib/client-only/hooks/use-field-page-coords';
 import type { TFieldMetaSchema } from '@documenso/lib/types/field-meta';
 import { ZFieldMetaSchema } from '@documenso/lib/types/field-meta';
-import type { Field } from '@documenso/prisma/client';
 
 import { cn } from '../../lib/utils';
 import { Card, CardContent } from '../../primitives/card';
@@ -31,7 +29,8 @@ const getCardClassNames = (
   checkBoxOrRadio: boolean,
   cardClassName?: string,
 ) => {
-  const baseClasses = 'field-card-container relative z-20 h-full w-full transition-all';
+  const baseClasses =
+    'field--FieldRootContainer field-card-container relative z-20 h-full w-full transition-all';
 
   const insertedClasses =
     'bg-primary/20 border-primary ring-primary/20 ring-offset-primary/20 ring-2 ring-offset-2 dark:shadow-none';
@@ -141,6 +140,7 @@ export function FieldRootContainer({ field, children, cardClassName }: FieldCont
       <Card
         id={`field-${field.id}`}
         ref={ref}
+        data-field-type={field.type}
         data-inserted={field.inserted ? 'true' : 'false'}
         className={cardClassNames}
       >

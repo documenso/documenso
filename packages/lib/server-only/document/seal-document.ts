@@ -1,3 +1,4 @@
+import { DocumentStatus, RecipientRole, SigningStatus, WebhookTriggerEvents } from '@prisma/client';
 import { nanoid } from 'nanoid';
 import path from 'node:path';
 import { PDFDocument } from 'pdf-lib';
@@ -6,12 +7,6 @@ import PostHogServerClient from '@documenso/lib/server-only/feature-flags/get-po
 import { DOCUMENT_AUDIT_LOG_TYPE } from '@documenso/lib/types/document-audit-logs';
 import { createDocumentAuditLogData } from '@documenso/lib/utils/document-audit-logs';
 import { prisma } from '@documenso/prisma';
-import {
-  DocumentStatus,
-  RecipientRole,
-  SigningStatus,
-  WebhookTriggerEvents,
-} from '@documenso/prisma/client';
 import { signPdf } from '@documenso/signing';
 
 import {
@@ -19,10 +14,11 @@ import {
   mapDocumentToWebhookDocumentPayload,
 } from '../../types/webhook-payload';
 import type { RequestMetadata } from '../../universal/extract-request-metadata';
-import { getFile } from '../../universal/upload/get-file';
-import { putPdfFile } from '../../universal/upload/put-file';
+import { getFileServerSide } from '../../universal/upload/get-file.server';
+import { putPdfFileServerSide } from '../../universal/upload/put-file.server';
 import { fieldsContainUnsignedRequiredField } from '../../utils/advanced-fields-helpers';
 import { getCertificatePdf } from '../htmltopdf/get-certificate-pdf';
+import { addRejectionStampToPdf } from '../pdf/add-rejection-stamp-to-pdf';
 import { flattenAnnotations } from '../pdf/flatten-annotations';
 import { flattenForm } from '../pdf/flatten-form';
 import { insertFieldInPDF } from '../pdf/insert-field-in-pdf';
@@ -46,11 +42,6 @@ export const sealDocument = async ({
   const document = await prisma.document.findFirstOrThrow({
     where: {
       id: documentId,
-      recipients: {
-        every: {
-          signingStatus: SigningStatus.SIGNED,
-        },
-      },
     },
     include: {
       documentData: true,
@@ -83,7 +74,21 @@ export const sealDocument = async ({
     },
   });
 
-  if (recipients.some((recipient) => recipient.signingStatus !== SigningStatus.SIGNED)) {
+  // Determine if the document has been rejected by checking if any recipient has rejected it
+  const rejectedRecipient = recipients.find(
+    (recipient) => recipient.signingStatus === SigningStatus.REJECTED,
+  );
+
+  const isRejected = Boolean(rejectedRecipient);
+
+  // Get the rejection reason from the rejected recipient
+  const rejectionReason = rejectedRecipient?.rejectionReason ?? '';
+
+  // If the document is not rejected, ensure all recipients have signed
+  if (
+    !isRejected &&
+    recipients.some((recipient) => recipient.signingStatus !== SigningStatus.SIGNED)
+  ) {
     throw new Error(`Document ${document.id} has unsigned recipients`);
   }
 
@@ -96,7 +101,8 @@ export const sealDocument = async ({
     },
   });
 
-  if (fieldsContainUnsignedRequiredField(fields)) {
+  // Skip the field check if the document is rejected
+  if (!isRejected && fieldsContainUnsignedRequiredField(fields)) {
     throw new Error(`Document ${document.id} has unsigned required fields`);
   }
 
@@ -107,7 +113,7 @@ export const sealDocument = async ({
   }
 
   // !: Need to write the fields onto the document as a hard copy
-  const pdfData = await getFile(documentData);
+  const pdfData = await getFileServerSide(documentData);
 
   const certificateData =
     (document.team?.teamGlobalSettings?.includeSigningCertificate ?? true)
@@ -123,6 +129,11 @@ export const sealDocument = async ({
   normalizeSignatureAppearances(doc);
   flattenForm(doc);
   flattenAnnotations(doc);
+
+  // Add rejection stamp if the document is rejected
+  if (isRejected && rejectionReason) {
+    await addRejectionStampToPdf(doc, rejectionReason);
+  }
 
   if (certificateData) {
     const certificate = await PDFDocument.load(certificateData);
@@ -147,8 +158,11 @@ export const sealDocument = async ({
 
   const { name } = path.parse(document.title);
 
-  const { data: newData } = await putPdfFile({
-    name: `${name}_signed.pdf`,
+  // Add suffix based on document status
+  const suffix = isRejected ? '_rejected.pdf' : '_signed.pdf';
+
+  const { data: newData } = await putPdfFileServerSide({
+    name: `${name}${suffix}`,
     type: 'application/pdf',
     arrayBuffer: async () => Promise.resolve(pdfBuffer),
   });
@@ -161,6 +175,7 @@ export const sealDocument = async ({
       event: 'App: Document Sealed',
       properties: {
         documentId: document.id,
+        isRejected,
       },
     });
   }
@@ -171,7 +186,7 @@ export const sealDocument = async ({
         id: document.id,
       },
       data: {
-        status: DocumentStatus.COMPLETED,
+        status: isRejected ? DocumentStatus.REJECTED : DocumentStatus.COMPLETED,
         completedAt: new Date(),
       },
     });
@@ -193,6 +208,7 @@ export const sealDocument = async ({
         user: null,
         data: {
           transactionId: nanoid(),
+          ...(isRejected ? { isRejected: true, rejectionReason } : {}),
         },
       }),
     });
@@ -214,7 +230,9 @@ export const sealDocument = async ({
   });
 
   await triggerWebhook({
-    event: WebhookTriggerEvents.DOCUMENT_COMPLETED,
+    event: isRejected
+      ? WebhookTriggerEvents.DOCUMENT_REJECTED
+      : WebhookTriggerEvents.DOCUMENT_COMPLETED,
     data: ZWebhookDocumentSchema.parse(mapDocumentToWebhookDocumentPayload(updatedDocument)),
     userId: document.userId,
     teamId: document.teamId ?? undefined,

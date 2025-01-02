@@ -1,7 +1,6 @@
 declare namespace NodeJS {
   export interface ProcessEnv {
     NEXT_PUBLIC_WEBAPP_URL?: string;
-    NEXT_PUBLIC_MARKETING_URL?: string;
 
     NEXT_PRIVATE_GOOGLE_CLIENT_ID?: string;
     NEXT_PRIVATE_GOOGLE_CLIENT_SECRET?: string;
@@ -10,14 +9,11 @@ declare namespace NodeJS {
     NEXT_PRIVATE_OIDC_CLIENT_ID?: string;
     NEXT_PRIVATE_OIDC_CLIENT_SECRET?: string;
     NEXT_PRIVATE_OIDC_PROVIDER_LABEL?: string;
-    NEXT_PRIVATE_OIDC_ALLOW_SIGNUP?: string;
     NEXT_PRIVATE_OIDC_SKIP_VERIFY?: string;
 
     NEXT_PRIVATE_DATABASE_URL: string;
     NEXT_PRIVATE_ENCRYPTION_KEY: string;
     NEXT_PRIVATE_ENCRYPTION_SECONDARY_KEY: string;
-
-    NEXT_PUBLIC_STRIPE_COMMUNITY_PLAN_MONTHLY_PRICE_ID: string;
 
     NEXT_PRIVATE_STRIPE_API_KEY: string;
     NEXT_PRIVATE_STRIPE_WEBHOOK_SECRET: string;
@@ -69,16 +65,9 @@ declare namespace NodeJS {
 
     NEXT_PUBLIC_DISABLE_SIGNUP?: string;
 
-    //
     NEXT_PRIVATE_BROWSERLESS_URL?: string;
 
-    NEXT_PRIVATE_JOBS_PROVIDER?: 'trigger' | 'inngest' | 'local';
-
-    /**
-     * Trigger.dev environment variables
-     */
-    NEXT_PRIVATE_TRIGGER_API_KEY?: string;
-    NEXT_PRIVATE_TRIGGER_API_URL?: string;
+    NEXT_PRIVATE_JOBS_PROVIDER?: 'inngest' | 'local';
 
     /**
      * Inngest environment variables
@@ -89,17 +78,6 @@ declare namespace NodeJS {
     NEXT_PRIVATE_INNGEST_EVENT_KEY?: string;
 
     NEXT_PRIVATE_LOGGER_HONEY_BADGER_API_KEY?: string;
-
-    /**
-     * Vercel environment variables
-     */
-    VERCEL?: string;
-    VERCEL_ENV?: 'production' | 'development' | 'preview';
-    VERCEL_URL?: string;
-
-    DEPLOYMENT_TARGET?: 'webapp' | 'marketing';
-    FONT_CAVEAT_URI: string;
-    FONT_NOTO_SANS_URI: string;
 
     POSTGRES_URL?: string;
     DATABASE_URL?: string;

@@ -1,3 +1,4 @@
+import { RecipientRole } from '@prisma/client';
 import { z } from 'zod';
 
 import {
@@ -6,7 +7,6 @@ import {
   ZRecipientActionAuthTypesSchema,
 } from '@documenso/lib/types/document-auth';
 import { ZRecipientLiteSchema, ZRecipientSchema } from '@documenso/lib/types/recipient';
-import { RecipientRole } from '@documenso/prisma/client';
 
 export const ZGetRecipientRequestSchema = z.object({
   recipientId: z.number(),

@@ -1,5 +1,3 @@
-'use server';
-
 import { generateAvaliableRecipientPlaceholder } from '@documenso/lib/utils/templates';
 import { prisma } from '@documenso/prisma';
 

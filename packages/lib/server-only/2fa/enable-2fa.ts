@@ -1,5 +1,6 @@
+import { type User, UserSecurityAuditLogType } from '@prisma/client';
+
 import { prisma } from '@documenso/prisma';
-import { type User, UserSecurityAuditLogType } from '@documenso/prisma/client';
 
 import { AppError } from '../../errors/app-error';
 import type { RequestMetadata } from '../../universal/extract-request-metadata';
@@ -7,7 +8,7 @@ import { getBackupCodes } from './get-backup-code';
 import { verifyTwoFactorAuthenticationToken } from './verify-2fa-token';
 
 type EnableTwoFactorAuthenticationOptions = {
-  user: User;
+  user: Pick<User, 'id' | 'email' | 'twoFactorEnabled' | 'twoFactorSecret'>;
   code: string;
   requestMetadata?: RequestMetadata;
 };
