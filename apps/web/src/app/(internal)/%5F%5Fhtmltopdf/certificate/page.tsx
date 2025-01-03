@@ -5,10 +5,12 @@ import { redirect } from 'next/navigation';
 import { msg } from '@lingui/macro';
 import { useLingui } from '@lingui/react';
 import { DateTime } from 'luxon';
+import { QRCodeSVG } from 'qrcode.react';
 import { match } from 'ts-pattern';
 import { UAParser } from 'ua-parser-js';
 
 import { setupI18nSSR } from '@documenso/lib/client-only/providers/i18n.server';
+import { WEBAPP_BASE_URL } from '@documenso/lib/constants/app';
 import { APP_I18N_OPTIONS, ZSupportedLanguageCodeSchema } from '@documenso/lib/constants/i18n';
 import {
   RECIPIENT_ROLES_DESCRIPTION,
@@ -304,6 +306,24 @@ export default async function SigningCertificate({ searchParams }: SigningCertif
           </Table>
         </CardContent>
       </Card>
+
+      <div className="my-8 flex-row-reverse">
+        <div className="flex items-end justify-end gap-x-4">
+          <QRCodeSVG
+            value={`${WEBAPP_BASE_URL}/documents/${documentId}`}
+            size={100}
+            bgColor="#ffffff"
+            fgColor="#111827"
+            level="H"
+            imageSettings={{
+              src: '/static/icon.svg',
+              height: 32,
+              width: 32,
+              excavate: true,
+            }}
+          />
+        </div>
+      </div>
 
       <div className="my-8 flex-row-reverse">
         <div className="flex items-end justify-end gap-x-4">
