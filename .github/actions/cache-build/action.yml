@@ -13,7 +13,6 @@ runs:
       with:
         path: |
           ${{ github.workspace }}/apps/web/.next
-          ${{ github.workspace }}/apps/marketing/.next
           **/.turbo/**
           **/dist/**
 

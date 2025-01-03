@@ -27,7 +27,6 @@ export const DocumentEmailCheckboxes = ({
         <Checkbox
           id={DocumentEmailEvents.RecipientSigned}
           className="h-5 w-5"
-          checkClassName="dark:text-white text-primary"
           checked={value.recipientSigned}
           onCheckedChange={(checked) =>
             onChange({ ...value, [DocumentEmailEvents.RecipientSigned]: Boolean(checked) })
@@ -66,7 +65,6 @@ export const DocumentEmailCheckboxes = ({
         <Checkbox
           id={DocumentEmailEvents.RecipientSigningRequest}
           className="h-5 w-5"
-          checkClassName="dark:text-white text-primary"
           checked={value.recipientSigningRequest}
           onCheckedChange={(checked) =>
             onChange({ ...value, [DocumentEmailEvents.RecipientSigningRequest]: Boolean(checked) })
@@ -105,7 +103,6 @@ export const DocumentEmailCheckboxes = ({
         <Checkbox
           id={DocumentEmailEvents.RecipientRemoved}
           className="h-5 w-5"
-          checkClassName="dark:text-white text-primary"
           checked={value.recipientRemoved}
           onCheckedChange={(checked) =>
             onChange({ ...value, [DocumentEmailEvents.RecipientRemoved]: Boolean(checked) })
@@ -144,7 +141,6 @@ export const DocumentEmailCheckboxes = ({
         <Checkbox
           id={DocumentEmailEvents.DocumentPending}
           className="h-5 w-5"
-          checkClassName="dark:text-white text-primary"
           checked={value.documentPending}
           onCheckedChange={(checked) =>
             onChange({ ...value, [DocumentEmailEvents.DocumentPending]: Boolean(checked) })
@@ -184,7 +180,6 @@ export const DocumentEmailCheckboxes = ({
         <Checkbox
           id={DocumentEmailEvents.DocumentCompleted}
           className="h-5 w-5"
-          checkClassName="dark:text-white text-primary"
           checked={value.documentCompleted}
           onCheckedChange={(checked) =>
             onChange({ ...value, [DocumentEmailEvents.DocumentCompleted]: Boolean(checked) })
@@ -223,7 +218,6 @@ export const DocumentEmailCheckboxes = ({
         <Checkbox
           id={DocumentEmailEvents.DocumentDeleted}
           className="h-5 w-5"
-          checkClassName="dark:text-white text-primary"
           checked={value.documentDeleted}
           onCheckedChange={(checked) =>
             onChange({ ...value, [DocumentEmailEvents.DocumentDeleted]: Boolean(checked) })
@@ -262,7 +256,6 @@ export const DocumentEmailCheckboxes = ({
         <Checkbox
           id={DocumentEmailEvents.OwnerDocumentCompleted}
           className="h-5 w-5"
-          checkClassName="dark:text-white text-primary"
           checked={value.ownerDocumentCompleted}
           onCheckedChange={(checked) =>
             onChange({ ...value, [DocumentEmailEvents.OwnerDocumentCompleted]: Boolean(checked) })

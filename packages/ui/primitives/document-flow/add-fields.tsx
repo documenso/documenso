@@ -800,7 +800,6 @@ export const AddFieldsFormPartial = ({
                         <Checkbox
                           {...field}
                           id="typedSignatureEnabled"
-                          checkClassName="text-white"
                           checked={value}
                           onCheckedChange={(checked) => field.onChange(checked)}
                           disabled={form.formState.isSubmitting}

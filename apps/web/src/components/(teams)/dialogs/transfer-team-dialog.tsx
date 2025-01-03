@@ -217,45 +217,10 @@ export const TransferTeamDialog = ({
                   )}
                 />
 
-                {/* Temporary removed.  */}
-                {/* {IS_BILLING_ENABLED && (
-                  <FormField
-                    control={form.control}
-                    name="clearPaymentMethods"
-                    render={({ field }) => (
-                      <FormItem>
-                        <div className="flex flex-row items-center">
-                          <Checkbox
-                            id="clearPaymentMethods"
-                            className="h-5 w-5 rounded-full"
-                            checkClassName="dark:text-white text-primary"
-                            checked={field.value}
-                            onCheckedChange={field.onChange}
-                          />
-
-                          <label
-                            className="text-muted-foreground ml-2 text-sm"
-                            htmlFor="clearPaymentMethods"
-                          >
-                            Clear current payment methods
-                          </label>
-                        </div>
-                      </FormItem>
-                    )}
-                  />
-                )} */}
-
                 <Alert variant="neutral">
                   <AlertDescription>
                     <ul className="list-outside list-disc space-y-2 pl-4">
                       {IS_BILLING_ENABLED() && (
-                        // Temporary removed.
-                        // <li>
-                        //   {form.getValues('clearPaymentMethods')
-                        //     ? 'You will not be billed for any upcoming invoices'
-                        //     : 'We will continue to bill current payment methods if required'}
-                        // </li>
-
                         <li>
                           <Trans>
                             Any payment methods attached to this team will remain attached to this

@@ -313,7 +313,6 @@ export function UseTemplateDialog({
                           <Checkbox
                             id="distributeDocument"
                             className="h-5 w-5"
-                            checkClassName="dark:text-white text-primary"
                             checked={field.value}
                             onCheckedChange={field.onChange}
                           />

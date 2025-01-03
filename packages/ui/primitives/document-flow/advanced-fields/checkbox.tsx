@@ -34,7 +34,6 @@ export const CheckboxField = ({ field }: CheckboxFieldProps) => {
           <div key={index} className="flex items-center gap-x-1.5">
             <Checkbox
               className="dark:border-field-border h-3 w-3 bg-white"
-              checkClassName="text-white"
               id={`checkbox-${index}`}
               checked={item.checked}
             />

@@ -155,8 +155,7 @@ export const ResendDocumentActionItem = ({
 
                       <FormControl>
                         <Checkbox
-                          className="h-5 w-5 rounded-full data-[state=checked]:border-black data-[state=checked]:bg-black"
-                          checkClassName="text-white"
+                          className="h-5 w-5 rounded-full"
                           value={recipient.id}
                           checked={value.includes(recipient.id)}
                           onCheckedChange={(checked: boolean) =>
@@ -179,7 +178,7 @@ export const ResendDocumentActionItem = ({
             <DialogClose asChild>
               <Button
                 type="button"
-                className="dark:bg-muted dark:hover:bg-muted/80 flex-1  bg-black/5 hover:bg-black/10"
+                className="dark:bg-muted dark:hover:bg-muted/80 flex-1 bg-black/5 hover:bg-black/10"
                 variant="secondary"
                 disabled={isSubmitting}
               >
