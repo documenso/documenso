@@ -2,7 +2,7 @@ import { TEAM_MEMBER_ROLE_PERMISSIONS_MAP } from '@documenso/lib/constants/teams
 import { prisma } from '@documenso/prisma';
 
 export type DeleteTeamEmailVerificationOptions = {
-  userId: number;
+  userId: string;
   teamId: number;
 };
 

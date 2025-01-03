@@ -9,7 +9,7 @@ import { createDocumentAuditLogData, diffFieldChanges } from '../../utils/docume
 export type UpdateFieldOptions = {
   fieldId: number;
   documentId: number;
-  userId: number;
+  userId: string;
   teamId?: number;
   recipientId?: number;
   type?: FieldType;

@@ -30,7 +30,7 @@ import { AppError, AppErrorCode } from '../../errors/app-error';
 import { canRecipientFieldsBeModified } from '../../utils/recipients';
 
 export interface SetFieldsForDocumentOptions {
-  userId: number;
+  userId: string;
   documentId: number;
   fields: FieldData[];
   requestMetadata?: RequestMetadata;

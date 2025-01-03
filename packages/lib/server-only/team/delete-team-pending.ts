@@ -1,7 +1,7 @@
 import { prisma } from '@documenso/prisma';
 
 export type DeleteTeamPendingOptions = {
-  userId: number;
+  userId: string;
   pendingTeamId: number;
 };
 

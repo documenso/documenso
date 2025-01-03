@@ -7,7 +7,7 @@ import type { FindResultResponse } from '../../types/search-params';
 import { parseDocumentAuditLogData } from '../../utils/document-audit-logs';
 
 export interface FindDocumentAuditLogsOptions {
-  userId: number;
+  userId: string;
   documentId: number;
   page?: number;
   perPage?: number;

@@ -2,7 +2,7 @@ import { prisma } from '@documenso/prisma';
 
 export type GetWebhookByIdOptions = {
   id: string;
-  userId: number;
+  userId: string;
   teamId?: number;
 };
 

@@ -4,7 +4,7 @@ import { prisma } from '@documenso/prisma';
 import { SubscriptionStatus } from '@documenso/prisma/client';
 
 export type GetActiveSubscriptionsByUserIdOptions = {
-  userId: number;
+  userId: string;
 };
 
 export const getActiveSubscriptionsByUserId = async ({

@@ -16,7 +16,7 @@ export type RequestTeamOwnershipTransferOptions = {
   /**
    * The ID of the user initiating the transfer.
    */
-  userId: number;
+  userId: string;
 
   /**
    * The name of the user initiating the transfer.
@@ -31,7 +31,7 @@ export type RequestTeamOwnershipTransferOptions = {
   /**
    * The user ID of the new owner.
    */
-  newOwnerUserId: number;
+  newOwneruserId: string;
 
   /**
    * Whether to clear any current payment methods attached to the team.

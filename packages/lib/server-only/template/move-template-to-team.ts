@@ -8,7 +8,7 @@ import { AppError, AppErrorCode } from '../../errors/app-error';
 export type MoveTemplateToTeamOptions = {
   templateId: number;
   teamId: number;
-  userId: number;
+  userId: string;
 };
 
 export const ZMoveTemplateToTeamResponseSchema = TemplateSchema;

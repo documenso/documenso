@@ -15,7 +15,7 @@ import { AppError, AppErrorCode } from '../../errors/app-error';
 
 export type CreateTemplateDirectLinkOptions = {
   templateId: number;
-  userId: number;
+  userId: string;
   directRecipientId?: number;
 };
 

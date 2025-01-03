@@ -46,7 +46,7 @@ type FinalRecipient = Pick<
 export type CreateDocumentFromTemplateOptions = {
   templateId: number;
   externalId?: string | null;
-  userId: number;
+  userId: string;
   teamId?: number;
   recipients: {
     id: number;

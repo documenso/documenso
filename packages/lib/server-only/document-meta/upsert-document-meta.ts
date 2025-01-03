@@ -25,7 +25,7 @@ export type CreateDocumentMetaOptions = {
   distributionMethod?: DocumentDistributionMethod;
   typedSignatureEnabled?: boolean;
   language?: SupportedLanguageCodes;
-  userId: number;
+  userId: string;
   requestMetadata: RequestMetadata;
 };
 

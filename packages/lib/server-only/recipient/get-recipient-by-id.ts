@@ -7,7 +7,7 @@ import { AppError, AppErrorCode } from '../../errors/app-error';
 
 export type GetRecipientByIdOptions = {
   recipientId: number;
-  userId: number;
+  userId: string;
   teamId?: number;
 };
 

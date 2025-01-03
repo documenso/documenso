@@ -45,7 +45,7 @@ import { useToast } from '@documenso/ui/primitives/use-toast';
 export type TransferTeamDialogProps = {
   teamId: number;
   teamName: string;
-  ownerUserId: number;
+  ownerUserId: string;
   trigger?: React.ReactNode;
 };
 
@@ -98,7 +98,7 @@ export const TransferTeamDialog = ({
     try {
       await requestTeamOwnershipTransfer({
         teamId,
-        newOwnerUserId: Number.parseInt(newOwnerUserId),
+        newOwnerUserId,
         clearPaymentMethods,
       });
 

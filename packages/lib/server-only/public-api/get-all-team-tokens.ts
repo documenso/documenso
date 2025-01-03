@@ -3,7 +3,7 @@ import { prisma } from '@documenso/prisma';
 import { TeamMemberRole } from '@documenso/prisma/client';
 
 export type GetUserTokensOptions = {
-  userId: number;
+  userId: string;
   teamId: number;
 };
 

@@ -5,7 +5,7 @@ import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import { prisma } from '@documenso/prisma';
 
 export type CreateTeamPendingCheckoutSession = {
-  userId: number;
+  userId: string;
   pendingTeamId: number;
   interval: 'monthly' | 'yearly';
 };

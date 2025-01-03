@@ -124,7 +124,7 @@ type VerifyPasskeyOptions = {
   /**
    * The ID of the user who initiated the request.
    */
-  userId: number;
+  userId: string;
 
   /**
    * The secondary ID of the verification token.

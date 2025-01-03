@@ -2,7 +2,7 @@ import { prisma } from '@documenso/prisma';
 
 export interface GetFieldsForDocumentOptions {
   documentId: number;
-  userId: number;
+  userId: string;
 }
 
 export type DocumentField = Awaited<ReturnType<typeof getFieldsForDocument>>[number];

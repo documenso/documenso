@@ -8,7 +8,7 @@ import { TemplateSchema } from '@documenso/prisma/generated/zod';
 import type { TDuplicateTemplateMutationSchema } from '@documenso/trpc/server/template-router/schema';
 
 export type DuplicateTemplateOptions = TDuplicateTemplateMutationSchema & {
-  userId: number;
+  userId: string;
 };
 
 export const ZDuplicateTemplateResponseSchema = TemplateSchema;

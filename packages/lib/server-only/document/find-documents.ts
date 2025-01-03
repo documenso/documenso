@@ -27,7 +27,7 @@ import { maskRecipientTokensForDocument } from '../../utils/mask-recipient-token
 export type PeriodSelectorValue = '' | '7d' | '14d' | '30d';
 
 export type FindDocumentsOptions = {
-  userId: number;
+  userId: string;
   teamId?: number;
   templateId?: number;
   source?: DocumentSource;

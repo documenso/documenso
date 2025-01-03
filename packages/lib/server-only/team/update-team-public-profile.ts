@@ -1,7 +1,7 @@
 import { prisma } from '@documenso/prisma';
 
 export type UpdatePublicProfileOptions = {
-  userId: number;
+  userId: string;
   teamId: number;
   data: {
     bio?: string;

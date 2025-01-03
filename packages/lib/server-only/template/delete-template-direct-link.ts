@@ -7,7 +7,7 @@ import { AppError, AppErrorCode } from '../../errors/app-error';
 
 export type DeleteTemplateDirectLinkOptions = {
   templateId: number;
-  userId: number;
+  userId: string;
 };
 
 export const deleteTemplateDirectLink = async ({

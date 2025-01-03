@@ -19,7 +19,7 @@ import { nanoid } from '../../universal/id';
 import { createRecipientAuthOptions } from '../../utils/document-auth';
 
 export type SetRecipientsForTemplateOptions = {
-  userId: number;
+  userId: string;
   teamId?: number;
   templateId: number;
   recipients: {

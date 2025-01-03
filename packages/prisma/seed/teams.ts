@@ -133,7 +133,7 @@ export const seedTeamMember = async ({
 
 type UnseedTeamMemberOptions = {
   teamId: number;
-  userId: number;
+  userId: string;
 };
 
 export const unseedTeamMember = async ({ teamId, userId }: UnseedTeamMemberOptions) => {
@@ -147,7 +147,7 @@ export const unseedTeamMember = async ({ teamId, userId }: UnseedTeamMemberOptio
   });
 };
 
-export const seedTeamTransfer = async (options: { newOwnerUserId: number; teamId: number }) => {
+export const seedTeamTransfer = async (options: { newOwneruserId: string; teamId: number }) => {
   return await prisma.teamTransferVerification.create({
     data: {
       teamId: options.teamId,

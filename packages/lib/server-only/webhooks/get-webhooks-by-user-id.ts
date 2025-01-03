@@ -1,6 +1,6 @@
 import { prisma } from '@documenso/prisma';
 
-export const getWebhooksByUserId = async (userId: number) => {
+export const getWebhooksByUserId = async (userId: string) => {
   return await prisma.webhook.findMany({
     where: {
       userId,

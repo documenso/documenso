@@ -11,7 +11,7 @@ import { createDocumentAuditLogData } from '../../utils/document-audit-logs';
 export type MoveDocumentToTeamOptions = {
   documentId: number;
   teamId: number;
-  userId: number;
+  userId: string;
   requestMetadata?: RequestMetadata;
 };
 

@@ -6,7 +6,7 @@ export interface CreateWebhookOptions {
   eventTriggers: WebhookTriggerEvents[];
   secret: string | null;
   enabled: boolean;
-  userId: number;
+  userId: string;
   teamId?: number;
 }
 

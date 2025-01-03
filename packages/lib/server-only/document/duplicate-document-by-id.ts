@@ -7,7 +7,7 @@ import { getDocumentWhereInput } from './get-document-by-id';
 
 export interface DuplicateDocumentOptions {
   documentId: number;
-  userId: number;
+  userId: string;
   teamId?: number;
 }
 

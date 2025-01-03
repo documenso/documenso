@@ -11,7 +11,7 @@ export type CreateSharingIdOptions =
     }
   | {
       documentId: number;
-      userId: number;
+      userId: string;
     };
 
 export const createOrGetShareLink = async ({ documentId, ...options }: CreateSharingIdOptions) => {

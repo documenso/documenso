@@ -20,7 +20,7 @@ export type UpdateRecipientOptions = {
   role?: RecipientRole;
   signingOrder?: number | null;
   actionAuth?: TRecipientActionAuthTypes | null;
-  userId: number;
+  userId: string;
   teamId?: number;
   requestMetadata?: RequestMetadata;
 };

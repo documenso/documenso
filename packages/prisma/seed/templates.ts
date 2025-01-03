@@ -16,7 +16,7 @@ const examplePdf = fs
 
 type SeedTemplateOptions = {
   title?: string;
-  userId: number;
+  userId: string;
   teamId?: number;
   createTemplateOptions?: Partial<Prisma.TemplateCreateInput>;
 };

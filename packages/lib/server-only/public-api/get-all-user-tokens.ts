@@ -1,7 +1,7 @@
 import { prisma } from '@documenso/prisma';
 
 export type GetUserTokensOptions = {
-  userId: number;
+  userId: string;
 };
 
 export const getUserTokens = async ({ userId }: GetUserTokensOptions) => {

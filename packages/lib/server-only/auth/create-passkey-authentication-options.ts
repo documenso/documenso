@@ -9,7 +9,7 @@ import { AppError, AppErrorCode } from '../../errors/app-error';
 import { getAuthenticatorOptions } from '../../utils/authenticator';
 
 type CreatePasskeyAuthenticationOptions = {
-  userId: number;
+  userId: string;
 
   /**
    * The ID of the passkey to request authentication for.

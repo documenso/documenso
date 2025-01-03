@@ -6,7 +6,7 @@ export type DeleteTeamTransferRequestOptions = {
   /**
    * The ID of the user deleting the transfer.
    */
-  userId: number;
+  userId: string;
 
   /**
    * The ID of the team whose team transfer request should be deleted.

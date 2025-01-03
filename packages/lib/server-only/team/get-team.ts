@@ -70,7 +70,7 @@ export const getTeamById = async ({
 };
 
 export type GetTeamByUrlOptions = {
-  userId: number;
+  userId: string;
   teamUrl: string;
 };
 

@@ -5,7 +5,7 @@ import { Prisma } from '@documenso/prisma/client';
 import type { FindResultResponse } from '../../types/search-params';
 
 export interface FindTeamsOptions {
-  userId: number;
+  userId: string;
   query?: string;
   page?: number;
   perPage?: number;

@@ -3,7 +3,7 @@
 import { prisma } from '@documenso/prisma';
 
 export type GetSubscriptionsByUserIdOptions = {
-  userId: number;
+  userId: string;
 };
 
 export const getSubscriptionsByUserId = async ({ userId }: GetSubscriptionsByUserIdOptions) => {

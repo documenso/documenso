@@ -7,7 +7,7 @@ import { prisma } from '@documenso/prisma';
 export type UpdateDocumentOptions = {
   documentId: number;
   data: Prisma.DocumentUpdateInput;
-  userId: number;
+  userId: string;
   teamId?: number;
 };
 

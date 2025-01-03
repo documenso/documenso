@@ -26,7 +26,7 @@ import { getDocumentWhereInput } from './get-document-by-id';
 
 export type ResendDocumentOptions = {
   documentId: number;
-  userId: number;
+  userId: string;
   recipients: number[];
   teamId?: number;
   requestMetadata: RequestMetadata;

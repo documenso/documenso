@@ -6,7 +6,7 @@ import { FieldSchema } from '@documenso/prisma/generated/zod';
 import { AppError, AppErrorCode } from '../../errors/app-error';
 
 export type GetFieldByIdOptions = {
-  userId: number;
+  userId: string;
   teamId?: number;
   fieldId: number;
   documentId?: number;

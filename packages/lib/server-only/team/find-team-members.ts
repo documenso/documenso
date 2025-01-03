@@ -10,7 +10,7 @@ import type { FindResultResponse } from '../../types/search-params';
 import { ZFindResultResponse } from '../../types/search-params';
 
 export interface FindTeamMembersOptions {
-  userId: number;
+  userId: string;
   teamId: number;
   query?: string;
   page?: number;

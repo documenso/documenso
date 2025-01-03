@@ -16,7 +16,7 @@ import { createDocumentAuditLogData } from '../../utils/document-audit-logs';
 
 export type CreateFieldOptions = {
   documentId: number;
-  userId: number;
+  userId: string;
   teamId?: number;
   recipientId: number;
   type: FieldType;

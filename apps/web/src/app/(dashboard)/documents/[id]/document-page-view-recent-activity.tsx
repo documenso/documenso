@@ -16,7 +16,7 @@ import { cn } from '@documenso/ui/lib/utils';
 
 export type DocumentPageViewRecentActivityProps = {
   documentId: number;
-  userId: number;
+  userId: string;
 };
 
 export const DocumentPageViewRecentActivity = ({

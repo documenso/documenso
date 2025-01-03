@@ -8,7 +8,7 @@ import { DocumentVisibility, TeamMemberRole } from '@documenso/prisma/client';
 
 export type SearchDocumentsWithKeywordOptions = {
   query: string;
-  userId: number;
+  userId: string;
   limit?: number;
 };
 

@@ -4,7 +4,7 @@ import { UserSecurityAuditLogType } from '@documenso/prisma/client';
 import type { RequestMetadata } from '../../universal/extract-request-metadata';
 
 export type UpdateProfileOptions = {
-  userId: number;
+  userId: string;
   name: string;
   signature: string;
   requestMetadata?: RequestMetadata;

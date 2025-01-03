@@ -9,7 +9,7 @@ import { AppError, AppErrorCode } from '../../errors/app-error';
 
 export type ToggleTemplateDirectLinkOptions = {
   templateId: number;
-  userId: number;
+  userId: string;
   enabled: boolean;
 };
 

@@ -24,7 +24,7 @@ import { DocumentHistorySheetChanges } from './document-history-sheet-changes';
 
 export type DocumentHistorySheetProps = {
   documentId: number;
-  userId: number;
+  userId: string;
   isMenuOpen?: boolean;
   onMenuOpenChange?: (_value: boolean) => void;
   children?: React.ReactNode;

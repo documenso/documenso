@@ -7,7 +7,7 @@ import { createDocumentAuditLogData } from '../../utils/document-audit-logs';
 export type DeleteFieldOptions = {
   fieldId: number;
   documentId: number;
-  userId: number;
+  userId: string;
   teamId?: number;
   requestMetadata?: RequestMetadata;
 };

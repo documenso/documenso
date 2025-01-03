@@ -5,7 +5,7 @@ import { TeamMemberRole } from '@documenso/prisma/client';
 import { TeamGlobalSettingsSchema } from '@documenso/prisma/generated/zod';
 
 export type UpdateTeamBrandingSettingsOptions = {
-  userId: number;
+  userId: string;
   teamId: number;
 
   settings: {

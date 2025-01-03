@@ -16,7 +16,7 @@ export type CreateTeamOptions = {
   /**
    * ID of the user creating the Team.
    */
-  userId: number;
+  userId: string;
 
   /**
    * Name of the team to display.

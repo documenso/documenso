@@ -8,7 +8,7 @@ import { TeamGlobalSettingsSchema } from '@documenso/prisma/generated/zod';
 import type { SupportedLanguageCodes } from '../../constants/i18n';
 
 export type UpdateTeamDocumentSettingsOptions = {
-  userId: number;
+  userId: string;
   teamId: number;
 
   settings: {

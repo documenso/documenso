@@ -8,7 +8,7 @@ import { UserSecurityAuditLogType } from '@documenso/prisma/client';
 import { AppError } from '../../errors/app-error';
 
 export type UpdatePasswordOptions = {
-  userId: number;
+  userId: string;
   password: string;
   currentPassword: string;
   requestMetadata?: RequestMetadata;

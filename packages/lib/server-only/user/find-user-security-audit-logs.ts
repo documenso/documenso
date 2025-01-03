@@ -4,7 +4,7 @@ import type { UserSecurityAuditLog, UserSecurityAuditLogType } from '@documenso/
 import type { FindResultResponse } from '../../types/search-params';
 
 export type FindUserSecurityAuditLogsOptions = {
-  userId: number;
+  userId: string;
   type?: UserSecurityAuditLogType;
   page?: number;
   perPage?: number;

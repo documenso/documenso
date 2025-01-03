@@ -6,7 +6,7 @@ import { TeamMemberInviteStatus } from '@documenso/prisma/client';
 import { jobs } from '../../jobs/client';
 
 export type AcceptTeamInvitationOptions = {
-  userId: number;
+  userId: string;
   teamId: number;
 };
 

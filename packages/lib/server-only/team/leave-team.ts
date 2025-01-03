@@ -8,7 +8,7 @@ export type LeaveTeamOptions = {
   /**
    * The ID of the user who is leaving the team.
    */
-  userId: number;
+  userId: string;
 
   /**
    * The ID of the team the user is leaving.

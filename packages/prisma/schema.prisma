@@ -28,7 +28,7 @@ enum Role {
 }
 
 model User {
-  id               Int              @id @default(autoincrement())
+  id               String           @unique @default(cuid(2))
   name             String?
   customerId       String?          @unique
   email            String           @unique
@@ -73,7 +73,7 @@ model User {
 model UserProfile {
   id      String  @id @default(cuid())
   enabled Boolean @default(false)
-  userId  Int     @unique
+  userId  String  @unique
   bio     String?
 
   User User? @relation(fields: [userId], references: [id], onDelete: Cascade)
@@ -106,8 +106,9 @@ enum UserSecurityAuditLogType {
 }
 
 model UserSecurityAuditLog {
-  id        Int                      @id @default(autoincrement())
-  userId    Int
+  id     Int    @id @default(autoincrement())
+  userId String
+
   createdAt DateTime                 @default(now())
   type      UserSecurityAuditLogType
   userAgent String?
@@ -121,13 +122,13 @@ model PasswordResetToken {
   token     String   @unique
   createdAt DateTime @default(now())
   expiry    DateTime
-  userId    Int
+  userId    String
   User      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model Passkey {
   id                   String    @id @default(cuid())
-  userId               Int
+  userId               String
   name                 String
   createdAt            DateTime  @default(now())
   updatedAt            DateTime  @default(now())
@@ -157,7 +158,7 @@ model VerificationToken {
   completed   Boolean  @default(false)
   expires     DateTime
   createdAt   DateTime @default(now())
-  userId      Int
+  userId      String
   user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
@@ -178,7 +179,7 @@ model Webhook {
   enabled       Boolean                @default(true)
   createdAt     DateTime               @default(now())
   updatedAt     DateTime               @default(now()) @updatedAt
-  userId        Int
+  userId        String
   User          User                   @relation(fields: [userId], references: [id], onDelete: Cascade)
   teamId        Int?
   team          Team?                  @relation(fields: [teamId], references: [id], onDelete: Cascade)
@@ -215,7 +216,7 @@ model ApiToken {
   algorithm ApiTokenAlgorithm @default(SHA512)
   expires   DateTime?
   createdAt DateTime          @default(now())
-  userId    Int?
+  userId    String?
   user      User?             @relation(fields: [userId], references: [id], onDelete: Cascade)
   teamId    Int?
   team      Team?             @relation(fields: [teamId], references: [id], onDelete: Cascade)
@@ -233,7 +234,7 @@ model Subscription {
   planId            String             @unique
   priceId           String
   periodEnd         DateTime?
-  userId            Int?
+  userId            String?
   teamId            Int?               @unique
   createdAt         DateTime           @default(now())
   updatedAt         DateTime           @updatedAt
@@ -247,16 +248,14 @@ model Subscription {
 
 model Account {
   id                String  @id @default(cuid())
-  userId            Int
+  userId            String
   type              String
   provider          String
   providerAccountId String
   refresh_token     String? @db.Text
   access_token      String? @db.Text
   expires_at        Int?
-  // Some providers return created_at so we need to make it optional
   created_at        Int?
-  // Stops next-auth from crashing when dealing with AzureAD
   ext_expires_in    Int?
   token_type        String?
   scope             String?
@@ -271,7 +270,7 @@ model Account {
 model Session {
   id           String   @id @default(cuid())
   sessionToken String   @unique
-  userId       Int
+  userId       String
   expires      DateTime
   user         User?    @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
@@ -297,7 +296,7 @@ enum DocumentVisibility {
 model Document {
   id             Int                 @id @default(autoincrement())
   externalId     String?
-  userId         Int
+  userId         String
   User           User                @relation(fields: [userId], references: [id], onDelete: Cascade)
   authOptions    Json?
   formValues     Json?
@@ -534,14 +533,13 @@ model TeamGlobalSettings {
 }
 
 model Team {
-  id            Int      @id @default(autoincrement())
-  name          String
-  url           String   @unique
-  createdAt     DateTime @default(now())
-  avatarImageId String?
-  customerId    String?  @unique
-  ownerUserId   Int
-
+  id                   Int                       @id @default(autoincrement())
+  name                 String
+  url                  String                    @unique
+  createdAt            DateTime                  @default(now())
+  avatarImageId        String?
+  customerId           String?                   @unique
+  ownerUserId          String
   members              TeamMember[]
   invites              TeamMemberInvite[]
   teamEmail            TeamEmail?
@@ -566,7 +564,7 @@ model TeamPending {
   url         String   @unique
   createdAt   DateTime @default(now())
   customerId  String   @unique
-  ownerUserId Int
+  ownerUserId String
 
   owner User @relation(fields: [ownerUserId], references: [id], onDelete: Cascade)
 }
@@ -576,7 +574,7 @@ model TeamMember {
   teamId    Int
   createdAt DateTime       @default(now())
   role      TeamMemberRole
-  userId    Int
+  userId    String
   user      User           @relation(fields: [userId], references: [id], onDelete: Cascade)
   team      Team           @relation(fields: [teamId], references: [id], onDelete: Cascade)
 
@@ -605,7 +603,7 @@ model TeamEmailVerification {
 
 model TeamTransferVerification {
   teamId              Int      @id @unique
-  userId              Int
+  userId              String
   name                String
   email               String
   token               String   @unique
@@ -658,11 +656,11 @@ model Template {
   externalId             String?
   type                   TemplateType  @default(PRIVATE)
   title                  String
-  userId                 Int
+  userId                 String
   teamId                 Int?
   authOptions            Json?
   templateMeta           TemplateMeta?
-  templateDocumentDataId String
+  templateDocumentDataId String        @unique
   createdAt              DateTime      @default(now())
   updatedAt              DateTime      @default(now()) @updatedAt
   publicTitle            String        @default("")
@@ -675,8 +673,6 @@ model Template {
   Field                Field[]
   directLink           TemplateDirectLink?
   documents            Document[]
-
-  @@unique([templateDocumentDataId])
 }
 
 model TemplateDirectLink {
@@ -695,7 +691,7 @@ model SiteSettings {
   id                   String   @id
   enabled              Boolean  @default(false)
   data                 Json
-  lastModifiedByUserId Int?
+  lastModifiedByUserId String?
   lastModifiedAt       DateTime @default(now())
   lastModifiedByUser   User?    @relation(fields: [lastModifiedByUserId], references: [id], onDelete: SetNull)
 }

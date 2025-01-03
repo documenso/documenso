@@ -5,7 +5,7 @@ import { prisma } from '@documenso/prisma';
 export type EditWebhookOptions = {
   id: string;
   data: Omit<Prisma.WebhookUpdateInput, 'id' | 'userId' | 'teamId'>;
-  userId: number;
+  userId: string;
   teamId?: number;
 };
 

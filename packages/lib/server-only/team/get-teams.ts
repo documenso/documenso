@@ -4,7 +4,7 @@ import { prisma } from '@documenso/prisma';
 import { TeamMemberSchema, TeamSchema } from '@documenso/prisma/generated/zod';
 
 export type GetTeamsOptions = {
-  userId: number;
+  userId: string;
 };
 
 export const ZGetTeamsResponseSchema = TeamSchema.extend({

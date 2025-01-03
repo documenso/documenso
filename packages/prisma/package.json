@@ -21,10 +21,10 @@
     "seed": "tsx ./seed-database.ts"
   },
   "dependencies": {
-    "@prisma/client": "5.4.2",
-    "kysely": "^0.27.3",
-    "prisma": "5.4.2",
-    "prisma-extension-kysely": "^2.1.0",
+    "@prisma/client": "^6.1.0",
+    "kysely": "^0.27.5",
+    "prisma": "^6.1.0",
+    "prisma-extension-kysely": "^3.0.0",
     "ts-pattern": "^5.0.6"
   },
   "devDependencies": {
@@ -33,6 +33,6 @@
     "prisma-kysely": "^1.8.0",
     "tsx": "^4.11.0",
     "typescript": "5.2.2",
-    "zod-prisma-types": "^3.1.8"
+    "zod-prisma-types": "^3.2.1"
   }
 }

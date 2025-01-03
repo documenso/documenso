@@ -10,7 +10,7 @@ import { useIsMounted } from '@documenso/lib/client-only/hooks/use-is-mounted';
 import type { Document, Recipient, User } from '@documenso/prisma/client';
 
 export type DocumentPageViewInformationProps = {
-  userId: number;
+  userId: string;
   document: Document & {
     User: Pick<User, 'id' | 'name' | 'email'>;
     Recipient: Recipient[];

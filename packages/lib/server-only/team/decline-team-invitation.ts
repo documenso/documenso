@@ -1,7 +1,7 @@
 import { prisma } from '@documenso/prisma';
 
 export type DeclineTeamInvitationOptions = {
-  userId: number;
+  userId: string;
   teamId: number;
 };
 

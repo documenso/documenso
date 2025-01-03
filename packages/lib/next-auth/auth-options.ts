@@ -126,7 +126,7 @@ export const NEXT_AUTH_OPTIONS: AuthOptions = {
         }
 
         return {
-          id: Number(user.id),
+          id: user.id,
           email: user.email,
           name: user.name,
           emailVerified: user.emailVerified?.toISOString() ?? null,
@@ -140,7 +140,7 @@ export const NEXT_AUTH_OPTIONS: AuthOptions = {
 
       profile(profile) {
         return {
-          id: Number(profile.sub),
+          id: profile.sub,
           name: profile.name || `${profile.given_name} ${profile.family_name}`.trim(),
           email: profile.email,
           emailVerified: profile.email_verified ? new Date().toISOString() : null,
@@ -274,7 +274,7 @@ export const NEXT_AUTH_OPTIONS: AuthOptions = {
         });
 
         return {
-          id: Number(user.id),
+          id: user.id,
           email: user.email,
           name: user.name,
           emailVerified: user.emailVerified?.toISOString() ?? null,
@@ -308,7 +308,7 @@ export const NEXT_AUTH_OPTIONS: AuthOptions = {
 
         const { userId, email } = parsedCredential;
 
-        if (typeof userId !== 'number' || typeof email !== 'string') {
+        if (typeof userId !== 'string' || typeof email !== 'string') {
           throw new AppError(AppErrorCode.INVALID_REQUEST);
         }
 
@@ -323,7 +323,7 @@ export const NEXT_AUTH_OPTIONS: AuthOptions = {
         }
 
         return {
-          id: Number(user.id),
+          id: user.id,
           email: user.email,
           name: user.name,
           emailVerified: user.emailVerified?.toISOString() ?? null,
@@ -340,7 +340,7 @@ export const NEXT_AUTH_OPTIONS: AuthOptions = {
       } satisfies JWT;
 
       if (!merged.email || typeof merged.emailVerified !== 'string') {
-        const userId = Number(merged.id ?? token.sub);
+        const userId = merged.id ?? token.sub;
 
         const retrieved = await prisma.user.findFirst({
           where: {
@@ -367,7 +367,7 @@ export const NEXT_AUTH_OPTIONS: AuthOptions = {
 
         const user = await prisma.user.update({
           where: {
-            id: Number(merged.id),
+            id: merged.id,
           },
           data: {
             lastSignedIn: merged.lastSignedIn,
@@ -384,7 +384,7 @@ export const NEXT_AUTH_OPTIONS: AuthOptions = {
 
         await prisma.user.update({
           where: {
-            id: Number(merged.id),
+            id: merged.id,
           },
           data: {
             emailVerified: merged.emailVerified,
@@ -407,7 +407,7 @@ export const NEXT_AUTH_OPTIONS: AuthOptions = {
         return {
           ...session,
           user: {
-            id: Number(token.id),
+            id: token.id,
             name: token.name,
             email: token.email,
             emailVerified: token.emailVerified ?? null,

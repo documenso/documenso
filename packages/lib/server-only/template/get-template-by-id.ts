@@ -16,7 +16,7 @@ import { AppError, AppErrorCode } from '../../errors/app-error';
 
 export type GetTemplateByIdOptions = {
   id: number;
-  userId: number;
+  userId: string;
   teamId?: number;
 };
 

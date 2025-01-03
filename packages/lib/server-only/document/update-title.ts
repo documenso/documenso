@@ -6,7 +6,7 @@ import { createDocumentAuditLogData } from '@documenso/lib/utils/document-audit-
 import { prisma } from '@documenso/prisma';
 
 export type UpdateTitleOptions = {
-  userId: number;
+  userId: string;
   teamId?: number;
   documentId: number;
   title: string;

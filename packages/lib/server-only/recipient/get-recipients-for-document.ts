@@ -2,7 +2,7 @@ import { prisma } from '@documenso/prisma';
 
 export interface GetRecipientsForDocumentOptions {
   documentId: number;
-  userId: number;
+  userId: string;
   teamId?: number;
 }
 

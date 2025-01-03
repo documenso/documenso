@@ -13,7 +13,7 @@ import type { TDocumentAccessAuthTypes, TDocumentActionAuthTypes } from '../../t
 import { createDocumentAuthOptions, extractDocumentAuthMethods } from '../../utils/document-auth';
 
 export type UpdateTemplateSettingsOptions = {
-  userId: number;
+  userId: string;
   teamId?: number;
   templateId: number;
   data: {

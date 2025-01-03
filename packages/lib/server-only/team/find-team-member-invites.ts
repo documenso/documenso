@@ -10,7 +10,7 @@ import { TEAM_MEMBER_ROLE_PERMISSIONS_MAP } from '../../constants/teams';
 import { type FindResultResponse, ZFindResultResponse } from '../../types/search-params';
 
 export interface FindTeamMemberInvitesOptions {
-  userId: number;
+  userId: string;
   teamId: number;
   query?: string;
   page?: number;

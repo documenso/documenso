@@ -8,7 +8,7 @@ export type ResendTeamMemberInvitationOptions = {
   /**
    * The ID of the user who is initiating this action.
    */
-  userId: number;
+  userId: string;
 
   /**
    * The name of the user who is initiating this action.

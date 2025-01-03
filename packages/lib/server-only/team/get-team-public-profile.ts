@@ -5,7 +5,7 @@ import { AppError, AppErrorCode } from '../../errors/app-error';
 import { updateTeamPublicProfile } from './update-team-public-profile';
 
 export type GetTeamPublicProfileOptions = {
-  userId: number;
+  userId: string;
   teamId: number;
 };
 

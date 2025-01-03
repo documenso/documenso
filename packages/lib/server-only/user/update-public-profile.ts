@@ -3,7 +3,7 @@ import { prisma } from '@documenso/prisma';
 import { AppError, AppErrorCode } from '../../errors/app-error';
 
 export type UpdatePublicProfileOptions = {
-  userId: number;
+  userId: string;
   data: {
     url?: string;
     bio?: string;

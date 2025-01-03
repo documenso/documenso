@@ -2,7 +2,7 @@ import { prisma } from '@documenso/prisma';
 
 export interface GetFieldsForTemplateOptions {
   templateId: number;
-  userId: number;
+  userId: string;
 }
 
 export const getFieldsForTemplate = async ({ templateId, userId }: GetFieldsForTemplateOptions) => {

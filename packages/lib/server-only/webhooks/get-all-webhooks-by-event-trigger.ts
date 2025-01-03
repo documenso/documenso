@@ -3,7 +3,7 @@ import type { WebhookTriggerEvents } from '@documenso/prisma/client';
 
 export type GetAllWebhooksByEventTriggerOptions = {
   event: WebhookTriggerEvents;
-  userId: number;
+  userId: string;
   teamId?: number;
 };
 

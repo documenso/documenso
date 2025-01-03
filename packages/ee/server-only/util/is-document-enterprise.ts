@@ -6,7 +6,7 @@ import type { Subscription } from '@documenso/prisma/client';
 import { getEnterprisePlanPriceIds } from '../stripe/get-enterprise-plan-prices';
 
 export type IsUserEnterpriseOptions = {
-  userId: number;
+  userId: string;
   teamId?: number;
 };
 

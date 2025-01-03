@@ -34,7 +34,7 @@ import { UpdateTeamMemberDialog } from '../dialogs/update-team-member-dialog';
 
 export type TeamMembersDataTableProps = {
   currentUserTeamRole: TeamMemberRole;
-  teamOwnerUserId: number;
+  teamOwneruserId: string;
   teamId: number;
   teamName: string;
 };

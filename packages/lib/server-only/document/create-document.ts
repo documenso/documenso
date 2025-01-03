@@ -21,7 +21,7 @@ import { triggerWebhook } from '../webhooks/trigger/trigger-webhook';
 export type CreateDocumentOptions = {
   title: string;
   externalId?: string | null;
-  userId: number;
+  userId: string;
   teamId?: number;
   documentDataId: string;
   formValues?: Record<string, string | number | boolean>;

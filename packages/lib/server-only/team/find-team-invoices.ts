@@ -4,7 +4,7 @@ import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import { prisma } from '@documenso/prisma';
 
 export interface FindTeamInvoicesOptions {
-  userId: number;
+  userId: string;
   teamId: number;
 }
 

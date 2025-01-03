@@ -2,7 +2,7 @@ import { prisma } from '@documenso/prisma';
 
 export type GetApiTokenByIdOptions = {
   id: number;
-  userId: number;
+  userId: string;
 };
 
 export const getApiTokenById = async ({ id, userId }: GetApiTokenByIdOptions) => {

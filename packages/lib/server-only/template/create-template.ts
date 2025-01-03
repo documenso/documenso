@@ -5,7 +5,7 @@ import { TemplateSchema } from '@documenso/prisma/generated/zod';
 import type { TCreateTemplateMutationSchema } from '@documenso/trpc/server/template-router/schema';
 
 export type CreateTemplateOptions = TCreateTemplateMutationSchema & {
-  userId: number;
+  userId: string;
   teamId?: number;
 };
 

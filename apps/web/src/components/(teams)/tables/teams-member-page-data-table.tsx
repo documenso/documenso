@@ -20,7 +20,7 @@ export type TeamsMemberPageDataTableProps = {
   currentUserTeamRole: TeamMemberRole;
   teamId: number;
   teamName: string;
-  teamOwnerUserId: number;
+  teamOwneruserId: string;
 };
 
 export const TeamsMemberPageDataTable = ({

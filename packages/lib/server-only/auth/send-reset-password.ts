@@ -8,7 +8,7 @@ import { NEXT_PUBLIC_WEBAPP_URL } from '../../constants/app';
 import { renderEmailWithI18N } from '../../utils/render-email-with-i18n';
 
 export interface SendResetPasswordOptions {
-  userId: number;
+  userId: string;
 }
 
 export const sendResetPassword = async ({ userId }: SendResetPasswordOptions) => {

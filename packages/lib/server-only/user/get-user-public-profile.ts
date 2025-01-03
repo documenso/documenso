@@ -5,7 +5,7 @@ import { AppError, AppErrorCode } from '../../errors/app-error';
 import { updatePublicProfile } from './update-public-profile';
 
 export type GetUserPublicProfileOptions = {
-  userId: number;
+  userId: string;
 };
 
 type GetUserPublicProfileResponse = {

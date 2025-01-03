@@ -19,7 +19,7 @@ import { FieldType } from '@documenso/prisma/client';
 import { FieldSchema } from '@documenso/prisma/generated/zod';
 
 export type SetFieldsForTemplateOptions = {
-  userId: number;
+  userId: string;
   templateId: number;
   fields: {
     id?: number | null;

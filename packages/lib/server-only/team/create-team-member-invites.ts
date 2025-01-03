@@ -20,7 +20,7 @@ import { renderEmailWithI18N } from '../../utils/render-email-with-i18n';
 import { teamGlobalSettingsToBranding } from '../../utils/team-global-settings-to-branding';
 
 export type CreateTeamMemberInvitesOptions = {
-  userId: number;
+  userId: string;
   userName: string;
   teamId: number;
   invitations: TCreateTeamMemberInvitesMutationSchema['invitations'];

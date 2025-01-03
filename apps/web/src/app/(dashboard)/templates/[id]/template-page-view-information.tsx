@@ -10,7 +10,7 @@ import { useIsMounted } from '@documenso/lib/client-only/hooks/use-is-mounted';
 import type { Template, User } from '@documenso/prisma/client';
 
 export type TemplatePageViewInformationProps = {
-  userId: number;
+  userId: string;
   template: Template & {
     User: Pick<User, 'id' | 'name' | 'email'>;
   };

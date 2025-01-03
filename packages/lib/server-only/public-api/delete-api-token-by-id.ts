@@ -3,7 +3,7 @@ import { TeamMemberRole } from '@documenso/prisma/client';
 
 export type DeleteTokenByIdOptions = {
   id: number;
-  userId: number;
+  userId: string;
   teamId?: number;
 };
 

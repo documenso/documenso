@@ -5,7 +5,7 @@ import { prisma } from '@documenso/prisma';
 import type { TeamMemberRole } from '@documenso/prisma/client';
 
 export type UpdateTeamMemberOptions = {
-  userId: number;
+  userId: string;
   teamId: number;
   teamMemberId: number;
   data: {

@@ -4,7 +4,7 @@ import { UserSecurityAuditLogType } from '@documenso/prisma/client';
 import type { RequestMetadata } from '../../universal/extract-request-metadata';
 
 export interface DeletePasskeyOptions {
-  userId: number;
+  userId: string;
   passkeyId: string;
   requestMetadata?: RequestMetadata;
 }

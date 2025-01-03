@@ -29,7 +29,7 @@ import { teamGlobalSettingsToBranding } from '../../utils/team-global-settings-t
 
 export type DeleteDocumentOptions = {
   id: number;
-  userId: number;
+  userId: string;
   teamId?: number;
   requestMetadata?: RequestMetadata;
 };

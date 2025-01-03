@@ -8,7 +8,7 @@ import { PASSKEY_TIMEOUT } from '../../constants/auth';
 import { getAuthenticatorOptions } from '../../utils/authenticator';
 
 type CreatePasskeyRegistrationOptions = {
-  userId: number;
+  userId: string;
 };
 
 export const createPasskeyRegistrationOptions = async ({

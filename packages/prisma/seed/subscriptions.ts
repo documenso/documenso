@@ -3,7 +3,7 @@ import { prisma } from '..';
 export const seedTestEmail = () => `user-${Date.now()}@test.documenso.com`;
 
 type SeedSubscriptionOptions = {
-  userId: number;
+  userId: string;
   priceId: string;
 };
 

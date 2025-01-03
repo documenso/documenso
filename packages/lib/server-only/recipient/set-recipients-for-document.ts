@@ -34,7 +34,7 @@ import { renderEmailWithI18N } from '../../utils/render-email-with-i18n';
 import { teamGlobalSettingsToBranding } from '../../utils/team-global-settings-to-branding';
 
 export interface SetRecipientsForDocumentOptions {
-  userId: number;
+  userId: string;
   teamId?: number;
   documentId: number;
   recipients: RecipientData[];

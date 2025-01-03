@@ -8,7 +8,7 @@ import { TeamPendingSchema } from '@documenso/prisma/generated/zod';
 import { type FindResultResponse, ZFindResultResponse } from '../../types/search-params';
 
 export interface FindTeamsPendingOptions {
-  userId: number;
+  userId: string;
   query?: string;
   page?: number;
   perPage?: number;

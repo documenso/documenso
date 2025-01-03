@@ -6,7 +6,7 @@ import { prisma } from '@documenso/prisma';
 import { sendTeamEmailVerificationEmail } from './create-team-email-verification';
 
 export type ResendTeamMemberInvitationOptions = {
-  userId: number;
+  userId: string;
   teamId: number;
 };
 

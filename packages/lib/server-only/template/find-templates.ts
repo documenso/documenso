@@ -15,7 +15,7 @@ import {
 import { type FindResultResponse, ZFindResultResponse } from '../../types/search-params';
 
 export type FindTemplatesOptions = {
-  userId: number;
+  userId: string;
   teamId?: number;
   type?: Template['type'];
   page?: number;

@@ -8,7 +8,7 @@ import { createDocumentAuditLogData } from '../../utils/document-audit-logs';
 export type DeleteRecipientOptions = {
   documentId: number;
   recipientId: number;
-  userId: number;
+  userId: string;
   teamId?: number;
   requestMetadata?: RequestMetadata;
 };

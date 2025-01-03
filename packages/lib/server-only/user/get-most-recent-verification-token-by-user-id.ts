@@ -1,7 +1,7 @@
 import { prisma } from '@documenso/prisma';
 
 export type GetMostRecentVerificationTokenByUserIdOptions = {
-  userId: number;
+  userId: string;
 };
 
 export const getMostRecentVerificationTokenByUserId = async ({

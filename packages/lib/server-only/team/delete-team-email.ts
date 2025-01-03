@@ -14,7 +14,7 @@ import { renderEmailWithI18N } from '../../utils/render-email-with-i18n';
 import { teamGlobalSettingsToBranding } from '../../utils/team-global-settings-to-branding';
 
 export type DeleteTeamEmailOptions = {
-  userId: number;
+  userId: string;
   userEmail: string;
   teamId: number;
 };

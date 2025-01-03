@@ -45,7 +45,7 @@ export const seedUser = async ({
   });
 };
 
-export const unseedUser = async (userId: number) => {
+export const unseedUser = async (userId: string) => {
   await prisma.user.delete({
     where: {
       id: userId,

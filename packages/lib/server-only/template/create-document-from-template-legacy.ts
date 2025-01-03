@@ -4,7 +4,7 @@ import { DocumentSource, type RecipientRole } from '@documenso/prisma/client';
 
 export type CreateDocumentFromTemplateLegacyOptions = {
   templateId: number;
-  userId: number;
+  userId: string;
   teamId?: number;
   recipients?: {
     name?: string;

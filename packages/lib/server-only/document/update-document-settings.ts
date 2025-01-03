@@ -18,7 +18,7 @@ import type { TDocumentAccessAuthTypes, TDocumentActionAuthTypes } from '../../t
 import { createDocumentAuthOptions, extractDocumentAuthMethods } from '../../utils/document-auth';
 
 export type UpdateDocumentSettingsOptions = {
-  userId: number;
+  userId: string;
   teamId?: number;
   documentId: number;
   data: {

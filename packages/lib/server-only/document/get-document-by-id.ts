@@ -10,7 +10,7 @@ import { getTeamById } from '../team/get-team';
 
 export type GetDocumentByIdOptions = {
   documentId: number;
-  userId: number;
+  userId: string;
   teamId?: number;
 };
 
@@ -58,7 +58,7 @@ export const getDocumentById = async ({ documentId, userId, teamId }: GetDocumen
 
 export type GetDocumentWhereInputOptions = {
   documentId: number;
-  userId: number;
+  userId: string;
   teamId?: number;
 
   /**

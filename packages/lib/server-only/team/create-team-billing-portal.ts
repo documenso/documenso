@@ -4,7 +4,7 @@ import { TEAM_MEMBER_ROLE_PERMISSIONS_MAP } from '@documenso/lib/constants/teams
 import { prisma } from '@documenso/prisma';
 
 export type CreateTeamBillingPortalOptions = {
-  userId: number;
+  userId: string;
   teamId: number;
 };
 

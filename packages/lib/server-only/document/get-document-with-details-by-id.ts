@@ -14,7 +14,7 @@ import { getDocumentWhereInput } from './get-document-by-id';
 
 export type GetDocumentWithDetailsByIdOptions = {
   documentId: number;
-  userId: number;
+  userId: string;
   teamId?: number;
 };
 

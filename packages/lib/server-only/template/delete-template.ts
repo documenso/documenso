@@ -4,7 +4,7 @@ import { prisma } from '@documenso/prisma';
 
 export type DeleteTemplateOptions = {
   id: number;
-  userId: number;
+  userId: string;
   teamId?: number;
 };
 

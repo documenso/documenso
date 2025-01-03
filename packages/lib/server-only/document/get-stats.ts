@@ -170,7 +170,7 @@ type GetTeamCountsOption = {
   teamEmail?: string;
   senderIds?: number[];
   currentUserEmail: string;
-  userId: number;
+  userId: string;
   createdAt: Prisma.DocumentWhereInput['createdAt'];
   currentTeamMemberRole?: TeamMemberRole;
   search?: string;

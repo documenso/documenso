@@ -6,7 +6,7 @@ import { prisma } from '@documenso/prisma';
 import { Prisma } from '@documenso/prisma/client';
 
 export type UpdateTeamOptions = {
-  userId: number;
+  userId: string;
   teamId: number;
   data: {
     name?: string;

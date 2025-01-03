@@ -6,7 +6,7 @@ import { AppError, AppErrorCode } from '../../errors/app-error';
 import type { RequestMetadata } from '../../universal/extract-request-metadata';
 
 export type SetAvatarImageOptions = {
-  userId: number;
+  userId: string;
   teamId?: number | null;
   bytes?: string | null;
   requestMetadata?: RequestMetadata;

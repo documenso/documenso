@@ -4,7 +4,7 @@ import { UserSecurityAuditLogType } from '@documenso/prisma/client';
 import type { RequestMetadata } from '../../universal/extract-request-metadata';
 
 export interface UpdateAuthenticatorsOptions {
-  userId: number;
+  userId: string;
   passkeyId: string;
   name: string;
   requestMetadata?: RequestMetadata;

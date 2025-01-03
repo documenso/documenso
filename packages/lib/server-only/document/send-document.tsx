@@ -28,7 +28,7 @@ import { triggerWebhook } from '../webhooks/trigger/trigger-webhook';
 
 export type SendDocumentOptions = {
   documentId: number;
-  userId: number;
+  userId: string;
   teamId?: number;
   sendEmail?: boolean;
   requestMetadata?: RequestMetadata;

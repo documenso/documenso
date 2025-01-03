@@ -10,7 +10,7 @@ import type { RequestMetadata } from '../../universal/extract-request-metadata';
 import { getAuthenticatorOptions } from '../../utils/authenticator';
 
 type CreatePasskeyOptions = {
-  userId: number;
+  userId: string;
   passkeyName: string;
   verificationResponse: RegistrationResponseJSON;
   requestMetadata?: RequestMetadata;
