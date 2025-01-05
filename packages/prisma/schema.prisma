@@ -29,10 +29,12 @@ enum Role {
 
 model User {
   id               Int              @id @default(autoincrement())
+  secondaryId      String           @unique @default(cuid())
   name             String?
   customerId       String?          @unique
   email            String           @unique
   emailVerified    DateTime?
+  isEmailVerified  Boolean          @default(false)
   password         String?
   source           String?
   signature        String?
@@ -44,18 +46,22 @@ model User {
   avatarImageId    String?
   disabled         Boolean          @default(false)
 
-  accounts             Account[]
-  sessions             Session[]
-  Document             Document[]
-  Subscription         Subscription[]
-  PasswordResetToken   PasswordResetToken[]
-  ownedTeams           Team[]
-  ownedPendingTeams    TeamPending[]
-  teamMembers          TeamMember[]
-  twoFactorSecret      String?
-  twoFactorEnabled     Boolean              @default(false)
+  accounts           Account[]
+  sessions           Session[]
+  Document           Document[]
+  Subscription       Subscription[]
+  PasswordResetToken PasswordResetToken[]
+  ownedTeams         Team[]
+  ownedPendingTeams  TeamPending[]
+  teamMembers        TeamMember[]
+  twoFactorEnabled   Boolean              @default(false)
+
+  // Todo: Delete these after full auth migration.
   twoFactorBackupCodes String?
-  url                  String?              @unique
+  twoFactorSecret      String?
+  // End of Todo.
+
+  url String? @unique
 
   profile           UserProfile?
   VerificationToken VerificationToken[]
@@ -67,7 +73,19 @@ model User {
   passkeys          Passkey[]
   avatarImage       AvatarImage?           @relation(fields: [avatarImageId], references: [id], onDelete: SetNull)
 
+  image String?
+
+  twofactors TwoFactor[]
+
   @@index([email])
+}
+
+model TwoFactor {
+  id          String @id @default(cuid())
+  secret      String
+  backupCodes String
+  userId      Int
+  user        User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model UserProfile {
@@ -248,7 +266,6 @@ model Subscription {
 model Account {
   id                String  @id @default(cuid())
   userId            Int
-  type              String
   provider          String
   providerAccountId String
   refresh_token     String? @db.Text
@@ -256,12 +273,24 @@ model Account {
   expires_at        Int?
   // Some providers return created_at so we need to make it optional
   created_at        Int?
-  // Stops next-auth from crashing when dealing with AzureAD
-  ext_expires_in    Int?
-  token_type        String?
   scope             String?
   id_token          String? @db.Text
-  session_state     String?
+
+  // Betterauth
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
+  accessTokenExpiresAt  DateTime?
+  refreshTokenExpiresAt DateTime?
+  password              String?
+
+  // Stops next-auth from crashing when dealing with AzureAD
+  ext_expires_in Int?
+
+  // Todo: Remove these fields after auth migration.
+  type          String  @default("legacy")
+  token_type    String?
+  session_state String?
+  // End of Todo.
 
   user User? @relation(fields: [userId], references: [id], onDelete: Cascade)
 
@@ -274,6 +303,23 @@ model Session {
   userId       Int
   expires      DateTime
   user         User?    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  // Better auth fields.
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  ipAddress String?
+  userAgent String?
+}
+
+model Verification {
+  id         String    @id @default(cuid())
+  identifier String
+  value      String
+  expiresAt  DateTime
+  createdAt  DateTime?
+  updatedAt  DateTime?
+
+  @@map("verification")
 }
 
 enum DocumentStatus {

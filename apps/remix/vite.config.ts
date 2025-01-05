@@ -11,4 +11,7 @@ export default defineConfig({
     },
   },
   plugins: [reactRouter(), tsconfigPaths()],
+  optimizeDeps: {
+    exclude: ['@node-rs/bcrypt'],
+  },
 });
