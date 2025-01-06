@@ -1,0 +1,20 @@
+{
+  "name": "@documenso/auth",
+  "version": "0.0.0",
+  "main": "./index.ts",
+  "types": "./index.ts",
+  "license": "MIT",
+  "scripts": {
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "clean": "rimraf node_modules"
+  },
+  "dependencies": {
+    "@documenso/prisma": "*",
+    "hono": "^4.6.15",
+    "luxon": "^3.5.0",
+    "nanoid": "^4.0.2",
+    "ts-pattern": "^5.0.5",
+    "zod": "3.24.1"
+  }
+}

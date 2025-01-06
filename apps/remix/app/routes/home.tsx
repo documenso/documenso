@@ -8,6 +8,12 @@ export function meta({}: Route.MetaArgs) {
   ];
 }
 
+export const loader = () => {
+  return {
+    message: 'Hello World' as const,
+  };
+};
+
 export default function Home() {
   return <Welcome />;
 }

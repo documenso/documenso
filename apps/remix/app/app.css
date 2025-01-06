@@ -1,1 +1,8 @@
 @import '@documenso/ui/styles/theme.css';
+
+@layer base {
+  :root {
+    --font-sans: 'Inter';
+    --font-signature: 'Caveat';
+  }
+}
