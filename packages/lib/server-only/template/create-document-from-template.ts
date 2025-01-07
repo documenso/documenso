@@ -54,6 +54,7 @@ export type CreateDocumentFromTemplateOptions = {
     email: string;
     signingOrder?: number | null;
   }[];
+  customDocumentDataId?: string;
 
   /**
    * Values that will override the predefined values in the template.
@@ -90,6 +91,7 @@ export const createDocumentFromTemplate = async ({
   userId,
   teamId,
   recipients,
+  customDocumentDataId,
   override,
   requestMetadata,
 }: CreateDocumentFromTemplateOptions): Promise<TCreateDocumentFromTemplateResponse> => {
@@ -171,11 +173,29 @@ export const createDocumentFromTemplate = async ({
     };
   });
 
+  let parentDocumentData = template.templateDocumentData;
+
+  if (customDocumentDataId) {
+    const customDocumentData = await prisma.documentData.findFirst({
+      where: {
+        id: customDocumentDataId,
+      },
+    });
+
+    if (!customDocumentData) {
+      throw new AppError(AppErrorCode.NOT_FOUND, {
+        message: 'Custom document data not found',
+      });
+    }
+
+    parentDocumentData = customDocumentData;
+  }
+
   const documentData = await prisma.documentData.create({
     data: {
-      type: template.templateDocumentData.type,
-      data: template.templateDocumentData.data,
-      initialData: template.templateDocumentData.initialData,
+      type: parentDocumentData.type,
+      data: parentDocumentData.data,
+      initialData: parentDocumentData.initialData,
     },
   });
 
