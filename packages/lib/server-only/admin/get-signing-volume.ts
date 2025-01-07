@@ -1,4 +1,4 @@
-import { kyselyPrisma,sql } from '@documenso/prisma';
+import { kyselyPrisma, sql } from '@documenso/prisma';
 import { DocumentStatus, SubscriptionStatus } from '@documenso/prisma/client';
 
 export type SigningVolume = {
@@ -43,7 +43,7 @@ export async function getSigningVolume({
         .on('td.status', '=', sql.lit(DocumentStatus.COMPLETED))
         .on('td.deletedAt', 'is', null),
     )
-    // @ts-expect-error
+    // @ts-expect-error - Raw SQL enum casting not properly typed by Kysely
     .where(sql`s.status = ${SubscriptionStatus.ACTIVE}::"SubscriptionStatus"`)
     .where((eb) =>
       eb.or([
@@ -80,7 +80,7 @@ export async function getSigningVolume({
     .selectFrom('Subscription as s')
     .leftJoin('User as u', 's.userId', 'u.id')
     .leftJoin('Team as t', 's.teamId', 't.id')
-    // @ts-expect-error
+    // @ts-expect-error - Raw SQL enum casting not properly typed by Kysely
     .where(sql`s.status = ${SubscriptionStatus.ACTIVE}::"SubscriptionStatus"`)
     .where((eb) =>
       eb.or([
