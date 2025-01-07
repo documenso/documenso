@@ -47,6 +47,7 @@ export const ZCreateDocumentFromTemplateMutationSchema = z.object({
       return new Set(emails).size === emails.length;
     }, 'Recipients must have unique emails'),
   distributeDocument: z.boolean().optional(),
+  customDocumentDataId: z.string().optional(),
 });
 
 export const ZDuplicateTemplateMutationSchema = z.object({
