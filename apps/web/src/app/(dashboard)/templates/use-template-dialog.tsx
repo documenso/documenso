@@ -11,6 +11,7 @@ import { InfoIcon, Plus, Upload, X } from 'lucide-react';
 import { useFieldArray, useForm } from 'react-hook-form';
 import * as z from 'zod';
 
+import { APP_DOCUMENT_UPLOAD_SIZE_LIMIT } from '@documenso/lib/constants/app';
 import {
   TEMPLATE_RECIPIENT_EMAIL_PLACEHOLDER_REGEX,
   TEMPLATE_RECIPIENT_NAME_PLACEHOLDER_REGEX,
@@ -453,7 +454,7 @@ export function UseTemplateDialog({
                                 className={cn(
                                   'text-muted-foreground hover:border-muted-foreground/50 group relative flex min-h-[150px] cursor-pointer flex-col items-center justify-center rounded-lg border border-dashed border-gray-300 px-6 py-10 transition-colors',
                                   {
-                                    'border-red-500 hover:border-red-500':
+                                    'border-destructive hover:border-destructive':
                                       form.formState.errors.customDocumentData,
                                   },
                                 )}
@@ -497,6 +498,7 @@ export function UseTemplateDialog({
 
                                     if (!file) {
                                       field.onChange(undefined);
+
                                       return;
                                     }
 
@@ -505,6 +507,18 @@ export function UseTemplateDialog({
                                         type: 'manual',
                                         message: _(msg`Please select a PDF file`),
                                       });
+
+                                      return;
+                                    }
+
+                                    if (file.size > APP_DOCUMENT_UPLOAD_SIZE_LIMIT * 1024 * 1024) {
+                                      form.setError('customDocumentData', {
+                                        type: 'manual',
+                                        message: _(
+                                          msg`File size exceeds the limit of ${APP_DOCUMENT_UPLOAD_SIZE_LIMIT} MB`,
+                                        ),
+                                      });
+
                                       return;
                                     }
 
