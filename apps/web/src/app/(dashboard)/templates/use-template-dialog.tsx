@@ -7,15 +7,17 @@ import { useRouter } from 'next/navigation';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Trans, msg } from '@lingui/macro';
 import { useLingui } from '@lingui/react';
-import { InfoIcon, Plus } from 'lucide-react';
+import { InfoIcon, Plus, Upload, X } from 'lucide-react';
 import { useFieldArray, useForm } from 'react-hook-form';
 import * as z from 'zod';
 
+import { APP_DOCUMENT_UPLOAD_SIZE_LIMIT } from '@documenso/lib/constants/app';
 import {
   TEMPLATE_RECIPIENT_EMAIL_PLACEHOLDER_REGEX,
   TEMPLATE_RECIPIENT_NAME_PLACEHOLDER_REGEX,
 } from '@documenso/lib/constants/template';
 import { AppError } from '@documenso/lib/errors/app-error';
+import { putPdfFile } from '@documenso/lib/universal/upload/put-file';
 import type { Recipient } from '@documenso/prisma/client';
 import { DocumentDistributionMethod, DocumentSigningOrder } from '@documenso/prisma/client';
 import { trpc } from '@documenso/trpc/react';
@@ -50,6 +52,11 @@ import { useOptionalCurrentTeam } from '~/providers/team';
 const ZAddRecipientsForNewDocumentSchema = z
   .object({
     distributeDocument: z.boolean(),
+    useCustomDocument: z.boolean().default(false),
+    customDocumentData: z
+      .any()
+      .refine((data) => data instanceof File || data === undefined)
+      .optional(),
     recipients: z.array(
       z.object({
         id: z.number(),
@@ -119,6 +126,8 @@ export function UseTemplateDialog({
     resolver: zodResolver(ZAddRecipientsForNewDocumentSchema),
     defaultValues: {
       distributeDocument: false,
+      useCustomDocument: false,
+      customDocumentData: undefined,
       recipients: recipients
         .sort((a, b) => (a.signingOrder || 0) - (b.signingOrder || 0))
         .map((recipient) => {
@@ -145,11 +154,19 @@ export function UseTemplateDialog({
 
   const onSubmit = async (data: TAddRecipientsForNewDocumentSchema) => {
     try {
+      let customDocumentDataId: string | undefined = undefined;
+
+      if (data.useCustomDocument && data.customDocumentData) {
+        const customDocumentData = await putPdfFile(data.customDocumentData);
+        customDocumentDataId = customDocumentData.id;
+      }
+
       const { id } = await createDocumentFromTemplate({
         templateId,
         teamId: team?.id,
         recipients: data.recipients,
         distributeDocument: data.distributeDocument,
+        customDocumentDataId,
       });
 
       toast({
@@ -300,89 +317,245 @@ export function UseTemplateDialog({
                     />
                   </div>
                 ))}
+
+                {recipients.length > 0 && (
+                  <div className="mt-4 flex flex-row items-center">
+                    <FormField
+                      control={form.control}
+                      name="distributeDocument"
+                      render={({ field }) => (
+                        <FormItem>
+                          <div className="flex flex-row items-center">
+                            <Checkbox
+                              id="distributeDocument"
+                              className="h-5 w-5"
+                              checked={field.value}
+                              onCheckedChange={field.onChange}
+                            />
+
+                            {documentDistributionMethod === DocumentDistributionMethod.EMAIL && (
+                              <label
+                                className="text-muted-foreground ml-2 flex items-center text-sm"
+                                htmlFor="distributeDocument"
+                              >
+                                <Trans>Send document</Trans>
+                                <Tooltip>
+                                  <TooltipTrigger type="button">
+                                    <InfoIcon className="mx-1 h-4 w-4" />
+                                  </TooltipTrigger>
+
+                                  <TooltipContent className="text-muted-foreground z-[99999] max-w-md space-y-2 p-4">
+                                    <p>
+                                      <Trans>
+                                        The document will be immediately sent to recipients if this
+                                        is checked.
+                                      </Trans>
+                                    </p>
+
+                                    <p>
+                                      <Trans>
+                                        Otherwise, the document will be created as a draft.
+                                      </Trans>
+                                    </p>
+                                  </TooltipContent>
+                                </Tooltip>
+                              </label>
+                            )}
+
+                            {documentDistributionMethod === DocumentDistributionMethod.NONE && (
+                              <label
+                                className="text-muted-foreground ml-2 flex items-center text-sm"
+                                htmlFor="distributeDocument"
+                              >
+                                <Trans>Create as pending</Trans>
+                                <Tooltip>
+                                  <TooltipTrigger type="button">
+                                    <InfoIcon className="mx-1 h-4 w-4" />
+                                  </TooltipTrigger>
+                                  <TooltipContent className="text-muted-foreground z-[99999] max-w-md space-y-2 p-4">
+                                    <p>
+                                      <Trans>
+                                        Create the document as pending and ready to sign.
+                                      </Trans>
+                                    </p>
+
+                                    <p>
+                                      <Trans>We won't send anything to notify recipients.</Trans>
+                                    </p>
+
+                                    <p className="mt-2">
+                                      <Trans>
+                                        We will generate signing links for you, which you can send
+                                        to the recipients through your method of choice.
+                                      </Trans>
+                                    </p>
+                                  </TooltipContent>
+                                </Tooltip>
+                              </label>
+                            )}
+                          </div>
+                        </FormItem>
+                      )}
+                    />
+                  </div>
+                )}
+
+                <FormField
+                  control={form.control}
+                  name="useCustomDocument"
+                  render={({ field }) => (
+                    <FormItem>
+                      <div className="flex flex-row items-center">
+                        <Checkbox
+                          id="useCustomDocument"
+                          className="h-5 w-5"
+                          checked={field.value}
+                          onCheckedChange={(checked) => {
+                            field.onChange(checked);
+                            if (!checked) {
+                              form.setValue('customDocumentData', undefined);
+                            }
+                          }}
+                        />
+                        <label
+                          className="text-muted-foreground ml-2 flex items-center text-sm"
+                          htmlFor="useCustomDocument"
+                        >
+                          <Trans>Upload custom document</Trans>
+                          <Tooltip>
+                            <TooltipTrigger type="button">
+                              <InfoIcon className="mx-1 h-4 w-4" />
+                            </TooltipTrigger>
+                            <TooltipContent className="text-muted-foreground z-[99999] max-w-md space-y-2 p-4">
+                              <p>
+                                <Trans>
+                                  Upload a custom document to use instead of the template's default
+                                  document
+                                </Trans>
+                              </p>
+                            </TooltipContent>
+                          </Tooltip>
+                        </label>
+                      </div>
+                    </FormItem>
+                  )}
+                />
+
+                {form.watch('useCustomDocument') && (
+                  <div className="my-4">
+                    <FormField
+                      control={form.control}
+                      name="customDocumentData"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormControl>
+                            <div className="w-full space-y-4">
+                              <label
+                                className={cn(
+                                  'text-muted-foreground hover:border-muted-foreground/50 group relative flex min-h-[150px] cursor-pointer flex-col items-center justify-center rounded-lg border border-dashed border-gray-300 px-6 py-10 transition-colors',
+                                  {
+                                    'border-destructive hover:border-destructive':
+                                      form.formState.errors.customDocumentData,
+                                  },
+                                )}
+                              >
+                                <div className="text-center">
+                                  {!field.value && (
+                                    <>
+                                      <Upload className="text-muted-foreground/50 mx-auto h-10 w-10" />
+                                      <div className="mt-4 flex text-sm leading-6">
+                                        <span className="text-muted-foreground relative">
+                                          <Trans>
+                                            <span className="text-primary font-semibold">
+                                              Click to upload
+                                            </span>{' '}
+                                            or drag and drop
+                                          </Trans>
+                                        </span>
+                                      </div>
+                                      <p className="text-muted-foreground/80 text-xs">
+                                        PDF files only
+                                      </p>
+                                    </>
+                                  )}
+
+                                  {field.value && (
+                                    <div className="text-muted-foreground space-y-1">
+                                      <p className="text-sm font-medium">{field.value.name}</p>
+                                      <p className="text-muted-foreground/60 text-xs">
+                                        {(field.value.size / (1024 * 1024)).toFixed(2)} MB
+                                      </p>
+                                    </div>
+                                  )}
+                                </div>
+
+                                <input
+                                  type="file"
+                                  className="absolute h-full w-full opacity-0"
+                                  accept=".pdf,application/pdf"
+                                  onChange={(e) => {
+                                    const file = e.target.files?.[0];
+
+                                    if (!file) {
+                                      field.onChange(undefined);
+
+                                      return;
+                                    }
+
+                                    if (file.type !== 'application/pdf') {
+                                      form.setError('customDocumentData', {
+                                        type: 'manual',
+                                        message: _(msg`Please select a PDF file`),
+                                      });
+
+                                      return;
+                                    }
+
+                                    if (file.size > APP_DOCUMENT_UPLOAD_SIZE_LIMIT * 1024 * 1024) {
+                                      form.setError('customDocumentData', {
+                                        type: 'manual',
+                                        message: _(
+                                          msg`File size exceeds the limit of ${APP_DOCUMENT_UPLOAD_SIZE_LIMIT} MB`,
+                                        ),
+                                      });
+
+                                      return;
+                                    }
+
+                                    field.onChange(file);
+                                  }}
+                                />
+
+                                {field.value && (
+                                  <div className="absolute right-2 top-2">
+                                    <Button
+                                      type="button"
+                                      variant="destructive"
+                                      className="h-6 w-6 p-0"
+                                      onClick={(e) => {
+                                        e.preventDefault();
+                                        field.onChange(undefined);
+                                      }}
+                                    >
+                                      <X className="h-4 w-4" />
+                                      <div className="sr-only">
+                                        <Trans>Clear file</Trans>
+                                      </div>
+                                    </Button>
+                                  </div>
+                                )}
+                              </label>
+                            </div>
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
+                )}
               </div>
 
-              {recipients.length > 0 && (
-                <div className="mt-4 flex flex-row items-center">
-                  <FormField
-                    control={form.control}
-                    name="distributeDocument"
-                    render={({ field }) => (
-                      <FormItem>
-                        <div className="flex flex-row items-center">
-                          <Checkbox
-                            id="distributeDocument"
-                            className="h-5 w-5"
-                            checked={field.value}
-                            onCheckedChange={field.onChange}
-                          />
-
-                          {documentDistributionMethod === DocumentDistributionMethod.EMAIL && (
-                            <label
-                              className="text-muted-foreground ml-2 flex items-center text-sm"
-                              htmlFor="distributeDocument"
-                            >
-                              <Trans>Send document</Trans>
-                              <Tooltip>
-                                <TooltipTrigger type="button">
-                                  <InfoIcon className="mx-1 h-4 w-4" />
-                                </TooltipTrigger>
-
-                                <TooltipContent className="text-muted-foreground z-[99999] max-w-md space-y-2 p-4">
-                                  <p>
-                                    <Trans>
-                                      The document will be immediately sent to recipients if this is
-                                      checked.
-                                    </Trans>
-                                  </p>
-
-                                  <p>
-                                    <Trans>
-                                      Otherwise, the document will be created as a draft.
-                                    </Trans>
-                                  </p>
-                                </TooltipContent>
-                              </Tooltip>
-                            </label>
-                          )}
-
-                          {documentDistributionMethod === DocumentDistributionMethod.NONE && (
-                            <label
-                              className="text-muted-foreground ml-2 flex items-center text-sm"
-                              htmlFor="distributeDocument"
-                            >
-                              <Trans>Create as pending</Trans>
-                              <Tooltip>
-                                <TooltipTrigger type="button">
-                                  <InfoIcon className="mx-1 h-4 w-4" />
-                                </TooltipTrigger>
-                                <TooltipContent className="text-muted-foreground z-[99999] max-w-md space-y-2 p-4">
-                                  <p>
-                                    <Trans>Create the document as pending and ready to sign.</Trans>
-                                  </p>
-
-                                  <p>
-                                    <Trans>We won't send anything to notify recipients.</Trans>
-                                  </p>
-
-                                  <p className="mt-2">
-                                    <Trans>
-                                      We will generate signing links for you, which you can send to
-                                      the recipients through your method of choice.
-                                    </Trans>
-                                  </p>
-                                </TooltipContent>
-                              </Tooltip>
-                            </label>
-                          )}
-                        </div>
-                      </FormItem>
-                    )}
-                  />
-                </div>
-              )}
-
-              <DialogFooter>
+              <DialogFooter className="mt-4">
                 <DialogClose asChild>
                   <Button type="button" variant="secondary">
                     <Trans>Close</Trans>
