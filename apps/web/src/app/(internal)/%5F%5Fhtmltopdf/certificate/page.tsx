@@ -1,13 +1,11 @@
-import React from 'react';
-
 import { redirect } from 'next/navigation';
 
 import { msg } from '@lingui/macro';
 import { useLingui } from '@lingui/react';
 import { DateTime } from 'luxon';
-import { QRCodeSVG } from 'qrcode.react';
 import { match } from 'ts-pattern';
 import { UAParser } from 'ua-parser-js';
+import { renderSVG } from 'uqr';
 
 import { setupI18nSSR } from '@documenso/lib/client-only/providers/i18n.server';
 import { WEBAPP_BASE_URL } from '@documenso/lib/constants/app';
@@ -307,25 +305,16 @@ export default async function SigningCertificate({ searchParams }: SigningCertif
         </CardContent>
       </Card>
 
-      <div className="my-8 flex-row-reverse">
+      <div className="my-8 flex-row-reverse space-y-2">
         <div className="flex items-end justify-end gap-x-4">
-          <QRCodeSVG
-            value={`${WEBAPP_BASE_URL}/documents/${documentId}`}
-            size={100}
-            bgColor="#ffffff"
-            fgColor="#111827"
-            level="H"
-            imageSettings={{
-              src: '/static/icon.svg',
-              height: 32,
-              width: 32,
-              excavate: true,
+          <div
+            className="flex h-36 justify-center"
+            dangerouslySetInnerHTML={{
+              __html: renderSVG(`${WEBAPP_BASE_URL}/documents/${documentId}`),
             }}
           />
         </div>
-      </div>
 
-      <div className="my-8 flex-row-reverse">
         <div className="flex items-end justify-end gap-x-4">
           <p className="flex-shrink-0 text-sm font-medium print:text-xs">
             {_(msg`Signing certificate provided by`)}:
