@@ -107,7 +107,7 @@ export const documentRouter = router({
         path: '/document/find',
         summary: 'Find documents',
         description: 'Find documents based on a search criteria',
-        tags: ['Documents'],
+        tags: ['Document'],
       },
     })
     .input(ZFindDocumentsQuerySchema)
@@ -154,7 +154,7 @@ export const documentRouter = router({
         path: '/document/{documentId}',
         summary: 'Get document',
         description: 'Returns a document given an ID',
-        tags: ['Documents'],
+        tags: ['Document'],
       },
     })
     .input(ZGetDocumentWithDetailsByIdQuerySchema)
@@ -175,7 +175,7 @@ export const documentRouter = router({
         method: 'POST',
         path: '/document/create',
         summary: 'Create document',
-        tags: ['Documents'],
+        tags: ['Document'],
       },
     })
     .input(ZCreateDocumentMutationSchema)
@@ -214,7 +214,7 @@ export const documentRouter = router({
         method: 'POST',
         path: '/document/{documentId}',
         summary: 'Update document',
-        tags: ['Documents'],
+        tags: ['Document'],
       },
     })
     .input(ZSetSettingsForDocumentMutationSchema)
@@ -256,7 +256,7 @@ export const documentRouter = router({
         method: 'POST',
         path: '/document/{documentId}/delete',
         summary: 'Delete document',
-        tags: ['Documents'],
+        tags: ['Document'],
       },
     })
     .input(ZDeleteDocumentMutationSchema)
@@ -284,7 +284,7 @@ export const documentRouter = router({
         path: '/document/{documentId}/move',
         summary: 'Move document',
         description: 'Move a document to a team',
-        tags: ['Documents'],
+        tags: ['Document'],
       },
     })
     .input(ZMoveDocumentToTeamSchema)
@@ -406,7 +406,7 @@ export const documentRouter = router({
         path: '/document/{documentId}/distribute',
         summary: 'Distribute document',
         description: 'Send the document out to recipients based on your distribution method',
-        tags: ['Documents'],
+        tags: ['Document'],
       },
     })
     .input(ZSendDocumentMutationSchema)
@@ -456,7 +456,7 @@ export const documentRouter = router({
         summary: 'Resend document',
         description:
           'Resend the document to recipients who have not signed. Will use the distribution method set in the document.',
-        tags: ['Documents'],
+        tags: ['Document'],
       },
     })
     .input(ZResendDocumentMutationSchema)
@@ -478,7 +478,7 @@ export const documentRouter = router({
         method: 'POST',
         path: '/document/{documentId}/duplicate',
         summary: 'Duplicate document',
-        tags: ['Documents'],
+        tags: ['Document'],
       },
     })
     .input(ZDuplicateDocumentMutationSchema)

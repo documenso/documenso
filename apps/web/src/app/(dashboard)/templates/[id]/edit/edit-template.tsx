@@ -129,7 +129,7 @@ export const EditTemplateForm = ({
     },
   });
 
-  const { mutateAsync: addTemplateSigners } = trpc.recipient.addTemplateSigners.useMutation({
+  const { mutateAsync: setRecipients } = trpc.recipient.setTemplateRecipients.useMutation({
     ...DO_NOT_INVALIDATE_QUERY_ON_MUTATION,
     onSuccess: (newData) => {
       utils.template.getTemplateById.setData(
@@ -202,10 +202,10 @@ export const EditTemplateForm = ({
           signingOrder: data.signingOrder,
         }),
 
-        addTemplateSigners({
+        setRecipients({
           templateId: template.id,
           teamId: team?.id,
-          signers: data.signers,
+          recipients: data.signers,
         }),
       ]);
 

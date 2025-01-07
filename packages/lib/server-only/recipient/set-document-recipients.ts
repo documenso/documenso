@@ -7,6 +7,7 @@ import { isUserEnterprise } from '@documenso/ee/server-only/util/is-document-ent
 import { mailer } from '@documenso/email/mailer';
 import RecipientRemovedFromDocumentTemplate from '@documenso/email/templates/recipient-removed-from-document';
 import { DOCUMENT_AUDIT_LOG_TYPE } from '@documenso/lib/types/document-audit-logs';
+import type { TRecipientAccessAuthTypes } from '@documenso/lib/types/document-auth';
 import {
   type TRecipientActionAuthTypes,
   ZRecipientAuthOptionsSchema,
@@ -33,7 +34,7 @@ import { canRecipientBeModified } from '../../utils/recipients';
 import { renderEmailWithI18N } from '../../utils/render-email-with-i18n';
 import { teamGlobalSettingsToBranding } from '../../utils/team-global-settings-to-branding';
 
-export interface SetRecipientsForDocumentOptions {
+export interface SetDocumentRecipientsOptions {
   userId: number;
   teamId?: number;
   documentId: number;
@@ -41,21 +42,19 @@ export interface SetRecipientsForDocumentOptions {
   requestMetadata?: RequestMetadata;
 }
 
-export const ZSetRecipientsForDocumentResponseSchema = z.object({
+export const ZSetDocumentRecipientsResponseSchema = z.object({
   recipients: RecipientSchema.array(),
 });
 
-export type TSetRecipientsForDocumentResponse = z.infer<
-  typeof ZSetRecipientsForDocumentResponseSchema
->;
+export type TSetDocumentRecipientsResponse = z.infer<typeof ZSetDocumentRecipientsResponseSchema>;
 
-export const setRecipientsForDocument = async ({
+export const setDocumentRecipients = async ({
   userId,
   teamId,
   documentId,
   recipients,
   requestMetadata,
-}: SetRecipientsForDocumentOptions): Promise<TSetRecipientsForDocumentResponse> => {
+}: SetDocumentRecipientsOptions): Promise<TSetDocumentRecipientsResponse> => {
   const document = await prisma.document.findFirst({
     where: {
       id: documentId,
@@ -167,10 +166,10 @@ export const setRecipientsForDocument = async ({
       linkedRecipients.map(async (recipient) => {
         let authOptions = ZRecipientAuthOptionsSchema.parse(recipient._persisted?.authOptions);
 
-        if (recipient.actionAuth !== undefined) {
+        if (recipient.actionAuth !== undefined || recipient.accessAuth !== undefined) {
           authOptions = createRecipientAuthOptions({
-            accessAuth: authOptions.accessAuth,
-            actionAuth: recipient.actionAuth,
+            accessAuth: recipient.accessAuth || authOptions.accessAuth,
+            actionAuth: recipient.actionAuth || authOptions.actionAuth,
           });
         }
 
@@ -256,6 +255,7 @@ export const setRecipientsForDocument = async ({
               requestMetadata,
               data: {
                 ...baseAuditLog,
+                accessAuth: recipient.accessAuth || undefined,
                 actionAuth: recipient.actionAuth || undefined,
               },
             }),
@@ -368,6 +368,7 @@ type RecipientData = {
   name: string;
   role: RecipientRole;
   signingOrder?: number | null;
+  accessAuth?: TRecipientAccessAuthTypes | null;
   actionAuth?: TRecipientActionAuthTypes | null;
 };
 
@@ -379,6 +380,7 @@ const hasRecipientBeenChanged = (recipient: Recipient, newRecipientData: Recipie
     recipient.name !== newRecipientData.name ||
     recipient.role !== newRecipientData.role ||
     recipient.signingOrder !== newRecipientData.signingOrder ||
+    authOptions.accessAuth !== newRecipientData.accessAuth ||
     authOptions.actionAuth !== newRecipientData.actionAuth
   );
 };

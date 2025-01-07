@@ -132,7 +132,7 @@ export const EditDocumentForm = ({
       },
     });
 
-  const { mutateAsync: addSigners } = trpc.recipient.addSigners.useMutation({
+  const { mutateAsync: setRecipients } = trpc.recipient.setDocumentRecipients.useMutation({
     ...DO_NOT_INVALIDATE_QUERY_ON_MUTATION,
     onSuccess: ({ recipients: newRecipients }) => {
       utils.document.getDocumentWithDetailsById.setData(
@@ -246,10 +246,10 @@ export const EditDocumentForm = ({
           signingOrder: data.signingOrder,
         }),
 
-        addSigners({
+        setRecipients({
           documentId: document.id,
           teamId: team?.id,
-          signers: data.signers.map((signer) => ({
+          recipients: data.signers.map((signer) => ({
             ...signer,
             // Explicitly set to null to indicate we want to remove auth if required.
             actionAuth: signer.actionAuth || null,

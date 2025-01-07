@@ -26,7 +26,7 @@ import { insertFormValuesInPdf } from '@documenso/lib/server-only/pdf/insert-for
 import { deleteRecipient } from '@documenso/lib/server-only/recipient/delete-recipient';
 import { getRecipientByIdV1Api } from '@documenso/lib/server-only/recipient/get-recipient-by-id-v1-api';
 import { getRecipientsForDocument } from '@documenso/lib/server-only/recipient/get-recipients-for-document';
-import { setRecipientsForDocument } from '@documenso/lib/server-only/recipient/set-recipients-for-document';
+import { setDocumentRecipients } from '@documenso/lib/server-only/recipient/set-document-recipients';
 import { updateRecipient } from '@documenso/lib/server-only/recipient/update-recipient';
 import { createTeamMemberInvites } from '@documenso/lib/server-only/team/create-team-member-invites';
 import { deleteTeamMembers } from '@documenso/lib/server-only/team/delete-team-members';
@@ -347,7 +347,7 @@ export const ApiContractV1Implementation = createNextRoute(ApiContractV1, {
         });
       }
 
-      const { recipients } = await setRecipientsForDocument({
+      const { recipients } = await setDocumentRecipients({
         userId: user.id,
         teamId: team?.id,
         documentId: document.id,
@@ -791,7 +791,7 @@ export const ApiContractV1Implementation = createNextRoute(ApiContractV1, {
     }
 
     try {
-      const { recipients: newRecipients } = await setRecipientsForDocument({
+      const { recipients: newRecipients } = await setDocumentRecipients({
         documentId: Number(documentId),
         userId: user.id,
         teamId: team?.id,
