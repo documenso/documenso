@@ -1,3 +1,4 @@
+// @ts-expect-error This is just due to our root config, it's a non-issue
 import { reactRouter } from '@react-router/dev/vite';
 import autoprefixer from 'autoprefixer';
 import tailwindcss from 'tailwindcss';

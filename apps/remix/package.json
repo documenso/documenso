@@ -1,10 +1,9 @@
 {
   "name": "@documenso/remix",
-  "type": "module",
   "private": true,
   "scripts": {
     "build": "cross-env NODE_ENV=production react-router build",
-    "dev": "tsx watch --ignore \"vite.config.ts*\" server/main.ts",
+    "dev": "tsx watch --ignore \"vite.config.{ts,mts,js,mjs}*\" server/main.ts",
     "start": "cross-env NODE_ENV=production node dist/server/index.js",
     "typecheck": "react-router typegen && tsc"
   },

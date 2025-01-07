@@ -6,4 +6,4 @@
 /build/
 
 # Vite
-vite.config.ts.timestamp*
+vite.config.*.timestamp*
