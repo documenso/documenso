@@ -245,7 +245,7 @@ export const AddTemplateSettingsFormPartial = ({
                           </li>
                           <li>
                             <Trans>
-                              <strong>Links</strong> - We will generate links which you can send to
+                              <strong>None</strong> - We will generate links which you can send to
                               the recipients manually.
                             </Trans>
                           </li>

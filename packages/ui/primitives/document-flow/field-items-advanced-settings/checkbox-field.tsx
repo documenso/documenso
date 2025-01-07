@@ -205,8 +205,7 @@ export const CheckboxFieldAdvancedSettings = ({
           {values.map((value, index) => (
             <div key={index} className="mt-2 flex items-center gap-4">
               <Checkbox
-                className="data-[state=checked]:bg-documenso border-foreground/30 h-5 w-5"
-                checkClassName="text-white"
+                className="data-[state=checked]:bg-primary border-foreground/30 h-5 w-5"
                 checked={value.checked}
                 onCheckedChange={(checked) => handleCheckboxValue(index, 'checked', checked)}
               />
@@ -217,7 +216,7 @@ export const CheckboxFieldAdvancedSettings = ({
               />
               <button
                 type="button"
-                className="col-span-1 mt-auto inline-flex h-10 w-10 items-center  text-slate-500 hover:opacity-80 disabled:cursor-not-allowed disabled:opacity-50"
+                className="col-span-1 mt-auto inline-flex h-10 w-10 items-center text-slate-500 hover:opacity-80 disabled:cursor-not-allowed disabled:opacity-50"
                 onClick={() => removeValue(index)}
               >
                 <Trash className="h-5 w-5" />

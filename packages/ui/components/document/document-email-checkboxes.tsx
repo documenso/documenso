@@ -25,9 +25,46 @@ export const DocumentEmailCheckboxes = ({
     <div className={cn('space-y-3', className)}>
       <div className="flex flex-row items-center">
         <Checkbox
+          id={DocumentEmailEvents.RecipientSigned}
+          className="h-5 w-5"
+          checked={value.recipientSigned}
+          onCheckedChange={(checked) =>
+            onChange({ ...value, [DocumentEmailEvents.RecipientSigned]: Boolean(checked) })
+          }
+        />
+
+        <label
+          className="text-muted-foreground ml-2 flex flex-row items-center text-sm"
+          htmlFor={DocumentEmailEvents.RecipientSigned}
+        >
+          <Trans>Send recipient signed email</Trans>
+
+          <Tooltip>
+            <TooltipTrigger>
+              <InfoIcon className="mx-2 h-4 w-4" />
+            </TooltipTrigger>
+
+            <TooltipContent className="text-foreground max-w-md space-y-2 p-4">
+              <h2>
+                <strong>
+                  <Trans>Recipient signed email</Trans>
+                </strong>
+              </h2>
+
+              <p>
+                <Trans>
+                  This email is sent to the document owner when a recipient has signed the document.
+                </Trans>
+              </p>
+            </TooltipContent>
+          </Tooltip>
+        </label>
+      </div>
+
+      <div className="flex flex-row items-center">
+        <Checkbox
           id={DocumentEmailEvents.RecipientSigningRequest}
           className="h-5 w-5"
-          checkClassName="dark:text-white text-primary"
           checked={value.recipientSigningRequest}
           onCheckedChange={(checked) =>
             onChange({ ...value, [DocumentEmailEvents.RecipientSigningRequest]: Boolean(checked) })
@@ -66,7 +103,6 @@ export const DocumentEmailCheckboxes = ({
         <Checkbox
           id={DocumentEmailEvents.RecipientRemoved}
           className="h-5 w-5"
-          checkClassName="dark:text-white text-primary"
           checked={value.recipientRemoved}
           onCheckedChange={(checked) =>
             onChange({ ...value, [DocumentEmailEvents.RecipientRemoved]: Boolean(checked) })
@@ -105,7 +141,6 @@ export const DocumentEmailCheckboxes = ({
         <Checkbox
           id={DocumentEmailEvents.DocumentPending}
           className="h-5 w-5"
-          checkClassName="dark:text-white text-primary"
           checked={value.documentPending}
           onCheckedChange={(checked) =>
             onChange({ ...value, [DocumentEmailEvents.DocumentPending]: Boolean(checked) })
@@ -145,7 +180,6 @@ export const DocumentEmailCheckboxes = ({
         <Checkbox
           id={DocumentEmailEvents.DocumentCompleted}
           className="h-5 w-5"
-          checkClassName="dark:text-white text-primary"
           checked={value.documentCompleted}
           onCheckedChange={(checked) =>
             onChange({ ...value, [DocumentEmailEvents.DocumentCompleted]: Boolean(checked) })
@@ -184,7 +218,6 @@ export const DocumentEmailCheckboxes = ({
         <Checkbox
           id={DocumentEmailEvents.DocumentDeleted}
           className="h-5 w-5"
-          checkClassName="dark:text-white text-primary"
           checked={value.documentDeleted}
           onCheckedChange={(checked) =>
             onChange({ ...value, [DocumentEmailEvents.DocumentDeleted]: Boolean(checked) })
@@ -223,7 +256,6 @@ export const DocumentEmailCheckboxes = ({
         <Checkbox
           id={DocumentEmailEvents.OwnerDocumentCompleted}
           className="h-5 w-5"
-          checkClassName="dark:text-white text-primary"
           checked={value.ownerDocumentCompleted}
           onCheckedChange={(checked) =>
             onChange({ ...value, [DocumentEmailEvents.OwnerDocumentCompleted]: Boolean(checked) })
@@ -244,7 +276,7 @@ export const DocumentEmailCheckboxes = ({
             <TooltipContent className="text-foreground max-w-md space-y-2 p-4">
               <h2>
                 <strong>
-                  <Trans>Document completed email to the owner</Trans>
+                  <Trans>Document completed email</Trans>
                 </strong>
               </h2>
 

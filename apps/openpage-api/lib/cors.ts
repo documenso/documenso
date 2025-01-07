@@ -30,10 +30,10 @@ function isOriginAllowed(origin: string, allowed: StaticOrigin): boolean {
   return Array.isArray(allowed)
     ? allowed.some((o) => isOriginAllowed(origin, o))
     : typeof allowed === 'string'
-    ? origin === allowed
-    : allowed instanceof RegExp
-    ? allowed.test(origin)
-    : !!allowed;
+      ? origin === allowed
+      : allowed instanceof RegExp
+        ? allowed.test(origin)
+        : !!allowed;
 }
 
 function getOriginHeaders(reqOrigin: string | undefined, origin: StaticOrigin) {

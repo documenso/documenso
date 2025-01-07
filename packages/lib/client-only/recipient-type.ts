@@ -1,5 +1,11 @@
 import type { Recipient } from '@documenso/prisma/client';
-import { ReadStatus, RecipientRole, SendStatus, SigningStatus } from '@documenso/prisma/client';
+import {
+  DocumentDistributionMethod,
+  ReadStatus,
+  RecipientRole,
+  SendStatus,
+  SigningStatus,
+} from '@documenso/prisma/client';
 
 export enum RecipientStatusType {
   COMPLETED = 'completed',
@@ -9,11 +15,11 @@ export enum RecipientStatusType {
   REJECTED = 'rejected',
 }
 
-export const getRecipientType = (recipient: Recipient) => {
-  if (
-    recipient.role === RecipientRole.CC ||
-    (recipient.sendStatus === SendStatus.SENT && recipient.signingStatus === SigningStatus.SIGNED)
-  ) {
+export const getRecipientType = (
+  recipient: Recipient,
+  distributionMethod: DocumentDistributionMethod = DocumentDistributionMethod.EMAIL,
+) => {
+  if (recipient.role === RecipientRole.CC || recipient.signingStatus === SigningStatus.SIGNED) {
     return RecipientStatusType.COMPLETED;
   }
 
@@ -22,7 +28,6 @@ export const getRecipientType = (recipient: Recipient) => {
   }
 
   if (
-    recipient.sendStatus === SendStatus.SENT &&
     recipient.readStatus === ReadStatus.OPENED &&
     recipient.signingStatus === SigningStatus.NOT_SIGNED
   ) {
@@ -30,6 +35,7 @@ export const getRecipientType = (recipient: Recipient) => {
   }
 
   if (
+    distributionMethod === DocumentDistributionMethod.EMAIL &&
     recipient.sendStatus === SendStatus.SENT &&
     recipient.signingStatus === SigningStatus.NOT_SIGNED
   ) {
