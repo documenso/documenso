@@ -3,8 +3,7 @@
 import { type HTMLAttributes, useEffect, useState } from 'react';
 
 import Link from 'next/link';
-import { useParams } from 'next/navigation';
-import { usePathname } from 'next/navigation';
+import { useParams, usePathname } from 'next/navigation';
 
 import { MenuIcon, SearchIcon } from 'lucide-react';
 

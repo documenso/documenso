@@ -82,7 +82,7 @@ export const DesktopNav = ({ className, setIsCommandMenuOpen, ...props }: Deskto
         </div>
 
         <div>
-          <div className="text-muted-foreground bg-muted flex items-center rounded-md px-1.5 py-0.5  text-xs tracking-wider">
+          <div className="text-muted-foreground bg-muted flex items-center rounded-md px-1.5 py-0.5 text-xs tracking-wider">
             {modifierKey}+K
           </div>
         </div>

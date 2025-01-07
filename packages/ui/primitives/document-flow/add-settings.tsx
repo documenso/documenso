@@ -4,6 +4,7 @@ import { useEffect } from 'react';
 
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Trans } from '@lingui/macro';
+import { useLingui } from '@lingui/react';
 import { InfoIcon } from 'lucide-react';
 import { useForm } from 'react-hook-form';
 import { match } from 'ts-pattern';
@@ -12,8 +13,14 @@ import { DATE_FORMATS, DEFAULT_DOCUMENT_DATE_FORMAT } from '@documenso/lib/const
 import { SUPPORTED_LANGUAGES } from '@documenso/lib/constants/i18n';
 import { DEFAULT_DOCUMENT_TIME_ZONE, TIME_ZONES } from '@documenso/lib/constants/time-zones';
 import { extractDocumentAuthMethods } from '@documenso/lib/utils/document-auth';
-import { DocumentVisibility, TeamMemberRole } from '@documenso/prisma/client';
-import { DocumentStatus, type Field, type Recipient, SendStatus } from '@documenso/prisma/client';
+import {
+  DocumentStatus,
+  DocumentVisibility,
+  type Field,
+  type Recipient,
+  SendStatus,
+  TeamMemberRole,
+} from '@documenso/prisma/client';
 import type { DocumentWithData } from '@documenso/prisma/types/document-with-data';
 import {
   DocumentGlobalAuthAccessSelect,
@@ -84,6 +91,8 @@ export const AddSettingsFormPartial = ({
     documentAuth: document.authOptions,
   });
 
+  const { i18n } = useLingui();
+
   const form = useForm<TAddSettingsFormSchema>({
     resolver: zodResolver(ZAddSettingsFormSchema),
     defaultValues: {
@@ -100,7 +109,7 @@ export const AddSettingsFormPartial = ({
           DATE_FORMATS.find((format) => format.value === document.documentMeta?.dateFormat)
             ?.value ?? DEFAULT_DOCUMENT_DATE_FORMAT,
         redirectUrl: document.documentMeta?.redirectUrl ?? '',
-        language: document.documentMeta?.language ?? 'en',
+        language: i18n.locale ?? i18n.locales?.[0] ?? document.documentMeta?.language ?? 'en',
       },
     },
   });
