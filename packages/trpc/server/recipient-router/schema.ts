@@ -14,7 +14,7 @@ export const ZGetRecipientQuerySchema = z.object({
 });
 
 const ZCreateRecipientSchema = z.object({
-  email: z.string().email().min(1),
+  email: z.string().toLowerCase().email().min(1),
   name: z.string(),
   role: z.nativeEnum(RecipientRole),
   signingOrder: z.number().optional(),
@@ -24,7 +24,7 @@ const ZCreateRecipientSchema = z.object({
 
 const ZUpdateRecipientSchema = z.object({
   id: z.number(),
-  email: z.string().email().min(1).optional(),
+  email: z.string().toLowerCase().email().min(1).optional(),
   name: z.string().optional(),
   role: z.nativeEnum(RecipientRole).optional(),
   signingOrder: z.number().optional(),
@@ -70,7 +70,11 @@ export const ZCreateDocumentRecipientResponseSchema = ZRecipientBaseResponseSche
 
 export const ZCreateDocumentRecipientsRequestSchema = z.object({
   documentId: z.number(),
-  recipients: z.array(ZCreateRecipientSchema),
+  recipients: z.array(ZCreateRecipientSchema).refine((recipients) => {
+    const emails = recipients.map((recipient) => recipient.email.toLowerCase());
+
+    return new Set(emails).size === emails.length;
+  }),
 });
 
 export const ZUpdateDocumentRecipientRequestSchema = z.object({
@@ -82,7 +86,13 @@ export const ZUpdateDocumentRecipientResponseSchema = ZRecipientResponseSchema;
 
 export const ZUpdateDocumentRecipientsRequestSchema = z.object({
   documentId: z.number(),
-  recipients: z.array(ZUpdateRecipientSchema),
+  recipients: z.array(ZUpdateRecipientSchema).refine((recipients) => {
+    const emails = recipients
+      .filter((recipient) => recipient.email !== undefined)
+      .map((recipient) => recipient.email?.toLowerCase());
+
+    return new Set(emails).size === emails.length;
+  }),
 });
 
 export const ZUpdateDocumentRecipientsResponseSchema = z.object({
@@ -100,7 +110,7 @@ export const ZSetDocumentRecipientsRequestSchema = z
     recipients: z.array(
       z.object({
         nativeId: z.number().optional(),
-        email: z.string().email().min(1),
+        email: z.string().toLowerCase().email().min(1),
         name: z.string(),
         role: z.nativeEnum(RecipientRole),
         signingOrder: z.number().optional(),
@@ -127,7 +137,11 @@ export const ZCreateTemplateRecipientResponseSchema = ZRecipientBaseResponseSche
 
 export const ZCreateTemplateRecipientsRequestSchema = z.object({
   templateId: z.number(),
-  recipients: z.array(ZCreateRecipientSchema),
+  recipients: z.array(ZCreateRecipientSchema).refine((recipients) => {
+    const emails = recipients.map((recipient) => recipient.email);
+
+    return new Set(emails).size === emails.length;
+  }),
 });
 
 export const ZUpdateTemplateRecipientRequestSchema = z.object({
@@ -139,11 +153,21 @@ export const ZUpdateTemplateRecipientResponseSchema = ZRecipientResponseSchema;
 
 export const ZUpdateTemplateRecipientsRequestSchema = z.object({
   templateId: z.number(),
-  recipients: z.array(ZUpdateRecipientSchema),
+  recipients: z.array(ZUpdateRecipientSchema).refine((recipients) => {
+    const emails = recipients
+      .filter((recipient) => recipient.email !== undefined)
+      .map((recipient) => recipient.email);
+
+    return new Set(emails).size === emails.length;
+  }),
 });
 
 export const ZUpdateTemplateRecipientsResponseSchema = z.object({
-  recipients: z.array(ZRecipientResponseSchema),
+  recipients: z.array(ZRecipientResponseSchema).refine((recipients) => {
+    const emails = recipients.map((recipient) => recipient.email);
+
+    return new Set(emails).size === emails.length;
+  }),
 });
 
 export const ZDeleteTemplateRecipientRequestSchema = z.object({
@@ -157,7 +181,7 @@ export const ZSetTemplateRecipientsRequestSchema = z
     recipients: z.array(
       z.object({
         nativeId: z.number().optional(),
-        email: z.string().email().min(1),
+        email: z.string().toLowerCase().email().min(1),
         name: z.string(),
         role: z.nativeEnum(RecipientRole),
         signingOrder: z.number().optional(),
@@ -167,12 +191,12 @@ export const ZSetTemplateRecipientsRequestSchema = z
   })
   .refine(
     (schema) => {
-      const emails = schema.recipients.map((recipient) => recipient.email.toLowerCase());
+      const emails = schema.recipients.map((recipient) => recipient.email);
 
       return new Set(emails).size === emails.length;
     },
     // Dirty hack to handle errors when .root is populated for an array type
-    { message: 'Signers must have unique emails', path: ['signers__root'] },
+    { message: 'Recipients must have unique emails', path: ['recipients__root'] },
   );
 
 export const ZCompleteDocumentWithTokenMutationSchema = z.object({
@@ -208,7 +232,7 @@ export const ZAddSignersMutationSchema = z
     signers: z.array(
       z.object({
         nativeId: z.number().optional(),
-        email: z.string().email().min(1),
+        email: z.string().toLowerCase().email().min(1),
         name: z.string(),
         role: z.nativeEnum(RecipientRole),
         signingOrder: z.number().optional(),

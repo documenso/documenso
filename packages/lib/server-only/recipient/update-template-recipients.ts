@@ -89,12 +89,7 @@ export const updateTemplateRecipients = async ({
     }
   }
 
-  const recipientsToUpdate = recipients.map((rawRecipient) => {
-    const recipient = {
-      ...rawRecipient,
-      email: rawRecipient.email?.toLowerCase(),
-    };
-
+  const recipientsToUpdate = recipients.map((recipient) => {
     const originalRecipient = template.Recipient.find(
       (existingRecipient) => existingRecipient.id === recipient.id,
     );
@@ -102,6 +97,17 @@ export const updateTemplateRecipients = async ({
     if (!originalRecipient) {
       throw new AppError(AppErrorCode.NOT_FOUND, {
         message: `Recipient with id ${recipient.id} not found`,
+      });
+    }
+
+    const duplicateRecipientWithSameEmail = template.Recipient.find(
+      (existingRecipient) =>
+        existingRecipient.email === recipient.email && existingRecipient.id !== recipient.id,
+    );
+
+    if (duplicateRecipientWithSameEmail) {
+      throw new AppError(AppErrorCode.INVALID_REQUEST, {
+        message: `Duplicate recipient with the same email found: ${duplicateRecipientWithSameEmail.email}`,
       });
     }
 
