@@ -209,7 +209,7 @@ export const ApiContractV1Implementation = createNextRoute(ApiContractV1, {
     }
   }),
 
-  deleteDocument: authenticatedMiddleware(async (args, user, team) => {
+  deleteDocument: authenticatedMiddleware(async (args, user, team, { metadata }) => {
     const { id: documentId } = args.params;
 
     try {
@@ -232,6 +232,7 @@ export const ApiContractV1Implementation = createNextRoute(ApiContractV1, {
         id: document.id,
         userId: user.id,
         teamId: team?.id,
+        requestMetadata: metadata,
       });
 
       return {
@@ -248,7 +249,7 @@ export const ApiContractV1Implementation = createNextRoute(ApiContractV1, {
     }
   }),
 
-  createDocument: authenticatedMiddleware(async (args, user, team) => {
+  createDocument: authenticatedMiddleware(async (args, user, team, { metadata }) => {
     const { body } = args;
 
     try {
@@ -316,7 +317,7 @@ export const ApiContractV1Implementation = createNextRoute(ApiContractV1, {
         teamId: team?.id,
         formValues: body.formValues,
         documentDataId: documentData.id,
-        requestMetadata: extractNextApiRequestMetadata(args.req),
+        requestMetadata: metadata,
       });
 
       await upsertDocumentMeta({
@@ -332,7 +333,7 @@ export const ApiContractV1Implementation = createNextRoute(ApiContractV1, {
         typedSignatureEnabled: body.meta.typedSignatureEnabled,
         distributionMethod: body.meta.distributionMethod,
         emailSettings: body.meta.emailSettings,
-        requestMetadata: extractNextApiRequestMetadata(args.req),
+        requestMetadata: metadata,
       });
 
       if (body.authOptions) {
@@ -343,7 +344,7 @@ export const ApiContractV1Implementation = createNextRoute(ApiContractV1, {
           data: {
             ...body.authOptions,
           },
-          requestMetadata: extractNextApiRequestMetadata(args.req),
+          requestMetadata: metadata,
         });
       }
 
@@ -352,7 +353,7 @@ export const ApiContractV1Implementation = createNextRoute(ApiContractV1, {
         teamId: team?.id,
         documentId: document.id,
         recipients: body.recipients,
-        requestMetadata: extractNextApiRequestMetadata(args.req),
+        requestMetadata: metadata,
       });
 
       return {
@@ -453,7 +454,7 @@ export const ApiContractV1Implementation = createNextRoute(ApiContractV1, {
     }
   }),
 
-  createDocumentFromTemplate: authenticatedMiddleware(async (args, user, team) => {
+  createDocumentFromTemplate: authenticatedMiddleware(async (args, user, team, { metadata }) => {
     const { body, params } = args;
 
     const { remaining } = await getServerLimits({ email: user.email, teamId: team?.id });
@@ -518,7 +519,7 @@ export const ApiContractV1Implementation = createNextRoute(ApiContractV1, {
         documentId: document.id,
         userId: user.id,
         ...body.meta,
-        requestMetadata: extractNextApiRequestMetadata(args.req),
+        requestMetadata: metadata,
       });
     }
 
@@ -528,7 +529,7 @@ export const ApiContractV1Implementation = createNextRoute(ApiContractV1, {
         userId: user.id,
         teamId: team?.id,
         data: body.authOptions,
-        requestMetadata: extractNextApiRequestMetadata(args.req),
+        requestMetadata: metadata,
       });
     }
 
@@ -550,7 +551,7 @@ export const ApiContractV1Implementation = createNextRoute(ApiContractV1, {
     };
   }),
 
-  generateDocumentFromTemplate: authenticatedMiddleware(async (args, user, team) => {
+  generateDocumentFromTemplate: authenticatedMiddleware(async (args, user, team, { metadata }) => {
     const { body, params } = args;
 
     const { remaining } = await getServerLimits({ email: user.email, teamId: team?.id });
@@ -579,6 +580,7 @@ export const ApiContractV1Implementation = createNextRoute(ApiContractV1, {
           title: body.title,
           ...body.meta,
         },
+        requestMetadata: metadata,
       });
     } catch (err) {
       return AppError.toRestAPIError(err);
@@ -621,7 +623,7 @@ export const ApiContractV1Implementation = createNextRoute(ApiContractV1, {
         userId: user.id,
         teamId: team?.id,
         data: body.authOptions,
-        requestMetadata: extractNextApiRequestMetadata(args.req),
+        requestMetadata: metadata,
       });
     }
 
@@ -642,7 +644,7 @@ export const ApiContractV1Implementation = createNextRoute(ApiContractV1, {
     };
   }),
 
-  sendDocument: authenticatedMiddleware(async (args, user, team) => {
+  sendDocument: authenticatedMiddleware(async (args, user, team, { metadata }) => {
     const { id: documentId } = args.params;
     const { sendEmail, sendCompletionEmails } = args.body;
 
@@ -683,7 +685,7 @@ export const ApiContractV1Implementation = createNextRoute(ApiContractV1, {
             documentCompleted: sendCompletionEmails,
             ownerDocumentCompleted: sendCompletionEmails,
           },
-          requestMetadata: extractNextApiRequestMetadata(args.req),
+          requestMetadata: metadata,
         });
       }
 
@@ -692,7 +694,7 @@ export const ApiContractV1Implementation = createNextRoute(ApiContractV1, {
         userId: user.id,
         teamId: team?.id,
         sendEmail,
-        requestMetadata: extractNextApiRequestMetadata(args.req),
+        requestMetadata: metadata,
       });
 
       return {
@@ -716,7 +718,7 @@ export const ApiContractV1Implementation = createNextRoute(ApiContractV1, {
     }
   }),
 
-  resendDocument: authenticatedMiddleware(async (args, user, team) => {
+  resendDocument: authenticatedMiddleware(async (args, user, team, { metadata }) => {
     const { id: documentId } = args.params;
     const { recipients } = args.body;
 
@@ -726,7 +728,7 @@ export const ApiContractV1Implementation = createNextRoute(ApiContractV1, {
         documentId: Number(documentId),
         recipients,
         teamId: team?.id,
-        requestMetadata: extractNextApiRequestMetadata(args.req),
+        requestMetadata: metadata,
       });
 
       return {
@@ -745,7 +747,7 @@ export const ApiContractV1Implementation = createNextRoute(ApiContractV1, {
     }
   }),
 
-  createRecipient: authenticatedMiddleware(async (args, user, team) => {
+  createRecipient: authenticatedMiddleware(async (args, user, team, { metadata }) => {
     const { id: documentId } = args.params;
     const { name, email, role, authOptions, signingOrder } = args.body;
 
@@ -809,7 +811,7 @@ export const ApiContractV1Implementation = createNextRoute(ApiContractV1, {
             actionAuth: authOptions?.actionAuth ?? null,
           },
         ],
-        requestMetadata: extractNextApiRequestMetadata(args.req),
+        requestMetadata: metadata,
       });
 
       const newRecipient = newRecipients.find((recipient) => recipient.email === email);

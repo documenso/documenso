@@ -48,7 +48,6 @@ import {
   ZUpdateTemplateSettingsResponseSchema,
   updateTemplateSettings,
 } from '@documenso/lib/server-only/template/update-template-settings';
-import { extractNextApiRequestMetadata } from '@documenso/lib/universal/extract-request-metadata';
 import type { Document } from '@documenso/prisma/client';
 
 import { authenticatedProcedure, maybeAuthenticatedProcedure, router } from '../trpc';
@@ -161,8 +160,6 @@ export const templateRouter = router({
 
       const userId = ctx.user.id;
 
-      const requestMetadata = extractNextApiRequestMetadata(ctx.req);
-
       return await updateTemplateSettings({
         userId,
         teamId,
@@ -172,7 +169,6 @@ export const templateRouter = router({
           ...meta,
           language: isValidLanguageCode(meta?.language) ? meta?.language : undefined,
         },
-        requestMetadata,
       });
     }),
 
@@ -246,15 +242,13 @@ export const templateRouter = router({
         throw new Error('You have reached your document limit.');
       }
 
-      const requestMetadata = extractNextApiRequestMetadata(ctx.req);
-
       const document: Document = await createDocumentFromTemplate({
         templateId,
         teamId,
         userId: ctx.user.id,
         recipients,
         customDocumentDataId,
-        requestMetadata,
+        requestMetadata: ctx.metadata,
       });
 
       if (distributeDocument) {
@@ -262,7 +256,7 @@ export const templateRouter = router({
           documentId: document.id,
           userId: ctx.user.id,
           teamId,
-          requestMetadata,
+          requestMetadata: ctx.metadata,
         }).catch((err) => {
           console.error(err);
 
@@ -302,8 +296,6 @@ export const templateRouter = router({
         templateUpdatedAt,
       } = input;
 
-      const requestMetadata = extractNextApiRequestMetadata(ctx.req);
-
       return await createDocumentFromDirectTemplate({
         directRecipientName,
         directRecipientEmail,
@@ -318,7 +310,7 @@ export const templateRouter = router({
               email: ctx.user.email,
             }
           : undefined,
-        requestMetadata,
+        requestMetadata: ctx.metadata,
       });
     }),
 
@@ -336,7 +328,6 @@ export const templateRouter = router({
         data: {},
         meta: { signingOrder },
         userId: ctx.user.id,
-        requestMetadata: extractNextApiRequestMetadata(ctx.req),
       });
     }),
 
@@ -474,7 +465,6 @@ export const templateRouter = router({
         meta: {
           typedSignatureEnabled,
         },
-        requestMetadata: extractNextApiRequestMetadata(ctx.req),
       });
     }),
 });

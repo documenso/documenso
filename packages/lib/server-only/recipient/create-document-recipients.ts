@@ -4,7 +4,7 @@ import { isUserEnterprise } from '@documenso/ee/server-only/util/is-document-ent
 import { DOCUMENT_AUDIT_LOG_TYPE } from '@documenso/lib/types/document-audit-logs';
 import type { TRecipientAccessAuthTypes } from '@documenso/lib/types/document-auth';
 import { type TRecipientActionAuthTypes } from '@documenso/lib/types/document-auth';
-import type { RequestMetadata } from '@documenso/lib/universal/extract-request-metadata';
+import type { ApiRequestMetadata } from '@documenso/lib/universal/extract-request-metadata';
 import { nanoid } from '@documenso/lib/universal/id';
 import { createDocumentAuditLogData } from '@documenso/lib/utils/document-audit-logs';
 import { createRecipientAuthOptions } from '@documenso/lib/utils/document-auth';
@@ -26,7 +26,7 @@ export interface CreateDocumentRecipientsOptions {
     accessAuth?: TRecipientAccessAuthTypes | null;
     actionAuth?: TRecipientActionAuthTypes | null;
   }[];
-  requestMetadata: RequestMetadata;
+  requestMetadata: ApiRequestMetadata;
 }
 
 export const ZCreateDocumentRecipientsResponseSchema = z.object({
@@ -155,8 +155,7 @@ export const createDocumentRecipients = async ({
           data: createDocumentAuditLogData({
             type: DOCUMENT_AUDIT_LOG_TYPE.RECIPIENT_CREATED,
             documentId: documentId,
-            user,
-            requestMetadata,
+            metadata: requestMetadata,
             data: {
               recipientEmail: createdRecipient.email,
               recipientName: createdRecipient.name,

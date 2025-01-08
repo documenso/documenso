@@ -42,9 +42,7 @@ import {
   ZUpdateDocumentSettingsResponseSchema,
   updateDocumentSettings,
 } from '@documenso/lib/server-only/document/update-document-settings';
-import { updateTitle } from '@documenso/lib/server-only/document/update-title';
 import { symmetricEncrypt } from '@documenso/lib/universal/crypto';
-import { extractNextApiRequestMetadata } from '@documenso/lib/universal/extract-request-metadata';
 import { DocumentStatus } from '@documenso/prisma/client';
 
 import { authenticatedProcedure, procedure, router } from '../trpc';
@@ -66,7 +64,6 @@ import {
   ZSetPasswordForDocumentMutationSchema,
   ZSetSettingsForDocumentMutationSchema,
   ZSetSigningOrderForDocumentMutationSchema,
-  ZSetTitleForDocumentMutationSchema,
   ZUpdateTypedSignatureSettingsMutationSchema,
 } from './schema';
 
@@ -199,7 +196,7 @@ export const documentRouter = router({
         documentDataId,
         normalizePdf: true,
         timezone,
-        requestMetadata: extractNextApiRequestMetadata(ctx.req),
+        requestMetadata: ctx.metadata,
       });
     }),
 
@@ -224,8 +221,6 @@ export const documentRouter = router({
 
       const userId = ctx.user.id;
 
-      const requestMetadata = extractNextApiRequestMetadata(ctx.req);
-
       if (meta.timezone || meta.dateFormat || meta.redirectUrl) {
         await upsertDocumentMeta({
           documentId,
@@ -234,7 +229,7 @@ export const documentRouter = router({
           redirectUrl: meta.redirectUrl,
           language: meta.language,
           userId: ctx.user.id,
-          requestMetadata,
+          requestMetadata: ctx.metadata,
         });
       }
 
@@ -243,7 +238,7 @@ export const documentRouter = router({
         teamId,
         documentId,
         data,
-        requestMetadata,
+        requestMetadata: ctx.metadata,
       });
     }),
 
@@ -270,7 +265,7 @@ export const documentRouter = router({
         id: documentId,
         userId,
         teamId,
-        requestMetadata: extractNextApiRequestMetadata(ctx.req),
+        requestMetadata: ctx.metadata,
       });
     }),
 
@@ -297,27 +292,7 @@ export const documentRouter = router({
         documentId,
         teamId,
         userId,
-        requestMetadata: extractNextApiRequestMetadata(ctx.req),
-      });
-    }),
-
-  /**
-   * @private
-   */
-  // Should probably use `updateDocument`
-  setTitleForDocument: authenticatedProcedure
-    .input(ZSetTitleForDocumentMutationSchema)
-    .mutation(async ({ input, ctx }) => {
-      const { documentId, teamId, title } = input;
-
-      const userId = ctx.user.id;
-
-      return await updateTitle({
-        title,
-        userId,
-        teamId,
-        documentId,
-        requestMetadata: extractNextApiRequestMetadata(ctx.req),
+        requestMetadata: ctx.metadata,
       });
     }),
 
@@ -344,7 +319,7 @@ export const documentRouter = router({
         documentId,
         password: securePassword,
         userId: ctx.user.id,
-        requestMetadata: extractNextApiRequestMetadata(ctx.req),
+        requestMetadata: ctx.metadata,
       });
     }),
 
@@ -360,7 +335,7 @@ export const documentRouter = router({
         documentId,
         signingOrder,
         userId: ctx.user.id,
-        requestMetadata: extractNextApiRequestMetadata(ctx.req),
+        requestMetadata: ctx.metadata,
       });
     }),
 
@@ -389,7 +364,7 @@ export const documentRouter = router({
         documentId,
         typedSignatureEnabled,
         userId: ctx.user.id,
-        requestMetadata: extractNextApiRequestMetadata(ctx.req),
+        requestMetadata: ctx.metadata,
       });
     }),
 
@@ -433,7 +408,7 @@ export const documentRouter = router({
           distributionMethod: meta.distributionMethod,
           userId: ctx.user.id,
           emailSettings: meta.emailSettings,
-          requestMetadata: extractNextApiRequestMetadata(ctx.req),
+          requestMetadata: ctx.metadata,
         });
       }
 
@@ -441,7 +416,7 @@ export const documentRouter = router({
         userId: ctx.user.id,
         documentId,
         teamId,
-        requestMetadata: extractNextApiRequestMetadata(ctx.req),
+        requestMetadata: ctx.metadata,
       });
     }),
 
@@ -465,7 +440,7 @@ export const documentRouter = router({
       return await resendDocument({
         userId: ctx.user.id,
         ...input,
-        requestMetadata: extractNextApiRequestMetadata(ctx.req),
+        requestMetadata: ctx.metadata,
       });
     }),
 

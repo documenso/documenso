@@ -103,7 +103,7 @@ export const recipientRouter = router({
         userId: ctx.user.id,
         documentId,
         recipients: [recipient],
-        requestMetadata: extractNextApiRequestMetadata(ctx.req),
+        requestMetadata: ctx.metadata,
       });
 
       return createdRecipients.recipients[0];
@@ -131,7 +131,7 @@ export const recipientRouter = router({
         userId: ctx.user.id,
         documentId,
         recipients,
-        requestMetadata: extractNextApiRequestMetadata(ctx.req),
+        requestMetadata: ctx.metadata,
       });
     }),
 
@@ -157,7 +157,7 @@ export const recipientRouter = router({
         userId: ctx.user.id,
         documentId,
         recipients: [recipient],
-        requestMetadata: extractNextApiRequestMetadata(ctx.req),
+        requestMetadata: ctx.metadata,
       });
 
       return updatedRecipients.recipients[0];
@@ -185,7 +185,7 @@ export const recipientRouter = router({
         userId: ctx.user.id,
         documentId,
         recipients,
-        requestMetadata: extractNextApiRequestMetadata(ctx.req),
+        requestMetadata: ctx.metadata,
       });
     }),
 
@@ -209,7 +209,7 @@ export const recipientRouter = router({
       await deleteDocumentRecipient({
         recipientId,
         userId: ctx.user.id,
-        requestMetadata: extractNextApiRequestMetadata(ctx.req),
+        requestMetadata: ctx.metadata,
       });
     }),
 
@@ -244,7 +244,7 @@ export const recipientRouter = router({
           signingOrder: recipient.signingOrder,
           actionAuth: recipient.actionAuth,
         })),
-        requestMetadata: extractNextApiRequestMetadata(ctx.req),
+        requestMetadata: ctx.metadata,
       });
     }),
 
@@ -465,7 +465,7 @@ export const recipientRouter = router({
           signingOrder: signer.signingOrder,
           actionAuth: signer.actionAuth,
         })),
-        requestMetadata: extractNextApiRequestMetadata(ctx.req),
+        requestMetadata: ctx.metadata,
       });
     }),
 });

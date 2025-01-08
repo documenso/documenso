@@ -5,6 +5,8 @@ import type { OpenApiMeta } from 'trpc-openapi';
 import { AppError, genericErrorCodeToTrpcErrorCodeMap } from '@documenso/lib/errors/app-error';
 import { isAdmin } from '@documenso/lib/next-auth/guards/is-admin';
 import { getApiTokenByToken } from '@documenso/lib/server-only/public-api/get-api-token-by-token';
+import type { ApiRequestMetadata } from '@documenso/lib/universal/extract-request-metadata';
+import { extractNextApiRequestMetadata } from '@documenso/lib/universal/extract-request-metadata';
 
 import type { TrpcContext } from './context';
 
@@ -63,7 +65,21 @@ export const authenticatedMiddleware = t.middleware(async ({ ctx, next }) => {
         ...ctx,
         user: apiToken.user,
         session: null,
-        source: 'api',
+        metadata: {
+          ...ctx.metadata,
+          auditUser: apiToken.team
+            ? {
+                id: null,
+                email: null,
+                name: apiToken.team.name,
+              }
+            : {
+                id: apiToken.user.id,
+                email: apiToken.user.email,
+                name: apiToken.user.name,
+              },
+          auth: 'api',
+        } satisfies ApiRequestMetadata,
       },
     });
   }
@@ -80,17 +96,39 @@ export const authenticatedMiddleware = t.middleware(async ({ ctx, next }) => {
       ...ctx,
       user: ctx.user,
       session: ctx.session,
-      source: 'app',
+      metadata: {
+        ...ctx.metadata,
+        auditUser: {
+          id: ctx.user.id,
+          name: ctx.user.name,
+          email: ctx.user.email,
+        },
+        auth: 'session',
+      } satisfies ApiRequestMetadata,
     },
   });
 });
 
 export const maybeAuthenticatedMiddleware = t.middleware(async ({ ctx, next }) => {
+  const requestMetadata = extractNextApiRequestMetadata(ctx.req);
+
   return await next({
     ctx: {
       ...ctx,
       user: ctx.user,
       session: ctx.session,
+      metadata: {
+        ...ctx.metadata,
+        auditUser: ctx.user
+          ? {
+              id: ctx.user.id,
+              name: ctx.user.name,
+              email: ctx.user.email,
+            }
+          : undefined,
+        requestMetadata,
+        auth: ctx.session ? 'session' : null,
+      } satisfies ApiRequestMetadata,
     },
   });
 });
@@ -117,6 +155,15 @@ export const adminMiddleware = t.middleware(async ({ ctx, next }) => {
       ...ctx,
       user: ctx.user,
       session: ctx.session,
+      metadata: {
+        ...ctx.metadata,
+        auditUser: {
+          id: ctx.user.id,
+          name: ctx.user.name,
+          email: ctx.user.email,
+        },
+        auth: 'session',
+      } satisfies ApiRequestMetadata,
     },
   });
 });

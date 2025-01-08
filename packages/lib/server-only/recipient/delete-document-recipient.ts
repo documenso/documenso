@@ -5,7 +5,7 @@ import { msg } from '@lingui/macro';
 import { mailer } from '@documenso/email/mailer';
 import RecipientRemovedFromDocumentTemplate from '@documenso/email/templates/recipient-removed-from-document';
 import { DOCUMENT_AUDIT_LOG_TYPE } from '@documenso/lib/types/document-audit-logs';
-import type { RequestMetadata } from '@documenso/lib/universal/extract-request-metadata';
+import type { ApiRequestMetadata } from '@documenso/lib/universal/extract-request-metadata';
 import { prisma } from '@documenso/prisma';
 import { SendStatus } from '@documenso/prisma/client';
 
@@ -20,7 +20,7 @@ import { renderEmailWithI18N } from '../../utils/render-email-with-i18n';
 export interface DeleteDocumentRecipientOptions {
   userId: number;
   recipientId: number;
-  requestMetadata: RequestMetadata;
+  requestMetadata: ApiRequestMetadata;
 }
 
 export const deleteDocumentRecipient = async ({
@@ -109,8 +109,7 @@ export const deleteDocumentRecipient = async ({
       data: createDocumentAuditLogData({
         type: DOCUMENT_AUDIT_LOG_TYPE.RECIPIENT_DELETED,
         documentId: document.id,
-        user,
-        requestMetadata,
+        metadata: requestMetadata,
         data: {
           recipientEmail: recipientToDelete.email,
           recipientName: recipientToDelete.name,

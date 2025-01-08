@@ -81,7 +81,7 @@ export const fieldRouter = router({
           pageHeight: field.pageHeight,
           fieldMeta: field.fieldMeta,
         })),
-        requestMetadata: extractNextApiRequestMetadata(ctx.req),
+        requestMetadata: ctx.metadata,
       });
     }),
 

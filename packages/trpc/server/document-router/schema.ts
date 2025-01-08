@@ -99,14 +99,6 @@ export type TSetGeneralSettingsForDocumentMutationSchema = z.infer<
   typeof ZSetSettingsForDocumentMutationSchema
 >;
 
-export const ZSetTitleForDocumentMutationSchema = z.object({
-  documentId: z.number(),
-  teamId: z.number().min(1).optional(),
-  title: z.string().min(1),
-});
-
-export type TSetTitleForDocumentMutationSchema = z.infer<typeof ZSetTitleForDocumentMutationSchema>;
-
 export const ZSetRecipientsForDocumentMutationSchema = z.object({
   documentId: z.number(),
   teamId: z.number().min(1).optional(),

@@ -7,7 +7,7 @@ import {
   type TRecipientActionAuthTypes,
   ZRecipientAuthOptionsSchema,
 } from '@documenso/lib/types/document-auth';
-import type { RequestMetadata } from '@documenso/lib/universal/extract-request-metadata';
+import type { ApiRequestMetadata } from '@documenso/lib/universal/extract-request-metadata';
 import {
   createDocumentAuditLogData,
   diffRecipientChanges,
@@ -26,7 +26,7 @@ export interface UpdateDocumentRecipientsOptions {
   userId: number;
   documentId: number;
   recipients: RecipientData[];
-  requestMetadata: RequestMetadata;
+  requestMetadata: ApiRequestMetadata;
 }
 
 export const ZUpdateDocumentRecipientsResponseSchema = z.object({
@@ -66,17 +66,6 @@ export const updateDocumentRecipients = async ({
       Field: true,
       Recipient: true,
       team: true,
-    },
-  });
-
-  const user = await prisma.user.findFirstOrThrow({
-    where: {
-      id: userId,
-    },
-    select: {
-      id: true,
-      name: true,
-      email: true,
     },
   });
 
@@ -213,12 +202,7 @@ export const updateDocumentRecipients = async ({
             data: createDocumentAuditLogData({
               type: DOCUMENT_AUDIT_LOG_TYPE.RECIPIENT_UPDATED,
               documentId: documentId,
-              user: {
-                id: team?.id ?? user.id,
-                name: team?.name ?? user.name,
-                email: team ? '' : user.email,
-              },
-              requestMetadata,
+              metadata: requestMetadata,
               data: {
                 recipientEmail: updatedRecipient.email,
                 recipientName: updatedRecipient.name,

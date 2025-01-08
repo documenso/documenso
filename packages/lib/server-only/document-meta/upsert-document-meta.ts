@@ -1,7 +1,7 @@
 'use server';
 
 import { DOCUMENT_AUDIT_LOG_TYPE } from '@documenso/lib/types/document-audit-logs';
-import type { RequestMetadata } from '@documenso/lib/universal/extract-request-metadata';
+import type { ApiRequestMetadata } from '@documenso/lib/universal/extract-request-metadata';
 import {
   createDocumentAuditLogData,
   diffDocumentMetaChanges,
@@ -26,7 +26,7 @@ export type CreateDocumentMetaOptions = {
   typedSignatureEnabled?: boolean;
   language?: SupportedLanguageCodes;
   userId: number;
-  requestMetadata: RequestMetadata;
+  requestMetadata: ApiRequestMetadata;
 };
 
 export const upsertDocumentMeta = async ({
@@ -120,8 +120,7 @@ export const upsertDocumentMeta = async ({
         data: createDocumentAuditLogData({
           type: DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_META_UPDATED,
           documentId,
-          user,
-          requestMetadata,
+          metadata: requestMetadata,
           data: {
             changes: diffDocumentMetaChanges(originalDocumentMeta ?? {}, upsertedDocumentMeta),
           },

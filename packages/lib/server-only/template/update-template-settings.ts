@@ -3,7 +3,6 @@
 import type { z } from 'zod';
 
 import { isUserEnterprise } from '@documenso/ee/server-only/util/is-document-enterprise';
-import type { RequestMetadata } from '@documenso/lib/universal/extract-request-metadata';
 import { prisma } from '@documenso/prisma';
 import type { DocumentVisibility, Template, TemplateMeta } from '@documenso/prisma/client';
 import { TemplateSchema } from '@documenso/prisma/generated/zod';
@@ -27,7 +26,6 @@ export type UpdateTemplateSettingsOptions = {
     type?: Template['type'];
   };
   meta?: Partial<Omit<TemplateMeta, 'id' | 'templateId'>>;
-  requestMetadata?: RequestMetadata;
 };
 
 export const ZUpdateTemplateSettingsResponseSchema = TemplateSchema;

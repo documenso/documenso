@@ -12,7 +12,7 @@ import {
   type TRecipientActionAuthTypes,
   ZRecipientAuthOptionsSchema,
 } from '@documenso/lib/types/document-auth';
-import type { RequestMetadata } from '@documenso/lib/universal/extract-request-metadata';
+import type { ApiRequestMetadata } from '@documenso/lib/universal/extract-request-metadata';
 import { nanoid } from '@documenso/lib/universal/id';
 import {
   createDocumentAuditLogData,
@@ -39,7 +39,7 @@ export interface SetDocumentRecipientsOptions {
   teamId?: number;
   documentId: number;
   recipients: RecipientData[];
-  requestMetadata?: RequestMetadata;
+  requestMetadata: ApiRequestMetadata;
 }
 
 export const ZSetDocumentRecipientsResponseSchema = z.object({
@@ -235,8 +235,7 @@ export const setDocumentRecipients = async ({
             data: createDocumentAuditLogData({
               type: DOCUMENT_AUDIT_LOG_TYPE.RECIPIENT_UPDATED,
               documentId: documentId,
-              user,
-              requestMetadata,
+              metadata: requestMetadata,
               data: {
                 changes,
                 ...baseAuditLog,
@@ -251,8 +250,7 @@ export const setDocumentRecipients = async ({
             data: createDocumentAuditLogData({
               type: DOCUMENT_AUDIT_LOG_TYPE.RECIPIENT_CREATED,
               documentId: documentId,
-              user,
-              requestMetadata,
+              metadata: requestMetadata,
               data: {
                 ...baseAuditLog,
                 accessAuth: recipient.accessAuth || undefined,
@@ -282,8 +280,7 @@ export const setDocumentRecipients = async ({
           createDocumentAuditLogData({
             type: DOCUMENT_AUDIT_LOG_TYPE.RECIPIENT_DELETED,
             documentId: documentId,
-            user,
-            requestMetadata,
+            metadata: requestMetadata,
             data: {
               recipientEmail: recipient.email,
               recipientName: recipient.name,

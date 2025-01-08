@@ -5,7 +5,7 @@ import type { z } from 'zod';
 
 import { isUserEnterprise } from '@documenso/ee/server-only/util/is-document-enterprise';
 import { DOCUMENT_AUDIT_LOG_TYPE } from '@documenso/lib/types/document-audit-logs';
-import type { RequestMetadata } from '@documenso/lib/universal/extract-request-metadata';
+import type { ApiRequestMetadata } from '@documenso/lib/universal/extract-request-metadata';
 import type { CreateDocumentAuditLogDataResponse } from '@documenso/lib/utils/document-audit-logs';
 import { createDocumentAuditLogData } from '@documenso/lib/utils/document-audit-logs';
 import { prisma } from '@documenso/prisma';
@@ -28,7 +28,7 @@ export type UpdateDocumentSettingsOptions = {
     globalAccessAuth?: TDocumentAccessAuthTypes | null;
     globalActionAuth?: TDocumentActionAuthTypes | null;
   };
-  requestMetadata?: RequestMetadata;
+  requestMetadata: ApiRequestMetadata;
 };
 
 export const ZUpdateDocumentSettingsResponseSchema = DocumentSchema;
@@ -47,12 +47,6 @@ export const updateDocumentSettings = async ({
       message: 'Missing data to update',
     });
   }
-
-  const user = await prisma.user.findFirstOrThrow({
-    where: {
-      id: userId,
-    },
-  });
 
   const document = await prisma.document.findFirstOrThrow({
     where: {
@@ -179,8 +173,7 @@ export const updateDocumentSettings = async ({
       createDocumentAuditLogData({
         type: DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_TITLE_UPDATED,
         documentId,
-        user,
-        requestMetadata,
+        metadata: requestMetadata,
         data: {
           from: document.title,
           to: data.title || '',
@@ -194,8 +187,7 @@ export const updateDocumentSettings = async ({
       createDocumentAuditLogData({
         type: DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_EXTERNAL_ID_UPDATED,
         documentId,
-        user,
-        requestMetadata,
+        metadata: requestMetadata,
         data: {
           from: document.externalId,
           to: data.externalId || '',
@@ -209,8 +201,7 @@ export const updateDocumentSettings = async ({
       createDocumentAuditLogData({
         type: DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_GLOBAL_AUTH_ACCESS_UPDATED,
         documentId,
-        user,
-        requestMetadata,
+        metadata: requestMetadata,
         data: {
           from: documentGlobalAccessAuth,
           to: newGlobalAccessAuth,
@@ -224,8 +215,7 @@ export const updateDocumentSettings = async ({
       createDocumentAuditLogData({
         type: DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_GLOBAL_AUTH_ACTION_UPDATED,
         documentId,
-        user,
-        requestMetadata,
+        metadata: requestMetadata,
         data: {
           from: documentGlobalActionAuth,
           to: newGlobalActionAuth,
@@ -239,8 +229,7 @@ export const updateDocumentSettings = async ({
       createDocumentAuditLogData({
         type: DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_VISIBILITY_UPDATED,
         documentId,
-        user,
-        requestMetadata,
+        metadata: requestMetadata,
         data: {
           from: document.visibility,
           to: data.visibility || '',
