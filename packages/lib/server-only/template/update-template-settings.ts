@@ -5,7 +5,7 @@ import type { z } from 'zod';
 import { isUserEnterprise } from '@documenso/ee/server-only/util/is-document-enterprise';
 import type { RequestMetadata } from '@documenso/lib/universal/extract-request-metadata';
 import { prisma } from '@documenso/prisma';
-import type { Template, TemplateMeta } from '@documenso/prisma/client';
+import type { DocumentVisibility, Template, TemplateMeta } from '@documenso/prisma/client';
 import { TemplateSchema } from '@documenso/prisma/generated/zod';
 
 import { AppError, AppErrorCode } from '../../errors/app-error';
@@ -19,6 +19,7 @@ export type UpdateTemplateSettingsOptions = {
   data: {
     title?: string;
     externalId?: string | null;
+    visibility?: DocumentVisibility;
     globalAccessAuth?: TDocumentAccessAuthTypes | null;
     globalActionAuth?: TDocumentActionAuthTypes | null;
     publicTitle?: string;
@@ -110,6 +111,7 @@ export const updateTemplateSettings = async ({
       title: data.title,
       externalId: data.externalId,
       type: data.type,
+      visibility: data.visibility,
       publicDescription: data.publicDescription,
       publicTitle: data.publicTitle,
       authOptions,
