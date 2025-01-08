@@ -545,7 +545,6 @@ export const ZTemplateWithDataSchema = ZTemplateSchema.extend({
   }),
   Field: ZFieldSchema.pick({
     id: true,
-    documentId: true,
     recipientId: true,
     type: true,
     page: true,
