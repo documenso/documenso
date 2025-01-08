@@ -59,10 +59,10 @@ export const findTemplates = async ({
   page = 1,
   perPage = 10,
 }: FindTemplatesOptions): Promise<TFindTemplatesResponse> => {
-  const whereFilter: Prisma.TemplateWhereInput[] = [{ type }];
+  const whereFilter: Prisma.TemplateWhereInput[] = [];
 
   if (teamId === undefined) {
-    whereFilter.push({ userId });
+    whereFilter.push({ userId, teamId: null });
   }
 
   if (teamId !== undefined) {
@@ -99,7 +99,7 @@ export const findTemplates = async ({
               },
             }))
             .otherwise(() => ({ visibility: DocumentVisibility.EVERYONE })),
-          { userId },
+          { userId, teamId },
         ],
       },
     );
@@ -108,6 +108,7 @@ export const findTemplates = async ({
   const [data, count] = await Promise.all([
     prisma.template.findMany({
       where: {
+        type,
         AND: whereFilter,
       },
       include: {
