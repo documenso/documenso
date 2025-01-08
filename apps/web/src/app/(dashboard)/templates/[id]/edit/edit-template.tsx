@@ -62,7 +62,6 @@ export const EditTemplateForm = ({
   const { data: template, refetch: refetchTemplate } = trpc.template.getTemplateById.useQuery(
     {
       templateId: initialTemplate.id,
-      teamId: initialTemplate.teamId || undefined,
     },
     {
       initialData: initialTemplate,
@@ -162,7 +161,6 @@ export const EditTemplateForm = ({
     try {
       await updateTemplateSettings({
         templateId: template.id,
-        teamId: team?.id,
         data: {
           title: data.title,
           externalId: data.externalId || null,
@@ -198,13 +196,11 @@ export const EditTemplateForm = ({
       await Promise.all([
         setSigningOrderForTemplate({
           templateId: template.id,
-          teamId: team?.id,
           signingOrder: data.signingOrder,
         }),
 
         setRecipients({
           templateId: template.id,
-          teamId: team?.id,
           recipients: data.signers,
         }),
       ]);
@@ -231,7 +227,6 @@ export const EditTemplateForm = ({
 
       await updateTypedSignature({
         templateId: template.id,
-        teamId: team?.id,
         typedSignatureEnabled: data.typedSignatureEnabled,
       });
 

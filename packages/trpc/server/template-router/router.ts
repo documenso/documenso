@@ -85,8 +85,11 @@ export const templateRouter = router({
     .input(ZFindTemplatesQuerySchema)
     .output(ZFindTemplatesResponseSchema)
     .query(async ({ input, ctx }) => {
+      const { teamId } = ctx;
+
       return await findTemplates({
         userId: ctx.user.id,
+        teamId,
         ...input,
       });
     }),
@@ -106,7 +109,8 @@ export const templateRouter = router({
     .input(ZGetTemplateByIdQuerySchema)
     .output(ZGetTemplateByIdResponseSchema)
     .query(async ({ input, ctx }) => {
-      const { templateId, teamId } = input;
+      const { teamId } = ctx;
+      const { templateId } = input;
 
       return await getTemplateById({
         id: templateId,
@@ -131,7 +135,8 @@ export const templateRouter = router({
     .input(ZCreateTemplateMutationSchema)
     .output(ZCreateTemplateResponseSchema)
     .mutation(async ({ input, ctx }) => {
-      const { teamId, title, templateDocumentDataId } = input;
+      const { teamId } = ctx;
+      const { title, templateDocumentDataId } = input;
 
       return await createTemplate({
         userId: ctx.user.id,
@@ -156,7 +161,8 @@ export const templateRouter = router({
     .input(ZUpdateTemplateSettingsMutationSchema)
     .output(ZUpdateTemplateSettingsResponseSchema)
     .mutation(async ({ input, ctx }) => {
-      const { templateId, teamId, data, meta } = input;
+      const { teamId } = ctx;
+      const { templateId, data, meta } = input;
 
       const userId = ctx.user.id;
 
@@ -187,7 +193,8 @@ export const templateRouter = router({
     .input(ZDuplicateTemplateMutationSchema)
     .output(ZDuplicateTemplateResponseSchema)
     .mutation(async ({ input, ctx }) => {
-      const { teamId, templateId } = input;
+      const { teamId } = ctx;
+      const { templateId } = input;
 
       return await duplicateTemplate({
         userId: ctx.user.id,
@@ -211,7 +218,8 @@ export const templateRouter = router({
     .input(ZDeleteTemplateMutationSchema)
     .output(z.void())
     .mutation(async ({ input, ctx }) => {
-      const { templateId, teamId } = input;
+      const { teamId } = ctx;
+      const { templateId } = input;
 
       const userId = ctx.user.id;
 
@@ -234,7 +242,8 @@ export const templateRouter = router({
     .input(ZCreateDocumentFromTemplateMutationSchema)
     .output(ZGetDocumentWithDetailsByIdResponseSchema)
     .mutation(async ({ ctx, input }) => {
-      const { templateId, teamId, recipients, distributeDocument, customDocumentDataId } = input;
+      const { teamId } = ctx;
+      const { templateId, recipients, distributeDocument, customDocumentDataId } = input;
 
       const limits = await getServerLimits({ email: ctx.user.email, teamId });
 
@@ -320,7 +329,8 @@ export const templateRouter = router({
   setSigningOrderForTemplate: authenticatedProcedure
     .input(ZSetSigningOrderForTemplateMutationSchema)
     .mutation(async ({ input, ctx }) => {
-      const { templateId, teamId, signingOrder } = input;
+      const { teamId } = ctx;
+      const { templateId, signingOrder } = input;
 
       return await updateTemplateSettings({
         templateId,
@@ -347,7 +357,8 @@ export const templateRouter = router({
     .input(ZCreateTemplateDirectLinkMutationSchema)
     .output(ZCreateTemplateDirectLinkResponseSchema)
     .mutation(async ({ input, ctx }) => {
-      const { templateId, teamId, directRecipientId } = input;
+      const { teamId } = ctx;
+      const { templateId, directRecipientId } = input;
 
       const userId = ctx.user.id;
 
@@ -361,7 +372,7 @@ export const templateRouter = router({
         });
       }
 
-      return await createTemplateDirectLink({ userId, templateId, directRecipientId });
+      return await createTemplateDirectLink({ userId, teamId, templateId, directRecipientId });
     }),
 
   /**
@@ -380,11 +391,12 @@ export const templateRouter = router({
     .input(ZDeleteTemplateDirectLinkMutationSchema)
     .output(z.void())
     .mutation(async ({ input, ctx }) => {
+      const { teamId } = ctx;
       const { templateId } = input;
 
       const userId = ctx.user.id;
 
-      await deleteTemplateDirectLink({ userId, templateId });
+      await deleteTemplateDirectLink({ userId, teamId, templateId });
     }),
 
   /**
@@ -403,11 +415,12 @@ export const templateRouter = router({
     .input(ZToggleTemplateDirectLinkMutationSchema)
     .output(ZToggleTemplateDirectLinkResponseSchema)
     .mutation(async ({ input, ctx }) => {
+      const { teamId } = ctx;
       const { templateId, enabled } = input;
 
       const userId = ctx.user.id;
 
-      return await toggleTemplateDirectLink({ userId, templateId, enabled });
+      return await toggleTemplateDirectLink({ userId, teamId, templateId, enabled });
     }),
 
   /**
@@ -442,7 +455,8 @@ export const templateRouter = router({
   updateTemplateTypedSignatureSettings: authenticatedProcedure
     .input(ZUpdateTemplateTypedSignatureSettingsMutationSchema)
     .mutation(async ({ input, ctx }) => {
-      const { templateId, teamId, typedSignatureEnabled } = input;
+      const { teamId } = ctx;
+      const { templateId, typedSignatureEnabled } = input;
 
       const template = await getTemplateById({
         id: templateId,

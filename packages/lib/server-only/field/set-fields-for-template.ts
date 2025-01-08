@@ -20,6 +20,7 @@ import { FieldSchema } from '@documenso/prisma/generated/zod';
 
 export type SetFieldsForTemplateOptions = {
   userId: number;
+  teamId?: number;
   templateId: number;
   fields: {
     id?: number | null;
@@ -42,26 +43,28 @@ export type TSetFieldsForTemplateResponse = z.infer<typeof ZSetFieldsForTemplate
 
 export const setFieldsForTemplate = async ({
   userId,
+  teamId,
   templateId,
   fields,
 }: SetFieldsForTemplateOptions): Promise<TSetFieldsForTemplateResponse> => {
   const template = await prisma.template.findFirst({
     where: {
       id: templateId,
-      OR: [
-        {
-          userId,
-        },
-        {
-          team: {
-            members: {
-              some: {
-                userId,
+      ...(teamId
+        ? {
+            team: {
+              id: teamId,
+              members: {
+                some: {
+                  userId,
+                },
               },
             },
-          },
-        },
-      ],
+          }
+        : {
+            userId,
+            teamId: null,
+          }),
     },
   });
 

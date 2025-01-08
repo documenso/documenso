@@ -98,13 +98,14 @@ export const ApiContractV1Implementation = createNextRoute(ApiContractV1, {
 
       const recipients = await getRecipientsForDocument({
         documentId: Number(documentId),
-        teamId: team?.id,
         userId: user.id,
+        teamId: team?.id,
       });
 
       const fields = await getFieldsForDocument({
         documentId: Number(documentId),
         userId: user.id,
+        teamId: team?.id,
       });
 
       const parsedMetaFields = fields.map((field) => {
@@ -323,6 +324,7 @@ export const ApiContractV1Implementation = createNextRoute(ApiContractV1, {
       await upsertDocumentMeta({
         documentId: document.id,
         userId: user.id,
+        teamId: team?.id,
         subject: body.meta.subject,
         message: body.meta.message,
         timezone,
@@ -518,6 +520,7 @@ export const ApiContractV1Implementation = createNextRoute(ApiContractV1, {
       await upsertDocumentMeta({
         documentId: document.id,
         userId: user.id,
+        teamId: team?.id,
         ...body.meta,
         requestMetadata: metadata,
       });
@@ -680,6 +683,7 @@ export const ApiContractV1Implementation = createNextRoute(ApiContractV1, {
         await upsertDocumentMeta({
           documentId: document.id,
           userId: user.id,
+          teamId: team?.id,
           emailSettings: {
             ...emailSettings,
             documentCompleted: sendCompletionEmails,

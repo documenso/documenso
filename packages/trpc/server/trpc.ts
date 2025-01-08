@@ -64,6 +64,7 @@ export const authenticatedMiddleware = t.middleware(async ({ ctx, next }) => {
       ctx: {
         ...ctx,
         user: apiToken.user,
+        teamId: apiToken.teamId || undefined,
         session: null,
         metadata: {
           ...ctx.metadata,

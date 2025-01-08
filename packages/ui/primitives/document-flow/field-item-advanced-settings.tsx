@@ -2,9 +2,6 @@
 
 import { forwardRef, useEffect, useState } from 'react';
 
-import { useParams } from 'next/navigation';
-import { usePathname } from 'next/navigation';
-
 import type { MessageDescriptor } from '@lingui/core';
 import { msg } from '@lingui/macro';
 import { useLingui } from '@lingui/react';
@@ -25,7 +22,6 @@ import {
   ZFieldMetaSchema,
 } from '@documenso/lib/types/field-meta';
 import { FieldType } from '@documenso/prisma/client';
-import { trpc } from '@documenso/trpc/react';
 import { useToast } from '@documenso/ui/primitives/use-toast';
 
 import type { FieldFormType } from './add-fields';
@@ -146,49 +142,13 @@ const getDefaultState = (fieldType: FieldType): FieldMeta => {
 
 export const FieldAdvancedSettings = forwardRef<HTMLDivElement, FieldAdvancedSettingsProps>(
   (
-    {
-      title,
-      description,
-      field,
-      fields,
-      onAdvancedSettings,
-      isDocumentPdfLoaded = true,
-      onSave,
-      teamId,
-    },
+    { title, description, field, fields, onAdvancedSettings, isDocumentPdfLoaded = true, onSave },
     ref,
   ) => {
     const { _ } = useLingui();
     const { toast } = useToast();
 
-    const params = useParams();
-    const pathname = usePathname();
-    const id = params?.id;
-    const isTemplatePage = pathname?.includes('template');
-    const isDocumentPage = pathname?.includes('document');
     const [errors, setErrors] = useState<string[]>([]);
-
-    const { data: template } = trpc.template.getTemplateById.useQuery(
-      {
-        templateId: Number(id),
-        teamId,
-      },
-      {
-        enabled: isTemplatePage,
-      },
-    );
-
-    const { data: document } = trpc.document.getDocumentById.useQuery(
-      {
-        documentId: Number(id),
-        teamId,
-      },
-      {
-        enabled: isDocumentPage,
-      },
-    );
-
-    const doesFieldExist = (!!document || !!template) && field.nativeId !== undefined;
 
     const fieldMeta = field?.fieldMeta;
 

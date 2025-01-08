@@ -19,12 +19,14 @@ import { renderEmailWithI18N } from '../../utils/render-email-with-i18n';
 
 export interface DeleteDocumentRecipientOptions {
   userId: number;
+  teamId?: number;
   recipientId: number;
   requestMetadata: ApiRequestMetadata;
 }
 
 export const deleteDocumentRecipient = async ({
   userId,
+  teamId,
   recipientId,
   requestMetadata,
 }: DeleteDocumentRecipientOptions): Promise<void> => {
@@ -35,24 +37,25 @@ export const deleteDocumentRecipient = async ({
           id: recipientId,
         },
       },
-      OR: [
-        {
-          team: {
-            members: {
-              some: {
-                userId,
+      ...(teamId
+        ? {
+            team: {
+              id: teamId,
+              members: {
+                some: {
+                  userId,
+                },
               },
             },
-          },
-        },
-        {
-          userId,
-          teamId: null,
-        },
-      ],
+          }
+        : {
+            userId,
+            teamId: null,
+          }),
     },
     include: {
       documentMeta: true,
+      team: true,
       Recipient: {
         where: {
           id: recipientId,
@@ -130,7 +133,7 @@ export const deleteDocumentRecipient = async ({
 
     const template = createElement(RecipientRemovedFromDocumentTemplate, {
       documentName: document.title,
-      inviterName: user.name || undefined,
+      inviterName: document.team?.name || user.name || undefined,
       assetBaseUrl,
     });
 

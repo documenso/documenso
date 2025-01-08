@@ -13,6 +13,8 @@ import type { SupportedLanguageCodes } from '../../constants/i18n';
 import type { TDocumentEmailSettings } from '../../types/document-email';
 
 export type CreateDocumentMetaOptions = {
+  userId: number;
+  teamId?: number;
   documentId: number;
   subject?: string;
   message?: string;
@@ -25,18 +27,18 @@ export type CreateDocumentMetaOptions = {
   distributionMethod?: DocumentDistributionMethod;
   typedSignatureEnabled?: boolean;
   language?: SupportedLanguageCodes;
-  userId: number;
   requestMetadata: ApiRequestMetadata;
 };
 
 export const upsertDocumentMeta = async ({
+  userId,
+  teamId,
   subject,
   message,
   timezone,
   dateFormat,
   documentId,
   password,
-  userId,
   redirectUrl,
   signingOrder,
   emailSettings,
@@ -45,34 +47,24 @@ export const upsertDocumentMeta = async ({
   language,
   requestMetadata,
 }: CreateDocumentMetaOptions) => {
-  const user = await prisma.user.findFirstOrThrow({
-    where: {
-      id: userId,
-    },
-    select: {
-      id: true,
-      email: true,
-      name: true,
-    },
-  });
-
   const { documentMeta: originalDocumentMeta } = await prisma.document.findFirstOrThrow({
     where: {
       id: documentId,
-      OR: [
-        {
-          userId: user.id,
-        },
-        {
-          team: {
-            members: {
-              some: {
-                userId: user.id,
+      ...(teamId
+        ? {
+            team: {
+              id: teamId,
+              members: {
+                some: {
+                  userId,
+                },
               },
             },
-          },
-        },
-      ],
+          }
+        : {
+            userId,
+            teamId: null,
+          }),
     },
     include: {
       documentMeta: true,

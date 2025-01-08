@@ -15,11 +15,9 @@ import {
   DocumentStatus,
   DocumentVisibility,
   FieldType,
-  RecipientRole,
 } from '@documenso/prisma/client';
 
 export const ZFindDocumentsQuerySchema = ZFindSearchParamsSchema.extend({
-  teamId: z.number().min(1).optional(),
   templateId: z.number().min(1).optional(),
   source: z.nativeEnum(DocumentSource).optional(),
   status: z.nativeEnum(DocumentStatus).optional(),
@@ -37,12 +35,10 @@ export const ZFindDocumentAuditLogsQuerySchema = ZFindSearchParamsSchema.extend(
 
 export const ZGetDocumentByIdQuerySchema = z.object({
   documentId: z.number().min(1),
-  teamId: z.number().min(1).optional(),
 });
 
 export const ZDuplicateDocumentMutationSchema = z.object({
   documentId: z.number().min(1),
-  teamId: z.number().min(1).optional(),
 });
 
 export type TGetDocumentByIdQuerySchema = z.infer<typeof ZGetDocumentByIdQuerySchema>;
@@ -55,7 +51,6 @@ export type TGetDocumentByTokenQuerySchema = z.infer<typeof ZGetDocumentByTokenQ
 
 export const ZGetDocumentWithDetailsByIdQuerySchema = z.object({
   documentId: z.number().min(1),
-  teamId: z.number().min(1).optional(),
 });
 
 export type TGetDocumentWithDetailsByIdQuerySchema = z.infer<
@@ -65,7 +60,6 @@ export type TGetDocumentWithDetailsByIdQuerySchema = z.infer<
 export const ZCreateDocumentMutationSchema = z.object({
   title: z.string().min(1),
   documentDataId: z.string().min(1),
-  teamId: z.number().optional(),
   timezone: z.string().optional(),
 });
 
@@ -73,7 +67,6 @@ export type TCreateDocumentMutationSchema = z.infer<typeof ZCreateDocumentMutati
 
 export const ZSetSettingsForDocumentMutationSchema = z.object({
   documentId: z.number(),
-  teamId: z.number().min(1).optional(),
   data: z.object({
     title: z.string().min(1).optional(),
     externalId: z.string().nullish(),
@@ -99,23 +92,6 @@ export type TSetGeneralSettingsForDocumentMutationSchema = z.infer<
   typeof ZSetSettingsForDocumentMutationSchema
 >;
 
-export const ZSetRecipientsForDocumentMutationSchema = z.object({
-  documentId: z.number(),
-  teamId: z.number().min(1).optional(),
-  recipients: z.array(
-    z.object({
-      id: z.number().nullish(),
-      email: z.string().min(1).email(),
-      name: z.string(),
-      role: z.nativeEnum(RecipientRole),
-    }),
-  ),
-});
-
-export type TSetRecipientsForDocumentMutationSchema = z.infer<
-  typeof ZSetRecipientsForDocumentMutationSchema
->;
-
 export const ZSetFieldsForDocumentMutationSchema = z.object({
   documentId: z.number(),
   fields: z.array(
@@ -138,7 +114,6 @@ export type TSetFieldsForDocumentMutationSchema = z.infer<
 
 export const ZSendDocumentMutationSchema = z.object({
   documentId: z.number(),
-  teamId: z.number().optional(),
   meta: z.object({
     subject: z.string(),
     message: z.string(),
@@ -176,7 +151,6 @@ export type TSetSigningOrderForDocumentMutationSchema = z.infer<
 
 export const ZUpdateTypedSignatureSettingsMutationSchema = z.object({
   documentId: z.number(),
-  teamId: z.number().optional(),
   typedSignatureEnabled: z.boolean(),
 });
 
@@ -187,14 +161,12 @@ export type TUpdateTypedSignatureSettingsMutationSchema = z.infer<
 export const ZResendDocumentMutationSchema = z.object({
   documentId: z.number(),
   recipients: z.array(z.number()).min(1),
-  teamId: z.number().min(1).optional(),
 });
 
 export type TSendDocumentMutationSchema = z.infer<typeof ZSendDocumentMutationSchema>;
 
 export const ZDeleteDocumentMutationSchema = z.object({
   documentId: z.number().min(1),
-  teamId: z.number().min(1).optional(),
 });
 
 export type TDeleteDocumentMutationSchema = z.infer<typeof ZDeleteDocumentMutationSchema>;
@@ -205,12 +177,10 @@ export const ZSearchDocumentsMutationSchema = z.object({
 
 export const ZDownloadAuditLogsMutationSchema = z.object({
   documentId: z.number(),
-  teamId: z.number().optional(),
 });
 
 export const ZDownloadCertificateMutationSchema = z.object({
   documentId: z.number(),
-  teamId: z.number().optional(),
 });
 
 export const ZMoveDocumentToTeamSchema = z.object({

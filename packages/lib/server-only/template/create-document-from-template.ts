@@ -95,12 +95,6 @@ export const createDocumentFromTemplate = async ({
   override,
   requestMetadata,
 }: CreateDocumentFromTemplateOptions): Promise<TCreateDocumentFromTemplateResponse> => {
-  const user = await prisma.user.findFirstOrThrow({
-    where: {
-      id: userId,
-    },
-  });
-
   const template = await prisma.template.findUnique({
     where: {
       id: templateId,

@@ -74,9 +74,13 @@ export const documentRouter = router({
   getDocumentById: authenticatedProcedure
     .input(ZGetDocumentByIdQuerySchema)
     .query(async ({ input, ctx }) => {
+      const { teamId } = ctx;
+      const { documentId } = input;
+
       return await getDocumentById({
-        ...input,
         userId: ctx.user.id,
+        teamId,
+        documentId,
       });
     }),
 
@@ -110,19 +114,10 @@ export const documentRouter = router({
     .input(ZFindDocumentsQuerySchema)
     .output(ZFindDocumentsResponseSchema)
     .query(async ({ input, ctx }) => {
-      const { user } = ctx;
+      const { user, teamId } = ctx;
 
-      const {
-        query,
-        teamId,
-        templateId,
-        page,
-        perPage,
-        orderByDirection,
-        orderByColumn,
-        source,
-        status,
-      } = input;
+      const { query, templateId, page, perPage, orderByDirection, orderByColumn, source, status } =
+        input;
 
       const documents = await findDocuments({
         userId: user.id,
@@ -157,9 +152,13 @@ export const documentRouter = router({
     .input(ZGetDocumentWithDetailsByIdQuerySchema)
     .output(ZGetDocumentWithDetailsByIdResponseSchema)
     .query(async ({ input, ctx }) => {
+      const { teamId, user } = ctx;
+      const { documentId } = input;
+
       return await getDocumentWithDetailsById({
-        ...input,
-        userId: ctx.user.id,
+        userId: user.id,
+        teamId,
+        documentId,
       });
     }),
 
@@ -178,7 +177,8 @@ export const documentRouter = router({
     .input(ZCreateDocumentMutationSchema)
     .output(ZCreateDocumentResponseSchema)
     .mutation(async ({ input, ctx }) => {
-      const { title, documentDataId, teamId, timezone } = input;
+      const { teamId } = ctx;
+      const { title, documentDataId, timezone } = input;
 
       const { remaining } = await getServerLimits({ email: ctx.user.email, teamId });
 
@@ -217,18 +217,20 @@ export const documentRouter = router({
     .input(ZSetSettingsForDocumentMutationSchema)
     .output(ZUpdateDocumentSettingsResponseSchema)
     .mutation(async ({ input, ctx }) => {
-      const { documentId, teamId, data, meta } = input;
+      const { teamId } = ctx;
+      const { documentId, data, meta } = input;
 
       const userId = ctx.user.id;
 
       if (meta.timezone || meta.dateFormat || meta.redirectUrl) {
         await upsertDocumentMeta({
+          userId: ctx.user.id,
+          teamId,
           documentId,
           dateFormat: meta.dateFormat,
           timezone: meta.timezone,
           redirectUrl: meta.redirectUrl,
           language: meta.language,
-          userId: ctx.user.id,
           requestMetadata: ctx.metadata,
         });
       }
@@ -257,7 +259,8 @@ export const documentRouter = router({
     .input(ZDeleteDocumentMutationSchema)
     .output(z.void())
     .mutation(async ({ input, ctx }) => {
-      const { documentId, teamId } = input;
+      const { teamId } = ctx;
+      const { documentId } = input;
 
       const userId = ctx.user.id;
 
@@ -302,6 +305,7 @@ export const documentRouter = router({
   setPasswordForDocument: authenticatedProcedure
     .input(ZSetPasswordForDocumentMutationSchema)
     .mutation(async ({ input, ctx }) => {
+      const { teamId } = ctx;
       const { documentId, password } = input;
 
       const key = DOCUMENSO_ENCRYPTION_KEY;
@@ -316,9 +320,10 @@ export const documentRouter = router({
       });
 
       await upsertDocumentMeta({
+        userId: ctx.user.id,
+        teamId,
         documentId,
         password: securePassword,
-        userId: ctx.user.id,
         requestMetadata: ctx.metadata,
       });
     }),
@@ -329,12 +334,14 @@ export const documentRouter = router({
   setSigningOrderForDocument: authenticatedProcedure
     .input(ZSetSigningOrderForDocumentMutationSchema)
     .mutation(async ({ input, ctx }) => {
+      const { teamId } = ctx;
       const { documentId, signingOrder } = input;
 
       return await upsertDocumentMeta({
+        userId: ctx.user.id,
+        teamId,
         documentId,
         signingOrder,
-        userId: ctx.user.id,
         requestMetadata: ctx.metadata,
       });
     }),
@@ -345,7 +352,8 @@ export const documentRouter = router({
   updateTypedSignatureSettings: authenticatedProcedure
     .input(ZUpdateTypedSignatureSettingsMutationSchema)
     .mutation(async ({ input, ctx }) => {
-      const { documentId, teamId, typedSignatureEnabled } = input;
+      const { teamId } = ctx;
+      const { documentId, typedSignatureEnabled } = input;
 
       const document = await getDocumentById({
         documentId,
@@ -361,9 +369,10 @@ export const documentRouter = router({
       }
 
       return await upsertDocumentMeta({
+        userId: ctx.user.id,
+        teamId,
         documentId,
         typedSignatureEnabled,
-        userId: ctx.user.id,
         requestMetadata: ctx.metadata,
       });
     }),
@@ -387,7 +396,8 @@ export const documentRouter = router({
     .input(ZSendDocumentMutationSchema)
     .output(ZSendDocumentResponseSchema)
     .mutation(async ({ input, ctx }) => {
-      const { documentId, teamId, meta } = input;
+      const { teamId } = ctx;
+      const { documentId, meta } = input;
 
       if (
         meta.message ||
@@ -399,6 +409,8 @@ export const documentRouter = router({
         meta.emailSettings
       ) {
         await upsertDocumentMeta({
+          userId: ctx.user.id,
+          teamId,
           documentId,
           subject: meta.subject,
           message: meta.message,
@@ -406,7 +418,6 @@ export const documentRouter = router({
           timezone: meta.timezone,
           redirectUrl: meta.redirectUrl,
           distributionMethod: meta.distributionMethod,
-          userId: ctx.user.id,
           emailSettings: meta.emailSettings,
           requestMetadata: ctx.metadata,
         });
@@ -437,9 +448,14 @@ export const documentRouter = router({
     .input(ZResendDocumentMutationSchema)
     .output(z.void())
     .mutation(async ({ input, ctx }) => {
+      const { teamId } = ctx;
+      const { documentId, recipients } = input;
+
       return await resendDocument({
         userId: ctx.user.id,
-        ...input,
+        teamId,
+        documentId,
+        recipients,
         requestMetadata: ctx.metadata,
       });
     }),
@@ -459,9 +475,13 @@ export const documentRouter = router({
     .input(ZDuplicateDocumentMutationSchema)
     .output(ZDuplicateDocumentResponseSchema)
     .mutation(async ({ input, ctx }) => {
+      const { teamId, user } = ctx;
+      const { documentId } = input;
+
       return await duplicateDocument({
-        userId: ctx.user.id,
-        ...input,
+        userId: user.id,
+        teamId,
+        documentId,
       });
     }),
 
@@ -487,6 +507,8 @@ export const documentRouter = router({
   findDocumentAuditLogs: authenticatedProcedure
     .input(ZFindDocumentAuditLogsQuerySchema)
     .query(async ({ input, ctx }) => {
+      const { teamId } = ctx;
+
       const {
         page,
         perPage,
@@ -498,13 +520,14 @@ export const documentRouter = router({
       } = input;
 
       return await findDocumentAuditLogs({
+        userId: ctx.user.id,
+        teamId,
         page,
         perPage,
         documentId,
         cursor,
         filterForRecentActivity,
         orderBy: orderByColumn ? { column: orderByColumn, direction: orderByDirection } : undefined,
-        userId: ctx.user.id,
       });
     }),
 
@@ -514,7 +537,8 @@ export const documentRouter = router({
   downloadAuditLogs: authenticatedProcedure
     .input(ZDownloadAuditLogsMutationSchema)
     .mutation(async ({ input, ctx }) => {
-      const { documentId, teamId } = input;
+      const { teamId } = ctx;
+      const { documentId } = input;
 
       const document = await getDocumentById({
         documentId,
@@ -545,7 +569,8 @@ export const documentRouter = router({
   downloadCertificate: authenticatedProcedure
     .input(ZDownloadCertificateMutationSchema)
     .mutation(async ({ input, ctx }) => {
-      const { documentId, teamId } = input;
+      const { teamId } = ctx;
+      const { documentId } = input;
 
       const document = await getDocumentById({
         documentId,

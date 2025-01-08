@@ -17,6 +17,7 @@ import { AppError, AppErrorCode } from '../../errors/app-error';
 
 export interface CreateDocumentRecipientsOptions {
   userId: number;
+  teamId?: number;
   documentId: number;
   recipients: {
     email: string;
@@ -39,6 +40,7 @@ export type TCreateDocumentRecipientsResponse = z.infer<
 
 export const createDocumentRecipients = async ({
   userId,
+  teamId,
   documentId,
   recipients: recipientsToCreate,
   requestMetadata,
@@ -46,35 +48,24 @@ export const createDocumentRecipients = async ({
   const document = await prisma.document.findFirst({
     where: {
       id: documentId,
-      OR: [
-        {
-          team: {
-            members: {
-              some: {
-                userId,
+      ...(teamId
+        ? {
+            team: {
+              id: teamId,
+              members: {
+                some: {
+                  userId,
+                },
               },
             },
-          },
-        },
-        {
-          userId,
-          teamId: null,
-        },
-      ],
+          }
+        : {
+            userId,
+            teamId: null,
+          }),
     },
     include: {
       Recipient: true,
-    },
-  });
-
-  const user = await prisma.user.findFirstOrThrow({
-    where: {
-      id: userId,
-    },
-    select: {
-      id: true,
-      name: true,
-      email: true,
     },
   });
 
@@ -89,8 +80,6 @@ export const createDocumentRecipients = async ({
       message: 'Document already complete',
     });
   }
-
-  const teamId = document?.teamId ?? undefined;
 
   const recipientsHaveActionAuth = recipientsToCreate.some((recipient) => recipient.actionAuth);
 

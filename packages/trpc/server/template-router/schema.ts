@@ -19,7 +19,6 @@ import { ZSignFieldWithTokenMutationSchema } from '../field-router/schema';
 
 export const ZCreateTemplateMutationSchema = z.object({
   title: z.string().min(1).trim(),
-  teamId: z.number().optional(),
   templateDocumentDataId: z.string().min(1),
 });
 
@@ -34,7 +33,6 @@ export const ZCreateDocumentFromDirectTemplateMutationSchema = z.object({
 
 export const ZCreateDocumentFromTemplateMutationSchema = z.object({
   templateId: z.number(),
-  teamId: z.number().optional(),
   recipients: z
     .array(
       z.object({
@@ -53,12 +51,10 @@ export const ZCreateDocumentFromTemplateMutationSchema = z.object({
 
 export const ZDuplicateTemplateMutationSchema = z.object({
   templateId: z.number(),
-  teamId: z.number().optional(),
 });
 
 export const ZCreateTemplateDirectLinkMutationSchema = z.object({
   templateId: z.number().min(1),
-  teamId: z.number().optional(),
   directRecipientId: z.number().min(1).optional(),
 });
 
@@ -73,7 +69,6 @@ export const ZToggleTemplateDirectLinkMutationSchema = z.object({
 
 export const ZDeleteTemplateMutationSchema = z.object({
   templateId: z.number().min(1),
-  teamId: z.number().optional(),
 });
 
 export const MAX_TEMPLATE_PUBLIC_TITLE_LENGTH = 50;
@@ -81,7 +76,6 @@ export const MAX_TEMPLATE_PUBLIC_DESCRIPTION_LENGTH = 256;
 
 export const ZUpdateTemplateSettingsMutationSchema = z.object({
   templateId: z.number(),
-  teamId: z.number().min(1).optional(),
   data: z.object({
     title: z.string().min(1).optional(),
     externalId: z.string().nullish(),
@@ -124,18 +118,15 @@ export const ZUpdateTemplateSettingsMutationSchema = z.object({
 
 export const ZSetSigningOrderForTemplateMutationSchema = z.object({
   templateId: z.number(),
-  teamId: z.number().optional(),
   signingOrder: z.nativeEnum(DocumentSigningOrder),
 });
 
 export const ZFindTemplatesQuerySchema = ZFindSearchParamsSchema.extend({
-  teamId: z.number().optional(),
   type: z.nativeEnum(TemplateType).optional(),
 });
 
 export const ZGetTemplateByIdQuerySchema = z.object({
   templateId: z.number().min(1),
-  teamId: z.number().optional(),
 });
 
 export const ZMoveTemplatesToTeamSchema = z.object({
@@ -145,7 +136,6 @@ export const ZMoveTemplatesToTeamSchema = z.object({
 
 export const ZUpdateTemplateTypedSignatureSettingsMutationSchema = z.object({
   templateId: z.number(),
-  teamId: z.number().optional(),
   typedSignatureEnabled: z.boolean(),
 });
 

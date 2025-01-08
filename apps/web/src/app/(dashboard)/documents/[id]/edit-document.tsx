@@ -64,7 +64,6 @@ export const EditDocumentForm = ({
     trpc.document.getDocumentWithDetailsById.useQuery(
       {
         documentId: initialDocument.id,
-        teamId: team?.id,
       },
       {
         initialData: initialDocument,
@@ -80,7 +79,6 @@ export const EditDocumentForm = ({
       utils.document.getDocumentWithDetailsById.setData(
         {
           documentId: initialDocument.id,
-          teamId: team?.id,
         },
         (oldData) => ({ ...(oldData || initialDocument), ...newData }),
       );
@@ -94,7 +92,6 @@ export const EditDocumentForm = ({
         utils.document.getDocumentWithDetailsById.setData(
           {
             documentId: initialDocument.id,
-            teamId: team?.id,
           },
           (oldData) => ({ ...(oldData || initialDocument), ...newData, id: Number(newData.id) }),
         );
@@ -107,7 +104,6 @@ export const EditDocumentForm = ({
       utils.document.getDocumentWithDetailsById.setData(
         {
           documentId: initialDocument.id,
-          teamId: team?.id,
         },
         (oldData) => ({ ...(oldData || initialDocument), Field: newFields }),
       );
@@ -121,7 +117,6 @@ export const EditDocumentForm = ({
         utils.document.getDocumentWithDetailsById.setData(
           {
             documentId: initialDocument.id,
-            teamId: team?.id,
           },
           (oldData) => ({
             ...(oldData || initialDocument),
@@ -138,7 +133,6 @@ export const EditDocumentForm = ({
       utils.document.getDocumentWithDetailsById.setData(
         {
           documentId: initialDocument.id,
-          teamId: team?.id,
         },
         (oldData) => ({ ...(oldData || initialDocument), Recipient: newRecipients }),
       );
@@ -151,7 +145,6 @@ export const EditDocumentForm = ({
       utils.document.getDocumentWithDetailsById.setData(
         {
           documentId: initialDocument.id,
-          teamId: team?.id,
         },
         (oldData) => ({ ...(oldData || initialDocument), ...newData }),
       );
@@ -207,7 +200,6 @@ export const EditDocumentForm = ({
 
       await setSettingsForDocument({
         documentId: document.id,
-        teamId: team?.id,
         data: {
           title: data.title,
           externalId: data.externalId || null,
@@ -248,7 +240,6 @@ export const EditDocumentForm = ({
 
         setRecipients({
           documentId: document.id,
-          teamId: team?.id,
           recipients: data.signers.map((signer) => ({
             ...signer,
             // Explicitly set to null to indicate we want to remove auth if required.
@@ -313,7 +304,6 @@ export const EditDocumentForm = ({
     try {
       await sendDocument({
         documentId: document.id,
-        teamId: team?.id,
         meta: {
           subject,
           message,

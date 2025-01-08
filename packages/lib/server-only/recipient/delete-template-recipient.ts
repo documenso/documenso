@@ -4,11 +4,13 @@ import { AppError, AppErrorCode } from '../../errors/app-error';
 
 export interface DeleteTemplateRecipientOptions {
   userId: number;
+  teamId?: number;
   recipientId: number;
 }
 
 export const deleteTemplateRecipient = async ({
   userId,
+  teamId,
   recipientId,
 }: DeleteTemplateRecipientOptions): Promise<void> => {
   const template = await prisma.template.findFirst({
@@ -18,21 +20,21 @@ export const deleteTemplateRecipient = async ({
           id: recipientId,
         },
       },
-      OR: [
-        {
-          team: {
-            members: {
-              some: {
-                userId,
+      ...(teamId
+        ? {
+            team: {
+              id: teamId,
+              members: {
+                some: {
+                  userId,
+                },
               },
             },
-          },
-        },
-        {
-          userId,
-          teamId: null,
-        },
-      ],
+          }
+        : {
+            userId,
+            teamId: null,
+          }),
     },
     include: {
       Recipient: {

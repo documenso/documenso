@@ -10,7 +10,6 @@ import { FieldSchema, RecipientSchema } from '@documenso/prisma/generated/zod';
 
 export const ZGetRecipientQuerySchema = z.object({
   recipientId: z.number(),
-  teamId: z.number().optional(),
 });
 
 const ZCreateRecipientSchema = z.object({
@@ -106,7 +105,6 @@ export const ZDeleteDocumentRecipientRequestSchema = z.object({
 export const ZSetDocumentRecipientsRequestSchema = z
   .object({
     documentId: z.number(),
-    teamId: z.number().optional(),
     recipients: z.array(
       z.object({
         nativeId: z.number().optional(),
@@ -176,7 +174,6 @@ export const ZDeleteTemplateRecipientRequestSchema = z.object({
 
 export const ZSetTemplateRecipientsRequestSchema = z
   .object({
-    teamId: z.number().optional(),
     templateId: z.number(),
     recipients: z.array(
       z.object({
@@ -228,7 +225,6 @@ export type TRejectDocumentWithTokenMutationSchema = z.infer<
 export const ZAddSignersMutationSchema = z
   .object({
     documentId: z.number(),
-    teamId: z.number().optional(),
     signers: z.array(
       z.object({
         nativeId: z.number().optional(),

@@ -14,6 +14,7 @@ import { AppError, AppErrorCode } from '../../errors/app-error';
 
 export interface CreateTemplateRecipientsOptions {
   userId: number;
+  teamId?: number;
   templateId: number;
   recipients: {
     email: string;
@@ -35,27 +36,28 @@ export type TCreateTemplateRecipientsResponse = z.infer<
 
 export const createTemplateRecipients = async ({
   userId,
+  teamId,
   templateId,
   recipients: recipientsToCreate,
 }: CreateTemplateRecipientsOptions): Promise<TCreateTemplateRecipientsResponse> => {
   const template = await prisma.template.findFirst({
     where: {
       id: templateId,
-      OR: [
-        {
-          team: {
-            members: {
-              some: {
-                userId,
+      ...(teamId
+        ? {
+            team: {
+              id: teamId,
+              members: {
+                some: {
+                  userId,
+                },
               },
             },
-          },
-        },
-        {
-          userId,
-          teamId: null,
-        },
-      ],
+          }
+        : {
+            userId,
+            teamId: null,
+          }),
     },
     include: {
       Recipient: true,
@@ -67,8 +69,6 @@ export const createTemplateRecipients = async ({
       message: 'Template not found',
     });
   }
-
-  const teamId = template?.teamId ?? undefined;
 
   const recipientsHaveActionAuth = recipientsToCreate.some((recipient) => recipient.actionAuth);
 

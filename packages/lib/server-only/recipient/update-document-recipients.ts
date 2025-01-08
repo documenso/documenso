@@ -24,6 +24,7 @@ import { canRecipientBeModified } from '../../utils/recipients';
 
 export interface UpdateDocumentRecipientsOptions {
   userId: number;
+  teamId?: number;
   documentId: number;
   recipients: RecipientData[];
   requestMetadata: ApiRequestMetadata;
@@ -39,6 +40,7 @@ export type TUpdateDocumentRecipientsResponse = z.infer<
 
 export const updateDocumentRecipients = async ({
   userId,
+  teamId,
   documentId,
   recipients,
   requestMetadata,
@@ -46,21 +48,21 @@ export const updateDocumentRecipients = async ({
   const document = await prisma.document.findFirst({
     where: {
       id: documentId,
-      OR: [
-        {
-          team: {
-            members: {
-              some: {
-                userId,
+      ...(teamId
+        ? {
+            team: {
+              id: teamId,
+              members: {
+                some: {
+                  userId,
+                },
               },
             },
-          },
-        },
-        {
-          userId,
-          teamId: null,
-        },
-      ],
+          }
+        : {
+            userId,
+            teamId: null,
+          }),
     },
     include: {
       Field: true,
@@ -80,9 +82,6 @@ export const updateDocumentRecipients = async ({
       message: 'Document already complete',
     });
   }
-
-  const team = document?.team ?? undefined;
-  const teamId = team?.id ?? undefined;
 
   const recipientsHaveActionAuth = recipients.some((recipient) => recipient.actionAuth);
 

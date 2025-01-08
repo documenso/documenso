@@ -8,6 +8,7 @@ import { parseDocumentAuditLogData } from '../../utils/document-audit-logs';
 
 export interface FindDocumentAuditLogsOptions {
   userId: number;
+  teamId?: number;
   documentId: number;
   page?: number;
   perPage?: number;
@@ -21,6 +22,7 @@ export interface FindDocumentAuditLogsOptions {
 
 export const findDocumentAuditLogs = async ({
   userId,
+  teamId,
   documentId,
   page = 1,
   perPage = 30,
@@ -34,20 +36,21 @@ export const findDocumentAuditLogs = async ({
   const document = await prisma.document.findFirst({
     where: {
       id: documentId,
-      OR: [
-        {
-          userId,
-        },
-        {
-          team: {
-            members: {
-              some: {
-                userId,
+      ...(teamId
+        ? {
+            team: {
+              id: teamId,
+              members: {
+                some: {
+                  userId,
+                },
               },
             },
-          },
-        },
-      ],
+          }
+        : {
+            userId,
+            teamId: null,
+          }),
     },
   });
 

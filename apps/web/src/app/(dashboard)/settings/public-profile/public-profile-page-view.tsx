@@ -61,7 +61,6 @@ export const PublicProfilePageView = ({ user, team, profile }: PublicProfilePage
 
   const { data } = trpc.template.findTemplates.useQuery({
     perPage: 100,
-    teamId: team?.id,
   });
 
   const { mutateAsync: updateUserProfile, isLoading: isUpdatingUserProfile } =

@@ -125,6 +125,7 @@ export const DocumentPageView = async ({ params, team }: DocumentPageViewProps) 
     getFieldsForDocument({
       documentId,
       userId: user.id,
+      teamId: team?.id,
     }),
   ]);
 

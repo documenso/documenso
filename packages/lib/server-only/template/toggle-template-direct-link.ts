@@ -10,6 +10,7 @@ import { AppError, AppErrorCode } from '../../errors/app-error';
 export type ToggleTemplateDirectLinkOptions = {
   templateId: number;
   userId: number;
+  teamId?: number;
   enabled: boolean;
 };
 
@@ -22,25 +23,27 @@ export type TToggleTemplateDirectLinkResponse = z.infer<
 export const toggleTemplateDirectLink = async ({
   templateId,
   userId,
+  teamId,
   enabled,
 }: ToggleTemplateDirectLinkOptions): Promise<TToggleTemplateDirectLinkResponse> => {
   const template = await prisma.template.findFirst({
     where: {
       id: templateId,
-      OR: [
-        {
-          userId,
-        },
-        {
-          team: {
-            members: {
-              some: {
-                userId,
+      ...(teamId
+        ? {
+            team: {
+              id: teamId,
+              members: {
+                some: {
+                  userId,
+                },
               },
             },
-          },
-        },
-      ],
+          }
+        : {
+            userId,
+            teamId: null,
+          }),
     },
     include: {
       Recipient: true,

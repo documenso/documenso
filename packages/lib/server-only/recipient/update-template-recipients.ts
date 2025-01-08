@@ -16,6 +16,7 @@ import { AppError, AppErrorCode } from '../../errors/app-error';
 
 export interface UpdateTemplateRecipientsOptions {
   userId: number;
+  teamId?: number;
   templateId: number;
   recipients: {
     id: number;
@@ -38,27 +39,28 @@ export type TUpdateTemplateRecipientsResponse = z.infer<
 
 export const updateTemplateRecipients = async ({
   userId,
+  teamId,
   templateId,
   recipients,
 }: UpdateTemplateRecipientsOptions): Promise<TUpdateTemplateRecipientsResponse> => {
   const template = await prisma.template.findFirst({
     where: {
       id: templateId,
-      OR: [
-        {
-          team: {
-            members: {
-              some: {
-                userId,
+      ...(teamId
+        ? {
+            team: {
+              id: teamId,
+              members: {
+                some: {
+                  userId,
+                },
               },
             },
-          },
-        },
-        {
-          userId,
-          teamId: null,
-        },
-      ],
+          }
+        : {
+            userId,
+            teamId: null,
+          }),
     },
     include: {
       Recipient: true,
@@ -70,8 +72,6 @@ export const updateTemplateRecipients = async ({
       message: 'Template not found',
     });
   }
-
-  const teamId = template.teamId ?? undefined;
 
   const recipientsHaveActionAuth = recipients.some((recipient) => recipient.actionAuth);
 

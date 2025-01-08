@@ -29,25 +29,21 @@ export const getRecipientById = async ({
   const recipient = await prisma.recipient.findFirst({
     where: {
       id: recipientId,
-      Document: {
-        OR: [
-          teamId === undefined
-            ? {
-                userId,
-                teamId: null,
-              }
-            : {
-                teamId,
-                team: {
-                  members: {
-                    some: {
-                      userId,
-                    },
-                  },
+      Document: teamId
+        ? {
+            team: {
+              id: teamId,
+              members: {
+                some: {
+                  userId,
                 },
               },
-        ],
-      },
+            },
+          }
+        : {
+            userId,
+            teamId: null,
+          },
     },
     include: {
       Field: true,

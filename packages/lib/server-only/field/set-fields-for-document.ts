@@ -31,6 +31,7 @@ import { canRecipientFieldsBeModified } from '../../utils/recipients';
 
 export interface SetFieldsForDocumentOptions {
   userId: number;
+  teamId?: number;
   documentId: number;
   fields: FieldData[];
   requestMetadata: ApiRequestMetadata;
@@ -44,6 +45,7 @@ export type TSetFieldsForDocumentResponse = z.infer<typeof ZSetFieldsForDocument
 
 export const setFieldsForDocument = async ({
   userId,
+  teamId,
   documentId,
   fields,
   requestMetadata,
@@ -51,20 +53,21 @@ export const setFieldsForDocument = async ({
   const document = await prisma.document.findFirst({
     where: {
       id: documentId,
-      OR: [
-        {
-          userId,
-        },
-        {
-          team: {
-            members: {
-              some: {
-                userId,
+      ...(teamId
+        ? {
+            team: {
+              id: teamId,
+              members: {
+                some: {
+                  userId,
+                },
               },
             },
-          },
-        },
-      ],
+          }
+        : {
+            userId,
+            teamId: null,
+          }),
     },
     include: {
       Recipient: true,

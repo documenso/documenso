@@ -76,7 +76,6 @@ export const DocumentPageViewDropdown = ({ document, team }: DocumentPageViewDro
     try {
       const documentWithData = await trpcClient.document.getDocumentById.query({
         documentId: document.id,
-        teamId: team?.id,
       });
 
       const documentData = documentWithData?.documentData;

@@ -41,7 +41,8 @@ export const fieldRouter = router({
     .input(ZGetFieldQuerySchema)
     .output(ZGetFieldByIdResponseSchema)
     .query(async ({ input, ctx }) => {
-      const { fieldId, teamId } = input;
+      const { teamId } = ctx;
+      const { fieldId } = input;
 
       return await getFieldById({
         userId: ctx.user.id,
@@ -65,11 +66,13 @@ export const fieldRouter = router({
     .input(ZAddFieldsMutationSchema)
     .output(ZSetFieldsForDocumentResponseSchema)
     .mutation(async ({ input, ctx }) => {
+      const { teamId } = ctx;
       const { documentId, fields } = input;
 
       return await setFieldsForDocument({
         documentId,
         userId: ctx.user.id,
+        teamId,
         fields: fields.map((field) => ({
           id: field.nativeId,
           signerEmail: field.signerEmail,
@@ -100,11 +103,13 @@ export const fieldRouter = router({
     .input(ZAddTemplateFieldsMutationSchema)
     .output(ZSetFieldsForTemplateResponseSchema)
     .mutation(async ({ input, ctx }) => {
+      const { teamId } = ctx;
       const { templateId, fields } = input;
 
       return await setFieldsForTemplate({
-        userId: ctx.user.id,
         templateId,
+        userId: ctx.user.id,
+        teamId,
         fields: fields.map((field) => ({
           id: field.nativeId,
           signerEmail: field.signerEmail,

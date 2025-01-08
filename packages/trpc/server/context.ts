@@ -1,3 +1,5 @@
+import { z } from 'zod';
+
 import { getServerSession } from '@documenso/lib/next-auth/get-server-session';
 import type { ApiRequestMetadata } from '@documenso/lib/universal/extract-request-metadata';
 import { extractNextApiRequestMetadata } from '@documenso/lib/universal/extract-request-metadata';
@@ -17,10 +19,17 @@ export const createTrpcContext = async ({ req, res, requestSource }: CreateTrpcC
     auth: null,
   };
 
+  const teamId = z.coerce
+    .number()
+    .optional()
+    .catch(() => undefined)
+    .parse(req.headers['x-team-id']);
+
   if (!session) {
     return {
       session: null,
       user: null,
+      teamId,
       req,
       metadata,
     };
@@ -30,6 +39,7 @@ export const createTrpcContext = async ({ req, res, requestSource }: CreateTrpcC
     return {
       session: null,
       user: null,
+      teamId,
       req,
       metadata,
     };
@@ -38,6 +48,7 @@ export const createTrpcContext = async ({ req, res, requestSource }: CreateTrpcC
   return {
     session,
     user,
+    teamId,
     req,
     metadata,
   };

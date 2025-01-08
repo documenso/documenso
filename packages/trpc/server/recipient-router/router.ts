@@ -72,7 +72,8 @@ export const recipientRouter = router({
     .input(ZGetRecipientQuerySchema)
     .output(ZGetRecipientByIdResponseSchema)
     .query(async ({ input, ctx }) => {
-      const { recipientId, teamId } = input;
+      const { teamId } = ctx;
+      const { recipientId } = input;
 
       return await getRecipientById({
         userId: ctx.user.id,
@@ -97,10 +98,12 @@ export const recipientRouter = router({
     .input(ZCreateDocumentRecipientRequestSchema)
     .output(ZCreateDocumentRecipientResponseSchema)
     .mutation(async ({ input, ctx }) => {
+      const { teamId } = ctx;
       const { documentId, recipient } = input;
 
       const createdRecipients = await createDocumentRecipients({
         userId: ctx.user.id,
+        teamId,
         documentId,
         recipients: [recipient],
         requestMetadata: ctx.metadata,
@@ -125,10 +128,12 @@ export const recipientRouter = router({
     .input(ZCreateDocumentRecipientsRequestSchema)
     .output(ZCreateDocumentRecipientsResponseSchema)
     .mutation(async ({ input, ctx }) => {
+      const { teamId } = ctx;
       const { documentId, recipients } = input;
 
       return await createDocumentRecipients({
         userId: ctx.user.id,
+        teamId,
         documentId,
         recipients,
         requestMetadata: ctx.metadata,
@@ -151,10 +156,12 @@ export const recipientRouter = router({
     .input(ZUpdateDocumentRecipientRequestSchema)
     .output(ZUpdateDocumentRecipientResponseSchema)
     .mutation(async ({ input, ctx }) => {
+      const { teamId } = ctx;
       const { documentId, recipient } = input;
 
       const updatedRecipients = await updateDocumentRecipients({
         userId: ctx.user.id,
+        teamId,
         documentId,
         recipients: [recipient],
         requestMetadata: ctx.metadata,
@@ -179,10 +186,12 @@ export const recipientRouter = router({
     .input(ZUpdateDocumentRecipientsRequestSchema)
     .output(ZUpdateDocumentRecipientsResponseSchema)
     .mutation(async ({ input, ctx }) => {
+      const { teamId } = ctx;
       const { documentId, recipients } = input;
 
       return await updateDocumentRecipients({
         userId: ctx.user.id,
+        teamId,
         documentId,
         recipients,
         requestMetadata: ctx.metadata,
@@ -204,11 +213,13 @@ export const recipientRouter = router({
     .input(ZDeleteDocumentRecipientRequestSchema)
     .output(z.void())
     .mutation(async ({ input, ctx }) => {
+      const { teamId } = ctx;
       const { recipientId } = input;
 
       await deleteDocumentRecipient({
-        recipientId,
         userId: ctx.user.id,
+        teamId,
+        recipientId,
         requestMetadata: ctx.metadata,
       });
     }),
@@ -230,12 +241,13 @@ export const recipientRouter = router({
     .input(ZSetDocumentRecipientsRequestSchema)
     .output(ZSetDocumentRecipientsResponseSchema)
     .mutation(async ({ input, ctx }) => {
-      const { documentId, teamId, recipients } = input;
+      const { teamId } = ctx;
+      const { documentId, recipients } = input;
 
       return await setDocumentRecipients({
         userId: ctx.user.id,
-        documentId,
         teamId,
+        documentId,
         recipients: recipients.map((recipient) => ({
           id: recipient.nativeId,
           email: recipient.email,
@@ -264,10 +276,12 @@ export const recipientRouter = router({
     .input(ZCreateTemplateRecipientRequestSchema)
     .output(ZCreateTemplateRecipientResponseSchema)
     .mutation(async ({ input, ctx }) => {
+      const { teamId } = ctx;
       const { templateId, recipient } = input;
 
       const createdRecipients = await createTemplateRecipients({
         userId: ctx.user.id,
+        teamId,
         templateId,
         recipients: [recipient],
       });
@@ -291,10 +305,12 @@ export const recipientRouter = router({
     .input(ZCreateTemplateRecipientsRequestSchema)
     .output(ZCreateTemplateRecipientsResponseSchema)
     .mutation(async ({ input, ctx }) => {
+      const { teamId } = ctx;
       const { templateId, recipients } = input;
 
       return await createTemplateRecipients({
         userId: ctx.user.id,
+        teamId,
         templateId,
         recipients,
       });
@@ -316,10 +332,12 @@ export const recipientRouter = router({
     .input(ZUpdateTemplateRecipientRequestSchema)
     .output(ZUpdateTemplateRecipientResponseSchema)
     .mutation(async ({ input, ctx }) => {
+      const { teamId } = ctx;
       const { templateId, recipient } = input;
 
       const updatedRecipients = await updateTemplateRecipients({
         userId: ctx.user.id,
+        teamId,
         templateId,
         recipients: [recipient],
       });
@@ -343,10 +361,12 @@ export const recipientRouter = router({
     .input(ZUpdateTemplateRecipientsRequestSchema)
     .output(ZUpdateTemplateRecipientsResponseSchema)
     .mutation(async ({ input, ctx }) => {
+      const { teamId } = ctx;
       const { templateId, recipients } = input;
 
       return await updateTemplateRecipients({
         userId: ctx.user.id,
+        teamId,
         templateId,
         recipients,
       });
@@ -367,11 +387,13 @@ export const recipientRouter = router({
     .input(ZDeleteTemplateRecipientRequestSchema)
     .output(z.void())
     .mutation(async ({ input, ctx }) => {
+      const { teamId } = ctx;
       const { recipientId } = input;
 
       await deleteTemplateRecipient({
         recipientId,
         userId: ctx.user.id,
+        teamId,
       });
     }),
 
@@ -392,7 +414,8 @@ export const recipientRouter = router({
     .input(ZSetTemplateRecipientsRequestSchema)
     .output(ZSetTemplateRecipientsResponseSchema)
     .mutation(async ({ input, ctx }) => {
-      const { templateId, recipients, teamId } = input;
+      const { teamId } = ctx;
+      const { templateId, recipients } = input;
 
       return await setTemplateRecipients({
         userId: ctx.user.id,
@@ -451,7 +474,8 @@ export const recipientRouter = router({
     .input(ZAddSignersMutationSchema)
     .output(ZSetDocumentRecipientsResponseSchema)
     .mutation(async ({ input, ctx }) => {
-      const { documentId, teamId, signers } = input;
+      const { teamId } = ctx;
+      const { documentId, signers } = input;
 
       return await setDocumentRecipients({
         userId: ctx.user.id,

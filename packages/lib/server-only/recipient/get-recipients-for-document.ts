@@ -14,23 +14,21 @@ export const getRecipientsForDocument = async ({
   const recipients = await prisma.recipient.findMany({
     where: {
       documentId,
-      Document: {
-        OR: [
-          {
-            userId,
-          },
-          {
-            teamId,
+      Document: teamId
+        ? {
             team: {
+              id: teamId,
               members: {
                 some: {
                   userId,
                 },
               },
             },
+          }
+        : {
+            userId,
+            teamId: null,
           },
-        ],
-      },
     },
     orderBy: {
       id: 'asc',
