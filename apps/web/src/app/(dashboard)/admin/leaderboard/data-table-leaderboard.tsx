@@ -157,6 +157,9 @@ export const LeaderboardTable = ({
   const handleColumnSort = (column: 'name' | 'createdAt' | 'signingVolume') => {
     startTransition(() => {
       updateSearchParams({
+        search: debouncedSearchString,
+        page,
+        perPage,
         sortBy: column,
         sortOrder: sortBy === column && sortOrder === 'asc' ? 'desc' : 'asc',
       });
