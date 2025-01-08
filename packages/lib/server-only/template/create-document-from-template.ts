@@ -213,7 +213,7 @@ export const createDocumentFromTemplate = async ({
           globalAccessAuth: templateAuthOptions.globalAccessAuth,
           globalActionAuth: templateAuthOptions.globalActionAuth,
         }),
-        visibility: template.team?.teamGlobalSettings?.documentVisibility,
+        visibility: template.visibility || template.team?.teamGlobalSettings?.documentVisibility,
         documentMeta: {
           create: {
             subject: override?.subject || template.templateMeta?.subject,
