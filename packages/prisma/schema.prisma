@@ -407,6 +407,7 @@ enum RecipientRole {
   SIGNER
   VIEWER
   APPROVER
+  ASSISTANT
 }
 
 model Recipient {
