@@ -61,6 +61,7 @@ export const ZSuccessfulGetDocumentResponseSchema = ZSuccessfulDocumentResponseS
   fields: z.lazy(() =>
     ZFieldSchema.pick({
       id: true,
+      documentId: true,
       recipientId: true,
       type: true,
       page: true,
@@ -68,6 +69,8 @@ export const ZSuccessfulGetDocumentResponseSchema = ZSuccessfulDocumentResponseS
       positionY: true,
       width: true,
       height: true,
+      customText: true,
+      fieldMeta: true,
     })
       .extend({
         fieldMeta: ZFieldMetaSchema.nullish(),
@@ -551,7 +554,6 @@ export const ZTemplateWithDataSchema = ZTemplateSchema.extend({
     width: true,
     height: true,
     customText: true,
-    inserted: true,
     fieldMeta: true,
   }).array(),
   Recipient: ZRecipientSchema.pick({
