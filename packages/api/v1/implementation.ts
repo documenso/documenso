@@ -36,10 +36,10 @@ import { deleteTemplate } from '@documenso/lib/server-only/template/delete-templ
 import { findTemplates } from '@documenso/lib/server-only/template/find-templates';
 import { getTemplateById } from '@documenso/lib/server-only/template/get-template-by-id';
 import { extractDerivedDocumentEmailSettings } from '@documenso/lib/types/document-email';
-import { ZFieldMetaSchema } from '@documenso/lib/types/field-meta';
 import {
   ZCheckboxFieldMeta,
   ZDropdownFieldMeta,
+  ZFieldMetaSchema,
   ZNumberFieldMeta,
   ZRadioFieldMeta,
   ZTextFieldMeta,
