@@ -11,6 +11,7 @@ import { isValidRedirectUrl } from '@documenso/lib/utils/is-valid-redirect-url';
 import {
   DocumentDistributionMethod,
   DocumentSigningOrder,
+  DocumentVisibility,
   TemplateType,
 } from '@documenso/prisma/client';
 
@@ -84,6 +85,7 @@ export const ZUpdateTemplateSettingsMutationSchema = z.object({
   data: z.object({
     title: z.string().min(1).optional(),
     externalId: z.string().nullish(),
+    visibility: z.nativeEnum(DocumentVisibility).optional(),
     globalAccessAuth: ZDocumentAccessAuthTypesSchema.nullable().optional(),
     globalActionAuth: ZDocumentActionAuthTypesSchema.nullable().optional(),
     publicTitle: z.string().trim().min(1).max(MAX_TEMPLATE_PUBLIC_TITLE_LENGTH).optional(),

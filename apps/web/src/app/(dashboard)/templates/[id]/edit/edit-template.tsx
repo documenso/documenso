@@ -166,6 +166,7 @@ export const EditTemplateForm = ({
         data: {
           title: data.title,
           externalId: data.externalId || null,
+          visibility: data.visibility,
           globalAccessAuth: data.globalAccessAuth ?? null,
           globalActionAuth: data.globalActionAuth ?? null,
         },
