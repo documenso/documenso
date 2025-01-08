@@ -109,6 +109,8 @@ export const AddSettingsFormPartial = ({
           DATE_FORMATS.find((format) => format.value === document.documentMeta?.dateFormat)
             ?.value ?? DEFAULT_DOCUMENT_DATE_FORMAT,
         redirectUrl: document.documentMeta?.redirectUrl ?? '',
+        // The database defaults document language to 'en'
+        // If a user's preferred language is different (e.g., French), we want their new documents to automatically use their language instead of defaulting to English
         language: i18n.locale ?? i18n.locales?.[0] ?? document.documentMeta?.language ?? 'en',
       },
     },
