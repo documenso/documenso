@@ -303,26 +303,27 @@ export default async function SigningCertificate({ searchParams }: SigningCertif
             </TableBody>
           </Table>
         </CardContent>
+        <div className="my-8 flex flex-row-reverse items-end justify-between px-8">
+          <div className="flex items-end justify-end gap-x-4">
+            <div
+              className="flex h-24 w-24 justify-center"
+              dangerouslySetInnerHTML={{
+                __html: renderSVG(`${WEBAPP_BASE_URL}/documents/${documentId}`, {
+                  ecc: 'Q',
+                }),
+              }}
+            />
+          </div>
+
+          <div>
+            <p className="flex-shrink-0 text-sm print:text-xs">
+              {_(msg`Signing certificate provided by`)}:
+            </p>
+
+            <Logo className="mt-2 max-h-6 print:max-h-4" />
+          </div>
+        </div>
       </Card>
-
-      <div className="my-8 flex-row-reverse space-y-2">
-        <div className="flex items-end justify-end gap-x-4">
-          <div
-            className="flex h-36 justify-center"
-            dangerouslySetInnerHTML={{
-              __html: renderSVG(`${WEBAPP_BASE_URL}/documents/${documentId}`),
-            }}
-          />
-        </div>
-
-        <div className="flex items-end justify-end gap-x-4">
-          <p className="flex-shrink-0 text-sm font-medium print:text-xs">
-            {_(msg`Signing certificate provided by`)}:
-          </p>
-
-          <Logo className="max-h-6 print:max-h-4" />
-        </div>
-      </div>
     </div>
   );
 }
