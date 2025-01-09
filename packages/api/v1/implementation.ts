@@ -1,5 +1,6 @@
 import { createNextRoute } from '@ts-rest/next';
 import { match } from 'ts-pattern';
+import { z } from 'zod';
 
 import { getServerLimits } from '@documenso/ee/server-only/limits/server';
 import { NEXT_PUBLIC_WEBAPP_URL } from '@documenso/lib/constants/app';
@@ -62,6 +63,7 @@ import {
 
 import { ApiContractV1 } from './contract';
 import { authenticatedMiddleware } from './middleware/authenticated';
+import { ZTemplateWithDataSchema } from './schema';
 
 export const ApiContractV1Implementation = createNextRoute(ApiContractV1, {
   getDocuments: authenticatedMiddleware(async (args, user, team) => {
@@ -414,9 +416,11 @@ export const ApiContractV1Implementation = createNextRoute(ApiContractV1, {
         teamId: team?.id,
       });
 
+      const parsed = ZTemplateWithDataSchema.parse(template);
+
       return {
         status: 200,
-        body: template,
+        body: parsed,
       };
     } catch (err) {
       return AppError.toRestAPIError(err);
@@ -435,10 +439,12 @@ export const ApiContractV1Implementation = createNextRoute(ApiContractV1, {
         teamId: team?.id,
       });
 
+      const parsed = z.array(ZTemplateWithDataSchema).parse(templates);
+
       return {
         status: 200,
         body: {
-          templates,
+          templates: parsed,
           totalPages,
         },
       };
