@@ -67,6 +67,8 @@ test('[DIRECT_TEMPLATES]: create direct link for template', async ({ page }) => 
     await page.getByRole('button', { name: 'Enable direct link signing' }).click();
     await page.getByRole('button', { name: 'Create one automatically' }).click();
     await expect(page.getByRole('heading', { name: 'Direct Link Signing' })).toBeVisible();
+
+    await page.waitForTimeout(1000);
     await page.getByTestId('btn-dialog-close').click();
 
     // Expect badge to appear.
