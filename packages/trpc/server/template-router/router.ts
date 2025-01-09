@@ -120,18 +120,20 @@ export const templateRouter = router({
     }),
 
   /**
-   * @public
+   * Wait until RR7 so we can passthrough documents.
+   *
+   * @private
    */
   createTemplate: authenticatedProcedure
-    .meta({
-      openapi: {
-        method: 'POST',
-        path: '/template/create',
-        summary: 'Create template',
-        description: 'Create a new template',
-        tags: ['Template'],
-      },
-    })
+    // .meta({
+    //   openapi: {
+    //     method: 'POST',
+    //     path: '/template/create',
+    //     summary: 'Create template',
+    //     description: 'Create a new template',
+    //     tags: ['Template'],
+    //   },
+    // })
     .input(ZCreateTemplateMutationSchema)
     .output(ZCreateTemplateResponseSchema)
     .mutation(async ({ input, ctx }) => {

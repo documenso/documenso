@@ -67,7 +67,6 @@ export const updateDocumentRecipients = async ({
     include: {
       Field: true,
       Recipient: true,
-      team: true,
     },
   });
 
@@ -132,28 +131,25 @@ export const updateDocumentRecipients = async ({
 
     return {
       originalRecipient,
-      recipientUpdateData: recipient,
+      updateData: recipient,
     };
   });
 
   const updatedRecipients = await prisma.$transaction(async (tx) => {
     return await Promise.all(
-      recipientsToUpdate.map(async ({ originalRecipient, recipientUpdateData }) => {
+      recipientsToUpdate.map(async ({ originalRecipient, updateData }) => {
         let authOptions = ZRecipientAuthOptionsSchema.parse(originalRecipient.authOptions);
 
-        if (
-          recipientUpdateData.actionAuth !== undefined ||
-          recipientUpdateData.accessAuth !== undefined
-        ) {
+        if (updateData.actionAuth !== undefined || updateData.accessAuth !== undefined) {
           authOptions = createRecipientAuthOptions({
-            accessAuth: recipientUpdateData.accessAuth || authOptions.accessAuth,
-            actionAuth: recipientUpdateData.actionAuth || authOptions.actionAuth,
+            accessAuth: updateData.accessAuth || authOptions.accessAuth,
+            actionAuth: updateData.actionAuth || authOptions.actionAuth,
           });
         }
 
         const mergedRecipient = {
           ...originalRecipient,
-          ...recipientUpdateData,
+          ...updateData,
         };
 
         const updatedRecipient = await tx.recipient.update({

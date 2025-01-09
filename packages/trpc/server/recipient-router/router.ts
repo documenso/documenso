@@ -225,19 +225,19 @@ export const recipientRouter = router({
     }),
 
   /**
-   * @public
+   * @private
    */
   setDocumentRecipients: authenticatedProcedure
-    .meta({
-      openapi: {
-        method: 'POST',
-        path: '/document/recipient/set',
-        summary: 'Set document recipients',
-        description:
-          'This will replace all recipients attached to the document. If the array contains existing recipients, they will be updated and the original fields will be retained.',
-        tags: ['Document Recipients'],
-      },
-    })
+    // .meta({
+    //   openapi: {
+    //     method: 'POST',
+    //     path: '/document/recipient/set',
+    //     summary: 'Set document recipients',
+    //     description:
+    //       'This will replace all recipients attached to the document. If the array contains existing recipients, they will be updated and the original fields will be retained.',
+    //     tags: ['Document Recipients'],
+    //   },
+    // })
     .input(ZSetDocumentRecipientsRequestSchema)
     .output(ZSetDocumentRecipientsResponseSchema)
     .mutation(async ({ input, ctx }) => {
@@ -398,19 +398,19 @@ export const recipientRouter = router({
     }),
 
   /**
-   * @public
+   * @private
    */
   setTemplateRecipients: authenticatedProcedure
-    .meta({
-      openapi: {
-        method: 'POST',
-        path: '/template/recipient/set',
-        summary: 'Set template recipients',
-        description:
-          'This will replace all recipients attached to the template. If the array contains existing recipients, they will be updated and the original fields will be retained.',
-        tags: ['Template Recipients'],
-      },
-    })
+    // .meta({
+    //   openapi: {
+    //     method: 'POST',
+    //     path: '/template/recipient/set',
+    //     summary: 'Set template recipients',
+    //     description:
+    //       'This will replace all recipients attached to the template. If the array contains existing recipients, they will be updated and the original fields will be retained.',
+    //     tags: ['Template Recipients'],
+    //   },
+    // })
     .input(ZSetTemplateRecipientsRequestSchema)
     .output(ZSetTemplateRecipientsResponseSchema)
     .mutation(async ({ input, ctx }) => {

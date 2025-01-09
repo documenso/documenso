@@ -1,0 +1,129 @@
+import { z } from 'zod';
+
+import type { TFieldMetaSchema } from '@documenso/lib/types/field-meta';
+import { prisma } from '@documenso/prisma';
+import type { FieldType } from '@documenso/prisma/client';
+import { FieldSchema } from '@documenso/prisma/generated/zod';
+
+import { AppError, AppErrorCode } from '../../errors/app-error';
+import { canRecipientFieldsBeModified } from '../../utils/recipients';
+
+export interface UpdateTemplateFieldsOptions {
+  userId: number;
+  teamId?: number;
+  templateId: number;
+  fields: {
+    id: number;
+    type?: FieldType;
+    pageNumber?: number;
+    pageX?: number;
+    pageY?: number;
+    width?: number;
+    height?: number;
+    fieldMeta?: TFieldMetaSchema;
+  }[];
+}
+
+export const ZUpdateTemplateFieldsResponseSchema = z.object({
+  fields: z.array(FieldSchema),
+});
+
+export type TUpdateTemplateFieldsResponse = z.infer<typeof ZUpdateTemplateFieldsResponseSchema>;
+
+export const updateTemplateFields = async ({
+  userId,
+  teamId,
+  templateId,
+  fields,
+}: UpdateTemplateFieldsOptions): Promise<TUpdateTemplateFieldsResponse> => {
+  const template = await prisma.template.findFirst({
+    where: {
+      id: templateId,
+      ...(teamId
+        ? {
+            team: {
+              id: teamId,
+              members: {
+                some: {
+                  userId,
+                },
+              },
+            },
+          }
+        : {
+            userId,
+            teamId: null,
+          }),
+    },
+    include: {
+      Recipient: true,
+      Field: true,
+    },
+  });
+
+  if (!template) {
+    throw new AppError(AppErrorCode.NOT_FOUND, {
+      message: 'Document not found',
+    });
+  }
+
+  const fieldsToUpdate = fields.map((field) => {
+    const originalField = template.Field.find((existingField) => existingField.id === field.id);
+
+    if (!originalField) {
+      throw new AppError(AppErrorCode.NOT_FOUND, {
+        message: `Field with id ${field.id} not found`,
+      });
+    }
+
+    const recipient = template.Recipient.find(
+      (recipient) => recipient.id === originalField.recipientId,
+    );
+
+    // Each field MUST have a recipient associated with it.
+    if (!recipient) {
+      throw new AppError(AppErrorCode.INVALID_REQUEST, {
+        message: `Recipient attached to field ${field.id} not found`,
+      });
+    }
+
+    // Check whether the recipient associated with the field can be modified.
+    if (!canRecipientFieldsBeModified(recipient, template.Field)) {
+      throw new AppError(AppErrorCode.INVALID_REQUEST, {
+        message:
+          'Cannot modify a field where the recipient has already interacted with the document',
+      });
+    }
+
+    return {
+      updateData: field,
+    };
+  });
+
+  const updatedFields = await prisma.$transaction(async (tx) => {
+    return await Promise.all(
+      fieldsToUpdate.map(async ({ updateData }) => {
+        const updatedField = await tx.field.update({
+          where: {
+            id: updateData.id,
+          },
+          data: {
+            type: updateData.type,
+            page: updateData.pageNumber,
+            positionX: updateData.pageX,
+            positionY: updateData.pageY,
+            width: updateData.width,
+            height: updateData.height,
+            fieldMeta: updateData.fieldMeta,
+          },
+        });
+
+        return updatedField;
+      }),
+    );
+  });
+
+  return {
+    fields: updatedFields,
+  };
+};

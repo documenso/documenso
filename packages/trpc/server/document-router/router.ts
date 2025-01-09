@@ -163,17 +163,19 @@ export const documentRouter = router({
     }),
 
   /**
-   * @public
+   * Wait until RR7 so we can passthrough documents.
+   *
+   * @private
    */
   createDocument: authenticatedProcedure
-    .meta({
-      openapi: {
-        method: 'POST',
-        path: '/document/create',
-        summary: 'Create document',
-        tags: ['Document'],
-      },
-    })
+    // .meta({
+    //   openapi: {
+    //     method: 'POST',
+    //     path: '/document/create',
+    //     summary: 'Create document',
+    //     tags: ['Document'],
+    //   },
+    // })
     .input(ZCreateDocumentMutationSchema)
     .output(ZCreateDocumentResponseSchema)
     .mutation(async ({ input, ctx }) => {
