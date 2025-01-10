@@ -134,6 +134,10 @@ export const AddSignersFormPartial = ({
   const watchedSigners = watch('signers');
   const isSigningOrderSequential = watch('signingOrder') === DocumentSigningOrder.SEQUENTIAL;
 
+  const hasAssistantRole = useMemo(() => {
+    return watchedSigners.some((signer) => signer.role === RecipientRole.ASSISTANT);
+  }, [watchedSigners]);
+
   const normalizeSigningOrders = (signers: typeof watchedSigners) => {
     return signers
       .sort((a, b) => (a.signingOrder ?? 0) - (b.signingOrder ?? 0))
@@ -410,7 +414,7 @@ export const AddSignersFormPartial = ({
                           checked ? DocumentSigningOrder.SEQUENTIAL : DocumentSigningOrder.PARALLEL,
                         )
                       }
-                      disabled={isSubmitting || hasDocumentBeenSent}
+                      disabled={isSubmitting || hasDocumentBeenSent || hasAssistantRole}
                     />
                   </FormControl>
 
