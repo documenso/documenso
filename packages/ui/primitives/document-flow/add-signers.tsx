@@ -308,6 +308,28 @@ export const AddSignersFormPartial = ({
     [signers],
   );
 
+  const handleRoleChange = useCallback(
+    (index: number, role: RecipientRole) => {
+      const currentSigners = form.getValues('signers');
+
+      if (role === RecipientRole.ASSISTANT) {
+        form.setValue('signingOrder', DocumentSigningOrder.SEQUENTIAL);
+
+        const updatedSigners = currentSigners.map((signer, idx) => ({
+          ...signer,
+          signingOrder: idx === index ? 1 : signer.signingOrder ? signer.signingOrder + 1 : idx + 2,
+        }));
+
+        updatedSigners.forEach((signer, idx) => {
+          form.setValue(`signers.${idx}.signingOrder`, signer.signingOrder);
+        });
+      }
+
+      form.setValue(`signers.${index}.role`, role);
+    },
+    [form],
+  );
+
   const updateSigningOrders = useCallback(
     (newIndex: number, oldIndex: number) => {
       const updatedSigners = form.getValues('signers').map((signer, index) => {
@@ -354,35 +376,10 @@ export const AddSignersFormPartial = ({
       const newIndex = newOrder - 1;
       if (index !== newIndex) {
         updateSigningOrders(newIndex, index);
-        triggerDragAndDrop(index, newIndex);
       }
     },
-    [form, triggerDragAndDrop, updateSigningOrders],
+    [form, updateSigningOrders],
   );
-
-  const handleRoleChange = useCallback(
-    (index: number, role: RecipientRole) => {
-      const currentSigners = form.getValues('signers');
-
-      if (role === RecipientRole.ASSISTANT) {
-        form.setValue('signingOrder', DocumentSigningOrder.SEQUENTIAL);
-
-        const updatedSigners = currentSigners.map((signer, idx) => ({
-          ...signer,
-          signingOrder: idx === index ? 1 : signer.signingOrder ? signer.signingOrder + 1 : idx + 2,
-        }));
-
-        updatedSigners.forEach((signer, idx) => {
-          form.setValue(`signers.${idx}.signingOrder`, signer.signingOrder);
-        });
-      }
-
-      form.setValue(`signers.${index}.role`, role);
-    },
-    [form],
-  );
-
-  // as long as there is an assistant role, avoid disabling signing order
 
   return (
     <>
