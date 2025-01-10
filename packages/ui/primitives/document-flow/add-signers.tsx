@@ -360,6 +360,30 @@ export const AddSignersFormPartial = ({
     [form, triggerDragAndDrop, updateSigningOrders],
   );
 
+  const handleRoleChange = useCallback(
+    (index: number, role: RecipientRole) => {
+      const currentSigners = form.getValues('signers');
+
+      if (role === RecipientRole.ASSISTANT) {
+        form.setValue('signingOrder', DocumentSigningOrder.SEQUENTIAL);
+
+        const updatedSigners = currentSigners.map((signer, idx) => ({
+          ...signer,
+          signingOrder: idx === index ? 1 : signer.signingOrder ? signer.signingOrder + 1 : idx + 2,
+        }));
+
+        updatedSigners.forEach((signer, idx) => {
+          form.setValue(`signers.${idx}.signingOrder`, signer.signingOrder);
+        });
+      }
+
+      form.setValue(`signers.${index}.role`, role);
+    },
+    [form],
+  );
+
+  // as long as there is an assistant role, avoid disabling signing order
+
   return (
     <>
       <DocumentFlowFormContainerHeader
@@ -613,7 +637,10 @@ export const AddSignersFormPartial = ({
                                       <FormControl>
                                         <RecipientRoleSelect
                                           {...field}
-                                          onValueChange={field.onChange}
+                                          onValueChange={(value) =>
+                                            // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
+                                            handleRoleChange(index, value as RecipientRole)
+                                          }
                                           disabled={
                                             snapshot.isDragging ||
                                             isSubmitting ||
