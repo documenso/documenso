@@ -517,6 +517,7 @@ export const AddFieldsFormPartial = ({
       VIEWER: [],
       SIGNER: [],
       APPROVER: [],
+      ASSISTANT: [],
     };
 
     recipients.forEach((recipient) => {

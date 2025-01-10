@@ -1,6 +1,6 @@
 'use client';
 
-import React, { forwardRef } from 'react';
+import { forwardRef } from 'react';
 
 import { Trans } from '@lingui/macro';
 import type { SelectProps } from '@radix-ui/react-select';
@@ -110,6 +110,27 @@ export const RecipientRoleSelect = forwardRef<HTMLButtonElement, RecipientRoleSe
             </div>
           </SelectItem>
         )}
+
+        <SelectItem value={RecipientRole.ASSISTANT}>
+          <div className="flex items-center">
+            <div className="flex w-[150px] items-center">
+              <span className="mr-2">{ROLE_ICONS[RecipientRole.ASSISTANT]}</span>
+              <Trans>Assistant Role</Trans>
+            </div>
+            <Tooltip>
+              <TooltipTrigger>
+                <InfoIcon className="h-4 w-4" />
+              </TooltipTrigger>
+              <TooltipContent className="text-foreground z-9999 max-w-md p-4">
+                <p>
+                  <Trans>
+                    The recipient is required to assist the document for it to be completed.
+                  </Trans>
+                </p>
+              </TooltipContent>
+            </Tooltip>
+          </div>
+        </SelectItem>
       </SelectContent>
     </Select>
   ),
