@@ -16,8 +16,7 @@ import { findDocuments } from '@documenso/lib/server-only/document/find-document
 import { getDocumentById } from '@documenso/lib/server-only/document/get-document-by-id';
 import { resendDocument } from '@documenso/lib/server-only/document/resend-document';
 import { sendDocument } from '@documenso/lib/server-only/document/send-document';
-import { updateDocument } from '@documenso/lib/server-only/document/update-document';
-import { updateDocumentSettings } from '@documenso/lib/server-only/document/update-document-settings';
+import { updateDocument as updateDocumentSettings } from '@documenso/lib/server-only/document/update-document';
 import { deleteField } from '@documenso/lib/server-only/field/delete-field';
 import { getFieldById } from '@documenso/lib/server-only/field/get-field-by-id';
 import { getFieldsForDocument } from '@documenso/lib/server-only/field/get-fields-for-document';
@@ -54,6 +53,7 @@ import {
 } from '@documenso/lib/universal/upload/server-actions';
 import { createDocumentAuditLogData } from '@documenso/lib/utils/document-audit-logs';
 import { prisma } from '@documenso/prisma';
+import type { Prisma } from '@documenso/prisma/client';
 import {
   DocumentDataType,
   DocumentStatus,
@@ -1580,3 +1580,39 @@ export const ApiContractV1Implementation = createNextRoute(ApiContractV1, {
     };
   }),
 });
+
+const updateDocument = async ({
+  documentId,
+  userId,
+  teamId,
+  data,
+}: {
+  documentId: number;
+  data: Prisma.DocumentUpdateInput;
+  userId: number;
+  teamId?: number;
+}) => {
+  return await prisma.document.update({
+    where: {
+      id: documentId,
+      ...(teamId
+        ? {
+            team: {
+              id: teamId,
+              members: {
+                some: {
+                  userId,
+                },
+              },
+            },
+          }
+        : {
+            userId,
+            teamId: null,
+          }),
+    },
+    data: {
+      ...data,
+    },
+  });
+};

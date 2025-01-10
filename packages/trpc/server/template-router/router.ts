@@ -43,9 +43,9 @@ import {
   toggleTemplateDirectLink,
 } from '@documenso/lib/server-only/template/toggle-template-direct-link';
 import {
-  ZUpdateTemplateSettingsResponseSchema,
-  updateTemplateSettings,
-} from '@documenso/lib/server-only/template/update-template-settings';
+  ZUpdateTemplateResponseSchema,
+  updateTemplate,
+} from '@documenso/lib/server-only/template/update-template';
 import type { Document } from '@documenso/prisma/client';
 
 import { authenticatedProcedure, maybeAuthenticatedProcedure, router } from '../trpc';
@@ -60,9 +60,8 @@ import {
   ZFindTemplatesQuerySchema,
   ZGetTemplateByIdQuerySchema,
   ZMoveTemplatesToTeamSchema,
-  ZSetSigningOrderForTemplateMutationSchema,
   ZToggleTemplateDirectLinkMutationSchema,
-  ZUpdateTemplateSettingsMutationSchema,
+  ZUpdateTemplateRequestSchema,
 } from './schema';
 
 export const templateRouter = router({
@@ -157,15 +156,15 @@ export const templateRouter = router({
         tags: ['Template'],
       },
     })
-    .input(ZUpdateTemplateSettingsMutationSchema)
-    .output(ZUpdateTemplateSettingsResponseSchema)
+    .input(ZUpdateTemplateRequestSchema)
+    .output(ZUpdateTemplateResponseSchema)
     .mutation(async ({ input, ctx }) => {
       const { teamId } = ctx;
       const { templateId, data, meta } = input;
 
       const userId = ctx.user.id;
 
-      return await updateTemplateSettings({
+      return await updateTemplate({
         userId,
         teamId,
         templateId,
@@ -318,24 +317,6 @@ export const templateRouter = router({
             }
           : undefined,
         requestMetadata: ctx.metadata,
-      });
-    }),
-
-  /**
-   * @private
-   */
-  setSigningOrderForTemplate: authenticatedProcedure
-    .input(ZSetSigningOrderForTemplateMutationSchema)
-    .mutation(async ({ input, ctx }) => {
-      const { teamId } = ctx;
-      const { templateId, signingOrder } = input;
-
-      return await updateTemplateSettings({
-        templateId,
-        teamId,
-        data: {},
-        meta: { signingOrder },
-        userId: ctx.user.id,
       });
     }),
 

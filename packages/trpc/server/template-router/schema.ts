@@ -92,7 +92,7 @@ export const ZDeleteTemplateMutationSchema = z.object({
 export const MAX_TEMPLATE_PUBLIC_TITLE_LENGTH = 50;
 export const MAX_TEMPLATE_PUBLIC_DESCRIPTION_LENGTH = 256;
 
-export const ZUpdateTemplateSettingsMutationSchema = z.object({
+export const ZUpdateTemplateRequestSchema = z.object({
   templateId: z.number(),
   data: z
     .object({
@@ -133,13 +133,9 @@ export const ZUpdateTemplateSettingsMutationSchema = z.object({
       redirectUrl: ZDocumentMetaRedirectUrlSchema.optional(),
       language: ZDocumentMetaLanguageSchema.optional(),
       typedSignatureEnabled: ZDocumentMetaTypedSignatureEnabledSchema.optional(),
+      signingOrder: z.nativeEnum(DocumentSigningOrder).optional(),
     })
     .optional(),
-});
-
-export const ZSetSigningOrderForTemplateMutationSchema = z.object({
-  templateId: z.number(),
-  signingOrder: z.nativeEnum(DocumentSigningOrder),
 });
 
 export const ZFindTemplatesQuerySchema = ZFindSearchParamsSchema.extend({

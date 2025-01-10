@@ -11,7 +11,7 @@ import { AppError, AppErrorCode } from '../../errors/app-error';
 import type { TDocumentAccessAuthTypes, TDocumentActionAuthTypes } from '../../types/document-auth';
 import { createDocumentAuthOptions, extractDocumentAuthMethods } from '../../utils/document-auth';
 
-export type UpdateTemplateSettingsOptions = {
+export type UpdateTemplateOptions = {
   userId: number;
   teamId?: number;
   templateId: number;
@@ -28,17 +28,17 @@ export type UpdateTemplateSettingsOptions = {
   meta?: Partial<Omit<TemplateMeta, 'id' | 'templateId'>>;
 };
 
-export const ZUpdateTemplateSettingsResponseSchema = TemplateSchema;
+export const ZUpdateTemplateResponseSchema = TemplateSchema;
 
-export type TUpdateTemplateSettingsResponse = z.infer<typeof ZUpdateTemplateSettingsResponseSchema>;
+export type TUpdateTemplateResponse = z.infer<typeof ZUpdateTemplateResponseSchema>;
 
-export const updateTemplateSettings = async ({
+export const updateTemplate = async ({
   userId,
   teamId,
   templateId,
   meta = {},
   data = {},
-}: UpdateTemplateSettingsOptions): Promise<TUpdateTemplateSettingsResponse> => {
+}: UpdateTemplateOptions): Promise<TUpdateTemplateResponse> => {
   const template = await prisma.template.findFirstOrThrow({
     where: {
       id: templateId,

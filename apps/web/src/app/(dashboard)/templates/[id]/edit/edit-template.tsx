@@ -103,19 +103,6 @@ export const EditTemplateForm = ({
     },
   });
 
-  const { mutateAsync: setSigningOrderForTemplate } =
-    trpc.template.setSigningOrderForTemplate.useMutation({
-      ...DO_NOT_INVALIDATE_QUERY_ON_MUTATION,
-      onSuccess: (newData) => {
-        utils.template.getTemplateById.setData(
-          {
-            templateId: initialTemplate.id,
-          },
-          (oldData) => ({ ...(oldData || initialTemplate), ...newData }),
-        );
-      },
-    });
-
   const { mutateAsync: addTemplateFields } = trpc.field.addTemplateFields.useMutation({
     ...DO_NOT_INVALIDATE_QUERY_ON_MUTATION,
     onSuccess: (newData) => {
@@ -177,9 +164,11 @@ export const EditTemplateForm = ({
   ) => {
     try {
       await Promise.all([
-        setSigningOrderForTemplate({
+        updateTemplateSettings({
           templateId: template.id,
-          signingOrder: data.signingOrder,
+          meta: {
+            signingOrder: data.signingOrder,
+          },
         }),
 
         setRecipients({

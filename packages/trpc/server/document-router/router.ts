@@ -40,8 +40,8 @@ import {
 } from '@documenso/lib/server-only/document/send-document';
 import {
   ZUpdateDocumentResponseSchema,
-  updateDocumentSettings,
-} from '@documenso/lib/server-only/document/update-document-settings';
+  updateDocument,
+} from '@documenso/lib/server-only/document/update-document';
 import { symmetricEncrypt } from '@documenso/lib/universal/crypto';
 import { DocumentStatus } from '@documenso/prisma/client';
 
@@ -242,7 +242,7 @@ export const documentRouter = router({
         });
       }
 
-      return await updateDocumentSettings({
+      return await updateDocument({
         userId,
         teamId,
         documentId,
