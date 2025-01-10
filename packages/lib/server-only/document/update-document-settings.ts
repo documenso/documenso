@@ -21,7 +21,7 @@ export type UpdateDocumentSettingsOptions = {
   userId: number;
   teamId?: number;
   documentId: number;
-  data: {
+  data?: {
     title?: string;
     externalId?: string | null;
     visibility?: DocumentVisibility | null;
@@ -31,9 +31,9 @@ export type UpdateDocumentSettingsOptions = {
   requestMetadata: ApiRequestMetadata;
 };
 
-export const ZUpdateDocumentSettingsResponseSchema = DocumentSchema;
+export const ZUpdateDocumentResponseSchema = DocumentSchema;
 
-export type TUpdateDocumentSettingsResponse = z.infer<typeof ZUpdateDocumentSettingsResponseSchema>;
+export type TUpdateDocumentSettingsResponse = z.infer<typeof ZUpdateDocumentResponseSchema>;
 
 export const updateDocumentSettings = async ({
   userId,
@@ -42,13 +42,7 @@ export const updateDocumentSettings = async ({
   data,
   requestMetadata,
 }: UpdateDocumentSettingsOptions): Promise<TUpdateDocumentSettingsResponse> => {
-  if (!data.title && !data.globalAccessAuth && !data.globalActionAuth) {
-    throw new AppError(AppErrorCode.INVALID_BODY, {
-      message: 'Missing data to update',
-    });
-  }
-
-  const document = await prisma.document.findFirstOrThrow({
+  const document = await prisma.document.findFirst({
     where: {
       id: documentId,
       ...(teamId
@@ -83,10 +77,16 @@ export const updateDocumentSettings = async ({
     },
   });
 
+  if (!document) {
+    throw new AppError(AppErrorCode.NOT_FOUND, {
+      message: 'Document not found',
+    });
+  }
+
   if (teamId) {
     const currentUserRole = document.team?.members[0]?.role;
     const isDocumentOwner = document.userId === userId;
-    const requestedVisibility = data.visibility;
+    const requestedVisibility = data?.visibility;
 
     if (!isDocumentOwner) {
       match(currentUserRole)
@@ -122,6 +122,11 @@ export const updateDocumentSettings = async ({
           });
         });
     }
+  }
+
+  // If no data just return the document since this function is normally chained after a meta update.
+  if (!data || Object.values(data).length === 0) {
+    return document;
   }
 
   const { documentAuthOption } = extractDocumentAuthMethods({

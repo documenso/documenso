@@ -73,7 +73,7 @@ export const EditDocumentForm = ({
 
   const { Recipient: recipients, Field: fields } = document;
 
-  const { mutateAsync: setSettingsForDocument } = trpc.document.setSettingsForDocument.useMutation({
+  const { mutateAsync: updateDocument } = trpc.document.setSettingsForDocument.useMutation({
     ...DO_NOT_INVALIDATE_QUERY_ON_MUTATION,
     onSuccess: (newData) => {
       utils.document.getDocumentWithDetailsById.setData(
@@ -109,23 +109,6 @@ export const EditDocumentForm = ({
       );
     },
   });
-
-  const { mutateAsync: updateTypedSignature } =
-    trpc.document.updateTypedSignatureSettings.useMutation({
-      ...DO_NOT_INVALIDATE_QUERY_ON_MUTATION,
-      onSuccess: (newData) => {
-        utils.document.getDocumentWithDetailsById.setData(
-          {
-            documentId: initialDocument.id,
-          },
-          (oldData) => ({
-            ...(oldData || initialDocument),
-            ...newData,
-            id: Number(newData.id),
-          }),
-        );
-      },
-    });
 
   const { mutateAsync: setRecipients } = trpc.recipient.setDocumentRecipients.useMutation({
     ...DO_NOT_INVALIDATE_QUERY_ON_MUTATION,
@@ -198,7 +181,7 @@ export const EditDocumentForm = ({
     try {
       const { timezone, dateFormat, redirectUrl, language } = data.meta;
 
-      await setSettingsForDocument({
+      await updateDocument({
         documentId: document.id,
         data: {
           title: data.title,
@@ -270,9 +253,12 @@ export const EditDocumentForm = ({
         fields: data.fields,
       });
 
-      await updateTypedSignature({
+      await updateDocument({
         documentId: document.id,
-        typedSignatureEnabled: data.typedSignatureEnabled,
+
+        meta: {
+          typedSignatureEnabled: data.typedSignatureEnabled,
+        },
       });
 
       // Clear all field data from localStorage

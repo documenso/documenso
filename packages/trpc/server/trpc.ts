@@ -88,7 +88,7 @@ export const authenticatedMiddleware = t.middleware(async ({ ctx, next }) => {
   if (!ctx.session) {
     throw new TRPCError({
       code: 'UNAUTHORIZED',
-      message: 'You must be logged in to perform this action.',
+      message: 'Invalid session or API token.',
     });
   }
 

@@ -1,8 +1,6 @@
-import { TRPCError } from '@trpc/server';
 import { z } from 'zod';
 
 import { getServerLimits } from '@documenso/ee/server-only/limits/server';
-import { isValidLanguageCode } from '@documenso/lib/constants/i18n';
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import {
   ZGetDocumentWithDetailsByIdResponseSchema,
@@ -65,7 +63,6 @@ import {
   ZSetSigningOrderForTemplateMutationSchema,
   ZToggleTemplateDirectLinkMutationSchema,
   ZUpdateTemplateSettingsMutationSchema,
-  ZUpdateTemplateTypedSignatureSettingsMutationSchema,
 } from './schema';
 
 export const templateRouter = router({
@@ -76,7 +73,7 @@ export const templateRouter = router({
     .meta({
       openapi: {
         method: 'GET',
-        path: '/template/find',
+        path: '/template',
         summary: 'Find templates',
         description: 'Find templates based on a search criteria',
         tags: ['Template'],
@@ -155,7 +152,7 @@ export const templateRouter = router({
     .meta({
       openapi: {
         method: 'POST',
-        path: '/template/{templateId}',
+        path: '/template/update',
         summary: 'Update template',
         tags: ['Template'],
       },
@@ -173,10 +170,7 @@ export const templateRouter = router({
         teamId,
         templateId,
         data,
-        meta: {
-          ...meta,
-          language: isValidLanguageCode(meta?.language) ? meta?.language : undefined,
-        },
+        meta,
       });
     }),
 
@@ -187,7 +181,7 @@ export const templateRouter = router({
     .meta({
       openapi: {
         method: 'POST',
-        path: '/template/{templateId}/duplicate',
+        path: '/template/duplicate',
         summary: 'Duplicate template',
         tags: ['Template'],
       },
@@ -211,8 +205,8 @@ export const templateRouter = router({
   deleteTemplate: authenticatedProcedure
     .meta({
       openapi: {
-        method: 'POST',
-        path: '/template/{templateId}/delete',
+        method: 'DELETE',
+        path: '/template/{templateId}',
         summary: 'Delete template',
         tags: ['Template'],
       },
@@ -235,7 +229,7 @@ export const templateRouter = router({
     .meta({
       openapi: {
         method: 'POST',
-        path: '/template/{templateId}/use',
+        path: '/template/use',
         summary: 'Use template',
         description: 'Use the template to create a document',
         tags: ['Template'],
@@ -283,18 +277,20 @@ export const templateRouter = router({
     }),
 
   /**
-   * @public
+   * Leaving this endpoint as private for now until there is a use case for it.
+   *
+   * @private
    */
   createDocumentFromDirectTemplate: maybeAuthenticatedProcedure
-    .meta({
-      openapi: {
-        method: 'POST',
-        path: '/template/use',
-        summary: 'Use direct template',
-        description: 'Use a direct template to create a document',
-        tags: ['Template'],
-      },
-    })
+    // .meta({
+    //   openapi: {
+    //     method: 'POST',
+    //     path: '/template/direct/use',
+    //     summary: 'Use direct template',
+    //     description: 'Use a direct template to create a document',
+    //     tags: ['Template'],
+    //   },
+    // })
     .input(ZCreateDocumentFromDirectTemplateMutationSchema)
     .output(ZCreateDocumentFromDirectTemplateResponseSchema)
     .mutation(async ({ input, ctx }) => {
@@ -350,7 +346,7 @@ export const templateRouter = router({
     .meta({
       openapi: {
         method: 'POST',
-        path: '/template/{templateId}/direct/create',
+        path: '/template/direct/create',
         summary: 'Create direct link',
         description: 'Create a direct link for a template',
         tags: ['Template'],
@@ -383,8 +379,8 @@ export const templateRouter = router({
   deleteTemplateDirectLink: authenticatedProcedure
     .meta({
       openapi: {
-        method: 'POST',
-        path: '/template/{templateId}/direct/delete',
+        method: 'DELETE',
+        path: '/template/direct/{templateId}',
         summary: 'Delete direct link',
         description: 'Delete a direct link for a template',
         tags: ['Template'],
@@ -432,7 +428,7 @@ export const templateRouter = router({
     .meta({
       openapi: {
         method: 'POST',
-        path: '/template/{templateId}/move',
+        path: '/template/move',
         summary: 'Move template',
         description: 'Move a template to a team',
         tags: ['Template'],
@@ -448,39 +444,6 @@ export const templateRouter = router({
         templateId,
         teamId,
         userId,
-      });
-    }),
-
-  /**
-   * @private
-   */
-  updateTemplateTypedSignatureSettings: authenticatedProcedure
-    .input(ZUpdateTemplateTypedSignatureSettingsMutationSchema)
-    .mutation(async ({ input, ctx }) => {
-      const { teamId } = ctx;
-      const { templateId, typedSignatureEnabled } = input;
-
-      const template = await getTemplateById({
-        id: templateId,
-        userId: ctx.user.id,
-        teamId,
-      }).catch(() => null);
-
-      if (!template) {
-        throw new TRPCError({
-          code: 'NOT_FOUND',
-          message: 'Template not found',
-        });
-      }
-
-      return await updateTemplateSettings({
-        templateId,
-        teamId,
-        userId: ctx.user.id,
-        data: {},
-        meta: {
-          typedSignatureEnabled,
-        },
       });
     }),
 });

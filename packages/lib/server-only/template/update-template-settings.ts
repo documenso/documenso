@@ -15,7 +15,7 @@ export type UpdateTemplateSettingsOptions = {
   userId: number;
   teamId?: number;
   templateId: number;
-  data: {
+  data?: {
     title?: string;
     externalId?: string | null;
     visibility?: DocumentVisibility;
@@ -36,15 +36,9 @@ export const updateTemplateSettings = async ({
   userId,
   teamId,
   templateId,
-  meta,
-  data,
+  meta = {},
+  data = {},
 }: UpdateTemplateSettingsOptions): Promise<TUpdateTemplateSettingsResponse> => {
-  if (Object.values(data).length === 0 && Object.keys(meta ?? {}).length === 0) {
-    throw new AppError(AppErrorCode.INVALID_BODY, {
-      message: 'Missing data to update',
-    });
-  }
-
   const template = await prisma.template.findFirstOrThrow({
     where: {
       id: templateId,
@@ -68,6 +62,10 @@ export const updateTemplateSettings = async ({
       templateMeta: true,
     },
   });
+
+  if (Object.values(data).length === 0 && Object.keys(meta).length === 0) {
+    return template;
+  }
 
   const { documentAuthOption } = extractDocumentAuthMethods({
     documentAuth: template.authOptions,
@@ -106,12 +104,12 @@ export const updateTemplateSettings = async ({
       id: templateId,
     },
     data: {
-      title: data.title,
-      externalId: data.externalId,
-      type: data.type,
-      visibility: data.visibility,
-      publicDescription: data.publicDescription,
-      publicTitle: data.publicTitle,
+      title: data?.title,
+      externalId: data?.externalId,
+      type: data?.type,
+      visibility: data?.visibility,
+      publicDescription: data?.publicDescription,
+      publicTitle: data?.publicTitle,
       authOptions,
       templateMeta: {
         upsert: {

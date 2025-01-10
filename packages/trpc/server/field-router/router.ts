@@ -207,8 +207,8 @@ export const fieldRouter = router({
   deleteDocumentField: authenticatedProcedure
     .meta({
       openapi: {
-        method: 'POST',
-        path: '/document/field/delete',
+        method: 'DELETE',
+        path: '/document/field/{fieldId}',
         summary: 'Delete document field',
         tags: ['Document Fields'],
       },
@@ -382,8 +382,8 @@ export const fieldRouter = router({
   deleteTemplateField: authenticatedProcedure
     .meta({
       openapi: {
-        method: 'POST',
-        path: '/template/field/delete',
+        method: 'DELETE',
+        path: '/template/field/{fieldId}',
         summary: 'Delete template field',
         tags: ['Template Fields'],
       },

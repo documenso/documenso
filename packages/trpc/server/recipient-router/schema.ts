@@ -22,7 +22,7 @@ const ZCreateRecipientSchema = z.object({
 });
 
 const ZUpdateRecipientSchema = z.object({
-  id: z.number(),
+  id: z.number().describe('The ID of the recipient to update.'),
   email: z.string().toLowerCase().email().min(1).optional(),
   name: z.string().optional(),
   role: z.nativeEnum(RecipientRole).optional(),

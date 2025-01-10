@@ -140,23 +140,6 @@ export const EditTemplateForm = ({
     },
   });
 
-  const { mutateAsync: updateTypedSignature } =
-    trpc.template.updateTemplateTypedSignatureSettings.useMutation({
-      ...DO_NOT_INVALIDATE_QUERY_ON_MUTATION,
-      onSuccess: (newData) => {
-        utils.template.getTemplateById.setData(
-          {
-            templateId: initialTemplate.id,
-          },
-          (oldData) => ({
-            ...(oldData || initialTemplate),
-            ...newData,
-            id: Number(newData.id),
-          }),
-        );
-      },
-    });
-
   const onAddSettingsFormSubmit = async (data: TAddTemplateSettingsFormSchema) => {
     try {
       await updateTemplateSettings({
@@ -225,9 +208,11 @@ export const EditTemplateForm = ({
         fields: data.fields,
       });
 
-      await updateTypedSignature({
+      await updateTemplateSettings({
         templateId: template.id,
-        typedSignatureEnabled: data.typedSignatureEnabled,
+        meta: {
+          typedSignatureEnabled: data.typedSignatureEnabled,
+        },
       });
 
       // Clear all field data from localStorage

@@ -39,7 +39,7 @@ import {
   sendDocument,
 } from '@documenso/lib/server-only/document/send-document';
 import {
-  ZUpdateDocumentSettingsResponseSchema,
+  ZUpdateDocumentResponseSchema,
   updateDocumentSettings,
 } from '@documenso/lib/server-only/document/update-document-settings';
 import { symmetricEncrypt } from '@documenso/lib/universal/crypto';
@@ -62,8 +62,8 @@ import {
   ZSearchDocumentsMutationSchema,
   ZSendDocumentMutationSchema,
   ZSetPasswordForDocumentMutationSchema,
-  ZSetSettingsForDocumentMutationSchema,
   ZSetSigningOrderForDocumentMutationSchema,
+  ZUpdateDocumentRequestSchema,
   ZUpdateTypedSignatureSettingsMutationSchema,
 } from './schema';
 
@@ -105,7 +105,7 @@ export const documentRouter = router({
     .meta({
       openapi: {
         method: 'GET',
-        path: '/document/find',
+        path: '/document',
         summary: 'Find documents',
         description: 'Find documents based on a search criteria',
         tags: ['Document'],
@@ -211,28 +211,33 @@ export const documentRouter = router({
     .meta({
       openapi: {
         method: 'POST',
-        path: '/document/{documentId}',
+        path: '/document/update',
         summary: 'Update document',
         tags: ['Document'],
       },
     })
-    .input(ZSetSettingsForDocumentMutationSchema)
-    .output(ZUpdateDocumentSettingsResponseSchema)
+    .input(ZUpdateDocumentRequestSchema)
+    .output(ZUpdateDocumentResponseSchema)
     .mutation(async ({ input, ctx }) => {
       const { teamId } = ctx;
-      const { documentId, data, meta } = input;
+      const { documentId, data, meta = {} } = input;
 
       const userId = ctx.user.id;
 
-      if (meta.timezone || meta.dateFormat || meta.redirectUrl) {
+      if (Object.values(meta).length > 0) {
         await upsertDocumentMeta({
           userId: ctx.user.id,
           teamId,
           documentId,
-          dateFormat: meta.dateFormat,
+          subject: meta.subject,
+          message: meta.message,
           timezone: meta.timezone,
-          redirectUrl: meta.redirectUrl,
+          dateFormat: meta.dateFormat,
           language: meta.language,
+          typedSignatureEnabled: meta.typedSignatureEnabled,
+          redirectUrl: meta.redirectUrl,
+          distributionMethod: meta.distributionMethod,
+          emailSettings: meta.emailSettings,
           requestMetadata: ctx.metadata,
         });
       }
@@ -252,8 +257,8 @@ export const documentRouter = router({
   deleteDocument: authenticatedProcedure
     .meta({
       openapi: {
-        method: 'POST',
-        path: '/document/{documentId}/delete',
+        method: 'DELETE',
+        path: '/document/{documentId}',
         summary: 'Delete document',
         tags: ['Document'],
       },
@@ -281,9 +286,9 @@ export const documentRouter = router({
     .meta({
       openapi: {
         method: 'POST',
-        path: '/document/{documentId}/move',
+        path: '/document/move',
         summary: 'Move document',
-        description: 'Move a document to a team',
+        description: 'Move a document from your personal account to a team',
         tags: ['Document'],
       },
     })
@@ -349,6 +354,8 @@ export const documentRouter = router({
     }),
 
   /**
+   * @deprecated Remove after deployment.
+   *
    * @private
    */
   updateTypedSignatureSettings: authenticatedProcedure
@@ -389,7 +396,7 @@ export const documentRouter = router({
     .meta({
       openapi: {
         method: 'POST',
-        path: '/document/{documentId}/distribute',
+        path: '/document/distribute',
         summary: 'Distribute document',
         description: 'Send the document out to recipients based on your distribution method',
         tags: ['Document'],
@@ -399,17 +406,9 @@ export const documentRouter = router({
     .output(ZSendDocumentResponseSchema)
     .mutation(async ({ input, ctx }) => {
       const { teamId } = ctx;
-      const { documentId, meta } = input;
+      const { documentId, meta = {} } = input;
 
-      if (
-        meta.message ||
-        meta.subject ||
-        meta.timezone ||
-        meta.dateFormat ||
-        meta.redirectUrl ||
-        meta.distributionMethod ||
-        meta.emailSettings
-      ) {
+      if (Object.values(meta).length > 0) {
         await upsertDocumentMeta({
           userId: ctx.user.id,
           teamId,
@@ -421,6 +420,7 @@ export const documentRouter = router({
           redirectUrl: meta.redirectUrl,
           distributionMethod: meta.distributionMethod,
           emailSettings: meta.emailSettings,
+          language: meta.language,
           requestMetadata: ctx.metadata,
         });
       }
@@ -435,15 +435,17 @@ export const documentRouter = router({
 
   /**
    * @public
+   *
+   * Todo: Refactor to redistributeDocument.
    */
   resendDocument: authenticatedProcedure
     .meta({
       openapi: {
         method: 'POST',
-        path: '/document/{documentId}/resend',
-        summary: 'Resend document',
+        path: '/document/redistribute',
+        summary: 'Redistribute document',
         description:
-          'Resend the document to recipients who have not signed. Will use the distribution method set in the document.',
+          'Redistribute the document to the provided recipients who have not actioned the document. Will use the distribution method set in the document',
         tags: ['Document'],
       },
     })
@@ -469,7 +471,7 @@ export const documentRouter = router({
     .meta({
       openapi: {
         method: 'POST',
-        path: '/document/{documentId}/duplicate',
+        path: '/document/duplicate',
         summary: 'Duplicate document',
         tags: ['Document'],
       },
