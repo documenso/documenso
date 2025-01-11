@@ -26,7 +26,7 @@ import { ZRecipientAuthOptionsSchema } from '../../types/document-auth';
 import type { TDocumentEmailSettings } from '../../types/document-email';
 import { ZFieldMetaSchema } from '../../types/field-meta';
 import { ZWebhookDocumentSchema } from '../../types/webhook-payload';
-import type { RequestMetadata } from '../../universal/extract-request-metadata';
+import type { ApiRequestMetadata } from '../../universal/extract-request-metadata';
 import { createDocumentAuditLogData } from '../../utils/document-audit-logs';
 import {
   createDocumentAuthOptions,
@@ -73,7 +73,7 @@ export type CreateDocumentFromTemplateOptions = {
     typedSignatureEnabled?: boolean;
     emailSettings?: TDocumentEmailSettings;
   };
-  requestMetadata?: RequestMetadata;
+  requestMetadata: ApiRequestMetadata;
 };
 
 export const ZCreateDocumentFromTemplateResponseSchema = DocumentSchema.extend({
@@ -95,12 +95,6 @@ export const createDocumentFromTemplate = async ({
   override,
   requestMetadata,
 }: CreateDocumentFromTemplateOptions): Promise<TCreateDocumentFromTemplateResponse> => {
-  const user = await prisma.user.findFirstOrThrow({
-    where: {
-      id: userId,
-    },
-  });
-
   const template = await prisma.template.findUnique({
     where: {
       id: templateId,
@@ -312,8 +306,7 @@ export const createDocumentFromTemplate = async ({
       data: createDocumentAuditLogData({
         type: DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_CREATED,
         documentId: document.id,
-        user,
-        requestMetadata,
+        metadata: requestMetadata,
         data: {
           title: document.title,
           source: {

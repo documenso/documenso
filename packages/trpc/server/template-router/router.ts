@@ -1,8 +1,6 @@
-import { TRPCError } from '@trpc/server';
 import { z } from 'zod';
 
 import { getServerLimits } from '@documenso/ee/server-only/limits/server';
-import { isValidLanguageCode } from '@documenso/lib/constants/i18n';
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import {
   ZGetDocumentWithDetailsByIdResponseSchema,
@@ -45,10 +43,9 @@ import {
   toggleTemplateDirectLink,
 } from '@documenso/lib/server-only/template/toggle-template-direct-link';
 import {
-  ZUpdateTemplateSettingsResponseSchema,
-  updateTemplateSettings,
-} from '@documenso/lib/server-only/template/update-template-settings';
-import { extractNextApiRequestMetadata } from '@documenso/lib/universal/extract-request-metadata';
+  ZUpdateTemplateResponseSchema,
+  updateTemplate,
+} from '@documenso/lib/server-only/template/update-template';
 import type { Document } from '@documenso/prisma/client';
 
 import { authenticatedProcedure, maybeAuthenticatedProcedure, router } from '../trpc';
@@ -63,10 +60,8 @@ import {
   ZFindTemplatesQuerySchema,
   ZGetTemplateByIdQuerySchema,
   ZMoveTemplatesToTeamSchema,
-  ZSetSigningOrderForTemplateMutationSchema,
   ZToggleTemplateDirectLinkMutationSchema,
-  ZUpdateTemplateSettingsMutationSchema,
-  ZUpdateTemplateTypedSignatureSettingsMutationSchema,
+  ZUpdateTemplateRequestSchema,
 } from './schema';
 
 export const templateRouter = router({
@@ -77,7 +72,7 @@ export const templateRouter = router({
     .meta({
       openapi: {
         method: 'GET',
-        path: '/template/find',
+        path: '/template',
         summary: 'Find templates',
         description: 'Find templates based on a search criteria',
         tags: ['Template'],
@@ -86,8 +81,11 @@ export const templateRouter = router({
     .input(ZFindTemplatesQuerySchema)
     .output(ZFindTemplatesResponseSchema)
     .query(async ({ input, ctx }) => {
+      const { teamId } = ctx;
+
       return await findTemplates({
         userId: ctx.user.id,
+        teamId,
         ...input,
       });
     }),
@@ -107,7 +105,8 @@ export const templateRouter = router({
     .input(ZGetTemplateByIdQuerySchema)
     .output(ZGetTemplateByIdResponseSchema)
     .query(async ({ input, ctx }) => {
-      const { templateId, teamId } = input;
+      const { teamId } = ctx;
+      const { templateId } = input;
 
       return await getTemplateById({
         id: templateId,
@@ -117,22 +116,25 @@ export const templateRouter = router({
     }),
 
   /**
-   * @public
+   * Wait until RR7 so we can passthrough documents.
+   *
+   * @private
    */
   createTemplate: authenticatedProcedure
-    .meta({
-      openapi: {
-        method: 'POST',
-        path: '/template/create',
-        summary: 'Create template',
-        description: 'Create a new template',
-        tags: ['Template'],
-      },
-    })
+    // .meta({
+    //   openapi: {
+    //     method: 'POST',
+    //     path: '/template/create',
+    //     summary: 'Create template',
+    //     description: 'Create a new template',
+    //     tags: ['Template'],
+    //   },
+    // })
     .input(ZCreateTemplateMutationSchema)
     .output(ZCreateTemplateResponseSchema)
     .mutation(async ({ input, ctx }) => {
-      const { teamId, title, templateDocumentDataId } = input;
+      const { teamId } = ctx;
+      const { title, templateDocumentDataId } = input;
 
       return await createTemplate({
         userId: ctx.user.id,
@@ -149,30 +151,25 @@ export const templateRouter = router({
     .meta({
       openapi: {
         method: 'POST',
-        path: '/template/{templateId}',
+        path: '/template/update',
         summary: 'Update template',
         tags: ['Template'],
       },
     })
-    .input(ZUpdateTemplateSettingsMutationSchema)
-    .output(ZUpdateTemplateSettingsResponseSchema)
+    .input(ZUpdateTemplateRequestSchema)
+    .output(ZUpdateTemplateResponseSchema)
     .mutation(async ({ input, ctx }) => {
-      const { templateId, teamId, data, meta } = input;
+      const { teamId } = ctx;
+      const { templateId, data, meta } = input;
 
       const userId = ctx.user.id;
 
-      const requestMetadata = extractNextApiRequestMetadata(ctx.req);
-
-      return await updateTemplateSettings({
+      return await updateTemplate({
         userId,
         teamId,
         templateId,
         data,
-        meta: {
-          ...meta,
-          language: isValidLanguageCode(meta?.language) ? meta?.language : undefined,
-        },
-        requestMetadata,
+        meta,
       });
     }),
 
@@ -183,7 +180,7 @@ export const templateRouter = router({
     .meta({
       openapi: {
         method: 'POST',
-        path: '/template/{templateId}/duplicate',
+        path: '/template/duplicate',
         summary: 'Duplicate template',
         tags: ['Template'],
       },
@@ -191,7 +188,8 @@ export const templateRouter = router({
     .input(ZDuplicateTemplateMutationSchema)
     .output(ZDuplicateTemplateResponseSchema)
     .mutation(async ({ input, ctx }) => {
-      const { teamId, templateId } = input;
+      const { teamId } = ctx;
+      const { templateId } = input;
 
       return await duplicateTemplate({
         userId: ctx.user.id,
@@ -206,8 +204,8 @@ export const templateRouter = router({
   deleteTemplate: authenticatedProcedure
     .meta({
       openapi: {
-        method: 'POST',
-        path: '/template/{templateId}/delete',
+        method: 'DELETE',
+        path: '/template/{templateId}',
         summary: 'Delete template',
         tags: ['Template'],
       },
@@ -215,7 +213,8 @@ export const templateRouter = router({
     .input(ZDeleteTemplateMutationSchema)
     .output(z.void())
     .mutation(async ({ input, ctx }) => {
-      const { templateId, teamId } = input;
+      const { teamId } = ctx;
+      const { templateId } = input;
 
       const userId = ctx.user.id;
 
@@ -229,7 +228,7 @@ export const templateRouter = router({
     .meta({
       openapi: {
         method: 'POST',
-        path: '/template/{templateId}/use',
+        path: '/template/use',
         summary: 'Use template',
         description: 'Use the template to create a document',
         tags: ['Template'],
@@ -238,7 +237,8 @@ export const templateRouter = router({
     .input(ZCreateDocumentFromTemplateMutationSchema)
     .output(ZGetDocumentWithDetailsByIdResponseSchema)
     .mutation(async ({ ctx, input }) => {
-      const { templateId, teamId, recipients, distributeDocument, customDocumentDataId } = input;
+      const { teamId } = ctx;
+      const { templateId, recipients, distributeDocument, customDocumentDataId } = input;
 
       const limits = await getServerLimits({ email: ctx.user.email, teamId });
 
@@ -246,15 +246,13 @@ export const templateRouter = router({
         throw new Error('You have reached your document limit.');
       }
 
-      const requestMetadata = extractNextApiRequestMetadata(ctx.req);
-
       const document: Document = await createDocumentFromTemplate({
         templateId,
         teamId,
         userId: ctx.user.id,
         recipients,
         customDocumentDataId,
-        requestMetadata,
+        requestMetadata: ctx.metadata,
       });
 
       if (distributeDocument) {
@@ -262,7 +260,7 @@ export const templateRouter = router({
           documentId: document.id,
           userId: ctx.user.id,
           teamId,
-          requestMetadata,
+          requestMetadata: ctx.metadata,
         }).catch((err) => {
           console.error(err);
 
@@ -278,18 +276,20 @@ export const templateRouter = router({
     }),
 
   /**
-   * @public
+   * Leaving this endpoint as private for now until there is a use case for it.
+   *
+   * @private
    */
   createDocumentFromDirectTemplate: maybeAuthenticatedProcedure
-    .meta({
-      openapi: {
-        method: 'POST',
-        path: '/template/use',
-        summary: 'Use direct template',
-        description: 'Use a direct template to create a document',
-        tags: ['Template'],
-      },
-    })
+    // .meta({
+    //   openapi: {
+    //     method: 'POST',
+    //     path: '/template/direct/use',
+    //     summary: 'Use direct template',
+    //     description: 'Use a direct template to create a document',
+    //     tags: ['Template'],
+    //   },
+    // })
     .input(ZCreateDocumentFromDirectTemplateMutationSchema)
     .output(ZCreateDocumentFromDirectTemplateResponseSchema)
     .mutation(async ({ input, ctx }) => {
@@ -301,8 +301,6 @@ export const templateRouter = router({
         signedFieldValues,
         templateUpdatedAt,
       } = input;
-
-      const requestMetadata = extractNextApiRequestMetadata(ctx.req);
 
       return await createDocumentFromDirectTemplate({
         directRecipientName,
@@ -318,25 +316,7 @@ export const templateRouter = router({
               email: ctx.user.email,
             }
           : undefined,
-        requestMetadata,
-      });
-    }),
-
-  /**
-   * @private
-   */
-  setSigningOrderForTemplate: authenticatedProcedure
-    .input(ZSetSigningOrderForTemplateMutationSchema)
-    .mutation(async ({ input, ctx }) => {
-      const { templateId, teamId, signingOrder } = input;
-
-      return await updateTemplateSettings({
-        templateId,
-        teamId,
-        data: {},
-        meta: { signingOrder },
-        userId: ctx.user.id,
-        requestMetadata: extractNextApiRequestMetadata(ctx.req),
+        requestMetadata: ctx.metadata,
       });
     }),
 
@@ -347,7 +327,7 @@ export const templateRouter = router({
     .meta({
       openapi: {
         method: 'POST',
-        path: '/template/{templateId}/direct/create',
+        path: '/template/direct/create',
         summary: 'Create direct link',
         description: 'Create a direct link for a template',
         tags: ['Template'],
@@ -356,7 +336,8 @@ export const templateRouter = router({
     .input(ZCreateTemplateDirectLinkMutationSchema)
     .output(ZCreateTemplateDirectLinkResponseSchema)
     .mutation(async ({ input, ctx }) => {
-      const { templateId, teamId, directRecipientId } = input;
+      const { teamId } = ctx;
+      const { templateId, directRecipientId } = input;
 
       const userId = ctx.user.id;
 
@@ -370,7 +351,7 @@ export const templateRouter = router({
         });
       }
 
-      return await createTemplateDirectLink({ userId, templateId, directRecipientId });
+      return await createTemplateDirectLink({ userId, teamId, templateId, directRecipientId });
     }),
 
   /**
@@ -379,8 +360,8 @@ export const templateRouter = router({
   deleteTemplateDirectLink: authenticatedProcedure
     .meta({
       openapi: {
-        method: 'POST',
-        path: '/template/{templateId}/direct/delete',
+        method: 'DELETE',
+        path: '/template/direct/{templateId}',
         summary: 'Delete direct link',
         description: 'Delete a direct link for a template',
         tags: ['Template'],
@@ -389,11 +370,12 @@ export const templateRouter = router({
     .input(ZDeleteTemplateDirectLinkMutationSchema)
     .output(z.void())
     .mutation(async ({ input, ctx }) => {
+      const { teamId } = ctx;
       const { templateId } = input;
 
       const userId = ctx.user.id;
 
-      await deleteTemplateDirectLink({ userId, templateId });
+      await deleteTemplateDirectLink({ userId, teamId, templateId });
     }),
 
   /**
@@ -412,11 +394,12 @@ export const templateRouter = router({
     .input(ZToggleTemplateDirectLinkMutationSchema)
     .output(ZToggleTemplateDirectLinkResponseSchema)
     .mutation(async ({ input, ctx }) => {
+      const { teamId } = ctx;
       const { templateId, enabled } = input;
 
       const userId = ctx.user.id;
 
-      return await toggleTemplateDirectLink({ userId, templateId, enabled });
+      return await toggleTemplateDirectLink({ userId, teamId, templateId, enabled });
     }),
 
   /**
@@ -426,7 +409,7 @@ export const templateRouter = router({
     .meta({
       openapi: {
         method: 'POST',
-        path: '/template/{templateId}/move',
+        path: '/template/move',
         summary: 'Move template',
         description: 'Move a template to a team',
         tags: ['Template'],
@@ -442,39 +425,6 @@ export const templateRouter = router({
         templateId,
         teamId,
         userId,
-      });
-    }),
-
-  /**
-   * @private
-   */
-  updateTemplateTypedSignatureSettings: authenticatedProcedure
-    .input(ZUpdateTemplateTypedSignatureSettingsMutationSchema)
-    .mutation(async ({ input, ctx }) => {
-      const { templateId, teamId, typedSignatureEnabled } = input;
-
-      const template = await getTemplateById({
-        id: templateId,
-        userId: ctx.user.id,
-        teamId,
-      }).catch(() => null);
-
-      if (!template) {
-        throw new TRPCError({
-          code: 'NOT_FOUND',
-          message: 'Template not found',
-        });
-      }
-
-      return await updateTemplateSettings({
-        templateId,
-        teamId,
-        userId: ctx.user.id,
-        data: {},
-        meta: {
-          typedSignatureEnabled,
-        },
-        requestMetadata: extractNextApiRequestMetadata(ctx.req),
       });
     }),
 });

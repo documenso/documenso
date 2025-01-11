@@ -73,7 +73,6 @@ export const TemplatePageViewDocumentsTable = ({
     trpc.document.findDocuments.useQuery(
       {
         templateId,
-        teamId: team?.id,
         page: parsedSearchParams.page,
         perPage: parsedSearchParams.perPage,
         query: parsedSearchParams.query,

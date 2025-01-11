@@ -13,7 +13,7 @@ const logger = buildLogger();
 export default createOpenApiNextHandler<typeof appRouter>({
   router: appRouter,
   createContext: async ({ req, res }: { req: NextApiRequest; res: NextApiResponse }) =>
-    createTrpcContext({ req, res }),
+    createTrpcContext({ req, res, requestSource: 'apiV2' }),
   onError: ({ error, path }: { error: TRPCError; path?: string }) => {
     // Always log the error for now.
     console.error(error.message);

@@ -37,7 +37,6 @@ export const DuplicateDocumentDialog = ({
 
   const { data: document, isLoading } = trpcReact.document.getDocumentById.useQuery({
     documentId: id,
-    teamId: team?.id,
   });
 
   const documentData = document?.documentData
@@ -66,7 +65,7 @@ export const DuplicateDocumentDialog = ({
 
   const onDuplicate = async () => {
     try {
-      await duplicateDocument({ documentId: id, teamId: team?.id });
+      await duplicateDocument({ documentId: id });
     } catch {
       toast({
         title: _(msg`Something went wrong`),

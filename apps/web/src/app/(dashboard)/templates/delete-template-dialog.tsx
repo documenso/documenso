@@ -22,12 +22,7 @@ type DeleteTemplateDialogProps = {
   onOpenChange: (_open: boolean) => void;
 };
 
-export const DeleteTemplateDialog = ({
-  id,
-  teamId,
-  open,
-  onOpenChange,
-}: DeleteTemplateDialogProps) => {
+export const DeleteTemplateDialog = ({ id, open, onOpenChange }: DeleteTemplateDialogProps) => {
   const router = useRouter();
 
   const { _ } = useLingui();
@@ -85,7 +80,7 @@ export const DeleteTemplateDialog = ({
             type="button"
             variant="destructive"
             loading={isLoading}
-            onClick={async () => deleteTemplate({ templateId: id, teamId })}
+            onClick={async () => deleteTemplate({ templateId: id })}
           >
             <Trans>Delete</Trans>
           </Button>

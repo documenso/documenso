@@ -5,7 +5,7 @@ import type { z } from 'zod';
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import { normalizePdf as makeNormalizedPdf } from '@documenso/lib/server-only/pdf/normalize-pdf';
 import { DOCUMENT_AUDIT_LOG_TYPE } from '@documenso/lib/types/document-audit-logs';
-import type { RequestMetadata } from '@documenso/lib/universal/extract-request-metadata';
+import type { ApiRequestMetadata } from '@documenso/lib/universal/extract-request-metadata';
 import { createDocumentAuditLogData } from '@documenso/lib/utils/document-audit-logs';
 import { prisma } from '@documenso/prisma';
 import { DocumentSource, DocumentVisibility, WebhookTriggerEvents } from '@documenso/prisma/client';
@@ -27,7 +27,7 @@ export type CreateDocumentOptions = {
   formValues?: Record<string, string | number | boolean>;
   normalizePdf?: boolean;
   timezone?: string;
-  requestMetadata?: RequestMetadata;
+  requestMetadata: ApiRequestMetadata;
 };
 
 export const ZCreateDocumentResponseSchema = DocumentSchema;
@@ -162,8 +162,7 @@ export const createDocument = async ({
       data: createDocumentAuditLogData({
         type: DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_CREATED,
         documentId: document.id,
-        user,
-        requestMetadata,
+        metadata: requestMetadata,
         data: {
           title,
           source: {

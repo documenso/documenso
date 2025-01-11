@@ -23,15 +23,12 @@ import { Skeleton } from '@documenso/ui/primitives/skeleton';
 import { useToast } from '@documenso/ui/primitives/use-toast';
 
 import { ManagePublicTemplateDialog } from '~/components/templates/manage-public-template-dialog';
-import { useOptionalCurrentTeam } from '~/providers/team';
 
 type DirectTemplate = FindTemplateRow & {
   directLink: Pick<TemplateDirectLink, 'token' | 'enabled'>;
 };
 
 export const PublicTemplatesDataTable = () => {
-  const team = useOptionalCurrentTeam();
-
   const { _ } = useLingui();
   const { toast } = useToast();
 
@@ -43,9 +40,7 @@ export const PublicTemplatesDataTable = () => {
   } | null>(null);
 
   const { data, isInitialLoading, isLoadingError, refetch } = trpc.template.findTemplates.useQuery(
-    {
-      teamId: team?.id,
-    },
+    {},
     {
       keepPreviousData: true,
     },

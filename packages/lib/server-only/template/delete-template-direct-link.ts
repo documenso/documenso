@@ -8,29 +8,32 @@ import { AppError, AppErrorCode } from '../../errors/app-error';
 export type DeleteTemplateDirectLinkOptions = {
   templateId: number;
   userId: number;
+  teamId?: number;
 };
 
 export const deleteTemplateDirectLink = async ({
   templateId,
   userId,
+  teamId,
 }: DeleteTemplateDirectLinkOptions): Promise<void> => {
   const template = await prisma.template.findFirst({
     where: {
       id: templateId,
-      OR: [
-        {
-          userId,
-        },
-        {
-          team: {
-            members: {
-              some: {
-                userId,
+      ...(teamId
+        ? {
+            team: {
+              id: teamId,
+              members: {
+                some: {
+                  userId,
+                },
               },
             },
-          },
-        },
-      ],
+          }
+        : {
+            userId,
+            teamId: null,
+          }),
     },
     include: {
       directLink: true,

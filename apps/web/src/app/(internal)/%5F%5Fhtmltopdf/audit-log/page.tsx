@@ -66,6 +66,7 @@ export default async function AuditLog({ searchParams }: AuditLogProps) {
   const { data: auditLogs } = await findDocumentAuditLogs({
     documentId: documentId,
     userId: document.userId,
+    teamId: document.teamId || undefined,
     perPage: 100_000,
   });
 

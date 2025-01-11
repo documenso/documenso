@@ -1,10 +1,10 @@
-import { TRPCError } from '@trpc/server';
 import type { z } from 'zod';
 
-import type { RequestMetadata } from '@documenso/lib/universal/extract-request-metadata';
+import type { ApiRequestMetadata } from '@documenso/lib/universal/extract-request-metadata';
 import { prisma } from '@documenso/prisma';
 import { DocumentSchema } from '@documenso/prisma/generated/zod';
 
+import { AppError, AppErrorCode } from '../../errors/app-error';
 import { DOCUMENT_AUDIT_LOG_TYPE } from '../../types/document-audit-logs';
 import { createDocumentAuditLogData } from '../../utils/document-audit-logs';
 
@@ -12,7 +12,7 @@ export type MoveDocumentToTeamOptions = {
   documentId: number;
   teamId: number;
   userId: number;
-  requestMetadata?: RequestMetadata;
+  requestMetadata: ApiRequestMetadata;
 };
 
 export const ZMoveDocumentToTeamResponseSchema = DocumentSchema;
@@ -26,10 +26,6 @@ export const moveDocumentToTeam = async ({
   requestMetadata,
 }: MoveDocumentToTeamOptions): Promise<TMoveDocumentToTeamResponse> => {
   return await prisma.$transaction(async (tx) => {
-    const user = await tx.user.findUniqueOrThrow({
-      where: { id: userId },
-    });
-
     const document = await tx.document.findFirst({
       where: {
         id: documentId,
@@ -39,8 +35,7 @@ export const moveDocumentToTeam = async ({
     });
 
     if (!document) {
-      throw new TRPCError({
-        code: 'NOT_FOUND',
+      throw new AppError(AppErrorCode.NOT_FOUND, {
         message: 'Document not found or already associated with a team.',
       });
     }
@@ -57,9 +52,8 @@ export const moveDocumentToTeam = async ({
     });
 
     if (!team) {
-      throw new TRPCError({
-        code: 'FORBIDDEN',
-        message: 'You are not a member of this team.',
+      throw new AppError(AppErrorCode.UNAUTHORIZED, {
+        message: 'This team does not exist, or you are not a member of this team.',
       });
     }
 
@@ -68,12 +62,11 @@ export const moveDocumentToTeam = async ({
       data: { teamId },
     });
 
-    const log = await tx.documentAuditLog.create({
+    await tx.documentAuditLog.create({
       data: createDocumentAuditLogData({
         type: DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_MOVED_TO_TEAM,
         documentId: updatedDocument.id,
-        user,
-        requestMetadata,
+        metadata: requestMetadata,
         data: {
           movedByUserId: userId,
           fromPersonalAccount: true,

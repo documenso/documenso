@@ -76,7 +76,6 @@ export const UploadDocument = ({ className, team }: UploadDocumentProps) => {
       const { id } = await createDocument({
         title: file.name,
         documentDataId,
-        teamId: team?.id,
         timezone: userTimezone,
       });
 

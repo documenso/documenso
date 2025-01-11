@@ -31,7 +31,7 @@ export const DownloadCertificateButton = ({
 
   const onDownloadCertificatesClick = async () => {
     try {
-      const { url } = await downloadCertificate({ documentId, teamId });
+      const { url } = await downloadCertificate({ documentId });
 
       const iframe = Object.assign(document.createElement('iframe'), {
         src: url,

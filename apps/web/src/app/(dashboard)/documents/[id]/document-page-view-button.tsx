@@ -25,7 +25,7 @@ export type DocumentPageViewButtonProps = {
   team?: Pick<Team, 'id' | 'url'>;
 };
 
-export const DocumentPageViewButton = ({ document, team }: DocumentPageViewButtonProps) => {
+export const DocumentPageViewButton = ({ document }: DocumentPageViewButtonProps) => {
   const { data: session } = useSession();
   const { toast } = useToast();
   const { _ } = useLingui();
@@ -48,7 +48,6 @@ export const DocumentPageViewButton = ({ document, team }: DocumentPageViewButto
     try {
       const documentWithData = await trpcClient.document.getDocumentById.query({
         documentId: document.id,
-        teamId: team?.id,
       });
 
       const documentData = documentWithData?.documentData;

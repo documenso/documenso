@@ -1,7 +1,6 @@
 import type { z } from 'zod';
 
 import { prisma } from '@documenso/prisma';
-import type { Prisma } from '@documenso/prisma/client';
 import {
   DocumentDataSchema,
   FieldSchema,
@@ -40,32 +39,25 @@ export const getTemplateById = async ({
   userId,
   teamId,
 }: GetTemplateByIdOptions): Promise<TGetTemplateByIdResponse> => {
-  const whereFilter: Prisma.TemplateWhereInput = {
-    id,
-    OR:
-      teamId === undefined
-        ? [
-            {
-              userId,
-              teamId: null,
-            },
-          ]
-        : [
-            {
-              teamId,
-              team: {
-                members: {
-                  some: {
-                    userId,
-                  },
+  const template = await prisma.template.findFirst({
+    where: {
+      id,
+      ...(teamId
+        ? {
+            team: {
+              id: teamId,
+              members: {
+                some: {
+                  userId,
                 },
               },
             },
-          ],
-  };
-
-  const template = await prisma.template.findFirst({
-    where: whereFilter,
+          }
+        : {
+            userId,
+            teamId: null,
+          }),
+    },
     include: {
       directLink: true,
       templateDocumentData: true,

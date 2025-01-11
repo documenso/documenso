@@ -47,8 +47,6 @@ import { Tooltip, TooltipContent, TooltipTrigger } from '@documenso/ui/primitive
 import type { Toast } from '@documenso/ui/primitives/use-toast';
 import { useToast } from '@documenso/ui/primitives/use-toast';
 
-import { useOptionalCurrentTeam } from '~/providers/team';
-
 const ZAddRecipientsForNewDocumentSchema = z
   .object({
     distributeDocument: z.boolean(),
@@ -120,8 +118,6 @@ export function UseTemplateDialog({
 
   const [open, setOpen] = useState(false);
 
-  const team = useOptionalCurrentTeam();
-
   const form = useForm<TAddRecipientsForNewDocumentSchema>({
     resolver: zodResolver(ZAddRecipientsForNewDocumentSchema),
     defaultValues: {
@@ -163,7 +159,6 @@ export function UseTemplateDialog({
 
       const { id } = await createDocumentFromTemplate({
         templateId,
-        teamId: team?.id,
         recipients: data.recipients,
         distributeDocument: data.distributeDocument,
         customDocumentDataId,

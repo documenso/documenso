@@ -18,7 +18,7 @@ import {
 import { nanoid } from '../../universal/id';
 import { createRecipientAuthOptions } from '../../utils/document-auth';
 
-export type SetRecipientsForTemplateOptions = {
+export type SetTemplateRecipientsOptions = {
   userId: number;
   teamId?: number;
   templateId: number;
@@ -32,37 +32,36 @@ export type SetRecipientsForTemplateOptions = {
   }[];
 };
 
-export const ZSetRecipientsForTemplateResponseSchema = z.object({
+export const ZSetTemplateRecipientsResponseSchema = z.object({
   recipients: RecipientSchema.array(),
 });
 
-export type TSetRecipientsForTemplateResponse = z.infer<
-  typeof ZSetRecipientsForTemplateResponseSchema
->;
+export type TSetTemplateRecipientsResponse = z.infer<typeof ZSetTemplateRecipientsResponseSchema>;
 
-export const setRecipientsForTemplate = async ({
+export const setTemplateRecipients = async ({
   userId,
   teamId,
   templateId,
   recipients,
-}: SetRecipientsForTemplateOptions): Promise<TSetRecipientsForTemplateResponse> => {
+}: SetTemplateRecipientsOptions): Promise<TSetTemplateRecipientsResponse> => {
   const template = await prisma.template.findFirst({
     where: {
       id: templateId,
-      OR: [
-        {
-          userId,
-        },
-        {
-          team: {
-            members: {
-              some: {
-                userId,
+      ...(teamId
+        ? {
+            team: {
+              id: teamId,
+              members: {
+                some: {
+                  userId,
+                },
               },
             },
-          },
-        },
-      ],
+          }
+        : {
+            userId,
+            teamId: null,
+          }),
     },
     include: {
       directLink: true,

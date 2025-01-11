@@ -3,6 +3,82 @@ import { z } from 'zod';
 import { ZRecipientActionAuthSchema } from '@documenso/lib/types/document-auth';
 import { ZFieldMetaSchema } from '@documenso/lib/types/field-meta';
 import { FieldType } from '@documenso/prisma/client';
+import { FieldSchema } from '@documenso/prisma/generated/zod';
+
+const ZCreateFieldSchema = z.object({
+  recipientId: z.number().describe('The ID of the recipient to create the field for.'),
+  type: FieldSchema.shape.type.describe('The type of the field to create.'),
+  pageNumber: z.number().describe('The page number the field will be on.'),
+  pageX: z.number().describe('The X coordinate of where the field will be placed.'),
+  pageY: z.number().describe('The Y coordinate of where the field will be placed.'),
+  width: z.number().describe('The width of the field.'),
+  height: z.number().describe('The height of the field.'),
+  fieldMeta: ZFieldMetaSchema.optional(),
+});
+
+const ZUpdateFieldSchema = z.object({
+  id: z.number().describe('The ID of the field to update.'),
+  type: FieldSchema.shape.type.optional().describe('The type of the field to update.'),
+  pageNumber: z.number().optional().describe('The page number the field will be on.'),
+  pageX: z.number().optional().describe('The X coordinate of where the field will be placed.'),
+  pageY: z.number().optional().describe('The Y coordinate of where the field will be placed.'),
+  width: z.number().optional().describe('The width of the field.'),
+  height: z.number().optional().describe('The height of the field.'),
+  fieldMeta: ZFieldMetaSchema.optional(),
+});
+
+export const ZCreateDocumentFieldRequestSchema = z.object({
+  documentId: z.number().min(1),
+  field: ZCreateFieldSchema,
+});
+
+export const ZCreateDocumentFieldsRequestSchema = z.object({
+  documentId: z.number().min(1),
+  fields: ZCreateFieldSchema.array(),
+});
+
+export const ZUpdateDocumentFieldRequestSchema = z.object({
+  documentId: z.number().min(1),
+  field: ZUpdateFieldSchema,
+});
+
+export const ZUpdateDocumentFieldsRequestSchema = z.object({
+  documentId: z.number().min(1),
+  fields: ZUpdateFieldSchema.array(),
+});
+
+export const ZDeleteDocumentFieldRequestSchema = z.object({
+  fieldId: z.number().min(1),
+});
+
+export const ZCreateTemplateFieldRequestSchema = z.object({
+  templateId: z.number().min(1),
+  field: ZCreateFieldSchema,
+});
+
+export const ZCreateDocumentFieldResponseSchema = FieldSchema;
+export const ZUpdateTemplateFieldResponseSchema = FieldSchema;
+export const ZUpdateDocumentFieldResponseSchema = FieldSchema;
+export const ZCreateTemplateFieldResponseSchema = FieldSchema;
+
+export const ZCreateTemplateFieldsRequestSchema = z.object({
+  templateId: z.number().min(1),
+  fields: ZCreateFieldSchema.array(),
+});
+
+export const ZUpdateTemplateFieldRequestSchema = z.object({
+  templateId: z.number().min(1),
+  field: ZUpdateFieldSchema,
+});
+
+export const ZUpdateTemplateFieldsRequestSchema = z.object({
+  templateId: z.number().min(1),
+  fields: ZUpdateFieldSchema.array(),
+});
+
+export const ZDeleteTemplateFieldRequestSchema = z.object({
+  fieldId: z.number().min(1),
+});
 
 export const ZAddFieldsMutationSchema = z.object({
   documentId: z.number(),
@@ -65,7 +141,6 @@ export type TRemovedSignedFieldWithTokenMutationSchema = z.infer<
 
 export const ZGetFieldQuerySchema = z.object({
   fieldId: z.number(),
-  teamId: z.number().optional(),
 });
 
 export type TGetFieldQuerySchema = z.infer<typeof ZGetFieldQuerySchema>;

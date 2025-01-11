@@ -1,25 +1,27 @@
 import { z } from 'zod';
 
-import { SUPPORTED_LANGUAGE_CODES } from '@documenso/lib/constants/i18n';
 import {
   ZDocumentAccessAuthTypesSchema,
   ZDocumentActionAuthTypesSchema,
 } from '@documenso/lib/types/document-auth';
 import { ZDocumentEmailSettingsSchema } from '@documenso/lib/types/document-email';
 import { ZFindSearchParamsSchema } from '@documenso/lib/types/search-params';
-import { isValidRedirectUrl } from '@documenso/lib/utils/is-valid-redirect-url';
-import {
-  DocumentDistributionMethod,
-  DocumentSigningOrder,
-  DocumentVisibility,
-  TemplateType,
-} from '@documenso/prisma/client';
+import { DocumentSigningOrder, DocumentVisibility, TemplateType } from '@documenso/prisma/client';
 
+import {
+  ZDocumentMetaDateFormatSchema,
+  ZDocumentMetaDistributionMethodSchema,
+  ZDocumentMetaLanguageSchema,
+  ZDocumentMetaMessageSchema,
+  ZDocumentMetaRedirectUrlSchema,
+  ZDocumentMetaSubjectSchema,
+  ZDocumentMetaTimezoneSchema,
+  ZDocumentMetaTypedSignatureEnabledSchema,
+} from '../document-router/schema';
 import { ZSignFieldWithTokenMutationSchema } from '../field-router/schema';
 
 export const ZCreateTemplateMutationSchema = z.object({
   title: z.string().min(1).trim(),
-  teamId: z.number().optional(),
   templateDocumentDataId: z.string().min(1),
 });
 
@@ -34,119 +36,119 @@ export const ZCreateDocumentFromDirectTemplateMutationSchema = z.object({
 
 export const ZCreateDocumentFromTemplateMutationSchema = z.object({
   templateId: z.number(),
-  teamId: z.number().optional(),
   recipients: z
     .array(
       z.object({
-        id: z.number(),
+        id: z.number().describe('The ID of the recipient in the template.'),
         email: z.string().email(),
         name: z.string().optional(),
       }),
     )
+    .describe('The information of the recipients to create the document with.')
     .refine((recipients) => {
       const emails = recipients.map((signer) => signer.email);
+
       return new Set(emails).size === emails.length;
     }, 'Recipients must have unique emails'),
-  distributeDocument: z.boolean().optional(),
-  customDocumentDataId: z.string().optional(),
+  distributeDocument: z
+    .boolean()
+    .describe('Whether to create the document as pending and distribute it to recipients.')
+    .optional(),
+  customDocumentDataId: z
+    .string()
+    .describe(
+      'The data ID of an alternative PDF to use when creating the document. If not provided, the PDF attached to the template will be used.',
+    )
+    .optional(),
 });
 
 export const ZDuplicateTemplateMutationSchema = z.object({
   templateId: z.number(),
-  teamId: z.number().optional(),
 });
 
 export const ZCreateTemplateDirectLinkMutationSchema = z.object({
-  templateId: z.number().min(1),
-  teamId: z.number().optional(),
-  directRecipientId: z.number().min(1).optional(),
+  templateId: z.number(),
+  directRecipientId: z
+    .number()
+    .describe(
+      'The of the recipient in the current template to transform into the primary recipient when the template is used.',
+    )
+    .optional(),
 });
 
 export const ZDeleteTemplateDirectLinkMutationSchema = z.object({
-  templateId: z.number().min(1),
+  templateId: z.number(),
 });
 
 export const ZToggleTemplateDirectLinkMutationSchema = z.object({
-  templateId: z.number().min(1),
+  templateId: z.number(),
   enabled: z.boolean(),
 });
 
 export const ZDeleteTemplateMutationSchema = z.object({
-  templateId: z.number().min(1),
-  teamId: z.number().optional(),
+  templateId: z.number(),
 });
 
 export const MAX_TEMPLATE_PUBLIC_TITLE_LENGTH = 50;
 export const MAX_TEMPLATE_PUBLIC_DESCRIPTION_LENGTH = 256;
 
-export const ZUpdateTemplateSettingsMutationSchema = z.object({
+export const ZUpdateTemplateRequestSchema = z.object({
   templateId: z.number(),
-  teamId: z.number().min(1).optional(),
-  data: z.object({
-    title: z.string().min(1).optional(),
-    externalId: z.string().nullish(),
-    visibility: z.nativeEnum(DocumentVisibility).optional(),
-    globalAccessAuth: ZDocumentAccessAuthTypesSchema.nullable().optional(),
-    globalActionAuth: ZDocumentActionAuthTypesSchema.nullable().optional(),
-    publicTitle: z.string().trim().min(1).max(MAX_TEMPLATE_PUBLIC_TITLE_LENGTH).optional(),
-    publicDescription: z
-      .string()
-      .trim()
-      .min(1)
-      .max(MAX_TEMPLATE_PUBLIC_DESCRIPTION_LENGTH)
-      .optional(),
-    type: z.nativeEnum(TemplateType).optional(),
-    language: z
-      .union([z.string(), z.enum(SUPPORTED_LANGUAGE_CODES)])
-      .optional()
-      .default('en'),
-  }),
+  data: z
+    .object({
+      title: z.string().min(1).optional(),
+      externalId: z.string().nullish(),
+      visibility: z.nativeEnum(DocumentVisibility).optional(),
+      globalAccessAuth: ZDocumentAccessAuthTypesSchema.nullable().optional(),
+      globalActionAuth: ZDocumentActionAuthTypesSchema.nullable().optional(),
+      publicTitle: z
+        .string()
+        .trim()
+        .min(1)
+        .max(MAX_TEMPLATE_PUBLIC_TITLE_LENGTH)
+        .describe(
+          'The title of the template that will be displayed to the public. Only applicable for public templates.',
+        )
+        .optional(),
+      publicDescription: z
+        .string()
+        .trim()
+        .min(1)
+        .max(MAX_TEMPLATE_PUBLIC_DESCRIPTION_LENGTH)
+        .describe(
+          'The description of the template that will be displayed to the public. Only applicable for public templates.',
+        )
+        .optional(),
+      type: z.nativeEnum(TemplateType).optional(),
+    })
+    .optional(),
   meta: z
     .object({
-      subject: z.string(),
-      message: z.string(),
-      timezone: z.string(),
-      dateFormat: z.string(),
-      distributionMethod: z.nativeEnum(DocumentDistributionMethod),
-      emailSettings: ZDocumentEmailSettingsSchema,
-      redirectUrl: z
-        .string()
-        .optional()
-        .refine((value) => value === undefined || value === '' || isValidRedirectUrl(value), {
-          message:
-            'Please enter a valid URL, make sure you include http:// or https:// part of the url.',
-        }),
-      language: z.enum(SUPPORTED_LANGUAGE_CODES).optional(),
-      typedSignatureEnabled: z.boolean().optional(),
+      subject: ZDocumentMetaSubjectSchema.optional(),
+      message: ZDocumentMetaMessageSchema.optional(),
+      timezone: ZDocumentMetaTimezoneSchema.optional(),
+      dateFormat: ZDocumentMetaDateFormatSchema.optional(),
+      distributionMethod: ZDocumentMetaDistributionMethodSchema.optional(),
+      emailSettings: ZDocumentEmailSettingsSchema.optional(),
+      redirectUrl: ZDocumentMetaRedirectUrlSchema.optional(),
+      language: ZDocumentMetaLanguageSchema.optional(),
+      typedSignatureEnabled: ZDocumentMetaTypedSignatureEnabledSchema.optional(),
+      signingOrder: z.nativeEnum(DocumentSigningOrder).optional(),
     })
     .optional(),
 });
 
-export const ZSetSigningOrderForTemplateMutationSchema = z.object({
-  templateId: z.number(),
-  teamId: z.number().optional(),
-  signingOrder: z.nativeEnum(DocumentSigningOrder),
-});
-
 export const ZFindTemplatesQuerySchema = ZFindSearchParamsSchema.extend({
-  teamId: z.number().optional(),
-  type: z.nativeEnum(TemplateType).optional(),
+  type: z.nativeEnum(TemplateType).describe('Filter templates by type.').optional(),
 });
 
 export const ZGetTemplateByIdQuerySchema = z.object({
   templateId: z.number().min(1),
-  teamId: z.number().optional(),
 });
 
 export const ZMoveTemplatesToTeamSchema = z.object({
-  templateId: z.number(),
-  teamId: z.number(),
-});
-
-export const ZUpdateTemplateTypedSignatureSettingsMutationSchema = z.object({
-  templateId: z.number(),
-  teamId: z.number().optional(),
-  typedSignatureEnabled: z.boolean(),
+  templateId: z.number().describe('The ID of the template to move to.'),
+  teamId: z.number().describe('The ID of the team to move the template to.'),
 });
 
 export type TCreateTemplateMutationSchema = z.infer<typeof ZCreateTemplateMutationSchema>;

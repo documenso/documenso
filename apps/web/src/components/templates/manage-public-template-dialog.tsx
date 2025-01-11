@@ -123,7 +123,6 @@ export const ManagePublicTemplateDialog = ({
     try {
       await updateTemplateSettings({
         templateId,
-        teamId: team?.id,
         data: {
           type: TemplateType.PRIVATE,
         },
@@ -158,7 +157,6 @@ export const ManagePublicTemplateDialog = ({
     try {
       await updateTemplateSettings({
         templateId: selectedTemplateId,
-        teamId: team?.id,
         data: {
           type: TemplateType.PUBLIC,
           publicTitle,

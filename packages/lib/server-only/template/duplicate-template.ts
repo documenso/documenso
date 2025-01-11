@@ -9,6 +9,7 @@ import type { TDuplicateTemplateMutationSchema } from '@documenso/trpc/server/te
 
 export type DuplicateTemplateOptions = TDuplicateTemplateMutationSchema & {
   userId: number;
+  teamId?: number;
 };
 
 export const ZDuplicateTemplateResponseSchema = TemplateSchema;
@@ -20,28 +21,25 @@ export const duplicateTemplate = async ({
   userId,
   teamId,
 }: DuplicateTemplateOptions): Promise<TDuplicateTemplateResponse> => {
-  let templateWhereFilter: Prisma.TemplateWhereUniqueInput = {
-    id: templateId,
-    userId,
-    teamId: null,
-  };
-
-  if (teamId !== undefined) {
-    templateWhereFilter = {
-      id: templateId,
-      teamId,
-      team: {
-        members: {
-          some: {
-            userId,
-          },
-        },
-      },
-    };
-  }
-
   const template = await prisma.template.findUnique({
-    where: templateWhereFilter,
+    where: {
+      id: templateId,
+      ...(teamId
+        ? {
+            team: {
+              id: teamId,
+              members: {
+                some: {
+                  userId,
+                },
+              },
+            },
+          }
+        : {
+            userId,
+            teamId: null,
+          }),
+    },
     include: {
       Recipient: true,
       Field: true,

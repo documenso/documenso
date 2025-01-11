@@ -64,7 +64,6 @@ export const EditDocumentForm = ({
     trpc.document.getDocumentWithDetailsById.useQuery(
       {
         documentId: initialDocument.id,
-        teamId: team?.id,
       },
       {
         initialData: initialDocument,
@@ -74,13 +73,12 @@ export const EditDocumentForm = ({
 
   const { Recipient: recipients, Field: fields } = document;
 
-  const { mutateAsync: setSettingsForDocument } = trpc.document.setSettingsForDocument.useMutation({
+  const { mutateAsync: updateDocument } = trpc.document.setSettingsForDocument.useMutation({
     ...DO_NOT_INVALIDATE_QUERY_ON_MUTATION,
     onSuccess: (newData) => {
       utils.document.getDocumentWithDetailsById.setData(
         {
           documentId: initialDocument.id,
-          teamId: team?.id,
         },
         (oldData) => ({ ...(oldData || initialDocument), ...newData }),
       );
@@ -94,7 +92,6 @@ export const EditDocumentForm = ({
         utils.document.getDocumentWithDetailsById.setData(
           {
             documentId: initialDocument.id,
-            teamId: team?.id,
           },
           (oldData) => ({ ...(oldData || initialDocument), ...newData, id: Number(newData.id) }),
         );
@@ -107,38 +104,18 @@ export const EditDocumentForm = ({
       utils.document.getDocumentWithDetailsById.setData(
         {
           documentId: initialDocument.id,
-          teamId: team?.id,
         },
         (oldData) => ({ ...(oldData || initialDocument), Field: newFields }),
       );
     },
   });
 
-  const { mutateAsync: updateTypedSignature } =
-    trpc.document.updateTypedSignatureSettings.useMutation({
-      ...DO_NOT_INVALIDATE_QUERY_ON_MUTATION,
-      onSuccess: (newData) => {
-        utils.document.getDocumentWithDetailsById.setData(
-          {
-            documentId: initialDocument.id,
-            teamId: team?.id,
-          },
-          (oldData) => ({
-            ...(oldData || initialDocument),
-            ...newData,
-            id: Number(newData.id),
-          }),
-        );
-      },
-    });
-
-  const { mutateAsync: addSigners } = trpc.recipient.addSigners.useMutation({
+  const { mutateAsync: setRecipients } = trpc.recipient.setDocumentRecipients.useMutation({
     ...DO_NOT_INVALIDATE_QUERY_ON_MUTATION,
     onSuccess: ({ recipients: newRecipients }) => {
       utils.document.getDocumentWithDetailsById.setData(
         {
           documentId: initialDocument.id,
-          teamId: team?.id,
         },
         (oldData) => ({ ...(oldData || initialDocument), Recipient: newRecipients }),
       );
@@ -151,7 +128,6 @@ export const EditDocumentForm = ({
       utils.document.getDocumentWithDetailsById.setData(
         {
           documentId: initialDocument.id,
-          teamId: team?.id,
         },
         (oldData) => ({ ...(oldData || initialDocument), ...newData }),
       );
@@ -205,9 +181,8 @@ export const EditDocumentForm = ({
     try {
       const { timezone, dateFormat, redirectUrl, language } = data.meta;
 
-      await setSettingsForDocument({
+      await updateDocument({
         documentId: document.id,
-        teamId: team?.id,
         data: {
           title: data.title,
           externalId: data.externalId || null,
@@ -246,10 +221,9 @@ export const EditDocumentForm = ({
           signingOrder: data.signingOrder,
         }),
 
-        addSigners({
+        setRecipients({
           documentId: document.id,
-          teamId: team?.id,
-          signers: data.signers.map((signer) => ({
+          recipients: data.signers.map((signer) => ({
             ...signer,
             // Explicitly set to null to indicate we want to remove auth if required.
             actionAuth: signer.actionAuth || null,
@@ -279,9 +253,12 @@ export const EditDocumentForm = ({
         fields: data.fields,
       });
 
-      await updateTypedSignature({
+      await updateDocument({
         documentId: document.id,
-        typedSignatureEnabled: data.typedSignatureEnabled,
+
+        meta: {
+          typedSignatureEnabled: data.typedSignatureEnabled,
+        },
       });
 
       // Clear all field data from localStorage
@@ -313,7 +290,6 @@ export const EditDocumentForm = ({
     try {
       await sendDocument({
         documentId: document.id,
-        teamId: team?.id,
         meta: {
           subject,
           message,

@@ -1,7 +1,7 @@
 import type { z } from 'zod';
 
 import { DOCUMENT_AUDIT_LOG_TYPE } from '@documenso/lib/types/document-audit-logs';
-import type { RequestMetadata } from '@documenso/lib/universal/extract-request-metadata';
+import type { ApiRequestMetadata } from '@documenso/lib/universal/extract-request-metadata';
 import { putPdfFile } from '@documenso/lib/universal/upload/put-file';
 import { createDocumentAuditLogData } from '@documenso/lib/utils/document-audit-logs';
 import { prisma } from '@documenso/prisma';
@@ -31,7 +31,7 @@ export type SendDocumentOptions = {
   userId: number;
   teamId?: number;
   sendEmail?: boolean;
-  requestMetadata?: RequestMetadata;
+  requestMetadata: ApiRequestMetadata;
 };
 
 export const ZSendDocumentResponseSchema = DocumentSchema.extend({
@@ -48,17 +48,6 @@ export const sendDocument = async ({
   sendEmail,
   requestMetadata,
 }: SendDocumentOptions): Promise<TSendDocumentResponse> => {
-  const user = await prisma.user.findFirstOrThrow({
-    where: {
-      id: userId,
-    },
-    select: {
-      id: true,
-      name: true,
-      email: true,
-    },
-  });
-
   const document = await prisma.document.findUnique({
     where: {
       id: documentId,
@@ -198,7 +187,7 @@ export const sendDocument = async ({
             userId,
             documentId,
             recipientId: recipient.id,
-            requestMetadata,
+            requestMetadata: requestMetadata?.requestMetadata,
           },
         });
       }),
@@ -215,7 +204,7 @@ export const sendDocument = async ({
       name: 'internal.seal-document',
       payload: {
         documentId,
-        requestMetadata,
+        requestMetadata: requestMetadata?.requestMetadata,
       },
     });
 
@@ -237,8 +226,7 @@ export const sendDocument = async ({
         data: createDocumentAuditLogData({
           type: DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_SENT,
           documentId: document.id,
-          requestMetadata,
-          user,
+          metadata: requestMetadata,
           data: {},
         }),
       });

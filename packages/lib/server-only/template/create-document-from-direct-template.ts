@@ -33,7 +33,7 @@ import type { TRecipientActionAuthTypes } from '../../types/document-auth';
 import { DocumentAccessAuth, ZRecipientAuthOptionsSchema } from '../../types/document-auth';
 import { ZFieldMetaSchema } from '../../types/field-meta';
 import { ZWebhookDocumentSchema } from '../../types/webhook-payload';
-import type { RequestMetadata } from '../../universal/extract-request-metadata';
+import type { ApiRequestMetadata } from '../../universal/extract-request-metadata';
 import type { CreateDocumentAuditLogDataResponse } from '../../utils/document-audit-logs';
 import { createDocumentAuditLogData } from '../../utils/document-audit-logs';
 import {
@@ -55,7 +55,7 @@ export type CreateDocumentFromDirectTemplateOptions = {
   directTemplateExternalId?: string;
   signedFieldValues: TSignFieldWithTokenMutationSchema[];
   templateUpdatedAt: Date;
-  requestMetadata: RequestMetadata;
+  requestMetadata: ApiRequestMetadata;
   user?: {
     id: number;
     name?: string;
@@ -454,7 +454,7 @@ export const createDocumentFromDirectTemplate = async ({
           name: user?.name,
           email: directRecipientEmail,
         },
-        requestMetadata,
+        metadata: requestMetadata,
         data: {
           title: document.title,
           source: {
@@ -472,7 +472,7 @@ export const createDocumentFromDirectTemplate = async ({
           name: user?.name,
           email: directRecipientEmail,
         },
-        requestMetadata,
+        metadata: requestMetadata,
         data: {
           recipientEmail: createdDirectRecipient.email,
           recipientId: createdDirectRecipient.id,
@@ -490,7 +490,7 @@ export const createDocumentFromDirectTemplate = async ({
             name: user?.name,
             email: directRecipientEmail,
           },
-          requestMetadata,
+          metadata: requestMetadata,
           data: {
             recipientEmail: createdDirectRecipient.email,
             recipientId: createdDirectRecipient.id,
@@ -535,7 +535,7 @@ export const createDocumentFromDirectTemplate = async ({
           name: user?.name,
           email: directRecipientEmail,
         },
-        requestMetadata,
+        metadata: requestMetadata,
         data: {
           recipientEmail: createdDirectRecipient.email,
           recipientId: createdDirectRecipient.id,

@@ -20,12 +20,10 @@ export type TemplatePageViewRecentActivityProps = {
 
 export const TemplatePageViewRecentActivity = ({
   templateId,
-  teamId,
   documentRootPath,
 }: TemplatePageViewRecentActivityProps) => {
   const { data, isLoading, isLoadingError, refetch } = trpc.document.findDocuments.useQuery({
     templateId,
-    teamId,
     orderByColumn: 'createdAt',
     orderByDirection: 'asc',
     perPage: 5,

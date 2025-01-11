@@ -3,7 +3,6 @@
 import type { z } from 'zod';
 
 import { isUserEnterprise } from '@documenso/ee/server-only/util/is-document-enterprise';
-import type { RequestMetadata } from '@documenso/lib/universal/extract-request-metadata';
 import { prisma } from '@documenso/prisma';
 import type { DocumentVisibility, Template, TemplateMeta } from '@documenso/prisma/client';
 import { TemplateSchema } from '@documenso/prisma/generated/zod';
@@ -12,11 +11,11 @@ import { AppError, AppErrorCode } from '../../errors/app-error';
 import type { TDocumentAccessAuthTypes, TDocumentActionAuthTypes } from '../../types/document-auth';
 import { createDocumentAuthOptions, extractDocumentAuthMethods } from '../../utils/document-auth';
 
-export type UpdateTemplateSettingsOptions = {
+export type UpdateTemplateOptions = {
   userId: number;
   teamId?: number;
   templateId: number;
-  data: {
+  data?: {
     title?: string;
     externalId?: string | null;
     visibility?: DocumentVisibility;
@@ -27,26 +26,19 @@ export type UpdateTemplateSettingsOptions = {
     type?: Template['type'];
   };
   meta?: Partial<Omit<TemplateMeta, 'id' | 'templateId'>>;
-  requestMetadata?: RequestMetadata;
 };
 
-export const ZUpdateTemplateSettingsResponseSchema = TemplateSchema;
+export const ZUpdateTemplateResponseSchema = TemplateSchema;
 
-export type TUpdateTemplateSettingsResponse = z.infer<typeof ZUpdateTemplateSettingsResponseSchema>;
+export type TUpdateTemplateResponse = z.infer<typeof ZUpdateTemplateResponseSchema>;
 
-export const updateTemplateSettings = async ({
+export const updateTemplate = async ({
   userId,
   teamId,
   templateId,
-  meta,
-  data,
-}: UpdateTemplateSettingsOptions): Promise<TUpdateTemplateSettingsResponse> => {
-  if (Object.values(data).length === 0 && Object.keys(meta ?? {}).length === 0) {
-    throw new AppError(AppErrorCode.INVALID_BODY, {
-      message: 'Missing data to update',
-    });
-  }
-
+  meta = {},
+  data = {},
+}: UpdateTemplateOptions): Promise<TUpdateTemplateResponse> => {
   const template = await prisma.template.findFirstOrThrow({
     where: {
       id: templateId,
@@ -70,6 +62,10 @@ export const updateTemplateSettings = async ({
       templateMeta: true,
     },
   });
+
+  if (Object.values(data).length === 0 && Object.keys(meta).length === 0) {
+    return template;
+  }
 
   const { documentAuthOption } = extractDocumentAuthMethods({
     documentAuth: template.authOptions,
@@ -108,12 +104,12 @@ export const updateTemplateSettings = async ({
       id: templateId,
     },
     data: {
-      title: data.title,
-      externalId: data.externalId,
-      type: data.type,
-      visibility: data.visibility,
-      publicDescription: data.publicDescription,
-      publicTitle: data.publicTitle,
+      title: data?.title,
+      externalId: data?.externalId,
+      type: data?.type,
+      visibility: data?.visibility,
+      publicDescription: data?.publicDescription,
+      publicTitle: data?.publicTitle,
       authOptions,
       templateMeta: {
         upsert: {

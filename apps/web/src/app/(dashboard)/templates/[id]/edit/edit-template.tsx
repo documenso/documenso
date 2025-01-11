@@ -62,7 +62,6 @@ export const EditTemplateForm = ({
   const { data: template, refetch: refetchTemplate } = trpc.template.getTemplateById.useQuery(
     {
       templateId: initialTemplate.id,
-      teamId: initialTemplate.teamId || undefined,
     },
     {
       initialData: initialTemplate,
@@ -104,19 +103,6 @@ export const EditTemplateForm = ({
     },
   });
 
-  const { mutateAsync: setSigningOrderForTemplate } =
-    trpc.template.setSigningOrderForTemplate.useMutation({
-      ...DO_NOT_INVALIDATE_QUERY_ON_MUTATION,
-      onSuccess: (newData) => {
-        utils.template.getTemplateById.setData(
-          {
-            templateId: initialTemplate.id,
-          },
-          (oldData) => ({ ...(oldData || initialTemplate), ...newData }),
-        );
-      },
-    });
-
   const { mutateAsync: addTemplateFields } = trpc.field.addTemplateFields.useMutation({
     ...DO_NOT_INVALIDATE_QUERY_ON_MUTATION,
     onSuccess: (newData) => {
@@ -129,7 +115,7 @@ export const EditTemplateForm = ({
     },
   });
 
-  const { mutateAsync: addTemplateSigners } = trpc.recipient.addTemplateSigners.useMutation({
+  const { mutateAsync: setRecipients } = trpc.recipient.setTemplateRecipients.useMutation({
     ...DO_NOT_INVALIDATE_QUERY_ON_MUTATION,
     onSuccess: (newData) => {
       utils.template.getTemplateById.setData(
@@ -141,28 +127,10 @@ export const EditTemplateForm = ({
     },
   });
 
-  const { mutateAsync: updateTypedSignature } =
-    trpc.template.updateTemplateTypedSignatureSettings.useMutation({
-      ...DO_NOT_INVALIDATE_QUERY_ON_MUTATION,
-      onSuccess: (newData) => {
-        utils.template.getTemplateById.setData(
-          {
-            templateId: initialTemplate.id,
-          },
-          (oldData) => ({
-            ...(oldData || initialTemplate),
-            ...newData,
-            id: Number(newData.id),
-          }),
-        );
-      },
-    });
-
   const onAddSettingsFormSubmit = async (data: TAddTemplateSettingsFormSchema) => {
     try {
       await updateTemplateSettings({
         templateId: template.id,
-        teamId: team?.id,
         data: {
           title: data.title,
           externalId: data.externalId || null,
@@ -196,16 +164,16 @@ export const EditTemplateForm = ({
   ) => {
     try {
       await Promise.all([
-        setSigningOrderForTemplate({
+        updateTemplateSettings({
           templateId: template.id,
-          teamId: team?.id,
-          signingOrder: data.signingOrder,
+          meta: {
+            signingOrder: data.signingOrder,
+          },
         }),
 
-        addTemplateSigners({
+        setRecipients({
           templateId: template.id,
-          teamId: team?.id,
-          signers: data.signers,
+          recipients: data.signers,
         }),
       ]);
 
@@ -229,10 +197,11 @@ export const EditTemplateForm = ({
         fields: data.fields,
       });
 
-      await updateTypedSignature({
+      await updateTemplateSettings({
         templateId: template.id,
-        teamId: team?.id,
-        typedSignatureEnabled: data.typedSignatureEnabled,
+        meta: {
+          typedSignatureEnabled: data.typedSignatureEnabled,
+        },
       });
 
       // Clear all field data from localStorage

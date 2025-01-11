@@ -38,7 +38,6 @@ export const DeleteDocumentDialog = ({
   onOpenChange,
   status,
   documentTitle,
-  teamId,
   canManageDocument,
 }: DeleteDocumentDialogProps) => {
   const router = useRouter();
@@ -76,7 +75,7 @@ export const DeleteDocumentDialog = ({
 
   const onDelete = async () => {
     try {
-      await deleteDocument({ documentId: id, teamId });
+      await deleteDocument({ documentId: id });
     } catch {
       toast({
         title: _(msg`Something went wrong`),
