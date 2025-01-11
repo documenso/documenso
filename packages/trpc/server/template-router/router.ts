@@ -4,6 +4,7 @@ import { z } from 'zod';
 import { getServerLimits } from '@documenso/ee/server-only/limits/server';
 import { isValidLanguageCode } from '@documenso/lib/constants/i18n';
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
+import { jobs } from '@documenso/lib/jobs/client';
 import {
   ZGetDocumentWithDetailsByIdResponseSchema,
   getDocumentWithDetailsById,
@@ -53,6 +54,7 @@ import type { Document } from '@documenso/prisma/client';
 
 import { authenticatedProcedure, maybeAuthenticatedProcedure, router } from '../trpc';
 import {
+  ZBulkSendTemplateMutationSchema,
   ZCreateDocumentFromDirectTemplateMutationSchema,
   ZCreateDocumentFromTemplateMutationSchema,
   ZCreateTemplateDirectLinkMutationSchema,
@@ -476,5 +478,46 @@ export const templateRouter = router({
         },
         requestMetadata: extractNextApiRequestMetadata(ctx.req),
       });
+    }),
+
+  uploadBulkSend: authenticatedProcedure
+    .input(ZBulkSendTemplateMutationSchema)
+    .mutation(async ({ ctx, input }) => {
+      const { templateId, teamId, csv, sendImmediately } = input;
+      const { user } = ctx;
+
+      if (csv.length > 4 * 1024 * 1024) {
+        throw new TRPCError({
+          code: 'BAD_REQUEST',
+          message: 'File size exceeds 4MB limit',
+        });
+      }
+
+      const template = await getTemplateById({
+        id: templateId,
+        teamId,
+        userId: user.id,
+      });
+
+      if (!template) {
+        throw new TRPCError({
+          code: 'NOT_FOUND',
+          message: 'Template not found',
+        });
+      }
+
+      await jobs.triggerJob({
+        name: 'internal.bulk-send-template',
+        payload: {
+          userId: user.id,
+          teamId,
+          templateId,
+          csvContent: csv,
+          sendImmediately,
+          requestMetadata: extractNextApiRequestMetadata(ctx.req),
+        },
+      });
+
+      return { success: true };
     }),
 });

@@ -14,6 +14,7 @@ import { LazyPDFViewer } from '@documenso/ui/primitives/lazy-pdf-viewer';
 
 import { DocumentReadOnlyFields } from '~/components/document/document-read-only-fields';
 import { TemplateType } from '~/components/formatter/template-type';
+import { TemplateBulkSendDialog } from '~/components/templates/template-bulk-send-dialog';
 
 import { DataTableActionDropdown } from '../data-table-action-dropdown';
 import { TemplateDirectLinkBadge } from '../template-direct-link-badge';
@@ -110,6 +111,8 @@ export const TemplatePageView = async ({ params, team }: TemplatePageViewProps) 
 
         <div className="mt-2 flex flex-row space-x-4 sm:mt-0 sm:self-end">
           <TemplateDirectLinkDialogWrapper template={template} />
+
+          <TemplateBulkSendDialog templateId={template.id} recipients={template.Recipient} />
 
           <Button className="w-full" asChild>
             <Link href={`${templateRootPath}/${template.id}/edit`}>

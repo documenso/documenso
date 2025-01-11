@@ -149,6 +149,13 @@ export const ZUpdateTemplateTypedSignatureSettingsMutationSchema = z.object({
   typedSignatureEnabled: z.boolean(),
 });
 
+export const ZBulkSendTemplateMutationSchema = z.object({
+  templateId: z.number(),
+  teamId: z.number().optional(),
+  csv: z.string().min(1),
+  sendImmediately: z.boolean(),
+});
+
 export type TCreateTemplateMutationSchema = z.infer<typeof ZCreateTemplateMutationSchema>;
 export type TCreateDocumentFromTemplateMutationSchema = z.infer<
   typeof ZCreateDocumentFromTemplateMutationSchema
@@ -157,3 +164,4 @@ export type TDuplicateTemplateMutationSchema = z.infer<typeof ZDuplicateTemplate
 export type TDeleteTemplateMutationSchema = z.infer<typeof ZDeleteTemplateMutationSchema>;
 export type TGetTemplateByIdQuerySchema = z.infer<typeof ZGetTemplateByIdQuerySchema>;
 export type TMoveTemplatesToSchema = z.infer<typeof ZMoveTemplatesToTeamSchema>;
+export type TBulkSendTemplateMutationSchema = z.infer<typeof ZBulkSendTemplateMutationSchema>;
