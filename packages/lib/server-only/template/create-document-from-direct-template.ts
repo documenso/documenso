@@ -609,6 +609,7 @@ export const createDocumentFromDirectTemplate = async ({
       },
       include: {
         documentData: true,
+        documentMeta: true,
         Recipient: true,
       },
     });
