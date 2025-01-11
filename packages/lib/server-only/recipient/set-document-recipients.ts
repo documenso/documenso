@@ -372,12 +372,15 @@ type RecipientData = {
 const hasRecipientBeenChanged = (recipient: Recipient, newRecipientData: RecipientData) => {
   const authOptions = ZRecipientAuthOptionsSchema.parse(recipient.authOptions);
 
+  const newRecipientAccessAuth = newRecipientData.accessAuth || null;
+  const newRecipientActionAuth = newRecipientData.actionAuth || null;
+
   return (
     recipient.email !== newRecipientData.email ||
     recipient.name !== newRecipientData.name ||
     recipient.role !== newRecipientData.role ||
     recipient.signingOrder !== newRecipientData.signingOrder ||
-    authOptions.accessAuth !== newRecipientData.accessAuth ||
-    authOptions.actionAuth !== newRecipientData.actionAuth
+    authOptions.accessAuth !== newRecipientAccessAuth ||
+    authOptions.actionAuth !== newRecipientActionAuth
   );
 };
