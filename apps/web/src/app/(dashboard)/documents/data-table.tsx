@@ -57,14 +57,14 @@ export const DocumentsDataTable = ({
       {
         id: 'sender',
         header: _(msg`Sender`),
-        cell: ({ row }) => row.original.User.name ?? row.original.User.email,
+        cell: ({ row }) => row.original.user.name ?? row.original.user.email,
       },
       {
         header: _(msg`Recipient`),
         accessorKey: 'recipient',
         cell: ({ row }) => (
           <StackAvatarsWithTooltip
-            recipients={row.original.Recipient}
+            recipients={row.original.recipients}
             documentStatus={row.original.status}
           />
         ),

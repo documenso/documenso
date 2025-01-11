@@ -29,7 +29,7 @@ export const getFieldById = async ({
       id: fieldId,
       documentId,
       templateId,
-      Document: {
+      document: {
         OR:
           teamId === undefined
             ? [

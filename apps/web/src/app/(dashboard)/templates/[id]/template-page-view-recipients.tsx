@@ -10,7 +10,7 @@ import { AvatarWithText } from '@documenso/ui/primitives/avatar';
 
 export type TemplatePageViewRecipientsProps = {
   template: Template & {
-    Recipient: Recipient[];
+    recipients: Recipient[];
   };
   templateRootPath: string;
 };
@@ -21,7 +21,7 @@ export const TemplatePageViewRecipients = ({
 }: TemplatePageViewRecipientsProps) => {
   const { _ } = useLingui();
 
-  const recipients = template.Recipient;
+  const recipients = template.recipients;
 
   return (
     <section className="dark:bg-background border-border bg-widget flex flex-col rounded-xl border">

@@ -56,7 +56,7 @@ export const duplicateDocument = async ({
   const createDocumentArguments: Prisma.DocumentCreateArgs = {
     data: {
       title: document.title,
-      User: {
+      user: {
         connect: {
           id: document.userId,
         },

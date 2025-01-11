@@ -55,7 +55,7 @@ export type SignDirectTemplateFormProps = {
   flowStep: DocumentFlowStep;
   directRecipient: Recipient;
   directRecipientFields: Field[];
-  template: Omit<TemplateWithDetails, 'User'>;
+  template: Omit<TemplateWithDetails, 'user'>;
   onSubmit: (_data: DirectTemplateLocalField[]) => Promise<void>;
 };
 
@@ -127,7 +127,7 @@ export const SignDirectTemplateForm = ({
           customText: '',
           inserted: false,
           signedValue: undefined,
-          Signature: undefined,
+          signature: undefined,
         };
       }),
     );

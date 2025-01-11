@@ -46,7 +46,7 @@ export const toggleTemplateDirectLink = async ({
           }),
     },
     include: {
-      Recipient: true,
+      recipients: true,
       directLink: true,
     },
   });

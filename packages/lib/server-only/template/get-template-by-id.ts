@@ -23,9 +23,9 @@ export const ZGetTemplateByIdResponseSchema = TemplateSchema.extend({
   directLink: TemplateDirectLinkSchema.nullable(),
   templateDocumentData: DocumentDataSchema,
   templateMeta: TemplateMetaSchema.nullable(),
-  Recipient: RecipientSchema.array(),
-  Field: FieldSchema.array(),
-  User: UserSchema.pick({
+  recipients: RecipientSchema.array(),
+  fields: FieldSchema.array(),
+  user: UserSchema.pick({
     id: true,
     name: true,
     email: true,
@@ -62,9 +62,9 @@ export const getTemplateById = async ({
       directLink: true,
       templateDocumentData: true,
       templateMeta: true,
-      Recipient: true,
-      Field: true,
-      User: {
+      recipients: true,
+      fields: true,
+      user: {
         select: {
           id: true,
           name: true,

@@ -61,8 +61,8 @@ export const createDocumentFields = async ({
           }),
     },
     include: {
-      Recipient: true,
-      Field: true,
+      recipients: true,
+      fields: true,
     },
   });
 
@@ -80,7 +80,7 @@ export const createDocumentFields = async ({
 
   // Field validation.
   const validatedFields = fields.map((field) => {
-    const recipient = document.Recipient.find((recipient) => recipient.id === field.recipientId);
+    const recipient = document.recipients.find((recipient) => recipient.id === field.recipientId);
 
     // Each field MUST have a recipient associated with it.
     if (!recipient) {
@@ -90,7 +90,7 @@ export const createDocumentFields = async ({
     }
 
     // Check whether the recipient associated with the field can have new fields created.
-    if (!canRecipientFieldsBeModified(recipient, document.Field)) {
+    if (!canRecipientFieldsBeModified(recipient, document.fields)) {
       throw new AppError(AppErrorCode.INVALID_REQUEST, {
         message:
           'Recipient type cannot have fields, or they have already interacted with the document.',

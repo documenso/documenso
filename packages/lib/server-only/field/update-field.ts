@@ -44,7 +44,7 @@ export const updateField = async ({
   const oldField = await prisma.field.findFirstOrThrow({
     where: {
       id: fieldId,
-      Document: {
+      document: {
         id: documentId,
         ...(teamId
           ? {
@@ -86,7 +86,7 @@ export const updateField = async ({
         fieldMeta: newFieldMeta,
       },
       include: {
-        Recipient: true,
+        recipient: true,
       },
     });
 
@@ -127,7 +127,7 @@ export const updateField = async ({
         },
         data: {
           fieldId: updatedField.secondaryId,
-          fieldRecipientEmail: updatedField.Recipient?.email ?? '',
+          fieldRecipientEmail: updatedField.recipient?.email ?? '',
           fieldRecipientId: recipientId ?? -1,
           fieldType: updatedField.type,
           changes: diffFieldChanges(oldField, updatedField),

@@ -56,8 +56,8 @@ export const updateTemplateFields = async ({
           }),
     },
     include: {
-      Recipient: true,
-      Field: true,
+      recipients: true,
+      fields: true,
     },
   });
 
@@ -68,7 +68,7 @@ export const updateTemplateFields = async ({
   }
 
   const fieldsToUpdate = fields.map((field) => {
-    const originalField = template.Field.find((existingField) => existingField.id === field.id);
+    const originalField = template.fields.find((existingField) => existingField.id === field.id);
 
     if (!originalField) {
       throw new AppError(AppErrorCode.NOT_FOUND, {
@@ -76,7 +76,7 @@ export const updateTemplateFields = async ({
       });
     }
 
-    const recipient = template.Recipient.find(
+    const recipient = template.recipients.find(
       (recipient) => recipient.id === originalField.recipientId,
     );
 
@@ -88,7 +88,7 @@ export const updateTemplateFields = async ({
     }
 
     // Check whether the recipient associated with the field can be modified.
-    if (!canRecipientFieldsBeModified(recipient, template.Field)) {
+    if (!canRecipientFieldsBeModified(recipient, template.fields)) {
       throw new AppError(AppErrorCode.INVALID_REQUEST, {
         message:
           'Cannot modify a field where the recipient has already interacted with the document',

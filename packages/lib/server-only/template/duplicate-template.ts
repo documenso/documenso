@@ -41,8 +41,8 @@ export const duplicateTemplate = async ({
           }),
     },
     include: {
-      Recipient: true,
-      Field: true,
+      recipients: true,
+      fields: true,
       templateDocumentData: true,
       templateMeta: true,
     },
@@ -77,8 +77,8 @@ export const duplicateTemplate = async ({
       teamId,
       title: template.title + ' (copy)',
       templateDocumentDataId: documentData.id,
-      Recipient: {
-        create: template.Recipient.map((recipient) => ({
+      recipients: {
+        create: template.recipients.map((recipient) => ({
           email: recipient.email,
           name: recipient.name,
           token: nanoid(),
@@ -87,15 +87,15 @@ export const duplicateTemplate = async ({
       templateMeta,
     },
     include: {
-      Recipient: true,
+      recipients: true,
     },
   });
 
   await prisma.field.createMany({
-    data: template.Field.map((field) => {
-      const recipient = template.Recipient.find((recipient) => recipient.id === field.recipientId);
+    data: template.fields.map((field) => {
+      const recipient = template.recipients.find((recipient) => recipient.id === field.recipientId);
 
-      const duplicatedTemplateRecipient = duplicatedTemplate.Recipient.find(
+      const duplicatedTemplateRecipient = duplicatedTemplate.recipients.find(
         (doc) => doc.email === recipient?.email,
       );
 

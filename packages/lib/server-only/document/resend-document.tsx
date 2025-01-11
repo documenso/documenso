@@ -54,7 +54,7 @@ export const resendDocument = async ({
   const document = await prisma.document.findUnique({
     where: documentWhereInput,
     include: {
-      Recipient: {
+      recipients: {
         where: {
           id: {
             in: recipients,
@@ -80,7 +80,7 @@ export const resendDocument = async ({
     throw new Error('Document not found');
   }
 
-  if (document.Recipient.length === 0) {
+  if (document.recipients.length === 0) {
     throw new Error('Document has no recipients');
   }
 
@@ -101,7 +101,7 @@ export const resendDocument = async ({
   }
 
   await Promise.all(
-    document.Recipient.map(async (recipient) => {
+    document.recipients.map(async (recipient) => {
       if (recipient.role === RecipientRole.CC) {
         return;
       }

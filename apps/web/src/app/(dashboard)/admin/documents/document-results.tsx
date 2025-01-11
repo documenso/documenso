@@ -86,14 +86,14 @@ export const AdminDocumentResults = () => {
         header: _(msg`Owner`),
         accessorKey: 'owner',
         cell: ({ row }) => {
-          const avatarFallbackText = row.original.User.name
-            ? extractInitials(row.original.User.name)
-            : row.original.User.email.slice(0, 1).toUpperCase();
+          const avatarFallbackText = row.original.user.name
+            ? extractInitials(row.original.user.name)
+            : row.original.user.email.slice(0, 1).toUpperCase();
 
           return (
             <Tooltip delayDuration={200}>
               <TooltipTrigger>
-                <Link href={`/admin/users/${row.original.User.id}`}>
+                <Link href={`/admin/users/${row.original.user.id}`}>
                   <Avatar className="dark:border-border h-12 w-12 border-2 border-solid border-white">
                     <AvatarFallback className="text-xs text-gray-400">
                       {avatarFallbackText}
@@ -110,8 +110,8 @@ export const AdminDocumentResults = () => {
                 </Avatar>
 
                 <div className="text-muted-foreground flex flex-col text-sm">
-                  <span>{row.original.User.name}</span>
-                  <span>{row.original.User.email}</span>
+                  <span>{row.original.user.name}</span>
+                  <span>{row.original.user.email}</span>
                 </div>
               </TooltipContent>
             </Tooltip>

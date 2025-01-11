@@ -217,7 +217,7 @@ export const NEXT_AUTH_OPTIONS: AuthOptions = {
             credentialId: Buffer.from(requestBodyCrediential.id, 'base64'),
           },
           include: {
-            User: {
+            user: {
               select: {
                 id: true,
                 email: true,
@@ -232,7 +232,7 @@ export const NEXT_AUTH_OPTIONS: AuthOptions = {
           throw new AppError(AppErrorCode.NOT_SETUP);
         }
 
-        const user = passkey.User;
+        const user = passkey.user;
 
         const { rpId, origin } = getAuthenticatorOptions();
 

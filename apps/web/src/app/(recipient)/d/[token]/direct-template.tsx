@@ -28,9 +28,9 @@ import type { DirectTemplateLocalField } from './sign-direct-template';
 import { SignDirectTemplateForm } from './sign-direct-template';
 
 export type TemplatesDirectPageViewProps = {
-  template: Omit<TemplateWithDetails, 'User'>;
+  template: Omit<TemplateWithDetails, 'user'>;
   directTemplateToken: string;
-  directTemplateRecipient: Recipient & { Field: Field[] };
+  directTemplateRecipient: Recipient & { fields: Field[] };
 };
 
 type DirectTemplateStep = 'configure' | 'sign';
@@ -164,7 +164,7 @@ export const DirectTemplatePageView = ({
             <SignDirectTemplateForm
               flowStep={directTemplateFlow.sign}
               directRecipient={recipient}
-              directRecipientFields={directTemplateRecipient.Field}
+              directRecipientFields={directTemplateRecipient.fields}
               template={template}
               onSubmit={onSignDirectTemplateSubmit}
             />

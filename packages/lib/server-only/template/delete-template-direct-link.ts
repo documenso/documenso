@@ -37,7 +37,7 @@ export const deleteTemplateDirectLink = async ({
     },
     include: {
       directLink: true,
-      Recipient: true,
+      recipients: true,
     },
   });
 
@@ -60,7 +60,7 @@ export const deleteTemplateDirectLink = async ({
         id: directLink.directTemplateRecipientId,
       },
       data: {
-        ...generateAvaliableRecipientPlaceholder(template.Recipient),
+        ...generateAvaliableRecipientPlaceholder(template.recipients),
       },
     });
 

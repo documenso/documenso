@@ -21,8 +21,8 @@ export type GetDocumentWithDetailsByIdOptions = {
 export const ZGetDocumentWithDetailsByIdResponseSchema = DocumentSchema.extend({
   documentData: DocumentDataSchema,
   documentMeta: DocumentMetaSchema.nullable(),
-  Recipient: RecipientSchema.array(),
-  Field: FieldSchema.array(),
+  recipients: RecipientSchema.array(),
+  fields: FieldSchema.array(),
 });
 
 export type TGetDocumentWithDetailsByIdResponse = z.infer<
@@ -45,8 +45,8 @@ export const getDocumentWithDetailsById = async ({
     include: {
       documentData: true,
       documentMeta: true,
-      Recipient: true,
-      Field: true,
+      recipients: true,
+      fields: true,
     },
   });
 

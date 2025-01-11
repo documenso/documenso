@@ -163,7 +163,7 @@ export const EmbedDirectTemplateClientPage = ({
           customText: '',
           inserted: false,
           signedValue: undefined,
-          Signature: undefined,
+          signature: undefined,
         });
       }),
     );

@@ -13,7 +13,10 @@ import type { Team, TeamGlobalSettings } from '@documenso/prisma/client';
 import { TeamMemberRole } from '@documenso/prisma/client';
 import { DocumentSchema } from '@documenso/prisma/generated/zod';
 
-import { ZWebhookDocumentSchema } from '../../types/webhook-payload';
+import {
+  ZWebhookDocumentSchema,
+  mapDocumentToWebhookDocumentPayload,
+} from '../../types/webhook-payload';
 import { getFile } from '../../universal/upload/get-file';
 import { putPdfFile } from '../../universal/upload/put-file';
 import { triggerWebhook } from '../webhooks/trigger/trigger-webhook';
@@ -178,7 +181,7 @@ export const createDocument = async ({
       },
       include: {
         documentMeta: true,
-        Recipient: true,
+        recipients: true,
       },
     });
 
@@ -188,7 +191,7 @@ export const createDocument = async ({
 
     await triggerWebhook({
       event: WebhookTriggerEvents.DOCUMENT_CREATED,
-      data: ZWebhookDocumentSchema.parse(createdDocument),
+      data: ZWebhookDocumentSchema.parse(mapDocumentToWebhookDocumentPayload(createdDocument)),
       userId,
       teamId,
     });

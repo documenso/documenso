@@ -56,8 +56,8 @@ export const createTemplateFields = async ({
           }),
     },
     include: {
-      Recipient: true,
-      Field: true,
+      recipients: true,
+      fields: true,
     },
   });
 
@@ -69,7 +69,7 @@ export const createTemplateFields = async ({
 
   // Field validation.
   const validatedFields = fields.map((field) => {
-    const recipient = template.Recipient.find((recipient) => recipient.id === field.recipientId);
+    const recipient = template.recipients.find((recipient) => recipient.id === field.recipientId);
 
     // Each field MUST have a recipient associated with it.
     if (!recipient) {
@@ -79,7 +79,7 @@ export const createTemplateFields = async ({
     }
 
     // Check whether the recipient associated with the field can have new fields created.
-    if (!canRecipientFieldsBeModified(recipient, template.Field)) {
+    if (!canRecipientFieldsBeModified(recipient, template.fields)) {
       throw new AppError(AppErrorCode.INVALID_REQUEST, {
         message:
           'Recipient type cannot have fields, or they have already interacted with the template.',

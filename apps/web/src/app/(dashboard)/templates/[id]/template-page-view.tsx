@@ -54,10 +54,10 @@ export const TemplatePageView = async ({ params, team }: TemplatePageViewProps) 
     redirect(templateRootPath);
   }
 
-  const { templateDocumentData, Field, Recipient: recipients, templateMeta } = template;
+  const { templateDocumentData, fields, recipients, templateMeta } = template;
 
   // Remap to fit the DocumentReadOnlyFields component.
-  const readOnlyFields = Field.map((field) => {
+  const readOnlyFields = fields.map((field) => {
     const recipient = recipients.find((recipient) => recipient.id === field.recipientId) || {
       name: '',
       email: '',
@@ -66,8 +66,8 @@ export const TemplatePageView = async ({ params, team }: TemplatePageViewProps) 
 
     return {
       ...field,
-      Recipient: recipient,
-      Signature: null,
+      recipient,
+      signature: null,
     };
   });
 
@@ -165,7 +165,7 @@ export const TemplatePageView = async ({ params, team }: TemplatePageViewProps) 
                 <UseTemplateDialog
                   templateId={template.id}
                   templateSigningOrder={template.templateMeta?.signingOrder}
-                  recipients={template.Recipient}
+                  recipients={template.recipients}
                   documentRootPath={documentRootPath}
                   trigger={
                     <Button className="w-full">

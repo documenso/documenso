@@ -24,7 +24,7 @@ import { apiSignin } from '../fixtures/authentication';
 const getDocumentByToken = async (token: string) => {
   return await prisma.document.findFirstOrThrow({
     where: {
-      Recipient: {
+      recipients: {
         some: {
           token,
         },
@@ -496,7 +496,7 @@ test('[DOCUMENT_FLOW]: should be able to sign a document with custom date', asyn
 
   const field = await prisma.field.findFirst({
     where: {
-      Recipient: {
+      recipients: {
         email: 'user1@example.com',
       },
       documentId: Number(document.id),
@@ -580,14 +580,14 @@ test('[DOCUMENT_FLOW]: should be able to create and sign a document with 3 recip
 
   const createdDocument = await prisma.document.findFirst({
     where: { title: documentTitle },
-    include: { Recipient: true },
+    include: { recipients: true },
   });
 
   expect(createdDocument).not.toBeNull();
-  expect(createdDocument?.Recipient.length).toBe(3);
+  expect(createdDocument?.recipients.length).toBe(3);
 
   for (let i = 0; i < 3; i++) {
-    const recipient = createdDocument?.Recipient.find(
+    const recipient = createdDocument?.recipients.find(
       (r) => r.email === `user${i + 1}@example.com`,
     );
     expect(recipient).not.toBeNull();

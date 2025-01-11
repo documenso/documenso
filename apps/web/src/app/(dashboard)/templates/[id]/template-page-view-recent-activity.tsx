@@ -123,7 +123,7 @@ export const TemplatePageViewRecentActivity = ({
                   {match(document.source)
                     .with(DocumentSource.DOCUMENT, DocumentSource.TEMPLATE, () => (
                       <Trans>
-                        Document created by <span className="font-bold">{document.User.name}</span>
+                        Document created by <span className="font-bold">{document.user.name}</span>
                       </Trans>
                     ))
                     .with(DocumentSource.TEMPLATE_DIRECT_LINK, () => (

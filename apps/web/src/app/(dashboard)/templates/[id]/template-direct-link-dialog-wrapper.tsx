@@ -11,7 +11,7 @@ import { Button } from '@documenso/ui/primitives/button';
 import { TemplateDirectLinkDialog } from '../template-direct-link-dialog';
 
 export type TemplateDirectLinkDialogWrapperProps = {
-  template: Template & { directLink?: TemplateDirectLink | null; Recipient: Recipient[] };
+  template: Template & { directLink?: TemplateDirectLink | null; recipients: Recipient[] };
 };
 
 export const TemplateDirectLinkDialogWrapper = ({

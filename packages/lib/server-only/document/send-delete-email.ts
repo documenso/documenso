@@ -23,7 +23,7 @@ export const sendDeleteEmail = async ({ documentId, reason }: SendDeleteEmailOpt
       id: documentId,
     },
     include: {
-      User: true,
+      user: true,
       documentMeta: true,
       team: {
         include: {
@@ -45,7 +45,7 @@ export const sendDeleteEmail = async ({ documentId, reason }: SendDeleteEmailOpt
     return;
   }
 
-  const { email, name } = document.User;
+  const { email, name } = document.user;
 
   const assetBaseUrl = NEXT_PUBLIC_WEBAPP_URL() || 'http://localhost:3000';
 
