@@ -90,7 +90,7 @@ jobs:
           GIT_SHA="$(git rev-parse HEAD)"
 
           # Check if the version is stable (no rc or beta in the version)
-          if [[ "$APP_VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+          if [[ "$APP_VERSION" =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
             docker manifest create \
               documenso/documenso:latest \
               --amend documenso/documenso-amd64:latest \
@@ -99,7 +99,7 @@ jobs:
             docker manifest push documenso/documenso:latest
           fi
 
-          if [[ "$APP_VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+-rc\.[0-9]+$ ]]; then
+          if [[ "$APP_VERSION" =~ ^v[0-9]+\.[0-9]+\.[0-9]+-rc\.[0-9]+$ ]]; then
             docker manifest create \
               documenso/documenso:rc \
               --amend documenso/documenso-amd64:rc \
@@ -127,7 +127,7 @@ jobs:
           GIT_SHA="$(git rev-parse HEAD)"
 
           # Check if the version is stable (no rc or beta in the version)
-          if [[ "$APP_VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+          if [[ "$APP_VERSION" =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
             docker manifest create \
               ghcr.io/documenso/documenso:latest \
               --amend ghcr.io/documenso/documenso-amd64:latest \
@@ -136,7 +136,7 @@ jobs:
             docker manifest push ghcr.io/documenso/documenso:latest
           fi
 
-          if [[ "$APP_VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+-rc\.[0-9]+$ ]]; then
+          if [[ "$APP_VERSION" =~ ^v[0-9]+\.[0-9]+\.[0-9]+-rc\.[0-9]+$ ]]; then
             docker manifest create \
               ghcr.io/documenso/documenso:rc \
               --amend ghcr.io/documenso/documenso-amd64:rc \

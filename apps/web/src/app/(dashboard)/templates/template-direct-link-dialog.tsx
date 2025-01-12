@@ -174,7 +174,6 @@ export const TemplateDirectLinkDialog = ({
 
     await createTemplateDirectLink({
       templateId: template.id,
-      teamId: team?.id,
       directRecipientId: recipientId,
     });
   };
@@ -345,7 +344,6 @@ export const TemplateDirectLinkDialog = ({
                         onClick={async () =>
                           createTemplateDirectLink({
                             templateId: template.id,
-                            teamId: team?.id,
                           })
                         }
                       >

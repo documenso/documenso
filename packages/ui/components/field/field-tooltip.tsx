@@ -40,7 +40,7 @@ export function FieldToolTip({ children, color, className = '', field }: FieldTo
 
   return createPortal(
     <div
-      className={cn('absolute')}
+      className={cn('pointer-events-none absolute')}
       style={{
         top: `${coords.y}px`,
         left: `${coords.x}px`,

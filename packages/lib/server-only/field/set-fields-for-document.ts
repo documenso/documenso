@@ -1,4 +1,5 @@
 import { isDeepEqual } from 'remeda';
+import { z } from 'zod';
 
 import { validateCheckboxField } from '@documenso/lib/advanced-fields-validation/validate-checkbox';
 import { validateDropdownField } from '@documenso/lib/advanced-fields-validation/validate-dropdown';
@@ -15,7 +16,7 @@ import {
   ZRadioFieldMeta,
   ZTextFieldMeta,
 } from '@documenso/lib/types/field-meta';
-import type { RequestMetadata } from '@documenso/lib/universal/extract-request-metadata';
+import type { ApiRequestMetadata } from '@documenso/lib/universal/extract-request-metadata';
 import {
   createDocumentAuditLogData,
   diffFieldChanges,
@@ -23,63 +24,66 @@ import {
 import { prisma } from '@documenso/prisma';
 import type { Field } from '@documenso/prisma/client';
 import { FieldType } from '@documenso/prisma/client';
+import { FieldSchema } from '@documenso/prisma/generated/zod';
 
 import { AppError, AppErrorCode } from '../../errors/app-error';
 import { canRecipientFieldsBeModified } from '../../utils/recipients';
 
 export interface SetFieldsForDocumentOptions {
   userId: number;
+  teamId?: number;
   documentId: number;
   fields: FieldData[];
-  requestMetadata?: RequestMetadata;
+  requestMetadata: ApiRequestMetadata;
 }
+
+export const ZSetFieldsForDocumentResponseSchema = z.object({
+  fields: z.array(FieldSchema),
+});
+
+export type TSetFieldsForDocumentResponse = z.infer<typeof ZSetFieldsForDocumentResponseSchema>;
 
 export const setFieldsForDocument = async ({
   userId,
+  teamId,
   documentId,
   fields,
   requestMetadata,
-}: SetFieldsForDocumentOptions): Promise<Field[]> => {
+}: SetFieldsForDocumentOptions): Promise<TSetFieldsForDocumentResponse> => {
   const document = await prisma.document.findFirst({
     where: {
       id: documentId,
-      OR: [
-        {
-          userId,
-        },
-        {
-          team: {
-            members: {
-              some: {
-                userId,
+      ...(teamId
+        ? {
+            team: {
+              id: teamId,
+              members: {
+                some: {
+                  userId,
+                },
               },
             },
-          },
-        },
-      ],
+          }
+        : {
+            userId,
+            teamId: null,
+          }),
     },
     include: {
       Recipient: true,
     },
   });
 
-  const user = await prisma.user.findFirstOrThrow({
-    where: {
-      id: userId,
-    },
-    select: {
-      id: true,
-      name: true,
-      email: true,
-    },
-  });
-
   if (!document) {
-    throw new Error('Document not found');
+    throw new AppError(AppErrorCode.NOT_FOUND, {
+      message: 'Document not found',
+    });
   }
 
   if (document.completedAt) {
-    throw new Error('Document already complete');
+    throw new AppError(AppErrorCode.INVALID_REQUEST, {
+      message: 'Document already complete',
+    });
   }
 
   const existingFields = await prisma.field.findMany({
@@ -104,7 +108,9 @@ export const setFieldsForDocument = async ({
 
     // Each field MUST have a recipient associated with it.
     if (!recipient) {
-      throw new AppError(AppErrorCode.INVALID_REQUEST, `Recipient not found for field ${field.id}`);
+      throw new AppError(AppErrorCode.INVALID_REQUEST, {
+        message: `Recipient not found for field ${field.id}`,
+      });
     }
 
     // Check whether the existing field can be modified.
@@ -113,10 +119,10 @@ export const setFieldsForDocument = async ({
       hasFieldBeenChanged(existing, field) &&
       !canRecipientFieldsBeModified(recipient, existingFields)
     ) {
-      throw new AppError(
-        AppErrorCode.INVALID_REQUEST,
-        'Cannot modify a field where the recipient has already interacted with the document',
-      );
+      throw new AppError(AppErrorCode.INVALID_REQUEST, {
+        message:
+          'Cannot modify a field where the recipient has already interacted with the document',
+      });
     }
 
     return {
@@ -266,8 +272,7 @@ export const setFieldsForDocument = async ({
             data: createDocumentAuditLogData({
               type: DOCUMENT_AUDIT_LOG_TYPE.FIELD_UPDATED,
               documentId: documentId,
-              user,
-              requestMetadata,
+              metadata: requestMetadata,
               data: {
                 changes,
                 ...baseAuditLog,
@@ -282,8 +287,7 @@ export const setFieldsForDocument = async ({
             data: createDocumentAuditLogData({
               type: DOCUMENT_AUDIT_LOG_TYPE.FIELD_CREATED,
               documentId: documentId,
-              user,
-              requestMetadata,
+              metadata: requestMetadata,
               data: {
                 ...baseAuditLog,
               },
@@ -311,8 +315,7 @@ export const setFieldsForDocument = async ({
           createDocumentAuditLogData({
             type: DOCUMENT_AUDIT_LOG_TYPE.FIELD_DELETED,
             documentId: documentId,
-            user,
-            requestMetadata,
+            metadata: requestMetadata,
             data: {
               fieldId: field.secondaryId,
               fieldRecipientEmail: field.Recipient?.email ?? '',
@@ -333,7 +336,9 @@ export const setFieldsForDocument = async ({
     return !isRemoved && !isUpdated;
   });
 
-  return [...filteredFields, ...persistedFields];
+  return {
+    fields: [...filteredFields, ...persistedFields],
+  };
 };
 
 /**

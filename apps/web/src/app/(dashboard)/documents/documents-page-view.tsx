@@ -83,7 +83,7 @@ export const DocumentsPageView = async ({ searchParams = {}, team }: DocumentsPa
     perPage,
     period,
     senderIds,
-    search,
+    query: search,
   });
 
   const getTabHref = (value: typeof status) => {

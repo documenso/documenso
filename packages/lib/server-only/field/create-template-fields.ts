@@ -1,0 +1,122 @@
+import { z } from 'zod';
+
+import type { TFieldMetaSchema } from '@documenso/lib/types/field-meta';
+import { prisma } from '@documenso/prisma';
+import type { FieldType } from '@documenso/prisma/client';
+import { FieldSchema } from '@documenso/prisma/generated/zod';
+
+import { AppError, AppErrorCode } from '../../errors/app-error';
+import { canRecipientFieldsBeModified } from '../../utils/recipients';
+
+export interface CreateTemplateFieldsOptions {
+  userId: number;
+  teamId?: number;
+  templateId: number;
+  fields: {
+    recipientId: number;
+    type: FieldType;
+    pageNumber: number;
+    pageX: number;
+    pageY: number;
+    width: number;
+    height: number;
+    fieldMeta?: TFieldMetaSchema;
+  }[];
+}
+
+export const ZCreateTemplateFieldsResponseSchema = z.object({
+  fields: z.array(FieldSchema),
+});
+
+export type TCreateTemplateFieldsResponse = z.infer<typeof ZCreateTemplateFieldsResponseSchema>;
+
+export const createTemplateFields = async ({
+  userId,
+  teamId,
+  templateId,
+  fields,
+}: CreateTemplateFieldsOptions): Promise<TCreateTemplateFieldsResponse> => {
+  const template = await prisma.template.findFirst({
+    where: {
+      id: templateId,
+      ...(teamId
+        ? {
+            team: {
+              id: teamId,
+              members: {
+                some: {
+                  userId,
+                },
+              },
+            },
+          }
+        : {
+            userId,
+            teamId: null,
+          }),
+    },
+    include: {
+      Recipient: true,
+      Field: true,
+    },
+  });
+
+  if (!template) {
+    throw new AppError(AppErrorCode.NOT_FOUND, {
+      message: 'template not found',
+    });
+  }
+
+  // Field validation.
+  const validatedFields = fields.map((field) => {
+    const recipient = template.Recipient.find((recipient) => recipient.id === field.recipientId);
+
+    // Each field MUST have a recipient associated with it.
+    if (!recipient) {
+      throw new AppError(AppErrorCode.INVALID_REQUEST, {
+        message: `Recipient ${field.recipientId} not found`,
+      });
+    }
+
+    // Check whether the recipient associated with the field can have new fields created.
+    if (!canRecipientFieldsBeModified(recipient, template.Field)) {
+      throw new AppError(AppErrorCode.INVALID_REQUEST, {
+        message:
+          'Recipient type cannot have fields, or they have already interacted with the template.',
+      });
+    }
+
+    return {
+      ...field,
+      recipientEmail: recipient.email,
+    };
+  });
+
+  const createdFields = await prisma.$transaction(async (tx) => {
+    return await Promise.all(
+      validatedFields.map(async (field) => {
+        const createdField = await tx.field.create({
+          data: {
+            type: field.type,
+            page: field.pageNumber,
+            positionX: field.pageX,
+            positionY: field.pageY,
+            width: field.width,
+            height: field.height,
+            customText: '',
+            inserted: false,
+            fieldMeta: field.fieldMeta,
+            templateId,
+            recipientId: field.recipientId,
+          },
+        });
+
+        return createdField;
+      }),
+    );
+  });
+
+  return {
+    fields: createdFields,
+  };
+};

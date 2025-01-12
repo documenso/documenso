@@ -60,7 +60,7 @@ export const DocumentPageView = async ({ params, team }: DocumentPageViewProps) 
   const { user } = await getRequiredServerComponentSession();
 
   const document = await getDocumentById({
-    id: documentId,
+    documentId,
     userId: user.id,
     teamId: team?.id,
   }).catch(() => null);
@@ -125,6 +125,7 @@ export const DocumentPageView = async ({ params, team }: DocumentPageViewProps) 
     getFieldsForDocument({
       documentId,
       userId: user.id,
+      teamId: team?.id,
     }),
   ]);
 
@@ -146,7 +147,10 @@ export const DocumentPageView = async ({ params, team }: DocumentPageViewProps) 
 
       <div className="flex flex-row justify-between truncate">
         <div>
-          <h1 className="mt-4 truncate text-2xl font-semibold md:text-3xl" title={document.title}>
+          <h1
+            className="mt-4 block max-w-[20rem] truncate text-2xl font-semibold md:max-w-[30rem] md:text-3xl"
+            title={document.title}
+          >
             {document.title}
           </h1>
 
@@ -218,7 +222,7 @@ export const DocumentPageView = async ({ params, team }: DocumentPageViewProps) 
                 <DocumentPageViewDropdown document={documentWithRecipients} team={team} />
               </div>
 
-              <p className="text-muted-foreground mt-2 px-4 text-sm ">
+              <p className="text-muted-foreground mt-2 px-4 text-sm">
                 {match(document.status)
                   .with(DocumentStatus.COMPLETED, () => (
                     <Trans>This document has been signed by all recipients</Trans>

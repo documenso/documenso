@@ -6,14 +6,19 @@ import PostHogServerClient from '@documenso/lib/server-only/feature-flags/get-po
 import { DOCUMENT_AUDIT_LOG_TYPE } from '@documenso/lib/types/document-audit-logs';
 import { createDocumentAuditLogData } from '@documenso/lib/utils/document-audit-logs';
 import { prisma } from '@documenso/prisma';
-import { DocumentStatus, RecipientRole, SigningStatus } from '@documenso/prisma/client';
-import { WebhookTriggerEvents } from '@documenso/prisma/client';
+import {
+  DocumentStatus,
+  RecipientRole,
+  SigningStatus,
+  WebhookTriggerEvents,
+} from '@documenso/prisma/client';
 import { signPdf } from '@documenso/signing';
 
-import { ZSupportedLanguageCodeSchema } from '../../constants/i18n';
+import { ZWebhookDocumentSchema } from '../../types/webhook-payload';
 import type { RequestMetadata } from '../../universal/extract-request-metadata';
 import { getFile } from '../../universal/upload/get-file';
 import { putPdfFile } from '../../universal/upload/put-file';
+import { fieldsContainUnsignedRequiredField } from '../../utils/advanced-fields-helpers';
 import { getCertificatePdf } from '../htmltopdf/get-certificate-pdf';
 import { flattenAnnotations } from '../pdf/flatten-annotations';
 import { flattenForm } from '../pdf/flatten-form';
@@ -48,6 +53,15 @@ export const sealDocument = async ({
       documentData: true,
       documentMeta: true,
       Recipient: true,
+      team: {
+        select: {
+          teamGlobalSettings: {
+            select: {
+              includeSigningCertificate: true,
+            },
+          },
+        },
+      },
     },
   });
 
@@ -79,8 +93,8 @@ export const sealDocument = async ({
     },
   });
 
-  if (fields.some((field) => !field.inserted)) {
-    throw new Error(`Document ${document.id} has unsigned fields`);
+  if (fieldsContainUnsignedRequiredField(fields)) {
+    throw new Error(`Document ${document.id} has unsigned required fields`);
   }
 
   if (isResealing) {
@@ -92,11 +106,13 @@ export const sealDocument = async ({
   // !: Need to write the fields onto the document as a hard copy
   const pdfData = await getFile(documentData);
 
-  const documentLanguage = ZSupportedLanguageCodeSchema.parse(document.documentMeta?.language);
-
-  const certificate = await getCertificatePdf({ documentId, language: documentLanguage })
-    .then(async (doc) => PDFDocument.load(doc))
-    .catch(() => null);
+  const certificateData =
+    (document.team?.teamGlobalSettings?.includeSigningCertificate ?? true)
+      ? await getCertificatePdf({
+          documentId,
+          language: document.documentMeta?.language,
+        }).catch(() => null)
+      : null;
 
   const doc = await PDFDocument.load(pdfData);
 
@@ -105,7 +121,9 @@ export const sealDocument = async ({
   flattenForm(doc);
   flattenAnnotations(doc);
 
-  if (certificate) {
+  if (certificateData) {
+    const certificate = await PDFDocument.load(certificateData);
+
     const certificatePages = await doc.copyPages(certificate, certificate.getPageIndices());
 
     certificatePages.forEach((page) => {
@@ -124,10 +142,10 @@ export const sealDocument = async ({
 
   const pdfBuffer = await signPdf({ pdf: Buffer.from(pdfBytes) });
 
-  const { name, ext } = path.parse(document.title);
+  const { name } = path.parse(document.title);
 
   const { data: newData } = await putPdfFile({
-    name: `${name}_signed${ext}`,
+    name: `${name}_signed.pdf`,
     type: 'application/pdf',
     arrayBuffer: async () => Promise.resolve(pdfBuffer),
   });
@@ -187,13 +205,14 @@ export const sealDocument = async ({
     },
     include: {
       documentData: true,
+      documentMeta: true,
       Recipient: true,
     },
   });
 
   await triggerWebhook({
     event: WebhookTriggerEvents.DOCUMENT_COMPLETED,
-    data: updatedDocument,
+    data: ZWebhookDocumentSchema.parse(updatedDocument),
     userId: document.userId,
     teamId: document.teamId ?? undefined,
   });

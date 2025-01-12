@@ -24,7 +24,6 @@ type DuplicateTemplateDialogProps = {
 
 export const DuplicateTemplateDialog = ({
   id,
-  teamId,
   open,
   onOpenChange,
 }: DuplicateTemplateDialogProps) => {
@@ -84,7 +83,6 @@ export const DuplicateTemplateDialog = ({
             onClick={async () =>
               duplicateTemplate({
                 templateId: id,
-                teamId,
               })
             }
           >

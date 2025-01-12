@@ -25,8 +25,6 @@ export const StackAvatar = ({ first, zIndex, fallbackText = '', type }: StackAva
     zIndexClass = ZIndexes[zIndex] ?? '';
   }
 
-  console.log({ type, fallbackText });
-
   switch (type) {
     case RecipientStatusType.UNSIGNED:
       classes = 'bg-dawn-200 text-dawn-900';
@@ -49,10 +47,7 @@ export const StackAvatar = ({ first, zIndex, fallbackText = '', type }: StackAva
 
   return (
     <Avatar
-      className={`
-        ${zIndexClass}
-        ${firstClass}
-        dark:border-border h-10 w-10 border-2 border-solid border-white`}
+      className={` ${zIndexClass} ${firstClass} dark:border-border h-10 w-10 border-2 border-solid border-white`}
     >
       <AvatarFallback className={classes}>{fallbackText}</AvatarFallback>
     </Avatar>

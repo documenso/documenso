@@ -2,10 +2,9 @@ import { Role } from '@prisma/client';
 import z from 'zod';
 
 import { ZSiteSettingSchema } from '@documenso/lib/server-only/site-settings/schema';
+import { ZFindSearchParamsSchema } from '@documenso/lib/types/search-params';
 
-export const ZAdminFindDocumentsQuerySchema = z.object({
-  term: z.string().optional(),
-  page: z.number().optional().default(1),
+export const ZAdminFindDocumentsQuerySchema = ZFindSearchParamsSchema.extend({
   perPage: z.number().optional().default(20),
 });
 
@@ -44,10 +43,21 @@ export type TAdminResealDocumentMutationSchema = z.infer<typeof ZAdminResealDocu
 
 export const ZAdminDeleteUserMutationSchema = z.object({
   id: z.number().min(1),
-  email: z.string().email(),
 });
 
 export type TAdminDeleteUserMutationSchema = z.infer<typeof ZAdminDeleteUserMutationSchema>;
+
+export const ZAdminEnableUserMutationSchema = z.object({
+  id: z.number().min(1),
+});
+
+export type TAdminEnableUserMutationSchema = z.infer<typeof ZAdminEnableUserMutationSchema>;
+
+export const ZAdminDisableUserMutationSchema = z.object({
+  id: z.number().min(1),
+});
+
+export type TAdminDisableUserMutationSchema = z.infer<typeof ZAdminDisableUserMutationSchema>;
 
 export const ZAdminDeleteDocumentMutationSchema = z.object({
   id: z.number().min(1),

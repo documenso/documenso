@@ -59,16 +59,15 @@ export const EditTemplateForm = ({
 
   const utils = trpc.useUtils();
 
-  const { data: template, refetch: refetchTemplate } =
-    trpc.template.getTemplateWithDetailsById.useQuery(
-      {
-        id: initialTemplate.id,
-      },
-      {
-        initialData: initialTemplate,
-        ...SKIP_QUERY_BATCH_META,
-      },
-    );
+  const { data: template, refetch: refetchTemplate } = trpc.template.getTemplateById.useQuery(
+    {
+      templateId: initialTemplate.id,
+    },
+    {
+      initialData: initialTemplate,
+      ...SKIP_QUERY_BATCH_META,
+    },
+  );
 
   const { Recipient: recipients, Field: fields, templateDocumentData } = template;
 
@@ -92,49 +91,36 @@ export const EditTemplateForm = ({
 
   const currentDocumentFlow = documentFlow[step];
 
-  const { mutateAsync: updateTemplateSettings } = trpc.template.updateTemplateSettings.useMutation({
+  const { mutateAsync: updateTemplateSettings } = trpc.template.updateTemplate.useMutation({
     ...DO_NOT_INVALIDATE_QUERY_ON_MUTATION,
     onSuccess: (newData) => {
-      utils.template.getTemplateWithDetailsById.setData(
+      utils.template.getTemplateById.setData(
         {
-          id: initialTemplate.id,
+          templateId: initialTemplate.id,
         },
         (oldData) => ({ ...(oldData || initialTemplate), ...newData }),
       );
     },
   });
-
-  const { mutateAsync: setSigningOrderForTemplate } =
-    trpc.template.setSigningOrderForTemplate.useMutation({
-      ...DO_NOT_INVALIDATE_QUERY_ON_MUTATION,
-      onSuccess: (newData) => {
-        utils.template.getTemplateWithDetailsById.setData(
-          {
-            id: initialTemplate.id,
-          },
-          (oldData) => ({ ...(oldData || initialTemplate), ...newData }),
-        );
-      },
-    });
 
   const { mutateAsync: addTemplateFields } = trpc.field.addTemplateFields.useMutation({
     ...DO_NOT_INVALIDATE_QUERY_ON_MUTATION,
     onSuccess: (newData) => {
-      utils.template.getTemplateWithDetailsById.setData(
+      utils.template.getTemplateById.setData(
         {
-          id: initialTemplate.id,
+          templateId: initialTemplate.id,
         },
         (oldData) => ({ ...(oldData || initialTemplate), ...newData }),
       );
     },
   });
 
-  const { mutateAsync: addTemplateSigners } = trpc.recipient.addTemplateSigners.useMutation({
+  const { mutateAsync: setRecipients } = trpc.recipient.setTemplateRecipients.useMutation({
     ...DO_NOT_INVALIDATE_QUERY_ON_MUTATION,
     onSuccess: (newData) => {
-      utils.template.getTemplateWithDetailsById.setData(
+      utils.template.getTemplateById.setData(
         {
-          id: initialTemplate.id,
+          templateId: initialTemplate.id,
         },
         (oldData) => ({ ...(oldData || initialTemplate), ...newData }),
       );
@@ -145,10 +131,10 @@ export const EditTemplateForm = ({
     try {
       await updateTemplateSettings({
         templateId: template.id,
-        teamId: team?.id,
         data: {
           title: data.title,
           externalId: data.externalId || null,
+          visibility: data.visibility,
           globalAccessAuth: data.globalAccessAuth ?? null,
           globalActionAuth: data.globalActionAuth ?? null,
         },
@@ -178,16 +164,16 @@ export const EditTemplateForm = ({
   ) => {
     try {
       await Promise.all([
-        setSigningOrderForTemplate({
+        updateTemplateSettings({
           templateId: template.id,
-          teamId: team?.id,
-          signingOrder: data.signingOrder,
+          meta: {
+            signingOrder: data.signingOrder,
+          },
         }),
 
-        addTemplateSigners({
+        setRecipients({
           templateId: template.id,
-          teamId: team?.id,
-          signers: data.signers,
+          recipients: data.signers,
         }),
       ]);
 
@@ -211,6 +197,13 @@ export const EditTemplateForm = ({
         fields: data.fields,
       });
 
+      await updateTemplateSettings({
+        templateId: template.id,
+        meta: {
+          typedSignatureEnabled: data.typedSignatureEnabled,
+        },
+      });
+
       // Clear all field data from localStorage
       for (let i = 0; i < localStorage.length; i++) {
         const key = localStorage.key(i);
@@ -225,14 +218,13 @@ export const EditTemplateForm = ({
         duration: 5000,
       });
 
-      // Router refresh is here to clear the router cache for when navigating to /documents.
-      router.refresh();
-
       router.push(templateRootPath);
     } catch (err) {
+      console.error(err);
+
       toast({
         title: _(msg`Error`),
-        description: _(msg`An error occurred while adding signers.`),
+        description: _(msg`An error occurred while adding fields.`),
         variant: 'destructive',
       });
     }
@@ -274,6 +266,7 @@ export const EditTemplateForm = ({
             <AddTemplateSettingsFormPartial
               key={recipients.length}
               template={template}
+              currentTeamMemberRole={team?.currentTeamMember?.role}
               documentFlow={documentFlow.settings}
               recipients={recipients}
               fields={fields}
@@ -301,6 +294,7 @@ export const EditTemplateForm = ({
               fields={fields}
               onSubmit={onAddFieldsFormSubmit}
               teamId={team?.id}
+              typedSignatureEnabled={template.templateMeta?.typedSignatureEnabled}
             />
           </Stepper>
         </DocumentFlowFormContainer>

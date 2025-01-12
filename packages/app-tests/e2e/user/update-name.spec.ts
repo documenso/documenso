@@ -12,15 +12,7 @@ test('[USER] update full name', async ({ page }) => {
 
   await page.getByLabel('Full Name').fill('John Doe');
 
-  const canvas = page.locator('canvas').first();
-  const box = await canvas.boundingBox();
-
-  if (box) {
-    await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2);
-    await page.mouse.down();
-    await page.mouse.move(box.x + box.width / 4, box.y + box.height / 4);
-    await page.mouse.up();
-  }
+  await page.getByPlaceholder('Type your signature').fill('John Doe');
 
   await page.getByRole('button', { name: 'Update profile' }).click();
 

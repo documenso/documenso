@@ -1,41 +1,63 @@
+import type { z } from 'zod';
+
 import { prisma } from '@documenso/prisma';
-import type { Prisma } from '@documenso/prisma/client';
+import {
+  DocumentDataSchema,
+  FieldSchema,
+  RecipientSchema,
+  TemplateDirectLinkSchema,
+  TemplateMetaSchema,
+  TemplateSchema,
+  UserSchema,
+} from '@documenso/prisma/generated/zod';
 
 import { AppError, AppErrorCode } from '../../errors/app-error';
 
-export interface GetTemplateByIdOptions {
+export type GetTemplateByIdOptions = {
   id: number;
   userId: number;
   teamId?: number;
-}
+};
 
-export const getTemplateById = async ({ id, userId, teamId }: GetTemplateByIdOptions) => {
-  const whereFilter: Prisma.TemplateWhereInput = {
-    id,
-    OR:
-      teamId === undefined
-        ? [
-            {
-              userId,
-              teamId: null,
-            },
-          ]
-        : [
-            {
-              teamId,
-              team: {
-                members: {
-                  some: {
-                    userId,
-                  },
+export const ZGetTemplateByIdResponseSchema = TemplateSchema.extend({
+  directLink: TemplateDirectLinkSchema.nullable(),
+  templateDocumentData: DocumentDataSchema,
+  templateMeta: TemplateMetaSchema.nullable(),
+  Recipient: RecipientSchema.array(),
+  Field: FieldSchema.array(),
+  User: UserSchema.pick({
+    id: true,
+    name: true,
+    email: true,
+  }),
+});
+
+export type TGetTemplateByIdResponse = z.infer<typeof ZGetTemplateByIdResponseSchema>;
+
+export const getTemplateById = async ({
+  id,
+  userId,
+  teamId,
+}: GetTemplateByIdOptions): Promise<TGetTemplateByIdResponse> => {
+  const template = await prisma.template.findFirst({
+    where: {
+      id,
+      ...(teamId
+        ? {
+            team: {
+              id: teamId,
+              members: {
+                some: {
+                  userId,
                 },
               },
             },
-          ],
-  };
-
-  const template = await prisma.template.findFirst({
-    where: whereFilter,
+          }
+        : {
+            userId,
+            teamId: null,
+          }),
+    },
     include: {
       directLink: true,
       templateDocumentData: true,
@@ -53,7 +75,9 @@ export const getTemplateById = async ({ id, userId, teamId }: GetTemplateByIdOpt
   });
 
   if (!template) {
-    throw new AppError(AppErrorCode.NOT_FOUND, 'Template not found');
+    throw new AppError(AppErrorCode.NOT_FOUND, {
+      message: 'Template not found',
+    });
   }
 
   return template;

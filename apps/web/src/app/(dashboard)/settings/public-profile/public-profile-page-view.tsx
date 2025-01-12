@@ -61,7 +61,6 @@ export const PublicProfilePageView = ({ user, team, profile }: PublicProfilePage
 
   const { data } = trpc.template.findTemplates.useQuery({
     perPage: 100,
-    teamId: team?.id,
   });
 
   const { mutateAsync: updateUserProfile, isLoading: isUpdatingUserProfile } =
@@ -75,7 +74,7 @@ export const PublicProfilePageView = ({ user, team, profile }: PublicProfilePage
 
   const enabledPrivateDirectTemplates = useMemo(
     () =>
-      (data?.templates ?? []).filter(
+      (data?.data ?? []).filter(
         (template): template is DirectTemplate =>
           template.directLink?.enabled === true && template.type !== TemplateType.PUBLIC,
       ),

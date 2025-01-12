@@ -1,5 +1,7 @@
 import { expect, test } from '@playwright/test';
 
+import { prisma } from '@documenso/prisma';
+import { TeamMemberRole } from '@documenso/prisma/client';
 import { seedUserSubscription } from '@documenso/prisma/seed/subscriptions';
 import { seedTeam } from '@documenso/prisma/seed/teams';
 import { seedBlankTemplate } from '@documenso/prisma/seed/templates';
@@ -156,4 +158,110 @@ test('[TEMPLATE_FLOW]: add settings', async ({ page }) => {
 
   await expect(page.getByLabel('Title')).toHaveValue('New Title');
   await expect(page.getByTestId('documentAccessSelectValue')).toContainText('Require account');
+});
+
+test('[TEMPLATE_FLOW] add document visibility settings', async ({ page }) => {
+  const { owner, ...team } = await seedTeam({
+    createTeamMembers: 1,
+  });
+
+  const template = await seedBlankTemplate(owner, {
+    createTemplateOptions: {
+      teamId: team.id,
+    },
+  });
+
+  await apiSignin({
+    page,
+    email: owner.email,
+    redirectPath: `/t/${team.url}/templates/${template.id}/edit`,
+  });
+
+  // Set document visibility.
+  await page.getByTestId('documentVisibilitySelectValue').click();
+  await page.getByLabel('Managers and above').click();
+  await expect(page.getByTestId('documentVisibilitySelectValue')).toContainText(
+    'Managers and above',
+  );
+
+  // Save the settings by going to the next step.
+  await page.getByRole('button', { name: 'Continue' }).click();
+  await expect(page.getByRole('heading', { name: 'Add Placeholders' })).toBeVisible();
+
+  // Navigate back to the edit page to check that the settings are saved correctly.
+  await page.goto(`/t/${team.url}/templates/${template.id}/edit`);
+
+  await expect(page.getByRole('heading', { name: 'General' })).toBeVisible();
+  await expect(page.getByTestId('documentVisibilitySelectValue')).toContainText(
+    'Managers and above',
+  );
+});
+
+test('[TEMPLATE_FLOW] team member visibility permissions', async ({ page }) => {
+  const team = await seedTeam({
+    createTeamMembers: 2, // Create an additional member to test different roles
+  });
+
+  await prisma.teamMember.update({
+    where: {
+      id: team.members[1].id,
+    },
+    data: {
+      role: TeamMemberRole.MANAGER,
+    },
+  });
+
+  const owner = team.owner;
+  const managerUser = team.members[1].user;
+  const memberUser = team.members[2].user;
+
+  const template = await seedBlankTemplate(owner, {
+    createTemplateOptions: {
+      teamId: team.id,
+    },
+  });
+
+  // Test as manager
+  await apiSignin({
+    page,
+    email: managerUser.email,
+    redirectPath: `/t/${team.url}/templates/${template.id}/edit`,
+  });
+
+  // Manager should be able to set visibility to managers and above
+  await page.getByTestId('documentVisibilitySelectValue').click();
+  await page.getByLabel('Managers and above').click();
+  await expect(page.getByTestId('documentVisibilitySelectValue')).toContainText(
+    'Managers and above',
+  );
+  await expect(page.getByText('Admins only')).toBeDisabled();
+
+  // Save and verify
+  await page.getByRole('button', { name: 'Continue' }).click();
+  await expect(page.getByRole('heading', { name: 'Add Placeholders' })).toBeVisible();
+
+  // Test as regular member
+  await apiSignin({
+    page,
+    email: memberUser.email,
+    redirectPath: `/t/${team.url}/templates/${template.id}/edit`,
+  });
+
+  // Regular member should not be able to modify visibility when set to managers and above
+  await expect(page.getByTestId('documentVisibilitySelectValue')).toBeDisabled();
+
+  // Create a new template with 'everyone' visibility
+  const everyoneTemplate = await seedBlankTemplate(owner, {
+    createTemplateOptions: {
+      teamId: team.id,
+      visibility: 'EVERYONE',
+    },
+  });
+
+  // Navigate to the new template
+  await page.goto(`/t/${team.url}/templates/${everyoneTemplate.id}/edit`);
+
+  // Regular member should be able to see but not modify visibility
+  await expect(page.getByTestId('documentVisibilitySelectValue')).toBeDisabled();
+  await expect(page.getByTestId('documentVisibilitySelectValue')).toContainText('Everyone');
 });

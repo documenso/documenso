@@ -3,11 +3,12 @@ import { hash } from '@node-rs/bcrypt';
 import { getStripeCustomerByUser } from '@documenso/ee/server-only/stripe/get-customer';
 import { updateSubscriptionItemQuantity } from '@documenso/ee/server-only/stripe/update-subscription-item-quantity';
 import { prisma } from '@documenso/prisma';
-import { IdentityProvider, Prisma, TeamMemberInviteStatus } from '@documenso/prisma/client';
+import { IdentityProvider, TeamMemberInviteStatus } from '@documenso/prisma/client';
 
 import { IS_BILLING_ENABLED } from '../../constants/app';
 import { SALT_ROUNDS } from '../../constants/auth';
 import { AppError, AppErrorCode } from '../../errors/app-error';
+import { buildLogger } from '../../utils/logger';
 
 export interface CreateUserOptions {
   name: string;
@@ -27,7 +28,7 @@ export const createUser = async ({ name, email, password, signature, url }: Crea
   });
 
   if (userExists) {
-    throw new Error('User already exists');
+    throw new AppError(AppErrorCode.ALREADY_EXISTS);
   }
 
   if (url) {
@@ -38,11 +39,10 @@ export const createUser = async ({ name, email, password, signature, url }: Crea
     });
 
     if (urlExists) {
-      throw new AppError(
-        AppErrorCode.PROFILE_URL_TAKEN,
-        'Profile username is taken',
-        'The profile username is already taken',
-      );
+      throw new AppError(AppErrorCode.PROFILE_URL_TAKEN, {
+        message: 'Profile username is taken',
+        userMessage: 'The profile username is already taken',
+      });
     }
   }
 
@@ -59,11 +59,11 @@ export const createUser = async ({ name, email, password, signature, url }: Crea
 
   const acceptedTeamInvites = await prisma.teamMemberInvite.findMany({
     where: {
+      status: TeamMemberInviteStatus.ACCEPTED,
       email: {
         equals: email,
-        mode: Prisma.QueryMode.insensitive,
+        mode: 'insensitive',
       },
-      status: TeamMemberInviteStatus.ACCEPTED,
     },
   });
 
@@ -135,6 +135,18 @@ export const createUser = async ({ name, email, password, signature, url }: Crea
       return await getStripeCustomerByUser(user).then((session) => session.user);
     } catch (err) {
       console.error(err);
+
+      const error = AppError.parseError(err);
+
+      const logger = buildLogger();
+
+      logger.error(error, {
+        method: 'createUser',
+        context: {
+          appError: AppError.toJSON(error),
+          userId: user.id,
+        },
+      });
     }
   }
 

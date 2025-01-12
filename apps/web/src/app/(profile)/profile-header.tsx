@@ -9,7 +9,7 @@ import { Trans } from '@lingui/macro';
 import { PlusIcon } from 'lucide-react';
 
 import LogoIcon from '@documenso/assets/logo_icon.png';
-import type { GetTeamsResponse } from '@documenso/lib/server-only/team/get-teams';
+import type { TGetTeamsResponse } from '@documenso/lib/server-only/team/get-teams';
 import type { User } from '@documenso/prisma/client';
 import { cn } from '@documenso/ui/lib/utils';
 import { Button } from '@documenso/ui/primitives/button';
@@ -19,7 +19,7 @@ import { Logo } from '~/components/branding/logo';
 
 type ProfileHeaderProps = {
   user?: User | null;
-  teams?: GetTeamsResponse;
+  teams?: TGetTeamsResponse;
 };
 
 export const ProfileHeader = ({ user, teams = [] }: ProfileHeaderProps) => {
@@ -58,7 +58,7 @@ export const ProfileHeader = ({ user, teams = [] }: ProfileHeaderProps) => {
             alt="Documenso Logo"
             width={48}
             height={48}
-            className="h-10 w-auto dark:invert sm:hidden"
+            className="h-10 w-auto sm:hidden dark:invert"
           />
         </Link>
 

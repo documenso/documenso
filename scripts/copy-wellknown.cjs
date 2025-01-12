@@ -10,7 +10,3 @@ console.log('Copying .well-known/ contents to apps');
 fs.cpSync(wellKnownPath, path.join(__dirname, '../apps/web/public/.well-known'), {
   recursive: true,
 });
-
-fs.cpSync(wellKnownPath, path.join(__dirname, '../apps/marketing/public/.well-known'), {
-  recursive: true,
-});

@@ -1,7 +1,8 @@
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 
 import { Trans } from '@lingui/macro';
 
+import { fieldsContainUnsignedRequiredField } from '@documenso/lib/utils/advanced-fields-helpers';
 import type { Field } from '@documenso/prisma/client';
 import { RecipientRole } from '@documenso/prisma/client';
 import { Button } from '@documenso/ui/primitives/button';
@@ -14,7 +15,6 @@ import {
 } from '@documenso/ui/primitives/dialog';
 
 import { SigningDisclosure } from '~/components/general/signing-disclosure';
-import { truncateTitle } from '~/helpers/truncate-title';
 
 export type SignDialogProps = {
   isSubmitting: boolean;
@@ -36,8 +36,8 @@ export const SignDialog = ({
   disabled = false,
 }: SignDialogProps) => {
   const [showDialog, setShowDialog] = useState(false);
-  const truncatedTitle = truncateTitle(documentTitle);
-  const isComplete = fields.every((field) => field.inserted);
+
+  const isComplete = useMemo(() => !fieldsContainUnsignedRequiredField(fields), [fields]);
 
   const handleOpenChange = (open: boolean) => {
     if (isSubmitting || !isComplete) {
@@ -75,7 +75,13 @@ export const SignDialog = ({
           {role === RecipientRole.VIEWER && (
             <span>
               <Trans>
-                You are about to complete viewing "{truncatedTitle}".
+                <span className="inline-flex flex-wrap">
+                  You are about to complete viewing "
+                  <span className="inline-block max-w-[11rem] truncate align-baseline">
+                    {documentTitle}
+                  </span>
+                  ".
+                </span>
                 <br /> Are you sure?
               </Trans>
             </span>
@@ -83,7 +89,13 @@ export const SignDialog = ({
           {role === RecipientRole.SIGNER && (
             <span>
               <Trans>
-                You are about to complete signing "{truncatedTitle}".
+                <span className="inline-flex flex-wrap">
+                  You are about to complete signing "
+                  <span className="inline-block max-w-[11rem] truncate align-baseline">
+                    {documentTitle}
+                  </span>
+                  ".
+                </span>
                 <br /> Are you sure?
               </Trans>
             </span>
@@ -91,7 +103,13 @@ export const SignDialog = ({
           {role === RecipientRole.APPROVER && (
             <span>
               <Trans>
-                You are about to complete approving "{truncatedTitle}".
+                <span className="inline-flex flex-wrap">
+                  You are about to complete approving{' '}
+                  <span className="inline-block max-w-[11rem] truncate align-baseline">
+                    "{documentTitle}"
+                  </span>
+                  .
+                </span>
                 <br /> Are you sure?
               </Trans>
             </span>
