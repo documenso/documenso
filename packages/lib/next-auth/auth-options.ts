@@ -31,18 +31,31 @@ import { ErrorCode } from './error-codes';
 // Delete unrecognized fields from authorization response to comply with
 // https://datatracker.ietf.org/doc/html/rfc6749#section-4.1.2
 const prismaAdapter = PrismaAdapter(prisma);
-const originalLinkAccount = prismaAdapter.linkAccount;
 
-const accountFields =
-  Prisma.dmmf.datamodel.models.find(({ name }) => name === 'Account')?.fields || [];
+const unsafe_linkAccount = prismaAdapter.linkAccount!;
+const unsafe_accountModel = Prisma.dmmf.datamodel.models.find(({ name }) => name === 'Account');
 
+if (!unsafe_accountModel) {
+  throw new Error('Account model not found');
+}
+
+// eslint-disable-next-line @typescript-eslint/promise-function-async
 prismaAdapter.linkAccount = (data) => {
-  const availableFields = accountFields.map((field) => field.name);
-  Object.keys(data).forEach((key) => {
-    if (availableFields.includes(key)) return;
-    delete data[key];
-  });
-  return originalLinkAccount?.(data);
+  const availableFields = unsafe_accountModel.fields.map((field) => field.name);
+
+  const newData = Object.keys(data).reduce(
+    (acc, key) => {
+      if (availableFields.includes(key)) {
+        acc[key] = data[key];
+      }
+
+      return acc;
+    },
+    // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
+    {} as typeof data,
+  );
+
+  return unsafe_linkAccount(newData);
 };
 
 export const NEXT_AUTH_OPTIONS: AuthOptions = {
