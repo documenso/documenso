@@ -23,7 +23,7 @@ type UserData = {
   email: string;
   roles: Role[];
   subscriptions?: SubscriptionLite[] | null;
-  documents?: DocumentLite[] | null;
+  documents: DocumentLite[];
 };
 
 type SubscriptionLite = Pick<
