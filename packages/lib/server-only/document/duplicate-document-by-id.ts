@@ -1,6 +1,7 @@
 import { prisma } from '@documenso/prisma';
 import { DocumentSource, type Prisma } from '@documenso/prisma/client';
 
+import { AppError, AppErrorCode } from '../../errors/app-error';
 import { getDocumentWhereInput } from './get-document-by-id';
 
 export interface DuplicateDocumentOptions {
@@ -20,7 +21,7 @@ export const duplicateDocument = async ({
     teamId,
   });
 
-  const document = await prisma.document.findUniqueOrThrow({
+  const document = await prisma.document.findFirst({
     where: documentWhereInput,
     select: {
       title: true,
@@ -44,6 +45,12 @@ export const duplicateDocument = async ({
       },
     },
   });
+
+  if (!document) {
+    throw new AppError(AppErrorCode.NOT_FOUND, {
+      message: 'Document not found',
+    });
+  }
 
   const createDocumentArguments: Prisma.DocumentCreateArgs = {
     data: {
