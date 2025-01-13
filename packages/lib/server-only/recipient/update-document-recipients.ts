@@ -1,5 +1,3 @@
-import { z } from 'zod';
-
 import { isUserEnterprise } from '@documenso/ee/server-only/util/is-document-enterprise';
 import { DOCUMENT_AUDIT_LOG_TYPE } from '@documenso/lib/types/document-audit-logs';
 import type { TRecipientAccessAuthTypes } from '@documenso/lib/types/document-auth';
@@ -17,7 +15,6 @@ import { prisma } from '@documenso/prisma';
 import type { Recipient } from '@documenso/prisma/client';
 import { RecipientRole } from '@documenso/prisma/client';
 import { SendStatus, SigningStatus } from '@documenso/prisma/client';
-import { ZRecipientResponseSchema } from '@documenso/trpc/server/recipient-router/schema';
 
 import { AppError, AppErrorCode } from '../../errors/app-error';
 import { canRecipientBeModified } from '../../utils/recipients';
@@ -30,21 +27,13 @@ export interface UpdateDocumentRecipientsOptions {
   requestMetadata: ApiRequestMetadata;
 }
 
-export const ZUpdateDocumentRecipientsResponseSchema = z.object({
-  recipients: ZRecipientResponseSchema.array(),
-});
-
-export type TUpdateDocumentRecipientsResponse = z.infer<
-  typeof ZUpdateDocumentRecipientsResponseSchema
->;
-
 export const updateDocumentRecipients = async ({
   userId,
   teamId,
   documentId,
   recipients,
   requestMetadata,
-}: UpdateDocumentRecipientsOptions): Promise<TUpdateDocumentRecipientsResponse> => {
+}: UpdateDocumentRecipientsOptions) => {
   const document = await prisma.document.findFirst({
     where: {
       id: documentId,

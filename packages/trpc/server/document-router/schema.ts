@@ -2,11 +2,16 @@ import { z } from 'zod';
 
 import { SUPPORTED_LANGUAGE_CODES } from '@documenso/lib/constants/i18n';
 import {
+  ZDocumentLiteSchema,
+  ZDocumentManySchema,
+  ZDocumentSchema,
+} from '@documenso/lib/types/document';
+import {
   ZDocumentAccessAuthTypesSchema,
   ZDocumentActionAuthTypesSchema,
 } from '@documenso/lib/types/document-auth';
 import { ZDocumentEmailSettingsSchema } from '@documenso/lib/types/document-email';
-import { ZFindSearchParamsSchema } from '@documenso/lib/types/search-params';
+import { ZFindResultResponse, ZFindSearchParamsSchema } from '@documenso/lib/types/search-params';
 import { isValidRedirectUrl } from '@documenso/lib/utils/is-valid-redirect-url';
 import {
   DocumentDistributionMethod,
@@ -17,7 +22,6 @@ import {
   FieldType,
 } from '@documenso/prisma/client';
 
-// Todo: Refactor all to ZDocumentMeta---
 export const ZDocumentMetaTimezoneSchema = z
   .string()
   .describe('The timezone to use for date fields and signing the document.');
@@ -53,7 +57,7 @@ export const ZDocumentMetaTypedSignatureEnabledSchema = z
   .boolean()
   .describe('Whether to allow typed signatures.');
 
-export const ZFindDocumentsQuerySchema = ZFindSearchParamsSchema.extend({
+export const ZFindDocumentsRequestSchema = ZFindSearchParamsSchema.extend({
   templateId: z
     .number()
     .describe('Filter documents by the template ID used to create it.')
@@ -70,6 +74,12 @@ export const ZFindDocumentsQuerySchema = ZFindSearchParamsSchema.extend({
   orderByDirection: z.enum(['asc', 'desc']).describe('').default('desc'),
 });
 
+export const ZFindDocumentsResponseSchema = ZFindResultResponse.extend({
+  data: ZDocumentManySchema.array(),
+});
+
+export type TFindDocumentsResponse = z.infer<typeof ZFindDocumentsResponseSchema>;
+
 export const ZFindDocumentAuditLogsQuerySchema = ZFindSearchParamsSchema.extend({
   documentId: z.number().min(1),
   cursor: z.string().optional(),
@@ -82,11 +92,13 @@ export const ZGetDocumentByIdQuerySchema = z.object({
   documentId: z.number(),
 });
 
-export const ZDuplicateDocumentMutationSchema = z.object({
+export const ZDuplicateDocumentRequestSchema = z.object({
   documentId: z.number(),
 });
 
-export type TGetDocumentByIdQuerySchema = z.infer<typeof ZGetDocumentByIdQuerySchema>;
+export const ZDuplicateDocumentResponseSchema = z.object({
+  documentId: z.number(),
+});
 
 export const ZGetDocumentByTokenQuerySchema = z.object({
   token: z.string().min(1),
@@ -94,21 +106,17 @@ export const ZGetDocumentByTokenQuerySchema = z.object({
 
 export type TGetDocumentByTokenQuerySchema = z.infer<typeof ZGetDocumentByTokenQuerySchema>;
 
-export const ZGetDocumentWithDetailsByIdQuerySchema = z.object({
+export const ZGetDocumentWithDetailsByIdRequestSchema = z.object({
   documentId: z.number(),
 });
 
-export type TGetDocumentWithDetailsByIdQuerySchema = z.infer<
-  typeof ZGetDocumentWithDetailsByIdQuerySchema
->;
+export const ZGetDocumentWithDetailsByIdResponseSchema = ZDocumentSchema;
 
-export const ZCreateDocumentMutationSchema = z.object({
+export const ZCreateDocumentRequestSchema = z.object({
   title: z.string().min(1),
   documentDataId: z.string().min(1),
   timezone: z.string().optional(),
 });
-
-export type TCreateDocumentMutationSchema = z.infer<typeof ZCreateDocumentMutationSchema>;
 
 export const ZUpdateDocumentRequestSchema = z.object({
   documentId: z.number(),
@@ -139,7 +147,7 @@ export const ZUpdateDocumentRequestSchema = z.object({
     .optional(),
 });
 
-export type TUpdateDocumentRequestSchema = z.infer<typeof ZUpdateDocumentRequestSchema>;
+export const ZUpdateDocumentResponseSchema = ZDocumentLiteSchema;
 
 export const ZSetFieldsForDocumentMutationSchema = z.object({
   documentId: z.number(),
@@ -161,7 +169,7 @@ export type TSetFieldsForDocumentMutationSchema = z.infer<
   typeof ZSetFieldsForDocumentMutationSchema
 >;
 
-export const ZSendDocumentMutationSchema = z.object({
+export const ZDistributeDocumentRequestSchema = z.object({
   documentId: z.number().describe('The ID of the document to send.'),
   meta: z
     .object({
@@ -176,6 +184,8 @@ export const ZSendDocumentMutationSchema = z.object({
     })
     .optional(),
 });
+
+export const ZDistributeDocumentResponseSchema = ZDocumentLiteSchema;
 
 export const ZSetPasswordForDocumentMutationSchema = z.object({
   documentId: z.number(),
@@ -195,15 +205,6 @@ export type TSetSigningOrderForDocumentMutationSchema = z.infer<
   typeof ZSetSigningOrderForDocumentMutationSchema
 >;
 
-export const ZUpdateTypedSignatureSettingsMutationSchema = z.object({
-  documentId: z.number(),
-  typedSignatureEnabled: z.boolean(),
-});
-
-export type TUpdateTypedSignatureSettingsMutationSchema = z.infer<
-  typeof ZUpdateTypedSignatureSettingsMutationSchema
->;
-
 export const ZResendDocumentMutationSchema = z.object({
   documentId: z.number(),
   recipients: z
@@ -211,8 +212,6 @@ export const ZResendDocumentMutationSchema = z.object({
     .min(1)
     .describe('The IDs of the recipients to redistribute the document to.'),
 });
-
-export type TSendDocumentMutationSchema = z.infer<typeof ZSendDocumentMutationSchema>;
 
 export const ZDeleteDocumentMutationSchema = z.object({
   documentId: z.number(),
@@ -236,3 +235,5 @@ export const ZMoveDocumentToTeamSchema = z.object({
   documentId: z.number().describe('The ID of the document to move to a team.'),
   teamId: z.number().describe('The ID of the team to move the document to.'),
 });
+
+export const ZMoveDocumentToTeamResponseSchema = ZDocumentLiteSchema;

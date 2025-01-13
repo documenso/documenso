@@ -2,48 +2,37 @@ import { z } from 'zod';
 
 import { completeDocumentWithToken } from '@documenso/lib/server-only/document/complete-document-with-token';
 import { rejectDocumentWithToken } from '@documenso/lib/server-only/document/reject-document-with-token';
-import {
-  ZCreateDocumentRecipientsResponseSchema,
-  createDocumentRecipients,
-} from '@documenso/lib/server-only/recipient/create-document-recipients';
-import {
-  ZCreateTemplateRecipientsResponseSchema,
-  createTemplateRecipients,
-} from '@documenso/lib/server-only/recipient/create-template-recipients';
+import { createDocumentRecipients } from '@documenso/lib/server-only/recipient/create-document-recipients';
+import { createTemplateRecipients } from '@documenso/lib/server-only/recipient/create-template-recipients';
 import { deleteDocumentRecipient } from '@documenso/lib/server-only/recipient/delete-document-recipient';
 import { deleteTemplateRecipient } from '@documenso/lib/server-only/recipient/delete-template-recipient';
-import {
-  ZGetRecipientByIdResponseSchema,
-  getRecipientById,
-} from '@documenso/lib/server-only/recipient/get-recipient-by-id';
-import {
-  ZSetDocumentRecipientsResponseSchema,
-  setDocumentRecipients,
-} from '@documenso/lib/server-only/recipient/set-document-recipients';
-import {
-  ZSetTemplateRecipientsResponseSchema,
-  setTemplateRecipients,
-} from '@documenso/lib/server-only/recipient/set-template-recipients';
+import { getRecipientById } from '@documenso/lib/server-only/recipient/get-recipient-by-id';
+import { setDocumentRecipients } from '@documenso/lib/server-only/recipient/set-document-recipients';
+import { setTemplateRecipients } from '@documenso/lib/server-only/recipient/set-template-recipients';
 import { updateDocumentRecipients } from '@documenso/lib/server-only/recipient/update-document-recipients';
 import { updateTemplateRecipients } from '@documenso/lib/server-only/recipient/update-template-recipients';
 import { extractNextApiRequestMetadata } from '@documenso/lib/universal/extract-request-metadata';
 
 import { authenticatedProcedure, procedure, router } from '../trpc';
 import {
-  ZAddSignersMutationSchema,
   ZCompleteDocumentWithTokenMutationSchema,
   ZCreateDocumentRecipientRequestSchema,
   ZCreateDocumentRecipientResponseSchema,
   ZCreateDocumentRecipientsRequestSchema,
+  ZCreateDocumentRecipientsResponseSchema,
   ZCreateTemplateRecipientRequestSchema,
   ZCreateTemplateRecipientResponseSchema,
   ZCreateTemplateRecipientsRequestSchema,
+  ZCreateTemplateRecipientsResponseSchema,
   ZDeleteDocumentRecipientRequestSchema,
   ZDeleteTemplateRecipientRequestSchema,
-  ZGetRecipientQuerySchema,
+  ZGetRecipientRequestSchema,
+  ZGetRecipientResponseSchema,
   ZRejectDocumentWithTokenMutationSchema,
   ZSetDocumentRecipientsRequestSchema,
+  ZSetDocumentRecipientsResponseSchema,
   ZSetTemplateRecipientsRequestSchema,
+  ZSetTemplateRecipientsResponseSchema,
   ZUpdateDocumentRecipientRequestSchema,
   ZUpdateDocumentRecipientResponseSchema,
   ZUpdateDocumentRecipientsRequestSchema,
@@ -69,8 +58,8 @@ export const recipientRouter = router({
         tags: ['Document Recipients', 'Template Recipients'],
       },
     })
-    .input(ZGetRecipientQuerySchema)
-    .output(ZGetRecipientByIdResponseSchema)
+    .input(ZGetRecipientRequestSchema)
+    .output(ZGetRecipientResponseSchema)
     .query(async ({ input, ctx }) => {
       const { teamId } = ctx;
       const { recipientId } = input;
@@ -462,34 +451,6 @@ export const recipientRouter = router({
         documentId,
         reason,
         requestMetadata: extractNextApiRequestMetadata(ctx.req),
-      });
-    }),
-
-  /**
-   * Leaving this here and will remove after deployment.
-   *
-   * @deprecated Remove after deployment.
-   */
-  addSigners: authenticatedProcedure
-    .input(ZAddSignersMutationSchema)
-    .output(ZSetDocumentRecipientsResponseSchema)
-    .mutation(async ({ input, ctx }) => {
-      const { teamId } = ctx;
-      const { documentId, signers } = input;
-
-      return await setDocumentRecipients({
-        userId: ctx.user.id,
-        documentId,
-        teamId,
-        recipients: signers.map((signer) => ({
-          id: signer.nativeId,
-          email: signer.email,
-          name: signer.name,
-          role: signer.role,
-          signingOrder: signer.signingOrder,
-          actionAuth: signer.actionAuth,
-        })),
-        requestMetadata: ctx.metadata,
       });
     }),
 });

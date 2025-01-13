@@ -1,60 +1,46 @@
 import { z } from 'zod';
 
-import {
-  ZCreateDocumentFieldsResponseSchema,
-  createDocumentFields,
-} from '@documenso/lib/server-only/field/create-document-fields';
-import {
-  ZCreateTemplateFieldsResponseSchema,
-  createTemplateFields,
-} from '@documenso/lib/server-only/field/create-template-fields';
+import { createDocumentFields } from '@documenso/lib/server-only/field/create-document-fields';
+import { createTemplateFields } from '@documenso/lib/server-only/field/create-template-fields';
 import { deleteDocumentField } from '@documenso/lib/server-only/field/delete-document-field';
 import { deleteTemplateField } from '@documenso/lib/server-only/field/delete-template-field';
-import {
-  ZGetFieldByIdResponseSchema,
-  getFieldById,
-} from '@documenso/lib/server-only/field/get-field-by-id';
+import { getFieldById } from '@documenso/lib/server-only/field/get-field-by-id';
 import { removeSignedFieldWithToken } from '@documenso/lib/server-only/field/remove-signed-field-with-token';
-import {
-  ZSetFieldsForDocumentResponseSchema,
-  setFieldsForDocument,
-} from '@documenso/lib/server-only/field/set-fields-for-document';
-import {
-  ZSetFieldsForTemplateResponseSchema,
-  setFieldsForTemplate,
-} from '@documenso/lib/server-only/field/set-fields-for-template';
+import { setFieldsForDocument } from '@documenso/lib/server-only/field/set-fields-for-document';
+import { setFieldsForTemplate } from '@documenso/lib/server-only/field/set-fields-for-template';
 import { signFieldWithToken } from '@documenso/lib/server-only/field/sign-field-with-token';
-import {
-  ZUpdateDocumentFieldsResponseSchema,
-  updateDocumentFields,
-} from '@documenso/lib/server-only/field/update-document-fields';
-import {
-  ZUpdateTemplateFieldsResponseSchema,
-  updateTemplateFields,
-} from '@documenso/lib/server-only/field/update-template-fields';
+import { updateDocumentFields } from '@documenso/lib/server-only/field/update-document-fields';
+import { updateTemplateFields } from '@documenso/lib/server-only/field/update-template-fields';
 import { extractNextApiRequestMetadata } from '@documenso/lib/universal/extract-request-metadata';
 
 import { authenticatedProcedure, procedure, router } from '../trpc';
 import {
-  ZAddFieldsMutationSchema,
-  ZAddTemplateFieldsMutationSchema,
   ZCreateDocumentFieldRequestSchema,
   ZCreateDocumentFieldResponseSchema,
   ZCreateDocumentFieldsRequestSchema,
+  ZCreateDocumentFieldsResponseSchema,
   ZCreateTemplateFieldRequestSchema,
   ZCreateTemplateFieldResponseSchema,
   ZCreateTemplateFieldsRequestSchema,
+  ZCreateTemplateFieldsResponseSchema,
   ZDeleteDocumentFieldRequestSchema,
   ZDeleteTemplateFieldRequestSchema,
-  ZGetFieldQuerySchema,
+  ZGetFieldRequestSchema,
+  ZGetFieldResponseSchema,
   ZRemovedSignedFieldWithTokenMutationSchema,
+  ZSetDocumentFieldsRequestSchema,
+  ZSetDocumentFieldsResponseSchema,
+  ZSetFieldsForTemplateRequestSchema,
+  ZSetFieldsForTemplateResponseSchema,
   ZSignFieldWithTokenMutationSchema,
   ZUpdateDocumentFieldRequestSchema,
   ZUpdateDocumentFieldResponseSchema,
   ZUpdateDocumentFieldsRequestSchema,
+  ZUpdateDocumentFieldsResponseSchema,
   ZUpdateTemplateFieldRequestSchema,
   ZUpdateTemplateFieldResponseSchema,
   ZUpdateTemplateFieldsRequestSchema,
+  ZUpdateTemplateFieldsResponseSchema,
 } from './schema';
 
 export const fieldRouter = router({
@@ -72,8 +58,8 @@ export const fieldRouter = router({
         tags: ['Document Fields', 'Template Fields'],
       },
     })
-    .input(ZGetFieldQuerySchema)
-    .output(ZGetFieldByIdResponseSchema)
+    .input(ZGetFieldRequestSchema)
+    .output(ZGetFieldResponseSchema)
     .query(async ({ input, ctx }) => {
       const { teamId } = ctx;
       const { fieldId } = input;
@@ -229,6 +215,8 @@ export const fieldRouter = router({
 
   /**
    * @private
+   *
+   * Todo: Refactor to setFieldsForDocument function.
    */
   addFields: authenticatedProcedure
     // .meta({
@@ -239,8 +227,8 @@ export const fieldRouter = router({
     //     tags: ['Document Fields'],
     //   },
     // })
-    .input(ZAddFieldsMutationSchema)
-    .output(ZSetFieldsForDocumentResponseSchema)
+    .input(ZSetDocumentFieldsRequestSchema)
+    .output(ZSetDocumentFieldsResponseSchema)
     .mutation(async ({ input, ctx }) => {
       const { teamId } = ctx;
       const { documentId, fields } = input;
@@ -403,6 +391,8 @@ export const fieldRouter = router({
 
   /**
    * @private
+   *
+   * Todo: Refactor to setFieldsForTemplate.
    */
   addTemplateFields: authenticatedProcedure
     // .meta({
@@ -413,7 +403,7 @@ export const fieldRouter = router({
     //     tags: ['Template Fields'],
     //   },
     // })
-    .input(ZAddTemplateFieldsMutationSchema)
+    .input(ZSetFieldsForTemplateRequestSchema)
     .output(ZSetFieldsForTemplateResponseSchema)
     .mutation(async ({ input, ctx }) => {
       const { teamId } = ctx;

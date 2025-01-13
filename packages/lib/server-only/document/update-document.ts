@@ -1,5 +1,4 @@
 import { match } from 'ts-pattern';
-import type { z } from 'zod';
 
 import { isUserEnterprise } from '@documenso/ee/server-only/util/is-document-enterprise';
 import { DOCUMENT_AUDIT_LOG_TYPE } from '@documenso/lib/types/document-audit-logs';
@@ -9,7 +8,6 @@ import { createDocumentAuditLogData } from '@documenso/lib/utils/document-audit-
 import { prisma } from '@documenso/prisma';
 import { DocumentVisibility } from '@documenso/prisma/client';
 import { DocumentStatus, TeamMemberRole } from '@documenso/prisma/client';
-import { DocumentSchema } from '@documenso/prisma/generated/zod';
 
 import { AppError, AppErrorCode } from '../../errors/app-error';
 import type { TDocumentAccessAuthTypes, TDocumentActionAuthTypes } from '../../types/document-auth';
@@ -29,17 +27,13 @@ export type UpdateDocumentOptions = {
   requestMetadata: ApiRequestMetadata;
 };
 
-export const ZUpdateDocumentResponseSchema = DocumentSchema;
-
-export type TUpdateDocumentResponse = z.infer<typeof ZUpdateDocumentResponseSchema>;
-
 export const updateDocument = async ({
   userId,
   teamId,
   documentId,
   data,
   requestMetadata,
-}: UpdateDocumentOptions): Promise<TUpdateDocumentResponse> => {
+}: UpdateDocumentOptions) => {
   const document = await prisma.document.findFirst({
     where: {
       id: documentId,

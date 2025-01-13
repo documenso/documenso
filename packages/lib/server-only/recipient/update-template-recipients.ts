@@ -1,5 +1,3 @@
-import { z } from 'zod';
-
 import { isUserEnterprise } from '@documenso/ee/server-only/util/is-document-enterprise';
 import type { TRecipientAccessAuthTypes } from '@documenso/lib/types/document-auth';
 import {
@@ -10,7 +8,6 @@ import { createRecipientAuthOptions } from '@documenso/lib/utils/document-auth';
 import { prisma } from '@documenso/prisma';
 import { RecipientRole } from '@documenso/prisma/client';
 import { SendStatus, SigningStatus } from '@documenso/prisma/client';
-import { ZRecipientResponseSchema } from '@documenso/trpc/server/recipient-router/schema';
 
 import { AppError, AppErrorCode } from '../../errors/app-error';
 
@@ -29,20 +26,12 @@ export interface UpdateTemplateRecipientsOptions {
   }[];
 }
 
-export const ZUpdateTemplateRecipientsResponseSchema = z.object({
-  recipients: ZRecipientResponseSchema.array(),
-});
-
-export type TUpdateTemplateRecipientsResponse = z.infer<
-  typeof ZUpdateTemplateRecipientsResponseSchema
->;
-
 export const updateTemplateRecipients = async ({
   userId,
   teamId,
   templateId,
   recipients,
-}: UpdateTemplateRecipientsOptions): Promise<TUpdateTemplateRecipientsResponse> => {
+}: UpdateTemplateRecipientsOptions) => {
   const template = await prisma.template.findFirst({
     where: {
       id: templateId,

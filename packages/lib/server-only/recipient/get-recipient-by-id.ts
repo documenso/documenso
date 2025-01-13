@@ -1,7 +1,4 @@
-import type { z } from 'zod';
-
 import { prisma } from '@documenso/prisma';
-import { FieldSchema, RecipientSchema } from '@documenso/prisma/generated/zod';
 
 import { AppError, AppErrorCode } from '../../errors/app-error';
 
@@ -11,12 +8,6 @@ export type GetRecipientByIdOptions = {
   teamId?: number;
 };
 
-export const ZGetRecipientByIdResponseSchema = RecipientSchema.extend({
-  fields: FieldSchema.array(),
-});
-
-export type TGetRecipientByIdResponse = z.infer<typeof ZGetRecipientByIdResponseSchema>;
-
 /**
  * Get a recipient by ID. This will also return the recipient signing token so
  * be careful when using this.
@@ -25,7 +16,7 @@ export const getRecipientById = async ({
   recipientId,
   userId,
   teamId,
-}: GetRecipientByIdOptions): Promise<TGetRecipientByIdResponse> => {
+}: GetRecipientByIdOptions) => {
   const recipient = await prisma.recipient.findFirst({
     where: {
       id: recipientId,

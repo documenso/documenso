@@ -5,12 +5,14 @@ import {
   ZRecipientActionAuthSchema,
   ZRecipientActionAuthTypesSchema,
 } from '@documenso/lib/types/document-auth';
+import { ZRecipientLiteSchema, ZRecipientSchema } from '@documenso/lib/types/recipient';
 import { RecipientRole } from '@documenso/prisma/client';
-import { FieldSchema, RecipientSchema } from '@documenso/prisma/generated/zod';
 
-export const ZGetRecipientQuerySchema = z.object({
+export const ZGetRecipientRequestSchema = z.object({
   recipientId: z.number(),
 });
+
+export const ZGetRecipientResponseSchema = ZRecipientSchema;
 
 const ZCreateRecipientSchema = z.object({
   email: z.string().toLowerCase().email().min(1),
@@ -31,41 +33,12 @@ const ZUpdateRecipientSchema = z.object({
   actionAuth: ZRecipientActionAuthTypesSchema.optional().nullable(),
 });
 
-/**
- * Use this when returning base recipients from the API.
- */
-export const ZRecipientBaseResponseSchema = RecipientSchema.pick({
-  id: true,
-  documentId: true,
-  templateId: true,
-  email: true,
-  name: true,
-  token: true,
-  documentDeletedAt: true,
-  expired: true,
-  signedAt: true,
-  authOptions: true,
-  signingOrder: true,
-  rejectionReason: true,
-  role: true,
-  readStatus: true,
-  signingStatus: true,
-  sendStatus: true,
-});
-
-/**
- * Use this when returning a full recipient from the API.
- */
-export const ZRecipientResponseSchema = ZRecipientBaseResponseSchema.extend({
-  fields: FieldSchema.array(),
-});
-
 export const ZCreateDocumentRecipientRequestSchema = z.object({
   documentId: z.number(),
   recipient: ZCreateRecipientSchema,
 });
 
-export const ZCreateDocumentRecipientResponseSchema = ZRecipientBaseResponseSchema;
+export const ZCreateDocumentRecipientResponseSchema = ZRecipientLiteSchema;
 
 export const ZCreateDocumentRecipientsRequestSchema = z.object({
   documentId: z.number(),
@@ -76,12 +49,16 @@ export const ZCreateDocumentRecipientsRequestSchema = z.object({
   }),
 });
 
+export const ZCreateDocumentRecipientsResponseSchema = z.object({
+  recipients: ZRecipientLiteSchema.array(),
+});
+
 export const ZUpdateDocumentRecipientRequestSchema = z.object({
   documentId: z.number(),
   recipient: ZUpdateRecipientSchema,
 });
 
-export const ZUpdateDocumentRecipientResponseSchema = ZRecipientResponseSchema;
+export const ZUpdateDocumentRecipientResponseSchema = ZRecipientSchema;
 
 export const ZUpdateDocumentRecipientsRequestSchema = z.object({
   documentId: z.number(),
@@ -95,7 +72,7 @@ export const ZUpdateDocumentRecipientsRequestSchema = z.object({
 });
 
 export const ZUpdateDocumentRecipientsResponseSchema = z.object({
-  recipients: z.array(ZRecipientResponseSchema),
+  recipients: z.array(ZRecipientSchema),
 });
 
 export const ZDeleteDocumentRecipientRequestSchema = z.object({
@@ -126,12 +103,16 @@ export const ZSetDocumentRecipientsRequestSchema = z
     { message: 'Signers must have unique emails', path: ['signers__root'] },
   );
 
+export const ZSetDocumentRecipientsResponseSchema = z.object({
+  recipients: ZRecipientLiteSchema.array(),
+});
+
 export const ZCreateTemplateRecipientRequestSchema = z.object({
   templateId: z.number(),
   recipient: ZCreateRecipientSchema,
 });
 
-export const ZCreateTemplateRecipientResponseSchema = ZRecipientBaseResponseSchema;
+export const ZCreateTemplateRecipientResponseSchema = ZRecipientLiteSchema;
 
 export const ZCreateTemplateRecipientsRequestSchema = z.object({
   templateId: z.number(),
@@ -142,12 +123,16 @@ export const ZCreateTemplateRecipientsRequestSchema = z.object({
   }),
 });
 
+export const ZCreateTemplateRecipientsResponseSchema = z.object({
+  recipients: ZRecipientLiteSchema.array(),
+});
+
 export const ZUpdateTemplateRecipientRequestSchema = z.object({
   templateId: z.number(),
   recipient: ZUpdateRecipientSchema,
 });
 
-export const ZUpdateTemplateRecipientResponseSchema = ZRecipientResponseSchema;
+export const ZUpdateTemplateRecipientResponseSchema = ZRecipientSchema;
 
 export const ZUpdateTemplateRecipientsRequestSchema = z.object({
   templateId: z.number(),
@@ -161,11 +146,7 @@ export const ZUpdateTemplateRecipientsRequestSchema = z.object({
 });
 
 export const ZUpdateTemplateRecipientsResponseSchema = z.object({
-  recipients: z.array(ZRecipientResponseSchema).refine((recipients) => {
-    const emails = recipients.map((recipient) => recipient.email);
-
-    return new Set(emails).size === emails.length;
-  }),
+  recipients: z.array(ZRecipientSchema),
 });
 
 export const ZDeleteTemplateRecipientRequestSchema = z.object({
@@ -196,6 +177,10 @@ export const ZSetTemplateRecipientsRequestSchema = z
     { message: 'Recipients must have unique emails', path: ['recipients__root'] },
   );
 
+export const ZSetTemplateRecipientsResponseSchema = z.object({
+  recipients: ZRecipientLiteSchema.array(),
+});
+
 export const ZCompleteDocumentWithTokenMutationSchema = z.object({
   token: z.string(),
   documentId: z.number(),
@@ -216,32 +201,3 @@ export const ZRejectDocumentWithTokenMutationSchema = z.object({
 export type TRejectDocumentWithTokenMutationSchema = z.infer<
   typeof ZRejectDocumentWithTokenMutationSchema
 >;
-
-/**
- * Legacy schema. Remove after deployment (when addSigners trpc is removed).
- *
- * @deprecated
- */
-export const ZAddSignersMutationSchema = z
-  .object({
-    documentId: z.number(),
-    signers: z.array(
-      z.object({
-        nativeId: z.number().optional(),
-        email: z.string().toLowerCase().email().min(1),
-        name: z.string(),
-        role: z.nativeEnum(RecipientRole),
-        signingOrder: z.number().optional(),
-        actionAuth: ZRecipientActionAuthTypesSchema.optional().nullable(),
-      }),
-    ),
-  })
-  .refine(
-    (schema) => {
-      const emails = schema.signers.map((signer) => signer.email.toLowerCase());
-
-      return new Set(emails).size === emails.length;
-    },
-    // Dirty hack to handle errors when .root is populated for an array type
-    { message: 'Signers must have unique emails', path: ['signers__root'] },
-  );

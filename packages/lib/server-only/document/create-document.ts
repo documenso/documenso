@@ -1,7 +1,5 @@
 'use server';
 
-import type { z } from 'zod';
-
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import { normalizePdf as makeNormalizedPdf } from '@documenso/lib/server-only/pdf/normalize-pdf';
 import { DOCUMENT_AUDIT_LOG_TYPE } from '@documenso/lib/types/document-audit-logs';
@@ -11,7 +9,6 @@ import { prisma } from '@documenso/prisma';
 import { DocumentSource, DocumentVisibility, WebhookTriggerEvents } from '@documenso/prisma/client';
 import type { Team, TeamGlobalSettings } from '@documenso/prisma/client';
 import { TeamMemberRole } from '@documenso/prisma/client';
-import { DocumentSchema } from '@documenso/prisma/generated/zod';
 
 import {
   ZWebhookDocumentSchema,
@@ -33,10 +30,6 @@ export type CreateDocumentOptions = {
   requestMetadata: ApiRequestMetadata;
 };
 
-export const ZCreateDocumentResponseSchema = DocumentSchema;
-
-export type TCreateDocumentResponse = z.infer<typeof ZCreateDocumentResponseSchema>;
-
 export const createDocument = async ({
   userId,
   title,
@@ -47,7 +40,7 @@ export const createDocument = async ({
   formValues,
   requestMetadata,
   timezone,
-}: CreateDocumentOptions): Promise<TCreateDocumentResponse> => {
+}: CreateDocumentOptions) => {
   const user = await prisma.user.findFirstOrThrow({
     where: {
       id: userId,

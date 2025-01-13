@@ -1,5 +1,4 @@
 import { isDeepEqual } from 'remeda';
-import { z } from 'zod';
 
 import { validateCheckboxField } from '@documenso/lib/advanced-fields-validation/validate-checkbox';
 import { validateDropdownField } from '@documenso/lib/advanced-fields-validation/validate-dropdown';
@@ -24,7 +23,6 @@ import {
 import { prisma } from '@documenso/prisma';
 import type { Field } from '@documenso/prisma/client';
 import { FieldType } from '@documenso/prisma/client';
-import { FieldSchema } from '@documenso/prisma/generated/zod';
 
 import { AppError, AppErrorCode } from '../../errors/app-error';
 import { canRecipientFieldsBeModified } from '../../utils/recipients';
@@ -37,19 +35,13 @@ export interface SetFieldsForDocumentOptions {
   requestMetadata: ApiRequestMetadata;
 }
 
-export const ZSetFieldsForDocumentResponseSchema = z.object({
-  fields: z.array(FieldSchema),
-});
-
-export type TSetFieldsForDocumentResponse = z.infer<typeof ZSetFieldsForDocumentResponseSchema>;
-
 export const setFieldsForDocument = async ({
   userId,
   teamId,
   documentId,
   fields,
   requestMetadata,
-}: SetFieldsForDocumentOptions): Promise<TSetFieldsForDocumentResponse> => {
+}: SetFieldsForDocumentOptions) => {
   const document = await prisma.document.findFirst({
     where: {
       id: documentId,

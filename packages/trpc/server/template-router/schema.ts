@@ -1,5 +1,6 @@
 import { z } from 'zod';
 
+import { ZDocumentSchema } from '@documenso/lib/types/document';
 import {
   ZDocumentAccessAuthTypesSchema,
   ZDocumentActionAuthTypesSchema,
@@ -25,7 +26,7 @@ export const ZCreateTemplateMutationSchema = z.object({
   templateDocumentDataId: z.string().min(1),
 });
 
-export const ZCreateDocumentFromDirectTemplateMutationSchema = z.object({
+export const ZCreateDocumentFromDirectTemplateRequestSchema = z.object({
   directRecipientName: z.string().optional(),
   directRecipientEmail: z.string().email(),
   directTemplateToken: z.string().min(1),
@@ -34,7 +35,7 @@ export const ZCreateDocumentFromDirectTemplateMutationSchema = z.object({
   templateUpdatedAt: z.date(),
 });
 
-export const ZCreateDocumentFromTemplateMutationSchema = z.object({
+export const ZCreateDocumentFromTemplateRequestSchema = z.object({
   templateId: z.number(),
   recipients: z
     .array(
@@ -61,6 +62,8 @@ export const ZCreateDocumentFromTemplateMutationSchema = z.object({
     )
     .optional(),
 });
+
+export const ZCreateDocumentFromTemplateResponseSchema = ZDocumentSchema;
 
 export const ZDuplicateTemplateMutationSchema = z.object({
   templateId: z.number(),
@@ -138,24 +141,19 @@ export const ZUpdateTemplateRequestSchema = z.object({
     .optional(),
 });
 
-export const ZFindTemplatesQuerySchema = ZFindSearchParamsSchema.extend({
+export const ZFindTemplatesRequestSchema = ZFindSearchParamsSchema.extend({
   type: z.nativeEnum(TemplateType).describe('Filter templates by type.').optional(),
 });
 
-export const ZGetTemplateByIdQuerySchema = z.object({
-  templateId: z.number().min(1),
+export const ZGetTemplateByIdRequestSchema = z.object({
+  templateId: z.number(),
 });
 
-export const ZMoveTemplatesToTeamSchema = z.object({
+export const ZMoveTemplatesToTeamRequestSchema = z.object({
   templateId: z.number().describe('The ID of the template to move to.'),
   teamId: z.number().describe('The ID of the team to move the template to.'),
 });
 
 export type TCreateTemplateMutationSchema = z.infer<typeof ZCreateTemplateMutationSchema>;
-export type TCreateDocumentFromTemplateMutationSchema = z.infer<
-  typeof ZCreateDocumentFromTemplateMutationSchema
->;
 export type TDuplicateTemplateMutationSchema = z.infer<typeof ZDuplicateTemplateMutationSchema>;
 export type TDeleteTemplateMutationSchema = z.infer<typeof ZDeleteTemplateMutationSchema>;
-export type TGetTemplateByIdQuerySchema = z.infer<typeof ZGetTemplateByIdQuerySchema>;
-export type TMoveTemplatesToSchema = z.infer<typeof ZMoveTemplatesToTeamSchema>;

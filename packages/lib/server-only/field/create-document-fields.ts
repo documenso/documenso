@@ -1,12 +1,9 @@
-import { z } from 'zod';
-
 import { DOCUMENT_AUDIT_LOG_TYPE } from '@documenso/lib/types/document-audit-logs';
 import type { TFieldMetaSchema } from '@documenso/lib/types/field-meta';
 import type { ApiRequestMetadata } from '@documenso/lib/universal/extract-request-metadata';
 import { createDocumentAuditLogData } from '@documenso/lib/utils/document-audit-logs';
 import { prisma } from '@documenso/prisma';
 import type { FieldType } from '@documenso/prisma/client';
-import { FieldSchema } from '@documenso/prisma/generated/zod';
 
 import { AppError, AppErrorCode } from '../../errors/app-error';
 import { canRecipientFieldsBeModified } from '../../utils/recipients';
@@ -28,19 +25,13 @@ export interface CreateDocumentFieldsOptions {
   requestMetadata: ApiRequestMetadata;
 }
 
-export const ZCreateDocumentFieldsResponseSchema = z.object({
-  fields: z.array(FieldSchema),
-});
-
-export type TCreateDocumentFieldsResponse = z.infer<typeof ZCreateDocumentFieldsResponseSchema>;
-
 export const createDocumentFields = async ({
   userId,
   teamId,
   documentId,
   fields,
   requestMetadata,
-}: CreateDocumentFieldsOptions): Promise<TCreateDocumentFieldsResponse> => {
+}: CreateDocumentFieldsOptions) => {
   const document = await prisma.document.findFirst({
     where: {
       id: documentId,

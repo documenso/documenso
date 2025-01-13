@@ -1,5 +1,3 @@
-import { z } from 'zod';
-
 import { prisma } from '@documenso/prisma';
 import { DocumentSource, type Prisma } from '@documenso/prisma/client';
 
@@ -11,17 +9,11 @@ export interface DuplicateDocumentOptions {
   teamId?: number;
 }
 
-export const ZDuplicateDocumentResponseSchema = z.object({
-  documentId: z.number(),
-});
-
-export type TDuplicateDocumentResponse = z.infer<typeof ZDuplicateDocumentResponseSchema>;
-
 export const duplicateDocument = async ({
   documentId,
   userId,
   teamId,
-}: DuplicateDocumentOptions): Promise<TDuplicateDocumentResponse> => {
+}: DuplicateDocumentOptions) => {
   const documentWhereInput = await getDocumentWhereInput({
     documentId,
     userId,

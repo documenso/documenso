@@ -2,10 +2,7 @@ import { z } from 'zod';
 
 import { getServerLimits } from '@documenso/ee/server-only/limits/server';
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
-import {
-  ZGetDocumentWithDetailsByIdResponseSchema,
-  getDocumentWithDetailsById,
-} from '@documenso/lib/server-only/document/get-document-with-details-by-id';
+import { getDocumentWithDetailsById } from '@documenso/lib/server-only/document/get-document-with-details-by-id';
 import { sendDocument } from '@documenso/lib/server-only/document/send-document';
 import {
   ZCreateDocumentFromDirectTemplateResponseSchema,
@@ -50,16 +47,17 @@ import type { Document } from '@documenso/prisma/client';
 
 import { authenticatedProcedure, maybeAuthenticatedProcedure, router } from '../trpc';
 import {
-  ZCreateDocumentFromDirectTemplateMutationSchema,
-  ZCreateDocumentFromTemplateMutationSchema,
+  ZCreateDocumentFromDirectTemplateRequestSchema,
+  ZCreateDocumentFromTemplateRequestSchema,
+  ZCreateDocumentFromTemplateResponseSchema,
   ZCreateTemplateDirectLinkMutationSchema,
   ZCreateTemplateMutationSchema,
   ZDeleteTemplateDirectLinkMutationSchema,
   ZDeleteTemplateMutationSchema,
   ZDuplicateTemplateMutationSchema,
-  ZFindTemplatesQuerySchema,
-  ZGetTemplateByIdQuerySchema,
-  ZMoveTemplatesToTeamSchema,
+  ZFindTemplatesRequestSchema,
+  ZGetTemplateByIdRequestSchema,
+  ZMoveTemplatesToTeamRequestSchema,
   ZToggleTemplateDirectLinkMutationSchema,
   ZUpdateTemplateRequestSchema,
 } from './schema';
@@ -78,7 +76,7 @@ export const templateRouter = router({
         tags: ['Template'],
       },
     })
-    .input(ZFindTemplatesQuerySchema)
+    .input(ZFindTemplatesRequestSchema)
     .output(ZFindTemplatesResponseSchema)
     .query(async ({ input, ctx }) => {
       const { teamId } = ctx;
@@ -102,7 +100,7 @@ export const templateRouter = router({
         tags: ['Template'],
       },
     })
-    .input(ZGetTemplateByIdQuerySchema)
+    .input(ZGetTemplateByIdRequestSchema)
     .output(ZGetTemplateByIdResponseSchema)
     .query(async ({ input, ctx }) => {
       const { teamId } = ctx;
@@ -234,8 +232,8 @@ export const templateRouter = router({
         tags: ['Template'],
       },
     })
-    .input(ZCreateDocumentFromTemplateMutationSchema)
-    .output(ZGetDocumentWithDetailsByIdResponseSchema)
+    .input(ZCreateDocumentFromTemplateRequestSchema)
+    .output(ZCreateDocumentFromTemplateResponseSchema)
     .mutation(async ({ ctx, input }) => {
       const { teamId } = ctx;
       const { templateId, recipients, distributeDocument, customDocumentDataId } = input;
@@ -290,7 +288,7 @@ export const templateRouter = router({
     //     tags: ['Template'],
     //   },
     // })
-    .input(ZCreateDocumentFromDirectTemplateMutationSchema)
+    .input(ZCreateDocumentFromDirectTemplateRequestSchema)
     .output(ZCreateDocumentFromDirectTemplateResponseSchema)
     .mutation(async ({ input, ctx }) => {
       const {
@@ -415,7 +413,7 @@ export const templateRouter = router({
         tags: ['Template'],
       },
     })
-    .input(ZMoveTemplatesToTeamSchema)
+    .input(ZMoveTemplatesToTeamRequestSchema)
     .output(ZMoveTemplateToTeamResponseSchema)
     .mutation(async ({ input, ctx }) => {
       const { templateId, teamId } = input;
