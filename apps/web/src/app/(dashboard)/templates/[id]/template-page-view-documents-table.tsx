@@ -116,7 +116,7 @@ export const TemplatePageViewDocumentsTable = ({
         accessorKey: 'recipient',
         cell: ({ row }) => (
           <StackAvatarsWithTooltip
-            recipients={row.original.Recipient}
+            recipients={row.original.recipients}
             documentStatus={row.original.status}
           />
         ),

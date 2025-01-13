@@ -21,7 +21,10 @@ import {
 
 import { jobs } from '../../jobs/client';
 import { extractDerivedDocumentEmailSettings } from '../../types/document-email';
-import { ZWebhookDocumentSchema } from '../../types/webhook-payload';
+import {
+  ZWebhookDocumentSchema,
+  mapDocumentToWebhookDocumentPayload,
+} from '../../types/webhook-payload';
 import { getFile } from '../../universal/upload/get-file';
 import { insertFormValuesInPdf } from '../pdf/insert-form-values-in-pdf';
 import { triggerWebhook } from '../webhooks/trigger/trigger-webhook';
@@ -36,7 +39,7 @@ export type SendDocumentOptions = {
 
 export const ZSendDocumentResponseSchema = DocumentSchema.extend({
   documentMeta: DocumentMetaSchema.nullable(),
-  Recipient: RecipientSchema.array(),
+  recipients: RecipientSchema.array(),
 });
 
 export type TSendDocumentResponse = z.infer<typeof ZSendDocumentResponseSchema>;
@@ -68,7 +71,7 @@ export const sendDocument = async ({
           }),
     },
     include: {
-      Recipient: {
+      recipients: {
         orderBy: [{ signingOrder: { sort: 'asc', nulls: 'last' } }, { id: 'asc' }],
       },
       documentMeta: true,
@@ -80,7 +83,7 @@ export const sendDocument = async ({
     throw new Error('Document not found');
   }
 
-  if (document.Recipient.length === 0) {
+  if (document.recipients.length === 0) {
     throw new Error('Document has no recipients');
   }
 
@@ -90,13 +93,13 @@ export const sendDocument = async ({
 
   const signingOrder = document.documentMeta?.signingOrder || DocumentSigningOrder.PARALLEL;
 
-  let recipientsToNotify = document.Recipient;
+  let recipientsToNotify = document.recipients;
 
   if (signingOrder === DocumentSigningOrder.SEQUENTIAL) {
     // Get the currently active recipient.
-    recipientsToNotify = document.Recipient.filter(
-      (r) => r.signingStatus === SigningStatus.NOT_SIGNED && r.role !== RecipientRole.CC,
-    ).slice(0, 1);
+    recipientsToNotify = document.recipients
+      .filter((r) => r.signingStatus === SigningStatus.NOT_SIGNED && r.role !== RecipientRole.CC)
+      .slice(0, 1);
 
     // Secondary filter so we aren't resending if the current active recipient has already
     // received the document.
@@ -194,7 +197,7 @@ export const sendDocument = async ({
     );
   }
 
-  const allRecipientsHaveNoActionToTake = document.Recipient.every(
+  const allRecipientsHaveNoActionToTake = document.recipients.every(
     (recipient) =>
       recipient.role === RecipientRole.CC || recipient.signingStatus === SigningStatus.SIGNED,
   );
@@ -215,7 +218,7 @@ export const sendDocument = async ({
       },
       include: {
         documentMeta: true,
-        Recipient: true,
+        recipients: true,
       },
     });
   }
@@ -241,14 +244,14 @@ export const sendDocument = async ({
       },
       include: {
         documentMeta: true,
-        Recipient: true,
+        recipients: true,
       },
     });
   });
 
   await triggerWebhook({
     event: WebhookTriggerEvents.DOCUMENT_SENT,
-    data: ZWebhookDocumentSchema.parse(updatedDocument),
+    data: ZWebhookDocumentSchema.parse(mapDocumentToWebhookDocumentPayload(updatedDocument)),
     userId,
     teamId,
   });

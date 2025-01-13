@@ -70,7 +70,7 @@ export const setFieldsForDocument = async ({
           }),
     },
     include: {
-      Recipient: true,
+      recipients: true,
     },
   });
 
@@ -91,7 +91,7 @@ export const setFieldsForDocument = async ({
       documentId,
     },
     include: {
-      Recipient: true,
+      recipient: true,
     },
   });
 
@@ -102,7 +102,7 @@ export const setFieldsForDocument = async ({
   const linkedFields = fields.map((field) => {
     const existing = existingFields.find((existingField) => existingField.id === field.id);
 
-    const recipient = document.Recipient.find(
+    const recipient = document.recipients.find(
       (recipient) => recipient.email.toLowerCase() === field.signerEmail.toLowerCase(),
     );
 
@@ -237,12 +237,12 @@ export const setFieldsForDocument = async ({
             customText: '',
             inserted: false,
             fieldMeta: parsedFieldMeta,
-            Document: {
+            document: {
               connect: {
                 id: documentId,
               },
             },
-            Recipient: {
+            recipient: {
               connect: {
                 documentId_email: {
                   documentId,
@@ -318,7 +318,7 @@ export const setFieldsForDocument = async ({
             metadata: requestMetadata,
             data: {
               fieldId: field.secondaryId,
-              fieldRecipientEmail: field.Recipient?.email ?? '',
+              fieldRecipientEmail: field.recipient?.email ?? '',
               fieldRecipientId: field.recipientId ?? -1,
               fieldType: field.type,
             },

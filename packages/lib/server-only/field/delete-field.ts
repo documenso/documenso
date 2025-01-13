@@ -22,7 +22,7 @@ export const deleteField = async ({
   const field = await prisma.field.delete({
     where: {
       id: fieldId,
-      Document: {
+      document: {
         id: documentId,
         ...(teamId
           ? {
@@ -42,7 +42,7 @@ export const deleteField = async ({
       },
     },
     include: {
-      Recipient: true,
+      recipient: true,
     },
   });
 
@@ -78,7 +78,7 @@ export const deleteField = async ({
       },
       data: {
         fieldId: field.secondaryId,
-        fieldRecipientEmail: field.Recipient?.email ?? '',
+        fieldRecipientEmail: field.recipient?.email ?? '',
         fieldRecipientId: field.recipientId ?? -1,
         fieldType: field.type,
       },

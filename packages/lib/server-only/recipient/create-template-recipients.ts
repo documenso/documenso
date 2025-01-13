@@ -60,7 +60,7 @@ export const createTemplateRecipients = async ({
           }),
     },
     include: {
-      Recipient: true,
+      recipients: true,
     },
   });
 
@@ -92,7 +92,7 @@ export const createTemplateRecipients = async ({
   }));
 
   const duplicateRecipients = normalizedRecipients.filter((newRecipient) => {
-    const existingRecipient = template.Recipient.find(
+    const existingRecipient = template.recipients.find(
       (existingRecipient) => existingRecipient.email === newRecipient.email,
     );
 

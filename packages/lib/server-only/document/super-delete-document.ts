@@ -30,9 +30,9 @@ export const superDeleteDocument = async ({ id, requestMetadata }: SuperDeleteDo
       id,
     },
     include: {
-      Recipient: true,
+      recipients: true,
       documentMeta: true,
-      User: true,
+      user: true,
       team: {
         include: {
           teamGlobalSettings: true,
@@ -45,7 +45,7 @@ export const superDeleteDocument = async ({ id, requestMetadata }: SuperDeleteDo
     throw new Error('Document not found');
   }
 
-  const { status, User: user } = document;
+  const { status, user } = document;
 
   const isDocumentDeletedEmailEnabled = extractDerivedDocumentEmailSettings(
     document.documentMeta,
@@ -54,11 +54,11 @@ export const superDeleteDocument = async ({ id, requestMetadata }: SuperDeleteDo
   // if the document is pending, send cancellation emails to all recipients
   if (
     status === DocumentStatus.PENDING &&
-    document.Recipient.length > 0 &&
+    document.recipients.length > 0 &&
     isDocumentDeletedEmailEnabled
   ) {
     await Promise.all(
-      document.Recipient.map(async (recipient) => {
+      document.recipients.map(async (recipient) => {
         if (recipient.sendStatus !== SendStatus.SENT) {
           return;
         }

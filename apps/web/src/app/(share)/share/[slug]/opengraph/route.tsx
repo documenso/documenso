@@ -52,15 +52,15 @@ export async function GET(_request: Request, { params: { slug } }: SharePageOpen
   const isRecipient = 'Signature' in recipientOrSender;
 
   const signatureImage = match(recipientOrSender)
-    .with({ Signature: P.array(P._) }, (recipient) => {
-      return recipient.Signature?.[0]?.signatureImageAsBase64 || null;
+    .with({ signatures: P.array(P._) }, (recipient) => {
+      return recipient.signatures?.[0]?.signatureImageAsBase64 || null;
     })
     .otherwise((sender) => {
       return sender.signature || null;
     });
 
   const signatureName = match(recipientOrSender)
-    .with({ Signature: P.array(P._) }, (recipient) => {
+    .with({ signatures: P.array(P._) }, (recipient) => {
       return recipient.name || recipient.email;
     })
     .otherwise((sender) => {

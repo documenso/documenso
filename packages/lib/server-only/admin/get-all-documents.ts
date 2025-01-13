@@ -30,14 +30,14 @@ export const findDocuments = async ({ query, page = 1, perPage = 10 }: FindDocum
         createdAt: 'desc',
       },
       include: {
-        User: {
+        user: {
           select: {
             id: true,
             name: true,
             email: true,
           },
         },
-        Recipient: true,
+        recipients: true,
       },
     }),
     prisma.document.count({

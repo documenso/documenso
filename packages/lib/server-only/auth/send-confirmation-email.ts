@@ -23,7 +23,7 @@ export const sendConfirmationEmail = async ({ userId }: SendConfirmationEmailPro
       id: userId,
     },
     include: {
-      VerificationToken: {
+      verificationTokens: {
         orderBy: {
           createdAt: 'desc',
         },
@@ -32,7 +32,7 @@ export const sendConfirmationEmail = async ({ userId }: SendConfirmationEmailPro
     },
   });
 
-  const [verificationToken] = user.VerificationToken;
+  const [verificationToken] = user.verificationTokens;
 
   if (!verificationToken?.token) {
     throw new Error('Verification token not found for the user');

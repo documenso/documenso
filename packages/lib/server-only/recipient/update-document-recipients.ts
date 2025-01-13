@@ -65,8 +65,8 @@ export const updateDocumentRecipients = async ({
           }),
     },
     include: {
-      Field: true,
-      Recipient: true,
+      fields: true,
+      recipients: true,
     },
   });
 
@@ -99,7 +99,7 @@ export const updateDocumentRecipients = async ({
   }
 
   const recipientsToUpdate = recipients.map((recipient) => {
-    const originalRecipient = document.Recipient.find(
+    const originalRecipient = document.recipients.find(
       (existingRecipient) => existingRecipient.id === recipient.id,
     );
 
@@ -109,7 +109,7 @@ export const updateDocumentRecipients = async ({
       });
     }
 
-    const duplicateRecipientWithSameEmail = document.Recipient.find(
+    const duplicateRecipientWithSameEmail = document.recipients.find(
       (existingRecipient) =>
         existingRecipient.email === recipient.email && existingRecipient.id !== recipient.id,
     );
@@ -122,7 +122,7 @@ export const updateDocumentRecipients = async ({
 
     if (
       hasRecipientBeenChanged(originalRecipient, recipient) &&
-      !canRecipientBeModified(originalRecipient, document.Field)
+      !canRecipientBeModified(originalRecipient, document.fields)
     ) {
       throw new AppError(AppErrorCode.INVALID_REQUEST, {
         message: 'Cannot modify a recipient who has already interacted with the document',
@@ -172,7 +172,7 @@ export const updateDocumentRecipients = async ({
             authOptions,
           },
           include: {
-            Field: true,
+            fields: true,
           },
         });
 

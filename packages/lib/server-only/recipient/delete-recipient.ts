@@ -23,7 +23,7 @@ export const deleteRecipient = async ({
   const recipient = await prisma.recipient.findFirst({
     where: {
       id: recipientId,
-      Document: {
+      document: {
         id: documentId,
         ...(teamId
           ? {

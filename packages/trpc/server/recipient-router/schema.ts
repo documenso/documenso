@@ -57,7 +57,7 @@ export const ZRecipientBaseResponseSchema = RecipientSchema.pick({
  * Use this when returning a full recipient from the API.
  */
 export const ZRecipientResponseSchema = ZRecipientBaseResponseSchema.extend({
-  Field: FieldSchema.array(),
+  fields: FieldSchema.array(),
 });
 
 export const ZCreateDocumentRecipientRequestSchema = z.object({

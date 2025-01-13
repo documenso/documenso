@@ -74,7 +74,7 @@ export const SignatureField = ({
     isLoading: isRemoveSignedFieldWithTokenLoading,
   } = trpc.field.removeSignedFieldWithToken.useMutation(DO_NOT_INVALIDATE_QUERY_ON_MUTATION);
 
-  const { Signature: signature } = field;
+  const { signature } = field;
 
   const isLoading = isSignFieldWithTokenLoading || isRemoveSignedFieldWithTokenLoading || isPending;
 

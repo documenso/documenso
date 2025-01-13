@@ -7,7 +7,8 @@ import { useSession } from 'next-auth/react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 
-import type { Field, Recipient } from '@documenso/prisma/client';
+import type { Recipient } from '@documenso/prisma/client';
+import type { Field } from '@documenso/prisma/client';
 import type { TemplateWithDetails } from '@documenso/prisma/types/template';
 import {
   DocumentFlowFormContainerActions,
@@ -40,8 +41,8 @@ export type TConfigureDirectTemplateFormSchema = z.infer<typeof ZConfigureDirect
 export type ConfigureDirectTemplateFormProps = {
   flowStep: DocumentFlowStep;
   isDocumentPdfLoaded: boolean;
-  template: Omit<TemplateWithDetails, 'User'>;
-  directTemplateRecipient: Recipient & { Field: Field[] };
+  template: Omit<TemplateWithDetails, 'user'>;
+  directTemplateRecipient: Recipient & { fields: Field[] };
   initialEmail?: string;
   onSubmit: (_data: TConfigureDirectTemplateFormSchema) => void;
 };
@@ -57,10 +58,10 @@ export const ConfigureDirectTemplateFormPartial = ({
   const { _ } = useLingui();
   const { data: session } = useSession();
 
-  const { Recipient } = template;
+  const { recipients } = template;
   const { derivedRecipientAccessAuth } = useRequiredDocumentAuthContext();
 
-  const recipientsWithBlankDirectRecipientEmail = Recipient.map((recipient) => {
+  const recipientsWithBlankDirectRecipientEmail = recipients.map((recipient) => {
     if (recipient.id === directTemplateRecipient.id) {
       return {
         ...recipient,
@@ -74,7 +75,7 @@ export const ConfigureDirectTemplateFormPartial = ({
   const form = useForm<TConfigureDirectTemplateFormSchema>({
     resolver: zodResolver(
       ZConfigureDirectTemplateFormSchema.superRefine((items, ctx) => {
-        if (template.Recipient.map((recipient) => recipient.email).includes(items.email)) {
+        if (template.recipients.map((recipient) => recipient.email).includes(items.email)) {
           ctx.addIssue({
             code: z.ZodIssueCode.custom,
             message: _(msg`Email cannot already exist in the template`),
@@ -96,7 +97,7 @@ export const ConfigureDirectTemplateFormPartial = ({
 
       <DocumentFlowFormContainerContent>
         {isDocumentPdfLoaded &&
-          directTemplateRecipient.Field.map((field, index) => (
+          directTemplateRecipient.fields.map((field, index) => (
             <ShowFieldItem
               key={index}
               field={field}

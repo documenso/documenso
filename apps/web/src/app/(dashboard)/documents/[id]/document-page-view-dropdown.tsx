@@ -41,8 +41,8 @@ import { DuplicateDocumentDialog } from '../duplicate-document-dialog';
 
 export type DocumentPageViewDropdownProps = {
   document: Document & {
-    User: Pick<User, 'id' | 'name' | 'email'>;
-    Recipient: Recipient[];
+    user: Pick<User, 'id' | 'name' | 'email'>;
+    recipients: Recipient[];
     team: Pick<Team, 'id' | 'url'> | null;
   };
   team?: Pick<Team, 'id' | 'url'> & { teamEmail: TeamEmail | null };
@@ -60,9 +60,9 @@ export const DocumentPageViewDropdown = ({ document, team }: DocumentPageViewDro
     return null;
   }
 
-  const recipient = document.Recipient.find((recipient) => recipient.email === session.user.email);
+  const recipient = document.recipients.find((recipient) => recipient.email === session.user.email);
 
-  const isOwner = document.User.id === session.user.id;
+  const isOwner = document.user.id === session.user.id;
   const isDraft = document.status === DocumentStatus.DRAFT;
   const isPending = document.status === DocumentStatus.PENDING;
   const isDeleted = document.deletedAt !== null;
@@ -94,7 +94,7 @@ export const DocumentPageViewDropdown = ({ document, team }: DocumentPageViewDro
     }
   };
 
-  const nonSignedRecipients = document.Recipient.filter((item) => item.signingStatus !== 'SIGNED');
+  const nonSignedRecipients = document.recipients.filter((item) => item.signingStatus !== 'SIGNED');
 
   return (
     <DropdownMenu>
@@ -149,7 +149,7 @@ export const DocumentPageViewDropdown = ({ document, team }: DocumentPageViewDro
 
         {canManageDocument && (
           <DocumentRecipientLinkCopyDialog
-            recipients={document.Recipient}
+            recipients={document.recipients}
             trigger={
               <DropdownMenuItem
                 disabled={!isPending || isDeleted}

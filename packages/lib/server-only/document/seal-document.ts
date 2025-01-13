@@ -14,7 +14,10 @@ import {
 } from '@documenso/prisma/client';
 import { signPdf } from '@documenso/signing';
 
-import { ZWebhookDocumentSchema } from '../../types/webhook-payload';
+import {
+  ZWebhookDocumentSchema,
+  mapDocumentToWebhookDocumentPayload,
+} from '../../types/webhook-payload';
 import type { RequestMetadata } from '../../universal/extract-request-metadata';
 import { getFile } from '../../universal/upload/get-file';
 import { putPdfFile } from '../../universal/upload/put-file';
@@ -43,7 +46,7 @@ export const sealDocument = async ({
   const document = await prisma.document.findFirstOrThrow({
     where: {
       id: documentId,
-      Recipient: {
+      recipients: {
         every: {
           signingStatus: SigningStatus.SIGNED,
         },
@@ -52,7 +55,7 @@ export const sealDocument = async ({
     include: {
       documentData: true,
       documentMeta: true,
-      Recipient: true,
+      recipients: true,
       team: {
         select: {
           teamGlobalSettings: {
@@ -89,7 +92,7 @@ export const sealDocument = async ({
       documentId: document.id,
     },
     include: {
-      Signature: true,
+      signature: true,
     },
   });
 
@@ -206,13 +209,13 @@ export const sealDocument = async ({
     include: {
       documentData: true,
       documentMeta: true,
-      Recipient: true,
+      recipients: true,
     },
   });
 
   await triggerWebhook({
     event: WebhookTriggerEvents.DOCUMENT_COMPLETED,
-    data: ZWebhookDocumentSchema.parse(updatedDocument),
+    data: ZWebhookDocumentSchema.parse(mapDocumentToWebhookDocumentPayload(updatedDocument)),
     userId: document.userId,
     teamId: document.teamId ?? undefined,
   });

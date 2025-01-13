@@ -118,7 +118,7 @@ export const EmbedDirectTemplateClientPage = ({
         });
 
         if (field.type === FieldType.SIGNATURE) {
-          newField.Signature = {
+          newField.signature = {
             id: 1,
             created: new Date(),
             recipientId: 1,
@@ -163,7 +163,7 @@ export const EmbedDirectTemplateClientPage = ({
           customText: '',
           inserted: false,
           signedValue: undefined,
-          Signature: undefined,
+          signature: undefined,
         });
       }),
     );

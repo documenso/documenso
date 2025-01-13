@@ -32,7 +32,7 @@ export const deleteDocumentRecipient = async ({
 }: DeleteDocumentRecipientOptions): Promise<void> => {
   const document = await prisma.document.findFirst({
     where: {
-      Recipient: {
+      recipients: {
         some: {
           id: recipientId,
         },
@@ -56,7 +56,7 @@ export const deleteDocumentRecipient = async ({
     include: {
       documentMeta: true,
       team: true,
-      Recipient: {
+      recipients: {
         where: {
           id: recipientId,
         },
@@ -93,7 +93,7 @@ export const deleteDocumentRecipient = async ({
     });
   }
 
-  const recipientToDelete = document.Recipient[0];
+  const recipientToDelete = document.recipients[0];
 
   if (!recipientToDelete || recipientToDelete.id !== recipientId) {
     throw new AppError(AppErrorCode.NOT_FOUND, {

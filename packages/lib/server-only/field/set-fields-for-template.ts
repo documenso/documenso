@@ -77,7 +77,7 @@ export const setFieldsForTemplate = async ({
       templateId,
     },
     include: {
-      Recipient: true,
+      recipient: true,
     },
   });
 
@@ -182,12 +182,12 @@ export const setFieldsForTemplate = async ({
           customText: '',
           inserted: false,
           fieldMeta: parsedFieldMeta,
-          Template: {
+          template: {
             connect: {
               id: templateId,
             },
           },
-          Recipient: {
+          recipient: {
             connect: {
               templateId_email: {
                 templateId,

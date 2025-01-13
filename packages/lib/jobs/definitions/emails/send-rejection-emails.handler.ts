@@ -33,7 +33,7 @@ export const run = async ({
         id: documentId,
       },
       include: {
-        User: true,
+        user: true,
         documentMeta: true,
         team: {
           select: {
@@ -53,7 +53,7 @@ export const run = async ({
     }),
   ]);
 
-  const { documentMeta, team, User: documentOwner } = document;
+  const { documentMeta, user: documentOwner } = document;
 
   const isEmailEnabled = extractDerivedDocumentEmailSettings(
     document.documentMeta,
@@ -70,7 +70,7 @@ export const run = async ({
     const recipientTemplate = createElement(DocumentRejectionConfirmedEmail, {
       recipientName: recipient.name,
       documentName: document.title,
-      documentOwnerName: document.User.name || document.User.email,
+      documentOwnerName: document.user.name || document.user.email,
       reason: recipient.rejectionReason || '',
       assetBaseUrl: NEXT_PUBLIC_WEBAPP_URL(),
     });

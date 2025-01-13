@@ -115,7 +115,7 @@ export const seedDraftDocument = async (
 
   for (const recipient of recipients) {
     const email = typeof recipient === 'string' ? recipient : recipient.email;
-    const name = typeof recipient === 'string' ? recipient : recipient.name ?? '';
+    const name = typeof recipient === 'string' ? recipient : (recipient.name ?? '');
 
     await prisma.recipient.create({
       data: {
@@ -126,12 +126,12 @@ export const seedDraftDocument = async (
         sendStatus: SendStatus.NOT_SENT,
         signingStatus: SigningStatus.NOT_SIGNED,
         signedAt: new Date(),
-        Document: {
+        document: {
           connect: {
             id: document.id,
           },
         },
-        Field: {
+        fields: {
           create: {
             page: 1,
             type: FieldType.NAME,
@@ -184,7 +184,7 @@ export const seedPendingDocument = async (
 
   for (const recipient of recipients) {
     const email = typeof recipient === 'string' ? recipient : recipient.email;
-    const name = typeof recipient === 'string' ? recipient : recipient.name ?? '';
+    const name = typeof recipient === 'string' ? recipient : (recipient.name ?? '');
 
     await prisma.recipient.create({
       data: {
@@ -195,12 +195,12 @@ export const seedPendingDocument = async (
         sendStatus: SendStatus.SENT,
         signingStatus: SigningStatus.NOT_SIGNED,
         signedAt: new Date(),
-        Document: {
+        document: {
           connect: {
             id: document.id,
           },
         },
-        Field: {
+        fields: {
           create: {
             page: 1,
             type: FieldType.NAME,
@@ -222,7 +222,7 @@ export const seedPendingDocument = async (
       id: document.id,
     },
     include: {
-      Recipient: true,
+      recipients: true,
     },
   });
 };
@@ -240,7 +240,7 @@ export const seedPendingDocumentNoFields = async ({
 
   for (const recipient of recipients) {
     const email = typeof recipient === 'string' ? recipient : recipient.email;
-    const name = typeof recipient === 'string' ? recipient : recipient.name ?? '';
+    const name = typeof recipient === 'string' ? recipient : (recipient.name ?? '');
 
     await prisma.recipient.create({
       data: {
@@ -251,7 +251,7 @@ export const seedPendingDocumentNoFields = async ({
         sendStatus: SendStatus.SENT,
         signingStatus: SigningStatus.NOT_SIGNED,
         signedAt: new Date(),
-        Document: {
+        document: {
           connect: {
             id: document.id,
           },
@@ -265,7 +265,7 @@ export const seedPendingDocumentNoFields = async ({
       documentId: document.id,
     },
     include: {
-      Field: true,
+      fields: true,
     },
   });
 
@@ -301,7 +301,7 @@ export const seedPendingDocumentWithFullFields = async ({
 
   for (const [recipientIndex, recipient] of recipients.entries()) {
     const email = typeof recipient === 'string' ? recipient : recipient.email;
-    const name = typeof recipient === 'string' ? recipient : recipient.name ?? '';
+    const name = typeof recipient === 'string' ? recipient : (recipient.name ?? '');
 
     await prisma.recipient.create({
       data: {
@@ -312,12 +312,12 @@ export const seedPendingDocumentWithFullFields = async ({
         sendStatus: SendStatus.SENT,
         signingStatus: SigningStatus.NOT_SIGNED,
         signedAt: new Date(),
-        Document: {
+        document: {
           connect: {
             id: document.id,
           },
         },
-        Field: {
+        fields: {
           createMany: {
             data: fields.map((fieldType, fieldIndex) => ({
               page: 1,
@@ -342,7 +342,7 @@ export const seedPendingDocumentWithFullFields = async ({
       documentId: document.id,
     },
     include: {
-      Field: true,
+      fields: true,
     },
   });
 
@@ -393,7 +393,7 @@ export const seedCompletedDocument = async (
 
   for (const recipient of recipients) {
     const email = typeof recipient === 'string' ? recipient : recipient.email;
-    const name = typeof recipient === 'string' ? recipient : recipient.name ?? '';
+    const name = typeof recipient === 'string' ? recipient : (recipient.name ?? '');
 
     await prisma.recipient.create({
       data: {
@@ -404,12 +404,12 @@ export const seedCompletedDocument = async (
         sendStatus: SendStatus.SENT,
         signingStatus: SigningStatus.SIGNED,
         signedAt: new Date(),
-        Document: {
+        document: {
           connect: {
             id: document.id,
           },
         },
-        Field: {
+        fields: {
           create: {
             page: 1,
             type: FieldType.NAME,

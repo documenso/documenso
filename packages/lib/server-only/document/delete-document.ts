@@ -58,7 +58,7 @@ export const deleteDocument = async ({
       id,
     },
     include: {
-      Recipient: true,
+      recipients: true,
       documentMeta: true,
       team: {
         include: {
@@ -77,7 +77,7 @@ export const deleteDocument = async ({
 
   const isUserOwner = document.userId === userId;
   const isUserTeamMember = document.team?.members.some((member) => member.userId === userId);
-  const userRecipient = document.Recipient.find((recipient) => recipient.email === user.email);
+  const userRecipient = document.recipients.find((recipient) => recipient.email === user.email);
 
   if (!isUserOwner && !isUserTeamMember && !userRecipient) {
     throw new AppError(AppErrorCode.UNAUTHORIZED, {
@@ -128,7 +128,7 @@ export const deleteDocument = async ({
 
 type HandleDocumentOwnerDeleteOptions = {
   document: Document & {
-    Recipient: Recipient[];
+    recipients: Recipient[];
     documentMeta: DocumentMeta | null;
   };
   team?:
@@ -210,7 +210,7 @@ const handleDocumentOwnerDelete = async ({
 
   // Send cancellation emails to recipients.
   await Promise.all(
-    document.Recipient.map(async (recipient) => {
+    document.recipients.map(async (recipient) => {
       if (recipient.sendStatus !== SendStatus.SENT) {
         return;
       }

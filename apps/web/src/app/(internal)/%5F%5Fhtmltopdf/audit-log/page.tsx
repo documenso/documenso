@@ -104,7 +104,7 @@ export default async function AuditLog({ searchParams }: AuditLogProps) {
             <span className="font-medium">{_(msg`Owner`)}</span>
 
             <span className="mt-1 block break-words">
-              {document.User.name} ({document.User.email})
+              {document.user.name} ({document.user.email})
             </span>
           </p>
 
@@ -140,7 +140,7 @@ export default async function AuditLog({ searchParams }: AuditLogProps) {
             <p className="font-medium">{_(msg`Recipients`)}</p>
 
             <ul className="mt-1 list-inside list-disc">
-              {document.Recipient.map((recipient) => (
+              {document.recipients.map((recipient) => (
                 <li key={recipient.id}>
                   <span className="text-muted-foreground">
                     [{_(RECIPIENT_ROLES_DESCRIPTION[recipient.role].roleName)}]

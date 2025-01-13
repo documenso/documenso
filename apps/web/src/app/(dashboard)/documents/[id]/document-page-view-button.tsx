@@ -18,8 +18,8 @@ import { useToast } from '@documenso/ui/primitives/use-toast';
 
 export type DocumentPageViewButtonProps = {
   document: Document & {
-    User: Pick<User, 'id' | 'name' | 'email'>;
-    Recipient: Recipient[];
+    user: Pick<User, 'id' | 'name' | 'email'>;
+    recipients: Recipient[];
     team: Pick<Team, 'id' | 'url'> | null;
   };
   team?: Pick<Team, 'id' | 'url'>;
@@ -34,7 +34,7 @@ export const DocumentPageViewButton = ({ document }: DocumentPageViewButtonProps
     return null;
   }
 
-  const recipient = document.Recipient.find((recipient) => recipient.email === session.user.email);
+  const recipient = document.recipients.find((recipient) => recipient.email === session.user.email);
 
   const isRecipient = !!recipient;
   const isPending = document.status === DocumentStatus.PENDING;

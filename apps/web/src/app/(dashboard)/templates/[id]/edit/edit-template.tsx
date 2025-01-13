@@ -69,7 +69,7 @@ export const EditTemplateForm = ({
     },
   );
 
-  const { Recipient: recipients, Field: fields, templateDocumentData } = template;
+  const { recipients, fields, templateDocumentData } = template;
 
   const documentFlow: Record<EditTemplateStep, DocumentFlowStep> = {
     settings: {

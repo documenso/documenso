@@ -146,7 +146,7 @@ export const TemplatesDataTable = ({
                 templateId={row.original.id}
                 templateSigningOrder={row.original.templateMeta?.signingOrder}
                 documentDistributionMethod={row.original.templateMeta?.distributionMethod}
-                recipients={row.original.Recipient}
+                recipients={row.original.recipients}
                 documentRootPath={documentRootPath}
               />
 

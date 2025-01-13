@@ -12,7 +12,7 @@ export type GetRecipientByIdOptions = {
 };
 
 export const ZGetRecipientByIdResponseSchema = RecipientSchema.extend({
-  Field: FieldSchema.array(),
+  fields: FieldSchema.array(),
 });
 
 export type TGetRecipientByIdResponse = z.infer<typeof ZGetRecipientByIdResponseSchema>;
@@ -29,7 +29,7 @@ export const getRecipientById = async ({
   const recipient = await prisma.recipient.findFirst({
     where: {
       id: recipientId,
-      Document: teamId
+      document: teamId
         ? {
             team: {
               id: teamId,
@@ -46,7 +46,7 @@ export const getRecipientById = async ({
           },
     },
     include: {
-      Field: true,
+      fields: true,
     },
   });
 

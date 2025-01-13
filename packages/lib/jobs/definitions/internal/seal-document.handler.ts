@@ -20,7 +20,10 @@ import { insertFieldInPDF } from '../../../server-only/pdf/insert-field-in-pdf';
 import { normalizeSignatureAppearances } from '../../../server-only/pdf/normalize-signature-appearances';
 import { triggerWebhook } from '../../../server-only/webhooks/trigger/trigger-webhook';
 import { DOCUMENT_AUDIT_LOG_TYPE } from '../../../types/document-audit-logs';
-import { ZWebhookDocumentSchema } from '../../../types/webhook-payload';
+import {
+  ZWebhookDocumentSchema,
+  mapDocumentToWebhookDocumentPayload,
+} from '../../../types/webhook-payload';
 import { getFile } from '../../../universal/upload/get-file';
 import { putPdfFile } from '../../../universal/upload/put-file';
 import { fieldsContainUnsignedRequiredField } from '../../../utils/advanced-fields-helpers';
@@ -40,7 +43,7 @@ export const run = async ({
   const document = await prisma.document.findFirstOrThrow({
     where: {
       id: documentId,
-      Recipient: {
+      recipients: {
         every: {
           signingStatus: SigningStatus.SIGNED,
         },
@@ -48,7 +51,7 @@ export const run = async ({
     },
     include: {
       documentMeta: true,
-      Recipient: true,
+      recipients: true,
       team: {
         select: {
           teamGlobalSettings: {
@@ -102,7 +105,7 @@ export const run = async ({
       documentId: document.id,
     },
     include: {
-      Signature: true,
+      signature: true,
     },
   });
 
@@ -243,13 +246,13 @@ export const run = async ({
     include: {
       documentData: true,
       documentMeta: true,
-      Recipient: true,
+      recipients: true,
     },
   });
 
   await triggerWebhook({
     event: WebhookTriggerEvents.DOCUMENT_COMPLETED,
-    data: ZWebhookDocumentSchema.parse(updatedDocument),
+    data: ZWebhookDocumentSchema.parse(mapDocumentToWebhookDocumentPayload(updatedDocument)),
     userId: updatedDocument.userId,
     teamId: updatedDocument.teamId ?? undefined,
   });

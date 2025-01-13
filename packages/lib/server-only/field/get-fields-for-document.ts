@@ -16,7 +16,7 @@ export const getFieldsForDocument = async ({
   const fields = await prisma.field.findMany({
     where: {
       documentId,
-      Document: teamId
+      document: teamId
         ? {
             team: {
               id: teamId,
@@ -33,8 +33,8 @@ export const getFieldsForDocument = async ({
           },
     },
     include: {
-      Signature: true,
-      Recipient: {
+      signature: true,
+      recipient: {
         select: {
           name: true,
           email: true,

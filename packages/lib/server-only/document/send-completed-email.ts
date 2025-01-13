@@ -32,8 +32,8 @@ export const sendCompletedEmail = async ({ documentId, requestMetadata }: SendDo
     include: {
       documentData: true,
       documentMeta: true,
-      Recipient: true,
-      User: true,
+      recipients: true,
+      user: true,
       team: {
         select: {
           id: true,
@@ -50,11 +50,11 @@ export const sendCompletedEmail = async ({ documentId, requestMetadata }: SendDo
 
   const isDirectTemplate = document?.source === DocumentSource.TEMPLATE_DIRECT_LINK;
 
-  if (document.Recipient.length === 0) {
+  if (document.recipients.length === 0) {
     throw new Error('Document has no recipients');
   }
 
-  const { User: owner } = document;
+  const { user: owner } = document;
 
   const completedDocument = await getFile(document.documentData);
 
@@ -83,7 +83,7 @@ export const sendCompletedEmail = async ({ documentId, requestMetadata }: SendDo
   //    - Recipient emails are disabled
   if (
     isOwnerDocumentCompletedEmailEnabled &&
-    (!document.Recipient.find((recipient) => recipient.email === owner.email) ||
+    (!document.recipients.find((recipient) => recipient.email === owner.email) ||
       !isDocumentCompletedEmailEnabled)
   ) {
     const template = createElement(DocumentCompletedEmailTemplate, {
@@ -150,7 +150,7 @@ export const sendCompletedEmail = async ({ documentId, requestMetadata }: SendDo
   }
 
   await Promise.all(
-    document.Recipient.map(async (recipient) => {
+    document.recipients.map(async (recipient) => {
       const customEmailTemplate = {
         'signer.name': recipient.name,
         'signer.email': recipient.email,

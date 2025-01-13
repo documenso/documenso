@@ -16,7 +16,7 @@ export const deleteTemplateField = async ({
   const field = await prisma.field.findFirst({
     where: {
       id: fieldId,
-      Template: teamId
+      template: teamId
         ? {
             team: {
               id: teamId,

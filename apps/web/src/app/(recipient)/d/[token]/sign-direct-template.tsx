@@ -55,13 +55,13 @@ export type SignDirectTemplateFormProps = {
   flowStep: DocumentFlowStep;
   directRecipient: Recipient;
   directRecipientFields: Field[];
-  template: Omit<TemplateWithDetails, 'User'>;
+  template: Omit<TemplateWithDetails, 'user'>;
   onSubmit: (_data: DirectTemplateLocalField[]) => Promise<void>;
 };
 
 export type DirectTemplateLocalField = Field & {
   signedValue?: TSignFieldWithTokenMutationSchema;
-  Signature?: Signature;
+  signature?: Signature;
 };
 
 export const SignDirectTemplateForm = ({
@@ -95,7 +95,7 @@ export const SignDirectTemplateForm = ({
         };
 
         if (field.type === FieldType.SIGNATURE) {
-          tempField.Signature = {
+          tempField.signature = {
             id: 1,
             created: new Date(),
             recipientId: 1,
@@ -127,7 +127,7 @@ export const SignDirectTemplateForm = ({
           customText: '',
           inserted: false,
           signedValue: undefined,
-          Signature: undefined,
+          signature: undefined,
         };
       }),
     );

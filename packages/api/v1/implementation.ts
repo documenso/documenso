@@ -1,6 +1,5 @@
 import { createNextRoute } from '@ts-rest/next';
 import { match } from 'ts-pattern';
-import { z } from 'zod';
 
 import { getServerLimits } from '@documenso/ee/server-only/limits/server';
 import { NEXT_PUBLIC_WEBAPP_URL } from '@documenso/lib/constants/app';
@@ -63,7 +62,6 @@ import {
 
 import { ApiContractV1 } from './contract';
 import { authenticatedMiddleware } from './middleware/authenticated';
-import { ZTemplateWithDataSchema } from './schema';
 
 export const ApiContractV1Implementation = createNextRoute(ApiContractV1, {
   getDocuments: authenticatedMiddleware(async (args, user, team) => {
@@ -419,11 +417,16 @@ export const ApiContractV1Implementation = createNextRoute(ApiContractV1, {
         teamId: team?.id,
       });
 
-      const parsed = ZTemplateWithDataSchema.parse(template);
-
       return {
         status: 200,
-        body: parsed,
+        body: {
+          ...template,
+          Field: template.fields.map((field) => ({
+            ...field,
+            fieldMeta: field.fieldMeta ? ZFieldMetaSchema.parse(field.fieldMeta) : null,
+          })),
+          Recipient: template.recipients,
+        },
       };
     } catch (err) {
       return AppError.toRestAPIError(err);
@@ -442,12 +445,17 @@ export const ApiContractV1Implementation = createNextRoute(ApiContractV1, {
         teamId: team?.id,
       });
 
-      const parsed = z.array(ZTemplateWithDataSchema).parse(templates);
-
       return {
         status: 200,
         body: {
-          templates: parsed,
+          templates: templates.map((template) => ({
+            ...template,
+            Field: template.fields.map((field) => ({
+              ...field,
+              fieldMeta: field.fieldMeta ? ZFieldMetaSchema.parse(field.fieldMeta) : null,
+            })),
+            Recipient: template.recipients,
+          })),
           totalPages,
         },
       };
@@ -540,7 +548,7 @@ export const ApiContractV1Implementation = createNextRoute(ApiContractV1, {
       status: 200,
       body: {
         documentId: document.id,
-        recipients: document.Recipient.map((recipient) => ({
+        recipients: document.recipients.map((recipient) => ({
           recipientId: recipient.id,
           name: recipient.name,
           email: recipient.email,
@@ -634,7 +642,7 @@ export const ApiContractV1Implementation = createNextRoute(ApiContractV1, {
       status: 200,
       body: {
         documentId: document.id,
-        recipients: document.Recipient.map((recipient) => ({
+        recipients: document.recipients.map((recipient) => ({
           recipientId: recipient.id,
           name: recipient.name,
           email: recipient.email,
@@ -693,7 +701,7 @@ export const ApiContractV1Implementation = createNextRoute(ApiContractV1, {
         });
       }
 
-      const { Recipient: recipients, ...sentDocument } = await sendDocument({
+      const { recipients, ...sentDocument } = await sendDocument({
         documentId: document.id,
         userId: user.id,
         teamId: team?.id,
@@ -1074,7 +1082,7 @@ export const ApiContractV1Implementation = createNextRoute(ApiContractV1, {
                 fieldMeta: result.data,
               },
               include: {
-                Recipient: true,
+                recipient: true,
               },
             });
 
@@ -1089,7 +1097,7 @@ export const ApiContractV1Implementation = createNextRoute(ApiContractV1, {
                 },
                 data: {
                   fieldId: field.secondaryId,
-                  fieldRecipientEmail: field.Recipient?.email ?? '',
+                  fieldRecipientEmail: field.recipient?.email ?? '',
                   fieldRecipientId: recipientId,
                   fieldType: field.type,
                 },
@@ -1108,7 +1116,7 @@ export const ApiContractV1Implementation = createNextRoute(ApiContractV1, {
               pageWidth: Number(field.width),
               pageHeight: Number(field.height),
               customText: field.customText,
-              fieldMeta: ZFieldMetaSchema.parse(field.fieldMeta),
+              fieldMeta: field.fieldMeta ? ZFieldMetaSchema.parse(field.fieldMeta) : undefined,
               inserted: field.inserted,
             };
           }),

@@ -41,7 +41,7 @@ export const getDocumentByToken = async ({ token }: GetDocumentByTokenOptions) =
 
   const result = await prisma.document.findFirstOrThrow({
     where: {
-      Recipient: {
+      recipients: {
         some: {
           token,
         },
@@ -66,17 +66,17 @@ export const getDocumentAndSenderByToken = async ({
 
   const result = await prisma.document.findFirstOrThrow({
     where: {
-      Recipient: {
+      recipients: {
         some: {
           token,
         },
       },
     },
     include: {
-      User: true,
+      user: true,
       documentData: true,
       documentMeta: true,
-      Recipient: {
+      recipients: {
         where: {
           token,
         },
@@ -96,9 +96,9 @@ export const getDocumentAndSenderByToken = async ({
   });
 
   // eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars
-  const { password: _password, ...User } = result.User;
+  const { password: _password, ...user } = result.user;
 
-  const recipient = result.Recipient[0];
+  const recipient = result.recipients[0];
 
   // Sanity check, should not be possible.
   if (!recipient) {
@@ -125,7 +125,7 @@ export const getDocumentAndSenderByToken = async ({
 
   return {
     ...result,
-    User,
+    user,
   };
 };
 
@@ -144,14 +144,14 @@ export const getDocumentAndRecipientByToken = async ({
 
   const result = await prisma.document.findFirstOrThrow({
     where: {
-      Recipient: {
+      recipients: {
         some: {
           token,
         },
       },
     },
     include: {
-      Recipient: {
+      recipients: {
         where: {
           token,
         },
@@ -160,7 +160,7 @@ export const getDocumentAndRecipientByToken = async ({
     },
   });
 
-  const [recipient] = result.Recipient;
+  const [recipient] = result.recipients;
 
   // Sanity check, should not be possible.
   if (!recipient) {
@@ -185,8 +185,5 @@ export const getDocumentAndRecipientByToken = async ({
     });
   }
 
-  return {
-    ...result,
-    Recipient: result.Recipient,
-  };
+  return result;
 };

@@ -24,7 +24,7 @@ import { apiSignin } from '../fixtures/authentication';
 const getDocumentByToken = async (token: string) => {
   return await prisma.document.findFirstOrThrow({
     where: {
-      Recipient: {
+      recipients: {
         some: {
           token,
         },
@@ -357,7 +357,7 @@ test('[DOCUMENT_FLOW]: should be able to approve a document', async ({ page }) =
   });
 
   for (const recipient of recipients) {
-    const { token, Field, role } = recipient;
+    const { token, fields, role } = recipient;
 
     const signUrl = `/sign/${token}`;
 
@@ -378,7 +378,7 @@ test('[DOCUMENT_FLOW]: should be able to approve a document', async ({ page }) =
       await page.mouse.up();
     }
 
-    for (const field of Field) {
+    for (const field of fields) {
       await page.locator(`#field-${field.id}`).getByRole('button').click();
 
       await expect(page.locator(`#field-${field.id}`)).toHaveAttribute('data-inserted', 'true');
@@ -479,8 +479,8 @@ test('[DOCUMENT_FLOW]: should be able to sign a document with custom date', asyn
     fields: [FieldType.DATE],
   });
 
-  const { token, Field } = recipients[0];
-  const [recipientField] = Field;
+  const { token, fields } = recipients[0];
+  const [recipientField] = fields;
 
   await page.goto(`/sign/${token}`);
   await page.waitForURL(`/sign/${token}`);
@@ -496,7 +496,7 @@ test('[DOCUMENT_FLOW]: should be able to sign a document with custom date', asyn
 
   const field = await prisma.field.findFirst({
     where: {
-      Recipient: {
+      recipient: {
         email: 'user1@example.com',
       },
       documentId: Number(document.id),
@@ -580,14 +580,14 @@ test('[DOCUMENT_FLOW]: should be able to create and sign a document with 3 recip
 
   const createdDocument = await prisma.document.findFirst({
     where: { title: documentTitle },
-    include: { Recipient: true },
+    include: { recipients: true },
   });
 
   expect(createdDocument).not.toBeNull();
-  expect(createdDocument?.Recipient.length).toBe(3);
+  expect(createdDocument?.recipients.length).toBe(3);
 
   for (let i = 0; i < 3; i++) {
-    const recipient = createdDocument?.Recipient.find(
+    const recipient = createdDocument?.recipients.find(
       (r) => r.email === `user${i + 1}@example.com`,
     );
     expect(recipient).not.toBeNull();

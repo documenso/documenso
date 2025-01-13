@@ -25,7 +25,7 @@ import { TemplateDirectLinkDialog } from './template-direct-link-dialog';
 export type DataTableActionDropdownProps = {
   row: Template & {
     directLink?: Pick<TemplateDirectLink, 'token' | 'enabled'> | null;
-    Recipient: Recipient[];
+    recipients: Recipient[];
   };
   templateRootPath: string;
   teamId?: number;

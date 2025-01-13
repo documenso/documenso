@@ -97,6 +97,11 @@ export const ZDropdownFieldMeta = ZBaseFieldMeta.extend({
 
 export type TDropdownFieldMeta = z.infer<typeof ZDropdownFieldMeta>;
 
+/**
+ * This will parse empty objects to { "type": "initials" }
+ *
+ * Todo: Fix.
+ */
 export const ZFieldMetaSchema = z
   .union([
     ZBaseFieldMeta.extend(ZInitialsFieldMeta.shape),

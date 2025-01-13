@@ -46,9 +46,9 @@ model User {
 
   accounts             Account[]
   sessions             Session[]
-  Document             Document[]
-  Subscription         Subscription[]
-  PasswordResetToken   PasswordResetToken[]
+  documents            Document[]
+  subscriptions        Subscription[]
+  passwordResetTokens  PasswordResetToken[]
   ownedTeams           Team[]
   ownedPendingTeams    TeamPending[]
   teamMembers          TeamMember[]
@@ -57,15 +57,15 @@ model User {
   twoFactorBackupCodes String?
   url                  String?              @unique
 
-  profile           UserProfile?
-  VerificationToken VerificationToken[]
-  ApiToken          ApiToken[]
-  Template          Template[]
-  securityAuditLogs UserSecurityAuditLog[]
-  Webhooks          Webhook[]
-  siteSettings      SiteSettings[]
-  passkeys          Passkey[]
-  avatarImage       AvatarImage?           @relation(fields: [avatarImageId], references: [id], onDelete: SetNull)
+  profile            UserProfile?
+  verificationTokens VerificationToken[]
+  apiTokens          ApiToken[]
+  templates          Template[]
+  securityAuditLogs  UserSecurityAuditLog[]
+  webhooks           Webhook[]
+  siteSettings       SiteSettings[]
+  passkeys           Passkey[]
+  avatarImage        AvatarImage?           @relation(fields: [avatarImageId], references: [id], onDelete: SetNull)
 
   @@index([email])
 }
@@ -113,7 +113,7 @@ model UserSecurityAuditLog {
   userAgent String?
   ipAddress String?
 
-  User User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model PasswordResetToken {
@@ -122,7 +122,7 @@ model PasswordResetToken {
   createdAt DateTime @default(now())
   expiry    DateTime
   userId    Int
-  User      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model Passkey {
@@ -139,7 +139,7 @@ model Passkey {
   credentialBackedUp   Boolean
   transports           String[]
 
-  User User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model AnonymousVerificationToken {
@@ -179,10 +179,10 @@ model Webhook {
   createdAt     DateTime               @default(now())
   updatedAt     DateTime               @default(now()) @updatedAt
   userId        Int
-  User          User                   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user          User                   @relation(fields: [userId], references: [id], onDelete: Cascade)
   teamId        Int?
   team          Team?                  @relation(fields: [teamId], references: [id], onDelete: Cascade)
-  WebhookCall   WebhookCall[]
+  webhookCalls  WebhookCall[]
 }
 
 enum WebhookCallStatus {
@@ -240,7 +240,7 @@ model Subscription {
   cancelAtPeriodEnd Boolean            @default(false)
 
   team Team? @relation(fields: [teamId], references: [id], onDelete: Cascade)
-  User User? @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user User? @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId])
 }
@@ -298,15 +298,15 @@ model Document {
   id             Int                 @id @default(autoincrement())
   externalId     String?
   userId         Int
-  User           User                @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user           User                @relation(fields: [userId], references: [id], onDelete: Cascade)
   authOptions    Json?
   formValues     Json?
   visibility     DocumentVisibility  @default(EVERYONE)
   title          String
   status         DocumentStatus      @default(DRAFT)
-  Recipient      Recipient[]
-  Field          Field[]
-  ShareLink      DocumentShareLink[]
+  recipients     Recipient[]
+  fields         Field[]
+  shareLinks     DocumentShareLink[]
   documentDataId String
   documentData   DocumentData        @relation(fields: [documentDataId], references: [id], onDelete: Cascade)
   documentMeta   DocumentMeta?
@@ -360,8 +360,8 @@ model DocumentData {
   type        DocumentDataType
   data        String
   initialData String
-  Document    Document?
-  Template    Template?
+  document    Document?
+  template    Template?
 }
 
 enum DocumentDistributionMethod {
@@ -426,10 +426,10 @@ model Recipient {
   readStatus        ReadStatus    @default(NOT_OPENED)
   signingStatus     SigningStatus @default(NOT_SIGNED)
   sendStatus        SendStatus    @default(NOT_SENT)
-  Document          Document?     @relation(fields: [documentId], references: [id], onDelete: Cascade)
-  Template          Template?     @relation(fields: [templateId], references: [id], onDelete: Cascade)
-  Field             Field[]
-  Signature         Signature[]
+  document          Document?     @relation(fields: [documentId], references: [id], onDelete: Cascade)
+  template          Template?     @relation(fields: [templateId], references: [id], onDelete: Cascade)
+  fields            Field[]
+  signatures        Signature[]
 
   @@unique([documentId, email])
   @@unique([templateId, email])
@@ -466,10 +466,10 @@ model Field {
   height      Decimal    @default(-1)
   customText  String
   inserted    Boolean
-  Document    Document?  @relation(fields: [documentId], references: [id], onDelete: Cascade)
-  Template    Template?  @relation(fields: [templateId], references: [id], onDelete: Cascade)
-  Recipient   Recipient  @relation(fields: [recipientId], references: [id], onDelete: Cascade)
-  Signature   Signature?
+  document    Document?  @relation(fields: [documentId], references: [id], onDelete: Cascade)
+  template    Template?  @relation(fields: [templateId], references: [id], onDelete: Cascade)
+  recipient   Recipient  @relation(fields: [recipientId], references: [id], onDelete: Cascade)
+  signature   Signature?
   fieldMeta   Json?
 
   @@index([documentId])
@@ -485,8 +485,8 @@ model Signature {
   signatureImageAsBase64 String?
   typedSignature         String?
 
-  Recipient Recipient @relation(fields: [recipientId], references: [id], onDelete: Cascade)
-  Field     Field     @relation(fields: [fieldId], references: [id], onDelete: Cascade)
+  recipient Recipient @relation(fields: [recipientId], references: [id], onDelete: Cascade)
+  field     Field     @relation(fields: [fieldId], references: [id], onDelete: Cascade)
 
   @@index([recipientId])
 }
@@ -554,10 +554,10 @@ model Team {
   owner        User          @relation(fields: [ownerUserId], references: [id], onDelete: Cascade)
   subscription Subscription?
 
-  document  Document[]
+  documents Document[]
   templates Template[]
-  ApiToken  ApiToken[]
-  Webhook   Webhook[]
+  apiTokens ApiToken[]
+  webhooks  Webhook[]
 }
 
 model TeamPending {
@@ -671,9 +671,9 @@ model Template {
 
   team                 Team?               @relation(fields: [teamId], references: [id], onDelete: Cascade)
   templateDocumentData DocumentData        @relation(fields: [templateDocumentDataId], references: [id], onDelete: Cascade)
-  User                 User                @relation(fields: [userId], references: [id], onDelete: Cascade)
-  Recipient            Recipient[]
-  Field                Field[]
+  user                 User                @relation(fields: [userId], references: [id], onDelete: Cascade)
+  recipients           Recipient[]
+  fields               Field[]
   directLink           TemplateDirectLink?
   documents            Document[]
 

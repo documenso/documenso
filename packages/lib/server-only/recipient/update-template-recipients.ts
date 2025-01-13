@@ -63,7 +63,7 @@ export const updateTemplateRecipients = async ({
           }),
     },
     include: {
-      Recipient: true,
+      recipients: true,
     },
   });
 
@@ -90,7 +90,7 @@ export const updateTemplateRecipients = async ({
   }
 
   const recipientsToUpdate = recipients.map((recipient) => {
-    const originalRecipient = template.Recipient.find(
+    const originalRecipient = template.recipients.find(
       (existingRecipient) => existingRecipient.id === recipient.id,
     );
 
@@ -100,7 +100,7 @@ export const updateTemplateRecipients = async ({
       });
     }
 
-    const duplicateRecipientWithSameEmail = template.Recipient.find(
+    const duplicateRecipientWithSameEmail = template.recipients.find(
       (existingRecipient) =>
         existingRecipient.email === recipient.email && existingRecipient.id !== recipient.id,
     );
@@ -157,7 +157,7 @@ export const updateTemplateRecipients = async ({
             authOptions,
           },
           include: {
-            Field: true,
+            fields: true,
           },
         });
 

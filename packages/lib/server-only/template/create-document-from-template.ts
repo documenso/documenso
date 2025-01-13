@@ -25,7 +25,10 @@ import { DOCUMENT_AUDIT_LOG_TYPE } from '../../types/document-audit-logs';
 import { ZRecipientAuthOptionsSchema } from '../../types/document-auth';
 import type { TDocumentEmailSettings } from '../../types/document-email';
 import { ZFieldMetaSchema } from '../../types/field-meta';
-import { ZWebhookDocumentSchema } from '../../types/webhook-payload';
+import {
+  ZWebhookDocumentSchema,
+  mapDocumentToWebhookDocumentPayload,
+} from '../../types/webhook-payload';
 import type { ApiRequestMetadata } from '../../universal/extract-request-metadata';
 import { createDocumentAuditLogData } from '../../utils/document-audit-logs';
 import {
@@ -78,7 +81,7 @@ export type CreateDocumentFromTemplateOptions = {
 
 export const ZCreateDocumentFromTemplateResponseSchema = DocumentSchema.extend({
   documentData: DocumentDataSchema,
-  Recipient: RecipientSchema.array(),
+  recipients: RecipientSchema.array(),
 });
 
 export type TCreateDocumentFromTemplateResponse = z.infer<
@@ -115,9 +118,9 @@ export const createDocumentFromTemplate = async ({
           }),
     },
     include: {
-      Recipient: {
+      recipients: {
         include: {
-          Field: true,
+          fields: true,
         },
       },
       templateDocumentData: true,
@@ -138,7 +141,7 @@ export const createDocumentFromTemplate = async ({
 
   // Check that all the passed in recipient IDs can be associated with a template recipient.
   recipients.forEach((recipient) => {
-    const foundRecipient = template.Recipient.find(
+    const foundRecipient = template.recipients.find(
       (templateRecipient) => templateRecipient.id === recipient.id,
     );
 
@@ -153,12 +156,12 @@ export const createDocumentFromTemplate = async ({
     documentAuth: template.authOptions,
   });
 
-  const finalRecipients: FinalRecipient[] = template.Recipient.map((templateRecipient) => {
+  const finalRecipients: FinalRecipient[] = template.recipients.map((templateRecipient) => {
     const foundRecipient = recipients.find((recipient) => recipient.id === templateRecipient.id);
 
     return {
       templateRecipientId: templateRecipient.id,
-      fields: templateRecipient.Field,
+      fields: templateRecipient.fields,
       name: foundRecipient ? (foundRecipient.name ?? '') : templateRecipient.name,
       email: foundRecipient ? foundRecipient.email : templateRecipient.email,
       role: templateRecipient.role,
@@ -233,7 +236,7 @@ export const createDocumentFromTemplate = async ({
               override?.typedSignatureEnabled ?? template.templateMeta?.typedSignatureEnabled,
           },
         },
-        Recipient: {
+        recipients: {
           createMany: {
             data: finalRecipients.map((recipient) => {
               const authOptions = ZRecipientAuthOptionsSchema.parse(recipient?.authOptions);
@@ -260,7 +263,7 @@ export const createDocumentFromTemplate = async ({
         },
       },
       include: {
-        Recipient: {
+        recipients: {
           orderBy: {
             id: 'asc',
           },
@@ -272,7 +275,7 @@ export const createDocumentFromTemplate = async ({
     let fieldsToCreate: Omit<Field, 'id' | 'secondaryId' | 'templateId'>[] = [];
 
     Object.values(finalRecipients).forEach(({ email, fields }) => {
-      const recipient = document.Recipient.find((recipient) => recipient.email === email);
+      const recipient = document.recipients.find((recipient) => recipient.email === email);
 
       if (!recipient) {
         throw new Error('Recipient not found.');
@@ -323,7 +326,7 @@ export const createDocumentFromTemplate = async ({
       },
       include: {
         documentMeta: true,
-        Recipient: true,
+        recipients: true,
       },
     });
 
@@ -333,7 +336,7 @@ export const createDocumentFromTemplate = async ({
 
     await triggerWebhook({
       event: WebhookTriggerEvents.DOCUMENT_CREATED,
-      data: ZWebhookDocumentSchema.parse(createdDocument),
+      data: ZWebhookDocumentSchema.parse(mapDocumentToWebhookDocumentPayload(createdDocument)),
       userId,
       teamId,
     });

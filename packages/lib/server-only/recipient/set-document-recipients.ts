@@ -75,7 +75,7 @@ export const setDocumentRecipients = async ({
           }),
     },
     include: {
-      Field: true,
+      fields: true,
       documentMeta: true,
       team: {
         include: {
@@ -148,7 +148,7 @@ export const setDocumentRecipients = async ({
     if (
       existing &&
       hasRecipientBeenChanged(existing, recipient) &&
-      !canRecipientBeModified(existing, document.Field)
+      !canRecipientBeModified(existing, document.fields)
     ) {
       throw new AppError(AppErrorCode.INVALID_REQUEST, {
         message: 'Cannot modify a recipient who has already interacted with the document',

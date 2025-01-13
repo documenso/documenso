@@ -15,7 +15,7 @@ export const deleteTemplateRecipient = async ({
 }: DeleteTemplateRecipientOptions): Promise<void> => {
   const template = await prisma.template.findFirst({
     where: {
-      Recipient: {
+      recipients: {
         some: {
           id: recipientId,
         },
@@ -37,7 +37,7 @@ export const deleteTemplateRecipient = async ({
           }),
     },
     include: {
-      Recipient: {
+      recipients: {
         where: {
           id: recipientId,
         },
@@ -51,7 +51,7 @@ export const deleteTemplateRecipient = async ({
     });
   }
 
-  const recipientToDelete = template.Recipient[0];
+  const recipientToDelete = template.recipients[0];
 
   if (!recipientToDelete || recipientToDelete.id !== recipientId) {
     throw new AppError(AppErrorCode.NOT_FOUND, {

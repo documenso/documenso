@@ -59,12 +59,12 @@ export const deleteDocumentField = async ({
           }),
     },
     include: {
-      Recipient: {
+      recipients: {
         where: {
           id: field.recipientId,
         },
         include: {
-          Field: true,
+          fields: true,
         },
       },
     },
@@ -82,7 +82,7 @@ export const deleteDocumentField = async ({
     });
   }
 
-  const recipient = document.Recipient.find((recipient) => recipient.id === field.recipientId);
+  const recipient = document.recipients.find((recipient) => recipient.id === field.recipientId);
 
   if (!recipient) {
     throw new AppError(AppErrorCode.INVALID_REQUEST, {
@@ -91,7 +91,7 @@ export const deleteDocumentField = async ({
   }
 
   // Check whether the recipient associated with the field can have new fields created.
-  if (!canRecipientFieldsBeModified(recipient, recipient.Field)) {
+  if (!canRecipientFieldsBeModified(recipient, recipient.fields)) {
     throw new AppError(AppErrorCode.INVALID_REQUEST, {
       message: 'Recipient has already interacted with the document.',
     });

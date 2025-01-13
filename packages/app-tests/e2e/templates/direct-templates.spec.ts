@@ -260,7 +260,7 @@ test('[DIRECT_TEMPLATES]: use direct template link with 2 recipients', async ({ 
   const secondRecipient = await seedUser();
 
   const createTemplateOptions = {
-    Recipient: {
+    recipients: {
       createMany: {
         data: [
           {

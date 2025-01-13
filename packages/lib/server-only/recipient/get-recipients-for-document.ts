@@ -14,7 +14,7 @@ export const getRecipientsForDocument = async ({
   const recipients = await prisma.recipient.findMany({
     where: {
       documentId,
-      Document: teamId
+      document: teamId
         ? {
             team: {
               id: teamId,

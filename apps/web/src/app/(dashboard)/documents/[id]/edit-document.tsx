@@ -71,7 +71,7 @@ export const EditDocumentForm = ({
       },
     );
 
-  const { Recipient: recipients, Field: fields } = document;
+  const { recipients, fields } = document;
 
   const { mutateAsync: updateDocument } = trpc.document.setSettingsForDocument.useMutation({
     ...DO_NOT_INVALIDATE_QUERY_ON_MUTATION,
@@ -105,7 +105,7 @@ export const EditDocumentForm = ({
         {
           documentId: initialDocument.id,
         },
-        (oldData) => ({ ...(oldData || initialDocument), Field: newFields }),
+        (oldData) => ({ ...(oldData || initialDocument), fields: newFields }),
       );
     },
   });
@@ -117,7 +117,7 @@ export const EditDocumentForm = ({
         {
           documentId: initialDocument.id,
         },
-        (oldData) => ({ ...(oldData || initialDocument), Recipient: newRecipients }),
+        (oldData) => ({ ...(oldData || initialDocument), recipients: newRecipients }),
       );
     },
   });

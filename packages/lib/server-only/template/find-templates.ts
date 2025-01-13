@@ -36,8 +36,8 @@ export const ZFindTemplatesResponseSchema = ZFindResultResponse.extend({
       id: true,
       url: true,
     }).nullable(),
-    Field: FieldSchema.array(),
-    Recipient: RecipientSchema.array(),
+    fields: FieldSchema.array(),
+    recipients: RecipientSchema.array(),
     templateMeta: TemplateMetaSchema.pick({
       signingOrder: true,
       distributionMethod: true,
@@ -119,8 +119,8 @@ export const findTemplates = async ({
             url: true,
           },
         },
-        Field: true,
-        Recipient: true,
+        fields: true,
+        recipients: true,
         templateMeta: true,
         directLink: {
           select: {

@@ -46,12 +46,10 @@ import {
 import { Tooltip, TooltipContent, TooltipTrigger } from '@documenso/ui/primitives/tooltip';
 import { useToast } from '@documenso/ui/primitives/use-toast';
 
-import { useOptionalCurrentTeam } from '~/providers/team';
-
 type TemplateDirectLinkDialogProps = {
   template: Template & {
     directLink?: Pick<TemplateDirectLink, 'token' | 'enabled'> | null;
-    Recipient: Recipient[];
+    recipients: Recipient[];
   };
   open: boolean;
   onOpenChange: (_open: boolean) => void;
@@ -68,8 +66,6 @@ export const TemplateDirectLinkDialog = ({
   const { quota, remaining } = useLimits();
   const { _ } = useLingui();
 
-  const team = useOptionalCurrentTeam();
-
   const [, copy] = useCopyToClipboard();
   const router = useRouter();
 
@@ -81,8 +77,8 @@ export const TemplateDirectLinkDialog = ({
   );
 
   const validDirectTemplateRecipients = useMemo(
-    () => template.Recipient.filter((recipient) => recipient.role !== RecipientRole.CC),
-    [template.Recipient],
+    () => template.recipients.filter((recipient) => recipient.role !== RecipientRole.CC),
+    [template.recipients],
   );
 
   const {
@@ -326,7 +322,7 @@ export const TemplateDirectLinkDialog = ({
                 </div>
 
                 {/* Prevent creating placeholder direct template recipient if the email already exists. */}
-                {!template.Recipient.some(
+                {!template.recipients.some(
                   (recipient) => recipient.email === DIRECT_TEMPLATE_RECIPIENT_EMAIL,
                 ) && (
                   <DialogFooter className="mx-auto">

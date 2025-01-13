@@ -59,17 +59,17 @@ export const signFieldWithToken = async ({
   const field = await prisma.field.findFirstOrThrow({
     where: {
       id: fieldId,
-      Recipient: {
+      recipient: {
         token,
       },
     },
     include: {
-      Document: true,
-      Recipient: true,
+      document: true,
+      recipient: true,
     },
   });
 
-  const { Document: document, Recipient: recipient } = field;
+  const { document, recipient } = field;
 
   if (!document) {
     throw new Error(`Document not found for field ${field.id}`);
@@ -213,7 +213,7 @@ export const signFieldWithToken = async ({
 
       // Dirty but I don't want to deal with type information
       Object.assign(updatedField, {
-        Signature: signature,
+        signature,
       });
     }
 

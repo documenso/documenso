@@ -19,8 +19,8 @@ import { useToast } from '@documenso/ui/primitives/use-toast';
 
 export type DataTableActionButtonProps = {
   row: Document & {
-    User: Pick<User, 'id' | 'name' | 'email'>;
-    Recipient: Recipient[];
+    user: Pick<User, 'id' | 'name' | 'email'>;
+    recipients: Recipient[];
     team: Pick<Team, 'id' | 'url'> | null;
   };
   team?: Pick<Team, 'id' | 'url'>;
@@ -35,9 +35,9 @@ export const DataTableActionButton = ({ row, team }: DataTableActionButtonProps)
     return null;
   }
 
-  const recipient = row.Recipient.find((recipient) => recipient.email === session.user.email);
+  const recipient = row.recipients.find((recipient) => recipient.email === session.user.email);
 
-  const isOwner = row.User.id === session.user.id;
+  const isOwner = row.user.id === session.user.id;
   const isRecipient = !!recipient;
   const isDraft = row.status === DocumentStatus.DRAFT;
   const isPending = row.status === DocumentStatus.PENDING;

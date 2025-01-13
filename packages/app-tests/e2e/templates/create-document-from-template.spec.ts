@@ -124,7 +124,7 @@ test('[TEMPLATE]: should create a document from a template', async ({ page }) =>
       id: documentId,
     },
     include: {
-      Recipient: true,
+      recipients: true,
       documentMeta: true,
     },
   });
@@ -144,8 +144,8 @@ test('[TEMPLATE]: should create a document from a template', async ({ page }) =>
   expect(document.documentMeta?.subject).toEqual('SUBJECT');
   expect(document.documentMeta?.timezone).toEqual('Etc/UTC');
 
-  const recipientOne = document.Recipient[0];
-  const recipientTwo = document.Recipient[1];
+  const recipientOne = document.recipients[0];
+  const recipientTwo = document.recipients[1];
 
   const recipientOneAuth = extractDocumentAuthMethods({
     documentAuth: document.authOptions,
@@ -259,7 +259,7 @@ test('[TEMPLATE]: should create a team document from a team template', async ({ 
       id: documentId,
     },
     include: {
-      Recipient: true,
+      recipients: true,
       documentMeta: true,
     },
   });
@@ -281,8 +281,8 @@ test('[TEMPLATE]: should create a team document from a team template', async ({ 
   expect(document.documentMeta?.subject).toEqual('SUBJECT');
   expect(document.documentMeta?.timezone).toEqual('Etc/UTC');
 
-  const recipientOne = document.Recipient[0];
-  const recipientTwo = document.Recipient[1];
+  const recipientOne = document.recipients[0];
+  const recipientTwo = document.recipients[1];
 
   const recipientOneAuth = extractDocumentAuthMethods({
     documentAuth: document.authOptions,
