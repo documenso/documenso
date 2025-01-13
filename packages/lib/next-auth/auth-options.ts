@@ -1,6 +1,7 @@
 /// <reference types="../types/next-auth.d.ts" />
 import { PrismaAdapter } from '@next-auth/prisma-adapter';
 import { compare } from '@node-rs/bcrypt';
+import { Prisma } from '@prisma/client';
 import { verifyAuthenticationResponse } from '@simplewebauthn/server';
 import { DateTime } from 'luxon';
 import type { AuthOptions, Session, User } from 'next-auth';
@@ -27,8 +28,38 @@ import { extractNextAuthRequestMetadata } from '../universal/extract-request-met
 import { getAuthenticatorOptions } from '../utils/authenticator';
 import { ErrorCode } from './error-codes';
 
+// Delete unrecognized fields from authorization response to comply with
+// https://datatracker.ietf.org/doc/html/rfc6749#section-4.1.2
+const prismaAdapter = PrismaAdapter(prisma);
+
+const unsafe_linkAccount = prismaAdapter.linkAccount!;
+const unsafe_accountModel = Prisma.dmmf.datamodel.models.find(({ name }) => name === 'Account');
+
+if (!unsafe_accountModel) {
+  throw new Error('Account model not found');
+}
+
+// eslint-disable-next-line @typescript-eslint/promise-function-async
+prismaAdapter.linkAccount = (data) => {
+  const availableFields = unsafe_accountModel.fields.map((field) => field.name);
+
+  const newData = Object.keys(data).reduce(
+    (acc, key) => {
+      if (availableFields.includes(key)) {
+        acc[key] = data[key];
+      }
+
+      return acc;
+    },
+    // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
+    {} as typeof data,
+  );
+
+  return unsafe_linkAccount(newData);
+};
+
 export const NEXT_AUTH_OPTIONS: AuthOptions = {
-  adapter: PrismaAdapter(prisma),
+  adapter: prismaAdapter,
   secret: process.env.NEXTAUTH_SECRET ?? 'secret',
   session: {
     strategy: 'jwt',
