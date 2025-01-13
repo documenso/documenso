@@ -61,7 +61,7 @@ export type SignDirectTemplateFormProps = {
 
 export type DirectTemplateLocalField = Field & {
   signedValue?: TSignFieldWithTokenMutationSchema;
-  Signature?: Signature;
+  signature?: Signature;
 };
 
 export const SignDirectTemplateForm = ({
@@ -95,7 +95,7 @@ export const SignDirectTemplateForm = ({
         };
 
         if (field.type === FieldType.SIGNATURE) {
-          tempField.Signature = {
+          tempField.signature = {
             id: 1,
             created: new Date(),
             recipientId: 1,

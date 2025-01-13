@@ -67,7 +67,7 @@ export type CreateDocumentFromDirectTemplateOptions = {
 };
 
 type CreatedDirectRecipientField = {
-  field: Field & { Signature?: Signature | null };
+  field: Field & { signature?: Signature | null };
   derivedRecipientActionAuth: TRecipientActionAuthTypes | null;
 };
 
@@ -504,7 +504,7 @@ export const createDocumentFromDirectTemplate = async ({
               .with(FieldType.SIGNATURE, FieldType.FREE_SIGNATURE, (type) => ({
                 type,
                 data:
-                  field.Signature?.signatureImageAsBase64 || field.Signature?.typedSignature || '',
+                  field.signature?.signatureImageAsBase64 || field.signature?.typedSignature || '',
               }))
               .with(
                 FieldType.DATE,
