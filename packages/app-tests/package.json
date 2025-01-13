@@ -13,7 +13,7 @@
   "author": "",
   "devDependencies": {
     "@playwright/test": "^1.18.1",
-    "@types/node": "^20.8.2",
+    "@types/node": "^20",
     "@documenso/lib": "*",
     "@documenso/prisma": "*",
     "@documenso/web": "*",
