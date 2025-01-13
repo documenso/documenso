@@ -1,6 +1,5 @@
 import { DateTime } from 'luxon';
 import { match } from 'ts-pattern';
-import type { z } from 'zod';
 
 import { prisma } from '@documenso/prisma';
 import type {
@@ -12,16 +11,10 @@ import type {
   User,
 } from '@documenso/prisma/client';
 import { RecipientRole, SigningStatus, TeamMemberRole } from '@documenso/prisma/client';
-import {
-  DocumentSchema,
-  RecipientSchema,
-  TeamSchema,
-  UserSchema,
-} from '@documenso/prisma/generated/zod';
 import { ExtendedDocumentStatus } from '@documenso/prisma/types/extended-document-status';
 
 import { DocumentVisibility } from '../../types/document-visibility';
-import { type FindResultResponse, ZFindResultResponse } from '../../types/search-params';
+import { type FindResultResponse } from '../../types/search-params';
 import { maskRecipientTokensForDocument } from '../../utils/mask-recipient-tokens-for-document';
 
 export type PeriodSelectorValue = '' | '7d' | '14d' | '30d';
@@ -43,23 +36,6 @@ export type FindDocumentsOptions = {
   query?: string;
 };
 
-export const ZFindDocumentsResponseSchema = ZFindResultResponse.extend({
-  data: DocumentSchema.extend({
-    user: UserSchema.pick({
-      id: true,
-      name: true,
-      email: true,
-    }),
-    recipients: RecipientSchema.array(),
-    team: TeamSchema.pick({
-      id: true,
-      url: true,
-    }).nullable(),
-  }).array(), // Todo: openapi remap.
-});
-
-export type TFindDocumentsResponse = z.infer<typeof ZFindDocumentsResponseSchema>;
-
 export const findDocuments = async ({
   userId,
   teamId,
@@ -72,7 +48,7 @@ export const findDocuments = async ({
   period,
   senderIds,
   query,
-}: FindDocumentsOptions): Promise<TFindDocumentsResponse> => {
+}: FindDocumentsOptions) => {
   const user = await prisma.user.findFirstOrThrow({
     where: {
       id: userId,

@@ -1,5 +1,3 @@
-import type { z } from 'zod';
-
 import { nanoid } from '@documenso/lib/universal/id';
 import { prisma } from '@documenso/prisma';
 import type { DocumentDistributionMethod } from '@documenso/prisma/client';
@@ -13,11 +11,6 @@ import {
   SigningStatus,
   WebhookTriggerEvents,
 } from '@documenso/prisma/client';
-import {
-  DocumentDataSchema,
-  DocumentSchema,
-  RecipientSchema,
-} from '@documenso/prisma/generated/zod';
 
 import type { SupportedLanguageCodes } from '../../constants/i18n';
 import { AppError, AppErrorCode } from '../../errors/app-error';
@@ -79,15 +72,6 @@ export type CreateDocumentFromTemplateOptions = {
   requestMetadata: ApiRequestMetadata;
 };
 
-export const ZCreateDocumentFromTemplateResponseSchema = DocumentSchema.extend({
-  documentData: DocumentDataSchema,
-  recipients: RecipientSchema.array(),
-});
-
-export type TCreateDocumentFromTemplateResponse = z.infer<
-  typeof ZCreateDocumentFromTemplateResponseSchema
->;
-
 export const createDocumentFromTemplate = async ({
   templateId,
   externalId,
@@ -97,7 +81,7 @@ export const createDocumentFromTemplate = async ({
   customDocumentDataId,
   override,
   requestMetadata,
-}: CreateDocumentFromTemplateOptions): Promise<TCreateDocumentFromTemplateResponse> => {
+}: CreateDocumentFromTemplateOptions) => {
   const template = await prisma.template.findUnique({
     where: {
       id: templateId,

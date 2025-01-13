@@ -1,5 +1,3 @@
-import { z } from 'zod';
-
 import { isUserEnterprise } from '@documenso/ee/server-only/util/is-document-enterprise';
 import { DOCUMENT_AUDIT_LOG_TYPE } from '@documenso/lib/types/document-audit-logs';
 import type { TRecipientAccessAuthTypes } from '@documenso/lib/types/document-auth';
@@ -11,7 +9,6 @@ import { createRecipientAuthOptions } from '@documenso/lib/utils/document-auth';
 import { prisma } from '@documenso/prisma';
 import { RecipientRole } from '@documenso/prisma/client';
 import { SendStatus, SigningStatus } from '@documenso/prisma/client';
-import { ZRecipientBaseResponseSchema } from '@documenso/trpc/server/recipient-router/schema';
 
 import { AppError, AppErrorCode } from '../../errors/app-error';
 
@@ -30,21 +27,13 @@ export interface CreateDocumentRecipientsOptions {
   requestMetadata: ApiRequestMetadata;
 }
 
-export const ZCreateDocumentRecipientsResponseSchema = z.object({
-  recipients: ZRecipientBaseResponseSchema.array(),
-});
-
-export type TCreateDocumentRecipientsResponse = z.infer<
-  typeof ZCreateDocumentRecipientsResponseSchema
->;
-
 export const createDocumentRecipients = async ({
   userId,
   teamId,
   documentId,
   recipients: recipientsToCreate,
   requestMetadata,
-}: CreateDocumentRecipientsOptions): Promise<TCreateDocumentRecipientsResponse> => {
+}: CreateDocumentRecipientsOptions) => {
   const document = await prisma.document.findFirst({
     where: {
       id: documentId,

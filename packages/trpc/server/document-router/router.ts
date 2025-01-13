@@ -8,63 +8,47 @@ import { DOCUMENSO_ENCRYPTION_KEY } from '@documenso/lib/constants/crypto';
 import { AppError } from '@documenso/lib/errors/app-error';
 import { encryptSecondaryData } from '@documenso/lib/server-only/crypto/encrypt';
 import { upsertDocumentMeta } from '@documenso/lib/server-only/document-meta/upsert-document-meta';
-import {
-  ZCreateDocumentResponseSchema,
-  createDocument,
-} from '@documenso/lib/server-only/document/create-document';
+import { createDocument } from '@documenso/lib/server-only/document/create-document';
 import { deleteDocument } from '@documenso/lib/server-only/document/delete-document';
-import {
-  ZDuplicateDocumentResponseSchema,
-  duplicateDocument,
-} from '@documenso/lib/server-only/document/duplicate-document-by-id';
+import { duplicateDocument } from '@documenso/lib/server-only/document/duplicate-document-by-id';
 import { findDocumentAuditLogs } from '@documenso/lib/server-only/document/find-document-audit-logs';
-import {
-  ZFindDocumentsResponseSchema,
-  findDocuments,
-} from '@documenso/lib/server-only/document/find-documents';
+import { findDocuments } from '@documenso/lib/server-only/document/find-documents';
 import { getDocumentById } from '@documenso/lib/server-only/document/get-document-by-id';
 import { getDocumentAndSenderByToken } from '@documenso/lib/server-only/document/get-document-by-token';
-import {
-  ZGetDocumentWithDetailsByIdResponseSchema,
-  getDocumentWithDetailsById,
-} from '@documenso/lib/server-only/document/get-document-with-details-by-id';
-import {
-  ZMoveDocumentToTeamResponseSchema,
-  moveDocumentToTeam,
-} from '@documenso/lib/server-only/document/move-document-to-team';
+import { getDocumentWithDetailsById } from '@documenso/lib/server-only/document/get-document-with-details-by-id';
+import { moveDocumentToTeam } from '@documenso/lib/server-only/document/move-document-to-team';
 import { resendDocument } from '@documenso/lib/server-only/document/resend-document';
 import { searchDocumentsWithKeyword } from '@documenso/lib/server-only/document/search-documents-with-keyword';
-import {
-  ZSendDocumentResponseSchema,
-  sendDocument,
-} from '@documenso/lib/server-only/document/send-document';
-import {
-  ZUpdateDocumentResponseSchema,
-  updateDocument,
-} from '@documenso/lib/server-only/document/update-document';
+import { sendDocument } from '@documenso/lib/server-only/document/send-document';
+import { updateDocument } from '@documenso/lib/server-only/document/update-document';
 import { symmetricEncrypt } from '@documenso/lib/universal/crypto';
 import { DocumentStatus } from '@documenso/prisma/client';
 
 import { authenticatedProcedure, procedure, router } from '../trpc';
 import {
-  ZCreateDocumentMutationSchema,
+  ZCreateDocumentRequestSchema,
   ZDeleteDocumentMutationSchema,
+  ZDistributeDocumentRequestSchema,
+  ZDistributeDocumentResponseSchema,
   ZDownloadAuditLogsMutationSchema,
   ZDownloadCertificateMutationSchema,
-  ZDuplicateDocumentMutationSchema,
+  ZDuplicateDocumentRequestSchema,
+  ZDuplicateDocumentResponseSchema,
   ZFindDocumentAuditLogsQuerySchema,
-  ZFindDocumentsQuerySchema,
+  ZFindDocumentsRequestSchema,
+  ZFindDocumentsResponseSchema,
   ZGetDocumentByIdQuerySchema,
   ZGetDocumentByTokenQuerySchema,
-  ZGetDocumentWithDetailsByIdQuerySchema,
+  ZGetDocumentWithDetailsByIdRequestSchema,
+  ZGetDocumentWithDetailsByIdResponseSchema,
+  ZMoveDocumentToTeamResponseSchema,
   ZMoveDocumentToTeamSchema,
   ZResendDocumentMutationSchema,
   ZSearchDocumentsMutationSchema,
-  ZSendDocumentMutationSchema,
   ZSetPasswordForDocumentMutationSchema,
   ZSetSigningOrderForDocumentMutationSchema,
   ZUpdateDocumentRequestSchema,
-  ZUpdateTypedSignatureSettingsMutationSchema,
+  ZUpdateDocumentResponseSchema,
 } from './schema';
 
 export const documentRouter = router({
@@ -111,7 +95,7 @@ export const documentRouter = router({
         tags: ['Document'],
       },
     })
-    .input(ZFindDocumentsQuerySchema)
+    .input(ZFindDocumentsRequestSchema)
     .output(ZFindDocumentsResponseSchema)
     .query(async ({ input, ctx }) => {
       const { user, teamId } = ctx;
@@ -149,7 +133,7 @@ export const documentRouter = router({
         tags: ['Document'],
       },
     })
-    .input(ZGetDocumentWithDetailsByIdQuerySchema)
+    .input(ZGetDocumentWithDetailsByIdRequestSchema)
     .output(ZGetDocumentWithDetailsByIdResponseSchema)
     .query(async ({ input, ctx }) => {
       const { teamId, user } = ctx;
@@ -176,8 +160,7 @@ export const documentRouter = router({
     //     tags: ['Document'],
     //   },
     // })
-    .input(ZCreateDocumentMutationSchema)
-    .output(ZCreateDocumentResponseSchema)
+    .input(ZCreateDocumentRequestSchema)
     .mutation(async ({ input, ctx }) => {
       const { teamId } = ctx;
       const { title, documentDataId, timezone } = input;
@@ -354,39 +337,6 @@ export const documentRouter = router({
     }),
 
   /**
-   * @deprecated Remove after deployment.
-   *
-   * @private
-   */
-  updateTypedSignatureSettings: authenticatedProcedure
-    .input(ZUpdateTypedSignatureSettingsMutationSchema)
-    .mutation(async ({ input, ctx }) => {
-      const { teamId } = ctx;
-      const { documentId, typedSignatureEnabled } = input;
-
-      const document = await getDocumentById({
-        documentId,
-        teamId,
-        userId: ctx.user.id,
-      }).catch(() => null);
-
-      if (!document) {
-        throw new TRPCError({
-          code: 'NOT_FOUND',
-          message: 'Document not found',
-        });
-      }
-
-      return await upsertDocumentMeta({
-        userId: ctx.user.id,
-        teamId,
-        documentId,
-        typedSignatureEnabled,
-        requestMetadata: ctx.metadata,
-      });
-    }),
-
-  /**
    * @public
    *
    * Todo: Refactor to distributeDocument.
@@ -402,8 +352,8 @@ export const documentRouter = router({
         tags: ['Document'],
       },
     })
-    .input(ZSendDocumentMutationSchema)
-    .output(ZSendDocumentResponseSchema)
+    .input(ZDistributeDocumentRequestSchema)
+    .output(ZDistributeDocumentResponseSchema)
     .mutation(async ({ input, ctx }) => {
       const { teamId } = ctx;
       const { documentId, meta = {} } = input;
@@ -476,7 +426,7 @@ export const documentRouter = router({
         tags: ['Document'],
       },
     })
-    .input(ZDuplicateDocumentMutationSchema)
+    .input(ZDuplicateDocumentRequestSchema)
     .output(ZDuplicateDocumentResponseSchema)
     .mutation(async ({ input, ctx }) => {
       const { teamId, user } = ctx;

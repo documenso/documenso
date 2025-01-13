@@ -28,7 +28,6 @@ import { setDocumentRecipients } from '@documenso/lib/server-only/recipient/set-
 import { updateRecipient } from '@documenso/lib/server-only/recipient/update-recipient';
 import { createTeamMemberInvites } from '@documenso/lib/server-only/team/create-team-member-invites';
 import { deleteTeamMembers } from '@documenso/lib/server-only/team/delete-team-members';
-import type { TCreateDocumentFromTemplateResponse } from '@documenso/lib/server-only/template/create-document-from-template';
 import { createDocumentFromTemplate } from '@documenso/lib/server-only/template/create-document-from-template';
 import { createDocumentFromTemplateLegacy } from '@documenso/lib/server-only/template/create-document-from-template-legacy';
 import { deleteTemplate } from '@documenso/lib/server-only/template/delete-template';
@@ -578,7 +577,7 @@ export const ApiContractV1Implementation = createNextRoute(ApiContractV1, {
 
     const templateId = Number(params.templateId);
 
-    let document: TCreateDocumentFromTemplateResponse | null = null;
+    let document: Awaited<ReturnType<typeof createDocumentFromTemplate>> | null = null;
 
     try {
       document = await createDocumentFromTemplate({

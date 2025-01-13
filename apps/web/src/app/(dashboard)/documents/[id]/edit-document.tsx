@@ -12,7 +12,7 @@ import {
   DO_NOT_INVALIDATE_QUERY_ON_MUTATION,
   SKIP_QUERY_BATCH_META,
 } from '@documenso/lib/constants/trpc';
-import type { TGetDocumentWithDetailsByIdResponse } from '@documenso/lib/server-only/document/get-document-with-details-by-id';
+import type { TDocument } from '@documenso/lib/types/document';
 import { DocumentDistributionMethod, DocumentStatus } from '@documenso/prisma/client';
 import { trpc } from '@documenso/trpc/react';
 import { cn } from '@documenso/ui/lib/utils';
@@ -35,7 +35,7 @@ import { useOptionalCurrentTeam } from '~/providers/team';
 
 export type EditDocumentFormProps = {
   className?: string;
-  initialDocument: TGetDocumentWithDetailsByIdResponse;
+  initialDocument: TDocument;
   documentRootPath: string;
   isDocumentEnterprise: boolean;
 };

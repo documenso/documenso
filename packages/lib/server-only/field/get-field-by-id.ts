@@ -1,7 +1,4 @@
-import type { z } from 'zod';
-
 import { prisma } from '@documenso/prisma';
-import { FieldSchema } from '@documenso/prisma/generated/zod';
 
 import { AppError, AppErrorCode } from '../../errors/app-error';
 
@@ -13,17 +10,13 @@ export type GetFieldByIdOptions = {
   templateId?: number;
 };
 
-export const ZGetFieldByIdResponseSchema = FieldSchema;
-
-export type TGetFieldByIdResponse = z.infer<typeof ZGetFieldByIdResponseSchema>;
-
 export const getFieldById = async ({
   userId,
   teamId,
   fieldId,
   documentId,
   templateId,
-}: GetFieldByIdOptions): Promise<TGetFieldByIdResponse> => {
+}: GetFieldByIdOptions) => {
   const field = await prisma.field.findFirst({
     where: {
       id: fieldId,

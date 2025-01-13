@@ -1,8 +1,13 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 
 import { createOpenApiNextHandler } from 'trpc-openapi';
+import type { CreateOpenApiNextHandlerOptions } from 'trpc-openapi/dist/adapters/next';
 
-import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
+import {
+  AppError,
+  AppErrorCode,
+  genericErrorCodeToTrpcErrorCodeMap,
+} from '@documenso/lib/errors/app-error';
 import { buildLogger } from '@documenso/lib/utils/logger';
 import type { TRPCError } from '@documenso/trpc/server';
 import { createTrpcContext } from '@documenso/trpc/server/context';
@@ -41,7 +46,18 @@ export default createOpenApiNextHandler<typeof appRouter>({
       });
     }
   },
-  responseMeta: () => {},
+  // Not sure why we need to do this since we handle it in errorFormatter which runs after this.
+  responseMeta: (opts: CreateOpenApiNextHandlerOptions<typeof appRouter>['responseMeta']) => {
+    if (opts.errors[0]?.cause instanceof AppError) {
+      const appError = AppError.parseError(opts.errors[0].cause);
+
+      const httpStatus = genericErrorCodeToTrpcErrorCodeMap[appError.code]?.status ?? 400;
+
+      return {
+        status: httpStatus,
+      };
+    }
+  },
 });
 
 const errorCodesToAlertOn = [AppErrorCode.UNKNOWN_ERROR, 'INTERNAL_SERVER_ERROR'];

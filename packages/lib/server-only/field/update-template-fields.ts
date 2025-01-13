@@ -1,9 +1,6 @@
-import { z } from 'zod';
-
 import type { TFieldMetaSchema } from '@documenso/lib/types/field-meta';
 import { prisma } from '@documenso/prisma';
 import type { FieldType } from '@documenso/prisma/client';
-import { FieldSchema } from '@documenso/prisma/generated/zod';
 
 import { AppError, AppErrorCode } from '../../errors/app-error';
 import { canRecipientFieldsBeModified } from '../../utils/recipients';
@@ -24,18 +21,12 @@ export interface UpdateTemplateFieldsOptions {
   }[];
 }
 
-export const ZUpdateTemplateFieldsResponseSchema = z.object({
-  fields: z.array(FieldSchema),
-});
-
-export type TUpdateTemplateFieldsResponse = z.infer<typeof ZUpdateTemplateFieldsResponseSchema>;
-
 export const updateTemplateFields = async ({
   userId,
   teamId,
   templateId,
   fields,
-}: UpdateTemplateFieldsOptions): Promise<TUpdateTemplateFieldsResponse> => {
+}: UpdateTemplateFieldsOptions) => {
   const template = await prisma.template.findFirst({
     where: {
       id: templateId,

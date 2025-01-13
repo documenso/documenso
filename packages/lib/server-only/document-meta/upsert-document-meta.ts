@@ -10,6 +10,7 @@ import { prisma } from '@documenso/prisma';
 import type { DocumentDistributionMethod, DocumentSigningOrder } from '@documenso/prisma/client';
 
 import type { SupportedLanguageCodes } from '../../constants/i18n';
+import { AppError, AppErrorCode } from '../../errors/app-error';
 import type { TDocumentEmailSettings } from '../../types/document-email';
 
 export type CreateDocumentMetaOptions = {
@@ -47,7 +48,7 @@ export const upsertDocumentMeta = async ({
   language,
   requestMetadata,
 }: CreateDocumentMetaOptions) => {
-  const { documentMeta: originalDocumentMeta } = await prisma.document.findFirstOrThrow({
+  const document = await prisma.document.findFirst({
     where: {
       id: documentId,
       ...(teamId
@@ -70,6 +71,14 @@ export const upsertDocumentMeta = async ({
       documentMeta: true,
     },
   });
+
+  if (!document) {
+    throw new AppError(AppErrorCode.NOT_FOUND, {
+      message: 'Document not found',
+    });
+  }
+
+  const { documentMeta: originalDocumentMeta } = document;
 
   return await prisma.$transaction(async (tx) => {
     const upsertedDocumentMeta = await tx.documentMeta.upsert({

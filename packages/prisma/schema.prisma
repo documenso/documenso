@@ -7,7 +7,10 @@ generator client {
 }
 
 generator zod {
-  provider = "zod-prisma-types"
+  provider         = "zod-prisma-types"
+  createInputTypes = false
+  writeBarrelFiles = true
+  useMultipleFiles = true
 }
 
 datasource db {
@@ -294,12 +297,13 @@ enum DocumentVisibility {
   ADMIN
 }
 
+/// @zod.import(["import { ZDocumentAuthOptionsSchema } from '@documenso/lib/types/document-auth';"])
 model Document {
   id             Int                 @id @default(autoincrement())
-  externalId     String?
-  userId         Int
+  externalId     String? /// @zod.string.describe("A custom external ID you can use to identify the document.")
+  userId         Int /// @zod.number.describe("The ID of the user that created this document.")
   user           User                @relation(fields: [userId], references: [id], onDelete: Cascade)
-  authOptions    Json?
+  authOptions    Json? /// Todo: zod.custom.use(ZDocumentAuthOptionsSchema.describe("Hello"))
   formValues     Json?
   visibility     DocumentVisibility  @default(EVERYONE)
   title          String
@@ -409,6 +413,7 @@ enum RecipientRole {
   APPROVER
 }
 
+/// @zod.import(["import { ZRecipientAuthOptionsSchema } from '@documenso/lib/types/document-auth';"])
 model Recipient {
   id                Int           @id @default(autoincrement())
   documentId        Int?
@@ -419,8 +424,8 @@ model Recipient {
   documentDeletedAt DateTime?
   expired           DateTime?
   signedAt          DateTime?
-  authOptions       Json?
-  signingOrder      Int?
+  authOptions       Json? /// Todo: zod.custom.use(ZRecipientAuthOptionsSchema)
+  signingOrder      Int? /// @zod.number.describe("The order in which the recipient should sign the document. Only works if the document is set to sequential signing.")
   rejectionReason   String?
   role              RecipientRole @default(SIGNER)
   readStatus        ReadStatus    @default(NOT_OPENED)
@@ -459,7 +464,7 @@ model Field {
   templateId  Int?
   recipientId Int
   type        FieldType
-  page        Int
+  page        Int /// @zod.number.describe("The page number of the field on the document. Starts from 1.")
   positionX   Decimal    @default(0)
   positionY   Decimal    @default(0)
   width       Decimal    @default(-1)
@@ -470,7 +475,7 @@ model Field {
   template    Template?  @relation(fields: [templateId], references: [id], onDelete: Cascade)
   recipient   Recipient  @relation(fields: [recipientId], references: [id], onDelete: Cascade)
   signature   Signature?
-  fieldMeta   Json?
+  fieldMeta   Json? // Todo: Fix ZFieldMetaSchema before using it here.
 
   @@index([documentId])
   @@index([templateId])

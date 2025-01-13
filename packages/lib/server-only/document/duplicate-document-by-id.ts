@@ -1,8 +1,7 @@
-import { z } from 'zod';
-
 import { prisma } from '@documenso/prisma';
 import { DocumentSource, type Prisma } from '@documenso/prisma/client';
 
+import { AppError, AppErrorCode } from '../../errors/app-error';
 import { getDocumentWhereInput } from './get-document-by-id';
 
 export interface DuplicateDocumentOptions {
@@ -11,24 +10,18 @@ export interface DuplicateDocumentOptions {
   teamId?: number;
 }
 
-export const ZDuplicateDocumentResponseSchema = z.object({
-  documentId: z.number(),
-});
-
-export type TDuplicateDocumentResponse = z.infer<typeof ZDuplicateDocumentResponseSchema>;
-
 export const duplicateDocument = async ({
   documentId,
   userId,
   teamId,
-}: DuplicateDocumentOptions): Promise<TDuplicateDocumentResponse> => {
+}: DuplicateDocumentOptions) => {
   const documentWhereInput = await getDocumentWhereInput({
     documentId,
     userId,
     teamId,
   });
 
-  const document = await prisma.document.findUniqueOrThrow({
+  const document = await prisma.document.findFirst({
     where: documentWhereInput,
     select: {
       title: true,
@@ -52,6 +45,12 @@ export const duplicateDocument = async ({
       },
     },
   });
+
+  if (!document) {
+    throw new AppError(AppErrorCode.NOT_FOUND, {
+      message: 'Document not found',
+    });
+  }
 
   const createDocumentArguments: Prisma.DocumentCreateArgs = {
     data: {

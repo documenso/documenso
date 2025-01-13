@@ -1,8 +1,5 @@
-import type { z } from 'zod';
-
 import type { ApiRequestMetadata } from '@documenso/lib/universal/extract-request-metadata';
 import { prisma } from '@documenso/prisma';
-import { DocumentSchema } from '@documenso/prisma/generated/zod';
 
 import { AppError, AppErrorCode } from '../../errors/app-error';
 import { DOCUMENT_AUDIT_LOG_TYPE } from '../../types/document-audit-logs';
@@ -15,16 +12,12 @@ export type MoveDocumentToTeamOptions = {
   requestMetadata: ApiRequestMetadata;
 };
 
-export const ZMoveDocumentToTeamResponseSchema = DocumentSchema;
-
-export type TMoveDocumentToTeamResponse = z.infer<typeof ZMoveDocumentToTeamResponseSchema>;
-
 export const moveDocumentToTeam = async ({
   documentId,
   teamId,
   userId,
   requestMetadata,
-}: MoveDocumentToTeamOptions): Promise<TMoveDocumentToTeamResponse> => {
+}: MoveDocumentToTeamOptions) => {
   return await prisma.$transaction(async (tx) => {
     const document = await tx.document.findFirst({
       where: {

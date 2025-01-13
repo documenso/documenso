@@ -9,9 +9,9 @@ import { DateTime } from 'luxon';
 import { useSession } from 'next-auth/react';
 
 import { useUpdateSearchParams } from '@documenso/lib/client-only/hooks/use-update-search-params';
-import type { TFindDocumentsResponse } from '@documenso/lib/server-only/document/find-documents';
 import type { Team } from '@documenso/prisma/client';
 import { ExtendedDocumentStatus } from '@documenso/prisma/types/extended-document-status';
+import type { TFindDocumentsResponse } from '@documenso/trpc/server/document-router/schema';
 import type { DataTableColumnDef } from '@documenso/ui/primitives/data-table';
 import { DataTable } from '@documenso/ui/primitives/data-table';
 import { DataTablePagination } from '@documenso/ui/primitives/data-table-pagination';
