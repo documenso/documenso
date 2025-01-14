@@ -319,19 +319,80 @@ export const AddSignersFormPartial = ({
       if (role === RecipientRole.ASSISTANT) {
         form.setValue('signingOrder', DocumentSigningOrder.SEQUENTIAL);
 
-        const updatedSigners = currentSigners.map((signer, idx) => ({
-          ...signer,
-          signingOrder: idx === index ? 1 : signer.signingOrder ? signer.signingOrder + 1 : idx + 2,
-        }));
+        const existingAssistants = currentSigners.filter(
+          (signer, idx) => idx !== index && signer.role === RecipientRole.ASSISTANT,
+        );
+        const otherSigners = currentSigners.filter(
+          (signer, idx) => idx !== index && signer.role !== RecipientRole.ASSISTANT,
+        );
 
-        updatedSigners.forEach((signer, idx) => {
-          form.setValue(`signers.${idx}.signingOrder`, signer.signingOrder);
+        const newAssistant = {
+          ...currentSigners[index],
+          role,
+          signingOrder: existingAssistants.length + 1,
+        };
+
+        const updatedSigners = [
+          ...existingAssistants.map((signer, idx) => ({
+            ...signer,
+            signingOrder: idx + 1,
+          })),
+          newAssistant,
+          ...otherSigners.map((signer, idx) => ({
+            ...signer,
+            signingOrder: existingAssistants.length + 2 + idx,
+          })),
+        ];
+
+        form.setValue('signers', updatedSigners, {
+          shouldValidate: true,
         });
-      }
 
-      form.setValue(`signers.${index}.role`, role);
+        setTimeout(() => {
+          if (index !== existingAssistants.length) {
+            triggerDragAndDrop(index, existingAssistants.length);
+          }
+        }, 0);
+      } else {
+        // When changing from assistant to another role
+        const assistants = currentSigners.filter(
+          (signer, idx) => idx !== index && signer.role === RecipientRole.ASSISTANT,
+        );
+        const otherSigners = currentSigners.filter(
+          (signer, idx) => idx !== index && signer.role !== RecipientRole.ASSISTANT,
+        );
+
+        const newSigner = {
+          ...currentSigners[index],
+          role,
+          signingOrder: assistants.length + otherSigners.length + 1,
+        };
+
+        const updatedSigners = [
+          ...assistants.map((signer, idx) => ({
+            ...signer,
+            signingOrder: idx + 1,
+          })),
+          ...otherSigners.map((signer, idx) => ({
+            ...signer,
+            signingOrder: assistants.length + 1 + idx,
+          })),
+          newSigner,
+        ];
+
+        form.setValue('signers', updatedSigners, {
+          shouldValidate: true,
+        });
+
+        setTimeout(() => {
+          const targetIndex = assistants.length + otherSigners.length;
+          if (index !== targetIndex) {
+            triggerDragAndDrop(index, targetIndex);
+          }
+        }, 0);
+      }
     },
-    [form],
+    [form, triggerDragAndDrop],
   );
 
   const updateSigningOrders = useCallback(
