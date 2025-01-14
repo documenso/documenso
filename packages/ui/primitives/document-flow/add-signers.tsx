@@ -41,6 +41,7 @@ import {
   DocumentFlowFormContainerStep,
 } from './document-flow-root';
 import { ShowFieldItem } from './show-field-item';
+import { SigningOrderConfirmation } from './signing-order-confirmation';
 import type { DocumentFlowStep } from './types';
 
 export type AddSignersFormProps = {
@@ -123,6 +124,7 @@ export const AddSignersFormPartial = ({
   }, [recipients, form]);
 
   const [showAdvancedSettings, setShowAdvancedSettings] = useState(alwaysShowAdvancedSettings);
+  const [showSigningOrderConfirmation, setShowSigningOrderConfirmation] = useState(false);
 
   const {
     setValue,
@@ -446,6 +448,19 @@ export const AddSignersFormPartial = ({
     [form, updateSigningOrders],
   );
 
+  const handleSigningOrderDisable = useCallback(() => {
+    setShowSigningOrderConfirmation(false);
+
+    const currentSigners = form.getValues('signers');
+    const updatedSigners = currentSigners.map((signer) => ({
+      ...signer,
+      role: signer.role === RecipientRole.ASSISTANT ? RecipientRole.SIGNER : signer.role,
+    }));
+
+    form.setValue('signers', updatedSigners);
+    form.setValue('signingOrder', DocumentSigningOrder.PARALLEL);
+  }, [form]);
+
   return (
     <>
       <DocumentFlowFormContainerHeader
@@ -470,12 +485,17 @@ export const AddSignersFormPartial = ({
                       {...field}
                       id="signingOrder"
                       checked={field.value === DocumentSigningOrder.SEQUENTIAL}
-                      onCheckedChange={(checked) =>
+                      onCheckedChange={(checked) => {
+                        if (!checked && hasAssistantRole) {
+                          setShowSigningOrderConfirmation(true);
+                          return;
+                        }
+
                         field.onChange(
                           checked ? DocumentSigningOrder.SEQUENTIAL : DocumentSigningOrder.PARALLEL,
-                        )
-                      }
-                      disabled={isSubmitting || hasDocumentBeenSent || hasAssistantRole}
+                        );
+                      }}
+                      disabled={isSubmitting || hasDocumentBeenSent}
                     />
                   </FormControl>
 
@@ -799,6 +819,12 @@ export const AddSignersFormPartial = ({
             )}
           </Form>
         </AnimateGenericFadeInOut>
+
+        <SigningOrderConfirmation
+          open={showSigningOrderConfirmation}
+          onOpenChange={setShowSigningOrderConfirmation}
+          onConfirm={handleSigningOrderDisable}
+        />
       </DocumentFlowFormContainerContent>
 
       <DocumentFlowFormContainerFooter>
