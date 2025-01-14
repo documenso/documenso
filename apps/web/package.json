@@ -73,6 +73,6 @@
     "@types/react": "^18",
     "@types/react-dom": "^18",
     "@types/ua-parser-js": "^0.7.39",
-    "typescript": "5.2.2"
+    "typescript": "5.6.2"
   }
 }

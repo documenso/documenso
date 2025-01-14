@@ -1053,12 +1053,12 @@ export const ApiContractV1Implementation = createNextRoute(ApiContractV1, {
               .with('TEXT', () => ZTextFieldMeta.safeParse(fieldMeta))
               .with('SIGNATURE', 'INITIALS', 'DATE', 'EMAIL', 'NAME', () => ({
                 success: true,
-                data: {},
+                data: undefined,
               }))
               .with('FREE_SIGNATURE', () => ({
                 success: false,
                 error: 'FREE_SIGNATURE is not supported',
-                data: {},
+                data: undefined,
               }))
               .exhaustive();
 

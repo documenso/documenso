@@ -4,6 +4,7 @@ import kyselyExtension from 'prisma-extension-kysely';
 
 import type { DB } from './generated/types';
 import { getDatabaseUrl } from './helper';
+import './types/types.d.ts';
 import { remember } from './utils/remember';
 
 export const prisma = remember(
