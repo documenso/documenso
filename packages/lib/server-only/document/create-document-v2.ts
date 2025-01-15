@@ -6,10 +6,9 @@ import type { ApiRequestMetadata } from '@documenso/lib/universal/extract-reques
 import { nanoid } from '@documenso/lib/universal/id';
 import { createDocumentAuditLogData } from '@documenso/lib/utils/document-audit-logs';
 import { prisma } from '@documenso/prisma';
-import type { TemplateMeta } from '@documenso/prisma/client';
+import type { DocumentVisibility, TemplateMeta } from '@documenso/prisma/client';
 import {
   DocumentSource,
-  DocumentVisibility,
   RecipientRole,
   SendStatus,
   SigningStatus,
@@ -27,6 +26,7 @@ import {
 import { getFile } from '../../universal/upload/get-file';
 import { putPdfFile } from '../../universal/upload/put-file';
 import { createDocumentAuthOptions, createRecipientAuthOptions } from '../../utils/document-auth';
+import { determineDocumentVisibility } from '../../utils/document-visibility';
 import { triggerWebhook } from '../webhooks/trigger/trigger-webhook';
 
 export type CreateDocumentOptions = {
@@ -88,25 +88,6 @@ export const createDocumentV2 = async ({
     });
   }
 
-  const determineVisibility = (
-    globalVisibility: DocumentVisibility | null | undefined,
-    userRole: TeamMemberRole,
-  ): DocumentVisibility => {
-    if (globalVisibility) {
-      return globalVisibility;
-    }
-
-    if (userRole === TeamMemberRole.ADMIN) {
-      return DocumentVisibility.ADMIN;
-    }
-
-    if (userRole === TeamMemberRole.MANAGER) {
-      return DocumentVisibility.MANAGER_AND_ABOVE;
-    }
-
-    return DocumentVisibility.EVERYONE;
-  };
-
   if (normalizePdf) {
     const documentData = await prisma.documentData.findFirst({
       where: {
@@ -151,7 +132,7 @@ export const createDocumentV2 = async ({
     }
   }
 
-  const visibility = determineVisibility(
+  const visibility = determineDocumentVisibility(
     team?.teamGlobalSettings?.documentVisibility,
     team?.members[0].role ?? TeamMemberRole.MEMBER,
   );

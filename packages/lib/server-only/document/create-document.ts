@@ -6,7 +6,7 @@ import { DOCUMENT_AUDIT_LOG_TYPE } from '@documenso/lib/types/document-audit-log
 import type { ApiRequestMetadata } from '@documenso/lib/universal/extract-request-metadata';
 import { createDocumentAuditLogData } from '@documenso/lib/utils/document-audit-logs';
 import { prisma } from '@documenso/prisma';
-import { DocumentSource, DocumentVisibility, WebhookTriggerEvents } from '@documenso/prisma/client';
+import { DocumentSource, WebhookTriggerEvents } from '@documenso/prisma/client';
 import type { Team, TeamGlobalSettings } from '@documenso/prisma/client';
 import { TeamMemberRole } from '@documenso/prisma/client';
 
@@ -16,6 +16,7 @@ import {
 } from '../../types/webhook-payload';
 import { getFile } from '../../universal/upload/get-file';
 import { putPdfFile } from '../../universal/upload/put-file';
+import { determineDocumentVisibility } from '../../utils/document-visibility';
 import { triggerWebhook } from '../webhooks/trigger/trigger-webhook';
 
 export type CreateDocumentOptions = {
@@ -88,25 +89,6 @@ export const createDocument = async ({
     userTeamRole = teamWithUserRole.members[0]?.role;
   }
 
-  const determineVisibility = (
-    globalVisibility: DocumentVisibility | null | undefined,
-    userRole: TeamMemberRole,
-  ): DocumentVisibility => {
-    if (globalVisibility) {
-      return globalVisibility;
-    }
-
-    if (userRole === TeamMemberRole.ADMIN) {
-      return DocumentVisibility.ADMIN;
-    }
-
-    if (userRole === TeamMemberRole.MANAGER) {
-      return DocumentVisibility.MANAGER_AND_ABOVE;
-    }
-
-    return DocumentVisibility.EVERYONE;
-  };
-
   if (normalizePdf) {
     const documentData = await prisma.documentData.findFirst({
       where: {
@@ -138,7 +120,7 @@ export const createDocument = async ({
         documentDataId,
         userId,
         teamId,
-        visibility: determineVisibility(
+        visibility: determineDocumentVisibility(
           team?.teamGlobalSettings?.documentVisibility,
           userTeamRole ?? TeamMemberRole.MEMBER,
         ),
