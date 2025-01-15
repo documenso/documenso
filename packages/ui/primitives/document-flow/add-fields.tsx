@@ -508,7 +508,15 @@ export const AddFieldsFormPartial = ({
   }, []);
 
   useEffect(() => {
-    setSelectedSigner(recipients.find((r) => r.sendStatus !== SendStatus.SENT) ?? recipients[0]);
+    const recipientsByRoleToDisplay = recipients.filter(
+      (recipient) =>
+        recipient.role !== RecipientRole.CC && recipient.role !== RecipientRole.ASSISTANT,
+    );
+
+    setSelectedSigner(
+      recipientsByRoleToDisplay.find((r) => r.sendStatus !== SendStatus.SENT) ??
+        recipientsByRoleToDisplay[0],
+    );
   }, [recipients]);
 
   const recipientsByRole = useMemo(() => {
@@ -530,7 +538,12 @@ export const AddFieldsFormPartial = ({
   const recipientsByRoleToDisplay = useMemo(() => {
     // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
     return (Object.entries(recipientsByRole) as [RecipientRole, Recipient[]][])
-      .filter(([role]) => role !== RecipientRole.CC && role !== RecipientRole.VIEWER)
+      .filter(
+        ([role]) =>
+          role !== RecipientRole.CC &&
+          role !== RecipientRole.VIEWER &&
+          role !== RecipientRole.ASSISTANT,
+      )
       .map(
         ([role, roleRecipients]) =>
           // eslint-disable-next-line @typescript-eslint/consistent-type-assertions

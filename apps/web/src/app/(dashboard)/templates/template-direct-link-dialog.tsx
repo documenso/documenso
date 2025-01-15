@@ -81,7 +81,11 @@ export const TemplateDirectLinkDialog = ({
   );
 
   const validDirectTemplateRecipients = useMemo(
-    () => template.Recipient.filter((recipient) => recipient.role !== RecipientRole.CC),
+    () =>
+      template.Recipient.filter(
+        (recipient) =>
+          recipient.role !== RecipientRole.CC && recipient.role !== RecipientRole.ASSISTANT,
+      ),
     [template.Recipient],
   );
 
