@@ -16,6 +16,7 @@ import type { CompletedField } from '@documenso/lib/types/fields';
 import type { Field, Recipient } from '@documenso/prisma/client';
 import { FieldType, RecipientRole } from '@documenso/prisma/client';
 import type { FieldWithSignatureAndFieldMeta } from '@documenso/prisma/types/field-with-signature-and-fieldmeta';
+import type { RecipientWithFields } from '@documenso/prisma/types/recipient-with-fields';
 import { Card, CardContent } from '@documenso/ui/primitives/card';
 import { ElementVisible } from '@documenso/ui/primitives/element-visible';
 import { LazyPDFViewer } from '@documenso/ui/primitives/lazy-pdf-viewer';
@@ -42,6 +43,7 @@ export type SigningPageViewProps = {
   fields: Field[];
   completedFields: CompletedField[];
   isRecipientsTurn: boolean;
+  allRecipients?: RecipientWithFields[];
 };
 
 export const SigningPageView = ({
@@ -50,6 +52,7 @@ export const SigningPageView = ({
   fields,
   completedFields,
   isRecipientsTurn,
+  allRecipients = [],
 }: SigningPageViewProps) => {
   const { documentData, documentMeta } = document;
 
@@ -107,6 +110,15 @@ export const SigningPageView = ({
                   <Trans>has invited you to approve this document</Trans>
                 ),
               )
+              .with(RecipientRole.ASSISTANT, () =>
+                document.teamId && !shouldUseTeamDetails ? (
+                  <Trans>
+                    on behalf of "{document.team?.name}" has invited you to assist this document
+                  </Trans>
+                ) : (
+                  <Trans>has invited you to assist this document</Trans>
+                ),
+              )
               .otherwise(() => null)}
           </span>
         </div>
@@ -136,6 +148,7 @@ export const SigningPageView = ({
             fields={fields}
             redirectUrl={documentMeta?.redirectUrl}
             isRecipientsTurn={isRecipientsTurn}
+            allRecipients={allRecipients}
           />
         </div>
       </div>

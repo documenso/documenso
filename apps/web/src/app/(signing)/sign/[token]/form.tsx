@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo, useState } from 'react';
+import { useId, useMemo, useState } from 'react';
 
 import { useRouter } from 'next/navigation';
 
@@ -13,7 +13,9 @@ import type { DocumentAndSender } from '@documenso/lib/server-only/document/get-
 import type { TRecipientActionAuth } from '@documenso/lib/types/document-auth';
 import { isFieldUnsignedAndRequired } from '@documenso/lib/utils/advanced-fields-helpers';
 import { sortFieldsByPosition, validateFieldsInserted } from '@documenso/lib/utils/fields';
-import { type Field, FieldType, type Recipient, RecipientRole } from '@documenso/prisma/client';
+import type { Recipient } from '@documenso/prisma/client';
+import { type Field, FieldType, RecipientRole } from '@documenso/prisma/client';
+import type { RecipientWithFields } from '@documenso/prisma/types/recipient-with-fields';
 import { trpc } from '@documenso/trpc/react';
 import { FieldToolTip } from '@documenso/ui/components/field/field-tooltip';
 import { cn } from '@documenso/ui/lib/utils';
@@ -21,6 +23,7 @@ import { Button } from '@documenso/ui/primitives/button';
 import { Card, CardContent } from '@documenso/ui/primitives/card';
 import { Input } from '@documenso/ui/primitives/input';
 import { Label } from '@documenso/ui/primitives/label';
+import { RadioGroup, RadioGroupItem } from '@documenso/ui/primitives/radio-group';
 import { SignaturePad } from '@documenso/ui/primitives/signature-pad';
 
 import { useRequiredSigningContext } from './provider';
@@ -32,6 +35,7 @@ export type SigningFormProps = {
   fields: Field[];
   redirectUrl?: string | null;
   isRecipientsTurn: boolean;
+  allRecipients?: RecipientWithFields[];
 };
 
 export const SigningForm = ({
@@ -40,10 +44,12 @@ export const SigningForm = ({
   fields,
   redirectUrl,
   isRecipientsTurn,
+  allRecipients,
 }: SigningFormProps) => {
   const router = useRouter();
   const analytics = useAnalytics();
   const { data: session } = useSession();
+  const assistantSignersId = useId();
 
   const { fullName, signature, setFullName, setSignature, signatureValid, setSignatureValid } =
     useRequiredSigningContext();
@@ -112,6 +118,8 @@ export const SigningForm = ({
     redirectUrl ? router.push(redirectUrl) : router.push(`/sign/${recipient.token}/complete`);
   };
 
+  console.log(allRecipients);
+
   return (
     <form
       className={cn(
@@ -140,6 +148,7 @@ export const SigningForm = ({
             {recipient.role === RecipientRole.VIEWER && <Trans>View Document</Trans>}
             {recipient.role === RecipientRole.SIGNER && <Trans>Sign Document</Trans>}
             {recipient.role === RecipientRole.APPROVER && <Trans>Approve Document</Trans>}
+            {recipient.role === RecipientRole.ASSISTANT && <Trans>Assist Document</Trans>}
           </h3>
 
           {recipient.role === RecipientRole.VIEWER ? (
@@ -175,6 +184,66 @@ export const SigningForm = ({
                   />
                 </div>
               </div>
+            </>
+          ) : recipient.role === RecipientRole.ASSISTANT ? (
+            <>
+              <p className="text-muted-foreground mt-2 text-sm">
+                <Trans>
+                  Complete the fields for the following signers. Once reviewed, they will inform you
+                  if any modifications are needed.
+                </Trans>
+              </p>
+
+              <hr className="border-border my-4" />
+
+              <fieldset className="rounded-2xl bg-white p-3">
+                <RadioGroup
+                  className="gap-0 space-y-3 shadow-none"
+                  defaultValue={JSON.stringify(allRecipients?.[0]?.id)}
+                >
+                  {allRecipients
+                    ?.filter((recipient) => recipient.Field.length > 0)
+                    ?.map((recipient) => (
+                      <div
+                        key={`${assistantSignersId}-${recipient.id}`}
+                        className="bg-widget relative flex flex-col gap-4 rounded-lg p-4"
+                      >
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center gap-3">
+                            <RadioGroupItem
+                              id={`${assistantSignersId}-${recipient.id}`}
+                              value={JSON.stringify(recipient.id)}
+                              className="after:absolute after:inset-0"
+                              aria-describedby={`${`${assistantSignersId}-${recipient.id}`}-field`}
+                            />
+
+                            <div className="grid grow gap-1">
+                              <Label
+                                className="inline-flex items-start"
+                                htmlFor={`${assistantSignersId}-${recipient.id}`}
+                              >
+                                {recipient.name}
+                              </Label>
+                              <p
+                                id={`${assistantSignersId}-1-description`}
+                                className="text-muted-foreground text-xs"
+                              >
+                                {recipient.email}
+                              </p>
+                            </div>
+                          </div>
+                          <div
+                            id={`${`${assistantSignersId}-${recipient.id}`}-field`}
+                            className="text-muted-foreground text-xs leading-[inherit]"
+                          >
+                            {recipient.Field.length}{' '}
+                            {recipient.Field.length === 1 ? 'field' : 'fields'}
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                </RadioGroup>
+              </fieldset>
             </>
           ) : (
             <>
