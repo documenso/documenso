@@ -202,8 +202,8 @@ export const templateRouter = router({
   deleteTemplate: authenticatedProcedure
     .meta({
       openapi: {
-        method: 'DELETE',
-        path: '/template/{templateId}',
+        method: 'POST',
+        path: '/template/delete',
         summary: 'Delete template',
         tags: ['Template'],
       },
@@ -358,8 +358,8 @@ export const templateRouter = router({
   deleteTemplateDirectLink: authenticatedProcedure
     .meta({
       openapi: {
-        method: 'DELETE',
-        path: '/template/direct/{templateId}',
+        method: 'POST',
+        path: '/template/direct/delete',
         summary: 'Delete direct link',
         description: 'Delete a direct link for a template',
         tags: ['Template'],

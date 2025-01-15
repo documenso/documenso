@@ -10,6 +10,10 @@ import {
 import { ZDocumentEmailSettingsSchema } from '@documenso/lib/types/document-email';
 import { isValidRedirectUrl } from '@documenso/lib/utils/is-valid-redirect-url';
 import { DocumentVisibility } from '@documenso/prisma/client';
+import {
+  ZDocumentMetaDateFormatSchema,
+  ZDocumentMetaTimezoneSchema,
+} from '@documenso/trpc/server/document-router/schema';
 
 import { ZMapNegativeOneToUndefinedSchema } from '../document-flow/add-settings.types';
 import { DocumentDistributionMethod } from '.prisma/client';
@@ -27,8 +31,8 @@ export const ZAddTemplateSettingsFormSchema = z.object({
   meta: z.object({
     subject: z.string(),
     message: z.string(),
-    timezone: z.string().optional().default(DEFAULT_DOCUMENT_TIME_ZONE),
-    dateFormat: z.string().optional().default(DEFAULT_DOCUMENT_DATE_FORMAT),
+    timezone: ZDocumentMetaTimezoneSchema.default(DEFAULT_DOCUMENT_TIME_ZONE),
+    dateFormat: ZDocumentMetaDateFormatSchema.default(DEFAULT_DOCUMENT_DATE_FORMAT),
     distributionMethod: z
       .nativeEnum(DocumentDistributionMethod)
       .optional()

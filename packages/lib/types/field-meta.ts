@@ -1,5 +1,7 @@
 import { z } from 'zod';
 
+import { FieldType } from '@documenso/prisma/client';
+
 export const ZBaseFieldMeta = z.object({
   label: z.string().optional(),
   placeholder: z.string().optional(),
@@ -114,3 +116,53 @@ export type TFieldMetaNotOptionalSchema = z.infer<typeof ZFieldMetaNotOptionalSc
 export const ZFieldMetaSchema = ZFieldMetaNotOptionalSchema.optional();
 
 export type TFieldMetaSchema = z.infer<typeof ZFieldMetaSchema>;
+
+export const ZFieldAndMetaSchema = z.discriminatedUnion('type', [
+  z.object({
+    type: z.literal(FieldType.SIGNATURE),
+    // Do not use z.undefined(), or void since this will create an invalid schema for Speakeasy SDK generation.
+    fieldMeta: z.literal(undefined),
+  }),
+  z.object({
+    type: z.literal(FieldType.FREE_SIGNATURE),
+    fieldMeta: z.literal(undefined), // Same as above.
+  }),
+  z.object({
+    type: z.literal(FieldType.INITIALS),
+    fieldMeta: ZInitialsFieldMeta.optional(),
+  }),
+  z.object({
+    type: z.literal(FieldType.NAME),
+    fieldMeta: ZNameFieldMeta.optional(),
+  }),
+  z.object({
+    type: z.literal(FieldType.EMAIL),
+    fieldMeta: ZEmailFieldMeta.optional(),
+  }),
+  z.object({
+    type: z.literal(FieldType.DATE),
+    fieldMeta: ZDateFieldMeta.optional(),
+  }),
+  z.object({
+    type: z.literal(FieldType.TEXT),
+    fieldMeta: ZTextFieldMeta.optional(),
+  }),
+  z.object({
+    type: z.literal(FieldType.NUMBER),
+    fieldMeta: ZNumberFieldMeta.optional(),
+  }),
+  z.object({
+    type: z.literal(FieldType.RADIO),
+    fieldMeta: ZRadioFieldMeta.optional(),
+  }),
+  z.object({
+    type: z.literal(FieldType.CHECKBOX),
+    fieldMeta: ZCheckboxFieldMeta.optional(),
+  }),
+  z.object({
+    type: z.literal(FieldType.DROPDOWN),
+    fieldMeta: ZDropdownFieldMeta.optional(),
+  }),
+]);
+
+export type TFieldAndMeta = z.infer<typeof ZFieldAndMetaSchema>;
