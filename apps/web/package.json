@@ -68,11 +68,11 @@
     "@simplewebauthn/types": "^9.0.1",
     "@types/formidable": "^2.0.6",
     "@types/luxon": "^3.3.1",
-    "@types/node": "20.1.0",
+    "@types/node": "^20",
     "@types/papaparse": "^5.3.14",
     "@types/react": "^18",
     "@types/react-dom": "^18",
     "@types/ua-parser-js": "^0.7.39",
-    "typescript": "5.2.2"
+    "typescript": "5.6.2"
   }
 }

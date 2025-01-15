@@ -65,11 +65,6 @@ export const updateField = async ({
     },
   });
 
-  const newFieldMeta = {
-    ...(oldField.fieldMeta as FieldMeta),
-    ...fieldMeta,
-  };
-
   const field = prisma.$transaction(async (tx) => {
     const updatedField = await tx.field.update({
       where: {
@@ -83,7 +78,7 @@ export const updateField = async ({
         positionY: pageY,
         width: pageWidth,
         height: pageHeight,
-        fieldMeta: newFieldMeta,
+        fieldMeta,
       },
       include: {
         recipient: true,
