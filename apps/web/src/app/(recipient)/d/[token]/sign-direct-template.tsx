@@ -14,10 +14,10 @@ import {
   ZRadioFieldMeta,
   ZTextFieldMeta,
 } from '@documenso/lib/types/field-meta';
+import type { TTemplate } from '@documenso/lib/types/template';
 import { sortFieldsByPosition, validateFieldsInserted } from '@documenso/lib/utils/fields';
 import type { Field, Recipient, Signature } from '@documenso/prisma/client';
 import { FieldType } from '@documenso/prisma/client';
-import type { TemplateWithDetails } from '@documenso/prisma/types/template';
 import type {
   TRemovedSignedFieldWithTokenMutationSchema,
   TSignFieldWithTokenMutationSchema,
@@ -55,7 +55,7 @@ export type SignDirectTemplateFormProps = {
   flowStep: DocumentFlowStep;
   directRecipient: Recipient;
   directRecipientFields: Field[];
-  template: Omit<TemplateWithDetails, 'user'>;
+  template: Omit<TTemplate, 'user'>;
   onSubmit: (_data: DirectTemplateLocalField[]) => Promise<void>;
 };
 

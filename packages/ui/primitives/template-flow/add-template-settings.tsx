@@ -14,10 +14,11 @@ import { DOCUMENT_DISTRIBUTION_METHODS } from '@documenso/lib/constants/document
 import { SUPPORTED_LANGUAGES } from '@documenso/lib/constants/i18n';
 import { DEFAULT_DOCUMENT_TIME_ZONE, TIME_ZONES } from '@documenso/lib/constants/time-zones';
 import { ZDocumentEmailSettingsSchema } from '@documenso/lib/types/document-email';
+import type { TTemplate } from '@documenso/lib/types/template';
 import { extractDocumentAuthMethods } from '@documenso/lib/utils/document-auth';
 import { DocumentVisibility, TeamMemberRole } from '@documenso/prisma/client';
 import { DocumentDistributionMethod, type Field, type Recipient } from '@documenso/prisma/client';
-import type { TemplateWithData } from '@documenso/prisma/types/template';
+import type { TDocumentMetaDateFormat } from '@documenso/trpc/server/document-router/schema';
 import {
   DocumentGlobalAuthAccessSelect,
   DocumentGlobalAuthAccessTooltip,
@@ -71,7 +72,7 @@ export type AddTemplateSettingsFormProps = {
   fields: Field[];
   isEnterprise: boolean;
   isDocumentPdfLoaded: boolean;
-  template: TemplateWithData;
+  template: TTemplate;
   currentTeamMemberRole?: TeamMemberRole;
   onSubmit: (_data: TAddTemplateSettingsFormSchema) => void;
 };
@@ -104,7 +105,9 @@ export const AddTemplateSettingsFormPartial = ({
         subject: template.templateMeta?.subject ?? '',
         message: template.templateMeta?.message ?? '',
         timezone: template.templateMeta?.timezone ?? DEFAULT_DOCUMENT_TIME_ZONE,
-        dateFormat: template.templateMeta?.dateFormat ?? DEFAULT_DOCUMENT_DATE_FORMAT,
+        // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
+        dateFormat: (template.templateMeta?.dateFormat ??
+          DEFAULT_DOCUMENT_DATE_FORMAT) as TDocumentMetaDateFormat,
         distributionMethod:
           template.templateMeta?.distributionMethod || DocumentDistributionMethod.EMAIL,
         redirectUrl: template.templateMeta?.redirectUrl ?? '',

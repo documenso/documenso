@@ -10,7 +10,7 @@ import { AlertTriangle, Globe2Icon, InfoIcon, Link2Icon, Loader, LockIcon } from
 
 import { useLimits } from '@documenso/ee/server-only/limits/provider/client';
 import { useUpdateSearchParams } from '@documenso/lib/client-only/hooks/use-update-search-params';
-import type { FindTemplateRow } from '@documenso/lib/server-only/template/find-templates';
+import type { FindTemplateRow } from '@documenso/trpc/server/template-router/schema';
 import { Alert, AlertDescription, AlertTitle } from '@documenso/ui/primitives/alert';
 import type { DataTableColumnDef } from '@documenso/ui/primitives/data-table';
 import { DataTable } from '@documenso/ui/primitives/data-table';

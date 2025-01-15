@@ -7,11 +7,11 @@ import { useLingui } from '@lingui/react';
 import { EditIcon, FileIcon, LinkIcon, MoreHorizontalIcon, Trash2Icon } from 'lucide-react';
 
 import { useCopyToClipboard } from '@documenso/lib/client-only/hooks/use-copy-to-clipboard';
-import type { FindTemplateRow } from '@documenso/lib/server-only/template/find-templates';
 import { formatDirectTemplatePath } from '@documenso/lib/utils/templates';
 import type { TemplateDirectLink } from '@documenso/prisma/client';
 import { TemplateType } from '@documenso/prisma/client';
 import { trpc } from '@documenso/trpc/react';
+import type { FindTemplateRow } from '@documenso/trpc/server/template-router/schema';
 import {
   DropdownMenu,
   DropdownMenuContent,

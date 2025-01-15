@@ -16,9 +16,6 @@ declare global {
     type DocumentAuthOptions = TDocumentAuthOptions;
     type DocumentEmailSettings = TDocumentEmailSettings;
 
-    type DocumentMetaTimezone = TDocumentMetaTimezone;
-    type DocumentMetaDateFormat = TDocumentMetaDateFormat;
-
     type RecipientAuthOptions = TRecipientAuthOptions;
 
     type FieldMeta = TFieldMetaNotOptionalSchema;

@@ -7,9 +7,9 @@ import { useSession } from 'next-auth/react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 
+import type { TTemplate } from '@documenso/lib/types/template';
 import type { Recipient } from '@documenso/prisma/client';
 import type { Field } from '@documenso/prisma/client';
-import type { TemplateWithDetails } from '@documenso/prisma/types/template';
 import {
   DocumentFlowFormContainerActions,
   DocumentFlowFormContainerContent,
@@ -41,7 +41,7 @@ export type TConfigureDirectTemplateFormSchema = z.infer<typeof ZConfigureDirect
 export type ConfigureDirectTemplateFormProps = {
   flowStep: DocumentFlowStep;
   isDocumentPdfLoaded: boolean;
-  template: Omit<TemplateWithDetails, 'user'>;
+  template: Omit<TTemplate, 'user'>;
   directTemplateRecipient: Recipient & { fields: Field[] };
   initialEmail?: string;
   onSubmit: (_data: TConfigureDirectTemplateFormSchema) => void;

@@ -382,9 +382,9 @@ model DocumentMeta {
   id                    String                     @id @default(cuid())
   subject               String?
   message               String?
-  timezone              String?                    @default("Etc/UTC") @db.Text /// [DocumentMetaTimezone]
+  timezone              String?                    @default("Etc/UTC") @db.Text
   password              String?
-  dateFormat            String?                    @default("yyyy-MM-dd hh:mm a") @db.Text /// [DocumentMetaDateFormat]
+  dateFormat            String?                    @default("yyyy-MM-dd hh:mm a") @db.Text
   documentId            Int                        @unique
   document              Document                   @relation(fields: [documentId], references: [id], onDelete: Cascade)
   redirectUrl           String?
@@ -651,9 +651,9 @@ model TemplateMeta {
   id                    String                     @id @default(cuid())
   subject               String?
   message               String?
-  timezone              String?                    @default("Etc/UTC") @db.Text /// [DocumentMetaTimezone]
+  timezone              String?                    @default("Etc/UTC") @db.Text
   password              String?
-  dateFormat            String?                    @default("yyyy-MM-dd hh:mm a") @db.Text /// [DocumentMetaDateFormat]
+  dateFormat            String?                    @default("yyyy-MM-dd hh:mm a") @db.Text
   signingOrder          DocumentSigningOrder?      @default(PARALLEL)
   typedSignatureEnabled Boolean                    @default(true)
   distributionMethod    DocumentDistributionMethod @default(EMAIL)
