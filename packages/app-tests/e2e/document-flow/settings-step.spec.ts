@@ -45,6 +45,7 @@ test.describe('[EE_ONLY]', () => {
     await expect(page.getByTestId('documentActionSelectValue')).toContainText('Require passkey');
 
     // Save the settings by going to the next step.
+    await page.waitForTimeout(2500);
     await page.getByRole('button', { name: 'Continue' }).click();
     await expect(page.getByRole('heading', { name: 'Add Signers' })).toBeVisible();
 
@@ -87,6 +88,7 @@ test.describe('[EE_ONLY]', () => {
     await expect(page.getByTestId('documentActionSelectValue')).toContainText('Require passkey');
 
     // Save the settings by going to the next step.
+    await page.waitForTimeout(2500);
     await page.getByRole('button', { name: 'Continue' }).click();
     await expect(page.getByRole('heading', { name: 'Add Signers' })).toBeVisible();
 
@@ -121,6 +123,7 @@ test.describe('[EE_ONLY]', () => {
     await expect(page.getByTestId('documentActionSelectValue')).not.toBeVisible();
 
     // Next step.
+    await page.waitForTimeout(2500);
     await page.getByRole('button', { name: 'Continue' }).click();
     await expect(page.getByRole('heading', { name: 'Add Signers' })).toBeVisible();
 
@@ -151,6 +154,8 @@ test('[DOCUMENT_FLOW]: add settings', async ({ page }) => {
   await expect(page.getByTestId('documentActionSelectValue')).not.toBeVisible();
 
   // Save the settings by going to the next step.
+
+  await page.waitForTimeout(2500);
   await page.getByRole('button', { name: 'Continue' }).click();
   await expect(page.getByRole('heading', { name: 'Add Signers' })).toBeVisible();
 
