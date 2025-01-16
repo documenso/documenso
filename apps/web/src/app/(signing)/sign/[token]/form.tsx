@@ -6,7 +6,7 @@ import { useRouter } from 'next/navigation';
 
 import { Trans } from '@lingui/macro';
 import { useSession } from 'next-auth/react';
-import { useForm } from 'react-hook-form';
+import { Controller, useForm } from 'react-hook-form';
 
 import { useAnalytics } from '@documenso/lib/client-only/hooks/use-analytics';
 import type { DocumentAndSender } from '@documenso/lib/server-only/document/get-document-by-token';
@@ -36,6 +36,7 @@ export type SigningFormProps = {
   redirectUrl?: string | null;
   isRecipientsTurn: boolean;
   allRecipients?: RecipientWithFields[];
+  setSelectSignerId: (id: number | null) => void;
 };
 
 export const SigningForm = ({
@@ -45,6 +46,7 @@ export const SigningForm = ({
   redirectUrl,
   isRecipientsTurn,
   allRecipients,
+  setSelectSignerId,
 }: SigningFormProps) => {
   const router = useRouter();
   const analytics = useAnalytics();
@@ -59,6 +61,11 @@ export const SigningForm = ({
   const { mutateAsync: completeDocumentWithToken } =
     trpc.recipient.completeDocumentWithToken.useMutation();
 
+  const assistantForm = useForm({
+    defaultValues: {
+      selectedSignerId: allRecipients?.[0]?.id,
+    },
+  });
   const { handleSubmit, formState } = useForm();
 
   // Keep the loading state going if successful since the redirect may take some time.
@@ -102,6 +109,13 @@ export const SigningForm = ({
     // });
   };
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const onAssistantFormSubmit = (data: any) => {
+    console.log('assistant form submit');
+
+    console.log(data);
+  };
+
   const completeDocument = async (authOptions?: TRecipientActionAuth) => {
     await completeDocumentWithToken({
       token: recipient.token,
@@ -118,10 +132,8 @@ export const SigningForm = ({
     redirectUrl ? router.push(redirectUrl) : router.push(`/sign/${recipient.token}/complete`);
   };
 
-  console.log(allRecipients);
-
   return (
-    <form
+    <div
       className={cn(
         'dark:bg-background border-border bg-widget sticky flex h-full flex-col rounded-xl border px-4 py-6',
         {
@@ -129,7 +141,6 @@ export const SigningForm = ({
           'top-4 max-h-[min(68rem,calc(100vh-2rem))]': !session,
         },
       )}
-      onSubmit={handleSubmit(onFormSubmit)}
     >
       {validateUninsertedFields && uninsertedFields[0] && (
         <FieldToolTip key={uninsertedFields[0].id} field={uninsertedFields[0]} color="warning">
@@ -137,13 +148,8 @@ export const SigningForm = ({
         </FieldToolTip>
       )}
 
-      <fieldset
-        disabled={isSubmitting}
-        className={cn(
-          'custom-scrollbar -mx-2 flex flex-1 flex-col overflow-y-auto overflow-x-hidden px-2',
-        )}
-      >
-        <div className={cn('flex flex-1 flex-col')}>
+      <div className="custom-scrollbar -mx-2 flex flex-1 flex-col overflow-y-auto overflow-x-hidden px-2">
+        <div className="flex flex-1 flex-col">
           <h3 className="text-foreground text-2xl font-semibold">
             {recipient.role === RecipientRole.VIEWER && <Trans>View Document</Trans>}
             {recipient.role === RecipientRole.SIGNER && <Trans>Sign Document</Trans>}
@@ -187,149 +193,166 @@ export const SigningForm = ({
             </>
           ) : recipient.role === RecipientRole.ASSISTANT ? (
             <>
-              <p className="text-muted-foreground mt-2 text-sm">
-                <Trans>
-                  Complete the fields for the following signers. Once reviewed, they will inform you
-                  if any modifications are needed.
-                </Trans>
-              </p>
+              <form onSubmit={assistantForm.handleSubmit(onAssistantFormSubmit)}>
+                <p className="text-muted-foreground mt-2 text-sm">
+                  <Trans>
+                    Complete the fields for the following signers. Once reviewed, they will inform
+                    you if any modifications are needed.
+                  </Trans>
+                </p>
 
-              <hr className="border-border my-4" />
+                <hr className="border-border my-4" />
 
-              <fieldset className="rounded-2xl bg-white p-3">
-                <RadioGroup
-                  className="gap-0 space-y-3 shadow-none"
-                  defaultValue={JSON.stringify(allRecipients?.[0]?.id)}
-                >
-                  {allRecipients
-                    ?.filter((recipient) => recipient.Field.length > 0)
-                    ?.map((recipient) => (
-                      <div
-                        key={`${assistantSignersId}-${recipient.id}`}
-                        className="bg-widget relative flex flex-col gap-4 rounded-lg p-4"
+                <fieldset className="rounded-2xl bg-white p-3">
+                  <Controller
+                    name="selectedSignerId"
+                    control={assistantForm.control}
+                    rules={{ required: 'Please select a signer' }}
+                    render={({ field }) => (
+                      <RadioGroup
+                        className="gap-0 space-y-3 shadow-none"
+                        value={field.value?.toString()}
+                        onValueChange={(value) => {
+                          field.onChange(value);
+                          setSelectSignerId(Number(value));
+                        }}
                       >
-                        <div className="flex items-center justify-between">
-                          <div className="flex items-center gap-3">
-                            <RadioGroupItem
-                              id={`${assistantSignersId}-${recipient.id}`}
-                              value={JSON.stringify(recipient.id)}
-                              className="after:absolute after:inset-0"
-                              aria-describedby={`${`${assistantSignersId}-${recipient.id}`}-field`}
-                            />
+                        {allRecipients
+                          ?.filter((recipient) => recipient.Field.length > 0)
+                          ?.map((recipient) => (
+                            <div
+                              key={`${assistantSignersId}-${recipient.id}`}
+                              className="bg-widget relative flex flex-col gap-4 rounded-lg p-4"
+                            >
+                              <div className="flex items-center justify-between">
+                                <div className="flex items-center gap-3">
+                                  <RadioGroupItem
+                                    id={`${assistantSignersId}-${recipient.id}`}
+                                    value={recipient.id.toString()}
+                                    className="after:absolute after:inset-0"
+                                  />
 
-                            <div className="grid grow gap-1">
-                              <Label
-                                className="inline-flex items-start"
-                                htmlFor={`${assistantSignersId}-${recipient.id}`}
-                              >
-                                {recipient.name}
-                              </Label>
-                              <p
-                                id={`${assistantSignersId}-1-description`}
-                                className="text-muted-foreground text-xs"
-                              >
-                                {recipient.email}
-                              </p>
+                                  <div className="grid grow gap-1">
+                                    <Label
+                                      className="inline-flex items-start"
+                                      htmlFor={`${assistantSignersId}-${recipient.id}`}
+                                    >
+                                      {recipient.name}
+                                    </Label>
+                                    <p className="text-muted-foreground text-xs">
+                                      {recipient.email}
+                                    </p>
+                                  </div>
+                                </div>
+                                <div className="text-muted-foreground text-xs leading-[inherit]">
+                                  {recipient.Field.length}{' '}
+                                  {recipient.Field.length === 1 ? 'field' : 'fields'}
+                                </div>
+                              </div>
                             </div>
-                          </div>
-                          <div
-                            id={`${`${assistantSignersId}-${recipient.id}`}-field`}
-                            className="text-muted-foreground text-xs leading-[inherit]"
-                          >
-                            {recipient.Field.length}{' '}
-                            {recipient.Field.length === 1 ? 'field' : 'fields'}
-                          </div>
-                        </div>
-                      </div>
-                    ))}
-                </RadioGroup>
-              </fieldset>
+                          ))}
+                      </RadioGroup>
+                    )}
+                  />
+                </fieldset>
+
+                <div className="mt-6 flex flex-col gap-4 md:flex-row">
+                  <Button type="submit" className="w-full" size="lg" disabled={isSubmitting}>
+                    {isSubmitting ? <Trans>Submitting...</Trans> : <Trans>Continue</Trans>}
+                  </Button>
+                </div>
+              </form>
             </>
           ) : (
             <>
-              <p className="text-muted-foreground mt-2 text-sm">
-                <Trans>Please review the document before signing.</Trans>
-              </p>
+              <form onSubmit={handleSubmit(onFormSubmit)}>
+                <p className="text-muted-foreground mt-2 text-sm">
+                  <Trans>Please review the document before signing.</Trans>
+                </p>
 
-              <hr className="border-border mb-8 mt-4" />
+                <hr className="border-border mb-8 mt-4" />
 
-              <div className="-mx-2 flex flex-1 flex-col gap-4 overflow-y-auto px-2">
-                <div className="flex flex-1 flex-col gap-y-4">
-                  <div>
-                    <Label htmlFor="full-name">
-                      <Trans>Full Name</Trans>
-                    </Label>
+                <fieldset
+                  disabled={isSubmitting}
+                  className="-mx-2 flex flex-1 flex-col gap-4 overflow-y-auto px-2"
+                >
+                  <div className="flex flex-1 flex-col gap-y-4">
+                    <div>
+                      <Label htmlFor="full-name">
+                        <Trans>Full Name</Trans>
+                      </Label>
 
-                    <Input
-                      type="text"
-                      id="full-name"
-                      className="bg-background mt-2"
-                      value={fullName}
-                      onChange={(e) => setFullName(e.target.value.trimStart())}
+                      <Input
+                        type="text"
+                        id="full-name"
+                        className="bg-background mt-2"
+                        value={fullName}
+                        onChange={(e) => setFullName(e.target.value.trimStart())}
+                      />
+                    </div>
+
+                    <div>
+                      <Label htmlFor="Signature">
+                        <Trans>Signature</Trans>
+                      </Label>
+
+                      <Card className="mt-2" gradient degrees={-120}>
+                        <CardContent className="p-0">
+                          <SignaturePad
+                            className="h-44 w-full"
+                            disabled={isSubmitting}
+                            defaultValue={signature ?? undefined}
+                            onValidityChange={(isValid) => {
+                              setSignatureValid(isValid);
+                            }}
+                            onChange={(value) => {
+                              if (signatureValid) {
+                                setSignature(value);
+                              }
+                            }}
+                            allowTypedSignature={document.documentMeta?.typedSignatureEnabled}
+                          />
+                        </CardContent>
+                      </Card>
+
+                      {hasSignatureField && !signatureValid && (
+                        <div className="text-destructive mt-2 text-sm">
+                          <Trans>
+                            Signature is too small. Please provide a more complete signature.
+                          </Trans>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+
+                  <div className="flex flex-col gap-4 md:flex-row">
+                    <Button
+                      type="button"
+                      className="dark:bg-muted dark:hover:bg-muted/80 w-full bg-black/5 hover:bg-black/10"
+                      variant="secondary"
+                      size="lg"
+                      disabled={typeof window !== 'undefined' && window.history.length <= 1}
+                      onClick={() => router.back()}
+                    >
+                      <Trans>Cancel</Trans>
+                    </Button>
+
+                    <SignDialog
+                      isSubmitting={isSubmitting}
+                      onSignatureComplete={handleSubmit(onFormSubmit)}
+                      documentTitle={document.title}
+                      fields={fields}
+                      fieldsValidated={fieldsValidated}
+                      role={recipient.role}
+                      disabled={!isRecipientsTurn}
                     />
                   </div>
-
-                  <div>
-                    <Label htmlFor="Signature">
-                      <Trans>Signature</Trans>
-                    </Label>
-
-                    <Card className="mt-2" gradient degrees={-120}>
-                      <CardContent className="p-0">
-                        <SignaturePad
-                          className="h-44 w-full"
-                          disabled={isSubmitting}
-                          defaultValue={signature ?? undefined}
-                          onValidityChange={(isValid) => {
-                            setSignatureValid(isValid);
-                          }}
-                          onChange={(value) => {
-                            if (signatureValid) {
-                              setSignature(value);
-                            }
-                          }}
-                          allowTypedSignature={document.documentMeta?.typedSignatureEnabled}
-                        />
-                      </CardContent>
-                    </Card>
-
-                    {hasSignatureField && !signatureValid && (
-                      <div className="text-destructive mt-2 text-sm">
-                        <Trans>
-                          Signature is too small. Please provide a more complete signature.
-                        </Trans>
-                      </div>
-                    )}
-                  </div>
-                </div>
-
-                <div className="flex flex-col gap-4 md:flex-row">
-                  <Button
-                    type="button"
-                    className="dark:bg-muted dark:hover:bg-muted/80 w-full bg-black/5 hover:bg-black/10"
-                    variant="secondary"
-                    size="lg"
-                    disabled={typeof window !== 'undefined' && window.history.length <= 1}
-                    onClick={() => router.back()}
-                  >
-                    <Trans>Cancel</Trans>
-                  </Button>
-
-                  <SignDialog
-                    isSubmitting={isSubmitting}
-                    onSignatureComplete={handleSubmit(onFormSubmit)}
-                    documentTitle={document.title}
-                    fields={fields}
-                    fieldsValidated={fieldsValidated}
-                    role={recipient.role}
-                    disabled={!isRecipientsTurn}
-                  />
-                </div>
-              </div>
+                </fieldset>
+              </form>
             </>
           )}
         </div>
-      </fieldset>
-    </form>
+      </div>
+    </div>
   );
 };
