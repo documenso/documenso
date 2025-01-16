@@ -2,7 +2,6 @@ import { z } from 'zod';
 
 import { VALID_DATE_FORMAT_VALUES } from '@documenso/lib/constants/date-formats';
 import { SUPPORTED_LANGUAGE_CODES } from '@documenso/lib/constants/i18n';
-import { TIME_ZONES } from '@documenso/lib/constants/time-zones';
 import {
   ZDocumentLiteSchema,
   ZDocumentManySchema,
@@ -55,10 +54,11 @@ export const ZDocumentMetaTimezoneSchema = z
   .string()
   .describe(
     'The timezone to use for date fields and signing the document. Example Etc/UTC, Australia/Melbourne',
-  )
-  .refine((value) => TIME_ZONES.includes(value), {
-    message: 'Invalid timezone. Please provide a valid timezone',
-  });
+  );
+// Cooked.
+// .refine((value) => TIME_ZONES.includes(value), {
+//   message: 'Invalid timezone. Please provide a valid timezone',
+// });
 
 export type TDocumentMetaTimezone = z.infer<typeof ZDocumentMetaTimezoneSchema>;
 
