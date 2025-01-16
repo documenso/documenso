@@ -14,7 +14,14 @@ export const ZGetRecipientRequestSchema = z.object({
 
 export const ZGetRecipientResponseSchema = ZRecipientSchema;
 
-const ZCreateRecipientSchema = z.object({
+/**
+ * When changing this, ensure everything that uses this schema is updated correctly
+ * since this will change the Openapi schema.
+ *
+ * Example `createDocument` uses this, so you will need to update that function to
+ * pass along required details.
+ */
+export const ZCreateRecipientSchema = z.object({
   email: z.string().toLowerCase().email().min(1),
   name: z.string(),
   role: z.nativeEnum(RecipientRole),
@@ -42,11 +49,16 @@ export const ZCreateDocumentRecipientResponseSchema = ZRecipientLiteSchema;
 
 export const ZCreateDocumentRecipientsRequestSchema = z.object({
   documentId: z.number(),
-  recipients: z.array(ZCreateRecipientSchema).refine((recipients) => {
-    const emails = recipients.map((recipient) => recipient.email.toLowerCase());
+  recipients: z.array(ZCreateRecipientSchema).refine(
+    (recipients) => {
+      const emails = recipients.map((recipient) => recipient.email.toLowerCase());
 
-    return new Set(emails).size === emails.length;
-  }),
+      return new Set(emails).size === emails.length;
+    },
+    {
+      message: 'Recipients must have unique emails',
+    },
+  ),
 });
 
 export const ZCreateDocumentRecipientsResponseSchema = z.object({
@@ -62,13 +74,18 @@ export const ZUpdateDocumentRecipientResponseSchema = ZRecipientSchema;
 
 export const ZUpdateDocumentRecipientsRequestSchema = z.object({
   documentId: z.number(),
-  recipients: z.array(ZUpdateRecipientSchema).refine((recipients) => {
-    const emails = recipients
-      .filter((recipient) => recipient.email !== undefined)
-      .map((recipient) => recipient.email?.toLowerCase());
+  recipients: z.array(ZUpdateRecipientSchema).refine(
+    (recipients) => {
+      const emails = recipients
+        .filter((recipient) => recipient.email !== undefined)
+        .map((recipient) => recipient.email?.toLowerCase());
 
-    return new Set(emails).size === emails.length;
-  }),
+      return new Set(emails).size === emails.length;
+    },
+    {
+      message: 'Recipients must have unique emails',
+    },
+  ),
 });
 
 export const ZUpdateDocumentRecipientsResponseSchema = z.object({
@@ -100,7 +117,7 @@ export const ZSetDocumentRecipientsRequestSchema = z
       return new Set(emails).size === emails.length;
     },
     // Dirty hack to handle errors when .root is populated for an array type
-    { message: 'Signers must have unique emails', path: ['signers__root'] },
+    { message: 'Recipients must have unique emails', path: ['recipients__root'] },
   );
 
 export const ZSetDocumentRecipientsResponseSchema = z.object({
@@ -116,11 +133,16 @@ export const ZCreateTemplateRecipientResponseSchema = ZRecipientLiteSchema;
 
 export const ZCreateTemplateRecipientsRequestSchema = z.object({
   templateId: z.number(),
-  recipients: z.array(ZCreateRecipientSchema).refine((recipients) => {
-    const emails = recipients.map((recipient) => recipient.email);
+  recipients: z.array(ZCreateRecipientSchema).refine(
+    (recipients) => {
+      const emails = recipients.map((recipient) => recipient.email);
 
-    return new Set(emails).size === emails.length;
-  }),
+      return new Set(emails).size === emails.length;
+    },
+    {
+      message: 'Recipients must have unique emails',
+    },
+  ),
 });
 
 export const ZCreateTemplateRecipientsResponseSchema = z.object({
@@ -136,13 +158,18 @@ export const ZUpdateTemplateRecipientResponseSchema = ZRecipientSchema;
 
 export const ZUpdateTemplateRecipientsRequestSchema = z.object({
   templateId: z.number(),
-  recipients: z.array(ZUpdateRecipientSchema).refine((recipients) => {
-    const emails = recipients
-      .filter((recipient) => recipient.email !== undefined)
-      .map((recipient) => recipient.email);
+  recipients: z.array(ZUpdateRecipientSchema).refine(
+    (recipients) => {
+      const emails = recipients
+        .filter((recipient) => recipient.email !== undefined)
+        .map((recipient) => recipient.email);
 
-    return new Set(emails).size === emails.length;
-  }),
+      return new Set(emails).size === emails.length;
+    },
+    {
+      message: 'Recipients must have unique emails',
+    },
+  ),
 });
 
 export const ZUpdateTemplateRecipientsResponseSchema = z.object({

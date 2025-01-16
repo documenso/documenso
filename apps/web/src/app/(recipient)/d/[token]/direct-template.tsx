@@ -8,9 +8,9 @@ import { msg } from '@lingui/macro';
 import { useLingui } from '@lingui/react';
 
 import { RECIPIENT_ROLES_DESCRIPTION } from '@documenso/lib/constants/recipient-roles';
+import type { TTemplate } from '@documenso/lib/types/template';
 import type { Field } from '@documenso/prisma/client';
 import { type Recipient } from '@documenso/prisma/client';
-import type { TemplateWithDetails } from '@documenso/prisma/types/template';
 import { trpc } from '@documenso/trpc/react';
 import { Card, CardContent } from '@documenso/ui/primitives/card';
 import { DocumentFlowFormContainer } from '@documenso/ui/primitives/document-flow/document-flow-root';
@@ -28,7 +28,7 @@ import type { DirectTemplateLocalField } from './sign-direct-template';
 import { SignDirectTemplateForm } from './sign-direct-template';
 
 export type TemplatesDirectPageViewProps = {
-  template: Omit<TemplateWithDetails, 'user'>;
+  template: Omit<TTemplate, 'user'>;
   directTemplateToken: string;
   directTemplateRecipient: Recipient & { fields: Field[] };
 };

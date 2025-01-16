@@ -25,7 +25,6 @@ import { downloadPDF } from '@documenso/lib/client-only/download-pdf';
 import { formatDocumentsPath } from '@documenso/lib/utils/teams';
 import { DocumentStatus, RecipientRole } from '@documenso/prisma/client';
 import type { Document, Recipient, Team, User } from '@documenso/prisma/client';
-import type { DocumentWithData } from '@documenso/prisma/types/document-with-data';
 import { trpc as trpcClient } from '@documenso/trpc/client';
 import { DocumentShareButton } from '@documenso/ui/components/document/document-share-button';
 import {
@@ -81,17 +80,13 @@ export const DataTableActionDropdown = ({ row, team }: DataTableActionDropdownPr
 
   const onDownloadClick = async () => {
     try {
-      let document: DocumentWithData | null = null;
-
-      if (!recipient) {
-        document = await trpcClient.document.getDocumentById.query({
-          documentId: row.id,
-        });
-      } else {
-        document = await trpcClient.document.getDocumentByToken.query({
-          token: recipient.token,
-        });
-      }
+      const document = !recipient
+        ? await trpcClient.document.getDocumentById.query({
+            documentId: row.id,
+          })
+        : await trpcClient.document.getDocumentByToken.query({
+            token: recipient.token,
+          });
 
       const documentData = document?.documentData;
 

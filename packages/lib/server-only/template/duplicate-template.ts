@@ -1,10 +1,8 @@
 import { omit } from 'remeda';
-import type { z } from 'zod';
 
 import { nanoid } from '@documenso/lib/universal/id';
 import { prisma } from '@documenso/prisma';
 import type { Prisma } from '@documenso/prisma/client';
-import { TemplateSchema } from '@documenso/prisma/generated/zod';
 import type { TDuplicateTemplateMutationSchema } from '@documenso/trpc/server/template-router/schema';
 
 export type DuplicateTemplateOptions = TDuplicateTemplateMutationSchema & {
@@ -12,15 +10,11 @@ export type DuplicateTemplateOptions = TDuplicateTemplateMutationSchema & {
   teamId?: number;
 };
 
-export const ZDuplicateTemplateResponseSchema = TemplateSchema;
-
-export type TDuplicateTemplateResponse = z.infer<typeof ZDuplicateTemplateResponseSchema>;
-
 export const duplicateTemplate = async ({
   templateId,
   userId,
   teamId,
-}: DuplicateTemplateOptions): Promise<TDuplicateTemplateResponse> => {
+}: DuplicateTemplateOptions) => {
   const template = await prisma.template.findUnique({
     where: {
       id: templateId,

@@ -9,6 +9,10 @@ import {
 } from '@documenso/lib/types/document-auth';
 import { isValidRedirectUrl } from '@documenso/lib/utils/is-valid-redirect-url';
 import { DocumentVisibility } from '@documenso/prisma/client';
+import {
+  ZDocumentMetaDateFormatSchema,
+  ZDocumentMetaTimezoneSchema,
+} from '@documenso/trpc/server/document-router/schema';
 
 export const ZMapNegativeOneToUndefinedSchema = z
   .string()
@@ -32,8 +36,8 @@ export const ZAddSettingsFormSchema = z.object({
     ZDocumentActionAuthTypesSchema.optional(),
   ),
   meta: z.object({
-    timezone: z.string().optional().default(DEFAULT_DOCUMENT_TIME_ZONE),
-    dateFormat: z.string().optional().default(DEFAULT_DOCUMENT_DATE_FORMAT),
+    timezone: ZDocumentMetaTimezoneSchema.optional().default(DEFAULT_DOCUMENT_TIME_ZONE),
+    dateFormat: ZDocumentMetaDateFormatSchema.optional().default(DEFAULT_DOCUMENT_DATE_FORMAT),
     redirectUrl: z
       .string()
       .optional()

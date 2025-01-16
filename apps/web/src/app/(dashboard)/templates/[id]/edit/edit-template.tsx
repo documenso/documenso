@@ -12,7 +12,7 @@ import {
   DO_NOT_INVALIDATE_QUERY_ON_MUTATION,
   SKIP_QUERY_BATCH_META,
 } from '@documenso/lib/constants/trpc';
-import type { TemplateWithDetails } from '@documenso/prisma/types/template';
+import type { TTemplate } from '@documenso/lib/types/template';
 import { trpc } from '@documenso/trpc/react';
 import { cn } from '@documenso/ui/lib/utils';
 import { Card, CardContent } from '@documenso/ui/primitives/card';
@@ -32,7 +32,7 @@ import { useOptionalCurrentTeam } from '~/providers/team';
 
 export type EditTemplateFormProps = {
   className?: string;
-  initialTemplate: TemplateWithDetails;
+  initialTemplate: TTemplate;
   isEnterprise: boolean;
   templateRootPath: string;
 };

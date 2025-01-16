@@ -6,8 +6,14 @@ import {
   ZDocumentActionAuthTypesSchema,
 } from '@documenso/lib/types/document-auth';
 import { ZDocumentEmailSettingsSchema } from '@documenso/lib/types/document-email';
-import { ZFindSearchParamsSchema } from '@documenso/lib/types/search-params';
+import { ZFindResultResponse, ZFindSearchParamsSchema } from '@documenso/lib/types/search-params';
+import {
+  ZTemplateLiteSchema,
+  ZTemplateManySchema,
+  ZTemplateSchema,
+} from '@documenso/lib/types/template';
 import { DocumentSigningOrder, DocumentVisibility, TemplateType } from '@documenso/prisma/client';
+import { TemplateDirectLinkSchema } from '@documenso/prisma/generated/zod';
 
 import {
   ZDocumentMetaDateFormatSchema,
@@ -69,7 +75,9 @@ export const ZDuplicateTemplateMutationSchema = z.object({
   templateId: z.number(),
 });
 
-export const ZCreateTemplateDirectLinkMutationSchema = z.object({
+export const ZDuplicateTemplateResponseSchema = ZTemplateLiteSchema;
+
+export const ZCreateTemplateDirectLinkRequestSchema = z.object({
   templateId: z.number(),
   directRecipientId: z
     .number()
@@ -79,14 +87,27 @@ export const ZCreateTemplateDirectLinkMutationSchema = z.object({
     .optional(),
 });
 
-export const ZDeleteTemplateDirectLinkMutationSchema = z.object({
+const GenericDirectLinkResponseSchema = TemplateDirectLinkSchema.pick({
+  id: true,
+  templateId: true,
+  token: true,
+  createdAt: true,
+  enabled: true,
+  directTemplateRecipientId: true,
+});
+
+export const ZCreateTemplateDirectLinkResponseSchema = GenericDirectLinkResponseSchema;
+
+export const ZDeleteTemplateDirectLinkRequestSchema = z.object({
   templateId: z.number(),
 });
 
-export const ZToggleTemplateDirectLinkMutationSchema = z.object({
+export const ZToggleTemplateDirectLinkRequestSchema = z.object({
   templateId: z.number(),
   enabled: z.boolean(),
 });
+
+export const ZToggleTemplateDirectLinkResponseSchema = GenericDirectLinkResponseSchema;
 
 export const ZDeleteTemplateMutationSchema = z.object({
   templateId: z.number(),
@@ -141,18 +162,31 @@ export const ZUpdateTemplateRequestSchema = z.object({
     .optional(),
 });
 
+export const ZUpdateTemplateResponseSchema = ZTemplateLiteSchema;
+
 export const ZFindTemplatesRequestSchema = ZFindSearchParamsSchema.extend({
   type: z.nativeEnum(TemplateType).describe('Filter templates by type.').optional(),
 });
+
+export const ZFindTemplatesResponseSchema = ZFindResultResponse.extend({
+  data: ZTemplateManySchema.array(),
+});
+
+export type TFindTemplatesResponse = z.infer<typeof ZFindTemplatesResponseSchema>;
+export type FindTemplateRow = TFindTemplatesResponse['data'][number];
 
 export const ZGetTemplateByIdRequestSchema = z.object({
   templateId: z.number(),
 });
 
-export const ZMoveTemplatesToTeamRequestSchema = z.object({
+export const ZGetTemplateByIdResponseSchema = ZTemplateSchema;
+
+export const ZMoveTemplateToTeamRequestSchema = z.object({
   templateId: z.number().describe('The ID of the template to move to.'),
   teamId: z.number().describe('The ID of the team to move the template to.'),
 });
+
+export const ZMoveTemplateToTeamResponseSchema = ZTemplateLiteSchema;
 
 export type TCreateTemplateMutationSchema = z.infer<typeof ZCreateTemplateMutationSchema>;
 export type TDuplicateTemplateMutationSchema = z.infer<typeof ZDuplicateTemplateMutationSchema>;

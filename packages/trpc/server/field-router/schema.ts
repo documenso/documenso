@@ -1,31 +1,38 @@
 import { z } from 'zod';
 
 import { ZRecipientActionAuthSchema } from '@documenso/lib/types/document-auth';
-import { ZFieldSchema } from '@documenso/lib/types/field';
-import { ZFieldMetaSchema } from '@documenso/lib/types/field-meta';
+import {
+  ZFieldHeightSchema,
+  ZFieldPageNumberSchema,
+  ZFieldPageXSchema,
+  ZFieldPageYSchema,
+  ZFieldSchema,
+  ZFieldWidthSchema,
+} from '@documenso/lib/types/field';
+import { ZFieldAndMetaSchema, ZFieldMetaSchema } from '@documenso/lib/types/field-meta';
 import { FieldType } from '@documenso/prisma/client';
 
-const ZCreateFieldSchema = z.object({
-  recipientId: z.number().describe('The ID of the recipient to create the field for.'),
-  type: ZFieldSchema.shape.type.describe('The type of the field to create.'),
-  pageNumber: z.number().describe('The page number the field will be on.'),
-  pageX: z.number().describe('The X coordinate of where the field will be placed.'),
-  pageY: z.number().describe('The Y coordinate of where the field will be placed.'),
-  width: z.number().describe('The width of the field.'),
-  height: z.number().describe('The height of the field.'),
-  fieldMeta: ZFieldMetaSchema.optional(),
-});
+const ZCreateFieldSchema = ZFieldAndMetaSchema.and(
+  z.object({
+    recipientId: z.number().describe('The ID of the recipient to create the field for.'),
+    pageNumber: ZFieldPageNumberSchema,
+    pageX: ZFieldPageXSchema,
+    pageY: ZFieldPageYSchema,
+    width: ZFieldWidthSchema,
+    height: ZFieldHeightSchema,
+  }),
+);
 
-const ZUpdateFieldSchema = z.object({
-  id: z.number().describe('The ID of the field to update.'),
-  type: ZFieldSchema.shape.type.optional().describe('The type of the field to update.'),
-  pageNumber: z.number().optional().describe('The page number the field will be on.'),
-  pageX: z.number().optional().describe('The X coordinate of where the field will be placed.'),
-  pageY: z.number().optional().describe('The Y coordinate of where the field will be placed.'),
-  width: z.number().optional().describe('The width of the field.'),
-  height: z.number().optional().describe('The height of the field.'),
-  fieldMeta: ZFieldMetaSchema.optional(),
-});
+const ZUpdateFieldSchema = ZFieldAndMetaSchema.and(
+  z.object({
+    id: z.number().describe('The ID of the field to update.'),
+    pageNumber: ZFieldPageNumberSchema.optional(),
+    pageX: ZFieldPageXSchema.optional(),
+    pageY: ZFieldPageYSchema.optional(),
+    width: ZFieldWidthSchema.optional(),
+    height: ZFieldHeightSchema.optional(),
+  }),
+);
 
 export const ZCreateDocumentFieldRequestSchema = z.object({
   documentId: z.number(),

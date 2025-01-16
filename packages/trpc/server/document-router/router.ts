@@ -7,8 +7,10 @@ import { NEXT_PUBLIC_WEBAPP_URL } from '@documenso/lib/constants/app';
 import { DOCUMENSO_ENCRYPTION_KEY } from '@documenso/lib/constants/crypto';
 import { AppError } from '@documenso/lib/errors/app-error';
 import { encryptSecondaryData } from '@documenso/lib/server-only/crypto/encrypt';
+import { createDocumentData } from '@documenso/lib/server-only/document-data/create-document-data';
 import { upsertDocumentMeta } from '@documenso/lib/server-only/document-meta/upsert-document-meta';
 import { createDocument } from '@documenso/lib/server-only/document/create-document';
+import { createDocumentV2 } from '@documenso/lib/server-only/document/create-document-v2';
 import { deleteDocument } from '@documenso/lib/server-only/document/delete-document';
 import { duplicateDocument } from '@documenso/lib/server-only/document/duplicate-document-by-id';
 import { findDocumentAuditLogs } from '@documenso/lib/server-only/document/find-document-audit-logs';
@@ -22,11 +24,14 @@ import { searchDocumentsWithKeyword } from '@documenso/lib/server-only/document/
 import { sendDocument } from '@documenso/lib/server-only/document/send-document';
 import { updateDocument } from '@documenso/lib/server-only/document/update-document';
 import { symmetricEncrypt } from '@documenso/lib/universal/crypto';
-import { DocumentStatus } from '@documenso/prisma/client';
+import { getPresignPostUrl } from '@documenso/lib/universal/upload/server-actions';
+import { DocumentDataType, DocumentStatus } from '@documenso/prisma/client';
 
 import { authenticatedProcedure, procedure, router } from '../trpc';
 import {
   ZCreateDocumentRequestSchema,
+  ZCreateDocumentV2RequestSchema,
+  ZCreateDocumentV2ResponseSchema,
   ZDeleteDocumentMutationSchema,
   ZDistributeDocumentRequestSchema,
   ZDistributeDocumentResponseSchema,
@@ -147,6 +152,79 @@ export const documentRouter = router({
     }),
 
   /**
+   * Temporariy endpoint for V2 Beta until we allow passthrough documents on create.
+   *
+   * @public
+   * @deprecated
+   */
+  createDocumentTemporary: authenticatedProcedure
+    .meta({
+      openapi: {
+        method: 'POST',
+        path: '/document/create/beta',
+        summary: 'Create document',
+        description:
+          'You will need to upload the PDF to the provided URL returned. Note: Once V2 API is released, this will be removed since we will allow direct uploads, instead of using an upload URL.',
+        tags: ['Document'],
+      },
+    })
+    .input(ZCreateDocumentV2RequestSchema)
+    .output(ZCreateDocumentV2ResponseSchema)
+    .mutation(async ({ input, ctx }) => {
+      const { teamId } = ctx;
+
+      const {
+        title,
+        externalId,
+        visibility,
+        globalAccessAuth,
+        globalActionAuth,
+        recipients,
+        meta,
+      } = input;
+
+      const { remaining } = await getServerLimits({ email: ctx.user.email, teamId });
+
+      if (remaining.documents <= 0) {
+        throw new TRPCError({
+          code: 'BAD_REQUEST',
+          message: 'You have reached your document limit for this month. Please upgrade your plan.',
+        });
+      }
+
+      const fileName = title.endsWith('.pdf') ? title : `${title}.pdf`;
+
+      const { url, key } = await getPresignPostUrl(fileName, 'application/pdf');
+
+      const documentData = await createDocumentData({
+        data: key,
+        type: DocumentDataType.S3_PATH,
+      });
+
+      const createdDocument = await createDocumentV2({
+        userId: ctx.user.id,
+        teamId,
+        documentDataId: documentData.id,
+        normalizePdf: false, // Not normalizing because of presigned URL.
+        data: {
+          title,
+          externalId,
+          visibility,
+          globalAccessAuth,
+          globalActionAuth,
+          recipients,
+        },
+        meta,
+        requestMetadata: ctx.metadata,
+      });
+
+      return {
+        document: createdDocument,
+        uploadUrl: url,
+      };
+    }),
+
+  /**
    * Wait until RR7 so we can passthrough documents.
    *
    * @private
@@ -220,6 +298,7 @@ export const documentRouter = router({
           typedSignatureEnabled: meta.typedSignatureEnabled,
           redirectUrl: meta.redirectUrl,
           distributionMethod: meta.distributionMethod,
+          signingOrder: meta.signingOrder,
           emailSettings: meta.emailSettings,
           requestMetadata: ctx.metadata,
         });
@@ -240,8 +319,8 @@ export const documentRouter = router({
   deleteDocument: authenticatedProcedure
     .meta({
       openapi: {
-        method: 'DELETE',
-        path: '/document/{documentId}',
+        method: 'POST',
+        path: '/document/delete',
         summary: 'Delete document',
         tags: ['Document'],
       },
@@ -320,6 +399,8 @@ export const documentRouter = router({
 
   /**
    * @private
+   *
+   * Todo: Remove and use `updateDocument` endpoint instead.
    */
   setSigningOrderForDocument: authenticatedProcedure
     .input(ZSetSigningOrderForDocumentMutationSchema)

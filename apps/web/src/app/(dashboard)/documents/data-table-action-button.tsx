@@ -12,7 +12,6 @@ import { downloadPDF } from '@documenso/lib/client-only/download-pdf';
 import { formatDocumentsPath } from '@documenso/lib/utils/teams';
 import type { Document, Recipient, Team, User } from '@documenso/prisma/client';
 import { DocumentStatus, RecipientRole, SigningStatus } from '@documenso/prisma/client';
-import type { DocumentWithData } from '@documenso/prisma/types/document-with-data';
 import { trpc as trpcClient } from '@documenso/trpc/client';
 import { Button } from '@documenso/ui/primitives/button';
 import { useToast } from '@documenso/ui/primitives/use-toast';
@@ -50,17 +49,13 @@ export const DataTableActionButton = ({ row, team }: DataTableActionButtonProps)
 
   const onDownloadClick = async () => {
     try {
-      let document: DocumentWithData | null = null;
-
-      if (!recipient) {
-        document = await trpcClient.document.getDocumentById.query({
-          documentId: row.id,
-        });
-      } else {
-        document = await trpcClient.document.getDocumentByToken.query({
-          token: recipient.token,
-        });
-      }
+      const document = !recipient
+        ? await trpcClient.document.getDocumentById.query({
+            documentId: row.id,
+          })
+        : await trpcClient.document.getDocumentByToken.query({
+            token: recipient.token,
+          });
 
       const documentData = document?.documentData;
 

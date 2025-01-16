@@ -193,8 +193,8 @@ export const recipientRouter = router({
   deleteDocumentRecipient: authenticatedProcedure
     .meta({
       openapi: {
-        method: 'DELETE',
-        path: '/document/recipient/{recipientId}',
+        method: 'POST',
+        path: '/document/recipient/delete',
         summary: 'Delete document recipient',
         tags: ['Document Recipients'],
       },
@@ -367,8 +367,8 @@ export const recipientRouter = router({
   deleteTemplateRecipient: authenticatedProcedure
     .meta({
       openapi: {
-        method: 'DELETE',
-        path: '/template/recipient/{recipientId}',
+        method: 'POST',
+        path: '/template/recipient/delete',
         summary: 'Delete template recipient',
         tags: ['Template Recipients'],
       },

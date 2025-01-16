@@ -1,11 +1,8 @@
 'use server';
 
-import type { z } from 'zod';
-
 import { isUserEnterprise } from '@documenso/ee/server-only/util/is-document-enterprise';
 import { prisma } from '@documenso/prisma';
 import type { DocumentVisibility, Template, TemplateMeta } from '@documenso/prisma/client';
-import { TemplateSchema } from '@documenso/prisma/generated/zod';
 
 import { AppError, AppErrorCode } from '../../errors/app-error';
 import type { TDocumentAccessAuthTypes, TDocumentActionAuthTypes } from '../../types/document-auth';
@@ -28,17 +25,13 @@ export type UpdateTemplateOptions = {
   meta?: Partial<Omit<TemplateMeta, 'id' | 'templateId'>>;
 };
 
-export const ZUpdateTemplateResponseSchema = TemplateSchema;
-
-export type TUpdateTemplateResponse = z.infer<typeof ZUpdateTemplateResponseSchema>;
-
 export const updateTemplate = async ({
   userId,
   teamId,
   templateId,
   meta = {},
   data = {},
-}: UpdateTemplateOptions): Promise<TUpdateTemplateResponse> => {
+}: UpdateTemplateOptions) => {
   const template = await prisma.template.findFirstOrThrow({
     where: {
       id: templateId,

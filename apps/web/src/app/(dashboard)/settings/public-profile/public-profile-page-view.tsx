@@ -5,7 +5,6 @@ import { useEffect, useMemo, useState } from 'react';
 import { Trans, msg } from '@lingui/macro';
 import { useLingui } from '@lingui/react';
 
-import type { FindTemplateRow } from '@documenso/lib/server-only/template/find-templates';
 import type {
   Team,
   TeamProfile,
@@ -15,6 +14,7 @@ import type {
 } from '@documenso/prisma/client';
 import { TemplateType } from '@documenso/prisma/client';
 import { trpc } from '@documenso/trpc/react';
+import type { FindTemplateRow } from '@documenso/trpc/server/template-router/schema';
 import { cn } from '@documenso/ui/lib/utils';
 import { Button } from '@documenso/ui/primitives/button';
 import { Switch } from '@documenso/ui/primitives/switch';
