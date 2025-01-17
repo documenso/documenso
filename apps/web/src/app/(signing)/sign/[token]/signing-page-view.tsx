@@ -31,6 +31,8 @@ import { AssistantDateField } from './assistant-date-field';
 import { AssistantEmailField } from './assistant-email-field';
 import { AssistantInitialsField } from './assistant-initials-field';
 import { AssistantNameField } from './assistant-name-field';
+import { AssistantNumberField } from './assistant-number-field';
+import { AssistantTextField } from './assistant-text-field';
 import { AutoSign } from './auto-sign';
 import { CheckboxField } from './checkbox-field';
 import { DateField } from './date-field';
@@ -252,6 +254,17 @@ export const SigningPageView = ({
                 ...field,
                 fieldMeta: field.fieldMeta ? ZTextFieldMeta.parse(field.fieldMeta) : null,
               };
+
+              if (recipient.role === RecipientRole.ASSISTANT) {
+                return (
+                  <AssistantTextField
+                    key={field.id}
+                    field={fieldWithMeta}
+                    selectedSigner={selectedSigner ?? null}
+                  />
+                );
+              }
+
               return <TextField key={field.id} field={fieldWithMeta} recipient={recipient} />;
             })
             .with(FieldType.NUMBER, () => {
@@ -259,6 +272,16 @@ export const SigningPageView = ({
                 ...field,
                 fieldMeta: field.fieldMeta ? ZNumberFieldMeta.parse(field.fieldMeta) : null,
               };
+
+              if (recipient.role === RecipientRole.ASSISTANT) {
+                return (
+                  <AssistantNumberField
+                    key={field.id}
+                    field={fieldWithMeta}
+                    selectedSigner={selectedSigner ?? null}
+                  />
+                );
+              }
               return <NumberField key={field.id} field={fieldWithMeta} recipient={recipient} />;
             })
             .with(FieldType.RADIO, () => {

@@ -11,10 +11,9 @@ import { Hash, Loader } from 'lucide-react';
 import { validateNumberField } from '@documenso/lib/advanced-fields-validation/validate-number';
 import { DO_NOT_INVALIDATE_QUERY_ON_MUTATION } from '@documenso/lib/constants/trpc';
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
-import type { TRecipientActionAuth } from '@documenso/lib/types/document-auth';
 import { ZNumberFieldMeta } from '@documenso/lib/types/field-meta';
-import type { Recipient } from '@documenso/prisma/client';
-import type { FieldWithSignature } from '@documenso/prisma/types/field-with-signature';
+import type { FieldWithSignatureAndFieldMeta } from '@documenso/prisma/types/field-with-signature-and-fieldmeta';
+import type { RecipientWithFields } from '@documenso/prisma/types/recipient-with-fields';
 import { trpc } from '@documenso/trpc/react';
 import type {
   TRemovedSignedFieldWithTokenMutationSchema,
@@ -26,7 +25,6 @@ import { Dialog, DialogContent, DialogFooter, DialogTitle } from '@documenso/ui/
 import { Input } from '@documenso/ui/primitives/input';
 import { useToast } from '@documenso/ui/primitives/use-toast';
 
-import { useRequiredDocumentAuthContext } from './document-auth-provider';
 import { SigningFieldContainer } from './signing-field-container';
 
 type ValidationErrors = {
@@ -37,27 +35,22 @@ type ValidationErrors = {
   numberFormat: string[];
 };
 
-export type NumberFieldProps = {
-  field: FieldWithSignature;
-  recipient: Recipient;
+export type AssistantNumberFieldProps = {
+  field: FieldWithSignatureAndFieldMeta;
   onSignField?: (value: TSignFieldWithTokenMutationSchema) => Promise<void> | void;
   onUnsignField?: (value: TRemovedSignedFieldWithTokenMutationSchema) => Promise<void> | void;
+  selectedSigner: RecipientWithFields | null;
 };
 
-export const NumberField = ({ field, recipient, onSignField, onUnsignField }: NumberFieldProps) => {
+export const AssistantNumberField = ({
+  field,
+  onSignField,
+  onUnsignField,
+  selectedSigner,
+}: AssistantNumberFieldProps) => {
   const { _ } = useLingui();
   const { toast } = useToast();
-
   const router = useRouter();
-  const [isPending, startTransition] = useTransition();
-  const [showNumberModal, setShowNumberModal] = useState(false);
-
-  const parsedFieldMeta = field.fieldMeta ? ZNumberFieldMeta.parse(field.fieldMeta) : null;
-  const isReadOnly = parsedFieldMeta?.readOnly;
-  const defaultValue = parsedFieldMeta?.value;
-  const [localNumber, setLocalNumber] = useState(
-    parsedFieldMeta?.value ? String(parsedFieldMeta.value) : '0',
-  );
 
   const initialErrors: ValidationErrors = {
     isNumber: [],
@@ -68,8 +61,14 @@ export const NumberField = ({ field, recipient, onSignField, onUnsignField }: Nu
   };
 
   const [errors, setErrors] = useState(initialErrors);
+  const [isPending, startTransition] = useTransition();
 
-  const { executeActionAuthProcedure } = useRequiredDocumentAuthContext();
+  const parsedFieldMeta = field.fieldMeta ? ZNumberFieldMeta.parse(field.fieldMeta) : null;
+
+  const [localNumber, setLocalNumber] = useState(
+    parsedFieldMeta?.value ? String(parsedFieldMeta.value) : '',
+  );
+  const [showNumberModal, setShowNumberModal] = useState(false);
 
   const { mutateAsync: signFieldWithToken, isLoading: isSignFieldWithTokenLoading } =
     trpc.field.signFieldWithToken.useMutation(DO_NOT_INVALIDATE_QUERY_ON_MUTATION);
@@ -104,26 +103,57 @@ export const NumberField = ({ field, recipient, onSignField, onUnsignField }: Nu
   };
 
   const onDialogSignClick = () => {
-    setShowNumberModal(false);
+    if (parsedFieldMeta) {
+      const validationErrors = validateNumberField(localNumber, parsedFieldMeta, true);
 
-    void executeActionAuthProcedure({
-      onReauthFormSubmit: async (authOptions) => await onSign(authOptions),
-      actionTarget: field.type,
-    });
+      if (validationErrors.length > 0) {
+        setErrors({
+          isNumber: validationErrors.filter((error) => error.includes('valid number')),
+          required: validationErrors.filter((error) => error.includes('required')),
+          minValue: validationErrors.filter((error) => error.includes('minimum value')),
+          maxValue: validationErrors.filter((error) => error.includes('maximum value')),
+          numberFormat: validationErrors.filter((error) => error.includes('number format')),
+        });
+        return;
+      }
+    }
+
+    setShowNumberModal(false);
+    void onSign();
   };
 
-  const onSign = async (authOptions?: TRecipientActionAuth) => {
+  const onPreSign = () => {
+    setShowNumberModal(true);
+
+    if (localNumber && parsedFieldMeta) {
+      const validationErrors = validateNumberField(localNumber, parsedFieldMeta, true);
+      setErrors({
+        isNumber: validationErrors.filter((error) => error.includes('valid number')),
+        required: validationErrors.filter((error) => error.includes('required')),
+        minValue: validationErrors.filter((error) => error.includes('minimum value')),
+        maxValue: validationErrors.filter((error) => error.includes('maximum value')),
+        numberFormat: validationErrors.filter((error) => error.includes('number format')),
+      });
+    }
+
+    return false;
+  };
+
+  const onSign = async () => {
     try {
-      if (!localNumber || Object.values(errors).some((error) => error.length > 0)) {
+      if (
+        !selectedSigner ||
+        !localNumber ||
+        Object.values(errors).some((error) => error.length > 0)
+      ) {
         return;
       }
 
       const payload: TSignFieldWithTokenMutationSchema = {
-        token: recipient.token,
+        token: selectedSigner.token,
         fieldId: field.id,
         value: localNumber,
         isBase64: true,
-        authOptions,
       };
 
       if (onSignField) {
@@ -147,33 +177,20 @@ export const NumberField = ({ field, recipient, onSignField, onUnsignField }: Nu
 
       toast({
         title: _(msg`Error`),
-        description: _(msg`An error occurred while signing the document.`),
+        description: _(msg`An error occurred while signing as assistant.`),
         variant: 'destructive',
       });
     }
   };
 
-  const onPreSign = () => {
-    setShowNumberModal(true);
-
-    if (localNumber && parsedFieldMeta) {
-      const validationErrors = validateNumberField(localNumber, parsedFieldMeta, true);
-      setErrors({
-        isNumber: validationErrors.filter((error) => error.includes('valid number')),
-        required: validationErrors.filter((error) => error.includes('required')),
-        minValue: validationErrors.filter((error) => error.includes('minimum value')),
-        maxValue: validationErrors.filter((error) => error.includes('maximum value')),
-        numberFormat: validationErrors.filter((error) => error.includes('number format')),
-      });
-    }
-
-    return false;
-  };
-
   const onRemove = async () => {
     try {
+      if (!selectedSigner) {
+        return;
+      }
+
       const payload: TRemovedSignedFieldWithTokenMutationSchema = {
-        token: recipient.token,
+        token: selectedSigner.token,
         fieldId: field.id,
       };
 
@@ -184,7 +201,7 @@ export const NumberField = ({ field, recipient, onSignField, onUnsignField }: Nu
 
       await removeSignedFieldWithToken(payload);
 
-      setLocalNumber(parsedFieldMeta?.value ? String(parsedFieldMeta?.value) : '');
+      setLocalNumber('');
 
       startTransition(() => router.refresh());
     } catch (err) {
@@ -192,7 +209,7 @@ export const NumberField = ({ field, recipient, onSignField, onUnsignField }: Nu
 
       toast({
         title: _(msg`Error`),
-        description: _(msg`An error occurred while removing the signature.`),
+        description: _(msg`An error occurred while removing the number.`),
         variant: 'destructive',
       });
     }
@@ -200,22 +217,12 @@ export const NumberField = ({ field, recipient, onSignField, onUnsignField }: Nu
 
   useEffect(() => {
     if (!showNumberModal) {
-      setLocalNumber(parsedFieldMeta?.value ? String(parsedFieldMeta.value) : '0');
+      setLocalNumber(parsedFieldMeta?.value ? String(parsedFieldMeta.value) : '');
       setErrors(initialErrors);
     }
   }, [showNumberModal]);
 
-  useEffect(() => {
-    if (
-      (!field.inserted && defaultValue && localNumber) ||
-      (!field.inserted && isReadOnly && defaultValue)
-    ) {
-      void executeActionAuthProcedure({
-        onReauthFormSubmit: async (authOptions) => await onSign(authOptions),
-        actionTarget: field.type,
-      });
-    }
-  }, []);
+  const userInputHasErrors = Object.values(errors).some((error) => error.length > 0);
 
   let fieldDisplayName = 'Number';
 
@@ -225,8 +232,6 @@ export const NumberField = ({ field, recipient, onSignField, onUnsignField }: Nu
         ? parsedFieldMeta.label.substring(0, 10) + '...'
         : parsedFieldMeta.label;
   }
-
-  const userInputHasErrors = Object.values(errors).some((error) => error.length > 0);
 
   return (
     <SigningFieldContainer
@@ -268,7 +273,7 @@ export const NumberField = ({ field, recipient, onSignField, onUnsignField }: Nu
       <Dialog open={showNumberModal} onOpenChange={setShowNumberModal}>
         <DialogContent>
           <DialogTitle>
-            {parsedFieldMeta?.label ? parsedFieldMeta?.label : <Trans>Number</Trans>}
+            {parsedFieldMeta?.label ? parsedFieldMeta?.label : <Trans>Number</Trans>}{' '}
           </DialogTitle>
 
           <div>
@@ -332,7 +337,7 @@ export const NumberField = ({ field, recipient, onSignField, onUnsignField }: Nu
                 type="button"
                 className="flex-1"
                 disabled={!localNumber || userInputHasErrors}
-                onClick={() => onDialogSignClick()}
+                onClick={onDialogSignClick}
               >
                 <Trans>Save</Trans>
               </Button>
