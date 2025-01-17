@@ -25,7 +25,7 @@ export const DataTableSenderFilter = ({ teamId }: DataTableSenderFilterProps) =>
 
   const senderIds = parseToIntegerArray(searchParams?.get('senderIds') ?? '');
 
-  const { data, isInitialLoading } = trpc.team.getTeamMembers.useQuery({
+  const { data, isLoading } = trpc.team.getTeamMembers.useQuery({
     teamId,
   });
 
@@ -61,7 +61,7 @@ export const DataTableSenderFilter = ({ teamId }: DataTableSenderFilterProps) =>
       }
       enableClearAllButton={true}
       inputPlaceholder={msg`Search`}
-      loading={!isMounted || isInitialLoading}
+      loading={!isMounted || isLoading}
       options={comboBoxOptions}
       selectedValues={senderIds}
       onChange={onChange}

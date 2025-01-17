@@ -32,7 +32,7 @@ export const DuplicateTemplateDialog = ({
   const { _ } = useLingui();
   const { toast } = useToast();
 
-  const { mutateAsync: duplicateTemplate, isLoading } =
+  const { mutateAsync: duplicateTemplate, isPending } =
     trpcReact.template.duplicateTemplate.useMutation({
       onSuccess: () => {
         router.refresh();
@@ -55,7 +55,7 @@ export const DuplicateTemplateDialog = ({
     });
 
   return (
-    <Dialog open={open} onOpenChange={(value) => !isLoading && onOpenChange(value)}>
+    <Dialog open={open} onOpenChange={(value) => !isPending && onOpenChange(value)}>
       <DialogContent>
         <DialogHeader>
           <DialogTitle>
@@ -70,7 +70,7 @@ export const DuplicateTemplateDialog = ({
         <DialogFooter>
           <Button
             type="button"
-            disabled={isLoading}
+            disabled={isPending}
             variant="secondary"
             onClick={() => onOpenChange(false)}
           >
@@ -79,7 +79,7 @@ export const DuplicateTemplateDialog = ({
 
           <Button
             type="button"
-            loading={isLoading}
+            loading={isPending}
             onClick={async () =>
               duplicateTemplate({
                 templateId: id,

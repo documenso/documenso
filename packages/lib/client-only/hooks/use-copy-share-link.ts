@@ -11,7 +11,7 @@ export type UseCopyShareLinkOptions = {
 export function useCopyShareLink({ onSuccess, onError }: UseCopyShareLinkOptions) {
   const [, copyToClipboard] = useCopyToClipboard();
 
-  const { mutateAsync: createOrGetShareLink, isLoading: isCreatingShareLink } =
+  const { mutateAsync: createOrGetShareLink, isPending: isCreatingShareLink } =
     trpc.shareLink.createOrGetShareLink.useMutation();
 
   /**

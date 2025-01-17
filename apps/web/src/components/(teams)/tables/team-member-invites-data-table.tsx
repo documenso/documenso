@@ -40,18 +40,17 @@ export const TeamMemberInvitesDataTable = ({ teamId }: TeamMemberInvitesDataTabl
 
   const parsedSearchParams = ZUrlSearchParamsSchema.parse(Object.fromEntries(searchParams ?? []));
 
-  const { data, isLoading, isInitialLoading, isLoadingError } =
-    trpc.team.findTeamMemberInvites.useQuery(
-      {
-        teamId,
-        query: parsedSearchParams.query,
-        page: parsedSearchParams.page,
-        perPage: parsedSearchParams.perPage,
-      },
-      {
-        keepPreviousData: true,
-      },
-    );
+  const { data, isLoading, isLoadingError } = trpc.team.findTeamMemberInvites.useQuery(
+    {
+      teamId,
+      query: parsedSearchParams.query,
+      page: parsedSearchParams.page,
+      perPage: parsedSearchParams.perPage,
+    },
+    {
+      placeholderData: (previousData) => previousData,
+    },
+  );
 
   const { mutateAsync: resendTeamMemberInvitation } =
     trpc.team.resendTeamMemberInvitation.useMutation({
@@ -182,7 +181,7 @@ export const TeamMemberInvitesDataTable = ({ teamId }: TeamMemberInvitesDataTabl
         enable: isLoadingError,
       }}
       skeleton={{
-        enable: isLoading && isInitialLoading,
+        enable: isLoading,
         rows: 3,
         component: (
           <>

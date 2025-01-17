@@ -25,7 +25,7 @@ export const TeamEmailDropdown = ({ team }: TeamsSettingsPageProps) => {
   const { _ } = useLingui();
   const { toast } = useToast();
 
-  const { mutateAsync: resendEmailVerification, isLoading: isResendingEmailVerification } =
+  const { mutateAsync: resendEmailVerification, isPending: isResendingEmailVerification } =
     trpc.team.resendTeamEmailVerification.useMutation({
       onSuccess: () => {
         toast({

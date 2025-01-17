@@ -1,7 +1,4 @@
-import type { NextApiRequest, NextApiResponse } from 'next';
-
-import { createOpenApiNextHandler } from 'trpc-openapi';
-import type { CreateOpenApiNextHandlerOptions } from 'trpc-openapi/dist/adapters/next';
+import { createOpenApiNextHandler } from 'trpc-to-openapi';
 
 import {
   AppError,
@@ -9,7 +6,6 @@ import {
   genericErrorCodeToTrpcErrorCodeMap,
 } from '@documenso/lib/errors/app-error';
 import { buildLogger } from '@documenso/lib/utils/logger';
-import type { TRPCError } from '@documenso/trpc/server';
 import { createTrpcContext } from '@documenso/trpc/server/context';
 import { appRouter } from '@documenso/trpc/server/router';
 
@@ -17,9 +13,8 @@ const logger = buildLogger();
 
 export default createOpenApiNextHandler<typeof appRouter>({
   router: appRouter,
-  createContext: async ({ req, res }: { req: NextApiRequest; res: NextApiResponse }) =>
-    createTrpcContext({ req, res, requestSource: 'apiV2' }),
-  onError: ({ error, path }: { error: TRPCError; path?: string }) => {
+  createContext: async ({ req, res }) => createTrpcContext({ req, res, requestSource: 'apiV2' }),
+  onError: ({ error, path }) => {
     // Always log the error for now.
     console.error(error.message);
 
@@ -47,7 +42,7 @@ export default createOpenApiNextHandler<typeof appRouter>({
     }
   },
   // Not sure why we need to do this since we handle it in errorFormatter which runs after this.
-  responseMeta: (opts: CreateOpenApiNextHandlerOptions<typeof appRouter>['responseMeta']) => {
+  responseMeta: (opts) => {
     if (opts.errors[0]?.cause instanceof AppError) {
       const appError = AppError.parseError(opts.errors[0].cause);
 
@@ -57,6 +52,8 @@ export default createOpenApiNextHandler<typeof appRouter>({
         status: httpStatus,
       };
     }
+
+    return {};
   },
 });
 
