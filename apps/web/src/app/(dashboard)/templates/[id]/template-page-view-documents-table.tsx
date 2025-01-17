@@ -69,20 +69,19 @@ export const TemplatePageViewDocumentsTable = ({
     Object.fromEntries(searchParams ?? []),
   );
 
-  const { data, isLoading, isInitialLoading, isLoadingError } =
-    trpc.document.findDocuments.useQuery(
-      {
-        templateId,
-        page: parsedSearchParams.page,
-        perPage: parsedSearchParams.perPage,
-        query: parsedSearchParams.query,
-        source: parsedSearchParams.source,
-        status: parsedSearchParams.status,
-      },
-      {
-        keepPreviousData: true,
-      },
-    );
+  const { data, isLoading, isLoadingError } = trpc.document.findDocuments.useQuery(
+    {
+      templateId,
+      page: parsedSearchParams.page,
+      perPage: parsedSearchParams.perPage,
+      query: parsedSearchParams.query,
+      source: parsedSearchParams.source,
+      status: parsedSearchParams.status,
+    },
+    {
+      placeholderData: (previousData) => previousData,
+    },
+  );
 
   const onPaginationChange = (page: number, perPage: number) => {
     updateSearchParams({
@@ -241,7 +240,7 @@ export const TemplatePageViewDocumentsTable = ({
           enable: isLoadingError,
         }}
         skeleton={{
-          enable: isLoading && isInitialLoading,
+          enable: isLoading,
           rows: 3,
           component: (
             <>

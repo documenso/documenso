@@ -39,10 +39,10 @@ export const PublicTemplatesDataTable = () => {
     templateId: number;
   } | null>(null);
 
-  const { data, isInitialLoading, isLoadingError, refetch } = trpc.template.findTemplates.useQuery(
+  const { data, isLoading, isLoadingError, refetch } = trpc.template.findTemplates.useQuery(
     {},
     {
-      keepPreviousData: true,
+      placeholderData: (previousData) => previousData,
     },
   );
 
@@ -80,7 +80,7 @@ export const PublicTemplatesDataTable = () => {
         {/* Loading and error handling states. */}
         {publicDirectTemplates.length === 0 && (
           <>
-            {isInitialLoading &&
+            {isLoading &&
               Array(3)
                 .fill(0)
                 .map((_, index) => (
@@ -115,7 +115,7 @@ export const PublicTemplatesDataTable = () => {
               </div>
             )}
 
-            {!isInitialLoading && (
+            {!isLoading && (
               <div className="text-muted-foreground flex h-32 flex-col items-center justify-center text-sm">
                 <Trans>No public profile templates found</Trans>
                 <ManagePublicTemplateDialog

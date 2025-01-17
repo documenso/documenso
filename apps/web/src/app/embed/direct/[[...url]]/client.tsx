@@ -100,7 +100,7 @@ export const EmbedDirectTemplateClientPage = ({
 
   const hasSignatureField = localFields.some((field) => field.type === FieldType.SIGNATURE);
 
-  const { mutateAsync: createDocumentFromDirectTemplate, isLoading: isSubmitting } =
+  const { mutateAsync: createDocumentFromDirectTemplate, isPending: isSubmitting } =
     trpc.template.createDocumentFromDirectTemplate.useMutation();
 
   const onSignField = (payload: TSignFieldWithTokenMutationSchema) => {

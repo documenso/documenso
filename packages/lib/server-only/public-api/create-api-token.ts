@@ -6,6 +6,7 @@ import { TeamMemberRole } from '@documenso/prisma/client';
 
 // temporary choice for testing only
 import * as timeConstants from '../../constants/time';
+import { AppError, AppErrorCode } from '../../errors/app-error';
 import { alphaid } from '../../universal/id';
 import { hashString } from '../auth/hash';
 
@@ -42,7 +43,9 @@ export const createApiToken = async ({
     });
 
     if (!member) {
-      throw new Error('You do not have permission to create a token for this team');
+      throw new AppError(AppErrorCode.UNAUTHORIZED, {
+        message: 'You do not have permission to create a token for this team',
+      });
     }
   }
 
@@ -55,10 +58,6 @@ export const createApiToken = async ({
       teamId,
     },
   });
-
-  if (!storedToken) {
-    throw new Error('Failed to create the API token');
-  }
 
   return {
     id: storedToken.id,

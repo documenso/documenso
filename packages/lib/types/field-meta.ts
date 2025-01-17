@@ -120,12 +120,11 @@ export type TFieldMetaSchema = z.infer<typeof ZFieldMetaSchema>;
 export const ZFieldAndMetaSchema = z.discriminatedUnion('type', [
   z.object({
     type: z.literal(FieldType.SIGNATURE),
-    // Do not use z.undefined(), or void since this will create an invalid schema for Speakeasy SDK generation.
-    fieldMeta: z.literal(undefined),
+    fieldMeta: z.undefined(),
   }),
   z.object({
     type: z.literal(FieldType.FREE_SIGNATURE),
-    fieldMeta: z.literal(undefined), // Same as above.
+    fieldMeta: z.undefined(),
   }),
   z.object({
     type: z.literal(FieldType.INITIALS),

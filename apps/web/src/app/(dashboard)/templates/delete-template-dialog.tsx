@@ -28,7 +28,7 @@ export const DeleteTemplateDialog = ({ id, open, onOpenChange }: DeleteTemplateD
   const { _ } = useLingui();
   const { toast } = useToast();
 
-  const { mutateAsync: deleteTemplate, isLoading } = trpcReact.template.deleteTemplate.useMutation({
+  const { mutateAsync: deleteTemplate, isPending } = trpcReact.template.deleteTemplate.useMutation({
     onSuccess: () => {
       router.refresh();
 
@@ -51,7 +51,7 @@ export const DeleteTemplateDialog = ({ id, open, onOpenChange }: DeleteTemplateD
   });
 
   return (
-    <Dialog open={open} onOpenChange={(value) => !isLoading && onOpenChange(value)}>
+    <Dialog open={open} onOpenChange={(value) => !isPending && onOpenChange(value)}>
       <DialogContent>
         <DialogHeader>
           <DialogTitle>
@@ -70,7 +70,7 @@ export const DeleteTemplateDialog = ({ id, open, onOpenChange }: DeleteTemplateD
           <Button
             type="button"
             variant="secondary"
-            disabled={isLoading}
+            disabled={isPending}
             onClick={() => onOpenChange(false)}
           >
             <Trans>Cancel</Trans>
@@ -79,7 +79,7 @@ export const DeleteTemplateDialog = ({ id, open, onOpenChange }: DeleteTemplateD
           <Button
             type="button"
             variant="destructive"
-            loading={isLoading}
+            loading={isPending}
             onClick={async () => deleteTemplate({ templateId: id })}
           >
             <Trans>Delete</Trans>

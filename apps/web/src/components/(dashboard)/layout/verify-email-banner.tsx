@@ -31,7 +31,7 @@ export const VerifyEmailBanner = ({ email }: VerifyEmailBannerProps) => {
 
   const [isButtonDisabled, setIsButtonDisabled] = useState(false);
 
-  const { mutateAsync: sendConfirmationEmail, isLoading } =
+  const { mutateAsync: sendConfirmationEmail, isPending } =
     trpc.profile.sendConfirmationEmail.useMutation();
 
   const onResendConfirmationEmail = async () => {
@@ -122,10 +122,10 @@ export const VerifyEmailBanner = ({ email }: VerifyEmailBannerProps) => {
           <div>
             <Button
               disabled={isButtonDisabled}
-              loading={isLoading}
+              loading={isPending}
               onClick={onResendConfirmationEmail}
             >
-              {isLoading ? <Trans>Sending...</Trans> : <Trans>Resend Confirmation Email</Trans>}
+              {isPending ? <Trans>Sending...</Trans> : <Trans>Resend Confirmation Email</Trans>}
             </Button>
           </div>
         </DialogContent>

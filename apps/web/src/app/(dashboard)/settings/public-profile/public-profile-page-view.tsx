@@ -63,10 +63,10 @@ export const PublicProfilePageView = ({ user, team, profile }: PublicProfilePage
     perPage: 100,
   });
 
-  const { mutateAsync: updateUserProfile, isLoading: isUpdatingUserProfile } =
+  const { mutateAsync: updateUserProfile, isPending: isUpdatingUserProfile } =
     trpc.profile.updatePublicProfile.useMutation();
 
-  const { mutateAsync: updateTeamProfile, isLoading: isUpdatingTeamProfile } =
+  const { mutateAsync: updateTeamProfile, isPending: isUpdatingTeamProfile } =
     trpc.team.updateTeamPublicProfile.useMutation();
 
   const isUpdating = isUpdatingUserProfile || isUpdatingTeamProfile;

@@ -9,7 +9,6 @@ import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 
 import type { User } from '@documenso/prisma/client';
-import { TRPCClientError } from '@documenso/trpc/client';
 import { trpc } from '@documenso/trpc/react';
 import { cn } from '@documenso/ui/lib/utils';
 import { Button } from '@documenso/ui/primitives/button';
@@ -76,21 +75,13 @@ export const ProfileForm = ({ className, user }: ProfileFormProps) => {
 
       router.refresh();
     } catch (err) {
-      if (err instanceof TRPCClientError && err.data?.code === 'BAD_REQUEST') {
-        toast({
-          title: _(msg`An error occurred`),
-          description: err.message,
-          variant: 'destructive',
-        });
-      } else {
-        toast({
-          title: _(msg`An unknown error occurred`),
-          description: _(
-            msg`We encountered an unknown error while attempting to sign you In. Please try again later.`,
-          ),
-          variant: 'destructive',
-        });
-      }
+      toast({
+        title: _(msg`An unknown error occurred`),
+        description: _(
+          msg`We encountered an unknown error while attempting update your profile. Please try again later.`,
+        ),
+        variant: 'destructive',
+      });
     }
   };
 

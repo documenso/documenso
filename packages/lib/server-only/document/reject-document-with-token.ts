@@ -1,10 +1,10 @@
 import { SigningStatus } from '@prisma/client';
-import { TRPCError } from '@trpc/server';
 
 import { jobs } from '@documenso/lib/jobs/client';
 import { prisma } from '@documenso/prisma';
 import { WebhookTriggerEvents } from '@documenso/prisma/client';
 
+import { AppError, AppErrorCode } from '../../errors/app-error';
 import { DOCUMENT_AUDIT_LOG_TYPE } from '../../types/document-audit-logs';
 import {
   ZWebhookDocumentSchema,
@@ -47,8 +47,7 @@ export async function rejectDocumentWithToken({
   const document = recipient?.document;
 
   if (!recipient || !document) {
-    throw new TRPCError({
-      code: 'NOT_FOUND',
+    throw new AppError(AppErrorCode.NOT_FOUND, {
       message: 'Document or recipient not found',
     });
   }

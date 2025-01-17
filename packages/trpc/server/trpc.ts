@@ -1,6 +1,6 @@
 import { TRPCError, initTRPC } from '@trpc/server';
 import SuperJSON from 'superjson';
-import type { OpenApiMeta } from 'trpc-openapi';
+import type { AnyZodObject } from 'zod';
 
 import { AppError, genericErrorCodeToTrpcErrorCodeMap } from '@documenso/lib/errors/app-error';
 import { isAdmin } from '@documenso/lib/next-auth/guards/is-admin';
@@ -9,6 +9,26 @@ import type { ApiRequestMetadata } from '@documenso/lib/universal/extract-reques
 import { extractNextApiRequestMetadata } from '@documenso/lib/universal/extract-request-metadata';
 
 import type { TrpcContext } from './context';
+
+// Can't import type from trpc-to-openapi because it breaks nextjs build, not sure why.
+type OpenApiMeta = {
+  openapi?: {
+    enabled?: boolean;
+    method: 'GET' | 'POST' | 'PATCH' | 'PUT' | 'DELETE';
+    path: `/${string}`;
+    summary?: string;
+    description?: string;
+    protect?: boolean;
+    tags?: string[];
+    // eslint-disable-next-line @typescript-eslint/ban-types
+    contentTypes?: ('application/json' | 'application/x-www-form-urlencoded' | (string & {}))[];
+    deprecated?: boolean;
+    requestHeaders?: AnyZodObject;
+    responseHeaders?: AnyZodObject;
+    successDescription?: string;
+    errorResponses?: number[] | Record<number, string>;
+  };
+} & Record<string, unknown>;
 
 const t = initTRPC
   .meta<OpenApiMeta>()

@@ -83,7 +83,7 @@ export const TemplateDirectLinkDialog = ({
 
   const {
     mutateAsync: createTemplateDirectLink,
-    isLoading: isCreatingTemplateDirectLink,
+    isPending: isCreatingTemplateDirectLink,
     reset: resetCreateTemplateDirectLink,
   } = trpcReact.template.createTemplateDirectLink.useMutation({
     onSuccess: (data) => {
@@ -104,7 +104,7 @@ export const TemplateDirectLinkDialog = ({
     },
   });
 
-  const { mutateAsync: toggleTemplateDirectLink, isLoading: isTogglingTemplateAccess } =
+  const { mutateAsync: toggleTemplateDirectLink, isPending: isTogglingTemplateAccess } =
     trpcReact.template.toggleTemplateDirectLink.useMutation({
       onSuccess: (data) => {
         const enabledDescription = msg`Direct link signing has been enabled`;
@@ -127,7 +127,7 @@ export const TemplateDirectLinkDialog = ({
       },
     });
 
-  const { mutateAsync: deleteTemplateDirectLink, isLoading: isDeletingTemplateDirectLink } =
+  const { mutateAsync: deleteTemplateDirectLink, isPending: isDeletingTemplateDirectLink } =
     trpcReact.template.deleteTemplateDirectLink.useMutation({
       onSuccess: () => {
         onOpenChange(false);

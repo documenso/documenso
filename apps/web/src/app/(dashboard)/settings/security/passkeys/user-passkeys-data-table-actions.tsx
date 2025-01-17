@@ -60,7 +60,7 @@ export const UserPasskeysDataTableActions = ({
     },
   });
 
-  const { mutateAsync: updatePasskey, isLoading: isUpdatingPasskey } =
+  const { mutateAsync: updatePasskey, isPending: isUpdatingPasskey } =
     trpc.auth.updatePasskey.useMutation({
       onSuccess: () => {
         toast({
@@ -80,7 +80,7 @@ export const UserPasskeysDataTableActions = ({
       },
     });
 
-  const { mutateAsync: deletePasskey, isLoading: isDeletingPasskey } =
+  const { mutateAsync: deletePasskey, isPending: isDeletingPasskey } =
     trpc.auth.deletePasskey.useMutation({
       onSuccess: () => {
         toast({

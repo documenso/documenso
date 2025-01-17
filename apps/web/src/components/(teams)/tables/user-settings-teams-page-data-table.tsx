@@ -32,7 +32,7 @@ export const UserSettingsTeamsPageDataTable = () => {
   const { data } = trpc.team.findTeamsPending.useQuery(
     {},
     {
-      keepPreviousData: true,
+      placeholderData: (previousData) => previousData,
     },
   );
 
