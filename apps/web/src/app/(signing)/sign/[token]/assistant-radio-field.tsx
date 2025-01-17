@@ -10,10 +10,9 @@ import { Loader } from 'lucide-react';
 
 import { DO_NOT_INVALIDATE_QUERY_ON_MUTATION } from '@documenso/lib/constants/trpc';
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
-import type { TRecipientActionAuth } from '@documenso/lib/types/document-auth';
 import { ZRadioFieldMeta } from '@documenso/lib/types/field-meta';
-import type { Recipient } from '@documenso/prisma/client';
 import type { FieldWithSignatureAndFieldMeta } from '@documenso/prisma/types/field-with-signature-and-fieldmeta';
+import type { RecipientWithFields } from '@documenso/prisma/types/recipient-with-fields';
 import { trpc } from '@documenso/trpc/react';
 import type {
   TRemovedSignedFieldWithTokenMutationSchema,
@@ -23,17 +22,21 @@ import { Label } from '@documenso/ui/primitives/label';
 import { RadioGroup, RadioGroupItem } from '@documenso/ui/primitives/radio-group';
 import { useToast } from '@documenso/ui/primitives/use-toast';
 
-import { useRequiredDocumentAuthContext } from './document-auth-provider';
 import { SigningFieldContainer } from './signing-field-container';
 
-export type RadioFieldProps = {
+export type AssistantRadioFieldProps = {
   field: FieldWithSignatureAndFieldMeta;
-  recipient: Recipient;
   onSignField?: (value: TSignFieldWithTokenMutationSchema) => Promise<void> | void;
   onUnsignField?: (value: TRemovedSignedFieldWithTokenMutationSchema) => Promise<void> | void;
+  selectedSigner: RecipientWithFields | null;
 };
 
-export const RadioField = ({ field, recipient, onSignField, onUnsignField }: RadioFieldProps) => {
+export const AssistantRadioField = ({
+  field,
+  onSignField,
+  onUnsignField,
+  selectedSigner,
+}: AssistantRadioFieldProps) => {
   const { _ } = useLingui();
   const { toast } = useToast();
 
@@ -50,8 +53,6 @@ export const RadioField = ({ field, recipient, onSignField, onUnsignField }: Rad
 
   const [selectedOption, setSelectedOption] = useState(defaultValue);
 
-  const { executeActionAuthProcedure } = useRequiredDocumentAuthContext();
-
   const { mutateAsync: signFieldWithToken, isLoading: isSignFieldWithTokenLoading } =
     trpc.field.signFieldWithToken.useMutation(DO_NOT_INVALIDATE_QUERY_ON_MUTATION);
 
@@ -62,22 +63,19 @@ export const RadioField = ({ field, recipient, onSignField, onUnsignField }: Rad
 
   const isLoading = isSignFieldWithTokenLoading || isRemoveSignedFieldWithTokenLoading || isPending;
   const shouldAutoSignField =
-    (!field.inserted && selectedOption) ||
-    (!field.inserted && defaultValue) ||
-    (!field.inserted && parsedFieldMeta.readOnly && defaultValue);
+    (!field.inserted && selectedOption) || (!field.inserted && defaultValue);
 
-  const onSign = async (authOptions?: TRecipientActionAuth) => {
+  const onSign = async () => {
     try {
-      if (!selectedOption) {
+      if (!selectedSigner || !selectedOption) {
         return;
       }
 
       const payload: TSignFieldWithTokenMutationSchema = {
-        token: recipient.token,
+        token: selectedSigner.token,
         fieldId: field.id,
         value: selectedOption,
         isBase64: true,
-        authOptions,
       };
 
       if (onSignField) {
@@ -86,7 +84,6 @@ export const RadioField = ({ field, recipient, onSignField, onUnsignField }: Rad
         await signFieldWithToken(payload);
       }
 
-      setSelectedOption('');
       startTransition(() => router.refresh());
     } catch (err) {
       const error = AppError.parseError(err);
@@ -99,7 +96,7 @@ export const RadioField = ({ field, recipient, onSignField, onUnsignField }: Rad
 
       toast({
         title: _(msg`Error`),
-        description: _(msg`An error occurred while signing the document.`),
+        description: _(msg`An error occurred while signing as assistant.`),
         variant: 'destructive',
       });
     }
@@ -107,8 +104,12 @@ export const RadioField = ({ field, recipient, onSignField, onUnsignField }: Rad
 
   const onRemove = async () => {
     try {
+      if (!selectedSigner) {
+        return;
+      }
+
       const payload: TRemovedSignedFieldWithTokenMutationSchema = {
-        token: recipient.token,
+        token: selectedSigner.token,
         fieldId: field.id,
       };
 
@@ -132,18 +133,15 @@ export const RadioField = ({ field, recipient, onSignField, onUnsignField }: Rad
     }
   };
 
-  const handleSelectItem = (selectedOption: string) => {
-    setSelectedOption(selectedOption);
+  const handleSelectItem = (selectedValue: string) => {
+    setSelectedOption(selectedValue);
   };
 
   useEffect(() => {
     if (shouldAutoSignField) {
-      void executeActionAuthProcedure({
-        onReauthFormSubmit: async (authOptions) => await onSign(authOptions),
-        actionTarget: field.type,
-      });
+      void onSign();
     }
-  }, [selectedOption, field]);
+  }, [selectedOption]);
 
   return (
     <SigningFieldContainer field={field} onSign={onSign} onRemove={onRemove} type="Radio">
@@ -154,7 +152,7 @@ export const RadioField = ({ field, recipient, onSignField, onUnsignField }: Rad
       )}
 
       {!field.inserted && (
-        <RadioGroup onValueChange={(value) => handleSelectItem(value)} className="z-10">
+        <RadioGroup value={selectedOption} onValueChange={handleSelectItem} className="z-10">
           {values?.map((item, index) => (
             <div key={index} className="flex items-center gap-x-1.5">
               <RadioGroupItem

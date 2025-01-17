@@ -27,11 +27,14 @@ import { LazyPDFViewer } from '@documenso/ui/primitives/lazy-pdf-viewer';
 
 import { DocumentReadOnlyFields } from '~/components/document/document-read-only-fields';
 
+import { AssistantCheckboxField } from './assistant-checkbox-field';
 import { AssistantDateField } from './assistant-date-field';
+import { AssistantDropdownField } from './assistant-dropdown-field';
 import { AssistantEmailField } from './assistant-email-field';
 import { AssistantInitialsField } from './assistant-initials-field';
 import { AssistantNameField } from './assistant-name-field';
 import { AssistantNumberField } from './assistant-number-field';
+import { AssistantRadioField } from './assistant-radio-field';
 import { AssistantTextField } from './assistant-text-field';
 import { AutoSign } from './auto-sign';
 import { CheckboxField } from './checkbox-field';
@@ -170,7 +173,6 @@ export const SigningPageView = ({
 
       <DocumentReadOnlyFields fields={completedFields} />
 
-      {/* TODO: disable autosign for assistants */}
       <AutoSign recipient={recipient} fields={fields} />
 
       <ElementVisible target={PDF_VIEWER_PAGE_SELECTOR}>
@@ -289,6 +291,17 @@ export const SigningPageView = ({
                 ...field,
                 fieldMeta: field.fieldMeta ? ZRadioFieldMeta.parse(field.fieldMeta) : null,
               };
+
+              if (recipient.role === RecipientRole.ASSISTANT) {
+                return (
+                  <AssistantRadioField
+                    key={field.id}
+                    field={fieldWithMeta}
+                    selectedSigner={selectedSigner ?? null}
+                  />
+                );
+              }
+
               return <RadioField key={field.id} field={fieldWithMeta} recipient={recipient} />;
             })
             .with(FieldType.CHECKBOX, () => {
@@ -296,6 +309,17 @@ export const SigningPageView = ({
                 ...field,
                 fieldMeta: field.fieldMeta ? ZCheckboxFieldMeta.parse(field.fieldMeta) : null,
               };
+
+              if (recipient.role === RecipientRole.ASSISTANT) {
+                return (
+                  <AssistantCheckboxField
+                    key={field.id}
+                    field={fieldWithMeta}
+                    selectedSigner={selectedSigner ?? null}
+                  />
+                );
+              }
+
               return <CheckboxField key={field.id} field={fieldWithMeta} recipient={recipient} />;
             })
             .with(FieldType.DROPDOWN, () => {
@@ -303,6 +327,17 @@ export const SigningPageView = ({
                 ...field,
                 fieldMeta: field.fieldMeta ? ZDropdownFieldMeta.parse(field.fieldMeta) : null,
               };
+
+              if (recipient.role === RecipientRole.ASSISTANT) {
+                return (
+                  <AssistantDropdownField
+                    key={field.id}
+                    field={fieldWithMeta}
+                    selectedSigner={selectedSigner ?? null}
+                  />
+                );
+              }
+
               return <DropdownField key={field.id} field={fieldWithMeta} recipient={recipient} />;
             })
             .otherwise(() => null),
