@@ -61,6 +61,7 @@ export const SigningForm = ({
 
   const [validateUninsertedFields, setValidateUninsertedFields] = useState(false);
   const [isConfirmationDialogOpen, setIsConfirmationDialogOpen] = useState(false);
+  const [isAssistantSubmitting, setIsAssistantSubmitting] = useState(false);
 
   const { mutateAsync: completeDocumentWithToken } =
     trpc.recipient.completeDocumentWithToken.useMutation();
@@ -74,7 +75,6 @@ export const SigningForm = ({
 
   // Keep the loading state going if successful since the redirect may take some time.
   const isSubmitting = formState.isSubmitting || formState.isSubmitSuccessful;
-  const isAssistantSubmitting = assistantForm.formState.isSubmitting;
 
   const fieldsRequiringValidation = useMemo(
     () => fields.filter(isFieldUnsignedAndRequired),
@@ -119,6 +119,7 @@ export const SigningForm = ({
   };
 
   const handleAssistantConfirmDialogSubmit = async () => {
+    setIsAssistantSubmitting(true);
     try {
       await completeDocument();
     } catch (err) {
@@ -128,6 +129,7 @@ export const SigningForm = ({
         variant: 'destructive',
       });
     } finally {
+      setIsAssistantSubmitting(false);
       setIsConfirmationDialogOpen(false);
     }
   };
@@ -287,7 +289,7 @@ export const SigningForm = ({
                 <AssistantConfirmationDialog
                   hasUninsertedFields={uninsertedFields.length > 0}
                   isOpen={isConfirmationDialogOpen}
-                  onClose={() => setIsConfirmationDialogOpen(false)}
+                  onClose={() => !isAssistantSubmitting && setIsConfirmationDialogOpen(false)}
                   onConfirm={handleAssistantConfirmDialogSubmit}
                   isSubmitting={isAssistantSubmitting}
                 />

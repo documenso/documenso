@@ -25,18 +25,18 @@ export function AssistantConfirmationDialog({
 }: ConfirmationDialogProps) {
   const title = hasUninsertedFields ? 'Warning' : 'Confirm Submission';
   const description = hasUninsertedFields
-    ? 'You haven’t filled some of the fields for the signer roles, are you sure you want to proceed?'
-    : 'Are you sure you want to submit the assistant’s form? This action cannot be undone.';
+    ? "You haven't filled some of the fields for the signer roles, are you sure you want to proceed?"
+    : "Are you sure you want to submit the assistant's form? This action cannot be undone.";
 
   return (
-    <Dialog open={isOpen} onOpenChange={onClose}>
+    <Dialog open={isOpen} onOpenChange={isSubmitting ? () => {} : onClose}>
       <DialogContent>
         <DialogHeader>
           <DialogTitle>{title}</DialogTitle>
           <DialogDescription>{description}</DialogDescription>
         </DialogHeader>
         <DialogFooter>
-          <Button variant="secondary" onClick={onClose}>
+          <Button variant="secondary" onClick={onClose} disabled={isSubmitting}>
             Cancel
           </Button>
           <Button
