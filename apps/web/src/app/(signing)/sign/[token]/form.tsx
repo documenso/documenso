@@ -25,6 +25,7 @@ import { Input } from '@documenso/ui/primitives/input';
 import { Label } from '@documenso/ui/primitives/label';
 import { RadioGroup, RadioGroupItem } from '@documenso/ui/primitives/radio-group';
 import { SignaturePad } from '@documenso/ui/primitives/signature-pad';
+import { useToast } from '@documenso/ui/primitives/use-toast';
 
 import { useRequiredSigningContext } from './provider';
 import { SignDialog } from './sign-dialog';
@@ -52,6 +53,7 @@ export const SigningForm = ({
   const analytics = useAnalytics();
   const { data: session } = useSession();
   const assistantSignersId = useId();
+  const { toast } = useToast();
 
   const { fullName, signature, setFullName, setSignature, signatureValid, setSignatureValid } =
     useRequiredSigningContext();
@@ -70,6 +72,8 @@ export const SigningForm = ({
 
   // Keep the loading state going if successful since the redirect may take some time.
   const isSubmitting = formState.isSubmitting || formState.isSubmitSuccessful;
+  const isAssistantSubmitting =
+    assistantForm.formState.isSubmitting || assistantForm.formState.isSubmitSuccessful;
 
   const fieldsRequiringValidation = useMemo(
     () => fields.filter(isFieldUnsignedAndRequired),
@@ -109,11 +113,16 @@ export const SigningForm = ({
     // });
   };
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const onAssistantFormSubmit = (data: any) => {
-    console.log('assistant form submit');
-
-    console.log(data);
+  const onAssistantFormSubmit = async () => {
+    try {
+      await completeDocument();
+    } catch (err) {
+      toast({
+        title: 'Error',
+        description: 'An error occurred while completing the document. Please try again.',
+        variant: 'destructive',
+      });
+    }
   };
 
   const completeDocument = async (authOptions?: TRecipientActionAuth) => {
@@ -257,8 +266,14 @@ export const SigningForm = ({
                 </fieldset>
 
                 <div className="mt-6 flex flex-col gap-4 md:flex-row">
-                  <Button type="submit" className="w-full" size="lg" disabled={isSubmitting}>
-                    {isSubmitting ? <Trans>Submitting...</Trans> : <Trans>Continue</Trans>}
+                  <Button
+                    type="submit"
+                    className="w-full"
+                    size="lg"
+                    loading={isAssistantSubmitting}
+                    disabled={isAssistantSubmitting}
+                  >
+                    {isAssistantSubmitting ? <Trans>Submitting...</Trans> : <Trans>Continue</Trans>}
                   </Button>
                 </div>
               </form>

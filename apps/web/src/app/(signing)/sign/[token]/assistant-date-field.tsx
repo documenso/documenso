@@ -147,8 +147,8 @@ export const AssistantDateField = ({
       )}
 
       {!field.inserted && (
-        <p className="text-muted-foreground text-[clamp(0.425rem,25cqw,0.825rem)]">
-          <Trans>Fill date for: {selectedSigner?.name}</Trans>
+        <p className="group-hover:text-primary text-muted-foreground text-[clamp(0.425rem,25cqw,0.825rem)] duration-200 group-hover:text-yellow-300">
+          <Trans>Date</Trans>
         </p>
       )}
 

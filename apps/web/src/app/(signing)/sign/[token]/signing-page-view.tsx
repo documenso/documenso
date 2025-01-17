@@ -173,7 +173,9 @@ export const SigningPageView = ({
 
       <DocumentReadOnlyFields fields={completedFields} />
 
-      <AutoSign recipient={recipient} fields={fields} />
+      {recipient.role !== RecipientRole.ASSISTANT && (
+        <AutoSign recipient={recipient} fields={fields} />
+      )}
 
       {recipient.role === RecipientRole.ASSISTANT ? (
         <ElementVisible target={PDF_VIEWER_PAGE_SELECTOR}>
