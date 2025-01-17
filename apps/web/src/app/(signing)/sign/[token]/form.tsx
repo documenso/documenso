@@ -27,6 +27,7 @@ import { RadioGroup, RadioGroupItem } from '@documenso/ui/primitives/radio-group
 import { SignaturePad } from '@documenso/ui/primitives/signature-pad';
 import { useToast } from '@documenso/ui/primitives/use-toast';
 
+import { AssistantConfirmationDialog } from './assistant-confirmation-dialog';
 import { useRequiredSigningContext } from './provider';
 import { SignDialog } from './sign-dialog';
 
@@ -59,6 +60,7 @@ export const SigningForm = ({
     useRequiredSigningContext();
 
   const [validateUninsertedFields, setValidateUninsertedFields] = useState(false);
+  const [isConfirmationDialogOpen, setIsConfirmationDialogOpen] = useState(false);
 
   const { mutateAsync: completeDocumentWithToken } =
     trpc.recipient.completeDocumentWithToken.useMutation();
@@ -72,8 +74,7 @@ export const SigningForm = ({
 
   // Keep the loading state going if successful since the redirect may take some time.
   const isSubmitting = formState.isSubmitting || formState.isSubmitSuccessful;
-  const isAssistantSubmitting =
-    assistantForm.formState.isSubmitting || assistantForm.formState.isSubmitSuccessful;
+  const isAssistantSubmitting = assistantForm.formState.isSubmitting;
 
   const fieldsRequiringValidation = useMemo(
     () => fields.filter(isFieldUnsignedAndRequired),
@@ -113,7 +114,11 @@ export const SigningForm = ({
     // });
   };
 
-  const onAssistantFormSubmit = async () => {
+  const onAssistantFormSubmit = () => {
+    setIsConfirmationDialogOpen(true);
+  };
+
+  const handleAssistantConfirmDialogSubmit = async () => {
     try {
       await completeDocument();
     } catch (err) {
@@ -122,6 +127,8 @@ export const SigningForm = ({
         description: 'An error occurred while completing the document. Please try again.',
         variant: 'destructive',
       });
+    } finally {
+      setIsConfirmationDialogOpen(false);
     }
   };
 
@@ -276,6 +283,14 @@ export const SigningForm = ({
                     {isAssistantSubmitting ? <Trans>Submitting...</Trans> : <Trans>Continue</Trans>}
                   </Button>
                 </div>
+
+                <AssistantConfirmationDialog
+                  hasUninsertedFields={uninsertedFields.length > 0}
+                  isOpen={isConfirmationDialogOpen}
+                  onClose={() => setIsConfirmationDialogOpen(false)}
+                  onConfirm={handleAssistantConfirmDialogSubmit}
+                  isSubmitting={isAssistantSubmitting}
+                />
               </form>
             </>
           ) : (
