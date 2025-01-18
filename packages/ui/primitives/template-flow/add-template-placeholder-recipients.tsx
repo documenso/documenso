@@ -39,6 +39,7 @@ import {
   DocumentFlowFormContainerStep,
 } from '../document-flow/document-flow-root';
 import { ShowFieldItem } from '../document-flow/show-field-item';
+import { SigningOrderConfirmation } from '../document-flow/signing-order-confirmation';
 import type { DocumentFlowStep } from '../document-flow/types';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '../form/form';
 import { useStep } from '../stepper';
@@ -328,6 +329,104 @@ export const AddTemplatePlaceholderRecipientsFormPartial = ({
     [form, triggerDragAndDrop, updateSigningOrders],
   );
 
+  const [showSigningOrderConfirmation, setShowSigningOrderConfirmation] = useState(false);
+
+  const handleRoleChange = useCallback(
+    (index: number, role: RecipientRole) => {
+      const currentSigners = form.getValues('signers');
+
+      if (role === RecipientRole.ASSISTANT) {
+        form.setValue('signingOrder', DocumentSigningOrder.SEQUENTIAL);
+
+        const existingAssistants = currentSigners.filter(
+          (signer, idx) => idx !== index && signer.role === RecipientRole.ASSISTANT,
+        );
+        const otherSigners = currentSigners.filter(
+          (signer, idx) => idx !== index && signer.role !== RecipientRole.ASSISTANT,
+        );
+
+        const newAssistant = {
+          ...currentSigners[index],
+          role,
+          signingOrder: existingAssistants.length + 1,
+        };
+
+        const updatedSigners = [
+          ...existingAssistants.map((signer, idx) => ({
+            ...signer,
+            signingOrder: idx + 1,
+          })),
+          newAssistant,
+          ...otherSigners.map((signer, idx) => ({
+            ...signer,
+            signingOrder: existingAssistants.length + 2 + idx,
+          })),
+        ];
+
+        form.setValue('signers', updatedSigners, {
+          shouldValidate: true,
+        });
+
+        setTimeout(() => {
+          if (index !== existingAssistants.length) {
+            triggerDragAndDrop(index, existingAssistants.length);
+          }
+        }, 0);
+      } else {
+        // When changing from assistant to another role
+        const assistants = currentSigners.filter(
+          (signer, idx) => idx !== index && signer.role === RecipientRole.ASSISTANT,
+        );
+        const otherSigners = currentSigners.filter(
+          (signer, idx) => idx !== index && signer.role !== RecipientRole.ASSISTANT,
+        );
+
+        const newSigner = {
+          ...currentSigners[index],
+          role,
+          signingOrder: assistants.length + otherSigners.length + 1,
+        };
+
+        const updatedSigners = [
+          ...assistants.map((signer, idx) => ({
+            ...signer,
+            signingOrder: idx + 1,
+          })),
+          ...otherSigners.map((signer, idx) => ({
+            ...signer,
+            signingOrder: assistants.length + 1 + idx,
+          })),
+          newSigner,
+        ];
+
+        form.setValue('signers', updatedSigners, {
+          shouldValidate: true,
+        });
+
+        setTimeout(() => {
+          const targetIndex = assistants.length + otherSigners.length;
+          if (index !== targetIndex) {
+            triggerDragAndDrop(index, targetIndex);
+          }
+        }, 0);
+      }
+    },
+    [form, triggerDragAndDrop],
+  );
+
+  const handleSigningOrderDisable = useCallback(() => {
+    setShowSigningOrderConfirmation(false);
+
+    const currentSigners = form.getValues('signers');
+    const updatedSigners = currentSigners.map((signer) => ({
+      ...signer,
+      role: signer.role === RecipientRole.ASSISTANT ? RecipientRole.SIGNER : signer.role,
+    }));
+
+    form.setValue('signers', updatedSigners);
+    form.setValue('signingOrder', DocumentSigningOrder.PARALLEL);
+  }, [form]);
+
   return (
     <>
       <DocumentFlowFormContainerHeader
@@ -353,11 +452,19 @@ export const AddTemplatePlaceholderRecipientsFormPartial = ({
                       {...field}
                       id="signingOrder"
                       checked={field.value === DocumentSigningOrder.SEQUENTIAL}
-                      onCheckedChange={(checked) =>
+                      onCheckedChange={(checked) => {
+                        if (
+                          !checked &&
+                          watchedSigners.some((s) => s.role === RecipientRole.ASSISTANT)
+                        ) {
+                          setShowSigningOrderConfirmation(true);
+                          return;
+                        }
+
                         field.onChange(
                           checked ? DocumentSigningOrder.SEQUENTIAL : DocumentSigningOrder.PARALLEL,
-                        )
-                      }
+                        );
+                      }}
                       disabled={isSubmitting}
                     />
                   </FormControl>
@@ -556,7 +663,10 @@ export const AddTemplatePlaceholderRecipientsFormPartial = ({
                                       <FormControl>
                                         <RecipientRoleSelect
                                           {...field}
-                                          onValueChange={field.onChange}
+                                          onValueChange={(value) =>
+                                            // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
+                                            handleRoleChange(index, value as RecipientRole)
+                                          }
                                           disabled={isSubmitting}
                                           hideCCRecipients={isSignerDirectRecipient(signer)}
                                         />
@@ -677,6 +787,12 @@ export const AddTemplatePlaceholderRecipientsFormPartial = ({
           onGoNextClick={() => void onFormSubmit()}
         />
       </DocumentFlowFormContainerFooter>
+
+      <SigningOrderConfirmation
+        open={showSigningOrderConfirmation}
+        onOpenChange={setShowSigningOrderConfirmation}
+        onConfirm={handleSigningOrderDisable}
+      />
     </>
   );
 };

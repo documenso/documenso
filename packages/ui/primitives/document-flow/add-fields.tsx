@@ -558,12 +558,6 @@ export const AddFieldsFormPartial = ({
       );
   }, [recipientsByRole]);
 
-  const isTypedSignatureEnabled = form.watch('typedSignatureEnabled');
-
-  const handleTypedSignatureChange = (value: boolean) => {
-    form.setValue('typedSignatureEnabled', value, { shouldDirty: true });
-  };
-
   const handleAdvancedSettings = () => {
     setShowAdvancedSettings((prev) => !prev);
   };
@@ -701,9 +695,7 @@ export const AddFieldsFormPartial = ({
                       )}
 
                       {!selectedSigner?.email && (
-                        <span className="gradie flex-1 truncate text-left">
-                          {selectedSigner?.email}
-                        </span>
+                        <span className="flex-1 truncate text-left">{selectedSigner?.email}</span>
                       )}
 
                       <ChevronsUpDown className="ml-2 h-4 w-4" />

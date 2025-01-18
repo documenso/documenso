@@ -31,7 +31,7 @@ import {
 import { nanoid } from '@documenso/lib/universal/id';
 import { parseMessageDescriptor } from '@documenso/lib/utils/i18n';
 import type { Field, Recipient } from '@documenso/prisma/client';
-import { FieldType, RecipientRole } from '@documenso/prisma/client';
+import { FieldType, RecipientRole, SendStatus } from '@documenso/prisma/client';
 import { cn } from '@documenso/ui/lib/utils';
 import { Button } from '@documenso/ui/primitives/button';
 import { Card, CardContent } from '@documenso/ui/primitives/card';
@@ -382,6 +382,7 @@ export const AddTemplateFieldsFormPartial = ({
       VIEWER: [],
       SIGNER: [],
       APPROVER: [],
+      ASSISTANT: [],
     };
 
     recipients.forEach((recipient) => {
@@ -391,21 +392,30 @@ export const AddTemplateFieldsFormPartial = ({
     return recipientsByRole;
   }, [recipients]);
 
+  useEffect(() => {
+    const recipientsByRoleToDisplay = recipients.filter(
+      (recipient) =>
+        recipient.role !== RecipientRole.CC && recipient.role !== RecipientRole.ASSISTANT,
+    );
+
+    setSelectedSigner(
+      recipientsByRoleToDisplay.find((r) => r.sendStatus !== SendStatus.SENT) ??
+        recipientsByRoleToDisplay[0],
+    );
+  }, [recipients]);
+
   const recipientsByRoleToDisplay = useMemo(() => {
     // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
     return (Object.entries(recipientsByRole) as [RecipientRole, Recipient[]][]).filter(
-      ([role]) => role !== RecipientRole.CC && role !== RecipientRole.VIEWER,
+      ([role]) =>
+        role !== RecipientRole.CC &&
+        role !== RecipientRole.VIEWER &&
+        role !== RecipientRole.ASSISTANT,
     );
   }, [recipientsByRole]);
 
   const handleAdvancedSettings = () => {
     setShowAdvancedSettings((prev) => !prev);
-  };
-
-  const isTypedSignatureEnabled = form.watch('typedSignatureEnabled');
-
-  const handleTypedSignatureChange = (value: boolean) => {
-    form.setValue('typedSignatureEnabled', value, { shouldDirty: true });
   };
 
   return (
