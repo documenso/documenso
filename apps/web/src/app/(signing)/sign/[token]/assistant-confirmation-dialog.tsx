@@ -28,8 +28,16 @@ export function AssistantConfirmationDialog({
     ? "You haven't filled some of the fields for the signer roles, are you sure you want to proceed?"
     : "Are you sure you want to submit the assistant's form? This action cannot be undone.";
 
+  const handleOpenChange = () => {
+    if (isSubmitting) {
+      return;
+    }
+
+    onClose();
+  };
+
   return (
-    <Dialog open={isOpen} onOpenChange={isSubmitting ? () => {} : onClose}>
+    <Dialog open={isOpen} onOpenChange={handleOpenChange}>
       <DialogContent>
         <DialogHeader>
           <DialogTitle>{title}</DialogTitle>
