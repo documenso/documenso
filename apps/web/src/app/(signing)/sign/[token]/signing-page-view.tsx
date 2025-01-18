@@ -69,7 +69,7 @@ export const SigningPageView = ({
 }: SigningPageViewProps) => {
   const { documentData, documentMeta } = document;
 
-  const [selectSignerId, setSelectSignerId] = useState<number | null>(allRecipients?.[0]?.id);
+  const [selectedSignerId, setSelectedSignerId] = useState<number | null>(allRecipients?.[0]?.id);
 
   const shouldUseTeamDetails =
     document.teamId && document.team?.teamGlobalSettings?.includeSenderDetails === false;
@@ -82,7 +82,7 @@ export const SigningPageView = ({
     senderEmail = document.team?.teamEmail?.email ? `(${document.team.teamEmail.email})` : '';
   }
 
-  const selectedSigner = allRecipients?.find((r) => r.id === selectSignerId);
+  const selectedSigner = allRecipients?.find((r) => r.id === selectedSignerId);
 
   return (
     <div className="mx-auto w-full max-w-screen-xl">
@@ -166,7 +166,7 @@ export const SigningPageView = ({
             redirectUrl={documentMeta?.redirectUrl}
             isRecipientsTurn={isRecipientsTurn}
             allRecipients={allRecipients}
-            setSelectSignerId={setSelectSignerId}
+            setSelectedSignerId={setSelectedSignerId}
           />
         </div>
       </div>
@@ -180,7 +180,7 @@ export const SigningPageView = ({
       {recipient.role === RecipientRole.ASSISTANT ? (
         <ElementVisible target={PDF_VIEWER_PAGE_SELECTOR}>
           {fields
-            .filter((field) => field.recipientId === selectSignerId)
+            .filter((field) => field.recipientId === selectedSignerId)
             .map((field) =>
               match(field.type)
                 .with(FieldType.INITIALS, () => (

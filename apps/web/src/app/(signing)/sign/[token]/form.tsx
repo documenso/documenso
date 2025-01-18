@@ -38,7 +38,7 @@ export type SigningFormProps = {
   redirectUrl?: string | null;
   isRecipientsTurn: boolean;
   allRecipients?: RecipientWithFields[];
-  setSelectSignerId: (id: number | null) => void;
+  setSelectedSignerId: (id: number | null) => void;
 };
 
 export const SigningForm = ({
@@ -48,7 +48,7 @@ export const SigningForm = ({
   redirectUrl,
   isRecipientsTurn,
   allRecipients,
-  setSelectSignerId,
+  setSelectedSignerId,
 }: SigningFormProps) => {
   const router = useRouter();
   const analytics = useAnalytics();
@@ -232,7 +232,7 @@ export const SigningForm = ({
                         value={field.value?.toString()}
                         onValueChange={(value) => {
                           field.onChange(value);
-                          setSelectSignerId(Number(value));
+                          setSelectedSignerId(Number(value));
                         }}
                       >
                         {allRecipients
