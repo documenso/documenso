@@ -7,17 +7,17 @@ inputs:
 runs:
   using: 'composite'
   steps:
-    # - name: Cache production build
-    #   uses: actions/cache@v3
-    #   id: production-build-cache
-    #   with:
-    #     path: |
-    #       ${{ github.workspace }}/apps/web/.next
-    #       **/.turbo/**
-    #       **/dist/**
+    - name: Cache production build
+      uses: actions/cache@v3
+      id: production-build-cache
+      with:
+        path: |
+          ${{ github.workspace }}/apps/web/.next
+          **/.turbo/**
+          **/dist/**
 
-    #     key: prod-build-${{ github.run_id }}-${{ hashFiles('package-lock.json') }}
-    #     restore-keys: prod-build-
+        key: prod-build-${{ github.run_id }}-${{ hashFiles('package-lock.json') }}
+        restore-keys: prod-build-
 
     - run: npm run build
       shell: bash
