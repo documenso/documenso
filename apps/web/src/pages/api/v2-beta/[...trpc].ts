@@ -6,7 +6,6 @@ import {
   genericErrorCodeToTrpcErrorCodeMap,
 } from '@documenso/lib/errors/app-error';
 import { buildLogger } from '@documenso/lib/utils/logger';
-import type { TRPCError } from '@documenso/trpc/server';
 import { createTrpcContext } from '@documenso/trpc/server/context';
 import { appRouter } from '@documenso/trpc/server/router';
 
@@ -15,7 +14,7 @@ const logger = buildLogger();
 export default createOpenApiNextHandler<typeof appRouter>({
   router: appRouter,
   createContext: async ({ req, res }) => createTrpcContext({ req, res, requestSource: 'apiV2' }),
-  onError: ({ error, path }: { error: TRPCError; path?: string }) => {
+  onError: ({ error, path }) => {
     // Always log the error for now.
     console.error(error.message);
 
