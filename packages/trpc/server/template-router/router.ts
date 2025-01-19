@@ -369,7 +369,7 @@ export const templateRouter = router({
     .meta({
       openapi: {
         method: 'POST',
-        path: '/template/{templateId}/direct/toggle',
+        path: '/template/direct/toggle',
         summary: 'Toggle direct link',
         description: 'Enable or disable a direct link for a template',
         tags: ['Template'],

@@ -63,17 +63,18 @@ export function TrpcProvider({ children, headers }: TrpcProviderProps) {
 
   const [trpcClient] = useState(() =>
     trpc.createClient({
-      transformer: SuperJSON,
       links: [
         splitLink({
           condition: (op) => op.context.skipBatch === true,
           true: httpLink({
             url: `${getBaseUrl()}/api/trpc`,
             headers,
+            transformer: SuperJSON,
           }),
           false: httpBatchLink({
             url: `${getBaseUrl()}/api/trpc`,
             headers,
+            transformer: SuperJSON,
           }),
         }),
       ],

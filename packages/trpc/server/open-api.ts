@@ -1,4 +1,4 @@
-import { generateOpenApiDocument } from 'trpc-openapi';
+import { generateOpenApiDocument } from 'trpc-to-openapi';
 
 import { NEXT_PUBLIC_WEBAPP_URL } from '@documenso/lib/constants/app';
 

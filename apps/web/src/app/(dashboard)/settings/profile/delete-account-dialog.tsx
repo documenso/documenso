@@ -36,7 +36,7 @@ export const DeleteAccountDialog = ({ className, user }: DeleteAccountDialogProp
 
   const [enteredEmail, setEnteredEmail] = useState<string>('');
 
-  const { mutateAsync: deleteAccount, isLoading: isDeletingAccount } =
+  const { mutateAsync: deleteAccount, isPending: isDeletingAccount } =
     trpc.profile.deleteAccount.useMutation();
 
   const onDeleteAccount = async () => {

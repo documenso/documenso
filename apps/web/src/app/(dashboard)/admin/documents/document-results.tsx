@@ -37,7 +37,7 @@ export const AdminDocumentResults = () => {
   const page = searchParams?.get?.('page') ? Number(searchParams.get('page')) : undefined;
   const perPage = searchParams?.get?.('perPage') ? Number(searchParams.get('perPage')) : undefined;
 
-  const { data: findDocumentsData, isLoading: isFindDocumentsLoading } =
+  const { data: findDocumentsData, isPending: isFindDocumentsLoading } =
     trpc.admin.findDocuments.useQuery(
       {
         query: debouncedTerm,
@@ -45,7 +45,7 @@ export const AdminDocumentResults = () => {
         perPage: perPage || 20,
       },
       {
-        keepPreviousData: true,
+        placeholderData: (previousData) => previousData,
       },
     );
 

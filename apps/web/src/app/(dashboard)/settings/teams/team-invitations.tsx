@@ -23,11 +23,11 @@ import { AcceptTeamInvitationButton } from './accept-team-invitation-button';
 import { DeclineTeamInvitationButton } from './decline-team-invitation-button';
 
 export const TeamInvitations = () => {
-  const { data, isInitialLoading } = trpc.team.getTeamInvitations.useQuery();
+  const { data, isLoading } = trpc.team.getTeamInvitations.useQuery();
 
   return (
     <AnimatePresence>
-      {data && data.length > 0 && !isInitialLoading && (
+      {data && data.length > 0 && !isLoading && (
         <AnimateGenericFadeInOut>
           <Alert variant="secondary">
             <div className="flex h-full flex-row items-center p-2">

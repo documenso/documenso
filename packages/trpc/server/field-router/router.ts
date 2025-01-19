@@ -219,14 +219,6 @@ export const fieldRouter = router({
    * Todo: Refactor to setFieldsForDocument function.
    */
   addFields: authenticatedProcedure
-    // .meta({
-    //   openapi: {
-    //     method: 'POST',
-    //     path: '/document/{documentId}/field',
-    //     summary: 'Set document fields',
-    //     tags: ['Document Fields'],
-    //   },
-    // })
     .input(ZSetDocumentFieldsRequestSchema)
     .output(ZSetDocumentFieldsResponseSchema)
     .mutation(async ({ input, ctx }) => {
@@ -395,14 +387,6 @@ export const fieldRouter = router({
    * Todo: Refactor to setFieldsForTemplate.
    */
   addTemplateFields: authenticatedProcedure
-    // .meta({
-    //   openapi: {
-    //     method: 'POST',
-    //     path: '/template/{templateId}/field',
-    //     summary: 'Set template fields',
-    //     tags: ['Template Fields'],
-    //   },
-    // })
     .input(ZSetFieldsForTemplateRequestSchema)
     .output(ZSetFieldsForTemplateResponseSchema)
     .mutation(async ({ input, ctx }) => {

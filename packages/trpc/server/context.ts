@@ -10,7 +10,11 @@ type CreateTrpcContext = CreateNextContextOptions & {
   requestSource: 'apiV1' | 'apiV2' | 'app';
 };
 
-export const createTrpcContext = async ({ req, res, requestSource }: CreateTrpcContext) => {
+export const createTrpcContext = async ({
+  req,
+  res,
+  requestSource,
+}: Omit<CreateTrpcContext, 'info'>) => {
   const { session, user } = await getServerSession({ req, res });
 
   const metadata: ApiRequestMetadata = {

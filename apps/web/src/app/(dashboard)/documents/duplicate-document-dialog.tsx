@@ -48,7 +48,7 @@ export const DuplicateDocumentDialog = ({
 
   const documentsPath = formatDocumentsPath(team?.url);
 
-  const { mutateAsync: duplicateDocument, isLoading: isDuplicateLoading } =
+  const { mutateAsync: duplicateDocument, isPending: isDuplicateLoading } =
     trpcReact.document.duplicateDocument.useMutation({
       onSuccess: (newId) => {
         router.push(`${documentsPath}/${newId}/edit`);

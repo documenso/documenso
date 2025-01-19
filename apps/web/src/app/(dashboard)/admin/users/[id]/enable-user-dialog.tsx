@@ -34,7 +34,7 @@ export const EnableUserDialog = ({ className, userToEnable }: EnableUserDialogPr
 
   const [email, setEmail] = useState('');
 
-  const { mutateAsync: enableUser, isLoading: isEnablingUser } =
+  const { mutateAsync: enableUser, isPending: isEnablingUser } =
     trpc.admin.enableUser.useMutation();
 
   const onEnableAccount = async () => {

@@ -5,7 +5,7 @@ import { z } from 'zod';
 import { getServerLimits } from '@documenso/ee/server-only/limits/server';
 import { NEXT_PUBLIC_WEBAPP_URL } from '@documenso/lib/constants/app';
 import { DOCUMENSO_ENCRYPTION_KEY } from '@documenso/lib/constants/crypto';
-import { AppError } from '@documenso/lib/errors/app-error';
+import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import { encryptSecondaryData } from '@documenso/lib/server-only/crypto/encrypt';
 import { createDocumentData } from '@documenso/lib/server-only/document-data/create-document-data';
 import { upsertDocumentMeta } from '@documenso/lib/server-only/document-meta/upsert-document-meta';
@@ -186,9 +186,9 @@ export const documentRouter = router({
       const { remaining } = await getServerLimits({ email: ctx.user.email, teamId });
 
       if (remaining.documents <= 0) {
-        throw new TRPCError({
-          code: 'BAD_REQUEST',
+        throw new AppError(AppErrorCode.LIMIT_EXCEEDED, {
           message: 'You have reached your document limit for this month. Please upgrade your plan.',
+          statusCode: 400,
         });
       }
 
@@ -246,9 +246,9 @@ export const documentRouter = router({
       const { remaining } = await getServerLimits({ email: ctx.user.email, teamId });
 
       if (remaining.documents <= 0) {
-        throw new TRPCError({
-          code: 'BAD_REQUEST',
+        throw new AppError(AppErrorCode.LIMIT_EXCEEDED, {
           message: 'You have reached your document limit for this month. Please upgrade your plan.',
+          statusCode: 400,
         });
       }
 

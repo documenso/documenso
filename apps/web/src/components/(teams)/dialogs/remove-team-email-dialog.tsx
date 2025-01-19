@@ -50,7 +50,7 @@ export const RemoveTeamEmailDialog = ({ trigger, teamName, team }: RemoveTeamEma
 
   const router = useRouter();
 
-  const { mutateAsync: deleteTeamEmail, isLoading: isDeletingTeamEmail } =
+  const { mutateAsync: deleteTeamEmail, isPending: isDeletingTeamEmail } =
     trpc.team.deleteTeamEmail.useMutation({
       onSuccess: () => {
         toast({
@@ -69,7 +69,7 @@ export const RemoveTeamEmailDialog = ({ trigger, teamName, team }: RemoveTeamEma
       },
     });
 
-  const { mutateAsync: deleteTeamEmailVerification, isLoading: isDeletingTeamEmailVerification } =
+  const { mutateAsync: deleteTeamEmailVerification, isPending: isDeletingTeamEmailVerification } =
     trpc.team.deleteTeamEmailVerification.useMutation({
       onSuccess: () => {
         toast({
