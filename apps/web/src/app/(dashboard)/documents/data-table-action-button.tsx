@@ -50,9 +50,16 @@ export const DataTableActionButton = ({ row, team }: DataTableActionButtonProps)
   const onDownloadClick = async () => {
     try {
       const document = !recipient
-        ? await trpcClient.document.getDocumentById.query({
-            documentId: row.id,
-          })
+        ? await trpcClient.document.getDocumentById.query(
+            {
+              documentId: row.id,
+            },
+            {
+              context: {
+                teamId: team?.id?.toString(),
+              },
+            },
+          )
         : await trpcClient.document.getDocumentByToken.query({
             token: recipient.token,
           });
