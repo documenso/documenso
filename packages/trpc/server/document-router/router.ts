@@ -31,6 +31,7 @@ import { DocumentDataType, DocumentStatus } from '@documenso/prisma/client';
 
 import { authenticatedProcedure, procedure, router } from '../trpc';
 import {
+  ZCreateAuditLogMutationSchema,
   ZCreateDocumentRequestSchema,
   ZCreateDocumentV2RequestSchema,
   ZCreateDocumentV2ResponseSchema,
@@ -629,27 +630,29 @@ export const documentRouter = router({
       };
     }),
 
+  /**
+   * @private
+   */
   createAuditLog: authenticatedProcedure
-    .input(
-      z.object({
-        documentId: z.number(),
-        type: z.literal('DOCUMENT_SIGNING_LINK_COPIED'),
-        data: z.object({
-          recipientEmail: z.string(),
-          recipientName: z.string(),
-          recipientId: z.number(),
-          recipientRole: z.string(),
-          isBulkCopy: z.boolean(),
-        }),
-      }),
-    )
+    .input(ZCreateAuditLogMutationSchema)
     .mutation(async ({ input, ctx }) => {
+      const { teamId } = ctx;
       const { documentId, type, data } = input;
 
-      console.log('input', input);
-      console.log('copiedddd');
+      const document = await getDocumentById({
+        documentId,
+        userId: ctx.user.id,
+        teamId,
+      }).catch(() => null);
 
-      const auditLog = await prisma.documentAuditLog.create({
+      if (!document || (teamId && document.teamId !== teamId)) {
+        throw new TRPCError({
+          code: 'FORBIDDEN',
+          message: 'You do not have access to this document.',
+        });
+      }
+
+      return await prisma.documentAuditLog.create({
         data: createDocumentAuditLogData({
           type,
           data,
@@ -658,7 +661,5 @@ export const documentRouter = router({
           metadata: ctx.metadata,
         }),
       });
-
-      return auditLog;
     }),
 });

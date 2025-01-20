@@ -326,6 +326,18 @@ export const ZDownloadCertificateMutationSchema = z.object({
   documentId: z.number(),
 });
 
+export const ZCreateAuditLogMutationSchema = z.object({
+  documentId: z.number(),
+  type: z.literal('DOCUMENT_SIGNING_LINK_COPIED'),
+  data: z.object({
+    recipientEmail: z.string(),
+    recipientName: z.string(),
+    recipientId: z.number(),
+    recipientRole: z.string(),
+    isBulkCopy: z.boolean(),
+  }),
+});
+
 export const ZMoveDocumentToTeamSchema = z.object({
   documentId: z.number().describe('The ID of the document to move to a team.'),
   teamId: z.number().describe('The ID of the team to move the document to.'),
