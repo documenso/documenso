@@ -26,6 +26,7 @@ export type AssistantNameFieldProps = {
   onSignField?: (value: TSignFieldWithTokenMutationSchema) => Promise<void> | void;
   onUnsignField?: (value: TRemovedSignedFieldWithTokenMutationSchema) => Promise<void> | void;
   selectedSigner: RecipientWithFields | null;
+  recipient: RecipientWithFields;
 };
 
 export const AssistantNameField = ({
@@ -33,6 +34,7 @@ export const AssistantNameField = ({
   onSignField,
   onUnsignField,
   selectedSigner,
+  recipient,
 }: AssistantNameFieldProps) => {
   const router = useRouter();
   const { toast } = useToast();
@@ -61,6 +63,8 @@ export const AssistantNameField = ({
         fieldId: field.id,
         value: selectedSigner.name,
         isBase64: false,
+        isAssistantPrefill: true,
+        assistantId: recipient.id,
       };
 
       if (onSignField) {

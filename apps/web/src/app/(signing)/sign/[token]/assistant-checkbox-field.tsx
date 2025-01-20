@@ -32,6 +32,7 @@ export type AssistantCheckboxFieldProps = {
   onSignField?: (value: TSignFieldWithTokenMutationSchema) => Promise<void> | void;
   onUnsignField?: (value: TRemovedSignedFieldWithTokenMutationSchema) => Promise<void> | void;
   selectedSigner: RecipientWithFields | null;
+  recipient: RecipientWithFields;
 };
 
 export const AssistantCheckboxField = ({
@@ -39,6 +40,7 @@ export const AssistantCheckboxField = ({
   onSignField,
   onUnsignField,
   selectedSigner,
+  recipient,
 }: AssistantCheckboxFieldProps) => {
   const { _ } = useLingui();
   const { toast } = useToast();
@@ -93,7 +95,7 @@ export const AssistantCheckboxField = ({
 
   const onSign = async () => {
     try {
-      if (!selectedSigner) {
+      if (!selectedSigner || !checkedValues.length) {
         return;
       }
 
@@ -102,6 +104,8 @@ export const AssistantCheckboxField = ({
         fieldId: field.id,
         value: toCheckboxValue(checkedValues),
         isBase64: true,
+        isAssistantPrefill: true,
+        assistantId: recipient.id,
       };
 
       if (onSignField) {

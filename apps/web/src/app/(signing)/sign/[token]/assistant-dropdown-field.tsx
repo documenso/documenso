@@ -35,6 +35,7 @@ export type AssistantDropdownFieldProps = {
   onSignField?: (value: TSignFieldWithTokenMutationSchema) => Promise<void> | void;
   onUnsignField?: (value: TRemovedSignedFieldWithTokenMutationSchema) => Promise<void> | void;
   selectedSigner: RecipientWithFields | null;
+  recipient: RecipientWithFields;
 };
 
 export const AssistantDropdownField = ({
@@ -42,6 +43,7 @@ export const AssistantDropdownField = ({
   onSignField,
   onUnsignField,
   selectedSigner,
+  recipient,
 }: AssistantDropdownFieldProps) => {
   const { _ } = useLingui();
   const { toast } = useToast();
@@ -77,6 +79,8 @@ export const AssistantDropdownField = ({
         fieldId: field.id,
         value: localChoice,
         isBase64: true,
+        isAssistantPrefill: true,
+        assistantId: recipient.id,
       };
 
       if (onSignField) {

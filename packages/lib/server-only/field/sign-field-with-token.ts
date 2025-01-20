@@ -35,6 +35,8 @@ export type SignFieldWithTokenOptions = {
   userId?: number;
   authOptions?: TRecipientActionAuth;
   requestMetadata?: RequestMetadata;
+  isAssistantPrefill?: boolean;
+  assistantId?: number;
 };
 
 /**
@@ -55,6 +57,8 @@ export const signFieldWithToken = async ({
   userId,
   authOptions,
   requestMetadata,
+  isAssistantPrefill,
+  assistantId,
 }: SignFieldWithTokenOptions) => {
   const field = await prisma.field.findFirstOrThrow({
     where: {
@@ -64,7 +68,11 @@ export const signFieldWithToken = async ({
       },
     },
     include: {
-      Document: true,
+      Document: {
+        include: {
+          Recipient: true,
+        },
+      },
       Recipient: true,
     },
   });
@@ -183,6 +191,15 @@ export const signFieldWithToken = async ({
     throw new Error('Typed signatures are not allowed. Please draw your signature');
   }
 
+  let assistant: typeof recipient | undefined;
+  if (isAssistantPrefill && assistantId) {
+    assistant = document.Recipient.find((r) => r.id === assistantId);
+
+    if (!assistant) {
+      throw new Error(`Assistant with ID ${assistantId} not found in document`);
+    }
+  }
+
   return await prisma.$transaction(async (tx) => {
     const updatedField = await tx.field.update({
       where: {
@@ -219,11 +236,13 @@ export const signFieldWithToken = async ({
 
     await tx.documentAuditLog.create({
       data: createDocumentAuditLogData({
-        type: DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_FIELD_INSERTED,
+        type: isAssistantPrefill
+          ? DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_FIELD_PREFILLED
+          : DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_FIELD_INSERTED,
         documentId: document.id,
         user: {
-          email: recipient.email,
-          name: recipient.name,
+          email: isAssistantPrefill && assistant ? assistant.email : recipient.email,
+          name: isAssistantPrefill && assistant ? assistant.name : recipient.name,
         },
         requestMetadata,
         data: {

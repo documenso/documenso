@@ -17,7 +17,7 @@ import {
   ZTextFieldMeta,
 } from '@documenso/lib/types/field-meta';
 import type { CompletedField } from '@documenso/lib/types/fields';
-import type { Field, Recipient } from '@documenso/prisma/client';
+import type { Field } from '@documenso/prisma/client';
 import { FieldType, RecipientRole } from '@documenso/prisma/client';
 import type { FieldWithSignatureAndFieldMeta } from '@documenso/prisma/types/field-with-signature-and-fieldmeta';
 import type { RecipientWithFields } from '@documenso/prisma/types/recipient-with-fields';
@@ -52,7 +52,7 @@ import { TextField } from './text-field';
 
 export type SigningPageViewProps = {
   document: DocumentAndSender;
-  recipient: Recipient;
+  recipient: RecipientWithFields;
   fields: Field[];
   completedFields: CompletedField[];
   isRecipientsTurn: boolean;
@@ -188,6 +188,7 @@ export const SigningPageView = ({
                     key={field.id}
                     field={field}
                     selectedSigner={selectedSigner ?? null}
+                    recipient={recipient}
                   />
                 ))
                 .with(FieldType.NAME, () => (
@@ -195,6 +196,7 @@ export const SigningPageView = ({
                     key={field.id}
                     field={field}
                     selectedSigner={selectedSigner ?? null}
+                    recipient={recipient}
                   />
                 ))
                 .with(FieldType.DATE, () => (
@@ -202,6 +204,7 @@ export const SigningPageView = ({
                     key={field.id}
                     field={field}
                     selectedSigner={selectedSigner ?? null}
+                    recipient={recipient}
                     dateFormat={documentMeta?.dateFormat ?? DEFAULT_DOCUMENT_DATE_FORMAT}
                     timezone={documentMeta?.timezone ?? DEFAULT_DOCUMENT_TIME_ZONE}
                   />
@@ -211,6 +214,7 @@ export const SigningPageView = ({
                     key={field.id}
                     field={field}
                     selectedSigner={selectedSigner ?? null}
+                    recipient={recipient}
                   />
                 ))
                 .with(FieldType.TEXT, () => {
@@ -223,6 +227,7 @@ export const SigningPageView = ({
                       key={field.id}
                       field={fieldWithMeta}
                       selectedSigner={selectedSigner ?? null}
+                      recipient={recipient}
                     />
                   );
                 })
@@ -236,6 +241,7 @@ export const SigningPageView = ({
                       key={field.id}
                       field={fieldWithMeta}
                       selectedSigner={selectedSigner ?? null}
+                      recipient={recipient}
                     />
                   );
                 })
@@ -249,6 +255,7 @@ export const SigningPageView = ({
                       key={field.id}
                       field={fieldWithMeta}
                       selectedSigner={selectedSigner ?? null}
+                      recipient={recipient}
                     />
                   );
                 })
@@ -262,6 +269,7 @@ export const SigningPageView = ({
                       key={field.id}
                       field={fieldWithMeta}
                       selectedSigner={selectedSigner ?? null}
+                      recipient={recipient}
                     />
                   );
                 })
@@ -275,6 +283,7 @@ export const SigningPageView = ({
                       key={field.id}
                       field={fieldWithMeta}
                       selectedSigner={selectedSigner ?? null}
+                      recipient={recipient}
                     />
                   );
                 })

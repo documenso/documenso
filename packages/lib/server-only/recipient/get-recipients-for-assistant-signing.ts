@@ -1,5 +1,5 @@
 import { prisma } from '@documenso/prisma';
-import { FieldType, RecipientRole } from '@documenso/prisma/client';
+import { FieldType } from '@documenso/prisma/client';
 
 export interface GetRecipientsForAssistantSigningOptions {
   documentId: number;
@@ -17,8 +17,6 @@ export const getRecipientsForAssistantSigning = async ({
   const recipients = await prisma.recipient.findMany({
     where: {
       documentId,
-      role: RecipientRole.SIGNER,
-
       Document: {
         OR: [
           {

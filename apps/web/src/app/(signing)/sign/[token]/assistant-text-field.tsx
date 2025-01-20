@@ -37,6 +37,7 @@ export type AssistantTextFieldProps = {
   onSignField?: (value: TSignFieldWithTokenMutationSchema) => Promise<void> | void;
   onUnsignField?: (value: TRemovedSignedFieldWithTokenMutationSchema) => Promise<void> | void;
   selectedSigner: RecipientWithFields | null;
+  recipient: RecipientWithFields;
 };
 
 export const AssistantTextField = ({
@@ -44,6 +45,7 @@ export const AssistantTextField = ({
   onSignField,
   onUnsignField,
   selectedSigner,
+  recipient,
 }: AssistantTextFieldProps) => {
   const { _ } = useLingui();
   const { toast } = useToast();
@@ -135,6 +137,8 @@ export const AssistantTextField = ({
         fieldId: field.id,
         value: localText,
         isBase64: true,
+        isAssistantPrefill: true,
+        assistantId: recipient.id,
       };
 
       if (onSignField) {

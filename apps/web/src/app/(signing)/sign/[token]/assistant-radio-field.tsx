@@ -29,6 +29,7 @@ export type AssistantRadioFieldProps = {
   onSignField?: (value: TSignFieldWithTokenMutationSchema) => Promise<void> | void;
   onUnsignField?: (value: TRemovedSignedFieldWithTokenMutationSchema) => Promise<void> | void;
   selectedSigner: RecipientWithFields | null;
+  recipient: RecipientWithFields;
 };
 
 export const AssistantRadioField = ({
@@ -36,6 +37,7 @@ export const AssistantRadioField = ({
   onSignField,
   onUnsignField,
   selectedSigner,
+  recipient,
 }: AssistantRadioFieldProps) => {
   const { _ } = useLingui();
   const { toast } = useToast();
@@ -76,6 +78,8 @@ export const AssistantRadioField = ({
         fieldId: field.id,
         value: selectedOption,
         isBase64: true,
+        isAssistantPrefill: true,
+        assistantId: recipient.id,
       };
 
       if (onSignField) {

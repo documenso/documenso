@@ -31,6 +31,7 @@ export type AssistantDateFieldProps = {
   onSignField?: (value: TSignFieldWithTokenMutationSchema) => Promise<void> | void;
   onUnsignField?: (value: TRemovedSignedFieldWithTokenMutationSchema) => Promise<void> | void;
   selectedSigner: RecipientWithFields | null;
+  recipient: RecipientWithFields;
   dateFormat?: string | null;
   timezone?: string | null;
 };
@@ -40,6 +41,7 @@ export const AssistantDateField = ({
   onSignField,
   onUnsignField,
   selectedSigner,
+  recipient,
   dateFormat = DEFAULT_DOCUMENT_DATE_FORMAT,
   timezone = DEFAULT_DOCUMENT_TIME_ZONE,
 }: AssistantDateFieldProps) => {
@@ -75,6 +77,9 @@ export const AssistantDateField = ({
         token: selectedSigner.token,
         fieldId: field.id,
         value: dateFormat ?? DEFAULT_DOCUMENT_DATE_FORMAT,
+        isBase64: true,
+        isAssistantPrefill: true,
+        assistantId: recipient.id,
       };
 
       if (onSignField) {
