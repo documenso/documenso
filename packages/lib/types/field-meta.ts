@@ -113,7 +113,16 @@ export const ZFieldMetaNotOptionalSchema = z.discriminatedUnion('type', [
 
 export type TFieldMetaNotOptionalSchema = z.infer<typeof ZFieldMetaNotOptionalSchema>;
 
-export const ZFieldMetaSchema = ZFieldMetaNotOptionalSchema.optional();
+export const ZFieldMetaSchema = z
+  .union([
+    // Handles an empty object being provided as fieldMeta.
+    z
+      .object({})
+      .strict()
+      .transform(() => undefined),
+    ZFieldMetaNotOptionalSchema,
+  ])
+  .optional();
 
 export type TFieldMetaSchema = z.infer<typeof ZFieldMetaSchema>;
 
