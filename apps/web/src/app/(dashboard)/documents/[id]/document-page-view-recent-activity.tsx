@@ -4,7 +4,7 @@ import { useMemo } from 'react';
 
 import { Trans, msg } from '@lingui/macro';
 import { useLingui } from '@lingui/react';
-import { AlertTriangle, CheckCheckIcon, CheckIcon, Loader, MailOpen } from 'lucide-react';
+import { AlertTriangle, CheckCheckIcon, CheckIcon, Copy, Loader, MailOpen } from 'lucide-react';
 import { DateTime } from 'luxon';
 import { match } from 'ts-pattern';
 
@@ -139,6 +139,11 @@ export const DocumentPageViewRecentActivity = ({
                     .with(DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_OPENED, () => (
                       <div className="bg-widget rounded-full border border-gray-300 p-1 dark:border-neutral-600">
                         <MailOpen className="h-3 w-3" aria-hidden="true" />
+                      </div>
+                    ))
+                    .with(DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_SIGNING_LINK_COPIED, () => (
+                      <div className="bg-widget rounded-full border border-gray-300 p-1 dark:border-neutral-600">
+                        <Copy className="h-3 w-3" aria-hidden="true" />
                       </div>
                     ))
                     .otherwise(() => (
