@@ -47,15 +47,15 @@ export const fieldRouter = router({
   /**
    * @public
    */
-  getField: authenticatedProcedure
+  getDocumentField: authenticatedProcedure
     .meta({
       openapi: {
         method: 'GET',
-        path: '/field/{fieldId}',
-        summary: 'Get field',
+        path: '/document/field/{fieldId}',
+        summary: 'Get document field',
         description:
-          'Returns a single field. If you want to retrieve all the fields for a document or template, use the "Get Document" or "Get Template" request.',
-        tags: ['Document Fields', 'Template Fields'],
+          'Returns a single field. If you want to retrieve all the fields for a document, use the "Get Document" endpoint.',
+        tags: ['Document Fields'],
       },
     })
     .input(ZGetFieldRequestSchema)
@@ -271,6 +271,33 @@ export const fieldRouter = router({
       });
 
       return createdFields.fields[0];
+    }),
+
+  /**
+   * @public
+   */
+  getTemplateField: authenticatedProcedure
+    .meta({
+      openapi: {
+        method: 'GET',
+        path: '/template/field/{fieldId}',
+        summary: 'Get template field',
+        description:
+          'Returns a single field. If you want to retrieve all the fields for a template, use the "Get Template" endpoint.',
+        tags: ['Template Fields'],
+      },
+    })
+    .input(ZGetFieldRequestSchema)
+    .output(ZGetFieldResponseSchema)
+    .query(async ({ input, ctx }) => {
+      const { teamId } = ctx;
+      const { fieldId } = input;
+
+      return await getFieldById({
+        userId: ctx.user.id,
+        teamId,
+        fieldId,
+      });
     }),
 
   /**
