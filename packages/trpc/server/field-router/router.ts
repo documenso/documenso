@@ -1,5 +1,3 @@
-import { z } from 'zod';
-
 import { createDocumentFields } from '@documenso/lib/server-only/field/create-document-fields';
 import { createTemplateFields } from '@documenso/lib/server-only/field/create-template-fields';
 import { deleteDocumentField } from '@documenso/lib/server-only/field/delete-document-field';
@@ -13,6 +11,7 @@ import { updateDocumentFields } from '@documenso/lib/server-only/field/update-do
 import { updateTemplateFields } from '@documenso/lib/server-only/field/update-template-fields';
 import { extractNextApiRequestMetadata } from '@documenso/lib/universal/extract-request-metadata';
 
+import { ZGenericSuccessResponse, ZSuccessResponseSchema } from '../document-router/schema';
 import { authenticatedProcedure, procedure, router } from '../trpc';
 import {
   ZCreateDocumentFieldRequestSchema,
@@ -200,7 +199,7 @@ export const fieldRouter = router({
       },
     })
     .input(ZDeleteDocumentFieldRequestSchema)
-    .output(z.void())
+    .output(ZSuccessResponseSchema)
     .mutation(async ({ input, ctx }) => {
       const { teamId } = ctx;
       const { fieldId } = input;
@@ -211,6 +210,8 @@ export const fieldRouter = router({
         fieldId,
         requestMetadata: ctx.metadata,
       });
+
+      return ZGenericSuccessResponse;
     }),
 
   /**
@@ -396,7 +397,7 @@ export const fieldRouter = router({
       },
     })
     .input(ZDeleteTemplateFieldRequestSchema)
-    .output(z.void())
+    .output(ZSuccessResponseSchema)
     .mutation(async ({ input, ctx }) => {
       const { teamId } = ctx;
       const { fieldId } = input;
@@ -406,6 +407,8 @@ export const fieldRouter = router({
         teamId,
         fieldId,
       });
+
+      return ZGenericSuccessResponse;
     }),
 
   /**

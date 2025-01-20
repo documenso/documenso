@@ -1,5 +1,3 @@
-import { z } from 'zod';
-
 import { completeDocumentWithToken } from '@documenso/lib/server-only/document/complete-document-with-token';
 import { rejectDocumentWithToken } from '@documenso/lib/server-only/document/reject-document-with-token';
 import { createDocumentRecipients } from '@documenso/lib/server-only/recipient/create-document-recipients';
@@ -13,6 +11,7 @@ import { updateDocumentRecipients } from '@documenso/lib/server-only/recipient/u
 import { updateTemplateRecipients } from '@documenso/lib/server-only/recipient/update-template-recipients';
 import { extractNextApiRequestMetadata } from '@documenso/lib/universal/extract-request-metadata';
 
+import { ZGenericSuccessResponse, ZSuccessResponseSchema } from '../document-router/schema';
 import { authenticatedProcedure, procedure, router } from '../trpc';
 import {
   ZCompleteDocumentWithTokenMutationSchema,
@@ -200,7 +199,7 @@ export const recipientRouter = router({
       },
     })
     .input(ZDeleteDocumentRecipientRequestSchema)
-    .output(z.void())
+    .output(ZSuccessResponseSchema)
     .mutation(async ({ input, ctx }) => {
       const { teamId } = ctx;
       const { recipientId } = input;
@@ -211,6 +210,8 @@ export const recipientRouter = router({
         recipientId,
         requestMetadata: ctx.metadata,
       });
+
+      return ZGenericSuccessResponse;
     }),
 
   /**
@@ -391,7 +392,7 @@ export const recipientRouter = router({
       },
     })
     .input(ZDeleteTemplateRecipientRequestSchema)
-    .output(z.void())
+    .output(ZSuccessResponseSchema)
     .mutation(async ({ input, ctx }) => {
       const { teamId } = ctx;
       const { recipientId } = input;
@@ -401,6 +402,8 @@ export const recipientRouter = router({
         userId: ctx.user.id,
         teamId,
       });
+
+      return ZGenericSuccessResponse;
     }),
 
   /**

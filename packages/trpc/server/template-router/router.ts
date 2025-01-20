@@ -1,5 +1,3 @@
-import { z } from 'zod';
-
 import { getServerLimits } from '@documenso/ee/server-only/limits/server';
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import { getDocumentWithDetailsById } from '@documenso/lib/server-only/document/get-document-with-details-by-id';
@@ -24,6 +22,7 @@ import { toggleTemplateDirectLink } from '@documenso/lib/server-only/template/to
 import { updateTemplate } from '@documenso/lib/server-only/template/update-template';
 import type { Document } from '@documenso/prisma/client';
 
+import { ZGenericSuccessResponse, ZSuccessResponseSchema } from '../document-router/schema';
 import { authenticatedProcedure, maybeAuthenticatedProcedure, router } from '../trpc';
 import {
   ZCreateDocumentFromDirectTemplateRequestSchema,
@@ -195,7 +194,7 @@ export const templateRouter = router({
       },
     })
     .input(ZDeleteTemplateMutationSchema)
-    .output(z.void())
+    .output(ZSuccessResponseSchema)
     .mutation(async ({ input, ctx }) => {
       const { teamId } = ctx;
       const { templateId } = input;
@@ -203,6 +202,8 @@ export const templateRouter = router({
       const userId = ctx.user.id;
 
       await deleteTemplate({ userId, id: templateId, teamId });
+
+      return ZGenericSuccessResponse;
     }),
 
   /**
@@ -352,7 +353,7 @@ export const templateRouter = router({
       },
     })
     .input(ZDeleteTemplateDirectLinkRequestSchema)
-    .output(z.void())
+    .output(ZSuccessResponseSchema)
     .mutation(async ({ input, ctx }) => {
       const { teamId } = ctx;
       const { templateId } = input;
@@ -360,6 +361,8 @@ export const templateRouter = router({
       const userId = ctx.user.id;
 
       await deleteTemplateDirectLink({ userId, teamId, templateId });
+
+      return ZGenericSuccessResponse;
     }),
 
   /**
