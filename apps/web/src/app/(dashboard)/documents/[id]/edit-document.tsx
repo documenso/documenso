@@ -134,8 +134,8 @@ export const EditDocumentForm = ({
     },
   });
 
-  // const { mutateAsync: setPasswordForDocument } =
-  //   trpc.document.setPasswordForDocument.useMutation();
+  const { mutateAsync: setPasswordForDocument } =
+    trpc.document.setPasswordForDocument.useMutation();
 
   const documentFlow: Record<EditDocumentStep, DocumentFlowStep> = {
     settings: {
@@ -358,8 +358,8 @@ export const EditDocumentForm = ({
             key={document.documentData.id}
             documentData={document.documentData}
             document={document}
-            // password={document.documentMeta?.password}
-            // onPasswordSubmit={onPasswordSubmit}
+            password={document.documentMeta?.password}
+            onPasswordSubmit={onPasswordSubmit}
             onDocumentLoad={() => setIsDocumentPdfLoaded(true)}
           />
         </CardContent>
