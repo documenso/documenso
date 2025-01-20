@@ -27,7 +27,7 @@ import { RadioGroup, RadioGroupItem } from '@documenso/ui/primitives/radio-group
 import { SignaturePad } from '@documenso/ui/primitives/signature-pad';
 import { useToast } from '@documenso/ui/primitives/use-toast';
 
-import { AssistantConfirmationDialog } from './assistant-confirmation-dialog';
+import { AssistantConfirmationDialog } from './assistant/assistant-confirmation-dialog';
 import { useRequiredSigningContext } from './provider';
 import { SignDialog } from './sign-dialog';
 

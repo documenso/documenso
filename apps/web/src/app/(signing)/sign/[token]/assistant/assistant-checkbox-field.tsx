@@ -25,7 +25,7 @@ import { checkboxValidationSigns } from '@documenso/ui/primitives/document-flow/
 import { Label } from '@documenso/ui/primitives/label';
 import { useToast } from '@documenso/ui/primitives/use-toast';
 
-import { SigningFieldContainer } from './signing-field-container';
+import { SigningFieldContainer } from '../signing-field-container';
 
 export type AssistantCheckboxFieldProps = {
   field: FieldWithSignatureAndFieldMeta;

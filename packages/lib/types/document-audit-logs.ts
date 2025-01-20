@@ -46,6 +46,7 @@ export const ZDocumentAuditLogEmailTypeSchema = z.enum([
   'SIGNING_REQUEST',
   'VIEW_REQUEST',
   'APPROVE_REQUEST',
+  'ASSISTING_REQUEST',
   'CC',
   'DOCUMENT_COMPLETED',
 ]);

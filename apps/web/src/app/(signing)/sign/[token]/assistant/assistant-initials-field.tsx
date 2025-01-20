@@ -20,7 +20,7 @@ import type {
 } from '@documenso/trpc/server/field-router/schema';
 import { useToast } from '@documenso/ui/primitives/use-toast';
 
-import { SigningFieldContainer } from './signing-field-container';
+import { SigningFieldContainer } from '../signing-field-container';
 
 export type AssistantInitialsFieldProps = {
   field: FieldWithSignature;

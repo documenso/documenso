@@ -27,15 +27,15 @@ import { LazyPDFViewer } from '@documenso/ui/primitives/lazy-pdf-viewer';
 
 import { DocumentReadOnlyFields } from '~/components/document/document-read-only-fields';
 
-import { AssistantCheckboxField } from './assistant-checkbox-field';
-import { AssistantDateField } from './assistant-date-field';
-import { AssistantDropdownField } from './assistant-dropdown-field';
-import { AssistantEmailField } from './assistant-email-field';
-import { AssistantInitialsField } from './assistant-initials-field';
-import { AssistantNameField } from './assistant-name-field';
-import { AssistantNumberField } from './assistant-number-field';
-import { AssistantRadioField } from './assistant-radio-field';
-import { AssistantTextField } from './assistant-text-field';
+import { AssistantCheckboxField } from './assistant/assistant-checkbox-field';
+import { AssistantDateField } from './assistant/assistant-date-field';
+import { AssistantDropdownField } from './assistant/assistant-dropdown-field';
+import { AssistantEmailField } from './assistant/assistant-email-field';
+import { AssistantInitialsField } from './assistant/assistant-initials-field';
+import { AssistantNameField } from './assistant/assistant-name-field';
+import { AssistantNumberField } from './assistant/assistant-number-field';
+import { AssistantRadioField } from './assistant/assistant-radio-field';
+import { AssistantTextField } from './assistant/assistant-text-field';
 import { AutoSign } from './auto-sign';
 import { CheckboxField } from './checkbox-field';
 import { DateField } from './date-field';

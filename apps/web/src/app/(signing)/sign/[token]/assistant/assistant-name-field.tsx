@@ -19,9 +19,9 @@ import type {
 } from '@documenso/trpc/server/field-router/schema';
 import { useToast } from '@documenso/ui/primitives/use-toast';
 
-import { SigningFieldContainer } from './signing-field-container';
+import { SigningFieldContainer } from '../signing-field-container';
 
-export type AssistantEmailFieldProps = {
+export type AssistantNameFieldProps = {
   field: FieldWithSignature;
   onSignField?: (value: TSignFieldWithTokenMutationSchema) => Promise<void> | void;
   onUnsignField?: (value: TRemovedSignedFieldWithTokenMutationSchema) => Promise<void> | void;
@@ -29,13 +29,13 @@ export type AssistantEmailFieldProps = {
   recipient: RecipientWithFields;
 };
 
-export const AssistantEmailField = ({
+export const AssistantNameField = ({
   field,
   onSignField,
   onUnsignField,
   selectedSigner,
   recipient,
-}: AssistantEmailFieldProps) => {
+}: AssistantNameFieldProps) => {
   const router = useRouter();
   const { toast } = useToast();
   const { _ } = useLingui();
@@ -61,7 +61,7 @@ export const AssistantEmailField = ({
       const payload: TSignFieldWithTokenMutationSchema = {
         token: selectedSigner.token,
         fieldId: field.id,
-        value: selectedSigner.email,
+        value: selectedSigner.name,
         isBase64: false,
         isAssistantPrefill: true,
         assistantId: recipient.id,
@@ -123,7 +123,7 @@ export const AssistantEmailField = ({
   };
 
   return (
-    <SigningFieldContainer field={field} onSign={onSign} onRemove={onRemove} type="Email">
+    <SigningFieldContainer field={field} onSign={onSign} onRemove={onRemove} type="Name">
       {isLoading && (
         <div className="bg-background absolute inset-0 flex items-center justify-center rounded-md">
           <Loader className="text-primary h-5 w-5 animate-spin md:h-8 md:w-8" />
@@ -131,8 +131,8 @@ export const AssistantEmailField = ({
       )}
 
       {!field.inserted && (
-        <p className="group-hover:text-primary text-muted-foreground text-[clamp(0.425rem,25cqw,0.825rem)] duration-200 group-hover:text-yellow-300">
-          <Trans>Email</Trans>
+        <p className="group-hover:text-primary text-muted-foreground duration-200 group-hover:text-yellow-300">
+          <Trans>Name</Trans>
         </p>
       )}
 

@@ -10,7 +10,7 @@ import { Loader } from 'lucide-react';
 
 import { DO_NOT_INVALIDATE_QUERY_ON_MUTATION } from '@documenso/lib/constants/trpc';
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
-import { ZDropdownFieldMeta } from '@documenso/lib/types/field-meta';
+import { ZRadioFieldMeta } from '@documenso/lib/types/field-meta';
 import type { FieldWithSignatureAndFieldMeta } from '@documenso/prisma/types/field-with-signature-and-fieldmeta';
 import type { RecipientWithFields } from '@documenso/prisma/types/recipient-with-fields';
 import { trpc } from '@documenso/trpc/react';
@@ -18,19 +18,13 @@ import type {
   TRemovedSignedFieldWithTokenMutationSchema,
   TSignFieldWithTokenMutationSchema,
 } from '@documenso/trpc/server/field-router/schema';
-import { cn } from '@documenso/ui/lib/utils';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@documenso/ui/primitives/select';
+import { Label } from '@documenso/ui/primitives/label';
+import { RadioGroup, RadioGroupItem } from '@documenso/ui/primitives/radio-group';
 import { useToast } from '@documenso/ui/primitives/use-toast';
 
-import { SigningFieldContainer } from './signing-field-container';
+import { SigningFieldContainer } from '../signing-field-container';
 
-export type AssistantDropdownFieldProps = {
+export type AssistantRadioFieldProps = {
   field: FieldWithSignatureAndFieldMeta;
   onSignField?: (value: TSignFieldWithTokenMutationSchema) => Promise<void> | void;
   onUnsignField?: (value: TRemovedSignedFieldWithTokenMutationSchema) => Promise<void> | void;
@@ -38,23 +32,28 @@ export type AssistantDropdownFieldProps = {
   recipient: RecipientWithFields;
 };
 
-export const AssistantDropdownField = ({
+export const AssistantRadioField = ({
   field,
   onSignField,
   onUnsignField,
   selectedSigner,
   recipient,
-}: AssistantDropdownFieldProps) => {
+}: AssistantRadioFieldProps) => {
   const { _ } = useLingui();
   const { toast } = useToast();
-  const router = useRouter();
 
+  const router = useRouter();
   const [isPending, startTransition] = useTransition();
 
-  const parsedFieldMeta = ZDropdownFieldMeta.parse(field.fieldMeta);
-  const isReadOnly = parsedFieldMeta.readOnly;
-  const defaultValue = parsedFieldMeta.defaultValue;
-  const [localChoice, setLocalChoice] = useState(parsedFieldMeta.defaultValue ?? '');
+  const parsedFieldMeta = ZRadioFieldMeta.parse(field.fieldMeta);
+  const values = parsedFieldMeta.values?.map((item) => ({
+    ...item,
+    value: item.value.length > 0 ? item.value : `empty-value-${item.id}`,
+  }));
+  const checkedItem = values?.find((item) => item.checked);
+  const defaultValue = !field.inserted && !!checkedItem ? checkedItem.value : '';
+
+  const [selectedOption, setSelectedOption] = useState(defaultValue);
 
   const { mutateAsync: signFieldWithToken, isLoading: isSignFieldWithTokenLoading } =
     trpc.field.signFieldWithToken.useMutation(DO_NOT_INVALIDATE_QUERY_ON_MUTATION);
@@ -66,18 +65,18 @@ export const AssistantDropdownField = ({
 
   const isLoading = isSignFieldWithTokenLoading || isRemoveSignedFieldWithTokenLoading || isPending;
   const shouldAutoSignField =
-    (!field.inserted && localChoice) || (!field.inserted && isReadOnly && defaultValue);
+    (!field.inserted && selectedOption) || (!field.inserted && defaultValue);
 
   const onSign = async () => {
     try {
-      if (!selectedSigner || !localChoice) {
+      if (!selectedSigner || !selectedOption) {
         return;
       }
 
       const payload: TSignFieldWithTokenMutationSchema = {
         token: selectedSigner.token,
         fieldId: field.id,
-        value: localChoice,
+        value: selectedOption,
         isBase64: true,
         isAssistantPrefill: true,
         assistantId: recipient.id,
@@ -107,10 +106,6 @@ export const AssistantDropdownField = ({
     }
   };
 
-  const onPreSign = () => {
-    return true;
-  };
-
   const onRemove = async () => {
     try {
       if (!selectedSigner) {
@@ -128,7 +123,8 @@ export const AssistantDropdownField = ({
         await removeSignedFieldWithToken(payload);
       }
 
-      setLocalChoice('');
+      setSelectedOption('');
+
       startTransition(() => router.refresh());
     } catch (err) {
       console.error(err);
@@ -141,71 +137,60 @@ export const AssistantDropdownField = ({
     }
   };
 
-  const handleSelectItem = (val: string) => {
-    setLocalChoice(val);
+  const handleSelectItem = (selectedValue: string) => {
+    setSelectedOption(selectedValue);
   };
-
-  useEffect(() => {
-    if (!field.inserted && localChoice) {
-      void onSign();
-    }
-  }, [localChoice]);
 
   useEffect(() => {
     if (shouldAutoSignField) {
       void onSign();
     }
-  }, []);
+  }, [selectedOption]);
 
   return (
-    <div className="pointer-events-none">
-      <SigningFieldContainer
-        field={field}
-        onPreSign={onPreSign}
-        onSign={onSign}
-        onRemove={onRemove}
-        type="Dropdown"
-      >
-        {isLoading && (
-          <div className="bg-background absolute inset-0 flex items-center justify-center rounded-md">
-            <Loader className="text-primary h-5 w-5 animate-spin md:h-8 md:w-8" />
-          </div>
-        )}
+    <SigningFieldContainer field={field} onSign={onSign} onRemove={onRemove} type="Radio">
+      {isLoading && (
+        <div className="bg-background absolute inset-0 z-20 flex items-center justify-center rounded-md">
+          <Loader className="text-primary h-5 w-5 animate-spin md:h-8 md:w-8" />
+        </div>
+      )}
 
-        {!field.inserted && (
-          <p className="group-hover:text-primary text-muted-foreground flex flex-col items-center justify-center duration-200">
-            <Select value={localChoice} onValueChange={handleSelectItem}>
-              <SelectTrigger
-                className={cn(
-                  'text-muted-foreground z-10 h-full w-full border-none ring-0 focus:ring-0',
-                  {
-                    'hover:text-red-300': parsedFieldMeta.required,
-                    'hover:text-yellow-300': !parsedFieldMeta.required,
-                  },
-                )}
-              >
-                <SelectValue
-                  className="text-[clamp(0.425rem,25cqw,0.825rem)]"
-                  placeholder={`${_(msg`Select`)}`}
-                />
-              </SelectTrigger>
-              <SelectContent className="w-full ring-0 focus:ring-0" position="popper">
-                {parsedFieldMeta?.values?.map((item, index) => (
-                  <SelectItem key={index} value={item.value} className="ring-0 focus:ring-0">
-                    {item.value}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </p>
-        )}
+      {!field.inserted && (
+        <RadioGroup value={selectedOption} onValueChange={handleSelectItem} className="z-10">
+          {values?.map((item, index) => (
+            <div key={index} className="flex items-center gap-x-1.5">
+              <RadioGroupItem
+                className="h-4 w-4 shrink-0"
+                value={item.value}
+                id={`option-${index}`}
+                checked={item.checked}
+              />
 
-        {field.inserted && (
-          <p className="text-muted-foreground dark:text-background/80 text-[clamp(0.425rem,25cqw,0.825rem)] duration-200">
-            {field.customText}
-          </p>
-        )}
-      </SigningFieldContainer>
-    </div>
+              <Label htmlFor={`option-${index}`}>
+                {item.value.includes('empty-value-') ? '' : item.value}
+              </Label>
+            </div>
+          ))}
+        </RadioGroup>
+      )}
+
+      {field.inserted && (
+        <RadioGroup className="gap-y-1">
+          {values?.map((item, index) => (
+            <div key={index} className="flex items-center gap-x-1.5">
+              <RadioGroupItem
+                className="h-3 w-3"
+                value={item.value}
+                id={`option-${index}`}
+                checked={item.value === field.customText}
+              />
+              <Label htmlFor={`option-${index}`} className="text-xs">
+                {item.value.includes('empty-value-') ? '' : item.value}
+              </Label>
+            </div>
+          ))}
+        </RadioGroup>
+      )}
+    </SigningFieldContainer>
   );
 };

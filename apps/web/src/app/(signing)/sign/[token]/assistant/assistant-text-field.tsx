@@ -4,14 +4,14 @@ import { useEffect, useState, useTransition } from 'react';
 
 import { useRouter } from 'next/navigation';
 
-import { Trans, msg } from '@lingui/macro';
+import { Plural, Trans, msg } from '@lingui/macro';
 import { useLingui } from '@lingui/react';
-import { Hash, Loader } from 'lucide-react';
+import { Loader, Type } from 'lucide-react';
 
-import { validateNumberField } from '@documenso/lib/advanced-fields-validation/validate-number';
+import { validateTextField } from '@documenso/lib/advanced-fields-validation/validate-text';
 import { DO_NOT_INVALIDATE_QUERY_ON_MUTATION } from '@documenso/lib/constants/trpc';
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
-import { ZNumberFieldMeta } from '@documenso/lib/types/field-meta';
+import { ZTextFieldMeta } from '@documenso/lib/types/field-meta';
 import type { FieldWithSignatureAndFieldMeta } from '@documenso/prisma/types/field-with-signature-and-fieldmeta';
 import type { RecipientWithFields } from '@documenso/prisma/types/recipient-with-fields';
 import { trpc } from '@documenso/trpc/react';
@@ -22,20 +22,17 @@ import type {
 import { cn } from '@documenso/ui/lib/utils';
 import { Button } from '@documenso/ui/primitives/button';
 import { Dialog, DialogContent, DialogFooter, DialogTitle } from '@documenso/ui/primitives/dialog';
-import { Input } from '@documenso/ui/primitives/input';
+import { Textarea } from '@documenso/ui/primitives/textarea';
 import { useToast } from '@documenso/ui/primitives/use-toast';
 
-import { SigningFieldContainer } from './signing-field-container';
+import { SigningFieldContainer } from '../signing-field-container';
 
 type ValidationErrors = {
-  isNumber: string[];
   required: string[];
-  minValue: string[];
-  maxValue: string[];
-  numberFormat: string[];
+  characterLimit: string[];
 };
 
-export type AssistantNumberFieldProps = {
+export type AssistantTextFieldProps = {
   field: FieldWithSignatureAndFieldMeta;
   onSignField?: (value: TSignFieldWithTokenMutationSchema) => Promise<void> | void;
   onUnsignField?: (value: TRemovedSignedFieldWithTokenMutationSchema) => Promise<void> | void;
@@ -43,34 +40,28 @@ export type AssistantNumberFieldProps = {
   recipient: RecipientWithFields;
 };
 
-export const AssistantNumberField = ({
+export const AssistantTextField = ({
   field,
   onSignField,
   onUnsignField,
   selectedSigner,
   recipient,
-}: AssistantNumberFieldProps) => {
+}: AssistantTextFieldProps) => {
   const { _ } = useLingui();
   const { toast } = useToast();
   const router = useRouter();
 
   const initialErrors: ValidationErrors = {
-    isNumber: [],
     required: [],
-    minValue: [],
-    maxValue: [],
-    numberFormat: [],
+    characterLimit: [],
   };
 
   const [errors, setErrors] = useState(initialErrors);
   const [isPending, startTransition] = useTransition();
+  const [showCustomTextModal, setShowCustomTextModal] = useState(false);
 
-  const parsedFieldMeta = field.fieldMeta ? ZNumberFieldMeta.parse(field.fieldMeta) : null;
-
-  const [localNumber, setLocalNumber] = useState(
-    parsedFieldMeta?.value ? String(parsedFieldMeta.value) : '',
-  );
-  const [showNumberModal, setShowNumberModal] = useState(false);
+  const parsedFieldMeta = field.fieldMeta ? ZTextFieldMeta.parse(field.fieldMeta) : null;
+  const [localText, setLocalCustomText] = useState(parsedFieldMeta?.text ?? '');
 
   const { mutateAsync: signFieldWithToken, isLoading: isSignFieldWithTokenLoading } =
     trpc.field.signFieldWithToken.useMutation(DO_NOT_INVALIDATE_QUERY_ON_MUTATION);
@@ -82,59 +73,53 @@ export const AssistantNumberField = ({
 
   const isLoading = isSignFieldWithTokenLoading || isRemoveSignedFieldWithTokenLoading || isPending;
 
-  const handleNumberChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const userInputHasErrors = Object.values(errors).some((error) => error.length > 0);
+
+  useEffect(() => {
+    if (!showCustomTextModal) {
+      setLocalCustomText(parsedFieldMeta?.text ?? '');
+      setErrors(initialErrors);
+    }
+  }, [showCustomTextModal]);
+
+  const handleTextChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     const text = e.target.value;
-    setLocalNumber(text);
+    setLocalCustomText(text);
 
     if (parsedFieldMeta) {
-      const validationErrors = validateNumberField(text, parsedFieldMeta, true);
+      const validationErrors = validateTextField(text, parsedFieldMeta, true);
       setErrors({
-        isNumber: validationErrors.filter((error) => error.includes('valid number')),
         required: validationErrors.filter((error) => error.includes('required')),
-        minValue: validationErrors.filter((error) => error.includes('minimum value')),
-        maxValue: validationErrors.filter((error) => error.includes('maximum value')),
-        numberFormat: validationErrors.filter((error) => error.includes('number format')),
+        characterLimit: validationErrors.filter((error) => error.includes('character limit')),
       });
-    } else {
-      const validationErrors = validateNumberField(text);
-      setErrors((prevErrors) => ({
-        ...prevErrors,
-        isNumber: validationErrors.filter((error) => error.includes('valid number')),
-      }));
     }
   };
 
   const onDialogSignClick = () => {
     if (parsedFieldMeta) {
-      const validationErrors = validateNumberField(localNumber, parsedFieldMeta, true);
+      const validationErrors = validateTextField(localText, parsedFieldMeta, true);
 
       if (validationErrors.length > 0) {
         setErrors({
-          isNumber: validationErrors.filter((error) => error.includes('valid number')),
           required: validationErrors.filter((error) => error.includes('required')),
-          minValue: validationErrors.filter((error) => error.includes('minimum value')),
-          maxValue: validationErrors.filter((error) => error.includes('maximum value')),
-          numberFormat: validationErrors.filter((error) => error.includes('number format')),
+          characterLimit: validationErrors.filter((error) => error.includes('character limit')),
         });
         return;
       }
     }
 
-    setShowNumberModal(false);
+    setShowCustomTextModal(false);
     void onSign();
   };
 
   const onPreSign = () => {
-    setShowNumberModal(true);
+    setShowCustomTextModal(true);
 
-    if (localNumber && parsedFieldMeta) {
-      const validationErrors = validateNumberField(localNumber, parsedFieldMeta, true);
+    if (localText && parsedFieldMeta) {
+      const validationErrors = validateTextField(localText, parsedFieldMeta, true);
       setErrors({
-        isNumber: validationErrors.filter((error) => error.includes('valid number')),
         required: validationErrors.filter((error) => error.includes('required')),
-        minValue: validationErrors.filter((error) => error.includes('minimum value')),
-        maxValue: validationErrors.filter((error) => error.includes('maximum value')),
-        numberFormat: validationErrors.filter((error) => error.includes('number format')),
+        characterLimit: validationErrors.filter((error) => error.includes('character limit')),
       });
     }
 
@@ -143,21 +128,17 @@ export const AssistantNumberField = ({
 
   const onSign = async () => {
     try {
-      if (
-        !selectedSigner ||
-        !localNumber ||
-        Object.values(errors).some((error) => error.length > 0)
-      ) {
+      if (!selectedSigner || !localText || userInputHasErrors) {
         return;
       }
 
       const payload: TSignFieldWithTokenMutationSchema = {
         token: selectedSigner.token,
         fieldId: field.id,
-        value: localNumber,
+        value: localText,
         isBase64: true,
-        assistantId: recipient.id,
         isAssistantPrefill: true,
+        assistantId: recipient.id,
       };
 
       if (onSignField) {
@@ -167,7 +148,7 @@ export const AssistantNumberField = ({
 
       await signFieldWithToken(payload);
 
-      setLocalNumber('');
+      setLocalCustomText('');
 
       startTransition(() => router.refresh());
     } catch (err) {
@@ -205,7 +186,7 @@ export const AssistantNumberField = ({
 
       await removeSignedFieldWithToken(payload);
 
-      setLocalNumber('');
+      setLocalCustomText(parsedFieldMeta?.text ?? '');
 
       startTransition(() => router.refresh());
     } catch (err) {
@@ -213,29 +194,31 @@ export const AssistantNumberField = ({
 
       toast({
         title: _(msg`Error`),
-        description: _(msg`An error occurred while removing the number.`),
+        description: _(msg`An error occurred while removing the text.`),
         variant: 'destructive',
       });
     }
   };
 
-  useEffect(() => {
-    if (!showNumberModal) {
-      setLocalNumber(parsedFieldMeta?.value ? String(parsedFieldMeta.value) : '');
-      setErrors(initialErrors);
-    }
-  }, [showNumberModal]);
+  const parsedField = field.fieldMeta ? ZTextFieldMeta.parse(field.fieldMeta) : undefined;
 
-  const userInputHasErrors = Object.values(errors).some((error) => error.length > 0);
+  const labelDisplay =
+    parsedField?.label && parsedField.label.length < 20
+      ? parsedField.label
+      : parsedField?.label
+        ? parsedField?.label.substring(0, 20) + '...'
+        : undefined;
 
-  let fieldDisplayName = 'Number';
+  const textDisplay =
+    parsedField?.text && parsedField.text.length < 20
+      ? parsedField.text
+      : parsedField?.text
+        ? parsedField?.text.substring(0, 20) + '...'
+        : undefined;
 
-  if (parsedFieldMeta?.label) {
-    fieldDisplayName =
-      parsedFieldMeta.label.length > 10
-        ? parsedFieldMeta.label.substring(0, 10) + '...'
-        : parsedFieldMeta.label;
-  }
+  const fieldDisplayName = labelDisplay ? labelDisplay : textDisplay;
+  const characterLimit = parsedFieldMeta?.characterLimit;
+  const charactersRemaining = characterLimit ? characterLimit - localText.length : null;
 
   return (
     <SigningFieldContainer
@@ -243,7 +226,7 @@ export const AssistantNumberField = ({
       onPreSign={onPreSign}
       onSign={onSign}
       onRemove={onRemove}
-      type="Number"
+      type="Text"
     >
       {isLoading && (
         <div className="bg-background absolute inset-0 flex items-center justify-center rounded-md">
@@ -262,76 +245,82 @@ export const AssistantNumberField = ({
           )}
         >
           <span className="flex items-center justify-center gap-x-1">
-            <Hash className="h-[clamp(0.625rem,20cqw,0.925rem)] w-[clamp(0.625rem,20cqw,0.925rem)]" />{' '}
-            <span className="text-[clamp(0.425rem,25cqw,0.825rem)]">{fieldDisplayName}</span>
+            <Type className="h-[clamp(0.625rem,20cqw,0.925rem)] w-[clamp(0.625rem,20cqw,0.925rem)]" />
+            <span className="text-[clamp(0.425rem,25cqw,0.825rem)]">
+              {fieldDisplayName || <Trans>Text</Trans>}
+            </span>
           </span>
         </p>
       )}
 
       {field.inserted && (
-        <p className="text-muted-foreground dark:text-background/80 text-[clamp(0.425rem,25cqw,0.825rem)] duration-200">
-          {field.customText}
+        <p className="text-muted-foregrou`nd dark:text-background/80 flex items-center justify-center gap-x-1 text-[clamp(0.425rem,25cqw,0.825rem)] duration-200">
+          {field.customText.length < 20
+            ? field.customText
+            : field.customText.substring(0, 15) + '...'}
         </p>
       )}
 
-      <Dialog open={showNumberModal} onOpenChange={setShowNumberModal}>
+      <Dialog open={showCustomTextModal} onOpenChange={setShowCustomTextModal}>
         <DialogContent>
           <DialogTitle>
-            {parsedFieldMeta?.label ? parsedFieldMeta?.label : <Trans>Number</Trans>}{' '}
+            {parsedFieldMeta?.label ? parsedFieldMeta?.label : <Trans>Text</Trans>}
           </DialogTitle>
 
           <div>
-            <Input
-              type="text"
-              placeholder={parsedFieldMeta?.placeholder ?? ''}
+            <Textarea
+              id="custom-text"
+              placeholder={parsedFieldMeta?.placeholder ?? _(msg`Enter text here`)}
               className={cn('mt-2 w-full rounded-md', {
                 'border-2 border-red-300 ring-2 ring-red-200 ring-offset-2 ring-offset-red-200 focus-visible:border-red-400 focus-visible:ring-4 focus-visible:ring-red-200 focus-visible:ring-offset-2 focus-visible:ring-offset-red-200':
                   userInputHasErrors,
               })}
-              value={localNumber}
-              onChange={handleNumberChange}
+              value={localText}
+              onChange={handleTextChange}
             />
           </div>
 
+          {characterLimit && !userInputHasErrors && charactersRemaining !== null && (
+            <div className="text-muted-foreground text-sm">
+              <Plural
+                value={charactersRemaining}
+                one="1 character remaining"
+                other={`${charactersRemaining} characters remaining`}
+              />
+            </div>
+          )}
+
           {userInputHasErrors && (
-            <div>
-              {errors.isNumber?.map((error, index) => (
-                <p key={index} className="mt-2 text-sm text-red-500">
+            <div className="text-sm">
+              {errors.required.map((error, index) => (
+                <p key={index} className="text-red-500">
                   {error}
                 </p>
               ))}
-              {errors.required?.map((error, index) => (
-                <p key={index} className="mt-2 text-sm text-red-500">
-                  {error}
-                </p>
-              ))}
-              {errors.minValue?.map((error, index) => (
-                <p key={index} className="mt-2 text-sm text-red-500">
-                  {error}
-                </p>
-              ))}
-              {errors.maxValue?.map((error, index) => (
-                <p key={index} className="mt-2 text-sm text-red-500">
-                  {error}
-                </p>
-              ))}
-              {errors.numberFormat?.map((error, index) => (
-                <p key={index} className="mt-2 text-sm text-red-500">
-                  {error}
+              {errors.characterLimit.map((error, index) => (
+                <p key={index} className="text-red-500">
+                  {error}{' '}
+                  {charactersRemaining && charactersRemaining < 0 && (
+                    <Plural
+                      value={Math.abs(charactersRemaining)}
+                      one="(1 character over)"
+                      other="(# characters over)"
+                    />
+                  )}
                 </p>
               ))}
             </div>
           )}
 
           <DialogFooter>
-            <div className="flex w-full flex-1 flex-nowrap gap-4">
+            <div className="mt-4 flex w-full flex-1 flex-nowrap gap-4">
               <Button
                 type="button"
                 className="dark:bg-muted dark:hover:bg-muted/80 flex-1 bg-black/5 hover:bg-black/10"
                 variant="secondary"
                 onClick={() => {
-                  setShowNumberModal(false);
-                  setLocalNumber('');
+                  setShowCustomTextModal(false);
+                  setLocalCustomText('');
                 }}
               >
                 <Trans>Cancel</Trans>
@@ -340,7 +329,7 @@ export const AssistantNumberField = ({
               <Button
                 type="button"
                 className="flex-1"
-                disabled={!localNumber || userInputHasErrors}
+                disabled={!localText || userInputHasErrors}
                 onClick={onDialogSignClick}
               >
                 <Trans>Save</Trans>

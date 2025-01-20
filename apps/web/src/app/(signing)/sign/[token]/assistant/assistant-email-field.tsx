@@ -8,11 +8,6 @@ import { Trans, msg } from '@lingui/macro';
 import { useLingui } from '@lingui/react';
 import { Loader } from 'lucide-react';
 
-import {
-  DEFAULT_DOCUMENT_DATE_FORMAT,
-  convertToLocalSystemFormat,
-} from '@documenso/lib/constants/date-formats';
-import { DEFAULT_DOCUMENT_TIME_ZONE } from '@documenso/lib/constants/time-zones';
 import { DO_NOT_INVALIDATE_QUERY_ON_MUTATION } from '@documenso/lib/constants/trpc';
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import type { FieldWithSignature } from '@documenso/prisma/types/field-with-signature';
@@ -24,27 +19,23 @@ import type {
 } from '@documenso/trpc/server/field-router/schema';
 import { useToast } from '@documenso/ui/primitives/use-toast';
 
-import { SigningFieldContainer } from './signing-field-container';
+import { SigningFieldContainer } from '../signing-field-container';
 
-export type AssistantDateFieldProps = {
+export type AssistantEmailFieldProps = {
   field: FieldWithSignature;
   onSignField?: (value: TSignFieldWithTokenMutationSchema) => Promise<void> | void;
   onUnsignField?: (value: TRemovedSignedFieldWithTokenMutationSchema) => Promise<void> | void;
   selectedSigner: RecipientWithFields | null;
   recipient: RecipientWithFields;
-  dateFormat?: string | null;
-  timezone?: string | null;
 };
 
-export const AssistantDateField = ({
+export const AssistantEmailField = ({
   field,
   onSignField,
   onUnsignField,
   selectedSigner,
   recipient,
-  dateFormat = DEFAULT_DOCUMENT_DATE_FORMAT,
-  timezone = DEFAULT_DOCUMENT_TIME_ZONE,
-}: AssistantDateFieldProps) => {
+}: AssistantEmailFieldProps) => {
   const router = useRouter();
   const { toast } = useToast();
   const { _ } = useLingui();
@@ -61,12 +52,6 @@ export const AssistantDateField = ({
 
   const isLoading = isSignFieldWithTokenLoading || isRemoveSignedFieldWithTokenLoading || isPending;
 
-  const localDateString = convertToLocalSystemFormat(field.customText, dateFormat, timezone);
-  const isDifferentTime = field.inserted && localDateString !== field.customText;
-  const tooltipText = _(
-    msg`"${field.customText}" will appear on the document as it has a timezone of "${timezone}".`,
-  );
-
   const onSign = async () => {
     try {
       if (!selectedSigner) {
@@ -76,8 +61,8 @@ export const AssistantDateField = ({
       const payload: TSignFieldWithTokenMutationSchema = {
         token: selectedSigner.token,
         fieldId: field.id,
-        value: dateFormat ?? DEFAULT_DOCUMENT_DATE_FORMAT,
-        isBase64: true,
+        value: selectedSigner.email,
+        isBase64: false,
         isAssistantPrefill: true,
         assistantId: recipient.id,
       };
@@ -138,13 +123,7 @@ export const AssistantDateField = ({
   };
 
   return (
-    <SigningFieldContainer
-      field={field}
-      onSign={onSign}
-      onRemove={onRemove}
-      type="Date"
-      tooltipText={isDifferentTime ? tooltipText : undefined}
-    >
+    <SigningFieldContainer field={field} onSign={onSign} onRemove={onRemove} type="Email">
       {isLoading && (
         <div className="bg-background absolute inset-0 flex items-center justify-center rounded-md">
           <Loader className="text-primary h-5 w-5 animate-spin md:h-8 md:w-8" />
@@ -153,13 +132,13 @@ export const AssistantDateField = ({
 
       {!field.inserted && (
         <p className="group-hover:text-primary text-muted-foreground text-[clamp(0.425rem,25cqw,0.825rem)] duration-200 group-hover:text-yellow-300">
-          <Trans>Date</Trans>
+          <Trans>Email</Trans>
         </p>
       )}
 
       {field.inserted && (
         <p className="text-muted-foreground dark:text-background/80 text-[clamp(0.425rem,25cqw,0.825rem)] duration-200">
-          {localDateString}
+          {field.customText}
         </p>
       )}
     </SigningFieldContainer>
