@@ -1,6 +1,5 @@
 import { TRPCError } from '@trpc/server';
 import { DateTime } from 'luxon';
-import { z } from 'zod';
 
 import { getServerLimits } from '@documenso/ee/server-only/limits/server';
 import { NEXT_PUBLIC_WEBAPP_URL } from '@documenso/lib/constants/app';
@@ -42,6 +41,7 @@ import {
   ZFindDocumentAuditLogsQuerySchema,
   ZFindDocumentsRequestSchema,
   ZFindDocumentsResponseSchema,
+  ZGenericSuccessResponse,
   ZGetDocumentByIdQuerySchema,
   ZGetDocumentByTokenQuerySchema,
   ZGetDocumentWithDetailsByIdRequestSchema,
@@ -52,6 +52,7 @@ import {
   ZSearchDocumentsMutationSchema,
   ZSetPasswordForDocumentMutationSchema,
   ZSetSigningOrderForDocumentMutationSchema,
+  ZSuccessResponseSchema,
   ZUpdateDocumentRequestSchema,
   ZUpdateDocumentResponseSchema,
 } from './schema';
@@ -326,7 +327,7 @@ export const documentRouter = router({
       },
     })
     .input(ZDeleteDocumentMutationSchema)
-    .output(z.void())
+    .output(ZSuccessResponseSchema)
     .mutation(async ({ input, ctx }) => {
       const { teamId } = ctx;
       const { documentId } = input;
@@ -339,6 +340,8 @@ export const documentRouter = router({
         teamId,
         requestMetadata: ctx.metadata,
       });
+
+      return ZGenericSuccessResponse;
     }),
 
   /**
@@ -481,18 +484,20 @@ export const documentRouter = router({
       },
     })
     .input(ZResendDocumentMutationSchema)
-    .output(z.void())
+    .output(ZSuccessResponseSchema)
     .mutation(async ({ input, ctx }) => {
       const { teamId } = ctx;
       const { documentId, recipients } = input;
 
-      return await resendDocument({
+      await resendDocument({
         userId: ctx.user.id,
         teamId,
         documentId,
         recipients,
         requestMetadata: ctx.metadata,
       });
+
+      return ZGenericSuccessResponse;
     }),
 
   /**

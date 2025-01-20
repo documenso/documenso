@@ -48,7 +48,6 @@ export const ZDocumentSchema = DocumentSchema.pick({
     subject: true,
     message: true,
     timezone: true,
-    password: true,
     dateFormat: true,
     documentId: true,
     redirectUrl: true,
