@@ -95,7 +95,7 @@ export const createTeam = async ({
           });
         }
 
-        await tx.team.create({
+        const team = await tx.team.create({
           data: {
             name: teamName,
             url: teamUrl,
@@ -104,11 +104,17 @@ export const createTeam = async ({
             members: {
               create: [
                 {
-                  userId,
+                  userId: user.id,
                   role: TeamMemberRole.ADMIN,
                 },
               ],
             },
+          },
+        });
+
+        await tx.teamGlobalSettings.create({
+          data: {
+            teamId: team.id,
           },
         });
       });
