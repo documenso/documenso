@@ -231,6 +231,12 @@ export const createTeamFromPendingTeam = async ({
       },
     });
 
+    await tx.teamGlobalSettings.create({
+      data: {
+        teamId: team.id,
+      },
+    });
+
     await tx.subscription.upsert(
       mapStripeSubscriptionToPrismaUpsertAction(subscription, undefined, team.id),
     );
