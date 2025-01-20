@@ -1,6 +1,6 @@
 'use client';
 
-import { useId, useMemo, useState } from 'react';
+import { useEffect, useId, useMemo, useState } from 'react';
 
 import { useRouter } from 'next/navigation';
 
@@ -66,11 +66,24 @@ export const SigningForm = ({
   const { mutateAsync: completeDocumentWithToken } =
     trpc.recipient.completeDocumentWithToken.useMutation();
 
-  const assistantForm = useForm({
+  const firstSignerWithFields = useMemo(
+    () => allRecipients?.find((recipient) => recipient.Field.length > 0)?.id,
+    [allRecipients],
+  );
+
+  const assistantForm = useForm<{ selectedSignerId: number | undefined }>({
     defaultValues: {
-      selectedSignerId: allRecipients?.[0]?.id,
+      selectedSignerId: undefined,
     },
   });
+
+  useEffect(() => {
+    if (firstSignerWithFields) {
+      assistantForm.setValue('selectedSignerId', firstSignerWithFields);
+      setSelectedSignerId(firstSignerWithFields);
+    }
+  }, [firstSignerWithFields, assistantForm, setSelectedSignerId]);
+
   const { handleSubmit, formState } = useForm();
 
   // Keep the loading state going if successful since the redirect may take some time.
