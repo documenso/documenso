@@ -25,6 +25,8 @@ import { sendDocument } from '@documenso/lib/server-only/document/send-document'
 import { updateDocument } from '@documenso/lib/server-only/document/update-document';
 import { symmetricEncrypt } from '@documenso/lib/universal/crypto';
 import { getPresignPostUrl } from '@documenso/lib/universal/upload/server-actions';
+import { createDocumentAuditLogData } from '@documenso/lib/utils/document-audit-logs';
+import { prisma } from '@documenso/prisma';
 import { DocumentDataType, DocumentStatus } from '@documenso/prisma/client';
 
 import { authenticatedProcedure, procedure, router } from '../trpc';
@@ -625,5 +627,38 @@ export const documentRouter = router({
       return {
         url: `${NEXT_PUBLIC_WEBAPP_URL()}/__htmltopdf/certificate?d=${encrypted}`,
       };
+    }),
+
+  createAuditLog: authenticatedProcedure
+    .input(
+      z.object({
+        documentId: z.number(),
+        type: z.literal('DOCUMENT_SIGNING_LINK_COPIED'),
+        data: z.object({
+          recipientEmail: z.string(),
+          recipientName: z.string(),
+          recipientId: z.number(),
+          recipientRole: z.string(),
+          isBulkCopy: z.boolean(),
+        }),
+      }),
+    )
+    .mutation(async ({ input, ctx }) => {
+      const { documentId, type, data } = input;
+
+      console.log('input', input);
+      console.log('copiedddd');
+
+      const auditLog = await prisma.documentAuditLog.create({
+        data: createDocumentAuditLogData({
+          type,
+          data,
+          documentId,
+          user: ctx.user,
+          metadata: ctx.metadata,
+        }),
+      });
+
+      return auditLog;
     }),
 });

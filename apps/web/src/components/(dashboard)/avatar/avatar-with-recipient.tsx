@@ -1,7 +1,5 @@
 'use client';
 
-import React from 'react';
-
 import { msg } from '@lingui/macro';
 import { useLingui } from '@lingui/react';
 
@@ -12,6 +10,7 @@ import { RECIPIENT_ROLES_DESCRIPTION } from '@documenso/lib/constants/recipient-
 import { recipientAbbreviation } from '@documenso/lib/utils/recipient-formatter';
 import type { Recipient } from '@documenso/prisma/client';
 import { DocumentStatus } from '@documenso/prisma/client';
+import { trpc } from '@documenso/trpc/react';
 import { cn } from '@documenso/ui/lib/utils';
 import { useToast } from '@documenso/ui/primitives/use-toast';
 
@@ -20,13 +19,20 @@ import { StackAvatar } from './stack-avatar';
 export type AvatarWithRecipientProps = {
   recipient: Recipient;
   documentStatus: DocumentStatus;
+  documentId: number;
 };
 
-export function AvatarWithRecipient({ recipient, documentStatus }: AvatarWithRecipientProps) {
+export function AvatarWithRecipient({
+  recipient,
+  documentStatus,
+  documentId,
+}: AvatarWithRecipientProps) {
   const [, copy] = useCopyToClipboard();
 
   const { _ } = useLingui();
   const { toast } = useToast();
+
+  const { mutateAsync: createAuditLog } = trpc.document.createAuditLog.useMutation();
 
   const signingToken = documentStatus === DocumentStatus.PENDING ? recipient.token : null;
 
@@ -39,6 +45,18 @@ export function AvatarWithRecipient({ recipient, documentStatus }: AvatarWithRec
       toast({
         title: _(msg`Copied to clipboard`),
         description: _(msg`The signing link has been copied to your clipboard.`),
+      });
+
+      void createAuditLog({
+        documentId,
+        type: 'DOCUMENT_SIGNING_LINK_COPIED',
+        data: {
+          recipientEmail: recipient.email,
+          recipientName: recipient.name,
+          recipientId: recipient.id,
+          recipientRole: recipient.role,
+          isBulkCopy: false,
+        },
       });
     });
   };

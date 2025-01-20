@@ -16,6 +16,7 @@ import {
   DocumentStatus,
   RecipientRole,
 } from '@documenso/prisma/client';
+import { trpc } from '@documenso/trpc/react';
 import { DocumentSendEmailMessageHelper } from '@documenso/ui/components/document/document-send-email-message-helper';
 import { Tabs, TabsList, TabsTrigger } from '@documenso/ui/primitives/tabs';
 
@@ -58,6 +59,8 @@ export const AddSubjectFormPartial = ({
 }: AddSubjectFormProps) => {
   const { _ } = useLingui();
 
+  const { mutateAsync: createAuditLog } = trpc.document.createAuditLog.useMutation();
+
   const {
     register,
     handleSubmit,
@@ -97,6 +100,25 @@ export const AddSubjectFormPartial = ({
 
   const onFormSubmit = handleSubmit(onSubmit);
   const { currentStep, totalSteps, previousStep } = useStep();
+
+  const onCopyLink = (recipient: Recipient) => {
+    toast({
+      title: _(msg`Copied to clipboard`),
+      description: _(msg`The signing link has been copied to your clipboard.`),
+    });
+
+    void createAuditLog({
+      documentId: document.id,
+      type: 'DOCUMENT_SIGNING_LINK_COPIED',
+      data: {
+        recipientEmail: recipient.email,
+        recipientName: recipient.name,
+        recipientId: recipient.id,
+        recipientRole: recipient.role,
+        isBulkCopy: false,
+      },
+    });
+  };
 
   return (
     <>
@@ -236,14 +258,7 @@ export const AddSubjectFormPartial = ({
                         {recipient.role !== RecipientRole.CC && (
                           <CopyTextButton
                             value={formatSigningLink(recipient.token)}
-                            onCopySuccess={() => {
-                              toast({
-                                title: _(msg`Copied to clipboard`),
-                                description: _(
-                                  msg`The signing link has been copied to your clipboard.`,
-                                ),
-                              });
-                            }}
+                            onCopySuccess={() => void onCopyLink(recipient)}
                             badgeContentUncopied={
                               <p className="ml-1 text-xs">
                                 <Trans>Copy</Trans>

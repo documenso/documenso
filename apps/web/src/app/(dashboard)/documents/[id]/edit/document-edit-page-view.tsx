@@ -13,8 +13,7 @@ import { DocumentVisibility } from '@documenso/lib/types/document-visibility';
 import { symmetricDecrypt } from '@documenso/lib/universal/crypto';
 import { formatDocumentsPath } from '@documenso/lib/utils/teams';
 import type { Team } from '@documenso/prisma/client';
-import { TeamMemberRole } from '@documenso/prisma/client';
-import { DocumentStatus as InternalDocumentStatus } from '@documenso/prisma/client';
+import { DocumentStatus as InternalDocumentStatus, TeamMemberRole } from '@documenso/prisma/client';
 
 import { EditDocumentForm } from '~/app/(dashboard)/documents/[id]/edit-document';
 import { StackAvatarsWithTooltip } from '~/components/(dashboard)/avatar/stack-avatars-with-tooltip';
@@ -127,6 +126,7 @@ export const DocumentEditPageView = async ({ params, team }: DocumentEditPageVie
               recipients={recipients}
               documentStatus={document.status}
               position="bottom"
+              documentId={document.id}
             >
               <span>
                 <Plural one="1 Recipient" other="# Recipients" value={recipients.length} />

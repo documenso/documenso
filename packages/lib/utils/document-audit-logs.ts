@@ -385,6 +385,10 @@ export const formatDocumentAuditLogAction = (
       anonymous: msg`Document completed`,
       identified: msg`Document completed`,
     }))
+    .with({ type: DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_SIGNING_LINK_COPIED }, () => ({
+      anonymous: msg`Document signing link copied`,
+      identified: msg`${prefix} copied the document signing link`,
+    }))
     .exhaustive();
 
   return {

@@ -117,6 +117,7 @@ export const TemplatePageViewDocumentsTable = ({
           <StackAvatarsWithTooltip
             recipients={row.original.recipients}
             documentStatus={row.original.status}
+            documentId={row.original.id}
           />
         ),
       },

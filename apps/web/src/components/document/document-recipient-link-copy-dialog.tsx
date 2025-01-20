@@ -14,6 +14,7 @@ import { RECIPIENT_ROLES_DESCRIPTION } from '@documenso/lib/constants/recipient-
 import { formatSigningLink } from '@documenso/lib/utils/recipients';
 import type { Recipient } from '@documenso/prisma/client';
 import { RecipientRole } from '@documenso/prisma/client';
+import { trpc } from '@documenso/trpc/react';
 import { CopyTextButton } from '@documenso/ui/components/common/copy-text-button';
 import { AvatarWithText } from '@documenso/ui/primitives/avatar';
 import { Button } from '@documenso/ui/primitives/button';
@@ -32,11 +33,13 @@ import { useToast } from '@documenso/ui/primitives/use-toast';
 export type DocumentRecipientLinkCopyDialogProps = {
   trigger?: React.ReactNode;
   recipients: Recipient[];
+  documentId: number;
 };
 
 export const DocumentRecipientLinkCopyDialog = ({
   trigger,
   recipients,
+  documentId,
 }: DocumentRecipientLinkCopyDialogProps) => {
   const { _ } = useLingui();
   const { toast } = useToast();
@@ -50,6 +53,29 @@ export const DocumentRecipientLinkCopyDialog = ({
 
   const actionSearchParam = searchParams?.get('action');
 
+  const { mutateAsync: createAuditLog } = trpc.document.createAuditLog.useMutation();
+
+  const onCopyLink = async (recipient: Recipient) => {
+    await copy(formatSigningLink(recipient.token)).then(() => {
+      toast({
+        title: _(msg`Copied to clipboard`),
+        description: _(msg`The signing link has been copied to your clipboard.`),
+      });
+
+      void createAuditLog({
+        documentId,
+        type: 'DOCUMENT_SIGNING_LINK_COPIED',
+        data: {
+          recipientEmail: recipient.email,
+          recipientName: recipient.name,
+          recipientId: recipient.id,
+          recipientRole: recipient.role,
+          isBulkCopy: false,
+        },
+      });
+    });
+  };
+
   const onBulkCopy = async () => {
     const generatedString = recipients
       .filter((recipient) => recipient.role !== RecipientRole.CC)
@@ -61,6 +87,24 @@ export const DocumentRecipientLinkCopyDialog = ({
         title: _(msg`Copied to clipboard`),
         description: _(msg`All signing links have been copied to your clipboard.`),
       });
+
+      void Promise.all(
+        recipients
+          .filter((recipient) => recipient.role !== RecipientRole.CC)
+          .map(async (recipient) =>
+            createAuditLog({
+              documentId,
+              type: 'DOCUMENT_SIGNING_LINK_COPIED',
+              data: {
+                recipientEmail: recipient.email,
+                recipientName: recipient.name,
+                recipientId: recipient.id,
+                recipientRole: recipient.role,
+                isBulkCopy: true,
+              },
+            }),
+          ),
+      );
     });
   };
 
@@ -112,12 +156,7 @@ export const DocumentRecipientLinkCopyDialog = ({
               {recipient.role !== RecipientRole.CC && (
                 <CopyTextButton
                   value={formatSigningLink(recipient.token)}
-                  onCopySuccess={() => {
-                    toast({
-                      title: _(msg`Copied to clipboard`),
-                      description: _(msg`The signing link has been copied to your clipboard.`),
-                    });
-                  }}
+                  onCopySuccess={async () => onCopyLink(recipient)}
                   badgeContentUncopied={
                     <p className="ml-1 text-xs">
                       <Trans>Copy</Trans>

@@ -15,9 +15,8 @@ import { getRecipientsForDocument } from '@documenso/lib/server-only/recipient/g
 import { DocumentVisibility } from '@documenso/lib/types/document-visibility';
 import { symmetricDecrypt } from '@documenso/lib/universal/crypto';
 import { formatDocumentsPath } from '@documenso/lib/utils/teams';
-import { DocumentStatus } from '@documenso/prisma/client';
 import type { Team, TeamEmail } from '@documenso/prisma/client';
-import { TeamMemberRole } from '@documenso/prisma/client';
+import { DocumentStatus, TeamMemberRole } from '@documenso/prisma/client';
 import { Badge } from '@documenso/ui/primitives/badge';
 import { Button } from '@documenso/ui/primitives/button';
 import { Card, CardContent } from '@documenso/ui/primitives/card';
@@ -137,7 +136,7 @@ export const DocumentPageView = async ({ params, team }: DocumentPageViewProps) 
   return (
     <div className="mx-auto -mt-4 w-full max-w-screen-xl px-4 md:px-8">
       {document.status === DocumentStatus.PENDING && (
-        <DocumentRecipientLinkCopyDialog recipients={recipients} />
+        <DocumentRecipientLinkCopyDialog recipients={recipients} documentId={document.id} />
       )}
 
       <Link href={documentRootPath} className="flex items-center text-[#7AC455] hover:opacity-80">
@@ -169,6 +168,7 @@ export const DocumentPageView = async ({ params, team }: DocumentPageViewProps) 
                   recipients={recipients}
                   documentStatus={document.status}
                   position="bottom"
+                  documentId={document.id}
                 >
                   <span>
                     <Trans>{recipients.length} Recipient(s)</Trans>

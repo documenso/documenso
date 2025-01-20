@@ -17,8 +17,9 @@ import { match } from 'ts-pattern';
 
 import { RECIPIENT_ROLES_DESCRIPTION } from '@documenso/lib/constants/recipient-roles';
 import { formatSigningLink } from '@documenso/lib/utils/recipients';
-import { DocumentStatus, RecipientRole, SigningStatus } from '@documenso/prisma/client';
 import type { Document, Recipient } from '@documenso/prisma/client';
+import { DocumentStatus, RecipientRole, SigningStatus } from '@documenso/prisma/client';
+import { trpc } from '@documenso/trpc/react';
 import { CopyTextButton } from '@documenso/ui/components/common/copy-text-button';
 import { SignatureIcon } from '@documenso/ui/icons/signature';
 import { AvatarWithText } from '@documenso/ui/primitives/avatar';
@@ -40,7 +41,28 @@ export const DocumentPageViewRecipients = ({
   const { _ } = useLingui();
   const { toast } = useToast();
 
+  const { mutateAsync: createAuditLog } = trpc.document.createAuditLog.useMutation();
+
   const recipients = document.recipients;
+
+  const onCopyLink = (recipient: Recipient) => {
+    toast({
+      title: _(msg`Copied to clipboard`),
+      description: _(msg`The signing link has been copied to your clipboard.`),
+    });
+
+    void createAuditLog({
+      documentId: document.id,
+      type: 'DOCUMENT_SIGNING_LINK_COPIED',
+      data: {
+        recipientEmail: recipient.email,
+        recipientName: recipient.name,
+        recipientId: recipient.id,
+        recipientRole: recipient.role,
+        isBulkCopy: false,
+      },
+    });
+  };
 
   return (
     <section className="dark:bg-background border-border bg-widget flex flex-col rounded-xl border">
@@ -157,12 +179,7 @@ export const DocumentPageViewRecipients = ({
                 recipient.role !== RecipientRole.CC && (
                   <CopyTextButton
                     value={formatSigningLink(recipient.token)}
-                    onCopySuccess={() => {
-                      toast({
-                        title: _(msg`Copied to clipboard`),
-                        description: _(msg`The signing link has been copied to your clipboard.`),
-                      });
-                    }}
+                    onCopySuccess={() => void onCopyLink(recipient)}
                   />
                 )}
             </div>

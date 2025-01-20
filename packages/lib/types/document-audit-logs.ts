@@ -39,6 +39,7 @@ export const ZDocumentAuditLogTypeSchema = z.enum([
   'DOCUMENT_TITLE_UPDATED', // When the document title is updated.
   'DOCUMENT_EXTERNAL_ID_UPDATED', // When the document external ID is updated.
   'DOCUMENT_MOVED_TO_TEAM', // When the document is moved to a team.
+  'DOCUMENT_SIGNING_LINK_COPIED', // When a signing link is copied.
 ]);
 
 export const ZDocumentAuditLogEmailTypeSchema = z.enum([
@@ -222,6 +223,16 @@ export const ZDocumentAuditLogEventDocumentDeletedSchema = z.object({
   type: z.literal(DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_DELETED),
   data: z.object({
     type: z.enum(['SOFT', 'HARD']),
+  }),
+});
+
+/**
+ * Event: Document signing link copied.
+ */
+export const ZDocumentAuditLogEventDocumentSigningLinkCopiedSchema = z.object({
+  type: z.literal(DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_SIGNING_LINK_COPIED),
+  data: ZBaseRecipientDataSchema.extend({
+    isBulkCopy: z.boolean(),
   }),
 });
 
@@ -490,6 +501,7 @@ export const ZDocumentAuditLogSchema = ZDocumentAuditLogBaseSchema.and(
     ZDocumentAuditLogEventDocumentCompletedSchema,
     ZDocumentAuditLogEventDocumentCreatedSchema,
     ZDocumentAuditLogEventDocumentDeletedSchema,
+    ZDocumentAuditLogEventDocumentSigningLinkCopiedSchema,
     ZDocumentAuditLogEventDocumentMovedToTeamSchema,
     ZDocumentAuditLogEventDocumentFieldInsertedSchema,
     ZDocumentAuditLogEventDocumentFieldUninsertedSchema,

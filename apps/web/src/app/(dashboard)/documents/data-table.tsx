@@ -66,6 +66,7 @@ export const DocumentsDataTable = ({
           <StackAvatarsWithTooltip
             recipients={row.original.recipients}
             documentStatus={row.original.status}
+            documentId={row.original.id}
           />
         ),
       },

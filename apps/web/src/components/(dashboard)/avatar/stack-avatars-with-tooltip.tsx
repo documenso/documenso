@@ -20,6 +20,7 @@ export type StackAvatarsWithTooltipProps = {
   recipients: Recipient[];
   position?: 'top' | 'bottom';
   children?: React.ReactNode;
+  documentId: number;
 };
 
 export const StackAvatarsWithTooltip = ({
@@ -27,6 +28,7 @@ export const StackAvatarsWithTooltip = ({
   recipients,
   position,
   children,
+  documentId,
 }: StackAvatarsWithTooltipProps) => {
   const { _ } = useLingui();
 
@@ -129,6 +131,7 @@ export const StackAvatarsWithTooltip = ({
               key={recipient.id}
               recipient={recipient}
               documentStatus={documentStatus}
+              documentId={documentId}
             />
           ))}
         </div>
@@ -144,6 +147,7 @@ export const StackAvatarsWithTooltip = ({
               key={recipient.id}
               recipient={recipient}
               documentStatus={documentStatus}
+              documentId={documentId}
             />
           ))}
         </div>
@@ -159,6 +163,7 @@ export const StackAvatarsWithTooltip = ({
               key={recipient.id}
               recipient={recipient}
               documentStatus={documentStatus}
+              documentId={documentId}
             />
           ))}
         </div>
