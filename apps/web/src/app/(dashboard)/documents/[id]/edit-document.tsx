@@ -329,12 +329,12 @@ export const EditDocumentForm = ({
     }
   };
 
-  // const onPasswordSubmit = async (password: string) => {
-  //   await setPasswordForDocument({
-  //     documentId: document.id,
-  //     password,
-  //   });
-  // };
+  const onPasswordSubmit = async (password: string) => {
+    await setPasswordForDocument({
+      documentId: document.id,
+      password,
+    });
+  };
 
   const currentDocumentFlow = documentFlow[step];
 
