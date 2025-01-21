@@ -234,7 +234,7 @@ export const SigningForm = ({
 
                 <hr className="border-border my-4" />
 
-                <fieldset className="rounded-2xl bg-white p-3">
+                <fieldset className="dark:bg-background border-border rounded-2xl border bg-white p-3">
                   <Controller
                     name="selectedSignerId"
                     control={assistantForm.control}
@@ -253,7 +253,7 @@ export const SigningForm = ({
                           ?.map((recipient) => (
                             <div
                               key={`${assistantSignersId}-${recipient.id}`}
-                              className="bg-widget relative flex flex-col gap-4 rounded-lg p-4"
+                              className="bg-widget border-border relative flex flex-col gap-4 rounded-lg border p-4"
                             >
                               <div className="flex items-center justify-between">
                                 <div className="flex items-center gap-3">
