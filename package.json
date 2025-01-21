@@ -1,6 +1,6 @@
 {
   "private": true,
-  "version": "1.9.0-rc.10",
+  "version": "1.9.0-rc.11",
   "scripts": {
     "build": "turbo run build",
     "build:web": "turbo run build --filter=@documenso/web",
