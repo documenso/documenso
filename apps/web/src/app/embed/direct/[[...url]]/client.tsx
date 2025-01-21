@@ -100,7 +100,7 @@ export const EmbedDirectTemplateClientPage = ({
 
   const hasSignatureField = localFields.some((field) => field.type === FieldType.SIGNATURE);
 
-  const { mutateAsync: createDocumentFromDirectTemplate, isLoading: isSubmitting } =
+  const { mutateAsync: createDocumentFromDirectTemplate, isPending: isSubmitting } =
     trpc.template.createDocumentFromDirectTemplate.useMutation();
 
   const onSignField = (payload: TSignFieldWithTokenMutationSchema) => {
@@ -118,7 +118,7 @@ export const EmbedDirectTemplateClientPage = ({
         });
 
         if (field.type === FieldType.SIGNATURE) {
-          newField.Signature = {
+          newField.signature = {
             id: 1,
             created: new Date(),
             recipientId: 1,
@@ -163,7 +163,7 @@ export const EmbedDirectTemplateClientPage = ({
           customText: '',
           inserted: false,
           signedValue: undefined,
-          Signature: undefined,
+          signature: undefined,
         });
       }),
     );

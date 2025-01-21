@@ -17,7 +17,7 @@ export const getRecipientsForAssistantSigning = async ({
   const recipients = await prisma.recipient.findMany({
     where: {
       documentId,
-      Document: {
+      document: {
         OR: [
           {
             userId,
@@ -39,7 +39,7 @@ export const getRecipientsForAssistantSigning = async ({
       id: 'asc',
     },
     include: {
-      Field: {
+      fields: {
         where: {
           NOT: {
             type: FieldType.SIGNATURE,

@@ -55,7 +55,7 @@ export const DocumentHistorySheet = ({
     },
     {
       getNextPageParam: (lastPage) => lastPage.nextCursor,
-      keepPreviousData: true,
+      placeholderData: (previousData) => previousData,
     },
   );
 

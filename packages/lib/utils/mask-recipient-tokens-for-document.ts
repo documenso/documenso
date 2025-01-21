@@ -12,7 +12,7 @@ export const maskRecipientTokensForDocument = <T extends DocumentWithRecipients>
   user,
   token,
 }: MaskRecipientTokensForDocumentOptions<T>) => {
-  const maskedRecipients = document.Recipient.map((recipient) => {
+  const maskedRecipients = document.recipients.map((recipient) => {
     if (document.userId === user?.id) {
       return recipient;
     }

@@ -20,7 +20,7 @@ export const PendingUserTeamsDataTableActions = ({
   const { _ } = useLingui();
   const { toast } = useToast();
 
-  const { mutateAsync: deleteTeamPending, isLoading: deletingTeam } =
+  const { mutateAsync: deleteTeamPending, isPending: deletingTeam } =
     trpc.team.deleteTeamPending.useMutation({
       onSuccess: () => {
         toast({

@@ -39,9 +39,9 @@ type TAdminUpdateRecipientFormSchema = z.infer<typeof ZAdminUpdateRecipientFormS
 
 export type RecipientItemProps = {
   recipient: Recipient & {
-    Field: Array<
+    fields: Array<
       Field & {
-        Signature: Signature | null;
+        signature: Signature | null;
       }
     >;
   };
@@ -89,13 +89,13 @@ export const RecipientItem = ({ recipient }: RecipientItemProps) => {
         accessorKey: 'signature',
         cell: ({ row }) => (
           <div>
-            {row.original.Signature?.typedSignature && (
-              <span>{row.original.Signature.typedSignature}</span>
+            {row.original.signature?.typedSignature && (
+              <span>{row.original.signature.typedSignature}</span>
             )}
 
-            {row.original.Signature?.signatureImageAsBase64 && (
+            {row.original.signature?.signatureImageAsBase64 && (
               <img
-                src={row.original.Signature.signatureImageAsBase64}
+                src={row.original.signature.signatureImageAsBase64}
                 alt="Signature"
                 className="h-12 w-full dark:invert"
               />
@@ -103,7 +103,7 @@ export const RecipientItem = ({ recipient }: RecipientItemProps) => {
           </div>
         ),
       },
-    ] satisfies DataTableColumnDef<(typeof recipient)['Field'][number]>[];
+    ] satisfies DataTableColumnDef<(typeof recipient)['fields'][number]>[];
   }, []);
 
   const onUpdateRecipientFormSubmit = async ({ name, email }: TAdminUpdateRecipientFormSchema) => {
@@ -190,7 +190,7 @@ export const RecipientItem = ({ recipient }: RecipientItemProps) => {
         <Trans>Fields</Trans>
       </h2>
 
-      <DataTable columns={columns} data={recipient.Field} />
+      <DataTable columns={columns} data={recipient.fields} />
     </div>
   );
 };

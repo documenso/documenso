@@ -73,7 +73,7 @@ export default async function EmbedDirectTemplatePage({ params }: EmbedDirectTem
 
   const { directTemplateRecipientId } = template.directLink;
 
-  const recipient = template.Recipient.find(
+  const recipient = template.recipients.find(
     (recipient) => recipient.id === directTemplateRecipientId,
   );
 
@@ -81,7 +81,7 @@ export default async function EmbedDirectTemplatePage({ params }: EmbedDirectTem
     return notFound();
   }
 
-  const fields = template.Field.filter((field) => field.recipientId === directTemplateRecipientId);
+  const fields = template.fields.filter((field) => field.recipientId === directTemplateRecipientId);
 
   const team = template.teamId
     ? await getTeamById({ teamId: template.teamId, userId: template.userId }).catch(() => null)

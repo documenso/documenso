@@ -25,24 +25,24 @@ export const getFieldsForToken = async ({ token }: GetFieldsForTokenOptions) => 
         type: {
           not: 'SIGNATURE',
         },
-        Recipient: {
+        recipient: {
           documentId: recipient.documentId,
         },
       },
       include: {
-        Signature: true,
+        signature: true,
       },
     });
   }
 
   return await prisma.field.findMany({
     where: {
-      Recipient: {
+      recipient: {
         token,
       },
     },
     include: {
-      Signature: true,
+      signature: true,
     },
   });
 };

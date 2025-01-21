@@ -47,7 +47,7 @@ export const ViewRecoveryCodesDialog = () => {
   const {
     data: recoveryCodes,
     mutate,
-    isLoading,
+    isPending,
     error,
   } = trpc.twoFactorAuthentication.viewRecoveryCodes.useMutation();
 
@@ -121,7 +121,7 @@ export const ViewRecoveryCodesDialog = () => {
                 </DialogDescription>
               </DialogHeader>
 
-              <fieldset className="flex flex-col space-y-4" disabled={isLoading}>
+              <fieldset className="flex flex-col space-y-4" disabled={isPending}>
                 <FormField
                   name="token"
                   control={viewRecoveryCodesForm.control}
@@ -164,7 +164,7 @@ export const ViewRecoveryCodesDialog = () => {
                     </Button>
                   </DialogClose>
 
-                  <Button type="submit" loading={isLoading}>
+                  <Button type="submit" loading={isPending}>
                     <Trans>View</Trans>
                   </Button>
                 </DialogFooter>

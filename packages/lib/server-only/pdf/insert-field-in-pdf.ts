@@ -98,8 +98,8 @@ export const insertFieldInPDF = async (pdf: PDFDocument, field: FieldWithSignatu
         type: P.union(FieldType.SIGNATURE, FieldType.FREE_SIGNATURE),
       },
       async (field) => {
-        if (field.Signature?.signatureImageAsBase64) {
-          const image = await pdf.embedPng(field.Signature?.signatureImageAsBase64 ?? '');
+        if (field.signature?.signatureImageAsBase64) {
+          const image = await pdf.embedPng(field.signature?.signatureImageAsBase64 ?? '');
 
           let imageWidth = image.width;
           let imageHeight = image.height;
@@ -136,7 +136,7 @@ export const insertFieldInPDF = async (pdf: PDFDocument, field: FieldWithSignatu
             rotate: degrees(pageRotationInDegrees),
           });
         } else {
-          const signatureText = field.Signature?.typedSignature ?? '';
+          const signatureText = field.signature?.typedSignature ?? '';
 
           const longestLineInTextForWidth = signatureText
             .split('\n')

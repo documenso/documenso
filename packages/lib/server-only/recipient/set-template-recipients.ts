@@ -1,5 +1,3 @@
-import { z } from 'zod';
-
 import { isUserEnterprise } from '@documenso/ee/server-only/util/is-document-enterprise';
 import {
   DIRECT_TEMPLATE_RECIPIENT_EMAIL,
@@ -8,7 +6,6 @@ import {
 import { prisma } from '@documenso/prisma';
 import type { Recipient } from '@documenso/prisma/client';
 import { RecipientRole } from '@documenso/prisma/client';
-import { RecipientSchema } from '@documenso/prisma/generated/zod';
 
 import { AppError, AppErrorCode } from '../../errors/app-error';
 import {
@@ -18,7 +15,7 @@ import {
 import { nanoid } from '../../universal/id';
 import { createRecipientAuthOptions } from '../../utils/document-auth';
 
-export type SetRecipientsForTemplateOptions = {
+export type SetTemplateRecipientsOptions = {
   userId: number;
   teamId?: number;
   templateId: number;
@@ -32,37 +29,30 @@ export type SetRecipientsForTemplateOptions = {
   }[];
 };
 
-export const ZSetRecipientsForTemplateResponseSchema = z.object({
-  recipients: RecipientSchema.array(),
-});
-
-export type TSetRecipientsForTemplateResponse = z.infer<
-  typeof ZSetRecipientsForTemplateResponseSchema
->;
-
-export const setRecipientsForTemplate = async ({
+export const setTemplateRecipients = async ({
   userId,
   teamId,
   templateId,
   recipients,
-}: SetRecipientsForTemplateOptions): Promise<TSetRecipientsForTemplateResponse> => {
+}: SetTemplateRecipientsOptions) => {
   const template = await prisma.template.findFirst({
     where: {
       id: templateId,
-      OR: [
-        {
-          userId,
-        },
-        {
-          team: {
-            members: {
-              some: {
-                userId,
+      ...(teamId
+        ? {
+            team: {
+              id: teamId,
+              members: {
+                some: {
+                  userId,
+                },
               },
             },
-          },
-        },
-      ],
+          }
+        : {
+            userId,
+            teamId: null,
+          }),
     },
     include: {
       directLink: true,

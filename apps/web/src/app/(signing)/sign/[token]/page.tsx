@@ -45,14 +45,14 @@ export default async function SigningPage({ params: { token } }: SigningPageProp
 
   const requestMetadata = extractNextHeaderRequestMetadata(requestHeaders);
 
-  const [document, fields, recipient, completedFields] = await Promise.all([
+  const [document, recipient, fields, completedFields] = await Promise.all([
     getDocumentAndSenderByToken({
       token,
       userId: user?.id,
       requireAccessAuth: false,
     }).catch(() => null),
-    getFieldsForToken({ token }),
     getRecipientByToken({ token }).catch(() => null),
+    getFieldsForToken({ token }),
     getCompletedFieldsForToken({ token }),
   ]);
 
@@ -64,6 +64,8 @@ export default async function SigningPage({ params: { token } }: SigningPageProp
   ) {
     return notFound();
   }
+
+  const recipientWithFields = { ...recipient, fields };
 
   let allRecipients: RecipientWithFields[] = [];
 
@@ -165,7 +167,7 @@ export default async function SigningPage({ params: { token } }: SigningPageProp
         user={user}
       >
         <SigningPageView
-          recipient={recipient}
+          recipient={recipientWithFields}
           document={document}
           fields={fields}
           completedFields={completedFields}

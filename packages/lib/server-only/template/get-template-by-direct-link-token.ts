@@ -16,9 +16,9 @@ export const getTemplateByDirectLinkToken = async ({
     },
     include: {
       directLink: true,
-      Recipient: {
+      recipients: {
         include: {
-          Field: true,
+          fields: true,
         },
       },
       templateDocumentData: true,
@@ -28,6 +28,6 @@ export const getTemplateByDirectLinkToken = async ({
 
   return {
     ...template,
-    Field: template.Recipient.map((recipient) => recipient.Field).flat(),
+    fields: template.recipients.map((recipient) => recipient.fields).flat(),
   };
 };

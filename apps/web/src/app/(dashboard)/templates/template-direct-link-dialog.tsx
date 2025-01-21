@@ -46,12 +46,10 @@ import {
 import { Tooltip, TooltipContent, TooltipTrigger } from '@documenso/ui/primitives/tooltip';
 import { useToast } from '@documenso/ui/primitives/use-toast';
 
-import { useOptionalCurrentTeam } from '~/providers/team';
-
 type TemplateDirectLinkDialogProps = {
   template: Template & {
     directLink?: Pick<TemplateDirectLink, 'token' | 'enabled'> | null;
-    Recipient: Recipient[];
+    recipients: Recipient[];
   };
   open: boolean;
   onOpenChange: (_open: boolean) => void;
@@ -68,8 +66,6 @@ export const TemplateDirectLinkDialog = ({
   const { quota, remaining } = useLimits();
   const { _ } = useLingui();
 
-  const team = useOptionalCurrentTeam();
-
   const [, copy] = useCopyToClipboard();
   const router = useRouter();
 
@@ -82,16 +78,16 @@ export const TemplateDirectLinkDialog = ({
 
   const validDirectTemplateRecipients = useMemo(
     () =>
-      template.Recipient.filter(
+      template.recipients.filter(
         (recipient) =>
           recipient.role !== RecipientRole.CC && recipient.role !== RecipientRole.ASSISTANT,
       ),
-    [template.Recipient],
+    [template.recipients],
   );
 
   const {
     mutateAsync: createTemplateDirectLink,
-    isLoading: isCreatingTemplateDirectLink,
+    isPending: isCreatingTemplateDirectLink,
     reset: resetCreateTemplateDirectLink,
   } = trpcReact.template.createTemplateDirectLink.useMutation({
     onSuccess: (data) => {
@@ -112,7 +108,7 @@ export const TemplateDirectLinkDialog = ({
     },
   });
 
-  const { mutateAsync: toggleTemplateDirectLink, isLoading: isTogglingTemplateAccess } =
+  const { mutateAsync: toggleTemplateDirectLink, isPending: isTogglingTemplateAccess } =
     trpcReact.template.toggleTemplateDirectLink.useMutation({
       onSuccess: (data) => {
         const enabledDescription = msg`Direct link signing has been enabled`;
@@ -135,7 +131,7 @@ export const TemplateDirectLinkDialog = ({
       },
     });
 
-  const { mutateAsync: deleteTemplateDirectLink, isLoading: isDeletingTemplateDirectLink } =
+  const { mutateAsync: deleteTemplateDirectLink, isPending: isDeletingTemplateDirectLink } =
     trpcReact.template.deleteTemplateDirectLink.useMutation({
       onSuccess: () => {
         onOpenChange(false);
@@ -178,7 +174,6 @@ export const TemplateDirectLinkDialog = ({
 
     await createTemplateDirectLink({
       templateId: template.id,
-      teamId: team?.id,
       directRecipientId: recipientId,
     });
   };
@@ -331,7 +326,7 @@ export const TemplateDirectLinkDialog = ({
                 </div>
 
                 {/* Prevent creating placeholder direct template recipient if the email already exists. */}
-                {!template.Recipient.some(
+                {!template.recipients.some(
                   (recipient) => recipient.email === DIRECT_TEMPLATE_RECIPIENT_EMAIL,
                 ) && (
                   <DialogFooter className="mx-auto">
@@ -349,7 +344,6 @@ export const TemplateDirectLinkDialog = ({
                         onClick={async () =>
                           createTemplateDirectLink({
                             templateId: template.id,
-                            teamId: team?.id,
                           })
                         }
                       >

@@ -7,14 +7,14 @@ export const getUserByApiToken = async ({ token }: { token: string }) => {
 
   const user = await prisma.user.findFirst({
     where: {
-      ApiToken: {
+      apiTokens: {
         some: {
           token: hashedToken,
         },
       },
     },
     include: {
-      ApiToken: true,
+      apiTokens: true,
     },
   });
 
@@ -22,7 +22,7 @@ export const getUserByApiToken = async ({ token }: { token: string }) => {
     throw new Error('Invalid token');
   }
 
-  const retrievedToken = user.ApiToken.find((apiToken) => apiToken.token === hashedToken);
+  const retrievedToken = user.apiTokens.find((apiToken) => apiToken.token === hashedToken);
 
   // This should be impossible but we need to satisfy TypeScript
   if (!retrievedToken) {

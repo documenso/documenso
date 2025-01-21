@@ -19,14 +19,15 @@ import {
   ZDocumentAuditLogSchema,
 } from '../types/document-audit-logs';
 import { ZRecipientAuthOptionsSchema } from '../types/document-auth';
-import type { RequestMetadata } from '../universal/extract-request-metadata';
+import type { ApiRequestMetadata, RequestMetadata } from '../universal/extract-request-metadata';
 
 type CreateDocumentAuditLogDataOptions<T = TDocumentAuditLog['type']> = {
   documentId: number;
   type: T;
   data: Extract<TDocumentAuditLog, { type: T }>['data'];
-  user: { email?: string; id?: number | null; name?: string | null } | null;
+  user?: { email?: string | null; id?: number | null; name?: string | null } | null;
   requestMetadata?: RequestMetadata;
+  metadata?: ApiRequestMetadata;
 };
 
 export type CreateDocumentAuditLogDataResponse = Pick<
@@ -42,16 +43,31 @@ export const createDocumentAuditLogData = <T extends TDocumentAuditLog['type']>(
   data,
   user,
   requestMetadata,
+  metadata,
 }: CreateDocumentAuditLogDataOptions<T>): CreateDocumentAuditLogDataResponse => {
+  let userId: number | null = metadata?.auditUser?.id || null;
+  let email: string | null = metadata?.auditUser?.email || null;
+  let name: string | null = metadata?.auditUser?.name || null;
+
+  // Prioritize explicit user parameter over metadata audit user.
+  if (user) {
+    userId = user.id || null;
+    email = user.email || null;
+    name = user.name || null;
+  }
+
+  const ipAddress = metadata?.requestMetadata.ipAddress ?? requestMetadata?.ipAddress ?? null;
+  const userAgent = metadata?.requestMetadata.userAgent ?? requestMetadata?.userAgent ?? null;
+
   return {
     type,
     data,
     documentId,
-    userId: user?.id ?? null,
-    email: user?.email ?? null,
-    name: user?.name ?? null,
-    userAgent: requestMetadata?.userAgent ?? null,
-    ipAddress: requestMetadata?.ipAddress ?? null,
+    userId,
+    email,
+    name,
+    userAgent,
+    ipAddress,
   };
 };
 

@@ -58,7 +58,7 @@ export const seedDatabase = async () => {
       title: 'Example Document',
       documentDataId: examplePdfData.id,
       userId: exampleUser.id,
-      Recipient: {
+      recipients: {
         create: {
           name: String(adminUser.name),
           email: adminUser.email,

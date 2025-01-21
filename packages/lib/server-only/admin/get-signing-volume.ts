@@ -28,7 +28,7 @@ export async function getSigningVolume({
     status: 'ACTIVE',
     OR: [
       {
-        User: {
+        user: {
           OR: [
             { name: { contains: search, mode: 'insensitive' } },
             { email: { contains: search, mode: 'insensitive' } },
@@ -47,11 +47,11 @@ export async function getSigningVolume({
     prisma.subscription.findMany({
       where: whereClause,
       include: {
-        User: {
+        user: {
           select: {
             name: true,
             email: true,
-            Document: {
+            documents: {
               where: {
                 status: DocumentStatus.COMPLETED,
                 deletedAt: null,
@@ -63,7 +63,7 @@ export async function getSigningVolume({
         team: {
           select: {
             name: true,
-            document: {
+            documents: {
               where: {
                 status: DocumentStatus.COMPLETED,
                 deletedAt: null,
@@ -74,7 +74,7 @@ export async function getSigningVolume({
       },
       orderBy:
         sortBy === 'name'
-          ? [{ User: { name: sortOrder } }, { team: { name: sortOrder } }, { createdAt: 'desc' }]
+          ? [{ user: { name: sortOrder } }, { team: { name: sortOrder } }, { createdAt: 'desc' }]
           : sortBy === 'createdAt'
             ? [{ createdAt: sortOrder }]
             : undefined,
@@ -88,9 +88,9 @@ export async function getSigningVolume({
 
   const leaderboardWithVolume: SigningVolume[] = subscriptions.map((subscription) => {
     const name =
-      subscription.User?.name || subscription.team?.name || subscription.User?.email || 'Unknown';
-    const userSignedDocs = subscription.User?.Document?.length || 0;
-    const teamSignedDocs = subscription.team?.document?.length || 0;
+      subscription.user?.name || subscription.team?.name || subscription.user?.email || 'Unknown';
+    const userSignedDocs = subscription.user?.documents?.length || 0;
+    const teamSignedDocs = subscription.team?.documents?.length || 0;
     return {
       id: subscription.id,
       name,

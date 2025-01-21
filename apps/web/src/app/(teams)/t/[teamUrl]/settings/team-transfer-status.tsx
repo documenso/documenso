@@ -36,7 +36,7 @@ export const TeamTransferStatus = ({
 
   const isExpired = transferVerification && isTokenExpired(transferVerification.expiresAt);
 
-  const { mutateAsync: deleteTeamTransferRequest, isLoading } =
+  const { mutateAsync: deleteTeamTransferRequest, isPending } =
     trpc.team.deleteTeamTransferRequest.useMutation({
       onSuccess: () => {
         if (!isExpired) {
@@ -112,7 +112,7 @@ export const TeamTransferStatus = ({
             {canExecuteTeamAction('DELETE_TEAM_TRANSFER_REQUEST', currentUserTeamRole) && (
               <Button
                 onClick={async () => deleteTeamTransferRequest({ teamId })}
-                loading={isLoading}
+                loading={isPending}
                 variant={isExpired ? 'destructive' : 'ghost'}
                 className={cn('ml-auto', {
                   'hover:bg-transparent hover:text-blue-800': !isExpired,

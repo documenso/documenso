@@ -63,21 +63,21 @@ export const signFieldWithToken = async ({
   const field = await prisma.field.findFirstOrThrow({
     where: {
       id: fieldId,
-      Recipient: {
+      recipient: {
         token,
       },
     },
     include: {
-      Document: {
+      document: {
         include: {
-          Recipient: true,
+          recipients: true,
         },
       },
-      Recipient: true,
+      recipient: true,
     },
   });
 
-  const { Document: document, Recipient: recipient } = field;
+  const { document, recipient } = field;
 
   if (!document) {
     throw new Error(`Document not found for field ${field.id}`);
@@ -193,7 +193,7 @@ export const signFieldWithToken = async ({
 
   let assistant: typeof recipient | undefined;
   if (isAssistantPrefill && assistantId) {
-    assistant = document.Recipient.find((r) => r.id === assistantId);
+    assistant = document.recipients.find((r) => r.id === assistantId);
 
     if (!assistant) {
       throw new Error(`Assistant with ID ${assistantId} not found in document`);
@@ -230,7 +230,7 @@ export const signFieldWithToken = async ({
 
       // Dirty but I don't want to deal with type information
       Object.assign(updatedField, {
-        Signature: signature,
+        signature,
       });
     }
 

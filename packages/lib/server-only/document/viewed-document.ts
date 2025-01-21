@@ -6,7 +6,10 @@ import { ReadStatus, SendStatus } from '@documenso/prisma/client';
 import { WebhookTriggerEvents } from '@documenso/prisma/client';
 
 import type { TDocumentAccessAuthTypes } from '../../types/document-auth';
-import { ZWebhookDocumentSchema } from '../../types/webhook-payload';
+import {
+  ZWebhookDocumentSchema,
+  mapDocumentToWebhookDocumentPayload,
+} from '../../types/webhook-payload';
 import { triggerWebhook } from '../webhooks/trigger/trigger-webhook';
 
 export type ViewedDocumentOptions = {
@@ -71,7 +74,7 @@ export const viewedDocument = async ({
     },
     include: {
       documentMeta: true,
-      Recipient: true,
+      recipients: true,
     },
   });
 
@@ -81,7 +84,7 @@ export const viewedDocument = async ({
 
   await triggerWebhook({
     event: WebhookTriggerEvents.DOCUMENT_OPENED,
-    data: ZWebhookDocumentSchema.parse(document),
+    data: ZWebhookDocumentSchema.parse(mapDocumentToWebhookDocumentPayload(document)),
     userId: document.userId,
     teamId: document.teamId ?? undefined,
   });

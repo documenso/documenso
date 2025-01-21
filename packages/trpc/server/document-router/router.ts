@@ -1,73 +1,60 @@
 import { TRPCError } from '@trpc/server';
 import { DateTime } from 'luxon';
-import { z } from 'zod';
 
 import { getServerLimits } from '@documenso/ee/server-only/limits/server';
 import { NEXT_PUBLIC_WEBAPP_URL } from '@documenso/lib/constants/app';
 import { DOCUMENSO_ENCRYPTION_KEY } from '@documenso/lib/constants/crypto';
-import { AppError } from '@documenso/lib/errors/app-error';
+import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import { encryptSecondaryData } from '@documenso/lib/server-only/crypto/encrypt';
+import { createDocumentData } from '@documenso/lib/server-only/document-data/create-document-data';
 import { upsertDocumentMeta } from '@documenso/lib/server-only/document-meta/upsert-document-meta';
-import {
-  ZCreateDocumentResponseSchema,
-  createDocument,
-} from '@documenso/lib/server-only/document/create-document';
+import { createDocument } from '@documenso/lib/server-only/document/create-document';
+import { createDocumentV2 } from '@documenso/lib/server-only/document/create-document-v2';
 import { deleteDocument } from '@documenso/lib/server-only/document/delete-document';
-import {
-  ZDuplicateDocumentResponseSchema,
-  duplicateDocument,
-} from '@documenso/lib/server-only/document/duplicate-document-by-id';
+import { duplicateDocument } from '@documenso/lib/server-only/document/duplicate-document-by-id';
 import { findDocumentAuditLogs } from '@documenso/lib/server-only/document/find-document-audit-logs';
-import {
-  ZFindDocumentsResponseSchema,
-  findDocuments,
-} from '@documenso/lib/server-only/document/find-documents';
+import { findDocuments } from '@documenso/lib/server-only/document/find-documents';
 import { getDocumentById } from '@documenso/lib/server-only/document/get-document-by-id';
 import { getDocumentAndSenderByToken } from '@documenso/lib/server-only/document/get-document-by-token';
-import {
-  ZGetDocumentWithDetailsByIdResponseSchema,
-  getDocumentWithDetailsById,
-} from '@documenso/lib/server-only/document/get-document-with-details-by-id';
-import {
-  ZMoveDocumentToTeamResponseSchema,
-  moveDocumentToTeam,
-} from '@documenso/lib/server-only/document/move-document-to-team';
+import { getDocumentWithDetailsById } from '@documenso/lib/server-only/document/get-document-with-details-by-id';
+import { moveDocumentToTeam } from '@documenso/lib/server-only/document/move-document-to-team';
 import { resendDocument } from '@documenso/lib/server-only/document/resend-document';
 import { searchDocumentsWithKeyword } from '@documenso/lib/server-only/document/search-documents-with-keyword';
-import {
-  ZSendDocumentResponseSchema,
-  sendDocument,
-} from '@documenso/lib/server-only/document/send-document';
-import {
-  ZUpdateDocumentSettingsResponseSchema,
-  updateDocumentSettings,
-} from '@documenso/lib/server-only/document/update-document-settings';
-import { updateTitle } from '@documenso/lib/server-only/document/update-title';
+import { sendDocument } from '@documenso/lib/server-only/document/send-document';
+import { updateDocument } from '@documenso/lib/server-only/document/update-document';
 import { symmetricEncrypt } from '@documenso/lib/universal/crypto';
-import { extractNextApiRequestMetadata } from '@documenso/lib/universal/extract-request-metadata';
-import { DocumentStatus } from '@documenso/prisma/client';
+import { getPresignPostUrl } from '@documenso/lib/universal/upload/server-actions';
+import { DocumentDataType, DocumentStatus } from '@documenso/prisma/client';
 
 import { authenticatedProcedure, procedure, router } from '../trpc';
 import {
-  ZCreateDocumentMutationSchema,
+  ZCreateDocumentRequestSchema,
+  ZCreateDocumentV2RequestSchema,
+  ZCreateDocumentV2ResponseSchema,
   ZDeleteDocumentMutationSchema,
+  ZDistributeDocumentRequestSchema,
+  ZDistributeDocumentResponseSchema,
   ZDownloadAuditLogsMutationSchema,
   ZDownloadCertificateMutationSchema,
-  ZDuplicateDocumentMutationSchema,
+  ZDuplicateDocumentRequestSchema,
+  ZDuplicateDocumentResponseSchema,
   ZFindDocumentAuditLogsQuerySchema,
-  ZFindDocumentsQuerySchema,
+  ZFindDocumentsRequestSchema,
+  ZFindDocumentsResponseSchema,
+  ZGenericSuccessResponse,
   ZGetDocumentByIdQuerySchema,
   ZGetDocumentByTokenQuerySchema,
-  ZGetDocumentWithDetailsByIdQuerySchema,
+  ZGetDocumentWithDetailsByIdRequestSchema,
+  ZGetDocumentWithDetailsByIdResponseSchema,
+  ZMoveDocumentToTeamResponseSchema,
   ZMoveDocumentToTeamSchema,
   ZResendDocumentMutationSchema,
   ZSearchDocumentsMutationSchema,
-  ZSendDocumentMutationSchema,
   ZSetPasswordForDocumentMutationSchema,
-  ZSetSettingsForDocumentMutationSchema,
   ZSetSigningOrderForDocumentMutationSchema,
-  ZSetTitleForDocumentMutationSchema,
-  ZUpdateTypedSignatureSettingsMutationSchema,
+  ZSuccessResponseSchema,
+  ZUpdateDocumentRequestSchema,
+  ZUpdateDocumentResponseSchema,
 } from './schema';
 
 export const documentRouter = router({
@@ -77,9 +64,13 @@ export const documentRouter = router({
   getDocumentById: authenticatedProcedure
     .input(ZGetDocumentByIdQuerySchema)
     .query(async ({ input, ctx }) => {
+      const { teamId } = ctx;
+      const { documentId } = input;
+
       return await getDocumentById({
-        ...input,
         userId: ctx.user.id,
+        teamId,
+        documentId,
       });
     }),
 
@@ -104,28 +95,19 @@ export const documentRouter = router({
     .meta({
       openapi: {
         method: 'GET',
-        path: '/document/find',
+        path: '/document',
         summary: 'Find documents',
         description: 'Find documents based on a search criteria',
-        tags: ['Documents'],
+        tags: ['Document'],
       },
     })
-    .input(ZFindDocumentsQuerySchema)
+    .input(ZFindDocumentsRequestSchema)
     .output(ZFindDocumentsResponseSchema)
     .query(async ({ input, ctx }) => {
-      const { user } = ctx;
+      const { user, teamId } = ctx;
 
-      const {
-        query,
-        teamId,
-        templateId,
-        page,
-        perPage,
-        orderByDirection,
-        orderByColumn,
-        source,
-        status,
-      } = input;
+      const { query, templateId, page, perPage, orderByDirection, orderByColumn, source, status } =
+        input;
 
       const documents = await findDocuments({
         userId: user.id,
@@ -154,41 +136,120 @@ export const documentRouter = router({
         path: '/document/{documentId}',
         summary: 'Get document',
         description: 'Returns a document given an ID',
-        tags: ['Documents'],
+        tags: ['Document'],
       },
     })
-    .input(ZGetDocumentWithDetailsByIdQuerySchema)
+    .input(ZGetDocumentWithDetailsByIdRequestSchema)
     .output(ZGetDocumentWithDetailsByIdResponseSchema)
     .query(async ({ input, ctx }) => {
+      const { teamId, user } = ctx;
+      const { documentId } = input;
+
       return await getDocumentWithDetailsById({
-        ...input,
-        userId: ctx.user.id,
+        userId: user.id,
+        teamId,
+        documentId,
       });
     }),
 
   /**
+   * Temporariy endpoint for V2 Beta until we allow passthrough documents on create.
+   *
    * @public
+   * @deprecated
    */
-  createDocument: authenticatedProcedure
+  createDocumentTemporary: authenticatedProcedure
     .meta({
       openapi: {
         method: 'POST',
-        path: '/document/create',
+        path: '/document/create/beta',
         summary: 'Create document',
-        tags: ['Documents'],
+        description:
+          'You will need to upload the PDF to the provided URL returned. Note: Once V2 API is released, this will be removed since we will allow direct uploads, instead of using an upload URL.',
+        tags: ['Document'],
       },
     })
-    .input(ZCreateDocumentMutationSchema)
-    .output(ZCreateDocumentResponseSchema)
+    .input(ZCreateDocumentV2RequestSchema)
+    .output(ZCreateDocumentV2ResponseSchema)
     .mutation(async ({ input, ctx }) => {
-      const { title, documentDataId, teamId, timezone } = input;
+      const { teamId } = ctx;
+
+      const {
+        title,
+        externalId,
+        visibility,
+        globalAccessAuth,
+        globalActionAuth,
+        recipients,
+        meta,
+      } = input;
 
       const { remaining } = await getServerLimits({ email: ctx.user.email, teamId });
 
       if (remaining.documents <= 0) {
-        throw new TRPCError({
-          code: 'BAD_REQUEST',
+        throw new AppError(AppErrorCode.LIMIT_EXCEEDED, {
           message: 'You have reached your document limit for this month. Please upgrade your plan.',
+          statusCode: 400,
+        });
+      }
+
+      const fileName = title.endsWith('.pdf') ? title : `${title}.pdf`;
+
+      const { url, key } = await getPresignPostUrl(fileName, 'application/pdf');
+
+      const documentData = await createDocumentData({
+        data: key,
+        type: DocumentDataType.S3_PATH,
+      });
+
+      const createdDocument = await createDocumentV2({
+        userId: ctx.user.id,
+        teamId,
+        documentDataId: documentData.id,
+        normalizePdf: false, // Not normalizing because of presigned URL.
+        data: {
+          title,
+          externalId,
+          visibility,
+          globalAccessAuth,
+          globalActionAuth,
+          recipients,
+        },
+        meta,
+        requestMetadata: ctx.metadata,
+      });
+
+      return {
+        document: createdDocument,
+        uploadUrl: url,
+      };
+    }),
+
+  /**
+   * Wait until RR7 so we can passthrough documents.
+   *
+   * @private
+   */
+  createDocument: authenticatedProcedure
+    // .meta({
+    //   openapi: {
+    //     method: 'POST',
+    //     path: '/document/create',
+    //     summary: 'Create document',
+    //     tags: ['Document'],
+    //   },
+    // })
+    .input(ZCreateDocumentRequestSchema)
+    .mutation(async ({ input, ctx }) => {
+      const { teamId } = ctx;
+      const { title, documentDataId, timezone } = input;
+
+      const { remaining } = await getServerLimits({ email: ctx.user.email, teamId });
+
+      if (remaining.documents <= 0) {
+        throw new AppError(AppErrorCode.LIMIT_EXCEEDED, {
+          message: 'You have reached your document limit for this month. Please upgrade your plan.',
+          statusCode: 400,
         });
       }
 
@@ -199,7 +260,7 @@ export const documentRouter = router({
         documentDataId,
         normalizePdf: true,
         timezone,
-        requestMetadata: extractNextApiRequestMetadata(ctx.req),
+        requestMetadata: ctx.metadata,
       });
     }),
 
@@ -212,38 +273,44 @@ export const documentRouter = router({
     .meta({
       openapi: {
         method: 'POST',
-        path: '/document/{documentId}',
+        path: '/document/update',
         summary: 'Update document',
-        tags: ['Documents'],
+        tags: ['Document'],
       },
     })
-    .input(ZSetSettingsForDocumentMutationSchema)
-    .output(ZUpdateDocumentSettingsResponseSchema)
+    .input(ZUpdateDocumentRequestSchema)
+    .output(ZUpdateDocumentResponseSchema)
     .mutation(async ({ input, ctx }) => {
-      const { documentId, teamId, data, meta } = input;
+      const { teamId } = ctx;
+      const { documentId, data, meta = {} } = input;
 
       const userId = ctx.user.id;
 
-      const requestMetadata = extractNextApiRequestMetadata(ctx.req);
-
-      if (meta.timezone || meta.dateFormat || meta.redirectUrl) {
+      if (Object.values(meta).length > 0) {
         await upsertDocumentMeta({
-          documentId,
-          dateFormat: meta.dateFormat,
-          timezone: meta.timezone,
-          redirectUrl: meta.redirectUrl,
-          language: meta.language,
           userId: ctx.user.id,
-          requestMetadata,
+          teamId,
+          documentId,
+          subject: meta.subject,
+          message: meta.message,
+          timezone: meta.timezone,
+          dateFormat: meta.dateFormat,
+          language: meta.language,
+          typedSignatureEnabled: meta.typedSignatureEnabled,
+          redirectUrl: meta.redirectUrl,
+          distributionMethod: meta.distributionMethod,
+          signingOrder: meta.signingOrder,
+          emailSettings: meta.emailSettings,
+          requestMetadata: ctx.metadata,
         });
       }
 
-      return await updateDocumentSettings({
+      return await updateDocument({
         userId,
         teamId,
         documentId,
         data,
-        requestMetadata,
+        requestMetadata: ctx.metadata,
       });
     }),
 
@@ -254,15 +321,16 @@ export const documentRouter = router({
     .meta({
       openapi: {
         method: 'POST',
-        path: '/document/{documentId}/delete',
+        path: '/document/delete',
         summary: 'Delete document',
-        tags: ['Documents'],
+        tags: ['Document'],
       },
     })
     .input(ZDeleteDocumentMutationSchema)
-    .output(z.void())
+    .output(ZSuccessResponseSchema)
     .mutation(async ({ input, ctx }) => {
-      const { documentId, teamId } = input;
+      const { teamId } = ctx;
+      const { documentId } = input;
 
       const userId = ctx.user.id;
 
@@ -270,8 +338,10 @@ export const documentRouter = router({
         id: documentId,
         userId,
         teamId,
-        requestMetadata: extractNextApiRequestMetadata(ctx.req),
+        requestMetadata: ctx.metadata,
       });
+
+      return ZGenericSuccessResponse;
     }),
 
   /**
@@ -281,10 +351,10 @@ export const documentRouter = router({
     .meta({
       openapi: {
         method: 'POST',
-        path: '/document/{documentId}/move',
+        path: '/document/move',
         summary: 'Move document',
-        description: 'Move a document to a team',
-        tags: ['Documents'],
+        description: 'Move a document from your personal account to a team',
+        tags: ['Document'],
       },
     })
     .input(ZMoveDocumentToTeamSchema)
@@ -297,27 +367,7 @@ export const documentRouter = router({
         documentId,
         teamId,
         userId,
-        requestMetadata: extractNextApiRequestMetadata(ctx.req),
-      });
-    }),
-
-  /**
-   * @private
-   */
-  // Should probably use `updateDocument`
-  setTitleForDocument: authenticatedProcedure
-    .input(ZSetTitleForDocumentMutationSchema)
-    .mutation(async ({ input, ctx }) => {
-      const { documentId, teamId, title } = input;
-
-      const userId = ctx.user.id;
-
-      return await updateTitle({
-        title,
-        userId,
-        teamId,
-        documentId,
-        requestMetadata: extractNextApiRequestMetadata(ctx.req),
+        requestMetadata: ctx.metadata,
       });
     }),
 
@@ -327,6 +377,7 @@ export const documentRouter = router({
   setPasswordForDocument: authenticatedProcedure
     .input(ZSetPasswordForDocumentMutationSchema)
     .mutation(async ({ input, ctx }) => {
+      const { teamId } = ctx;
       const { documentId, password } = input;
 
       const key = DOCUMENSO_ENCRYPTION_KEY;
@@ -341,55 +392,31 @@ export const documentRouter = router({
       });
 
       await upsertDocumentMeta({
+        userId: ctx.user.id,
+        teamId,
         documentId,
         password: securePassword,
-        userId: ctx.user.id,
-        requestMetadata: extractNextApiRequestMetadata(ctx.req),
+        requestMetadata: ctx.metadata,
       });
     }),
 
   /**
    * @private
+   *
+   * Todo: Remove and use `updateDocument` endpoint instead.
    */
   setSigningOrderForDocument: authenticatedProcedure
     .input(ZSetSigningOrderForDocumentMutationSchema)
     .mutation(async ({ input, ctx }) => {
+      const { teamId } = ctx;
       const { documentId, signingOrder } = input;
 
       return await upsertDocumentMeta({
+        userId: ctx.user.id,
+        teamId,
         documentId,
         signingOrder,
-        userId: ctx.user.id,
-        requestMetadata: extractNextApiRequestMetadata(ctx.req),
-      });
-    }),
-
-  /**
-   * @private
-   */
-  updateTypedSignatureSettings: authenticatedProcedure
-    .input(ZUpdateTypedSignatureSettingsMutationSchema)
-    .mutation(async ({ input, ctx }) => {
-      const { documentId, teamId, typedSignatureEnabled } = input;
-
-      const document = await getDocumentById({
-        documentId,
-        teamId,
-        userId: ctx.user.id,
-      }).catch(() => null);
-
-      if (!document) {
-        throw new TRPCError({
-          code: 'NOT_FOUND',
-          message: 'Document not found',
-        });
-      }
-
-      return await upsertDocumentMeta({
-        documentId,
-        typedSignatureEnabled,
-        userId: ctx.user.id,
-        requestMetadata: extractNextApiRequestMetadata(ctx.req),
+        requestMetadata: ctx.metadata,
       });
     }),
 
@@ -403,27 +430,22 @@ export const documentRouter = router({
     .meta({
       openapi: {
         method: 'POST',
-        path: '/document/{documentId}/distribute',
+        path: '/document/distribute',
         summary: 'Distribute document',
         description: 'Send the document out to recipients based on your distribution method',
-        tags: ['Documents'],
+        tags: ['Document'],
       },
     })
-    .input(ZSendDocumentMutationSchema)
-    .output(ZSendDocumentResponseSchema)
+    .input(ZDistributeDocumentRequestSchema)
+    .output(ZDistributeDocumentResponseSchema)
     .mutation(async ({ input, ctx }) => {
-      const { documentId, teamId, meta } = input;
+      const { teamId } = ctx;
+      const { documentId, meta = {} } = input;
 
-      if (
-        meta.message ||
-        meta.subject ||
-        meta.timezone ||
-        meta.dateFormat ||
-        meta.redirectUrl ||
-        meta.distributionMethod ||
-        meta.emailSettings
-      ) {
+      if (Object.values(meta).length > 0) {
         await upsertDocumentMeta({
+          userId: ctx.user.id,
+          teamId,
           documentId,
           subject: meta.subject,
           message: meta.message,
@@ -431,9 +453,9 @@ export const documentRouter = router({
           timezone: meta.timezone,
           redirectUrl: meta.redirectUrl,
           distributionMethod: meta.distributionMethod,
-          userId: ctx.user.id,
           emailSettings: meta.emailSettings,
-          requestMetadata: extractNextApiRequestMetadata(ctx.req),
+          language: meta.language,
+          requestMetadata: ctx.metadata,
         });
       }
 
@@ -441,32 +463,41 @@ export const documentRouter = router({
         userId: ctx.user.id,
         documentId,
         teamId,
-        requestMetadata: extractNextApiRequestMetadata(ctx.req),
+        requestMetadata: ctx.metadata,
       });
     }),
 
   /**
    * @public
+   *
+   * Todo: Refactor to redistributeDocument.
    */
   resendDocument: authenticatedProcedure
     .meta({
       openapi: {
         method: 'POST',
-        path: '/document/{documentId}/resend',
-        summary: 'Resend document',
+        path: '/document/redistribute',
+        summary: 'Redistribute document',
         description:
-          'Resend the document to recipients who have not signed. Will use the distribution method set in the document.',
-        tags: ['Documents'],
+          'Redistribute the document to the provided recipients who have not actioned the document. Will use the distribution method set in the document',
+        tags: ['Document'],
       },
     })
     .input(ZResendDocumentMutationSchema)
-    .output(z.void())
+    .output(ZSuccessResponseSchema)
     .mutation(async ({ input, ctx }) => {
-      return await resendDocument({
+      const { teamId } = ctx;
+      const { documentId, recipients } = input;
+
+      await resendDocument({
         userId: ctx.user.id,
-        ...input,
-        requestMetadata: extractNextApiRequestMetadata(ctx.req),
+        teamId,
+        documentId,
+        recipients,
+        requestMetadata: ctx.metadata,
       });
+
+      return ZGenericSuccessResponse;
     }),
 
   /**
@@ -476,17 +507,21 @@ export const documentRouter = router({
     .meta({
       openapi: {
         method: 'POST',
-        path: '/document/{documentId}/duplicate',
+        path: '/document/duplicate',
         summary: 'Duplicate document',
-        tags: ['Documents'],
+        tags: ['Document'],
       },
     })
-    .input(ZDuplicateDocumentMutationSchema)
+    .input(ZDuplicateDocumentRequestSchema)
     .output(ZDuplicateDocumentResponseSchema)
     .mutation(async ({ input, ctx }) => {
+      const { teamId, user } = ctx;
+      const { documentId } = input;
+
       return await duplicateDocument({
-        userId: ctx.user.id,
-        ...input,
+        userId: user.id,
+        teamId,
+        documentId,
       });
     }),
 
@@ -512,6 +547,8 @@ export const documentRouter = router({
   findDocumentAuditLogs: authenticatedProcedure
     .input(ZFindDocumentAuditLogsQuerySchema)
     .query(async ({ input, ctx }) => {
+      const { teamId } = ctx;
+
       const {
         page,
         perPage,
@@ -523,13 +560,14 @@ export const documentRouter = router({
       } = input;
 
       return await findDocumentAuditLogs({
+        userId: ctx.user.id,
+        teamId,
         page,
         perPage,
         documentId,
         cursor,
         filterForRecentActivity,
         orderBy: orderByColumn ? { column: orderByColumn, direction: orderByDirection } : undefined,
-        userId: ctx.user.id,
       });
     }),
 
@@ -539,7 +577,8 @@ export const documentRouter = router({
   downloadAuditLogs: authenticatedProcedure
     .input(ZDownloadAuditLogsMutationSchema)
     .mutation(async ({ input, ctx }) => {
-      const { documentId, teamId } = input;
+      const { teamId } = ctx;
+      const { documentId } = input;
 
       const document = await getDocumentById({
         documentId,
@@ -570,7 +609,8 @@ export const documentRouter = router({
   downloadCertificate: authenticatedProcedure
     .input(ZDownloadCertificateMutationSchema)
     .mutation(async ({ input, ctx }) => {
-      const { documentId, teamId } = input;
+      const { teamId } = ctx;
+      const { documentId } = input;
 
       const document = await getDocumentById({
         documentId,

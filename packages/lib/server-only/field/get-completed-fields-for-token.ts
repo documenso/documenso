@@ -8,21 +8,21 @@ export type GetCompletedFieldsForTokenOptions = {
 export const getCompletedFieldsForToken = async ({ token }: GetCompletedFieldsForTokenOptions) => {
   return await prisma.field.findMany({
     where: {
-      Document: {
-        Recipient: {
+      document: {
+        recipients: {
           some: {
             token,
           },
         },
       },
-      Recipient: {
+      recipient: {
         signingStatus: SigningStatus.SIGNED,
       },
       inserted: true,
     },
     include: {
-      Signature: true,
-      Recipient: {
+      signature: true,
+      recipient: {
         select: {
           name: true,
           email: true,

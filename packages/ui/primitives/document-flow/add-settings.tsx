@@ -11,10 +11,10 @@ import { match } from 'ts-pattern';
 import { DATE_FORMATS, DEFAULT_DOCUMENT_DATE_FORMAT } from '@documenso/lib/constants/date-formats';
 import { SUPPORTED_LANGUAGES } from '@documenso/lib/constants/i18n';
 import { DEFAULT_DOCUMENT_TIME_ZONE, TIME_ZONES } from '@documenso/lib/constants/time-zones';
+import type { TDocument } from '@documenso/lib/types/document';
 import { extractDocumentAuthMethods } from '@documenso/lib/utils/document-auth';
 import { DocumentVisibility, TeamMemberRole } from '@documenso/prisma/client';
 import { DocumentStatus, type Field, type Recipient, SendStatus } from '@documenso/prisma/client';
-import type { DocumentWithData } from '@documenso/prisma/types/document-with-data';
 import {
   DocumentGlobalAuthAccessSelect,
   DocumentGlobalAuthAccessTooltip,
@@ -65,7 +65,7 @@ export type AddSettingsFormProps = {
   fields: Field[];
   isDocumentEnterprise: boolean;
   isDocumentPdfLoaded: boolean;
-  document: DocumentWithData;
+  document: TDocument;
   currentTeamMemberRole?: TeamMemberRole;
   onSubmit: (_data: TAddSettingsFormSchema) => void;
 };

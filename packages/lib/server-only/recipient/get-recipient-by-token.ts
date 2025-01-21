@@ -10,7 +10,7 @@ export const getRecipientByToken = async ({ token }: GetRecipientByTokenOptions)
       token,
     },
     include: {
-      Field: true,
+      fields: true,
     },
   });
 };

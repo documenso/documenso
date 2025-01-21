@@ -67,7 +67,7 @@ export const SigningForm = ({
     trpc.recipient.completeDocumentWithToken.useMutation();
 
   const firstSignerWithFields = useMemo(
-    () => allRecipients?.find((recipient) => recipient.Field.length > 0)?.id,
+    () => allRecipients?.find((recipient) => recipient.fields.length > 0)?.id,
     [allRecipients],
   );
 
@@ -249,7 +249,7 @@ export const SigningForm = ({
                         }}
                       >
                         {allRecipients
-                          ?.filter((recipient) => recipient.Field.length > 0)
+                          ?.filter((recipient) => recipient.fields.length > 0)
                           ?.map((recipient) => (
                             <div
                               key={`${assistantSignersId}-${recipient.id}`}
@@ -276,8 +276,8 @@ export const SigningForm = ({
                                   </div>
                                 </div>
                                 <div className="text-muted-foreground text-xs leading-[inherit]">
-                                  {recipient.Field.length}{' '}
-                                  {recipient.Field.length === 1 ? 'field' : 'fields'}
+                                  {recipient.fields.length}{' '}
+                                  {recipient.fields.length === 1 ? 'field' : 'fields'}
                                 </div>
                               </div>
                             </div>

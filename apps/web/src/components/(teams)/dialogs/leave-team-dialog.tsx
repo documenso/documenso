@@ -43,7 +43,7 @@ export const LeaveTeamDialog = ({
   const { _ } = useLingui();
   const { toast } = useToast();
 
-  const { mutateAsync: leaveTeam, isLoading: isLeavingTeam } = trpc.team.leaveTeam.useMutation({
+  const { mutateAsync: leaveTeam, isPending: isLeavingTeam } = trpc.team.leaveTeam.useMutation({
     onSuccess: () => {
       toast({
         title: _(msg`Success`),

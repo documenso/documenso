@@ -71,7 +71,7 @@ export const DocumentPageView = async ({ params, team }: DocumentPageViewProps) 
 
   const documentVisibility = document?.visibility;
   const currentTeamMemberRole = team?.currentTeamMember?.role;
-  const isRecipient = document?.Recipient.find((recipient) => recipient.email === user.email);
+  const isRecipient = document?.recipients.find((recipient) => recipient.email === user.email);
   let canAccessDocument = true;
 
   if (team && !isRecipient && document?.userId !== user.id) {
@@ -125,12 +125,13 @@ export const DocumentPageView = async ({ params, team }: DocumentPageViewProps) 
     getFieldsForDocument({
       documentId,
       userId: user.id,
+      teamId: team?.id,
     }),
   ]);
 
   const documentWithRecipients = {
     ...document,
-    Recipient: recipients,
+    recipients,
   };
 
   return (

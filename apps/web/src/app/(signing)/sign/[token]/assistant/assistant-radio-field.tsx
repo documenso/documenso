@@ -55,12 +55,12 @@ export const AssistantRadioField = ({
 
   const [selectedOption, setSelectedOption] = useState(defaultValue);
 
-  const { mutateAsync: signFieldWithToken, isLoading: isSignFieldWithTokenLoading } =
+  const { mutateAsync: signFieldWithToken, isPending: isSignFieldWithTokenLoading } =
     trpc.field.signFieldWithToken.useMutation(DO_NOT_INVALIDATE_QUERY_ON_MUTATION);
 
   const {
     mutateAsync: removeSignedFieldWithToken,
-    isLoading: isRemoveSignedFieldWithTokenLoading,
+    isPending: isRemoveSignedFieldWithTokenLoading,
   } = trpc.field.removeSignedFieldWithToken.useMutation(DO_NOT_INVALIDATE_QUERY_ON_MUTATION);
 
   const isLoading = isSignFieldWithTokenLoading || isRemoveSignedFieldWithTokenLoading || isPending;
