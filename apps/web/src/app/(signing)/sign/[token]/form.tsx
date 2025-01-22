@@ -141,7 +141,7 @@ export const SigningForm = ({
         description: 'An error occurred while completing the document. Please try again.',
         variant: 'destructive',
       });
-    } finally {
+
       setIsAssistantSubmitting(false);
       setIsConfirmationDialogOpen(false);
     }
