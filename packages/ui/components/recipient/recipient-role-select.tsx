@@ -115,7 +115,7 @@ export const RecipientRoleSelect = forwardRef<HTMLButtonElement, RecipientRoleSe
           <div className="flex items-center">
             <div className="flex w-[150px] items-center">
               <span className="mr-2">{ROLE_ICONS[RecipientRole.ASSISTANT]}</span>
-              <Trans>Assistant Role</Trans>
+              <Trans>Can prepare</Trans>
             </div>
             <Tooltip>
               <TooltipTrigger>
@@ -124,7 +124,8 @@ export const RecipientRoleSelect = forwardRef<HTMLButtonElement, RecipientRoleSe
               <TooltipContent className="text-foreground z-9999 max-w-md p-4">
                 <p>
                   <Trans>
-                    The recipient is required to assist the document for it to be completed.
+                    The recipient can prepare the document for later signers by pre-filling suggest
+                    values.
                   </Trans>
                 </p>
               </TooltipContent>
