@@ -50,8 +50,8 @@ export const DuplicateDocumentDialog = ({
 
   const { mutateAsync: duplicateDocument, isPending: isDuplicateLoading } =
     trpcReact.document.duplicateDocument.useMutation({
-      onSuccess: (newId) => {
-        router.push(`${documentsPath}/${newId}/edit`);
+      onSuccess: ({ documentId }) => {
+        router.push(`${documentsPath}/${documentId}/edit`);
 
         toast({
           title: _(msg`Document Duplicated`),
