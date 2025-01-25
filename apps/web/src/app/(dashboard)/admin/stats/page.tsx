@@ -9,6 +9,7 @@ import {
   Mail,
   MailOpen,
   PenTool,
+  UserCheck,
   UserPlus,
   UserSquare2,
   Users,
@@ -20,6 +21,7 @@ import { getRecipientsStats } from '@documenso/lib/server-only/admin/get-recipie
 import {
   getUserWithSignedDocumentMonthlyGrowth,
   getUsersCount,
+  getUsersWithLastSignedInCount,
   getUsersWithSubscriptionsCount,
 } from '@documenso/lib/server-only/admin/get-users-stats';
 import { getSignerConversionMonthly } from '@documenso/lib/server-only/user/get-signer-conversion';
@@ -43,6 +45,7 @@ export default async function AdminStatsPage() {
     // userWithAtLeastOneDocumentPerMonth,
     // userWithAtLeastOneDocumentSignedPerMonth,
     MONTHLY_USERS_SIGNED,
+    usersWithLastSignedInCount,
   ] = await Promise.all([
     getUsersCount(),
     getUsersWithSubscriptionsCount(),
@@ -52,6 +55,7 @@ export default async function AdminStatsPage() {
     // getUserWithAtLeastOneDocumentPerMonth(),
     // getUserWithAtLeastOneDocumentSignedPerMonth(),
     getUserWithSignedDocumentMonthlyGrowth(),
+    getUsersWithLastSignedInCount(),
   ]);
 
   return (
@@ -68,7 +72,11 @@ export default async function AdminStatsPage() {
           title={_(msg`Active Subscriptions`)}
           value={usersWithSubscriptionsCount}
         />
-
+        <CardMetric
+          icon={UserCheck}
+          title={_(msg`MAU (signed in)`)}
+          value={usersWithLastSignedInCount}
+        />
         <CardMetric
           icon={FileCog}
           title={_(msg`App Version`)}
