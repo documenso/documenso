@@ -8,19 +8,14 @@ import { FieldType } from '@documenso/prisma/client';
 export const ZDocumentFlowFormSchema = z.object({
   title: z.string().min(1),
 
-  signers: z
-    .array(
-      z.object({
-        formId: z.string().min(1),
-        nativeId: z.number().optional(),
-        email: z.string().min(1).email(),
-        name: z.string(),
-      }),
-    )
-    .refine((signers) => {
-      const emails = signers.map((signer) => signer.email);
-      return new Set(emails).size === emails.length;
-    }, 'Signers must have unique emails'),
+  signers: z.array(
+    z.object({
+      formId: z.string().min(1),
+      nativeId: z.number().optional(),
+      email: z.string().min(1).email(),
+      name: z.string(),
+    }),
+  ),
 
   fields: z.array(
     z.object({
