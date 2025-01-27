@@ -5,6 +5,13 @@ import { validateTextField } from '@documenso/lib/advanced-fields-validation/val
 import { type TTextFieldMeta as TextFieldMeta } from '@documenso/lib/types/field-meta';
 import { Input } from '@documenso/ui/primitives/input';
 import { Label } from '@documenso/ui/primitives/label';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@documenso/ui/primitives/select';
 import { Switch } from '@documenso/ui/primitives/switch';
 import { Textarea } from '@documenso/ui/primitives/textarea';
 
@@ -22,7 +29,7 @@ export const TextFieldAdvancedSettings = ({
   const { _ } = useLingui();
 
   const handleInput = (field: keyof TextFieldMeta, value: string | boolean) => {
-    const text = field === 'text' ? String(value) : fieldState.text ?? '';
+    const text = field === 'text' ? String(value) : (fieldState.text ?? '');
     const limit =
       field === 'characterLimit' ? Number(value) : Number(fieldState.characterLimit ?? 0);
     const fontSize = field === 'fontSize' ? Number(value) : Number(fieldState.fontSize ?? 14);
@@ -110,6 +117,27 @@ export const TextFieldAdvancedSettings = ({
           min={8}
           max={96}
         />
+      </div>
+
+      <div>
+        <Label>
+          <Trans>Text Align</Trans>
+        </Label>
+
+        <Select
+          value={fieldState.textAlign}
+          onValueChange={(value) => handleInput('textAlign', value)}
+        >
+          <SelectTrigger className="bg-background mt-2">
+            <SelectValue placeholder="Select text align" />
+          </SelectTrigger>
+
+          <SelectContent>
+            <SelectItem value="left">Left</SelectItem>
+            <SelectItem value="center">Center</SelectItem>
+            <SelectItem value="right">Right</SelectItem>
+          </SelectContent>
+        </Select>
       </div>
 
       <div className="mt-4 flex flex-col gap-4">
