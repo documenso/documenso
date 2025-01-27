@@ -23,6 +23,10 @@ import { FROM_ADDRESS, FROM_NAME } from '../../constants/email';
 import { AppError, AppErrorCode } from '../../errors/app-error';
 import { DOCUMENT_AUDIT_LOG_TYPE } from '../../types/document-audit-logs';
 import { extractDerivedDocumentEmailSettings } from '../../types/document-email';
+import {
+  ZWebhookDocumentSchema,
+  mapDocumentToWebhookDocumentPayload,
+} from '../../types/webhook-payload';
 import type { ApiRequestMetadata } from '../../universal/extract-request-metadata';
 import { createDocumentAuditLogData } from '../../utils/document-audit-logs';
 import { renderEmailWithI18N } from '../../utils/render-email-with-i18n';
@@ -115,12 +119,9 @@ export const deleteDocument = async ({
 
   await triggerWebhook({
     event: WebhookTriggerEvents.DOCUMENT_CANCELLED,
-    data: {
-      documentId: document.id,
-      lol: 'inside deleteDocument',
-    },
-    userId: document.userId,
-    teamId: document.teamId === null ? undefined : document.teamId,
+    data: ZWebhookDocumentSchema.parse(mapDocumentToWebhookDocumentPayload(document)),
+    userId,
+    teamId,
   });
 
   // Return partial document for API v1 response.
