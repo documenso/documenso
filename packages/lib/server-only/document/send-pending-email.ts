@@ -21,14 +21,14 @@ export const sendPendingEmail = async ({ documentId, recipientId }: SendPendingE
   const document = await prisma.document.findFirst({
     where: {
       id: documentId,
-      Recipient: {
+      recipients: {
         some: {
           id: recipientId,
         },
       },
     },
     include: {
-      Recipient: {
+      recipients: {
         where: {
           id: recipientId,
         },
@@ -46,7 +46,7 @@ export const sendPendingEmail = async ({ documentId, recipientId }: SendPendingE
     throw new Error('Document not found');
   }
 
-  if (document.Recipient.length === 0) {
+  if (document.recipients.length === 0) {
     throw new Error('Document has no recipients');
   }
 
@@ -58,7 +58,7 @@ export const sendPendingEmail = async ({ documentId, recipientId }: SendPendingE
     return;
   }
 
-  const [recipient] = document.Recipient;
+  const [recipient] = document.recipients;
 
   const { email, name } = recipient;
 

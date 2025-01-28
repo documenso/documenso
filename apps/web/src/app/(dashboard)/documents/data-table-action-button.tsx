@@ -12,15 +12,14 @@ import { downloadPDF } from '@documenso/lib/client-only/download-pdf';
 import { formatDocumentsPath } from '@documenso/lib/utils/teams';
 import type { Document, Recipient, Team, User } from '@documenso/prisma/client';
 import { DocumentStatus, RecipientRole, SigningStatus } from '@documenso/prisma/client';
-import type { DocumentWithData } from '@documenso/prisma/types/document-with-data';
 import { trpc as trpcClient } from '@documenso/trpc/client';
 import { Button } from '@documenso/ui/primitives/button';
 import { useToast } from '@documenso/ui/primitives/use-toast';
 
 export type DataTableActionButtonProps = {
   row: Document & {
-    User: Pick<User, 'id' | 'name' | 'email'>;
-    Recipient: Recipient[];
+    user: Pick<User, 'id' | 'name' | 'email'>;
+    recipients: Recipient[];
     team: Pick<Team, 'id' | 'url'> | null;
   };
   team?: Pick<Team, 'id' | 'url'>;
@@ -35,9 +34,9 @@ export const DataTableActionButton = ({ row, team }: DataTableActionButtonProps)
     return null;
   }
 
-  const recipient = row.Recipient.find((recipient) => recipient.email === session.user.email);
+  const recipient = row.recipients.find((recipient) => recipient.email === session.user.email);
 
-  const isOwner = row.User.id === session.user.id;
+  const isOwner = row.user.id === session.user.id;
   const isRecipient = !!recipient;
   const isDraft = row.status === DocumentStatus.DRAFT;
   const isPending = row.status === DocumentStatus.PENDING;
@@ -50,18 +49,20 @@ export const DataTableActionButton = ({ row, team }: DataTableActionButtonProps)
 
   const onDownloadClick = async () => {
     try {
-      let document: DocumentWithData | null = null;
-
-      if (!recipient) {
-        document = await trpcClient.document.getDocumentById.query({
-          id: row.id,
-          teamId: team?.id,
-        });
-      } else {
-        document = await trpcClient.document.getDocumentByToken.query({
-          token: recipient.token,
-        });
-      }
+      const document = !recipient
+        ? await trpcClient.document.getDocumentById.query(
+            {
+              documentId: row.id,
+            },
+            {
+              context: {
+                teamId: team?.id?.toString(),
+              },
+            },
+          )
+        : await trpcClient.document.getDocumentByToken.query({
+            token: recipient.token,
+          });
 
       const documentData = document?.documentData;
 

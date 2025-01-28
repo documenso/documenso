@@ -17,6 +17,7 @@ import { FieldType } from '@documenso/prisma/client';
 
 export type SetFieldsForTemplateOptions = {
   userId: number;
+  teamId?: number;
   templateId: number;
   fields: {
     id?: number | null;
@@ -33,26 +34,28 @@ export type SetFieldsForTemplateOptions = {
 
 export const setFieldsForTemplate = async ({
   userId,
+  teamId,
   templateId,
   fields,
 }: SetFieldsForTemplateOptions) => {
   const template = await prisma.template.findFirst({
     where: {
       id: templateId,
-      OR: [
-        {
-          userId,
-        },
-        {
-          team: {
-            members: {
-              some: {
-                userId,
+      ...(teamId
+        ? {
+            team: {
+              id: teamId,
+              members: {
+                some: {
+                  userId,
+                },
               },
             },
-          },
-        },
-      ],
+          }
+        : {
+            userId,
+            teamId: null,
+          }),
     },
   });
 
@@ -65,7 +68,7 @@ export const setFieldsForTemplate = async ({
       templateId,
     },
     include: {
-      Recipient: true,
+      recipient: true,
     },
   });
 
@@ -170,12 +173,12 @@ export const setFieldsForTemplate = async ({
           customText: '',
           inserted: false,
           fieldMeta: parsedFieldMeta,
-          Template: {
+          template: {
             connect: {
               id: templateId,
             },
           },
-          Recipient: {
+          recipient: {
             connect: {
               templateId_email: {
                 templateId,
@@ -206,5 +209,7 @@ export const setFieldsForTemplate = async ({
     return !isRemoved && !isUpdated;
   });
 
-  return [...filteredFields, ...persistedFields];
+  return {
+    fields: [...filteredFields, ...persistedFields],
+  };
 };

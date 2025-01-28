@@ -58,12 +58,12 @@ export const DropdownField = ({
   const defaultValue = parsedFieldMeta?.defaultValue;
   const [localChoice, setLocalChoice] = useState(parsedFieldMeta.defaultValue ?? '');
 
-  const { mutateAsync: signFieldWithToken, isLoading: isSignFieldWithTokenLoading } =
+  const { mutateAsync: signFieldWithToken, isPending: isSignFieldWithTokenLoading } =
     trpc.field.signFieldWithToken.useMutation(DO_NOT_INVALIDATE_QUERY_ON_MUTATION);
 
   const {
     mutateAsync: removeSignedFieldWithToken,
-    isLoading: isRemoveSignedFieldWithTokenLoading,
+    isPending: isRemoveSignedFieldWithTokenLoading,
   } = trpc.field.removeSignedFieldWithToken.useMutation(DO_NOT_INVALIDATE_QUERY_ON_MUTATION);
 
   const isLoading = isSignFieldWithTokenLoading || isRemoveSignedFieldWithTokenLoading || isPending;
@@ -178,7 +178,7 @@ export const DropdownField = ({
         )}
 
         {!field.inserted && (
-          <p className="group-hover:text-primary text-muted-foreground flex flex-col items-center justify-center duration-200 ">
+          <p className="group-hover:text-primary text-muted-foreground flex flex-col items-center justify-center duration-200">
             <Select value={localChoice} onValueChange={handleSelectItem}>
               <SelectTrigger
                 className={cn(

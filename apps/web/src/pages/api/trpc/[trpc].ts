@@ -17,7 +17,7 @@ const logger = buildLogger();
 
 export default trpcNext.createNextApiHandler({
   router: appRouter,
-  createContext: async ({ req, res }) => createTrpcContext({ req, res }),
+  createContext: async ({ req, res }) => createTrpcContext({ req, res, requestSource: 'app' }),
   onError(opts) {
     const { error, path } = opts;
 
@@ -45,6 +45,7 @@ export default trpcNext.createNextApiHandler({
       logger.error(error, {
         method: path,
         context: {
+          source: 'trpc',
           appError: AppError.toJSON(appError),
         },
       });

@@ -61,6 +61,7 @@ export const ZSuccessfulGetDocumentResponseSchema = ZSuccessfulDocumentResponseS
   fields: z.lazy(() =>
     ZFieldSchema.pick({
       id: true,
+      documentId: true,
       recipientId: true,
       type: true,
       page: true,
@@ -68,6 +69,8 @@ export const ZSuccessfulGetDocumentResponseSchema = ZSuccessfulDocumentResponseS
       positionY: true,
       width: true,
       height: true,
+      customText: true,
+      fieldMeta: true,
     })
       .extend({
         fieldMeta: ZFieldMetaSchema.nullish(),
@@ -88,8 +91,12 @@ export const ZSendDocumentForSigningMutationSchema = z
       description:
         'Whether to send an email to the recipients asking them to action the document. If you disable this, you will need to manually distribute the document to the recipients using the generated signing links.',
     }),
+    sendCompletionEmails: z.boolean().optional().openapi({
+      description:
+        'Whether to send completion emails when the document is fully signed. This will override the document email settings.',
+    }),
   })
-  .or(z.literal('').transform(() => ({ sendEmail: true })));
+  .or(z.literal('').transform(() => ({ sendEmail: true, sendCompletionEmails: undefined })));
 
 export type TSendDocumentForSigningMutationSchema = typeof ZSendDocumentForSigningMutationSchema;
 
@@ -161,7 +168,10 @@ export const ZCreateDocumentMutationSchema = z.object({
       globalAccessAuth: ZDocumentAccessAuthTypesSchema.optional(),
       globalActionAuth: ZDocumentActionAuthTypesSchema.optional(),
     })
-    .optional(),
+    .optional()
+    .openapi({
+      description: 'The globalActionAuth property is only available for Enterprise accounts.',
+    }),
   formValues: z.record(z.string(), z.union([z.string(), z.boolean(), z.number()])).optional(),
 });
 
@@ -325,7 +335,10 @@ export const ZCreateRecipientMutationSchema = z.object({
     .object({
       actionAuth: ZRecipientActionAuthTypesSchema.optional(),
     })
-    .optional(),
+    .optional()
+    .openapi({
+      description: 'The authOptions property is only available for Enterprise accounts.',
+    }),
 });
 
 /**
@@ -520,6 +533,7 @@ export const ZFieldSchema = z.object({
   height: z.unknown(),
   customText: z.string(),
   inserted: z.boolean(),
+  fieldMeta: ZFieldMetaSchema.nullish().openapi({}),
 });
 
 export const ZTemplateWithDataSchema = ZTemplateSchema.extend({
@@ -537,6 +551,8 @@ export const ZTemplateWithDataSchema = ZTemplateSchema.extend({
   }),
   Field: ZFieldSchema.pick({
     id: true,
+    documentId: true,
+    templateId: true,
     recipientId: true,
     type: true,
     page: true,
@@ -544,6 +560,8 @@ export const ZTemplateWithDataSchema = ZTemplateSchema.extend({
     positionY: true,
     width: true,
     height: true,
+    customText: true,
+    fieldMeta: true,
   }).array(),
   Recipient: ZRecipientSchema.pick({
     id: true,

@@ -34,6 +34,7 @@ import {
   ZFieldMetaSchema,
 } from '@documenso/lib/types/field-meta';
 import { nanoid } from '@documenso/lib/universal/id';
+import { ADVANCED_FIELD_TYPES_WITH_OPTIONAL_SETTING } from '@documenso/lib/utils/advanced-fields-helpers';
 import { validateFieldsUninserted } from '@documenso/lib/utils/fields';
 import { parseMessageDescriptor } from '@documenso/lib/utils/i18n';
 import {
@@ -129,6 +130,7 @@ export const AddFieldsFormPartial = ({
     currentStep === 1 && typeof documentFlow.onBackStep === 'function' && canGoBack;
   const [showAdvancedSettings, setShowAdvancedSettings] = useState(false);
   const [currentField, setCurrentField] = useState<FieldFormType>();
+  const [activeFieldId, setActiveFieldId] = useState<string | null>(null);
 
   const form = useForm<TAddFieldsFormSchema>({
     defaultValues: {
@@ -351,6 +353,13 @@ export const AddFieldsFormPartial = ({
       };
 
       append(field);
+
+      // Only open fields with significant amount of settings (instead of just a font setting) to
+      // reduce friction when adding fields.
+      if (ADVANCED_FIELD_TYPES_WITH_OPTIONAL_SETTING.includes(selectedField)) {
+        setCurrentField(field);
+        setShowAdvancedSettings(true);
+      }
 
       setIsFieldWithinBounds(false);
       setSelectedField(null);
@@ -652,6 +661,9 @@ export const AddFieldsFormPartial = ({
                       }}
                       hideRecipients={hideRecipients}
                       hasErrors={!!hasFieldError}
+                      active={activeFieldId === field.formId}
+                      onFieldActivate={() => setActiveFieldId(field.formId)}
+                      onFieldDeactivate={() => setActiveFieldId(null)}
                     />
                   );
                 })}
@@ -788,7 +800,6 @@ export const AddFieldsFormPartial = ({
                         <Checkbox
                           {...field}
                           id="typedSignatureEnabled"
-                          checkClassName="text-white"
                           checked={value}
                           onCheckedChange={(checked) => field.onChange(checked)}
                           disabled={form.formState.isSubmitting}
@@ -1082,8 +1093,8 @@ export const AddFieldsFormPartial = ({
                     {emptyCheckboxFields.length > 0
                       ? 'Checkbox'
                       : emptyRadioFields.length > 0
-                      ? 'Radio'
-                      : 'Select'}{' '}
+                        ? 'Radio'
+                        : 'Select'}{' '}
                     field.
                   </Trans>
                 </li>

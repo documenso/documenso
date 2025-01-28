@@ -56,7 +56,7 @@ export const createTeam = async ({
       id: userId,
     },
     include: {
-      Subscription: true,
+      subscriptions: true,
     },
   });
 
@@ -68,7 +68,7 @@ export const createTeam = async ({
       prices.map((price) => price.id),
     );
 
-    isPaymentRequired = !subscriptionsContainsActivePlan(user.Subscription, teamRelatedPriceIds);
+    isPaymentRequired = !subscriptionsContainsActivePlan(user.subscriptions, teamRelatedPriceIds);
 
     customerId = await createTeamCustomer({
       name: user.name ?? teamName,
@@ -95,7 +95,7 @@ export const createTeam = async ({
           });
         }
 
-        await tx.team.create({
+        const team = await tx.team.create({
           data: {
             name: teamName,
             url: teamUrl,
@@ -104,11 +104,21 @@ export const createTeam = async ({
             members: {
               create: [
                 {
-                  userId,
+                  userId: user.id,
                   role: TeamMemberRole.ADMIN,
                 },
               ],
             },
+          },
+        });
+
+        await tx.teamGlobalSettings.upsert({
+          where: {
+            teamId: team.id,
+          },
+          update: {},
+          create: {
+            teamId: team.id,
           },
         });
       });
@@ -222,6 +232,16 @@ export const createTeamFromPendingTeam = async ({
             },
           ],
         },
+      },
+    });
+
+    await tx.teamGlobalSettings.upsert({
+      where: {
+        teamId: team.id,
+      },
+      update: {},
+      create: {
+        teamId: team.id,
       },
     });
 

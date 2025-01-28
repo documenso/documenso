@@ -10,7 +10,7 @@ import { Edit, MoreHorizontal, Trash2 } from 'lucide-react';
 
 import { useUpdateSearchParams } from '@documenso/lib/client-only/hooks/use-update-search-params';
 import { TEAM_MEMBER_ROLE_MAP } from '@documenso/lib/constants/teams';
-import { ZBaseTableSearchParamsSchema } from '@documenso/lib/types/search-params';
+import { ZUrlSearchParamsSchema } from '@documenso/lib/types/search-params';
 import { extractInitials } from '@documenso/lib/utils/recipient-formatter';
 import { isTeamRoleWithinUserHierarchy } from '@documenso/lib/utils/teams';
 import type { TeamMemberRole } from '@documenso/prisma/client';
@@ -50,19 +50,17 @@ export const TeamMembersDataTable = ({
   const searchParams = useSearchParams();
   const updateSearchParams = useUpdateSearchParams();
 
-  const parsedSearchParams = ZBaseTableSearchParamsSchema.parse(
-    Object.fromEntries(searchParams ?? []),
-  );
+  const parsedSearchParams = ZUrlSearchParamsSchema.parse(Object.fromEntries(searchParams ?? []));
 
-  const { data, isLoading, isInitialLoading, isLoadingError } = trpc.team.findTeamMembers.useQuery(
+  const { data, isLoading, isLoadingError } = trpc.team.findTeamMembers.useQuery(
     {
       teamId,
-      term: parsedSearchParams.query,
+      query: parsedSearchParams.query,
       page: parsedSearchParams.page,
       perPage: parsedSearchParams.perPage,
     },
     {
-      keepPreviousData: true,
+      placeholderData: (previousData) => previousData,
     },
   );
 
@@ -187,7 +185,7 @@ export const TeamMembersDataTable = ({
         enable: isLoadingError,
       }}
       skeleton={{
-        enable: isLoading && isInitialLoading,
+        enable: isLoading,
         rows: 3,
         component: (
           <>

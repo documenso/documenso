@@ -9,14 +9,14 @@ import { DocumentVisibility } from '../../types/document-visibility';
 import { getTeamById } from '../team/get-team';
 
 export type GetDocumentByIdOptions = {
-  id: number;
+  documentId: number;
   userId: number;
   teamId?: number;
 };
 
-export const getDocumentById = async ({ id, userId, teamId }: GetDocumentByIdOptions) => {
+export const getDocumentById = async ({ documentId, userId, teamId }: GetDocumentByIdOptions) => {
   const documentWhereInput = await getDocumentWhereInput({
-    documentId: id,
+    documentId,
     userId,
     teamId,
   });
@@ -26,14 +26,14 @@ export const getDocumentById = async ({ id, userId, teamId }: GetDocumentByIdOpt
     include: {
       documentData: true,
       documentMeta: true,
-      User: {
+      user: {
         select: {
           id: true,
           name: true,
           email: true,
         },
       },
-      Recipient: {
+      recipients: {
         select: {
           email: true,
         },
@@ -119,14 +119,14 @@ export const getDocumentWhereInput = async ({
   if (team.teamEmail) {
     documentWhereInput.OR.push(
       {
-        Recipient: {
+        recipients: {
           some: {
             email: team.teamEmail.email,
           },
         },
       },
       {
-        User: {
+        user: {
           email: team.teamEmail.email,
         },
       },
@@ -154,7 +154,7 @@ export const getDocumentWhereInput = async ({
     {
       OR: [
         {
-          Recipient: {
+          recipients: {
             some: {
               email: user.email,
             },

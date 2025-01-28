@@ -8,6 +8,7 @@ import { getServerComponentSession } from '@documenso/lib/next-auth/get-server-c
 import { getTeamByUrl } from '@documenso/lib/server-only/team/get-team';
 import { getTeams } from '@documenso/lib/server-only/team/get-teams';
 import { SubscriptionStatus } from '@documenso/prisma/client';
+import { TrpcProvider } from '@documenso/trpc/react';
 
 import { Header } from '~/components/(dashboard)/layout/header';
 import { RefreshOnFocus } from '~/components/(dashboard)/refresh-on-focus/refresh-on-focus';
@@ -47,6 +48,10 @@ export default async function AuthenticatedTeamsLayout({
   const team = getTeamPromise.value;
   const teams = getTeamsPromise.status === 'fulfilled' ? getTeamsPromise.value : [];
 
+  const trpcHeaders = {
+    'x-team-Id': team.id.toString(),
+  };
+
   return (
     <NextAuthProvider session={session}>
       <LimitsProvider teamId={team.id}>
@@ -61,7 +66,9 @@ export default async function AuthenticatedTeamsLayout({
         <Header user={user} teams={teams} />
 
         <TeamProvider team={team}>
-          <main className="mt-8 pb-8 md:mt-12 md:pb-12">{children}</main>
+          <TrpcProvider headers={trpcHeaders}>
+            <main className="mt-8 pb-8 md:mt-12 md:pb-12">{children}</main>
+          </TrpcProvider>
         </TeamProvider>
 
         <RefreshOnFocus />

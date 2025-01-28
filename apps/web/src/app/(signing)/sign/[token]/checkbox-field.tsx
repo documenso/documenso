@@ -12,6 +12,7 @@ import { DO_NOT_INVALIDATE_QUERY_ON_MUTATION } from '@documenso/lib/constants/tr
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import type { TRecipientActionAuth } from '@documenso/lib/types/document-auth';
 import { ZCheckboxFieldMeta } from '@documenso/lib/types/field-meta';
+import { fromCheckboxValue, toCheckboxValue } from '@documenso/lib/universal/field-checkbox';
 import type { Recipient } from '@documenso/prisma/client';
 import type { FieldWithSignatureAndFieldMeta } from '@documenso/prisma/types/field-with-signature-and-fieldmeta';
 import { trpc } from '@documenso/trpc/react';
@@ -54,6 +55,7 @@ export const CheckboxField = ({
     ...item,
     value: item.value.length > 0 ? item.value : `empty-value-${item.id}`,
   }));
+
   const [checkedValues, setCheckedValues] = useState(
     values
       ?.map((item) =>
@@ -79,12 +81,12 @@ export const CheckboxField = ({
     );
   }, [checkedValues, validationSign, checkboxValidationLength]);
 
-  const { mutateAsync: signFieldWithToken, isLoading: isSignFieldWithTokenLoading } =
+  const { mutateAsync: signFieldWithToken, isPending: isSignFieldWithTokenLoading } =
     trpc.field.signFieldWithToken.useMutation(DO_NOT_INVALIDATE_QUERY_ON_MUTATION);
 
   const {
     mutateAsync: removeSignedFieldWithToken,
-    isLoading: isRemoveSignedFieldWithTokenLoading,
+    isPending: isRemoveSignedFieldWithTokenLoading,
   } = trpc.field.removeSignedFieldWithToken.useMutation(DO_NOT_INVALIDATE_QUERY_ON_MUTATION);
 
   const isLoading = isSignFieldWithTokenLoading || isRemoveSignedFieldWithTokenLoading || isPending;
@@ -97,7 +99,7 @@ export const CheckboxField = ({
       const payload: TSignFieldWithTokenMutationSchema = {
         token: recipient.token,
         fieldId: field.id,
-        value: checkedValues.join(','),
+        value: toCheckboxValue(checkedValues),
         isBase64: true,
         authOptions,
       };
@@ -191,7 +193,7 @@ export const CheckboxField = ({
           await signFieldWithToken({
             token: recipient.token,
             fieldId: field.id,
-            value: updatedValues.join(','),
+            value: toCheckboxValue(checkedValues),
             isBase64: true,
           });
         }
@@ -228,6 +230,11 @@ export const CheckboxField = ({
     }
   }, [checkedValues, isLengthConditionMet, field.inserted]);
 
+  const parsedCheckedValues = useMemo(
+    () => fromCheckboxValue(field.customText),
+    [field.customText],
+  );
+
   return (
     <SigningFieldContainer field={field} onSign={onSign} onRemove={onRemove} type="Checkbox">
       {isLoading && (
@@ -251,7 +258,6 @@ export const CheckboxField = ({
                 <div key={index} className="flex items-center gap-x-1.5">
                   <Checkbox
                     className="h-4 w-4"
-                    checkClassName="text-white"
                     id={`checkbox-${index}`}
                     checked={checkedValues.includes(itemValue)}
                     onCheckedChange={() => handleCheckboxChange(item.value, item.id)}
@@ -275,11 +281,8 @@ export const CheckboxField = ({
               <div key={index} className="flex items-center gap-x-1.5">
                 <Checkbox
                   className="h-3 w-3"
-                  checkClassName="text-white"
                   id={`checkbox-${index}`}
-                  checked={field.customText
-                    .split(',')
-                    .some((customValue) => customValue === itemValue)}
+                  checked={parsedCheckedValues.includes(itemValue)}
                   disabled={isLoading}
                   onCheckedChange={() => void handleCheckboxOptionClick(item)}
                 />

@@ -40,6 +40,7 @@
     "@trigger.dev/sdk": "^2.3.18",
     "@upstash/redis": "^1.20.6",
     "@vvo/tzdb": "^6.117.0",
+    "csv-parse": "^5.6.0",
     "inngest": "^3.19.13",
     "kysely": "^0.26.3",
     "luxon": "^3.4.0",
@@ -56,7 +57,7 @@
     "sharp": "0.32.6",
     "stripe": "^12.7.0",
     "ts-pattern": "^5.0.5",
-    "zod": "^3.23.8"
+    "zod": "3.24.1"
   },
   "devDependencies": {
     "@playwright/browser-chromium": "1.43.0",

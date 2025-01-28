@@ -4,4 +4,4 @@ set -x
 
 npx prisma migrate deploy --schema ./packages/prisma/schema.prisma
 
-node apps/web/server.js
+HOSTNAME=0.0.0.0 node apps/web/server.js

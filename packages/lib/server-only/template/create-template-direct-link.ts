@@ -7,41 +7,44 @@ import {
   DIRECT_TEMPLATE_RECIPIENT_NAME,
 } from '@documenso/lib/constants/direct-templates';
 import { prisma } from '@documenso/prisma';
-import type { Recipient, TemplateDirectLink } from '@documenso/prisma/client';
+import type { Recipient } from '@documenso/prisma/client';
 
 import { AppError, AppErrorCode } from '../../errors/app-error';
 
 export type CreateTemplateDirectLinkOptions = {
   templateId: number;
   userId: number;
+  teamId?: number;
   directRecipientId?: number;
 };
 
 export const createTemplateDirectLink = async ({
   templateId,
   userId,
+  teamId,
   directRecipientId,
-}: CreateTemplateDirectLinkOptions): Promise<TemplateDirectLink> => {
+}: CreateTemplateDirectLinkOptions) => {
   const template = await prisma.template.findFirst({
     where: {
       id: templateId,
-      OR: [
-        {
-          userId,
-        },
-        {
-          team: {
-            members: {
-              some: {
-                userId,
+      ...(teamId
+        ? {
+            team: {
+              id: teamId,
+              members: {
+                some: {
+                  userId,
+                },
               },
             },
-          },
-        },
-      ],
+          }
+        : {
+            userId,
+            teamId: null,
+          }),
     },
     include: {
-      Recipient: true,
+      recipients: true,
       directLink: true,
     },
   });
@@ -56,14 +59,14 @@ export const createTemplateDirectLink = async ({
 
   if (
     directRecipientId &&
-    !template.Recipient.find((recipient) => recipient.id === directRecipientId)
+    !template.recipients.find((recipient) => recipient.id === directRecipientId)
   ) {
     throw new AppError(AppErrorCode.NOT_FOUND, { message: 'Recipient not found' });
   }
 
   if (
     !directRecipientId &&
-    template.Recipient.find(
+    template.recipients.find(
       (recipient) => recipient.email.toLowerCase() === DIRECT_TEMPLATE_RECIPIENT_EMAIL,
     )
   ) {

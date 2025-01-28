@@ -20,16 +20,12 @@ export type TemplatePageViewRecentActivityProps = {
 
 export const TemplatePageViewRecentActivity = ({
   templateId,
-  teamId,
   documentRootPath,
 }: TemplatePageViewRecentActivityProps) => {
   const { data, isLoading, isLoadingError, refetch } = trpc.document.findDocuments.useQuery({
     templateId,
-    teamId,
-    orderBy: {
-      column: 'createdAt',
-      direction: 'asc',
-    },
+    orderByColumn: 'createdAt',
+    orderByDirection: 'asc',
     perPage: 5,
   });
 
@@ -127,7 +123,7 @@ export const TemplatePageViewRecentActivity = ({
                   {match(document.source)
                     .with(DocumentSource.DOCUMENT, DocumentSource.TEMPLATE, () => (
                       <Trans>
-                        Document created by <span className="font-bold">{document.User.name}</span>
+                        Document created by <span className="font-bold">{document.user.name}</span>
                       </Trans>
                     ))
                     .with(DocumentSource.TEMPLATE_DIRECT_LINK, () => (

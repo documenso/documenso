@@ -20,7 +20,7 @@ export const sendForgotPassword = async ({ userId }: SendForgotPasswordOptions) 
       id: userId,
     },
     include: {
-      PasswordResetToken: {
+      passwordResetTokens: {
         orderBy: {
           createdAt: 'desc',
         },
@@ -33,7 +33,7 @@ export const sendForgotPassword = async ({ userId }: SendForgotPasswordOptions) 
     throw new Error('User not found');
   }
 
-  const token = user.PasswordResetToken[0].token;
+  const token = user.passwordResetTokens[0].token;
   const assetBaseUrl = NEXT_PUBLIC_WEBAPP_URL() || 'http://localhost:3000';
   const resetPasswordLink = `${NEXT_PUBLIC_WEBAPP_URL()}/reset-password/${token}`;
 

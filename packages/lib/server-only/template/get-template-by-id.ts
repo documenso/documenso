@@ -1,48 +1,40 @@
 import { prisma } from '@documenso/prisma';
-import type { Prisma } from '@documenso/prisma/client';
 
 import { AppError, AppErrorCode } from '../../errors/app-error';
 
-export interface GetTemplateByIdOptions {
+export type GetTemplateByIdOptions = {
   id: number;
   userId: number;
   teamId?: number;
-}
+};
 
 export const getTemplateById = async ({ id, userId, teamId }: GetTemplateByIdOptions) => {
-  const whereFilter: Prisma.TemplateWhereInput = {
-    id,
-    OR:
-      teamId === undefined
-        ? [
-            {
-              userId,
-              teamId: null,
-            },
-          ]
-        : [
-            {
-              teamId,
-              team: {
-                members: {
-                  some: {
-                    userId,
-                  },
+  const template = await prisma.template.findFirst({
+    where: {
+      id,
+      ...(teamId
+        ? {
+            team: {
+              id: teamId,
+              members: {
+                some: {
+                  userId,
                 },
               },
             },
-          ],
-  };
-
-  const template = await prisma.template.findFirst({
-    where: whereFilter,
+          }
+        : {
+            userId,
+            teamId: null,
+          }),
+    },
     include: {
       directLink: true,
       templateDocumentData: true,
       templateMeta: true,
-      Recipient: true,
-      Field: true,
-      User: {
+      recipients: true,
+      fields: true,
+      user: {
         select: {
           id: true,
           name: true,

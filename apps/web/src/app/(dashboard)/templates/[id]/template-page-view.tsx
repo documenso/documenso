@@ -14,6 +14,7 @@ import { LazyPDFViewer } from '@documenso/ui/primitives/lazy-pdf-viewer';
 
 import { DocumentReadOnlyFields } from '~/components/document/document-read-only-fields';
 import { TemplateType } from '~/components/formatter/template-type';
+import { TemplateBulkSendDialog } from '~/components/templates/template-bulk-send-dialog';
 
 import { DataTableActionDropdown } from '../data-table-action-dropdown';
 import { TemplateDirectLinkBadge } from '../template-direct-link-badge';
@@ -54,10 +55,10 @@ export const TemplatePageView = async ({ params, team }: TemplatePageViewProps) 
     redirect(templateRootPath);
   }
 
-  const { templateDocumentData, Field, Recipient: recipients, templateMeta } = template;
+  const { templateDocumentData, fields, recipients, templateMeta } = template;
 
   // Remap to fit the DocumentReadOnlyFields component.
-  const readOnlyFields = Field.map((field) => {
+  const readOnlyFields = fields.map((field) => {
     const recipient = recipients.find((recipient) => recipient.id === field.recipientId) || {
       name: '',
       email: '',
@@ -66,8 +67,8 @@ export const TemplatePageView = async ({ params, team }: TemplatePageViewProps) 
 
     return {
       ...field,
-      Recipient: recipient,
-      Signature: null,
+      recipient,
+      signature: null,
     };
   });
 
@@ -110,6 +111,8 @@ export const TemplatePageView = async ({ params, team }: TemplatePageViewProps) 
 
         <div className="mt-2 flex flex-row space-x-4 sm:mt-0 sm:self-end">
           <TemplateDirectLinkDialogWrapper template={template} />
+
+          <TemplateBulkSendDialog templateId={template.id} recipients={template.recipients} />
 
           <Button className="w-full" asChild>
             <Link href={`${templateRootPath}/${template.id}/edit`}>
@@ -165,7 +168,7 @@ export const TemplatePageView = async ({ params, team }: TemplatePageViewProps) 
                 <UseTemplateDialog
                   templateId={template.id}
                   templateSigningOrder={template.templateMeta?.signingOrder}
-                  recipients={template.Recipient}
+                  recipients={template.recipients}
                   documentRootPath={documentRootPath}
                   trigger={
                     <Button className="w-full">

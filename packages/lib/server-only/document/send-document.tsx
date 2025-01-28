@@ -1,5 +1,5 @@
 import { DOCUMENT_AUDIT_LOG_TYPE } from '@documenso/lib/types/document-audit-logs';
-import type { RequestMetadata } from '@documenso/lib/universal/extract-request-metadata';
+import type { ApiRequestMetadata } from '@documenso/lib/universal/extract-request-metadata';
 import { putPdfFile } from '@documenso/lib/universal/upload/put-file';
 import { createDocumentAuditLogData } from '@documenso/lib/utils/document-audit-logs';
 import { prisma } from '@documenso/prisma';
@@ -9,12 +9,15 @@ import {
   RecipientRole,
   SendStatus,
   SigningStatus,
+  WebhookTriggerEvents,
 } from '@documenso/prisma/client';
-import { WebhookTriggerEvents } from '@documenso/prisma/client';
 
 import { jobs } from '../../jobs/client';
 import { extractDerivedDocumentEmailSettings } from '../../types/document-email';
-import { ZWebhookDocumentSchema } from '../../types/webhook-payload';
+import {
+  ZWebhookDocumentSchema,
+  mapDocumentToWebhookDocumentPayload,
+} from '../../types/webhook-payload';
 import { getFile } from '../../universal/upload/get-file';
 import { insertFormValuesInPdf } from '../pdf/insert-form-values-in-pdf';
 import { triggerWebhook } from '../webhooks/trigger/trigger-webhook';
@@ -24,7 +27,7 @@ export type SendDocumentOptions = {
   userId: number;
   teamId?: number;
   sendEmail?: boolean;
-  requestMetadata?: RequestMetadata;
+  requestMetadata: ApiRequestMetadata;
 };
 
 export const sendDocument = async ({
@@ -34,17 +37,6 @@ export const sendDocument = async ({
   sendEmail,
   requestMetadata,
 }: SendDocumentOptions) => {
-  const user = await prisma.user.findFirstOrThrow({
-    where: {
-      id: userId,
-    },
-    select: {
-      id: true,
-      name: true,
-      email: true,
-    },
-  });
-
   const document = await prisma.document.findUnique({
     where: {
       id: documentId,
@@ -65,7 +57,7 @@ export const sendDocument = async ({
           }),
     },
     include: {
-      Recipient: {
+      recipients: {
         orderBy: [{ signingOrder: { sort: 'asc', nulls: 'last' } }, { id: 'asc' }],
       },
       documentMeta: true,
@@ -77,7 +69,7 @@ export const sendDocument = async ({
     throw new Error('Document not found');
   }
 
-  if (document.Recipient.length === 0) {
+  if (document.recipients.length === 0) {
     throw new Error('Document has no recipients');
   }
 
@@ -87,13 +79,13 @@ export const sendDocument = async ({
 
   const signingOrder = document.documentMeta?.signingOrder || DocumentSigningOrder.PARALLEL;
 
-  let recipientsToNotify = document.Recipient;
+  let recipientsToNotify = document.recipients;
 
   if (signingOrder === DocumentSigningOrder.SEQUENTIAL) {
     // Get the currently active recipient.
-    recipientsToNotify = document.Recipient.filter(
-      (r) => r.signingStatus === SigningStatus.NOT_SIGNED && r.role !== RecipientRole.CC,
-    ).slice(0, 1);
+    recipientsToNotify = document.recipients
+      .filter((r) => r.signingStatus === SigningStatus.NOT_SIGNED && r.role !== RecipientRole.CC)
+      .slice(0, 1);
 
     // Secondary filter so we aren't resending if the current active recipient has already
     // received the document.
@@ -184,14 +176,14 @@ export const sendDocument = async ({
             userId,
             documentId,
             recipientId: recipient.id,
-            requestMetadata,
+            requestMetadata: requestMetadata?.requestMetadata,
           },
         });
       }),
     );
   }
 
-  const allRecipientsHaveNoActionToTake = document.Recipient.every(
+  const allRecipientsHaveNoActionToTake = document.recipients.every(
     (recipient) =>
       recipient.role === RecipientRole.CC || recipient.signingStatus === SigningStatus.SIGNED,
   );
@@ -201,7 +193,7 @@ export const sendDocument = async ({
       name: 'internal.seal-document',
       payload: {
         documentId,
-        requestMetadata,
+        requestMetadata: requestMetadata?.requestMetadata,
       },
     });
 
@@ -211,7 +203,8 @@ export const sendDocument = async ({
         id: documentId,
       },
       include: {
-        Recipient: true,
+        documentMeta: true,
+        recipients: true,
       },
     });
   }
@@ -222,8 +215,7 @@ export const sendDocument = async ({
         data: createDocumentAuditLogData({
           type: DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_SENT,
           documentId: document.id,
-          requestMetadata,
-          user,
+          metadata: requestMetadata,
           data: {},
         }),
       });
@@ -238,14 +230,14 @@ export const sendDocument = async ({
       },
       include: {
         documentMeta: true,
-        Recipient: true,
+        recipients: true,
       },
     });
   });
 
   await triggerWebhook({
     event: WebhookTriggerEvents.DOCUMENT_SENT,
-    data: ZWebhookDocumentSchema.parse(updatedDocument),
+    data: ZWebhookDocumentSchema.parse(mapDocumentToWebhookDocumentPayload(updatedDocument)),
     userId,
     teamId,
   });

@@ -1,5 +1,6 @@
 import { z } from 'zod';
 
+import type { Document, DocumentMeta, Recipient } from '@documenso/prisma/client';
 import {
   DocumentDistributionMethod,
   DocumentSigningOrder,
@@ -73,8 +74,36 @@ export const ZWebhookDocumentSchema = z.object({
   templateId: z.number().nullable(),
   source: z.nativeEnum(DocumentSource),
   documentMeta: ZWebhookDocumentMetaSchema.nullable(),
+  recipients: z.array(ZWebhookRecipientSchema),
+
+  /**
+   * Legacy field for backwards compatibility.
+   */
   Recipient: z.array(ZWebhookRecipientSchema),
 });
 
 export type TWebhookRecipient = z.infer<typeof ZWebhookRecipientSchema>;
 export type TWebhookDocument = z.infer<typeof ZWebhookDocumentSchema>;
+
+export const mapDocumentToWebhookDocumentPayload = (
+  document: Document & {
+    recipients: Recipient[];
+    documentMeta: DocumentMeta | null;
+  },
+): TWebhookDocument => {
+  const { recipients, documentMeta, ...trimmedDocument } = document;
+
+  return {
+    ...trimmedDocument,
+    documentMeta: documentMeta
+      ? {
+          ...documentMeta,
+          // Not sure why is optional in the prisma schema.
+          timezone: 'Etc/UTC',
+          dateFormat: 'yyyy-MM-dd hh:mm a',
+        }
+      : null,
+    Recipient: recipients,
+    recipients,
+  };
+};

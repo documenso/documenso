@@ -10,7 +10,7 @@ export const getUsersCount = async () => {
 export const getUsersWithSubscriptionsCount = async () => {
   return await prisma.user.count({
     where: {
-      Subscription: {
+      subscriptions: {
         some: {
           status: SubscriptionStatus.ACTIVE,
         },
@@ -22,7 +22,7 @@ export const getUsersWithSubscriptionsCount = async () => {
 export const getUserWithAtLeastOneDocumentPerMonth = async () => {
   return await prisma.user.count({
     where: {
-      Document: {
+      documents: {
         some: {
           createdAt: {
             gte: DateTime.now().minus({ months: 1 }).toJSDate(),
@@ -36,7 +36,7 @@ export const getUserWithAtLeastOneDocumentPerMonth = async () => {
 export const getUserWithAtLeastOneDocumentSignedPerMonth = async () => {
   return await prisma.user.count({
     where: {
-      Document: {
+      documents: {
         some: {
           status: {
             equals: DocumentStatus.COMPLETED,

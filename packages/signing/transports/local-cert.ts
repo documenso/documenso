@@ -15,8 +15,8 @@ export const signWithLocalCert = async ({ pdf }: SignWithLocalCertOptions) => {
   });
 
   const pdfWithoutSignature = Buffer.concat([
-    pdfWithPlaceholder.subarray(0, byteRange[1]),
-    pdfWithPlaceholder.subarray(byteRange[2]),
+    new Uint8Array(pdfWithPlaceholder.subarray(0, byteRange[1])),
+    new Uint8Array(pdfWithPlaceholder.subarray(byteRange[2])),
   ]);
 
   const signatureLength = byteRange[2] - byteRange[1];
@@ -51,9 +51,9 @@ export const signWithLocalCert = async ({ pdf }: SignWithLocalCertOptions) => {
   const signatureAsHex = signature.toString('hex');
 
   const signedPdf = Buffer.concat([
-    pdfWithPlaceholder.subarray(0, byteRange[1]),
-    Buffer.from(`<${signatureAsHex.padEnd(signatureLength - 2, '0')}>`),
-    pdfWithPlaceholder.subarray(byteRange[2]),
+    new Uint8Array(pdfWithPlaceholder.subarray(0, byteRange[1])),
+    new Uint8Array(Buffer.from(`<${signatureAsHex.padEnd(signatureLength - 2, '0')}>`)),
+    new Uint8Array(pdfWithPlaceholder.subarray(byteRange[2])),
   ]);
 
   return signedPdf;

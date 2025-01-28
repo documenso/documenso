@@ -43,8 +43,8 @@ export const createDocumentFromTemplateLegacy = async ({
           }),
     },
     include: {
-      Recipient: true,
-      Field: true,
+      recipients: true,
+      fields: true,
       templateDocumentData: true,
       templateMeta: true,
       team: {
@@ -76,8 +76,8 @@ export const createDocumentFromTemplateLegacy = async ({
       title: template.title,
       visibility: template.team?.teamGlobalSettings?.documentVisibility,
       documentDataId: documentData.id,
-      Recipient: {
-        create: template.Recipient.map((recipient) => ({
+      recipients: {
+        create: template.recipients.map((recipient) => ({
           email: recipient.email,
           name: recipient.name,
           role: recipient.role,
@@ -100,7 +100,7 @@ export const createDocumentFromTemplateLegacy = async ({
     },
 
     include: {
-      Recipient: {
+      recipients: {
         orderBy: {
           id: 'asc',
         },
@@ -110,10 +110,10 @@ export const createDocumentFromTemplateLegacy = async ({
   });
 
   await prisma.field.createMany({
-    data: template.Field.map((field) => {
-      const recipient = template.Recipient.find((recipient) => recipient.id === field.recipientId);
+    data: template.fields.map((field) => {
+      const recipient = template.recipients.find((recipient) => recipient.id === field.recipientId);
 
-      const documentRecipient = document.Recipient.find((doc) => doc.email === recipient?.email);
+      const documentRecipient = document.recipients.find((doc) => doc.email === recipient?.email);
 
       if (!documentRecipient) {
         throw new Error('Recipient not found.');
@@ -135,9 +135,9 @@ export const createDocumentFromTemplateLegacy = async ({
   });
 
   if (recipients && recipients.length > 0) {
-    document.Recipient = await Promise.all(
+    document.recipients = await Promise.all(
       recipients.map(async (recipient, index) => {
-        const existingRecipient = document.Recipient.at(index);
+        const existingRecipient = document.recipients.at(index);
 
         return await prisma.recipient.upsert({
           where: {

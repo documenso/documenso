@@ -9,7 +9,7 @@ import { useLingui } from '@lingui/react';
 import { DateTime } from 'luxon';
 
 import { useUpdateSearchParams } from '@documenso/lib/client-only/hooks/use-update-search-params';
-import { ZBaseTableSearchParamsSchema } from '@documenso/lib/types/search-params';
+import { ZUrlSearchParamsSchema } from '@documenso/lib/types/search-params';
 import { trpc } from '@documenso/trpc/react';
 import type { DataTableColumnDef } from '@documenso/ui/primitives/data-table';
 import { DataTable } from '@documenso/ui/primitives/data-table';
@@ -27,17 +27,15 @@ export const UserPasskeysDataTable = () => {
   const searchParams = useSearchParams();
   const updateSearchParams = useUpdateSearchParams();
 
-  const parsedSearchParams = ZBaseTableSearchParamsSchema.parse(
-    Object.fromEntries(searchParams ?? []),
-  );
+  const parsedSearchParams = ZUrlSearchParamsSchema.parse(Object.fromEntries(searchParams ?? []));
 
-  const { data, isLoading, isInitialLoading, isLoadingError } = trpc.auth.findPasskeys.useQuery(
+  const { data, isLoading, isLoadingError } = trpc.auth.findPasskeys.useQuery(
     {
       page: parsedSearchParams.page,
       perPage: parsedSearchParams.perPage,
     },
     {
-      keepPreviousData: true,
+      placeholderData: (previousData) => previousData,
     },
   );
 
@@ -102,7 +100,7 @@ export const UserPasskeysDataTable = () => {
         enable: isLoadingError,
       }}
       skeleton={{
-        enable: isLoading && isInitialLoading,
+        enable: isLoading,
         rows: 3,
         component: (
           <>

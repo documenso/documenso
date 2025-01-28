@@ -48,7 +48,9 @@ export const ZDocumentAuthMethodsSchema = z.discriminatedUnion('type', [
  * Must keep these two in sync.
  */
 export const ZDocumentAccessAuthSchema = z.discriminatedUnion('type', [ZDocumentAuthAccountSchema]);
-export const ZDocumentAccessAuthTypesSchema = z.enum([DocumentAuth.ACCOUNT]);
+export const ZDocumentAccessAuthTypesSchema = z
+  .enum([DocumentAuth.ACCOUNT])
+  .describe('The type of authentication required for the recipient to access the document.');
 
 /**
  * The global document action auth methods.
@@ -60,11 +62,11 @@ export const ZDocumentActionAuthSchema = z.discriminatedUnion('type', [
   ZDocumentAuthPasskeySchema,
   ZDocumentAuth2FASchema,
 ]);
-export const ZDocumentActionAuthTypesSchema = z.enum([
-  DocumentAuth.ACCOUNT,
-  DocumentAuth.PASSKEY,
-  DocumentAuth.TWO_FACTOR_AUTH,
-]);
+export const ZDocumentActionAuthTypesSchema = z
+  .enum([DocumentAuth.ACCOUNT, DocumentAuth.PASSKEY, DocumentAuth.TWO_FACTOR_AUTH])
+  .describe(
+    'The type of authentication required for the recipient to sign the document. This field is restricted to Enterprise plan users only.',
+  );
 
 /**
  * The recipient access auth methods.
@@ -74,7 +76,9 @@ export const ZDocumentActionAuthTypesSchema = z.enum([
 export const ZRecipientAccessAuthSchema = z.discriminatedUnion('type', [
   ZDocumentAuthAccountSchema,
 ]);
-export const ZRecipientAccessAuthTypesSchema = z.enum([DocumentAuth.ACCOUNT]);
+export const ZRecipientAccessAuthTypesSchema = z
+  .enum([DocumentAuth.ACCOUNT])
+  .describe('The type of authentication required for the recipient to access the document.');
 
 /**
  * The recipient action auth methods.
@@ -87,12 +91,14 @@ export const ZRecipientActionAuthSchema = z.discriminatedUnion('type', [
   ZDocumentAuth2FASchema,
   ZDocumentAuthExplicitNoneSchema,
 ]);
-export const ZRecipientActionAuthTypesSchema = z.enum([
-  DocumentAuth.ACCOUNT,
-  DocumentAuth.PASSKEY,
-  DocumentAuth.TWO_FACTOR_AUTH,
-  DocumentAuth.EXPLICIT_NONE,
-]);
+export const ZRecipientActionAuthTypesSchema = z
+  .enum([
+    DocumentAuth.ACCOUNT,
+    DocumentAuth.PASSKEY,
+    DocumentAuth.TWO_FACTOR_AUTH,
+    DocumentAuth.EXPLICIT_NONE,
+  ])
+  .describe('The type of authentication required for the recipient to sign the document.');
 
 export const DocumentAccessAuth = ZDocumentAccessAuthTypesSchema.Enum;
 export const DocumentActionAuth = ZDocumentActionAuthTypesSchema.Enum;

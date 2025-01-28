@@ -47,7 +47,7 @@ export const DocumentLogsPageView = async ({ params, team }: DocumentLogsPageVie
 
   const [document, recipients] = await Promise.all([
     getDocumentById({
-      id: documentId,
+      documentId,
       userId: user.id,
       teamId: team?.id,
     }).catch(() => null),
@@ -77,9 +77,9 @@ export const DocumentLogsPageView = async ({ params, team }: DocumentLogsPageVie
     },
     {
       description: msg`Created by`,
-      value: document.User.name
-        ? `${document.User.name} (${document.User.email})`
-        : document.User.email,
+      value: document.user.name
+        ? `${document.user.name} (${document.user.email})`
+        : document.user.email,
     },
     {
       description: msg`Date created`,

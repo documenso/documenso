@@ -39,7 +39,7 @@ export const CreateTeamCheckoutDialog = ({
 
   const { data, isLoading } = trpc.team.getTeamPrices.useQuery();
 
-  const { mutateAsync: createCheckout, isLoading: isCreatingCheckout } =
+  const { mutateAsync: createCheckout, isPending: isCreatingCheckout } =
     trpc.team.createTeamPendingCheckout.useMutation({
       onSuccess: (checkoutUrl) => {
         window.open(checkoutUrl, '_blank');

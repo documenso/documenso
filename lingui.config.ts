@@ -8,18 +8,8 @@ const config: LinguiConfig = {
   // Any changes to these catalogue paths should be reflected in crowdin.yml
   catalogs: [
     {
-      path: '<rootDir>/packages/lib/translations/{locale}/marketing',
-      include: ['apps/marketing/src'],
-      exclude: ['**/node_modules/**'],
-    },
-    {
       path: '<rootDir>/packages/lib/translations/{locale}/web',
-      include: ['apps/web/src'],
-      exclude: ['**/node_modules/**'],
-    },
-    {
-      path: '<rootDir>/packages/lib/translations/{locale}/common',
-      include: ['packages/ui', 'packages/lib', 'packages/email'],
+      include: ['apps/web/src', 'packages/ui', 'packages/lib', 'packages/email'],
       exclude: ['**/node_modules/**'],
     },
   ],

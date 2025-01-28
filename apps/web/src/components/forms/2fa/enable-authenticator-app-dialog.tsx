@@ -61,7 +61,7 @@ export const EnableAuthenticatorAppDialog = ({ onSuccess }: EnableAuthenticatorA
   const {
     mutateAsync: setup2FA,
     data: setup2FAData,
-    isLoading: isSettingUp2FA,
+    isPending: isSettingUp2FA,
   } = trpc.twoFactorAuthentication.setup.useMutation({
     onError: () => {
       toast({

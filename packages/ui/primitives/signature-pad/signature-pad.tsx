@@ -191,8 +191,9 @@ export const SignaturePad = ({
     }
 
     const point = Point.fromEvent(event, DPI, $el.current);
+    const lastPoint = currentLine[currentLine.length - 1];
 
-    if (point.distanceTo(currentLine[currentLine.length - 1]) > 5) {
+    if (lastPoint && point.distanceTo(lastPoint) > 5) {
       setCurrentLine([...currentLine, point]);
 
       // Update the canvas here to draw the lines
@@ -301,6 +302,7 @@ export const SignaturePad = ({
     setTypedSignature('');
     setLines([]);
     setCurrentLine([]);
+    setIsPressed(false);
   };
 
   const renderTypedSignature = () => {
@@ -349,12 +351,30 @@ export const SignaturePad = ({
 
   const handleTypedSignatureChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const newValue = event.target.value;
+
+    // Deny input while drawing.
+    if (isPressed) {
+      return;
+    }
+
+    if (lines.length > 0) {
+      setLines([]);
+      setCurrentLine([]);
+    }
+
     setTypedSignature(newValue);
+
+    if ($el.current) {
+      const ctx = $el.current.getContext('2d');
+      ctx?.clearRect(0, 0, $el.current.width, $el.current.height);
+    }
 
     if (newValue.trim() !== '') {
       onChange?.(newValue);
+      onValidityChange?.(true);
     } else {
       onChange?.(null);
+      onValidityChange?.(false);
     }
   };
 
@@ -454,7 +474,7 @@ export const SignaturePad = ({
 
   return (
     <div
-      className={cn('relative block', containerClassName, {
+      className={cn('relative block select-none', containerClassName, {
         'pointer-events-none opacity-50': disabled,
       })}
     >

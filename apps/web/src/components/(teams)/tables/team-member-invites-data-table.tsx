@@ -10,7 +10,7 @@ import { History, MoreHorizontal, Trash2 } from 'lucide-react';
 
 import { useUpdateSearchParams } from '@documenso/lib/client-only/hooks/use-update-search-params';
 import { TEAM_MEMBER_ROLE_MAP } from '@documenso/lib/constants/teams';
-import { ZBaseTableSearchParamsSchema } from '@documenso/lib/types/search-params';
+import { ZUrlSearchParamsSchema } from '@documenso/lib/types/search-params';
 import { trpc } from '@documenso/trpc/react';
 import { AvatarWithText } from '@documenso/ui/primitives/avatar';
 import type { DataTableColumnDef } from '@documenso/ui/primitives/data-table';
@@ -38,22 +38,19 @@ export const TeamMemberInvitesDataTable = ({ teamId }: TeamMemberInvitesDataTabl
   const { _, i18n } = useLingui();
   const { toast } = useToast();
 
-  const parsedSearchParams = ZBaseTableSearchParamsSchema.parse(
-    Object.fromEntries(searchParams ?? []),
-  );
+  const parsedSearchParams = ZUrlSearchParamsSchema.parse(Object.fromEntries(searchParams ?? []));
 
-  const { data, isLoading, isInitialLoading, isLoadingError } =
-    trpc.team.findTeamMemberInvites.useQuery(
-      {
-        teamId,
-        term: parsedSearchParams.query,
-        page: parsedSearchParams.page,
-        perPage: parsedSearchParams.perPage,
-      },
-      {
-        keepPreviousData: true,
-      },
-    );
+  const { data, isLoading, isLoadingError } = trpc.team.findTeamMemberInvites.useQuery(
+    {
+      teamId,
+      query: parsedSearchParams.query,
+      page: parsedSearchParams.page,
+      perPage: parsedSearchParams.perPage,
+    },
+    {
+      placeholderData: (previousData) => previousData,
+    },
+  );
 
   const { mutateAsync: resendTeamMemberInvitation } =
     trpc.team.resendTeamMemberInvitation.useMutation({
@@ -184,7 +181,7 @@ export const TeamMemberInvitesDataTable = ({ teamId }: TeamMemberInvitesDataTabl
         enable: isLoadingError,
       }}
       skeleton={{
-        enable: isLoading && isInitialLoading,
+        enable: isLoading,
         rows: 3,
         component: (
           <>

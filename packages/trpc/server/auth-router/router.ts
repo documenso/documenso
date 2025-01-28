@@ -4,6 +4,7 @@ import { parse } from 'cookie-es';
 import { env } from 'next-runtime-env';
 
 import { IS_BILLING_ENABLED } from '@documenso/lib/constants/app';
+import { formatSecureCookieName } from '@documenso/lib/constants/auth';
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import { jobsClient } from '@documenso/lib/jobs/client';
 import { ErrorCode } from '@documenso/lib/next-auth/error-codes';
@@ -16,7 +17,6 @@ import { findPasskeys } from '@documenso/lib/server-only/auth/find-passkeys';
 import { compareSync } from '@documenso/lib/server-only/auth/hash';
 import { updatePasskey } from '@documenso/lib/server-only/auth/update-passkey';
 import { createUser } from '@documenso/lib/server-only/user/create-user';
-import { extractNextApiRequestMetadata } from '@documenso/lib/universal/extract-request-metadata';
 
 import { authenticatedProcedure, procedure, router } from '../trpc';
 import {
@@ -88,7 +88,7 @@ export const authRouter = router({
         userId: ctx.user.id,
         verificationResponse,
         passkeyName: input.passkeyName,
-        requestMetadata: extractNextApiRequestMetadata(ctx.req),
+        requestMetadata: ctx.metadata.requestMetadata,
       });
     }),
 
@@ -111,7 +111,8 @@ export const authRouter = router({
     const cookies = parse(ctx.req.headers.cookie ?? '');
 
     const sessionIdToken =
-      cookies['__Host-next-auth.csrf-token'] || cookies['next-auth.csrf-token'];
+      cookies[formatSecureCookieName('__Host-next-auth.csrf-token')] ||
+      cookies[formatSecureCookieName('next-auth.csrf-token')];
 
     if (!sessionIdToken) {
       throw new Error('Missing CSRF token');
@@ -130,7 +131,7 @@ export const authRouter = router({
       await deletePasskey({
         userId: ctx.user.id,
         passkeyId,
-        requestMetadata: extractNextApiRequestMetadata(ctx.req),
+        requestMetadata: ctx.metadata.requestMetadata,
       });
     }),
 
@@ -156,7 +157,7 @@ export const authRouter = router({
         userId: ctx.user.id,
         passkeyId,
         name,
-        requestMetadata: extractNextApiRequestMetadata(ctx.req),
+        requestMetadata: ctx.metadata.requestMetadata,
       });
     }),
 });

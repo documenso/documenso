@@ -1,12 +1,15 @@
 import { SigningStatus } from '@prisma/client';
-import { TRPCError } from '@trpc/server';
 
 import { jobs } from '@documenso/lib/jobs/client';
 import { prisma } from '@documenso/prisma';
 import { WebhookTriggerEvents } from '@documenso/prisma/client';
 
+import { AppError, AppErrorCode } from '../../errors/app-error';
 import { DOCUMENT_AUDIT_LOG_TYPE } from '../../types/document-audit-logs';
-import { ZWebhookDocumentSchema } from '../../types/webhook-payload';
+import {
+  ZWebhookDocumentSchema,
+  mapDocumentToWebhookDocumentPayload,
+} from '../../types/webhook-payload';
 import type { RequestMetadata } from '../../universal/extract-request-metadata';
 import { createDocumentAuditLogData } from '../../utils/document-audit-logs';
 import { triggerWebhook } from '../webhooks/trigger/trigger-webhook';
@@ -31,21 +34,20 @@ export async function rejectDocumentWithToken({
       documentId,
     },
     include: {
-      Document: {
+      document: {
         include: {
-          User: true,
-          Recipient: true,
+          user: true,
+          recipients: true,
           documentMeta: true,
         },
       },
     },
   });
 
-  const document = recipient?.Document;
+  const document = recipient?.document;
 
   if (!recipient || !document) {
-    throw new TRPCError({
-      code: 'NOT_FOUND',
+    throw new AppError(AppErrorCode.NOT_FOUND, {
       message: 'Document or recipient not found',
     });
   }
@@ -97,7 +99,7 @@ export async function rejectDocumentWithToken({
       id: document.id,
     },
     include: {
-      Recipient: true,
+      recipients: true,
       documentMeta: true,
     },
   });
@@ -109,7 +111,7 @@ export async function rejectDocumentWithToken({
   // Trigger webhook for document rejection
   await triggerWebhook({
     event: WebhookTriggerEvents.DOCUMENT_REJECTED,
-    data: ZWebhookDocumentSchema.parse(updatedDocument),
+    data: ZWebhookDocumentSchema.parse(mapDocumentToWebhookDocumentPayload(updatedDocument)),
     userId: document.userId,
     teamId: document.teamId ?? undefined,
   });

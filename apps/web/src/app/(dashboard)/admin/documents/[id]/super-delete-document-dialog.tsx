@@ -8,7 +8,6 @@ import { Trans, msg } from '@lingui/macro';
 import { useLingui } from '@lingui/react';
 
 import type { Document } from '@documenso/prisma/client';
-import { TRPCClientError } from '@documenso/trpc/client';
 import { trpc } from '@documenso/trpc/react';
 import { Alert, AlertDescription, AlertTitle } from '@documenso/ui/primitives/alert';
 import { Button } from '@documenso/ui/primitives/button';
@@ -36,7 +35,7 @@ export const SuperDeleteDocumentDialog = ({ document }: SuperDeleteDocumentDialo
 
   const [reason, setReason] = useState('');
 
-  const { mutateAsync: deleteDocument, isLoading: isDeletingDocument } =
+  const { mutateAsync: deleteDocument, isPending: isDeletingDocument } =
     trpc.admin.deleteDocument.useMutation();
 
   const handleDeleteDocument = async () => {
@@ -55,21 +54,12 @@ export const SuperDeleteDocumentDialog = ({ document }: SuperDeleteDocumentDialo
 
       router.push('/admin/documents');
     } catch (err) {
-      if (err instanceof TRPCClientError && err.data?.code === 'BAD_REQUEST') {
-        toast({
-          title: _(msg`An error occurred`),
-          description: err.message,
-          variant: 'destructive',
-        });
-      } else {
-        toast({
-          title: _(msg`An unknown error occurred`),
-          variant: 'destructive',
-          description:
-            err.message ??
-            'We encountered an unknown error while attempting to delete your document. Please try again later.',
-        });
-      }
+      toast({
+        title: _(msg`An unknown error occurred`),
+        variant: 'destructive',
+        description:
+          'We encountered an unknown error while attempting to delete your document. Please try again later.',
+      });
     }
   };
 
@@ -77,7 +67,7 @@ export const SuperDeleteDocumentDialog = ({ document }: SuperDeleteDocumentDialo
     <div>
       <div>
         <Alert
-          className="flex flex-col items-center justify-between gap-4 p-6 md:flex-row "
+          className="flex flex-col items-center justify-between gap-4 p-6 md:flex-row"
           variant="neutral"
         >
           <div>

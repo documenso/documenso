@@ -4,8 +4,10 @@ import { useRouter } from 'next/navigation';
 
 import { Trans, msg } from '@lingui/macro';
 import { useLingui } from '@lingui/react';
+import { match } from 'ts-pattern';
 
 import { NEXT_PUBLIC_WEBAPP_URL } from '@documenso/lib/constants/app';
+import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import { trpc } from '@documenso/trpc/react';
 import { Avatar, AvatarFallback, AvatarImage } from '@documenso/ui/primitives/avatar';
 import { Button } from '@documenso/ui/primitives/button';
@@ -41,7 +43,7 @@ export const MoveTemplateDialog = ({ templateId, open, onOpenChange }: MoveTempl
   const [selectedTeamId, setSelectedTeamId] = useState<number | null>(null);
 
   const { data: teams, isLoading: isLoadingTeams } = trpc.team.getTeams.useQuery();
-  const { mutateAsync: moveTemplate, isLoading } = trpc.template.moveTemplateToTeam.useMutation({
+  const { mutateAsync: moveTemplate, isPending } = trpc.template.moveTemplateToTeam.useMutation({
     onSuccess: () => {
       router.refresh();
       toast({
@@ -51,10 +53,20 @@ export const MoveTemplateDialog = ({ templateId, open, onOpenChange }: MoveTempl
       });
       onOpenChange(false);
     },
-    onError: (error) => {
+    onError: (err) => {
+      const error = AppError.parseError(err);
+
+      const errorMessage = match(error.code)
+        .with(
+          AppErrorCode.NOT_FOUND,
+          () => msg`Template not found or already associated with a team.`,
+        )
+        .with(AppErrorCode.UNAUTHORIZED, () => msg`You are not a member of this team.`)
+        .otherwise(() => msg`An error occurred while moving the template.`);
+
       toast({
         title: _(msg`Error`),
-        description: error.message || _(msg`An error occurred while moving the template.`),
+        description: _(errorMessage),
         variant: 'destructive',
         duration: 7500,
       });
@@ -118,8 +130,8 @@ export const MoveTemplateDialog = ({ templateId, open, onOpenChange }: MoveTempl
           <Button variant="secondary" onClick={() => onOpenChange(false)}>
             <Trans>Cancel</Trans>
           </Button>
-          <Button onClick={onMove} loading={isLoading} disabled={!selectedTeamId || isLoading}>
-            {isLoading ? <Trans>Moving...</Trans> : <Trans>Move</Trans>}
+          <Button onClick={onMove} loading={isPending} disabled={!selectedTeamId || isPending}>
+            {isPending ? <Trans>Moving...</Trans> : <Trans>Move</Trans>}
           </Button>
         </DialogFooter>
       </DialogContent>
