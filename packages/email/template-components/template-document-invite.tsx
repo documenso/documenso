@@ -59,7 +59,7 @@ export const TemplateDocumentInvite = ({
             ))
             .with({ isTeamInvite: true, includeSenderDetails: true, teamName: P.string }, () => (
               <Trans>
-                {`${inviterName} on behalf of "${teamName}"`} has invited you to{' '}
+                {inviterName} on behalf of "{teamName}" has invited you to{' '}
                 {_(actionVerb).toLowerCase()}
                 <br />"{documentName}"
               </Trans>
