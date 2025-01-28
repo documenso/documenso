@@ -1,6 +1,6 @@
-import { DocumentStatus, Prisma } from '@prisma/client';
+import { DocumentStatus } from '@prisma/client';
 
-import { prisma } from '@documenso/prisma';
+import { kyselyPrisma, sql } from '@documenso/prisma';
 
 export type SigningVolume = {
   id: number;
@@ -25,92 +25,78 @@ export async function getSigningVolume({
   sortBy = 'signingVolume',
   sortOrder = 'desc',
 }: GetSigningVolumeOptions) {
-  const whereClause = Prisma.validator<Prisma.SubscriptionWhereInput>()({
-    status: 'ACTIVE',
-    OR: [
-      {
-        user: {
-          OR: [
-            { name: { contains: search, mode: 'insensitive' } },
-            { email: { contains: search, mode: 'insensitive' } },
-          ],
-        },
-      },
-      {
-        team: {
-          name: { contains: search, mode: 'insensitive' },
-        },
-      },
-    ],
-  });
+  const offset = Math.max(page - 1, 0) * perPage;
 
-  const [subscriptions, totalCount] = await Promise.all([
-    prisma.subscription.findMany({
-      where: whereClause,
-      include: {
-        user: {
-          select: {
-            name: true,
-            email: true,
-            documents: {
-              where: {
-                status: DocumentStatus.COMPLETED,
-                deletedAt: null,
-                teamId: null,
-              },
-            },
-          },
-        },
-        team: {
-          select: {
-            name: true,
-            documents: {
-              where: {
-                status: DocumentStatus.COMPLETED,
-                deletedAt: null,
-              },
-            },
-          },
-        },
-      },
-      orderBy:
-        sortBy === 'name'
-          ? [{ user: { name: sortOrder } }, { team: { name: sortOrder } }, { createdAt: 'desc' }]
-          : sortBy === 'createdAt'
-            ? [{ createdAt: sortOrder }]
-            : undefined,
-      skip: Math.max(page - 1, 0) * perPage,
-      take: perPage,
-    }),
-    prisma.subscription.count({
-      where: whereClause,
-    }),
-  ]);
+  let findQuery = kyselyPrisma.$kysely
+    .selectFrom('Subscription as s')
+    .leftJoin('User as u', 's.userId', 'u.id')
+    .leftJoin('Team as t', 's.teamId', 't.id')
+    .leftJoin('Document as ud', (join) =>
+      join
+        .onRef('u.id', '=', 'ud.userId')
+        .on('ud.status', '=', sql.lit(DocumentStatus.COMPLETED))
+        .on('ud.deletedAt', 'is', null)
+        .on('ud.teamId', 'is', null),
+    )
+    .leftJoin('Document as td', (join) =>
+      join
+        .onRef('t.id', '=', 'td.teamId')
+        .on('td.status', '=', sql.lit(DocumentStatus.COMPLETED))
+        .on('td.deletedAt', 'is', null),
+    )
+    // @ts-expect-error - Raw SQL enum casting not properly typed by Kysely
+    .where(sql`s.status = ${SubscriptionStatus.ACTIVE}::"SubscriptionStatus"`)
+    .where((eb) =>
+      eb.or([
+        eb('u.name', 'ilike', `%${search}%`),
+        eb('u.email', 'ilike', `%${search}%`),
+        eb('t.name', 'ilike', `%${search}%`),
+      ]),
+    )
+    .select([
+      's.id as id',
+      's.createdAt as createdAt',
+      's.planId as planId',
+      sql<string>`COALESCE(u.name, t.name, u.email, 'Unknown')`.as('name'),
+      sql<number>`COUNT(DISTINCT ud.id) + COUNT(DISTINCT td.id)`.as('signingVolume'),
+    ])
+    .groupBy(['s.id', 'u.name', 't.name', 'u.email']);
 
-  const leaderboardWithVolume: SigningVolume[] = subscriptions.map((subscription) => {
-    const name =
-      subscription.user?.name || subscription.team?.name || subscription.user?.email || 'Unknown';
-    const userSignedDocs = subscription.user?.documents?.length || 0;
-    const teamSignedDocs = subscription.team?.documents?.length || 0;
-    return {
-      id: subscription.id,
-      name,
-      signingVolume: userSignedDocs + teamSignedDocs,
-      createdAt: subscription.createdAt,
-      planId: subscription.planId,
-    };
-  });
-
-  if (sortBy === 'signingVolume') {
-    leaderboardWithVolume.sort((a, b) => {
-      return sortOrder === 'desc'
-        ? b.signingVolume - a.signingVolume
-        : a.signingVolume - b.signingVolume;
-    });
+  switch (sortBy) {
+    case 'name':
+      findQuery = findQuery.orderBy('name', sortOrder);
+      break;
+    case 'createdAt':
+      findQuery = findQuery.orderBy('createdAt', sortOrder);
+      break;
+    case 'signingVolume':
+      findQuery = findQuery.orderBy('signingVolume', sortOrder);
+      break;
+    default:
+      findQuery = findQuery.orderBy('signingVolume', 'desc');
   }
 
+  findQuery = findQuery.limit(perPage).offset(offset);
+
+  const countQuery = kyselyPrisma.$kysely
+    .selectFrom('Subscription as s')
+    .leftJoin('User as u', 's.userId', 'u.id')
+    .leftJoin('Team as t', 's.teamId', 't.id')
+    // @ts-expect-error - Raw SQL enum casting not properly typed by Kysely
+    .where(sql`s.status = ${SubscriptionStatus.ACTIVE}::"SubscriptionStatus"`)
+    .where((eb) =>
+      eb.or([
+        eb('u.name', 'ilike', `%${search}%`),
+        eb('u.email', 'ilike', `%${search}%`),
+        eb('t.name', 'ilike', `%${search}%`),
+      ]),
+    )
+    .select(({ fn }) => [fn.countAll().as('count')]);
+
+  const [results, [{ count }]] = await Promise.all([findQuery.execute(), countQuery.execute()]);
+
   return {
-    leaderboard: leaderboardWithVolume,
-    totalPages: Math.ceil(totalCount / perPage),
+    leaderboard: results,
+    totalPages: Math.ceil(Number(count) / perPage),
   };
 }
