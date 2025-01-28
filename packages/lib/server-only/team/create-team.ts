@@ -112,8 +112,12 @@ export const createTeam = async ({
           },
         });
 
-        await tx.teamGlobalSettings.create({
-          data: {
+        await tx.teamGlobalSettings.upsert({
+          where: {
+            teamId: team.id,
+          },
+          update: {},
+          create: {
             teamId: team.id,
           },
         });
@@ -231,8 +235,12 @@ export const createTeamFromPendingTeam = async ({
       },
     });
 
-    await tx.teamGlobalSettings.create({
-      data: {
+    await tx.teamGlobalSettings.upsert({
+      where: {
+        teamId: team.id,
+      },
+      update: {},
+      create: {
         teamId: team.id,
       },
     });
