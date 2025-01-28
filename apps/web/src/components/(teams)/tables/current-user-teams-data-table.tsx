@@ -32,14 +32,14 @@ export const CurrentUserTeamsDataTable = () => {
 
   const parsedSearchParams = ZUrlSearchParamsSchema.parse(Object.fromEntries(searchParams ?? []));
 
-  const { data, isLoading, isInitialLoading, isLoadingError } = trpc.team.findTeams.useQuery(
+  const { data, isLoading, isLoadingError } = trpc.team.findTeams.useQuery(
     {
       query: parsedSearchParams.query,
       page: parsedSearchParams.page,
       perPage: parsedSearchParams.perPage,
     },
     {
-      keepPreviousData: true,
+      placeholderData: (previousData) => previousData,
     },
   );
 
@@ -134,7 +134,7 @@ export const CurrentUserTeamsDataTable = () => {
         enable: isLoadingError,
       }}
       skeleton={{
-        enable: isLoading && isInitialLoading,
+        enable: isLoading,
         rows: 3,
         component: (
           <>

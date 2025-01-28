@@ -23,13 +23,14 @@ export const signWithGoogleCloudHSM = async ({ pdf }: SignWithGoogleCloudHSMOpti
     process.env.NEXT_PRIVATE_SIGNING_GCLOUD_APPLICATION_CREDENTIALS_CONTENTS
   ) {
     if (!fs.existsSync(process.env.GOOGLE_APPLICATION_CREDENTIALS)) {
-      fs.writeFileSync(
-        process.env.GOOGLE_APPLICATION_CREDENTIALS,
+      const contents = new Uint8Array(
         Buffer.from(
           process.env.NEXT_PRIVATE_SIGNING_GCLOUD_APPLICATION_CREDENTIALS_CONTENTS,
           'base64',
         ),
       );
+
+      fs.writeFileSync(process.env.GOOGLE_APPLICATION_CREDENTIALS, contents);
     }
   }
 
@@ -38,8 +39,8 @@ export const signWithGoogleCloudHSM = async ({ pdf }: SignWithGoogleCloudHSMOpti
   });
 
   const pdfWithoutSignature = Buffer.concat([
-    pdfWithPlaceholder.subarray(0, byteRange[1]),
-    pdfWithPlaceholder.subarray(byteRange[2]),
+    new Uint8Array(pdfWithPlaceholder.subarray(0, byteRange[1])),
+    new Uint8Array(pdfWithPlaceholder.subarray(byteRange[2])),
   ]);
 
   const signatureLength = byteRange[2] - byteRange[1];
@@ -70,9 +71,9 @@ export const signWithGoogleCloudHSM = async ({ pdf }: SignWithGoogleCloudHSMOpti
   const signatureAsHex = signature.toString('hex');
 
   const signedPdf = Buffer.concat([
-    pdfWithPlaceholder.subarray(0, byteRange[1]),
-    Buffer.from(`<${signatureAsHex.padEnd(signatureLength - 2, '0')}>`),
-    pdfWithPlaceholder.subarray(byteRange[2]),
+    new Uint8Array(pdfWithPlaceholder.subarray(0, byteRange[1])),
+    new Uint8Array(Buffer.from(`<${signatureAsHex.padEnd(signatureLength - 2, '0')}>`)),
+    new Uint8Array(pdfWithPlaceholder.subarray(byteRange[2])),
   ]);
 
   return signedPdf;

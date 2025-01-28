@@ -17,7 +17,6 @@ import { findPasskeys } from '@documenso/lib/server-only/auth/find-passkeys';
 import { compareSync } from '@documenso/lib/server-only/auth/hash';
 import { updatePasskey } from '@documenso/lib/server-only/auth/update-passkey';
 import { createUser } from '@documenso/lib/server-only/user/create-user';
-import { extractNextApiRequestMetadata } from '@documenso/lib/universal/extract-request-metadata';
 
 import { authenticatedProcedure, procedure, router } from '../trpc';
 import {
@@ -89,7 +88,7 @@ export const authRouter = router({
         userId: ctx.user.id,
         verificationResponse,
         passkeyName: input.passkeyName,
-        requestMetadata: extractNextApiRequestMetadata(ctx.req),
+        requestMetadata: ctx.metadata.requestMetadata,
       });
     }),
 
@@ -132,7 +131,7 @@ export const authRouter = router({
       await deletePasskey({
         userId: ctx.user.id,
         passkeyId,
-        requestMetadata: extractNextApiRequestMetadata(ctx.req),
+        requestMetadata: ctx.metadata.requestMetadata,
       });
     }),
 
@@ -158,7 +157,7 @@ export const authRouter = router({
         userId: ctx.user.id,
         passkeyId,
         name,
-        requestMetadata: extractNextApiRequestMetadata(ctx.req),
+        requestMetadata: ctx.metadata.requestMetadata,
       });
     }),
 });

@@ -41,7 +41,7 @@ export default async function TemplatesDirectPage({ params }: TemplatesDirectPag
     notFound();
   }
 
-  const directTemplateRecipient = template.Recipient.find(
+  const directTemplateRecipient = template.recipients.find(
     (recipient) => recipient.id === template.directLink?.directTemplateRecipientId,
   );
 
@@ -81,7 +81,7 @@ export default async function TemplatesDirectPage({ params }: TemplatesDirectPag
           <div className="text-muted-foreground mb-8 mt-2.5 flex items-center gap-x-2">
             <UsersIcon className="h-4 w-4" />
             <p className="text-muted-foreground/80">
-              <Plural value={template.Recipient.length} one="# recipient" other="# recipients" />
+              <Plural value={template.recipients.length} one="# recipient" other="# recipients" />
             </p>
           </div>
 

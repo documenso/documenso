@@ -61,7 +61,7 @@ export const getPublicProfileByUrl = async ({
       },
       include: {
         profile: true,
-        Template: {
+        templates: {
           where: {
             directLink: {
               enabled: true,
@@ -73,7 +73,7 @@ export const getPublicProfileByUrl = async ({
           },
         },
         // Subscriptions and teamMembers are used to calculate the badges.
-        Subscription: {
+        subscriptions: {
           where: {
             status: SubscriptionStatus.ACTIVE,
           },
@@ -133,7 +133,7 @@ export const getPublicProfileByUrl = async ({
     if (IS_BILLING_ENABLED()) {
       const earlyAdopterPriceIds = await getCommunityPlanPriceIds();
 
-      const activeEarlyAdopterSub = user.Subscription.find(
+      const activeEarlyAdopterSub = user.subscriptions.find(
         (subscription) =>
           subscription.status === SubscriptionStatus.ACTIVE &&
           earlyAdopterPriceIds.includes(subscription.priceId),
@@ -154,7 +154,7 @@ export const getPublicProfileByUrl = async ({
       url: profileUrl,
       avatarImageId: user.avatarImageId,
       name: user.name || '',
-      templates: user.Template.filter(
+      templates: user.templates.filter(
         (template): template is PublicDirectLinkTemplate =>
           template.directLink?.enabled === true && template.type === TemplateType.PUBLIC,
       ),

@@ -106,14 +106,6 @@ export const adminRouter = router({
   deleteUser: adminProcedure.input(ZAdminDeleteUserMutationSchema).mutation(async ({ input }) => {
     const { id } = input;
 
-    const user = await getUserById({ id }).catch(() => null);
-
-    if (!user) {
-      throw new AppError(AppErrorCode.NOT_FOUND, {
-        message: 'User not found',
-      });
-    }
-
     return await deleteUser({ id });
   }),
 

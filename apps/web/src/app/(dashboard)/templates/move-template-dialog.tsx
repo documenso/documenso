@@ -43,7 +43,7 @@ export const MoveTemplateDialog = ({ templateId, open, onOpenChange }: MoveTempl
   const [selectedTeamId, setSelectedTeamId] = useState<number | null>(null);
 
   const { data: teams, isLoading: isLoadingTeams } = trpc.team.getTeams.useQuery();
-  const { mutateAsync: moveTemplate, isLoading } = trpc.template.moveTemplateToTeam.useMutation({
+  const { mutateAsync: moveTemplate, isPending } = trpc.template.moveTemplateToTeam.useMutation({
     onSuccess: () => {
       router.refresh();
       toast({
@@ -130,8 +130,8 @@ export const MoveTemplateDialog = ({ templateId, open, onOpenChange }: MoveTempl
           <Button variant="secondary" onClick={() => onOpenChange(false)}>
             <Trans>Cancel</Trans>
           </Button>
-          <Button onClick={onMove} loading={isLoading} disabled={!selectedTeamId || isLoading}>
-            {isLoading ? <Trans>Moving...</Trans> : <Trans>Move</Trans>}
+          <Button onClick={onMove} loading={isPending} disabled={!selectedTeamId || isPending}>
+            {isPending ? <Trans>Moving...</Trans> : <Trans>Move</Trans>}
           </Button>
         </DialogFooter>
       </DialogContent>

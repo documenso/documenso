@@ -85,8 +85,8 @@ const getCounts = async ({ user, createdAt, search }: GetCountsOption) => {
   const searchFilter: Prisma.DocumentWhereInput = {
     OR: [
       { title: { contains: search, mode: 'insensitive' } },
-      { Recipient: { some: { name: { contains: search, mode: 'insensitive' } } } },
-      { Recipient: { some: { email: { contains: search, mode: 'insensitive' } } } },
+      { recipients: { some: { name: { contains: search, mode: 'insensitive' } } } },
+      { recipients: { some: { email: { contains: search, mode: 'insensitive' } } } },
     ],
   };
 
@@ -113,7 +113,7 @@ const getCounts = async ({ user, createdAt, search }: GetCountsOption) => {
       },
       where: {
         status: ExtendedDocumentStatus.PENDING,
-        Recipient: {
+        recipients: {
           some: {
             email: user.email,
             signingStatus: SigningStatus.NOT_SIGNED,
@@ -132,7 +132,7 @@ const getCounts = async ({ user, createdAt, search }: GetCountsOption) => {
       },
       where: {
         createdAt,
-        User: {
+        user: {
           email: {
             not: user.email,
           },
@@ -140,7 +140,7 @@ const getCounts = async ({ user, createdAt, search }: GetCountsOption) => {
         OR: [
           {
             status: ExtendedDocumentStatus.PENDING,
-            Recipient: {
+            recipients: {
               some: {
                 email: user.email,
                 signingStatus: SigningStatus.SIGNED,
@@ -150,7 +150,7 @@ const getCounts = async ({ user, createdAt, search }: GetCountsOption) => {
           },
           {
             status: ExtendedDocumentStatus.COMPLETED,
-            Recipient: {
+            recipients: {
               some: {
                 email: user.email,
                 signingStatus: SigningStatus.SIGNED,
@@ -191,8 +191,8 @@ const getTeamCounts = async (options: GetTeamCountsOption) => {
   const searchFilter: Prisma.DocumentWhereInput = {
     OR: [
       { title: { contains: options.search, mode: 'insensitive' } },
-      { Recipient: { some: { name: { contains: options.search, mode: 'insensitive' } } } },
-      { Recipient: { some: { email: { contains: options.search, mode: 'insensitive' } } } },
+      { recipients: { some: { name: { contains: options.search, mode: 'insensitive' } } } },
+      { recipients: { some: { email: { contains: options.search, mode: 'insensitive' } } } },
     ],
   };
 
@@ -234,7 +234,7 @@ const getTeamCounts = async (options: GetTeamCountsOption) => {
           {
             OR: [
               { userId: options.userId },
-              { Recipient: { some: { email: options.currentUserEmail } } },
+              { recipients: { some: { email: options.currentUserEmail } } },
             ],
           },
         ],
@@ -257,7 +257,7 @@ const getTeamCounts = async (options: GetTeamCountsOption) => {
           teamId,
         },
         {
-          User: {
+          user: {
             email: teamEmail,
           },
         },
@@ -274,7 +274,7 @@ const getTeamCounts = async (options: GetTeamCountsOption) => {
         userId: userIdWhereClause,
         createdAt,
         status: ExtendedDocumentStatus.PENDING,
-        Recipient: {
+        recipients: {
           some: {
             email: teamEmail,
             signingStatus: SigningStatus.NOT_SIGNED,
@@ -296,7 +296,7 @@ const getTeamCounts = async (options: GetTeamCountsOption) => {
         OR: [
           {
             status: ExtendedDocumentStatus.PENDING,
-            Recipient: {
+            recipients: {
               some: {
                 email: teamEmail,
                 signingStatus: SigningStatus.SIGNED,
@@ -307,7 +307,7 @@ const getTeamCounts = async (options: GetTeamCountsOption) => {
           },
           {
             status: ExtendedDocumentStatus.COMPLETED,
-            Recipient: {
+            recipients: {
               some: {
                 email: teamEmail,
                 signingStatus: SigningStatus.SIGNED,

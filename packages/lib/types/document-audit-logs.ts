@@ -8,7 +8,7 @@ import { z } from 'zod';
 
 import { DocumentSource, FieldType } from '@documenso/prisma/client';
 
-import { ZRecipientActionAuthTypesSchema } from './document-auth';
+import { ZRecipientAccessAuthTypesSchema, ZRecipientActionAuthTypesSchema } from './document-auth';
 
 export const ZDocumentAuditLogTypeSchema = z.enum([
   // Document actions.
@@ -127,11 +127,11 @@ export const ZGenericFromToSchema = z.object({
 });
 
 export const ZRecipientDiffActionAuthSchema = ZGenericFromToSchema.extend({
-  type: z.literal(RECIPIENT_DIFF_TYPE.ACCESS_AUTH),
+  type: z.literal(RECIPIENT_DIFF_TYPE.ACTION_AUTH),
 });
 
 export const ZRecipientDiffAccessAuthSchema = ZGenericFromToSchema.extend({
-  type: z.literal(RECIPIENT_DIFF_TYPE.ACTION_AUTH),
+  type: z.literal(RECIPIENT_DIFF_TYPE.ACCESS_AUTH),
 });
 
 export const ZRecipientDiffNameSchema = ZGenericFromToSchema.extend({
@@ -438,6 +438,7 @@ export const ZDocumentAuditLogEventFieldUpdatedSchema = z.object({
 export const ZDocumentAuditLogEventRecipientAddedSchema = z.object({
   type: z.literal(DOCUMENT_AUDIT_LOG_TYPE.RECIPIENT_CREATED),
   data: ZBaseRecipientDataSchema.extend({
+    accessAuth: ZRecipientAccessAuthTypesSchema.optional(),
     actionAuth: ZRecipientActionAuthTypesSchema.optional(),
   }),
 });

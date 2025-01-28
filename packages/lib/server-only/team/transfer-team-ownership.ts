@@ -57,7 +57,7 @@ export const transferTeamOwnership = async ({ token }: TransferTeamOwnershipOpti
           },
         },
         include: {
-          Subscription: true,
+          subscriptions: true,
         },
       });
 

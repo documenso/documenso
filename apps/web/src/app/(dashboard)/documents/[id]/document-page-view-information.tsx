@@ -12,8 +12,8 @@ import type { Document, Recipient, User } from '@documenso/prisma/client';
 export type DocumentPageViewInformationProps = {
   userId: number;
   document: Document & {
-    User: Pick<User, 'id' | 'name' | 'email'>;
-    Recipient: Recipient[];
+    user: Pick<User, 'id' | 'name' | 'email'>;
+    recipients: Recipient[];
   };
 };
 
@@ -29,7 +29,8 @@ export const DocumentPageViewInformation = ({
     return [
       {
         description: msg`Uploaded by`,
-        value: userId === document.userId ? _(msg`You`) : document.User.name ?? document.User.email,
+        value:
+          userId === document.userId ? _(msg`You`) : (document.user.name ?? document.user.email),
       },
       {
         description: msg`Created`,

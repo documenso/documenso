@@ -24,12 +24,12 @@ export type TeamBillingInvoicesDataTableProps = {
 export const TeamBillingInvoicesDataTable = ({ teamId }: TeamBillingInvoicesDataTableProps) => {
   const { _ } = useLingui();
 
-  const { data, isLoading, isInitialLoading, isLoadingError } = trpc.team.findTeamInvoices.useQuery(
+  const { data, isLoading, isLoadingError } = trpc.team.findTeamInvoices.useQuery(
     {
       teamId,
     },
     {
-      keepPreviousData: true,
+      placeholderData: (previousData) => previousData,
     },
   );
 
@@ -127,7 +127,7 @@ export const TeamBillingInvoicesDataTable = ({ teamId }: TeamBillingInvoicesData
         enable: isLoadingError,
       }}
       skeleton={{
-        enable: isLoading && isInitialLoading,
+        enable: isLoading,
         rows: 3,
         component: (
           <>

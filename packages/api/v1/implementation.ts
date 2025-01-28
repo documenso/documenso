@@ -15,8 +15,7 @@ import { findDocuments } from '@documenso/lib/server-only/document/find-document
 import { getDocumentById } from '@documenso/lib/server-only/document/get-document-by-id';
 import { resendDocument } from '@documenso/lib/server-only/document/resend-document';
 import { sendDocument } from '@documenso/lib/server-only/document/send-document';
-import { updateDocument } from '@documenso/lib/server-only/document/update-document';
-import { updateDocumentSettings } from '@documenso/lib/server-only/document/update-document-settings';
+import { updateDocument as updateDocumentSettings } from '@documenso/lib/server-only/document/update-document';
 import { deleteField } from '@documenso/lib/server-only/field/delete-field';
 import { getFieldById } from '@documenso/lib/server-only/field/get-field-by-id';
 import { getFieldsForDocument } from '@documenso/lib/server-only/field/get-fields-for-document';
@@ -25,21 +24,20 @@ import { insertFormValuesInPdf } from '@documenso/lib/server-only/pdf/insert-for
 import { deleteRecipient } from '@documenso/lib/server-only/recipient/delete-recipient';
 import { getRecipientByIdV1Api } from '@documenso/lib/server-only/recipient/get-recipient-by-id-v1-api';
 import { getRecipientsForDocument } from '@documenso/lib/server-only/recipient/get-recipients-for-document';
-import { setRecipientsForDocument } from '@documenso/lib/server-only/recipient/set-recipients-for-document';
+import { setDocumentRecipients } from '@documenso/lib/server-only/recipient/set-document-recipients';
 import { updateRecipient } from '@documenso/lib/server-only/recipient/update-recipient';
 import { createTeamMemberInvites } from '@documenso/lib/server-only/team/create-team-member-invites';
 import { deleteTeamMembers } from '@documenso/lib/server-only/team/delete-team-members';
-import type { TCreateDocumentFromTemplateResponse } from '@documenso/lib/server-only/template/create-document-from-template';
 import { createDocumentFromTemplate } from '@documenso/lib/server-only/template/create-document-from-template';
 import { createDocumentFromTemplateLegacy } from '@documenso/lib/server-only/template/create-document-from-template-legacy';
 import { deleteTemplate } from '@documenso/lib/server-only/template/delete-template';
 import { findTemplates } from '@documenso/lib/server-only/template/find-templates';
 import { getTemplateById } from '@documenso/lib/server-only/template/get-template-by-id';
 import { extractDerivedDocumentEmailSettings } from '@documenso/lib/types/document-email';
-import { ZFieldMetaSchema } from '@documenso/lib/types/field-meta';
 import {
   ZCheckboxFieldMeta,
   ZDropdownFieldMeta,
+  ZFieldMetaSchema,
   ZNumberFieldMeta,
   ZRadioFieldMeta,
   ZTextFieldMeta,
@@ -53,6 +51,7 @@ import {
 } from '@documenso/lib/universal/upload/server-actions';
 import { createDocumentAuditLogData } from '@documenso/lib/utils/document-audit-logs';
 import { prisma } from '@documenso/prisma';
+import type { Prisma } from '@documenso/prisma/client';
 import {
   DocumentDataType,
   DocumentStatus,
@@ -96,13 +95,14 @@ export const ApiContractV1Implementation = createNextRoute(ApiContractV1, {
 
       const recipients = await getRecipientsForDocument({
         documentId: Number(documentId),
-        teamId: team?.id,
         userId: user.id,
+        teamId: team?.id,
       });
 
       const fields = await getFieldsForDocument({
         documentId: Number(documentId),
         userId: user.id,
+        teamId: team?.id,
       });
 
       const parsedMetaFields = fields.map((field) => {
@@ -207,7 +207,7 @@ export const ApiContractV1Implementation = createNextRoute(ApiContractV1, {
     }
   }),
 
-  deleteDocument: authenticatedMiddleware(async (args, user, team) => {
+  deleteDocument: authenticatedMiddleware(async (args, user, team, { metadata }) => {
     const { id: documentId } = args.params;
 
     try {
@@ -230,6 +230,7 @@ export const ApiContractV1Implementation = createNextRoute(ApiContractV1, {
         id: document.id,
         userId: user.id,
         teamId: team?.id,
+        requestMetadata: metadata,
       });
 
       return {
@@ -246,7 +247,7 @@ export const ApiContractV1Implementation = createNextRoute(ApiContractV1, {
     }
   }),
 
-  createDocument: authenticatedMiddleware(async (args, user, team) => {
+  createDocument: authenticatedMiddleware(async (args, user, team, { metadata }) => {
     const { body } = args;
 
     try {
@@ -314,12 +315,13 @@ export const ApiContractV1Implementation = createNextRoute(ApiContractV1, {
         teamId: team?.id,
         formValues: body.formValues,
         documentDataId: documentData.id,
-        requestMetadata: extractNextApiRequestMetadata(args.req),
+        requestMetadata: metadata,
       });
 
       await upsertDocumentMeta({
         documentId: document.id,
         userId: user.id,
+        teamId: team?.id,
         subject: body.meta.subject,
         message: body.meta.message,
         timezone,
@@ -330,7 +332,7 @@ export const ApiContractV1Implementation = createNextRoute(ApiContractV1, {
         typedSignatureEnabled: body.meta.typedSignatureEnabled,
         distributionMethod: body.meta.distributionMethod,
         emailSettings: body.meta.emailSettings,
-        requestMetadata: extractNextApiRequestMetadata(args.req),
+        requestMetadata: metadata,
       });
 
       if (body.authOptions) {
@@ -341,16 +343,16 @@ export const ApiContractV1Implementation = createNextRoute(ApiContractV1, {
           data: {
             ...body.authOptions,
           },
-          requestMetadata: extractNextApiRequestMetadata(args.req),
+          requestMetadata: metadata,
         });
       }
 
-      const { recipients } = await setRecipientsForDocument({
+      const { recipients } = await setDocumentRecipients({
         userId: user.id,
         teamId: team?.id,
         documentId: document.id,
         recipients: body.recipients,
-        requestMetadata: extractNextApiRequestMetadata(args.req),
+        requestMetadata: metadata,
       });
 
       return {
@@ -416,7 +418,14 @@ export const ApiContractV1Implementation = createNextRoute(ApiContractV1, {
 
       return {
         status: 200,
-        body: template,
+        body: {
+          ...template,
+          Field: template.fields.map((field) => ({
+            ...field,
+            fieldMeta: field.fieldMeta ? ZFieldMetaSchema.parse(field.fieldMeta) : null,
+          })),
+          Recipient: template.recipients,
+        },
       };
     } catch (err) {
       return AppError.toRestAPIError(err);
@@ -438,7 +447,14 @@ export const ApiContractV1Implementation = createNextRoute(ApiContractV1, {
       return {
         status: 200,
         body: {
-          templates,
+          templates: templates.map((template) => ({
+            ...template,
+            Field: template.fields.map((field) => ({
+              ...field,
+              fieldMeta: field.fieldMeta ? ZFieldMetaSchema.parse(field.fieldMeta) : null,
+            })),
+            Recipient: template.recipients,
+          })),
           totalPages,
         },
       };
@@ -447,7 +463,7 @@ export const ApiContractV1Implementation = createNextRoute(ApiContractV1, {
     }
   }),
 
-  createDocumentFromTemplate: authenticatedMiddleware(async (args, user, team) => {
+  createDocumentFromTemplate: authenticatedMiddleware(async (args, user, team, { metadata }) => {
     const { body, params } = args;
 
     const { remaining } = await getServerLimits({ email: user.email, teamId: team?.id });
@@ -511,8 +527,9 @@ export const ApiContractV1Implementation = createNextRoute(ApiContractV1, {
       await upsertDocumentMeta({
         documentId: document.id,
         userId: user.id,
+        teamId: team?.id,
         ...body.meta,
-        requestMetadata: extractNextApiRequestMetadata(args.req),
+        requestMetadata: metadata,
       });
     }
 
@@ -522,7 +539,7 @@ export const ApiContractV1Implementation = createNextRoute(ApiContractV1, {
         userId: user.id,
         teamId: team?.id,
         data: body.authOptions,
-        requestMetadata: extractNextApiRequestMetadata(args.req),
+        requestMetadata: metadata,
       });
     }
 
@@ -530,7 +547,7 @@ export const ApiContractV1Implementation = createNextRoute(ApiContractV1, {
       status: 200,
       body: {
         documentId: document.id,
-        recipients: document.Recipient.map((recipient) => ({
+        recipients: document.recipients.map((recipient) => ({
           recipientId: recipient.id,
           name: recipient.name,
           email: recipient.email,
@@ -544,7 +561,7 @@ export const ApiContractV1Implementation = createNextRoute(ApiContractV1, {
     };
   }),
 
-  generateDocumentFromTemplate: authenticatedMiddleware(async (args, user, team) => {
+  generateDocumentFromTemplate: authenticatedMiddleware(async (args, user, team, { metadata }) => {
     const { body, params } = args;
 
     const { remaining } = await getServerLimits({ email: user.email, teamId: team?.id });
@@ -560,7 +577,7 @@ export const ApiContractV1Implementation = createNextRoute(ApiContractV1, {
 
     const templateId = Number(params.templateId);
 
-    let document: TCreateDocumentFromTemplateResponse | null = null;
+    let document: Awaited<ReturnType<typeof createDocumentFromTemplate>> | null = null;
 
     try {
       document = await createDocumentFromTemplate({
@@ -573,6 +590,7 @@ export const ApiContractV1Implementation = createNextRoute(ApiContractV1, {
           title: body.title,
           ...body.meta,
         },
+        requestMetadata: metadata,
       });
     } catch (err) {
       return AppError.toRestAPIError(err);
@@ -615,7 +633,7 @@ export const ApiContractV1Implementation = createNextRoute(ApiContractV1, {
         userId: user.id,
         teamId: team?.id,
         data: body.authOptions,
-        requestMetadata: extractNextApiRequestMetadata(args.req),
+        requestMetadata: metadata,
       });
     }
 
@@ -623,7 +641,7 @@ export const ApiContractV1Implementation = createNextRoute(ApiContractV1, {
       status: 200,
       body: {
         documentId: document.id,
-        recipients: document.Recipient.map((recipient) => ({
+        recipients: document.recipients.map((recipient) => ({
           recipientId: recipient.id,
           name: recipient.name,
           email: recipient.email,
@@ -636,7 +654,7 @@ export const ApiContractV1Implementation = createNextRoute(ApiContractV1, {
     };
   }),
 
-  sendDocument: authenticatedMiddleware(async (args, user, team) => {
+  sendDocument: authenticatedMiddleware(async (args, user, team, { metadata }) => {
     const { id: documentId } = args.params;
     const { sendEmail, sendCompletionEmails } = args.body;
 
@@ -672,21 +690,22 @@ export const ApiContractV1Implementation = createNextRoute(ApiContractV1, {
         await upsertDocumentMeta({
           documentId: document.id,
           userId: user.id,
+          teamId: team?.id,
           emailSettings: {
             ...emailSettings,
             documentCompleted: sendCompletionEmails,
             ownerDocumentCompleted: sendCompletionEmails,
           },
-          requestMetadata: extractNextApiRequestMetadata(args.req),
+          requestMetadata: metadata,
         });
       }
 
-      const { Recipient: recipients, ...sentDocument } = await sendDocument({
+      const { recipients, ...sentDocument } = await sendDocument({
         documentId: document.id,
         userId: user.id,
         teamId: team?.id,
         sendEmail,
-        requestMetadata: extractNextApiRequestMetadata(args.req),
+        requestMetadata: metadata,
       });
 
       return {
@@ -710,7 +729,7 @@ export const ApiContractV1Implementation = createNextRoute(ApiContractV1, {
     }
   }),
 
-  resendDocument: authenticatedMiddleware(async (args, user, team) => {
+  resendDocument: authenticatedMiddleware(async (args, user, team, { metadata }) => {
     const { id: documentId } = args.params;
     const { recipients } = args.body;
 
@@ -720,7 +739,7 @@ export const ApiContractV1Implementation = createNextRoute(ApiContractV1, {
         documentId: Number(documentId),
         recipients,
         teamId: team?.id,
-        requestMetadata: extractNextApiRequestMetadata(args.req),
+        requestMetadata: metadata,
       });
 
       return {
@@ -739,7 +758,7 @@ export const ApiContractV1Implementation = createNextRoute(ApiContractV1, {
     }
   }),
 
-  createRecipient: authenticatedMiddleware(async (args, user, team) => {
+  createRecipient: authenticatedMiddleware(async (args, user, team, { metadata }) => {
     const { id: documentId } = args.params;
     const { name, email, role, authOptions, signingOrder } = args.body;
 
@@ -785,7 +804,7 @@ export const ApiContractV1Implementation = createNextRoute(ApiContractV1, {
     }
 
     try {
-      const { recipients: newRecipients } = await setRecipientsForDocument({
+      const { recipients: newRecipients } = await setDocumentRecipients({
         documentId: Number(documentId),
         userId: user.id,
         teamId: team?.id,
@@ -803,7 +822,7 @@ export const ApiContractV1Implementation = createNextRoute(ApiContractV1, {
             actionAuth: authOptions?.actionAuth ?? null,
           },
         ],
-        requestMetadata: extractNextApiRequestMetadata(args.req),
+        requestMetadata: metadata,
       });
 
       const newRecipient = newRecipients.find((recipient) => recipient.email === email);
@@ -1034,12 +1053,12 @@ export const ApiContractV1Implementation = createNextRoute(ApiContractV1, {
               .with('TEXT', () => ZTextFieldMeta.safeParse(fieldMeta))
               .with('SIGNATURE', 'INITIALS', 'DATE', 'EMAIL', 'NAME', () => ({
                 success: true,
-                data: {},
+                data: undefined,
               }))
               .with('FREE_SIGNATURE', () => ({
                 success: false,
                 error: 'FREE_SIGNATURE is not supported',
-                data: {},
+                data: undefined,
               }))
               .exhaustive();
 
@@ -1062,7 +1081,7 @@ export const ApiContractV1Implementation = createNextRoute(ApiContractV1, {
                 fieldMeta: result.data,
               },
               include: {
-                Recipient: true,
+                recipient: true,
               },
             });
 
@@ -1077,7 +1096,7 @@ export const ApiContractV1Implementation = createNextRoute(ApiContractV1, {
                 },
                 data: {
                   fieldId: field.secondaryId,
-                  fieldRecipientEmail: field.Recipient?.email ?? '',
+                  fieldRecipientEmail: field.recipient?.email ?? '',
                   fieldRecipientId: recipientId,
                   fieldType: field.type,
                 },
@@ -1096,7 +1115,7 @@ export const ApiContractV1Implementation = createNextRoute(ApiContractV1, {
               pageWidth: Number(field.width),
               pageHeight: Number(field.height),
               customText: field.customText,
-              fieldMeta: ZFieldMetaSchema.parse(field.fieldMeta),
+              fieldMeta: field.fieldMeta ? ZFieldMetaSchema.parse(field.fieldMeta) : undefined,
               inserted: field.inserted,
             };
           }),
@@ -1568,3 +1587,39 @@ export const ApiContractV1Implementation = createNextRoute(ApiContractV1, {
     };
   }),
 });
+
+const updateDocument = async ({
+  documentId,
+  userId,
+  teamId,
+  data,
+}: {
+  documentId: number;
+  data: Prisma.DocumentUpdateInput;
+  userId: number;
+  teamId?: number;
+}) => {
+  return await prisma.document.update({
+    where: {
+      id: documentId,
+      ...(teamId
+        ? {
+            team: {
+              id: teamId,
+              members: {
+                some: {
+                  userId,
+                },
+              },
+            },
+          }
+        : {
+            userId,
+            teamId: null,
+          }),
+    },
+    data: {
+      ...data,
+    },
+  });
+};

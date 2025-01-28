@@ -151,6 +151,7 @@ test('[DOCUMENT_FLOW]: add settings', async ({ page }) => {
   await expect(page.getByTestId('documentActionSelectValue')).not.toBeVisible();
 
   // Save the settings by going to the next step.
+
   await page.getByRole('button', { name: 'Continue' }).click();
   await expect(page.getByRole('heading', { name: 'Add Signers' })).toBeVisible();
 
