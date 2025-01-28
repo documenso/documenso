@@ -21,6 +21,7 @@ Documenso supports Webhooks and allows you to subscribe to the following events:
 - `document.signed`
 - `document.completed`
 - `document.rejected`
+- `document.cancelled`
 
 ## Create a webhook subscription
 
@@ -37,7 +38,7 @@ Clicking on the "**Create Webhook**" button opens a modal to create a new webhoo
 To create a new webhook subscription, you need to provide the following information:
 
 - Enter the webhook URL that will receive the event payload.
-- Select the event(s) you want to subscribe to: `document.created`, `document.sent`, `document.opened`, `document.signed`, `document.completed`, `document.rejected`.
+- Select the event(s) you want to subscribe to: `document.created`, `document.sent`, `document.opened`, `document.signed`, `document.completed`, `document.rejected`, `document.cancelled`.
 - Optionally, you can provide a secret key that will be used to sign the payload. This key will be included in the `X-Documenso-Secret` header of the request.
 
 ![A screenshot of the Create Webhook modal that shows the URL input field and the event checkboxes](/webhook-images/webhooks-page-create-webhook-modal.webp)
@@ -524,6 +525,96 @@ Example payload for the `document.rejected` event:
     ]
   },
   "createdAt": "2024-04-22T11:48:07.945Z",
+  "webhookEndpoint": "https://mywebhooksite.com/mywebhook"
+}
+```
+
+Example payload for the `document.rejected` event:
+
+```json
+{
+  "event": "DOCUMENT_CANCELLED",
+  "payload": {
+    "id": 7,
+    "externalId": null,
+    "userId": 3,
+    "authOptions": null,
+    "formValues": null,
+    "visibility": "EVERYONE",
+    "title": "documenso.pdf",
+    "status": "PENDING",
+    "documentDataId": "cm6exvn93006hi02ru90a265a",
+    "createdAt": "2025-01-27T11:02:14.393Z",
+    "updatedAt": "2025-01-27T11:03:16.387Z",
+    "completedAt": null,
+    "deletedAt": null,
+    "teamId": null,
+    "templateId": null,
+    "source": "DOCUMENT",
+    "documentMeta": {
+      "id": "cm6exvn96006ji02rqvzjvwoy",
+      "subject": "",
+      "message": "",
+      "timezone": "Etc/UTC",
+      "password": null,
+      "dateFormat": "yyyy-MM-dd hh:mm a",
+      "redirectUrl": "",
+      "signingOrder": "PARALLEL",
+      "typedSignatureEnabled": true,
+      "language": "en",
+      "distributionMethod": "EMAIL",
+      "emailSettings": {
+        "documentDeleted": true,
+        "documentPending": true,
+        "recipientSigned": true,
+        "recipientRemoved": true,
+        "documentCompleted": true,
+        "ownerDocumentCompleted": true,
+        "recipientSigningRequest": true
+      }
+    },
+    "recipients": [
+      {
+        "id": 7,
+        "documentId": 7,
+        "templateId": null,
+        "email": "mybirihix@mailinator.com",
+        "name": "Zorita Baird",
+        "token": "XkKx1HCs6Znm2UBJA2j6o",
+        "documentDeletedAt": null,
+        "expired": null,
+        "signedAt": null,
+        "authOptions": { "accessAuth": null, "actionAuth": null },
+        "signingOrder": 1,
+        "rejectionReason": null,
+        "role": "SIGNER",
+        "readStatus": "NOT_OPENED",
+        "signingStatus": "NOT_SIGNED",
+        "sendStatus": "SENT"
+      }
+    ],
+    "Recipient": [
+      {
+        "id": 7,
+        "documentId": 7,
+        "templateId": null,
+        "email": "signer@documenso.com",
+        "name": "Signer",
+        "token": "XkKx1HCs6Znm2UBJA2j6o",
+        "documentDeletedAt": null,
+        "expired": null,
+        "signedAt": null,
+        "authOptions": { "accessAuth": null, "actionAuth": null },
+        "signingOrder": 1,
+        "rejectionReason": null,
+        "role": "SIGNER",
+        "readStatus": "NOT_OPENED",
+        "signingStatus": "NOT_SIGNED",
+        "sendStatus": "SENT"
+      }
+    ]
+  },
+  "createdAt": "2025-01-27T11:03:27.730Z",
   "webhookEndpoint": "https://mywebhooksite.com/mywebhook"
 }
 ```
