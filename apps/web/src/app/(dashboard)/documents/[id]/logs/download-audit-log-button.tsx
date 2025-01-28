@@ -19,7 +19,7 @@ export const DownloadAuditLogButton = ({ className, documentId }: DownloadAuditL
   const { toast } = useToast();
   const { _ } = useLingui();
 
-  const { mutateAsync: downloadAuditLogs, isLoading } =
+  const { mutateAsync: downloadAuditLogs, isPending } =
     trpc.document.downloadAuditLogs.useMutation();
 
   const onDownloadAuditLogsClick = async () => {
@@ -70,10 +70,10 @@ export const DownloadAuditLogButton = ({ className, documentId }: DownloadAuditL
   return (
     <Button
       className={cn('w-full sm:w-auto', className)}
-      loading={isLoading}
+      loading={isPending}
       onClick={() => void onDownloadAuditLogsClick()}
     >
-      {!isLoading && <DownloadIcon className="mr-1.5 h-4 w-4" />}
+      {!isPending && <DownloadIcon className="mr-1.5 h-4 w-4" />}
       <Trans>Download Audit Logs</Trans>
     </Button>
   );

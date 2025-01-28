@@ -8,16 +8,16 @@ import { Trans, msg } from '@lingui/macro';
 import { useLingui } from '@lingui/react';
 import { Loader } from 'lucide-react';
 import { useSession } from 'next-auth/react';
+import { match } from 'ts-pattern';
 
 import { useLimits } from '@documenso/ee/server-only/limits/provider/client';
 import { useAnalytics } from '@documenso/lib/client-only/hooks/use-analytics';
 import { APP_DOCUMENT_UPLOAD_SIZE_LIMIT } from '@documenso/lib/constants/app';
 import { DEFAULT_DOCUMENT_TIME_ZONE, TIME_ZONES } from '@documenso/lib/constants/time-zones';
-import { AppError } from '@documenso/lib/errors/app-error';
+import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import { createDocumentData } from '@documenso/lib/server-only/document-data/create-document-data';
 import { putPdfFile } from '@documenso/lib/universal/upload/put-file';
 import { formatDocumentsPath } from '@documenso/lib/utils/teams';
-import { TRPCClientError } from '@documenso/trpc/client';
 import { trpc } from '@documenso/trpc/react';
 import { cn } from '@documenso/ui/lib/utils';
 import { DocumentDropzone } from '@documenso/ui/primitives/document-dropzone';
@@ -99,25 +99,20 @@ export const UploadDocument = ({ className, team }: UploadDocumentProps) => {
 
       console.error(err);
 
-      if (error.code === 'INVALID_DOCUMENT_FILE') {
-        toast({
-          title: _(msg`Invalid file`),
-          description: _(msg`You cannot upload encrypted PDFs`),
-          variant: 'destructive',
-        });
-      } else if (err instanceof TRPCClientError) {
-        toast({
-          title: _(msg`Error`),
-          description: err.message,
-          variant: 'destructive',
-        });
-      } else {
-        toast({
-          title: _(msg`Error`),
-          description: _(msg`An error occurred while uploading your document.`),
-          variant: 'destructive',
-        });
-      }
+      const errorMessage = match(error.code)
+        .with('INVALID_DOCUMENT_FILE', () => msg`You cannot upload encrypted PDFs`)
+        .with(
+          AppErrorCode.LIMIT_EXCEEDED,
+          () => msg`You have reached your document limit for this month. Please upgrade your plan.`,
+        )
+        .otherwise(() => msg`An error occurred while uploading your document.`);
+
+      toast({
+        title: _(msg`Error`),
+        description: _(errorMessage),
+        variant: 'destructive',
+        duration: 7500,
+      });
     } finally {
       setIsLoading(false);
     }

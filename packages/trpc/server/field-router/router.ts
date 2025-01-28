@@ -1,5 +1,3 @@
-import { z } from 'zod';
-
 import { createDocumentFields } from '@documenso/lib/server-only/field/create-document-fields';
 import { createTemplateFields } from '@documenso/lib/server-only/field/create-template-fields';
 import { deleteDocumentField } from '@documenso/lib/server-only/field/delete-document-field';
@@ -13,6 +11,7 @@ import { updateDocumentFields } from '@documenso/lib/server-only/field/update-do
 import { updateTemplateFields } from '@documenso/lib/server-only/field/update-template-fields';
 import { extractNextApiRequestMetadata } from '@documenso/lib/universal/extract-request-metadata';
 
+import { ZGenericSuccessResponse, ZSuccessResponseSchema } from '../document-router/schema';
 import { authenticatedProcedure, procedure, router } from '../trpc';
 import {
   ZCreateDocumentFieldRequestSchema,
@@ -47,15 +46,15 @@ export const fieldRouter = router({
   /**
    * @public
    */
-  getField: authenticatedProcedure
+  getDocumentField: authenticatedProcedure
     .meta({
       openapi: {
         method: 'GET',
-        path: '/field/{fieldId}',
-        summary: 'Get field',
+        path: '/document/field/{fieldId}',
+        summary: 'Get document field',
         description:
-          'Returns a single field. If you want to retrieve all the fields for a document or template, use the "Get Document" or "Get Template" request.',
-        tags: ['Document Fields', 'Template Fields'],
+          'Returns a single field. If you want to retrieve all the fields for a document, use the "Get Document" endpoint.',
+        tags: ['Document Fields'],
       },
     })
     .input(ZGetFieldRequestSchema)
@@ -200,7 +199,7 @@ export const fieldRouter = router({
       },
     })
     .input(ZDeleteDocumentFieldRequestSchema)
-    .output(z.void())
+    .output(ZSuccessResponseSchema)
     .mutation(async ({ input, ctx }) => {
       const { teamId } = ctx;
       const { fieldId } = input;
@@ -211,6 +210,8 @@ export const fieldRouter = router({
         fieldId,
         requestMetadata: ctx.metadata,
       });
+
+      return ZGenericSuccessResponse;
     }),
 
   /**
@@ -219,14 +220,6 @@ export const fieldRouter = router({
    * Todo: Refactor to setFieldsForDocument function.
    */
   addFields: authenticatedProcedure
-    // .meta({
-    //   openapi: {
-    //     method: 'POST',
-    //     path: '/document/{documentId}/field',
-    //     summary: 'Set document fields',
-    //     tags: ['Document Fields'],
-    //   },
-    // })
     .input(ZSetDocumentFieldsRequestSchema)
     .output(ZSetDocumentFieldsResponseSchema)
     .mutation(async ({ input, ctx }) => {
@@ -279,6 +272,33 @@ export const fieldRouter = router({
       });
 
       return createdFields.fields[0];
+    }),
+
+  /**
+   * @public
+   */
+  getTemplateField: authenticatedProcedure
+    .meta({
+      openapi: {
+        method: 'GET',
+        path: '/template/field/{fieldId}',
+        summary: 'Get template field',
+        description:
+          'Returns a single field. If you want to retrieve all the fields for a template, use the "Get Template" endpoint.',
+        tags: ['Template Fields'],
+      },
+    })
+    .input(ZGetFieldRequestSchema)
+    .output(ZGetFieldResponseSchema)
+    .query(async ({ input, ctx }) => {
+      const { teamId } = ctx;
+      const { fieldId } = input;
+
+      return await getFieldById({
+        userId: ctx.user.id,
+        teamId,
+        fieldId,
+      });
     }),
 
   /**
@@ -377,7 +397,7 @@ export const fieldRouter = router({
       },
     })
     .input(ZDeleteTemplateFieldRequestSchema)
-    .output(z.void())
+    .output(ZSuccessResponseSchema)
     .mutation(async ({ input, ctx }) => {
       const { teamId } = ctx;
       const { fieldId } = input;
@@ -387,6 +407,8 @@ export const fieldRouter = router({
         teamId,
         fieldId,
       });
+
+      return ZGenericSuccessResponse;
     }),
 
   /**
@@ -395,14 +417,6 @@ export const fieldRouter = router({
    * Todo: Refactor to setFieldsForTemplate.
    */
   addTemplateFields: authenticatedProcedure
-    // .meta({
-    //   openapi: {
-    //     method: 'POST',
-    //     path: '/template/{templateId}/field',
-    //     summary: 'Set template fields',
-    //     tags: ['Template Fields'],
-    //   },
-    // })
     .input(ZSetFieldsForTemplateRequestSchema)
     .output(ZSetFieldsForTemplateResponseSchema)
     .mutation(async ({ input, ctx }) => {

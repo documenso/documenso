@@ -12,6 +12,7 @@ import { DocumentStatus, SendStatus } from '@documenso/prisma/client';
 import { getI18nInstance } from '../../client-only/providers/i18n.server';
 import { NEXT_PUBLIC_WEBAPP_URL } from '../../constants/app';
 import { FROM_ADDRESS, FROM_NAME } from '../../constants/email';
+import { AppError, AppErrorCode } from '../../errors/app-error';
 import { DOCUMENT_AUDIT_LOG_TYPE } from '../../types/document-audit-logs';
 import { extractDerivedDocumentEmailSettings } from '../../types/document-email';
 import type { RequestMetadata } from '../../universal/extract-request-metadata';
@@ -42,7 +43,9 @@ export const superDeleteDocument = async ({ id, requestMetadata }: SuperDeleteDo
   });
 
   if (!document) {
-    throw new Error('Document not found');
+    throw new AppError(AppErrorCode.NOT_FOUND, {
+      message: 'Document not found',
+    });
   }
 
   const { status, user } = document;

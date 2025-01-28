@@ -29,13 +29,13 @@ export const UserPasskeysDataTable = () => {
 
   const parsedSearchParams = ZUrlSearchParamsSchema.parse(Object.fromEntries(searchParams ?? []));
 
-  const { data, isLoading, isInitialLoading, isLoadingError } = trpc.auth.findPasskeys.useQuery(
+  const { data, isLoading, isLoadingError } = trpc.auth.findPasskeys.useQuery(
     {
       page: parsedSearchParams.page,
       perPage: parsedSearchParams.perPage,
     },
     {
-      keepPreviousData: true,
+      placeholderData: (previousData) => previousData,
     },
   );
 
@@ -100,7 +100,7 @@ export const UserPasskeysDataTable = () => {
         enable: isLoadingError,
       }}
       skeleton={{
-        enable: isLoading && isInitialLoading,
+        enable: isLoading,
         rows: 3,
         component: (
           <>

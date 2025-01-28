@@ -1,5 +1,3 @@
-import { z } from 'zod';
-
 import { completeDocumentWithToken } from '@documenso/lib/server-only/document/complete-document-with-token';
 import { rejectDocumentWithToken } from '@documenso/lib/server-only/document/reject-document-with-token';
 import { createDocumentRecipients } from '@documenso/lib/server-only/recipient/create-document-recipients';
@@ -13,6 +11,7 @@ import { updateDocumentRecipients } from '@documenso/lib/server-only/recipient/u
 import { updateTemplateRecipients } from '@documenso/lib/server-only/recipient/update-template-recipients';
 import { extractNextApiRequestMetadata } from '@documenso/lib/universal/extract-request-metadata';
 
+import { ZGenericSuccessResponse, ZSuccessResponseSchema } from '../document-router/schema';
 import { authenticatedProcedure, procedure, router } from '../trpc';
 import {
   ZCompleteDocumentWithTokenMutationSchema,
@@ -47,15 +46,15 @@ export const recipientRouter = router({
   /**
    * @public
    */
-  getRecipient: authenticatedProcedure
+  getDocumentRecipient: authenticatedProcedure
     .meta({
       openapi: {
         method: 'GET',
-        path: '/recipient/{recipientId}',
-        summary: 'Get recipient',
+        path: '/document/recipient/{recipientId}',
+        summary: 'Get document recipient',
         description:
-          'Returns a single recipient. If you want to retrieve all the recipients for a document or template, use the "Get Document" or "Get Template" request.',
-        tags: ['Document Recipients', 'Template Recipients'],
+          'Returns a single recipient. If you want to retrieve all the recipients for a document, use the "Get Document" endpoint.',
+        tags: ['Document Recipients'],
       },
     })
     .input(ZGetRecipientRequestSchema)
@@ -200,7 +199,7 @@ export const recipientRouter = router({
       },
     })
     .input(ZDeleteDocumentRecipientRequestSchema)
-    .output(z.void())
+    .output(ZSuccessResponseSchema)
     .mutation(async ({ input, ctx }) => {
       const { teamId } = ctx;
       const { recipientId } = input;
@@ -211,22 +210,14 @@ export const recipientRouter = router({
         recipientId,
         requestMetadata: ctx.metadata,
       });
+
+      return ZGenericSuccessResponse;
     }),
 
   /**
    * @private
    */
   setDocumentRecipients: authenticatedProcedure
-    // .meta({
-    //   openapi: {
-    //     method: 'POST',
-    //     path: '/document/recipient/set',
-    //     summary: 'Set document recipients',
-    //     description:
-    //       'This will replace all recipients attached to the document. If the array contains existing recipients, they will be updated and the original fields will be retained.',
-    //     tags: ['Document Recipients'],
-    //   },
-    // })
     .input(ZSetDocumentRecipientsRequestSchema)
     .output(ZSetDocumentRecipientsResponseSchema)
     .mutation(async ({ input, ctx }) => {
@@ -246,6 +237,33 @@ export const recipientRouter = router({
           actionAuth: recipient.actionAuth,
         })),
         requestMetadata: ctx.metadata,
+      });
+    }),
+
+  /**
+   * @public
+   */
+  getTemplateRecipient: authenticatedProcedure
+    .meta({
+      openapi: {
+        method: 'GET',
+        path: '/template/recipient/{recipientId}',
+        summary: 'Get template recipient',
+        description:
+          'Returns a single recipient. If you want to retrieve all the recipients for a template, use the "Get Template" endpoint.',
+        tags: ['Template Recipients'],
+      },
+    })
+    .input(ZGetRecipientRequestSchema)
+    .output(ZGetRecipientResponseSchema)
+    .query(async ({ input, ctx }) => {
+      const { teamId } = ctx;
+      const { recipientId } = input;
+
+      return await getRecipientById({
+        userId: ctx.user.id,
+        teamId,
+        recipientId,
       });
     }),
 
@@ -374,7 +392,7 @@ export const recipientRouter = router({
       },
     })
     .input(ZDeleteTemplateRecipientRequestSchema)
-    .output(z.void())
+    .output(ZSuccessResponseSchema)
     .mutation(async ({ input, ctx }) => {
       const { teamId } = ctx;
       const { recipientId } = input;
@@ -384,22 +402,14 @@ export const recipientRouter = router({
         userId: ctx.user.id,
         teamId,
       });
+
+      return ZGenericSuccessResponse;
     }),
 
   /**
    * @private
    */
   setTemplateRecipients: authenticatedProcedure
-    // .meta({
-    //   openapi: {
-    //     method: 'POST',
-    //     path: '/template/recipient/set',
-    //     summary: 'Set template recipients',
-    //     description:
-    //       'This will replace all recipients attached to the template. If the array contains existing recipients, they will be updated and the original fields will be retained.',
-    //     tags: ['Template Recipients'],
-    //   },
-    // })
     .input(ZSetTemplateRecipientsRequestSchema)
     .output(ZSetTemplateRecipientsResponseSchema)
     .mutation(async ({ input, ctx }) => {

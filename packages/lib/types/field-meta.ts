@@ -11,9 +11,14 @@ export const ZBaseFieldMeta = z.object({
 
 export type TBaseFieldMeta = z.infer<typeof ZBaseFieldMeta>;
 
+export const ZFieldTextAlignSchema = z.enum(['left', 'center', 'right']);
+
+export type TFieldTextAlignSchema = z.infer<typeof ZFieldTextAlignSchema>;
+
 export const ZInitialsFieldMeta = ZBaseFieldMeta.extend({
   type: z.literal('initials'),
   fontSize: z.number().min(8).max(96).optional(),
+  textAlign: ZFieldTextAlignSchema.optional(),
 });
 
 export type TInitialsFieldMeta = z.infer<typeof ZInitialsFieldMeta>;
@@ -21,6 +26,7 @@ export type TInitialsFieldMeta = z.infer<typeof ZInitialsFieldMeta>;
 export const ZNameFieldMeta = ZBaseFieldMeta.extend({
   type: z.literal('name'),
   fontSize: z.number().min(8).max(96).optional(),
+  textAlign: ZFieldTextAlignSchema.optional(),
 });
 
 export type TNameFieldMeta = z.infer<typeof ZNameFieldMeta>;
@@ -28,6 +34,7 @@ export type TNameFieldMeta = z.infer<typeof ZNameFieldMeta>;
 export const ZEmailFieldMeta = ZBaseFieldMeta.extend({
   type: z.literal('email'),
   fontSize: z.number().min(8).max(96).optional(),
+  textAlign: ZFieldTextAlignSchema.optional(),
 });
 
 export type TEmailFieldMeta = z.infer<typeof ZEmailFieldMeta>;
@@ -35,6 +42,7 @@ export type TEmailFieldMeta = z.infer<typeof ZEmailFieldMeta>;
 export const ZDateFieldMeta = ZBaseFieldMeta.extend({
   type: z.literal('date'),
   fontSize: z.number().min(8).max(96).optional(),
+  textAlign: ZFieldTextAlignSchema.optional(),
 });
 
 export type TDateFieldMeta = z.infer<typeof ZDateFieldMeta>;
@@ -44,6 +52,7 @@ export const ZTextFieldMeta = ZBaseFieldMeta.extend({
   text: z.string().optional(),
   characterLimit: z.number().optional(),
   fontSize: z.number().min(8).max(96).optional(),
+  textAlign: ZFieldTextAlignSchema.optional(),
 });
 
 export type TTextFieldMeta = z.infer<typeof ZTextFieldMeta>;
@@ -55,6 +64,7 @@ export const ZNumberFieldMeta = ZBaseFieldMeta.extend({
   minValue: z.number().optional(),
   maxValue: z.number().optional(),
   fontSize: z.number().min(8).max(96).optional(),
+  textAlign: ZFieldTextAlignSchema.optional(),
 });
 
 export type TNumberFieldMeta = z.infer<typeof ZNumberFieldMeta>;
@@ -113,19 +123,27 @@ export const ZFieldMetaNotOptionalSchema = z.discriminatedUnion('type', [
 
 export type TFieldMetaNotOptionalSchema = z.infer<typeof ZFieldMetaNotOptionalSchema>;
 
-export const ZFieldMetaSchema = ZFieldMetaNotOptionalSchema.optional();
+export const ZFieldMetaSchema = z
+  .union([
+    // Handles an empty object being provided as fieldMeta.
+    z
+      .object({})
+      .strict()
+      .transform(() => undefined),
+    ZFieldMetaNotOptionalSchema,
+  ])
+  .optional();
 
 export type TFieldMetaSchema = z.infer<typeof ZFieldMetaSchema>;
 
 export const ZFieldAndMetaSchema = z.discriminatedUnion('type', [
   z.object({
     type: z.literal(FieldType.SIGNATURE),
-    // Do not use z.undefined(), or void since this will create an invalid schema for Speakeasy SDK generation.
-    fieldMeta: z.literal(undefined),
+    fieldMeta: z.undefined(),
   }),
   z.object({
     type: z.literal(FieldType.FREE_SIGNATURE),
-    fieldMeta: z.literal(undefined), // Same as above.
+    fieldMeta: z.undefined(),
   }),
   z.object({
     type: z.literal(FieldType.INITIALS),

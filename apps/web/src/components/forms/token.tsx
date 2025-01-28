@@ -9,11 +9,12 @@ import { Trans, msg } from '@lingui/macro';
 import { useLingui } from '@lingui/react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { useForm } from 'react-hook-form';
+import { match } from 'ts-pattern';
 import { z } from 'zod';
 
 import { useCopyToClipboard } from '@documenso/lib/client-only/hooks/use-copy-to-clipboard';
+import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import type { ApiToken } from '@documenso/prisma/client';
-import { TRPCClientError } from '@documenso/trpc/client';
 import { trpc } from '@documenso/trpc/react';
 import type { TCreateTokenMutationSchema } from '@documenso/trpc/server/api-token-router/schema';
 import { ZCreateTokenMutationSchema } from '@documenso/trpc/server/api-token-router/schema';
@@ -131,23 +132,22 @@ export const ApiTokenForm = ({ className, teamId, tokens }: ApiTokenFormProps) =
       form.reset();
 
       startTransition(() => router.refresh());
-    } catch (error) {
-      if (error instanceof TRPCClientError && error.data?.code === 'BAD_REQUEST') {
-        toast({
-          title: _(msg`An error occurred`),
-          description: error.message,
-          variant: 'destructive',
-        });
-      } else {
-        toast({
-          title: _(msg`An unknown error occurred`),
-          description: _(
-            msg`We encountered an unknown error while attempting create the new token. Please try again later.`,
-          ),
-          variant: 'destructive',
-          duration: 5000,
-        });
-      }
+    } catch (err) {
+      const error = AppError.parseError(err);
+
+      const errorMessage = match(error.code)
+        .with(
+          AppErrorCode.UNAUTHORIZED,
+          () => msg`You do not have permission to create a token for this team`,
+        )
+        .otherwise(() => msg`Something went wrong. Please try again later.`);
+
+      toast({
+        title: _(msg`An error occurred`),
+        description: _(errorMessage),
+        variant: 'destructive',
+        duration: 5000,
+      });
     }
   };
 

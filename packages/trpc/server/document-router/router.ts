@@ -1,11 +1,10 @@
 import { TRPCError } from '@trpc/server';
 import { DateTime } from 'luxon';
-import { z } from 'zod';
 
 import { getServerLimits } from '@documenso/ee/server-only/limits/server';
 import { NEXT_PUBLIC_WEBAPP_URL } from '@documenso/lib/constants/app';
 import { DOCUMENSO_ENCRYPTION_KEY } from '@documenso/lib/constants/crypto';
-import { AppError } from '@documenso/lib/errors/app-error';
+import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import { encryptSecondaryData } from '@documenso/lib/server-only/crypto/encrypt';
 import { createDocumentData } from '@documenso/lib/server-only/document-data/create-document-data';
 import { upsertDocumentMeta } from '@documenso/lib/server-only/document-meta/upsert-document-meta';
@@ -42,6 +41,7 @@ import {
   ZFindDocumentAuditLogsQuerySchema,
   ZFindDocumentsRequestSchema,
   ZFindDocumentsResponseSchema,
+  ZGenericSuccessResponse,
   ZGetDocumentByIdQuerySchema,
   ZGetDocumentByTokenQuerySchema,
   ZGetDocumentWithDetailsByIdRequestSchema,
@@ -52,6 +52,7 @@ import {
   ZSearchDocumentsMutationSchema,
   ZSetPasswordForDocumentMutationSchema,
   ZSetSigningOrderForDocumentMutationSchema,
+  ZSuccessResponseSchema,
   ZUpdateDocumentRequestSchema,
   ZUpdateDocumentResponseSchema,
 } from './schema';
@@ -186,9 +187,9 @@ export const documentRouter = router({
       const { remaining } = await getServerLimits({ email: ctx.user.email, teamId });
 
       if (remaining.documents <= 0) {
-        throw new TRPCError({
-          code: 'BAD_REQUEST',
+        throw new AppError(AppErrorCode.LIMIT_EXCEEDED, {
           message: 'You have reached your document limit for this month. Please upgrade your plan.',
+          statusCode: 400,
         });
       }
 
@@ -246,9 +247,9 @@ export const documentRouter = router({
       const { remaining } = await getServerLimits({ email: ctx.user.email, teamId });
 
       if (remaining.documents <= 0) {
-        throw new TRPCError({
-          code: 'BAD_REQUEST',
+        throw new AppError(AppErrorCode.LIMIT_EXCEEDED, {
           message: 'You have reached your document limit for this month. Please upgrade your plan.',
+          statusCode: 400,
         });
       }
 
@@ -326,7 +327,7 @@ export const documentRouter = router({
       },
     })
     .input(ZDeleteDocumentMutationSchema)
-    .output(z.void())
+    .output(ZSuccessResponseSchema)
     .mutation(async ({ input, ctx }) => {
       const { teamId } = ctx;
       const { documentId } = input;
@@ -339,6 +340,8 @@ export const documentRouter = router({
         teamId,
         requestMetadata: ctx.metadata,
       });
+
+      return ZGenericSuccessResponse;
     }),
 
   /**
@@ -481,18 +484,20 @@ export const documentRouter = router({
       },
     })
     .input(ZResendDocumentMutationSchema)
-    .output(z.void())
+    .output(ZSuccessResponseSchema)
     .mutation(async ({ input, ctx }) => {
       const { teamId } = ctx;
       const { documentId, recipients } = input;
 
-      return await resendDocument({
+      await resendDocument({
         userId: ctx.user.id,
         teamId,
         documentId,
         recipients,
         requestMetadata: ctx.metadata,
       });
+
+      return ZGenericSuccessResponse;
     }),
 
   /**

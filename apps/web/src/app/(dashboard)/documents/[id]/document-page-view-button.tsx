@@ -46,9 +46,16 @@ export const DocumentPageViewButton = ({ document }: DocumentPageViewButtonProps
 
   const onDownloadClick = async () => {
     try {
-      const documentWithData = await trpcClient.document.getDocumentById.query({
-        documentId: document.id,
-      });
+      const documentWithData = await trpcClient.document.getDocumentById.query(
+        {
+          documentId: document.id,
+        },
+        {
+          context: {
+            teamId: document.team?.id?.toString(),
+          },
+        },
+      );
 
       const documentData = documentWithData?.documentData;
 

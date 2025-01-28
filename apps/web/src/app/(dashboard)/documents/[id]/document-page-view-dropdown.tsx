@@ -74,9 +74,16 @@ export const DocumentPageViewDropdown = ({ document, team }: DocumentPageViewDro
 
   const onDownloadClick = async () => {
     try {
-      const documentWithData = await trpcClient.document.getDocumentById.query({
-        documentId: document.id,
-      });
+      const documentWithData = await trpcClient.document.getDocumentById.query(
+        {
+          documentId: document.id,
+        },
+        {
+          context: {
+            teamId: team?.id?.toString(),
+          },
+        },
+      );
 
       const documentData = documentWithData?.documentData;
 
