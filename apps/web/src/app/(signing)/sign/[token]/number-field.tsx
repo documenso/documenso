@@ -52,8 +52,19 @@ export const NumberField = ({ field, recipient, onSignField, onUnsignField }: Nu
   const [isPending, startTransition] = useTransition();
   const [showNumberModal, setShowNumberModal] = useState(false);
 
-  const parsedFieldMeta = field.fieldMeta ? ZNumberFieldMeta.parse(field.fieldMeta) : null;
-  const isReadOnly = parsedFieldMeta?.readOnly;
+  const { mutateAsync: signFieldWithToken, isPending: isSignFieldWithTokenLoading } =
+    trpc.field.signFieldWithToken.useMutation(DO_NOT_INVALIDATE_QUERY_ON_MUTATION);
+
+  const {
+    mutateAsync: removeSignedFieldWithToken,
+    isPending: isRemoveSignedFieldWithTokenLoading,
+  } = trpc.field.removeSignedFieldWithToken.useMutation(DO_NOT_INVALIDATE_QUERY_ON_MUTATION);
+
+  const safeFieldMeta = ZNumberFieldMeta.safeParse(field.fieldMeta);
+  const parsedFieldMeta = safeFieldMeta.success ? safeFieldMeta.data : null;
+
+  const isLoading = isSignFieldWithTokenLoading || isRemoveSignedFieldWithTokenLoading || isPending;
+
   const defaultValue = parsedFieldMeta?.value;
   const [localNumber, setLocalNumber] = useState(
     parsedFieldMeta?.value ? String(parsedFieldMeta.value) : '0',
@@ -70,16 +81,6 @@ export const NumberField = ({ field, recipient, onSignField, onUnsignField }: Nu
   const [errors, setErrors] = useState(initialErrors);
 
   const { executeActionAuthProcedure } = useRequiredDocumentAuthContext();
-
-  const { mutateAsync: signFieldWithToken, isPending: isSignFieldWithTokenLoading } =
-    trpc.field.signFieldWithToken.useMutation(DO_NOT_INVALIDATE_QUERY_ON_MUTATION);
-
-  const {
-    mutateAsync: removeSignedFieldWithToken,
-    isPending: isRemoveSignedFieldWithTokenLoading,
-  } = trpc.field.removeSignedFieldWithToken.useMutation(DO_NOT_INVALIDATE_QUERY_ON_MUTATION);
-
-  const isLoading = isSignFieldWithTokenLoading || isRemoveSignedFieldWithTokenLoading || isPending;
 
   const handleNumberChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const text = e.target.value;
@@ -208,7 +209,7 @@ export const NumberField = ({ field, recipient, onSignField, onUnsignField }: Nu
   useEffect(() => {
     if (
       (!field.inserted && defaultValue && localNumber) ||
-      (!field.inserted && isReadOnly && defaultValue)
+      (!field.inserted && parsedFieldMeta?.readOnly && defaultValue)
     ) {
       void executeActionAuthProcedure({
         onReauthFormSubmit: async (authOptions) => await onSign(authOptions),
@@ -260,9 +261,21 @@ export const NumberField = ({ field, recipient, onSignField, onUnsignField }: Nu
       )}
 
       {field.inserted && (
-        <p className="text-muted-foreground dark:text-background/80 text-[clamp(0.425rem,25cqw,0.825rem)] duration-200">
-          {field.customText}
-        </p>
+        <div className="flex h-full w-full items-center">
+          <p
+            className={cn(
+              'text-muted-foreground dark:text-background/80 w-full text-[clamp(0.425rem,25cqw,0.825rem)] duration-200',
+              {
+                'text-left': parsedFieldMeta?.textAlign === 'left',
+                'text-center':
+                  !parsedFieldMeta?.textAlign || parsedFieldMeta?.textAlign === 'center',
+                'text-right': parsedFieldMeta?.textAlign === 'right',
+              },
+            )}
+          >
+            {field.customText}
+          </p>
+        </div>
       )}
 
       <Dialog open={showNumberModal} onOpenChange={setShowNumberModal}>

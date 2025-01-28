@@ -233,14 +233,12 @@ export const DataTableActionDropdown = ({ row, team }: DataTableActionDropdownPr
         onOpenChange={setMoveDialogOpen}
       />
 
-      {isDuplicateDialogOpen && (
-        <DuplicateDocumentDialog
-          id={row.id}
-          open={isDuplicateDialogOpen}
-          onOpenChange={setDuplicateDialogOpen}
-          team={team}
-        />
-      )}
+      <DuplicateDocumentDialog
+        id={row.id}
+        open={isDuplicateDialogOpen}
+        onOpenChange={setDuplicateDialogOpen}
+        team={team}
+      />
     </DropdownMenu>
   );
 };
