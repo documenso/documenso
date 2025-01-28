@@ -38,12 +38,12 @@ export const NumberFieldAdvancedSettings = ({
   const [showValidation, setShowValidation] = useState(false);
 
   const handleInput = (field: keyof NumberFieldMeta, value: string | boolean) => {
-    const userValue = field === 'value' ? value : fieldState.value ?? 0;
+    const userValue = field === 'value' ? value : (fieldState.value ?? 0);
     const userMinValue = field === 'minValue' ? Number(value) : Number(fieldState.minValue ?? 0);
     const userMaxValue = field === 'maxValue' ? Number(value) : Number(fieldState.maxValue ?? 0);
     const readOnly = field === 'readOnly' ? Boolean(value) : Boolean(fieldState.readOnly);
     const required = field === 'required' ? Boolean(value) : Boolean(fieldState.required);
-    const numberFormat = field === 'numberFormat' ? String(value) : fieldState.numberFormat ?? '';
+    const numberFormat = field === 'numberFormat' ? String(value) : (fieldState.numberFormat ?? '');
     const fontSize = field === 'fontSize' ? Number(value) : Number(fieldState.fontSize ?? 14);
 
     const valueErrors = validateNumberField(String(userValue), {
@@ -133,6 +133,27 @@ export const NumberFieldAdvancedSettings = ({
           min={8}
           max={96}
         />
+      </div>
+
+      <div>
+        <Label>
+          <Trans>Text Align</Trans>
+        </Label>
+
+        <Select
+          value={fieldState.textAlign}
+          onValueChange={(value) => handleInput('textAlign', value)}
+        >
+          <SelectTrigger className="bg-background mt-2">
+            <SelectValue placeholder="Select text align" />
+          </SelectTrigger>
+
+          <SelectContent>
+            <SelectItem value="left">Left</SelectItem>
+            <SelectItem value="center">Center</SelectItem>
+            <SelectItem value="right">Right</SelectItem>
+          </SelectContent>
+        </Select>
       </div>
 
       <div className="mt-2 flex flex-col gap-4">
