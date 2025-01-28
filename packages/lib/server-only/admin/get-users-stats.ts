@@ -90,3 +90,31 @@ export const getUserWithSignedDocumentMonthlyGrowth = async () => {
     signed_count: Number(row.signed_count),
   }));
 };
+
+export type GetMonthlyActiveUsersResult = Array<{
+  month: string;
+  count: number;
+}>;
+
+type GetMonthlyActiveUsersQueryResult = Array<{
+  month: Date;
+  count: bigint;
+}>;
+
+export const getMonthlyActiveUsers = async () => {
+  const result = await prisma.$queryRaw<GetMonthlyActiveUsersQueryResult>`
+      SELECT
+        DATE_TRUNC('month', "lastSignedIn") AS "month",
+        COUNT(DISTINCT "id") as "count"
+      FROM "User"
+      WHERE "lastSignedIn" >= NOW() - INTERVAL '1 year'
+      GROUP BY "month"
+      ORDER BY "month" DESC
+      LIMIT 12
+  `;
+
+  return result.map((row) => ({
+    month: DateTime.fromJSDate(row.month).toFormat('yyyy-MM'),
+    count: Number(row.count),
+  }));
+};

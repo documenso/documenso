@@ -19,6 +19,7 @@ import { setupI18nSSR } from '@documenso/lib/client-only/providers/i18n.server';
 import { getDocumentStats } from '@documenso/lib/server-only/admin/get-documents-stats';
 import { getRecipientsStats } from '@documenso/lib/server-only/admin/get-recipients-stats';
 import {
+  getMonthlyActiveUsers,
   getUserWithSignedDocumentMonthlyGrowth,
   getUsersCount,
   getUsersWithLastSignedInCount,
@@ -28,6 +29,7 @@ import { getSignerConversionMonthly } from '@documenso/lib/server-only/user/get-
 
 import { CardMetric } from '~/components/(dashboard)/metric-card/metric-card';
 
+import { MonthlyActiveUsersChart } from './monthly-active-users-chart';
 import { SignerConversionChart } from './signer-conversion-chart';
 import { UserWithDocumentChart } from './user-with-document';
 
@@ -46,6 +48,7 @@ export default async function AdminStatsPage() {
     // userWithAtLeastOneDocumentSignedPerMonth,
     MONTHLY_USERS_SIGNED,
     usersWithLastSignedInCount,
+    monthlyActiveUsers,
   ] = await Promise.all([
     getUsersCount(),
     getUsersWithSubscriptionsCount(),
@@ -56,6 +59,7 @@ export default async function AdminStatsPage() {
     // getUserWithAtLeastOneDocumentSignedPerMonth(),
     getUserWithSignedDocumentMonthlyGrowth(),
     getUsersWithLastSignedInCount(),
+    getMonthlyActiveUsers(),
   ]);
 
   return (
@@ -140,6 +144,11 @@ export default async function AdminStatsPage() {
           <Trans>Charts</Trans>
         </h3>
         <div className="mt-5 grid grid-cols-2 gap-8">
+          <MonthlyActiveUsersChart
+            title={_(msg`Monthly Active Users (signed in)`)}
+            data={monthlyActiveUsers}
+            tooltip={_(msg`Number of users who signed in each month`)}
+          />
           <UserWithDocumentChart
             data={MONTHLY_USERS_SIGNED}
             title={_(msg`MAU (created document)`)}
