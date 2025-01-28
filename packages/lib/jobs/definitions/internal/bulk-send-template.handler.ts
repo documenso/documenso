@@ -54,7 +54,7 @@ export const run = async ({
     throw new Error('Maximum 100 rows allowed per upload');
   }
 
-  const recipients = template.Recipient;
+  const { recipients } = template;
 
   // Validate CSV structure
   const csvHeaders = Object.keys(rows[0]);
@@ -115,7 +115,11 @@ export const run = async ({
               signingOrder: recipient.signingOrder,
             };
           }),
-          requestMetadata,
+          requestMetadata: {
+            source: 'app',
+            auth: 'session',
+            requestMetadata: requestMetadata || {},
+          },
         });
       });
 
@@ -125,7 +129,11 @@ export const run = async ({
             documentId: document.id,
             userId,
             teamId,
-            requestMetadata,
+            requestMetadata: {
+              source: 'app',
+              auth: 'session',
+              requestMetadata: requestMetadata || {},
+            },
           }).catch((err) => {
             console.error(err);
 

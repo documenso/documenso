@@ -90,7 +90,7 @@ export const DataTableActionDropdown = ({
 
         <TemplateBulkSendDialog
           templateId={row.id}
-          recipients={row.Recipient}
+          recipients={row.recipients}
           trigger={
             <div className="hover:bg-accent hover:text-accent-foreground relative flex cursor-pointer select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none transition-colors">
               <Upload className="mr-2 h-4 w-4" />

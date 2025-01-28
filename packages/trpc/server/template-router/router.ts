@@ -23,7 +23,6 @@ import { getTemplateById } from '@documenso/lib/server-only/template/get-templat
 import { moveTemplateToTeam } from '@documenso/lib/server-only/template/move-template-to-team';
 import { toggleTemplateDirectLink } from '@documenso/lib/server-only/template/toggle-template-direct-link';
 import { updateTemplate } from '@documenso/lib/server-only/template/update-template';
-import { extractNextApiRequestMetadata } from '@documenso/lib/universal/extract-request-metadata';
 import type { Document } from '@documenso/prisma/client';
 
 import { ZGenericSuccessResponse, ZSuccessResponseSchema } from '../document-router/schema';
@@ -457,7 +456,7 @@ export const templateRouter = router({
           templateId,
           csvContent: csv,
           sendImmediately,
-          requestMetadata: extractNextApiRequestMetadata(ctx.req),
+          requestMetadata: ctx.metadata.requestMetadata,
         },
       });
 

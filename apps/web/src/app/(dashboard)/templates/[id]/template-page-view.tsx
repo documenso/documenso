@@ -112,7 +112,7 @@ export const TemplatePageView = async ({ params, team }: TemplatePageViewProps) 
         <div className="mt-2 flex flex-row space-x-4 sm:mt-0 sm:self-end">
           <TemplateDirectLinkDialogWrapper template={template} />
 
-          <TemplateBulkSendDialog templateId={template.id} recipients={template.Recipient} />
+          <TemplateBulkSendDialog templateId={template.id} recipients={template.recipients} />
 
           <Button className="w-full" asChild>
             <Link href={`${templateRootPath}/${template.id}/edit`}>
