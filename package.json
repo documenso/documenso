@@ -34,8 +34,7 @@
     "make:version": " npm version --workspace @documenso/web --include-workspace-root --no-git-tag-version -m \"v%s\"",
     "translate": "npm run translate:extract && npm run translate:compile",
     "translate:extract": "lingui extract --clean",
-    "translate:compile": "lingui compile",
-    "prisma:seed-mau": "npm run with:env -- npm run prisma:seed-mau -w @documenso/prisma"
+    "translate:compile": "lingui compile"
   },
   "packageManager": "npm@10.7.0",
   "engines": {
