@@ -2,7 +2,7 @@ import { useMemo } from 'react';
 
 import { useLingui } from '@lingui/react';
 import { Trans } from '@lingui/react/macro';
-import { match } from 'ts-pattern';
+import { P, match } from 'ts-pattern';
 
 import { RECIPIENT_ROLES_DESCRIPTION } from '@documenso/lib/constants/recipient-roles';
 import { RecipientRole } from '@documenso/prisma/client';
@@ -40,11 +40,9 @@ export const TemplateDocumentInvite = ({
 
   const rejectDocumentLink = useMemo(() => {
     const url = new URL(signDocumentLink);
-
     url.searchParams.set('reject', 'true');
-
     return url.toString();
-  }, []);
+  }, [signDocumentLink]);
 
   return (
     <>
@@ -52,31 +50,32 @@ export const TemplateDocumentInvite = ({
 
       <Section>
         <Text className="text-primary mx-auto mb-0 max-w-[80%] text-center text-lg font-semibold">
-          {selfSigner ? (
-            <Trans>
-              Please {_(actionVerb).toLowerCase()} your document
-              <br />"{documentName}"
-            </Trans>
-          ) : isTeamInvite ? (
-            <>
-              {includeSenderDetails ? (
-                <Trans>
-                  {inviterName} on behalf of "{teamName}" has invited you to{' '}
-                  {_(actionVerb).toLowerCase()}
-                </Trans>
-              ) : (
-                <Trans>
-                  {teamName} has invited you to {_(actionVerb).toLowerCase()}
-                </Trans>
-              )}
-              <br />"{documentName}"
-            </>
-          ) : (
-            <Trans>
-              {inviterName} has invited you to {_(actionVerb).toLowerCase()}
-              <br />"{documentName}"
-            </Trans>
-          )}
+          {match({ selfSigner, isTeamInvite, includeSenderDetails, teamName })
+            .with({ selfSigner: true }, () => (
+              <Trans>
+                Please {_(actionVerb).toLowerCase()} your document
+                <br />"{documentName}"
+              </Trans>
+            ))
+            .with({ isTeamInvite: true, includeSenderDetails: true, teamName: P.string }, () => (
+              <Trans>
+                {inviterName} on behalf of "{teamName}" has invited you to{' '}
+                {_(actionVerb).toLowerCase()}
+                <br />"{documentName}"
+              </Trans>
+            ))
+            .with({ isTeamInvite: true, teamName: P.string }, () => (
+              <Trans>
+                {teamName} has invited you to {_(actionVerb).toLowerCase()}
+                <br />"{documentName}"
+              </Trans>
+            ))
+            .otherwise(() => (
+              <Trans>
+                {inviterName} has invited you to {_(actionVerb).toLowerCase()}
+                <br />"{documentName}"
+              </Trans>
+            ))}
         </Text>
 
         <Text className="my-1 text-center text-base text-slate-400">
