@@ -29,7 +29,7 @@ import { getSignerConversionMonthly } from '@documenso/lib/server-only/user/get-
 
 import { CardMetric } from '~/components/(dashboard)/metric-card/metric-card';
 
-import { MonthlyActiveUsersChart } from './monthly-active-users-chart';
+import { MonthlyActiveUsersChart } from './mau';
 import { SignerConversionChart } from './signer-conversion-chart';
 import { UserWithDocumentChart } from './user-with-document';
 
@@ -147,8 +147,14 @@ export default async function AdminStatsPage() {
           <MonthlyActiveUsersChart
             title={_(msg`Monthly Active Users (signed in)`)}
             data={monthlyActiveUsers}
-            tooltip={_(msg`Number of users who signed in each month`)}
           />
+
+          <MonthlyActiveUsersChart
+            title={_(msg`Cumulative MAU (signed in)`)}
+            data={monthlyActiveUsers}
+            cummulative
+          />
+
           <UserWithDocumentChart
             data={MONTHLY_USERS_SIGNED}
             title={_(msg`MAU (created document)`)}

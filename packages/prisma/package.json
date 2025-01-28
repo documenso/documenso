@@ -15,7 +15,8 @@
     "prisma:migrate-deploy": "prisma migrate deploy",
     "prisma:migrate-reset": "prisma migrate reset",
     "prisma:seed": "prisma db seed",
-    "prisma:studio": "prisma studio"
+    "prisma:studio": "prisma studio",
+    "prisma:seed-mau": "tsx ./mau-seed.ts"
   },
   "prisma": {
     "seed": "tsx ./seed-database.ts"

@@ -94,21 +94,24 @@ export const getUserWithSignedDocumentMonthlyGrowth = async () => {
 export type GetMonthlyActiveUsersResult = Array<{
   month: string;
   count: number;
+  cume_count: number;
 }>;
 
 type GetMonthlyActiveUsersQueryResult = Array<{
   month: Date;
   count: bigint;
+  cume_count: bigint;
 }>;
 
 export const getMonthlyActiveUsers = async () => {
   const result = await prisma.$queryRaw<GetMonthlyActiveUsersQueryResult>`
       SELECT
         DATE_TRUNC('month', "lastSignedIn") AS "month",
-        COUNT(DISTINCT "id") as "count"
+        COUNT(DISTINCT "id") as "count",
+        SUM(COUNT(DISTINCT "id")) OVER (ORDER BY DATE_TRUNC('month', "lastSignedIn")) as "cume_count"
       FROM "User"
       WHERE "lastSignedIn" >= NOW() - INTERVAL '1 year'
-      GROUP BY "month"
+      GROUP BY DATE_TRUNC('month', "lastSignedIn")
       ORDER BY "month" DESC
       LIMIT 12
   `;
@@ -116,5 +119,6 @@ export const getMonthlyActiveUsers = async () => {
   return result.map((row) => ({
     month: DateTime.fromJSDate(row.month).toFormat('yyyy-MM'),
     count: Number(row.count),
+    cume_count: Number(row.cume_count),
   }));
 };
