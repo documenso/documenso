@@ -50,16 +50,6 @@ export const getUserWithAtLeastOneDocumentSignedPerMonth = async () => {
   });
 };
 
-export const getUsersWithLastSignedInCount = async () => {
-  return await prisma.user.count({
-    where: {
-      lastSignedIn: {
-        gte: DateTime.now().minus({ months: 1 }).toJSDate(),
-      },
-    },
-  });
-};
-
 export type GetUserWithDocumentMonthlyGrowth = Array<{
   month: string;
   count: number;

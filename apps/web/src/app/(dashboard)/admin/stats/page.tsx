@@ -9,7 +9,6 @@ import {
   Mail,
   MailOpen,
   PenTool,
-  UserCheck,
   UserPlus,
   UserSquare2,
   Users,
@@ -22,14 +21,13 @@ import {
   getMonthlyActiveUsers,
   getUserWithSignedDocumentMonthlyGrowth,
   getUsersCount,
-  getUsersWithLastSignedInCount,
   getUsersWithSubscriptionsCount,
 } from '@documenso/lib/server-only/admin/get-users-stats';
 import { getSignerConversionMonthly } from '@documenso/lib/server-only/user/get-signer-conversion';
 
 import { CardMetric } from '~/components/(dashboard)/metric-card/metric-card';
 
-import { MonthlyActiveUsersChart } from './mau';
+import { MonthlyActiveUsersChart } from './monthly-active-users-chart';
 import { SignerConversionChart } from './signer-conversion-chart';
 import { UserWithDocumentChart } from './user-with-document';
 
@@ -47,8 +45,7 @@ export default async function AdminStatsPage() {
     // userWithAtLeastOneDocumentPerMonth,
     // userWithAtLeastOneDocumentSignedPerMonth,
     MONTHLY_USERS_SIGNED,
-    usersWithLastSignedInCount,
-    monthlyActiveUsers,
+    MONTHLY_ACTIVE_USERS,
   ] = await Promise.all([
     getUsersCount(),
     getUsersWithSubscriptionsCount(),
@@ -58,7 +55,6 @@ export default async function AdminStatsPage() {
     // getUserWithAtLeastOneDocumentPerMonth(),
     // getUserWithAtLeastOneDocumentSignedPerMonth(),
     getUserWithSignedDocumentMonthlyGrowth(),
-    getUsersWithLastSignedInCount(),
     getMonthlyActiveUsers(),
   ]);
 
@@ -75,11 +71,6 @@ export default async function AdminStatsPage() {
           icon={UserPlus}
           title={_(msg`Active Subscriptions`)}
           value={usersWithSubscriptionsCount}
-        />
-        <CardMetric
-          icon={UserCheck}
-          title={_(msg`MAU (signed in)`)}
-          value={usersWithLastSignedInCount}
         />
         <CardMetric
           icon={FileCog}
@@ -144,14 +135,11 @@ export default async function AdminStatsPage() {
           <Trans>Charts</Trans>
         </h3>
         <div className="mt-5 grid grid-cols-2 gap-8">
-          <MonthlyActiveUsersChart
-            title={_(msg`Monthly Active Users (signed in)`)}
-            data={monthlyActiveUsers}
-          />
+          <MonthlyActiveUsersChart title={_(msg`MAU (signed in)`)} data={MONTHLY_ACTIVE_USERS} />
 
           <MonthlyActiveUsersChart
             title={_(msg`Cumulative MAU (signed in)`)}
-            data={monthlyActiveUsers}
+            data={MONTHLY_ACTIVE_USERS}
             cummulative
           />
 
