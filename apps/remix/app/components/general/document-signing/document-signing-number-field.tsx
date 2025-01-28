@@ -54,8 +54,9 @@ export const DocumentSigningNumberField = ({
 
   const [showRadioModal, setShowRadioModal] = useState(false);
 
-  const parsedFieldMeta = field.fieldMeta ? ZNumberFieldMeta.parse(field.fieldMeta) : null;
-  const isReadOnly = parsedFieldMeta?.readOnly;
+  const safeFieldMeta = ZNumberFieldMeta.safeParse(field.fieldMeta);
+  const parsedFieldMeta = safeFieldMeta.success ? safeFieldMeta.data : null;
+
   const defaultValue = parsedFieldMeta?.value;
   const [localNumber, setLocalNumber] = useState(
     parsedFieldMeta?.value ? String(parsedFieldMeta.value) : '0',
@@ -210,7 +211,7 @@ export const DocumentSigningNumberField = ({
   useEffect(() => {
     if (
       (!field.inserted && defaultValue && localNumber) ||
-      (!field.inserted && isReadOnly && defaultValue)
+      (!field.inserted && parsedFieldMeta?.readOnly && defaultValue)
     ) {
       void executeActionAuthProcedure({
         onReauthFormSubmit: async (authOptions) => await onSign(authOptions),
@@ -262,9 +263,21 @@ export const DocumentSigningNumberField = ({
       )}
 
       {field.inserted && (
-        <p className="text-muted-foreground dark:text-background/80 text-[clamp(0.425rem,25cqw,0.825rem)] duration-200">
-          {field.customText}
-        </p>
+        <div className="flex h-full w-full items-center">
+          <p
+            className={cn(
+              'text-muted-foreground dark:text-background/80 w-full text-[clamp(0.425rem,25cqw,0.825rem)] duration-200',
+              {
+                'text-left': parsedFieldMeta?.textAlign === 'left',
+                'text-center':
+                  !parsedFieldMeta?.textAlign || parsedFieldMeta?.textAlign === 'center',
+                'text-right': parsedFieldMeta?.textAlign === 'right',
+              },
+            )}
+          >
+            {field.customText}
+          </p>
+        </div>
       )}
 
       <Dialog open={showRadioModal} onOpenChange={setShowRadioModal}>

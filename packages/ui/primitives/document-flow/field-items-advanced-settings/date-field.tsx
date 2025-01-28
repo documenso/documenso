@@ -6,6 +6,13 @@ import { validateFields as validateDateFields } from '@documenso/lib/advanced-fi
 import { type TDateFieldMeta as DateFieldMeta } from '@documenso/lib/types/field-meta';
 import { Input } from '@documenso/ui/primitives/input';
 import { Label } from '@documenso/ui/primitives/label';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@documenso/ui/primitives/select';
 
 type DateFieldAdvancedSettingsProps = {
   fieldState: DateFieldMeta;
@@ -66,6 +73,27 @@ export const DateFieldAdvancedSettings = ({
           min={8}
           max={96}
         />
+      </div>
+
+      <div>
+        <Label>
+          <Trans>Text Align</Trans>
+        </Label>
+
+        <Select
+          value={fieldState.textAlign}
+          onValueChange={(value) => handleInput('textAlign', value)}
+        >
+          <SelectTrigger className="bg-background mt-2">
+            <SelectValue placeholder="Select text align" />
+          </SelectTrigger>
+
+          <SelectContent>
+            <SelectItem value="left">Left</SelectItem>
+            <SelectItem value="center">Center</SelectItem>
+            <SelectItem value="right">Right</SelectItem>
+          </SelectContent>
+        </Select>
       </div>
     </div>
   );

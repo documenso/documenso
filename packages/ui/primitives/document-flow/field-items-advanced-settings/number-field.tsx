@@ -134,6 +134,27 @@ export const NumberFieldAdvancedSettings = ({
         />
       </div>
 
+      <div>
+        <Label>
+          <Trans>Text Align</Trans>
+        </Label>
+
+        <Select
+          value={fieldState.textAlign}
+          onValueChange={(value) => handleInput('textAlign', value)}
+        >
+          <SelectTrigger className="bg-background mt-2">
+            <SelectValue placeholder="Select text align" />
+          </SelectTrigger>
+
+          <SelectContent>
+            <SelectItem value="left">Left</SelectItem>
+            <SelectItem value="center">Center</SelectItem>
+            <SelectItem value="right">Right</SelectItem>
+          </SelectContent>
+        </Select>
+      </div>
+
       <div className="mt-2 flex flex-col gap-4">
         <div className="flex flex-row items-center gap-2">
           <Switch

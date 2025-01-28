@@ -69,21 +69,25 @@ const getDefaultState = (fieldType: FieldType): FieldMeta => {
       return {
         type: 'initials',
         fontSize: 14,
+        textAlign: 'left',
       };
     case FieldType.NAME:
       return {
         type: 'name',
         fontSize: 14,
+        textAlign: 'left',
       };
     case FieldType.EMAIL:
       return {
         type: 'email',
         fontSize: 14,
+        textAlign: 'left',
       };
     case FieldType.DATE:
       return {
         type: 'date',
         fontSize: 14,
+        textAlign: 'left',
       };
     case FieldType.TEXT:
       return {
@@ -95,6 +99,7 @@ const getDefaultState = (fieldType: FieldType): FieldMeta => {
         fontSize: 14,
         required: false,
         readOnly: false,
+        textAlign: 'left',
       };
     case FieldType.NUMBER:
       return {
@@ -108,6 +113,7 @@ const getDefaultState = (fieldType: FieldType): FieldMeta => {
         required: false,
         readOnly: false,
         fontSize: 14,
+        textAlign: 'left',
       };
     case FieldType.RADIO:
       return {

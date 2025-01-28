@@ -13,12 +13,14 @@ import { DEFAULT_DOCUMENT_TIME_ZONE } from '@documenso/lib/constants/time-zones'
 import { DO_NOT_INVALIDATE_QUERY_ON_MUTATION } from '@documenso/lib/constants/trpc';
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import type { TRecipientActionAuth } from '@documenso/lib/types/document-auth';
+import { ZDateFieldMeta } from '@documenso/lib/types/field-meta';
 import type { FieldWithSignature } from '@documenso/prisma/types/field-with-signature';
 import { trpc } from '@documenso/trpc/react';
 import type {
   TRemovedSignedFieldWithTokenMutationSchema,
   TSignFieldWithTokenMutationSchema,
 } from '@documenso/trpc/server/field-router/schema';
+import { cn } from '@documenso/ui/lib/utils';
 import { useToast } from '@documenso/ui/primitives/use-toast';
 
 import { DocumentSigningFieldContainer } from './document-signing-field-container';
@@ -53,6 +55,9 @@ export const DocumentSigningDateField = ({
   } = trpc.field.removeSignedFieldWithToken.useMutation(DO_NOT_INVALIDATE_QUERY_ON_MUTATION);
 
   const isLoading = isSignFieldWithTokenLoading || isRemoveSignedFieldWithTokenLoading;
+
+  const safeFieldMeta = ZDateFieldMeta.safeParse(field.fieldMeta);
+  const parsedFieldMeta = safeFieldMeta.success ? safeFieldMeta.data : null;
 
   const localDateString = convertToLocalSystemFormat(field.customText, dateFormat, timezone);
 
@@ -143,9 +148,21 @@ export const DocumentSigningDateField = ({
       )}
 
       {field.inserted && (
-        <p className="text-muted-foreground dark:text-background/80 text-[clamp(0.425rem,25cqw,0.825rem)] duration-200">
-          {localDateString}
-        </p>
+        <div className="flex h-full w-full items-center">
+          <p
+            className={cn(
+              'text-muted-foreground dark:text-background/80 w-full text-[clamp(0.425rem,25cqw,0.825rem)] duration-200',
+              {
+                'text-left': parsedFieldMeta?.textAlign === 'left',
+                'text-center':
+                  !parsedFieldMeta?.textAlign || parsedFieldMeta?.textAlign === 'center',
+                'text-right': parsedFieldMeta?.textAlign === 'right',
+              },
+            )}
+          >
+            {localDateString}
+          </p>
+        </div>
       )}
     </DocumentSigningFieldContainer>
   );
