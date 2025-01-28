@@ -52,7 +52,7 @@ export const profileRouter = router({
         userId: ctx.user.id,
         name,
         signature,
-        requestMetadata: extractNextApiRequestMetadata(ctx.req),
+        requestMetadata: ctx.metadata.requestMetadata,
       });
     }),
 
@@ -96,7 +96,7 @@ export const profileRouter = router({
         userId: ctx.user.id,
         password,
         currentPassword,
-        requestMetadata: extractNextApiRequestMetadata(ctx.req),
+        requestMetadata: ctx.metadata.requestMetadata,
       });
     }),
 
@@ -146,7 +146,7 @@ export const profileRouter = router({
         userId: ctx.user.id,
         teamId,
         bytes,
-        requestMetadata: extractNextApiRequestMetadata(ctx.req),
+        requestMetadata: ctx.metadata,
       });
     }),
 });

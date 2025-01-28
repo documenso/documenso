@@ -19,6 +19,7 @@ import {
   User,
 } from 'lucide-react';
 import { useFieldArray, useForm } from 'react-hook-form';
+import { useHotkeys } from 'react-hotkeys-hook';
 
 import { getBoundingClientRect } from '@documenso/lib/client-only/get-bounding-client-rect';
 import { useDocumentElement } from '@documenso/lib/client-only/hooks/use-document-element';
@@ -53,6 +54,7 @@ import { FieldItem } from '@documenso/ui/primitives/document-flow/field-item';
 import type { DocumentFlowStep } from '@documenso/ui/primitives/document-flow/types';
 import { FRIENDLY_FIELD_TYPE } from '@documenso/ui/primitives/document-flow/types';
 import { Popover, PopoverContent, PopoverTrigger } from '@documenso/ui/primitives/popover';
+import { useToast } from '@documenso/ui/primitives/use-toast';
 
 import { getSignerColorStyles, useSignerColors } from '../../lib/signer-colors';
 import { Checkbox } from '../checkbox';
@@ -95,12 +97,19 @@ export const AddTemplateFieldsFormPartial = ({
   typedSignatureEnabled,
 }: AddTemplateFieldsFormProps) => {
   const { _ } = useLingui();
+  const { toast } = useToast();
 
   const { isWithinPageBounds, getFieldPosition, getPage } = useDocumentElement();
   const { currentStep, totalSteps, previousStep } = useStep();
   const [showAdvancedSettings, setShowAdvancedSettings] = useState(false);
   const [currentField, setCurrentField] = useState<FieldFormType>();
   const [activeFieldId, setActiveFieldId] = useState<string | null>(null);
+  const [lastActiveField, setLastActiveField] = useState<
+    TAddTemplateFieldsFormSchema['fields'][0] | null
+  >(null);
+  const [fieldClipboard, setFieldClipboard] = useState<
+    TAddTemplateFieldsFormSchema['fields'][0] | null
+  >(null);
 
   const form = useForm<TAddTemplateFieldsFormSchema>({
     defaultValues: {
@@ -126,25 +135,6 @@ export const AddTemplateFieldsFormPartial = ({
 
   const onFormSubmit = form.handleSubmit(onSubmit);
 
-  const handleSavedFieldSettings = (fieldState: FieldMeta) => {
-    const initialValues = form.getValues();
-
-    const updatedFields = initialValues.fields.map((field) => {
-      if (field.formId === currentField?.formId) {
-        const parsedFieldMeta = ZFieldMetaSchema.parse(fieldState);
-
-        return {
-          ...field,
-          fieldMeta: parsedFieldMeta,
-        };
-      }
-
-      return field;
-    });
-
-    form.setValue('fields', updatedFields);
-  };
-
   const {
     append,
     remove,
@@ -163,6 +153,72 @@ export const AddTemplateFieldsFormPartial = ({
   const selectedSignerStyles = useSignerColors(
     selectedSignerIndex === -1 ? 0 : selectedSignerIndex,
   );
+
+  const onFieldCopy = useCallback(
+    (event?: KeyboardEvent | null, options?: { duplicate?: boolean }) => {
+      const { duplicate = false } = options ?? {};
+
+      if (lastActiveField) {
+        event?.preventDefault();
+
+        if (!duplicate) {
+          setFieldClipboard(lastActiveField);
+
+          toast({
+            title: 'Copied field',
+            description: 'Copied field to clipboard',
+          });
+
+          return;
+        }
+
+        const newField: TAddTemplateFieldsFormSchema['fields'][0] = {
+          ...structuredClone(lastActiveField),
+          formId: nanoid(12),
+          signerEmail: selectedSigner?.email ?? lastActiveField.signerEmail,
+          signerId: selectedSigner?.id ?? lastActiveField.signerId,
+          signerToken: selectedSigner?.token ?? lastActiveField.signerToken,
+          pageX: lastActiveField.pageX + 3,
+          pageY: lastActiveField.pageY + 3,
+        };
+
+        append(newField);
+      }
+    },
+    [
+      append,
+      lastActiveField,
+      selectedSigner?.email,
+      selectedSigner?.id,
+      selectedSigner?.token,
+      toast,
+    ],
+  );
+
+  const onFieldPaste = useCallback(
+    (event: KeyboardEvent) => {
+      if (fieldClipboard) {
+        event.preventDefault();
+
+        const copiedField = structuredClone(fieldClipboard);
+
+        append({
+          ...copiedField,
+          formId: nanoid(12),
+          signerEmail: selectedSigner?.email ?? copiedField.signerEmail,
+          signerId: selectedSigner?.id ?? copiedField.signerId,
+          signerToken: selectedSigner?.token ?? copiedField.signerToken,
+          pageX: copiedField.pageX + 3,
+          pageY: copiedField.pageY + 3,
+        });
+      }
+    },
+    [append, fieldClipboard, selectedSigner?.email, selectedSigner?.id, selectedSigner?.token],
+  );
+
+  useHotkeys(['ctrl+c', 'meta+c'], (evt) => onFieldCopy(evt));
+  useHotkeys(['ctrl+v', 'meta+v'], (evt) => onFieldPaste(evt));
+  useHotkeys(['ctrl+d', 'meta+d'], (evt) => onFieldCopy(evt, { duplicate: true }));
 
   const filterFieldsWithEmptyValues = (fields: typeof localFields, fieldType: string) =>
     fields
@@ -402,6 +458,25 @@ export const AddTemplateFieldsFormPartial = ({
     setShowAdvancedSettings((prev) => !prev);
   };
 
+  const handleSavedFieldSettings = (fieldState: FieldMeta) => {
+    const initialValues = form.getValues();
+
+    const updatedFields = initialValues.fields.map((field) => {
+      if (field.formId === currentField?.formId) {
+        const parsedFieldMeta = ZFieldMetaSchema.parse(fieldState);
+
+        return {
+          ...field,
+          fieldMeta: parsedFieldMeta,
+        };
+      }
+
+      return field;
+    });
+
+    form.setValue('fields', updatedFields);
+  };
+
   const isTypedSignatureEnabled = form.watch('typedSignatureEnabled');
 
   const handleTypedSignatureChange = (value: boolean) => {
@@ -468,9 +543,12 @@ export const AddTemplateFieldsFormPartial = ({
                     defaultHeight={DEFAULT_HEIGHT_PX}
                     defaultWidth={DEFAULT_WIDTH_PX}
                     passive={isFieldWithinBounds && !!selectedField}
+                    onFocus={() => setLastActiveField(field)}
+                    onBlur={() => setLastActiveField(null)}
                     onResize={(options) => onFieldResize(options, index)}
                     onMove={(options) => onFieldMove(options, index)}
                     onRemove={() => remove(index)}
+                    onDuplicate={() => onFieldCopy(null, { duplicate: true })}
                     onAdvancedSettings={() => {
                       setCurrentField(field);
                       handleAdvancedSettings();

@@ -65,7 +65,7 @@ export const CreatePasskeyDialog = ({ trigger, onSuccess, ...props }: CreatePass
     },
   });
 
-  const { mutateAsync: createPasskeyRegistrationOptions, isLoading } =
+  const { mutateAsync: createPasskeyRegistrationOptions, isPending } =
     trpc.auth.createPasskeyRegistrationOptions.useMutation();
 
   const { mutateAsync: createPasskey } = trpc.auth.createPasskey.useMutation();
@@ -141,7 +141,7 @@ export const CreatePasskeyDialog = ({ trigger, onSuccess, ...props }: CreatePass
     >
       <DialogTrigger onClick={(e) => e.stopPropagation()} asChild={true}>
         {trigger ?? (
-          <Button variant="secondary" loading={isLoading}>
+          <Button variant="secondary" loading={isPending}>
             <KeyRoundIcon className="-ml-1 mr-1 h-5 w-5" />
             <Trans>Add passkey</Trans>
           </Button>

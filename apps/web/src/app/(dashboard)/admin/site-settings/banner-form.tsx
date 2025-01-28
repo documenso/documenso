@@ -13,7 +13,6 @@ import {
   SITE_SETTINGS_BANNER_ID,
   ZSiteSettingsBannerSchema,
 } from '@documenso/lib/server-only/site-settings/schemas/banner';
-import { TRPCClientError } from '@documenso/trpc/client';
 import { trpc as trpcReact } from '@documenso/trpc/react';
 import { Button } from '@documenso/ui/primitives/button';
 import { ColorPicker } from '@documenso/ui/primitives/color-picker';
@@ -59,7 +58,7 @@ export function BannerForm({ banner }: BannerFormProps) {
 
   const enabled = form.watch('enabled');
 
-  const { mutateAsync: updateSiteSetting, isLoading: isUpdateSiteSettingLoading } =
+  const { mutateAsync: updateSiteSetting, isPending: isUpdateSiteSettingLoading } =
     trpcReact.admin.updateSiteSetting.useMutation();
 
   const onBannerUpdate = async ({ id, enabled, data }: TBannerFormSchema) => {
@@ -78,21 +77,13 @@ export function BannerForm({ banner }: BannerFormProps) {
 
       router.refresh();
     } catch (err) {
-      if (err instanceof TRPCClientError && err.data?.code === 'BAD_REQUEST') {
-        toast({
-          title: _(msg`An error occurred`),
-          description: err.message,
-          variant: 'destructive',
-        });
-      } else {
-        toast({
-          title: _(msg`An unknown error occurred`),
-          variant: 'destructive',
-          description: _(
-            msg`We encountered an unknown error while attempting to update the banner. Please try again later.`,
-          ),
-        });
-      }
+      toast({
+        title: _(msg`An unknown error occurred`),
+        variant: 'destructive',
+        description: _(
+          msg`We encountered an unknown error while attempting to update the banner. Please try again later.`,
+        ),
+      });
     }
   };
 

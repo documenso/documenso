@@ -28,7 +28,7 @@ import { useToast } from '@documenso/ui/primitives/use-toast';
 
 export type DocumentPageViewRecipientsProps = {
   document: Document & {
-    Recipient: Recipient[];
+    recipients: Recipient[];
   };
   documentRootPath: string;
 };
@@ -40,7 +40,7 @@ export const DocumentPageViewRecipients = ({
   const { _ } = useLingui();
   const { toast } = useToast();
 
-  const recipients = document.Recipient;
+  const recipients = document.recipients;
 
   return (
     <section className="dark:bg-background border-border bg-widget flex flex-col rounded-xl border">

@@ -1,5 +1,3 @@
-import { z } from 'zod';
-
 import { validateCheckboxField } from '@documenso/lib/advanced-fields-validation/validate-checkbox';
 import { validateDropdownField } from '@documenso/lib/advanced-fields-validation/validate-dropdown';
 import { validateNumberField } from '@documenso/lib/advanced-fields-validation/validate-number';
@@ -16,10 +14,10 @@ import {
 } from '@documenso/lib/types/field-meta';
 import { prisma } from '@documenso/prisma';
 import { FieldType } from '@documenso/prisma/client';
-import { FieldSchema } from '@documenso/prisma/generated/zod';
 
 export type SetFieldsForTemplateOptions = {
   userId: number;
+  teamId?: number;
   templateId: number;
   fields: {
     id?: number | null;
@@ -34,34 +32,30 @@ export type SetFieldsForTemplateOptions = {
   }[];
 };
 
-export const ZSetFieldsForTemplateResponseSchema = z.object({
-  fields: z.array(FieldSchema),
-});
-
-export type TSetFieldsForTemplateResponse = z.infer<typeof ZSetFieldsForTemplateResponseSchema>;
-
 export const setFieldsForTemplate = async ({
   userId,
+  teamId,
   templateId,
   fields,
-}: SetFieldsForTemplateOptions): Promise<TSetFieldsForTemplateResponse> => {
+}: SetFieldsForTemplateOptions) => {
   const template = await prisma.template.findFirst({
     where: {
       id: templateId,
-      OR: [
-        {
-          userId,
-        },
-        {
-          team: {
-            members: {
-              some: {
-                userId,
+      ...(teamId
+        ? {
+            team: {
+              id: teamId,
+              members: {
+                some: {
+                  userId,
+                },
               },
             },
-          },
-        },
-      ],
+          }
+        : {
+            userId,
+            teamId: null,
+          }),
     },
   });
 
@@ -74,7 +68,7 @@ export const setFieldsForTemplate = async ({
       templateId,
     },
     include: {
-      Recipient: true,
+      recipient: true,
     },
   });
 
@@ -179,12 +173,12 @@ export const setFieldsForTemplate = async ({
           customText: '',
           inserted: false,
           fieldMeta: parsedFieldMeta,
-          Template: {
+          template: {
             connect: {
               id: templateId,
             },
           },
-          Recipient: {
+          recipient: {
             connect: {
               templateId_email: {
                 templateId,

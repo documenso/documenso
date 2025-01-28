@@ -1,6 +1,6 @@
 {
   "name": "@documenso/web",
-  "version": "1.9.0-rc.5",
+  "version": "1.9.0-rc.11",
   "private": true,
   "license": "AGPL-3.0",
   "scripts": {
@@ -26,7 +26,6 @@
     "@lingui/react": "^4.11.3",
     "@simplewebauthn/browser": "^9.0.1",
     "@simplewebauthn/server": "^9.0.3",
-    "@tanstack/react-query": "^4.29.5",
     "colord": "^2.9.3",
     "cookie-es": "^1.0.0",
     "formidable": "^2.1.1",
@@ -55,7 +54,7 @@
     "recharts": "^2.7.2",
     "remeda": "^2.17.3",
     "sharp": "0.32.6",
-    "trpc-openapi": "^1.2.0",
+    "trpc-to-openapi": "2.0.4",
     "ts-pattern": "^5.0.5",
     "ua-parser-js": "^1.0.37",
     "uqr": "^0.1.2",
@@ -68,11 +67,11 @@
     "@simplewebauthn/types": "^9.0.1",
     "@types/formidable": "^2.0.6",
     "@types/luxon": "^3.3.1",
-    "@types/node": "20.1.0",
+    "@types/node": "^20",
     "@types/papaparse": "^5.3.14",
     "@types/react": "^18",
     "@types/react-dom": "^18",
     "@types/ua-parser-js": "^0.7.39",
-    "typescript": "5.2.2"
+    "typescript": "5.6.2"
   }
 }

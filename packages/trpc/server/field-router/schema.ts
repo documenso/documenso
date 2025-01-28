@@ -1,10 +1,112 @@
 import { z } from 'zod';
 
 import { ZRecipientActionAuthSchema } from '@documenso/lib/types/document-auth';
-import { ZFieldMetaSchema } from '@documenso/lib/types/field-meta';
+import {
+  ZFieldHeightSchema,
+  ZFieldPageNumberSchema,
+  ZFieldPageXSchema,
+  ZFieldPageYSchema,
+  ZFieldSchema,
+  ZFieldWidthSchema,
+} from '@documenso/lib/types/field';
+import { ZFieldAndMetaSchema, ZFieldMetaSchema } from '@documenso/lib/types/field-meta';
 import { FieldType } from '@documenso/prisma/client';
 
-export const ZAddFieldsMutationSchema = z.object({
+const ZCreateFieldSchema = ZFieldAndMetaSchema.and(
+  z.object({
+    recipientId: z.number().describe('The ID of the recipient to create the field for.'),
+    pageNumber: ZFieldPageNumberSchema,
+    pageX: ZFieldPageXSchema,
+    pageY: ZFieldPageYSchema,
+    width: ZFieldWidthSchema,
+    height: ZFieldHeightSchema,
+  }),
+);
+
+const ZUpdateFieldSchema = ZFieldAndMetaSchema.and(
+  z.object({
+    id: z.number().describe('The ID of the field to update.'),
+    pageNumber: ZFieldPageNumberSchema.optional(),
+    pageX: ZFieldPageXSchema.optional(),
+    pageY: ZFieldPageYSchema.optional(),
+    width: ZFieldWidthSchema.optional(),
+    height: ZFieldHeightSchema.optional(),
+  }),
+);
+
+export const ZCreateDocumentFieldRequestSchema = z.object({
+  documentId: z.number(),
+  field: ZCreateFieldSchema,
+});
+
+export const ZCreateDocumentFieldResponseSchema = ZFieldSchema;
+
+export const ZCreateDocumentFieldsRequestSchema = z.object({
+  documentId: z.number(),
+  fields: ZCreateFieldSchema.array(),
+});
+
+export const ZCreateDocumentFieldsResponseSchema = z.object({
+  fields: z.array(ZFieldSchema),
+});
+
+export const ZUpdateDocumentFieldRequestSchema = z.object({
+  documentId: z.number(),
+  field: ZUpdateFieldSchema,
+});
+
+export const ZUpdateDocumentFieldResponseSchema = ZFieldSchema;
+
+export const ZUpdateDocumentFieldsRequestSchema = z.object({
+  documentId: z.number(),
+  fields: ZUpdateFieldSchema.array(),
+});
+
+export const ZUpdateDocumentFieldsResponseSchema = z.object({
+  fields: z.array(ZFieldSchema),
+});
+
+export const ZDeleteDocumentFieldRequestSchema = z.object({
+  fieldId: z.number(),
+});
+
+export const ZCreateTemplateFieldRequestSchema = z.object({
+  templateId: z.number(),
+  field: ZCreateFieldSchema,
+});
+
+export const ZCreateTemplateFieldResponseSchema = ZFieldSchema;
+
+export const ZCreateTemplateFieldsRequestSchema = z.object({
+  templateId: z.number(),
+  fields: ZCreateFieldSchema.array(),
+});
+
+export const ZCreateTemplateFieldsResponseSchema = z.object({
+  fields: z.array(ZFieldSchema),
+});
+
+export const ZUpdateTemplateFieldRequestSchema = z.object({
+  templateId: z.number(),
+  field: ZUpdateFieldSchema,
+});
+
+export const ZUpdateTemplateFieldsRequestSchema = z.object({
+  templateId: z.number(),
+  fields: ZUpdateFieldSchema.array(),
+});
+
+export const ZUpdateTemplateFieldsResponseSchema = z.object({
+  fields: z.array(ZFieldSchema),
+});
+
+export const ZUpdateTemplateFieldResponseSchema = ZFieldSchema;
+
+export const ZDeleteTemplateFieldRequestSchema = z.object({
+  fieldId: z.number(),
+});
+
+export const ZSetDocumentFieldsRequestSchema = z.object({
   documentId: z.number(),
   fields: z.array(
     z.object({
@@ -22,9 +124,11 @@ export const ZAddFieldsMutationSchema = z.object({
   ),
 });
 
-export type TAddFieldsMutationSchema = z.infer<typeof ZAddFieldsMutationSchema>;
+export const ZSetDocumentFieldsResponseSchema = z.object({
+  fields: z.array(ZFieldSchema),
+});
 
-export const ZAddTemplateFieldsMutationSchema = z.object({
+export const ZSetFieldsForTemplateRequestSchema = z.object({
   templateId: z.number(),
   fields: z.array(
     z.object({
@@ -42,7 +146,9 @@ export const ZAddTemplateFieldsMutationSchema = z.object({
   ),
 });
 
-export type TAddTemplateFieldsMutationSchema = z.infer<typeof ZAddTemplateFieldsMutationSchema>;
+export const ZSetFieldsForTemplateResponseSchema = z.object({
+  fields: z.array(ZFieldSchema),
+});
 
 export const ZSignFieldWithTokenMutationSchema = z.object({
   token: z.string(),
@@ -63,16 +169,8 @@ export type TRemovedSignedFieldWithTokenMutationSchema = z.infer<
   typeof ZRemovedSignedFieldWithTokenMutationSchema
 >;
 
-export const ZGetFieldQuerySchema = z.object({
+export const ZGetFieldRequestSchema = z.object({
   fieldId: z.number(),
-  teamId: z.number().optional(),
 });
 
-export type TGetFieldQuerySchema = z.infer<typeof ZGetFieldQuerySchema>;
-
-export const ZUpdateFieldMutationSchema = z.object({
-  fieldId: z.number(),
-  documentId: z.number(),
-  fieldMeta: ZFieldMetaSchema,
-  teamId: z.number().optional(),
-});
+export const ZGetFieldResponseSchema = ZFieldSchema;

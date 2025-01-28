@@ -5,7 +5,7 @@ import path from 'path';
 
 import { extractDocumentAuthMethods } from '@documenso/lib/utils/document-auth';
 import { prisma } from '@documenso/prisma';
-import { DocumentDataType } from '@documenso/prisma/client';
+import { DocumentDataType, TeamMemberRole } from '@documenso/prisma/client';
 import { seedUserSubscription } from '@documenso/prisma/seed/subscriptions';
 import { seedTeam } from '@documenso/prisma/seed/teams';
 import { seedBlankTemplate } from '@documenso/prisma/seed/templates';
@@ -27,7 +27,7 @@ function createTempPdfFile() {
     '%PDF-1.4\n1 0 obj<</Type/Catalog/Pages 2 0 R>>endobj 2 0 obj<</Type/Pages/Kids[3 0 R]/Count 1>>endobj 3 0 obj<</Type/Page/MediaBox[0 0 612 792]/Parent 2 0 R>>endobj\nxref\n0 4\n0000000000 65535 f\n0000000009 00000 n\n0000000052 00000 n\n0000000101 00000 n\ntrailer<</Size 4/Root 1 0 R>>\nstartxref\n178\n%%EOF',
   );
 
-  fs.writeFileSync(tempFilePath, pdfContent);
+  fs.writeFileSync(tempFilePath, new Uint8Array(pdfContent));
   return tempFilePath;
 }
 
@@ -124,7 +124,7 @@ test('[TEMPLATE]: should create a document from a template', async ({ page }) =>
       id: documentId,
     },
     include: {
-      Recipient: true,
+      recipients: true,
       documentMeta: true,
     },
   });
@@ -144,8 +144,8 @@ test('[TEMPLATE]: should create a document from a template', async ({ page }) =>
   expect(document.documentMeta?.subject).toEqual('SUBJECT');
   expect(document.documentMeta?.timezone).toEqual('Etc/UTC');
 
-  const recipientOne = document.Recipient[0];
-  const recipientTwo = document.Recipient[1];
+  const recipientOne = document.recipients[0];
+  const recipientTwo = document.recipients[1];
 
   const recipientOneAuth = extractDocumentAuthMethods({
     documentAuth: document.authOptions,
@@ -259,7 +259,7 @@ test('[TEMPLATE]: should create a team document from a team template', async ({ 
       id: documentId,
     },
     include: {
-      Recipient: true,
+      recipients: true,
       documentMeta: true,
     },
   });
@@ -281,8 +281,8 @@ test('[TEMPLATE]: should create a team document from a team template', async ({ 
   expect(document.documentMeta?.subject).toEqual('SUBJECT');
   expect(document.documentMeta?.timezone).toEqual('Etc/UTC');
 
-  const recipientOne = document.Recipient[0];
-  const recipientTwo = document.Recipient[1];
+  const recipientOne = document.recipients[0];
+  const recipientTwo = document.recipients[1];
 
   const recipientOneAuth = extractDocumentAuthMethods({
     documentAuth: document.authOptions,
@@ -528,4 +528,91 @@ test('[TEMPLATE]: should create a document from a template using template docume
     templateWithData.templateDocumentData.initialData,
   );
   expect(document.documentData.type).toEqual(templateWithData.templateDocumentData.type);
+});
+
+test('[TEMPLATE]: should persist document visibility when creating from template', async ({
+  page,
+}) => {
+  const { owner, ...team } = await seedTeam({
+    createTeamMembers: 2,
+  });
+
+  const template = await seedBlankTemplate(owner, {
+    createTemplateOptions: {
+      teamId: team.id,
+    },
+  });
+
+  await apiSignin({
+    page,
+    email: owner.email,
+    redirectPath: `/t/${team.url}/templates/${template.id}/edit`,
+  });
+
+  // Set template title and visibility
+  await page.getByLabel('Title').fill('TEMPLATE_WITH_VISIBILITY');
+  await page.getByTestId('documentVisibilitySelectValue').click();
+  await page.getByLabel('Managers and above').click();
+  await expect(page.getByTestId('documentVisibilitySelectValue')).toContainText(
+    'Managers and above',
+  );
+
+  await page.getByRole('button', { name: 'Continue' }).click();
+  await expect(page.getByRole('heading', { name: 'Add Placeholder' })).toBeVisible();
+
+  // Add a signer
+  await page.getByPlaceholder('Email').fill('recipient@documenso.com');
+  await page.getByPlaceholder('Name').fill('Recipient');
+
+  await page.getByRole('button', { name: 'Continue' }).click();
+  await expect(page.getByRole('heading', { name: 'Add Fields' })).toBeVisible();
+
+  await page.getByRole('button', { name: 'Save template' }).click();
+
+  // Test creating document as team manager
+  await prisma.teamMember.update({
+    where: {
+      id: team.members[1].id,
+    },
+    data: {
+      role: TeamMemberRole.MANAGER,
+    },
+  });
+
+  const managerUser = team.members[1].user;
+
+  await apiSignin({
+    page,
+    email: managerUser.email,
+    redirectPath: `/t/${team.url}/templates`,
+  });
+
+  await page.getByRole('button', { name: 'Use Template' }).click();
+  await page.getByRole('button', { name: 'Create as draft' }).click();
+
+  // Review that the document was created with the correct visibility
+  await page.waitForURL(/documents/);
+
+  const documentId = Number(page.url().split('/').pop());
+
+  const document = await prisma.document.findFirstOrThrow({
+    where: {
+      id: documentId,
+    },
+  });
+
+  expect(document.title).toEqual('TEMPLATE_WITH_VISIBILITY');
+  expect(document.visibility).toEqual('MANAGER_AND_ABOVE');
+  expect(document.teamId).toEqual(team.id);
+
+  // Test that regular member cannot create document from restricted template
+  const memberUser = team.members[2].user;
+  await apiSignin({
+    page,
+    email: memberUser.email,
+    redirectPath: `/t/${team.url}/templates`,
+  });
+
+  // Template should not be visible to regular member
+  await expect(page.getByRole('button', { name: 'Use Template' })).not.toBeVisible();
 });

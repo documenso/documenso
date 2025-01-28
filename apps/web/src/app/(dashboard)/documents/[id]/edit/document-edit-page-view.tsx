@@ -52,7 +52,7 @@ export const DocumentEditPageView = async ({ params, team }: DocumentEditPageVie
 
   const documentVisibility = document?.visibility;
   const currentTeamMemberRole = team?.currentTeamMember?.role;
-  const isRecipient = document?.Recipient.find((recipient) => recipient.email === user.email);
+  const isRecipient = document?.recipients.find((recipient) => recipient.email === user.email);
   let canAccessDocument = true;
 
   if (!isRecipient && document?.userId !== user.id) {
@@ -78,7 +78,7 @@ export const DocumentEditPageView = async ({ params, team }: DocumentEditPageVie
     redirect(`${documentRootPath}/${documentId}`);
   }
 
-  const { documentMeta, Recipient: recipients } = document;
+  const { documentMeta, recipients } = document;
 
   if (documentMeta?.password) {
     const key = DOCUMENSO_ENCRYPTION_KEY;

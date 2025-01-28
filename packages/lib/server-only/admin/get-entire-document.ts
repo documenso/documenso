@@ -11,18 +11,18 @@ export const getEntireDocument = async ({ id }: GetEntireDocumentOptions) => {
     },
     include: {
       documentMeta: true,
-      User: {
+      user: {
         select: {
           id: true,
           name: true,
           email: true,
         },
       },
-      Recipient: {
+      recipients: {
         include: {
-          Field: {
+          fields: {
             include: {
-              Signature: true,
+              signature: true,
             },
           },
         },

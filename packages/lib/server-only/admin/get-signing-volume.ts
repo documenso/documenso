@@ -26,7 +26,7 @@ export async function getSigningVolume({
 }: GetSigningVolumeOptions) {
   const offset = Math.max(page - 1, 0) * perPage;
 
-  const baseQuery = kyselyPrisma.$kysely
+  let findQuery = kyselyPrisma.$kysely
     .selectFrom('Subscription as s')
     .leftJoin('User as u', 's.userId', 'u.id')
     .leftJoin('Team as t', 's.teamId', 't.id')
@@ -61,20 +61,21 @@ export async function getSigningVolume({
     ])
     .groupBy(['s.id', 'u.name', 't.name', 'u.email']);
 
-  const sortQuery = (() => {
-    switch (sortBy) {
-      case 'name':
-        return baseQuery.orderBy('name', sortOrder);
-      case 'createdAt':
-        return baseQuery.orderBy('createdAt', sortOrder);
-      case 'signingVolume':
-        return baseQuery.orderBy('signingVolume', sortOrder);
-      default:
-        return baseQuery.orderBy('signingVolume', 'desc');
-    }
-  })();
+  switch (sortBy) {
+    case 'name':
+      findQuery = findQuery.orderBy('name', sortOrder);
+      break;
+    case 'createdAt':
+      findQuery = findQuery.orderBy('createdAt', sortOrder);
+      break;
+    case 'signingVolume':
+      findQuery = findQuery.orderBy('signingVolume', sortOrder);
+      break;
+    default:
+      findQuery = findQuery.orderBy('signingVolume', 'desc');
+  }
 
-  const finalQuery = sortQuery.limit(perPage).offset(offset);
+  findQuery = findQuery.limit(perPage).offset(offset);
 
   const countQuery = kyselyPrisma.$kysely
     .selectFrom('Subscription as s')
@@ -91,7 +92,7 @@ export async function getSigningVolume({
     )
     .select(({ fn }) => [fn.countAll().as('count')]);
 
-  const [results, [{ count }]] = await Promise.all([finalQuery.execute(), countQuery.execute()]);
+  const [results, [{ count }]] = await Promise.all([findQuery.execute(), countQuery.execute()]);
 
   return {
     leaderboard: results,

@@ -36,19 +36,19 @@ export const SEND_RECIPIENT_SIGNED_EMAIL_JOB_DEFINITION = {
     const document = await prisma.document.findFirst({
       where: {
         id: documentId,
-        Recipient: {
+        recipients: {
           some: {
             id: recipientId,
           },
         },
       },
       include: {
-        Recipient: {
+        recipients: {
           where: {
             id: recipientId,
           },
         },
-        User: true,
+        user: true,
         documentMeta: true,
         team: {
           include: {
@@ -62,7 +62,7 @@ export const SEND_RECIPIENT_SIGNED_EMAIL_JOB_DEFINITION = {
       throw new Error('Document not found');
     }
 
-    if (document.Recipient.length === 0) {
+    if (document.recipients.length === 0) {
       throw new Error('Document has no recipients');
     }
 
@@ -74,9 +74,9 @@ export const SEND_RECIPIENT_SIGNED_EMAIL_JOB_DEFINITION = {
       return;
     }
 
-    const [recipient] = document.Recipient;
+    const [recipient] = document.recipients;
     const { email: recipientEmail, name: recipientName } = recipient;
-    const { User: owner } = document;
+    const { user: owner } = document;
 
     const recipientReference = recipientName || recipientEmail;
 

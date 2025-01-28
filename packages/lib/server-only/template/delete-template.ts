@@ -12,26 +12,21 @@ export const deleteTemplate = async ({ id, userId, teamId }: DeleteTemplateOptio
   return await prisma.template.delete({
     where: {
       id,
-      OR:
-        teamId === undefined
-          ? [
-              {
-                userId,
-                teamId: null,
-              },
-            ]
-          : [
-              {
-                teamId,
-                team: {
-                  members: {
-                    some: {
-                      userId,
-                    },
-                  },
+      ...(teamId
+        ? {
+            team: {
+              id: teamId,
+              members: {
+                some: {
+                  userId,
                 },
               },
-            ],
+            },
+          }
+        : {
+            userId,
+            teamId: null,
+          }),
     },
   });
 };

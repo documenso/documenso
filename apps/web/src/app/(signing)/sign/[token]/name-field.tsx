@@ -11,6 +11,7 @@ import { Loader } from 'lucide-react';
 import { DO_NOT_INVALIDATE_QUERY_ON_MUTATION } from '@documenso/lib/constants/trpc';
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import type { TRecipientActionAuth } from '@documenso/lib/types/document-auth';
+import { ZNameFieldMeta } from '@documenso/lib/types/field-meta';
 import { type Recipient } from '@documenso/prisma/client';
 import type { FieldWithSignature } from '@documenso/prisma/types/field-with-signature';
 import { trpc } from '@documenso/trpc/react';
@@ -18,6 +19,7 @@ import type {
   TRemovedSignedFieldWithTokenMutationSchema,
   TSignFieldWithTokenMutationSchema,
 } from '@documenso/trpc/server/field-router/schema';
+import { cn } from '@documenso/ui/lib/utils';
 import { Button } from '@documenso/ui/primitives/button';
 import { Dialog, DialogContent, DialogFooter, DialogTitle } from '@documenso/ui/primitives/dialog';
 import { Input } from '@documenso/ui/primitives/input';
@@ -48,13 +50,16 @@ export const NameField = ({ field, recipient, onSignField, onUnsignField }: Name
 
   const [isPending, startTransition] = useTransition();
 
-  const { mutateAsync: signFieldWithToken, isLoading: isSignFieldWithTokenLoading } =
+  const { mutateAsync: signFieldWithToken, isPending: isSignFieldWithTokenLoading } =
     trpc.field.signFieldWithToken.useMutation(DO_NOT_INVALIDATE_QUERY_ON_MUTATION);
 
   const {
     mutateAsync: removeSignedFieldWithToken,
-    isLoading: isRemoveSignedFieldWithTokenLoading,
+    isPending: isRemoveSignedFieldWithTokenLoading,
   } = trpc.field.removeSignedFieldWithToken.useMutation(DO_NOT_INVALIDATE_QUERY_ON_MUTATION);
+
+  const safeFieldMeta = ZNameFieldMeta.safeParse(field.fieldMeta);
+  const parsedFieldMeta = safeFieldMeta.success ? safeFieldMeta.data : null;
 
   const isLoading = isSignFieldWithTokenLoading || isRemoveSignedFieldWithTokenLoading || isPending;
 
@@ -172,9 +177,21 @@ export const NameField = ({ field, recipient, onSignField, onUnsignField }: Name
       )}
 
       {field.inserted && (
-        <p className="text-muted-foreground dark:text-background/80 text-[clamp(0.425rem,25cqw,0.825rem)] duration-200">
-          {field.customText}
-        </p>
+        <div className="flex h-full w-full items-center">
+          <p
+            className={cn(
+              'text-muted-foreground dark:text-background/80 w-full text-[clamp(0.425rem,25cqw,0.825rem)] duration-200',
+              {
+                'text-left': parsedFieldMeta?.textAlign === 'left',
+                'text-center':
+                  !parsedFieldMeta?.textAlign || parsedFieldMeta?.textAlign === 'center',
+                'text-right': parsedFieldMeta?.textAlign === 'right',
+              },
+            )}
+          >
+            {field.customText}
+          </p>
+        </div>
       )}
 
       <Dialog open={showFullNameModal} onOpenChange={setShowFullNameModal}>

@@ -15,13 +15,44 @@ export enum DocumentEmailEvents {
 
 export const ZDocumentEmailSettingsSchema = z
   .object({
-    recipientSigningRequest: z.boolean().default(true),
-    recipientRemoved: z.boolean().default(true),
-    recipientSigned: z.boolean().default(true),
-    documentPending: z.boolean().default(true),
-    documentCompleted: z.boolean().default(true),
-    documentDeleted: z.boolean().default(true),
-    ownerDocumentCompleted: z.boolean().default(true),
+    recipientSigningRequest: z
+      .boolean()
+      .describe(
+        'Whether to send an email to all recipients that the document is ready for them to sign.',
+      )
+      .default(true),
+    recipientRemoved: z
+      .boolean()
+      .describe(
+        'Whether to send an email to the recipient who was removed from a pending document.',
+      )
+      .default(true),
+    recipientSigned: z
+      .boolean()
+      .describe(
+        'Whether to send an email to the document owner when a recipient has signed the document.',
+      )
+      .default(true),
+    documentPending: z
+      .boolean()
+      .describe(
+        'Whether to send an email to the recipient who has just signed the document indicating that there are still other recipients who need to sign the document. This will only be sent if the document is still pending after the recipient has signed.',
+      )
+      .default(true),
+    documentCompleted: z
+      .boolean()
+      .describe('Whether to send an email to all recipients when the document is complete.')
+      .default(true),
+    documentDeleted: z
+      .boolean()
+      .describe(
+        'Whether to send an email to all recipients if a pending document has been deleted.',
+      )
+      .default(true),
+    ownerDocumentCompleted: z
+      .boolean()
+      .describe('Whether to send an email to the document owner when the document is complete.')
+      .default(true),
   })
   .strip()
   .catch(() => ({

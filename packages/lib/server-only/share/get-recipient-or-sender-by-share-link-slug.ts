@@ -15,7 +15,7 @@ export const getRecipientOrSenderByShareLinkSlug = async ({
 
   const sender = await prisma.user.findFirst({
     where: {
-      Document: { some: { id: documentId } },
+      documents: { some: { id: documentId } },
       email,
     },
     select: {
@@ -35,7 +35,7 @@ export const getRecipientOrSenderByShareLinkSlug = async ({
       email,
     },
     include: {
-      Signature: true,
+      signatures: true,
     },
   });
 

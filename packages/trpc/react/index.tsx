@@ -35,9 +35,10 @@ export const trpc = createTRPCReact<AppRouter>({
 
 export interface TrpcProviderProps {
   children: React.ReactNode;
+  headers?: Record<string, string>;
 }
 
-export function TrpcProvider({ children }: TrpcProviderProps) {
+export function TrpcProvider({ children, headers }: TrpcProviderProps) {
   let queryClientConfig: QueryClientConfig | undefined;
 
   const isDevelopingOffline =
@@ -62,16 +63,18 @@ export function TrpcProvider({ children }: TrpcProviderProps) {
 
   const [trpcClient] = useState(() =>
     trpc.createClient({
-      transformer: SuperJSON,
-
       links: [
         splitLink({
           condition: (op) => op.context.skipBatch === true,
           true: httpLink({
             url: `${getBaseUrl()}/api/trpc`,
+            headers,
+            transformer: SuperJSON,
           }),
           false: httpBatchLink({
             url: `${getBaseUrl()}/api/trpc`,
+            headers,
+            transformer: SuperJSON,
           }),
         }),
       ],

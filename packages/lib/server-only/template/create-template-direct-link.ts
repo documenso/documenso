@@ -1,7 +1,6 @@
 'use server';
 
 import { nanoid } from 'nanoid';
-import type { z } from 'zod';
 
 import {
   DIRECT_TEMPLATE_RECIPIENT_EMAIL,
@@ -9,47 +8,43 @@ import {
 } from '@documenso/lib/constants/direct-templates';
 import { prisma } from '@documenso/prisma';
 import type { Recipient } from '@documenso/prisma/client';
-import { TemplateDirectLinkSchema } from '@documenso/prisma/generated/zod';
 
 import { AppError, AppErrorCode } from '../../errors/app-error';
 
 export type CreateTemplateDirectLinkOptions = {
   templateId: number;
   userId: number;
+  teamId?: number;
   directRecipientId?: number;
 };
-
-export const ZCreateTemplateDirectLinkResponseSchema = TemplateDirectLinkSchema;
-
-export type TCreateTemplateDirectLinkResponse = z.infer<
-  typeof ZCreateTemplateDirectLinkResponseSchema
->;
 
 export const createTemplateDirectLink = async ({
   templateId,
   userId,
+  teamId,
   directRecipientId,
-}: CreateTemplateDirectLinkOptions): Promise<TCreateTemplateDirectLinkResponse> => {
+}: CreateTemplateDirectLinkOptions) => {
   const template = await prisma.template.findFirst({
     where: {
       id: templateId,
-      OR: [
-        {
-          userId,
-        },
-        {
-          team: {
-            members: {
-              some: {
-                userId,
+      ...(teamId
+        ? {
+            team: {
+              id: teamId,
+              members: {
+                some: {
+                  userId,
+                },
               },
             },
-          },
-        },
-      ],
+          }
+        : {
+            userId,
+            teamId: null,
+          }),
     },
     include: {
-      Recipient: true,
+      recipients: true,
       directLink: true,
     },
   });
@@ -64,14 +59,14 @@ export const createTemplateDirectLink = async ({
 
   if (
     directRecipientId &&
-    !template.Recipient.find((recipient) => recipient.id === directRecipientId)
+    !template.recipients.find((recipient) => recipient.id === directRecipientId)
   ) {
     throw new AppError(AppErrorCode.NOT_FOUND, { message: 'Recipient not found' });
   }
 
   if (
     !directRecipientId &&
-    template.Recipient.find(
+    template.recipients.find(
       (recipient) => recipient.email.toLowerCase() === DIRECT_TEMPLATE_RECIPIENT_EMAIL,
     )
   ) {

@@ -17,7 +17,7 @@ export const AcceptTeamInvitationButton = ({ teamId }: AcceptTeamInvitationButto
 
   const {
     mutateAsync: acceptTeamInvitation,
-    isLoading,
+    isPending,
     isSuccess,
   } = trpc.team.acceptTeamInvitation.useMutation({
     onSuccess: () => {
@@ -40,8 +40,8 @@ export const AcceptTeamInvitationButton = ({ teamId }: AcceptTeamInvitationButto
   return (
     <Button
       onClick={async () => acceptTeamInvitation({ teamId })}
-      loading={isLoading}
-      disabled={isLoading || isSuccess}
+      loading={isPending}
+      disabled={isPending || isSuccess}
     >
       <Trans>Accept</Trans>
     </Button>

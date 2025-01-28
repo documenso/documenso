@@ -45,7 +45,7 @@ test.describe('Signing Certificate Tests', () => {
       await page.mouse.up();
     }
 
-    for (const field of recipient.Field) {
+    for (const field of recipient.fields) {
       await page.locator(`#field-${field.id}`).getByRole('button').click();
 
       await expect(page.locator(`#field-${field.id}`)).toHaveAttribute('data-inserted', 'true');
@@ -122,7 +122,7 @@ test.describe('Signing Certificate Tests', () => {
       await page.mouse.up();
     }
 
-    for (const field of recipient.Field) {
+    for (const field of recipient.fields) {
       await page.locator(`#field-${field.id}`).getByRole('button').click();
 
       await expect(page.locator(`#field-${field.id}`)).toHaveAttribute('data-inserted', 'true');
@@ -199,7 +199,7 @@ test.describe('Signing Certificate Tests', () => {
       await page.mouse.up();
     }
 
-    for (const field of recipient.Field) {
+    for (const field of recipient.fields) {
       await page.locator(`#field-${field.id}`).getByRole('button').click();
 
       await expect(page.locator(`#field-${field.id}`)).toHaveAttribute('data-inserted', 'true');

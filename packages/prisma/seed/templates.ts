@@ -66,12 +66,12 @@ export const seedTemplate = async (options: SeedTemplateOptions) => {
           id: documentData.id,
         },
       },
-      User: {
+      user: {
         connect: {
           id: userId,
         },
       },
-      Recipient: {
+      recipients: {
         create: {
           email: 'recipient.1@documenso.com',
           name: 'Recipient 1',
@@ -114,12 +114,12 @@ export const seedDirectTemplate = async (options: SeedTemplateOptions) => {
           id: documentData.id,
         },
       },
-      User: {
+      user: {
         connect: {
           id: userId,
         },
       },
-      Recipient: {
+      recipients: {
         create: {
           email: DIRECT_TEMPLATE_RECIPIENT_EMAIL,
           name: DIRECT_TEMPLATE_RECIPIENT_NAME,
@@ -138,12 +138,12 @@ export const seedDirectTemplate = async (options: SeedTemplateOptions) => {
       ...options.createTemplateOptions,
     },
     include: {
-      Recipient: true,
-      User: true,
+      recipients: true,
+      user: true,
     },
   });
 
-  const directTemplateRecpient = template.Recipient.find(
+  const directTemplateRecpient = template.recipients.find(
     (recipient) => recipient.email === DIRECT_TEMPLATE_RECIPIENT_EMAIL,
   );
 
@@ -166,8 +166,8 @@ export const seedDirectTemplate = async (options: SeedTemplateOptions) => {
     },
     include: {
       directLink: true,
-      Field: true,
-      Recipient: true,
+      fields: true,
+      recipients: true,
       team: true,
     },
   });

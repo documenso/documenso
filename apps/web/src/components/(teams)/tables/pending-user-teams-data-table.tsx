@@ -31,14 +31,14 @@ export const PendingUserTeamsDataTable = () => {
 
   const [checkoutPendingTeamId, setCheckoutPendingTeamId] = useState<number | null>(null);
 
-  const { data, isLoading, isInitialLoading, isLoadingError } = trpc.team.findTeamsPending.useQuery(
+  const { data, isLoading, isLoadingError } = trpc.team.findTeamsPending.useQuery(
     {
       query: parsedSearchParams.query,
       page: parsedSearchParams.page,
       perPage: parsedSearchParams.perPage,
     },
     {
-      keepPreviousData: true,
+      placeholderData: (previousData) => previousData,
     },
   );
 
@@ -112,7 +112,7 @@ export const PendingUserTeamsDataTable = () => {
           enable: isLoadingError,
         }}
         skeleton={{
-          enable: isLoading && isInitialLoading,
+          enable: isLoading,
           rows: 3,
           component: (
             <>

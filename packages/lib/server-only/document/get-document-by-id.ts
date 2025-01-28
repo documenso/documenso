@@ -26,14 +26,14 @@ export const getDocumentById = async ({ documentId, userId, teamId }: GetDocumen
     include: {
       documentData: true,
       documentMeta: true,
-      User: {
+      user: {
         select: {
           id: true,
           name: true,
           email: true,
         },
       },
-      Recipient: {
+      recipients: {
         select: {
           email: true,
         },
@@ -119,14 +119,14 @@ export const getDocumentWhereInput = async ({
   if (team.teamEmail) {
     documentWhereInput.OR.push(
       {
-        Recipient: {
+        recipients: {
           some: {
             email: team.teamEmail.email,
           },
         },
       },
       {
-        User: {
+        user: {
           email: team.teamEmail.email,
         },
       },
@@ -154,7 +154,7 @@ export const getDocumentWhereInput = async ({
     {
       OR: [
         {
-          Recipient: {
+          recipients: {
             some: {
               email: user.email,
             },

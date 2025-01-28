@@ -1,21 +1,22 @@
 'use server';
 
-import type { z } from 'zod';
-
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import { normalizePdf as makeNormalizedPdf } from '@documenso/lib/server-only/pdf/normalize-pdf';
 import { DOCUMENT_AUDIT_LOG_TYPE } from '@documenso/lib/types/document-audit-logs';
-import type { RequestMetadata } from '@documenso/lib/universal/extract-request-metadata';
+import type { ApiRequestMetadata } from '@documenso/lib/universal/extract-request-metadata';
 import { createDocumentAuditLogData } from '@documenso/lib/utils/document-audit-logs';
 import { prisma } from '@documenso/prisma';
-import { DocumentSource, DocumentVisibility, WebhookTriggerEvents } from '@documenso/prisma/client';
+import { DocumentSource, WebhookTriggerEvents } from '@documenso/prisma/client';
 import type { Team, TeamGlobalSettings } from '@documenso/prisma/client';
 import { TeamMemberRole } from '@documenso/prisma/client';
-import { DocumentSchema } from '@documenso/prisma/generated/zod';
 
-import { ZWebhookDocumentSchema } from '../../types/webhook-payload';
+import {
+  ZWebhookDocumentSchema,
+  mapDocumentToWebhookDocumentPayload,
+} from '../../types/webhook-payload';
 import { getFile } from '../../universal/upload/get-file';
 import { putPdfFile } from '../../universal/upload/put-file';
+import { determineDocumentVisibility } from '../../utils/document-visibility';
 import { triggerWebhook } from '../webhooks/trigger/trigger-webhook';
 
 export type CreateDocumentOptions = {
@@ -27,12 +28,8 @@ export type CreateDocumentOptions = {
   formValues?: Record<string, string | number | boolean>;
   normalizePdf?: boolean;
   timezone?: string;
-  requestMetadata?: RequestMetadata;
+  requestMetadata: ApiRequestMetadata;
 };
-
-export const ZCreateDocumentResponseSchema = DocumentSchema;
-
-export type TCreateDocumentResponse = z.infer<typeof ZCreateDocumentResponseSchema>;
 
 export const createDocument = async ({
   userId,
@@ -44,7 +41,7 @@ export const createDocument = async ({
   formValues,
   requestMetadata,
   timezone,
-}: CreateDocumentOptions): Promise<TCreateDocumentResponse> => {
+}: CreateDocumentOptions) => {
   const user = await prisma.user.findFirstOrThrow({
     where: {
       id: userId,
@@ -92,25 +89,6 @@ export const createDocument = async ({
     userTeamRole = teamWithUserRole.members[0]?.role;
   }
 
-  const determineVisibility = (
-    globalVisibility: DocumentVisibility | null | undefined,
-    userRole: TeamMemberRole,
-  ): DocumentVisibility => {
-    if (globalVisibility) {
-      return globalVisibility;
-    }
-
-    if (userRole === TeamMemberRole.ADMIN) {
-      return DocumentVisibility.ADMIN;
-    }
-
-    if (userRole === TeamMemberRole.MANAGER) {
-      return DocumentVisibility.MANAGER_AND_ABOVE;
-    }
-
-    return DocumentVisibility.EVERYONE;
-  };
-
   if (normalizePdf) {
     const documentData = await prisma.documentData.findFirst({
       where: {
@@ -142,7 +120,7 @@ export const createDocument = async ({
         documentDataId,
         userId,
         teamId,
-        visibility: determineVisibility(
+        visibility: determineDocumentVisibility(
           team?.teamGlobalSettings?.documentVisibility,
           userTeamRole ?? TeamMemberRole.MEMBER,
         ),
@@ -162,8 +140,7 @@ export const createDocument = async ({
       data: createDocumentAuditLogData({
         type: DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_CREATED,
         documentId: document.id,
-        user,
-        requestMetadata,
+        metadata: requestMetadata,
         data: {
           title,
           source: {
@@ -179,7 +156,7 @@ export const createDocument = async ({
       },
       include: {
         documentMeta: true,
-        Recipient: true,
+        recipients: true,
       },
     });
 
@@ -189,7 +166,7 @@ export const createDocument = async ({
 
     await triggerWebhook({
       event: WebhookTriggerEvents.DOCUMENT_CREATED,
-      data: ZWebhookDocumentSchema.parse(createdDocument),
+      data: ZWebhookDocumentSchema.parse(mapDocumentToWebhookDocumentPayload(createdDocument)),
       userId,
       teamId,
     });

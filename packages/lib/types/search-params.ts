@@ -8,9 +8,9 @@ import { z } from 'zod';
  * Keep this and `ZUrlSearchParamsSchema` in sync.
  */
 export const ZFindSearchParamsSchema = z.object({
-  query: z.string().optional(),
-  page: z.coerce.number().min(1).optional(),
-  perPage: z.coerce.number().min(1).optional(),
+  query: z.string().describe('The search query.').optional(),
+  page: z.coerce.number().min(1).describe('The pagination page number, starts at 1.').optional(),
+  perPage: z.coerce.number().min(1).describe('The number of items per page.').max(100).optional(),
 });
 
 /**
@@ -31,16 +31,17 @@ export const ZUrlSearchParamsSchema = z.object({
   perPage: z.coerce
     .number()
     .min(1)
+    .max(100)
     .optional()
     .catch(() => undefined),
 });
 
 export const ZFindResultResponse = z.object({
-  data: z.union([z.array(z.unknown()), z.unknown()]),
-  count: z.number(),
-  currentPage: z.number(),
-  perPage: z.number(),
-  totalPages: z.number(),
+  data: z.union([z.array(z.unknown()), z.unknown()]).describe('The results from the search.'),
+  count: z.number().describe('The total number of items.'),
+  currentPage: z.number().describe('The current page number, starts at 1.'),
+  perPage: z.number().describe('The number of items per page.'),
+  totalPages: z.number().describe('The total number of pages.'),
 });
 
 // Can't infer generics from Zod.
