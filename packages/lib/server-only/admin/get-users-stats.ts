@@ -100,7 +100,7 @@ export const getMonthlyActiveUsers = async () => {
         COUNT(DISTINCT "id") as "count",
         SUM(COUNT(DISTINCT "id")) OVER (ORDER BY DATE_TRUNC('month', "lastSignedIn")) as "cume_count"
       FROM "User"
-      WHERE "lastSignedIn" >= NOW() - INTERVAL '1 year'
+      WHERE "lastSignedIn" >= NOW() - INTERVAL '1 year' AND "disabled" = false
       GROUP BY DATE_TRUNC('month', "lastSignedIn")
       ORDER BY "month" DESC
       LIMIT 12
