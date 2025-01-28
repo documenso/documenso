@@ -37,17 +37,16 @@ export const DocumentLogsDataTable = ({ documentId }: DocumentLogsDataTableProps
 
   const parsedSearchParams = ZUrlSearchParamsSchema.parse(Object.fromEntries(searchParams ?? []));
 
-  const { data, isLoading, isInitialLoading, isLoadingError } =
-    trpc.document.findDocumentAuditLogs.useQuery(
-      {
-        documentId,
-        page: parsedSearchParams.page,
-        perPage: parsedSearchParams.perPage,
-      },
-      {
-        keepPreviousData: true,
-      },
-    );
+  const { data, isLoading, isLoadingError } = trpc.document.findDocumentAuditLogs.useQuery(
+    {
+      documentId,
+      page: parsedSearchParams.page,
+      perPage: parsedSearchParams.perPage,
+    },
+    {
+      placeholderData: (previousData) => previousData,
+    },
+  );
 
   const onPaginationChange = (page: number, perPage: number) => {
     updateSearchParams({
@@ -132,7 +131,7 @@ export const DocumentLogsDataTable = ({ documentId }: DocumentLogsDataTableProps
         enable: isLoadingError,
       }}
       skeleton={{
-        enable: isLoading && isInitialLoading,
+        enable: isLoading,
         rows: 3,
         component: (
           <>

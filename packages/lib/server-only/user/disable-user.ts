@@ -11,11 +11,11 @@ export const disableUser = async ({ id }: DisableUserOptions) => {
       id,
     },
     include: {
-      ApiToken: true,
-      Webhooks: true,
+      apiTokens: true,
+      webhooks: true,
       passkeys: true,
-      VerificationToken: true,
-      PasswordResetToken: true,
+      verificationTokens: true,
+      passwordResetTokens: true,
     },
   });
 

@@ -56,8 +56,8 @@ export const SigningPageView = ({
   const shouldUseTeamDetails =
     document.teamId && document.team?.teamGlobalSettings?.includeSenderDetails === false;
 
-  let senderName = document.User.name ?? '';
-  let senderEmail = `(${document.User.email})`;
+  let senderName = document.user.name ?? '';
+  let senderEmail = `(${document.user.email})`;
 
   if (shouldUseTeamDetails) {
     senderName = document.team?.name ?? '';

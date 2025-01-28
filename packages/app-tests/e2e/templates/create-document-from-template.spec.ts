@@ -27,7 +27,7 @@ function createTempPdfFile() {
     '%PDF-1.4\n1 0 obj<</Type/Catalog/Pages 2 0 R>>endobj 2 0 obj<</Type/Pages/Kids[3 0 R]/Count 1>>endobj 3 0 obj<</Type/Page/MediaBox[0 0 612 792]/Parent 2 0 R>>endobj\nxref\n0 4\n0000000000 65535 f\n0000000009 00000 n\n0000000052 00000 n\n0000000101 00000 n\ntrailer<</Size 4/Root 1 0 R>>\nstartxref\n178\n%%EOF',
   );
 
-  fs.writeFileSync(tempFilePath, pdfContent);
+  fs.writeFileSync(tempFilePath, new Uint8Array(pdfContent));
   return tempFilePath;
 }
 
@@ -124,7 +124,7 @@ test('[TEMPLATE]: should create a document from a template', async ({ page }) =>
       id: documentId,
     },
     include: {
-      Recipient: true,
+      recipients: true,
       documentMeta: true,
     },
   });
@@ -144,8 +144,8 @@ test('[TEMPLATE]: should create a document from a template', async ({ page }) =>
   expect(document.documentMeta?.subject).toEqual('SUBJECT');
   expect(document.documentMeta?.timezone).toEqual('Etc/UTC');
 
-  const recipientOne = document.Recipient[0];
-  const recipientTwo = document.Recipient[1];
+  const recipientOne = document.recipients[0];
+  const recipientTwo = document.recipients[1];
 
   const recipientOneAuth = extractDocumentAuthMethods({
     documentAuth: document.authOptions,
@@ -259,7 +259,7 @@ test('[TEMPLATE]: should create a team document from a team template', async ({ 
       id: documentId,
     },
     include: {
-      Recipient: true,
+      recipients: true,
       documentMeta: true,
     },
   });
@@ -281,8 +281,8 @@ test('[TEMPLATE]: should create a team document from a team template', async ({ 
   expect(document.documentMeta?.subject).toEqual('SUBJECT');
   expect(document.documentMeta?.timezone).toEqual('Etc/UTC');
 
-  const recipientOne = document.Recipient[0];
-  const recipientTwo = document.Recipient[1];
+  const recipientOne = document.recipients[0];
+  const recipientTwo = document.recipients[1];
 
   const recipientOneAuth = extractDocumentAuthMethods({
     documentAuth: document.authOptions,

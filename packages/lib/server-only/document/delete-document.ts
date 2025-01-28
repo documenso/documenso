@@ -20,9 +20,10 @@ import { DocumentStatus, SendStatus } from '@documenso/prisma/client';
 import { getI18nInstance } from '../../client-only/providers/i18n.server';
 import { NEXT_PUBLIC_WEBAPP_URL } from '../../constants/app';
 import { FROM_ADDRESS, FROM_NAME } from '../../constants/email';
+import { AppError, AppErrorCode } from '../../errors/app-error';
 import { DOCUMENT_AUDIT_LOG_TYPE } from '../../types/document-audit-logs';
 import { extractDerivedDocumentEmailSettings } from '../../types/document-email';
-import type { RequestMetadata } from '../../universal/extract-request-metadata';
+import type { ApiRequestMetadata } from '../../universal/extract-request-metadata';
 import { createDocumentAuditLogData } from '../../utils/document-audit-logs';
 import { renderEmailWithI18N } from '../../utils/render-email-with-i18n';
 import { teamGlobalSettingsToBranding } from '../../utils/team-global-settings-to-branding';
@@ -31,7 +32,7 @@ export type DeleteDocumentOptions = {
   id: number;
   userId: number;
   teamId?: number;
-  requestMetadata?: RequestMetadata;
+  requestMetadata: ApiRequestMetadata;
 };
 
 export const deleteDocument = async ({
@@ -47,7 +48,9 @@ export const deleteDocument = async ({
   });
 
   if (!user) {
-    throw new Error('User not found');
+    throw new AppError(AppErrorCode.NOT_FOUND, {
+      message: 'User not found',
+    });
   }
 
   const document = await prisma.document.findUnique({
@@ -55,7 +58,7 @@ export const deleteDocument = async ({
       id,
     },
     include: {
-      Recipient: true,
+      recipients: true,
       documentMeta: true,
       team: {
         include: {
@@ -67,15 +70,19 @@ export const deleteDocument = async ({
   });
 
   if (!document || (teamId !== undefined && teamId !== document.teamId)) {
-    throw new Error('Document not found');
+    throw new AppError(AppErrorCode.NOT_FOUND, {
+      message: 'Document not found',
+    });
   }
 
   const isUserOwner = document.userId === userId;
   const isUserTeamMember = document.team?.members.some((member) => member.userId === userId);
-  const userRecipient = document.Recipient.find((recipient) => recipient.email === user.email);
+  const userRecipient = document.recipients.find((recipient) => recipient.email === user.email);
 
   if (!isUserOwner && !isUserTeamMember && !userRecipient) {
-    throw new Error('Not allowed');
+    throw new AppError(AppErrorCode.UNAUTHORIZED, {
+      message: 'Not allowed',
+    });
   }
 
   // Handle hard or soft deleting the actual document if user has permission.
@@ -121,7 +128,7 @@ export const deleteDocument = async ({
 
 type HandleDocumentOwnerDeleteOptions = {
   document: Document & {
-    Recipient: Recipient[];
+    recipients: Recipient[];
     documentMeta: DocumentMeta | null;
   };
   team?:
@@ -130,7 +137,7 @@ type HandleDocumentOwnerDeleteOptions = {
       })
     | null;
   user: User;
-  requestMetadata?: RequestMetadata;
+  requestMetadata: ApiRequestMetadata;
 };
 
 const handleDocumentOwnerDelete = async ({
@@ -150,8 +157,7 @@ const handleDocumentOwnerDelete = async ({
         data: createDocumentAuditLogData({
           documentId: document.id,
           type: DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_DELETED,
-          user,
-          requestMetadata,
+          metadata: requestMetadata,
           data: {
             type: 'SOFT',
           },
@@ -177,8 +183,7 @@ const handleDocumentOwnerDelete = async ({
       data: createDocumentAuditLogData({
         documentId: document.id,
         type: DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_DELETED,
-        user,
-        requestMetadata,
+        metadata: requestMetadata,
         data: {
           type: 'HARD',
         },
@@ -205,7 +210,7 @@ const handleDocumentOwnerDelete = async ({
 
   // Send cancellation emails to recipients.
   await Promise.all(
-    document.Recipient.map(async (recipient) => {
+    document.recipients.map(async (recipient) => {
       if (recipient.sendStatus !== SendStatus.SENT) {
         return;
       }

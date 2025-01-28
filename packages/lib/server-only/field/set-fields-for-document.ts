@@ -1,5 +1,4 @@
 import { isDeepEqual } from 'remeda';
-import { z } from 'zod';
 
 import { validateCheckboxField } from '@documenso/lib/advanced-fields-validation/validate-checkbox';
 import { validateDropdownField } from '@documenso/lib/advanced-fields-validation/validate-dropdown';
@@ -16,7 +15,7 @@ import {
   ZRadioFieldMeta,
   ZTextFieldMeta,
 } from '@documenso/lib/types/field-meta';
-import type { RequestMetadata } from '@documenso/lib/universal/extract-request-metadata';
+import type { ApiRequestMetadata } from '@documenso/lib/universal/extract-request-metadata';
 import {
   createDocumentAuditLogData,
   diffFieldChanges,
@@ -24,61 +23,46 @@ import {
 import { prisma } from '@documenso/prisma';
 import type { Field } from '@documenso/prisma/client';
 import { FieldType } from '@documenso/prisma/client';
-import { FieldSchema } from '@documenso/prisma/generated/zod';
 
 import { AppError, AppErrorCode } from '../../errors/app-error';
 import { canRecipientFieldsBeModified } from '../../utils/recipients';
 
 export interface SetFieldsForDocumentOptions {
   userId: number;
+  teamId?: number;
   documentId: number;
   fields: FieldData[];
-  requestMetadata?: RequestMetadata;
+  requestMetadata: ApiRequestMetadata;
 }
-
-export const ZSetFieldsForDocumentResponseSchema = z.object({
-  fields: z.array(FieldSchema),
-});
-
-export type TSetFieldsForDocumentResponse = z.infer<typeof ZSetFieldsForDocumentResponseSchema>;
 
 export const setFieldsForDocument = async ({
   userId,
+  teamId,
   documentId,
   fields,
   requestMetadata,
-}: SetFieldsForDocumentOptions): Promise<TSetFieldsForDocumentResponse> => {
+}: SetFieldsForDocumentOptions) => {
   const document = await prisma.document.findFirst({
     where: {
       id: documentId,
-      OR: [
-        {
-          userId,
-        },
-        {
-          team: {
-            members: {
-              some: {
-                userId,
+      ...(teamId
+        ? {
+            team: {
+              id: teamId,
+              members: {
+                some: {
+                  userId,
+                },
               },
             },
-          },
-        },
-      ],
+          }
+        : {
+            userId,
+            teamId: null,
+          }),
     },
     include: {
-      Recipient: true,
-    },
-  });
-
-  const user = await prisma.user.findFirstOrThrow({
-    where: {
-      id: userId,
-    },
-    select: {
-      id: true,
-      name: true,
-      email: true,
+      recipients: true,
     },
   });
 
@@ -99,7 +83,7 @@ export const setFieldsForDocument = async ({
       documentId,
     },
     include: {
-      Recipient: true,
+      recipient: true,
     },
   });
 
@@ -110,7 +94,7 @@ export const setFieldsForDocument = async ({
   const linkedFields = fields.map((field) => {
     const existing = existingFields.find((existingField) => existingField.id === field.id);
 
-    const recipient = document.Recipient.find(
+    const recipient = document.recipients.find(
       (recipient) => recipient.email.toLowerCase() === field.signerEmail.toLowerCase(),
     );
 
@@ -245,12 +229,12 @@ export const setFieldsForDocument = async ({
             customText: '',
             inserted: false,
             fieldMeta: parsedFieldMeta,
-            Document: {
+            document: {
               connect: {
                 id: documentId,
               },
             },
-            Recipient: {
+            recipient: {
               connect: {
                 documentId_email: {
                   documentId,
@@ -280,8 +264,7 @@ export const setFieldsForDocument = async ({
             data: createDocumentAuditLogData({
               type: DOCUMENT_AUDIT_LOG_TYPE.FIELD_UPDATED,
               documentId: documentId,
-              user,
-              requestMetadata,
+              metadata: requestMetadata,
               data: {
                 changes,
                 ...baseAuditLog,
@@ -296,8 +279,7 @@ export const setFieldsForDocument = async ({
             data: createDocumentAuditLogData({
               type: DOCUMENT_AUDIT_LOG_TYPE.FIELD_CREATED,
               documentId: documentId,
-              user,
-              requestMetadata,
+              metadata: requestMetadata,
               data: {
                 ...baseAuditLog,
               },
@@ -325,11 +307,10 @@ export const setFieldsForDocument = async ({
           createDocumentAuditLogData({
             type: DOCUMENT_AUDIT_LOG_TYPE.FIELD_DELETED,
             documentId: documentId,
-            user,
-            requestMetadata,
+            metadata: requestMetadata,
             data: {
               fieldId: field.secondaryId,
-              fieldRecipientEmail: field.Recipient?.email ?? '',
+              fieldRecipientEmail: field.recipient?.email ?? '',
               fieldRecipientId: field.recipientId ?? -1,
               fieldType: field.type,
             },

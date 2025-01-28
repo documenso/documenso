@@ -6,9 +6,10 @@ import { useRouter } from 'next/navigation';
 
 import { Trans, msg } from '@lingui/macro';
 import { useLingui } from '@lingui/react';
+import { match } from 'ts-pattern';
 
+import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import type { User } from '@documenso/prisma/client';
-import { TRPCClientError } from '@documenso/trpc/client';
 import { trpc } from '@documenso/trpc/react';
 import { Alert, AlertDescription, AlertTitle } from '@documenso/ui/primitives/alert';
 import { Button } from '@documenso/ui/primitives/button';
@@ -37,7 +38,7 @@ export const DeleteUserDialog = ({ className, user }: DeleteUserDialogProps) => 
 
   const [email, setEmail] = useState('');
 
-  const { mutateAsync: deleteUser, isLoading: isDeletingUser } =
+  const { mutateAsync: deleteUser, isPending: isDeletingUser } =
     trpc.admin.deleteUser.useMutation();
 
   const onDeleteAccount = async () => {
@@ -54,23 +55,19 @@ export const DeleteUserDialog = ({ className, user }: DeleteUserDialogProps) => 
 
       router.push('/admin/users');
     } catch (err) {
-      if (err instanceof TRPCClientError && err.data?.code === 'BAD_REQUEST') {
-        toast({
-          title: _(msg`An error occurred`),
-          description: err.message,
-          variant: 'destructive',
-        });
-      } else {
-        toast({
-          title: _(msg`An unknown error occurred`),
-          variant: 'destructive',
-          description:
-            err.message ??
-            _(
-              msg`We encountered an unknown error while attempting to delete your account. Please try again later.`,
-            ),
-        });
-      }
+      const error = AppError.parseError(err);
+
+      const errorMessage = match(error.code)
+        .with(AppErrorCode.NOT_FOUND, () => msg`User not found.`)
+        .with(AppErrorCode.UNAUTHORIZED, () => msg`You are not authorized to delete this user.`)
+        .otherwise(() => msg`An error occurred while deleting the user.`);
+
+      toast({
+        title: _(msg`Error`),
+        description: _(errorMessage),
+        variant: 'destructive',
+        duration: 7500,
+      });
     }
   };
 

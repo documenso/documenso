@@ -14,7 +14,10 @@ import {
 
 import { jobs } from '../../jobs/client';
 import type { TRecipientActionAuth } from '../../types/document-auth';
-import { ZWebhookDocumentSchema } from '../../types/webhook-payload';
+import {
+  ZWebhookDocumentSchema,
+  mapDocumentToWebhookDocumentPayload,
+} from '../../types/webhook-payload';
 import { getIsRecipientsTurnToSign } from '../recipient/get-is-recipient-turn';
 import { triggerWebhook } from '../webhooks/trigger/trigger-webhook';
 import { sendPendingEmail } from './send-pending-email';
@@ -31,7 +34,7 @@ const getDocument = async ({ token, documentId }: CompleteDocumentWithTokenOptio
   return await prisma.document.findFirstOrThrow({
     where: {
       id: documentId,
-      Recipient: {
+      recipients: {
         some: {
           token,
         },
@@ -39,7 +42,7 @@ const getDocument = async ({ token, documentId }: CompleteDocumentWithTokenOptio
     },
     include: {
       documentMeta: true,
-      Recipient: {
+      recipients: {
         where: {
           token,
         },
@@ -59,11 +62,11 @@ export const completeDocumentWithToken = async ({
     throw new Error(`Document ${document.id} must be pending`);
   }
 
-  if (document.Recipient.length === 0) {
+  if (document.recipients.length === 0) {
     throw new Error(`Document ${document.id} has no recipient with token ${token}`);
   }
 
-  const [recipient] = document.Recipient;
+  const [recipient] = document.recipients;
 
   if (recipient.signingStatus === SigningStatus.SIGNED) {
     throw new Error(`Recipient ${recipient.id} has already signed`);
@@ -195,7 +198,7 @@ export const completeDocumentWithToken = async ({
   const haveAllRecipientsSigned = await prisma.document.findFirst({
     where: {
       id: document.id,
-      Recipient: {
+      recipients: {
         every: {
           OR: [{ signingStatus: SigningStatus.SIGNED }, { role: RecipientRole.CC }],
         },
@@ -219,13 +222,13 @@ export const completeDocumentWithToken = async ({
     },
     include: {
       documentMeta: true,
-      Recipient: true,
+      recipients: true,
     },
   });
 
   await triggerWebhook({
     event: WebhookTriggerEvents.DOCUMENT_SIGNED,
-    data: ZWebhookDocumentSchema.parse(updatedDocument),
+    data: ZWebhookDocumentSchema.parse(mapDocumentToWebhookDocumentPayload(updatedDocument)),
     userId: updatedDocument.userId,
     teamId: updatedDocument.teamId ?? undefined,
   });

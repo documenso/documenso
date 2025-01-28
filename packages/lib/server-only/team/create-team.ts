@@ -56,7 +56,7 @@ export const createTeam = async ({
       id: userId,
     },
     include: {
-      Subscription: true,
+      subscriptions: true,
     },
   });
 
@@ -68,7 +68,7 @@ export const createTeam = async ({
       prices.map((price) => price.id),
     );
 
-    isPaymentRequired = !subscriptionsContainsActivePlan(user.Subscription, teamRelatedPriceIds);
+    isPaymentRequired = !subscriptionsContainsActivePlan(user.subscriptions, teamRelatedPriceIds);
 
     customerId = await createTeamCustomer({
       name: user.name ?? teamName,

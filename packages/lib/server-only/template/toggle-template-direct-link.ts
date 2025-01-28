@@ -1,49 +1,43 @@
 'use server';
 
-import type { z } from 'zod';
-
 import { prisma } from '@documenso/prisma';
-import { TemplateDirectLinkSchema } from '@documenso/prisma/generated/zod';
 
 import { AppError, AppErrorCode } from '../../errors/app-error';
 
 export type ToggleTemplateDirectLinkOptions = {
   templateId: number;
   userId: number;
+  teamId?: number;
   enabled: boolean;
 };
-
-export const ZToggleTemplateDirectLinkResponseSchema = TemplateDirectLinkSchema;
-
-export type TToggleTemplateDirectLinkResponse = z.infer<
-  typeof ZToggleTemplateDirectLinkResponseSchema
->;
 
 export const toggleTemplateDirectLink = async ({
   templateId,
   userId,
+  teamId,
   enabled,
-}: ToggleTemplateDirectLinkOptions): Promise<TToggleTemplateDirectLinkResponse> => {
+}: ToggleTemplateDirectLinkOptions) => {
   const template = await prisma.template.findFirst({
     where: {
       id: templateId,
-      OR: [
-        {
-          userId,
-        },
-        {
-          team: {
-            members: {
-              some: {
-                userId,
+      ...(teamId
+        ? {
+            team: {
+              id: teamId,
+              members: {
+                some: {
+                  userId,
+                },
               },
             },
-          },
-        },
-      ],
+          }
+        : {
+            userId,
+            teamId: null,
+          }),
     },
     include: {
-      Recipient: true,
+      recipients: true,
       directLink: true,
     },
   });

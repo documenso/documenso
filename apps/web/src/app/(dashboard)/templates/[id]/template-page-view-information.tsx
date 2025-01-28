@@ -12,7 +12,7 @@ import type { Template, User } from '@documenso/prisma/client';
 export type TemplatePageViewInformationProps = {
   userId: number;
   template: Template & {
-    User: Pick<User, 'id' | 'name' | 'email'>;
+    user: Pick<User, 'id' | 'name' | 'email'>;
   };
 };
 
@@ -28,7 +28,8 @@ export const TemplatePageViewInformation = ({
     return [
       {
         description: msg`Uploaded by`,
-        value: userId === template.userId ? _(msg`You`) : template.User.name ?? template.User.email,
+        value:
+          userId === template.userId ? _(msg`You`) : (template.user.name ?? template.user.email),
       },
       {
         description: msg`Created`,

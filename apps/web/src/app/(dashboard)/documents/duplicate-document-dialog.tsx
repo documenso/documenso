@@ -37,7 +37,6 @@ export const DuplicateDocumentDialog = ({
 
   const { data: document, isLoading } = trpcReact.document.getDocumentById.useQuery({
     documentId: id,
-    teamId: team?.id,
   });
 
   const documentData = document?.documentData
@@ -49,10 +48,10 @@ export const DuplicateDocumentDialog = ({
 
   const documentsPath = formatDocumentsPath(team?.url);
 
-  const { mutateAsync: duplicateDocument, isLoading: isDuplicateLoading } =
+  const { mutateAsync: duplicateDocument, isPending: isDuplicateLoading } =
     trpcReact.document.duplicateDocument.useMutation({
-      onSuccess: (newId) => {
-        router.push(`${documentsPath}/${newId}/edit`);
+      onSuccess: ({ documentId }) => {
+        router.push(`${documentsPath}/${documentId}/edit`);
 
         toast({
           title: _(msg`Document Duplicated`),
@@ -66,7 +65,7 @@ export const DuplicateDocumentDialog = ({
 
   const onDuplicate = async () => {
     try {
-      await duplicateDocument({ documentId: id, teamId: team?.id });
+      await duplicateDocument({ documentId: id });
     } catch {
       toast({
         title: _(msg`Something went wrong`),

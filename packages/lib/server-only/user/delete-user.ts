@@ -1,6 +1,7 @@
 import { prisma } from '@documenso/prisma';
 import { DocumentStatus } from '@documenso/prisma/client';
 
+import { AppError, AppErrorCode } from '../../errors/app-error';
 import { deletedAccountServiceAccount } from './service-accounts/deleted-account';
 
 export type DeleteUserOptions = {
@@ -15,7 +16,9 @@ export const deleteUser = async ({ id }: DeleteUserOptions) => {
   });
 
   if (!user) {
-    throw new Error(`User with ID ${id} not found`);
+    throw new AppError(AppErrorCode.NOT_FOUND, {
+      message: `User with ID ${id} not found`,
+    });
   }
 
   const serviceAccount = await deletedAccountServiceAccount();

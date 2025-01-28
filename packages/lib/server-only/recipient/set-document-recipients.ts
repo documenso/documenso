@@ -1,17 +1,17 @@
 import { createElement } from 'react';
 
 import { msg } from '@lingui/macro';
-import { z } from 'zod';
 
 import { isUserEnterprise } from '@documenso/ee/server-only/util/is-document-enterprise';
 import { mailer } from '@documenso/email/mailer';
 import RecipientRemovedFromDocumentTemplate from '@documenso/email/templates/recipient-removed-from-document';
 import { DOCUMENT_AUDIT_LOG_TYPE } from '@documenso/lib/types/document-audit-logs';
+import type { TRecipientAccessAuthTypes } from '@documenso/lib/types/document-auth';
 import {
   type TRecipientActionAuthTypes,
   ZRecipientAuthOptionsSchema,
 } from '@documenso/lib/types/document-auth';
-import type { RequestMetadata } from '@documenso/lib/universal/extract-request-metadata';
+import type { ApiRequestMetadata } from '@documenso/lib/universal/extract-request-metadata';
 import { nanoid } from '@documenso/lib/universal/id';
 import {
   createDocumentAuditLogData,
@@ -22,7 +22,6 @@ import { prisma } from '@documenso/prisma';
 import type { Recipient } from '@documenso/prisma/client';
 import { RecipientRole } from '@documenso/prisma/client';
 import { SendStatus, SigningStatus } from '@documenso/prisma/client';
-import { RecipientSchema } from '@documenso/prisma/generated/zod';
 
 import { getI18nInstance } from '../../client-only/providers/i18n.server';
 import { NEXT_PUBLIC_WEBAPP_URL } from '../../constants/app';
@@ -33,29 +32,21 @@ import { canRecipientBeModified } from '../../utils/recipients';
 import { renderEmailWithI18N } from '../../utils/render-email-with-i18n';
 import { teamGlobalSettingsToBranding } from '../../utils/team-global-settings-to-branding';
 
-export interface SetRecipientsForDocumentOptions {
+export interface SetDocumentRecipientsOptions {
   userId: number;
   teamId?: number;
   documentId: number;
   recipients: RecipientData[];
-  requestMetadata?: RequestMetadata;
+  requestMetadata: ApiRequestMetadata;
 }
 
-export const ZSetRecipientsForDocumentResponseSchema = z.object({
-  recipients: RecipientSchema.array(),
-});
-
-export type TSetRecipientsForDocumentResponse = z.infer<
-  typeof ZSetRecipientsForDocumentResponseSchema
->;
-
-export const setRecipientsForDocument = async ({
+export const setDocumentRecipients = async ({
   userId,
   teamId,
   documentId,
   recipients,
   requestMetadata,
-}: SetRecipientsForDocumentOptions): Promise<TSetRecipientsForDocumentResponse> => {
+}: SetDocumentRecipientsOptions) => {
   const document = await prisma.document.findFirst({
     where: {
       id: documentId,
@@ -76,7 +67,7 @@ export const setRecipientsForDocument = async ({
           }),
     },
     include: {
-      Field: true,
+      fields: true,
       documentMeta: true,
       team: {
         include: {
@@ -149,7 +140,7 @@ export const setRecipientsForDocument = async ({
     if (
       existing &&
       hasRecipientBeenChanged(existing, recipient) &&
-      !canRecipientBeModified(existing, document.Field)
+      !canRecipientBeModified(existing, document.fields)
     ) {
       throw new AppError(AppErrorCode.INVALID_REQUEST, {
         message: 'Cannot modify a recipient who has already interacted with the document',
@@ -167,10 +158,10 @@ export const setRecipientsForDocument = async ({
       linkedRecipients.map(async (recipient) => {
         let authOptions = ZRecipientAuthOptionsSchema.parse(recipient._persisted?.authOptions);
 
-        if (recipient.actionAuth !== undefined) {
+        if (recipient.actionAuth !== undefined || recipient.accessAuth !== undefined) {
           authOptions = createRecipientAuthOptions({
-            accessAuth: authOptions.accessAuth,
-            actionAuth: recipient.actionAuth,
+            accessAuth: recipient.accessAuth || authOptions.accessAuth,
+            actionAuth: recipient.actionAuth || authOptions.actionAuth,
           });
         }
 
@@ -236,8 +227,7 @@ export const setRecipientsForDocument = async ({
             data: createDocumentAuditLogData({
               type: DOCUMENT_AUDIT_LOG_TYPE.RECIPIENT_UPDATED,
               documentId: documentId,
-              user,
-              requestMetadata,
+              metadata: requestMetadata,
               data: {
                 changes,
                 ...baseAuditLog,
@@ -252,10 +242,10 @@ export const setRecipientsForDocument = async ({
             data: createDocumentAuditLogData({
               type: DOCUMENT_AUDIT_LOG_TYPE.RECIPIENT_CREATED,
               documentId: documentId,
-              user,
-              requestMetadata,
+              metadata: requestMetadata,
               data: {
                 ...baseAuditLog,
+                accessAuth: recipient.accessAuth || undefined,
                 actionAuth: recipient.actionAuth || undefined,
               },
             }),
@@ -282,8 +272,7 @@ export const setRecipientsForDocument = async ({
           createDocumentAuditLogData({
             type: DOCUMENT_AUDIT_LOG_TYPE.RECIPIENT_DELETED,
             documentId: documentId,
-            user,
-            requestMetadata,
+            metadata: requestMetadata,
             data: {
               recipientEmail: recipient.email,
               recipientName: recipient.name,
@@ -368,17 +357,22 @@ type RecipientData = {
   name: string;
   role: RecipientRole;
   signingOrder?: number | null;
+  accessAuth?: TRecipientAccessAuthTypes | null;
   actionAuth?: TRecipientActionAuthTypes | null;
 };
 
 const hasRecipientBeenChanged = (recipient: Recipient, newRecipientData: RecipientData) => {
   const authOptions = ZRecipientAuthOptionsSchema.parse(recipient.authOptions);
 
+  const newRecipientAccessAuth = newRecipientData.accessAuth || null;
+  const newRecipientActionAuth = newRecipientData.actionAuth || null;
+
   return (
     recipient.email !== newRecipientData.email ||
     recipient.name !== newRecipientData.name ||
     recipient.role !== newRecipientData.role ||
     recipient.signingOrder !== newRecipientData.signingOrder ||
-    authOptions.actionAuth !== newRecipientData.actionAuth
+    authOptions.accessAuth !== newRecipientAccessAuth ||
+    authOptions.actionAuth !== newRecipientActionAuth
   );
 };

@@ -35,12 +35,12 @@ export const isUserEnterprise = async ({
         select: {
           owner: {
             include: {
-              Subscription: true,
+              subscriptions: true,
             },
           },
         },
       })
-      .then((team) => team.owner.Subscription);
+      .then((team) => team.owner.subscriptions);
   } else {
     subscriptions = await prisma.user
       .findFirstOrThrow({
@@ -48,10 +48,10 @@ export const isUserEnterprise = async ({
           id: userId,
         },
         select: {
-          Subscription: true,
+          subscriptions: true,
         },
       })
-      .then((user) => user.Subscription);
+      .then((user) => user.subscriptions);
   }
 
   if (subscriptions.length === 0) {

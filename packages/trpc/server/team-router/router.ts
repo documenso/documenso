@@ -91,7 +91,6 @@ export const teamRouter = router({
     //   },
     // })
     .input(ZFindTeamsQuerySchema)
-    .output(z.unknown())
     .query(async ({ input, ctx }) => {
       return await findTeams({
         userId: ctx.user.id,
@@ -110,7 +109,6 @@ export const teamRouter = router({
     //   },
     // })
     .input(ZGetTeamQuerySchema)
-    .output(z.unknown())
     .query(async ({ input, ctx }) => {
       return await getTeamById({ teamId: input.teamId, userId: ctx.user.id });
     }),
@@ -126,7 +124,6 @@ export const teamRouter = router({
     //   },
     // })
     .input(ZCreateTeamMutationSchema)
-    .output(z.unknown())
     .mutation(async ({ input, ctx }) => {
       return await createTeam({
         userId: ctx.user.id,
@@ -145,7 +142,6 @@ export const teamRouter = router({
     //   },
     // })
     .input(ZUpdateTeamMutationSchema)
-    .output(z.unknown())
     .mutation(async ({ input, ctx }) => {
       return await updateTeam({
         userId: ctx.user.id,
@@ -164,7 +160,6 @@ export const teamRouter = router({
     //   },
     // })
     .input(ZDeleteTeamMutationSchema)
-    .output(z.unknown())
     .mutation(async ({ input, ctx }) => {
       return await deleteTeam({
         userId: ctx.user.id,
@@ -184,7 +179,6 @@ export const teamRouter = router({
     //   },
     // })
     .input(ZLeaveTeamMutationSchema)
-    .output(z.unknown())
     .mutation(async ({ input, ctx }) => {
       return await leaveTeam({
         userId: ctx.user.id,
@@ -204,7 +198,6 @@ export const teamRouter = router({
     //   },
     // })
     .input(ZFindTeamMemberInvitesQuerySchema)
-    .output(z.unknown())
     .query(async ({ input, ctx }) => {
       return await findTeamMemberInvites({
         userId: ctx.user.id,
@@ -224,7 +217,6 @@ export const teamRouter = router({
     //   },
     // })
     .input(ZCreateTeamMemberInvitesMutationSchema)
-    .output(z.unknown())
     .mutation(async ({ input, ctx }) => {
       return await createTeamMemberInvites({
         userId: ctx.user.id,
@@ -245,7 +237,6 @@ export const teamRouter = router({
     //   },
     // })
     .input(ZResendTeamMemberInvitationMutationSchema)
-    .output(z.unknown())
     .mutation(async ({ input, ctx }) => {
       await resendTeamMemberInvitation({
         userId: ctx.user.id,
@@ -266,7 +257,6 @@ export const teamRouter = router({
     //   },
     // })
     .input(ZDeleteTeamMemberInvitationsMutationSchema)
-    .output(z.unknown())
     .mutation(async ({ input, ctx }) => {
       return await deleteTeamMemberInvitations({
         userId: ctx.user.id,
@@ -285,7 +275,6 @@ export const teamRouter = router({
     //   },
     // })
     .input(ZGetTeamMembersQuerySchema)
-    .output(z.unknown())
     .query(async ({ input, ctx }) => {
       return await getTeamMembers({ teamId: input.teamId, userId: ctx.user.id });
     }),
@@ -302,7 +291,6 @@ export const teamRouter = router({
     //   },
     // })
     .input(ZFindTeamMembersQuerySchema)
-    .output(z.unknown())
     .query(async ({ input, ctx }) => {
       return await findTeamMembers({
         userId: ctx.user.id,
@@ -321,7 +309,6 @@ export const teamRouter = router({
     //   },
     // })
     .input(ZUpdateTeamMemberMutationSchema)
-    .output(z.unknown())
     .mutation(async ({ input, ctx }) => {
       return await updateTeamMember({
         userId: ctx.user.id,
@@ -341,7 +328,6 @@ export const teamRouter = router({
     //   },
     // })
     .input(ZDeleteTeamMembersMutationSchema)
-    .output(z.unknown())
     .mutation(async ({ input, ctx }) => {
       return await deleteTeamMembers({
         userId: ctx.user.id,
@@ -400,7 +386,6 @@ export const teamRouter = router({
     //   },
     // })
     .input(ZUpdateTeamPublicProfileMutationSchema)
-    .output(z.unknown())
     .mutation(async ({ input, ctx }) => {
       try {
         const { teamId, bio, enabled } = input;

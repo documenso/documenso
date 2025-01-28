@@ -1,14 +1,9 @@
 import { TRPCError } from '@trpc/server';
-import { z } from 'zod';
 
 import { getServerLimits } from '@documenso/ee/server-only/limits/server';
-import { isValidLanguageCode } from '@documenso/lib/constants/i18n';
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import { jobs } from '@documenso/lib/jobs/client';
-import {
-  ZGetDocumentWithDetailsByIdResponseSchema,
-  getDocumentWithDetailsById,
-} from '@documenso/lib/server-only/document/get-document-with-details-by-id';
+import { getDocumentWithDetailsById } from '@documenso/lib/server-only/document/get-document-with-details-by-id';
 import { sendDocument } from '@documenso/lib/server-only/document/send-document';
 import {
   ZCreateDocumentFromDirectTemplateResponseSchema,
@@ -19,56 +14,42 @@ import {
   ZCreateTemplateResponseSchema,
   createTemplate,
 } from '@documenso/lib/server-only/template/create-template';
-import {
-  ZCreateTemplateDirectLinkResponseSchema,
-  createTemplateDirectLink,
-} from '@documenso/lib/server-only/template/create-template-direct-link';
+import { createTemplateDirectLink } from '@documenso/lib/server-only/template/create-template-direct-link';
 import { deleteTemplate } from '@documenso/lib/server-only/template/delete-template';
 import { deleteTemplateDirectLink } from '@documenso/lib/server-only/template/delete-template-direct-link';
-import {
-  ZDuplicateTemplateResponseSchema,
-  duplicateTemplate,
-} from '@documenso/lib/server-only/template/duplicate-template';
-import {
-  ZFindTemplatesResponseSchema,
-  findTemplates,
-} from '@documenso/lib/server-only/template/find-templates';
-import {
-  ZGetTemplateByIdResponseSchema,
-  getTemplateById,
-} from '@documenso/lib/server-only/template/get-template-by-id';
-import {
-  ZMoveTemplateToTeamResponseSchema,
-  moveTemplateToTeam,
-} from '@documenso/lib/server-only/template/move-template-to-team';
-import {
-  ZToggleTemplateDirectLinkResponseSchema,
-  toggleTemplateDirectLink,
-} from '@documenso/lib/server-only/template/toggle-template-direct-link';
-import {
-  ZUpdateTemplateSettingsResponseSchema,
-  updateTemplateSettings,
-} from '@documenso/lib/server-only/template/update-template-settings';
+import { duplicateTemplate } from '@documenso/lib/server-only/template/duplicate-template';
+import { findTemplates } from '@documenso/lib/server-only/template/find-templates';
+import { getTemplateById } from '@documenso/lib/server-only/template/get-template-by-id';
+import { moveTemplateToTeam } from '@documenso/lib/server-only/template/move-template-to-team';
+import { toggleTemplateDirectLink } from '@documenso/lib/server-only/template/toggle-template-direct-link';
+import { updateTemplate } from '@documenso/lib/server-only/template/update-template';
 import { extractNextApiRequestMetadata } from '@documenso/lib/universal/extract-request-metadata';
 import type { Document } from '@documenso/prisma/client';
 
+import { ZGenericSuccessResponse, ZSuccessResponseSchema } from '../document-router/schema';
 import { authenticatedProcedure, maybeAuthenticatedProcedure, router } from '../trpc';
 import {
   ZBulkSendTemplateMutationSchema,
-  ZCreateDocumentFromDirectTemplateMutationSchema,
-  ZCreateDocumentFromTemplateMutationSchema,
-  ZCreateTemplateDirectLinkMutationSchema,
+  ZCreateDocumentFromDirectTemplateRequestSchema,
+  ZCreateDocumentFromTemplateRequestSchema,
+  ZCreateDocumentFromTemplateResponseSchema,
+  ZCreateTemplateDirectLinkRequestSchema,
+  ZCreateTemplateDirectLinkResponseSchema,
   ZCreateTemplateMutationSchema,
-  ZDeleteTemplateDirectLinkMutationSchema,
+  ZDeleteTemplateDirectLinkRequestSchema,
   ZDeleteTemplateMutationSchema,
   ZDuplicateTemplateMutationSchema,
-  ZFindTemplatesQuerySchema,
-  ZGetTemplateByIdQuerySchema,
-  ZMoveTemplatesToTeamSchema,
-  ZSetSigningOrderForTemplateMutationSchema,
-  ZToggleTemplateDirectLinkMutationSchema,
-  ZUpdateTemplateSettingsMutationSchema,
-  ZUpdateTemplateTypedSignatureSettingsMutationSchema,
+  ZDuplicateTemplateResponseSchema,
+  ZFindTemplatesRequestSchema,
+  ZFindTemplatesResponseSchema,
+  ZGetTemplateByIdRequestSchema,
+  ZGetTemplateByIdResponseSchema,
+  ZMoveTemplateToTeamRequestSchema,
+  ZMoveTemplateToTeamResponseSchema,
+  ZToggleTemplateDirectLinkRequestSchema,
+  ZToggleTemplateDirectLinkResponseSchema,
+  ZUpdateTemplateRequestSchema,
+  ZUpdateTemplateResponseSchema,
 } from './schema';
 
 export const templateRouter = router({
@@ -79,17 +60,20 @@ export const templateRouter = router({
     .meta({
       openapi: {
         method: 'GET',
-        path: '/template/find',
+        path: '/template',
         summary: 'Find templates',
         description: 'Find templates based on a search criteria',
         tags: ['Template'],
       },
     })
-    .input(ZFindTemplatesQuerySchema)
+    .input(ZFindTemplatesRequestSchema)
     .output(ZFindTemplatesResponseSchema)
     .query(async ({ input, ctx }) => {
+      const { teamId } = ctx;
+
       return await findTemplates({
         userId: ctx.user.id,
+        teamId,
         ...input,
       });
     }),
@@ -106,10 +90,11 @@ export const templateRouter = router({
         tags: ['Template'],
       },
     })
-    .input(ZGetTemplateByIdQuerySchema)
+    .input(ZGetTemplateByIdRequestSchema)
     .output(ZGetTemplateByIdResponseSchema)
     .query(async ({ input, ctx }) => {
-      const { templateId, teamId } = input;
+      const { teamId } = ctx;
+      const { templateId } = input;
 
       return await getTemplateById({
         id: templateId,
@@ -119,22 +104,25 @@ export const templateRouter = router({
     }),
 
   /**
-   * @public
+   * Wait until RR7 so we can passthrough documents.
+   *
+   * @private
    */
   createTemplate: authenticatedProcedure
-    .meta({
-      openapi: {
-        method: 'POST',
-        path: '/template/create',
-        summary: 'Create template',
-        description: 'Create a new template',
-        tags: ['Template'],
-      },
-    })
+    // .meta({
+    //   openapi: {
+    //     method: 'POST',
+    //     path: '/template/create',
+    //     summary: 'Create template',
+    //     description: 'Create a new template',
+    //     tags: ['Template'],
+    //   },
+    // })
     .input(ZCreateTemplateMutationSchema)
     .output(ZCreateTemplateResponseSchema)
     .mutation(async ({ input, ctx }) => {
-      const { teamId, title, templateDocumentDataId } = input;
+      const { teamId } = ctx;
+      const { title, templateDocumentDataId } = input;
 
       return await createTemplate({
         userId: ctx.user.id,
@@ -151,30 +139,25 @@ export const templateRouter = router({
     .meta({
       openapi: {
         method: 'POST',
-        path: '/template/{templateId}',
+        path: '/template/update',
         summary: 'Update template',
         tags: ['Template'],
       },
     })
-    .input(ZUpdateTemplateSettingsMutationSchema)
-    .output(ZUpdateTemplateSettingsResponseSchema)
+    .input(ZUpdateTemplateRequestSchema)
+    .output(ZUpdateTemplateResponseSchema)
     .mutation(async ({ input, ctx }) => {
-      const { templateId, teamId, data, meta } = input;
+      const { teamId } = ctx;
+      const { templateId, data, meta } = input;
 
       const userId = ctx.user.id;
 
-      const requestMetadata = extractNextApiRequestMetadata(ctx.req);
-
-      return await updateTemplateSettings({
+      return await updateTemplate({
         userId,
         teamId,
         templateId,
         data,
-        meta: {
-          ...meta,
-          language: isValidLanguageCode(meta?.language) ? meta?.language : undefined,
-        },
-        requestMetadata,
+        meta,
       });
     }),
 
@@ -185,7 +168,7 @@ export const templateRouter = router({
     .meta({
       openapi: {
         method: 'POST',
-        path: '/template/{templateId}/duplicate',
+        path: '/template/duplicate',
         summary: 'Duplicate template',
         tags: ['Template'],
       },
@@ -193,7 +176,8 @@ export const templateRouter = router({
     .input(ZDuplicateTemplateMutationSchema)
     .output(ZDuplicateTemplateResponseSchema)
     .mutation(async ({ input, ctx }) => {
-      const { teamId, templateId } = input;
+      const { teamId } = ctx;
+      const { templateId } = input;
 
       return await duplicateTemplate({
         userId: ctx.user.id,
@@ -209,19 +193,22 @@ export const templateRouter = router({
     .meta({
       openapi: {
         method: 'POST',
-        path: '/template/{templateId}/delete',
+        path: '/template/delete',
         summary: 'Delete template',
         tags: ['Template'],
       },
     })
     .input(ZDeleteTemplateMutationSchema)
-    .output(z.void())
+    .output(ZSuccessResponseSchema)
     .mutation(async ({ input, ctx }) => {
-      const { templateId, teamId } = input;
+      const { teamId } = ctx;
+      const { templateId } = input;
 
       const userId = ctx.user.id;
 
       await deleteTemplate({ userId, id: templateId, teamId });
+
+      return ZGenericSuccessResponse;
     }),
 
   /**
@@ -231,16 +218,17 @@ export const templateRouter = router({
     .meta({
       openapi: {
         method: 'POST',
-        path: '/template/{templateId}/use',
+        path: '/template/use',
         summary: 'Use template',
         description: 'Use the template to create a document',
         tags: ['Template'],
       },
     })
-    .input(ZCreateDocumentFromTemplateMutationSchema)
-    .output(ZGetDocumentWithDetailsByIdResponseSchema)
+    .input(ZCreateDocumentFromTemplateRequestSchema)
+    .output(ZCreateDocumentFromTemplateResponseSchema)
     .mutation(async ({ ctx, input }) => {
-      const { templateId, teamId, recipients, distributeDocument, customDocumentDataId } = input;
+      const { teamId } = ctx;
+      const { templateId, recipients, distributeDocument, customDocumentDataId } = input;
 
       const limits = await getServerLimits({ email: ctx.user.email, teamId });
 
@@ -248,15 +236,13 @@ export const templateRouter = router({
         throw new Error('You have reached your document limit.');
       }
 
-      const requestMetadata = extractNextApiRequestMetadata(ctx.req);
-
       const document: Document = await createDocumentFromTemplate({
         templateId,
         teamId,
         userId: ctx.user.id,
         recipients,
         customDocumentDataId,
-        requestMetadata,
+        requestMetadata: ctx.metadata,
       });
 
       if (distributeDocument) {
@@ -264,7 +250,7 @@ export const templateRouter = router({
           documentId: document.id,
           userId: ctx.user.id,
           teamId,
-          requestMetadata,
+          requestMetadata: ctx.metadata,
         }).catch((err) => {
           console.error(err);
 
@@ -280,19 +266,21 @@ export const templateRouter = router({
     }),
 
   /**
-   * @public
+   * Leaving this endpoint as private for now until there is a use case for it.
+   *
+   * @private
    */
   createDocumentFromDirectTemplate: maybeAuthenticatedProcedure
-    .meta({
-      openapi: {
-        method: 'POST',
-        path: '/template/use',
-        summary: 'Use direct template',
-        description: 'Use a direct template to create a document',
-        tags: ['Template'],
-      },
-    })
-    .input(ZCreateDocumentFromDirectTemplateMutationSchema)
+    // .meta({
+    //   openapi: {
+    //     method: 'POST',
+    //     path: '/template/direct/use',
+    //     summary: 'Use direct template',
+    //     description: 'Use a direct template to create a document',
+    //     tags: ['Template'],
+    //   },
+    // })
+    .input(ZCreateDocumentFromDirectTemplateRequestSchema)
     .output(ZCreateDocumentFromDirectTemplateResponseSchema)
     .mutation(async ({ input, ctx }) => {
       const {
@@ -303,8 +291,6 @@ export const templateRouter = router({
         signedFieldValues,
         templateUpdatedAt,
       } = input;
-
-      const requestMetadata = extractNextApiRequestMetadata(ctx.req);
 
       return await createDocumentFromDirectTemplate({
         directRecipientName,
@@ -320,25 +306,7 @@ export const templateRouter = router({
               email: ctx.user.email,
             }
           : undefined,
-        requestMetadata,
-      });
-    }),
-
-  /**
-   * @private
-   */
-  setSigningOrderForTemplate: authenticatedProcedure
-    .input(ZSetSigningOrderForTemplateMutationSchema)
-    .mutation(async ({ input, ctx }) => {
-      const { templateId, teamId, signingOrder } = input;
-
-      return await updateTemplateSettings({
-        templateId,
-        teamId,
-        data: {},
-        meta: { signingOrder },
-        userId: ctx.user.id,
-        requestMetadata: extractNextApiRequestMetadata(ctx.req),
+        requestMetadata: ctx.metadata,
       });
     }),
 
@@ -349,16 +317,17 @@ export const templateRouter = router({
     .meta({
       openapi: {
         method: 'POST',
-        path: '/template/{templateId}/direct/create',
+        path: '/template/direct/create',
         summary: 'Create direct link',
         description: 'Create a direct link for a template',
         tags: ['Template'],
       },
     })
-    .input(ZCreateTemplateDirectLinkMutationSchema)
+    .input(ZCreateTemplateDirectLinkRequestSchema)
     .output(ZCreateTemplateDirectLinkResponseSchema)
     .mutation(async ({ input, ctx }) => {
-      const { templateId, teamId, directRecipientId } = input;
+      const { teamId } = ctx;
+      const { templateId, directRecipientId } = input;
 
       const userId = ctx.user.id;
 
@@ -372,7 +341,7 @@ export const templateRouter = router({
         });
       }
 
-      return await createTemplateDirectLink({ userId, templateId, directRecipientId });
+      return await createTemplateDirectLink({ userId, teamId, templateId, directRecipientId });
     }),
 
   /**
@@ -382,20 +351,23 @@ export const templateRouter = router({
     .meta({
       openapi: {
         method: 'POST',
-        path: '/template/{templateId}/direct/delete',
+        path: '/template/direct/delete',
         summary: 'Delete direct link',
         description: 'Delete a direct link for a template',
         tags: ['Template'],
       },
     })
-    .input(ZDeleteTemplateDirectLinkMutationSchema)
-    .output(z.void())
+    .input(ZDeleteTemplateDirectLinkRequestSchema)
+    .output(ZSuccessResponseSchema)
     .mutation(async ({ input, ctx }) => {
+      const { teamId } = ctx;
       const { templateId } = input;
 
       const userId = ctx.user.id;
 
-      await deleteTemplateDirectLink({ userId, templateId });
+      await deleteTemplateDirectLink({ userId, teamId, templateId });
+
+      return ZGenericSuccessResponse;
     }),
 
   /**
@@ -405,20 +377,21 @@ export const templateRouter = router({
     .meta({
       openapi: {
         method: 'POST',
-        path: '/template/{templateId}/direct/toggle',
+        path: '/template/direct/toggle',
         summary: 'Toggle direct link',
         description: 'Enable or disable a direct link for a template',
         tags: ['Template'],
       },
     })
-    .input(ZToggleTemplateDirectLinkMutationSchema)
+    .input(ZToggleTemplateDirectLinkRequestSchema)
     .output(ZToggleTemplateDirectLinkResponseSchema)
     .mutation(async ({ input, ctx }) => {
+      const { teamId } = ctx;
       const { templateId, enabled } = input;
 
       const userId = ctx.user.id;
 
-      return await toggleTemplateDirectLink({ userId, templateId, enabled });
+      return await toggleTemplateDirectLink({ userId, teamId, templateId, enabled });
     }),
 
   /**
@@ -428,13 +401,13 @@ export const templateRouter = router({
     .meta({
       openapi: {
         method: 'POST',
-        path: '/template/{templateId}/move',
+        path: '/template/move',
         summary: 'Move template',
         description: 'Move a template to a team',
         tags: ['Template'],
       },
     })
-    .input(ZMoveTemplatesToTeamSchema)
+    .input(ZMoveTemplateToTeamRequestSchema)
     .output(ZMoveTemplateToTeamResponseSchema)
     .mutation(async ({ input, ctx }) => {
       const { templateId, teamId } = input;
@@ -450,36 +423,6 @@ export const templateRouter = router({
   /**
    * @private
    */
-  updateTemplateTypedSignatureSettings: authenticatedProcedure
-    .input(ZUpdateTemplateTypedSignatureSettingsMutationSchema)
-    .mutation(async ({ input, ctx }) => {
-      const { templateId, teamId, typedSignatureEnabled } = input;
-
-      const template = await getTemplateById({
-        id: templateId,
-        userId: ctx.user.id,
-        teamId,
-      }).catch(() => null);
-
-      if (!template) {
-        throw new TRPCError({
-          code: 'NOT_FOUND',
-          message: 'Template not found',
-        });
-      }
-
-      return await updateTemplateSettings({
-        templateId,
-        teamId,
-        userId: ctx.user.id,
-        data: {},
-        meta: {
-          typedSignatureEnabled,
-        },
-        requestMetadata: extractNextApiRequestMetadata(ctx.req),
-      });
-    }),
-
   uploadBulkSend: authenticatedProcedure
     .input(ZBulkSendTemplateMutationSchema)
     .mutation(async ({ ctx, input }) => {

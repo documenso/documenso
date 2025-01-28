@@ -64,7 +64,7 @@ export const AddTeamEmailDialog = ({ teamId, trigger, ...props }: AddTeamEmailDi
     },
   });
 
-  const { mutateAsync: createTeamEmailVerification, isLoading } =
+  const { mutateAsync: createTeamEmailVerification, isPending } =
     trpc.team.createTeamEmailVerification.useMutation();
 
   const onFormSubmit = async ({ name, email }: TCreateTeamEmailFormSchema) => {
@@ -120,7 +120,7 @@ export const AddTeamEmailDialog = ({ teamId, trigger, ...props }: AddTeamEmailDi
     >
       <DialogTrigger onClick={(e) => e.stopPropagation()} asChild={true}>
         {trigger ?? (
-          <Button variant="outline" loading={isLoading} className="bg-background">
+          <Button variant="outline" loading={isPending} className="bg-background">
             <Plus className="-ml-1 mr-1 h-5 w-5" />
             <Trans>Add email</Trans>
           </Button>

@@ -145,7 +145,7 @@ export const createField = async ({
       fieldMeta: result.data,
     },
     include: {
-      Recipient: true,
+      recipient: true,
     },
   });
 
@@ -160,7 +160,7 @@ export const createField = async ({
       },
       data: {
         fieldId: field.secondaryId,
-        fieldRecipientEmail: field.Recipient?.email ?? '',
+        fieldRecipientEmail: field.recipient?.email ?? '',
         fieldRecipientId: recipientId,
         fieldType: field.type,
       },

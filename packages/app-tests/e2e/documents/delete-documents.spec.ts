@@ -129,7 +129,7 @@ test('[DOCUMENTS]: deleting a pending document should remove it from recipients'
   // signout
   await apiSignout({ page });
 
-  for (const recipient of pendingDocument.Recipient) {
+  for (const recipient of pendingDocument.recipients) {
     await apiSignin({
       page,
       email: recipient.email,
