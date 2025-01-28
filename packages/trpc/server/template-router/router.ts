@@ -1,7 +1,9 @@
 import type { Document } from '@prisma/client';
+import { TRPCError } from '@trpc/server';
 
 import { getServerLimits } from '@documenso/ee/server-only/limits/server';
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
+import { jobs } from '@documenso/lib/jobs/client';
 import { getDocumentWithDetailsById } from '@documenso/lib/server-only/document/get-document-with-details-by-id';
 import { sendDocument } from '@documenso/lib/server-only/document/send-document';
 import {
@@ -26,6 +28,7 @@ import { updateTemplate } from '@documenso/lib/server-only/template/update-templ
 import { ZGenericSuccessResponse, ZSuccessResponseSchema } from '../document-router/schema';
 import { authenticatedProcedure, maybeAuthenticatedProcedure, router } from '../trpc';
 import {
+  ZBulkSendTemplateMutationSchema,
   ZCreateDocumentFromDirectTemplateRequestSchema,
   ZCreateDocumentFromTemplateRequestSchema,
   ZCreateDocumentFromTemplateResponseSchema,
@@ -414,5 +417,49 @@ export const templateRouter = router({
         teamId,
         userId,
       });
+    }),
+
+  /**
+   * @private
+   */
+  uploadBulkSend: authenticatedProcedure
+    .input(ZBulkSendTemplateMutationSchema)
+    .mutation(async ({ ctx, input }) => {
+      const { templateId, teamId, csv, sendImmediately } = input;
+      const { user } = ctx;
+
+      if (csv.length > 4 * 1024 * 1024) {
+        throw new TRPCError({
+          code: 'BAD_REQUEST',
+          message: 'File size exceeds 4MB limit',
+        });
+      }
+
+      const template = await getTemplateById({
+        id: templateId,
+        teamId,
+        userId: user.id,
+      });
+
+      if (!template) {
+        throw new TRPCError({
+          code: 'NOT_FOUND',
+          message: 'Template not found',
+        });
+      }
+
+      await jobs.triggerJob({
+        name: 'internal.bulk-send-template',
+        payload: {
+          userId: user.id,
+          teamId,
+          templateId,
+          csvContent: csv,
+          sendImmediately,
+          requestMetadata: ctx.metadata.requestMetadata,
+        },
+      });
+
+      return { success: true };
     }),
 });

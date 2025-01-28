@@ -10,6 +10,7 @@ import { Button } from '@documenso/ui/primitives/button';
 import { Card, CardContent } from '@documenso/ui/primitives/card';
 import { LazyPDFViewer } from '@documenso/ui/primitives/lazy-pdf-viewer';
 
+import { TemplateBulkSendDialog } from '~/components/dialogs/template-bulk-send-dialog';
 import { TemplateDirectLinkDialogWrapper } from '~/components/dialogs/template-direct-link-dialog-wrapper';
 import { TemplateUseDialog } from '~/components/dialogs/template-use-dialog';
 import { DocumentReadOnlyFields } from '~/components/general/document/document-read-only-fields';
@@ -118,6 +119,8 @@ export default function TemplatePage() {
 
         <div className="mt-2 flex flex-row space-x-4 sm:mt-0 sm:self-end">
           <TemplateDirectLinkDialogWrapper template={template} />
+
+          <TemplateBulkSendDialog templateId={template.id} recipients={template.recipients} />
 
           <Button className="w-full" asChild>
             <Link to={`${templateRootPath}/${template.id}/edit`}>

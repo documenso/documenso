@@ -2,7 +2,7 @@ import { useState } from 'react';
 
 import { Trans } from '@lingui/react/macro';
 import type { Recipient, Template, TemplateDirectLink } from '@prisma/client';
-import { Copy, Edit, MoreHorizontal, MoveRight, Share2Icon, Trash2 } from 'lucide-react';
+import { Copy, Edit, MoreHorizontal, MoveRight, Share2Icon, Trash2, Upload } from 'lucide-react';
 import { Link } from 'react-router';
 
 import { useSession } from '@documenso/lib/client-only/providers/session';
@@ -14,6 +14,7 @@ import {
   DropdownMenuTrigger,
 } from '@documenso/ui/primitives/dropdown-menu';
 
+import { TemplateBulkSendDialog } from '../dialogs/template-bulk-send-dialog';
 import { TemplateDeleteDialog } from '../dialogs/template-delete-dialog';
 import { TemplateDirectLinkDialog } from '../dialogs/template-direct-link-dialog';
 import { TemplateDuplicateDialog } from '../dialogs/template-duplicate-dialog';
@@ -88,6 +89,17 @@ export const TemplatesTableActionDropdown = ({
             <Trans>Move to Team</Trans>
           </DropdownMenuItem>
         )}
+
+        <TemplateBulkSendDialog
+          templateId={row.id}
+          recipients={row.recipients}
+          trigger={
+            <div className="hover:bg-accent hover:text-accent-foreground relative flex cursor-pointer select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none transition-colors">
+              <Upload className="mr-2 h-4 w-4" />
+              <Trans>Bulk Send via CSV</Trans>
+            </div>
+          }
+        />
 
         <DropdownMenuItem
           disabled={!isOwner && !isTeamTemplate}

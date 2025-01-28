@@ -188,6 +188,14 @@ export const ZMoveTemplateToTeamRequestSchema = z.object({
 
 export const ZMoveTemplateToTeamResponseSchema = ZTemplateLiteSchema;
 
+export const ZBulkSendTemplateMutationSchema = z.object({
+  templateId: z.number(),
+  teamId: z.number().optional(),
+  csv: z.string().min(1),
+  sendImmediately: z.boolean(),
+});
+
 export type TCreateTemplateMutationSchema = z.infer<typeof ZCreateTemplateMutationSchema>;
 export type TDuplicateTemplateMutationSchema = z.infer<typeof ZDuplicateTemplateMutationSchema>;
 export type TDeleteTemplateMutationSchema = z.infer<typeof ZDeleteTemplateMutationSchema>;
+export type TBulkSendTemplateMutationSchema = z.infer<typeof ZBulkSendTemplateMutationSchema>;
