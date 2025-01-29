@@ -229,6 +229,14 @@ export const ZCreateDocumentFromTemplateMutationSchema = z.object({
     })
     .optional(),
   formValues: z.record(z.string(), z.union([z.string(), z.boolean(), z.number()])).optional(),
+  prefillValues: z
+    .array(
+      z.object({
+        id: z.number(),
+        fieldMeta: ZFieldMetaSchema,
+      }),
+    )
+    .optional(),
 });
 
 export type TCreateDocumentFromTemplateMutationSchema = z.infer<
@@ -299,6 +307,14 @@ export const ZGenerateDocumentFromTemplateMutationSchema = z.object({
     })
     .optional(),
   formValues: z.record(z.string(), z.union([z.string(), z.boolean(), z.number()])).optional(),
+  prefillValues: z
+    .array(
+      z.object({
+        id: z.number(),
+        fieldMeta: ZFieldMetaSchema,
+      }),
+    )
+    .optional(),
 });
 
 export type TGenerateDocumentFromTemplateMutationSchema = z.infer<

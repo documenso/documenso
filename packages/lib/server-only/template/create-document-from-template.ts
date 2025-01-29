@@ -17,6 +17,7 @@ import { AppError, AppErrorCode } from '../../errors/app-error';
 import { DOCUMENT_AUDIT_LOG_TYPE } from '../../types/document-audit-logs';
 import { ZRecipientAuthOptionsSchema } from '../../types/document-auth';
 import type { TDocumentEmailSettings } from '../../types/document-email';
+import type { TFieldMetaSchema } from '../../types/field-meta';
 import { ZFieldMetaSchema } from '../../types/field-meta';
 import {
   ZWebhookDocumentSchema,
@@ -50,6 +51,10 @@ export type CreateDocumentFromTemplateOptions = {
     email: string;
     signingOrder?: number | null;
   }[];
+  prefillValues?: {
+    id: number;
+    fieldMeta?: TFieldMetaSchema;
+  }[];
   customDocumentDataId?: string;
 
   /**
@@ -81,6 +86,7 @@ export const createDocumentFromTemplate = async ({
   customDocumentDataId,
   override,
   requestMetadata,
+  prefillValues,
 }: CreateDocumentFromTemplateOptions) => {
   const template = await prisma.template.findUnique({
     where: {
@@ -266,19 +272,23 @@ export const createDocumentFromTemplate = async ({
       }
 
       fieldsToCreate = fieldsToCreate.concat(
-        fields.map((field) => ({
-          documentId: document.id,
-          recipientId: recipient.id,
-          type: field.type,
-          page: field.page,
-          positionX: field.positionX,
-          positionY: field.positionY,
-          width: field.width,
-          height: field.height,
-          customText: '',
-          inserted: false,
-          fieldMeta: field.fieldMeta,
-        })),
+        fields.map((field) => {
+          const prefillValue = prefillValues?.find((value) => value?.id === field.id);
+
+          return {
+            documentId: document.id,
+            recipientId: recipient.id,
+            type: field.type,
+            page: field.page,
+            positionX: field.positionX,
+            positionY: field.positionY,
+            width: field.width,
+            height: field.height,
+            customText: '',
+            inserted: false,
+            fieldMeta: prefillValue?.fieldMeta ?? field.fieldMeta,
+          };
+        }),
       );
     });
 

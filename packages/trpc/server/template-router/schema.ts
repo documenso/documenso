@@ -6,6 +6,7 @@ import {
   ZDocumentActionAuthTypesSchema,
 } from '@documenso/lib/types/document-auth';
 import { ZDocumentEmailSettingsSchema } from '@documenso/lib/types/document-email';
+import { ZFieldMetaSchema } from '@documenso/lib/types/field-meta';
 import { ZFindResultResponse, ZFindSearchParamsSchema } from '@documenso/lib/types/search-params';
 import {
   ZTemplateLiteSchema,
@@ -65,6 +66,14 @@ export const ZCreateDocumentFromTemplateRequestSchema = z.object({
     .string()
     .describe(
       'The data ID of an alternative PDF to use when creating the document. If not provided, the PDF attached to the template will be used.',
+    )
+    .optional(),
+  prefillValues: z
+    .array(
+      z.object({
+        id: z.number(),
+        fieldMeta: ZFieldMetaSchema,
+      }),
     )
     .optional(),
 });
