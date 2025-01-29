@@ -1,7 +1,11 @@
 import { DateTime } from 'luxon';
 
-import { prisma } from '@documenso/prisma';
-import { DocumentStatus, SubscriptionStatus } from '@documenso/prisma/client';
+import { kyselyPrisma, prisma, sql } from '@documenso/prisma';
+import {
+  DocumentStatus,
+  SubscriptionStatus,
+  UserSecurityAuditLogType,
+} from '@documenso/prisma/client';
 
 export const getUsersCount = async () => {
   return await prisma.user.count();
@@ -94,17 +98,26 @@ type GetMonthlyActiveUsersQueryResult = Array<{
 }>;
 
 export const getMonthlyActiveUsers = async () => {
-  const result = await prisma.$queryRaw<GetMonthlyActiveUsersQueryResult>`
-      SELECT
-        DATE_TRUNC('month', "lastSignedIn") AS "month",
-        COUNT(DISTINCT "id") as "count",
-        SUM(COUNT(DISTINCT "id")) OVER (ORDER BY DATE_TRUNC('month', "lastSignedIn")) as "cume_count"
-      FROM "User"
-      WHERE "lastSignedIn" >= NOW() - INTERVAL '1 year' AND "disabled" = false
-      GROUP BY DATE_TRUNC('month', "lastSignedIn")
-      ORDER BY "month" DESC
-      LIMIT 12
-  `;
+  const qb = kyselyPrisma.$kysely
+    .selectFrom('UserSecurityAuditLog')
+    .select(({ fn }) => [
+      fn<Date>('DATE_TRUNC', [sql.lit('MONTH'), 'UserSecurityAuditLog.createdAt']).as('month'),
+      fn.count('userId').distinct().as('count'),
+      fn
+        .sum(fn.count('userId').distinct())
+        .over((ob) =>
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          ob.orderBy(fn('DATE_TRUNC', [sql.lit('MONTH'), 'UserSecurityAuditLog.createdAt']) as any),
+        )
+        .as('cume_count'),
+    ])
+    // @ts-expect-error - Raw SQL enum casting not properly typed by Kysely
+    .where(sql`type = ${UserSecurityAuditLogType.SIGN_IN}::"UserSecurityAuditLogType"`)
+    .groupBy(({ fn }) => fn('DATE_TRUNC', [sql.lit('MONTH'), 'UserSecurityAuditLog.createdAt']))
+    .orderBy('month', 'desc')
+    .limit(12);
+
+  const result = await qb.execute();
 
   return result.map((row) => ({
     month: DateTime.fromJSDate(row.month).toFormat('yyyy-MM'),
