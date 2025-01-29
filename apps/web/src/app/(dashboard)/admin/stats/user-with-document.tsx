@@ -1,8 +1,8 @@
 'use client';
 
 import { DateTime } from 'luxon';
-import { Bar, BarChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
 import type { TooltipProps } from 'recharts';
+import { Bar, BarChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
 import type { NameType, ValueType } from 'recharts/types/component/DefaultTooltipContent';
 
 import type { GetUserWithDocumentMonthlyGrowth } from '@documenso/lib/server-only/admin/get-users-stats';
@@ -23,7 +23,7 @@ const CustomTooltip = ({
 }: TooltipProps<ValueType, NameType> & { tooltip?: string }) => {
   if (active && payload && payload.length) {
     return (
-      <div className="z-100 w-60 space-y-1 rounded-md border border-solid  bg-white p-2 px-3">
+      <div className="z-100 w-60 space-y-1 rounded-md border border-solid bg-white p-2 px-3">
         <p className="">{label}</p>
         <p className="text-documenso">
           {`${tooltip} : `}
