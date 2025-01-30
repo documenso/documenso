@@ -264,6 +264,23 @@ export const createDocumentFromTemplate = async ({
 
     let fieldsToCreate: Omit<Field, 'id' | 'secondaryId' | 'templateId'>[] = [];
 
+    // Get all template field IDs first so we can validate later
+    const allTemplateFieldIds = finalRecipients.flatMap((recipient) =>
+      recipient.fields.map((field) => field.id),
+    );
+
+    if (prefillFields?.length) {
+      const invalidFieldIds = prefillFields
+        .map((prefillField) => prefillField.id)
+        .filter((id) => !allTemplateFieldIds.includes(id));
+
+      if (invalidFieldIds.length > 0) {
+        throw new Error(
+          `The following field IDs do not exist in the template: ${invalidFieldIds.join(', ')}`,
+        );
+      }
+    }
+
     Object.values(finalRecipients).forEach(({ email, fields }) => {
       const recipient = document.recipients.find((recipient) => recipient.email === email);
 
@@ -273,7 +290,17 @@ export const createDocumentFromTemplate = async ({
 
       fieldsToCreate = fieldsToCreate.concat(
         fields.map((field) => {
-          const prefillValue = prefillValues?.find((value) => value?.id === field.id);
+          const prefillField = prefillFields?.find((value) => value?.id === field.id);
+
+          if (prefillField?.fieldMeta) {
+            const fieldMeta = ZFieldMetaSchema.safeParse(prefillField.fieldMeta);
+
+            if (!fieldMeta.success) {
+              throw new Error(
+                `There has been an error parsing field meta for field ${field.id}: ${fieldMeta.error}`,
+              );
+            }
+          }
 
           return {
             documentId: document.id,
