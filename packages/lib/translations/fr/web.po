@@ -8,7 +8,7 @@ msgstr ""
 "Language: fr\n"
 "Project-Id-Version: documenso-app\n"
 "Report-Msgid-Bugs-To: \n"
-"PO-Revision-Date: 2024-12-31 08:04\n"
+"PO-Revision-Date: 2025-01-19 12:04\n"
 "Last-Translator: \n"
 "Language-Team: French\n"
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
@@ -360,7 +360,7 @@ msgstr "<0>{teamName}</0> a demandé à utiliser votre adresse e-mail pour leur 
 
 #: apps/web/src/app/(dashboard)/templates/use-template-dialog.tsx:463
 msgid "<0>Click to upload</0> or drag and drop"
-msgstr ""
+msgstr "<0>Cliquez pour télécharger</0> ou faites glisser et déposez"
 
 #: packages/ui/primitives/template-flow/add-template-settings.tsx:287
 msgid "<0>Email</0> - The recipient will be emailed the document to sign, approve, etc."
@@ -905,7 +905,7 @@ msgstr "Une erreur est survenue lors de la création du webhook. Veuillez réess
 
 #: apps/web/src/app/(dashboard)/admin/users/[id]/delete-user-dialog.tsx:63
 msgid "An error occurred while deleting the user."
-msgstr ""
+msgstr "Une erreur s'est produite lors de la suppression de l'utilisateur."
 
 #: apps/web/src/app/(dashboard)/templates/template-direct-link-dialog.tsx:120
 msgid "An error occurred while disabling direct link signing."
@@ -1389,7 +1389,7 @@ msgstr "Revendiquer votre nom d'utilisateur maintenant"
 
 #: apps/web/src/app/(dashboard)/templates/use-template-dialog.tsx:537
 msgid "Clear file"
-msgstr ""
+msgstr "Effacer le fichier"
 
 #: packages/ui/primitives/data-table.tsx:156
 msgid "Clear filters"
@@ -2670,7 +2670,7 @@ msgstr "Le fichier ne peut pas dépasser {APP_DOCUMENT_UPLOAD_SIZE_LIMIT} Mo"
 
 #: apps/web/src/app/(dashboard)/templates/use-template-dialog.tsx:513
 msgid "File size exceeds the limit of {APP_DOCUMENT_UPLOAD_SIZE_LIMIT} MB"
-msgstr ""
+msgstr "La taille du fichier dépasse la limite de {APP_DOCUMENT_UPLOAD_SIZE_LIMIT} MB"
 
 #: packages/ui/primitives/document-flow/field-items-advanced-settings/date-field.tsx:56
 #: packages/ui/primitives/document-flow/field-items-advanced-settings/email-field.tsx:38
@@ -3793,7 +3793,7 @@ msgstr "Veuillez examiner le document avant de signer."
 
 #: apps/web/src/app/(dashboard)/templates/use-template-dialog.tsx:503
 msgid "Please select a PDF file"
-msgstr ""
+msgstr "Veuillez sélectionner un fichier PDF"
 
 #: apps/web/src/components/forms/send-confirmation-email.tsx:64
 msgid "Please try again and make sure you enter the correct email address."
@@ -4713,7 +4713,7 @@ msgstr "Quelque chose a mal tourné."
 
 #: apps/web/src/components/forms/token.tsx:143
 msgid "Something went wrong. Please try again later."
-msgstr ""
+msgstr "Quelque chose a mal tourné. Veuillez réessayer plus tard."
 
 #: apps/web/src/app/(dashboard)/settings/security/passkeys/create-passkey-dialog.tsx:240
 #: apps/web/src/components/forms/2fa/view-recovery-codes-dialog.tsx:154
@@ -5818,7 +5818,7 @@ msgstr "Améliorer"
 
 #: apps/web/src/app/(dashboard)/templates/use-template-dialog.tsx:426
 msgid "Upload a custom document to use instead of the template's default document"
-msgstr ""
+msgstr "Téléchargez un document personnalisé à utiliser à la place du document par défaut du modèle"
 
 #: apps/web/src/components/forms/avatar-image.tsx:179
 msgid "Upload Avatar"
@@ -5826,7 +5826,7 @@ msgstr "Télécharger un avatar"
 
 #: apps/web/src/app/(dashboard)/templates/use-template-dialog.tsx:419
 msgid "Upload custom document"
-msgstr ""
+msgstr "Télécharger un document personnalisé"
 
 #: packages/ui/primitives/signature-pad/signature-pad.tsx:529
 msgid "Upload Signature"
@@ -6213,7 +6213,7 @@ msgstr "Une erreur inconnue s'est produite lors de la mise à jour de l'e-mail d
 
 #: apps/web/src/components/forms/profile.tsx:81
 msgid "We encountered an unknown error while attempting update your profile. Please try again later."
-msgstr ""
+msgstr "Nous avons rencontré une erreur inconnue lors de la tentative de mise à jour de votre profil. Veuillez réessayer plus tard."
 
 #: apps/web/src/components/(teams)/dialogs/add-team-email-dialog.tsx:80
 msgid "We have sent a confirmation email for verification."
@@ -6449,7 +6449,7 @@ msgstr "Vous n'êtes pas membre de cette équipe."
 
 #: apps/web/src/app/(dashboard)/admin/users/[id]/delete-user-dialog.tsx:62
 msgid "You are not authorized to delete this user."
-msgstr ""
+msgstr "Vous n'êtes pas autorisé à supprimer cet utilisateur."
 
 #: apps/web/src/app/(dashboard)/admin/users/[id]/disable-user-dialog.tsx:56
 msgid "You are not authorized to disable this user."
@@ -6525,7 +6525,7 @@ msgstr "Vous n'avez actuellement pas de dossier client, cela ne devrait pas se p
 
 #: apps/web/src/components/forms/token.tsx:141
 msgid "You do not have permission to create a token for this team"
-msgstr ""
+msgstr "Vous n'avez pas la permission de créer un jeton pour cette équipe"
 
 #: packages/email/template-components/template-document-cancel.tsx:35
 msgid "You don't need to sign it anymore."
@@ -6593,7 +6593,7 @@ msgstr "Vous avez atteint la limite maximale de {0} modèles directs. <0>Mettez 
 
 #: apps/web/src/app/(dashboard)/documents/upload-document.tsx:106
 msgid "You have reached your document limit for this month. Please upgrade your plan."
-msgstr ""
+msgstr "Vous avez atteint votre limite de documents pour ce mois. Veuillez passer à un plan supérieur."
 
 #: apps/web/src/app/(dashboard)/documents/upload-document.tsx:56
 #: packages/ui/primitives/document-dropzone.tsx:69
@@ -6857,3 +6857,4 @@ msgstr "Votre token a été créé avec succès ! Assurez-vous de le copier car 
 #: apps/web/src/app/(teams)/t/[teamUrl]/settings/tokens/page.tsx:86
 msgid "Your tokens will be shown here once you create them."
 msgstr "Vos tokens seront affichés ici une fois que vous les aurez créés."
+
