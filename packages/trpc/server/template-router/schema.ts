@@ -68,10 +68,10 @@ export const ZCreateDocumentFromTemplateRequestSchema = z.object({
       'The data ID of an alternative PDF to use when creating the document. If not provided, the PDF attached to the template will be used.',
     )
     .optional(),
-  prefillValues: z
+  prefillFields: z
     .array(
       z.object({
-        id: z.number(),
+        id: z.number().describe('The ID of the field in the template.'),
         fieldMeta: ZFieldMetaSchema,
       }),
     )

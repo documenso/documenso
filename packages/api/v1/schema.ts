@@ -229,10 +229,10 @@ export const ZCreateDocumentFromTemplateMutationSchema = z.object({
     })
     .optional(),
   formValues: z.record(z.string(), z.union([z.string(), z.boolean(), z.number()])).optional(),
-  prefillValues: z
+  prefillFields: z
     .array(
       z.object({
-        id: z.number(),
+        id: z.number().describe('The ID of the field in the template.'),
         fieldMeta: ZFieldMetaSchema,
       }),
     )
@@ -307,10 +307,10 @@ export const ZGenerateDocumentFromTemplateMutationSchema = z.object({
     })
     .optional(),
   formValues: z.record(z.string(), z.union([z.string(), z.boolean(), z.number()])).optional(),
-  prefillValues: z
+  prefillFields: z
     .array(
       z.object({
-        id: z.number(),
+        id: z.number().describe('The ID of the field in the template.'),
         fieldMeta: ZFieldMetaSchema,
       }),
     )

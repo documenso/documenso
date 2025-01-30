@@ -51,7 +51,7 @@ export type CreateDocumentFromTemplateOptions = {
     email: string;
     signingOrder?: number | null;
   }[];
-  prefillValues?: {
+  prefillFields?: {
     id: number;
     fieldMeta?: TFieldMetaSchema;
   }[];
@@ -86,7 +86,7 @@ export const createDocumentFromTemplate = async ({
   customDocumentDataId,
   override,
   requestMetadata,
-  prefillValues,
+  prefillFields,
 }: CreateDocumentFromTemplateOptions) => {
   const template = await prisma.template.findUnique({
     where: {
@@ -286,7 +286,7 @@ export const createDocumentFromTemplate = async ({
             height: field.height,
             customText: '',
             inserted: false,
-            fieldMeta: prefillValue?.fieldMeta ?? field.fieldMeta,
+            fieldMeta: prefillField?.fieldMeta ?? field.fieldMeta,
           };
         }),
       );
