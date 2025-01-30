@@ -73,6 +73,8 @@ export default async function SigningCertificate({ searchParams }: SigningCertif
     id: documentId,
   }).catch(() => null);
 
+  const documentAccessToken = document?.documentAccessToken?.token;
+
   if (!document) {
     return redirect('/');
   }
@@ -308,7 +310,7 @@ export default async function SigningCertificate({ searchParams }: SigningCertif
             <div
               className="flex h-24 w-24 justify-center"
               dangerouslySetInnerHTML={{
-                __html: renderSVG(`${WEBAPP_BASE_URL}/documents/${documentId}`, {
+                __html: renderSVG(`${WEBAPP_BASE_URL}/q/${documentAccessToken}`, {
                   ecc: 'Q',
                 }),
               }}

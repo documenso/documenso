@@ -11,6 +11,7 @@ export const getEntireDocument = async ({ id }: GetEntireDocumentOptions) => {
     },
     include: {
       documentMeta: true,
+      documentAccessToken: true,
       User: {
         select: {
           id: true,
