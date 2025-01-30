@@ -210,6 +210,13 @@ export const run = async ({
         },
       });
 
+      await tx.documentAccessToken.create({
+        data: {
+          token: nanoid(32),
+          documentId: document.id,
+        },
+      });
+
       await tx.documentAuditLog.create({
         data: createDocumentAuditLogData({
           type: DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_COMPLETED,
