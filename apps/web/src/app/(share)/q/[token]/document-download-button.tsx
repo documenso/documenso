@@ -10,7 +10,7 @@ import { Button } from '@documenso/ui/primitives/button';
 import { useToast } from '@documenso/ui/primitives/use-toast';
 
 export type DocumentDownloadButtonProps = {
-  document: Document & {
+  document: Pick<Document, 'title'> & {
     documentData: DocumentData;
   };
 };

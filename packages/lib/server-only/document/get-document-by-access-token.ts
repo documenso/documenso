@@ -13,11 +13,23 @@ export const getDocumentByAccessToken = async ({ token }: GetDocumentByAccessTok
     where: {
       token,
     },
-    include: {
+    select: {
       document: {
-        include: {
-          documentData: true,
-          documentMeta: true,
+        select: {
+          title: true,
+          documentData: {
+            select: {
+              id: true,
+              type: true,
+              data: true,
+              initialData: true,
+            },
+          },
+          documentMeta: {
+            select: {
+              password: true,
+            },
+          },
         },
       },
     },
