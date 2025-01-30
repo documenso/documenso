@@ -91,12 +91,6 @@ export type GetMonthlyActiveUsersResult = Array<{
   cume_count: number;
 }>;
 
-type GetMonthlyActiveUsersQueryResult = Array<{
-  month: Date;
-  count: bigint;
-  cume_count: bigint;
-}>;
-
 export const getMonthlyActiveUsers = async () => {
   const qb = kyselyPrisma.$kysely
     .selectFrom('UserSecurityAuditLog')
