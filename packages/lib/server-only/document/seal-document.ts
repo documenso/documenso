@@ -103,6 +103,21 @@ export const sealDocument = async ({
     documentData.data = documentData.initialData;
   }
 
+  const existingDocumentAccessToken = await prisma.documentAccessToken.findUnique({
+    where: {
+      documentId: document.id,
+    },
+  });
+
+  if (!existingDocumentAccessToken) {
+    await prisma.documentAccessToken.create({
+      data: {
+        token: nanoid(),
+        documentId: document.id,
+      },
+    });
+  }
+
   // !: Need to write the fields onto the document as a hard copy
   const pdfData = await getFile(documentData);
 
