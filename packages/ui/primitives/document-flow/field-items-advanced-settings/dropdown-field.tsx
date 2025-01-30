@@ -106,7 +106,6 @@ export const DropdownFieldAdvancedSettings = ({
         </Label>
         <Select
           value={defaultValue}
-          defaultValue={defaultValue}
           onValueChange={(val) => {
             if (!val) {
               return;
