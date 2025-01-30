@@ -8,7 +8,7 @@ msgstr ""
 "Language: fr\n"
 "Project-Id-Version: documenso-app\n"
 "Report-Msgid-Bugs-To: \n"
-"PO-Revision-Date: 2025-01-19 12:04\n"
+"PO-Revision-Date: 2025-01-30 03:57\n"
 "Last-Translator: \n"
 "Language-Team: French\n"
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
@@ -1981,12 +1981,12 @@ msgstr "Désactiver 2FA"
 
 #: apps/web/src/app/(dashboard)/admin/users/[id]/disable-user-dialog.tsx:132
 msgid "Disable account"
-msgstr ""
+msgstr "Désactiver le compte"
 
 #: apps/web/src/app/(dashboard)/admin/users/[id]/disable-user-dialog.tsx:88
 #: apps/web/src/app/(dashboard)/admin/users/[id]/disable-user-dialog.tsx:95
 msgid "Disable Account"
-msgstr ""
+msgstr "Désactiver le Compte"
 
 #: apps/web/src/app/(dashboard)/settings/profile/delete-account-dialog.tsx:105
 msgid "Disable Two Factor Authentication before deleting your account."
@@ -2450,12 +2450,12 @@ msgstr "Activer 2FA"
 
 #: apps/web/src/app/(dashboard)/admin/users/[id]/enable-user-dialog.tsx:121
 msgid "Enable account"
-msgstr ""
+msgstr "Activer le compte"
 
 #: apps/web/src/app/(dashboard)/admin/users/[id]/enable-user-dialog.tsx:88
 #: apps/web/src/app/(dashboard)/admin/users/[id]/enable-user-dialog.tsx:95
 msgid "Enable Account"
-msgstr ""
+msgstr "Activer le Compte"
 
 #: apps/web/src/components/forms/2fa/enable-authenticator-app-dialog.tsx:194
 msgid "Enable Authenticator App"
@@ -3969,7 +3969,7 @@ msgstr "E-mail de destinataire supprimé"
 
 #: packages/ui/components/document/document-email-checkboxes.tsx:50
 msgid "Recipient signed email"
-msgstr ""
+msgstr "E-mail signé par le destinataire"
 
 #: packages/ui/components/document/document-email-checkboxes.tsx:88
 msgid "Recipient signing request email"
@@ -4325,7 +4325,7 @@ msgstr "Envoyer l'e-mail de document complété"
 
 #: packages/ui/components/document/document-email-checkboxes.tsx:269
 msgid "Send document completed email to the owner"
-msgstr ""
+msgstr "Envoyer l'e-mail de document complété au propriétaire"
 
 #: packages/ui/components/document/document-email-checkboxes.tsx:231
 msgid "Send document deleted email"
@@ -4349,7 +4349,7 @@ msgstr "Envoyer l'e-mail de destinataire supprimé"
 
 #: packages/ui/components/document/document-email-checkboxes.tsx:40
 msgid "Send recipient signed email"
-msgstr ""
+msgstr "Envoyer l'e-mail signé par le destinataire"
 
 #: packages/ui/components/document/document-email-checkboxes.tsx:78
 msgid "Send recipient signing request email"
