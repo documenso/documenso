@@ -1320,12 +1320,12 @@ msgstr "No se puede eliminar el firmante"
 
 #: packages/lib/constants/recipient-roles.ts:18
 msgid "Cc"
-msgstr "Copia visible"
+msgstr "Cc"
 
 #: packages/lib/constants/recipient-roles.ts:15
 #: packages/lib/constants/recipient-roles.ts:17
 msgid "CC"
-msgstr "COPIA VISIBLE"
+msgstr "CC"
 
 #: packages/lib/constants/recipient-roles.ts:16
 msgid "CC'd"
