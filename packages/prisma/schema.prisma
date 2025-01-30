@@ -320,7 +320,8 @@ model Document {
   template       Template?           @relation(fields: [templateId], references: [id], onDelete: SetNull)
   source         DocumentSource
 
-  auditLogs DocumentAuditLog[]
+  auditLogs           DocumentAuditLog[]
+  documentAccessToken DocumentAccessToken?
 
   @@unique([documentDataId])
   @@index([userId])
@@ -384,6 +385,23 @@ model DocumentMeta {
   language              String                     @default("en")
   distributionMethod    DocumentDistributionMethod @default(EMAIL)
   emailSettings         Json?
+}
+
+model DocumentAccessToken {
+  id             String    @id @default(cuid())
+  token          String    @unique
+  documentId     Int       @unique
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+  expiresAt      DateTime?
+  revokedAt      DateTime?
+  lastAccessedAt DateTime?
+  accessCount    Int       @default(0)
+
+  document Document @relation(fields: [documentId], references: [id], onDelete: Cascade)
+
+  @@index([token])
+  @@index([documentId])
 }
 
 enum ReadStatus {
