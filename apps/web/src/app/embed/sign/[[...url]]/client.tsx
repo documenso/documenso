@@ -84,7 +84,7 @@ export const EmbedSignDocumentClientPage = ({
     fields.filter((field) => field.inserted),
   ];
 
-  const { mutateAsync: completeDocumentWithToken, isLoading: isSubmitting } =
+  const { mutateAsync: completeDocumentWithToken, isPending: isSubmitting } =
     trpc.recipient.completeDocumentWithToken.useMutation();
 
   const hasSignatureField = fields.some((field) => field.type === FieldType.SIGNATURE);

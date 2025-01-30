@@ -26,9 +26,9 @@ export const updateSigningPlaceholder = ({ pdf }: UpdateSigningPlaceholderOption
   const newByteRange = `[${byteRange.join(' ')}]`.padEnd(byteRangeSlice.length, ' ');
 
   const updatedPdf = Buffer.concat([
-    pdf.subarray(0, byteRangeStart),
-    Buffer.from(newByteRange),
-    pdf.subarray(byteRangeEnd + 1),
+    new Uint8Array(pdf.subarray(0, byteRangeStart)),
+    new Uint8Array(Buffer.from(newByteRange)),
+    new Uint8Array(pdf.subarray(byteRangeEnd + 1)),
   ]);
 
   if (updatedPdf.length !== length) {

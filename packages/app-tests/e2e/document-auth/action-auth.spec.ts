@@ -28,7 +28,7 @@ test('[DOCUMENT_AUTH]: should allow signing when no auth setup', async ({ page }
 
   // Check that both are granted access.
   for (const recipient of recipients) {
-    const { token, Field } = recipient;
+    const { token, fields } = recipient;
 
     const signUrl = `/sign/${token}`;
 
@@ -45,7 +45,7 @@ test('[DOCUMENT_AUTH]: should allow signing when no auth setup', async ({ page }
       await page.mouse.up();
     }
 
-    for (const field of Field) {
+    for (const field of fields) {
       await page.locator(`#field-${field.id}`).getByRole('button').click();
 
       if (field.type === FieldType.TEXT) {
@@ -80,7 +80,7 @@ test('[DOCUMENT_AUTH]: should allow signing with valid global auth', async ({ pa
 
   const recipient = recipients[0];
 
-  const { token, Field } = recipient;
+  const { token, fields } = recipient;
 
   const signUrl = `/sign/${token}`;
 
@@ -102,7 +102,7 @@ test('[DOCUMENT_AUTH]: should allow signing with valid global auth', async ({ pa
     await page.mouse.up();
   }
 
-  for (const field of Field) {
+  for (const field of fields) {
     await page.locator(`#field-${field.id}`).getByRole('button').click();
 
     if (field.type === FieldType.TEXT) {
@@ -170,12 +170,12 @@ test('[DOCUMENT_AUTH]: should deny signing fields when required for global auth'
 
   // Check that both are denied access.
   for (const recipient of recipients) {
-    const { token, Field } = recipient;
+    const { token, fields } = recipient;
 
     await page.goto(`/sign/${token}`);
     await expect(page.getByRole('heading', { name: 'Sign Document' })).toBeVisible();
 
-    for (const field of Field) {
+    for (const field of fields) {
       if (field.type !== FieldType.SIGNATURE) {
         continue;
       }
@@ -229,7 +229,7 @@ test('[DOCUMENT_AUTH]: should allow field signing when required for recipient au
   });
 
   for (const recipient of recipients) {
-    const { token, Field } = recipient;
+    const { token, fields } = recipient;
     const { actionAuth } = ZRecipientAuthOptionsSchema.parse(recipient.authOptions);
 
     // This document has no global action auth, so only account should require auth.
@@ -241,7 +241,7 @@ test('[DOCUMENT_AUTH]: should allow field signing when required for recipient au
     await expect(page.getByRole('heading', { name: 'Sign Document' })).toBeVisible();
 
     if (isAuthRequired) {
-      for (const field of Field) {
+      for (const field of fields) {
         if (field.type !== FieldType.SIGNATURE) {
           continue;
         }
@@ -271,7 +271,7 @@ test('[DOCUMENT_AUTH]: should allow field signing when required for recipient au
       await page.mouse.up();
     }
 
-    for (const field of Field) {
+    for (const field of fields) {
       await page.locator(`#field-${field.id}`).getByRole('button').click();
 
       if (field.type === FieldType.TEXT) {
@@ -340,7 +340,7 @@ test('[DOCUMENT_AUTH]: should allow field signing when required for recipient an
   });
 
   for (const recipient of recipients) {
-    const { token, Field } = recipient;
+    const { token, fields } = recipient;
     const { actionAuth } = ZRecipientAuthOptionsSchema.parse(recipient.authOptions);
 
     // This document HAS global action auth, so account and inherit should require auth.
@@ -352,7 +352,7 @@ test('[DOCUMENT_AUTH]: should allow field signing when required for recipient an
     await expect(page.getByRole('heading', { name: 'Sign Document' })).toBeVisible();
 
     if (isAuthRequired) {
-      for (const field of Field) {
+      for (const field of fields) {
         if (field.type !== FieldType.SIGNATURE) {
           continue;
         }
@@ -382,7 +382,7 @@ test('[DOCUMENT_AUTH]: should allow field signing when required for recipient an
       await page.mouse.up();
     }
 
-    for (const field of Field) {
+    for (const field of fields) {
       await page.locator(`#field-${field.id}`).getByRole('button').click();
 
       if (field.type === FieldType.TEXT) {

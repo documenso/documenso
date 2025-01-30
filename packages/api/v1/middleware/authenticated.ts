@@ -2,6 +2,8 @@ import type { NextApiRequest } from 'next';
 
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import { getApiTokenByToken } from '@documenso/lib/server-only/public-api/get-api-token-by-token';
+import type { ApiRequestMetadata } from '@documenso/lib/universal/extract-request-metadata';
+import { extractNextApiRequestMetadata } from '@documenso/lib/universal/extract-request-metadata';
 import type { Team, User } from '@documenso/prisma/client';
 
 export const authenticatedMiddleware = <
@@ -13,7 +15,12 @@ export const authenticatedMiddleware = <
     body: unknown;
   },
 >(
-  handler: (args: T, user: User, team?: Team | null) => Promise<R>,
+  handler: (
+    args: T,
+    user: User,
+    team: Team | null | undefined,
+    options: { metadata: ApiRequestMetadata },
+  ) => Promise<R>,
 ) => {
   return async (args: T) => {
     try {
@@ -36,7 +43,18 @@ export const authenticatedMiddleware = <
         });
       }
 
-      return await handler(args, apiToken.user, apiToken.team);
+      const metadata: ApiRequestMetadata = {
+        requestMetadata: extractNextApiRequestMetadata(args.req),
+        source: 'apiV1',
+        auth: 'api',
+        auditUser: {
+          id: apiToken.team ? null : apiToken.user.id,
+          email: apiToken.team ? null : apiToken.user.email,
+          name: apiToken.team?.name ?? apiToken.user.name,
+        },
+      };
+
+      return await handler(args, apiToken.user, apiToken.team, { metadata });
     } catch (err) {
       console.log({ err: err });
 

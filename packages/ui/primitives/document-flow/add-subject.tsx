@@ -7,6 +7,7 @@ import { AnimatePresence, motion } from 'framer-motion';
 import { useForm } from 'react-hook-form';
 
 import { RECIPIENT_ROLES_DESCRIPTION } from '@documenso/lib/constants/recipient-roles';
+import type { TDocument } from '@documenso/lib/types/document';
 import { ZDocumentEmailSettingsSchema } from '@documenso/lib/types/document-email';
 import { formatSigningLink } from '@documenso/lib/utils/recipients';
 import type { Field, Recipient } from '@documenso/prisma/client';
@@ -15,7 +16,6 @@ import {
   DocumentStatus,
   RecipientRole,
 } from '@documenso/prisma/client';
-import type { DocumentWithData } from '@documenso/prisma/types/document-with-data';
 import { DocumentSendEmailMessageHelper } from '@documenso/ui/components/document/document-send-email-message-helper';
 import { Tabs, TabsList, TabsTrigger } from '@documenso/ui/primitives/tabs';
 
@@ -43,7 +43,7 @@ export type AddSubjectFormProps = {
   documentFlow: DocumentFlowStep;
   recipients: Recipient[];
   fields: Field[];
-  document: DocumentWithData;
+  document: TDocument;
   onSubmit: (_data: TAddSubjectFormSchema) => void;
   isDocumentPdfLoaded: boolean;
 };

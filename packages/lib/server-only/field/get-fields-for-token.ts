@@ -7,12 +7,12 @@ export type GetFieldsForTokenOptions = {
 export const getFieldsForToken = async ({ token }: GetFieldsForTokenOptions) => {
   return await prisma.field.findMany({
     where: {
-      Recipient: {
+      recipient: {
         token,
       },
     },
     include: {
-      Signature: true,
+      signature: true,
     },
   });
 };

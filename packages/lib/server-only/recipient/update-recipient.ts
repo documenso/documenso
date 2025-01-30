@@ -40,7 +40,7 @@ export const updateRecipient = async ({
   const recipient = await prisma.recipient.findFirst({
     where: {
       id: recipientId,
-      Document: {
+      document: {
         id: documentId,
         ...(teamId
           ? {
@@ -60,7 +60,7 @@ export const updateRecipient = async ({
       },
     },
     include: {
-      Document: true,
+      document: true,
     },
   });
 

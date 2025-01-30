@@ -28,7 +28,7 @@ export const AdminActions = ({ className, document, recipients }: AdminActionsPr
   const { _ } = useLingui();
   const { toast } = useToast();
 
-  const { mutate: resealDocument, isLoading: isResealDocumentLoading } =
+  const { mutate: resealDocument, isPending: isResealDocumentLoading } =
     trpc.admin.resealDocument.useMutation({
       onSuccess: () => {
         toast({

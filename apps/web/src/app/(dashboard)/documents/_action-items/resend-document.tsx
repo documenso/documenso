@@ -91,7 +91,7 @@ export const ResendDocumentActionItem = ({
 
   const onFormSubmit = async ({ recipients }: TResendDocumentFormSchema) => {
     try {
-      await resendDocument({ documentId: document.id, recipients, teamId: team?.id });
+      await resendDocument({ documentId: document.id, recipients });
 
       toast({
         title: _(msg`Document re-sent`),

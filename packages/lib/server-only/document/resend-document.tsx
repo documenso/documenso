@@ -10,7 +10,7 @@ import {
   RECIPIENT_ROLE_TO_EMAIL_TYPE,
 } from '@documenso/lib/constants/recipient-roles';
 import { DOCUMENT_AUDIT_LOG_TYPE } from '@documenso/lib/types/document-audit-logs';
-import type { RequestMetadata } from '@documenso/lib/universal/extract-request-metadata';
+import type { ApiRequestMetadata } from '@documenso/lib/universal/extract-request-metadata';
 import { createDocumentAuditLogData } from '@documenso/lib/utils/document-audit-logs';
 import { renderCustomEmailTemplate } from '@documenso/lib/utils/render-custom-email-template';
 import { prisma } from '@documenso/prisma';
@@ -29,7 +29,7 @@ export type ResendDocumentOptions = {
   userId: number;
   recipients: number[];
   teamId?: number;
-  requestMetadata: RequestMetadata;
+  requestMetadata: ApiRequestMetadata;
 };
 
 export const resendDocument = async ({
@@ -54,7 +54,7 @@ export const resendDocument = async ({
   const document = await prisma.document.findUnique({
     where: documentWhereInput,
     include: {
-      Recipient: {
+      recipients: {
         where: {
           id: {
             in: recipients,
@@ -80,7 +80,7 @@ export const resendDocument = async ({
     throw new Error('Document not found');
   }
 
-  if (document.Recipient.length === 0) {
+  if (document.recipients.length === 0) {
     throw new Error('Document has no recipients');
   }
 
@@ -101,7 +101,7 @@ export const resendDocument = async ({
   }
 
   await Promise.all(
-    document.Recipient.map(async (recipient) => {
+    document.recipients.map(async (recipient) => {
       if (recipient.role === RecipientRole.CC) {
         return;
       }
@@ -201,8 +201,7 @@ export const resendDocument = async ({
             data: createDocumentAuditLogData({
               type: DOCUMENT_AUDIT_LOG_TYPE.EMAIL_SENT,
               documentId: document.id,
-              user,
-              requestMetadata,
+              metadata: requestMetadata,
               data: {
                 emailType: recipientEmailType,
                 recipientEmail: recipient.email,

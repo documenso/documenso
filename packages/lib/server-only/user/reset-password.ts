@@ -24,7 +24,7 @@ export const resetPassword = async ({ token, password, requestMetadata }: ResetP
       token,
     },
     include: {
-      User: true,
+      user: true,
     },
   });
 
@@ -38,7 +38,7 @@ export const resetPassword = async ({ token, password, requestMetadata }: ResetP
     throw new AppError(AppErrorCode.EXPIRED_CODE);
   }
 
-  const isSamePassword = await compare(password, foundToken.User.password || '');
+  const isSamePassword = await compare(password, foundToken.user.password || '');
 
   if (isSamePassword) {
     throw new AppError('SAME_PASSWORD');

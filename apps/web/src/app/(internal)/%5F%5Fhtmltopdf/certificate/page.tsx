@@ -88,7 +88,7 @@ export default async function SigningCertificate({ searchParams }: SigningCertif
   });
 
   const isOwner = (email: string) => {
-    return email.toLowerCase() === document.User.email.toLowerCase();
+    return email.toLowerCase() === document.user.email.toLowerCase();
   };
 
   const getDevice = (userAgent?: string | null) => {
@@ -106,7 +106,7 @@ export default async function SigningCertificate({ searchParams }: SigningCertif
   };
 
   const getAuthenticationLevel = (recipientId: number) => {
-    const recipient = document.Recipient.find((recipient) => recipient.id === recipientId);
+    const recipient = document.recipients.find((recipient) => recipient.id === recipientId);
 
     if (!recipient) {
       return 'Unknown';
@@ -159,9 +159,11 @@ export default async function SigningCertificate({ searchParams }: SigningCertif
   };
 
   const getRecipientSignatureField = (recipientId: number) => {
-    return document.Recipient.find((recipient) => recipient.id === recipientId)?.Field.find(
-      (field) => field.type === FieldType.SIGNATURE || field.type === FieldType.FREE_SIGNATURE,
-    );
+    return document.recipients
+      .find((recipient) => recipient.id === recipientId)
+      ?.fields.find(
+        (field) => field.type === FieldType.SIGNATURE || field.type === FieldType.FREE_SIGNATURE,
+      );
   };
 
   return (
@@ -183,7 +185,7 @@ export default async function SigningCertificate({ searchParams }: SigningCertif
             </TableHeader>
 
             <TableBody className="print:text-xs">
-              {document.Recipient.map((recipient, i) => {
+              {document.recipients.map((recipient, i) => {
                 const logs = getRecipientAuditLogs(recipient.id);
                 const signature = getRecipientSignatureField(recipient.id);
 
@@ -211,17 +213,17 @@ export default async function SigningCertificate({ searchParams }: SigningCertif
                               boxShadow: `0px 0px 0px 4.88px rgba(122, 196, 85, 0.1), 0px 0px 0px 1.22px rgba(122, 196, 85, 0.6), 0px 0px 0px 0.61px rgba(122, 196, 85, 1)`,
                             }}
                           >
-                            {signature.Signature?.signatureImageAsBase64 && (
+                            {signature.signature?.signatureImageAsBase64 && (
                               <img
-                                src={`${signature.Signature?.signatureImageAsBase64}`}
+                                src={`${signature.signature?.signatureImageAsBase64}`}
                                 alt="Signature"
                                 className="max-h-12 max-w-full"
                               />
                             )}
 
-                            {signature.Signature?.typedSignature && (
+                            {signature.signature?.typedSignature && (
                               <p className="font-signature text-center text-sm">
-                                {signature.Signature?.typedSignature}
+                                {signature.signature?.typedSignature}
                               </p>
                             )}
                           </div>

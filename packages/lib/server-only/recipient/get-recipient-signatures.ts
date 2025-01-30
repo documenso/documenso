@@ -7,7 +7,7 @@ export type GetRecipientSignaturesOptions = {
 export const getRecipientSignatures = async ({ recipientId }: GetRecipientSignaturesOptions) => {
   return await prisma.signature.findMany({
     where: {
-      Field: {
+      field: {
         recipientId,
       },
     },

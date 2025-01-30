@@ -35,16 +35,15 @@ export const UserSecurityActivityDataTable = () => {
 
   const parsedSearchParams = ZUrlSearchParamsSchema.parse(Object.fromEntries(searchParams ?? []));
 
-  const { data, isLoading, isInitialLoading, isLoadingError } =
-    trpc.profile.findUserSecurityAuditLogs.useQuery(
-      {
-        page: parsedSearchParams.page,
-        perPage: parsedSearchParams.perPage,
-      },
-      {
-        keepPreviousData: true,
-      },
-    );
+  const { data, isLoading, isLoadingError } = trpc.profile.findUserSecurityAuditLogs.useQuery(
+    {
+      page: parsedSearchParams.page,
+      perPage: parsedSearchParams.perPage,
+    },
+    {
+      placeholderData: (previousData) => previousData,
+    },
+  );
 
   const onPaginationChange = (page: number, perPage: number) => {
     updateSearchParams({
@@ -134,7 +133,7 @@ export const UserSecurityActivityDataTable = () => {
         enable: isLoadingError,
       }}
       skeleton={{
-        enable: isLoading && isInitialLoading,
+        enable: isLoading,
         rows: 3,
         component: (
           <>

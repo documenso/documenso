@@ -3,13 +3,13 @@ import sharp from 'sharp';
 import { prisma } from '@documenso/prisma';
 
 import { AppError, AppErrorCode } from '../../errors/app-error';
-import type { RequestMetadata } from '../../universal/extract-request-metadata';
+import type { ApiRequestMetadata } from '../../universal/extract-request-metadata';
 
 export type SetAvatarImageOptions = {
   userId: number;
   teamId?: number | null;
   bytes?: string | null;
-  requestMetadata?: RequestMetadata;
+  requestMetadata: ApiRequestMetadata;
 };
 
 export const setAvatarImage = async ({

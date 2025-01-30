@@ -91,7 +91,7 @@ export function CommandMenu({ open, onOpenChange }: CommandMenuProps) {
         query: search,
       },
       {
-        keepPreviousData: true,
+        placeholderData: (previousData) => previousData,
         // Do not batch this due to relatively long request time compared to
         // other queries which are generally batched with this.
         ...SKIP_QUERY_BATCH_META,

@@ -38,7 +38,6 @@ export const DeleteDocumentDialog = ({
   onOpenChange,
   status,
   documentTitle,
-  teamId,
   canManageDocument,
 }: DeleteDocumentDialogProps) => {
   const router = useRouter();
@@ -52,7 +51,7 @@ export const DeleteDocumentDialog = ({
   const [inputValue, setInputValue] = useState('');
   const [isDeleteEnabled, setIsDeleteEnabled] = useState(status === DocumentStatus.DRAFT);
 
-  const { mutateAsync: deleteDocument, isLoading } = trpcReact.document.deleteDocument.useMutation({
+  const { mutateAsync: deleteDocument, isPending } = trpcReact.document.deleteDocument.useMutation({
     onSuccess: () => {
       router.refresh();
       void refreshLimits();
@@ -76,7 +75,7 @@ export const DeleteDocumentDialog = ({
 
   const onDelete = async () => {
     try {
-      await deleteDocument({ documentId: id, teamId });
+      await deleteDocument({ documentId: id });
     } catch {
       toast({
         title: _(msg`Something went wrong`),
@@ -93,7 +92,7 @@ export const DeleteDocumentDialog = ({
   };
 
   return (
-    <Dialog open={open} onOpenChange={(value) => !isLoading && onOpenChange(value)}>
+    <Dialog open={open} onOpenChange={(value) => !isPending && onOpenChange(value)}>
       <DialogContent>
         <DialogHeader>
           <DialogTitle>
@@ -194,7 +193,7 @@ export const DeleteDocumentDialog = ({
 
           <Button
             type="button"
-            loading={isLoading}
+            loading={isPending}
             onClick={onDelete}
             disabled={!isDeleteEnabled && canManageDocument}
             variant="destructive"
