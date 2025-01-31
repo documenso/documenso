@@ -33,13 +33,13 @@ import { useToast } from '@documenso/ui/primitives/use-toast';
 
 import { useOptionalCurrentTeam } from '~/providers/team';
 
-export type DeleteWebhookDialogProps = {
+export type WebhookDeleteDialogProps = {
   webhook: Pick<Webhook, 'id' | 'webhookUrl'>;
   onDelete?: () => void;
   children: React.ReactNode;
 };
 
-export const DeleteWebhookDialog = ({ webhook, children }: DeleteWebhookDialogProps) => {
+export const WebhookDeleteDialog = ({ webhook, children }: WebhookDeleteDialogProps) => {
   const { _ } = useLingui();
   const { toast } = useToast();
 

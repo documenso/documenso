@@ -3,7 +3,6 @@ import { Trans, msg } from '@lingui/macro';
 import { useLingui } from '@lingui/react';
 import { Loader } from 'lucide-react';
 import { useForm } from 'react-hook-form';
-import { useParams } from 'react-router';
 import type { z } from 'zod';
 
 import { trpc } from '@documenso/trpc/react';
@@ -24,25 +23,27 @@ import { Switch } from '@documenso/ui/primitives/switch';
 import { useToast } from '@documenso/ui/primitives/use-toast';
 
 import { SettingsHeader } from '~/components/(dashboard)/settings/layout/header';
-import { TriggerMultiSelectCombobox } from '~/components/general/webhook-multiselect-combobox';
+import { WebhookMultiSelectCombobox } from '~/components/general/webhook-multiselect-combobox';
+import { useCurrentTeam } from '~/providers/team';
+
+import type { Route } from './+types/webhooks.$id';
 
 const ZEditWebhookFormSchema = ZEditWebhookMutationSchema.omit({ id: true });
 
 type TEditWebhookFormSchema = z.infer<typeof ZEditWebhookFormSchema>;
 
-export default function WebhookPage() {
-  const params = useParams();
-
+export default function WebhookPage({ params }: Route.ComponentProps) {
   const { _ } = useLingui();
   const { toast } = useToast();
 
-  const webhookId = params.id || '';
+  const team = useCurrentTeam();
 
   const { data: webhook, isLoading } = trpc.webhook.getWebhookById.useQuery(
     {
-      id: webhookId,
+      id: params.id,
+      teamId: team.id,
     },
-    { enabled: !!webhookId },
+    { enabled: !!params.id && !!team.id },
   );
 
   const { mutateAsync: updateWebhook } = trpc.webhook.editWebhook.useMutation();
@@ -60,7 +61,8 @@ export default function WebhookPage() {
   const onSubmit = async (data: TEditWebhookFormSchema) => {
     try {
       await updateWebhook({
-        id: webhookId,
+        id: params.id,
+        teamId: team.id,
         ...data,
       });
 
@@ -108,9 +110,7 @@ export default function WebhookPage() {
                 name="webhookUrl"
                 render={({ field }) => (
                   <FormItem className="flex-1">
-                    <FormLabel required>
-                      <Trans>Webhook URL</Trans>
-                    </FormLabel>
+                    <FormLabel required>Webhook URL</FormLabel>
                     <FormControl>
                       <Input className="bg-background" {...field} />
                     </FormControl>
@@ -158,7 +158,7 @@ export default function WebhookPage() {
                     <Trans>Triggers</Trans>
                   </FormLabel>
                   <FormControl>
-                    <TriggerMultiSelectCombobox
+                    <WebhookMultiSelectCombobox
                       listValues={value}
                       onChange={(values: string[]) => {
                         onChange(values);
@@ -167,7 +167,7 @@ export default function WebhookPage() {
                   </FormControl>
 
                   <FormDescription>
-                    <Trans> The events that will trigger a webhook to be sent to your URL.</Trans>
+                    <Trans>The events that will trigger a webhook to be sent to your URL.</Trans>
                   </FormDescription>
 
                   <FormMessage />
@@ -180,9 +180,7 @@ export default function WebhookPage() {
               name="secret"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>
-                    <Trans>Secret</Trans>
-                  </FormLabel>
+                  <FormLabel>Secret</FormLabel>
                   <FormControl>
                     <PasswordInput className="bg-background" {...field} value={field.value ?? ''} />
                   </FormControl>

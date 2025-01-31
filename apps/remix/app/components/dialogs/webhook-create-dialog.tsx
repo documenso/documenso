@@ -35,17 +35,17 @@ import { useToast } from '@documenso/ui/primitives/use-toast';
 
 import { useOptionalCurrentTeam } from '~/providers/team';
 
-import { TriggerMultiSelectCombobox } from './trigger-multiselect-combobox';
+import { WebhookMultiSelectCombobox } from '../general/webhook-multiselect-combobox';
 
 const ZCreateWebhookFormSchema = ZCreateWebhookMutationSchema.omit({ teamId: true });
 
 type TCreateWebhookFormSchema = z.infer<typeof ZCreateWebhookFormSchema>;
 
-export type CreateWebhookDialogProps = {
+export type WebhookCreateDialogProps = {
   trigger?: React.ReactNode;
 } & Omit<DialogPrimitive.DialogProps, 'children'>;
 
-export const CreateWebhookDialog = ({ trigger, ...props }: CreateWebhookDialogProps) => {
+export const WebhookCreateDialog = ({ trigger, ...props }: WebhookCreateDialogProps) => {
   const { _ } = useLingui();
   const { toast } = useToast();
 
@@ -185,7 +185,7 @@ export const CreateWebhookDialog = ({ trigger, ...props }: CreateWebhookDialogPr
                       <Trans>Triggers</Trans>
                     </FormLabel>
                     <FormControl>
-                      <TriggerMultiSelectCombobox
+                      <WebhookMultiSelectCombobox
                         listValues={value}
                         onChange={(values: string[]) => {
                           onChange(values);

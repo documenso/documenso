@@ -18,15 +18,15 @@ import { Popover, PopoverContent, PopoverTrigger } from '@documenso/ui/primitive
 
 import { truncateTitle } from '~/helpers/truncate-title';
 
-type TriggerMultiSelectComboboxProps = {
+type WebhookMultiSelectComboboxProps = {
   listValues: string[];
   onChange: (_values: string[]) => void;
 };
 
-export const TriggerMultiSelectCombobox = ({
+export const WebhookMultiSelectCombobox = ({
   listValues,
   onChange,
-}: TriggerMultiSelectComboboxProps) => {
+}: WebhookMultiSelectComboboxProps) => {
   const [isOpen, setIsOpen] = useState(false);
   const [selectedValues, setSelectedValues] = useState<string[]>([]);
 

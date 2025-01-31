@@ -1,14 +1,14 @@
 import { createContext, useContext } from 'react';
 import React from 'react';
 
-import type { TGetTeamByIdResponse } from '@documenso/lib/server-only/team/get-team';
+import type { TGetTeamByUrlResponse } from '@documenso/lib/server-only/team/get-team';
 
 interface TeamProviderProps {
   children: React.ReactNode;
-  team: TGetTeamByIdResponse;
+  team: TGetTeamByUrlResponse;
 }
 
-const TeamContext = createContext<TGetTeamByIdResponse | null>(null);
+const TeamContext = createContext<TGetTeamByUrlResponse | null>(null);
 
 export const useCurrentTeam = () => {
   const context = useContext(TeamContext);

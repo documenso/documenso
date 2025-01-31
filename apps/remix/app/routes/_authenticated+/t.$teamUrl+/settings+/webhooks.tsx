@@ -11,13 +11,18 @@ import { Badge } from '@documenso/ui/primitives/badge';
 import { Button } from '@documenso/ui/primitives/button';
 
 import { SettingsHeader } from '~/components/(dashboard)/settings/layout/header';
-import { CreateWebhookDialog } from '~/components/dialogs/webhook-create-dialog';
-import { DeleteWebhookDialog } from '~/components/dialogs/webhook-delete-dialog';
+import { WebhookCreateDialog } from '~/components/dialogs/webhook-create-dialog';
+import { WebhookDeleteDialog } from '~/components/dialogs/webhook-delete-dialog';
+import { useCurrentTeam } from '~/providers/team';
 
 export default function WebhookPage() {
   const { _, i18n } = useLingui();
 
-  const { data: webhooks, isLoading } = trpc.webhook.getWebhooks.useQuery();
+  const team = useCurrentTeam();
+
+  const { data: webhooks, isLoading } = trpc.webhook.getTeamWebhooks.useQuery({
+    teamId: team.id,
+  });
 
   return (
     <div>
@@ -25,7 +30,7 @@ export default function WebhookPage() {
         title={_(msg`Webhooks`)}
         subtitle={_(msg`On this page, you can create new Webhooks and manage the existing ones.`)}
       >
-        <CreateWebhookDialog />
+        <WebhookCreateDialog />
       </SettingsHeader>
 
       {isLoading && (
@@ -59,7 +64,7 @@ export default function WebhookPage() {
                 <div>
                   <div className="truncate font-mono text-xs">{webhook.id}</div>
 
-                  <div className="mt-1.5 flex items-center gap-4">
+                  <div className="mt-1.5 flex items-center gap-2">
                     <h5
                       className="max-w-[30rem] truncate text-sm sm:max-w-[18rem]"
                       title={webhook.webhookUrl}
@@ -88,15 +93,15 @@ export default function WebhookPage() {
 
                 <div className="mt-4 flex flex-shrink-0 gap-4 sm:mt-0">
                   <Button asChild variant="outline">
-                    <Link to={`/settings/webhooks/${webhook.id}`}>
+                    <Link to={`/t/${team.url}/settings/webhooks/${webhook.id}`}>
                       <Trans>Edit</Trans>
                     </Link>
                   </Button>
-                  <DeleteWebhookDialog webhook={webhook}>
+                  <WebhookDeleteDialog webhook={webhook}>
                     <Button variant="destructive">
                       <Trans>Delete</Trans>
                     </Button>
-                  </DeleteWebhookDialog>
+                  </WebhookDeleteDialog>
                 </div>
               </div>
             </div>

@@ -3,6 +3,7 @@ import { Trans, msg } from '@lingui/macro';
 import { useLingui } from '@lingui/react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { useForm } from 'react-hook-form';
+import { useNavigate } from 'react-router';
 import type { z } from 'zod';
 
 import { WEBAPP_BASE_URL } from '@documenso/lib/constants/app';

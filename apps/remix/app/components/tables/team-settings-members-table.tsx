@@ -2,12 +2,14 @@ import { useMemo } from 'react';
 
 import { Trans, msg } from '@lingui/macro';
 import { useLingui } from '@lingui/react';
-import { History, MoreHorizontal, Trash2 } from 'lucide-react';
+import { Edit, MoreHorizontal, Trash2 } from 'lucide-react';
 import { useSearchParams } from 'react-router';
 
 import { useUpdateSearchParams } from '@documenso/lib/client-only/hooks/use-update-search-params';
 import { TEAM_MEMBER_ROLE_MAP } from '@documenso/lib/constants/teams';
 import { ZUrlSearchParamsSchema } from '@documenso/lib/types/search-params';
+import { extractInitials } from '@documenso/lib/utils/recipient-formatter';
+import { isTeamRoleWithinUserHierarchy } from '@documenso/lib/utils/teams';
 import { trpc } from '@documenso/trpc/react';
 import { AvatarWithText } from '@documenso/ui/primitives/avatar';
 import type { DataTableColumnDef } from '@documenso/ui/primitives/data-table';
@@ -22,24 +24,23 @@ import {
 } from '@documenso/ui/primitives/dropdown-menu';
 import { Skeleton } from '@documenso/ui/primitives/skeleton';
 import { TableCell } from '@documenso/ui/primitives/table';
-import { useToast } from '@documenso/ui/primitives/use-toast';
 
-export type TeamMemberInvitesDataTableProps = {
-  teamId: number;
-};
+import { TeamMemberDeleteDialog } from '~/components/dialogs/team-member-delete-dialog';
+import { TeamMemberUpdateDialog } from '~/components/dialogs/team-member-update-dialog';
+import { useCurrentTeam } from '~/providers/team';
 
-export const TeamMemberInvitesDataTable = ({ teamId }: TeamMemberInvitesDataTableProps) => {
+export const TeamSettingsMembersDataTable = () => {
+  const { _, i18n } = useLingui();
+
   const [searchParams] = useSearchParams();
   const updateSearchParams = useUpdateSearchParams();
-
-  const { _, i18n } = useLingui();
-  const { toast } = useToast();
+  const team = useCurrentTeam();
 
   const parsedSearchParams = ZUrlSearchParamsSchema.parse(Object.fromEntries(searchParams ?? []));
 
-  const { data, isLoading, isLoadingError } = trpc.team.findTeamMemberInvites.useQuery(
+  const { data, isLoading, isLoadingError } = trpc.team.findTeamMembers.useQuery(
     {
-      teamId,
+      teamId: team.id,
       query: parsedSearchParams.query,
       page: parsedSearchParams.page,
       perPage: parsedSearchParams.perPage,
@@ -48,40 +49,6 @@ export const TeamMemberInvitesDataTable = ({ teamId }: TeamMemberInvitesDataTabl
       placeholderData: (previousData) => previousData,
     },
   );
-
-  const { mutateAsync: resendTeamMemberInvitation } =
-    trpc.team.resendTeamMemberInvitation.useMutation({
-      onSuccess: () => {
-        toast({
-          title: _(msg`Success`),
-          description: _(msg`Invitation has been resent`),
-        });
-      },
-      onError: () => {
-        toast({
-          title: _(msg`Something went wrong`),
-          description: _(msg`Unable to resend invitation. Please try again.`),
-          variant: 'destructive',
-        });
-      },
-    });
-
-  const { mutateAsync: deleteTeamMemberInvitations } =
-    trpc.team.deleteTeamMemberInvitations.useMutation({
-      onSuccess: () => {
-        toast({
-          title: _(msg`Success`),
-          description: _(msg`Invitation has been deleted`),
-        });
-      },
-      onError: () => {
-        toast({
-          title: _(msg`Something went wrong`),
-          description: _(msg`Unable to delete invitation. Please try again.`),
-          variant: 'destructive',
-        });
-      },
-    });
 
   const onPaginationChange = (page: number, perPage: number) => {
     updateSearchParams({
@@ -102,13 +69,18 @@ export const TeamMemberInvitesDataTable = ({ teamId }: TeamMemberInvitesDataTabl
       {
         header: _(msg`Team Member`),
         cell: ({ row }) => {
+          const avatarFallbackText = row.original.user.name
+            ? extractInitials(row.original.user.name)
+            : row.original.user.email.slice(0, 1).toUpperCase();
+
           return (
             <AvatarWithText
               avatarClass="h-12 w-12"
-              avatarFallback={row.original.email.slice(0, 1).toUpperCase()}
+              avatarFallback={avatarFallbackText}
               primaryText={
-                <span className="text-foreground/80 font-semibold">{row.original.email}</span>
+                <span className="text-foreground/80 font-semibold">{row.original.user.name}</span>
               }
+              secondaryText={row.original.user.email}
             />
           );
         },
@@ -116,10 +88,13 @@ export const TeamMemberInvitesDataTable = ({ teamId }: TeamMemberInvitesDataTabl
       {
         header: _(msg`Role`),
         accessorKey: 'role',
-        cell: ({ row }) => _(TEAM_MEMBER_ROLE_MAP[row.original.role]) ?? row.original.role,
+        cell: ({ row }) =>
+          team.ownerUserId === row.original.userId
+            ? _(msg`Owner`)
+            : _(TEAM_MEMBER_ROLE_MAP[row.original.role]),
       },
       {
-        header: _(msg`Invited At`),
+        header: _(msg`Member Since`),
         accessorKey: 'createdAt',
         cell: ({ row }) => i18n.date(row.original.createdAt),
       },
@@ -136,29 +111,47 @@ export const TeamMemberInvitesDataTable = ({ teamId }: TeamMemberInvitesDataTabl
                 <Trans>Actions</Trans>
               </DropdownMenuLabel>
 
-              <DropdownMenuItem
-                onClick={async () =>
-                  resendTeamMemberInvitation({
-                    teamId,
-                    invitationId: row.original.id,
-                  })
+              <TeamMemberUpdateDialog
+                currentUserTeamRole={team.currentTeamMember.role}
+                teamId={row.original.teamId}
+                teamMemberId={row.original.id}
+                teamMemberName={row.original.user.name ?? ''}
+                teamMemberRole={row.original.role}
+                trigger={
+                  <DropdownMenuItem
+                    disabled={
+                      team.ownerUserId === row.original.userId ||
+                      !isTeamRoleWithinUserHierarchy(team.currentTeamMember.role, row.original.role)
+                    }
+                    onSelect={(e) => e.preventDefault()}
+                    title="Update team member role"
+                  >
+                    <Edit className="mr-2 h-4 w-4" />
+                    <Trans>Update role</Trans>
+                  </DropdownMenuItem>
                 }
-              >
-                <History className="mr-2 h-4 w-4" />
-                <Trans>Resend</Trans>
-              </DropdownMenuItem>
+              />
 
-              <DropdownMenuItem
-                onClick={async () =>
-                  deleteTeamMemberInvitations({
-                    teamId,
-                    invitationIds: [row.original.id],
-                  })
+              <TeamMemberDeleteDialog
+                teamId={team.id}
+                teamName={team.name}
+                teamMemberId={row.original.id}
+                teamMemberName={row.original.user.name ?? ''}
+                teamMemberEmail={row.original.user.email}
+                trigger={
+                  <DropdownMenuItem
+                    onSelect={(e) => e.preventDefault()}
+                    disabled={
+                      team.ownerUserId === row.original.userId ||
+                      !isTeamRoleWithinUserHierarchy(team.currentTeamMember.role, row.original.role)
+                    }
+                    title={_(msg`Remove team member`)}
+                  >
+                    <Trash2 className="mr-2 h-4 w-4" />
+                    <Trans>Remove</Trans>
+                  </DropdownMenuItem>
                 }
-              >
-                <Trash2 className="mr-2 h-4 w-4" />
-                <Trans>Remove</Trans>
-              </DropdownMenuItem>
+              />
             </DropdownMenuContent>
           </DropdownMenu>
         ),
@@ -185,7 +178,11 @@ export const TeamMemberInvitesDataTable = ({ teamId }: TeamMemberInvitesDataTabl
             <TableCell className="w-1/2 py-4 pr-4">
               <div className="flex w-full flex-row items-center">
                 <Skeleton className="h-12 w-12 flex-shrink-0 rounded-full" />
-                <Skeleton className="ml-2 h-4 w-1/3 max-w-[10rem]" />
+
+                <div className="ml-2 flex flex-grow flex-col">
+                  <Skeleton className="h-4 w-1/3 max-w-[8rem]" />
+                  <Skeleton className="mt-1 h-4 w-1/2 max-w-[12rem]" />
+                </div>
               </div>
             </TableCell>
             <TableCell>
