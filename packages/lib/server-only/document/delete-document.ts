@@ -15,7 +15,7 @@ import type {
   TeamGlobalSettings,
   User,
 } from '@documenso/prisma/client';
-import { DocumentStatus, SendStatus } from '@documenso/prisma/client';
+import { DocumentStatus, SendStatus, WebhookTriggerEvents } from '@documenso/prisma/client';
 
 import { getI18nInstance } from '../../client-only/providers/i18n.server';
 import { NEXT_PUBLIC_WEBAPP_URL } from '../../constants/app';
@@ -23,10 +23,15 @@ import { FROM_ADDRESS, FROM_NAME } from '../../constants/email';
 import { AppError, AppErrorCode } from '../../errors/app-error';
 import { DOCUMENT_AUDIT_LOG_TYPE } from '../../types/document-audit-logs';
 import { extractDerivedDocumentEmailSettings } from '../../types/document-email';
+import {
+  ZWebhookDocumentSchema,
+  mapDocumentToWebhookDocumentPayload,
+} from '../../types/webhook-payload';
 import type { ApiRequestMetadata } from '../../universal/extract-request-metadata';
 import { createDocumentAuditLogData } from '../../utils/document-audit-logs';
 import { renderEmailWithI18N } from '../../utils/render-email-with-i18n';
 import { teamGlobalSettingsToBranding } from '../../utils/team-global-settings-to-branding';
+import { triggerWebhook } from '../webhooks/trigger/trigger-webhook';
 
 export type DeleteDocumentOptions = {
   id: number;
@@ -111,6 +116,13 @@ export const deleteDocument = async ({
         // Do nothing.
       });
   }
+
+  await triggerWebhook({
+    event: WebhookTriggerEvents.DOCUMENT_CANCELLED,
+    data: ZWebhookDocumentSchema.parse(mapDocumentToWebhookDocumentPayload(document)),
+    userId,
+    teamId,
+  });
 
   // Return partial document for API v1 response.
   return {
