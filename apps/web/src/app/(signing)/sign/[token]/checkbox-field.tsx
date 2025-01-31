@@ -91,29 +91,12 @@ export const CheckboxField = ({ field, onSignField, onUnsignField }: CheckboxFie
 
   const onSign = async (authOptions?: TRecipientActionAuth) => {
     try {
-      if (isAssistantMode && !targetSigner) {
-        return;
-      }
-
-      console.log({
-        authOptions,
-        isAssistantMode,
-        targetSigner,
-        recipient,
-      });
-
-      const signingRecipient = isAssistantMode && targetSigner ? targetSigner : recipient;
-
       const payload: TSignFieldWithTokenMutationSchema = {
-        token: signingRecipient.token,
+        token: recipient.token,
         fieldId: field.id,
         value: toCheckboxValue(checkedValues),
         isBase64: true,
         authOptions,
-        ...(isAssistantMode && {
-          isAssistantPrefill: true,
-          assistantId: recipient.id,
-        }),
       };
 
       if (onSignField) {
@@ -144,14 +127,8 @@ export const CheckboxField = ({ field, onSignField, onUnsignField }: CheckboxFie
 
   const onRemove = async (fieldType?: string) => {
     try {
-      if (isAssistantMode && !targetSigner) {
-        return;
-      }
-
-      const signingRecipient = isAssistantMode && targetSigner ? targetSigner : recipient;
-
       const payload: TRemovedSignedFieldWithTokenMutationSchema = {
-        token: signingRecipient.token,
+        token: recipient.token,
         fieldId: field.id,
       };
 

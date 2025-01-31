@@ -53,23 +53,14 @@ export const InitialsField = ({ field, onSignField, onUnsignField }: InitialsFie
 
   const onSign = async (authOptions?: TRecipientActionAuth) => {
     try {
-      if (isAssistantMode && !targetSigner) {
-        return;
-      }
-
-      const signingRecipient = isAssistantMode && targetSigner ? targetSigner : recipient;
       const value = initials ?? '';
 
       const payload: TSignFieldWithTokenMutationSchema = {
-        token: signingRecipient.token,
+        token: recipient.token,
         fieldId: field.id,
         value,
         isBase64: false,
         authOptions,
-        ...(isAssistantMode && {
-          isAssistantPrefill: true,
-          assistantId: recipient.id,
-        }),
       };
 
       if (onSignField) {
@@ -101,14 +92,8 @@ export const InitialsField = ({ field, onSignField, onUnsignField }: InitialsFie
 
   const onRemove = async () => {
     try {
-      if (isAssistantMode && !targetSigner) {
-        return;
-      }
-
-      const signingRecipient = isAssistantMode && targetSigner ? targetSigner : recipient;
-
       const payload: TRemovedSignedFieldWithTokenMutationSchema = {
-        token: signingRecipient.token,
+        token: recipient.token,
         fieldId: field.id,
       };
 

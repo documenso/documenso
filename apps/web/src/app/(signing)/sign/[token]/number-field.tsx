@@ -115,26 +115,16 @@ export const NumberField = ({ field, onSignField, onUnsignField }: NumberFieldPr
 
   const onSign = async (authOptions?: TRecipientActionAuth) => {
     try {
-      if (isAssistantMode && !targetSigner) {
-        return;
-      }
-
       if (!localNumber || Object.values(errors).some((error) => error.length > 0)) {
         return;
       }
 
-      const signingRecipient = isAssistantMode && targetSigner ? targetSigner : recipient;
-
       const payload: TSignFieldWithTokenMutationSchema = {
-        token: signingRecipient.token,
+        token: recipient.token,
         fieldId: field.id,
         value: localNumber,
         isBase64: true,
         authOptions,
-        ...(isAssistantMode && {
-          isAssistantPrefill: true,
-          assistantId: recipient.id,
-        }),
       };
 
       if (onSignField) {

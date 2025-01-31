@@ -137,26 +137,16 @@ export const TextField = ({ field, onSignField, onUnsignField }: TextFieldProps)
 
   const onSign = async (authOptions?: TRecipientActionAuth) => {
     try {
-      if (isAssistantMode && !targetSigner) {
-        return;
-      }
-
       if (!localText || userInputHasErrors) {
         return;
       }
 
-      const signingRecipient = isAssistantMode && targetSigner ? targetSigner : recipient;
-
       const payload: TSignFieldWithTokenMutationSchema = {
-        token: signingRecipient.token,
+        token: recipient.token,
         fieldId: field.id,
         value: localText,
         isBase64: true,
         authOptions,
-        ...(isAssistantMode && {
-          isAssistantPrefill: true,
-          assistantId: recipient.id,
-        }),
       };
 
       if (onSignField) {
@@ -190,14 +180,8 @@ export const TextField = ({ field, onSignField, onUnsignField }: TextFieldProps)
 
   const onRemove = async () => {
     try {
-      if (isAssistantMode && !targetSigner) {
-        return;
-      }
-
-      const signingRecipient = isAssistantMode && targetSigner ? targetSigner : recipient;
-
       const payload: TRemovedSignedFieldWithTokenMutationSchema = {
-        token: signingRecipient.token,
+        token: recipient.token,
         fieldId: field.id,
       };
 

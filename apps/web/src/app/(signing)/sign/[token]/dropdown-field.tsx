@@ -67,26 +67,16 @@ export const DropdownField = ({ field, onSignField, onUnsignField }: DropdownFie
 
   const onSign = async (authOptions?: TRecipientActionAuth) => {
     try {
-      if (isAssistantMode && !targetSigner) {
-        return;
-      }
-
       if (!localChoice) {
         return;
       }
 
-      const signingRecipient = isAssistantMode && targetSigner ? targetSigner : recipient;
-
       const payload: TSignFieldWithTokenMutationSchema = {
-        token: signingRecipient.token,
+        token: recipient.token,
         fieldId: field.id,
         value: localChoice,
         isBase64: true,
         authOptions,
-        ...(isAssistantMode && {
-          isAssistantPrefill: true,
-          assistantId: recipient.id,
-        }),
       };
 
       if (onSignField) {
@@ -122,14 +112,8 @@ export const DropdownField = ({ field, onSignField, onUnsignField }: DropdownFie
 
   const onRemove = async () => {
     try {
-      if (isAssistantMode && !targetSigner) {
-        return;
-      }
-
-      const signingRecipient = isAssistantMode && targetSigner ? targetSigner : recipient;
-
       const payload: TRemovedSignedFieldWithTokenMutationSchema = {
-        token: signingRecipient.token,
+        token: recipient.token,
         fieldId: field.id,
       };
 

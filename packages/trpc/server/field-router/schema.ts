@@ -156,8 +156,6 @@ export const ZSignFieldWithTokenMutationSchema = z.object({
   value: z.string().trim(),
   isBase64: z.boolean().optional(),
   authOptions: ZRecipientActionAuthSchema.optional(),
-  isAssistantPrefill: z.boolean().optional(),
-  assistantId: z.number().optional(),
 });
 
 export type TSignFieldWithTokenMutationSchema = z.infer<typeof ZSignFieldWithTokenMutationSchema>;

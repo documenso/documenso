@@ -57,23 +57,14 @@ export const EmailField = ({ field, onSignField, onUnsignField }: EmailFieldProp
 
   const onSign = async (authOptions?: TRecipientActionAuth) => {
     try {
-      if (isAssistantMode && !targetSigner) {
-        return;
-      }
-
-      const signingRecipient = isAssistantMode && targetSigner ? targetSigner : recipient;
       const value = providedEmail ?? '';
 
       const payload: TSignFieldWithTokenMutationSchema = {
-        token: signingRecipient.token,
+        token: recipient.token,
         fieldId: field.id,
         value,
         isBase64: false,
         authOptions,
-        ...(isAssistantMode && {
-          isAssistantPrefill: true,
-          assistantId: recipient.id,
-        }),
       };
 
       if (onSignField) {
@@ -105,14 +96,8 @@ export const EmailField = ({ field, onSignField, onUnsignField }: EmailFieldProp
 
   const onRemove = async () => {
     try {
-      if (isAssistantMode && !targetSigner) {
-        return;
-      }
-
-      const signingRecipient = isAssistantMode && targetSigner ? targetSigner : recipient;
-
       const payload: TRemovedSignedFieldWithTokenMutationSchema = {
-        token: signingRecipient.token,
+        token: recipient.token,
         fieldId: field.id,
       };
 

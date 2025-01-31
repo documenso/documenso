@@ -73,24 +73,11 @@ export const DateField = ({
 
   const onSign = async (authOptions?: TRecipientActionAuth) => {
     try {
-      // In assistant mode, we need a target signer
-      if (isAssistantMode && !targetSigner) {
-        return;
-      }
-
-      // At this point, if we're in assistant mode, targetSigner is guaranteed to be non-null
-      const signingRecipient = isAssistantMode && targetSigner ? targetSigner : recipient;
-
       const payload: TSignFieldWithTokenMutationSchema = {
-        token: signingRecipient.token,
+        token: recipient.token,
         fieldId: field.id,
         value: dateFormat ?? DEFAULT_DOCUMENT_DATE_FORMAT,
         authOptions,
-        ...(isAssistantMode && {
-          isBase64: true,
-          isAssistantPrefill: true,
-          assistantId: recipient.id,
-        }),
       };
 
       if (onSignField) {
@@ -122,16 +109,8 @@ export const DateField = ({
 
   const onRemove = async () => {
     try {
-      // In assistant mode, we need a target signer
-      if (isAssistantMode && !targetSigner) {
-        return;
-      }
-
-      // At this point, if we're in assistant mode, targetSigner is guaranteed to be non-null
-      const signingRecipient = isAssistantMode && targetSigner ? targetSigner : recipient;
-
       const payload: TRemovedSignedFieldWithTokenMutationSchema = {
-        token: signingRecipient.token,
+        token: recipient.token,
         fieldId: field.id,
       };
 
