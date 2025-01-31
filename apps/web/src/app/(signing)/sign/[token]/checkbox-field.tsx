@@ -170,8 +170,6 @@ export const CheckboxField = ({ field, onSignField, onUnsignField }: CheckboxFie
   }) => {
     let updatedValues: string[] = [];
 
-    const signingRecipient = isAssistantMode && targetSigner ? targetSigner : recipient;
-
     try {
       const isChecked = checkedValues.includes(
         item.value.length > 0 ? item.value : `empty-value-${item.id}`,
@@ -184,20 +182,16 @@ export const CheckboxField = ({ field, onSignField, onUnsignField }: CheckboxFie
         ];
 
         await removeSignedFieldWithToken({
-          token: signingRecipient.token,
+          token: recipient.token,
           fieldId: field.id,
         });
 
         if (isLengthConditionMet) {
           await signFieldWithToken({
-            token: signingRecipient.token,
+            token: recipient.token,
             fieldId: field.id,
             value: toCheckboxValue(checkedValues),
             isBase64: true,
-            ...(isAssistantMode && {
-              isAssistantPrefill: true,
-              assistantId: recipient.id,
-            }),
           });
         }
       } else {
@@ -206,7 +200,7 @@ export const CheckboxField = ({ field, onSignField, onUnsignField }: CheckboxFie
         );
 
         await removeSignedFieldWithToken({
-          token: signingRecipient.token,
+          token: recipient.token,
           fieldId: field.id,
         });
       }
