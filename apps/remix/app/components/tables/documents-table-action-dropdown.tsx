@@ -157,7 +157,7 @@ export const DocumentsTableActionDropdown = ({ row }: DocumentsTableActionDropdo
         </DropdownMenuItem>
 
         {/* We don't want to allow teams moving documents across at the moment. */}
-        {!team && (
+        {!team && !row.teamId && (
           <DropdownMenuItem onClick={() => setMoveDialogOpen(true)}>
             <MoveRight className="mr-2 h-4 w-4" />
             <Trans>Move to Team</Trans>
