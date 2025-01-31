@@ -29,6 +29,7 @@ import { cn } from '@documenso/ui/lib/utils';
 import { Button } from '@documenso/ui/primitives/button';
 import { FormErrorMessage } from '@documenso/ui/primitives/form/form-error-message';
 import { Input } from '@documenso/ui/primitives/input';
+import { toast } from '@documenso/ui/primitives/use-toast';
 
 import { Checkbox } from '../checkbox';
 import {
@@ -214,41 +215,30 @@ export const AddTemplatePlaceholderRecipientsFormPartial = ({
 
       const items = Array.from(watchedSigners);
       const [reorderedSigner] = items.splice(result.source.index, 1);
-
       const insertIndex = result.destination.index;
 
       items.splice(insertIndex, 0, reorderedSigner);
 
-      const updatedSigners = items.map((item, index) => ({
-        ...item,
+      const updatedSigners = items.map((signer, index) => ({
+        ...signer,
         signingOrder: index + 1,
       }));
 
-      updatedSigners.forEach((item, index) => {
-        const keys: (keyof typeof item)[] = [
-          'formId',
-          'nativeId',
-          'email',
-          'name',
-          'role',
-          'signingOrder',
-          'actionAuth',
-        ];
-        keys.forEach((key) => {
-          form.setValue(`signers.${index}.${key}` as const, item[key]);
-        });
-      });
+      form.setValue('signers', updatedSigners);
 
-      const currentLength = form.getValues('signers').length;
-      if (currentLength > updatedSigners.length) {
-        for (let i = updatedSigners.length; i < currentLength; i++) {
-          form.unregister(`signers.${i}`);
-        }
+      const lastSigner = updatedSigners[updatedSigners.length - 1];
+      if (lastSigner.role === RecipientRole.ASSISTANT) {
+        toast({
+          title: _(msg`Warning: Assistant as last signer`),
+          description: _(
+            msg`Having an assistant as the last signer means they will be unable to take any action as there are no subsequent signers to assist.`,
+          ),
+        });
       }
 
       await form.trigger('signers');
     },
-    [form, watchedSigners],
+    [form, watchedSigners, toast],
   );
 
   const triggerDragAndDrop = useCallback(
@@ -309,110 +299,80 @@ export const AddTemplatePlaceholderRecipientsFormPartial = ({
 
   const handleSigningOrderChange = useCallback(
     (index: number, newOrderString: string) => {
-      const newOrder = parseInt(newOrderString, 10);
-
-      if (!newOrderString.trim()) {
+      const trimmedOrderString = newOrderString.trim();
+      if (!trimmedOrderString) {
         return;
       }
 
-      if (Number.isNaN(newOrder)) {
-        form.setValue(`signers.${index}.signingOrder`, index + 1);
+      const newOrder = Number(trimmedOrderString);
+      if (!Number.isInteger(newOrder) || newOrder < 1) {
         return;
       }
 
-      const newIndex = newOrder - 1;
-      if (index !== newIndex) {
-        updateSigningOrders(newIndex, index);
-        triggerDragAndDrop(index, newIndex);
+      const currentSigners = form.getValues('signers');
+      const signer = currentSigners[index];
+
+      // Remove signer from current position and insert at new position
+      const remainingSigners = currentSigners.filter((_, idx) => idx !== index);
+      const newPosition = Math.min(Math.max(0, newOrder - 1), currentSigners.length - 1);
+      remainingSigners.splice(newPosition, 0, signer);
+
+      const updatedSigners = remainingSigners.map((s, idx) => ({
+        ...s,
+        signingOrder: idx + 1,
+      }));
+
+      form.setValue('signers', updatedSigners);
+
+      if (signer.role === RecipientRole.ASSISTANT && newPosition === remainingSigners.length - 1) {
+        toast({
+          title: _(msg`Warning: Assistant as last signer`),
+          description: _(
+            msg`Having an assistant as the last signer means they will be unable to take any action as there are no subsequent signers to assist.`,
+          ),
+        });
       }
     },
-    [form, triggerDragAndDrop, updateSigningOrders],
+    [form, toast],
   );
-
-  const [showSigningOrderConfirmation, setShowSigningOrderConfirmation] = useState(false);
 
   const handleRoleChange = useCallback(
     (index: number, role: RecipientRole) => {
       const currentSigners = form.getValues('signers');
+      const signingOrder = form.getValues('signingOrder');
 
-      if (role === RecipientRole.ASSISTANT) {
+      // Handle parallel to sequential conversion for assistants
+      if (role === RecipientRole.ASSISTANT && signingOrder === DocumentSigningOrder.PARALLEL) {
         form.setValue('signingOrder', DocumentSigningOrder.SEQUENTIAL);
-
-        const existingAssistants = currentSigners.filter(
-          (signer, idx) => idx !== index && signer.role === RecipientRole.ASSISTANT,
-        );
-        const otherSigners = currentSigners.filter(
-          (signer, idx) => idx !== index && signer.role !== RecipientRole.ASSISTANT,
-        );
-
-        const newAssistant = {
-          ...currentSigners[index],
-          role,
-          signingOrder: existingAssistants.length + 1,
-        };
-
-        const updatedSigners = [
-          ...existingAssistants.map((signer, idx) => ({
-            ...signer,
-            signingOrder: idx + 1,
-          })),
-          newAssistant,
-          ...otherSigners.map((signer, idx) => ({
-            ...signer,
-            signingOrder: existingAssistants.length + 2 + idx,
-          })),
-        ];
-
-        form.setValue('signers', updatedSigners, {
-          shouldValidate: true,
+        toast({
+          title: _(msg`Signing order is enabled.`),
+          description: _(msg`You cannot add assistants when signing order is disabled.`),
+          variant: 'destructive',
         });
+        return;
+      }
 
-        setTimeout(() => {
-          if (index !== existingAssistants.length) {
-            triggerDragAndDrop(index, existingAssistants.length);
-          }
-        }, 0);
-      } else {
-        // When changing from assistant to another role
-        const assistants = currentSigners.filter(
-          (signer, idx) => idx !== index && signer.role === RecipientRole.ASSISTANT,
-        );
-        const otherSigners = currentSigners.filter(
-          (signer, idx) => idx !== index && signer.role !== RecipientRole.ASSISTANT,
-        );
+      const updatedSigners = currentSigners.map((signer, idx) => ({
+        ...signer,
+        role: idx === index ? role : signer.role,
+        signingOrder: idx + 1,
+      }));
 
-        const newSigner = {
-          ...currentSigners[index],
-          role,
-          signingOrder: assistants.length + otherSigners.length + 1,
-        };
+      form.setValue('signers', updatedSigners);
 
-        const updatedSigners = [
-          ...assistants.map((signer, idx) => ({
-            ...signer,
-            signingOrder: idx + 1,
-          })),
-          ...otherSigners.map((signer, idx) => ({
-            ...signer,
-            signingOrder: assistants.length + 1 + idx,
-          })),
-          newSigner,
-        ];
-
-        form.setValue('signers', updatedSigners, {
-          shouldValidate: true,
+      if (role === RecipientRole.ASSISTANT && index === updatedSigners.length - 1) {
+        toast({
+          title: _(msg`Warning: Assistant as last signer`),
+          description: _(
+            msg`Having an assistant as the last signer means they will be unable to take any action as there are no subsequent signers to assist.`,
+          ),
         });
-
-        setTimeout(() => {
-          const targetIndex = assistants.length + otherSigners.length;
-          if (index !== targetIndex) {
-            triggerDragAndDrop(index, targetIndex);
-          }
-        }, 0);
       }
     },
-    [form, triggerDragAndDrop],
+    [form, toast],
   );
+
+  const [showSigningOrderConfirmation, setShowSigningOrderConfirmation] = useState(false);
 
   const handleSigningOrderDisable = useCallback(() => {
     setShowSigningOrderConfirmation(false);

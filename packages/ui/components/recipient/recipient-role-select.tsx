@@ -11,12 +11,15 @@ import { ROLE_ICONS } from '@documenso/ui/primitives/recipient-role-icons';
 import { Select, SelectContent, SelectItem, SelectTrigger } from '@documenso/ui/primitives/select';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@documenso/ui/primitives/tooltip';
 
+import { cn } from '../../lib/utils';
+
 export type RecipientRoleSelectProps = SelectProps & {
   hideCCRecipients?: boolean;
+  isAssistantEnabled?: boolean;
 };
 
 export const RecipientRoleSelect = forwardRef<HTMLButtonElement, RecipientRoleSelectProps>(
-  ({ hideCCRecipients, ...props }, ref) => (
+  ({ hideCCRecipients, isAssistantEnabled = true, ...props }, ref) => (
     <Select {...props}>
       <SelectTrigger ref={ref} className="bg-background w-[50px] p-2">
         {/* eslint-disable-next-line @typescript-eslint/consistent-type-assertions */}
@@ -111,7 +114,14 @@ export const RecipientRoleSelect = forwardRef<HTMLButtonElement, RecipientRoleSe
           </SelectItem>
         )}
 
-        <SelectItem value={RecipientRole.ASSISTANT}>
+        <SelectItem
+          value={RecipientRole.ASSISTANT}
+          disabled={!isAssistantEnabled}
+          className={cn(
+            !isAssistantEnabled &&
+              'cursor-not-allowed opacity-50 data-[disabled]:pointer-events-auto',
+          )}
+        >
           <div className="flex items-center">
             <div className="flex w-[150px] items-center">
               <span className="mr-2">{ROLE_ICONS[RecipientRole.ASSISTANT]}</span>
@@ -123,10 +133,17 @@ export const RecipientRoleSelect = forwardRef<HTMLButtonElement, RecipientRoleSe
               </TooltipTrigger>
               <TooltipContent className="text-foreground z-9999 max-w-md p-4">
                 <p>
-                  <Trans>
-                    The recipient can prepare the document for later signers by pre-filling suggest
-                    values.
-                  </Trans>
+                  {isAssistantEnabled ? (
+                    <Trans>
+                      The recipient can prepare the document for later signers by pre-filling
+                      suggest values.
+                    </Trans>
+                  ) : (
+                    <Trans>
+                      Assistant role is only available when the document is in sequential signing
+                      mode.
+                    </Trans>
+                  )}
                 </p>
               </TooltipContent>
             </Tooltip>

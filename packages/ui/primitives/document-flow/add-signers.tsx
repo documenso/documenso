@@ -239,6 +239,7 @@ export const AddSignersFormPartial = ({
       const items = Array.from(watchedSigners);
       const [reorderedSigner] = items.splice(result.source.index, 1);
 
+      // Find next valid position
       let insertIndex = result.destination.index;
       while (insertIndex < items.length && !canRecipientBeModified(items[insertIndex].nativeId)) {
         insertIndex++;
@@ -246,206 +247,101 @@ export const AddSignersFormPartial = ({
 
       items.splice(insertIndex, 0, reorderedSigner);
 
-      const updatedSigners = items.map((item, index) => ({
-        ...item,
-        signingOrder: !canRecipientBeModified(item.nativeId) ? item.signingOrder : index + 1,
+      const updatedSigners = items.map((signer, index) => ({
+        ...signer,
+        signingOrder: !canRecipientBeModified(signer.nativeId) ? signer.signingOrder : index + 1,
       }));
 
-      updatedSigners.forEach((item, index) => {
-        const keys: (keyof typeof item)[] = [
-          'formId',
-          'nativeId',
-          'email',
-          'name',
-          'role',
-          'signingOrder',
-          'actionAuth',
-        ];
-        keys.forEach((key) => {
-          form.setValue(`signers.${index}.${key}` as const, item[key]);
-        });
-      });
+      form.setValue('signers', updatedSigners);
 
-      const currentLength = form.getValues('signers').length;
-      if (currentLength > updatedSigners.length) {
-        for (let i = updatedSigners.length; i < currentLength; i++) {
-          form.unregister(`signers.${i}`);
-        }
+      const lastSigner = updatedSigners[updatedSigners.length - 1];
+      if (lastSigner.role === RecipientRole.ASSISTANT) {
+        toast({
+          title: _(msg`Warning: Assistant as last signer`),
+          description: _(
+            msg`Having an assistant as the last signer means they will be unable to take any action as there are no subsequent signers to assist.`,
+          ),
+        });
       }
 
       await form.trigger('signers');
     },
-    [form, canRecipientBeModified, watchedSigners],
-  );
-
-  const triggerDragAndDrop = useCallback(
-    (fromIndex: number, toIndex: number) => {
-      if (!$sensorApi.current) {
-        return;
-      }
-
-      const draggableId = signers[fromIndex].id;
-
-      const preDrag = $sensorApi.current.tryGetLock(draggableId);
-
-      if (!preDrag) {
-        return;
-      }
-
-      const drag = preDrag.snapLift();
-
-      setTimeout(() => {
-        // Move directly to the target index
-        if (fromIndex < toIndex) {
-          for (let i = fromIndex; i < toIndex; i++) {
-            drag.moveDown();
-          }
-        } else {
-          for (let i = fromIndex; i > toIndex; i--) {
-            drag.moveUp();
-          }
-        }
-
-        setTimeout(() => {
-          drag.drop();
-        }, 500);
-      }, 0);
-    },
-    [signers],
+    [form, canRecipientBeModified, watchedSigners, toast],
   );
 
   const handleRoleChange = useCallback(
     (index: number, role: RecipientRole) => {
       const currentSigners = form.getValues('signers');
+      const signingOrder = form.getValues('signingOrder');
 
-      if (role === RecipientRole.ASSISTANT) {
+      // Handle parallel to sequential conversion for assistants
+      if (role === RecipientRole.ASSISTANT && signingOrder === DocumentSigningOrder.PARALLEL) {
         form.setValue('signingOrder', DocumentSigningOrder.SEQUENTIAL);
-
-        const existingAssistants = currentSigners.filter(
-          (signer, idx) => idx !== index && signer.role === RecipientRole.ASSISTANT,
-        );
-        const otherSigners = currentSigners.filter(
-          (signer, idx) => idx !== index && signer.role !== RecipientRole.ASSISTANT,
-        );
-
-        const newAssistant = {
-          ...currentSigners[index],
-          role,
-          signingOrder: existingAssistants.length + 1,
-        };
-
-        const updatedSigners = [
-          ...existingAssistants.map((signer, idx) => ({
-            ...signer,
-            signingOrder: idx + 1,
-          })),
-          newAssistant,
-          ...otherSigners.map((signer, idx) => ({
-            ...signer,
-            signingOrder: existingAssistants.length + 2 + idx,
-          })),
-        ];
-
-        form.setValue('signers', updatedSigners, {
-          shouldValidate: true,
+        toast({
+          title: _(msg`Signing order is enabled.`),
+          description: _(msg`You cannot add assistants when signing order is disabled.`),
+          variant: 'destructive',
         });
+        return;
+      }
 
-        setTimeout(() => {
-          if (index !== existingAssistants.length) {
-            triggerDragAndDrop(index, existingAssistants.length);
-          }
-        }, 0);
-      } else {
-        // When changing from assistant to another role
-        const assistants = currentSigners.filter(
-          (signer, idx) => idx !== index && signer.role === RecipientRole.ASSISTANT,
-        );
-        const otherSigners = currentSigners.filter(
-          (signer, idx) => idx !== index && signer.role !== RecipientRole.ASSISTANT,
-        );
+      const updatedSigners = currentSigners.map((signer, idx) => ({
+        ...signer,
+        role: idx === index ? role : signer.role,
+        signingOrder: !canRecipientBeModified(signer.nativeId) ? signer.signingOrder : idx + 1,
+      }));
 
-        const newSigner = {
-          ...currentSigners[index],
-          role,
-          signingOrder: assistants.length + otherSigners.length + 1,
-        };
+      form.setValue('signers', updatedSigners);
 
-        const updatedSigners = [
-          ...assistants.map((signer, idx) => ({
-            ...signer,
-            signingOrder: idx + 1,
-          })),
-          ...otherSigners.map((signer, idx) => ({
-            ...signer,
-            signingOrder: assistants.length + 1 + idx,
-          })),
-          newSigner,
-        ];
-
-        form.setValue('signers', updatedSigners, {
-          shouldValidate: true,
+      if (role === RecipientRole.ASSISTANT && index === updatedSigners.length - 1) {
+        toast({
+          title: _(msg`Warning: Assistant as last signer`),
+          description: _(
+            msg`Having an assistant as the last signer means they will be unable to take any action as there are no subsequent signers to assist.`,
+          ),
         });
-
-        setTimeout(() => {
-          const targetIndex = assistants.length + otherSigners.length;
-          if (index !== targetIndex) {
-            triggerDragAndDrop(index, targetIndex);
-          }
-        }, 0);
       }
     },
-    [form, triggerDragAndDrop],
-  );
-
-  const updateSigningOrders = useCallback(
-    (newIndex: number, oldIndex: number) => {
-      const updatedSigners = form.getValues('signers').map((signer, index) => {
-        if (index === oldIndex) {
-          return { ...signer, signingOrder: newIndex + 1 };
-        } else if (index >= newIndex && index < oldIndex) {
-          return {
-            ...signer,
-            signingOrder: !canRecipientBeModified(signer.nativeId)
-              ? signer.signingOrder
-              : (signer.signingOrder ?? index + 1) + 1,
-          };
-        } else if (index <= newIndex && index > oldIndex) {
-          return {
-            ...signer,
-            signingOrder: !canRecipientBeModified(signer.nativeId)
-              ? signer.signingOrder
-              : Math.max(1, (signer.signingOrder ?? index + 1) - 1),
-          };
-        }
-        return signer;
-      });
-
-      updatedSigners.forEach((signer, index) => {
-        form.setValue(`signers.${index}.signingOrder`, signer.signingOrder);
-      });
-    },
-    [form, canRecipientBeModified],
+    [form, toast, canRecipientBeModified],
   );
 
   const handleSigningOrderChange = useCallback(
     (index: number, newOrderString: string) => {
-      const newOrder = parseInt(newOrderString, 10);
-
-      if (!newOrderString.trim()) {
+      const trimmedOrderString = newOrderString.trim();
+      if (!trimmedOrderString) {
         return;
       }
 
-      if (Number.isNaN(newOrder)) {
-        form.setValue(`signers.${index}.signingOrder`, index + 1);
+      const newOrder = Number(trimmedOrderString);
+      if (!Number.isInteger(newOrder) || newOrder < 1) {
         return;
       }
 
-      const newIndex = newOrder - 1;
-      if (index !== newIndex) {
-        updateSigningOrders(newIndex, index);
+      const currentSigners = form.getValues('signers');
+      const signer = currentSigners[index];
+
+      // Remove signer from current position and insert at new position
+      const remainingSigners = currentSigners.filter((_, idx) => idx !== index);
+      const newPosition = Math.min(Math.max(0, newOrder - 1), currentSigners.length - 1);
+      remainingSigners.splice(newPosition, 0, signer);
+
+      const updatedSigners = remainingSigners.map((s, idx) => ({
+        ...s,
+        signingOrder: !canRecipientBeModified(s.nativeId) ? s.signingOrder : idx + 1,
+      }));
+
+      form.setValue('signers', updatedSigners);
+
+      if (signer.role === RecipientRole.ASSISTANT && newPosition === remainingSigners.length - 1) {
+        toast({
+          title: _(msg`Warning: Assistant as last signer`),
+          description: _(
+            msg`Having an assistant as the last signer means they will be unable to take any action as there are no subsequent signers to assist.`,
+          ),
+        });
       }
     },
-    [form, updateSigningOrders],
+    [form, canRecipientBeModified, toast],
   );
 
   const handleSigningOrderDisable = useCallback(() => {
@@ -719,6 +615,7 @@ export const AddSignersFormPartial = ({
                                       <FormControl>
                                         <RecipientRoleSelect
                                           {...field}
+                                          isAssistantEnabled={isSigningOrderSequential}
                                           onValueChange={(value) =>
                                             // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
                                             handleRoleChange(index, value as RecipientRole)
