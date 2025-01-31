@@ -53,7 +53,7 @@ export type CreateDocumentFromTemplateOptions = {
   }[];
   prefillFields?: {
     id: number;
-    fieldMeta?: TFieldMetaSchema;
+    fieldMeta: TFieldMetaSchema;
   }[];
   customDocumentDataId?: string;
 

@@ -586,7 +586,7 @@ export const ApiContractV1Implementation = createNextRoute(ApiContractV1, {
         userId: user.id,
         teamId: team?.id,
         recipients: body.recipients,
-        prefillFields: body.prefillFields,
+        prefillFields: body.prefillFields?.map(({ id, fieldMeta }) => ({ id, fieldMeta })),
         override: {
           title: body.title,
           ...body.meta,
