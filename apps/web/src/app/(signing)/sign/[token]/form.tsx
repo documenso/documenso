@@ -1,10 +1,11 @@
 'use client';
 
-import { useEffect, useId, useMemo, useState } from 'react';
+import { useId, useMemo, useState } from 'react';
 
 import { useRouter } from 'next/navigation';
 
-import { Trans } from '@lingui/macro';
+import { Trans, msg } from '@lingui/macro';
+import { useLingui } from '@lingui/react';
 import { useSession } from 'next-auth/react';
 import { Controller, useForm } from 'react-hook-form';
 
@@ -38,7 +39,7 @@ export type SigningFormProps = {
   redirectUrl?: string | null;
   isRecipientsTurn: boolean;
   allRecipients?: RecipientWithFields[];
-  setSelectedSignerId: (id: number | null) => void;
+  setSelectedSignerId?: (id: number | null) => void;
 };
 
 export const SigningForm = ({
@@ -47,14 +48,18 @@ export const SigningForm = ({
   fields,
   redirectUrl,
   isRecipientsTurn,
-  allRecipients,
+  allRecipients = [],
   setSelectedSignerId,
 }: SigningFormProps) => {
+  const { _ } = useLingui();
+  const { toast } = useToast();
+
   const router = useRouter();
   const analytics = useAnalytics();
+
   const { data: session } = useSession();
+
   const assistantSignersId = useId();
-  const { toast } = useToast();
 
   const { fullName, signature, setFullName, setSignature, signatureValid, setSignatureValid } =
     useRequiredSigningContext();
@@ -66,23 +71,11 @@ export const SigningForm = ({
   const { mutateAsync: completeDocumentWithToken } =
     trpc.recipient.completeDocumentWithToken.useMutation();
 
-  const firstSignerWithFields = useMemo(
-    () => allRecipients?.find((recipient) => recipient.fields.length > 0)?.id,
-    [allRecipients],
-  );
-
   const assistantForm = useForm<{ selectedSignerId: number | undefined }>({
     defaultValues: {
       selectedSignerId: undefined,
     },
   });
-
-  useEffect(() => {
-    if (firstSignerWithFields) {
-      assistantForm.setValue('selectedSignerId', firstSignerWithFields);
-      setSelectedSignerId(firstSignerWithFields);
-    }
-  }, [firstSignerWithFields, assistantForm, setSelectedSignerId]);
 
   const { handleSubmit, formState } = useForm();
 
@@ -119,12 +112,6 @@ export const SigningForm = ({
     }
 
     await completeDocument();
-
-    // Reauth is currently not required for completing the document.
-    // await executeActionAuthProcedure({
-    //   onReauthFormSubmit: completeDocument,
-    //   actionTarget: 'DOCUMENT',
-    // });
   };
 
   const onAssistantFormSubmit = () => {
@@ -133,6 +120,7 @@ export const SigningForm = ({
 
   const handleAssistantConfirmDialogSubmit = async () => {
     setIsAssistantSubmitting(true);
+
     try {
       await completeDocument();
     } catch (err) {
@@ -245,39 +233,42 @@ export const SigningForm = ({
                         value={field.value?.toString()}
                         onValueChange={(value) => {
                           field.onChange(value);
-                          setSelectedSignerId(Number(value));
+                          setSelectedSignerId?.(Number(value));
                         }}
                       >
                         {allRecipients
-                          ?.filter((recipient) => recipient.fields.length > 0)
-                          ?.map((recipient) => (
+                          .filter((r) => r.fields.length > 0)
+                          .map((r) => (
                             <div
-                              key={`${assistantSignersId}-${recipient.id}`}
+                              key={`${assistantSignersId}-${r.id}`}
                               className="bg-widget border-border relative flex flex-col gap-4 rounded-lg border p-4"
                             >
                               <div className="flex items-center justify-between">
                                 <div className="flex items-center gap-3">
                                   <RadioGroupItem
-                                    id={`${assistantSignersId}-${recipient.id}`}
-                                    value={recipient.id.toString()}
+                                    id={`${assistantSignersId}-${r.id}`}
+                                    value={r.id.toString()}
                                     className="after:absolute after:inset-0"
                                   />
 
                                   <div className="grid grow gap-1">
                                     <Label
                                       className="inline-flex items-start"
-                                      htmlFor={`${assistantSignersId}-${recipient.id}`}
+                                      htmlFor={`${assistantSignersId}-${r.id}`}
                                     >
-                                      {recipient.name}
+                                      {r.name}
+
+                                      {r.id === recipient.id && (
+                                        <span className="text-muted-foreground ml-2">
+                                          {_(msg`(You)`)}
+                                        </span>
+                                      )}
                                     </Label>
-                                    <p className="text-muted-foreground text-xs">
-                                      {recipient.email}
-                                    </p>
+                                    <p className="text-muted-foreground text-xs">{r.email}</p>
                                   </div>
                                 </div>
                                 <div className="text-muted-foreground text-xs leading-[inherit]">
-                                  {recipient.fields.length}{' '}
-                                  {recipient.fields.length === 1 ? 'field' : 'fields'}
+                                  {r.fields.length} {r.fields.length === 1 ? 'field' : 'fields'}
                                 </div>
                               </div>
                             </div>

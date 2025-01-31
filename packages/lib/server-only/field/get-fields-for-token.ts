@@ -1,5 +1,5 @@
 import { prisma } from '@documenso/prisma';
-import { RecipientRole } from '@documenso/prisma/client';
+import { FieldType, RecipientRole } from '@documenso/prisma/client';
 
 export type GetFieldsForTokenOptions = {
   token: string;
@@ -12,7 +12,6 @@ export const getFieldsForToken = async ({ token }: GetFieldsForTokenOptions) => 
 
   const recipient = await prisma.recipient.findFirst({
     where: { token },
-    select: { role: true, documentId: true },
   });
 
   if (!recipient) {
@@ -22,12 +21,18 @@ export const getFieldsForToken = async ({ token }: GetFieldsForTokenOptions) => 
   if (recipient.role === RecipientRole.ASSISTANT) {
     return await prisma.field.findMany({
       where: {
-        type: {
-          not: 'SIGNATURE',
-        },
-        recipient: {
-          documentId: recipient.documentId,
-        },
+        OR: [
+          {
+            type: {
+              not: FieldType.SIGNATURE,
+            },
+            documentId: recipient.documentId,
+          },
+          {
+            recipientId: recipient.id,
+            documentId: recipient.documentId,
+          },
+        ],
       },
       include: {
         signature: true,
@@ -37,9 +42,7 @@ export const getFieldsForToken = async ({ token }: GetFieldsForTokenOptions) => 
 
   return await prisma.field.findMany({
     where: {
-      recipient: {
-        token,
-      },
+      recipientId: recipient.id,
     },
     include: {
       signature: true,
