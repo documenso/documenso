@@ -12,7 +12,6 @@ import { DO_NOT_INVALIDATE_QUERY_ON_MUTATION } from '@documenso/lib/constants/tr
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import type { TRecipientActionAuth } from '@documenso/lib/types/document-auth';
 import { extractInitials } from '@documenso/lib/utils/recipient-formatter';
-import type { Recipient } from '@documenso/prisma/client';
 import type { FieldWithSignature } from '@documenso/prisma/types/field-with-signature';
 import { trpc } from '@documenso/trpc/react';
 import type {
@@ -22,26 +21,22 @@ import type {
 import { useToast } from '@documenso/ui/primitives/use-toast';
 
 import { useRequiredSigningContext } from './provider';
+import { useRecipientContext } from './recipient-context';
 import { SigningFieldContainer } from './signing-field-container';
 
 export type InitialsFieldProps = {
   field: FieldWithSignature;
-  recipient: Recipient;
   onSignField?: (value: TSignFieldWithTokenMutationSchema) => Promise<void> | void;
   onUnsignField?: (value: TRemovedSignedFieldWithTokenMutationSchema) => Promise<void> | void;
 };
 
-export const InitialsField = ({
-  field,
-  recipient,
-  onSignField,
-  onUnsignField,
-}: InitialsFieldProps) => {
+export const InitialsField = ({ field, onSignField, onUnsignField }: InitialsFieldProps) => {
   const router = useRouter();
   const { toast } = useToast();
   const { _ } = useLingui();
 
   const { fullName } = useRequiredSigningContext();
+  const { recipient, targetSigner, isAssistantMode } = useRecipientContext();
   const initials = extractInitials(fullName);
 
   const [isPending, startTransition] = useTransition();
@@ -58,14 +53,23 @@ export const InitialsField = ({
 
   const onSign = async (authOptions?: TRecipientActionAuth) => {
     try {
+      if (isAssistantMode && !targetSigner) {
+        return;
+      }
+
+      const signingRecipient = isAssistantMode && targetSigner ? targetSigner : recipient;
       const value = initials ?? '';
 
       const payload: TSignFieldWithTokenMutationSchema = {
-        token: recipient.token,
+        token: signingRecipient.token,
         fieldId: field.id,
         value,
         isBase64: false,
         authOptions,
+        ...(isAssistantMode && {
+          isAssistantPrefill: true,
+          assistantId: recipient.id,
+        }),
       };
 
       if (onSignField) {
@@ -87,7 +91,9 @@ export const InitialsField = ({
 
       toast({
         title: _(msg`Error`),
-        description: _(msg`An error occurred while signing the document.`),
+        description: isAssistantMode
+          ? _(msg`An error occurred while signing as assistant.`)
+          : _(msg`An error occurred while signing the document.`),
         variant: 'destructive',
       });
     }
@@ -95,8 +101,14 @@ export const InitialsField = ({
 
   const onRemove = async () => {
     try {
+      if (isAssistantMode && !targetSigner) {
+        return;
+      }
+
+      const signingRecipient = isAssistantMode && targetSigner ? targetSigner : recipient;
+
       const payload: TRemovedSignedFieldWithTokenMutationSchema = {
-        token: recipient.token,
+        token: signingRecipient.token,
         fieldId: field.id,
       };
 

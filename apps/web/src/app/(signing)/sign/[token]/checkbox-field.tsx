@@ -13,7 +13,6 @@ import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import type { TRecipientActionAuth } from '@documenso/lib/types/document-auth';
 import { ZCheckboxFieldMeta } from '@documenso/lib/types/field-meta';
 import { fromCheckboxValue, toCheckboxValue } from '@documenso/lib/universal/field-checkbox';
-import type { Recipient } from '@documenso/prisma/client';
 import type { FieldWithSignatureAndFieldMeta } from '@documenso/prisma/types/field-with-signature-and-fieldmeta';
 import { trpc } from '@documenso/trpc/react';
 import type {
@@ -27,23 +26,19 @@ import { Label } from '@documenso/ui/primitives/label';
 import { useToast } from '@documenso/ui/primitives/use-toast';
 
 import { useRequiredDocumentAuthContext } from './document-auth-provider';
+import { useRecipientContext } from './recipient-context';
 import { SigningFieldContainer } from './signing-field-container';
 
 export type CheckboxFieldProps = {
   field: FieldWithSignatureAndFieldMeta;
-  recipient: Recipient;
   onSignField?: (value: TSignFieldWithTokenMutationSchema) => Promise<void> | void;
   onUnsignField?: (value: TRemovedSignedFieldWithTokenMutationSchema) => Promise<void> | void;
 };
 
-export const CheckboxField = ({
-  field,
-  recipient,
-  onSignField,
-  onUnsignField,
-}: CheckboxFieldProps) => {
+export const CheckboxField = ({ field, onSignField, onUnsignField }: CheckboxFieldProps) => {
   const { _ } = useLingui();
   const { toast } = useToast();
+  const { recipient, targetSigner, isAssistantMode } = useRecipientContext();
 
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
@@ -96,12 +91,29 @@ export const CheckboxField = ({
 
   const onSign = async (authOptions?: TRecipientActionAuth) => {
     try {
+      if (isAssistantMode && !targetSigner) {
+        return;
+      }
+
+      console.log({
+        authOptions,
+        isAssistantMode,
+        targetSigner,
+        recipient,
+      });
+
+      const signingRecipient = isAssistantMode && targetSigner ? targetSigner : recipient;
+
       const payload: TSignFieldWithTokenMutationSchema = {
-        token: recipient.token,
+        token: signingRecipient.token,
         fieldId: field.id,
         value: toCheckboxValue(checkedValues),
         isBase64: true,
         authOptions,
+        ...(isAssistantMode && {
+          isAssistantPrefill: true,
+          assistantId: recipient.id,
+        }),
       };
 
       if (onSignField) {
@@ -122,7 +134,9 @@ export const CheckboxField = ({
 
       toast({
         title: _(msg`Error`),
-        description: _(msg`An error occurred while signing the document.`),
+        description: isAssistantMode
+          ? _(msg`An error occurred while signing as assistant.`)
+          : _(msg`An error occurred while signing the document.`),
         variant: 'destructive',
       });
     }
@@ -130,8 +144,14 @@ export const CheckboxField = ({
 
   const onRemove = async (fieldType?: string) => {
     try {
+      if (isAssistantMode && !targetSigner) {
+        return;
+      }
+
+      const signingRecipient = isAssistantMode && targetSigner ? targetSigner : recipient;
+
       const payload: TRemovedSignedFieldWithTokenMutationSchema = {
-        token: recipient.token,
+        token: signingRecipient.token,
         fieldId: field.id,
       };
 
@@ -151,7 +171,7 @@ export const CheckboxField = ({
 
       toast({
         title: _(msg`Error`),
-        description: _(msg`An error occurred while removing the signature.`),
+        description: _(msg`An error occurred while removing the field.`),
         variant: 'destructive',
       });
     }

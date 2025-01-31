@@ -27,15 +27,6 @@ import { LazyPDFViewer } from '@documenso/ui/primitives/lazy-pdf-viewer';
 
 import { DocumentReadOnlyFields } from '~/components/document/document-read-only-fields';
 
-import { AssistantCheckboxField } from './assistant/assistant-checkbox-field';
-import { AssistantDateField } from './assistant/assistant-date-field';
-import { AssistantDropdownField } from './assistant/assistant-dropdown-field';
-import { AssistantEmailField } from './assistant/assistant-email-field';
-import { AssistantInitialsField } from './assistant/assistant-initials-field';
-import { AssistantNameField } from './assistant/assistant-name-field';
-import { AssistantNumberField } from './assistant/assistant-number-field';
-import { AssistantRadioField } from './assistant/assistant-radio-field';
-import { AssistantTextField } from './assistant/assistant-text-field';
 import { AutoSign } from './auto-sign';
 import { CheckboxField } from './checkbox-field';
 import { DateField } from './date-field';
@@ -46,6 +37,7 @@ import { InitialsField } from './initials-field';
 import { NameField } from './name-field';
 import { NumberField } from './number-field';
 import { RadioField } from './radio-field';
+import { RecipientProvider } from './recipient-context';
 import { RejectDocumentDialog } from './reject-document-dialog';
 import { SignatureField } from './signature-field';
 import { TextField } from './text-field';
@@ -85,280 +77,211 @@ export const SigningPageView = ({
   const selectedSigner = allRecipients?.find((r) => r.id === selectedSignerId);
 
   return (
-    <div className="mx-auto w-full max-w-screen-xl">
-      <h1
-        className="mt-4 block max-w-[20rem] truncate text-2xl font-semibold md:max-w-[30rem] md:text-3xl"
-        title={document.title}
-      >
-        {document.title}
-      </h1>
-
-      <div className="mt-2.5 flex flex-wrap items-center justify-between gap-x-6">
-        <div className="max-w-[50ch]">
-          <span className="text-muted-foreground truncate" title={senderName}>
-            {senderName} {senderEmail}
-          </span>{' '}
-          <span className="text-muted-foreground">
-            {match(recipient.role)
-              .with(RecipientRole.VIEWER, () =>
-                document.teamId && !shouldUseTeamDetails ? (
-                  <Trans>
-                    on behalf of "{document.team?.name}" has invited you to view this document
-                  </Trans>
-                ) : (
-                  <Trans>has invited you to view this document</Trans>
-                ),
-              )
-              .with(RecipientRole.SIGNER, () =>
-                document.teamId && !shouldUseTeamDetails ? (
-                  <Trans>
-                    on behalf of "{document.team?.name}" has invited you to sign this document
-                  </Trans>
-                ) : (
-                  <Trans>has invited you to sign this document</Trans>
-                ),
-              )
-              .with(RecipientRole.APPROVER, () =>
-                document.teamId && !shouldUseTeamDetails ? (
-                  <Trans>
-                    on behalf of "{document.team?.name}" has invited you to approve this document
-                  </Trans>
-                ) : (
-                  <Trans>has invited you to approve this document</Trans>
-                ),
-              )
-              .with(RecipientRole.ASSISTANT, () =>
-                document.teamId && !shouldUseTeamDetails ? (
-                  <Trans>
-                    on behalf of "{document.team?.name}" has invited you to assist this document
-                  </Trans>
-                ) : (
-                  <Trans>has invited you to assist this document</Trans>
-                ),
-              )
-              .otherwise(() => null)}
-          </span>
-        </div>
-
-        <RejectDocumentDialog document={document} token={recipient.token} />
-      </div>
-
-      <div className="mt-8 grid grid-cols-12 gap-y-8 lg:gap-x-8 lg:gap-y-0">
-        <Card
-          className="col-span-12 rounded-xl before:rounded-xl lg:col-span-7 xl:col-span-8"
-          gradient
+    <RecipientProvider recipient={recipient} targetSigner={selectedSigner ?? null}>
+      <div className="mx-auto w-full max-w-screen-xl">
+        <h1
+          className="mt-4 block max-w-[20rem] truncate text-2xl font-semibold md:max-w-[30rem] md:text-3xl"
+          title={document.title}
         >
-          <CardContent className="p-2">
-            <LazyPDFViewer
-              key={documentData.id}
-              documentData={documentData}
-              document={document}
-              password={documentMeta?.password}
-            />
-          </CardContent>
-        </Card>
+          {document.title}
+        </h1>
 
-        <div className="col-span-12 lg:col-span-5 xl:col-span-4">
-          <SigningForm
-            document={document}
-            recipient={recipient}
-            fields={fields}
-            redirectUrl={documentMeta?.redirectUrl}
-            isRecipientsTurn={isRecipientsTurn}
-            allRecipients={allRecipients}
-            setSelectedSignerId={setSelectedSignerId}
-          />
+        <div className="mt-2.5 flex flex-wrap items-center justify-between gap-x-6">
+          <div className="max-w-[50ch]">
+            <span className="text-muted-foreground truncate" title={senderName}>
+              {senderName} {senderEmail}
+            </span>{' '}
+            <span className="text-muted-foreground">
+              {match(recipient.role)
+                .with(RecipientRole.VIEWER, () =>
+                  document.teamId && !shouldUseTeamDetails ? (
+                    <Trans>
+                      on behalf of "{document.team?.name}" has invited you to view this document
+                    </Trans>
+                  ) : (
+                    <Trans>has invited you to view this document</Trans>
+                  ),
+                )
+                .with(RecipientRole.SIGNER, () =>
+                  document.teamId && !shouldUseTeamDetails ? (
+                    <Trans>
+                      on behalf of "{document.team?.name}" has invited you to sign this document
+                    </Trans>
+                  ) : (
+                    <Trans>has invited you to sign this document</Trans>
+                  ),
+                )
+                .with(RecipientRole.APPROVER, () =>
+                  document.teamId && !shouldUseTeamDetails ? (
+                    <Trans>
+                      on behalf of "{document.team?.name}" has invited you to approve this document
+                    </Trans>
+                  ) : (
+                    <Trans>has invited you to approve this document</Trans>
+                  ),
+                )
+                .with(RecipientRole.ASSISTANT, () =>
+                  document.teamId && !shouldUseTeamDetails ? (
+                    <Trans>
+                      on behalf of "{document.team?.name}" has invited you to assist this document
+                    </Trans>
+                  ) : (
+                    <Trans>has invited you to assist this document</Trans>
+                  ),
+                )
+                .otherwise(() => null)}
+            </span>
+          </div>
+
+          <RejectDocumentDialog document={document} token={recipient.token} />
         </div>
-      </div>
 
-      <DocumentReadOnlyFields fields={completedFields} />
+        <div className="mt-8 grid grid-cols-12 gap-y-8 lg:gap-x-8 lg:gap-y-0">
+          <Card
+            className="col-span-12 rounded-xl before:rounded-xl lg:col-span-7 xl:col-span-8"
+            gradient
+          >
+            <CardContent className="p-2">
+              <LazyPDFViewer
+                key={documentData.id}
+                documentData={documentData}
+                document={document}
+                password={documentMeta?.password}
+              />
+            </CardContent>
+          </Card>
 
-      {recipient.role !== RecipientRole.ASSISTANT && (
-        <AutoSign recipient={recipient} fields={fields} />
-      )}
+          <div className="col-span-12 lg:col-span-5 xl:col-span-4">
+            <SigningForm
+              document={document}
+              recipient={recipient}
+              fields={fields}
+              redirectUrl={documentMeta?.redirectUrl}
+              isRecipientsTurn={isRecipientsTurn}
+              allRecipients={allRecipients}
+              setSelectedSignerId={setSelectedSignerId}
+            />
+          </div>
+        </div>
 
-      {recipient.role === RecipientRole.ASSISTANT ? (
-        <ElementVisible target={PDF_VIEWER_PAGE_SELECTOR}>
-          {fields
-            .filter((field) => field.recipientId === selectedSignerId)
-            .map((field) =>
+        <DocumentReadOnlyFields fields={completedFields} />
+
+        {recipient.role !== RecipientRole.ASSISTANT && (
+          <AutoSign recipient={recipient} fields={fields} />
+        )}
+
+        {recipient.role === RecipientRole.ASSISTANT ? (
+          <ElementVisible target={PDF_VIEWER_PAGE_SELECTOR}>
+            {fields
+              .filter((field) => field.recipientId === selectedSignerId)
+              .map((field) =>
+                match(field.type)
+                  .with(FieldType.INITIALS, () => <InitialsField key={field.id} field={field} />)
+                  .with(FieldType.NAME, () => <NameField key={field.id} field={field} />)
+                  .with(FieldType.DATE, () => (
+                    <DateField
+                      key={field.id}
+                      field={field}
+                      dateFormat={documentMeta?.dateFormat ?? DEFAULT_DOCUMENT_DATE_FORMAT}
+                      timezone={documentMeta?.timezone ?? DEFAULT_DOCUMENT_TIME_ZONE}
+                    />
+                  ))
+                  .with(FieldType.EMAIL, () => <EmailField key={field.id} field={field} />)
+                  .with(FieldType.TEXT, () => {
+                    const fieldWithMeta: FieldWithSignatureAndFieldMeta = {
+                      ...field,
+                      fieldMeta: field.fieldMeta ? ZTextFieldMeta.parse(field.fieldMeta) : null,
+                    };
+                    return <TextField key={field.id} field={fieldWithMeta} />;
+                  })
+                  .with(FieldType.NUMBER, () => {
+                    const fieldWithMeta: FieldWithSignatureAndFieldMeta = {
+                      ...field,
+                      fieldMeta: field.fieldMeta ? ZNumberFieldMeta.parse(field.fieldMeta) : null,
+                    };
+                    return <NumberField key={field.id} field={fieldWithMeta} />;
+                  })
+                  .with(FieldType.RADIO, () => {
+                    const fieldWithMeta: FieldWithSignatureAndFieldMeta = {
+                      ...field,
+                      fieldMeta: field.fieldMeta ? ZRadioFieldMeta.parse(field.fieldMeta) : null,
+                    };
+                    return <RadioField key={field.id} field={fieldWithMeta} />;
+                  })
+                  .with(FieldType.CHECKBOX, () => {
+                    const fieldWithMeta: FieldWithSignatureAndFieldMeta = {
+                      ...field,
+                      fieldMeta: field.fieldMeta ? ZCheckboxFieldMeta.parse(field.fieldMeta) : null,
+                    };
+                    return <CheckboxField key={field.id} field={fieldWithMeta} />;
+                  })
+                  .with(FieldType.DROPDOWN, () => {
+                    const fieldWithMeta: FieldWithSignatureAndFieldMeta = {
+                      ...field,
+                      fieldMeta: field.fieldMeta ? ZDropdownFieldMeta.parse(field.fieldMeta) : null,
+                    };
+                    return <DropdownField key={field.id} field={fieldWithMeta} />;
+                  })
+                  .with(FieldType.SIGNATURE, () => <SignatureField key={field.id} field={field} />)
+                  .otherwise(() => null),
+              )}
+          </ElementVisible>
+        ) : (
+          <ElementVisible target={PDF_VIEWER_PAGE_SELECTOR}>
+            {fields.map((field) =>
               match(field.type)
-                .with(FieldType.INITIALS, () => (
-                  <AssistantInitialsField
-                    key={field.id}
-                    field={field}
-                    selectedSigner={selectedSigner ?? null}
-                    recipient={recipient}
-                  />
-                ))
-                .with(FieldType.NAME, () => (
-                  <AssistantNameField
-                    key={field.id}
-                    field={field}
-                    selectedSigner={selectedSigner ?? null}
-                    recipient={recipient}
-                  />
-                ))
+                .with(FieldType.SIGNATURE, () => <SignatureField key={field.id} field={field} />)
+                .with(FieldType.INITIALS, () => <InitialsField key={field.id} field={field} />)
+                .with(FieldType.NAME, () => <NameField key={field.id} field={field} />)
                 .with(FieldType.DATE, () => (
-                  <AssistantDateField
+                  <DateField
                     key={field.id}
                     field={field}
-                    selectedSigner={selectedSigner ?? null}
-                    recipient={recipient}
                     dateFormat={documentMeta?.dateFormat ?? DEFAULT_DOCUMENT_DATE_FORMAT}
                     timezone={documentMeta?.timezone ?? DEFAULT_DOCUMENT_TIME_ZONE}
                   />
                 ))
-                .with(FieldType.EMAIL, () => (
-                  <AssistantEmailField
-                    key={field.id}
-                    field={field}
-                    selectedSigner={selectedSigner ?? null}
-                    recipient={recipient}
-                  />
-                ))
+                .with(FieldType.EMAIL, () => <EmailField key={field.id} field={field} />)
                 .with(FieldType.TEXT, () => {
                   const fieldWithMeta: FieldWithSignatureAndFieldMeta = {
                     ...field,
                     fieldMeta: field.fieldMeta ? ZTextFieldMeta.parse(field.fieldMeta) : null,
                   };
-                  return (
-                    <AssistantTextField
-                      key={field.id}
-                      field={fieldWithMeta}
-                      selectedSigner={selectedSigner ?? null}
-                      recipient={recipient}
-                    />
-                  );
+                  return <TextField key={field.id} field={fieldWithMeta} />;
                 })
                 .with(FieldType.NUMBER, () => {
                   const fieldWithMeta: FieldWithSignatureAndFieldMeta = {
                     ...field,
                     fieldMeta: field.fieldMeta ? ZNumberFieldMeta.parse(field.fieldMeta) : null,
                   };
-                  return (
-                    <AssistantNumberField
-                      key={field.id}
-                      field={fieldWithMeta}
-                      selectedSigner={selectedSigner ?? null}
-                      recipient={recipient}
-                    />
-                  );
+                  return <NumberField key={field.id} field={fieldWithMeta} />;
                 })
                 .with(FieldType.RADIO, () => {
                   const fieldWithMeta: FieldWithSignatureAndFieldMeta = {
                     ...field,
                     fieldMeta: field.fieldMeta ? ZRadioFieldMeta.parse(field.fieldMeta) : null,
                   };
-                  return (
-                    <AssistantRadioField
-                      key={field.id}
-                      field={fieldWithMeta}
-                      selectedSigner={selectedSigner ?? null}
-                      recipient={recipient}
-                    />
-                  );
+                  return <RadioField key={field.id} field={fieldWithMeta} />;
                 })
                 .with(FieldType.CHECKBOX, () => {
                   const fieldWithMeta: FieldWithSignatureAndFieldMeta = {
                     ...field,
                     fieldMeta: field.fieldMeta ? ZCheckboxFieldMeta.parse(field.fieldMeta) : null,
                   };
-                  return (
-                    <AssistantCheckboxField
-                      key={field.id}
-                      field={fieldWithMeta}
-                      selectedSigner={selectedSigner ?? null}
-                      recipient={recipient}
-                    />
-                  );
+                  return <CheckboxField key={field.id} field={fieldWithMeta} />;
                 })
                 .with(FieldType.DROPDOWN, () => {
                   const fieldWithMeta: FieldWithSignatureAndFieldMeta = {
                     ...field,
                     fieldMeta: field.fieldMeta ? ZDropdownFieldMeta.parse(field.fieldMeta) : null,
                   };
-                  return (
-                    <AssistantDropdownField
-                      key={field.id}
-                      field={fieldWithMeta}
-                      selectedSigner={selectedSigner ?? null}
-                      recipient={recipient}
-                    />
-                  );
+                  return <DropdownField key={field.id} field={fieldWithMeta} />;
                 })
                 .otherwise(() => null),
             )}
-        </ElementVisible>
-      ) : (
-        <ElementVisible target={PDF_VIEWER_PAGE_SELECTOR}>
-          {fields.map((field) =>
-            match(field.type)
-              .with(FieldType.SIGNATURE, () => (
-                <SignatureField
-                  key={field.id}
-                  field={field}
-                  recipient={recipient}
-                  typedSignatureEnabled={documentMeta?.typedSignatureEnabled}
-                />
-              ))
-              .with(FieldType.INITIALS, () => (
-                <InitialsField key={field.id} field={field} recipient={recipient} />
-              ))
-              .with(FieldType.NAME, () => (
-                <NameField key={field.id} field={field} recipient={recipient} />
-              ))
-              .with(FieldType.DATE, () => (
-                <DateField
-                  key={field.id}
-                  field={field}
-                  recipient={recipient}
-                  dateFormat={documentMeta?.dateFormat ?? DEFAULT_DOCUMENT_DATE_FORMAT}
-                  timezone={documentMeta?.timezone ?? DEFAULT_DOCUMENT_TIME_ZONE}
-                />
-              ))
-              .with(FieldType.EMAIL, () => (
-                <EmailField key={field.id} field={field} recipient={recipient} />
-              ))
-              .with(FieldType.TEXT, () => {
-                const fieldWithMeta: FieldWithSignatureAndFieldMeta = {
-                  ...field,
-                  fieldMeta: field.fieldMeta ? ZTextFieldMeta.parse(field.fieldMeta) : null,
-                };
-                return <TextField key={field.id} field={fieldWithMeta} recipient={recipient} />;
-              })
-              .with(FieldType.NUMBER, () => {
-                const fieldWithMeta: FieldWithSignatureAndFieldMeta = {
-                  ...field,
-                  fieldMeta: field.fieldMeta ? ZNumberFieldMeta.parse(field.fieldMeta) : null,
-                };
-                return <NumberField key={field.id} field={fieldWithMeta} recipient={recipient} />;
-              })
-              .with(FieldType.RADIO, () => {
-                const fieldWithMeta: FieldWithSignatureAndFieldMeta = {
-                  ...field,
-                  fieldMeta: field.fieldMeta ? ZRadioFieldMeta.parse(field.fieldMeta) : null,
-                };
-                return <RadioField key={field.id} field={fieldWithMeta} recipient={recipient} />;
-              })
-              .with(FieldType.CHECKBOX, () => {
-                const fieldWithMeta: FieldWithSignatureAndFieldMeta = {
-                  ...field,
-                  fieldMeta: field.fieldMeta ? ZCheckboxFieldMeta.parse(field.fieldMeta) : null,
-                };
-                return <CheckboxField key={field.id} field={fieldWithMeta} recipient={recipient} />;
-              })
-              .with(FieldType.DROPDOWN, () => {
-                const fieldWithMeta: FieldWithSignatureAndFieldMeta = {
-                  ...field,
-                  fieldMeta: field.fieldMeta ? ZDropdownFieldMeta.parse(field.fieldMeta) : null,
-                };
-                return <DropdownField key={field.id} field={fieldWithMeta} recipient={recipient} />;
-              })
-              .otherwise(() => null),
-          )}
-        </ElementVisible>
-      )}
-    </div>
+          </ElementVisible>
+        )}
+      </div>
+    </RecipientProvider>
   );
 };
