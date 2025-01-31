@@ -1,10 +1,10 @@
 import { Trans, msg } from '@lingui/macro';
 import { useLingui } from '@lingui/react';
+import type { TeamMemberRole, TeamTransferVerification } from '@prisma/client';
 import { AnimatePresence } from 'framer-motion';
 
 import { canExecuteTeamAction } from '@documenso/lib/utils/teams';
 import { isTokenExpired } from '@documenso/lib/utils/token-verification';
-import type { TeamMemberRole, TeamTransferVerification } from '@documenso/prisma/client';
 import { trpc } from '@documenso/trpc/react';
 import { AnimateGenericFadeInOut } from '@documenso/ui/components/animate/animate-generic-fade-in-out';
 import { cn } from '@documenso/ui/lib/utils';

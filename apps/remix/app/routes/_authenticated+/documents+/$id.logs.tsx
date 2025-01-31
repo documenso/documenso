@@ -5,6 +5,7 @@ import type { Recipient } from '@prisma/client';
 import { ChevronLeft } from 'lucide-react';
 import { DateTime } from 'luxon';
 import { Link, redirect } from 'react-router';
+import { getRequiredSessionContext } from 'server/utils/get-required-session-context';
 
 import { getRequiredSession } from '@documenso/auth/server/lib/utils/get-session';
 import { getDocumentById } from '@documenso/lib/server-only/document/get-document-by-id';
@@ -23,21 +24,10 @@ import { DocumentLogsTable } from '~/components/tables/document-logs-table';
 
 import type { Route } from './+types/$id.logs';
 
-export async function loader({ request, params }: Route.LoaderArgs) {
+export async function loader({ params, context }: Route.LoaderArgs) {
   const { id } = params;
 
-  const { user } = await getRequiredSession(request);
-
-  // Todo: Get from parent loader, this is just for testing.
-  const team = await prisma.team.findFirst({
-    where: {
-      documents: {
-        some: {
-          id: Number(id),
-        },
-      },
-    },
-  });
+  const { user, currentTeam: team } = getRequiredSessionContext(context);
 
   const documentId = Number(id);
 

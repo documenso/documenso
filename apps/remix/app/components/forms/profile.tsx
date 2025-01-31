@@ -4,6 +4,7 @@ import { useLingui } from '@lingui/react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 
+import { useSession } from '@documenso/lib/client-only/providers/session';
 import { trpc } from '@documenso/trpc/react';
 import { cn } from '@documenso/ui/lib/utils';
 import { Button } from '@documenso/ui/primitives/button';
@@ -19,8 +20,6 @@ import { Input } from '@documenso/ui/primitives/input';
 import { Label } from '@documenso/ui/primitives/label';
 import { SignaturePad } from '@documenso/ui/primitives/signature-pad';
 import { useToast } from '@documenso/ui/primitives/use-toast';
-
-import { useAuth } from '~/providers/auth';
 
 export const ZProfileFormSchema = z.object({
   name: z.string().trim().min(1, { message: 'Please enter a valid name.' }),
@@ -41,7 +40,7 @@ export type ProfileFormProps = {
 export const ProfileForm = ({ className }: ProfileFormProps) => {
   const { _ } = useLingui();
   const { toast } = useToast();
-  const { user } = useAuth();
+  const { user } = useSession();
 
   const form = useForm<TProfileFormSchema>({
     values: {

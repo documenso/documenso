@@ -1,11 +1,10 @@
 import { Trans } from '@lingui/macro';
 import { useLingui } from '@lingui/react';
 import { DateTime } from 'luxon';
+import { getRequiredTeamSessionContext } from 'server/utils/get-required-session-context';
 
-import { getRequiredSession } from '@documenso/auth/server/lib/utils/get-session';
 import { NEXT_PUBLIC_WEBAPP_URL } from '@documenso/lib/constants/app';
 import { getTeamTokens } from '@documenso/lib/server-only/public-api/get-all-team-tokens';
-import { getTeamByUrl } from '@documenso/lib/server-only/team/get-team';
 import { Button } from '@documenso/ui/primitives/button';
 
 import DeleteTokenDialog from '~/components/(dashboard)/settings/token/delete-token-dialog';
@@ -13,11 +12,8 @@ import { ApiTokenForm } from '~/components/forms/token';
 
 import type { Route } from './+types/tokens';
 
-export async function loader({ request, params }: Route.LoaderArgs) {
-  const { user } = await getRequiredSession(request); // Todo
-
-  // Todo
-  const team = await getTeamByUrl({ userId: user.id, teamUrl: params.teamUrl });
+export async function loader({ context }: Route.LoaderArgs) {
+  const { user, currentTeam: team } = getRequiredTeamSessionContext(context);
 
   const tokens = await getTeamTokens({ userId: user.id, teamId: team.id }).catch(() => null);
 

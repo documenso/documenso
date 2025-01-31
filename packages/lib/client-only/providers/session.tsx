@@ -9,13 +9,13 @@ interface AuthProviderProps {
   user: User;
 }
 
-const AuthContext = createContext<{
+const SessionContext = createContext<{
   user: User; // Todo: Exclude password
   session: Session;
 } | null>(null);
 
-export const useAuth = () => {
-  const context = useContext(AuthContext);
+export const useSession = () => {
+  const context = useContext(SessionContext);
 
   if (!context) {
     throw new Error('useAuth must be used within a AuthProvider');
@@ -24,6 +24,6 @@ export const useAuth = () => {
   return context;
 };
 
-export const AuthProvider = ({ children, session, user }: AuthProviderProps) => {
-  return <AuthContext.Provider value={{ session, user }}>{children}</AuthContext.Provider>;
+export const SessionProvider = ({ children, session, user }: AuthProviderProps) => {
+  return <SessionContext.Provider value={{ session, user }}>{children}</SessionContext.Provider>;
 };

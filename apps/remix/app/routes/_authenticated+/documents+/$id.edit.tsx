@@ -3,16 +3,15 @@ import { TeamMemberRole } from '@prisma/client';
 import { DocumentStatus as InternalDocumentStatus } from '@prisma/client';
 import { ChevronLeft, Users2 } from 'lucide-react';
 import { Link, redirect } from 'react-router';
+import { getRequiredSessionContext } from 'server/utils/get-required-session-context';
 import { match } from 'ts-pattern';
 
-import { getRequiredSession } from '@documenso/auth/server/lib/utils/get-session';
 import { isUserEnterprise } from '@documenso/ee/server-only/util/is-document-enterprise';
 import { DOCUMENSO_ENCRYPTION_KEY } from '@documenso/lib/constants/crypto';
 import { getDocumentWithDetailsById } from '@documenso/lib/server-only/document/get-document-with-details-by-id';
 import { DocumentVisibility } from '@documenso/lib/types/document-visibility';
 import { symmetricDecrypt } from '@documenso/lib/universal/crypto';
 import { formatDocumentsPath } from '@documenso/lib/utils/teams';
-import { prisma } from '@documenso/prisma';
 
 import { StackAvatarsWithTooltip } from '~/components/(dashboard)/avatar/stack-avatars-with-tooltip';
 import { DocumentStatus } from '~/components/formatter/document-status';
@@ -20,21 +19,10 @@ import { DocumentEditForm } from '~/components/pages/document/document-edit-form
 
 import type { Route } from './+types/$id.edit';
 
-export async function loader({ request, params }: Route.LoaderArgs) {
+export async function loader({ params, context }: Route.LoaderArgs) {
+  const { user, currentTeam: team } = getRequiredSessionContext(context);
+
   const { id } = params;
-
-  const { user } = await getRequiredSession(request);
-
-  // Todo: Get from parent loader, this is just for testing.
-  const team = await prisma.team.findFirst({
-    where: {
-      documents: {
-        some: {
-          id: Number(id),
-        },
-      },
-    },
-  });
 
   const documentId = Number(id);
 

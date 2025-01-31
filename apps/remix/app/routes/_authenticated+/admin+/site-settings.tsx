@@ -29,6 +29,10 @@ import { SettingsHeader } from '~/components/(dashboard)/settings/layout/header'
 
 import type { Route } from './+types/site-settings';
 
+const ZBannerFormSchema = ZSiteSettingsBannerSchema;
+
+type TBannerFormSchema = z.infer<typeof ZBannerFormSchema>;
+
 export async function loader() {
   const banner = await getSiteSettings().then((settings) =>
     settings.find((setting) => setting.id === SITE_SETTINGS_BANNER_ID),
@@ -36,10 +40,6 @@ export async function loader() {
 
   return { banner };
 }
-
-const ZBannerFormSchema = ZSiteSettingsBannerSchema;
-
-type TBannerFormSchema = z.infer<typeof ZBannerFormSchema>;
 
 export default function AdminBannerPage({ loaderData }: Route.ComponentProps) {
   const { banner } = loaderData;

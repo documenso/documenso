@@ -2,13 +2,11 @@ import type { MessageDescriptor } from '@lingui/core';
 import { Trans, msg } from '@lingui/macro';
 import { useLingui } from '@lingui/react';
 import { ChevronLeft } from 'lucide-react';
-import { Link, Outlet, isRouteErrorResponse, replace, useNavigate } from 'react-router';
+import { Link, Outlet, isRouteErrorResponse, redirect, useNavigate } from 'react-router';
+import { getRequiredSessionContext } from 'server/utils/get-required-session-context';
 import { match } from 'ts-pattern';
 
-import { getRequiredSession } from '@documenso/auth/server/lib/utils/get-session';
 import { AppErrorCode } from '@documenso/lib/errors/app-error';
-import { getTeamByUrl } from '@documenso/lib/server-only/team/get-team';
-import { getTeams } from '@documenso/lib/server-only/team/get-teams';
 import { TrpcProvider } from '@documenso/trpc/react';
 import { Button } from '@documenso/ui/primitives/button';
 
@@ -16,43 +14,28 @@ import { TeamProvider } from '~/providers/team';
 
 import type { Route } from './+types/_layout';
 
-export const loader = async ({ request, params }: Route.LoaderArgs) => {
-  // Todo: get user better from context or something
-  // Todo: get user better from context or something
-  const { user } = await getRequiredSession(request);
+export const loader = ({ context }: Route.LoaderArgs) => {
+  const { currentTeam } = getRequiredSessionContext(context);
 
-  const [getTeamsPromise, getTeamPromise] = await Promise.allSettled([
-    getTeams({ userId: user.id }),
-    getTeamByUrl({ userId: user.id, teamUrl: params.teamUrl }),
-  ]);
-
-  console.log('1');
-  console.log({ userId: user.id, teamUrl: params.teamUrl });
-  console.log(getTeamPromise.status);
-  if (getTeamPromise.status === 'rejected') {
-    console.log('2');
-    return replace('/documents');
+  if (!currentTeam) {
+    return redirect('/documents');
   }
 
-  const team = getTeamPromise.value;
-  const teams = getTeamsPromise.status === 'fulfilled' ? getTeamsPromise.value : [];
-
   const trpcHeaders = {
-    'x-team-Id': team.id.toString(),
+    'x-team-Id': currentTeam.id.toString(),
   };
 
   return {
-    team,
-    teams,
+    currentTeam,
     trpcHeaders,
   };
 };
 
 export default function Layout({ loaderData }: Route.ComponentProps) {
-  const { team, trpcHeaders } = loaderData;
+  const { currentTeam, trpcHeaders } = loaderData;
 
   return (
-    <TeamProvider team={team}>
+    <TeamProvider team={currentTeam}>
       <TrpcProvider headers={trpcHeaders}>
         {/* Todo: Do this. */}
         {/* {team.subscription && team.subscription.status !== SubscriptionStatus.ACTIVE && (

@@ -4,9 +4,10 @@ import { DocumentStatus } from '@prisma/client';
 import { TeamMemberRole } from '@prisma/client';
 import { ChevronLeft, Clock9, Users2 } from 'lucide-react';
 import { Link, redirect } from 'react-router';
+import { getRequiredSessionContext } from 'server/utils/get-required-session-context';
 import { match } from 'ts-pattern';
 
-import { getRequiredSession } from '@documenso/auth/server/lib/utils/get-session';
+import { useSession } from '@documenso/lib/client-only/providers/session';
 import { DOCUMENSO_ENCRYPTION_KEY } from '@documenso/lib/constants/crypto';
 import { getDocumentById } from '@documenso/lib/server-only/document/get-document-by-id';
 import { getFieldsForDocument } from '@documenso/lib/server-only/field/get-fields-for-document';
@@ -14,7 +15,6 @@ import { getRecipientsForDocument } from '@documenso/lib/server-only/recipient/g
 import { DocumentVisibility } from '@documenso/lib/types/document-visibility';
 import { symmetricDecrypt } from '@documenso/lib/universal/crypto';
 import { formatDocumentsPath } from '@documenso/lib/utils/teams';
-import { prisma } from '@documenso/prisma';
 import { Badge } from '@documenso/ui/primitives/badge';
 import { Button } from '@documenso/ui/primitives/button';
 import { Card, CardContent } from '@documenso/ui/primitives/card';
@@ -33,25 +33,13 @@ import { DocumentPageViewDropdown } from '~/components/pages/document/document-p
 import { DocumentPageViewInformation } from '~/components/pages/document/document-page-view-information';
 import { DocumentPageViewRecentActivity } from '~/components/pages/document/document-page-view-recent-activity';
 import { DocumentPageViewRecipients } from '~/components/pages/document/document-page-view-recipients';
-import { useAuth } from '~/providers/auth';
 
 import type { Route } from './+types/$id._index';
 
-export async function loader({ request, params }: Route.LoaderArgs) {
+export async function loader({ params, context }: Route.LoaderArgs) {
+  const { user, currentTeam: team } = getRequiredSessionContext(context);
+
   const { id } = params;
-
-  const { user } = await getRequiredSession(request);
-
-  // Todo: Get from parent loader, this is just for testing.
-  const team = await prisma.team.findFirst({
-    where: {
-      documents: {
-        some: {
-          id: Number(id),
-        },
-      },
-    },
-  });
 
   const documentId = Number(id);
 
@@ -142,7 +130,7 @@ export async function loader({ request, params }: Route.LoaderArgs) {
 
 export default function DocumentPage({ loaderData }: Route.ComponentProps) {
   const { _ } = useLingui();
-  const { user } = useAuth();
+  const { user } = useSession();
 
   const { document, documentRootPath, fields } = loaderData;
 

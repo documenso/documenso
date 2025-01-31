@@ -1,8 +1,8 @@
 import { Trans } from '@lingui/macro';
 import { useLingui } from '@lingui/react';
 import { DateTime } from 'luxon';
+import { getRequiredSessionContext } from 'server/utils/get-required-session-context';
 
-import { getRequiredSession } from '@documenso/auth/server/lib/utils/get-session';
 import { getUserTokens } from '@documenso/lib/server-only/public-api/get-all-user-tokens';
 import { Button } from '@documenso/ui/primitives/button';
 
@@ -11,9 +11,8 @@ import { ApiTokenForm } from '~/components/forms/token';
 
 import type { Route } from './+types/index';
 
-export async function loader({ request }: Route.LoaderArgs) {
-  // Todo: Make better
-  const { user } = await getRequiredSession(request);
+export async function loader({ context }: Route.LoaderArgs) {
+  const { user } = getRequiredSessionContext(context);
 
   // Todo: Use TRPC & use table instead
   const tokens = await getUserTokens({ userId: user.id });

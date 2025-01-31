@@ -1,7 +1,3 @@
-'use client';
-
-import Link from 'next/link';
-
 import { Trans, msg } from '@lingui/macro';
 import { useLingui } from '@lingui/react';
 import { DocumentStatus, RecipientRole, SigningStatus } from '@prisma/client';
@@ -15,6 +11,7 @@ import {
   PenIcon,
   PlusIcon,
 } from 'lucide-react';
+import { Link } from 'react-router';
 import { match } from 'ts-pattern';
 
 import { RECIPIENT_ROLES_DESCRIPTION } from '@documenso/lib/constants/recipient-roles';
@@ -51,7 +48,7 @@ export const DocumentPageViewRecipients = ({
 
         {document.status !== DocumentStatus.COMPLETED && (
           <Link
-            href={`${documentRootPath}/${document.id}/edit?step=signers`}
+            to={`${documentRootPath}/${document.id}/edit?step=signers`}
             title={_(msg`Modify recipients`)}
             className="flex flex-row items-center justify-between"
           >

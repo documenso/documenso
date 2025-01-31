@@ -223,7 +223,7 @@ export const SignInForm = ({
       }
 
       if (error.code === AuthenticationErrorCode.UnverifiedEmail) {
-        void navigate('/unverified-account');
+        await navigate('/unverified-account');
 
         toast({
           title: _(msg`Unable to sign in`),

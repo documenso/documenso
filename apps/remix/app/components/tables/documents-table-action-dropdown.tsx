@@ -20,6 +20,7 @@ import {
 import { Link } from 'react-router';
 
 import { downloadPDF } from '@documenso/lib/client-only/download-pdf';
+import { useSession } from '@documenso/lib/client-only/providers/session';
 import { formatDocumentsPath } from '@documenso/lib/utils/teams';
 import { trpc as trpcClient } from '@documenso/trpc/client';
 import { DocumentShareButton } from '@documenso/ui/components/document/document-share-button';
@@ -37,7 +38,7 @@ import { DocumentDuplicateDialog } from '~/components/dialogs/document-duplicate
 import { DocumentMoveDialog } from '~/components/dialogs/document-move-dialog';
 import { DocumentResendDialog } from '~/components/dialogs/document-resend-dialog';
 import { DocumentRecipientLinkCopyDialog } from '~/components/document/document-recipient-link-copy-dialog';
-import { useAuth } from '~/providers/auth';
+import { useOptionalCurrentTeam } from '~/providers/team';
 
 export type DocumentsTableActionDropdownProps = {
   row: Document & {
@@ -45,11 +46,12 @@ export type DocumentsTableActionDropdownProps = {
     recipients: Recipient[];
     team: Pick<Team, 'id' | 'url'> | null;
   };
-  team?: Pick<Team, 'id' | 'url'> & { teamEmail?: string };
 };
 
-export const DocumentsTableActionDropdown = ({ row, team }: DocumentsTableActionDropdownProps) => {
-  const { user } = useAuth();
+export const DocumentsTableActionDropdown = ({ row }: DocumentsTableActionDropdownProps) => {
+  const { user } = useSession();
+  const team = useOptionalCurrentTeam();
+
   const { toast } = useToast();
   const { _ } = useLingui();
 
@@ -229,7 +231,6 @@ export const DocumentsTableActionDropdown = ({ row, team }: DocumentsTableAction
         id={row.id}
         open={isDuplicateDialogOpen}
         onOpenChange={setDuplicateDialogOpen}
-        team={team}
       />
     </DropdownMenu>
   );

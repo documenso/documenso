@@ -9,6 +9,7 @@ import { History } from 'lucide-react';
 import { useForm } from 'react-hook-form';
 import * as z from 'zod';
 
+import { useSession } from '@documenso/lib/client-only/providers/session';
 import { getRecipientType } from '@documenso/lib/client-only/recipient-type';
 import { recipientAbbreviation } from '@documenso/lib/utils/recipient-formatter';
 import { trpc as trpcReact } from '@documenso/trpc/react';
@@ -35,7 +36,6 @@ import {
 import { useToast } from '@documenso/ui/primitives/use-toast';
 
 import { StackAvatar } from '~/components/(dashboard)/avatar/stack-avatar';
-import { useAuth } from '~/providers/auth';
 import { useOptionalCurrentTeam } from '~/providers/team';
 
 const FORM_ID = 'resend-email';
@@ -56,7 +56,7 @@ export const ZResendDocumentFormSchema = z.object({
 export type TResendDocumentFormSchema = z.infer<typeof ZResendDocumentFormSchema>;
 
 export const DocumentResendDialog = ({ document, recipients }: DocumentResendDialogProps) => {
-  const { user } = useAuth();
+  const { user } = useSession();
   const team = useOptionalCurrentTeam();
 
   const { toast } = useToast();

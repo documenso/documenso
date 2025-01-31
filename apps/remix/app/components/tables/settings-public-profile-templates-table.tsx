@@ -20,7 +20,7 @@ import {
 import { Skeleton } from '@documenso/ui/primitives/skeleton';
 import { useToast } from '@documenso/ui/primitives/use-toast';
 
-import { ManagePublicTemplateDialog } from '~/components/templates/manage-public-template-dialog';
+import { ManagePublicTemplateDialog } from '~/components/dialogs/public-profile-template-manage-dialog';
 
 type DirectTemplate = FindTemplateRow & {
   directLink: Pick<TemplateDirectLink, 'token' | 'enabled'>;

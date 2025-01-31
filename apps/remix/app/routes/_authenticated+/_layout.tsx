@@ -1,29 +1,25 @@
 import { Outlet } from 'react-router';
 import { redirect } from 'react-router';
 
-import { getSession } from '@documenso/auth/server/lib/utils/get-session';
 import { LimitsProvider } from '@documenso/ee/server-only/limits/provider/client';
-import { getTeams } from '@documenso/lib/server-only/team/get-teams';
+import { SessionProvider } from '@documenso/lib/client-only/providers/session';
 
 import { Header } from '~/components/(dashboard)/layout/header';
 import { VerifyEmailBanner } from '~/components/(dashboard)/layout/verify-email-banner';
-import { AuthProvider } from '~/providers/auth';
 
 import type { Route } from './+types/_layout';
 
-export const loader = async ({ request }: Route.LoaderArgs) => {
-  const { session, user, isAuthenticated } = await getSession(request);
+export const loader = ({ context }: Route.LoaderArgs) => {
+  const { session } = context;
 
-  if (!isAuthenticated) {
+  if (!session) {
     return redirect('/signin');
   }
 
-  const teams = await getTeams({ userId: user.id });
-
   return {
-    user,
-    session,
-    teams,
+    user: session.user,
+    session: session.session,
+    teams: session.teams,
   };
 };
 
@@ -31,7 +27,7 @@ export default function Layout({ loaderData }: Route.ComponentProps) {
   const { user, session, teams } = loaderData;
 
   return (
-    <AuthProvider session={session} user={user}>
+    <SessionProvider session={session} user={user}>
       <LimitsProvider>
         {!user.emailVerified && <VerifyEmailBanner email={user.email} />}
 
@@ -44,6 +40,6 @@ export default function Layout({ loaderData }: Route.ComponentProps) {
           <Outlet />
         </main>
       </LimitsProvider>
-    </AuthProvider>
+    </SessionProvider>
   );
 }

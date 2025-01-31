@@ -51,15 +51,14 @@ export const DocumentDuplicateDialog = ({
 
   const { mutateAsync: duplicateDocument, isPending: isDuplicateLoading } =
     trpcReact.document.duplicateDocument.useMutation({
-      onSuccess: ({ documentId }) => {
-        void navigate(`${documentsPath}/${documentId}/edit`);
-
+      onSuccess: async ({ documentId }) => {
         toast({
           title: _(msg`Document Duplicated`),
           description: _(msg`Your document has been successfully duplicated.`),
           duration: 5000,
         });
 
+        await navigate(`${documentsPath}/${documentId}/edit`);
         onOpenChange(false);
       },
     });

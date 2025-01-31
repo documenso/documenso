@@ -4,8 +4,9 @@ import { Trans, msg } from '@lingui/macro';
 import { useLingui } from '@lingui/react';
 import type { TemplateDirectLink } from '@prisma/client';
 import { TemplateType } from '@prisma/client';
+import { getRequiredSessionContext } from 'server/utils/get-required-session-context';
 
-import { getRequiredSession } from '@documenso/auth/server/lib/utils/get-session';
+import { useSession } from '@documenso/lib/client-only/providers/session';
 import { getUserPublicProfile } from '@documenso/lib/server-only/user/get-user-public-profile';
 import { trpc } from '@documenso/trpc/react';
 import type { FindTemplateRow } from '@documenso/trpc/server/template-router/schema';
@@ -16,10 +17,9 @@ import { Tooltip, TooltipContent, TooltipTrigger } from '@documenso/ui/primitive
 import { useToast } from '@documenso/ui/primitives/use-toast';
 
 import { SettingsHeader } from '~/components/(dashboard)/settings/layout/header';
+import { ManagePublicTemplateDialog } from '~/components/dialogs/public-profile-template-manage-dialog';
 import type { TPublicProfileFormSchema } from '~/components/forms/public-profile-form';
 import { PublicProfileForm } from '~/components/forms/public-profile-form';
-import { ManagePublicTemplateDialog } from '~/components/templates/manage-public-template-dialog';
-import { useAuth } from '~/providers/auth';
 import { useOptionalCurrentTeam } from '~/providers/team';
 
 import { SettingsPublicProfileTemplatesTable } from '../../../../components/tables/settings-public-profile-templates-table';
@@ -43,8 +43,8 @@ const teamProfileText = {
   templatesSubtitle: msg`Show templates in your team public profile for your audience to sign and get started quickly`,
 };
 
-export async function loader({ request }: Route.LoaderArgs) {
-  const { user } = await getRequiredSession(request); // Todo: Pull from...
+export async function loader({ context }: Route.LoaderArgs) {
+  const { user } = getRequiredSessionContext(context);
 
   const { profile } = await getUserPublicProfile({
     userId: user.id,
@@ -59,7 +59,7 @@ export default function PublicProfilePage({ loaderData }: Route.ComponentProps) 
   const { _ } = useLingui();
   const { toast } = useToast();
 
-  const user = useAuth();
+  const user = useSession();
   const team = useOptionalCurrentTeam();
 
   const [isPublicProfileVisible, setIsPublicProfileVisible] = useState(profile.enabled);

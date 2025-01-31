@@ -8,6 +8,7 @@ import { useForm } from 'react-hook-form';
 import { match } from 'ts-pattern';
 import { z } from 'zod';
 
+import { useSession } from '@documenso/lib/client-only/providers/session';
 import { NEXT_PUBLIC_WEBAPP_URL } from '@documenso/lib/constants/app';
 import { AppError } from '@documenso/lib/errors/app-error';
 import { base64 } from '@documenso/lib/universal/base64';
@@ -26,7 +27,6 @@ import {
 } from '@documenso/ui/primitives/form/form';
 import { useToast } from '@documenso/ui/primitives/use-toast';
 
-import { useAuth } from '~/providers/auth';
 import { useOptionalCurrentTeam } from '~/providers/team';
 
 export const ZAvatarImageFormSchema = z.object({
@@ -40,7 +40,7 @@ export type AvatarImageFormProps = {
 };
 
 export const AvatarImageForm = ({ className }: AvatarImageFormProps) => {
-  const { user } = useAuth();
+  const { user } = useSession();
   const { _ } = useLingui();
   const { toast } = useToast();
 

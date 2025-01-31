@@ -2,7 +2,7 @@ import { Trans, msg } from '@lingui/macro';
 import { useLingui } from '@lingui/react';
 import { SigningStatus } from '@prisma/client';
 import { DateTime } from 'luxon';
-import { Link } from 'react-router';
+import { Link, redirect } from 'react-router';
 
 import { getEntireDocument } from '@documenso/lib/server-only/admin/get-entire-document';
 import { trpc } from '@documenso/trpc/react';
@@ -30,10 +30,13 @@ import type { Route } from './+types/documents.$id';
 
 export async function loader({ params }: Route.LoaderArgs) {
   const id = Number(params.id);
+  // Todo: Is it possible for this to return data to the frontend w/out auth layout due to race condition?
+  // Todo: Is it possible for this to return data to the frontend w/out auth layout due to race condition?
+  // Todo: Is it possible for this to return data to the frontend w/out auth layout due to race condition?
 
-  // if (isNaN(id)) {
-  //   return redirect('/admin/documents');
-  // }
+  if (isNaN(id)) {
+    return redirect('/admin/documents');
+  }
 
   const document = await getEntireDocument({ id });
 

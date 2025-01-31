@@ -71,9 +71,9 @@ export const TeamDeleteDialog = ({ trigger, teamId, teamName }: TeamDeleteDialog
         duration: 5000,
       });
 
-      setOpen(false);
+      await navigate('/settings/teams');
 
-      void navigate('/settings/teams');
+      setOpen(false);
     } catch (err) {
       const error = AppError.parseError(err);
 

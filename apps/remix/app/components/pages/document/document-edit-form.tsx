@@ -294,18 +294,15 @@ export const DocumentEditForm = ({
           duration: 5000,
         });
 
-        void navigate(documentRootPath);
-        return;
-      }
-
-      if (document.status === DocumentStatus.DRAFT) {
+        await navigate(documentRootPath);
+      } else if (document.status === DocumentStatus.DRAFT) {
         toast({
           title: _(msg`Links Generated`),
           description: _(msg`Signing links have been generated for this document.`),
           duration: 5000,
         });
       } else {
-        void navigate(`${documentRootPath}/${document.id}`);
+        await navigate(`${documentRootPath}/${document.id}`);
       }
     } catch (err) {
       console.error(err);

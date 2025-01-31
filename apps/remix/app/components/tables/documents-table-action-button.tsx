@@ -7,12 +7,13 @@ import { Link } from 'react-router';
 import { match } from 'ts-pattern';
 
 import { downloadPDF } from '@documenso/lib/client-only/download-pdf';
+import { useSession } from '@documenso/lib/client-only/providers/session';
 import { formatDocumentsPath } from '@documenso/lib/utils/teams';
 import { trpc as trpcClient } from '@documenso/trpc/client';
 import { Button } from '@documenso/ui/primitives/button';
 import { useToast } from '@documenso/ui/primitives/use-toast';
 
-import { useAuth } from '~/providers/auth';
+import { useOptionalCurrentTeam } from '~/providers/team';
 
 export type DocumentsTableActionButtonProps = {
   row: Document & {
@@ -20,13 +21,14 @@ export type DocumentsTableActionButtonProps = {
     recipients: Recipient[];
     team: Pick<Team, 'id' | 'url'> | null;
   };
-  team?: Pick<Team, 'id' | 'url'>;
 };
 
-export const DocumentsTableActionButton = ({ row, team }: DocumentsTableActionButtonProps) => {
-  const { user } = useAuth();
+export const DocumentsTableActionButton = ({ row }: DocumentsTableActionButtonProps) => {
+  const { user } = useSession();
   const { toast } = useToast();
   const { _ } = useLingui();
+
+  const team = useOptionalCurrentTeam();
 
   const recipient = row.recipients.find((recipient) => recipient.email === user.email);
 

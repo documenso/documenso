@@ -9,6 +9,7 @@ import { Link } from 'react-router';
 import { match } from 'ts-pattern';
 
 import { useUpdateSearchParams } from '@documenso/lib/client-only/hooks/use-update-search-params';
+import { useSession } from '@documenso/lib/client-only/providers/session';
 import { formatDocumentsPath } from '@documenso/lib/utils/teams';
 import { ExtendedDocumentStatus } from '@documenso/prisma/types/extended-document-status';
 import type { TFindDocumentsResponse } from '@documenso/trpc/server/document-router/schema';
@@ -20,7 +21,6 @@ import { TableCell } from '@documenso/ui/primitives/table';
 
 import { StackAvatarsWithTooltip } from '~/components/(dashboard)/avatar/stack-avatars-with-tooltip';
 import { DocumentStatus } from '~/components/formatter/document-status';
-import { useAuth } from '~/providers/auth';
 
 import { DocumentsTableActionButton } from './documents-table-action-button';
 import { DocumentsTableActionDropdown } from './documents-table-action-dropdown';
@@ -86,8 +86,8 @@ export const DocumentsTable = ({
         cell: ({ row }) =>
           (!row.original.deletedAt || row.original.status === ExtendedDocumentStatus.COMPLETED) && (
             <div className="flex items-center gap-x-4">
-              <DocumentsTableActionButton team={team} row={row.original} />
-              <DocumentsTableActionDropdown team={team} row={row.original} />
+              <DocumentsTableActionButton row={row.original} />
+              <DocumentsTableActionDropdown row={row.original} />
             </div>
           ),
       },
@@ -169,7 +169,7 @@ type DataTableTitleProps = {
 };
 
 const DataTableTitle = ({ row, teamUrl }: DataTableTitleProps) => {
-  const { user } = useAuth();
+  const { user } = useSession();
 
   const recipient = row.recipients.find((recipient) => recipient.email === user.email);
 

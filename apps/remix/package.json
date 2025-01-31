@@ -5,6 +5,7 @@
   "scripts": {
     "build": "cross-env NODE_ENV=production react-router build",
     "dev": "react-router dev",
+    "dev:bun": "bunx --bun vite",
     "start": "cross-env NODE_ENV=production node dist/server/index.js",
     "clean": "rimraf .react-router && rimraf node_modules",
     "typecheck": "react-router typegen && tsc",

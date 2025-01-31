@@ -1,19 +1,17 @@
-'use client';
-
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Trans, msg } from '@lingui/macro';
 import { useLingui } from '@lingui/react';
-import { useSession } from 'next-auth/react';
+import type { Team, TeamGlobalSettings } from '@prisma/client';
+import { DocumentVisibility } from '@prisma/client';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 
+import { useSession } from '@documenso/lib/client-only/providers/session';
 import {
   SUPPORTED_LANGUAGES,
   SUPPORTED_LANGUAGE_CODES,
   isValidLanguageCode,
 } from '@documenso/lib/constants/i18n';
-import type { Team, TeamGlobalSettings } from '@documenso/prisma/client';
-import { DocumentVisibility } from '@documenso/prisma/client';
 import { trpc } from '@documenso/trpc/react';
 import { Alert } from '@documenso/ui/primitives/alert';
 import { Button } from '@documenso/ui/primitives/button';
@@ -56,9 +54,9 @@ export const TeamDocumentPreferencesForm = ({
 }: TeamDocumentPreferencesFormProps) => {
   const { _ } = useLingui();
   const { toast } = useToast();
-  const { data } = useSession();
+  const { user } = useSession();
 
-  const placeholderEmail = data?.user.email ?? 'user@example.com';
+  const placeholderEmail = user.email ?? 'user@example.com';
 
   const { mutateAsync: updateTeamDocumentPreferences } =
     trpc.team.updateTeamDocumentSettings.useMutation();

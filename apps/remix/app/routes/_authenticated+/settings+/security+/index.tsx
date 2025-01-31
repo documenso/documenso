@@ -2,6 +2,7 @@ import { Trans, msg } from '@lingui/macro';
 import { useLingui } from '@lingui/react';
 import { Link } from 'react-router';
 
+import { useSession } from '@documenso/lib/client-only/providers/session';
 import { Alert, AlertDescription, AlertTitle } from '@documenso/ui/primitives/alert';
 import { Button } from '@documenso/ui/primitives/button';
 
@@ -10,7 +11,6 @@ import { DisableAuthenticatorAppDialog } from '~/components/forms/2fa/disable-au
 import { EnableAuthenticatorAppDialog } from '~/components/forms/2fa/enable-authenticator-app-dialog';
 import { ViewRecoveryCodesDialog } from '~/components/forms/2fa/view-recovery-codes-dialog';
 import { PasswordForm } from '~/components/forms/password';
-import { useAuth } from '~/providers/auth';
 
 export function meta() {
   return [{ title: 'Security' }];
@@ -18,7 +18,7 @@ export function meta() {
 
 export default function SettingsSecurity() {
   const { _ } = useLingui();
-  const { user } = useAuth();
+  const { user } = useSession();
 
   return (
     <div>

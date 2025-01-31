@@ -4,6 +4,7 @@ import { Trans, msg } from '@lingui/macro';
 import { useLingui } from '@lingui/react';
 
 import { authClient } from '@documenso/auth/client';
+import { useSession } from '@documenso/lib/client-only/providers/session';
 import { trpc } from '@documenso/trpc/react';
 import { Alert, AlertDescription, AlertTitle } from '@documenso/ui/primitives/alert';
 import { Button } from '@documenso/ui/primitives/button';
@@ -20,14 +21,12 @@ import { Input } from '@documenso/ui/primitives/input';
 import { Label } from '@documenso/ui/primitives/label';
 import { useToast } from '@documenso/ui/primitives/use-toast';
 
-import { useAuth } from '~/providers/auth';
-
 export type AccountDeleteDialogProps = {
   className?: string;
 };
 
 export const AccountDeleteDialog = ({ className }: AccountDeleteDialogProps) => {
-  const { user } = useAuth();
+  const { user } = useSession();
 
   const { _ } = useLingui();
   const { toast } = useToast();

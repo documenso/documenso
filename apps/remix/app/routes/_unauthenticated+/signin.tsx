@@ -1,7 +1,6 @@
 import { Trans } from '@lingui/macro';
 import { Link, redirect } from 'react-router';
 
-import { getSession } from '@documenso/auth/server/lib/utils/get-session';
 import {
   IS_GOOGLE_SSO_ENABLED,
   IS_OIDC_SSO_ENABLED,
@@ -17,10 +16,8 @@ export function meta(_args: Route.MetaArgs) {
   return [{ title: 'Sign In' }];
 }
 
-export async function loader({ request }: Route.LoaderArgs) {
-  const session = await getSession(request);
-
-  if (session.isAuthenticated) {
+export async function loader({ context }: Route.LoaderArgs) {
+  if (context.session) {
     return redirect('/documents');
   }
 }

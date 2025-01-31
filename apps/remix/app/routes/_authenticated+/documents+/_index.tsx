@@ -2,6 +2,7 @@ import { Trans } from '@lingui/macro';
 import { useSearchParams } from 'react-router';
 import { Link } from 'react-router';
 
+import { useSession } from '@documenso/lib/client-only/providers/session';
 import { formatAvatarUrl } from '@documenso/lib/utils/avatars';
 import { parseToIntegerArray } from '@documenso/lib/utils/params';
 import { formatDocumentsPath } from '@documenso/lib/utils/teams';
@@ -20,7 +21,6 @@ import { UpcomingProfileClaimTeaser } from '~/components/general/upcoming-profil
 import { DocumentsTable } from '~/components/tables/documents-table';
 import { DocumentsTableEmptyState } from '~/components/tables/documents-table-empty-state';
 import { DocumentsTableSenderFilter } from '~/components/tables/documents-table-sender-filter';
-import { useAuth } from '~/providers/auth';
 import { useOptionalCurrentTeam } from '~/providers/team';
 
 export function meta() {
@@ -39,7 +39,7 @@ export function meta() {
 export default function DocumentsPage() {
   const [searchParams] = useSearchParams();
 
-  const { user } = useAuth();
+  const { user } = useSession();
   const team = useOptionalCurrentTeam();
 
   const status = isExtendedDocumentStatus(searchParams.status) ? searchParams.status : 'ALL';

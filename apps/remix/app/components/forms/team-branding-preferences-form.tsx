@@ -1,17 +1,13 @@
-'use client';
-
 import { useEffect, useState } from 'react';
 
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Trans, msg } from '@lingui/macro';
 import { useLingui } from '@lingui/react';
+import type { Team, TeamGlobalSettings } from '@prisma/client';
 import { Loader } from 'lucide-react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 
-import { getFile } from '@documenso/lib/universal/upload/get-file';
-import { putFile } from '@documenso/lib/universal/upload/put-file';
-import type { Team, TeamGlobalSettings } from '@documenso/prisma/client';
 import { trpc } from '@documenso/trpc/react';
 import { cn } from '@documenso/ui/lib/utils';
 import { Button } from '@documenso/ui/primitives/button';
@@ -81,7 +77,8 @@ export function TeamBrandingPreferencesForm({ team, settings }: TeamBrandingPref
       let uploadedBrandingLogo = settings?.brandingLogo;
 
       if (brandingLogo) {
-        uploadedBrandingLogo = JSON.stringify(await putFile(brandingLogo));
+        // Todo
+        // uploadedBrandingLogo = JSON.stringify(await putFile(brandingLogo));
       }
 
       if (brandingLogo === null) {
@@ -118,12 +115,26 @@ export function TeamBrandingPreferencesForm({ team, settings }: TeamBrandingPref
       const file = JSON.parse(settings.brandingLogo);
 
       if ('type' in file && 'data' in file) {
-        void getFile(file).then((binaryData) => {
-          const objectUrl = URL.createObjectURL(new Blob([binaryData]));
+        // Todo
+        // Todo
+        // Todo
+        void fetch(`/api/file?key=${file.key}`, {
+          method: 'GET',
+        })
+          .then((res) => res.json())
+          .then((data) => {
+            const objectUrl = URL.createObjectURL(new Blob([data.binaryData]));
 
-          setPreviewUrl(objectUrl);
-          setHasLoadedPreview(true);
-        });
+            setPreviewUrl(objectUrl);
+            setHasLoadedPreview(true);
+          });
+
+        // void getFile(file).then((binaryData) => {
+        //   const objectUrl = URL.createObjectURL(new Blob([binaryData]));
+
+        //   setPreviewUrl(objectUrl);
+        //   setHasLoadedPreview(true);
+        // });
 
         return;
       }

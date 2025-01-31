@@ -3,13 +3,13 @@ import { useCallback, useEffect, useState } from 'react';
 import { msg } from '@lingui/macro';
 import { useLingui } from '@lingui/react';
 
+import { useSession } from '@documenso/lib/client-only/providers/session';
 import { useToast } from '@documenso/ui/primitives/use-toast';
 
 import { ClaimPublicProfileDialogForm } from '~/components/forms/public-profile-claim-dialog';
-import { useAuth } from '~/providers/auth';
 
 export const UpcomingProfileClaimTeaser = () => {
-  const { user } = useAuth();
+  const { user } = useSession();
 
   const { _ } = useLingui();
   const { toast } = useToast();

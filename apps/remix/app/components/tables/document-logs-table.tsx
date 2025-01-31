@@ -1,13 +1,10 @@
-'use client';
-
 import { useMemo } from 'react';
-
-import { useSearchParams } from 'next/navigation';
 
 import { msg } from '@lingui/macro';
 import { useLingui } from '@lingui/react';
 import { DateTime } from 'luxon';
 import type { DateTimeFormatOptions } from 'luxon';
+import { useSearchParams } from 'react-router';
 import { UAParser } from 'ua-parser-js';
 
 import { useUpdateSearchParams } from '@documenso/lib/client-only/hooks/use-update-search-params';
@@ -32,7 +29,7 @@ const dateFormat: DateTimeFormatOptions = {
 export const DocumentLogsTable = ({ documentId }: DocumentLogsTableProps) => {
   const { _, i18n } = useLingui();
 
-  const searchParams = useSearchParams();
+  const [searchParams] = useSearchParams();
   const updateSearchParams = useUpdateSearchParams();
 
   const parsedSearchParams = ZUrlSearchParamsSchema.parse(Object.fromEntries(searchParams ?? []));

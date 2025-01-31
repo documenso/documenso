@@ -9,7 +9,7 @@ import { authDebugger } from '../utils/debugger';
  * @param c - The Hono context.
  */
 export const getSessionCookie = async (c: Context) => {
-  const sessionId = await getSignedCookie(c, 'secret', 'sessionId');
+  const sessionId = await getSignedCookie(c, 'secret', 'sessionId'); // Todo: Use secret
 
   return sessionId;
 };

@@ -36,7 +36,7 @@ export const SearchParamSelector = ({ children, paramKey, isValueValid }: Search
       params.delete(paramKey);
     }
 
-    void navigate(`${pathname}?${params.toString()}`, { scroll: false });
+    void navigate(`${pathname}?${params.toString()}`, { preventScrollReset: true });
   };
 
   return (

@@ -1,9 +1,7 @@
 import { Trans } from '@lingui/macro';
 import { Outlet } from 'react-router';
+import { getRequiredTeamSessionContext } from 'server/utils/get-required-session-context';
 
-import { getRequiredSession } from '@documenso/auth/server/lib/utils/get-session';
-import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
-import { getTeamByUrl } from '@documenso/lib/server-only/team/get-team';
 import { canExecuteTeamAction } from '@documenso/lib/utils/teams';
 
 import { TeamSettingsDesktopNav } from '~/components/pages/teams/team-settings-desktop-nav';
@@ -11,26 +9,12 @@ import { TeamSettingsMobileNav } from '~/components/pages/teams/team-settings-mo
 
 import type { Route } from '../+types/_layout';
 
-export async function loader({ request, params }: Route.LoaderArgs) {
-  // Todo: Get from parent loaders...
-  const { user } = await getRequiredSession(request);
-  const teamUrl = params.teamUrl;
+export async function loader({ context }: Route.LoaderArgs) {
+  const { currentTeam: team } = getRequiredTeamSessionContext(context);
 
-  try {
-    const team = await getTeamByUrl({ userId: user.id, teamUrl });
-
-    if (!canExecuteTeamAction('MANAGE_TEAM', team.currentTeamMember.role)) {
-      // Unauthorized.
-      throw new Response(null, { status: 401 }); // Todo: Test
-    }
-  } catch (e) {
-    const error = AppError.parseError(e);
-
-    if (error.code === AppErrorCode.NOT_FOUND) {
-      throw new Response(null, { status: 404 }); // Todo: Test
-    }
-
-    throw e;
+  // Todo: Test that 404 page shows up from error.
+  if (!team || !canExecuteTeamAction('MANAGE_TEAM', team.currentTeamMember.role)) {
+    throw new Response(null, { status: 401 }); // Unauthorized.
   }
 }
 

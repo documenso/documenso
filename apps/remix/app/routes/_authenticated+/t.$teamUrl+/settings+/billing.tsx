@@ -1,12 +1,11 @@
 import { Plural, Trans, msg } from '@lingui/macro';
 import { useLingui } from '@lingui/react';
 import { DateTime } from 'luxon';
+import { getRequiredTeamSessionContext } from 'server/utils/get-required-session-context';
 import type Stripe from 'stripe';
 import { match } from 'ts-pattern';
 
-import { getRequiredSession } from '@documenso/auth/server/lib/utils/get-session';
 import { stripe } from '@documenso/lib/server-only/stripe';
-import { getTeamByUrl } from '@documenso/lib/server-only/team/get-team';
 import { canExecuteTeamAction } from '@documenso/lib/utils/teams';
 import { Card, CardContent } from '@documenso/ui/primitives/card';
 
@@ -16,10 +15,8 @@ import { TeamBillingPortalButton } from '~/components/pages/teams/team-billing-p
 
 import type { Route } from './+types/billing';
 
-export async function loader({ request, params }: Route.LoaderArgs) {
-  const { user } = await getRequiredSession(request);
-
-  const team = await getTeamByUrl({ userId: user.id, teamUrl: params.teamUrl });
+export async function loader({ context }: Route.LoaderArgs) {
+  const { currentTeam: team } = getRequiredTeamSessionContext(context);
 
   let teamSubscription: Stripe.Subscription | null = null;
 

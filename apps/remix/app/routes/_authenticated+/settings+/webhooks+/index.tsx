@@ -11,8 +11,8 @@ import { Badge } from '@documenso/ui/primitives/badge';
 import { Button } from '@documenso/ui/primitives/button';
 
 import { SettingsHeader } from '~/components/(dashboard)/settings/layout/header';
-import { CreateWebhookDialog } from '~/components/dialogs/webhook-create-dialog';
-import { DeleteWebhookDialog } from '~/components/dialogs/webhook-delete-dialog';
+import { WebhookCreateDialog } from '~/components/dialogs/webhook-create-dialog';
+import { WebhookDeleteDialog } from '~/components/dialogs/webhook-delete-dialog';
 
 export default function WebhookPage() {
   const { _, i18n } = useLingui();
@@ -25,7 +25,7 @@ export default function WebhookPage() {
         title={_(msg`Webhooks`)}
         subtitle={_(msg`On this page, you can create new Webhooks and manage the existing ones.`)}
       >
-        <CreateWebhookDialog />
+        <WebhookCreateDialog />
       </SettingsHeader>
 
       {isLoading && (
@@ -92,11 +92,11 @@ export default function WebhookPage() {
                       <Trans>Edit</Trans>
                     </Link>
                   </Button>
-                  <DeleteWebhookDialog webhook={webhook}>
+                  <WebhookDeleteDialog webhook={webhook}>
                     <Button variant="destructive">
                       <Trans>Delete</Trans>
                     </Button>
-                  </DeleteWebhookDialog>
+                  </WebhookDeleteDialog>
                 </div>
               </div>
             </div>

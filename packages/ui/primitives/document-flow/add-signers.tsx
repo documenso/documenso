@@ -1,5 +1,3 @@
-'use client';
-
 import React, { useCallback, useId, useMemo, useRef, useState } from 'react';
 
 import type { DropResult, SensorAPI } from '@hello-pangea/dnd';
@@ -11,11 +9,11 @@ import type { Field, Recipient } from '@prisma/client';
 import { DocumentSigningOrder, RecipientRole, SendStatus } from '@prisma/client';
 import { motion } from 'framer-motion';
 import { GripVerticalIcon, Plus, Trash } from 'lucide-react';
-import { useSession } from 'next-auth/react';
 import { useFieldArray, useForm } from 'react-hook-form';
 import { prop, sortBy } from 'remeda';
 
 import { useLimits } from '@documenso/ee/server-only/limits/provider/client';
+import { useSession } from '@documenso/lib/client-only/providers/session';
 import { ZRecipientAuthOptionsSchema } from '@documenso/lib/types/document-auth';
 import { nanoid } from '@documenso/lib/universal/id';
 import { canRecipientBeModified as utilCanRecipientBeModified } from '@documenso/lib/utils/recipients';
@@ -65,9 +63,7 @@ export const AddSignersFormPartial = ({
   const { _ } = useLingui();
   const { toast } = useToast();
   const { remaining } = useLimits();
-  const { data: session } = useSession();
-
-  const user = session?.user;
+  const { user } = useSession();
 
   const initialId = useId();
   const $sensorApi = useRef<SensorAPI | null>(null);

@@ -1,5 +1,3 @@
-'use client';
-
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 
 import { Trans, msg } from '@lingui/macro';

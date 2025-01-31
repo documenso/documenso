@@ -7,12 +7,11 @@ import { Link } from 'react-router';
 import { match } from 'ts-pattern';
 
 import { downloadPDF } from '@documenso/lib/client-only/download-pdf';
+import { useSession } from '@documenso/lib/client-only/providers/session';
 import { formatDocumentsPath } from '@documenso/lib/utils/teams';
 import { trpc as trpcClient } from '@documenso/trpc/client';
 import { Button } from '@documenso/ui/primitives/button';
 import { useToast } from '@documenso/ui/primitives/use-toast';
-
-import { useAuth } from '~/providers/auth';
 
 export type DocumentPageViewButtonProps = {
   document: Document & {
@@ -23,7 +22,7 @@ export type DocumentPageViewButtonProps = {
 };
 
 export const DocumentPageViewButton = ({ document }: DocumentPageViewButtonProps) => {
-  const { user } = useAuth();
+  const { user } = useSession();
 
   const { toast } = useToast();
   const { _ } = useLingui();

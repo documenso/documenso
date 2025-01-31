@@ -2,6 +2,7 @@ import { Trans } from '@lingui/macro';
 import { CheckCircle2, Clock } from 'lucide-react';
 import { P, match } from 'ts-pattern';
 
+import { useSession } from '@documenso/lib/client-only/providers/session';
 import { NEXT_PUBLIC_WEBAPP_URL } from '@documenso/lib/constants/app';
 import { extractInitials } from '@documenso/lib/utils/recipient-formatter';
 import { isTokenExpired } from '@documenso/lib/utils/token-verification';
@@ -16,11 +17,10 @@ import { TeamTransferDialog } from '~/components/dialogs/team-transfer-dialog';
 import { AvatarImageForm } from '~/components/forms/avatar-image';
 import { TeamEmailDropdown } from '~/components/pages/teams/team-email-dropdown';
 import { TeamTransferStatus } from '~/components/pages/teams/team-transfer-status';
-import { useAuth } from '~/providers/auth';
 import { useCurrentTeam } from '~/providers/team';
 
 export default function TeamsSettingsPage() {
-  const { user } = useAuth();
+  const { user } = useSession();
 
   const team = useCurrentTeam();
 

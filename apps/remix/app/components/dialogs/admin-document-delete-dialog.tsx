@@ -3,7 +3,7 @@ import { useState } from 'react';
 import { Trans, msg } from '@lingui/macro';
 import { useLingui } from '@lingui/react';
 import type { Document } from '@prisma/client';
-import { useNavigation } from 'react-router';
+import { useNavigate } from 'react-router';
 
 import { trpc } from '@documenso/trpc/react';
 import { Alert, AlertDescription, AlertTitle } from '@documenso/ui/primitives/alert';
@@ -28,7 +28,7 @@ export const AdminDocumentDeleteDialog = ({ document }: AdminDocumentDeleteDialo
   const { _ } = useLingui();
   const { toast } = useToast();
 
-  const navigate = useNavigation();
+  const navigate = useNavigate();
 
   const [reason, setReason] = useState('');
 
@@ -49,7 +49,7 @@ export const AdminDocumentDeleteDialog = ({ document }: AdminDocumentDeleteDialo
         duration: 5000,
       });
 
-      void navigate('/admin/documents');
+      await navigate('/admin/documents');
     } catch (err) {
       toast({
         title: _(msg`An unknown error occurred`),

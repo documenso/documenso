@@ -2,9 +2,8 @@ import type { Document, Recipient, Team, User } from '@prisma/client';
 import { Link } from 'react-router';
 import { match } from 'ts-pattern';
 
+import { useSession } from '@documenso/lib/client-only/providers/session';
 import { formatDocumentsPath } from '@documenso/lib/utils/teams';
-
-import { useAuth } from '~/providers/auth';
 
 export type DataTableTitleProps = {
   row: Document & {
@@ -16,7 +15,7 @@ export type DataTableTitleProps = {
 };
 
 export const DataTableTitle = ({ row, teamUrl }: DataTableTitleProps) => {
-  const { user } = useAuth();
+  const { user } = useSession();
 
   const recipient = row.recipients.find((recipient) => recipient.email === user.email);
 

@@ -17,6 +17,7 @@ import {
 import { Link } from 'react-router';
 
 import { downloadPDF } from '@documenso/lib/client-only/download-pdf';
+import { useSession } from '@documenso/lib/client-only/providers/session';
 import { formatDocumentsPath } from '@documenso/lib/utils/teams';
 import { trpc as trpcClient } from '@documenso/trpc/client';
 import { DocumentShareButton } from '@documenso/ui/components/document/document-share-button';
@@ -33,7 +34,6 @@ import { DocumentDeleteDialog } from '~/components/dialogs/document-delete-dialo
 import { DocumentDuplicateDialog } from '~/components/dialogs/document-duplicate-dialog';
 import { DocumentResendDialog } from '~/components/dialogs/document-resend-dialog';
 import { DocumentRecipientLinkCopyDialog } from '~/components/document/document-recipient-link-copy-dialog';
-import { useAuth } from '~/providers/auth';
 import { useOptionalCurrentTeam } from '~/providers/team';
 
 export type DocumentPageViewDropdownProps = {
@@ -45,7 +45,7 @@ export type DocumentPageViewDropdownProps = {
 };
 
 export const DocumentPageViewDropdown = ({ document }: DocumentPageViewDropdownProps) => {
-  const { user } = useAuth();
+  const { user } = useSession();
   const { toast } = useToast();
   const { _ } = useLingui();
 

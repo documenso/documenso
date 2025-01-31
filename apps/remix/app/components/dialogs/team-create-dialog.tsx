@@ -78,7 +78,7 @@ export const TeamCreateDialog = ({ trigger, ...props }: TeamCreateDialogProps) =
       setOpen(false);
 
       if (response.paymentRequired) {
-        void navigate(`/settings/teams?tab=pending&checkout=${response.pendingTeamId}`);
+        await navigate(`/settings/teams?tab=pending&checkout=${response.pendingTeamId}`);
         return;
       }
 

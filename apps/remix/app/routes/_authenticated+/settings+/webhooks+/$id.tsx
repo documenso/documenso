@@ -24,7 +24,7 @@ import { Switch } from '@documenso/ui/primitives/switch';
 import { useToast } from '@documenso/ui/primitives/use-toast';
 
 import { SettingsHeader } from '~/components/(dashboard)/settings/layout/header';
-import { TriggerMultiSelectCombobox } from '~/components/general/webhook-multiselect-combobox';
+import { WebhookMultiSelectCombobox } from '~/components/general/webhook-multiselect-combobox';
 
 const ZEditWebhookFormSchema = ZEditWebhookMutationSchema.omit({ id: true });
 
@@ -158,7 +158,7 @@ export default function WebhookPage() {
                     <Trans>Triggers</Trans>
                   </FormLabel>
                   <FormControl>
-                    <TriggerMultiSelectCombobox
+                    <WebhookMultiSelectCombobox
                       listValues={value}
                       onChange={(values: string[]) => {
                         onChange(values);

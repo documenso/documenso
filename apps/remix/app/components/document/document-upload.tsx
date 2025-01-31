@@ -7,6 +7,7 @@ import { useNavigate } from 'react-router';
 import { match } from 'ts-pattern';
 
 import { useLimits } from '@documenso/ee/server-only/limits/provider/client';
+import { useSession } from '@documenso/lib/client-only/providers/session';
 import { APP_DOCUMENT_UPLOAD_SIZE_LIMIT } from '@documenso/lib/constants/app';
 import { DEFAULT_DOCUMENT_TIME_ZONE, TIME_ZONES } from '@documenso/lib/constants/time-zones';
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
@@ -15,8 +16,6 @@ import { trpc } from '@documenso/trpc/react';
 import { cn } from '@documenso/ui/lib/utils';
 import { DocumentDropzone } from '@documenso/ui/primitives/document-dropzone';
 import { useToast } from '@documenso/ui/primitives/use-toast';
-
-import { useAuth } from '~/providers/auth';
 
 export type DocumentUploadDropzoneProps = {
   className?: string;
@@ -33,7 +32,7 @@ export const DocumentUploadDropzone = ({ className, team }: DocumentUploadDropzo
     TIME_ZONES.find((timezone) => timezone === Intl.DateTimeFormat().resolvedOptions().timeZone) ??
     DEFAULT_DOCUMENT_TIME_ZONE;
 
-  const { user } = useAuth();
+  const { user } = useSession();
 
   const { _ } = useLingui();
   const { toast } = useToast();
@@ -64,16 +63,29 @@ export const DocumentUploadDropzone = ({ className, team }: DocumentUploadDropzo
       // Todo
       // const { type, data } = await putPdfFile(file);
 
+      const formData = new FormData();
+      formData.append('file', file);
+
+      const response = await fetch('/api/file', {
+        method: 'POST',
+        body: formData,
+      })
+        .then((res) => res.json())
+        .catch((e) => {
+          console.error('Upload failed:', e);
+          throw new AppError('UPLOAD_FAILED');
+        });
+
       // const { id: documentDataId } = await createDocumentData({
       //   type,
       //   data,
       // });
 
-      // const { id } = await createDocument({
-      //   title: file.name,
-      //   documentDataId,
-      //   timezone: userTimezone,
-      // });
+      const { id } = await createDocument({
+        title: file.name,
+        documentDataId: response.id, // todo
+        timezone: userTimezone,
+      });
 
       void refreshLimits();
 

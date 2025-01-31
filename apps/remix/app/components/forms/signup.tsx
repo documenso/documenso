@@ -124,7 +124,7 @@ export const SignUpForm = ({
     try {
       await authClient.emailPassword.signUp({ name, email, password, signature, url });
 
-      void navigate(`/unverified-account`);
+      await navigate(`/unverified-account`);
 
       toast({
         title: _(msg`Registration Successful`),
