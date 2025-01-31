@@ -1,5 +1,6 @@
 import fs from 'node:fs';
 
+import { env } from '@documenso/lib/utils/env';
 import { signWithGCloud } from '@documenso/pdf-sign';
 
 import { addSigningPlaceholder } from '../helpers/add-signing-placeholder';
@@ -10,7 +11,7 @@ export type SignWithGoogleCloudHSMOptions = {
 };
 
 export const signWithGoogleCloudHSM = async ({ pdf }: SignWithGoogleCloudHSMOptions) => {
-  const keyPath = process.env.NEXT_PRIVATE_SIGNING_GCLOUD_HSM_KEY_PATH;
+  const keyPath = env('NEXT_PRIVATE_SIGNING_GCLOUD_HSM_KEY_PATH');
 
   if (!keyPath) {
     throw new Error('No certificate path provided for Google Cloud HSM signing');
@@ -19,18 +20,15 @@ export const signWithGoogleCloudHSM = async ({ pdf }: SignWithGoogleCloudHSMOpti
   // To handle hosting in serverless environments like Vercel we can supply the base64 encoded
   // application credentials as an environment variable and write it to a file if it doesn't exist
   if (
-    process.env.GOOGLE_APPLICATION_CREDENTIALS &&
-    process.env.NEXT_PRIVATE_SIGNING_GCLOUD_APPLICATION_CREDENTIALS_CONTENTS
+    env('GOOGLE_APPLICATION_CREDENTIALS') &&
+    env('NEXT_PRIVATE_SIGNING_GCLOUD_APPLICATION_CREDENTIALS_CONTENTS')
   ) {
-    if (!fs.existsSync(process.env.GOOGLE_APPLICATION_CREDENTIALS)) {
+    if (!fs.existsSync(env('GOOGLE_APPLICATION_CREDENTIALS'))) {
       const contents = new Uint8Array(
-        Buffer.from(
-          process.env.NEXT_PRIVATE_SIGNING_GCLOUD_APPLICATION_CREDENTIALS_CONTENTS,
-          'base64',
-        ),
+        Buffer.from(env('NEXT_PRIVATE_SIGNING_GCLOUD_APPLICATION_CREDENTIALS_CONTENTS'), 'base64'),
       );
 
-      fs.writeFileSync(process.env.GOOGLE_APPLICATION_CREDENTIALS, contents);
+      fs.writeFileSync(env('GOOGLE_APPLICATION_CREDENTIALS'), contents);
     }
   }
 
@@ -47,17 +45,14 @@ export const signWithGoogleCloudHSM = async ({ pdf }: SignWithGoogleCloudHSMOpti
 
   let cert: Buffer | null = null;
 
-  if (process.env.NEXT_PRIVATE_SIGNING_GCLOUD_HSM_PUBLIC_CRT_FILE_CONTENTS) {
-    cert = Buffer.from(
-      process.env.NEXT_PRIVATE_SIGNING_GCLOUD_HSM_PUBLIC_CRT_FILE_CONTENTS,
-      'base64',
-    );
+  if (env('NEXT_PRIVATE_SIGNING_GCLOUD_HSM_PUBLIC_CRT_FILE_CONTENTS')) {
+    cert = Buffer.from(env('NEXT_PRIVATE_SIGNING_GCLOUD_HSM_PUBLIC_CRT_FILE_CONTENTS'), 'base64');
   }
 
   if (!cert) {
     cert = Buffer.from(
       fs.readFileSync(
-        process.env.NEXT_PRIVATE_SIGNING_GCLOUD_HSM_PUBLIC_CRT_FILE_PATH || './example/cert.crt',
+        env('NEXT_PRIVATE_SIGNING_GCLOUD_HSM_PUBLIC_CRT_FILE_PATH') || './example/cert.crt',
       ),
     );
   }

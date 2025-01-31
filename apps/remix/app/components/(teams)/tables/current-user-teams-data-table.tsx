@@ -20,7 +20,7 @@ import { DataTablePagination } from '@documenso/ui/primitives/data-table-paginat
 import { Skeleton } from '@documenso/ui/primitives/skeleton';
 import { TableCell } from '@documenso/ui/primitives/table';
 
-import { LeaveTeamDialog } from '../dialogs/leave-team-dialog';
+import { TeamLeaveDialog } from '~/components/dialogs/team-leave-dialog';
 
 export const CurrentUserTeamsDataTable = () => {
   const { _, i18n } = useLingui();
@@ -99,7 +99,7 @@ export const CurrentUserTeamsDataTable = () => {
               </Button>
             )}
 
-            <LeaveTeamDialog
+            <TeamLeaveDialog
               teamId={row.original.id}
               teamName={row.original.name}
               teamAvatarImageId={row.original.avatarImageId}

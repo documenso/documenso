@@ -11,7 +11,7 @@ import { useForm } from 'react-hook-form';
 import type { z } from 'zod';
 
 import { useCopyToClipboard } from '@documenso/lib/client-only/hooks/use-copy-to-clipboard';
-import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
+import { AppError } from '@documenso/lib/errors/app-error';
 import { formatUserProfilePath } from '@documenso/lib/utils/public-profiles';
 import {
   MAX_PROFILE_BIO_LENGTH,
@@ -88,8 +88,8 @@ export const PublicProfileForm = ({
       const error = AppError.parseError(err);
 
       switch (error.code) {
-        case AppErrorCode.PREMIUM_PROFILE_URL:
-        case AppErrorCode.PROFILE_URL_TAKEN:
+        case 'PREMIUM_PROFILE_URL':
+        case 'PROFILE_URL_TAKEN':
           form.setError('url', {
             type: 'manual',
             message: error.message,

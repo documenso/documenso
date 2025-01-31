@@ -4,15 +4,18 @@ import autoprefixer from 'autoprefixer';
 import serverAdapter from 'hono-react-router-adapter/vite';
 import path from 'path';
 import tailwindcss from 'tailwindcss';
-import { defineConfig } from 'vite';
+import { defineConfig, loadEnv } from 'vite';
 import macrosPlugin from 'vite-plugin-babel-macros';
 import tsconfigPaths from 'vite-tsconfig-paths';
 
 export default defineConfig({
   envDir: path.join(__dirname, '../../'),
-  envPrefix: 'NEXT_',
+  envPrefix: '__DO_NOT_USE_OR_YOU_WILL_BE_FIRED__',
   define: {
-    'process.env': {},
+    'process.env': {
+      ...process.env,
+      ...loadEnv('development', path.join(__dirname, '../../'), ''),
+    },
   },
   css: {
     postcss: {
@@ -20,6 +23,7 @@ export default defineConfig({
     },
   },
   ssr: {
+    // , 'next/font/google' doesnot work
     noExternal: ['react-dropzone', 'recharts'],
   },
   server: {
@@ -36,7 +40,7 @@ export default defineConfig({
     tsconfigPaths(),
   ],
   // optimizeDeps: {
-  //   exclude: ['@node-rs/bcrypt', '@node-rs/bcrypt-wasm32-wasi', 'react-dropzone', '@documenso/ui'], // Todo: Probably remove.
+  //   exclude: ['next/font/google'], // Todo: Probably remove.
   //   force: true,
   // },
 });

@@ -5,10 +5,9 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import type { StaticImageData } from 'next/image';
 import Image from 'next/image';
 
+import type { Signature } from '@prisma/client';
 import { animate, motion, useMotionTemplate, useMotionValue, useTransform } from 'framer-motion';
 import { P, match } from 'ts-pattern';
-
-import type { Signature } from '@documenso/prisma/client';
 
 import { cn } from '../lib/utils';
 import { Card, CardContent } from '../primitives/card';

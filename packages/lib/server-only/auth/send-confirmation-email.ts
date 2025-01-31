@@ -8,6 +8,7 @@ import { prisma } from '@documenso/prisma';
 
 import { getI18nInstance } from '../../client-only/providers/i18n-server';
 import { NEXT_PUBLIC_WEBAPP_URL } from '../../constants/app';
+import { env } from '../../utils/env';
 import { renderEmailWithI18N } from '../../utils/render-email-with-i18n';
 
 export interface SendConfirmationEmailProps {
@@ -15,8 +16,8 @@ export interface SendConfirmationEmailProps {
 }
 
 export const sendConfirmationEmail = async ({ userId }: SendConfirmationEmailProps) => {
-  const NEXT_PRIVATE_SMTP_FROM_NAME = process.env.NEXT_PRIVATE_SMTP_FROM_NAME;
-  const NEXT_PRIVATE_SMTP_FROM_ADDRESS = process.env.NEXT_PRIVATE_SMTP_FROM_ADDRESS;
+  const NEXT_PRIVATE_SMTP_FROM_NAME = env('NEXT_PRIVATE_SMTP_FROM_NAME');
+  const NEXT_PRIVATE_SMTP_FROM_ADDRESS = env('NEXT_PRIVATE_SMTP_FROM_ADDRESS');
 
   const user = await prisma.user.findFirstOrThrow({
     where: {

@@ -12,9 +12,9 @@ import { Link, useNavigate, useSearchParams } from 'react-router';
 import { z } from 'zod';
 
 import communityCardsImage from '@documenso/assets/images/community-cards.png';
+import { authClient } from '@documenso/auth/client';
 import { NEXT_PUBLIC_WEBAPP_URL } from '@documenso/lib/constants/app';
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
-import { trpc } from '@documenso/trpc/react';
 import { ZPasswordSchema } from '@documenso/trpc/server/auth-router/schema';
 import { cn } from '@documenso/ui/lib/utils';
 import { Button } from '@documenso/ui/primitives/button';
@@ -71,8 +71,8 @@ export const signupErrorMessages: Record<string, MessageDescriptor> = {
   SIGNUP_DISABLED: msg`Signups are disabled.`,
   [AppErrorCode.ALREADY_EXISTS]: msg`User with this email already exists. Please use a different email address.`,
   [AppErrorCode.INVALID_REQUEST]: msg`We were unable to create your account. Please review the information you provided and try again.`,
-  [AppErrorCode.PROFILE_URL_TAKEN]: msg`This username has already been taken`,
-  [AppErrorCode.PREMIUM_PROFILE_URL]: msg`Only subscribers can have a username shorter than 6 characters`,
+  PROFILE_URL_TAKEN: msg`This username has already been taken`,
+  PREMIUM_PROFILE_URL: msg`Only subscribers can have a username shorter than 6 characters`,
 };
 
 export type TSignUpFormSchema = z.infer<typeof ZSignUpFormSchema>;
@@ -93,7 +93,7 @@ export const SignUpForm = ({
   const { _ } = useLingui();
   const { toast } = useToast();
 
-  // const analytics = useAnalytics();
+  // const analytics = useAnalytics(); // Todo
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
 
@@ -120,11 +120,9 @@ export const SignUpForm = ({
   const name = form.watch('name');
   const url = form.watch('url');
 
-  const { mutateAsync: signup } = trpc.auth.signup.useMutation();
-
   const onFormSubmit = async ({ name, email, password, signature, url }: TSignUpFormSchema) => {
     try {
-      await signup({ name, email, password, signature, url });
+      await authClient.emailPassword.signUp({ name, email, password, signature, url });
 
       void navigate(`/unverified-account`);
 
@@ -146,10 +144,7 @@ export const SignUpForm = ({
 
       const errorMessage = signupErrorMessages[error.code] ?? signupErrorMessages.INVALID_REQUEST;
 
-      if (
-        error.code === AppErrorCode.PROFILE_URL_TAKEN ||
-        error.code === AppErrorCode.PREMIUM_PROFILE_URL
-      ) {
+      if (error.code === 'PROFILE_URL_TAKEN' || error.code === 'PREMIUM_PROFILE_URL') {
         form.setError('url', {
           type: 'manual',
           message: _(errorMessage),
@@ -175,8 +170,7 @@ export const SignUpForm = ({
 
   const onSignUpWithGoogleClick = async () => {
     try {
-      await new Promise((resolve) => setTimeout(resolve, 2000));
-      // await signIn('google', { callbackUrl: SIGN_UP_REDIRECT_PATH });
+      await authClient.google.signIn();
     } catch (err) {
       toast({
         title: _(msg`An unknown error occurred`),

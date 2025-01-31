@@ -4,6 +4,7 @@ import React, { useEffect, useMemo, useRef, useState } from 'react';
 
 import { Trans, msg } from '@lingui/macro';
 import { useLingui } from '@lingui/react';
+import type { DocumentData } from '@prisma/client';
 import { Loader } from 'lucide-react';
 import { type PDFDocumentProxy, PasswordResponses } from 'pdfjs-dist';
 import { Document as PDFDocument, Page as PDFPage, pdfjs } from 'react-pdf';
@@ -13,7 +14,6 @@ import { match } from 'ts-pattern';
 
 import { PDF_VIEWER_PAGE_SELECTOR } from '@documenso/lib/constants/pdf-viewer';
 import { getFile } from '@documenso/lib/universal/upload/get-file';
-import type { DocumentData } from '@documenso/prisma/client';
 
 import { cn } from '../lib/utils';
 import { PasswordDialog } from './document-password-dialog';

@@ -1,9 +1,7 @@
-'use client';
-
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
-import { Caveat } from 'next/font/google';
-
+// Todo
+// import { Caveat } from 'next/font/google';
 import { CopyPlus, Settings2, Trash } from 'lucide-react';
 import { createPortal } from 'react-dom';
 import { Rnd } from 'react-rnd';
@@ -22,12 +20,12 @@ import type { TDocumentFlowFormSchema } from './types';
 
 type Field = TDocumentFlowFormSchema['fields'][0];
 
-const fontCaveat = Caveat({
-  weight: ['500'],
-  subsets: ['latin'],
-  display: 'swap',
-  variable: '--font-caveat',
-});
+// const fontCaveat = Caveat({
+//   weight: ['500'],
+//   subsets: ['latin'],
+//   display: 'swap',
+//   variable: '--font-caveat',
+// });
 
 export type FieldItemProps = {
   field: Field;
@@ -258,7 +256,7 @@ export const FieldItem = ({
               fieldMeta={field.fieldMeta}
               type={field.type}
               signerEmail={field.signerEmail}
-              fontCaveatClassName={fontCaveat.className}
+              // fontCaveatClassName={fontCaveat.className}
             />
           ))}
 

@@ -22,6 +22,7 @@ import {
   getUsersWithSubscriptionsCount,
 } from '@documenso/lib/server-only/admin/get-users-stats';
 import { getSignerConversionMonthly } from '@documenso/lib/server-only/user/get-signer-conversion';
+import { env } from '@documenso/lib/utils/env';
 
 import { CardMetric } from '~/components/(dashboard)/metric-card/metric-card';
 import { AdminStatsSignerConversionChart } from '~/components/general/admin-stats-signer-conversion-chart';
@@ -87,11 +88,7 @@ export default function AdminStatsPage({ loaderData }: Route.ComponentProps) {
           value={usersWithSubscriptionsCount}
         />
 
-        <CardMetric
-          icon={FileCog}
-          title={_(msg`App Version`)}
-          value={`v${process.env.APP_VERSION}`}
-        />
+        <CardMetric icon={FileCog} title={_(msg`App Version`)} value={`v${env('APP_VERSION')}`} />
       </div>
 
       <div className="mt-16 gap-8">

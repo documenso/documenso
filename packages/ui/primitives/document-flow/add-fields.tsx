@@ -1,12 +1,12 @@
-'use client';
-
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
-import { Caveat } from 'next/font/google';
-
+// Todo
+// import { Caveat } from 'next/font/google';
 import { Trans, msg } from '@lingui/macro';
 import { useLingui } from '@lingui/react';
 import { Prisma } from '@prisma/client';
+import type { Field, Recipient } from '@prisma/client';
+import { FieldType, RecipientRole, SendStatus } from '@prisma/client';
 import {
   CalendarDays,
   Check,
@@ -41,8 +41,6 @@ import {
   canRecipientBeModified,
   canRecipientFieldsBeModified,
 } from '@documenso/lib/utils/recipients';
-import type { Field, Recipient } from '@documenso/prisma/client';
-import { FieldType, RecipientRole, SendStatus } from '@documenso/prisma/client';
 
 import { FieldToolTip } from '../../components/field/field-tooltip';
 import { getSignerColorStyles, useSignerColors } from '../../lib/signer-colors';
@@ -70,12 +68,12 @@ import { FieldAdvancedSettings } from './field-item-advanced-settings';
 import { MissingSignatureFieldDialog } from './missing-signature-field-dialog';
 import { type DocumentFlowStep, FRIENDLY_FIELD_TYPE } from './types';
 
-const fontCaveat = Caveat({
-  weight: ['500'],
-  subsets: ['latin'],
-  display: 'swap',
-  variable: '--font-caveat',
-});
+// const fontCaveat = Caveat({
+//   weight: ['500'],
+//   subsets: ['latin'],
+//   display: 'swap',
+//   variable: '--font-caveat',
+// });
 
 const MIN_HEIGHT_PX = 12;
 const MIN_WIDTH_PX = 36;
@@ -612,7 +610,7 @@ export const AddFieldsFormPartial = ({
                       '-rotate-6 scale-90 opacity-50 dark:bg-black/20': !isFieldWithinBounds,
                       'dark:text-black/60': isFieldWithinBounds,
                     },
-                    selectedField === FieldType.SIGNATURE && fontCaveat.className,
+                    // selectedField === FieldType.SIGNATURE && fontCaveat.className,
                   )}
                   style={{
                     top: coords.y,
@@ -835,7 +833,7 @@ export const AddFieldsFormPartial = ({
                           <p
                             className={cn(
                               'text-muted-foreground group-data-[selected]:text-foreground flex items-center justify-center gap-x-1.5 text-lg font-normal',
-                              fontCaveat.className,
+                              // fontCaveat.className,
                             )}
                           >
                             <Trans>Signature</Trans>

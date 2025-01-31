@@ -3,14 +3,14 @@ import { useMemo } from 'react';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Trans, msg } from '@lingui/macro';
 import { useLingui } from '@lingui/react';
-// Todo
-// import { ErrorCode, useDropzone } from 'react-dropzone';
+import { ErrorCode, useDropzone } from 'react-dropzone';
 import { useForm } from 'react-hook-form';
 import { match } from 'ts-pattern';
 import { z } from 'zod';
 
+import { NEXT_PUBLIC_WEBAPP_URL } from '@documenso/lib/constants/app';
 import { AppError } from '@documenso/lib/errors/app-error';
-import { formatAvatarUrl } from '@documenso/lib/utils/avatars';
+import { base64 } from '@documenso/lib/universal/base64';
 import { extractInitials } from '@documenso/lib/utils/recipient-formatter';
 import { trpc } from '@documenso/trpc/react';
 import { cn } from '@documenso/ui/lib/utils';
@@ -40,9 +40,9 @@ export type AvatarImageFormProps = {
 };
 
 export const AvatarImageForm = ({ className }: AvatarImageFormProps) => {
+  const { user } = useAuth();
   const { _ } = useLingui();
   const { toast } = useToast();
-  const { user } = useAuth();
 
   const team = useOptionalCurrentTeam();
 
@@ -67,31 +67,31 @@ export const AvatarImageForm = ({ className }: AvatarImageFormProps) => {
     resolver: zodResolver(ZAvatarImageFormSchema),
   });
 
-  // const { getRootProps, getInputProps } = useDropzone({
-  //   maxSize: 1024 * 1024,
-  //   accept: {
-  //     'image/*': ['.png', '.jpg', '.jpeg'],
-  //   },
-  //   multiple: false,
-  //   onDropAccepted: ([file]) => {
-  //     void file.arrayBuffer().then((buffer) => {
-  //       const contents = base64.encode(new Uint8Array(buffer));
+  const { getRootProps, getInputProps } = useDropzone({
+    maxSize: 1024 * 1024,
+    accept: {
+      'image/*': ['.png', '.jpg', '.jpeg'],
+    },
+    multiple: false,
+    onDropAccepted: ([file]) => {
+      void file.arrayBuffer().then((buffer) => {
+        const contents = base64.encode(new Uint8Array(buffer));
 
-  //       form.setValue('bytes', contents);
-  //       void form.handleSubmit(onFormSubmit)();
-  //     });
-  //   },
-  //   onDropRejected: ([file]) => {
-  //     form.setError('bytes', {
-  //       type: 'onChange',
-  //       message: match(file.errors[0].code)
-  //         .with(ErrorCode.FileTooLarge, () => _(msg`Uploaded file is too large`))
-  //         .with(ErrorCode.FileTooSmall, () => _(msg`Uploaded file is too small`))
-  //         .with(ErrorCode.FileInvalidType, () => _(msg`Uploaded file not an allowed file type`))
-  //         .otherwise(() => _(msg`An unknown error occurred`)),
-  //     });
-  //   },
-  // });
+        form.setValue('bytes', contents);
+        void form.handleSubmit(onFormSubmit)();
+      });
+    },
+    onDropRejected: ([file]) => {
+      form.setError('bytes', {
+        type: 'onChange',
+        message: match(file.errors[0].code)
+          .with(ErrorCode.FileTooLarge, () => _(msg`Uploaded file is too large`))
+          .with(ErrorCode.FileTooSmall, () => _(msg`Uploaded file is too small`))
+          .with(ErrorCode.FileInvalidType, () => _(msg`Uploaded file not an allowed file type`))
+          .otherwise(() => _(msg`An unknown error occurred`)),
+      });
+    },
+  });
 
   const onFormSubmit = async (data: TAvatarImageFormSchema) => {
     try {
@@ -106,7 +106,8 @@ export const AvatarImageForm = ({ className }: AvatarImageFormProps) => {
         duration: 5000,
       });
 
-      // router.refresh(); // Todo
+      // Todo
+      // router.refresh();
     } catch (err) {
       const error = AppError.parseError(err);
 
@@ -143,7 +144,11 @@ export const AvatarImageForm = ({ className }: AvatarImageFormProps) => {
                   <div className="flex items-center gap-8">
                     <div className="relative">
                       <Avatar className="h-16 w-16 border-2 border-solid">
-                        {avatarImageId && <AvatarImage src={formatAvatarUrl(avatarImageId)} />}
+                        {avatarImageId && (
+                          <AvatarImage
+                            src={`${NEXT_PUBLIC_WEBAPP_URL()}/api/avatar/${avatarImageId}`}
+                          />
+                        )}
                         <AvatarFallback className="text-sm text-gray-400">
                           {initials}
                         </AvatarFallback>
@@ -165,12 +170,12 @@ export const AvatarImageForm = ({ className }: AvatarImageFormProps) => {
                       type="button"
                       variant="secondary"
                       size="sm"
-                      // {...getRootProps()}
+                      {...getRootProps()}
                       loading={form.formState.isSubmitting}
                       disabled={form.formState.isSubmitting}
                     >
                       <Trans>Upload Avatar</Trans>
-                      {/* <input {...getInputProps()} /> */}
+                      <input {...getInputProps()} />
                     </Button>
                   </div>
                 </FormControl>

@@ -1,11 +1,11 @@
-'use client';
-
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
-import { Caveat } from 'next/font/google';
-
+// Todo
+// import { Caveat } from 'next/font/google';
 import { Trans, msg } from '@lingui/macro';
 import { useLingui } from '@lingui/react';
+import type { Field, Recipient } from '@prisma/client';
+import { FieldType, RecipientRole } from '@prisma/client';
 import {
   CalendarDays,
   CheckSquare,
@@ -31,8 +31,6 @@ import {
 } from '@documenso/lib/types/field-meta';
 import { nanoid } from '@documenso/lib/universal/id';
 import { parseMessageDescriptor } from '@documenso/lib/utils/i18n';
-import type { Field, Recipient } from '@documenso/prisma/client';
-import { FieldType, RecipientRole } from '@documenso/prisma/client';
 import { cn } from '@documenso/ui/lib/utils';
 import { Button } from '@documenso/ui/primitives/button';
 import { Card, CardContent } from '@documenso/ui/primitives/card';
@@ -64,12 +62,12 @@ import { Form, FormControl, FormField, FormItem, FormLabel } from '../form/form'
 import { useStep } from '../stepper';
 import type { TAddTemplateFieldsFormSchema } from './add-template-fields.types';
 
-const fontCaveat = Caveat({
-  weight: ['500'],
-  subsets: ['latin'],
-  display: 'swap',
-  variable: '--font-caveat',
-});
+// const fontCaveat = Caveat({
+//   weight: ['500'],
+//   subsets: ['latin'],
+//   display: 'swap',
+//   variable: '--font-caveat',
+// });
 
 const MIN_HEIGHT_PX = 12;
 const MIN_WIDTH_PX = 36;
@@ -700,7 +698,7 @@ export const AddTemplateFieldsFormPartial = ({
                           <p
                             className={cn(
                               'text-muted-foreground group-data-[selected]:text-foreground flex items-center justify-center gap-x-1.5 text-lg font-normal',
-                              fontCaveat.className,
+                              // fontCaveat.className,
                             )}
                           >
                             <Trans>Signature</Trans>

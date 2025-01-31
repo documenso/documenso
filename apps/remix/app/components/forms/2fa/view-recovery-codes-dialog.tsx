@@ -8,7 +8,6 @@ import { z } from 'zod';
 
 import { downloadFile } from '@documenso/lib/client-only/download-file';
 import { AppError } from '@documenso/lib/errors/app-error';
-import { ErrorCode } from '@documenso/lib/next-auth/error-codes';
 import { trpc } from '@documenso/trpc/react';
 import { Alert, AlertDescription } from '@documenso/ui/primitives/alert';
 import { Button } from '@documenso/ui/primitives/button';
@@ -145,7 +144,7 @@ export const ViewRecoveryCodesDialog = () => {
                   <Alert variant="destructive">
                     <AlertDescription>
                       {match(AppError.parseError(error).message)
-                        .with(ErrorCode.INCORRECT_TWO_FACTOR_CODE, () => (
+                        .with('INCORRECT_TWO_FACTOR_CODE', () => (
                           <Trans>Invalid code. Please try again.</Trans>
                         ))
                         .otherwise(() => (

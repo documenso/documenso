@@ -1,23 +1,24 @@
 import { Trans } from '@lingui/macro';
 import { Link, redirect } from 'react-router';
 
+import { getSession } from '@documenso/auth/server/lib/utils/get-session';
 import {
   IS_GOOGLE_SSO_ENABLED,
   IS_OIDC_SSO_ENABLED,
   OIDC_PROVIDER_LABEL,
 } from '@documenso/lib/constants/auth';
+import { env } from '@documenso/lib/utils/env';
 
 import { SignInForm } from '~/components/forms/signin';
 
 import type { Route } from './+types/signin';
-import { getSession } from '@documenso/auth/server/lib/utils/get-session';
 
 export function meta(_args: Route.MetaArgs) {
   return [{ title: 'Sign In' }];
 }
 
 export async function loader({ request }: Route.LoaderArgs) {
-  const session = await getSession(request)
+  const session = await getSession(request);
 
   if (session.isAuthenticated) {
     return redirect('/documents');
@@ -25,9 +26,7 @@ export async function loader({ request }: Route.LoaderArgs) {
 }
 
 export default function SignIn() {
-  // Todo
-  // const NEXT_PUBLIC_DISABLE_SIGNUP = env('NEXT_PUBLIC_DISABLE_SIGNUP');
-  const NEXT_PUBLIC_DISABLE_SIGNUP = 'false';
+  const NEXT_PUBLIC_DISABLE_SIGNUP = env('NEXT_PUBLIC_DISABLE_SIGNUP');
 
   return (
     <div className="w-screen max-w-lg px-4">

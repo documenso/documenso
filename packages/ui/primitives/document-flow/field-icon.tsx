@@ -1,4 +1,5 @@
 import { Trans } from '@lingui/macro';
+import { FieldType } from '@prisma/client';
 import {
   CalendarDays,
   CheckSquare,
@@ -12,7 +13,6 @@ import {
 } from 'lucide-react';
 
 import type { TFieldMetaSchema as FieldMetaType } from '@documenso/lib/types/field-meta';
-import { FieldType } from '@documenso/prisma/client';
 
 import { cn } from '../../lib/utils';
 

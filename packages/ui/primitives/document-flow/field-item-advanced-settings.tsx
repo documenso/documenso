@@ -5,6 +5,7 @@ import { forwardRef, useEffect, useState } from 'react';
 import type { MessageDescriptor } from '@lingui/core';
 import { msg } from '@lingui/macro';
 import { useLingui } from '@lingui/react';
+import { FieldType } from '@prisma/client';
 import { match } from 'ts-pattern';
 
 import {
@@ -21,7 +22,6 @@ import {
   type TTextFieldMeta as TextFieldMeta,
   ZFieldMetaSchema,
 } from '@documenso/lib/types/field-meta';
-import { FieldType } from '@documenso/prisma/client';
 import { useToast } from '@documenso/ui/primitives/use-toast';
 
 import type { FieldFormType } from './add-fields';

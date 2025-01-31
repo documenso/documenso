@@ -5,9 +5,10 @@ import type { I18n, MessageDescriptor } from '@lingui/core';
 import { IS_APP_WEB, IS_APP_WEB_I18N_ENABLED } from '../constants/app';
 import type { I18nLocaleData, SupportedLanguageCodes } from '../constants/i18n';
 import { APP_I18N_OPTIONS } from '../constants/i18n';
+import { env } from './env';
 
 export async function dynamicActivate(i18nInstance: I18n, locale: string) {
-  const extension = process.env.NODE_ENV === 'development' ? 'po' : 'js';
+  const extension = env('NODE_ENV') === 'development' ? 'po' : 'js';
 
   // const { messages } = await import(`../translations/${locale}/web.${extension}`);
   // todo

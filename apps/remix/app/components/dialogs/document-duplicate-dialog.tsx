@@ -16,23 +16,25 @@ import {
 import { LazyPDFViewer } from '@documenso/ui/primitives/lazy-pdf-viewer';
 import { useToast } from '@documenso/ui/primitives/use-toast';
 
+import { useOptionalCurrentTeam } from '~/providers/team';
+
 type DocumentDuplicateDialogProps = {
   id: number;
   open: boolean;
   onOpenChange: (_open: boolean) => void;
-  team?: Pick<Team, 'id' | 'url'>;
 };
 
 export const DocumentDuplicateDialog = ({
   id,
   open,
   onOpenChange,
-  team,
 }: DocumentDuplicateDialogProps) => {
   const navigate = useNavigate();
 
   const { toast } = useToast();
   const { _ } = useLingui();
+
+  const team = useOptionalCurrentTeam();
 
   const { data: document, isLoading } = trpcReact.document.getDocumentById.useQuery({
     documentId: id,

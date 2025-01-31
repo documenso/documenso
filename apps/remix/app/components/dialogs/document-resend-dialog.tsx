@@ -36,6 +36,7 @@ import { useToast } from '@documenso/ui/primitives/use-toast';
 
 import { StackAvatar } from '~/components/(dashboard)/avatar/stack-avatar';
 import { useAuth } from '~/providers/auth';
+import { useOptionalCurrentTeam } from '~/providers/team';
 
 const FORM_ID = 'resend-email';
 
@@ -44,7 +45,6 @@ export type DocumentResendDialogProps = {
     team: Pick<Team, 'id' | 'url'> | null;
   };
   recipients: Recipient[];
-  team?: Pick<Team, 'id' | 'url'>;
 };
 
 export const ZResendDocumentFormSchema = z.object({
@@ -55,8 +55,9 @@ export const ZResendDocumentFormSchema = z.object({
 
 export type TResendDocumentFormSchema = z.infer<typeof ZResendDocumentFormSchema>;
 
-export const DocumentResendDialog = ({ document, recipients, team }: DocumentResendDialogProps) => {
+export const DocumentResendDialog = ({ document, recipients }: DocumentResendDialogProps) => {
   const { user } = useAuth();
+  const team = useOptionalCurrentTeam();
 
   const { toast } = useToast();
   const { _ } = useLingui();

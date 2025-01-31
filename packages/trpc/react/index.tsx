@@ -1,11 +1,11 @@
-'use client';
-
 import { useState } from 'react';
 
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { httpBatchLink, httpLink, splitLink } from '@trpc/client';
 import { createTRPCReact } from '@trpc/react-query';
 import SuperJSON from 'superjson';
+
+import { getBaseUrl } from '@documenso/lib/universal/get-base-url';
 
 // import { getBaseUrl } from '@documenso/lib/universal/get-base-url';
 import type { AppRouter } from '../server/router';
@@ -35,10 +35,6 @@ export interface TrpcProviderProps {
   children: React.ReactNode;
   headers?: Record<string, string>;
 }
-
-//  'next-runtime-env
-// Todo
-const getBaseUrl = () => 'http://localhost:3000';
 
 export function TrpcProvider({ children, headers }: TrpcProviderProps) {
   const [queryClient] = useState(() => new QueryClient());

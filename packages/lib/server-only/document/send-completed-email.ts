@@ -14,6 +14,7 @@ import { extractDerivedDocumentEmailSettings } from '../../types/document-email'
 import type { RequestMetadata } from '../../universal/extract-request-metadata';
 import { getFile } from '../../universal/upload/get-file';
 import { createDocumentAuditLogData } from '../../utils/document-audit-logs';
+import { env } from '../../utils/env';
 import { renderCustomEmailTemplate } from '../../utils/render-custom-email-template';
 import { renderEmailWithI18N } from '../../utils/render-email-with-i18n';
 import { teamGlobalSettingsToBranding } from '../../utils/team-global-settings-to-branding';
@@ -113,8 +114,8 @@ export const sendCompletedEmail = async ({ documentId, requestMetadata }: SendDo
         },
       ],
       from: {
-        name: process.env.NEXT_PRIVATE_SMTP_FROM_NAME || 'Documenso',
-        address: process.env.NEXT_PRIVATE_SMTP_FROM_ADDRESS || 'noreply@documenso.com',
+        name: env('NEXT_PRIVATE_SMTP_FROM_NAME') || 'Documenso',
+        address: env('NEXT_PRIVATE_SMTP_FROM_ADDRESS') || 'noreply@documenso.com',
       },
       subject: i18n._(msg`Signing Complete!`),
       html,
@@ -190,8 +191,8 @@ export const sendCompletedEmail = async ({ documentId, requestMetadata }: SendDo
           },
         ],
         from: {
-          name: process.env.NEXT_PRIVATE_SMTP_FROM_NAME || 'Documenso',
-          address: process.env.NEXT_PRIVATE_SMTP_FROM_ADDRESS || 'noreply@documenso.com',
+          name: env('NEXT_PRIVATE_SMTP_FROM_NAME') || 'Documenso',
+          address: env('NEXT_PRIVATE_SMTP_FROM_ADDRESS') || 'noreply@documenso.com',
         },
         subject:
           isDirectTemplate && document.documentMeta?.subject

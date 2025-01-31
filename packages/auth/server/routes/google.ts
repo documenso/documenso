@@ -4,6 +4,7 @@ import { getCookie, setCookie } from 'hono/cookie';
 
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import { setupTwoFactorAuthentication } from '@documenso/lib/server-only/2fa/setup-2fa';
+import { env } from '@documenso/lib/utils/env';
 import { prisma } from '@documenso/prisma';
 
 import { AuthenticationErrorCode } from '../lib/errors/error-codes';
@@ -12,8 +13,8 @@ import { getRequiredSession } from '../lib/utils/get-session';
 import type { HonoAuthContext } from '../types/context';
 
 const options = {
-  clientId: import.meta.env.NEXT_PRIVATE_GOOGLE_CLIENT_ID,
-  clientSecret: import.meta.env.NEXT_PRIVATE_GOOGLE_CLIENT_SECRET,
+  clientId: env('NEXT_PRIVATE_GOOGLE_CLIENT_ID'),
+  clientSecret: env('NEXT_PRIVATE_GOOGLE_CLIENT_SECRET'),
   redirectUri: 'http://localhost:3000/api/auth/google/callback',
   scope: ['openid', 'email', 'profile'],
   id: 'google',
@@ -36,7 +37,7 @@ export const googleRoute = new Hono<HonoAuthContext>()
     setCookie(c, 'google_oauth_state', state, {
       path: '/',
       httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
+      secure: env('NODE_ENV') === 'production',
       maxAge: 60 * 10, // 10 minutes
       sameSite: 'lax',
     });
@@ -44,7 +45,8 @@ export const googleRoute = new Hono<HonoAuthContext>()
     setCookie(c, 'google_code_verifier', codeVerifier, {
       path: '/',
       httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
+      // Todo: Might not be node_env but something vite specific?
+      secure: env('NODE_ENV') === 'production',
       maxAge: 60 * 10, // 10 minutes
       sameSite: 'lax',
     });

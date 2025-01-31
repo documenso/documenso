@@ -88,12 +88,12 @@ export const ClaimPublicProfileDialogForm = ({
     } catch (err) {
       const error = AppError.parseError(err);
 
-      if (error.code === AppErrorCode.PROFILE_URL_TAKEN) {
+      if (error.code === 'PROFILE_URL_TAKEN') {
         form.setError('url', {
           type: 'manual',
           message: _(msg`This username is already taken`),
         });
-      } else if (error.code === AppErrorCode.PREMIUM_PROFILE_URL) {
+      } else if (error.code === 'PREMIUM_PROFILE_URL') {
         form.setError('url', {
           type: 'manual',
           message: error.message,

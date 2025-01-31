@@ -25,8 +25,7 @@ export const DocumentSearch = ({ initialValue = '' }: { initialValue?: string })
         params.delete('search');
       }
 
-      // Todo: Test
-      void navigate(`/documents?${params.toString()}`);
+      void navigate(`?${params.toString()}`);
     },
     [searchParams],
   );

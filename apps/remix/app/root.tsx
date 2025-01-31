@@ -5,6 +5,7 @@ import {
   Scripts,
   ScrollRestoration,
   isRouteErrorResponse,
+  useLoaderData,
 } from 'react-router';
 
 import { TrpcProvider } from '@documenso/trpc/react';
@@ -32,7 +33,17 @@ export const links: Route.LinksFunction = () => [
   { rel: 'stylesheet', href: stylesheet },
 ];
 
+export function loader() {
+  return {
+    __ENV__: Object.fromEntries(
+      Object.entries(process.env).filter(([key]) => key.startsWith('NEXT_')),
+    ),
+  };
+}
+
 export function Layout({ children }: { children: React.ReactNode }) {
+  const { __ENV__ } = useLoaderData<typeof loader>() || {};
+
   return (
     <html lang="en">
       <head>
@@ -45,6 +56,12 @@ export function Layout({ children }: { children: React.ReactNode }) {
         {children}
         <ScrollRestoration />
         <Scripts />
+
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `window.__ENV__ = ${JSON.stringify(__ENV__)}`,
+          }}
+        />
       </body>
     </html>
   );

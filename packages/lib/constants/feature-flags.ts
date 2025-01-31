@@ -1,4 +1,4 @@
-import { env } from 'next-runtime-env';
+import { env } from '@documenso/lib/utils/env';
 
 import { APP_BASE_URL, WEBAPP_BASE_URL } from './app';
 

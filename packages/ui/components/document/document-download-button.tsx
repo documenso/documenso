@@ -5,10 +5,10 @@ import { useState } from 'react';
 
 import { Trans } from '@lingui/macro';
 import { useLingui } from '@lingui/react';
+import type { DocumentData } from '@prisma/client';
 import { Download } from 'lucide-react';
 
 import { downloadPDF } from '@documenso/lib/client-only/download-pdf';
-import type { DocumentData } from '@documenso/prisma/client';
 import { useToast } from '@documenso/ui/primitives/use-toast';
 
 import { Button } from '../../primitives/button';

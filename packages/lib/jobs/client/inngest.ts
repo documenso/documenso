@@ -9,6 +9,7 @@ import type { Logger } from 'inngest/middleware/logger';
 import { serve as createPagesRoute } from 'inngest/next';
 import { json } from 'micro';
 
+import { env } from '../../utils/env';
 import type { JobDefinition, JobRunIO, SimpleTriggerJobOptions } from './_internal/job';
 import { BaseJobProvider } from './base';
 
@@ -28,8 +29,8 @@ export class InngestJobProvider extends BaseJobProvider {
   static getInstance() {
     if (!this._instance) {
       const client = new InngestClient({
-        id: process.env.NEXT_PRIVATE_INNGEST_APP_ID || 'documenso-app',
-        eventKey: process.env.INNGEST_EVENT_KEY || process.env.NEXT_PRIVATE_INNGEST_EVENT_KEY,
+        id: env('NEXT_PRIVATE_INNGEST_APP_ID') || 'documenso-app',
+        eventKey: env('INNGEST_EVENT_KEY') || env('NEXT_PRIVATE_INNGEST_EVENT_KEY'),
       });
 
       this._instance = new InngestJobProvider({ client });

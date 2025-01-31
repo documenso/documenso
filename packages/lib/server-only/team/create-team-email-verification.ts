@@ -15,6 +15,7 @@ import { createTokenVerification } from '@documenso/lib/utils/token-verification
 import { prisma } from '@documenso/prisma';
 
 import { getI18nInstance } from '../../client-only/providers/i18n-server';
+import { env } from '../../utils/env';
 import { renderEmailWithI18N } from '../../utils/render-email-with-i18n';
 import { teamGlobalSettingsToBranding } from '../../utils/team-global-settings-to-branding';
 
@@ -122,7 +123,7 @@ export const sendTeamEmailVerificationEmail = async (
     teamGlobalSettings?: TeamGlobalSettings | null;
   },
 ) => {
-  const assetBaseUrl = process.env.NEXT_PUBLIC_WEBAPP_URL || 'http://localhost:3000';
+  const assetBaseUrl = env('NEXT_PUBLIC_WEBAPP_URL') || 'http://localhost:3000';
 
   const template = createElement(ConfirmTeamEmailTemplate, {
     assetBaseUrl,

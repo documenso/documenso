@@ -1,4 +1,4 @@
-// Todo: Reimport
+import { env } from '../utils/env';
 
 export const SALT_ROUNDS = 12;
 
@@ -9,17 +9,16 @@ export const IDENTITY_PROVIDER_NAME: Record<string, string> = {
 };
 
 export const IS_GOOGLE_SSO_ENABLED = Boolean(
-  import.meta.env.NEXT_PRIVATE_GOOGLE_CLIENT_ID &&
-    import.meta.env.NEXT_PRIVATE_GOOGLE_CLIENT_SECRET,
+  env('NEXT_PRIVATE_GOOGLE_CLIENT_ID') && env('NEXT_PRIVATE_GOOGLE_CLIENT_SECRET'),
 );
 
 export const IS_OIDC_SSO_ENABLED = Boolean(
-  process.env.NEXT_PRIVATE_OIDC_WELL_KNOWN &&
-    process.env.NEXT_PRIVATE_OIDC_CLIENT_ID &&
-    process.env.NEXT_PRIVATE_OIDC_CLIENT_SECRET,
+  env('NEXT_PRIVATE_OIDC_WELL_KNOWN') &&
+    env('NEXT_PRIVATE_OIDC_CLIENT_ID') &&
+    env('NEXT_PRIVATE_OIDC_CLIENT_SECRET'),
 );
 
-export const OIDC_PROVIDER_LABEL = process.env.NEXT_PRIVATE_OIDC_PROVIDER_LABEL;
+export const OIDC_PROVIDER_LABEL = env('NEXT_PRIVATE_OIDC_PROVIDER_LABEL');
 
 export const USER_SECURITY_AUDIT_LOG_MAP: Record<string, string> = {
   ACCOUNT_SSO_LINK: 'Linked account to SSO',
@@ -49,7 +48,7 @@ export const PASSKEY_TIMEOUT = 60000;
 export const MAXIMUM_PASSKEYS = 50;
 
 export const useSecureCookies =
-  process.env.NODE_ENV === 'production' && String(process.env.NEXTAUTH_URL).startsWith('https://');
+  env('NODE_ENV') === 'production' && String(env('NEXTAUTH_URL')).startsWith('https://');
 
 const secureCookiePrefix = useSecureCookies ? '__Secure-' : '';
 

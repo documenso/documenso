@@ -8,6 +8,7 @@ import type { Stripe } from '@documenso/lib/server-only/stripe';
 import { stripe } from '@documenso/lib/server-only/stripe';
 import { createTeamFromPendingTeam } from '@documenso/lib/server-only/team/create-team';
 import { getFlag } from '@documenso/lib/universal/get-feature-flag';
+import { env } from '@documenso/lib/utils/env';
 import { prisma } from '@documenso/prisma';
 
 import { onSubscriptionDeleted } from './on-subscription-deleted';
@@ -47,7 +48,7 @@ export const stripeWebhookHandler = async (
     const event = stripe.webhooks.constructEvent(
       body,
       signature,
-      process.env.NEXT_PRIVATE_STRIPE_WEBHOOK_SECRET,
+      env('NEXT_PRIVATE_STRIPE_WEBHOOK_SECRET'), // Todo: Test
     );
 
     await match(event.type)

@@ -1,3 +1,4 @@
+import { DocumentVisibility } from '@prisma/client';
 import { z } from 'zod';
 
 import { DEFAULT_DOCUMENT_DATE_FORMAT } from '@documenso/lib/constants/date-formats';
@@ -8,7 +9,6 @@ import {
   ZDocumentActionAuthTypesSchema,
 } from '@documenso/lib/types/document-auth';
 import { isValidRedirectUrl } from '@documenso/lib/utils/is-valid-redirect-url';
-import { DocumentVisibility } from '@documenso/prisma/client';
 import {
   ZDocumentMetaDateFormatSchema,
   ZDocumentMetaTimezoneSchema,

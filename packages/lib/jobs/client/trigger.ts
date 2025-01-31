@@ -2,6 +2,7 @@ import { createPagesRoute } from '@trigger.dev/nextjs';
 import type { IO } from '@trigger.dev/sdk';
 import { TriggerClient, eventTrigger } from '@trigger.dev/sdk';
 
+import { env } from '../../utils/env';
 import type { JobDefinition, JobRunIO, SimpleTriggerJobOptions } from './_internal/job';
 import { BaseJobProvider } from './base';
 
@@ -20,8 +21,8 @@ export class TriggerJobProvider extends BaseJobProvider {
     if (!this._instance) {
       const client = new TriggerClient({
         id: 'documenso-app',
-        apiKey: process.env.NEXT_PRIVATE_TRIGGER_API_KEY,
-        apiUrl: process.env.NEXT_PRIVATE_TRIGGER_API_URL,
+        apiKey: env('NEXT_PRIVATE_TRIGGER_API_KEY'),
+        apiUrl: env('NEXT_PRIVATE_TRIGGER_API_URL'),
       });
 
       this._instance = new TriggerJobProvider({ client });

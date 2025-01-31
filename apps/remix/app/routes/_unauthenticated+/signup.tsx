@@ -1,19 +1,16 @@
 import { redirect } from 'react-router';
 
 import { IS_GOOGLE_SSO_ENABLED, IS_OIDC_SSO_ENABLED } from '@documenso/lib/constants/auth';
+import { env } from '@documenso/lib/utils/env';
 
 import { SignUpForm } from '~/components/forms/signup';
 
-import type { Route } from './+types/_unauth.signup';
-
-export function meta(_args: Route.MetaArgs) {
+export function meta() {
   return [{ title: 'Sign Up' }];
 }
 
 export function loader() {
-  // Todo
-  // const NEXT_PUBLIC_DISABLE_SIGNUP = env('NEXT_PUBLIC_DISABLE_SIGNUP');
-  const NEXT_PUBLIC_DISABLE_SIGNUP: string = 'false';
+  const NEXT_PUBLIC_DISABLE_SIGNUP = env('NEXT_PUBLIC_DISABLE_SIGNUP');
 
   if (NEXT_PUBLIC_DISABLE_SIGNUP === 'true') {
     return redirect('/signin');

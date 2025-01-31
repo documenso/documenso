@@ -2,14 +2,11 @@ import { msg } from '@lingui/macro';
 import { useLingui } from '@lingui/react';
 
 import { SettingsHeader } from '~/components/(dashboard)/settings/layout/header';
+import { AccountDeleteDialog } from '~/components/dialogs/account-delete-dialog';
 import { AvatarImageForm } from '~/components/forms/avatar-image';
 import { ProfileForm } from '~/components/forms/profile';
 
-import type { Route } from './+types/profile';
-
-// import { DeleteAccountDialog } from './settings/profile/delete-account-dialog';
-
-export function meta(_args: Route.MetaArgs) {
+export function meta() {
   return [{ title: 'Profile' }];
 }
 
@@ -28,7 +25,7 @@ export default function SettingsProfile() {
 
       <hr className="my-4 max-w-xl" />
 
-      {/* <DeleteAccountDialog className="max-w-xl" /> */}
+      <AccountDeleteDialog className="max-w-xl" />
     </div>
   );
 }

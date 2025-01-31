@@ -6,8 +6,8 @@ import { useForm } from 'react-hook-form';
 import { match } from 'ts-pattern';
 import { z } from 'zod';
 
+import { authClient } from '@documenso/auth/client';
 import { AppError } from '@documenso/lib/errors/app-error';
-import { trpc } from '@documenso/trpc/react';
 import { ZCurrentPasswordSchema, ZPasswordSchema } from '@documenso/trpc/server/auth-router/schema';
 import { cn } from '@documenso/ui/lib/utils';
 import { Button } from '@documenso/ui/primitives/button';
@@ -55,11 +55,9 @@ export const PasswordForm = ({ className }: PasswordFormProps) => {
 
   const isSubmitting = form.formState.isSubmitting;
 
-  const { mutateAsync: updatePassword } = trpc.profile.updatePassword.useMutation();
-
   const onFormSubmit = async ({ currentPassword, password }: TPasswordFormSchema) => {
     try {
-      await updatePassword({
+      await authClient.updatePassword({
         currentPassword,
         password,
       });

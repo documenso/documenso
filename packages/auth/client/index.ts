@@ -7,8 +7,8 @@ import type { AuthAppType } from '../server';
 import type {
   TForgotPasswordSchema,
   TResetPasswordSchema,
-  TSignInFormSchema,
-  TSignUpRequestSchema,
+  TSignInSchema,
+  TSignUpSchema,
   TVerifyEmailSchema,
 } from '../server/types/email-password';
 import type { TPasskeyAuthorizeSchema } from '../server/types/passkey';
@@ -32,18 +32,6 @@ export class AuthClient {
     return this.client.session.$get();
   }
 
-  public passkey = {
-    signIn: async (data: TPasskeyAuthorizeSchema) => {
-      const result = await this.client['passkey'].authorize.$post({ json: data });
-
-      if (result.ok) {
-        return result.json();
-      }
-
-      throw new Error(result.statusText);
-    },
-  };
-
   private async handleResponse<T>(response: ClientResponse<T>) {
     if (!response.ok) {
       const error = await response.json();
@@ -59,9 +47,16 @@ export class AuthClient {
   }
 
   public emailPassword = {
-    signIn: async (data: TSignInFormSchema) => {
-      const response = await this.client['email-password'].authorize.$post({ json: data });
-      return this.handleResponse(response);
+    signIn: async (data: TSignInSchema & { redirectUrl?: string }) => {
+      const response = await this.client['email-password'].authorize
+        .$post({ json: data })
+        .then(this.handleResponse);
+
+      if (data.redirectUrl) {
+        window.location.href = data.redirectUrl;
+      }
+
+      return response;
     },
 
     forgotPassword: async (data: TForgotPasswordSchema) => {
@@ -74,7 +69,7 @@ export class AuthClient {
       return this.handleResponse(response);
     },
 
-    signUp: async (data: TSignUpRequestSchema) => {
+    signUp: async (data: TSignUpSchema) => {
       const response = await this.client['email-password']['signup'].$post({ json: data });
       return this.handleResponse(response);
     },
@@ -85,20 +80,29 @@ export class AuthClient {
     },
   };
 
-  public google = {
-    signIn: async () => {
-      const response = await this.client['google'].authorize.$post();
+  public passkey = {
+    signIn: async (data: TPasskeyAuthorizeSchema & { redirectUrl?: string }) => {
+      const response = await this.client['passkey'].authorize
+        .$post({ json: data })
+        .then(this.handleResponse);
 
-      // const parsedResponse = this.handleResponse(response);
-      if (!response.ok) {
-        const error = await response.json();
-
-        throw AppError.parseError(error);
+      if (data.redirectUrl) {
+        window.location.href = data.redirectUrl;
       }
 
-      const test = await response.json();
+      return response;
+    },
+  };
 
-      window.location.href = test.redirectUrl;
+  public google = {
+    signIn: async () => {
+      const response = await this.client['google'].authorize.$post().then(this.handleResponse);
+
+      if (response.redirectUrl) {
+        window.location.href = response.redirectUrl;
+      }
+
+      return response;
     },
   };
 }

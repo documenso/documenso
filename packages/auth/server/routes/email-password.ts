@@ -4,6 +4,7 @@ import { Hono } from 'hono';
 import { DateTime } from 'luxon';
 import { z } from 'zod';
 
+import { IS_BILLING_ENABLED } from '@documenso/lib/constants/app';
 import { AppError } from '@documenso/lib/errors/app-error';
 import { jobsClient } from '@documenso/lib/jobs/client';
 import { disableTwoFactorAuthentication } from '@documenso/lib/server-only/2fa/disable-2fa';
@@ -16,19 +17,25 @@ import { createUser } from '@documenso/lib/server-only/user/create-user';
 import { forgotPassword } from '@documenso/lib/server-only/user/forgot-password';
 import { getMostRecentVerificationTokenByUserId } from '@documenso/lib/server-only/user/get-most-recent-verification-token-by-user-id';
 import { resetPassword } from '@documenso/lib/server-only/user/reset-password';
-import { verifyEmail } from '@documenso/lib/server-only/user/verify-email';
+import { updatePassword } from '@documenso/lib/server-only/user/update-password';
+import {
+  EMAIL_VERIFICATION_STATE,
+  verifyEmail,
+} from '@documenso/lib/server-only/user/verify-email';
+import { env } from '@documenso/lib/utils/env';
 import { prisma } from '@documenso/prisma';
 import { UserSecurityAuditLogType } from '@documenso/prisma/client';
 
 import { AuthenticationErrorCode } from '../lib/errors/error-codes';
 import { onAuthorize } from '../lib/utils/authorizer';
-import { getRequiredSession } from '../lib/utils/get-session';
+import { getRequiredSession, getSession } from '../lib/utils/get-session';
 import type { HonoAuthContext } from '../types/context';
 import {
   ZForgotPasswordSchema,
   ZResetPasswordSchema,
-  ZSignInFormSchema,
-  ZSignUpRequestSchema,
+  ZSignInSchema,
+  ZSignUpSchema,
+  ZUpdatePasswordSchema,
   ZVerifyEmailSchema,
 } from '../types/email-password';
 
@@ -36,7 +43,7 @@ export const emailPasswordRoute = new Hono<HonoAuthContext>()
   /**
    * Authorize endpoint.
    */
-  .post('/authorize', zValidator('json', ZSignInFormSchema), async (c) => {
+  .post('/authorize', zValidator('json', ZSignInSchema), async (c) => {
     const requestMetadata = c.get('requestMetadata');
 
     const { email, password, totpCode, backupCode } = c.req.valid('json');
@@ -48,8 +55,8 @@ export const emailPasswordRoute = new Hono<HonoAuthContext>()
     });
 
     if (!user || !user.password) {
-      throw new AppError(AuthenticationErrorCode.NotFound, {
-        message: 'User not found',
+      throw new AppError(AuthenticationErrorCode.InvalidCredentials, {
+        message: 'Invalid email or password',
       });
     }
 
@@ -85,7 +92,7 @@ export const emailPasswordRoute = new Hono<HonoAuthContext>()
           },
         });
 
-        throw new AppError(AuthenticationErrorCode.IncorrectTwoFactorCode);
+        throw new AppError(AuthenticationErrorCode.InvalidTwoFactorCode);
       }
     }
 
@@ -125,20 +132,20 @@ export const emailPasswordRoute = new Hono<HonoAuthContext>()
   /**
    * Signup endpoint.
    */
-  .post('/signup', zValidator('json', ZSignUpRequestSchema), async (c) => {
-    // if (NEXT_PUBLIC_DISABLE_SIGNUP() === 'true') {
-    //   throw new AppError('SIGNUP_DISABLED', {
-    //     message: 'Signups are disabled.',
-    //   });
-    // }
+  .post('/signup', zValidator('json', ZSignUpSchema), async (c) => {
+    if (env('NEXT_PUBLIC_DISABLE_SIGNUP') === 'true') {
+      throw new AppError('SIGNUP_DISABLED', {
+        message: 'Signups are disabled.',
+      });
+    }
 
     const { name, email, password, signature, url } = c.req.valid('json');
 
-    // if (IS_BILLING_ENABLED() && url && url.length < 6) {
-    //   throw new AppError(AppErrorCode.PREMIUM_PROFILE_URL, {
-    //     message: 'Only subscribers can have a username shorter than 6 characters',
-    //   });
-    // }
+    if (IS_BILLING_ENABLED() && url && url.length < 6) {
+      throw new AppError('PREMIUM_PROFILE_URL', {
+        message: 'Only subscribers can have a username shorter than 6 characters',
+      });
+    }
 
     const user = await createUser({ name, email, password, signature, url });
 
@@ -149,18 +156,59 @@ export const emailPasswordRoute = new Hono<HonoAuthContext>()
       },
     });
 
-    // Todo: Check this.
-    return c.json({
-      user,
+    return c.text('OK', 201);
+  })
+  /**
+   * Update password endpoint.
+   */
+  .post('/update-password', zValidator('json', ZUpdatePasswordSchema), async (c) => {
+    const { password, currentPassword } = c.req.valid('json');
+    const requestMetadata = c.get('requestMetadata');
+
+    const session = await getSession(c);
+
+    if (!session.isAuthenticated) {
+      throw new AppError(AuthenticationErrorCode.Unauthorized);
+    }
+
+    await updatePassword({
+      userId: session.user.id,
+      password,
+      currentPassword,
+      requestMetadata,
     });
+
+    return c.text('OK', 201);
   })
   /**
    * Verify email endpoint.
    */
   .post('/verify-email', zValidator('json', ZVerifyEmailSchema), async (c) => {
-    await verifyEmail({ token: c.req.valid('json').token });
+    const { state, userId } = await verifyEmail({ token: c.req.valid('json').token });
 
-    return c.text('OK', 201);
+    // If email is verified, automatically authenticate user.
+    if (state === EMAIL_VERIFICATION_STATE.VERIFIED && userId !== null) {
+      await onAuthorize({ userId }, c);
+    }
+
+    return c.json({
+      state,
+    });
+  })
+  /**
+   * Resend verification email endpoint.
+   */
+  .post('/resend-email', zValidator('json', ZVerifyEmailSchema), async (c) => {
+    const { state, userId } = await verifyEmail({ token: c.req.valid('json').token });
+
+    // If email is verified, automatically authenticate user.
+    if (state === EMAIL_VERIFICATION_STATE.VERIFIED && userId !== null) {
+      await onAuthorize({ userId }, c);
+    }
+
+    return c.json({
+      state,
+    });
   })
   /**
    * Forgot password endpoint.
@@ -180,9 +228,12 @@ export const emailPasswordRoute = new Hono<HonoAuthContext>()
   .post('/reset-password', zValidator('json', ZResetPasswordSchema), async (c) => {
     const { token, password } = c.req.valid('json');
 
+    const requestMetadata = c.get('requestMetadata');
+
     await resetPassword({
       token,
       password,
+      requestMetadata,
     });
 
     return c.text('OK', 201);
@@ -291,9 +342,7 @@ export const emailPasswordRoute = new Hono<HonoAuthContext>()
         requestMetadata,
       });
 
-      return c.json({
-        success: true,
-      });
+      return c.text('OK', 201);
     },
   )
   /**

@@ -44,6 +44,7 @@ import {
   createRecipientAuthOptions,
   extractDocumentAuthMethods,
 } from '../../utils/document-auth';
+import { env } from '../../utils/env';
 import { renderEmailWithI18N } from '../../utils/render-email-with-i18n';
 import { teamGlobalSettingsToBranding } from '../../utils/team-global-settings-to-branding';
 import { formatDocumentsPath } from '../../utils/teams';
@@ -582,8 +583,8 @@ export const createDocumentFromDirectTemplate = async ({
         },
       ],
       from: {
-        name: process.env.NEXT_PRIVATE_SMTP_FROM_NAME || 'Documenso',
-        address: process.env.NEXT_PRIVATE_SMTP_FROM_ADDRESS || 'noreply@documenso.com',
+        name: env('NEXT_PRIVATE_SMTP_FROM_NAME') || 'Documenso',
+        address: env('NEXT_PRIVATE_SMTP_FROM_ADDRESS') || 'noreply@documenso.com',
       },
       subject: i18n._(msg`Document created from direct template`),
       html,

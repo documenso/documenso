@@ -15,7 +15,6 @@ import { z } from 'zod';
 import { authClient } from '@documenso/auth/client';
 import { AuthenticationErrorCode } from '@documenso/auth/server/lib/errors/error-codes';
 import { AppError } from '@documenso/lib/errors/app-error';
-import { ErrorCode } from '@documenso/lib/next-auth/error-codes';
 import { trpc } from '@documenso/trpc/react';
 import { ZCurrentPasswordSchema } from '@documenso/trpc/server/auth-router/schema';
 import { cn } from '@documenso/ui/lib/utils';
@@ -45,8 +44,6 @@ const CommonErrorMessages = {
   //   'This account appears to be using a social login method, please sign in using that method',
   [AuthenticationErrorCode.AccountDisabled]: msg`This account has been disabled. Please contact support.`,
 };
-
-const TwoFactorEnabledErrorCode = ErrorCode.TWO_FACTOR_MISSING_CREDENTIALS;
 
 const LOGIN_REDIRECT_PATH = '/documents';
 
@@ -90,7 +87,7 @@ export const SignInForm = ({
 
   const [isPasskeyLoading, setIsPasskeyLoading] = useState(false);
 
-  const callbackUrl = useMemo(() => {
+  const redirectUrl = useMemo(() => {
     // Handle SSR
     if (typeof window === 'undefined') {
       return LOGIN_REDIRECT_PATH;
@@ -161,15 +158,16 @@ export const SignInForm = ({
 
       const credential = await startAuthentication(options);
 
-      const result = await authClient.passkey.signIn({
+      await authClient.passkey.signIn({
         credential: JSON.stringify(credential),
         csrfToken: sessionId,
+        redirectUrl,
         // callbackUrl,
         // redirect: false,
       });
 
       // Todo: Can't use navigate because of embed?
-      window.location.href = callbackUrl;
+      // window.location.href = callbackUrl;
     } catch (err) {
       setIsPasskeyLoading(false);
 
@@ -208,17 +206,18 @@ export const SignInForm = ({
         password,
         totpCode,
         backupCode,
+        redirectUrl,
         // callbackUrl,
         // redirect: false,
       });
 
-      window.location.href = callbackUrl;
+      // window.location.href = callbackUrl; // Todo: Handle redirect.
     } catch (err) {
       console.log(err);
 
       const error = AppError.parseError(err);
 
-      if (error.code === TwoFactorEnabledErrorCode) {
+      if (error.code === 'TWO_FACTOR_MISSING_CREDENTIALS') {
         setIsTwoFactorAuthenticationDialogOpen(true);
         return;
       }
@@ -257,12 +256,7 @@ export const SignInForm = ({
 
   const onSignInWithGoogleClick = async () => {
     try {
-      // await signIn('google', {
-      //   callbackUrl,
-      // });
-
-      const result = await authClient.google.signIn();
-      console.log(result);
+      await authClient.google.signIn(); // Todo: Handle redirect.
     } catch (err) {
       toast({
         title: _(msg`An unknown error occurred`),

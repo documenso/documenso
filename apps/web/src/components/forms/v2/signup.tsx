@@ -76,10 +76,10 @@ export const ZSignUpFormV2Schema = z
 
 export const signupErrorMessages: Record<string, MessageDescriptor> = {
   SIGNUP_DISABLED: msg`Signups are disabled.`,
+  PROFILE_URL_TAKEN: msg`This username has already been taken`,
+  PREMIUM_PROFILE_URL: msg`Only subscribers can have a username shorter than 6 characters`,
   [AppErrorCode.ALREADY_EXISTS]: msg`User with this email already exists. Please use a different email address.`,
   [AppErrorCode.INVALID_REQUEST]: msg`We were unable to create your account. Please review the information you provided and try again.`,
-  [AppErrorCode.PROFILE_URL_TAKEN]: msg`This username has already been taken`,
-  [AppErrorCode.PREMIUM_PROFILE_URL]: msg`Only subscribers can have a username shorter than 6 characters`,
 };
 
 export type TSignUpFormV2Schema = z.infer<typeof ZSignUpFormV2Schema>;

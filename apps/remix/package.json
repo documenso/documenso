@@ -7,7 +7,8 @@
     "dev": "react-router dev",
     "start": "cross-env NODE_ENV=production node dist/server/index.js",
     "clean": "rimraf .react-router && rimraf node_modules",
-    "typecheck": "react-router typegen && tsc"
+    "typecheck": "react-router typegen && tsc",
+    "copy:pdfjs": "node ../../scripts/copy-pdfjs.cjs"
   },
   "dependencies": {
     "@epic-web/remember": "^1.1.0",

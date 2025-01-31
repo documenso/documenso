@@ -15,7 +15,8 @@ import { DataTablePagination } from '@documenso/ui/primitives/data-table-paginat
 import { Skeleton } from '@documenso/ui/primitives/skeleton';
 import { TableCell } from '@documenso/ui/primitives/table';
 
-import { CreateTeamCheckoutDialog } from '../dialogs/create-team-checkout-dialog';
+import { TeamCheckoutCreateDialog } from '~/components/dialogs/team-checkout-create-dialog';
+
 import { PendingUserTeamsDataTableActions } from './pending-user-teams-data-table-actions';
 
 export const PendingUserTeamsDataTable = () => {
@@ -139,7 +140,7 @@ export const PendingUserTeamsDataTable = () => {
         {(table) => <DataTablePagination additionalInformation="VisibleCount" table={table} />}
       </DataTable>
 
-      <CreateTeamCheckoutDialog
+      <TeamCheckoutCreateDialog
         pendingTeamId={checkoutPendingTeamId}
         onClose={() => setCheckoutPendingTeamId(null)}
       />

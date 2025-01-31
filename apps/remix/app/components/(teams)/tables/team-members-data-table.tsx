@@ -26,8 +26,8 @@ import {
 import { Skeleton } from '@documenso/ui/primitives/skeleton';
 import { TableCell } from '@documenso/ui/primitives/table';
 
-import { DeleteTeamMemberDialog } from '../dialogs/delete-team-member-dialog';
-import { UpdateTeamMemberDialog } from '../dialogs/update-team-member-dialog';
+import { DeleteTeamMemberDialog } from '../../dialogs/team-member-delete-dialog';
+import { UpdateTeamMemberDialog } from '../../dialogs/team-member-update-dialog';
 
 export type TeamMembersDataTableProps = {
   currentUserTeamRole: TeamMemberRole;

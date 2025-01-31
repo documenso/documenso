@@ -23,33 +23,26 @@ datasource db {
   directUrl = env("NEXT_PRIVATE_DIRECT_DATABASE_URL")
 }
 
-enum IdentityProvider {
-  DOCUMENSO
-  GOOGLE
-  OIDC
-}
-
 enum Role {
   ADMIN
   USER
 }
 
 model User {
-  id               Int              @id @default(autoincrement())
-  name             String?
-  customerId       String?          @unique
-  email            String           @unique
-  emailVerified    DateTime?
-  password         String?
-  source           String?
-  signature        String?
-  createdAt        DateTime         @default(now())
-  updatedAt        DateTime         @default(now()) @updatedAt
-  lastSignedIn     DateTime         @default(now())
-  roles            Role[]           @default([USER])
-  identityProvider IdentityProvider @default(DOCUMENSO)
-  avatarImageId    String?
-  disabled         Boolean          @default(false)
+  id            Int       @id @default(autoincrement())
+  name          String?
+  customerId    String?   @unique
+  email         String    @unique
+  emailVerified DateTime?
+  password      String?
+  source        String?
+  signature     String?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @default(now()) @updatedAt
+  lastSignedIn  DateTime  @default(now())
+  roles         Role[]    @default([USER])
+  avatarImageId String?
+  disabled      Boolean   @default(false)
 
   accounts             Account[]
   sessions             Session[]

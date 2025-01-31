@@ -5,14 +5,14 @@ export const ZCurrentPasswordSchema = z
   .min(6, { message: 'Must be at least 6 characters in length' })
   .max(72);
 
-export const ZSignInFormSchema = z.object({
+export const ZSignInSchema = z.object({
   email: z.string().email().min(1),
   password: ZCurrentPasswordSchema,
   totpCode: z.string().trim().optional(),
   backupCode: z.string().trim().optional(),
 });
 
-export type TSignInFormSchema = z.infer<typeof ZSignInFormSchema>;
+export type TSignInSchema = z.infer<typeof ZSignInSchema>;
 
 export const ZPasswordSchema = z
   .string()
@@ -31,7 +31,7 @@ export const ZPasswordSchema = z
     message: 'One special character is required',
   });
 
-export const ZSignUpRequestSchema = z.object({
+export const ZSignUpSchema = z.object({
   name: z.string().min(1),
   email: z.string().email(),
   password: ZPasswordSchema,
@@ -47,7 +47,7 @@ export const ZSignUpRequestSchema = z.object({
     .optional(),
 });
 
-export type TSignUpRequestSchema = z.infer<typeof ZSignUpRequestSchema>;
+export type TSignUpSchema = z.infer<typeof ZSignUpSchema>;
 
 export const ZForgotPasswordSchema = z.object({
   email: z.string().email().min(1),
@@ -67,3 +67,10 @@ export const ZVerifyEmailSchema = z.object({
 });
 
 export type TVerifyEmailSchema = z.infer<typeof ZVerifyEmailSchema>;
+
+export const ZUpdatePasswordSchema = z.object({
+  currentPassword: ZCurrentPasswordSchema,
+  password: ZPasswordSchema,
+});
+
+export type TUpdatePasswordSchema = z.infer<typeof ZUpdatePasswordSchema>;

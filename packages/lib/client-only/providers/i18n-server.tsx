@@ -6,6 +6,7 @@ import {
   SUPPORTED_LANGUAGE_CODES,
   isValidLanguageCode,
 } from '../../constants/i18n';
+import { env } from '../../utils/env';
 import { remember } from '../../utils/remember';
 
 type SupportedLanguages = (typeof SUPPORTED_LANGUAGE_CODES)[number];
@@ -13,7 +14,7 @@ type SupportedLanguages = (typeof SUPPORTED_LANGUAGE_CODES)[number];
 export async function loadCatalog(lang: SupportedLanguages): Promise<{
   [k: string]: Messages;
 }> {
-  const extension = process.env.NODE_ENV === 'development' ? 'po' : 'js';
+  const extension = env('NODE_ENV') === 'development' ? 'po' : 'js';
 
   // const { messages } = await import(`../../translations/${lang}/web.${extension}`);
   const messages = {};

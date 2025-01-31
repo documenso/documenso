@@ -25,15 +25,12 @@ import {
   ZRadioFieldMeta,
   ZTextFieldMeta,
 } from '../../types/field-meta';
+import { env } from '../../utils/env';
 
 export const insertFieldInPDF = async (pdf: PDFDocument, field: FieldWithSignature) => {
-  const fontCaveat = await fetch(process.env.FONT_CAVEAT_URI).then(async (res) =>
-    res.arrayBuffer(),
-  );
+  const fontCaveat = await fetch(env('FONT_CAVEAT_URI')).then(async (res) => res.arrayBuffer());
 
-  const fontNoto = await fetch(process.env.FONT_NOTO_SANS_URI).then(async (res) =>
-    res.arrayBuffer(),
-  );
+  const fontNoto = await fetch(env('FONT_NOTO_SANS_URI')).then(async (res) => res.arrayBuffer());
 
   const isSignatureField = isSignatureFieldType(field.type);
 
