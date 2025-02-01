@@ -485,7 +485,6 @@ export const EmbedDirectTemplateClientPage = ({
 
         {/* Fields */}
         <EmbedDocumentFields
-          recipient={recipient}
           fields={localFields}
           metadata={metadata}
           onSignField={onSignField}
