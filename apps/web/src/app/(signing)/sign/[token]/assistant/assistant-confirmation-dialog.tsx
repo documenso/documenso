@@ -27,11 +27,7 @@ export function AssistantConfirmationDialog({
   hasUninsertedFields,
   isSubmitting,
 }: ConfirmationDialogProps) {
-  const description = hasUninsertedFields
-    ? "You haven't filled some of the fields for the signer roles, are you sure you want to proceed?"
-    : "Are you sure you want to submit the assistant's form? This action cannot be undone.";
-
-  const handleOpenChange = () => {
+  const onOpenChange = () => {
     if (isSubmitting) {
       return;
     }
@@ -40,7 +36,7 @@ export function AssistantConfirmationDialog({
   };
 
   return (
-    <Dialog open={isOpen} onOpenChange={handleOpenChange}>
+    <Dialog open={isOpen} onOpenChange={onOpenChange}>
       <DialogContent>
         <DialogHeader>
           <DialogTitle>
