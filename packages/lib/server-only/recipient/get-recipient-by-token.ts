@@ -9,5 +9,8 @@ export const getRecipientByToken = async ({ token }: GetRecipientByTokenOptions)
     where: {
       token,
     },
+    include: {
+      fields: true,
+    },
   });
 };

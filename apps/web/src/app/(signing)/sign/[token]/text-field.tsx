@@ -13,7 +13,6 @@ import { DO_NOT_INVALIDATE_QUERY_ON_MUTATION } from '@documenso/lib/constants/tr
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import type { TRecipientActionAuth } from '@documenso/lib/types/document-auth';
 import { ZTextFieldMeta } from '@documenso/lib/types/field-meta';
-import type { Recipient } from '@documenso/prisma/client';
 import type { FieldWithSignatureAndFieldMeta } from '@documenso/prisma/types/field-with-signature-and-fieldmeta';
 import { trpc } from '@documenso/trpc/react';
 import type {
@@ -27,26 +26,31 @@ import { Textarea } from '@documenso/ui/primitives/textarea';
 import { useToast } from '@documenso/ui/primitives/use-toast';
 
 import { useRequiredDocumentAuthContext } from './document-auth-provider';
+import { useRecipientContext } from './recipient-context';
 import { SigningFieldContainer } from './signing-field-container';
+
+type ValidationErrors = {
+  required: string[];
+  characterLimit: string[];
+};
 
 export type TextFieldProps = {
   field: FieldWithSignatureAndFieldMeta;
-  recipient: Recipient;
   onSignField?: (value: TSignFieldWithTokenMutationSchema) => Promise<void> | void;
   onUnsignField?: (value: TRemovedSignedFieldWithTokenMutationSchema) => Promise<void> | void;
 };
 
-export const TextField = ({ field, recipient, onSignField, onUnsignField }: TextFieldProps) => {
+export const TextField = ({ field, onSignField, onUnsignField }: TextFieldProps) => {
   const { _ } = useLingui();
   const { toast } = useToast();
+  const { recipient, targetSigner, isAssistantMode } = useRecipientContext();
 
   const router = useRouter();
 
-  const initialErrors: Record<string, string[]> = {
+  const initialErrors: ValidationErrors = {
     required: [],
     characterLimit: [],
   };
-
   const [errors, setErrors] = useState(initialErrors);
   const userInputHasErrors = Object.values(errors).some((error) => error.length > 0);
 
@@ -166,7 +170,9 @@ export const TextField = ({ field, recipient, onSignField, onUnsignField }: Text
 
       toast({
         title: _(msg`Error`),
-        description: _(msg`An error occurred while signing the document.`),
+        description: isAssistantMode
+          ? _(msg`An error occurred while signing as assistant.`)
+          : _(msg`An error occurred while signing the document.`),
         variant: 'destructive',
       });
     }
@@ -194,7 +200,7 @@ export const TextField = ({ field, recipient, onSignField, onUnsignField }: Text
 
       toast({
         title: _(msg`Error`),
-        description: _(msg`An error occurred while removing the text.`),
+        description: _(msg`An error occurred while removing the field.`),
         variant: 'destructive',
       });
     }
@@ -234,7 +240,7 @@ export const TextField = ({ field, recipient, onSignField, onUnsignField }: Text
       onPreSign={onPreSign}
       onSign={onSign}
       onRemove={onRemove}
-      type="Signature"
+      type="Text"
     >
       {isLoading && (
         <div className="bg-background absolute inset-0 flex items-center justify-center rounded-md">
@@ -276,7 +282,7 @@ export const TextField = ({ field, recipient, onSignField, onUnsignField }: Text
           >
             {field.customText.length < 20
               ? field.customText
-              : field.customText.substring(0, 15) + '...'}
+              : field.customText.substring(0, 20) + '...'}
           </p>
         </div>
       )}

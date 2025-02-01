@@ -10,7 +10,7 @@ import { validateRadioField } from '@documenso/lib/advanced-fields-validation/va
 import { validateTextField } from '@documenso/lib/advanced-fields-validation/validate-text';
 import { fromCheckboxValue } from '@documenso/lib/universal/field-checkbox';
 import { prisma } from '@documenso/prisma';
-import { DocumentStatus, FieldType, SigningStatus } from '@documenso/prisma/client';
+import { DocumentStatus, FieldType, RecipientRole, SigningStatus } from '@documenso/prisma/client';
 
 import { DEFAULT_DOCUMENT_DATE_FORMAT } from '../../constants/date-formats';
 import { DEFAULT_DOCUMENT_TIME_ZONE } from '../../constants/time-zones';
@@ -56,20 +56,41 @@ export const signFieldWithToken = async ({
   authOptions,
   requestMetadata,
 }: SignFieldWithTokenOptions) => {
+  const recipient = await prisma.recipient.findFirstOrThrow({
+    where: {
+      token,
+    },
+  });
+
   const field = await prisma.field.findFirstOrThrow({
     where: {
       id: fieldId,
       recipient: {
-        token,
+        ...(recipient.role !== RecipientRole.ASSISTANT
+          ? {
+              id: recipient.id,
+            }
+          : {
+              signingStatus: {
+                not: SigningStatus.SIGNED,
+              },
+              signingOrder: {
+                gte: recipient.signingOrder ?? 0,
+              },
+            }),
       },
     },
     include: {
-      document: true,
+      document: {
+        include: {
+          recipients: true,
+        },
+      },
       recipient: true,
     },
   });
 
-  const { document, recipient } = field;
+  const { document } = field;
 
   if (!document) {
     throw new Error(`Document not found for field ${field.id}`);
@@ -87,7 +108,10 @@ export const signFieldWithToken = async ({
     throw new Error(`Document ${document.id} must be pending for signing`);
   }
 
-  if (recipient?.signingStatus === SigningStatus.SIGNED) {
+  if (
+    recipient.signingStatus === SigningStatus.SIGNED ||
+    field.recipient.signingStatus === SigningStatus.SIGNED
+  ) {
     throw new Error(`Recipient ${recipient.id} has already signed`);
   }
 
@@ -183,6 +207,8 @@ export const signFieldWithToken = async ({
     throw new Error('Typed signatures are not allowed. Please draw your signature');
   }
 
+  const assistant = recipient.role === RecipientRole.ASSISTANT ? recipient : undefined;
+
   return await prisma.$transaction(async (tx) => {
     const updatedField = await tx.field.update({
       where: {
@@ -219,11 +245,14 @@ export const signFieldWithToken = async ({
 
     await tx.documentAuditLog.create({
       data: createDocumentAuditLogData({
-        type: DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_FIELD_INSERTED,
+        type:
+          assistant && field.recipientId !== assistant.id
+            ? DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_FIELD_PREFILLED
+            : DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_FIELD_INSERTED,
         documentId: document.id,
         user: {
-          email: recipient.email,
-          name: recipient.name,
+          email: assistant?.email ?? recipient.email,
+          name: assistant?.name ?? recipient.name,
         },
         requestMetadata,
         data: {
