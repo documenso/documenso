@@ -282,7 +282,7 @@ export const TextField = ({ field, onSignField, onUnsignField }: TextFieldProps)
           >
             {field.customText.length < 20
               ? field.customText
-              : field.customText.substring(0, 15) + '...'}
+              : field.customText.substring(0, 20) + '...'}
           </p>
         </div>
       )}
