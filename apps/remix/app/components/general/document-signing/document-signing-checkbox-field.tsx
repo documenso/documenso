@@ -181,28 +181,25 @@ export const DocumentSigningCheckboxField = ({
           ...checkedValues,
           item.value.length > 0 ? item.value : `empty-value-${item.id}`,
         ];
-
-        await removeSignedFieldWithToken({
-          token: recipient.token,
-          fieldId: field.id,
-        });
-
-        if (isLengthConditionMet) {
-          await signFieldWithToken({
-            token: recipient.token,
-            fieldId: field.id,
-            value: toCheckboxValue(checkedValues),
-            isBase64: true,
-          });
-        }
       } else {
         updatedValues = checkedValues.filter(
           (v) => v !== item.value && v !== `empty-value-${item.id}`,
         );
+      }
 
-        await removeSignedFieldWithToken({
+      setCheckedValues(updatedValues);
+
+      await removeSignedFieldWithToken({
+        token: recipient.token,
+        fieldId: field.id,
+      });
+
+      if (updatedValues.length > 0) {
+        await signFieldWithToken({
           token: recipient.token,
           fieldId: field.id,
+          value: toCheckboxValue(updatedValues),
+          isBase64: true,
         });
       }
     } catch (err) {
@@ -214,7 +211,6 @@ export const DocumentSigningCheckboxField = ({
         variant: 'destructive',
       });
     } finally {
-      setCheckedValues(updatedValues);
       await revalidate();
     }
   };
