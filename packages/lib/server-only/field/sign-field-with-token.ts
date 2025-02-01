@@ -245,9 +245,10 @@ export const signFieldWithToken = async ({
 
     await tx.documentAuditLog.create({
       data: createDocumentAuditLogData({
-        type: assistant
-          ? DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_FIELD_PREFILLED
-          : DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_FIELD_INSERTED,
+        type:
+          assistant && field.recipientId !== assistant.id
+            ? DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_FIELD_PREFILLED
+            : DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_FIELD_INSERTED,
         documentId: document.id,
         user: {
           email: assistant?.email ?? recipient.email,

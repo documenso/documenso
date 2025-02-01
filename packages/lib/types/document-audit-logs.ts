@@ -322,6 +322,8 @@ export const ZDocumentAuditLogEventDocumentFieldPrefilledSchema = z.object({
   type: z.literal(DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_FIELD_PREFILLED),
   data: ZBaseRecipientDataSchema.extend({
     fieldId: z.string(),
+
+    // Organised into union to allow us to extend each field if required.
     field: z.union([
       z.object({
         type: z.literal(FieldType.INITIALS),
@@ -344,6 +346,10 @@ export const ZDocumentAuditLogEventDocumentFieldPrefilledSchema = z.object({
         data: z.string(),
       }),
       z.object({
+        type: z.union([z.literal(FieldType.SIGNATURE), z.literal(FieldType.FREE_SIGNATURE)]),
+        data: z.string(),
+      }),
+      z.object({
         type: z.literal(FieldType.RADIO),
         data: z.string(),
       }),
@@ -360,6 +366,29 @@ export const ZDocumentAuditLogEventDocumentFieldPrefilledSchema = z.object({
         data: z.string(),
       }),
     ]),
+    fieldSecurity: z.preprocess(
+      (input) => {
+        const legacyNoneSecurityType = JSON.stringify({
+          type: 'NONE',
+        });
+
+        // Replace legacy 'NONE' field security type with undefined.
+        if (
+          typeof input === 'object' &&
+          input !== null &&
+          JSON.stringify(input) === legacyNoneSecurityType
+        ) {
+          return undefined;
+        }
+
+        return input;
+      },
+      z
+        .object({
+          type: ZRecipientActionAuthTypesSchema,
+        })
+        .optional(),
+    ),
   }),
 });
 

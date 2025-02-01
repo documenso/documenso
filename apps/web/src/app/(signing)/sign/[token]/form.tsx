@@ -91,7 +91,11 @@ export const SigningForm = ({
 
   const uninsertedFields = useMemo(() => {
     return sortFieldsByPosition(fieldsRequiringValidation.filter((field) => !field.inserted));
-  }, [fields]);
+  }, [fieldsRequiringValidation]);
+
+  const uninsertedRecipientFields = useMemo(() => {
+    return fieldsRequiringValidation.filter((field) => field.recipientId === recipient.id);
+  }, [fieldsRequiringValidation, recipient]);
 
   const fieldsValidated = () => {
     setValidateUninsertedFields(true);
@@ -115,6 +119,10 @@ export const SigningForm = ({
   };
 
   const onAssistantFormSubmit = () => {
+    if (uninsertedRecipientFields.length > 0) {
+      return;
+    }
+
     setIsConfirmationDialogOpen(true);
   };
 
@@ -284,7 +292,7 @@ export const SigningForm = ({
                     className="w-full"
                     size="lg"
                     loading={isAssistantSubmitting}
-                    disabled={isAssistantSubmitting}
+                    disabled={isAssistantSubmitting || uninsertedRecipientFields.length > 0}
                   >
                     {isAssistantSubmitting ? <Trans>Submitting...</Trans> : <Trans>Continue</Trans>}
                   </Button>

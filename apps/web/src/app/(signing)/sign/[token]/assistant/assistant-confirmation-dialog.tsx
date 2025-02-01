@@ -1,3 +1,5 @@
+import { Trans } from '@lingui/macro';
+
 import { Button } from '@documenso/ui/primitives/button';
 import {
   Dialog,
@@ -7,6 +9,8 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@documenso/ui/primitives/dialog';
+
+import { SigningDisclosure } from '~/components/general/signing-disclosure';
 
 type ConfirmationDialogProps = {
   isOpen: boolean;
@@ -23,7 +27,6 @@ export function AssistantConfirmationDialog({
   hasUninsertedFields,
   isSubmitting,
 }: ConfirmationDialogProps) {
-  const title = hasUninsertedFields ? 'Warning' : 'Confirm Submission';
   const description = hasUninsertedFields
     ? "You haven't filled some of the fields for the signer roles, are you sure you want to proceed?"
     : "Are you sure you want to submit the assistant's form? This action cannot be undone.";
@@ -40,10 +43,22 @@ export function AssistantConfirmationDialog({
     <Dialog open={isOpen} onOpenChange={handleOpenChange}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>{title}</DialogTitle>
-          <DialogDescription>{description}</DialogDescription>
+          <DialogTitle>
+            <Trans>Complete Document</Trans>
+          </DialogTitle>
+          <DialogDescription>
+            <Trans>
+              Are you sure you want to complete the document? This action cannot be undone. Please
+              ensure that you have completed prefilling all relevant fields before proceeding.
+            </Trans>
+          </DialogDescription>
         </DialogHeader>
-        <DialogFooter>
+
+        <div className="flex flex-col gap-4">
+          <SigningDisclosure />
+        </div>
+
+        <DialogFooter className="mt-4">
           <Button variant="secondary" onClick={onClose} disabled={isSubmitting}>
             Cancel
           </Button>
