@@ -12,13 +12,12 @@ import { getFieldsForToken } from '@documenso/lib/server-only/field/get-fields-f
 import { getIsRecipientsTurnToSign } from '@documenso/lib/server-only/recipient/get-is-recipient-turn';
 import { getRecipientByToken } from '@documenso/lib/server-only/recipient/get-recipient-by-token';
 import { getRecipientSignatures } from '@documenso/lib/server-only/recipient/get-recipient-signatures';
-import { getRecipientsForAssistantSigning } from '@documenso/lib/server-only/recipient/get-recipients-for-assistant-signing';
+import { getRecipientsForAssistant } from '@documenso/lib/server-only/recipient/get-recipients-for-assistant';
 import { getUserByEmail } from '@documenso/lib/server-only/user/get-user-by-email';
 import { symmetricDecrypt } from '@documenso/lib/universal/crypto';
 import { extractNextHeaderRequestMetadata } from '@documenso/lib/universal/extract-request-metadata';
 import { extractDocumentAuthMethods } from '@documenso/lib/utils/document-auth';
 import { DocumentStatus, RecipientRole, SigningStatus } from '@documenso/prisma/client';
-import type { RecipientWithFields } from '@documenso/prisma/types/recipient-with-fields';
 
 import { DocumentAuthProvider } from './document-auth-provider';
 import { NoLongerAvailable } from './no-longer-available';
@@ -67,21 +66,18 @@ export default async function SigningPage({ params: { token } }: SigningPageProp
 
   const recipientWithFields = { ...recipient, fields };
 
-  let allRecipients: RecipientWithFields[] = [];
-
-  if (recipient.role === RecipientRole.ASSISTANT) {
-    allRecipients = await getRecipientsForAssistantSigning({
-      documentId: document.id,
-      userId: document.userId,
-      teamId: document.teamId ?? undefined,
-    });
-  }
-
   const isRecipientsTurn = await getIsRecipientsTurnToSign({ token });
 
   if (!isRecipientsTurn) {
     return redirect(`/sign/${token}/waiting`);
   }
+
+  const allRecipients =
+    recipient.role === RecipientRole.ASSISTANT
+      ? await getRecipientsForAssistant({
+          token,
+        })
+      : [];
 
   const { derivedRecipientAccessAuth } = extractDocumentAuthMethods({
     documentAuth: document.authOptions,
