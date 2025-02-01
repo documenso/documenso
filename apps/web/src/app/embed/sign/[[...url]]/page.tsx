@@ -8,17 +8,20 @@ import { IS_BILLING_ENABLED } from '@documenso/lib/constants/app';
 import { getServerComponentSession } from '@documenso/lib/next-auth/get-server-component-session';
 import { getDocumentAndSenderByToken } from '@documenso/lib/server-only/document/get-document-by-token';
 import { getFieldsForToken } from '@documenso/lib/server-only/field/get-fields-for-token';
+import { getIsRecipientsTurnToSign } from '@documenso/lib/server-only/recipient/get-is-recipient-turn';
 import { getRecipientByToken } from '@documenso/lib/server-only/recipient/get-recipient-by-token';
+import { getRecipientsForAssistant } from '@documenso/lib/server-only/recipient/get-recipients-for-assistant';
 import { getTeamById } from '@documenso/lib/server-only/team/get-team';
 import { DocumentAccessAuth } from '@documenso/lib/types/document-auth';
 import { extractDocumentAuthMethods } from '@documenso/lib/utils/document-auth';
-import { DocumentStatus } from '@documenso/prisma/client';
+import { DocumentStatus, RecipientRole } from '@documenso/prisma/client';
 
 import { DocumentAuthProvider } from '~/app/(signing)/sign/[token]/document-auth-provider';
 import { SigningProvider } from '~/app/(signing)/sign/[token]/provider';
 
 import { EmbedAuthenticateView } from '../../authenticate';
 import { EmbedPaywall } from '../../paywall';
+import { EmbedWaitingForTurn } from '../../waiting-for-turn';
 import { EmbedSignDocumentClientPage } from './client';
 
 export type EmbedSignDocumentPageProps = {
@@ -85,6 +88,19 @@ export default async function EmbedSignDocumentPage({ params }: EmbedSignDocumen
     );
   }
 
+  const isRecipientsTurnToSign = await getIsRecipientsTurnToSign({ token });
+
+  if (!isRecipientsTurnToSign) {
+    return <EmbedWaitingForTurn />;
+  }
+
+  const allRecipients =
+    recipient.role === RecipientRole.ASSISTANT
+      ? await getRecipientsForAssistant({
+          token,
+        })
+      : [];
+
   const team = document.teamId
     ? await getTeamById({ teamId: document.teamId, userId: document.userId }).catch(() => null)
     : null;
@@ -112,6 +128,7 @@ export default async function EmbedSignDocumentPage({ params }: EmbedSignDocumen
           isCompleted={document.status === DocumentStatus.COMPLETED}
           hidePoweredBy={isPlatformDocument || isEnterpriseDocument || hidePoweredBy}
           isPlatformOrEnterprise={isPlatformDocument || isEnterpriseDocument}
+          allRecipients={allRecipients}
         />
       </DocumentAuthProvider>
     </SigningProvider>

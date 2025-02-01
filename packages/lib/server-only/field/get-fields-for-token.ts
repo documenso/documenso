@@ -1,5 +1,5 @@
 import { prisma } from '@documenso/prisma';
-import { FieldType, RecipientRole } from '@documenso/prisma/client';
+import { FieldType, RecipientRole, SigningStatus } from '@documenso/prisma/client';
 
 export type GetFieldsForTokenOptions = {
   token: string;
@@ -26,11 +26,18 @@ export const getFieldsForToken = async ({ token }: GetFieldsForTokenOptions) => 
             type: {
               not: FieldType.SIGNATURE,
             },
+            recipient: {
+              signingStatus: {
+                not: SigningStatus.SIGNED,
+              },
+              signingOrder: {
+                gte: recipient.signingOrder ?? 0,
+              },
+            },
             documentId: recipient.documentId,
           },
           {
             recipientId: recipient.id,
-            documentId: recipient.documentId,
           },
         ],
       },
