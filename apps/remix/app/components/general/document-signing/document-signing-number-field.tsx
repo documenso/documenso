@@ -236,8 +236,8 @@ export const DocumentSigningNumberField = ({
 
   if (parsedFieldMeta?.label) {
     fieldDisplayName =
-      parsedFieldMeta.label.length > 10
-        ? parsedFieldMeta.label.substring(0, 10) + '...'
+      parsedFieldMeta.label.length > 20
+        ? parsedFieldMeta.label.substring(0, 20) + '...'
         : parsedFieldMeta.label;
   }
 

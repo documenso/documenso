@@ -51,10 +51,10 @@ export const FieldIcon = ({ fieldMeta, type }: FieldIconProps) => {
     if (fieldMeta && (type === 'TEXT' || type === 'NUMBER')) {
       if (type === 'TEXT' && 'text' in fieldMeta && fieldMeta.text && !fieldMeta.label) {
         label =
-          fieldMeta.text.length > 10 ? fieldMeta.text.substring(0, 10) + '...' : fieldMeta.text;
+          fieldMeta.text.length > 20 ? fieldMeta.text.substring(0, 20) + '...' : fieldMeta.text;
       } else if (fieldMeta.label) {
         label =
-          fieldMeta.label.length > 10 ? fieldMeta.label.substring(0, 10) + '...' : fieldMeta.label;
+          fieldMeta.label.length > 20 ? fieldMeta.label.substring(0, 20) + '...' : fieldMeta.label;
       } else {
         label = fieldIcons[type]?.label;
       }
