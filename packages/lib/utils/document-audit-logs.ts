@@ -313,6 +313,10 @@ export const formatDocumentAuditLogAction = (
       anonymous: msg`Field unsigned`,
       identified: msg`${prefix} unsigned a field`,
     }))
+    .with({ type: DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_FIELD_PREFILLED }, () => ({
+      anonymous: msg`Field prefilled by assistant`,
+      identified: msg`${prefix} prefilled a field`,
+    }))
     .with({ type: DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_VISIBILITY_UPDATED }, () => ({
       anonymous: msg`Document visibility updated`,
       identified: msg`${prefix} updated the document visibility`,

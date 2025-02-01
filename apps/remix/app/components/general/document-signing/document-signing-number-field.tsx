@@ -3,7 +3,6 @@ import { useEffect, useState } from 'react';
 import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
 import { Trans } from '@lingui/react/macro';
-import type { Recipient } from '@prisma/client';
 import { Hash, Loader } from 'lucide-react';
 import { useRevalidator } from 'react-router';
 
@@ -26,6 +25,7 @@ import { useToast } from '@documenso/ui/primitives/use-toast';
 
 import { useRequiredDocumentSigningAuthContext } from './document-signing-auth-provider';
 import { DocumentSigningFieldContainer } from './document-signing-field-container';
+import { useDocumentSigningRecipientContext } from './document-signing-recipient-provider';
 
 type ValidationErrors = {
   isNumber: string[];
@@ -37,14 +37,12 @@ type ValidationErrors = {
 
 export type DocumentSigningNumberFieldProps = {
   field: FieldWithSignature;
-  recipient: Recipient;
   onSignField?: (value: TSignFieldWithTokenMutationSchema) => Promise<void> | void;
   onUnsignField?: (value: TRemovedSignedFieldWithTokenMutationSchema) => Promise<void> | void;
 };
 
 export const DocumentSigningNumberField = ({
   field,
-  recipient,
   onSignField,
   onUnsignField,
 }: DocumentSigningNumberFieldProps) => {
@@ -52,7 +50,9 @@ export const DocumentSigningNumberField = ({
   const { toast } = useToast();
   const { revalidate } = useRevalidator();
 
-  const [showRadioModal, setShowRadioModal] = useState(false);
+  const { recipient, targetSigner, isAssistantMode } = useDocumentSigningRecipientContext();
+
+  const [showNumberModal, setShowNumberModal] = useState(false);
 
   const safeFieldMeta = ZNumberFieldMeta.safeParse(field.fieldMeta);
   const parsedFieldMeta = safeFieldMeta.success ? safeFieldMeta.data : null;
@@ -107,7 +107,7 @@ export const DocumentSigningNumberField = ({
   };
 
   const onDialogSignClick = () => {
-    setShowRadioModal(false);
+    setShowNumberModal(false);
 
     void executeActionAuthProcedure({
       onReauthFormSubmit: async (authOptions) => await onSign(authOptions),
@@ -150,14 +150,20 @@ export const DocumentSigningNumberField = ({
 
       toast({
         title: _(msg`Error`),
-        description: _(msg`An error occurred while signing the document.`),
+        description: isAssistantMode
+          ? _(msg`An error occurred while signing as assistant.`)
+          : _(msg`An error occurred while signing the document.`),
         variant: 'destructive',
       });
     }
   };
 
   const onPreSign = () => {
-    setShowRadioModal(true);
+    if (isAssistantMode) {
+      return true;
+    }
+
+    setShowNumberModal(true);
 
     if (localNumber && parsedFieldMeta) {
       const validationErrors = validateNumberField(localNumber, parsedFieldMeta, true);
@@ -175,8 +181,14 @@ export const DocumentSigningNumberField = ({
 
   const onRemove = async () => {
     try {
+      if (isAssistantMode && !targetSigner) {
+        return;
+      }
+
+      const signingRecipient = isAssistantMode && targetSigner ? targetSigner : recipient;
+
       const payload: TRemovedSignedFieldWithTokenMutationSchema = {
-        token: recipient.token,
+        token: signingRecipient.token,
         fieldId: field.id,
       };
 
@@ -195,18 +207,18 @@ export const DocumentSigningNumberField = ({
 
       toast({
         title: _(msg`Error`),
-        description: _(msg`An error occurred while removing the signature.`),
+        description: _(msg`An error occurred while removing the field.`),
         variant: 'destructive',
       });
     }
   };
 
   useEffect(() => {
-    if (!showRadioModal) {
+    if (!showNumberModal) {
       setLocalNumber(parsedFieldMeta?.value ? String(parsedFieldMeta.value) : '0');
       setErrors(initialErrors);
     }
-  }, [showRadioModal]);
+  }, [showNumberModal]);
 
   useEffect(() => {
     if (
@@ -237,7 +249,7 @@ export const DocumentSigningNumberField = ({
       onPreSign={onPreSign}
       onSign={onSign}
       onRemove={onRemove}
-      type="Signature"
+      type="Number"
     >
       {isLoading && (
         <div className="bg-background absolute inset-0 flex items-center justify-center rounded-md">
@@ -280,7 +292,7 @@ export const DocumentSigningNumberField = ({
         </div>
       )}
 
-      <Dialog open={showRadioModal} onOpenChange={setShowRadioModal}>
+      <Dialog open={showNumberModal} onOpenChange={setShowNumberModal}>
         <DialogContent>
           <DialogTitle>
             {parsedFieldMeta?.label ? parsedFieldMeta?.label : <Trans>Number</Trans>}
@@ -336,7 +348,7 @@ export const DocumentSigningNumberField = ({
                 className="dark:bg-muted dark:hover:bg-muted/80 flex-1 bg-black/5 hover:bg-black/10"
                 variant="secondary"
                 onClick={() => {
-                  setShowRadioModal(false);
+                  setShowNumberModal(false);
                   setLocalNumber('');
                 }}
               >

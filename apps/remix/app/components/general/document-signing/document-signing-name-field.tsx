@@ -3,7 +3,6 @@ import { useState } from 'react';
 import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
 import { Trans } from '@lingui/react/macro';
-import { type Recipient } from '@prisma/client';
 import { Loader } from 'lucide-react';
 import { useRevalidator } from 'react-router';
 
@@ -27,17 +26,16 @@ import { useToast } from '@documenso/ui/primitives/use-toast';
 import { useRequiredDocumentSigningAuthContext } from './document-signing-auth-provider';
 import { DocumentSigningFieldContainer } from './document-signing-field-container';
 import { useRequiredDocumentSigningContext } from './document-signing-provider';
+import { useDocumentSigningRecipientContext } from './document-signing-recipient-provider';
 
 export type DocumentSigningNameFieldProps = {
   field: FieldWithSignature;
-  recipient: Recipient;
   onSignField?: (value: TSignFieldWithTokenMutationSchema) => Promise<void> | void;
   onUnsignField?: (value: TRemovedSignedFieldWithTokenMutationSchema) => Promise<void> | void;
 };
 
 export const DocumentSigningNameField = ({
   field,
-  recipient,
   onSignField,
   onUnsignField,
 }: DocumentSigningNameFieldProps) => {
@@ -47,6 +45,8 @@ export const DocumentSigningNameField = ({
 
   const { fullName: providedFullName, setFullName: setProvidedFullName } =
     useRequiredDocumentSigningContext();
+
+  const { recipient, isAssistantMode } = useDocumentSigningRecipientContext();
 
   const { executeActionAuthProcedure } = useRequiredDocumentSigningAuthContext();
 
@@ -67,7 +67,7 @@ export const DocumentSigningNameField = ({
   const [localFullName, setLocalFullName] = useState('');
 
   const onPreSign = () => {
-    if (!providedFullName) {
+    if (!providedFullName && !isAssistantMode) {
       setShowFullNameModal(true);
       return false;
     }
@@ -90,9 +90,9 @@ export const DocumentSigningNameField = ({
 
   const onSign = async (authOptions?: TRecipientActionAuth, name?: string) => {
     try {
-      const value = name || providedFullName;
+      const value = name || providedFullName || '';
 
-      if (!value) {
+      if (!value && !isAssistantMode) {
         setShowFullNameModal(true);
         return;
       }
@@ -124,7 +124,9 @@ export const DocumentSigningNameField = ({
 
       toast({
         title: _(msg`Error`),
-        description: _(msg`An error occurred while signing the document.`),
+        description: isAssistantMode
+          ? _(msg`An error occurred while signing as assistant.`)
+          : _(msg`An error occurred while signing the document.`),
         variant: 'destructive',
       });
     }
@@ -150,7 +152,7 @@ export const DocumentSigningNameField = ({
 
       toast({
         title: _(msg`Error`),
-        description: _(msg`An error occurred while removing the signature.`),
+        description: _(msg`An error occurred while removing the field.`),
         variant: 'destructive',
       });
     }

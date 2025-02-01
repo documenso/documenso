@@ -4,7 +4,7 @@ import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
 import { Trans } from '@lingui/react/macro';
 import type { Field, Recipient } from '@prisma/client';
-import { FieldType, RecipientRole } from '@prisma/client';
+import { FieldType, RecipientRole, SendStatus } from '@prisma/client';
 import {
   CalendarDays,
   CheckSquare,
@@ -428,6 +428,7 @@ export const AddTemplateFieldsFormPartial = ({
       VIEWER: [],
       SIGNER: [],
       APPROVER: [],
+      ASSISTANT: [],
     };
 
     recipients.forEach((recipient) => {
@@ -437,10 +438,25 @@ export const AddTemplateFieldsFormPartial = ({
     return recipientsByRole;
   }, [recipients]);
 
+  useEffect(() => {
+    const recipientsByRoleToDisplay = recipients.filter(
+      (recipient) =>
+        recipient.role !== RecipientRole.CC && recipient.role !== RecipientRole.ASSISTANT,
+    );
+
+    setSelectedSigner(
+      recipientsByRoleToDisplay.find((r) => r.sendStatus !== SendStatus.SENT) ??
+        recipientsByRoleToDisplay[0],
+    );
+  }, [recipients]);
+
   const recipientsByRoleToDisplay = useMemo(() => {
     // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
     return (Object.entries(recipientsByRole) as [RecipientRole, Recipient[]][]).filter(
-      ([role]) => role !== RecipientRole.CC && role !== RecipientRole.VIEWER,
+      ([role]) =>
+        role !== RecipientRole.CC &&
+        role !== RecipientRole.VIEWER &&
+        role !== RecipientRole.ASSISTANT,
     );
   }, [recipientsByRole]);
 

@@ -1,6 +1,7 @@
 import { Outlet, isRouteErrorResponse, useRouteError } from 'react-router';
 
 import { EmbedAuthenticationRequired } from '~/components/embed/embed-authentication-required';
+import { EmbedDocumentWaitingForTurn } from '~/components/embed/embed-document-waiting-for-turn';
 import { EmbedPaywall } from '~/components/embed/embed-paywall';
 
 import type { Route } from './+types/_layout';
@@ -35,6 +36,10 @@ export function ErrorBoundary() {
 
     if (error.status === 403 && error.data.type === 'embed-paywall') {
       return <EmbedPaywall />;
+    }
+
+    if (error.status === 403 && error.data.type === 'embed-waiting-for-turn') {
+      return <EmbedDocumentWaitingForTurn />;
     }
   }
 

@@ -1,7 +1,6 @@
 import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
 import { Trans } from '@lingui/react/macro';
-import type { Recipient } from '@prisma/client';
 import { Loader } from 'lucide-react';
 import { useRevalidator } from 'react-router';
 
@@ -24,10 +23,10 @@ import { cn } from '@documenso/ui/lib/utils';
 import { useToast } from '@documenso/ui/primitives/use-toast';
 
 import { DocumentSigningFieldContainer } from './document-signing-field-container';
+import { useDocumentSigningRecipientContext } from './document-signing-recipient-provider';
 
 export type DocumentSigningDateFieldProps = {
   field: FieldWithSignature;
-  recipient: Recipient;
   dateFormat?: string | null;
   timezone?: string | null;
   onSignField?: (value: TSignFieldWithTokenMutationSchema) => Promise<void> | void;
@@ -36,7 +35,6 @@ export type DocumentSigningDateFieldProps = {
 
 export const DocumentSigningDateField = ({
   field,
-  recipient,
   dateFormat = DEFAULT_DOCUMENT_DATE_FORMAT,
   timezone = DEFAULT_DOCUMENT_TIME_ZONE,
   onSignField,
@@ -45,6 +43,8 @@ export const DocumentSigningDateField = ({
   const { _ } = useLingui();
   const { toast } = useToast();
   const { revalidate } = useRevalidator();
+
+  const { recipient, isAssistantMode } = useDocumentSigningRecipientContext();
 
   const { mutateAsync: signFieldWithToken, isPending: isSignFieldWithTokenLoading } =
     trpc.field.signFieldWithToken.useMutation(DO_NOT_INVALIDATE_QUERY_ON_MUTATION);
@@ -60,9 +60,7 @@ export const DocumentSigningDateField = ({
   const parsedFieldMeta = safeFieldMeta.success ? safeFieldMeta.data : null;
 
   const localDateString = convertToLocalSystemFormat(field.customText, dateFormat, timezone);
-
   const isDifferentTime = field.inserted && localDateString !== field.customText;
-
   const tooltipText = _(
     msg`"${field.customText}" will appear on the document as it has a timezone of "${timezone || ''}".`,
   );
@@ -95,7 +93,9 @@ export const DocumentSigningDateField = ({
 
       toast({
         title: _(msg`Error`),
-        description: _(msg`An error occurred while signing the document.`),
+        description: isAssistantMode
+          ? _(msg`An error occurred while signing as assistant.`)
+          : _(msg`An error occurred while signing the document.`),
         variant: 'destructive',
       });
     }
@@ -121,7 +121,7 @@ export const DocumentSigningDateField = ({
 
       toast({
         title: _(msg`Error`),
-        description: _(msg`An error occurred while removing the signature.`),
+        description: _(msg`An error occurred while removing the field.`),
         variant: 'destructive',
       });
     }

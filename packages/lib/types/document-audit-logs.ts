@@ -27,6 +27,7 @@ export const ZDocumentAuditLogTypeSchema = z.enum([
   'DOCUMENT_DELETED', // When the document is soft deleted.
   'DOCUMENT_FIELD_INSERTED', // When a field is inserted (signed/approved/etc) by a recipient.
   'DOCUMENT_FIELD_UNINSERTED', // When a field is uninserted by a recipient.
+  'DOCUMENT_FIELD_PREFILLED', // When a field is prefilled by an assistant.
   'DOCUMENT_VISIBILITY_UPDATED', // When the document visibility scope is updated
   'DOCUMENT_GLOBAL_AUTH_ACCESS_UPDATED', // When the global access authentication is updated.
   'DOCUMENT_GLOBAL_AUTH_ACTION_UPDATED', // When the global action authentication is updated.
@@ -44,6 +45,7 @@ export const ZDocumentAuditLogEmailTypeSchema = z.enum([
   'SIGNING_REQUEST',
   'VIEW_REQUEST',
   'APPROVE_REQUEST',
+  'ASSISTING_REQUEST',
   'CC',
   'DOCUMENT_COMPLETED',
 ]);
@@ -312,6 +314,83 @@ export const ZDocumentAuditLogEventDocumentFieldUninsertedSchema = z.object({
   }),
 });
 
+/**
+ * Event: Document field prefilled by assistant.
+ */
+export const ZDocumentAuditLogEventDocumentFieldPrefilledSchema = z.object({
+  type: z.literal(DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_FIELD_PREFILLED),
+  data: ZBaseRecipientDataSchema.extend({
+    fieldId: z.string(),
+
+    // Organised into union to allow us to extend each field if required.
+    field: z.union([
+      z.object({
+        type: z.literal(FieldType.INITIALS),
+        data: z.string(),
+      }),
+      z.object({
+        type: z.literal(FieldType.EMAIL),
+        data: z.string(),
+      }),
+      z.object({
+        type: z.literal(FieldType.DATE),
+        data: z.string(),
+      }),
+      z.object({
+        type: z.literal(FieldType.NAME),
+        data: z.string(),
+      }),
+      z.object({
+        type: z.literal(FieldType.TEXT),
+        data: z.string(),
+      }),
+      z.object({
+        type: z.union([z.literal(FieldType.SIGNATURE), z.literal(FieldType.FREE_SIGNATURE)]),
+        data: z.string(),
+      }),
+      z.object({
+        type: z.literal(FieldType.RADIO),
+        data: z.string(),
+      }),
+      z.object({
+        type: z.literal(FieldType.CHECKBOX),
+        data: z.string(),
+      }),
+      z.object({
+        type: z.literal(FieldType.DROPDOWN),
+        data: z.string(),
+      }),
+      z.object({
+        type: z.literal(FieldType.NUMBER),
+        data: z.string(),
+      }),
+    ]),
+    fieldSecurity: z.preprocess(
+      (input) => {
+        const legacyNoneSecurityType = JSON.stringify({
+          type: 'NONE',
+        });
+
+        // Replace legacy 'NONE' field security type with undefined.
+        if (
+          typeof input === 'object' &&
+          input !== null &&
+          JSON.stringify(input) === legacyNoneSecurityType
+        ) {
+          return undefined;
+        }
+
+        return input;
+      },
+      z
+        .object({
+          type: ZRecipientActionAuthTypesSchema,
+        })
+        .optional(),
+    ),
+  }),
+});
+
 export const ZDocumentAuditLogEventDocumentVisibilitySchema = z.object({
   type: z.literal(DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_VISIBILITY_UPDATED),
   data: ZGenericFromToSchema,
@@ -492,6 +571,7 @@ export const ZDocumentAuditLogSchema = ZDocumentAuditLogBaseSchema.and(
     ZDocumentAuditLogEventDocumentMovedToTeamSchema,
     ZDocumentAuditLogEventDocumentFieldInsertedSchema,
     ZDocumentAuditLogEventDocumentFieldUninsertedSchema,
+    ZDocumentAuditLogEventDocumentFieldPrefilledSchema,
     ZDocumentAuditLogEventDocumentVisibilitySchema,
     ZDocumentAuditLogEventDocumentGlobalAuthAccessUpdatedSchema,
     ZDocumentAuditLogEventDocumentGlobalAuthActionUpdatedSchema,

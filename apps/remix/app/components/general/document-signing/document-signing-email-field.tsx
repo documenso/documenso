@@ -1,7 +1,6 @@
 import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
 import { Trans } from '@lingui/react/macro';
-import type { Recipient } from '@prisma/client';
 import { Loader } from 'lucide-react';
 import { useRevalidator } from 'react-router';
 
@@ -20,17 +19,16 @@ import { useToast } from '@documenso/ui/primitives/use-toast';
 
 import { DocumentSigningFieldContainer } from './document-signing-field-container';
 import { useRequiredDocumentSigningContext } from './document-signing-provider';
+import { useDocumentSigningRecipientContext } from './document-signing-recipient-provider';
 
 export type DocumentSigningEmailFieldProps = {
   field: FieldWithSignature;
-  recipient: Recipient;
   onSignField?: (value: TSignFieldWithTokenMutationSchema) => Promise<void> | void;
   onUnsignField?: (value: TRemovedSignedFieldWithTokenMutationSchema) => Promise<void> | void;
 };
 
 export const DocumentSigningEmailField = ({
   field,
-  recipient,
   onSignField,
   onUnsignField,
 }: DocumentSigningEmailFieldProps) => {
@@ -39,6 +37,8 @@ export const DocumentSigningEmailField = ({
   const { revalidate } = useRevalidator();
 
   const { email: providedEmail } = useRequiredDocumentSigningContext();
+
+  const { recipient, targetSigner, isAssistantMode } = useDocumentSigningRecipientContext();
 
   const { mutateAsync: signFieldWithToken, isPending: isSignFieldWithTokenLoading } =
     trpc.field.signFieldWithToken.useMutation(DO_NOT_INVALIDATE_QUERY_ON_MUTATION);
@@ -84,7 +84,9 @@ export const DocumentSigningEmailField = ({
 
       toast({
         title: _(msg`Error`),
-        description: _(msg`An error occurred while signing the document.`),
+        description: isAssistantMode
+          ? _(msg`An error occurred while signing as assistant.`)
+          : _(msg`An error occurred while signing the document.`),
         variant: 'destructive',
       });
     }
@@ -110,7 +112,7 @@ export const DocumentSigningEmailField = ({
 
       toast({
         title: _(msg`Error`),
-        description: _(msg`An error occurred while removing the signature.`),
+        description: _(msg`An error occurred while removing the field.`),
         variant: 'destructive',
       });
     }

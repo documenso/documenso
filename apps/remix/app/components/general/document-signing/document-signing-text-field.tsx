@@ -3,7 +3,6 @@ import { useEffect, useState } from 'react';
 import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
 import { Plural, Trans } from '@lingui/react/macro';
-import type { Recipient } from '@prisma/client';
 import { Loader, Type } from 'lucide-react';
 import { useRevalidator } from 'react-router';
 
@@ -26,17 +25,27 @@ import { useToast } from '@documenso/ui/primitives/use-toast';
 
 import { useRequiredDocumentSigningAuthContext } from './document-signing-auth-provider';
 import { DocumentSigningFieldContainer } from './document-signing-field-container';
+import { useDocumentSigningRecipientContext } from './document-signing-recipient-provider';
 
 export type DocumentSigningTextFieldProps = {
   field: FieldWithSignatureAndFieldMeta;
-  recipient: Recipient;
+  onSignField?: (value: TSignFieldWithTokenMutationSchema) => Promise<void> | void;
+  onUnsignField?: (value: TRemovedSignedFieldWithTokenMutationSchema) => Promise<void> | void;
+};
+
+type ValidationErrors = {
+  required: string[];
+  characterLimit: string[];
+};
+
+export type TextFieldProps = {
+  field: FieldWithSignatureAndFieldMeta;
   onSignField?: (value: TSignFieldWithTokenMutationSchema) => Promise<void> | void;
   onUnsignField?: (value: TRemovedSignedFieldWithTokenMutationSchema) => Promise<void> | void;
 };
 
 export const DocumentSigningTextField = ({
   field,
-  recipient,
   onSignField,
   onUnsignField,
 }: DocumentSigningTextFieldProps) => {
@@ -44,11 +53,12 @@ export const DocumentSigningTextField = ({
   const { toast } = useToast();
   const { revalidate } = useRevalidator();
 
-  const initialErrors: Record<string, string[]> = {
+  const { recipient, isAssistantMode } = useDocumentSigningRecipientContext();
+
+  const initialErrors: ValidationErrors = {
     required: [],
     characterLimit: [],
   };
-
   const [errors, setErrors] = useState(initialErrors);
   const userInputHasErrors = Object.values(errors).some((error) => error.length > 0);
 
@@ -166,7 +176,9 @@ export const DocumentSigningTextField = ({
 
       toast({
         title: _(msg`Error`),
-        description: _(msg`An error occurred while signing the document.`),
+        description: isAssistantMode
+          ? _(msg`An error occurred while signing as assistant.`)
+          : _(msg`An error occurred while signing the document.`),
         variant: 'destructive',
       });
     }
@@ -194,7 +206,7 @@ export const DocumentSigningTextField = ({
 
       toast({
         title: _(msg`Error`),
-        description: _(msg`An error occurred while removing the text.`),
+        description: _(msg`An error occurred while removing the field.`),
         variant: 'destructive',
       });
     }
@@ -234,7 +246,7 @@ export const DocumentSigningTextField = ({
       onPreSign={onPreSign}
       onSign={onSign}
       onRemove={onRemove}
-      type="Signature"
+      type="Text"
     >
       {isLoading && (
         <div className="bg-background absolute inset-0 flex items-center justify-center rounded-md">

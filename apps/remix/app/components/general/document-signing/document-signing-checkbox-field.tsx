@@ -2,7 +2,6 @@ import { useEffect, useMemo, useState } from 'react';
 
 import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
-import type { Recipient } from '@prisma/client';
 import { Loader } from 'lucide-react';
 import { useRevalidator } from 'react-router';
 
@@ -25,23 +24,24 @@ import { useToast } from '@documenso/ui/primitives/use-toast';
 
 import { useRequiredDocumentSigningAuthContext } from './document-signing-auth-provider';
 import { DocumentSigningFieldContainer } from './document-signing-field-container';
+import { useDocumentSigningRecipientContext } from './document-signing-recipient-provider';
 
 export type DocumentSigningCheckboxFieldProps = {
   field: FieldWithSignatureAndFieldMeta;
-  recipient: Recipient;
   onSignField?: (value: TSignFieldWithTokenMutationSchema) => Promise<void> | void;
   onUnsignField?: (value: TRemovedSignedFieldWithTokenMutationSchema) => Promise<void> | void;
 };
 
 export const DocumentSigningCheckboxField = ({
   field,
-  recipient,
   onSignField,
   onUnsignField,
 }: DocumentSigningCheckboxFieldProps) => {
   const { _ } = useLingui();
   const { toast } = useToast();
   const { revalidate } = useRevalidator();
+
+  const { recipient, isAssistantMode } = useDocumentSigningRecipientContext();
 
   const { executeActionAuthProcedure } = useRequiredDocumentSigningAuthContext();
 
@@ -118,7 +118,9 @@ export const DocumentSigningCheckboxField = ({
 
       toast({
         title: _(msg`Error`),
-        description: _(msg`An error occurred while signing the document.`),
+        description: isAssistantMode
+          ? _(msg`An error occurred while signing as assistant.`)
+          : _(msg`An error occurred while signing the document.`),
         variant: 'destructive',
       });
     }
@@ -147,7 +149,7 @@ export const DocumentSigningCheckboxField = ({
 
       toast({
         title: _(msg`Error`),
-        description: _(msg`An error occurred while removing the signature.`),
+        description: _(msg`An error occurred while removing the field.`),
         variant: 'destructive',
       });
     }

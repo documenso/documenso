@@ -51,6 +51,8 @@ import { DocumentSigningRadioField } from '~/components/general/document-signing
 import { DocumentSigningSignatureField } from '~/components/general/document-signing/document-signing-signature-field';
 import { DocumentSigningTextField } from '~/components/general/document-signing/document-signing-text-field';
 
+import { DocumentSigningRecipientProvider } from '../document-signing/document-signing-recipient-provider';
+
 export type DirectTemplateSigningFormProps = {
   flowStep: DocumentFlowStep;
   directRecipient: Recipient;
@@ -169,7 +171,7 @@ export const DirectTemplateSigningForm = ({
   };
 
   return (
-    <>
+    <DocumentSigningRecipientProvider recipient={directRecipient}>
       <DocumentFlowFormContainerHeader title={flowStep.title} description={flowStep.description} />
 
       <DocumentFlowFormContainerContent>
@@ -186,7 +188,6 @@ export const DirectTemplateSigningForm = ({
                 <DocumentSigningSignatureField
                   key={field.id}
                   field={field}
-                  recipient={directRecipient}
                   onSignField={onSignField}
                   onUnsignField={onUnsignField}
                 />
@@ -195,7 +196,6 @@ export const DirectTemplateSigningForm = ({
                 <DocumentSigningInitialsField
                   key={field.id}
                   field={field}
-                  recipient={directRecipient}
                   onSignField={onSignField}
                   onUnsignField={onUnsignField}
                 />
@@ -204,7 +204,6 @@ export const DirectTemplateSigningForm = ({
                 <DocumentSigningNameField
                   key={field.id}
                   field={field}
-                  recipient={directRecipient}
                   onSignField={onSignField}
                   onUnsignField={onUnsignField}
                 />
@@ -213,7 +212,6 @@ export const DirectTemplateSigningForm = ({
                 <DocumentSigningDateField
                   key={field.id}
                   field={field}
-                  recipient={directRecipient}
                   dateFormat={template.templateMeta?.dateFormat ?? DEFAULT_DOCUMENT_DATE_FORMAT}
                   timezone={template.templateMeta?.timezone ?? DEFAULT_DOCUMENT_TIME_ZONE}
                   onSignField={onSignField}
@@ -224,7 +222,6 @@ export const DirectTemplateSigningForm = ({
                 <DocumentSigningEmailField
                   key={field.id}
                   field={field}
-                  recipient={directRecipient}
                   onSignField={onSignField}
                   onUnsignField={onUnsignField}
                 />
@@ -241,7 +238,6 @@ export const DirectTemplateSigningForm = ({
                       ...field,
                       fieldMeta: parsedFieldMeta,
                     }}
-                    recipient={directRecipient}
                     onSignField={onSignField}
                     onUnsignField={onUnsignField}
                   />
@@ -259,7 +255,6 @@ export const DirectTemplateSigningForm = ({
                       ...field,
                       fieldMeta: parsedFieldMeta,
                     }}
-                    recipient={directRecipient}
                     onSignField={onSignField}
                     onUnsignField={onUnsignField}
                   />
@@ -277,7 +272,6 @@ export const DirectTemplateSigningForm = ({
                       ...field,
                       fieldMeta: parsedFieldMeta,
                     }}
-                    recipient={directRecipient}
                     onSignField={onSignField}
                     onUnsignField={onUnsignField}
                   />
@@ -295,7 +289,6 @@ export const DirectTemplateSigningForm = ({
                       ...field,
                       fieldMeta: parsedFieldMeta,
                     }}
-                    recipient={directRecipient}
                     onSignField={onSignField}
                     onUnsignField={onUnsignField}
                   />
@@ -313,7 +306,6 @@ export const DirectTemplateSigningForm = ({
                       ...field,
                       fieldMeta: parsedFieldMeta,
                     }}
-                    recipient={directRecipient}
                     onSignField={onSignField}
                     onUnsignField={onUnsignField}
                   />
@@ -383,6 +375,6 @@ export const DirectTemplateSigningForm = ({
           />
         </div>
       </DocumentFlowFormContainerFooter>
-    </>
+    </DocumentSigningRecipientProvider>
   );
 };

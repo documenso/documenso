@@ -3,7 +3,6 @@ import { useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
 import { Trans } from '@lingui/react/macro';
-import { type Recipient } from '@prisma/client';
 import { Loader } from 'lucide-react';
 import { useRevalidator } from 'react-router';
 
@@ -27,11 +26,11 @@ import { DocumentSigningDisclosure } from '~/components/general/document-signing
 import { useRequiredDocumentSigningAuthContext } from './document-signing-auth-provider';
 import { DocumentSigningFieldContainer } from './document-signing-field-container';
 import { useRequiredDocumentSigningContext } from './document-signing-provider';
+import { useDocumentSigningRecipientContext } from './document-signing-recipient-provider';
 
 type SignatureFieldState = 'empty' | 'signed-image' | 'signed-text';
 export type DocumentSigningSignatureFieldProps = {
   field: FieldWithSignature;
-  recipient: Recipient;
   onSignField?: (value: TSignFieldWithTokenMutationSchema) => Promise<void> | void;
   onUnsignField?: (value: TRemovedSignedFieldWithTokenMutationSchema) => Promise<void> | void;
   typedSignatureEnabled?: boolean;
@@ -39,7 +38,6 @@ export type DocumentSigningSignatureFieldProps = {
 
 export const DocumentSigningSignatureField = ({
   field,
-  recipient,
   onSignField,
   onUnsignField,
   typedSignatureEnabled,
@@ -47,6 +45,8 @@ export const DocumentSigningSignatureField = ({
   const { _ } = useLingui();
   const { toast } = useToast();
   const { revalidate } = useRevalidator();
+
+  const { recipient } = useDocumentSigningRecipientContext();
 
   const signatureRef = useRef<HTMLParagraphElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);

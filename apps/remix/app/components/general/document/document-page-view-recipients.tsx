@@ -11,6 +11,7 @@ import {
   MailOpenIcon,
   PenIcon,
   PlusIcon,
+  UserIcon,
 } from 'lucide-react';
 import { Link } from 'react-router';
 import { match } from 'ts-pattern';
@@ -116,6 +117,12 @@ export const DocumentPageViewRecipients = ({
                         <>
                           <MailOpenIcon className="mr-1 h-3 w-3" />
                           <Trans>Viewed</Trans>
+                        </>
+                      ))
+                      .with(RecipientRole.ASSISTANT, () => (
+                        <>
+                          <UserIcon className="mr-1 h-3 w-3" />
+                          <Trans>Assisted</Trans>
                         </>
                       ))
                       .exhaustive()}

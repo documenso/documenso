@@ -44,6 +44,7 @@ export type DocumentSigningFieldContainerProps = {
     | 'Email'
     | 'Name'
     | 'Signature'
+    | 'Text'
     | 'Radio'
     | 'Dropdown'
     | 'Number'

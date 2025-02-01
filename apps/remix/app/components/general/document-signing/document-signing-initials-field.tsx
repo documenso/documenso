@@ -1,7 +1,6 @@
 import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
 import { Trans } from '@lingui/react/macro';
-import type { Recipient } from '@prisma/client';
 import { Loader } from 'lucide-react';
 import { useRevalidator } from 'react-router';
 
@@ -19,17 +18,16 @@ import { useToast } from '@documenso/ui/primitives/use-toast';
 
 import { DocumentSigningFieldContainer } from './document-signing-field-container';
 import { useRequiredDocumentSigningContext } from './document-signing-provider';
+import { useDocumentSigningRecipientContext } from './document-signing-recipient-provider';
 
 export type DocumentSigningInitialsFieldProps = {
   field: FieldWithSignature;
-  recipient: Recipient;
   onSignField?: (value: TSignFieldWithTokenMutationSchema) => Promise<void> | void;
   onUnsignField?: (value: TRemovedSignedFieldWithTokenMutationSchema) => Promise<void> | void;
 };
 
 export const DocumentSigningInitialsField = ({
   field,
-  recipient,
   onSignField,
   onUnsignField,
 }: DocumentSigningInitialsFieldProps) => {
@@ -38,6 +36,8 @@ export const DocumentSigningInitialsField = ({
   const { revalidate } = useRevalidator();
 
   const { fullName } = useRequiredDocumentSigningContext();
+  const { recipient, isAssistantMode } = useDocumentSigningRecipientContext();
+
   const initials = extractInitials(fullName);
 
   const { mutateAsync: signFieldWithToken, isPending: isSignFieldWithTokenLoading } =
@@ -81,7 +81,9 @@ export const DocumentSigningInitialsField = ({
 
       toast({
         title: _(msg`Error`),
-        description: _(msg`An error occurred while signing the document.`),
+        description: isAssistantMode
+          ? _(msg`An error occurred while signing as assistant.`)
+          : _(msg`An error occurred while signing the document.`),
         variant: 'destructive',
       });
     }

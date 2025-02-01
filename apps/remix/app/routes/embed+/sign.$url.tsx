@@ -1,4 +1,4 @@
-import { DocumentStatus } from '@prisma/client';
+import { DocumentStatus, RecipientRole } from '@prisma/client';
 import { data } from 'react-router';
 import { getLoaderSession } from 'server/utils/get-loader-session';
 import { match } from 'ts-pattern';
@@ -8,7 +8,9 @@ import { isDocumentPlatform } from '@documenso/ee/server-only/util/is-document-p
 import { IS_BILLING_ENABLED } from '@documenso/lib/constants/app';
 import { getDocumentAndSenderByToken } from '@documenso/lib/server-only/document/get-document-by-token';
 import { getFieldsForToken } from '@documenso/lib/server-only/field/get-fields-for-token';
+import { getIsRecipientsTurnToSign } from '@documenso/lib/server-only/recipient/get-is-recipient-turn';
 import { getRecipientByToken } from '@documenso/lib/server-only/recipient/get-recipient-by-token';
+import { getRecipientsForAssistant } from '@documenso/lib/server-only/recipient/get-recipients-for-assistant';
 import { getTeamById } from '@documenso/lib/server-only/team/get-team';
 import { DocumentAccessAuth } from '@documenso/lib/types/document-auth';
 import { extractDocumentAuthMethods } from '@documenso/lib/utils/document-auth';
@@ -89,6 +91,26 @@ export async function loader({ params }: Route.LoaderArgs) {
     );
   }
 
+  const isRecipientsTurnToSign = await getIsRecipientsTurnToSign({ token });
+
+  if (!isRecipientsTurnToSign) {
+    throw data(
+      {
+        type: 'embed-waiting-for-turn',
+      },
+      {
+        status: 403,
+      },
+    );
+  }
+
+  const allRecipients =
+    recipient.role === RecipientRole.ASSISTANT
+      ? await getRecipientsForAssistant({
+          token,
+        })
+      : [];
+
   const team = document.teamId
     ? await getTeamById({ teamId: document.teamId, userId: document.userId }).catch(() => null)
     : null;
@@ -99,6 +121,7 @@ export async function loader({ params }: Route.LoaderArgs) {
     token,
     user,
     document,
+    allRecipients,
     recipient,
     fields,
     hidePoweredBy,
@@ -112,6 +135,7 @@ export default function EmbedSignDocumentPage() {
     token,
     user,
     document,
+    allRecipients,
     recipient,
     fields,
     hidePoweredBy,
@@ -140,6 +164,7 @@ export default function EmbedSignDocumentPage() {
           isCompleted={document.status === DocumentStatus.COMPLETED}
           hidePoweredBy={isPlatformDocument || isEnterpriseDocument || hidePoweredBy}
           isPlatformOrEnterprise={isPlatformDocument || isEnterpriseDocument}
+          allRecipients={allRecipients}
         />
       </DocumentSigningAuthProvider>
     </DocumentSigningProvider>

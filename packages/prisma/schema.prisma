@@ -425,6 +425,7 @@ enum RecipientRole {
   SIGNER
   VIEWER
   APPROVER
+  ASSISTANT
 }
 
 /// @zod.import(["import { ZRecipientAuthOptionsSchema } from '@documenso/lib/types/document-auth';"])

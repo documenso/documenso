@@ -84,6 +84,9 @@ export const TemplateDocumentInvite = ({
             .with(RecipientRole.VIEWER, () => <Trans>Continue by viewing the document.</Trans>)
             .with(RecipientRole.APPROVER, () => <Trans>Continue by approving the document.</Trans>)
             .with(RecipientRole.CC, () => '')
+            .with(RecipientRole.ASSISTANT, () => (
+              <Trans>Continue by assisting with the document.</Trans>
+            ))
             .exhaustive()}
         </Text>
 
@@ -104,6 +107,7 @@ export const TemplateDocumentInvite = ({
               .with(RecipientRole.VIEWER, () => <Trans>View Document</Trans>)
               .with(RecipientRole.APPROVER, () => <Trans>Approve Document</Trans>)
               .with(RecipientRole.CC, () => '')
+              .with(RecipientRole.ASSISTANT, () => <Trans>Assist Document</Trans>)
               .exhaustive()}
           </Button>
         </Section>

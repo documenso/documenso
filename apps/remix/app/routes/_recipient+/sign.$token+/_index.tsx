@@ -1,5 +1,5 @@
 import { Trans } from '@lingui/react/macro';
-import { DocumentStatus, SigningStatus } from '@prisma/client';
+import { DocumentStatus, RecipientRole, SigningStatus } from '@prisma/client';
 import { Clock8 } from 'lucide-react';
 import { Link, redirect } from 'react-router';
 import { getOptionalLoaderContext } from 'server/utils/get-loader-session';
@@ -14,6 +14,7 @@ import { getFieldsForToken } from '@documenso/lib/server-only/field/get-fields-f
 import { getIsRecipientsTurnToSign } from '@documenso/lib/server-only/recipient/get-is-recipient-turn';
 import { getRecipientByToken } from '@documenso/lib/server-only/recipient/get-recipient-by-token';
 import { getRecipientSignatures } from '@documenso/lib/server-only/recipient/get-recipient-signatures';
+import { getRecipientsForAssistant } from '@documenso/lib/server-only/recipient/get-recipients-for-assistant';
 import { getUserByEmail } from '@documenso/lib/server-only/user/get-user-by-email';
 import { extractDocumentAuthMethods } from '@documenso/lib/utils/document-auth';
 import { SigningCard3D } from '@documenso/ui/components/signing-card';
@@ -37,14 +38,14 @@ export async function loader({ params }: Route.LoaderArgs) {
 
   const user = session?.user;
 
-  const [document, fields, recipient, completedFields] = await Promise.all([
+  const [document, recipient, fields, completedFields] = await Promise.all([
     getDocumentAndSenderByToken({
       token,
       userId: user?.id,
       requireAccessAuth: false,
     }).catch(() => null),
-    getFieldsForToken({ token }),
     getRecipientByToken({ token }).catch(() => null),
+    getFieldsForToken({ token }),
     getCompletedFieldsForToken({ token }),
   ]);
 
@@ -57,11 +58,20 @@ export async function loader({ params }: Route.LoaderArgs) {
     throw new Response('Not Found', { status: 404 });
   }
 
+  const recipientWithFields = { ...recipient, fields };
+
   const isRecipientsTurn = await getIsRecipientsTurnToSign({ token });
 
   if (!isRecipientsTurn) {
     throw redirect(`/sign/${token}/waiting`);
   }
+
+  const allRecipients =
+    recipient.role === RecipientRole.ASSISTANT
+      ? await getRecipientsForAssistant({
+          token,
+        })
+      : [];
 
   const { derivedRecipientAccessAuth } = extractDocumentAuthMethods({
     documentAuth: document.authOptions,
@@ -133,6 +143,8 @@ export async function loader({ params }: Route.LoaderArgs) {
     document,
     fields,
     recipient,
+    recipientWithFields,
+    allRecipients,
     completedFields,
     recipientSignature,
     isRecipientsTurn,
@@ -153,8 +165,16 @@ export default function SigningPage() {
     );
   }
 
-  const { document, fields, recipient, completedFields, recipientSignature, isRecipientsTurn } =
-    data;
+  const {
+    document,
+    fields,
+    recipient,
+    completedFields,
+    recipientSignature,
+    isRecipientsTurn,
+    allRecipients,
+    recipientWithFields,
+  } = data;
 
   if (document.deletedAt) {
     return (
@@ -218,11 +238,12 @@ export default function SigningPage() {
         user={user}
       >
         <DocumentSigningPageView
-          recipient={recipient}
+          recipient={recipientWithFields}
           document={document}
           fields={fields}
           completedFields={completedFields}
           isRecipientsTurn={isRecipientsTurn}
+          allRecipients={allRecipients}
         />
       </DocumentSigningAuthProvider>
     </DocumentSigningProvider>

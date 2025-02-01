@@ -2,7 +2,6 @@ import { useEffect, useState } from 'react';
 
 import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
-import type { Recipient } from '@prisma/client';
 import { Loader } from 'lucide-react';
 import { useRevalidator } from 'react-router';
 
@@ -22,23 +21,24 @@ import { useToast } from '@documenso/ui/primitives/use-toast';
 
 import { useRequiredDocumentSigningAuthContext } from './document-signing-auth-provider';
 import { DocumentSigningFieldContainer } from './document-signing-field-container';
+import { useDocumentSigningRecipientContext } from './document-signing-recipient-provider';
 
 export type DocumentSigningRadioFieldProps = {
   field: FieldWithSignatureAndFieldMeta;
-  recipient: Recipient;
   onSignField?: (value: TSignFieldWithTokenMutationSchema) => Promise<void> | void;
   onUnsignField?: (value: TRemovedSignedFieldWithTokenMutationSchema) => Promise<void> | void;
 };
 
 export const DocumentSigningRadioField = ({
   field,
-  recipient,
   onSignField,
   onUnsignField,
 }: DocumentSigningRadioFieldProps) => {
   const { _ } = useLingui();
   const { toast } = useToast();
   const { revalidate } = useRevalidator();
+
+  const { recipient, targetSigner, isAssistantMode } = useDocumentSigningRecipientContext();
 
   const parsedFieldMeta = ZRadioFieldMeta.parse(field.fieldMeta);
   const values = parsedFieldMeta.values?.map((item) => ({
@@ -68,16 +68,26 @@ export const DocumentSigningRadioField = ({
 
   const onSign = async (authOptions?: TRecipientActionAuth) => {
     try {
+      if (isAssistantMode && !targetSigner) {
+        return;
+      }
+
       if (!selectedOption) {
         return;
       }
 
+      const signingRecipient = isAssistantMode && targetSigner ? targetSigner : recipient;
+
       const payload: TSignFieldWithTokenMutationSchema = {
-        token: recipient.token,
+        token: signingRecipient.token,
         fieldId: field.id,
         value: selectedOption,
         isBase64: true,
         authOptions,
+        ...(isAssistantMode && {
+          isAssistantPrefill: true,
+          assistantId: recipient.id,
+        }),
       };
 
       if (onSignField) {
@@ -100,7 +110,9 @@ export const DocumentSigningRadioField = ({
 
       toast({
         title: _(msg`Error`),
-        description: _(msg`An error occurred while signing the document.`),
+        description: isAssistantMode
+          ? _(msg`An error occurred while signing as assistant.`)
+          : _(msg`An error occurred while signing the document.`),
         variant: 'destructive',
       });
     }
@@ -127,7 +139,7 @@ export const DocumentSigningRadioField = ({
 
       toast({
         title: _(msg`Error`),
-        description: _(msg`An error occurred while removing the signature.`),
+        description: _(msg`An error occurred while removing the selection.`),
         variant: 'destructive',
       });
     }
