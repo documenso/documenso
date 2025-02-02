@@ -12,7 +12,7 @@ export type EmbedDocumentCompletedPageProps = {
 export const EmbedDocumentCompleted = ({ name, signature }: EmbedDocumentCompletedPageProps) => {
   console.log({ signature });
   return (
-    <div className="relative mx-auto flex min-h-[100dvh] max-w-screen-lg flex-col items-center justify-center p-6">
+    <div className="embed--DocumentCompleted relative mx-auto flex min-h-[100dvh] max-w-screen-lg flex-col items-center justify-center p-6">
       <h3 className="text-foreground text-2xl font-semibold">
         <Trans>Document Completed!</Trans>
       </h3>

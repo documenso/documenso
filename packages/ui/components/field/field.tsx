@@ -29,7 +29,8 @@ const getCardClassNames = (
   checkBoxOrRadio: boolean,
   cardClassName?: string,
 ) => {
-  const baseClasses = 'field-card-container relative z-20 h-full w-full transition-all';
+  const baseClasses =
+    'field--FieldRootContainer field-card-container relative z-20 h-full w-full transition-all';
 
   const insertedClasses =
     'bg-primary/20 border-primary ring-primary/20 ring-offset-primary/20 ring-2 ring-offset-2 dark:shadow-none';
@@ -139,6 +140,7 @@ export function FieldRootContainer({ field, children, cardClassName }: FieldCont
       <Card
         id={`field-${field.id}`}
         ref={ref}
+        data-field-type={field.type}
         data-inserted={field.inserted ? 'true' : 'false'}
         className={cardClassNames}
       >

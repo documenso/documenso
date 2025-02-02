@@ -225,12 +225,12 @@ export const EmbedSignDocumentClientPage = ({
 
   return (
     <DocumentSigningRecipientProvider recipient={recipient} targetSigner={selectedSigner ?? null}>
-      <div className="relative mx-auto flex min-h-[100dvh] max-w-screen-lg flex-col items-center justify-center p-6">
+      <div className="embed--Root relative mx-auto flex min-h-[100dvh] max-w-screen-lg flex-col items-center justify-center p-6">
         {(!hasFinishedInit || !hasDocumentLoaded) && <EmbedClientLoading />}
 
-        <div className="relative flex w-full flex-col gap-x-6 gap-y-12 md:flex-row">
+        <div className="embed--DocumentContainer relative flex w-full flex-col gap-x-6 gap-y-12 md:flex-row">
           {/* Viewer */}
-          <div className="flex-1">
+          <div className="embed--DocumentViewer flex-1">
             <LazyPDFViewer
               documentData={documentData}
               onDocumentLoad={() => setHasDocumentLoaded(true)}
@@ -240,12 +240,12 @@ export const EmbedSignDocumentClientPage = ({
           {/* Widget */}
           <div
             key={isExpanded ? 'expanded' : 'collapsed'}
-            className="group/document-widget fixed bottom-8 left-0 z-50 h-fit w-full flex-shrink-0 px-6 md:sticky md:top-4 md:z-auto md:w-[350px] md:px-0"
+            className="embed--DocumentWidgetContainer group/document-widget fixed bottom-8 left-0 z-50 h-fit w-full flex-shrink-0 px-6 md:sticky md:top-4 md:z-auto md:w-[350px] md:px-0"
             data-expanded={isExpanded || undefined}
           >
-            <div className="border-border bg-widget flex w-full flex-col rounded-xl border px-4 py-4 md:py-6">
+            <div className="embed--DocumentWidget border-border bg-widget flex w-full flex-col rounded-xl border px-4 py-4 md:py-6">
               {/* Header */}
-              <div>
+              <div className="embed--DocumentWidgetHeader">
                 <div className="flex items-center justify-between gap-x-2">
                   <h3 className="text-foreground text-xl font-semibold md:text-2xl">
                     {isAssistantMode ? (
@@ -271,7 +271,7 @@ export const EmbedSignDocumentClientPage = ({
                 </div>
               </div>
 
-              <div className="hidden group-data-[expanded]/document-widget:block md:block">
+              <div className="embed--DocumentWidgetContent hidden group-data-[expanded]/document-widget:block md:block">
                 <p className="text-muted-foreground mt-2 text-sm">
                   {isAssistantMode ? (
                     <Trans>Help complete the document for other signers.</Trans>
@@ -284,7 +284,7 @@ export const EmbedSignDocumentClientPage = ({
               </div>
 
               {/* Form */}
-              <div className="-mx-2 hidden px-2 group-data-[expanded]/document-widget:block md:block">
+              <div className="embed--DocumentWidgetForm -mx-2 hidden px-2 group-data-[expanded]/document-widget:block md:block">
                 <div className="flex flex-1 flex-col gap-y-4">
                   {isAssistantMode && (
                     <div>
@@ -412,7 +412,7 @@ export const EmbedSignDocumentClientPage = ({
 
               <div className="hidden flex-1 group-data-[expanded]/document-widget:block md:block" />
 
-              <div className="mt-4 hidden w-full grid-cols-2 items-center group-data-[expanded]/document-widget:grid md:grid">
+              <div className="embed--DocumentWidgetFooter mt-4 hidden w-full grid-cols-2 items-center group-data-[expanded]/document-widget:grid md:grid">
                 {pendingFields.length > 0 ? (
                   <Button className="col-start-2" onClick={() => onNextFieldClick()}>
                     <Trans>Next</Trans>

@@ -24,7 +24,7 @@ export const EmbedDocumentWaitingForTurn = () => {
   }
 
   return (
-    <div className="relative mx-auto flex min-h-[100dvh] max-w-screen-lg flex-col items-center justify-center p-6">
+    <div className="embed--WaitingForTurn relative mx-auto flex min-h-[100dvh] max-w-screen-lg flex-col items-center justify-center p-6">
       <h3 className="text-foreground text-center text-2xl font-bold">
         <Trans>Waiting for Your Turn</Trans>
       </h3>
