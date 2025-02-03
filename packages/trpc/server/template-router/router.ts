@@ -243,7 +243,7 @@ export const templateRouter = router({
         recipients,
         customDocumentDataId,
         requestMetadata: ctx.metadata,
-        prefillFields: prefillFields?.map(({ id, fieldMeta }) => ({ id, fieldMeta })),
+        prefillFields,
       });
 
       if (distributeDocument) {

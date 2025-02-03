@@ -11,7 +11,7 @@ import {
   ZRecipientActionAuthTypesSchema,
 } from '@documenso/lib/types/document-auth';
 import { ZDocumentEmailSettingsSchema } from '@documenso/lib/types/document-email';
-import { ZFieldMetaSchema } from '@documenso/lib/types/field-meta';
+import { ZFieldMetaNotOptionalSchema, ZFieldMetaSchema } from '@documenso/lib/types/field-meta';
 import {
   DocumentDataType,
   DocumentDistributionMethod,
@@ -233,7 +233,7 @@ export const ZCreateDocumentFromTemplateMutationSchema = z.object({
     .array(
       z.object({
         id: z.number().describe('The ID of the field in the template.'),
-        fieldMeta: ZFieldMetaSchema,
+        fieldMeta: ZFieldMetaNotOptionalSchema,
       }),
     )
     .optional(),
@@ -311,7 +311,7 @@ export const ZGenerateDocumentFromTemplateMutationSchema = z.object({
     .array(
       z.object({
         id: z.number().describe('The ID of the field in the template.'),
-        fieldMeta: ZFieldMetaSchema,
+        fieldMeta: ZFieldMetaNotOptionalSchema,
       }),
     )
     .optional(),
