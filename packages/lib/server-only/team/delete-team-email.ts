@@ -4,7 +4,7 @@ import { msg } from '@lingui/macro';
 
 import { mailer } from '@documenso/email/mailer';
 import { TeamEmailRemovedTemplate } from '@documenso/email/templates/team-email-removed';
-import { WEBAPP_BASE_URL } from '@documenso/lib/constants/app';
+import { NEXT_PUBLIC_WEBAPP_URL } from '@documenso/lib/constants/app';
 import { FROM_ADDRESS, FROM_NAME } from '@documenso/lib/constants/email';
 import { TEAM_MEMBER_ROLE_PERMISSIONS_MAP } from '@documenso/lib/constants/teams';
 import { prisma } from '@documenso/prisma';
@@ -74,7 +74,7 @@ export const deleteTeamEmail = async ({ userId, userEmail, teamId }: DeleteTeamE
 
     const template = createElement(TeamEmailRemovedTemplate, {
       assetBaseUrl,
-      baseUrl: WEBAPP_BASE_URL,
+      baseUrl: NEXT_PUBLIC_WEBAPP_URL(),
       teamEmail: team.teamEmail?.email ?? '',
       teamName: team.name,
       teamUrl: team.url,

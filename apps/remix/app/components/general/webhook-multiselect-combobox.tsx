@@ -16,7 +16,7 @@ import {
 } from '@documenso/ui/primitives/command';
 import { Popover, PopoverContent, PopoverTrigger } from '@documenso/ui/primitives/popover';
 
-import { truncateTitle } from '~/helpers/truncate-title';
+import { truncateTitle } from '~/utils/truncate-title';
 
 type WebhookMultiSelectComboboxProps = {
   listValues: string[];

@@ -7,7 +7,7 @@ import { z } from 'zod';
 
 import { mailer } from '@documenso/email/mailer';
 import { ConfirmTeamEmailTemplate } from '@documenso/email/templates/confirm-team-email';
-import { WEBAPP_BASE_URL } from '@documenso/lib/constants/app';
+import { NEXT_PUBLIC_WEBAPP_URL } from '@documenso/lib/constants/app';
 import { FROM_ADDRESS, FROM_NAME } from '@documenso/lib/constants/email';
 import { TEAM_MEMBER_ROLE_PERMISSIONS_MAP } from '@documenso/lib/constants/teams';
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
@@ -127,7 +127,7 @@ export const sendTeamEmailVerificationEmail = async (
 
   const template = createElement(ConfirmTeamEmailTemplate, {
     assetBaseUrl,
-    baseUrl: WEBAPP_BASE_URL,
+    baseUrl: NEXT_PUBLIC_WEBAPP_URL(),
     teamName: team.name,
     teamUrl: team.url,
     token,

@@ -15,8 +15,8 @@ import { TeamDeleteDialog } from '~/components/dialogs/team-delete-dialog';
 import { TeamEmailAddDialog } from '~/components/dialogs/team-email-add-dialog';
 import { TeamTransferDialog } from '~/components/dialogs/team-transfer-dialog';
 import { AvatarImageForm } from '~/components/forms/avatar-image';
-import { TeamEmailDropdown } from '~/components/pages/teams/team-email-dropdown';
-import { TeamTransferStatus } from '~/components/pages/teams/team-transfer-status';
+import { TeamEmailDropdown } from '~/components/general/teams/team-email-dropdown';
+import { TeamTransferStatus } from '~/components/general/teams/team-transfer-status';
 import { useCurrentTeam } from '~/providers/team';
 
 export default function TeamsSettingsPage() {

@@ -1,10 +1,9 @@
 import { Trans } from '@lingui/macro';
-import { DocumentSigningOrder, SigningStatus, type Team } from '@prisma/client';
+import { DocumentSigningOrder, SigningStatus } from '@prisma/client';
 import { ChevronLeft, LucideEdit } from 'lucide-react';
 import { Link, redirect } from 'react-router';
 import { getRequiredSessionContext } from 'server/utils/get-required-session-context';
 
-import { useSession } from '@documenso/lib/client-only/providers/session';
 import { getTemplateById } from '@documenso/lib/server-only/template/get-template-by-id';
 import { formatDocumentsPath, formatTemplatesPath } from '@documenso/lib/utils/teams';
 import { Button } from '@documenso/ui/primitives/button';
@@ -15,13 +14,13 @@ import { TemplateDirectLinkDialogWrapper } from '~/components/dialogs/template-d
 import { TemplateUseDialog } from '~/components/dialogs/template-use-dialog';
 import { DocumentReadOnlyFields } from '~/components/document/document-read-only-fields';
 import { TemplateType } from '~/components/formatter/template-type';
-import { TemplateDirectLinkBadge } from '~/components/pages/template/template-direct-link-badge';
-import { TemplatePageViewDocumentsTable } from '~/components/pages/template/template-page-view-documents-table';
-import { TemplatePageViewInformation } from '~/components/pages/template/template-page-view-information';
-import { TemplatePageViewRecentActivity } from '~/components/pages/template/template-page-view-recent-activity';
-import { TemplatePageViewRecipients } from '~/components/pages/template/template-page-view-recipients';
+import { TemplateDirectLinkBadge } from '~/components/general/template/template-direct-link-badge';
+import { TemplatePageViewDocumentsTable } from '~/components/general/template/template-page-view-documents-table';
+import { TemplatePageViewInformation } from '~/components/general/template/template-page-view-information';
+import { TemplatePageViewRecentActivity } from '~/components/general/template/template-page-view-recent-activity';
+import { TemplatePageViewRecipients } from '~/components/general/template/template-page-view-recipients';
 import { TemplatesTableActionDropdown } from '~/components/tables/templates-table-action-dropdown';
-import { useOptionalCurrentTeam } from '~/providers/team';
+import { superLoaderJson, useSuperLoaderData } from '~/utils/super-json-loader';
 
 import type { Route } from './+types/$id._index';
 
@@ -35,7 +34,7 @@ export async function loader({ params, context }: Route.LoaderArgs) {
   const documentRootPath = formatDocumentsPath(team?.url);
 
   if (!templateId || Number.isNaN(templateId)) {
-    return redirect(templateRootPath);
+    throw redirect(templateRootPath);
   }
 
   const template = await getTemplateById({
@@ -45,20 +44,21 @@ export async function loader({ params, context }: Route.LoaderArgs) {
   }).catch(() => null);
 
   if (!template || !template.templateDocumentData || (template?.teamId && !team?.url)) {
-    return redirect(templateRootPath);
+    throw redirect(templateRootPath);
   }
 
-  return {
+  return superLoaderJson({
     user,
     team,
     template,
     templateRootPath,
     documentRootPath,
-  };
+  });
 }
 
-export default function TemplatePage({ loaderData }: Route.ComponentProps) {
-  const { user, team, template, templateRootPath, documentRootPath } = loaderData;
+export default function TemplatePage() {
+  const { user, team, template, templateRootPath, documentRootPath } =
+    useSuperLoaderData<typeof loader>();
 
   const { templateDocumentData, fields, recipients, templateMeta } = template;
 

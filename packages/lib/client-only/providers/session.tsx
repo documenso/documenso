@@ -5,14 +5,15 @@ import type { Session, User } from '@prisma/client';
 
 interface AuthProviderProps {
   children: React.ReactNode;
-  session: Session;
-  user: User;
+  session: DocumensoSession | null;
 }
 
-const SessionContext = createContext<{
+export type DocumensoSession = {
   user: User; // Todo: Exclude password
   session: Session;
-} | null>(null);
+};
+
+const SessionContext = createContext<DocumensoSession | null>(null);
 
 export const useSession = () => {
   const context = useContext(SessionContext);
@@ -24,6 +25,15 @@ export const useSession = () => {
   return context;
 };
 
-export const SessionProvider = ({ children, session, user }: AuthProviderProps) => {
-  return <SessionContext.Provider value={{ session, user }}>{children}</SessionContext.Provider>;
+export const useOptionalSession = () => {
+  return (
+    useContext(SessionContext) || {
+      user: null,
+      session: null,
+    }
+  );
+};
+
+export const SessionProvider = ({ children, session }: AuthProviderProps) => {
+  return <SessionContext.Provider value={session}>{children}</SessionContext.Provider>;
 };

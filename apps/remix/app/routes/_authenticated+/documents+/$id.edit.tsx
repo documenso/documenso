@@ -1,21 +1,19 @@
 import { Plural, Trans } from '@lingui/macro';
-import { TeamMemberRole } from '@prisma/client';
-import { DocumentStatus as InternalDocumentStatus } from '@prisma/client';
+import { DocumentStatus as InternalDocumentStatus, TeamMemberRole } from '@prisma/client';
 import { ChevronLeft, Users2 } from 'lucide-react';
 import { Link, redirect } from 'react-router';
 import { getRequiredSessionContext } from 'server/utils/get-required-session-context';
 import { match } from 'ts-pattern';
 
 import { isUserEnterprise } from '@documenso/ee/server-only/util/is-document-enterprise';
-import { DOCUMENSO_ENCRYPTION_KEY } from '@documenso/lib/constants/crypto';
 import { getDocumentWithDetailsById } from '@documenso/lib/server-only/document/get-document-with-details-by-id';
 import { DocumentVisibility } from '@documenso/lib/types/document-visibility';
-import { symmetricDecrypt } from '@documenso/lib/universal/crypto';
 import { formatDocumentsPath } from '@documenso/lib/utils/teams';
 
 import { StackAvatarsWithTooltip } from '~/components/(dashboard)/avatar/stack-avatars-with-tooltip';
 import { DocumentStatus } from '~/components/formatter/document-status';
-import { DocumentEditForm } from '~/components/pages/document/document-edit-form';
+import { DocumentEditForm } from '~/components/general/document/document-edit-form';
+import { superLoaderJson, useSuperLoaderData } from '~/utils/super-json-loader';
 
 import type { Route } from './+types/$id.edit';
 
@@ -29,7 +27,7 @@ export async function loader({ params, context }: Route.LoaderArgs) {
   const documentRootPath = formatDocumentsPath(team?.url);
 
   if (!documentId || Number.isNaN(documentId)) {
-    return redirect(documentRootPath);
+    throw redirect(documentRootPath);
   }
 
   const document = await getDocumentWithDetailsById({
@@ -39,7 +37,7 @@ export async function loader({ params, context }: Route.LoaderArgs) {
   }).catch(() => null);
 
   if (document?.teamId && !team?.url) {
-    return redirect(documentRootPath);
+    throw redirect(documentRootPath);
   }
 
   const documentVisibility = document?.visibility;
@@ -59,50 +57,49 @@ export async function loader({ params, context }: Route.LoaderArgs) {
   }
 
   if (!document) {
-    return redirect(documentRootPath);
+    throw redirect(documentRootPath);
   }
 
   if (team && !canAccessDocument) {
-    return redirect(documentRootPath);
+    throw redirect(documentRootPath);
   }
 
   if (document.status === InternalDocumentStatus.COMPLETED) {
-    return redirect(`${documentRootPath}/${documentId}`);
+    throw redirect(`${documentRootPath}/${documentId}`);
   }
 
-  const { documentMeta, recipients } = document;
+  // Todo: We don't handle encrypted files right.
+  // if (documentMeta?.password) {
+  //   const key = DOCUMENSO_ENCRYPTION_KEY;
 
-  if (documentMeta?.password) {
-    const key = DOCUMENSO_ENCRYPTION_KEY;
+  //   if (!key) {
+  //     throw new Error('Missing DOCUMENSO_ENCRYPTION_KEY');
+  //   }
 
-    if (!key) {
-      throw new Error('Missing DOCUMENSO_ENCRYPTION_KEY');
-    }
+  //   const securePassword = Buffer.from(
+  //     symmetricDecrypt({
+  //       key,
+  //       data: documentMeta.password,
+  //     }),
+  //   ).toString('utf-8');
 
-    const securePassword = Buffer.from(
-      symmetricDecrypt({
-        key,
-        data: documentMeta.password,
-      }),
-    ).toString('utf-8');
-
-    documentMeta.password = securePassword;
-  }
+  //   documentMeta.password = securePassword;
+  // }
 
   const isDocumentEnterprise = await isUserEnterprise({
     userId: user.id,
     teamId: team?.id,
   });
 
-  return {
+  return superLoaderJson({
     document,
     documentRootPath,
     isDocumentEnterprise,
-  };
+  });
 }
 
-export default function DocumentEditPage({ loaderData }: Route.ComponentProps) {
-  const { document, documentRootPath, isDocumentEnterprise } = loaderData;
+export default function DocumentEditPage() {
+  const { document, documentRootPath, isDocumentEnterprise } = useSuperLoaderData<typeof loader>();
 
   const { recipients } = document;
 

@@ -7,7 +7,7 @@ import {
   ZSuccessfulUpdateTeamMemberResponseSchema,
   ZUnsuccessfulResponseSchema,
 } from '@documenso/api/v1/schema';
-import { WEBAPP_BASE_URL } from '@documenso/lib/constants/app';
+import { NEXT_PUBLIC_WEBAPP_URL } from '@documenso/lib/constants/app';
 import { createApiToken } from '@documenso/lib/server-only/public-api/create-api-token';
 import { prisma } from '@documenso/prisma';
 import { TeamMemberRole } from '@documenso/prisma/client';
@@ -32,11 +32,14 @@ test.describe('Team API', () => {
       expiresIn: null,
     });
 
-    const response = await request.get(`${WEBAPP_BASE_URL}/api/v1/team/${team.id}/members`, {
-      headers: {
-        Authorization: `Bearer ${token}`,
+    const response = await request.get(
+      `${NEXT_PUBLIC_WEBAPP_URL()}/api/v1/team/${team.id}/members`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
       },
-    });
+    );
 
     expect(response.ok()).toBeTruthy();
     expect(response.status()).toBe(200);
@@ -74,7 +77,7 @@ test.describe('Team API', () => {
     const newUser = await seedUser();
 
     const response = await request.post(
-      `${WEBAPP_BASE_URL}/api/v1/team/${team.id}/members/invite`,
+      `${NEXT_PUBLIC_WEBAPP_URL()}/api/v1/team/${team.id}/members/invite`,
       {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -126,7 +129,7 @@ test.describe('Team API', () => {
     expect(member).toBeTruthy();
 
     const response = await request.put(
-      `${WEBAPP_BASE_URL}/api/v1/team/${team.id}/members/${member.id}`,
+      `${NEXT_PUBLIC_WEBAPP_URL()}/api/v1/team/${team.id}/members/${member.id}`,
       {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -171,7 +174,7 @@ test.describe('Team API', () => {
     expect(member).toBeTruthy();
 
     const response = await request.delete(
-      `${WEBAPP_BASE_URL}/api/v1/team/${team.id}/members/${member.id}`,
+      `${NEXT_PUBLIC_WEBAPP_URL()}/api/v1/team/${team.id}/members/${member.id}`,
       {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -221,7 +224,7 @@ test.describe('Team API', () => {
     expect(ownerMember).toBeTruthy();
 
     const response = await request.delete(
-      `${WEBAPP_BASE_URL}/api/v1/team/${team.id}/members/${ownerMember.id}`,
+      `${NEXT_PUBLIC_WEBAPP_URL()}/api/v1/team/${team.id}/members/${ownerMember.id}`,
       {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -261,7 +264,7 @@ test.describe('Team API', () => {
     });
 
     const response = await request.delete(
-      `${WEBAPP_BASE_URL}/api/v1/team/${team.id}/members/${member.id}`,
+      `${NEXT_PUBLIC_WEBAPP_URL()}/api/v1/team/${team.id}/members/${member.id}`,
       {
         headers: {
           Authorization: `Bearer ${token}`,

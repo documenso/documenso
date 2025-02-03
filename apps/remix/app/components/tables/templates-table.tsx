@@ -21,7 +21,7 @@ import { TemplateType } from '~/components/formatter/template-type';
 import { useOptionalCurrentTeam } from '~/providers/team';
 
 import { TemplateUseDialog } from '../dialogs/template-use-dialog';
-import { TemplateDirectLinkBadge } from '../pages/template/template-direct-link-badge';
+import { TemplateDirectLinkBadge } from '../general/template/template-direct-link-badge';
 import { TemplatesTableActionDropdown } from './templates-table-action-dropdown';
 
 type TemplatesTableProps = {

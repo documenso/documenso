@@ -1,7 +1,6 @@
 import { msg } from '@lingui/macro';
 import { useLingui } from '@lingui/react';
 import { DateTime } from 'luxon';
-import { useSearchParams } from 'react-router';
 import { redirect } from 'react-router';
 
 import { DOCUMENT_STATUS } from '@documenso/lib/constants/document';
@@ -22,13 +21,13 @@ export async function loader({ request }: Route.LoaderArgs) {
   const d = new URL(request.url).searchParams.get('d');
 
   if (typeof d !== 'string' || !d) {
-    return redirect('/');
+    throw redirect('/');
   }
 
   const rawDocumentId = decryptSecondaryData(d);
 
   if (!rawDocumentId || isNaN(Number(rawDocumentId))) {
-    return redirect('/');
+    throw redirect('/');
   }
 
   const documentId = Number(rawDocumentId);
@@ -38,7 +37,7 @@ export async function loader({ request }: Route.LoaderArgs) {
   }).catch(() => null);
 
   if (!document) {
-    return redirect('/');
+    throw redirect('/');
   }
 
   const documentLanguage = ZSupportedLanguageCodeSchema.parse(document.documentMeta?.language);
@@ -68,7 +67,8 @@ export default function AuditLog({ loaderData }: Route.ComponentProps) {
 
   const { i18n } = useLingui();
 
-  dynamicActivate(i18n, documentLanguage);
+  // Todo
+  void dynamicActivate(i18n, documentLanguage);
 
   const { _ } = useLingui();
 

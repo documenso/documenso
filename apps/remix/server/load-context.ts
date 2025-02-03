@@ -1,6 +1,7 @@
 import { getSession } from '@documenso/auth/server/lib/utils/get-session';
 import { type TGetTeamByUrlResponse, getTeamByUrl } from '@documenso/lib/server-only/team/get-team';
 import { type TGetTeamsResponse, getTeams } from '@documenso/lib/server-only/team/get-teams';
+import { extractRequestMetadata } from '@documenso/lib/universal/extract-request-metadata';
 
 type GetLoadContextArgs = {
   request: Request;
@@ -21,6 +22,7 @@ export async function getLoadContext(args: GetLoadContextArgs) {
   if (request.method !== 'GET' || !config.matcher.test(url.pathname)) {
     console.log('[Session]: Pathname ignored', url.pathname);
     return {
+      requestMetadata: extractRequestMetadata(request),
       session: null,
     };
   }
@@ -51,6 +53,7 @@ export async function getLoadContext(args: GetLoadContextArgs) {
   // Todo: This is server only right?? Results not exposed?
 
   return {
+    requestMetadata: extractRequestMetadata(request),
     session: session.isAuthenticated
       ? {
           session: session.session,

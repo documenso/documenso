@@ -7,19 +7,17 @@ import { DateTime } from 'luxon';
 import { Link, redirect } from 'react-router';
 import { getRequiredSessionContext } from 'server/utils/get-required-session-context';
 
-import { getRequiredSession } from '@documenso/auth/server/lib/utils/get-session';
 import { getDocumentById } from '@documenso/lib/server-only/document/get-document-by-id';
 import { getRecipientsForDocument } from '@documenso/lib/server-only/recipient/get-recipients-for-document';
 import { formatDocumentsPath } from '@documenso/lib/utils/teams';
-import { prisma } from '@documenso/prisma';
 import { Card } from '@documenso/ui/primitives/card';
 
 import {
   DocumentStatus as DocumentStatusComponent,
   FRIENDLY_STATUS_MAP,
 } from '~/components/formatter/document-status';
-import { DocumentAuditLogDownloadButton } from '~/components/pages/document/document-audit-log-download-button';
-import { DocumentCertificateDownloadButton } from '~/components/pages/document/document-certificate-download-button';
+import { DocumentAuditLogDownloadButton } from '~/components/general/document/document-audit-log-download-button';
+import { DocumentCertificateDownloadButton } from '~/components/general/document/document-certificate-download-button';
 import { DocumentLogsTable } from '~/components/tables/document-logs-table';
 
 import type { Route } from './+types/$id.logs';
@@ -34,7 +32,7 @@ export async function loader({ params, context }: Route.LoaderArgs) {
   const documentRootPath = formatDocumentsPath(team?.url);
 
   if (!documentId || Number.isNaN(documentId)) {
-    return redirect(documentRootPath);
+    throw redirect(documentRootPath);
   }
 
   // Todo:  Get detailed?
@@ -52,7 +50,7 @@ export async function loader({ params, context }: Route.LoaderArgs) {
   ]);
 
   if (!document || !document.documentData) {
-    return redirect(documentRootPath);
+    throw redirect(documentRootPath);
   }
 
   return {

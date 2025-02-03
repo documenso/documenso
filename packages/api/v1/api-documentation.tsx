@@ -9,6 +9,7 @@ import 'swagger-ui-react/swagger-ui.css';
 import { OpenAPIV1 } from '@documenso/api/v1/openapi';
 
 export const OpenApiDocsPage = () => {
+  // Todo
   const { resolvedTheme } = useTheme();
 
   useEffect(() => {

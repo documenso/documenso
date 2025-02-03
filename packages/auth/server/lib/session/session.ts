@@ -8,10 +8,11 @@ import { prisma } from '@documenso/prisma';
 export type SessionValidationResult =
   | {
       session: Session;
-      user: Pick<
-        User,
-        'id' | 'name' | 'email' | 'emailVerified' | 'avatarImageId' | 'twoFactorEnabled' | 'roles' // Todo
-      >;
+      user: User;
+      // user: Pick<
+      //   User,
+      //   'id' | 'name' | 'email' | 'emailVerified' | 'avatarImageId' | 'twoFactorEnabled' | 'roles' // Todo
+      // >;
       isAuthenticated: true;
     }
   | { session: null; user: null; isAuthenticated: false };

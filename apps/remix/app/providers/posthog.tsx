@@ -1,9 +1,9 @@
 import { useEffect } from 'react';
 
-import { getSession } from 'next-auth/react';
 import posthog from 'posthog-js';
 import { useLocation, useSearchParams } from 'react-router';
 
+import { useOptionalSession } from '@documenso/lib/client-only/providers/session';
 import { extractPostHogConfig } from '@documenso/lib/constants/feature-flags';
 
 export function PostHogPageview() {
@@ -12,22 +12,18 @@ export function PostHogPageview() {
   const { pathname } = useLocation();
   const [searchParams] = useSearchParams();
 
+  const { user } = useOptionalSession();
+
   if (typeof window !== 'undefined' && postHogConfig) {
     posthog.init(postHogConfig.key, {
       api_host: postHogConfig.host,
       disable_session_recording: true,
       loaded: () => {
-        getSession()
-          .then((session) => {
-            if (session) {
-              posthog.identify(session.user.email ?? session.user.id.toString());
-            } else {
-              posthog.reset();
-            }
-          })
-          .catch(() => {
-            // Do nothing.
-          });
+        if (user) {
+          posthog.identify(user.email ?? user.id.toString());
+        } else {
+          posthog.reset();
+        }
       },
       custom_campaign_params: ['src'],
     });

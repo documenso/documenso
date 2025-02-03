@@ -7,7 +7,7 @@ import { nanoid } from 'nanoid';
 
 import { mailer } from '@documenso/email/mailer';
 import { TeamInviteEmailTemplate } from '@documenso/email/templates/team-invite';
-import { WEBAPP_BASE_URL } from '@documenso/lib/constants/app';
+import { NEXT_PUBLIC_WEBAPP_URL } from '@documenso/lib/constants/app';
 import { FROM_ADDRESS, FROM_NAME } from '@documenso/lib/constants/email';
 import { TEAM_MEMBER_ROLE_PERMISSIONS_MAP } from '@documenso/lib/constants/teams';
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
@@ -154,8 +154,8 @@ export const sendTeamMemberInviteEmail = async ({
   team,
 }: SendTeamMemberInviteEmailOptions) => {
   const template = createElement(TeamInviteEmailTemplate, {
-    assetBaseUrl: WEBAPP_BASE_URL,
-    baseUrl: WEBAPP_BASE_URL,
+    assetBaseUrl: NEXT_PUBLIC_WEBAPP_URL(),
+    baseUrl: NEXT_PUBLIC_WEBAPP_URL(),
     senderName,
     token,
     teamName: team.name,

@@ -7,13 +7,16 @@ import {
   isRouteErrorResponse,
   useLoaderData,
 } from 'react-router';
+import { ThemeProvider } from 'remix-themes';
 
+import { SessionProvider } from '@documenso/lib/client-only/providers/session';
 import { TrpcProvider } from '@documenso/trpc/react';
 import { Toaster } from '@documenso/ui/primitives/toaster';
 import { TooltipProvider } from '@documenso/ui/primitives/tooltip';
 
 import type { Route } from './+types/root';
 import stylesheet from './app.css?url';
+import { themeSessionResolver } from './storage/theme-session.server';
 
 export const links: Route.LinksFunction = () => [
   { rel: 'preconnect', href: 'https://fonts.googleapis.com' },
@@ -33,8 +36,12 @@ export const links: Route.LinksFunction = () => [
   { rel: 'stylesheet', href: stylesheet },
 ];
 
-export function loader() {
+export async function loader({ request, context }: Route.LoaderArgs) {
+  const { getTheme } = await themeSessionResolver(request);
+
   return {
+    theme: getTheme(),
+    session: context.session,
     __ENV__: Object.fromEntries(
       Object.entries(process.env).filter(([key]) => key.startsWith('NEXT_')),
     ),
@@ -42,15 +49,18 @@ export function loader() {
 }
 
 export function Layout({ children }: { children: React.ReactNode }) {
-  const { __ENV__ } = useLoaderData<typeof loader>() || {};
+  const { __ENV__, theme } = useLoaderData<typeof loader>() || {};
+
+  // const [theme] = useTheme();
 
   return (
-    <html lang="en">
+    <html lang="en" data-theme={theme ?? ''}>
       <head>
         <meta charSet="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <Meta />
         <Links />
+        {/* <PreventFlashOnWrongTheme ssrTheme={Boolean(theme)} /> */}
       </head>
       <body>
         {children}
@@ -67,15 +77,20 @@ export function Layout({ children }: { children: React.ReactNode }) {
   );
 }
 
-export default function App() {
+export default function App({ loaderData }: Route.ComponentProps) {
   return (
-    <TooltipProvider>
-      <TrpcProvider>
-        <Outlet />
+    <SessionProvider session={loaderData.session}>
+      {/* Todo: Themes (this won't work for now) */}
+      <ThemeProvider specifiedTheme={loaderData.theme} themeAction="/api/theme">
+        <TooltipProvider>
+          <TrpcProvider>
+            <Outlet />
 
-        <Toaster />
-      </TrpcProvider>
-    </TooltipProvider>
+            <Toaster />
+          </TrpcProvider>
+        </TooltipProvider>
+      </ThemeProvider>
+    </SessionProvider>
   );
 }
 

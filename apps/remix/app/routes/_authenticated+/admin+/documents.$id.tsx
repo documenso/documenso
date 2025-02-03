@@ -35,7 +35,7 @@ export async function loader({ params }: Route.LoaderArgs) {
   // Todo: Is it possible for this to return data to the frontend w/out auth layout due to race condition?
 
   if (isNaN(id)) {
-    return redirect('/admin/documents');
+    throw redirect('/admin/documents');
   }
 
   const document = await getEntireDocument({ id });

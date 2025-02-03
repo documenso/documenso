@@ -13,7 +13,7 @@ export function loader({ context }: Route.LoaderArgs) {
   const { user } = getRequiredSessionContext(context);
 
   if (!user || !isAdmin(user)) {
-    return redirect('/documents');
+    throw redirect('/documents');
   }
 }
 

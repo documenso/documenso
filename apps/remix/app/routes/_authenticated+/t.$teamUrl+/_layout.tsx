@@ -18,7 +18,7 @@ export const loader = ({ context }: Route.LoaderArgs) => {
   const { currentTeam } = getRequiredSessionContext(context);
 
   if (!currentTeam) {
-    return redirect('/documents');
+    throw redirect('/documents');
   }
 
   const trpcHeaders = {

@@ -1,5 +1,3 @@
-'use client';
-
 import { useState } from 'react';
 
 import type { DocumentData } from '@prisma/client';
@@ -7,17 +5,18 @@ import * as DialogPrimitive from '@radix-ui/react-dialog';
 import { X } from 'lucide-react';
 
 import { cn } from '../../lib/utils';
-import { Dialog, DialogOverlay, DialogPortal } from '../../primitives/dialog';
+import { Dialog, DialogOverlay, DialogPortal, DialogTrigger } from '../../primitives/dialog';
 import { LazyPDFViewerNoLoader } from '../../primitives/lazy-pdf-viewer';
 
 export type DocumentDialogProps = {
+  trigger?: React.ReactNode;
   documentData: DocumentData;
 } & Omit<DialogPrimitive.DialogProps, 'children'>;
 
 /**
  * A dialog which renders the provided document.
  */
-export default function DocumentDialog({ documentData, ...props }: DocumentDialogProps) {
+export default function DocumentDialog({ trigger, documentData, ...props }: DocumentDialogProps) {
   const [documentLoaded, setDocumentLoaded] = useState(false);
 
   const onDocumentLoad = () => {
@@ -28,6 +27,12 @@ export default function DocumentDialog({ documentData, ...props }: DocumentDialo
     <Dialog {...props}>
       <DialogPortal>
         <DialogOverlay className="bg-black/80" />
+
+        {trigger && (
+          <DialogTrigger onClick={(e) => e.stopPropagation()} asChild={true}>
+            {trigger}
+          </DialogTrigger>
+        )}
 
         <DialogPrimitive.Content
           className={cn(

@@ -4,9 +4,9 @@ import type { MessageDescriptor } from '@lingui/core';
 import { Trans, msg } from '@lingui/macro';
 import { useLingui } from '@lingui/react';
 import { CheckIcon, Loader, Monitor, Moon, Sun } from 'lucide-react';
-import { useTheme } from 'next-themes';
 import { useHotkeys } from 'react-hotkeys-hook';
 import { useNavigate } from 'react-router';
+import { Theme, useTheme } from 'remix-themes';
 
 import { SUPPORTED_LANGUAGES } from '@documenso/lib/constants/i18n';
 import {
@@ -31,7 +31,6 @@ import {
   CommandList,
   CommandShortcut,
 } from '@documenso/ui/primitives/command';
-import { THEMES_TYPE } from '@documenso/ui/primitives/constants';
 import { useToast } from '@documenso/ui/primitives/use-toast';
 
 const DOCUMENTS_PAGES = [
@@ -74,7 +73,6 @@ export type CommandMenuProps = {
 
 export function CommandMenu({ open, onOpenChange }: CommandMenuProps) {
   const { _ } = useLingui();
-  const { setTheme } = useTheme();
 
   const navigate = useNavigate();
 
@@ -224,7 +222,7 @@ export function CommandMenu({ open, onOpenChange }: CommandMenuProps) {
           </>
         )}
 
-        {currentPage === 'theme' && <ThemeCommands setTheme={setTheme} />}
+        {currentPage === 'theme' && <ThemeCommands />}
         {currentPage === 'language' && <LanguageCommands />}
       </CommandList>
     </CommandDialog>
@@ -253,19 +251,18 @@ const Commands = ({
   ));
 };
 
-const ThemeCommands = ({ setTheme }: { setTheme: (_theme: string) => void }) => {
+const ThemeCommands = () => {
   const { _ } = useLingui();
 
-  const THEMES = useMemo(
-    () => [
-      { label: msg`Light Mode`, theme: THEMES_TYPE.LIGHT, icon: Sun },
-      { label: msg`Dark Mode`, theme: THEMES_TYPE.DARK, icon: Moon },
-      { label: msg`System Theme`, theme: THEMES_TYPE.SYSTEM, icon: Monitor },
-    ],
-    [],
-  );
+  const [, setTheme] = useTheme();
 
-  return THEMES.map((theme) => (
+  const themes = [
+    { label: msg`Light Mode`, theme: Theme.LIGHT, icon: Sun },
+    { label: msg`Dark Mode`, theme: Theme.DARK, icon: Moon },
+    { label: msg`System Theme`, theme: null, icon: Monitor },
+  ] as const;
+
+  return themes.map((theme) => (
     <CommandItem
       key={theme.theme}
       onSelect={() => setTheme(theme.theme)}

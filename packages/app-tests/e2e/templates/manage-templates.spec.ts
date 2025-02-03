@@ -1,6 +1,6 @@
 import { expect, test } from '@playwright/test';
 
-import { WEBAPP_BASE_URL } from '@documenso/lib/constants/app';
+import { NEXT_PUBLIC_WEBAPP_URL } from '@documenso/lib/constants/app';
 import { seedTeam } from '@documenso/prisma/seed/teams';
 import { seedTemplate } from '@documenso/prisma/seed/templates';
 
@@ -43,11 +43,11 @@ test('[TEMPLATES]: view templates', async ({ page }) => {
   });
 
   // Owner should see both team templates.
-  await page.goto(`${WEBAPP_BASE_URL}/t/${team.url}/templates`);
+  await page.goto(`${NEXT_PUBLIC_WEBAPP_URL()}/t/${team.url}/templates`);
   await expect(page.getByRole('main')).toContainText('Showing 2 results');
 
   // Only should only see their personal template.
-  await page.goto(`${WEBAPP_BASE_URL}/templates`);
+  await page.goto(`${NEXT_PUBLIC_WEBAPP_URL()}/templates`);
   await expect(page.getByRole('main')).toContainText('Showing 1 result');
 });
 
@@ -92,7 +92,7 @@ test('[TEMPLATES]: delete template', async ({ page }) => {
   await expect(page.getByText('Template deleted').first()).toBeVisible();
 
   // Team member should be able to delete all templates.
-  await page.goto(`${WEBAPP_BASE_URL}/t/${team.url}/templates`);
+  await page.goto(`${NEXT_PUBLIC_WEBAPP_URL()}/t/${team.url}/templates`);
 
   for (const template of ['Team template 1', 'Team template 2']) {
     await page
@@ -144,7 +144,7 @@ test('[TEMPLATES]: duplicate template', async ({ page }) => {
   await expect(page.getByText('Template duplicated').first()).toBeVisible();
   await expect(page.getByRole('main')).toContainText('Showing 2 results');
 
-  await page.goto(`${WEBAPP_BASE_URL}/t/${team.url}/templates`);
+  await page.goto(`${NEXT_PUBLIC_WEBAPP_URL()}/t/${team.url}/templates`);
 
   // Duplicate team template.
   await page.getByRole('cell', { name: 'Use Template' }).getByRole('button').nth(1).click();
@@ -196,7 +196,7 @@ test('[TEMPLATES]: use template', async ({ page }) => {
   await page.waitForURL('/documents');
   await expect(page.getByRole('main')).toContainText('Showing 1 result');
 
-  await page.goto(`${WEBAPP_BASE_URL}/t/${team.url}/templates`);
+  await page.goto(`${NEXT_PUBLIC_WEBAPP_URL()}/t/${team.url}/templates`);
   await page.waitForTimeout(1000);
 
   // Use team template.

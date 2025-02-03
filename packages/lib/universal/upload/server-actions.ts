@@ -10,7 +10,7 @@ import path from 'node:path';
 
 import { env } from '@documenso/lib/utils/env';
 
-import { APP_BASE_URL } from '../../constants/app';
+import { NEXT_PUBLIC_WEBAPP_URL } from '../../constants/app';
 import { ONE_HOUR, ONE_SECOND } from '../../constants/time';
 import { alphaid } from '../id';
 
@@ -22,7 +22,7 @@ export const getPresignPostUrl = async (fileName: string, contentType: string) =
   const token: JWT | null = null;
 
   try {
-    const baseUrl = APP_BASE_URL() ?? 'http://localhost:3000';
+    const baseUrl = NEXT_PUBLIC_WEBAPP_URL();
 
     // Todo
     // token = await getToken({

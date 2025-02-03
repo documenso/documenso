@@ -10,7 +10,7 @@ import { useNavigate } from 'react-router';
 import type { z } from 'zod';
 
 import { useUpdateSearchParams } from '@documenso/lib/client-only/hooks/use-update-search-params';
-import { WEBAPP_BASE_URL } from '@documenso/lib/constants/app';
+import { NEXT_PUBLIC_WEBAPP_URL } from '@documenso/lib/constants/app';
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import { trpc } from '@documenso/trpc/react';
 import { ZCreateTeamMutationSchema } from '@documenso/trpc/server/team-router/schema';
@@ -199,7 +199,7 @@ export const TeamCreateDialog = ({ trigger, ...props }: TeamCreateDialogProps) =
                     {!form.formState.errors.teamUrl && (
                       <span className="text-foreground/50 text-xs font-normal">
                         {field.value ? (
-                          `${WEBAPP_BASE_URL}/t/${field.value}`
+                          `${NEXT_PUBLIC_WEBAPP_URL()}/t/${field.value}`
                         ) : (
                           <Trans>A unique URL to identify your team</Trans>
                         )}

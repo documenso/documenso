@@ -2,7 +2,6 @@ import type { ReadonlyRequestCookies } from 'next/dist/server/web/spec-extension
 
 import type { I18n, MessageDescriptor } from '@lingui/core';
 
-import { IS_APP_WEB, IS_APP_WEB_I18N_ENABLED } from '../constants/app';
 import type { I18nLocaleData, SupportedLanguageCodes } from '../constants/i18n';
 import { APP_I18N_OPTIONS } from '../constants/i18n';
 import { env } from './env';
@@ -86,11 +85,6 @@ export const extractLocaleData = ({
 
   if (!lang && langHeader?.lang) {
     lang = langHeader.lang;
-  }
-
-  // Override web app to be English.
-  if (!IS_APP_WEB_I18N_ENABLED && IS_APP_WEB) {
-    lang = 'en';
   }
 
   // Filter out locales that are not valid.

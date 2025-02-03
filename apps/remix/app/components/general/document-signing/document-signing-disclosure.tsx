@@ -5,9 +5,12 @@ import { Link } from 'react-router';
 
 import { cn } from '@documenso/ui/lib/utils';
 
-export type SigningDisclosureProps = HTMLAttributes<HTMLParagraphElement>;
+export type DocumentSigningDisclosureProps = HTMLAttributes<HTMLParagraphElement>;
 
-export const SigningDisclosure = ({ className, ...props }: SigningDisclosureProps) => {
+export const DocumentSigningDisclosure = ({
+  className,
+  ...props
+}: DocumentSigningDisclosureProps) => {
   return (
     <p className={cn('text-muted-foreground text-xs', className)} {...props}>
       <Trans>
@@ -21,7 +24,7 @@ export const SigningDisclosure = ({ className, ...props }: SigningDisclosureProp
           Read the full{' '}
           <Link
             className="text-documenso-700 underline"
-            href="/articles/signature-disclosure"
+            to="/articles/signature-disclosure"
             target="_blank"
           >
             signature disclosure

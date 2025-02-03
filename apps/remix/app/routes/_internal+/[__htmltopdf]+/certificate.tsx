@@ -1,7 +1,8 @@
 import { msg } from '@lingui/macro';
 import { useLingui } from '@lingui/react';
+import { FieldType } from '@prisma/client';
 import { DateTime } from 'luxon';
-import { redirect, useSearchParams } from 'react-router';
+import { redirect } from 'react-router';
 import { match } from 'ts-pattern';
 import { UAParser } from 'ua-parser-js';
 
@@ -15,8 +16,6 @@ import { decryptSecondaryData } from '@documenso/lib/server-only/crypto/decrypt'
 import { getDocumentCertificateAuditLogs } from '@documenso/lib/server-only/document/get-document-certificate-audit-logs';
 import { DOCUMENT_AUDIT_LOG_TYPE } from '@documenso/lib/types/document-audit-logs';
 import { extractDocumentAuthMethods } from '@documenso/lib/utils/document-auth';
-import { dynamicActivate } from '@documenso/lib/utils/i18n';
-import { FieldType } from '@documenso/prisma/client';
 import { Card, CardContent } from '@documenso/ui/primitives/card';
 import {
   Table,
@@ -40,13 +39,13 @@ export async function loader({ request }: Route.LoaderArgs) {
   const d = new URL(request.url).searchParams.get('d');
 
   if (typeof d !== 'string' || !d) {
-    return redirect('/');
+    throw redirect('/');
   }
 
   const rawDocumentId = decryptSecondaryData(d);
 
   if (!rawDocumentId || isNaN(Number(rawDocumentId))) {
-    return redirect('/');
+    throw redirect('/');
   }
 
   const documentId = Number(rawDocumentId);
@@ -56,7 +55,7 @@ export async function loader({ request }: Route.LoaderArgs) {
   }).catch(() => null);
 
   if (!document) {
-    return redirect('/');
+    throw redirect('/');
   }
 
   const documentLanguage = ZSupportedLanguageCodeSchema.parse(document.documentMeta?.language);
@@ -86,7 +85,8 @@ export default function SigningCertificate({ loaderData }: Route.ComponentProps)
 
   const { _ } = useLingui();
 
-  dynamicActivate(i18n, documentLanguage);
+  // Todo
+  // dynamicActivate(i18n, documentLanguage);
 
   const isOwner = (email: string) => {
     return email.toLowerCase() === document.user.email.toLowerCase();

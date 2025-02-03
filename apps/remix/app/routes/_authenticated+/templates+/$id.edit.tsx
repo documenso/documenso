@@ -8,8 +8,9 @@ import { getTemplateById } from '@documenso/lib/server-only/template/get-templat
 import { formatTemplatesPath } from '@documenso/lib/utils/teams';
 
 import { TemplateType } from '~/components/formatter/template-type';
-import { TemplateDirectLinkBadge } from '~/components/pages/template/template-direct-link-badge';
-import { TemplateEditForm } from '~/components/pages/template/template-edit-form';
+import { TemplateDirectLinkBadge } from '~/components/general/template/template-direct-link-badge';
+import { TemplateEditForm } from '~/components/general/template/template-edit-form';
+import { superLoaderJson, useSuperLoaderData } from '~/utils/super-json-loader';
 
 import { TemplateDirectLinkDialogWrapper } from '../../../components/dialogs/template-direct-link-dialog-wrapper';
 import type { Route } from './+types/$id.edit';
@@ -23,7 +24,7 @@ export async function loader({ context, params }: Route.LoaderArgs) {
   const templateRootPath = formatTemplatesPath(team?.url);
 
   if (!templateId || Number.isNaN(templateId)) {
-    return redirect(templateRootPath);
+    throw redirect(templateRootPath);
   }
 
   const template = await getTemplateById({
@@ -33,7 +34,7 @@ export async function loader({ context, params }: Route.LoaderArgs) {
   }).catch(() => null);
 
   if (!template || !template.templateDocumentData) {
-    return redirect(templateRootPath);
+    throw redirect(templateRootPath);
   }
 
   const isTemplateEnterprise = await isUserEnterprise({
@@ -41,15 +42,15 @@ export async function loader({ context, params }: Route.LoaderArgs) {
     teamId: team?.id,
   });
 
-  return {
+  return superLoaderJson({
     template,
     isTemplateEnterprise,
     templateRootPath,
-  };
+  });
 }
 
-export default function TemplateEditPage({ loaderData }: Route.ComponentProps) {
-  const { template, isTemplateEnterprise, templateRootPath } = loaderData;
+export default function TemplateEditPage() {
+  const { template, isTemplateEnterprise, templateRootPath } = useSuperLoaderData<typeof loader>();
 
   return (
     <div className="mx-auto -mt-4 max-w-screen-xl px-4 md:px-8">

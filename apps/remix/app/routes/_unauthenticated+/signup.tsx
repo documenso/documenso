@@ -13,7 +13,7 @@ export function loader() {
   const NEXT_PUBLIC_DISABLE_SIGNUP = env('NEXT_PUBLIC_DISABLE_SIGNUP');
 
   if (NEXT_PUBLIC_DISABLE_SIGNUP === 'true') {
-    return redirect('/signin');
+    throw redirect('/signin');
   }
 }
 

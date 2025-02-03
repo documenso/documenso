@@ -1,9 +1,4 @@
-'use client';
-
 import { useCallback, useEffect, useRef, useState } from 'react';
-
-import type { StaticImageData } from 'next/image';
-import Image from 'next/image';
 
 import type { Signature } from '@prisma/client';
 import { animate, motion, useMotionTemplate, useMotionValue, useTransform } from 'framer-motion';
@@ -16,7 +11,7 @@ export type SigningCardProps = {
   className?: string;
   name: string;
   signature?: Signature;
-  signingCelebrationImage?: StaticImageData;
+  signingCelebrationImage?: string;
 };
 
 /**
@@ -212,7 +207,7 @@ const SigningCardContent = ({ className, name, signature }: SigningCardContentPr
 };
 
 type SigningCardImageProps = {
-  signingCelebrationImage: StaticImageData;
+  signingCelebrationImage: string;
 };
 
 const SigningCardImage = ({ signingCelebrationImage }: SigningCardImageProps) => {
@@ -232,7 +227,7 @@ const SigningCardImage = ({ signingCelebrationImage }: SigningCardImageProps) =>
         duration: 0.5,
       }}
     >
-      <Image
+      <img
         src={signingCelebrationImage}
         alt="background pattern"
         className="w-full dark:brightness-150 dark:contrast-[70%] dark:invert dark:sepia"
@@ -240,7 +235,6 @@ const SigningCardImage = ({ signingCelebrationImage }: SigningCardImageProps) =>
           mask: 'radial-gradient(rgba(255, 255, 255, 1) 0%, transparent 67%)',
           WebkitMask: 'radial-gradient(rgba(255, 255, 255, 1) 0%, transparent 67%)',
         }}
-        priority
       />
     </motion.div>
   );

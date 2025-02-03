@@ -8,7 +8,7 @@ import TeamJoinEmailTemplate from '@documenso/email/templates/team-join';
 import { prisma } from '@documenso/prisma';
 
 import { getI18nInstance } from '../../../client-only/providers/i18n-server';
-import { WEBAPP_BASE_URL } from '../../../constants/app';
+import { NEXT_PUBLIC_WEBAPP_URL } from '../../../constants/app';
 import { FROM_ADDRESS, FROM_NAME } from '../../../constants/email';
 import { renderEmailWithI18N } from '../../../utils/render-email-with-i18n';
 import { teamGlobalSettingsToBranding } from '../../../utils/team-global-settings-to-branding';
@@ -60,8 +60,8 @@ export const run = async ({
       `send-team-member-joined-email--${invitedMember.id}_${member.id}`,
       async () => {
         const emailContent = createElement(TeamJoinEmailTemplate, {
-          assetBaseUrl: WEBAPP_BASE_URL,
-          baseUrl: WEBAPP_BASE_URL,
+          assetBaseUrl: NEXT_PUBLIC_WEBAPP_URL(),
+          baseUrl: NEXT_PUBLIC_WEBAPP_URL(),
           memberName: invitedMember.user.name || '',
           memberEmail: invitedMember.user.email,
           teamName: team.name,

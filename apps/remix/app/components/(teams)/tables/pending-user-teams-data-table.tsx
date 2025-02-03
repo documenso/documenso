@@ -5,7 +5,7 @@ import { useLingui } from '@lingui/react';
 import { useSearchParams } from 'react-router';
 
 import { useUpdateSearchParams } from '@documenso/lib/client-only/hooks/use-update-search-params';
-import { WEBAPP_BASE_URL } from '@documenso/lib/constants/app';
+import { NEXT_PUBLIC_WEBAPP_URL } from '@documenso/lib/constants/app';
 import { ZUrlSearchParamsSchema } from '@documenso/lib/types/search-params';
 import { trpc } from '@documenso/trpc/react';
 import { AvatarWithText } from '@documenso/ui/primitives/avatar';
@@ -66,7 +66,7 @@ export const PendingUserTeamsDataTable = () => {
             primaryText={
               <span className="text-foreground/80 font-semibold">{row.original.name}</span>
             }
-            secondaryText={`${WEBAPP_BASE_URL}/t/${row.original.url}`}
+            secondaryText={`${NEXT_PUBLIC_WEBAPP_URL()}/t/${row.original.url}`}
           />
         ),
       },

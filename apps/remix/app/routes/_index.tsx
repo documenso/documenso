@@ -2,10 +2,10 @@ import { redirect } from 'react-router';
 
 import type { Route } from './+types/_index';
 
-export async function loader({ context }: Route.LoaderArgs) {
+export function loader({ context }: Route.LoaderArgs) {
   if (context.session) {
-    return redirect('/documents');
+    throw redirect('/documents');
   }
 
-  return redirect('/signin');
+  throw redirect('/signin');
 }

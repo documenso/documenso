@@ -1,4 +1,4 @@
-import { APP_BASE_URL } from '@documenso/lib/constants/app';
+import { NEXT_PUBLIC_WEBAPP_URL } from '@documenso/lib/constants/app';
 
 import { FREE_PLAN_LIMITS } from './constants';
 import type { TLimitsResponseSchema } from './schema';
@@ -12,7 +12,7 @@ export type GetLimitsOptions = {
 export const getLimits = async ({ headers, teamId }: GetLimitsOptions = {}) => {
   const requestHeaders = headers ?? {};
 
-  const url = new URL('/api/limits', APP_BASE_URL() ?? 'http://localhost:3000');
+  const url = new URL('/api/limits', NEXT_PUBLIC_WEBAPP_URL());
 
   if (teamId) {
     requestHeaders['team-id'] = teamId.toString();

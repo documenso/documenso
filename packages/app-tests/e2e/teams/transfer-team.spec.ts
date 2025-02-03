@@ -1,6 +1,6 @@
 import { expect, test } from '@playwright/test';
 
-import { WEBAPP_BASE_URL } from '@documenso/lib/constants/app';
+import { NEXT_PUBLIC_WEBAPP_URL } from '@documenso/lib/constants/app';
 import { seedTeam, seedTeamTransfer } from '@documenso/prisma/seed/teams';
 
 import { apiSignin } from '../fixtures/authentication';
@@ -60,6 +60,6 @@ test.skip('[TEAMS]: accept team transfer', async ({ page }) => {
     newOwnerUserId: newOwnerMember.userId,
   });
 
-  await page.goto(`${WEBAPP_BASE_URL}/team/verify/transfer/${teamTransferRequest.token}`);
+  await page.goto(`${NEXT_PUBLIC_WEBAPP_URL()}/team/verify/transfer/${teamTransferRequest.token}`);
   await expect(page.getByRole('heading')).toContainText('Team ownership transferred!');
 });

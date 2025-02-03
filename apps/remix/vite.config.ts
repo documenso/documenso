@@ -26,7 +26,18 @@ export default defineConfig({
   },
   ssr: {
     // , 'next/font/google' doesnot work
-    noExternal: ['react-dropzone', 'recharts'],
+    noExternal: [
+      'react-dropzone',
+      'recharts',
+      'superjson',
+      // '@node-rs/bcrypt-wasm32-wasi',
+      // '@noble/ciphers/chacha',
+      // '@noble/ciphers/utils',
+      // '@noble/ciphers/webcrypto/utils',
+      // '@noble/hashes/sha256a',
+      // '@node-rs/bcrypt',
+      // 'crypto',
+    ],
   },
   server: {
     port: 3000,
@@ -42,8 +53,25 @@ export default defineConfig({
     }),
     tsconfigPaths(),
   ],
+  optimizeDeps: {
+    exclude: ['superjson'],
+    force: true,
+  },
+  build: {
+    commonjsOptions: {
+      include: ['superjson'],
+    },
+  },
   // optimizeDeps: {
-  //   exclude: ['next/font/google'], // Todo: Probably remove.
+  //   exclude: [
+  //     '@node-rs/bcrypt-wasm32-wasi',
+  //     '@noble/ciphers/chacha',
+  //     '@noble/ciphers/utils',
+  //     '@noble/ciphers/webcrypto/utils',
+  //     '@noble/hashes/sha256a',
+  //     'crypto',
+  //     '@node-rs/bcrypt',
+  //   ], // Todo: Probably remove.
   //   force: true,
   // },
 });

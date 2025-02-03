@@ -1,19 +1,16 @@
 import { Plural, Trans } from '@lingui/macro';
 import { useLingui } from '@lingui/react';
-import { DocumentStatus } from '@prisma/client';
-import { TeamMemberRole } from '@prisma/client';
+import { DocumentStatus, TeamMemberRole } from '@prisma/client';
 import { ChevronLeft, Clock9, Users2 } from 'lucide-react';
 import { Link, redirect } from 'react-router';
 import { getRequiredSessionContext } from 'server/utils/get-required-session-context';
 import { match } from 'ts-pattern';
 
 import { useSession } from '@documenso/lib/client-only/providers/session';
-import { DOCUMENSO_ENCRYPTION_KEY } from '@documenso/lib/constants/crypto';
 import { getDocumentById } from '@documenso/lib/server-only/document/get-document-by-id';
 import { getFieldsForDocument } from '@documenso/lib/server-only/field/get-fields-for-document';
 import { getRecipientsForDocument } from '@documenso/lib/server-only/recipient/get-recipients-for-document';
 import { DocumentVisibility } from '@documenso/lib/types/document-visibility';
-import { symmetricDecrypt } from '@documenso/lib/universal/crypto';
 import { formatDocumentsPath } from '@documenso/lib/utils/teams';
 import { Badge } from '@documenso/ui/primitives/badge';
 import { Button } from '@documenso/ui/primitives/button';
@@ -28,11 +25,11 @@ import {
   DocumentStatus as DocumentStatusComponent,
   FRIENDLY_STATUS_MAP,
 } from '~/components/formatter/document-status';
-import { DocumentPageViewButton } from '~/components/pages/document/document-page-view-button';
-import { DocumentPageViewDropdown } from '~/components/pages/document/document-page-view-dropdown';
-import { DocumentPageViewInformation } from '~/components/pages/document/document-page-view-information';
-import { DocumentPageViewRecentActivity } from '~/components/pages/document/document-page-view-recent-activity';
-import { DocumentPageViewRecipients } from '~/components/pages/document/document-page-view-recipients';
+import { DocumentPageViewButton } from '~/components/general/document/document-page-view-button';
+import { DocumentPageViewDropdown } from '~/components/general/document/document-page-view-dropdown';
+import { DocumentPageViewInformation } from '~/components/general/document/document-page-view-information';
+import { DocumentPageViewRecentActivity } from '~/components/general/document/document-page-view-recent-activity';
+import { DocumentPageViewRecipients } from '~/components/general/document/document-page-view-recipients';
 
 import type { Route } from './+types/$id._index';
 
@@ -46,7 +43,7 @@ export async function loader({ params, context }: Route.LoaderArgs) {
   const documentRootPath = formatDocumentsPath(team?.url);
 
   if (!documentId || Number.isNaN(documentId)) {
-    return redirect(documentRootPath);
+    throw redirect(documentRootPath);
   }
 
   const document = await getDocumentById({
@@ -56,7 +53,7 @@ export async function loader({ params, context }: Route.LoaderArgs) {
   }).catch(() => null);
 
   if (document?.teamId && !team?.url) {
-    return redirect(documentRootPath);
+    throw redirect(documentRootPath);
   }
 
   const documentVisibility = document?.visibility;
@@ -76,31 +73,32 @@ export async function loader({ params, context }: Route.LoaderArgs) {
   }
 
   if (!document || !document.documentData || (team && !canAccessDocument)) {
-    return redirect(documentRootPath);
+    throw redirect(documentRootPath);
   }
 
   if (team && !canAccessDocument) {
-    return redirect(documentRootPath);
+    throw redirect(documentRootPath);
   }
 
   const { documentMeta } = document;
 
-  if (documentMeta?.password) {
-    const key = DOCUMENSO_ENCRYPTION_KEY;
+  // Todo: We don't handle encrypted files right.
+  // if (documentMeta?.password) {
+  //   const key = DOCUMENSO_ENCRYPTION_KEY;
 
-    if (!key) {
-      throw new Error('Missing DOCUMENSO_ENCRYPTION_KEY');
-    }
+  //   if (!key) {
+  //     throw new Error('Missing DOCUMENSO_ENCRYPTION_KEY');
+  //   }
 
-    const securePassword = Buffer.from(
-      symmetricDecrypt({
-        key,
-        data: documentMeta.password,
-      }),
-    ).toString('utf-8');
+  //   const securePassword = Buffer.from(
+  //     symmetricDecrypt({
+  //       key,
+  //       data: documentMeta.password,
+  //     }),
+  //   ).toString('utf-8');
 
-    documentMeta.password = securePassword;
-  }
+  //   documentMeta.password = securePassword;
+  // }
 
   // Todo: Get full document instead???
   const [recipients, fields] = await Promise.all([

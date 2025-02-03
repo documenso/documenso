@@ -11,7 +11,7 @@ import { Card, CardContent } from '@documenso/ui/primitives/card';
 
 import { SettingsHeader } from '~/components/(dashboard)/settings/layout/header';
 import { TeamBillingInvoicesDataTable } from '~/components/(teams)/tables/team-billing-invoices-data-table';
-import { TeamBillingPortalButton } from '~/components/pages/teams/team-billing-portal-button';
+import { TeamBillingPortalButton } from '~/components/general/teams/team-billing-portal-button';
 
 import type { Route } from './+types/billing';
 

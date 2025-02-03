@@ -9,7 +9,7 @@ import { Trans, msg } from '@lingui/macro';
 import { useLingui } from '@lingui/react';
 
 import { useUpdateSearchParams } from '@documenso/lib/client-only/hooks/use-update-search-params';
-import { NEXT_PUBLIC_WEBAPP_URL, WEBAPP_BASE_URL } from '@documenso/lib/constants/app';
+import { NEXT_PUBLIC_WEBAPP_URL } from '@documenso/lib/constants/app';
 import { TEAM_MEMBER_ROLE_MAP } from '@documenso/lib/constants/teams';
 import { ZUrlSearchParamsSchema } from '@documenso/lib/types/search-params';
 import { canExecuteTeamAction } from '@documenso/lib/utils/teams';
@@ -71,7 +71,7 @@ export const CurrentUserTeamsDataTable = () => {
               primaryText={
                 <span className="text-foreground/80 font-semibold">{row.original.name}</span>
               }
-              secondaryText={`${WEBAPP_BASE_URL}/t/${row.original.url}`}
+              secondaryText={`${NEXT_PUBLIC_WEBAPP_URL()}/t/${row.original.url}`}
             />
           </Link>
         ),

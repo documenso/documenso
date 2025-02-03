@@ -4,8 +4,8 @@ import { getRequiredTeamSessionContext } from 'server/utils/get-required-session
 
 import { canExecuteTeamAction } from '@documenso/lib/utils/teams';
 
-import { TeamSettingsDesktopNav } from '~/components/pages/teams/team-settings-desktop-nav';
-import { TeamSettingsMobileNav } from '~/components/pages/teams/team-settings-mobile-nav';
+import { TeamSettingsDesktopNav } from '~/components/general/teams/team-settings-desktop-nav';
+import { TeamSettingsMobileNav } from '~/components/general/teams/team-settings-mobile-nav';
 
 import type { Route } from '../+types/_layout';
 

@@ -6,7 +6,7 @@ import { useForm } from 'react-hook-form';
 import { useNavigate } from 'react-router';
 import type { z } from 'zod';
 
-import { WEBAPP_BASE_URL } from '@documenso/lib/constants/app';
+import { NEXT_PUBLIC_WEBAPP_URL } from '@documenso/lib/constants/app';
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import { trpc } from '@documenso/trpc/react';
 import { ZUpdateTeamMutationSchema } from '@documenso/trpc/server/team-router/schema';
@@ -72,7 +72,7 @@ export const UpdateTeamForm = ({ teamId, teamName, teamUrl }: UpdateTeamDialogPr
       });
 
       if (url !== teamUrl) {
-        await navigate(`${WEBAPP_BASE_URL}/t/${url}/settings`);
+        await navigate(`${NEXT_PUBLIC_WEBAPP_URL()}/t/${url}/settings`);
       }
     } catch (err) {
       const error = AppError.parseError(err);
@@ -130,7 +130,7 @@ export const UpdateTeamForm = ({ teamId, teamName, teamUrl }: UpdateTeamDialogPr
                 {!form.formState.errors.url && (
                   <span className="text-foreground/50 text-xs font-normal">
                     {field.value ? (
-                      `${WEBAPP_BASE_URL}/t/${field.value}`
+                      `${NEXT_PUBLIC_WEBAPP_URL()}/t/${field.value}`
                     ) : (
                       <Trans>A unique URL to identify your team</Trans>
                     )}

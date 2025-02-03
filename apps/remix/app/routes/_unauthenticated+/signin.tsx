@@ -12,13 +12,13 @@ import { SignInForm } from '~/components/forms/signin';
 
 import type { Route } from './+types/signin';
 
-export function meta(_args: Route.MetaArgs) {
+export function meta() {
   return [{ title: 'Sign In' }];
 }
 
-export async function loader({ context }: Route.LoaderArgs) {
+export function loader({ context }: Route.LoaderArgs) {
   if (context.session) {
-    return redirect('/documents');
+    throw redirect('/documents');
   }
 }
 
