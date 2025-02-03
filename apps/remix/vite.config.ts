@@ -25,7 +25,6 @@ export default defineConfig({
     },
   },
   ssr: {
-    // , 'next/font/google' doesnot work
     noExternal: [
       'react-dropzone',
       'recharts',

@@ -19,6 +19,7 @@ import { TooltipProvider } from '@documenso/ui/primitives/tooltip';
 
 import type { Route } from './+types/root';
 import stylesheet from './app.css?url';
+import { GenericErrorLayout } from './components/general/generic-error-layout';
 import { langCookie } from './storage/lang-cookie.server';
 import { themeSessionResolver } from './storage/theme-session.server';
 
@@ -79,6 +80,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
         <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
         <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <link rel="manifest" href="/site.webmanifest" />
         <Meta />
         <Links />
         <meta name="google" content="notranslate" />
@@ -117,28 +119,7 @@ export default function App({ loaderData }: Route.ComponentProps) {
 }
 
 export function ErrorBoundary({ error }: Route.ErrorBoundaryProps) {
-  let message = 'Oops!';
-  let details = 'An unexpected error occurred.';
-  let stack: string | undefined;
+  const errorCode = isRouteErrorResponse(error) ? error.status : 500;
 
-  if (isRouteErrorResponse(error)) {
-    message = error.status === 404 ? '404' : 'Error';
-    details =
-      error.status === 404 ? 'The requested page could not be found.' : error.statusText || details;
-  } else if (import.meta.env.DEV && error && error instanceof Error) {
-    details = error.message;
-    stack = error.stack;
-  }
-
-  return (
-    <main className="container mx-auto p-4 pt-16">
-      <h1>{message}</h1>
-      <p>{details}</p>
-      {stack && (
-        <pre className="w-full overflow-x-auto p-4">
-          <code>{stack}</code>
-        </pre>
-      )}
-    </main>
-  );
+  return <GenericErrorLayout errorCode={errorCode} />;
 }
