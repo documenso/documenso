@@ -17,15 +17,14 @@ import { cn } from '@documenso/ui/lib/utils';
 import { DocumentDropzone } from '@documenso/ui/primitives/document-dropzone';
 import { useToast } from '@documenso/ui/primitives/use-toast';
 
+import { useOptionalCurrentTeam } from '~/providers/team';
+
 export type DocumentUploadDropzoneProps = {
   className?: string;
-  team?: {
-    id: number;
-    url: string;
-  };
 };
 
-export const DocumentUploadDropzone = ({ className, team }: DocumentUploadDropzoneProps) => {
+export const DocumentUploadDropzone = ({ className }: DocumentUploadDropzoneProps) => {
+  const team = useOptionalCurrentTeam();
   const navigate = useNavigate();
 
   const userTimezone =
@@ -70,7 +69,7 @@ export const DocumentUploadDropzone = ({ className, team }: DocumentUploadDropzo
         method: 'POST',
         body: formData,
       })
-        .then((res) => res.json())
+        .then(async (res) => res.json())
         .catch((e) => {
           console.error('Upload failed:', e);
           throw new AppError('UPLOAD_FAILED');

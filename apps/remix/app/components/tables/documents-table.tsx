@@ -2,7 +2,6 @@ import { useMemo, useTransition } from 'react';
 
 import { msg } from '@lingui/macro';
 import { useLingui } from '@lingui/react';
-import type { Team } from '@prisma/client';
 import { Loader } from 'lucide-react';
 import { DateTime } from 'luxon';
 import { Link } from 'react-router';
@@ -21,6 +20,7 @@ import { TableCell } from '@documenso/ui/primitives/table';
 
 import { StackAvatarsWithTooltip } from '~/components/(dashboard)/avatar/stack-avatars-with-tooltip';
 import { DocumentStatus } from '~/components/formatter/document-status';
+import { useOptionalCurrentTeam } from '~/providers/team';
 
 import { DocumentsTableActionButton } from './documents-table-action-button';
 import { DocumentsTableActionDropdown } from './documents-table-action-dropdown';
@@ -29,21 +29,14 @@ export type DocumentsTableProps = {
   data?: TFindDocumentsResponse;
   isLoading?: boolean;
   isLoadingError?: boolean;
-  showSenderColumn?: boolean;
-  team?: Pick<Team, 'id' | 'url'> & { teamEmail?: string };
 };
 
 type DocumentsTableRow = TFindDocumentsResponse['data'][number];
 
-export const DocumentsTable = ({
-  data,
-  showSenderColumn,
-  team,
-  isLoading,
-  isLoadingError,
-}: DocumentsTableProps) => {
+export const DocumentsTable = ({ data, isLoading, isLoadingError }: DocumentsTableProps) => {
   const { _, i18n } = useLingui();
 
+  const team = useOptionalCurrentTeam();
   const [isPending, startTransition] = useTransition();
 
   const updateSearchParams = useUpdateSearchParams();
@@ -120,7 +113,7 @@ export const DocumentsTable = ({
         totalPages={results.totalPages}
         onPaginationChange={onPaginationChange}
         columnVisibility={{
-          sender: Boolean(showSenderColumn),
+          sender: team !== undefined,
         }}
         error={{
           enable: isLoadingError || false,

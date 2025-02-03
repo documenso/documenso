@@ -18,7 +18,6 @@ import {
   DO_NOT_INVALIDATE_QUERY_ON_MUTATION,
   SKIP_QUERY_BATCH_META,
 } from '@documenso/lib/constants/trpc';
-import { switchI18NLanguage } from '@documenso/lib/server-only/i18n/switch-i18n-language';
 import { dynamicActivate } from '@documenso/lib/utils/i18n';
 import { trpc as trpcReact } from '@documenso/trpc/react';
 import { cn } from '@documenso/ui/lib/utils';
@@ -288,9 +287,23 @@ const LanguageCommands = () => {
     setIsLoading(true);
 
     try {
-      await dynamicActivate(i18n, lang);
-      await switchI18NLanguage(lang);
-    } catch (err) {
+      await dynamicActivate(lang);
+
+      const formData = new FormData();
+
+      formData.append('lang', lang);
+
+      const response = await fetch('/api/locale', {
+        method: 'post',
+        body: formData,
+      });
+
+      if (!response.ok) {
+        throw new Error(response.statusText);
+      }
+    } catch (e) {
+      console.error(`Failed to set language: ${e}`);
+
       toast({
         title: _(msg`An unknown error occurred`),
         variant: 'destructive',
