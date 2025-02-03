@@ -11,7 +11,6 @@ import { Loader } from 'lucide-react';
 import { DO_NOT_INVALIDATE_QUERY_ON_MUTATION } from '@documenso/lib/constants/trpc';
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import type { TRecipientActionAuth } from '@documenso/lib/types/document-auth';
-import { type Recipient } from '@documenso/prisma/client';
 import type { FieldWithSignature } from '@documenso/prisma/types/field-with-signature';
 import { trpc } from '@documenso/trpc/react';
 import type {
@@ -28,12 +27,12 @@ import { SigningDisclosure } from '~/components/general/signing-disclosure';
 
 import { useRequiredDocumentAuthContext } from './document-auth-provider';
 import { useRequiredSigningContext } from './provider';
+import { useRecipientContext } from './recipient-context';
 import { SigningFieldContainer } from './signing-field-container';
 
 type SignatureFieldState = 'empty' | 'signed-image' | 'signed-text';
 export type SignatureFieldProps = {
   field: FieldWithSignature;
-  recipient: Recipient;
   onSignField?: (value: TSignFieldWithTokenMutationSchema) => Promise<void> | void;
   onUnsignField?: (value: TRemovedSignedFieldWithTokenMutationSchema) => Promise<void> | void;
   typedSignatureEnabled?: boolean;
@@ -41,15 +40,14 @@ export type SignatureFieldProps = {
 
 export const SignatureField = ({
   field,
-  recipient,
   onSignField,
   onUnsignField,
   typedSignatureEnabled,
 }: SignatureFieldProps) => {
   const router = useRouter();
-
   const { _ } = useLingui();
   const { toast } = useToast();
+  const { recipient } = useRecipientContext();
 
   const signatureRef = useRef<HTMLParagraphElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);

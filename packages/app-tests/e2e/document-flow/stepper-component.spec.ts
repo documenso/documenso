@@ -540,12 +540,19 @@ test('[DOCUMENT_FLOW]: should be able to create and sign a document with 3 recip
     if (i > 1) {
       await page.getByRole('button', { name: 'Add Signer' }).click();
     }
+
     await page
-      .getByPlaceholder('Email')
+      .getByLabel('Email')
+      .nth(i - 1)
+      .focus();
+
+    await page
+      .getByLabel('Email')
       .nth(i - 1)
       .fill(`user${i}@example.com`);
+
     await page
-      .getByPlaceholder('Name')
+      .getByLabel('Name')
       .nth(i - 1)
       .fill(`User ${i}`);
   }

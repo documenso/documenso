@@ -14,8 +14,8 @@ import type { ApiRequestMetadata } from '@documenso/lib/universal/extract-reques
 import { createDocumentAuditLogData } from '@documenso/lib/utils/document-audit-logs';
 import { renderCustomEmailTemplate } from '@documenso/lib/utils/render-custom-email-template';
 import { prisma } from '@documenso/prisma';
-import { DocumentStatus, RecipientRole, SigningStatus } from '@documenso/prisma/client';
 import type { Prisma } from '@documenso/prisma/client';
+import { DocumentStatus, RecipientRole, SigningStatus } from '@documenso/prisma/client';
 
 import { getI18nInstance } from '../../client-only/providers/i18n.server';
 import { NEXT_PUBLIC_WEBAPP_URL } from '../../constants/app';

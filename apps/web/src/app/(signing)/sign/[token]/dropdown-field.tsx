@@ -12,7 +12,6 @@ import { DO_NOT_INVALIDATE_QUERY_ON_MUTATION } from '@documenso/lib/constants/tr
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import type { TRecipientActionAuth } from '@documenso/lib/types/document-auth';
 import { ZDropdownFieldMeta } from '@documenso/lib/types/field-meta';
-import type { Recipient } from '@documenso/prisma/client';
 import type { FieldWithSignatureAndFieldMeta } from '@documenso/prisma/types/field-with-signature-and-fieldmeta';
 import { trpc } from '@documenso/trpc/react';
 import type {
@@ -30,23 +29,19 @@ import {
 import { useToast } from '@documenso/ui/primitives/use-toast';
 
 import { useRequiredDocumentAuthContext } from './document-auth-provider';
+import { useRecipientContext } from './recipient-context';
 import { SigningFieldContainer } from './signing-field-container';
 
 export type DropdownFieldProps = {
   field: FieldWithSignatureAndFieldMeta;
-  recipient: Recipient;
   onSignField?: (value: TSignFieldWithTokenMutationSchema) => Promise<void> | void;
   onUnsignField?: (value: TRemovedSignedFieldWithTokenMutationSchema) => Promise<void> | void;
 };
 
-export const DropdownField = ({
-  field,
-  recipient,
-  onSignField,
-  onUnsignField,
-}: DropdownFieldProps) => {
+export const DropdownField = ({ field, onSignField, onUnsignField }: DropdownFieldProps) => {
   const { _ } = useLingui();
   const { toast } = useToast();
+  const { recipient, targetSigner, isAssistantMode } = useRecipientContext();
 
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
@@ -103,7 +98,9 @@ export const DropdownField = ({
 
       toast({
         title: _(msg`Error`),
-        description: _(msg`An error occurred while signing the document.`),
+        description: isAssistantMode
+          ? _(msg`An error occurred while signing as assistant.`)
+          : _(msg`An error occurred while signing the document.`),
         variant: 'destructive',
       });
     }
@@ -134,7 +131,7 @@ export const DropdownField = ({
 
       toast({
         title: _(msg`Error`),
-        description: _(msg`An error occurred while removing the signature.`),
+        description: _(msg`An error occurred while removing the field.`),
         variant: 'destructive',
       });
     }

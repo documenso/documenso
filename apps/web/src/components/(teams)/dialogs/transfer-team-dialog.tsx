@@ -67,7 +67,7 @@ export const TransferTeamDialog = ({
   const {
     data,
     refetch: refetchTeamMembers,
-    isLoading: loadingTeamMembers,
+    isPending: loadingTeamMembers,
     isLoadingError: loadingTeamMembersError,
   } = trpc.team.getTeamMembers.useQuery({
     teamId,

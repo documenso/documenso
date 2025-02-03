@@ -8,7 +8,7 @@ msgstr ""
 "Language: fr\n"
 "Project-Id-Version: documenso-app\n"
 "Report-Msgid-Bugs-To: \n"
-"PO-Revision-Date: 2025-01-30 03:57\n"
+"PO-Revision-Date: 2025-01-30 06:04\n"
 "Last-Translator: \n"
 "Language-Team: French\n"
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
@@ -163,7 +163,7 @@ msgstr "{inviterName} vous a retiré du document<0/>\"{documentName}\""
 
 #: packages/email/template-components/template-document-invite.tsx:61
 msgid "{inviterName} on behalf of \"{teamName}\" has invited you to {0}<0/>\"{documentName}\""
-msgstr ""
+msgstr "{inviterName} représentant \"{teamName}\" vous a invité à {0}<0/>\"{documentName}\""
 
 #: packages/email/templates/document-invite.tsx:45
 msgid "{inviterName} on behalf of \"{teamName}\" has invited you to {action} {documentName}"
@@ -308,7 +308,7 @@ msgstr "{signerName} a rejeté le document \"{documentName}\"."
 
 #: packages/email/template-components/template-document-invite.tsx:68
 msgid "{teamName} has invited you to {0}<0/>\"{documentName}\""
-msgstr ""
+msgstr "{teamName} vous a invité à {0}<0/>\"{documentName}\""
 
 #: packages/email/templates/document-invite.tsx:46
 msgid "{teamName} has invited you to {action} {documentName}"
@@ -1232,20 +1232,20 @@ msgstr "Importation en masse"
 
 #: packages/lib/jobs/definitions/internal/bulk-send-template.handler.ts:203
 msgid "Bulk Send Complete: {0}"
-msgstr ""
+msgstr "Envoi en masse terminé : {0}"
 
 #: packages/email/templates/bulk-send-complete.tsx:30
 msgid "Bulk send operation complete for template \"{templateName}\""
-msgstr ""
+msgstr "Envoi groupé terminé pour le modèle \"{templateName}\""
 
 #: apps/web/src/components/templates/template-bulk-send-dialog.tsx:128
 msgid "Bulk Send Template via CSV"
-msgstr ""
+msgstr "Envoi de modèle groupé via CSV"
 
 #: apps/web/src/app/(dashboard)/templates/data-table-action-dropdown.tsx:97
 #: apps/web/src/components/templates/template-bulk-send-dialog.tsx:120
 msgid "Bulk Send via CSV"
-msgstr ""
+msgstr "Envoi en masse via CSV"
 
 #: packages/email/templates/team-invite.tsx:84
 msgid "by <0>{senderName}</0>"
@@ -1788,7 +1788,7 @@ msgstr "Créé le {0}"
 
 #: apps/web/src/components/templates/template-bulk-send-dialog.tsx:143
 msgid "CSV Structure"
-msgstr ""
+msgstr "Structure CSV"
 
 #: apps/web/src/components/forms/password.tsx:112
 msgid "Current Password"
@@ -1800,7 +1800,7 @@ msgstr "Le mot de passe actuel est incorrect."
 
 #: apps/web/src/components/templates/template-bulk-send-dialog.tsx:154
 msgid "Current recipients:"
-msgstr ""
+msgstr "Destinataires actuels :"
 
 #: apps/web/src/app/(dashboard)/settings/billing/billing-plans.tsx:28
 msgid "Daily"
@@ -2328,7 +2328,7 @@ msgstr "Télécharger le certificat"
 
 #: apps/web/src/components/templates/template-bulk-send-dialog.tsx:168
 msgid "Download Template CSV"
-msgstr ""
+msgstr "Télécharger le modèle CSV"
 
 #: apps/web/src/app/(dashboard)/templates/[id]/template-page-view-documents-table.tsx:208
 #: apps/web/src/components/formatter/document-status.tsx:34
@@ -2659,7 +2659,7 @@ msgstr "Échec de la mise à jour du webhook"
 
 #: packages/email/templates/bulk-send-complete.tsx:55
 msgid "Failed: {failedCount}"
-msgstr ""
+msgstr "Échoués : {failedCount}"
 
 #: packages/ui/primitives/document-flow/field-items-advanced-settings/text-field.tsx:100
 msgid "Field character limit"
@@ -2721,7 +2721,7 @@ msgstr "Pour toute question concernant cette divulgation, les signatures électr
 
 #: apps/web/src/components/templates/template-bulk-send-dialog.tsx:147
 msgid "For each recipient, provide their email (required) and name (optional) in separate columns. Download the template CSV below for the correct format."
-msgstr ""
+msgstr "Pour chaque destinataire, fournissez leur email (obligatoire) et leur nom (facultatif) dans des colonnes séparées. Téléchargez le modèle CSV ci-dessous pour le format correct."
 
 #: packages/lib/server-only/auth/send-forgot-password.ts:61
 msgid "Forgot Password?"
@@ -2834,7 +2834,7 @@ msgstr "Salut, je suis Timur"
 
 #: packages/email/templates/bulk-send-complete.tsx:36
 msgid "Hi {userName},"
-msgstr ""
+msgstr "Bonjour, {userName},"
 
 #: packages/email/templates/reset-password.tsx:56
 msgid "Hi, {userName} <0>({userEmail})</0>"
@@ -3238,7 +3238,7 @@ msgstr ""
 
 #: apps/web/src/components/templates/template-bulk-send-dialog.tsx:227
 msgid "Maximum file size: 4MB. Maximum 100 rows per upload. Blank values will use template defaults."
-msgstr ""
+msgstr "Taille maximale du fichier : 4 Mo. Maximum de 100 lignes par téléversement. Les valeurs vides utiliseront les valeurs par défaut du modèle."
 
 #: packages/lib/constants/teams.ts:12
 msgid "Member"
@@ -3868,7 +3868,7 @@ msgstr "Veuillez taper <0>{0}</0> pour confirmer."
 
 #: apps/web/src/components/templates/template-bulk-send-dialog.tsx:172
 msgid "Pre-formatted CSV template with example data."
-msgstr ""
+msgstr "Modèle CSV pré-formaté avec des données d'exemple."
 
 #: apps/web/src/components/(dashboard)/common/command-menu.tsx:214
 #: apps/web/src/components/(teams)/settings/layout/desktop-nav.tsx:58
@@ -4392,7 +4392,7 @@ msgstr "Envoyer des documents au nom de l'équipe en utilisant l'adresse e-mail"
 
 #: apps/web/src/components/templates/template-bulk-send-dialog.tsx:253
 msgid "Send documents to recipients immediately"
-msgstr ""
+msgstr "Envoyer les documents aux destinataires immédiatement"
 
 #: apps/web/src/app/(teams)/t/[teamUrl]/settings/preferences/document-preferences.tsx:200
 msgid "Send on Behalf of Team"
@@ -4864,11 +4864,11 @@ msgstr "Clé d'authentification créée avec succès"
 
 #: packages/email/templates/bulk-send-complete.tsx:52
 msgid "Successfully created: {successCount}"
-msgstr ""
+msgstr "Créés avec succès : {successCount}"
 
 #: packages/email/templates/bulk-send-complete.tsx:44
 msgid "Summary:"
-msgstr ""
+msgstr "Résumé :"
 
 #: apps/web/src/app/(unauthenticated)/articles/signature-disclosure/page.tsx:57
 msgid "System Requirements"
@@ -5089,7 +5089,7 @@ msgstr "Texte"
 #: packages/ui/primitives/document-flow/field-items-advanced-settings/number-field.tsx:140
 #: packages/ui/primitives/document-flow/field-items-advanced-settings/text-field.tsx:124
 msgid "Text Align"
-msgstr ""
+msgstr "Alignement du texte"
 
 #: apps/web/src/app/(dashboard)/admin/site-settings/banner-form.tsx:157
 msgid "Text Color"
@@ -5177,7 +5177,7 @@ msgstr "Les événements qui déclencheront un webhook à envoyer à votre URL."
 
 #: packages/email/templates/bulk-send-complete.tsx:62
 msgid "The following errors occurred:"
-msgstr ""
+msgstr "Les erreurs suivantes se sont produites :"
 
 #: packages/email/templates/team-delete.tsx:37
 msgid "The following team has been deleted by its owner. You will no longer be able to access this team and its documents"
@@ -5637,7 +5637,7 @@ msgstr "Total des destinataires"
 
 #: packages/email/templates/bulk-send-complete.tsx:49
 msgid "Total rows processed: {totalProcessed}"
-msgstr ""
+msgstr "Lignes totales traitées : {totalProcessed}"
 
 #: apps/web/src/app/(dashboard)/admin/stats/page.tsx:150
 msgid "Total Signers that Signed Up"
@@ -5899,7 +5899,7 @@ msgstr "Améliorer"
 
 #: apps/web/src/components/templates/template-bulk-send-dialog.tsx:132
 msgid "Upload a CSV file to create multiple documents from this template. Each row represents one document with its recipient details."
-msgstr ""
+msgstr "Téléchargez un fichier CSV pour créer plusieurs documents à partir de ce modèle. Chaque ligne représente un document avec ses détails de destinataire."
 
 #: apps/web/src/app/(dashboard)/templates/use-template-dialog.tsx:426
 msgid "Upload a custom document to use instead of the template's default document"
@@ -5907,7 +5907,7 @@ msgstr "Téléchargez un document personnalisé à utiliser à la place du docum
 
 #: apps/web/src/components/templates/template-bulk-send-dialog.tsx:267
 msgid "Upload and Process"
-msgstr ""
+msgstr "Télécharger et traiter"
 
 #: apps/web/src/components/forms/avatar-image.tsx:179
 msgid "Upload Avatar"
@@ -5915,7 +5915,7 @@ msgstr "Télécharger un avatar"
 
 #: apps/web/src/components/templates/template-bulk-send-dialog.tsx:198
 msgid "Upload CSV"
-msgstr ""
+msgstr "Télécharger le CSV"
 
 #: apps/web/src/app/(dashboard)/templates/use-template-dialog.tsx:419
 msgid "Upload custom document"
@@ -6594,7 +6594,7 @@ msgstr "Vous pouvez voir les documents associés à cet e-mail et utiliser cette
 
 #: packages/email/templates/bulk-send-complete.tsx:76
 msgid "You can view the created documents in your dashboard under the \"Documents created from template\" section."
-msgstr ""
+msgstr "Vous pouvez voir les documents créés dans votre tableau de bord sous la section \"Documents créés à partir du modèle\"."
 
 #: packages/email/template-components/template-document-rejected.tsx:37
 msgid "You can view the document and its status by clicking the button below."
@@ -6807,11 +6807,11 @@ msgstr "Vos préférences de branding ont été mises à jour"
 
 #: apps/web/src/components/templates/template-bulk-send-dialog.tsx:97
 msgid "Your bulk send has been initiated. You will receive an email notification upon completion."
-msgstr ""
+msgstr "Votre envoi groupé a été initié. Vous recevrez une notification par email une fois terminé."
 
 #: packages/email/templates/bulk-send-complete.tsx:40
 msgid "Your bulk send operation for template \"{templateName}\" has completed."
-msgstr ""
+msgstr "Votre opération d'envoi groupé pour le modèle \"{templateName}\" est terminée."
 
 #: apps/web/src/app/(dashboard)/settings/billing/page.tsx:125
 msgid "Your current plan is past due. Please update your payment information."
@@ -6962,3 +6962,4 @@ msgstr "Votre token a été créé avec succès ! Assurez-vous de le copier car 
 #: apps/web/src/app/(teams)/t/[teamUrl]/settings/tokens/page.tsx:86
 msgid "Your tokens will be shown here once you create them."
 msgstr "Vos tokens seront affichés ici une fois que vous les aurez créés."
+
