@@ -12,13 +12,14 @@ import {
   MailOpenIcon,
   PenIcon,
   PlusIcon,
+  UserIcon,
 } from 'lucide-react';
 import { match } from 'ts-pattern';
 
 import { RECIPIENT_ROLES_DESCRIPTION } from '@documenso/lib/constants/recipient-roles';
 import { formatSigningLink } from '@documenso/lib/utils/recipients';
-import { DocumentStatus, RecipientRole, SigningStatus } from '@documenso/prisma/client';
 import type { Document, Recipient } from '@documenso/prisma/client';
+import { DocumentStatus, RecipientRole, SigningStatus } from '@documenso/prisma/client';
 import { CopyTextButton } from '@documenso/ui/components/common/copy-text-button';
 import { SignatureIcon } from '@documenso/ui/icons/signature';
 import { AvatarWithText } from '@documenso/ui/primitives/avatar';
@@ -118,6 +119,12 @@ export const DocumentPageViewRecipients = ({
                         <>
                           <MailOpenIcon className="mr-1 h-3 w-3" />
                           <Trans>Viewed</Trans>
+                        </>
+                      ))
+                      .with(RecipientRole.ASSISTANT, () => (
+                        <>
+                          <UserIcon className="mr-1 h-3 w-3" />
+                          <Trans>Assisted</Trans>
                         </>
                       ))
                       .exhaustive()}

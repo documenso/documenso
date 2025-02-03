@@ -42,7 +42,7 @@ export const MoveTemplateDialog = ({ templateId, open, onOpenChange }: MoveTempl
 
   const [selectedTeamId, setSelectedTeamId] = useState<number | null>(null);
 
-  const { data: teams, isLoading: isLoadingTeams } = trpc.team.getTeams.useQuery();
+  const { data: teams, isPending: isLoadingTeams } = trpc.team.getTeams.useQuery();
   const { mutateAsync: moveTemplate, isPending } = trpc.template.moveTemplateToTeam.useMutation({
     onSuccess: () => {
       router.refresh();
