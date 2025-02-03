@@ -32,25 +32,16 @@ export const RadioField = ({ field }: RadioFieldProps) => {
       ) : (
         <RadioGroup className="gap-y-1">
           {parsedFieldMeta.values?.map((item, index) => (
-            <div key={index}>
-              <div className="flex flex-col">
-                {parsedFieldMeta?.label ? (
-                  <span className="text-center text-xs font-normal text-black">
-                    {parsedFieldMeta.label}
-                  </span>
-                ) : null}
-                <div className="flex items-center gap-x-1.5 pt-4">
-                  <RadioGroupItem
-                    className="dark:border-field-border pointer-events-none h-3 w-3"
-                    value={item.value}
-                    id={`option-${index}`}
-                    checked={item.checked}
-                  />
-                  <Label htmlFor={`option-${index}`} className="text-xs font-normal text-black">
-                    {item.value}
-                  </Label>
-                </div>
-              </div>
+            <div key={index} className="flex items-center gap-x-1.5">
+              <RadioGroupItem
+                className="dark:border-field-border pointer-events-none h-3 w-3"
+                value={item.value}
+                id={`option-${index}`}
+                checked={item.checked}
+              />
+              <Label htmlFor={`option-${index}`} className="text-xs font-normal text-black">
+                {item.value}
+              </Label>
             </div>
           ))}
         </RadioGroup>
