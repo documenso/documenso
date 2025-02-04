@@ -4,7 +4,7 @@ import { DOCUMENT_AUDIT_LOG_TYPE } from '@documenso/lib/types/document-audit-log
 import type { RequestMetadata } from '@documenso/lib/universal/extract-request-metadata';
 import { createDocumentAuditLogData } from '@documenso/lib/utils/document-audit-logs';
 import { prisma } from '@documenso/prisma';
-import { DocumentStatus, SigningStatus } from '@documenso/prisma/client';
+import { DocumentStatus, RecipientRole, SigningStatus } from '@documenso/prisma/client';
 
 export type RemovedSignedFieldWithTokenOptions = {
   token: string;
@@ -17,11 +17,28 @@ export const removeSignedFieldWithToken = async ({
   fieldId,
   requestMetadata,
 }: RemovedSignedFieldWithTokenOptions) => {
+  const recipient = await prisma.recipient.findFirstOrThrow({
+    where: {
+      token,
+    },
+  });
+
   const field = await prisma.field.findFirstOrThrow({
     where: {
       id: fieldId,
       recipient: {
-        token,
+        ...(recipient.role !== RecipientRole.ASSISTANT
+          ? {
+              id: recipient.id,
+            }
+          : {
+              signingOrder: {
+                gte: recipient.signingOrder ?? 0,
+              },
+              signingStatus: {
+                not: SigningStatus.SIGNED,
+              },
+            }),
       },
     },
     include: {
@@ -30,7 +47,7 @@ export const removeSignedFieldWithToken = async ({
     },
   });
 
-  const { document, recipient } = field;
+  const { document } = field;
 
   if (!document) {
     throw new Error(`Document not found for field ${field.id}`);
@@ -40,7 +57,10 @@ export const removeSignedFieldWithToken = async ({
     throw new Error(`Document ${document.id} must be pending`);
   }
 
-  if (recipient?.signingStatus === SigningStatus.SIGNED) {
+  if (
+    recipient?.signingStatus === SigningStatus.SIGNED ||
+    field.recipient.signingStatus === SigningStatus.SIGNED
+  ) {
     throw new Error(`Recipient ${recipient.id} has already signed`);
   }
 
@@ -66,20 +86,22 @@ export const removeSignedFieldWithToken = async ({
       },
     });
 
-    await tx.documentAuditLog.create({
-      data: createDocumentAuditLogData({
-        type: DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_FIELD_UNINSERTED,
-        documentId: document.id,
-        user: {
-          name: recipient?.name,
-          email: recipient?.email,
-        },
-        requestMetadata,
-        data: {
-          field: field.type,
-          fieldId: field.secondaryId,
-        },
-      }),
-    });
+    if (recipient.role !== RecipientRole.ASSISTANT) {
+      await tx.documentAuditLog.create({
+        data: createDocumentAuditLogData({
+          type: DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_FIELD_UNINSERTED,
+          documentId: document.id,
+          user: {
+            name: recipient.name,
+            email: recipient.email,
+          },
+          requestMetadata,
+          data: {
+            field: field.type,
+            fieldId: field.secondaryId,
+          },
+        }),
+      });
+    }
   });
 };

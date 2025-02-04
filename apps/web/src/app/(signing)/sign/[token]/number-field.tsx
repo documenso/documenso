@@ -13,7 +13,6 @@ import { DO_NOT_INVALIDATE_QUERY_ON_MUTATION } from '@documenso/lib/constants/tr
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import type { TRecipientActionAuth } from '@documenso/lib/types/document-auth';
 import { ZNumberFieldMeta } from '@documenso/lib/types/field-meta';
-import type { Recipient } from '@documenso/prisma/client';
 import type { FieldWithSignature } from '@documenso/prisma/types/field-with-signature';
 import { trpc } from '@documenso/trpc/react';
 import type {
@@ -27,6 +26,7 @@ import { Input } from '@documenso/ui/primitives/input';
 import { useToast } from '@documenso/ui/primitives/use-toast';
 
 import { useRequiredDocumentAuthContext } from './document-auth-provider';
+import { useRecipientContext } from './recipient-context';
 import { SigningFieldContainer } from './signing-field-container';
 
 type ValidationErrors = {
@@ -39,18 +39,18 @@ type ValidationErrors = {
 
 export type NumberFieldProps = {
   field: FieldWithSignature;
-  recipient: Recipient;
   onSignField?: (value: TSignFieldWithTokenMutationSchema) => Promise<void> | void;
   onUnsignField?: (value: TRemovedSignedFieldWithTokenMutationSchema) => Promise<void> | void;
 };
 
-export const NumberField = ({ field, recipient, onSignField, onUnsignField }: NumberFieldProps) => {
+export const NumberField = ({ field, onSignField, onUnsignField }: NumberFieldProps) => {
   const { _ } = useLingui();
   const { toast } = useToast();
+  const { recipient, targetSigner, isAssistantMode } = useRecipientContext();
 
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
-  const [showRadioModal, setShowRadioModal] = useState(false);
+  const [showNumberModal, setShowNumberModal] = useState(false);
 
   const { mutateAsync: signFieldWithToken, isPending: isSignFieldWithTokenLoading } =
     trpc.field.signFieldWithToken.useMutation(DO_NOT_INVALIDATE_QUERY_ON_MUTATION);
@@ -105,7 +105,7 @@ export const NumberField = ({ field, recipient, onSignField, onUnsignField }: Nu
   };
 
   const onDialogSignClick = () => {
-    setShowRadioModal(false);
+    setShowNumberModal(false);
 
     void executeActionAuthProcedure({
       onReauthFormSubmit: async (authOptions) => await onSign(authOptions),
@@ -148,14 +148,20 @@ export const NumberField = ({ field, recipient, onSignField, onUnsignField }: Nu
 
       toast({
         title: _(msg`Error`),
-        description: _(msg`An error occurred while signing the document.`),
+        description: isAssistantMode
+          ? _(msg`An error occurred while signing as assistant.`)
+          : _(msg`An error occurred while signing the document.`),
         variant: 'destructive',
       });
     }
   };
 
   const onPreSign = () => {
-    setShowRadioModal(true);
+    if (isAssistantMode) {
+      return true;
+    }
+
+    setShowNumberModal(true);
 
     if (localNumber && parsedFieldMeta) {
       const validationErrors = validateNumberField(localNumber, parsedFieldMeta, true);
@@ -193,18 +199,18 @@ export const NumberField = ({ field, recipient, onSignField, onUnsignField }: Nu
 
       toast({
         title: _(msg`Error`),
-        description: _(msg`An error occurred while removing the signature.`),
+        description: _(msg`An error occurred while removing the field.`),
         variant: 'destructive',
       });
     }
   };
 
   useEffect(() => {
-    if (!showRadioModal) {
+    if (!showNumberModal) {
       setLocalNumber(parsedFieldMeta?.value ? String(parsedFieldMeta.value) : '0');
       setErrors(initialErrors);
     }
-  }, [showRadioModal]);
+  }, [showNumberModal]);
 
   useEffect(() => {
     if (
@@ -222,8 +228,8 @@ export const NumberField = ({ field, recipient, onSignField, onUnsignField }: Nu
 
   if (parsedFieldMeta?.label) {
     fieldDisplayName =
-      parsedFieldMeta.label.length > 10
-        ? parsedFieldMeta.label.substring(0, 10) + '...'
+      parsedFieldMeta.label.length > 20
+        ? parsedFieldMeta.label.substring(0, 20) + '...'
         : parsedFieldMeta.label;
   }
 
@@ -235,7 +241,7 @@ export const NumberField = ({ field, recipient, onSignField, onUnsignField }: Nu
       onPreSign={onPreSign}
       onSign={onSign}
       onRemove={onRemove}
-      type="Signature"
+      type="Number"
     >
       {isLoading && (
         <div className="bg-background absolute inset-0 flex items-center justify-center rounded-md">
@@ -278,7 +284,7 @@ export const NumberField = ({ field, recipient, onSignField, onUnsignField }: Nu
         </div>
       )}
 
-      <Dialog open={showRadioModal} onOpenChange={setShowRadioModal}>
+      <Dialog open={showNumberModal} onOpenChange={setShowNumberModal}>
         <DialogContent>
           <DialogTitle>
             {parsedFieldMeta?.label ? parsedFieldMeta?.label : <Trans>Number</Trans>}
@@ -334,7 +340,7 @@ export const NumberField = ({ field, recipient, onSignField, onUnsignField }: Nu
                 className="dark:bg-muted dark:hover:bg-muted/80 flex-1 bg-black/5 hover:bg-black/10"
                 variant="secondary"
                 onClick={() => {
-                  setShowRadioModal(false);
+                  setShowNumberModal(false);
                   setLocalNumber('');
                 }}
               >

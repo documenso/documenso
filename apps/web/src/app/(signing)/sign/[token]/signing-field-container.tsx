@@ -46,6 +46,7 @@ export type SignatureFieldProps = {
     | 'Email'
     | 'Name'
     | 'Signature'
+    | 'Text'
     | 'Radio'
     | 'Dropdown'
     | 'Number'

@@ -13,6 +13,7 @@ import { extractDocumentAuthMethods } from '@documenso/lib/utils/document-auth';
 
 import { DocumentAuthProvider } from '~/app/(signing)/sign/[token]/document-auth-provider';
 import { SigningProvider } from '~/app/(signing)/sign/[token]/provider';
+import { RecipientProvider } from '~/app/(signing)/sign/[token]/recipient-context';
 
 import { EmbedAuthenticateView } from '../../authenticate';
 import { EmbedPaywall } from '../../paywall';
@@ -96,16 +97,18 @@ export default async function EmbedDirectTemplatePage({ params }: EmbedDirectTem
         recipient={recipient}
         user={user}
       >
-        <EmbedDirectTemplateClientPage
-          token={token}
-          updatedAt={template.updatedAt}
-          documentData={template.templateDocumentData}
-          recipient={recipient}
-          fields={fields}
-          metadata={template.templateMeta}
-          hidePoweredBy={isPlatformDocument || isEnterpriseDocument || hidePoweredBy}
-          isPlatformOrEnterprise={isPlatformDocument || isEnterpriseDocument}
-        />
+        <RecipientProvider recipient={recipient}>
+          <EmbedDirectTemplateClientPage
+            token={token}
+            updatedAt={template.updatedAt}
+            documentData={template.templateDocumentData}
+            recipient={recipient}
+            fields={fields}
+            metadata={template.templateMeta}
+            hidePoweredBy={isPlatformDocument || isEnterpriseDocument || hidePoweredBy}
+            isPlatformOrEnterprise={isPlatformDocument || isEnterpriseDocument}
+          />
+        </RecipientProvider>
       </DocumentAuthProvider>
     </SigningProvider>
   );
