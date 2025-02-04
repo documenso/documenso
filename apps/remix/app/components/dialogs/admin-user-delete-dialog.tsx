@@ -3,6 +3,7 @@ import { useState } from 'react';
 import { Trans, msg } from '@lingui/macro';
 import { useLingui } from '@lingui/react';
 import type { User } from '@prisma/client';
+import { useNavigate } from 'react-router';
 import { match } from 'ts-pattern';
 
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
@@ -29,7 +30,7 @@ export type AdminUserDeleteDialogProps = {
 export const AdminUserDeleteDialog = ({ className, user }: AdminUserDeleteDialogProps) => {
   const { _ } = useLingui();
   const { toast } = useToast();
-
+  const navigate = useNavigate();
   const [email, setEmail] = useState('');
 
   const { mutateAsync: deleteUser, isPending: isDeletingUser } =
@@ -41,14 +42,13 @@ export const AdminUserDeleteDialog = ({ className, user }: AdminUserDeleteDialog
         id: user.id,
       });
 
+      await navigate('/admin/users');
+
       toast({
         title: _(msg`Account deleted`),
         description: _(msg`The account has been deleted successfully.`),
         duration: 5000,
       });
-
-      // todo
-      // router.push('/admin/users');
     } catch (err) {
       const error = AppError.parseError(err);
 

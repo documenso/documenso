@@ -26,12 +26,22 @@ export type TemplatesTableActionDropdownProps = {
   };
   templateRootPath: string;
   teamId?: number;
+  onDelete?: () => Promise<void> | void;
+  onMove?: ({
+    templateId,
+    teamUrl,
+  }: {
+    templateId: number;
+    teamUrl: string;
+  }) => Promise<void> | void;
 };
 
 export const TemplatesTableActionDropdown = ({
   row,
   templateRootPath,
   teamId,
+  onDelete,
+  onMove,
 }: TemplatesTableActionDropdownProps) => {
   const { user } = useSession();
 
@@ -104,12 +114,14 @@ export const TemplatesTableActionDropdown = ({
         templateId={row.id}
         open={isMoveDialogOpen}
         onOpenChange={setMoveDialogOpen}
+        onMove={onMove}
       />
 
       <TemplateDeleteDialog
         id={row.id}
         open={isDeleteDialogOpen}
         onOpenChange={setDeleteDialogOpen}
+        onDelete={onDelete}
       />
     </DropdownMenu>
   );

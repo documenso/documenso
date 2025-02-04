@@ -5,9 +5,9 @@ import { LimitsProvider } from '@documenso/ee/server-only/limits/provider/client
 import { getSiteSettings } from '@documenso/lib/server-only/site-settings/get-site-settings';
 import { SITE_SETTINGS_BANNER_ID } from '@documenso/lib/server-only/site-settings/schemas/banner';
 
-import { AppBanner } from '~/components/(dashboard)/layout/app-banner';
-import { Header } from '~/components/(dashboard)/layout/header';
-import { VerifyEmailBanner } from '~/components/(dashboard)/layout/verify-email-banner';
+import { AppBanner } from '~/components/general/app-banner';
+import { Header } from '~/components/general/app-header';
+import { VerifyEmailBanner } from '~/components/general/verify-email-banner';
 
 import type { Route } from './+types/_layout';
 

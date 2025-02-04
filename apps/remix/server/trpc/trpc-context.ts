@@ -36,17 +36,7 @@ export const createHonoTrpcContext = async ({
     .catch(() => undefined)
     .parse(rawTeamId);
 
-  if (!session) {
-    return {
-      session: null,
-      user: null,
-      teamId,
-      req,
-      metadata,
-    };
-  }
-
-  if (!user) {
+  if (!session || !user) {
     return {
       session: null,
       user: null,
@@ -58,7 +48,7 @@ export const createHonoTrpcContext = async ({
 
   return {
     session,
-    user, // Todo
+    user,
     teamId,
     req,
     metadata,

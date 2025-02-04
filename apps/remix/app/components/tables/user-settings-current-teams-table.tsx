@@ -22,7 +22,7 @@ import { TableCell } from '@documenso/ui/primitives/table';
 
 import { TeamLeaveDialog } from '~/components/dialogs/team-leave-dialog';
 
-export const CurrentUserTeamsDataTable = () => {
+export const UserSettingsCurrentTeamsDataTable = () => {
   const { _, i18n } = useLingui();
 
   const [searchParams] = useSearchParams();

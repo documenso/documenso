@@ -22,7 +22,7 @@ import { PasswordInput } from '@documenso/ui/primitives/password-input';
 import { Switch } from '@documenso/ui/primitives/switch';
 import { useToast } from '@documenso/ui/primitives/use-toast';
 
-import { SettingsHeader } from '~/components/(dashboard)/settings/layout/header';
+import { SettingsHeader } from '~/components/general/settings-header';
 import { WebhookMultiSelectCombobox } from '~/components/general/webhook-multiselect-combobox';
 import { useCurrentTeam } from '~/providers/team';
 

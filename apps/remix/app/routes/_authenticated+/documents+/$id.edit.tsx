@@ -2,7 +2,7 @@ import { Plural, Trans } from '@lingui/macro';
 import { DocumentStatus as InternalDocumentStatus, TeamMemberRole } from '@prisma/client';
 import { ChevronLeft, Users2 } from 'lucide-react';
 import { Link, redirect } from 'react-router';
-import { getRequiredLoaderSession } from 'server/utils/get-required-session-context';
+import { getRequiredLoaderSession } from 'server/utils/get-loader-session';
 import { match } from 'ts-pattern';
 
 import { isUserEnterprise } from '@documenso/ee/server-only/util/is-document-enterprise';
@@ -10,9 +10,9 @@ import { getDocumentWithDetailsById } from '@documenso/lib/server-only/document/
 import { DocumentVisibility } from '@documenso/lib/types/document-visibility';
 import { formatDocumentsPath } from '@documenso/lib/utils/teams';
 
-import { StackAvatarsWithTooltip } from '~/components/(dashboard)/avatar/stack-avatars-with-tooltip';
-import { DocumentStatus } from '~/components/formatter/document-status';
 import { DocumentEditForm } from '~/components/general/document/document-edit-form';
+import { DocumentStatus } from '~/components/general/document/document-status';
+import { StackAvatarsWithTooltip } from '~/components/general/stack-avatars-with-tooltip';
 import { superLoaderJson, useSuperLoaderData } from '~/utils/super-json-loader';
 
 import type { Route } from './+types/$id.edit';

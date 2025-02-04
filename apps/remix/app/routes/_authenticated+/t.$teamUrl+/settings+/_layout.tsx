@@ -1,11 +1,11 @@
 import { Trans } from '@lingui/macro';
 import { Outlet } from 'react-router';
-import { getRequiredLoaderTeamSession } from 'server/utils/get-required-session-context';
+import { getRequiredLoaderTeamSession } from 'server/utils/get-loader-session';
 
 import { canExecuteTeamAction } from '@documenso/lib/utils/teams';
 
-import { TeamSettingsDesktopNav } from '~/components/general/teams/team-settings-desktop-nav';
-import { TeamSettingsMobileNav } from '~/components/general/teams/team-settings-mobile-nav';
+import { TeamSettingsNavDesktop } from '~/components/general/teams/team-settings-nav-desktop';
+import { TeamSettingsNavMobile } from '~/components/general/teams/team-settings-nav-mobile';
 
 import type { Route } from '../+types/_layout';
 
@@ -25,8 +25,8 @@ export default function TeamsSettingsLayout() {
       </h1>
 
       <div className="mt-4 grid grid-cols-12 gap-x-8 md:mt-8">
-        <TeamSettingsDesktopNav className="hidden md:col-span-3 md:flex" />
-        <TeamSettingsMobileNav className="col-span-12 mb-8 md:hidden" />
+        <TeamSettingsNavDesktop className="hidden md:col-span-3 md:flex" />
+        <TeamSettingsNavMobile className="col-span-12 mb-8 md:hidden" />
 
         <div className="col-span-12 md:col-span-9">
           <Outlet />

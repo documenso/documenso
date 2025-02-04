@@ -1,7 +1,7 @@
 import { msg } from '@lingui/macro';
 import { useLingui } from '@lingui/react';
 
-import { SettingsHeader } from '~/components/(dashboard)/settings/layout/header';
+import { SettingsHeader } from '~/components/general/settings-header';
 import { SettingsSecurityActivityTable } from '~/components/tables/settings-security-activity-table';
 
 export function meta() {

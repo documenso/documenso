@@ -8,12 +8,12 @@ import { getRootHref } from '@documenso/lib/utils/params';
 import { Sheet, SheetContent } from '@documenso/ui/primitives/sheet';
 import { ThemeSwitcher } from '@documenso/ui/primitives/theme-switcher';
 
-export type MobileNavigationProps = {
+export type AppNavMobileProps = {
   isMenuOpen: boolean;
   onMenuOpenChange?: (_value: boolean) => void;
 };
 
-export const MobileNavigation = ({ isMenuOpen, onMenuOpenChange }: MobileNavigationProps) => {
+export const AppNavMobile = ({ isMenuOpen, onMenuOpenChange }: AppNavMobileProps) => {
   const { _ } = useLingui();
 
   const params = useParams();

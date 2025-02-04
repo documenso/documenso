@@ -4,8 +4,8 @@ import { Trans, msg } from '@lingui/macro';
 import { useLingui } from '@lingui/react';
 import { match } from 'ts-pattern';
 
-import { NEXT_PUBLIC_WEBAPP_URL } from '@documenso/lib/constants/app';
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
+import { formatAvatarUrl } from '@documenso/lib/utils/avatars';
 import { trpc } from '@documenso/trpc/react';
 import { Avatar, AvatarFallback, AvatarImage } from '@documenso/ui/primitives/avatar';
 import { Button } from '@documenso/ui/primitives/button';
@@ -30,23 +30,42 @@ type TemplateMoveDialogProps = {
   templateId: number;
   open: boolean;
   onOpenChange: (_open: boolean) => void;
+  onMove?: ({
+    templateId,
+    teamUrl,
+  }: {
+    templateId: number;
+    teamUrl: string;
+  }) => Promise<void> | void;
 };
 
-export const TemplateMoveDialog = ({ templateId, open, onOpenChange }: TemplateMoveDialogProps) => {
+export const TemplateMoveDialog = ({
+  templateId,
+  open,
+  onOpenChange,
+  onMove,
+}: TemplateMoveDialogProps) => {
   const { toast } = useToast();
   const { _ } = useLingui();
 
   const [selectedTeamId, setSelectedTeamId] = useState<number | null>(null);
 
   const { data: teams, isLoading: isLoadingTeams } = trpc.team.getTeams.useQuery();
+
   const { mutateAsync: moveTemplate, isPending } = trpc.template.moveTemplateToTeam.useMutation({
-    onSuccess: () => {
-      // router.refresh(); // Todo
+    onSuccess: async () => {
+      const team = teams?.find((team) => team.id === selectedTeamId);
+
+      if (team) {
+        await onMove?.({ templateId, teamUrl: team.url });
+      }
+
       toast({
         title: _(msg`Template moved`),
         description: _(msg`The template has been successfully moved to the selected team.`),
         duration: 5000,
       });
+
       onOpenChange(false);
     },
     onError: (err) => {
@@ -69,7 +88,7 @@ export const TemplateMoveDialog = ({ templateId, open, onOpenChange }: TemplateM
     },
   });
 
-  const onMove = async () => {
+  const handleOnMove = async () => {
     if (!selectedTeamId) {
       return;
     }
@@ -104,9 +123,7 @@ export const TemplateMoveDialog = ({ templateId, open, onOpenChange }: TemplateM
                   <div className="flex items-center gap-4">
                     <Avatar className="h-8 w-8">
                       {team.avatarImageId && (
-                        <AvatarImage
-                          src={`${NEXT_PUBLIC_WEBAPP_URL()}/api/avatar/${team.avatarImageId}`}
-                        />
+                        <AvatarImage src={formatAvatarUrl(team.avatarImageId)} />
                       )}
 
                       <AvatarFallback className="text-sm text-gray-400">
@@ -126,7 +143,11 @@ export const TemplateMoveDialog = ({ templateId, open, onOpenChange }: TemplateM
           <Button variant="secondary" onClick={() => onOpenChange(false)}>
             <Trans>Cancel</Trans>
           </Button>
-          <Button onClick={onMove} loading={isPending} disabled={!selectedTeamId || isPending}>
+          <Button
+            onClick={handleOnMove}
+            loading={isPending}
+            disabled={!selectedTeamId || isPending}
+          >
             {isPending ? <Trans>Moving...</Trans> : <Trans>Move</Trans>}
           </Button>
         </DialogFooter>

@@ -1,10 +1,10 @@
 import { msg } from '@lingui/macro';
 import { useLingui } from '@lingui/react';
 
-import { SettingsHeader } from '~/components/(dashboard)/settings/layout/header';
 import { AccountDeleteDialog } from '~/components/dialogs/account-delete-dialog';
 import { AvatarImageForm } from '~/components/forms/avatar-image';
 import { ProfileForm } from '~/components/forms/profile';
+import { SettingsHeader } from '~/components/general/settings-header';
 
 export function meta() {
   return [{ title: 'Profile' }];

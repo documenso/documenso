@@ -1,8 +1,8 @@
 import { msg } from '@lingui/macro';
 import { useLingui } from '@lingui/react';
 
-import { SettingsHeader } from '~/components/(dashboard)/settings/layout/header';
 import { CreatePasskeyDialog } from '~/components/dialogs/create-passkey-dialog';
+import { SettingsHeader } from '~/components/general/settings-header';
 import { SettingsSecurityPasskeyTable } from '~/components/tables/settings-security-passkey-table';
 
 import type { Route } from './+types/index';

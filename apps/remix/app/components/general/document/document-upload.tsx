@@ -7,6 +7,7 @@ import { useNavigate } from 'react-router';
 import { match } from 'ts-pattern';
 
 import { useLimits } from '@documenso/ee/server-only/limits/provider/client';
+import { useAnalytics } from '@documenso/lib/client-only/hooks/use-analytics';
 import { useSession } from '@documenso/lib/client-only/providers/session';
 import { APP_DOCUMENT_UPLOAD_SIZE_LIMIT } from '@documenso/lib/constants/app';
 import { DEFAULT_DOCUMENT_TIME_ZONE, TIME_ZONES } from '@documenso/lib/constants/time-zones';
@@ -24,17 +25,18 @@ export type DocumentUploadDropzoneProps = {
 };
 
 export const DocumentUploadDropzone = ({ className }: DocumentUploadDropzoneProps) => {
+  const { _ } = useLingui();
+  const { toast } = useToast();
+  const { user } = useSession();
+
   const team = useOptionalCurrentTeam();
+
   const navigate = useNavigate();
+  const analytics = useAnalytics();
 
   const userTimezone =
     TIME_ZONES.find((timezone) => timezone === Intl.DateTimeFormat().resolvedOptions().timeZone) ??
     DEFAULT_DOCUMENT_TIME_ZONE;
-
-  const { user } = useSession();
-
-  const { _ } = useLingui();
-  const { toast } = useToast();
 
   const { quota, remaining, refreshLimits } = useLimits();
 
@@ -94,12 +96,11 @@ export const DocumentUploadDropzone = ({ className }: DocumentUploadDropzoneProp
         duration: 5000,
       });
 
-      // Todo
-      // analytics.capture('App: Document Uploaded', {
-      //   userId: session?.user.id,
-      //   documentId: id,
-      //   timestamp: new Date().toISOString(),
-      // });
+      analytics.capture('App: Document Uploaded', {
+        userId: user.id,
+        documentId: id,
+        timestamp: new Date().toISOString(),
+      });
 
       void navigate(`${formatDocumentsPath(team?.url)}/${id}/edit`);
     } catch (err) {

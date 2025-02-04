@@ -17,15 +17,21 @@ type TemplateDeleteDialogProps = {
   id: number;
   open: boolean;
   onOpenChange: (_open: boolean) => void;
+  onDelete?: () => Promise<void> | void;
 };
 
-export const TemplateDeleteDialog = ({ id, open, onOpenChange }: TemplateDeleteDialogProps) => {
+export const TemplateDeleteDialog = ({
+  id,
+  open,
+  onOpenChange,
+  onDelete,
+}: TemplateDeleteDialogProps) => {
   const { _ } = useLingui();
   const { toast } = useToast();
 
   const { mutateAsync: deleteTemplate, isPending } = trpcReact.template.deleteTemplate.useMutation({
-    onSuccess: () => {
-      // router.refresh(); // Todo
+    onSuccess: async () => {
+      await onDelete?.();
 
       toast({
         title: _(msg`Template deleted`),

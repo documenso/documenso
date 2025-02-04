@@ -17,9 +17,9 @@ import { TableCell } from '@documenso/ui/primitives/table';
 
 import { TeamCheckoutCreateDialog } from '~/components/dialogs/team-checkout-create-dialog';
 
-import { PendingUserTeamsDataTableActions } from './pending-user-teams-data-table-actions';
+import { UserSettingsPendingTeamsTableActions } from './user-settings-pending-teams-table-actions';
 
-export const PendingUserTeamsDataTable = () => {
+export const UserSettingsPendingTeamsDataTable = () => {
   const { _, i18n } = useLingui();
 
   const [searchParams] = useSearchParams();
@@ -78,7 +78,7 @@ export const PendingUserTeamsDataTable = () => {
       {
         id: 'actions',
         cell: ({ row }) => (
-          <PendingUserTeamsDataTableActions
+          <UserSettingsPendingTeamsTableActions
             className="justify-end"
             pendingTeamId={row.original.id}
             onPayClick={setCheckoutPendingTeamId}

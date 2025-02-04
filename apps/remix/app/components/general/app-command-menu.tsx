@@ -65,12 +65,12 @@ const SETTINGS_PAGES = [
   { label: msg`Password`, path: '/settings/password' },
 ];
 
-export type CommandMenuProps = {
+export type AppCommandMenuProps = {
   open?: boolean;
   onOpenChange?: (_open: boolean) => void;
 };
 
-export function CommandMenu({ open, onOpenChange }: CommandMenuProps) {
+export function AppCommandMenu({ open, onOpenChange }: AppCommandMenuProps) {
   const { _ } = useLingui();
 
   const navigate = useNavigate();

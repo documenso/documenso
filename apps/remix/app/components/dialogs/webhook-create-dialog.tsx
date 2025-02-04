@@ -88,8 +88,6 @@ export const WebhookCreateDialog = ({ trigger, ...props }: WebhookCreateDialogPr
       });
 
       form.reset();
-
-      // router.refresh(); // Todo
     } catch (err) {
       toast({
         title: _(msg`Error`),

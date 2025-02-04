@@ -4,11 +4,11 @@ import { Link, Outlet } from 'react-router';
 
 import { Button } from '@documenso/ui/primitives/button';
 
-import { Header as AuthenticatedHeader } from '~/components/(dashboard)/layout/header';
+import { Header as AuthenticatedHeader } from '~/components/general/app-header';
 
 import type { Route } from './+types/_layout';
 
-export async function loader({ context }: Route.LoaderArgs) {
+export function loader({ context }: Route.LoaderArgs) {
   return {
     user: context.session?.user,
     teams: context.session?.teams || [],

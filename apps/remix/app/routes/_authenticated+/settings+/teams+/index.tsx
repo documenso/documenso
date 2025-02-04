@@ -5,9 +5,9 @@ import { AnimatePresence } from 'framer-motion';
 import { trpc } from '@documenso/trpc/react';
 import { AnimateGenericFadeInOut } from '@documenso/ui/components/animate/animate-generic-fade-in-out';
 
-import { SettingsHeader } from '~/components/(dashboard)/settings/layout/header';
-import { UserSettingsTeamsPageDataTable } from '~/components/(teams)/tables/user-settings-teams-page-data-table';
 import { TeamCreateDialog } from '~/components/dialogs/team-create-dialog';
+import { SettingsHeader } from '~/components/general/settings-header';
+import { UserSettingsTeamsPageDataTable } from '~/components/tables/user-settings-teams-page-table';
 
 import { TeamEmailUsage } from './team-email-usage';
 import { TeamInvitations } from './team-invitations';

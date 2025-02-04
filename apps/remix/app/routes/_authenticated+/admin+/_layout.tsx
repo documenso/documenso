@@ -1,7 +1,7 @@
 import { Trans } from '@lingui/macro';
 import { BarChart3, FileStack, Settings, Trophy, Users, Wallet2 } from 'lucide-react';
 import { Link, Outlet, redirect, useLocation } from 'react-router';
-import { getRequiredLoaderSession } from 'server/utils/get-required-session-context';
+import { getRequiredLoaderSession } from 'server/utils/get-loader-session';
 
 import { isAdmin } from '@documenso/lib/next-auth/guards/is-admin';
 import { cn } from '@documenso/ui/lib/utils';

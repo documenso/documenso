@@ -1,5 +1,3 @@
-'use effect';
-
 import { useEffect, useState } from 'react';
 
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -77,8 +75,6 @@ export const WebhookDeleteDialog = ({ webhook, children }: WebhookDeleteDialogPr
       });
 
       setOpen(false);
-
-      // router.refresh(); // Todo
     } catch (error) {
       toast({
         title: _(msg`An unknown error occurred`),

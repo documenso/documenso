@@ -24,9 +24,9 @@ import {
 import { getSignerConversionMonthly } from '@documenso/lib/server-only/user/get-signer-conversion';
 import { env } from '@documenso/lib/utils/env';
 
-import { CardMetric } from '~/components/(dashboard)/metric-card/metric-card';
 import { AdminStatsSignerConversionChart } from '~/components/general/admin-stats-signer-conversion-chart';
 import { AdminStatsUsersWithDocumentsChart } from '~/components/general/admin-stats-users-with-documents';
+import { CardMetric } from '~/components/general/metric-card';
 
 import type { Route } from './+types/stats';
 

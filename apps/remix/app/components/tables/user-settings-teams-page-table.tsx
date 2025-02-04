@@ -11,8 +11,8 @@ import { trpc } from '@documenso/trpc/react';
 import { Input } from '@documenso/ui/primitives/input';
 import { Tabs, TabsList, TabsTrigger } from '@documenso/ui/primitives/tabs';
 
-import { CurrentUserTeamsDataTable } from './current-user-teams-data-table';
-import { PendingUserTeamsDataTable } from './pending-user-teams-data-table';
+import { UserSettingsCurrentTeamsDataTable } from './user-settings-current-teams-table';
+import { UserSettingsPendingTeamsDataTable } from './user-settings-pending-teams-table';
 
 export const UserSettingsTeamsPageDataTable = () => {
   const { _ } = useLingui();
@@ -82,7 +82,11 @@ export const UserSettingsTeamsPageDataTable = () => {
         </Tabs>
       </div>
 
-      {currentTab === 'pending' ? <PendingUserTeamsDataTable /> : <CurrentUserTeamsDataTable />}
+      {currentTab === 'pending' ? (
+        <UserSettingsPendingTeamsDataTable />
+      ) : (
+        <UserSettingsCurrentTeamsDataTable />
+      )}
     </div>
   );
 };

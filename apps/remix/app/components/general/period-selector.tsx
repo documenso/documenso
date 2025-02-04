@@ -3,6 +3,7 @@ import { useMemo } from 'react';
 import { Trans } from '@lingui/macro';
 import { useLocation, useNavigate, useSearchParams } from 'react-router';
 
+import type { PeriodSelectorValue } from '@documenso/lib/server-only/document/find-documents';
 import {
   Select,
   SelectContent,
@@ -11,7 +12,10 @@ import {
   SelectValue,
 } from '@documenso/ui/primitives/select';
 
-import { isPeriodSelectorValue } from './types';
+const isPeriodSelectorValue = (value: unknown): value is PeriodSelectorValue => {
+  // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
+  return ['', '7d', '14d', '30d'].includes(value as string);
+};
 
 export const PeriodSelector = () => {
   const { pathname } = useLocation();

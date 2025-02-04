@@ -172,18 +172,33 @@ export const documentRouter = router({
         };
       }
 
+      console.log({
+        userId: user.id,
+        teamId,
+        query,
+        templateId,
+        page,
+        perPage,
+        source,
+        status,
+        period,
+        senderIds,
+        orderBy: orderByColumn ? { column: orderByColumn, direction: orderByDirection } : undefined,
+      });
+
       const [stats, documents] = await Promise.all([
         getStats(getStatOptions),
         findDocuments({
           userId: user.id,
           teamId,
-          templateId,
           query,
-          source,
-          status,
+          templateId,
           page,
           perPage,
+          source,
+          status,
           period,
+          senderIds,
           orderBy: orderByColumn
             ? { column: orderByColumn, direction: orderByDirection }
             : undefined,

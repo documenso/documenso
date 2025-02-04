@@ -9,7 +9,7 @@ import LogoIcon from '@documenso/assets/logo_icon.png';
 import { cn } from '@documenso/ui/lib/utils';
 import { Button } from '@documenso/ui/primitives/button';
 
-import { Header as AuthenticatedHeader } from '~/components/(dashboard)/layout/header';
+import { Header as AuthenticatedHeader } from '~/components/general/app-header';
 import { Logo } from '~/components/general/branding-logo';
 
 import type { Route } from './+types/_layout';

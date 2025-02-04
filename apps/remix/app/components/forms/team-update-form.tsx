@@ -28,20 +28,20 @@ export type UpdateTeamDialogProps = {
   teamUrl: string;
 };
 
-const ZUpdateTeamFormSchema = ZUpdateTeamMutationSchema.shape.data.pick({
+const ZTeamUpdateFormSchema = ZUpdateTeamMutationSchema.shape.data.pick({
   name: true,
   url: true,
 });
 
-type TUpdateTeamFormSchema = z.infer<typeof ZUpdateTeamFormSchema>;
+type TTeamUpdateFormSchema = z.infer<typeof ZTeamUpdateFormSchema>;
 
-export const UpdateTeamForm = ({ teamId, teamName, teamUrl }: UpdateTeamDialogProps) => {
+export const TeamUpdateForm = ({ teamId, teamName, teamUrl }: UpdateTeamDialogProps) => {
   const navigate = useNavigate();
   const { _ } = useLingui();
   const { toast } = useToast();
 
   const form = useForm({
-    resolver: zodResolver(ZUpdateTeamFormSchema),
+    resolver: zodResolver(ZTeamUpdateFormSchema),
     defaultValues: {
       name: teamName,
       url: teamUrl,
@@ -50,7 +50,7 @@ export const UpdateTeamForm = ({ teamId, teamName, teamUrl }: UpdateTeamDialogPr
 
   const { mutateAsync: updateTeam } = trpc.team.updateTeam.useMutation();
 
-  const onFormSubmit = async ({ name, url }: TUpdateTeamFormSchema) => {
+  const onFormSubmit = async ({ name, url }: TTeamUpdateFormSchema) => {
     try {
       await updateTeam({
         data: {

@@ -15,6 +15,7 @@ import {
   Trash2,
 } from 'lucide-react';
 import { Link } from 'react-router';
+import { useNavigate } from 'react-router';
 
 import { downloadPDF } from '@documenso/lib/client-only/download-pdf';
 import { useSession } from '@documenso/lib/client-only/providers/session';
@@ -33,7 +34,7 @@ import { useToast } from '@documenso/ui/primitives/use-toast';
 import { DocumentDeleteDialog } from '~/components/dialogs/document-delete-dialog';
 import { DocumentDuplicateDialog } from '~/components/dialogs/document-duplicate-dialog';
 import { DocumentResendDialog } from '~/components/dialogs/document-resend-dialog';
-import { DocumentRecipientLinkCopyDialog } from '~/components/document/document-recipient-link-copy-dialog';
+import { DocumentRecipientLinkCopyDialog } from '~/components/general/document/document-recipient-link-copy-dialog';
 import { useOptionalCurrentTeam } from '~/providers/team';
 
 export type DocumentPageViewDropdownProps = {
@@ -49,6 +50,7 @@ export const DocumentPageViewDropdown = ({ document }: DocumentPageViewDropdownP
   const { toast } = useToast();
   const { _ } = useLingui();
 
+  const navigate = useNavigate();
   const team = useOptionalCurrentTeam();
 
   const [isDeleteDialogOpen, setDeleteDialogOpen] = useState(false);
@@ -186,6 +188,9 @@ export const DocumentPageViewDropdown = ({ document }: DocumentPageViewDropdownP
         open={isDeleteDialogOpen}
         canManageDocument={canManageDocument}
         onOpenChange={setDeleteDialogOpen}
+        onDelete={() => {
+          void navigate(documentsPath);
+        }}
       />
 
       {isDuplicateDialogOpen && (

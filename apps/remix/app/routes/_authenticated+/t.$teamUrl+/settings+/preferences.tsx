@@ -1,9 +1,9 @@
 import { msg } from '@lingui/macro';
 import { useLingui } from '@lingui/react';
 
-import { SettingsHeader } from '~/components/(dashboard)/settings/layout/header';
 import { TeamBrandingPreferencesForm } from '~/components/forms/team-branding-preferences-form';
 import { TeamDocumentPreferencesForm } from '~/components/forms/team-document-preferences-form';
+import { SettingsHeader } from '~/components/general/settings-header';
 import { useCurrentTeam } from '~/providers/team';
 
 export default function TeamsSettingsPage() {

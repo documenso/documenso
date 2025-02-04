@@ -10,9 +10,9 @@ import { cn } from '@documenso/ui/lib/utils';
 import { Badge } from '@documenso/ui/primitives/badge';
 import { Button } from '@documenso/ui/primitives/button';
 
-import { SettingsHeader } from '~/components/(dashboard)/settings/layout/header';
 import { WebhookCreateDialog } from '~/components/dialogs/webhook-create-dialog';
 import { WebhookDeleteDialog } from '~/components/dialogs/webhook-delete-dialog';
+import { SettingsHeader } from '~/components/general/settings-header';
 
 export default function WebhookPage() {
   const { _, i18n } = useLingui();

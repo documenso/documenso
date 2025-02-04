@@ -1,29 +1,17 @@
 import { Trans } from '@lingui/macro';
 import { useLingui } from '@lingui/react';
 import { DateTime } from 'luxon';
-import { getRequiredLoaderSession } from 'server/utils/get-required-session-context';
 
-import { getUserTokens } from '@documenso/lib/server-only/public-api/get-all-user-tokens';
+import { trpc } from '@documenso/trpc/react';
 import { Button } from '@documenso/ui/primitives/button';
 
-import DeleteTokenDialog from '~/components/(dashboard)/settings/token/delete-token-dialog';
+import TokenDeleteDialog from '~/components/dialogs/token-delete-dialog';
 import { ApiTokenForm } from '~/components/forms/token';
 
-import type { Route } from './+types/index';
-
-export async function loader({ context }: Route.LoaderArgs) {
-  const { user } = getRequiredLoaderSession(context);
-
-  // Todo: Use TRPC & use table instead
-  const tokens = await getUserTokens({ userId: user.id });
-
-  return { tokens };
-}
-
-export default function ApiTokensPage({ loaderData }: Route.ComponentProps) {
+export default function ApiTokensPage() {
   const { i18n } = useLingui();
 
-  const { tokens } = loaderData;
+  const { data: tokens } = trpc.apiToken.getTokens.useQuery();
 
   return (
     <div>
@@ -56,7 +44,7 @@ export default function ApiTokensPage({ loaderData }: Route.ComponentProps) {
         <Trans>Your existing tokens</Trans>
       </h4>
 
-      {tokens.length === 0 && (
+      {tokens && tokens.length === 0 && (
         <div className="mb-4">
           <p className="text-muted-foreground mt-2 text-sm italic">
             <Trans>Your tokens will be shown here once you create them.</Trans>
@@ -64,7 +52,7 @@ export default function ApiTokensPage({ loaderData }: Route.ComponentProps) {
         </div>
       )}
 
-      {tokens.length > 0 && (
+      {tokens && tokens.length > 0 && (
         <div className="mt-4 flex max-w-xl flex-col gap-y-4">
           {tokens.map((token) => (
             <div key={token.id} className="border-border rounded-lg border p-4">
@@ -87,11 +75,11 @@ export default function ApiTokensPage({ loaderData }: Route.ComponentProps) {
                 </div>
 
                 <div>
-                  <DeleteTokenDialog token={token}>
+                  <TokenDeleteDialog token={token}>
                     <Button variant="destructive">
                       <Trans>Delete</Trans>
                     </Button>
-                  </DeleteTokenDialog>
+                  </TokenDeleteDialog>
                 </div>
               </div>
             </div>

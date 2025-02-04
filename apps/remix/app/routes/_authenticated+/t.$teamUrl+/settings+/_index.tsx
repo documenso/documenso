@@ -3,18 +3,18 @@ import { CheckCircle2, Clock } from 'lucide-react';
 import { P, match } from 'ts-pattern';
 
 import { useSession } from '@documenso/lib/client-only/providers/session';
-import { NEXT_PUBLIC_WEBAPP_URL } from '@documenso/lib/constants/app';
+import { formatAvatarUrl } from '@documenso/lib/utils/avatars';
 import { extractInitials } from '@documenso/lib/utils/recipient-formatter';
 import { isTokenExpired } from '@documenso/lib/utils/token-verification';
 import { Alert, AlertDescription, AlertTitle } from '@documenso/ui/primitives/alert';
 import { AvatarWithText } from '@documenso/ui/primitives/avatar';
 
-import { SettingsHeader } from '~/components/(dashboard)/settings/layout/header';
-import { UpdateTeamForm } from '~/components/(teams)/forms/update-team-form';
 import { TeamDeleteDialog } from '~/components/dialogs/team-delete-dialog';
 import { TeamEmailAddDialog } from '~/components/dialogs/team-email-add-dialog';
 import { TeamTransferDialog } from '~/components/dialogs/team-transfer-dialog';
 import { AvatarImageForm } from '~/components/forms/avatar-image';
+import { TeamUpdateForm } from '~/components/forms/team-update-form';
+import { SettingsHeader } from '~/components/general/settings-header';
 import { TeamEmailDropdown } from '~/components/general/teams/team-email-dropdown';
 import { TeamTransferStatus } from '~/components/general/teams/team-transfer-status';
 import { useCurrentTeam } from '~/providers/team';
@@ -40,7 +40,7 @@ export default function TeamsSettingsPage() {
 
       <AvatarImageForm className="mb-8" />
 
-      <UpdateTeamForm teamId={team.id} teamName={team.name} teamUrl={team.url} />
+      <TeamUpdateForm teamId={team.id} teamName={team.name} teamUrl={team.url} />
 
       <section className="mt-6 space-y-6">
         {(team.teamEmail || team.emailVerification) && (
@@ -61,7 +61,7 @@ export default function TeamsSettingsPage() {
             <div className="flex flex-row items-center justify-between pt-4">
               <AvatarWithText
                 avatarClass="h-12 w-12"
-                avatarSrc={`${NEXT_PUBLIC_WEBAPP_URL()}/api/avatar/${team.avatarImageId}`}
+                avatarSrc={formatAvatarUrl(team.avatarImageId)}
                 avatarFallback={extractInitials(
                   (team.teamEmail?.name || team.emailVerification?.name) ?? '',
                 )}

@@ -40,7 +40,7 @@ export const findDocuments = async ({
   orderBy,
   period,
   senderIds,
-  query,
+  query = '',
 }: FindDocumentsOptions) => {
   const user = await prisma.user.findFirstOrThrow({
     where: {
@@ -225,6 +225,8 @@ export const findDocuments = async ({
       in: senderIds,
     };
   }
+
+  console.log(JSON.stringify(whereClause, null, 2));
 
   const [data, count] = await Promise.all([
     prisma.document.findMany({

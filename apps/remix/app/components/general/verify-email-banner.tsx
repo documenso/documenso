@@ -29,6 +29,7 @@ export const VerifyEmailBanner = ({ email }: VerifyEmailBannerProps) => {
 
   const [isButtonDisabled, setIsButtonDisabled] = useState(false);
 
+  // Todo
   const { mutateAsync: sendConfirmationEmail, isPending } =
     trpc.profile.sendConfirmationEmail.useMutation();
 

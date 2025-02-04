@@ -3,7 +3,7 @@ import { useState } from 'react';
 import { Trans, msg } from '@lingui/macro';
 import { useLingui } from '@lingui/react';
 
-import { NEXT_PUBLIC_WEBAPP_URL } from '@documenso/lib/constants/app';
+import { formatAvatarUrl } from '@documenso/lib/utils/avatars';
 import { trpc } from '@documenso/trpc/react';
 import { Avatar, AvatarFallback, AvatarImage } from '@documenso/ui/primitives/avatar';
 import { Button } from '@documenso/ui/primitives/button';
@@ -40,14 +40,12 @@ export const DocumentMoveDialog = ({ documentId, open, onOpenChange }: DocumentM
 
   const { mutateAsync: moveDocument, isPending } = trpc.document.moveDocumentToTeam.useMutation({
     onSuccess: () => {
-      // todo
-      // router.refresh();
-
       toast({
         title: _(msg`Document moved`),
         description: _(msg`The document has been successfully moved to the selected team.`),
         duration: 5000,
       });
+
       onOpenChange(false);
     },
     onError: (error) => {
@@ -95,9 +93,7 @@ export const DocumentMoveDialog = ({ documentId, open, onOpenChange }: DocumentM
                   <div className="flex items-center gap-4">
                     <Avatar className="h-8 w-8">
                       {team.avatarImageId && (
-                        <AvatarImage
-                          src={`${NEXT_PUBLIC_WEBAPP_URL()}/api/avatar/${team.avatarImageId}`}
-                        />
+                        <AvatarImage src={formatAvatarUrl(team.avatarImageId)} />
                       )}
 
                       <AvatarFallback className="text-sm text-gray-400">

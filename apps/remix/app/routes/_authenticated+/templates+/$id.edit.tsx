@@ -1,15 +1,15 @@
 import { Trans } from '@lingui/macro';
 import { ChevronLeft } from 'lucide-react';
 import { Link, redirect } from 'react-router';
-import { getRequiredLoaderSession } from 'server/utils/get-required-session-context';
+import { getRequiredLoaderSession } from 'server/utils/get-loader-session';
 
 import { isUserEnterprise } from '@documenso/ee/server-only/util/is-document-enterprise';
 import { getTemplateById } from '@documenso/lib/server-only/template/get-template-by-id';
 import { formatTemplatesPath } from '@documenso/lib/utils/teams';
 
-import { TemplateType } from '~/components/formatter/template-type';
 import { TemplateDirectLinkBadge } from '~/components/general/template/template-direct-link-badge';
 import { TemplateEditForm } from '~/components/general/template/template-edit-form';
+import { TemplateType } from '~/components/general/template/template-type';
 import { superLoaderJson, useSuperLoaderData } from '~/utils/super-json-loader';
 
 import { TemplateDirectLinkDialogWrapper } from '../../../components/dialogs/template-direct-link-dialog-wrapper';

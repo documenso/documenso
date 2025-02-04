@@ -1,7 +1,7 @@
 import { Plural, Trans, msg } from '@lingui/macro';
 import { useLingui } from '@lingui/react';
 import { DateTime } from 'luxon';
-import { getRequiredLoaderTeamSession } from 'server/utils/get-required-session-context';
+import { getRequiredLoaderTeamSession } from 'server/utils/get-loader-session';
 import type Stripe from 'stripe';
 import { match } from 'ts-pattern';
 
@@ -9,9 +9,9 @@ import { stripe } from '@documenso/lib/server-only/stripe';
 import { canExecuteTeamAction } from '@documenso/lib/utils/teams';
 import { Card, CardContent } from '@documenso/ui/primitives/card';
 
-import { SettingsHeader } from '~/components/(dashboard)/settings/layout/header';
-import { TeamBillingInvoicesDataTable } from '~/components/(teams)/tables/team-billing-invoices-data-table';
+import { SettingsHeader } from '~/components/general/settings-header';
 import { TeamBillingPortalButton } from '~/components/general/teams/team-billing-portal-button';
+import { TeamSettingsBillingInvoicesTable } from '~/components/tables/team-settings-billing-invoices-table';
 
 import type { Route } from './+types/billing';
 
@@ -94,7 +94,7 @@ export default function TeamsSettingBillingPage({ loaderData }: Route.ComponentP
       </Card>
 
       <section className="mt-6">
-        <TeamBillingInvoicesDataTable teamId={team.id} />
+        <TeamSettingsBillingInvoicesTable teamId={team.id} />
       </section>
     </div>
   );

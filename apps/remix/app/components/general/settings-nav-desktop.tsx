@@ -2,24 +2,22 @@ import type { HTMLAttributes } from 'react';
 
 import { Trans } from '@lingui/macro';
 import { Braces, CreditCard, Globe2Icon, Lock, User, Users, Webhook } from 'lucide-react';
-import { Link, useLocation } from 'react-router';
+import { useLocation } from 'react-router';
+import { Link } from 'react-router';
 
+import { IS_BILLING_ENABLED } from '@documenso/lib/constants/app';
 import { cn } from '@documenso/ui/lib/utils';
 import { Button } from '@documenso/ui/primitives/button';
 
-export type MobileNavProps = HTMLAttributes<HTMLDivElement>;
+export type SettingsDesktopNavProps = HTMLAttributes<HTMLDivElement>;
 
-export const MobileNav = ({ className, ...props }: MobileNavProps) => {
+export const SettingsDesktopNav = ({ className, ...props }: SettingsDesktopNavProps) => {
   const { pathname } = useLocation();
 
-  const isBillingEnabled = false; // Todo getFlag('app_billing');
-  const isPublicProfileEnabled = true; // Todo getFlag('app_public_profile');
+  const isBillingEnabled = IS_BILLING_ENABLED();
 
   return (
-    <div
-      className={cn('flex flex-wrap items-center justify-start gap-x-2 gap-y-4', className)}
-      {...props}
-    >
+    <div className={cn('flex flex-col gap-y-2', className)} {...props}>
       <Link to="/settings/profile">
         <Button
           variant="ghost"
@@ -33,20 +31,18 @@ export const MobileNav = ({ className, ...props }: MobileNavProps) => {
         </Button>
       </Link>
 
-      {isPublicProfileEnabled && (
-        <Link to="/settings/public-profile">
-          <Button
-            variant="ghost"
-            className={cn(
-              'w-full justify-start',
-              pathname?.startsWith('/settings/public-profile') && 'bg-secondary',
-            )}
-          >
-            <Globe2Icon className="mr-2 h-5 w-5" />
-            <Trans>Public Profile</Trans>
-          </Button>
-        </Link>
-      )}
+      <Link to="/settings/public-profile">
+        <Button
+          variant="ghost"
+          className={cn(
+            'w-full justify-start',
+            pathname?.startsWith('/settings/public-profile') && 'bg-secondary',
+          )}
+        >
+          <Globe2Icon className="mr-2 h-5 w-5" />
+          <Trans>Public Profile</Trans>
+        </Button>
+      </Link>
 
       <Link to="/settings/teams">
         <Button

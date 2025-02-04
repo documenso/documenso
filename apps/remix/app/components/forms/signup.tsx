@@ -32,8 +32,8 @@ import { PasswordInput } from '@documenso/ui/primitives/password-input';
 import { SignaturePad } from '@documenso/ui/primitives/signature-pad';
 import { useToast } from '@documenso/ui/primitives/use-toast';
 
-import { UserProfileSkeleton } from '~/components/ui/user-profile-skeleton';
-import { UserProfileTimur } from '~/components/ui/user-profile-timur';
+import { UserProfileSkeleton } from '~/components/general/user-profile-skeleton';
+import { UserProfileTimur } from '~/components/general/user-profile-timur';
 
 const SIGN_UP_REDIRECT_PATH = '/documents';
 
@@ -216,9 +216,8 @@ export const SignUpForm = ({
         <div className="absolute -inset-8 -z-[2] backdrop-blur">
           <img
             src={communityCardsImage}
-            // Todo fill={true}
             alt="community-cards"
-            className="dark:brightness-95 dark:contrast-[70%] dark:invert"
+            className="h-full w-full object-cover dark:brightness-95 dark:contrast-[70%] dark:invert"
           />
         </div>
 

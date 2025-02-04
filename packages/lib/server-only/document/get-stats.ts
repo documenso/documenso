@@ -17,7 +17,7 @@ export type GetStatsInput = {
   search?: string;
 };
 
-export const getStats = async ({ user, period, search, ...options }: GetStatsInput) => {
+export const getStats = async ({ user, period, search = '', ...options }: GetStatsInput) => {
   let createdAt: Prisma.DocumentWhereInput['createdAt'];
 
   if (period) {

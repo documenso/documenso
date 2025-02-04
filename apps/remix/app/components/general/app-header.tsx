@@ -10,10 +10,10 @@ import { cn } from '@documenso/ui/lib/utils';
 
 import { BrandingLogo } from '~/components/general/branding-logo';
 
-import { CommandMenu } from '../common/command-menu';
-import { DesktopNav } from './desktop-nav';
+import { AppCommandMenu } from './app-command-menu';
+import { AppNavDesktop } from './app-nav-desktop';
+import { AppNavMobile } from './app-nav-mobile';
 import { MenuSwitcher } from './menu-switcher';
-import { MobileNavigation } from './mobile-navigation';
 
 export type HeaderProps = HTMLAttributes<HTMLDivElement> & {
   user: User;
@@ -22,7 +22,7 @@ export type HeaderProps = HTMLAttributes<HTMLDivElement> & {
 
 export const Header = ({ className, user, teams, ...props }: HeaderProps) => {
   const params = useParams();
-  const { pathname } = useLocation(); // Todo: Test
+  const { pathname } = useLocation();
 
   const [isCommandMenuOpen, setIsCommandMenuOpen] = useState(false);
   const [isHamburgerMenuOpen, setIsHamburgerMenuOpen] = useState(false);
@@ -65,7 +65,7 @@ export const Header = ({ className, user, teams, ...props }: HeaderProps) => {
           <BrandingLogo className="h-6 w-auto" />
         </Link>
 
-        <DesktopNav setIsCommandMenuOpen={setIsCommandMenuOpen} />
+        <AppNavDesktop setIsCommandMenuOpen={setIsCommandMenuOpen} />
 
         <div
           className="flex gap-x-4 md:ml-8"
@@ -83,9 +83,9 @@ export const Header = ({ className, user, teams, ...props }: HeaderProps) => {
             <MenuIcon className="text-muted-foreground h-6 w-6" />
           </button>
 
-          <CommandMenu open={isCommandMenuOpen} onOpenChange={setIsCommandMenuOpen} />
+          <AppCommandMenu open={isCommandMenuOpen} onOpenChange={setIsCommandMenuOpen} />
 
-          <MobileNavigation
+          <AppNavMobile
             isMenuOpen={isHamburgerMenuOpen}
             onMenuOpenChange={setIsHamburgerMenuOpen}
           />

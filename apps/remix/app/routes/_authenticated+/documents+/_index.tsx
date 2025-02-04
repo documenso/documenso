@@ -15,10 +15,10 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from '@documenso/ui/primitives/avatar';
 import { Tabs, TabsList, TabsTrigger } from '@documenso/ui/primitives/tabs';
 
-import { DocumentSearch } from '~/components/(dashboard)/document-search/document-search';
-import { PeriodSelector } from '~/components/(dashboard)/period-selector/period-selector';
-import { DocumentUploadDropzone } from '~/components/document/document-upload';
-import { DocumentStatus } from '~/components/formatter/document-status';
+import { DocumentSearch } from '~/components/general/document/document-search';
+import { DocumentStatus } from '~/components/general/document/document-status';
+import { DocumentUploadDropzone } from '~/components/general/document/document-upload';
+import { PeriodSelector } from '~/components/general/period-selector';
 import { DocumentsTable } from '~/components/tables/documents-table';
 import { DocumentsTableEmptyState } from '~/components/tables/documents-table-empty-state';
 import { DocumentsTableSenderFilter } from '~/components/tables/documents-table-sender-filter';
@@ -98,7 +98,7 @@ export default function DocumentsPage() {
         </div>
 
         <div className="-m-1 flex flex-wrap gap-x-4 gap-y-6 overflow-hidden p-1">
-          <Tabs value={findDocumentSearchParams.status} className="overflow-x-auto">
+          <Tabs value={findDocumentSearchParams.status || 'ALL'} className="overflow-x-auto">
             <TabsList>
               {[
                 ExtendedDocumentStatus.INBOX,

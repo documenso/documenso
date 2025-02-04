@@ -35,8 +35,9 @@ import {
 } from '@documenso/ui/primitives/form/form';
 import { useToast } from '@documenso/ui/primitives/use-toast';
 
-import { StackAvatar } from '~/components/(dashboard)/avatar/stack-avatar';
 import { useOptionalCurrentTeam } from '~/providers/team';
+
+import { StackAvatar } from '../general/stack-avatar';
 
 const FORM_ID = 'resend-email';
 

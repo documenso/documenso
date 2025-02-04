@@ -6,11 +6,11 @@ import { useSession } from '@documenso/lib/client-only/providers/session';
 import { Alert, AlertDescription, AlertTitle } from '@documenso/ui/primitives/alert';
 import { Button } from '@documenso/ui/primitives/button';
 
-import { SettingsHeader } from '~/components/(dashboard)/settings/layout/header';
 import { DisableAuthenticatorAppDialog } from '~/components/forms/2fa/disable-authenticator-app-dialog';
 import { EnableAuthenticatorAppDialog } from '~/components/forms/2fa/enable-authenticator-app-dialog';
 import { ViewRecoveryCodesDialog } from '~/components/forms/2fa/view-recovery-codes-dialog';
 import { PasswordForm } from '~/components/forms/password';
+import { SettingsHeader } from '~/components/general/settings-header';
 
 export function meta() {
   return [{ title: 'Security' }];

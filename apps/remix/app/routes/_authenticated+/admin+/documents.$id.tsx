@@ -23,7 +23,7 @@ import {
 import { useToast } from '@documenso/ui/primitives/use-toast';
 
 import { AdminDocumentDeleteDialog } from '~/components/dialogs/admin-document-delete-dialog';
-import { DocumentStatus } from '~/components/formatter/document-status';
+import { DocumentStatus } from '~/components/general/document/document-status';
 import { AdminDocumentRecipientItemTable } from '~/components/tables/admin-document-recipient-item-table';
 
 import type { Route } from './+types/documents.$id';

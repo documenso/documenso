@@ -17,7 +17,7 @@ import { DataTablePagination } from '@documenso/ui/primitives/data-table-paginat
 import { Input } from '@documenso/ui/primitives/input';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@documenso/ui/primitives/tooltip';
 
-import { DocumentStatus } from '~/components/formatter/document-status';
+import { DocumentStatus } from '~/components/general/document/document-status';
 
 export default function AdminDocumentsPage() {
   const { _, i18n } = useLingui();

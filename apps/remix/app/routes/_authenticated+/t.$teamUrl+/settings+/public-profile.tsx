@@ -1,4 +1,4 @@
-import { getRequiredLoaderTeamSession } from 'server/utils/get-required-session-context';
+import { getRequiredLoaderTeamSession } from 'server/utils/get-loader-session';
 
 import { getTeamPublicProfile } from '@documenso/lib/server-only/team/get-team-public-profile';
 

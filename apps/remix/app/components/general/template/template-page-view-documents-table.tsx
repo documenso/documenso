@@ -20,15 +20,16 @@ import { Skeleton } from '@documenso/ui/primitives/skeleton';
 import { TableCell } from '@documenso/ui/primitives/table';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@documenso/ui/primitives/tooltip';
 
-import { StackAvatarsWithTooltip } from '~/components/(dashboard)/avatar/stack-avatars-with-tooltip';
-import { DocumentSearch } from '~/components/(dashboard)/document-search/document-search';
-import { PeriodSelector } from '~/components/(dashboard)/period-selector/period-selector';
-import { DocumentStatus } from '~/components/formatter/document-status';
 import { SearchParamSelector } from '~/components/forms/search-param-selector';
+import { DocumentSearch } from '~/components/general/document/document-search';
+import { DocumentStatus } from '~/components/general/document/document-status';
+import { StackAvatarsWithTooltip } from '~/components/general/stack-avatars-with-tooltip';
 import { DocumentsTableActionButton } from '~/components/tables/documents-table-action-button';
 import { DocumentsTableActionDropdown } from '~/components/tables/documents-table-action-dropdown';
 import { DataTableTitle } from '~/components/tables/documents-table-title';
 import { useOptionalCurrentTeam } from '~/providers/team';
+
+import { PeriodSelector } from '../period-selector';
 
 const DOCUMENT_SOURCE_LABELS: { [key in DocumentSource]: MessageDescriptor } = {
   DOCUMENT: msg`Document`,

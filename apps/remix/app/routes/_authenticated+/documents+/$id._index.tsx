@@ -3,7 +3,7 @@ import { useLingui } from '@lingui/react';
 import { DocumentStatus, TeamMemberRole } from '@prisma/client';
 import { ChevronLeft, Clock9, Users2 } from 'lucide-react';
 import { Link, redirect } from 'react-router';
-import { getRequiredLoaderSession } from 'server/utils/get-required-session-context';
+import { getRequiredLoaderSession } from 'server/utils/get-loader-session';
 import { match } from 'ts-pattern';
 
 import { useSession } from '@documenso/lib/client-only/providers/session';
@@ -17,19 +17,19 @@ import { Button } from '@documenso/ui/primitives/button';
 import { Card, CardContent } from '@documenso/ui/primitives/card';
 import { LazyPDFViewer } from '@documenso/ui/primitives/lazy-pdf-viewer';
 
-import { StackAvatarsWithTooltip } from '~/components/(dashboard)/avatar/stack-avatars-with-tooltip';
-import { DocumentHistorySheet } from '~/components/document/document-history-sheet';
-import { DocumentReadOnlyFields } from '~/components/document/document-read-only-fields';
-import { DocumentRecipientLinkCopyDialog } from '~/components/document/document-recipient-link-copy-dialog';
-import {
-  DocumentStatus as DocumentStatusComponent,
-  FRIENDLY_STATUS_MAP,
-} from '~/components/formatter/document-status';
+import { DocumentHistorySheet } from '~/components/general/document/document-history-sheet';
 import { DocumentPageViewButton } from '~/components/general/document/document-page-view-button';
 import { DocumentPageViewDropdown } from '~/components/general/document/document-page-view-dropdown';
 import { DocumentPageViewInformation } from '~/components/general/document/document-page-view-information';
 import { DocumentPageViewRecentActivity } from '~/components/general/document/document-page-view-recent-activity';
 import { DocumentPageViewRecipients } from '~/components/general/document/document-page-view-recipients';
+import { DocumentReadOnlyFields } from '~/components/general/document/document-read-only-fields';
+import { DocumentRecipientLinkCopyDialog } from '~/components/general/document/document-recipient-link-copy-dialog';
+import {
+  DocumentStatus as DocumentStatusComponent,
+  FRIENDLY_STATUS_MAP,
+} from '~/components/general/document/document-status';
+import { StackAvatarsWithTooltip } from '~/components/general/stack-avatars-with-tooltip';
 import { superLoaderJson, useSuperLoaderData } from '~/utils/super-json-loader';
 
 import type { Route } from './+types/$id._index';

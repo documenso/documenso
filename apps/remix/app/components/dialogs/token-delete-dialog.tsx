@@ -29,19 +29,19 @@ import {
 import { Input } from '@documenso/ui/primitives/input';
 import { useToast } from '@documenso/ui/primitives/use-toast';
 
-export type DeleteTokenDialogProps = {
+export type TokenDeleteDialogProps = {
   teamId?: number;
   token: Pick<ApiToken, 'id' | 'name'>;
   onDelete?: () => void;
   children?: React.ReactNode;
 };
 
-export default function DeleteTokenDialog({
+export default function TokenDeleteDialog({
   teamId,
   token,
   onDelete,
   children,
-}: DeleteTokenDialogProps) {
+}: TokenDeleteDialogProps) {
   const { _ } = useLingui();
   const { toast } = useToast();
 
@@ -49,13 +49,13 @@ export default function DeleteTokenDialog({
 
   const deleteMessage = _(msg`delete ${token.name}`);
 
-  const ZDeleteTokenDialogSchema = z.object({
+  const ZTokenDeleteDialogSchema = z.object({
     tokenName: z.literal(deleteMessage, {
       errorMap: () => ({ message: _(msg`You must enter '${deleteMessage}' to proceed`) }),
     }),
   });
 
-  type TDeleteTokenByIdMutationSchema = z.infer<typeof ZDeleteTokenDialogSchema>;
+  type TDeleteTokenByIdMutationSchema = z.infer<typeof ZTokenDeleteDialogSchema>;
 
   const { mutateAsync: deleteTokenMutation } = trpc.apiToken.deleteTokenById.useMutation({
     onSuccess() {
@@ -64,7 +64,7 @@ export default function DeleteTokenDialog({
   });
 
   const form = useForm<TDeleteTokenByIdMutationSchema>({
-    resolver: zodResolver(ZDeleteTokenDialogSchema),
+    resolver: zodResolver(ZTokenDeleteDialogSchema),
     values: {
       tokenName: '',
     },
@@ -84,8 +84,6 @@ export default function DeleteTokenDialog({
       });
 
       setIsOpen(false);
-
-      // router.refresh(); // Todo
     } catch (error) {
       toast({
         title: _(msg`An unknown error occurred`),

@@ -8,9 +8,9 @@ import { IS_BILLING_ENABLED } from '@documenso/lib/constants/app';
 import { cn } from '@documenso/ui/lib/utils';
 import { Button } from '@documenso/ui/primitives/button';
 
-export type TeamSettingsDesktopNavProps = HTMLAttributes<HTMLDivElement>;
+export type TeamSettingsNavDesktopProps = HTMLAttributes<HTMLDivElement>;
 
-export const TeamSettingsDesktopNav = ({ className, ...props }: TeamSettingsDesktopNavProps) => {
+export const TeamSettingsNavDesktop = ({ className, ...props }: TeamSettingsNavDesktopProps) => {
   const { pathname } = useLocation();
   const params = useParams();
 

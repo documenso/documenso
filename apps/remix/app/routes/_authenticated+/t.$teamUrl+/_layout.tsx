@@ -3,7 +3,7 @@ import { Trans, msg } from '@lingui/macro';
 import { useLingui } from '@lingui/react';
 import { ChevronLeft } from 'lucide-react';
 import { Link, Outlet, isRouteErrorResponse, redirect, useNavigate } from 'react-router';
-import { getRequiredLoaderSession } from 'server/utils/get-required-session-context';
+import { getRequiredLoaderSession } from 'server/utils/get-loader-session';
 import { match } from 'ts-pattern';
 
 import { AppErrorCode } from '@documenso/lib/errors/app-error';

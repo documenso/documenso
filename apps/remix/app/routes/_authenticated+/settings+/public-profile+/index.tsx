@@ -4,7 +4,7 @@ import { Trans, msg } from '@lingui/macro';
 import { useLingui } from '@lingui/react';
 import type { TemplateDirectLink } from '@prisma/client';
 import { TemplateType } from '@prisma/client';
-import { getRequiredLoaderSession } from 'server/utils/get-required-session-context';
+import { getRequiredLoaderSession } from 'server/utils/get-loader-session';
 
 import { useSession } from '@documenso/lib/client-only/providers/session';
 import { getUserPublicProfile } from '@documenso/lib/server-only/user/get-user-public-profile';
@@ -16,10 +16,10 @@ import { Switch } from '@documenso/ui/primitives/switch';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@documenso/ui/primitives/tooltip';
 import { useToast } from '@documenso/ui/primitives/use-toast';
 
-import { SettingsHeader } from '~/components/(dashboard)/settings/layout/header';
 import { ManagePublicTemplateDialog } from '~/components/dialogs/public-profile-template-manage-dialog';
 import type { TPublicProfileFormSchema } from '~/components/forms/public-profile-form';
 import { PublicProfileForm } from '~/components/forms/public-profile-form';
+import { SettingsHeader } from '~/components/general/settings-header';
 import { useOptionalCurrentTeam } from '~/providers/team';
 
 import { SettingsPublicProfileTemplatesTable } from '../../../../components/tables/settings-public-profile-templates-table';

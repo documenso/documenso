@@ -6,17 +6,17 @@ import { cn } from '@documenso/ui/lib/utils';
 import { Button } from '@documenso/ui/primitives/button';
 import { useToast } from '@documenso/ui/primitives/use-toast';
 
-export type PendingUserTeamsDataTableActionsProps = {
+export type UserSettingsPendingTeamsTableActionsProps = {
   className?: string;
   pendingTeamId: number;
   onPayClick: (pendingTeamId: number) => void;
 };
 
-export const PendingUserTeamsDataTableActions = ({
+export const UserSettingsPendingTeamsTableActions = ({
   className,
   pendingTeamId,
   onPayClick,
-}: PendingUserTeamsDataTableActionsProps) => {
+}: UserSettingsPendingTeamsTableActionsProps) => {
   const { _ } = useLingui();
   const { toast } = useToast();
 

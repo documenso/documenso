@@ -21,11 +21,15 @@ const navigationLinks = [
   },
 ];
 
-export type DesktopNavProps = HTMLAttributes<HTMLDivElement> & {
+export type AppNavDesktopProps = HTMLAttributes<HTMLDivElement> & {
   setIsCommandMenuOpen: (value: boolean) => void;
 };
 
-export const DesktopNav = ({ className, setIsCommandMenuOpen, ...props }: DesktopNavProps) => {
+export const AppNavDesktop = ({
+  className,
+  setIsCommandMenuOpen,
+  ...props
+}: AppNavDesktopProps) => {
   const { _ } = useLingui();
 
   const { pathname } = useLocation();

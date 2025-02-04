@@ -31,7 +31,7 @@ import {
 import { Input } from '@documenso/ui/primitives/input';
 import { useToast } from '@documenso/ui/primitives/use-toast';
 
-import { UserProfileSkeleton } from '../ui/user-profile-skeleton';
+import { UserProfileSkeleton } from '../general/user-profile-skeleton';
 
 export const ZClaimPublicProfileFormSchema = z.object({
   url: z

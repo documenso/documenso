@@ -1,13 +1,13 @@
 import { Trans } from '@lingui/macro';
 import { useLingui } from '@lingui/react';
 import { DateTime } from 'luxon';
-import { getRequiredLoaderTeamSession } from 'server/utils/get-required-session-context';
+import { getRequiredLoaderTeamSession } from 'server/utils/get-loader-session';
 
 import { NEXT_PUBLIC_WEBAPP_URL } from '@documenso/lib/constants/app';
 import { getTeamTokens } from '@documenso/lib/server-only/public-api/get-all-team-tokens';
 import { Button } from '@documenso/ui/primitives/button';
 
-import DeleteTokenDialog from '~/components/(dashboard)/settings/token/delete-token-dialog';
+import TokenDeleteDialog from '~/components/dialogs/token-delete-dialog';
 import { ApiTokenForm } from '~/components/forms/token';
 
 import type { Route } from './+types/tokens';
@@ -103,11 +103,11 @@ export default function ApiTokensPage({ loaderData }: Route.ComponentProps) {
                 </div>
 
                 <div>
-                  <DeleteTokenDialog token={token} teamId={team.id}>
+                  <TokenDeleteDialog token={token} teamId={team.id}>
                     <Button variant="destructive">
                       <Trans>Delete</Trans>
                     </Button>
-                  </DeleteTokenDialog>
+                  </TokenDeleteDialog>
                 </div>
               </div>
             </div>

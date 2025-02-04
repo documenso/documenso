@@ -5,13 +5,14 @@ import { Trans, msg } from '@lingui/macro';
 import { useLingui } from '@lingui/react';
 import { ErrorCode, useDropzone } from 'react-dropzone';
 import { useForm } from 'react-hook-form';
+import { useRevalidator } from 'react-router';
 import { match } from 'ts-pattern';
 import { z } from 'zod';
 
 import { useSession } from '@documenso/lib/client-only/providers/session';
-import { NEXT_PUBLIC_WEBAPP_URL } from '@documenso/lib/constants/app';
 import { AppError } from '@documenso/lib/errors/app-error';
 import { base64 } from '@documenso/lib/universal/base64';
+import { formatAvatarUrl } from '@documenso/lib/utils/avatars';
 import { extractInitials } from '@documenso/lib/utils/recipient-formatter';
 import { trpc } from '@documenso/trpc/react';
 import { cn } from '@documenso/ui/lib/utils';
@@ -43,6 +44,7 @@ export const AvatarImageForm = ({ className }: AvatarImageFormProps) => {
   const { user } = useSession();
   const { _ } = useLingui();
   const { toast } = useToast();
+  const { revalidate } = useRevalidator();
 
   const team = useOptionalCurrentTeam();
 
@@ -106,8 +108,7 @@ export const AvatarImageForm = ({ className }: AvatarImageFormProps) => {
         duration: 5000,
       });
 
-      // Todo
-      // router.refresh();
+      void revalidate();
     } catch (err) {
       const error = AppError.parseError(err);
 
@@ -144,11 +145,7 @@ export const AvatarImageForm = ({ className }: AvatarImageFormProps) => {
                   <div className="flex items-center gap-8">
                     <div className="relative">
                       <Avatar className="h-16 w-16 border-2 border-solid">
-                        {avatarImageId && (
-                          <AvatarImage
-                            src={`${NEXT_PUBLIC_WEBAPP_URL()}/api/avatar/${avatarImageId}`}
-                          />
-                        )}
+                        {avatarImageId && <AvatarImage src={formatAvatarUrl(avatarImageId)} />}
                         <AvatarFallback className="text-sm text-gray-400">
                           {initials}
                         </AvatarFallback>

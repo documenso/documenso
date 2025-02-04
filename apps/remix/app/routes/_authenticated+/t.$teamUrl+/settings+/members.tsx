@@ -8,8 +8,8 @@ import { useDebouncedValue } from '@documenso/lib/client-only/hooks/use-debounce
 import { Input } from '@documenso/ui/primitives/input';
 import { Tabs, TabsList, TabsTrigger } from '@documenso/ui/primitives/tabs';
 
-import { SettingsHeader } from '~/components/(dashboard)/settings/layout/header';
 import { TeamMemberInviteDialog } from '~/components/dialogs/team-member-invite-dialog';
+import { SettingsHeader } from '~/components/general/settings-header';
 import { TeamSettingsMemberInvitesTable } from '~/components/tables/team-settings-member-invites-table';
 import { TeamSettingsMembersDataTable } from '~/components/tables/team-settings-members-table';
 import { useCurrentTeam } from '~/providers/team';

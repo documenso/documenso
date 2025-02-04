@@ -1,8 +1,8 @@
 import { Trans } from '@lingui/macro';
 import { DocumentSigningOrder, SigningStatus } from '@prisma/client';
 import { ChevronLeft, LucideEdit } from 'lucide-react';
-import { Link, redirect } from 'react-router';
-import { getRequiredLoaderSession } from 'server/utils/get-required-session-context';
+import { Link, redirect, useNavigate } from 'react-router';
+import { getRequiredLoaderSession } from 'server/utils/get-loader-session';
 
 import { getTemplateById } from '@documenso/lib/server-only/template/get-template-by-id';
 import { formatDocumentsPath, formatTemplatesPath } from '@documenso/lib/utils/teams';
@@ -12,13 +12,13 @@ import { LazyPDFViewer } from '@documenso/ui/primitives/lazy-pdf-viewer';
 
 import { TemplateDirectLinkDialogWrapper } from '~/components/dialogs/template-direct-link-dialog-wrapper';
 import { TemplateUseDialog } from '~/components/dialogs/template-use-dialog';
-import { DocumentReadOnlyFields } from '~/components/document/document-read-only-fields';
-import { TemplateType } from '~/components/formatter/template-type';
+import { DocumentReadOnlyFields } from '~/components/general/document/document-read-only-fields';
 import { TemplateDirectLinkBadge } from '~/components/general/template/template-direct-link-badge';
 import { TemplatePageViewDocumentsTable } from '~/components/general/template/template-page-view-documents-table';
 import { TemplatePageViewInformation } from '~/components/general/template/template-page-view-information';
 import { TemplatePageViewRecentActivity } from '~/components/general/template/template-page-view-recent-activity';
 import { TemplatePageViewRecipients } from '~/components/general/template/template-page-view-recipients';
+import { TemplateType } from '~/components/general/template/template-type';
 import { TemplatesTableActionDropdown } from '~/components/tables/templates-table-action-dropdown';
 import { superLoaderJson, useSuperLoaderData } from '~/utils/super-json-loader';
 
@@ -61,6 +61,8 @@ export default function TemplatePage() {
     useSuperLoaderData<typeof loader>();
 
   const { templateDocumentData, fields, recipients, templateMeta } = template;
+
+  const navigate = useNavigate();
 
   // Remap to fit the DocumentReadOnlyFields component.
   const readOnlyFields = fields.map((field) => {
@@ -159,6 +161,10 @@ export default function TemplatePage() {
                     row={template}
                     teamId={team?.id}
                     templateRootPath={templateRootPath}
+                    onDelete={async () => navigate(templateRootPath)}
+                    onMove={async ({ teamUrl, templateId }) =>
+                      navigate(`${formatTemplatesPath(teamUrl)}/${templateId}`)
+                    }
                   />
                 </div>
               </div>

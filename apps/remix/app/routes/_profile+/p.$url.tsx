@@ -4,8 +4,8 @@ import { DateTime } from 'luxon';
 import { Link, redirect } from 'react-router';
 
 import { useOptionalSession } from '@documenso/lib/client-only/providers/session';
-import { NEXT_PUBLIC_WEBAPP_URL } from '@documenso/lib/constants/app';
 import { getPublicProfileByUrl } from '@documenso/lib/server-only/profile/get-public-profile-by-url';
+import { formatAvatarUrl } from '@documenso/lib/utils/avatars';
 import { extractInitials } from '@documenso/lib/utils/recipient-formatter';
 import { formatDirectTemplatePath } from '@documenso/lib/utils/templates';
 import { Avatar, AvatarFallback, AvatarImage } from '@documenso/ui/primitives/avatar';
@@ -66,9 +66,7 @@ export default function PublicProfilePage({ loaderData }: Route.ComponentProps) 
       <div className="flex flex-col items-center">
         <Avatar className="dark:border-border h-24 w-24 border-2 border-solid">
           {publicProfile.avatarImageId && (
-            <AvatarImage
-              src={`${NEXT_PUBLIC_WEBAPP_URL()}/api/avatar/${publicProfile.avatarImageId}`}
-            />
+            <AvatarImage src={formatAvatarUrl(publicProfile.avatarImageId)} />
           )}
 
           <AvatarFallback className="text-sm text-gray-400">

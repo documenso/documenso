@@ -30,8 +30,6 @@ export const TemplateDuplicateDialog = ({
   const { mutateAsync: duplicateTemplate, isPending } =
     trpcReact.template.duplicateTemplate.useMutation({
       onSuccess: () => {
-        // router.refresh(); // Todo
-
         toast({
           title: _(msg`Template duplicated`),
           description: _(msg`Your template has been duplicated successfully.`),

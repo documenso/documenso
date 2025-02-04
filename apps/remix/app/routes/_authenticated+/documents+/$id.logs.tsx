@@ -5,19 +5,19 @@ import type { Recipient } from '@prisma/client';
 import { ChevronLeft } from 'lucide-react';
 import { DateTime } from 'luxon';
 import { Link, redirect } from 'react-router';
-import { getRequiredLoaderSession } from 'server/utils/get-required-session-context';
+import { getRequiredLoaderSession } from 'server/utils/get-loader-session';
 
 import { getDocumentById } from '@documenso/lib/server-only/document/get-document-by-id';
 import { getRecipientsForDocument } from '@documenso/lib/server-only/recipient/get-recipients-for-document';
 import { formatDocumentsPath } from '@documenso/lib/utils/teams';
 import { Card } from '@documenso/ui/primitives/card';
 
+import { DocumentAuditLogDownloadButton } from '~/components/general/document/document-audit-log-download-button';
+import { DocumentCertificateDownloadButton } from '~/components/general/document/document-certificate-download-button';
 import {
   DocumentStatus as DocumentStatusComponent,
   FRIENDLY_STATUS_MAP,
-} from '~/components/formatter/document-status';
-import { DocumentAuditLogDownloadButton } from '~/components/general/document/document-audit-log-download-button';
-import { DocumentCertificateDownloadButton } from '~/components/general/document/document-certificate-download-button';
+} from '~/components/general/document/document-status';
 import { DocumentLogsTable } from '~/components/tables/document-logs-table';
 
 import type { Route } from './+types/$id.logs';

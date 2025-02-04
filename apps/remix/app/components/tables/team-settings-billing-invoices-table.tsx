@@ -14,11 +14,13 @@ import { DataTablePagination } from '@documenso/ui/primitives/data-table-paginat
 import { Skeleton } from '@documenso/ui/primitives/skeleton';
 import { TableCell } from '@documenso/ui/primitives/table';
 
-export type TeamBillingInvoicesDataTableProps = {
+export type TeamSettingsBillingInvoicesTableProps = {
   teamId: number;
 };
 
-export const TeamBillingInvoicesDataTable = ({ teamId }: TeamBillingInvoicesDataTableProps) => {
+export const TeamSettingsBillingInvoicesTable = ({
+  teamId,
+}: TeamSettingsBillingInvoicesTableProps) => {
   const { _ } = useLingui();
 
   const { data, isLoading, isLoadingError } = trpc.team.findTeamInvoices.useQuery(

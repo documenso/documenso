@@ -24,6 +24,7 @@ type DocumentDeleteDialogProps = {
   id: number;
   open: boolean;
   onOpenChange: (_open: boolean) => void;
+  onDelete?: () => Promise<void> | void;
   status: DocumentStatus;
   documentTitle: string;
   teamId?: number;
@@ -34,6 +35,7 @@ export const DocumentDeleteDialog = ({
   id,
   open,
   onOpenChange,
+  onDelete,
   status,
   documentTitle,
   canManageDocument,
@@ -48,9 +50,7 @@ export const DocumentDeleteDialog = ({
   const [isDeleteEnabled, setIsDeleteEnabled] = useState(status === DocumentStatus.DRAFT);
 
   const { mutateAsync: deleteDocument, isPending } = trpcReact.document.deleteDocument.useMutation({
-    onSuccess: () => {
-      // todo
-      // router.refresh();
+    onSuccess: async () => {
       void refreshLimits();
 
       toast({
@@ -59,7 +59,17 @@ export const DocumentDeleteDialog = ({
         duration: 5000,
       });
 
+      await onDelete?.();
+
       onOpenChange(false);
+    },
+    onError: () => {
+      toast({
+        title: _(msg`Something went wrong`),
+        description: _(msg`This document could not be deleted at this time. Please try again.`),
+        variant: 'destructive',
+        duration: 7500,
+      });
     },
   });
 
@@ -69,19 +79,6 @@ export const DocumentDeleteDialog = ({
       setIsDeleteEnabled(status === DocumentStatus.DRAFT);
     }
   }, [open, status]);
-
-  const onDelete = async () => {
-    try {
-      await deleteDocument({ documentId: id });
-    } catch {
-      toast({
-        title: _(msg`Something went wrong`),
-        description: _(msg`This document could not be deleted at this time. Please try again.`),
-        variant: 'destructive',
-        duration: 7500,
-      });
-    }
-  };
 
   const onInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setInputValue(event.target.value);
@@ -191,7 +188,7 @@ export const DocumentDeleteDialog = ({
           <Button
             type="button"
             loading={isPending}
-            onClick={onDelete}
+            onClick={() => void deleteDocument({ documentId: id })}
             disabled={!isDeleteEnabled && canManageDocument}
             variant="destructive"
           >

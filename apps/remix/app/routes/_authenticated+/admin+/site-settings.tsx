@@ -25,7 +25,7 @@ import { Switch } from '@documenso/ui/primitives/switch';
 import { Textarea } from '@documenso/ui/primitives/textarea';
 import { useToast } from '@documenso/ui/primitives/use-toast';
 
-import { SettingsHeader } from '~/components/(dashboard)/settings/layout/header';
+import { SettingsHeader } from '~/components/general/settings-header';
 
 import type { Route } from './+types/site-settings';
 
