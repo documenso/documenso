@@ -3,7 +3,7 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "build": "cross-env NODE_ENV=production react-router build",
+    "build": "cross-env NODE_ENV=production bunx --bun vite build",
     "dev": "bunx --bun vite",
     "dev:node": "react-router dev",
     "start": "cross-env NODE_ENV=production node dist/server/index.js",
@@ -12,6 +12,15 @@
     "copy:pdfjs": "node ../../scripts/copy-pdfjs.cjs"
   },
   "dependencies": {
+    "@documenso/auth": "*",
+    "@documenso/api": "*",
+    "@documenso/assets": "*",
+    "@documenso/ee": "*",
+    "@documenso/lib": "*",
+    "@documenso/prisma": "*",
+    "@documenso/trpc": "*",
+    "@documenso/ui": "*",
+    "@documenso/tailwind-config": "*",
     "@epic-web/remember": "^1.1.0",
     "@hono/node-server": "^1.13.7",
     "@hono/trpc-server": "^0.3.4",

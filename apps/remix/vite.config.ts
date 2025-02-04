@@ -54,23 +54,14 @@ export default defineConfig({
   ],
   optimizeDeps: {
     exclude: ['superjson'],
-    force: true,
+    // force: true,
   },
   build: {
     commonjsOptions: {
       include: ['superjson'],
     },
+    rollupOptions: {
+      external: ['@node-rs/bcrypt'],
+    },
   },
-  // optimizeDeps: {
-  //   exclude: [
-  //     '@node-rs/bcrypt-wasm32-wasi',
-  //     '@noble/ciphers/chacha',
-  //     '@noble/ciphers/utils',
-  //     '@noble/ciphers/webcrypto/utils',
-  //     '@noble/hashes/sha256a',
-  //     'crypto',
-  //     '@node-rs/bcrypt',
-  //   ], // Todo: Probably remove.
-  //   force: true,
-  // },
 });

@@ -1,5 +1,3 @@
-'use client';
-
 import { Trans, msg } from '@lingui/macro';
 import { useLingui } from '@lingui/react';
 import { Edit, Loader, Mail, MoreHorizontal, X } from 'lucide-react';

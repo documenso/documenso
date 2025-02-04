@@ -10,17 +10,7 @@
     "rootDirs": [".", "./.react-router/types"],
     "baseUrl": ".",
     "paths": {
-      "~/*": ["./app/*"],
-      // Todo fix this stuff
-      "@documenso/api": ["../../packages/api"],
-      "@documenso/assets": ["../../packages/assets"],
-      "@documenso/auth": ["../../packages/auth"],
-      "@documenso/ee": ["../../packages/ee"],
-      "@documenso/lib": ["../../packages/lib"],
-      "@documenso/prisma": ["../../packages/prisma"],
-      "@documenso/trpc": ["../../packages/trpc"],
-      "@documenso/ui": ["../../packages/ui"],
-      "@documenso/tailwind-config": ["../../packages/tailwind-config"]
+      "~/*": ["./app/*"]
     },
     "esModuleInterop": true,
     "verbatimModuleSyntax": true,

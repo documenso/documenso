@@ -1,5 +1,3 @@
-'use client';
-
 import { Trans } from '@lingui/macro';
 import { DialogClose } from '@radix-ui/react-dialog';
 

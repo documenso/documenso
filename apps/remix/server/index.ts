@@ -1,4 +1,3 @@
-// server/index.ts
 import { Hono } from 'hono';
 import { PDFDocument } from 'pdf-lib';
 

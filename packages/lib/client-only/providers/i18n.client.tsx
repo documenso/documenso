@@ -1,5 +1,3 @@
-'use client';
-
 import { useState } from 'react';
 
 import { type Messages, setupI18n } from '@lingui/core';

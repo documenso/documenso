@@ -1,5 +1,3 @@
-'use server';
-
 import type { DocumentDataType } from '@prisma/client';
 
 import { prisma } from '@documenso/prisma';
