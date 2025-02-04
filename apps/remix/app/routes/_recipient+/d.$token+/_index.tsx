@@ -16,12 +16,6 @@ import { superLoaderJson, useSuperLoaderData } from '~/utils/super-json-loader';
 
 import type { Route } from './+types/_index';
 
-export type TemplatesDirectPageProps = {
-  params: {
-    token: string;
-  };
-};
-
 export async function loader({ params, context }: Route.LoaderArgs) {
   const { token } = params;
 

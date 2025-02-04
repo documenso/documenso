@@ -1,7 +1,7 @@
 import { Trans } from '@lingui/macro';
 import { useLingui } from '@lingui/react';
 import { DateTime } from 'luxon';
-import { getRequiredTeamSessionContext } from 'server/utils/get-required-session-context';
+import { getRequiredLoaderTeamSession } from 'server/utils/get-required-session-context';
 
 import { NEXT_PUBLIC_WEBAPP_URL } from '@documenso/lib/constants/app';
 import { getTeamTokens } from '@documenso/lib/server-only/public-api/get-all-team-tokens';
@@ -13,7 +13,7 @@ import { ApiTokenForm } from '~/components/forms/token';
 import type { Route } from './+types/tokens';
 
 export async function loader({ context }: Route.LoaderArgs) {
-  const { user, currentTeam: team } = getRequiredTeamSessionContext(context);
+  const { user, currentTeam: team } = getRequiredLoaderTeamSession(context);
 
   const tokens = await getTeamTokens({ userId: user.id, teamId: team.id }).catch(() => null);
 

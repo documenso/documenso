@@ -3,7 +3,7 @@ import { useLingui } from '@lingui/react';
 import { DocumentStatus, TeamMemberRole } from '@prisma/client';
 import { ChevronLeft, Clock9, Users2 } from 'lucide-react';
 import { Link, redirect } from 'react-router';
-import { getRequiredSessionContext } from 'server/utils/get-required-session-context';
+import { getRequiredLoaderSession } from 'server/utils/get-required-session-context';
 import { match } from 'ts-pattern';
 
 import { useSession } from '@documenso/lib/client-only/providers/session';
@@ -34,7 +34,7 @@ import { DocumentPageViewRecipients } from '~/components/general/document/docume
 import type { Route } from './+types/$id._index';
 
 export async function loader({ params, context }: Route.LoaderArgs) {
-  const { user, currentTeam: team } = getRequiredSessionContext(context);
+  const { user, currentTeam: team } = getRequiredLoaderSession(context);
 
   const { id } = params;
 

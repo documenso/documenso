@@ -135,15 +135,6 @@ export const documentRouter = router({
    * @private
    */
   findDocumentsInternal: authenticatedProcedure
-    .meta({
-      openapi: {
-        method: 'GET',
-        path: '/document',
-        summary: 'Find documents',
-        description: 'Find documents based on a search criteria',
-        tags: ['Document'],
-      },
-    })
     .input(ZFindDocumentsInternalRequestSchema)
     .output(ZFindDocumentsInternalResponseSchema)
     .query(async ({ input, ctx }) => {

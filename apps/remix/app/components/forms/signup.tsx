@@ -13,6 +13,7 @@ import { z } from 'zod';
 
 import communityCardsImage from '@documenso/assets/images/community-cards.png';
 import { authClient } from '@documenso/auth/client';
+import { useAnalytics } from '@documenso/lib/client-only/hooks/use-analytics';
 import { NEXT_PUBLIC_WEBAPP_URL } from '@documenso/lib/constants/app';
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import { ZPasswordSchema } from '@documenso/trpc/server/auth-router/schema';
@@ -93,7 +94,7 @@ export const SignUpForm = ({
   const { _ } = useLingui();
   const { toast } = useToast();
 
-  // const analytics = useAnalytics(); // Todo
+  const analytics = useAnalytics();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
 
@@ -134,11 +135,11 @@ export const SignUpForm = ({
         duration: 5000,
       });
 
-      // analytics.capture('App: User Sign Up', {
-      //   email,
-      //   timestamp: new Date().toISOString(),
-      //   custom_campaign_params: { src: utmSrc },
-      // });
+      analytics.capture('App: User Sign Up', {
+        email,
+        timestamp: new Date().toISOString(),
+        custom_campaign_params: { src: utmSrc },
+      });
     } catch (err) {
       const error = AppError.parseError(err);
 

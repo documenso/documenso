@@ -1,10 +1,6 @@
 import { posthog } from 'posthog-js';
 
-import { useFeatureFlags } from '@documenso/lib/client-only/providers/feature-flag';
-import {
-  FEATURE_FLAG_GLOBAL_SESSION_RECORDING,
-  extractPostHogConfig,
-} from '@documenso/lib/constants/feature-flags';
+import { extractPostHogConfig } from '@documenso/lib/constants/feature-flags';
 
 export function useAnalytics() {
   // const featureFlags = useFeatureFlags();

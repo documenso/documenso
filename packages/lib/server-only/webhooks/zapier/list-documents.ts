@@ -1,5 +1,3 @@
-import type { NextApiRequest, NextApiResponse } from 'next';
-
 import type { Webhook } from '@prisma/client';
 
 import { findDocuments } from '@documenso/lib/server-only/document/find-documents';
@@ -9,9 +7,14 @@ import { getWebhooksByTeamId } from '../get-webhooks-by-team-id';
 import { getWebhooksByUserId } from '../get-webhooks-by-user-id';
 import { validateApiToken } from './validateApiToken';
 
-export const listDocumentsHandler = async (req: NextApiRequest, res: NextApiResponse) => {
+export const listDocumentsHandler = async (req: Request) => {
   try {
-    const { authorization } = req.headers;
+    const authorization = req.headers.get('authorization');
+
+    if (!authorization) {
+      return new Response('Unauthorized', { status: 401 });
+    }
+
     const { user, userId, teamId } = await validateApiToken({ authorization });
 
     let allWebhooks: Webhook[] = [];
@@ -56,13 +59,16 @@ export const listDocumentsHandler = async (req: NextApiRequest, res: NextApiResp
         },
       };
 
-      return res.status(200).json([testWebhook]);
+      return Response.json([testWebhook]);
     }
 
-    return res.status(200).json([]);
+    return Response.json([]);
   } catch (err) {
-    return res.status(500).json({
-      message: 'Internal Server Error',
-    });
+    return Response.json(
+      {
+        message: 'Internal Server Error',
+      },
+      { status: 500 },
+    );
   }
 };

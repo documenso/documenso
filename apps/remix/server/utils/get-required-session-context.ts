@@ -4,7 +4,7 @@ import { redirect } from 'react-router';
 /**
  * Returns the session context or throws a redirect to signin if it is not present.
  */
-export const getRequiredSessionContext = (context: AppLoadContext) => {
+export const getRequiredLoaderSession = (context: AppLoadContext) => {
   if (!context.session) {
     throw redirect('/signin'); // Todo: Maybe add a redirect cookie to come back?
   }
@@ -15,7 +15,7 @@ export const getRequiredSessionContext = (context: AppLoadContext) => {
 /**
  * Returns the team session context or throws a redirect to signin if it is not present.
  */
-export const getRequiredTeamSessionContext = (context: AppLoadContext) => {
+export const getRequiredLoaderTeamSession = (context: AppLoadContext) => {
   if (!context.session) {
     throw redirect('/signin'); // Todo: Maybe add a redirect cookie to come back?
   }

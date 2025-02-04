@@ -5,7 +5,7 @@ import type { Recipient } from '@prisma/client';
 import { ChevronLeft } from 'lucide-react';
 import { DateTime } from 'luxon';
 import { Link, redirect } from 'react-router';
-import { getRequiredSessionContext } from 'server/utils/get-required-session-context';
+import { getRequiredLoaderSession } from 'server/utils/get-required-session-context';
 
 import { getDocumentById } from '@documenso/lib/server-only/document/get-document-by-id';
 import { getRecipientsForDocument } from '@documenso/lib/server-only/recipient/get-recipients-for-document';
@@ -25,7 +25,7 @@ import type { Route } from './+types/$id.logs';
 export async function loader({ params, context }: Route.LoaderArgs) {
   const { id } = params;
 
-  const { user, currentTeam: team } = getRequiredSessionContext(context);
+  const { user, currentTeam: team } = getRequiredLoaderSession(context);
 
   const documentId = Number(id);
 

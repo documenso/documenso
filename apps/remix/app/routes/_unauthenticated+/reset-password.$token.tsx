@@ -17,7 +17,7 @@ export async function loader({ params }: Route.LoaderArgs) {
   const isValid = await getResetTokenValidity({ token });
 
   if (!isValid) {
-    redirect('/reset-password');
+    throw redirect('/reset-password');
   }
 
   return {

@@ -3,7 +3,7 @@ import { Trans, msg } from '@lingui/macro';
 import { useLingui } from '@lingui/react';
 import { ChevronLeft } from 'lucide-react';
 import { Link, Outlet, isRouteErrorResponse, redirect, useNavigate } from 'react-router';
-import { getRequiredSessionContext } from 'server/utils/get-required-session-context';
+import { getRequiredLoaderSession } from 'server/utils/get-required-session-context';
 import { match } from 'ts-pattern';
 
 import { AppErrorCode } from '@documenso/lib/errors/app-error';
@@ -15,7 +15,7 @@ import { TeamProvider } from '~/providers/team';
 import type { Route } from './+types/_layout';
 
 export const loader = ({ context }: Route.LoaderArgs) => {
-  const { currentTeam } = getRequiredSessionContext(context);
+  const { currentTeam } = getRequiredLoaderSession(context);
 
   if (!currentTeam) {
     throw redirect('/documents');

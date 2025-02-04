@@ -1,5 +1,5 @@
 import { data } from 'react-router';
-import { getRequiredSessionContext } from 'server/utils/get-required-session-context';
+import { getRequiredLoaderSession } from 'server/utils/get-required-session-context';
 import { match } from 'ts-pattern';
 
 import { isUserEnterprise } from '@documenso/ee/server-only/util/is-document-enterprise';
@@ -48,7 +48,7 @@ export async function loader({ params, context }: Route.LoaderArgs) {
     );
   }
 
-  const { user } = getRequiredSessionContext(context);
+  const { user } = getRequiredLoaderSession(context);
 
   const { derivedRecipientAccessAuth } = extractDocumentAuthMethods({
     documentAuth: template.authOptions,

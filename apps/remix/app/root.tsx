@@ -1,3 +1,5 @@
+import { Suspense } from 'react';
+
 import {
   Links,
   Meta,
@@ -20,6 +22,7 @@ import { TooltipProvider } from '@documenso/ui/primitives/tooltip';
 import type { Route } from './+types/root';
 import stylesheet from './app.css?url';
 import { GenericErrorLayout } from './components/general/generic-error-layout';
+import { PostHogPageview } from './providers/posthog';
 import { langCookie } from './storage/lang-cookie.server';
 import { themeSessionResolver } from './storage/theme-session.server';
 
@@ -40,6 +43,37 @@ export const links: Route.LinksFunction = () => [
   },
   { rel: 'stylesheet', href: stylesheet },
 ];
+
+// Todo: Meta data.
+// export function generateMetadata() {
+//   return {
+//     title: {
+//       template: '%s - Documenso',
+//       default: 'Documenso',
+//     },
+//     description:
+//       'Join Documenso, the open signing infrastructure, and get a 10x better signing experience. Pricing starts at $30/mo. forever! Sign in now and enjoy a faster, smarter, and more beautiful document signing process. Integrates with your favorite tools, customizable, and expandable. Support our mission and become a part of our open-source community.',
+//     keywords:
+//       'Documenso, open source, DocuSign alternative, document signing, open signing infrastructure, open-source community, fast signing, beautiful signing, smart templates',
+//     authors: { name: 'Documenso, Inc.' },
+//     robots: 'index, follow',
+//     metadataBase: new URL(NEXT_PUBLIC_WEBAPP_URL() ?? 'http://localhost:3000'),
+//     openGraph: {
+//       title: 'Documenso - The Open Source DocuSign Alternative',
+//       description:
+//         'Join Documenso, the open signing infrastructure, and get a 10x better signing experience. Pricing starts at $30/mo. forever! Sign in now and enjoy a faster, smarter, and more beautiful document signing process. Integrates with your favorite tools, customizable, and expandable. Support our mission and become a part of our open-source community.',
+//       type: 'website',
+//       images: ['/opengraph-image.jpg'],
+//     },
+//     twitter: {
+//       site: '@documenso',
+//       card: 'summary_large_image',
+//       images: ['/opengraph-image.jpg'],
+//       description:
+//         'Join Documenso, the open signing infrastructure, and get a 10x better signing experience. Pricing starts at $30/mo. forever! Sign in now and enjoy a faster, smarter, and more beautiful document signing process. Integrates with your favorite tools, customizable, and expandable. Support our mission and become a part of our open-source community.',
+//     },
+//   };
+// }
 
 export async function loader({ request, context }: Route.LoaderArgs) {
   const { getTheme } = await themeSessionResolver(request);
@@ -81,10 +115,15 @@ export function Layout({ children }: { children: React.ReactNode }) {
         <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <link rel="manifest" href="/site.webmanifest" />
+        <meta name="google" content="notranslate" />
         <Meta />
         <Links />
         <meta name="google" content="notranslate" />
         {/* <PreventFlashOnWrongTheme ssrTheme={Boolean(theme)} /> */}
+
+        <Suspense>
+          <PostHogPageview />
+        </Suspense>
       </head>
       <body>
         {children}

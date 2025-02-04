@@ -1,7 +1,7 @@
 import { Plural, Trans, msg } from '@lingui/macro';
 import { useLingui } from '@lingui/react';
 import { DateTime } from 'luxon';
-import { getRequiredTeamSessionContext } from 'server/utils/get-required-session-context';
+import { getRequiredLoaderTeamSession } from 'server/utils/get-required-session-context';
 import type Stripe from 'stripe';
 import { match } from 'ts-pattern';
 
@@ -16,7 +16,7 @@ import { TeamBillingPortalButton } from '~/components/general/teams/team-billing
 import type { Route } from './+types/billing';
 
 export async function loader({ context }: Route.LoaderArgs) {
-  const { currentTeam: team } = getRequiredTeamSessionContext(context);
+  const { currentTeam: team } = getRequiredLoaderTeamSession(context);
 
   let teamSubscription: Stripe.Subscription | null = null;
 

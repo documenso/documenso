@@ -4,7 +4,7 @@ import { Trans, msg } from '@lingui/macro';
 import { useLingui } from '@lingui/react';
 import type { TemplateDirectLink } from '@prisma/client';
 import { TemplateType } from '@prisma/client';
-import { getRequiredSessionContext } from 'server/utils/get-required-session-context';
+import { getRequiredLoaderSession } from 'server/utils/get-required-session-context';
 
 import { useSession } from '@documenso/lib/client-only/providers/session';
 import { getUserPublicProfile } from '@documenso/lib/server-only/user/get-user-public-profile';
@@ -44,7 +44,7 @@ const teamProfileText = {
 };
 
 export async function loader({ context }: Route.LoaderArgs) {
-  const { user } = getRequiredSessionContext(context);
+  const { user } = getRequiredLoaderSession(context);
 
   const { profile } = await getUserPublicProfile({
     userId: user.id,

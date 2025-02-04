@@ -1,6 +1,6 @@
 import { Trans } from '@lingui/macro';
 import { Outlet } from 'react-router';
-import { getRequiredTeamSessionContext } from 'server/utils/get-required-session-context';
+import { getRequiredLoaderTeamSession } from 'server/utils/get-required-session-context';
 
 import { canExecuteTeamAction } from '@documenso/lib/utils/teams';
 
@@ -9,10 +9,9 @@ import { TeamSettingsMobileNav } from '~/components/general/teams/team-settings-
 
 import type { Route } from '../+types/_layout';
 
-export async function loader({ context }: Route.LoaderArgs) {
-  const { currentTeam: team } = getRequiredTeamSessionContext(context);
+export function loader({ context }: Route.LoaderArgs) {
+  const { currentTeam: team } = getRequiredLoaderTeamSession(context);
 
-  // Todo: Test that 404 page shows up from error.
   if (!team || !canExecuteTeamAction('MANAGE_TEAM', team.currentTeamMember.role)) {
     throw new Response(null, { status: 401 }); // Unauthorized.
   }

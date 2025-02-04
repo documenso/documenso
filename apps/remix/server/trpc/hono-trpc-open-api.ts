@@ -1,6 +1,7 @@
 import type { Context } from 'hono';
 import { createOpenApiFetchHandler } from 'trpc-to-openapi';
 
+import { API_V2_BETA_URL } from '@documenso/lib/constants/app';
 import { AppError, genericErrorCodeToTrpcErrorCodeMap } from '@documenso/lib/errors/app-error';
 import { appRouter } from '@documenso/trpc/server/router';
 import { handleTrpcRouterError } from '@documenso/trpc/utils/trpc-error-handler';
@@ -9,7 +10,7 @@ import { createHonoTrpcContext } from './trpc-context';
 
 export const openApiTrpcServerHandler = async (c: Context) => {
   return createOpenApiFetchHandler<typeof appRouter>({
-    endpoint: '/v2/api',
+    endpoint: API_V2_BETA_URL,
     router: appRouter,
     // Todo: Test this, since it's not using the createContext params.
     createContext: async () => createHonoTrpcContext({ c, requestSource: 'apiV2' }),

@@ -2,12 +2,15 @@
 import { Hono } from 'hono';
 import { PDFDocument } from 'pdf-lib';
 
+import { tsRestHonoApp } from '@documenso/api/hono';
 import { auth } from '@documenso/auth/server';
+import { API_V2_BETA_URL } from '@documenso/lib/constants/app';
 import { AppError } from '@documenso/lib/errors/app-error';
 import { jobsClient } from '@documenso/lib/jobs/client';
 import { createDocumentData } from '@documenso/lib/server-only/document-data/create-document-data';
 import { putFile } from '@documenso/lib/universal/upload/put-file';
 import { getPresignGetUrl } from '@documenso/lib/universal/upload/server-actions';
+import { openApiDocument } from '@documenso/trpc/server/open-api';
 
 import { openApiTrpcServerHandler } from './trpc/hono-trpc-open-api';
 import { reactRouterTrpcServer } from './trpc/hono-trpc-remix';
@@ -18,10 +21,13 @@ const app = new Hono();
 app.route('/api/auth', auth);
 
 // API servers. Todo: Configure max durations, etc?
+app.route('/api/v1', tsRestHonoApp);
 app.use('/api/jobs/*', jobsClient.getHonoApiHandler());
-app.use('/api/v1/*', reactRouterTrpcServer); // Todo: ts-rest
-app.use('/api/v2/*', async (c) => openApiTrpcServerHandler(c));
 app.use('/api/trpc/*', reactRouterTrpcServer);
+
+// Unstable API server routes. Order matters for these two.
+app.get(`${API_V2_BETA_URL}/openapi.json`, (c) => c.json(openApiDocument));
+app.use(`${API_V2_BETA_URL}/*`, async (c) => openApiTrpcServerHandler(c));
 
 // Temp uploader.
 app
