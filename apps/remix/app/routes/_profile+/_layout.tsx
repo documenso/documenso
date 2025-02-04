@@ -10,7 +10,7 @@ import { cn } from '@documenso/ui/lib/utils';
 import { Button } from '@documenso/ui/primitives/button';
 
 import { Header as AuthenticatedHeader } from '~/components/(dashboard)/layout/header';
-import { Logo } from '~/components/branding/logo';
+import { Logo } from '~/components/general/branding-logo';
 
 import type { Route } from './+types/_layout';
 

@@ -12,7 +12,7 @@ import { findDocumentAuditLogs } from '@documenso/lib/server-only/document/find-
 import { dynamicActivate } from '@documenso/lib/utils/i18n';
 import { Card, CardContent } from '@documenso/ui/primitives/card';
 
-import { Logo } from '~/components/branding/logo';
+import { BrandingLogo } from '~/components/general/branding-logo';
 import { InternalAuditLogTable } from '~/components/tables/internal-audit-log-table';
 
 import type { Route } from './+types/audit-log';
@@ -68,7 +68,7 @@ export default function AuditLog({ loaderData }: Route.ComponentProps) {
   const { i18n } = useLingui();
 
   // Todo
-  void dynamicActivate(i18n, documentLanguage);
+  void dynamicActivate(documentLanguage);
 
   const { _ } = useLingui();
 
@@ -163,7 +163,7 @@ export default function AuditLog({ loaderData }: Route.ComponentProps) {
 
       <div className="my-8 flex-row-reverse">
         <div className="flex items-end justify-end gap-x-4">
-          <Logo className="max-h-6 print:max-h-4" />
+          <BrandingLogo className="max-h-6 print:max-h-4" />
         </div>
       </div>
     </div>

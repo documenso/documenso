@@ -28,7 +28,7 @@ import { LazyPDFViewer } from '@documenso/ui/primitives/lazy-pdf-viewer';
 import { SignaturePad } from '@documenso/ui/primitives/signature-pad';
 import { useToast } from '@documenso/ui/primitives/use-toast';
 
-import { Logo } from '~/components/branding/logo';
+import { BrandingLogo } from '~/components/general/branding-logo';
 import { ZDirectTemplateEmbedDataSchema } from '~/types/embed-direct-template-schema';
 import { injectCss } from '~/utils/css-vars';
 
@@ -493,7 +493,7 @@ export const EmbedDirectTemplateClientPage = ({
       {!hidePoweredBy && (
         <div className="bg-primary text-primary-foreground fixed bottom-0 left-0 z-40 rounded-tr px-2 py-1 text-xs font-medium opacity-60 hover:opacity-100">
           <span>Powered by</span>
-          <Logo className="ml-2 inline-block h-[14px]" />
+          <BrandingLogo className="ml-2 inline-block h-[14px]" />
         </div>
       )}
     </div>

@@ -30,6 +30,7 @@ import { DocumentPageViewDropdown } from '~/components/general/document/document
 import { DocumentPageViewInformation } from '~/components/general/document/document-page-view-information';
 import { DocumentPageViewRecentActivity } from '~/components/general/document/document-page-view-recent-activity';
 import { DocumentPageViewRecipients } from '~/components/general/document/document-page-view-recipients';
+import { superLoaderJson, useSuperLoaderData } from '~/utils/super-json-loader';
 
 import type { Route } from './+types/$id._index';
 
@@ -119,14 +120,16 @@ export async function loader({ params, context }: Route.LoaderArgs) {
     recipients,
   };
 
-  return {
+  return superLoaderJson({
     document: documentWithRecipients,
     documentRootPath,
     fields,
-  };
+  });
 }
 
-export default function DocumentPage({ loaderData }: Route.ComponentProps) {
+export default function DocumentPage() {
+  const loaderData = useSuperLoaderData<typeof loader>();
+
   const { _ } = useLingui();
   const { user } = useSession();
 

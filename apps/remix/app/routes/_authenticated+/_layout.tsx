@@ -1,5 +1,6 @@
 import { Outlet, redirect } from 'react-router';
 
+import { getLimits } from '@documenso/ee/server-only/limits/client';
 import { LimitsProvider } from '@documenso/ee/server-only/limits/provider/client';
 import { getSiteSettings } from '@documenso/lib/server-only/site-settings/get-site-settings';
 import { SITE_SETTINGS_BANNER_ID } from '@documenso/lib/server-only/site-settings/schemas/banner';
@@ -10,29 +11,35 @@ import { VerifyEmailBanner } from '~/components/(dashboard)/layout/verify-email-
 
 import type { Route } from './+types/_layout';
 
-export const loader = async ({ context }: Route.LoaderArgs) => {
+export const loader = async ({ request, context }: Route.LoaderArgs) => {
   const { session } = context;
-
-  const banner = await getSiteSettings().then((settings) =>
-    settings.find((setting) => setting.id === SITE_SETTINGS_BANNER_ID),
-  );
 
   if (!session) {
     throw redirect('/signin');
   }
 
+  const banner = await getSiteSettings().then((settings) =>
+    settings.find((setting) => setting.id === SITE_SETTINGS_BANNER_ID),
+  );
+
+  const requestHeaders = Object.fromEntries(request.headers.entries());
+
+  const limits = await getLimits({ headers: requestHeaders, teamId: session.currentTeam?.id });
+
   return {
     user: session.user,
     teams: session.teams,
     banner,
+    limits,
+    teamId: session.currentTeam?.id,
   };
 };
 
 export default function Layout({ loaderData }: Route.ComponentProps) {
-  const { user, teams, banner } = loaderData;
+  const { user, teams, banner, limits, teamId } = loaderData;
 
   return (
-    <LimitsProvider>
+    <LimitsProvider initialValue={limits} teamId={teamId}>
       {!user.emailVerified && <VerifyEmailBanner email={user.email} />}
 
       {banner && <AppBanner banner={banner} />}

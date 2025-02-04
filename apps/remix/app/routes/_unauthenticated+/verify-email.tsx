@@ -1,19 +1,14 @@
-import type { Metadata } from 'next';
-import Link from 'next/link';
-
 import { Trans } from '@lingui/macro';
 import { XCircle } from 'lucide-react';
+import { Link } from 'react-router';
 
-import { setupI18nSSR } from '@documenso/lib/client-only/providers/i18n.server';
 import { Button } from '@documenso/ui/primitives/button';
 
-export const metadata: Metadata = {
-  title: 'Verify Email',
-};
+export function meta() {
+  return [{ title: 'Verify Email' }];
+}
 
-export default async function EmailVerificationWithoutTokenPage() {
-  await setupI18nSSR();
-
+export default function EmailVerificationWithoutTokenPage() {
   return (
     <div className="w-screen max-w-lg px-4">
       <div className="flex w-full items-start">
@@ -34,7 +29,7 @@ export default async function EmailVerificationWithoutTokenPage() {
           </p>
 
           <Button className="mt-4" asChild>
-            <Link href="/">
+            <Link to="/">
               <Trans>Go back home</Trans>
             </Link>
           </Button>

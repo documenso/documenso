@@ -1,6 +1,5 @@
 import { Trans, msg } from '@lingui/macro';
 import { useLingui } from '@lingui/react';
-import type { Team } from '@prisma/client';
 import { useNavigate } from 'react-router';
 
 import { formatDocumentsPath } from '@documenso/lib/utils/teams';

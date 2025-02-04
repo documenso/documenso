@@ -5,7 +5,6 @@ import type { JobDefinition, TriggerJobOptions } from './_internal/job';
 import type { BaseJobProvider as JobClientProvider } from './base';
 import { InngestJobProvider } from './inngest';
 import { LocalJobProvider } from './local';
-import { TriggerJobProvider } from './trigger';
 
 export class JobClient<T extends ReadonlyArray<JobDefinition> = []> {
   private _provider: JobClientProvider;
@@ -13,7 +12,6 @@ export class JobClient<T extends ReadonlyArray<JobDefinition> = []> {
   public constructor(definitions: T) {
     this._provider = match(env('NEXT_PRIVATE_JOBS_PROVIDER'))
       .with('inngest', () => InngestJobProvider.getInstance())
-      .with('trigger', () => TriggerJobProvider.getInstance())
       .otherwise(() => LocalJobProvider.getInstance());
 
     definitions.forEach((definition) => {
@@ -27,9 +25,5 @@ export class JobClient<T extends ReadonlyArray<JobDefinition> = []> {
 
   public getApiHandler() {
     return this._provider.getApiHandler();
-  }
-
-  public getHonoApiHandler() {
-    return this._provider.getHonoApiHandler();
   }
 }

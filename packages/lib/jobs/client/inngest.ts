@@ -1,13 +1,8 @@
-import type { NextApiRequest, NextApiResponse } from 'next';
-import type { NextRequest } from 'next/server';
-
 import type { Context as HonoContext } from 'hono';
 import type { Context, Handler, InngestFunction } from 'inngest';
 import { Inngest as InngestClient } from 'inngest';
 import { serve as createHonoPagesRoute } from 'inngest/hono';
 import type { Logger } from 'inngest/middleware/logger';
-import { serve as createPagesRoute } from 'inngest/next';
-import { json } from 'micro';
 
 import { env } from '../../utils/env';
 import type { JobDefinition, JobRunIO, SimpleTriggerJobOptions } from './_internal/job';
@@ -76,29 +71,29 @@ export class InngestJobProvider extends BaseJobProvider {
     });
   }
 
-  public getApiHandler() {
-    const handler = createPagesRoute({
-      client: this._client,
-      functions: this._functions,
-    });
+  // public getApiHandler() {
+  //   const handler = createPagesRoute({
+  //     client: this._client,
+  //     functions: this._functions,
+  //   });
 
-    return async (req: NextApiRequest, res: NextApiResponse) => {
-      // Since body-parser is disabled for this route we need to patch in the parsed body
-      if (req.headers['content-type'] === 'application/json') {
-        Object.assign(req, {
-          body: await json(req),
-        });
-      }
+  //   return async (req: NextApiRequest, res: NextApiResponse) => {
+  //     // Since body-parser is disabled for this route we need to patch in the parsed body
+  //     if (req.headers['content-type'] === 'application/json') {
+  //       Object.assign(req, {
+  //         body: await json(req),
+  //       });
+  //     }
 
-      // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
-      const nextReq = req as unknown as NextRequest;
+  //     // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
+  //     const nextReq = req as unknown as NextRequest;
 
-      return await handler(nextReq, res);
-    };
-  }
+  //     return await handler(nextReq, res);
+  //   };
+  // }
 
   // Todo: Do we need to handle the above?
-  public getHonoApiHandler() {
+  public getApiHandler() {
     return async (context: HonoContext) => {
       const handler = createHonoPagesRoute({
         client: this._client,

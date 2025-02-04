@@ -22,7 +22,7 @@ app.route('/api/auth', auth);
 
 // API servers. Todo: Configure max durations, etc?
 app.route('/api/v1', tsRestHonoApp);
-app.use('/api/jobs/*', jobsClient.getHonoApiHandler());
+app.use('/api/jobs/*', jobsClient.getApiHandler());
 app.use('/api/trpc/*', reactRouterTrpcServer);
 
 // Unstable API server routes. Order matters for these two.

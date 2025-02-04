@@ -73,9 +73,6 @@ export async function getLoadContext(args: GetLoadContextArgs) {
  * - /favicon.* (Favicon files)
  * - *.webmanifest (Web manifest files)
  * - Paths starting with . (e.g. .well-known)
- *
- * The regex pattern (?!pattern) is a negative lookahead that ensures the path does NOT match any of these patterns.
- * The .* at the end matches any remaining characters in the path.
  */
 const config = {
   matcher: new RegExp(

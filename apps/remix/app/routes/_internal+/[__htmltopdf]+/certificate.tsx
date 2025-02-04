@@ -26,7 +26,7 @@ import {
   TableRow,
 } from '@documenso/ui/primitives/table';
 
-import { Logo } from '~/components/branding/logo';
+import { BrandingLogo } from '~/components/general/branding-logo';
 
 import type { Route } from './+types/certificate';
 
@@ -316,7 +316,7 @@ export default function SigningCertificate({ loaderData }: Route.ComponentProps)
             {_(msg`Signing certificate provided by`)}:
           </p>
 
-          <Logo className="max-h-6 print:max-h-4" />
+          <BrandingLogo className="max-h-6 print:max-h-4" />
         </div>
       </div>
     </div>

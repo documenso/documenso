@@ -2,8 +2,8 @@ import { Trans } from '@lingui/macro';
 
 import { Alert, AlertDescription } from '@documenso/ui/primitives/alert';
 
-import { Logo } from '~/components/branding/logo';
 import { SignInForm } from '~/components/forms/signin';
+import { BrandingLogo } from '~/components/general/branding-logo';
 
 export type EmbedAuthenticationRequiredProps = {
   email?: string;
@@ -17,7 +17,7 @@ export const EmbedAuthenticationRequired = ({
   return (
     <div className="flex min-h-[100dvh] w-full items-center justify-center">
       <div className="flex w-full max-w-md flex-col">
-        <Logo className="h-8" />
+        <BrandingLogo className="h-8" />
 
         <Alert className="mt-8" variant="warning">
           <AlertDescription>

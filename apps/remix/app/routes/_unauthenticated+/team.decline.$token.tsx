@@ -1,10 +1,7 @@
-import Link from 'next/link';
-
 import { Trans } from '@lingui/macro';
 import { DateTime } from 'luxon';
+import { Link } from 'react-router';
 
-import { setupI18nSSR } from '@documenso/lib/client-only/providers/i18n.server';
-import { getServerComponentSession } from '@documenso/lib/next-auth/get-server-component-session';
 import { encryptSecondaryData } from '@documenso/lib/server-only/crypto/encrypt';
 import { declineTeamInvitation } from '@documenso/lib/server-only/team/decline-team-invitation';
 import { getTeamById } from '@documenso/lib/server-only/team/get-team';
@@ -12,18 +9,16 @@ import { prisma } from '@documenso/prisma';
 import { TeamMemberInviteStatus } from '@documenso/prisma/client';
 import { Button } from '@documenso/ui/primitives/button';
 
-type DeclineInvitationPageProps = {
-  params: {
-    token: string;
-  };
-};
+import type { Route } from './+types/team.decline.$token';
 
-export default async function DeclineInvitationPage({
-  params: { token },
-}: DeclineInvitationPageProps) {
-  await setupI18nSSR();
+export async function loader({ params, context }: Route.LoaderArgs) {
+  const { token } = params;
 
-  const session = await getServerComponentSession();
+  if (!token) {
+    return {
+      state: 'InvalidLink',
+    } as const;
+  }
 
   const teamMemberInvite = await prisma.teamMemberInvite.findUnique({
     where: {
@@ -32,25 +27,9 @@ export default async function DeclineInvitationPage({
   });
 
   if (!teamMemberInvite) {
-    return (
-      <div className="w-screen max-w-lg px-4">
-        <div className="w-full">
-          <h1 className="text-4xl font-semibold">
-            <Trans>Invalid token</Trans>
-          </h1>
-
-          <p className="text-muted-foreground mb-4 mt-2 text-sm">
-            <Trans>This token is invalid or has expired. No action is needed.</Trans>
-          </p>
-
-          <Button asChild>
-            <Link href="/">
-              <Trans>Return</Trans>
-            </Link>
-          </Button>
-        </div>
-      </div>
-    );
+    return {
+      state: 'InvalidLink',
+    } as const;
   }
 
   const team = await getTeamById({ teamId: teamMemberInvite.teamId });
@@ -85,6 +64,49 @@ export default async function DeclineInvitationPage({
   });
 
   if (!user) {
+    return {
+      state: 'LoginRequired',
+      email,
+      teamName: team.name,
+    } as const;
+  }
+
+  const isSessionUserTheInvitedUser = user.id === context.session?.user.id;
+
+  return {
+    state: 'Success',
+    email,
+    teamName: team.name,
+    isSessionUserTheInvitedUser,
+  } as const;
+}
+
+export default function DeclineInvitationPage({ loaderData }: Route.ComponentProps) {
+  const data = loaderData;
+
+  if (data.state === 'InvalidLink') {
+    return (
+      <div className="w-screen max-w-lg px-4">
+        <div className="w-full">
+          <h1 className="text-4xl font-semibold">
+            <Trans>Invalid token</Trans>
+          </h1>
+
+          <p className="text-muted-foreground mb-4 mt-2 text-sm">
+            <Trans>This token is invalid or has expired. No action is needed.</Trans>
+          </p>
+
+          <Button asChild>
+            <Link to="/">
+              <Trans>Return</Trans>
+            </Link>
+          </Button>
+        </div>
+      </div>
+    );
+  }
+
+  if (data.state === 'LoginRequired') {
     return (
       <div>
         <h1 className="text-4xl font-semibold">
@@ -93,7 +115,7 @@ export default async function DeclineInvitationPage({
 
         <p className="text-muted-foreground mt-2 text-sm">
           <Trans>
-            You have been invited by <strong>{team.name}</strong> to join their team.
+            You have been invited by <strong>{data.teamName}</strong> to join their team.
           </Trans>
         </p>
 
@@ -102,15 +124,13 @@ export default async function DeclineInvitationPage({
         </p>
 
         <Button asChild>
-          <Link href={`/signup?email=${encodeURIComponent(email)}`}>
+          <Link to={`/signup?email=${encodeURIComponent(data.email)}`}>
             <Trans>Create account</Trans>
           </Link>
         </Button>
       </div>
     );
   }
-
-  const isSessionUserTheInvitedUser = user?.id === session.user?.id;
 
   return (
     <div className="w-screen max-w-lg px-4">
@@ -120,19 +140,19 @@ export default async function DeclineInvitationPage({
 
       <p className="text-muted-foreground mb-4 mt-2 text-sm">
         <Trans>
-          You have declined the invitation from <strong>{team.name}</strong> to join their team.
+          You have declined the invitation from <strong>{data.teamName}</strong> to join their team.
         </Trans>
       </p>
 
-      {isSessionUserTheInvitedUser ? (
+      {data.isSessionUserTheInvitedUser ? (
         <Button asChild>
-          <Link href="/">
+          <Link to="/">
             <Trans>Return to Dashboard</Trans>
           </Link>
         </Button>
       ) : (
         <Button asChild>
-          <Link href="/">
+          <Link to="/">
             <Trans>Return to Home</Trans>
           </Link>
         </Button>

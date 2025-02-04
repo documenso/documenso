@@ -1,5 +1,3 @@
-import type { NextApiRequest, NextApiResponse } from 'next';
-
 import type { Context as HonoContext } from 'hono';
 
 import type { JobDefinition, SimpleTriggerJobOptions } from './_internal/job';
@@ -15,11 +13,7 @@ export abstract class BaseJobProvider {
     throw new Error('Not implemented');
   }
 
-  public getApiHandler(): (req: NextApiRequest, res: NextApiResponse) => Promise<Response | void> {
-    throw new Error('Not implemented');
-  }
-
-  public getHonoApiHandler(): (req: HonoContext) => Promise<Response | void> {
+  public getApiHandler(): (req: HonoContext) => Promise<Response | void> {
     throw new Error('Not implemented');
   }
 }
