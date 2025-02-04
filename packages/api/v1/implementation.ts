@@ -1229,7 +1229,7 @@ export const ApiContractV1Implementation = createNextRoute(ApiContractV1, {
     const { id: documentId } = args.params;
 
     const document = await getDocumentById({
-      id: Number(documentId),
+      documentId: Number(documentId),
       userId: user.id,
       teamId: team?.id,
     });
