@@ -68,6 +68,7 @@
     "@documenso/pdf-sign": "^0.1.0",
     "@documenso/prisma": "^0.0.0",
     "@lingui/core": "^4.11.3",
+    "@prisma/client": "^5.4.2",
     "inngest-cli": "^0.29.1",
     "luxon": "^3.5.0",
     "mupdf": "^1.0.0",
@@ -77,7 +78,6 @@
     "zod": "3.24.1"
   },
   "overrides": {
-    "next": "14.2.6",
     "zod": "3.24.1"
   },
   "trigger.dev": {
