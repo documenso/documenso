@@ -16,8 +16,9 @@ export async function loadCatalog(lang: SupportedLanguages): Promise<{
 }> {
   const extension = env('NODE_ENV') === 'development' ? 'po' : 'js';
 
+  // Todo
+  const { messages } = await import(`../../translations/${lang}/web.po`);
   // const { messages } = await import(`../../translations/${lang}/web.${extension}`);
-  const messages = {};
 
   return {
     [lang]: messages,

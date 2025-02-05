@@ -2,7 +2,6 @@ import { zValidator } from '@hono/zod-validator';
 import { UserSecurityAuditLogType } from '@prisma/client';
 import { verifyAuthenticationResponse } from '@simplewebauthn/server';
 import { Hono } from 'hono';
-import { z } from 'zod';
 
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import type { TAuthenticationResponseJSONSchema } from '@documenso/lib/types/webauthn';
@@ -11,11 +10,13 @@ import { getAuthenticatorOptions } from '@documenso/lib/utils/authenticator';
 import { prisma } from '@documenso/prisma';
 
 import { onAuthorize } from '../lib/utils/authorizer';
-import { getRequiredSession } from '../lib/utils/get-session';
 import type { HonoAuthContext } from '../types/context';
 import { ZPasskeyAuthorizeSchema } from '../types/passkey';
 
 export const passkeyRoute = new Hono<HonoAuthContext>()
+  /**
+   * Authorize endpoint.
+   */
   .post('/authorize', zValidator('json', ZPasskeyAuthorizeSchema), async (c) => {
     const requestMetadata = c.get('requestMetadata');
 
@@ -43,7 +44,7 @@ export const passkeyRoute = new Hono<HonoAuthContext>()
       .catch(() => null);
 
     if (!challengeToken) {
-      return null;
+      throw new AppError(AppErrorCode.INVALID_REQUEST);
     }
 
     if (challengeToken.expiresAt < new Date()) {
@@ -96,7 +97,7 @@ export const passkeyRoute = new Hono<HonoAuthContext>()
         },
       });
 
-      return null;
+      throw new AppError(AppErrorCode.INVALID_REQUEST);
     }
 
     await prisma.passkey.update({
@@ -117,28 +118,29 @@ export const passkeyRoute = new Hono<HonoAuthContext>()
       },
       200,
     );
-  })
+  });
 
-  .post('/register', async (c) => {
-    const { user } = await getRequiredSession(c);
+// Todo
+// .post('/register', async (c) => {
+//   const { user } = await getRequiredSession(c);
 
-    //
-  })
+//   //
+// })
 
-  .post(
-    '/pre-authenticate',
-    zValidator(
-      'json',
-      z.object({
-        code: z.string(),
-      }),
-    ),
-    async (c) => {
-      //
+// .post(
+//   '/pre-authenticate',
+//   zValidator(
+//     'json',
+//     z.object({
+//       code: z.string(),
+//     }),
+//   ),
+//   async (c) => {
+//     //
 
-      return c.json({
-        success: true,
-        recoveryCodes: result.recoveryCodes,
-      });
-    },
-  );
+//     return c.json({
+//       success: true,
+//       recoveryCodes: result.recoveryCodes,
+//     });
+//   },
+// );

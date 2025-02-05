@@ -121,7 +121,7 @@ export function TeamBrandingPreferencesForm({ team, settings }: TeamBrandingPref
         void fetch(`/api/file?key=${file.key}`, {
           method: 'GET',
         })
-          .then((res) => res.json())
+          .then(async (res) => await res.json())
           .then((data) => {
             const objectUrl = URL.createObjectURL(new Blob([data.binaryData]));
 

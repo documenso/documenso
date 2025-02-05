@@ -22,7 +22,7 @@ type ComboBoxOption<T = OptionValue> = {
 };
 
 type MultiSelectComboboxProps<T = OptionValue> = {
-  emptySelectionPlaceholder?: React.ReactNode | string;
+  emptySelectionPlaceholder?: React.ReactElement | string;
   enableClearAllButton?: boolean;
   loading?: boolean;
   inputPlaceholder?: MessageDescriptor;

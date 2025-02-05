@@ -107,7 +107,7 @@ export const DocumentSigningForm = ({
       timestamp: new Date().toISOString(),
     });
 
-    redirectUrl ? navigate(redirectUrl) : navigate(`/sign/${recipient.token}/complete`);
+    await navigate(redirectUrl ? redirectUrl : `/sign/${recipient.token}/complete`);
   };
 
   return (
@@ -157,7 +157,7 @@ export const DocumentSigningForm = ({
                     variant="secondary"
                     size="lg"
                     disabled={typeof window !== 'undefined' && window.history.length <= 1}
-                    onClick={() => navigate(-1)}
+                    onClick={async () => navigate(-1)}
                   >
                     <Trans>Cancel</Trans>
                   </Button>
@@ -239,7 +239,7 @@ export const DocumentSigningForm = ({
                     variant="secondary"
                     size="lg"
                     disabled={typeof window !== 'undefined' && window.history.length <= 1}
-                    onClick={() => navigate(-1)}
+                    onClick={async () => navigate(-1)}
                   >
                     <Trans>Cancel</Trans>
                   </Button>

@@ -66,7 +66,7 @@ const t = initTRPC
  * Middlewares
  */
 export const authenticatedMiddleware = t.middleware(async ({ ctx, next }) => {
-  const authorizationHeader = ctx.req.headers.authorization;
+  const authorizationHeader = ctx.req.headers.get('authorization');
 
   // Taken from `authenticatedMiddleware` in `@documenso/api/v1/middleware/authenticated.ts`.
   if (authorizationHeader) {

@@ -185,6 +185,7 @@ export const SignUpForm = ({
 
   const onSignUpWithOIDCClick = async () => {
     try {
+      // eslint-disable-next-line no-promise-executor-return
       await new Promise((resolve) => setTimeout(resolve, 2000));
       // await signIn('oidc', { callbackUrl: SIGN_UP_REDIRECT_PATH });
     } catch (err) {

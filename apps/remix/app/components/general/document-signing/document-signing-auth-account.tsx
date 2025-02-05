@@ -39,7 +39,7 @@ export const DocumentSigningAuthAccount = ({
       //   // Todo: Redirect to signin like below
       // }
 
-      navigate(`/signin#email=${email}`);
+      await navigate(`/signin#email=${email}`);
     } catch {
       setIsSigningOut(false);
 

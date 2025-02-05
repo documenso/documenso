@@ -7,7 +7,10 @@ import { verifyBackupCode } from './verify-backup-code';
 type ValidateTwoFactorAuthenticationOptions = {
   totpCode?: string;
   backupCode?: string;
-  user: Pick<User, 'id' | 'email' | 'twoFactorEnabled' | 'twoFactorSecret'>;
+  user: Pick<
+    User,
+    'id' | 'email' | 'twoFactorEnabled' | 'twoFactorSecret' | 'twoFactorBackupCodes'
+  >;
 };
 
 export const validateTwoFactorAuthentication = async ({
@@ -28,7 +31,7 @@ export const validateTwoFactorAuthentication = async ({
   }
 
   if (backupCode) {
-    return await verifyBackupCode({ user, backupCode });
+    return verifyBackupCode({ user, backupCode });
   }
 
   throw new AppError('TWO_FACTOR_MISSING_CREDENTIALS');

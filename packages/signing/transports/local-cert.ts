@@ -24,8 +24,10 @@ export const signWithLocalCert = async ({ pdf }: SignWithLocalCertOptions) => {
 
   let cert: Buffer | null = null;
 
-  if (env('NEXT_PRIVATE_SIGNING_LOCAL_FILE_CONTENTS')) {
-    cert = Buffer.from(env('NEXT_PRIVATE_SIGNING_LOCAL_FILE_CONTENTS'), 'base64');
+  const localFileContents = env('NEXT_PRIVATE_SIGNING_LOCAL_FILE_CONTENTS');
+
+  if (localFileContents) {
+    cert = Buffer.from(localFileContents, 'base64');
   }
 
   if (!cert) {

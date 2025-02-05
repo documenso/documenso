@@ -1,5 +1,6 @@
 import { match } from 'ts-pattern';
 
+import { IS_BILLING_ENABLED } from '@documenso/lib/constants/app';
 import { STRIPE_PLAN_TYPE } from '@documenso/lib/constants/billing';
 import type { Stripe } from '@documenso/lib/server-only/stripe';
 import { stripe } from '@documenso/lib/server-only/stripe';
@@ -17,9 +18,7 @@ type StripeWebhookResponse = {
 
 export const stripeWebhookHandler = async (req: Request) => {
   try {
-    // Todo
-    // const isBillingEnabled = await getFlag('app_billing');
-    const isBillingEnabled = true;
+    const isBillingEnabled = IS_BILLING_ENABLED();
 
     const webhookSecret = env('NEXT_PRIVATE_STRIPE_WEBHOOK_SECRET');
 

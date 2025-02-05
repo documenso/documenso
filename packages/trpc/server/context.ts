@@ -4,7 +4,7 @@ import { z } from 'zod';
 import { getSession } from '@documenso/auth/server/lib/utils/get-session';
 import type { ApiRequestMetadata } from '@documenso/lib/universal/extract-request-metadata';
 import { extractRequestMetadata } from '@documenso/lib/universal/extract-request-metadata';
-import type { User } from '@documenso/prisma/client';
+import type { Session, User } from '@documenso/prisma/client';
 
 type CreateTrpcContextOptions = {
   c: Context;
@@ -58,7 +58,7 @@ export type TrpcContext = (
       user: null;
     }
   | {
-      session: unknown;
+      session: Session;
       user: User;
     }
 ) & {

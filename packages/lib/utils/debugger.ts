@@ -1,9 +1,7 @@
-import { env } from '@documenso/lib/utils/env';
-
 export const appLog = (context: string, ...args: Parameters<typeof console.log>) => {
-  if (env('NEXT_DEBUG') === 'true') {
-    console.log(`[${context}]: ${args[0]}`, ...args.slice(1));
-  }
+  // if (env('NEXT_DEBUG') === 'true') {
+  console.log(`[${context}]: ${args[0]}`, ...args.slice(1));
+  // }
 };
 
 export class AppLogger {

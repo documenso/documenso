@@ -31,7 +31,7 @@ export const DocumentSigningAuthPageView = ({
       // Todo: Redirect false
       await authClient.signOut();
 
-      navigate(emailHasAccount ? `/signin#email=${email}` : `/signup#email=${email}`);
+      await navigate(emailHasAccount ? `/signin#email=${email}` : `/signup#email=${email}`);
     } catch {
       toast({
         title: _(msg`Something went wrong`),

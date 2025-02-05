@@ -426,7 +426,7 @@ export const TemplateDirectLinkDialog = ({
                       await toggleTemplateDirectLink({
                         templateId: template.id,
                         enabled: isEnabled,
-                      }).catch((e) => null);
+                      }).catch(() => null);
 
                       onOpenChange(false);
                     }}

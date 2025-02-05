@@ -5,7 +5,7 @@ import { useForm } from 'react-hook-form';
 import { useNavigate } from 'react-router';
 import { z } from 'zod';
 
-import { trpc } from '@documenso/trpc/react';
+import { authClient } from '@documenso/auth/client';
 import { cn } from '@documenso/ui/lib/utils';
 import { Button } from '@documenso/ui/primitives/button';
 import {
@@ -44,10 +44,10 @@ export const ForgotPasswordForm = ({ className }: ForgotPasswordFormProps) => {
 
   const isSubmitting = form.formState.isSubmitting;
 
-  const { mutateAsync: forgotPassword } = trpc.profile.forgotPassword.useMutation();
-
   const onFormSubmit = async ({ email }: TForgotPasswordFormSchema) => {
-    await forgotPassword({ email }).catch(() => null);
+    await authClient.emailPassword.forgotPassword({ email }).catch(() => null);
+
+    await navigate('/check-email');
 
     toast({
       title: _(msg`Reset email sent`),
@@ -58,8 +58,6 @@ export const ForgotPasswordForm = ({ className }: ForgotPasswordFormProps) => {
     });
 
     form.reset();
-
-    navigate('/check-email');
   };
 
   return (

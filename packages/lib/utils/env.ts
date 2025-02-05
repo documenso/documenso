@@ -2,7 +2,7 @@
 
 type EnvironmentVariable = keyof NodeJS.ProcessEnv;
 
-export const env = (variable: EnvironmentVariable | (string & {})): string | undefined => {
+export const env = (variable: EnvironmentVariable | (string & object)): string | undefined => {
   // console.log({
   //   ['typeof window']: typeof window,
   //   ['process.env']: process.env,

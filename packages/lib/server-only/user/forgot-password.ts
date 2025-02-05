@@ -1,12 +1,11 @@
 import crypto from 'crypto';
 
 import { prisma } from '@documenso/prisma';
-import type { TForgotPasswordFormSchema } from '@documenso/trpc/server/profile-router/schema';
 
 import { ONE_DAY } from '../../constants/time';
 import { sendForgotPassword } from '../auth/send-forgot-password';
 
-export const forgotPassword = async ({ email }: TForgotPasswordFormSchema) => {
+export const forgotPassword = async ({ email }: { email: string }) => {
   const user = await prisma.user.findFirst({
     where: {
       email: {

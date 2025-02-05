@@ -5,7 +5,6 @@ import {
   S3Client,
 } from '@aws-sdk/client-s3';
 import slugify from '@sindresorhus/slugify';
-import { type JWT } from 'next-auth/jwt';
 import path from 'node:path';
 
 import { env } from '@documenso/lib/utils/env';
@@ -19,7 +18,7 @@ export const getPresignPostUrl = async (fileName: string, contentType: string) =
 
   const { getSignedUrl } = await import('@aws-sdk/s3-request-presigner');
 
-  const token: JWT | null = null;
+  const token: { id: string } | null = null;
 
   try {
     const baseUrl = NEXT_PUBLIC_WEBAPP_URL();

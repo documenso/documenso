@@ -1,6 +1,7 @@
 import type { ClientResponse } from 'hono/client';
 import { hc } from 'hono/client';
 
+import { NEXT_PUBLIC_WEBAPP_URL } from '@documenso/lib/constants/app';
 import { AppError } from '@documenso/lib/errors/app-error';
 
 import type { AuthAppType } from '../server';
@@ -107,10 +108,6 @@ export class AuthClient {
   };
 }
 
-// Todo: Env
-// Todo: Remove in favor of AuthClient
-// export const authClient = hc<AuthAppType>('http://localhost:3000/api/auth');
-
 export const authClient = new AuthClient({
-  baseUrl: 'http://localhost:3000/api/auth',
+  baseUrl: `${NEXT_PUBLIC_WEBAPP_URL()}/api/auth`,
 });

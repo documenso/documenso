@@ -17,18 +17,18 @@ export const signWithGoogleCloudHSM = async ({ pdf }: SignWithGoogleCloudHSMOpti
     throw new Error('No certificate path provided for Google Cloud HSM signing');
   }
 
+  const googleApplicationCredentials = env('GOOGLE_APPLICATION_CREDENTIALS');
+  const googleApplicationCredentialsContents = env(
+    'NEXT_PRIVATE_SIGNING_GCLOUD_APPLICATION_CREDENTIALS_CONTENTS',
+  );
+
   // To handle hosting in serverless environments like Vercel we can supply the base64 encoded
   // application credentials as an environment variable and write it to a file if it doesn't exist
-  if (
-    env('GOOGLE_APPLICATION_CREDENTIALS') &&
-    env('NEXT_PRIVATE_SIGNING_GCLOUD_APPLICATION_CREDENTIALS_CONTENTS')
-  ) {
-    if (!fs.existsSync(env('GOOGLE_APPLICATION_CREDENTIALS'))) {
-      const contents = new Uint8Array(
-        Buffer.from(env('NEXT_PRIVATE_SIGNING_GCLOUD_APPLICATION_CREDENTIALS_CONTENTS'), 'base64'),
-      );
+  if (googleApplicationCredentials && googleApplicationCredentialsContents) {
+    if (!fs.existsSync(googleApplicationCredentials)) {
+      const contents = new Uint8Array(Buffer.from(googleApplicationCredentialsContents, 'base64'));
 
-      fs.writeFileSync(env('GOOGLE_APPLICATION_CREDENTIALS'), contents);
+      fs.writeFileSync(googleApplicationCredentials, contents);
     }
   }
 
@@ -45,8 +45,12 @@ export const signWithGoogleCloudHSM = async ({ pdf }: SignWithGoogleCloudHSMOpti
 
   let cert: Buffer | null = null;
 
-  if (env('NEXT_PRIVATE_SIGNING_GCLOUD_HSM_PUBLIC_CRT_FILE_CONTENTS')) {
-    cert = Buffer.from(env('NEXT_PRIVATE_SIGNING_GCLOUD_HSM_PUBLIC_CRT_FILE_CONTENTS'), 'base64');
+  const googleCloudHsmPublicCrtFileContents = env(
+    'NEXT_PRIVATE_SIGNING_GCLOUD_HSM_PUBLIC_CRT_FILE_CONTENTS',
+  );
+
+  if (googleCloudHsmPublicCrtFileContents) {
+    cert = Buffer.from(googleCloudHsmPublicCrtFileContents, 'base64');
   }
 
   if (!cert) {

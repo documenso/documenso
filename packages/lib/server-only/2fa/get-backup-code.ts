@@ -13,6 +13,10 @@ const ZBackupCodeSchema = z.array(z.string());
 export const getBackupCodes = ({ user }: GetBackupCodesOptions) => {
   const key = DOCUMENSO_ENCRYPTION_KEY;
 
+  if (!key) {
+    throw new Error('Missing DOCUMENSO_ENCRYPTION_KEY');
+  }
+
   if (!user.twoFactorEnabled) {
     throw new Error('User has not enabled 2FA');
   }

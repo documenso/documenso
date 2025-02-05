@@ -35,5 +35,5 @@ export const loader = ({ request }: Route.LoaderArgs) => {
     return null;
   }
 
-  return redirect(NEXT_PUBLIC_MARKETING_URL());
+  throw redirect(NEXT_PUBLIC_MARKETING_URL());
 };

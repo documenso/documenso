@@ -13,7 +13,7 @@ declare module 'react-router' {
   interface AppLoadContext extends Awaited<ReturnType<typeof getLoadContext>> {}
 }
 
-const logger = new AppLogger('[Context]');
+const logger = new AppLogger('Context');
 
 export async function getLoadContext(args: GetLoadContextArgs) {
   const initTime = Date.now();

@@ -270,6 +270,8 @@ export const SignInForm = ({
 
   const onSignInWithOIDCClick = async () => {
     try {
+      // eslint-disable-next-line no-promise-executor-return
+      await new Promise((resolve) => setTimeout(resolve, 2000));
       // await signIn('oidc', {
       //   callbackUrl,
       // });

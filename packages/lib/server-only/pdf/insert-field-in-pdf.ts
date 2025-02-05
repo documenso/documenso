@@ -28,9 +28,16 @@ import {
 import { env } from '../../utils/env';
 
 export const insertFieldInPDF = async (pdf: PDFDocument, field: FieldWithSignature) => {
-  const fontCaveat = await fetch(env('FONT_CAVEAT_URI')).then(async (res) => res.arrayBuffer());
+  const fontCaveatUri = env('FONT_CAVEAT_URI');
+  const fontNotoSansUri = env('FONT_NOTO_SANS_URI');
 
-  const fontNoto = await fetch(env('FONT_NOTO_SANS_URI')).then(async (res) => res.arrayBuffer());
+  if (!fontCaveatUri || !fontNotoSansUri) {
+    throw new Error('Missing font URI');
+  }
+
+  const fontCaveat = await fetch(fontCaveatUri).then(async (res) => res.arrayBuffer());
+
+  const fontNoto = await fetch(fontNotoSansUri).then(async (res) => res.arrayBuffer());
 
   const isSignatureField = isSignatureFieldType(field.type);
 

@@ -159,7 +159,7 @@ export function TemplateUseDialog({
           method: 'POST',
           body: formData,
         })
-          .then((res) => res.json())
+          .then(async (res) => await res.json())
           .catch((e) => {
             console.error('Upload failed:', e);
             throw new AppError('UPLOAD_FAILED');
