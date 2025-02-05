@@ -36,6 +36,13 @@ export default defineConfig({
       // '@noble/hashes/sha256a',
       // '@node-rs/bcrypt',
       // 'crypto',
+      // '@documenso/assets',
+      // '@documenso/ee',
+      // '@documenso/lib',
+      // '@documenso/prisma',
+      // '@documenso/tailwind-config',
+      // '@documenso/trpc',
+      // '@documenso/ui',
     ],
   },
   server: {

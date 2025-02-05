@@ -16,7 +16,6 @@
     "@types/node": "^20",
     "@documenso/lib": "*",
     "@documenso/prisma": "*",
-    "@documenso/web": "*",
     "pdf-lib": "^1.17.1"
   },
   "dependencies": {

@@ -226,8 +226,6 @@ export const findDocuments = async ({
     };
   }
 
-  console.log(JSON.stringify(whereClause, null, 2));
-
   const [data, count] = await Promise.all([
     prisma.document.findMany({
       where: whereClause,
