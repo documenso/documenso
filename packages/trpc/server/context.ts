@@ -1,49 +1,39 @@
-import type { User } from '@prisma/client';
+import type { Context } from 'hono';
 import { z } from 'zod';
 
-import { getServerSession } from '@documenso/lib/next-auth/get-server-session';
+import { getSession } from '@documenso/auth/server/lib/utils/get-session';
 import type { ApiRequestMetadata } from '@documenso/lib/universal/extract-request-metadata';
-import { extractNextApiRequestMetadata } from '@documenso/lib/universal/extract-request-metadata';
+import { extractRequestMetadata } from '@documenso/lib/universal/extract-request-metadata';
+import type { User } from '@documenso/prisma/client';
 
-import type { CreateNextContextOptions, NextApiRequest } from './adapters/next';
-
-type CreateTrpcContext = CreateNextContextOptions & {
-  requestSource: 'apiV1' | 'apiV2' | 'app';
+type CreateTrpcContextOptions = {
+  c: Context;
+  requestSource: 'app' | 'apiV1' | 'apiV2';
 };
 
-/**
- * Todo: Delete
- */
 export const createTrpcContext = async ({
-  req,
-  res,
+  c,
   requestSource,
-}: Omit<CreateTrpcContext, 'info'>): Promise<TrpcContext> => {
-  const { session, user } = await getServerSession({ req, res });
+}: CreateTrpcContextOptions): Promise<TrpcContext> => {
+  const { session, user } = await getSession(c);
+
+  const req = c.req.raw;
 
   const metadata: ApiRequestMetadata = {
-    requestMetadata: extractNextApiRequestMetadata(req),
+    requestMetadata: extractRequestMetadata(req),
     source: requestSource,
     auth: null,
   };
+
+  const rawTeamId = req.headers.get('x-team-id') || undefined;
 
   const teamId = z.coerce
     .number()
     .optional()
     .catch(() => undefined)
-    .parse(req.headers['x-team-id']);
+    .parse(rawTeamId);
 
-  if (!session) {
-    return {
-      session: null,
-      user: null,
-      teamId,
-      req,
-      metadata,
-    };
-  }
-
-  if (!user) {
+  if (!session || !user) {
     return {
       session: null,
       user: null,
@@ -73,6 +63,6 @@ export type TrpcContext = (
     }
 ) & {
   teamId: number | undefined;
-  req: Request | NextApiRequest;
+  req: Request;
   metadata: ApiRequestMetadata;
 };

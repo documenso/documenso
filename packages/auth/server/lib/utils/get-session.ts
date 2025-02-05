@@ -6,13 +6,10 @@ import { AuthenticationErrorCode } from '../errors/error-codes';
 import type { SessionValidationResult } from '../session/session';
 import { validateSessionToken } from '../session/session';
 import { getSessionCookie } from '../session/session-cookies';
-import { authDebugger } from './debugger';
 
 export const getSession = async (c: Context | Request): Promise<SessionValidationResult> => {
   // Todo: Make better
   const sessionId = await getSessionCookie(mapRequestToContextForCookie(c));
-
-  authDebugger(`Session ID: ${sessionId}`);
 
   if (!sessionId) {
     return {

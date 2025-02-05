@@ -11,10 +11,14 @@ import { putFile } from '@documenso/lib/universal/upload/put-file';
 import { getPresignGetUrl } from '@documenso/lib/universal/upload/server-actions';
 import { openApiDocument } from '@documenso/trpc/server/open-api';
 
+import { appMiddleware } from './middleware';
 import { openApiTrpcServerHandler } from './trpc/hono-trpc-open-api';
 import { reactRouterTrpcServer } from './trpc/hono-trpc-remix';
 
 const app = new Hono();
+
+// App middleware.
+app.use('*', appMiddleware);
 
 // Auth server.
 app.route('/api/auth', auth);
@@ -26,7 +30,7 @@ app.use('/api/trpc/*', reactRouterTrpcServer);
 
 // Unstable API server routes. Order matters for these two.
 app.get(`${API_V2_BETA_URL}/openapi.json`, (c) => c.json(openApiDocument));
-app.use(`${API_V2_BETA_URL}/*`, async (c) => openApiTrpcServerHandler(c));
+app.use(`${API_V2_BETA_URL}/*`, async (c) => openApiTrpcServerHandler(c)); // Todo: Add next()?
 
 // Temp uploader.
 app

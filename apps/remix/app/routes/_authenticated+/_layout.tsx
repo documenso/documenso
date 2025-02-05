@@ -18,13 +18,15 @@ export const loader = async ({ request, context }: Route.LoaderArgs) => {
     throw redirect('/signin');
   }
 
-  const banner = await getSiteSettings().then((settings) =>
-    settings.find((setting) => setting.id === SITE_SETTINGS_BANNER_ID),
-  );
-
   const requestHeaders = Object.fromEntries(request.headers.entries());
 
-  const limits = await getLimits({ headers: requestHeaders, teamId: session.currentTeam?.id });
+  // Todo: Should only load this on first render.
+  const [limits, banner] = await Promise.all([
+    getLimits({ headers: requestHeaders, teamId: session.currentTeam?.id }),
+    getSiteSettings().then((settings) =>
+      settings.find((setting) => setting.id === SITE_SETTINGS_BANNER_ID),
+    ),
+  ]);
 
   return {
     user: session.user,

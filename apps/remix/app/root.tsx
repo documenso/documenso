@@ -162,6 +162,8 @@ export default function App({ loaderData }: Route.ComponentProps) {
 }
 
 export function ErrorBoundary({ error }: Route.ErrorBoundaryProps) {
+  console.error('[RootErrorBoundary]', error);
+
   const errorCode = isRouteErrorResponse(error) ? error.status : 500;
 
   return <GenericErrorLayout errorCode={errorCode} />;
