@@ -178,7 +178,11 @@ export const DocumentSigningPageView = ({
             .map((field) =>
               match(field.type)
                 .with(FieldType.SIGNATURE, () => (
-                  <DocumentSigningSignatureField key={field.id} field={field} />
+                  <DocumentSigningSignatureField
+                    key={field.id}
+                    field={field}
+                    typedSignatureEnabled={documentMeta?.typedSignatureEnabled}
+                  />
                 ))
                 .with(FieldType.INITIALS, () => (
                   <DocumentSigningInitialsField key={field.id} field={field} />

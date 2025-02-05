@@ -190,6 +190,7 @@ export const DirectTemplateSigningForm = ({
                   field={field}
                   onSignField={onSignField}
                   onUnsignField={onUnsignField}
+                  typedSignatureEnabled={template.templateMeta?.typedSignatureEnabled}
                 />
               ))
               .with(FieldType.INITIALS, () => (
@@ -343,6 +344,7 @@ export const DirectTemplateSigningForm = ({
                     onChange={(value) => {
                       setSignature(value);
                     }}
+                    allowTypedSignature={template.templateMeta?.typedSignatureEnabled}
                   />
                 </CardContent>
               </Card>
