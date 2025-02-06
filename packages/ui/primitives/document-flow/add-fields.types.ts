@@ -9,7 +9,7 @@ export const ZAddFieldsFormSchema = z.object({
       formId: z.string().min(1),
       nativeId: z.number().optional(),
       type: z.nativeEnum(FieldType),
-      signerEmail: z.string().min(1),
+      recipientId: z.number(),
       pageNumber: z.number().min(1),
       pageX: z.number().min(0),
       pageY: z.number().min(0),

@@ -94,9 +94,7 @@ export const setFieldsForDocument = async ({
   const linkedFields = fields.map((field) => {
     const existing = existingFields.find((existingField) => existingField.id === field.id);
 
-    const recipient = document.recipients.find(
-      (recipient) => recipient.email.toLowerCase() === field.signerEmail.toLowerCase(),
-    );
+    const recipient = document.recipients.find((recipient) => recipient.id === field.recipientId);
 
     // Each field MUST have a recipient associated with it.
     if (!recipient) {
@@ -127,8 +125,6 @@ export const setFieldsForDocument = async ({
   const persistedFields = await prisma.$transaction(async (tx) => {
     return await Promise.all(
       linkedFields.map(async (field) => {
-        const fieldSignerEmail = field.signerEmail.toLowerCase();
-
         const parsedFieldMeta = field.fieldMeta
           ? ZFieldMetaSchema.parse(field.fieldMeta)
           : undefined;
@@ -211,6 +207,13 @@ export const setFieldsForDocument = async ({
             id: field._persisted?.id ?? -1,
             documentId,
           },
+          include: {
+            recipient: {
+              select: {
+                email: true,
+              },
+            },
+          },
           update: {
             page: field.pageNumber,
             positionX: field.pageX,
@@ -236,10 +239,7 @@ export const setFieldsForDocument = async ({
             },
             recipient: {
               connect: {
-                documentId_email: {
-                  documentId,
-                  email: fieldSignerEmail,
-                },
+                id: field.recipientId,
               },
             },
           },
@@ -251,7 +251,7 @@ export const setFieldsForDocument = async ({
 
         const baseAuditLog = {
           fieldId: upsertedField.secondaryId,
-          fieldRecipientEmail: fieldSignerEmail,
+          fieldRecipientEmail: upsertedField.recipient?.email ?? '',
           fieldRecipientId: upsertedField.recipientId,
           fieldType: upsertedField.type,
         };
@@ -339,7 +339,7 @@ export const setFieldsForDocument = async ({
 type FieldData = {
   id?: number | null;
   type: FieldType;
-  signerEmail: string;
+  recipientId: number;
   pageNumber: number;
   pageX: number;
   pageY: number;
