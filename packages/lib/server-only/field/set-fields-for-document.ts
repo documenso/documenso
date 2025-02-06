@@ -125,6 +125,8 @@ export const setFieldsForDocument = async ({
   const persistedFields = await prisma.$transaction(async (tx) => {
     return await Promise.all(
       linkedFields.map(async (field) => {
+        const fieldSignerEmail = field.signerEmail.toLowerCase();
+
         const parsedFieldMeta = field.fieldMeta
           ? ZFieldMetaSchema.parse(field.fieldMeta)
           : undefined;
@@ -239,6 +241,7 @@ export const setFieldsForDocument = async ({
             },
             recipient: {
               connect: {
+                documentId,
                 id: field.recipientId,
               },
             },
@@ -251,7 +254,7 @@ export const setFieldsForDocument = async ({
 
         const baseAuditLog = {
           fieldId: upsertedField.secondaryId,
-          fieldRecipientEmail: upsertedField.recipient?.email ?? '',
+          fieldRecipientEmail: fieldSignerEmail,
           fieldRecipientId: upsertedField.recipientId,
           fieldType: upsertedField.type,
         };
@@ -339,6 +342,7 @@ export const setFieldsForDocument = async ({
 type FieldData = {
   id?: number | null;
   type: FieldType;
+  signerEmail: string;
   recipientId: number;
   pageNumber: number;
   pageX: number;

@@ -93,6 +93,7 @@ export type FieldFormType = {
   pageWidth: number;
   pageHeight: number;
   recipientId: number;
+  signerEmail: string;
   fieldMeta?: FieldMeta;
 };
 
@@ -144,6 +145,7 @@ export const AddFieldsFormPartial = ({
         pageWidth: Number(field.width),
         pageHeight: Number(field.height),
         recipientId: field.recipientId,
+        signerEmail: recipients.find((r) => r.id === field.recipientId)?.email || '',
         fieldMeta: field.fieldMeta ? ZFieldMetaSchema.parse(field.fieldMeta) : undefined,
       })),
       typedSignatureEnabled: typedSignatureEnabled ?? false,
@@ -348,6 +350,7 @@ export const AddFieldsFormPartial = ({
         pageWidth: fieldPageWidth,
         pageHeight: fieldPageHeight,
         recipientId: selectedSigner.id,
+        signerEmail: selectedSigner.email,
         fieldMeta: undefined,
       };
 
@@ -441,6 +444,7 @@ export const AddFieldsFormPartial = ({
           ...structuredClone(lastActiveField),
           formId: nanoid(12),
           recipientId: selectedSigner?.id ?? lastActiveField.recipientId,
+          signerEmail: selectedSigner?.email ?? lastActiveField.signerEmail,
           pageX: lastActiveField.pageX + 3,
           pageY: lastActiveField.pageY + 3,
         };
@@ -448,7 +452,7 @@ export const AddFieldsFormPartial = ({
         append(newField);
       }
     },
-    [append, lastActiveField, selectedSigner?.id, toast],
+    [append, lastActiveField, selectedSigner?.id, selectedSigner?.email, toast],
   );
 
   const onFieldPaste = useCallback(
