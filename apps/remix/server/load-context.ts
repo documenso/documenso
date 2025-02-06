@@ -23,7 +23,7 @@ export async function getLoadContext(args: GetLoadContextArgs) {
 
   const noSessionCookie = extractSessionCookieFromHeaders(request.headers) === null;
 
-  if (!isPageRequest(request) || noSessionCookie) {
+  if (!isPageRequest(request) || noSessionCookie || blacklistedPathsRegex.test(url.pathname)) {
     logger.log('Pathname ignored', url.pathname);
 
     return {
@@ -32,7 +32,7 @@ export async function getLoadContext(args: GetLoadContextArgs) {
     };
   }
 
-  const splitUrl = url.pathname.split('/');
+  const splitUrl = url.pathname.replace('.data', '').split('/');
 
   let team: TGetTeamByUrlResponse | null = null;
   let teams: TGetTeamsResponse = [];
@@ -78,6 +78,7 @@ const isPageRequest = (request: Request) => {
     return false;
   }
 
+  // If it ends with .data it's the loader which we need to pass context for.
   if (url.pathname.endsWith('.data')) {
     return true;
   }
@@ -88,3 +89,10 @@ const isPageRequest = (request: Request) => {
 
   return false;
 };
+
+/**
+ * List of paths to reject
+ * - Urls that start with /api
+ * - Urls that start with _
+ */
+const blacklistedPathsRegex = new RegExp('^/api/|^/__');

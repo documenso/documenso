@@ -11,14 +11,13 @@ import { putFile } from '@documenso/lib/universal/upload/put-file';
 import { getPresignGetUrl } from '@documenso/lib/universal/upload/server-actions';
 import { openApiDocument } from '@documenso/trpc/server/open-api';
 
-import { appMiddleware } from './middleware';
 import { openApiTrpcServerHandler } from './trpc/hono-trpc-open-api';
 import { reactRouterTrpcServer } from './trpc/hono-trpc-remix';
 
 const app = new Hono();
 
 // App middleware.
-app.use('*', appMiddleware);
+// app.use('*', appMiddleware);
 
 // Auth server.
 app.route('/api/auth', auth);
