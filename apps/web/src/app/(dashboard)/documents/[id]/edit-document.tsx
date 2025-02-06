@@ -141,8 +141,7 @@ export const EditDocumentForm = ({
     onSuccess: (newData) => {
       utils.document.getDocumentWithDetailsById.setData(
         {
-          id: initialDocument.id,
-          teamId: team?.id,
+          documentId: initialDocument.id,
         },
         (oldData) => ({ ...(oldData || initialDocument), ...newData }),
       );
