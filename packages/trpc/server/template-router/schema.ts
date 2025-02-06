@@ -13,7 +13,7 @@ import {
   ZTemplateManySchema,
   ZTemplateSchema,
 } from '@documenso/lib/types/template';
-import { TemplateDirectLinkSchema } from '@documenso/prisma/generated/zod';
+import { TemplateDirectLinkSchema } from '@documenso/prisma/generated/zod/modelSchema/TemplateDirectLinkSchema';
 
 import {
   ZDocumentMetaDateFormatSchema,

@@ -85,12 +85,12 @@ export const MenuSwitcher = ({ user, teams: initialTeamsData }: MenuSwitcherProp
    * seemlessly between teams and personal accounts.
    */
   const formatRedirectUrlOnSwitch = (teamUrl?: string) => {
-    const baseUrl = teamUrl ? `/t/${teamUrl}/` : '/';
+    const baseUrl = teamUrl ? `/t/${teamUrl}` : '';
 
     const currentPathname = (pathname ?? '/').replace(TEAM_URL_REGEX, '');
 
     if (currentPathname === '/templates') {
-      return `${baseUrl}templates`;
+      return `${baseUrl}/templates`;
     }
 
     return baseUrl;

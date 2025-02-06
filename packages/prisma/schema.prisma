@@ -13,7 +13,7 @@ generator json {
 generator zod {
   provider         = "zod-prisma-types"
   createInputTypes = false
-  writeBarrelFiles = true
+  writeBarrelFiles = false
   useMultipleFiles = true
 }
 

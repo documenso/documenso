@@ -3,7 +3,7 @@ import { Prisma } from '@prisma/client';
 import type { z } from 'zod';
 
 import { prisma } from '@documenso/prisma';
-import { TeamPendingSchema } from '@documenso/prisma/generated/zod';
+import { TeamPendingSchema } from '@documenso/prisma/generated/zod/modelSchema/TeamPendingSchema';
 
 import { type FindResultResponse, ZFindResultResponse } from '../../types/search-params';
 

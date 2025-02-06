@@ -2,12 +2,10 @@ import type { Prisma } from '@prisma/client';
 import type { z } from 'zod';
 
 import { prisma } from '@documenso/prisma';
-import {
-  TeamEmailSchema,
-  TeamGlobalSettingsSchema,
-  TeamSchema,
-} from '@documenso/prisma/generated/zod';
-import { TeamMemberSchema } from '@documenso/prisma/generated/zod';
+import { TeamEmailSchema } from '@documenso/prisma/generated/zod/modelSchema/TeamEmailSchema';
+import { TeamGlobalSettingsSchema } from '@documenso/prisma/generated/zod/modelSchema/TeamGlobalSettingsSchema';
+import { TeamMemberSchema } from '@documenso/prisma/generated/zod/modelSchema/TeamMemberSchema';
+import { TeamSchema } from '@documenso/prisma/generated/zod/modelSchema/TeamSchema';
 
 import { AppError, AppErrorCode } from '../../errors/app-error';
 
