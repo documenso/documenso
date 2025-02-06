@@ -10,7 +10,11 @@ export type UpdateTeamEmailOptions = {
   };
 };
 
-export const updateTeamEmail = async ({ userId, teamId, data }: UpdateTeamEmailOptions) => {
+export const updateTeamEmail = async ({
+  userId,
+  teamId,
+  data,
+}: UpdateTeamEmailOptions): Promise<void> => {
   await prisma.$transaction(async (tx) => {
     await tx.team.findFirstOrThrow({
       where: {

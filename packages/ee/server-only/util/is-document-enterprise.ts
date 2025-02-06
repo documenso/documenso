@@ -1,7 +1,9 @@
 import { IS_BILLING_ENABLED } from '@documenso/lib/constants/app';
-import { subscriptionsContainActiveEnterprisePlan } from '@documenso/lib/utils/billing';
+import { subscriptionsContainsActivePlan } from '@documenso/lib/utils/billing';
 import { prisma } from '@documenso/prisma';
 import type { Subscription } from '@documenso/prisma/client';
+
+import { getEnterprisePlanPriceIds } from '../stripe/get-enterprise-plan-prices';
 
 export type IsUserEnterpriseOptions = {
   userId: number;
@@ -33,12 +35,12 @@ export const isUserEnterprise = async ({
         select: {
           owner: {
             include: {
-              Subscription: true,
+              subscriptions: true,
             },
           },
         },
       })
-      .then((team) => team.owner.Subscription);
+      .then((team) => team.owner.subscriptions);
   } else {
     subscriptions = await prisma.user
       .findFirstOrThrow({
@@ -46,11 +48,17 @@ export const isUserEnterprise = async ({
           id: userId,
         },
         select: {
-          Subscription: true,
+          subscriptions: true,
         },
       })
-      .then((user) => user.Subscription);
+      .then((user) => user.subscriptions);
   }
 
-  return subscriptionsContainActiveEnterprisePlan(subscriptions);
+  if (subscriptions.length === 0) {
+    return false;
+  }
+
+  const enterprisePlanPriceIds = await getEnterprisePlanPriceIds();
+
+  return subscriptionsContainsActivePlan(subscriptions, enterprisePlanPriceIds, true);
 };

@@ -1,4 +1,4 @@
-import { BadgeCheck, Copy, Eye, PencilLine } from 'lucide-react';
+import { BadgeCheck, Copy, Eye, PencilLine, User } from 'lucide-react';
 
 import type { RecipientRole } from '.prisma/client';
 
@@ -7,4 +7,5 @@ export const ROLE_ICONS: Record<RecipientRole, JSX.Element> = {
   APPROVER: <BadgeCheck className="h-4 w-4" />,
   CC: <Copy className="h-4 w-4" />,
   VIEWER: <Eye className="h-4 w-4" />,
+  ASSISTANT: <User className="h-4 w-4" />,
 };

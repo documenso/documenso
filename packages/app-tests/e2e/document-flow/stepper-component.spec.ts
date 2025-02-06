@@ -26,7 +26,7 @@ import { apiSignin } from '../fixtures/authentication';
 const getDocumentByToken = async (token: string) => {
   return await prisma.document.findFirstOrThrow({
     where: {
-      Recipient: {
+      recipients: {
         some: {
           token,
         },
@@ -109,6 +109,7 @@ test('[DOCUMENT_FLOW]: should be able to create a document', async ({ page }) =>
 
   // Add subject and send
   await expect(page.getByRole('heading', { name: 'Distribute Document' })).toBeVisible();
+  await page.waitForTimeout(2500);
   await page.getByRole('button', { name: 'Send' }).click();
 
   await page.waitForURL('/documents');
@@ -193,6 +194,7 @@ test('[DOCUMENT_FLOW]: should be able to create a document with multiple recipie
 
   // Add subject and send
   await expect(page.getByRole('heading', { name: 'Distribute Document' })).toBeVisible();
+  await page.waitForTimeout(2500);
   await page.getByRole('button', { name: 'Send' }).click();
 
   await page.waitForURL('/documents');
@@ -290,6 +292,7 @@ test('[DOCUMENT_FLOW]: should be able to create a document with multiple recipie
 
   // Add subject and send
   await expect(page.getByRole('heading', { name: 'Distribute Document' })).toBeVisible();
+  await page.waitForTimeout(2500);
   await page.getByRole('button', { name: 'Send' }).click();
 
   await page.waitForURL('/documents');
@@ -356,7 +359,7 @@ test('[DOCUMENT_FLOW]: should be able to approve a document', async ({ page }) =
   });
 
   for (const recipient of recipients) {
-    const { token, Field, role } = recipient;
+    const { token, fields, role } = recipient;
 
     const signUrl = `/sign/${token}`;
 
@@ -371,13 +374,13 @@ test('[DOCUMENT_FLOW]: should be able to approve a document', async ({ page }) =
     const canvas = page.locator('canvas');
     const box = await canvas.boundingBox();
     if (box) {
-      await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2);
+      await page.mouse.move(box.x + 40, box.y + 40);
       await page.mouse.down();
-      await page.mouse.move(box.x + box.width / 4, box.y + box.height / 4);
+      await page.mouse.move(box.x + box.width - 2, box.y + box.height - 2);
       await page.mouse.up();
     }
 
-    for (const field of Field) {
+    for (const field of fields) {
       await page.locator(`#field-${field.id}`).getByRole('button').click();
 
       await expect(page.locator(`#field-${field.id}`)).toHaveAttribute('data-inserted', 'true');
@@ -428,6 +431,7 @@ test('[DOCUMENT_FLOW]: should be able to create, send with redirect url, sign a 
   await expect(page.getByRole('heading', { name: 'Add Fields' })).toBeVisible();
   await page.getByRole('button', { name: 'Continue' }).click();
 
+  await page.waitForTimeout(2500);
   await page.getByRole('button', { name: 'Send' }).click();
 
   await page.waitForURL('/documents');
@@ -477,8 +481,8 @@ test('[DOCUMENT_FLOW]: should be able to sign a document with custom date', asyn
     fields: [FieldType.DATE],
   });
 
-  const { token, Field } = recipients[0];
-  const [recipientField] = Field;
+  const { token, fields } = recipients[0];
+  const [recipientField] = fields;
 
   await page.goto(`/sign/${token}`);
   await page.waitForURL(`/sign/${token}`);
@@ -494,7 +498,7 @@ test('[DOCUMENT_FLOW]: should be able to sign a document with custom date', asyn
 
   const field = await prisma.field.findFirst({
     where: {
-      Recipient: {
+      recipient: {
         email: 'user1@example.com',
       },
       documentId: Number(document.id),
@@ -538,12 +542,19 @@ test('[DOCUMENT_FLOW]: should be able to create and sign a document with 3 recip
     if (i > 1) {
       await page.getByRole('button', { name: 'Add Signer' }).click();
     }
+
     await page
-      .getByPlaceholder('Email')
+      .getByLabel('Email')
+      .nth(i - 1)
+      .focus();
+
+    await page
+      .getByLabel('Email')
       .nth(i - 1)
       .fill(`user${i}@example.com`);
+
     await page
-      .getByPlaceholder('Name')
+      .getByLabel('Name')
       .nth(i - 1)
       .fill(`User ${i}`);
   }
@@ -569,6 +580,7 @@ test('[DOCUMENT_FLOW]: should be able to create and sign a document with 3 recip
   await page.getByRole('button', { name: 'Continue' }).click();
 
   await expect(page.getByRole('heading', { name: 'Distribute Document' })).toBeVisible();
+  await page.waitForTimeout(2500);
   await page.getByRole('button', { name: 'Send' }).click();
 
   await page.waitForURL('/documents');
@@ -577,14 +589,14 @@ test('[DOCUMENT_FLOW]: should be able to create and sign a document with 3 recip
 
   const createdDocument = await prisma.document.findFirst({
     where: { title: documentTitle },
-    include: { Recipient: true },
+    include: { recipients: true },
   });
 
   expect(createdDocument).not.toBeNull();
-  expect(createdDocument?.Recipient.length).toBe(3);
+  expect(createdDocument?.recipients.length).toBe(3);
 
   for (let i = 0; i < 3; i++) {
-    const recipient = createdDocument?.Recipient.find(
+    const recipient = createdDocument?.recipients.find(
       (r) => r.email === `user${i + 1}@example.com`,
     );
     expect(recipient).not.toBeNull();
@@ -610,9 +622,9 @@ test('[DOCUMENT_FLOW]: should be able to create and sign a document with 3 recip
     const canvas = page.locator('canvas#signature');
     const box = await canvas.boundingBox();
     if (box) {
-      await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2);
+      await page.mouse.move(box.x + 40, box.y + 40);
       await page.mouse.down();
-      await page.mouse.move(box.x + box.width / 4, box.y + box.height / 4);
+      await page.mouse.move(box.x + box.width - 2, box.y + box.height - 2);
       await page.mouse.up();
     }
 

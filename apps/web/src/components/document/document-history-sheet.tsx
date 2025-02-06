@@ -55,7 +55,7 @@ export const DocumentHistorySheet = ({
     },
     {
       getNextPageParam: (lastPage) => lastPage.nextCursor,
-      keepPreviousData: true,
+      placeholderData: (previousData) => previousData,
     },
   );
 
@@ -363,6 +363,16 @@ export const DocumentHistorySheet = ({
                       />
                     ),
                   )
+                  .with({ type: DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_FIELD_PREFILLED }, ({ data }) => (
+                    <DocumentHistorySheetChanges
+                      values={[
+                        {
+                          key: 'Field prefilled',
+                          value: formatGenericText(data.field.type),
+                        },
+                      ]}
+                    />
+                  ))
                   .exhaustive()}
 
                 {isUserDetailsVisible && (

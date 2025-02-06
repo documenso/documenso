@@ -10,6 +10,9 @@ export const DOCUMENT_AUDIT_LOG_EMAIL_FORMAT = {
   [DOCUMENT_EMAIL_TYPE.APPROVE_REQUEST]: {
     description: 'Approval request',
   },
+  [DOCUMENT_EMAIL_TYPE.ASSISTING_REQUEST]: {
+    description: 'Assisting request',
+  },
   [DOCUMENT_EMAIL_TYPE.CC]: {
     description: 'CC',
   },

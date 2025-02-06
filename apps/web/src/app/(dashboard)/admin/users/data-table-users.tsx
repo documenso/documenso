@@ -22,8 +22,8 @@ type UserData = {
   name: string | null;
   email: string;
   roles: Role[];
-  Subscription?: SubscriptionLite[] | null;
-  Document: DocumentLite[];
+  subscriptions?: SubscriptionLite[] | null;
+  documents: DocumentLite[];
 };
 
 type SubscriptionLite = Pick<
@@ -81,7 +81,7 @@ export const UsersDataTable = ({
         header: _(msg`Subscription`),
         accessorKey: 'subscription',
         cell: ({ row }) => {
-          const foundIndividualSubscription = (row.original.Subscription ?? []).find((sub) =>
+          const foundIndividualSubscription = (row.original.subscriptions ?? []).find((sub) =>
             individualPriceIds.includes(sub.priceId),
           );
 
@@ -92,7 +92,7 @@ export const UsersDataTable = ({
         header: _(msg`Documents`),
         accessorKey: 'documents',
         cell: ({ row }) => {
-          return <div>{row.original.Document.length}</div>;
+          return <div>{row.original.documents?.length}</div>;
         },
       },
       {

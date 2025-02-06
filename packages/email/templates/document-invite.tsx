@@ -42,7 +42,7 @@ export const DocumentInviteEmailTemplate = ({
 
   if (isTeamInvite) {
     previewText = includeSenderDetails
-      ? msg`${inviterName} on behalf of ${teamName} has invited you to ${action} ${documentName}`
+      ? msg`${inviterName} on behalf of "${teamName}" has invited you to ${action} ${documentName}`
       : msg`${teamName} has invited you to ${action} ${documentName}`;
   }
 
@@ -90,14 +90,16 @@ export const DocumentInviteEmailTemplate = ({
 
           <Container className="mx-auto mt-12 max-w-xl">
             <Section>
-              <Text className="my-4 text-base font-semibold">
-                <Trans>
-                  {inviterName}{' '}
-                  <Link className="font-normal text-slate-400" href="mailto:{inviterEmail}">
-                    ({inviterEmail})
-                  </Link>
-                </Trans>
-              </Text>
+              {!isTeamInvite && (
+                <Text className="my-4 text-base font-semibold">
+                  <Trans>
+                    {inviterName}{' '}
+                    <Link className="font-normal text-slate-400" href="mailto:{inviterEmail}">
+                      ({inviterEmail})
+                    </Link>
+                  </Trans>
+                </Text>
+              )}
 
               <Text className="mt-2 text-base text-slate-400">
                 {customBody ? (

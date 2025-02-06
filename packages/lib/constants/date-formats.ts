@@ -4,6 +4,19 @@ import { DEFAULT_DOCUMENT_TIME_ZONE } from './time-zones';
 
 export const DEFAULT_DOCUMENT_DATE_FORMAT = 'yyyy-MM-dd hh:mm a';
 
+export const VALID_DATE_FORMAT_VALUES = [
+  DEFAULT_DOCUMENT_DATE_FORMAT,
+  'yyyy-MM-dd',
+  'dd/MM/yyyy hh:mm a',
+  'MM/dd/yyyy hh:mm a',
+  'yyyy-MM-dd HH:mm',
+  'yy-MM-dd hh:mm a',
+  'yyyy-MM-dd HH:mm:ss',
+  'MMMM dd, yyyy hh:mm a',
+  'EEEE, MMMM dd, yyyy hh:mm a',
+  "yyyy-MM-dd'T'HH:mm:ss.SSSXXX",
+] as const;
+
 export const DATE_FORMATS = [
   {
     key: 'yyyy-MM-dd_hh:mm_a',
@@ -55,7 +68,11 @@ export const DATE_FORMATS = [
     label: 'ISO 8601',
     value: "yyyy-MM-dd'T'HH:mm:ss.SSSXXX",
   },
-];
+] satisfies {
+  key: string;
+  label: string;
+  value: (typeof VALID_DATE_FORMAT_VALUES)[number];
+}[];
 
 export const convertToLocalSystemFormat = (
   customText: string,

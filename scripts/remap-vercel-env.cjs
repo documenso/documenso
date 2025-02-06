@@ -34,10 +34,6 @@ const remapVercelEnv = () => {
     process.env.NEXTAUTH_URL = `https://${process.env.VERCEL_URL}`;
     process.env.NEXT_PUBLIC_WEBAPP_URL = `https://${process.env.VERCEL_URL}`;
   }
-
-  if (process.env.VERCEL_ENV !== 'production' && process.env.DEPLOYMENT_TARGET === 'marketing') {
-    process.env.NEXT_PUBLIC_MARKETING_URL = `https://${process.env.VERCEL_URL}`;
-  }
 };
 
 module.exports = {

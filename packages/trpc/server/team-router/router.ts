@@ -1,4 +1,5 @@
 import { TRPCError } from '@trpc/server';
+import { z } from 'zod';
 
 import { getTeamPrices } from '@documenso/ee/server-only/stripe/get-team-prices';
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
@@ -73,424 +74,323 @@ import {
 } from './schema';
 
 export const teamRouter = router({
-  acceptTeamInvitation: authenticatedProcedure
-    .input(ZAcceptTeamInvitationMutationSchema)
-    .mutation(async ({ input, ctx }) => {
-      try {
-        return await acceptTeamInvitation({
-          teamId: input.teamId,
-          userId: ctx.user.id,
-        });
-      } catch (err) {
-        console.error(err);
+  // Internal endpoint for now.
+  getTeams: authenticatedProcedure.query(async ({ ctx }) => {
+    return await getTeams({ userId: ctx.user.id });
+  }),
 
-        throw AppError.parseErrorToTRPCError(err);
-      }
-    }),
-
-  declineTeamInvitation: authenticatedProcedure
-    .input(ZDeclineTeamInvitationMutationSchema)
-    .mutation(async ({ input, ctx }) => {
-      try {
-        return await declineTeamInvitation({
-          teamId: input.teamId,
-          userId: ctx.user.id,
-        });
-      } catch (err) {
-        console.error(err);
-
-        throw AppError.parseErrorToTRPCError(err);
-      }
-    }),
-
-  createBillingPortal: authenticatedProcedure
-    .input(ZCreateTeamBillingPortalMutationSchema)
-    .mutation(async ({ input, ctx }) => {
-      try {
-        return await createTeamBillingPortal({
-          userId: ctx.user.id,
-          ...input,
-        });
-      } catch (err) {
-        console.error(err);
-
-        throw AppError.parseErrorToTRPCError(err);
-      }
-    }),
-
-  createTeam: authenticatedProcedure
-    .input(ZCreateTeamMutationSchema)
-    .mutation(async ({ input, ctx }) => {
-      try {
-        return await createTeam({
-          userId: ctx.user.id,
-          ...input,
-        });
-      } catch (err) {
-        console.error(err);
-
-        throw AppError.parseErrorToTRPCError(err);
-      }
-    }),
-
-  createTeamEmailVerification: authenticatedProcedure
-    .input(ZCreateTeamEmailVerificationMutationSchema)
-    .mutation(async ({ input, ctx }) => {
-      try {
-        return await createTeamEmailVerification({
-          teamId: input.teamId,
-          userId: ctx.user.id,
-          data: {
-            email: input.email,
-            name: input.name,
-          },
-        });
-      } catch (err) {
-        console.error(err);
-
-        throw AppError.parseErrorToTRPCError(err);
-      }
-    }),
-
-  createTeamMemberInvites: authenticatedProcedure
-    .input(ZCreateTeamMemberInvitesMutationSchema)
-    .mutation(async ({ input, ctx }) => {
-      try {
-        return await createTeamMemberInvites({
-          userId: ctx.user.id,
-          userName: ctx.user.name ?? '',
-          ...input,
-        });
-      } catch (err) {
-        console.error(err);
-
-        throw AppError.parseErrorToTRPCError(err);
-      }
-    }),
-
-  createTeamPendingCheckout: authenticatedProcedure
-    .input(ZCreateTeamPendingCheckoutMutationSchema)
-    .mutation(async ({ input, ctx }) => {
-      try {
-        return await createTeamPendingCheckoutSession({
-          userId: ctx.user.id,
-          ...input,
-        });
-      } catch (err) {
-        console.error(err);
-
-        throw AppError.parseErrorToTRPCError(err);
-      }
-    }),
-
-  deleteTeam: authenticatedProcedure
-    .input(ZDeleteTeamMutationSchema)
-    .mutation(async ({ input, ctx }) => {
-      try {
-        return await deleteTeam({
-          userId: ctx.user.id,
-          ...input,
-        });
-      } catch (err) {
-        console.error(err);
-
-        throw AppError.parseErrorToTRPCError(err);
-      }
-    }),
-
-  deleteTeamEmail: authenticatedProcedure
-    .input(ZDeleteTeamEmailMutationSchema)
-    .mutation(async ({ input, ctx }) => {
-      try {
-        return await deleteTeamEmail({
-          userId: ctx.user.id,
-          userEmail: ctx.user.email,
-          ...input,
-        });
-      } catch (err) {
-        console.error(err);
-
-        throw AppError.parseErrorToTRPCError(err);
-      }
-    }),
-
-  deleteTeamEmailVerification: authenticatedProcedure
-    .input(ZDeleteTeamEmailVerificationMutationSchema)
-    .mutation(async ({ input, ctx }) => {
-      try {
-        return await deleteTeamEmailVerification({
-          userId: ctx.user.id,
-          ...input,
-        });
-      } catch (err) {
-        console.error(err);
-
-        throw AppError.parseErrorToTRPCError(err);
-      }
-    }),
-
-  deleteTeamMemberInvitations: authenticatedProcedure
-    .input(ZDeleteTeamMemberInvitationsMutationSchema)
-    .mutation(async ({ input, ctx }) => {
-      try {
-        return await deleteTeamMemberInvitations({
-          userId: ctx.user.id,
-          ...input,
-        });
-      } catch (err) {
-        console.error(err);
-
-        throw AppError.parseErrorToTRPCError(err);
-      }
-    }),
-
-  deleteTeamMembers: authenticatedProcedure
-    .input(ZDeleteTeamMembersMutationSchema)
-    .mutation(async ({ input, ctx }) => {
-      try {
-        return await deleteTeamMembers({
-          userId: ctx.user.id,
-          ...input,
-        });
-      } catch (err) {
-        console.error(err);
-
-        throw AppError.parseErrorToTRPCError(err);
-      }
-    }),
-
-  deleteTeamPending: authenticatedProcedure
-    .input(ZDeleteTeamPendingMutationSchema)
-    .mutation(async ({ input, ctx }) => {
-      try {
-        return await deleteTeamPending({
-          userId: ctx.user.id,
-          ...input,
-        });
-      } catch (err) {
-        console.error(err);
-
-        throw AppError.parseErrorToTRPCError(err);
-      }
-    }),
-
-  deleteTeamTransferRequest: authenticatedProcedure
-    .input(ZDeleteTeamTransferRequestMutationSchema)
-    .mutation(async ({ input, ctx }) => {
-      try {
-        return await deleteTeamTransferRequest({
-          userId: ctx.user.id,
-          ...input,
-        });
-      } catch (err) {
-        console.error(err);
-
-        throw AppError.parseErrorToTRPCError(err);
-      }
-    }),
-
-  findTeamInvoices: authenticatedProcedure
-    .input(ZFindTeamInvoicesQuerySchema)
+  // Todo: Public endpoint.
+  findTeams: authenticatedProcedure
+    // .meta({
+    //   openapi: {
+    //     method: 'GET',
+    //     path: '/team',
+    //     summary: 'Find teams',
+    //     description: 'Find your teams based on a search criteria',
+    //     tags: ['Teams'],
+    //   },
+    // })
+    .input(ZFindTeamsQuerySchema)
     .query(async ({ input, ctx }) => {
-      try {
-        return await findTeamInvoices({
-          userId: ctx.user.id,
-          ...input,
-        });
-      } catch (err) {
-        console.error(err);
-
-        throw AppError.parseErrorToTRPCError(err);
-      }
-    }),
-
-  findTeamMemberInvites: authenticatedProcedure
-    .input(ZFindTeamMemberInvitesQuerySchema)
-    .query(async ({ input, ctx }) => {
-      try {
-        return await findTeamMemberInvites({
-          userId: ctx.user.id,
-          ...input,
-        });
-      } catch (err) {
-        console.error(err);
-
-        throw AppError.parseErrorToTRPCError(err);
-      }
-    }),
-
-  findTeamMembers: authenticatedProcedure
-    .input(ZFindTeamMembersQuerySchema)
-    .query(async ({ input, ctx }) => {
-      try {
-        return await findTeamMembers({
-          userId: ctx.user.id,
-          ...input,
-        });
-      } catch (err) {
-        console.error(err);
-
-        throw AppError.parseErrorToTRPCError(err);
-      }
-    }),
-
-  findTeams: authenticatedProcedure.input(ZFindTeamsQuerySchema).query(async ({ input, ctx }) => {
-    try {
       return await findTeams({
         userId: ctx.user.id,
         ...input,
       });
-    } catch (err) {
-      console.error(err);
-
-      throw AppError.parseErrorToTRPCError(err);
-    }
-  }),
-
-  findTeamsPending: authenticatedProcedure
-    .input(ZFindTeamsPendingQuerySchema)
-    .query(async ({ input, ctx }) => {
-      try {
-        return await findTeamsPending({
-          userId: ctx.user.id,
-          ...input,
-        });
-      } catch (err) {
-        console.error(err);
-
-        throw AppError.parseErrorToTRPCError(err);
-      }
     }),
 
-  getTeam: authenticatedProcedure.input(ZGetTeamQuerySchema).query(async ({ input, ctx }) => {
-    try {
+  // Todo: Public endpoint.
+  getTeam: authenticatedProcedure
+    // .meta({
+    //   openapi: {
+    //     method: 'GET',
+    //     path: '/team/{teamId}',
+    //     summary: 'Get team',
+    //     tags: ['Teams'],
+    //   },
+    // })
+    .input(ZGetTeamQuerySchema)
+    .query(async ({ input, ctx }) => {
       return await getTeamById({ teamId: input.teamId, userId: ctx.user.id });
-    } catch (err) {
-      console.error(err);
-
-      throw AppError.parseErrorToTRPCError(err);
-    }
-  }),
-
-  getTeamEmailByEmail: authenticatedProcedure.query(async ({ ctx }) => {
-    try {
-      return await getTeamEmailByEmail({ email: ctx.user.email });
-    } catch (err) {
-      console.error(err);
-
-      throw AppError.parseErrorToTRPCError(err);
-    }
-  }),
-
-  getTeamInvitations: authenticatedProcedure.query(async ({ ctx }) => {
-    try {
-      return await getTeamInvitations({ email: ctx.user.email });
-    } catch (err) {
-      console.error(err);
-
-      throw AppError.parseErrorToTRPCError(err);
-    }
-  }),
-
-  getTeamMembers: authenticatedProcedure
-    .input(ZGetTeamMembersQuerySchema)
-    .query(async ({ input, ctx }) => {
-      try {
-        return await getTeamMembers({ teamId: input.teamId, userId: ctx.user.id });
-      } catch (err) {
-        console.error(err);
-
-        throw AppError.parseErrorToTRPCError(err);
-      }
     }),
 
-  getTeamPrices: authenticatedProcedure.query(async () => {
-    try {
-      return await getTeamPrices();
-    } catch (err) {
-      console.error(err);
-
-      throw AppError.parseErrorToTRPCError(err);
-    }
-  }),
-
-  getTeams: authenticatedProcedure.query(async ({ ctx }) => {
-    try {
-      return await getTeams({ userId: ctx.user.id });
-    } catch (err) {
-      console.error(err);
-
-      throw AppError.parseErrorToTRPCError(err);
-    }
-  }),
-
-  leaveTeam: authenticatedProcedure
-    .input(ZLeaveTeamMutationSchema)
+  // Todo: Public endpoint.
+  createTeam: authenticatedProcedure
+    // .meta({
+    //   openapi: {
+    //     method: 'POST',
+    //     path: '/team/create',
+    //     summary: 'Create team',
+    //     tags: ['Teams'],
+    //   },
+    // })
+    .input(ZCreateTeamMutationSchema)
     .mutation(async ({ input, ctx }) => {
-      try {
-        return await leaveTeam({
-          userId: ctx.user.id,
-          ...input,
-        });
-      } catch (err) {
-        console.error(err);
-
-        throw AppError.parseErrorToTRPCError(err);
-      }
+      return await createTeam({
+        userId: ctx.user.id,
+        ...input,
+      });
     }),
 
+  // Todo: Public endpoint.
   updateTeam: authenticatedProcedure
+    // .meta({
+    //   openapi: {
+    //     method: 'POST',
+    //     path: '/team/{teamId}',
+    //     summary: 'Update team',
+    //     tags: ['Teams'],
+    //   },
+    // })
     .input(ZUpdateTeamMutationSchema)
     .mutation(async ({ input, ctx }) => {
-      try {
-        return await updateTeam({
-          userId: ctx.user.id,
-          ...input,
-        });
-      } catch (err) {
-        console.error(err);
-
-        throw AppError.parseErrorToTRPCError(err);
-      }
+      return await updateTeam({
+        userId: ctx.user.id,
+        ...input,
+      });
     }),
 
-  updateTeamEmail: authenticatedProcedure
-    .input(ZUpdateTeamEmailMutationSchema)
+  // Todo: Public endpoint.
+  deleteTeam: authenticatedProcedure
+    // .meta({
+    //   openapi: {
+    //     method: 'POST',
+    //     path: '/team/{teamId}/delete',
+    //     summary: 'Delete team',
+    //     tags: ['Teams'],
+    //   },
+    // })
+    .input(ZDeleteTeamMutationSchema)
     .mutation(async ({ input, ctx }) => {
-      try {
-        return await updateTeamEmail({
-          userId: ctx.user.id,
-          ...input,
-        });
-      } catch (err) {
-        console.error(err);
-
-        throw AppError.parseErrorToTRPCError(err);
-      }
+      return await deleteTeam({
+        userId: ctx.user.id,
+        ...input,
+      });
     }),
 
+  // Todo: Public endpoint.
+  leaveTeam: authenticatedProcedure
+    // .meta({
+    //   openapi: {
+    //     method: 'POST',
+    //     path: '/team/{teamId}/leave',
+    //     summary: 'Leave a team',
+    //     description: '',
+    //     tags: ['Teams'],
+    //   },
+    // })
+    .input(ZLeaveTeamMutationSchema)
+    .mutation(async ({ input, ctx }) => {
+      return await leaveTeam({
+        userId: ctx.user.id,
+        ...input,
+      });
+    }),
+
+  // Todo: Public endpoint.
+  findTeamMemberInvites: authenticatedProcedure
+    // .meta({
+    //   openapi: {
+    //     method: 'GET',
+    //     path: '/team/{teamId}/member/invite',
+    //     summary: 'Find member invites',
+    //     description: 'Returns pending team member invites',
+    //     tags: ['Teams'],
+    //   },
+    // })
+    .input(ZFindTeamMemberInvitesQuerySchema)
+    .query(async ({ input, ctx }) => {
+      return await findTeamMemberInvites({
+        userId: ctx.user.id,
+        ...input,
+      });
+    }),
+
+  // Todo: Public endpoint.
+  createTeamMemberInvites: authenticatedProcedure
+    // .meta({
+    //   openapi: {
+    //     method: 'POST',
+    //     path: '/team/{teamId}/member/invite',
+    //     summary: 'Invite members',
+    //     description: 'Send email invitations to users to join the team',
+    //     tags: ['Teams'],
+    //   },
+    // })
+    .input(ZCreateTeamMemberInvitesMutationSchema)
+    .mutation(async ({ input, ctx }) => {
+      return await createTeamMemberInvites({
+        userId: ctx.user.id,
+        userName: ctx.user.name ?? '',
+        ...input,
+      });
+    }),
+
+  // Todo: Public endpoint.
+  resendTeamMemberInvitation: authenticatedProcedure
+    // .meta({
+    //   openapi: {
+    //     method: 'POST',
+    //     path: '/team/{teamId}/member/invite/{invitationId}/resend',
+    //     summary: 'Resend member invite',
+    //     description: 'Resend an email invitation to a user to join the team',
+    //     tags: ['Teams'],
+    //   },
+    // })
+    .input(ZResendTeamMemberInvitationMutationSchema)
+    .mutation(async ({ input, ctx }) => {
+      await resendTeamMemberInvitation({
+        userId: ctx.user.id,
+        userName: ctx.user.name ?? '',
+        ...input,
+      });
+    }),
+
+  // Todo: Public endpoint.
+  deleteTeamMemberInvitations: authenticatedProcedure
+    // .meta({
+    //   openapi: {
+    //     method: 'POST',
+    //     path: '/team/{teamId}/member/invite/delete',
+    //     summary: 'Delete member invite',
+    //     description: 'Delete a pending team member invite',
+    //     tags: ['Teams'],
+    //   },
+    // })
+    .input(ZDeleteTeamMemberInvitationsMutationSchema)
+    .mutation(async ({ input, ctx }) => {
+      return await deleteTeamMemberInvitations({
+        userId: ctx.user.id,
+        ...input,
+      });
+    }),
+
+  // Todo: Public endpoint.
+  getTeamMembers: authenticatedProcedure
+    // .meta({
+    //   openapi: {
+    //     method: 'GET',
+    //     path: '/team/{teamId}/member',
+    //     summary: 'Get members',
+    //     tags: ['Teams'],
+    //   },
+    // })
+    .input(ZGetTeamMembersQuerySchema)
+    .query(async ({ input, ctx }) => {
+      return await getTeamMembers({ teamId: input.teamId, userId: ctx.user.id });
+    }),
+
+  // Todo: Public endpoint.
+  findTeamMembers: authenticatedProcedure
+    // .meta({
+    //   openapi: {
+    //     method: 'GET',
+    //     path: '/team/{teamId}/member/find',
+    //     summary: 'Find members',
+    //     description: 'Find team members based on a search criteria',
+    //     tags: ['Teams'],
+    //   },
+    // })
+    .input(ZFindTeamMembersQuerySchema)
+    .query(async ({ input, ctx }) => {
+      return await findTeamMembers({
+        userId: ctx.user.id,
+        ...input,
+      });
+    }),
+
+  // Todo: Public endpoint.
   updateTeamMember: authenticatedProcedure
+    // .meta({
+    //   openapi: {
+    //     method: 'POST',
+    //     path: '/team/{teamId}/member/{teamMemberId}',
+    //     summary: 'Update member',
+    //     tags: ['Teams'],
+    //   },
+    // })
     .input(ZUpdateTeamMemberMutationSchema)
     .mutation(async ({ input, ctx }) => {
-      try {
-        return await updateTeamMember({
-          userId: ctx.user.id,
-          ...input,
-        });
-      } catch (err) {
-        console.error(err);
-
-        throw AppError.parseErrorToTRPCError(err);
-      }
+      return await updateTeamMember({
+        userId: ctx.user.id,
+        ...input,
+      });
     }),
 
+  // Todo: Public endpoint.
+  deleteTeamMembers: authenticatedProcedure
+    // .meta({
+    //   openapi: {
+    //     method: 'POST',
+    //     path: '/team/{teamId}/member/delete',
+    //     summary: 'Delete members',
+    //     description: '',
+    //     tags: ['Teams'],
+    //   },
+    // })
+    .input(ZDeleteTeamMembersMutationSchema)
+    .mutation(async ({ input, ctx }) => {
+      return await deleteTeamMembers({
+        userId: ctx.user.id,
+        ...input,
+      });
+    }),
+
+  // Internal endpoint for now.
+  createTeamEmailVerification: authenticatedProcedure
+    // .meta({
+    //   openapi: {
+    //     method: 'POST',
+    //     path: '/team/{teamId}/email/create',
+    //     summary: 'Create team email',
+    //     description: 'Add an email to a team and send an email request to verify it',
+    //     tags: ['Teams'],
+    //   },
+    // })
+    .input(ZCreateTeamEmailVerificationMutationSchema)
+    .mutation(async ({ input, ctx }) => {
+      return await createTeamEmailVerification({
+        teamId: input.teamId,
+        userId: ctx.user.id,
+        data: {
+          email: input.email,
+          name: input.name,
+        },
+      });
+    }),
+
+  // Internal endpoint for now.
+  getTeamInvitations: authenticatedProcedure
+    // .meta({
+    //   openapi: {
+    //     method: 'GET',
+    //     path: '/team/invite',
+    //     summary: 'Get team invitations',
+    //     description: '',
+    //     tags: ['Teams'],
+    //   },
+    // })
+    .input(z.void())
+    .query(async ({ ctx }) => {
+      return await getTeamInvitations({ email: ctx.user.email });
+    }),
+
+  // Todo: Public endpoint.
   updateTeamPublicProfile: authenticatedProcedure
+    // .meta({
+    //   openapi: {
+    //     method: 'POST',
+    //     path: '/team/{teamId}/profile',
+    //     summary: 'Update a team public profile',
+    //     description: '',
+    //     tags: ['Teams'],
+    //   },
+    // })
     .input(ZUpdateTeamPublicProfileMutationSchema)
     .mutation(async ({ input, ctx }) => {
       try {
         const { teamId, bio, enabled } = input;
 
-        const team = await updateTeamPublicProfile({
+        await updateTeamPublicProfile({
           userId: ctx.user.id,
           teamId,
           data: {
@@ -498,15 +398,13 @@ export const teamRouter = router({
             enabled,
           },
         });
-
-        return { success: true, url: team.url };
       } catch (err) {
         console.error(err);
 
         const error = AppError.parseError(err);
 
         if (error.code !== AppErrorCode.UNKNOWN_ERROR) {
-          throw AppError.parseErrorToTRPCError(error);
+          throw error;
         }
 
         throw new TRPCError({
@@ -517,86 +415,240 @@ export const teamRouter = router({
       }
     }),
 
+  // Internal endpoint for now.
   requestTeamOwnershipTransfer: authenticatedProcedure
+    // .meta({
+    //   openapi: {
+    //     method: 'POST',
+    //     path: '/team/{teamId}/transfer',
+    //     summary: 'Request a team ownership transfer',
+    //     description: '',
+    //     tags: ['Teams'],
+    //   },
+    // })
     .input(ZRequestTeamOwnerhsipTransferMutationSchema)
     .mutation(async ({ input, ctx }) => {
-      try {
-        return await requestTeamOwnershipTransfer({
-          userId: ctx.user.id,
-          userName: ctx.user.name ?? '',
-          ...input,
-        });
-      } catch (err) {
-        console.error(err);
-
-        throw AppError.parseErrorToTRPCError(err);
-      }
+      return await requestTeamOwnershipTransfer({
+        userId: ctx.user.id,
+        userName: ctx.user.name ?? '',
+        ...input,
+      });
     }),
 
+  // Internal endpoint for now.
+  deleteTeamTransferRequest: authenticatedProcedure
+    // .meta({
+    //   openapi: {
+    //     method: 'POST',
+    //     path: '/team/{teamId}/transfer/delete',
+    //     summary: 'Delete team transfer request',
+    //     tags: ['Teams'],
+    //   },
+    // })
+    .input(ZDeleteTeamTransferRequestMutationSchema)
+    .mutation(async ({ input, ctx }) => {
+      return await deleteTeamTransferRequest({
+        userId: ctx.user.id,
+        ...input,
+      });
+    }),
+
+  // Todo
+  getTeamEmailByEmail: authenticatedProcedure.query(async ({ ctx }) => {
+    return await getTeamEmailByEmail({ email: ctx.user.email });
+  }),
+
+  // Internal endpoint for now.
+  updateTeamEmail: authenticatedProcedure
+    // .meta({
+    //   openapi: {
+    //     method: 'POST',
+    //     path: '/team/{teamId}/email',
+    //     summary: 'Update a team email',
+    //     description: '',
+    //     tags: ['Teams'],
+    //   },
+    // })
+    .input(ZUpdateTeamEmailMutationSchema)
+    .mutation(async ({ input, ctx }) => {
+      return await updateTeamEmail({
+        userId: ctx.user.id,
+        ...input,
+      });
+    }),
+
+  // Internal endpoint for now.
+  deleteTeamEmail: authenticatedProcedure
+    // .meta({
+    //   openapi: {
+    //     method: 'POST',
+    //     path: '/team/{teamId}/email/delete',
+    //     summary: 'Delete team email',
+    //     description: '',
+    //     tags: ['Teams'],
+    //   },
+    // })
+    .input(ZDeleteTeamEmailMutationSchema)
+    .mutation(async ({ input, ctx }) => {
+      return await deleteTeamEmail({
+        userId: ctx.user.id,
+        userEmail: ctx.user.email,
+        ...input,
+      });
+    }),
+
+  // Internal endpoint for now.
   resendTeamEmailVerification: authenticatedProcedure
+    // .meta({
+    //   openapi: {
+    //     method: 'POST',
+    //     path: '/team/{teamId}/email/resend',
+    //     summary: 'Resend team email verification',
+    //     tags: ['Teams'],
+    //   },
+    // })
     .input(ZResendTeamEmailVerificationMutationSchema)
     .mutation(async ({ input, ctx }) => {
-      try {
-        await resendTeamEmailVerification({
-          userId: ctx.user.id,
-          ...input,
-        });
-      } catch (err) {
-        console.error(err);
-
-        throw AppError.parseErrorToTRPCError(err);
-      }
+      await resendTeamEmailVerification({
+        userId: ctx.user.id,
+        ...input,
+      });
     }),
 
-  resendTeamMemberInvitation: authenticatedProcedure
-    .input(ZResendTeamMemberInvitationMutationSchema)
+  // Internal endpoint for now.
+  deleteTeamEmailVerification: authenticatedProcedure
+    // .meta({
+    //   openapi: {
+    //     method: 'POST',
+    //     path: '/team/{teamId}/email/verify/delete',
+    //     summary: 'Delete team email verification',
+    //     tags: ['Teams'],
+    //   },
+    // })
+    .input(ZDeleteTeamEmailVerificationMutationSchema)
     .mutation(async ({ input, ctx }) => {
-      try {
-        await resendTeamMemberInvitation({
-          userId: ctx.user.id,
-          userName: ctx.user.name ?? '',
-          ...input,
-        });
-      } catch (err) {
-        console.error(err);
-
-        throw AppError.parseErrorToTRPCError(err);
-      }
+      return await deleteTeamEmailVerification({
+        userId: ctx.user.id,
+        ...input,
+      });
     }),
 
+  // Internal endpoint. Use updateTeam instead.
   updateTeamBrandingSettings: authenticatedProcedure
     .input(ZUpdateTeamBrandingSettingsMutationSchema)
     .mutation(async ({ ctx, input }) => {
       const { teamId, settings } = input;
 
-      try {
-        return await updateTeamBrandingSettings({
-          userId: ctx.user.id,
-          teamId,
-          settings,
-        });
-      } catch (err) {
-        console.error(err);
-
-        throw AppError.parseErrorToTRPCError(err);
-      }
+      return await updateTeamBrandingSettings({
+        userId: ctx.user.id,
+        teamId,
+        settings,
+      });
     }),
 
+  // Internal endpoint for now.
+  createTeamPendingCheckout: authenticatedProcedure
+    .input(ZCreateTeamPendingCheckoutMutationSchema)
+    .mutation(async ({ input, ctx }) => {
+      return await createTeamPendingCheckoutSession({
+        userId: ctx.user.id,
+        ...input,
+      });
+    }),
+
+  // Internal endpoint for now.
+  findTeamInvoices: authenticatedProcedure
+    .input(ZFindTeamInvoicesQuerySchema)
+    .query(async ({ input, ctx }) => {
+      return await findTeamInvoices({
+        userId: ctx.user.id,
+        ...input,
+      });
+    }),
+
+  // Internal endpoint for now.
+  getTeamPrices: authenticatedProcedure.query(async () => {
+    return await getTeamPrices();
+  }),
+
+  // Internal endpoint. Use updateTeam instead.
   updateTeamDocumentSettings: authenticatedProcedure
     .input(ZUpdateTeamDocumentSettingsMutationSchema)
     .mutation(async ({ ctx, input }) => {
       const { teamId, settings } = input;
 
-      try {
-        return await updateTeamDocumentSettings({
-          userId: ctx.user.id,
-          teamId,
-          settings,
-        });
-      } catch (err) {
-        console.error(err);
+      return await updateTeamDocumentSettings({
+        userId: ctx.user.id,
+        teamId,
+        settings,
+      });
+    }),
 
-        throw AppError.parseErrorToTRPCError(err);
-      }
+  // Internal endpoint for now.
+  acceptTeamInvitation: authenticatedProcedure
+    .input(ZAcceptTeamInvitationMutationSchema)
+    .mutation(async ({ input, ctx }) => {
+      return await acceptTeamInvitation({
+        teamId: input.teamId,
+        userId: ctx.user.id,
+      });
+    }),
+
+  // Internal endpoint for now.
+  declineTeamInvitation: authenticatedProcedure
+    .input(ZDeclineTeamInvitationMutationSchema)
+    .mutation(async ({ input, ctx }) => {
+      return await declineTeamInvitation({
+        teamId: input.teamId,
+        userId: ctx.user.id,
+      });
+    }),
+
+  // Internal endpoint for now.
+  createBillingPortal: authenticatedProcedure
+    .input(ZCreateTeamBillingPortalMutationSchema)
+    .mutation(async ({ input, ctx }) => {
+      return await createTeamBillingPortal({
+        userId: ctx.user.id,
+        ...input,
+      });
+    }),
+
+  // Internal endpoint for now.
+  findTeamsPending: authenticatedProcedure
+    // .meta({
+    //   openapi: {
+    //     method: 'GET',
+    //     path: '/team/pending',
+    //     summary: 'Find pending teams',
+    //     description: 'Find teams that are pending payment',
+    //     tags: ['Teams'],
+    //   },
+    // })
+    .input(ZFindTeamsPendingQuerySchema)
+    .query(async ({ input, ctx }) => {
+      return await findTeamsPending({
+        userId: ctx.user.id,
+        ...input,
+      });
+    }),
+
+  // Internal endpoint for now.
+  deleteTeamPending: authenticatedProcedure
+    // .meta({
+    //   openapi: {
+    //     method: 'POST',
+    //     path: '/team/pending/{pendingTeamId}/delete',
+    //     summary: 'Delete pending team',
+    //     description: '',
+    //     tags: ['Teams'],
+    //   },
+    // })
+    .input(ZDeleteTeamPendingMutationSchema)
+    .mutation(async ({ input, ctx }) => {
+      return await deleteTeamPending({
+        userId: ctx.user.id,
+        ...input,
+      });
     }),
 });

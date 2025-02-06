@@ -12,7 +12,7 @@ import { DateTime } from 'luxon';
 import { z } from 'zod';
 
 import { useUpdateSearchParams } from '@documenso/lib/client-only/hooks/use-update-search-params';
-import { ZBaseTableSearchParamsSchema } from '@documenso/lib/types/search-params';
+import { ZUrlSearchParamsSchema } from '@documenso/lib/types/search-params';
 import type { Team } from '@documenso/prisma/client';
 import { DocumentSource, DocumentStatus as DocumentStatusEnum } from '@documenso/prisma/client';
 import { trpc } from '@documenso/trpc/react';
@@ -40,17 +40,13 @@ const DOCUMENT_SOURCE_LABELS: { [key in DocumentSource]: MessageDescriptor } = {
   TEMPLATE_DIRECT_LINK: msg`Direct link`,
 };
 
-const ZTemplateSearchParamsSchema = ZBaseTableSearchParamsSchema.extend({
+const ZDocumentSearchParamsSchema = ZUrlSearchParamsSchema.extend({
   source: z
     .nativeEnum(DocumentSource)
     .optional()
     .catch(() => undefined),
   status: z
     .nativeEnum(DocumentStatusEnum)
-    .optional()
-    .catch(() => undefined),
-  search: z.coerce
-    .string()
     .optional()
     .catch(() => undefined),
 });
@@ -69,25 +65,23 @@ export const TemplatePageViewDocumentsTable = ({
   const searchParams = useSearchParams();
   const updateSearchParams = useUpdateSearchParams();
 
-  const parsedSearchParams = ZTemplateSearchParamsSchema.parse(
+  const parsedSearchParams = ZDocumentSearchParamsSchema.parse(
     Object.fromEntries(searchParams ?? []),
   );
 
-  const { data, isLoading, isInitialLoading, isLoadingError } =
-    trpc.document.findDocuments.useQuery(
-      {
-        templateId,
-        teamId: team?.id,
-        page: parsedSearchParams.page,
-        perPage: parsedSearchParams.perPage,
-        search: parsedSearchParams.search,
-        source: parsedSearchParams.source,
-        status: parsedSearchParams.status,
-      },
-      {
-        keepPreviousData: true,
-      },
-    );
+  const { data, isLoading, isLoadingError } = trpc.document.findDocuments.useQuery(
+    {
+      templateId,
+      page: parsedSearchParams.page,
+      perPage: parsedSearchParams.perPage,
+      query: parsedSearchParams.query,
+      source: parsedSearchParams.source,
+      status: parsedSearchParams.status,
+    },
+    {
+      placeholderData: (previousData) => previousData,
+    },
+  );
 
   const onPaginationChange = (page: number, perPage: number) => {
     updateSearchParams({
@@ -121,7 +115,7 @@ export const TemplatePageViewDocumentsTable = ({
         accessorKey: 'recipient',
         cell: ({ row }) => (
           <StackAvatarsWithTooltip
-            recipients={row.original.Recipient}
+            recipients={row.original.recipients}
             documentStatus={row.original.status}
           />
         ),
@@ -246,7 +240,7 @@ export const TemplatePageViewDocumentsTable = ({
           enable: isLoadingError,
         }}
         skeleton={{
-          enable: isLoading && isInitialLoading,
+          enable: isLoading,
           rows: 3,
           component: (
             <>

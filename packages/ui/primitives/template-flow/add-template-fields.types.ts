@@ -20,6 +20,7 @@ export const ZAddTemplateFieldsFormSchema = z.object({
       fieldMeta: ZFieldMetaSchema,
     }),
   ),
+  typedSignatureEnabled: z.boolean(),
 });
 
 export type TAddTemplateFieldsFormSchema = z.infer<typeof ZAddTemplateFieldsFormSchema>;

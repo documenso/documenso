@@ -106,7 +106,7 @@ export const DocumentAuthProvider = ({
       perPage: MAXIMUM_PASSKEYS,
     },
     {
-      keepPreviousData: true,
+      placeholderData: (previousData) => previousData,
       enabled: derivedRecipientActionAuth === DocumentAuth.PASSKEY,
     },
   );

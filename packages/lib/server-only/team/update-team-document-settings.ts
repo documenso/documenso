@@ -1,6 +1,9 @@
+import type { z } from 'zod';
+
 import { prisma } from '@documenso/prisma';
 import type { DocumentVisibility } from '@documenso/prisma/client';
 import { TeamMemberRole } from '@documenso/prisma/client';
+import { TeamGlobalSettingsSchema } from '@documenso/prisma/generated/zod';
 
 import type { SupportedLanguageCodes } from '../../constants/i18n';
 
@@ -12,15 +15,29 @@ export type UpdateTeamDocumentSettingsOptions = {
     documentVisibility: DocumentVisibility;
     documentLanguage: SupportedLanguageCodes;
     includeSenderDetails: boolean;
+    typedSignatureEnabled: boolean;
+    includeSigningCertificate: boolean;
   };
 };
+
+export const ZUpdateTeamDocumentSettingsResponseSchema = TeamGlobalSettingsSchema;
+
+export type TUpdateTeamDocumentSettingsResponse = z.infer<
+  typeof ZUpdateTeamDocumentSettingsResponseSchema
+>;
 
 export const updateTeamDocumentSettings = async ({
   userId,
   teamId,
   settings,
-}: UpdateTeamDocumentSettingsOptions) => {
-  const { documentVisibility, documentLanguage, includeSenderDetails } = settings;
+}: UpdateTeamDocumentSettingsOptions): Promise<TUpdateTeamDocumentSettingsResponse> => {
+  const {
+    documentVisibility,
+    documentLanguage,
+    includeSenderDetails,
+    includeSigningCertificate,
+    typedSignatureEnabled,
+  } = settings;
 
   const member = await prisma.teamMember.findFirst({
     where: {
@@ -42,11 +59,15 @@ export const updateTeamDocumentSettings = async ({
       documentVisibility,
       documentLanguage,
       includeSenderDetails,
+      typedSignatureEnabled,
+      includeSigningCertificate,
     },
     update: {
       documentVisibility,
       documentLanguage,
       includeSenderDetails,
+      typedSignatureEnabled,
+      includeSigningCertificate,
     },
   });
 };

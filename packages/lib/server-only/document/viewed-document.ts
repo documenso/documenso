@@ -2,12 +2,15 @@ import { DOCUMENT_AUDIT_LOG_TYPE } from '@documenso/lib/types/document-audit-log
 import type { RequestMetadata } from '@documenso/lib/universal/extract-request-metadata';
 import { createDocumentAuditLogData } from '@documenso/lib/utils/document-audit-logs';
 import { prisma } from '@documenso/prisma';
-import { ReadStatus } from '@documenso/prisma/client';
+import { ReadStatus, SendStatus } from '@documenso/prisma/client';
 import { WebhookTriggerEvents } from '@documenso/prisma/client';
 
 import type { TDocumentAccessAuthTypes } from '../../types/document-auth';
+import {
+  ZWebhookDocumentSchema,
+  mapDocumentToWebhookDocumentPayload,
+} from '../../types/webhook-payload';
 import { triggerWebhook } from '../webhooks/trigger/trigger-webhook';
-import { getDocumentAndRecipientByToken } from './get-document-by-token';
 
 export type ViewedDocumentOptions = {
   token: string;
@@ -39,6 +42,8 @@ export const viewedDocument = async ({
         id: recipient.id,
       },
       data: {
+        // This handles cases where distribution is done manually
+        sendStatus: SendStatus.SENT,
         readStatus: ReadStatus.OPENED,
       },
     });
@@ -63,11 +68,23 @@ export const viewedDocument = async ({
     });
   });
 
-  const document = await getDocumentAndRecipientByToken({ token, requireAccessAuth: false });
+  const document = await prisma.document.findFirst({
+    where: {
+      id: documentId,
+    },
+    include: {
+      documentMeta: true,
+      recipients: true,
+    },
+  });
+
+  if (!document) {
+    throw new Error('Document not found');
+  }
 
   await triggerWebhook({
     event: WebhookTriggerEvents.DOCUMENT_OPENED,
-    data: document,
+    data: ZWebhookDocumentSchema.parse(mapDocumentToWebhookDocumentPayload(document)),
     userId: document.userId,
     teamId: document.teamId ?? undefined,
   });

@@ -44,7 +44,7 @@ export const updateField = async ({
   const oldField = await prisma.field.findFirstOrThrow({
     where: {
       id: fieldId,
-      Document: {
+      document: {
         id: documentId,
         ...(teamId
           ? {
@@ -65,11 +65,6 @@ export const updateField = async ({
     },
   });
 
-  const newFieldMeta = {
-    ...(oldField.fieldMeta as FieldMeta),
-    ...fieldMeta,
-  };
-
   const field = prisma.$transaction(async (tx) => {
     const updatedField = await tx.field.update({
       where: {
@@ -83,10 +78,10 @@ export const updateField = async ({
         positionY: pageY,
         width: pageWidth,
         height: pageHeight,
-        fieldMeta: newFieldMeta,
+        fieldMeta,
       },
       include: {
-        Recipient: true,
+        recipient: true,
       },
     });
 
@@ -127,7 +122,7 @@ export const updateField = async ({
         },
         data: {
           fieldId: updatedField.secondaryId,
-          fieldRecipientEmail: updatedField.Recipient?.email ?? '',
+          fieldRecipientEmail: updatedField.recipient?.email ?? '',
           fieldRecipientId: recipientId ?? -1,
           fieldType: updatedField.type,
           changes: diffFieldChanges(oldField, updatedField),

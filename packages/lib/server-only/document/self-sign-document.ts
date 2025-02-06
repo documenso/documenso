@@ -1,5 +1,5 @@
 import { DOCUMENT_AUDIT_LOG_TYPE } from '@documenso/lib/types/document-audit-logs';
-import type { RequestMetadata } from '@documenso/lib/universal/extract-request-metadata';
+import type { ApiRequestMetadata } from '@documenso/lib/universal/extract-request-metadata';
 import { putPdfFile } from '@documenso/lib/universal/upload/put-file';
 import { createDocumentAuditLogData } from '@documenso/lib/utils/document-audit-logs';
 import { prisma } from '@documenso/prisma';
@@ -13,7 +13,7 @@ export type SelfSignDocumentOptions = {
   documentId: number;
   userId: number;
   teamId?: number;
-  requestMetadata?: RequestMetadata;
+  requestMetadata?: ApiRequestMetadata;
 };
 
 export const selfSignDocument = async ({
@@ -53,7 +53,7 @@ export const selfSignDocument = async ({
           }),
     },
     include: {
-      Recipient: {
+      recipients: {
         orderBy: [{ signingOrder: { sort: 'asc', nulls: 'last' } }, { id: 'asc' }],
       },
       documentMeta: true,
@@ -65,11 +65,11 @@ export const selfSignDocument = async ({
     throw new Error('Document not found');
   }
 
-  if (document.Recipient.length === 0) {
+  if (document.recipients.length === 0) {
     throw new Error('Document has no recipients');
   }
 
-  if (document.Recipient.length !== 1 || document.Recipient[0].email !== user.email) {
+  if (document.recipients.length !== 1 || document.recipients[0].email !== user.email) {
     throw new Error('Invalid document for self-signing');
   }
 
@@ -111,15 +111,15 @@ export const selfSignDocument = async ({
   }
 
   const recipientHasNoActionToTake =
-    document.Recipient[0].role === RecipientRole.CC ||
-    document.Recipient[0].signingStatus === SigningStatus.SIGNED;
+    document.recipients[0].role === RecipientRole.CC ||
+    document.recipients[0].signingStatus === SigningStatus.SIGNED;
 
   if (recipientHasNoActionToTake) {
     await jobs.triggerJob({
       name: 'internal.seal-document',
       payload: {
         documentId,
-        requestMetadata,
+        requestMetadata: requestMetadata?.requestMetadata,
       },
     });
 
@@ -128,7 +128,7 @@ export const selfSignDocument = async ({
         id: documentId,
       },
       include: {
-        Recipient: true,
+        recipients: true,
       },
     });
   }
@@ -139,13 +139,13 @@ export const selfSignDocument = async ({
         data: createDocumentAuditLogData({
           type: DOCUMENT_AUDIT_LOG_TYPE.SELF_SIGN,
           documentId: document.id,
-          requestMetadata,
+          requestMetadata: requestMetadata?.requestMetadata,
           user,
           data: {
-            recipientId: document.Recipient[0].id,
-            recipientEmail: document.Recipient[0].email,
-            recipientName: document.Recipient[0].name,
-            recipientRole: document.Recipient[0].role,
+            recipientId: document.recipients[0].id,
+            recipientEmail: document.recipients[0].email,
+            recipientName: document.recipients[0].name,
+            recipientRole: document.recipients[0].role,
           },
         }),
       });
@@ -153,7 +153,7 @@ export const selfSignDocument = async ({
 
     await tx.recipient.update({
       where: {
-        id: document.Recipient[0].id,
+        id: document.recipients[0].id,
       },
       data: {
         sendStatus: SendStatus.SENT,
@@ -168,7 +168,7 @@ export const selfSignDocument = async ({
         status: DocumentStatus.PENDING,
       },
       include: {
-        Recipient: true,
+        recipients: true,
       },
     });
   });

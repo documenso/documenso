@@ -1,7 +1,6 @@
 import { useMemo, useState } from 'react';
 
 import { Trans } from '@lingui/macro';
-import { useLingui } from '@lingui/react';
 import { DateTime } from 'luxon';
 import { match } from 'ts-pattern';
 
@@ -15,10 +14,10 @@ import {
   ZRadioFieldMeta,
   ZTextFieldMeta,
 } from '@documenso/lib/types/field-meta';
+import type { TTemplate } from '@documenso/lib/types/template';
 import { sortFieldsByPosition, validateFieldsInserted } from '@documenso/lib/utils/fields';
 import type { Field, Recipient, Signature } from '@documenso/prisma/client';
 import { FieldType } from '@documenso/prisma/client';
-import type { TemplateWithDetails } from '@documenso/prisma/types/template';
 import type {
   TRemovedSignedFieldWithTokenMutationSchema,
   TSignFieldWithTokenMutationSchema,
@@ -48,6 +47,7 @@ import { NameField } from '~/app/(signing)/sign/[token]/name-field';
 import { NumberField } from '~/app/(signing)/sign/[token]/number-field';
 import { useRequiredSigningContext } from '~/app/(signing)/sign/[token]/provider';
 import { RadioField } from '~/app/(signing)/sign/[token]/radio-field';
+import { RecipientProvider } from '~/app/(signing)/sign/[token]/recipient-context';
 import { SignDialog } from '~/app/(signing)/sign/[token]/sign-dialog';
 import { SignatureField } from '~/app/(signing)/sign/[token]/signature-field';
 import { TextField } from '~/app/(signing)/sign/[token]/text-field';
@@ -56,13 +56,13 @@ export type SignDirectTemplateFormProps = {
   flowStep: DocumentFlowStep;
   directRecipient: Recipient;
   directRecipientFields: Field[];
-  template: TemplateWithDetails;
+  template: Omit<TTemplate, 'user'>;
   onSubmit: (_data: DirectTemplateLocalField[]) => Promise<void>;
 };
 
 export type DirectTemplateLocalField = Field & {
   signedValue?: TSignFieldWithTokenMutationSchema;
-  Signature?: Signature;
+  signature?: Signature;
 };
 
 export const SignDirectTemplateForm = ({
@@ -72,9 +72,8 @@ export const SignDirectTemplateForm = ({
   template,
   onSubmit,
 }: SignDirectTemplateFormProps) => {
-  const { _ } = useLingui();
-
-  const { fullName, signature, setFullName, setSignature } = useRequiredSigningContext();
+  const { fullName, signature, signatureValid, setFullName, setSignature } =
+    useRequiredSigningContext();
 
   const [localFields, setLocalFields] = useState<DirectTemplateLocalField[]>(directRecipientFields);
   const [validateUninsertedFields, setValidateUninsertedFields] = useState(false);
@@ -97,14 +96,14 @@ export const SignDirectTemplateForm = ({
         };
 
         if (field.type === FieldType.SIGNATURE) {
-          tempField.Signature = {
+          tempField.signature = {
             id: 1,
             created: new Date(),
             recipientId: 1,
             fieldId: 1,
-            signatureImageAsBase64: value.value,
-            typedSignature: null,
-          };
+            signatureImageAsBase64: value.value.startsWith('data:') ? value.value : null,
+            typedSignature: value.value.startsWith('data:') ? null : value.value,
+          } satisfies Signature;
         }
 
         if (field.type === FieldType.DATE) {
@@ -129,11 +128,13 @@ export const SignDirectTemplateForm = ({
           customText: '',
           inserted: false,
           signedValue: undefined,
-          Signature: undefined,
+          signature: undefined,
         };
       }),
     );
   };
+
+  const hasSignatureField = localFields.some((field) => field.type === FieldType.SIGNATURE);
 
   const uninsertedFields = useMemo(() => {
     return sortFieldsByPosition(localFields.filter((field) => !field.inserted));
@@ -146,6 +147,10 @@ export const SignDirectTemplateForm = ({
 
   const handleSubmit = async () => {
     setValidateUninsertedFields(true);
+
+    if (hasSignatureField && !signatureValid) {
+      return;
+    }
 
     const isFieldsValid = validateFieldsInserted(localFields);
 
@@ -165,7 +170,7 @@ export const SignDirectTemplateForm = ({
   };
 
   return (
-    <>
+    <RecipientProvider recipient={directRecipient}>
       <DocumentFlowFormContainerHeader title={flowStep.title} description={flowStep.description} />
 
       <DocumentFlowFormContainerContent>
@@ -182,16 +187,15 @@ export const SignDirectTemplateForm = ({
                 <SignatureField
                   key={field.id}
                   field={field}
-                  recipient={directRecipient}
                   onSignField={onSignField}
                   onUnsignField={onUnsignField}
+                  typedSignatureEnabled={template.templateMeta?.typedSignatureEnabled}
                 />
               ))
               .with(FieldType.INITIALS, () => (
                 <InitialsField
                   key={field.id}
                   field={field}
-                  recipient={directRecipient}
                   onSignField={onSignField}
                   onUnsignField={onUnsignField}
                 />
@@ -200,7 +204,6 @@ export const SignDirectTemplateForm = ({
                 <NameField
                   key={field.id}
                   field={field}
-                  recipient={directRecipient}
                   onSignField={onSignField}
                   onUnsignField={onUnsignField}
                 />
@@ -209,7 +212,6 @@ export const SignDirectTemplateForm = ({
                 <DateField
                   key={field.id}
                   field={field}
-                  recipient={directRecipient}
                   dateFormat={template.templateMeta?.dateFormat ?? DEFAULT_DOCUMENT_DATE_FORMAT}
                   timezone={template.templateMeta?.timezone ?? DEFAULT_DOCUMENT_TIME_ZONE}
                   onSignField={onSignField}
@@ -220,7 +222,6 @@ export const SignDirectTemplateForm = ({
                 <EmailField
                   key={field.id}
                   field={field}
-                  recipient={directRecipient}
                   onSignField={onSignField}
                   onUnsignField={onUnsignField}
                 />
@@ -237,7 +238,6 @@ export const SignDirectTemplateForm = ({
                       ...field,
                       fieldMeta: parsedFieldMeta,
                     }}
-                    recipient={directRecipient}
                     onSignField={onSignField}
                     onUnsignField={onUnsignField}
                   />
@@ -255,7 +255,6 @@ export const SignDirectTemplateForm = ({
                       ...field,
                       fieldMeta: parsedFieldMeta,
                     }}
-                    recipient={directRecipient}
                     onSignField={onSignField}
                     onUnsignField={onUnsignField}
                   />
@@ -273,7 +272,6 @@ export const SignDirectTemplateForm = ({
                       ...field,
                       fieldMeta: parsedFieldMeta,
                     }}
-                    recipient={directRecipient}
                     onSignField={onSignField}
                     onUnsignField={onUnsignField}
                   />
@@ -291,7 +289,6 @@ export const SignDirectTemplateForm = ({
                       ...field,
                       fieldMeta: parsedFieldMeta,
                     }}
-                    recipient={directRecipient}
                     onSignField={onSignField}
                     onUnsignField={onUnsignField}
                   />
@@ -309,7 +306,6 @@ export const SignDirectTemplateForm = ({
                       ...field,
                       fieldMeta: parsedFieldMeta,
                     }}
-                    recipient={directRecipient}
                     onSignField={onSignField}
                     onUnsignField={onUnsignField}
                   />
@@ -347,6 +343,7 @@ export const SignDirectTemplateForm = ({
                     onChange={(value) => {
                       setSignature(value);
                     }}
+                    allowTypedSignature={template.templateMeta?.typedSignatureEnabled}
                   />
                 </CardContent>
               </Card>
@@ -379,6 +376,6 @@ export const SignDirectTemplateForm = ({
           />
         </div>
       </DocumentFlowFormContainerFooter>
-    </>
+    </RecipientProvider>
   );
 };

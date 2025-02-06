@@ -33,9 +33,6 @@
     "test:e2e": {
       "dependsOn": ["^build"],
       "cache": false
-    },
-    "translate:compile": {
-      "cache": false
     }
   },
   "globalDependencies": ["**/.env.*local"],
@@ -114,6 +111,7 @@
     "NEXT_PRIVATE_TRIGGER_API_KEY",
     "NEXT_PRIVATE_TRIGGER_API_URL",
     "NEXT_PRIVATE_INNGEST_APP_ID",
+    "NEXT_PRIVATE_LOGGER_HONEY_BADGER_API_KEY",
     "INNGEST_EVENT_KEY",
     "NEXT_PRIVATE_INNGEST_EVENT_KEY",
     "CI",

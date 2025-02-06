@@ -10,9 +10,9 @@ import type { Document, Recipient, Team, User } from '@documenso/prisma/client';
 
 export type DataTableTitleProps = {
   row: Document & {
-    User: Pick<User, 'id' | 'name' | 'email'>;
+    user: Pick<User, 'id' | 'name' | 'email'>;
     team: Pick<Team, 'url'> | null;
-    Recipient: Recipient[];
+    recipients: Recipient[];
   };
   teamUrl?: string;
 };
@@ -24,9 +24,9 @@ export const DataTableTitle = ({ row, teamUrl }: DataTableTitleProps) => {
     return null;
   }
 
-  const recipient = row.Recipient.find((recipient) => recipient.email === session.user.email);
+  const recipient = row.recipients.find((recipient) => recipient.email === session.user.email);
 
-  const isOwner = row.User.id === session.user.id;
+  const isOwner = row.user.id === session.user.id;
   const isRecipient = !!recipient;
   const isCurrentTeamDocument = teamUrl && row.team?.url === teamUrl;
 

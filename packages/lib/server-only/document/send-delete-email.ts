@@ -8,6 +8,7 @@ import { prisma } from '@documenso/prisma';
 
 import { getI18nInstance } from '../../client-only/providers/i18n.server';
 import { NEXT_PUBLIC_WEBAPP_URL } from '../../constants/app';
+import { AppError, AppErrorCode } from '../../errors/app-error';
 import { extractDerivedDocumentEmailSettings } from '../../types/document-email';
 import { renderEmailWithI18N } from '../../utils/render-email-with-i18n';
 import { teamGlobalSettingsToBranding } from '../../utils/team-global-settings-to-branding';
@@ -23,7 +24,7 @@ export const sendDeleteEmail = async ({ documentId, reason }: SendDeleteEmailOpt
       id: documentId,
     },
     include: {
-      User: true,
+      user: true,
       documentMeta: true,
       team: {
         include: {
@@ -34,7 +35,9 @@ export const sendDeleteEmail = async ({ documentId, reason }: SendDeleteEmailOpt
   });
 
   if (!document) {
-    throw new Error('Document not found');
+    throw new AppError(AppErrorCode.NOT_FOUND, {
+      message: 'Document not found',
+    });
   }
 
   const isDocumentDeletedEmailEnabled = extractDerivedDocumentEmailSettings(
@@ -45,7 +48,7 @@ export const sendDeleteEmail = async ({ documentId, reason }: SendDeleteEmailOpt
     return;
   }
 
-  const { email, name } = document.User;
+  const { email, name } = document.user;
 
   const assetBaseUrl = NEXT_PUBLIC_WEBAPP_URL() || 'http://localhost:3000';
 

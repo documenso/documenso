@@ -47,7 +47,7 @@ export const DocumentLogsPageView = async ({ params, team }: DocumentLogsPageVie
 
   const [document, recipients] = await Promise.all([
     getDocumentById({
-      id: documentId,
+      documentId,
       userId: user.id,
       teamId: team?.id,
     }).catch(() => null),
@@ -77,9 +77,9 @@ export const DocumentLogsPageView = async ({ params, team }: DocumentLogsPageVie
     },
     {
       description: msg`Created by`,
-      value: document.User.name
-        ? `${document.User.name} (${document.User.email})`
-        : document.User.email,
+      value: document.user.name
+        ? `${document.user.name} (${document.user.email})`
+        : document.user.email,
     },
     {
       description: msg`Date created`,
@@ -121,7 +121,10 @@ export const DocumentLogsPageView = async ({ params, team }: DocumentLogsPageVie
 
       <div className="flex flex-col justify-between truncate sm:flex-row">
         <div>
-          <h1 className="mt-4 truncate text-2xl font-semibold md:text-3xl" title={document.title}>
+          <h1
+            className="mt-4 block max-w-[20rem] truncate text-2xl font-semibold md:max-w-[30rem] md:text-3xl"
+            title={document.title}
+          >
             {document.title}
           </h1>
 

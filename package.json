@@ -1,14 +1,14 @@
 {
   "private": true,
-  "version": "1.8.1-rc.0",
+  "version": "1.9.1-rc.1",
   "scripts": {
     "build": "turbo run build",
     "build:web": "turbo run build --filter=@documenso/web",
     "dev": "turbo run dev --filter=@documenso/web",
     "dev:web": "turbo run dev --filter=@documenso/web",
-    "dev:marketing": "turbo run dev --filter=@documenso/marketing",
     "dev:docs": "turbo run dev --filter=@documenso/documentation",
-    "start": "turbo run start --filter=@documenso/web --filter=@documenso/marketing --filter=@documenso/documentation",
+    "dev:openpage-api": "turbo run dev --filter=@documenso/openpage-api",
+    "start": "turbo run start --filter=@documenso/web --filter=@documenso/documentation --filter=@documenso/openpage-api",
     "lint": "turbo run lint",
     "lint:fix": "turbo run lint:fix",
     "format": "prettier --write \"**/*.{js,jsx,cjs,mjs,ts,tsx,cts,mts,mdx}\"",
@@ -31,9 +31,10 @@
     "precommit": "npm install && git add package.json package-lock.json",
     "trigger:dev": "npm run with:env -- npx trigger-cli dev --handler-path=\"/api/jobs\"",
     "inngest:dev": "inngest dev -u http://localhost:3000/api/jobs",
-    "make:version": " npm version --workspace @documenso/web --workspace @documenso/marketing --include-workspace-root --no-git-tag-version -m \"v%s\"",
-    "translate:extract": "lingui extract",
-    "translate:compile": "turbo run translate:compile --filter=@documenso/web --filter=@documenso/marketing --filter=@documenso/ui"
+    "make:version": " npm version --workspace @documenso/web --include-workspace-root --no-git-tag-version -m \"v%s\"",
+    "translate": "npm run translate:extract && npm run translate:compile",
+    "translate:extract": "lingui extract --clean",
+    "translate:compile": "lingui compile"
   },
   "packageManager": "npm@10.7.0",
   "engines": {
@@ -52,7 +53,7 @@
     "husky": "^9.0.11",
     "lint-staged": "^15.2.2",
     "playwright": "1.43.0",
-    "prettier": "^2.5.1",
+    "prettier": "^3.3.3",
     "rimraf": "^5.0.1",
     "turbo": "^1.9.3"
   },
@@ -63,13 +64,19 @@
   ],
   "dependencies": {
     "@documenso/pdf-sign": "^0.1.0",
+    "@documenso/prisma": "^0.0.0",
     "@lingui/core": "^4.11.3",
     "inngest-cli": "^0.29.1",
+    "luxon": "^3.5.0",
+    "mupdf": "^1.0.0",
     "next-runtime-env": "^3.2.0",
-    "react": "^18"
+    "react": "^18",
+    "typescript": "5.6.2",
+    "zod": "3.24.1"
   },
   "overrides": {
-    "next": "14.2.6"
+    "next": "14.2.6",
+    "zod": "3.24.1"
   },
   "trigger.dev": {
     "endpointId": "documenso-app"

@@ -1,6 +1,6 @@
-import { TRPCError } from '@trpc/server';
-
 import { prisma } from '@documenso/prisma';
+
+import { AppError, AppErrorCode } from '../../errors/app-error';
 
 export type MoveTemplateToTeamOptions = {
   templateId: number;
@@ -23,8 +23,7 @@ export const moveTemplateToTeam = async ({
     });
 
     if (!template) {
-      throw new TRPCError({
-        code: 'NOT_FOUND',
+      throw new AppError(AppErrorCode.NOT_FOUND, {
         message: 'Template not found or already associated with a team.',
       });
     }
@@ -41,9 +40,8 @@ export const moveTemplateToTeam = async ({
     });
 
     if (!team) {
-      throw new TRPCError({
-        code: 'FORBIDDEN',
-        message: 'You are not a member of this team.',
+      throw new AppError(AppErrorCode.UNAUTHORIZED, {
+        message: 'Team does not exist or you are not a member of this team.',
       });
     }
 

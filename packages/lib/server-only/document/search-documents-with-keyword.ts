@@ -35,7 +35,7 @@ export const searchDocumentsWithKeyword = async ({
           deletedAt: null,
         },
         {
-          Recipient: {
+          recipients: {
             some: {
               email: {
                 contains: query,
@@ -48,7 +48,7 @@ export const searchDocumentsWithKeyword = async ({
         },
         {
           status: DocumentStatus.COMPLETED,
-          Recipient: {
+          recipients: {
             some: {
               email: user.email,
             },
@@ -60,7 +60,7 @@ export const searchDocumentsWithKeyword = async ({
         },
         {
           status: DocumentStatus.PENDING,
-          Recipient: {
+          recipients: {
             some: {
               email: user.email,
             },
@@ -91,7 +91,7 @@ export const searchDocumentsWithKeyword = async ({
       ],
     },
     include: {
-      Recipient: true,
+      recipients: true,
       team: {
         select: {
           url: true,
@@ -140,7 +140,7 @@ export const searchDocumentsWithKeyword = async ({
       return canAccessDocument;
     })
     .map((document) => {
-      const { Recipient, ...documentWithoutRecipient } = document;
+      const { recipients, ...documentWithoutRecipient } = document;
 
       let documentPath;
 
@@ -149,13 +149,13 @@ export const searchDocumentsWithKeyword = async ({
       } else if (document.teamId && document.team) {
         documentPath = `${formatDocumentsPath(document.team.url)}/${document.id}`;
       } else {
-        documentPath = getSigningLink(Recipient, user);
+        documentPath = getSigningLink(recipients, user);
       }
 
       return {
         ...documentWithoutRecipient,
         path: documentPath,
-        value: [document.id, document.title, ...document.Recipient.map((r) => r.email)].join(' '),
+        value: [document.id, document.title, ...document.recipients.map((r) => r.email)].join(' '),
       };
     });
 

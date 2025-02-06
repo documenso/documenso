@@ -6,7 +6,11 @@ import { getPricesByPlan } from './get-prices-by-plan';
  * Returns the Stripe prices of items that affect the amount of teams a user can create.
  */
 export const getTeamRelatedPrices = async () => {
-  return await getPricesByPlan([STRIPE_PLAN_TYPE.COMMUNITY, STRIPE_PLAN_TYPE.ENTERPRISE]);
+  return await getPricesByPlan([
+    STRIPE_PLAN_TYPE.COMMUNITY,
+    STRIPE_PLAN_TYPE.PLATFORM,
+    STRIPE_PLAN_TYPE.ENTERPRISE,
+  ]);
 };
 
 /**

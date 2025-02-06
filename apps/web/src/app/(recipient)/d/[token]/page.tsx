@@ -12,7 +12,6 @@ import { extractDocumentAuthMethods } from '@documenso/lib/utils/document-auth';
 
 import { DocumentAuthProvider } from '~/app/(signing)/sign/[token]/document-auth-provider';
 import { SigningProvider } from '~/app/(signing)/sign/[token]/provider';
-import { truncateTitle } from '~/helpers/truncate-title';
 
 import { DirectTemplatePageView } from './direct-template';
 import { DirectTemplateAuthPageView } from './signing-auth-page';
@@ -42,7 +41,7 @@ export default async function TemplatesDirectPage({ params }: TemplatesDirectPag
     notFound();
   }
 
-  const directTemplateRecipient = template.Recipient.find(
+  const directTemplateRecipient = template.recipients.find(
     (recipient) => recipient.id === template.directLink?.directTemplateRecipientId,
   );
 
@@ -72,14 +71,17 @@ export default async function TemplatesDirectPage({ params }: TemplatesDirectPag
         user={user}
       >
         <div className="mx-auto -mt-4 w-full max-w-screen-xl px-4 md:px-8">
-          <h1 className="mt-4 truncate text-2xl font-semibold md:text-3xl" title={template.title}>
-            {truncateTitle(template.title)}
+          <h1
+            className="mt-4 block max-w-[20rem] truncate text-2xl font-semibold md:max-w-[30rem] md:text-3xl"
+            title={template.title}
+          >
+            {template.title}
           </h1>
 
           <div className="text-muted-foreground mb-8 mt-2.5 flex items-center gap-x-2">
             <UsersIcon className="h-4 w-4" />
             <p className="text-muted-foreground/80">
-              <Plural value={template.Recipient.length} one="# recipient" other="# recipients" />
+              <Plural value={template.recipients.length} one="# recipient" other="# recipients" />
             </p>
           </div>
 

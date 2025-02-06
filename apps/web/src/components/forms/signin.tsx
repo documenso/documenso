@@ -53,6 +53,7 @@ const ERROR_MESSAGES: Partial<Record<keyof typeof ErrorCode, string>> = {
   [ErrorCode.INCORRECT_TWO_FACTOR_BACKUP_CODE]: 'The backup code provided is incorrect',
   [ErrorCode.UNVERIFIED_EMAIL]:
     'This account has not been verified. Please verify your account before signing in.',
+  [ErrorCode.ACCOUNT_DISABLED]: 'This account has been disabled. Please contact support.',
 };
 
 const TwoFactorEnabledErrorCode = ErrorCode.TWO_FACTOR_MISSING_CREDENTIALS;

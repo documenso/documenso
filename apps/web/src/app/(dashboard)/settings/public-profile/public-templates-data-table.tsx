@@ -7,11 +7,11 @@ import { useLingui } from '@lingui/react';
 import { EditIcon, FileIcon, LinkIcon, MoreHorizontalIcon, Trash2Icon } from 'lucide-react';
 
 import { useCopyToClipboard } from '@documenso/lib/client-only/hooks/use-copy-to-clipboard';
-import type { FindTemplateRow } from '@documenso/lib/server-only/template/find-templates';
 import { formatDirectTemplatePath } from '@documenso/lib/utils/templates';
 import type { TemplateDirectLink } from '@documenso/prisma/client';
 import { TemplateType } from '@documenso/prisma/client';
 import { trpc } from '@documenso/trpc/react';
+import type { FindTemplateRow } from '@documenso/trpc/server/template-router/schema';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -23,15 +23,12 @@ import { Skeleton } from '@documenso/ui/primitives/skeleton';
 import { useToast } from '@documenso/ui/primitives/use-toast';
 
 import { ManagePublicTemplateDialog } from '~/components/templates/manage-public-template-dialog';
-import { useOptionalCurrentTeam } from '~/providers/team';
 
 type DirectTemplate = FindTemplateRow & {
   directLink: Pick<TemplateDirectLink, 'token' | 'enabled'>;
 };
 
 export const PublicTemplatesDataTable = () => {
-  const team = useOptionalCurrentTeam();
-
   const { _ } = useLingui();
   const { toast } = useToast();
 
@@ -42,17 +39,15 @@ export const PublicTemplatesDataTable = () => {
     templateId: number;
   } | null>(null);
 
-  const { data, isInitialLoading, isLoadingError, refetch } = trpc.template.findTemplates.useQuery(
+  const { data, isLoading, isLoadingError, refetch } = trpc.template.findTemplates.useQuery(
+    {},
     {
-      teamId: team?.id,
-    },
-    {
-      keepPreviousData: true,
+      placeholderData: (previousData) => previousData,
     },
   );
 
   const { directTemplates, publicDirectTemplates, privateDirectTemplates } = useMemo(() => {
-    const directTemplates = (data?.templates ?? []).filter(
+    const directTemplates = (data?.data ?? []).filter(
       (template): template is DirectTemplate => template.directLink?.enabled === true,
     );
 
@@ -85,7 +80,7 @@ export const PublicTemplatesDataTable = () => {
         {/* Loading and error handling states. */}
         {publicDirectTemplates.length === 0 && (
           <>
-            {isInitialLoading &&
+            {isLoading &&
               Array(3)
                 .fill(0)
                 .map((_, index) => (
@@ -120,7 +115,7 @@ export const PublicTemplatesDataTable = () => {
               </div>
             )}
 
-            {!isInitialLoading && (
+            {!isLoading && (
               <div className="text-muted-foreground flex h-32 flex-col items-center justify-center text-sm">
                 <Trans>No public profile templates found</Trans>
                 <ManagePublicTemplateDialog
