@@ -122,6 +122,7 @@ export const AddTemplateFieldsFormPartial = ({
         pageY: Number(field.positionY),
         pageWidth: Number(field.width),
         pageHeight: Number(field.height),
+        recipientId: field.recipientId ?? -1,
         signerId: field.recipientId ?? -1,
         signerEmail:
           recipients.find((recipient) => recipient.id === field.recipientId)?.email ?? '',
@@ -177,6 +178,8 @@ export const AddTemplateFieldsFormPartial = ({
           formId: nanoid(12),
           signerEmail: selectedSigner?.email ?? lastActiveField.signerEmail,
           signerId: selectedSigner?.id ?? lastActiveField.signerId,
+          recipientId:
+            selectedSigner?.id || lastActiveField.recipientId || lastActiveField.signerId || 0,
           signerToken: selectedSigner?.token ?? lastActiveField.signerToken,
           pageX: lastActiveField.pageX + 3,
           pageY: lastActiveField.pageY + 3,
@@ -207,6 +210,7 @@ export const AddTemplateFieldsFormPartial = ({
           formId: nanoid(12),
           signerEmail: selectedSigner?.email ?? copiedField.signerEmail,
           signerId: selectedSigner?.id ?? copiedField.signerId,
+          recipientId: selectedSigner?.id || copiedField.recipientId || copiedField.signerId || 0,
           signerToken: selectedSigner?.token ?? copiedField.signerToken,
           pageX: copiedField.pageX + 3,
           pageY: copiedField.pageY + 3,
@@ -329,6 +333,8 @@ export const AddTemplateFieldsFormPartial = ({
         pageHeight: fieldPageHeight,
         signerEmail: selectedSigner.email,
         signerId: selectedSigner.id,
+        recipientId:
+          selectedSigner.id || lastActiveField?.recipientId || lastActiveField?.signerId || 0,
         signerToken: selectedSigner.token ?? '',
         fieldMeta: undefined,
       });

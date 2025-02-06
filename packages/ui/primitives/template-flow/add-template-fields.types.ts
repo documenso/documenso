@@ -12,6 +12,7 @@ export const ZAddTemplateFieldsFormSchema = z.object({
       signerEmail: z.string().min(1),
       signerToken: z.string(),
       signerId: z.number().optional(),
+      recipientId: z.number(),
       pageNumber: z.number().min(1),
       pageX: z.number().min(0),
       pageY: z.number().min(0),
