@@ -1,24 +1,27 @@
+import type { Context, Next } from 'hono';
+
 import { extractSessionCookieFromHeaders } from '@documenso/auth/server/lib/session/session-cookies';
 import { getSession } from '@documenso/auth/server/lib/utils/get-session';
+import type { AppSession } from '@documenso/lib/client-only/providers/session';
 import { type TGetTeamByUrlResponse, getTeamByUrl } from '@documenso/lib/server-only/team/get-team';
 import { type TGetTeamsResponse, getTeams } from '@documenso/lib/server-only/team/get-teams';
-import { extractRequestMetadata } from '@documenso/lib/universal/extract-request-metadata';
+import {
+  type RequestMetadata,
+  extractRequestMetadata,
+} from '@documenso/lib/universal/extract-request-metadata';
 import { AppLogger } from '@documenso/lib/utils/debugger';
 
-type GetLoadContextArgs = {
-  request: Request;
+const logger = new AppLogger('Middleware');
+
+export type AppContext = {
+  requestMetadata: RequestMetadata;
+  session: AppSession | null;
 };
 
-declare module 'react-router' {
-  interface AppLoadContext extends Awaited<ReturnType<typeof getLoadContext>> {}
-}
-
-const logger = new AppLogger('Context');
-
-export async function getLoadContext(args: GetLoadContextArgs) {
+export const appContext = async (c: Context, next: Next) => {
   const initTime = Date.now();
 
-  const request = args.request;
+  const request = c.req.raw;
   const url = new URL(request.url);
 
   const noSessionCookie = extractSessionCookieFromHeaders(request.headers) === null;
@@ -26,10 +29,12 @@ export async function getLoadContext(args: GetLoadContextArgs) {
   if (!isPageRequest(request) || noSessionCookie || blacklistedPathsRegex.test(url.pathname)) {
     logger.log('Pathname ignored', url.pathname);
 
-    return {
+    setAppContext(c, {
       requestMetadata: extractRequestMetadata(request),
       session: null,
-    };
+    });
+
+    return next();
   }
 
   const splitUrl = url.pathname.replace('.data', '').split('/');
@@ -37,7 +42,7 @@ export async function getLoadContext(args: GetLoadContextArgs) {
   let team: TGetTeamByUrlResponse | null = null;
   let teams: TGetTeamsResponse = [];
 
-  const session = await getSession(args.request);
+  const session = await getSession(c);
 
   if (session.isAuthenticated) {
     let teamUrl = null;
@@ -58,7 +63,7 @@ export async function getLoadContext(args: GetLoadContextArgs) {
   const endTime = Date.now();
   logger.log(`Pathname accepted in ${endTime - initTime}ms`, url.pathname);
 
-  return {
+  setAppContext(c, {
     requestMetadata: extractRequestMetadata(request),
     session: session.isAuthenticated
       ? {
@@ -68,8 +73,14 @@ export async function getLoadContext(args: GetLoadContextArgs) {
           teams,
         }
       : null,
-  };
-}
+  });
+
+  return next();
+};
+
+const setAppContext = (c: Context, context: AppContext) => {
+  c.set('context', context);
+};
 
 const isPageRequest = (request: Request) => {
   const url = new URL(request.url);

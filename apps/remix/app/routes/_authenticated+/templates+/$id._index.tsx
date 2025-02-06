@@ -2,7 +2,7 @@ import { Trans } from '@lingui/macro';
 import { DocumentSigningOrder, SigningStatus } from '@prisma/client';
 import { ChevronLeft, LucideEdit } from 'lucide-react';
 import { Link, redirect, useNavigate } from 'react-router';
-import { getRequiredLoaderSession } from 'server/utils/get-loader-session';
+import { getLoaderSession } from 'server/utils/get-loader-session';
 
 import { getTemplateById } from '@documenso/lib/server-only/template/get-template-by-id';
 import { formatDocumentsPath, formatTemplatesPath } from '@documenso/lib/utils/teams';
@@ -24,8 +24,8 @@ import { superLoaderJson, useSuperLoaderData } from '~/utils/super-json-loader';
 
 import type { Route } from './+types/$id._index';
 
-export async function loader({ params, context }: Route.LoaderArgs) {
-  const { user, currentTeam: team } = getRequiredLoaderSession(context);
+export async function loader({ params }: Route.LoaderArgs) {
+  const { user, currentTeam: team } = getLoaderSession();
 
   const { id } = params;
 

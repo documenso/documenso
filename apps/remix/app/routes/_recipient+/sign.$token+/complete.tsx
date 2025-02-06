@@ -3,6 +3,7 @@ import { useLingui } from '@lingui/react';
 import { DocumentStatus, FieldType, RecipientRole } from '@prisma/client';
 import { CheckCircle2, Clock8, FileSearch } from 'lucide-react';
 import { Link } from 'react-router';
+import { getOptionalLoaderSession } from 'server/utils/get-loader-session';
 import { match } from 'ts-pattern';
 
 import signingCelebration from '@documenso/assets/images/signing-celebration.png';
@@ -27,14 +28,16 @@ import { DocumentSigningAuthPageView } from '~/components/general/document-signi
 
 import type { Route } from './+types/complete';
 
-export async function loader({ params, context }: Route.LoaderArgs) {
+export async function loader({ params }: Route.LoaderArgs) {
+  const session = getOptionalLoaderSession();
+
   const { token } = params;
 
   if (!token) {
     throw new Response('Not Found', { status: 404 });
   }
 
-  const user = context.session?.user;
+  const user = session?.user;
 
   const document = await getDocumentAndSenderByToken({
     token,

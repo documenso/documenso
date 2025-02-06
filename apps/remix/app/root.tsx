@@ -13,6 +13,7 @@ import {
   useLocation,
 } from 'react-router';
 import { ThemeProvider } from 'remix-themes';
+import { getOptionalLoaderSession } from 'server/utils/get-loader-session';
 
 import { SessionProvider } from '@documenso/lib/client-only/providers/session';
 import { APP_I18N_OPTIONS, type SupportedLanguageCodes } from '@documenso/lib/constants/i18n';
@@ -82,7 +83,9 @@ export const links: Route.LinksFunction = () => [
 //   };
 // }
 
-export async function loader({ request, context }: Route.LoaderArgs) {
+export async function loader({ request }: Route.LoaderArgs) {
+  const session = getOptionalLoaderSession();
+
   const { getTheme } = await themeSessionResolver(request);
 
   let lang: SupportedLanguageCodes = await langCookie.parse(request.headers.get('cookie') ?? '');
@@ -95,7 +98,7 @@ export async function loader({ request, context }: Route.LoaderArgs) {
     {
       lang,
       theme: getTheme(),
-      session: context.session,
+      session,
       __ENV__: Object.fromEntries(
         Object.entries(process.env).filter(([key]) => key.startsWith('NEXT_')), // Todo: I'm pretty sure this will leak?
       ),

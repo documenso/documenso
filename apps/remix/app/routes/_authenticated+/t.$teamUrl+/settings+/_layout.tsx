@@ -1,16 +1,14 @@
 import { Trans } from '@lingui/macro';
 import { Outlet } from 'react-router';
-import { getRequiredLoaderTeamSession } from 'server/utils/get-loader-session';
+import { getLoaderTeamSession } from 'server/utils/get-loader-session';
 
 import { canExecuteTeamAction } from '@documenso/lib/utils/teams';
 
 import { TeamSettingsNavDesktop } from '~/components/general/teams/team-settings-nav-desktop';
 import { TeamSettingsNavMobile } from '~/components/general/teams/team-settings-nav-mobile';
 
-import type { Route } from '../+types/_layout';
-
-export function loader({ context }: Route.LoaderArgs) {
-  const { currentTeam: team } = getRequiredLoaderTeamSession(context);
+export function loader() {
+  const { currentTeam: team } = getLoaderTeamSession();
 
   if (!team || !canExecuteTeamAction('MANAGE_TEAM', team.currentTeamMember.role)) {
     throw new Response(null, { status: 401 }); // Unauthorized.

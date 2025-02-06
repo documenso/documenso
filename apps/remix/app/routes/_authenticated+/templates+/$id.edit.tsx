@@ -1,7 +1,7 @@
 import { Trans } from '@lingui/macro';
 import { ChevronLeft } from 'lucide-react';
 import { Link, redirect } from 'react-router';
-import { getRequiredLoaderSession } from 'server/utils/get-loader-session';
+import { getLoaderSession } from 'server/utils/get-loader-session';
 
 import { isUserEnterprise } from '@documenso/ee/server-only/util/is-document-enterprise';
 import { getTemplateById } from '@documenso/lib/server-only/template/get-template-by-id';
@@ -15,8 +15,8 @@ import { superLoaderJson, useSuperLoaderData } from '~/utils/super-json-loader';
 import { TemplateDirectLinkDialogWrapper } from '../../../components/dialogs/template-direct-link-dialog-wrapper';
 import type { Route } from './+types/$id.edit';
 
-export async function loader({ context, params }: Route.LoaderArgs) {
-  const { user, currentTeam: team } = getRequiredLoaderSession(context);
+export async function loader({ params }: Route.LoaderArgs) {
+  const { user, currentTeam: team } = getLoaderSession();
 
   const { id } = params;
 

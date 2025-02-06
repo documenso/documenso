@@ -1,4 +1,5 @@
-import { Outlet, redirect } from 'react-router';
+import { Outlet } from 'react-router';
+import { getLoaderSession } from 'server/utils/get-loader-session';
 
 import { getLimits } from '@documenso/ee/server-only/limits/client';
 import { LimitsProvider } from '@documenso/ee/server-only/limits/provider/client';
@@ -11,29 +12,25 @@ import { VerifyEmailBanner } from '~/components/general/verify-email-banner';
 
 import type { Route } from './+types/_layout';
 
-export const loader = async ({ request, context }: Route.LoaderArgs) => {
-  const { session } = context;
-
-  if (!session) {
-    throw redirect('/signin');
-  }
+export const loader = async ({ request }: Route.LoaderArgs) => {
+  const { user, teams, currentTeam } = getLoaderSession();
 
   const requestHeaders = Object.fromEntries(request.headers.entries());
 
   // Todo: Should only load this on first render.
   const [limits, banner] = await Promise.all([
-    getLimits({ headers: requestHeaders, teamId: session.currentTeam?.id }),
+    getLimits({ headers: requestHeaders, teamId: currentTeam?.id }),
     getSiteSettings().then((settings) =>
       settings.find((setting) => setting.id === SITE_SETTINGS_BANNER_ID),
     ),
   ]);
 
   return {
-    user: session.user,
-    teams: session.teams,
+    user,
+    teams,
     banner,
     limits,
-    teamId: session.currentTeam?.id,
+    teamId: currentTeam?.id,
   };
 };
 

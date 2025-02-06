@@ -5,7 +5,7 @@ import type { Recipient } from '@prisma/client';
 import { ChevronLeft } from 'lucide-react';
 import { DateTime } from 'luxon';
 import { Link, redirect } from 'react-router';
-import { getRequiredLoaderSession } from 'server/utils/get-loader-session';
+import { getLoaderSession } from 'server/utils/get-loader-session';
 
 import { getDocumentById } from '@documenso/lib/server-only/document/get-document-by-id';
 import { getRecipientsForDocument } from '@documenso/lib/server-only/recipient/get-recipients-for-document';
@@ -22,10 +22,10 @@ import { DocumentLogsTable } from '~/components/tables/document-logs-table';
 
 import type { Route } from './+types/$id.logs';
 
-export async function loader({ params, context }: Route.LoaderArgs) {
+export async function loader({ params }: Route.LoaderArgs) {
   const { id } = params;
 
-  const { user, currentTeam: team } = getRequiredLoaderSession(context);
+  const { user, currentTeam: team } = getLoaderSession();
 
   const documentId = Number(id);
 

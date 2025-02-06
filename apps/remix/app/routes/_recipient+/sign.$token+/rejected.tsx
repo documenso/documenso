@@ -2,6 +2,7 @@ import { Trans } from '@lingui/macro';
 import { FieldType } from '@prisma/client';
 import { XCircle } from 'lucide-react';
 import { Link } from 'react-router';
+import { getOptionalLoaderSession } from 'server/utils/get-loader-session';
 
 import { useOptionalSession } from '@documenso/lib/client-only/providers/session';
 import { getDocumentAndSenderByToken } from '@documenso/lib/server-only/document/get-document-by-token';
@@ -16,14 +17,16 @@ import { truncateTitle } from '~/utils/truncate-title';
 
 import type { Route } from './+types/rejected';
 
-export async function loader({ params, context }: Route.LoaderArgs) {
+export async function loader({ params }: Route.LoaderArgs) {
+  const session = getOptionalLoaderSession();
+
   const { token } = params;
 
   if (!token) {
     throw new Response('Not Found', { status: 404 });
   }
 
-  const user = context.session?.user;
+  const user = session?.user;
 
   const document = await getDocumentAndSenderByToken({
     token,

@@ -1,16 +1,14 @@
 import { Trans } from '@lingui/macro';
 import { BarChart3, FileStack, Settings, Trophy, Users, Wallet2 } from 'lucide-react';
 import { Link, Outlet, redirect, useLocation } from 'react-router';
-import { getRequiredLoaderSession } from 'server/utils/get-loader-session';
+import { getLoaderSession } from 'server/utils/get-loader-session';
 
 import { isAdmin } from '@documenso/lib/next-auth/guards/is-admin';
 import { cn } from '@documenso/ui/lib/utils';
 import { Button } from '@documenso/ui/primitives/button';
 
-import type { Route } from './+types/_layout';
-
-export function loader({ context }: Route.LoaderArgs) {
-  const { user } = getRequiredLoaderSession(context);
+export function loader() {
+  const { user } = getLoaderSession();
 
   if (!user || !isAdmin(user)) {
     throw redirect('/documents');

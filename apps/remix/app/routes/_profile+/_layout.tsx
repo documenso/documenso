@@ -6,24 +6,15 @@ import { ChevronLeft } from 'lucide-react';
 import { Link, Outlet } from 'react-router';
 
 import LogoIcon from '@documenso/assets/logo_icon.png';
+import { useSession } from '@documenso/lib/client-only/providers/session';
 import { cn } from '@documenso/ui/lib/utils';
 import { Button } from '@documenso/ui/primitives/button';
 
 import { Header as AuthenticatedHeader } from '~/components/general/app-header';
-import { Logo } from '~/components/general/branding-logo';
+import { BrandingLogo } from '~/components/general/branding-logo';
 
-import type { Route } from './+types/_layout';
-
-export function loader({ context }: Route.LoaderArgs) {
-  const { session } = context;
-
-  return {
-    session,
-  };
-}
-
-export default function PublicProfileLayout({ loaderData }: Route.ComponentProps) {
-  const { session } = loaderData;
+export default function PublicProfileLayout() {
+  const session = useSession();
 
   const [scrollY, setScrollY] = useState(0);
 
@@ -53,7 +44,7 @@ export default function PublicProfileLayout({ loaderData }: Route.ComponentProps
               to="/"
               className="focus-visible:ring-ring ring-offset-background rounded-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 md:inline"
             >
-              <Logo className="hidden h-6 w-auto sm:block" />
+              <BrandingLogo className="hidden h-6 w-auto sm:block" />
 
               <img
                 src={LogoIcon}

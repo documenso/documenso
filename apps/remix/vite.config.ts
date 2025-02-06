@@ -8,8 +8,6 @@ import { defineConfig, loadEnv } from 'vite';
 import macrosPlugin from 'vite-plugin-babel-macros';
 import tsconfigPaths from 'vite-tsconfig-paths';
 
-import { getLoadContext } from './server/load-context';
-
 export default defineConfig({
   envDir: path.join(__dirname, '../../'),
   envPrefix: '__DO_NOT_USE_OR_YOU_WILL_BE_FIRED__',
@@ -54,7 +52,6 @@ export default defineConfig({
     lingui(),
     macrosPlugin(),
     serverAdapter({
-      getLoadContext,
       entry: 'server/index.ts',
     }),
     tsconfigPaths(),

@@ -1,6 +1,7 @@
 import { Plural } from '@lingui/macro';
 import { UsersIcon } from 'lucide-react';
 import { redirect } from 'react-router';
+import { getOptionalLoaderSession } from 'server/utils/get-loader-session';
 import { match } from 'ts-pattern';
 
 import { useOptionalSession } from '@documenso/lib/client-only/providers/session';
@@ -16,7 +17,9 @@ import { superLoaderJson, useSuperLoaderData } from '~/utils/super-json-loader';
 
 import type { Route } from './+types/_index';
 
-export async function loader({ params, context }: Route.LoaderArgs) {
+export async function loader({ params }: Route.LoaderArgs) {
+  const session = getOptionalLoaderSession();
+
   const { token } = params;
 
   if (!token) {
@@ -45,7 +48,7 @@ export async function loader({ params, context }: Route.LoaderArgs) {
 
   // Ensure typesafety when we add more options.
   const isAccessAuthValid = match(derivedRecipientAccessAuth)
-    .with(DocumentAccessAuth.ACCOUNT, () => context.session?.user !== null)
+    .with(DocumentAccessAuth.ACCOUNT, () => session?.user !== null)
     .with(null, () => true)
     .exhaustive();
 
@@ -67,6 +70,7 @@ export default function DirectTemplatePage() {
 
   const data = useSuperLoaderData<typeof loader>();
 
+  // Should not be possible for directLink to be null.
   if (!data.isAccessAuthValid) {
     return <DirectTemplateAuthPageView />;
   }

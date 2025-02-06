@@ -1,6 +1,6 @@
 import { DocumentStatus } from '@prisma/client';
 import { data } from 'react-router';
-import { getRequiredLoaderSession } from 'server/utils/get-loader-session';
+import { getLoaderSession } from 'server/utils/get-loader-session';
 import { match } from 'ts-pattern';
 
 import { isUserEnterprise } from '@documenso/ee/server-only/util/is-document-enterprise';
@@ -20,14 +20,14 @@ import { superLoaderJson, useSuperLoaderData } from '~/utils/super-json-loader';
 
 import type { Route } from './+types/sign.$url';
 
-export async function loader({ params, context }: Route.LoaderArgs) {
+export async function loader({ params }: Route.LoaderArgs) {
   if (!params.url) {
     throw new Response('Not found', { status: 404 });
   }
 
   const token = params.url;
 
-  const { user } = getRequiredLoaderSession(context);
+  const { user } = getLoaderSession();
 
   const [document, fields, recipient] = await Promise.all([
     getDocumentAndSenderByToken({

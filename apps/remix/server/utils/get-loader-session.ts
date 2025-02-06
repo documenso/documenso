@@ -1,31 +1,43 @@
-import type { AppLoadContext } from 'react-router';
+import { getContext } from 'hono/context-storage';
 import { redirect } from 'react-router';
+import type { HonoEnv } from 'server';
+
+import type { AppSession } from '@documenso/lib/client-only/providers/session';
 
 /**
  * Returns the session context or throws a redirect to signin if it is not present.
  */
-export const getRequiredLoaderSession = (context: AppLoadContext) => {
-  if (!context.session) {
+export const getLoaderSession = (): AppSession => {
+  const session = getOptionalLoaderSession();
+
+  if (!session) {
     throw redirect('/signin'); // Todo: Maybe add a redirect cookie to come back?
   }
 
+  return session;
+};
+
+export const getOptionalLoaderSession = (): AppSession | null => {
+  const { context } = getContext<HonoEnv>().var;
   return context.session;
 };
 
 /**
  * Returns the team session context or throws a redirect to signin if it is not present.
  */
-export const getRequiredLoaderTeamSession = (context: AppLoadContext) => {
-  if (!context.session) {
+export const getLoaderTeamSession = () => {
+  const session = getOptionalLoaderSession();
+
+  if (!session) {
     throw redirect('/signin'); // Todo: Maybe add a redirect cookie to come back?
   }
 
-  if (!context.session.currentTeam) {
+  if (!session.currentTeam) {
     throw new Response(null, { status: 404 }); // Todo: Test that 404 page shows up.
   }
 
   return {
-    ...context.session,
-    currentTeam: context.session.currentTeam,
+    ...session,
+    currentTeam: session.currentTeam,
   };
 };

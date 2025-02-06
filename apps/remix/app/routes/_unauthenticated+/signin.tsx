@@ -1,5 +1,6 @@
 import { Trans } from '@lingui/macro';
 import { Link, redirect } from 'react-router';
+import { getOptionalLoaderSession } from 'server/utils/get-loader-session';
 
 import {
   IS_GOOGLE_SSO_ENABLED,
@@ -10,14 +11,14 @@ import { env } from '@documenso/lib/utils/env';
 
 import { SignInForm } from '~/components/forms/signin';
 
-import type { Route } from './+types/signin';
-
 export function meta() {
   return [{ title: 'Sign In' }];
 }
 
-export function loader({ context }: Route.LoaderArgs) {
-  if (context.session) {
+export function loader() {
+  const session = getOptionalLoaderSession();
+
+  if (session) {
     throw redirect('/documents');
   }
 }

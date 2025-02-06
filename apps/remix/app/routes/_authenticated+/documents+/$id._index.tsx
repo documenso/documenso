@@ -3,7 +3,7 @@ import { useLingui } from '@lingui/react';
 import { DocumentStatus, TeamMemberRole } from '@prisma/client';
 import { ChevronLeft, Clock9, Users2 } from 'lucide-react';
 import { Link, redirect } from 'react-router';
-import { getRequiredLoaderSession } from 'server/utils/get-loader-session';
+import { getLoaderSession } from 'server/utils/get-loader-session';
 import { match } from 'ts-pattern';
 
 import { useSession } from '@documenso/lib/client-only/providers/session';
@@ -34,8 +34,8 @@ import { superLoaderJson, useSuperLoaderData } from '~/utils/super-json-loader';
 
 import type { Route } from './+types/$id._index';
 
-export async function loader({ params, context }: Route.LoaderArgs) {
-  const { user, currentTeam: team } = getRequiredLoaderSession(context);
+export async function loader({ params }: Route.LoaderArgs) {
+  const { user, currentTeam: team } = getLoaderSession();
 
   const { id } = params;
 

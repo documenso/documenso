@@ -1,7 +1,7 @@
 import { Plural, Trans, msg } from '@lingui/macro';
 import { useLingui } from '@lingui/react';
 import { DateTime } from 'luxon';
-import { getRequiredLoaderTeamSession } from 'server/utils/get-loader-session';
+import { getLoaderTeamSession } from 'server/utils/get-loader-session';
 import type Stripe from 'stripe';
 import { match } from 'ts-pattern';
 
@@ -15,8 +15,8 @@ import { TeamSettingsBillingInvoicesTable } from '~/components/tables/team-setti
 
 import type { Route } from './+types/billing';
 
-export async function loader({ context }: Route.LoaderArgs) {
-  const { currentTeam: team } = getRequiredLoaderTeamSession(context);
+export async function loader() {
+  const { currentTeam: team } = getLoaderTeamSession();
 
   let teamSubscription: Stripe.Subscription | null = null;
 

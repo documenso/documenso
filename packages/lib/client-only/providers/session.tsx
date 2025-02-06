@@ -1,25 +1,30 @@
 import { createContext, useContext } from 'react';
 import React from 'react';
 
-import type { Session, User } from '@prisma/client';
+import type { Session, User } from '@documenso/prisma/client';
 
-interface AuthProviderProps {
-  children: React.ReactNode;
-  session: DocumensoSession | null;
-}
+import type { TGetTeamByUrlResponse } from '../../server-only/team/get-team';
+import type { TGetTeamsResponse } from '../../server-only/team/get-teams';
 
-export type DocumensoSession = {
-  user: User; // Todo: Exclude password
+export type AppSession = {
   session: Session;
+  user: User; // Todo: Remove password, and redundant fields.
+  currentTeam: TGetTeamByUrlResponse | null;
+  teams: TGetTeamsResponse;
 };
 
-const SessionContext = createContext<DocumensoSession | null>(null);
+interface SessionProviderProps {
+  children: React.ReactNode;
+  session: AppSession | null;
+}
+
+const SessionContext = createContext<AppSession | null>(null);
 
 export const useSession = () => {
   const context = useContext(SessionContext);
 
   if (!context) {
-    throw new Error('useAuth must be used within a AuthProvider');
+    throw new Error('useSession must be used within a SessionProvider');
   }
 
   return context;
@@ -34,6 +39,6 @@ export const useOptionalSession = () => {
   );
 };
 
-export const SessionProvider = ({ children, session }: AuthProviderProps) => {
+export const SessionProvider = ({ children, session }: SessionProviderProps) => {
   return <SessionContext.Provider value={session}>{children}</SessionContext.Provider>;
 };

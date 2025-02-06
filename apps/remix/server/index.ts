@@ -1,4 +1,5 @@
 import { Hono } from 'hono';
+import { contextStorage } from 'hono/context-storage';
 import { PDFDocument } from 'pdf-lib';
 
 import { tsRestHonoApp } from '@documenso/api/hono';
@@ -11,10 +12,21 @@ import { putFile } from '@documenso/lib/universal/upload/put-file';
 import { getPresignGetUrl } from '@documenso/lib/universal/upload/server-actions';
 import { openApiDocument } from '@documenso/trpc/server/open-api';
 
+import { type AppContext, appContext } from './context';
 import { openApiTrpcServerHandler } from './trpc/hono-trpc-open-api';
 import { reactRouterTrpcServer } from './trpc/hono-trpc-remix';
 
-const app = new Hono();
+export interface HonoEnv {
+  Variables: {
+    context: AppContext;
+  };
+}
+
+const app = new Hono<HonoEnv>();
+
+app.use(contextStorage());
+
+app.use(appContext);
 
 // App middleware.
 // app.use('*', appMiddleware);

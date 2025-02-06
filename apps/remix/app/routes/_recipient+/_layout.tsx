@@ -1,6 +1,7 @@
 import { Trans } from '@lingui/macro';
 import { ChevronLeft } from 'lucide-react';
 import { Link, Outlet } from 'react-router';
+import { getOptionalLoaderSession } from 'server/utils/get-loader-session';
 
 import { Button } from '@documenso/ui/primitives/button';
 
@@ -8,10 +9,12 @@ import { Header as AuthenticatedHeader } from '~/components/general/app-header';
 
 import type { Route } from './+types/_layout';
 
-export function loader({ context }: Route.LoaderArgs) {
+export function loader() {
+  const session = getOptionalLoaderSession();
+
   return {
-    user: context.session?.user,
-    teams: context.session?.teams || [],
+    user: session?.user,
+    teams: session?.teams || [],
   };
 }
 

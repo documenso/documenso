@@ -1,9 +1,10 @@
 import { redirect } from 'react-router';
+import { getOptionalLoaderSession } from 'server/utils/get-loader-session';
 
-import type { Route } from './+types/_index';
+export function loader() {
+  const session = getOptionalLoaderSession();
 
-export function loader({ context }: Route.LoaderArgs) {
-  if (context.session) {
+  if (session) {
     throw redirect('/documents');
   }
 
