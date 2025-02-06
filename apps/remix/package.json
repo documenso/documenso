@@ -47,6 +47,7 @@
     "lucide-react": "^0.279.0",
     "luxon": "^3.4.0",
     "papaparse": "^5.4.1",
+    "plausible-tracker": "^0.3.9",
     "posthog-js": "^1.75.3",
     "posthog-node": "^3.1.1",
     "react": "^18",

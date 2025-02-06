@@ -2,13 +2,13 @@ import { useEffect, useLayoutEffect, useState } from 'react';
 
 import { Trans, msg } from '@lingui/macro';
 import { useLingui } from '@lingui/react';
+import type { DocumentMeta, Recipient, TemplateMeta } from '@prisma/client';
+import { type DocumentData, type Field, FieldType } from '@prisma/client';
 import { LucideChevronDown, LucideChevronUp } from 'lucide-react';
 
 import { useThrottleFn } from '@documenso/lib/client-only/hooks/use-throttle-fn';
 import { PDF_VIEWER_PAGE_SELECTOR } from '@documenso/lib/constants/pdf-viewer';
 import { validateFieldsInserted } from '@documenso/lib/utils/fields';
-import type { DocumentMeta, Recipient, TemplateMeta } from '@documenso/prisma/client';
-import { type DocumentData, type Field, FieldType } from '@documenso/prisma/client';
 import { trpc } from '@documenso/trpc/react';
 import { FieldToolTip } from '@documenso/ui/components/field/field-tooltip';
 import { Button } from '@documenso/ui/primitives/button';

@@ -1,7 +1,7 @@
 import { Trans } from '@lingui/macro';
+import type { Signature } from '@prisma/client';
 
 import signingCelebration from '@documenso/assets/images/signing-celebration.png';
-import type { Signature } from '@documenso/prisma/client';
 import { SigningCard3D } from '@documenso/ui/components/signing-card';
 
 export type EmbedDocumentCompletedPageProps = {

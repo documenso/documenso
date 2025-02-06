@@ -1,3 +1,4 @@
+import { DocumentStatus } from '@prisma/client';
 import { data } from 'react-router';
 import { getRequiredLoaderSession } from 'server/utils/get-loader-session';
 import { match } from 'ts-pattern';
@@ -11,7 +12,6 @@ import { getRecipientByToken } from '@documenso/lib/server-only/recipient/get-re
 import { getTeamById } from '@documenso/lib/server-only/team/get-team';
 import { DocumentAccessAuth } from '@documenso/lib/types/document-auth';
 import { extractDocumentAuthMethods } from '@documenso/lib/utils/document-auth';
-import { DocumentStatus } from '@documenso/prisma/client';
 
 import { EmbedSignDocumentClientPage } from '~/components/embed/embed-document-signing-page';
 import { DocumentSigningAuthProvider } from '~/components/general/document-signing/document-signing-auth-provider';

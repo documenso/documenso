@@ -2,6 +2,8 @@ import { useEffect, useLayoutEffect, useState } from 'react';
 
 import { Trans, msg } from '@lingui/macro';
 import { useLingui } from '@lingui/react';
+import { type DocumentData, type Field, FieldType } from '@prisma/client';
+import type { DocumentMeta, Recipient, Signature, TemplateMeta } from '@prisma/client';
 import { LucideChevronDown, LucideChevronUp } from 'lucide-react';
 import { DateTime } from 'luxon';
 import { useSearchParams } from 'react-router';
@@ -11,8 +13,6 @@ import { DEFAULT_DOCUMENT_DATE_FORMAT } from '@documenso/lib/constants/date-form
 import { PDF_VIEWER_PAGE_SELECTOR } from '@documenso/lib/constants/pdf-viewer';
 import { DEFAULT_DOCUMENT_TIME_ZONE } from '@documenso/lib/constants/time-zones';
 import { validateFieldsInserted } from '@documenso/lib/utils/fields';
-import type { DocumentMeta, Recipient, Signature, TemplateMeta } from '@documenso/prisma/client';
-import { type DocumentData, type Field, FieldType } from '@documenso/prisma/client';
 import { trpc } from '@documenso/trpc/react';
 import type {
   TRemovedSignedFieldWithTokenMutationSchema,

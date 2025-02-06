@@ -1,4 +1,5 @@
 import { Trans } from '@lingui/macro';
+import { TeamMemberInviteStatus } from '@prisma/client';
 import { DateTime } from 'luxon';
 import { Link } from 'react-router';
 
@@ -6,7 +7,6 @@ import { encryptSecondaryData } from '@documenso/lib/server-only/crypto/encrypt'
 import { acceptTeamInvitation } from '@documenso/lib/server-only/team/accept-team-invitation';
 import { getTeamById } from '@documenso/lib/server-only/team/get-team';
 import { prisma } from '@documenso/prisma';
-import { TeamMemberInviteStatus } from '@documenso/prisma/client';
 import { Button } from '@documenso/ui/primitives/button';
 
 import type { Route } from './+types/team.invite.$token';

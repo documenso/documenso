@@ -1,5 +1,6 @@
-import { Suspense } from 'react';
+import { Suspense, useEffect } from 'react';
 
+import Plausible from 'plausible-tracker';
 import {
   Links,
   Meta,
@@ -9,6 +10,7 @@ import {
   data,
   isRouteErrorResponse,
   useLoaderData,
+  useLocation,
 } from 'react-router';
 import { ThemeProvider } from 'remix-themes';
 
@@ -26,6 +28,10 @@ import { RefreshOnFocus } from './components/general/refresh-on-focus';
 import { PostHogPageview } from './providers/posthog';
 import { langCookie } from './storage/lang-cookie.server';
 import { themeSessionResolver } from './storage/theme-session.server';
+
+const { trackPageview } = Plausible({
+  domain: 'documenso.com',
+});
 
 export const links: Route.LinksFunction = () => [
   { rel: 'preconnect', href: 'https://fonts.googleapis.com' },
@@ -145,6 +151,12 @@ export function Layout({ children }: { children: React.ReactNode }) {
 }
 
 export default function App({ loaderData }: Route.ComponentProps) {
+  const location = useLocation();
+
+  useEffect(() => {
+    trackPageview();
+  }, [location.pathname]);
+
   return (
     <SessionProvider session={loaderData.session}>
       {/* Todo: Themes (this won't work for now) */}

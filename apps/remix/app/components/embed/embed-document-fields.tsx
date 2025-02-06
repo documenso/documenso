@@ -1,3 +1,5 @@
+import type { DocumentMeta, Recipient, TemplateMeta } from '@prisma/client';
+import { type Field, FieldType } from '@prisma/client';
 import { match } from 'ts-pattern';
 
 import { DEFAULT_DOCUMENT_DATE_FORMAT } from '@documenso/lib/constants/date-formats';
@@ -10,8 +12,6 @@ import {
   ZRadioFieldMeta,
   ZTextFieldMeta,
 } from '@documenso/lib/types/field-meta';
-import type { DocumentMeta, Recipient, TemplateMeta } from '@documenso/prisma/client';
-import { type Field, FieldType } from '@documenso/prisma/client';
 import type { FieldWithSignatureAndFieldMeta } from '@documenso/prisma/types/field-with-signature-and-fieldmeta';
 import type {
   TRemovedSignedFieldWithTokenMutationSchema,

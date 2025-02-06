@@ -2,12 +2,12 @@ import { useState } from 'react';
 
 import { Trans, msg } from '@lingui/macro';
 import { useLingui } from '@lingui/react';
+import type { TeamMemberRole } from '@prisma/client';
+import { type Subscription, SubscriptionStatus } from '@prisma/client';
 import { AlertTriangle } from 'lucide-react';
 import { match } from 'ts-pattern';
 
 import { canExecuteTeamAction } from '@documenso/lib/utils/teams';
-import type { TeamMemberRole } from '@documenso/prisma/client';
-import { type Subscription, SubscriptionStatus } from '@documenso/prisma/client';
 import { trpc } from '@documenso/trpc/react';
 import { cn } from '@documenso/ui/lib/utils';
 import { Button } from '@documenso/ui/primitives/button';
