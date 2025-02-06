@@ -259,14 +259,23 @@ export type TCreateDocumentFromTemplateMutationResponseSchema = z.infer<
 export const ZGenerateDocumentFromTemplateMutationSchema = z.object({
   title: z.string().optional(),
   externalId: z.string().optional(),
-  recipients: z.array(
-    z.object({
-      id: z.number(),
-      email: z.string().email(),
-      name: z.string().optional(),
-      signingOrder: z.number().optional(),
-    }),
-  ),
+  recipients: z
+    .array(
+      z.object({
+        id: z.number(),
+        email: z.string().email(),
+        name: z.string().optional(),
+        signingOrder: z.number().optional(),
+      }),
+    )
+    .refine(
+      (schema) => {
+        const ids = schema.map((signer) => signer.id);
+
+        return new Set(ids).size === ids.length;
+      },
+      { message: 'Recipient IDs must be unique' },
+    ),
   meta: z
     .object({
       subject: z.string(),
