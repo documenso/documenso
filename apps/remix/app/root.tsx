@@ -15,7 +15,7 @@ import {
 import { ThemeProvider } from 'remix-themes';
 
 import { SessionProvider } from '@documenso/lib/client-only/providers/session';
-import { APP_I18N_OPTIONS } from '@documenso/lib/constants/i18n';
+import { APP_I18N_OPTIONS, type SupportedLanguageCodes } from '@documenso/lib/constants/i18n';
 import { extractLocaleData } from '@documenso/lib/utils/i18n';
 import { TrpcProvider } from '@documenso/trpc/react';
 import { Toaster } from '@documenso/ui/primitives/toaster';
@@ -85,10 +85,10 @@ export const links: Route.LinksFunction = () => [
 export async function loader({ request, context }: Route.LoaderArgs) {
   const { getTheme } = await themeSessionResolver(request);
 
-  let lang = await langCookie.parse(request.headers.get('cookie') ?? '');
+  let lang: SupportedLanguageCodes = await langCookie.parse(request.headers.get('cookie') ?? '');
 
   if (!APP_I18N_OPTIONS.supportedLangs.includes(lang)) {
-    lang = extractLocaleData({ headers: request.headers });
+    lang = extractLocaleData({ headers: request.headers }).lang;
   }
 
   return data(
