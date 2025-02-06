@@ -61,7 +61,7 @@ export const DocumentReadOnlyFields = ({
                   trigger={
                     <Avatar className="dark:border-foreground h-8 w-8 border-2 border-solid border-gray-200/50 transition-colors hover:border-gray-200">
                       <AvatarFallback className="bg-neutral-50 text-xs text-gray-400">
-                        {extractInitials(field.Recipient.name || field.Recipient.email)}
+                        {extractInitials(field.recipient.name || field.recipient.email)}
                       </AvatarFallback>
                     </Avatar>
                   }
@@ -73,12 +73,12 @@ export const DocumentReadOnlyFields = ({
                     <Badge
                       className="mx-auto mb-1 py-0.5"
                       variant={
-                        field.Recipient.signingStatus === SigningStatus.SIGNED
+                        field.recipient.signingStatus === SigningStatus.SIGNED
                           ? 'default'
                           : 'secondary'
                       }
                     >
-                      {field.Recipient.signingStatus === SigningStatus.SIGNED ? (
+                      {field.recipient.signingStatus === SigningStatus.SIGNED ? (
                         <>
                           <SignatureIcon className="mr-1 h-3 w-3" />
                           <Trans>Signed</Trans>
@@ -97,9 +97,9 @@ export const DocumentReadOnlyFields = ({
                   </p>
 
                   <p className="text-muted-foreground mt-1 text-center text-xs">
-                    {field.Recipient.name
-                      ? `${field.Recipient.name} (${field.Recipient.email})`
-                      : field.Recipient.email}{' '}
+                    {field.recipient.name
+                      ? `${field.recipient.name} (${field.recipient.email})`
+                      : field.recipient.email}{' '}
                   </p>
 
                   <button
@@ -113,18 +113,18 @@ export const DocumentReadOnlyFields = ({
               </div>
 
               <div className="text-muted-foreground dark:text-background/70 break-all text-sm">
-                {field.Recipient.signingStatus === SigningStatus.SIGNED &&
+                {field.recipient.signingStatus === SigningStatus.SIGNED &&
                   match(field)
                     .with({ type: FieldType.SIGNATURE }, (field) =>
-                      field.Signature?.signatureImageAsBase64 ? (
+                      field.signature?.signatureImageAsBase64 ? (
                         <img
-                          src={field.Signature.signatureImageAsBase64}
+                          src={field.signature.signatureImageAsBase64}
                           alt="Signature"
                           className="h-full w-full object-contain dark:invert"
                         />
                       ) : (
                         <p className="font-signature text-muted-foreground text-lg duration-200 sm:text-xl md:text-2xl">
-                          {field.Signature?.typedSignature}
+                          {field.signature?.typedSignature}
                         </p>
                       ),
                     )
@@ -153,7 +153,7 @@ export const DocumentReadOnlyFields = ({
                     .with({ type: FieldType.FREE_SIGNATURE }, () => null)
                     .exhaustive()}
 
-                {field.Recipient.signingStatus === SigningStatus.NOT_SIGNED && (
+                {field.recipient.signingStatus === SigningStatus.NOT_SIGNED && (
                   <p
                     className={cn('text-muted-foreground text-lg duration-200', {
                       'font-signature sm:text-xl md:text-2xl':

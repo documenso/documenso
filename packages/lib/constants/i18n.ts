@@ -1,6 +1,6 @@
 import { z } from 'zod';
 
-export const SUPPORTED_LANGUAGE_CODES = ['de', 'en', 'fr', 'es'] as const;
+export const SUPPORTED_LANGUAGE_CODES = ['de', 'en', 'fr', 'es', 'it', 'pl'] as const;
 
 export const ZSupportedLanguageCodeSchema = z.enum(SUPPORTED_LANGUAGE_CODES).catch('en');
 
@@ -45,6 +45,14 @@ export const SUPPORTED_LANGUAGES: Record<string, SupportedLanguage> = {
   es: {
     full: 'Spanish',
     short: 'es',
+  },
+  it: {
+    full: 'Italian',
+    short: 'it',
+  },
+  pl: {
+    short: 'pl',
+    full: 'Polish',
   },
 } satisfies Record<SupportedLanguageCodes, SupportedLanguage>;
 

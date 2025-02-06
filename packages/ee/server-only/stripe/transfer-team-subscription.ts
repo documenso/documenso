@@ -14,7 +14,7 @@ type TransferStripeSubscriptionOptions = {
   /**
    * The user to transfer the subscription to.
    */
-  user: User & { Subscription: Subscription[] };
+  user: User & { subscriptions: Subscription[] };
 
   /**
    * The team the subscription is associated with.
@@ -43,7 +43,9 @@ export const transferTeamSubscription = async ({
   const teamCustomerId = team.customerId;
 
   if (!teamCustomerId) {
-    throw new AppError(AppErrorCode.NOT_FOUND, 'Missing customer ID.');
+    throw new AppError(AppErrorCode.NOT_FOUND, {
+      message: 'Missing customer ID.',
+    });
   }
 
   const [teamRelatedPlanPriceIds, teamSeatPrices] = await Promise.all([
@@ -52,7 +54,7 @@ export const transferTeamSubscription = async ({
   ]);
 
   const teamSubscriptionRequired = !subscriptionsContainsActivePlan(
-    user.Subscription,
+    user.subscriptions,
     teamRelatedPlanPriceIds,
   );
 

@@ -34,6 +34,7 @@ import {
   ZFieldMetaSchema,
 } from '@documenso/lib/types/field-meta';
 import { nanoid } from '@documenso/lib/universal/id';
+import { ADVANCED_FIELD_TYPES_WITH_OPTIONAL_SETTING } from '@documenso/lib/utils/advanced-fields-helpers';
 import { validateFieldsUninserted } from '@documenso/lib/utils/fields';
 import { parseMessageDescriptor } from '@documenso/lib/utils/i18n';
 import {
@@ -129,6 +130,7 @@ export const AddFieldsFormPartial = ({
     currentStep === 1 && typeof documentFlow.onBackStep === 'function' && canGoBack;
   const [showAdvancedSettings, setShowAdvancedSettings] = useState(false);
   const [currentField, setCurrentField] = useState<FieldFormType>();
+  const [activeFieldId, setActiveFieldId] = useState<string | null>(null);
 
   const form = useForm<TAddFieldsFormSchema>({
     defaultValues: {
@@ -352,6 +354,13 @@ export const AddFieldsFormPartial = ({
 
       append(field);
 
+      // Only open fields with significant amount of settings (instead of just a font setting) to
+      // reduce friction when adding fields.
+      if (ADVANCED_FIELD_TYPES_WITH_OPTIONAL_SETTING.includes(selectedField)) {
+        setCurrentField(field);
+        setShowAdvancedSettings(true);
+      }
+
       setIsFieldWithinBounds(false);
       setSelectedField(null);
     },
@@ -499,7 +508,15 @@ export const AddFieldsFormPartial = ({
   }, []);
 
   useEffect(() => {
-    setSelectedSigner(recipients.find((r) => r.sendStatus !== SendStatus.SENT) ?? recipients[0]);
+    const recipientsByRoleToDisplay = recipients.filter(
+      (recipient) =>
+        recipient.role !== RecipientRole.CC && recipient.role !== RecipientRole.ASSISTANT,
+    );
+
+    setSelectedSigner(
+      recipientsByRoleToDisplay.find((r) => r.sendStatus !== SendStatus.SENT) ??
+        recipientsByRoleToDisplay[0],
+    );
   }, [recipients]);
 
   const recipientsByRole = useMemo(() => {
@@ -508,6 +525,7 @@ export const AddFieldsFormPartial = ({
       VIEWER: [],
       SIGNER: [],
       APPROVER: [],
+      ASSISTANT: [],
     };
 
     recipients.forEach((recipient) => {
@@ -520,7 +538,12 @@ export const AddFieldsFormPartial = ({
   const recipientsByRoleToDisplay = useMemo(() => {
     // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
     return (Object.entries(recipientsByRole) as [RecipientRole, Recipient[]][])
-      .filter(([role]) => role !== RecipientRole.CC && role !== RecipientRole.VIEWER)
+      .filter(
+        ([role]) =>
+          role !== RecipientRole.CC &&
+          role !== RecipientRole.VIEWER &&
+          role !== RecipientRole.ASSISTANT,
+      )
       .map(
         ([role, roleRecipients]) =>
           // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
@@ -534,12 +557,6 @@ export const AddFieldsFormPartial = ({
           ] as [RecipientRole, Recipient[]],
       );
   }, [recipientsByRole]);
-
-  const isTypedSignatureEnabled = form.watch('typedSignatureEnabled');
-
-  const handleTypedSignatureChange = (value: boolean) => {
-    form.setValue('typedSignatureEnabled', value, { shouldDirty: true });
-  };
 
   const handleAdvancedSettings = () => {
     setShowAdvancedSettings((prev) => !prev);
@@ -652,6 +669,9 @@ export const AddFieldsFormPartial = ({
                       }}
                       hideRecipients={hideRecipients}
                       hasErrors={!!hasFieldError}
+                      active={activeFieldId === field.formId}
+                      onFieldActivate={() => setActiveFieldId(field.formId)}
+                      onFieldDeactivate={() => setActiveFieldId(null)}
                     />
                   );
                 })}
@@ -675,9 +695,7 @@ export const AddFieldsFormPartial = ({
                       )}
 
                       {!selectedSigner?.email && (
-                        <span className="gradie flex-1 truncate text-left">
-                          {selectedSigner?.email}
-                        </span>
+                        <span className="flex-1 truncate text-left">{selectedSigner?.email}</span>
                       )}
 
                       <ChevronsUpDown className="ml-2 h-4 w-4" />
@@ -788,7 +806,6 @@ export const AddFieldsFormPartial = ({
                         <Checkbox
                           {...field}
                           id="typedSignatureEnabled"
-                          checkClassName="text-white"
                           checked={value}
                           onCheckedChange={(checked) => field.onChange(checked)}
                           disabled={form.formState.isSubmitting}
@@ -1082,8 +1099,8 @@ export const AddFieldsFormPartial = ({
                     {emptyCheckboxFields.length > 0
                       ? 'Checkbox'
                       : emptyRadioFields.length > 0
-                      ? 'Radio'
-                      : 'Select'}{' '}
+                        ? 'Radio'
+                        : 'Select'}{' '}
                     field.
                   </Trans>
                 </li>

@@ -1,6 +1,6 @@
 import { z } from 'zod';
 
-import { ZBaseTableSearchParamsSchema } from '@documenso/lib/types/search-params';
+import { ZFindSearchParamsSchema } from '@documenso/lib/types/search-params';
 import { ZRegistrationResponseJSONSchema } from '@documenso/lib/types/webauthn';
 
 export const ZCurrentPasswordSchema = z
@@ -10,14 +10,20 @@ export const ZCurrentPasswordSchema = z
 
 export const ZPasswordSchema = z
   .string()
-  .regex(new RegExp('.*[A-Z].*'), { message: 'One uppercase character' })
-  .regex(new RegExp('.*[a-z].*'), { message: 'One lowercase character' })
-  .regex(new RegExp('.*\\d.*'), { message: 'One number' })
-  .regex(new RegExp('.*[`~<>?,./!@#$%^&*()\\-_+="\'|{}\\[\\];:\\\\].*'), {
-    message: 'One special character is required',
-  })
   .min(8, { message: 'Must be at least 8 characters in length' })
-  .max(72, { message: 'Cannot be more than 72 characters in length' });
+  .max(72, { message: 'Cannot be more than 72 characters in length' })
+  .refine((value) => value.length > 25 || /[A-Z]/.test(value), {
+    message: 'One uppercase character',
+  })
+  .refine((value) => value.length > 25 || /[a-z]/.test(value), {
+    message: 'One lowercase character',
+  })
+  .refine((value) => value.length > 25 || /\d/.test(value), {
+    message: 'One number',
+  })
+  .refine((value) => value.length > 25 || /[`~<>?,./!@#$%^&*()\-_"'+=|{}[\];:\\]/.test(value), {
+    message: 'One special character is required',
+  });
 
 export const ZSignUpMutationSchema = z.object({
   name: z.string().min(1),
@@ -55,7 +61,7 @@ export const ZUpdatePasskeyMutationSchema = z.object({
   name: z.string().trim().min(1),
 });
 
-export const ZFindPasskeysQuerySchema = ZBaseTableSearchParamsSchema.extend({
+export const ZFindPasskeysQuerySchema = ZFindSearchParamsSchema.extend({
   orderBy: z
     .object({
       column: z.enum(['createdAt', 'updatedAt', 'name']),

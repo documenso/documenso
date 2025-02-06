@@ -1,12 +1,18 @@
 import { SigningStatus } from '@prisma/client';
-import { TRPCError } from '@trpc/server';
 
 import { jobs } from '@documenso/lib/jobs/client';
 import { prisma } from '@documenso/prisma';
+import { WebhookTriggerEvents } from '@documenso/prisma/client';
 
+import { AppError, AppErrorCode } from '../../errors/app-error';
 import { DOCUMENT_AUDIT_LOG_TYPE } from '../../types/document-audit-logs';
+import {
+  ZWebhookDocumentSchema,
+  mapDocumentToWebhookDocumentPayload,
+} from '../../types/webhook-payload';
 import type { RequestMetadata } from '../../universal/extract-request-metadata';
 import { createDocumentAuditLogData } from '../../utils/document-audit-logs';
+import { triggerWebhook } from '../webhooks/trigger/trigger-webhook';
 
 export type RejectDocumentWithTokenOptions = {
   token: string;
@@ -28,24 +34,23 @@ export async function rejectDocumentWithToken({
       documentId,
     },
     include: {
-      Document: {
+      document: {
         include: {
-          User: true,
+          user: true,
+          recipients: true,
+          documentMeta: true,
         },
       },
     },
   });
 
-  const document = recipient?.Document;
+  const document = recipient?.document;
 
   if (!recipient || !document) {
-    throw new TRPCError({
-      code: 'NOT_FOUND',
+    throw new AppError(AppErrorCode.NOT_FOUND, {
       message: 'Document or recipient not found',
     });
   }
-
-  // Add the audit log entry before updating the recipient
 
   // Update the recipient status to rejected
   const [updatedRecipient] = await prisma.$transaction([
@@ -86,6 +91,29 @@ export async function rejectDocumentWithToken({
       recipientId: recipient.id,
       documentId,
     },
+  });
+
+  // Get the updated document with all recipients
+  const updatedDocument = await prisma.document.findFirst({
+    where: {
+      id: document.id,
+    },
+    include: {
+      recipients: true,
+      documentMeta: true,
+    },
+  });
+
+  if (!updatedDocument) {
+    throw new Error('Document not found after update');
+  }
+
+  // Trigger webhook for document rejection
+  await triggerWebhook({
+    event: WebhookTriggerEvents.DOCUMENT_REJECTED,
+    data: ZWebhookDocumentSchema.parse(mapDocumentToWebhookDocumentPayload(updatedDocument)),
+    userId: document.userId,
+    teamId: document.teamId ?? undefined,
   });
 
   return updatedRecipient;

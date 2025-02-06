@@ -2,7 +2,6 @@ import { z } from 'zod';
 
 import { DOCUMENSO_ENCRYPTION_SECONDARY_KEY } from '@documenso/lib/constants/crypto';
 import { symmetricEncrypt } from '@documenso/lib/universal/crypto';
-import type { TEncryptSecondaryDataMutationSchema } from '@documenso/trpc/server/crypto/schema';
 
 export const ZEncryptedDataSchema = z.object({
   data: z.string(),
@@ -25,7 +24,7 @@ export type EncryptDataOptions = {
  *
  * @returns The encrypted data.
  */
-export const encryptSecondaryData = ({ data, expiresAt }: TEncryptSecondaryDataMutationSchema) => {
+export const encryptSecondaryData = ({ data, expiresAt }: EncryptDataOptions) => {
   if (!DOCUMENSO_ENCRYPTION_SECONDARY_KEY) {
     throw new Error('Missing encryption key');
   }

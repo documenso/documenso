@@ -85,13 +85,13 @@ export function CommandMenu({ open, onOpenChange }: CommandMenuProps) {
   const [search, setSearch] = useState('');
   const [pages, setPages] = useState<string[]>([]);
 
-  const { data: searchDocumentsData, isLoading: isSearchingDocuments } =
+  const { data: searchDocumentsData, isPending: isSearchingDocuments } =
     trpcReact.document.searchDocuments.useQuery(
       {
         query: search,
       },
       {
-        keepPreviousData: true,
+        placeholderData: (previousData) => previousData,
         // Do not batch this due to relatively long request time compared to
         // other queries which are generally batched with this.
         ...SKIP_QUERY_BATCH_META,

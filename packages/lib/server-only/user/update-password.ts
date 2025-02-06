@@ -5,6 +5,8 @@ import type { RequestMetadata } from '@documenso/lib/universal/extract-request-m
 import { prisma } from '@documenso/prisma';
 import { UserSecurityAuditLogType } from '@documenso/prisma/client';
 
+import { AppError } from '../../errors/app-error';
+
 export type UpdatePasswordOptions = {
   userId: number;
   password: string;
@@ -26,18 +28,18 @@ export const updatePassword = async ({
   });
 
   if (!user.password) {
-    throw new Error('User has no password');
+    throw new AppError('NO_PASSWORD');
   }
 
   const isCurrentPasswordValid = await compare(currentPassword, user.password);
   if (!isCurrentPasswordValid) {
-    throw new Error('Current password is incorrect.');
+    throw new AppError('INCORRECT_PASSWORD');
   }
 
   // Compare the new password with the old password
   const isSamePassword = await compare(password, user.password);
   if (isSamePassword) {
-    throw new Error('Your new password cannot be the same as your old password.');
+    throw new AppError('SAME_PASSWORD');
   }
 
   const hashedNewPassword = await hash(password, SALT_ROUNDS);

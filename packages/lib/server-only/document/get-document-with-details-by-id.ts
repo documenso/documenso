@@ -1,32 +1,40 @@
 import { prisma } from '@documenso/prisma';
-import type { DocumentWithDetails } from '@documenso/prisma/types/document';
 
+import { AppError, AppErrorCode } from '../../errors/app-error';
 import { getDocumentWhereInput } from './get-document-by-id';
 
 export type GetDocumentWithDetailsByIdOptions = {
-  id: number;
+  documentId: number;
   userId: number;
   teamId?: number;
 };
 
 export const getDocumentWithDetailsById = async ({
-  id,
+  documentId,
   userId,
   teamId,
-}: GetDocumentWithDetailsByIdOptions): Promise<DocumentWithDetails> => {
+}: GetDocumentWithDetailsByIdOptions) => {
   const documentWhereInput = await getDocumentWhereInput({
-    documentId: id,
+    documentId,
     userId,
     teamId,
   });
 
-  return await prisma.document.findFirstOrThrow({
+  const document = await prisma.document.findFirst({
     where: documentWhereInput,
     include: {
       documentData: true,
       documentMeta: true,
-      Recipient: true,
-      Field: true,
+      recipients: true,
+      fields: true,
     },
   });
+
+  if (!document) {
+    throw new AppError(AppErrorCode.NOT_FOUND, {
+      message: 'Document not found',
+    });
+  }
+
+  return document;
 };

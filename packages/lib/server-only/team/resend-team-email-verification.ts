@@ -16,7 +16,7 @@ export type ResendTeamMemberInvitationOptions = {
 export const resendTeamEmailVerification = async ({
   userId,
   teamId,
-}: ResendTeamMemberInvitationOptions) => {
+}: ResendTeamMemberInvitationOptions): Promise<void> => {
   await prisma.$transaction(
     async (tx) => {
       const team = await tx.team.findUniqueOrThrow({
@@ -38,16 +38,17 @@ export const resendTeamEmailVerification = async ({
       });
 
       if (!team) {
-        throw new AppError('TeamNotFound', 'User is not a member of the team.');
+        throw new AppError('TeamNotFound', {
+          message: 'User is not a member of the team.',
+        });
       }
 
       const { emailVerification } = team;
 
       if (!emailVerification) {
-        throw new AppError(
-          'VerificationNotFound',
-          'No team email verification exists for this team.',
-        );
+        throw new AppError('VerificationNotFound', {
+          message: 'No team email verification exists for this team.',
+        });
       }
 
       const { token, expiresAt } = createTokenVerification({ hours: 1 });

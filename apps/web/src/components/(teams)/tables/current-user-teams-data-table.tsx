@@ -11,7 +11,7 @@ import { useLingui } from '@lingui/react';
 import { useUpdateSearchParams } from '@documenso/lib/client-only/hooks/use-update-search-params';
 import { NEXT_PUBLIC_WEBAPP_URL, WEBAPP_BASE_URL } from '@documenso/lib/constants/app';
 import { TEAM_MEMBER_ROLE_MAP } from '@documenso/lib/constants/teams';
-import { ZBaseTableSearchParamsSchema } from '@documenso/lib/types/search-params';
+import { ZUrlSearchParamsSchema } from '@documenso/lib/types/search-params';
 import { canExecuteTeamAction } from '@documenso/lib/utils/teams';
 import { trpc } from '@documenso/trpc/react';
 import { AvatarWithText } from '@documenso/ui/primitives/avatar';
@@ -30,18 +30,16 @@ export const CurrentUserTeamsDataTable = () => {
   const searchParams = useSearchParams();
   const updateSearchParams = useUpdateSearchParams();
 
-  const parsedSearchParams = ZBaseTableSearchParamsSchema.parse(
-    Object.fromEntries(searchParams ?? []),
-  );
+  const parsedSearchParams = ZUrlSearchParamsSchema.parse(Object.fromEntries(searchParams ?? []));
 
-  const { data, isLoading, isInitialLoading, isLoadingError } = trpc.team.findTeams.useQuery(
+  const { data, isLoading, isLoadingError } = trpc.team.findTeams.useQuery(
     {
-      term: parsedSearchParams.query,
+      query: parsedSearchParams.query,
       page: parsedSearchParams.page,
       perPage: parsedSearchParams.perPage,
     },
     {
-      keepPreviousData: true,
+      placeholderData: (previousData) => previousData,
     },
   );
 
@@ -136,7 +134,7 @@ export const CurrentUserTeamsDataTable = () => {
         enable: isLoadingError,
       }}
       skeleton={{
-        enable: isLoading && isInitialLoading,
+        enable: isLoading,
         rows: 3,
         component: (
           <>

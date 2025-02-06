@@ -43,7 +43,7 @@ const handleUserLimits = async ({ email }: HandleUserLimitsOptions) => {
       email,
     },
     include: {
-      Subscription: true,
+      subscriptions: true,
     },
   });
 
@@ -54,7 +54,7 @@ const handleUserLimits = async ({ email }: HandleUserLimitsOptions) => {
   let quota = structuredClone(FREE_PLAN_LIMITS);
   let remaining = structuredClone(FREE_PLAN_LIMITS);
 
-  const activeSubscriptions = user.Subscription.filter(
+  const activeSubscriptions = user.subscriptions.filter(
     ({ status }) => status === SubscriptionStatus.ACTIVE,
   );
 

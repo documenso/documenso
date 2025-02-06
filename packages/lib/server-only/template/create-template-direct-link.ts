@@ -7,67 +7,72 @@ import {
   DIRECT_TEMPLATE_RECIPIENT_NAME,
 } from '@documenso/lib/constants/direct-templates';
 import { prisma } from '@documenso/prisma';
-import type { Recipient, TemplateDirectLink } from '@documenso/prisma/client';
+import type { Recipient } from '@documenso/prisma/client';
 
 import { AppError, AppErrorCode } from '../../errors/app-error';
 
 export type CreateTemplateDirectLinkOptions = {
   templateId: number;
   userId: number;
+  teamId?: number;
   directRecipientId?: number;
 };
 
 export const createTemplateDirectLink = async ({
   templateId,
   userId,
+  teamId,
   directRecipientId,
-}: CreateTemplateDirectLinkOptions): Promise<TemplateDirectLink> => {
+}: CreateTemplateDirectLinkOptions) => {
   const template = await prisma.template.findFirst({
     where: {
       id: templateId,
-      OR: [
-        {
-          userId,
-        },
-        {
-          team: {
-            members: {
-              some: {
-                userId,
+      ...(teamId
+        ? {
+            team: {
+              id: teamId,
+              members: {
+                some: {
+                  userId,
+                },
               },
             },
-          },
-        },
-      ],
+          }
+        : {
+            userId,
+            teamId: null,
+          }),
     },
     include: {
-      Recipient: true,
+      recipients: true,
       directLink: true,
     },
   });
 
   if (!template) {
-    throw new AppError(AppErrorCode.NOT_FOUND, 'Template not found');
+    throw new AppError(AppErrorCode.NOT_FOUND, { message: 'Template not found' });
   }
 
   if (template.directLink) {
-    throw new AppError(AppErrorCode.ALREADY_EXISTS, 'Direct template already exists');
+    throw new AppError(AppErrorCode.ALREADY_EXISTS, { message: 'Direct template already exists' });
   }
 
   if (
     directRecipientId &&
-    !template.Recipient.find((recipient) => recipient.id === directRecipientId)
+    !template.recipients.find((recipient) => recipient.id === directRecipientId)
   ) {
-    throw new AppError(AppErrorCode.NOT_FOUND, 'Recipient not found');
+    throw new AppError(AppErrorCode.NOT_FOUND, { message: 'Recipient not found' });
   }
 
   if (
     !directRecipientId &&
-    template.Recipient.find(
+    template.recipients.find(
       (recipient) => recipient.email.toLowerCase() === DIRECT_TEMPLATE_RECIPIENT_EMAIL,
     )
   ) {
-    throw new AppError(AppErrorCode.INVALID_BODY, 'Cannot generate placeholder direct recipient');
+    throw new AppError(AppErrorCode.INVALID_BODY, {
+      message: 'Cannot generate placeholder direct recipient',
+    });
   }
 
   return await prisma.$transaction(async (tx) => {

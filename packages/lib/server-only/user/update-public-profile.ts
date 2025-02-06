@@ -13,7 +13,7 @@ export type UpdatePublicProfileOptions = {
 
 export const updatePublicProfile = async ({ userId, data }: UpdatePublicProfileOptions) => {
   if (Object.values(data).length === 0) {
-    throw new AppError(AppErrorCode.INVALID_BODY, 'Missing data to update');
+    throw new AppError(AppErrorCode.INVALID_BODY, { message: 'Missing data to update' });
   }
 
   const { url, bio, enabled } = data;
@@ -25,13 +25,15 @@ export const updatePublicProfile = async ({ userId, data }: UpdatePublicProfileO
   });
 
   if (!user) {
-    throw new AppError(AppErrorCode.NOT_FOUND, 'User not found');
+    throw new AppError(AppErrorCode.NOT_FOUND, { message: 'User not found' });
   }
 
   const finalUrl = url ?? user.url;
 
   if (!finalUrl && enabled) {
-    throw new AppError(AppErrorCode.INVALID_REQUEST, 'Cannot enable a profile without a URL');
+    throw new AppError(AppErrorCode.INVALID_REQUEST, {
+      message: 'Cannot enable a profile without a URL',
+    });
   }
 
   if (url) {
@@ -57,7 +59,9 @@ export const updatePublicProfile = async ({ userId, data }: UpdatePublicProfileO
     });
 
     if (isUrlTakenByAnotherUser || isUrlTakenByAnotherTeam) {
-      throw new AppError(AppErrorCode.PROFILE_URL_TAKEN, 'The profile username is already taken');
+      throw new AppError(AppErrorCode.PROFILE_URL_TAKEN, {
+        message: 'The profile username is already taken',
+      });
     }
   }
 

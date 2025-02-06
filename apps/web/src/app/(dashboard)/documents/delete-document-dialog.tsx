@@ -38,7 +38,6 @@ export const DeleteDocumentDialog = ({
   onOpenChange,
   status,
   documentTitle,
-  teamId,
   canManageDocument,
 }: DeleteDocumentDialogProps) => {
   const router = useRouter();
@@ -47,10 +46,12 @@ export const DeleteDocumentDialog = ({
   const { refreshLimits } = useLimits();
   const { _ } = useLingui();
 
+  const deleteMessage = msg`delete`;
+
   const [inputValue, setInputValue] = useState('');
   const [isDeleteEnabled, setIsDeleteEnabled] = useState(status === DocumentStatus.DRAFT);
 
-  const { mutateAsync: deleteDocument, isLoading } = trpcReact.document.deleteDocument.useMutation({
+  const { mutateAsync: deleteDocument, isPending } = trpcReact.document.deleteDocument.useMutation({
     onSuccess: () => {
       router.refresh();
       void refreshLimits();
@@ -74,7 +75,7 @@ export const DeleteDocumentDialog = ({
 
   const onDelete = async () => {
     try {
-      await deleteDocument({ id, teamId });
+      await deleteDocument({ documentId: id });
     } catch {
       toast({
         title: _(msg`Something went wrong`),
@@ -87,11 +88,11 @@ export const DeleteDocumentDialog = ({
 
   const onInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setInputValue(event.target.value);
-    setIsDeleteEnabled(event.target.value === _(msg`delete`));
+    setIsDeleteEnabled(event.target.value === _(deleteMessage));
   };
 
   return (
-    <Dialog open={open} onOpenChange={(value) => !isLoading && onOpenChange(value)}>
+    <Dialog open={open} onOpenChange={(value) => !isPending && onOpenChange(value)}>
       <DialogContent>
         <DialogHeader>
           <DialogTitle>
@@ -181,7 +182,7 @@ export const DeleteDocumentDialog = ({
             type="text"
             value={inputValue}
             onChange={onInputChange}
-            placeholder={_(msg`Type 'delete' to confirm`)}
+            placeholder={_(msg`Please type ${`'${_(deleteMessage)}'`} to confirm`)}
           />
         )}
 
@@ -192,7 +193,7 @@ export const DeleteDocumentDialog = ({
 
           <Button
             type="button"
-            loading={isLoading}
+            loading={isPending}
             onClick={onDelete}
             disabled={!isDeleteEnabled && canManageDocument}
             variant="destructive"

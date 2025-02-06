@@ -42,7 +42,7 @@ export const DeleteTeamMemberDialog = ({
   const { _ } = useLingui();
   const { toast } = useToast();
 
-  const { mutateAsync: deleteTeamMembers, isLoading: isDeletingTeamMember } =
+  const { mutateAsync: deleteTeamMembers, isPending: isDeletingTeamMember } =
     trpc.team.deleteTeamMembers.useMutation({
       onSuccess: () => {
         toast({

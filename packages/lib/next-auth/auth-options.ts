@@ -1,6 +1,7 @@
 /// <reference types="../types/next-auth.d.ts" />
 import { PrismaAdapter } from '@next-auth/prisma-adapter';
 import { compare } from '@node-rs/bcrypt';
+import { Prisma } from '@prisma/client';
 import { verifyAuthenticationResponse } from '@simplewebauthn/server';
 import { DateTime } from 'luxon';
 import type { AuthOptions, Session, User } from 'next-auth';
@@ -13,6 +14,7 @@ import { env } from 'next-runtime-env';
 import { prisma } from '@documenso/prisma';
 import { IdentityProvider, UserSecurityAuditLogType } from '@documenso/prisma/client';
 
+import { formatSecureCookieName, useSecureCookies } from '../constants/auth';
 import { AppError, AppErrorCode } from '../errors/app-error';
 import { jobsClient } from '../jobs/client';
 import { isTwoFactorAuthenticationEnabled } from '../server-only/2fa/is-2fa-availble';
@@ -26,8 +28,38 @@ import { extractNextAuthRequestMetadata } from '../universal/extract-request-met
 import { getAuthenticatorOptions } from '../utils/authenticator';
 import { ErrorCode } from './error-codes';
 
+// Delete unrecognized fields from authorization response to comply with
+// https://datatracker.ietf.org/doc/html/rfc6749#section-4.1.2
+const prismaAdapter = PrismaAdapter(prisma);
+
+const unsafe_linkAccount = prismaAdapter.linkAccount!;
+const unsafe_accountModel = Prisma.dmmf.datamodel.models.find(({ name }) => name === 'Account');
+
+if (!unsafe_accountModel) {
+  throw new Error('Account model not found');
+}
+
+// eslint-disable-next-line @typescript-eslint/promise-function-async
+prismaAdapter.linkAccount = (data) => {
+  const availableFields = unsafe_accountModel.fields.map((field) => field.name);
+
+  const newData = Object.keys(data).reduce(
+    (acc, key) => {
+      if (availableFields.includes(key)) {
+        acc[key] = data[key];
+      }
+
+      return acc;
+    },
+    // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
+    {} as typeof data,
+  );
+
+  return unsafe_linkAccount(newData);
+};
+
 export const NEXT_AUTH_OPTIONS: AuthOptions = {
-  adapter: PrismaAdapter(prisma),
+  adapter: prismaAdapter,
   secret: process.env.NEXTAUTH_SECRET ?? 'secret',
   session: {
     strategy: 'jwt',
@@ -118,6 +150,10 @@ export const NEXT_AUTH_OPTIONS: AuthOptions = {
           }
 
           throw new Error(ErrorCode.UNVERIFIED_EMAIL);
+        }
+
+        if (user.disabled) {
+          throw new Error(ErrorCode.ACCOUNT_DISABLED);
         }
 
         return {
@@ -212,7 +248,7 @@ export const NEXT_AUTH_OPTIONS: AuthOptions = {
             credentialId: Buffer.from(requestBodyCrediential.id, 'base64'),
           },
           include: {
-            User: {
+            user: {
               select: {
                 id: true,
                 email: true,
@@ -227,7 +263,7 @@ export const NEXT_AUTH_OPTIONS: AuthOptions = {
           throw new AppError(AppErrorCode.NOT_SETUP);
         }
 
-        const user = passkey.User;
+        const user = passkey.user;
 
         const { rpId, origin } = getAuthenticatorOptions();
 
@@ -429,6 +465,54 @@ export const NEXT_AUTH_OPTIONS: AuthOptions = {
       }
 
       return true;
+    },
+  },
+  cookies: {
+    sessionToken: {
+      name: formatSecureCookieName('next-auth.session-token'),
+      options: {
+        httpOnly: true,
+        sameSite: useSecureCookies ? 'none' : 'lax',
+        path: '/',
+        secure: useSecureCookies,
+      },
+    },
+    callbackUrl: {
+      name: formatSecureCookieName('next-auth.callback-url'),
+      options: {
+        sameSite: useSecureCookies ? 'none' : 'lax',
+        path: '/',
+        secure: useSecureCookies,
+      },
+    },
+    csrfToken: {
+      // Default to __Host- for CSRF token for additional protection if using useSecureCookies
+      // NB: The `__Host-` prefix is stricter than the `__Secure-` prefix.
+      name: formatSecureCookieName('next-auth.csrf-token'),
+      options: {
+        httpOnly: true,
+        sameSite: useSecureCookies ? 'none' : 'lax',
+        path: '/',
+        secure: useSecureCookies,
+      },
+    },
+    pkceCodeVerifier: {
+      name: formatSecureCookieName('next-auth.pkce.code_verifier'),
+      options: {
+        httpOnly: true,
+        sameSite: useSecureCookies ? 'none' : 'lax',
+        path: '/',
+        secure: useSecureCookies,
+      },
+    },
+    state: {
+      name: formatSecureCookieName('next-auth.state'),
+      options: {
+        httpOnly: true,
+        sameSite: useSecureCookies ? 'none' : 'lax',
+        path: '/',
+        secure: useSecureCookies,
+      },
     },
   },
   // Note: `events` are handled in `apps/web/src/pages/api/auth/[...nextauth].ts` to allow access to the request.

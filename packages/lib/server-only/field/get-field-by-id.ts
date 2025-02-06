@@ -1,5 +1,7 @@
 import { prisma } from '@documenso/prisma';
 
+import { AppError, AppErrorCode } from '../../errors/app-error';
+
 export type GetFieldByIdOptions = {
   userId: number;
   teamId?: number;
@@ -20,7 +22,7 @@ export const getFieldById = async ({
       id: fieldId,
       documentId,
       templateId,
-      Document: {
+      document: {
         OR:
           teamId === undefined
             ? [
@@ -44,6 +46,12 @@ export const getFieldById = async ({
       },
     },
   });
+
+  if (!field) {
+    throw new AppError(AppErrorCode.NOT_FOUND, {
+      message: 'Field not found',
+    });
+  }
 
   return field;
 };

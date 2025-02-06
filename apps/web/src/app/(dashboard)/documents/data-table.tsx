@@ -9,9 +9,9 @@ import { DateTime } from 'luxon';
 import { useSession } from 'next-auth/react';
 
 import { useUpdateSearchParams } from '@documenso/lib/client-only/hooks/use-update-search-params';
-import type { FindResultSet } from '@documenso/lib/types/find-result-set';
-import type { Document, Recipient, Team, User } from '@documenso/prisma/client';
+import type { Team } from '@documenso/prisma/client';
 import { ExtendedDocumentStatus } from '@documenso/prisma/types/extended-document-status';
+import type { TFindDocumentsResponse } from '@documenso/trpc/server/document-router/schema';
 import type { DataTableColumnDef } from '@documenso/ui/primitives/data-table';
 import { DataTable } from '@documenso/ui/primitives/data-table';
 import { DataTablePagination } from '@documenso/ui/primitives/data-table-pagination';
@@ -24,13 +24,7 @@ import { DataTableActionDropdown } from './data-table-action-dropdown';
 import { DataTableTitle } from './data-table-title';
 
 export type DocumentsDataTableProps = {
-  results: FindResultSet<
-    Document & {
-      Recipient: Recipient[];
-      User: Pick<User, 'id' | 'name' | 'email'>;
-      team: Pick<Team, 'id' | 'url'> | null;
-    }
-  >;
+  results: TFindDocumentsResponse;
   showSenderColumn?: boolean;
   team?: Pick<Team, 'id' | 'url'> & { teamEmail?: string };
 };
@@ -63,14 +57,14 @@ export const DocumentsDataTable = ({
       {
         id: 'sender',
         header: _(msg`Sender`),
-        cell: ({ row }) => row.original.User.name ?? row.original.User.email,
+        cell: ({ row }) => row.original.user.name ?? row.original.user.email,
       },
       {
         header: _(msg`Recipient`),
         accessorKey: 'recipient',
         cell: ({ row }) => (
           <StackAvatarsWithTooltip
-            recipients={row.original.Recipient}
+            recipients={row.original.recipients}
             documentStatus={row.original.status}
           />
         ),

@@ -17,7 +17,7 @@ export const DeclineTeamInvitationButton = ({ teamId }: DeclineTeamInvitationBut
 
   const {
     mutateAsync: declineTeamInvitation,
-    isLoading,
+    isPending,
     isSuccess,
   } = trpc.team.declineTeamInvitation.useMutation({
     onSuccess: () => {
@@ -40,8 +40,8 @@ export const DeclineTeamInvitationButton = ({ teamId }: DeclineTeamInvitationBut
   return (
     <Button
       onClick={async () => declineTeamInvitation({ teamId })}
-      loading={isLoading}
-      disabled={isLoading || isSuccess}
+      loading={isPending}
+      disabled={isPending || isSuccess}
       variant="ghost"
     >
       <Trans>Decline</Trans>

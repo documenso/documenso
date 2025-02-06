@@ -16,7 +16,7 @@ export const TeamBillingPortalButton = ({ buttonProps, teamId }: TeamBillingPort
   const { _ } = useLingui();
   const { toast } = useToast();
 
-  const { mutateAsync: createBillingPortal, isLoading } =
+  const { mutateAsync: createBillingPortal, isPending } =
     trpc.team.createBillingPortal.useMutation();
 
   const handleCreatePortal = async () => {
@@ -37,7 +37,7 @@ export const TeamBillingPortalButton = ({ buttonProps, teamId }: TeamBillingPort
   };
 
   return (
-    <Button {...buttonProps} onClick={async () => handleCreatePortal()} loading={isLoading}>
+    <Button {...buttonProps} onClick={async () => handleCreatePortal()} loading={isPending}>
       <Trans>Manage subscription</Trans>
     </Button>
   );

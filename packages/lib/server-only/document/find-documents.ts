@@ -1,8 +1,7 @@
 import { DateTime } from 'luxon';
-import { P, match } from 'ts-pattern';
+import { match } from 'ts-pattern';
 
 import { prisma } from '@documenso/prisma';
-import { RecipientRole, SigningStatus, TeamMemberRole } from '@documenso/prisma/client';
 import type {
   Document,
   DocumentSource,
@@ -11,10 +10,11 @@ import type {
   TeamEmail,
   User,
 } from '@documenso/prisma/client';
+import { RecipientRole, SigningStatus, TeamMemberRole } from '@documenso/prisma/client';
 import { ExtendedDocumentStatus } from '@documenso/prisma/types/extended-document-status';
 
 import { DocumentVisibility } from '../../types/document-visibility';
-import type { FindResultSet } from '../../types/find-result-set';
+import { type FindResultResponse } from '../../types/search-params';
 import { maskRecipientTokensForDocument } from '../../utils/mask-recipient-tokens-for-document';
 
 export type PeriodSelectorValue = '' | '7d' | '14d' | '30d';
@@ -22,7 +22,6 @@ export type PeriodSelectorValue = '' | '7d' | '14d' | '30d';
 export type FindDocumentsOptions = {
   userId: number;
   teamId?: number;
-  term?: string;
   templateId?: number;
   source?: DocumentSource;
   status?: ExtendedDocumentStatus;
@@ -34,13 +33,12 @@ export type FindDocumentsOptions = {
   };
   period?: PeriodSelectorValue;
   senderIds?: number[];
-  search?: string;
+  query?: string;
 };
 
 export const findDocuments = async ({
   userId,
   teamId,
-  term,
   templateId,
   source,
   status = ExtendedDocumentStatus.ALL,
@@ -49,7 +47,7 @@ export const findDocuments = async ({
   orderBy,
   period,
   senderIds,
-  search,
+  query,
 }: FindDocumentsOptions) => {
   const user = await prisma.user.findFirstOrThrow({
     where: {
@@ -87,22 +85,11 @@ export const findDocuments = async ({
   const orderByDirection = orderBy?.direction ?? 'desc';
   const teamMemberRole = team?.members[0].role ?? null;
 
-  const termFilters = match(term)
-    .with(P.string.minLength(1), () => {
-      return {
-        title: {
-          contains: term,
-          mode: 'insensitive',
-        },
-      } as const;
-    })
-    .otherwise(() => undefined);
-
   const searchFilter: Prisma.DocumentWhereInput = {
     OR: [
-      { title: { contains: search, mode: 'insensitive' } },
-      { Recipient: { some: { name: { contains: search, mode: 'insensitive' } } } },
-      { Recipient: { some: { email: { contains: search, mode: 'insensitive' } } } },
+      { title: { contains: query, mode: 'insensitive' } },
+      { recipients: { some: { name: { contains: query, mode: 'insensitive' } } } },
+      { recipients: { some: { email: { contains: query, mode: 'insensitive' } } } },
     ],
   };
 
@@ -126,7 +113,7 @@ export const findDocuments = async ({
     {
       OR: [
         {
-          Recipient: {
+          recipients: {
             some: {
               email: user.email,
             },
@@ -163,7 +150,7 @@ export const findDocuments = async ({
           deletedAt: null,
         },
         {
-          Recipient: {
+          recipients: {
             some: {
               email: user.email,
               documentDeletedAt: null,
@@ -184,13 +171,13 @@ export const findDocuments = async ({
                 deletedAt: null,
               },
               {
-                User: {
+                user: {
                   email: team.teamEmail.email,
                 },
                 deletedAt: null,
               },
               {
-                Recipient: {
+                recipients: {
                   some: {
                     email: team.teamEmail.email,
                     documentDeletedAt: null,
@@ -209,7 +196,6 @@ export const findDocuments = async ({
   }
 
   const whereAndClause: Prisma.DocumentWhereInput['AND'] = [
-    { ...termFilters },
     { ...filters },
     { ...deletedFilter },
     { ...searchFilter },
@@ -256,14 +242,14 @@ export const findDocuments = async ({
         [orderByColumn]: orderByDirection,
       },
       include: {
-        User: {
+        user: {
           select: {
             id: true,
             name: true,
             email: true,
           },
         },
-        Recipient: true,
+        recipients: true,
         team: {
           select: {
             id: true,
@@ -290,7 +276,7 @@ export const findDocuments = async ({
     currentPage: Math.max(page, 1),
     perPage,
     totalPages: Math.ceil(count / perPage),
-  } satisfies FindResultSet<typeof data>;
+  } satisfies FindResultResponse<typeof data>;
 };
 
 const findDocumentsFilter = (status: ExtendedDocumentStatus, user: User) => {
@@ -303,7 +289,7 @@ const findDocumentsFilter = (status: ExtendedDocumentStatus, user: User) => {
         },
         {
           status: ExtendedDocumentStatus.COMPLETED,
-          Recipient: {
+          recipients: {
             some: {
               email: user.email,
             },
@@ -311,7 +297,7 @@ const findDocumentsFilter = (status: ExtendedDocumentStatus, user: User) => {
         },
         {
           status: ExtendedDocumentStatus.PENDING,
-          Recipient: {
+          recipients: {
             some: {
               email: user.email,
             },
@@ -323,7 +309,7 @@ const findDocumentsFilter = (status: ExtendedDocumentStatus, user: User) => {
       status: {
         not: ExtendedDocumentStatus.DRAFT,
       },
-      Recipient: {
+      recipients: {
         some: {
           email: user.email,
           signingStatus: SigningStatus.NOT_SIGNED,
@@ -347,7 +333,7 @@ const findDocumentsFilter = (status: ExtendedDocumentStatus, user: User) => {
         },
         {
           status: ExtendedDocumentStatus.PENDING,
-          Recipient: {
+          recipients: {
             some: {
               email: user.email,
               signingStatus: SigningStatus.SIGNED,
@@ -368,7 +354,7 @@ const findDocumentsFilter = (status: ExtendedDocumentStatus, user: User) => {
         },
         {
           status: ExtendedDocumentStatus.COMPLETED,
-          Recipient: {
+          recipients: {
             some: {
               email: user.email,
             },
@@ -433,7 +419,7 @@ const findTeamDocumentsFilter = (
           status: {
             not: ExtendedDocumentStatus.DRAFT,
           },
-          Recipient: {
+          recipients: {
             some: {
               email: teamEmail,
             },
@@ -443,7 +429,7 @@ const findTeamDocumentsFilter = (
 
         // Filter to display all documents that have been sent by the team email.
         filter.OR.push({
-          User: {
+          user: {
             email: teamEmail,
           },
           OR: visibilityFilters,
@@ -462,7 +448,7 @@ const findTeamDocumentsFilter = (
         status: {
           not: ExtendedDocumentStatus.DRAFT,
         },
-        Recipient: {
+        recipients: {
           some: {
             email: teamEmail,
             signingStatus: SigningStatus.NOT_SIGNED,
@@ -488,7 +474,7 @@ const findTeamDocumentsFilter = (
       if (teamEmail && filter.OR) {
         filter.OR.push({
           status: ExtendedDocumentStatus.DRAFT,
-          User: {
+          user: {
             email: teamEmail,
           },
           OR: visibilityFilters,
@@ -513,7 +499,7 @@ const findTeamDocumentsFilter = (
           status: ExtendedDocumentStatus.PENDING,
           OR: [
             {
-              Recipient: {
+              recipients: {
                 some: {
                   email: teamEmail,
                   signingStatus: SigningStatus.SIGNED,
@@ -525,7 +511,7 @@ const findTeamDocumentsFilter = (
               OR: visibilityFilters,
             },
             {
-              User: {
+              user: {
                 email: teamEmail,
               },
               OR: visibilityFilters,
@@ -550,7 +536,7 @@ const findTeamDocumentsFilter = (
       if (teamEmail && filter.OR) {
         filter.OR.push(
           {
-            Recipient: {
+            recipients: {
               some: {
                 email: teamEmail,
               },
@@ -558,7 +544,7 @@ const findTeamDocumentsFilter = (
             OR: visibilityFilters,
           },
           {
-            User: {
+            user: {
               email: teamEmail,
             },
             OR: visibilityFilters,

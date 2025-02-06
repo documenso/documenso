@@ -6,14 +6,15 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { Trans } from '@lingui/macro';
 import { InfoIcon } from 'lucide-react';
 import { useForm } from 'react-hook-form';
+import { match } from 'ts-pattern';
 
 import { DATE_FORMATS, DEFAULT_DOCUMENT_DATE_FORMAT } from '@documenso/lib/constants/date-formats';
 import { SUPPORTED_LANGUAGES } from '@documenso/lib/constants/i18n';
 import { DEFAULT_DOCUMENT_TIME_ZONE, TIME_ZONES } from '@documenso/lib/constants/time-zones';
+import type { TDocument } from '@documenso/lib/types/document';
 import { extractDocumentAuthMethods } from '@documenso/lib/utils/document-auth';
-import type { TeamMemberRole } from '@documenso/prisma/client';
+import { DocumentVisibility, TeamMemberRole } from '@documenso/prisma/client';
 import { DocumentStatus, type Field, type Recipient, SendStatus } from '@documenso/prisma/client';
-import type { DocumentWithData } from '@documenso/prisma/types/document-with-data';
 import {
   DocumentGlobalAuthAccessSelect,
   DocumentGlobalAuthAccessTooltip,
@@ -64,7 +65,7 @@ export type AddSettingsFormProps = {
   fields: Field[];
   isDocumentEnterprise: boolean;
   isDocumentPdfLoaded: boolean;
-  document: DocumentWithData;
+  document: TDocument;
   currentTeamMemberRole?: TeamMemberRole;
   onSubmit: (_data: TAddSettingsFormSchema) => void;
 };
@@ -109,6 +110,16 @@ export const AddSettingsFormPartial = ({
   const documentHasBeenSent = recipients.some(
     (recipient) => recipient.sendStatus === SendStatus.SENT,
   );
+
+  const canUpdateVisibility = match(currentTeamMemberRole)
+    .with(TeamMemberRole.ADMIN, () => true)
+    .with(
+      TeamMemberRole.MANAGER,
+      () =>
+        document.visibility === DocumentVisibility.EVERYONE ||
+        document.visibility === DocumentVisibility.MANAGER_AND_ABOVE,
+    )
+    .otherwise(() => false);
 
   // We almost always want to set the timezone to the user's local timezone to avoid confusion
   // when the document is signed.
@@ -237,7 +248,8 @@ export const AddSettingsFormPartial = ({
 
                     <FormControl>
                       <DocumentVisibilitySelect
-                        currentMemberRole={currentTeamMemberRole}
+                        canUpdateVisibility={canUpdateVisibility}
+                        currentTeamMemberRole={currentTeamMemberRole}
                         {...field}
                         onValueChange={field.onChange}
                       />
@@ -273,7 +285,7 @@ export const AddSettingsFormPartial = ({
                 </AccordionTrigger>
 
                 <AccordionContent className="text-muted-foreground -mx-1 px-1 pt-2 text-sm leading-relaxed">
-                  <div className="flex flex-col space-y-6 ">
+                  <div className="flex flex-col space-y-6">
                     <FormField
                       control={form.control}
                       name="externalId"

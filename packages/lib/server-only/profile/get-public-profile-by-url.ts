@@ -61,7 +61,7 @@ export const getPublicProfileByUrl = async ({
       },
       include: {
         profile: true,
-        Template: {
+        templates: {
           where: {
             directLink: {
               enabled: true,
@@ -73,7 +73,7 @@ export const getPublicProfileByUrl = async ({
           },
         },
         // Subscriptions and teamMembers are used to calculate the badges.
-        Subscription: {
+        subscriptions: {
           where: {
             status: SubscriptionStatus.ACTIVE,
           },
@@ -115,7 +115,9 @@ export const getPublicProfileByUrl = async ({
   // Log as critical error.
   if (user?.profile && team?.profile) {
     console.error('Profile URL is ambiguous', { profileUrl, userId: user.id, teamId: team.id });
-    throw new AppError(AppErrorCode.INVALID_REQUEST, 'Profile URL is ambiguous');
+    throw new AppError(AppErrorCode.INVALID_REQUEST, {
+      message: 'Profile URL is ambiguous',
+    });
   }
 
   if (user?.profile?.enabled) {
@@ -131,7 +133,7 @@ export const getPublicProfileByUrl = async ({
     if (IS_BILLING_ENABLED()) {
       const earlyAdopterPriceIds = await getCommunityPlanPriceIds();
 
-      const activeEarlyAdopterSub = user.Subscription.find(
+      const activeEarlyAdopterSub = user.subscriptions.find(
         (subscription) =>
           subscription.status === SubscriptionStatus.ACTIVE &&
           earlyAdopterPriceIds.includes(subscription.priceId),
@@ -152,7 +154,7 @@ export const getPublicProfileByUrl = async ({
       url: profileUrl,
       avatarImageId: user.avatarImageId,
       name: user.name || '',
-      templates: user.Template.filter(
+      templates: user.templates.filter(
         (template): template is PublicDirectLinkTemplate =>
           template.directLink?.enabled === true && template.type === TemplateType.PUBLIC,
       ),
@@ -177,5 +179,7 @@ export const getPublicProfileByUrl = async ({
     };
   }
 
-  throw new AppError(AppErrorCode.NOT_FOUND, 'Profile not found');
+  throw new AppError(AppErrorCode.NOT_FOUND, {
+    message: 'Profile not found',
+  });
 };

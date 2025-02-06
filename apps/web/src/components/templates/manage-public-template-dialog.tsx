@@ -116,14 +116,13 @@ export const ManagePublicTemplateDialog = ({
     },
   });
 
-  const { mutateAsync: updateTemplateSettings, isLoading: isUpdatingTemplateSettings } =
-    trpc.template.updateTemplateSettings.useMutation();
+  const { mutateAsync: updateTemplateSettings, isPending: isUpdatingTemplateSettings } =
+    trpc.template.updateTemplate.useMutation();
 
   const setTemplateToPrivate = async (templateId: number) => {
     try {
       await updateTemplateSettings({
         templateId,
-        teamId: team?.id,
         data: {
           type: TemplateType.PRIVATE,
         },
@@ -158,7 +157,6 @@ export const ManagePublicTemplateDialog = ({
     try {
       await updateTemplateSettings({
         templateId: selectedTemplateId,
-        teamId: team?.id,
         data: {
           type: TemplateType.PUBLIC,
           publicTitle,

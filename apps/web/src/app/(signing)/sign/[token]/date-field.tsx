@@ -16,20 +16,21 @@ import { DEFAULT_DOCUMENT_TIME_ZONE } from '@documenso/lib/constants/time-zones'
 import { DO_NOT_INVALIDATE_QUERY_ON_MUTATION } from '@documenso/lib/constants/trpc';
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import type { TRecipientActionAuth } from '@documenso/lib/types/document-auth';
-import type { Recipient } from '@documenso/prisma/client';
+import { ZDateFieldMeta } from '@documenso/lib/types/field-meta';
 import type { FieldWithSignature } from '@documenso/prisma/types/field-with-signature';
 import { trpc } from '@documenso/trpc/react';
 import type {
   TRemovedSignedFieldWithTokenMutationSchema,
   TSignFieldWithTokenMutationSchema,
 } from '@documenso/trpc/server/field-router/schema';
+import { cn } from '@documenso/ui/lib/utils';
 import { useToast } from '@documenso/ui/primitives/use-toast';
 
+import { useRecipientContext } from './recipient-context';
 import { SigningFieldContainer } from './signing-field-container';
 
 export type DateFieldProps = {
   field: FieldWithSignature;
-  recipient: Recipient;
   dateFormat?: string | null;
   timezone?: string | null;
   onSignField?: (value: TSignFieldWithTokenMutationSchema) => Promise<void> | void;
@@ -38,33 +39,34 @@ export type DateFieldProps = {
 
 export const DateField = ({
   field,
-  recipient,
   dateFormat = DEFAULT_DOCUMENT_DATE_FORMAT,
   timezone = DEFAULT_DOCUMENT_TIME_ZONE,
   onSignField,
   onUnsignField,
 }: DateFieldProps) => {
   const router = useRouter();
-
   const { _ } = useLingui();
   const { toast } = useToast();
 
+  const { recipient, targetSigner, isAssistantMode } = useRecipientContext();
+
   const [isPending, startTransition] = useTransition();
 
-  const { mutateAsync: signFieldWithToken, isLoading: isSignFieldWithTokenLoading } =
+  const { mutateAsync: signFieldWithToken, isPending: isSignFieldWithTokenLoading } =
     trpc.field.signFieldWithToken.useMutation(DO_NOT_INVALIDATE_QUERY_ON_MUTATION);
 
   const {
     mutateAsync: removeSignedFieldWithToken,
-    isLoading: isRemoveSignedFieldWithTokenLoading,
+    isPending: isRemoveSignedFieldWithTokenLoading,
   } = trpc.field.removeSignedFieldWithToken.useMutation(DO_NOT_INVALIDATE_QUERY_ON_MUTATION);
+
+  const safeFieldMeta = ZDateFieldMeta.safeParse(field.fieldMeta);
+  const parsedFieldMeta = safeFieldMeta.success ? safeFieldMeta.data : null;
 
   const isLoading = isSignFieldWithTokenLoading || isRemoveSignedFieldWithTokenLoading || isPending;
 
   const localDateString = convertToLocalSystemFormat(field.customText, dateFormat, timezone);
-
   const isDifferentTime = field.inserted && localDateString !== field.customText;
-
   const tooltipText = _(
     msg`"${field.customText}" will appear on the document as it has a timezone of "${timezone}".`,
   );
@@ -97,7 +99,9 @@ export const DateField = ({
 
       toast({
         title: _(msg`Error`),
-        description: _(msg`An error occurred while signing the document.`),
+        description: isAssistantMode
+          ? _(msg`An error occurred while signing as assistant.`)
+          : _(msg`An error occurred while signing the document.`),
         variant: 'destructive',
       });
     }
@@ -123,7 +127,7 @@ export const DateField = ({
 
       toast({
         title: _(msg`Error`),
-        description: _(msg`An error occurred while removing the signature.`),
+        description: _(msg`An error occurred while removing the field.`),
         variant: 'destructive',
       });
     }
@@ -150,9 +154,21 @@ export const DateField = ({
       )}
 
       {field.inserted && (
-        <p className="text-muted-foreground dark:text-background/80 text-[clamp(0.425rem,25cqw,0.825rem)] duration-200">
-          {localDateString}
-        </p>
+        <div className="flex h-full w-full items-center">
+          <p
+            className={cn(
+              'text-muted-foreground dark:text-background/80 w-full text-[clamp(0.425rem,25cqw,0.825rem)] duration-200',
+              {
+                'text-left': parsedFieldMeta?.textAlign === 'left',
+                'text-center':
+                  !parsedFieldMeta?.textAlign || parsedFieldMeta?.textAlign === 'center',
+                'text-right': parsedFieldMeta?.textAlign === 'right',
+              },
+            )}
+          >
+            {localDateString}
+          </p>
+        </div>
       )}
     </SigningFieldContainer>
   );

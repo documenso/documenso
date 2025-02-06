@@ -13,7 +13,6 @@ import { DO_NOT_INVALIDATE_QUERY_ON_MUTATION } from '@documenso/lib/constants/tr
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import type { TRecipientActionAuth } from '@documenso/lib/types/document-auth';
 import { ZTextFieldMeta } from '@documenso/lib/types/field-meta';
-import type { Recipient } from '@documenso/prisma/client';
 import type { FieldWithSignatureAndFieldMeta } from '@documenso/prisma/types/field-with-signature-and-fieldmeta';
 import { trpc } from '@documenso/trpc/react';
 import type {
@@ -27,26 +26,31 @@ import { Textarea } from '@documenso/ui/primitives/textarea';
 import { useToast } from '@documenso/ui/primitives/use-toast';
 
 import { useRequiredDocumentAuthContext } from './document-auth-provider';
+import { useRecipientContext } from './recipient-context';
 import { SigningFieldContainer } from './signing-field-container';
+
+type ValidationErrors = {
+  required: string[];
+  characterLimit: string[];
+};
 
 export type TextFieldProps = {
   field: FieldWithSignatureAndFieldMeta;
-  recipient: Recipient;
   onSignField?: (value: TSignFieldWithTokenMutationSchema) => Promise<void> | void;
   onUnsignField?: (value: TRemovedSignedFieldWithTokenMutationSchema) => Promise<void> | void;
 };
 
-export const TextField = ({ field, recipient, onSignField, onUnsignField }: TextFieldProps) => {
+export const TextField = ({ field, onSignField, onUnsignField }: TextFieldProps) => {
   const { _ } = useLingui();
   const { toast } = useToast();
+  const { recipient, targetSigner, isAssistantMode } = useRecipientContext();
 
   const router = useRouter();
 
-  const initialErrors: Record<string, string[]> = {
+  const initialErrors: ValidationErrors = {
     required: [],
     characterLimit: [],
   };
-
   const [errors, setErrors] = useState(initialErrors);
   const userInputHasErrors = Object.values(errors).some((error) => error.length > 0);
 
@@ -54,15 +58,16 @@ export const TextField = ({ field, recipient, onSignField, onUnsignField }: Text
 
   const [isPending, startTransition] = useTransition();
 
-  const { mutateAsync: signFieldWithToken, isLoading: isSignFieldWithTokenLoading } =
+  const { mutateAsync: signFieldWithToken, isPending: isSignFieldWithTokenLoading } =
     trpc.field.signFieldWithToken.useMutation(DO_NOT_INVALIDATE_QUERY_ON_MUTATION);
 
   const {
     mutateAsync: removeSignedFieldWithToken,
-    isLoading: isRemoveSignedFieldWithTokenLoading,
+    isPending: isRemoveSignedFieldWithTokenLoading,
   } = trpc.field.removeSignedFieldWithToken.useMutation(DO_NOT_INVALIDATE_QUERY_ON_MUTATION);
 
-  const parsedFieldMeta = field.fieldMeta ? ZTextFieldMeta.parse(field.fieldMeta) : null;
+  const safeFieldMeta = ZTextFieldMeta.safeParse(field.fieldMeta);
+  const parsedFieldMeta = safeFieldMeta.success ? safeFieldMeta.data : null;
 
   const isLoading = isSignFieldWithTokenLoading || isRemoveSignedFieldWithTokenLoading || isPending;
   const shouldAutoSignField =
@@ -165,7 +170,9 @@ export const TextField = ({ field, recipient, onSignField, onUnsignField }: Text
 
       toast({
         title: _(msg`Error`),
-        description: _(msg`An error occurred while signing the document.`),
+        description: isAssistantMode
+          ? _(msg`An error occurred while signing as assistant.`)
+          : _(msg`An error occurred while signing the document.`),
         variant: 'destructive',
       });
     }
@@ -193,7 +200,7 @@ export const TextField = ({ field, recipient, onSignField, onUnsignField }: Text
 
       toast({
         title: _(msg`Error`),
-        description: _(msg`An error occurred while removing the text.`),
+        description: _(msg`An error occurred while removing the field.`),
         variant: 'destructive',
       });
     }
@@ -214,15 +221,15 @@ export const TextField = ({ field, recipient, onSignField, onUnsignField }: Text
     parsedField?.label && parsedField.label.length < 20
       ? parsedField.label
       : parsedField?.label
-      ? parsedField?.label.substring(0, 20) + '...'
-      : undefined;
+        ? parsedField?.label.substring(0, 20) + '...'
+        : undefined;
 
   const textDisplay =
     parsedField?.text && parsedField.text.length < 20
       ? parsedField.text
       : parsedField?.text
-      ? parsedField?.text.substring(0, 20) + '...'
-      : undefined;
+        ? parsedField?.text.substring(0, 20) + '...'
+        : undefined;
 
   const fieldDisplayName = labelDisplay ? labelDisplay : textDisplay;
   const charactersRemaining = (parsedFieldMeta?.characterLimit ?? 0) - (localText.length ?? 0);
@@ -233,7 +240,7 @@ export const TextField = ({ field, recipient, onSignField, onUnsignField }: Text
       onPreSign={onPreSign}
       onSign={onSign}
       onRemove={onRemove}
-      type="Signature"
+      type="Text"
     >
       {isLoading && (
         <div className="bg-background absolute inset-0 flex items-center justify-center rounded-md">
@@ -261,11 +268,23 @@ export const TextField = ({ field, recipient, onSignField, onUnsignField }: Text
       )}
 
       {field.inserted && (
-        <p className="text-muted-foreground dark:text-background/80 flex items-center justify-center gap-x-1 text-[clamp(0.425rem,25cqw,0.825rem)] duration-200">
-          {field.customText.length < 20
-            ? field.customText
-            : field.customText.substring(0, 15) + '...'}
-        </p>
+        <div className="flex h-full w-full items-center">
+          <p
+            className={cn(
+              'text-muted-foreground dark:text-background/80 w-full text-[clamp(0.425rem,25cqw,0.825rem)] duration-200',
+              {
+                'text-left': parsedFieldMeta?.textAlign === 'left',
+                'text-center':
+                  !parsedFieldMeta?.textAlign || parsedFieldMeta?.textAlign === 'center',
+                'text-right': parsedFieldMeta?.textAlign === 'right',
+              },
+            )}
+          >
+            {field.customText.length < 20
+              ? field.customText
+              : field.customText.substring(0, 20) + '...'}
+          </p>
+        </div>
       )}
 
       <Dialog open={showCustomTextModal} onOpenChange={setShowCustomTextModal}>
@@ -281,6 +300,10 @@ export const TextField = ({ field, recipient, onSignField, onUnsignField }: Text
               className={cn('mt-2 w-full rounded-md', {
                 'border-2 border-red-300 ring-2 ring-red-200 ring-offset-2 ring-offset-red-200 focus-visible:border-red-400 focus-visible:ring-4 focus-visible:ring-red-200 focus-visible:ring-offset-2 focus-visible:ring-offset-red-200':
                   userInputHasErrors,
+                'text-left': parsedFieldMeta?.textAlign === 'left',
+                'text-center':
+                  !parsedFieldMeta?.textAlign || parsedFieldMeta?.textAlign === 'center',
+                'text-right': parsedFieldMeta?.textAlign === 'right',
               })}
               value={localText}
               onChange={handleTextChange}
@@ -325,7 +348,7 @@ export const TextField = ({ field, recipient, onSignField, onUnsignField }: Text
             <div className="mt-4 flex w-full flex-1 flex-nowrap gap-4">
               <Button
                 type="button"
-                className="dark:bg-muted dark:hover:bg-muted/80 flex-1  bg-black/5 hover:bg-black/10"
+                className="dark:bg-muted dark:hover:bg-muted/80 flex-1 bg-black/5 hover:bg-black/10"
                 variant="secondary"
                 onClick={() => {
                   setShowCustomTextModal(false);

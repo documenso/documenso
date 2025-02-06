@@ -2,14 +2,18 @@ import { notFound } from 'next/navigation';
 
 import { match } from 'ts-pattern';
 
+import { isUserEnterprise } from '@documenso/ee/server-only/util/is-document-enterprise';
+import { isDocumentPlatform } from '@documenso/ee/server-only/util/is-document-platform';
 import { IS_BILLING_ENABLED } from '@documenso/lib/constants/app';
 import { getServerComponentSession } from '@documenso/lib/next-auth/get-server-component-session';
+import { getTeamById } from '@documenso/lib/server-only/team/get-team';
 import { getTemplateByDirectLinkToken } from '@documenso/lib/server-only/template/get-template-by-direct-link-token';
 import { DocumentAccessAuth } from '@documenso/lib/types/document-auth';
 import { extractDocumentAuthMethods } from '@documenso/lib/utils/document-auth';
 
 import { DocumentAuthProvider } from '~/app/(signing)/sign/[token]/document-auth-provider';
 import { SigningProvider } from '~/app/(signing)/sign/[token]/provider';
+import { RecipientProvider } from '~/app/(signing)/sign/[token]/recipient-context';
 
 import { EmbedAuthenticateView } from '../../authenticate';
 import { EmbedPaywall } from '../../paywall';
@@ -51,6 +55,14 @@ export default async function EmbedDirectTemplatePage({ params }: EmbedDirectTem
     documentAuth: template.authOptions,
   });
 
+  const [isPlatformDocument, isEnterpriseDocument] = await Promise.all([
+    isDocumentPlatform(template),
+    isUserEnterprise({
+      userId: template.userId,
+      teamId: template.teamId ?? undefined,
+    }),
+  ]);
+
   const isAccessAuthValid = match(derivedRecipientAccessAuth)
     .with(DocumentAccessAuth.ACCOUNT, () => user !== null)
     .with(null, () => true)
@@ -62,7 +74,7 @@ export default async function EmbedDirectTemplatePage({ params }: EmbedDirectTem
 
   const { directTemplateRecipientId } = template.directLink;
 
-  const recipient = template.Recipient.find(
+  const recipient = template.recipients.find(
     (recipient) => recipient.id === directTemplateRecipientId,
   );
 
@@ -70,7 +82,13 @@ export default async function EmbedDirectTemplatePage({ params }: EmbedDirectTem
     return notFound();
   }
 
-  const fields = template.Field.filter((field) => field.recipientId === directTemplateRecipientId);
+  const fields = template.fields.filter((field) => field.recipientId === directTemplateRecipientId);
+
+  const team = template.teamId
+    ? await getTeamById({ teamId: template.teamId, userId: template.userId }).catch(() => null)
+    : null;
+
+  const hidePoweredBy = team?.teamGlobalSettings?.brandingHidePoweredBy ?? false;
 
   return (
     <SigningProvider email={user?.email} fullName={user?.name} signature={user?.signature}>
@@ -79,14 +97,18 @@ export default async function EmbedDirectTemplatePage({ params }: EmbedDirectTem
         recipient={recipient}
         user={user}
       >
-        <EmbedDirectTemplateClientPage
-          token={token}
-          updatedAt={template.updatedAt}
-          documentData={template.templateDocumentData}
-          recipient={recipient}
-          fields={fields}
-          metadata={template.templateMeta}
-        />
+        <RecipientProvider recipient={recipient}>
+          <EmbedDirectTemplateClientPage
+            token={token}
+            updatedAt={template.updatedAt}
+            documentData={template.templateDocumentData}
+            recipient={recipient}
+            fields={fields}
+            metadata={template.templateMeta}
+            hidePoweredBy={isPlatformDocument || isEnterpriseDocument || hidePoweredBy}
+            isPlatformOrEnterprise={isPlatformDocument || isEnterpriseDocument}
+          />
+        </RecipientProvider>
       </DocumentAuthProvider>
     </SigningProvider>
   );

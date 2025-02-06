@@ -5,7 +5,6 @@ import { useEffect, useMemo, useState } from 'react';
 import { Trans, msg } from '@lingui/macro';
 import { useLingui } from '@lingui/react';
 
-import type { FindTemplateRow } from '@documenso/lib/server-only/template/find-templates';
 import type {
   Team,
   TeamProfile,
@@ -15,6 +14,7 @@ import type {
 } from '@documenso/prisma/client';
 import { TemplateType } from '@documenso/prisma/client';
 import { trpc } from '@documenso/trpc/react';
+import type { FindTemplateRow } from '@documenso/trpc/server/template-router/schema';
 import { cn } from '@documenso/ui/lib/utils';
 import { Button } from '@documenso/ui/primitives/button';
 import { Switch } from '@documenso/ui/primitives/switch';
@@ -61,13 +61,12 @@ export const PublicProfilePageView = ({ user, team, profile }: PublicProfilePage
 
   const { data } = trpc.template.findTemplates.useQuery({
     perPage: 100,
-    teamId: team?.id,
   });
 
-  const { mutateAsync: updateUserProfile, isLoading: isUpdatingUserProfile } =
+  const { mutateAsync: updateUserProfile, isPending: isUpdatingUserProfile } =
     trpc.profile.updatePublicProfile.useMutation();
 
-  const { mutateAsync: updateTeamProfile, isLoading: isUpdatingTeamProfile } =
+  const { mutateAsync: updateTeamProfile, isPending: isUpdatingTeamProfile } =
     trpc.team.updateTeamPublicProfile.useMutation();
 
   const isUpdating = isUpdatingUserProfile || isUpdatingTeamProfile;
@@ -75,7 +74,7 @@ export const PublicProfilePageView = ({ user, team, profile }: PublicProfilePage
 
   const enabledPrivateDirectTemplates = useMemo(
     () =>
-      (data?.templates ?? []).filter(
+      (data?.data ?? []).filter(
         (template): template is DirectTemplate =>
           template.directLink?.enabled === true && template.type !== TemplateType.PUBLIC,
       ),

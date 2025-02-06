@@ -5,7 +5,7 @@ import { useState } from 'react';
 import Link from 'next/link';
 
 import { Trans } from '@lingui/macro';
-import { Copy, Edit, MoreHorizontal, MoveRight, Share2Icon, Trash2 } from 'lucide-react';
+import { Copy, Edit, MoreHorizontal, MoveRight, Share2Icon, Trash2, Upload } from 'lucide-react';
 import { useSession } from 'next-auth/react';
 
 import type { Recipient, Template, TemplateDirectLink } from '@documenso/prisma/client';
@@ -17,6 +17,8 @@ import {
   DropdownMenuTrigger,
 } from '@documenso/ui/primitives/dropdown-menu';
 
+import { TemplateBulkSendDialog } from '~/components/templates/template-bulk-send-dialog';
+
 import { DeleteTemplateDialog } from './delete-template-dialog';
 import { DuplicateTemplateDialog } from './duplicate-template-dialog';
 import { MoveTemplateDialog } from './move-template-dialog';
@@ -25,7 +27,7 @@ import { TemplateDirectLinkDialog } from './template-direct-link-dialog';
 export type DataTableActionDropdownProps = {
   row: Template & {
     directLink?: Pick<TemplateDirectLink, 'token' | 'enabled'> | null;
-    Recipient: Recipient[];
+    recipients: Recipient[];
   };
   templateRootPath: string;
   teamId?: number;
@@ -79,12 +81,23 @@ export const DataTableActionDropdown = ({
           <Trans>Direct link</Trans>
         </DropdownMenuItem>
 
-        {!teamId && (
+        {!teamId && !row.teamId && (
           <DropdownMenuItem onClick={() => setMoveDialogOpen(true)}>
             <MoveRight className="mr-2 h-4 w-4" />
             <Trans>Move to Team</Trans>
           </DropdownMenuItem>
         )}
+
+        <TemplateBulkSendDialog
+          templateId={row.id}
+          recipients={row.recipients}
+          trigger={
+            <div className="hover:bg-accent hover:text-accent-foreground relative flex cursor-pointer select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none transition-colors">
+              <Upload className="mr-2 h-4 w-4" />
+              <Trans>Bulk Send via CSV</Trans>
+            </div>
+          }
+        />
 
         <DropdownMenuItem
           disabled={!isOwner && !isTeamTemplate}

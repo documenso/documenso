@@ -38,7 +38,7 @@ export const LayoutBillingBanner = ({
 
   const [isOpen, setIsOpen] = useState(false);
 
-  const { mutateAsync: createBillingPortal, isLoading } =
+  const { mutateAsync: createBillingPortal, isPending } =
     trpc.team.createBillingPortal.useMutation();
 
   const handleCreatePortal = async () => {
@@ -92,7 +92,7 @@ export const LayoutBillingBanner = ({
               'text-destructive-foreground hover:bg-destructive-foreground hover:text-white':
                 subscription.status === SubscriptionStatus.INACTIVE,
             })}
-            disabled={isLoading}
+            disabled={isPending}
             onClick={() => setIsOpen(true)}
             size="sm"
           >
@@ -101,7 +101,7 @@ export const LayoutBillingBanner = ({
         </div>
       </div>
 
-      <Dialog open={isOpen} onOpenChange={(value) => !isLoading && setIsOpen(value)}>
+      <Dialog open={isOpen} onOpenChange={(value) => !isPending && setIsOpen(value)}>
         <DialogContent>
           <DialogTitle>
             <Trans>Payment overdue</Trans>
@@ -128,7 +128,7 @@ export const LayoutBillingBanner = ({
 
           {canExecuteTeamAction('MANAGE_BILLING', userRole) && (
             <DialogFooter>
-              <Button loading={isLoading} onClick={handleCreatePortal}>
+              <Button loading={isPending} onClick={handleCreatePortal}>
                 <Trans>Resolve payment</Trans>
               </Button>
             </DialogFooter>
