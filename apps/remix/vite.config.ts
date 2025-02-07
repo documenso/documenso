@@ -22,50 +22,59 @@ export default defineConfig({
       plugins: [tailwindcss, autoprefixer],
     },
   },
-  ssr: {
-    noExternal: [
-      'react-dropzone',
-      'recharts',
-      'superjson',
-      // '@node-rs/bcrypt-wasm32-wasi',
-      // '@noble/ciphers/chacha',
-      // '@noble/ciphers/utils',
-      // '@noble/ciphers/webcrypto/utils',
-      // '@noble/hashes/sha256a',
-      // '@node-rs/bcrypt',
-      // 'crypto',
-      // '@documenso/assets',
-      // '@documenso/ee',
-      // '@documenso/lib',
-      // '@documenso/prisma',
-      // '@documenso/tailwind-config',
-      // '@documenso/trpc',
-      // '@documenso/ui',
-    ],
-  },
   server: {
     port: 3000,
     strictPort: true,
   },
   plugins: [
     reactRouter(),
-    lingui(),
     macrosPlugin(),
+    lingui(),
+    tsconfigPaths(),
     serverAdapter({
       entry: 'server/index.ts',
     }),
-    tsconfigPaths(),
   ],
+  ssr: {
+    noExternal: ['react-dropzone', 'plausible-tracker', 'pdfjs-dist'],
+    external: ['@node-rs/bcrypt'],
+  },
   optimizeDeps: {
-    exclude: ['superjson'],
-    // force: true,
+    exclude: ['@node-rs/bcrypt'],
   },
-  build: {
-    commonjsOptions: {
-      include: ['superjson'],
-    },
-    rollupOptions: {
-      external: ['@node-rs/bcrypt'],
-    },
-  },
+  /**
+   * Throwing shit at a wall to see what sticks for building below onwards.
+   */
+  // resolve: {
+  //   alias: {
+  //     // https: 'node:https',
+  //     // '.prisma/client/default': '../../node_modules/.prisma/client/default.js',
+  //   },
+  // },
+  // optimizeDeps: {
+  //   include: [],
+  // },
+  // ssr: {
+  //   // noExternal: true,
+  //   noExternal: [
+  //     '@documenso/assets',
+  //     '@documenso/ee',
+  //     '@documenso/lib',
+  //     '@documenso/prisma',
+  //     '@documenso/tailwind-config',
+  //     '@documenso/trpc',
+  //     '@documenso/ui',
+  //   ],
+  // },
+  // build: {
+  //   rollupOptions: {
+  //     external: [
+  //       '@node-rs/bcrypt',
+  //       '@documenso/pdf-sign',
+  //       'nodemailer',
+  //       'playwright',
+  //       '@aws-sdk/cloudfront-signer',
+  //     ],
+  //   },
+  // },
 });

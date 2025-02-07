@@ -5,6 +5,9 @@ import type { PDFDocument } from 'pdf-lib';
 import { RotationTypes, degrees, radiansToDegrees } from 'pdf-lib';
 import { P, match } from 'ts-pattern';
 
+// Todo: Check if this is okay to do compared to the old approach.
+import fontCaveat from '@documenso/assets/fonts/caveat.ttf?inline';
+import fontNoto from '@documenso/assets/fonts/noto-sans.ttf?inline';
 import {
   DEFAULT_HANDWRITING_FONT_SIZE,
   DEFAULT_STANDARD_FONT_SIZE,
@@ -25,20 +28,8 @@ import {
   ZRadioFieldMeta,
   ZTextFieldMeta,
 } from '../../types/field-meta';
-import { env } from '../../utils/env';
 
 export const insertFieldInPDF = async (pdf: PDFDocument, field: FieldWithSignature) => {
-  const fontCaveatUri = env('FONT_CAVEAT_URI');
-  const fontNotoSansUri = env('FONT_NOTO_SANS_URI');
-
-  if (!fontCaveatUri || !fontNotoSansUri) {
-    throw new Error('Missing font URI');
-  }
-
-  const fontCaveat = await fetch(fontCaveatUri).then(async (res) => res.arrayBuffer());
-
-  const fontNoto = await fetch(fontNotoSansUri).then(async (res) => res.arrayBuffer());
-
   const isSignatureField = isSignatureFieldType(field.type);
 
   pdf.registerFontkit(fontkit);

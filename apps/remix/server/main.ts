@@ -5,7 +5,6 @@ import handle from 'hono-react-router-adapter/node';
 
 import server from '.';
 import * as build from '../build/server';
-import { getLoadContext } from './load-context';
 
 server.use(
   serveStatic({
@@ -13,6 +12,6 @@ server.use(
   }),
 );
 
-const handler = handle(build, server, { getLoadContext });
+const handler = handle(build, server);
 
 serve({ fetch: handler.fetch, port: 3000 });

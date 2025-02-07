@@ -1,6 +1,6 @@
-// Todo: This relies on NextJS
-import { ImageResponse } from 'next/og';
-
+// Todo: Test, used AI to migrate this component from NextJS to Remix.
+import satori from 'satori';
+import sharp from 'sharp';
 import { P, match } from 'ts-pattern';
 
 import { NEXT_PUBLIC_WEBAPP_URL } from '@documenso/lib/constants/app';
@@ -25,7 +25,7 @@ export const loader = async ({ params }: Route.LoaderArgs) => {
 
   const baseUrl = NEXT_PUBLIC_WEBAPP_URL();
 
-  const [interSemiBold, interRegular, caveatRegular, shareFrameImage] = await Promise.all([
+  const [interSemiBold, interRegular, caveatRegular] = await Promise.all([
     fetch(new URL(`${baseUrl}/fonts/inter-semibold.ttf`, import.meta.url)).then(async (res) =>
       res.arrayBuffer(),
     ),
@@ -33,9 +33,6 @@ export const loader = async ({ params }: Route.LoaderArgs) => {
       res.arrayBuffer(),
     ),
     fetch(new URL(`${baseUrl}/fonts/caveat-regular.ttf`, import.meta.url)).then(async (res) =>
-      res.arrayBuffer(),
-    ),
-    fetch(new URL(`${baseUrl}/static/og-share-frame2.png`, import.meta.url)).then(async (res) =>
       res.arrayBuffer(),
     ),
   ]);
@@ -66,65 +63,100 @@ export const loader = async ({ params }: Route.LoaderArgs) => {
       return sender.name || sender.email;
     });
 
-  return new ImageResponse(
-    (
-      <div tw="relative flex h-full w-full bg-white">
-        {/* @ts-expect-error Lack of typing from ImageResponse */}
-        <img src={shareFrameImage} alt="og-share-frame" tw="absolute inset-0 w-full h-full" />
+  // Generate SVG using Satori
+  const svg = await satori(
+    <div
+      style={{
+        display: 'flex',
+        height: '100%',
+        width: '100%',
+        backgroundColor: 'white',
+        position: 'relative',
+      }}
+    >
+      <img
+        src={`${baseUrl}/static/og-share-frame2.png`}
+        alt="og-share-frame"
+        style={{
+          position: 'absolute',
+          inset: 0,
+          width: '100%',
+          height: '100%',
+        }}
+      />
 
-        {signatureImage ? (
-          <div
-            tw="absolute py-6 px-12 flex items-center justify-center text-center"
-            style={{
-              top: `${CARD_OFFSET_TOP}px`,
-              left: `${CARD_OFFSET_LEFT}px`,
-              width: `${CARD_WIDTH}px`,
-              height: `${CARD_HEIGHT}px`,
-            }}
-          >
-            <img src={signatureImage} alt="signature" tw="opacity-60 h-full max-w-[100%]" />
-          </div>
-        ) : (
-          <p
-            tw="absolute py-6 px-12 -mt-2 flex items-center justify-center text-center text-slate-500"
-            style={{
-              fontFamily: 'Caveat',
-              fontSize: `${Math.max(
-                Math.min((CARD_WIDTH * 1.5) / signatureName.length, 80),
-                36,
-              )}px`,
-              top: `${CARD_OFFSET_TOP}px`,
-              left: `${CARD_OFFSET_LEFT}px`,
-              width: `${CARD_WIDTH}px`,
-              height: `${CARD_HEIGHT}px`,
-            }}
-          >
-            {signatureName}
-          </p>
-        )}
-
+      {signatureImage ? (
         <div
-          tw="absolute flex w-full"
           style={{
-            top: `${CARD_OFFSET_TOP - 78}px`,
-            left: `${CARD_OFFSET_LEFT}px`,
+            position: 'absolute',
+            padding: '24px 48px',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            textAlign: 'center',
+            top: CARD_OFFSET_TOP,
+            left: CARD_OFFSET_LEFT,
+            width: CARD_WIDTH,
+            height: CARD_HEIGHT,
           }}
         >
-          <h2
-            tw="text-xl"
+          <img
+            src={signatureImage}
+            alt="signature"
             style={{
-              color: '#828282',
-              fontFamily: 'Inter',
-              fontWeight: 700,
+              opacity: 0.6,
+              height: '100%',
+              maxWidth: '100%',
             }}
-          >
-            {isRecipient ? 'Document Signed!' : 'Document Sent!'}
-          </h2>
+          />
         </div>
+      ) : (
+        <p
+          style={{
+            position: 'absolute',
+            padding: '24px 48px',
+            marginTop: '-8px',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            textAlign: 'center',
+            color: '#64748b',
+            fontFamily: 'Caveat',
+            fontSize: Math.max(Math.min((CARD_WIDTH * 1.5) / signatureName.length, 80), 36),
+            top: CARD_OFFSET_TOP,
+            left: CARD_OFFSET_LEFT,
+            width: CARD_WIDTH,
+            height: CARD_HEIGHT,
+          }}
+        >
+          {signatureName}
+        </p>
+      )}
+
+      <div
+        style={{
+          position: 'absolute',
+          display: 'flex',
+          width: '100%',
+          top: CARD_OFFSET_TOP - 78,
+          left: CARD_OFFSET_LEFT,
+        }}
+      >
+        <h2
+          style={{
+            fontSize: '20px',
+            color: '#828282',
+            fontFamily: 'Inter',
+            fontWeight: 700,
+          }}
+        >
+          {isRecipient ? 'Document Signed!' : 'Document Sent!'}
+        </h2>
       </div>
-    ),
+    </div>,
     {
-      ...IMAGE_SIZE,
+      width: IMAGE_SIZE.width,
+      height: IMAGE_SIZE.height,
       fonts: [
         {
           name: 'Caveat',
@@ -134,20 +166,27 @@ export const loader = async ({ params }: Route.LoaderArgs) => {
         {
           name: 'Inter',
           data: interRegular,
-          style: 'normal',
           weight: 400,
         },
         {
           name: 'Inter',
           data: interSemiBold,
-          style: 'normal',
           weight: 600,
         },
       ],
-      headers: {
-        'Access-Control-Allow-Origin': '*',
-        'Access-Control-Allow-Methods': 'GET, OPTIONS',
-      },
     },
   );
+
+  // Convert SVG to PNG using sharp
+  const pngBuffer = await sharp(Buffer.from(svg)).toFormat('png').toBuffer();
+
+  return new Response(pngBuffer, {
+    headers: {
+      'Content-Type': 'image/png',
+      'Content-Length': pngBuffer.length.toString(),
+      'Cache-Control': 'public, max-age=31536000, immutable',
+      'Access-Control-Allow-Origin': '*',
+      'Access-Control-Allow-Methods': 'GET, OPTIONS',
+    },
+  });
 };

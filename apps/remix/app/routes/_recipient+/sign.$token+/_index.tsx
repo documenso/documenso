@@ -2,7 +2,7 @@ import { Trans } from '@lingui/macro';
 import { DocumentStatus, SigningStatus } from '@prisma/client';
 import { Clock8 } from 'lucide-react';
 import { Link, redirect } from 'react-router';
-import { getOptionalLoaderSession } from 'server/utils/get-loader-session';
+import { getOptionalLoaderContext } from 'server/utils/get-loader-session';
 
 import signingCelebration from '@documenso/assets/images/signing-celebration.png';
 import { useOptionalSession } from '@documenso/lib/client-only/providers/session';
@@ -27,7 +27,7 @@ import { superLoaderJson, useSuperLoaderData } from '~/utils/super-json-loader';
 import type { Route } from './+types/_index';
 
 export async function loader({ params }: Route.LoaderArgs) {
-  const session = getOptionalLoaderSession();
+  const { session, requestMetadata } = getOptionalLoaderContext();
 
   const { token } = params;
 
@@ -91,7 +91,7 @@ export async function loader({ params }: Route.LoaderArgs) {
 
   await viewedDocument({
     token,
-    requestMetadata: context.requestMetadata,
+    requestMetadata,
     recipientAccessAuth: derivedRecipientAccessAuth,
   }).catch(() => null);
 

@@ -1,8 +1,29 @@
 import { getContext } from 'hono/context-storage';
 import { redirect } from 'react-router';
 import type { HonoEnv } from 'server';
+import type { AppContext } from 'server/context';
 
 import type { AppSession } from '@documenso/lib/client-only/providers/session';
+
+/**
+ * Get the full context passed to the loader.
+ *
+ * @returns The full app context.
+ */
+export const getOptionalLoaderContext = (): AppContext => {
+  const { context } = getContext<HonoEnv>().var;
+  return context;
+};
+
+/**
+ * Returns the session extracted from the app context.
+ *
+ * @returns The session, or null if not authenticated.
+ */
+export const getOptionalLoaderSession = (): AppSession | null => {
+  const { context } = getContext<HonoEnv>().var;
+  return context.session;
+};
 
 /**
  * Returns the session context or throws a redirect to signin if it is not present.
@@ -15,11 +36,6 @@ export const getLoaderSession = (): AppSession => {
   }
 
   return session;
-};
-
-export const getOptionalLoaderSession = (): AppSession | null => {
-  const { context } = getContext<HonoEnv>().var;
-  return context.session;
 };
 
 /**
