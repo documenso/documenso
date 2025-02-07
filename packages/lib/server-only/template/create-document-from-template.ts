@@ -256,10 +256,20 @@ export const createDocumentFromTemplate = async ({
       },
     });
 
+    const recipientMapping = new Map<number, number>();
+
+    template.recipients.forEach((templateRecipient, index) => {
+      const documentRecipient = document.recipients[index];
+      if (documentRecipient) {
+        recipientMapping.set(templateRecipient.id, documentRecipient.id);
+      }
+    });
+
     let fieldsToCreate: Omit<Field, 'id' | 'secondaryId' | 'templateId'>[] = [];
 
-    Object.values(finalRecipients).forEach(({ email, fields }) => {
-      const recipient = document.recipients.find((recipient) => recipient.email === email);
+    finalRecipients.forEach(({ templateRecipientId, fields }) => {
+      const documentRecipientId = recipientMapping.get(templateRecipientId);
+      const recipient = document.recipients.find((r) => r.id === documentRecipientId);
 
       if (!recipient) {
         throw new Error('Recipient not found.');
