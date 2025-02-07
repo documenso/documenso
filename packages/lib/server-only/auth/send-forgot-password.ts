@@ -1,6 +1,6 @@
 import { createElement } from 'react';
 
-import { msg } from '@lingui/macro';
+import { msg } from '@lingui/core/macro';
 
 import { mailer } from '@documenso/email/mailer';
 import { ForgotPasswordTemplate } from '@documenso/email/templates/forgot-password';

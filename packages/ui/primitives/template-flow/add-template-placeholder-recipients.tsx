@@ -3,8 +3,9 @@ import { useCallback, useEffect, useId, useMemo, useRef, useState } from 'react'
 import type { DropResult, SensorAPI } from '@hello-pangea/dnd';
 import { DragDropContext, Draggable, Droppable } from '@hello-pangea/dnd';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Trans, msg } from '@lingui/macro';
+import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
+import { Trans } from '@lingui/react/macro';
 import type { TemplateDirectLink } from '@prisma/client';
 import { DocumentSigningOrder, type Field, type Recipient, RecipientRole } from '@prisma/client';
 import { motion } from 'framer-motion';

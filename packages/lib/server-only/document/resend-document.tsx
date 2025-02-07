@@ -1,6 +1,6 @@
 import { createElement } from 'react';
 
-import { msg } from '@lingui/macro';
+import { msg } from '@lingui/core/macro';
 import { DocumentStatus, RecipientRole, SigningStatus } from '@prisma/client';
 import type { Prisma } from '@prisma/client';
 

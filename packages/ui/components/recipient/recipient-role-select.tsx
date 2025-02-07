@@ -1,6 +1,6 @@
 import React, { forwardRef } from 'react';
 
-import { Trans } from '@lingui/macro';
+import { Trans } from '@lingui/react/macro';
 import { RecipientRole } from '@prisma/client';
 import type { SelectProps } from '@radix-ui/react-select';
 import { InfoIcon } from 'lucide-react';

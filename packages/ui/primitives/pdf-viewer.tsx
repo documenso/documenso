@@ -1,7 +1,8 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 
-import { Trans, msg } from '@lingui/macro';
+import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
+import { Trans } from '@lingui/react/macro';
 import type { DocumentData } from '@prisma/client';
 import { Loader } from 'lucide-react';
 import { type PDFDocumentProxy, PasswordResponses } from 'pdfjs-dist';

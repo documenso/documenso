@@ -1,8 +1,7 @@
 import type { HTMLAttributes, MouseEvent, PointerEvent, TouchEvent } from 'react';
 import { useEffect, useMemo, useRef, useState } from 'react';
 
-// import { Caveat } from 'next/font/google';
-import { Trans } from '@lingui/macro';
+import { Trans } from '@lingui/react/macro';
 import { Undo2, Upload } from 'lucide-react';
 import type { StrokeOptions } from 'perfect-freehand';
 import { getStroke } from 'perfect-freehand';

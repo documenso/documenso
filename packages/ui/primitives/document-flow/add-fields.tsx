@@ -1,9 +1,8 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
-// Todo
-// import { Caveat } from 'next/font/google';
-import { Trans, msg } from '@lingui/macro';
+import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
+import { Trans } from '@lingui/react/macro';
 import { Prisma } from '@prisma/client';
 import type { Field, Recipient } from '@prisma/client';
 import { FieldType, RecipientRole, SendStatus } from '@prisma/client';

@@ -1,6 +1,6 @@
 import { createElement } from 'react';
 
-import { msg } from '@lingui/macro';
+import { msg } from '@lingui/core/macro';
 import type { Team, TeamGlobalSettings } from '@prisma/client';
 import { TeamMemberInviteStatus } from '@prisma/client';
 import { nanoid } from 'nanoid';

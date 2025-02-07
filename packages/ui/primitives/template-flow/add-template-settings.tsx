@@ -1,8 +1,8 @@
 import { useEffect } from 'react';
 
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Trans } from '@lingui/macro';
 import { useLingui } from '@lingui/react';
+import { Trans } from '@lingui/react/macro';
 import { DocumentVisibility, TeamMemberRole } from '@prisma/client';
 import { DocumentDistributionMethod, type Field, type Recipient } from '@prisma/client';
 import { InfoIcon } from 'lucide-react';

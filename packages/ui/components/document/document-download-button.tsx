@@ -1,8 +1,8 @@
 import type { HTMLAttributes } from 'react';
 import { useState } from 'react';
 
-import { Trans } from '@lingui/macro';
 import { useLingui } from '@lingui/react';
+import { Trans } from '@lingui/react/macro';
 import type { DocumentData } from '@prisma/client';
 import { Download } from 'lucide-react';
 

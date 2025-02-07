@@ -1,6 +1,6 @@
 import { createElement } from 'react';
 
-import { msg } from '@lingui/macro';
+import { msg } from '@lingui/core/macro';
 
 import { mailer } from '@documenso/email/mailer';
 import { DocumentRecipientSignedEmailTemplate } from '@documenso/email/templates/document-recipient-signed';

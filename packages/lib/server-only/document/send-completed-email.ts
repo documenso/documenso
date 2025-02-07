@@ -1,6 +1,6 @@
 import { createElement } from 'react';
 
-import { msg } from '@lingui/macro';
+import { msg } from '@lingui/core/macro';
 import { DocumentSource } from '@prisma/client';
 
 import { mailer } from '@documenso/email/mailer';

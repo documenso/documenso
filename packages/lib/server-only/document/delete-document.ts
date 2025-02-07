@@ -2,7 +2,7 @@
 
 import { createElement } from 'react';
 
-import { msg } from '@lingui/macro';
+import { msg } from '@lingui/core/macro';
 import type {
   Document,
   DocumentMeta,

@@ -1,7 +1,7 @@
 // Todo: Not sure if this actually makes it client-only.
 import { Suspense, lazy } from 'react';
 
-import { Trans } from '@lingui/macro';
+import { Trans } from '@lingui/react/macro';
 import { Loader } from 'lucide-react';
 import { Await } from 'react-router';
 

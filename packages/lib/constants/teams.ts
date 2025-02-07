@@ -1,5 +1,5 @@
 import type { MessageDescriptor } from '@lingui/core';
-import { msg } from '@lingui/macro';
+import { msg } from '@lingui/core/macro';
 import { TeamMemberRole } from '@prisma/client';
 
 export const TEAM_URL_ROOT_REGEX = new RegExp('^/t/[^/]+/?$');

@@ -1,6 +1,7 @@
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Trans, msg } from '@lingui/macro';
+import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
+import { Trans } from '@lingui/react/macro';
 import type { Field, Recipient } from '@prisma/client';
 import { DocumentDistributionMethod, DocumentStatus, RecipientRole } from '@prisma/client';
 import { AnimatePresence, motion } from 'framer-motion';

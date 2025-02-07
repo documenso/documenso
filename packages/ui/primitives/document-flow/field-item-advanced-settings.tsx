@@ -1,7 +1,7 @@
 import { forwardRef, useEffect, useState } from 'react';
 
 import type { MessageDescriptor } from '@lingui/core';
-import { msg } from '@lingui/macro';
+import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
 import { FieldType } from '@prisma/client';
 import { match } from 'ts-pattern';

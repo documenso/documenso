@@ -1,5 +1,5 @@
 import type { MessageDescriptor } from '@lingui/core';
-import { msg } from '@lingui/macro';
+import { msg } from '@lingui/core/macro';
 import { FieldType } from '@prisma/client';
 import { z } from 'zod';
 

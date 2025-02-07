@@ -1,4 +1,4 @@
-import { Trans } from '@lingui/macro';
+import { Trans } from '@lingui/react/macro';
 import { DialogClose } from '@radix-ui/react-dialog';
 
 import { Button } from '@documenso/ui/primitives/button';
