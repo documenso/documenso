@@ -47,50 +47,22 @@ import { Tooltip, TooltipContent, TooltipTrigger } from '@documenso/ui/primitive
 import type { Toast } from '@documenso/ui/primitives/use-toast';
 import { useToast } from '@documenso/ui/primitives/use-toast';
 
-const ZAddRecipientsForNewDocumentSchema = z
-  .object({
-    distributeDocument: z.boolean(),
-    useCustomDocument: z.boolean().default(false),
-    customDocumentData: z
-      .any()
-      .refine((data) => data instanceof File || data === undefined)
-      .optional(),
-    recipients: z.array(
-      z.object({
-        id: z.number(),
-        email: z.string().email(),
-        name: z.string(),
-        signingOrder: z.number().optional(),
-      }),
-    ),
-  })
-  // Display exactly which rows are duplicates.
-  .superRefine((items, ctx) => {
-    const uniqueEmails = new Map<string, number>();
-
-    for (const [index, recipients] of items.recipients.entries()) {
-      const email = recipients.email.toLowerCase();
-
-      const firstFoundIndex = uniqueEmails.get(email);
-
-      if (firstFoundIndex === undefined) {
-        uniqueEmails.set(email, index);
-        continue;
-      }
-
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        message: 'Emails must be unique',
-        path: ['recipients', index, 'email'],
-      });
-
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        message: 'Emails must be unique',
-        path: ['recipients', firstFoundIndex, 'email'],
-      });
-    }
-  });
+const ZAddRecipientsForNewDocumentSchema = z.object({
+  distributeDocument: z.boolean(),
+  useCustomDocument: z.boolean().default(false),
+  customDocumentData: z
+    .any()
+    .refine((data) => data instanceof File || data === undefined)
+    .optional(),
+  recipients: z.array(
+    z.object({
+      id: z.number(),
+      email: z.string().email(),
+      name: z.string(),
+      signingOrder: z.number().optional(),
+    }),
+  ),
+});
 
 type TAddRecipientsForNewDocumentSchema = z.infer<typeof ZAddRecipientsForNewDocumentSchema>;
 
