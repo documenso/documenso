@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 
-import { Plural, Trans } from '@lingui/macro';
+import { Plural, Trans } from '@lingui/react/macro';
 import { WebhookTriggerEvents } from '@prisma/client';
 import { Check, ChevronsUpDown } from 'lucide-react';
 

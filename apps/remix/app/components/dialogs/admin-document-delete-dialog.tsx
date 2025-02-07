@@ -1,7 +1,8 @@
 import { useState } from 'react';
 
-import { Trans, msg } from '@lingui/macro';
+import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
+import { Trans } from '@lingui/react/macro';
 import type { Document } from '@prisma/client';
 import { useNavigate } from 'react-router';
 

@@ -1,6 +1,7 @@
 import type { MessageDescriptor } from '@lingui/core';
-import { Trans, msg } from '@lingui/macro';
+import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
+import { Trans } from '@lingui/react/macro';
 import { ChevronLeft } from 'lucide-react';
 import { Link, Outlet, isRouteErrorResponse, redirect, useNavigate } from 'react-router';
 import { getLoaderSession } from 'server/utils/get-loader-session';

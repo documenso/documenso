@@ -1,7 +1,7 @@
 import type { HTMLAttributes } from 'react';
 
 import type { MessageDescriptor } from '@lingui/core';
-import { msg } from '@lingui/macro';
+import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
 import type { ExtendedDocumentStatus } from '@prisma/types/extended-document-status';
 import { CheckCircle2, Clock, File } from 'lucide-react';

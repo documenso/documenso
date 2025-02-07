@@ -1,6 +1,6 @@
 import { useState } from 'react';
 
-import { Trans } from '@lingui/macro';
+import { Trans } from '@lingui/react/macro';
 import type { Recipient, Template, TemplateDirectLink } from '@prisma/client';
 import { Copy, Edit, MoreHorizontal, MoveRight, Share2Icon, Trash2 } from 'lucide-react';
 import { Link } from 'react-router';

@@ -1,7 +1,8 @@
 import { useState } from 'react';
 
-import { Trans, msg } from '@lingui/macro';
+import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
+import { Trans } from '@lingui/react/macro';
 import { useNavigate } from 'react-router';
 
 import { authClient } from '@documenso/auth/client';

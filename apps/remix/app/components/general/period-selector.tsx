@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
 
-import { Trans } from '@lingui/macro';
+import { Trans } from '@lingui/react/macro';
 import { useLocation, useNavigate, useSearchParams } from 'react-router';
 
 import type { PeriodSelectorValue } from '@documenso/lib/server-only/document/find-documents';

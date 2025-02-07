@@ -1,5 +1,6 @@
-import { Trans, msg } from '@lingui/macro';
+import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
+import { Trans } from '@lingui/react/macro';
 import { Loader } from 'lucide-react';
 import { DateTime } from 'luxon';
 import { Link } from 'react-router';
@@ -27,13 +28,11 @@ export default function WebhookPage() {
       >
         <WebhookCreateDialog />
       </SettingsHeader>
-
       {isLoading && (
         <div className="absolute inset-0 flex items-center justify-center bg-white/50">
           <Loader className="h-8 w-8 animate-spin text-gray-500" />
         </div>
       )}
-
       {webhooks && webhooks.length === 0 && (
         // TODO: Perhaps add some illustrations here to make the page more engaging
         <div className="mb-4">
@@ -44,7 +43,6 @@ export default function WebhookPage() {
           </p>
         </div>
       )}
-
       {webhooks && webhooks.length > 0 && (
         <div className="mt-4 flex max-w-xl flex-col gap-y-4">
           {webhooks?.map((webhook) => (

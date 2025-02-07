@@ -1,5 +1,6 @@
-import { Trans, msg } from '@lingui/macro';
+import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
+import { Trans } from '@lingui/react/macro';
 import type { Recipient, Template } from '@prisma/client';
 import { PenIcon, PlusIcon } from 'lucide-react';
 import { Link } from 'react-router';

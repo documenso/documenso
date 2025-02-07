@@ -1,7 +1,8 @@
 import { useMemo } from 'react';
 
-import { Plural, Trans, msg } from '@lingui/macro';
+import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
+import { Plural, Trans } from '@lingui/react/macro';
 import { File } from 'lucide-react';
 import { DateTime } from 'luxon';
 import { Link } from 'react-router';

@@ -1,7 +1,8 @@
 import { useTransition } from 'react';
 
-import { Trans, msg } from '@lingui/macro';
+import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
+import { Trans } from '@lingui/react/macro';
 import type { Recipient } from '@prisma/client';
 import { Loader } from 'lucide-react';
 

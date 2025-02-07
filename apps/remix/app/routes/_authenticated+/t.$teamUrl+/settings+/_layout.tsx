@@ -1,4 +1,4 @@
-import { Trans } from '@lingui/macro';
+import { Trans } from '@lingui/react/macro';
 import { Outlet } from 'react-router';
 import { getLoaderTeamSession } from 'server/utils/get-loader-session';
 

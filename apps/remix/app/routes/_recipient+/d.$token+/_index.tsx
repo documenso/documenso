@@ -1,4 +1,4 @@
-import { Plural } from '@lingui/macro';
+import { Plural } from '@lingui/react/macro';
 import { UsersIcon } from 'lucide-react';
 import { redirect } from 'react-router';
 import { getOptionalLoaderSession } from 'server/utils/get-loader-session';

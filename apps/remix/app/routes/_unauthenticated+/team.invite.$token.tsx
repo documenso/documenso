@@ -1,4 +1,4 @@
-import { Trans } from '@lingui/macro';
+import { Trans } from '@lingui/react/macro';
 import { TeamMemberInviteStatus } from '@prisma/client';
 import { DateTime } from 'luxon';
 import { Link } from 'react-router';

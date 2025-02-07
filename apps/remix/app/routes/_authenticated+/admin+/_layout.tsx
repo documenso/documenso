@@ -1,4 +1,4 @@
-import { Trans } from '@lingui/macro';
+import { Trans } from '@lingui/react/macro';
 import { BarChart3, FileStack, Settings, Trophy, Users, Wallet2 } from 'lucide-react';
 import { Link, Outlet, redirect, useLocation } from 'react-router';
 import { getLoaderSession } from 'server/utils/get-loader-session';

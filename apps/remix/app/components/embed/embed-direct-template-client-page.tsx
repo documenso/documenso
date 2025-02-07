@@ -1,7 +1,8 @@
 import { useEffect, useLayoutEffect, useState } from 'react';
 
-import { Trans, msg } from '@lingui/macro';
+import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
+import { Trans } from '@lingui/react/macro';
 import { type DocumentData, type Field, FieldType } from '@prisma/client';
 import type { DocumentMeta, Recipient, Signature, TemplateMeta } from '@prisma/client';
 import { LucideChevronDown, LucideChevronUp } from 'lucide-react';

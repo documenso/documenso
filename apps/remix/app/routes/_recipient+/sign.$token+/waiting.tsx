@@ -1,4 +1,4 @@
-import { Trans } from '@lingui/macro';
+import { Trans } from '@lingui/react/macro';
 import type { Team } from '@prisma/client';
 import { DocumentStatus } from '@prisma/client';
 import { Link, redirect } from 'react-router';

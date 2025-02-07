@@ -1,8 +1,9 @@
 import { useCallback, useMemo, useState } from 'react';
 
 import type { MessageDescriptor } from '@lingui/core';
-import { Trans, msg } from '@lingui/macro';
+import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
+import { Trans } from '@lingui/react/macro';
 import { CheckIcon, Loader, Monitor, Moon, Sun } from 'lucide-react';
 import { useHotkeys } from 'react-hotkeys-hook';
 import { useNavigate } from 'react-router';

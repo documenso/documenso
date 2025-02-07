@@ -1,7 +1,8 @@
 import { useState } from 'react';
 
-import { Trans, msg } from '@lingui/macro';
+import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
+import { Trans } from '@lingui/react/macro';
 
 import { trpc } from '@documenso/trpc/react';
 import { Alert } from '@documenso/ui/primitives/alert';

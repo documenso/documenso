@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Trans } from '@lingui/macro';
+import { Trans } from '@lingui/react/macro';
 import { RecipientRole } from '@prisma/client';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
@@ -119,7 +119,6 @@ export const DocumentSigningAuth2FA = ({
             )}
           </AlertDescription>
         </Alert>
-
         <DialogFooter>
           <Button type="button" variant="secondary" onClick={() => onOpenChange(false)}>
             <Trans>Close</Trans>

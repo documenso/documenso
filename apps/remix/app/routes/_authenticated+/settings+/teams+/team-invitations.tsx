@@ -1,5 +1,6 @@
-import { Plural, Trans, msg } from '@lingui/macro';
+import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
+import { Plural, Trans } from '@lingui/react/macro';
 import { AnimatePresence } from 'framer-motion';
 import { BellIcon } from 'lucide-react';
 

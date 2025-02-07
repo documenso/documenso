@@ -1,4 +1,4 @@
-import { Trans } from '@lingui/macro';
+import { Trans } from '@lingui/react/macro';
 import type { User } from '@prisma/client';
 import { File, User2 } from 'lucide-react';
 

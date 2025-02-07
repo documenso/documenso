@@ -1,4 +1,4 @@
-import { Trans } from '@lingui/macro';
+import { Trans } from '@lingui/react/macro';
 
 import { getPricesByPlan } from '@documenso/ee/server-only/stripe/get-prices-by-plan';
 import { STRIPE_PLAN_TYPE } from '@documenso/lib/constants/billing';

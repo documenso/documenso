@@ -1,8 +1,9 @@
 import type { HTMLAttributes } from 'react';
 import { useEffect, useState } from 'react';
 
-import { Trans, msg } from '@lingui/macro';
+import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
+import { Trans } from '@lingui/react/macro';
 import { Search } from 'lucide-react';
 import { Link, useLocation, useParams } from 'react-router';
 

@@ -1,4 +1,4 @@
-import { msg } from '@lingui/macro';
+import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
 import { Bird, CheckCircle2 } from 'lucide-react';
 import { match } from 'ts-pattern';

@@ -1,8 +1,9 @@
 import { useMemo } from 'react';
 
 import type { MessageDescriptor } from '@lingui/core';
-import { Trans, msg } from '@lingui/macro';
+import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
+import { Trans } from '@lingui/react/macro';
 import { DocumentSource, DocumentStatus as DocumentStatusEnum } from '@prisma/client';
 import { InfoIcon } from 'lucide-react';
 import { DateTime } from 'luxon';

@@ -1,4 +1,4 @@
-import { Trans } from '@lingui/macro';
+import { Trans } from '@lingui/react/macro';
 import type { Signature } from '@prisma/client';
 
 import signingCelebration from '@documenso/assets/images/signing-celebration.png';

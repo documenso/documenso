@@ -1,7 +1,7 @@
 import type { HTMLAttributes } from 'react';
 
 import type { MessageDescriptor } from '@lingui/core';
-import { msg } from '@lingui/macro';
+import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
 import type { TemplateType as TemplateTypePrisma } from '@prisma/client';
 import { Globe2, Lock } from 'lucide-react';

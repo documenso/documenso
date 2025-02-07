@@ -1,4 +1,4 @@
-import { Trans } from '@lingui/macro';
+import { Trans } from '@lingui/react/macro';
 import { Bird } from 'lucide-react';
 import { useSearchParams } from 'react-router';
 

@@ -1,4 +1,4 @@
-import { Trans } from '@lingui/macro';
+import { Trans } from '@lingui/react/macro';
 import { DocumentSource } from '@prisma/client';
 import { Loader } from 'lucide-react';
 import { DateTime } from 'luxon';

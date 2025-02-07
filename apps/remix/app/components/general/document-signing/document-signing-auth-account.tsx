@@ -1,6 +1,6 @@
 import { useState } from 'react';
 
-import { Trans } from '@lingui/macro';
+import { Trans } from '@lingui/react/macro';
 import { RecipientRole } from '@prisma/client';
 import { useNavigate } from 'react-router';
 

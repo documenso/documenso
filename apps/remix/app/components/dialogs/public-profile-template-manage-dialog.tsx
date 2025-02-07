@@ -1,8 +1,9 @@
 import { useEffect, useMemo, useState } from 'react';
 
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Plural, Trans, msg } from '@lingui/macro';
+import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
+import { Plural, Trans } from '@lingui/react/macro';
 import type { Template, TemplateDirectLink } from '@prisma/client';
 import { TemplateType } from '@prisma/client';
 import type * as DialogPrimitive from '@radix-ui/react-dialog';

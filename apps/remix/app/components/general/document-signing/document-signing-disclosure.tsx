@@ -1,6 +1,6 @@
 import type { HTMLAttributes } from 'react';
 
-import { Trans } from '@lingui/macro';
+import { Trans } from '@lingui/react/macro';
 import { Link } from 'react-router';
 
 import { cn } from '@documenso/ui/lib/utils';

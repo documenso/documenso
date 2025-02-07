@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react';
 
-import { Trans } from '@lingui/macro';
+import { Trans } from '@lingui/react/macro';
 import type { Field, Recipient, Signature } from '@prisma/client';
 import { FieldType } from '@prisma/client';
 import { DateTime } from 'luxon';

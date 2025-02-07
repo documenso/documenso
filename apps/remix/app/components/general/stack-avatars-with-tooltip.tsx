@@ -1,7 +1,7 @@
 import { useMemo } from 'react';
 
-import { Trans } from '@lingui/macro';
 import { useLingui } from '@lingui/react';
+import { Trans } from '@lingui/react/macro';
 import { type DocumentStatus, type Recipient } from '@prisma/client';
 
 import { RecipientStatusType, getRecipientType } from '@documenso/lib/client-only/recipient-type';

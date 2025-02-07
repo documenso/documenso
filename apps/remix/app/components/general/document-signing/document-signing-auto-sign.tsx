@@ -1,7 +1,8 @@
 import { useState, useTransition } from 'react';
 
-import { Plural, Trans, msg } from '@lingui/macro';
+import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
+import { Plural, Trans } from '@lingui/react/macro';
 import type { Field, Recipient } from '@prisma/client';
 import { FieldType } from '@prisma/client';
 import { useForm } from 'react-hook-form';

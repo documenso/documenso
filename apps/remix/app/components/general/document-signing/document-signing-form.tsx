@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react';
 
-import { Trans } from '@lingui/macro';
+import { Trans } from '@lingui/react/macro';
 import { type Field, FieldType, type Recipient, RecipientRole } from '@prisma/client';
 import { useForm } from 'react-hook-form';
 import { useNavigate } from 'react-router';

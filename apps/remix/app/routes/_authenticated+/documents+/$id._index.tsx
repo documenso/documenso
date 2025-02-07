@@ -1,5 +1,5 @@
-import { Plural, Trans } from '@lingui/macro';
 import { useLingui } from '@lingui/react';
+import { Plural, Trans } from '@lingui/react/macro';
 import { DocumentStatus, TeamMemberRole } from '@prisma/client';
 import { ChevronLeft, Clock9, Users2 } from 'lucide-react';
 import { Link, redirect } from 'react-router';

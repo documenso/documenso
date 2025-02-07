@@ -1,4 +1,4 @@
-import { Trans } from '@lingui/macro';
+import { Trans } from '@lingui/react/macro';
 import { XCircle } from 'lucide-react';
 import { Link } from 'react-router';
 

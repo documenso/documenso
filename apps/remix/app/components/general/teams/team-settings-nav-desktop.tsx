@@ -1,6 +1,6 @@
 import type { HTMLAttributes } from 'react';
 
-import { Trans } from '@lingui/macro';
+import { Trans } from '@lingui/react/macro';
 import { Braces, CreditCard, Globe2Icon, Settings, Settings2, Users, Webhook } from 'lucide-react';
 import { Link, useLocation, useParams } from 'react-router';
 

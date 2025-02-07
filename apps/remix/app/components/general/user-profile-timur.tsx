@@ -1,4 +1,4 @@
-import { Trans } from '@lingui/macro';
+import { Trans } from '@lingui/react/macro';
 import { File } from 'lucide-react';
 
 import timurImage from '@documenso/assets/images/timur.png';

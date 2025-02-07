@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react';
 
-import { Trans, msg } from '@lingui/macro';
+import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
+import { Trans } from '@lingui/react/macro';
 import { Link, useSearchParams } from 'react-router';
 import { useNavigate } from 'react-router';
 import { useLocation } from 'react-router';

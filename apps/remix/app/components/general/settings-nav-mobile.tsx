@@ -1,6 +1,6 @@
 import type { HTMLAttributes } from 'react';
 
-import { Trans } from '@lingui/macro';
+import { Trans } from '@lingui/react/macro';
 import { Braces, CreditCard, Globe2Icon, Lock, User, Users, Webhook } from 'lucide-react';
 import { Link, useLocation } from 'react-router';
 

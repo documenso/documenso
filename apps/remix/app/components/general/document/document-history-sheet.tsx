@@ -1,7 +1,7 @@
 import { useMemo, useState } from 'react';
 
-import { Trans } from '@lingui/macro';
 import { useLingui } from '@lingui/react';
+import { Trans } from '@lingui/react/macro';
 import { ArrowRightIcon, Loader } from 'lucide-react';
 import { DateTime } from 'luxon';
 import { match } from 'ts-pattern';

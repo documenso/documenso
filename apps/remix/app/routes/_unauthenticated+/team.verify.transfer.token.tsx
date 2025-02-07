@@ -1,4 +1,4 @@
-import { Trans } from '@lingui/macro';
+import { Trans } from '@lingui/react/macro';
 import { Link } from 'react-router';
 
 import { transferTeamOwnership } from '@documenso/lib/server-only/team/transfer-team-ownership';

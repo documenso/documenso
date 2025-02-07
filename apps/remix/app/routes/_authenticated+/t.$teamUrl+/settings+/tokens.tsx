@@ -1,5 +1,5 @@
-import { Trans } from '@lingui/macro';
 import { useLingui } from '@lingui/react';
+import { Trans } from '@lingui/react/macro';
 import { DateTime } from 'luxon';
 import { getLoaderTeamSession } from 'server/utils/get-loader-session';
 

@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react';
 
-import { Trans, msg } from '@lingui/macro';
+import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
+import { Trans } from '@lingui/react/macro';
 import type { Recipient } from '@prisma/client';
 import { RecipientRole } from '@prisma/client';
 import { useSearchParams } from 'react-router';

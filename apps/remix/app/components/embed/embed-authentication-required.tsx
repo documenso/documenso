@@ -1,4 +1,4 @@
-import { Trans } from '@lingui/macro';
+import { Trans } from '@lingui/react/macro';
 
 import { Alert, AlertDescription } from '@documenso/ui/primitives/alert';
 

@@ -1,5 +1,6 @@
-import { Plural, Trans, msg } from '@lingui/macro';
+import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
+import { Plural, Trans } from '@lingui/react/macro';
 import { DateTime } from 'luxon';
 import { getLoaderTeamSession } from 'server/utils/get-loader-session';
 import type Stripe from 'stripe';

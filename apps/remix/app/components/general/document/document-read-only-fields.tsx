@@ -1,7 +1,7 @@
 import { useState } from 'react';
 
-import { Trans } from '@lingui/macro';
 import { useLingui } from '@lingui/react';
+import { Trans } from '@lingui/react/macro';
 import type { DocumentMeta } from '@prisma/client';
 import { FieldType, SigningStatus } from '@prisma/client';
 import { Clock, EyeOffIcon } from 'lucide-react';

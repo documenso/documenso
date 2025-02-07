@@ -1,4 +1,4 @@
-import { Trans } from '@lingui/macro';
+import { Trans } from '@lingui/react/macro';
 import { Link, redirect } from 'react-router';
 
 import { getResetTokenValidity } from '@documenso/lib/server-only/user/get-reset-token-validity';

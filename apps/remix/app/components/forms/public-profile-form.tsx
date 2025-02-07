@@ -1,8 +1,9 @@
 import { useState } from 'react';
 
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Plural, Trans, msg } from '@lingui/macro';
+import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
+import { Plural, Trans } from '@lingui/react/macro';
 import type { TeamProfile, UserProfile } from '@prisma/client';
 import { motion } from 'framer-motion';
 import { AnimatePresence } from 'framer-motion';

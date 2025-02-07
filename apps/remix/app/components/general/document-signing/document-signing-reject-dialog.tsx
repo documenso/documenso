@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react';
 
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Trans, msg } from '@lingui/macro';
+import { msg } from '@lingui/core/macro';
+import { Trans } from '@lingui/react/macro';
 import type { Document } from '@prisma/client';
 import { useForm } from 'react-hook-form';
 import { useNavigate } from 'react-router';
