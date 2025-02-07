@@ -14,6 +14,7 @@ export const ZAddTemplatePlacholderRecipientsFormSchema = z.object({
       name: z.string(),
       role: z.nativeEnum(RecipientRole),
       signingOrder: z.number().optional(),
+      signerIndex: z.number().min(0),
       actionAuth: ZMapNegativeOneToUndefinedSchema.pipe(ZRecipientActionAuthTypesSchema.optional()),
     }),
   ),
