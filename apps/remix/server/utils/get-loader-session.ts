@@ -1,7 +1,7 @@
 import { getContext } from 'hono/context-storage';
 import { redirect } from 'react-router';
-import type { HonoEnv } from 'server';
 import type { AppContext } from 'server/context';
+import type { HonoEnv } from 'server/router';
 
 import type { AppSession } from '@documenso/lib/client-only/providers/session';
 

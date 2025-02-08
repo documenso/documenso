@@ -1,5 +1,3 @@
-'use server';
-
 import type { DocumentDistributionMethod, DocumentSigningOrder } from '@prisma/client';
 
 import { DOCUMENT_AUDIT_LOG_TYPE } from '@documenso/lib/types/document-audit-logs';

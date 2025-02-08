@@ -1,5 +1,3 @@
-'use server';
-
 import { DocumentSource, WebhookTriggerEvents } from '@prisma/client';
 import type { Team, TeamGlobalSettings } from '@prisma/client';
 import { TeamMemberRole } from '@prisma/client';

@@ -1,5 +1,3 @@
-'use server';
-
 import { DocumentStatus, SigningStatus } from '@prisma/client';
 
 import { DOCUMENT_AUDIT_LOG_TYPE } from '@documenso/lib/types/document-audit-logs';

@@ -10,8 +10,7 @@ export async function dynamicActivate(locale: string) {
 
   // Todo: Use extension (currently breaks).
 
-  // const { messages } = await import(`../translations/${locale}/web.${extension}`);
-  const { messages } = await import(`../translations/${locale}/web.po`);
+  const { messages } = await import(`../translations/${locale}/web.${extension}`);
 
   i18n.loadAndActivate({ locale, messages });
 }

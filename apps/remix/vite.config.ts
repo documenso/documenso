@@ -32,49 +32,38 @@ export default defineConfig({
     lingui(),
     tsconfigPaths(),
     serverAdapter({
-      entry: 'server/index.ts',
+      entry: 'server/main.ts',
     }),
   ],
   ssr: {
     noExternal: ['react-dropzone', 'plausible-tracker', 'pdfjs-dist'],
-    external: ['@node-rs/bcrypt'],
+    external: ['@node-rs/bcrypt', '@prisma/client'],
   },
   optimizeDeps: {
+    // include: ['react-icons'],
     exclude: ['@node-rs/bcrypt'],
   },
+  resolve: {
+    alias: {
+      https: 'node:https',
+      '.prisma/client/default': '../../node_modules/.prisma/client/default.js',
+      '.prisma/client/index-browser': '../../node_modules/.prisma/client/index-browser.js',
+    },
+  },
   /**
-   * Throwing shit at a wall to see what sticks for building below onwards.
+   * Note: Re run rollup again to build the server afterwards.
+   *
+   * See rollup.config.mjs which is used for that.
    */
-  // resolve: {
-  //   alias: {
-  //     // https: 'node:https',
-  //     // '.prisma/client/default': '../../node_modules/.prisma/client/default.js',
-  //   },
-  // },
-  // optimizeDeps: {
-  //   include: [],
-  // },
-  // ssr: {
-  //   // noExternal: true,
-  //   noExternal: [
-  //     '@documenso/assets',
-  //     '@documenso/ee',
-  //     '@documenso/lib',
-  //     '@documenso/prisma',
-  //     '@documenso/tailwind-config',
-  //     '@documenso/trpc',
-  //     '@documenso/ui',
-  //   ],
-  // },
-  // build: {
-  //   rollupOptions: {
-  //     external: [
-  //       '@node-rs/bcrypt',
-  //       '@documenso/pdf-sign',
-  //       'nodemailer',
-  //       'playwright',
-  //       '@aws-sdk/cloudfront-signer',
-  //     ],
-  //   },
-  // },
+  build: {
+    rollupOptions: {
+      external: [
+        '@node-rs/bcrypt',
+        '@documenso/pdf-sign',
+        '@aws-sdk/cloudfront-signer',
+        'nodemailer',
+        'playwright',
+      ],
+    },
+  },
 });

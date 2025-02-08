@@ -1,5 +1,3 @@
-'use server';
-
 import { DocumentStatus, FieldType, SigningStatus } from '@prisma/client';
 import { DateTime } from 'luxon';
 import { match } from 'ts-pattern';

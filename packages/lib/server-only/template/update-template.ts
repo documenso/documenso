@@ -1,5 +1,3 @@
-'use server';
-
 import type { DocumentVisibility, Template, TemplateMeta } from '@prisma/client';
 
 import { isUserEnterprise } from '@documenso/ee/server-only/util/is-document-enterprise';

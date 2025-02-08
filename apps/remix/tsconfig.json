@@ -10,7 +10,16 @@
     "rootDirs": [".", "./.react-router/types"],
     "baseUrl": ".",
     "paths": {
-      "~/*": ["./app/*"]
+      "~/*": ["./app/*"],
+      "@documenso/api": ["../../packages/api"],
+      "@documenso/assets": ["../../packages/assets"],
+      "@documenso/auth": ["../../packages/auth"],
+      "@documenso/ee": ["../../packages/ee"],
+      "@documenso/lib": ["../../packages/lib"],
+      "@documenso/prisma": ["../../packages/prisma"],
+      "@documenso/trpc": ["../../packages/trpc"],
+      "@documenso/ui": ["../../packages/ui"],
+      "@documenso/tailwind-config": ["../../packages/tailwind-config"]
     },
     "esModuleInterop": true,
     "verbatimModuleSyntax": true,

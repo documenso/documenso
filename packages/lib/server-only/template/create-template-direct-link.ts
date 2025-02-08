@@ -1,5 +1,3 @@
-'use server';
-
 import type { Recipient } from '@prisma/client';
 import { nanoid } from 'nanoid';
 

@@ -72,8 +72,12 @@ app
         throw new AppError('INVALID_DOCUMENT_FILE');
       }
 
+      // Todo: Test this.
       if (!file.name.endsWith('.pdf')) {
-        file.name = `${file.name}.pdf`;
+        Object.defineProperty(file, 'name', {
+          writable: true,
+          value: `${file.name}.pdf`,
+        });
       }
 
       const { type, data } = await putFile(file);
