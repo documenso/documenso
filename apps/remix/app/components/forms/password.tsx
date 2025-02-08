@@ -58,7 +58,7 @@ export const PasswordForm = ({ className }: PasswordFormProps) => {
 
   const onFormSubmit = async ({ currentPassword, password }: TPasswordFormSchema) => {
     try {
-      await authClient.updatePassword({
+      await authClient.emailPassword.updatePassword({
         currentPassword,
         password,
       });

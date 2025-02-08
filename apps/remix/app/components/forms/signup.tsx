@@ -124,7 +124,13 @@ export const SignUpForm = ({
 
   const onFormSubmit = async ({ name, email, password, signature, url }: TSignUpFormSchema) => {
     try {
-      await authClient.emailPassword.signUp({ name, email, password, signature, url });
+      await authClient.emailPassword.signUp({
+        name,
+        email,
+        password,
+        signature,
+        url,
+      });
 
       await navigate(`/unverified-account`);
 

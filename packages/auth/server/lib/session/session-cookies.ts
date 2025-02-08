@@ -1,6 +1,7 @@
 import type { Context } from 'hono';
-import { getSignedCookie, setSignedCookie } from 'hono/cookie';
+import { deleteCookie, getSignedCookie, setSignedCookie } from 'hono/cookie';
 
+import { NEXT_PUBLIC_WEBAPP_URL } from '@documenso/lib/constants/app';
 import { appLog } from '@documenso/lib/utils/debugger';
 import { env } from '@documenso/lib/utils/env';
 
@@ -14,6 +15,12 @@ const getAuthSecret = () => {
   }
 
   return authSecret;
+};
+
+const getAuthDomain = () => {
+  const url = new URL(NEXT_PUBLIC_WEBAPP_URL());
+
+  return url.hostname;
 };
 
 export const extractSessionCookieFromHeaders = (headers: Headers): string | null => {
@@ -51,10 +58,24 @@ export const setSessionCookie = async (c: Context, sessionToken: string) => {
     path: '/',
     // sameSite: '', // whats the default? we need to change this for embed right?
     // secure: true,
-    domain: 'localhost', // todo
+    domain: getAuthDomain(),
   }).catch((err) => {
     appLog('SetSessionCookie', `Error setting signed cookie: ${err}`);
 
     throw err;
+  });
+};
+
+/**
+ * Set the session cookie into the Hono context.
+ *
+ * @param c - The Hono context.
+ * @param sessionToken - The session token to set.
+ */
+export const deleteSessionCookie = (c: Context) => {
+  deleteCookie(c, sessionCookieName, {
+    path: '/',
+    secure: true,
+    domain: getAuthDomain(),
   });
 };

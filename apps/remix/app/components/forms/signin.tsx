@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 
 import { zodResolver } from '@hookform/resolvers/zod';
+import type { MessageDescriptor } from '@lingui/core';
 import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
 import { Trans } from '@lingui/react/macro';
@@ -40,10 +41,18 @@ import { PasswordInput } from '@documenso/ui/primitives/password-input';
 import { PinInput, PinInputGroup, PinInputSlot } from '@documenso/ui/primitives/pin-input';
 import { useToast } from '@documenso/ui/primitives/use-toast';
 
-const CommonErrorMessages = {
-  // [AuthenticationErrorCode.USER_MISSING_PASSWORD]:
-  //   'This account appears to be using a social login method, please sign in using that method',
+const CommonErrorMessages: Record<string, MessageDescriptor> = {
   [AuthenticationErrorCode.AccountDisabled]: msg`This account has been disabled. Please contact support.`,
+};
+
+const handleFallbackErrorMessages = (code: string) => {
+  const message = CommonErrorMessages[code];
+
+  if (!message) {
+    return msg`An unknown error occurred`;
+  }
+
+  return message;
 };
 
 const LOGIN_REDIRECT_PATH = '/documents';
@@ -163,12 +172,7 @@ export const SignInForm = ({
         credential: JSON.stringify(credential),
         csrfToken: sessionId,
         redirectUrl,
-        // callbackUrl,
-        // redirect: false,
       });
-
-      // Todo: Can't use navigate because of embed?
-      // window.location.href = callbackUrl;
     } catch (err) {
       setIsPasskeyLoading(false);
 
@@ -186,10 +190,10 @@ export const SignInForm = ({
             msg`This passkey is not configured for this application. Please login and add one in the user settings.`,
         )
         .with(
-          AuthenticationErrorCode.SessionExpired, // Todo
+          AuthenticationErrorCode.SessionExpired,
           () => msg`This session has expired. Please try again.`,
         )
-        .otherwise(() => msg`Please try again later or login using your normal details`);
+        .otherwise(() => handleFallbackErrorMessages(error.code));
 
       toast({
         title: 'Something went wrong',
@@ -208,11 +212,7 @@ export const SignInForm = ({
         totpCode,
         backupCode,
         redirectUrl,
-        // callbackUrl,
-        // redirect: false,
       });
-
-      // window.location.href = callbackUrl; // Todo: Handle redirect.
     } catch (err) {
       console.log(err);
 
@@ -245,7 +245,7 @@ export const SignInForm = ({
           AuthenticationErrorCode.InvalidTwoFactorCode,
           () => msg`The two-factor authentication code provided is incorrect`,
         )
-        .otherwise(() => msg`An unknown error occurred`);
+        .otherwise(() => handleFallbackErrorMessages(error.code));
 
       toast({
         title: _(msg`Unable to sign in`),
@@ -257,7 +257,7 @@ export const SignInForm = ({
 
   const onSignInWithGoogleClick = async () => {
     try {
-      await authClient.google.signIn(); // Todo: Handle redirect.
+      await authClient.google.signIn();
     } catch (err) {
       toast({
         title: _(msg`An unknown error occurred`),

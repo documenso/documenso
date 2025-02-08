@@ -1,13 +1,13 @@
 import { useState } from 'react';
 
-import { Trans } from '@lingui/react/macro';
+import { Trans, useLingui } from '@lingui/react/macro';
 import { RecipientRole } from '@prisma/client';
-import { useNavigate } from 'react-router';
 
 import { authClient } from '@documenso/auth/client';
 import { Alert, AlertDescription } from '@documenso/ui/primitives/alert';
 import { Button } from '@documenso/ui/primitives/button';
 import { DialogFooter } from '@documenso/ui/primitives/dialog';
+import { useToast } from '@documenso/ui/primitives/use-toast';
 
 import { useRequiredDocumentSigningAuthContext } from './document-signing-auth-provider';
 
@@ -24,7 +24,9 @@ export const DocumentSigningAuthAccount = ({
 }: DocumentSigningAuthAccountProps) => {
   const { recipient } = useRequiredDocumentSigningAuthContext();
 
-  const navigate = useNavigate();
+  const { t } = useLingui();
+
+  const { toast } = useToast();
 
   const [isSigningOut, setIsSigningOut] = useState(false);
 
@@ -32,18 +34,18 @@ export const DocumentSigningAuthAccount = ({
     try {
       setIsSigningOut(true);
 
-      // Todo
-      await authClient.signOut();
-      // {
-      //   // redirect: false,
-      //   // Todo: Redirect to signin like below
-      // }
-
-      await navigate(`/signin#email=${email}`);
+      await authClient.signOut({
+        redirectUrl: `/signin#email=${email}`,
+      });
     } catch {
       setIsSigningOut(false);
 
-      // Todo: Alert.
+      toast({
+        title: t`Something went wrong`,
+        description: t`We were unable to log you out at this time.`,
+        duration: 10000,
+        variant: 'destructive',
+      });
     }
   };
 

@@ -1,11 +1,10 @@
 import { Hono } from 'hono';
-import { deleteCookie, getSignedCookie } from 'hono/cookie';
 
 import { invalidateSession, validateSessionToken } from '../lib/session/session';
+import { deleteSessionCookie, getSessionCookie } from '../lib/session/session-cookies';
 
 export const signOutRoute = new Hono().post('/signout', async (c) => {
-  // todo: secret
-  const sessionId = await getSignedCookie(c, 'secret', 'sessionId');
+  const sessionId = await getSessionCookie(c);
 
   if (!sessionId) {
     return new Response('No session found', { status: 401 });
@@ -19,11 +18,7 @@ export const signOutRoute = new Hono().post('/signout', async (c) => {
 
   await invalidateSession(session.id);
 
-  deleteCookie(c, 'sessionId', {
-    path: '/',
-    secure: true,
-    domain: 'example.com',
-  });
+  deleteSessionCookie(c);
 
   return c.status(200);
 });

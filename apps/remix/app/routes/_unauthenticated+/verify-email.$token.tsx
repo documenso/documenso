@@ -27,8 +27,6 @@ export const loader = ({ params }: Route.LoaderArgs) => {
 };
 
 export default function VerifyEmailPage({ loaderData }: Route.ComponentProps) {
-  console.log('hello world');
-
   const { token } = loaderData;
 
   const { _ } = useLingui();
@@ -42,7 +40,6 @@ export default function VerifyEmailPage({ loaderData }: Route.ComponentProps) {
     setIsLoading(true);
 
     try {
-      // Todo: Types and check.
       const response = await authClient.emailPassword.verifyEmail({
         token,
       });

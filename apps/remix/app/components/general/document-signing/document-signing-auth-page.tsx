@@ -3,7 +3,6 @@ import { useState } from 'react';
 import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
 import { Trans } from '@lingui/react/macro';
-import { useNavigate } from 'react-router';
 
 import { authClient } from '@documenso/auth/client';
 import { Button } from '@documenso/ui/primitives/button';
@@ -21,18 +20,15 @@ export const DocumentSigningAuthPageView = ({
   const { _ } = useLingui();
   const { toast } = useToast();
 
-  const navigate = useNavigate();
-
   const [isSigningOut, setIsSigningOut] = useState(false);
 
   const handleChangeAccount = async (email: string) => {
     try {
       setIsSigningOut(true);
 
-      // Todo: Redirect false
-      await authClient.signOut();
-
-      await navigate(emailHasAccount ? `/signin#email=${email}` : `/signup#email=${email}`);
+      await authClient.signOut({
+        redirectUrl: emailHasAccount ? `/signin#email=${email}` : `/signup#email=${email}`,
+      });
     } catch {
       toast({
         title: _(msg`Something went wrong`),

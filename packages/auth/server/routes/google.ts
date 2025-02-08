@@ -1,21 +1,22 @@
+import { zValidator } from '@hono/zod-validator';
 import { Google, decodeIdToken, generateCodeVerifier, generateState } from 'arctic';
 import { Hono } from 'hono';
-import { getCookie, setCookie } from 'hono/cookie';
+import { deleteCookie, setCookie } from 'hono/cookie';
+import { z } from 'zod';
 
+import { NEXT_PUBLIC_WEBAPP_URL } from '@documenso/lib/constants/app';
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
-import { setupTwoFactorAuthentication } from '@documenso/lib/server-only/2fa/setup-2fa';
 import { env } from '@documenso/lib/utils/env';
 import { prisma } from '@documenso/prisma';
 
 import { AuthenticationErrorCode } from '../lib/errors/error-codes';
 import { onAuthorize } from '../lib/utils/authorizer';
-import { getRequiredSession } from '../lib/utils/get-session';
 import type { HonoAuthContext } from '../types/context';
 
 const options = {
-  clientId: env('NEXT_PRIVATE_GOOGLE_CLIENT_ID'),
-  clientSecret: env('NEXT_PRIVATE_GOOGLE_CLIENT_SECRET'),
-  redirectUri: 'http://localhost:3000/api/auth/google/callback',
+  clientId: env('NEXT_PRIVATE_GOOGLE_CLIENT_ID') ?? '',
+  clientSecret: env('NEXT_PRIVATE_GOOGLE_CLIENT_SECRET') ?? '',
+  redirectUri: `${NEXT_PUBLIC_WEBAPP_URL()}/api/auth/google/callback`,
   scope: ['openid', 'email', 'profile'],
   id: 'google',
 };
@@ -24,55 +25,62 @@ const google = new Google(options.clientId, options.clientSecret, options.redire
 
 // todo: NEXT_PRIVATE_OIDC_WELL_KNOWN???
 
+const ZGoogleAuthorizeSchema = z.object({
+  redirectPath: z.string().optional(),
+});
+
 export const googleRoute = new Hono<HonoAuthContext>()
   /**
    * Authorize endpoint.
    */
-  .post('/authorize', (c) => {
+  .post('/authorize', zValidator('json', ZGoogleAuthorizeSchema), (c) => {
     const scopes = options.scope;
     const state = generateState();
+
     const codeVerifier = generateCodeVerifier();
     const url = google.createAuthorizationURL(state, codeVerifier, scopes);
+
+    const { redirectPath } = c.req.valid('json');
 
     setCookie(c, 'google_oauth_state', state, {
       path: '/',
       httpOnly: true,
-      secure: env('NODE_ENV') === 'production',
+      secure: env('NODE_ENV') === 'production', // Todo: Check.
       maxAge: 60 * 10, // 10 minutes
-      sameSite: 'lax',
+      sameSite: 'lax', // Todo??
     });
 
     setCookie(c, 'google_code_verifier', codeVerifier, {
       path: '/',
       httpOnly: true,
-      // Todo: Might not be node_env but something vite specific?
-      secure: env('NODE_ENV') === 'production',
+      secure: env('NODE_ENV') === 'production', // Todo: Check.
       maxAge: 60 * 10, // 10 minutes
-      sameSite: 'lax',
+      sameSite: 'lax', // Todo??
     });
 
-    // return new Response(null, {
-    //   status: 302,
-    //   headers: {
-    //     Location: url.toString()
-    //   }
-    // });
+    if (redirectPath) {
+      setCookie(c, 'google_redirect_path', `${state}:${redirectPath}`, {
+        path: '/',
+        httpOnly: true,
+        secure: env('NODE_ENV') === 'production', // Todo: Check.
+        maxAge: 60 * 10, // 10 minutes
+        sameSite: 'lax', // Todo??
+      });
+    }
 
     return c.json({
-      redirectUrl: url,
+      redirectUrl: url.toString(),
     });
   })
   /**
    * Google callback verification.
    */
   .get('/callback', async (c) => {
-    // Todo: Use ZValidator to validate query params.
-
     const code = c.req.query('code');
     const state = c.req.query('state');
 
-    const storedState = getCookie(c, 'google_oauth_state');
-    const storedCodeVerifier = getCookie(c, 'google_code_verifier');
+    const storedState = deleteCookie(c, 'google_oauth_state');
+    const storedCodeVerifier = deleteCookie(c, 'google_code_verifier');
 
     if (!code || !storedState || state !== storedState || !storedCodeVerifier) {
       throw new AppError(AppErrorCode.INVALID_REQUEST, {
@@ -80,17 +88,22 @@ export const googleRoute = new Hono<HonoAuthContext>()
       });
     }
 
+    const storedredirectPath = deleteCookie(c, 'google_redirect_path') ?? '';
+
+    // eslint-disable-next-line prefer-const
+    let [redirectState, redirectPath] = storedredirectPath.split(':');
+
+    if (redirectState !== storedState || !redirectPath) {
+      redirectPath = '/documents';
+    }
+
     const tokens = await google.validateAuthorizationCode(code, storedCodeVerifier);
     const accessToken = tokens.accessToken();
     const accessTokenExpiresAt = tokens.accessTokenExpiresAt();
     const idToken = tokens.idToken();
 
-    console.log(tokens);
-
     // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
     const claims = decodeIdToken(tokens.idToken()) as Record<string, unknown>;
-
-    console.log(claims);
 
     const googleEmail = claims.email;
     const googleName = claims.name;
@@ -127,7 +140,7 @@ export const googleRoute = new Hono<HonoAuthContext>()
     if (existingAccount) {
       await onAuthorize({ userId: existingAccount.user.id }, c);
 
-      return c.redirect('/documents', 302); // Todo: Redirect
+      return c.redirect(redirectPath, 302);
     }
 
     const userWithSameEmail = await prisma.user.findFirst({
@@ -154,7 +167,7 @@ export const googleRoute = new Hono<HonoAuthContext>()
       // Todo: Link account
       await onAuthorize({ userId: userWithSameEmail.id }, c);
 
-      return c.redirect('/documents', 302); // Todo: Redirect
+      return c.redirect(redirectPath, 302);
     }
 
     // Handle new user.
@@ -184,21 +197,5 @@ export const googleRoute = new Hono<HonoAuthContext>()
 
     await onAuthorize({ userId: createdUser.id }, c);
 
-    return c.redirect('/documents', 302); // Todo: Redirect
-  })
-  /**
-   * Setup passkey authentication.
-   */
-  .post('/setup', async (c) => {
-    const { user } = await getRequiredSession(c);
-
-    const result = await setupTwoFactorAuthentication({
-      user,
-    });
-
-    return c.json({
-      success: true,
-      secret: result.secret,
-      uri: result.uri,
-    });
+    return c.redirect(redirectPath, 302);
   });

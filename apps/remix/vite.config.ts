@@ -40,8 +40,9 @@ export default defineConfig({
     external: ['@node-rs/bcrypt', '@prisma/client'],
   },
   optimizeDeps: {
-    // include: ['react-icons'],
-    exclude: ['@node-rs/bcrypt'],
+    entries: ['./app/**/*', '../../packages/ui/**/*', '../../packages/lib/**/*'],
+    include: ['prop-types', 'file-selector', 'attr-accept'],
+    exclude: ['node_modules', '@node-rs/bcrypt', '@documenso/pdf-sign', 'sharp'],
   },
   resolve: {
     alias: {
