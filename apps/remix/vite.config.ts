@@ -32,7 +32,7 @@ export default defineConfig({
     lingui(),
     tsconfigPaths(),
     serverAdapter({
-      entry: 'server/main.ts',
+      entry: 'server/router.ts',
     }),
   ],
   ssr: {
