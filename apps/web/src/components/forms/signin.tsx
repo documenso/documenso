@@ -10,7 +10,7 @@ import { Trans, msg } from '@lingui/macro';
 import { useLingui } from '@lingui/react';
 import { browserSupportsWebAuthn, startAuthentication } from '@simplewebauthn/browser';
 import { KeyRoundIcon } from 'lucide-react';
-import { signIn } from 'next-auth/react';
+import { signIn, useSession } from 'next-auth/react';
 import { useForm } from 'react-hook-form';
 import { FaIdCardClip } from 'react-icons/fa6';
 import { FcGoogle } from 'react-icons/fc';
@@ -75,6 +75,7 @@ export type SignInFormProps = {
   isGoogleSSOEnabled?: boolean;
   isOIDCSSOEnabled?: boolean;
   oidcProviderLabel?: string;
+  isOIDCDefault?: boolean;
   returnTo?: string;
 };
 
@@ -84,11 +85,13 @@ export const SignInForm = ({
   isGoogleSSOEnabled,
   isOIDCSSOEnabled,
   oidcProviderLabel,
+  isOIDCDefault,
   returnTo,
 }: SignInFormProps) => {
   const { _ } = useLingui();
   const { toast } = useToast();
   const { getFlag } = useFeatureFlags();
+  const { status } = useSession();
 
   const router = useRouter();
 
@@ -307,6 +310,20 @@ export const SignInForm = ({
       });
     }
   };
+
+  useEffect(() => {
+    if (!isOIDCDefault || !isOIDCSSOEnabled) return;
+
+    if (status === 'unauthenticated' && isOIDCSSOEnabled) {
+      signIn('oidc', { callbackUrl }).catch(() =>
+        toast({
+          title: 'OIDC Login Failed',
+          description: 'We encountered an error while attempting to sign you in.',
+          variant: 'destructive',
+        }),
+      );
+    }
+  }, [isOIDCDefault, isOIDCSSOEnabled, callbackUrl, toast, status]);
 
   useEffect(() => {
     const hash = window.location.hash.slice(1);
