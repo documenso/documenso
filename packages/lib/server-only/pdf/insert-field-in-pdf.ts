@@ -15,6 +15,7 @@ import { fromCheckboxValue } from '@documenso/lib/universal/field-checkbox';
 import { isSignatureFieldType } from '@documenso/prisma/guards/is-signature-field';
 import type { FieldWithSignature } from '@documenso/prisma/types/field-with-signature';
 
+import { NEXT_PUBLIC_WEBAPP_URL } from '../../constants/app';
 import {
   ZCheckboxFieldMeta,
   ZDateFieldMeta,
@@ -26,14 +27,12 @@ import {
   ZTextFieldMeta,
 } from '../../types/field-meta';
 
-// Todo: Check if this is okay to do compared to the old approach.
-// import fontCaveat from '@documenso/assets/fonts/caveat.ttf?inline';
-// import fontNoto from '@documenso/assets/fonts/noto-sans.ttf?inline';
-
-const fontCaveat = '';
-const fontNoto = '';
-
 export const insertFieldInPDF = async (pdf: PDFDocument, field: FieldWithSignature) => {
+  const [fontCaveat, fontNoto] = await Promise.all([
+    fetch(`${NEXT_PUBLIC_WEBAPP_URL()}/fonts/caveat.ttf`).then(async (res) => res.arrayBuffer()),
+    fetch(`${NEXT_PUBLIC_WEBAPP_URL()}/fonts/noto-sans.ttf`).then(async (res) => res.arrayBuffer()),
+  ]);
+
   const isSignatureField = isSignatureFieldType(field.type);
 
   pdf.registerFontkit(fontkit);

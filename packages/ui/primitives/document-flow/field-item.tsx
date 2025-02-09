@@ -1,7 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
-// Todo
-// import { Caveat } from 'next/font/google';
 import { CopyPlus, Settings2, Trash } from 'lucide-react';
 import { createPortal } from 'react-dom';
 import { Rnd } from 'react-rnd';
@@ -19,13 +17,6 @@ import { FieldIcon } from './field-icon';
 import type { TDocumentFlowFormSchema } from './types';
 
 type Field = TDocumentFlowFormSchema['fields'][0];
-
-// const fontCaveat = Caveat({
-//   weight: ['500'],
-//   subsets: ['latin'],
-//   display: 'swap',
-//   variable: '--font-caveat',
-// });
 
 export type FieldItemProps = {
   field: Field;
@@ -252,12 +243,7 @@ export const FieldItem = ({
           .with('CHECKBOX', () => <CheckboxField field={field} />)
           .with('RADIO', () => <RadioField field={field} />)
           .otherwise(() => (
-            <FieldIcon
-              fieldMeta={field.fieldMeta}
-              type={field.type}
-              signerEmail={field.signerEmail}
-              // fontCaveatClassName={fontCaveat.className}
-            />
+            <FieldIcon fieldMeta={field.fieldMeta} type={field.type} />
           ))}
 
         {!hideRecipients && (

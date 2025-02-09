@@ -8,6 +8,7 @@ import { NEXT_PUBLIC_WEBAPP_URL } from '@documenso/lib/constants/app';
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import { env } from '@documenso/lib/utils/env';
 import { prisma } from '@documenso/prisma';
+import { UserSecurityAuditLogType } from '@documenso/prisma/client';
 
 import { AuthenticationErrorCode } from '../lib/errors/error-codes';
 import { sessionCookieOptions } from '../lib/session/session-cookies';
@@ -71,6 +72,8 @@ export const googleRoute = new Hono<HonoAuthContext>()
    * Google callback verification.
    */
   .get('/callback', async (c) => {
+    const requestMeta = c.get('requestMetadata');
+
     const code = c.req.query('code');
     const state = c.req.query('state');
 
@@ -100,6 +103,7 @@ export const googleRoute = new Hono<HonoAuthContext>()
     const claims = decodeIdToken(tokens.idToken()) as Record<string, unknown>;
 
     const googleEmail = claims.email;
+    const googleEmailVerified = claims.email_verified;
     const googleName = claims.name;
     const googleSub = claims.sub;
 
@@ -145,20 +149,59 @@ export const googleRoute = new Hono<HonoAuthContext>()
 
     // Handle existing user but no account.
     if (userWithSameEmail) {
-      await prisma.account.create({
-        data: {
-          type: 'oauth',
-          provider: 'google',
-          providerAccountId: googleSub,
-          access_token: accessToken,
-          expires_at: Math.floor(accessTokenExpiresAt.getTime() / 1000),
-          token_type: 'Bearer',
-          id_token: idToken,
-          userId: userWithSameEmail.id,
-        },
+      await prisma.$transaction(async (tx) => {
+        await tx.account.create({
+          data: {
+            type: 'oauth',
+            provider: 'google',
+            providerAccountId: googleSub,
+            access_token: accessToken,
+            expires_at: Math.floor(accessTokenExpiresAt.getTime() / 1000),
+            token_type: 'Bearer',
+            id_token: idToken,
+            userId: userWithSameEmail.id,
+          },
+        });
+
+        // Log link event.
+        await tx.userSecurityAuditLog.create({
+          data: {
+            userId: userWithSameEmail.id,
+            ipAddress: requestMeta.ipAddress,
+            userAgent: requestMeta.userAgent,
+            type: UserSecurityAuditLogType.ACCOUNT_SSO_LINK,
+          },
+        });
+
+        // If account already exists in an unverified state, remove the password to ensure
+        // they cannot sign in since we cannot confirm the password was set by the user.
+        if (!userWithSameEmail.emailVerified) {
+          await tx.user.update({
+            where: {
+              id: userWithSameEmail.id,
+            },
+            data: {
+              emailVerified: new Date(),
+              password: null, // Todo: Check this
+            },
+          });
+        }
+
+        // Apparently incredibly rare case? So we whole account to unverified.
+        if (!googleEmailVerified) {
+          // Todo: Add logging.
+
+          await tx.user.update({
+            where: {
+              id: userWithSameEmail.id,
+            },
+            data: {
+              emailVerified: null,
+            },
+          });
+        }
       });
 
-      // Todo: Link account
       await onAuthorize({ userId: userWithSameEmail.id }, c);
 
       return c.redirect(redirectPath, 302);
