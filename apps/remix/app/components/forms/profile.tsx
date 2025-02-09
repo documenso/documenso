@@ -3,6 +3,7 @@ import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
 import { Trans } from '@lingui/react/macro';
 import { useForm } from 'react-hook-form';
+import { useRevalidator } from 'react-router';
 import { z } from 'zod';
 
 import { useSession } from '@documenso/lib/client-only/providers/session';
@@ -42,6 +43,7 @@ export const ProfileForm = ({ className }: ProfileFormProps) => {
   const { _ } = useLingui();
   const { toast } = useToast();
   const { user } = useSession();
+  const { revalidate } = useRevalidator();
 
   const form = useForm<TProfileFormSchema>({
     values: {
@@ -68,7 +70,7 @@ export const ProfileForm = ({ className }: ProfileFormProps) => {
         duration: 5000,
       });
 
-      // router.refresh(); // Todo
+      await revalidate();
     } catch (err) {
       toast({
         title: _(msg`An unknown error occurred`),

@@ -1,10 +1,11 @@
-import { useState, useTransition } from 'react';
+import { useState } from 'react';
 
 import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
 import { Trans } from '@lingui/react/macro';
 import { type Recipient } from '@prisma/client';
 import { Loader } from 'lucide-react';
+import { useRevalidator } from 'react-router';
 
 import { DO_NOT_INVALIDATE_QUERY_ON_MUTATION } from '@documenso/lib/constants/trpc';
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
@@ -40,13 +41,12 @@ export const DocumentSigningNameField = ({
 }: DocumentSigningNameFieldProps) => {
   const { _ } = useLingui();
   const { toast } = useToast();
+  const { revalidate } = useRevalidator();
 
   const { fullName: providedFullName, setFullName: setProvidedFullName } =
     useRequiredDocumentSigningContext();
 
   const { executeActionAuthProcedure } = useRequiredDocumentSigningAuthContext();
-
-  const [isPending, startTransition] = useTransition();
 
   const { mutateAsync: signFieldWithToken, isPending: isSignFieldWithTokenLoading } =
     trpc.field.signFieldWithToken.useMutation(DO_NOT_INVALIDATE_QUERY_ON_MUTATION);
@@ -56,7 +56,7 @@ export const DocumentSigningNameField = ({
     isPending: isRemoveSignedFieldWithTokenLoading,
   } = trpc.field.removeSignedFieldWithToken.useMutation(DO_NOT_INVALIDATE_QUERY_ON_MUTATION);
 
-  const isLoading = isSignFieldWithTokenLoading || isRemoveSignedFieldWithTokenLoading || isPending;
+  const isLoading = isSignFieldWithTokenLoading || isRemoveSignedFieldWithTokenLoading;
 
   const [showFullNameModal, setShowFullNameModal] = useState(false);
   const [localFullName, setLocalFullName] = useState('');
@@ -107,7 +107,7 @@ export const DocumentSigningNameField = ({
 
       await signFieldWithToken(payload);
 
-      // startTransition(() => router.refresh());
+      await revalidate();
     } catch (err) {
       const error = AppError.parseError(err);
 
@@ -139,7 +139,7 @@ export const DocumentSigningNameField = ({
 
       await removeSignedFieldWithToken(payload);
 
-      // startTransition(() => router.refresh());
+      await revalidate();
     } catch (err) {
       console.error(err);
 

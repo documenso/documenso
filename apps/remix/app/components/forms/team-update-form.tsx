@@ -73,7 +73,7 @@ export const TeamUpdateForm = ({ teamId, teamName, teamUrl }: UpdateTeamDialogPr
       });
 
       if (url !== teamUrl) {
-        await navigate(`${NEXT_PUBLIC_WEBAPP_URL()}/t/${url}/settings`);
+        await navigate(`/t/${url}/settings`);
       }
     } catch (err) {
       const error = AppError.parseError(err);

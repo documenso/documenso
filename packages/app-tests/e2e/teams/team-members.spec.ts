@@ -33,7 +33,6 @@ test('[TEAMS]: update team member role', async ({ page }) => {
   await page.getByLabel('Manager').click();
   await page.getByRole('button', { name: 'Update' }).click();
 
-  // TODO: Remove me, but i don't care for now
   await page.reload();
 
   await expect(

@@ -42,13 +42,12 @@ test('[TEMPLATES]: view templates', async ({ page }) => {
     redirectPath: '/templates',
   });
 
+  // Only should only see their personal template.
+  await expect(page.getByTestId('data-table-count')).toContainText('Showing 1 result');
+
   // Owner should see both team templates.
   await page.goto(`${NEXT_PUBLIC_WEBAPP_URL()}/t/${team.url}/templates`);
-  await expect(page.getByRole('main')).toContainText('Showing 2 results');
-
-  // Only should only see their personal template.
-  await page.goto(`${NEXT_PUBLIC_WEBAPP_URL()}/templates`);
-  await expect(page.getByRole('main')).toContainText('Showing 1 result');
+  await expect(page.getByTestId('data-table-count')).toContainText('Showing 2 results');
 });
 
 test('[TEMPLATES]: delete template', async ({ page }) => {
@@ -142,7 +141,7 @@ test('[TEMPLATES]: duplicate template', async ({ page }) => {
   await page.getByRole('menuitem', { name: 'Duplicate' }).click();
   await page.getByRole('button', { name: 'Duplicate' }).click();
   await expect(page.getByText('Template duplicated').first()).toBeVisible();
-  await expect(page.getByRole('main')).toContainText('Showing 2 results');
+  await expect(page.getByTestId('data-table-count')).toContainText('Showing 2 results');
 
   await page.goto(`${NEXT_PUBLIC_WEBAPP_URL()}/t/${team.url}/templates`);
 
@@ -151,7 +150,7 @@ test('[TEMPLATES]: duplicate template', async ({ page }) => {
   await page.getByRole('menuitem', { name: 'Duplicate' }).click();
   await page.getByRole('button', { name: 'Duplicate' }).click();
   await expect(page.getByText('Template duplicated').first()).toBeVisible();
-  await expect(page.getByRole('main')).toContainText('Showing 2 results');
+  await expect(page.getByTestId('data-table-count')).toContainText('Showing 2 results');
 });
 
 test('[TEMPLATES]: use template', async ({ page }) => {
@@ -194,7 +193,7 @@ test('[TEMPLATES]: use template', async ({ page }) => {
   await page.waitForURL(/documents/);
   await page.getByRole('main').getByRole('link', { name: 'Documents' }).click();
   await page.waitForURL('/documents');
-  await expect(page.getByRole('main')).toContainText('Showing 1 result');
+  await expect(page.getByTestId('data-table-count')).toContainText('Showing 1 result');
 
   await page.goto(`${NEXT_PUBLIC_WEBAPP_URL()}/t/${team.url}/templates`);
   await page.waitForTimeout(1000);
@@ -212,5 +211,5 @@ test('[TEMPLATES]: use template', async ({ page }) => {
   await page.waitForURL(/\/t\/.+\/documents/);
   await page.getByRole('main').getByRole('link', { name: 'Documents' }).click();
   await page.waitForURL(`/t/${team.url}/documents`);
-  await expect(page.getByRole('main')).toContainText('Showing 1 result');
+  await expect(page.getByTestId('data-table-count')).toContainText('Showing 1 result');
 });

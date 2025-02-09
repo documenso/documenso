@@ -1,6 +1,6 @@
 import { sha256 } from '@oslojs/crypto/sha2';
 import { encodeBase32LowerCaseNoPadding, encodeHexLowerCase } from '@oslojs/encoding';
-import type { Session, User } from '@prisma/client';
+import { type Session, type User, UserSecurityAuditLogType } from '@prisma/client';
 
 import type { RequestMetadata } from '@documenso/lib/universal/extract-request-metadata';
 import { prisma } from '@documenso/prisma';
@@ -47,6 +47,15 @@ export const createSession = async (
 
   await prisma.session.create({
     data: session,
+  });
+
+  await prisma.userSecurityAuditLog.create({
+    data: {
+      userId,
+      ipAddress: metadata.ipAddress,
+      userAgent: metadata.userAgent,
+      type: UserSecurityAuditLogType.SIGN_IN,
+    },
   });
 
   return session;
@@ -103,6 +112,18 @@ export const validateSessionToken = async (token: string): Promise<SessionValida
   return { session, user, isAuthenticated: true };
 };
 
-export const invalidateSession = async (sessionId: string): Promise<void> => {
-  await prisma.session.delete({ where: { id: sessionId } });
+export const invalidateSession = async (
+  sessionId: string,
+  metadata: RequestMetadata,
+): Promise<void> => {
+  const session = await prisma.session.delete({ where: { id: sessionId } });
+
+  await prisma.userSecurityAuditLog.create({
+    data: {
+      userId: session.userId,
+      ipAddress: metadata.ipAddress,
+      userAgent: metadata.userAgent,
+      type: UserSecurityAuditLogType.SIGN_OUT,
+    },
+  });
 };

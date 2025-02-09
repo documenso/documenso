@@ -7,6 +7,7 @@ import { Trans } from '@lingui/react/macro';
 import type { TeamEmail } from '@prisma/client';
 import type * as DialogPrimitive from '@radix-ui/react-dialog';
 import { useForm } from 'react-hook-form';
+import { useRevalidator } from 'react-router';
 import { z } from 'zod';
 
 import { trpc } from '@documenso/trpc/react';
@@ -51,6 +52,7 @@ export const TeamEmailUpdateDialog = ({
 
   const { _ } = useLingui();
   const { toast } = useToast();
+  const { revalidate } = useRevalidator();
 
   const form = useForm<TUpdateTeamEmailFormSchema>({
     resolver: zodResolver(ZUpdateTeamEmailFormSchema),
@@ -76,7 +78,7 @@ export const TeamEmailUpdateDialog = ({
         duration: 5000,
       });
 
-      // router.refresh(); // Todo
+      await revalidate();
 
       setOpen(false);
     } catch (err) {

@@ -3,8 +3,10 @@ import { useEffect, useMemo, useState } from 'react';
 import { Trans } from '@lingui/react/macro';
 import { useSearchParams } from 'react-router';
 import { Link } from 'react-router';
+import { z } from 'zod';
 
 import { formatAvatarUrl } from '@documenso/lib/utils/avatars';
+import { parseToIntegerArray } from '@documenso/lib/utils/params';
 import { formatDocumentsPath } from '@documenso/lib/utils/teams';
 import { ExtendedDocumentStatus } from '@documenso/prisma/types/extended-document-status';
 import { trpc } from '@documenso/trpc/react';
@@ -33,8 +35,9 @@ const ZSearchParamsSchema = ZFindDocumentsInternalRequestSchema.pick({
   period: true,
   page: true,
   perPage: true,
-  senderIds: true,
   query: true,
+}).extend({
+  senderIds: z.string().transform(parseToIntegerArray).optional().catch([]),
 });
 
 export default function DocumentsPage() {
@@ -59,7 +62,7 @@ export default function DocumentsPage() {
     ...findDocumentSearchParams,
   });
 
-  const getTabHref = (value: typeof status) => {
+  const getTabHref = (value: keyof typeof ExtendedDocumentStatus) => {
     const params = new URLSearchParams(searchParams);
 
     params.set('status', value);

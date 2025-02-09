@@ -1,10 +1,11 @@
-import { useEffect, useState, useTransition } from 'react';
+import { useEffect, useState } from 'react';
 
 import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
 import { Plural, Trans } from '@lingui/react/macro';
 import type { Recipient } from '@prisma/client';
 import { Loader, Type } from 'lucide-react';
+import { useRevalidator } from 'react-router';
 
 import { validateTextField } from '@documenso/lib/advanced-fields-validation/validate-text';
 import { DO_NOT_INVALIDATE_QUERY_ON_MUTATION } from '@documenso/lib/constants/trpc';
@@ -41,6 +42,7 @@ export const DocumentSigningTextField = ({
 }: DocumentSigningTextFieldProps) => {
   const { _ } = useLingui();
   const { toast } = useToast();
+  const { revalidate } = useRevalidator();
 
   const initialErrors: Record<string, string[]> = {
     required: [],
@@ -52,8 +54,6 @@ export const DocumentSigningTextField = ({
 
   const { executeActionAuthProcedure } = useRequiredDocumentSigningAuthContext();
 
-  const [isPending, startTransition] = useTransition();
-
   const { mutateAsync: signFieldWithToken, isPending: isSignFieldWithTokenLoading } =
     trpc.field.signFieldWithToken.useMutation(DO_NOT_INVALIDATE_QUERY_ON_MUTATION);
 
@@ -64,7 +64,7 @@ export const DocumentSigningTextField = ({
 
   const parsedFieldMeta = field.fieldMeta ? ZTextFieldMeta.parse(field.fieldMeta) : null;
 
-  const isLoading = isSignFieldWithTokenLoading || isRemoveSignedFieldWithTokenLoading || isPending;
+  const isLoading = isSignFieldWithTokenLoading || isRemoveSignedFieldWithTokenLoading;
   const shouldAutoSignField =
     (!field.inserted && parsedFieldMeta?.text) ||
     (!field.inserted && parsedFieldMeta?.text && parsedFieldMeta?.readOnly);
@@ -153,8 +153,7 @@ export const DocumentSigningTextField = ({
 
       setLocalCustomText('');
 
-      // Todo
-      // startTransition(() => router.refresh());
+      await revalidate();
     } catch (err) {
       const error = AppError.parseError(err);
 
@@ -188,8 +187,7 @@ export const DocumentSigningTextField = ({
 
       setLocalCustomText(parsedFieldMeta?.text ?? '');
 
-      // Todo
-      // startTransition(() => router.refresh());
+      await revalidate();
     } catch (err) {
       console.error(err);
 

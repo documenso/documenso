@@ -53,7 +53,7 @@ export const appContext = async (c: Context, next: Next) => {
 
     const result = await Promise.all([
       getTeams({ userId: session.user.id }),
-      teamUrl ? getTeamByUrl({ userId: session.user.id, teamUrl }) : null,
+      teamUrl ? getTeamByUrl({ userId: session.user.id, teamUrl }).catch(() => null) : null,
     ]);
 
     teams = result[0];

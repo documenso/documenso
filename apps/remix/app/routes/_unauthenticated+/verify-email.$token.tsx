@@ -8,7 +8,7 @@ import { Link, redirect, useNavigate } from 'react-router';
 import { match } from 'ts-pattern';
 
 import { authClient } from '@documenso/auth/client';
-import { EMAIL_VERIFICATION_STATE } from '@documenso/lib/server-only/user/verify-email';
+import { EMAIL_VERIFICATION_STATE } from '@documenso/lib/constants/email';
 import { Button } from '@documenso/ui/primitives/button';
 import { useToast } from '@documenso/ui/primitives/use-toast';
 

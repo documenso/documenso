@@ -5,6 +5,7 @@ import { useLingui } from '@lingui/react';
 import { Trans } from '@lingui/react/macro';
 import { type Field, type Recipient, type Signature, SigningStatus } from '@prisma/client';
 import { useForm } from 'react-hook-form';
+import { useRevalidator } from 'react-router';
 import { z } from 'zod';
 
 import { trpc } from '@documenso/trpc/react';
@@ -42,6 +43,7 @@ export type RecipientItemProps = {
 export const AdminDocumentRecipientItemTable = ({ recipient }: RecipientItemProps) => {
   const { _ } = useLingui();
   const { toast } = useToast();
+  const { revalidate } = useRevalidator();
 
   const form = useForm<TAdminUpdateRecipientFormSchema>({
     defaultValues: {
@@ -109,8 +111,7 @@ export const AdminDocumentRecipientItemTable = ({ recipient }: RecipientItemProp
         description: _(msg`The recipient has been updated successfully`),
       });
 
-      // todo
-      // router.refresh();
+      await revalidate();
     } catch (error) {
       toast({
         title: _(msg`Failed to update recipient`),

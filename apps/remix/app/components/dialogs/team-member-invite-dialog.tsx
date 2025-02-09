@@ -46,9 +46,9 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@documenso/ui/primitives/tabs';
 import { useToast } from '@documenso/ui/primitives/use-toast';
 
+import { useCurrentTeam } from '~/providers/team';
+
 export type TeamMemberInviteDialogProps = {
-  currentUserTeamRole: TeamMemberRole;
-  teamId: number;
   trigger?: React.ReactNode;
 } & Omit<DialogPrimitive.DialogProps, 'children'>;
 
@@ -95,18 +95,15 @@ const ZImportTeamMemberSchema = z.array(
   }),
 );
 
-export const TeamMemberInviteDialog = ({
-  currentUserTeamRole,
-  teamId,
-  trigger,
-  ...props
-}: TeamMemberInviteDialogProps) => {
+export const TeamMemberInviteDialog = ({ trigger, ...props }: TeamMemberInviteDialogProps) => {
   const [open, setOpen] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [invitationType, setInvitationType] = useState<TabTypes>('INDIVIDUAL');
 
   const { _ } = useLingui();
   const { toast } = useToast();
+
+  const team = useCurrentTeam();
 
   const form = useForm<TInviteTeamMembersFormSchema>({
     resolver: zodResolver(ZInviteTeamMembersFormSchema),
@@ -141,7 +138,7 @@ export const TeamMemberInviteDialog = ({
   const onFormSubmit = async ({ invitations }: TInviteTeamMembersFormSchema) => {
     try {
       await createTeamMemberInvites({
-        teamId,
+        teamId: team.id,
         invitations,
       });
 
@@ -203,7 +200,7 @@ export const TeamMemberInviteDialog = ({
 
           setInvitationType('INDIVIDUAL');
         } catch (err) {
-          console.error(err.message);
+          console.error(err);
 
           toast({
             title: _(msg`Something went wrong`),
@@ -324,11 +321,13 @@ export const TeamMemberInviteDialog = ({
                                   </SelectTrigger>
 
                                   <SelectContent position="popper">
-                                    {TEAM_MEMBER_ROLE_HIERARCHY[currentUserTeamRole].map((role) => (
-                                      <SelectItem key={role} value={role}>
-                                        {_(TEAM_MEMBER_ROLE_MAP[role]) ?? role}
-                                      </SelectItem>
-                                    ))}
+                                    {TEAM_MEMBER_ROLE_HIERARCHY[team.currentTeamMember.role].map(
+                                      (role) => (
+                                        <SelectItem key={role} value={role}>
+                                          {_(TEAM_MEMBER_ROLE_MAP[role]) ?? role}
+                                        </SelectItem>
+                                      ),
+                                    )}
                                   </SelectContent>
                                 </Select>
                               </FormControl>

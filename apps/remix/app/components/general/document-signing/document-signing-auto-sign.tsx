@@ -1,4 +1,4 @@
-import { useState, useTransition } from 'react';
+import { useState } from 'react';
 
 import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
@@ -6,6 +6,7 @@ import { Plural, Trans } from '@lingui/react/macro';
 import type { Field, Recipient } from '@prisma/client';
 import { FieldType } from '@prisma/client';
 import { useForm } from 'react-hook-form';
+import { useRevalidator } from 'react-router';
 import { P, match } from 'ts-pattern';
 
 import { unsafe_useEffectOnce } from '@documenso/lib/client-only/hooks/use-effect-once';
@@ -60,12 +61,12 @@ export type DocumentSigningAutoSignProps = {
 export const DocumentSigningAutoSign = ({ recipient, fields }: DocumentSigningAutoSignProps) => {
   const { _ } = useLingui();
   const { toast } = useToast();
+  const { revalidate } = useRevalidator();
 
   const { email, fullName } = useRequiredDocumentSigningContext();
   const { derivedRecipientActionAuth } = useRequiredDocumentSigningAuthContext();
 
   const [open, setOpen] = useState(false);
-  const [isPending, startTransition] = useTransition();
 
   const form = useForm();
 
@@ -153,12 +154,7 @@ export const DocumentSigningAutoSign = ({ recipient, fields }: DocumentSigningAu
       });
     }
 
-    startTransition(() => {
-      // Todo
-      // router.refresh();
-
-      setOpen(false);
-    });
+    await revalidate();
   };
 
   unsafe_useEffectOnce(() => {
@@ -219,7 +215,7 @@ export const DocumentSigningAutoSign = ({ recipient, fields }: DocumentSigningAu
               <Button
                 type="submit"
                 className="min-w-[6rem]"
-                loading={form.formState.isSubmitting || isPending}
+                loading={form.formState.isSubmitting}
                 disabled={!autoSignableFields.length}
               >
                 <Trans>Sign</Trans>

@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react';
 import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
 import { Trans } from '@lingui/react/macro';
-import { Link, useLocation, useNavigate, useSearchParams } from 'react-router';
+import { Link, useLocation, useSearchParams } from 'react-router';
 
 import { useDebouncedValue } from '@documenso/lib/client-only/hooks/use-debounced-value';
 import { Input } from '@documenso/ui/primitives/input';
@@ -13,15 +13,11 @@ import { TeamMemberInviteDialog } from '~/components/dialogs/team-member-invite-
 import { SettingsHeader } from '~/components/general/settings-header';
 import { TeamSettingsMemberInvitesTable } from '~/components/tables/team-settings-member-invites-table';
 import { TeamSettingsMembersDataTable } from '~/components/tables/team-settings-members-table';
-import { useCurrentTeam } from '~/providers/team';
 
 export default function TeamsSettingsMembersPage() {
   const { _ } = useLingui();
 
-  const team = useCurrentTeam();
-
-  const [searchParams] = useSearchParams();
-  const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
   const { pathname } = useLocation();
 
   const [searchQuery, setSearchQuery] = useState(() => searchParams?.get('query') ?? '');
@@ -34,10 +30,6 @@ export default function TeamsSettingsMembersPage() {
    * Handle debouncing the search query.
    */
   useEffect(() => {
-    if (!pathname) {
-      return;
-    }
-
     const params = new URLSearchParams(searchParams?.toString());
 
     params.set('query', debouncedSearchQuery);
@@ -46,8 +38,13 @@ export default function TeamsSettingsMembersPage() {
       params.delete('query');
     }
 
-    void navigate(`${pathname}?${params.toString()}`);
-  }, [debouncedSearchQuery, pathname, navigate, searchParams]);
+    // If nothing  to change then do nothing.
+    if (params.toString() === searchParams?.toString()) {
+      return;
+    }
+
+    setSearchParams(params);
+  }, [debouncedSearchQuery, pathname, searchParams]);
 
   return (
     <div>
@@ -55,10 +52,7 @@ export default function TeamsSettingsMembersPage() {
         title={_(msg`Members`)}
         subtitle={_(msg`Manage the members or invite new members.`)}
       >
-        <TeamMemberInviteDialog
-          teamId={team.id}
-          currentUserTeamRole={team.currentTeamMember.role}
-        />
+        <TeamMemberInviteDialog />
       </SettingsHeader>
 
       <div>

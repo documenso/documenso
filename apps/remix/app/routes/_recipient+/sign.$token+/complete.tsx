@@ -1,9 +1,11 @@
+import { useEffect } from 'react';
+
 import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
 import { Trans } from '@lingui/react/macro';
-import { DocumentStatus, FieldType, RecipientRole } from '@prisma/client';
+import { type Document, DocumentStatus, FieldType, RecipientRole } from '@prisma/client';
 import { CheckCircle2, Clock8, FileSearch } from 'lucide-react';
-import { Link } from 'react-router';
+import { Link, useRevalidator } from 'react-router';
 import { getOptionalLoaderSession } from 'server/utils/get-loader-session';
 import { match } from 'ts-pattern';
 
@@ -254,35 +256,32 @@ export default function CompletedSigningPage({ loaderData }: Route.ComponentProp
         </div>
       </div>
 
-      {/* Todo */}
-      {/* Todo */}
-      {/* <PollUntilDocumentCompleted document={document} /> */}
+      <PollUntilDocumentCompleted document={document} />
     </div>
   );
 }
 
-// Todo: Refresh on focus? Was in a layout w it before.
-// Todo:
-// export type PollUntilDocumentCompletedProps = {
-//   document: Pick<Document, 'id' | 'status' | 'deletedAt'>;
-// };
+export type PollUntilDocumentCompletedProps = {
+  document: Pick<Document, 'id' | 'status' | 'deletedAt'>;
+};
 
-// export const PollUntilDocumentCompleted = ({ document }: PollUntilDocumentCompletedProps) => {
-//   const router = useRouter();
+export const PollUntilDocumentCompleted = ({ document }: PollUntilDocumentCompletedProps) => {
+  const { revalidate } = useRevalidator();
 
-//   useEffect(() => {
-//     if (document.status === DocumentStatus.COMPLETED) {
-//       return;
-//     }
+  useEffect(() => {
+    if (document.status === DocumentStatus.COMPLETED) {
+      return;
+    }
 
-//     const interval = setInterval(() => {
-//       if (window.document.hasFocus()) {
-//         router.refresh();
-//       }
-//     }, 5000);
+    const interval = setInterval(() => {
+      if (window.document.hasFocus()) {
+        void revalidate();
+      }
+    }, 5000);
 
-//     return () => clearInterval(interval);
-//   }, [router, document.status]);
+    return () => clearInterval(interval);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [document.status]);
 
-//   return <></>;
-// };
+  return <></>;
+};

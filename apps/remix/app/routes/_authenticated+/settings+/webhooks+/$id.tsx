@@ -4,7 +4,7 @@ import { useLingui } from '@lingui/react';
 import { Trans } from '@lingui/react/macro';
 import { Loader } from 'lucide-react';
 import { useForm } from 'react-hook-form';
-import { useParams } from 'react-router';
+import { useParams, useRevalidator } from 'react-router';
 import type { z } from 'zod';
 
 import { trpc } from '@documenso/trpc/react';
@@ -36,6 +36,7 @@ export default function WebhookPage() {
 
   const { _ } = useLingui();
   const { toast } = useToast();
+  const { revalidate } = useRevalidator();
 
   const webhookId = params.id || '';
 
@@ -71,8 +72,7 @@ export default function WebhookPage() {
         duration: 5000,
       });
 
-      // Todo
-      // router.refresh();
+      await revalidate();
     } catch (err) {
       toast({
         title: _(msg`Failed to update webhook`),

@@ -6,6 +6,7 @@ import { useLingui } from '@lingui/react';
 import { Trans } from '@lingui/react/macro';
 import { flushSync } from 'react-dom';
 import { useForm } from 'react-hook-form';
+import { useRevalidator } from 'react-router';
 import { z } from 'zod';
 
 import { trpc } from '@documenso/trpc/react';
@@ -41,6 +42,7 @@ export type TDisable2FAForm = z.infer<typeof ZDisable2FAForm>;
 export const DisableAuthenticatorAppDialog = () => {
   const { _ } = useLingui();
   const { toast } = useToast();
+  const { revalidate } = useRevalidator();
 
   const [isOpen, setIsOpen] = useState(false);
   const [twoFactorDisableMethod, setTwoFactorDisableMethod] = useState<'totp' | 'backup'>('totp');
@@ -92,8 +94,7 @@ export const DisableAuthenticatorAppDialog = () => {
         onCloseTwoFactorDisableDialog();
       });
 
-      // Todo
-      // router.refresh();
+      await revalidate();
     } catch (_err) {
       toast({
         title: _(msg`Unable to disable two-factor authentication`),

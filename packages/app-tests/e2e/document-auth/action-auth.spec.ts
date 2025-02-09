@@ -13,6 +13,7 @@ import {
 import { seedTestEmail, seedUser } from '@documenso/prisma/seed/users';
 
 import { apiSignin, apiSignout } from '../fixtures/authentication';
+import { signSignaturePad } from '../fixtures/signature';
 
 test.describe.configure({ mode: 'parallel', timeout: 60000 });
 
@@ -35,15 +36,7 @@ test('[DOCUMENT_AUTH]: should allow signing when no auth setup', async ({ page }
     await page.goto(signUrl);
     await expect(page.getByRole('heading', { name: 'Sign Document' })).toBeVisible();
 
-    // Add signature.
-    const canvas = page.locator('canvas').first();
-    const box = await canvas.boundingBox();
-    if (box) {
-      await page.mouse.move(box.x + 40, box.y + 40);
-      await page.mouse.down();
-      await page.mouse.move(box.x + box.width - 2, box.y + box.height - 2);
-      await page.mouse.up();
-    }
+    await signSignaturePad(page);
 
     for (const field of fields) {
       await page.locator(`#field-${field.id}`).getByRole('button').click();
@@ -92,15 +85,7 @@ test('[DOCUMENT_AUTH]: should allow signing with valid global auth', async ({ pa
 
   await expect(page.getByRole('heading', { name: 'Sign Document' })).toBeVisible();
 
-  // Add signature.
-  const canvas = page.locator('canvas').first();
-  const box = await canvas.boundingBox();
-  if (box) {
-    await page.mouse.move(box.x + 40, box.y + 40);
-    await page.mouse.down();
-    await page.mouse.move(box.x + box.width - 2, box.y + box.height - 2);
-    await page.mouse.up();
-  }
+  await signSignaturePad(page);
 
   for (const field of fields) {
     await page.locator(`#field-${field.id}`).getByRole('button').click();
@@ -261,15 +246,7 @@ test('[DOCUMENT_AUTH]: should allow field signing when required for recipient au
       });
     }
 
-    // Add signature.
-    const canvas = page.locator('canvas').first();
-    const box = await canvas.boundingBox();
-    if (box) {
-      await page.mouse.move(box.x + 40, box.y + 40);
-      await page.mouse.down();
-      await page.mouse.move(box.x + box.width - 2, box.y + box.height - 2);
-      await page.mouse.up();
-    }
+    await signSignaturePad(page);
 
     for (const field of fields) {
       await page.locator(`#field-${field.id}`).getByRole('button').click();
@@ -372,15 +349,7 @@ test('[DOCUMENT_AUTH]: should allow field signing when required for recipient an
       });
     }
 
-    // Add signature.
-    const canvas = page.locator('canvas').first();
-    const box = await canvas.boundingBox();
-    if (box) {
-      await page.mouse.move(box.x + 40, box.y + 40);
-      await page.mouse.down();
-      await page.mouse.move(box.x + box.width - 2, box.y + box.height - 2);
-      await page.mouse.up();
-    }
+    await signSignaturePad(page);
 
     for (const field of fields) {
       await page.locator(`#field-${field.id}`).getByRole('button').click();

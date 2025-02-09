@@ -6,6 +6,8 @@ import {
   seedUser,
 } from '@documenso/prisma/seed/users';
 
+import { signSignaturePad } from '../fixtures/signature';
+
 test.use({ storageState: { cookies: [], origins: [] } });
 
 test('[USER] can sign up with email and password', async ({ page }: { page: Page }) => {
@@ -18,14 +20,7 @@ test('[USER] can sign up with email and password', async ({ page }: { page: Page
   await page.getByLabel('Email').fill(email);
   await page.getByLabel('Password', { exact: true }).fill(password);
 
-  const canvas = page.locator('canvas').first();
-  const box = await canvas.boundingBox();
-  if (box) {
-    await page.mouse.move(box.x + 40, box.y + 40);
-    await page.mouse.down();
-    await page.mouse.move(box.x + box.width - 2, box.y + box.height - 2);
-    await page.mouse.up();
-  }
+  await signSignaturePad(page);
 
   await page.getByRole('button', { name: 'Next', exact: true }).click();
   await page.getByLabel('Public profile username').fill(Date.now().toString());
@@ -41,7 +36,7 @@ test('[USER] can sign up with email and password', async ({ page }: { page: Page
   await expect(page.getByRole('heading')).toContainText('Email Confirmed!');
 
   // We now automatically redirect to the home page
-  // await page.getByRole('link', { name: 'Go back home' }).click();
+  await page.getByRole('link', { name: 'Continue' }).click();
 
   await page.waitForURL('/documents');
 

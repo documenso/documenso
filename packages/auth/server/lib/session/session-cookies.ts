@@ -2,6 +2,7 @@ import type { Context } from 'hono';
 import { deleteCookie, getSignedCookie, setSignedCookie } from 'hono/cookie';
 
 import { NEXT_PUBLIC_WEBAPP_URL } from '@documenso/lib/constants/app';
+import { useSecureCookies } from '@documenso/lib/constants/auth';
 import { appLog } from '@documenso/lib/utils/debugger';
 import { env } from '@documenso/lib/utils/env';
 
@@ -22,6 +23,18 @@ const getAuthDomain = () => {
 
   return url.hostname;
 };
+
+/**
+ * Generic auth session cookie options.
+ */
+export const sessionCookieOptions = {
+  httpOnly: true,
+  path: '/',
+  sameSite: useSecureCookies ? 'none' : 'lax',
+  secure: useSecureCookies,
+  domain: getAuthDomain(),
+  // Todo: Max age for specific auth cookies.
+} as const;
 
 export const extractSessionCookieFromHeaders = (headers: Headers): string | null => {
   const cookieHeader = headers.get('cookie') || '';
@@ -54,12 +67,13 @@ export const getSessionCookie = async (c: Context): Promise<string | null> => {
  * @param sessionToken - The session token to set.
  */
 export const setSessionCookie = async (c: Context, sessionToken: string) => {
-  await setSignedCookie(c, sessionCookieName, sessionToken, getAuthSecret(), {
-    path: '/',
-    // sameSite: '', // whats the default? we need to change this for embed right?
-    // secure: true,
-    domain: getAuthDomain(),
-  }).catch((err) => {
+  await setSignedCookie(
+    c,
+    sessionCookieName,
+    sessionToken,
+    getAuthSecret(),
+    sessionCookieOptions,
+  ).catch((err) => {
     appLog('SetSessionCookie', `Error setting signed cookie: ${err}`);
 
     throw err;
@@ -73,9 +87,5 @@ export const setSessionCookie = async (c: Context, sessionToken: string) => {
  * @param sessionToken - The session token to set.
  */
 export const deleteSessionCookie = (c: Context) => {
-  deleteCookie(c, sessionCookieName, {
-    path: '/',
-    secure: true,
-    domain: getAuthDomain(),
-  });
+  deleteCookie(c, sessionCookieName, sessionCookieOptions);
 };

@@ -85,6 +85,7 @@
     "@types/formidable": "^2.0.6",
     "@types/luxon": "^3.3.1",
     "@types/node": "^20",
+    "@types/papaparse": "^5.3.15",
     "@types/react": "^18",
     "@types/react-dom": "^18",
     "@types/ua-parser-js": "^0.7.39",

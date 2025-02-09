@@ -6,6 +6,7 @@ import { useLingui } from '@lingui/react';
 import { Trans } from '@lingui/react/macro';
 import { Loader } from 'lucide-react';
 import { useForm } from 'react-hook-form';
+import { useRevalidator } from 'react-router';
 import { z } from 'zod';
 
 import { IS_BILLING_ENABLED } from '@documenso/lib/constants/app';
@@ -56,6 +57,7 @@ export const TeamTransferDialog = ({
 
   const { _ } = useLingui();
   const { toast } = useToast();
+  const { revalidate } = useRevalidator();
 
   const { mutateAsync: requestTeamOwnershipTransfer } =
     trpc.team.requestTeamOwnershipTransfer.useMutation();
@@ -98,7 +100,7 @@ export const TeamTransferDialog = ({
         clearPaymentMethods,
       });
 
-      // router.refresh(); // Todo
+      await revalidate();
 
       toast({
         title: _(msg`Success`),

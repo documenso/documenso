@@ -107,7 +107,11 @@ export const DocumentSigningForm = ({
       timestamp: new Date().toISOString(),
     });
 
-    await navigate(redirectUrl ? redirectUrl : `/sign/${recipient.token}/complete`);
+    if (redirectUrl) {
+      window.location.href = redirectUrl;
+    } else {
+      await navigate(`/sign/${recipient.token}/complete`);
+    }
   };
 
   return (

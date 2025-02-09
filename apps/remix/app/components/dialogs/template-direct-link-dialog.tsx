@@ -10,7 +10,7 @@ import {
   type TemplateDirectLink,
 } from '@prisma/client';
 import { CircleDotIcon, CircleIcon, ClipboardCopyIcon, InfoIcon, LoaderIcon } from 'lucide-react';
-import { Link } from 'react-router';
+import { Link, useRevalidator } from 'react-router';
 import { P, match } from 'ts-pattern';
 
 import { useLimits } from '@documenso/ee/server-only/limits/provider/client';
@@ -64,6 +64,7 @@ export const TemplateDirectLinkDialog = ({
   const { toast } = useToast();
   const { quota, remaining } = useLimits();
   const { _ } = useLingui();
+  const { revalidate } = useRevalidator();
 
   const [, copy] = useCopyToClipboard();
 
@@ -84,7 +85,9 @@ export const TemplateDirectLinkDialog = ({
     isPending: isCreatingTemplateDirectLink,
     reset: resetCreateTemplateDirectLink,
   } = trpcReact.template.createTemplateDirectLink.useMutation({
-    onSuccess: (data) => {
+    onSuccess: async (data) => {
+      await revalidate();
+
       setToken(data.token);
       setIsEnabled(data.enabled);
       setCurrentStep('MANAGE');
@@ -102,7 +105,9 @@ export const TemplateDirectLinkDialog = ({
 
   const { mutateAsync: toggleTemplateDirectLink, isPending: isTogglingTemplateAccess } =
     trpcReact.template.toggleTemplateDirectLink.useMutation({
-      onSuccess: (data) => {
+      onSuccess: async (data) => {
+        await revalidate();
+
         const enabledDescription = msg`Direct link signing has been enabled`;
         const disabledDescription = msg`Direct link signing has been disabled`;
 
@@ -125,7 +130,9 @@ export const TemplateDirectLinkDialog = ({
 
   const { mutateAsync: deleteTemplateDirectLink, isPending: isDeletingTemplateDirectLink } =
     trpcReact.template.deleteTemplateDirectLink.useMutation({
-      onSuccess: () => {
+      onSuccess: async () => {
+        await revalidate();
+
         onOpenChange(false);
         setToken(null);
 

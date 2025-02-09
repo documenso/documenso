@@ -4,6 +4,7 @@ import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
 import { Trans } from '@lingui/react/macro';
 import type { Prisma } from '@prisma/client';
+import { useRevalidator } from 'react-router';
 
 import { formatAvatarUrl } from '@documenso/lib/utils/avatars';
 import { extractInitials } from '@documenso/lib/utils/recipient-formatter';
@@ -44,6 +45,7 @@ export const TeamEmailDeleteDialog = ({ trigger, teamName, team }: TeamEmailDele
 
   const { _ } = useLingui();
   const { toast } = useToast();
+  const { revalidate } = useRevalidator();
 
   const { mutateAsync: deleteTeamEmail, isPending: isDeletingTeamEmail } =
     trpc.team.deleteTeamEmail.useMutation({
@@ -92,7 +94,7 @@ export const TeamEmailDeleteDialog = ({ trigger, teamName, team }: TeamEmailDele
       await deleteTeamEmailVerification({ teamId: team.id });
     }
 
-    // router.refresh(); // Todo
+    await revalidate();
   };
 
   return (

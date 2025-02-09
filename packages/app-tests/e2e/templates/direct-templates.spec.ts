@@ -117,7 +117,7 @@ test('[DIRECT_TEMPLATES]: toggle direct template link', async ({ page }) => {
 
     // Check that the direct template link is no longer accessible.
     await page.goto(formatDirectTemplatePath(template.directLink?.token || ''));
-    await expect(page.getByText('Template not found')).toBeVisible();
+    await expect(page.getByText('404 not found')).toBeVisible();
   }
 });
 
@@ -162,7 +162,7 @@ test('[DIRECT_TEMPLATES]: delete direct template link', async ({ page }) => {
 
     // Check that the direct template link is no longer accessible.
     await page.goto(formatDirectTemplatePath(template.directLink?.token || ''));
-    await expect(page.getByText('Template not found')).toBeVisible();
+    await expect(page.getByText('404 not found')).toBeVisible();
   }
 });
 

@@ -2,14 +2,8 @@ import { DateTime } from 'luxon';
 
 import { prisma } from '@documenso/prisma';
 
+import { EMAIL_VERIFICATION_STATE } from '../../constants/email';
 import { jobsClient } from '../../jobs/client';
-
-export const EMAIL_VERIFICATION_STATE = {
-  NOT_FOUND: 'NOT_FOUND',
-  VERIFIED: 'VERIFIED',
-  EXPIRED: 'EXPIRED',
-  ALREADY_VERIFIED: 'ALREADY_VERIFIED',
-} as const;
 
 export type VerifyEmailProps = {
   token: string;

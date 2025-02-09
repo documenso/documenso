@@ -1,9 +1,10 @@
-import { useEffect, useMemo, useState, useTransition } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 
 import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
 import type { Recipient } from '@prisma/client';
 import { Loader } from 'lucide-react';
+import { useRevalidator } from 'react-router';
 
 import { DO_NOT_INVALIDATE_QUERY_ON_MUTATION } from '@documenso/lib/constants/trpc';
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
@@ -40,8 +41,8 @@ export const DocumentSigningCheckboxField = ({
 }: DocumentSigningCheckboxFieldProps) => {
   const { _ } = useLingui();
   const { toast } = useToast();
+  const { revalidate } = useRevalidator();
 
-  const [isPending, startTransition] = useTransition();
   const { executeActionAuthProcedure } = useRequiredDocumentSigningAuthContext();
 
   const parsedFieldMeta = ZCheckboxFieldMeta.parse(field.fieldMeta);
@@ -84,7 +85,7 @@ export const DocumentSigningCheckboxField = ({
     isPending: isRemoveSignedFieldWithTokenLoading,
   } = trpc.field.removeSignedFieldWithToken.useMutation(DO_NOT_INVALIDATE_QUERY_ON_MUTATION);
 
-  const isLoading = isSignFieldWithTokenLoading || isRemoveSignedFieldWithTokenLoading || isPending;
+  const isLoading = isSignFieldWithTokenLoading || isRemoveSignedFieldWithTokenLoading;
   const shouldAutoSignField =
     (!field.inserted && checkedValues.length > 0 && isLengthConditionMet) ||
     (!field.inserted && isReadOnly && isLengthConditionMet);
@@ -105,8 +106,7 @@ export const DocumentSigningCheckboxField = ({
         await signFieldWithToken(payload);
       }
 
-      // Todo
-      // startTransition(() => router.refresh());
+      await revalidate();
     } catch (err) {
       const error = AppError.parseError(err);
 
@@ -141,8 +141,7 @@ export const DocumentSigningCheckboxField = ({
         setCheckedValues([]);
       }
 
-      // Todo
-      // startTransition(() => router.refresh());
+      await revalidate();
     } catch (err) {
       console.error(err);
 
@@ -214,9 +213,7 @@ export const DocumentSigningCheckboxField = ({
       });
     } finally {
       setCheckedValues(updatedValues);
-
-      // Todo
-      // startTransition(() => router.refresh());
+      await revalidate();
     }
   };
 

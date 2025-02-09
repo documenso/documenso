@@ -477,6 +477,7 @@ export const SignaturePad = ({
       })}
     >
       <canvas
+        data-testid="signature-pad"
         ref={$el}
         className={cn(
           'relative block',

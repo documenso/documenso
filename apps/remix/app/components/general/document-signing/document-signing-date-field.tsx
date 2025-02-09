@@ -1,10 +1,9 @@
-import { useTransition } from 'react';
-
 import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
 import { Trans } from '@lingui/react/macro';
 import type { Recipient } from '@prisma/client';
 import { Loader } from 'lucide-react';
+import { useRevalidator } from 'react-router';
 
 import {
   DEFAULT_DOCUMENT_DATE_FORMAT,
@@ -43,8 +42,7 @@ export const DocumentSigningDateField = ({
 }: DocumentSigningDateFieldProps) => {
   const { _ } = useLingui();
   const { toast } = useToast();
-
-  const [isPending, startTransition] = useTransition();
+  const { revalidate } = useRevalidator();
 
   const { mutateAsync: signFieldWithToken, isPending: isSignFieldWithTokenLoading } =
     trpc.field.signFieldWithToken.useMutation(DO_NOT_INVALIDATE_QUERY_ON_MUTATION);
@@ -54,14 +52,14 @@ export const DocumentSigningDateField = ({
     isPending: isRemoveSignedFieldWithTokenLoading,
   } = trpc.field.removeSignedFieldWithToken.useMutation(DO_NOT_INVALIDATE_QUERY_ON_MUTATION);
 
-  const isLoading = isSignFieldWithTokenLoading || isRemoveSignedFieldWithTokenLoading || isPending;
+  const isLoading = isSignFieldWithTokenLoading || isRemoveSignedFieldWithTokenLoading;
 
   const localDateString = convertToLocalSystemFormat(field.customText, dateFormat, timezone);
 
   const isDifferentTime = field.inserted && localDateString !== field.customText;
 
   const tooltipText = _(
-    msg`"${field.customText}" will appear on the document as it has a timezone of "${timezone}".`,
+    msg`"${field.customText}" will appear on the document as it has a timezone of "${timezone || ''}".`,
   );
 
   const onSign = async (authOptions?: TRecipientActionAuth) => {
@@ -80,8 +78,7 @@ export const DocumentSigningDateField = ({
 
       await signFieldWithToken(payload);
 
-      // Todo
-      // startTransition(() => router.refresh());
+      await revalidate();
     } catch (err) {
       const error = AppError.parseError(err);
 
@@ -113,8 +110,7 @@ export const DocumentSigningDateField = ({
 
       await removeSignedFieldWithToken(payload);
 
-      // Todo
-      // startTransition(() => router.refresh());
+      await revalidate();
     } catch (err) {
       console.error(err);
 

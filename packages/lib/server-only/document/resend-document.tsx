@@ -134,7 +134,7 @@ export const resendDocument = async ({
         emailMessage =
           customEmail?.message ||
           i18n._(
-            msg`${user.name} on behalf of "${document.team.name}" has invited you to ${recipientActionVerb} the document "${document.title}".`,
+            msg`${user.name || user.email} on behalf of "${document.team.name}" has invited you to ${recipientActionVerb} the document "${document.title}".`,
           );
       }
 
@@ -164,20 +164,20 @@ export const resendDocument = async ({
         ? teamGlobalSettingsToBranding(document.team.teamGlobalSettings)
         : undefined;
 
+      const [html, text] = await Promise.all([
+        renderEmailWithI18N(template, {
+          lang: document.documentMeta?.language,
+          branding,
+        }),
+        renderEmailWithI18N(template, {
+          lang: document.documentMeta?.language,
+          branding,
+          plainText: true,
+        }),
+      ]);
+
       await prisma.$transaction(
         async (tx) => {
-          const [html, text] = await Promise.all([
-            renderEmailWithI18N(template, {
-              lang: document.documentMeta?.language,
-              branding,
-            }),
-            renderEmailWithI18N(template, {
-              lang: document.documentMeta?.language,
-              branding,
-              plainText: true,
-            }),
-          ]);
-
           await mailer.sendMail({
             to: {
               address: email,

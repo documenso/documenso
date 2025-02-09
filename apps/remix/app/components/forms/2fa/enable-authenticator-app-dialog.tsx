@@ -5,6 +5,7 @@ import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
 import { Trans } from '@lingui/react/macro';
 import { useForm } from 'react-hook-form';
+import { useRevalidator } from 'react-router';
 import { renderSVG } from 'uqr';
 import { z } from 'zod';
 
@@ -47,6 +48,7 @@ export type EnableAuthenticatorAppDialogProps = {
 export const EnableAuthenticatorAppDialog = ({ onSuccess }: EnableAuthenticatorAppDialogProps) => {
   const { _ } = useLingui();
   const { toast } = useToast();
+  const { revalidate } = useRevalidator();
 
   const [isOpen, setIsOpen] = useState(false);
   const [recoveryCodes, setRecoveryCodes] = useState<string[] | null>(null);
@@ -128,8 +130,7 @@ export const EnableAuthenticatorAppDialog = ({ onSuccess }: EnableAuthenticatorA
 
     if (!isOpen && recoveryCodes && recoveryCodes.length > 0) {
       setRecoveryCodes(null);
-      // Todo
-      // router.refresh();
+      void revalidate();
     }
 
     // eslint-disable-next-line react-hooks/exhaustive-deps

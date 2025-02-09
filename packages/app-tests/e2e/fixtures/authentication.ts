@@ -21,31 +21,23 @@ export const apiSignin = async ({
 }: LoginOptions) => {
   const { request } = page.context();
 
-  const csrfToken = await getCsrfToken(page);
+  // const csrfToken = await getCsrfToken(page);
 
-  await request.post(`${NEXT_PUBLIC_WEBAPP_URL()}/api/auth/callback/credentials`, {
-    form: {
+  await request.post(`${NEXT_PUBLIC_WEBAPP_URL()}/api/auth/email-password/authorize`, {
+    data: {
       email,
       password,
-      json: true,
-      csrfToken,
     },
   });
 
   await page.goto(`${NEXT_PUBLIC_WEBAPP_URL()}${redirectPath}`);
+  await page.waitForTimeout(500);
 };
 
 export const apiSignout = async ({ page }: { page: Page }) => {
   const { request } = page.context();
 
-  const csrfToken = await getCsrfToken(page);
-
-  await request.post(`${NEXT_PUBLIC_WEBAPP_URL()}/api/auth/signout`, {
-    form: {
-      csrfToken,
-      json: true,
-    },
-  });
+  await request.post(`${NEXT_PUBLIC_WEBAPP_URL()}/api/auth/signout`);
 
   await page.goto(`${NEXT_PUBLIC_WEBAPP_URL()}/signin`);
 };

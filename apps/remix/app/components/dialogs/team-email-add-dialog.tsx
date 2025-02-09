@@ -7,6 +7,7 @@ import { Trans } from '@lingui/react/macro';
 import type * as DialogPrimitive from '@radix-ui/react-dialog';
 import { Plus } from 'lucide-react';
 import { useForm } from 'react-hook-form';
+import { useRevalidator } from 'react-router';
 import type { z } from 'zod';
 
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
@@ -50,6 +51,7 @@ export const TeamEmailAddDialog = ({ teamId, trigger, ...props }: TeamEmailAddDi
 
   const { _ } = useLingui();
   const { toast } = useToast();
+  const { revalidate } = useRevalidator();
 
   const form = useForm<TCreateTeamEmailFormSchema>({
     resolver: zodResolver(ZCreateTeamEmailFormSchema),
@@ -76,7 +78,7 @@ export const TeamEmailAddDialog = ({ teamId, trigger, ...props }: TeamEmailAddDi
         duration: 5000,
       });
 
-      // router.refresh(); // Todo
+      await revalidate();
 
       setOpen(false);
     } catch (err) {

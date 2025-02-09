@@ -1,10 +1,11 @@
-import { useEffect, useState, useTransition } from 'react';
+import { useEffect, useState } from 'react';
 
 import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
 import { Trans } from '@lingui/react/macro';
 import type { Recipient } from '@prisma/client';
 import { Hash, Loader } from 'lucide-react';
+import { useRevalidator } from 'react-router';
 
 import { validateNumberField } from '@documenso/lib/advanced-fields-validation/validate-number';
 import { DO_NOT_INVALIDATE_QUERY_ON_MUTATION } from '@documenso/lib/constants/trpc';
@@ -49,8 +50,8 @@ export const DocumentSigningNumberField = ({
 }: DocumentSigningNumberFieldProps) => {
   const { _ } = useLingui();
   const { toast } = useToast();
+  const { revalidate } = useRevalidator();
 
-  const [isPending, startTransition] = useTransition();
   const [showRadioModal, setShowRadioModal] = useState(false);
 
   const parsedFieldMeta = field.fieldMeta ? ZNumberFieldMeta.parse(field.fieldMeta) : null;
@@ -80,7 +81,7 @@ export const DocumentSigningNumberField = ({
     isPending: isRemoveSignedFieldWithTokenLoading,
   } = trpc.field.removeSignedFieldWithToken.useMutation(DO_NOT_INVALIDATE_QUERY_ON_MUTATION);
 
-  const isLoading = isSignFieldWithTokenLoading || isRemoveSignedFieldWithTokenLoading || isPending;
+  const isLoading = isSignFieldWithTokenLoading || isRemoveSignedFieldWithTokenLoading;
 
   const handleNumberChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const text = e.target.value;
@@ -136,8 +137,7 @@ export const DocumentSigningNumberField = ({
 
       setLocalNumber('');
 
-      // Todo
-      // startTransition(() => router.refresh());
+      await revalidate();
     } catch (err) {
       const error = AppError.parseError(err);
 
@@ -188,8 +188,7 @@ export const DocumentSigningNumberField = ({
 
       setLocalNumber(parsedFieldMeta?.value ? String(parsedFieldMeta?.value) : '');
 
-      // Todo
-      // startTransition(() => router.refresh());
+      await revalidate();
     } catch (err) {
       console.error(err);
 

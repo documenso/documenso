@@ -1,10 +1,11 @@
-import { useLayoutEffect, useMemo, useRef, useState, useTransition } from 'react';
+import { useLayoutEffect, useMemo, useRef, useState } from 'react';
 
 import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
 import { Trans } from '@lingui/react/macro';
 import { type Recipient } from '@prisma/client';
 import { Loader } from 'lucide-react';
+import { useRevalidator } from 'react-router';
 
 import { DO_NOT_INVALIDATE_QUERY_ON_MUTATION } from '@documenso/lib/constants/trpc';
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
@@ -45,6 +46,7 @@ export const DocumentSigningSignatureField = ({
 }: DocumentSigningSignatureFieldProps) => {
   const { _ } = useLingui();
   const { toast } = useToast();
+  const { revalidate } = useRevalidator();
 
   const signatureRef = useRef<HTMLParagraphElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -59,8 +61,6 @@ export const DocumentSigningSignatureField = ({
 
   const { executeActionAuthProcedure } = useRequiredDocumentSigningAuthContext();
 
-  const [isPending, startTransition] = useTransition();
-
   const { mutateAsync: signFieldWithToken, isPending: isSignFieldWithTokenLoading } =
     trpc.field.signFieldWithToken.useMutation(DO_NOT_INVALIDATE_QUERY_ON_MUTATION);
 
@@ -71,7 +71,7 @@ export const DocumentSigningSignatureField = ({
 
   const { signature } = field;
 
-  const isLoading = isSignFieldWithTokenLoading || isRemoveSignedFieldWithTokenLoading || isPending;
+  const isLoading = isSignFieldWithTokenLoading || isRemoveSignedFieldWithTokenLoading;
 
   const [showSignatureModal, setShowSignatureModal] = useState(false);
   const [localSignature, setLocalSignature] = useState<string | null>(null);
@@ -143,13 +143,11 @@ export const DocumentSigningSignatureField = ({
 
       if (onSignField) {
         await onSignField(payload);
-        return;
+      } else {
+        await signFieldWithToken(payload);
       }
 
-      await signFieldWithToken(payload);
-
-      // Todo
-      // startTransition(() => router.refresh());
+      await revalidate();
     } catch (err) {
       const error = AppError.parseError(err);
 
@@ -177,12 +175,11 @@ export const DocumentSigningSignatureField = ({
       if (onUnsignField) {
         await onUnsignField(payload);
         return;
+      } else {
+        await removeSignedFieldWithToken(payload);
       }
 
-      await removeSignedFieldWithToken(payload);
-
-      // Todo
-      // startTransition(() => router.refresh());
+      await revalidate();
     } catch (err) {
       console.error(err);
 

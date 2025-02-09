@@ -3,6 +3,7 @@ import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
 import { Trans } from '@lingui/react/macro';
 import { useForm } from 'react-hook-form';
+import { useRevalidator } from 'react-router';
 import type { z } from 'zod';
 
 import { trpc } from '@documenso/trpc/react';
@@ -32,6 +33,7 @@ type TUserFormSchema = z.infer<typeof ZUserFormSchema>;
 export default function UserPage({ params }: { params: { id: number } }) {
   const { _ } = useLingui();
   const { toast } = useToast();
+  const { revalidate } = useRevalidator();
 
   const { data: user } = trpc.profile.getUser.useQuery(
     {
@@ -64,8 +66,7 @@ export default function UserPage({ params }: { params: { id: number } }) {
         roles,
       });
 
-      // Todo
-      // router.refresh();
+      await revalidate();
 
       toast({
         title: _(msg`Profile updated`),

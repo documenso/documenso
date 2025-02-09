@@ -28,9 +28,7 @@ export const auth = new Hono<HonoAuthContext>()
  * Handle errors.
  */
 auth.onError((err, c) => {
-  console.error(`-----------`);
-  console.error(`-----------`);
-  console.error(`-----------`);
+  // Todo Remove
   console.error(`${err}`);
 
   if (err instanceof HTTPException) {

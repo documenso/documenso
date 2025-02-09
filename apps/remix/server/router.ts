@@ -24,8 +24,10 @@ export interface HonoEnv {
 
 const app = new Hono<HonoEnv>();
 
+/**
+ * Attach session and context to requests.
+ */
 app.use(contextStorage());
-
 app.use(appContext);
 
 // App middleware.

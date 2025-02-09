@@ -4,7 +4,6 @@ import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
 import { Trans } from '@lingui/react/macro';
 import { Link, useSearchParams } from 'react-router';
-import { useNavigate } from 'react-router';
 import { useLocation } from 'react-router';
 
 import { useDebouncedValue } from '@documenso/lib/client-only/hooks/use-debounced-value';
@@ -18,8 +17,7 @@ import { UserSettingsPendingTeamsDataTable } from './user-settings-pending-teams
 export const UserSettingsTeamsPageDataTable = () => {
   const { _ } = useLingui();
 
-  const [searchParams] = useSearchParams();
-  const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
   const { pathname } = useLocation();
 
   const [searchQuery, setSearchQuery] = useState(() => searchParams?.get('query') ?? '');
@@ -39,10 +37,6 @@ export const UserSettingsTeamsPageDataTable = () => {
    * Handle debouncing the search query.
    */
   useEffect(() => {
-    if (!pathname) {
-      return;
-    }
-
     const params = new URLSearchParams(searchParams?.toString());
 
     params.set('query', debouncedSearchQuery);
@@ -51,8 +45,8 @@ export const UserSettingsTeamsPageDataTable = () => {
       params.delete('query');
     }
 
-    void navigate(`${pathname}?${params.toString()}`);
-  }, [debouncedSearchQuery, pathname, navigate, searchParams]);
+    setSearchParams(params);
+  }, [debouncedSearchQuery, pathname, searchParams]);
 
   return (
     <div>

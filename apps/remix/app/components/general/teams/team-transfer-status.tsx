@@ -3,6 +3,7 @@ import { useLingui } from '@lingui/react';
 import { Trans } from '@lingui/react/macro';
 import type { TeamMemberRole, TeamTransferVerification } from '@prisma/client';
 import { AnimatePresence } from 'framer-motion';
+import { useRevalidator } from 'react-router';
 
 import { canExecuteTeamAction } from '@documenso/lib/utils/teams';
 import { isTokenExpired } from '@documenso/lib/utils/token-verification';
@@ -28,12 +29,13 @@ export const TeamTransferStatus = ({
 }: TeamTransferStatusProps) => {
   const { _ } = useLingui();
   const { toast } = useToast();
+  const { revalidate } = useRevalidator();
 
   const isExpired = transferVerification && isTokenExpired(transferVerification.expiresAt);
 
   const { mutateAsync: deleteTeamTransferRequest, isPending } =
     trpc.team.deleteTeamTransferRequest.useMutation({
-      onSuccess: () => {
+      onSuccess: async () => {
         if (!isExpired) {
           toast({
             title: _(msg`Success`),
@@ -42,8 +44,7 @@ export const TeamTransferStatus = ({
           });
         }
 
-        // todo?
-        // router.refresh();
+        await revalidate();
       },
       onError: () => {
         toast({

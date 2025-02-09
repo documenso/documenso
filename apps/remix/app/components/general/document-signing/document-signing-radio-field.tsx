@@ -1,9 +1,10 @@
-import { useEffect, useState, useTransition } from 'react';
+import { useEffect, useState } from 'react';
 
 import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
 import type { Recipient } from '@prisma/client';
 import { Loader } from 'lucide-react';
+import { useRevalidator } from 'react-router';
 
 import { DO_NOT_INVALIDATE_QUERY_ON_MUTATION } from '@documenso/lib/constants/trpc';
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
@@ -37,8 +38,7 @@ export const DocumentSigningRadioField = ({
 }: DocumentSigningRadioFieldProps) => {
   const { _ } = useLingui();
   const { toast } = useToast();
-
-  const [isPending, startTransition] = useTransition();
+  const { revalidate } = useRevalidator();
 
   const parsedFieldMeta = ZRadioFieldMeta.parse(field.fieldMeta);
   const values = parsedFieldMeta.values?.map((item) => ({
@@ -60,7 +60,7 @@ export const DocumentSigningRadioField = ({
     isPending: isRemoveSignedFieldWithTokenLoading,
   } = trpc.field.removeSignedFieldWithToken.useMutation(DO_NOT_INVALIDATE_QUERY_ON_MUTATION);
 
-  const isLoading = isSignFieldWithTokenLoading || isRemoveSignedFieldWithTokenLoading || isPending;
+  const isLoading = isSignFieldWithTokenLoading || isRemoveSignedFieldWithTokenLoading;
   const shouldAutoSignField =
     (!field.inserted && selectedOption) ||
     (!field.inserted && defaultValue) ||
@@ -88,8 +88,7 @@ export const DocumentSigningRadioField = ({
 
       setSelectedOption('');
 
-      // Todo
-      // startTransition(() => router.refresh());
+      await revalidate();
     } catch (err) {
       const error = AppError.parseError(err);
 
@@ -122,8 +121,7 @@ export const DocumentSigningRadioField = ({
 
       setSelectedOption('');
 
-      // Todo
-      // startTransition(() => router.refresh());
+      await revalidate();
     } catch (err) {
       console.error(err);
 

@@ -168,7 +168,6 @@ export const SignUpForm = ({
   };
 
   const onNextClick = async () => {
-    console.log('hello-world');
     const valid = await form.trigger(['name', 'email', 'password', 'signature']);
 
     if (valid) {

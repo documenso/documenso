@@ -10,6 +10,7 @@ import { env } from '@documenso/lib/utils/env';
 import { prisma } from '@documenso/prisma';
 
 import { AuthenticationErrorCode } from '../lib/errors/error-codes';
+import { sessionCookieOptions } from '../lib/session/session-cookies';
 import { onAuthorize } from '../lib/utils/authorizer';
 import type { HonoAuthContext } from '../types/context';
 
@@ -43,28 +44,22 @@ export const googleRoute = new Hono<HonoAuthContext>()
     const { redirectPath } = c.req.valid('json');
 
     setCookie(c, 'google_oauth_state', state, {
-      path: '/',
-      httpOnly: true,
-      secure: env('NODE_ENV') === 'production', // Todo: Check.
-      maxAge: 60 * 10, // 10 minutes
-      sameSite: 'lax', // Todo??
+      ...sessionCookieOptions,
+      sameSite: 'lax', // Todo
+      maxAge: 60 * 10, // 10 minutes.
     });
 
     setCookie(c, 'google_code_verifier', codeVerifier, {
-      path: '/',
-      httpOnly: true,
-      secure: env('NODE_ENV') === 'production', // Todo: Check.
-      maxAge: 60 * 10, // 10 minutes
-      sameSite: 'lax', // Todo??
+      ...sessionCookieOptions,
+      sameSite: 'lax', // Todo
+      maxAge: 60 * 10, // 10 minutes.
     });
 
     if (redirectPath) {
       setCookie(c, 'google_redirect_path', `${state}:${redirectPath}`, {
-        path: '/',
-        httpOnly: true,
-        secure: env('NODE_ENV') === 'production', // Todo: Check.
-        maxAge: 60 * 10, // 10 minutes
-        sameSite: 'lax', // Todo??
+        ...sessionCookieOptions,
+        sameSite: 'lax', // Todo
+        maxAge: 60 * 10, // 10 minutes.
       });
     }
 
@@ -81,14 +76,13 @@ export const googleRoute = new Hono<HonoAuthContext>()
 
     const storedState = deleteCookie(c, 'google_oauth_state');
     const storedCodeVerifier = deleteCookie(c, 'google_code_verifier');
+    const storedredirectPath = deleteCookie(c, 'google_redirect_path') ?? '';
 
     if (!code || !storedState || state !== storedState || !storedCodeVerifier) {
       throw new AppError(AppErrorCode.INVALID_REQUEST, {
         message: 'Invalid or missing state',
       });
     }
-
-    const storedredirectPath = deleteCookie(c, 'google_redirect_path') ?? '';
 
     // eslint-disable-next-line prefer-const
     let [redirectState, redirectPath] = storedredirectPath.split(':');

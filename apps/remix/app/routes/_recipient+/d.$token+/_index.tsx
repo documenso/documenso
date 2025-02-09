@@ -48,7 +48,7 @@ export async function loader({ params }: Route.LoaderArgs) {
 
   // Ensure typesafety when we add more options.
   const isAccessAuthValid = match(derivedRecipientAccessAuth)
-    .with(DocumentAccessAuth.ACCOUNT, () => session?.user !== null)
+    .with(DocumentAccessAuth.ACCOUNT, () => Boolean(session?.user))
     .with(null, () => true)
     .exhaustive();
 

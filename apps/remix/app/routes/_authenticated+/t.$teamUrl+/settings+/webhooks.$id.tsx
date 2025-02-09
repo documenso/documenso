@@ -4,6 +4,7 @@ import { useLingui } from '@lingui/react';
 import { Trans } from '@lingui/react/macro';
 import { Loader } from 'lucide-react';
 import { useForm } from 'react-hook-form';
+import { useRevalidator } from 'react-router';
 import type { z } from 'zod';
 
 import { trpc } from '@documenso/trpc/react';
@@ -36,6 +37,7 @@ type TEditWebhookFormSchema = z.infer<typeof ZEditWebhookFormSchema>;
 export default function WebhookPage({ params }: Route.ComponentProps) {
   const { _ } = useLingui();
   const { toast } = useToast();
+  const { revalidate } = useRevalidator();
 
   const team = useCurrentTeam();
 
@@ -73,8 +75,7 @@ export default function WebhookPage({ params }: Route.ComponentProps) {
         duration: 5000,
       });
 
-      // Todo
-      // router.refresh();
+      await revalidate();
     } catch (err) {
       toast({
         title: _(msg`Failed to update webhook`),

@@ -113,7 +113,7 @@ test('[TEAMS]: check team documents count with internal team email', async ({ pa
     await apiSignin({
       page,
       email: user.email,
-      redirectPath: `/t/${team.url}/documents`,
+      redirectPath: `/t/${team.url}/documents?perPage=20`,
     });
 
     // Check document counts.

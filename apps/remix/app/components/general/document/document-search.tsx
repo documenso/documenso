@@ -2,7 +2,7 @@ import { useCallback, useEffect, useState } from 'react';
 
 import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
-import { useNavigate, useSearchParams } from 'react-router';
+import { useSearchParams } from 'react-router';
 
 import { useDebouncedValue } from '@documenso/lib/client-only/hooks/use-debounced-value';
 import { Input } from '@documenso/ui/primitives/input';
@@ -10,8 +10,7 @@ import { Input } from '@documenso/ui/primitives/input';
 export const DocumentSearch = ({ initialValue = '' }: { initialValue?: string }) => {
   const { _ } = useLingui();
 
-  const navigate = useNavigate();
-  const [searchParams] = useSearchParams();
+  const [searchParams, setSearchParams] = useSearchParams();
 
   const [searchTerm, setSearchTerm] = useState(initialValue);
   const debouncedSearchTerm = useDebouncedValue(searchTerm, 500);
@@ -20,12 +19,12 @@ export const DocumentSearch = ({ initialValue = '' }: { initialValue?: string })
     (term: string) => {
       const params = new URLSearchParams(searchParams?.toString() ?? '');
       if (term) {
-        params.set('search', term);
+        params.set('query', term);
       } else {
-        params.delete('search');
+        params.delete('query');
       }
 
-      void navigate(`?${params.toString()}`);
+      setSearchParams(params);
     },
     [searchParams],
   );

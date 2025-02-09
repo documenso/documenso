@@ -37,12 +37,18 @@ export default defineConfig({
   ],
   ssr: {
     noExternal: ['react-dropzone', 'plausible-tracker', 'pdfjs-dist'],
-    external: ['@node-rs/bcrypt', '@prisma/client'],
+    external: ['@node-rs/bcrypt', '@node-rs/bcrypt-wasm32-wasi', '@prisma/client'],
   },
   optimizeDeps: {
     entries: ['./app/**/*', '../../packages/ui/**/*', '../../packages/lib/**/*'],
     include: ['prop-types', 'file-selector', 'attr-accept'],
-    exclude: ['node_modules', '@node-rs/bcrypt', '@documenso/pdf-sign', 'sharp'],
+    exclude: [
+      'node_modules',
+      '@node-rs/bcrypt',
+      '@node-rs/bcrypt-wasm32-wasi',
+      '@documenso/pdf-sign',
+      'sharp',
+    ],
   },
   resolve: {
     alias: {

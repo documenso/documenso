@@ -5,6 +5,7 @@ import { DateTime } from 'luxon';
 import { z } from 'zod';
 
 import { IS_BILLING_ENABLED } from '@documenso/lib/constants/app';
+import { EMAIL_VERIFICATION_STATE } from '@documenso/lib/constants/email';
 import { AppError } from '@documenso/lib/errors/app-error';
 import { jobsClient } from '@documenso/lib/jobs/client';
 import { disableTwoFactorAuthentication } from '@documenso/lib/server-only/2fa/disable-2fa';
@@ -18,10 +19,7 @@ import { forgotPassword } from '@documenso/lib/server-only/user/forgot-password'
 import { getMostRecentVerificationTokenByUserId } from '@documenso/lib/server-only/user/get-most-recent-verification-token-by-user-id';
 import { resetPassword } from '@documenso/lib/server-only/user/reset-password';
 import { updatePassword } from '@documenso/lib/server-only/user/update-password';
-import {
-  EMAIL_VERIFICATION_STATE,
-  verifyEmail,
-} from '@documenso/lib/server-only/user/verify-email';
+import { verifyEmail } from '@documenso/lib/server-only/user/verify-email';
 import { env } from '@documenso/lib/utils/env';
 import { prisma } from '@documenso/prisma';
 import { UserSecurityAuditLogType } from '@documenso/prisma/client';

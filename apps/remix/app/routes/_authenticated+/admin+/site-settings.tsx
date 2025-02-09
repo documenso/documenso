@@ -3,6 +3,7 @@ import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
 import { Trans } from '@lingui/react/macro';
 import { useForm } from 'react-hook-form';
+import { useRevalidator } from 'react-router';
 import type { z } from 'zod';
 
 import { getSiteSettings } from '@documenso/lib/server-only/site-settings/get-site-settings';
@@ -47,6 +48,7 @@ export default function AdminBannerPage({ loaderData }: Route.ComponentProps) {
 
   const { toast } = useToast();
   const { _ } = useLingui();
+  const { revalidate } = useRevalidator();
 
   const form = useForm<TBannerFormSchema>({
     resolver: zodResolver(ZBannerFormSchema),
@@ -80,8 +82,7 @@ export default function AdminBannerPage({ loaderData }: Route.ComponentProps) {
         duration: 5000,
       });
 
-      // Todo
-      // router.refresh();
+      await revalidate();
     } catch (err) {
       toast({
         title: _(msg`An unknown error occurred`),

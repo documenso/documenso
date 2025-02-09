@@ -5,6 +5,7 @@ module.exports = {
   rules: {
     '@next/next/no-img-element': 'off',
     'no-unreachable': 'error',
+    'react-hooks/exhaustive-deps': 'off',
   },
   settings: {
     next: {
