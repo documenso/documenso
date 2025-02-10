@@ -1,10 +1,9 @@
 import * as ReactEmail from '@react-email/render';
 
+import config from '@documenso/tailwind-config';
+
 import { Tailwind } from './components';
 import { BrandingProvider, type BrandingSettings } from './providers/branding';
-
-// Todo:
-// import config from '@documenso/tailwind-config';
 
 export type RenderOptions = ReactEmail.Options & {
   branding?: BrandingSettings;
@@ -18,7 +17,7 @@ export const render = (element: React.ReactNode, options?: RenderOptions) => {
       config={{
         theme: {
           extend: {
-            // colors: config.theme.extend.colors,
+            colors: config.theme.extend.colors,
           },
         },
       }}
@@ -37,7 +36,7 @@ export const renderAsync = async (element: React.ReactNode, options?: RenderOpti
       config={{
         theme: {
           extend: {
-            // colors: config.theme.extend.colors,
+            colors: config.theme.extend.colors,
           },
         },
       }}

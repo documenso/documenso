@@ -17,6 +17,7 @@ import { getOptionalLoaderSession } from 'server/utils/get-loader-session';
 
 import { SessionProvider } from '@documenso/lib/client-only/providers/session';
 import { APP_I18N_OPTIONS, type SupportedLanguageCodes } from '@documenso/lib/constants/i18n';
+import { createPublicEnv } from '@documenso/lib/utils/env';
 import { extractLocaleData } from '@documenso/lib/utils/i18n';
 import { TrpcProvider } from '@documenso/trpc/react';
 import { Toaster } from '@documenso/ui/primitives/toaster';
@@ -99,9 +100,7 @@ export async function loader({ request }: Route.LoaderArgs) {
       lang,
       theme: getTheme(),
       session,
-      __ENV__: Object.fromEntries(
-        Object.entries(process.env).filter(([key]) => key.startsWith('NEXT_')), // Todo: I'm pretty sure this will leak?
-      ),
+      publicEnv: createPublicEnv(),
     },
     {
       headers: {
@@ -112,7 +111,7 @@ export async function loader({ request }: Route.LoaderArgs) {
 }
 
 export function Layout({ children }: { children: React.ReactNode }) {
-  const { __ENV__, theme, lang } = useLoaderData<typeof loader>() || {};
+  const { publicEnv, theme, lang } = useLoaderData<typeof loader>() || {};
 
   // const [theme] = useTheme();
 
@@ -145,7 +144,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
 
         <script
           dangerouslySetInnerHTML={{
-            __html: `window.__ENV__ = ${JSON.stringify(__ENV__)}`,
+            __html: `window.__ENV__ = ${JSON.stringify(publicEnv)}`,
           }}
         />
       </body>

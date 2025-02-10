@@ -5,6 +5,8 @@ import { env } from '@documenso/lib/utils/env';
 
 import { SignUpForm } from '~/components/forms/signup';
 
+import type { Route } from './+types/signup';
+
 export function meta() {
   return [{ title: 'Sign Up' }];
 }
@@ -12,17 +14,28 @@ export function meta() {
 export function loader() {
   const NEXT_PUBLIC_DISABLE_SIGNUP = env('NEXT_PUBLIC_DISABLE_SIGNUP');
 
+  // SSR env variables.
+  const isGoogleSSOEnabled = IS_GOOGLE_SSO_ENABLED;
+  const isOIDCSSOEnabled = IS_OIDC_SSO_ENABLED;
+
   if (NEXT_PUBLIC_DISABLE_SIGNUP === 'true') {
     throw redirect('/signin');
   }
+
+  return {
+    isGoogleSSOEnabled,
+    isOIDCSSOEnabled,
+  };
 }
 
-export default function SignUp() {
+export default function SignUp({ loaderData }: Route.ComponentProps) {
+  const { isGoogleSSOEnabled, isOIDCSSOEnabled } = loaderData;
+
   return (
     <SignUpForm
       className="w-screen max-w-screen-2xl px-4 md:px-16 lg:-my-16"
-      isGoogleSSOEnabled={IS_GOOGLE_SSO_ENABLED}
-      isOIDCSSOEnabled={IS_OIDC_SSO_ENABLED}
+      isGoogleSSOEnabled={isGoogleSSOEnabled}
+      isOIDCSSOEnabled={isOIDCSSOEnabled}
     />
   );
 }

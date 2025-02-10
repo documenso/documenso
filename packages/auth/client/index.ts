@@ -8,6 +8,7 @@ import type { AuthAppType } from '../server';
 import { handleSignInRedirect } from '../server/lib/utils/redirect';
 import type {
   TForgotPasswordSchema,
+  TResendVerifyEmailSchema,
   TResetPasswordSchema,
   TSignUpSchema,
   TUpdatePasswordSchema,
@@ -76,6 +77,13 @@ export class AuthClient {
 
     signUp: async (data: TSignUpSchema) => {
       const response = await this.client['email-password']['signup'].$post({ json: data });
+      await this.handleError(response);
+    },
+
+    resendVerifyEmail: async (data: TResendVerifyEmailSchema) => {
+      const response = await this.client['email-password']['resend-verify-email'].$post({
+        json: data,
+      });
       await this.handleError(response);
     },
 

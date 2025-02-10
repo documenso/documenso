@@ -6,11 +6,12 @@
     "build": "sh .bin/build.sh",
     "build:app": "cross-env NODE_ENV=production react-router build",
     "build:server": "cross-env NODE_ENV=production rollup -c rollup.config.mjs",
-    "dev": "react-router dev",
-    "start": "cross-env NODE_ENV=production node build/server/main.js",
+    "dev": "npm run with:env -- react-router dev",
+    "start": "npm run with:env -- cross-env NODE_ENV=production node build/server/main.js",
     "clean": "rimraf .react-router && rimraf node_modules",
     "typecheck": "react-router typegen && tsc",
-    "copy:pdfjs": "node ../../scripts/copy-pdfjs.cjs"
+    "copy:pdfjs": "node ../../scripts/copy-pdfjs.cjs",
+    "with:env": "dotenv -e ../../.env -e ../../.env.local --"
   },
   "dependencies": {
     "@documenso/api": "*",

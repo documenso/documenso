@@ -68,6 +68,12 @@ export const ZVerifyEmailSchema = z.object({
 
 export type TVerifyEmailSchema = z.infer<typeof ZVerifyEmailSchema>;
 
+export const ZResendVerifyEmailSchema = z.object({
+  email: z.string().email().min(1),
+});
+
+export type TResendVerifyEmailSchema = z.infer<typeof ZResendVerifyEmailSchema>;
+
 export const ZUpdatePasswordSchema = z.object({
   currentPassword: ZCurrentPasswordSchema,
   password: ZPasswordSchema,

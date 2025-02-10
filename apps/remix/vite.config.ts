@@ -2,21 +2,18 @@ import { lingui } from '@lingui/vite-plugin';
 import { reactRouter } from '@react-router/dev/vite';
 import autoprefixer from 'autoprefixer';
 import serverAdapter from 'hono-react-router-adapter/vite';
-import path from 'path';
 import tailwindcss from 'tailwindcss';
-import { defineConfig, loadEnv } from 'vite';
+import { defineConfig } from 'vite';
 import macrosPlugin from 'vite-plugin-babel-macros';
 import tsconfigPaths from 'vite-tsconfig-paths';
 
+/**
+ * Note: We load the env variables externally so we can have runtime enviroment variables
+ * for docker.
+ *
+ * Do not configure any envs here.
+ */
 export default defineConfig({
-  envDir: path.join(__dirname, '../../'),
-  envPrefix: '__DO_NOT_USE_OR_YOU_WILL_BE_FIRED__',
-  define: {
-    'process.env': {
-      ...process.env,
-      ...loadEnv('development', path.join(__dirname, '../../'), ''),
-    },
-  },
   css: {
     postcss: {
       plugins: [tailwindcss, autoprefixer],
@@ -37,18 +34,12 @@ export default defineConfig({
   ],
   ssr: {
     noExternal: ['react-dropzone', 'plausible-tracker', 'pdfjs-dist'],
-    external: ['@node-rs/bcrypt', '@node-rs/bcrypt-wasm32-wasi', '@prisma/client'],
+    external: ['@node-rs/bcrypt', '@prisma/client', '@documenso/tailwind-config'],
   },
   optimizeDeps: {
     entries: ['./app/**/*', '../../packages/ui/**/*', '../../packages/lib/**/*'],
     include: ['prop-types', 'file-selector', 'attr-accept'],
-    exclude: [
-      'node_modules',
-      '@node-rs/bcrypt',
-      '@node-rs/bcrypt-wasm32-wasi',
-      '@documenso/pdf-sign',
-      'sharp',
-    ],
+    exclude: ['node_modules', '@node-rs/bcrypt', '@documenso/pdf-sign', 'sharp'],
   },
   resolve: {
     alias: {

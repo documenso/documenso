@@ -3,11 +3,12 @@ import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
 import { Trans } from '@lingui/react/macro';
 import { useForm } from 'react-hook-form';
+import { useNavigate } from 'react-router';
 import { match } from 'ts-pattern';
 import { z } from 'zod';
 
+import { authClient } from '@documenso/auth/client';
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
-import { trpc } from '@documenso/trpc/react';
 import { ZPasswordSchema } from '@documenso/trpc/server/auth-router/schema';
 import { cn } from '@documenso/ui/lib/utils';
 import { Button } from '@documenso/ui/primitives/button';
@@ -55,14 +56,14 @@ export const ResetPasswordForm = ({ className, token }: ResetPasswordFormProps) 
 
   const isSubmitting = form.formState.isSubmitting;
 
-  const { mutateAsync: resetPassword } = trpc.profile.resetPassword.useMutation();
-
   const onFormSubmit = async ({ password }: Omit<TResetPasswordFormSchema, 'repeatedPassword'>) => {
     try {
-      await resetPassword({
+      await authClient.emailPassword.resetPassword({
         password,
         token,
       });
+
+      await navigate('/signin');
 
       form.reset();
 
@@ -71,8 +72,6 @@ export const ResetPasswordForm = ({ className, token }: ResetPasswordFormProps) 
         description: _(msg`Your password has been updated successfully.`),
         duration: 5000,
       });
-
-      navigate('/signin');
     } catch (err) {
       const error = AppError.parseError(err);
 

@@ -11,6 +11,8 @@ import { env } from '@documenso/lib/utils/env';
 
 import { SignInForm } from '~/components/forms/signin';
 
+import type { Route } from './+types/signin';
+
 export function meta() {
   return [{ title: 'Sign In' }];
 }
@@ -18,13 +20,24 @@ export function meta() {
 export function loader() {
   const session = getOptionalLoaderSession();
 
+  // SSR env variables.
+  const isGoogleSSOEnabled = IS_GOOGLE_SSO_ENABLED;
+  const isOIDCSSOEnabled = IS_OIDC_SSO_ENABLED;
+  const oidcProviderLabel = OIDC_PROVIDER_LABEL;
+
   if (session) {
     throw redirect('/documents');
   }
+
+  return {
+    isGoogleSSOEnabled,
+    isOIDCSSOEnabled,
+    oidcProviderLabel,
+  };
 }
 
-export default function SignIn() {
-  const NEXT_PUBLIC_DISABLE_SIGNUP = env('NEXT_PUBLIC_DISABLE_SIGNUP');
+export default function SignIn({ loaderData }: Route.ComponentProps) {
+  const { isGoogleSSOEnabled, isOIDCSSOEnabled, oidcProviderLabel } = loaderData;
 
   return (
     <div className="w-screen max-w-lg px-4">
@@ -39,12 +52,12 @@ export default function SignIn() {
         <hr className="-mx-6 my-4" />
 
         <SignInForm
-          isGoogleSSOEnabled={IS_GOOGLE_SSO_ENABLED}
-          isOIDCSSOEnabled={IS_OIDC_SSO_ENABLED}
-          oidcProviderLabel={OIDC_PROVIDER_LABEL}
+          isGoogleSSOEnabled={isGoogleSSOEnabled}
+          isOIDCSSOEnabled={isOIDCSSOEnabled}
+          oidcProviderLabel={oidcProviderLabel}
         />
 
-        {NEXT_PUBLIC_DISABLE_SIGNUP !== 'true' && (
+        {env('NEXT_PUBLIC_DISABLE_SIGNUP') !== 'true' && (
           <p className="text-muted-foreground mt-6 text-center text-sm">
             <Trans>
               Don't have an account?{' '}

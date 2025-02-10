@@ -3,13 +3,11 @@ import { i18n } from '@lingui/core';
 
 import type { I18nLocaleData, SupportedLanguageCodes } from '../constants/i18n';
 import { APP_I18N_OPTIONS } from '../constants/i18n';
+import { env } from './env';
 
 export async function dynamicActivate(locale: string) {
-  // const extension = import.meta.env.PROD env('NODE_ENV') === 'development' ? 'po' : 'js';
-  // eslint-disable-next-line turbo/no-undeclared-env-vars
-  const extension = import.meta.env.PROD ? 'js' : 'po';
+  const extension = env('NODE_ENV') === 'development' ? 'po' : 'mjs';
 
-  // Todo: Use extension (currently breaks).
   const { messages } = await import(`../translations/${locale}/web.${extension}`);
 
   i18n.loadAndActivate({ locale, messages });

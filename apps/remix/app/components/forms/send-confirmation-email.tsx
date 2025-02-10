@@ -5,7 +5,7 @@ import { Trans } from '@lingui/react/macro';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 
-import { trpc } from '@documenso/trpc/react';
+import { authClient } from '@documenso/auth/client';
 import { cn } from '@documenso/ui/lib/utils';
 import { Button } from '@documenso/ui/primitives/button';
 import {
@@ -42,11 +42,9 @@ export const SendConfirmationEmailForm = ({ className }: SendConfirmationEmailFo
 
   const isSubmitting = form.formState.isSubmitting;
 
-  const { mutateAsync: sendConfirmationEmail } = trpc.profile.sendConfirmationEmail.useMutation();
-
   const onFormSubmit = async ({ email }: TSendConfirmationEmailFormSchema) => {
     try {
-      await sendConfirmationEmail({ email });
+      await authClient.emailPassword.resendVerifyEmail({ email });
 
       toast({
         title: _(msg`Confirmation email sent`),
@@ -59,6 +57,7 @@ export const SendConfirmationEmailForm = ({ className }: SendConfirmationEmailFo
       form.reset();
     } catch (err) {
       toast({
+        variant: 'destructive',
         title: _(msg`An error occurred while sending your confirmation email`),
         description: _(msg`Please try again and make sure you enter the correct email address.`),
       });

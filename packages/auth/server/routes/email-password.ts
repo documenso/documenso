@@ -30,6 +30,7 @@ import { getRequiredSession, getSession } from '../lib/utils/get-session';
 import type { HonoAuthContext } from '../types/context';
 import {
   ZForgotPasswordSchema,
+  ZResendVerifyEmailSchema,
   ZResetPasswordSchema,
   ZSignInSchema,
   ZSignUpSchema,
@@ -196,17 +197,17 @@ export const emailPasswordRoute = new Hono<HonoAuthContext>()
   /**
    * Resend verification email endpoint.
    */
-  .post('/resend-email', zValidator('json', ZVerifyEmailSchema), async (c) => {
-    const { state, userId } = await verifyEmail({ token: c.req.valid('json').token });
+  .post('/resend-verify-email', zValidator('json', ZResendVerifyEmailSchema), async (c) => {
+    const { email } = c.req.valid('json');
 
-    // If email is verified, automatically authenticate user.
-    if (state === EMAIL_VERIFICATION_STATE.VERIFIED && userId !== null) {
-      await onAuthorize({ userId }, c);
-    }
-
-    return c.json({
-      state,
+    await jobsClient.triggerJob({
+      name: 'send.signup.confirmation.email',
+      payload: {
+        email,
+      },
     });
+
+    return c.text('OK', 201);
   })
   /**
    * Forgot password endpoint.
