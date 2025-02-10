@@ -22,7 +22,7 @@ export type SetFieldsForTemplateOptions = {
   fields: {
     id?: number | null;
     type: FieldType;
-    recipientId: number;
+    signerId: number;
     signerEmail: string;
     pageNumber: number;
     pageX: number;
@@ -182,7 +182,7 @@ export const setFieldsForTemplate = async ({
           recipient: {
             connect: {
               templateId,
-              id: field.recipientId,
+              id: field.signerId,
             },
           },
         },
