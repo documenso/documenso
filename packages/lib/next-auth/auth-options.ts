@@ -193,7 +193,15 @@ export const NEXT_AUTH_OPTIONS: AuthOptions = {
       idToken: true,
       allowDangerousEmailAccountLinking: true,
 
-      profile(profile) {
+      profile(profile, tokens) {
+        if (tokens && 'refresh_expires_in' in tokens) {
+          delete tokens.refresh_expires_in;
+        }
+
+        if (tokens && 'not-before-policy' in tokens) {
+          delete tokens['not-before-policy'];
+        }
+
         return {
           id: profile.sub,
           email: profile.email || profile.preferred_username,
