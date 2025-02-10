@@ -12,6 +12,7 @@ import { match } from 'ts-pattern';
 import { PDF_VIEWER_PAGE_SELECTOR } from '@documenso/lib/constants/pdf-viewer';
 import type { TFieldMetaSchema } from '@documenso/lib/types/field-meta';
 import { ZCheckboxFieldMeta, ZRadioFieldMeta } from '@documenso/lib/types/field-meta';
+import { FieldType } from '@documenso/prisma/client';
 
 import { useSignerColors } from '../../lib/signer-colors';
 import { cn } from '../../lib/utils';
@@ -229,6 +230,27 @@ export const FieldItem = ({
         onMove?.(d.node);
       }}
     >
+      {(field.type === FieldType.RADIO || field.type === FieldType.CHECKBOX) &&
+        field.fieldMeta?.label && (
+          <div
+            className={cn(
+              'absolute -top-16 left-0 right-0 rounded-md p-2 text-center text-xs text-gray-700',
+              {
+                'bg-foreground/5 border-border border': !field.fieldMeta.values?.some(
+                  (value) => value.checked,
+                ),
+              },
+              {
+                'bg-documenso-200 border-primary border': field.fieldMeta.values?.some(
+                  (value) => value.checked,
+                ),
+              },
+            )}
+          >
+            {field.fieldMeta.label}
+          </div>
+        )}
+
       <div
         className={cn(
           'relative flex h-full w-full items-center justify-center bg-white',
