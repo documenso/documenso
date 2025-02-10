@@ -1,9 +1,9 @@
 -- Create deleted@documenso.com
 DO $$
 BEGIN  
-  IF NOT EXISTS (SELECT 1 FROM "public"."User" WHERE "email" = 'deleted-account@documenso.com') THEN  
+  IF NOT EXISTS (SELECT 1 FROM "User" WHERE "email" = 'deleted-account@documenso.com') THEN  
     INSERT INTO
-      "public"."User" (
+      "User" (
         "email",
         "emailVerified",
         "password",
@@ -22,8 +22,8 @@ BEGIN
         NOW(),
         NOW(),
         NOW(),
-        ARRAY['USER'::TEXT]::"public"."Role" [],
-        CAST('GOOGLE'::TEXT AS "public"."IdentityProvider"),
+        ARRAY['USER'::TEXT]::"Role" [],
+        CAST('GOOGLE'::TEXT AS "IdentityProvider"),
         FALSE
       );
   END IF;  
