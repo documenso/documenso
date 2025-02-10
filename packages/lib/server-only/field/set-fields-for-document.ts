@@ -209,13 +209,6 @@ export const setFieldsForDocument = async ({
             id: field._persisted?.id ?? -1,
             documentId,
           },
-          include: {
-            recipient: {
-              select: {
-                email: true,
-              },
-            },
-          },
           update: {
             page: field.pageNumber,
             positionX: field.pageX,

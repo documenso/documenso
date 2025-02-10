@@ -121,7 +121,7 @@ export const ZSetDocumentFieldsRequestSchema = z.object({
       pageY: ZFieldPageYSchema,
       pageWidth: ZFieldWidthSchema,
       pageHeight: ZFieldHeightSchema,
-      fieldMeta: ZFieldMetaSchema.optional(),
+      fieldMeta: ZFieldMetaSchema,
     }),
   ),
 });

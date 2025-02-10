@@ -145,7 +145,8 @@ export const AddFieldsFormPartial = ({
         pageWidth: Number(field.width),
         pageHeight: Number(field.height),
         recipientId: field.recipientId,
-        signerEmail: recipients.find((r) => r.id === field.recipientId)?.email || '',
+        signerEmail:
+          recipients.find((recipient) => recipient.id === field.recipientId)?.email ?? '',
         fieldMeta: field.fieldMeta ? ZFieldMetaSchema.parse(field.fieldMeta) : undefined,
       })),
       typedSignatureEnabled: typedSignatureEnabled ?? false,
@@ -466,12 +467,14 @@ export const AddFieldsFormPartial = ({
           ...copiedField,
           formId: nanoid(12),
           recipientId: selectedSigner?.id ?? copiedField.recipientId,
+          signerEmail: selectedSigner?.email ?? copiedField.signerEmail,
+
           pageX: copiedField.pageX + 3,
           pageY: copiedField.pageY + 3,
         });
       }
     },
-    [append, fieldClipboard, selectedSigner?.id],
+    [append, fieldClipboard, selectedSigner?.id, selectedSigner?.email],
   );
 
   useEffect(() => {
