@@ -101,15 +101,10 @@ export const setTemplateRecipients = async ({
     },
   });
 
-  const removedRecipients = existingRecipients.filter((existingRecipient) => {
-    // Keep direct template recipients from being removed
-    if (template.directLink?.directTemplateRecipientId === existingRecipient.id) {
-      return false;
-    }
-
-    // Check if this recipient still exists in the normalized recipients
-    return !normalizedRecipients.some((recipient) => recipient.id === existingRecipient.id);
-  });
+  const removedRecipients = existingRecipients.filter(
+    (existingRecipient) =>
+      !normalizedRecipients.find((recipient) => recipient.id === existingRecipient.id),
+  );
 
   if (template.directLink !== null) {
     const updatedDirectRecipient = recipients.find(
@@ -134,24 +129,11 @@ export const setTemplateRecipients = async ({
   }
 
   const linkedRecipients = normalizedRecipients.map((recipient) => {
-    // For direct template recipients, match by ID only
-    if (template.directLink?.directTemplateRecipientId === recipient.id) {
-      const existing = existingRecipients.find(
-        (existingRecipient) => existingRecipient.id === recipient.id,
-      );
-      return { ...recipient, _persisted: existing };
-    }
+    const existing = existingRecipients.find(
+      (existingRecipient) => existingRecipient.id === recipient.id,
+    );
 
-    // For other recipients, match by ID if it exists
-    if (recipient.id) {
-      const existing = existingRecipients.find(
-        (existingRecipient) => existingRecipient.id === recipient.id,
-      );
-      return { ...recipient, _persisted: existing };
-    }
-
-    // For new recipients, create a new entry
-    return { ...recipient, _persisted: undefined };
+    return { ...recipient, _persisted: existing };
   });
 
   const persistedRecipients = await prisma.$transaction(async (tx) => {

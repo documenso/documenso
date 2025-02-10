@@ -260,6 +260,7 @@ export const createDocumentFromTemplate = async ({
 
     template.recipients.forEach((templateRecipient, index) => {
       const documentRecipient = document.recipients[index];
+
       if (documentRecipient) {
         recipientMapping.set(templateRecipient.id, documentRecipient.id);
       }
