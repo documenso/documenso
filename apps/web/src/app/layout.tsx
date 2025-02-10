@@ -2,6 +2,7 @@ import { Suspense } from 'react';
 
 import { Caveat, Inter } from 'next/font/google';
 
+import { SessionProvider } from 'next-auth/react';
 import { AxiomWebVitals } from 'next-axiom';
 import { PublicEnvScript } from 'next-runtime-env';
 
@@ -88,7 +89,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
                   initialLocaleData={{ lang, locales }}
                   initialMessages={i18n.messages}
                 >
-                  {children}
+                  <SessionProvider>{children}</SessionProvider>
                 </I18nClientProvider>
               </TrpcProvider>
             </TooltipProvider>
