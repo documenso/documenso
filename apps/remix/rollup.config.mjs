@@ -25,6 +25,7 @@ const config = {
       noEmitOnError: true,
       moduleResolution: 'bundler',
       include: ['server/**/*', '../../packages/**/*', '../../packages/lib/translations/**/*'],
+      jsx: 'preserve',
     }),
     resolve({
       rootDir: path.join(process.cwd(), '../..'),
@@ -41,8 +42,8 @@ const config = {
     commonjs(),
     babel({
       babelHelpers: 'bundled',
-      extensions: ['.js', '.ts', '.tsx'],
-      presets: ['@babel/preset-typescript'],
+      extensions: ['.ts', '.tsx'],
+      presets: ['@babel/preset-typescript', ['@babel/preset-react', { runtime: 'automatic' }]],
       plugins: [linguiMacro],
     }),
   ],

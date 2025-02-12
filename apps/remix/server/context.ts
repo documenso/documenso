@@ -27,7 +27,7 @@ export const appContext = async (c: Context, next: Next) => {
   const noSessionCookie = extractSessionCookieFromHeaders(request.headers) === null;
 
   if (!isPageRequest(request) || noSessionCookie || blacklistedPathsRegex.test(url.pathname)) {
-    logger.log('Pathname ignored', url.pathname);
+    // logger.log('Pathname ignored', url.pathname);
 
     setAppContext(c, {
       requestMetadata: extractRequestMetadata(request),

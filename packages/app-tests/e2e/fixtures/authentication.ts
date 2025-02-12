@@ -21,12 +21,13 @@ export const apiSignin = async ({
 }: LoginOptions) => {
   const { request } = page.context();
 
-  // const csrfToken = await getCsrfToken(page);
+  const csrfToken = await getCsrfToken(page);
 
   await request.post(`${NEXT_PUBLIC_WEBAPP_URL()}/api/auth/email-password/authorize`, {
     data: {
       email,
       password,
+      csrfToken,
     },
   });
 
@@ -50,6 +51,7 @@ const getCsrfToken = async (page: Page) => {
   });
 
   const { csrfToken } = await response.json();
+
   if (!csrfToken) {
     throw new Error('Invalid session');
   }

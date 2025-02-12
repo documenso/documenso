@@ -12,6 +12,6 @@ import type { Route } from './+types/webhook.trigger';
 //   },
 // };
 
-export async function loader({ request }: Route.LoaderArgs) {
+export async function action({ request }: Route.ActionArgs) {
   return handlerTriggerWebhooks(request);
 }

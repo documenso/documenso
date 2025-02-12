@@ -72,6 +72,7 @@
   },
   "devDependencies": {
     "@babel/core": "^7.26.7",
+    "@babel/preset-react": "^7.26.3",
     "@babel/preset-typescript": "^7.26.0",
     "@lingui/babel-plugin-lingui-macro": "^5.2.0",
     "@lingui/vite-plugin": "^5.2.0",

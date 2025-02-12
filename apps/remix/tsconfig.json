@@ -26,6 +26,7 @@
     "noEmit": true,
     "moduleDetection": "force",
     "resolveJsonModule": true,
+    "isolatedModules": true,
     "skipLibCheck": true,
     "strict": true,
     "useUnknownInCatchVariables": false
