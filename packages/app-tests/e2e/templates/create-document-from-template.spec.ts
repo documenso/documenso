@@ -110,14 +110,13 @@ test('[TEMPLATE]: should create a document from a template', async ({ page }) =>
   await page.getByRole('button', { name: 'Save template' }).click();
 
   // Use template
-  await page.waitForURL('/templates');
+  await page.waitForURL('**/templates');
   await page.getByRole('button', { name: 'Use Template' }).click();
   await page.getByRole('button', { name: 'Create as draft' }).click();
 
   // Review that the document was created with the correct values.
-  await page.waitForURL(/documents/);
-
-  const documentId = Number(page.url().split('/').pop());
+  await page.waitForURL(/\/documents\/\d+/);
+  const documentId = Number(page.url().match(/\/documents\/(\d+)/)?.[1]);
 
   const document = await prisma.document.findFirstOrThrow({
     where: {
@@ -250,9 +249,8 @@ test('[TEMPLATE]: should create a team document from a team template', async ({ 
   await page.getByRole('button', { name: 'Create as draft' }).click();
 
   // Review that the document was created with the correct values.
-  await page.waitForURL(/documents/);
-
-  const documentId = Number(page.url().split('/').pop());
+  await page.waitForURL(/\/documents\/\d+/);
+  const documentId = Number(page.url().match(/\/documents\/(\d+)/)?.[1]);
 
   const document = await prisma.document.findFirstOrThrow({
     where: {
@@ -353,9 +351,8 @@ test('[TEMPLATE]: should create a document from a template with custom document'
     await page.getByRole('button', { name: 'Create as draft' }).click();
 
     // Review that the document was created with the custom document data
-    await page.waitForURL(/documents/);
-
-    const documentId = Number(page.url().split('/').pop());
+    await page.waitForURL(/\/documents\/\d+/);
+    const documentId = Number(page.url().match(/\/documents\/(\d+)/)?.[1]);
 
     const document = await prisma.document.findFirstOrThrow({
       where: {
@@ -434,9 +431,8 @@ test('[TEMPLATE]: should create a team document from a template with custom docu
     await page.getByRole('button', { name: 'Create as draft' }).click();
 
     // Review that the document was created with the custom document data
-    await page.waitForURL(/documents/);
-
-    const documentId = Number(page.url().split('/').pop());
+    await page.waitForURL(/\/documents\/\d+/);
+    const documentId = Number(page.url().match(/\/documents\/(\d+)/)?.[1]);
 
     const document = await prisma.document.findFirstOrThrow({
       where: {
@@ -500,9 +496,8 @@ test('[TEMPLATE]: should create a document from a template using template docume
   await page.getByRole('button', { name: 'Create as draft' }).click();
 
   // Review that the document was created with the template's document data
-  await page.waitForURL(/documents/);
-
-  const documentId = Number(page.url().split('/').pop());
+  await page.waitForURL(/\/documents\/\d+/);
+  const documentId = Number(page.url().match(/\/documents\/(\d+)/)?.[1]);
 
   const document = await prisma.document.findFirstOrThrow({
     where: {
@@ -591,9 +586,8 @@ test('[TEMPLATE]: should persist document visibility when creating from template
   await page.getByRole('button', { name: 'Create as draft' }).click();
 
   // Review that the document was created with the correct visibility
-  await page.waitForURL(/documents/);
-
-  const documentId = Number(page.url().split('/').pop());
+  await page.waitForURL(/\/documents\/\d+/);
+  const documentId = Number(page.url().match(/\/documents\/(\d+)/)?.[1]);
 
   const document = await prisma.document.findFirstOrThrow({
     where: {
@@ -615,4 +609,369 @@ test('[TEMPLATE]: should persist document visibility when creating from template
 
   // Template should not be visible to regular member
   await expect(page.getByRole('button', { name: 'Use Template' })).not.toBeVisible();
+});
+
+/**
+ * This test verifies that we can create a document from a template with duplicate recipients
+ **/
+test('[TEMPLATE]: should create a document from a template with duplicate recipients', async ({
+  page,
+}) => {
+  const user = await seedUser();
+  const template = await seedBlankTemplate(user);
+
+  const isBillingEnabled =
+    process.env.NEXT_PUBLIC_FEATURE_BILLING_ENABLED === 'true' && enterprisePriceId;
+
+  await seedUserSubscription({
+    userId: user.id,
+    priceId: enterprisePriceId,
+  });
+
+  await apiSignin({
+    page,
+    email: user.email,
+    redirectPath: `/templates/${template.id}/edit`,
+  });
+
+  // Set template title.
+  await page.getByLabel('Title').fill('TEMPLATE_TITLE');
+
+  // Set template document access.
+  await page.getByTestId('documentAccessSelectValue').click();
+  await page.getByLabel('Require account').getByText('Require account').click();
+  await expect(page.getByTestId('documentAccessSelectValue')).toContainText('Require account');
+
+  // Set EE action auth.
+  if (isBillingEnabled) {
+    await page.getByTestId('documentActionSelectValue').click();
+    await page.getByLabel('Require passkey').getByText('Require passkey').click();
+    await expect(page.getByTestId('documentActionSelectValue')).toContainText('Require passkey');
+  }
+
+  // Set email options.
+  await page.getByRole('button', { name: 'Email Options' }).click();
+  await page.getByLabel('Subject (Optional)').fill('SUBJECT');
+  await page.getByLabel('Message (Optional)').fill('MESSAGE');
+
+  // Set advanced options.
+  await page.getByRole('button', { name: 'Advanced Options' }).click();
+  await page.locator('button').filter({ hasText: 'YYYY-MM-DD HH:mm a' }).click();
+  await page.getByLabel('DD/MM/YYYY').click();
+
+  await page.locator('.time-zone-field').click();
+  await page.getByRole('option', { name: 'Etc/UTC' }).click();
+  await page.getByLabel('Redirect URL').fill('https://documenso.com');
+  await page.getByRole('button', { name: 'Continue' }).click();
+
+  await expect(page.getByRole('heading', { name: 'Add Placeholder' })).toBeVisible();
+
+  // Add 2 signers.
+  await page.getByPlaceholder('Email').fill('recipient1@documenso.com');
+  await page.getByPlaceholder('Name').fill('Recipient 1');
+  await page.getByRole('button', { name: 'Add Placeholder Recipient' }).click();
+  await page.getByPlaceholder('Email').nth(1).fill('recipient1@documenso.com');
+  await page.getByPlaceholder('Name').nth(1).fill('Recipient 1');
+
+  // Apply require passkey for Recipient 1.
+  if (isBillingEnabled) {
+    await page.getByLabel('Show advanced settings').check();
+    await page.getByRole('combobox').first().click();
+    await page.getByLabel('Require passkey').click();
+  }
+
+  await page.getByRole('button', { name: 'Continue' }).click();
+  await expect(page.getByRole('heading', { name: 'Add Fields' })).toBeVisible();
+
+  // Add signature fields for each recipient
+  await page.getByRole('button', { name: 'Signature' }).click();
+  await page.locator('canvas').click({
+    position: {
+      x: 100,
+      y: 100,
+    },
+  });
+
+  await page.getByRole('combobox').click();
+  await page.getByRole('option', { name: 'Recipient 1 (recipient1@documenso.com)' }).nth(1).click();
+
+  await page.getByRole('button', { name: 'Signature' }).click();
+  await page.locator('canvas').click({
+    position: {
+      x: 200,
+      y: 100,
+    },
+  });
+
+  await page.getByRole('button', { name: 'Save template' }).click();
+
+  // Use template
+  await page.waitForURL('**/templates');
+  await page.getByRole('button', { name: 'Use Template' }).click();
+  await page.getByRole('button', { name: 'Create as draft' }).click();
+
+  // Review that the document was created with the correct values.
+  await page.waitForURL(/\/documents\/\d+/);
+  const documentId = Number(page.url().match(/\/documents\/(\d+)/)?.[1]);
+
+  const document = await prisma.document.findFirstOrThrow({
+    where: {
+      id: documentId,
+    },
+    include: {
+      recipients: true,
+      documentMeta: true,
+    },
+  });
+
+  const documentAuth = extractDocumentAuthMethods({
+    documentAuth: document.authOptions,
+  });
+
+  expect(document.title).toEqual('TEMPLATE_TITLE');
+  expect(documentAuth.documentAuthOption.globalAccessAuth).toEqual('ACCOUNT');
+  expect(documentAuth.documentAuthOption.globalActionAuth).toEqual(
+    isBillingEnabled ? 'PASSKEY' : null,
+  );
+  expect(document.documentMeta?.dateFormat).toEqual('dd/MM/yyyy hh:mm a');
+  expect(document.documentMeta?.message).toEqual('MESSAGE');
+  expect(document.documentMeta?.redirectUrl).toEqual('https://documenso.com');
+  expect(document.documentMeta?.subject).toEqual('SUBJECT');
+  expect(document.documentMeta?.timezone).toEqual('Etc/UTC');
+
+  const recipientOne = document.recipients[0];
+  const recipientTwo = document.recipients[1];
+
+  const recipientOneAuth = extractDocumentAuthMethods({
+    documentAuth: document.authOptions,
+    recipientAuth: recipientOne.authOptions,
+  });
+
+  const recipientTwoAuth = extractDocumentAuthMethods({
+    documentAuth: document.authOptions,
+    recipientAuth: recipientTwo.authOptions,
+  });
+
+  if (isBillingEnabled) {
+    expect(recipientOneAuth.derivedRecipientActionAuth).toEqual('PASSKEY');
+  }
+
+  expect(recipientOneAuth.derivedRecipientAccessAuth).toEqual('ACCOUNT');
+  expect(recipientTwoAuth.derivedRecipientAccessAuth).toEqual('ACCOUNT');
+
+  await page.getByRole('link', { name: 'Edit' }).click();
+  await expect(page.getByRole('heading', { name: 'General' })).toBeVisible();
+
+  await page.getByRole('button', { name: 'Continue' }).click();
+  await expect(page.getByRole('heading', { name: 'Add Signers' })).toBeVisible();
+
+  await page.getByRole('button', { name: 'Continue' }).click();
+  await expect(page.getByRole('heading', { name: 'Add Fields' })).toBeVisible();
+
+  await expect(page.getByText('SignatureRE').first()).toBeVisible();
+
+  await page.getByRole('combobox').click();
+  await page.getByRole('option', { name: 'recipient1@documenso.com' }).nth(1).click();
+
+  await expect(page.getByText('SignatureRE').nth(1)).toBeVisible();
+});
+
+/**
+ * This test verifies that we can create a document from a template with a mix of duplicate and unique recipients
+ **/
+test('[TEMPLATE]: should create a document from a template with mixed duplicate and unique recipients', async ({
+  page,
+}) => {
+  const user = await seedUser();
+  const template = await seedBlankTemplate(user);
+
+  const isBillingEnabled =
+    process.env.NEXT_PUBLIC_FEATURE_BILLING_ENABLED === 'true' && enterprisePriceId;
+
+  await seedUserSubscription({
+    userId: user.id,
+    priceId: enterprisePriceId,
+  });
+
+  await apiSignin({
+    page,
+    email: user.email,
+    redirectPath: `/templates/${template.id}/edit`,
+  });
+
+  // Set template title.
+  await page.getByLabel('Title').fill('TEMPLATE_MIXED_RECIPIENTS');
+
+  // Set template document access.
+  await page.getByTestId('documentAccessSelectValue').click();
+  await page.getByLabel('Require account').getByText('Require account').click();
+  await expect(page.getByTestId('documentAccessSelectValue')).toContainText('Require account');
+
+  // Set EE action auth.
+  if (isBillingEnabled) {
+    await page.getByTestId('documentActionSelectValue').click();
+    await page.getByLabel('Require passkey').getByText('Require passkey').click();
+    await expect(page.getByTestId('documentActionSelectValue')).toContainText('Require passkey');
+  }
+
+  // Set email options.
+  await page.getByRole('button', { name: 'Email Options' }).click();
+  await page.getByLabel('Subject (Optional)').fill('SUBJECT');
+  await page.getByLabel('Message (Optional)').fill('MESSAGE');
+
+  // Set advanced options.
+  await page.getByRole('button', { name: 'Advanced Options' }).click();
+  await page.locator('button').filter({ hasText: 'YYYY-MM-DD HH:mm a' }).click();
+  await page.getByLabel('DD/MM/YYYY').click();
+
+  await page.locator('.time-zone-field').click();
+  await page.getByRole('option', { name: 'Etc/UTC' }).click();
+  await page.getByLabel('Redirect URL').fill('https://documenso.com');
+  await page.getByRole('button', { name: 'Continue' }).click();
+
+  await expect(page.getByRole('heading', { name: 'Add Placeholder' })).toBeVisible();
+
+  // Add 4 signers: 2 duplicates of recipient1 and 2 unique recipients
+  await page.getByPlaceholder('Email').fill('recipient1@documenso.com');
+  await page.getByPlaceholder('Name').fill('Recipient 1');
+  await page.getByRole('button', { name: 'Add Placeholder Recipient' }).click();
+
+  await page.getByPlaceholder('Email').nth(1).fill('recipient2@documenso.com');
+  await page.getByPlaceholder('Name').nth(1).fill('Recipient 2');
+  await page.getByRole('button', { name: 'Add Placeholder Recipient' }).click();
+
+  await page.getByPlaceholder('Email').nth(2).fill('recipient1@documenso.com');
+  await page.getByPlaceholder('Name').nth(2).fill('Recipient 1');
+  await page.getByRole('button', { name: 'Add Placeholder Recipient' }).click();
+
+  await page.getByPlaceholder('Email').nth(3).fill('recipient3@documenso.com');
+  await page.getByPlaceholder('Name').nth(3).fill('Recipient 3');
+
+  // Apply require passkey for first instance of Recipient 1
+  if (isBillingEnabled) {
+    await page.getByLabel('Show advanced settings').check();
+    await page.getByRole('combobox').first().click();
+    await page.getByLabel('Require passkey').click();
+  }
+
+  await page.getByRole('button', { name: 'Continue' }).click();
+  await expect(page.getByRole('heading', { name: 'Add Fields' })).toBeVisible();
+
+  // Add signature fields for each recipient
+  await page.getByRole('button', { name: 'Signature' }).click();
+  await page.locator('canvas').click({
+    position: {
+      x: 100,
+      y: 100,
+    },
+  });
+
+  await page.getByRole('combobox').click();
+  await page.getByRole('option', { name: 'Recipient 2 (recipient2@documenso.com)' }).click();
+
+  await page.getByRole('button', { name: 'Signature' }).click();
+  await page.locator('canvas').click({
+    position: {
+      x: 200,
+      y: 100,
+    },
+  });
+
+  await page.getByRole('combobox').click();
+  await page.getByRole('option', { name: 'Recipient 1 (recipient1@documenso.com)' }).nth(1).click();
+
+  await page.getByRole('button', { name: 'Signature' }).click();
+  await page.locator('canvas').click({
+    position: {
+      x: 300,
+      y: 100,
+    },
+  });
+
+  await page.getByRole('combobox').click();
+  await page.getByRole('option', { name: 'Recipient 3 (recipient3@documenso.com)' }).click();
+
+  await page.getByRole('button', { name: 'Signature' }).click();
+  await page.locator('canvas').click({
+    position: {
+      x: 400,
+      y: 100,
+    },
+  });
+
+  await page.getByRole('button', { name: 'Save template' }).click();
+
+  // Use template
+  await page.waitForURL('**/templates');
+  await page.getByRole('button', { name: 'Use Template' }).click();
+  await page.getByRole('button', { name: 'Create as draft' }).click();
+
+  // Review that the document was created with the correct values.
+  await page.waitForURL(/\/documents\/\d+/);
+  const documentId = Number(page.url().match(/\/documents\/(\d+)/)?.[1]);
+
+  const document = await prisma.document.findFirstOrThrow({
+    where: {
+      id: documentId,
+    },
+    include: {
+      recipients: {
+        orderBy: {
+          email: 'asc',
+        },
+      },
+      documentMeta: true,
+    },
+  });
+
+  const documentAuth = extractDocumentAuthMethods({
+    documentAuth: document.authOptions,
+  });
+
+  expect(document.title).toEqual('TEMPLATE_MIXED_RECIPIENTS');
+  expect(documentAuth.documentAuthOption.globalAccessAuth).toEqual('ACCOUNT');
+  expect(documentAuth.documentAuthOption.globalActionAuth).toEqual(
+    isBillingEnabled ? 'PASSKEY' : null,
+  );
+  expect(document.documentMeta?.dateFormat).toEqual('dd/MM/yyyy hh:mm a');
+  expect(document.documentMeta?.message).toEqual('MESSAGE');
+  expect(document.documentMeta?.redirectUrl).toEqual('https://documenso.com');
+  expect(document.documentMeta?.subject).toEqual('SUBJECT');
+  expect(document.documentMeta?.timezone).toEqual('Etc/UTC');
+
+  // Check auth settings for first instance of recipient1
+  const firstRecipientOne = document.recipients[0];
+  const firstRecipientOneAuth = extractDocumentAuthMethods({
+    documentAuth: document.authOptions,
+    recipientAuth: firstRecipientOne.authOptions,
+  });
+
+  if (isBillingEnabled) {
+    expect(firstRecipientOneAuth.derivedRecipientActionAuth).toEqual('PASSKEY');
+  }
+
+  expect(firstRecipientOneAuth.derivedRecipientAccessAuth).toEqual('ACCOUNT');
+
+  await page.getByRole('link', { name: 'Edit' }).click();
+  await expect(page.getByRole('heading', { name: 'General' })).toBeVisible();
+
+  await page.getByRole('button', { name: 'Continue' }).click();
+  await expect(page.getByRole('heading', { name: 'Add Signers' })).toBeVisible();
+
+  await page.getByRole('button', { name: 'Continue' }).click();
+  await expect(page.getByRole('heading', { name: 'Add Fields' })).toBeVisible();
+
+  await expect(page.getByText('SignatureRE').first()).toBeVisible();
+
+  await page.getByRole('combobox').click();
+  await page.getByRole('option', { name: 'recipient2@documenso.com' }).click();
+  await expect(page.getByText('SignatureRE').nth(1)).toBeVisible();
+
+  await page.getByRole('combobox').click();
+  await page.getByRole('option', { name: 'recipient1@documenso.com' }).nth(1).click();
+  await expect(page.getByText('SignatureRE').nth(2)).toBeVisible();
+
+  await page.getByRole('combobox').click();
+  await page.getByRole('option', { name: 'recipient3@documenso.com' }).click();
+  await expect(page.getByText('SignatureRE').nth(3)).toBeVisible();
 });

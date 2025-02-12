@@ -122,6 +122,7 @@ export const AddTemplateFieldsFormPartial = ({
         pageY: Number(field.positionY),
         pageWidth: Number(field.width),
         pageHeight: Number(field.height),
+        recipientId: field.recipientId ?? -1,
         signerId: field.recipientId ?? -1,
         signerEmail:
           recipients.find((recipient) => recipient.id === field.recipientId)?.email ?? '',
@@ -177,6 +178,8 @@ export const AddTemplateFieldsFormPartial = ({
           formId: nanoid(12),
           signerEmail: selectedSigner?.email ?? lastActiveField.signerEmail,
           signerId: selectedSigner?.id ?? lastActiveField.signerId,
+          recipientId:
+            selectedSigner?.id || lastActiveField.recipientId || lastActiveField.signerId || 0,
           signerToken: selectedSigner?.token ?? lastActiveField.signerToken,
           pageX: lastActiveField.pageX + 3,
           pageY: lastActiveField.pageY + 3,
@@ -201,19 +204,29 @@ export const AddTemplateFieldsFormPartial = ({
         event.preventDefault();
 
         const copiedField = structuredClone(fieldClipboard);
+        const signerIndex = recipients.findIndex((r) => r.id === selectedSigner?.id);
 
         append({
           ...copiedField,
           formId: nanoid(12),
           signerEmail: selectedSigner?.email ?? copiedField.signerEmail,
           signerId: selectedSigner?.id ?? copiedField.signerId,
+          recipientId: selectedSigner?.id || copiedField.recipientId || copiedField.signerId || 0,
           signerToken: selectedSigner?.token ?? copiedField.signerToken,
+          signerIndex: signerIndex >= 0 ? signerIndex : 0,
           pageX: copiedField.pageX + 3,
           pageY: copiedField.pageY + 3,
         });
       }
     },
-    [append, fieldClipboard, selectedSigner?.email, selectedSigner?.id, selectedSigner?.token],
+    [
+      append,
+      fieldClipboard,
+      selectedSigner?.email,
+      selectedSigner?.id,
+      selectedSigner?.token,
+      recipients,
+    ],
   );
 
   useHotkeys(['ctrl+c', 'meta+c'], (evt) => onFieldCopy(evt));
@@ -319,6 +332,8 @@ export const AddTemplateFieldsFormPartial = ({
       pageX -= fieldPageWidth / 2;
       pageY -= fieldPageHeight / 2;
 
+      const signerIndex = recipients.findIndex((r) => r.id === selectedSigner.id);
+
       append({
         formId: nanoid(12),
         type: selectedField,
@@ -329,14 +344,17 @@ export const AddTemplateFieldsFormPartial = ({
         pageHeight: fieldPageHeight,
         signerEmail: selectedSigner.email,
         signerId: selectedSigner.id,
+        recipientId:
+          selectedSigner.id || lastActiveField?.recipientId || lastActiveField?.signerId || 0,
         signerToken: selectedSigner.token ?? '',
+        signerIndex: signerIndex >= 0 ? signerIndex : 0,
         fieldMeta: undefined,
       });
 
       setIsFieldWithinBounds(false);
       setSelectedField(null);
     },
-    [append, isWithinPageBounds, selectedField, selectedSigner, getPage],
+    [append, isWithinPageBounds, selectedField, selectedSigner, getPage, recipients],
   );
 
   const onFieldResize = useCallback(
@@ -546,14 +564,15 @@ export const AddTemplateFieldsFormPartial = ({
               )}
 
               {localFields.map((field, index) => {
-                const recipientIndex = recipients.findIndex((r) => r.email === field.signerEmail);
+                const recipientIndex =
+                  field.signerIndex ?? recipients.findIndex((r) => r.id === field.signerId);
 
                 return (
                   <FieldItem
                     key={index}
-                    recipientIndex={recipientIndex === -1 ? 0 : recipientIndex}
+                    recipientIndex={recipientIndex >= 0 ? recipientIndex : 0}
                     field={field}
-                    disabled={selectedSigner?.email !== field.signerEmail}
+                    disabled={selectedSigner?.id !== field.signerId}
                     minHeight={MIN_HEIGHT_PX}
                     minWidth={MIN_WIDTH_PX}
                     defaultHeight={DEFAULT_HEIGHT_PX}
