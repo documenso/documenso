@@ -9,7 +9,6 @@ import {
 
 import { DOCUMENT_AUDIT_LOG_TYPE } from '@documenso/lib/types/document-audit-logs';
 import type { ApiRequestMetadata } from '@documenso/lib/universal/extract-request-metadata';
-import { putPdfFile } from '@documenso/lib/universal/upload/put-file';
 import { createDocumentAuditLogData } from '@documenso/lib/utils/document-audit-logs';
 import { prisma } from '@documenso/prisma';
 
@@ -19,7 +18,8 @@ import {
   ZWebhookDocumentSchema,
   mapDocumentToWebhookDocumentPayload,
 } from '../../types/webhook-payload';
-import { getFile } from '../../universal/upload/get-file';
+import { getFileServerSide } from '../../universal/upload/get-file.server';
+import { putPdfFileServerSide } from '../../universal/upload/put-file.server';
 import { insertFormValuesInPdf } from '../pdf/insert-form-values-in-pdf';
 import { triggerWebhook } from '../webhooks/trigger/trigger-webhook';
 
@@ -100,7 +100,7 @@ export const sendDocument = async ({
   }
 
   if (document.formValues) {
-    const file = await getFile(documentData);
+    const file = await getFileServerSide(documentData);
 
     const prefilled = await insertFormValuesInPdf({
       pdf: Buffer.from(file),
@@ -114,7 +114,7 @@ export const sendDocument = async ({
       fileName = `${document.title}.pdf`;
     }
 
-    const newDocumentData = await putPdfFile({
+    const newDocumentData = await putPdfFileServerSide({
       name: fileName,
       type: 'application/pdf',
       arrayBuffer: async () => Promise.resolve(prefilled),

@@ -13,6 +13,7 @@ import { useSession } from '@documenso/lib/client-only/providers/session';
 import { APP_DOCUMENT_UPLOAD_SIZE_LIMIT } from '@documenso/lib/constants/app';
 import { DEFAULT_DOCUMENT_TIME_ZONE, TIME_ZONES } from '@documenso/lib/constants/time-zones';
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
+import { putPdfFile } from '@documenso/lib/universal/upload/put-file';
 import { formatDocumentsPath } from '@documenso/lib/utils/teams';
 import { trpc } from '@documenso/trpc/react';
 import { cn } from '@documenso/ui/lib/utils';
@@ -62,30 +63,11 @@ export const DocumentUploadDropzone = ({ className }: DocumentUploadDropzoneProp
     try {
       setIsLoading(true);
 
-      // Todo
-      // const { type, data } = await putPdfFile(file);
-
-      const formData = new FormData();
-      formData.append('file', file);
-
-      const response = await fetch('/api/file', {
-        method: 'POST',
-        body: formData,
-      })
-        .then(async (res) => res.json())
-        .catch((e) => {
-          console.error('Upload failed:', e);
-          throw new AppError('UPLOAD_FAILED');
-        });
-
-      // const { id: documentDataId } = await createDocumentData({
-      //   type,
-      //   data,
-      // });
+      const response = await putPdfFile(file);
 
       const { id } = await createDocument({
         title: file.name,
-        documentDataId: response.id, // todo
+        documentDataId: response.id,
         timezone: userTimezone,
       });
 

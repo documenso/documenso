@@ -7,7 +7,7 @@ import { FilePlus, Loader } from 'lucide-react';
 import { useNavigate } from 'react-router';
 
 import { useSession } from '@documenso/lib/client-only/providers/session';
-import { AppError } from '@documenso/lib/errors/app-error';
+import { putPdfFile } from '@documenso/lib/universal/upload/put-file';
 import { trpc } from '@documenso/trpc/react';
 import { Button } from '@documenso/ui/primitives/button';
 import {
@@ -48,27 +48,7 @@ export const TemplateCreateDialog = ({ templateRootPath }: TemplateCreateDialogP
     setIsUploadingFile(true);
 
     try {
-      // Todo
-      // const { type, data } = await putPdfFile(file);
-
-      const formData = new FormData();
-      formData.append('file', file);
-
-      const response = await fetch('/api/file', {
-        method: 'POST',
-        body: formData,
-      })
-        .then(async (res) => await res.json())
-        .catch((e) => {
-          console.error('Upload failed:', e);
-          throw new AppError('UPLOAD_FAILED');
-        });
-
-      // Why do we run this twice?
-      // const { id: templateDocumentDataId } = await createDocumentData({
-      //   type: response.type,
-      //   data: response.data,
-      // });
+      const response = await putPdfFile(file);
 
       const { id } = await createTemplate({
         title: file.name,

@@ -97,7 +97,7 @@ export const SignInForm = ({
 
   const [isPasskeyLoading, setIsPasskeyLoading] = useState(false);
 
-  const redirectUrl = useMemo(() => {
+  const redirectPath = useMemo(() => {
     // Handle SSR
     if (typeof window === 'undefined') {
       return LOGIN_REDIRECT_PATH;
@@ -171,7 +171,7 @@ export const SignInForm = ({
       await authClient.passkey.signIn({
         credential: JSON.stringify(credential),
         csrfToken: sessionId,
-        redirectUrl,
+        redirectPath,
       });
     } catch (err) {
       setIsPasskeyLoading(false);
@@ -211,7 +211,7 @@ export const SignInForm = ({
         password,
         totpCode,
         backupCode,
-        redirectUrl,
+        redirectPath,
       });
     } catch (err) {
       console.log(err);

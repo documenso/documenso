@@ -1,4 +1,4 @@
-import { zValidator } from '@hono/zod-validator';
+import { sValidator } from '@hono/standard-validator';
 import { Google, decodeIdToken, generateCodeVerifier, generateState } from 'arctic';
 import { Hono } from 'hono';
 import { deleteCookie, setCookie } from 'hono/cookie';
@@ -35,7 +35,7 @@ export const googleRoute = new Hono<HonoAuthContext>()
   /**
    * Authorize endpoint.
    */
-  .post('/authorize', zValidator('json', ZGoogleAuthorizeSchema), (c) => {
+  .post('/authorize', sValidator('json', ZGoogleAuthorizeSchema), (c) => {
     const scopes = options.scope;
     const state = generateState();
 

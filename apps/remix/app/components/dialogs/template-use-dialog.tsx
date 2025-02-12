@@ -17,6 +17,7 @@ import {
   TEMPLATE_RECIPIENT_NAME_PLACEHOLDER_REGEX,
 } from '@documenso/lib/constants/template';
 import { AppError } from '@documenso/lib/errors/app-error';
+import { putPdfFile } from '@documenso/lib/universal/upload/put-file';
 import { trpc } from '@documenso/trpc/react';
 import { cn } from '@documenso/ui/lib/utils';
 import { Button } from '@documenso/ui/primitives/button';
@@ -150,22 +151,7 @@ export function TemplateUseDialog({
       let customDocumentDataId: string | undefined = undefined;
 
       if (data.useCustomDocument && data.customDocumentData) {
-        // const customDocumentData = await putPdfFile(data.customDocumentData);
-        // Todo
-
-        const formData = new FormData();
-        formData.append('file', data.customDocumentData);
-
-        const customDocumentData = await fetch('/api/file', {
-          method: 'POST',
-          body: formData,
-        })
-          .then(async (res) => await res.json())
-          .catch((e) => {
-            console.error('Upload failed:', e);
-            throw new AppError('UPLOAD_FAILED');
-          });
-
+        const customDocumentData = await putPdfFile(data.customDocumentData);
         customDocumentDataId = customDocumentData.id;
       }
 

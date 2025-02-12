@@ -22,7 +22,7 @@
   },
   "dependencies": {
     "@prisma/client": "^5.4.2",
-    "kysely": "^0.27.3",
+    "kysely": "0.26.3",
     "prisma": "^5.4.2",
     "prisma-extension-kysely": "^2.1.0",
     "ts-pattern": "^5.0.6"

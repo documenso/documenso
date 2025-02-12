@@ -180,5 +180,11 @@ export function ErrorBoundary({ error }: Route.ErrorBoundaryProps) {
 
   const errorCode = isRouteErrorResponse(error) ? error.status : 500;
 
+  if (isRouteErrorResponse(error)) {
+    console.log(error.data);
+    console.log(error.status);
+    console.log(error.statusText);
+  }
+
   return <GenericErrorLayout errorCode={errorCode} />;
 }

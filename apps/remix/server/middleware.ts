@@ -1,12 +1,20 @@
 import type { Context, Next } from 'hono';
-import { deleteCookie, getCookie, setCookie } from 'hono/cookie';
+import { getCookie } from 'hono/cookie';
 
-import { TEAM_URL_ROOT_REGEX } from '@documenso/lib/constants/teams';
+import { setCsrfCookie } from '@documenso/auth/server/lib/session/session-cookies';
 import { AppLogger } from '@documenso/lib/utils/debugger';
-import { formatDocumentsPath } from '@documenso/lib/utils/teams';
 
 const logger = new AppLogger('Middleware');
 
+/**
+ * Middleware for initial page loads.
+ *
+ * You won't be able to easily handle sequential page loads because they will be
+ * called under `path.data`
+ *
+ * Example an initial page load would be `/documents` then if the user click templates
+ * the path here would be `/templates.data`.
+ */
 export const appMiddleware = async (c: Context, next: Next) => {
   const { req } = c;
   const { path } = req;
@@ -24,70 +32,64 @@ export const appMiddleware = async (c: Context, next: Next) => {
   const referrerUrl = referrer ? new URL(referrer) : null;
   const referrerPathname = referrerUrl ? referrerUrl.pathname : null;
 
-  // Whether to reset the preferred team url cookie if the user accesses a non team page from a team page.
-  const resetPreferredTeamUrl =
-    referrerPathname &&
-    referrerPathname.startsWith('/t/') &&
-    (!path.startsWith('/t/') || path === '/');
+  // Set csrf token if not set.
+  const csrfToken = getCookie(c, 'csrfToken');
 
-  // Redirect root page to `/documents` or `/t/{preferredTeamUrl}/documents`.
-  if (path === '/') {
-    logger.log('Redirecting from root to documents');
-
-    const redirectUrlPath = formatDocumentsPath(
-      resetPreferredTeamUrl ? undefined : preferredTeamUrl,
-    );
-
-    const redirectUrl = new URL(redirectUrlPath, req.url);
-
-    return c.redirect(redirectUrl);
+  // Todo: Currently not working.
+  if (!csrfToken) {
+    await setCsrfCookie(c);
   }
 
-  // Redirect `/t` to `/settings/teams`.
-  if (path === '/t' || path === '/t/') {
-    logger.log('Redirecting to /settings/teams');
+  // // Whether to reset the preferred team url cookie if the user accesses a non team page from a team page.
+  // const resetPreferredTeamUrl =
+  //   referrerPathname &&
+  //   referrerPathname.startsWith('/t/') &&
+  //   (!path.startsWith('/t/') || path === '/');
 
-    const redirectUrl = new URL('/settings/teams', req.url);
-    return c.redirect(redirectUrl);
-  }
+  // // Redirect root page to `/documents` or `/t/{preferredTeamUrl}/documents`.
+  // if (path === '/') {
+  //   logger.log('Redirecting from root to documents');
 
-  // Redirect `/t/<team_url>` to `/t/<team_url>/documents`.
-  if (TEAM_URL_ROOT_REGEX.test(path)) {
-    logger.log('Redirecting team documents');
+  //   const redirectUrlPath = formatDocumentsPath(
+  //     resetPreferredTeamUrl ? undefined : preferredTeamUrl,
+  //   );
 
-    const redirectUrl = new URL(`${path}/documents`, req.url);
-    setCookie(c, 'preferred-team-url', path.replace('/t/', ''));
+  //   const redirectUrl = new URL(redirectUrlPath, req.url);
 
-    return c.redirect(redirectUrl);
-  }
+  //   return c.redirect(redirectUrl);
+  // }
 
-  // Set the preferred team url cookie if user accesses a team page.
-  if (path.startsWith('/t/')) {
-    setCookie(c, 'preferred-team-url', path.split('/')[2]);
-    return next();
-  }
+  // // Redirect `/t` to `/settings/teams`.
+  // if (path === '/t' || path === '/t/') {
+  //   logger.log('Redirecting to /settings/teams');
 
-  // Clear preferred team url cookie if user accesses a non team page from a team page.
-  if (resetPreferredTeamUrl || path === '/documents') {
-    logger.log('Resetting preferred team url');
+  //   const redirectUrl = new URL('/settings/teams', req.url);
+  //   return c.redirect(redirectUrl);
+  // }
 
-    deleteCookie(c, 'preferred-team-url');
-    return next();
-  }
+  // // Redirect `/t/<team_url>` to `/t/<team_url>/documents`.
+  // if (TEAM_URL_ROOT_REGEX.test(path)) {
+  //   logger.log('Redirecting team documents');
 
-  // Todo: Test
-  if (path.startsWith('/embed')) {
-    const origin = req.header('Origin') ?? '*';
+  //   const redirectUrl = new URL(`${path}/documents`, req.url);
+  //   setCookie(c, 'preferred-team-url', path.replace('/t/', ''));
 
-    // Allow third parties to iframe the document.
-    c.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
-    c.header('Access-Control-Allow-Origin', origin);
-    c.header('Content-Security-Policy', `frame-ancestors ${origin}`);
-    c.header('Referrer-Policy', 'strict-origin-when-cross-origin');
-    c.header('X-Content-Type-Options', 'nosniff');
+  //   return c.redirect(redirectUrl);
+  // }
 
-    return next();
-  }
+  // // Set the preferred team url cookie if user accesses a team page.
+  // if (path.startsWith('/t/')) {
+  //   setCookie(c, 'preferred-team-url', path.split('/')[2]);
+  //   return next();
+  // }
+
+  // // Clear preferred team url cookie if user accesses a non team page from a team page.
+  // if (resetPreferredTeamUrl || path === '/documents') {
+  //   logger.log('Resetting preferred team url');
+
+  //   deleteCookie(c, 'preferred-team-url');
+  //   return next();
+  // }
 
   return next();
 };

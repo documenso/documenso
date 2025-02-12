@@ -5,8 +5,8 @@ import { useLingui } from '@lingui/react';
 import { Trans } from '@lingui/react/macro';
 import { AlertTriangle } from 'lucide-react';
 
+import { authClient } from '@documenso/auth/client';
 import { ONE_DAY, ONE_SECOND } from '@documenso/lib/constants/time';
-import { trpc } from '@documenso/trpc/react';
 import { Button } from '@documenso/ui/primitives/button';
 import {
   Dialog,
@@ -27,18 +27,20 @@ export const VerifyEmailBanner = ({ email }: VerifyEmailBannerProps) => {
   const { toast } = useToast();
 
   const [isOpen, setIsOpen] = useState(false);
+  const [isPending, setIsPending] = useState(false);
 
   const [isButtonDisabled, setIsButtonDisabled] = useState(false);
 
-  // Todo
-  const { mutateAsync: sendConfirmationEmail, isPending } =
-    trpc.profile.sendConfirmationEmail.useMutation();
-
   const onResendConfirmationEmail = async () => {
+    if (isPending) {
+      return;
+    }
+
+    setIsPending(true);
+
     try {
       setIsButtonDisabled(true);
-
-      await sendConfirmationEmail({ email: email });
+      await authClient.emailPassword.resendVerifyEmail({ email: email });
 
       toast({
         title: _(msg`Success`),
@@ -56,6 +58,8 @@ export const VerifyEmailBanner = ({ email }: VerifyEmailBannerProps) => {
         variant: 'destructive',
       });
     }
+
+    setIsPending(false);
   };
 
   useEffect(() => {

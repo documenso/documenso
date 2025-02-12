@@ -1,4 +1,4 @@
-import { zValidator } from '@hono/zod-validator';
+import { sValidator } from '@hono/standard-validator';
 import { compare } from '@node-rs/bcrypt';
 import { Hono } from 'hono';
 import { DateTime } from 'luxon';
@@ -42,7 +42,7 @@ export const emailPasswordRoute = new Hono<HonoAuthContext>()
   /**
    * Authorize endpoint.
    */
-  .post('/authorize', zValidator('json', ZSignInSchema), async (c) => {
+  .post('/authorize', sValidator('json', ZSignInSchema), async (c) => {
     const requestMetadata = c.get('requestMetadata');
 
     const { email, password, totpCode, backupCode } = c.req.valid('json');
@@ -131,7 +131,7 @@ export const emailPasswordRoute = new Hono<HonoAuthContext>()
   /**
    * Signup endpoint.
    */
-  .post('/signup', zValidator('json', ZSignUpSchema), async (c) => {
+  .post('/signup', sValidator('json', ZSignUpSchema), async (c) => {
     if (env('NEXT_PUBLIC_DISABLE_SIGNUP') === 'true') {
       throw new AppError('SIGNUP_DISABLED', {
         message: 'Signups are disabled.',
@@ -160,7 +160,7 @@ export const emailPasswordRoute = new Hono<HonoAuthContext>()
   /**
    * Update password endpoint.
    */
-  .post('/update-password', zValidator('json', ZUpdatePasswordSchema), async (c) => {
+  .post('/update-password', sValidator('json', ZUpdatePasswordSchema), async (c) => {
     const { password, currentPassword } = c.req.valid('json');
     const requestMetadata = c.get('requestMetadata');
 
@@ -182,7 +182,7 @@ export const emailPasswordRoute = new Hono<HonoAuthContext>()
   /**
    * Verify email endpoint.
    */
-  .post('/verify-email', zValidator('json', ZVerifyEmailSchema), async (c) => {
+  .post('/verify-email', sValidator('json', ZVerifyEmailSchema), async (c) => {
     const { state, userId } = await verifyEmail({ token: c.req.valid('json').token });
 
     // If email is verified, automatically authenticate user.
@@ -197,7 +197,7 @@ export const emailPasswordRoute = new Hono<HonoAuthContext>()
   /**
    * Resend verification email endpoint.
    */
-  .post('/resend-verify-email', zValidator('json', ZResendVerifyEmailSchema), async (c) => {
+  .post('/resend-verify-email', sValidator('json', ZResendVerifyEmailSchema), async (c) => {
     const { email } = c.req.valid('json');
 
     await jobsClient.triggerJob({
@@ -212,7 +212,7 @@ export const emailPasswordRoute = new Hono<HonoAuthContext>()
   /**
    * Forgot password endpoint.
    */
-  .post('/forgot-password', zValidator('json', ZForgotPasswordSchema), async (c) => {
+  .post('/forgot-password', sValidator('json', ZForgotPasswordSchema), async (c) => {
     const { email } = c.req.valid('json');
 
     await forgotPassword({
@@ -224,7 +224,7 @@ export const emailPasswordRoute = new Hono<HonoAuthContext>()
   /**
    * Reset password endpoint.
    */
-  .post('/reset-password', zValidator('json', ZResetPasswordSchema), async (c) => {
+  .post('/reset-password', sValidator('json', ZResetPasswordSchema), async (c) => {
     const { token, password } = c.req.valid('json');
 
     const requestMetadata = c.get('requestMetadata');
@@ -258,7 +258,7 @@ export const emailPasswordRoute = new Hono<HonoAuthContext>()
    */
   .post(
     '/2fa/enable',
-    zValidator(
+    sValidator(
       'json',
       z.object({
         code: z.string(),
@@ -304,7 +304,7 @@ export const emailPasswordRoute = new Hono<HonoAuthContext>()
    */
   .post(
     '/2fa/disable',
-    zValidator(
+    sValidator(
       'json',
       z.object({
         totpCode: z.string().trim().optional(),
@@ -325,6 +325,7 @@ export const emailPasswordRoute = new Hono<HonoAuthContext>()
           email: true,
           twoFactorEnabled: true,
           twoFactorSecret: true,
+          twoFactorBackupCodes: true,
         },
       });
 
@@ -349,7 +350,7 @@ export const emailPasswordRoute = new Hono<HonoAuthContext>()
    */
   .post(
     '/2fa/view-recovery-codes',
-    zValidator(
+    sValidator(
       'json',
       z.object({
         token: z.string(),

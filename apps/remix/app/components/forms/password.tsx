@@ -2,12 +2,12 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
 import { Trans } from '@lingui/react/macro';
-import type { User } from '@prisma/client';
 import { useForm } from 'react-hook-form';
 import { match } from 'ts-pattern';
 import { z } from 'zod';
 
 import { authClient } from '@documenso/auth/client';
+import type { SessionUser } from '@documenso/auth/server/lib/session/session';
 import { AppError } from '@documenso/lib/errors/app-error';
 import { ZCurrentPasswordSchema, ZPasswordSchema } from '@documenso/trpc/server/auth-router/schema';
 import { cn } from '@documenso/ui/lib/utils';
@@ -38,7 +38,7 @@ export type TPasswordFormSchema = z.infer<typeof ZPasswordFormSchema>;
 
 export type PasswordFormProps = {
   className?: string;
-  user: User;
+  user: SessionUser;
 };
 
 export const PasswordForm = ({ className }: PasswordFormProps) => {

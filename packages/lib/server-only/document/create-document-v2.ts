@@ -24,8 +24,8 @@ import {
   ZWebhookDocumentSchema,
   mapDocumentToWebhookDocumentPayload,
 } from '../../types/webhook-payload';
-import { getFile } from '../../universal/upload/get-file';
-import { putPdfFile } from '../../universal/upload/put-file';
+import { getFileServerSide } from '../../universal/upload/get-file.server';
+import { putPdfFileServerSide } from '../../universal/upload/put-file.server';
 import { createDocumentAuthOptions, createRecipientAuthOptions } from '../../utils/document-auth';
 import { determineDocumentVisibility } from '../../utils/document-visibility';
 import { triggerWebhook } from '../webhooks/trigger/trigger-webhook';
@@ -97,11 +97,11 @@ export const createDocumentV2 = async ({
     });
 
     if (documentData) {
-      const buffer = await getFile(documentData);
+      const buffer = await getFileServerSide(documentData);
 
       const normalizedPdf = await makeNormalizedPdf(Buffer.from(buffer));
 
-      const newDocumentData = await putPdfFile({
+      const newDocumentData = await putPdfFileServerSide({
         name: title.endsWith('.pdf') ? title : `${title}.pdf`,
         type: 'application/pdf',
         arrayBuffer: async () => Promise.resolve(normalizedPdf),

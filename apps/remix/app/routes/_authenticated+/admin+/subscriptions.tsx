@@ -11,7 +11,7 @@ import {
   TableRow,
 } from '@documenso/ui/primitives/table';
 
-import type { Route } from './+types/_index';
+import type { Route } from './+types/subscriptions';
 
 export async function loader() {
   const subscriptions = await findSubscriptions();

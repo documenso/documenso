@@ -12,11 +12,11 @@
   "dependencies": {
     "@documenso/lib": "*",
     "@documenso/prisma": "*",
-    "@hono/zod-validator": "^0.4.2",
+    "@hono/standard-validator": "^0.1.2",
     "@oslojs/crypto": "^1.0.1",
     "@oslojs/encoding": "^1.1.0",
     "arctic": "^3.1.0",
-    "hono": "4.6.15",
+    "hono": "4.7.0",
     "luxon": "^3.5.0",
     "nanoid": "^4.0.2",
     "ts-pattern": "^5.0.5",

@@ -59,10 +59,10 @@ export async function loader({ params }: Route.LoaderArgs) {
   }
 
   return superLoaderJson({
-    isAccessAuthValid: true as const,
+    isAccessAuthValid: true,
     template,
     directTemplateRecipient,
-  });
+  } as const);
 }
 
 export default function DirectTemplatePage() {

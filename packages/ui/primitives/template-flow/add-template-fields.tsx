@@ -61,13 +61,6 @@ import { Form, FormControl, FormField, FormItem, FormLabel } from '../form/form'
 import { useStep } from '../stepper';
 import type { TAddTemplateFieldsFormSchema } from './add-template-fields.types';
 
-// const fontCaveat = Caveat({
-//   weight: ['500'],
-//   subsets: ['latin'],
-//   display: 'swap',
-//   variable: '--font-caveat',
-// });
-
 const MIN_HEIGHT_PX = 12;
 const MIN_WIDTH_PX = 36;
 
@@ -696,8 +689,7 @@ export const AddTemplateFieldsFormPartial = ({
                         <CardContent className="flex flex-col items-center justify-center px-6 py-4">
                           <p
                             className={cn(
-                              'text-muted-foreground group-data-[selected]:text-foreground flex items-center justify-center gap-x-1.5 text-lg font-normal',
-                              // fontCaveat.className,
+                              'text-muted-foreground group-data-[selected]:text-foreground font-signature flex items-center justify-center gap-x-1.5 text-lg font-normal',
                             )}
                           >
                             <Trans>Signature</Trans>

@@ -2,8 +2,10 @@ import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
 import { Trans } from '@lingui/react/macro';
 import { Link } from 'react-router';
+import { getLoaderSession } from 'server/utils/get-loader-session';
 
 import { useSession } from '@documenso/lib/client-only/providers/session';
+import { prisma } from '@documenso/prisma';
 import { Alert, AlertDescription, AlertTitle } from '@documenso/ui/primitives/alert';
 import { Button } from '@documenso/ui/primitives/button';
 
@@ -13,13 +15,38 @@ import { ViewRecoveryCodesDialog } from '~/components/forms/2fa/view-recovery-co
 import { PasswordForm } from '~/components/forms/password';
 import { SettingsHeader } from '~/components/general/settings-header';
 
+import type { Route } from './+types';
+
 export function meta() {
   return [{ title: 'Security' }];
 }
 
-export default function SettingsSecurity() {
+export async function loader() {
+  const { user } = getLoaderSession();
+
+  const accounts = await prisma.account.findMany({
+    where: {
+      userId: user.id,
+    },
+    select: {
+      provider: true,
+    },
+  });
+
+  const providers = accounts.map((account) => account.provider);
+
+  return {
+    providers,
+  };
+}
+
+export default function SettingsSecurity({ loaderData }: Route.ComponentProps) {
+  const { providers } = loaderData;
+
   const { _ } = useLingui();
   const { user } = useSession();
+
+  const hasEmailPasswordAccount = providers.includes('DOCUMENSO');
 
   return (
     <div>
@@ -27,8 +54,7 @@ export default function SettingsSecurity() {
         title={_(msg`Security`)}
         subtitle={_(msg`Here you can manage your password and security settings.`)}
       />
-
-      {user.identityProvider === 'DOCUMENSO' && (
+      {hasEmailPasswordAccount && (
         <>
           <PasswordForm user={user} />
 
@@ -46,7 +72,7 @@ export default function SettingsSecurity() {
           </AlertTitle>
 
           <AlertDescription className="mr-4">
-            {user.identityProvider === 'DOCUMENSO' ? (
+            {hasEmailPasswordAccount ? (
               <Trans>
                 Add an authenticator to serve as a secondary authentication method when signing in,
                 or when signing documents.

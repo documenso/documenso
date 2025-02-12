@@ -4,7 +4,7 @@
   "type": "module",
   "scripts": {
     "build": "sh .bin/build.sh",
-    "build:app": "cross-env NODE_ENV=production react-router build",
+    "build:app": "npm run typecheck && cross-env NODE_ENV=production react-router build",
     "build:server": "cross-env NODE_ENV=production rollup -c rollup.config.mjs",
     "dev": "npm run with:env -- react-router dev",
     "start": "npm run with:env -- cross-env NODE_ENV=production node build/server/main.js",
@@ -26,7 +26,6 @@
     "@epic-web/remember": "^1.1.0",
     "@hono/node-server": "^1.13.7",
     "@hono/trpc-server": "^0.3.4",
-    "@hono/zod-validator": "^0.4.2",
     "@hookform/resolvers": "^3.1.0",
     "@lingui/core": "^5.2.0",
     "@lingui/detect-locale": "^5.2.0",
@@ -41,7 +40,7 @@
     "autoprefixer": "^10.4.13",
     "colord": "^2.9.3",
     "framer-motion": "^10.12.8",
-    "hono": "4.6.15",
+    "hono": "4.7.0",
     "hono-react-router-adapter": "^0.6.2",
     "input-otp": "^1.2.4",
     "isbot": "^5.1.17",
@@ -98,6 +97,7 @@
     "typescript": "5.6.2",
     "vite": "^6.1.0",
     "vite-plugin-babel-macros": "^1.0.6",
+    "vite-plugin-checker": "^0.8.0",
     "vite-tsconfig-paths": "^5.1.4"
   }
 }

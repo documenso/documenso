@@ -109,14 +109,12 @@ export const DocumentSigningAuth2FA = ({
               )}
             </p>
 
-            {user?.identityProvider === 'DOCUMENSO' && (
-              <p className="mt-2">
-                <Trans>
-                  By enabling 2FA, you will be required to enter a code from your authenticator app
-                  every time you sign in.
-                </Trans>
-              </p>
-            )}
+            <p className="mt-2">
+              <Trans>
+                By enabling 2FA, you will be required to enter a code from your authenticator app
+                every time you sign in using email password.
+              </Trans>
+            </p>
           </AlertDescription>
         </Alert>
         <DialogFooter>

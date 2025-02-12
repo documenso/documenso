@@ -9,37 +9,21 @@ import path from 'node:path';
 
 import { env } from '@documenso/lib/utils/env';
 
-import { NEXT_PUBLIC_WEBAPP_URL } from '../../constants/app';
 import { ONE_HOUR, ONE_SECOND } from '../../constants/time';
 import { alphaid } from '../id';
 
-export const getPresignPostUrl = async (fileName: string, contentType: string) => {
+export const getPresignPostUrl = async (fileName: string, contentType: string, userId?: number) => {
   const client = getS3Client();
 
   const { getSignedUrl } = await import('@aws-sdk/s3-request-presigner');
-
-  const token: { id: string } | null = null;
-
-  try {
-    const baseUrl = NEXT_PUBLIC_WEBAPP_URL();
-
-    // Todo
-    // token = await getToken({
-    //   req: new NextRequest(baseUrl, {
-    //     headers: headers(),
-    //   }),
-    // });
-  } catch (err) {
-    // Non server-component environment
-  }
 
   // Get the basename and extension for the file
   const { name, ext } = path.parse(fileName);
 
   let key = `${alphaid(12)}/${slugify(name)}${ext}`;
 
-  if (token) {
-    key = `${token.id}/${key}`;
+  if (userId) {
+    key = `${userId}/${key}`;
   }
 
   const putObjectCommand = new PutObjectCommand({
@@ -102,6 +86,31 @@ export const getPresignGetUrl = async (key: string) => {
   });
 
   return { key, url };
+};
+
+/**
+ * Uploads a file to S3.
+ */
+export const uploadS3File = async (file: File) => {
+  const client = getS3Client();
+
+  // Get the basename and extension for the file
+  const { name, ext } = path.parse(file.name);
+
+  const key = `${alphaid(12)}/${slugify(name)}${ext}`;
+
+  const fileBuffer = await file.arrayBuffer();
+
+  const response = await client.send(
+    new PutObjectCommand({
+      Bucket: env('NEXT_PRIVATE_UPLOAD_BUCKET'),
+      Key: key,
+      Body: Buffer.from(fileBuffer),
+      ContentType: file.type,
+    }),
+  );
+
+  return { key, response };
 };
 
 export const deleteS3File = async (key: string) => {

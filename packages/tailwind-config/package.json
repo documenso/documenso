@@ -2,6 +2,7 @@
   "name": "@documenso/tailwind-config",
   "version": "0.0.0",
   "main": "index.cjs",
+  "types": "index.d.ts",
   "license": "MIT",
   "scripts": {
     "clean": "rimraf node_modules"

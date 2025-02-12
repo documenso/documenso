@@ -60,7 +60,7 @@ export default function PublicProfilePage({ loaderData }: Route.ComponentProps) 
   const { _ } = useLingui();
   const { toast } = useToast();
 
-  const user = useSession();
+  const { user } = useSession();
   const team = useOptionalCurrentTeam();
 
   const [isPublicProfileVisible, setIsPublicProfileVisible] = useState(profile.enabled);

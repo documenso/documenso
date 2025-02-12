@@ -1,9 +1,9 @@
 import { type HTMLAttributes, useEffect, useState } from 'react';
 
-import type { User } from '@prisma/client';
 import { MenuIcon, SearchIcon } from 'lucide-react';
 import { Link, useLocation, useParams } from 'react-router';
 
+import type { SessionUser } from '@documenso/auth/server/lib/session/session';
 import type { TGetTeamsResponse } from '@documenso/lib/server-only/team/get-teams';
 import { getRootHref } from '@documenso/lib/utils/params';
 import { cn } from '@documenso/ui/lib/utils';
@@ -16,7 +16,7 @@ import { AppNavMobile } from './app-nav-mobile';
 import { MenuSwitcher } from './menu-switcher';
 
 export type HeaderProps = HTMLAttributes<HTMLDivElement> & {
-  user: User;
+  user: SessionUser;
   teams: TGetTeamsResponse;
 };
 

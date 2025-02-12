@@ -137,7 +137,8 @@ export default function DocumentPage() {
 
   const { recipients, documentData, documentMeta } = document;
 
-  const isDocumentHistoryEnabled = false; // Todo: Was flag
+  // This was a feature flag. Leave to false since it's not ready.
+  const isDocumentHistoryEnabled = false;
 
   return (
     <div className="mx-auto -mt-4 w-full max-w-screen-xl px-4 md:px-8">

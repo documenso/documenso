@@ -8,7 +8,10 @@ import type { RequestMetadata } from '../../universal/extract-request-metadata';
 import { validateTwoFactorAuthentication } from './validate-2fa';
 
 type DisableTwoFactorAuthenticationOptions = {
-  user: Pick<User, 'id' | 'email' | 'twoFactorEnabled' | 'twoFactorSecret'>;
+  user: Pick<
+    User,
+    'id' | 'email' | 'twoFactorEnabled' | 'twoFactorSecret' | 'twoFactorBackupCodes'
+  >;
   totpCode?: string;
   backupCode?: string;
   requestMetadata?: RequestMetadata;

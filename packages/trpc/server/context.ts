@@ -1,10 +1,11 @@
 import type { Context } from 'hono';
 import { z } from 'zod';
 
+import type { SessionUser } from '@documenso/auth/server/lib/session/session';
 import { getSession } from '@documenso/auth/server/lib/utils/get-session';
 import type { ApiRequestMetadata } from '@documenso/lib/universal/extract-request-metadata';
 import { extractRequestMetadata } from '@documenso/lib/universal/extract-request-metadata';
-import type { Session, User } from '@documenso/prisma/client';
+import type { Session } from '@documenso/prisma/client';
 
 type CreateTrpcContextOptions = {
   c: Context;
@@ -59,7 +60,7 @@ export type TrpcContext = (
     }
   | {
       session: Session;
-      user: User;
+      user: SessionUser;
     }
 ) & {
   teamId: number | undefined;

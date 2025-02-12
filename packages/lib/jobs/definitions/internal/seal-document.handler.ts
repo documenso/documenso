@@ -19,8 +19,8 @@ import {
   ZWebhookDocumentSchema,
   mapDocumentToWebhookDocumentPayload,
 } from '../../../types/webhook-payload';
-import { getFile } from '../../../universal/upload/get-file';
-import { putPdfFile } from '../../../universal/upload/put-file';
+import { getFileServerSide } from '../../../universal/upload/get-file.server';
+import { putPdfFileServerSide } from '../../../universal/upload/put-file.server';
 import { fieldsContainUnsignedRequiredField } from '../../../utils/advanced-fields-helpers';
 import { createDocumentAuditLogData } from '../../../utils/document-audit-logs';
 import type { JobRunIO } from '../../client/_internal/job';
@@ -114,7 +114,7 @@ export const run = async ({
     documentData.data = documentData.initialData;
   }
 
-  const pdfData = await getFile(documentData);
+  const pdfData = await getFileServerSide(documentData);
 
   const certificateData =
     (document.team?.teamGlobalSettings?.includeSigningCertificate ?? true)
@@ -160,7 +160,7 @@ export const run = async ({
 
     const { name } = path.parse(document.title);
 
-    const documentData = await putPdfFile({
+    const documentData = await putPdfFileServerSide({
       name: `${name}_signed.pdf`,
       type: 'application/pdf',
       arrayBuffer: async () => Promise.resolve(pdfBuffer),

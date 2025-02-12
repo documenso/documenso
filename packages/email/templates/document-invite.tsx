@@ -31,7 +31,7 @@ export const DocumentInviteEmailTemplate = ({
   role,
   selfSigner = false,
   isTeamInvite = false,
-  teamName,
+  teamName = '',
   includeSenderDetails,
 }: DocumentInviteEmailTemplateProps) => {
   const { _ } = useLingui();

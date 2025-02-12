@@ -114,9 +114,11 @@ export const run = async ({
     emailMessage = customEmail?.message ?? '';
 
     if (!emailMessage) {
+      const inviterName = user.name || '';
+
       emailMessage = i18n._(
         team.teamGlobalSettings?.includeSenderDetails
-          ? msg`${user.name} on behalf of "${team.name}" has invited you to ${recipientActionVerb} the document "${document.title}".`
+          ? msg`${inviterName} on behalf of "${team.name}" has invited you to ${recipientActionVerb} the document "${document.title}".`
           : msg`${team.name} has invited you to ${recipientActionVerb} the document "${document.title}".`,
       );
     }

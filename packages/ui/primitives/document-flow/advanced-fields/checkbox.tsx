@@ -20,15 +20,13 @@ export const CheckboxField = ({ field }: CheckboxFieldProps) => {
   }
 
   if (parsedFieldMeta && (!parsedFieldMeta.values || parsedFieldMeta.values.length === 0)) {
-    return (
-      <FieldIcon fieldMeta={field.fieldMeta} type={field.type} signerEmail={field.signerEmail} />
-    );
+    return <FieldIcon fieldMeta={field.fieldMeta} type={field.type} />;
   }
 
   return (
     <div className="flex flex-col gap-y-1">
       {!parsedFieldMeta?.values ? (
-        <FieldIcon fieldMeta={field.fieldMeta} type={field.type} signerEmail={field.signerEmail} />
+        <FieldIcon fieldMeta={field.fieldMeta} type={field.type} />
       ) : (
         parsedFieldMeta.values.map((item: { value: string; checked: boolean }, index: number) => (
           <div key={index} className="flex items-center gap-x-1.5">

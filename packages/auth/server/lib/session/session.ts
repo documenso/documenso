@@ -5,14 +5,28 @@ import { type Session, type User, UserSecurityAuditLogType } from '@prisma/clien
 import type { RequestMetadata } from '@documenso/lib/universal/extract-request-metadata';
 import { prisma } from '@documenso/prisma';
 
+/**
+ * The user object to pass around the app.
+ *
+ * Do not put anything sensitive in here since it will be public.
+ */
+export type SessionUser = Pick<
+  User,
+  | 'id'
+  | 'name'
+  | 'email'
+  | 'emailVerified'
+  | 'avatarImageId'
+  | 'twoFactorEnabled'
+  | 'roles'
+  | 'signature'
+  | 'url'
+>;
+
 export type SessionValidationResult =
   | {
       session: Session;
-      user: User;
-      // user: Pick<
-      //   User,
-      //   'id' | 'name' | 'email' | 'emailVerified' | 'avatarImageId' | 'twoFactorEnabled' | 'roles' // Todo
-      // >;
+      user: SessionUser;
       isAuthenticated: true;
     }
   | { session: null; user: null; isAuthenticated: false };
@@ -36,7 +50,7 @@ export const createSession = async (
 
   const session: Session = {
     id: hashedSessionId,
-    sessionToken: hashedSessionId, // todo
+    sessionToken: hashedSessionId,
     userId,
     updatedAt: new Date(),
     createdAt: new Date(),
@@ -69,23 +83,26 @@ export const validateSessionToken = async (token: string): Promise<SessionValida
       id: sessionId,
     },
     include: {
-      user: true,
+      user: {
+        /**
+         * Do not expose anything sensitive here.
+         */
+        select: {
+          id: true,
+          name: true,
+          email: true,
+          emailVerified: true,
+          avatarImageId: true,
+          twoFactorEnabled: true,
+          roles: true,
+          signature: true,
+          url: true,
+        },
+      },
     },
   });
 
-  // user: {
-  //   select: {
-  //     id: true,
-  //     name: true,
-  //     email: true,
-  //     emailVerified: true,
-  //     avatarImageId: true,
-  //     twoFactorEnabled: true,
-  //   },
-  // },
-
-  // todo; how can result.user be null?
-  if (result === null || !result.user) {
+  if (!result?.user) {
     return { session: null, user: null, isAuthenticated: false };
   }
 

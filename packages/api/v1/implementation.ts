@@ -42,8 +42,8 @@ import {
   ZRadioFieldMeta,
   ZTextFieldMeta,
 } from '@documenso/lib/types/field-meta';
-import { getFile } from '@documenso/lib/universal/upload/get-file';
-import { putPdfFile } from '@documenso/lib/universal/upload/put-file';
+import { getFileServerSide } from '@documenso/lib/universal/upload/get-file.server';
+import { putPdfFileServerSide } from '@documenso/lib/universal/upload/put-file.server';
 import {
   getPresignGetUrl,
   getPresignPostUrl,
@@ -490,14 +490,14 @@ export const ApiContractV1Implementation = tsr.router(ApiContractV1, {
     let documentDataId = document.documentDataId;
 
     if (body.formValues) {
-      const pdf = await getFile(document.documentData);
+      const pdf = await getFileServerSide(document.documentData);
 
       const prefilled = await insertFormValuesInPdf({
         pdf: Buffer.from(pdf),
         formValues: body.formValues,
       });
 
-      const newDocumentData = await putPdfFile({
+      const newDocumentData = await putPdfFileServerSide({
         name: fileName,
         type: 'application/pdf',
         arrayBuffer: async () => Promise.resolve(prefilled),
@@ -598,14 +598,14 @@ export const ApiContractV1Implementation = tsr.router(ApiContractV1, {
     if (body.formValues) {
       const fileName = document.title.endsWith('.pdf') ? document.title : `${document.title}.pdf`;
 
-      const pdf = await getFile(document.documentData);
+      const pdf = await getFileServerSide(document.documentData);
 
       const prefilled = await insertFormValuesInPdf({
         pdf: Buffer.from(pdf),
         formValues: body.formValues,
       });
 
-      const newDocumentData = await putPdfFile({
+      const newDocumentData = await putPdfFileServerSide({
         name: fileName,
         type: 'application/pdf',
         arrayBuffer: async () => Promise.resolve(prefilled),

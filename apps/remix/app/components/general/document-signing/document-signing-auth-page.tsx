@@ -27,7 +27,7 @@ export const DocumentSigningAuthPageView = ({
       setIsSigningOut(true);
 
       await authClient.signOut({
-        redirectUrl: emailHasAccount ? `/signin#email=${email}` : `/signup#email=${email}`,
+        redirectPath: emailHasAccount ? `/signin#email=${email}` : `/signup#email=${email}`,
       });
     } catch {
       toast({

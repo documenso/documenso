@@ -12,7 +12,7 @@ import { NEXT_PUBLIC_WEBAPP_URL } from '../../constants/app';
 import { DOCUMENT_AUDIT_LOG_TYPE } from '../../types/document-audit-logs';
 import { extractDerivedDocumentEmailSettings } from '../../types/document-email';
 import type { RequestMetadata } from '../../universal/extract-request-metadata';
-import { getFile } from '../../universal/upload/get-file';
+import { getFileServerSide } from '../../universal/upload/get-file.server';
 import { createDocumentAuditLogData } from '../../utils/document-audit-logs';
 import { env } from '../../utils/env';
 import { renderCustomEmailTemplate } from '../../utils/render-custom-email-template';
@@ -57,7 +57,7 @@ export const sendCompletedEmail = async ({ documentId, requestMetadata }: SendDo
 
   const { user: owner } = document;
 
-  const completedDocument = await getFile(document.documentData);
+  const completedDocument = await getFileServerSide(document.documentData);
 
   const assetBaseUrl = NEXT_PUBLIC_WEBAPP_URL() || 'http://localhost:3000';
 

@@ -20,14 +20,6 @@ import { cn } from '../../lib/utils';
 import { getSvgPathFromStroke } from './helper';
 import { Point } from './point';
 
-// Todo
-// const fontCaveat = Caveat({
-//   weight: ['500'],
-//   subsets: ['latin'],
-//   display: 'swap',
-//   variable: '--font-caveat',
-// });
-
 const DPI = 2;
 
 const isBase64Image = (value: string) => value.startsWith('data:image/png;base64,');
@@ -309,8 +301,7 @@ export const SignaturePad = ({
       if (ctx) {
         const canvasWidth = $el.current.width;
         const canvasHeight = $el.current.height;
-        // const fontFamily = String(fontCaveat.style.fontFamily);
-        const fontFamily = 'sans-serif';
+        const fontFamily = 'Caveat';
 
         ctx.clearRect(0, 0, canvasWidth, canvasHeight);
         ctx.textAlign = 'center';

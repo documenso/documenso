@@ -3,10 +3,10 @@ import type { HTMLAttributes } from 'react';
 import type { MessageDescriptor } from '@lingui/core';
 import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
-import type { ExtendedDocumentStatus } from '@prisma/types/extended-document-status';
 import { CheckCircle2, Clock, File } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react/dist/lucide-react';
 
+import type { ExtendedDocumentStatus } from '@documenso/prisma/types/extended-document-status';
 import { SignatureIcon } from '@documenso/ui/icons/signature';
 import { cn } from '@documenso/ui/lib/utils';
 

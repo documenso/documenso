@@ -1,3 +1,4 @@
+import linguiMacro from '@lingui/babel-plugin-lingui-macro';
 import babel from '@rollup/plugin-babel';
 import commonjs from '@rollup/plugin-commonjs';
 import resolve from '@rollup/plugin-node-resolve';
@@ -21,7 +22,7 @@ const config = {
   external: [/node_modules/],
   plugins: [
     typescript({
-      // noEmitOnError: true,
+      noEmitOnError: true,
       moduleResolution: 'bundler',
       include: ['server/**/*', '../../packages/**/*', '../../packages/lib/translations/**/*'],
     }),
@@ -33,6 +34,7 @@ const config = {
         '@documenso/auth/*',
         '@documenso/lib/*',
         '@documenso/trpc/*',
+        '@documenso/email/*',
       ],
       extensions: ['.ts', '.tsx', '.js', '.jsx', '.json'],
     }),
@@ -41,7 +43,7 @@ const config = {
       babelHelpers: 'bundled',
       extensions: ['.js', '.ts', '.tsx'],
       presets: ['@babel/preset-typescript'],
-      plugins: ['@lingui/babel-plugin-lingui-macro'],
+      plugins: [linguiMacro],
     }),
   ],
 };

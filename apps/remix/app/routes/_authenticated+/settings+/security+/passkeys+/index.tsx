@@ -1,7 +1,7 @@
 import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
 
-import { CreatePasskeyDialog } from '~/components/dialogs/create-passkey-dialog';
+import { PasskeyCreateDialog } from '~/components/dialogs/passkey-create-dialog';
 import { SettingsHeader } from '~/components/general/settings-header';
 import { SettingsSecurityPasskeyTable } from '~/components/tables/settings-security-passkey-table';
 
@@ -21,7 +21,7 @@ export default function SettingsPasskeys() {
         subtitle={_(msg`Manage your passkeys.`)}
         hideDivider={true}
       >
-        <CreatePasskeyDialog />
+        <PasskeyCreateDialog />
       </SettingsHeader>
 
       <div className="mt-4">

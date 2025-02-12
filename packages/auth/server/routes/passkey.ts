@@ -1,4 +1,4 @@
-import { zValidator } from '@hono/zod-validator';
+import { sValidator } from '@hono/standard-validator';
 import { UserSecurityAuditLogType } from '@prisma/client';
 import { verifyAuthenticationResponse } from '@simplewebauthn/server';
 import { Hono } from 'hono';
@@ -17,7 +17,7 @@ export const passkeyRoute = new Hono<HonoAuthContext>()
   /**
    * Authorize endpoint.
    */
-  .post('/authorize', zValidator('json', ZPasskeyAuthorizeSchema), async (c) => {
+  .post('/authorize', sValidator('json', ZPasskeyAuthorizeSchema), async (c) => {
     const requestMetadata = c.get('requestMetadata');
 
     const { csrfToken, credential } = c.req.valid('json');
@@ -129,7 +129,7 @@ export const passkeyRoute = new Hono<HonoAuthContext>()
 
 // .post(
 //   '/pre-authenticate',
-//   zValidator(
+//   sValidator(
 //     'json',
 //     z.object({
 //       code: z.string(),

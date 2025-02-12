@@ -1,8 +1,9 @@
 import { createContext, useContext, useEffect, useMemo, useState } from 'react';
 
-import { type Document, FieldType, type Passkey, type Recipient, type User } from '@prisma/client';
+import { type Document, FieldType, type Passkey, type Recipient } from '@prisma/client';
 import { match } from 'ts-pattern';
 
+import type { SessionUser } from '@documenso/auth/server/lib/session/session';
 import { MAXIMUM_PASSKEYS } from '@documenso/lib/constants/auth';
 import type {
   TDocumentAuthOptions,
@@ -40,7 +41,7 @@ export type DocumentSigningAuthContextValue = {
   passkeyData: PasskeyData;
   preferredPasskeyId: string | null;
   setPreferredPasskeyId: (_value: string | null) => void;
-  user?: User | null;
+  user?: SessionUser | null;
   refetchPasskeys: () => Promise<void>;
 };
 
@@ -63,7 +64,7 @@ export const useRequiredDocumentSigningAuthContext = () => {
 export interface DocumentSigningAuthProviderProps {
   documentAuthOptions: Document['authOptions'];
   recipient: Recipient;
-  user?: User | null;
+  user?: SessionUser | null;
   children: React.ReactNode;
 }
 

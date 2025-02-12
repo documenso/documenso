@@ -32,7 +32,7 @@ import {
   SelectValue,
 } from '@documenso/ui/primitives/select';
 
-import { CreatePasskeyDialog } from '~/components/dialogs/create-passkey-dialog';
+import { PasskeyCreateDialog } from '~/components/dialogs/passkey-create-dialog';
 
 import { useRequiredDocumentSigningAuthContext } from './document-signing-auth-provider';
 
@@ -190,7 +190,7 @@ export const DocumentSigningAuthPasskey = ({
             <Trans>Cancel</Trans>
           </Button>
 
-          <CreatePasskeyDialog
+          <PasskeyCreateDialog
             onSuccess={async () => refetchPasskeys()}
             trigger={
               <Button>

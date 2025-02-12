@@ -35,7 +35,7 @@ export const DocumentSigningAuthAccount = ({
       setIsSigningOut(true);
 
       await authClient.signOut({
-        redirectUrl: `/signin#email=${email}`,
+        redirectPath: `/signin#email=${email}`,
       });
     } catch {
       setIsSigningOut(false);

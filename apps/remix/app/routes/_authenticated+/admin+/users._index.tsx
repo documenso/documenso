@@ -6,7 +6,7 @@ import { findUsers } from '@documenso/lib/server-only/user/get-all-users';
 
 import { AdminDashboardUsersTable } from '~/components/tables/admin-dashboard-users-table';
 
-import type { Route } from './+types/users';
+import type { Route } from './+types/users._index';
 
 export async function loader({ request }: Route.LoaderArgs) {
   const url = new URL(request.url);

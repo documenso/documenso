@@ -196,7 +196,7 @@ export const DocumentsTableActionDropdown = ({ row }: DocumentsTableActionDropdo
           />
         )}
 
-        <DocumentResendDialog document={row} recipients={nonSignedRecipients} team={team} />
+        <DocumentResendDialog document={row} recipients={nonSignedRecipients} />
 
         <DocumentShareButton
           documentId={row.id}

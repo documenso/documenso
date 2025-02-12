@@ -3,12 +3,12 @@ import { useState } from 'react';
 import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
 import { Trans } from '@lingui/react/macro';
-import type { User } from '@prisma/client';
 import { motion } from 'framer-motion';
 import { CheckCircle2, ChevronsUpDown, Plus, Settings2 } from 'lucide-react';
 import { Link, useLocation } from 'react-router';
 
 import { authClient } from '@documenso/auth/client';
+import type { SessionUser } from '@documenso/auth/server/lib/session/session';
 import { TEAM_MEMBER_ROLE_MAP, TEAM_URL_REGEX } from '@documenso/lib/constants/teams';
 import { isAdmin } from '@documenso/lib/next-auth/guards/is-admin';
 import type { TGetTeamsResponse } from '@documenso/lib/server-only/team/get-teams';
@@ -32,7 +32,7 @@ import {
 const MotionLink = motion(Link);
 
 export type MenuSwitcherProps = {
-  user: User;
+  user: SessionUser;
   teams: TGetTeamsResponse;
 };
 

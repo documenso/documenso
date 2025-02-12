@@ -1,14 +1,15 @@
 import { createContext, useContext } from 'react';
 import React from 'react';
 
-import type { Session, User } from '@documenso/prisma/client';
+import type { SessionUser } from '@documenso/auth/server/lib/session/session';
+import type { Session } from '@documenso/prisma/client';
 
 import type { TGetTeamByUrlResponse } from '../../server-only/team/get-team';
 import type { TGetTeamsResponse } from '../../server-only/team/get-teams';
 
 export type AppSession = {
   session: Session;
-  user: User; // Todo: Remove password, and redundant fields.
+  user: SessionUser;
   currentTeam: TGetTeamByUrlResponse | null;
   teams: TGetTeamsResponse;
 };

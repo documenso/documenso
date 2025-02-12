@@ -7,7 +7,7 @@ export type GetFileOptions = {
   data: string;
 };
 
-export const getFile = async ({ type, data }: GetFileOptions) => {
+export const getFileServerSide = async ({ type, data }: GetFileOptions) => {
   return await match(type)
     .with(DocumentDataType.BYTES, () => getFileFromBytes(data))
     .with(DocumentDataType.BYTES_64, () => getFileFromBytes64(data))
@@ -30,23 +30,9 @@ const getFileFromBytes64 = (data: string) => {
 };
 
 const getFileFromS3 = async (key: string) => {
-  const getPresignedUrlResponse = await fetch(`/api/files/presigned-get-url`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({
-      key,
-    }),
-  });
+  const { getPresignGetUrl } = await import('./server-actions');
 
-  if (!getPresignedUrlResponse.ok) {
-    throw new Error(
-      `Failed to get presigned url with key "${key}", failed with status code ${getPresignedUrlResponse.status}`,
-    );
-  }
-
-  const { url } = await getPresignedUrlResponse.json();
+  const { url } = await getPresignGetUrl(key);
 
   const response = await fetch(url, {
     method: 'GET',

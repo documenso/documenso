@@ -14,8 +14,8 @@ import {
   mapDocumentToWebhookDocumentPayload,
 } from '../../types/webhook-payload';
 import type { RequestMetadata } from '../../universal/extract-request-metadata';
-import { getFile } from '../../universal/upload/get-file';
-import { putPdfFile } from '../../universal/upload/put-file';
+import { getFileServerSide } from '../../universal/upload/get-file.server';
+import { putPdfFileServerSide } from '../../universal/upload/put-file.server';
 import { fieldsContainUnsignedRequiredField } from '../../utils/advanced-fields-helpers';
 import { getCertificatePdf } from '../htmltopdf/get-certificate-pdf';
 import { flattenAnnotations } from '../pdf/flatten-annotations';
@@ -102,7 +102,7 @@ export const sealDocument = async ({
   }
 
   // !: Need to write the fields onto the document as a hard copy
-  const pdfData = await getFile(documentData);
+  const pdfData = await getFileServerSide(documentData);
 
   const certificateData =
     (document.team?.teamGlobalSettings?.includeSigningCertificate ?? true)
@@ -142,7 +142,7 @@ export const sealDocument = async ({
 
   const { name } = path.parse(document.title);
 
-  const { data: newData } = await putPdfFile({
+  const { data: newData } = await putPdfFileServerSide({
     name: `${name}_signed.pdf`,
     type: 'application/pdf',
     arrayBuffer: async () => Promise.resolve(pdfBuffer),
