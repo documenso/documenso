@@ -6,6 +6,8 @@ import { useSecureCookies } from '@documenso/lib/constants/auth';
 import { appLog } from '@documenso/lib/utils/debugger';
 import { env } from '@documenso/lib/utils/env';
 
+import { generateSessionToken } from './session';
+
 export const sessionCookieName = 'sessionId';
 
 const getAuthSecret = () => {
@@ -30,7 +32,7 @@ const getAuthDomain = () => {
 export const sessionCookieOptions = {
   httpOnly: true,
   path: '/',
-  sameSite: useSecureCookies ? 'none' : 'lax',
+  sameSite: useSecureCookies ? 'none' : 'lax', // Todo: This feels wrong?
   secure: useSecureCookies,
   domain: getAuthDomain(),
   // Todo: Max age for specific auth cookies.
@@ -88,4 +90,24 @@ export const setSessionCookie = async (c: Context, sessionToken: string) => {
  */
 export const deleteSessionCookie = (c: Context) => {
   deleteCookie(c, sessionCookieName, sessionCookieOptions);
+};
+
+export const getCsrfCookie = async (c: Context) => {
+  const csrfToken = await getSignedCookie(c, getAuthSecret(), 'csrfToken');
+
+  return csrfToken || null;
+};
+
+export const setCsrfCookie = async (c: Context) => {
+  const csrfToken = generateSessionToken();
+
+  await setSignedCookie(c, 'csrfToken', csrfToken, getAuthSecret(), {
+    ...sessionCookieOptions,
+
+    // Explicity set to undefined for session lived cookie.
+    expires: undefined,
+    maxAge: undefined,
+  });
+
+  return csrfToken;
 };

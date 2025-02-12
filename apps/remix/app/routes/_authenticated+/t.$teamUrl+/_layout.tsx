@@ -19,7 +19,7 @@ export const loader = () => {
   const { currentTeam } = getLoaderSession();
 
   if (!currentTeam) {
-    throw redirect('/documents');
+    throw redirect('/settings/teams');
   }
 
   const trpcHeaders = {

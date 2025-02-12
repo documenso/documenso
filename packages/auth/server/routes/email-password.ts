@@ -25,6 +25,7 @@ import { prisma } from '@documenso/prisma';
 import { UserSecurityAuditLogType } from '@documenso/prisma/client';
 
 import { AuthenticationErrorCode } from '../lib/errors/error-codes';
+import { getCsrfCookie } from '../lib/session/session-cookies';
 import { onAuthorize } from '../lib/utils/authorizer';
 import { getRequiredSession, getSession } from '../lib/utils/get-session';
 import type { HonoAuthContext } from '../types/context';
@@ -45,7 +46,16 @@ export const emailPasswordRoute = new Hono<HonoAuthContext>()
   .post('/authorize', sValidator('json', ZSignInSchema), async (c) => {
     const requestMetadata = c.get('requestMetadata');
 
-    const { email, password, totpCode, backupCode } = c.req.valid('json');
+    const { email, password, totpCode, backupCode, csrfToken } = c.req.valid('json');
+
+    const csrfCookieToken = await getCsrfCookie(c);
+
+    // Todo: Add logging here.
+    if (csrfToken !== csrfCookieToken || !csrfCookieToken) {
+      throw new AppError(AuthenticationErrorCode.InvalidRequest, {
+        message: 'Invalid CSRF token',
+      });
+    }
 
     const user = await prisma.user.findFirst({
       where: {

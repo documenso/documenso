@@ -1,7 +1,6 @@
 import type { Context, Next } from 'hono';
 import { getCookie } from 'hono/cookie';
 
-import { setCsrfCookie } from '@documenso/auth/server/lib/session/session-cookies';
 import { AppLogger } from '@documenso/lib/utils/debugger';
 
 const logger = new AppLogger('Middleware');
@@ -32,14 +31,6 @@ export const appMiddleware = async (c: Context, next: Next) => {
   const referrerUrl = referrer ? new URL(referrer) : null;
   const referrerPathname = referrerUrl ? referrerUrl.pathname : null;
 
-  // Set csrf token if not set.
-  const csrfToken = getCookie(c, 'csrfToken');
-
-  // Todo: Currently not working.
-  if (!csrfToken) {
-    await setCsrfCookie(c);
-  }
-
   // // Whether to reset the preferred team url cookie if the user accesses a non team page from a team page.
   // const resetPreferredTeamUrl =
   //   referrerPathname &&
@@ -59,24 +50,6 @@ export const appMiddleware = async (c: Context, next: Next) => {
   //   return c.redirect(redirectUrl);
   // }
 
-  // // Redirect `/t` to `/settings/teams`.
-  // if (path === '/t' || path === '/t/') {
-  //   logger.log('Redirecting to /settings/teams');
-
-  //   const redirectUrl = new URL('/settings/teams', req.url);
-  //   return c.redirect(redirectUrl);
-  // }
-
-  // // Redirect `/t/<team_url>` to `/t/<team_url>/documents`.
-  // if (TEAM_URL_ROOT_REGEX.test(path)) {
-  //   logger.log('Redirecting team documents');
-
-  //   const redirectUrl = new URL(`${path}/documents`, req.url);
-  //   setCookie(c, 'preferred-team-url', path.replace('/t/', ''));
-
-  //   return c.redirect(redirectUrl);
-  // }
-
   // // Set the preferred team url cookie if user accesses a team page.
   // if (path.startsWith('/t/')) {
   //   setCookie(c, 'preferred-team-url', path.split('/')[2]);
@@ -90,6 +63,4 @@ export const appMiddleware = async (c: Context, next: Next) => {
   //   deleteCookie(c, 'preferred-team-url');
   //   return next();
   // }
-
-  return next();
 };

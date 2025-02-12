@@ -53,8 +53,16 @@ export class AuthClient {
   }
 
   public emailPassword = {
-    signIn: async (data: TEmailPasswordSignin) => {
-      const response = await this.client['email-password'].authorize.$post({ json: data });
+    signIn: async (data: Omit<TEmailPasswordSignin, 'csrfToken'>) => {
+      const { csrfToken } = await this.client.csrf.$get().then(async (res) => res.json());
+
+      const response = await this.client['email-password'].authorize.$post({
+        json: {
+          ...data,
+          csrfToken,
+        },
+      });
+
       await this.handleError(response);
 
       handleSignInRedirect(data.redirectPath);

@@ -9,7 +9,6 @@ import { openApiDocument } from '@documenso/trpc/server/open-api';
 
 import { filesRoute } from './api/files';
 import { type AppContext, appContext } from './context';
-import { appMiddleware } from './middleware';
 import { openApiTrpcServerHandler } from './trpc/hono-trpc-open-api';
 import { reactRouterTrpcServer } from './trpc/hono-trpc-remix';
 
@@ -30,7 +29,7 @@ app.use(appContext);
 /**
  * Middleware for initial page loads.
  */
-app.use('*', appMiddleware);
+// app.use('*', appMiddleware);
 
 // Auth server.
 app.route('/api/auth', auth);

@@ -10,6 +10,7 @@ export const ZSignInSchema = z.object({
   password: ZCurrentPasswordSchema,
   totpCode: z.string().trim().optional(),
   backupCode: z.string().trim().optional(),
+  csrfToken: z.string().trim(),
 });
 
 export type TSignInSchema = z.infer<typeof ZSignInSchema>;

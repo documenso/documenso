@@ -5,8 +5,9 @@ import { formatDocumentsPath } from '@documenso/lib/utils/teams';
 
 export function loader() {
   const { currentTeam } = getLoaderSession();
+
   if (!currentTeam) {
-    throw redirect('/documents');
+    throw redirect('/settings/teams');
   }
 
   throw redirect(formatDocumentsPath(currentTeam.url));
