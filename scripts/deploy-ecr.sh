@@ -12,7 +12,7 @@ echo "Building Documenso webapp!"
 npm run prisma:generate
 npm run prisma:migrate-deploy
 
-npm run build:web
+npm run build
 
 # ECR is in production only, so use prod credentials
 
@@ -20,6 +20,7 @@ aws ecr get-login-password --region us-west-2 | docker login --username AWS --pa
 docker buildx build \
     -f "$SCRIPT_DIR/../docker/Dockerfile" \
     -t "sunrebel/documenso" \
+    -t "806620123734.dkr.ecr.us-west-2.amazonaws.com/sunrebel/documenso:$CI_COMMIT_SHORT_SHA" \
     "$MONOREPO_ROOT"
     
 docker tag sunrebel/documenso:latest 806620123734.dkr.ecr.us-west-2.amazonaws.com/sunrebel/documenso:latest
