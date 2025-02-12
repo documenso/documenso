@@ -12,7 +12,7 @@ import {
   ZRadioFieldMeta,
   ZTextFieldMeta,
 } from '@documenso/lib/types/field-meta';
-import type { DocumentMeta, Recipient, TemplateMeta } from '@documenso/prisma/client';
+import type { DocumentMeta, TemplateMeta } from '@documenso/prisma/client';
 import { type Field, FieldType } from '@documenso/prisma/client';
 import type { FieldWithSignatureAndFieldMeta } from '@documenso/prisma/types/field-with-signature-and-fieldmeta';
 import type {
@@ -33,7 +33,6 @@ import { SignatureField } from '~/app/(signing)/sign/[token]/signature-field';
 import { TextField } from '~/app/(signing)/sign/[token]/text-field';
 
 export type EmbedDocumentFieldsProps = {
-  recipient: Recipient;
   fields: Field[];
   metadata?: DocumentMeta | TemplateMeta | null;
   onSignField?: (value: TSignFieldWithTokenMutationSchema) => Promise<void> | void;
@@ -41,7 +40,6 @@ export type EmbedDocumentFieldsProps = {
 };
 
 export const EmbedDocumentFields = ({
-  recipient,
   fields,
   metadata,
   onSignField,
@@ -55,7 +53,6 @@ export const EmbedDocumentFields = ({
             <SignatureField
               key={field.id}
               field={field}
-              recipient={recipient}
               onSignField={onSignField}
               onUnsignField={onUnsignField}
               typedSignatureEnabled={metadata?.typedSignatureEnabled}
@@ -65,7 +62,6 @@ export const EmbedDocumentFields = ({
             <InitialsField
               key={field.id}
               field={field}
-              recipient={recipient}
               onSignField={onSignField}
               onUnsignField={onUnsignField}
             />
@@ -74,7 +70,6 @@ export const EmbedDocumentFields = ({
             <NameField
               key={field.id}
               field={field}
-              recipient={recipient}
               onSignField={onSignField}
               onUnsignField={onUnsignField}
             />
@@ -83,7 +78,6 @@ export const EmbedDocumentFields = ({
             <DateField
               key={field.id}
               field={field}
-              recipient={recipient}
               onSignField={onSignField}
               onUnsignField={onUnsignField}
               dateFormat={metadata?.dateFormat ?? DEFAULT_DOCUMENT_DATE_FORMAT}
@@ -94,7 +88,6 @@ export const EmbedDocumentFields = ({
             <EmailField
               key={field.id}
               field={field}
-              recipient={recipient}
               onSignField={onSignField}
               onUnsignField={onUnsignField}
             />
@@ -109,7 +102,6 @@ export const EmbedDocumentFields = ({
               <TextField
                 key={field.id}
                 field={fieldWithMeta}
-                recipient={recipient}
                 onSignField={onSignField}
                 onUnsignField={onUnsignField}
               />
@@ -125,7 +117,6 @@ export const EmbedDocumentFields = ({
               <NumberField
                 key={field.id}
                 field={fieldWithMeta}
-                recipient={recipient}
                 onSignField={onSignField}
                 onUnsignField={onUnsignField}
               />
@@ -141,7 +132,6 @@ export const EmbedDocumentFields = ({
               <RadioField
                 key={field.id}
                 field={fieldWithMeta}
-                recipient={recipient}
                 onSignField={onSignField}
                 onUnsignField={onUnsignField}
               />
@@ -157,7 +147,6 @@ export const EmbedDocumentFields = ({
               <CheckboxField
                 key={field.id}
                 field={fieldWithMeta}
-                recipient={recipient}
                 onSignField={onSignField}
                 onUnsignField={onUnsignField}
               />
@@ -173,7 +162,6 @@ export const EmbedDocumentFields = ({
               <DropdownField
                 key={field.id}
                 field={fieldWithMeta}
-                recipient={recipient}
                 onSignField={onSignField}
                 onUnsignField={onUnsignField}
               />

@@ -47,6 +47,7 @@ import { NameField } from '~/app/(signing)/sign/[token]/name-field';
 import { NumberField } from '~/app/(signing)/sign/[token]/number-field';
 import { useRequiredSigningContext } from '~/app/(signing)/sign/[token]/provider';
 import { RadioField } from '~/app/(signing)/sign/[token]/radio-field';
+import { RecipientProvider } from '~/app/(signing)/sign/[token]/recipient-context';
 import { SignDialog } from '~/app/(signing)/sign/[token]/sign-dialog';
 import { SignatureField } from '~/app/(signing)/sign/[token]/signature-field';
 import { TextField } from '~/app/(signing)/sign/[token]/text-field';
@@ -169,7 +170,7 @@ export const SignDirectTemplateForm = ({
   };
 
   return (
-    <>
+    <RecipientProvider recipient={directRecipient}>
       <DocumentFlowFormContainerHeader title={flowStep.title} description={flowStep.description} />
 
       <DocumentFlowFormContainerContent>
@@ -186,16 +187,15 @@ export const SignDirectTemplateForm = ({
                 <SignatureField
                   key={field.id}
                   field={field}
-                  recipient={directRecipient}
                   onSignField={onSignField}
                   onUnsignField={onUnsignField}
+                  typedSignatureEnabled={template.templateMeta?.typedSignatureEnabled}
                 />
               ))
               .with(FieldType.INITIALS, () => (
                 <InitialsField
                   key={field.id}
                   field={field}
-                  recipient={directRecipient}
                   onSignField={onSignField}
                   onUnsignField={onUnsignField}
                 />
@@ -204,7 +204,6 @@ export const SignDirectTemplateForm = ({
                 <NameField
                   key={field.id}
                   field={field}
-                  recipient={directRecipient}
                   onSignField={onSignField}
                   onUnsignField={onUnsignField}
                 />
@@ -213,7 +212,6 @@ export const SignDirectTemplateForm = ({
                 <DateField
                   key={field.id}
                   field={field}
-                  recipient={directRecipient}
                   dateFormat={template.templateMeta?.dateFormat ?? DEFAULT_DOCUMENT_DATE_FORMAT}
                   timezone={template.templateMeta?.timezone ?? DEFAULT_DOCUMENT_TIME_ZONE}
                   onSignField={onSignField}
@@ -224,7 +222,6 @@ export const SignDirectTemplateForm = ({
                 <EmailField
                   key={field.id}
                   field={field}
-                  recipient={directRecipient}
                   onSignField={onSignField}
                   onUnsignField={onUnsignField}
                 />
@@ -241,7 +238,6 @@ export const SignDirectTemplateForm = ({
                       ...field,
                       fieldMeta: parsedFieldMeta,
                     }}
-                    recipient={directRecipient}
                     onSignField={onSignField}
                     onUnsignField={onUnsignField}
                   />
@@ -259,7 +255,6 @@ export const SignDirectTemplateForm = ({
                       ...field,
                       fieldMeta: parsedFieldMeta,
                     }}
-                    recipient={directRecipient}
                     onSignField={onSignField}
                     onUnsignField={onUnsignField}
                   />
@@ -277,7 +272,6 @@ export const SignDirectTemplateForm = ({
                       ...field,
                       fieldMeta: parsedFieldMeta,
                     }}
-                    recipient={directRecipient}
                     onSignField={onSignField}
                     onUnsignField={onUnsignField}
                   />
@@ -295,7 +289,6 @@ export const SignDirectTemplateForm = ({
                       ...field,
                       fieldMeta: parsedFieldMeta,
                     }}
-                    recipient={directRecipient}
                     onSignField={onSignField}
                     onUnsignField={onUnsignField}
                   />
@@ -313,7 +306,6 @@ export const SignDirectTemplateForm = ({
                       ...field,
                       fieldMeta: parsedFieldMeta,
                     }}
-                    recipient={directRecipient}
                     onSignField={onSignField}
                     onUnsignField={onUnsignField}
                   />
@@ -351,6 +343,7 @@ export const SignDirectTemplateForm = ({
                     onChange={(value) => {
                       setSignature(value);
                     }}
+                    allowTypedSignature={template.templateMeta?.typedSignatureEnabled}
                   />
                 </CardContent>
               </Card>
@@ -383,6 +376,6 @@ export const SignDirectTemplateForm = ({
           />
         </div>
       </DocumentFlowFormContainerFooter>
-    </>
+    </RecipientProvider>
   );
 };
