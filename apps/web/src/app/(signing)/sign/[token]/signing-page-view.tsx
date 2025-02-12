@@ -179,7 +179,13 @@ export const SigningPageView = ({
             )
             .map((field) =>
               match(field.type)
-                .with(FieldType.SIGNATURE, () => <SignatureField key={field.id} field={field} />)
+                .with(FieldType.SIGNATURE, () => (
+                  <SignatureField
+                    key={field.id}
+                    field={field}
+                    typedSignatureEnabled={documentMeta?.typedSignatureEnabled}
+                  />
+                ))
                 .with(FieldType.INITIALS, () => <InitialsField key={field.id} field={field} />)
                 .with(FieldType.NAME, () => <NameField key={field.id} field={field} />)
                 .with(FieldType.DATE, () => (

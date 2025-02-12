@@ -5,6 +5,18 @@ import { hashSync } from '@documenso/lib/server-only/auth/hash';
 
 import { prisma } from '..';
 import { DocumentDataType, DocumentSource, Role, TeamMemberRole } from '../client';
+import { seedPendingDocument } from './documents';
+import { seedDirectTemplate, seedTemplate } from './templates';
+
+const createDocumentData = async ({ documentData }: { documentData: string }) => {
+  return prisma.documentData.create({
+    data: {
+      type: DocumentDataType.BYTES_64,
+      data: documentData,
+      initialData: documentData,
+    },
+  });
+};
 
 export const seedDatabase = async () => {
   const examplePdf = fs
@@ -39,34 +51,79 @@ export const seedDatabase = async () => {
     update: {},
   });
 
-  const examplePdfData = await prisma.documentData.upsert({
-    where: {
-      id: 'clmn0kv5k0000pe04vcqg5zla',
-    },
-    create: {
-      id: 'clmn0kv5k0000pe04vcqg5zla',
-      type: DocumentDataType.BYTES_64,
-      data: examplePdf,
-      initialData: examplePdf,
-    },
-    update: {},
-  });
+  for (let i = 1; i <= 4; i++) {
+    const documentData = await createDocumentData({ documentData: examplePdf });
 
-  await prisma.document.create({
-    data: {
-      source: DocumentSource.DOCUMENT,
-      title: 'Example Document',
-      documentDataId: examplePdfData.id,
-      userId: exampleUser.id,
-      recipients: {
-        create: {
-          name: String(adminUser.name),
-          email: adminUser.email,
-          token: Math.random().toString(36).slice(2, 9),
+    await prisma.document.create({
+      data: {
+        source: DocumentSource.DOCUMENT,
+        title: `Example Document ${i}`,
+        documentDataId: documentData.id,
+        userId: exampleUser.id,
+        recipients: {
+          create: {
+            name: String(adminUser.name),
+            email: adminUser.email,
+            token: Math.random().toString(36).slice(2, 9),
+          },
         },
       },
+    });
+  }
+
+  for (let i = 1; i <= 4; i++) {
+    const documentData = await createDocumentData({ documentData: examplePdf });
+
+    await prisma.document.create({
+      data: {
+        source: DocumentSource.DOCUMENT,
+        title: `Document ${i}`,
+        documentDataId: documentData.id,
+        userId: adminUser.id,
+        recipients: {
+          create: {
+            name: String(exampleUser.name),
+            email: exampleUser.email,
+            token: Math.random().toString(36).slice(2, 9),
+          },
+        },
+      },
+    });
+  }
+
+  await seedPendingDocument(exampleUser, [adminUser], {
+    key: 'example-pending',
+    createDocumentOptions: {
+      title: 'Pending Document',
     },
   });
+
+  await seedPendingDocument(adminUser, [exampleUser], {
+    key: 'admin-pending',
+    createDocumentOptions: {
+      title: 'Pending Document',
+    },
+  });
+
+  await Promise.all([
+    seedTemplate({
+      title: 'Template 1',
+      userId: exampleUser.id,
+    }),
+    seedDirectTemplate({
+      title: 'Direct Template 1',
+      userId: exampleUser.id,
+    }),
+
+    seedTemplate({
+      title: 'Template 1',
+      userId: adminUser.id,
+    }),
+    seedDirectTemplate({
+      title: 'Direct Template 1',
+      userId: adminUser.id,
+    }),
+  ]);
 
   const testUsers = [
     'test@documenso.com',
