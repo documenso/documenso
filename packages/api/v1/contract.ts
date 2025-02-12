@@ -46,6 +46,16 @@ const c = initContract();
 
 export const ApiContractV1 = c.router(
   {
+    live: {
+      method: 'GET',
+      path: '/api/v1/live',
+      query: ZNoBodyMutationSchema,
+      responses: {
+        204: ZNoBodyMutationSchema,
+      },
+      summary: 'Check if the API is live',
+    },
+
     getDocuments: {
       method: 'GET',
       path: '/api/v1/documents',

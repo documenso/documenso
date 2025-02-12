@@ -63,6 +63,13 @@ import { ApiContractV1 } from './contract';
 import { authenticatedMiddleware } from './middleware/authenticated';
 
 export const ApiContractV1Implementation = createNextRoute(ApiContractV1, {
+  live: async () => {
+    return await Promise.resolve({
+      status: 204,
+      body: null,
+    });
+  },
+
   getDocuments: authenticatedMiddleware(async (args, user, team) => {
     const page = Number(args.query.page) || 1;
     const perPage = Number(args.query.perPage) || 10;
