@@ -6,6 +6,11 @@ import { canExecuteTeamAction } from '@documenso/lib/utils/teams';
 
 import { TeamSettingsNavDesktop } from '~/components/general/teams/team-settings-nav-desktop';
 import { TeamSettingsNavMobile } from '~/components/general/teams/team-settings-nav-mobile';
+import { appMetaTags } from '~/utils/meta';
+
+export function meta() {
+  return appMetaTags('Team Settings');
+}
 
 export function loader() {
   const { currentTeam: team } = getLoaderTeamSession();

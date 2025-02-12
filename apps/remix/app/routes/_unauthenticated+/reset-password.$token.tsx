@@ -4,11 +4,12 @@ import { Link, redirect } from 'react-router';
 import { getResetTokenValidity } from '@documenso/lib/server-only/user/get-reset-token-validity';
 
 import { ResetPasswordForm } from '~/components/forms/reset-password';
+import { appMetaTags } from '~/utils/meta';
 
 import type { Route } from './+types/reset-password.$token';
 
 export function meta() {
-  return [{ title: 'Reset Password' }];
+  return appMetaTags('Reset Password');
 }
 
 export async function loader({ params }: Route.LoaderArgs) {

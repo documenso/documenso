@@ -25,9 +25,10 @@ import { DocumentsTable } from '~/components/tables/documents-table';
 import { DocumentsTableEmptyState } from '~/components/tables/documents-table-empty-state';
 import { DocumentsTableSenderFilter } from '~/components/tables/documents-table-sender-filter';
 import { useOptionalCurrentTeam } from '~/providers/team';
+import { appMetaTags } from '~/utils/meta';
 
 export function meta() {
-  return [{ title: 'Documents' }];
+  return appMetaTags('Documents');
 }
 
 const ZSearchParamsSchema = ZFindDocumentsInternalRequestSchema.pick({

@@ -5,9 +5,10 @@ import { AccountDeleteDialog } from '~/components/dialogs/account-delete-dialog'
 import { AvatarImageForm } from '~/components/forms/avatar-image';
 import { ProfileForm } from '~/components/forms/profile';
 import { SettingsHeader } from '~/components/general/settings-header';
+import { appMetaTags } from '~/utils/meta';
 
 export function meta() {
-  return [{ title: 'Profile' }];
+  return appMetaTags('Profile');
 }
 
 export default function SettingsProfile() {

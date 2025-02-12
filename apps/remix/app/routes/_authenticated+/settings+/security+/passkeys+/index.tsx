@@ -4,11 +4,10 @@ import { useLingui } from '@lingui/react';
 import { PasskeyCreateDialog } from '~/components/dialogs/passkey-create-dialog';
 import { SettingsHeader } from '~/components/general/settings-header';
 import { SettingsSecurityPasskeyTable } from '~/components/tables/settings-security-passkey-table';
+import { appMetaTags } from '~/utils/meta';
 
-import type { Route } from './+types/index';
-
-export function meta(_args: Route.MetaArgs) {
-  return [{ title: 'Manage passkeys' }];
+export function meta() {
+  return appMetaTags('Manage passkeys');
 }
 
 export default function SettingsPasskeys() {

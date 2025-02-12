@@ -3,8 +3,10 @@ import { Link } from 'react-router';
 
 import { Button } from '@documenso/ui/primitives/button';
 
+import { appMetaTags } from '~/utils/meta';
+
 export function meta() {
-  return [{ title: 'Forgot password' }];
+  return appMetaTags('Forgot password');
 }
 
 export default function ForgotPasswordPage() {

@@ -3,6 +3,11 @@ import { Outlet } from 'react-router';
 
 import { SettingsDesktopNav } from '~/components/general/settings-nav-desktop';
 import { SettingsMobileNav } from '~/components/general/settings-nav-mobile';
+import { appMetaTags } from '~/utils/meta';
+
+export function meta() {
+  return appMetaTags('Settings');
+}
 
 export default function SettingsLayout() {
   return (

@@ -10,9 +10,10 @@ import { Avatar, AvatarFallback, AvatarImage } from '@documenso/ui/primitives/av
 import { TemplateCreateDialog } from '~/components/dialogs/template-create-dialog';
 import { TemplatesTable } from '~/components/tables/templates-table';
 import { useOptionalCurrentTeam } from '~/providers/team';
+import { appMetaTags } from '~/utils/meta';
 
 export function meta() {
-  return [{ title: 'Templates' }];
+  return appMetaTags('Templates');
 }
 
 export default function TemplatesPage() {

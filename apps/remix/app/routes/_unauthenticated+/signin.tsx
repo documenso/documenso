@@ -10,11 +10,12 @@ import {
 import { env } from '@documenso/lib/utils/env';
 
 import { SignInForm } from '~/components/forms/signin';
+import { appMetaTags } from '~/utils/meta';
 
 import type { Route } from './+types/signin';
 
 export function meta() {
-  return [{ title: 'Sign In' }];
+  return appMetaTags('Sign In');
 }
 
 export function loader() {

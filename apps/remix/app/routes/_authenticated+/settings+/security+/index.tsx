@@ -14,11 +14,12 @@ import { EnableAuthenticatorAppDialog } from '~/components/forms/2fa/enable-auth
 import { ViewRecoveryCodesDialog } from '~/components/forms/2fa/view-recovery-codes-dialog';
 import { PasswordForm } from '~/components/forms/password';
 import { SettingsHeader } from '~/components/general/settings-header';
+import { appMetaTags } from '~/utils/meta';
 
 import type { Route } from './+types';
 
 export function meta() {
-  return [{ title: 'Security' }];
+  return appMetaTags('Security');
 }
 
 export async function loader() {

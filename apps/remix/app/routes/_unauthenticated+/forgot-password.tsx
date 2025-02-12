@@ -2,9 +2,10 @@ import { Trans } from '@lingui/react/macro';
 import { Link } from 'react-router';
 
 import { ForgotPasswordForm } from '~/components/forms/forgot-password';
+import { appMetaTags } from '~/utils/meta';
 
 export function meta() {
-  return [{ title: 'Forgot Password' }];
+  return appMetaTags('Forgot Password');
 }
 
 export default function ForgotPasswordPage() {

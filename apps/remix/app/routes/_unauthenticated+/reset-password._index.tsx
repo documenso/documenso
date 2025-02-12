@@ -3,8 +3,10 @@ import { Link } from 'react-router';
 
 import { Button } from '@documenso/ui/primitives/button';
 
+import { appMetaTags } from '~/utils/meta';
+
 export function meta() {
-  return [{ title: 'Reset Password' }];
+  return appMetaTags('Reset Password');
 }
 
 export default function ResetPasswordPage() {

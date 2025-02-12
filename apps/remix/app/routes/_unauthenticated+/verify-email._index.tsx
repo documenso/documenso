@@ -4,8 +4,10 @@ import { Link } from 'react-router';
 
 import { Button } from '@documenso/ui/primitives/button';
 
+import { appMetaTags } from '~/utils/meta';
+
 export function meta() {
-  return [{ title: 'Verify Email' }];
+  return appMetaTags('Verify Email');
 }
 
 export default function EmailVerificationWithoutTokenPage() {

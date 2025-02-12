@@ -3,9 +3,10 @@ import { useLingui } from '@lingui/react';
 
 import { SettingsHeader } from '~/components/general/settings-header';
 import { SettingsSecurityActivityTable } from '~/components/tables/settings-security-activity-table';
+import { appMetaTags } from '~/utils/meta';
 
 export function meta() {
-  return [{ title: 'Security activity' }];
+  return appMetaTags('Security activity');
 }
 
 export default function SettingsSecurityActivity() {

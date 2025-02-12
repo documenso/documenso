@@ -4,11 +4,12 @@ import { IS_GOOGLE_SSO_ENABLED, IS_OIDC_SSO_ENABLED } from '@documenso/lib/const
 import { env } from '@documenso/lib/utils/env';
 
 import { SignUpForm } from '~/components/forms/signup';
+import { appMetaTags } from '~/utils/meta';
 
 import type { Route } from './+types/signup';
 
 export function meta() {
-  return [{ title: 'Sign Up' }];
+  return appMetaTags('Sign Up');
 }
 
 export function loader() {
