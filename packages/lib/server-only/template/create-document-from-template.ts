@@ -17,6 +17,7 @@ import { AppError, AppErrorCode } from '../../errors/app-error';
 import { DOCUMENT_AUDIT_LOG_TYPE } from '../../types/document-audit-logs';
 import { ZRecipientAuthOptionsSchema } from '../../types/document-auth';
 import type { TDocumentEmailSettings } from '../../types/document-email';
+import type { TFieldMetaSchema } from '../../types/field-meta';
 import { ZFieldMetaSchema } from '../../types/field-meta';
 import {
   ZWebhookDocumentSchema,
@@ -50,6 +51,10 @@ export type CreateDocumentFromTemplateOptions = {
     email: string;
     signingOrder?: number | null;
   }[];
+  prefillFields?: {
+    id: number;
+    fieldMeta: TFieldMetaSchema;
+  }[];
   customDocumentDataId?: string;
 
   /**
@@ -81,6 +86,7 @@ export const createDocumentFromTemplate = async ({
   customDocumentDataId,
   override,
   requestMetadata,
+  prefillFields,
 }: CreateDocumentFromTemplateOptions) => {
   const template = await prisma.template.findUnique({
     where: {
@@ -258,6 +264,23 @@ export const createDocumentFromTemplate = async ({
 
     let fieldsToCreate: Omit<Field, 'id' | 'secondaryId' | 'templateId'>[] = [];
 
+    // Get all template field IDs first so we can validate later
+    const allTemplateFieldIds = finalRecipients.flatMap((recipient) =>
+      recipient.fields.map((field) => field.id),
+    );
+
+    if (prefillFields?.length) {
+      const invalidFieldIds = prefillFields
+        .map((prefillField) => prefillField.id)
+        .filter((id) => !allTemplateFieldIds.includes(id));
+
+      if (invalidFieldIds.length > 0) {
+        throw new Error(
+          `The following field IDs do not exist in the template: ${invalidFieldIds.join(', ')}`,
+        );
+      }
+    }
+
     Object.values(finalRecipients).forEach(({ email, fields }) => {
       const recipient = document.recipients.find((recipient) => recipient.email === email);
 
@@ -266,19 +289,33 @@ export const createDocumentFromTemplate = async ({
       }
 
       fieldsToCreate = fieldsToCreate.concat(
-        fields.map((field) => ({
-          documentId: document.id,
-          recipientId: recipient.id,
-          type: field.type,
-          page: field.page,
-          positionX: field.positionX,
-          positionY: field.positionY,
-          width: field.width,
-          height: field.height,
-          customText: '',
-          inserted: false,
-          fieldMeta: field.fieldMeta,
-        })),
+        fields.map((field) => {
+          const prefillField = prefillFields?.find((value) => value?.id === field.id);
+
+          if (prefillField?.fieldMeta) {
+            const fieldMeta = ZFieldMetaSchema.safeParse(prefillField.fieldMeta);
+
+            if (!fieldMeta.success) {
+              throw new Error(
+                `There has been an error parsing field meta for field ${field.id}: ${fieldMeta.error}`,
+              );
+            }
+          }
+
+          return {
+            documentId: document.id,
+            recipientId: recipient.id,
+            type: field.type,
+            page: field.page,
+            positionX: field.positionX,
+            positionY: field.positionY,
+            width: field.width,
+            height: field.height,
+            customText: '',
+            inserted: false,
+            fieldMeta: prefillField?.fieldMeta ?? field.fieldMeta,
+          };
+        }),
       );
     });
 
