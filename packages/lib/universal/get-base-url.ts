@@ -7,10 +7,6 @@ export const getBaseUrl = () => {
     return '';
   }
 
-  if (env('VERCEL_URL')) {
-    return `https://${env('VERCEL_URL')}`;
-  }
-
   const webAppUrl = NEXT_PUBLIC_WEBAPP_URL();
 
   if (webAppUrl) {

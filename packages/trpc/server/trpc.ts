@@ -3,9 +3,9 @@ import SuperJSON from 'superjson';
 import type { AnyZodObject } from 'zod';
 
 import { AppError, genericErrorCodeToTrpcErrorCodeMap } from '@documenso/lib/errors/app-error';
-import { isAdmin } from '@documenso/lib/next-auth/guards/is-admin';
 import { getApiTokenByToken } from '@documenso/lib/server-only/public-api/get-api-token-by-token';
 import type { ApiRequestMetadata } from '@documenso/lib/universal/extract-request-metadata';
+import { isAdmin } from '@documenso/lib/utils/is-admin';
 
 import type { TrpcContext } from './context';
 

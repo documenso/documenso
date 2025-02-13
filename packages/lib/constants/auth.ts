@@ -1,4 +1,5 @@
 import { env } from '../utils/env';
+import { NEXT_PUBLIC_WEBAPP_URL } from './app';
 
 export const SALT_ROUNDS = 12;
 
@@ -49,7 +50,7 @@ export const MAXIMUM_PASSKEYS = 50;
 
 // Todo: nextuauth_url ??
 export const useSecureCookies =
-  env('NODE_ENV') === 'production' && String(env('NEXTAUTH_URL')).startsWith('https://');
+  env('NODE_ENV') === 'production' && String(NEXT_PUBLIC_WEBAPP_URL()).startsWith('https://');
 
 // Todo: Test secure cookies prefix in remix.
 const secureCookiePrefix = useSecureCookies ? '__Secure-' : '';

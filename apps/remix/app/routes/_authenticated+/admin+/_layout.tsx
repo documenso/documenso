@@ -3,7 +3,7 @@ import { BarChart3, FileStack, Settings, Trophy, Users, Wallet2 } from 'lucide-r
 import { Link, Outlet, redirect, useLocation } from 'react-router';
 import { getLoaderSession } from 'server/utils/get-loader-session';
 
-import { isAdmin } from '@documenso/lib/next-auth/guards/is-admin';
+import { isAdmin } from '@documenso/lib/utils/is-admin';
 import { cn } from '@documenso/ui/lib/utils';
 import { Button } from '@documenso/ui/primitives/button';
 

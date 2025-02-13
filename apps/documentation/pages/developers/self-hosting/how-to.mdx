@@ -35,7 +35,6 @@ cp .env.example .env
 Open the `.env` file and fill in the following variables:
 
 ```bash
-- NEXTAUTH_URL
 - NEXTAUTH_SECRET
 - NEXT_PUBLIC_WEBAPP_URL
 - NEXT_PUBLIC_MARKETING_URL
@@ -46,8 +45,8 @@ Open the `.env` file and fill in the following variables:
 ```
 
 <Callout type="info">
-  If you use a reverse proxy in front of Documenso, don't forget to provide the public URL for both
-  the `NEXTAUTH_URL` and `NEXT_PUBLIC_WEBAPP_URL` variables!
+  If you use a reverse proxy in front of Documenso, don't forget to provide the public URL for the
+  `NEXT_PUBLIC_WEBAPP_URL` variable!
 </Callout>
 
 ### Install the Dependencies
@@ -171,7 +170,6 @@ Run the Docker container with the required environment variables:
 ```bash
 docker run -d \
  -p 3000:3000 \
- -e NEXTAUTH_URL="<your-nextauth-url>"
  -e NEXTAUTH_SECRET="<your-nextauth-secret>"
  -e NEXT_PRIVATE_ENCRYPTION_KEY="<your-next-private-encryption-key>"
  -e NEXT_PRIVATE_ENCRYPTION_SECONDARY_KEY="<your-next-private-encryption-secondary-key>"
@@ -200,7 +198,6 @@ The environment variables listed above are a subset of those available for confi
 | Variable                                     | Description                                                                                         |
 | -------------------------------------------- | --------------------------------------------------------------------------------------------------- |
 | `PORT`                                       | The port on which the Documenso application runs. It defaults to `3000`.                            |
-| `NEXTAUTH_URL`                               | The URL for the NextAuth.js authentication service.                                                 |
 | `NEXTAUTH_SECRET`                            | The secret key used by NextAuth.js for encryption and signing.                                      |
 | `NEXT_PRIVATE_ENCRYPTION_KEY`                | The primary encryption key for symmetric encryption and decryption (at least 32 characters).        |
 | `NEXT_PRIVATE_ENCRYPTION_SECONDARY_KEY`      | The secondary encryption key for symmetric encryption and decryption (at least 32 characters).      |

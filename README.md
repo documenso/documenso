@@ -1,7 +1,3 @@
-> 🚨 We are live on Product Hunt 🎉  Check out our latest launch: <a href="documen.so/sign-everywhere">The Platform Plan</a>!
-
-<a href="https://www.producthunt.com/posts/documenso-platform-plan?embed=true&utm_source=badge-featured&utm_medium=badge&utm_souce=badge-documenso&#0045;platform&#0045;plan" target="_blank"><img src="https://api.producthunt.com/widgets/embed-image/v1/featured.svg?post_id=670576&theme=light" alt="Documenso&#0032;Platform&#0032;Plan - Whitelabeled&#0032;signing&#0032;flows&#0032;in&#0032;your&#0032;product | Product Hunt" style="width: 250px; height: 54px;" width="250" height="54" /></a>
-
 <img src="https://github.com/documenso/documenso/assets/13398220/a643571f-0239-46a6-a73e-6bef38d1228b" alt="Documenso Logo">
 
 <p align="center" style="margin-top: 20px">
@@ -73,9 +69,9 @@ Contact us if you are interested in our Enterprise plan for large organizations 
 <a href="https://cal.com/timurercan/enterprise-customers?utm_source=banner&utm_campaign=oss"><img alt="Book us with Cal.com" src="https://cal.com/book-with-cal-dark.svg" /></a>
 
 ## Tech Stack
+
 <p align="left">
   <a href="https://www.typescriptlang.org"><img src="https://shields.io/badge/TypeScript-3178C6?logo=TypeScript&logoColor=FFF&style=flat-square" alt="TypeScript"></a>
-  <a href="https://nextjs.org/"><img src="https://img.shields.io/badge/next.js-000000?style=flat-square&logo=nextdotjs&logoColor=white" alt="NextJS"></a>
   <a href="https://prisma.io"><img width="122" height="20" src="http://made-with.prisma.io/indigo.svg" alt="Made with Prisma" /></a>
   <a href="https://tailwindcss.com/"><img src="https://img.shields.io/badge/tailwindcss-0F172A?&logo=tailwindcss" alt="Tailwind CSS"></a>
   <a href=""><img src="" alt=""></a>
@@ -85,20 +81,17 @@ Contact us if you are interested in our Enterprise plan for large organizations 
   <a href=""><img src="" alt=""></a>
 </p>
 
-
 - [Typescript](https://www.typescriptlang.org/) - Language
-- [Next.js](https://nextjs.org/) - Framework
-- [Prisma](https://www.prisma.io/)  - ORM
+- [ReactRouter](https://reactrouter.com/) - Framework
+- [Prisma](https://www.prisma.io/) - ORM
 - [Tailwind](https://tailwindcss.com/) - CSS
 - [shadcn/ui](https://ui.shadcn.com/) - Component Library
-- [NextAuth.js](https://next-auth.js.org/) - Authentication
 - [react-email](https://react.email/) - Email Templates
 - [tRPC](https://trpc.io/) - API
 - [@documenso/pdf-sign](https://www.npmjs.com/package/@documenso/pdf-sign) - PDF Signatures (launching soon)
 - [React-PDF](https://github.com/wojtekmaj/react-pdf) - Viewing PDFs
 - [PDF-Lib](https://github.com/Hopding/pdf-lib) - PDF manipulation
 - [Stripe](https://stripe.com/) - Payments
-- [Vercel](https://vercel.com) - Hosting
 
 <!-- - Support for [opensignpdf (requires Java on server)](https://github.com/open-pdf-sign) is currently planned. -->
 
@@ -108,7 +101,7 @@ Contact us if you are interested in our Enterprise plan for large organizations 
 
 To run Documenso locally, you will need
 
-- Node.js (v18 or above)
+- Node.js (v22 or above)
 - Postgres SQL Database
 - Docker (optional)
 
@@ -171,7 +164,6 @@ git clone https://github.com/<your-username>/documenso
 
 4. Set the following environment variables:
 
-   - NEXTAUTH_URL
    - NEXTAUTH_SECRET
    - NEXT_PUBLIC_WEBAPP_URL
    - NEXT_PUBLIC_MARKETING_URL
@@ -243,7 +235,6 @@ cp .env.example .env
 
 The following environment variables must be set:
 
-- `NEXTAUTH_URL`
 - `NEXTAUTH_SECRET`
 - `NEXT_PUBLIC_WEBAPP_URL`
 - `NEXT_PUBLIC_MARKETING_URL`
@@ -252,7 +243,7 @@ The following environment variables must be set:
 - `NEXT_PRIVATE_SMTP_FROM_NAME`
 - `NEXT_PRIVATE_SMTP_FROM_ADDRESS`
 
-> If you are using a reverse proxy in front of Documenso, don't forget to provide the public URL for both `NEXTAUTH_URL` and `NEXT_PUBLIC_WEBAPP_URL` variables!
+> If you are using a reverse proxy in front of Documenso, don't forget to provide the public URL for the `NEXT_PUBLIC_WEBAPP_URL` variable!
 
 Now you can install the dependencies and build it:
 

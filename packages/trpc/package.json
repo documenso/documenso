@@ -17,7 +17,6 @@
     "@trpc/react-query": "11.0.0-rc.648",
     "@trpc/server": "11.0.0-rc.648",
     "@ts-rest/core": "^3.30.5",
-    "@ts-rest/next": "^3.30.5",
     "luxon": "^3.4.0",
     "superjson": "^1.13.1",
     "trpc-to-openapi": "2.0.4",

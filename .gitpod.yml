@@ -4,7 +4,6 @@ tasks:
       npm run dx:up &&
       cp .env.example .env &&
       set -a; source .env &&
-      export NEXTAUTH_URL="$(gp url 3000)" &&
       export NEXT_PUBLIC_WEBAPP_URL="$(gp url 3000)" &&
       export NEXT_PUBLIC_MARKETING_URL="$(gp url 3001)"
     command: npm run d
