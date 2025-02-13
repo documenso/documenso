@@ -72,6 +72,22 @@ export const setFieldsForDocument = async ({
     });
   }
 
+  // Check that every signer has a signature field
+  const signers = document.recipients.filter((recipient) => recipient.role === 'SIGNER');
+  const hasEverySignerSignature = signers.every((signer) =>
+    fields.some(
+      (field) =>
+        (field.type === FieldType.SIGNATURE || field.type === FieldType.FREE_SIGNATURE) &&
+        field.recipientId === signer.id,
+    ),
+  );
+
+  if (!hasEverySignerSignature) {
+    throw new AppError(AppErrorCode.INVALID_REQUEST, {
+      message: 'Every signer must have at least one signature field',
+    });
+  }
+
   if (document.completedAt) {
     throw new AppError(AppErrorCode.INVALID_REQUEST, {
       message: 'Document already complete',

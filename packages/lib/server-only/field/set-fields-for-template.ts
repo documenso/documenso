@@ -58,10 +58,27 @@ export const setFieldsForTemplate = async ({
             teamId: null,
           }),
     },
+    include: {
+      recipients: true,
+    },
   });
 
   if (!template) {
     throw new Error('Template not found');
+  }
+
+  // Check that every signer has a signature field
+  const signers = template.recipients.filter((recipient) => recipient.role === 'SIGNER');
+  const hasEverySignerSignature = signers.every((signer) =>
+    fields.some(
+      (field) =>
+        (field.type === FieldType.SIGNATURE || field.type === FieldType.FREE_SIGNATURE) &&
+        field.signerId === signer.id,
+    ),
+  );
+
+  if (!hasEverySignerSignature) {
+    throw new Error('Every signer must have at least one signature field');
   }
 
   const existingFields = await prisma.field.findMany({
