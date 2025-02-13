@@ -33,11 +33,6 @@ export const filesRoute = new Hono<HonoEnv>()
         return c.json({ error: 'No file provided' }, 400);
       }
 
-      // Todo: Do we want to validate the file type?
-      // if (file.type !== 'application/pdf') {
-      //   return c.json({ error: 'File must be a PDF' }, 400);
-      // }
-
       // Todo: This is new.
       // Add file size validation.
       // Convert MB to bytes (1 MB = 1024 * 1024 bytes)

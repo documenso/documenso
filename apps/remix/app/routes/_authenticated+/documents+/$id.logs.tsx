@@ -36,7 +36,7 @@ export async function loader({ params }: Route.LoaderArgs) {
     throw redirect(documentRootPath);
   }
 
-  // Todo:  Get detailed?
+  // Todo: Get full document instead?
   const [document, recipients] = await Promise.all([
     getDocumentById({
       documentId,

@@ -9,9 +9,9 @@ import {
   type RequestMetadata,
   extractRequestMetadata,
 } from '@documenso/lib/universal/extract-request-metadata';
-import { AppLogger } from '@documenso/lib/utils/debugger';
+import { AppDebugger } from '@documenso/lib/utils/debugger';
 
-const logger = new AppLogger('Middleware');
+const debug = new AppDebugger('Middleware');
 
 export type AppContext = {
   requestMetadata: RequestMetadata;
@@ -27,7 +27,7 @@ export const appContext = async (c: Context, next: Next) => {
   const noSessionCookie = extractSessionCookieFromHeaders(request.headers) === null;
 
   if (!isPageRequest(request) || noSessionCookie || blacklistedPathsRegex.test(url.pathname)) {
-    // logger.log('Pathname ignored', url.pathname);
+    // debug.log('Pathname ignored', url.pathname);
 
     setAppContext(c, {
       requestMetadata: extractRequestMetadata(request),
@@ -61,7 +61,7 @@ export const appContext = async (c: Context, next: Next) => {
   }
 
   const endTime = Date.now();
-  logger.log(`Pathname accepted in ${endTime - initTime}ms`, url.pathname);
+  debug.log(`Pathname accepted in ${endTime - initTime}ms`, url.pathname);
 
   setAppContext(c, {
     requestMetadata: extractRequestMetadata(request),

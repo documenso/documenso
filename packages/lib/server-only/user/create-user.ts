@@ -1,4 +1,5 @@
 import { hash } from '@node-rs/bcrypt';
+import type { User } from '@prisma/client';
 import { TeamMemberInviteStatus } from '@prisma/client';
 
 import { getStripeCustomerByUser } from '@documenso/ee/server-only/stripe/get-customer';
@@ -69,6 +70,22 @@ export const createUser = async ({ name, email, password, signature, url }: Crea
 
     return user;
   });
+
+  await onCreateUserHook(user).catch((err) => {
+    // Todo: Add logging.
+    console.error(err);
+  });
+
+  return user;
+};
+
+/**
+ * Should be run after a user is created.
+ *
+ * @returns User
+ */
+export const onCreateUserHook = async (user: User) => {
+  const { email } = user;
 
   const acceptedTeamInvites = await prisma.teamMemberInvite.findMany({
     where: {

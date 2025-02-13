@@ -1,9 +1,9 @@
 import type { Context, Next } from 'hono';
 import { getCookie } from 'hono/cookie';
 
-import { AppLogger } from '@documenso/lib/utils/debugger';
+import { AppDebugger } from '@documenso/lib/utils/debugger';
 
-const logger = new AppLogger('Middleware');
+const debug = new AppDebugger('Middleware');
 
 /**
  * Middleware for initial page loads.
@@ -23,7 +23,7 @@ export const appMiddleware = async (c: Context, next: Next) => {
     return next();
   }
 
-  logger.log('Path', path);
+  debug.log('Path', path);
 
   const preferredTeamUrl = getCookie(c, 'preferred-team-url');
 
@@ -39,7 +39,7 @@ export const appMiddleware = async (c: Context, next: Next) => {
 
   // // Redirect root page to `/documents` or `/t/{preferredTeamUrl}/documents`.
   // if (path === '/') {
-  //   logger.log('Redirecting from root to documents');
+  //   debug.log('Redirecting from root to documents');
 
   //   const redirectUrlPath = formatDocumentsPath(
   //     resetPreferredTeamUrl ? undefined : preferredTeamUrl,
@@ -58,7 +58,7 @@ export const appMiddleware = async (c: Context, next: Next) => {
 
   // // Clear preferred team url cookie if user accesses a non team page from a team page.
   // if (resetPreferredTeamUrl || path === '/documents') {
-  //   logger.log('Resetting preferred team url');
+  //   debug.log('Resetting preferred team url');
 
   //   deleteCookie(c, 'preferred-team-url');
   //   return next();

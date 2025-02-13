@@ -68,24 +68,6 @@ export async function loader({ params }: Route.LoaderArgs) {
     throw redirect(`${documentRootPath}/${documentId}`);
   }
 
-  // Todo: We don't handle encrypted files right.
-  // if (documentMeta?.password) {
-  //   const key = DOCUMENSO_ENCRYPTION_KEY;
-
-  //   if (!key) {
-  //     throw new Error('Missing DOCUMENSO_ENCRYPTION_KEY');
-  //   }
-
-  //   const securePassword = Buffer.from(
-  //     symmetricDecrypt({
-  //       key,
-  //       data: documentMeta.password,
-  //     }),
-  //   ).toString('utf-8');
-
-  //   documentMeta.password = securePassword;
-  // }
-
   const isDocumentEnterprise = await isUserEnterprise({
     userId: user.id,
     teamId: team?.id,

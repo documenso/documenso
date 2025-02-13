@@ -6,6 +6,7 @@ import { z } from 'zod';
 
 import { NEXT_PUBLIC_WEBAPP_URL } from '@documenso/lib/constants/app';
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
+import { onCreateUserHook } from '@documenso/lib/server-only/user/create-user';
 import { env } from '@documenso/lib/utils/env';
 import { prisma } from '@documenso/prisma';
 import { UserSecurityAuditLogType } from '@documenso/prisma/client';
@@ -230,6 +231,11 @@ export const googleRoute = new Hono<HonoAuthContext>()
       });
 
       return user;
+    });
+
+    await onCreateUserHook(createdUser).catch((err) => {
+      // Todo: Add logging.
+      console.error(err);
     });
 
     await onAuthorize({ userId: createdUser.id }, c);
