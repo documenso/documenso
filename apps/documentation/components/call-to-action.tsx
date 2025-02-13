@@ -1,7 +1,7 @@
-import { Link } from 'react-router';
+import Link from 'next/link';
 
-import { Button } from '../primitives/button';
-import { Card, CardContent } from '../primitives/card';
+import { Button } from '@documenso/ui/primitives/button';
+import { Card, CardContent } from '@documenso/ui/primitives/card';
 
 type CallToActionProps = {
   className?: string;
@@ -25,7 +25,7 @@ export const CallToAction = ({ className, utmSource = 'generic-cta' }: CallToAct
           size="lg"
           asChild
         >
-          <Link to={`https://app.documenso.com/signup?utm_source=${utmSource}`} target="_blank">
+          <Link href={`https://app.documenso.com/signup?utm_source=${utmSource}`} target="_blank">
             Get started
           </Link>
         </Button>
