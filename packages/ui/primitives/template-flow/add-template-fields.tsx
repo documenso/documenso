@@ -60,6 +60,7 @@ import { getSignerColorStyles, useSignerColors } from '../../lib/signer-colors';
 import { Checkbox } from '../checkbox';
 import type { FieldFormType } from '../document-flow/add-fields';
 import { FieldAdvancedSettings } from '../document-flow/field-item-advanced-settings';
+import { MissingSignatureFieldDialog } from '../document-flow/missing-signature-field-dialog';
 import { Form, FormControl, FormField, FormItem, FormLabel } from '../form/form';
 import { useStep } from '../stepper';
 import type { TAddTemplateFieldsFormSchema } from './add-template-fields.types';
@@ -110,6 +111,7 @@ export const AddTemplateFieldsFormPartial = ({
   const [fieldClipboard, setFieldClipboard] = useState<
     TAddTemplateFieldsFormSchema['fields'][0] | null
   >(null);
+  const [isMissingSignatureDialogVisible, setIsMissingSignatureDialogVisible] = useState(false);
 
   const form = useForm<TAddTemplateFieldsFormSchema>({
     defaultValues: {
@@ -515,6 +517,23 @@ export const AddTemplateFieldsFormPartial = ({
 
   const handleTypedSignatureChange = (value: boolean) => {
     form.setValue('typedSignatureEnabled', value, { shouldDirty: true });
+  };
+
+  const handleGoNextClick = () => {
+    const everySignerHasSignature = recipientsByRole.SIGNER.every((signer) =>
+      localFields.some(
+        (field) =>
+          (field.type === FieldType.SIGNATURE || field.type === FieldType.FREE_SIGNATURE) &&
+          field.recipientId === signer.id,
+      ),
+    );
+
+    if (!everySignerHasSignature) {
+      setIsMissingSignatureDialogVisible(true);
+      return;
+    }
+
+    void onFormSubmit();
   };
 
   return (
@@ -1012,9 +1031,14 @@ export const AddTemplateFieldsFormPartial = ({
                     previousStep();
                     remove();
                   }}
-                  onGoNextClick={() => void onFormSubmit()}
+                  onGoNextClick={handleGoNextClick}
                 />
               </DocumentFlowFormContainerFooter>
+
+              <MissingSignatureFieldDialog
+                isOpen={isMissingSignatureDialogVisible}
+                onOpenChange={(value) => setIsMissingSignatureDialogVisible(value)}
+              />
             </div>
           </DocumentFlowFormContainerContent>
         </>
