@@ -22,6 +22,7 @@ import type { RequestMetadata } from '../../universal/extract-request-metadata';
 import { getFile } from '../../universal/upload/get-file';
 import { putPdfFile } from '../../universal/upload/put-file';
 import { fieldsContainUnsignedRequiredField } from '../../utils/advanced-fields-helpers';
+import { getAuditLogsPdf } from '../htmltopdf/get-audit-logs-pdf';
 import { getCertificatePdf } from '../htmltopdf/get-certificate-pdf';
 import { flattenAnnotations } from '../pdf/flatten-annotations';
 import { flattenForm } from '../pdf/flatten-form';
@@ -117,6 +118,10 @@ export const sealDocument = async ({
         }).catch(() => null)
       : null;
 
+  const auditLogData = await getAuditLogsPdf({ documentId }).catch(() => null);
+
+  console.log({ auditLogData });
+
   const doc = await PDFDocument.load(pdfData);
 
   // Normalize and flatten layers that could cause issues with the signature
@@ -130,6 +135,16 @@ export const sealDocument = async ({
     const certificatePages = await doc.copyPages(certificate, certificate.getPageIndices());
 
     certificatePages.forEach((page) => {
+      doc.addPage(page);
+    });
+  }
+
+  if (auditLogData) {
+    const auditLog = await PDFDocument.load(auditLogData);
+
+    const auditLogPages = await doc.copyPages(auditLog, auditLog.getPageIndices());
+
+    auditLogPages.forEach((page) => {
       doc.addPage(page);
     });
   }
