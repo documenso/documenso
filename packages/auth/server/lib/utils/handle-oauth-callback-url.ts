@@ -79,7 +79,7 @@ export const handleOAuthCallbackUrl = async (options: HandleOAuthCallbackUrlOpti
     });
   }
 
-  if (claims.email_verified !== true) {
+  if (claims.email_verified !== true && !clientOptions.bypassEmailVerification) {
     throw new AppError(AuthenticationErrorCode.UnverifiedEmail, {
       message: 'Account email is not verified',
     });
