@@ -25,29 +25,41 @@ export function meta() {
 export async function loader() {
   const { user } = getLoaderSession();
 
-  const accounts = await prisma.account.findMany({
-    where: {
-      userId: user.id,
-    },
-    select: {
-      provider: true,
-    },
-  });
+  // Todo: Use providers instead after RR7 migration.
+  // const accounts = await prisma.account.findMany({
+  //   where: {
+  //     userId: user.id,
+  //   },
+  //   select: {
+  //     provider: true,
+  //   },
+  // });
 
-  const providers = accounts.map((account) => account.provider);
+  // const providers = accounts.map((account) => account.provider);
+  // let hasEmailPasswordAccount = providers.includes('DOCUMENSO');
+
+  const hasEmailPasswordAccount: boolean = await prisma.user
+    .count({
+      where: {
+        id: user.id,
+        password: {
+          not: null,
+        },
+      },
+    })
+    .then((value) => value > 0);
 
   return {
-    providers,
+    // providers,
+    hasEmailPasswordAccount,
   };
 }
 
 export default function SettingsSecurity({ loaderData }: Route.ComponentProps) {
-  const { providers } = loaderData;
+  const { hasEmailPasswordAccount } = loaderData;
 
   const { _ } = useLingui();
   const { user } = useSession();
-
-  const hasEmailPasswordAccount = providers.includes('DOCUMENSO');
 
   return (
     <div>

@@ -58,15 +58,16 @@ export const createUser = async ({ name, email, password, signature, url }: Crea
       },
     });
 
-    await tx.account.create({
-      data: {
-        userId: user.id,
-        type: 'emailPassword', // Todo
-        provider: 'DOCUMENSO', // Todo: Enums
-        providerAccountId: user.id.toString(),
-        password: hashedPassword,
-      },
-    });
+    // Todo: Migrate to use this after RR7.
+    // await tx.account.create({
+    //   data: {
+    //     userId: user.id,
+    //     type: 'emailPassword', // Todo
+    //     provider: 'DOCUMENSO', // Todo: Enums
+    //     providerAccountId: user.id.toString(),
+    //     password: hashedPassword,
+    //   },
+    // });
 
     return user;
   });
