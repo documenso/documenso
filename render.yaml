@@ -42,13 +42,13 @@ services:
           type: web
           envVarKey: RENDER_EXTERNAL_URL
       - key: NEXT_PUBLIC_MARKETING_URL
-        value: 'http://localhost:3001'
+        value: "http://localhost:3001"
       - key: NEXT_PRIVATE_INTERNAL_WEBAPP_URL
-        value: 'http://localhost:10000'
+        value: "http://localhost:10000"
 
       # SMTP
       - key: NEXT_PRIVATE_SMTP_TRANSPORT
-        value: 'smtp-auth'
+        value: "smtp-auth"
       - key: NEXT_PRIVATE_SMTP_HOST
         sync: false
       - key: NEXT_PRIVATE_SMTP_PORT
@@ -86,7 +86,7 @@ services:
 
       # Storage
       - key: NEXT_PUBLIC_UPLOAD_TRANSPORT
-        value: 'database'
+        value: "database"
       - key: NEXT_PRIVATE_UPLOAD_ENDPOINT
         sync: false
       - key: NEXT_PRIVATE_UPLOAD_FORCE_PATH_STYLE
@@ -98,6 +98,8 @@ services:
       - key: NEXT_PRIVATE_UPLOAD_ACCESS_KEY_ID
         sync: false
       - key: NEXT_PRIVATE_UPLOAD_SECRET_ACCESS_KEY
+        sync: false
+      - key: NEXT_PRIVATE_UPLOAD_AWS_ROLE_ARN
         sync: false
 
       # Crypto

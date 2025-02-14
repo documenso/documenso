@@ -4,6 +4,7 @@
   "scripts": {
     "build": "turbo run build",
     "build:web": "turbo run build --filter=@documenso/web",
+    "postinstall": "if [ \"$VERCEL\" = \"1\" ]; then npm run prisma:migrate-deploy; fi",
     "dev": "turbo run dev --filter=@documenso/web",
     "dev:web": "turbo run dev --filter=@documenso/web",
     "dev:docs": "turbo run dev --filter=@documenso/documentation",
