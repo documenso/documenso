@@ -9,8 +9,8 @@ import { useRevalidator } from 'react-router';
 import { renderSVG } from 'uqr';
 import { z } from 'zod';
 
+import { authClient } from '@documenso/auth/client';
 import { downloadFile } from '@documenso/lib/client-only/download-file';
-import { trpc } from '@documenso/trpc/react';
 import { Button } from '@documenso/ui/primitives/button';
 import {
   Dialog,
@@ -52,24 +52,8 @@ export const EnableAuthenticatorAppDialog = ({ onSuccess }: EnableAuthenticatorA
 
   const [isOpen, setIsOpen] = useState(false);
   const [recoveryCodes, setRecoveryCodes] = useState<string[] | null>(null);
-
-  const { mutateAsync: enable2FA } = trpc.twoFactorAuthentication.enable.useMutation();
-
-  const {
-    mutateAsync: setup2FA,
-    data: setup2FAData,
-    isPending: isSettingUp2FA,
-  } = trpc.twoFactorAuthentication.setup.useMutation({
-    onError: () => {
-      toast({
-        title: _(msg`Unable to setup two-factor authentication`),
-        description: _(
-          msg`We were unable to setup two-factor authentication for your account. Please ensure that you have entered your code correctly and try again.`,
-        ),
-        variant: 'destructive',
-      });
-    },
-  });
+  const [isSettingUp2FA, setIsSettingUp2FA] = useState(false);
+  const [setup2FAData, setSetup2FAData] = useState<{ uri: string; secret: string } | null>(null);
 
   const enable2FAForm = useForm<TEnable2FAForm>({
     defaultValues: {
@@ -80,9 +64,34 @@ export const EnableAuthenticatorAppDialog = ({ onSuccess }: EnableAuthenticatorA
 
   const { isSubmitting: isEnabling2FA } = enable2FAForm.formState;
 
+  const setup2FA = async () => {
+    if (isSettingUp2FA) {
+      return;
+    }
+
+    setIsSettingUp2FA(true);
+    setSetup2FAData(null);
+
+    try {
+      const data = await authClient.twoFactor.setup();
+
+      setSetup2FAData(data);
+    } catch (err) {
+      toast({
+        title: _(msg`Unable to setup two-factor authentication`),
+        description: _(
+          msg`We were unable to setup two-factor authentication for your account. Please ensure that you have entered your code correctly and try again.`,
+        ),
+        variant: 'destructive',
+      });
+    }
+
+    setIsSettingUp2FA(false);
+  };
+
   const onEnable2FAFormSubmit = async ({ token }: TEnable2FAForm) => {
     try {
-      const data = await enable2FA({ code: token });
+      const data = await authClient.twoFactor.enable({ code: token });
 
       setRecoveryCodes(data.recoveryCodes);
       onSuccess?.();

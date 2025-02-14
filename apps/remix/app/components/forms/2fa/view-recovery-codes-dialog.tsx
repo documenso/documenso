@@ -6,9 +6,9 @@ import { useForm } from 'react-hook-form';
 import { match } from 'ts-pattern';
 import { z } from 'zod';
 
+import { authClient } from '@documenso/auth/client';
 import { downloadFile } from '@documenso/lib/client-only/download-file';
 import { AppError } from '@documenso/lib/errors/app-error';
-import { trpc } from '@documenso/trpc/react';
 import { Alert, AlertDescription } from '@documenso/ui/primitives/alert';
 import { Button } from '@documenso/ui/primitives/button';
 import {
@@ -41,19 +41,31 @@ export type TViewRecoveryCodesForm = z.infer<typeof ZViewRecoveryCodesForm>;
 export const ViewRecoveryCodesDialog = () => {
   const [isOpen, setIsOpen] = useState(false);
 
-  const {
-    data: recoveryCodes,
-    mutate,
-    isPending,
-    error,
-  } = trpc.twoFactorAuthentication.viewRecoveryCodes.useMutation();
+  const [recoveryCodes, setRecoveryCodes] = useState<string[] | null>(null);
+  const [error, setError] = useState<string | null>(null);
 
-  const viewRecoveryCodesForm = useForm<TViewRecoveryCodesForm>({
+  const form = useForm<TViewRecoveryCodesForm>({
     defaultValues: {
       token: '',
     },
     resolver: zodResolver(ZViewRecoveryCodesForm),
   });
+
+  const onFormSubmit = async ({ token }: TViewRecoveryCodesForm) => {
+    setError(null);
+
+    try {
+      const data = await authClient.twoFactor.viewRecoveryCodes({
+        token,
+      });
+
+      setRecoveryCodes(data.backupCodes);
+    } catch (err) {
+      const error = AppError.parseError(err);
+
+      setError(error.code);
+    }
+  };
 
   const downloadRecoveryCodes = () => {
     if (recoveryCodes) {
@@ -106,8 +118,8 @@ export const ViewRecoveryCodesDialog = () => {
             </DialogFooter>
           </div>
         ) : (
-          <Form {...viewRecoveryCodesForm}>
-            <form onSubmit={viewRecoveryCodesForm.handleSubmit((value) => mutate(value))}>
+          <Form {...form}>
+            <form onSubmit={form.handleSubmit(onFormSubmit)}>
               <DialogHeader className="mb-4">
                 <DialogTitle>
                   <Trans>View Recovery Codes</Trans>
@@ -118,10 +130,10 @@ export const ViewRecoveryCodesDialog = () => {
                 </DialogDescription>
               </DialogHeader>
 
-              <fieldset className="flex flex-col space-y-4" disabled={isPending}>
+              <fieldset className="flex flex-col space-y-4" disabled={form.formState.isSubmitting}>
                 <FormField
                   name="token"
-                  control={viewRecoveryCodesForm.control}
+                  control={form.control}
                   render={({ field }) => (
                     <FormItem>
                       <FormControl>
@@ -161,7 +173,7 @@ export const ViewRecoveryCodesDialog = () => {
                     </Button>
                   </DialogClose>
 
-                  <Button type="submit" loading={isPending}>
+                  <Button type="submit" loading={form.formState.isSubmitting}>
                     <Trans>View</Trans>
                   </Button>
                 </DialogFooter>

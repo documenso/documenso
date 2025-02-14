@@ -7,6 +7,11 @@ import { AppError } from '@documenso/lib/errors/app-error';
 import type { AuthAppType } from '../server';
 import { handleSignInRedirect } from '../server/lib/utils/redirect';
 import type {
+  TDisableTwoFactorRequestSchema,
+  TEnableTwoFactorRequestSchema,
+  TViewTwoFactorRecoveryCodesRequestSchema,
+} from '../server/routes/two-factor.types';
+import type {
   TForgotPasswordSchema,
   TResendVerifyEmailSchema,
   TResetPasswordSchema,
@@ -101,6 +106,31 @@ export class AuthClient {
 
     verifyEmail: async (data: TVerifyEmailSchema) => {
       const response = await this.client['email-password']['verify-email'].$post({ json: data });
+      await this.handleError(response);
+
+      return response.json();
+    },
+  };
+
+  public twoFactor = {
+    setup: async () => {
+      const response = await this.client['two-factor'].setup.$post();
+      await this.handleError(response);
+
+      return response.json();
+    },
+    enable: async (data: TEnableTwoFactorRequestSchema) => {
+      const response = await this.client['two-factor'].enable.$post({ json: data });
+      await this.handleError(response);
+
+      return response.json();
+    },
+    disable: async (data: TDisableTwoFactorRequestSchema) => {
+      const response = await this.client['two-factor'].disable.$post({ json: data });
+      await this.handleError(response);
+    },
+    viewRecoveryCodes: async (data: TViewTwoFactorRecoveryCodesRequestSchema) => {
+      const response = await this.client['two-factor']['view-recovery-codes'].$post({ json: data });
       await this.handleError(response);
 
       return response.json();

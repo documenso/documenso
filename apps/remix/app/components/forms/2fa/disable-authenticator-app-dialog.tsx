@@ -9,7 +9,7 @@ import { useForm } from 'react-hook-form';
 import { useRevalidator } from 'react-router';
 import { z } from 'zod';
 
-import { trpc } from '@documenso/trpc/react';
+import { authClient } from '@documenso/auth/client';
 import { Button } from '@documenso/ui/primitives/button';
 import {
   Dialog,
@@ -47,8 +47,6 @@ export const DisableAuthenticatorAppDialog = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [twoFactorDisableMethod, setTwoFactorDisableMethod] = useState<'totp' | 'backup'>('totp');
 
-  const { mutateAsync: disable2FA } = trpc.twoFactorAuthentication.disable.useMutation();
-
   const disable2FAForm = useForm<TDisable2FAForm>({
     defaultValues: {
       totpCode: '',
@@ -81,7 +79,7 @@ export const DisableAuthenticatorAppDialog = () => {
 
   const onDisable2FAFormSubmit = async ({ totpCode, backupCode }: TDisable2FAForm) => {
     try {
-      await disable2FA({ totpCode, backupCode });
+      await authClient.twoFactor.disable({ totpCode, backupCode });
 
       toast({
         title: _(msg`Two-factor authentication disabled`),

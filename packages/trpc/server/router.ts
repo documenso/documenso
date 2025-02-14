@@ -9,7 +9,6 @@ import { shareLinkRouter } from './share-link-router/router';
 import { teamRouter } from './team-router/router';
 import { templateRouter } from './template-router/router';
 import { router } from './trpc';
-import { twoFactorAuthenticationRouter } from './two-factor-authentication-router/router';
 import { webhookRouter } from './webhook-router/router';
 
 export const appRouter = router({
@@ -24,7 +23,6 @@ export const appRouter = router({
   team: teamRouter,
   template: templateRouter,
   webhook: webhookRouter,
-  twoFactorAuthentication: twoFactorAuthenticationRouter,
 });
 
 export type AppRouter = typeof appRouter;

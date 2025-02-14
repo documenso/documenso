@@ -732,11 +732,11 @@ msgstr "Dodaj wszystkie istotne pola dla każdego odbiorcy."
 msgid "Add all relevant placeholders for each recipient."
 msgstr "Dodaj wszystkie odpowiednie symbole zastępcze dla każdego odbiorcy."
 
-#: apps/remix/app/routes/_authenticated+/settings+/security+/index.tsx:82
+#: apps/remix/app/routes/_authenticated+/settings+/security+/index.tsx:94
 msgid "Add an authenticator to serve as a secondary authentication method for signing documents."
 msgstr "Dodaj autoryzator, aby służył jako dodatkowa metoda uwierzytelniania do podpisywania dokumentów."
 
-#: apps/remix/app/routes/_authenticated+/settings+/security+/index.tsx:77
+#: apps/remix/app/routes/_authenticated+/settings+/security+/index.tsx:89
 msgid "Add an authenticator to serve as a secondary authentication method when signing in, or when signing documents."
 msgstr "Dodaj autoryzator, aby służył jako dodatkowa metoda uwierzytelniania podczas logowania lub podpisywania dokumentów."
 
@@ -901,7 +901,7 @@ msgstr "Cały czas"
 msgid "Allow document recipients to reply directly to this email address"
 msgstr "Zezwól odbiorcom dokumentów na bezpośrednią odpowiedź na ten adres e-mail"
 
-#: apps/remix/app/routes/_authenticated+/settings+/security+/index.tsx:129
+#: apps/remix/app/routes/_authenticated+/settings+/security+/index.tsx:141
 msgid "Allows authenticating using biometrics, password managers, hardware keys, etc."
 msgstr "Pozwala na uwierzytelnianie za pomocą biometrii, menedżerów haseł, kluczy sprzętowych itp."
 
@@ -1094,7 +1094,7 @@ msgstr ""
 #: apps/remix/app/components/forms/signup.tsx:183
 #: apps/remix/app/components/forms/signup.tsx:199
 #: apps/remix/app/components/forms/signin.tsx:52
-#: apps/remix/app/components/forms/signin.tsx:263
+#: apps/remix/app/components/forms/signin.tsx:265
 #: apps/remix/app/components/forms/signin.tsx:281
 #: apps/remix/app/components/forms/public-profile-form.tsx:103
 #: apps/remix/app/components/forms/public-profile-claim-dialog.tsx:109
@@ -1281,11 +1281,11 @@ msgid "Background Color"
 msgstr "Kolor tła"
 
 #: apps/remix/app/components/forms/signin.tsx:463
-#: apps/remix/app/components/forms/2fa/disable-authenticator-app-dialog.tsx:164
+#: apps/remix/app/components/forms/2fa/disable-authenticator-app-dialog.tsx:162
 msgid "Backup Code"
 msgstr "Kod zapasowy"
 
-#: apps/remix/app/components/forms/2fa/enable-authenticator-app-dialog.tsx:161
+#: apps/remix/app/components/forms/2fa/enable-authenticator-app-dialog.tsx:170
 msgid "Backup codes"
 msgstr "Kody zapasowe"
 
@@ -1409,8 +1409,8 @@ msgstr ""
 #: apps/remix/app/components/general/document-signing/document-signing-auth-passkey.tsx:190
 #: apps/remix/app/components/general/document-signing/document-signing-auth-account.tsx:75
 #: apps/remix/app/components/general/document-signing/document-signing-auth-2fa.tsx:175
-#: apps/remix/app/components/forms/2fa/view-recovery-codes-dialog.tsx:160
-#: apps/remix/app/components/forms/2fa/enable-authenticator-app-dialog.tsx:254
+#: apps/remix/app/components/forms/2fa/view-recovery-codes-dialog.tsx:172
+#: apps/remix/app/components/forms/2fa/enable-authenticator-app-dialog.tsx:263
 #: apps/remix/app/components/dialogs/webhook-delete-dialog.tsx:156
 #: apps/remix/app/components/dialogs/webhook-create-dialog.tsx:235
 #: apps/remix/app/components/dialogs/token-delete-dialog.tsx:169
@@ -1557,8 +1557,8 @@ msgstr "Kliknij, aby wstawić pole"
 #: apps/remix/app/components/general/document-signing/document-signing-auth-passkey.tsx:139
 #: apps/remix/app/components/general/document-signing/document-signing-auth-2fa.tsx:122
 #: apps/remix/app/components/general/document/document-recipient-link-copy-dialog.tsx:138
-#: apps/remix/app/components/forms/2fa/view-recovery-codes-dialog.tsx:99
-#: apps/remix/app/components/forms/2fa/enable-authenticator-app-dialog.tsx:177
+#: apps/remix/app/components/forms/2fa/view-recovery-codes-dialog.tsx:111
+#: apps/remix/app/components/forms/2fa/enable-authenticator-app-dialog.tsx:186
 #: apps/remix/app/components/dialogs/template-use-dialog.tsx:554
 #: apps/remix/app/components/dialogs/template-create-dialog.tsx:118
 #: apps/remix/app/components/dialogs/public-profile-template-manage-dialog.tsx:316
@@ -2125,9 +2125,9 @@ msgstr "Przekroczono użycie linku szablonu bezpośredniego ({0}/{1})"
 msgid "Disable"
 msgstr "Wyłącz"
 
-#: apps/remix/app/components/forms/2fa/disable-authenticator-app-dialog.tsx:113
-#: apps/remix/app/components/forms/2fa/disable-authenticator-app-dialog.tsx:120
-#: apps/remix/app/components/forms/2fa/disable-authenticator-app-dialog.tsx:189
+#: apps/remix/app/components/forms/2fa/disable-authenticator-app-dialog.tsx:111
+#: apps/remix/app/components/forms/2fa/disable-authenticator-app-dialog.tsx:118
+#: apps/remix/app/components/forms/2fa/disable-authenticator-app-dialog.tsx:187
 msgid "Disable 2FA"
 msgstr "Wyłącz 2FA"
 
@@ -2440,8 +2440,8 @@ msgstr "Nie masz konta? <0>Zarejestruj się</0>"
 #: apps/remix/app/components/tables/documents-table-action-button.tsx:139
 #: apps/remix/app/components/general/document/document-page-view-dropdown.tsx:126
 #: apps/remix/app/components/general/document/document-page-view-button.tsx:111
-#: apps/remix/app/components/forms/2fa/view-recovery-codes-dialog.tsx:104
-#: apps/remix/app/components/forms/2fa/enable-authenticator-app-dialog.tsx:182
+#: apps/remix/app/components/forms/2fa/view-recovery-codes-dialog.tsx:116
+#: apps/remix/app/components/forms/2fa/enable-authenticator-app-dialog.tsx:191
 #: packages/ui/components/document/document-download-button.tsx:66
 #: packages/email/template-components/template-document-completed.tsx:57
 msgid "Download"
@@ -2605,8 +2605,8 @@ msgstr "Weryfikacja e-mailu została ponownie wysłana"
 msgid "Empty field"
 msgstr "Puste pole"
 
-#: apps/remix/app/components/forms/2fa/enable-authenticator-app-dialog.tsx:150
-#: apps/remix/app/components/forms/2fa/enable-authenticator-app-dialog.tsx:259
+#: apps/remix/app/components/forms/2fa/enable-authenticator-app-dialog.tsx:159
+#: apps/remix/app/components/forms/2fa/enable-authenticator-app-dialog.tsx:268
 msgid "Enable 2FA"
 msgstr "Włącz 2FA"
 
@@ -2619,7 +2619,7 @@ msgstr "Włącz konto"
 msgid "Enable Account"
 msgstr "Włącz konto"
 
-#: apps/remix/app/components/forms/2fa/enable-authenticator-app-dialog.tsx:191
+#: apps/remix/app/components/forms/2fa/enable-authenticator-app-dialog.tsx:200
 msgid "Enable Authenticator App"
 msgstr "Włącz aplikację uwierzytelniającą"
 
@@ -2962,7 +2962,7 @@ msgstr ""
 msgid "Here you can edit your personal details."
 msgstr "Tutaj możesz edytować szczegóły konta."
 
-#: apps/remix/app/routes/_authenticated+/settings+/security+/index.tsx:56
+#: apps/remix/app/routes/_authenticated+/settings+/security+/index.tsx:68
 msgid "Here you can manage your password and security settings."
 msgstr "Tutaj możesz zarządzać swoim hasłem i ustawieniami zabezpieczeń."
 
@@ -3041,7 +3041,7 @@ msgstr "Jeśli nie chcesz korzystać z proponowanego uwierzytelnienia, możesz j
 msgid "If you don't find the confirmation link in your inbox, you can request a new one below."
 msgstr "Jeśli nie znajdziesz linku potwierdzającego w swojej skrzynce odbiorczej, możesz poprosić o nowy poniżej."
 
-#: apps/remix/app/components/forms/2fa/enable-authenticator-app-dialog.tsx:210
+#: apps/remix/app/components/forms/2fa/enable-authenticator-app-dialog.tsx:219
 msgid "If your authenticator app does not support QR codes, you can use the following code instead:"
 msgstr "Jeśli Twoja aplikacja uwierzytelniająca nie obsługuje kodów QR, możesz użyć poniższego kodu:"
 
@@ -3080,7 +3080,7 @@ msgstr "Wstawione"
 msgid "Instance Stats"
 msgstr "Statystyki instancji"
 
-#: apps/remix/app/components/forms/2fa/view-recovery-codes-dialog.tsx:148
+#: apps/remix/app/components/forms/2fa/view-recovery-codes-dialog.tsx:160
 msgid "Invalid code. Please try again."
 msgstr "Nieprawidłowy kod. Proszę spróbuj ponownie."
 
@@ -3324,7 +3324,7 @@ msgstr "Zarządzaj Bezpośrednim Linkiem"
 msgid "Manage documents"
 msgstr "Zarządzaj dokumentami"
 
-#: apps/remix/app/routes/_authenticated+/settings+/security+/index.tsx:137
+#: apps/remix/app/routes/_authenticated+/settings+/security+/index.tsx:149
 msgid "Manage passkeys"
 msgstr "Zarządzaj kluczami dostępu"
 
@@ -3674,7 +3674,7 @@ msgstr "Po potwierdzeniu, nastąpi:"
 msgid "Once enabled, you can select any active recipient to be a direct link signing recipient, or create a new one. This recipient type cannot be edited or deleted."
 msgstr "Po włączeniu możesz wybrać dowolnego aktywnego odbiorcę na sygnatariusza bezpośredniego lub utworzyć nowego. Tego typu odbiorca nie może być edytowany ani usunięty."
 
-#: apps/remix/app/components/forms/2fa/enable-authenticator-app-dialog.tsx:221
+#: apps/remix/app/components/forms/2fa/enable-authenticator-app-dialog.tsx:230
 msgid "Once you have scanned the QR code or entered the code manually, enter the code provided by your authenticator app below."
 msgstr "Po zeskanowaniu kodu QR lub ręcznym wpisaniu kodu, wprowadź poniżej kod dostarczony przez swoją aplikację uwierzytelniającą."
 
@@ -3771,7 +3771,7 @@ msgstr "Nazwa klucza dostępu"
 msgid "Passkey Re-Authentication"
 msgstr "Ponowna Autoryzacja Klucza Dostępu"
 
-#: apps/remix/app/routes/_authenticated+/settings+/security+/index.tsx:125
+#: apps/remix/app/routes/_authenticated+/settings+/security+/index.tsx:137
 #: apps/remix/app/routes/_authenticated+/settings+/security+/passkeys+/index.tsx:19
 msgid "Passkeys"
 msgstr "Klucze dostępu"
@@ -3981,11 +3981,11 @@ msgstr "Proszę pamiętać, że stracisz dostęp do wszystkich dokumentów powi�
 msgid "Please provide a reason"
 msgstr "Proszę podać powód"
 
-#: apps/remix/app/components/forms/2fa/disable-authenticator-app-dialog.tsx:124
+#: apps/remix/app/components/forms/2fa/disable-authenticator-app-dialog.tsx:122
 msgid "Please provide a token from the authenticator, or a backup code. If you do not have a backup code available, please contact support."
 msgstr "Proszę podać token z aplikacji uwierzytelniającej lub kod zapasowy. Jeśli nie masz dostępnego kodu zapasowego, skontaktuj się z pomocą techniczną."
 
-#: apps/remix/app/components/forms/2fa/view-recovery-codes-dialog.tsx:117
+#: apps/remix/app/components/forms/2fa/view-recovery-codes-dialog.tsx:129
 msgid "Please provide a token from your authenticator, or a backup code."
 msgstr "Proszę podać token z Twojego uwierzytelniacza lub kod zapasowy."
 
@@ -4144,7 +4144,7 @@ msgstr "Wymagana jest ponowna autoryzacja, aby podpisać to pole"
 msgid "Receives copy"
 msgstr "Otrzymuje kopię"
 
-#: apps/remix/app/routes/_authenticated+/settings+/security+/index.tsx:148
+#: apps/remix/app/routes/_authenticated+/settings+/security+/index.tsx:160
 #: apps/remix/app/components/general/document/document-page-view-recent-activity.tsx:54
 msgid "Recent activity"
 msgstr "Ostatnia aktywność"
@@ -4202,7 +4202,7 @@ msgstr "Odbiorcy nadal zachowają swoją kopię dokumentu"
 msgid "Recovery code copied"
 msgstr "Kod odzyskiwania skopiowany"
 
-#: apps/remix/app/routes/_authenticated+/settings+/security+/index.tsx:104
+#: apps/remix/app/routes/_authenticated+/settings+/security+/index.tsx:116
 msgid "Recovery codes"
 msgstr "Kody odzyskiwania"
 
@@ -4453,7 +4453,7 @@ msgstr "Szukaj języków..."
 msgid "Secret"
 msgstr "Sekret"
 
-#: apps/remix/app/routes/_authenticated+/settings+/security+/index.tsx:55
+#: apps/remix/app/routes/_authenticated+/settings+/security+/index.tsx:67
 #: apps/remix/app/components/general/settings-nav-mobile.tsx:71
 #: apps/remix/app/components/general/settings-nav-desktop.tsx:69
 msgid "Security"
@@ -4930,7 +4930,7 @@ msgstr "Coś poszło nie tak."
 msgid "Something went wrong. Please try again later."
 msgstr "Coś poszło nie tak. Proszę spróbować ponownie później."
 
-#: apps/remix/app/components/forms/2fa/view-recovery-codes-dialog.tsx:151
+#: apps/remix/app/components/forms/2fa/view-recovery-codes-dialog.tsx:163
 #: apps/remix/app/components/dialogs/passkey-create-dialog.tsx:239
 msgid "Something went wrong. Please try again or contact support."
 msgstr "Coś poszło nie tak. Proszę spróbować ponownie lub skontaktować się z pomocą techniczną."
@@ -5747,7 +5747,7 @@ msgstr "Aby potwierdzić, proszę wpisać powód"
 msgid "To decline this invitation you must create an account."
 msgstr "Aby odrzucić to zaproszenie, musisz założyć konto."
 
-#: apps/remix/app/components/forms/2fa/enable-authenticator-app-dialog.tsx:194
+#: apps/remix/app/components/forms/2fa/enable-authenticator-app-dialog.tsx:203
 msgid "To enable two-factor authentication, scan the following QR code using your authenticator app."
 msgstr "Aby włączyć uwierzytelnianie dwuetapowe, zeskanuj poniższy kod QR za pomocą swojej aplikacji uwierzytelniającej."
 
@@ -5783,7 +5783,7 @@ msgstr "Przełącz przełącznik, aby ukryć swój profil przed publicznością.
 msgid "Toggle the switch to show your profile to the public."
 msgstr "Przełącz przełącznik, aby pokazać swój profil publicznie."
 
-#: apps/remix/app/components/forms/2fa/enable-authenticator-app-dialog.tsx:233
+#: apps/remix/app/components/forms/2fa/enable-authenticator-app-dialog.tsx:242
 msgid "Token"
 msgstr "Token"
 
@@ -5860,11 +5860,11 @@ msgstr "Przenieś własność zespołu na innego członka zespołu."
 msgid "Triggers"
 msgstr "Wyzwalacze"
 
-#: apps/remix/app/routes/_authenticated+/settings+/security+/index.tsx:72
+#: apps/remix/app/routes/_authenticated+/settings+/security+/index.tsx:84
 msgid "Two factor authentication"
 msgstr "Uwierzytelnianie dwuetapowe"
 
-#: apps/remix/app/routes/_authenticated+/settings+/security+/index.tsx:108
+#: apps/remix/app/routes/_authenticated+/settings+/security+/index.tsx:120
 msgid "Two factor authentication recovery codes are used to access your account in the event that you lose access to your authenticator app."
 msgstr "Kody odzyskiwania uwierzytelniania dwuetapowego są używane do uzyskania dostępu do Twojego konta w przypadku, gdy stracisz dostęp do aplikacji uwierzytelniającej."
 
@@ -5872,15 +5872,15 @@ msgstr "Kody odzyskiwania uwierzytelniania dwuetapowego są używane do uzyskani
 msgid "Two-Factor Authentication"
 msgstr "Uwierzytelnianie dwuetapowe"
 
-#: apps/remix/app/components/forms/2fa/disable-authenticator-app-dialog.tsx:87
+#: apps/remix/app/components/forms/2fa/disable-authenticator-app-dialog.tsx:85
 msgid "Two-factor authentication disabled"
 msgstr "Uwierzytelnianie dwuetapowe wyłączone"
 
-#: apps/remix/app/components/forms/2fa/enable-authenticator-app-dialog.tsx:91
+#: apps/remix/app/components/forms/2fa/enable-authenticator-app-dialog.tsx:100
 msgid "Two-factor authentication enabled"
 msgstr "Uwierzytelnianie dwuetapowe włączone"
 
-#: apps/remix/app/components/forms/2fa/disable-authenticator-app-dialog.tsx:89
+#: apps/remix/app/components/forms/2fa/disable-authenticator-app-dialog.tsx:87
 msgid "Two-factor authentication has been disabled for your account. You will no longer be required to enter a code from your authenticator app when signing in."
 msgstr "Uwierzytelnianie dwuetapowe zostało wyłączone dla Twojego konta. Nie będziesz już musiał wprowadzać kodu z aplikacji uwierzytelniającej podczas logowania."
 
@@ -5933,7 +5933,7 @@ msgstr "Nie można usunąć zaproszenia. Proszę spróbować ponownie."
 msgid "Unable to delete team"
 msgstr "Nie można usunąć zespołu"
 
-#: apps/remix/app/components/forms/2fa/disable-authenticator-app-dialog.tsx:100
+#: apps/remix/app/components/forms/2fa/disable-authenticator-app-dialog.tsx:98
 msgid "Unable to disable two-factor authentication"
 msgstr "Nie można wyłączyć uwierzytelniania dwuetapowego"
 
@@ -5974,8 +5974,8 @@ msgstr "Nie można ponownie wysłać weryfikacji w tej chwili. Proszę spróbowa
 msgid "Unable to reset password"
 msgstr "Nie można zresetować hasła"
 
-#: apps/remix/app/components/forms/2fa/enable-authenticator-app-dialog.tsx:65
-#: apps/remix/app/components/forms/2fa/enable-authenticator-app-dialog.tsx:98
+#: apps/remix/app/components/forms/2fa/enable-authenticator-app-dialog.tsx:81
+#: apps/remix/app/components/forms/2fa/enable-authenticator-app-dialog.tsx:107
 msgid "Unable to setup two-factor authentication"
 msgstr "Nie można skonfigurować uwierzytelniania dwuetapowego"
 
@@ -6144,12 +6144,12 @@ msgid "Use"
 msgstr "Użyj"
 
 #: apps/remix/app/components/forms/signin.tsx:483
-#: apps/remix/app/components/forms/2fa/disable-authenticator-app-dialog.tsx:184
+#: apps/remix/app/components/forms/2fa/disable-authenticator-app-dialog.tsx:182
 msgid "Use Authenticator"
 msgstr "Użyj Authenticatora"
 
 #: apps/remix/app/components/forms/signin.tsx:481
-#: apps/remix/app/components/forms/2fa/disable-authenticator-app-dialog.tsx:182
+#: apps/remix/app/components/forms/2fa/disable-authenticator-app-dialog.tsx:180
 msgid "Use Backup Code"
 msgstr "Użyj kodu zapasowego"
 
@@ -6244,12 +6244,12 @@ msgstr "Historia wersji"
 #: apps/remix/app/components/tables/documents-table-action-button.tsx:124
 #: apps/remix/app/components/tables/documents-table-action-button.tsx:133
 #: apps/remix/app/components/general/document/document-page-view-button.tsx:95
-#: apps/remix/app/components/forms/2fa/view-recovery-codes-dialog.tsx:165
+#: apps/remix/app/components/forms/2fa/view-recovery-codes-dialog.tsx:177
 #: packages/lib/constants/recipient-roles.ts:28
 msgid "View"
 msgstr "Widok"
 
-#: apps/remix/app/routes/_authenticated+/settings+/security+/index.tsx:158
+#: apps/remix/app/routes/_authenticated+/settings+/security+/index.tsx:170
 msgid "View activity"
 msgstr "Wyświetl aktywność"
 
@@ -6261,7 +6261,7 @@ msgstr "Wyświetl wszystkie dokumenty wysłane do i z tego adresu e-mail"
 msgid "View all documents sent to your account"
 msgstr "Wyświetl wszystkie dokumenty wysłane na twoje konto"
 
-#: apps/remix/app/routes/_authenticated+/settings+/security+/index.tsx:152
+#: apps/remix/app/routes/_authenticated+/settings+/security+/index.tsx:164
 msgid "View all recent security activity related to your account."
 msgstr "Wyświetl wszystkie ostatnie aktywności związane z bezpieczeństwem twojego konta."
 
@@ -6273,7 +6273,7 @@ msgstr "Zobacz wszystkie powiązane dokumenty"
 msgid "View all security activity related to your account."
 msgstr "Wyświetl wszystkie aktywności związane z bezpieczeństwem twojego konta."
 
-#: apps/remix/app/components/forms/2fa/view-recovery-codes-dialog.tsx:75
+#: apps/remix/app/components/forms/2fa/view-recovery-codes-dialog.tsx:87
 msgid "View Codes"
 msgstr "Wyświetl kody"
 
@@ -6309,8 +6309,8 @@ msgstr "Wyświetl oryginalny dokument"
 msgid "View plans"
 msgstr "Zobacz plany"
 
-#: apps/remix/app/components/forms/2fa/view-recovery-codes-dialog.tsx:84
-#: apps/remix/app/components/forms/2fa/view-recovery-codes-dialog.tsx:113
+#: apps/remix/app/components/forms/2fa/view-recovery-codes-dialog.tsx:96
+#: apps/remix/app/components/forms/2fa/view-recovery-codes-dialog.tsx:125
 msgid "View Recovery Codes"
 msgstr "Wyświetl kody odzyskiwania"
 
@@ -6460,7 +6460,7 @@ msgstr "Natknęliśmy się na nieznany błąd podczas próby odwołania dostępu
 msgid "We encountered an unknown error while attempting to save your details. Please try again later."
 msgstr "Natknęliśmy się na nieznany błąd podczas próby zapisania twoich danych. Proszę spróbuj ponownie później."
 
-#: apps/remix/app/components/forms/signin.tsx:265
+#: apps/remix/app/components/forms/signin.tsx:267
 #: apps/remix/app/components/forms/signin.tsx:283
 msgid "We encountered an unknown error while attempting to sign you In. Please try again later."
 msgstr "Natknęliśmy się na nieznany błąd podczas próby zalogowania się. Proszę spróbuj ponownie później."
@@ -6531,7 +6531,7 @@ msgstr "Nie udało się utworzyć sesji zakupu. Proszę spróbuj ponownie lub sk
 msgid "We were unable to create your account. Please review the information you provided and try again."
 msgstr "Nie udało się utworzyć Twojego konta. Proszę sprawdzić podane informacje i spróbować ponownie."
 
-#: apps/remix/app/components/forms/2fa/disable-authenticator-app-dialog.tsx:102
+#: apps/remix/app/components/forms/2fa/disable-authenticator-app-dialog.tsx:100
 msgid "We were unable to disable two-factor authentication for your account. Please ensure that you have entered your password and backup code correctly and try again."
 msgstr "Nie udało nam się wyłączyć uwierzytelniania dwuskładnikowego dla twojego konta. Upewnij się, że wpisałeś poprawnie swoje hasło i kod zapasowy, a następnie spróbuj ponownie."
 
@@ -6545,8 +6545,8 @@ msgstr "Nie udało nam się wylogować w tej chwili."
 msgid "We were unable to set your public profile to public. Please try again."
 msgstr "Nie udało nam się ustawić twojego profilu publicznego na publiczny. Proszę spróbuj ponownie."
 
-#: apps/remix/app/components/forms/2fa/enable-authenticator-app-dialog.tsx:67
-#: apps/remix/app/components/forms/2fa/enable-authenticator-app-dialog.tsx:100
+#: apps/remix/app/components/forms/2fa/enable-authenticator-app-dialog.tsx:83
+#: apps/remix/app/components/forms/2fa/enable-authenticator-app-dialog.tsx:109
 msgid "We were unable to setup two-factor authentication for your account. Please ensure that you have entered your code correctly and try again."
 msgstr "Nie udało nam się skonfigurować uwierzytelniania dwuskładnikowego dla twojego konta. Upewnij się, że wpisałeś poprawnie swój kod, a następnie spróbuj ponownie."
 
@@ -6976,7 +6976,7 @@ msgstr "Musisz skonfigurować 2FA, aby oznaczyć ten dokument jako przeczytany."
 msgid "You will get notified & be able to set up your documenso public profile when we launch the feature."
 msgstr "Otrzymasz powiadomienie i będziesz mógł skonfigurować swój publiczny profil documenso, gdy uruchomimy tę funkcję."
 
-#: apps/remix/app/components/forms/2fa/enable-authenticator-app-dialog.tsx:93
+#: apps/remix/app/components/forms/2fa/enable-authenticator-app-dialog.tsx:102
 msgid "You will now be required to enter a code from your authenticator app when signing in."
 msgstr "Będziesz teraz zobowiązany do wpisania kodu z aplikacji uwierzytelniającej podczas logowania."
 
@@ -7109,8 +7109,8 @@ msgstr "Profil publiczny został zaktualizowany."
 msgid "Your recovery code has been copied to your clipboard."
 msgstr "Twój kod odzyskiwania został skopiowany do schowka."
 
-#: apps/remix/app/components/forms/2fa/view-recovery-codes-dialog.tsx:88
-#: apps/remix/app/components/forms/2fa/enable-authenticator-app-dialog.tsx:164
+#: apps/remix/app/components/forms/2fa/view-recovery-codes-dialog.tsx:100
+#: apps/remix/app/components/forms/2fa/enable-authenticator-app-dialog.tsx:173
 msgid "Your recovery codes are listed below. Please store them in a safe place."
 msgstr "Twoje kody odzyskiwania są wymienione poniżej. Proszę przechowywać je w bezpiecznym miejscu."
 
