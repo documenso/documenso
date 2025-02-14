@@ -38,7 +38,7 @@ export type SignDialogProps = {
   documentTitle: string;
   fields: Field[];
   fieldsValidated: () => void | Promise<void>;
-  onSignatureComplete: (nextSigner?: { email: string; name: string }) => void | Promise<void>;
+  onSignatureComplete: (nextSigner?: { email?: string; name?: string }) => void | Promise<void>;
   role: RecipientRole;
   disabled?: boolean;
   canModifyNextSigner?: boolean;
@@ -48,20 +48,10 @@ const formSchema = z.object({
   nextSigner: z
     .object({
       email: z.string().email({ message: 'Please enter a valid email address' }).optional(),
-      name: z.string().min(1, { message: 'Name is required' }).optional(),
+      name: z.string().optional(),
     })
-    .refine(
-      (data) => {
-        if (data.name) {
-          return !!data.email;
-        }
-        return true;
-      },
-      {
-        message: 'Email is required when name is provided',
-        path: ['email'],
-      },
-    ),
+    .optional()
+    .default({}),
 });
 
 type TFormSchema = z.infer<typeof formSchema>;
@@ -99,26 +89,15 @@ export function SignDialog({
 
   const form = useForm<TFormSchema>({
     resolver: zodResolver(formSchema),
-    defaultValues: {
-      nextSigner: {
-        email: '',
-        name: '',
-      },
-    },
   });
 
   const onFormSubmit = async (data: TFormSchema) => {
     try {
       await fieldsValidated();
 
-      if (!canModifyNextSigner || !data.nextSigner.email) {
-        await onSignatureComplete();
-        return;
-      }
-
       await onSignatureComplete({
-        email: data.nextSigner.email.trim().toLowerCase(),
-        name: data.nextSigner.name?.trim() ?? '',
+        email: data.nextSigner.email?.trim().toLowerCase(),
+        name: data.nextSigner.name?.trim(),
       });
 
       setShowDialog(false);
@@ -378,6 +357,7 @@ export function SignDialog({
                     Cancel
                   </Button>
                 </DialogClose>
+
                 {step === 1 && (
                   <Button className="group" type="button" onClick={handleContinue}>
                     Next

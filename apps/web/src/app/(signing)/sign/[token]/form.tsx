@@ -45,6 +45,7 @@ export type SigningFormProps = {
   isRecipientsTurn: boolean;
   allRecipients?: RecipientWithFields[];
   setSelectedSignerId?: (id: number | null) => void;
+  isLastRecipient: boolean;
 };
 
 type SigningFormData = {
@@ -60,6 +61,7 @@ export const SigningForm = ({
   isRecipientsTurn,
   allRecipients = [],
   setSelectedSignerId,
+  isLastRecipient,
 }: SigningFormProps) => {
   const { _ } = useLingui();
   const { toast } = useToast();
@@ -252,7 +254,8 @@ export const SigningForm = ({
                     disabled={!isRecipientsTurn}
                     canModifyNextSigner={
                       document.documentMeta?.modifyNextSigner &&
-                      document.documentMeta?.signingOrder === DocumentSigningOrder.SEQUENTIAL
+                      document.documentMeta?.signingOrder === DocumentSigningOrder.SEQUENTIAL &&
+                      !isLastRecipient
                     }
                   />
                 </div>
@@ -435,7 +438,8 @@ export const SigningForm = ({
                       disabled={!isRecipientsTurn}
                       canModifyNextSigner={
                         document.documentMeta?.modifyNextSigner &&
-                        document.documentMeta?.signingOrder === DocumentSigningOrder.SEQUENTIAL
+                        document.documentMeta?.signingOrder === DocumentSigningOrder.SEQUENTIAL &&
+                        !isLastRecipient
                       }
                     />
                   </div>

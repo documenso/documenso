@@ -9,6 +9,7 @@ import { isRecipientAuthorized } from '@documenso/lib/server-only/document/is-re
 import { viewedDocument } from '@documenso/lib/server-only/document/viewed-document';
 import { getCompletedFieldsForToken } from '@documenso/lib/server-only/field/get-completed-fields-for-token';
 import { getFieldsForToken } from '@documenso/lib/server-only/field/get-fields-for-token';
+import { getIsLastRecipient } from '@documenso/lib/server-only/recipient/get-is-last-recipient';
 import { getIsRecipientsTurnToSign } from '@documenso/lib/server-only/recipient/get-is-recipient-turn';
 import { getRecipientByToken } from '@documenso/lib/server-only/recipient/get-recipient-by-token';
 import { getRecipientSignatures } from '@documenso/lib/server-only/recipient/get-recipient-signatures';
@@ -44,7 +45,7 @@ export default async function SigningPage({ params: { token } }: SigningPageProp
 
   const requestMetadata = extractNextHeaderRequestMetadata(requestHeaders);
 
-  const [document, recipient, fields, completedFields] = await Promise.all([
+  const [document, recipient, fields, completedFields, isLastRecipient] = await Promise.all([
     getDocumentAndSenderByToken({
       token,
       userId: user?.id,
@@ -53,6 +54,7 @@ export default async function SigningPage({ params: { token } }: SigningPageProp
     getRecipientByToken({ token }).catch(() => null),
     getFieldsForToken({ token }),
     getCompletedFieldsForToken({ token }),
+    getIsLastRecipient({ token }),
   ]);
 
   if (
@@ -169,6 +171,7 @@ export default async function SigningPage({ params: { token } }: SigningPageProp
           completedFields={completedFields}
           isRecipientsTurn={isRecipientsTurn}
           allRecipients={allRecipients}
+          isLastRecipient={isLastRecipient}
         />
       </DocumentAuthProvider>
     </SigningProvider>
