@@ -1,9 +1,7 @@
-import { useLocation, useNavigate, useSearchParams } from 'react-router';
+import { useSearchParams } from 'react-router';
 
 export const useUpdateSearchParams = () => {
-  const navigate = useNavigate();
-  const { pathname } = useLocation();
-  const [searchParams] = useSearchParams();
+  const [searchParams, setSearchParams] = useSearchParams();
 
   return (params: Record<string, string | number | boolean | null | undefined>) => {
     const nextSearchParams = new URLSearchParams(searchParams?.toString() ?? '');
@@ -16,6 +14,6 @@ export const useUpdateSearchParams = () => {
       }
     });
 
-    void navigate(`${pathname}?${nextSearchParams.toString()}`);
+    setSearchParams(nextSearchParams);
   };
 };

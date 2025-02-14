@@ -119,7 +119,7 @@ export const TeamCreateDialog = ({ trigger, ...props }: TeamCreateDialogProps) =
       setOpen(true);
       updateSearchParams({ action: null });
     }
-  }, [actionSearchParam, open, setOpen, updateSearchParams]);
+  }, [actionSearchParam, open]);
 
   useEffect(() => {
     form.reset();

@@ -67,7 +67,7 @@ export const DocumentRecipientLinkCopyDialog = ({
       setOpen(true);
       updateSearchParams({ action: null });
     }
-  }, [actionSearchParam, open, setOpen, updateSearchParams]);
+  }, [actionSearchParam, open]);
 
   return (
     <Dialog open={open} onOpenChange={(value) => setOpen(value)}>
