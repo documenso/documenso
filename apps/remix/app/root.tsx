@@ -107,6 +107,9 @@ export function App() {
         <Suspense>
           <PostHogPageview />
         </Suspense>
+
+        {/* Fix: https://stackoverflow.com/questions/21147149/flash-of-unstyled-content-fouc-in-firefox-only-is-ff-slow-renderer */}
+        <script>0</script>
       </head>
       <body>
         <SessionProvider session={session}>
