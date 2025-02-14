@@ -28,6 +28,10 @@ export type CompleteDocumentWithTokenOptions = {
   userId?: number;
   authOptions?: TRecipientActionAuth;
   requestMetadata?: RequestMetadata;
+  nextSigner?: {
+    email: string;
+    name: string;
+  };
 };
 
 const getDocument = async ({ token, documentId }: CompleteDocumentWithTokenOptions) => {
@@ -51,11 +55,56 @@ const getDocument = async ({ token, documentId }: CompleteDocumentWithTokenOptio
   });
 };
 
+export const delegateNextSigner = async ({
+  documentId,
+  currentRecipientId,
+  nextSigner,
+}: {
+  documentId: number;
+  currentRecipientId: number;
+  nextSigner: { email: string; name: string };
+}) => {
+  const document = await prisma.document.findUnique({
+    where: { id: documentId },
+    include: {
+      recipients: {
+        orderBy: [{ signingOrder: 'asc' }, { id: 'asc' }],
+      },
+    },
+  });
+
+  if (!document) {
+    throw new Error('Document not found');
+  }
+
+  const currentRecipient = document.recipients.find((r) => r.id === currentRecipientId);
+  const nextRecipient = document.recipients.find(
+    (r) => r.signingOrder === (currentRecipient?.signingOrder ?? 0) + 1,
+  );
+
+  if (!nextRecipient) {
+    throw new Error('Next recipient not found');
+  }
+
+  await prisma.recipient.update({
+    where: { id: nextRecipient.id },
+    data: {
+      email: nextSigner.email,
+      name: nextSigner.name,
+    },
+  });
+
+  return nextRecipient;
+};
+
 export const completeDocumentWithToken = async ({
   token,
   documentId,
   requestMetadata,
+  nextSigner,
 }: CompleteDocumentWithTokenOptions) => {
+  console.log('completeDocumentWithToken == document-router', token, documentId, nextSigner);
+
   const document = await getDocument({ token, documentId });
 
   if (document.status !== DocumentStatus.PENDING) {
@@ -111,6 +160,20 @@ export const completeDocumentWithToken = async ({
   // if (!isValid) {
   //   throw new AppError(AppErrorCode.UNAUTHORIZED, 'Invalid authentication values');
   // }
+
+  if (
+    nextSigner &&
+    document.documentMeta?.modifyNextSigner &&
+    document.documentMeta?.signingOrder === DocumentSigningOrder.SEQUENTIAL
+  ) {
+    console.log('delegateNextSigner == document-router', document.id, recipient.id, nextSigner);
+
+    await delegateNextSigner({
+      documentId: document.id,
+      currentRecipientId: recipient.id,
+      nextSigner,
+    });
+  }
 
   await prisma.$transaction(async (tx) => {
     await tx.recipient.update({

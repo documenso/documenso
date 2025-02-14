@@ -15,7 +15,12 @@ import type { TRecipientActionAuth } from '@documenso/lib/types/document-auth';
 import { isFieldUnsignedAndRequired } from '@documenso/lib/utils/advanced-fields-helpers';
 import { sortFieldsByPosition, validateFieldsInserted } from '@documenso/lib/utils/fields';
 import type { Recipient } from '@documenso/prisma/client';
-import { type Field, FieldType, RecipientRole } from '@documenso/prisma/client';
+import {
+  DocumentSigningOrder,
+  type Field,
+  FieldType,
+  RecipientRole,
+} from '@documenso/prisma/client';
 import type { RecipientWithFields } from '@documenso/prisma/types/recipient-with-fields';
 import { trpc } from '@documenso/trpc/react';
 import { FieldToolTip } from '@documenso/ui/components/field/field-tooltip';
@@ -40,6 +45,11 @@ export type SigningFormProps = {
   isRecipientsTurn: boolean;
   allRecipients?: RecipientWithFields[];
   setSelectedSignerId?: (id: number | null) => void;
+};
+
+type SigningFormData = {
+  email?: string;
+  name?: string;
 };
 
 export const SigningForm = ({
@@ -77,7 +87,7 @@ export const SigningForm = ({
     },
   });
 
-  const { handleSubmit, formState } = useForm();
+  const { handleSubmit, formState } = useForm<SigningFormData>();
 
   // Keep the loading state going if successful since the redirect may take some time.
   const isSubmitting = formState.isSubmitting || formState.isSubmitSuccessful;
@@ -102,20 +112,58 @@ export const SigningForm = ({
     validateFieldsInserted(fieldsRequiringValidation);
   };
 
-  const onFormSubmit = async () => {
-    setValidateUninsertedFields(true);
+  const completeDocument = async (
+    authOptions?: TRecipientActionAuth,
+    nextSigner?: { email: string; name: string },
+  ) => {
+    const payload = {
+      token: recipient.token,
+      documentId: document.id,
+      authOptions,
+      ...(nextSigner?.email && nextSigner?.name ? { nextSigner } : {}),
+    };
 
-    const isFieldsValid = validateFieldsInserted(fieldsRequiringValidation);
+    await completeDocumentWithToken(payload);
 
-    if (hasSignatureField && !signatureValid) {
-      return;
+    analytics.capture('App: Recipient has completed signing', {
+      signerId: recipient.id,
+      documentId: document.id,
+      timestamp: new Date().toISOString(),
+    });
+
+    redirectUrl ? router.push(redirectUrl) : router.push(`/sign/${recipient.token}/complete`);
+  };
+
+  const onFormSubmit = async (data: SigningFormData) => {
+    try {
+      setValidateUninsertedFields(true);
+
+      const isFieldsValid = validateFieldsInserted(fieldsRequiringValidation);
+
+      if (hasSignatureField && !signatureValid) {
+        throw new Error('Please provide a valid signature');
+      }
+
+      if (!isFieldsValid) {
+        throw new Error('Please complete all required fields');
+      }
+
+      const nextSigner =
+        data.email && data.name
+          ? {
+              email: data.email,
+              name: data.name,
+            }
+          : undefined;
+
+      await completeDocument(undefined, nextSigner);
+    } catch (error) {
+      toast({
+        title: 'Error',
+        description: 'An error occurred while completing the document. Please try again.',
+        variant: 'destructive',
+      });
     }
-
-    if (!isFieldsValid) {
-      return;
-    }
-
-    await completeDocument();
   };
 
   const onAssistantFormSubmit = () => {
@@ -141,22 +189,6 @@ export const SigningForm = ({
       setIsAssistantSubmitting(false);
       setIsConfirmationDialogOpen(false);
     }
-  };
-
-  const completeDocument = async (authOptions?: TRecipientActionAuth) => {
-    await completeDocumentWithToken({
-      token: recipient.token,
-      documentId: document.id,
-      authOptions,
-    });
-
-    analytics.capture('App: Recipient has completed signing', {
-      signerId: recipient.id,
-      documentId: document.id,
-      timestamp: new Date().toISOString(),
-    });
-
-    redirectUrl ? router.push(redirectUrl) : router.push(`/sign/${recipient.token}/complete`);
   };
 
   return (
@@ -208,12 +240,20 @@ export const SigningForm = ({
 
                   <SignDialog
                     isSubmitting={isSubmitting}
-                    onSignatureComplete={handleSubmit(onFormSubmit)}
+                    onSignatureComplete={async (nextSigner) => {
+                      await handleSubmit(async (formData) =>
+                        onFormSubmit({ ...formData, ...nextSigner }),
+                      )();
+                    }}
                     documentTitle={document.title}
                     fields={fields}
                     fieldsValidated={fieldsValidated}
                     role={recipient.role}
                     disabled={!isRecipientsTurn}
+                    canModifyNextSigner={
+                      document.documentMeta?.modifyNextSigner &&
+                      document.documentMeta?.signingOrder === DocumentSigningOrder.SEQUENTIAL
+                    }
                   />
                 </div>
               </div>
@@ -383,12 +423,20 @@ export const SigningForm = ({
 
                     <SignDialog
                       isSubmitting={isSubmitting}
-                      onSignatureComplete={handleSubmit(onFormSubmit)}
+                      onSignatureComplete={async (nextSigner) => {
+                        await handleSubmit(async (formData) =>
+                          onFormSubmit({ ...formData, ...nextSigner }),
+                        )();
+                      }}
                       documentTitle={document.title}
                       fields={fields}
                       fieldsValidated={fieldsValidated}
                       role={recipient.role}
                       disabled={!isRecipientsTurn}
+                      canModifyNextSigner={
+                        document.documentMeta?.modifyNextSigner &&
+                        document.documentMeta?.signingOrder === DocumentSigningOrder.SEQUENTIAL
+                      }
                     />
                   </div>
                 </fieldset>

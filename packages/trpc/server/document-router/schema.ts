@@ -251,6 +251,7 @@ export const ZUpdateDocumentRequestSchema = z.object({
       language: ZDocumentMetaLanguageSchema.optional(),
       typedSignatureEnabled: ZDocumentMetaTypedSignatureEnabledSchema.optional(),
       emailSettings: ZDocumentEmailSettingsSchema.optional(),
+      modifyNextSigner: z.boolean().optional(),
     })
     .optional(),
 });

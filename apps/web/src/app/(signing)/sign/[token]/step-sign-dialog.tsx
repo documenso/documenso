@@ -33,7 +33,7 @@ import { Input } from '@documenso/ui/primitives/input';
 
 import { SigningDisclosure } from '~/components/general/signing-disclosure';
 
-export type SignDialogProps = {
+export type StepSignDialogProps = {
   isSubmitting: boolean;
   documentTitle: string;
   fields: Field[];
@@ -66,7 +66,7 @@ const formSchema = z.object({
 
 type TFormSchema = z.infer<typeof formSchema>;
 
-export function SignDialog({
+export default function StepSignDialog({
   isSubmitting,
   documentTitle,
   fields,
@@ -75,7 +75,7 @@ export function SignDialog({
   role,
   disabled = false,
   canModifyNextSigner = false,
-}: SignDialogProps) {
+}: StepSignDialogProps) {
   const [step, setStep] = useState(1);
   const [showDialog, setShowDialog] = useState(false);
 

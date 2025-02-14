@@ -437,13 +437,22 @@ export const recipientRouter = router({
   completeDocumentWithToken: procedure
     .input(ZCompleteDocumentWithTokenMutationSchema)
     .mutation(async ({ input, ctx }) => {
-      const { token, documentId, authOptions } = input;
+      const { token, documentId, authOptions, nextSigner } = input;
+
+      console.log(
+        'completeDocumentWithToken == recipient-router',
+        token,
+        documentId,
+        authOptions,
+        nextSigner,
+      );
 
       return await completeDocumentWithToken({
         token,
         documentId,
         authOptions,
         userId: ctx.user?.id,
+        nextSigner,
         requestMetadata: extractNextApiRequestMetadata(ctx.req),
       });
     }),
