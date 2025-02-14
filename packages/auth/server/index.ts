@@ -7,8 +7,9 @@ import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import { extractRequestMetadata } from '@documenso/lib/universal/extract-request-metadata';
 
 import { setCsrfCookie } from './lib/session/session-cookies';
+import { callbackRoute } from './routes/callback';
 import { emailPasswordRoute } from './routes/email-password';
-import { googleRoute } from './routes/google';
+import { oauthRoute } from './routes/oauth';
 import { passkeyRoute } from './routes/passkey';
 import { sessionRoute } from './routes/session';
 import { signOutRoute } from './routes/sign-out';
@@ -42,9 +43,10 @@ export const auth = new Hono<HonoAuthContext>()
   })
   .route('/', sessionRoute)
   .route('/', signOutRoute)
+  .route('/callback', callbackRoute)
+  .route('/oauth', oauthRoute)
   .route('/email-password', emailPasswordRoute)
-  .route('/passkey', passkeyRoute)
-  .route('/google', googleRoute);
+  .route('/passkey', passkeyRoute);
 
 /**
  * Handle errors.

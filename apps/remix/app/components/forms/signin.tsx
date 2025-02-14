@@ -257,7 +257,9 @@ export const SignInForm = ({
 
   const onSignInWithGoogleClick = async () => {
     try {
-      await authClient.google.signIn();
+      await authClient.google.signIn({
+        redirectPath,
+      });
     } catch (err) {
       toast({
         title: _(msg`An unknown error occurred`),
@@ -271,11 +273,9 @@ export const SignInForm = ({
 
   const onSignInWithOIDCClick = async () => {
     try {
-      // eslint-disable-next-line no-promise-executor-return
-      await new Promise((resolve) => setTimeout(resolve, 2000));
-      // await signIn('oidc', {
-      //   callbackUrl,
-      // });
+      await authClient.oidc.signIn({
+        redirectPath,
+      });
     } catch (err) {
       toast({
         title: _(msg`An unknown error occurred`),
