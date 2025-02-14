@@ -3,7 +3,16 @@
 # Exit on error.
 set -eo pipefail
 
-cd "$(dirname "$0")/.."
+SCRIPT_DIR="$(readlink -f "$(dirname "$0")")"
+WEB_APP_DIR="$SCRIPT_DIR/.."
+
+# Store the original directory
+ORIGINAL_DIR=$(pwd)
+
+# Set up trap to ensure we return to original directory
+trap 'cd "$ORIGINAL_DIR"' EXIT
+
+cd "$WEB_APP_DIR"
 
 start_time=$(date +%s)
 

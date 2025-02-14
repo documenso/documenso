@@ -17,6 +17,7 @@
     "worker:test": "tsup worker/index.ts --format esm"
   },
   "dependencies": {
+    "@documenso/tailwind-config": "*",
     "@documenso/nodemailer-resend": "2.0.0",
     "@react-email/body": "0.0.4",
     "@react-email/button": "0.0.11",
@@ -40,7 +41,6 @@
     "resend": "2.0.0"
   },
   "devDependencies": {
-    "@documenso/tailwind-config": "*",
     "@documenso/tsconfig": "*",
     "@types/nodemailer": "^6.4.14",
     "tsup": "^7.1.0"
