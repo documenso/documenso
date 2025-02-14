@@ -12,7 +12,7 @@ import {
   useLoaderData,
   useLocation,
 } from 'react-router';
-import { ThemeProvider } from 'remix-themes';
+import { PreventFlashOnWrongTheme, ThemeProvider, useTheme } from 'remix-themes';
 import { getOptionalLoaderSession } from 'server/utils/get-loader-session';
 
 import { SessionProvider } from '@documenso/lib/client-only/providers/session';
@@ -84,13 +84,13 @@ export async function loader({ request }: Route.LoaderArgs) {
   );
 }
 
-export function Layout({ children }: { children: React.ReactNode }) {
-  const { publicEnv, theme, lang } = useLoaderData<typeof loader>() || {};
+export function App() {
+  const { publicEnv, lang, session, ...data } = useLoaderData<typeof loader>() || {};
 
-  // const [theme] = useTheme();
+  const [theme] = useTheme();
 
   return (
-    <html translate="no" lang={lang} data-theme={theme ?? ''}>
+    <html translate="no" lang={lang} className={theme ?? ''}>
       <head>
         <meta charSet="utf-8" />
         <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
@@ -102,18 +102,25 @@ export function Layout({ children }: { children: React.ReactNode }) {
         <Meta />
         <Links />
         <meta name="google" content="notranslate" />
-        {/* <PreventFlashOnWrongTheme ssrTheme={Boolean(theme)} /> */}
+        <PreventFlashOnWrongTheme ssrTheme={Boolean(data.theme)} />
 
         <Suspense>
           <PostHogPageview />
         </Suspense>
       </head>
       <body>
-        {children}
+        <SessionProvider session={session}>
+          <TooltipProvider>
+            <TrpcProvider>
+              <Outlet />
+              <Toaster />
+            </TrpcProvider>
+          </TooltipProvider>
+        </SessionProvider>
+
         <ScrollRestoration />
         <Scripts />
 
-        {/* Todo: Do we want this here? */}
         <RefreshOnFocus />
 
         <script
@@ -126,7 +133,14 @@ export function Layout({ children }: { children: React.ReactNode }) {
   );
 }
 
-export default function App({ loaderData }: Route.ComponentProps) {
+/**
+ * We have this weird setup with:
+ * - No root layout
+ * - AppWithTheme
+ *
+ * To handle remix-themes.
+ */
+export default function AppWithTheme({ loaderData }: Route.ComponentProps) {
   const location = useLocation();
 
   useEffect(() => {
@@ -134,18 +148,9 @@ export default function App({ loaderData }: Route.ComponentProps) {
   }, [location.pathname]);
 
   return (
-    <SessionProvider session={loaderData.session}>
-      {/* Todo: Themes (this won't work for now) */}
-      <ThemeProvider specifiedTheme={loaderData.theme} themeAction="/api/theme">
-        <TooltipProvider>
-          <TrpcProvider>
-            <Outlet />
-
-            <Toaster />
-          </TrpcProvider>
-        </TooltipProvider>
-      </ThemeProvider>
-    </SessionProvider>
+    <ThemeProvider specifiedTheme={loaderData.theme} themeAction="/api/theme">
+      <App />
+    </ThemeProvider>
   );
 }
 

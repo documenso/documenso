@@ -1,8 +1,7 @@
 import { createCookieSessionStorage } from 'react-router';
 import { createThemeSessionResolver } from 'remix-themes';
 
-import { NEXT_PUBLIC_WEBAPP_URL } from '@documenso/lib/constants/app';
-import { env } from '@documenso/lib/utils/env';
+import { getCookieDomain, useSecureCookies } from '@documenso/lib/constants/auth';
 
 const themeSessionStorage = createCookieSessionStorage({
   cookie: {
@@ -10,10 +9,9 @@ const themeSessionStorage = createCookieSessionStorage({
     path: '/',
     httpOnly: true,
     sameSite: 'lax',
-    secrets: ['insecure-secret'], // Todo: Don't need secret
-    // Todo: Check this works on production.
-    // Set domain and secure only if in production
-    ...(env('NODE_ENV') === 'production' ? { domain: NEXT_PUBLIC_WEBAPP_URL(), secure: true } : {}),
+    secrets: ['insecure-secret-do-not-care'],
+    secure: useSecureCookies,
+    domain: getCookieDomain(),
   },
 });
 

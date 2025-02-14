@@ -1,8 +1,7 @@
 import type { Context } from 'hono';
 import { deleteCookie, getSignedCookie, setSignedCookie } from 'hono/cookie';
 
-import { NEXT_PUBLIC_WEBAPP_URL } from '@documenso/lib/constants/app';
-import { useSecureCookies } from '@documenso/lib/constants/auth';
+import { getCookieDomain, useSecureCookies } from '@documenso/lib/constants/auth';
 import { appLog } from '@documenso/lib/utils/debugger';
 import { env } from '@documenso/lib/utils/env';
 
@@ -20,12 +19,6 @@ const getAuthSecret = () => {
   return authSecret;
 };
 
-const getAuthDomain = () => {
-  const url = new URL(NEXT_PUBLIC_WEBAPP_URL());
-
-  return url.hostname;
-};
-
 /**
  * Generic auth session cookie options.
  */
@@ -34,7 +27,7 @@ export const sessionCookieOptions = {
   path: '/',
   sameSite: useSecureCookies ? 'none' : 'lax', // Todo: This feels wrong?
   secure: useSecureCookies,
-  domain: getAuthDomain(),
+  domain: getCookieDomain(),
   // Todo: Max age for specific auth cookies.
 } as const;
 
