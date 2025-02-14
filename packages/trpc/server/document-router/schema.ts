@@ -141,6 +141,8 @@ export const ZFindDocumentAuditLogsQuerySchema = ZFindSearchParamsSchema.extend(
 
 export const ZGetDocumentByIdQuerySchema = z.object({
   documentId: z.number(),
+  includeCertificate: z.boolean().default(true).optional(),
+  includeAuditLog: z.boolean().default(true).optional(),
 });
 
 export const ZDuplicateDocumentRequestSchema = z.object({

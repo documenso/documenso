@@ -14,6 +14,12 @@ import type { Document, Recipient, Team, User } from '@documenso/prisma/client';
 import { DocumentStatus, RecipientRole, SigningStatus } from '@documenso/prisma/client';
 import { trpc as trpcClient } from '@documenso/trpc/client';
 import { Button } from '@documenso/ui/primitives/button';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@documenso/ui/primitives/dropdown-menu';
 import { useToast } from '@documenso/ui/primitives/use-toast';
 
 export type DocumentPageViewButtonProps = {
@@ -44,11 +50,19 @@ export const DocumentPageViewButton = ({ document }: DocumentPageViewButtonProps
 
   const documentsPath = formatDocumentsPath(document.team?.url);
 
-  const onDownloadClick = async () => {
+  const onDownloadClick = async ({
+    includeCertificate = true,
+    includeAuditLog = true,
+  }: {
+    includeCertificate?: boolean;
+    includeAuditLog?: boolean;
+  } = {}) => {
     try {
       const documentWithData = await trpcClient.document.getDocumentById.query(
         {
           documentId: document.id,
+          includeCertificate,
+          includeAuditLog,
         },
         {
           context: {
@@ -63,7 +77,12 @@ export const DocumentPageViewButton = ({ document }: DocumentPageViewButtonProps
         throw new Error('No document available');
       }
 
-      await downloadPDF({ documentData, fileName: documentWithData.title });
+      await downloadPDF({
+        documentData,
+        fileName: documentWithData.title,
+        includeCertificate,
+        includeAuditLog,
+      });
     } catch (err) {
       toast({
         title: _(msg`Something went wrong`),
@@ -112,10 +131,44 @@ export const DocumentPageViewButton = ({ document }: DocumentPageViewButtonProps
       </Button>
     ))
     .with({ isComplete: true }, () => (
-      <Button className="w-full" onClick={onDownloadClick}>
-        <Download className="-ml-1 mr-2 inline h-4 w-4" />
-        <Trans>Download</Trans>
-      </Button>
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <Button className="w-full">
+            <Download className="-ml-1 mr-2 inline h-4 w-4" />
+            <Trans>Download</Trans>
+          </Button>
+        </DropdownMenuTrigger>
+
+        <DropdownMenuContent align="end" className="w-56">
+          <DropdownMenuItem onClick={() => void onDownloadClick()}>
+            <Trans>Complete Document</Trans>
+          </DropdownMenuItem>
+
+          <DropdownMenuItem
+            onClick={() =>
+              void onDownloadClick({ includeCertificate: true, includeAuditLog: false })
+            }
+          >
+            <Trans>Without Audit Log</Trans>
+          </DropdownMenuItem>
+
+          <DropdownMenuItem
+            onClick={() =>
+              void onDownloadClick({ includeCertificate: false, includeAuditLog: true })
+            }
+          >
+            <Trans>Without Certificate</Trans>
+          </DropdownMenuItem>
+
+          <DropdownMenuItem
+            onClick={() =>
+              void onDownloadClick({ includeCertificate: false, includeAuditLog: false })
+            }
+          >
+            <Trans>Without Certificate & Audit Log</Trans>
+          </DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenu>
     ))
     .otherwise(() => null);
 };
