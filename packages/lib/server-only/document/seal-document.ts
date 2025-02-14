@@ -118,9 +118,10 @@ export const sealDocument = async ({
         }).catch(() => null)
       : null;
 
-  const auditLogData = await getAuditLogsPdf({ documentId }).catch(() => null);
-
-  console.log({ auditLogData });
+  const auditLogData = await getAuditLogsPdf({
+    documentId,
+    language: document.documentMeta?.language,
+  }).catch(() => null);
 
   const doc = await PDFDocument.load(pdfData);
 

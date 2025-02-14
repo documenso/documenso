@@ -13,6 +13,7 @@ import { signPdf } from '@documenso/signing';
 
 import { sendCompletedEmail } from '../../../server-only/document/send-completed-email';
 import PostHogServerClient from '../../../server-only/feature-flags/get-post-hog-server-client';
+import { getAuditLogsPdf } from '../../../server-only/htmltopdf/get-audit-logs-pdf';
 import { getCertificatePdf } from '../../../server-only/htmltopdf/get-certificate-pdf';
 import { flattenAnnotations } from '../../../server-only/pdf/flatten-annotations';
 import { flattenForm } from '../../../server-only/pdf/flatten-form';
@@ -129,6 +130,11 @@ export const run = async ({
         }).catch(() => null)
       : null;
 
+  const auditLogData = await getAuditLogsPdf({
+    documentId,
+    language: document.documentMeta?.language,
+  }).catch(() => null);
+
   const newDataId = await io.runTask('decorate-and-sign-pdf', async () => {
     const pdfDoc = await PDFDocument.load(pdfData);
 
@@ -146,6 +152,16 @@ export const run = async ({
       );
 
       certificatePages.forEach((page) => {
+        pdfDoc.addPage(page);
+      });
+    }
+
+    if (auditLogData) {
+      const auditLog = await PDFDocument.load(auditLogData);
+
+      const auditLogPages = await pdfDoc.copyPages(auditLog, auditLog.getPageIndices());
+
+      auditLogPages.forEach((page) => {
         pdfDoc.addPage(page);
       });
     }
