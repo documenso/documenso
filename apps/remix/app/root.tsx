@@ -17,7 +17,7 @@ import { getOptionalLoaderSession } from 'server/utils/get-loader-session';
 
 import { SessionProvider } from '@documenso/lib/client-only/providers/session';
 import { APP_I18N_OPTIONS, type SupportedLanguageCodes } from '@documenso/lib/constants/i18n';
-import { createPublicEnv } from '@documenso/lib/utils/env';
+import { createPublicEnv, env } from '@documenso/lib/utils/env';
 import { extractLocaleData } from '@documenso/lib/utils/i18n';
 import { TrpcProvider } from '@documenso/trpc/react';
 import { Toaster } from '@documenso/ui/primitives/toaster';
@@ -34,6 +34,7 @@ import { appMetaTags } from './utils/meta';
 
 const { trackPageview } = Plausible({
   domain: 'documenso.com',
+  trackLocalhost: false,
 });
 
 export const links: Route.LinksFunction = () => [
@@ -147,7 +148,9 @@ export default function AppWithTheme({ loaderData }: Route.ComponentProps) {
   const location = useLocation();
 
   useEffect(() => {
-    trackPageview();
+    if (env('NODE_ENV') === 'production') {
+      trackPageview();
+    }
   }, [location.pathname]);
 
   return (
