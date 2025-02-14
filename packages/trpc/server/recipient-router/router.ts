@@ -439,14 +439,6 @@ export const recipientRouter = router({
     .mutation(async ({ input, ctx }) => {
       const { token, documentId, authOptions, nextSigner } = input;
 
-      console.log(
-        'completeDocumentWithToken == recipient-router',
-        token,
-        documentId,
-        authOptions,
-        nextSigner,
-      );
-
       return await completeDocumentWithToken({
         token,
         documentId,

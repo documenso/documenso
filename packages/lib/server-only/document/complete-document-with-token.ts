@@ -103,8 +103,6 @@ export const completeDocumentWithToken = async ({
   requestMetadata,
   nextSigner,
 }: CompleteDocumentWithTokenOptions) => {
-  console.log('completeDocumentWithToken == document-router', token, documentId, nextSigner);
-
   const document = await getDocument({ token, documentId });
 
   if (document.status !== DocumentStatus.PENDING) {
@@ -166,8 +164,6 @@ export const completeDocumentWithToken = async ({
     document.documentMeta?.modifyNextSigner &&
     document.documentMeta?.signingOrder === DocumentSigningOrder.SEQUENTIAL
   ) {
-    console.log('delegateNextSigner == document-router', document.id, recipient.id, nextSigner);
-
     await delegateNextSigner({
       documentId: document.id,
       currentRecipientId: recipient.id,
