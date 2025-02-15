@@ -9,7 +9,7 @@ import { viewBackupCodes } from '@documenso/lib/server-only/2fa/view-backup-code
 import { prisma } from '@documenso/prisma';
 
 import { AuthenticationErrorCode } from '../lib/errors/error-codes';
-import { getRequiredSession } from '../lib/utils/get-session';
+import { getSession } from '../lib/utils/get-session';
 import type { HonoAuthContext } from '../types/context';
 import {
   ZDisableTwoFactorRequestSchema,
@@ -22,7 +22,7 @@ export const twoFactorRoute = new Hono<HonoAuthContext>()
    * Setup two factor authentication.
    */
   .post('/setup', async (c) => {
-    const { user } = await getRequiredSession(c);
+    const { user } = await getSession(c);
 
     const result = await setupTwoFactorAuthentication({
       user,
@@ -41,7 +41,7 @@ export const twoFactorRoute = new Hono<HonoAuthContext>()
   .post('/enable', sValidator('json', ZEnableTwoFactorRequestSchema), async (c) => {
     const requestMetadata = c.get('requestMetadata');
 
-    const { user: sessionUser } = await getRequiredSession(c);
+    const { user: sessionUser } = await getSession(c);
 
     const user = await prisma.user.findFirst({
       where: {
@@ -79,7 +79,7 @@ export const twoFactorRoute = new Hono<HonoAuthContext>()
   .post('/disable', sValidator('json', ZDisableTwoFactorRequestSchema), async (c) => {
     const requestMetadata = c.get('requestMetadata');
 
-    const { user: sessionUser } = await getRequiredSession(c);
+    const { user: sessionUser } = await getSession(c);
 
     const user = await prisma.user.findFirst({
       where: {
@@ -117,7 +117,7 @@ export const twoFactorRoute = new Hono<HonoAuthContext>()
     '/view-recovery-codes',
     sValidator('json', ZViewTwoFactorRecoveryCodesRequestSchema),
     async (c) => {
-      const { user: sessionUser } = await getRequiredSession(c);
+      const { user: sessionUser } = await getSession(c);
 
       const user = await prisma.user.findFirst({
         where: {

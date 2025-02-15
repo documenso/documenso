@@ -5,11 +5,8 @@ import { getSession } from '@documenso/auth/server/lib/utils/get-session';
 import { ERROR_CODES } from './errors';
 import { getServerLimits } from './server';
 
-// res: NextApiResponse<TLimitsResponseSchema | TLimitsErrorResponseSchema>,
-
 export const limitsHandler = async (req: Request) => {
   try {
-    // Todo: Check
     const { user } = await getSession(req);
 
     const rawTeamId = req.headers.get('team-id');
@@ -24,7 +21,7 @@ export const limitsHandler = async (req: Request) => {
       throw new Error(ERROR_CODES.INVALID_TEAM_ID);
     }
 
-    const limits = await getServerLimits({ email: user?.email, teamId });
+    const limits = await getServerLimits({ email: user.email, teamId });
 
     return Response.json(limits, {
       status: 200,

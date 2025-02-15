@@ -11,7 +11,7 @@ import type { TLimitsResponseSchema } from './schema';
 import { ZLimitsSchema } from './schema';
 
 export type GetServerLimitsOptions = {
-  email?: string | null;
+  email: string;
   teamId?: number | null;
 };
 

@@ -1,7 +1,7 @@
 import type { Context, Next } from 'hono';
 
 import { extractSessionCookieFromHeaders } from '@documenso/auth/server/lib/session/session-cookies';
-import { getSession } from '@documenso/auth/server/lib/utils/get-session';
+import { getOptionalSession } from '@documenso/auth/server/lib/utils/get-session';
 import type { AppSession } from '@documenso/lib/client-only/providers/session';
 import { type TGetTeamByUrlResponse, getTeamByUrl } from '@documenso/lib/server-only/team/get-team';
 import { type TGetTeamsResponse, getTeams } from '@documenso/lib/server-only/team/get-teams';
@@ -42,7 +42,7 @@ export const appContext = async (c: Context, next: Next) => {
   let team: TGetTeamByUrlResponse | null = null;
   let teams: TGetTeamsResponse = [];
 
-  const session = await getSession(c);
+  const session = await getOptionalSession(c);
 
   if (session.isAuthenticated) {
     let teamUrl = null;

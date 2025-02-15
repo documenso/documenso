@@ -27,7 +27,7 @@ import { UserSecurityAuditLogType } from '@documenso/prisma/client';
 import { AuthenticationErrorCode } from '../lib/errors/error-codes';
 import { getCsrfCookie } from '../lib/session/session-cookies';
 import { onAuthorize } from '../lib/utils/authorizer';
-import { getRequiredSession, getSession } from '../lib/utils/get-session';
+import { getSession } from '../lib/utils/get-session';
 import type { HonoAuthContext } from '../types/context';
 import {
   ZForgotPasswordSchema,
@@ -176,10 +176,6 @@ export const emailPasswordRoute = new Hono<HonoAuthContext>()
 
     const session = await getSession(c);
 
-    if (!session.isAuthenticated) {
-      throw new AppError(AuthenticationErrorCode.Unauthorized);
-    }
-
     await updatePassword({
       userId: session.user.id,
       password,
@@ -251,7 +247,7 @@ export const emailPasswordRoute = new Hono<HonoAuthContext>()
    * Setup two factor authentication.
    */
   .post('/2fa/setup', async (c) => {
-    const { user } = await getRequiredSession(c);
+    const { user } = await getSession(c);
 
     const result = await setupTwoFactorAuthentication({
       user,
@@ -277,7 +273,7 @@ export const emailPasswordRoute = new Hono<HonoAuthContext>()
     async (c) => {
       const requestMetadata = c.get('requestMetadata');
 
-      const { user: sessionUser } = await getRequiredSession(c);
+      const { user: sessionUser } = await getSession(c);
 
       const user = await prisma.user.findFirst({
         where: {
@@ -324,7 +320,7 @@ export const emailPasswordRoute = new Hono<HonoAuthContext>()
     async (c) => {
       const requestMetadata = c.get('requestMetadata');
 
-      const { user: sessionUser } = await getRequiredSession(c);
+      const { user: sessionUser } = await getSession(c);
 
       const user = await prisma.user.findFirst({
         where: {
@@ -367,7 +363,7 @@ export const emailPasswordRoute = new Hono<HonoAuthContext>()
       }),
     ),
     async (c) => {
-      const { user: sessionUser } = await getRequiredSession(c);
+      const { user: sessionUser } = await getSession(c);
 
       const user = await prisma.user.findFirst({
         where: {

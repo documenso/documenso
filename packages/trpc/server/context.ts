@@ -2,7 +2,7 @@ import type { Context } from 'hono';
 import { z } from 'zod';
 
 import type { SessionUser } from '@documenso/auth/server/lib/session/session';
-import { getSession } from '@documenso/auth/server/lib/utils/get-session';
+import { getOptionalSession } from '@documenso/auth/server/lib/utils/get-session';
 import type { ApiRequestMetadata } from '@documenso/lib/universal/extract-request-metadata';
 import { extractRequestMetadata } from '@documenso/lib/universal/extract-request-metadata';
 import type { Session } from '@documenso/prisma/client';
@@ -16,7 +16,7 @@ export const createTrpcContext = async ({
   c,
   requestSource,
 }: CreateTrpcContextOptions): Promise<TrpcContext> => {
-  const { session, user } = await getSession(c);
+  const { session, user } = await getOptionalSession(c);
 
   const req = c.req.raw;
 

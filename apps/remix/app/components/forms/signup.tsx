@@ -36,8 +36,6 @@ import { useToast } from '@documenso/ui/primitives/use-toast';
 import { UserProfileSkeleton } from '~/components/general/user-profile-skeleton';
 import { UserProfileTimur } from '~/components/general/user-profile-timur';
 
-const SIGN_UP_REDIRECT_PATH = '/documents';
-
 type SignUpStep = 'BASIC_DETAILS' | 'CLAIM_USERNAME';
 
 export const ZSignUpFormSchema = z
@@ -191,9 +189,7 @@ export const SignUpForm = ({
 
   const onSignUpWithOIDCClick = async () => {
     try {
-      // eslint-disable-next-line no-promise-executor-return
-      await new Promise((resolve) => setTimeout(resolve, 2000));
-      // await signIn('oidc', { callbackUrl: SIGN_UP_REDIRECT_PATH });
+      await authClient.oidc.signIn();
     } catch (err) {
       toast({
         title: _(msg`An unknown error occurred`),

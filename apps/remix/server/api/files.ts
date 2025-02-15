@@ -74,7 +74,6 @@ export const filesRoute = new Hono<HonoEnv>()
   })
   .post('/presigned-get-url', sValidator('json', ZGetPresignedGetUrlRequestSchema), async (c) => {
     const { key } = await c.req.json();
-    console.log(key);
 
     try {
       const { url } = await getPresignGetUrl(key || '');
@@ -90,11 +89,7 @@ export const filesRoute = new Hono<HonoEnv>()
     const { fileName, contentType } = c.req.valid('json');
 
     try {
-      console.log({
-        fileName,
-      });
       const { key, url } = await getPresignPostUrl(fileName, contentType);
-      console.log(key);
 
       return c.json({ key, url } satisfies TGetPresignedPostUrlResponse);
     } catch (err) {

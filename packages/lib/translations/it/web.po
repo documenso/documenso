@@ -905,7 +905,7 @@ msgstr "Consenti ai destinatari del documento di rispondere direttamente a quest
 msgid "Allows authenticating using biometrics, password managers, hardware keys, etc."
 msgstr "Consente di autenticare utilizzando biometria, gestori di password, chiavi hardware, ecc."
 
-#: apps/remix/app/components/forms/signup.tsx:424
+#: apps/remix/app/components/forms/signup.tsx:420
 msgid "Already have an account? <0>Sign in instead</0>"
 msgstr "Hai già un account? <0>Accedi al posto</0>"
 
@@ -935,7 +935,7 @@ msgstr "È stata inviata un'email per richiedere il trasferimento di questo team
 
 #: apps/remix/app/components/general/claim-account.tsx:96
 #: apps/remix/app/components/forms/token.tsx:139
-#: apps/remix/app/components/forms/signup.tsx:162
+#: apps/remix/app/components/forms/signup.tsx:160
 #: apps/remix/app/components/forms/reset-password.tsx:91
 #: apps/remix/app/components/forms/password.tsx:89
 #: apps/remix/app/components/forms/avatar-image.tsx:122
@@ -1091,8 +1091,8 @@ msgstr ""
 #: apps/remix/app/components/general/app-command-menu.tsx:309
 #: apps/remix/app/components/general/teams/team-transfer-status.tsx:51
 #: apps/remix/app/components/forms/team-update-form.tsx:91
-#: apps/remix/app/components/forms/signup.tsx:183
-#: apps/remix/app/components/forms/signup.tsx:199
+#: apps/remix/app/components/forms/signup.tsx:181
+#: apps/remix/app/components/forms/signup.tsx:195
 #: apps/remix/app/components/forms/signin.tsx:52
 #: apps/remix/app/components/forms/signin.tsx:265
 #: apps/remix/app/components/forms/signin.tsx:281
@@ -1268,7 +1268,7 @@ msgid "Awaiting email confirmation"
 msgstr "In attesa della conferma email"
 
 #: apps/remix/app/components/general/direct-template/direct-template-signing-form.tsx:367
-#: apps/remix/app/components/forms/signup.tsx:507
+#: apps/remix/app/components/forms/signup.tsx:503
 msgid "Back"
 msgstr "Indietro"
 
@@ -1293,7 +1293,7 @@ msgstr "Codici di Backup"
 msgid "Banner Updated"
 msgstr "Banner Aggiornato"
 
-#: apps/remix/app/components/forms/signup.tsx:470
+#: apps/remix/app/components/forms/signup.tsx:466
 msgid "Basic details"
 msgstr "Dettagli di Base"
 
@@ -1506,11 +1506,11 @@ msgstr "Scegli..."
 msgid "Claim account"
 msgstr "Rivendica account"
 
-#: apps/remix/app/components/forms/signup.tsx:479
+#: apps/remix/app/components/forms/signup.tsx:475
 msgid "Claim username"
 msgstr "Rivendica nome utente"
 
-#: apps/remix/app/components/forms/signup.tsx:280
+#: apps/remix/app/components/forms/signup.tsx:276
 msgid "Claim your username now"
 msgstr "Rivendica il tuo nome utente ora"
 
@@ -1568,7 +1568,7 @@ msgid "Close"
 msgstr "Chiudi"
 
 #: apps/remix/app/components/general/document-signing/document-signing-complete-dialog.tsx:61
-#: apps/remix/app/components/forms/signup.tsx:532
+#: apps/remix/app/components/forms/signup.tsx:528
 #: apps/remix/app/components/embed/embed-document-signing-page.tsx:429
 #: apps/remix/app/components/embed/embed-direct-template-client-page.tsx:469
 msgid "Complete"
@@ -1791,7 +1791,7 @@ msgstr "Crea"
 msgid "Create a <0>free account</0> to access your signed documents at any time."
 msgstr "Crea un <0>account gratuito</0> per accedere ai tuoi documenti firmati in qualsiasi momento."
 
-#: apps/remix/app/components/forms/signup.tsx:265
+#: apps/remix/app/components/forms/signup.tsx:261
 msgid "Create a new account"
 msgstr "Crea un nuovo account"
 
@@ -1873,7 +1873,7 @@ msgstr "Crea Webhook"
 msgid "Create your account and start using state-of-the-art document signing."
 msgstr "Crea il tuo account e inizia a utilizzare firme digitali all'avanguardia."
 
-#: apps/remix/app/components/forms/signup.tsx:269
+#: apps/remix/app/components/forms/signup.tsx:265
 msgid "Create your account and start using state-of-the-art document signing. Open and beautiful signing is within your grasp."
 msgstr "Crea il tuo account e inizia a utilizzare firme digitali all'avanguardia. Una firma aperta e bella è a tua portata."
 
@@ -2561,7 +2561,7 @@ msgstr "Email"
 msgid "Email address"
 msgstr "Indirizzo email"
 
-#: apps/remix/app/components/forms/signup.tsx:329
+#: apps/remix/app/components/forms/signup.tsx:325
 msgid "Email Address"
 msgstr "Indirizzo Email"
 
@@ -2873,7 +2873,7 @@ msgstr "Firma gratuita"
 #: apps/remix/app/components/general/document-signing/document-signing-name-field.tsx:212
 #: apps/remix/app/components/general/document-signing/document-signing-form.tsx:327
 #: apps/remix/app/components/general/direct-template/direct-template-signing-form.tsx:323
-#: apps/remix/app/components/forms/signup.tsx:313
+#: apps/remix/app/components/forms/signup.tsx:309
 #: apps/remix/app/components/forms/profile.tsx:98
 #: apps/remix/app/components/embed/embed-document-signing-page.tsx:347
 #: apps/remix/app/components/embed/embed-direct-template-client-page.tsx:390
@@ -3511,7 +3511,7 @@ msgstr "Nuovo proprietario del team"
 msgid "New Template"
 msgstr "Nuovo modello"
 
-#: apps/remix/app/components/forms/signup.tsx:519
+#: apps/remix/app/components/forms/signup.tsx:515
 #: apps/remix/app/components/embed/embed-document-signing-page.tsx:418
 #: apps/remix/app/components/embed/embed-direct-template-client-page.tsx:460
 msgid "Next"
@@ -3690,7 +3690,7 @@ msgstr "Solo gli amministratori possono accedere e visualizzare il documento"
 msgid "Only managers and above can access and view the document"
 msgstr "Solo i manager e superiori possono accedere e visualizzare il documento"
 
-#: apps/remix/app/components/forms/signup.tsx:77
+#: apps/remix/app/components/forms/signup.tsx:75
 msgid "Only subscribers can have a username shorter than 6 characters"
 msgstr "Solo gli abbonati possono avere un nome utente più corto di 6 caratteri"
 
@@ -3707,7 +3707,7 @@ msgstr "Ops! Qualcosa è andato storto."
 msgid "Opened"
 msgstr "Aperto"
 
-#: apps/remix/app/components/forms/signup.tsx:384
+#: apps/remix/app/components/forms/signup.tsx:380
 #: apps/remix/app/components/dialogs/template-direct-link-dialog.tsx:338
 msgid "Or"
 msgstr "Oppure"
@@ -3785,7 +3785,7 @@ msgid "Passkeys are not supported on this browser"
 msgstr "Le passkey non sono supportate su questo browser"
 
 #: apps/remix/app/components/general/app-command-menu.tsx:66
-#: apps/remix/app/components/forms/signup.tsx:345
+#: apps/remix/app/components/forms/signup.tsx:341
 #: apps/remix/app/components/forms/signin.tsx:336
 #: apps/remix/app/components/forms/reset-password.tsx:111
 #: apps/remix/app/components/forms/password.tsx:125
@@ -3805,7 +3805,7 @@ msgid "Password Reset Successful"
 msgstr "Reimpostazione password riuscita"
 
 #: apps/remix/app/components/general/claim-account.tsx:49
-#: apps/remix/app/components/forms/signup.tsx:67
+#: apps/remix/app/components/forms/signup.tsx:65
 msgid "Password should not be common or based on personal information"
 msgstr "La password non deve essere comune o basata su informazioni personali"
 
@@ -3941,7 +3941,7 @@ msgid "Please enter a meaningful name for your token. This will help you identif
 msgstr "Si prega di inserire un nome significativo per il proprio token. Questo ti aiuterà a identificarlo più tardi."
 
 #: apps/remix/app/components/general/claim-account.tsx:39
-#: apps/remix/app/components/forms/signup.tsx:48
+#: apps/remix/app/components/forms/signup.tsx:46
 msgid "Please enter a valid name."
 msgstr "Per favore inserisci un nome valido."
 
@@ -4084,7 +4084,7 @@ msgstr "Profilo pubblico"
 msgid "Public profile URL"
 msgstr "URL del profilo pubblico"
 
-#: apps/remix/app/components/forms/signup.tsx:448
+#: apps/remix/app/components/forms/signup.tsx:444
 msgid "Public profile username"
 msgstr "Nome utente del profilo pubblico"
 
@@ -4216,7 +4216,7 @@ msgid "Redirect URL"
 msgstr "URL di reindirizzamento"
 
 #: apps/remix/app/components/general/claim-account.tsx:79
-#: apps/remix/app/components/forms/signup.tsx:138
+#: apps/remix/app/components/forms/signup.tsx:136
 msgid "Registration Successful"
 msgstr "Registrazione avvenuta con successo"
 
@@ -4685,7 +4685,7 @@ msgstr "Firma documento"
 msgid "Sign field"
 msgstr "Campo di firma"
 
-#: apps/remix/app/components/forms/signup.tsx:363
+#: apps/remix/app/components/forms/signup.tsx:359
 msgid "Sign Here"
 msgstr "Firma qui"
 
@@ -4713,11 +4713,11 @@ msgstr "Firma il documento per completare il processo."
 msgid "Sign up"
 msgstr "Registrati"
 
-#: apps/remix/app/components/forms/signup.tsx:402
+#: apps/remix/app/components/forms/signup.tsx:398
 msgid "Sign Up with Google"
 msgstr "Iscriviti con Google"
 
-#: apps/remix/app/components/forms/signup.tsx:418
+#: apps/remix/app/components/forms/signup.tsx:414
 msgid "Sign Up with OIDC"
 msgstr "Iscriviti con OIDC"
 
@@ -4824,7 +4824,7 @@ msgstr ""
 msgid "Signing Volume"
 msgstr "Volume di firma"
 
-#: apps/remix/app/components/forms/signup.tsx:73
+#: apps/remix/app/components/forms/signup.tsx:71
 msgid "Signups are disabled."
 msgstr "Le iscrizioni sono disabilitate."
 
@@ -5675,7 +5675,7 @@ msgstr "Questo token è invalido o è scaduto. Si prega di contattare il vostro 
 msgid "This URL is already in use."
 msgstr "Questo URL è già in uso."
 
-#: apps/remix/app/components/forms/signup.tsx:76
+#: apps/remix/app/components/forms/signup.tsx:74
 msgid "This username has already been taken"
 msgstr "Questo nome utente è già stato preso"
 
@@ -6176,7 +6176,7 @@ msgstr "ID Utente"
 msgid "User not found."
 msgstr "Utente non trovato."
 
-#: apps/remix/app/components/forms/signup.tsx:235
+#: apps/remix/app/components/forms/signup.tsx:231
 msgid "User profiles are here!"
 msgstr "I profili utente sono qui!"
 
@@ -6184,11 +6184,11 @@ msgstr "I profili utente sono qui!"
 msgid "User settings"
 msgstr "Impostazioni utente"
 
-#: apps/remix/app/components/forms/signup.tsx:74
+#: apps/remix/app/components/forms/signup.tsx:72
 msgid "User with this email already exists. Please use a different email address."
 msgstr "Un utente con questo email esiste già. Si prega di utilizzare un indirizzo email diverso."
 
-#: apps/remix/app/components/forms/signup.tsx:58
+#: apps/remix/app/components/forms/signup.tsx:56
 msgid "Username can only container alphanumeric characters and dashes."
 msgstr "Il nome utente può contenere solo caratteri alfanumerici e trattini."
 
@@ -6465,8 +6465,8 @@ msgstr "Abbiamo riscontrato un errore sconosciuto durante il tentativo di salvar
 msgid "We encountered an unknown error while attempting to sign you In. Please try again later."
 msgstr "Abbiamo riscontrato un errore sconosciuto durante il tentativo di accedere. Si prega di riprovare più tardi."
 
-#: apps/remix/app/components/forms/signup.tsx:185
-#: apps/remix/app/components/forms/signup.tsx:201
+#: apps/remix/app/components/forms/signup.tsx:183
+#: apps/remix/app/components/forms/signup.tsx:197
 msgid "We encountered an unknown error while attempting to sign you Up. Please try again later."
 msgstr "Abbiamo riscontrato un errore sconosciuto durante il tentativo di registrarti. Si prega di riprovare più tardi."
 
@@ -6507,11 +6507,11 @@ msgstr "Abbiamo riscontrato un errore sconosciuto durante il tentativo di aggior
 msgid "We have sent a confirmation email for verification."
 msgstr "Abbiamo inviato un'email di conferma per la verifica."
 
-#: apps/remix/app/components/forms/signup.tsx:56
+#: apps/remix/app/components/forms/signup.tsx:54
 msgid "We need a username to create your profile"
 msgstr "Abbiamo bisogno di un nome utente per creare il tuo profilo"
 
-#: apps/remix/app/components/forms/signup.tsx:51
+#: apps/remix/app/components/forms/signup.tsx:49
 msgid "We need your signature to sign documents"
 msgstr "Abbiamo bisogno della tua firma per firmare i documenti"
 
@@ -6527,7 +6527,7 @@ msgstr "Non siamo riusciti a copiare il tuo codice di recupero negli appunti. Si
 msgid "We were unable to create a checkout session. Please try again, or contact support"
 msgstr "Non siamo riusciti a creare una sessione di pagamento. Si prega di riprovare o contattare il supporto"
 
-#: apps/remix/app/components/forms/signup.tsx:75
+#: apps/remix/app/components/forms/signup.tsx:73
 msgid "We were unable to create your account. Please review the information you provided and try again."
 msgstr "Non siamo riusciti a creare il tuo account. Si prega di rivedere le informazioni fornite e riprovare."
 
@@ -6917,7 +6917,7 @@ msgid "You have successfully left this team."
 msgstr "Hai lasciato con successo questo team."
 
 #: apps/remix/app/components/general/claim-account.tsx:81
-#: apps/remix/app/components/forms/signup.tsx:140
+#: apps/remix/app/components/forms/signup.tsx:138
 msgid "You have successfully registered. Please verify your account by clicking on the link you received in the email."
 msgstr "Ti sei registrato con successo. Verifica il tuo account cliccando sul link ricevuto via email."
 
@@ -6972,7 +6972,7 @@ msgstr "Devi essere loggato per visualizzare questa pagina."
 msgid "You need to setup 2FA to mark this document as viewed."
 msgstr "Devi configurare l'autenticazione a due fattori per contrassegnare questo documento come visualizzato."
 
-#: apps/remix/app/components/forms/signup.tsx:284
+#: apps/remix/app/components/forms/signup.tsx:280
 msgid "You will get notified & be able to set up your documenso public profile when we launch the feature."
 msgstr "Riceverai una notifica e potrai configurare il tuo profilo pubblico su Documenso quando lanceremo la funzionalità."
 

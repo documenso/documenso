@@ -119,28 +119,3 @@ export const passkeyRoute = new Hono<HonoAuthContext>()
       200,
     );
   });
-
-// Todo
-// .post('/register', async (c) => {
-//   const { user } = await getRequiredSession(c);
-
-//   //
-// })
-
-// .post(
-//   '/pre-authenticate',
-//   sValidator(
-//     'json',
-//     z.object({
-//       code: z.string(),
-//     }),
-//   ),
-//   async (c) => {
-//     //
-
-//     return c.json({
-//       success: true,
-//       recoveryCodes: result.recoveryCodes,
-//     });
-//   },
-// );

@@ -21,7 +21,6 @@ export const auth = new Hono<HonoAuthContext>()
   .use(async (c, next) => {
     c.set('requestMetadata', extractRequestMetadata(c.req.raw));
 
-    // Todo: Maybe use auth URL.
     const validOrigin = new URL(NEXT_PUBLIC_WEBAPP_URL()).origin;
     const headerOrigin = c.req.header('Origin');
 
@@ -54,9 +53,6 @@ export const auth = new Hono<HonoAuthContext>()
  * Handle errors.
  */
 auth.onError((err, c) => {
-  // Todo Remove
-  console.error(`${err}`);
-
   if (err instanceof HTTPException) {
     return c.json(
       {

@@ -48,11 +48,9 @@ export const PASSKEY_TIMEOUT = 60000;
  */
 export const MAXIMUM_PASSKEYS = 50;
 
-// Todo: nextuauth_url ??
 export const useSecureCookies =
   env('NODE_ENV') === 'production' && String(NEXT_PUBLIC_WEBAPP_URL()).startsWith('https://');
 
-// Todo: Test secure cookies prefix in remix.
 const secureCookiePrefix = useSecureCookies ? '__Secure-' : '';
 
 export const formatSecureCookieName = (name: string) => `${secureCookiePrefix}${name}`;

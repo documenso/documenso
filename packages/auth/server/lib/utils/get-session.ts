@@ -7,7 +7,23 @@ import type { SessionValidationResult } from '../session/session';
 import { validateSessionToken } from '../session/session';
 import { getSessionCookie } from '../session/session-cookies';
 
-export const getSession = async (c: Context | Request): Promise<SessionValidationResult> => {
+export const getSession = async (c: Context | Request) => {
+  const { session, user } = await getOptionalSession(mapRequestToContextForCookie(c));
+
+  if (session && user) {
+    return { session, user };
+  }
+
+  if (c instanceof Request) {
+    throw new Error('Unauthorized');
+  }
+
+  throw new AppError(AuthenticationErrorCode.Unauthorized);
+};
+
+export const getOptionalSession = async (
+  c: Context | Request,
+): Promise<SessionValidationResult> => {
   const sessionId = await getSessionCookie(mapRequestToContextForCookie(c));
 
   if (!sessionId) {
@@ -19,20 +35,6 @@ export const getSession = async (c: Context | Request): Promise<SessionValidatio
   }
 
   return await validateSessionToken(sessionId);
-};
-
-export const getRequiredSession = async (c: Context | Request) => {
-  const { session, user } = await getSession(mapRequestToContextForCookie(c));
-
-  if (session && user) {
-    return { session, user };
-  }
-
-  if (c instanceof Request) {
-    throw new Error('Unauthorized');
-  }
-
-  throw new AppError(AuthenticationErrorCode.Unauthorized);
 };
 
 /**

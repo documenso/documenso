@@ -1,13 +1,18 @@
 import type { Context } from 'hono';
 import { deleteCookie, getSignedCookie, setSignedCookie } from 'hono/cookie';
 
-import { getCookieDomain, useSecureCookies } from '@documenso/lib/constants/auth';
+import {
+  formatSecureCookieName,
+  getCookieDomain,
+  useSecureCookies,
+} from '@documenso/lib/constants/auth';
 import { appLog } from '@documenso/lib/utils/debugger';
 import { env } from '@documenso/lib/utils/env';
 
 import { generateSessionToken } from './session';
 
-export const sessionCookieName = 'sessionId';
+export const sessionCookieName = formatSecureCookieName('sessionId');
+export const csrfCookieName = formatSecureCookieName('csrfToken');
 
 const getAuthSecret = () => {
   const authSecret = env('NEXTAUTH_SECRET');
@@ -86,7 +91,7 @@ export const deleteSessionCookie = (c: Context) => {
 };
 
 export const getCsrfCookie = async (c: Context) => {
-  const csrfToken = await getSignedCookie(c, getAuthSecret(), 'csrfToken');
+  const csrfToken = await getSignedCookie(c, getAuthSecret(), csrfCookieName);
 
   return csrfToken || null;
 };
@@ -94,7 +99,7 @@ export const getCsrfCookie = async (c: Context) => {
 export const setCsrfCookie = async (c: Context) => {
   const csrfToken = generateSessionToken();
 
-  await setSignedCookie(c, 'csrfToken', csrfToken, getAuthSecret(), {
+  await setSignedCookie(c, csrfCookieName, csrfToken, getAuthSecret(), {
     ...sessionCookieOptions,
 
     // Explicity set to undefined for session lived cookie.
