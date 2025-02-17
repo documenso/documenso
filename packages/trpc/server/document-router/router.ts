@@ -1,6 +1,5 @@
 import { TRPCError } from '@trpc/server';
 import { DateTime } from 'luxon';
-import { PDFDocument } from 'pdf-lib';
 
 import { getServerLimits } from '@documenso/ee/server-only/limits/server';
 import { NEXT_PUBLIC_WEBAPP_URL } from '@documenso/lib/constants/app';
@@ -24,7 +23,6 @@ import { searchDocumentsWithKeyword } from '@documenso/lib/server-only/document/
 import { sendDocument } from '@documenso/lib/server-only/document/send-document';
 import { updateDocument } from '@documenso/lib/server-only/document/update-document';
 import { symmetricEncrypt } from '@documenso/lib/universal/crypto';
-import { getFile } from '@documenso/lib/universal/upload/get-file';
 import { getPresignPostUrl } from '@documenso/lib/universal/upload/server-actions';
 import { DocumentDataType, DocumentStatus } from '@documenso/prisma/client';
 
@@ -69,82 +67,11 @@ export const documentRouter = router({
       const { teamId } = ctx;
       const { documentId, includeCertificate, includeAuditLog } = input;
 
-      const documentWithData = await getDocumentById({
+      return await getDocumentById({
         userId: ctx.user.id,
         teamId,
         documentId,
       });
-
-      if (includeCertificate && includeAuditLog) {
-        return documentWithData;
-      } else if (includeCertificate) {
-        const pdfData = await getFile(documentWithData.documentData);
-        const pdfDoc = await PDFDocument.load(pdfData);
-
-        const totalPages = pdfDoc.getPageCount();
-
-        if (!includeAuditLog) {
-          pdfDoc.removePage(totalPages - 1);
-        }
-
-        const pdfBytes = await pdfDoc.save();
-        const pdfBuffer = Buffer.from(pdfBytes).toString('base64');
-
-        return {
-          ...documentWithData,
-          documentData: {
-            ...documentWithData.documentData,
-            data: pdfBuffer,
-            initialData: documentWithData.documentData.data,
-            type: DocumentDataType.BYTES_64,
-          },
-        };
-      } else if (includeAuditLog) {
-        const pdfData = await getFile(documentWithData.documentData);
-        const pdfDoc = await PDFDocument.load(pdfData);
-
-        const totalPages = pdfDoc.getPageCount();
-
-        if (!includeCertificate) {
-          pdfDoc.removePage(totalPages - 2);
-        }
-
-        const pdfBytes = await pdfDoc.save();
-        const pdfBuffer = Buffer.from(pdfBytes).toString('base64');
-
-        return {
-          ...documentWithData,
-          documentData: {
-            ...documentWithData.documentData,
-            data: pdfBuffer,
-            initialData: documentWithData.documentData.data,
-            type: DocumentDataType.BYTES_64,
-          },
-        };
-      } else if (!includeCertificate && !includeAuditLog) {
-        const pdfData = await getFile(documentWithData.documentData);
-        const pdfDoc = await PDFDocument.load(pdfData);
-
-        const totalPages = pdfDoc.getPageCount();
-
-        pdfDoc.removePage(totalPages - 1);
-        pdfDoc.removePage(totalPages - 2);
-
-        const pdfBytes = await pdfDoc.save();
-        const pdfBuffer = Buffer.from(pdfBytes).toString('base64');
-
-        return {
-          ...documentWithData,
-          documentData: {
-            ...documentWithData.documentData,
-            data: pdfBuffer,
-            initialData: documentWithData.documentData.data,
-            type: DocumentDataType.BYTES_64,
-          },
-        };
-      } else {
-        return documentWithData;
-      }
     }),
 
   /**

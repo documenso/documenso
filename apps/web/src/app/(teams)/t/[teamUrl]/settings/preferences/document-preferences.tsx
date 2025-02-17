@@ -88,6 +88,7 @@ export const TeamDocumentPreferencesForm = ({
         includeSenderDetails,
         includeSigningCertificate,
         typedSignatureEnabled,
+        includeAuditTrailLog,
       } = data;
 
       await updateTeamDocumentPreferences({
@@ -98,6 +99,7 @@ export const TeamDocumentPreferencesForm = ({
           includeSenderDetails,
           typedSignatureEnabled,
           includeSigningCertificate,
+          includeAuditTrailLog,
         },
       });
 
