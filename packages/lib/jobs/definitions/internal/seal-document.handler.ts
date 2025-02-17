@@ -58,6 +58,7 @@ export const run = async ({
           teamGlobalSettings: {
             select: {
               includeSigningCertificate: true,
+              includeAuditTrailLog: true,
             },
           },
         },
@@ -130,10 +131,13 @@ export const run = async ({
         }).catch(() => null)
       : null;
 
-  const auditLogData = await getAuditLogsPdf({
-    documentId,
-    language: document.documentMeta?.language,
-  }).catch(() => null);
+  const auditLogData =
+    (document.team?.teamGlobalSettings?.includeAuditTrailLog ?? true)
+      ? await getAuditLogsPdf({
+          documentId,
+          language: document.documentMeta?.language,
+        }).catch(() => null)
+      : null;
 
   const newDataId = await io.runTask('decorate-and-sign-pdf', async () => {
     const pdfDoc = await PDFDocument.load(pdfData);

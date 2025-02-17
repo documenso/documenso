@@ -41,6 +41,7 @@ const ZTeamDocumentPreferencesFormSchema = z.object({
   includeSenderDetails: z.boolean(),
   typedSignatureEnabled: z.boolean(),
   includeSigningCertificate: z.boolean(),
+  includeAuditTrailLog: z.boolean(),
 });
 
 type TTeamDocumentPreferencesFormSchema = z.infer<typeof ZTeamDocumentPreferencesFormSchema>;
@@ -72,6 +73,7 @@ export const TeamDocumentPreferencesForm = ({
       includeSenderDetails: settings?.includeSenderDetails ?? false,
       typedSignatureEnabled: settings?.typedSignatureEnabled ?? true,
       includeSigningCertificate: settings?.includeSigningCertificate ?? true,
+      includeAuditTrailLog: settings?.includeAuditTrailLog ?? false,
     },
     resolver: zodResolver(ZTeamDocumentPreferencesFormSchema),
   });
@@ -294,6 +296,37 @@ export const TeamDocumentPreferencesForm = ({
                     Controls whether the signing certificate will be included in the document when
                     it is downloaded. The signing certificate can still be downloaded from the logs
                     page separately.
+                  </Trans>
+                </FormDescription>
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={form.control}
+            name="includeAuditTrailLog"
+            render={({ field }) => (
+              <FormItem className="flex-1">
+                <FormLabel>
+                  <Trans>Include the Audit Trail Log in the Document</Trans>
+                </FormLabel>
+
+                <div>
+                  <FormControl className="block">
+                    <Switch
+                      ref={field.ref}
+                      name={field.name}
+                      checked={field.value}
+                      onCheckedChange={field.onChange}
+                    />
+                  </FormControl>
+                </div>
+
+                <FormDescription>
+                  <Trans>
+                    Controls whether the audit trail log will be included in the document when it is
+                    downloaded. The audit trail log can still be downloaded from the logs page
+                    separately.
                   </Trans>
                 </FormDescription>
               </FormItem>

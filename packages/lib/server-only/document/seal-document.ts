@@ -62,6 +62,7 @@ export const sealDocument = async ({
           teamGlobalSettings: {
             select: {
               includeSigningCertificate: true,
+              includeAuditTrailLog: true,
             },
           },
         },
@@ -118,10 +119,13 @@ export const sealDocument = async ({
         }).catch(() => null)
       : null;
 
-  const auditLogData = await getAuditLogsPdf({
-    documentId,
-    language: document.documentMeta?.language,
-  }).catch(() => null);
+  const auditLogData =
+    (document.team?.teamGlobalSettings?.includeAuditTrailLog ?? true)
+      ? await getAuditLogsPdf({
+          documentId,
+          language: document.documentMeta?.language,
+        }).catch(() => null)
+      : null;
 
   const doc = await PDFDocument.load(pdfData);
 

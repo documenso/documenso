@@ -536,6 +536,7 @@ model TeamGlobalSettings {
   includeSenderDetails      Boolean            @default(true)
   typedSignatureEnabled     Boolean            @default(true)
   includeSigningCertificate Boolean            @default(true)
+  includeAuditTrailLog      Boolean            @default(false)
 
   brandingEnabled        Boolean @default(false)
   brandingLogo           String  @default("")
