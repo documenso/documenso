@@ -5,6 +5,7 @@ import { Link, redirect } from 'react-router';
 import { getOptionalLoaderContext } from 'server/utils/get-loader-session';
 
 import signingCelebration from '@documenso/assets/images/signing-celebration.png';
+import { getOptionalSession } from '@documenso/auth/server/lib/utils/get-session';
 import { useOptionalSession } from '@documenso/lib/client-only/providers/session';
 import { getDocumentAndSenderByToken } from '@documenso/lib/server-only/document/get-document-by-token';
 import { isRecipientAuthorized } from '@documenso/lib/server-only/document/is-recipient-authorized';
@@ -27,16 +28,16 @@ import { superLoaderJson, useSuperLoaderData } from '~/utils/super-json-loader';
 
 import type { Route } from './+types/_index';
 
-export async function loader({ params }: Route.LoaderArgs) {
-  const { session, requestMetadata } = getOptionalLoaderContext();
+export async function loader({ params, request }: Route.LoaderArgs) {
+  const { requestMetadata } = getOptionalLoaderContext();
+
+  const { user } = await getOptionalSession(request);
 
   const { token } = params;
 
   if (!token) {
     throw new Response('Not Found', { status: 404 });
   }
-
-  const user = session?.user;
 
   const [document, recipient, fields, completedFields] = await Promise.all([
     getDocumentAndSenderByToken({
@@ -136,7 +137,8 @@ export async function loader({ params }: Route.LoaderArgs) {
 export default function SigningPage() {
   const data = useSuperLoaderData<typeof loader>();
 
-  const { user } = useOptionalSession();
+  const { sessionData } = useOptionalSession();
+  const user = sessionData?.user;
 
   if (!data.isDocumentAccessValid) {
     return (

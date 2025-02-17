@@ -1,14 +1,16 @@
 import { Trans } from '@lingui/react/macro';
 import { BarChart3, FileStack, Settings, Trophy, Users, Wallet2 } from 'lucide-react';
 import { Link, Outlet, redirect, useLocation } from 'react-router';
-import { getLoaderSession } from 'server/utils/get-loader-session';
 
+import { getSession } from '@documenso/auth/server/lib/utils/get-session';
 import { isAdmin } from '@documenso/lib/utils/is-admin';
 import { cn } from '@documenso/ui/lib/utils';
 import { Button } from '@documenso/ui/primitives/button';
 
-export function loader() {
-  const { user } = getLoaderSession();
+import type { Route } from './+types/_layout';
+
+export async function loader({ request }: Route.LoaderArgs) {
+  const { user } = await getSession(request);
 
   if (!user || !isAdmin(user)) {
     throw redirect('/documents');

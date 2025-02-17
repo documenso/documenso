@@ -2,8 +2,8 @@ import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
 import { Trans } from '@lingui/react/macro';
 import { Link } from 'react-router';
-import { getLoaderSession } from 'server/utils/get-loader-session';
 
+import { getSession } from '@documenso/auth/server/lib/utils/get-session';
 import { useSession } from '@documenso/lib/client-only/providers/session';
 import { prisma } from '@documenso/prisma';
 import { Alert, AlertDescription, AlertTitle } from '@documenso/ui/primitives/alert';
@@ -22,8 +22,8 @@ export function meta() {
   return appMetaTags('Security');
 }
 
-export async function loader() {
-  const { user } = getLoaderSession();
+export async function loader({ request }: Route.LoaderArgs) {
+  const { user } = await getSession(request);
 
   // Todo: Use providers instead after RR7 migration.
   // const accounts = await prisma.account.findMany({

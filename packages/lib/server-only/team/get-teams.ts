@@ -1,6 +1,7 @@
 import type { z } from 'zod';
 
 import { prisma } from '@documenso/prisma';
+import { SubscriptionSchema } from '@documenso/prisma/generated/zod/modelSchema/SubscriptionSchema';
 import { TeamMemberSchema } from '@documenso/prisma/generated/zod/modelSchema/TeamMemberSchema';
 import { TeamSchema } from '@documenso/prisma/generated/zod/modelSchema/TeamSchema';
 
@@ -12,6 +13,9 @@ export const ZGetTeamsResponseSchema = TeamSchema.extend({
   currentTeamMember: TeamMemberSchema.pick({
     role: true,
   }),
+  subscription: SubscriptionSchema.pick({
+    status: true,
+  }).nullable(),
 }).array();
 
 export type TGetTeamsResponse = z.infer<typeof ZGetTeamsResponseSchema>;
@@ -26,6 +30,11 @@ export const getTeams = async ({ userId }: GetTeamsOptions): Promise<TGetTeamsRe
       },
     },
     include: {
+      subscription: {
+        select: {
+          status: true,
+        },
+      },
       members: {
         where: {
           userId,

@@ -2,8 +2,8 @@ import { Trans } from '@lingui/react/macro';
 import { TeamMemberInviteStatus } from '@prisma/client';
 import { DateTime } from 'luxon';
 import { Link } from 'react-router';
-import { getOptionalLoaderSession } from 'server/utils/get-loader-session';
 
+import { getOptionalSession } from '@documenso/auth/server/lib/utils/get-session';
 import { encryptSecondaryData } from '@documenso/lib/server-only/crypto/encrypt';
 import { declineTeamInvitation } from '@documenso/lib/server-only/team/decline-team-invitation';
 import { getTeamById } from '@documenso/lib/server-only/team/get-team';
@@ -12,8 +12,8 @@ import { Button } from '@documenso/ui/primitives/button';
 
 import type { Route } from './+types/team.decline.$token';
 
-export async function loader({ params }: Route.LoaderArgs) {
-  const session = getOptionalLoaderSession();
+export async function loader({ params, request }: Route.LoaderArgs) {
+  const session = await getOptionalSession(request);
 
   const { token } = params;
 
@@ -74,7 +74,7 @@ export async function loader({ params }: Route.LoaderArgs) {
     } as const;
   }
 
-  const isSessionUserTheInvitedUser = user.id === session?.user.id;
+  const isSessionUserTheInvitedUser = user.id === session?.user?.id;
 
   return {
     state: 'Success',

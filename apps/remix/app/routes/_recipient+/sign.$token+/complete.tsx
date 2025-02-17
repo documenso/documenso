@@ -6,10 +6,10 @@ import { Trans } from '@lingui/react/macro';
 import { type Document, DocumentStatus, FieldType, RecipientRole } from '@prisma/client';
 import { CheckCircle2, Clock8, FileSearch } from 'lucide-react';
 import { Link, useRevalidator } from 'react-router';
-import { getOptionalLoaderSession } from 'server/utils/get-loader-session';
 import { match } from 'ts-pattern';
 
 import signingCelebration from '@documenso/assets/images/signing-celebration.png';
+import { getOptionalSession } from '@documenso/auth/server/lib/utils/get-session';
 import { useOptionalSession } from '@documenso/lib/client-only/providers/session';
 import { getDocumentAndSenderByToken } from '@documenso/lib/server-only/document/get-document-by-token';
 import { isRecipientAuthorized } from '@documenso/lib/server-only/document/is-recipient-authorized';
@@ -31,16 +31,14 @@ import { DocumentSigningAuthPageView } from '~/components/general/document-signi
 
 import type { Route } from './+types/complete';
 
-export async function loader({ params }: Route.LoaderArgs) {
-  const session = getOptionalLoaderSession();
+export async function loader({ params, request }: Route.LoaderArgs) {
+  const { user } = await getOptionalSession(request);
 
   const { token } = params;
 
   if (!token) {
     throw new Response('Not Found', { status: 404 });
   }
-
-  const user = session?.user;
 
   const document = await getDocumentAndSenderByToken({
     token,
@@ -100,7 +98,8 @@ export async function loader({ params }: Route.LoaderArgs) {
 export default function CompletedSigningPage({ loaderData }: Route.ComponentProps) {
   const { _ } = useLingui();
 
-  const { user } = useOptionalSession();
+  const { sessionData } = useOptionalSession();
+  const user = sessionData?.user;
 
   const {
     isDocumentAccessValid,

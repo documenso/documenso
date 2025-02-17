@@ -1,10 +1,13 @@
 import { redirect } from 'react-router';
-import { getOptionalLoaderSession } from 'server/utils/get-loader-session';
 
-export function loader() {
-  const session = getOptionalLoaderSession();
+import { getOptionalSession } from '@documenso/auth/server/lib/utils/get-session';
 
-  if (session) {
+import type { Route } from './+types/_index';
+
+export async function loader({ request }: Route.LoaderArgs) {
+  const { isAuthenticated } = await getOptionalSession(request);
+
+  if (isAuthenticated) {
     throw redirect('/documents');
   }
 

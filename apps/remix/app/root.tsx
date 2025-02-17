@@ -13,10 +13,11 @@ import {
   useLocation,
 } from 'react-router';
 import { PreventFlashOnWrongTheme, ThemeProvider, useTheme } from 'remix-themes';
-import { getOptionalLoaderSession } from 'server/utils/get-loader-session';
 
+import { getOptionalSession } from '@documenso/auth/server/lib/utils/get-session';
 import { SessionProvider } from '@documenso/lib/client-only/providers/session';
 import { APP_I18N_OPTIONS, type SupportedLanguageCodes } from '@documenso/lib/constants/i18n';
+import { type TGetTeamsResponse, getTeams } from '@documenso/lib/server-only/team/get-teams';
 import { createPublicEnv, env } from '@documenso/lib/utils/env';
 import { extractLocaleData } from '@documenso/lib/utils/i18n';
 import { TrpcProvider } from '@documenso/trpc/react';
@@ -59,8 +60,21 @@ export function meta() {
   return appMetaTags();
 }
 
+/**
+ * Don't revalidate (run the loader on sequential navigations) on the root layout
+ *
+ * Update values via providers.
+ */
+export const shouldRevalidate = () => false;
+
 export async function loader({ request }: Route.LoaderArgs) {
-  const session = getOptionalLoaderSession();
+  const session = await getOptionalSession(request);
+
+  let teams: TGetTeamsResponse = [];
+
+  if (session.isAuthenticated) {
+    teams = await getTeams({ userId: session.user.id });
+  }
 
   const { getTheme } = await themeSessionResolver(request);
 
@@ -74,7 +88,13 @@ export async function loader({ request }: Route.LoaderArgs) {
     {
       lang,
       theme: getTheme(),
-      session,
+      session: session.isAuthenticated
+        ? {
+            user: session.user,
+            session: session.session,
+            teams,
+          }
+        : null,
       publicEnv: createPublicEnv(),
     },
     {
@@ -113,7 +133,7 @@ export function App() {
         <script>0</script>
       </head>
       <body>
-        <SessionProvider session={session}>
+        <SessionProvider initialSession={session}>
           <TooltipProvider>
             <TrpcProvider>
               <Outlet />

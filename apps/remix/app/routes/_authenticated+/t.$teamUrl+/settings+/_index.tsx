@@ -2,7 +2,9 @@ import { Trans } from '@lingui/react/macro';
 import { CheckCircle2, Clock } from 'lucide-react';
 import { P, match } from 'ts-pattern';
 
+import { getSession } from '@documenso/auth/server/lib/utils/get-session';
 import { useSession } from '@documenso/lib/client-only/providers/session';
+import { getTeamByUrl } from '@documenso/lib/server-only/team/get-team';
 import { formatAvatarUrl } from '@documenso/lib/utils/avatars';
 import { extractInitials } from '@documenso/lib/utils/recipient-formatter';
 import { isTokenExpired } from '@documenso/lib/utils/token-verification';
@@ -17,12 +19,26 @@ import { TeamUpdateForm } from '~/components/forms/team-update-form';
 import { SettingsHeader } from '~/components/general/settings-header';
 import { TeamEmailDropdown } from '~/components/general/teams/team-email-dropdown';
 import { TeamTransferStatus } from '~/components/general/teams/team-transfer-status';
-import { useCurrentTeam } from '~/providers/team';
 
-export default function TeamsSettingsPage() {
+import type { Route } from './+types/_index';
+
+export async function loader({ request, params }: Route.LoaderArgs) {
+  const { user } = await getSession(request);
+
+  const team = await getTeamByUrl({
+    userId: user.id,
+    teamUrl: params.teamUrl,
+  });
+
+  return {
+    team,
+  };
+}
+
+export default function TeamsSettingsPage({ loaderData }: Route.ComponentProps) {
+  const { team } = loaderData;
+
   const { user } = useSession();
-
-  const team = useCurrentTeam();
 
   const isTransferVerificationExpired =
     !team.transferVerification || isTokenExpired(team.transferVerification.expiresAt);

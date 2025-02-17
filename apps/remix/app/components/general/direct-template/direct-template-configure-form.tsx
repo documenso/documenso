@@ -56,7 +56,8 @@ export const DirectTemplateConfigureForm = ({
 }: DirectTemplateConfigureFormProps) => {
   const { _ } = useLingui();
 
-  const { user } = useOptionalSession();
+  const { sessionData } = useOptionalSession();
+  const user = sessionData?.user;
 
   const { recipients } = template;
   const { derivedRecipientAccessAuth } = useRequiredDocumentSigningAuthContext();

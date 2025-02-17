@@ -139,10 +139,7 @@ export const DocumentPageViewDropdown = ({ document }: DocumentPageViewDropdownP
           <Trans>Duplicate</Trans>
         </DropdownMenuItem>
 
-        <DropdownMenuItem
-          onClick={() => setDeleteDialogOpen(true)}
-          disabled={Boolean(!canManageDocument && team?.teamEmail) || isDeleted}
-        >
+        <DropdownMenuItem onClick={() => setDeleteDialogOpen(true)} disabled={isDeleted}>
           <Trash2 className="mr-2 h-4 w-4" />
           <Trans>Delete</Trans>
         </DropdownMenuItem>

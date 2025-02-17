@@ -1,22 +1,11 @@
 import { Trans } from '@lingui/react/macro';
 import { ChevronLeft } from 'lucide-react';
 import { Link, Outlet } from 'react-router';
-import { getOptionalLoaderSession } from 'server/utils/get-loader-session';
 
+import { useOptionalSession } from '@documenso/lib/client-only/providers/session';
 import { Button } from '@documenso/ui/primitives/button';
 
 import { Header as AuthenticatedHeader } from '~/components/general/app-header';
-
-import type { Route } from './+types/_layout';
-
-export function loader() {
-  const session = getOptionalLoaderSession();
-
-  return {
-    user: session?.user,
-    teams: session?.teams || [],
-  };
-}
 
 /**
  * A layout to handle scenarios where the user is a recipient of a given resource
@@ -24,12 +13,14 @@ export function loader() {
  *
  * Such as direct template access, or signing.
  */
-export default function RecipientLayout({ loaderData }: Route.ComponentProps) {
-  const { user, teams } = loaderData;
+export default function RecipientLayout() {
+  const { sessionData } = useOptionalSession();
 
   return (
     <div className="min-h-screen">
-      {user && <AuthenticatedHeader user={user} teams={teams} />}
+      {sessionData?.user && (
+        <AuthenticatedHeader user={sessionData.user} teams={sessionData.teams} />
+      )}
 
       <main className="mb-8 mt-8 px-4 md:mb-12 md:mt-12 md:px-8">
         <Outlet />
@@ -38,6 +29,7 @@ export default function RecipientLayout({ loaderData }: Route.ComponentProps) {
   );
 }
 
+// Todo: Use generic error boundary.
 export function ErrorBoundary() {
   return (
     <div className="mx-auto flex min-h-[80vh] w-full items-center justify-center py-32">

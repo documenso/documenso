@@ -4,7 +4,7 @@ import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
 import { Trans } from '@lingui/react/macro';
 import type { TeamMemberRole } from '@prisma/client';
-import { type Subscription, SubscriptionStatus } from '@prisma/client';
+import { SubscriptionStatus } from '@prisma/client';
 import { AlertTriangle } from 'lucide-react';
 import { match } from 'ts-pattern';
 
@@ -22,13 +22,13 @@ import {
 import { useToast } from '@documenso/ui/primitives/use-toast';
 
 export type TeamLayoutBillingBannerProps = {
-  subscription: Subscription;
+  subscriptionStatus: SubscriptionStatus;
   teamId: number;
   userRole: TeamMemberRole;
 };
 
 export const TeamLayoutBillingBanner = ({
-  subscription,
+  subscriptionStatus,
   teamId,
   userRole,
 }: TeamLayoutBillingBannerProps) => {
@@ -59,7 +59,7 @@ export const TeamLayoutBillingBanner = ({
     }
   };
 
-  if (subscription.status === SubscriptionStatus.ACTIVE) {
+  if (subscriptionStatus === SubscriptionStatus.ACTIVE) {
     return null;
   }
 
@@ -68,16 +68,16 @@ export const TeamLayoutBillingBanner = ({
       <div
         className={cn({
           'bg-yellow-200 text-yellow-900 dark:bg-yellow-400':
-            subscription.status === SubscriptionStatus.PAST_DUE,
+            subscriptionStatus === SubscriptionStatus.PAST_DUE,
           'bg-destructive text-destructive-foreground':
-            subscription.status === SubscriptionStatus.INACTIVE,
+            subscriptionStatus === SubscriptionStatus.INACTIVE,
         })}
       >
         <div className="mx-auto flex max-w-screen-xl items-center justify-center gap-x-4 px-4 py-2 text-sm font-medium">
           <div className="flex items-center">
             <AlertTriangle className="mr-2.5 h-5 w-5" />
 
-            {match(subscription.status)
+            {match(subscriptionStatus)
               .with(SubscriptionStatus.PAST_DUE, () => <Trans>Payment overdue</Trans>)
               .with(SubscriptionStatus.INACTIVE, () => <Trans>Teams restricted</Trans>)
               .exhaustive()}
@@ -87,9 +87,9 @@ export const TeamLayoutBillingBanner = ({
             variant="ghost"
             className={cn({
               'text-yellow-900 hover:bg-yellow-100 hover:text-yellow-900 dark:hover:bg-yellow-500':
-                subscription.status === SubscriptionStatus.PAST_DUE,
+                subscriptionStatus === SubscriptionStatus.PAST_DUE,
               'text-destructive-foreground hover:bg-destructive-foreground hover:text-white':
-                subscription.status === SubscriptionStatus.INACTIVE,
+                subscriptionStatus === SubscriptionStatus.INACTIVE,
             })}
             disabled={isPending}
             onClick={() => setIsOpen(true)}
@@ -106,7 +106,7 @@ export const TeamLayoutBillingBanner = ({
             <Trans>Payment overdue</Trans>
           </DialogTitle>
 
-          {match(subscription.status)
+          {match(subscriptionStatus)
             .with(SubscriptionStatus.PAST_DUE, () => (
               <DialogDescription>
                 <Trans>

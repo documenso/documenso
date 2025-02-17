@@ -59,7 +59,8 @@ export default function PublicProfilePage({ loaderData }: Route.ComponentProps) 
 
   const { profile, templates } = publicProfile;
 
-  const { user } = useOptionalSession();
+  const { sessionData } = useOptionalSession();
+  const user = sessionData?.user;
 
   return (
     <div className="flex flex-col items-center justify-center py-4 sm:py-32">

@@ -1,10 +1,12 @@
 import type { ClientResponse, InferRequestType } from 'hono/client';
 import { hc } from 'hono/client';
+import superjson from 'superjson';
 
 import { NEXT_PUBLIC_WEBAPP_URL } from '@documenso/lib/constants/app';
 import { AppError } from '@documenso/lib/errors/app-error';
 
 import type { AuthAppType } from '../server';
+import type { SessionValidationResult } from '../server/lib/session/session';
 import { handleSignInRedirect } from '../server/lib/utils/redirect';
 import type {
   TDisableTwoFactorRequestSchema,
@@ -45,8 +47,14 @@ export class AuthClient {
     window.location.href = redirectPath ?? this.signOutredirectPath;
   }
 
-  public async session() {
-    return this.client.session.$get();
+  public async getSession() {
+    const response = await this.client['session-json'].$get();
+
+    await this.handleError(response);
+
+    const result = await response.json();
+
+    return superjson.deserialize<SessionValidationResult>(result);
   }
 
   private async handleError<T>(response: ClientResponse<T>): Promise<void> {

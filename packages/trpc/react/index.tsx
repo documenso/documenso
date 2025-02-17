@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { httpBatchLink, httpLink, splitLink } from '@trpc/client';
@@ -7,7 +7,6 @@ import SuperJSON from 'superjson';
 
 import { getBaseUrl } from '@documenso/lib/universal/get-base-url';
 
-// import { getBaseUrl } from '@documenso/lib/universal/get-base-url';
 import type { AppRouter } from '../server/router';
 
 export { getQueryKey } from '@trpc/react-query';
@@ -39,24 +38,27 @@ export interface TrpcProviderProps {
 export function TrpcProvider({ children, headers }: TrpcProviderProps) {
   const [queryClient] = useState(() => new QueryClient());
 
-  const [trpcClient] = useState(() =>
-    trpc.createClient({
-      links: [
-        splitLink({
-          condition: (op) => op.context.skipBatch === true,
-          true: httpLink({
-            url: `${getBaseUrl()}/api/trpc`,
-            headers,
-            transformer: SuperJSON,
+  // May cause remounting issues.
+  const trpcClient = useMemo(
+    () =>
+      trpc.createClient({
+        links: [
+          splitLink({
+            condition: (op) => op.context.skipBatch === true,
+            true: httpLink({
+              url: `${getBaseUrl()}/api/trpc`,
+              headers,
+              transformer: SuperJSON,
+            }),
+            false: httpBatchLink({
+              url: `${getBaseUrl()}/api/trpc`,
+              headers,
+              transformer: SuperJSON,
+            }),
           }),
-          false: httpBatchLink({
-            url: `${getBaseUrl()}/api/trpc`,
-            headers,
-            transformer: SuperJSON,
-          }),
-        }),
-      ],
-    }),
+        ],
+      }),
+    [headers],
   );
 
   return (

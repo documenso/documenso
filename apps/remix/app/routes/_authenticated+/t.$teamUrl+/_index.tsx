@@ -1,14 +1,9 @@
 import { redirect } from 'react-router';
-import { getLoaderSession } from 'server/utils/get-loader-session';
 
 import { formatDocumentsPath } from '@documenso/lib/utils/teams';
 
-export function loader() {
-  const { currentTeam } = getLoaderSession();
+import type { Route } from './+types/_index';
 
-  if (!currentTeam) {
-    throw redirect('/settings/teams');
-  }
-
-  throw redirect(formatDocumentsPath(currentTeam.url));
+export function loader({ params }: Route.LoaderArgs) {
+  throw redirect(formatDocumentsPath(params.teamUrl));
 }

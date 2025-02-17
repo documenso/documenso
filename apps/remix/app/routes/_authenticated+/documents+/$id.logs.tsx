@@ -6,10 +6,11 @@ import type { Recipient } from '@prisma/client';
 import { ChevronLeft } from 'lucide-react';
 import { DateTime } from 'luxon';
 import { Link, redirect } from 'react-router';
-import { getLoaderSession } from 'server/utils/get-loader-session';
 
+import { getSession } from '@documenso/auth/server/lib/utils/get-session';
 import { getDocumentById } from '@documenso/lib/server-only/document/get-document-by-id';
 import { getRecipientsForDocument } from '@documenso/lib/server-only/recipient/get-recipients-for-document';
+import { type TGetTeamByUrlResponse, getTeamByUrl } from '@documenso/lib/server-only/team/get-team';
 import { formatDocumentsPath } from '@documenso/lib/utils/teams';
 import { Card } from '@documenso/ui/primitives/card';
 
@@ -23,10 +24,16 @@ import { DocumentLogsTable } from '~/components/tables/document-logs-table';
 
 import type { Route } from './+types/$id.logs';
 
-export async function loader({ params }: Route.LoaderArgs) {
-  const { id } = params;
+export async function loader({ params, request }: Route.LoaderArgs) {
+  const { user } = await getSession(request);
 
-  const { user, currentTeam: team } = getLoaderSession();
+  let team: TGetTeamByUrlResponse | null = null;
+
+  if (params.teamUrl) {
+    team = await getTeamByUrl({ userId: user.id, teamUrl: params.teamUrl });
+  }
+
+  const { id } = params;
 
   const documentId = Number(id);
 

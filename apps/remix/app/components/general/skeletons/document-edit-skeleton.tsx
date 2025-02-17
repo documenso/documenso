@@ -4,7 +4,7 @@ import { Link } from 'react-router';
 
 import { Skeleton } from '@documenso/ui/primitives/skeleton';
 
-export default function Loading() {
+export default function DocumentEditSkeleton() {
   return (
     <div className="mx-auto -mt-4 flex w-full max-w-screen-xl flex-col px-4 md:px-8">
       <Link to="/documents" className="flex grow-0 items-center text-[#7AC455] hover:opacity-80">

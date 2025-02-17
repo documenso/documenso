@@ -2,8 +2,9 @@ import { Trans } from '@lingui/react/macro';
 import { DocumentSigningOrder, SigningStatus } from '@prisma/client';
 import { ChevronLeft, LucideEdit } from 'lucide-react';
 import { Link, redirect, useNavigate } from 'react-router';
-import { getLoaderSession } from 'server/utils/get-loader-session';
 
+import { getSession } from '@documenso/auth/server/lib/utils/get-session';
+import { type TGetTeamByUrlResponse, getTeamByUrl } from '@documenso/lib/server-only/team/get-team';
 import { getTemplateById } from '@documenso/lib/server-only/template/get-template-by-id';
 import { formatDocumentsPath, formatTemplatesPath } from '@documenso/lib/utils/teams';
 import { Button } from '@documenso/ui/primitives/button';
@@ -25,8 +26,14 @@ import { superLoaderJson, useSuperLoaderData } from '~/utils/super-json-loader';
 
 import type { Route } from './+types/$id._index';
 
-export async function loader({ params }: Route.LoaderArgs) {
-  const { user, currentTeam: team } = getLoaderSession();
+export async function loader({ params, request }: Route.LoaderArgs) {
+  const { user } = await getSession(request);
+
+  let team: TGetTeamByUrlResponse | null = null;
+
+  if (params.teamUrl) {
+    team = await getTeamByUrl({ userId: user.id, teamUrl: params.teamUrl });
+  }
 
   const { id } = params;
 

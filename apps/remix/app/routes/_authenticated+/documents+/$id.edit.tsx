@@ -2,11 +2,12 @@ import { Plural, Trans } from '@lingui/react/macro';
 import { DocumentStatus as InternalDocumentStatus, TeamMemberRole } from '@prisma/client';
 import { ChevronLeft, Users2 } from 'lucide-react';
 import { Link, redirect } from 'react-router';
-import { getLoaderSession } from 'server/utils/get-loader-session';
 import { match } from 'ts-pattern';
 
+import { getSession } from '@documenso/auth/server/lib/utils/get-session';
 import { isUserEnterprise } from '@documenso/ee/server-only/util/is-document-enterprise';
 import { getDocumentWithDetailsById } from '@documenso/lib/server-only/document/get-document-with-details-by-id';
+import { type TGetTeamByUrlResponse, getTeamByUrl } from '@documenso/lib/server-only/team/get-team';
 import { DocumentVisibility } from '@documenso/lib/types/document-visibility';
 import { formatDocumentsPath } from '@documenso/lib/utils/teams';
 
@@ -17,8 +18,14 @@ import { superLoaderJson, useSuperLoaderData } from '~/utils/super-json-loader';
 
 import type { Route } from './+types/$id.edit';
 
-export async function loader({ params }: Route.LoaderArgs) {
-  const { user, currentTeam: team } = getLoaderSession();
+export async function loader({ params, request }: Route.LoaderArgs) {
+  const { user } = await getSession(request);
+
+  let team: TGetTeamByUrlResponse | null = null;
+
+  if (params.teamUrl) {
+    team = await getTeamByUrl({ userId: user.id, teamUrl: params.teamUrl });
+  }
 
   const { id } = params;
 

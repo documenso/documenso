@@ -1,3 +1,5 @@
+import { useEffect } from 'react';
+
 import { Trans } from '@lingui/react/macro';
 import { Bird } from 'lucide-react';
 import { useSearchParams } from 'react-router';
@@ -27,10 +29,15 @@ export default function TemplatesPage() {
   const documentRootPath = formatDocumentsPath(team?.url);
   const templateRootPath = formatTemplatesPath(team?.url);
 
-  const { data, isLoading, isLoadingError } = trpc.template.findTemplates.useQuery({
+  const { data, isLoading, isLoadingError, refetch } = trpc.template.findTemplates.useQuery({
     page: page,
     perPage: perPage,
   });
+
+  // Refetch the templates when the team URL changes.
+  useEffect(() => {
+    void refetch();
+  }, [team?.url]);
 
   return (
     <div className="mx-auto max-w-screen-xl px-4 md:px-8">

@@ -1,147 +1,104 @@
-import type { MessageDescriptor } from '@lingui/core';
-import { msg } from '@lingui/core/macro';
-import { useLingui } from '@lingui/react';
-import { Trans } from '@lingui/react/macro';
-import { ChevronLeft } from 'lucide-react';
-import { Link, Outlet, isRouteErrorResponse, redirect, useNavigate } from 'react-router';
-import { getLoaderSession } from 'server/utils/get-loader-session';
-import { match } from 'ts-pattern';
+import { useMemo } from 'react';
 
-import { AppErrorCode } from '@documenso/lib/errors/app-error';
+import { msg } from '@lingui/core/macro';
+import { Trans } from '@lingui/react/macro';
+import { SubscriptionStatus } from '@prisma/client';
+import { Link, Outlet } from 'react-router';
+
+import { TEAM_PLAN_LIMITS } from '@documenso/ee/server-only/limits/constants';
+import { LimitsProvider } from '@documenso/ee/server-only/limits/provider/client';
+import { useSession } from '@documenso/lib/client-only/providers/session';
 import { TrpcProvider } from '@documenso/trpc/react';
 import { Button } from '@documenso/ui/primitives/button';
 
+import { GenericErrorLayout } from '~/components/general/generic-error-layout';
+import { PortalComponent } from '~/components/general/portal';
+import { TeamLayoutBillingBanner } from '~/components/general/teams/team-layout-billing-banner';
 import { TeamProvider } from '~/providers/team';
 
 import type { Route } from './+types/_layout';
 
-export const loader = () => {
-  const { currentTeam } = getLoaderSession();
+export default function Layout({ params }: Route.ComponentProps) {
+  const { teams } = useSession();
+
+  const currentTeam = teams.find((team) => team.url === params.teamUrl);
+
+  const limits = useMemo(() => {
+    if (!currentTeam) {
+      return undefined;
+    }
+
+    if (
+      currentTeam?.subscription &&
+      currentTeam.subscription.status === SubscriptionStatus.INACTIVE
+    ) {
+      return {
+        quota: {
+          documents: 0,
+          recipients: 0,
+          directTemplates: 0,
+        },
+        remaining: {
+          documents: 0,
+          recipients: 0,
+          directTemplates: 0,
+        },
+      };
+    }
+
+    return {
+      quota: TEAM_PLAN_LIMITS,
+      remaining: TEAM_PLAN_LIMITS,
+    };
+  }, [currentTeam?.subscription, currentTeam?.id]);
 
   if (!currentTeam) {
-    throw redirect('/settings/teams');
+    return (
+      <GenericErrorLayout
+        errorCode={404}
+        errorCodeMap={{
+          404: {
+            heading: msg`Team not found`,
+            subHeading: msg`404 Team not found`,
+            message: msg`The team you are looking for may have been removed, renamed or may have never
+                existed.`,
+          },
+        }}
+        primaryButton={
+          <Button asChild>
+            <Link to="/settings/teams">
+              <Trans>View teams</Trans>
+            </Link>
+          </Button>
+        }
+      ></GenericErrorLayout>
+    );
   }
 
   const trpcHeaders = {
     'x-team-Id': currentTeam.id.toString(),
   };
 
-  return {
-    currentTeam,
-    trpcHeaders,
-  };
-};
-
-export default function Layout({ loaderData }: Route.ComponentProps) {
-  const { currentTeam, trpcHeaders } = loaderData;
-
   return (
     <TeamProvider team={currentTeam}>
-      <TrpcProvider headers={trpcHeaders}>
-        <main className="mt-8 pb-8 md:mt-12 md:pb-12">
-          <Outlet />
-        </main>
-      </TrpcProvider>
+      <LimitsProvider initialValue={limits} teamId={currentTeam.id}>
+        <TrpcProvider headers={trpcHeaders}>
+          {currentTeam?.subscription &&
+            currentTeam.subscription.status !== SubscriptionStatus.ACTIVE && (
+              <PortalComponent target="portal-header">
+                <TeamLayoutBillingBanner
+                  subscriptionStatus={currentTeam.subscription.status}
+                  teamId={currentTeam.id}
+                  userRole={currentTeam.currentTeamMember.role}
+                />
+              </PortalComponent>
+            )}
+
+          <main className="mt-8 pb-8 md:mt-12 md:pb-12">
+            <Outlet />
+          </main>
+        </TrpcProvider>
+      </LimitsProvider>
     </TeamProvider>
   );
-}
-
-export function ErrorBoundary({ error }: Route.ErrorBoundaryProps) {
-  const { _ } = useLingui();
-
-  const navigate = useNavigate();
-
-  let errorMessage = msg`Unknown error`;
-  let errorDetails: MessageDescriptor | null = null;
-
-  if (error instanceof Error && error.message === AppErrorCode.UNAUTHORIZED) {
-    errorMessage = msg`Unauthorized`;
-    errorDetails = msg`You are not authorized to view this page.`;
-  }
-
-  if (isRouteErrorResponse(error)) {
-    return match(error.status)
-      .with(404, () => (
-        <div className="mx-auto flex min-h-[80vh] w-full items-center justify-center py-32">
-          <div>
-            <p className="text-muted-foreground font-semibold">
-              <Trans>404 Team not found</Trans>
-            </p>
-
-            <h1 className="mt-3 text-2xl font-bold md:text-3xl">
-              <Trans>Oops! Something went wrong.</Trans>
-            </h1>
-
-            <p className="text-muted-foreground mt-4 text-sm">
-              <Trans>
-                The team you are looking for may have been removed, renamed or may have never
-                existed.
-              </Trans>
-            </p>
-
-            <div className="mt-6 flex gap-x-2.5 gap-y-4 md:items-center">
-              <Button asChild className="w-32">
-                <Link to="/settings/teams">
-                  <ChevronLeft className="mr-2 h-4 w-4" />
-                  <Trans>Go Back</Trans>
-                </Link>
-              </Button>
-            </div>
-          </div>
-        </div>
-      ))
-      .with(500, () => (
-        <div className="mx-auto flex min-h-[80vh] w-full items-center justify-center py-32">
-          <div>
-            <p className="text-muted-foreground font-semibold">{_(errorMessage)}</p>
-
-            <h1 className="mt-3 text-2xl font-bold md:text-3xl">
-              <Trans>Oops! Something went wrong.</Trans>
-            </h1>
-
-            <p className="text-muted-foreground mt-4 text-sm">
-              {errorDetails ? _(errorDetails) : ''}
-            </p>
-
-            <div className="mt-6 flex gap-x-2.5 gap-y-4 md:items-center">
-              <Button
-                variant="ghost"
-                className="w-32"
-                onClick={() => {
-                  void navigate(-1);
-                }}
-              >
-                <ChevronLeft className="mr-2 h-4 w-4" />
-                <Trans>Go Back</Trans>
-              </Button>
-
-              <Button asChild>
-                <Link to="/settings/teams">
-                  <Trans>View teams</Trans>
-                </Link>
-              </Button>
-            </div>
-          </div>
-        </div>
-      ))
-      .otherwise(() => (
-        <>
-          <h1>
-            {error.status} {error.statusText}
-          </h1>
-          <p>{error.data}</p>
-        </>
-      ));
-  } else if (error instanceof Error) {
-    return (
-      <div>
-        <h1>Error</h1>
-        <p>{error.message}</p>
-        <p>The stack trace is:</p>
-        <pre>{error.stack}</pre>
-      </div>
-    );
-  } else {
-    return <h1>Unknown Error</h1>;
-  }
 }

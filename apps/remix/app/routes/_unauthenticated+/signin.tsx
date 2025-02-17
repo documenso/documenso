@@ -1,7 +1,7 @@
 import { Trans } from '@lingui/react/macro';
 import { Link, redirect } from 'react-router';
-import { getOptionalLoaderSession } from 'server/utils/get-loader-session';
 
+import { getOptionalSession } from '@documenso/auth/server/lib/utils/get-session';
 import {
   IS_GOOGLE_SSO_ENABLED,
   IS_OIDC_SSO_ENABLED,
@@ -18,15 +18,15 @@ export function meta() {
   return appMetaTags('Sign In');
 }
 
-export function loader() {
-  const session = getOptionalLoaderSession();
+export async function loader({ request }: Route.LoaderArgs) {
+  const { isAuthenticated } = await getOptionalSession(request);
 
   // SSR env variables.
   const isGoogleSSOEnabled = IS_GOOGLE_SSO_ENABLED;
   const isOIDCSSOEnabled = IS_OIDC_SSO_ENABLED;
   const oidcProviderLabel = OIDC_PROVIDER_LABEL;
 
-  if (session) {
+  if (isAuthenticated) {
     throw redirect('/documents');
   }
 

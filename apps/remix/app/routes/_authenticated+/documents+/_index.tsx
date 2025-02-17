@@ -59,14 +59,25 @@ export default function DocumentsPage() {
     [searchParams],
   );
 
-  const { data, isLoading, isLoadingError } = trpc.document.findDocumentsInternal.useQuery({
-    ...findDocumentSearchParams,
-  });
+  const { data, isLoading, isLoadingError, refetch } = trpc.document.findDocumentsInternal.useQuery(
+    {
+      ...findDocumentSearchParams,
+    },
+  );
+
+  // Refetch the documents when the team URL changes.
+  useEffect(() => {
+    void refetch();
+  }, [team?.url]);
 
   const getTabHref = (value: keyof typeof ExtendedDocumentStatus) => {
     const params = new URLSearchParams(searchParams);
 
     params.set('status', value);
+
+    if (value === ExtendedDocumentStatus.ALL) {
+      params.delete('status');
+    }
 
     if (params.has('page')) {
       params.delete('page');

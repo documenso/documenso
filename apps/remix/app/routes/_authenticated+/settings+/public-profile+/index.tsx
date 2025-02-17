@@ -5,8 +5,8 @@ import { useLingui } from '@lingui/react';
 import { Trans } from '@lingui/react/macro';
 import type { TemplateDirectLink } from '@prisma/client';
 import { TemplateType } from '@prisma/client';
-import { getLoaderSession } from 'server/utils/get-loader-session';
 
+import { getSession } from '@documenso/auth/server/lib/utils/get-session';
 import { useSession } from '@documenso/lib/client-only/providers/session';
 import { getUserPublicProfile } from '@documenso/lib/server-only/user/get-user-public-profile';
 import { trpc } from '@documenso/trpc/react';
@@ -44,8 +44,8 @@ const teamProfileText = {
   templatesSubtitle: msg`Show templates in your team public profile for your audience to sign and get started quickly`,
 };
 
-export async function loader() {
-  const { user } = getLoaderSession();
+export async function loader({ request }: Route.LoaderArgs) {
+  const { user } = await getSession(request);
 
   const { profile } = await getUserPublicProfile({
     userId: user.id,

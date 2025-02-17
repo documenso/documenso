@@ -8,7 +8,6 @@ import { Link, useNavigate } from 'react-router';
 
 import backgroundPattern from '@documenso/assets/images/background-pattern.png';
 import { formatDocumentsPath } from '@documenso/lib/utils/teams';
-import { cn } from '@documenso/ui/lib/utils';
 import { Button } from '@documenso/ui/primitives/button';
 
 import { useOptionalCurrentTeam } from '~/providers/team';
@@ -66,7 +65,7 @@ export const GenericErrorLayout = ({
     errorCodeMap[errorCode || 404] ?? defaultErrorCodeMap[500];
 
   return (
-    <div className={cn('relative max-w-[100vw] overflow-hidden')}>
+    <div className="fixed inset-0 z-0 flex h-screen w-screen items-center justify-center">
       <div className="absolute -inset-24 -z-10">
         <motion.div
           className="flex h-full w-full items-center justify-center"
@@ -85,7 +84,7 @@ export const GenericErrorLayout = ({
         </motion.div>
       </div>
 
-      <div className="container mx-auto flex h-full min-h-screen items-center justify-center px-6 py-32">
+      <div className="inset-0 mx-auto flex h-full flex-grow items-center justify-center px-6 py-32">
         <div>
           <p className="text-muted-foreground font-semibold">{_(subHeading)}</p>
 

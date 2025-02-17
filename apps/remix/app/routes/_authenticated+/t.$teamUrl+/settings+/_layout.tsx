@@ -1,23 +1,35 @@
 import { Trans } from '@lingui/react/macro';
-import { Outlet } from 'react-router';
-import { getLoaderTeamSession } from 'server/utils/get-loader-session';
+import { Outlet, redirect } from 'react-router';
 
+import { getSession } from '@documenso/auth/server/lib/utils/get-session';
+import { getTeamByUrl } from '@documenso/lib/server-only/team/get-team';
 import { canExecuteTeamAction } from '@documenso/lib/utils/teams';
 
 import { TeamSettingsNavDesktop } from '~/components/general/teams/team-settings-nav-desktop';
 import { TeamSettingsNavMobile } from '~/components/general/teams/team-settings-nav-mobile';
 import { appMetaTags } from '~/utils/meta';
 
+import type { Route } from './+types/_layout';
+
 export function meta() {
   return appMetaTags('Team Settings');
 }
 
-export function loader() {
-  const { currentTeam: team } = getLoaderTeamSession();
+export async function loader({ request, params }: Route.LoaderArgs) {
+  const session = await getSession(request);
+
+  const team = await getTeamByUrl({
+    userId: session.user.id,
+    teamUrl: params.teamUrl,
+  });
 
   if (!team || !canExecuteTeamAction('MANAGE_TEAM', team.currentTeamMember.role)) {
-    throw new Response(null, { status: 401 }); // Unauthorized.
+    throw redirect(`/t/${params.teamUrl}`);
   }
+}
+
+export async function clientLoader() {
+  // Do nothing, we only want the loader to run on SSR.
 }
 
 export default function TeamsSettingsLayout() {

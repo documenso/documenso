@@ -262,7 +262,7 @@ export const MenuSwitcher = ({ user, teams: initialTeamsData }: MenuSwitcherProp
         {selectedTeam &&
           canExecuteTeamAction('MANAGE_TEAM', selectedTeam.currentTeamMember.role) && (
             <DropdownMenuItem className="text-muted-foreground px-4 py-2" asChild>
-              <Link to={`/t/${selectedTeam.url}/settings/`}>
+              <Link to={`/t/${selectedTeam.url}/settings`}>
                 <Trans>Team settings</Trans>
               </Link>
             </DropdownMenuItem>

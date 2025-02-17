@@ -2,8 +2,8 @@ import { Trans } from '@lingui/react/macro';
 import type { Team } from '@prisma/client';
 import { DocumentStatus } from '@prisma/client';
 import { Link, redirect } from 'react-router';
-import { getOptionalLoaderSession } from 'server/utils/get-loader-session';
 
+import { getOptionalSession } from '@documenso/auth/server/lib/utils/get-session';
 import { getDocumentById } from '@documenso/lib/server-only/document/get-document-by-id';
 import { getDocumentAndSenderByToken } from '@documenso/lib/server-only/document/get-document-by-token';
 import { getRecipientByToken } from '@documenso/lib/server-only/recipient/get-recipient-by-token';
@@ -13,8 +13,8 @@ import { Button } from '@documenso/ui/primitives/button';
 
 import type { Route } from './+types/waiting';
 
-export async function loader({ params }: Route.LoaderArgs) {
-  const session = getOptionalLoaderSession();
+export async function loader({ params, request }: Route.LoaderArgs) {
+  const { user } = await getOptionalSession(request);
 
   const { token } = params;
 
@@ -37,7 +37,6 @@ export async function loader({ params }: Route.LoaderArgs) {
 
   let isOwnerOrTeamMember = false;
 
-  const user = session?.user;
   let team: Team | null = null;
 
   if (user) {

@@ -1,25 +1,31 @@
-import { createContext, useContext } from 'react';
+import { createContext, useCallback, useContext, useEffect, useState } from 'react';
 import React from 'react';
 
-import type { SessionUser } from '@documenso/auth/server/lib/session/session';
-import type { Session } from '@documenso/prisma/client';
+import { useLocation } from 'react-router';
 
-import type { TGetTeamByUrlResponse } from '../../server-only/team/get-team';
-import type { TGetTeamsResponse } from '../../server-only/team/get-teams';
+import { authClient } from '@documenso/auth/client';
+import type { SessionUser } from '@documenso/auth/server/lib/session/session';
+import { type TGetTeamsResponse } from '@documenso/lib/server-only/team/get-teams';
+import type { Session } from '@documenso/prisma/client';
+import { trpc } from '@documenso/trpc/client';
 
 export type AppSession = {
   session: Session;
   user: SessionUser;
-  currentTeam: TGetTeamByUrlResponse | null;
   teams: TGetTeamsResponse;
 };
 
 interface SessionProviderProps {
   children: React.ReactNode;
-  session: AppSession | null;
+  initialSession: AppSession | null;
 }
 
-const SessionContext = createContext<AppSession | null>(null);
+interface SessionContextValue {
+  sessionData: AppSession | null;
+  refresh: () => Promise<void>;
+}
+
+const SessionContext = createContext<SessionContextValue | null>(null);
 
 export const useSession = () => {
   const context = useContext(SessionContext);
@@ -28,18 +34,78 @@ export const useSession = () => {
     throw new Error('useSession must be used within a SessionProvider');
   }
 
-  return context;
+  if (!context.sessionData) {
+    throw new Error('Session not found');
+  }
+
+  return {
+    ...context.sessionData,
+    refresh: context.refresh,
+  };
 };
 
 export const useOptionalSession = () => {
-  return (
-    useContext(SessionContext) || {
-      user: null,
-      session: null,
-    }
-  );
+  const context = useContext(SessionContext);
+
+  if (!context) {
+    throw new Error('useOptionalSession must be used within a SessionProvider');
+  }
+
+  return context;
 };
 
-export const SessionProvider = ({ children, session }: SessionProviderProps) => {
-  return <SessionContext.Provider value={session}>{children}</SessionContext.Provider>;
+export const SessionProvider = ({ children, initialSession }: SessionProviderProps) => {
+  const [session, setSession] = useState<AppSession | null>(initialSession);
+
+  const location = useLocation();
+
+  const refreshSession = useCallback(async () => {
+    const newSession = await authClient.getSession();
+
+    if (!newSession.isAuthenticated) {
+      setSession(null);
+      return;
+    }
+
+    const teams = await trpc.team.getTeams.query().catch(() => {
+      // Todo: Log
+      return [];
+    });
+
+    setSession({
+      session: newSession.session,
+      user: newSession.user,
+      teams,
+    });
+  }, []);
+
+  useEffect(() => {
+    const onFocus = () => {
+      void refreshSession();
+    };
+
+    window.addEventListener('focus', onFocus);
+
+    return () => {
+      window.removeEventListener('focus', onFocus);
+    };
+  }, [refreshSession]);
+
+  /**
+   * Refresh session in background on navigation.
+   */
+  useEffect(() => {
+    void refreshSession();
+  }, [location.pathname]);
+
+  return (
+    <SessionContext.Provider
+      value={{
+        sessionData: session,
+        refresh: refreshSession,
+      }}
+    >
+      {children}
+    </SessionContext.Provider>
+  );
 };

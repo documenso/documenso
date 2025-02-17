@@ -170,10 +170,7 @@ export const DocumentsTableActionDropdown = ({ row }: DocumentsTableActionDropdo
           Void
         </DropdownMenuItem> */}
 
-        <DropdownMenuItem
-          onClick={() => setDeleteDialogOpen(true)}
-          disabled={Boolean(!canManageDocument && team?.teamEmail)}
-        >
+        <DropdownMenuItem onClick={() => setDeleteDialogOpen(true)}>
           <Trash2 className="mr-2 h-4 w-4" />
           {canManageDocument ? _(msg`Delete`) : _(msg`Hide`)}
         </DropdownMenuItem>

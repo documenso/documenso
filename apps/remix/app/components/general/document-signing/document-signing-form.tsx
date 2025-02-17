@@ -48,7 +48,8 @@ export const DocumentSigningForm = ({
   allRecipients = [],
   setSelectedSignerId,
 }: DocumentSigningFormProps) => {
-  const { user } = useOptionalSession();
+  const { sessionData } = useOptionalSession();
+  const user = sessionData?.user;
 
   const { _ } = useLingui();
   const { toast } = useToast();
