@@ -13,7 +13,7 @@ export const env = (variable: EnvironmentVariable | (string & object)): string |
     return window.__ENV__[variable];
   }
 
-  return process?.env?.[variable];
+  return typeof process !== 'undefined' ? process?.env?.[variable] : undefined;
 };
 
 export const createPublicEnv = () =>

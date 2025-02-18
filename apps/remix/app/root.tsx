@@ -12,7 +12,7 @@ import {
   useLoaderData,
   useLocation,
 } from 'react-router';
-import { PreventFlashOnWrongTheme, ThemeProvider, useTheme } from 'remix-themes';
+import { PreventFlashOnWrongTheme, useTheme } from 'remix-themes';
 
 import { getOptionalSession } from '@documenso/auth/server/lib/utils/get-session';
 import { SessionProvider } from '@documenso/lib/client-only/providers/session';
@@ -105,13 +105,21 @@ export async function loader({ request }: Route.LoaderArgs) {
   );
 }
 
-export function App() {
+export function Layout({ children }: { children: React.ReactNode }) {
   const { publicEnv, lang, session, ...data } = useLoaderData<typeof loader>() || {};
 
   const [theme] = useTheme();
 
+  const location = useLocation();
+
+  useEffect(() => {
+    if (env('NODE_ENV') === 'production') {
+      trackPageview();
+    }
+  }, [location.pathname]);
+
   return (
-    <html translate="no" lang={lang} className={theme ?? ''}>
+    <html translate="no" lang={lang} data-theme={theme} className={theme ?? ''}>
       <head>
         <meta charSet="utf-8" />
         <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
@@ -136,7 +144,8 @@ export function App() {
         <SessionProvider initialSession={session}>
           <TooltipProvider>
             <TrpcProvider>
-              <Outlet />
+              {children}
+
               <Toaster />
             </TrpcProvider>
           </TooltipProvider>
@@ -157,27 +166,8 @@ export function App() {
   );
 }
 
-/**
- * We have this weird setup with:
- * - No root layout
- * - AppWithTheme
- *
- * To handle remix-themes.
- */
-export default function AppWithTheme({ loaderData }: Route.ComponentProps) {
-  const location = useLocation();
-
-  useEffect(() => {
-    if (env('NODE_ENV') === 'production') {
-      trackPageview();
-    }
-  }, [location.pathname]);
-
-  return (
-    <ThemeProvider specifiedTheme={loaderData.theme} themeAction="/api/theme">
-      <App />
-    </ThemeProvider>
-  );
+export default function App() {
+  return <Outlet />;
 }
 
 export function ErrorBoundary({ error }: Route.ErrorBoundaryProps) {

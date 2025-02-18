@@ -7,11 +7,13 @@ import type { RenderToPipeableStreamOptions } from 'react-dom/server';
 import { renderToPipeableStream } from 'react-dom/server';
 import type { AppLoadContext, EntryContext } from 'react-router';
 import { ServerRouter } from 'react-router';
+import { ThemeProvider } from 'remix-themes';
 
 import { APP_I18N_OPTIONS } from '@documenso/lib/constants/i18n';
 import { dynamicActivate, extractLocaleData } from '@documenso/lib/utils/i18n';
 
 import { langCookie } from './storage/lang-cookie.server';
+import { themeSessionResolver } from './storage/theme-session.server';
 
 export const streamTimeout = 5_000;
 
@@ -30,6 +32,10 @@ export default async function handleRequest(
 
   await dynamicActivate(language);
 
+  const { getTheme } = await themeSessionResolver(request);
+
+  const theme = getTheme();
+
   return new Promise((resolve, reject) => {
     let shellRendered = false;
     const userAgent = request.headers.get('user-agent');
@@ -41,7 +47,9 @@ export default async function handleRequest(
 
     const { pipe, abort } = renderToPipeableStream(
       <I18nProvider i18n={i18n}>
-        <ServerRouter context={routerContext} url={request.url} />
+        <ThemeProvider specifiedTheme={theme} themeAction="/api/theme">
+          <ServerRouter context={routerContext} url={request.url} />
+        </ThemeProvider>
       </I18nProvider>,
       {
         [readyOption]() {
