@@ -2,7 +2,7 @@ import { kyselyPrisma, sql } from '@documenso/prisma';
 import { DocumentStatus, SubscriptionStatus } from '@documenso/prisma/client';
 
 export type SigningVolume = {
-  id: string;
+  id: number;
   name: string;
   signingVolume: number;
   createdAt: Date;
@@ -52,6 +52,7 @@ export async function getSigningVolume({
       ]),
     )
     .select([
+      's.id as id',
       's.planId as planId',
       's.createdAt as createdAt',
       sql<string>`COALESCE(u."customerId", t."customerId")`.as('customerId'),
@@ -59,6 +60,7 @@ export async function getSigningVolume({
       sql<number>`COUNT(DISTINCT d.id)`.as('signingVolume'),
     ])
     .groupBy([
+      's.id',
       's.planId',
       's.createdAt',
       'u.customerId',

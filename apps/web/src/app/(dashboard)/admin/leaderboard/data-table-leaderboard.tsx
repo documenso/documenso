@@ -19,6 +19,7 @@ export type SigningVolume = {
   signingVolume: number;
   createdAt: Date;
   planId: string;
+  customerId: string;
 };
 
 type LeaderboardTableProps = {
