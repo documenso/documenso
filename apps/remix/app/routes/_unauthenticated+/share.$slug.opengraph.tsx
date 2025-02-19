@@ -1,11 +1,10 @@
-// Todo: (RR7) Test, used AI to migrate this component from NextJS to Remix.
 import satori from 'satori';
 import sharp from 'sharp';
 import { P, match } from 'ts-pattern';
 
 import { NEXT_PUBLIC_WEBAPP_URL } from '@documenso/lib/constants/app';
+import { getRecipientOrSenderByShareLinkSlug } from '@documenso/lib/server-only/document/get-recipient-or-sender-by-share-link-slug';
 
-import type { ShareHandlerAPIResponse } from '../api+/share';
 import type { Route } from './+types/share.$slug.opengraph';
 
 export const runtime = 'edge';
@@ -37,9 +36,9 @@ export const loader = async ({ params }: Route.LoaderArgs) => {
     ),
   ]);
 
-  const recipientOrSender: ShareHandlerAPIResponse = await fetch(
-    new URL(`/api/share?slug=${slug}`, baseUrl),
-  ).then(async (res) => res.json());
+  const recipientOrSender = await getRecipientOrSenderByShareLinkSlug({
+    slug,
+  });
 
   if ('error' in recipientOrSender) {
     return Response.json({ error: 'Not found' }, { status: 404 });

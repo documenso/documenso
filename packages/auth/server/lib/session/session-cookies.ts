@@ -9,6 +9,7 @@ import {
 import { appLog } from '@documenso/lib/utils/debugger';
 import { env } from '@documenso/lib/utils/env';
 
+import { AUTH_SESSION_LIFETIME } from '../../config';
 import { generateSessionToken } from './session';
 
 export const sessionCookieName = formatSecureCookieName('sessionId');
@@ -33,7 +34,7 @@ export const sessionCookieOptions = {
   sameSite: useSecureCookies ? 'none' : 'lax', // Todo: (RR7) This feels wrong?
   secure: useSecureCookies,
   domain: getCookieDomain(),
-  // Todo: (RR7) Max age for specific auth cookies.
+  expires: new Date(Date.now() + AUTH_SESSION_LIFETIME),
 } as const;
 
 export const extractSessionCookieFromHeaders = (headers: Headers): string | null => {

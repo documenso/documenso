@@ -11,8 +11,6 @@ export const openApiTrpcServerHandler = async (c: Context) => {
   return createOpenApiFetchHandler<typeof appRouter>({
     endpoint: API_V2_BETA_URL,
     router: appRouter,
-    // Todo: (RR7) Test this, since it's not using the createContext params.
-    // Todo: (RR7) Reduce calls since we fetch on most request? maybe
     createContext: async () => createTrpcContext({ c, requestSource: 'apiV2' }),
     req: c.req.raw,
     onError: (opts) => handleTrpcRouterError(opts, 'apiV2'),

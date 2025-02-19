@@ -1,5 +1,7 @@
 import { Hono } from 'hono';
+import { bodyLimit } from 'hono/body-limit';
 import { contextStorage } from 'hono/context-storage';
+import { timeout } from 'hono/timeout';
 
 import { tsRestHonoApp } from '@documenso/api/hono';
 import { auth } from '@documenso/auth/server';
@@ -21,15 +23,16 @@ export interface HonoEnv {
 const app = new Hono<HonoEnv>();
 
 /**
+ * Global middleware limits.
+ */
+app.use(timeout(120000)); // Two minute timeout.
+app.use(bodyLimit({ maxSize: 50 * 1024 * 1024 })); // 50mb size limit.
+
+/**
  * Attach session and context to requests.
  */
 app.use(contextStorage());
 app.use(appContext);
-
-/**
- * Middleware for initial page loads.
- */
-// app.use('*', appMiddleware);
 
 // Auth server.
 app.route('/api/auth', auth);
@@ -37,13 +40,13 @@ app.route('/api/auth', auth);
 // Files route.
 app.route('/api/files', filesRoute);
 
-// API servers. Todo: (RR7) Configure max durations, etc?
+// API servers.
 app.route('/api/v1', tsRestHonoApp);
 app.use('/api/jobs/*', jobsClient.getApiHandler());
 app.use('/api/trpc/*', reactRouterTrpcServer);
 
 // Unstable API server routes. Order matters for these two.
 app.get(`${API_V2_BETA_URL}/openapi.json`, (c) => c.json(openApiDocument));
-app.use(`${API_V2_BETA_URL}/*`, async (c) => openApiTrpcServerHandler(c)); // Todo: (RR7) Add next()?
+app.use(`${API_V2_BETA_URL}/*`, async (c) => openApiTrpcServerHandler(c));
 
 export default app;
