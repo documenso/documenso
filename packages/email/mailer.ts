@@ -4,6 +4,7 @@ import { createTransport } from 'nodemailer';
 import { ResendTransport } from '@documenso/nodemailer-resend';
 
 import { MailChannelsTransport } from './transports/mailchannels';
+import { DisabledTransport } from './transports/disabled';
 
 /**
  * Creates a Nodemailer transport object for sending emails.
@@ -86,6 +87,13 @@ const getTransport = (): Transporter => {
         pass: process.env.NEXT_PRIVATE_SMTP_APIKEY ?? '',
       },
     });
+  }
+
+  if (transport === 'disabled') {
+    // This provides a way to disable the email sending by creating a stub transport
+    return createTransport(
+      DisabledTransport.makeTransport(),
+    );
   }
 
   return createTransport({
