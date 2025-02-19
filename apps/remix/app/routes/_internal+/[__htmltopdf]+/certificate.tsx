@@ -16,6 +16,7 @@ import { decryptSecondaryData } from '@documenso/lib/server-only/crypto/decrypt'
 import { getDocumentCertificateAuditLogs } from '@documenso/lib/server-only/document/get-document-certificate-audit-logs';
 import { DOCUMENT_AUDIT_LOG_TYPE } from '@documenso/lib/types/document-audit-logs';
 import { extractDocumentAuthMethods } from '@documenso/lib/utils/document-auth';
+import { getTranslations } from '@documenso/lib/utils/i18n';
 import { Card, CardContent } from '@documenso/ui/primitives/card';
 import {
   Table,
@@ -64,10 +65,13 @@ export async function loader({ request }: Route.LoaderArgs) {
     id: documentId,
   });
 
+  const messages = await getTranslations(documentLanguage);
+
   return {
     document,
     documentLanguage,
     auditLogs,
+    messages,
   };
 }
 
@@ -77,16 +81,15 @@ export async function loader({ request }: Route.LoaderArgs) {
  *
  * Cannot use dynamicActivate by itself to translate this specific page and all
  * children components because `not-found.tsx` page runs and overrides the i18n.
+ *
+ * Update: Maybe <Trans> tags work now after RR7 migration.
  */
 export default function SigningCertificate({ loaderData }: Route.ComponentProps) {
-  const { document, documentLanguage, auditLogs } = loaderData;
+  const { document, documentLanguage, auditLogs, messages } = loaderData;
 
-  const { i18n } = useLingui();
+  const { i18n, _ } = useLingui();
 
-  const { _ } = useLingui();
-
-  // Todo
-  // dynamicActivate(i18n, documentLanguage);
+  i18n.loadAndActivate({ locale: documentLanguage, messages });
 
   const isOwner = (email: string) => {
     return email.toLowerCase() === document.user.email.toLowerCase();
