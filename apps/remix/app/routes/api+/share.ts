@@ -6,7 +6,7 @@ export type ShareHandlerAPIResponse =
   | Awaited<ReturnType<typeof getRecipientOrSenderByShareLinkSlug>>
   | { error: string };
 
-// Todo: Test
+// Todo: (RR7) Test
 export async function loader({ request }: Route.LoaderArgs) {
   try {
     const url = new URL(request.url);

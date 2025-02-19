@@ -40,7 +40,7 @@ export const useSession = () => {
 
   return {
     ...context.sessionData,
-    refresh: context.refresh,
+    refreshSession: context.refresh,
   };
 };
 
@@ -68,7 +68,7 @@ export const SessionProvider = ({ children, initialSession }: SessionProviderPro
     }
 
     const teams = await trpc.team.getTeams.query().catch(() => {
-      // Todo: Log
+      // Todo: (RR7) Log
       return [];
     });
 

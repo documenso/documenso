@@ -7,7 +7,7 @@ import { ChevronLeft } from 'lucide-react';
 import { Link, Outlet } from 'react-router';
 
 import LogoIcon from '@documenso/assets/logo_icon.png';
-import { useSession } from '@documenso/lib/client-only/providers/session';
+import { useOptionalSession } from '@documenso/lib/client-only/providers/session';
 import { cn } from '@documenso/ui/lib/utils';
 import { Button } from '@documenso/ui/primitives/button';
 
@@ -21,7 +21,7 @@ export function meta() {
 }
 
 export default function PublicProfileLayout() {
-  const session = useSession();
+  const { sessionData } = useOptionalSession();
 
   const [scrollY, setScrollY] = useState(0);
 
@@ -37,8 +37,8 @@ export default function PublicProfileLayout() {
 
   return (
     <div className="min-h-screen">
-      {session ? (
-        <AuthenticatedHeader user={session.user} teams={session.teams} />
+      {sessionData ? (
+        <AuthenticatedHeader user={sessionData.user} teams={sessionData.teams} />
       ) : (
         <header
           className={cn(

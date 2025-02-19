@@ -23,7 +23,7 @@ datasource db {
   directUrl = env("NEXT_PRIVATE_DIRECT_DATABASE_URL")
 }
 
-// Todo: Remove after RR7 migration.
+// Todo: (RR7) Remove after RR7 migration.
 enum IdentityProvider {
   DOCUMENSO
   GOOGLE
@@ -41,14 +41,14 @@ model User {
   customerId       String?          @unique
   email            String           @unique
   emailVerified    DateTime?
-  password         String? // Todo: Remove after RR7 migration.
+  password         String? // Todo: (RR7) Remove after RR7 migration.
   source           String?
   signature        String?
   createdAt        DateTime         @default(now())
   updatedAt        DateTime         @default(now()) @updatedAt
   lastSignedIn     DateTime         @default(now())
   roles            Role[]           @default([USER])
-  identityProvider IdentityProvider @default(DOCUMENSO) // Todo: Remove after RR7 migration.
+  identityProvider IdentityProvider @default(DOCUMENSO) // Todo: (RR7) Remove after RR7 migration.
   avatarImageId    String?
   disabled         Boolean          @default(false)
 

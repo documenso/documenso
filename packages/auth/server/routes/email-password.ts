@@ -50,7 +50,7 @@ export const emailPasswordRoute = new Hono<HonoAuthContext>()
 
     const csrfCookieToken = await getCsrfCookie(c);
 
-    // Todo: Add logging here.
+    // Todo: (RR7) Add logging here.
     if (csrfToken !== csrfCookieToken || !csrfCookieToken) {
       throw new AppError(AuthenticationErrorCode.InvalidRequest, {
         message: 'Invalid CSRF token',

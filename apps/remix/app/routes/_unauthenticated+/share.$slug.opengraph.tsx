@@ -1,4 +1,4 @@
-// Todo: Test, used AI to migrate this component from NextJS to Remix.
+// Todo: (RR7) Test, used AI to migrate this component from NextJS to Remix.
 import satori from 'satori';
 import sharp from 'sharp';
 import { P, match } from 'ts-pattern';

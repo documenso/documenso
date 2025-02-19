@@ -33,7 +33,7 @@ export const filesRoute = new Hono<HonoEnv>()
         return c.json({ error: 'No file provided' }, 400);
       }
 
-      // Todo: This is new.
+      // Todo: (RR7) This is new.
       // Add file size validation.
       // Convert MB to bytes (1 MB = 1024 * 1024 bytes)
       const MAX_FILE_SIZE = APP_DOCUMENT_UPLOAD_SIZE_LIMIT * 1024 * 1024;
@@ -54,7 +54,7 @@ export const filesRoute = new Hono<HonoEnv>()
         throw new AppError('INVALID_DOCUMENT_FILE');
       }
 
-      // Todo: Test this.
+      // Todo: (RR7) Test this.
       if (!file.name.endsWith('.pdf')) {
         Object.defineProperty(file, 'name', {
           writable: true,

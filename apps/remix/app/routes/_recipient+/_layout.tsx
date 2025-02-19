@@ -29,7 +29,7 @@ export default function RecipientLayout() {
   );
 }
 
-// Todo: Use generic error boundary.
+// Todo: (RR7) Use generic error boundary.
 export function ErrorBoundary() {
   return (
     <div className="mx-auto flex min-h-[80vh] w-full items-center justify-center py-32">

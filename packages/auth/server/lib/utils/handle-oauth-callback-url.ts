@@ -144,7 +144,7 @@ export const handleOAuthCallbackUrl = async (options: HandleOAuthCallbackUrlOpti
           },
           data: {
             emailVerified: new Date(),
-            password: null, // Todo: Check this
+            password: null, // Todo: (RR7) Check this
           },
         });
       }
@@ -182,7 +182,7 @@ export const handleOAuthCallbackUrl = async (options: HandleOAuthCallbackUrlOpti
   });
 
   await onCreateUserHook(createdUser).catch((err) => {
-    // Todo: Add logging.
+    // Todo: (RR7) Add logging.
     console.error(err);
   });
 

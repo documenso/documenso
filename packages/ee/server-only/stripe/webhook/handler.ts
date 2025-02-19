@@ -51,7 +51,7 @@ export const stripeWebhookHandler = async (req: Request) => {
       );
     }
 
-    // Todo: I'm not sure about this.
+    // Todo: (RR7) I'm not sure about this.
     const clonedReq = req.clone();
     const rawBody = await clonedReq.arrayBuffer();
     const body = Buffer.from(rawBody);

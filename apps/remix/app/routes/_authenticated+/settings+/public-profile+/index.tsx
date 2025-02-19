@@ -60,7 +60,7 @@ export default function PublicProfilePage({ loaderData }: Route.ComponentProps) 
   const { _ } = useLingui();
   const { toast } = useToast();
 
-  const { user } = useSession();
+  const { user, refreshSession } = useSession();
   const team = useOptionalCurrentTeam();
 
   const [isPublicProfileVisible, setIsPublicProfileVisible] = useState(profile.enabled);
@@ -96,6 +96,9 @@ export default function PublicProfilePage({ loaderData }: Route.ComponentProps) 
       });
     } else {
       await updateUserProfile(data);
+
+      // Need to refresh session because we're editing the user's profile.
+      await refreshSession();
     }
 
     if (data.enabled === undefined && !isPublicProfileVisible) {

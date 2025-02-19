@@ -52,7 +52,7 @@ export const authenticatedMiddleware = <
       }
 
       const metadata: ApiRequestMetadata = {
-        requestMetadata: extractRequestMetadata(request), // Todo: Test
+        requestMetadata: extractRequestMetadata(request), // Todo: (RR7) Test
         source: 'apiV1',
         auth: 'api',
         auditUser: {

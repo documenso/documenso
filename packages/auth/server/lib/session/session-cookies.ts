@@ -30,10 +30,10 @@ const getAuthSecret = () => {
 export const sessionCookieOptions = {
   httpOnly: true,
   path: '/',
-  sameSite: useSecureCookies ? 'none' : 'lax', // Todo: This feels wrong?
+  sameSite: useSecureCookies ? 'none' : 'lax', // Todo: (RR7) This feels wrong?
   secure: useSecureCookies,
   domain: getCookieDomain(),
-  // Todo: Max age for specific auth cookies.
+  // Todo: (RR7) Max age for specific auth cookies.
 } as const;
 
 export const extractSessionCookieFromHeaders = (headers: Headers): string | null => {

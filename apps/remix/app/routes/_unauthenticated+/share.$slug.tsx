@@ -4,7 +4,7 @@ import { NEXT_PUBLIC_MARKETING_URL, NEXT_PUBLIC_WEBAPP_URL } from '@documenso/li
 
 import type { Route } from './+types/share.$slug';
 
-// Todo: Test meta.
+// Todo: (RR7) Test meta.
 export function meta({ params: { slug } }: Route.MetaArgs) {
   return [
     { title: 'Documenso - Share' },

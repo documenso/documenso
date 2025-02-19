@@ -6,7 +6,7 @@ import { EmbedPaywall } from '~/components/embed/embed-paywall';
 
 import type { Route } from './+types/_layout';
 
-// Todo: Test
+// Todo: (RR7) Test
 export function headers({ loaderHeaders }: Route.HeadersArgs) {
   const origin = loaderHeaders.get('Origin') ?? '*';
 

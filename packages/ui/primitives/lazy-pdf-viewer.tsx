@@ -1,4 +1,4 @@
-// Todo: Not sure if this actually makes it client-only.
+// Todo: (RR7) Not sure if this actually makes it client-only.
 import { Suspense, lazy } from 'react';
 
 import { Trans } from '@lingui/react/macro';
