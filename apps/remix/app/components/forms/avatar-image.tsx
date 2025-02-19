@@ -42,7 +42,7 @@ export type AvatarImageFormProps = {
 };
 
 export const AvatarImageForm = ({ className }: AvatarImageFormProps) => {
-  const { user } = useSession();
+  const { user, refreshSession } = useSession();
   const { _ } = useLingui();
   const { toast } = useToast();
   const { revalidate } = useRevalidator();
@@ -103,13 +103,13 @@ export const AvatarImageForm = ({ className }: AvatarImageFormProps) => {
         teamId: team?.id,
       });
 
+      await refreshSession();
+
       toast({
         title: _(msg`Avatar Updated`),
         description: _(msg`Your avatar has been updated successfully.`),
         duration: 5000,
       });
-
-      void revalidate();
     } catch (err) {
       const error = AppError.parseError(err);
 

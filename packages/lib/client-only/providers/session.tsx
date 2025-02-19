@@ -22,7 +22,7 @@ interface SessionProviderProps {
 
 interface SessionContextValue {
   sessionData: AppSession | null;
-  refresh: () => Promise<void>;
+  refreshSession: () => Promise<void>;
 }
 
 const SessionContext = createContext<SessionContextValue | null>(null);
@@ -40,7 +40,7 @@ export const useSession = () => {
 
   return {
     ...context.sessionData,
-    refreshSession: context.refresh,
+    refreshSession: context.refreshSession,
   };
 };
 
@@ -102,7 +102,7 @@ export const SessionProvider = ({ children, initialSession }: SessionProviderPro
     <SessionContext.Provider
       value={{
         sessionData: session,
-        refresh: refreshSession,
+        refreshSession,
       }}
     >
       {children}

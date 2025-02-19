@@ -3,7 +3,6 @@ import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
 import { Trans } from '@lingui/react/macro';
 import { useForm } from 'react-hook-form';
-import { useRevalidator } from 'react-router';
 import { z } from 'zod';
 
 import { useSession } from '@documenso/lib/client-only/providers/session';
@@ -42,8 +41,7 @@ export type ProfileFormProps = {
 export const ProfileForm = ({ className }: ProfileFormProps) => {
   const { _ } = useLingui();
   const { toast } = useToast();
-  const { user } = useSession();
-  const { revalidate } = useRevalidator();
+  const { user, refreshSession } = useSession();
 
   const form = useForm<TProfileFormSchema>({
     values: {
@@ -64,13 +62,13 @@ export const ProfileForm = ({ className }: ProfileFormProps) => {
         signature,
       });
 
+      await refreshSession();
+
       toast({
         title: _(msg`Profile updated`),
         description: _(msg`Your profile has been updated successfully.`),
         duration: 5000,
       });
-
-      await revalidate();
     } catch (err) {
       toast({
         title: _(msg`An unknown error occurred`),
