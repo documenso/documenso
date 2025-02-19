@@ -13,6 +13,7 @@ import type { Field } from '@documenso/prisma/client';
 import { RecipientRole } from '@documenso/prisma/client';
 import { cn } from '@documenso/ui/lib/utils';
 import { Button } from '@documenso/ui/primitives/button';
+import { Checkbox } from '@documenso/ui/primitives/checkbox';
 import {
   Dialog,
   DialogClose,
@@ -45,6 +46,7 @@ export type SignDialogProps = {
 };
 
 const formSchema = z.object({
+  modifyNextSigner: z.boolean().default(false),
   nextSigner: z
     .object({
       email: z.string().email({ message: 'Please enter a valid email address' }).optional(),
@@ -232,8 +234,10 @@ export function SignDialog({
           <DialogContent>
             <DialogTitle>
               {step === 1 && (
-                <div className="text-foreground text-xl font-semibold">
-                  <Trans>Modify Next Signer</Trans>
+                <div className="text-foreground text-base font-semibold">
+                  <Trans>
+                    Modify Next Signer <span className="text-muted-foreground">(Optional)</span>
+                  </Trans>
                 </div>
               )}
 
@@ -251,35 +255,54 @@ export function SignDialog({
                 <form onSubmit={form.handleSubmit(onFormSubmit)} className="flex flex-col gap-y-4">
                   <FormField
                     control={form.control}
-                    name="nextSigner.email"
+                    name="modifyNextSigner"
                     render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>
-                          <Trans>Next Signer Email</Trans>
-                        </FormLabel>
+                      <FormItem className="flex flex-row items-center space-x-2 space-y-0">
                         <FormControl>
-                          <Input type="email" {...field} />
+                          <Checkbox checked={field.value} onCheckedChange={field.onChange} />
                         </FormControl>
-                        <FormMessage />
+                        <FormLabel className="font-normal">
+                          <Trans>Modify next signer details</Trans>
+                        </FormLabel>
                       </FormItem>
                     )}
                   />
 
-                  <FormField
-                    control={form.control}
-                    name="nextSigner.name"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>
-                          <Trans>Next Signer Name</Trans>
-                        </FormLabel>
-                        <FormControl>
-                          <Input {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
+                  {form.watch('modifyNextSigner') && (
+                    <>
+                      <FormField
+                        control={form.control}
+                        name="nextSigner.email"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>
+                              <Trans>Next Signer Email</Trans>
+                            </FormLabel>
+                            <FormControl>
+                              <Input type="email" {...field} />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+
+                      <FormField
+                        control={form.control}
+                        name="nextSigner.name"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>
+                              <Trans>Next Signer Name</Trans>
+                            </FormLabel>
+                            <FormControl>
+                              <Input {...field} />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    </>
+                  )}
                 </form>
               </Form>
             )}
