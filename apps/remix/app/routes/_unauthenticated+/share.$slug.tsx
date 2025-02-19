@@ -1,10 +1,10 @@
 import { redirect } from 'react-router';
 
-import { NEXT_PUBLIC_MARKETING_URL, NEXT_PUBLIC_WEBAPP_URL } from '@documenso/lib/constants/app';
+import { NEXT_PUBLIC_WEBAPP_URL } from '@documenso/lib/constants/app';
 
 import type { Route } from './+types/share.$slug';
 
-// Todo: (RR7) Test meta.
+// Todo: (RR7) Test on stg
 export function meta({ params: { slug } }: Route.MetaArgs) {
   return [
     { title: 'Documenso - Share' },
@@ -23,7 +23,7 @@ export function meta({ params: { slug } }: Route.MetaArgs) {
     },
     {
       property: 'og:images',
-      images: `${NEXT_PUBLIC_WEBAPP_URL()}/share/${slug}/opengraph`,
+      images: [`${NEXT_PUBLIC_WEBAPP_URL()}/share/${slug}/opengraph`],
     },
     {
       name: 'twitter:site',
@@ -35,7 +35,7 @@ export function meta({ params: { slug } }: Route.MetaArgs) {
     },
     {
       name: 'twitter:images',
-      images: `${NEXT_PUBLIC_WEBAPP_URL()}/share/${slug}/opengraph`,
+      images: [`${NEXT_PUBLIC_WEBAPP_URL()}/share/${slug}/opengraph`],
     },
     {
       name: 'twitter:description',
@@ -51,5 +51,6 @@ export const loader = ({ request }: Route.LoaderArgs) => {
     return null;
   }
 
-  throw redirect(NEXT_PUBLIC_MARKETING_URL());
+  // Is hardcoded because this whole meta is hardcoded anyway for Documenso.
+  throw redirect('https://documenso.com');
 };
