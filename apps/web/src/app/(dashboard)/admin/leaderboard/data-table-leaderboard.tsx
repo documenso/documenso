@@ -15,11 +15,10 @@ import { Input } from '@documenso/ui/primitives/input';
 
 export type SigningVolume = {
   id: number;
-  name: string;
+  name: string | null;
   signingVolume: number;
   createdAt: Date;
   planId: string;
-  customerId: string;
 };
 
 type LeaderboardTableProps = {
