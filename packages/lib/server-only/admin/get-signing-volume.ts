@@ -54,7 +54,7 @@ export async function getSigningVolume({
     .select([
       's.planId as planId',
       's.createdAt as createdAt',
-      sql<string>`COALESCE(u.customerId, t.customerId)`.as('customerId'),
+      sql<string>`COALESCE(u."customerId", t."customerId")`.as('customerId'),
       sql<string>`COALESCE(u.name, t.name, u.email, 'Unknown')`.as('name'),
       sql<number>`COUNT(DISTINCT d.id)`.as('signingVolume'),
     ])
