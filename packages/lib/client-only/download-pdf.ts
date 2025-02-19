@@ -6,16 +6,9 @@ import { downloadFile } from './download-file';
 type DownloadPDFProps = {
   documentData: DocumentData;
   fileName?: string;
-  includeCertificate?: boolean;
-  includeAuditLog?: boolean;
 };
 
-export const downloadPDF = async ({
-  documentData,
-  fileName,
-  includeCertificate,
-  includeAuditLog,
-}: DownloadPDFProps) => {
+export const downloadPDF = async ({ documentData, fileName }: DownloadPDFProps) => {
   const bytes = await getFile(documentData);
 
   const blob = new Blob([bytes], {
@@ -24,18 +17,8 @@ export const downloadPDF = async ({
 
   const baseTitle = (fileName ?? 'document').replace(/\.pdf$/, '');
 
-  let suffix = '_signed';
-
-  if (includeCertificate && includeAuditLog) {
-    suffix = suffix + '_with_certificate_and_audit';
-  } else if (includeCertificate) {
-    suffix = suffix + '_with_certificate';
-  } else if (includeAuditLog) {
-    suffix = suffix + '_with_audit';
-  }
-
   downloadFile({
-    filename: `${baseTitle}${suffix}.pdf`,
+    filename: `${baseTitle}_signed.pdf`,
     data: blob,
   });
 };

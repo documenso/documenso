@@ -15,11 +15,11 @@ import { DocumentStatus, RecipientRole, SigningStatus } from '@documenso/prisma/
 import { trpc as trpcClient } from '@documenso/trpc/client';
 import { Button } from '@documenso/ui/primitives/button';
 import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from '@documenso/ui/primitives/dropdown-menu';
+  SplitButton,
+  SplitButtonAction,
+  SplitButtonDropdown,
+  SplitButtonDropdownItem,
+} from '@documenso/ui/primitives/split-button';
 import { useToast } from '@documenso/ui/primitives/use-toast';
 
 export type DocumentPageViewButtonProps = {
@@ -31,7 +31,9 @@ export type DocumentPageViewButtonProps = {
   team?: Pick<Team, 'id' | 'url'>;
 };
 
-export const DocumentPageViewButton = ({ document }: DocumentPageViewButtonProps) => {
+export const DocumentPageViewButton = ({
+  document: activeDocument,
+}: DocumentPageViewButtonProps) => {
   const { data: session } = useSession();
   const { toast } = useToast();
   const { _ } = useLingui();
@@ -40,33 +42,27 @@ export const DocumentPageViewButton = ({ document }: DocumentPageViewButtonProps
     return null;
   }
 
-  const recipient = document.recipients.find((recipient) => recipient.email === session.user.email);
+  const recipient = activeDocument.recipients.find(
+    (recipient) => recipient.email === session.user.email,
+  );
 
   const isRecipient = !!recipient;
-  const isPending = document.status === DocumentStatus.PENDING;
-  const isComplete = document.status === DocumentStatus.COMPLETED;
+  const isPending = activeDocument.status === DocumentStatus.PENDING;
+  const isComplete = activeDocument.status === DocumentStatus.COMPLETED;
   const isSigned = recipient?.signingStatus === SigningStatus.SIGNED;
   const role = recipient?.role;
 
-  const documentsPath = formatDocumentsPath(document.team?.url);
+  const documentsPath = formatDocumentsPath(activeDocument.team?.url);
 
-  const onDownloadClick = async ({
-    includeCertificate = true,
-    includeAuditLog = true,
-  }: {
-    includeCertificate?: boolean;
-    includeAuditLog?: boolean;
-  } = {}) => {
+  const onDownloadClick = async () => {
     try {
       const documentWithData = await trpcClient.document.getDocumentById.query(
         {
-          documentId: document.id,
-          includeCertificate,
-          includeAuditLog,
+          documentId: activeDocument.id,
         },
         {
           context: {
-            teamId: document.team?.id?.toString(),
+            teamId: activeDocument.team?.id?.toString(),
           },
         },
       );
@@ -80,13 +76,105 @@ export const DocumentPageViewButton = ({ document }: DocumentPageViewButtonProps
       await downloadPDF({
         documentData,
         fileName: documentWithData.title,
-        includeCertificate,
-        includeAuditLog,
       });
     } catch (err) {
       toast({
         title: _(msg`Something went wrong`),
         description: _(msg`An error occurred while downloading your document.`),
+        variant: 'destructive',
+      });
+    }
+  };
+
+  const onDownloadAuditLogClick = async () => {
+    try {
+      const { url } = await trpcClient.document.downloadAuditLogs.mutate({
+        documentId: activeDocument.id,
+      });
+
+      const iframe = Object.assign(document.createElement('iframe'), {
+        src: url,
+      });
+
+      Object.assign(iframe.style, {
+        position: 'fixed',
+        top: '0',
+        left: '0',
+        width: '0',
+        height: '0',
+      });
+
+      const onLoaded = () => {
+        if (iframe.contentDocument?.readyState === 'complete') {
+          iframe.contentWindow?.print();
+
+          iframe.contentWindow?.addEventListener('afterprint', () => {
+            document.body.removeChild(iframe);
+          });
+        }
+      };
+
+      // When the iframe has loaded, print the iframe and remove it from the dom
+      iframe.addEventListener('load', onLoaded);
+
+      document.body.appendChild(iframe);
+
+      onLoaded();
+    } catch (error) {
+      console.error(error);
+
+      toast({
+        title: _(msg`Something went wrong`),
+        description: _(
+          msg`Sorry, we were unable to download the audit logs. Please try again later.`,
+        ),
+        variant: 'destructive',
+      });
+    }
+  };
+
+  const onDownloadSigningCertificateClick = async () => {
+    try {
+      const { url } = await trpcClient.document.downloadCertificate.mutate({
+        documentId: activeDocument.id,
+      });
+
+      const iframe = Object.assign(document.createElement('iframe'), {
+        src: url,
+      });
+
+      Object.assign(iframe.style, {
+        position: 'fixed',
+        top: '0',
+        left: '0',
+        width: '0',
+        height: '0',
+      });
+
+      const onLoaded = () => {
+        if (iframe.contentDocument?.readyState === 'complete') {
+          iframe.contentWindow?.print();
+
+          iframe.contentWindow?.addEventListener('afterprint', () => {
+            document.body.removeChild(iframe);
+          });
+        }
+      };
+
+      // When the iframe has loaded, print the iframe and remove it from the dom
+      iframe.addEventListener('load', onLoaded);
+
+      document.body.appendChild(iframe);
+
+      onLoaded();
+    } catch (error) {
+      console.error(error);
+
+      toast({
+        title: _(msg`Something went wrong`),
+        description: _(
+          msg`Sorry, we were unable to download the certificate. Please try again later.`,
+        ),
         variant: 'destructive',
       });
     }
@@ -125,50 +213,27 @@ export const DocumentPageViewButton = ({ document }: DocumentPageViewButtonProps
     ))
     .with({ isComplete: false }, () => (
       <Button className="w-full" asChild>
-        <Link href={`${documentsPath}/${document.id}/edit`}>
+        <Link href={`${documentsPath}/${activeDocument.id}/edit`}>
           <Trans>Edit</Trans>
         </Link>
       </Button>
     ))
     .with({ isComplete: true }, () => (
-      <DropdownMenu>
-        <DropdownMenuTrigger asChild>
-          <Button className="w-full">
-            <Download className="-ml-1 mr-2 inline h-4 w-4" />
-            <Trans>Download</Trans>
-          </Button>
-        </DropdownMenuTrigger>
+      <SplitButton className="flex w-full">
+        <SplitButtonAction className="w-full" onClick={() => void onDownloadClick()}>
+          <Download className="-ml-1 mr-2 inline h-4 w-4" />
+          <Trans>Download</Trans>
+        </SplitButtonAction>
+        <SplitButtonDropdown>
+          <SplitButtonDropdownItem onClick={() => void onDownloadAuditLogClick()}>
+            <Trans>Only Audit Log</Trans>
+          </SplitButtonDropdownItem>
 
-        <DropdownMenuContent align="end" className="w-56">
-          <DropdownMenuItem onClick={() => void onDownloadClick()}>
-            <Trans>Complete Document</Trans>
-          </DropdownMenuItem>
-
-          <DropdownMenuItem
-            onClick={() =>
-              void onDownloadClick({ includeCertificate: true, includeAuditLog: false })
-            }
-          >
-            <Trans>Without Audit Log</Trans>
-          </DropdownMenuItem>
-
-          <DropdownMenuItem
-            onClick={() =>
-              void onDownloadClick({ includeCertificate: false, includeAuditLog: true })
-            }
-          >
-            <Trans>Without Certificate</Trans>
-          </DropdownMenuItem>
-
-          <DropdownMenuItem
-            onClick={() =>
-              void onDownloadClick({ includeCertificate: false, includeAuditLog: false })
-            }
-          >
-            <Trans>Without Certificate & Audit Log</Trans>
-          </DropdownMenuItem>
-        </DropdownMenuContent>
-      </DropdownMenu>
+          <SplitButtonDropdownItem onClick={() => void onDownloadSigningCertificateClick()}>
+            <Trans>Only Signing Certificate</Trans>
+          </SplitButtonDropdownItem>
+        </SplitButtonDropdown>
+      </SplitButton>
     ))
     .otherwise(() => null);
 };

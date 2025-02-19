@@ -29,7 +29,9 @@ export const ZDocumentAuditLogTypeSchema = z.enum([
   'DOCUMENT_FIELD_INSERTED', // When a field is inserted (signed/approved/etc) by a recipient.
   'DOCUMENT_FIELD_UNINSERTED', // When a field is uninserted by a recipient.
   'DOCUMENT_FIELD_PREFILLED', // When a field is prefilled by an assistant.
-  'DOCUMENT_VISIBILITY_UPDATED', // When the document visibility scope is updated
+  'DOCUMENT_VISIBILITY_UPDATED', // When the document visibility scope is updated.
+  'DOCUMENT_SIGNING_CERTIFICATE_UPDATED', // When the include signing certificate is updated.
+  'DOCUMENT_AUDIT_TRAIL_UPDATED', // When the include audit trail is updated.
   'DOCUMENT_GLOBAL_AUTH_ACCESS_UPDATED', // When the global access authentication is updated.
   'DOCUMENT_GLOBAL_AUTH_ACTION_UPDATED', // When the global action authentication is updated.
   'DOCUMENT_META_UPDATED', // When the document meta data is updated.
@@ -397,6 +399,16 @@ export const ZDocumentAuditLogEventDocumentVisibilitySchema = z.object({
   data: ZGenericFromToSchema,
 });
 
+export const ZDocumentAuditLogEventDocumentSigningCertificateUpdatedSchema = z.object({
+  type: z.literal(DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_SIGNING_CERTIFICATE_UPDATED),
+  data: ZGenericFromToSchema,
+});
+
+export const ZDocumentAuditLogEventDocumentAuditTrailUpdatedSchema = z.object({
+  type: z.literal(DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_AUDIT_TRAIL_UPDATED),
+  data: ZGenericFromToSchema,
+});
+
 /**
  * Event: Document global authentication access updated.
  */
@@ -574,6 +586,8 @@ export const ZDocumentAuditLogSchema = ZDocumentAuditLogBaseSchema.and(
     ZDocumentAuditLogEventDocumentFieldUninsertedSchema,
     ZDocumentAuditLogEventDocumentFieldPrefilledSchema,
     ZDocumentAuditLogEventDocumentVisibilitySchema,
+    ZDocumentAuditLogEventDocumentSigningCertificateUpdatedSchema,
+    ZDocumentAuditLogEventDocumentAuditTrailUpdatedSchema,
     ZDocumentAuditLogEventDocumentGlobalAuthAccessUpdatedSchema,
     ZDocumentAuditLogEventDocumentGlobalAuthActionUpdatedSchema,
     ZDocumentAuditLogEventDocumentMetaUpdatedSchema,

@@ -42,6 +42,7 @@ import {
   FormMessage,
 } from '@documenso/ui/primitives/form/form';
 
+import { Checkbox } from '../checkbox';
 import { Combobox } from '../combobox';
 import { Input } from '../input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../select';
@@ -92,6 +93,8 @@ export const AddSettingsFormPartial = ({
       visibility: document.visibility || '',
       globalAccessAuth: documentAuthOption?.globalAccessAuth || undefined,
       globalActionAuth: documentAuthOption?.globalActionAuth || undefined,
+      includeSigningCertificate: document.includeSigningCertificate ?? true,
+      includeAuditTrailLog: document.includeAuditTrailLog ?? true,
       meta: {
         timezone:
           TIME_ZONES.find((timezone) => timezone === document.documentMeta?.timezone) ??
@@ -258,6 +261,111 @@ export const AddSettingsFormPartial = ({
                 )}
               />
             )}
+
+            <FormField
+              control={form.control}
+              name="globalActionAuth"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="flex flex-row items-center">
+                    <Trans>Recipient action authentication</Trans>
+                    <DocumentGlobalAuthActionTooltip />
+                  </FormLabel>
+
+                  <FormControl>
+                    <DocumentGlobalAuthActionSelect {...field} onValueChange={field.onChange} />
+                  </FormControl>
+                </FormItem>
+              )}
+            />
+
+            <Accordion type="multiple" className="mt-6">
+              <AccordionItem value="advanced-options" className="border-none">
+                <AccordionTrigger className="text-foreground mb-2 rounded border px-3 py-2 text-left hover:bg-neutral-200/30 hover:no-underline">
+                  <Trans>Certificates</Trans>
+                </AccordionTrigger>
+
+                <AccordionContent className="text-muted-foreground -mx-1 px-1 pt-2 text-sm leading-relaxed">
+                  <div className="flex flex-col space-y-6">
+                    <FormField
+                      control={form.control}
+                      name="includeSigningCertificate"
+                      render={({ field }) => (
+                        <FormItem>
+                          <div className="flex flex-row items-center gap-4">
+                            <FormControl>
+                              <Checkbox
+                                checked={field.value}
+                                className="h-5 w-5"
+                                onCheckedChange={field.onChange}
+                              />
+                            </FormControl>
+                            <FormLabel className="m-0 flex flex-row items-center">
+                              <Trans>Include signing certificate</Trans>{' '}
+                              <Tooltip>
+                                <TooltipTrigger>
+                                  <InfoIcon className="mx-2 h-4 w-4" />
+                                </TooltipTrigger>
+
+                                <TooltipContent className="text-muted-foreground max-w-xs">
+                                  <Trans>
+                                    Including the signing certificate means that the certificate
+                                    will be attached to the document. You won't be able to remove
+                                    it. <br />
+                                    <br />
+                                    If you don't include it, you can download it individually.
+                                  </Trans>
+                                </TooltipContent>
+                              </Tooltip>
+                            </FormLabel>
+                          </div>
+
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    <FormField
+                      control={form.control}
+                      name="includeAuditTrailLog"
+                      render={({ field }) => (
+                        <FormItem>
+                          <div className="flex flex-row items-center gap-4">
+                            <FormControl>
+                              <Checkbox
+                                checked={field.value}
+                                className="h-5 w-5"
+                                onCheckedChange={field.onChange}
+                              />
+                            </FormControl>
+                            <FormLabel className="m-0 flex flex-row items-center">
+                              <Trans>Include audit trail</Trans>{' '}
+                              <Tooltip>
+                                <TooltipTrigger>
+                                  <InfoIcon className="mx-2 h-4 w-4" />
+                                </TooltipTrigger>
+
+                                <TooltipContent className="text-muted-foreground max-w-xs">
+                                  <Trans>
+                                    Including the audit trail means that the log of all actions will
+                                    be attached to the document. You won't be able to remove it.{' '}
+                                    <br />
+                                    <br />
+                                    If you don't include it, you can download it individually.
+                                  </Trans>
+                                </TooltipContent>
+                              </Tooltip>
+                            </FormLabel>
+                          </div>
+
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
+                </AccordionContent>
+              </AccordionItem>
+            </Accordion>
 
             {isDocumentEnterprise && (
               <FormField
