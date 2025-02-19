@@ -2,11 +2,12 @@ import { kyselyPrisma, sql } from '@documenso/prisma';
 import { DocumentStatus, SubscriptionStatus } from '@documenso/prisma/client';
 
 export type SigningVolume = {
-  id: number;
+  id: string;
   name: string;
   signingVolume: number;
   createdAt: Date;
   planId: string;
+  customerId: string;
 };
 
 export type GetSigningVolumeOptions = {
@@ -30,18 +31,16 @@ export async function getSigningVolume({
     .selectFrom('Subscription as s')
     .leftJoin('User as u', 's.userId', 'u.id')
     .leftJoin('Team as t', 's.teamId', 't.id')
-    .leftJoin('Document as ud', (join) =>
+    .leftJoin('Document as d', (join) =>
       join
-        .onRef('u.id', '=', 'ud.userId')
-        .on('ud.status', '=', sql.lit(DocumentStatus.COMPLETED))
-        .on('ud.deletedAt', 'is', null)
-        .on('ud.teamId', 'is', null),
-    )
-    .leftJoin('Document as td', (join) =>
-      join
-        .onRef('t.id', '=', 'td.teamId')
-        .on('td.status', '=', sql.lit(DocumentStatus.COMPLETED))
-        .on('td.deletedAt', 'is', null),
+        .on((eb) =>
+          eb.or([
+            eb.and([eb('d.userId', '=', eb.ref('u.id')), eb('d.teamId', 'is', null)]),
+            eb('d.teamId', '=', eb.ref('t.id')),
+          ]),
+        )
+        .on('d.status', '=', sql.lit(DocumentStatus.COMPLETED))
+        .on('d.deletedAt', 'is', null),
     )
     // @ts-expect-error - Raw SQL enum casting not properly typed by Kysely
     .where(sql`s.status = ${SubscriptionStatus.ACTIVE}::"SubscriptionStatus"`)
@@ -53,13 +52,21 @@ export async function getSigningVolume({
       ]),
     )
     .select([
-      's.id as id',
-      's.createdAt as createdAt',
       's.planId as planId',
+      's.createdAt as createdAt',
+      sql<string>`COALESCE(u.customerId, t.customerId)`.as('customerId'),
       sql<string>`COALESCE(u.name, t.name, u.email, 'Unknown')`.as('name'),
-      sql<number>`COUNT(DISTINCT ud.id) + COUNT(DISTINCT td.id)`.as('signingVolume'),
+      sql<number>`COUNT(DISTINCT d.id)`.as('signingVolume'),
     ])
-    .groupBy(['s.id', 'u.name', 't.name', 'u.email']);
+    .groupBy([
+      's.planId',
+      's.createdAt',
+      'u.customerId',
+      't.customerId',
+      'u.name',
+      't.name',
+      'u.email',
+    ]);
 
   switch (sortBy) {
     case 'name':
