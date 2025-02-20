@@ -18,6 +18,8 @@ import { ZRecipientLiteSchema } from './recipient';
  */
 export const ZDocumentSchema = DocumentSchema.pick({
   visibility: true,
+  includeSigningCertificate: true,
+  includeAuditTrailLog: true,
   status: true,
   source: true,
   id: true,
@@ -82,6 +84,8 @@ export const ZDocumentLiteSchema = DocumentSchema.pick({
   deletedAt: true,
   teamId: true,
   templateId: true,
+  includeSigningCertificate: true,
+  includeAuditTrailLog: true,
 });
 
 /**
@@ -104,6 +108,8 @@ export const ZDocumentManySchema = DocumentSchema.pick({
   deletedAt: true,
   teamId: true,
   templateId: true,
+  includeSigningCertificate: true,
+  includeAuditTrailLog: true,
 }).extend({
   user: UserSchema.pick({
     id: true,

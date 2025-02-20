@@ -124,6 +124,8 @@ export const createDocument = async ({
           team?.teamGlobalSettings?.documentVisibility,
           userTeamRole ?? TeamMemberRole.MEMBER,
         ),
+        includeSigningCertificate: team?.teamGlobalSettings?.includeSigningCertificate ?? true,
+        includeAuditTrailLog: team?.teamGlobalSettings?.includeAuditTrailLog ?? true,
         formValues,
         source: DocumentSource.DOCUMENT,
         documentMeta: {
