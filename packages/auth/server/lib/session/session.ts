@@ -23,6 +23,7 @@ export type SessionUser = Pick<
   | 'roles'
   | 'signature'
   | 'url'
+  | 'customerId'
 >;
 
 export type SessionValidationResult =
@@ -99,6 +100,7 @@ export const validateSessionToken = async (token: string): Promise<SessionValida
           roles: true,
           signature: true,
           url: true,
+          customerId: true,
         },
       },
     },

@@ -4,6 +4,8 @@ import { IS_BILLING_ENABLED } from '@documenso/lib/constants/app';
 import { AppError } from '@documenso/lib/errors/app-error';
 import { setAvatarImage } from '@documenso/lib/server-only/profile/set-avatar-image';
 import { getSubscriptionsByUserId } from '@documenso/lib/server-only/subscription/get-subscriptions-by-user-id';
+import { createBillingPortal } from '@documenso/lib/server-only/user/create-billing-portal';
+import { createCheckoutSession } from '@documenso/lib/server-only/user/create-checkout-session';
 import { deleteUser } from '@documenso/lib/server-only/user/delete-user';
 import { findUserSecurityAuditLogs } from '@documenso/lib/server-only/user/find-user-security-audit-logs';
 import { getUserById } from '@documenso/lib/server-only/user/get-user-by-id';
@@ -12,6 +14,7 @@ import { updatePublicProfile } from '@documenso/lib/server-only/user/update-publ
 
 import { adminProcedure, authenticatedProcedure, router } from '../trpc';
 import {
+  ZCreateCheckoutSessionRequestSchema,
   ZFindUserSecurityAuditLogsSchema,
   ZRetrieveUserByIdQuerySchema,
   ZSetProfileImageMutationSchema,
@@ -34,6 +37,31 @@ export const profileRouter = router({
 
     return await getUserById({ id });
   }),
+
+  createBillingPortal: authenticatedProcedure.mutation(async ({ ctx }) => {
+    return await createBillingPortal({
+      user: {
+        id: ctx.user.id,
+        customerId: ctx.user.customerId,
+        email: ctx.user.email,
+        name: ctx.user.name,
+      },
+    });
+  }),
+
+  createCheckoutSession: authenticatedProcedure
+    .input(ZCreateCheckoutSessionRequestSchema)
+    .mutation(async ({ ctx, input }) => {
+      return await createCheckoutSession({
+        user: {
+          id: ctx.user.id,
+          customerId: ctx.user.customerId,
+          email: ctx.user.email,
+          name: ctx.user.name,
+        },
+        priceId: input.priceId,
+      });
+    }),
 
   updateProfile: authenticatedProcedure
     .input(ZUpdateProfileMutationSchema)

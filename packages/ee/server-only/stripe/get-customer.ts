@@ -31,7 +31,9 @@ export const getStripeCustomerById = async (stripeCustomerId: string) => {
  *
  * Will create a Stripe customer and update the relevant user if one does not exist.
  */
-export const getStripeCustomerByUser = async (user: User) => {
+export const getStripeCustomerByUser = async (
+  user: Pick<User, 'id' | 'customerId' | 'email' | 'name'>,
+) => {
   if (user.customerId) {
     const stripeCustomer = await getStripeCustomerById(user.customerId);
 
