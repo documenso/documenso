@@ -2,7 +2,8 @@
 
 import { useEffect, useState } from 'react';
 
-import { Trans } from '@lingui/macro';
+import { Trans, msg } from '@lingui/macro';
+import { useLingui } from '@lingui/react';
 import { ChevronDown, ChevronUp, Trash } from 'lucide-react';
 
 import { validateRadioField } from '@documenso/lib/advanced-fields-validation/validate-radio';
@@ -27,6 +28,8 @@ export const RadioFieldAdvancedSettings = ({
   handleFieldChange,
   handleErrors,
 }: RadioFieldAdvancedSettingsProps) => {
+  const { _ } = useLingui();
+
   const [showValidation, setShowValidation] = useState(false);
   const [values, setValues] = useState(
     fieldState.values ?? [{ id: 1, checked: false, value: 'Default value' }],
@@ -102,6 +105,18 @@ export const RadioFieldAdvancedSettings = ({
   return (
     <div className="flex flex-col gap-4">
       <div className="flex flex-col gap-4">
+        <div>
+          <Label>
+            <Trans>Label</Trans>
+          </Label>
+          <Input
+            id="label"
+            className="bg-background mt-2"
+            placeholder={_(msg`Field label`)}
+            value={fieldState.label}
+            onChange={(e) => handleFieldChange('label', e.target.value)}
+          />
+        </div>
         <div className="flex flex-row items-center gap-2">
           <Switch
             className="bg-background"
