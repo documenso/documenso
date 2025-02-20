@@ -4,9 +4,6 @@
 SCRIPT_DIR="$(readlink -f "$(dirname "$0")")"
 MONOREPO_ROOT="$(readlink -f "$SCRIPT_DIR/../")"
 
-echo "Copying pdf.js"
-npm run copy:pdfjs --workspace apps/**
-
 echo "Copying .well-known/ contents"
 node "$MONOREPO_ROOT/scripts/copy-wellknown.cjs"
 

@@ -24,12 +24,6 @@ server.use(
         // Cache with revalidation for rest of static files.
         c.header('Cache-Control', 'public, max-age=0, stale-while-revalidate=86400');
       }
-
-      // Custom cache for static file pdf.worker.min.js
-      if (path === './build/client/pdf.worker.min.js') {
-        c.header('Cache-Control', 'public, max-age=3600, stale-while-revalidate=86400');
-        c.header('ETag', 'pdf.worker.min.js');
-      }
     },
   }),
 );

@@ -31,7 +31,7 @@ const getAuthSecret = () => {
 export const sessionCookieOptions = {
   httpOnly: true,
   path: '/',
-  sameSite: useSecureCookies ? 'none' : 'lax', // Todo: (RR7) This feels wrong?
+  sameSite: useSecureCookies ? 'none' : 'lax',
   secure: useSecureCookies,
   domain: getCookieDomain(),
   expires: new Date(Date.now() + AUTH_SESSION_LIFETIME),

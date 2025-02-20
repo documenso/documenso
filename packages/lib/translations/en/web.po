@@ -484,10 +484,6 @@ msgstr "12 months"
 msgid "3 months"
 msgstr "3 months"
 
-#: apps/remix/app/routes/_recipient+/_layout.tsx:38
-msgid "404 Not found"
-msgstr "404 Not found"
-
 #: apps/remix/app/components/general/generic-error-layout.tsx:41
 msgid "404 Page not found"
 msgstr "404 Page not found"
@@ -651,7 +647,7 @@ msgstr "Acceptance and Consent"
 msgid "Accepted team invitation"
 msgstr "Accepted team invitation"
 
-#: apps/remix/app/routes/_internal+/[__htmltopdf]+/certificate.tsx:131
+#: apps/remix/app/routes/_internal+/[__htmltopdf]+/certificate.tsx:134
 msgid "Account Authentication"
 msgstr "Account Authentication"
 
@@ -668,7 +664,7 @@ msgstr "Account disabled"
 msgid "Account enabled"
 msgstr "Account enabled"
 
-#: apps/remix/app/routes/_internal+/[__htmltopdf]+/certificate.tsx:122
+#: apps/remix/app/routes/_internal+/[__htmltopdf]+/certificate.tsx:125
 msgid "Account Re-Authentication"
 msgstr "Account Re-Authentication"
 
@@ -997,7 +993,7 @@ msgstr "An error occurred while enabling the user."
 msgid "An error occurred while loading team members. Please try again later."
 msgstr "An error occurred while loading team members. Please try again later."
 
-#: packages/ui/primitives/pdf-viewer.tsx:166
+#: packages/ui/primitives/pdf-viewer.tsx:169
 msgid "An error occurred while loading the document."
 msgstr "An error occurred while loading the document."
 
@@ -1092,8 +1088,7 @@ msgstr "An unexpected error occurred."
 #: apps/remix/app/components/forms/signin.tsx:265
 #: apps/remix/app/components/forms/signin.tsx:281
 #: apps/remix/app/components/forms/public-profile-form.tsx:103
-#: apps/remix/app/components/forms/public-profile-claim-dialog.tsx:109
-#: apps/remix/app/components/forms/profile.tsx:76
+#: apps/remix/app/components/forms/profile.tsx:74
 #: apps/remix/app/components/forms/avatar-image.tsx:94
 #: apps/remix/app/components/dialogs/webhook-delete-dialog.tsx:81
 #: apps/remix/app/components/dialogs/token-delete-dialog.tsx:90
@@ -1241,7 +1236,7 @@ msgstr "Attempts sealing the document again, useful for after a code change has 
 msgid "Audit Log"
 msgstr "Audit Log"
 
-#: apps/remix/app/routes/_internal+/[__htmltopdf]+/certificate.tsx:203
+#: apps/remix/app/routes/_internal+/[__htmltopdf]+/certificate.tsx:206
 msgid "Authentication Level"
 msgstr "Authentication Level"
 
@@ -1254,7 +1249,7 @@ msgstr "Authentication required"
 msgid "Avatar"
 msgstr "Avatar"
 
-#: apps/remix/app/components/forms/avatar-image.tsx:107
+#: apps/remix/app/components/forms/avatar-image.tsx:109
 msgid "Avatar Updated"
 msgstr "Avatar Updated"
 
@@ -1677,7 +1672,7 @@ msgstr "Contact Information"
 msgid "Content"
 msgstr "Content"
 
-#: apps/remix/app/routes/_unauthenticated+/verify-email.$token.tsx:152
+#: apps/remix/app/routes/_unauthenticated+/verify-email.$token.tsx:156
 #: apps/remix/app/routes/_unauthenticated+/team.verify.transfer.token.tsx:110
 #: apps/remix/app/routes/_unauthenticated+/team.verify.transfer.token.tsx:149
 #: apps/remix/app/routes/_unauthenticated+/team.verify.email.$token.tsx:133
@@ -1884,7 +1879,7 @@ msgstr "Create your account and start using state-of-the-art document signing. O
 msgid "Created"
 msgstr "Created"
 
-#: apps/remix/app/routes/_internal+/[__htmltopdf]+/audit-log.tsx:114
+#: apps/remix/app/routes/_internal+/[__htmltopdf]+/audit-log.tsx:116
 #: apps/remix/app/routes/_authenticated+/admin+/subscriptions.tsx:39
 msgid "Created At"
 msgstr "Created At"
@@ -2045,7 +2040,7 @@ msgstr "Delete Webhook"
 msgid "Delete your account and all its contents, including completed documents. This action is irreversible and will cancel your subscription, so proceed with caution."
 msgstr "Delete your account and all its contents, including completed documents. This action is irreversible and will cancel your subscription, so proceed with caution."
 
-#: apps/remix/app/routes/_internal+/[__htmltopdf]+/audit-log.tsx:100
+#: apps/remix/app/routes/_internal+/[__htmltopdf]+/audit-log.tsx:102
 #: apps/remix/app/routes/_authenticated+/admin+/documents.$id.tsx:77
 msgid "Deleted"
 msgstr "Deleted"
@@ -2054,11 +2049,11 @@ msgstr "Deleted"
 msgid "Deleting account..."
 msgstr "Deleting account..."
 
-#: apps/remix/app/routes/_internal+/[__htmltopdf]+/certificate.tsx:183
+#: apps/remix/app/routes/_internal+/[__htmltopdf]+/certificate.tsx:186
 msgid "Details"
 msgstr "Details"
 
-#: apps/remix/app/routes/_internal+/[__htmltopdf]+/certificate.tsx:247
+#: apps/remix/app/routes/_internal+/[__htmltopdf]+/certificate.tsx:250
 #: apps/remix/app/components/tables/settings-security-activity-table.tsx:69
 msgid "Device"
 msgstr "Device"
@@ -2287,7 +2282,7 @@ msgstr "Document external ID updated"
 msgid "Document history"
 msgstr "Document history"
 
-#: apps/remix/app/routes/_internal+/[__htmltopdf]+/audit-log.tsx:84
+#: apps/remix/app/routes/_internal+/[__htmltopdf]+/audit-log.tsx:86
 #: apps/remix/app/routes/_authenticated+/documents+/$id.logs.tsx:82
 msgid "Document ID"
 msgstr "Document ID"
@@ -2398,7 +2393,7 @@ msgstr "Document visibility updated"
 msgid "Document will be permanently deleted"
 msgstr "Document will be permanently deleted"
 
-#: apps/remix/app/routes/_profile+/p.$url.tsx:164
+#: apps/remix/app/routes/_profile+/p.$url.tsx:163
 #: apps/remix/app/routes/_authenticated+/documents+/_index.tsx:111
 #: apps/remix/app/routes/_authenticated+/documents+/$id.edit.tsx:99
 #: apps/remix/app/routes/_authenticated+/documents+/$id._index.tsx:138
@@ -2523,15 +2518,15 @@ msgstr "Electronic Delivery of Documents"
 msgid "Electronic Signature Disclosure"
 msgstr "Electronic Signature Disclosure"
 
-#: apps/remix/app/routes/_internal+/[__htmltopdf]+/certificate.tsx:125
-#: apps/remix/app/routes/_internal+/[__htmltopdf]+/certificate.tsx:132
+#: apps/remix/app/routes/_internal+/[__htmltopdf]+/certificate.tsx:128
+#: apps/remix/app/routes/_internal+/[__htmltopdf]+/certificate.tsx:135
 #: apps/remix/app/routes/_authenticated+/admin+/users.$id.tsx:114
 #: apps/remix/app/components/tables/admin-document-recipient-item-table.tsx:158
 #: apps/remix/app/components/tables/admin-dashboard-users-table.tsx:68
 #: apps/remix/app/components/general/document-signing/document-signing-email-field.tsx:131
 #: apps/remix/app/components/general/direct-template/direct-template-configure-form.tsx:120
 #: apps/remix/app/components/forms/signin.tsx:318
-#: apps/remix/app/components/forms/profile.tsx:110
+#: apps/remix/app/components/forms/profile.tsx:108
 #: apps/remix/app/components/forms/forgot-password.tsx:77
 #: apps/remix/app/components/embed/embed-document-signing-page.tsx:362
 #: apps/remix/app/components/embed/embed-direct-template-client-page.tsx:405
@@ -2560,7 +2555,7 @@ msgstr "Email address"
 msgid "Email Address"
 msgstr "Email Address"
 
-#: apps/remix/app/routes/_unauthenticated+/verify-email.$token.tsx:168
+#: apps/remix/app/routes/_unauthenticated+/verify-email.$token.tsx:172
 msgid "Email already confirmed"
 msgstr "Email already confirmed"
 
@@ -2568,7 +2563,7 @@ msgstr "Email already confirmed"
 msgid "Email cannot already exist in the template"
 msgstr "Email cannot already exist in the template"
 
-#: apps/remix/app/routes/_unauthenticated+/verify-email.$token.tsx:140
+#: apps/remix/app/routes/_unauthenticated+/verify-email.$token.tsx:144
 msgid "Email Confirmed!"
 msgstr "Email Confirmed!"
 
@@ -2654,7 +2649,7 @@ msgstr "Enabled"
 msgid "Enabling the account results in the user being able to use the account again, and all the related features such as webhooks, teams, and API keys for example."
 msgstr "Enabling the account results in the user being able to use the account again, and all the related features such as webhooks, teams, and API keys for example."
 
-#: apps/remix/app/routes/_internal+/[__htmltopdf]+/audit-log.tsx:90
+#: apps/remix/app/routes/_internal+/[__htmltopdf]+/audit-log.tsx:92
 msgid "Enclosed Document"
 msgstr "Enclosed Document"
 
@@ -2728,7 +2723,7 @@ msgstr "Enter your text here"
 #: apps/remix/app/components/dialogs/admin-user-enable-dialog.tsx:59
 #: apps/remix/app/components/dialogs/admin-user-disable-dialog.tsx:62
 #: apps/remix/app/components/dialogs/admin-user-delete-dialog.tsx:62
-#: packages/ui/primitives/pdf-viewer.tsx:165
+#: packages/ui/primitives/pdf-viewer.tsx:168
 #: packages/ui/primitives/document-flow/field-item-advanced-settings.tsx:222
 msgid "Error"
 msgstr "Error"
@@ -2869,7 +2864,7 @@ msgstr "Free Signature"
 #: apps/remix/app/components/general/document-signing/document-signing-form.tsx:328
 #: apps/remix/app/components/general/direct-template/direct-template-signing-form.tsx:323
 #: apps/remix/app/components/forms/signup.tsx:309
-#: apps/remix/app/components/forms/profile.tsx:98
+#: apps/remix/app/components/forms/profile.tsx:96
 #: apps/remix/app/components/embed/embed-document-signing-page.tsx:347
 #: apps/remix/app/components/embed/embed-direct-template-client-page.tsx:390
 msgid "Full Name"
@@ -2891,7 +2886,7 @@ msgstr "Generate Links"
 msgid "Global recipient action authentication"
 msgstr "Global recipient action authentication"
 
-#: apps/remix/app/routes/_recipient+/_layout.tsx:56
+#: apps/remix/app/routes/_recipient+/_layout.tsx:41
 #: apps/remix/app/routes/_profile+/_layout.tsx:116
 #: apps/remix/app/components/general/generic-error-layout.tsx:106
 #: packages/ui/primitives/document-flow/document-flow-root.tsx:141
@@ -2899,9 +2894,9 @@ msgid "Go Back"
 msgstr "Go Back"
 
 #: apps/remix/app/routes/_unauthenticated+/verify-email._index.tsx:35
-#: apps/remix/app/routes/_unauthenticated+/verify-email.$token.tsx:96
-#: apps/remix/app/routes/_unauthenticated+/verify-email.$token.tsx:124
-#: apps/remix/app/routes/_unauthenticated+/verify-email.$token.tsx:179
+#: apps/remix/app/routes/_unauthenticated+/verify-email.$token.tsx:100
+#: apps/remix/app/routes/_unauthenticated+/verify-email.$token.tsx:128
+#: apps/remix/app/routes/_unauthenticated+/verify-email.$token.tsx:183
 msgid "Go back home"
 msgstr "Go back home"
 
@@ -2914,7 +2909,7 @@ msgstr "Go Back Home"
 msgid "Go to owner"
 msgstr "Go to owner"
 
-#: apps/remix/app/routes/_profile+/p.$url.tsx:145
+#: apps/remix/app/routes/_profile+/p.$url.tsx:144
 msgid "Go to your <0>public profile settings</0> to add documents."
 msgstr "Go to your <0>public profile settings</0> to add documents."
 
@@ -2983,7 +2978,7 @@ msgstr "Hi {userName},"
 msgid "Hi, {userName} <0>({userEmail})</0>"
 msgstr "Hi, {userName} <0>({userEmail})</0>"
 
-#: apps/remix/app/routes/_authenticated+/settings+/public-profile+/index.tsx:161
+#: apps/remix/app/routes/_authenticated+/settings+/public-profile+/index.tsx:164
 #: apps/remix/app/components/tables/documents-table-action-dropdown.tsx:175
 #: apps/remix/app/components/dialogs/document-delete-dialog.tsx:196
 msgid "Hide"
@@ -3013,7 +3008,7 @@ msgstr "I am an assistant of this document"
 msgid "I am required to receive a copy of this document"
 msgstr "I am required to receive a copy of this document"
 
-#: apps/remix/app/routes/_internal+/[__htmltopdf]+/certificate.tsx:34
+#: apps/remix/app/routes/_internal+/[__htmltopdf]+/certificate.tsx:35
 msgid "I am the owner of this document"
 msgstr "I am the owner of this document"
 
@@ -3135,7 +3130,7 @@ msgstr "Invited At"
 msgid "Invoice"
 msgstr "Invoice"
 
-#: apps/remix/app/routes/_internal+/[__htmltopdf]+/certificate.tsx:240
+#: apps/remix/app/routes/_internal+/[__htmltopdf]+/certificate.tsx:243
 #: apps/remix/app/components/tables/internal-audit-log-table.tsx:47
 msgid "IP Address"
 msgstr "IP Address"
@@ -3145,11 +3140,11 @@ msgid "It is crucial to keep your contact information, especially your email add
 msgstr "It is crucial to keep your contact information, especially your email address, up to date with us. Please notify us immediately of any changes to ensure that you continue to receive all necessary communications."
 
 #. placeholder {0}: publicProfile.name
-#: apps/remix/app/routes/_profile+/p.$url.tsx:132
+#: apps/remix/app/routes/_profile+/p.$url.tsx:131
 msgid "It looks like {0} hasn't added any documents to their profile yet."
 msgstr "It looks like {0} hasn't added any documents to their profile yet."
 
-#: apps/remix/app/routes/_unauthenticated+/verify-email.$token.tsx:116
+#: apps/remix/app/routes/_unauthenticated+/verify-email.$token.tsx:120
 msgid "It seems that the provided token has expired. We've just sent you another token, please check your email and try again."
 msgstr "It seems that the provided token has expired. We've just sent you another token, please check your email and try again."
 
@@ -3202,7 +3197,7 @@ msgstr "Last modified"
 msgid "Last updated"
 msgstr "Last updated"
 
-#: apps/remix/app/routes/_internal+/[__htmltopdf]+/audit-log.tsx:124
+#: apps/remix/app/routes/_internal+/[__htmltopdf]+/audit-log.tsx:126
 msgid "Last Updated"
 msgstr "Last Updated"
 
@@ -3244,7 +3239,7 @@ msgstr "Like to have your own public profile with agreements?"
 msgid "Link expires in 1 hour."
 msgstr "Link expires in 1 hour."
 
-#: apps/remix/app/routes/_authenticated+/settings+/public-profile+/index.tsx:222
+#: apps/remix/app/routes/_authenticated+/settings+/public-profile+/index.tsx:225
 msgid "Link template"
 msgstr "Link template"
 
@@ -3263,7 +3258,7 @@ msgid "Load older activity"
 msgstr "Load older activity"
 
 #: apps/remix/app/components/general/skeletons/document-edit-skeleton.tsx:29
-#: packages/ui/primitives/pdf-viewer.tsx:43
+#: packages/ui/primitives/pdf-viewer.tsx:46
 #: packages/ui/primitives/lazy-pdf-viewer.tsx:12
 msgid "Loading document..."
 msgstr "Loading document..."
@@ -3495,6 +3490,10 @@ msgstr "Never"
 msgid "Never expire"
 msgstr "Never expire"
 
+#: apps/remix/app/components/forms/password.tsx:125
+msgid "New Password"
+msgstr "New Password"
+
 #: apps/remix/app/components/dialogs/team-transfer-dialog.tsx:174
 msgid "New team owner"
 msgstr "New team owner"
@@ -3687,7 +3686,6 @@ msgstr "Only managers and above can access and view the document"
 msgid "Only subscribers can have a username shorter than 6 characters"
 msgstr "Only subscribers can have a username shorter than 6 characters"
 
-#: apps/remix/app/routes/_recipient+/_layout.tsx:42
 #: apps/remix/app/routes/_profile+/_layout.tsx:103
 #: apps/remix/app/components/general/generic-error-layout.tsx:42
 #: apps/remix/app/components/general/generic-error-layout.tsx:47
@@ -3711,7 +3709,7 @@ msgstr "Or continue with"
 msgid "Otherwise, the document will be created as a draft."
 msgstr "Otherwise, the document will be created as a draft."
 
-#: apps/remix/app/routes/_internal+/[__htmltopdf]+/audit-log.tsx:106
+#: apps/remix/app/routes/_internal+/[__htmltopdf]+/audit-log.tsx:108
 #: apps/remix/app/routes/_authenticated+/admin+/documents._index.tsx:81
 #: apps/remix/app/components/tables/user-settings-current-teams-table.tsx:83
 #: apps/remix/app/components/tables/team-settings-members-table.tsx:94
@@ -3726,7 +3724,7 @@ msgid "Page {0} of {1}"
 msgstr "Page {0} of {1}"
 
 #. placeholder {0}: i + 1
-#: packages/ui/primitives/pdf-viewer.tsx:258
+#: packages/ui/primitives/pdf-viewer.tsx:261
 msgid "Page {0} of {numPages}"
 msgstr "Page {0} of {numPages}"
 
@@ -3758,7 +3756,7 @@ msgstr "Passkey has been updated"
 msgid "Passkey name"
 msgstr "Passkey name"
 
-#: apps/remix/app/routes/_internal+/[__htmltopdf]+/certificate.tsx:124
+#: apps/remix/app/routes/_internal+/[__htmltopdf]+/certificate.tsx:127
 msgid "Passkey Re-Authentication"
 msgstr "Passkey Re-Authentication"
 
@@ -3779,7 +3777,6 @@ msgstr "Passkeys are not supported on this browser"
 #: apps/remix/app/components/forms/signup.tsx:341
 #: apps/remix/app/components/forms/signin.tsx:336
 #: apps/remix/app/components/forms/reset-password.tsx:111
-#: apps/remix/app/components/forms/password.tsx:125
 msgid "Password"
 msgstr "Password"
 
@@ -3996,8 +3993,8 @@ msgstr "Please try again and make sure you enter the correct email address."
 msgid "Please try again later."
 msgstr "Please try again later."
 
-#: packages/ui/primitives/pdf-viewer.tsx:222
-#: packages/ui/primitives/pdf-viewer.tsx:237
+#: packages/ui/primitives/pdf-viewer.tsx:225
+#: packages/ui/primitives/pdf-viewer.tsx:240
 msgid "Please try again or contact our support."
 msgstr "Please try again or contact our support."
 
@@ -4045,11 +4042,11 @@ msgstr "Private templates can only be modified and viewed by you."
 msgid "Profile"
 msgstr "Profile"
 
-#: apps/remix/app/routes/_authenticated+/settings+/public-profile+/index.tsx:190
+#: apps/remix/app/routes/_authenticated+/settings+/public-profile+/index.tsx:193
 msgid "Profile is currently <0>hidden</0>."
 msgstr "Profile is currently <0>hidden</0>."
 
-#: apps/remix/app/routes/_authenticated+/settings+/public-profile+/index.tsx:178
+#: apps/remix/app/routes/_authenticated+/settings+/public-profile+/index.tsx:181
 msgid "Profile is currently <0>visible</0>."
 msgstr "Profile is currently <0>visible</0>."
 
@@ -4111,7 +4108,7 @@ msgstr "Read the full <0>signature disclosure</0>."
 msgid "Ready"
 msgstr "Ready"
 
-#: apps/remix/app/routes/_internal+/[__htmltopdf]+/certificate.tsx:294
+#: apps/remix/app/routes/_internal+/[__htmltopdf]+/certificate.tsx:297
 msgid "Reason"
 msgstr "Reason"
 
@@ -4174,7 +4171,7 @@ msgstr "Recipient signing request email"
 msgid "Recipient updated"
 msgstr "Recipient updated"
 
-#: apps/remix/app/routes/_internal+/[__htmltopdf]+/audit-log.tsx:142
+#: apps/remix/app/routes/_internal+/[__htmltopdf]+/audit-log.tsx:144
 #: apps/remix/app/routes/_authenticated+/admin+/documents.$id.tsx:132
 #: apps/remix/app/components/general/template/template-page-view-recipients.tsx:30
 #: apps/remix/app/components/general/document/document-page-view-recipients.tsx:48
@@ -4572,7 +4569,7 @@ msgstr "Sending Reset Email..."
 msgid "Sending..."
 msgstr "Sending..."
 
-#: apps/remix/app/routes/_internal+/[__htmltopdf]+/certificate.tsx:261
+#: apps/remix/app/routes/_internal+/[__htmltopdf]+/certificate.tsx:264
 #: apps/remix/app/components/general/document/document-page-view-recipients.tsx:100
 msgid "Sent"
 msgstr "Sent"
@@ -4614,7 +4611,7 @@ msgstr "Share the Link"
 msgid "Share your signing experience!"
 msgstr "Share your signing experience!"
 
-#: apps/remix/app/routes/_authenticated+/settings+/public-profile+/index.tsx:169
+#: apps/remix/app/routes/_authenticated+/settings+/public-profile+/index.tsx:172
 msgid "Show"
 msgstr "Show"
 
@@ -4635,7 +4632,7 @@ msgstr "Show templates in your public profile for your audience to sign and get 
 msgid "Show templates in your team public profile for your audience to sign and get started quickly"
 msgstr "Show templates in your team public profile for your audience to sign and get started quickly"
 
-#: apps/remix/app/routes/_profile+/p.$url.tsx:190
+#: apps/remix/app/routes/_profile+/p.$url.tsx:189
 #: apps/remix/app/components/tables/documents-table-action-dropdown.tsx:128
 #: apps/remix/app/components/tables/documents-table-action-button.tsx:112
 #: apps/remix/app/components/general/user-profile-timur.tsx:77
@@ -4712,13 +4709,13 @@ msgstr "Sign Up with Google"
 msgid "Sign Up with OIDC"
 msgstr "Sign Up with OIDC"
 
-#: apps/remix/app/routes/_internal+/[__htmltopdf]+/certificate.tsx:182
+#: apps/remix/app/routes/_internal+/[__htmltopdf]+/certificate.tsx:185
 #: apps/remix/app/components/tables/admin-document-recipient-item-table.tsx:80
 #: apps/remix/app/components/general/document-signing/document-signing-signature-field.tsx:245
 #: apps/remix/app/components/general/document-signing/document-signing-signature-field.tsx:280
 #: apps/remix/app/components/general/document-signing/document-signing-form.tsx:342
 #: apps/remix/app/components/general/direct-template/direct-template-signing-form.tsx:335
-#: apps/remix/app/components/forms/profile.tsx:120
+#: apps/remix/app/components/forms/profile.tsx:118
 #: apps/remix/app/components/embed/embed-document-signing-page.tsx:376
 #: apps/remix/app/components/embed/embed-direct-template-client-page.tsx:420
 #: packages/ui/primitives/template-flow/add-template-fields.tsx:711
@@ -4728,7 +4725,7 @@ msgstr "Sign Up with OIDC"
 msgid "Signature"
 msgstr "Signature"
 
-#: apps/remix/app/routes/_internal+/[__htmltopdf]+/certificate.tsx:233
+#: apps/remix/app/routes/_internal+/[__htmltopdf]+/certificate.tsx:236
 msgid "Signature ID"
 msgstr "Signature ID"
 
@@ -4747,7 +4744,7 @@ msgstr "Signatures Collected"
 msgid "Signatures will appear once the document has been completed"
 msgstr "Signatures will appear once the document has been completed"
 
-#: apps/remix/app/routes/_internal+/[__htmltopdf]+/certificate.tsx:283
+#: apps/remix/app/routes/_internal+/[__htmltopdf]+/certificate.tsx:286
 #: apps/remix/app/components/general/document/document-read-only-fields.tsx:82
 #: apps/remix/app/components/general/document/document-page-view-recipients.tsx:113
 #: packages/lib/constants/recipient-roles.ts:22
@@ -4758,7 +4755,7 @@ msgstr "Signed"
 msgid "Signer"
 msgstr "Signer"
 
-#: apps/remix/app/routes/_internal+/[__htmltopdf]+/certificate.tsx:181
+#: apps/remix/app/routes/_internal+/[__htmltopdf]+/certificate.tsx:184
 msgid "Signer Events"
 msgstr "Signer Events"
 
@@ -4774,11 +4771,11 @@ msgstr "Signers must have unique emails"
 msgid "Signing"
 msgstr "Signing"
 
-#: apps/remix/app/routes/_internal+/[__htmltopdf]+/certificate.tsx:173
+#: apps/remix/app/routes/_internal+/[__htmltopdf]+/certificate.tsx:176
 msgid "Signing Certificate"
 msgstr "Signing Certificate"
 
-#: apps/remix/app/routes/_internal+/[__htmltopdf]+/certificate.tsx:316
+#: apps/remix/app/routes/_internal+/[__htmltopdf]+/certificate.tsx:319
 msgid "Signing certificate provided by"
 msgstr "Signing certificate provided by"
 
@@ -4820,7 +4817,7 @@ msgid "Signups are disabled."
 msgstr "Signups are disabled."
 
 #. placeholder {0}: DateTime.fromJSDate(publicProfile.badge.since).toFormat('LLL ‘yy')
-#: apps/remix/app/routes/_profile+/p.$url.tsx:107
+#: apps/remix/app/routes/_profile+/p.$url.tsx:106
 msgid "Since {0}"
 msgstr "Since {0}"
 
@@ -4837,12 +4834,12 @@ msgstr "Site Settings"
 msgid "Some signers have not been assigned a signature field. Please assign at least 1 signature field to each signer before proceeding."
 msgstr "Some signers have not been assigned a signature field. Please assign at least 1 signature field to each signer before proceeding."
 
-#: apps/remix/app/routes/_unauthenticated+/verify-email.$token.tsx:52
-#: apps/remix/app/routes/_unauthenticated+/verify-email.$token.tsx:84
+#: apps/remix/app/routes/_unauthenticated+/verify-email.$token.tsx:56
+#: apps/remix/app/routes/_unauthenticated+/verify-email.$token.tsx:88
 #: apps/remix/app/routes/_authenticated+/settings+/teams+/team-invitations.tsx:132
 #: apps/remix/app/routes/_authenticated+/settings+/teams+/team-invitations.tsx:169
 #: apps/remix/app/routes/_authenticated+/settings+/teams+/team-email-usage.tsx:43
-#: apps/remix/app/routes/_authenticated+/settings+/public-profile+/index.tsx:130
+#: apps/remix/app/routes/_authenticated+/settings+/public-profile+/index.tsx:133
 #: apps/remix/app/components/tables/user-settings-pending-teams-table-actions.tsx:34
 #: apps/remix/app/components/tables/team-settings-member-invites-table.tsx:62
 #: apps/remix/app/components/tables/team-settings-member-invites-table.tsx:79
@@ -4891,8 +4888,8 @@ msgstr "Something went wrong while attempting to transfer the ownership of team 
 msgid "Something went wrong while attempting to verify your email address for <0>{0}</0>. Please try again later."
 msgstr "Something went wrong while attempting to verify your email address for <0>{0}</0>. Please try again later."
 
-#: packages/ui/primitives/pdf-viewer.tsx:219
-#: packages/ui/primitives/pdf-viewer.tsx:234
+#: packages/ui/primitives/pdf-viewer.tsx:222
+#: packages/ui/primitives/pdf-viewer.tsx:237
 msgid "Something went wrong while loading the document."
 msgstr "Something went wrong while loading the document."
 
@@ -4942,7 +4939,7 @@ msgstr "Source"
 msgid "Stats"
 msgstr "Stats"
 
-#: apps/remix/app/routes/_internal+/[__htmltopdf]+/audit-log.tsx:96
+#: apps/remix/app/routes/_internal+/[__htmltopdf]+/audit-log.tsx:98
 #: apps/remix/app/routes/_authenticated+/admin+/subscriptions.tsx:36
 #: apps/remix/app/routes/_authenticated+/admin+/documents._index.tsx:76
 #: apps/remix/app/components/tables/team-settings-billing-invoices-table.tsx:73
@@ -5404,10 +5401,6 @@ msgstr "The recipient is required to sign the document for it to be completed."
 msgid "The recipient is required to view the document for it to be completed."
 msgstr "The recipient is required to view the document for it to be completed."
 
-#: apps/remix/app/routes/_recipient+/_layout.tsx:46
-msgid "The resource you are looking for may have been disabled, deleted or may have never existed."
-msgstr "The resource you are looking for may have been disabled, deleted or may have never existed."
-
 #: apps/remix/app/components/dialogs/team-transfer-dialog.tsx:230
 msgid "The selected team member will receive an email which they must accept before the team is transferred"
 msgstr "The selected team member will receive an email which they must accept before the team is transferred"
@@ -5678,10 +5671,6 @@ msgstr "This URL is already in use."
 msgid "This username has already been taken"
 msgstr "This username has already been taken"
 
-#: apps/remix/app/components/forms/public-profile-claim-dialog.tsx:94
-msgid "This username is already taken"
-msgstr "This username is already taken"
-
 #: packages/ui/components/document/document-email-checkboxes.tsx:246
 msgid "This will be sent to all recipients if a pending document has been deleted."
 msgstr "This will be sent to all recipients if a pending document has been deleted."
@@ -5707,7 +5696,7 @@ msgstr "Time"
 msgid "Time zone"
 msgstr "Time zone"
 
-#: apps/remix/app/routes/_internal+/[__htmltopdf]+/audit-log.tsx:134
+#: apps/remix/app/routes/_internal+/[__htmltopdf]+/audit-log.tsx:136
 #: packages/ui/primitives/template-flow/add-template-settings.tsx:482
 #: packages/ui/primitives/document-flow/add-settings.tsx:357
 msgid "Time Zone"
@@ -5774,11 +5763,11 @@ msgstr "To use our electronic signature service, you must have access to:"
 msgid "To view this document you need to be signed into your account, please sign in to continue."
 msgstr "To view this document you need to be signed into your account, please sign in to continue."
 
-#: apps/remix/app/routes/_authenticated+/settings+/public-profile+/index.tsx:184
+#: apps/remix/app/routes/_authenticated+/settings+/public-profile+/index.tsx:187
 msgid "Toggle the switch to hide your profile from the public."
 msgstr "Toggle the switch to hide your profile from the public."
 
-#: apps/remix/app/routes/_authenticated+/settings+/public-profile+/index.tsx:196
+#: apps/remix/app/routes/_authenticated+/settings+/public-profile+/index.tsx:199
 msgid "Toggle the switch to show your profile to the public."
 msgstr "Toggle the switch to show your profile to the public."
 
@@ -5883,7 +5872,7 @@ msgstr "Two-factor authentication enabled"
 msgid "Two-factor authentication has been disabled for your account. You will no longer be required to enter a code from your authenticator app when signing in."
 msgstr "Two-factor authentication has been disabled for your account. You will no longer be required to enter a code from your authenticator app when signing in."
 
-#: apps/remix/app/routes/_internal+/[__htmltopdf]+/certificate.tsx:123
+#: apps/remix/app/routes/_internal+/[__htmltopdf]+/certificate.tsx:126
 msgid "Two-Factor Re-Authentication"
 msgstr "Two-Factor Re-Authentication"
 
@@ -5991,10 +5980,10 @@ msgstr "Unauthorized"
 msgid "Uncompleted"
 msgstr "Uncompleted"
 
-#: apps/remix/app/routes/_internal+/[__htmltopdf]+/certificate.tsx:242
-#: apps/remix/app/routes/_internal+/[__htmltopdf]+/certificate.tsx:267
-#: apps/remix/app/routes/_internal+/[__htmltopdf]+/certificate.tsx:278
-#: apps/remix/app/routes/_internal+/[__htmltopdf]+/certificate.tsx:289
+#: apps/remix/app/routes/_internal+/[__htmltopdf]+/certificate.tsx:245
+#: apps/remix/app/routes/_internal+/[__htmltopdf]+/certificate.tsx:270
+#: apps/remix/app/routes/_internal+/[__htmltopdf]+/certificate.tsx:281
+#: apps/remix/app/routes/_internal+/[__htmltopdf]+/certificate.tsx:292
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/settings+/billing.tsx:61
 msgid "Unknown"
 msgstr "Unknown"
@@ -6025,7 +6014,7 @@ msgstr "Update passkey"
 msgid "Update password"
 msgstr "Update password"
 
-#: apps/remix/app/components/forms/profile.tsx:139
+#: apps/remix/app/components/forms/profile.tsx:137
 msgid "Update profile"
 msgstr "Update profile"
 
@@ -6068,7 +6057,7 @@ msgstr "Update webhook"
 msgid "Updating password..."
 msgstr "Updating password..."
 
-#: apps/remix/app/components/forms/profile.tsx:139
+#: apps/remix/app/components/forms/profile.tsx:137
 msgid "Updating profile..."
 msgstr "Updating profile..."
 
@@ -6229,7 +6218,7 @@ msgstr "Verify your email to upload documents."
 msgid "Verify your team email address"
 msgstr "Verify your team email address"
 
-#: apps/remix/app/routes/_internal+/[__htmltopdf]+/audit-log.tsx:78
+#: apps/remix/app/routes/_internal+/[__htmltopdf]+/audit-log.tsx:80
 msgid "Version History"
 msgstr "Version History"
 
@@ -6312,7 +6301,7 @@ msgstr "View Recovery Codes"
 msgid "View teams"
 msgstr "View teams"
 
-#: apps/remix/app/routes/_internal+/[__htmltopdf]+/certificate.tsx:272
+#: apps/remix/app/routes/_internal+/[__htmltopdf]+/certificate.tsx:275
 #: apps/remix/app/components/general/document/document-page-view-recipients.tsx:119
 #: packages/lib/constants/recipient-roles.ts:29
 msgid "Viewed"
@@ -6450,10 +6439,6 @@ msgstr "We encountered an unknown error while attempting to reset your password.
 msgid "We encountered an unknown error while attempting to revoke access. Please try again or contact support."
 msgstr "We encountered an unknown error while attempting to revoke access. Please try again or contact support."
 
-#: apps/remix/app/components/forms/public-profile-claim-dialog.tsx:111
-msgid "We encountered an unknown error while attempting to save your details. Please try again later."
-msgstr "We encountered an unknown error while attempting to save your details. Please try again later."
-
 #: apps/remix/app/components/forms/signin.tsx:267
 #: apps/remix/app/components/forms/signin.tsx:283
 msgid "We encountered an unknown error while attempting to sign you In. Please try again later."
@@ -6493,7 +6478,7 @@ msgstr "We encountered an unknown error while attempting to update your team. Pl
 msgid "We encountered an unknown error while attempting update the team email. Please try again later."
 msgstr "We encountered an unknown error while attempting update the team email. Please try again later."
 
-#: apps/remix/app/components/forms/profile.tsx:78
+#: apps/remix/app/components/forms/profile.tsx:76
 msgid "We encountered an unknown error while attempting update your profile. Please try again later."
 msgstr "We encountered an unknown error while attempting update your profile. Please try again later."
 
@@ -6535,7 +6520,7 @@ msgstr "We were unable to disable two-factor authentication for your account. Pl
 msgid "We were unable to log you out at this time."
 msgstr "We were unable to log you out at this time."
 
-#: apps/remix/app/routes/_authenticated+/settings+/public-profile+/index.tsx:131
+#: apps/remix/app/routes/_authenticated+/settings+/public-profile+/index.tsx:134
 msgid "We were unable to set your public profile to public. Please try again."
 msgstr "We were unable to set your public profile to public. Please try again."
 
@@ -6562,11 +6547,11 @@ msgstr "We were unable to update your document preferences at this time, please 
 msgid "We were unable to verify your details. Please try again or contact support"
 msgstr "We were unable to verify your details. Please try again or contact support"
 
-#: apps/remix/app/routes/_unauthenticated+/verify-email.$token.tsx:53
+#: apps/remix/app/routes/_unauthenticated+/verify-email.$token.tsx:57
 msgid "We were unable to verify your email at this time."
 msgstr "We were unable to verify your email at this time."
 
-#: apps/remix/app/routes/_unauthenticated+/verify-email.$token.tsx:88
+#: apps/remix/app/routes/_unauthenticated+/verify-email.$token.tsx:92
 msgid "We were unable to verify your email. If your email is not verified already, please try again."
 msgstr "We were unable to verify your email. If your email is not verified already, please try again."
 
@@ -6655,7 +6640,7 @@ msgstr "When you sign a document, we can automatically fill in and sign the foll
 msgid "When you use our platform to affix your electronic signature to documents, you are consenting to do so under the Electronic Signatures in Global and National Commerce Act (E-Sign Act) and other applicable laws. This action indicates your agreement to use electronic means to sign documents and receive notifications."
 msgstr "When you use our platform to affix your electronic signature to documents, you are consenting to do so under the Electronic Signatures in Global and National Commerce Act (E-Sign Act) and other applicable laws. This action indicates your agreement to use electronic means to sign documents and receive notifications."
 
-#: apps/remix/app/routes/_profile+/p.$url.tsx:137
+#: apps/remix/app/routes/_profile+/p.$url.tsx:136
 msgid "While waiting for them to do so you can create your own Documenso account and get started with document signing right away."
 msgstr "While waiting for them to do so you can create your own Documenso account and get started with document signing right away."
 
@@ -6946,7 +6931,7 @@ msgstr "You must enter '{deleteMessage}' to proceed"
 msgid "You must have at least one other team member to transfer ownership."
 msgstr "You must have at least one other team member to transfer ownership."
 
-#: apps/remix/app/routes/_authenticated+/settings+/public-profile+/index.tsx:115
+#: apps/remix/app/routes/_authenticated+/settings+/public-profile+/index.tsx:118
 msgid "You must set a profile URL before enabling your public profile."
 msgstr "You must set a profile URL before enabling your public profile."
 
@@ -6978,7 +6963,7 @@ msgstr "You will receive an Email copy of the signed document once everyone has 
 msgid "Your account has been deleted successfully."
 msgstr "Your account has been deleted successfully."
 
-#: apps/remix/app/components/forms/avatar-image.tsx:108
+#: apps/remix/app/components/forms/avatar-image.tsx:110
 msgid "Your avatar has been updated successfully."
 msgstr "Your avatar has been updated successfully."
 
@@ -7046,11 +7031,11 @@ msgstr "Your document preferences have been updated"
 msgid "Your documents"
 msgstr "Your documents"
 
-#: apps/remix/app/routes/_unauthenticated+/verify-email.$token.tsx:172
+#: apps/remix/app/routes/_unauthenticated+/verify-email.$token.tsx:176
 msgid "Your email has already been confirmed. You can now use all features of Documenso."
 msgstr "Your email has already been confirmed. You can now use all features of Documenso."
 
-#: apps/remix/app/routes/_unauthenticated+/verify-email.$token.tsx:144
+#: apps/remix/app/routes/_unauthenticated+/verify-email.$token.tsx:148
 msgid "Your email has been successfully confirmed! You can now use all features of Documenso."
 msgstr "Your email has been successfully confirmed! You can now use all features of Documenso."
 
@@ -7141,7 +7126,7 @@ msgstr "Your template will be duplicated."
 msgid "Your templates has been saved successfully."
 msgstr "Your templates has been saved successfully."
 
-#: apps/remix/app/routes/_unauthenticated+/verify-email.$token.tsx:112
+#: apps/remix/app/routes/_unauthenticated+/verify-email.$token.tsx:116
 msgid "Your token has expired!"
 msgstr "Your token has expired!"
 

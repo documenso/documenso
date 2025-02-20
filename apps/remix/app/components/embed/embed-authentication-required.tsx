@@ -8,11 +8,17 @@ import { BrandingLogo } from '~/components/general/branding-logo';
 export type EmbedAuthenticationRequiredProps = {
   email?: string;
   returnTo: string;
+  isGoogleSSOEnabled?: boolean;
+  isOIDCSSOEnabled?: boolean;
+  oidcProviderLabel?: string;
 };
 
 export const EmbedAuthenticationRequired = ({
   email,
   returnTo,
+  isGoogleSSOEnabled,
+  isOIDCSSOEnabled,
+  oidcProviderLabel,
 }: EmbedAuthenticationRequiredProps) => {
   return (
     <div className="flex min-h-[100dvh] w-full items-center justify-center">
@@ -28,7 +34,14 @@ export const EmbedAuthenticationRequired = ({
           </AlertDescription>
         </Alert>
 
-        <SignInForm className="mt-4" initialEmail={email} returnTo={returnTo} />
+        <SignInForm
+          isGoogleSSOEnabled={isGoogleSSOEnabled}
+          isOIDCSSOEnabled={isOIDCSSOEnabled}
+          oidcProviderLabel={oidcProviderLabel}
+          className="mt-4"
+          initialEmail={email}
+          returnTo={returnTo}
+        />
       </div>
     </div>
   );

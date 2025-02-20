@@ -1,5 +1,11 @@
 import { Outlet, isRouteErrorResponse, useRouteError } from 'react-router';
 
+import {
+  IS_GOOGLE_SSO_ENABLED,
+  IS_OIDC_SSO_ENABLED,
+  OIDC_PROVIDER_LABEL,
+} from '@documenso/lib/constants/auth';
+
 import { EmbedAuthenticationRequired } from '~/components/embed/embed-authentication-required';
 import { EmbedDocumentWaitingForTurn } from '~/components/embed/embed-document-waiting-for-turn';
 import { EmbedPaywall } from '~/components/embed/embed-paywall';
@@ -20,17 +26,38 @@ export function headers({ loaderHeaders }: Route.HeadersArgs) {
   };
 }
 
+export function loader() {
+  // SSR env variables.
+  const isGoogleSSOEnabled = IS_GOOGLE_SSO_ENABLED;
+  const isOIDCSSOEnabled = IS_OIDC_SSO_ENABLED;
+  const oidcProviderLabel = OIDC_PROVIDER_LABEL;
+
+  return {
+    isGoogleSSOEnabled,
+    isOIDCSSOEnabled,
+    oidcProviderLabel,
+  };
+}
+
 export default function Layout() {
   return <Outlet />;
 }
 
-export function ErrorBoundary() {
+export function ErrorBoundary({ loaderData }: Route.ErrorBoundaryProps) {
+  const { isGoogleSSOEnabled, isOIDCSSOEnabled, oidcProviderLabel } = loaderData || {};
+
   const error = useRouteError();
 
   if (isRouteErrorResponse(error)) {
     if (error.status === 401 && error.data.type === 'embed-authentication-required') {
       return (
-        <EmbedAuthenticationRequired email={error.data.email} returnTo={error.data.returnTo} />
+        <EmbedAuthenticationRequired
+          isGoogleSSOEnabled={isGoogleSSOEnabled}
+          isOIDCSSOEnabled={isOIDCSSOEnabled}
+          oidcProviderLabel={oidcProviderLabel}
+          email={error.data.email}
+          returnTo={error.data.returnTo}
+        />
       );
     }
 

@@ -2,7 +2,7 @@ import { DocumentStatus, RecipientRole } from '@prisma/client';
 import { data } from 'react-router';
 import { match } from 'ts-pattern';
 
-import { getSession } from '@documenso/auth/server/lib/utils/get-session';
+import { getOptionalSession } from '@documenso/auth/server/lib/utils/get-session';
 import { isUserEnterprise } from '@documenso/ee/server-only/util/is-document-enterprise';
 import { isDocumentPlatform } from '@documenso/ee/server-only/util/is-document-platform';
 import { IS_BILLING_ENABLED } from '@documenso/lib/constants/app';
@@ -29,7 +29,7 @@ export async function loader({ params, request }: Route.LoaderArgs) {
 
   const token = params.url;
 
-  const { user } = await getSession(request);
+  const { user } = await getOptionalSession(request);
 
   const [document, fields, recipient] = await Promise.all([
     getDocumentAndSenderByToken({

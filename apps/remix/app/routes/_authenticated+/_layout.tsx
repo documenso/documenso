@@ -26,7 +26,7 @@ export const loader = async ({ request }: Route.LoaderArgs) => {
   const session = await getOptionalSession(request);
 
   if (!session.isAuthenticated) {
-    return redirect('/signin');
+    throw redirect('/signin');
   }
 
   const [limits, banner] = await Promise.all([
