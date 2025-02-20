@@ -42,9 +42,14 @@ type TRejectDocumentFormSchema = z.infer<typeof ZRejectDocumentFormSchema>;
 export interface DocumentSigningRejectDialogProps {
   document: Pick<Document, 'id'>;
   token: string;
+  onRejected?: (reason: string) => void | Promise<void>;
 }
 
-export function DocumentSigningRejectDialog({ document, token }: DocumentSigningRejectDialogProps) {
+export function DocumentSigningRejectDialog({
+  document,
+  token,
+  onRejected,
+}: DocumentSigningRejectDialogProps) {
   const { toast } = useToast();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
@@ -75,9 +80,13 @@ export function DocumentSigningRejectDialog({ document, token }: DocumentSigning
         duration: 5000,
       });
 
-      await navigate(`/sign/${token}/rejected`);
-
       setIsOpen(false);
+
+      if (onRejected) {
+        await onRejected(reason);
+      } else {
+        await navigate(`/sign/${token}/rejected`);
+      }
     } catch (err) {
       toast({
         title: 'Error',
