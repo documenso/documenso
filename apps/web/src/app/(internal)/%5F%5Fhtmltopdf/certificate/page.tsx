@@ -1,5 +1,3 @@
-import React from 'react';
-
 import { redirect } from 'next/navigation';
 
 import { msg } from '@lingui/macro';
@@ -7,8 +5,10 @@ import { useLingui } from '@lingui/react';
 import { DateTime } from 'luxon';
 import { match } from 'ts-pattern';
 import { UAParser } from 'ua-parser-js';
+import { renderSVG } from 'uqr';
 
 import { setupI18nSSR } from '@documenso/lib/client-only/providers/i18n.server';
+import { WEBAPP_BASE_URL } from '@documenso/lib/constants/app';
 import { APP_I18N_OPTIONS, ZSupportedLanguageCodeSchema } from '@documenso/lib/constants/i18n';
 import {
   RECIPIENT_ROLES_DESCRIPTION,
@@ -72,6 +72,8 @@ export default async function SigningCertificate({ searchParams }: SigningCertif
   const document = await getEntireDocument({
     id: documentId,
   }).catch(() => null);
+
+  const documentAccessToken = document?.documentAccessToken?.token;
 
   if (!document) {
     return redirect('/');
@@ -305,17 +307,27 @@ export default async function SigningCertificate({ searchParams }: SigningCertif
             </TableBody>
           </Table>
         </CardContent>
-      </Card>
+        <div className="my-8 flex flex-row-reverse items-end justify-between px-8">
+          <div className="flex items-end justify-end gap-x-4">
+            <div
+              className="flex h-24 w-24 justify-center"
+              dangerouslySetInnerHTML={{
+                __html: renderSVG(`${WEBAPP_BASE_URL}/q/${documentAccessToken}`, {
+                  ecc: 'Q',
+                }),
+              }}
+            />
+          </div>
 
-      <div className="my-8 flex-row-reverse">
-        <div className="flex items-end justify-end gap-x-4">
-          <p className="flex-shrink-0 text-sm font-medium print:text-xs">
-            {_(msg`Signing certificate provided by`)}:
-          </p>
+          <div>
+            <p className="flex-shrink-0 text-sm print:text-xs">
+              {_(msg`Signing certificate provided by`)}:
+            </p>
 
-          <Logo className="max-h-6 print:max-h-4" />
+            <Logo className="mt-2 max-h-6 print:max-h-4" />
+          </div>
         </div>
-      </div>
+      </Card>
     </div>
   );
 }
