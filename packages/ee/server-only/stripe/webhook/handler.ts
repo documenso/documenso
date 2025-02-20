@@ -16,7 +16,7 @@ type StripeWebhookResponse = {
   message: string;
 };
 
-export const stripeWebhookHandler = async (req: Request) => {
+export const stripeWebhookHandler = async (req: Request): Promise<Response> => {
   try {
     const isBillingEnabled = IS_BILLING_ENABLED();
 
@@ -51,17 +51,21 @@ export const stripeWebhookHandler = async (req: Request) => {
       );
     }
 
-    // Todo: (RR7) I'm not sure about this.
-    const clonedReq = req.clone();
-    const rawBody = await clonedReq.arrayBuffer();
-    const body = Buffer.from(rawBody);
+    const payload = await req.text();
 
-    // It was this:
-    // const body = await buffer(req);
+    if (!payload) {
+      return Response.json(
+        {
+          success: false,
+          message: 'No payload found in request',
+        } satisfies StripeWebhookResponse,
+        { status: 400 },
+      );
+    }
 
-    const event = stripe.webhooks.constructEvent(body, signature, webhookSecret);
+    const event = stripe.webhooks.constructEvent(payload, signature, webhookSecret);
 
-    await match(event.type)
+    return await match(event.type)
       .with('checkout.session.completed', async () => {
         // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
         const session = event.data.object as Stripe.Checkout.Session;

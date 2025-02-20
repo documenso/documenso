@@ -1,7 +1,5 @@
 import { Hono } from 'hono';
-import { bodyLimit } from 'hono/body-limit';
 import { contextStorage } from 'hono/context-storage';
-import { timeout } from 'hono/timeout';
 
 import { tsRestHonoApp } from '@documenso/api/hono';
 import { auth } from '@documenso/auth/server';
@@ -21,12 +19,6 @@ export interface HonoEnv {
 }
 
 const app = new Hono<HonoEnv>();
-
-/**
- * Global middleware limits.
- */
-app.use(timeout(120000)); // Two minute timeout.
-app.use(bodyLimit({ maxSize: 50 * 1024 * 1024 })); // 50mb size limit.
 
 /**
  * Attach session and context to requests.
