@@ -54,3 +54,7 @@ export const loader = ({ request }: Route.LoaderArgs) => {
   // Is hardcoded because this whole meta is hardcoded anyway for Documenso.
   throw redirect('https://documenso.com');
 };
+
+export default function SharePage() {
+  return <div></div>;
+}
