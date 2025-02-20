@@ -92,6 +92,7 @@ export const AddTemplatePlaceholderRecipientsFormPartial = ({
           actionAuth: undefined,
           ...generateRecipientPlaceholder(1),
           signingOrder: 1,
+          signerIndex: 0,
         },
       ];
     }
@@ -104,6 +105,7 @@ export const AddTemplatePlaceholderRecipientsFormPartial = ({
       role: recipient.role,
       actionAuth: ZRecipientAuthOptionsSchema.parse(recipient.authOptions)?.actionAuth ?? undefined,
       signingOrder: recipient.signingOrder ?? index + 1,
+      signerIndex: index,
     }));
 
     if (signingOrder === DocumentSigningOrder.SEQUENTIAL) {
@@ -174,21 +176,35 @@ export const AddTemplatePlaceholderRecipientsFormPartial = ({
   });
 
   const onAddPlaceholderSelfRecipient = () => {
+    const currentSigners = form.getValues('signers');
+    const nextSignerIndex = currentSigners.length;
+
     appendSigner({
       formId: nanoid(12),
       name: user?.name ?? '',
       email: user?.email ?? '',
       role: RecipientRole.SIGNER,
-      signingOrder: signers.length > 0 ? (signers[signers.length - 1]?.signingOrder ?? 0) + 1 : 1,
+      signingOrder:
+        currentSigners.length > 0
+          ? (currentSigners[currentSigners.length - 1]?.signingOrder ?? 0) + 1
+          : 1,
+      signerIndex: nextSignerIndex,
     });
   };
 
   const onAddPlaceholderRecipient = () => {
+    const currentSigners = form.getValues('signers');
+    const nextSignerIndex = currentSigners.length;
+
     appendSigner({
       formId: nanoid(12),
       role: RecipientRole.SIGNER,
       ...generateRecipientPlaceholder(placeholderRecipientCount),
-      signingOrder: signers.length > 0 ? (signers[signers.length - 1]?.signingOrder ?? 0) + 1 : 1,
+      signingOrder:
+        currentSigners.length > 0
+          ? (currentSigners[currentSigners.length - 1]?.signingOrder ?? 0) + 1
+          : 1,
+      signerIndex: nextSignerIndex,
     });
 
     setPlaceholderRecipientCount((count) => count + 1);

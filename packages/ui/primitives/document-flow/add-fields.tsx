@@ -92,6 +92,7 @@ export type FieldFormType = {
   pageY: number;
   pageWidth: number;
   pageHeight: number;
+  recipientId: number;
   signerEmail: string;
   fieldMeta?: FieldMeta;
 };
@@ -143,6 +144,7 @@ export const AddFieldsFormPartial = ({
         pageY: Number(field.positionY),
         pageWidth: Number(field.width),
         pageHeight: Number(field.height),
+        recipientId: field.recipientId,
         signerEmail:
           recipients.find((recipient) => recipient.id === field.recipientId)?.email ?? '',
         fieldMeta: field.fieldMeta ? ZFieldMetaSchema.parse(field.fieldMeta) : undefined,
@@ -348,6 +350,7 @@ export const AddFieldsFormPartial = ({
         pageY,
         pageWidth: fieldPageWidth,
         pageHeight: fieldPageHeight,
+        recipientId: selectedSigner.id,
         signerEmail: selectedSigner.email,
         fieldMeta: undefined,
       };
@@ -441,6 +444,7 @@ export const AddFieldsFormPartial = ({
         const newField: TAddFieldsFormSchema['fields'][0] = {
           ...structuredClone(lastActiveField),
           formId: nanoid(12),
+          recipientId: selectedSigner?.id ?? lastActiveField.recipientId,
           signerEmail: selectedSigner?.email ?? lastActiveField.signerEmail,
           pageX: lastActiveField.pageX + 3,
           pageY: lastActiveField.pageY + 3,
@@ -449,7 +453,7 @@ export const AddFieldsFormPartial = ({
         append(newField);
       }
     },
-    [append, lastActiveField, selectedSigner?.email, toast],
+    [append, lastActiveField, selectedSigner?.id, selectedSigner?.email, toast],
   );
 
   const onFieldPaste = useCallback(
@@ -462,13 +466,15 @@ export const AddFieldsFormPartial = ({
         append({
           ...copiedField,
           formId: nanoid(12),
+          recipientId: selectedSigner?.id ?? copiedField.recipientId,
           signerEmail: selectedSigner?.email ?? copiedField.signerEmail,
+
           pageX: copiedField.pageX + 3,
           pageY: copiedField.pageY + 3,
         });
       }
     },
-    [append, fieldClipboard, selectedSigner?.email],
+    [append, fieldClipboard, selectedSigner?.id, selectedSigner?.email],
   );
 
   useEffect(() => {
@@ -567,7 +573,7 @@ export const AddFieldsFormPartial = ({
       localFields.some(
         (field) =>
           (field.type === FieldType.SIGNATURE || field.type === FieldType.FREE_SIGNATURE) &&
-          field.signerEmail === signer.email,
+          field.recipientId === signer.id,
       ),
     );
 
@@ -637,7 +643,7 @@ export const AddFieldsFormPartial = ({
 
               {isDocumentPdfLoaded &&
                 localFields.map((field, index) => {
-                  const recipientIndex = recipients.findIndex((r) => r.email === field.signerEmail);
+                  const recipientIndex = recipients.findIndex((r) => r.id === field.recipientId);
                   const hasFieldError =
                     emptyCheckboxFields.find((f) => f.formId === field.formId) ||
                     emptyRadioFields.find((f) => f.formId === field.formId) ||
@@ -649,7 +655,7 @@ export const AddFieldsFormPartial = ({
                       recipientIndex={recipientIndex === -1 ? 0 : recipientIndex}
                       field={field}
                       disabled={
-                        selectedSigner?.email !== field.signerEmail ||
+                        selectedSigner?.id !== field.recipientId ||
                         !canRecipientBeModified(selectedSigner, fields)
                       }
                       minHeight={MIN_HEIGHT_PX}
