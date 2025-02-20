@@ -266,15 +266,14 @@ export const documentRouter = router({
 
   /**
    * @public
-   *
-   * Todo: Refactor to updateDocument.
    */
-  setSettingsForDocument: authenticatedProcedure
+  updateDocument: authenticatedProcedure
     .meta({
       openapi: {
         method: 'POST',
         path: '/document/update',
         summary: 'Update document',
+        description: 'Update an existing document',
         tags: ['Document'],
       },
     })
@@ -286,9 +285,9 @@ export const documentRouter = router({
 
       const userId = ctx.user.id;
 
-      if (Object.values(meta).length > 0) {
+      if (Object.keys(meta).length > 0) {
         await upsertDocumentMeta({
-          userId: ctx.user.id,
+          userId,
           teamId,
           documentId,
           subject: meta.subject,
@@ -301,6 +300,7 @@ export const documentRouter = router({
           distributionMethod: meta.distributionMethod,
           signingOrder: meta.signingOrder,
           emailSettings: meta.emailSettings,
+          modifyNextSigner: meta.modifyNextSigner,
           requestMetadata: ctx.metadata,
         });
       }

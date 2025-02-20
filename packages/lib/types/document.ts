@@ -55,6 +55,7 @@ export const ZDocumentSchema = DocumentSchema.pick({
     typedSignatureEnabled: true,
     language: true,
     emailSettings: true,
+    modifyNextSigner: true,
   }).nullable(),
   recipients: ZRecipientLiteSchema.array(),
   fields: ZFieldSchema.array(),
