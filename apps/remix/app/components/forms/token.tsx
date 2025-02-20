@@ -1,4 +1,4 @@
-import { useState, useTransition } from 'react';
+import { useState } from 'react';
 
 import { zodResolver } from '@hookform/resolvers/zod';
 import { msg } from '@lingui/core/macro';
@@ -38,6 +38,8 @@ import {
 import { Switch } from '@documenso/ui/primitives/switch';
 import { useToast } from '@documenso/ui/primitives/use-toast';
 
+import { useOptionalCurrentTeam } from '~/providers/team';
+
 export const EXPIRATION_DATES = {
   ONE_WEEK: msg`7 days`,
   ONE_MONTH: msg`1 month`,
@@ -59,14 +61,13 @@ type NewlyCreatedToken = {
 
 export type ApiTokenFormProps = {
   className?: string;
-  teamId?: number;
   tokens?: Pick<ApiToken, 'id'>[];
 };
 
-export const ApiTokenForm = ({ className, teamId, tokens }: ApiTokenFormProps) => {
-  const [isTransitionPending, startTransition] = useTransition();
-
+export const ApiTokenForm = ({ className, tokens }: ApiTokenFormProps) => {
   const [, copy] = useCopyToClipboard();
+
+  const team = useOptionalCurrentTeam();
 
   const { _ } = useLingui();
   const { toast } = useToast();
@@ -113,7 +114,7 @@ export const ApiTokenForm = ({ className, teamId, tokens }: ApiTokenFormProps) =
   const onSubmit = async ({ tokenName, expirationDate }: TCreateTokenMutationSchema) => {
     try {
       await createTokenMutation({
-        teamId,
+        teamId: team?.id,
         tokenName,
         expirationDate: noExpirationDate ? null : expirationDate,
       });
@@ -238,7 +239,7 @@ export const ApiTokenForm = ({ className, teamId, tokens }: ApiTokenFormProps) =
               type="submit"
               className="hidden md:inline-flex"
               disabled={!form.formState.isDirty}
-              loading={form.formState.isSubmitting || isTransitionPending}
+              loading={form.formState.isSubmitting}
             >
               <Trans>Create token</Trans>
             </Button>
@@ -247,7 +248,7 @@ export const ApiTokenForm = ({ className, teamId, tokens }: ApiTokenFormProps) =
               <Button
                 type="submit"
                 disabled={!form.formState.isDirty}
-                loading={form.formState.isSubmitting || isTransitionPending}
+                loading={form.formState.isSubmitting}
               >
                 <Trans>Create token</Trans>
               </Button>

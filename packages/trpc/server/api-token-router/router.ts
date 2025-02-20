@@ -1,7 +1,7 @@
 import { createApiToken } from '@documenso/lib/server-only/public-api/create-api-token';
 import { deleteTokenById } from '@documenso/lib/server-only/public-api/delete-api-token-by-id';
-import { getUserTokens } from '@documenso/lib/server-only/public-api/get-all-user-tokens';
 import { getApiTokenById } from '@documenso/lib/server-only/public-api/get-api-token-by-id';
+import { getApiTokens } from '@documenso/lib/server-only/public-api/get-api-tokens';
 
 import { authenticatedProcedure, router } from '../trpc';
 import {
@@ -12,7 +12,7 @@ import {
 
 export const apiTokenRouter = router({
   getTokens: authenticatedProcedure.query(async ({ ctx }) => {
-    return await getUserTokens({ userId: ctx.user.id });
+    return await getApiTokens({ userId: ctx.user.id, teamId: ctx.teamId });
   }),
 
   getTokenById: authenticatedProcedure
