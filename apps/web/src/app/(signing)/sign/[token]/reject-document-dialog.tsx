@@ -43,9 +43,10 @@ type TRejectDocumentFormSchema = z.infer<typeof ZRejectDocumentFormSchema>;
 export interface RejectDocumentDialogProps {
   document: Pick<Document, 'id'>;
   token: string;
+  onRejected?: (reason: string) => void | Promise<void>;
 }
 
-export function RejectDocumentDialog({ document, token }: RejectDocumentDialogProps) {
+export function RejectDocumentDialog({ document, token, onRejected }: RejectDocumentDialogProps) {
   const { toast } = useToast();
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -79,7 +80,11 @@ export function RejectDocumentDialog({ document, token }: RejectDocumentDialogPr
 
       setIsOpen(false);
 
-      router.push(`/sign/${token}/rejected`);
+      if (onRejected) {
+        await onRejected(reason);
+      } else {
+        router.push(`/sign/${token}/rejected`);
+      }
     } catch (err) {
       toast({
         title: 'Error',
