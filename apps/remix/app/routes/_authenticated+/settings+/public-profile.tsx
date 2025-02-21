@@ -21,10 +21,10 @@ import { ManagePublicTemplateDialog } from '~/components/dialogs/public-profile-
 import type { TPublicProfileFormSchema } from '~/components/forms/public-profile-form';
 import { PublicProfileForm } from '~/components/forms/public-profile-form';
 import { SettingsHeader } from '~/components/general/settings-header';
+import { SettingsPublicProfileTemplatesTable } from '~/components/tables/settings-public-profile-templates-table';
 import { useOptionalCurrentTeam } from '~/providers/team';
 
-import { SettingsPublicProfileTemplatesTable } from '../../../../components/tables/settings-public-profile-templates-table';
-import type { Route } from './+types/index';
+import type { Route } from './+types/public-profile';
 
 type DirectTemplate = FindTemplateRow & {
   directLink: Pick<TemplateDirectLink, 'token' | 'enabled'>;

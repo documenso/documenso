@@ -9,7 +9,7 @@ import { TeamSettingsNavDesktop } from '~/components/general/teams/team-settings
 import { TeamSettingsNavMobile } from '~/components/general/teams/team-settings-nav-mobile';
 import { appMetaTags } from '~/utils/meta';
 
-import type { Route } from './+types/_layout';
+import type { Route } from './+types/settings._layout';
 
 export function meta() {
   return appMetaTags('Team Settings');

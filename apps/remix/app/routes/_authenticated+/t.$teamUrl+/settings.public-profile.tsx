@@ -2,9 +2,9 @@ import { getSession } from '@documenso/auth/server/lib/utils/get-session';
 import { getTeamByUrl } from '@documenso/lib/server-only/team/get-team';
 import { getTeamPublicProfile } from '@documenso/lib/server-only/team/get-team-public-profile';
 
-import PublicProfilePage from '~/routes/_authenticated+/settings+/public-profile+/index';
+import PublicProfilePage from '~/routes/_authenticated+/settings+/public-profile';
 
-import type { Route } from './+types/public-profile';
+import type { Route } from './+types/settings.public-profile';
 
 // Todo: This can be optimized.
 export async function loader({ request, params }: Route.LoaderArgs) {

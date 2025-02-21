@@ -13,8 +13,8 @@ import { TemplateEditForm } from '~/components/general/template/template-edit-fo
 import { TemplateType } from '~/components/general/template/template-type';
 import { superLoaderJson, useSuperLoaderData } from '~/utils/super-json-loader';
 
-import { TemplateDirectLinkDialogWrapper } from '../../../components/dialogs/template-direct-link-dialog-wrapper';
-import type { Route } from './+types/$id.edit';
+import { TemplateDirectLinkDialogWrapper } from '../../components/dialogs/template-direct-link-dialog-wrapper';
+import type { Route } from './+types/templates.$id.edit';
 
 export async function loader({ params, request }: Route.LoaderArgs) {
   const { user } = await getSession(request);

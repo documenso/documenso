@@ -15,7 +15,7 @@ import { SettingsHeader } from '~/components/general/settings-header';
 import { TeamBillingPortalButton } from '~/components/general/teams/team-billing-portal-button';
 import { TeamSettingsBillingInvoicesTable } from '~/components/tables/team-settings-billing-invoices-table';
 
-import type { Route } from './+types/billing';
+import type { Route } from './+types/settings.billing';
 
 export async function loader({ request, params }: Route.LoaderArgs) {
   const session = await getSession(request);

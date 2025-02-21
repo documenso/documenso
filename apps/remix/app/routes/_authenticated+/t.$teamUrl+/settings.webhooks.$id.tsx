@@ -28,7 +28,7 @@ import { SettingsHeader } from '~/components/general/settings-header';
 import { WebhookMultiSelectCombobox } from '~/components/general/webhook-multiselect-combobox';
 import { useCurrentTeam } from '~/providers/team';
 
-import type { Route } from './+types/webhooks.$id';
+import type { Route } from './+types/settings.webhooks.$id';
 
 const ZEditWebhookFormSchema = ZEditWebhookMutationSchema.omit({ id: true });
 

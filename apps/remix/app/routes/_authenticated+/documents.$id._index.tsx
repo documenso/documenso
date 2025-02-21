@@ -33,7 +33,7 @@ import {
 import { StackAvatarsWithTooltip } from '~/components/general/stack-avatars-with-tooltip';
 import { superLoaderJson, useSuperLoaderData } from '~/utils/super-json-loader';
 
-import type { Route } from './+types/$id._index';
+import type { Route } from './+types/documents.$id._index';
 
 export async function loader({ params, request }: Route.LoaderArgs) {
   const { user } = await getSession(request);

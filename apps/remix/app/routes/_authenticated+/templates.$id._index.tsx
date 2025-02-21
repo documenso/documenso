@@ -24,7 +24,7 @@ import { TemplateType } from '~/components/general/template/template-type';
 import { TemplatesTableActionDropdown } from '~/components/tables/templates-table-action-dropdown';
 import { superLoaderJson, useSuperLoaderData } from '~/utils/super-json-loader';
 
-import type { Route } from './+types/$id._index';
+import type { Route } from './+types/templates.$id._index';
 
 export async function loader({ params, request }: Route.LoaderArgs) {
   const { user } = await getSession(request);

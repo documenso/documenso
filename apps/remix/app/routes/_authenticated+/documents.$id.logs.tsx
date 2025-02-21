@@ -22,7 +22,7 @@ import {
 } from '~/components/general/document/document-status';
 import { DocumentLogsTable } from '~/components/tables/document-logs-table';
 
-import type { Route } from './+types/$id.logs';
+import type { Route } from './+types/documents.$id.logs';
 
 export async function loader({ params, request }: Route.LoaderArgs) {
   const { user } = await getSession(request);

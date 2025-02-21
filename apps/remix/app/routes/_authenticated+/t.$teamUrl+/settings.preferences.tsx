@@ -8,7 +8,7 @@ import { TeamBrandingPreferencesForm } from '~/components/forms/team-branding-pr
 import { TeamDocumentPreferencesForm } from '~/components/forms/team-document-preferences-form';
 import { SettingsHeader } from '~/components/general/settings-header';
 
-import type { Route } from './+types/preferences';
+import type { Route } from './+types/settings.preferences';
 
 export async function loader({ request, params }: Route.LoaderArgs) {
   const { user } = await getSession(request);

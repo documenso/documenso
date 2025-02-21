@@ -20,7 +20,7 @@ import { SettingsHeader } from '~/components/general/settings-header';
 import { TeamEmailDropdown } from '~/components/general/teams/team-email-dropdown';
 import { TeamTransferStatus } from '~/components/general/teams/team-transfer-status';
 
-import type { Route } from './+types/_index';
+import type { Route } from './+types/settings._index';
 
 export async function loader({ request, params }: Route.LoaderArgs) {
   const { user } = await getSession(request);

@@ -16,7 +16,7 @@ import { DocumentStatus } from '~/components/general/document/document-status';
 import { StackAvatarsWithTooltip } from '~/components/general/stack-avatars-with-tooltip';
 import { superLoaderJson, useSuperLoaderData } from '~/utils/super-json-loader';
 
-import type { Route } from './+types/$id.edit';
+import type { Route } from './+types/documents.$id.edit';
 
 export async function loader({ params, request }: Route.LoaderArgs) {
   const { user } = await getSession(request);

@@ -7,10 +7,9 @@ import { AnimateGenericFadeInOut } from '@documenso/ui/components/animate/animat
 
 import { TeamCreateDialog } from '~/components/dialogs/team-create-dialog';
 import { SettingsHeader } from '~/components/general/settings-header';
+import { TeamEmailUsage } from '~/components/general/teams/team-email-usage';
+import { TeamInvitations } from '~/components/general/teams/team-invitations';
 import { UserSettingsTeamsPageDataTable } from '~/components/tables/user-settings-teams-page-table';
-
-import { TeamEmailUsage } from './team-email-usage';
-import { TeamInvitations } from './team-invitations';
 
 export default function TeamsSettingsPage() {
   const { _ } = useLingui();
