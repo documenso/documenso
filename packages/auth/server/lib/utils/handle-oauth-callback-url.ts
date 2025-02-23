@@ -1,6 +1,7 @@
 import { OAuth2Client, decodeIdToken } from 'arctic';
 import type { Context } from 'hono';
 import { deleteCookie } from 'hono/cookie';
+import { nanoid } from 'nanoid';
 
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import { onCreateUserHook } from '@documenso/lib/server-only/user/create-user';
@@ -144,7 +145,9 @@ export const handleOAuthCallbackUrl = async (options: HandleOAuthCallbackUrlOpti
           },
           data: {
             emailVerified: new Date(),
-            password: null, // Todo: (RR7) Check this
+            password: null,
+            // Todo: (RR7) Check this
+            // Todo: (RR7) Not required after we setup password specific accounts.
           },
         });
       }
@@ -162,6 +165,7 @@ export const handleOAuthCallbackUrl = async (options: HandleOAuthCallbackUrlOpti
         email: email,
         name: name,
         emailVerified: new Date(),
+        url: nanoid(17),
       },
     });
 

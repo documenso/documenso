@@ -16,7 +16,7 @@ import { PasswordForm } from '~/components/forms/password';
 import { SettingsHeader } from '~/components/general/settings-header';
 import { appMetaTags } from '~/utils/meta';
 
-import type { Route } from './+types/security';
+import type { Route } from './+types/security._index';
 
 export function meta() {
   return appMetaTags('Security');

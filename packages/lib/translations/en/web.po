@@ -723,11 +723,11 @@ msgstr "Add all relevant fields for each recipient."
 msgid "Add all relevant placeholders for each recipient."
 msgstr "Add all relevant placeholders for each recipient."
 
-#: apps/remix/app/routes/_authenticated+/settings+/security.tsx:94
+#: apps/remix/app/routes/_authenticated+/settings+/security._index.tsx:94
 msgid "Add an authenticator to serve as a secondary authentication method for signing documents."
 msgstr "Add an authenticator to serve as a secondary authentication method for signing documents."
 
-#: apps/remix/app/routes/_authenticated+/settings+/security.tsx:89
+#: apps/remix/app/routes/_authenticated+/settings+/security._index.tsx:89
 msgid "Add an authenticator to serve as a secondary authentication method when signing in, or when signing documents."
 msgstr "Add an authenticator to serve as a secondary authentication method when signing in, or when signing documents."
 
@@ -892,7 +892,7 @@ msgstr "All Time"
 msgid "Allow document recipients to reply directly to this email address"
 msgstr "Allow document recipients to reply directly to this email address"
 
-#: apps/remix/app/routes/_authenticated+/settings+/security.tsx:141
+#: apps/remix/app/routes/_authenticated+/settings+/security._index.tsx:141
 msgid "Allows authenticating using biometrics, password managers, hardware keys, etc."
 msgstr "Allows authenticating using biometrics, password managers, hardware keys, etc."
 
@@ -2955,7 +2955,7 @@ msgstr "Help complete the document for other signers."
 msgid "Here you can edit your personal details."
 msgstr "Here you can edit your personal details."
 
-#: apps/remix/app/routes/_authenticated+/settings+/security.tsx:68
+#: apps/remix/app/routes/_authenticated+/settings+/security._index.tsx:68
 msgid "Here you can manage your password and security settings."
 msgstr "Here you can manage your password and security settings."
 
@@ -3321,7 +3321,7 @@ msgstr "Manage Direct Link"
 msgid "Manage documents"
 msgstr "Manage documents"
 
-#: apps/remix/app/routes/_authenticated+/settings+/security.tsx:149
+#: apps/remix/app/routes/_authenticated+/settings+/security._index.tsx:149
 msgid "Manage passkeys"
 msgstr "Manage passkeys"
 
@@ -3771,8 +3771,8 @@ msgstr "Passkey name"
 msgid "Passkey Re-Authentication"
 msgstr "Passkey Re-Authentication"
 
-#: apps/remix/app/routes/_authenticated+/settings+/security.tsx:137
 #: apps/remix/app/routes/_authenticated+/settings+/security.passkeys.tsx:19
+#: apps/remix/app/routes/_authenticated+/settings+/security._index.tsx:137
 msgid "Passkeys"
 msgstr "Passkeys"
 
@@ -4143,7 +4143,7 @@ msgstr "Reauthentication is required to sign this field"
 msgid "Receives copy"
 msgstr "Receives copy"
 
-#: apps/remix/app/routes/_authenticated+/settings+/security.tsx:160
+#: apps/remix/app/routes/_authenticated+/settings+/security._index.tsx:160
 #: apps/remix/app/components/general/document/document-page-view-recent-activity.tsx:54
 msgid "Recent activity"
 msgstr "Recent activity"
@@ -4201,7 +4201,7 @@ msgstr "Recipients will still retain their copy of the document"
 msgid "Recovery code copied"
 msgstr "Recovery code copied"
 
-#: apps/remix/app/routes/_authenticated+/settings+/security.tsx:116
+#: apps/remix/app/routes/_authenticated+/settings+/security._index.tsx:116
 msgid "Recovery codes"
 msgstr "Recovery codes"
 
@@ -4452,7 +4452,7 @@ msgstr "Search languages..."
 msgid "Secret"
 msgstr "Secret"
 
-#: apps/remix/app/routes/_authenticated+/settings+/security.tsx:67
+#: apps/remix/app/routes/_authenticated+/settings+/security._index.tsx:67
 #: apps/remix/app/components/general/settings-nav-mobile.tsx:71
 #: apps/remix/app/components/general/settings-nav-desktop.tsx:69
 msgid "Security"
@@ -5864,11 +5864,11 @@ msgstr "Transfer the ownership of the team to another team member."
 msgid "Triggers"
 msgstr "Triggers"
 
-#: apps/remix/app/routes/_authenticated+/settings+/security.tsx:84
+#: apps/remix/app/routes/_authenticated+/settings+/security._index.tsx:84
 msgid "Two factor authentication"
 msgstr "Two factor authentication"
 
-#: apps/remix/app/routes/_authenticated+/settings+/security.tsx:120
+#: apps/remix/app/routes/_authenticated+/settings+/security._index.tsx:120
 msgid "Two factor authentication recovery codes are used to access your account in the event that you lose access to your authenticator app."
 msgstr "Two factor authentication recovery codes are used to access your account in the event that you lose access to your authenticator app."
 
@@ -6249,7 +6249,7 @@ msgstr "Version History"
 msgid "View"
 msgstr "View"
 
-#: apps/remix/app/routes/_authenticated+/settings+/security.tsx:170
+#: apps/remix/app/routes/_authenticated+/settings+/security._index.tsx:170
 msgid "View activity"
 msgstr "View activity"
 
@@ -6261,7 +6261,7 @@ msgstr "View all documents sent to and from this email address"
 msgid "View all documents sent to your account"
 msgstr "View all documents sent to your account"
 
-#: apps/remix/app/routes/_authenticated+/settings+/security.tsx:164
+#: apps/remix/app/routes/_authenticated+/settings+/security._index.tsx:164
 msgid "View all recent security activity related to your account."
 msgstr "View all recent security activity related to your account."
 
