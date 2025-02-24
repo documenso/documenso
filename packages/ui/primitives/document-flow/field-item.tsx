@@ -260,7 +260,7 @@ export const FieldItem = ({
             className={cn(
               'absolute -top-16 left-0 right-0 rounded-md p-2 text-center text-xs text-gray-700',
               {
-                'bg-foreground/5 border-border border': !fieldHasCheckedValues,
+                'bg-foreground/5 border-primary border': !fieldHasCheckedValues,
                 'bg-documenso-200 border-primary border': fieldHasCheckedValues,
               },
             )}
