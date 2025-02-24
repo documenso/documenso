@@ -2,6 +2,7 @@ import { notFound } from 'next/navigation';
 
 import { match } from 'ts-pattern';
 
+import { isCommunityPlan as isUserCommunityPlan } from '@documenso/ee/server-only/util/is-community-plan';
 import { isUserEnterprise } from '@documenso/ee/server-only/util/is-document-enterprise';
 import { isDocumentPlatform } from '@documenso/ee/server-only/util/is-document-platform';
 import { IS_BILLING_ENABLED } from '@documenso/lib/constants/app';
@@ -62,9 +63,13 @@ export default async function EmbedSignDocumentPage({ params }: EmbedSignDocumen
     return <EmbedPaywall />;
   }
 
-  const [isPlatformDocument, isEnterpriseDocument] = await Promise.all([
+  const [isPlatformDocument, isEnterpriseDocument, isCommunityPlan] = await Promise.all([
     isDocumentPlatform(document),
     isUserEnterprise({
+      userId: document.userId,
+      teamId: document.teamId ?? undefined,
+    }),
+    isUserCommunityPlan({
       userId: document.userId,
       teamId: document.teamId ?? undefined,
     }),
@@ -127,7 +132,7 @@ export default async function EmbedSignDocumentPage({ params }: EmbedSignDocumen
           metadata={document.documentMeta}
           isCompleted={document.status === DocumentStatus.COMPLETED}
           hidePoweredBy={isPlatformDocument || isEnterpriseDocument || hidePoweredBy}
-          isPlatformOrEnterprise={isPlatformDocument || isEnterpriseDocument}
+          allowWhitelabelling={isCommunityPlan || isPlatformDocument || isEnterpriseDocument}
           allRecipients={allRecipients}
         />
       </DocumentAuthProvider>
