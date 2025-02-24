@@ -47,7 +47,7 @@ export type EmbedDirectTemplateClientPageProps = {
   fields: Field[];
   metadata?: DocumentMeta | TemplateMeta | null;
   hidePoweredBy?: boolean;
-  isPlatformOrEnterprise?: boolean;
+  allowWhiteLabelling?: boolean;
 };
 
 export const EmbedDirectTemplateClientPage = ({
@@ -58,7 +58,7 @@ export const EmbedDirectTemplateClientPage = ({
   fields,
   metadata,
   hidePoweredBy = false,
-  isPlatformOrEnterprise = false,
+  allowWhiteLabelling = false,
 }: EmbedDirectTemplateClientPageProps) => {
   const { _ } = useLingui();
   const { toast } = useToast();
@@ -286,7 +286,7 @@ export const EmbedDirectTemplateClientPage = ({
         document.documentElement.classList.add('dark-mode-disabled');
       }
 
-      if (isPlatformOrEnterprise) {
+      if (allowWhiteLabelling) {
         injectCss({
           css: data.css,
           cssVars: data.cssVars,

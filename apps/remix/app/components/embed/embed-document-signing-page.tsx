@@ -50,7 +50,7 @@ export type EmbedSignDocumentClientPageProps = {
   metadata?: DocumentMeta | TemplateMeta | null;
   isCompleted?: boolean;
   hidePoweredBy?: boolean;
-  isPlatformOrEnterprise?: boolean;
+  allowWhitelabelling?: boolean;
   allRecipients?: RecipientWithFields[];
 };
 
@@ -63,7 +63,7 @@ export const EmbedSignDocumentClientPage = ({
   metadata,
   isCompleted,
   hidePoweredBy = false,
-  isPlatformOrEnterprise = false,
+  allowWhitelabelling = false,
   allRecipients = [],
 }: EmbedSignDocumentClientPageProps) => {
   const { _ } = useLingui();
@@ -211,7 +211,7 @@ export const EmbedSignDocumentClientPage = ({
         document.documentElement.classList.add('dark-mode-disabled');
       }
 
-      if (isPlatformOrEnterprise) {
+      if (allowWhitelabelling) {
         injectCss({
           css: data.css,
           cssVars: data.cssVars,

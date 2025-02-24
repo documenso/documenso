@@ -2,6 +2,7 @@ import { data } from 'react-router';
 import { match } from 'ts-pattern';
 
 import { getOptionalSession } from '@documenso/auth/server/lib/utils/get-session';
+import { isCommunityPlan as isUserCommunityPlan } from '@documenso/ee/server-only/util/is-community-plan';
 import { isUserEnterprise } from '@documenso/ee/server-only/util/is-document-enterprise';
 import { isDocumentPlatform } from '@documenso/ee/server-only/util/is-document-platform';
 import { IS_BILLING_ENABLED } from '@documenso/lib/constants/app';
@@ -55,9 +56,13 @@ export async function loader({ params, request }: Route.LoaderArgs) {
     documentAuth: template.authOptions,
   });
 
-  const [isPlatformDocument, isEnterpriseDocument] = await Promise.all([
+  const [isPlatformDocument, isEnterpriseDocument, isCommunityPlan] = await Promise.all([
     isDocumentPlatform(template),
     isUserEnterprise({
+      userId: template.userId,
+      teamId: template.teamId ?? undefined,
+    }),
+    isUserCommunityPlan({
       userId: template.userId,
       teamId: template.teamId ?? undefined,
     }),
@@ -108,6 +113,7 @@ export async function loader({ params, request }: Route.LoaderArgs) {
     hidePoweredBy,
     isPlatformDocument,
     isEnterpriseDocument,
+    isCommunityPlan,
   });
 }
 
@@ -121,6 +127,7 @@ export default function EmbedDirectTemplatePage() {
     hidePoweredBy,
     isPlatformDocument,
     isEnterpriseDocument,
+    isCommunityPlan,
   } = useSuperLoaderData<typeof loader>();
 
   return (
@@ -139,7 +146,7 @@ export default function EmbedDirectTemplatePage() {
             fields={fields}
             metadata={template.templateMeta}
             hidePoweredBy={isPlatformDocument || isEnterpriseDocument || hidePoweredBy}
-            isPlatformOrEnterprise={isPlatformDocument || isEnterpriseDocument}
+            allowWhiteLabelling={isCommunityPlan || isPlatformDocument || isEnterpriseDocument}
           />
         </DocumentSigningRecipientProvider>
       </DocumentSigningAuthProvider>

@@ -3,6 +3,7 @@ import { data } from 'react-router';
 import { match } from 'ts-pattern';
 
 import { getOptionalSession } from '@documenso/auth/server/lib/utils/get-session';
+import { isCommunityPlan as isUserCommunityPlan } from '@documenso/ee/server-only/util/is-community-plan';
 import { isUserEnterprise } from '@documenso/ee/server-only/util/is-document-enterprise';
 import { isDocumentPlatform } from '@documenso/ee/server-only/util/is-document-platform';
 import { IS_BILLING_ENABLED } from '@documenso/lib/constants/app';
@@ -61,9 +62,13 @@ export async function loader({ params, request }: Route.LoaderArgs) {
     );
   }
 
-  const [isPlatformDocument, isEnterpriseDocument] = await Promise.all([
+  const [isPlatformDocument, isEnterpriseDocument, isCommunityPlan] = await Promise.all([
     isDocumentPlatform(document),
     isUserEnterprise({
+      userId: document.userId,
+      teamId: document.teamId ?? undefined,
+    }),
+    isUserCommunityPlan({
       userId: document.userId,
       teamId: document.teamId ?? undefined,
     }),
@@ -127,6 +132,7 @@ export async function loader({ params, request }: Route.LoaderArgs) {
     hidePoweredBy,
     isPlatformDocument,
     isEnterpriseDocument,
+    isCommunityPlan,
   });
 }
 
@@ -141,6 +147,7 @@ export default function EmbedSignDocumentPage() {
     hidePoweredBy,
     isPlatformDocument,
     isEnterpriseDocument,
+    isCommunityPlan,
   } = useSuperLoaderData<typeof loader>();
 
   return (
@@ -163,7 +170,7 @@ export default function EmbedSignDocumentPage() {
           metadata={document.documentMeta}
           isCompleted={document.status === DocumentStatus.COMPLETED}
           hidePoweredBy={isPlatformDocument || isEnterpriseDocument || hidePoweredBy}
-          isPlatformOrEnterprise={isPlatformDocument || isEnterpriseDocument}
+          allowWhitelabelling={isCommunityPlan || isPlatformDocument || isEnterpriseDocument}
           allRecipients={allRecipients}
         />
       </DocumentSigningAuthProvider>
