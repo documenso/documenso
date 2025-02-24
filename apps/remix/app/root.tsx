@@ -171,9 +171,11 @@ export default function App() {
 }
 
 export function ErrorBoundary({ error }: Route.ErrorBoundaryProps) {
-  console.error('[RootErrorBoundary]', error);
-
   const errorCode = isRouteErrorResponse(error) ? error.status : 500;
+
+  if (errorCode !== 404) {
+    console.error('[RootErrorBoundary]', error);
+  }
 
   return <GenericErrorLayout errorCode={errorCode} />;
 }

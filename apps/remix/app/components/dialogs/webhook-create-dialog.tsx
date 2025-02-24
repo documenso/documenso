@@ -230,14 +230,13 @@ export const WebhookCreateDialog = ({ trigger, ...props }: WebhookCreateDialogPr
               />
 
               <DialogFooter>
-                <div className="flex w-full flex-nowrap gap-4">
-                  <Button type="button" variant="secondary" onClick={() => setOpen(false)}>
-                    <Trans>Cancel</Trans>
-                  </Button>
-                  <Button type="submit" loading={form.formState.isSubmitting}>
-                    <Trans>Create</Trans>
-                  </Button>
-                </div>
+                <Button type="button" variant="secondary" onClick={() => setOpen(false)}>
+                  <Trans>Cancel</Trans>
+                </Button>
+
+                <Button type="submit" loading={form.formState.isSubmitting}>
+                  <Trans>Create</Trans>
+                </Button>
               </DialogFooter>
             </fieldset>
           </form>

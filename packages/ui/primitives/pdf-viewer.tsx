@@ -6,6 +6,7 @@ import { Trans } from '@lingui/react/macro';
 import type { DocumentData } from '@prisma/client';
 import { Loader } from 'lucide-react';
 import { type PDFDocumentProxy, PasswordResponses } from 'pdfjs-dist';
+import pdfWorker from 'pdfjs-dist/build/pdf.worker.min?url';
 import { Document as PDFDocument, Page as PDFPage, pdfjs } from 'react-pdf';
 import 'react-pdf/dist/esm/Page/AnnotationLayer.css';
 import 'react-pdf/dist/esm/Page/TextLayer.css';
@@ -23,10 +24,7 @@ export type LoadedPDFDocument = PDFDocumentProxy;
 /**
  * This imports the worker from the `pdfjs-dist` package.
  */
-pdfjs.GlobalWorkerOptions.workerSrc = new URL(
-  'pdfjs-dist/build/pdf.worker.min.js',
-  import.meta.url,
-).toString();
+pdfjs.GlobalWorkerOptions.workerSrc = pdfWorker;
 
 export type OnPDFViewerPageClick = (_event: {
   pageNumber: number;
