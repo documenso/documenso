@@ -21,6 +21,46 @@ export const listDocumentsHandler = async (req: NextApiRequest, res: NextApiResp
       perPage: 1,
     });
 
+    if (!documents || !documents.data || documents.data.length === 0) {
+      const dummyWebhook = {
+        event: 'DOCUMENT_SIGNED',
+        createdAt: new Date(),
+        webhookEndpoint: 'https://example.com/webhook',
+        payload: {
+          id: 1,
+          userId: 2,
+          title: 'Example Document',
+          status: 'COMPLETED',
+          documentDataId: 3,
+          createdAt: new Date(),
+          updatedAt: new Date(),
+          completedAt: new Date(),
+          deletedAt: null,
+          teamId: 4,
+          Recipient: [
+            {
+              id: 1,
+              documentId: 123,
+              templateId: null,
+              token: 'example-token',
+              email: 'recipient@example.com',
+              name: 'Example Recipient',
+              role: 'SIGNER',
+              status: 'SIGNED',
+              signedAt: new Date(),
+              completedAt: new Date(),
+              expired: false,
+              readStatus: 'OPENED',
+              signingStatus: 'SIGNED',
+              sendStatus: 'SENT',
+            },
+          ],
+        },
+      };
+
+      return res.status(200).json([dummyWebhook]);
+    }
+
     const recipients = await getRecipientsForDocument({
       documentId: documents.data[0].id,
       userId: userId ?? user.id,
@@ -56,44 +96,6 @@ export const listDocumentsHandler = async (req: NextApiRequest, res: NextApiResp
       };
 
       return res.status(200).json([testWebhook]);
-    } else if (documents && documents.data.length > 0) {
-      const dummyWebhook = {
-        event: 'DOCUMENT_SIGNED',
-        createdAt: new Date(),
-        webhookEndpoint: 'https://example.com/webhook',
-        payload: {
-          id: documents.data[0].id,
-          userId: documents.data[0].userId,
-          title: documents.data[0].title,
-          status: documents.data[0].status,
-          documentDataId: documents.data[0].documentDataId,
-          createdAt: documents.data[0].createdAt,
-          updatedAt: documents.data[0].updatedAt,
-          completedAt: documents.data[0].completedAt,
-          deletedAt: documents.data[0].deletedAt,
-          teamId: documents.data[0].teamId,
-          Recipient: [
-            {
-              id: 1,
-              documentId: 123,
-              templateId: null,
-              token: 'example-token',
-              email: 'recipient@example.com',
-              name: 'Example Recipient',
-              role: 'SIGNER',
-              status: 'SIGNED',
-              signedAt: new Date(),
-              completedAt: new Date(),
-              expired: false,
-              readStatus: 'OPENED',
-              signingStatus: 'SIGNED',
-              sendStatus: 'SENT',
-            },
-          ],
-        },
-      };
-
-      return res.status(200).json([dummyWebhook]);
     }
 
     return res.status(200).json([]);
