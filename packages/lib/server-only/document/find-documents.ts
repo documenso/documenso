@@ -81,6 +81,7 @@ export const findDocuments = async ({
   const searchFilter: Prisma.DocumentWhereInput = {
     OR: [
       { title: { contains: query, mode: 'insensitive' } },
+      { externalId: { contains: query, mode: 'insensitive' } },
       { recipients: { some: { name: { contains: query, mode: 'insensitive' } } } },
       { recipients: { some: { email: { contains: query, mode: 'insensitive' } } } },
     ],
