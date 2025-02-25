@@ -73,7 +73,7 @@ export const EditDocumentForm = ({
 
   const { recipients, fields } = document;
 
-  const { mutateAsync: updateDocument } = trpc.document.setSettingsForDocument.useMutation({
+  const { mutateAsync: updateDocument } = trpc.document.updateDocument.useMutation({
     ...DO_NOT_INVALIDATE_QUERY_ON_MUTATION,
     onSuccess: (newData) => {
       utils.document.getDocumentWithDetailsById.setData(
@@ -84,19 +84,6 @@ export const EditDocumentForm = ({
       );
     },
   });
-
-  const { mutateAsync: setSigningOrderForDocument } =
-    trpc.document.setSigningOrderForDocument.useMutation({
-      ...DO_NOT_INVALIDATE_QUERY_ON_MUTATION,
-      onSuccess: (newData) => {
-        utils.document.getDocumentWithDetailsById.setData(
-          {
-            documentId: initialDocument.id,
-          },
-          (oldData) => ({ ...(oldData || initialDocument), ...newData, id: Number(newData.id) }),
-        );
-      },
-    });
 
   const { mutateAsync: addFields } = trpc.field.addFields.useMutation({
     ...DO_NOT_INVALIDATE_QUERY_ON_MUTATION,
@@ -216,9 +203,12 @@ export const EditDocumentForm = ({
   const onAddSignersFormSubmit = async (data: TAddSignersFormSchema) => {
     try {
       await Promise.all([
-        setSigningOrderForDocument({
+        updateDocument({
           documentId: document.id,
-          signingOrder: data.signingOrder,
+          meta: {
+            signingOrder: data.signingOrder,
+            modifyNextSigner: data.modifyNextSigner,
+          },
         }),
 
         setRecipients({
@@ -391,6 +381,7 @@ export const EditDocumentForm = ({
               documentFlow={documentFlow.signers}
               recipients={recipients}
               signingOrder={document.documentMeta?.signingOrder}
+              modifyNextSigner={document.documentMeta?.modifyNextSigner}
               fields={fields}
               isDocumentEnterprise={isDocumentEnterprise}
               onSubmit={onAddSignersFormSubmit}
