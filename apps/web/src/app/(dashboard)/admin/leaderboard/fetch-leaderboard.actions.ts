@@ -23,3 +23,22 @@ export async function search({ search, page, perPage, sortBy, sortOrder }: Searc
 
   return results;
 }
+
+// delete
+export async function downloadLeaderboardData() {
+  const { user } = await getRequiredServerComponentSession();
+
+  if (!isAdmin(user)) {
+    throw new Error('Unauthorized');
+  }
+
+  const results = await getSigningVolume({
+    search: '',
+    page: 1,
+    perPage: 1000,
+    sortBy: 'signingVolume',
+    sortOrder: 'desc',
+  });
+
+  return results.leaderboard;
+}
