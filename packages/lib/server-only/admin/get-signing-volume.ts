@@ -28,103 +28,116 @@ export async function getSigningVolume({
 }: GetSigningVolumeOptions) {
   const skip = (page - 1) * perPage;
 
-  const baseUserQuery = {
-    OR: [
-      {
-        subscriptions: {
-          some: {
-            status: SubscriptionStatus.ACTIVE,
-          },
-        },
-      },
-      {
-        teamMembers: {
-          some: {
-            team: {
-              subscription: {
-                status: SubscriptionStatus.ACTIVE,
-              },
-            },
-          },
-        },
-      },
-    ],
-    ...(search
-      ? {
-          OR: [
-            { name: { contains: search, mode: Prisma.QueryMode.insensitive } },
-            { email: { contains: search, mode: Prisma.QueryMode.insensitive } },
-          ],
-        }
-      : {}),
-  };
+  // Find all unique customerIds from both personal and team subscriptions
+  const activeCustomerIds = await prisma.$queryRaw<{ customerId: string }[]>`
+    SELECT DISTINCT "customerId"
+    FROM (
+      -- Get customerIds from users with active subscriptions
+      SELECT u."customerId"
+      FROM "User" u
+      JOIN "Subscription" s ON u.id = s."userId"
+      WHERE s.status = 'ACTIVE' AND u."customerId" IS NOT NULL
+      
+      UNION
+      
+      -- Get customerIds from teams with active subscriptions
+      SELECT t."customerId"
+      FROM "Team" t
+      JOIN "Subscription" s ON t.id = s."teamId"
+      WHERE s.status = 'ACTIVE' AND t."customerId" IS NOT NULL
+    ) AS active_customers
+    ${search ? Prisma.sql`WHERE "customerId" LIKE ${`%${search}%`}` : Prisma.empty}
+  `;
 
-  const results = await prisma.user.findMany({
-    where: baseUserQuery,
-    select: {
-      id: true,
-      name: true,
-      email: true,
-      createdAt: true,
-      _count: {
+  const totalCustomerCount = activeCustomerIds.length;
+
+  const paginatedCustomerIds = activeCustomerIds.slice(skip, skip + perPage);
+
+  const customerData = await Promise.all(
+    paginatedCustomerIds.map(async ({ customerId }) => {
+      const users = await prisma.user.findMany({
+        where: { customerId },
         select: {
-          documents: {
-            where: {
-              status: DocumentStatus.COMPLETED,
-            },
-          },
+          id: true,
+          name: true,
+          email: true,
+          createdAt: true,
         },
-      },
-      teamMembers: {
+      });
+
+      const teams = await prisma.team.findMany({
+        where: { customerId },
         select: {
-          team: {
-            select: {
-              documents: {
-                where: {
-                  status: DocumentStatus.COMPLETED,
-                },
-              },
-            },
-          },
+          id: true,
+          name: true,
+          createdAt: true,
         },
-      },
-    },
-    skip,
-    take: perPage,
-    orderBy: [
-      ...(sortBy === 'name'
-        ? [{ name: sortOrder }]
-        : sortBy === 'createdAt'
-          ? [{ createdAt: sortOrder }]
-          : []),
-    ],
-  });
+      });
 
-  const count = await prisma.user.count({
-    where: baseUserQuery,
-  });
+      const userDocumentCount = await prisma.document.count({
+        where: {
+          userId: { in: users.map((user) => user.id) },
+          status: DocumentStatus.COMPLETED,
+        },
+      });
 
-  const transformedResults = results.map((user) => {
-    const personalDocuments = user._count.documents;
+      const teamDocumentCount = await prisma.document.count({
+        where: {
+          teamId: { in: teams.map((team) => team.id) },
+          status: DocumentStatus.COMPLETED,
+        },
+      });
 
-    const teamDocuments = user.teamMembers.reduce(
-      (acc, member) => acc + member.team.documents.length,
-      0,
-    );
+      const subscription = await prisma.subscription.findFirst({
+        where: {
+          OR: [{ user: { customerId } }, { team: { customerId } }],
+          status: SubscriptionStatus.ACTIVE,
+        },
+        select: {
+          planId: true,
+        },
+      });
 
-    const signingVolume = personalDocuments + teamDocuments;
+      const displayName = users[0]?.name || teams[0]?.name || customerId;
 
-    return {
-      id: user.id,
-      name: user.name,
-      signingVolume,
-      createdAt: user.createdAt,
-      planId: '',
-    };
-  });
+      const creationDates = [
+        ...users.map((user) => user.createdAt),
+        ...teams.map((team) => team.createdAt),
+      ].filter(Boolean);
 
-  if (sortBy === 'signingVolume') {
-    transformedResults.sort((a, b) => {
+      const createdAt =
+        creationDates.length > 0
+          ? new Date(Math.min(...creationDates.map((date) => date.getTime())))
+          : new Date();
+
+      return {
+        id: users[0]?.id || teams[0]?.id || 0,
+        customerId,
+        name: displayName,
+        signingVolume: userDocumentCount + teamDocumentCount,
+        createdAt,
+        planId: subscription?.planId || '',
+      };
+    }),
+  );
+
+  // Sort the results by the requested sort criteria
+  const sortedResults = [...customerData];
+
+  if (sortBy === 'name') {
+    sortedResults.sort((a, b) => {
+      return sortOrder === 'desc'
+        ? (b.name || '').localeCompare(a.name || '')
+        : (a.name || '').localeCompare(b.name || '');
+    });
+  } else if (sortBy === 'createdAt') {
+    sortedResults.sort((a, b) => {
+      return sortOrder === 'desc'
+        ? b.createdAt.getTime() - a.createdAt.getTime()
+        : a.createdAt.getTime() - b.createdAt.getTime();
+    });
+  } else if (sortBy === 'signingVolume') {
+    sortedResults.sort((a, b) => {
       return sortOrder === 'desc'
         ? b.signingVolume - a.signingVolume
         : a.signingVolume - b.signingVolume;
@@ -132,7 +145,7 @@ export async function getSigningVolume({
   }
 
   return {
-    leaderboard: transformedResults,
-    totalPages: Math.ceil(count / perPage),
+    leaderboard: sortedResults,
+    totalPages: Math.ceil(totalCustomerCount / perPage),
   };
 }
