@@ -993,7 +993,7 @@ msgstr "An error occurred while enabling the user."
 msgid "An error occurred while loading team members. Please try again later."
 msgstr "An error occurred while loading team members. Please try again later."
 
-#: packages/ui/primitives/pdf-viewer.tsx:169
+#: packages/ui/primitives/pdf-viewer.tsx:167
 msgid "An error occurred while loading the document."
 msgstr "An error occurred while loading the document."
 
@@ -1405,7 +1405,7 @@ msgstr "Can prepare"
 #: apps/remix/app/components/forms/2fa/view-recovery-codes-dialog.tsx:172
 #: apps/remix/app/components/forms/2fa/enable-authenticator-app-dialog.tsx:263
 #: apps/remix/app/components/dialogs/webhook-delete-dialog.tsx:156
-#: apps/remix/app/components/dialogs/webhook-create-dialog.tsx:235
+#: apps/remix/app/components/dialogs/webhook-create-dialog.tsx:234
 #: apps/remix/app/components/dialogs/token-delete-dialog.tsx:167
 #: apps/remix/app/components/dialogs/template-move-dialog.tsx:145
 #: apps/remix/app/components/dialogs/template-duplicate-dialog.tsx:71
@@ -2729,7 +2729,7 @@ msgstr "Enter your text here"
 #: apps/remix/app/components/dialogs/admin-user-enable-dialog.tsx:59
 #: apps/remix/app/components/dialogs/admin-user-disable-dialog.tsx:62
 #: apps/remix/app/components/dialogs/admin-user-delete-dialog.tsx:62
-#: packages/ui/primitives/pdf-viewer.tsx:168
+#: packages/ui/primitives/pdf-viewer.tsx:166
 #: packages/ui/primitives/document-flow/field-item-advanced-settings.tsx:222
 msgid "Error"
 msgstr "Error"
@@ -3263,7 +3263,7 @@ msgid "Load older activity"
 msgstr "Load older activity"
 
 #: apps/remix/app/components/general/skeletons/document-edit-skeleton.tsx:29
-#: packages/ui/primitives/pdf-viewer.tsx:46
+#: packages/ui/primitives/pdf-viewer.tsx:44
 #: packages/ui/primitives/lazy-pdf-viewer.tsx:12
 msgid "Loading document..."
 msgstr "Loading document..."
@@ -3735,7 +3735,7 @@ msgid "Page {0} of {1}"
 msgstr "Page {0} of {1}"
 
 #. placeholder {0}: i + 1
-#: packages/ui/primitives/pdf-viewer.tsx:261
+#: packages/ui/primitives/pdf-viewer.tsx:259
 msgid "Page {0} of {numPages}"
 msgstr "Page {0} of {numPages}"
 
@@ -4004,8 +4004,8 @@ msgstr "Please try again and make sure you enter the correct email address."
 msgid "Please try again later."
 msgstr "Please try again later."
 
-#: packages/ui/primitives/pdf-viewer.tsx:225
-#: packages/ui/primitives/pdf-viewer.tsx:240
+#: packages/ui/primitives/pdf-viewer.tsx:223
+#: packages/ui/primitives/pdf-viewer.tsx:238
 msgid "Please try again or contact our support."
 msgstr "Please try again or contact our support."
 
@@ -4901,8 +4901,8 @@ msgstr "Something went wrong while attempting to transfer the ownership of team 
 msgid "Something went wrong while attempting to verify your email address for <0>{0}</0>. Please try again later."
 msgstr "Something went wrong while attempting to verify your email address for <0>{0}</0>. Please try again later."
 
-#: packages/ui/primitives/pdf-viewer.tsx:222
-#: packages/ui/primitives/pdf-viewer.tsx:237
+#: packages/ui/primitives/pdf-viewer.tsx:220
+#: packages/ui/primitives/pdf-viewer.tsx:235
 msgid "Something went wrong while loading the document."
 msgstr "Something went wrong while loading the document."
 

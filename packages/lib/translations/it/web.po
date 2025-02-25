@@ -998,7 +998,7 @@ msgstr "Si è verificato un errore durante l'abilitazione dell'utente."
 msgid "An error occurred while loading team members. Please try again later."
 msgstr "Si è verificato un errore durante il caricamento dei membri del team. Per favore riprova più tardi."
 
-#: packages/ui/primitives/pdf-viewer.tsx:169
+#: packages/ui/primitives/pdf-viewer.tsx:167
 msgid "An error occurred while loading the document."
 msgstr "Si è verificato un errore durante il caricamento del documento."
 
@@ -1410,7 +1410,7 @@ msgstr ""
 #: apps/remix/app/components/forms/2fa/view-recovery-codes-dialog.tsx:172
 #: apps/remix/app/components/forms/2fa/enable-authenticator-app-dialog.tsx:263
 #: apps/remix/app/components/dialogs/webhook-delete-dialog.tsx:156
-#: apps/remix/app/components/dialogs/webhook-create-dialog.tsx:235
+#: apps/remix/app/components/dialogs/webhook-create-dialog.tsx:234
 #: apps/remix/app/components/dialogs/token-delete-dialog.tsx:167
 #: apps/remix/app/components/dialogs/template-move-dialog.tsx:145
 #: apps/remix/app/components/dialogs/template-duplicate-dialog.tsx:71
@@ -2734,7 +2734,7 @@ msgstr "Inserisci il tuo testo qui"
 #: apps/remix/app/components/dialogs/admin-user-enable-dialog.tsx:59
 #: apps/remix/app/components/dialogs/admin-user-disable-dialog.tsx:62
 #: apps/remix/app/components/dialogs/admin-user-delete-dialog.tsx:62
-#: packages/ui/primitives/pdf-viewer.tsx:168
+#: packages/ui/primitives/pdf-viewer.tsx:166
 #: packages/ui/primitives/document-flow/field-item-advanced-settings.tsx:222
 msgid "Error"
 msgstr "Errore"
@@ -3268,7 +3268,7 @@ msgid "Load older activity"
 msgstr "Carica attività precedente"
 
 #: apps/remix/app/components/general/skeletons/document-edit-skeleton.tsx:29
-#: packages/ui/primitives/pdf-viewer.tsx:46
+#: packages/ui/primitives/pdf-viewer.tsx:44
 #: packages/ui/primitives/lazy-pdf-viewer.tsx:12
 msgid "Loading document..."
 msgstr "Caricamento del documento..."
@@ -3740,7 +3740,7 @@ msgid "Page {0} of {1}"
 msgstr "Pagina {0} di {1}"
 
 #. placeholder {0}: i + 1
-#: packages/ui/primitives/pdf-viewer.tsx:261
+#: packages/ui/primitives/pdf-viewer.tsx:259
 msgid "Page {0} of {numPages}"
 msgstr "Pagina {0} di {numPages}"
 
@@ -4009,8 +4009,8 @@ msgstr "Si prega di riprovare assicurandosi di inserire l'indirizzo email corret
 msgid "Please try again later."
 msgstr "Si prega di riprovare più tardi."
 
-#: packages/ui/primitives/pdf-viewer.tsx:225
-#: packages/ui/primitives/pdf-viewer.tsx:240
+#: packages/ui/primitives/pdf-viewer.tsx:223
+#: packages/ui/primitives/pdf-viewer.tsx:238
 msgid "Please try again or contact our support."
 msgstr "Per favore, riprova o contatta il nostro supporto."
 
@@ -4906,8 +4906,8 @@ msgstr "Qualcosa è andato storto durante il tentativo di trasferimento della pr
 msgid "Something went wrong while attempting to verify your email address for <0>{0}</0>. Please try again later."
 msgstr "Qualcosa è andato storto durante il tentativo di verifica del tuo indirizzo e-mail per <0>{0}</0>. Riprova più tardi."
 
-#: packages/ui/primitives/pdf-viewer.tsx:222
-#: packages/ui/primitives/pdf-viewer.tsx:237
+#: packages/ui/primitives/pdf-viewer.tsx:220
+#: packages/ui/primitives/pdf-viewer.tsx:235
 msgid "Something went wrong while loading the document."
 msgstr "Qualcosa è andato storto durante il caricamento del documento."
 

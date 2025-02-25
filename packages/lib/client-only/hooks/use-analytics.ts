@@ -21,6 +21,20 @@ export function useAnalytics() {
   };
 
   /**
+   * Capture an analytic event.
+   *
+   * @param error The error to capture.
+   * @param properties Properties to attach to the event.
+   */
+  const captureException = (error: Error, properties?: Record<string, unknown>) => {
+    if (!isPostHogEnabled) {
+      return;
+    }
+
+    posthog.captureException(error, properties);
+  };
+
+  /**
    * Start the session recording.
    *
    * @param eventFlag The event to check against feature flags to determine whether tracking is enabled.
@@ -53,6 +67,7 @@ export function useAnalytics() {
 
   return {
     capture,
+    captureException,
     startSessionRecording,
     stopSessionRecording,
   };

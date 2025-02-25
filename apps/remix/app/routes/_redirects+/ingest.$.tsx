@@ -23,6 +23,8 @@ const posthogProxy = async (request: Request) => {
     method: request.method,
     headers,
     body: request.body,
+    // @ts-expect-error - Not really sure about this
+    duplex: 'half',
   });
 
   return new Response(response.body, {

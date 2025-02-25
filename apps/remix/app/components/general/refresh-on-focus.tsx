@@ -3,10 +3,12 @@ import { useCallback, useEffect } from 'react';
 import { useRevalidator } from 'react-router';
 
 export const RefreshOnFocus = () => {
-  const { revalidate } = useRevalidator();
+  const { revalidate, state } = useRevalidator();
 
   const onFocus = useCallback(() => {
-    void revalidate();
+    if (state === 'idle') {
+      void revalidate();
+    }
   }, [revalidate]);
 
   useEffect(() => {

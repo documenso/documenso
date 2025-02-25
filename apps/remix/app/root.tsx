@@ -1,4 +1,4 @@
-import { Suspense, useEffect } from 'react';
+import { useEffect } from 'react';
 
 import Plausible from 'plausible-tracker';
 import {
@@ -12,7 +12,7 @@ import {
   useLoaderData,
   useLocation,
 } from 'react-router';
-import { PreventFlashOnWrongTheme, useTheme } from 'remix-themes';
+import { PreventFlashOnWrongTheme, ThemeProvider, useTheme } from 'remix-themes';
 
 import { getOptionalSession } from '@documenso/auth/server/lib/utils/get-session';
 import { SessionProvider } from '@documenso/lib/client-only/providers/session';
@@ -28,7 +28,6 @@ import type { Route } from './+types/root';
 import stylesheet from './app.css?url';
 import { GenericErrorLayout } from './components/general/generic-error-layout';
 import { RefreshOnFocus } from './components/general/refresh-on-focus';
-import { PostHogPageview } from './providers/posthog';
 import { langCookie } from './storage/lang-cookie.server';
 import { themeSessionResolver } from './storage/theme-session.server';
 import { appMetaTags } from './utils/meta';
@@ -106,9 +105,7 @@ export async function loader({ request }: Route.LoaderArgs) {
 }
 
 export function Layout({ children }: { children: React.ReactNode }) {
-  const { publicEnv, lang, session, ...data } = useLoaderData<typeof loader>() || {};
-
-  const [theme] = useTheme();
+  const { theme } = useLoaderData<typeof loader>() || {};
 
   const location = useLocation();
 
@@ -117,6 +114,18 @@ export function Layout({ children }: { children: React.ReactNode }) {
       trackPageview();
     }
   }, [location.pathname]);
+
+  return (
+    <ThemeProvider specifiedTheme={theme} themeAction="/api/theme">
+      <LayoutContent>{children}</LayoutContent>
+    </ThemeProvider>
+  );
+}
+
+export function LayoutContent({ children }: { children: React.ReactNode }) {
+  const { publicEnv, session, lang, ...data } = useLoaderData<typeof loader>() || {};
+
+  const [theme] = useTheme();
 
   return (
     <html translate="no" lang={lang} data-theme={theme} className={theme ?? ''}>
@@ -132,10 +141,6 @@ export function Layout({ children }: { children: React.ReactNode }) {
         <Links />
         <meta name="google" content="notranslate" />
         <PreventFlashOnWrongTheme ssrTheme={Boolean(data.theme)} />
-
-        <Suspense>
-          <PostHogPageview />
-        </Suspense>
 
         {/* Fix: https://stackoverflow.com/questions/21147149/flash-of-unstyled-content-fouc-in-firefox-only-is-ff-slow-renderer */}
         <script>0</script>
