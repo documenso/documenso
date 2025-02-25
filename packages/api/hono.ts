@@ -19,7 +19,6 @@ tsRestHonoApp
   .get('/me', async (c) => testCredentialsHandler(c.req.raw));
 
 // Zapier. Todo: (RR7) Check methods. Are these get/post/update requests?
-// Todo: (RR7) Is there really no validations?
 tsRestHonoApp
   .all('/zapier/list-documents', async (c) => listDocumentsHandler(c.req.raw))
   .all('/zapier/subscribe', async (c) => subscribeHandler(c.req.raw))

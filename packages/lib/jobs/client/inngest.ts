@@ -71,28 +71,6 @@ export class InngestJobProvider extends BaseJobProvider {
     });
   }
 
-  // public getApiHandler() {
-  //   const handler = createPagesRoute({
-  //     client: this._client,
-  //     functions: this._functions,
-  //   });
-
-  //   return async (req: NextApiRequest, res: NextApiResponse) => {
-  //     // Since body-parser is disabled for this route we need to patch in the parsed body
-  //     if (req.headers['content-type'] === 'application/json') {
-  //       Object.assign(req, {
-  //         body: await json(req),
-  //       });
-  //     }
-
-  //     // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
-  //     const nextReq = req as unknown as NextRequest;
-
-  //     return await handler(nextReq, res);
-  //   };
-  // }
-
-  // Todo: (RR7) Do we need to handle the above?
   public getApiHandler() {
     return async (context: HonoContext) => {
       const handler = createHonoPagesRoute({

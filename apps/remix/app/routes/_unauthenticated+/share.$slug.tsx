@@ -4,42 +4,41 @@ import { NEXT_PUBLIC_WEBAPP_URL } from '@documenso/lib/constants/app';
 
 import type { Route } from './+types/share.$slug';
 
-// Todo: (RR7) Test on stg
 export function meta({ params: { slug } }: Route.MetaArgs) {
   return [
     { title: 'Documenso - Share' },
     { description: 'I just signed a document in style with Documenso!' },
     {
       property: 'og:title',
-      title: 'Documenso - Join the open source signing revolution',
+      content: 'Documenso - Join the open source signing revolution',
     },
     {
       property: 'og:description',
-      description: 'I just signed with Documenso!',
+      content: 'I just signed with Documenso!',
     },
     {
       property: 'og:type',
-      type: 'website',
+      content: 'website',
     },
     {
-      property: 'og:images',
-      images: [`${NEXT_PUBLIC_WEBAPP_URL()}/share/${slug}/opengraph`],
+      property: 'og:image',
+      content: `${NEXT_PUBLIC_WEBAPP_URL()}/share/${slug}/opengraph`,
     },
     {
       name: 'twitter:site',
-      site: '@documenso',
+      content: '@documenso',
     },
     {
       name: 'twitter:card',
-      card: 'summary_large_image',
+      content: 'summary_large_image',
     },
     {
-      name: 'twitter:images',
-      images: [`${NEXT_PUBLIC_WEBAPP_URL()}/share/${slug}/opengraph`],
+      name: 'twitter:image',
+      content: `${NEXT_PUBLIC_WEBAPP_URL()}/share/${slug}/opengraph`,
     },
     {
       name: 'twitter:description',
-      description: 'I just signed with Documenso!',
+      content: 'I just signed with Documenso!',
     },
   ];
 }

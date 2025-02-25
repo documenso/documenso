@@ -146,8 +146,7 @@ export const handleOAuthCallbackUrl = async (options: HandleOAuthCallbackUrlOpti
           data: {
             emailVerified: new Date(),
             password: null,
-            // Todo: (RR7) Check this
-            // Todo: (RR7) Not required after we setup password specific accounts.
+            // Todo: (RR7) Will need to update the "password" account after the migration.
           },
         });
       }
