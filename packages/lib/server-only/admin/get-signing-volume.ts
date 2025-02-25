@@ -53,37 +53,67 @@ export const getSigningVolume = async ({
     },
   });
 
-  const subscriptionData = activeSubscriptions.map((subscription) => {
+  const userSubscriptionsMap = new Map();
+  const teamSubscriptionsMap = new Map();
+
+  activeSubscriptions.forEach((subscription) => {
     const isTeam = !!subscription.teamId;
-    return {
-      id: subscription.id,
-      planId: subscription.planId,
-      userId: subscription.userId,
-      teamId: subscription.teamId,
-      name: isTeam ? subscription.team?.name : subscription.user?.name || '',
-      email: isTeam
-        ? subscription.team?.teamEmail?.email || `Team ${subscription.team?.id}`
-        : subscription.user?.email || '',
-      createdAt: isTeam ? subscription.team?.createdAt : subscription.user?.createdAt,
-      isTeam,
-    };
+
+    if (isTeam && subscription.teamId) {
+      if (!teamSubscriptionsMap.has(subscription.teamId)) {
+        teamSubscriptionsMap.set(subscription.teamId, {
+          id: subscription.id,
+          planId: subscription.planId,
+          teamId: subscription.teamId,
+          name: subscription.team?.name || '',
+          email: subscription.team?.teamEmail?.email || `Team ${subscription.team?.id}`,
+          createdAt: subscription.team?.createdAt,
+          isTeam: true,
+          subscriptionIds: [subscription.id],
+        });
+      } else {
+        const existingTeam = teamSubscriptionsMap.get(subscription.teamId);
+        existingTeam.subscriptionIds.push(subscription.id);
+      }
+    } else if (subscription.userId) {
+      if (!userSubscriptionsMap.has(subscription.userId)) {
+        userSubscriptionsMap.set(subscription.userId, {
+          id: subscription.id,
+          planId: subscription.planId,
+          userId: subscription.userId,
+          name: subscription.user?.name || '',
+          email: subscription.user?.email || '',
+          createdAt: subscription.user?.createdAt,
+          isTeam: false,
+          subscriptionIds: [subscription.id],
+        });
+      } else {
+        const existingUser = userSubscriptionsMap.get(subscription.userId);
+        existingUser.subscriptionIds.push(subscription.id);
+      }
+    }
   });
 
+  const consolidatedSubscriptions = [
+    ...Array.from(userSubscriptionsMap.values()),
+    ...Array.from(teamSubscriptionsMap.values()),
+  ];
+
   const filteredSubscriptions = search
-    ? subscriptionData.filter((sub) => {
+    ? consolidatedSubscriptions.filter((sub) => {
         const searchLower = search.toLowerCase();
         return (
           sub.name?.toLowerCase().includes(searchLower) ||
           sub.email?.toLowerCase().includes(searchLower)
         );
       })
-    : subscriptionData;
+    : consolidatedSubscriptions;
 
   const leaderboardWithVolume = await Promise.all(
     filteredSubscriptions.map(async (subscription) => {
       let signingVolume = 0;
 
-      if (subscription.userId && !subscription.teamId) {
+      if (subscription.userId && !subscription.isTeam) {
         const personalCount = await prisma.document.count({
           where: {
             userId: subscription.userId,
