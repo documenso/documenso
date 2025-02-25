@@ -94,22 +94,22 @@ export const getSigningVolume = async ({
     }
   });
 
-  const consolidatedSubscriptions = [
+  const subscriptions = [
     ...Array.from(userSubscriptionsMap.values()),
     ...Array.from(teamSubscriptionsMap.values()),
   ];
 
   const filteredSubscriptions = search
-    ? consolidatedSubscriptions.filter((sub) => {
+    ? subscriptions.filter((sub) => {
         const searchLower = search.toLowerCase();
         return (
           sub.name?.toLowerCase().includes(searchLower) ||
           sub.email?.toLowerCase().includes(searchLower)
         );
       })
-    : consolidatedSubscriptions;
+    : subscriptions;
 
-  const leaderboardWithVolume = await Promise.all(
+  const signingVolume = await Promise.all(
     filteredSubscriptions.map(async (subscription) => {
       let signingVolume = 0;
 
@@ -166,7 +166,7 @@ export const getSigningVolume = async ({
     }),
   );
 
-  const sortedResults = [...leaderboardWithVolume].sort((a, b) => {
+  const sortedResults = [...signingVolume].sort((a, b) => {
     if (sortBy === 'name') {
       return sortOrder === 'asc'
         ? (a.name || '').localeCompare(b.name || '')
