@@ -53,29 +53,21 @@ export const getSigningVolume = async ({
     },
   });
 
-  const uniqueEntities = new Map();
-
-  activeSubscriptions.forEach((subscription) => {
+  const subscriptionData = activeSubscriptions.map((subscription) => {
     const isTeam = !!subscription.teamId;
-    const entityId = isTeam ? `team-${subscription.teamId}` : `user-${subscription.userId}`;
-
-    if (!uniqueEntities.has(entityId)) {
-      uniqueEntities.set(entityId, {
-        id: subscription.id,
-        planId: subscription.planId,
-        userId: subscription.userId,
-        teamId: subscription.teamId,
-        name: isTeam ? subscription.team?.name : subscription.user?.name || '',
-        email: isTeam
-          ? subscription.team?.teamEmail?.email || `Team ${subscription.team?.id}`
-          : subscription.user?.email || '',
-        createdAt: isTeam ? subscription.team?.createdAt : subscription.user?.createdAt,
-        isTeam,
-      });
-    }
+    return {
+      id: subscription.id,
+      planId: subscription.planId,
+      userId: subscription.userId,
+      teamId: subscription.teamId,
+      name: isTeam ? subscription.team?.name : subscription.user?.name || '',
+      email: isTeam
+        ? subscription.team?.teamEmail?.email || `Team ${subscription.team?.id}`
+        : subscription.user?.email || '',
+      createdAt: isTeam ? subscription.team?.createdAt : subscription.user?.createdAt,
+      isTeam,
+    };
   });
-
-  const subscriptionData = Array.from(uniqueEntities.values());
 
   const filteredSubscriptions = search
     ? subscriptionData.filter((sub) => {
@@ -91,16 +83,38 @@ export const getSigningVolume = async ({
     filteredSubscriptions.map(async (subscription) => {
       let signingVolume = 0;
 
-      if (subscription.userId && !subscription.isTeam) {
+      if (subscription.userId) {
         const personalCount = await prisma.document.count({
           where: {
             userId: subscription.userId,
-            teamId: null,
             status: DocumentStatus.COMPLETED,
           },
         });
 
         signingVolume += personalCount;
+
+        const userTeams = await prisma.teamMember.findMany({
+          where: {
+            userId: subscription.userId,
+          },
+          select: {
+            teamId: true,
+          },
+        });
+
+        if (userTeams.length > 0) {
+          const teamIds = userTeams.map((team) => team.teamId);
+          const teamCount = await prisma.document.count({
+            where: {
+              teamId: {
+                in: teamIds,
+              },
+              status: DocumentStatus.COMPLETED,
+            },
+          });
+
+          signingVolume += teamCount;
+        }
       }
 
       if (subscription.teamId) {
