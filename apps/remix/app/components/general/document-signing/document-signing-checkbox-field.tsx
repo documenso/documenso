@@ -52,12 +52,19 @@ export const DocumentSigningCheckboxField = ({
     value: item.value.length > 0 ? item.value : `empty-value-${item.id}`,
   }));
 
+  const parsedCheckedValues = useMemo(
+    () => fromCheckboxValue(field.customText),
+    [field.customText],
+  );
+
   const [checkedValues, setCheckedValues] = useState(
-    values
-      ?.map((item) =>
-        item.checked ? (item.value.length > 0 ? item.value : `empty-value-${item.id}`) : '',
-      )
-      .filter(Boolean) || [],
+    field.inserted && parsedCheckedValues.length > 0
+      ? parsedCheckedValues
+      : values
+          ?.map((item) =>
+            item.checked ? (item.value.length > 0 ? item.value : `empty-value-${item.id}`) : '',
+          )
+          .filter(Boolean) || [],
   );
 
   const isReadOnly = parsedFieldMeta.readOnly;
@@ -172,19 +179,13 @@ export const DocumentSigningCheckboxField = ({
     let updatedValues: string[] = [];
 
     try {
-      const isChecked = checkedValues.includes(
-        item.value.length > 0 ? item.value : `empty-value-${item.id}`,
-      );
+      const itemValue = item.value.length > 0 ? item.value : `empty-value-${item.id}`;
+      const isChecked = checkedValues.includes(itemValue);
 
       if (!isChecked) {
-        updatedValues = [
-          ...checkedValues,
-          item.value.length > 0 ? item.value : `empty-value-${item.id}`,
-        ];
+        updatedValues = [...checkedValues, itemValue];
       } else {
-        updatedValues = checkedValues.filter(
-          (v) => v !== item.value && v !== `empty-value-${item.id}`,
-        );
+        updatedValues = checkedValues.filter((v) => v !== itemValue);
       }
 
       setCheckedValues(updatedValues);
@@ -216,6 +217,12 @@ export const DocumentSigningCheckboxField = ({
   };
 
   useEffect(() => {
+    if (field.inserted && parsedCheckedValues.length > 0) {
+      setCheckedValues(parsedCheckedValues);
+    }
+  }, [field.inserted, parsedCheckedValues]);
+
+  useEffect(() => {
     if (shouldAutoSignField) {
       void executeActionAuthProcedure({
         onReauthFormSubmit: async (authOptions) => await onSign(authOptions),
@@ -223,11 +230,6 @@ export const DocumentSigningCheckboxField = ({
       });
     }
   }, [checkedValues, isLengthConditionMet, field.inserted]);
-
-  const parsedCheckedValues = useMemo(
-    () => fromCheckboxValue(field.customText),
-    [field.customText],
-  );
 
   return (
     <DocumentSigningFieldContainer
@@ -252,16 +254,17 @@ export const DocumentSigningCheckboxField = ({
           <div className="z-50 flex flex-col gap-y-2">
             {values?.map((item: { id: number; value: string; checked: boolean }, index: number) => {
               const itemValue = item.value || `empty-value-${item.id}`;
+              const checkboxId = `checkbox-field-${field.id}-${index}`;
 
               return (
                 <div key={index} className="flex items-center gap-x-1.5">
                   <Checkbox
                     className="h-4 w-4"
-                    id={`checkbox-${index}`}
+                    id={checkboxId}
                     checked={checkedValues.includes(itemValue)}
                     onCheckedChange={() => handleCheckboxChange(item.value, item.id)}
                   />
-                  <Label htmlFor={`checkbox-${index}`}>
+                  <Label htmlFor={checkboxId}>
                     {item.value.includes('empty-value-') ? '' : item.value}
                   </Label>
                 </div>
@@ -272,20 +275,21 @@ export const DocumentSigningCheckboxField = ({
       )}
 
       {field.inserted && (
-        <div className="flex flex-col gap-y-1">
+        <div className="flex flex-col gap-y-2">
           {values?.map((item: { id: number; value: string; checked: boolean }, index: number) => {
             const itemValue = item.value || `empty-value-${item.id}`;
+            const checkboxId = `checkbox-field-${field.id}-${index}-inserted`;
 
             return (
               <div key={index} className="flex items-center gap-x-1.5">
                 <Checkbox
-                  className="h-3 w-3"
-                  id={`checkbox-${index}`}
-                  checked={parsedCheckedValues.includes(itemValue)}
+                  className="h-4 w-4"
+                  id={checkboxId}
+                  checked={checkedValues.includes(itemValue)}
                   disabled={isLoading}
                   onCheckedChange={() => void handleCheckboxOptionClick(item)}
                 />
-                <Label htmlFor={`checkbox-${index}`} className="text-xs">
+                <Label htmlFor={checkboxId}>
                   {item.value.includes('empty-value-') ? '' : item.value}
                 </Label>
               </div>

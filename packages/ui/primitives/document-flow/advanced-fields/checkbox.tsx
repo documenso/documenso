@@ -1,5 +1,5 @@
-import { ZCheckboxFieldMeta } from '@documenso/lib/types/field-meta';
 import type { TCheckboxFieldMeta } from '@documenso/lib/types/field-meta';
+import { ZCheckboxFieldMeta } from '@documenso/lib/types/field-meta';
 import { Checkbox } from '@documenso/ui/primitives/checkbox';
 import { Label } from '@documenso/ui/primitives/label';
 
@@ -28,18 +28,22 @@ export const CheckboxField = ({ field }: CheckboxFieldProps) => {
       {!parsedFieldMeta?.values ? (
         <FieldIcon fieldMeta={field.fieldMeta} type={field.type} />
       ) : (
-        parsedFieldMeta.values.map((item: { value: string; checked: boolean }, index: number) => (
-          <div key={index} className="flex items-center gap-x-1.5">
-            <Checkbox
-              className="dark:border-field-border h-3 w-3 bg-white"
-              id={`checkbox-${index}`}
-              checked={item.checked}
-            />
-            <Label htmlFor={`checkbox-${index}`} className="text-xs font-normal text-black">
-              {item.value}
-            </Label>
-          </div>
-        ))
+        parsedFieldMeta.values.map((item: { value: string; checked: boolean }, index: number) => {
+          const checkboxId = `checkbox-field-${field.formId}-${index}`;
+
+          return (
+            <div key={index} className="flex items-center gap-x-1.5">
+              <Checkbox
+                className="dark:border-field-border h-3 w-3 bg-white"
+                id={checkboxId}
+                checked={item.checked}
+              />
+              <Label htmlFor={checkboxId} className="text-xs font-normal text-black">
+                {item.value}
+              </Label>
+            </div>
+          );
+        })
       )}
     </div>
   );
