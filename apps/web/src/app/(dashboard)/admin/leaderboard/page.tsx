@@ -5,7 +5,6 @@ import { getRequiredServerComponentSession } from '@documenso/lib/next-auth/get-
 import { isAdmin } from '@documenso/lib/next-auth/guards/is-admin';
 
 import { LeaderboardTable, type SigningVolume } from './data-table-leaderboard';
-import { DownloadButton } from './download-button';
 import { search } from './fetch-leaderboard.actions';
 
 type AdminLeaderboardProps = {
@@ -53,8 +52,6 @@ export default async function Leaderboard({ searchParams = {} }: AdminLeaderboar
         <h2 className="text-4xl font-semibold">
           <Trans>Signing Volume</Trans>
         </h2>
-        {/* TODO: remove */}
-        <DownloadButton />
       </div>
       <div className="mt-8">
         <LeaderboardTable
