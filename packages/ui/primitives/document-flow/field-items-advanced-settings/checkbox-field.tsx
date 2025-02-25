@@ -205,6 +205,7 @@ export const CheckboxFieldAdvancedSettings = ({
             <div key={index} className="mt-2 flex items-center gap-4">
               <Checkbox
                 className="data-[state=checked]:bg-primary border-foreground/30 h-5 w-5"
+                id={`checkbox-${value.id}-${index}`}
                 checked={value.checked}
                 onCheckedChange={(checked) => handleCheckboxValue(index, 'checked', checked)}
               />
