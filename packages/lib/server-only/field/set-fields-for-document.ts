@@ -72,6 +72,22 @@ export const setFieldsForDocument = async ({
     });
   }
 
+  // Check that every signer has a signature field
+  const signers = document.recipients.filter((recipient) => recipient.role === 'SIGNER');
+  const hasEverySignerSignature = signers.every((signer) =>
+    fields.some(
+      (field) =>
+        (field.type === FieldType.SIGNATURE || field.type === FieldType.FREE_SIGNATURE) &&
+        field.recipientId === signer.id,
+    ),
+  );
+
+  if (!hasEverySignerSignature) {
+    throw new AppError(AppErrorCode.INVALID_REQUEST, {
+      message: 'Every signer must have at least one signature field',
+    });
+  }
+
   if (document.completedAt) {
     throw new AppError(AppErrorCode.INVALID_REQUEST, {
       message: 'Document already complete',
@@ -94,9 +110,7 @@ export const setFieldsForDocument = async ({
   const linkedFields = fields.map((field) => {
     const existing = existingFields.find((existingField) => existingField.id === field.id);
 
-    const recipient = document.recipients.find(
-      (recipient) => recipient.email.toLowerCase() === field.signerEmail.toLowerCase(),
-    );
+    const recipient = document.recipients.find((recipient) => recipient.id === field.recipientId);
 
     // Each field MUST have a recipient associated with it.
     if (!recipient) {
@@ -236,10 +250,8 @@ export const setFieldsForDocument = async ({
             },
             recipient: {
               connect: {
-                documentId_email: {
-                  documentId,
-                  email: fieldSignerEmail,
-                },
+                documentId,
+                id: field.recipientId,
               },
             },
           },
@@ -340,6 +352,7 @@ type FieldData = {
   id?: number | null;
   type: FieldType;
   signerEmail: string;
+  recipientId: number;
   pageNumber: number;
   pageX: number;
   pageY: number;
