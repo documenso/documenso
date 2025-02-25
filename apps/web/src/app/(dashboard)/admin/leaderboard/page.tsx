@@ -40,7 +40,6 @@ export default async function Leaderboard({ searchParams = {} }: AdminLeaderboar
     sortOrder,
   });
 
-  // Ensure all required properties are defined and match the expected types
   const typedSigningVolume: SigningVolume[] = leaderboard.map((item) => ({
     ...item,
     name: item.name || '',
