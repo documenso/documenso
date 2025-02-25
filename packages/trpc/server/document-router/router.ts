@@ -65,7 +65,7 @@ export const documentRouter = router({
     .input(ZGetDocumentByIdQuerySchema)
     .query(async ({ input, ctx }) => {
       const { teamId } = ctx;
-      const { documentId } = input;
+      const { documentId, includeCertificate, includeAuditLog } = input;
 
       return await getDocumentById({
         userId: ctx.user.id,

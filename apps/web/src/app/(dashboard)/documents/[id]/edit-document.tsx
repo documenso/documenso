@@ -187,6 +187,8 @@ export const EditDocumentForm = ({
           title: data.title,
           externalId: data.externalId || null,
           visibility: data.visibility,
+          includeSigningCertificate: data.includeSigningCertificate,
+          includeAuditTrailLog: data.includeAuditTrailLog,
           globalAccessAuth: data.globalAccessAuth ?? null,
           globalActionAuth: data.globalActionAuth ?? null,
         },
