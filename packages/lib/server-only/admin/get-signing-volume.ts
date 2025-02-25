@@ -83,11 +83,12 @@ export const getSigningVolume = async ({
     filteredSubscriptions.map(async (subscription) => {
       let signingVolume = 0;
 
-      if (subscription.userId) {
+      if (subscription.userId && !subscription.teamId) {
         const personalCount = await prisma.document.count({
           where: {
             userId: subscription.userId,
             status: DocumentStatus.COMPLETED,
+            teamId: null,
           },
         });
 
