@@ -5,6 +5,7 @@ import { z } from 'zod';
 import { createTeamCustomer } from '@documenso/ee/server-only/stripe/create-team-customer';
 import { getTeamRelatedPrices } from '@documenso/ee/server-only/stripe/get-team-related-prices';
 import { mapStripeSubscriptionToPrismaUpsertAction } from '@documenso/ee/server-only/stripe/webhook/on-subscription-updated';
+import { isDocumentPlatform as isUserPlatformPlan } from '@documenso/ee/server-only/util/is-document-platform';
 import { IS_BILLING_ENABLED } from '@documenso/lib/constants/app';
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import { subscriptionsContainsActivePlan } from '@documenso/lib/utils/billing';
@@ -58,6 +59,11 @@ export const createTeam = async ({
     include: {
       subscriptions: true,
     },
+  });
+
+  const isPlatformPlan = await isUserPlatformPlan({
+    userId: user.id,
+    teamId: null,
   });
 
   let isPaymentRequired = IS_BILLING_ENABLED();
