@@ -1,0 +1,89 @@
+---
+title: Web Components Integration
+description: Learn how to use our embedding SDK via Web Components on a framework-less web application.
+---
+
+# Web Components Integration
+
+Our Web Components SDK provides a simple way to embed a signing experience within your framework-less web application. It supports both direct link templates and signing tokens.
+
+## Installation
+
+To install the SDK, run the following command:
+
+```bash
+npm install @documenso/embed-webcomponent
+```
+
+Then in your html file, add the following to add the script, replacing the path with the proper path to the web component script.
+
+```html
+<script src="YOUR_PATH_HERE"></script>
+```
+
+## Usage
+
+To embed a signing experience, you'll need to provide the token for the document you want to embed. This can be done in a few different ways, depending on your use case.
+
+### Direct Link Template
+
+If you have a direct link template, you can simply provide the token for the template to the `documenso-embed-direct-template` tag.
+
+```html
+<documenso-embed-direct-template
+  token="YOUR_TOKEN_HERE"
+</documenso-embed-direct-template>
+```
+
+#### Attributes
+
+| Attribute                | Type                | Description                                                                                |
+| ------------------- | ------------------- | ------------------------------------------------------------------------------------------ |
+| token               | string              | The token for the document you want to embed                                               |
+| host                | string (optional)   | The host to be used for the signing experience, relevant for self-hosters                  |
+| name                | string (optional)   | The name the signer that will be used by default for signing                               |
+| lockName            | boolean (optional)  | Whether or not the name field should be locked disallowing modifications                   |
+| email               | string (optional)   | The email the signer that will be used by default for signing                              |
+| lockEmail           | boolean (optional)  | Whether or not the email field should be locked disallowing modifications                  |
+| onDocumentReady     | function (optional) | A callback function that will be called when the document is loaded and ready to be signed |
+| onDocumentCompleted | function (optional) | A callback function that will be called when the document has been completed               |
+| onDocumentError     | function (optional) | A callback function that will be called when an error occurs with the document             |
+| onFieldSigned       | function (optional) | A callback function that will be called when a field is signed                             |
+| onFieldUnsigned     | function (optional) | A callback function that will be called when a field is unsigned                           |
+
+### Signing Token
+
+If you have a signing token, you can provide it to the `documenso-embed-sign-document` tag.
+
+```html
+<documenso-embed-sign-document
+  token="YOUR_TOKEN_HERE"
+</documenso-embed-sign-document>
+```
+
+#### Attributes
+
+| Attribute                | Type                | Description                                                                                |
+| ------------------- | ------------------- | ------------------------------------------------------------------------------------------ |
+| token               | string              | The token for the document you want to embed                                               |
+| host                | string (optional)   | The host to be used for the signing experience, relevant for self-hosters                  |
+| name                | string (optional)   | The name the signer that will be used by default for signing                               |
+| lockName            | boolean (optional)  | Whether or not the name field should be locked disallowing modifications                   |
+| onDocumentReady     | function (optional) | A callback function that will be called when the document is loaded and ready to be signed |
+| onDocumentCompleted | function (optional) | A callback function that will be called when the document has been completed               |
+| onDocumentError     | function (optional) | A callback function that will be called when an error occurs with the document             |
+
+### Creating via JavaScript
+
+You can also create the tag element using javascript, for dynamic generation of either modes. For example, this would add the sign document embed to the DOM.
+
+```javascript
+document.getElementById('my-wrapper-here').innerHTML = '';
+
+const tag = document.createElement('documenso-embed-sign-document');
+tag.setAttribute('token', data.token);
+tag.style.width = '100%';
+tag.style.height = '100%';
+
+document.getElementById('my-wrapper-here').appendChild(tag);
+```
