@@ -2,6 +2,7 @@ import { notFound } from 'next/navigation';
 
 import { match } from 'ts-pattern';
 
+import { isCommunityPlan as isUserCommunityPlan } from '@documenso/ee/server-only/util/is-community-plan';
 import { isUserEnterprise } from '@documenso/ee/server-only/util/is-document-enterprise';
 import { isDocumentPlatform } from '@documenso/ee/server-only/util/is-document-platform';
 import { IS_BILLING_ENABLED } from '@documenso/lib/constants/app';
@@ -55,9 +56,13 @@ export default async function EmbedDirectTemplatePage({ params }: EmbedDirectTem
     documentAuth: template.authOptions,
   });
 
-  const [isPlatformDocument, isEnterpriseDocument] = await Promise.all([
+  const [isPlatformDocument, isEnterpriseDocument, isCommunityPlan] = await Promise.all([
     isDocumentPlatform(template),
     isUserEnterprise({
+      userId: template.userId,
+      teamId: template.teamId ?? undefined,
+    }),
+    isUserCommunityPlan({
       userId: template.userId,
       teamId: template.teamId ?? undefined,
     }),
@@ -106,7 +111,7 @@ export default async function EmbedDirectTemplatePage({ params }: EmbedDirectTem
             fields={fields}
             metadata={template.templateMeta}
             hidePoweredBy={isPlatformDocument || isEnterpriseDocument || hidePoweredBy}
-            isPlatformOrEnterprise={isPlatformDocument || isEnterpriseDocument}
+            allowWhiteLabelling={isCommunityPlan || isPlatformDocument || isEnterpriseDocument}
           />
         </RecipientProvider>
       </DocumentAuthProvider>

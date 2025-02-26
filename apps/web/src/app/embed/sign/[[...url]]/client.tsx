@@ -10,7 +10,13 @@ import { useThrottleFn } from '@documenso/lib/client-only/hooks/use-throttle-fn'
 import { PDF_VIEWER_PAGE_SELECTOR } from '@documenso/lib/constants/pdf-viewer';
 import { validateFieldsInserted } from '@documenso/lib/utils/fields';
 import type { DocumentMeta, TemplateMeta } from '@documenso/prisma/client';
-import { type DocumentData, type Field, FieldType, RecipientRole } from '@documenso/prisma/client';
+import {
+  type DocumentData,
+  type Field,
+  FieldType,
+  RecipientRole,
+  SigningStatus,
+} from '@documenso/prisma/client';
 import type { RecipientWithFields } from '@documenso/prisma/types/recipient-with-fields';
 import { trpc } from '@documenso/trpc/react';
 import { FieldToolTip } from '@documenso/ui/components/field/field-tooltip';
@@ -26,11 +32,13 @@ import { useToast } from '@documenso/ui/primitives/use-toast';
 
 import { useRequiredSigningContext } from '~/app/(signing)/sign/[token]/provider';
 import { RecipientProvider } from '~/app/(signing)/sign/[token]/recipient-context';
+import { RejectDocumentDialog } from '~/app/(signing)/sign/[token]/reject-document-dialog';
 import { Logo } from '~/components/branding/logo';
 
 import { EmbedClientLoading } from '../../client-loading';
 import { EmbedDocumentCompleted } from '../../completed';
 import { EmbedDocumentFields } from '../../document-fields';
+import { EmbedDocumentRejected } from '../../rejected';
 import { injectCss } from '../../util';
 import { ZSignDocumentEmbedDataSchema } from './schema';
 
@@ -43,7 +51,7 @@ export type EmbedSignDocumentClientPageProps = {
   metadata?: DocumentMeta | TemplateMeta | null;
   isCompleted?: boolean;
   hidePoweredBy?: boolean;
-  isPlatformOrEnterprise?: boolean;
+  allowWhitelabelling?: boolean;
   allRecipients?: RecipientWithFields[];
 };
 
@@ -56,7 +64,7 @@ export const EmbedSignDocumentClientPage = ({
   metadata,
   isCompleted,
   hidePoweredBy = false,
-  isPlatformOrEnterprise = false,
+  allowWhitelabelling = false,
   allRecipients = [],
 }: EmbedSignDocumentClientPageProps) => {
   const { _ } = useLingui();
@@ -75,6 +83,9 @@ export const EmbedSignDocumentClientPage = ({
   const [hasFinishedInit, setHasFinishedInit] = useState(false);
   const [hasDocumentLoaded, setHasDocumentLoaded] = useState(false);
   const [hasCompletedDocument, setHasCompletedDocument] = useState(isCompleted);
+  const [hasRejectedDocument, setHasRejectedDocument] = useState(
+    recipient.signingStatus === SigningStatus.REJECTED,
+  );
   const [selectedSignerId, setSelectedSignerId] = useState<number | null>(
     allRecipients.length > 0 ? allRecipients[0].id : null,
   );
@@ -82,6 +93,8 @@ export const EmbedSignDocumentClientPage = ({
   const [isExpanded, setIsExpanded] = useState(false);
   const [isNameLocked, setIsNameLocked] = useState(false);
   const [showPendingFieldTooltip, setShowPendingFieldTooltip] = useState(false);
+
+  const [allowDocumentRejection, setAllowDocumentRejection] = useState(false);
 
   const selectedSigner = allRecipients.find((r) => r.id === selectedSignerId);
   const isAssistantMode = recipient.role === RecipientRole.ASSISTANT;
@@ -161,6 +174,25 @@ export const EmbedSignDocumentClientPage = ({
     }
   };
 
+  const onDocumentRejected = (reason: string) => {
+    if (window.parent) {
+      window.parent.postMessage(
+        {
+          action: 'document-rejected',
+          data: {
+            token,
+            documentId,
+            recipientId: recipient.id,
+            reason,
+          },
+        },
+        '*',
+      );
+    }
+
+    setHasRejectedDocument(true);
+  };
+
   useLayoutEffect(() => {
     const hash = window.location.hash.slice(1);
 
@@ -174,12 +206,13 @@ export const EmbedSignDocumentClientPage = ({
       // Since a recipient can be provided a name we can lock it without requiring
       // a to be provided by the parent application, unlike direct templates.
       setIsNameLocked(!!data.lockName);
+      setAllowDocumentRejection(!!data.allowDocumentRejection);
 
       if (data.darkModeDisabled) {
         document.documentElement.classList.add('dark-mode-disabled');
       }
 
-      if (isPlatformOrEnterprise) {
+      if (allowWhitelabelling) {
         injectCss({
           css: data.css,
           cssVars: data.cssVars,
@@ -208,6 +241,10 @@ export const EmbedSignDocumentClientPage = ({
     }
   }, [hasFinishedInit, hasDocumentLoaded]);
 
+  if (hasRejectedDocument) {
+    return <EmbedDocumentRejected name={fullName} />;
+  }
+
   if (hasCompletedDocument) {
     return (
       <EmbedDocumentCompleted
@@ -228,6 +265,16 @@ export const EmbedSignDocumentClientPage = ({
     <RecipientProvider recipient={recipient} targetSigner={selectedSigner ?? null}>
       <div className="embed--Root relative mx-auto flex min-h-[100dvh] max-w-screen-lg flex-col items-center justify-center p-6">
         {(!hasFinishedInit || !hasDocumentLoaded) && <EmbedClientLoading />}
+
+        {allowDocumentRejection && (
+          <div className="embed--Actions mb-4 flex w-full flex-row-reverse items-baseline justify-between">
+            <RejectDocumentDialog
+              document={{ id: documentId }}
+              token={token}
+              onRejected={onDocumentRejected}
+            />
+          </div>
+        )}
 
         <div className="embed--DocumentContainer relative flex w-full flex-col gap-x-6 gap-y-12 md:flex-row">
           {/* Viewer */}
@@ -420,7 +467,7 @@ export const EmbedSignDocumentClientPage = ({
                   </Button>
                 ) : (
                   <Button
-                    className="col-start-2"
+                    className={allowDocumentRejection ? 'col-start-2' : 'col-span-2'}
                     disabled={
                       isThrottled || (!isAssistantMode && hasSignatureField && !signatureValid)
                     }
