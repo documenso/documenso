@@ -1017,7 +1017,7 @@ msgstr "Si è verificato un errore durante lo spostamento del modello."
 #: apps/remix/app/components/general/document-signing/document-signing-email-field.tsx:115
 #: apps/remix/app/components/general/document-signing/document-signing-dropdown-field.tsx:136
 #: apps/remix/app/components/general/document-signing/document-signing-date-field.tsx:124
-#: apps/remix/app/components/general/document-signing/document-signing-checkbox-field.tsx:152
+#: apps/remix/app/components/general/document-signing/document-signing-checkbox-field.tsx:157
 msgid "An error occurred while removing the field."
 msgstr "Si è verificato un errore durante la rimozione del campo."
 
@@ -1045,7 +1045,7 @@ msgstr "Si è verificato un errore durante l'invio della tua email di conferma"
 #: apps/remix/app/components/general/document-signing/document-signing-email-field.tsx:88
 #: apps/remix/app/components/general/document-signing/document-signing-dropdown-field.tsx:103
 #: apps/remix/app/components/general/document-signing/document-signing-date-field.tsx:97
-#: apps/remix/app/components/general/document-signing/document-signing-checkbox-field.tsx:122
+#: apps/remix/app/components/general/document-signing/document-signing-checkbox-field.tsx:127
 msgid "An error occurred while signing as assistant."
 msgstr ""
 
@@ -1058,7 +1058,7 @@ msgstr ""
 #: apps/remix/app/components/general/document-signing/document-signing-email-field.tsx:89
 #: apps/remix/app/components/general/document-signing/document-signing-dropdown-field.tsx:104
 #: apps/remix/app/components/general/document-signing/document-signing-date-field.tsx:98
-#: apps/remix/app/components/general/document-signing/document-signing-checkbox-field.tsx:123
+#: apps/remix/app/components/general/document-signing/document-signing-checkbox-field.tsx:128
 msgid "An error occurred while signing the document."
 msgstr "Si è verificato un errore durante la firma del documento."
 
@@ -1071,7 +1071,7 @@ msgstr ""
 msgid "An error occurred while updating the document settings."
 msgstr "Si è verificato un errore durante l'aggiornamento delle impostazioni del documento."
 
-#: apps/remix/app/components/general/document-signing/document-signing-checkbox-field.tsx:210
+#: apps/remix/app/components/general/document-signing/document-signing-checkbox-field.tsx:215
 msgid "An error occurred while updating the signature."
 msgstr "Si è verificato un errore durante l'aggiornamento della firma."
 
@@ -2717,9 +2717,9 @@ msgstr "Inserisci il tuo testo qui"
 #: apps/remix/app/components/general/document-signing/document-signing-dropdown-field.tsx:135
 #: apps/remix/app/components/general/document-signing/document-signing-date-field.tsx:95
 #: apps/remix/app/components/general/document-signing/document-signing-date-field.tsx:123
-#: apps/remix/app/components/general/document-signing/document-signing-checkbox-field.tsx:120
-#: apps/remix/app/components/general/document-signing/document-signing-checkbox-field.tsx:151
-#: apps/remix/app/components/general/document-signing/document-signing-checkbox-field.tsx:209
+#: apps/remix/app/components/general/document-signing/document-signing-checkbox-field.tsx:125
+#: apps/remix/app/components/general/document-signing/document-signing-checkbox-field.tsx:156
+#: apps/remix/app/components/general/document-signing/document-signing-checkbox-field.tsx:214
 #: apps/remix/app/components/general/document-signing/document-signing-auto-sign.tsx:148
 #: apps/remix/app/components/general/document/document-upload.tsx:103
 #: apps/remix/app/components/general/document/document-edit-form.tsx:204
