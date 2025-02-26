@@ -15,7 +15,7 @@ import { cn } from '@documenso/ui/lib/utils';
 import { Card, CardContent } from '@documenso/ui/primitives/card';
 import { DocumentFlowFormContainer } from '@documenso/ui/primitives/document-flow/document-flow-root';
 import type { DocumentFlowStep } from '@documenso/ui/primitives/document-flow/types';
-import { LazyPDFViewer } from '@documenso/ui/primitives/lazy-pdf-viewer';
+import { PDFViewer } from '@documenso/ui/primitives/pdf-viewer';
 import { Stepper } from '@documenso/ui/primitives/stepper';
 import { AddTemplateFieldsFormPartial } from '@documenso/ui/primitives/template-flow/add-template-fields';
 import type { TAddTemplateFieldsFormSchema } from '@documenso/ui/primitives/template-flow/add-template-fields.types';
@@ -236,7 +236,7 @@ export const TemplateEditForm = ({
         gradient
       >
         <CardContent className="p-2">
-          <LazyPDFViewer
+          <PDFViewer
             key={templateDocumentData.id}
             documentData={templateDocumentData}
             onDocumentLoad={() => setIsDocumentPdfLoaded(true)}

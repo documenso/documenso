@@ -13,7 +13,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@documenso/ui/primitives/dialog';
-import { LazyPDFViewer } from '@documenso/ui/primitives/lazy-pdf-viewer';
+import { PDFViewer } from '@documenso/ui/primitives/pdf-viewer';
 import { useToast } from '@documenso/ui/primitives/use-toast';
 
 import { useOptionalCurrentTeam } from '~/providers/team';
@@ -97,7 +97,7 @@ export const DocumentDuplicateDialog = ({
           </div>
         ) : (
           <div className="p-2 [&>div]:h-[50vh] [&>div]:overflow-y-scroll">
-            <LazyPDFViewer key={document?.id} documentData={documentData} />
+            <PDFViewer key={document?.id} documentData={documentData} />
           </div>
         )}
 

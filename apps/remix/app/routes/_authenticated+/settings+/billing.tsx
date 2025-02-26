@@ -16,6 +16,7 @@ import { getSubscriptionsByUserId } from '@documenso/lib/server-only/subscriptio
 import { BillingPlans } from '~/components/general/billing-plans';
 import { BillingPortalButton } from '~/components/general/billing-portal-button';
 import { appMetaTags } from '~/utils/meta';
+import { superLoaderJson, useSuperLoaderData } from '~/utils/super-json-loader';
 
 import type { Route } from './+types/billing';
 
@@ -62,17 +63,17 @@ export async function loader({ request }: Route.LoaderArgs) {
   const isMissingOrInactiveOrFreePlan =
     !subscription || subscription.status === SubscriptionStatus.INACTIVE;
 
-  return {
+  return superLoaderJson({
     prices,
     subscription,
     subscriptionProductName: subscriptionProduct?.name,
     isMissingOrInactiveOrFreePlan,
-  };
+  });
 }
 
-export default function TeamsSettingBillingPage({ loaderData }: Route.ComponentProps) {
+export default function TeamsSettingBillingPage() {
   const { prices, subscription, subscriptionProductName, isMissingOrInactiveOrFreePlan } =
-    loaderData;
+    useSuperLoaderData<typeof loader>();
 
   const { i18n } = useLingui();
 

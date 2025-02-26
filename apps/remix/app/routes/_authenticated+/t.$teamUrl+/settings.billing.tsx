@@ -14,6 +14,7 @@ import { Card, CardContent } from '@documenso/ui/primitives/card';
 import { SettingsHeader } from '~/components/general/settings-header';
 import { TeamBillingPortalButton } from '~/components/general/teams/team-billing-portal-button';
 import { TeamSettingsBillingInvoicesTable } from '~/components/tables/team-settings-billing-invoices-table';
+import { superLoaderJson, useSuperLoaderData } from '~/utils/super-json-loader';
 
 import type { Route } from './+types/settings.billing';
 
@@ -31,16 +32,16 @@ export async function loader({ request, params }: Route.LoaderArgs) {
     teamSubscription = await stripe.subscriptions.retrieve(team.subscription.planId);
   }
 
-  return {
+  return superLoaderJson({
     team,
     teamSubscription,
-  };
+  });
 }
 
-export default function TeamsSettingBillingPage({ loaderData }: Route.ComponentProps) {
+export default function TeamsSettingBillingPage() {
   const { _ } = useLingui();
 
-  const { team, teamSubscription } = loaderData;
+  const { team, teamSubscription } = useSuperLoaderData<typeof loader>();
 
   const canManageBilling = canExecuteTeamAction('MANAGE_BILLING', team.currentTeamMember.role);
 

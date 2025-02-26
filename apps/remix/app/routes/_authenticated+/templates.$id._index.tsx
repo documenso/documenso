@@ -9,7 +9,7 @@ import { getTemplateById } from '@documenso/lib/server-only/template/get-templat
 import { formatDocumentsPath, formatTemplatesPath } from '@documenso/lib/utils/teams';
 import { Button } from '@documenso/ui/primitives/button';
 import { Card, CardContent } from '@documenso/ui/primitives/card';
-import { LazyPDFViewer } from '@documenso/ui/primitives/lazy-pdf-viewer';
+import { PDFViewer } from '@documenso/ui/primitives/pdf-viewer';
 
 import { TemplateBulkSendDialog } from '~/components/dialogs/template-bulk-send-dialog';
 import { TemplateDirectLinkDialogWrapper } from '~/components/dialogs/template-direct-link-dialog-wrapper';
@@ -144,11 +144,7 @@ export default function TemplatePage() {
           gradient
         >
           <CardContent className="p-2">
-            <LazyPDFViewer
-              document={template}
-              key={template.id}
-              documentData={templateDocumentData}
-            />
+            <PDFViewer document={template} key={template.id} documentData={templateDocumentData} />
           </CardContent>
         </Card>
 

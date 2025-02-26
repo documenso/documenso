@@ -4,7 +4,6 @@ import { DateTime } from 'luxon';
 
 import { getServerLimits } from '@documenso/ee/server-only/limits/server';
 import { NEXT_PUBLIC_WEBAPP_URL } from '@documenso/lib/constants/app';
-import { DOCUMENSO_ENCRYPTION_KEY } from '@documenso/lib/constants/crypto';
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import { encryptSecondaryData } from '@documenso/lib/server-only/crypto/encrypt';
 import { createDocumentData } from '@documenso/lib/server-only/document-data/create-document-data';
@@ -26,7 +25,6 @@ import { searchDocumentsWithKeyword } from '@documenso/lib/server-only/document/
 import { sendDocument } from '@documenso/lib/server-only/document/send-document';
 import { updateDocument } from '@documenso/lib/server-only/document/update-document';
 import { getTeamById } from '@documenso/lib/server-only/team/get-team';
-import { symmetricEncrypt } from '@documenso/lib/universal/crypto';
 import { getPresignPostUrl } from '@documenso/lib/universal/upload/server-actions';
 
 import { authenticatedProcedure, procedure, router } from '../trpc';
@@ -55,7 +53,6 @@ import {
   ZMoveDocumentToTeamSchema,
   ZResendDocumentMutationSchema,
   ZSearchDocumentsMutationSchema,
-  ZSetPasswordForDocumentMutationSchema,
   ZSetSigningOrderForDocumentMutationSchema,
   ZSuccessResponseSchema,
   ZUpdateDocumentRequestSchema,
@@ -440,35 +437,6 @@ export const documentRouter = router({
         documentId,
         teamId,
         userId,
-        requestMetadata: ctx.metadata,
-      });
-    }),
-
-  /**
-   * @private
-   */
-  setPasswordForDocument: authenticatedProcedure
-    .input(ZSetPasswordForDocumentMutationSchema)
-    .mutation(async ({ input, ctx }) => {
-      const { teamId } = ctx;
-      const { documentId, password } = input;
-
-      const key = DOCUMENSO_ENCRYPTION_KEY;
-
-      if (!key) {
-        throw new Error('Missing encryption key');
-      }
-
-      const securePassword = symmetricEncrypt({
-        data: password,
-        key,
-      });
-
-      await upsertDocumentMeta({
-        userId: ctx.user.id,
-        teamId,
-        documentId,
-        password: securePassword,
         requestMetadata: ctx.metadata,
       });
     }),

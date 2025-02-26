@@ -76,7 +76,7 @@
     "@babel/preset-typescript": "^7.26.0",
     "@lingui/babel-plugin-lingui-macro": "^5.2.0",
     "@lingui/vite-plugin": "^5.2.0",
-    "@react-router/dev": "^7.1.1",
+    "@react-router/dev": "^7.1.5",
     "@react-router/remix-routes-option-adapter": "^7.1.5",
     "@rollup/plugin-babel": "^6.0.4",
     "@rollup/plugin-commonjs": "^28.0.2",
