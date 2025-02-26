@@ -46,6 +46,7 @@ export default defineConfig({
       https: 'node:https',
       '.prisma/client/default': '../../node_modules/.prisma/client/default.js',
       '.prisma/client/index-browser': '../../node_modules/.prisma/client/index-browser.js',
+      canvas: './app/types/empty-module.ts',
     },
   },
   /**
