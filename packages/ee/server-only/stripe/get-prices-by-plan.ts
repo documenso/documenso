@@ -4,15 +4,14 @@ import { stripe } from '@documenso/lib/server-only/stripe';
 type PlanType = (typeof STRIPE_PLAN_TYPE)[keyof typeof STRIPE_PLAN_TYPE];
 
 export const getPricesByPlan = async (plan: PlanType | PlanType[]) => {
-  const planTypes = typeof plan === 'string' ? [plan] : plan;
+  const planTypes: string[] = typeof plan === 'string' ? [plan] : plan;
 
-  const query = planTypes.map((planType) => `metadata['plan']:'${planType}'`).join(' OR ');
-
-  const { data: prices } = await stripe.prices.search({
-    query,
+  const prices = await stripe.prices.list({
     expand: ['data.product'],
     limit: 100,
   });
 
-  return prices.filter((price) => price.type === 'recurring');
+  return prices.data.filter(
+    (price) => price.type === 'recurring' && planTypes.includes(price.metadata.plan),
+  );
 };
