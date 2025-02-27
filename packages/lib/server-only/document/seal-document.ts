@@ -22,6 +22,7 @@ import type { RequestMetadata } from '../../universal/extract-request-metadata';
 import { getFile } from '../../universal/upload/get-file';
 import { putPdfFile } from '../../universal/upload/put-file';
 import { fieldsContainUnsignedRequiredField } from '../../utils/advanced-fields-helpers';
+import { getAuditLogsPdf } from '../htmltopdf/get-audit-logs-pdf';
 import { getCertificatePdf } from '../htmltopdf/get-certificate-pdf';
 import { flattenAnnotations } from '../pdf/flatten-annotations';
 import { flattenForm } from '../pdf/flatten-form';
@@ -61,6 +62,7 @@ export const sealDocument = async ({
           teamGlobalSettings: {
             select: {
               includeSigningCertificate: true,
+              includeAuditTrailLog: true,
             },
           },
         },
@@ -109,13 +111,36 @@ export const sealDocument = async ({
   // !: Need to write the fields onto the document as a hard copy
   const pdfData = await getFile(documentData);
 
-  const certificateData =
-    (document.team?.teamGlobalSettings?.includeSigningCertificate ?? true)
-      ? await getCertificatePdf({
-          documentId,
-          language: document.documentMeta?.language,
-        }).catch(() => null)
-      : null;
+  let includeSigningCertificate;
+
+  if (document.teamId) {
+    includeSigningCertificate =
+      document.team?.teamGlobalSettings?.includeSigningCertificate ?? true;
+  } else {
+    includeSigningCertificate = document.includeSigningCertificate ?? true;
+  }
+
+  const certificateData = includeSigningCertificate
+    ? await getCertificatePdf({
+        documentId,
+        language: document.documentMeta?.language,
+      }).catch(() => null)
+    : null;
+
+  let includeAuditTrailLog;
+
+  if (document.teamId) {
+    includeAuditTrailLog = document.team?.teamGlobalSettings?.includeAuditTrailLog ?? true;
+  } else {
+    includeAuditTrailLog = document.includeAuditTrailLog ?? true;
+  }
+
+  const auditLogData = includeAuditTrailLog
+    ? await getAuditLogsPdf({
+        documentId,
+        language: document.documentMeta?.language,
+      }).catch(() => null)
+    : null;
 
   const doc = await PDFDocument.load(pdfData);
 
@@ -130,6 +155,16 @@ export const sealDocument = async ({
     const certificatePages = await doc.copyPages(certificate, certificate.getPageIndices());
 
     certificatePages.forEach((page) => {
+      doc.addPage(page);
+    });
+  }
+
+  if (auditLogData) {
+    const auditLog = await PDFDocument.load(auditLogData);
+
+    const auditLogPages = await doc.copyPages(auditLog, auditLog.getPageIndices());
+
+    auditLogPages.forEach((page) => {
       doc.addPage(page);
     });
   }
