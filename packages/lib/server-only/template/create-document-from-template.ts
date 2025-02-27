@@ -275,9 +275,9 @@ export const createDocumentFromTemplate = async ({
         .filter((id) => !allTemplateFieldIds.includes(id));
 
       if (invalidFieldIds.length > 0) {
-        throw new Error(
-          `The following field IDs do not exist in the template: ${invalidFieldIds.join(', ')}`,
-        );
+        throw new AppError(AppErrorCode.INVALID_BODY, {
+          message: `The following field IDs do not exist in the template: ${invalidFieldIds.join(', ')}`,
+        });
       }
     }
 
