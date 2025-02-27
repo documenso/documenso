@@ -28,6 +28,7 @@ export type CreateDocumentMetaOptions = {
   distributionMethod?: DocumentDistributionMethod;
   typedSignatureEnabled?: boolean;
   language?: SupportedLanguageCodes;
+  modifyNextSigner?: boolean;
   requestMetadata: ApiRequestMetadata;
 };
 
@@ -46,6 +47,7 @@ export const upsertDocumentMeta = async ({
   distributionMethod,
   typedSignatureEnabled,
   language,
+  modifyNextSigner,
   requestMetadata,
 }: CreateDocumentMetaOptions) => {
   const document = await prisma.document.findFirst({
@@ -98,6 +100,7 @@ export const upsertDocumentMeta = async ({
         distributionMethod,
         typedSignatureEnabled,
         language,
+        modifyNextSigner,
       },
       update: {
         subject,
@@ -111,6 +114,7 @@ export const upsertDocumentMeta = async ({
         distributionMethod,
         typedSignatureEnabled,
         language,
+        modifyNextSigner,
       },
     });
 
