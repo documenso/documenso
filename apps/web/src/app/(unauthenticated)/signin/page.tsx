@@ -38,6 +38,7 @@ export default async function SignInPage() {
           isGoogleSSOEnabled={IS_GOOGLE_SSO_ENABLED}
           isOIDCSSOEnabled={IS_OIDC_SSO_ENABLED}
           oidcProviderLabel={OIDC_PROVIDER_LABEL}
+          //Need to pass isOIDCDefault prop for enabling default OIDC login
         />
 
         {NEXT_PUBLIC_DISABLE_SIGNUP !== 'true' && (
