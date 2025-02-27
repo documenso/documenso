@@ -6,7 +6,7 @@ import {
   ZDocumentActionAuthTypesSchema,
 } from '@documenso/lib/types/document-auth';
 import { ZDocumentEmailSettingsSchema } from '@documenso/lib/types/document-email';
-import { ZFieldMetaNotOptionalSchema } from '@documenso/lib/types/field-meta';
+import { ZFieldMetaPrefillFieldsSchema } from '@documenso/lib/types/field-meta';
 import { ZFindResultResponse, ZFindSearchParamsSchema } from '@documenso/lib/types/search-params';
 import {
   ZTemplateLiteSchema,
@@ -72,7 +72,9 @@ export const ZCreateDocumentFromTemplateRequestSchema = z.object({
     .array(
       z.object({
         id: z.number().describe('The ID of the field in the template.'),
-        fieldMeta: ZFieldMetaNotOptionalSchema,
+        fieldMeta: ZFieldMetaPrefillFieldsSchema.describe(
+          'The field meta to prefill the field with.',
+        ),
       }),
     )
     .optional(),

@@ -17,8 +17,8 @@ import { AppError, AppErrorCode } from '../../errors/app-error';
 import { DOCUMENT_AUDIT_LOG_TYPE } from '../../types/document-audit-logs';
 import { ZRecipientAuthOptionsSchema } from '../../types/document-auth';
 import type { TDocumentEmailSettings } from '../../types/document-email';
-import type { TFieldMetaSchema } from '../../types/field-meta';
-import { ZFieldMetaSchema } from '../../types/field-meta';
+import type { TFieldMetaPrefillFieldsSchema } from '../../types/field-meta';
+import { ZFieldMetaPrefillFieldsSchema, ZFieldMetaSchema } from '../../types/field-meta';
 import {
   ZWebhookDocumentSchema,
   mapDocumentToWebhookDocumentPayload,
@@ -53,7 +53,7 @@ export type CreateDocumentFromTemplateOptions = {
   }[];
   prefillFields?: {
     id: number;
-    fieldMeta: TFieldMetaSchema;
+    fieldMeta: TFieldMetaPrefillFieldsSchema;
   }[];
   customDocumentDataId?: string;
 
@@ -291,15 +291,18 @@ export const createDocumentFromTemplate = async ({
       fieldsToCreate = fieldsToCreate.concat(
         fields.map((field) => {
           const prefillField = prefillFields?.find((value) => value?.id === field.id);
+          let updatedFieldMeta = field.fieldMeta;
 
-          if (prefillField?.fieldMeta) {
-            const fieldMeta = ZFieldMetaSchema.safeParse(prefillField.fieldMeta);
+          const parsedFieldMeta = ZFieldMetaPrefillFieldsSchema.safeParse(prefillField?.fieldMeta);
 
-            if (!fieldMeta.success) {
-              throw new Error(
-                `There has been an error parsing field meta for field ${field.id}: ${fieldMeta.error}`,
-              );
-            }
+          if (parsedFieldMeta.success && field.fieldMeta) {
+            const prefillData = parsedFieldMeta.data || {};
+
+            updatedFieldMeta = {
+              ...field.fieldMeta,
+              label: prefillData.label ?? field.fieldMeta.label,
+              placeholder: prefillData.placeholder ?? field.fieldMeta.placeholder,
+            };
           }
 
           return {
@@ -313,7 +316,7 @@ export const createDocumentFromTemplate = async ({
             height: field.height,
             customText: '',
             inserted: false,
-            fieldMeta: prefillField?.fieldMeta ?? field.fieldMeta,
+            fieldMeta: updatedFieldMeta,
           };
         }),
       );
