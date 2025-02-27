@@ -119,6 +119,21 @@ export const run = async ({
     documentData.data = documentData.initialData;
   }
 
+  const existingDocumentAccessToken = await prisma.documentAccessToken.findUnique({
+    where: {
+      documentId: document.id,
+    },
+  });
+
+  if (!existingDocumentAccessToken) {
+    await prisma.documentAccessToken.create({
+      data: {
+        token: nanoid(),
+        documentId: document.id,
+      },
+    });
+  }
+
   const pdfData = await getFile(documentData);
 
   const certificateData =
