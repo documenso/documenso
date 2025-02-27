@@ -1,6 +1,7 @@
 import { useEffect } from 'react';
 
 import Plausible from 'plausible-tracker';
+import posthog from 'posthog-js';
 import {
   Links,
   Meta,
@@ -180,6 +181,7 @@ export function ErrorBoundary({ error }: Route.ErrorBoundaryProps) {
 
   if (errorCode !== 404) {
     console.error('[RootErrorBoundary]', error);
+    posthog.captureException(error);
   }
 
   return <GenericErrorLayout errorCode={errorCode} />;
