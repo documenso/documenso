@@ -647,8 +647,6 @@ model TeamMemberInvite {
   role      TeamMemberRole
   token     String                 @unique
   team      Team                   @relation(fields: [teamId], references: [id], onDelete: Cascade)
-
-  @@unique([teamId, email])
 }
 
 enum TemplateType {

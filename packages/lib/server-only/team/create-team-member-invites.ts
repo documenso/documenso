@@ -65,7 +65,9 @@ export const createTeamMemberInvites = async ({
   });
 
   const teamMemberEmails = team.members.map((member) => member.user.email);
-  const teamMemberInviteEmails = team.invites.map((invite) => invite.email);
+  const teamMemberInviteEmails = team.invites
+    .filter((invite) => invite.status === TeamMemberInviteStatus.PENDING)
+    .map((invite) => invite.email);
   const currentTeamMember = team.members.find((member) => member.user.id === userId);
 
   if (!currentTeamMember) {

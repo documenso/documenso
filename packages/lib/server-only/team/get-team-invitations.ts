@@ -1,3 +1,4 @@
+import { TeamMemberInviteStatus } from '@prisma/client';
 import type { z } from 'zod';
 
 import { prisma } from '@documenso/prisma';
@@ -25,6 +26,7 @@ export const getTeamInvitations = async ({
   return await prisma.teamMemberInvite.findMany({
     where: {
       email,
+      status: TeamMemberInviteStatus.PENDING,
     },
     include: {
       team: {

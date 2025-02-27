@@ -1,5 +1,5 @@
 import type { TeamMemberInvite } from '@prisma/client';
-import { Prisma } from '@prisma/client';
+import { Prisma, TeamMemberInviteStatus } from '@prisma/client';
 import { P, match } from 'ts-pattern';
 import type { z } from 'zod';
 
@@ -71,6 +71,7 @@ export const findTeamMemberInvites = async ({
   const whereClause: Prisma.TeamMemberInviteWhereInput = {
     ...termFilters,
     teamId: userTeam.id,
+    status: TeamMemberInviteStatus.PENDING,
   };
 
   const [data, count] = await Promise.all([
