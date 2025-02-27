@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useId, useLayoutEffect, useState } from 'react';
+import { useEffect, useId, useLayoutEffect, useRef, useState } from 'react';
 
 import { Trans, msg } from '@lingui/macro';
 import { useLingui } from '@lingui/react';
@@ -91,10 +91,13 @@ export const EmbedSignDocumentClientPage = ({
   );
 
   const [isExpanded, setIsExpanded] = useState(false);
+  const [hasAutoExpanded, setHasAutoExpanded] = useState(false);
   const [isNameLocked, setIsNameLocked] = useState(false);
   const [showPendingFieldTooltip, setShowPendingFieldTooltip] = useState(false);
 
   const [allowDocumentRejection, setAllowDocumentRejection] = useState(false);
+
+  const documentEndRef = useRef<HTMLDivElement>(null);
 
   const selectedSigner = allRecipients.find((r) => r.id === selectedSignerId);
   const isAssistantMode = recipient.role === RecipientRole.ASSISTANT;
@@ -241,6 +244,42 @@ export const EmbedSignDocumentClientPage = ({
     }
   }, [hasFinishedInit, hasDocumentLoaded]);
 
+  // Set up intersection observer to auto-expand widget when user reaches bottom of document
+  useEffect(() => {
+    if (!hasDocumentLoaded || !hasFinishedInit || hasAutoExpanded || isExpanded) {
+      return;
+    }
+
+    // Add a delay to ensure document has fully rendered and stabilized
+    const timeoutId = setTimeout(() => {
+      const pageCount = document.querySelectorAll(PDF_VIEWER_PAGE_SELECTOR).length;
+
+      // Only set up the observer if there's more than one page
+      if (pageCount <= 1) return;
+
+      const observer = new IntersectionObserver(
+        (entries) => {
+          const [entry] = entries;
+
+          if (entry.isIntersecting) {
+            setIsExpanded(true);
+            setHasAutoExpanded(true);
+            observer.disconnect();
+          }
+        },
+        { threshold: 1.0 },
+      );
+
+      if (documentEndRef.current) {
+        observer.observe(documentEndRef.current);
+      }
+    }, 1500); // 1.5 second delay
+
+    return () => {
+      clearTimeout(timeoutId);
+    };
+  }, [hasDocumentLoaded, hasFinishedInit, hasAutoExpanded, isExpanded]);
+
   if (hasRejectedDocument) {
     return <EmbedDocumentRejected name={fullName} />;
   }
@@ -283,6 +322,8 @@ export const EmbedSignDocumentClientPage = ({
               documentData={documentData}
               onDocumentLoad={() => setHasDocumentLoaded(true)}
             />
+            {/* Observer target at the bottom of the document */}
+            <div ref={documentEndRef} className="h-4 w-full" />
           </div>
 
           {/* Widget */}
@@ -303,19 +344,36 @@ export const EmbedSignDocumentClientPage = ({
                     )}
                   </h3>
 
-                  <Button variant="outline" className="h-8 w-8 p-0 md:hidden">
-                    {isExpanded ? (
-                      <LucideChevronDown
-                        className="text-muted-foreground h-5 w-5"
-                        onClick={() => setIsExpanded(false)}
-                      />
-                    ) : (
-                      <LucideChevronUp
-                        className="text-muted-foreground h-5 w-5"
-                        onClick={() => setIsExpanded(true)}
-                      />
-                    )}
-                  </Button>
+                  {isExpanded ? (
+                    <Button
+                      variant="outline"
+                      className="bg-background dark:bg-foreground h-8 w-8 p-0 md:hidden"
+                      onClick={() => setIsExpanded(false)}
+                    >
+                      <LucideChevronDown className="text-muted-foreground dark:text-background h-5 w-5" />
+                    </Button>
+                  ) : pendingFields.length > 0 ? (
+                    <Button
+                      variant="outline"
+                      className="bg-background dark:bg-foreground h-8 w-8 p-0 md:hidden"
+                      onClick={() => setIsExpanded(true)}
+                    >
+                      <LucideChevronUp className="text-muted-foreground dark:text-background h-5 w-5" />
+                    </Button>
+                  ) : (
+                    <Button
+                      variant="default"
+                      size="sm"
+                      className="md:hidden"
+                      disabled={
+                        isThrottled || (!isAssistantMode && hasSignatureField && !signatureValid)
+                      }
+                      loading={isSubmitting}
+                      onClick={() => throttledOnCompleteClick()}
+                    >
+                      <Trans>Complete</Trans>
+                    </Button>
+                  )}
                 </div>
               </div>
 
