@@ -123,6 +123,13 @@ export const ZFieldMetaNotOptionalSchema = z.discriminatedUnion('type', [
 
 export type TFieldMetaNotOptionalSchema = z.infer<typeof ZFieldMetaNotOptionalSchema>;
 
+export const ZFieldMetaPrefillFieldsSchema = ZBaseFieldMeta.pick({
+  label: true,
+  placeholder: true,
+});
+
+export type TFieldMetaPrefillFieldsSchema = z.infer<typeof ZFieldMetaPrefillFieldsSchema>;
+
 export const ZFieldMetaSchema = z
   .union([
     // Handles an empty object being provided as fieldMeta.
