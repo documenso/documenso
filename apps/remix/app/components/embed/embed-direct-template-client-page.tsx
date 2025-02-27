@@ -347,7 +347,7 @@ export const EmbedDirectTemplateClientPage = ({
         {/* Widget */}
         <div
           key={isExpanded ? 'expanded' : 'collapsed'}
-          className="group/document-widget fixed bottom-8 left-0 z-50 h-fit w-full flex-shrink-0 px-6 md:sticky md:top-4 md:z-auto md:w-[350px] md:px-0"
+          className="group/document-widget fixed bottom-8 left-0 z-50 h-fit max-h-[calc(100dvh-2rem)] w-full flex-shrink-0 px-6 md:sticky md:top-4 md:z-auto md:w-[350px] md:px-0"
           data-expanded={isExpanded || undefined}
         >
           <div className="border-border bg-widget flex h-fit w-full flex-col rounded-xl border px-4 py-4 md:min-h-[min(calc(100dvh-2rem),48rem)] md:py-6">

@@ -145,7 +145,9 @@ export default function EmbedDirectTemplatePage() {
             recipient={recipient}
             fields={fields}
             metadata={template.templateMeta}
-            hidePoweredBy={isPlatformDocument || isEnterpriseDocument || hidePoweredBy}
+            hidePoweredBy={
+              isCommunityPlan || isPlatformDocument || isEnterpriseDocument || hidePoweredBy
+            }
             allowWhiteLabelling={isCommunityPlan || isPlatformDocument || isEnterpriseDocument}
           />
         </DocumentSigningRecipientProvider>
