@@ -123,6 +123,23 @@ export const ZFieldMetaNotOptionalSchema = z.discriminatedUnion('type', [
 
 export type TFieldMetaNotOptionalSchema = z.infer<typeof ZFieldMetaNotOptionalSchema>;
 
+export const ZFieldMetaPrefillFieldsSchema = ZBaseFieldMeta.pick({
+  label: true,
+  placeholder: true,
+})
+  .extend({
+    type: z
+      .literal('text')
+      .or(
+        z
+          .literal('number')
+          .or(z.literal('radio').or(z.literal('checkbox').or(z.literal('dropdown')))),
+      ),
+  })
+  .strict();
+
+export type TFieldMetaPrefillFieldsSchema = z.infer<typeof ZFieldMetaPrefillFieldsSchema>;
+
 export const ZFieldMetaSchema = z
   .union([
     // Handles an empty object being provided as fieldMeta.
