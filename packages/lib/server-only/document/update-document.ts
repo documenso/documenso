@@ -21,6 +21,8 @@ export type UpdateDocumentOptions = {
     title?: string;
     externalId?: string | null;
     visibility?: DocumentVisibility | null;
+    includeSigningCertificate?: boolean;
+    includeAuditTrailLog?: boolean;
     globalAccessAuth?: TDocumentAccessAuthTypes | null;
     globalActionAuth?: TDocumentActionAuthTypes | null;
   };
@@ -156,6 +158,12 @@ export const updateDocument = async ({
     documentGlobalActionAuth === undefined || documentGlobalActionAuth === newGlobalActionAuth;
   const isDocumentVisibilitySame =
     data.visibility === undefined || data.visibility === document.visibility;
+  const isIncludeSigningCertificateSame =
+    data.includeSigningCertificate === undefined ||
+    data.includeSigningCertificate === document.includeSigningCertificate;
+  const isIncludeAuditTrailLogSame =
+    data.includeAuditTrailLog === undefined ||
+    data.includeAuditTrailLog === document.includeAuditTrailLog;
 
   const auditLogs: CreateDocumentAuditLogDataResponse[] = [];
 
@@ -235,6 +243,34 @@ export const updateDocument = async ({
     );
   }
 
+  if (!isIncludeSigningCertificateSame) {
+    auditLogs.push(
+      createDocumentAuditLogData({
+        type: DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_SIGNING_CERTIFICATE_UPDATED,
+        documentId,
+        metadata: requestMetadata,
+        data: {
+          from: String(document.includeSigningCertificate),
+          to: String(data.includeSigningCertificate || false),
+        },
+      }),
+    );
+  }
+
+  if (!isIncludeAuditTrailLogSame) {
+    auditLogs.push(
+      createDocumentAuditLogData({
+        type: DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_AUDIT_TRAIL_UPDATED,
+        documentId,
+        metadata: requestMetadata,
+        data: {
+          from: String(document.includeAuditTrailLog),
+          to: String(data.includeAuditTrailLog || false),
+        },
+      }),
+    );
+  }
+
   // Early return if nothing is required.
   if (auditLogs.length === 0) {
     return document;
@@ -254,6 +290,8 @@ export const updateDocument = async ({
         title: data.title,
         externalId: data.externalId,
         visibility: data.visibility as DocumentVisibility,
+        includeSigningCertificate: data.includeSigningCertificate,
+        includeAuditTrailLog: data.includeAuditTrailLog,
         authOptions,
       },
     });
