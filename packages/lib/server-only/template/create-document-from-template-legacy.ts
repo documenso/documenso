@@ -141,10 +141,8 @@ export const createDocumentFromTemplateLegacy = async ({
 
         return await prisma.recipient.upsert({
           where: {
-            documentId_email: {
-              documentId: document.id,
-              email: existingRecipient?.email ?? recipient.email,
-            },
+            documentId: document.id,
+            id: existingRecipient?.id,
           },
           update: {
             name: recipient.name,

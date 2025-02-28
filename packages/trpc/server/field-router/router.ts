@@ -232,8 +232,9 @@ export const fieldRouter = router({
         teamId,
         fields: fields.map((field) => ({
           id: field.nativeId,
-          signerEmail: field.signerEmail,
+          recipientId: field.recipientId,
           type: field.type,
+          signerEmail: field.signerEmail,
           pageNumber: field.pageNumber,
           pageX: field.pageX,
           pageY: field.pageY,
@@ -429,6 +430,7 @@ export const fieldRouter = router({
         teamId,
         fields: fields.map((field) => ({
           id: field.nativeId,
+          signerId: field.recipientId,
           signerEmail: field.signerEmail,
           type: field.type,
           pageNumber: field.pageNumber,
