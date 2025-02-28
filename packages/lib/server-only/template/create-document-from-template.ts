@@ -291,18 +291,44 @@ export const createDocumentFromTemplate = async ({
       fieldsToCreate = fieldsToCreate.concat(
         fields.map((field) => {
           const prefillField = prefillFields?.find((value) => value?.id === field.id);
+          const advancedField = ['NUMBER', 'RADIO', 'CHECKBOX', 'DROPDOWN', 'TEXT'].includes(
+            field.type,
+          );
+
           let updatedFieldMeta = field.fieldMeta;
 
-          const parsedFieldMeta = ZFieldMetaPrefillFieldsSchema.safeParse(prefillField?.fieldMeta);
+          if (prefillField?.fieldMeta) {
+            if (!advancedField) {
+              throw new AppError(AppErrorCode.INVALID_BODY, {
+                message: `Field ${field.id} is not an advanced field and cannot have field meta information.`,
+              });
+            }
 
-          if (parsedFieldMeta.success && field.fieldMeta) {
-            const prefillData = parsedFieldMeta.data || {};
+            const parsedFieldMeta = ZFieldMetaPrefillFieldsSchema.safeParse(prefillField.fieldMeta);
 
-            updatedFieldMeta = {
-              ...field.fieldMeta,
-              label: prefillData.label ?? field.fieldMeta.label,
-              placeholder: prefillData.placeholder ?? field.fieldMeta.placeholder,
-            };
+            if (parsedFieldMeta.success) {
+              const prefillData = parsedFieldMeta.data;
+
+              if (prefillData.type.toUpperCase() !== field.type) {
+                throw new AppError(AppErrorCode.INVALID_BODY, {
+                  message: `Field ${field.id} type mismatch: expected ${field.type}, got ${prefillData.type.toUpperCase()}`,
+                });
+              }
+
+              if (field.fieldMeta) {
+                updatedFieldMeta = {
+                  ...field.fieldMeta,
+                  label: prefillData.label ?? field.fieldMeta.label,
+                  placeholder: prefillData.placeholder ?? field.fieldMeta.placeholder,
+                };
+              } else {
+                updatedFieldMeta = {
+                  type: prefillData.type,
+                  label: prefillData.label,
+                  placeholder: prefillData.placeholder,
+                };
+              }
+            }
           }
 
           return {

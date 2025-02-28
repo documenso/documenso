@@ -126,7 +126,17 @@ export type TFieldMetaNotOptionalSchema = z.infer<typeof ZFieldMetaNotOptionalSc
 export const ZFieldMetaPrefillFieldsSchema = ZBaseFieldMeta.pick({
   label: true,
   placeholder: true,
-});
+})
+  .extend({
+    type: z
+      .literal('text')
+      .or(
+        z
+          .literal('number')
+          .or(z.literal('radio').or(z.literal('checkbox').or(z.literal('dropdown')))),
+      ),
+  })
+  .strict();
 
 export type TFieldMetaPrefillFieldsSchema = z.infer<typeof ZFieldMetaPrefillFieldsSchema>;
 
