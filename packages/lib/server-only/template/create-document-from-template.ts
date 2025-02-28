@@ -77,6 +77,53 @@ export type CreateDocumentFromTemplateOptions = {
   requestMetadata: ApiRequestMetadata;
 };
 
+const getUpdatedFieldMeta = (
+  field: Field,
+  prefillField?: { id: number; fieldMeta: TFieldMetaPrefillFieldsSchema },
+) => {
+  if (!prefillField?.fieldMeta) {
+    return field.fieldMeta;
+  }
+
+  const advancedField = ['NUMBER', 'RADIO', 'CHECKBOX', 'DROPDOWN', 'TEXT'].includes(field.type);
+
+  if (!advancedField) {
+    throw new AppError(AppErrorCode.INVALID_BODY, {
+      message: `Field ${field.id} is not an advanced field and cannot have field meta information. Allowed types: NUMBER, RADIO, CHECKBOX, DROPDOWN, TEXT.`,
+    });
+  }
+
+  const parsedFieldMeta = ZFieldMetaPrefillFieldsSchema.safeParse(prefillField.fieldMeta);
+
+  if (!parsedFieldMeta.success) {
+    throw new AppError(AppErrorCode.INVALID_BODY, {
+      message: `Invalid field meta for field ${field.id}: ${parsedFieldMeta.error.message}`,
+    });
+  }
+
+  const prefillData = parsedFieldMeta.data;
+
+  if (prefillData.type.toUpperCase() !== field.type) {
+    throw new AppError(AppErrorCode.INVALID_BODY, {
+      message: `Field ${field.id} type mismatch: expected ${field.type}, got ${prefillData.type.toUpperCase()}`,
+    });
+  }
+
+  if (field.fieldMeta) {
+    return {
+      ...field.fieldMeta,
+      label: prefillData.label ?? field.fieldMeta.label,
+      placeholder: prefillData.placeholder ?? field.fieldMeta.placeholder,
+    };
+  }
+
+  return {
+    type: prefillData.type,
+    label: prefillData.label,
+    placeholder: prefillData.placeholder,
+  };
+};
+
 export const createDocumentFromTemplate = async ({
   templateId,
   externalId,
@@ -291,45 +338,7 @@ export const createDocumentFromTemplate = async ({
       fieldsToCreate = fieldsToCreate.concat(
         fields.map((field) => {
           const prefillField = prefillFields?.find((value) => value?.id === field.id);
-          const advancedField = ['NUMBER', 'RADIO', 'CHECKBOX', 'DROPDOWN', 'TEXT'].includes(
-            field.type,
-          );
-
-          let updatedFieldMeta = field.fieldMeta;
-
-          if (prefillField?.fieldMeta) {
-            if (!advancedField) {
-              throw new AppError(AppErrorCode.INVALID_BODY, {
-                message: `Field ${field.id} is not an advanced field and cannot have field meta information.`,
-              });
-            }
-
-            const parsedFieldMeta = ZFieldMetaPrefillFieldsSchema.safeParse(prefillField.fieldMeta);
-
-            if (parsedFieldMeta.success) {
-              const prefillData = parsedFieldMeta.data;
-
-              if (prefillData.type.toUpperCase() !== field.type) {
-                throw new AppError(AppErrorCode.INVALID_BODY, {
-                  message: `Field ${field.id} type mismatch: expected ${field.type}, got ${prefillData.type.toUpperCase()}`,
-                });
-              }
-
-              if (field.fieldMeta) {
-                updatedFieldMeta = {
-                  ...field.fieldMeta,
-                  label: prefillData.label ?? field.fieldMeta.label,
-                  placeholder: prefillData.placeholder ?? field.fieldMeta.placeholder,
-                };
-              } else {
-                updatedFieldMeta = {
-                  type: prefillData.type,
-                  label: prefillData.label,
-                  placeholder: prefillData.placeholder,
-                };
-              }
-            }
-          }
+          const updatedFieldMeta = getUpdatedFieldMeta(field, prefillField);
 
           return {
             documentId: document.id,
