@@ -397,6 +397,7 @@ model DocumentMeta {
   document              Document                   @relation(fields: [documentId], references: [id], onDelete: Cascade)
   redirectUrl           String?
   signingOrder          DocumentSigningOrder       @default(PARALLEL)
+  modifyNextSigner      Boolean                    @default(false)
   typedSignatureEnabled Boolean                    @default(true)
   language              String                     @default("en")
   distributionMethod    DocumentDistributionMethod @default(EMAIL)
@@ -666,6 +667,7 @@ model TemplateMeta {
   signingOrder          DocumentSigningOrder?      @default(PARALLEL)
   typedSignatureEnabled Boolean                    @default(true)
   distributionMethod    DocumentDistributionMethod @default(EMAIL)
+  modifyNextSigner      Boolean                    @default(false)
 
   templateId    Int      @unique
   template      Template @relation(fields: [templateId], references: [id], onDelete: Cascade)
