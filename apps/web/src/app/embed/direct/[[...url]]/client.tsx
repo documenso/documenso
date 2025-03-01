@@ -49,7 +49,7 @@ export type EmbedDirectTemplateClientPageProps = {
   fields: Field[];
   metadata?: DocumentMeta | TemplateMeta | null;
   hidePoweredBy?: boolean;
-  isPlatformOrEnterprise?: boolean;
+  allowWhiteLabelling?: boolean;
 };
 
 export const EmbedDirectTemplateClientPage = ({
@@ -60,7 +60,7 @@ export const EmbedDirectTemplateClientPage = ({
   fields,
   metadata,
   hidePoweredBy = false,
-  isPlatformOrEnterprise = false,
+  allowWhiteLabelling = false,
 }: EmbedDirectTemplateClientPageProps) => {
   const { _ } = useLingui();
   const { toast } = useToast();
@@ -288,7 +288,7 @@ export const EmbedDirectTemplateClientPage = ({
         document.documentElement.classList.add('dark-mode-disabled');
       }
 
-      if (isPlatformOrEnterprise) {
+      if (allowWhiteLabelling) {
         injectCss({
           css: data.css,
           cssVars: data.cssVars,
@@ -349,7 +349,7 @@ export const EmbedDirectTemplateClientPage = ({
         {/* Widget */}
         <div
           key={isExpanded ? 'expanded' : 'collapsed'}
-          className="group/document-widget fixed bottom-8 left-0 z-50 h-fit w-full flex-shrink-0 px-6 md:sticky md:top-4 md:z-auto md:w-[350px] md:px-0"
+          className="group/document-widget fixed bottom-8 left-0 z-50 h-fit max-h-[calc(100dvh-2rem)] w-full flex-shrink-0 px-6 md:sticky md:top-4 md:z-auto md:w-[350px] md:px-0"
           data-expanded={isExpanded || undefined}
         >
           <div className="border-border bg-widget flex h-fit w-full flex-col rounded-xl border px-4 py-4 md:min-h-[min(calc(100dvh-2rem),48rem)] md:py-6">
@@ -360,19 +360,34 @@ export const EmbedDirectTemplateClientPage = ({
                   <Trans>Sign document</Trans>
                 </h3>
 
-                <Button variant="outline" className="h-8 w-8 p-0 md:hidden">
-                  {isExpanded ? (
-                    <LucideChevronDown
-                      className="text-muted-foreground h-5 w-5"
-                      onClick={() => setIsExpanded(false)}
-                    />
-                  ) : (
-                    <LucideChevronUp
-                      className="text-muted-foreground h-5 w-5"
-                      onClick={() => setIsExpanded(true)}
-                    />
-                  )}
-                </Button>
+                {isExpanded ? (
+                  <Button
+                    variant="outline"
+                    className="h-8 w-8 p-0 md:hidden"
+                    onClick={() => setIsExpanded(false)}
+                  >
+                    <LucideChevronDown className="text-muted-foreground h-5 w-5" />
+                  </Button>
+                ) : pendingFields.length > 0 ? (
+                  <Button
+                    variant="outline"
+                    className="h-8 w-8 p-0 md:hidden"
+                    onClick={() => setIsExpanded(true)}
+                  >
+                    <LucideChevronUp className="text-muted-foreground h-5 w-5" />
+                  </Button>
+                ) : (
+                  <Button
+                    variant="default"
+                    size="sm"
+                    className="md:hidden"
+                    disabled={isThrottled || (hasSignatureField && !signatureValid)}
+                    loading={isSubmitting}
+                    onClick={() => throttledOnCompleteClick()}
+                  >
+                    <Trans>Complete</Trans>
+                  </Button>
+                )}
               </div>
             </div>
 
