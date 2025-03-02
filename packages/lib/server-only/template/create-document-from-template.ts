@@ -1,3 +1,5 @@
+import { match } from 'ts-pattern';
+
 import { nanoid } from '@documenso/lib/universal/id';
 import { prisma } from '@documenso/prisma';
 import type { DocumentDistributionMethod } from '@documenso/prisma/client';
@@ -17,8 +19,20 @@ import { AppError, AppErrorCode } from '../../errors/app-error';
 import { DOCUMENT_AUDIT_LOG_TYPE } from '../../types/document-audit-logs';
 import { ZRecipientAuthOptionsSchema } from '../../types/document-auth';
 import type { TDocumentEmailSettings } from '../../types/document-email';
-import type { TFieldMetaPrefillFieldsSchema } from '../../types/field-meta';
-import { ZFieldMetaPrefillFieldsSchema, ZFieldMetaSchema } from '../../types/field-meta';
+import type {
+  TCheckboxFieldMeta,
+  TDropdownFieldMeta,
+  TFieldMetaPrefillFieldsSchema,
+  TNumberFieldMeta,
+  TRadioFieldMeta,
+  TTextFieldMeta,
+} from '../../types/field-meta';
+import {
+  ZCheckboxFieldMeta,
+  ZDropdownFieldMeta,
+  ZFieldMetaSchema,
+  ZRadioFieldMeta,
+} from '../../types/field-meta';
 import {
   ZWebhookDocumentSchema,
   mapDocumentToWebhookDocumentPayload,
@@ -51,10 +65,7 @@ export type CreateDocumentFromTemplateOptions = {
     email: string;
     signingOrder?: number | null;
   }[];
-  prefillFields?: {
-    id: number;
-    fieldMeta: TFieldMetaPrefillFieldsSchema;
-  }[];
+  prefillFields?: TFieldMetaPrefillFieldsSchema[];
   customDocumentDataId?: string;
 
   /**
@@ -77,11 +88,8 @@ export type CreateDocumentFromTemplateOptions = {
   requestMetadata: ApiRequestMetadata;
 };
 
-const getUpdatedFieldMeta = (
-  field: Field,
-  prefillField?: { id: number; fieldMeta: TFieldMetaPrefillFieldsSchema },
-) => {
-  if (!prefillField?.fieldMeta) {
+const getUpdatedFieldMeta = (field: Field, prefillField?: TFieldMetaPrefillFieldsSchema) => {
+  if (!prefillField) {
     return field.fieldMeta;
   }
 
@@ -93,35 +101,150 @@ const getUpdatedFieldMeta = (
     });
   }
 
-  const parsedFieldMeta = ZFieldMetaPrefillFieldsSchema.safeParse(prefillField.fieldMeta);
+  // We've already validated that the field types match at a higher level
+  // Start with the existing field meta or an empty object
+  const existingMeta = field.fieldMeta || {};
 
-  if (!parsedFieldMeta.success) {
-    throw new AppError(AppErrorCode.INVALID_BODY, {
-      message: `Invalid field meta for field ${field.id}: ${parsedFieldMeta.error.message}`,
-    });
-  }
+  // Apply type-specific updates based on the prefill field type using ts-pattern
+  return match(prefillField)
+    .with({ type: 'text' }, (field) => {
+      if (typeof field.value !== 'string') {
+        throw new AppError(AppErrorCode.INVALID_BODY, {
+          message: `Invalid value for TEXT field ${field.id}: expected string, got ${typeof field.value}`,
+        });
+      }
 
-  const prefillData = parsedFieldMeta.data;
+      const meta: TTextFieldMeta = {
+        ...existingMeta,
+        type: 'text',
+        label: field.label,
+        text: field.value,
+      };
 
-  if (prefillData.type.toUpperCase() !== field.type) {
-    throw new AppError(AppErrorCode.INVALID_BODY, {
-      message: `Field ${field.id} type mismatch: expected ${field.type}, got ${prefillData.type.toUpperCase()}`,
-    });
-  }
+      return meta;
+    })
+    .with({ type: 'number' }, (field) => {
+      if (typeof field.value !== 'string') {
+        throw new AppError(AppErrorCode.INVALID_BODY, {
+          message: `Invalid value for NUMBER field ${field.id}: expected string, got ${typeof field.value}`,
+        });
+      }
 
-  if (field.fieldMeta) {
-    return {
-      ...field.fieldMeta,
-      label: prefillData.label ?? field.fieldMeta.label,
-      placeholder: prefillData.placeholder ?? field.fieldMeta.placeholder,
-    };
-  }
+      const meta: TNumberFieldMeta = {
+        ...existingMeta,
+        type: 'number',
+        label: field.label,
+        value: field.value,
+      };
 
-  return {
-    type: prefillData.type,
-    label: prefillData.label,
-    placeholder: prefillData.placeholder,
-  };
+      return meta;
+    })
+    .with({ type: 'radio' }, (field) => {
+      if (typeof field.value !== 'string') {
+        throw new AppError(AppErrorCode.INVALID_BODY, {
+          message: `Invalid value for RADIO field ${field.id}: expected string, got ${typeof field.value}`,
+        });
+      }
+
+      const result = ZRadioFieldMeta.safeParse(existingMeta);
+
+      if (!result.success) {
+        throw new AppError(AppErrorCode.INVALID_BODY, {
+          message: `Invalid field meta for RADIO field ${field.id}`,
+        });
+      }
+
+      const radioMeta = result.data;
+
+      // Validate that the value exists in the options
+      const valueExists = radioMeta.values?.some((option) => option.value === field.value);
+
+      if (!valueExists) {
+        throw new AppError(AppErrorCode.INVALID_BODY, {
+          message: `Value "${field.value}" not found in options for RADIO field ${field.id}`,
+        });
+      }
+
+      const newValues = radioMeta.values?.map((option) => ({
+        ...option,
+        checked: option.value === field.value,
+      }));
+
+      const meta: TRadioFieldMeta = {
+        ...existingMeta,
+        type: 'radio',
+        label: field.label,
+        values: newValues,
+      };
+
+      return meta;
+    })
+    .with({ type: 'checkbox' }, (field) => {
+      const result = ZCheckboxFieldMeta.safeParse(existingMeta);
+
+      if (!result.success) {
+        throw new AppError(AppErrorCode.INVALID_BODY, {
+          message: `Invalid field meta for CHECKBOX field ${field.id}`,
+        });
+      }
+
+      const checkboxMeta = result.data;
+
+      // Validate that all values exist in the options
+      for (const value of field.value) {
+        const valueExists = checkboxMeta.values?.some((option) => option.value === value);
+
+        if (!valueExists) {
+          throw new AppError(AppErrorCode.INVALID_BODY, {
+            message: `Value "${value}" not found in options for CHECKBOX field ${field.id}`,
+          });
+        }
+      }
+
+      const newValues = checkboxMeta.values?.map((option) => ({
+        ...option,
+        checked: field.value.includes(option.value),
+      }));
+
+      const meta: TCheckboxFieldMeta = {
+        ...existingMeta,
+        type: 'checkbox',
+        label: field.label,
+        values: newValues,
+      };
+
+      return meta;
+    })
+    .with({ type: 'dropdown' }, (field) => {
+      const result = ZDropdownFieldMeta.safeParse(existingMeta);
+
+      if (!result.success) {
+        throw new AppError(AppErrorCode.INVALID_BODY, {
+          message: `Invalid field meta for DROPDOWN field ${field.id}`,
+        });
+      }
+
+      const dropdownMeta = result.data;
+
+      // Validate that the value exists in the options if values are defined
+      const valueExists = dropdownMeta.values?.some((option) => option.value === field.value);
+
+      if (!valueExists) {
+        throw new AppError(AppErrorCode.INVALID_BODY, {
+          message: `Value "${field.value}" not found in options for DROPDOWN field ${field.id}`,
+        });
+      }
+
+      const meta: TDropdownFieldMeta = {
+        ...existingMeta,
+        type: 'dropdown',
+        label: field.label,
+        defaultValue: field.value,
+      };
+
+      return meta;
+    })
+    .otherwise(() => field.fieldMeta);
 };
 
 export const createDocumentFromTemplate = async ({
@@ -317,6 +440,7 @@ export const createDocumentFromTemplate = async ({
     );
 
     if (prefillFields?.length) {
+      // Validate that all prefill field IDs exist in the template
       const invalidFieldIds = prefillFields
         .map((prefillField) => prefillField.id)
         .filter((id) => !allTemplateFieldIds.includes(id));
@@ -325,6 +449,29 @@ export const createDocumentFromTemplate = async ({
         throw new AppError(AppErrorCode.INVALID_BODY, {
           message: `The following field IDs do not exist in the template: ${invalidFieldIds.join(', ')}`,
         });
+      }
+
+      // Validate that all prefill fields have the correct type
+      for (const prefillField of prefillFields) {
+        const templateField = finalRecipients
+          .flatMap((recipient) => recipient.fields)
+          .find((field) => field.id === prefillField.id);
+
+        if (!templateField) {
+          // This should never happen due to the previous validation, but just in case
+          throw new AppError(AppErrorCode.INVALID_BODY, {
+            message: `Field with ID ${prefillField.id} not found in the template`,
+          });
+        }
+
+        const expectedType = templateField.type.toLowerCase();
+        const actualType = prefillField.type;
+
+        if (expectedType !== actualType) {
+          throw new AppError(AppErrorCode.INVALID_BODY, {
+            message: `Field type mismatch for field ${prefillField.id}: expected ${expectedType}, got ${actualType}`,
+          });
+        }
       }
     }
 
@@ -337,7 +484,8 @@ export const createDocumentFromTemplate = async ({
 
       fieldsToCreate = fieldsToCreate.concat(
         fields.map((field) => {
-          const prefillField = prefillFields?.find((value) => value?.id === field.id);
+          const prefillField = prefillFields?.find((value) => value.id === field.id);
+          // Use type assertion to help TypeScript understand the structure
           const updatedFieldMeta = getUpdatedFieldMeta(field, prefillField);
 
           return {

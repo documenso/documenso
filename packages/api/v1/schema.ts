@@ -309,16 +309,7 @@ export const ZGenerateDocumentFromTemplateMutationSchema = z.object({
     })
     .optional(),
   formValues: z.record(z.string(), z.union([z.string(), z.boolean(), z.number()])).optional(),
-  prefillFields: z
-    .array(
-      z.object({
-        id: z.number().describe('The ID of the field in the template.'),
-        fieldMeta: ZFieldMetaPrefillFieldsSchema.describe(
-          'The field meta to prefill the field with.',
-        ),
-      }),
-    )
-    .optional(),
+  prefillFields: z.array(ZFieldMetaPrefillFieldsSchema).optional(),
 });
 
 export type TGenerateDocumentFromTemplateMutationSchema = z.infer<
