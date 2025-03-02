@@ -110,7 +110,9 @@ export default async function EmbedDirectTemplatePage({ params }: EmbedDirectTem
             recipient={recipient}
             fields={fields}
             metadata={template.templateMeta}
-            hidePoweredBy={isPlatformDocument || isEnterpriseDocument || hidePoweredBy}
+            hidePoweredBy={
+              isCommunityPlan || isPlatformDocument || isEnterpriseDocument || hidePoweredBy
+            }
             allowWhiteLabelling={isCommunityPlan || isPlatformDocument || isEnterpriseDocument}
           />
         </RecipientProvider>
