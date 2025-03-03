@@ -1,5 +1,6 @@
 import { sValidator } from '@hono/standard-validator';
 import { compare } from '@node-rs/bcrypt';
+import { UserSecurityAuditLogType } from '@prisma/client';
 import { Hono } from 'hono';
 import { DateTime } from 'luxon';
 import { z } from 'zod';
@@ -22,7 +23,6 @@ import { updatePassword } from '@documenso/lib/server-only/user/update-password'
 import { verifyEmail } from '@documenso/lib/server-only/user/verify-email';
 import { env } from '@documenso/lib/utils/env';
 import { prisma } from '@documenso/prisma';
-import { UserSecurityAuditLogType } from '@documenso/prisma/client';
 
 import { AuthenticationErrorCode } from '../lib/errors/error-codes';
 import { getCsrfCookie } from '../lib/session/session-cookies';

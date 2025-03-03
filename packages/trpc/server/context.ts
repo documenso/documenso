@@ -1,3 +1,4 @@
+import type { Session } from '@prisma/client';
 import type { Context } from 'hono';
 import { z } from 'zod';
 
@@ -5,7 +6,6 @@ import type { SessionUser } from '@documenso/auth/server/lib/session/session';
 import { getOptionalSession } from '@documenso/auth/server/lib/utils/get-session';
 import type { ApiRequestMetadata } from '@documenso/lib/universal/extract-request-metadata';
 import { extractRequestMetadata } from '@documenso/lib/universal/extract-request-metadata';
-import type { Session } from '@documenso/prisma/client';
 
 type CreateTrpcContextOptions = {
   c: Context;

@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
+import { FieldType } from '@prisma/client';
 import { CopyPlus, Settings2, Trash } from 'lucide-react';
 import { createPortal } from 'react-dom';
 import { Rnd } from 'react-rnd';
@@ -8,7 +9,6 @@ import { match } from 'ts-pattern';
 import { PDF_VIEWER_PAGE_SELECTOR } from '@documenso/lib/constants/pdf-viewer';
 import type { TFieldMetaSchema } from '@documenso/lib/types/field-meta';
 import { ZCheckboxFieldMeta, ZRadioFieldMeta } from '@documenso/lib/types/field-meta';
-import { FieldType } from '@documenso/prisma/client';
 
 import { useSignerColors } from '../../lib/signer-colors';
 import { cn } from '../../lib/utils';

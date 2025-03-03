@@ -1,3 +1,4 @@
+import { UserSecurityAuditLogType } from '@prisma/client';
 import { OAuth2Client, decodeIdToken } from 'arctic';
 import type { Context } from 'hono';
 import { deleteCookie } from 'hono/cookie';
@@ -6,7 +7,6 @@ import { nanoid } from 'nanoid';
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import { onCreateUserHook } from '@documenso/lib/server-only/user/create-user';
 import { prisma } from '@documenso/prisma';
-import { UserSecurityAuditLogType } from '@documenso/prisma/client';
 
 import type { OAuthClientOptions } from '../../config';
 import { AuthenticationErrorCode } from '../errors/error-codes';

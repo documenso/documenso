@@ -1,16 +1,16 @@
 import { expect, test } from '@playwright/test';
-import { DateTime } from 'luxon';
-import path from 'node:path';
-
-import { getRecipientByEmail } from '@documenso/lib/server-only/recipient/get-recipient-by-email';
-import { prisma } from '@documenso/prisma';
 import {
   DocumentSigningOrder,
   DocumentStatus,
   FieldType,
   RecipientRole,
   SigningStatus,
-} from '@documenso/prisma/client';
+} from '@prisma/client';
+import { DateTime } from 'luxon';
+import path from 'node:path';
+
+import { getRecipientByEmail } from '@documenso/lib/server-only/recipient/get-recipient-by-email';
+import { prisma } from '@documenso/prisma';
 import {
   seedBlankDocument,
   seedPendingDocumentWithFullFields,

@@ -1,5 +1,6 @@
+import { TeamMemberRole } from '@prisma/client';
+
 import { prisma } from '@documenso/prisma';
-import { TeamMemberRole } from '@documenso/prisma/client';
 
 export type GetApiTokensOptions = {
   userId: number;

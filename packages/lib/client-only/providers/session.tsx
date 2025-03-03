@@ -1,12 +1,12 @@
 import { createContext, useCallback, useContext, useEffect, useState } from 'react';
 import React from 'react';
 
+import type { Session } from '@prisma/client';
 import { useLocation } from 'react-router';
 
 import { authClient } from '@documenso/auth/client';
 import type { SessionUser } from '@documenso/auth/server/lib/session/session';
 import { type TGetTeamsResponse } from '@documenso/lib/server-only/team/get-teams';
-import type { Session } from '@documenso/prisma/client';
 import { trpc } from '@documenso/trpc/client';
 
 export type AppSession = {

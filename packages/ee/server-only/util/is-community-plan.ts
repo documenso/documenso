@@ -1,6 +1,7 @@
+import type { Subscription } from '@prisma/client';
+
 import { subscriptionsContainsActivePlan } from '@documenso/lib/utils/billing';
 import { prisma } from '@documenso/prisma';
-import type { Subscription } from '@documenso/prisma/client';
 
 import { getCommunityPlanPriceIds } from '../stripe/get-community-plan-prices';
 

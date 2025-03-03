@@ -1,4 +1,16 @@
 import { extendZodWithOpenApi } from '@anatine/zod-openapi';
+import {
+  DocumentDataType,
+  DocumentDistributionMethod,
+  DocumentSigningOrder,
+  FieldType,
+  ReadStatus,
+  RecipientRole,
+  SendStatus,
+  SigningStatus,
+  TeamMemberRole,
+  TemplateType,
+} from '@prisma/client';
 import { z } from 'zod';
 
 import { DATE_FORMATS, DEFAULT_DOCUMENT_DATE_FORMAT } from '@documenso/lib/constants/date-formats';
@@ -12,18 +24,6 @@ import {
 } from '@documenso/lib/types/document-auth';
 import { ZDocumentEmailSettingsSchema } from '@documenso/lib/types/document-email';
 import { ZFieldMetaSchema } from '@documenso/lib/types/field-meta';
-import {
-  DocumentDataType,
-  DocumentDistributionMethod,
-  DocumentSigningOrder,
-  FieldType,
-  ReadStatus,
-  RecipientRole,
-  SendStatus,
-  SigningStatus,
-  TeamMemberRole,
-  TemplateType,
-} from '@documenso/prisma/client';
 
 extendZodWithOpenApi(z);
 

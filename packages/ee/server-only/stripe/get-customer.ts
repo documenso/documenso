@@ -1,7 +1,8 @@
+import type { User } from '@prisma/client';
+
 import { STRIPE_CUSTOMER_TYPE } from '@documenso/lib/constants/billing';
 import { stripe } from '@documenso/lib/server-only/stripe';
 import { prisma } from '@documenso/prisma';
-import type { User } from '@documenso/prisma/client';
 
 import { onSubscriptionUpdated } from './webhook/on-subscription-updated';
 

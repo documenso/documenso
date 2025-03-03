@@ -1,6 +1,6 @@
 import { expect, test } from '@playwright/test';
+import { DocumentStatus, TeamMemberRole } from '@prisma/client';
 
-import { DocumentStatus, TeamMemberRole } from '@documenso/prisma/client';
 import { seedDocuments, seedTeamDocuments } from '@documenso/prisma/seed/documents';
 import { seedTeam, seedTeamMember } from '@documenso/prisma/seed/teams';
 import { seedUser } from '@documenso/prisma/seed/users';
