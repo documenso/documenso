@@ -2804,6 +2804,8 @@ msgid "Field format"
 msgstr "Formato de campo"
 
 #: packages/ui/primitives/document-flow/field-items-advanced-settings/text-field.tsx
+#: packages/ui/primitives/document-flow/field-items-advanced-settings/radio-field.tsx
+#: packages/ui/primitives/document-flow/field-items-advanced-settings/checkbox-field.tsx
 msgid "Field label"
 msgstr "Etiqueta de campo"
 
@@ -3171,8 +3173,10 @@ msgid "Join {teamName} on Documenso"
 msgstr "Únete a {teamName} en Documenso"
 
 #: packages/ui/primitives/document-flow/field-items-advanced-settings/text-field.tsx
+#: packages/ui/primitives/document-flow/field-items-advanced-settings/radio-field.tsx
 #: packages/ui/primitives/document-flow/field-items-advanced-settings/number-field.tsx
 #: packages/ui/primitives/document-flow/field-items-advanced-settings/number-field.tsx
+#: packages/ui/primitives/document-flow/field-items-advanced-settings/checkbox-field.tsx
 msgid "Label"
 msgstr "Etiqueta"
 
