@@ -17,7 +17,6 @@ import type { RequestMetadata } from '../../universal/extract-request-metadata';
 import { getFileServerSide } from '../../universal/upload/get-file.server';
 import { putPdfFileServerSide } from '../../universal/upload/put-file.server';
 import { fieldsContainUnsignedRequiredField } from '../../utils/advanced-fields-helpers';
-import { getCertificatePdf } from '../htmltopdf/get-certificate-pdf';
 import { flattenAnnotations } from '../pdf/flatten-annotations';
 import { flattenForm } from '../pdf/flatten-form';
 import { insertFieldInPDF } from '../pdf/insert-field-in-pdf';
@@ -104,13 +103,14 @@ export const sealDocument = async ({
   // !: Need to write the fields onto the document as a hard copy
   const pdfData = await getFileServerSide(documentData);
 
-  const certificateData =
-    (document.team?.teamGlobalSettings?.includeSigningCertificate ?? true)
-      ? await getCertificatePdf({
-          documentId,
-          language: document.documentMeta?.language,
-        }).catch(() => null)
-      : null;
+  // debugging........
+  // const certificateData =
+  //   (document.team?.teamGlobalSettings?.includeSigningCertificate ?? true)
+  //     ? await getCertificatePdf({
+  //         documentId,
+  //         language: document.documentMeta?.language,
+  //       }).catch(() => null)
+  //     : null;
 
   const doc = await PDFDocument.load(pdfData);
 
@@ -119,15 +119,15 @@ export const sealDocument = async ({
   flattenForm(doc);
   flattenAnnotations(doc);
 
-  if (certificateData) {
-    const certificate = await PDFDocument.load(certificateData);
+  // if (certificateData) {
+  //   const certificate = await PDFDocument.load(certificateData);
 
-    const certificatePages = await doc.copyPages(certificate, certificate.getPageIndices());
+  //   const certificatePages = await doc.copyPages(certificate, certificate.getPageIndices());
 
-    certificatePages.forEach((page) => {
-      doc.addPage(page);
-    });
-  }
+  //   certificatePages.forEach((page) => {
+  //     doc.addPage(page);
+  //   });
+  // }
 
   for (const field of fields) {
     await insertFieldInPDF(doc, field);

@@ -103,6 +103,14 @@ module.exports = {
           900: '#364772',
           950: '#252d46',
         },
+        signer: {
+          green: 'hsl(var(--signer-green))',
+          blue: 'hsl(var(--signer-blue))',
+          purple: 'hsl(var(--signer-purple))',
+          orange: 'hsl(var(--signer-orange))',
+          yellow: 'hsl(var(--signer-yellow))',
+          pink: 'hsl(var(--signer-pink))',
+        },
       },
       backgroundImage: {
         'gradient-radial': 'radial-gradient(var(--tw-gradient-stops))',

@@ -2,16 +2,14 @@
 // !: therefore doing this at runtime is not possible without whitelisting a set of classnames.
 // !:
 // !: This will later be improved as we move to a CSS variable approach and rotate the lightness
+
 // !: values of the declared variable to do all the background, border and shadow styles.
 export const SIGNER_COLOR_STYLES = {
   green: {
     default: {
-      background: 'bg-[hsl(var(--signer-green))]',
-      base: 'rounded-lg shadow-[0_0_0_5px_hsl(var(--signer-green)/10%),0_0_0_2px_hsl(var(--signer-green)/60%),0_0_0_0.5px_hsl(var(--signer-green))]',
-      fieldItem:
-        'group/field-item p-2 border-none ring-none hover:bg-gradient-to-r hover:from-[hsl(var(--signer-green))]/10 hover:to-[hsl(var(--signer-green))]/10',
-      fieldItemInitials:
-        'opacity-0 transition duration-200 group-hover/field-item:opacity-100 group-hover/field-item:bg-[hsl(var(--signer-green))]',
+      base: 'ring-signer-green hover:bg-signer-green/30',
+      fieldItem: 'group/field-item rounded-sm',
+      fieldItemInitials: 'group-hover/field-item:bg-[hsl(var(--signer-green))]',
       comboxBoxItem:
         'hover:bg-[hsl(var(--signer-green)/15%)] active:bg-[hsl(var(--signer-green)/15%)]',
     },
@@ -19,12 +17,9 @@ export const SIGNER_COLOR_STYLES = {
 
   blue: {
     default: {
-      background: 'bg-[hsl(var(--signer-blue))]',
-      base: 'rounded-lg shadow-[0_0_0_5px_hsl(var(--signer-blue)/10%),0_0_0_2px_hsl(var(--signer-blue)/60%),0_0_0_0.5px_hsl(var(--signer-blue))]',
-      fieldItem:
-        'group/field-item p-2 border-none ring-none hover:bg-gradient-to-r hover:from-[hsl(var(--signer-blue))]/10 hover:to-[hsl(var(--signer-blue))]/10',
-      fieldItemInitials:
-        'opacity-0 transition duration-200 group-hover/field-item:opacity-100 group-hover/field-item:bg-[hsl(var(--signer-blue))]',
+      base: 'ring-signer-blue hover:bg-signer-blue/30',
+      fieldItem: 'group/field-item rounded-sm',
+      fieldItemInitials: 'group-hover/field-item:bg-[hsl(var(--signer-blue))]',
       comboxBoxItem:
         'hover:bg-[hsl(var(--signer-blue)/15%)] active:bg-[hsl(var(--signer-blue)/15%)]',
     },
@@ -32,12 +27,9 @@ export const SIGNER_COLOR_STYLES = {
 
   purple: {
     default: {
-      background: 'bg-[hsl(var(--signer-purple))]',
-      base: 'rounded-lg shadow-[0_0_0_5px_hsl(var(--signer-purple)/10%),0_0_0_2px_hsl(var(--signer-purple)/60%),0_0_0_0.5px_hsl(var(--signer-purple))]',
-      fieldItem:
-        'group/field-item p-2 border-none ring-none hover:bg-gradient-to-r hover:from-[hsl(var(--signer-purple))]/10 hover:to-[hsl(var(--signer-purple))]/10',
-      fieldItemInitials:
-        'opacity-0 transition duration-200 group-hover/field-item:opacity-100 group-hover/field-item:bg-[hsl(var(--signer-purple))]',
+      base: 'ring-signer-purple hover:bg-signer-purple/30',
+      fieldItem: 'group/field-item rounded-sm',
+      fieldItemInitials: 'group-hover/field-item:bg-[hsl(var(--signer-purple))]',
       comboxBoxItem:
         'hover:bg-[hsl(var(--signer-purple)/15%)] active:bg-[hsl(var(--signer-purple)/15%)]',
     },
@@ -45,12 +37,9 @@ export const SIGNER_COLOR_STYLES = {
 
   orange: {
     default: {
-      background: 'bg-[hsl(var(--signer-orange))]',
-      base: 'rounded-lg shadow-[0_0_0_5px_hsl(var(--signer-orange)/10%),0_0_0_2px_hsl(var(--signer-orange)/60%),0_0_0_0.5px_hsl(var(--signer-orange))]',
-      fieldItem:
-        'group/field-item p-2 border-none ring-none hover:bg-gradient-to-r hover:from-[hsl(var(--signer-orange))]/10 hover:to-[hsl(var(--signer-orange))]/10',
-      fieldItemInitials:
-        'opacity-0 transition duration-200 group-hover/field-item:opacity-100 group-hover/field-item:bg-[hsl(var(--signer-orange))]',
+      base: 'ring-signer-orange hover:bg-signer-orange/30',
+      fieldItem: 'group/field-item rounded-sm',
+      fieldItemInitials: 'group-hover/field-item:bg-[hsl(var(--signer-orange))]',
       comboxBoxItem:
         'hover:bg-[hsl(var(--signer-orange)/15%)] active:bg-[hsl(var(--signer-orange)/15%)]',
     },
@@ -58,12 +47,9 @@ export const SIGNER_COLOR_STYLES = {
 
   yellow: {
     default: {
-      background: 'bg-[hsl(var(--signer-yellow))]',
-      base: 'rounded-lg shadow-[0_0_0_5px_hsl(var(--signer-yellow)/10%),0_0_0_2px_hsl(var(--signer-yellow)/60%),0_0_0_0.5px_hsl(var(--signer-yellow))]',
-      fieldItem:
-        'group/field-item p-2 border-none ring-none hover:bg-gradient-to-r hover:from-[hsl(var(--signer-yellow))]/10 hover:to-[hsl(var(--signer-yellow))]/10',
-      fieldItemInitials:
-        'opacity-0 transition duration-200 group-hover/field-item:opacity-100 group-hover/field-item:bg-[hsl(var(--signer-yellow))]',
+      base: 'ring-signer-yellow hover:bg-signer-yellow/30',
+      fieldItem: 'group/field-item rounded-sm',
+      fieldItemInitials: 'group-hover/field-item:bg-[hsl(var(--signer-yellow))]',
       comboxBoxItem:
         'hover:bg-[hsl(var(--signer-yellow)/15%)] active:bg-[hsl(var(--signer-yellow)/15%)]',
     },
@@ -71,12 +57,9 @@ export const SIGNER_COLOR_STYLES = {
 
   pink: {
     default: {
-      background: 'bg-[hsl(var(--signer-pink))]',
-      base: 'rounded-lg shadow-[0_0_0_5px_hsl(var(--signer-pink)/10%),0_0_0_2px_hsl(var(--signer-pink)/60%),0_0_0_0.5px_hsl(var(--signer-pink))]',
-      fieldItem:
-        'group/field-item p-2 border-none ring-none hover:bg-gradient-to-r hover:from-[hsl(var(--signer-pink))]/10 hover:to-[hsl(var(--signer-pink))]/10',
-      fieldItemInitials:
-        'opacity-0 transition duration-200 group-hover/field-item:opacity-100 group-hover/field-item:bg-[hsl(var(--signer-pink))]',
+      base: 'ring-signer-pink hover:bg-signer-pink/30',
+      fieldItem: 'group/field-item rounded-sm',
+      fieldItemInitials: 'group-hover/field-item:bg-[hsl(var(--signer-pink))]',
       comboxBoxItem:
         'hover:bg-[hsl(var(--signer-pink)/15%)] active:bg-[hsl(var(--signer-pink)/15%)]',
     },

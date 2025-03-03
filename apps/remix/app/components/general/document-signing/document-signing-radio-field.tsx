@@ -157,17 +157,20 @@ export const DocumentSigningRadioField = ({
       )}
 
       {!field.inserted && (
-        <RadioGroup onValueChange={(value) => handleSelectItem(value)} className="z-10">
+        <RadioGroup
+          onValueChange={(value) => handleSelectItem(value)}
+          className="z-10 my-0.5 gap-y-1"
+        >
           {values?.map((item, index) => (
             <div key={index} className="flex items-center gap-x-1.5">
               <RadioGroupItem
-                className="h-4 w-4 shrink-0"
+                className="h-3 w-3 shrink-0"
                 value={item.value}
                 id={`option-${index}`}
                 checked={item.checked}
               />
 
-              <Label htmlFor={`option-${index}`}>
+              <Label htmlFor={`option-${index}`} className="text-xs font-normal">
                 {item.value.includes('empty-value-') ? '' : item.value}
               </Label>
             </div>
@@ -176,7 +179,7 @@ export const DocumentSigningRadioField = ({
       )}
 
       {field.inserted && (
-        <RadioGroup className="gap-y-1">
+        <RadioGroup className="my-0.5 gap-y-1">
           {values?.map((item, index) => (
             <div key={index} className="flex items-center gap-x-1.5">
               <RadioGroupItem
@@ -185,7 +188,7 @@ export const DocumentSigningRadioField = ({
                 id={`option-${index}`}
                 checked={item.value === field.customText}
               />
-              <Label htmlFor={`option-${index}`} className="text-xs">
+              <Label htmlFor={`option-${index}`} className="text-xs font-normal">
                 {item.value.includes('empty-value-') ? '' : item.value}
               </Label>
             </div>

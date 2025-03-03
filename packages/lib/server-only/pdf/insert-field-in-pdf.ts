@@ -36,7 +36,8 @@ export const insertFieldInPDF = async (pdf: PDFDocument, field: FieldWithSignatu
   const isSignatureField = isSignatureFieldType(field.type);
   const isDebugMode =
     // eslint-disable-next-line turbo/no-undeclared-env-vars
-    process.env.DEBUG_PDF_INSERT === '1' || process.env.DEBUG_PDF_INSERT === 'true';
+    false; // todo
+  // true || process.env.DEBUG_PDF_INSERT === '1' || process.env.DEBUG_PDF_INSERT === 'true';
 
   pdf.registerFontkit(fontkit);
 
@@ -227,8 +228,13 @@ export const insertFieldInPDF = async (pdf: PDFDocument, field: FieldWithSignatu
 
       const selected: string[] = fromCheckboxValue(field.customText);
 
+      const topPadding = 13;
+      const leftCheckboxPadding = 6;
+      const leftCheckboxLabelPadding = 12;
+      const checkboxSpaceY = 13;
+
       for (const [index, item] of (values ?? []).entries()) {
-        const offsetY = index * 16;
+        const offsetY = index * checkboxSpaceY + topPadding;
 
         const checkbox = pdf.getForm().createCheckBox(`checkbox.${field.secondaryId}.${index}`);
 
@@ -237,7 +243,7 @@ export const insertFieldInPDF = async (pdf: PDFDocument, field: FieldWithSignatu
         }
 
         page.drawText(item.value.includes('empty-value-') ? '' : item.value, {
-          x: fieldX + 16,
+          x: fieldX + leftCheckboxPadding + leftCheckboxLabelPadding,
           y: pageHeight - (fieldY + offsetY),
           size: 12,
           font,
@@ -245,7 +251,7 @@ export const insertFieldInPDF = async (pdf: PDFDocument, field: FieldWithSignatu
         });
 
         checkbox.addToPage(page, {
-          x: fieldX,
+          x: fieldX + leftCheckboxPadding,
           y: pageHeight - (fieldY + offsetY),
           height: 8,
           width: 8,
@@ -268,21 +274,28 @@ export const insertFieldInPDF = async (pdf: PDFDocument, field: FieldWithSignatu
 
       const selected = field.customText.split(',');
 
+      const topPadding = 13;
+      const leftRadioPadding = 6;
+      const leftRadioLabelPadding = 12;
+      const radioSpaceY = 13;
+
       for (const [index, item] of (values ?? []).entries()) {
-        const offsetY = index * 16;
+        const offsetY = index * radioSpaceY + topPadding;
 
         const radio = pdf.getForm().createRadioGroup(`radio.${field.secondaryId}.${index}`);
 
+        // Draw label.
         page.drawText(item.value.includes('empty-value-') ? '' : item.value, {
-          x: fieldX + 16,
+          x: fieldX + leftRadioPadding + leftRadioLabelPadding,
           y: pageHeight - (fieldY + offsetY),
           size: 12,
           font,
           rotate: degrees(pageRotationInDegrees),
         });
 
+        // Draw radio button.
         radio.addOptionToPage(item.value, page, {
-          x: fieldX,
+          x: fieldX + leftRadioPadding,
           y: pageHeight - (fieldY + offsetY),
           height: 8,
           width: 8,
@@ -308,7 +321,7 @@ export const insertFieldInPDF = async (pdf: PDFDocument, field: FieldWithSignatu
       const meta = Parser ? Parser.safeParse(field.fieldMeta) : null;
 
       const customFontSize = meta?.success && meta.data.fontSize ? meta.data.fontSize : null;
-      const textAlign = meta?.success && meta.data.textAlign ? meta.data.textAlign : 'center';
+      const textAlign = meta?.success && meta.data.textAlign ? meta.data.textAlign : 'left'; // ???
       const longestLineInTextForWidth = field.customText
         .split('\n')
         .sort((a, b) => b.length - a.length)[0];
@@ -325,41 +338,69 @@ export const insertFieldInPDF = async (pdf: PDFDocument, field: FieldWithSignatu
       textWidth = font.widthOfTextAtSize(longestLineInTextForWidth, fontSize);
 
       // Add padding similar to web display (roughly 0.5rem equivalent in PDF units)
-      const padding = 8; // PDF points, roughly equivalent to 0.5rem
+      const padding = 8; // Todo: Play around with this.
 
       // Calculate X position based on text alignment with padding
       let textX = fieldX + padding; // Left alignment starts after padding
+
       if (textAlign === 'center') {
         textX = fieldX + (fieldWidth - textWidth) / 2; // Center alignment ignores padding
       } else if (textAlign === 'right') {
         textX = fieldX + fieldWidth - textWidth - padding; // Right alignment respects right padding
       }
 
-      let textY = fieldY + (fieldHeight - textHeight) / 2;
-
       // Invert the Y axis since PDFs use a bottom-left coordinate system
-      textY = pageHeight - textY - textHeight;
+      let textFieldBoxY = pageHeight - fieldY - fieldHeight;
+      let textFieldBoxX = textX;
+
+      const textField = pdf.getForm().createTextField(`text.${field.secondaryId}`);
 
       if (pageRotationInDegrees !== 0) {
         const adjustedPosition = adjustPositionForRotation(
           pageWidth,
           pageHeight,
-          textX,
-          textY,
+          textFieldBoxX,
+          textFieldBoxY,
           pageRotationInDegrees,
         );
 
-        textX = adjustedPosition.xPos;
-        textY = adjustedPosition.yPos;
+        textFieldBoxX = adjustedPosition.xPos;
+        textFieldBoxY = adjustedPosition.yPos;
       }
 
-      page.drawText(field.customText, {
-        x: textX,
-        y: textY,
-        size: fontSize,
-        font,
+      if (isDebugMode) {
+        page.drawRectangle({
+          x: textFieldBoxX,
+          y: textFieldBoxY,
+          width: textWidth,
+          height: textHeight,
+          borderColor: rgb(1, 0, 0),
+          borderWidth: 1,
+          rotate: degrees(pageRotationInDegrees),
+        });
+      }
+
+      // Set the position and size of the text field
+      textField.addToPage(page, {
+        x: textFieldBoxX,
+        y: textFieldBoxY,
+        width: fieldWidth,
+        height: fieldHeight,
+        borderWidth: 0, // Hide border.
+        borderColor: rgb(1, 1, 1), // Hide border.
+        backgroundColor: undefined, // Makes transparent so background doesn't cover other text.
         rotate: degrees(pageRotationInDegrees),
+
+        // Draw debug box if debug mode is enabled.
+        ...(isDebugMode && {
+          borderColor: rgb(1, 0, 0),
+          borderWidth: 1,
+        }),
       });
+
+      // Set properties for the text field
+      textField.setFontSize(fontSize);
+      textField.setText(field.customText);
     });
 
   return pdf;

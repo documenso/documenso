@@ -277,12 +277,11 @@ export const DocumentSigningTextField = ({
         <div className="flex h-full w-full items-center">
           <p
             className={cn(
-              'text-muted-foreground dark:text-background/80 w-full text-[clamp(0.425rem,25cqw,0.825rem)] duration-200',
+              'text-muted-foreground dark:text-background/80 w-full text-left text-[clamp(0.425rem,25cqw,0.825rem)] duration-200',
               {
-                'text-left': parsedFieldMeta?.textAlign === 'left',
-                'text-center':
-                  !parsedFieldMeta?.textAlign || parsedFieldMeta?.textAlign === 'center',
-                'text-right': parsedFieldMeta?.textAlign === 'right',
+                // Todo: Test
+                '!text-center': parsedFieldMeta?.textAlign === 'center',
+                '!text-right': parsedFieldMeta?.textAlign === 'right',
               },
             )}
           >
@@ -304,11 +303,9 @@ export const DocumentSigningTextField = ({
               id="custom-text"
               placeholder={parsedFieldMeta?.placeholder ?? _(msg`Enter your text here`)}
               className={cn('mt-2 w-full rounded-md', {
-                'border-2 border-red-300 ring-2 ring-red-200 ring-offset-2 ring-offset-red-200 focus-visible:border-red-400 focus-visible:ring-4 focus-visible:ring-red-200 focus-visible:ring-offset-2 focus-visible:ring-offset-red-200':
+                'border-2 border-red-300 text-left ring-2 ring-red-200 ring-offset-2 ring-offset-red-200 focus-visible:border-red-400 focus-visible:ring-4 focus-visible:ring-red-200 focus-visible:ring-offset-2 focus-visible:ring-offset-red-200':
                   userInputHasErrors,
-                'text-left': parsedFieldMeta?.textAlign === 'left',
-                'text-center':
-                  !parsedFieldMeta?.textAlign || parsedFieldMeta?.textAlign === 'center',
+                'text-center': parsedFieldMeta?.textAlign === 'center',
                 'text-right': parsedFieldMeta?.textAlign === 'right',
               })}
               value={localText}
