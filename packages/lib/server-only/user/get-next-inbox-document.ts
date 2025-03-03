@@ -13,7 +13,7 @@ export const getNextInboxDocument = async ({ email }: GetNextInboxDocumentOption
 
   return await prisma.document.findMany({
     where: {
-      Recipient: {
+      recipients: {
         some: {
           email,
           signingStatus: SigningStatus.NOT_SIGNED,
@@ -30,7 +30,7 @@ export const getNextInboxDocument = async ({ email }: GetNextInboxDocumentOption
       createdAt: true,
       title: true,
       status: true,
-      Recipient: {
+      recipients: {
         where: {
           email,
         },

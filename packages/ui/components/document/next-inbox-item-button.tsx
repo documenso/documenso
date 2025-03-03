@@ -30,7 +30,7 @@ type GetNextInboxDocumentResult =
         createdAt: true;
         title: true;
         status: true;
-        Recipient: {
+        recipients: {
           select: {
             token: true;
             role: true;
@@ -78,7 +78,7 @@ export const NextInboxItemButton = ({
 
         <div className="mt-8 space-y-6">
           {nextInboxDocument?.map((document) => {
-            const recipient = document.Recipient[0];
+            const recipient = document.recipients[0];
 
             return (
               <div key={document.id} className="flex items-center justify-between space-y-1">
