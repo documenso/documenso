@@ -11,13 +11,18 @@ const alertVariants = cva(
     variants: {
       variant: {
         default:
-          'bg-green-50 text-green-700 [&_.alert-title]:text-green-800 [&>svg]:text-green-400',
+          'bg-primary-lighter text-primary-darker [&_.alert-title]:text-primary-dark [&>svg]:text-primary',
         neutral:
           'bg-gray-50 dark:bg-neutral-900/20 text-muted-foreground [&_.alert-title]:text-foreground',
-        secondary: 'bg-blue-50 text-blue-700 [&_.alert-title]:text-blue-800 [&>svg]:text-blue-400',
-        destructive: 'bg-red-50 text-red-700 [&_.alert-title]:text-red-800 [&>svg]:text-red-400',
+        secondary:
+          'bg-secondary-lighter text-secondary-darker [&_.alert-title]:text-secondary-dark [&>svg]:text-secondary',
+        destructive:
+          'bg-destructive-lighter text-destructive-darker [&_.alert-title]:text-destructive-dark [&>svg]:text-destructive',
         warning:
-          'bg-yellow-50 text-yellow-700 [&_.alert-title]:text-yellow-800 [&>svg]:text-yellow-400',
+          'bg-warning-lighter text-warning-darker [&_.alert-title]:text-warning-dark [&>svg]:text-warning',
+        info: 'bg-info-lighter text-info-darker [&_.alert-title]:text-info-dark [&>svg]:text-info',
+        success:
+          'bg-success-lighter text-success-darker [&_.alert-title]:text-success-dark [&>svg]:text-success',
       },
       padding: {
         tighter: 'p-2',

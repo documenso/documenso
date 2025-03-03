@@ -121,7 +121,7 @@ export default function WebhookPage({ params }: WebhookPageOptions) {
                     </FormControl>
 
                     <FormDescription>
-                      <Trans>The URL for Documenso to send webhook events to.</Trans>
+                      <Trans>The URL for Maddocs to send webhook events to.</Trans>
                     </FormDescription>
 
                     <FormMessage />
@@ -195,7 +195,7 @@ export default function WebhookPage({ params }: WebhookPageOptions) {
                   <FormDescription>
                     <Trans>
                       A secret that will be sent to your URL so you can verify that the request has
-                      been sent by Documenso.
+                      been sent by Maddocs.
                     </Trans>
                   </FormDescription>
                   <FormMessage />

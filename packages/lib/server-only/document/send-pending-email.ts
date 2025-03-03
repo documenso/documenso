@@ -90,7 +90,7 @@ export const sendPendingEmail = async ({ documentId, recipientId }: SendPendingE
       name,
     },
     from: {
-      name: process.env.NEXT_PRIVATE_SMTP_FROM_NAME || 'Documenso',
+      name: process.env.NEXT_PRIVATE_SMTP_FROM_NAME || 'Maddocs',
       address: process.env.NEXT_PRIVATE_SMTP_FROM_ADDRESS || 'noreply@documenso.com',
     },
     subject: i18n._(msg`Waiting for others to complete signing.`),

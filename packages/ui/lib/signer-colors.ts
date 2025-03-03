@@ -6,27 +6,25 @@
 export const SIGNER_COLOR_STYLES = {
   green: {
     default: {
-      background: 'bg-[hsl(var(--signer-green))]',
-      base: 'rounded-lg shadow-[0_0_0_5px_hsl(var(--signer-green)/10%),0_0_0_2px_hsl(var(--signer-green)/60%),0_0_0_0.5px_hsl(var(--signer-green))]',
+      background: 'bg-[hsl(var(--success))]',
+      base: 'rounded-lg shadow-[0_0_0_5px_hsl(var(--success)/10%),0_0_0_2px_hsl(var(--success)/60%),0_0_0_0.5px_hsl(var(--success))]',
       fieldItem:
-        'group/field-item p-2 border-none ring-none hover:bg-gradient-to-r hover:from-[hsl(var(--signer-green))]/10 hover:to-[hsl(var(--signer-green))]/10',
+        'group/field-item p-2 border-none ring-none hover:bg-gradient-to-r hover:from-[hsl(var(--success))]/10 hover:to-[hsl(var(--success))]/10',
       fieldItemInitials:
-        'opacity-0 transition duration-200 group-hover/field-item:opacity-100 group-hover/field-item:bg-[hsl(var(--signer-green))]',
-      comboxBoxItem:
-        'hover:bg-[hsl(var(--signer-green)/15%)] active:bg-[hsl(var(--signer-green)/15%)]',
+        'opacity-0 transition duration-200 group-hover/field-item:opacity-100 group-hover/field-item:bg-[hsl(var(--success))]',
+      comboxBoxItem: 'hover:bg-[hsl(var(--success)/15%)] active:bg-[hsl(var(--success)/15%)]',
     },
   },
 
   blue: {
     default: {
-      background: 'bg-[hsl(var(--signer-blue))]',
-      base: 'rounded-lg shadow-[0_0_0_5px_hsl(var(--signer-blue)/10%),0_0_0_2px_hsl(var(--signer-blue)/60%),0_0_0_0.5px_hsl(var(--signer-blue))]',
+      background: 'bg-[hsl(var(--info))]',
+      base: 'rounded-lg shadow-[0_0_0_5px_hsl(var(--info)/10%),0_0_0_2px_hsl(var(--info)/60%),0_0_0_0.5px_hsl(var(--info))]',
       fieldItem:
-        'group/field-item p-2 border-none ring-none hover:bg-gradient-to-r hover:from-[hsl(var(--signer-blue))]/10 hover:to-[hsl(var(--signer-blue))]/10',
+        'group/field-item p-2 border-none ring-none hover:bg-gradient-to-r hover:from-[hsl(var(--info))]/10 hover:to-[hsl(var(--info))]/10',
       fieldItemInitials:
-        'opacity-0 transition duration-200 group-hover/field-item:opacity-100 group-hover/field-item:bg-[hsl(var(--signer-blue))]',
-      comboxBoxItem:
-        'hover:bg-[hsl(var(--signer-blue)/15%)] active:bg-[hsl(var(--signer-blue)/15%)]',
+        'opacity-0 transition duration-200 group-hover/field-item:opacity-100 group-hover/field-item:bg-[hsl(var(--info))]',
+      comboxBoxItem: 'hover:bg-[hsl(var(--info)/15%)] active:bg-[hsl(var(--info)/15%)]',
     },
   },
 

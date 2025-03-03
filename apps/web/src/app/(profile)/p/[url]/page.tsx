@@ -137,7 +137,7 @@ export default async function PublicProfilePage({ params }: PublicProfilePagePro
             {!user?.id && (
               <span className="mt-2 inline-block">
                 <Trans>
-                  While waiting for them to do so you can create your own Documenso account and get
+                  While waiting for them to do so you can create your own Maddocs account and get
                   started with document signing right away.
                 </Trans>
               </span>

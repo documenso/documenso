@@ -2,13 +2,11 @@
 
 import { useEffect, useState } from 'react';
 
-import Image from 'next/image';
 import Link from 'next/link';
 
 import { Trans } from '@lingui/macro';
 import { PlusIcon } from 'lucide-react';
 
-import LogoIcon from '@documenso/assets/logo_icon.png';
 import type { TGetTeamsResponse } from '@documenso/lib/server-only/team/get-teams';
 import type { User } from '@documenso/prisma/client';
 import { cn } from '@documenso/ui/lib/utils';
@@ -52,14 +50,7 @@ export const ProfileHeader = ({ user, teams = [] }: ProfileHeaderProps) => {
           className="focus-visible:ring-ring ring-offset-background rounded-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 md:inline"
         >
           <Logo className="hidden h-6 w-auto sm:block" />
-
-          <Image
-            src={LogoIcon}
-            alt="Documenso Logo"
-            width={48}
-            height={48}
-            className="h-10 w-auto sm:hidden dark:invert"
-          />
+          <p className="text-muted-foreground">Maddocs</p>
         </Link>
 
         <div className="flex flex-row items-center justify-center">

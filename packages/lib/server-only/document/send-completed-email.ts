@@ -113,7 +113,7 @@ export const sendCompletedEmail = async ({ documentId, requestMetadata }: SendDo
         },
       ],
       from: {
-        name: process.env.NEXT_PRIVATE_SMTP_FROM_NAME || 'Documenso',
+        name: process.env.NEXT_PRIVATE_SMTP_FROM_NAME || 'Maddocs',
         address: process.env.NEXT_PRIVATE_SMTP_FROM_ADDRESS || 'noreply@documenso.com',
       },
       subject: i18n._(msg`Signing Complete!`),
@@ -190,7 +190,7 @@ export const sendCompletedEmail = async ({ documentId, requestMetadata }: SendDo
           },
         ],
         from: {
-          name: process.env.NEXT_PRIVATE_SMTP_FROM_NAME || 'Documenso',
+          name: process.env.NEXT_PRIVATE_SMTP_FROM_NAME || 'Maddocs',
           address: process.env.NEXT_PRIVATE_SMTP_FROM_ADDRESS || 'noreply@documenso.com',
         },
         subject:

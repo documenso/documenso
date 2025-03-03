@@ -26,7 +26,7 @@ export const TeamTransferRequestTemplate = ({
 }: TeamTransferRequestTemplateProps) => {
   const { _ } = useLingui();
 
-  const previewText = msg`Accept team transfer request on Documenso`;
+  const previewText = msg`Accept team transfer request on Maddocs`;
 
   return (
     <Html>

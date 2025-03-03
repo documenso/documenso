@@ -26,7 +26,7 @@ export const TeamEmailRemovedTemplate = ({
   const { _ } = useLingui();
   const branding = useBranding();
 
-  const previewText = msg`Team email removed for ${teamName} on Documenso`;
+  const previewText = msg`Team email removed for ${teamName} on Maddocs`;
 
   return (
     <Html>

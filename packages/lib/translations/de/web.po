@@ -101,12 +101,12 @@ msgid "{0} invited you to {recipientActionVerb} a document"
 msgstr "{0} hat dich eingeladen, ein Dokument {recipientActionVerb}"
 
 #: packages/email/templates/team-join.tsx:61
-msgid "{0} joined the team {teamName} on Documenso"
-msgstr "{0} ist dem Team {teamName} bei Documenso beigetreten"
+msgid "{0} joined the team {teamName} on Maddocs"
+msgstr "{0} ist dem Team {teamName} bei Maddocs beigetreten"
 
 #: packages/email/templates/team-leave.tsx:61
-msgid "{0} left the team {teamName} on Documenso"
-msgstr "{0} hat das Team {teamName} bei Documenso verlassen"
+msgid "{0} left the team {teamName} on Maddocs"
+msgstr "{0} hat das Team {teamName} bei Maddocs verlassen"
 
 #: apps/web/src/app/(dashboard)/documents/upload-document.tsx:145
 msgid "{0} of {1} documents remaining this month."
@@ -355,8 +355,8 @@ msgid "<0>{senderName}</0> has requested that you take ownership of the followin
 msgstr "<0>{senderName}</0> hat angefordert, dass du das folgende Team übernimmst"
 
 #: packages/email/templates/confirm-team-email.tsx:75
-msgid "<0>{teamName}</0> has requested to use your email address for their team on Documenso."
-msgstr "<0>{teamName}</0> hat angefragt, Ihre E-Mail-Adresse für ihr Team bei Documenso zu verwenden."
+msgid "<0>{teamName}</0> has requested to use your email address for their team on Maddocs."
+msgstr "<0>{teamName}</0> hat angefragt, Ihre E-Mail-Adresse für ihr Team bei Maddocs zu verwenden."
 
 #: apps/web/src/app/(dashboard)/templates/use-template-dialog.tsx:463
 msgid "<0>Click to upload</0> or drag and drop"
@@ -518,33 +518,33 @@ msgid "A request to transfer the ownership of this team has been sent to <0>{0} 
 msgstr "Eine Anfrage zur Übertragung des Eigentums dieses Teams wurde an <0>{0} ({1})</0> gesendet"
 
 #: packages/lib/server-only/team/create-team-email-verification.ts:159
-msgid "A request to use your email has been initiated by {0} on Documenso"
-msgstr "Eine Anfrage zur Verwendung Ihrer E-Mail wurde von {0} auf Documenso initiiert"
+msgid "A request to use your email has been initiated by {0} on Maddocs"
+msgstr "Eine Anfrage zur Verwendung Ihrer E-Mail wurde von {0} auf Maddocs initiiert"
 
 #: apps/web/src/components/(dashboard)/settings/webhooks/create-webhook-dialog.tsx:228
-msgid "A secret that will be sent to your URL so you can verify that the request has been sent by Documenso"
-msgstr "Ein Geheimnis, das an deine URL gesendet wird, damit du überprüfen kannst, dass die Anfrage von Documenso gesendet wurde"
+msgid "A secret that will be sent to your URL so you can verify that the request has been sent by Maddocs"
+msgstr "Ein Geheimnis, das an deine URL gesendet wird, damit du überprüfen kannst, dass die Anfrage von Maddocs gesendet wurde"
 
 #: apps/web/src/app/(dashboard)/settings/webhooks/[id]/page.tsx:196
 #: apps/web/src/app/(teams)/t/[teamUrl]/settings/webhooks/[id]/page.tsx:198
-msgid "A secret that will be sent to your URL so you can verify that the request has been sent by Documenso."
-msgstr "Ein Geheimnis, das an deine URL gesendet wird, damit du überprüfen kannst, dass die Anfrage von Documenso gesendet wurde."
+msgid "A secret that will be sent to your URL so you can verify that the request has been sent by Maddocs."
+msgstr "Ein Geheimnis, das an deine URL gesendet wird, damit du überprüfen kannst, dass die Anfrage von Maddocs gesendet wurde."
 
 #: apps/web/src/app/(unauthenticated)/articles/signature-disclosure/page.tsx:64
 msgid "A stable internet connection"
 msgstr "Eine stabile Internetverbindung"
 
 #: packages/email/templates/team-join.tsx:31
-msgid "A team member has joined a team on Documenso"
-msgstr "Ein Teammitglied ist einem Team bei Documenso beigetreten"
+msgid "A team member has joined a team on Maddocs"
+msgstr "Ein Teammitglied ist einem Team bei Maddocs beigetreten"
 
 #: packages/lib/jobs/definitions/emails/send-team-member-left-email.handler.ts:87
 msgid "A team member has left {0}"
 msgstr "Ein Teammitglied hat {0} verlassen"
 
 #: packages/email/templates/team-leave.tsx:31
-msgid "A team member has left a team on Documenso"
-msgstr "Ein Teammitglied hat ein Team auf Documenso verlassen"
+msgid "A team member has left a team on Maddocs"
+msgstr "Ein Teammitglied hat ein Team auf Maddocs verlassen"
 
 #: packages/email/templates/team-delete.tsx:29
 #: packages/email/templates/team-delete.tsx:33
@@ -572,16 +572,16 @@ msgid "Accept"
 msgstr "Akzeptieren"
 
 #: packages/email/templates/team-invite.tsx:42
-msgid "Accept invitation to join a team on Documenso"
-msgstr "Einladung annehmen, um einem Team auf Documenso beizutreten"
+msgid "Accept invitation to join a team on Maddocs"
+msgstr "Einladung annehmen, um einem Team auf Maddocs beizutreten"
 
 #: packages/email/templates/confirm-team-email.tsx:41
-msgid "Accept team email request for {teamName} on Documenso"
-msgstr "Akzeptiere die Team-E-Mail-Anfrage für {teamName} bei Documenso"
+msgid "Accept team email request for {teamName} on Maddocs"
+msgstr "Akzeptiere die Team-E-Mail-Anfrage für {teamName} bei Maddocs"
 
 #: packages/email/templates/team-transfer-request.tsx:29
-msgid "Accept team transfer request on Documenso"
-msgstr "Übertragungsanfrage des Teams auf Documenso annehmen"
+msgid "Accept team transfer request on Maddocs"
+msgstr "Übertragungsanfrage des Teams auf Maddocs annehmen"
 
 #: apps/web/src/app/(unauthenticated)/articles/signature-disclosure/page.tsx:33
 msgid "Acceptance and Consent"
@@ -1268,8 +1268,8 @@ msgid "By enabling 2FA, you will be required to enter a code from your authentic
 msgstr "Durch die Aktivierung von 2FA müssen Sie jedes Mal, wenn Sie sich anmelden, einen Code aus Ihrer Authenticator-App eingeben."
 
 #: apps/web/src/app/(unauthenticated)/articles/signature-disclosure/page.tsx:142
-msgid "By proceeding to use the electronic signature service provided by Documenso, you affirm that you have read and understood this disclosure. You agree to all terms and conditions related to the use of electronic signatures and electronic transactions as outlined herein."
-msgstr "Indem Sie den elektronischen Unterzeichnungsdienst von Documenso verwenden, bestätigen Sie, dass Sie diese Offenlegung gelesen und verstanden haben. Sie stimmen allen Bedingungen und Konditionen zu, die mit der Verwendung elektronischer Unterschriften und elektronischer Transaktionen verbunden sind, wie hierin dargelegt."
+msgid "By proceeding to use the electronic signature service provided by Maddocs, you affirm that you have read and understood this disclosure. You agree to all terms and conditions related to the use of electronic signatures and electronic transactions as outlined herein."
+msgstr "Indem Sie den elektronischen Unterzeichnungsdienst von Maddocs verwenden, bestätigen Sie, dass Sie diese Offenlegung gelesen und verstanden haben. Sie stimmen allen Bedingungen und Konditionen zu, die mit der Verwendung elektronischer Unterschriften und elektronischer Transaktionen verbunden sind, wie hierin dargelegt."
 
 #: apps/web/src/components/general/signing-disclosure.tsx:14
 msgid "By proceeding with your electronic signature, you acknowledge and consent that it will be used to sign the given document and holds the same legal validity as a handwritten signature. By completing the electronic signing process, you affirm your understanding and acceptance of these conditions."
@@ -2048,8 +2048,8 @@ msgid "Do you want to duplicate this template?"
 msgstr "Möchten Sie diese Vorlage duplizieren?"
 
 #: apps/web/src/app/(dashboard)/settings/profile/delete-account-dialog.tsx:111
-msgid "Documenso will delete <0>all of your documents</0>, along with all of your completed documents, signatures, and all other resources belonging to your Account."
-msgstr "Documenso wird <0>alle Ihre Dokumente</0> löschen, zusammen mit allen abgeschlossenen Dokumenten, Unterschriften und allen anderen Ressourcen, die zu Ihrem Konto gehören."
+msgid "Maddocs will delete <0>all of your documents</0>, along with all of your completed documents, signatures, and all other resources belonging to your Account."
+msgstr "Maddocs wird <0>alle Ihre Dokumente</0> löschen, zusammen mit allen abgeschlossenen Dokumenten, Unterschriften und allen anderen Ressourcen, die zu Ihrem Konto gehören."
 
 #: apps/web/src/app/(dashboard)/documents/[id]/logs/document-logs-page-view.tsx:119
 #: apps/web/src/app/(dashboard)/templates/[id]/template-page-view-documents-table.tsx:38
@@ -3018,8 +3018,8 @@ msgid "It's currently not your turn to sign. You will receive an email with inst
 msgstr "Es ist derzeit nicht deine Reihe zu unterschreiben. Du erhältst eine E-Mail mit Anweisungen, sobald es deine Reihe ist, das Dokument zu unterschreiben."
 
 #: packages/email/templates/team-invite.tsx:72
-msgid "Join {teamName} on Documenso"
-msgstr "Tritt {teamName} auf Documenso bei"
+msgid "Join {teamName} on Maddocs"
+msgstr "Tritt {teamName} auf Maddocs bei"
 
 #: packages/ui/primitives/document-flow/field-items-advanced-settings/number-field.tsx:67
 #: packages/ui/primitives/document-flow/field-items-advanced-settings/number-field.tsx:72
@@ -4884,8 +4884,8 @@ msgid "Team"
 msgstr "Team"
 
 #: packages/lib/server-only/team/delete-team.ts:124
-msgid "Team \"{0}\" has been deleted on Documenso"
-msgstr "Team \"{0}\" wurde auf Documenso gelöscht"
+msgid "Team \"{0}\" has been deleted on Maddocs"
+msgstr "Team \"{0}\" wurde auf Maddocs gelöscht"
 
 #: apps/web/src/components/(teams)/dialogs/create-team-checkout-dialog.tsx:85
 msgid "Team checkout"
@@ -4917,8 +4917,8 @@ msgid "Team email removed"
 msgstr "Team-E-Mail entfernt"
 
 #: packages/email/templates/team-email-removed.tsx:29
-msgid "Team email removed for {teamName} on Documenso"
-msgstr "Team-E-Mail für {teamName} auf Documenso entfernt"
+msgid "Team email removed for {teamName} on Maddocs"
+msgstr "Team-E-Mail für {teamName} auf Maddocs entfernt"
 
 #: apps/web/src/app/(unauthenticated)/team/verify/email/[token]/page.tsx:116
 msgid "Team email verification"
@@ -5096,8 +5096,8 @@ msgid "Text Color"
 msgstr "Textfarbe"
 
 #: apps/web/src/app/(unauthenticated)/articles/signature-disclosure/page.tsx:24
-msgid "Thank you for using Documenso to perform your electronic document signing. The purpose of this disclosure is to inform you about the process, legality, and your rights regarding the use of electronic signatures on our platform. By opting to use an electronic signature, you are agreeing to the terms and conditions outlined below."
-msgstr "Vielen Dank, dass Sie Documenso zur elektronischen Unterzeichnung Ihrer Dokumente verwenden. Der Zweck dieser Offenlegung besteht darin, Sie über den Prozess, die Rechtmäßigkeit und Ihre Rechte in Bezug auf die Verwendung elektronischer Unterschriften auf unserer Plattform zu informieren. Indem Sie sich entscheiden, eine elektronische Unterschrift zu verwenden, stimmen Sie den nachfolgend dargelegten Bedingungen zu."
+msgid "Thank you for using Maddocs to perform your electronic document signing. The purpose of this disclosure is to inform you about the process, legality, and your rights regarding the use of electronic signatures on our platform. By opting to use an electronic signature, you are agreeing to the terms and conditions outlined below."
+msgstr "Vielen Dank, dass Sie Maddocs zur elektronischen Unterzeichnung Ihrer Dokumente verwenden. Der Zweck dieser Offenlegung besteht darin, Sie über den Prozess, die Rechtmäßigkeit und Ihre Rechte in Bezug auf die Verwendung elektronischer Unterschriften auf unserer Plattform zu informieren. Indem Sie sich entscheiden, eine elektronische Unterschrift zu verwenden, stimmen Sie den nachfolgend dargelegten Bedingungen zu."
 
 #: packages/email/template-components/template-forgot-password.tsx:25
 msgid "That's okay, it happens! Click the button below to reset your password."
@@ -5313,8 +5313,8 @@ msgstr "Der Token, den Sie zur Zurücksetzung Ihres Passworts verwendet haben, i
 #: apps/web/src/app/(dashboard)/settings/webhooks/[id]/page.tsx:124
 #: apps/web/src/app/(teams)/t/[teamUrl]/settings/webhooks/[id]/page.tsx:128
 #: apps/web/src/components/(dashboard)/settings/webhooks/create-webhook-dialog.tsx:152
-msgid "The URL for Documenso to send webhook events to."
-msgstr "Die URL für Documenso, um Webhook-Ereignisse zu senden."
+msgid "The URL for Maddocs to send webhook events to."
+msgstr "Die URL für Maddocs, um Webhook-Ereignisse zu senden."
 
 #: apps/web/src/components/(dashboard)/settings/webhooks/delete-webhook-dialog.tsx:79
 msgid "The webhook has been successfully deleted."
@@ -5404,8 +5404,8 @@ msgid "This document was created using a direct link."
 msgstr "Dieses Dokument wurde mit einem direkten Link erstellt."
 
 #: packages/email/template-components/template-footer.tsx:17
-msgid "This document was sent using <0>Documenso.</0>"
-msgstr "Dieses Dokument wurde mit <0>Documenso.</0> gesendet"
+msgid "This document was sent using <0>Maddocs.</0>"
+msgstr "Dieses Dokument wurde mit <0>Maddocs.</0> gesendet"
 
 #: packages/email/template-components/template-document-rejection-confirmed.tsx:26
 msgid "This email confirms that you have rejected the document <0>\"{documentName}\"</0> sent by {documentOwnerName}."
@@ -6168,8 +6168,8 @@ msgid "Waiting for Your Turn"
 msgstr "Warten auf deine Reihe"
 
 #: apps/web/src/app/(signing)/sign/[token]/no-longer-available.tsx:61
-msgid "Want to send slick signing links like this one? <0>Check out Documenso.</0>"
-msgstr "Möchten Sie auffällige Signatur-Links wie diesen senden? <0>Überprüfen Sie Documenso.</0>"
+msgid "Want to send slick signing links like this one? <0>Check out Maddocs.</0>"
+msgstr "Möchten Sie auffällige Signatur-Links wie diesen senden? <0>Überprüfen Sie Maddocs.</0>"
 
 #: apps/web/src/app/(profile)/profile-header.tsx:68
 msgid "Want your own public profile?"
@@ -6446,8 +6446,8 @@ msgid "Welcome back, we are lucky to have you."
 msgstr "Willkommen zurück, wir freuen uns, Sie zu haben."
 
 #: packages/email/template-components/template-confirmation-email.tsx:21
-msgid "Welcome to Documenso!"
-msgstr "Willkommen bei Documenso!"
+msgid "Welcome to Maddocs!"
+msgstr "Willkommen bei Maddocs!"
 
 #: apps/web/src/app/(signing)/sign/[token]/waiting/page.tsx:88
 msgid "Were you trying to edit this document instead?"
@@ -6466,8 +6466,8 @@ msgid "When you use our platform to affix your electronic signature to documents
 msgstr "Wenn Sie unsere Plattform nutzen, um Ihre elektronische Unterschrift auf Dokumente anzubringen, stimmen Sie zu, dies unter dem Gesetz über elektronische Unterschriften im globalen und nationalen Handel (E-Sign-Gesetz) und anderen anwendbaren Gesetzen zu tun. Diese Handlung zeigt Ihre Zustimmung zur Verwendung elektronischer Mittel zum Unterzeichnen von Dokumenten und zum Empfang von Benachrichtigungen an."
 
 #: apps/web/src/app/(profile)/p/[url]/page.tsx:139
-msgid "While waiting for them to do so you can create your own Documenso account and get started with document signing right away."
-msgstr "Während Sie darauf warten, können Sie Ihr eigenes Documenso-Konto erstellen und sofort mit der Dokumentenunterzeichnung beginnen."
+msgid "While waiting for them to do so you can create your own Maddocs account and get started with document signing right away."
+msgstr "Während Sie darauf warten, können Sie Ihr eigenes Maddocs-Konto erstellen und sofort mit der Dokumentenunterzeichnung beginnen."
 
 #: apps/web/src/app/(dashboard)/documents/_action-items/resend-document.tsx:126
 msgid "Who do you want to remind?"
@@ -6577,8 +6577,8 @@ msgid "You can copy and share these links to recipients so they can action the d
 msgstr "Sie können diese Links kopieren und mit den Empfängern teilen, damit sie das Dokument bearbeiten können."
 
 #: packages/email/templates/confirm-team-email.tsx:106
-msgid "You can revoke access at any time in your team settings on Documenso <0>here.</0>"
-msgstr "Sie können den Zugriff jederzeit in Ihren Teameinstellungen auf Documenso <0>hier.</0> widerrufen"
+msgid "You can revoke access at any time in your team settings on Maddocs <0>here.</0>"
+msgstr "Sie können den Zugriff jederzeit in Ihren Teameinstellungen auf Maddocs <0>hier.</0> widerrufen"
 
 #: apps/web/src/components/forms/public-profile-form.tsx:154
 msgid "You can update the profile URL by updating the team URL in the general settings page."
@@ -6646,8 +6646,8 @@ msgid "You have been invited by <0>{0}</0> to join their team."
 msgstr "Sie wurden von <0>{0}</0> eingeladen, ihrem Team beizutreten."
 
 #: packages/lib/server-only/team/create-team-member-invites.ts:186
-msgid "You have been invited to join {0} on Documenso"
-msgstr "Du wurdest eingeladen, {0} auf Documenso beizutreten"
+msgid "You have been invited to join {0} on Maddocs"
+msgstr "Du wurdest eingeladen, {0} auf Maddocs beizutreten"
 
 #: packages/email/templates/team-invite.tsx:76
 msgid "You have been invited to join the following team"
@@ -6659,8 +6659,8 @@ msgid "You have been removed from a document"
 msgstr "Du wurdest von einem Dokument entfernt"
 
 #: packages/lib/server-only/team/request-team-ownership-transfer.ts:114
-msgid "You have been requested to take ownership of team {0} on Documenso"
-msgstr "Du wurdest gebeten, das Team {0} auf Documenso zu übernehmen"
+msgid "You have been requested to take ownership of team {0} on Maddocs"
+msgstr "Du wurdest gebeten, das Team {0} auf Maddocs zu übernehmen"
 
 #: apps/web/src/app/(unauthenticated)/team/decline/[token]/page.tsx:122
 msgid "You have declined the invitation from <0>{0}</0> to join their team."
@@ -6775,7 +6775,7 @@ msgstr "Sie müssen 2FA einrichten, um dieses Dokument als angesehen zu markiere
 
 #: apps/web/src/components/forms/v2/signup.tsx:287
 msgid "You will get notified & be able to set up your documenso public profile when we launch the feature."
-msgstr "Sie werden benachrichtigt und können Ihr Documenso öffentliches Profil einrichten, wenn wir die Funktion starten."
+msgstr "Sie werden benachrichtigt und können Ihr Maddocs öffentliches Profil einrichten, wenn wir die Funktion starten."
 
 #: apps/web/src/components/forms/2fa/enable-authenticator-app-dialog.tsx:96
 msgid "You will now be required to enter a code from your authenticator app when signing in."
@@ -6862,8 +6862,8 @@ msgid "Your documents"
 msgstr "Ihre Dokumente"
 
 #: apps/web/src/app/(unauthenticated)/verify-email/[token]/client.tsx:40
-msgid "Your email has been successfully confirmed! You can now use all features of Documenso."
-msgstr "Ihre E-Mail wurde erfolgreich bestätigt! Sie können jetzt alle Funktionen von Documenso nutzen."
+msgid "Your email has been successfully confirmed! You can now use all features of Maddocs."
+msgstr "Ihre E-Mail wurde erfolgreich bestätigt! Sie können jetzt alle Funktionen von Maddocs nutzen."
 
 #: apps/web/src/app/(dashboard)/settings/teams/team-email-usage.tsx:62
 msgid "Your email is currently being used by team <0>{0}</0> ({1})."

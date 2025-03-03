@@ -38,7 +38,7 @@ export const VerifyEmailPageClient = ({ signInData }: VerifyEmailPageClientProps
 
           <p className="text-muted-foreground mt-4">
             <Trans>
-              Your email has been successfully confirmed! You can now use all features of Documenso.
+              Your email has been successfully confirmed! You can now use all features of Maddocs.
             </Trans>
           </p>
 

@@ -11,15 +11,18 @@ const badgeVariants = cva(
     variants: {
       variant: {
         neutral:
-          'bg-gray-50 text-gray-600 ring-gray-500/10 dark:bg-gray-400/10 dark:text-gray-400 dark:ring-gray-400/20',
+          'bg-grey-100 text-grey-600 ring-grey-500/10 dark:bg-grey-400/10 dark:text-grey-400 dark:ring-grey-400/20',
         destructive:
-          'bg-red-50 text-red-700 ring-red-600/10 dark:bg-red-400/10 dark:text-red-400 dark:ring-red-400/20',
+          'bg-destructive-lighter text-destructive-dark ring-destructive/10 dark:bg-destructive-lighter/10 dark:text-destructive-light dark:ring-destructive/20',
         warning:
-          'bg-yellow-50 text-yellow-800 ring-yellow-600/20 dark:bg-yellow-400/10 dark:text-yellow-500 dark:ring-yellow-400/20',
+          'bg-warning-lighter text-warning-dark ring-warning/20 dark:bg-warning-lighter/10 dark:text-warning-light dark:ring-warning/20',
         default:
-          'bg-green-50 text-green-700 ring-green-600/20 dark:bg-green-500/10 dark:text-green-400 dark:ring-green-500/20',
+          'bg-primary-lighter text-primary-dark ring-primary/20 dark:bg-primary-lighter/10 dark:text-primary-light dark:ring-primary/20',
         secondary:
-          'bg-blue-50 text-blue-700 ring-blue-700/10 dark:bg-blue-400/10 dark:text-blue-400 dark:ring-blue-400/30',
+          'bg-secondary-lighter text-secondary-dark ring-secondary/10 dark:bg-secondary-lighter/10 dark:text-secondary-light dark:ring-secondary/30',
+        info: 'bg-info-lighter text-info-dark ring-info/10 dark:bg-info-lighter/10 dark:text-info-light dark:ring-info/30',
+        success:
+          'bg-success-lighter text-success-dark ring-success/10 dark:bg-success-lighter/10 dark:text-success-light dark:ring-success/30',
       },
       size: {
         small: 'px-1.5 py-0.5 text-xs',

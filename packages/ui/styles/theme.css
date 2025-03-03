@@ -4,22 +4,33 @@
 
 @layer base {
   :root {
+    /* Base colors */
     --background: 0 0% 100%;
     --foreground: 222.2 47.4% 11.2%;
 
+    /* Primary - Lime */
+    --primary: 75 100% 60%;
+    --primary-foreground: 0 0% 7%;
+
+    /* Secondary - Lilac */
+    --secondary: 280 75% 60%;
+    --secondary-foreground: 0 0% 100%;
+
+    /* Neutral/Gray */
     --muted: 210 40% 96.1%;
     --muted-foreground: 215.4 16.3% 46.9%;
 
+    /* UI Elements */
     --popover: 0 0% 100%;
     --popover-foreground: 222.2 47.4% 11.2%;
 
     --card: 0 0% 100%;
     --card-border: 214.3 31.8% 91.4%;
-    --card-border-tint: 112 205 159;
+    --card-border-tint: 75 100% 60%;
     --card-foreground: 222.2 47.4% 11.2%;
 
-    --field-card: 95 74% 90%;
-    --field-card-border: 95.08 71.08% 67.45%;
+    --field-card: 75 100% 90%;
+    --field-card-border: 75 100% 60%;
     --field-card-foreground: 222.2 47.4% 11.2%;
 
     --widget: 0 0% 97%;
@@ -28,34 +39,36 @@
     --border: 214.3 31.8% 91.4%;
     --input: 214.3 31.8% 91.4%;
 
-    --primary: 95.08 71.08% 67.45%;
-    --primary-foreground: 95.08 71.08% 10%;
+    /* Semantic Colors */
+    --accent: 280 75% 60%;
+    --accent-foreground: 0 0% 100%;
 
-    --secondary: 210 40% 96.1%;
-    --secondary-foreground: 222.2 47.4% 11.2%;
-
-    --accent: 210 40% 96.1%;
-    --accent-foreground: 222.2 47.4% 11.2%;
-
-    --destructive: 0 100% 50%;
+    --destructive: 0 84% 60%;
     --destructive-foreground: 210 40% 98%;
 
-    --ring: 95.08 71.08% 67.45%;
-
+    --ring: 75 100% 60%;
     --radius: 0.5rem;
 
-    --warning: 54 96% 45%;
-
+    --warning: 38 92% 50%;
     --gold: 47.9 95.8% 53.1%;
 
-    --signer-green: 100 48% 55%;
-    --signer-blue: 212 56% 50%;
-    --signer-purple: 266 100% 64%;
-    --signer-orange: 36 92% 54%;
+    /* Info - Blue */
+    --info: 210 100% 50%;
+    --info-foreground: 0 0% 100%;
+
+    /* Success - Green */
+    --success: 142 76% 36%;
+    --success-foreground: 210 40% 98%;
+
+    /* Signer Colors */
+    --signer-green: 142 76% 36%;
+    --signer-blue: 210 100% 50%;
+    --signer-purple: 280 75% 60%;
+    --signer-orange: 38 92% 50%;
     --signer-yellow: 51 100% 43%;
     --signer-pink: 313 65% 57%;
 
-    /* Base - Neutral */
+    /* Neutral - Gray */
     --new-neutral-50: 0, 0%, 96%;
     --new-neutral-100: 0, 0%, 91%;
     --new-neutral-200: 0, 0%, 82%;
@@ -139,47 +152,59 @@
   }
 
   .dark:not(.dark-mode-disabled) {
-    --background: 0 0% 14.9%;
-    --foreground: 0 0% 97%;
+    /* Base colors */
+    --background: 222.2 84% 4.9%;
+    --foreground: 210 40% 98%;
 
-    --muted: 0 0% 23.4%;
-    --muted-foreground: 0 0% 85%;
+    /* Primary - Lime */
+    --primary: 75 100% 60%;
+    --primary-foreground: 0 0% 7%;
 
-    --popover: 0 0% 14.9%;
-    --popover-foreground: 0 0% 90%;
+    /* Secondary - Lilac */
+    --secondary: 280 75% 60%;
+    --secondary-foreground: 0 0% 100%;
 
-    --card: 0 0% 14.9%;
-    --card-border: 0 0% 27.9%;
-    --card-border-tint: 112 205 159;
-    --card-foreground: 0 0% 95%;
+    /* Neutral/Gray */
+    --muted: 217.2 32.6% 17.5%;
+    --muted-foreground: 215 20.2% 65.1%;
 
-    --widget: 0 0% 14.9%;
-    --widget-foreground: 0 0% 18%;
+    /* UI Elements */
+    --popover: 222.2 84% 4.9%;
+    --popover-foreground: 210 40% 98%;
 
-    --border: 0 0% 27.9%;
-    --input: 0 0% 27.9%;
+    --card: 222.2 84% 4.9%;
+    --card-border: 217.2 32.6% 17.5%;
+    --card-border-tint: 75 100% 60%;
+    --card-foreground: 210 40% 98%;
 
-    --field-border: 214.3 31.8% 91.4%;
+    --field-card: 75 100% 20%;
+    --field-card-border: 75 100% 40%;
+    --field-card-foreground: 0 0% 100%;
 
-    --primary: 95.08 71.08% 67.45%;
-    --primary-foreground: 95.08 71.08% 10%;
+    --widget: 222.2 84% 4.9%;
+    --widget-foreground: 210 40% 98%;
 
-    --secondary: 0 0% 23.4%;
-    --secondary-foreground: 95.08 71.08% 67.45%;
+    --border: 217.2 32.6% 17.5%;
+    --input: 217.2 32.6% 17.5%;
 
-    --accent: 0 0% 27.9%;
-    --accent-foreground: 95.08 71.08% 67.45%;
+    /* Semantic Colors */
+    --accent: 280 75% 60%;
+    --accent-foreground: 0 0% 100%;
 
-    --destructive: 0 87% 62%;
-    --destructive-foreground: 0 87% 19%;
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 210 40% 98%;
 
-    --ring: 95.08 71.08% 67.45%;
+    --ring: 75 100% 60%;
 
-    --radius: 0.5rem;
+    --warning: 38 92% 50%;
 
-    --warning: 54 96% 45%;
+    /* Info - Blue */
+    --info: 210 100% 50%;
+    --info-foreground: 0 0% 100%;
 
-    --gold: 47.9 95.8% 53.1%;
+    /* Success - Green */
+    --success: 142 76% 36%;
+    --success-foreground: 210 40% 98%;
   }
 }
 

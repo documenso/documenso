@@ -149,7 +149,7 @@ export const CreateWebhookDialog = ({ trigger, ...props }: CreateWebhookDialogPr
                       </FormControl>
 
                       <FormDescription>
-                        <Trans>The URL for Documenso to send webhook events to.</Trans>
+                        <Trans>The URL for Maddocs to send webhook events to.</Trans>
                       </FormDescription>
 
                       <FormMessage />
@@ -227,7 +227,7 @@ export const CreateWebhookDialog = ({ trigger, ...props }: CreateWebhookDialogPr
                     <FormDescription>
                       <Trans>
                         A secret that will be sent to your URL so you can verify that the request
-                        has been sent by Documenso
+                        has been sent by Maddocs
                       </Trans>
                       .
                     </FormDescription>
