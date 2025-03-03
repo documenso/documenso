@@ -36,6 +36,7 @@ const posthogProxy = async (request: Request) => {
   responseHeaders.delete('content-encoding');
   responseHeaders.delete('content-length');
   responseHeaders.delete('transfer-encoding');
+  responseHeaders.delete('cookie');
 
   return new Response(response.body, {
     status: response.status,
