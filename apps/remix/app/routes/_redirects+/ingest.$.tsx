@@ -19,6 +19,10 @@ const posthogProxy = async (request: Request) => {
   const headers = new Headers(request.headers);
   headers.set('host', hostname);
 
+  headers.delete('connection');
+  headers.delete('content-length');
+  headers.delete('cookie');
+
   const response = await fetch(newUrl, {
     method: request.method,
     headers,
