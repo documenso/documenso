@@ -5,12 +5,12 @@ import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
 import { Trans } from '@lingui/react/macro';
 import { useForm } from 'react-hook-form';
-import { useRevalidator } from 'react-router';
 import { renderSVG } from 'uqr';
 import { z } from 'zod';
 
 import { authClient } from '@documenso/auth/client';
 import { downloadFile } from '@documenso/lib/client-only/download-file';
+import { useSession } from '@documenso/lib/client-only/providers/session';
 import { Button } from '@documenso/ui/primitives/button';
 import {
   Dialog,
@@ -48,7 +48,7 @@ export type EnableAuthenticatorAppDialogProps = {
 export const EnableAuthenticatorAppDialog = ({ onSuccess }: EnableAuthenticatorAppDialogProps) => {
   const { _ } = useLingui();
   const { toast } = useToast();
-  const { revalidate } = useRevalidator();
+  const { refreshSession } = useSession();
 
   const [isOpen, setIsOpen] = useState(false);
   const [recoveryCodes, setRecoveryCodes] = useState<string[] | null>(null);
@@ -74,6 +74,7 @@ export const EnableAuthenticatorAppDialog = ({ onSuccess }: EnableAuthenticatorA
 
     try {
       const data = await authClient.twoFactor.setup();
+      await refreshSession();
 
       setSetup2FAData(data);
     } catch (err) {
@@ -92,6 +93,7 @@ export const EnableAuthenticatorAppDialog = ({ onSuccess }: EnableAuthenticatorA
   const onEnable2FAFormSubmit = async ({ token }: TEnable2FAForm) => {
     try {
       const data = await authClient.twoFactor.enable({ code: token });
+      await refreshSession();
 
       setRecoveryCodes(data.recoveryCodes);
       onSuccess?.();
@@ -139,7 +141,6 @@ export const EnableAuthenticatorAppDialog = ({ onSuccess }: EnableAuthenticatorA
 
     if (!isOpen && recoveryCodes && recoveryCodes.length > 0) {
       setRecoveryCodes(null);
-      void revalidate();
     }
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
