@@ -429,6 +429,7 @@ export const AddFieldsFormPartial = ({
 
         const newField: TAddFieldsFormSchema['fields'][0] = {
           ...structuredClone(lastActiveField),
+          nativeId: undefined,
           formId: nanoid(12),
           signerEmail: selectedSigner?.email ?? lastActiveField.signerEmail,
           pageX: lastActiveField.pageX + 3,
@@ -450,6 +451,7 @@ export const AddFieldsFormPartial = ({
 
         append({
           ...copiedField,
+          nativeId: undefined,
           formId: nanoid(12),
           signerEmail: selectedSigner?.email ?? copiedField.signerEmail,
           pageX: copiedField.pageX + 3,
