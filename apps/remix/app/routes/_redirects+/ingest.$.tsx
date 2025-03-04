@@ -27,6 +27,7 @@ const posthogProxy = async (request: Request) => {
 
   if (!['GET', 'HEAD'].includes(request.method)) {
     fetchOptions.body = request.body;
+    // @ts-expect-error - It should exist
     fetchOptions.duplex = 'half';
   }
 
