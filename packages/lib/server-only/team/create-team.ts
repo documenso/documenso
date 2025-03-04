@@ -74,7 +74,25 @@ export const createTeam = async ({
       prices.map((price) => price.id),
     );
 
-    isPaymentRequired = !subscriptionsContainsActivePlan(user.subscriptions, teamRelatedPriceIds);
+    const hasTeamRelatedSubscription = subscriptionsContainsActivePlan(
+      user.subscriptions,
+      teamRelatedPriceIds,
+    );
+
+    if (isPlatformPlan) {
+      // For platform users, check if they already have any teams
+      const existingTeams = await prisma.team.findMany({
+        where: {
+          ownerUserId: userId,
+        },
+      });
+
+      // Payment is required if they already have any team
+      isPaymentRequired = existingTeams.length > 0;
+    } else {
+      // For non-platform users, payment is required if they don't have a team-related subscription
+      isPaymentRequired = !hasTeamRelatedSubscription;
+    }
 
     customerId = await createTeamCustomer({
       name: user.name ?? teamName,
