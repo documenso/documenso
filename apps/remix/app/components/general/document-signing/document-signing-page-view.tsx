@@ -21,7 +21,7 @@ import type { FieldWithSignatureAndFieldMeta } from '@documenso/prisma/types/fie
 import type { RecipientWithFields } from '@documenso/prisma/types/recipient-with-fields';
 import { Card, CardContent } from '@documenso/ui/primitives/card';
 import { ElementVisible } from '@documenso/ui/primitives/element-visible';
-import { LazyPDFViewer } from '@documenso/ui/primitives/lazy-pdf-viewer';
+import { PDFViewer } from '@documenso/ui/primitives/pdf-viewer';
 
 import { DocumentSigningAutoSign } from '~/components/general/document-signing/document-signing-auto-sign';
 import { DocumentSigningCheckboxField } from '~/components/general/document-signing/document-signing-checkbox-field';
@@ -140,12 +140,7 @@ export const DocumentSigningPageView = ({
             gradient
           >
             <CardContent className="p-2">
-              <LazyPDFViewer
-                key={documentData.id}
-                documentData={documentData}
-                document={document}
-                password={documentMeta?.password}
-              />
+              <PDFViewer key={documentData.id} documentData={documentData} document={document} />
             </CardContent>
           </Card>
 

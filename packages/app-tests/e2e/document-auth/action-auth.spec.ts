@@ -1,11 +1,11 @@
 import { expect, test } from '@playwright/test';
+import { FieldType } from '@prisma/client';
 
 import { ZRecipientAuthOptionsSchema } from '@documenso/lib/types/document-auth';
 import {
   createDocumentAuthOptions,
   createRecipientAuthOptions,
 } from '@documenso/lib/utils/document-auth';
-import { FieldType } from '@documenso/prisma/client';
 import {
   seedPendingDocumentNoFields,
   seedPendingDocumentWithFullFields,

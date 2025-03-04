@@ -25,7 +25,7 @@ import { Card, CardContent } from '@documenso/ui/primitives/card';
 import { ElementVisible } from '@documenso/ui/primitives/element-visible';
 import { Input } from '@documenso/ui/primitives/input';
 import { Label } from '@documenso/ui/primitives/label';
-import { LazyPDFViewer } from '@documenso/ui/primitives/lazy-pdf-viewer';
+import { PDFViewer } from '@documenso/ui/primitives/pdf-viewer';
 import { SignaturePad } from '@documenso/ui/primitives/signature-pad';
 import { useToast } from '@documenso/ui/primitives/use-toast';
 
@@ -338,7 +338,7 @@ export const EmbedDirectTemplateClientPage = ({
       <div className="relative flex w-full flex-col gap-x-6 gap-y-12 md:flex-row">
         {/* Viewer */}
         <div className="flex-1">
-          <LazyPDFViewer
+          <PDFViewer
             documentData={documentData}
             onDocumentLoad={() => setHasDocumentLoaded(true)}
           />
@@ -347,7 +347,7 @@ export const EmbedDirectTemplateClientPage = ({
         {/* Widget */}
         <div
           key={isExpanded ? 'expanded' : 'collapsed'}
-          className="group/document-widget fixed bottom-8 left-0 z-50 h-fit w-full flex-shrink-0 px-6 md:sticky md:top-4 md:z-auto md:w-[350px] md:px-0"
+          className="group/document-widget fixed bottom-8 left-0 z-50 h-fit max-h-[calc(100dvh-2rem)] w-full flex-shrink-0 px-6 md:sticky md:top-4 md:z-auto md:w-[350px] md:px-0"
           data-expanded={isExpanded || undefined}
         >
           <div className="border-border bg-widget flex h-fit w-full flex-col rounded-xl border px-4 py-4 md:min-h-[min(calc(100dvh-2rem),48rem)] md:py-6">

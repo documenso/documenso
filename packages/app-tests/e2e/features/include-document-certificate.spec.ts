@@ -1,10 +1,10 @@
 import { expect, test } from '@playwright/test';
+import { DocumentStatus, FieldType } from '@prisma/client';
 import { PDFDocument } from 'pdf-lib';
 
 import { getDocumentByToken } from '@documenso/lib/server-only/document/get-document-by-token';
 import { getFile } from '@documenso/lib/universal/upload/get-file';
 import { prisma } from '@documenso/prisma';
-import { DocumentStatus, FieldType } from '@documenso/prisma/client';
 import { seedPendingDocumentWithFullFields } from '@documenso/prisma/seed/documents';
 import { seedTeam } from '@documenso/prisma/seed/teams';
 import { seedUser } from '@documenso/prisma/seed/users';

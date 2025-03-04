@@ -1,10 +1,10 @@
+import type { Team, User } from '@prisma/client';
 import type { TsRestRequest } from '@ts-rest/serverless';
 
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import { getApiTokenByToken } from '@documenso/lib/server-only/public-api/get-api-token-by-token';
 import type { ApiRequestMetadata } from '@documenso/lib/universal/extract-request-metadata';
 import { extractRequestMetadata } from '@documenso/lib/universal/extract-request-metadata';
-import type { Team, User } from '@documenso/prisma/client';
 
 type B = {
   // appRoute: any;

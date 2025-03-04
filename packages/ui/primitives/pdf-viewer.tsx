@@ -5,18 +5,15 @@ import { useLingui } from '@lingui/react';
 import { Trans } from '@lingui/react/macro';
 import type { DocumentData } from '@prisma/client';
 import { Loader } from 'lucide-react';
-import { type PDFDocumentProxy, PasswordResponses } from 'pdfjs-dist';
-import pdfWorker from 'pdfjs-dist/build/pdf.worker.min?url';
+import { type PDFDocumentProxy } from 'pdfjs-dist';
 import { Document as PDFDocument, Page as PDFPage, pdfjs } from 'react-pdf';
 import 'react-pdf/dist/esm/Page/AnnotationLayer.css';
 import 'react-pdf/dist/esm/Page/TextLayer.css';
-import { match } from 'ts-pattern';
 
 import { PDF_VIEWER_PAGE_SELECTOR } from '@documenso/lib/constants/pdf-viewer';
 import { getFile } from '@documenso/lib/universal/upload/get-file';
 
 import { cn } from '../lib/utils';
-import { PasswordDialog } from './document-password-dialog';
 import { useToast } from './use-toast';
 
 export type LoadedPDFDocument = PDFDocumentProxy;
@@ -24,7 +21,10 @@ export type LoadedPDFDocument = PDFDocumentProxy;
 /**
  * This imports the worker from the `pdfjs-dist` package.
  */
-pdfjs.GlobalWorkerOptions.workerSrc = pdfWorker;
+pdfjs.GlobalWorkerOptions.workerSrc = new URL(
+  'pdfjs-dist/build/pdf.worker.min.js',
+  import.meta.url,
+).toString();
 
 export type OnPDFViewerPageClick = (_event: {
   pageNumber: number;
@@ -49,8 +49,6 @@ const PDFLoader = () => (
 export type PDFViewerProps = {
   className?: string;
   documentData: DocumentData;
-  password?: string | null;
-  onPasswordSubmit?: (password: string) => void | Promise<void>;
   onDocumentLoad?: (_doc: LoadedPDFDocument) => void;
   onPageClick?: OnPDFViewerPageClick;
   [key: string]: unknown;
@@ -59,8 +57,6 @@ export type PDFViewerProps = {
 export const PDFViewer = ({
   className,
   documentData,
-  password: defaultPassword,
-  onPasswordSubmit,
   onDocumentLoad,
   onPageClick,
   ...props
@@ -70,11 +66,7 @@ export const PDFViewer = ({
 
   const $el = useRef<HTMLDivElement>(null);
 
-  const passwordCallbackRef = useRef<((password: string | null) => void) | null>(null);
-
   const [isDocumentBytesLoading, setIsDocumentBytesLoading] = useState(false);
-  const [isPasswordModalOpen, setIsPasswordModalOpen] = useState(false);
-  const [isPasswordError, setIsPasswordError] = useState(false);
   const [documentBytes, setDocumentBytes] = useState<Uint8Array | null>(null);
 
   const [width, setWidth] = useState(0);
@@ -190,21 +182,6 @@ export const PDFViewer = ({
             className={cn('w-full overflow-hidden rounded', {
               'h-[80vh] max-h-[60rem]': numPages === 0,
             })}
-            onPassword={(callback, reason) => {
-              // If the document already has a password, we don't need to ask for it again.
-              if (defaultPassword && reason !== PasswordResponses.INCORRECT_PASSWORD) {
-                callback(defaultPassword);
-                return;
-              }
-
-              setIsPasswordModalOpen(true);
-
-              passwordCallbackRef.current = callback;
-
-              match(reason)
-                .with(PasswordResponses.NEED_PASSWORD, () => setIsPasswordError(false))
-                .with(PasswordResponses.INCORRECT_PASSWORD, () => setIsPasswordError(true));
-            }}
             onLoadSuccess={(d) => onDocumentLoaded(d)}
             // Uploading a invalid document causes an error which doesn't appear to be handled by the `error` prop.
             // Therefore we add some additional custom error handling.
@@ -263,19 +240,6 @@ export const PDFViewer = ({
                 </div>
               ))}
           </PDFDocument>
-
-          <PasswordDialog
-            open={isPasswordModalOpen}
-            onOpenChange={setIsPasswordModalOpen}
-            onPasswordSubmit={(password) => {
-              passwordCallbackRef.current?.(password);
-
-              setIsPasswordModalOpen(false);
-
-              void onPasswordSubmit?.(password);
-            }}
-            isError={isPasswordError}
-          />
         </>
       )}
     </div>

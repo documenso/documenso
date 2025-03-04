@@ -16,7 +16,7 @@ import { formatDocumentsPath } from '@documenso/lib/utils/teams';
 import { Badge } from '@documenso/ui/primitives/badge';
 import { Button } from '@documenso/ui/primitives/button';
 import { Card, CardContent } from '@documenso/ui/primitives/card';
-import { LazyPDFViewer } from '@documenso/ui/primitives/lazy-pdf-viewer';
+import { PDFViewer } from '@documenso/ui/primitives/pdf-viewer';
 
 import { DocumentHistorySheet } from '~/components/general/document/document-history-sheet';
 import { DocumentPageViewButton } from '~/components/general/document/document-page-view-button';
@@ -196,7 +196,7 @@ export default function DocumentPage() {
           gradient
         >
           <CardContent className="p-2">
-            <LazyPDFViewer document={document} key={documentData.id} documentData={documentData} />
+            <PDFViewer document={document} key={documentData.id} documentData={documentData} />
           </CardContent>
         </Card>
 

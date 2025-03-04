@@ -9,6 +9,7 @@ import { openApiDocument } from '@documenso/trpc/server/open-api';
 
 import { filesRoute } from './api/files';
 import { type AppContext, appContext } from './context';
+import { appMiddleware } from './middleware';
 import { openApiTrpcServerHandler } from './trpc/hono-trpc-open-api';
 import { reactRouterTrpcServer } from './trpc/hono-trpc-remix';
 
@@ -25,6 +26,11 @@ const app = new Hono<HonoEnv>();
  */
 app.use(contextStorage());
 app.use(appContext);
+
+/**
+ * RR7 app middleware.
+ */
+app.use('*', appMiddleware);
 
 // Auth server.
 app.route('/api/auth', auth);

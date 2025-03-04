@@ -62,7 +62,7 @@ export const GenericErrorLayout = ({
   const team = useOptionalCurrentTeam();
 
   const { subHeading, heading, message } =
-    errorCodeMap[errorCode || 404] ?? defaultErrorCodeMap[500];
+    errorCodeMap[errorCode || 500] ?? defaultErrorCodeMap[500];
 
   return (
     <div className="fixed inset-0 z-0 flex h-screen w-screen items-center justify-center">

@@ -20,7 +20,7 @@ import type { Route } from './+types/_layout';
  */
 export const shouldRevalidate = () => false;
 
-export const loader = async ({ request }: Route.LoaderArgs) => {
+export async function loader({ request }: Route.LoaderArgs) {
   const requestHeaders = Object.fromEntries(request.headers.entries());
 
   const session = await getOptionalSession(request);
@@ -40,7 +40,7 @@ export const loader = async ({ request }: Route.LoaderArgs) => {
     banner,
     limits,
   };
-};
+}
 
 export default function Layout({ loaderData }: Route.ComponentProps) {
   const { user, teams } = useSession();

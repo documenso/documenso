@@ -16,9 +16,9 @@ export type EmbedAuthenticationRequiredProps = {
 export const EmbedAuthenticationRequired = ({
   email,
   returnTo,
-  isGoogleSSOEnabled,
-  isOIDCSSOEnabled,
-  oidcProviderLabel,
+  // isGoogleSSOEnabled,
+  // isOIDCSSOEnabled,
+  // oidcProviderLabel,
 }: EmbedAuthenticationRequiredProps) => {
   return (
     <div className="flex min-h-[100dvh] w-full items-center justify-center">
@@ -35,9 +35,10 @@ export const EmbedAuthenticationRequired = ({
         </Alert>
 
         <SignInForm
-          isGoogleSSOEnabled={isGoogleSSOEnabled}
-          isOIDCSSOEnabled={isOIDCSSOEnabled}
-          oidcProviderLabel={oidcProviderLabel}
+          // Embed currently not supported.
+          // isGoogleSSOEnabled={isGoogleSSOEnabled}
+          // isOIDCSSOEnabled={isOIDCSSOEnabled}
+          // oidcProviderLabel={oidcProviderLabel}
           className="mt-4"
           initialEmail={email}
           returnTo={returnTo}

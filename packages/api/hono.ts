@@ -1,4 +1,4 @@
-import { fetchRequestHandler } from '@ts-rest/serverless/fetch';
+import { TsRestHttpError, fetchRequestHandler } from '@ts-rest/serverless/fetch';
 import { Hono } from 'hono';
 
 import { ApiContractV1 } from '@documenso/api/v1/contract';
@@ -29,6 +29,12 @@ tsRestHonoApp.mount('/', async (request) => {
     request,
     contract: ApiContractV1,
     router: ApiContractV1Implementation,
-    options: {},
+    options: {
+      errorHandler: (err) => {
+        if (err instanceof TsRestHttpError && err.statusCode === 500) {
+          console.error(err);
+        }
+      },
+    },
   });
 });

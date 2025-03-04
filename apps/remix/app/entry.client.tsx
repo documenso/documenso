@@ -17,6 +17,7 @@ function PosthogInit() {
     if (postHogConfig) {
       posthog.init(postHogConfig.key, {
         api_host: postHogConfig.host,
+        capture_exceptions: true,
       });
     }
   }, []);

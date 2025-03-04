@@ -1,6 +1,7 @@
 import { createElement } from 'react';
 
 import { msg } from '@lingui/macro';
+import type { TeamGlobalSettings } from '@prisma/client';
 import { parse } from 'csv-parse/sync';
 import { z } from 'zod';
 
@@ -10,7 +11,6 @@ import { sendDocument } from '@documenso/lib/server-only/document/send-document'
 import { createDocumentFromTemplate } from '@documenso/lib/server-only/template/create-document-from-template';
 import { getTemplateById } from '@documenso/lib/server-only/template/get-template-by-id';
 import { prisma } from '@documenso/prisma';
-import type { TeamGlobalSettings } from '@documenso/prisma/client';
 
 import { getI18nInstance } from '../../../client-only/providers/i18n-server';
 import { NEXT_PUBLIC_WEBAPP_URL } from '../../../constants/app';

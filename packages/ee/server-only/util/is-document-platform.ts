@@ -1,7 +1,8 @@
+import type { Document, Subscription } from '@prisma/client';
+
 import { IS_BILLING_ENABLED } from '@documenso/lib/constants/app';
 import { subscriptionsContainsActivePlan } from '@documenso/lib/utils/billing';
 import { prisma } from '@documenso/prisma';
-import type { Document, Subscription } from '@documenso/prisma/client';
 
 import { getPlatformPlanPriceIds } from '../stripe/get-platform-plan-prices';
 

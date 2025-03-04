@@ -169,7 +169,9 @@ export default function EmbedSignDocumentPage() {
           fields={fields}
           metadata={document.documentMeta}
           isCompleted={document.status === DocumentStatus.COMPLETED}
-          hidePoweredBy={isPlatformDocument || isEnterpriseDocument || hidePoweredBy}
+          hidePoweredBy={
+            isCommunityPlan || isPlatformDocument || isEnterpriseDocument || hidePoweredBy
+          }
           allowWhitelabelling={isCommunityPlan || isPlatformDocument || isEnterpriseDocument}
           allRecipients={allRecipients}
         />

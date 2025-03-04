@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
+import { FieldType } from '@prisma/client';
 import { CopyPlus, Settings2, Trash } from 'lucide-react';
 import { createPortal } from 'react-dom';
 import { Rnd } from 'react-rnd';
@@ -174,9 +175,33 @@ export const FieldItem = ({
     () => hasFieldMetaValues('CHECKBOX', field.fieldMeta, ZCheckboxFieldMeta),
     [field.fieldMeta],
   );
+
   const radioHasValues = useMemo(
     () => hasFieldMetaValues('RADIO', field.fieldMeta, ZRadioFieldMeta),
     [field.fieldMeta],
+  );
+
+  const hasCheckedValues = (fieldMeta: TFieldMetaSchema, type: FieldType) => {
+    if (!fieldMeta || (type !== FieldType.RADIO && type !== FieldType.CHECKBOX)) {
+      return false;
+    }
+
+    if (type === FieldType.RADIO) {
+      const parsed = ZRadioFieldMeta.parse(fieldMeta);
+      return parsed.values?.some((value) => value.checked) ?? false;
+    }
+
+    if (type === FieldType.CHECKBOX) {
+      const parsed = ZCheckboxFieldMeta.parse(fieldMeta);
+      return parsed.values?.some((value) => value.checked) ?? false;
+    }
+
+    return false;
+  };
+
+  const fieldHasCheckedValues = useMemo(
+    () => hasCheckedValues(field.fieldMeta, field.type),
+    [field.fieldMeta, field.type],
   );
 
   const fixedSize = checkBoxHasValues || radioHasValues;
@@ -218,6 +243,21 @@ export const FieldItem = ({
         onMove?.(d.node);
       }}
     >
+      {(field.type === FieldType.RADIO || field.type === FieldType.CHECKBOX) &&
+        field.fieldMeta?.label && (
+          <div
+            className={cn(
+              'absolute -top-16 left-0 right-0 rounded-md p-2 text-center text-xs text-gray-700',
+              {
+                'bg-foreground/5 border-primary border': !fieldHasCheckedValues,
+                'bg-documenso-200 border-primary border': fieldHasCheckedValues,
+              },
+            )}
+          >
+            {field.fieldMeta.label}
+          </div>
+        )}
+
       <div
         className={cn(
           'relative flex h-full w-full items-center justify-center bg-white',

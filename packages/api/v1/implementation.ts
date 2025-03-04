@@ -1,3 +1,5 @@
+import type { Prisma } from '@prisma/client';
+import { DocumentDataType, DocumentStatus, SigningStatus, TeamMemberRole } from '@prisma/client';
 import { tsr } from '@ts-rest/serverless/fetch';
 import { match } from 'ts-pattern';
 
@@ -50,13 +52,6 @@ import {
 } from '@documenso/lib/universal/upload/server-actions';
 import { createDocumentAuditLogData } from '@documenso/lib/utils/document-audit-logs';
 import { prisma } from '@documenso/prisma';
-import type { Prisma } from '@documenso/prisma/client';
-import {
-  DocumentDataType,
-  DocumentStatus,
-  SigningStatus,
-  TeamMemberRole,
-} from '@documenso/prisma/client';
 
 import { ApiContractV1 } from './contract';
 import { authenticatedMiddleware } from './middleware/authenticated';

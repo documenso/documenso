@@ -2,10 +2,10 @@ import { useMemo } from 'react';
 
 import { useLingui } from '@lingui/react';
 import { Trans } from '@lingui/react/macro';
+import { RecipientRole } from '@prisma/client';
 import { P, match } from 'ts-pattern';
 
 import { RECIPIENT_ROLES_DESCRIPTION } from '@documenso/lib/constants/recipient-roles';
-import { RecipientRole } from '@documenso/prisma/client';
 
 import { Button, Section, Text } from '../components';
 import { TemplateDocumentImage } from './template-document-image';

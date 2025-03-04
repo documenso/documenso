@@ -11,10 +11,11 @@ generator json {
 }
 
 generator zod {
-  provider         = "zod-prisma-types"
-  createInputTypes = false
-  writeBarrelFiles = false
-  useMultipleFiles = true
+  provider             = "zod-prisma-types"
+  createInputTypes     = false
+  writeBarrelFiles     = false
+  useMultipleFiles     = true
+  useDefaultValidators = false
 }
 
 datasource db {
