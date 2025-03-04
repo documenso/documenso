@@ -3,9 +3,8 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
 import { Trans } from '@lingui/react/macro';
-import { Prisma } from '@prisma/client';
 import type { Field, Recipient } from '@prisma/client';
-import { FieldType, RecipientRole, SendStatus } from '@prisma/client';
+import { FieldType, Prisma, RecipientRole, SendStatus } from '@prisma/client';
 import {
   CalendarDays,
   Check,
@@ -411,8 +410,11 @@ export const AddFieldsFormPartial = ({
   );
 
   const onFieldCopy = useCallback(
-    (event?: KeyboardEvent | null, options?: { duplicate?: boolean }) => {
-      const { duplicate = false } = options ?? {};
+    (
+      event?: KeyboardEvent | null,
+      options?: { duplicate?: boolean; duplicateAllPages?: boolean },
+    ) => {
+      const { duplicate = false, duplicateAllPages = false } = options ?? {};
 
       if (lastActiveField) {
         event?.preventDefault();
@@ -423,6 +425,31 @@ export const AddFieldsFormPartial = ({
           toast({
             title: 'Copied field',
             description: 'Copied field to clipboard',
+          });
+
+          return;
+        }
+
+        if (duplicateAllPages) {
+          const pages = Array.from(document.querySelectorAll(PDF_VIEWER_PAGE_SELECTOR));
+          const totalPages = pages.length;
+
+          for (let pageNumber = 1; pageNumber <= totalPages; pageNumber++) {
+            if (pageNumber !== lastActiveField.pageNumber) {
+              const newField: TAddFieldsFormSchema['fields'][0] = {
+                ...structuredClone(lastActiveField),
+                formId: nanoid(12),
+                signerEmail: selectedSigner?.email ?? lastActiveField.signerEmail,
+                pageNumber,
+              };
+
+              append(newField);
+            }
+          }
+
+          toast({
+            title: 'Field duplicated',
+            description: 'Field has been duplicated across all pages',
           });
 
           return;
@@ -653,6 +680,9 @@ export const AddFieldsFormPartial = ({
                       onMove={(options) => onFieldMove(options, index)}
                       onRemove={() => remove(index)}
                       onDuplicate={() => onFieldCopy(null, { duplicate: true })}
+                      onDuplicateAllPages={() =>
+                        onFieldCopy(null, { duplicate: true, duplicateAllPages: true })
+                      }
                       onAdvancedSettings={() => {
                         setCurrentField(field);
                         handleAdvancedSettings();

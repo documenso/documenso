@@ -303,6 +303,7 @@ export const FieldAdvancedSettings = forwardRef<HTMLDivElement, FieldAdvancedSet
               />
             ))
             .otherwise(() => null)}
+
           {errors.length > 0 && (
             <div className="mt-4">
               <ul>
@@ -315,6 +316,7 @@ export const FieldAdvancedSettings = forwardRef<HTMLDivElement, FieldAdvancedSet
             </div>
           )}
         </DocumentFlowFormContainerContent>
+
         <DocumentFlowFormContainerFooter className="mt-auto">
           <DocumentFlowFormContainerActions
             goNextLabel={msg`Save`}
