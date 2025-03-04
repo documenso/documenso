@@ -465,6 +465,7 @@ export const AddFieldsFormPartial = ({
 
         append({
           ...copiedField,
+          nativeId: undefined,
           formId: nanoid(12),
           signerEmail: selectedSigner?.email ?? copiedField.signerEmail,
           pageX: copiedField.pageX + 3,
