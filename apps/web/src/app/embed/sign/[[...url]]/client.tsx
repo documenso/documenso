@@ -288,7 +288,7 @@ export const EmbedSignDocumentClientPage = ({
           {/* Widget */}
           <div
             key={isExpanded ? 'expanded' : 'collapsed'}
-            className="embed--DocumentWidgetContainer group/document-widget fixed bottom-8 left-0 z-50 h-fit w-full flex-shrink-0 px-6 md:sticky md:top-4 md:z-auto md:w-[350px] md:px-0"
+            className="embed--DocumentWidgetContainer group/document-widget fixed bottom-8 left-0 z-50 h-fit max-h-[calc(100dvh-2rem)] w-full flex-shrink-0 px-6 md:sticky md:top-4 md:z-auto md:w-[350px] md:px-0"
             data-expanded={isExpanded || undefined}
           >
             <div className="embed--DocumentWidget border-border bg-widget flex w-full flex-col rounded-xl border px-4 py-4 md:py-6">
@@ -303,19 +303,36 @@ export const EmbedSignDocumentClientPage = ({
                     )}
                   </h3>
 
-                  <Button variant="outline" className="h-8 w-8 p-0 md:hidden">
-                    {isExpanded ? (
-                      <LucideChevronDown
-                        className="text-muted-foreground h-5 w-5"
-                        onClick={() => setIsExpanded(false)}
-                      />
-                    ) : (
-                      <LucideChevronUp
-                        className="text-muted-foreground h-5 w-5"
-                        onClick={() => setIsExpanded(true)}
-                      />
-                    )}
-                  </Button>
+                  {isExpanded ? (
+                    <Button
+                      variant="outline"
+                      className="bg-background dark:bg-foreground h-8 w-8 p-0 md:hidden"
+                      onClick={() => setIsExpanded(false)}
+                    >
+                      <LucideChevronDown className="text-muted-foreground dark:text-background h-5 w-5" />
+                    </Button>
+                  ) : pendingFields.length > 0 ? (
+                    <Button
+                      variant="outline"
+                      className="bg-background dark:bg-foreground h-8 w-8 p-0 md:hidden"
+                      onClick={() => setIsExpanded(true)}
+                    >
+                      <LucideChevronUp className="text-muted-foreground dark:text-background h-5 w-5" />
+                    </Button>
+                  ) : (
+                    <Button
+                      variant="default"
+                      size="sm"
+                      className="md:hidden"
+                      disabled={
+                        isThrottled || (!isAssistantMode && hasSignatureField && !signatureValid)
+                      }
+                      loading={isSubmitting}
+                      onClick={() => throttledOnCompleteClick()}
+                    >
+                      <Trans>Complete</Trans>
+                    </Button>
+                  )}
                 </div>
               </div>
 
