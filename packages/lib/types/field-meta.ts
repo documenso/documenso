@@ -122,6 +122,42 @@ export const ZFieldMetaNotOptionalSchema = z.discriminatedUnion('type', [
 
 export type TFieldMetaNotOptionalSchema = z.infer<typeof ZFieldMetaNotOptionalSchema>;
 
+export const ZFieldMetaPrefillFieldsSchema = z
+  .object({
+    id: z.number(),
+  })
+  .and(
+    z.discriminatedUnion('type', [
+      z.object({
+        type: z.literal('text'),
+        label: z.string(),
+        value: z.string(),
+      }),
+      z.object({
+        type: z.literal('number'),
+        label: z.string(),
+        value: z.string(),
+      }),
+      z.object({
+        type: z.literal('radio'),
+        label: z.string(),
+        value: z.string(),
+      }),
+      z.object({
+        type: z.literal('checkbox'),
+        label: z.string(),
+        value: z.array(z.string()),
+      }),
+      z.object({
+        type: z.literal('dropdown'),
+        label: z.string(),
+        value: z.string(),
+      }),
+    ]),
+  );
+
+export type TFieldMetaPrefillFieldsSchema = z.infer<typeof ZFieldMetaPrefillFieldsSchema>;
+
 export const ZFieldMetaSchema = z
   .union([
     // Handles an empty object being provided as fieldMeta.

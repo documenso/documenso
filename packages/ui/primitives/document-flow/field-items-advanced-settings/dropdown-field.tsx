@@ -104,8 +104,12 @@ export const DropdownFieldAdvancedSettings = ({
           <Trans>Select default option</Trans>
         </Label>
         <Select
-          defaultValue={defaultValue}
+          value={defaultValue}
           onValueChange={(val) => {
+            if (!val) {
+              return;
+            }
+
             setDefaultValue(val);
             handleFieldChange('defaultValue', val);
           }}

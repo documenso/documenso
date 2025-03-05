@@ -23,7 +23,7 @@ import {
   ZRecipientActionAuthTypesSchema,
 } from '@documenso/lib/types/document-auth';
 import { ZDocumentEmailSettingsSchema } from '@documenso/lib/types/document-email';
-import { ZFieldMetaSchema } from '@documenso/lib/types/field-meta';
+import { ZFieldMetaPrefillFieldsSchema, ZFieldMetaSchema } from '@documenso/lib/types/field-meta';
 
 extendZodWithOpenApi(z);
 
@@ -299,6 +299,7 @@ export const ZGenerateDocumentFromTemplateMutationSchema = z.object({
     })
     .optional(),
   formValues: z.record(z.string(), z.union([z.string(), z.boolean(), z.number()])).optional(),
+  prefillFields: z.array(ZFieldMetaPrefillFieldsSchema).optional(),
 });
 
 export type TGenerateDocumentFromTemplateMutationSchema = z.infer<

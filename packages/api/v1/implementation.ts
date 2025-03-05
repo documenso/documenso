@@ -580,6 +580,7 @@ export const ApiContractV1Implementation = tsr.router(ApiContractV1, {
         userId: user.id,
         teamId: team?.id,
         recipients: body.recipients,
+        prefillFields: body.prefillFields,
         override: {
           title: body.title,
           ...body.meta,

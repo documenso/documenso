@@ -127,7 +127,13 @@ export const TextFieldAdvancedSettings = ({
 
         <Select
           value={fieldState.textAlign}
-          onValueChange={(value) => handleInput('textAlign', value)}
+          onValueChange={(value) => {
+            if (!value) {
+              return;
+            }
+
+            handleInput('textAlign', value);
+          }}
         >
           <SelectTrigger className="bg-background mt-2">
             <SelectValue placeholder="Select text align" />
