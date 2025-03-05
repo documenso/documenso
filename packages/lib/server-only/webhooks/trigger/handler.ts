@@ -21,22 +21,16 @@ export const handlerTriggerWebhooks = async (req: Request) => {
     return Response.json({ success: false, error: 'Missing signature' }, { status: 400 });
   }
 
-  const rawBody = await req.text();
+  const body = await req.json();
 
-  console.log('Raw body:', rawBody);
-
-  const parsedBody = JSON.parse(rawBody);
-
-  console.log('Parsed body:', parsedBody);
-
-  const valid = verify(parsedBody, signature);
+  const valid = verify(body, signature);
 
   if (!valid) {
     console.log('Invalid signature');
     return Response.json({ success: false, error: 'Invalid signature' }, { status: 400 });
   }
 
-  const result = ZTriggerWebhookBodySchema.safeParse(parsedBody);
+  const result = ZTriggerWebhookBodySchema.safeParse(body);
 
   if (!result.success) {
     console.log('Invalid request body');
