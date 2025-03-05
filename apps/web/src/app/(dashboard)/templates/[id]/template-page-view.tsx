@@ -76,6 +76,7 @@ export const TemplatePageView = async ({ params, team }: TemplatePageViewProps) 
     ? {
         ...templateMeta,
         signingOrder: templateMeta.signingOrder || DocumentSigningOrder.SEQUENTIAL,
+        modifyNextSigner: templateMeta.modifyNextSigner ?? false,
         documentId: 0,
       }
     : undefined;

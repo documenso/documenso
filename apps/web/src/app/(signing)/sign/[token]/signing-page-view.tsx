@@ -49,6 +49,7 @@ export type SigningPageViewProps = {
   completedFields: CompletedField[];
   isRecipientsTurn: boolean;
   allRecipients?: RecipientWithFields[];
+  isLastRecipient: boolean;
 };
 
 export const SigningPageView = ({
@@ -58,6 +59,7 @@ export const SigningPageView = ({
   completedFields,
   isRecipientsTurn,
   allRecipients = [],
+  isLastRecipient,
 }: SigningPageViewProps) => {
   const { documentData, documentMeta } = document;
 
@@ -159,6 +161,7 @@ export const SigningPageView = ({
               redirectUrl={documentMeta?.redirectUrl}
               isRecipientsTurn={isRecipientsTurn}
               allRecipients={allRecipients}
+              isLastRecipient={isLastRecipient}
               setSelectedSignerId={setSelectedSignerId}
             />
           </div>

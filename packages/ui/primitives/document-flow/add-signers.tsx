@@ -49,6 +49,7 @@ export type AddSignersFormProps = {
   recipients: Recipient[];
   fields: Field[];
   signingOrder?: DocumentSigningOrder | null;
+  modifyNextSigner?: boolean | null;
   isDocumentEnterprise: boolean;
   onSubmit: (_data: TAddSignersFormSchema) => void;
   isDocumentPdfLoaded: boolean;
@@ -59,6 +60,7 @@ export const AddSignersFormPartial = ({
   recipients,
   fields,
   signingOrder,
+  modifyNextSigner,
   isDocumentEnterprise,
   onSubmit,
   isDocumentPdfLoaded,
@@ -107,6 +109,7 @@ export const AddSignersFormPartial = ({
             )
           : defaultRecipients,
       signingOrder: signingOrder || DocumentSigningOrder.PARALLEL,
+      modifyNextSigner: modifyNextSigner ?? false,
     },
   });
 
@@ -404,6 +407,35 @@ export const AddSignersFormPartial = ({
                 </FormItem>
               )}
             />
+
+            {isSigningOrderSequential && (
+              <FormField
+                control={form.control}
+                name="modifyNextSigner"
+                render={({ field }) => (
+                  <FormItem className="mb-6 flex flex-row items-center space-x-2 space-y-0">
+                    <FormControl>
+                      <Checkbox
+                        id="modifyNextSigner"
+                        checked={field.value}
+                        onCheckedChange={(checked) => {
+                          field.onChange(checked);
+                        }}
+                        disabled={isSubmitting || hasDocumentBeenSent}
+                      />
+                    </FormControl>
+
+                    <FormLabel
+                      htmlFor="modifyNextSigner"
+                      className="text-sm leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                    >
+                      <Trans>Modify next signer</Trans>
+                    </FormLabel>
+                  </FormItem>
+                )}
+              />
+            )}
+
             <DragDropContext
               onDragEnd={onDragEnd}
               sensors={[
