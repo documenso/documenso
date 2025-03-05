@@ -78,7 +78,7 @@ export const SignDialog = ({
               .with(RecipientRole.SIGNER, () => <Trans>Complete Signing</Trans>)
               .with(RecipientRole.APPROVER, () => <Trans>Complete Approval</Trans>)
               .with(RecipientRole.CC, () => <Trans>Complete Viewing</Trans>)
-              .with(RecipientRole.ASSISTANT, () => <Trans>Complete Reviewing</Trans>)
+              .with(RecipientRole.ASSISTANT, () => <Trans>Complete Assisting</Trans>)
               .exhaustive()}
           </div>
         </DialogTitle>
@@ -170,7 +170,7 @@ export const SignDialog = ({
                 .with(RecipientRole.SIGNER, () => <Trans>Sign</Trans>)
                 .with(RecipientRole.APPROVER, () => <Trans>Approve</Trans>)
                 .with(RecipientRole.CC, () => <Trans>Mark as Viewed</Trans>)
-                .with(RecipientRole.ASSISTANT, () => <Trans>Confirm Review</Trans>)
+                .with(RecipientRole.ASSISTANT, () => <Trans>Complete</Trans>)
                 .exhaustive()}
             </Button>
           </div>

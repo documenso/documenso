@@ -364,7 +364,7 @@ export const SigningForm = ({
                           </CardContent>
                         </Card>
 
-                        {hasSignatureField && !signatureValid && (
+                        {!signatureValid && (
                           <div className="text-destructive mt-2 text-sm">
                             <Trans>
                               Signature is too small. Please provide a more complete signature.
