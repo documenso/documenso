@@ -532,3 +532,9 @@ Replace the `text` value with the corresponding field type:
 - For the `SELECT` field it should be `select`. (check this before merge)
 
 You must pass this property at all times, even if you don't need to set any other properties. If you don't, the endpoint will throw an error.
+
+## Pre-fill Fields On Document Creation
+
+The API allows you to pre-fill fields on document creation. This is useful when you want to create a document from an existing template and pre-fill the fields with specific values.
+
+To pre-fill a field, you need to make a `POST` request to the `/api/v1/templates/{templateId}/generate-document` endpoint with the field information. Here's an example:
