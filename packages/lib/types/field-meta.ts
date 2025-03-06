@@ -130,28 +130,30 @@ export const ZFieldMetaPrefillFieldsSchema = z
     z.discriminatedUnion('type', [
       z.object({
         type: z.literal('text'),
-        label: z.string(),
-        value: z.string(),
+        label: z.string().optional(),
+        placeholder: z.string().optional(),
+        value: z.string().optional(),
       }),
       z.object({
         type: z.literal('number'),
-        label: z.string(),
-        value: z.string(),
+        label: z.string().optional(),
+        placeholder: z.string().optional(),
+        value: z.string().optional(),
       }),
       z.object({
         type: z.literal('radio'),
-        label: z.string(),
-        value: z.string(),
+        label: z.string().optional(),
+        value: z.string().optional(),
       }),
       z.object({
         type: z.literal('checkbox'),
-        label: z.string(),
-        value: z.array(z.string()),
+        label: z.string().optional(),
+        value: z.array(z.string()).optional(),
       }),
       z.object({
         type: z.literal('dropdown'),
-        label: z.string(),
-        value: z.string(),
+        label: z.string().optional(),
+        value: z.string().optional(),
       }),
     ]),
   );
