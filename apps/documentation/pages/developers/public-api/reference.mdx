@@ -554,25 +554,24 @@ To pre-fill a field, you need to make a `POST` request to the `/api/v1/templates
   "prefillFields": [
     {
       "id": 21,
-      "fieldMeta": {
-        "type": "text",
-        "placeholder": "my-placeholder"
-      }
+      "type": "text",
+      "label": "my-label",
+      "placeholder": "my-placeholder",
+      "value": "my-value"
     },
     {
       "id": 22,
-      "fieldMeta": {
-        "type": "number",
-        "label": "my-label"
-      }
+      "type": "number",
+      "label": "my-label",
+      "placeholder": "my-placeholder",
+      "value": "123"
     },
     {
       "id": 23,
-      "fieldMeta": {
-        "type": "checkbox",
-        "label": "my-label",
-        "placeholder": "my-placeholder"
-      }
+      "type": "checkbox",
+      "label": "my-label",
+      "placeholder": "my-placeholder",
+      "value": ["option-1", "option-2"]
     }
   ]
 }
@@ -599,25 +598,24 @@ For API V2, you need to make a `POST` request to the `/api/v2-beta/template/use`
   "prefillFields": [
     {
       "id": 21,
-      "fieldMeta": {
-        "type": "text",
-        "placeholder": "my-placeholder"
-      }
+      "type": "text",
+      "label": "my-label",
+      "placeholder": "my-placeholder",
+      "value": "my-value"
     },
     {
       "id": 22,
-      "fieldMeta": {
-        "type": "number",
-        "label": "my-label"
-      }
+      "type": "number",
+      "label": "my-label",
+      "placeholder": "my-placeholder",
+      "value": "123"
     },
     {
       "id": 23,
-      "fieldMeta": {
-        "type": "checkbox",
-        "label": "my-label",
-        "placeholder": "my-placeholder"
-      }
+      "type": "checkbox",
+      "label": "my-label",
+      "placeholder": "my-placeholder",
+      "value": ["option-1", "option-2"]
     }
   ]
 }
