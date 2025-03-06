@@ -313,7 +313,11 @@ export const DocumentSigningForm = ({
             <>
               <form onSubmit={handleSubmit(onFormSubmit)}>
                 <p className="text-muted-foreground mt-2 text-sm">
-                  <Trans>Please review the document before signing.</Trans>
+                  {recipient.role === RecipientRole.APPROVER && !hasSignatureField ? (
+                    <Trans>Please review the document before approving.</Trans>
+                  ) : (
+                    <Trans>Please review the document before signing.</Trans>
+                  )}
                 </p>
 
                 <hr className="border-border mb-8 mt-4" />
@@ -337,38 +341,40 @@ export const DocumentSigningForm = ({
                       />
                     </div>
 
-                    <div>
-                      <Label htmlFor="Signature">
-                        <Trans>Signature</Trans>
-                      </Label>
+                    {hasSignatureField && (
+                      <div>
+                        <Label htmlFor="Signature">
+                          <Trans>Signature</Trans>
+                        </Label>
 
-                      <Card className="mt-2" gradient degrees={-120}>
-                        <CardContent className="p-0">
-                          <SignaturePad
-                            className="h-44 w-full"
-                            disabled={isSubmitting}
-                            defaultValue={signature ?? undefined}
-                            onValidityChange={(isValid) => {
-                              setSignatureValid(isValid);
-                            }}
-                            onChange={(value) => {
-                              if (signatureValid) {
-                                setSignature(value);
-                              }
-                            }}
-                            allowTypedSignature={document.documentMeta?.typedSignatureEnabled}
-                          />
-                        </CardContent>
-                      </Card>
+                        <Card className="mt-2" gradient degrees={-120}>
+                          <CardContent className="p-0">
+                            <SignaturePad
+                              className="h-44 w-full"
+                              disabled={isSubmitting}
+                              defaultValue={signature ?? undefined}
+                              onValidityChange={(isValid) => {
+                                setSignatureValid(isValid);
+                              }}
+                              onChange={(value) => {
+                                if (signatureValid) {
+                                  setSignature(value);
+                                }
+                              }}
+                              allowTypedSignature={document.documentMeta?.typedSignatureEnabled}
+                            />
+                          </CardContent>
+                        </Card>
 
-                      {hasSignatureField && !signatureValid && (
-                        <div className="text-destructive mt-2 text-sm">
-                          <Trans>
-                            Signature is too small. Please provide a more complete signature.
-                          </Trans>
-                        </div>
-                      )}
-                    </div>
+                        {!signatureValid && (
+                          <div className="text-destructive mt-2 text-sm">
+                            <Trans>
+                              Signature is too small. Please provide a more complete signature.
+                            </Trans>
+                          </div>
+                        )}
+                      </div>
+                    )}
                   </div>
 
                   <div className="flex flex-col gap-4 md:flex-row">

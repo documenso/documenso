@@ -377,7 +377,9 @@ test('[DOCUMENT_FLOW]: should be able to approve a document', async ({ page }) =
       await expect(page.locator(`#field-${field.id}`)).toHaveAttribute('data-inserted', 'true');
     }
 
-    await page.getByRole('button', { name: 'Complete' }).click();
+    await page
+      .getByRole('button', { name: role === RecipientRole.SIGNER ? 'Complete' : 'Approve' })
+      .click();
     await page
       .getByRole('button', { name: role === RecipientRole.SIGNER ? 'Sign' : 'Approve' })
       .click();
@@ -447,7 +449,7 @@ test('[DOCUMENT_FLOW]: should be able to create, send with redirect url, sign a 
   const { status } = await getDocumentByToken(token);
   expect(status).toBe(DocumentStatus.PENDING);
 
-  await page.getByRole('button', { name: 'Complete' }).click();
+  await page.getByRole('button', { name: 'Approve' }).click();
   await expect(page.getByRole('dialog').getByText('Complete Approval').first()).toBeVisible();
   await page.getByRole('button', { name: 'Approve' }).click();
 

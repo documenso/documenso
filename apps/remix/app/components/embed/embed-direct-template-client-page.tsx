@@ -415,40 +415,42 @@ export const EmbedDirectTemplateClientPage = ({
                   />
                 </div>
 
-                <div>
-                  <Label htmlFor="Signature">
-                    <Trans>Signature</Trans>
-                  </Label>
+                {hasSignatureField && (
+                  <div>
+                    <Label htmlFor="Signature">
+                      <Trans>Signature</Trans>
+                    </Label>
 
-                  <Card className="mt-2" gradient degrees={-120}>
-                    <CardContent className="p-0">
-                      <SignaturePad
-                        className="h-44 w-full"
-                        disabled={isThrottled || isSubmitting}
-                        defaultValue={signature ?? undefined}
-                        onChange={(value) => {
-                          setSignature(value);
-                        }}
-                        onValidityChange={(isValid) => {
-                          setSignatureValid(isValid);
-                        }}
-                        allowTypedSignature={Boolean(
-                          metadata &&
-                            'typedSignatureEnabled' in metadata &&
-                            metadata.typedSignatureEnabled,
-                        )}
-                      />
-                    </CardContent>
-                  </Card>
+                    <Card className="mt-2" gradient degrees={-120}>
+                      <CardContent className="p-0">
+                        <SignaturePad
+                          className="h-44 w-full"
+                          disabled={isThrottled || isSubmitting}
+                          defaultValue={signature ?? undefined}
+                          onChange={(value) => {
+                            setSignature(value);
+                          }}
+                          onValidityChange={(isValid) => {
+                            setSignatureValid(isValid);
+                          }}
+                          allowTypedSignature={Boolean(
+                            metadata &&
+                              'typedSignatureEnabled' in metadata &&
+                              metadata.typedSignatureEnabled,
+                          )}
+                        />
+                      </CardContent>
+                    </Card>
 
-                  {hasSignatureField && !signatureValid && (
-                    <div className="text-destructive mt-2 text-sm">
-                      <Trans>
-                        Signature is too small. Please provide a more complete signature.
-                      </Trans>
-                    </div>
-                  )}
-                </div>
+                    {hasSignatureField && !signatureValid && (
+                      <div className="text-destructive mt-2 text-sm">
+                        <Trans>
+                          Signature is too small. Please provide a more complete signature.
+                        </Trans>
+                      </div>
+                    )}
+                  </div>
+                )}
               </div>
             </div>
 

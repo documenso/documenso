@@ -3,6 +3,7 @@ import { useMemo, useState } from 'react';
 import { Trans } from '@lingui/react/macro';
 import type { Field } from '@prisma/client';
 import { RecipientRole } from '@prisma/client';
+import { match } from 'ts-pattern';
 
 import { fieldsContainUnsignedRequiredField } from '@documenso/lib/utils/advanced-fields-helpers';
 import { Button } from '@documenso/ui/primitives/button';
@@ -58,62 +59,88 @@ export const DocumentSigningCompleteDialog = ({
           loading={isSubmitting}
           disabled={disabled}
         >
-          {isComplete ? <Trans>Complete</Trans> : <Trans>Next field</Trans>}
+          {match({ isComplete, role })
+            .with({ isComplete: false }, () => <Trans>Next field</Trans>)
+            .with({ isComplete: true, role: RecipientRole.APPROVER }, () => <Trans>Approve</Trans>)
+            .with({ isComplete: true, role: RecipientRole.VIEWER }, () => (
+              <Trans>Mark as viewed</Trans>
+            ))
+            .with({ isComplete: true }, () => <Trans>Complete</Trans>)
+            .exhaustive()}
         </Button>
       </DialogTrigger>
 
       <DialogContent>
         <DialogTitle>
           <div className="text-foreground text-xl font-semibold">
-            {role === RecipientRole.VIEWER && <Trans>Complete Viewing</Trans>}
-            {role === RecipientRole.SIGNER && <Trans>Complete Signing</Trans>}
-            {role === RecipientRole.APPROVER && <Trans>Complete Approval</Trans>}
+            {match(role)
+              .with(RecipientRole.VIEWER, () => <Trans>Complete Viewing</Trans>)
+              .with(RecipientRole.SIGNER, () => <Trans>Complete Signing</Trans>)
+              .with(RecipientRole.APPROVER, () => <Trans>Complete Approval</Trans>)
+              .with(RecipientRole.CC, () => <Trans>Complete Viewing</Trans>)
+              .with(RecipientRole.ASSISTANT, () => <Trans>Complete Assisting</Trans>)
+              .exhaustive()}
           </div>
         </DialogTitle>
 
         <div className="text-muted-foreground max-w-[50ch]">
-          {role === RecipientRole.VIEWER && (
-            <span>
-              <Trans>
-                <span className="inline-flex flex-wrap">
-                  You are about to complete viewing "
-                  <span className="inline-block max-w-[11rem] truncate align-baseline">
-                    {documentTitle}
+          {match(role)
+            .with(RecipientRole.VIEWER, () => (
+              <span>
+                <Trans>
+                  <span className="inline-flex flex-wrap">
+                    You are about to complete viewing "
+                    <span className="inline-block max-w-[11rem] truncate align-baseline">
+                      {documentTitle}
+                    </span>
+                    ".
                   </span>
-                  ".
-                </span>
-                <br /> Are you sure?
-              </Trans>
-            </span>
-          )}
-          {role === RecipientRole.SIGNER && (
-            <span>
-              <Trans>
-                <span className="inline-flex flex-wrap">
-                  You are about to complete signing "
-                  <span className="inline-block max-w-[11rem] truncate align-baseline">
-                    {documentTitle}
+                  <br /> Are you sure?
+                </Trans>
+              </span>
+            ))
+            .with(RecipientRole.SIGNER, () => (
+              <span>
+                <Trans>
+                  <span className="inline-flex flex-wrap">
+                    You are about to complete signing "
+                    <span className="inline-block max-w-[11rem] truncate align-baseline">
+                      {documentTitle}
+                    </span>
+                    ".
                   </span>
-                  ".
-                </span>
-                <br /> Are you sure?
-              </Trans>
-            </span>
-          )}
-          {role === RecipientRole.APPROVER && (
-            <span>
-              <Trans>
-                <span className="inline-flex flex-wrap">
-                  You are about to complete approving{' '}
-                  <span className="inline-block max-w-[11rem] truncate align-baseline">
-                    "{documentTitle}"
+                  <br /> Are you sure?
+                </Trans>
+              </span>
+            ))
+            .with(RecipientRole.APPROVER, () => (
+              <span>
+                <Trans>
+                  <span className="inline-flex flex-wrap">
+                    You are about to complete approving{' '}
+                    <span className="inline-block max-w-[11rem] truncate align-baseline">
+                      "{documentTitle}"
+                    </span>
+                    .
                   </span>
-                  .
-                </span>
-                <br /> Are you sure?
-              </Trans>
-            </span>
-          )}
+                  <br /> Are you sure?
+                </Trans>
+              </span>
+            ))
+            .otherwise(() => (
+              <span>
+                <Trans>
+                  <span className="inline-flex flex-wrap">
+                    You are about to complete viewing "
+                    <span className="inline-block max-w-[11rem] truncate align-baseline">
+                      {documentTitle}
+                    </span>
+                    ".
+                  </span>
+                  <br /> Are you sure?
+                </Trans>
+              </span>
+            ))}
         </div>
 
         <DocumentSigningDisclosure className="mt-4" />
@@ -138,9 +165,13 @@ export const DocumentSigningCompleteDialog = ({
               loading={isSubmitting}
               onClick={onSignatureComplete}
             >
-              {role === RecipientRole.VIEWER && <Trans>Mark as Viewed</Trans>}
-              {role === RecipientRole.SIGNER && <Trans>Sign</Trans>}
-              {role === RecipientRole.APPROVER && <Trans>Approve</Trans>}
+              {match(role)
+                .with(RecipientRole.VIEWER, () => <Trans>Mark as Viewed</Trans>)
+                .with(RecipientRole.SIGNER, () => <Trans>Sign</Trans>)
+                .with(RecipientRole.APPROVER, () => <Trans>Approve</Trans>)
+                .with(RecipientRole.CC, () => <Trans>Mark as Viewed</Trans>)
+                .with(RecipientRole.ASSISTANT, () => <Trans>Complete</Trans>)
+                .exhaustive()}
             </Button>
           </div>
         </DialogFooter>
