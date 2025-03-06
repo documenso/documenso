@@ -539,6 +539,47 @@ The API allows you to pre-fill fields on document creation. This is useful when 
 
 To pre-fill a field, you need to make a `POST` request to the `/api/v1/templates/{templateId}/generate-document` endpoint with the field information. Here's an example:
 
+```json
+{
+  "title": "my-document.pdf",
+  "recipients": [
+    {
+      "id": 3,
+      "name": "Example User",
+      "email": "example@documenso.com",
+      "signingOrder": 1,
+      "role": "SIGNER"
+    }
+  ],
+  "prefillFields": [
+    {
+      "id": 21,
+      "fieldMeta": {
+        "type": "text",
+        "placeholder": "my-placeholder"
+      }
+    },
+    {
+      "id": 22,
+      "fieldMeta": {
+        "type": "number",
+        "label": "my-label"
+      }
+    },
+    {
+      "id": 23,
+      "fieldMeta": {
+        "type": "checkbox",
+        "label": "my-label",
+        "placeholder": "my-placeholder"
+      }
+    }
+  ]
+}
+```
+
+Check out the endpoint in the [API V1 documentation](https://app.documenso.com/api/v1/openapi#:~:text=/%7BtemplateId%7D/-,generate,-%2Ddocument).
+
 ### API V2
 
 For API V2, you need to make a `POST` request to the `/api/v2-beta/template/use` endpoint with the field(s) information. Here's an example:
