@@ -118,6 +118,7 @@ const getUpdatedFieldMeta = (field: Field, prefillField?: TFieldMetaPrefillField
         ...existingMeta,
         type: 'text',
         label: field.label,
+        placeholder: field.placeholder,
         text: field.value,
       };
 
@@ -134,6 +135,7 @@ const getUpdatedFieldMeta = (field: Field, prefillField?: TFieldMetaPrefillField
         ...existingMeta,
         type: 'number',
         label: field.label,
+        placeholder: field.placeholder,
         value: field.value,
       };
 
@@ -190,8 +192,16 @@ const getUpdatedFieldMeta = (field: Field, prefillField?: TFieldMetaPrefillField
 
       const checkboxMeta = result.data;
 
+      if (!field.value) {
+        throw new AppError(AppErrorCode.INVALID_BODY, {
+          message: `Value is required for CHECKBOX field ${field.id}`,
+        });
+      }
+
+      const fieldValue = field.value;
+
       // Validate that all values exist in the options
-      for (const value of field.value) {
+      for (const value of fieldValue) {
         const valueExists = checkboxMeta.values?.some((option) => option.value === value);
 
         if (!valueExists) {
@@ -203,7 +213,7 @@ const getUpdatedFieldMeta = (field: Field, prefillField?: TFieldMetaPrefillField
 
       const newValues = checkboxMeta.values?.map((option) => ({
         ...option,
-        checked: field.value.includes(option.value),
+        checked: fieldValue.includes(option.value),
       }));
 
       const meta: TCheckboxFieldMeta = {
