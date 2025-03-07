@@ -8,6 +8,7 @@ import { LucideChevronDown, LucideChevronUp } from 'lucide-react';
 
 import { useThrottleFn } from '@documenso/lib/client-only/hooks/use-throttle-fn';
 import { PDF_VIEWER_PAGE_SELECTOR } from '@documenso/lib/constants/pdf-viewer';
+import { isFieldUnsignedAndRequired } from '@documenso/lib/utils/advanced-fields-helpers';
 import { validateFieldsInserted } from '@documenso/lib/utils/fields';
 import type { DocumentMeta, TemplateMeta } from '@documenso/prisma/client';
 import {
@@ -102,7 +103,9 @@ export const EmbedSignDocumentClientPage = ({
   const [throttledOnCompleteClick, isThrottled] = useThrottleFn(() => void onCompleteClick(), 500);
 
   const [pendingFields, _completedFields] = [
-    fields.filter((field) => field.recipientId === recipient.id && !field.inserted),
+    fields.filter(
+      (field) => field.recipientId === recipient.id && isFieldUnsignedAndRequired(field),
+    ),
     fields.filter((field) => field.inserted),
   ];
 

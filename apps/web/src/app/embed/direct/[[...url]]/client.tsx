@@ -13,6 +13,7 @@ import { useThrottleFn } from '@documenso/lib/client-only/hooks/use-throttle-fn'
 import { DEFAULT_DOCUMENT_DATE_FORMAT } from '@documenso/lib/constants/date-formats';
 import { PDF_VIEWER_PAGE_SELECTOR } from '@documenso/lib/constants/pdf-viewer';
 import { DEFAULT_DOCUMENT_TIME_ZONE } from '@documenso/lib/constants/time-zones';
+import { isFieldUnsignedAndRequired } from '@documenso/lib/utils/advanced-fields-helpers';
 import { validateFieldsInserted } from '@documenso/lib/utils/fields';
 import type { DocumentMeta, Recipient, Signature, TemplateMeta } from '@documenso/prisma/client';
 import { type DocumentData, type Field, FieldType } from '@documenso/prisma/client';
@@ -94,7 +95,7 @@ export const EmbedDirectTemplateClientPage = ({
   const [localFields, setLocalFields] = useState<DirectTemplateLocalField[]>(() => fields);
 
   const [pendingFields, _completedFields] = [
-    localFields.filter((field) => !field.inserted),
+    localFields.filter((field) => isFieldUnsignedAndRequired(field)),
     localFields.filter((field) => field.inserted),
   ];
 
