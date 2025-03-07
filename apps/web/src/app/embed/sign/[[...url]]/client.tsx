@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useId, useLayoutEffect, useState } from 'react';
+import { useEffect, useId, useLayoutEffect, useMemo, useState } from 'react';
 
 import { Trans, msg } from '@lingui/macro';
 import { useLingui } from '@lingui/react';
@@ -112,12 +112,17 @@ export const EmbedSignDocumentClientPage = ({
   const { mutateAsync: completeDocumentWithToken, isPending: isSubmitting } =
     trpc.recipient.completeDocumentWithToken.useMutation();
 
+  const fieldsRequiringValidation = useMemo(
+    () => fields.filter(isFieldUnsignedAndRequired),
+    [fields],
+  );
+
   const hasSignatureField = fields.some((field) => field.type === FieldType.SIGNATURE);
 
   const assistantSignersId = useId();
 
   const onNextFieldClick = () => {
-    validateFieldsInserted(fields);
+    validateFieldsInserted(fieldsRequiringValidation);
 
     setShowPendingFieldTooltip(true);
     setIsExpanded(false);
@@ -129,7 +134,7 @@ export const EmbedSignDocumentClientPage = ({
         return;
       }
 
-      const valid = validateFieldsInserted(fields);
+      const valid = validateFieldsInserted(fieldsRequiringValidation);
 
       if (!valid) {
         setShowPendingFieldTooltip(true);
