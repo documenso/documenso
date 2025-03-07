@@ -18,6 +18,7 @@ import { setupI18nSSR } from '@documenso/lib/client-only/providers/i18n.server';
 import { getDocumentStats } from '@documenso/lib/server-only/admin/get-documents-stats';
 import { getRecipientsStats } from '@documenso/lib/server-only/admin/get-recipients-stats';
 import {
+  getMonthlyActiveUsers,
   getUserWithSignedDocumentMonthlyGrowth,
   getUsersCount,
   getUsersWithSubscriptionsCount,
@@ -26,6 +27,7 @@ import { getSignerConversionMonthly } from '@documenso/lib/server-only/user/get-
 
 import { CardMetric } from '~/components/(dashboard)/metric-card/metric-card';
 
+import { MonthlyActiveUsersChart } from './monthly-active-users-chart';
 import { SignerConversionChart } from './signer-conversion-chart';
 import { UserWithDocumentChart } from './user-with-document';
 
@@ -43,6 +45,7 @@ export default async function AdminStatsPage() {
     // userWithAtLeastOneDocumentPerMonth,
     // userWithAtLeastOneDocumentSignedPerMonth,
     MONTHLY_USERS_SIGNED,
+    MONTHLY_ACTIVE_USERS,
   ] = await Promise.all([
     getUsersCount(),
     getUsersWithSubscriptionsCount(),
@@ -52,6 +55,7 @@ export default async function AdminStatsPage() {
     // getUserWithAtLeastOneDocumentPerMonth(),
     // getUserWithAtLeastOneDocumentSignedPerMonth(),
     getUserWithSignedDocumentMonthlyGrowth(),
+    getMonthlyActiveUsers(),
   ]);
 
   return (
@@ -68,7 +72,6 @@ export default async function AdminStatsPage() {
           title={_(msg`Active Subscriptions`)}
           value={usersWithSubscriptionsCount}
         />
-
         <CardMetric
           icon={FileCog}
           title={_(msg`App Version`)}
@@ -132,6 +135,14 @@ export default async function AdminStatsPage() {
           <Trans>Charts</Trans>
         </h3>
         <div className="mt-5 grid grid-cols-2 gap-8">
+          <MonthlyActiveUsersChart title={_(msg`MAU (signed in)`)} data={MONTHLY_ACTIVE_USERS} />
+
+          <MonthlyActiveUsersChart
+            title={_(msg`Cumulative MAU (signed in)`)}
+            data={MONTHLY_ACTIVE_USERS}
+            cummulative
+          />
+
           <UserWithDocumentChart
             data={MONTHLY_USERS_SIGNED}
             title={_(msg`MAU (created document)`)}
