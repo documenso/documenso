@@ -1,4 +1,4 @@
-import { useEffect, useId, useLayoutEffect, useState } from 'react';
+import { useEffect, useId, useLayoutEffect, useMemo, useState } from 'react';
 
 import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
@@ -15,6 +15,7 @@ import { LucideChevronDown, LucideChevronUp } from 'lucide-react';
 
 import { useThrottleFn } from '@documenso/lib/client-only/hooks/use-throttle-fn';
 import { PDF_VIEWER_PAGE_SELECTOR } from '@documenso/lib/constants/pdf-viewer';
+import { isFieldUnsignedAndRequired } from '@documenso/lib/utils/advanced-fields-helpers';
 import { validateFieldsInserted } from '@documenso/lib/utils/fields';
 import type { RecipientWithFields } from '@documenso/prisma/types/recipient-with-fields';
 import { trpc } from '@documenso/trpc/react';
@@ -101,19 +102,26 @@ export const EmbedSignDocumentClientPage = ({
   const [throttledOnCompleteClick, isThrottled] = useThrottleFn(() => void onCompleteClick(), 500);
 
   const [pendingFields, _completedFields] = [
-    fields.filter((field) => field.recipientId === recipient.id && !field.inserted),
+    fields.filter(
+      (field) => field.recipientId === recipient.id && isFieldUnsignedAndRequired(field),
+    ),
     fields.filter((field) => field.inserted),
   ];
 
   const { mutateAsync: completeDocumentWithToken, isPending: isSubmitting } =
     trpc.recipient.completeDocumentWithToken.useMutation();
 
+  const fieldsRequiringValidation = useMemo(
+    () => fields.filter(isFieldUnsignedAndRequired),
+    [fields],
+  );
+
   const hasSignatureField = fields.some((field) => field.type === FieldType.SIGNATURE);
 
   const assistantSignersId = useId();
 
   const onNextFieldClick = () => {
-    validateFieldsInserted(fields);
+    validateFieldsInserted(fieldsRequiringValidation);
 
     setShowPendingFieldTooltip(true);
     setIsExpanded(false);
@@ -125,7 +133,7 @@ export const EmbedSignDocumentClientPage = ({
         return;
       }
 
-      const valid = validateFieldsInserted(fields);
+      const valid = validateFieldsInserted(fieldsRequiringValidation);
 
       if (!valid) {
         setShowPendingFieldTooltip(true);

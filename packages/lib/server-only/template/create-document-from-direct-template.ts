@@ -37,6 +37,7 @@ import {
   mapDocumentToWebhookDocumentPayload,
 } from '../../types/webhook-payload';
 import type { ApiRequestMetadata } from '../../universal/extract-request-metadata';
+import { isRequiredField } from '../../utils/advanced-fields-helpers';
 import type { CreateDocumentAuditLogDataResponse } from '../../utils/document-audit-logs';
 import { createDocumentAuditLogData } from '../../utils/document-audit-logs';
 import {
@@ -176,20 +177,28 @@ export const createDocumentFromDirectTemplate = async ({
   const metaSigningOrder = template.templateMeta?.signingOrder || DocumentSigningOrder.PARALLEL;
 
   // Associate, validate and map to a query every direct template recipient field with the provided fields.
+  // Only process fields that are either required or have been signed by the user
+  const fieldsToProcess = directTemplateRecipient.fields.filter((templateField) => {
+    const signedFieldValue = signedFieldValues.find((value) => value.fieldId === templateField.id);
+
+    // Include if it's required or has a signed value
+    return isRequiredField(templateField) || signedFieldValue !== undefined;
+  });
+
   const createDirectRecipientFieldArgs = await Promise.all(
-    directTemplateRecipient.fields.map(async (templateField) => {
+    fieldsToProcess.map(async (templateField) => {
       const signedFieldValue = signedFieldValues.find(
         (value) => value.fieldId === templateField.id,
       );
 
-      if (!signedFieldValue) {
+      if (isRequiredField(templateField) && !signedFieldValue) {
         throw new AppError(AppErrorCode.INVALID_BODY, {
           message: 'Invalid, missing or changed fields',
         });
       }
 
       if (templateField.type === FieldType.NAME && directRecipientName === undefined) {
-        directRecipientName === signedFieldValue.value;
+        directRecipientName === signedFieldValue?.value;
       }
 
       const derivedRecipientActionAuth = await validateFieldAuth({
@@ -200,8 +209,17 @@ export const createDocumentFromDirectTemplate = async ({
         },
         field: templateField,
         userId: user?.id,
-        authOptions: signedFieldValue.authOptions,
+        authOptions: signedFieldValue?.authOptions,
       });
+
+      if (!signedFieldValue) {
+        return {
+          templateField,
+          customText: '',
+          derivedRecipientActionAuth,
+          signature: null,
+        };
+      }
 
       const { value, isBase64 } = signedFieldValue;
 
@@ -380,7 +398,7 @@ export const createDocumentFromDirectTemplate = async ({
               positionY: templateField.positionY,
               width: templateField.width,
               height: templateField.height,
-              customText,
+              customText: customText ?? '',
               inserted: true,
               fieldMeta: templateField.fieldMeta || Prisma.JsonNull,
             })),

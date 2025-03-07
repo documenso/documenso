@@ -474,6 +474,7 @@ msgid "<0>You are about to complete signing \"<1>{documentTitle}</1>\".</0><2/> 
 msgstr "<0>Está a punto de completar la firma de \"<1>{documentTitle}</1>\".</0><2/> ¿Está seguro?"
 
 #: apps/remix/app/components/general/document-signing/document-signing-complete-dialog.tsx
+#: apps/remix/app/components/general/document-signing/document-signing-complete-dialog.tsx
 msgid "<0>You are about to complete viewing \"<1>{documentTitle}</1>\".</0><2/> Are you sure?"
 msgstr "<0>Está a punto de completar la visualización de \"<1>{documentTitle}</1>\".</0><2/> ¿Está seguro?"
 
@@ -1144,6 +1145,7 @@ msgstr "Versión de la Aplicación"
 #: apps/remix/app/components/tables/documents-table-action-dropdown.tsx
 #: apps/remix/app/components/tables/documents-table-action-button.tsx
 #: apps/remix/app/components/general/document-signing/document-signing-complete-dialog.tsx
+#: apps/remix/app/components/general/document-signing/document-signing-complete-dialog.tsx
 #: apps/remix/app/components/general/document/document-page-view-button.tsx
 #: packages/lib/constants/recipient-roles.ts
 msgid "Approve"
@@ -1566,6 +1568,7 @@ msgid "Close"
 msgstr "Cerrar"
 
 #: apps/remix/app/components/general/document-signing/document-signing-complete-dialog.tsx
+#: apps/remix/app/components/general/document-signing/document-signing-complete-dialog.tsx
 #: apps/remix/app/components/forms/signup.tsx
 #: apps/remix/app/components/embed/embed-document-signing-page.tsx
 #: apps/remix/app/components/embed/embed-direct-template-client-page.tsx
@@ -1575,6 +1578,10 @@ msgstr "Completo"
 #: apps/remix/app/components/general/document-signing/document-signing-complete-dialog.tsx
 msgid "Complete Approval"
 msgstr "Completar Aprobación"
+
+#: apps/remix/app/components/general/document-signing/document-signing-complete-dialog.tsx
+msgid "Complete Assisting"
+msgstr ""
 
 #: apps/remix/app/components/dialogs/assistant-confirmation-dialog.tsx
 msgid "Complete Document"
@@ -1588,6 +1595,7 @@ msgstr "Completar Firmado"
 msgid "Complete the fields for the following signers. Once reviewed, they will inform you if any modifications are needed."
 msgstr ""
 
+#: apps/remix/app/components/general/document-signing/document-signing-complete-dialog.tsx
 #: apps/remix/app/components/general/document-signing/document-signing-complete-dialog.tsx
 msgid "Complete Viewing"
 msgstr "Completar Visualización"
@@ -3374,6 +3382,11 @@ msgid "Manager"
 msgstr "Gerente"
 
 #: apps/remix/app/components/general/document-signing/document-signing-complete-dialog.tsx
+msgid "Mark as viewed"
+msgstr ""
+
+#: apps/remix/app/components/general/document-signing/document-signing-complete-dialog.tsx
+#: apps/remix/app/components/general/document-signing/document-signing-complete-dialog.tsx
 msgid "Mark as Viewed"
 msgstr "Marcar como visto"
 
@@ -3987,6 +4000,10 @@ msgstr "Por favor, proporciona un token del autenticador o un código de respald
 #: apps/remix/app/components/forms/2fa/view-recovery-codes-dialog.tsx
 msgid "Please provide a token from your authenticator, or a backup code."
 msgstr "Por favor, proporciona un token de tu autenticador, o un código de respaldo."
+
+#: apps/remix/app/components/general/document-signing/document-signing-form.tsx
+msgid "Please review the document before approving."
+msgstr ""
 
 #: apps/remix/app/components/general/document-signing/document-signing-form.tsx
 msgid "Please review the document before signing."

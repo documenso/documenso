@@ -91,7 +91,7 @@ export const DirectTemplateSigningForm = ({
 
         const tempField: DirectTemplateLocalField = {
           ...field,
-          customText: value.value,
+          customText: value.value ?? '',
           inserted: true,
           signedValue: value,
         };
@@ -102,8 +102,8 @@ export const DirectTemplateSigningForm = ({
             created: new Date(),
             recipientId: 1,
             fieldId: 1,
-            signatureImageAsBase64: value.value.startsWith('data:') ? value.value : null,
-            typedSignature: value.value.startsWith('data:') ? null : value.value,
+            signatureImageAsBase64: value.value?.startsWith('data:') ? value.value : null,
+            typedSignature: value.value && !value.value.startsWith('data:') ? value.value : null,
           } satisfies Signature;
         }
 

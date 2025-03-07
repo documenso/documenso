@@ -451,7 +451,7 @@ export const fieldRouter = router({
       return await signFieldWithToken({
         token,
         fieldId,
-        value,
+        value: value ?? '',
         isBase64,
         userId: ctx.user?.id,
         authOptions,

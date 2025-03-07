@@ -13,6 +13,10 @@ import { useThrottleFn } from '@documenso/lib/client-only/hooks/use-throttle-fn'
 import { DEFAULT_DOCUMENT_DATE_FORMAT } from '@documenso/lib/constants/date-formats';
 import { PDF_VIEWER_PAGE_SELECTOR } from '@documenso/lib/constants/pdf-viewer';
 import { DEFAULT_DOCUMENT_TIME_ZONE } from '@documenso/lib/constants/time-zones';
+import {
+  isFieldUnsignedAndRequired,
+  isRequiredField,
+} from '@documenso/lib/utils/advanced-fields-helpers';
 import { validateFieldsInserted } from '@documenso/lib/utils/fields';
 import { trpc } from '@documenso/trpc/react';
 import type {
@@ -92,7 +96,7 @@ export const EmbedDirectTemplateClientPage = ({
   const [localFields, setLocalFields] = useState<DirectTemplateLocalField[]>(() => fields);
 
   const [pendingFields, _completedFields] = [
-    localFields.filter((field) => !field.inserted),
+    localFields.filter((field) => isFieldUnsignedAndRequired(field)),
     localFields.filter((field) => field.inserted),
   ];
 
@@ -110,7 +114,7 @@ export const EmbedDirectTemplateClientPage = ({
 
         const newField: DirectTemplateLocalField = structuredClone({
           ...field,
-          customText: payload.value,
+          customText: payload.value ?? '',
           inserted: true,
           signedValue: payload,
         });
@@ -121,8 +125,10 @@ export const EmbedDirectTemplateClientPage = ({
             created: new Date(),
             recipientId: 1,
             fieldId: 1,
-            signatureImageAsBase64: payload.value.startsWith('data:') ? payload.value : null,
-            typedSignature: payload.value.startsWith('data:') ? null : payload.value,
+            signatureImageAsBase64:
+              payload.value && payload.value.startsWith('data:') ? payload.value : null,
+            typedSignature:
+              payload.value && !payload.value.startsWith('data:') ? payload.value : null,
           } satisfies Signature;
         }
 
@@ -180,7 +186,7 @@ export const EmbedDirectTemplateClientPage = ({
   };
 
   const onNextFieldClick = () => {
-    validateFieldsInserted(localFields);
+    validateFieldsInserted(pendingFields);
 
     setShowPendingFieldTooltip(true);
     setIsExpanded(false);
@@ -192,7 +198,7 @@ export const EmbedDirectTemplateClientPage = ({
         return;
       }
 
-      const valid = validateFieldsInserted(localFields);
+      const valid = validateFieldsInserted(pendingFields);
 
       if (!valid) {
         setShowPendingFieldTooltip(true);
@@ -205,12 +211,6 @@ export const EmbedDirectTemplateClientPage = ({
         directTemplateExternalId = decodeURIComponent(directTemplateExternalId);
       }
 
-      localFields.forEach((field) => {
-        if (!field.signedValue) {
-          throw new Error('Invalid configuration');
-        }
-      });
-
       const {
         documentId,
         token: documentToken,
@@ -221,13 +221,11 @@ export const EmbedDirectTemplateClientPage = ({
         directRecipientName: fullName,
         directRecipientEmail: email,
         templateUpdatedAt: updatedAt,
-        signedFieldValues: localFields.map((field) => {
-          if (!field.signedValue) {
-            throw new Error('Invalid configuration');
-          }
-
-          return field.signedValue;
-        }),
+        signedFieldValues: localFields
+          .filter((field) => {
+            return field.signedValue && (isRequiredField(field) || field.inserted);
+          })
+          .map((field) => field.signedValue!),
       });
 
       if (window.parent) {
