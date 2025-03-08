@@ -27,7 +27,6 @@ import { TooltipProvider } from '@documenso/ui/primitives/tooltip';
 import type { Route } from './+types/root';
 import stylesheet from './app.css?url';
 import { GenericErrorLayout } from './components/general/generic-error-layout';
-import { RefreshOnFocus } from './components/general/refresh-on-focus';
 import { langCookie } from './storage/lang-cookie.server';
 import { themeSessionResolver } from './storage/theme-session.server';
 import { appMetaTags } from './utils/meta';
@@ -158,8 +157,6 @@ export function LayoutContent({ children }: { children: React.ReactNode }) {
 
         <ScrollRestoration />
         <Scripts />
-
-        <RefreshOnFocus />
 
         <script
           dangerouslySetInnerHTML={{
