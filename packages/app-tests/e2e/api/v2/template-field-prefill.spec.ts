@@ -1,6 +1,6 @@
 import { expect, test } from '@playwright/test';
 
-import { WEBAPP_BASE_URL } from '@documenso/lib/constants/app';
+import { NEXT_PUBLIC_WEBAPP_URL } from '@documenso/lib/constants/app';
 import { createApiToken } from '@documenso/lib/server-only/public-api/create-api-token';
 import type { TCheckboxFieldMeta, TRadioFieldMeta } from '@documenso/lib/types/field-meta';
 import { prisma } from '@documenso/prisma';
@@ -9,6 +9,8 @@ import { seedBlankTemplate } from '@documenso/prisma/seed/templates';
 import { seedUser } from '@documenso/prisma/seed/users';
 
 import { apiSignin } from '../../fixtures/authentication';
+
+const WEBAPP_BASE_URL = NEXT_PUBLIC_WEBAPP_URL();
 
 test.describe('Template Field Prefill API v2', () => {
   test('should create a document from template with prefilled fields', async ({
