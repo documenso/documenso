@@ -8,7 +8,7 @@ msgstr ""
 "Language: fr\n"
 "Project-Id-Version: documenso-app\n"
 "Report-Msgid-Bugs-To: \n"
-"PO-Revision-Date: 2025-01-30 06:04\n"
+"PO-Revision-Date: 2025-02-04 04:03\n"
 "Last-Translator: \n"
 "Language-Team: French\n"
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
@@ -1338,16 +1338,16 @@ msgstr "Impossible de supprimer le signataire"
 
 #: packages/lib/constants/recipient-roles.ts:18
 msgid "Cc"
-msgstr ""
+msgstr "Cc"
 
 #: packages/lib/constants/recipient-roles.ts:15
 #: packages/lib/constants/recipient-roles.ts:17
 msgid "CC"
-msgstr ""
+msgstr "CC"
 
 #: packages/lib/constants/recipient-roles.ts:16
 msgid "CC'd"
-msgstr ""
+msgstr "CC'd"
 
 #: packages/lib/constants/recipient-roles.ts:19
 msgid "Ccers"
@@ -3234,7 +3234,7 @@ msgstr "MAU (document terminé)"
 
 #: packages/ui/primitives/document-flow/field-items-advanced-settings/number-field.tsx:209
 msgid "Max"
-msgstr ""
+msgstr "Max"
 
 #: apps/web/src/components/templates/template-bulk-send-dialog.tsx:227
 msgid "Maximum file size: 4MB. Maximum 100 rows per upload. Blank values will use template defaults."
@@ -3262,7 +3262,7 @@ msgstr "Message <0>(Optionnel)</0>"
 
 #: packages/ui/primitives/document-flow/field-items-advanced-settings/number-field.tsx:197
 msgid "Min"
-msgstr ""
+msgstr "Min"
 
 #: apps/web/src/app/(dashboard)/documents/[id]/document-page-view-recipients.tsx:55
 #: apps/web/src/app/(dashboard)/templates/[id]/template-page-view-recipients.tsx:35
@@ -3940,7 +3940,7 @@ msgstr "Les modèles publics sont connectés à votre profil public. Toute modif
 
 #: packages/ui/primitives/document-flow/types.ts:57
 msgid "Radio"
-msgstr ""
+msgstr "Radio"
 
 #: packages/ui/primitives/document-flow/field-items-advanced-settings/radio-field.tsx:133
 msgid "Radio values"
