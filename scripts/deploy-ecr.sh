@@ -15,12 +15,12 @@ npm run prisma:migrate-deploy
 npm run build
 
 # Install dependencies
-sudo apt-get update && apt-get install -y curl unzip
+sudo apt-get update && sudo apt-get install -y curl unzip
 
 # Download and install AWS CLI v2
-curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
-unzip awscliv2.zip
-./aws/install
+sudo curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+sudo unzip awscliv2.zip
+sudo ./aws/install
 
 # Clean up
 rm -rf awscliv2.zip aws
