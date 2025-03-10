@@ -8,7 +8,7 @@ SCRIPT_DIR="$(readlink -f "$(dirname "$0")")"
 CI_COMMIT_SHORT_SHA="$(git rev-parse --short HEAD)"
 APP_NAME="documenso"
 IMAGE_NAME="sunrebel/documenso"
-CONTAINER_PORT=80
+CONTAINER_PORT=5000
 REVISION_NAME="TASK_DEFINITION_REVISION"
 
 echo "Deploying Documenso to ECS"
