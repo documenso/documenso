@@ -12,6 +12,7 @@ const themeSessionStorage = createCookieSessionStorage({
     secrets: ['insecure-secret-do-not-care'],
     secure: useSecureCookies,
     domain: getCookieDomain(),
+    maxAge: 60 * 60 * 24 * 365,
   },
 });
 
