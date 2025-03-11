@@ -345,28 +345,9 @@ export const insertFieldInPDF = async (pdf: PDFDocument, field: FieldWithSignatu
        * - True = text will overflow downwards.
        * - False = text will overflow sideways.
        */
-      const isMultiline = (() => {
-        // No multiline for date, number or email fields, it MUST overflow on X axis.
-        if (
-          field.type === FieldType.DATE ||
-          field.type === FieldType.NUMBER ||
-          field.type === FieldType.EMAIL
-        ) {
-          return false;
-        }
-
-        // If width of text overflows, multiline is enabled.
-        if (textWidth > fieldWidth) {
-          return true;
-        }
-
-        // If the text contains a newline, it must be multiline.
-        if (field.customText.includes('\n')) {
-          return true;
-        }
-
-        return false;
-      })();
+      const isMultiline =
+        field.type === FieldType.TEXT &&
+        (textWidth > fieldWidth || field.customText.includes('\n'));
 
       // Add padding similar to web display (roughly 0.5rem equivalent in PDF units)
       const padding = 8;

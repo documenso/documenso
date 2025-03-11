@@ -62,7 +62,9 @@ export const FieldContent = ({ field, documentMeta }: FieldIconProps) => {
             <Checkbox
               className="h-3 w-3"
               id={`checkbox-${index}`}
-              checked={checkedValues.includes(item.value)}
+              checked={checkedValues.includes(
+                item.value === '' ? `empty-value-${index + 1}` : item.value, // I got no idea...
+              )}
             />
 
             {item.value && (
@@ -171,7 +173,7 @@ export const FieldContent = ({ field, documentMeta }: FieldIconProps) => {
   return (
     <div
       className={cn(
-        'text-field-card-foreground flex h-full w-full items-center justify-center gap-x-1.5 whitespace-nowrap text-center text-[clamp(0.07rem,25cqw,0.825rem)]',
+        'text-field-card-foreground flex h-full w-full items-center justify-center gap-x-1.5 overflow-clip whitespace-nowrap text-center text-[clamp(0.07rem,25cqw,0.825rem)]',
         {
           // Using justify instead of align because we also vertically center the text.
           'justify-start': field.inserted && !isSignatureField && textAlign === 'left',
