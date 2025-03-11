@@ -153,7 +153,7 @@ export const ZSetFieldsForTemplateResponseSchema = z.object({
 export const ZSignFieldWithTokenMutationSchema = z.object({
   token: z.string(),
   fieldId: z.number(),
-  value: z.string().trim(),
+  value: z.string().trim().optional(),
   isBase64: z.boolean().optional(),
   authOptions: ZRecipientActionAuthSchema.optional(),
 });

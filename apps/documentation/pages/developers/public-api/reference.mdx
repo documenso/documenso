@@ -532,3 +532,93 @@ Replace the `text` value with the corresponding field type:
 - For the `SELECT` field it should be `select`. (check this before merge)
 
 You must pass this property at all times, even if you don't need to set any other properties. If you don't, the endpoint will throw an error.
+
+## Pre-fill Fields On Document Creation
+
+The API allows you to pre-fill fields on document creation. This is useful when you want to create a document from an existing template and pre-fill the fields with specific values.
+
+To pre-fill a field, you need to make a `POST` request to the `/api/v1/templates/{templateId}/generate-document` endpoint with the field information. Here's an example:
+
+```json
+{
+  "title": "my-document.pdf",
+  "recipients": [
+    {
+      "id": 3,
+      "name": "Example User",
+      "email": "example@documenso.com",
+      "signingOrder": 1,
+      "role": "SIGNER"
+    }
+  ],
+  "prefillFields": [
+    {
+      "id": 21,
+      "type": "text",
+      "label": "my-label",
+      "placeholder": "my-placeholder",
+      "value": "my-value"
+    },
+    {
+      "id": 22,
+      "type": "number",
+      "label": "my-label",
+      "placeholder": "my-placeholder",
+      "value": "123"
+    },
+    {
+      "id": 23,
+      "type": "checkbox",
+      "label": "my-label",
+      "placeholder": "my-placeholder",
+      "value": ["option-1", "option-2"]
+    }
+  ]
+}
+```
+
+Check out the endpoint in the [API V1 documentation](https://app.documenso.com/api/v1/openapi#:~:text=/%7BtemplateId%7D/-,generate,-%2Ddocument).
+
+### API V2
+
+For API V2, you need to make a `POST` request to the `/api/v2-beta/template/use` endpoint with the field(s) information. Here's an example:
+
+```json
+{
+  "templateId": 111,
+  "recipients": [
+    {
+      "id": 3,
+      "name": "Example User",
+      "email": "example@documenso.com",
+      "signingOrder": 1,
+      "role": "SIGNER"
+    }
+  ],
+  "prefillFields": [
+    {
+      "id": 21,
+      "type": "text",
+      "label": "my-label",
+      "placeholder": "my-placeholder",
+      "value": "my-value"
+    },
+    {
+      "id": 22,
+      "type": "number",
+      "label": "my-label",
+      "placeholder": "my-placeholder",
+      "value": "123"
+    },
+    {
+      "id": 23,
+      "type": "checkbox",
+      "label": "my-label",
+      "placeholder": "my-placeholder",
+      "value": ["option-1", "option-2"]
+    }
+  ]
+}
+```
+
+Check out the endpoint in the [API V2 documentation](https://openapi.documenso.com/reference#tag/template/POST/template/use).

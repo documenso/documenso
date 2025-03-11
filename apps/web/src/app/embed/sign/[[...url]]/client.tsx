@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useId, useLayoutEffect, useState } from 'react';
+import { useEffect, useId, useLayoutEffect, useMemo, useState } from 'react';
 
 import { Trans, msg } from '@lingui/macro';
 import { useLingui } from '@lingui/react';
@@ -8,6 +8,7 @@ import { LucideChevronDown, LucideChevronUp } from 'lucide-react';
 
 import { useThrottleFn } from '@documenso/lib/client-only/hooks/use-throttle-fn';
 import { PDF_VIEWER_PAGE_SELECTOR } from '@documenso/lib/constants/pdf-viewer';
+import { isFieldUnsignedAndRequired } from '@documenso/lib/utils/advanced-fields-helpers';
 import { validateFieldsInserted } from '@documenso/lib/utils/fields';
 import type { DocumentMeta, TemplateMeta } from '@documenso/prisma/client';
 import {
@@ -102,19 +103,26 @@ export const EmbedSignDocumentClientPage = ({
   const [throttledOnCompleteClick, isThrottled] = useThrottleFn(() => void onCompleteClick(), 500);
 
   const [pendingFields, _completedFields] = [
-    fields.filter((field) => field.recipientId === recipient.id && !field.inserted),
+    fields.filter(
+      (field) => field.recipientId === recipient.id && isFieldUnsignedAndRequired(field),
+    ),
     fields.filter((field) => field.inserted),
   ];
 
   const { mutateAsync: completeDocumentWithToken, isPending: isSubmitting } =
     trpc.recipient.completeDocumentWithToken.useMutation();
 
+  const fieldsRequiringValidation = useMemo(
+    () => fields.filter(isFieldUnsignedAndRequired),
+    [fields],
+  );
+
   const hasSignatureField = fields.some((field) => field.type === FieldType.SIGNATURE);
 
   const assistantSignersId = useId();
 
   const onNextFieldClick = () => {
-    validateFieldsInserted(fields);
+    validateFieldsInserted(fieldsRequiringValidation);
 
     setShowPendingFieldTooltip(true);
     setIsExpanded(false);
@@ -126,7 +134,7 @@ export const EmbedSignDocumentClientPage = ({
         return;
       }
 
-      const valid = validateFieldsInserted(fields);
+      const valid = validateFieldsInserted(fieldsRequiringValidation);
 
       if (!valid) {
         setShowPendingFieldTooltip(true);
@@ -436,40 +444,42 @@ export const EmbedSignDocumentClientPage = ({
                         />
                       </div>
 
-                      <div>
-                        <Label htmlFor="Signature">
-                          <Trans>Signature</Trans>
-                        </Label>
+                      {hasSignatureField && (
+                        <div>
+                          <Label htmlFor="Signature">
+                            <Trans>Signature</Trans>
+                          </Label>
 
-                        <Card className="mt-2" gradient degrees={-120}>
-                          <CardContent className="p-0">
-                            <SignaturePad
-                              className="h-44 w-full"
-                              disabled={isThrottled || isSubmitting}
-                              defaultValue={signature ?? undefined}
-                              onChange={(value) => {
-                                setSignature(value);
-                              }}
-                              onValidityChange={(isValid) => {
-                                setSignatureValid(isValid);
-                              }}
-                              allowTypedSignature={Boolean(
-                                metadata &&
-                                  'typedSignatureEnabled' in metadata &&
-                                  metadata.typedSignatureEnabled,
-                              )}
-                            />
-                          </CardContent>
-                        </Card>
+                          <Card className="mt-2" gradient degrees={-120}>
+                            <CardContent className="p-0">
+                              <SignaturePad
+                                className="h-44 w-full"
+                                disabled={isThrottled || isSubmitting}
+                                defaultValue={signature ?? undefined}
+                                onChange={(value) => {
+                                  setSignature(value);
+                                }}
+                                onValidityChange={(isValid) => {
+                                  setSignatureValid(isValid);
+                                }}
+                                allowTypedSignature={Boolean(
+                                  metadata &&
+                                    'typedSignatureEnabled' in metadata &&
+                                    metadata.typedSignatureEnabled,
+                                )}
+                              />
+                            </CardContent>
+                          </Card>
 
-                        {hasSignatureField && !signatureValid && (
-                          <div className="text-destructive mt-2 text-sm">
-                            <Trans>
-                              Signature is too small. Please provide a more complete signature.
-                            </Trans>
-                          </div>
-                        )}
-                      </div>
+                          {hasSignatureField && !signatureValid && (
+                            <div className="text-destructive mt-2 text-sm">
+                              <Trans>
+                                Signature is too small. Please provide a more complete signature.
+                              </Trans>
+                            </div>
+                          )}
+                        </div>
+                      )}
                     </>
                   )}
                 </div>
