@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 
 import { Trans } from '@lingui/react/macro';
 import type { Field, Recipient, Signature } from '@prisma/client';
@@ -169,6 +169,63 @@ export const DirectTemplateSigningForm = ({
 
     // Do not reset to false since we do a redirect.
   };
+
+  useEffect(() => {
+    const updatedFields = [...localFields];
+
+    const fieldsToAutoSign = localFields.filter((field) => field.fieldMeta?.readOnly);
+
+    fieldsToAutoSign.forEach((field) => {
+      const index = updatedFields.findIndex((f) => f.id === field.id);
+      let value = '';
+
+      match(field.type)
+        .with(FieldType.TEXT, () => {
+          const meta = field.fieldMeta ? ZTextFieldMeta.safeParse(field.fieldMeta) : null;
+
+          if (meta?.success) {
+            value = meta.data.text ?? '';
+          }
+        })
+        .with(FieldType.NUMBER, () => {
+          const meta = field.fieldMeta ? ZNumberFieldMeta.safeParse(field.fieldMeta) : null;
+
+          if (meta?.success) {
+            value = meta.data.value ?? '';
+          }
+        })
+        .with(FieldType.CHECKBOX, () => {
+          const meta = field.fieldMeta ? ZCheckboxFieldMeta.safeParse(field.fieldMeta) : null;
+
+          const checkedValues = meta?.data?.values
+            ?.filter((item) => item.checked)
+            .map((item) => item.value);
+
+          console.log('checkedValues', checkedValues);
+
+          console.log(checkedValues);
+
+          if (checkedValues && checkedValues.length > 0) {
+            value = checkedValues.join(', ');
+          }
+        });
+
+      const signedValue = {
+        token: directRecipient.token,
+        fieldId: field.id,
+        value,
+      };
+
+      updatedFields[index] = {
+        ...field,
+        customText: value,
+        inserted: true,
+        signedValue,
+      };
+    });
+
+    setLocalFields(updatedFields);
+  }, []);
 
   return (
     <DocumentSigningRecipientProvider recipient={directRecipient}>
