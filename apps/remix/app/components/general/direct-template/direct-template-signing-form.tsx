@@ -17,6 +17,7 @@ import {
   ZTextFieldMeta,
 } from '@documenso/lib/types/field-meta';
 import type { TTemplate } from '@documenso/lib/types/template';
+import { toCheckboxValue } from '@documenso/lib/universal/field-checkbox';
 import { sortFieldsByPosition, validateFieldsInserted } from '@documenso/lib/utils/fields';
 import type {
   TRemovedSignedFieldWithTokenMutationSchema,
@@ -201,31 +202,29 @@ export const DirectTemplateSigningForm = ({
             ?.filter((item) => item.checked)
             .map((item) => item.value);
 
-          console.log('checkedValues', checkedValues);
-
-          console.log(checkedValues);
-
           if (checkedValues && checkedValues.length > 0) {
-            value = checkedValues.join(', ');
+            value = toCheckboxValue(checkedValues);
           }
         });
 
-      const signedValue = {
-        token: directRecipient.token,
-        fieldId: field.id,
-        value,
-      };
+      if (value) {
+        const signedValue = {
+          token: directRecipient.token,
+          fieldId: field.id,
+          value,
+        };
 
-      updatedFields[index] = {
-        ...field,
-        customText: value,
-        inserted: true,
-        signedValue,
-      };
+        updatedFields[index] = {
+          ...field,
+          customText: value,
+          inserted: true,
+          signedValue,
+        };
+      }
     });
 
     setLocalFields(updatedFields);
-  }, []);
+  }, [directRecipient.token]);
 
   return (
     <DocumentSigningRecipientProvider recipient={directRecipient}>
