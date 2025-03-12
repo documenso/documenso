@@ -97,6 +97,10 @@ export const DocumentSigningCheckboxField = ({
 
   const onSign = async (authOptions?: TRecipientActionAuth) => {
     try {
+      if (!isLengthConditionMet) {
+        return;
+      }
+
       const payload: TSignFieldWithTokenMutationSchema = {
         token: recipient.token,
         fieldId: field.id,
@@ -205,7 +209,7 @@ export const DocumentSigningCheckboxField = ({
         await removeSignedFieldWithToken(removePayload);
       }
 
-      if (updatedValues.length > 0) {
+      if (updatedValues.length > 0 && shouldAutoSignField) {
         const signPayload: TSignFieldWithTokenMutationSchema = {
           token: recipient.token,
           fieldId: field.id,

@@ -173,8 +173,6 @@ export const DirectTemplateSigningForm = ({
   useEffect(() => {
     const updatedFields = [...localFields];
 
-    // const fieldsToAutoSign = localFields.filter((field) => field.fieldMeta?.readOnly);
-
     localFields.forEach((field) => {
       const index = updatedFields.findIndex((f) => f.id === field.id);
       let value = '';
@@ -219,7 +217,7 @@ export const DirectTemplateSigningForm = ({
     });
 
     setLocalFields(updatedFields);
-  }, [directRecipient.token]);
+  }, []);
 
   return (
     <DocumentSigningRecipientProvider recipient={directRecipient}>
