@@ -174,9 +174,9 @@ export const DirectTemplateSigningForm = ({
   useEffect(() => {
     const updatedFields = [...localFields];
 
-    const fieldsToAutoSign = localFields.filter((field) => field.fieldMeta?.readOnly);
+    // const fieldsToAutoSign = localFields.filter((field) => field.fieldMeta?.readOnly);
 
-    fieldsToAutoSign.forEach((field) => {
+    localFields.forEach((field) => {
       const index = updatedFields.findIndex((f) => f.id === field.id);
       let value = '';
 
@@ -204,6 +204,13 @@ export const DirectTemplateSigningForm = ({
 
           if (checkedValues && checkedValues.length > 0) {
             value = toCheckboxValue(checkedValues);
+          }
+        })
+        .with(FieldType.DROPDOWN, () => {
+          const meta = field.fieldMeta ? ZDropdownFieldMeta.safeParse(field.fieldMeta) : null;
+
+          if (meta?.success) {
+            value = meta.data.defaultValue ?? '';
           }
         });
 
