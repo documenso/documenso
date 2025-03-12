@@ -17,7 +17,6 @@ import {
   ZTextFieldMeta,
 } from '@documenso/lib/types/field-meta';
 import type { TTemplate } from '@documenso/lib/types/template';
-import { toCheckboxValue } from '@documenso/lib/universal/field-checkbox';
 import { sortFieldsByPosition, validateFieldsInserted } from '@documenso/lib/utils/fields';
 import type {
   TRemovedSignedFieldWithTokenMutationSchema,
@@ -193,17 +192,6 @@ export const DirectTemplateSigningForm = ({
 
           if (meta?.success) {
             value = meta.data.value ?? '';
-          }
-        })
-        .with(FieldType.CHECKBOX, () => {
-          const meta = field.fieldMeta ? ZCheckboxFieldMeta.safeParse(field.fieldMeta) : null;
-
-          const checkedValues = meta?.data?.values
-            ?.filter((item) => item.checked)
-            .map((item) => item.value);
-
-          if (checkedValues && checkedValues.length > 0) {
-            value = toCheckboxValue(checkedValues);
           }
         })
         .with(FieldType.DROPDOWN, () => {
