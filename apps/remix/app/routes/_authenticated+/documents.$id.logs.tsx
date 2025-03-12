@@ -129,7 +129,7 @@ export default function DocumentsLogsPage({ loaderData }: Route.ComponentProps) 
         <Trans>Document</Trans>
       </Link>
 
-      <div className="flex flex-col justify-between truncate sm:flex-row">
+      <div className="flex flex-col">
         <div>
           <h1
             className="mt-4 block max-w-[20rem] truncate text-2xl font-semibold md:max-w-[30rem] md:text-3xl"
@@ -137,7 +137,8 @@ export default function DocumentsLogsPage({ loaderData }: Route.ComponentProps) 
           >
             {document.title}
           </h1>
-
+        </div>
+        <div className="mt-1 flex flex-col justify-between sm:flex-row">
           <div className="mt-2.5 flex items-center gap-x-6">
             <DocumentStatusComponent
               inheritColor
@@ -145,16 +146,15 @@ export default function DocumentsLogsPage({ loaderData }: Route.ComponentProps) 
               className="text-muted-foreground"
             />
           </div>
-        </div>
+          <div className="mt-4 flex w-full flex-row sm:mt-0 sm:w-auto sm:self-end">
+            <DocumentCertificateDownloadButton
+              className="mr-2"
+              documentId={document.id}
+              documentStatus={document.status}
+            />
 
-        <div className="mt-4 flex w-full flex-row sm:mt-0 sm:w-auto sm:self-end">
-          <DocumentCertificateDownloadButton
-            className="mr-2"
-            documentId={document.id}
-            documentStatus={document.status}
-          />
-
-          <DocumentAuditLogDownloadButton documentId={document.id} />
+            <DocumentAuditLogDownloadButton documentId={document.id} />
+          </div>
         </div>
       </div>
 
@@ -163,7 +163,7 @@ export default function DocumentsLogsPage({ loaderData }: Route.ComponentProps) 
           {documentInformation.map((info, i) => (
             <div className="text-foreground text-sm" key={i}>
               <h3 className="font-semibold">{_(info.description)}</h3>
-              <p className="text-muted-foreground">{info.value}</p>
+              <p className="text-muted-foreground truncate">{info.value}</p>
             </div>
           ))}
 
