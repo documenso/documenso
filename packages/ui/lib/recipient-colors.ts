@@ -2,7 +2,8 @@
 // !: therefore doing this at runtime is not possible without whitelisting a set of classnames.
 // !:
 // !: This will later be improved as we move to a CSS variable approach and rotate the lightness
-import type { DocumentField } from '@documenso/lib/server-only/field/get-fields-for-document';
+
+export type RecipientColorMap = Record<number, RecipientColorStyles>;
 
 export type RecipientColorStyles = {
   base: string;
@@ -91,21 +92,4 @@ export const getRecipientColorStyles = (index: number) => {
   // be used universally.
   // eslint-disable-next-line react-hooks/rules-of-hooks
   return useRecipientColors(index);
-};
-
-export type RecipientColorMap = Record<number, RecipientColorStyles>;
-
-export const buildRecipientsColorMap = (fields: DocumentField[]): RecipientColorMap => {
-  // Unique recipient IDs sorted from lowest to highest.
-  const recipientIds = [...new Set(fields.map((field) => field.recipientId))].sort();
-
-  return recipientIds.reduce(
-    (acc, recipientId, index) => {
-      acc[recipientId] = getRecipientColorStyles(index);
-
-      return acc;
-    },
-    // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
-    {} as RecipientColorMap,
-  );
 };

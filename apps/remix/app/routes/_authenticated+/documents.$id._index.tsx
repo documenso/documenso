@@ -206,6 +206,7 @@ export default function DocumentPage() {
             documentMeta={documentMeta || undefined}
             showRecipientTooltip={true}
             showRecipientColors={true}
+            recipientIds={recipients.map((recipient) => recipient.id)}
           />
         )}
 

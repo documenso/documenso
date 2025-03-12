@@ -106,6 +106,7 @@ export const DirectTemplateConfigureForm = ({
               directTemplateRecipient.fields,
               recipientsWithBlankDirectRecipientEmail,
             )}
+            recipientIds={recipients.map((recipient) => recipient.id)}
             showRecipientColors={true}
           />
         )}

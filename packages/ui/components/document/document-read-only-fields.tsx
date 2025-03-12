@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useState } from 'react';
 
 import { useLingui } from '@lingui/react';
 import { Trans } from '@lingui/react/macro';
@@ -18,7 +18,7 @@ import { FRIENDLY_FIELD_TYPE } from '@documenso/ui/primitives/document-flow/type
 import { ElementVisible } from '@documenso/ui/primitives/element-visible';
 import { PopoverHover } from '@documenso/ui/primitives/popover';
 
-import { buildRecipientsColorMap } from '../../lib/recipient-colors';
+import { getRecipientColorStyles } from '../../lib/recipient-colors';
 import { FieldContent } from '../../primitives/document-flow/field-content';
 
 export type DocumentReadOnlyFieldsProps = {
@@ -26,6 +26,14 @@ export type DocumentReadOnlyFieldsProps = {
   documentMeta?: DocumentMeta;
 
   showFieldStatus?: boolean;
+
+  /**
+   * Required if you want to show colors.
+   *
+   * Can't derive this from the fields because sometimes recipients don't have fields
+   * yet.
+   */
+  recipientIds?: number[];
 
   /**
    * Whether to show the recipient tooltip.
@@ -61,6 +69,7 @@ export const mapFieldsWithRecipients = (
 export const DocumentReadOnlyFields = ({
   documentMeta,
   fields,
+  recipientIds = [],
   showFieldStatus = true,
   showRecipientTooltip = false,
   showRecipientColors = false,
@@ -73,17 +82,6 @@ export const DocumentReadOnlyFields = ({
     setHiddenFieldIds((prev) => ({ ...prev, [fieldId]: true }));
   };
 
-  /**
-   * Create a map of recipient IDs to their color styles.
-   */
-  const recipientColors = useMemo(() => {
-    if (!showRecipientColors) {
-      return {};
-    }
-
-    return buildRecipientsColorMap(fields);
-  }, [fields, showRecipientColors]);
-
   return (
     <ElementVisible target={PDF_VIEWER_PAGE_SELECTOR}>
       {fields.map(
@@ -92,7 +90,16 @@ export const DocumentReadOnlyFields = ({
             <FieldRootContainer
               field={field}
               key={field.id}
-              color={recipientColors[field.recipientId]}
+              color={
+                showRecipientColors
+                  ? getRecipientColorStyles(
+                      Math.max(
+                        recipientIds.findIndex((id) => id === field.recipientId),
+                        0,
+                      ),
+                    )
+                  : undefined
+              }
             >
               {showRecipientTooltip && (
                 <div className="absolute -right-3 -top-3">

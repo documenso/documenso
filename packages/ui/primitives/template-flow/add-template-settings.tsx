@@ -152,6 +152,7 @@ export const AddTemplateSettingsFormPartial = ({
         {isDocumentPdfLoaded && (
           <DocumentReadOnlyFields
             showRecipientColors={true}
+            recipientIds={recipients.map((recipient) => recipient.id)}
             fields={mapFieldsWithRecipients(fields, recipients)}
           />
         )}

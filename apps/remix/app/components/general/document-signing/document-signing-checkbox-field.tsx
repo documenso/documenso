@@ -97,6 +97,11 @@ export const DocumentSigningCheckboxField = ({
 
   const onSign = async (authOptions?: TRecipientActionAuth) => {
     try {
+      // Do nothing, since the user clicked on a non checkbox area.
+      if (checkedValues.length === 0) {
+        return;
+      }
+
       const payload: TSignFieldWithTokenMutationSchema = {
         token: recipient.token,
         fieldId: field.id,

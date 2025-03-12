@@ -153,6 +153,7 @@ export default function TemplatePage() {
           showFieldStatus={false}
           showRecipientTooltip={true}
           showRecipientColors={true}
+          recipientIds={recipients.map((recipient) => recipient.id)}
           documentMeta={mockedDocumentMeta}
         />
 
