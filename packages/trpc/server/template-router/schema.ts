@@ -68,7 +68,12 @@ export const ZCreateDocumentFromTemplateRequestSchema = z.object({
       'The data ID of an alternative PDF to use when creating the document. If not provided, the PDF attached to the template will be used.',
     )
     .optional(),
-  prefillFields: z.array(ZFieldMetaPrefillFieldsSchema).optional(),
+  prefillFields: z
+    .array(ZFieldMetaPrefillFieldsSchema)
+    .describe(
+      'The fields to prefill on the document before sending it out. Useful when you want to create a document from an existing template and pre-fill the fields with specific values.',
+    )
+    .optional(),
 });
 
 export const ZCreateDocumentFromTemplateResponseSchema = ZDocumentSchema;
