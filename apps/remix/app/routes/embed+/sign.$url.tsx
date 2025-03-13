@@ -1,4 +1,4 @@
-import { DocumentStatus, RecipientRole } from '@prisma/client';
+import { RecipientRole } from '@prisma/client';
 import { data } from 'react-router';
 import { match } from 'ts-pattern';
 
@@ -14,6 +14,7 @@ import { getRecipientByToken } from '@documenso/lib/server-only/recipient/get-re
 import { getRecipientsForAssistant } from '@documenso/lib/server-only/recipient/get-recipients-for-assistant';
 import { getTeamById } from '@documenso/lib/server-only/team/get-team';
 import { DocumentAccessAuth } from '@documenso/lib/types/document-auth';
+import { isDocumentCompleted } from '@documenso/lib/utils/document';
 import { extractDocumentAuthMethods } from '@documenso/lib/utils/document-auth';
 
 import { EmbedSignDocumentClientPage } from '~/components/embed/embed-document-signing-page';
@@ -168,7 +169,7 @@ export default function EmbedSignDocumentPage() {
           recipient={recipient}
           fields={fields}
           metadata={document.documentMeta}
-          isCompleted={document.status === DocumentStatus.COMPLETED}
+          isCompleted={isDocumentCompleted(document.status)}
           hidePoweredBy={
             isCommunityPlan || isPlatformDocument || isEnterpriseDocument || hidePoweredBy
           }

@@ -96,7 +96,7 @@ export const ZSendDocumentForSigningMutationSchema = z
         'Whether to send completion emails when the document is fully signed. This will override the document email settings.',
     }),
   })
-  .or(z.literal('').transform(() => ({ sendEmail: true, sendCompletionEmails: undefined })));
+  .or(z.any().transform(() => ({ sendEmail: true, sendCompletionEmails: undefined })));
 
 export type TSendDocumentForSigningMutationSchema = typeof ZSendDocumentForSigningMutationSchema;
 

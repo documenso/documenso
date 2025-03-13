@@ -17,6 +17,7 @@ import { Link } from 'react-router';
 import { match } from 'ts-pattern';
 
 import { RECIPIENT_ROLES_DESCRIPTION } from '@documenso/lib/constants/recipient-roles';
+import { isDocumentCompleted } from '@documenso/lib/utils/document';
 import { formatSigningLink } from '@documenso/lib/utils/recipients';
 import { CopyTextButton } from '@documenso/ui/components/common/copy-text-button';
 import { SignatureIcon } from '@documenso/ui/icons/signature';
@@ -48,7 +49,7 @@ export const DocumentPageViewRecipients = ({
           <Trans>Recipients</Trans>
         </h1>
 
-        {document.status !== DocumentStatus.COMPLETED && (
+        {!isDocumentCompleted(document.status) && (
           <Link
             to={`${documentRootPath}/${document.id}/edit?step=signers`}
             title={_(msg`Modify recipients`)}

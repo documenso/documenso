@@ -9,6 +9,7 @@ import { match } from 'ts-pattern';
 
 import { downloadPDF } from '@documenso/lib/client-only/download-pdf';
 import { useSession } from '@documenso/lib/client-only/providers/session';
+import { isDocumentCompleted } from '@documenso/lib/utils/document';
 import { formatDocumentsPath } from '@documenso/lib/utils/teams';
 import { trpc as trpcClient } from '@documenso/trpc/client';
 import { Button } from '@documenso/ui/primitives/button';
@@ -32,7 +33,7 @@ export const DocumentPageViewButton = ({ document }: DocumentPageViewButtonProps
 
   const isRecipient = !!recipient;
   const isPending = document.status === DocumentStatus.PENDING;
-  const isComplete = document.status === DocumentStatus.COMPLETED;
+  const isComplete = isDocumentCompleted(document);
   const isSigned = recipient?.signingStatus === SigningStatus.SIGNED;
   const role = recipient?.role;
 

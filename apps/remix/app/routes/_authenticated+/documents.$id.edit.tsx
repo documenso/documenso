@@ -1,5 +1,5 @@
 import { Plural, Trans } from '@lingui/react/macro';
-import { DocumentStatus as InternalDocumentStatus, TeamMemberRole } from '@prisma/client';
+import { TeamMemberRole } from '@prisma/client';
 import { ChevronLeft, Users2 } from 'lucide-react';
 import { Link, redirect } from 'react-router';
 import { match } from 'ts-pattern';
@@ -9,6 +9,7 @@ import { isUserEnterprise } from '@documenso/ee/server-only/util/is-document-ent
 import { getDocumentWithDetailsById } from '@documenso/lib/server-only/document/get-document-with-details-by-id';
 import { type TGetTeamByUrlResponse, getTeamByUrl } from '@documenso/lib/server-only/team/get-team';
 import { DocumentVisibility } from '@documenso/lib/types/document-visibility';
+import { isDocumentCompleted } from '@documenso/lib/utils/document';
 import { formatDocumentsPath } from '@documenso/lib/utils/teams';
 
 import { DocumentEditForm } from '~/components/general/document/document-edit-form';
@@ -71,7 +72,7 @@ export async function loader({ params, request }: Route.LoaderArgs) {
     throw redirect(documentRootPath);
   }
 
-  if (document.status === InternalDocumentStatus.COMPLETED) {
+  if (isDocumentCompleted(document.status)) {
     throw redirect(`${documentRootPath}/${documentId}`);
   }
 

@@ -160,7 +160,7 @@ export default function SigningPage() {
     recipientWithFields,
   } = data;
 
-  if (document.deletedAt) {
+  if (document.deletedAt || document.status === DocumentStatus.REJECTED) {
     return (
       <div className="-mx-4 flex max-w-[100vw] flex-col items-center overflow-x-hidden px-4 pt-16 md:-mx-8 md:px-8 lg:pt-16 xl:pt-24">
         <SigningCard3D
