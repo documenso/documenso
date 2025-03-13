@@ -1,7 +1,5 @@
-import { TeamMemberRole } from '@prisma/client';
 import type { Prisma, User } from '@prisma/client';
-import { SigningStatus } from '@prisma/client';
-import { DocumentVisibility } from '@prisma/client';
+import { DocumentVisibility, SigningStatus, TeamMemberRole } from '@prisma/client';
 import { DateTime } from 'luxon';
 import { match } from 'ts-pattern';
 
@@ -17,7 +15,7 @@ export type GetStatsInput = {
   search?: string;
 };
 
-export const getStats = async ({ user, period, search = '', ...options }: GetStatsInput) => {
+export const getStats = async ({ user, period, search, ...options }: GetStatsInput) => {
   let createdAt: Prisma.DocumentWhereInput['createdAt'];
 
   if (period) {
@@ -30,7 +28,7 @@ export const getStats = async ({ user, period, search = '', ...options }: GetSta
     };
   }
 
-  const [ownerCounts, notSignedCounts, hasSignedCounts] = await (options.team
+  const [ownerCounts, notSignedCounts, hasSignedCounts, deletedCounts] = await (options.team
     ? getTeamCounts({
         ...options.team,
         createdAt,
@@ -45,6 +43,7 @@ export const getStats = async ({ user, period, search = '', ...options }: GetSta
     [ExtendedDocumentStatus.PENDING]: 0,
     [ExtendedDocumentStatus.COMPLETED]: 0,
     [ExtendedDocumentStatus.REJECTED]: 0,
+    [ExtendedDocumentStatus.DELETED]: 0,
     [ExtendedDocumentStatus.INBOX]: 0,
     [ExtendedDocumentStatus.ALL]: 0,
   };
@@ -70,6 +69,8 @@ export const getStats = async ({ user, period, search = '', ...options }: GetSta
       stats[ExtendedDocumentStatus.REJECTED] += stat._count._all;
     }
   });
+
+  stats[ExtendedDocumentStatus.DELETED] = deletedCounts || 0;
 
   Object.keys(stats).forEach((key) => {
     if (key !== ExtendedDocumentStatus.ALL && isExtendedDocumentStatus(key)) {
@@ -160,6 +161,32 @@ const getCounts = async ({ user, createdAt, search }: GetCountsOption) => {
                 email: user.email,
                 signingStatus: SigningStatus.SIGNED,
                 documentDeletedAt: null,
+              },
+            },
+          },
+        ],
+        AND: [searchFilter],
+      },
+    }),
+    // Deleted count
+    prisma.document.count({
+      where: {
+        OR: [
+          {
+            userId: user.id,
+            deletedAt: {
+              gte: DateTime.now().minus({ days: 30 }).toJSDate(),
+              not: null,
+            },
+          },
+          {
+            recipients: {
+              some: {
+                email: user.email,
+                documentDeletedAt: {
+                  gte: DateTime.now().minus({ days: 30 }).toJSDate(),
+                  not: null,
+                },
               },
             },
           },
@@ -336,5 +363,40 @@ const getTeamCounts = async (options: GetTeamCountsOption) => {
     }),
     notSignedCountsGroupByArgs ? prisma.document.groupBy(notSignedCountsGroupByArgs) : [],
     hasSignedCountsGroupByArgs ? prisma.document.groupBy(hasSignedCountsGroupByArgs) : [],
+    prisma.document.count({
+      where: {
+        OR: [
+          {
+            teamId,
+            userId: userIdWhereClause,
+            deletedAt: {
+              gte: DateTime.now().minus({ days: 30 }).toJSDate(),
+              not: null,
+            },
+          },
+          {
+            user: {
+              email: teamEmail,
+            },
+            deletedAt: {
+              gte: DateTime.now().minus({ days: 30 }).toJSDate(),
+              not: null,
+            },
+          },
+          {
+            recipients: {
+              some: {
+                email: teamEmail,
+                documentDeletedAt: {
+                  gte: DateTime.now().minus({ days: 30 }).toJSDate(),
+                  not: null,
+                },
+              },
+            },
+          },
+        ],
+        AND: [searchFilter],
+      },
+    }),
   ]);
 };

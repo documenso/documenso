@@ -1,8 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 
 import { Trans } from '@lingui/react/macro';
-import { useSearchParams } from 'react-router';
-import { Link } from 'react-router';
+import { Link, useSearchParams } from 'react-router';
 import { z } from 'zod';
 
 import { formatAvatarUrl } from '@documenso/lib/utils/avatars';
@@ -51,6 +50,7 @@ export default function DocumentsPage() {
     [ExtendedDocumentStatus.PENDING]: 0,
     [ExtendedDocumentStatus.COMPLETED]: 0,
     [ExtendedDocumentStatus.REJECTED]: 0,
+    [ExtendedDocumentStatus.DELETED]: 0,
     [ExtendedDocumentStatus.INBOX]: 0,
     [ExtendedDocumentStatus.ALL]: 0,
   });
@@ -114,13 +114,17 @@ export default function DocumentsPage() {
         </div>
 
         <div className="-m-1 flex flex-wrap gap-x-4 gap-y-6 overflow-hidden p-1">
-          <Tabs value={findDocumentSearchParams.status || 'ALL'} className="overflow-x-auto">
+          <Tabs
+            value={findDocumentSearchParams.status || ExtendedDocumentStatus.ALL}
+            className="overflow-x-auto"
+          >
             <TabsList>
               {[
                 ExtendedDocumentStatus.INBOX,
                 ExtendedDocumentStatus.PENDING,
                 ExtendedDocumentStatus.COMPLETED,
                 ExtendedDocumentStatus.DRAFT,
+                ExtendedDocumentStatus.DELETED,
                 ExtendedDocumentStatus.ALL,
               ].map((value) => (
                 <TabsTrigger
