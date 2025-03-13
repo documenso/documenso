@@ -103,7 +103,9 @@ export default function AdminDocumentDetailsPage({ loaderData }: Route.Component
                 variant="outline"
                 loading={isResealDocumentLoading}
                 disabled={document.recipients.some(
-                  (recipient) => recipient.signingStatus !== SigningStatus.SIGNED,
+                  (recipient) =>
+                    recipient.signingStatus !== SigningStatus.SIGNED &&
+                    recipient.signingStatus !== SigningStatus.REJECTED,
                 )}
                 onClick={() => resealDocument({ id: document.id })}
               >

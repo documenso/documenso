@@ -8,6 +8,9 @@ export const DOCUMENT_STATUS: {
   [DocumentStatus.COMPLETED]: {
     description: msg`Completed`,
   },
+  [DocumentStatus.REJECTED]: {
+    description: msg`Rejected`,
+  },
   [DocumentStatus.DRAFT]: {
     description: msg`Draft`,
   },

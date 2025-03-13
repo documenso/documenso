@@ -297,6 +297,7 @@ enum DocumentStatus {
   DRAFT
   PENDING
   COMPLETED
+  REJECTED
 }
 
 enum DocumentSource {

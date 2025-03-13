@@ -1,4 +1,4 @@
-import { DocumentDataType, DocumentStatus } from '@prisma/client';
+import { DocumentDataType } from '@prisma/client';
 import { TRPCError } from '@trpc/server';
 import { DateTime } from 'luxon';
 
@@ -26,6 +26,7 @@ import { sendDocument } from '@documenso/lib/server-only/document/send-document'
 import { updateDocument } from '@documenso/lib/server-only/document/update-document';
 import { getTeamById } from '@documenso/lib/server-only/team/get-team';
 import { getPresignPostUrl } from '@documenso/lib/universal/upload/server-actions';
+import { isDocumentCompleted } from '@documenso/lib/utils/document';
 
 import { authenticatedProcedure, procedure, router } from '../trpc';
 import {
@@ -659,7 +660,7 @@ export const documentRouter = router({
         teamId,
       });
 
-      if (document.status !== DocumentStatus.COMPLETED) {
+      if (!isDocumentCompleted(document.status)) {
         throw new AppError('DOCUMENT_NOT_COMPLETE');
       }
 

@@ -6,9 +6,11 @@ import { PDFDocument } from 'pdf-lib';
 import { prisma } from '@documenso/prisma';
 import { signPdf } from '@documenso/signing';
 
+import { AppError, AppErrorCode } from '../../../errors/app-error';
 import { sendCompletedEmail } from '../../../server-only/document/send-completed-email';
 import PostHogServerClient from '../../../server-only/feature-flags/get-post-hog-server-client';
 import { getCertificatePdf } from '../../../server-only/htmltopdf/get-certificate-pdf';
+import { addRejectionStampToPdf } from '../../../server-only/pdf/add-rejection-stamp-to-pdf';
 import { flattenAnnotations } from '../../../server-only/pdf/flatten-annotations';
 import { flattenForm } from '../../../server-only/pdf/flatten-form';
 import { insertFieldInPDF } from '../../../server-only/pdf/insert-field-in-pdf';
@@ -22,6 +24,7 @@ import {
 import { getFileServerSide } from '../../../universal/upload/get-file.server';
 import { putPdfFileServerSide } from '../../../universal/upload/put-file.server';
 import { fieldsContainUnsignedRequiredField } from '../../../utils/advanced-fields-helpers';
+import { isDocumentCompleted } from '../../../utils/document';
 import { createDocumentAuditLogData } from '../../../utils/document-audit-logs';
 import type { JobRunIO } from '../../client/_internal/job';
 import type { TSealDocumentJobDefinition } from './seal-document';
@@ -38,11 +41,6 @@ export const run = async ({
   const document = await prisma.document.findFirstOrThrow({
     where: {
       id: documentId,
-      recipients: {
-        every: {
-          signingStatus: SigningStatus.SIGNED,
-        },
-      },
     },
     include: {
       documentMeta: true,
@@ -58,6 +56,16 @@ export const run = async ({
       },
     },
   });
+
+  const isComplete =
+    document.recipients.some((recipient) => recipient.signingStatus === SigningStatus.REJECTED) ||
+    document.recipients.every((recipient) => recipient.signingStatus === SigningStatus.SIGNED);
+
+  if (!isComplete) {
+    throw new AppError(AppErrorCode.UNKNOWN_ERROR, {
+      message: 'Document is not complete',
+    });
+  }
 
   // Seems silly but we need to do this in case the job is re-ran
   // after it has already run through the update task further below.
@@ -91,9 +99,15 @@ export const run = async ({
     },
   });
 
-  if (recipients.some((recipient) => recipient.signingStatus !== SigningStatus.SIGNED)) {
-    throw new Error(`Document ${document.id} has unsigned recipients`);
-  }
+  // Determine if the document has been rejected by checking if any recipient has rejected it
+  const rejectedRecipient = recipients.find(
+    (recipient) => recipient.signingStatus === SigningStatus.REJECTED,
+  );
+
+  const isRejected = Boolean(rejectedRecipient);
+
+  // Get the rejection reason from the rejected recipient
+  const rejectionReason = rejectedRecipient?.rejectionReason ?? '';
 
   const fields = await prisma.field.findMany({
     where: {
@@ -104,7 +118,8 @@ export const run = async ({
     },
   });
 
-  if (fieldsContainUnsignedRequiredField(fields)) {
+  // Skip the field check if the document is rejected
+  if (!isRejected && fieldsContainUnsignedRequiredField(fields)) {
     throw new Error(`Document ${document.id} has unsigned required fields`);
   }
 
@@ -131,6 +146,11 @@ export const run = async ({
     normalizeSignatureAppearances(pdfDoc);
     flattenForm(pdfDoc);
     flattenAnnotations(pdfDoc);
+
+    // Add rejection stamp if the document is rejected
+    if (isRejected && rejectionReason) {
+      await addRejectionStampToPdf(pdfDoc, rejectionReason);
+    }
 
     if (certificateData) {
       const certificateDoc = await PDFDocument.load(certificateData);
@@ -160,8 +180,11 @@ export const run = async ({
 
     const { name } = path.parse(document.title);
 
+    // Add suffix based on document status
+    const suffix = isRejected ? '_rejected.pdf' : '_signed.pdf';
+
     const documentData = await putPdfFileServerSide({
-      name: `${name}_signed.pdf`,
+      name: `${name}${suffix}`,
       type: 'application/pdf',
       arrayBuffer: async () => Promise.resolve(pdfBuffer),
     });
@@ -177,6 +200,7 @@ export const run = async ({
       event: 'App: Document Sealed',
       properties: {
         documentId: document.id,
+        isRejected,
       },
     });
   }
@@ -194,7 +218,7 @@ export const run = async ({
           id: document.id,
         },
         data: {
-          status: DocumentStatus.COMPLETED,
+          status: isRejected ? DocumentStatus.REJECTED : DocumentStatus.COMPLETED,
           completedAt: new Date(),
         },
       });
@@ -216,6 +240,7 @@ export const run = async ({
           user: null,
           data: {
             transactionId: nanoid(),
+            ...(isRejected ? { isRejected: true, rejectionReason: rejectionReason } : {}),
           },
         }),
       });
@@ -223,9 +248,9 @@ export const run = async ({
   });
 
   await io.runTask('send-completed-email', async () => {
-    let shouldSendCompletedEmail = sendEmail && !isResealing;
+    let shouldSendCompletedEmail = sendEmail && !isResealing && !isRejected;
 
-    if (isResealing && documentStatus !== DocumentStatus.COMPLETED) {
+    if (isResealing && !isDocumentCompleted(document.status)) {
       shouldSendCompletedEmail = sendEmail;
     }
 
@@ -246,7 +271,9 @@ export const run = async ({
   });
 
   await triggerWebhook({
-    event: WebhookTriggerEvents.DOCUMENT_COMPLETED,
+    event: isRejected
+      ? WebhookTriggerEvents.DOCUMENT_REJECTED
+      : WebhookTriggerEvents.DOCUMENT_COMPLETED,
     data: ZWebhookDocumentSchema.parse(mapDocumentToWebhookDocumentPayload(updatedDocument)),
     userId: updatedDocument.userId,
     teamId: updatedDocument.teamId ?? undefined,

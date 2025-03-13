@@ -31,6 +31,7 @@ type DocumentToSeed = {
 
 export const seedDocuments = async (documents: DocumentToSeed[]) => {
   await Promise.all(
+    // eslint-disable-next-line @typescript-eslint/require-await
     documents.map(async (document, i) =>
       match(document.type)
         .with(DocumentStatus.DRAFT, async () =>
@@ -50,8 +51,7 @@ export const seedDocuments = async (documents: DocumentToSeed[]) => {
             key: i,
             createDocumentOptions: document.documentOptions,
           }),
-        )
-        .exhaustive(),
+        ),
     ),
   );
 };

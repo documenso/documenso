@@ -1,6 +1,6 @@
 import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
-import { FieldType } from '@prisma/client';
+import { FieldType, SigningStatus } from '@prisma/client';
 import { DateTime } from 'luxon';
 import { redirect } from 'react-router';
 import { match } from 'ts-pattern';
@@ -159,6 +159,13 @@ export default function SigningCertificate({ loaderData }: Route.ComponentProps)
           log.type === DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_RECIPIENT_COMPLETED &&
           log.data.recipientId === recipientId,
       ),
+      [DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_RECIPIENT_REJECTED]: auditLogs[
+        DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_RECIPIENT_REJECTED
+      ].filter(
+        (log) =>
+          log.type === DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_RECIPIENT_REJECTED &&
+          log.data.recipientId === recipientId,
+      ),
     };
   };
 
@@ -282,25 +289,42 @@ export default function SigningCertificate({ loaderData }: Route.ComponentProps)
                           </span>
                         </p>
 
-                        <p className="text-muted-foreground text-sm print:text-xs">
-                          <span className="font-medium">{_(msg`Signed`)}:</span>{' '}
-                          <span className="inline-block">
-                            {logs.DOCUMENT_RECIPIENT_COMPLETED[0]
-                              ? DateTime.fromJSDate(logs.DOCUMENT_RECIPIENT_COMPLETED[0].createdAt)
-                                  .setLocale(APP_I18N_OPTIONS.defaultLocale)
-                                  .toFormat('yyyy-MM-dd hh:mm:ss a (ZZZZ)')
-                              : _(msg`Unknown`)}
-                          </span>
-                        </p>
+                        {logs.DOCUMENT_RECIPIENT_REJECTED[0] ? (
+                          <p className="text-muted-foreground text-sm print:text-xs">
+                            <span className="font-medium">{_(msg`Rejected`)}:</span>{' '}
+                            <span className="inline-block">
+                              {logs.DOCUMENT_RECIPIENT_REJECTED[0]
+                                ? DateTime.fromJSDate(logs.DOCUMENT_RECIPIENT_REJECTED[0].createdAt)
+                                    .setLocale(APP_I18N_OPTIONS.defaultLocale)
+                                    .toFormat('yyyy-MM-dd hh:mm:ss a (ZZZZ)')
+                                : _(msg`Unknown`)}
+                            </span>
+                          </p>
+                        ) : (
+                          <p className="text-muted-foreground text-sm print:text-xs">
+                            <span className="font-medium">{_(msg`Signed`)}:</span>{' '}
+                            <span className="inline-block">
+                              {logs.DOCUMENT_RECIPIENT_COMPLETED[0]
+                                ? DateTime.fromJSDate(
+                                    logs.DOCUMENT_RECIPIENT_COMPLETED[0].createdAt,
+                                  )
+                                    .setLocale(APP_I18N_OPTIONS.defaultLocale)
+                                    .toFormat('yyyy-MM-dd hh:mm:ss a (ZZZZ)')
+                                : _(msg`Unknown`)}
+                            </span>
+                          </p>
+                        )}
 
                         <p className="text-muted-foreground text-sm print:text-xs">
                           <span className="font-medium">{_(msg`Reason`)}:</span>{' '}
                           <span className="inline-block">
-                            {_(
-                              isOwner(recipient.email)
-                                ? FRIENDLY_SIGNING_REASONS['__OWNER__']
-                                : FRIENDLY_SIGNING_REASONS[recipient.role],
-                            )}
+                            {recipient.signingStatus === SigningStatus.REJECTED
+                              ? recipient.rejectionReason
+                              : _(
+                                  isOwner(recipient.email)
+                                    ? FRIENDLY_SIGNING_REASONS['__OWNER__']
+                                    : FRIENDLY_SIGNING_REASONS[recipient.role],
+                                )}
                           </span>
                         </p>
                       </div>

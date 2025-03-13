@@ -4,7 +4,7 @@ import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
 import { Trans } from '@lingui/react/macro';
 import { DocumentStatus } from '@prisma/client';
-import { match } from 'ts-pattern';
+import { P, match } from 'ts-pattern';
 
 import { useLimits } from '@documenso/ee/server-only/limits/provider/client';
 import { trpc as trpcReact } from '@documenso/trpc/react';
@@ -146,7 +146,7 @@ export const DocumentDeleteDialog = ({
                   </ul>
                 </AlertDescription>
               ))
-              .with(DocumentStatus.COMPLETED, () => (
+              .with(P.union(DocumentStatus.COMPLETED, DocumentStatus.REJECTED), () => (
                 <AlertDescription>
                   <p>
                     <Trans>By deleting this document, the following will occur:</Trans>

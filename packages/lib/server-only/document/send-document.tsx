@@ -20,6 +20,7 @@ import {
 } from '../../types/webhook-payload';
 import { getFileServerSide } from '../../universal/upload/get-file.server';
 import { putPdfFileServerSide } from '../../universal/upload/put-file.server';
+import { isDocumentCompleted } from '../../utils/document';
 import { insertFormValuesInPdf } from '../pdf/insert-form-values-in-pdf';
 import { triggerWebhook } from '../webhooks/trigger/trigger-webhook';
 
@@ -74,7 +75,7 @@ export const sendDocument = async ({
     throw new Error('Document has no recipients');
   }
 
-  if (document.status === DocumentStatus.COMPLETED) {
+  if (isDocumentCompleted(document.status)) {
     throw new Error('Can not send completed document');
   }
 
