@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 
 import { Trans } from '@lingui/react/macro';
 import type { Field, Recipient, Signature } from '@prisma/client';
@@ -169,6 +169,55 @@ export const DirectTemplateSigningForm = ({
 
     // Do not reset to false since we do a redirect.
   };
+
+  useEffect(() => {
+    const updatedFields = [...localFields];
+
+    localFields.forEach((field) => {
+      const index = updatedFields.findIndex((f) => f.id === field.id);
+      let value = '';
+
+      match(field.type)
+        .with(FieldType.TEXT, () => {
+          const meta = field.fieldMeta ? ZTextFieldMeta.safeParse(field.fieldMeta) : null;
+
+          if (meta?.success) {
+            value = meta.data.text ?? '';
+          }
+        })
+        .with(FieldType.NUMBER, () => {
+          const meta = field.fieldMeta ? ZNumberFieldMeta.safeParse(field.fieldMeta) : null;
+
+          if (meta?.success) {
+            value = meta.data.value ?? '';
+          }
+        })
+        .with(FieldType.DROPDOWN, () => {
+          const meta = field.fieldMeta ? ZDropdownFieldMeta.safeParse(field.fieldMeta) : null;
+
+          if (meta?.success) {
+            value = meta.data.defaultValue ?? '';
+          }
+        });
+
+      if (value) {
+        const signedValue = {
+          token: directRecipient.token,
+          fieldId: field.id,
+          value,
+        };
+
+        updatedFields[index] = {
+          ...field,
+          customText: value,
+          inserted: true,
+          signedValue,
+        };
+      }
+    });
+
+    setLocalFields(updatedFields);
+  }, []);
 
   return (
     <DocumentSigningRecipientProvider recipient={directRecipient}>
