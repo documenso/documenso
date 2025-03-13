@@ -213,8 +213,6 @@ export const run = async ({
         },
       });
 
-      console.log('Updating document to have status:', isRejected ? 'REJECTED' : 'COMPLETED');
-
       await tx.document.update({
         where: {
           id: document.id,
