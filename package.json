@@ -14,7 +14,7 @@
     "prepare": "husky && husky install || true",
     "commitlint": "commitlint --edit",
     "clean": "turbo run clean && rimraf node_modules",
-    "d": "npm run dx && npm run dev",
+    "d": "npm run dx && npm run translate:compile && npm run dev",
     "dx": "npm i && npm run dx:up && npm run prisma:migrate-dev && npm run prisma:seed",
     "dx:up": "docker compose -f docker/development/compose.yml up -d",
     "dx:down": "docker compose -f docker/development/compose.yml down",
