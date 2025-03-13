@@ -293,6 +293,11 @@ export const ZDistributeDocumentRequestSchema = z.object({
     .optional(),
 });
 
+export const ZSelfSignDocumentMutationSchema = z.object({
+  documentId: z.number(),
+  teamId: z.number().optional(),
+});
+
 export const ZDistributeDocumentResponseSchema = ZDocumentLiteSchema;
 
 export const ZSetPasswordForDocumentMutationSchema = z.object({
