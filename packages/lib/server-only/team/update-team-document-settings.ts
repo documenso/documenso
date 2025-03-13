@@ -17,6 +17,7 @@ export type UpdateTeamDocumentSettingsOptions = {
     includeSenderDetails: boolean;
     typedSignatureEnabled: boolean;
     includeSigningCertificate: boolean;
+    includeAuditTrailLog: boolean;
   };
 };
 
@@ -36,6 +37,7 @@ export const updateTeamDocumentSettings = async ({
     documentLanguage,
     includeSenderDetails,
     includeSigningCertificate,
+    includeAuditTrailLog,
     typedSignatureEnabled,
   } = settings;
 
@@ -61,6 +63,7 @@ export const updateTeamDocumentSettings = async ({
       includeSenderDetails,
       typedSignatureEnabled,
       includeSigningCertificate,
+      includeAuditTrailLog,
     },
     update: {
       documentVisibility,
@@ -68,6 +71,7 @@ export const updateTeamDocumentSettings = async ({
       includeSenderDetails,
       typedSignatureEnabled,
       includeSigningCertificate,
+      includeAuditTrailLog,
     },
   });
 };
