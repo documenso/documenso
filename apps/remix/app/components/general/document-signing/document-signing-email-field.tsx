@@ -1,7 +1,6 @@
 import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
 import { Trans } from '@lingui/react/macro';
-import { Loader } from 'lucide-react';
 import { useRevalidator } from 'react-router';
 
 import { DO_NOT_INVALIDATE_QUERY_ON_MUTATION } from '@documenso/lib/constants/trpc';
@@ -14,10 +13,14 @@ import type {
   TRemovedSignedFieldWithTokenMutationSchema,
   TSignFieldWithTokenMutationSchema,
 } from '@documenso/trpc/server/field-router/schema';
-import { cn } from '@documenso/ui/lib/utils';
 import { useToast } from '@documenso/ui/primitives/use-toast';
 
 import { DocumentSigningFieldContainer } from './document-signing-field-container';
+import {
+  DocumentSigningFieldsInserted,
+  DocumentSigningFieldsLoader,
+  DocumentSigningFieldsUninserted,
+} from './document-signing-fields';
 import { useRequiredDocumentSigningContext } from './document-signing-provider';
 import { useDocumentSigningRecipientContext } from './document-signing-recipient-provider';
 
@@ -120,34 +123,18 @@ export const DocumentSigningEmailField = ({
 
   return (
     <DocumentSigningFieldContainer field={field} onSign={onSign} onRemove={onRemove} type="Email">
-      {isLoading && (
-        <div className="bg-background absolute inset-0 flex items-center justify-center rounded-md">
-          <Loader className="text-primary h-5 w-5 animate-spin md:h-8 md:w-8" />
-        </div>
-      )}
+      {isLoading && <DocumentSigningFieldsLoader />}
 
       {!field.inserted && (
-        <p className="group-hover:text-primary text-muted-foreground text-[clamp(0.425rem,25cqw,0.825rem)] duration-200 group-hover:text-yellow-300">
+        <DocumentSigningFieldsUninserted>
           <Trans>Email</Trans>
-        </p>
+        </DocumentSigningFieldsUninserted>
       )}
 
       {field.inserted && (
-        <div className="flex h-full w-full items-center">
-          <p
-            className={cn(
-              'text-muted-foreground dark:text-background/80 w-full text-[clamp(0.425rem,25cqw,0.825rem)] duration-200',
-              {
-                'text-left': parsedFieldMeta?.textAlign === 'left',
-                'text-center':
-                  !parsedFieldMeta?.textAlign || parsedFieldMeta?.textAlign === 'center',
-                'text-right': parsedFieldMeta?.textAlign === 'right',
-              },
-            )}
-          >
-            {field.customText}
-          </p>
-        </div>
+        <DocumentSigningFieldsInserted textAlign={parsedFieldMeta?.textAlign}>
+          {field.customText}
+        </DocumentSigningFieldsInserted>
       )}
     </DocumentSigningFieldContainer>
   );

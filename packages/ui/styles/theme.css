@@ -3,7 +3,8 @@
 @tailwind utilities;
 
 @layer base {
-  :root {
+  :root,
+  .dark-mode-disabled {
     --background: 0 0% 100%;
     --foreground: 222.2 47.4% 11.2%;
 
@@ -48,12 +49,12 @@
 
     --gold: 47.9 95.8% 53.1%;
 
-    --signer-green: 100 48% 55%;
-    --signer-blue: 212 56% 50%;
-    --signer-purple: 266 100% 64%;
-    --signer-orange: 36 92% 54%;
-    --signer-yellow: 51 100% 43%;
-    --signer-pink: 313 65% 57%;
+    --recipient-green: 100 48% 55%;
+    --recipient-blue: 212 56% 50%;
+    --recipient-purple: 266 100% 64%;
+    --recipient-orange: 36 92% 54%;
+    --recipient-yellow: 51 100% 43%;
+    --recipient-pink: 313 65% 57%;
 
     /* Base - Neutral */
     --new-neutral-50: 0, 0%, 96%;
@@ -190,7 +191,9 @@
 
   body {
     @apply bg-background text-foreground;
-    font-feature-settings: 'rlig' 1, 'calt' 1;
+    font-feature-settings:
+      'rlig' 1,
+      'calt' 1;
   }
 }
 
@@ -210,8 +213,12 @@
 }
 
 .gradient-border-mask::before {
-  mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  mask:
+    linear-gradient(#fff 0 0) content-box,
+    linear-gradient(#fff 0 0);
+  -webkit-mask:
+    linear-gradient(#fff 0 0) content-box,
+    linear-gradient(#fff 0 0);
   mask-composite: exclude;
   -webkit-mask-composite: xor;
 }

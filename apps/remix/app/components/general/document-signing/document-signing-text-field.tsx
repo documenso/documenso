@@ -3,7 +3,6 @@ import { useEffect, useState } from 'react';
 import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
 import { Plural, Trans } from '@lingui/react/macro';
-import { Loader, Type } from 'lucide-react';
 import { useRevalidator } from 'react-router';
 
 import { validateTextField } from '@documenso/lib/advanced-fields-validation/validate-text';
@@ -25,6 +24,11 @@ import { useToast } from '@documenso/ui/primitives/use-toast';
 
 import { useRequiredDocumentSigningAuthContext } from './document-signing-auth-provider';
 import { DocumentSigningFieldContainer } from './document-signing-field-container';
+import {
+  DocumentSigningFieldsInserted,
+  DocumentSigningFieldsLoader,
+  DocumentSigningFieldsUninserted,
+} from './document-signing-fields';
 import { useDocumentSigningRecipientContext } from './document-signing-recipient-provider';
 
 export type DocumentSigningTextFieldProps = {
@@ -248,49 +252,20 @@ export const DocumentSigningTextField = ({
       onRemove={onRemove}
       type="Text"
     >
-      {isLoading && (
-        <div className="bg-background absolute inset-0 flex items-center justify-center rounded-md">
-          <Loader className="text-primary h-5 w-5 animate-spin md:h-8 md:w-8" />
-        </div>
-      )}
+      {isLoading && <DocumentSigningFieldsLoader />}
 
       {!field.inserted && (
-        <p
-          className={cn(
-            'group-hover:text-primary text-muted-foreground flex flex-col items-center justify-center duration-200',
-            {
-              'group-hover:text-yellow-300': !field.inserted && !parsedFieldMeta?.required,
-              'group-hover:text-red-300': !field.inserted && parsedFieldMeta?.required,
-            },
-          )}
-        >
-          <span className="flex items-center justify-center gap-x-1">
-            <Type className="h-[clamp(0.625rem,20cqw,0.925rem)] w-[clamp(0.625rem,20cqw,0.925rem)]" />
-            <span className="text-[clamp(0.425rem,25cqw,0.825rem)]">
-              {fieldDisplayName || <Trans>Text</Trans>}
-            </span>
-          </span>
-        </p>
+        <DocumentSigningFieldsUninserted>
+          {fieldDisplayName || <Trans>Text</Trans>}
+        </DocumentSigningFieldsUninserted>
       )}
 
       {field.inserted && (
-        <div className="flex h-full w-full items-center">
-          <p
-            className={cn(
-              'text-muted-foreground dark:text-background/80 w-full text-[clamp(0.425rem,25cqw,0.825rem)] duration-200',
-              {
-                'text-left': parsedFieldMeta?.textAlign === 'left',
-                'text-center':
-                  !parsedFieldMeta?.textAlign || parsedFieldMeta?.textAlign === 'center',
-                'text-right': parsedFieldMeta?.textAlign === 'right',
-              },
-            )}
-          >
-            {field.customText.length < 20
-              ? field.customText
-              : field.customText.substring(0, 20) + '...'}
-          </p>
-        </div>
+        <DocumentSigningFieldsInserted textAlign={parsedFieldMeta?.textAlign}>
+          {field.customText.length < 20
+            ? field.customText
+            : field.customText.substring(0, 20) + '...'}
+        </DocumentSigningFieldsInserted>
       )}
 
       <Dialog open={showCustomTextModal} onOpenChange={setShowCustomTextModal}>
@@ -304,11 +279,9 @@ export const DocumentSigningTextField = ({
               id="custom-text"
               placeholder={parsedFieldMeta?.placeholder ?? _(msg`Enter your text here`)}
               className={cn('mt-2 w-full rounded-md', {
-                'border-2 border-red-300 ring-2 ring-red-200 ring-offset-2 ring-offset-red-200 focus-visible:border-red-400 focus-visible:ring-4 focus-visible:ring-red-200 focus-visible:ring-offset-2 focus-visible:ring-offset-red-200':
+                'border-2 border-red-300 text-left ring-2 ring-red-200 ring-offset-2 ring-offset-red-200 focus-visible:border-red-400 focus-visible:ring-4 focus-visible:ring-red-200 focus-visible:ring-offset-2 focus-visible:ring-offset-red-200':
                   userInputHasErrors,
-                'text-left': parsedFieldMeta?.textAlign === 'left',
-                'text-center':
-                  !parsedFieldMeta?.textAlign || parsedFieldMeta?.textAlign === 'center',
+                'text-center': parsedFieldMeta?.textAlign === 'center',
                 'text-right': parsedFieldMeta?.textAlign === 'right',
               })}
               value={localText}
@@ -354,8 +327,8 @@ export const DocumentSigningTextField = ({
             <div className="mt-4 flex w-full flex-1 flex-nowrap gap-4">
               <Button
                 type="button"
-                className="dark:bg-muted dark:hover:bg-muted/80 flex-1 bg-black/5 hover:bg-black/10"
                 variant="secondary"
+                className="flex-1"
                 onClick={() => {
                   setShowCustomTextModal(false);
                   setLocalCustomText('');

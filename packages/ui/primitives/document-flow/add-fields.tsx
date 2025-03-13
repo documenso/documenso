@@ -42,7 +42,7 @@ import {
 } from '@documenso/lib/utils/recipients';
 
 import { FieldToolTip } from '../../components/field/field-tooltip';
-import { getSignerColorStyles, useSignerColors } from '../../lib/signer-colors';
+import { getRecipientColorStyles, useRecipientColors } from '../../lib/recipient-colors';
 import { cn } from '../../lib/utils';
 import { Alert, AlertDescription } from '../alert';
 import { Button } from '../button';
@@ -88,7 +88,6 @@ export type FieldFormType = {
 
 export type AddFieldsFormProps = {
   documentFlow: DocumentFlowStep;
-  hideRecipients?: boolean;
   recipients: Recipient[];
   fields: Field[];
   onSubmit: (_data: TAddFieldsFormSchema) => void;
@@ -100,7 +99,6 @@ export type AddFieldsFormProps = {
 
 export const AddFieldsFormPartial = ({
   documentFlow,
-  hideRecipients = false,
   recipients,
   fields,
   onSubmit,
@@ -186,9 +184,10 @@ export const AddFieldsFormPartial = ({
     null,
   );
   const selectedSignerIndex = recipients.findIndex((r) => r.id === selectedSigner?.id);
-  const selectedSignerStyles = useSignerColors(
+  const selectedSignerStyles = useRecipientColors(
     selectedSignerIndex === -1 ? 0 : selectedSignerIndex,
   );
+
   const [validateUninsertedFields, setValidateUninsertedFields] = useState(false);
 
   const filterFieldsWithEmptyValues = (fields: typeof localFields, fieldType: string) =>
@@ -604,13 +603,12 @@ export const AddFieldsFormPartial = ({
               {selectedField && (
                 <div
                   className={cn(
-                    'text-muted-foreground dark:text-muted-background pointer-events-none fixed z-50 flex cursor-pointer flex-col items-center justify-center bg-white transition duration-200 [container-type:size]',
-                    selectedSignerStyles.default.base,
+                    'text-muted-foreground dark:text-muted-background pointer-events-none fixed z-50 flex cursor-pointer flex-col items-center justify-center rounded-[2px] bg-white ring-2 transition duration-200 [container-type:size]',
+                    selectedSignerStyles?.base,
                     {
                       '-rotate-6 scale-90 opacity-50 dark:bg-black/20': !isFieldWithinBounds,
                       'dark:text-black/60': isFieldWithinBounds,
                     },
-                    // selectedField === FieldType.SIGNATURE && fontCaveat.className,
                   )}
                   style={{
                     top: coords.y,
@@ -657,7 +655,6 @@ export const AddFieldsFormPartial = ({
                         setCurrentField(field);
                         handleAdvancedSettings();
                       }}
-                      hideRecipients={hideRecipients}
                       hasErrors={!!hasFieldError}
                       active={activeFieldId === field.formId}
                       onFieldActivate={() => setActiveFieldId(field.formId)}
@@ -666,125 +663,124 @@ export const AddFieldsFormPartial = ({
                   );
                 })}
 
-              {!hideRecipients && (
-                <Popover open={showRecipientsSelector} onOpenChange={setShowRecipientsSelector}>
-                  <PopoverTrigger asChild>
-                    <Button
-                      type="button"
-                      variant="outline"
-                      role="combobox"
-                      className={cn(
-                        'bg-background text-muted-foreground hover:text-foreground mb-12 mt-2 justify-between font-normal',
-                        selectedSignerStyles.default.base,
-                      )}
-                    >
-                      {selectedSigner?.email && (
-                        <span className="flex-1 truncate text-left">
-                          {selectedSigner?.name} ({selectedSigner?.email})
-                        </span>
-                      )}
+              <Popover open={showRecipientsSelector} onOpenChange={setShowRecipientsSelector}>
+                <PopoverTrigger asChild>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    role="combobox"
+                    className={cn(
+                      'bg-background text-muted-foreground hover:text-foreground mb-12 mt-2 justify-between font-normal',
+                      selectedSignerStyles?.comboxBoxTrigger,
+                    )}
+                  >
+                    {selectedSigner?.email && (
+                      <span className="flex-1 truncate text-left">
+                        {selectedSigner?.name} ({selectedSigner?.email})
+                      </span>
+                    )}
 
-                      {!selectedSigner?.email && (
-                        <span className="flex-1 truncate text-left">{selectedSigner?.email}</span>
-                      )}
+                    {!selectedSigner?.email && (
+                      <span className="flex-1 truncate text-left">{selectedSigner?.email}</span>
+                    )}
 
-                      <ChevronsUpDown className="ml-2 h-4 w-4" />
-                    </Button>
-                  </PopoverTrigger>
+                    <ChevronsUpDown className="ml-2 h-4 w-4" />
+                  </Button>
+                </PopoverTrigger>
 
-                  <PopoverContent className="p-0" align="start">
-                    <Command value={selectedSigner?.email}>
-                      <CommandInput />
+                <PopoverContent className="p-0" align="start">
+                  <Command value={selectedSigner?.email}>
+                    <CommandInput />
 
-                      <CommandEmpty>
-                        <span className="text-muted-foreground inline-block px-4">
-                          <Trans>No recipient matching this description was found.</Trans>
-                        </span>
-                      </CommandEmpty>
+                    <CommandEmpty>
+                      <span className="text-muted-foreground inline-block px-4">
+                        <Trans>No recipient matching this description was found.</Trans>
+                      </span>
+                    </CommandEmpty>
 
-                      {recipientsByRoleToDisplay.map(([role, roleRecipients], roleIndex) => (
-                        <CommandGroup key={roleIndex}>
-                          <div className="text-muted-foreground mb-1 ml-2 mt-2 text-xs font-medium">
-                            {_(RECIPIENT_ROLES_DESCRIPTION[role].roleNamePlural)}
+                    {/* Note: This is duplicated in `add-template-fields.tsx` */}
+                    {recipientsByRoleToDisplay.map(([role, roleRecipients], roleIndex) => (
+                      <CommandGroup key={roleIndex}>
+                        <div className="text-muted-foreground mb-1 ml-2 mt-2 text-xs font-medium">
+                          {_(RECIPIENT_ROLES_DESCRIPTION[role].roleNamePlural)}
+                        </div>
+
+                        {roleRecipients.length === 0 && (
+                          <div
+                            key={`${role}-empty`}
+                            className="text-muted-foreground/80 px-4 pb-4 pt-2.5 text-center text-xs"
+                          >
+                            <Trans>No recipients with this role</Trans>
                           </div>
+                        )}
 
-                          {roleRecipients.length === 0 && (
-                            <div
-                              key={`${role}-empty`}
-                              className="text-muted-foreground/80 px-4 pb-4 pt-2.5 text-center text-xs"
+                        {roleRecipients.map((recipient) => (
+                          <CommandItem
+                            key={recipient.id}
+                            className={cn(
+                              'px-2 last:mb-1 [&:not(:first-child)]:mt-1',
+                              getRecipientColorStyles(
+                                Math.max(
+                                  recipients.findIndex((r) => r.id === recipient.id),
+                                  0,
+                                ),
+                              )?.comboxBoxItem,
+                              {
+                                'text-muted-foreground': recipient.sendStatus === SendStatus.SENT,
+                              },
+                            )}
+                            onSelect={() => {
+                              setSelectedSigner(recipient);
+                              setShowRecipientsSelector(false);
+                            }}
+                          >
+                            <span
+                              className={cn('text-foreground/70 truncate', {
+                                'text-foreground/80': recipient === selectedSigner,
+                              })}
                             >
-                              <Trans>No recipients with this role</Trans>
-                            </div>
-                          )}
-
-                          {roleRecipients.map((recipient) => (
-                            <CommandItem
-                              key={recipient.id}
-                              className={cn(
-                                'px-2 last:mb-1 [&:not(:first-child)]:mt-1',
-                                getSignerColorStyles(
-                                  Math.max(
-                                    recipients.findIndex((r) => r.id === recipient.id),
-                                    0,
-                                  ),
-                                ).default.comboxBoxItem,
-                                {
-                                  'text-muted-foreground': recipient.sendStatus === SendStatus.SENT,
-                                },
+                              {recipient.name && (
+                                <span title={`${recipient.name} (${recipient.email})`}>
+                                  {recipient.name} ({recipient.email})
+                                </span>
                               )}
-                              onSelect={() => {
-                                setSelectedSigner(recipient);
-                                setShowRecipientsSelector(false);
-                              }}
-                            >
-                              <span
-                                className={cn('text-foreground/70 truncate', {
-                                  'text-foreground/80': recipient === selectedSigner,
-                                })}
-                              >
-                                {recipient.name && (
-                                  <span title={`${recipient.name} (${recipient.email})`}>
-                                    {recipient.name} ({recipient.email})
-                                  </span>
-                                )}
 
-                                {!recipient.name && (
-                                  <span title={recipient.email}>{recipient.email}</span>
-                                )}
-                              </span>
+                              {!recipient.name && (
+                                <span title={recipient.email}>{recipient.email}</span>
+                              )}
+                            </span>
 
-                              <div className="ml-auto flex items-center justify-center">
-                                {recipient.sendStatus !== SendStatus.SENT ? (
-                                  <Check
-                                    aria-hidden={recipient !== selectedSigner}
-                                    className={cn('h-4 w-4 flex-shrink-0', {
-                                      'opacity-0': recipient !== selectedSigner,
-                                      'opacity-100': recipient === selectedSigner,
-                                    })}
-                                  />
-                                ) : (
-                                  <Tooltip>
-                                    <TooltipTrigger>
-                                      <Info className="ml-2 h-4 w-4" />
-                                    </TooltipTrigger>
+                            <div className="ml-auto flex items-center justify-center">
+                              {recipient.sendStatus !== SendStatus.SENT ? (
+                                <Check
+                                  aria-hidden={recipient !== selectedSigner}
+                                  className={cn('h-4 w-4 flex-shrink-0', {
+                                    'opacity-0': recipient !== selectedSigner,
+                                    'opacity-100': recipient === selectedSigner,
+                                  })}
+                                />
+                              ) : (
+                                <Tooltip>
+                                  <TooltipTrigger>
+                                    <Info className="ml-2 h-4 w-4" />
+                                  </TooltipTrigger>
 
-                                    <TooltipContent className="text-muted-foreground max-w-xs">
-                                      <Trans>
-                                        This document has already been sent to this recipient. You
-                                        can no longer edit this recipient.
-                                      </Trans>
-                                    </TooltipContent>
-                                  </Tooltip>
-                                )}
-                              </div>
-                            </CommandItem>
-                          ))}
-                        </CommandGroup>
-                      ))}
-                    </Command>
-                  </PopoverContent>
-                </Popover>
-              )}
+                                  <TooltipContent className="text-muted-foreground max-w-xs">
+                                    <Trans>
+                                      This document has already been sent to this recipient. You can
+                                      no longer edit this recipient.
+                                    </Trans>
+                                  </TooltipContent>
+                                </Tooltip>
+                              )}
+                            </div>
+                          </CommandItem>
+                        ))}
+                      </CommandGroup>
+                    ))}
+                  </Command>
+                </PopoverContent>
+              </Popover>
 
               <Form {...form}>
                 <FormField
@@ -824,7 +820,6 @@ export const AddFieldsFormPartial = ({
                       <Card
                         className={cn(
                           'flex h-full w-full cursor-pointer items-center justify-center group-disabled:opacity-50',
-                          // selectedSignerStyles.borderClass,
                         )}
                       >
                         <CardContent className="flex flex-col items-center justify-center px-6 py-4">
@@ -849,7 +844,6 @@ export const AddFieldsFormPartial = ({
                       <Card
                         className={cn(
                           'flex h-full w-full cursor-pointer items-center justify-center group-disabled:opacity-50',
-                          // selectedSignerStyles.borderClass,
                         )}
                       >
                         <CardContent className="flex flex-col items-center justify-center px-6 py-4">
@@ -875,7 +869,6 @@ export const AddFieldsFormPartial = ({
                       <Card
                         className={cn(
                           'flex h-full w-full cursor-pointer items-center justify-center group-disabled:opacity-50',
-                          // selectedSignerStyles.borderClass,
                         )}
                       >
                         <CardContent className="flex flex-col items-center justify-center px-6 py-4">
@@ -901,7 +894,6 @@ export const AddFieldsFormPartial = ({
                       <Card
                         className={cn(
                           'flex h-full w-full cursor-pointer items-center justify-center group-disabled:opacity-50',
-                          // selectedSignerStyles.borderClass,
                         )}
                       >
                         <CardContent className="p-4">
@@ -927,7 +919,6 @@ export const AddFieldsFormPartial = ({
                       <Card
                         className={cn(
                           'flex h-full w-full cursor-pointer items-center justify-center group-disabled:opacity-50',
-                          // selectedSignerStyles.borderClass,
                         )}
                       >
                         <CardContent className="p-4">
@@ -953,7 +944,6 @@ export const AddFieldsFormPartial = ({
                       <Card
                         className={cn(
                           'flex h-full w-full cursor-pointer items-center justify-center group-disabled:opacity-50',
-                          // selectedSignerStyles.borderClass,
                         )}
                       >
                         <CardContent className="p-4">
@@ -979,7 +969,6 @@ export const AddFieldsFormPartial = ({
                       <Card
                         className={cn(
                           'flex h-full w-full cursor-pointer items-center justify-center group-disabled:opacity-50',
-                          // selectedSignerStyles.borderClass,
                         )}
                       >
                         <CardContent className="p-4">
@@ -1005,7 +994,6 @@ export const AddFieldsFormPartial = ({
                       <Card
                         className={cn(
                           'flex h-full w-full cursor-pointer items-center justify-center group-disabled:opacity-50',
-                          // selectedSignerStyles.borderClass,
                         )}
                       >
                         <CardContent className="p-4">
@@ -1031,7 +1019,6 @@ export const AddFieldsFormPartial = ({
                       <Card
                         className={cn(
                           'flex h-full w-full cursor-pointer items-center justify-center group-disabled:opacity-50',
-                          // selectedSignerStyles.borderClass,
                         )}
                       >
                         <CardContent className="p-4">
@@ -1058,7 +1045,6 @@ export const AddFieldsFormPartial = ({
                       <Card
                         className={cn(
                           'flex h-full w-full cursor-pointer items-center justify-center group-disabled:opacity-50',
-                          // selectedSignerStyles.borderClass,
                         )}
                       >
                         <CardContent className="p-4">

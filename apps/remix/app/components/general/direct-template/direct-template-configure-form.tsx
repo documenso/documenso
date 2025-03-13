@@ -10,13 +10,16 @@ import { z } from 'zod';
 import { useOptionalSession } from '@documenso/lib/client-only/providers/session';
 import type { TTemplate } from '@documenso/lib/types/template';
 import {
+  DocumentReadOnlyFields,
+  mapFieldsWithRecipients,
+} from '@documenso/ui/components/document/document-read-only-fields';
+import {
   DocumentFlowFormContainerActions,
   DocumentFlowFormContainerContent,
   DocumentFlowFormContainerFooter,
   DocumentFlowFormContainerHeader,
   DocumentFlowFormContainerStep,
 } from '@documenso/ui/primitives/document-flow/document-flow-root';
-import { ShowFieldItem } from '@documenso/ui/primitives/document-flow/show-field-item';
 import type { DocumentFlowStep } from '@documenso/ui/primitives/document-flow/types';
 import {
   Form,
@@ -97,14 +100,16 @@ export const DirectTemplateConfigureForm = ({
       <DocumentFlowFormContainerHeader title={flowStep.title} description={flowStep.description} />
 
       <DocumentFlowFormContainerContent>
-        {isDocumentPdfLoaded &&
-          directTemplateRecipient.fields.map((field, index) => (
-            <ShowFieldItem
-              key={index}
-              field={field}
-              recipients={recipientsWithBlankDirectRecipientEmail}
-            />
-          ))}
+        {isDocumentPdfLoaded && (
+          <DocumentReadOnlyFields
+            fields={mapFieldsWithRecipients(
+              directTemplateRecipient.fields,
+              recipientsWithBlankDirectRecipientEmail,
+            )}
+            recipientIds={recipients.map((recipient) => recipient.id)}
+            showRecipientColors={true}
+          />
+        )}
 
         <Form {...form}>
           <fieldset

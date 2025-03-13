@@ -4,23 +4,21 @@ import { FieldType } from '@prisma/client';
 import { CopyPlus, Settings2, Trash } from 'lucide-react';
 import { createPortal } from 'react-dom';
 import { Rnd } from 'react-rnd';
-import { match } from 'ts-pattern';
 
 import { PDF_VIEWER_PAGE_SELECTOR } from '@documenso/lib/constants/pdf-viewer';
 import type { TFieldMetaSchema } from '@documenso/lib/types/field-meta';
 import { ZCheckboxFieldMeta, ZRadioFieldMeta } from '@documenso/lib/types/field-meta';
 
-import { useSignerColors } from '../../lib/signer-colors';
+import { useRecipientColors } from '../../lib/recipient-colors';
 import { cn } from '../../lib/utils';
-import { CheckboxField } from './advanced-fields/checkbox';
-import { RadioField } from './advanced-fields/radio';
-import { FieldIcon } from './field-icon';
+import { FieldContent } from './field-content';
 import type { TDocumentFlowFormSchema } from './types';
 
 type Field = TDocumentFlowFormSchema['fields'][0];
 
 export type FieldItemProps = {
   field: Field;
+  fieldClassName?: string;
   passive?: boolean;
   disabled?: boolean;
   minHeight?: number;
@@ -35,14 +33,17 @@ export type FieldItemProps = {
   onFocus?: () => void;
   onBlur?: () => void;
   recipientIndex?: number;
-  hideRecipients?: boolean;
   hasErrors?: boolean;
   active?: boolean;
   onFieldActivate?: () => void;
   onFieldDeactivate?: () => void;
 };
 
+/**
+ * The item when editing fields??
+ */
 export const FieldItem = ({
+  fieldClassName,
   field,
   passive,
   disabled,
@@ -58,7 +59,6 @@ export const FieldItem = ({
   onBlur,
   onAdvancedSettings,
   recipientIndex = 0,
-  hideRecipients = false,
   hasErrors,
   active,
   onFieldActivate,
@@ -73,7 +73,7 @@ export const FieldItem = ({
   const [settingsActive, setSettingsActive] = useState(false);
   const $el = useRef(null);
 
-  const signerStyles = useSignerColors(recipientIndex);
+  const signerStyles = useRecipientColors(recipientIndex);
 
   const advancedField = [
     'NUMBER',
@@ -209,7 +209,7 @@ export const FieldItem = ({
   return createPortal(
     <Rnd
       key={coords.pageX + coords.pageY + coords.pageHeight + coords.pageWidth}
-      className={cn('group', {
+      className={cn('dark-mode-disabled group', {
         'pointer-events-none': passive,
         'pointer-events-none cursor-not-allowed opacity-75': disabled,
         'z-50': active && !disabled,
@@ -260,11 +260,12 @@ export const FieldItem = ({
 
       <div
         className={cn(
-          'relative flex h-full w-full items-center justify-center bg-white',
-          !hasErrors && signerStyles.default.base,
-          !hasErrors && signerStyles.default.fieldItem,
+          'group/field-item relative flex h-full w-full items-center justify-center rounded-[2px] bg-white/90 px-2 ring-2 transition-colors',
+          !hasErrors && signerStyles.base,
+          !hasErrors && signerStyles.fieldItem,
+          fieldClassName,
           {
-            'rounded-lg border border-red-400 bg-red-400/20 shadow-[0_0_0_5px_theme(colors.red.500/10%),0_0_0_2px_theme(colors.red.500/40%),0_0_0_0.5px_theme(colors.red.500)]':
+            'rounded-[2px] border bg-red-400/20 shadow-[0_0_0_5px_theme(colors.red.500/10%),0_0_0_2px_theme(colors.red.500/40%),0_0_0_0.5px_theme(colors.red.500)] ring-red-400':
               hasErrors,
           },
           !fixedSize && '[container-type:size]',
@@ -279,37 +280,31 @@ export const FieldItem = ({
         ref={$el}
         data-field-id={field.nativeId}
       >
-        {match(field.type)
-          .with('CHECKBOX', () => <CheckboxField field={field} />)
-          .with('RADIO', () => <RadioField field={field} />)
-          .otherwise(() => (
-            <FieldIcon fieldMeta={field.fieldMeta} type={field.type} />
-          ))}
+        <FieldContent field={field} />
 
-        {!hideRecipients && (
-          <div className="absolute -right-5 top-0 z-20 hidden h-full w-5 items-center justify-center group-hover:flex">
-            <div
-              className={cn(
-                'flex h-5 w-5 flex-col items-center justify-center rounded-r-md text-[0.5rem] font-bold text-white',
-                signerStyles.default.fieldItemInitials,
-                {
-                  '!opacity-50': disabled || passive,
-                },
-              )}
-            >
-              {(field.signerEmail?.charAt(0)?.toUpperCase() ?? '') +
-                (field.signerEmail?.charAt(1)?.toUpperCase() ?? '')}
-            </div>
+        {/* On hover, display recipient initials on side of field.  */}
+        <div className="absolute -right-5 top-0 z-20 hidden h-full w-5 items-center justify-center group-hover:flex">
+          <div
+            className={cn(
+              'flex h-5 w-5 flex-col items-center justify-center rounded-r-md text-[0.5rem] font-bold text-white opacity-0 transition duration-200 group-hover/field-item:opacity-100',
+              signerStyles.fieldItemInitials,
+              {
+                '!opacity-50': disabled || passive,
+              },
+            )}
+          >
+            {(field.signerEmail?.charAt(0)?.toUpperCase() ?? '') +
+              (field.signerEmail?.charAt(1)?.toUpperCase() ?? '')}
           </div>
-        )}
+        </div>
       </div>
 
       {!disabled && settingsActive && (
-        <div className="z-[60] mt-1 flex justify-center">
-          <div className="dark:bg-background group flex items-center justify-evenly gap-x-1 rounded-md border bg-gray-900 p-0.5">
+        <div className="absolute z-[60] mt-1 flex w-full items-center justify-center">
+          <div className="group flex items-center justify-evenly gap-x-1 rounded-md border bg-gray-900 p-0.5">
             {advancedField && (
               <button
-                className="dark:text-muted-foreground/50 dark:hover:text-muted-foreground dark:hover:bg-foreground/10 rounded-sm p-1.5 text-gray-400 transition-colors hover:bg-white/10 hover:text-gray-100"
+                className="rounded-sm p-1.5 text-gray-400 transition-colors hover:bg-white/10 hover:text-gray-100"
                 onClick={onAdvancedSettings}
                 onTouchEnd={onAdvancedSettings}
               >
@@ -318,7 +313,7 @@ export const FieldItem = ({
             )}
 
             <button
-              className="dark:text-muted-foreground/50 dark:hover:text-muted-foreground dark:hover:bg-foreground/10 rounded-sm p-1.5 text-gray-400 transition-colors hover:bg-white/10 hover:text-gray-100"
+              className="rounded-sm p-1.5 text-gray-400 transition-colors hover:bg-white/10 hover:text-gray-100"
               onClick={onDuplicate}
               onTouchEnd={onDuplicate}
             >
@@ -326,7 +321,7 @@ export const FieldItem = ({
             </button>
 
             <button
-              className="dark:text-muted-foreground/50 dark:hover:text-muted-foreground dark:hover:bg-foreground/10 rounded-sm p-1.5 text-gray-400 transition-colors hover:bg-white/10 hover:text-gray-100"
+              className="rounded-sm p-1.5 text-gray-400 transition-colors hover:bg-white/10 hover:text-gray-100"
               onClick={onRemove}
               onTouchEnd={onRemove}
             >

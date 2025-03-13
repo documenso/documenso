@@ -13,6 +13,7 @@ import { getRecipientsForDocument } from '@documenso/lib/server-only/recipient/g
 import { type TGetTeamByUrlResponse, getTeamByUrl } from '@documenso/lib/server-only/team/get-team';
 import { DocumentVisibility } from '@documenso/lib/types/document-visibility';
 import { formatDocumentsPath } from '@documenso/lib/utils/teams';
+import { DocumentReadOnlyFields } from '@documenso/ui/components/document/document-read-only-fields';
 import { Badge } from '@documenso/ui/primitives/badge';
 import { Button } from '@documenso/ui/primitives/button';
 import { Card, CardContent } from '@documenso/ui/primitives/card';
@@ -24,7 +25,6 @@ import { DocumentPageViewDropdown } from '~/components/general/document/document
 import { DocumentPageViewInformation } from '~/components/general/document/document-page-view-information';
 import { DocumentPageViewRecentActivity } from '~/components/general/document/document-page-view-recent-activity';
 import { DocumentPageViewRecipients } from '~/components/general/document/document-page-view-recipients';
-import { DocumentReadOnlyFields } from '~/components/general/document/document-read-only-fields';
 import { DocumentRecipientLinkCopyDialog } from '~/components/general/document/document-recipient-link-copy-dialog';
 import {
   DocumentStatus as DocumentStatusComponent,
@@ -200,8 +200,14 @@ export default function DocumentPage() {
           </CardContent>
         </Card>
 
-        {document.status === DocumentStatus.PENDING && (
-          <DocumentReadOnlyFields fields={fields} documentMeta={documentMeta || undefined} />
+        {document.status !== DocumentStatus.COMPLETED && (
+          <DocumentReadOnlyFields
+            fields={fields}
+            documentMeta={documentMeta || undefined}
+            showRecipientTooltip={true}
+            showRecipientColors={true}
+            recipientIds={recipients.map((recipient) => recipient.id)}
+          />
         )}
 
         <div className="col-span-12 lg:col-span-6 xl:col-span-5">

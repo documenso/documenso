@@ -7,6 +7,7 @@ import { getSession } from '@documenso/auth/server/lib/utils/get-session';
 import { type TGetTeamByUrlResponse, getTeamByUrl } from '@documenso/lib/server-only/team/get-team';
 import { getTemplateById } from '@documenso/lib/server-only/template/get-template-by-id';
 import { formatDocumentsPath, formatTemplatesPath } from '@documenso/lib/utils/teams';
+import { DocumentReadOnlyFields } from '@documenso/ui/components/document/document-read-only-fields';
 import { Button } from '@documenso/ui/primitives/button';
 import { Card, CardContent } from '@documenso/ui/primitives/card';
 import { PDFViewer } from '@documenso/ui/primitives/pdf-viewer';
@@ -14,7 +15,6 @@ import { PDFViewer } from '@documenso/ui/primitives/pdf-viewer';
 import { TemplateBulkSendDialog } from '~/components/dialogs/template-bulk-send-dialog';
 import { TemplateDirectLinkDialogWrapper } from '~/components/dialogs/template-direct-link-dialog-wrapper';
 import { TemplateUseDialog } from '~/components/dialogs/template-use-dialog';
-import { DocumentReadOnlyFields } from '~/components/general/document/document-read-only-fields';
 import { TemplateDirectLinkBadge } from '~/components/general/template/template-direct-link-badge';
 import { TemplatePageViewDocumentsTable } from '~/components/general/template/template-page-view-documents-table';
 import { TemplatePageViewInformation } from '~/components/general/template/template-page-view-information';
@@ -151,6 +151,9 @@ export default function TemplatePage() {
         <DocumentReadOnlyFields
           fields={readOnlyFields}
           showFieldStatus={false}
+          showRecipientTooltip={true}
+          showRecipientColors={true}
+          recipientIds={recipients.map((recipient) => recipient.id)}
           documentMeta={mockedDocumentMeta}
         />
 
