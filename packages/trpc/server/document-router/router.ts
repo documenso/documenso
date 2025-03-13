@@ -21,6 +21,7 @@ import type { GetStatsInput } from '@documenso/lib/server-only/document/get-stat
 import { getStats } from '@documenso/lib/server-only/document/get-stats';
 import { moveDocumentToTeam } from '@documenso/lib/server-only/document/move-document-to-team';
 import { resendDocument } from '@documenso/lib/server-only/document/resend-document';
+import { restoreDocument } from '@documenso/lib/server-only/document/restore-document';
 import { searchDocumentsWithKeyword } from '@documenso/lib/server-only/document/search-documents-with-keyword';
 import { sendDocument } from '@documenso/lib/server-only/document/send-document';
 import { updateDocument } from '@documenso/lib/server-only/document/update-document';
@@ -53,6 +54,7 @@ import {
   ZMoveDocumentToTeamResponseSchema,
   ZMoveDocumentToTeamSchema,
   ZResendDocumentMutationSchema,
+  ZRestoreDocumentMutationSchema,
   ZSearchDocumentsMutationSchema,
   ZSetSigningOrderForDocumentMutationSchema,
   ZSuccessResponseSchema,
@@ -406,6 +408,36 @@ export const documentRouter = router({
       const userId = ctx.user.id;
 
       await deleteDocument({
+        id: documentId,
+        userId,
+        teamId,
+        requestMetadata: ctx.metadata,
+      });
+
+      return ZGenericSuccessResponse;
+    }),
+
+  /**
+   * @public
+   */
+  restoreDocument: authenticatedProcedure
+    .meta({
+      openapi: {
+        method: 'POST',
+        path: '/document/restore',
+        summary: 'Restore deleted document',
+        tags: ['Document'],
+      },
+    })
+    .input(ZRestoreDocumentMutationSchema)
+    .output(ZSuccessResponseSchema)
+    .mutation(async ({ input, ctx }) => {
+      const { teamId } = ctx;
+      const { documentId } = input;
+
+      const userId = ctx.user.id;
+
+      await restoreDocument({
         id: documentId,
         userId,
         teamId,

@@ -25,7 +25,7 @@ export const DocumentPageViewInformation = ({
   const { _, i18n } = useLingui();
 
   const documentInformation = useMemo(() => {
-    return [
+    const documentInfo = [
       {
         description: msg`Uploaded by`,
         value:
@@ -44,6 +44,19 @@ export const DocumentPageViewInformation = ({
           .toRelative(),
       },
     ];
+
+    if (document.deletedAt) {
+      documentInfo.push({
+        description: msg`Deleted`,
+        value:
+          document.deletedAt &&
+          DateTime.fromJSDate(document.deletedAt)
+            .setLocale(i18n.locales?.[0] || i18n.locale)
+            .toFormat('MMMM d, yyyy'),
+      });
+    }
+
+    return documentInfo;
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isMounted, document, userId]);
 
