@@ -15,6 +15,7 @@ import {
   MoreHorizontal,
   MoveRight,
   Pencil,
+  RotateCcw,
   Share,
   Trash2,
 } from 'lucide-react';
@@ -39,6 +40,7 @@ import { DocumentDeleteDialog } from '~/components/dialogs/document-delete-dialo
 import { DocumentDuplicateDialog } from '~/components/dialogs/document-duplicate-dialog';
 import { DocumentMoveDialog } from '~/components/dialogs/document-move-dialog';
 import { DocumentResendDialog } from '~/components/dialogs/document-resend-dialog';
+import { DocumentRestoreDialog } from '~/components/dialogs/document-restore-dialog';
 import { DocumentRecipientLinkCopyDialog } from '~/components/general/document/document-recipient-link-copy-dialog';
 import { useOptionalCurrentTeam } from '~/providers/team';
 
@@ -58,18 +60,20 @@ export const DocumentsTableActionDropdown = ({ row }: DocumentsTableActionDropdo
   const { _ } = useLingui();
 
   const [isDeleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [isRestoreDialogOpen, setRestoreDialogOpen] = useState(false);
   const [isDuplicateDialogOpen, setDuplicateDialogOpen] = useState(false);
   const [isMoveDialogOpen, setMoveDialogOpen] = useState(false);
 
   const recipient = row.recipients.find((recipient) => recipient.email === user.email);
 
   const isOwner = row.user.id === user.id;
-  // const isRecipient = !!recipient;
+  const isRecipient = !!recipient;
   const isDraft = row.status === DocumentStatus.DRAFT;
   const isPending = row.status === DocumentStatus.PENDING;
   const isComplete = isDocumentCompleted(row.status);
   // const isSigned = recipient?.signingStatus === SigningStatus.SIGNED;
   const isCurrentTeamDocument = team && row.team?.url === team.url;
+  const isDocumentDeleted = row.deletedAt !== null;
   const canManageDocument = Boolean(isOwner || isCurrentTeamDocument);
 
   const documentsPath = formatDocumentsPath(team?.url);
@@ -171,10 +175,17 @@ export const DocumentsTableActionDropdown = ({ row }: DocumentsTableActionDropdo
           Void
         </DropdownMenuItem> */}
 
-        <DropdownMenuItem onClick={() => setDeleteDialogOpen(true)}>
-          <Trash2 className="mr-2 h-4 w-4" />
-          {canManageDocument ? _(msg`Delete`) : _(msg`Hide`)}
-        </DropdownMenuItem>
+        {isDocumentDeleted || (isRecipient && !canManageDocument) ? (
+          <DropdownMenuItem disabled={isRecipient} onClick={() => setRestoreDialogOpen(true)}>
+            <RotateCcw className="mr-2 h-4 w-4" />
+            <Trans>Restore</Trans>
+          </DropdownMenuItem>
+        ) : (
+          <DropdownMenuItem onClick={() => setDeleteDialogOpen(true)}>
+            <Trash2 className="mr-2 h-4 w-4" />
+            {canManageDocument ? _(msg`Delete`) : _(msg`Hide`)}
+          </DropdownMenuItem>
+        )}
 
         <DropdownMenuLabel>
           <Trans>Share</Trans>
@@ -216,6 +227,15 @@ export const DocumentsTableActionDropdown = ({ row }: DocumentsTableActionDropdo
         documentTitle={row.title}
         open={isDeleteDialogOpen}
         onOpenChange={setDeleteDialogOpen}
+        teamId={team?.id}
+        canManageDocument={canManageDocument}
+      />
+
+      <DocumentRestoreDialog
+        id={row.id}
+        open={isRestoreDialogOpen}
+        onOpenChange={setRestoreDialogOpen}
+        documentTitle={row.title}
         teamId={team?.id}
         canManageDocument={canManageDocument}
       />

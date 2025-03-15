@@ -162,7 +162,16 @@ export const DocumentDeleteDialog = ({
                   </ul>
                 </AlertDescription>
               ))
-              .exhaustive()}
+              // DocumentStatus.REJECTED isnt working currently so this is a fallback to prevent 500 error.
+              // The union should work but currently its not
+              .otherwise(() => (
+                <AlertDescription>
+                  <Trans>
+                    Please note that this action is <strong>irreversible</strong>. Once confirmed,
+                    this document will be permanently deleted.
+                  </Trans>
+                </AlertDescription>
+              ))}
           </Alert>
         ) : (
           <Alert variant="warning" className="-mt-1">
