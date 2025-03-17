@@ -447,7 +447,7 @@ export const EmbedSignDocumentClientPage = ({
                 ) : (
                   <Button
                     className={allowDocumentRejection ? 'col-start-2' : 'col-span-2'}
-                    disabled={isThrottled || !isAssistantMode}
+                    disabled={isThrottled}
                     loading={isSubmitting}
                     onClick={() => throttledOnCompleteClick()}
                   >

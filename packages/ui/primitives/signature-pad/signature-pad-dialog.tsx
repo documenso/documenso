@@ -139,7 +139,7 @@ export const SignaturePadDialog = ({
               {dialogConfirmText ? (
                 parseMessageDescriptor(i18n._, dialogConfirmText)
               ) : (
-                <Trans>Update</Trans>
+                <Trans>Next</Trans>
               )}
             </Button>
           </DialogFooter>

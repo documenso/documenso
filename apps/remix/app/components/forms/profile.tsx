@@ -126,7 +126,6 @@ export const ProfileForm = ({ className }: ProfileFormProps) => {
                     disabled={isSubmitting}
                     value={value}
                     onChange={(v) => onChange(v ?? '')}
-                    dialogConfirmText={_(msg`Next`)}
                   />
                 </FormControl>
                 <FormMessage />

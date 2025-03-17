@@ -1,4 +1,4 @@
-import { createContext, useContext, useMemo, useState } from 'react';
+import { createContext, useContext, useState } from 'react';
 
 import { isBase64Image } from '@documenso/lib/constants/signatures';
 
@@ -9,7 +9,6 @@ export type DocumentSigningContextValue = {
   setEmail: (_value: string) => void;
   signature: string | null;
   setSignature: (_value: string | null) => void;
-  signatureValid: boolean;
 };
 
 const DocumentSigningContext = createContext<DocumentSigningContextValue | null>(null);
@@ -68,8 +67,6 @@ export const DocumentSigningProvider = ({
     })(),
   );
 
-  const signatureValid = useMemo(() => signature !== null && signature.length > 0, [signature]);
-
   return (
     <DocumentSigningContext.Provider
       value={{
@@ -79,7 +76,6 @@ export const DocumentSigningProvider = ({
         setEmail,
         signature,
         setSignature,
-        signatureValid,
       }}
     >
       {children}

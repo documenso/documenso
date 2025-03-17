@@ -56,11 +56,8 @@ export const DocumentSigningSignatureField = ({
   const containerRef = useRef<HTMLDivElement>(null);
   const [fontSize, setFontSize] = useState(2);
 
-  const {
-    signature: providedSignature,
-    setSignature: setProvidedSignature,
-    signatureValid,
-  } = useRequiredDocumentSigningContext();
+  const { signature: providedSignature, setSignature: setProvidedSignature } =
+    useRequiredDocumentSigningContext();
 
   const { executeActionAuthProcedure } = useRequiredDocumentSigningAuthContext();
 
@@ -92,7 +89,7 @@ export const DocumentSigningSignatureField = ({
   }, [field.inserted, signature?.signatureImageAsBase64]);
 
   const onPreSign = () => {
-    if (!providedSignature || !signatureValid) {
+    if (!providedSignature) {
       setShowSignatureModal(true);
       return false;
     }
@@ -105,6 +102,7 @@ export const DocumentSigningSignatureField = ({
   const onDialogSignClick = () => {
     setShowSignatureModal(false);
     setProvidedSignature(localSignature);
+
     if (!localSignature) {
       return;
     }
@@ -119,7 +117,7 @@ export const DocumentSigningSignatureField = ({
     try {
       const value = signature || providedSignature;
 
-      if (!value || (signature && !signatureValid)) {
+      if (!value) {
         setShowSignatureModal(true);
         return;
       }

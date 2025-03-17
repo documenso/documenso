@@ -346,7 +346,6 @@ export const DocumentSigningForm = ({
                           disabled={isSubmitting}
                           value={signature ?? ''}
                           onChange={(v) => setSignature(v ?? '')}
-                          dialogConfirmText={_(msg`Next`)}
                           typedSignatureEnabled={document.documentMeta?.typedSignatureEnabled}
                           uploadSignatureEnabled={document.documentMeta?.uploadSignatureEnabled}
                           drawSignatureEnabled={document.documentMeta?.drawSignatureEnabled}
