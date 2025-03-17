@@ -23,7 +23,7 @@ test('[TEAMS]: update the default document visibility in the team global setting
   // !: Brittle selector
   await page.getByRole('combobox').first().click();
   await page.getByRole('option', { name: 'Admin' }).click();
-  await page.getByRole('button', { name: 'Save' }).first().click();
+  await page.getByRole('button', { name: 'Update' }).first().click();
 
   const toast = page.locator('li[role="status"][data-state="open"]').first();
   await expect(toast).toBeVisible();
@@ -47,7 +47,7 @@ test('[TEAMS]: update the sender details in the team global settings', async ({ 
 
   await expect(checkbox).toBeChecked();
 
-  await page.getByRole('button', { name: 'Save' }).first().click();
+  await page.getByRole('button', { name: 'Update' }).first().click();
 
   const toast = page.locator('li[role="status"][data-state="open"]').first();
   await expect(toast).toBeVisible();

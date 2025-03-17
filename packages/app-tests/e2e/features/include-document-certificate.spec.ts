@@ -222,7 +222,10 @@ test.describe('Signing Certificate Tests', () => {
 
     // Toggle signing certificate setting
     await page.getByLabel('Include the Signing Certificate in the Document').click();
-    await page.getByRole('button', { name: /Save/ }).first().click();
+    await page
+      .getByRole('button', { name: /Update/ })
+      .first()
+      .click();
 
     await page.waitForTimeout(1000);
 
@@ -236,7 +239,10 @@ test.describe('Signing Certificate Tests', () => {
 
     // Toggle the setting back to true
     await page.getByLabel('Include the Signing Certificate in the Document').click();
-    await page.getByRole('button', { name: /Save/ }).first().click();
+    await page
+      .getByRole('button', { name: /Update/ })
+      .first()
+      .click();
 
     await page.waitForTimeout(1000);
 

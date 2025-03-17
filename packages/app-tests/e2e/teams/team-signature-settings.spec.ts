@@ -167,6 +167,14 @@ test('[TEAMS]: check signature modes work for templates', async ({ page }) => {
       },
     });
 
+    // Test kinda flaky, debug here.
+    // console.log({
+    //   tabs,
+    //   typedSignatureEnabled: document?.documentMeta?.typedSignatureEnabled,
+    //   uploadSignatureEnabled: document?.documentMeta?.uploadSignatureEnabled,
+    //   drawSignatureEnabled: document?.documentMeta?.drawSignatureEnabled,
+    // });
+
     expect(document?.documentMeta?.typedSignatureEnabled).toEqual(tabs.includes('Type'));
     expect(document?.documentMeta?.uploadSignatureEnabled).toEqual(tabs.includes('Upload'));
     expect(document?.documentMeta?.drawSignatureEnabled).toEqual(tabs.includes('Draw'));
