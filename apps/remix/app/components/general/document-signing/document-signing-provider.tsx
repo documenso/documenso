@@ -1,4 +1,6 @@
-import { createContext, useContext, useEffect, useState } from 'react';
+import { createContext, useContext, useMemo, useState } from 'react';
+
+import { isBase64Image } from '@documenso/lib/constants/signatures';
 
 export type DocumentSigningContextValue = {
   fullName: string;
@@ -8,7 +10,6 @@ export type DocumentSigningContextValue = {
   signature: string | null;
   setSignature: (_value: string | null) => void;
   signatureValid: boolean;
-  setSignatureValid: (_valid: boolean) => void;
 };
 
 const DocumentSigningContext = createContext<DocumentSigningContextValue | null>(null);
@@ -31,6 +32,9 @@ export interface DocumentSigningProviderProps {
   fullName?: string | null;
   email?: string | null;
   signature?: string | null;
+  typedSignatureEnabled?: boolean;
+  uploadSignatureEnabled?: boolean;
+  drawSignatureEnabled?: boolean;
   children: React.ReactNode;
 }
 
@@ -38,18 +42,33 @@ export const DocumentSigningProvider = ({
   fullName: initialFullName,
   email: initialEmail,
   signature: initialSignature,
+  typedSignatureEnabled = true,
+  uploadSignatureEnabled = true,
+  drawSignatureEnabled = true,
   children,
 }: DocumentSigningProviderProps) => {
   const [fullName, setFullName] = useState(initialFullName || '');
   const [email, setEmail] = useState(initialEmail || '');
-  const [signature, setSignature] = useState(initialSignature || null);
-  const [signatureValid, setSignatureValid] = useState(true);
 
-  useEffect(() => {
-    if (initialSignature) {
-      setSignature(initialSignature);
-    }
-  }, [initialSignature]);
+  // Ensure the user signature doesn't show up if it's not allowed.
+  const [signature, setSignature] = useState(
+    (() => {
+      const sig = initialSignature || '';
+      const isBase64 = isBase64Image(sig);
+
+      if (isBase64 && (uploadSignatureEnabled || drawSignatureEnabled)) {
+        return sig;
+      }
+
+      if (!isBase64 && typedSignatureEnabled) {
+        return sig;
+      }
+
+      return null;
+    })(),
+  );
+
+  const signatureValid = useMemo(() => signature !== null && signature.length > 0, [signature]);
 
   return (
     <DocumentSigningContext.Provider
@@ -61,7 +80,6 @@ export const DocumentSigningProvider = ({
         signature,
         setSignature,
         signatureValid,
-        setSignatureValid,
       }}
     >
       {children}

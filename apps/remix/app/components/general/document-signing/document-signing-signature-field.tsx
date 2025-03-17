@@ -17,7 +17,6 @@ import type {
 } from '@documenso/trpc/server/field-router/schema';
 import { Button } from '@documenso/ui/primitives/button';
 import { Dialog, DialogContent, DialogFooter, DialogTitle } from '@documenso/ui/primitives/dialog';
-import { Label } from '@documenso/ui/primitives/label';
 import { SignaturePad } from '@documenso/ui/primitives/signature-pad';
 import { useToast } from '@documenso/ui/primitives/use-toast';
 
@@ -29,11 +28,14 @@ import { useRequiredDocumentSigningContext } from './document-signing-provider';
 import { useDocumentSigningRecipientContext } from './document-signing-recipient-provider';
 
 type SignatureFieldState = 'empty' | 'signed-image' | 'signed-text';
+
 export type DocumentSigningSignatureFieldProps = {
   field: FieldWithSignature;
   onSignField?: (value: TSignFieldWithTokenMutationSchema) => Promise<void> | void;
   onUnsignField?: (value: TRemovedSignedFieldWithTokenMutationSchema) => Promise<void> | void;
   typedSignatureEnabled?: boolean;
+  uploadSignatureEnabled?: boolean;
+  drawSignatureEnabled?: boolean;
 };
 
 export const DocumentSigningSignatureField = ({
@@ -41,6 +43,8 @@ export const DocumentSigningSignatureField = ({
   onSignField,
   onUnsignField,
   typedSignatureEnabled,
+  uploadSignatureEnabled,
+  drawSignatureEnabled,
 }: DocumentSigningSignatureFieldProps) => {
   const { _ } = useLingui();
   const { toast } = useToast();
@@ -56,7 +60,6 @@ export const DocumentSigningSignatureField = ({
     signature: providedSignature,
     setSignature: setProvidedSignature,
     signatureValid,
-    setSignatureValid,
   } = useRequiredDocumentSigningContext();
 
   const { executeActionAuthProcedure } = useRequiredDocumentSigningAuthContext();
@@ -275,29 +278,14 @@ export const DocumentSigningSignatureField = ({
             </Trans>
           </DialogTitle>
 
-          <div className="">
-            <Label htmlFor="signature">
-              <Trans>Signature</Trans>
-            </Label>
-
-            <div className="border-border mt-2 rounded-md border">
-              <SignaturePad
-                id="signature"
-                className="h-44 w-full"
-                onChange={(value) => setLocalSignature(value)}
-                allowTypedSignature={typedSignatureEnabled}
-                onValidityChange={(isValid) => {
-                  setSignatureValid(isValid);
-                }}
-              />
-            </div>
-
-            {!signatureValid && (
-              <div className="text-destructive mt-2 text-sm">
-                <Trans>Signature is too small. Please provide a more complete signature.</Trans>
-              </div>
-            )}
-          </div>
+          <SignaturePad
+            className="mt-2"
+            value={localSignature ?? ''}
+            onChange={({ value }) => setLocalSignature(value)}
+            typedSignatureEnabled={typedSignatureEnabled}
+            uploadSignatureEnabled={uploadSignatureEnabled}
+            drawSignatureEnabled={drawSignatureEnabled}
+          />
 
           <DocumentSigningDisclosure />
 
@@ -317,7 +305,7 @@ export const DocumentSigningSignatureField = ({
               <Button
                 type="button"
                 className="flex-1"
-                disabled={!localSignature || !signatureValid}
+                disabled={!localSignature}
                 onClick={() => onDialogSignClick()}
               >
                 <Trans>Sign</Trans>

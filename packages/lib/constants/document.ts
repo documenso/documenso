@@ -34,3 +34,29 @@ export const DOCUMENT_DISTRIBUTION_METHODS: Record<string, DocumentDistributionM
     description: msg`None`,
   },
 } satisfies Record<DocumentDistributionMethod, DocumentDistributionMethodTypeData>;
+
+export enum DocumentSignatureType {
+  DRAW = 'draw',
+  TYPE = 'type',
+  UPLOAD = 'upload',
+}
+
+type DocumentSignatureTypeData = {
+  label: MessageDescriptor;
+  value: DocumentSignatureType;
+};
+
+export const DOCUMENT_SIGNATURE_TYPES = {
+  [DocumentSignatureType.DRAW]: {
+    label: msg`Draw`,
+    value: DocumentSignatureType.DRAW,
+  },
+  [DocumentSignatureType.TYPE]: {
+    label: msg`Type`,
+    value: DocumentSignatureType.TYPE,
+  },
+  [DocumentSignatureType.UPLOAD]: {
+    label: msg`Upload`,
+    value: DocumentSignatureType.UPLOAD,
+  },
+} satisfies Record<DocumentSignatureType, DocumentSignatureTypeData>;

@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
 
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useLingui } from '@lingui/react';
+import { useLingui } from '@lingui/react/macro';
 import { Trans } from '@lingui/react/macro';
 import { DocumentVisibility, TeamMemberRole } from '@prisma/client';
 import { DocumentDistributionMethod, type Field, type Recipient } from '@prisma/client';
@@ -10,12 +10,16 @@ import { useForm } from 'react-hook-form';
 import { match } from 'ts-pattern';
 
 import { DATE_FORMATS, DEFAULT_DOCUMENT_DATE_FORMAT } from '@documenso/lib/constants/date-formats';
-import { DOCUMENT_DISTRIBUTION_METHODS } from '@documenso/lib/constants/document';
+import {
+  DOCUMENT_DISTRIBUTION_METHODS,
+  DOCUMENT_SIGNATURE_TYPES,
+} from '@documenso/lib/constants/document';
 import { SUPPORTED_LANGUAGES } from '@documenso/lib/constants/i18n';
 import { DEFAULT_DOCUMENT_TIME_ZONE, TIME_ZONES } from '@documenso/lib/constants/time-zones';
 import { ZDocumentEmailSettingsSchema } from '@documenso/lib/types/document-email';
 import type { TTemplate } from '@documenso/lib/types/template';
 import { extractDocumentAuthMethods } from '@documenso/lib/utils/document-auth';
+import { extractTeamSignatureSettings } from '@documenso/lib/utils/teams';
 import type { TDocumentMetaDateFormat } from '@documenso/trpc/server/document-router/schema';
 import {
   DocumentGlobalAuthAccessSelect,
@@ -46,6 +50,7 @@ import {
 } from '@documenso/ui/primitives/form/form';
 
 import { DocumentEmailCheckboxes } from '../../components/document/document-email-checkboxes';
+import { DocumentSignatureSettingsTooltip } from '../../components/document/document-signature-settings-tooltip';
 import { Combobox } from '../combobox';
 import {
   DocumentFlowFormContainerActions,
@@ -57,6 +62,7 @@ import {
 import { ShowFieldItem } from '../document-flow/show-field-item';
 import type { DocumentFlowStep } from '../document-flow/types';
 import { Input } from '../input';
+import { MultiSelectCombobox } from '../multi-select-combobox';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../select';
 import { useStep } from '../stepper';
 import { Textarea } from '../textarea';
@@ -85,7 +91,7 @@ export const AddTemplateSettingsFormPartial = ({
   currentTeamMemberRole,
   onSubmit,
 }: AddTemplateSettingsFormProps) => {
-  const { _ } = useLingui();
+  const { t, i18n } = useLingui();
 
   const { documentAuthOption } = extractDocumentAuthMethods({
     documentAuth: template.authOptions,
@@ -111,6 +117,7 @@ export const AddTemplateSettingsFormPartial = ({
         redirectUrl: template.templateMeta?.redirectUrl ?? '',
         language: template.templateMeta?.language ?? 'en',
         emailSettings: ZDocumentEmailSettingsSchema.parse(template?.templateMeta?.emailSettings),
+        signatureTypes: extractTeamSignatureSettings(template?.templateMeta),
       },
     },
   });
@@ -314,13 +321,41 @@ export const AddTemplateSettingsFormPartial = ({
                         {Object.values(DOCUMENT_DISTRIBUTION_METHODS).map(
                           ({ value, description }) => (
                             <SelectItem key={value} value={value}>
-                              {_(description)}
+                              {i18n._(description)}
                             </SelectItem>
                           ),
                         )}
                       </SelectContent>
                     </Select>
                   </FormControl>
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="meta.signatureTypes"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="flex flex-row items-center">
+                    <Trans>Allowed Signature Types</Trans>
+                    <DocumentSignatureSettingsTooltip />
+                  </FormLabel>
+
+                  <FormControl>
+                    <MultiSelectCombobox
+                      options={Object.values(DOCUMENT_SIGNATURE_TYPES).map((option) => ({
+                        label: t(option.label),
+                        value: option.value,
+                      }))}
+                      selectedValues={field.value}
+                      onChange={field.onChange}
+                      className="bg-background w-full"
+                      emptySelectionPlaceholder="Select signature types"
+                    />
+                  </FormControl>
+
+                  <FormMessage />
                 </FormItem>
               )}
             />
