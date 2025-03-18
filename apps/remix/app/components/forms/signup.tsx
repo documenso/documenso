@@ -536,6 +536,7 @@ export const SignUpForm = ({
             By proceeding, you agree to our{' '}
             <Link
               to="https://documen.so/terms"
+              target="_blank"
               className="text-documenso-700 duration-200 hover:opacity-70"
             >
               Terms of Service
@@ -543,6 +544,7 @@ export const SignUpForm = ({
             and{' '}
             <Link
               to="https://documen.so/privacy"
+              target="_blank"
               className="text-documenso-700 duration-200 hover:opacity-70"
             >
               Privacy Policy
