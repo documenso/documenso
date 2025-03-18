@@ -29,6 +29,8 @@ export const ZAddSettingsFormSchema = z.object({
   title: z.string().trim().min(1, { message: "Title can't be empty" }),
   externalId: z.string().optional(),
   visibility: z.nativeEnum(DocumentVisibility).optional(),
+  includeSigningCertificate: z.boolean().default(true).optional(),
+  includeAuditTrailLog: z.boolean().default(true).optional(),
   globalAccessAuth: ZMapNegativeOneToUndefinedSchema.pipe(
     ZDocumentAccessAuthTypesSchema.optional(),
   ),

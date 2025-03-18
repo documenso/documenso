@@ -322,6 +322,14 @@ export const formatDocumentAuditLogAction = (
       anonymous: msg`Document visibility updated`,
       identified: msg`${prefix} updated the document visibility`,
     }))
+    .with({ type: DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_SIGNING_CERTIFICATE_UPDATED }, () => ({
+      anonymous: msg`Document signing certificate updated`,
+      identified: msg`${prefix} updated the document signing certificate`,
+    }))
+    .with({ type: DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_AUDIT_TRAIL_UPDATED }, () => ({
+      anonymous: msg`Document audit trail updated`,
+      identified: msg`${prefix} updated the document audit trail`,
+    }))
     .with({ type: DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_GLOBAL_AUTH_ACCESS_UPDATED }, () => ({
       anonymous: msg`Document access auth updated`,
       identified: msg`${prefix} updated the document access auth requirements`,

@@ -206,6 +206,7 @@ export const ZUpdateTeamDocumentSettingsMutationSchema = z.object({
     includeSenderDetails: z.boolean().optional().default(false),
     typedSignatureEnabled: z.boolean().optional().default(true),
     includeSigningCertificate: z.boolean().optional().default(true),
+    includeAuditTrailLog: z.boolean().optional().default(true),
   }),
 });
 

@@ -63,6 +63,16 @@ export const ZDocumentVisibilitySchema = z
   .nativeEnum(DocumentVisibility)
   .describe('The visibility of the document.');
 
+export const ZDocumentIncludeSigningCertificateSchema = z
+  .boolean()
+  .default(true)
+  .describe('Whether to include a signing certificate in the document.');
+
+export const ZDocumentIncludeAuditTrailSchema = z
+  .boolean()
+  .default(true)
+  .describe('Whether to include an audit trail in the document.');
+
 export const ZDocumentMetaTimezoneSchema = z
   .string()
   .describe(
@@ -141,6 +151,8 @@ export const ZFindDocumentAuditLogsQuerySchema = ZFindSearchParamsSchema.extend(
 
 export const ZGetDocumentByIdQuerySchema = z.object({
   documentId: z.number(),
+  includeCertificate: z.boolean().default(true).optional(),
+  includeAuditLog: z.boolean().default(true).optional(),
 });
 
 export const ZDuplicateDocumentRequestSchema = z.object({
@@ -235,6 +247,8 @@ export const ZUpdateDocumentRequestSchema = z.object({
       title: ZDocumentTitleSchema.optional(),
       externalId: ZDocumentExternalIdSchema.nullish(),
       visibility: ZDocumentVisibilitySchema.optional(),
+      includeSigningCertificate: ZDocumentIncludeSigningCertificateSchema.optional(),
+      includeAuditTrailLog: ZDocumentIncludeAuditTrailSchema.optional(),
       globalAccessAuth: ZDocumentAccessAuthTypesSchema.nullish(),
       globalActionAuth: ZDocumentActionAuthTypesSchema.nullish(),
     })
