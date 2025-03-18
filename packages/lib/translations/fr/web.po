@@ -8,7 +8,7 @@ msgstr ""
 "Language: fr\n"
 "Project-Id-Version: documenso-app\n"
 "Report-Msgid-Bugs-To: \n"
-"PO-Revision-Date: 2025-01-30 06:04\n"
+"PO-Revision-Date: 2025-02-04 04:03\n"
 "Last-Translator: \n"
 "Language-Team: French\n"
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
@@ -360,7 +360,7 @@ msgstr "<0>{teamName}</0> a demandé à utiliser votre adresse e-mail pour leur 
 
 #: apps/web/src/app/(dashboard)/templates/use-template-dialog.tsx:463
 msgid "<0>Click to upload</0> or drag and drop"
-msgstr "<0>Cliquez pour importer</0> ou faites glisser et déposez"
+msgstr "<0>Cliquez pour télécharger</0> ou faites glisser et déposez"
 
 #: packages/ui/primitives/template-flow/add-template-settings.tsx:287
 msgid "<0>Email</0> - The recipient will be emailed the document to sign, approve, etc."
@@ -1009,7 +1009,7 @@ msgstr "Une erreur est survenue lors de la mise à jour de votre profil."
 
 #: apps/web/src/app/(dashboard)/documents/upload-document.tsx:108
 msgid "An error occurred while uploading your document."
-msgstr "Une erreur est survenue lors de l'importation de votre document."
+msgstr "Une erreur est survenue lors du téléchargement de votre document."
 
 #: apps/web/src/app/(dashboard)/admin/documents/[id]/super-delete-document-dialog.tsx:58
 #: apps/web/src/app/(dashboard)/admin/site-settings/banner-form.tsx:81
@@ -1338,16 +1338,16 @@ msgstr "Impossible de supprimer le signataire"
 
 #: packages/lib/constants/recipient-roles.ts:18
 msgid "Cc"
-msgstr ""
+msgstr "Cc"
 
 #: packages/lib/constants/recipient-roles.ts:15
 #: packages/lib/constants/recipient-roles.ts:17
 msgid "CC"
-msgstr ""
+msgstr "CC"
 
 #: packages/lib/constants/recipient-roles.ts:16
 msgid "CC'd"
-msgstr ""
+msgstr "CC'd"
 
 #: packages/lib/constants/recipient-roles.ts:19
 msgid "Ccers"
@@ -1430,7 +1430,7 @@ msgstr "Cliquez ici pour réessayer"
 
 #: apps/web/src/components/(teams)/dialogs/invite-team-member-dialog.tsx:392
 msgid "Click here to upload"
-msgstr "Cliquez ici pour importer"
+msgstr "Cliquez ici pour télécharger"
 
 #: apps/web/src/components/(dashboard)/avatar/avatar-with-recipient.tsx:52
 #: apps/web/src/components/(dashboard)/avatar/avatar-with-recipient.tsx:65
@@ -1597,11 +1597,11 @@ msgstr "Continuer vers la connexion"
 
 #: apps/web/src/app/(teams)/t/[teamUrl]/settings/preferences/document-preferences.tsx:185
 msgid "Controls the default language of an uploaded document. This will be used as the language in email communications with the recipients."
-msgstr "Contrôle la langue par défaut d'un document importé. Cela sera utilisé comme langue dans les communications par e-mail avec les destinataires."
+msgstr "Contrôle la langue par défaut d'un document téléchargé. Cela sera utilisé comme langue dans les communications par e-mail avec les destinataires."
 
 #: apps/web/src/app/(teams)/t/[teamUrl]/settings/preferences/document-preferences.tsx:153
 msgid "Controls the default visibility of an uploaded document."
-msgstr "Contrôle la visibilité par défaut d'un document importé."
+msgstr "Contrôle la visibilité par défaut d'un document téléchargé."
 
 #: apps/web/src/app/(teams)/t/[teamUrl]/settings/preferences/document-preferences.tsx:232
 msgid "Controls the formatting of the message that will be sent when inviting a recipient to sign a document. If a custom message has been provided while configuring the document, it will be used instead."
@@ -2255,11 +2255,11 @@ msgstr "Document mis à jour"
 
 #: apps/web/src/app/(dashboard)/documents/upload-document.tsx:55
 msgid "Document upload disabled due to unpaid invoices"
-msgstr "Importation de documents désactivé en raison de factures impayées"
+msgstr "Téléchargement du document désactivé en raison de factures impayées"
 
 #: apps/web/src/app/(dashboard)/documents/upload-document.tsx:85
 msgid "Document uploaded"
-msgstr "Document importé"
+msgstr "Document téléchargé"
 
 #: apps/web/src/app/(signing)/sign/[token]/complete/page.tsx:131
 msgid "Document Viewed"
@@ -2721,7 +2721,7 @@ msgstr "Pour toute question concernant cette divulgation, les signatures électr
 
 #: apps/web/src/components/templates/template-bulk-send-dialog.tsx:147
 msgid "For each recipient, provide their email (required) and name (optional) in separate columns. Download the template CSV below for the correct format."
-msgstr "Pour chaque destinataire, fournissez son e-mail (obligatoire) et son nom (facultatif) dans des colonnes séparées. Téléchargez le modèle CSV ci-dessous pour obtenir le format requis."
+msgstr "Pour chaque destinataire, fournissez leur email (obligatoire) et leur nom (facultatif) dans des colonnes séparées. Téléchargez le modèle CSV ci-dessous pour le format correct."
 
 #: packages/lib/server-only/auth/send-forgot-password.ts:61
 msgid "Forgot Password?"
@@ -2770,7 +2770,7 @@ msgstr "Authentification d'action de destinataire globale"
 #: apps/web/src/components/partials/not-found.tsx:67
 #: packages/ui/primitives/document-flow/document-flow-root.tsx:142
 msgid "Go Back"
-msgstr "Retour"
+msgstr "Retourner"
 
 #: apps/web/src/app/(unauthenticated)/verify-email/[token]/client.tsx:48
 #: apps/web/src/app/(unauthenticated)/verify-email/[token]/page.tsx:73
@@ -2834,7 +2834,7 @@ msgstr "Salut, je suis Timur"
 
 #: packages/email/templates/bulk-send-complete.tsx:36
 msgid "Hi {userName},"
-msgstr "Bonjour {userName},"
+msgstr "Bonjour, {userName},"
 
 #: packages/email/templates/reset-password.tsx:56
 msgid "Hi, {userName} <0>({userEmail})</0>"
@@ -2856,7 +2856,7 @@ msgstr "Je suis un signataire de ce document"
 
 #: packages/lib/constants/recipient-roles.ts:47
 msgid "I am a viewer of this document"
-msgstr "Je suis un lecteur de ce document"
+msgstr "Je suis un visualiseur de ce document"
 
 #: packages/lib/constants/recipient-roles.ts:45
 msgid "I am an approver of this document"
@@ -3234,11 +3234,11 @@ msgstr "MAU (document terminé)"
 
 #: packages/ui/primitives/document-flow/field-items-advanced-settings/number-field.tsx:209
 msgid "Max"
-msgstr "Maximum"
+msgstr "Max"
 
 #: apps/web/src/components/templates/template-bulk-send-dialog.tsx:227
 msgid "Maximum file size: 4MB. Maximum 100 rows per upload. Blank values will use template defaults."
-msgstr "Taille maximale du fichier : 4 Mo. Maximum de 100 lignes par importation. Les valeurs vides utiliseront les valeurs par défaut du modèle."
+msgstr "Taille maximale du fichier : 4 Mo. Maximum de 100 lignes par téléversement. Les valeurs vides utiliseront les valeurs par défaut du modèle."
 
 #: packages/lib/constants/teams.ts:12
 msgid "Member"
@@ -3262,7 +3262,7 @@ msgstr "Message <0>(Optionnel)</0>"
 
 #: packages/ui/primitives/document-flow/field-items-advanced-settings/number-field.tsx:197
 msgid "Min"
-msgstr ""
+msgstr "Min"
 
 #: apps/web/src/app/(dashboard)/documents/[id]/document-page-view-recipients.tsx:55
 #: apps/web/src/app/(dashboard)/templates/[id]/template-page-view-recipients.tsx:35
@@ -3940,7 +3940,7 @@ msgstr "Les modèles publics sont connectés à votre profil public. Toute modif
 
 #: packages/ui/primitives/document-flow/types.ts:57
 msgid "Radio"
-msgstr ""
+msgstr "Radio"
 
 #: packages/ui/primitives/document-flow/field-items-advanced-settings/radio-field.tsx:133
 msgid "Radio values"
@@ -5032,7 +5032,7 @@ msgstr "Modèle supprimé"
 
 #: apps/web/src/app/(dashboard)/templates/new-template-dialog.tsx:66
 msgid "Template document uploaded"
-msgstr "Document modèle importé"
+msgstr "Document modèle téléchargé"
 
 #: apps/web/src/app/(dashboard)/templates/duplicate-template-dialog.tsx:41
 msgid "Template duplicated"
@@ -5097,11 +5097,11 @@ msgstr "Couleur du texte"
 
 #: apps/web/src/app/(unauthenticated)/articles/signature-disclosure/page.tsx:24
 msgid "Thank you for using Documenso to perform your electronic document signing. The purpose of this disclosure is to inform you about the process, legality, and your rights regarding the use of electronic signatures on our platform. By opting to use an electronic signature, you are agreeing to the terms and conditions outlined below."
-msgstr "Merci d'utiliser Documenso pour signer vos documents électroniquement. L'objectif de cette clause est de vous informer sur le processus, la légalité et vos droits concernant l'utilisation de la signature électronique sur notre plateforme. En choisissant d'utiliser un sytème de signature électronique, vous acceptez les termes et conditions exposés ci-dessous."
+msgstr "Merci d'utiliser Documenso pour signer vos documents électroniquement. L'objectif de cette divulgation est de vous informer sur le processus, la légalité et vos droits concernant l'utilisation des signatures électroniques sur notre plateforme. En choisissant d'utiliser une signature électronique, vous acceptez les termes et conditions énoncés ci-dessous."
 
 #: packages/email/template-components/template-forgot-password.tsx:25
 msgid "That's okay, it happens! Click the button below to reset your password."
-msgstr "Ce n'est pas grave, cela arrive ! Cliquez sur le bouton ci-dessous pour réinitialiser votre mot de passe."
+msgstr "C'est d'accord, cela arrive ! Cliquez sur le bouton ci-dessous pour réinitialiser votre mot de passe."
 
 #: apps/web/src/app/(dashboard)/admin/users/[id]/delete-user-dialog.tsx:52
 msgid "The account has been deleted successfully."
@@ -5331,7 +5331,7 @@ msgstr "Le webhook a été créé avec succès."
 
 #: apps/web/src/app/(dashboard)/documents/empty-state.tsx:25
 msgid "There are no active drafts at the current moment. You can upload a document to start drafting."
-msgstr "Il n'y a pas de brouillons actifs pour le moment. Vous pouvez importer un document pour commencer un brouillon."
+msgstr "Il n'y a pas de brouillons actifs pour le moment. Vous pouvez télécharger un document pour commencer à rédiger."
 
 #: apps/web/src/app/(dashboard)/documents/empty-state.tsx:20
 msgid "There are no completed documents yet. Documents that you have created or received will appear here once completed."
@@ -5899,27 +5899,27 @@ msgstr "Améliorer"
 
 #: apps/web/src/components/templates/template-bulk-send-dialog.tsx:132
 msgid "Upload a CSV file to create multiple documents from this template. Each row represents one document with its recipient details."
-msgstr "Importer un fichier CSV pour créer plusieurs documents à partir de ce modèle. Chaque ligne représente un document avec les coordonnées de son destinataire."
+msgstr "Téléchargez un fichier CSV pour créer plusieurs documents à partir de ce modèle. Chaque ligne représente un document avec ses détails de destinataire."
 
 #: apps/web/src/app/(dashboard)/templates/use-template-dialog.tsx:426
 msgid "Upload a custom document to use instead of the template's default document"
-msgstr "Importer un document personnalisé à utiliser à la place du modèle par défaut"
+msgstr "Téléchargez un document personnalisé à utiliser à la place du document par défaut du modèle"
 
 #: apps/web/src/components/templates/template-bulk-send-dialog.tsx:267
 msgid "Upload and Process"
-msgstr "Importer et traiter"
+msgstr "Télécharger et traiter"
 
 #: apps/web/src/components/forms/avatar-image.tsx:179
 msgid "Upload Avatar"
-msgstr "Importer un avatar"
+msgstr "Télécharger un avatar"
 
 #: apps/web/src/components/templates/template-bulk-send-dialog.tsx:198
 msgid "Upload CSV"
-msgstr "Importer le CSV"
+msgstr "Télécharger le CSV"
 
 #: apps/web/src/app/(dashboard)/templates/use-template-dialog.tsx:419
 msgid "Upload custom document"
-msgstr "Importer un document personnalisé"
+msgstr "Télécharger un document personnalisé"
 
 #: packages/ui/primitives/signature-pad/signature-pad.tsx:529
 msgid "Upload Signature"
@@ -5927,7 +5927,7 @@ msgstr "Importer une signature"
 
 #: packages/ui/primitives/document-dropzone.tsx:70
 msgid "Upload Template Document"
-msgstr "Importer le document modèle"
+msgstr "Télécharger le document modèle"
 
 #: apps/web/src/app/(teams)/t/[teamUrl]/settings/preferences/branding-preferences.tsx:256
 msgid "Upload your brand logo (max 5MB, JPG, PNG, or WebP)"
@@ -5940,15 +5940,15 @@ msgstr "Téléversé par"
 
 #: apps/web/src/components/forms/avatar-image.tsx:91
 msgid "Uploaded file is too large"
-msgstr "Le fichier importé est trop volumineux"
+msgstr "Le fichier téléchargé est trop volumineux"
 
 #: apps/web/src/components/forms/avatar-image.tsx:92
 msgid "Uploaded file is too small"
-msgstr "Le fichier importé est trop petit"
+msgstr "Le fichier téléchargé est trop petit"
 
 #: apps/web/src/components/forms/avatar-image.tsx:93
 msgid "Uploaded file not an allowed file type"
-msgstr "Le fichier importé n'est pas un type de fichier autorisé"
+msgstr "Le fichier téléchargé n'est pas un type de fichier autorisé"
 
 #: apps/web/src/app/(dashboard)/templates/[id]/template-page-view.tsx:175
 msgid "Use"
@@ -6040,7 +6040,7 @@ msgstr "Vérifiez votre adresse e-mail pour débloquer toutes les fonctionnalit�
 
 #: apps/web/src/app/(dashboard)/documents/upload-document.tsx:60
 msgid "Verify your email to upload documents."
-msgstr "Vérifiez votre e-mail pour importer des documents."
+msgstr "Vérifiez votre e-mail pour télécharger des documents."
 
 #: packages/email/templates/confirm-team-email.tsx:71
 msgid "Verify your team email address"
@@ -6137,11 +6137,11 @@ msgstr "Vu"
 
 #: packages/lib/constants/recipient-roles.ts:32
 msgid "Viewer"
-msgstr "Lecteur"
+msgstr "Visiteur"
 
 #: packages/lib/constants/recipient-roles.ts:33
 msgid "Viewers"
-msgstr "Lecteurs"
+msgstr "Spectateurs"
 
 #: packages/lib/constants/recipient-roles.ts:31
 msgid "Viewing"
@@ -6526,7 +6526,7 @@ msgstr "Vous êtes sur le point d'envoyer ce document aux destinataires. Êtes-v
 
 #: apps/web/src/app/(dashboard)/settings/billing/page.tsx:80
 msgid "You are currently on the <0>Free Plan</0>."
-msgstr "Vous êtes actuellement sur l'<0>Abonnement Gratuit</0>."
+msgstr "Vous êtes actuellement sur le <0>Plan Gratuit</0>."
 
 #: apps/web/src/components/(teams)/dialogs/update-team-member-dialog.tsx:148
 msgid "You are currently updating <0>{teamMemberName}.</0>"
@@ -6610,11 +6610,11 @@ msgstr "Vous ne pouvez pas modifier un membre de l'équipe qui a un rôle plus �
 
 #: packages/ui/primitives/document-dropzone.tsx:43
 msgid "You cannot upload documents at this time."
-msgstr "Vous ne pouvez pas importer de documents pour le moment."
+msgstr "Vous ne pouvez pas télécharger de documents pour le moment."
 
 #: apps/web/src/app/(dashboard)/documents/upload-document.tsx:103
 msgid "You cannot upload encrypted PDFs"
-msgstr "Vous ne pouvez pas importer de PDF cryptés"
+msgstr "Vous ne pouvez pas télécharger de PDF cryptés"
 
 #: apps/web/src/app/(dashboard)/settings/billing/billing-portal-button.tsx:46
 msgid "You do not currently have a customer record, this should not happen. Please contact support for assistance."
@@ -6678,11 +6678,11 @@ msgstr "Vous n'avez pas encore de webhooks. Vos webhooks seront affichés ici un
 
 #: apps/web/src/app/(dashboard)/templates/empty-state.tsx:15
 msgid "You have not yet created any templates. To create a template please upload one."
-msgstr "Vous n'avez pas encore créé de modèles. Pour créer un modèle, veuillez en importer un."
+msgstr "Vous n'avez pas encore créé de modèles. Pour créer un modèle, veuillez en télécharger un."
 
 #: apps/web/src/app/(dashboard)/documents/empty-state.tsx:30
 msgid "You have not yet created or received any documents. To create a document please upload one."
-msgstr "Vous n'avez pas encore créé ou reçu de documents. Pour créer un document, veuillez en importer un."
+msgstr "Vous n'avez pas encore créé ou reçu de documents. Pour créer un document, veuillez en télécharger un."
 
 #: apps/web/src/app/(dashboard)/templates/template-direct-link-dialog.tsx:229
 msgid "You have reached the maximum limit of {0} direct templates. <0>Upgrade your account to continue!</0>"
@@ -6690,7 +6690,7 @@ msgstr "Vous avez atteint la limite maximale de {0} modèles directs. <0>Mettez 
 
 #: apps/web/src/app/(dashboard)/documents/upload-document.tsx:106
 msgid "You have reached your document limit for this month. Please upgrade your plan."
-msgstr "Vous avez atteint votre limite de documents pour ce mois. Veuillez passer à l'abonnement supérieur."
+msgstr "Vous avez atteint votre limite de documents pour ce mois. Veuillez passer à un plan supérieur."
 
 #: apps/web/src/app/(dashboard)/documents/upload-document.tsx:56
 #: packages/ui/primitives/document-dropzone.tsx:69
@@ -6811,11 +6811,11 @@ msgstr "Votre envoi groupé a été initié. Vous recevrez une notification par 
 
 #: packages/email/templates/bulk-send-complete.tsx:40
 msgid "Your bulk send operation for template \"{templateName}\" has completed."
-msgstr "Votre envoi groupé pour le modèle \"{templateName}\" est terminé."
+msgstr "Votre opération d'envoi groupé pour le modèle \"{templateName}\" est terminée."
 
 #: apps/web/src/app/(dashboard)/settings/billing/page.tsx:125
 msgid "Your current plan is past due. Please update your payment information."
-msgstr "Votre abonnement actuel est arrivé à échéance. Veuillez mettre à jour vos informations de paiement."
+msgstr "Votre plan actuel est en retard. Veuillez mettre à jour vos informations de paiement."
 
 #: apps/web/src/components/templates/manage-public-template-dialog.tsx:249
 msgid "Your direct signing templates"
@@ -6823,7 +6823,7 @@ msgstr "Vos modèles de signature directe"
 
 #: apps/web/src/app/(dashboard)/documents/upload-document.tsx:123
 msgid "Your document failed to upload."
-msgstr "L'importation de votre document a échoué."
+msgstr "Votre document a échoué à se télécharger."
 
 #: apps/web/src/app/(dashboard)/templates/use-template-dialog.tsx:169
 msgid "Your document has been created from the template successfully."
@@ -6847,11 +6847,11 @@ msgstr "Votre document a été dupliqué avec succès."
 
 #: apps/web/src/app/(dashboard)/documents/upload-document.tsx:86
 msgid "Your document has been uploaded successfully."
-msgstr "Votre document a été importé avec succès."
+msgstr "Votre document a été téléchargé avec succès."
 
 #: apps/web/src/app/(dashboard)/templates/new-template-dialog.tsx:68
 msgid "Your document has been uploaded successfully. You will be redirected to the template page."
-msgstr "Votre document a été importé avec succès. Vous serez redirigé vers la page de modèle."
+msgstr "Votre document a été téléchargé avec succès. Vous serez redirigé vers la page de modèle."
 
 #: apps/web/src/app/(teams)/t/[teamUrl]/settings/preferences/document-preferences.tsx:104
 msgid "Your document preferences have been updated"
