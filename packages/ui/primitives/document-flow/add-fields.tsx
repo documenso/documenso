@@ -3,9 +3,8 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
 import { Trans } from '@lingui/react/macro';
-import { Prisma } from '@prisma/client';
 import type { Field, Recipient } from '@prisma/client';
-import { FieldType, RecipientRole, SendStatus } from '@prisma/client';
+import { FieldType, Prisma, RecipientRole, SendStatus } from '@prisma/client';
 import {
   CalendarDays,
   Check,
@@ -430,6 +429,7 @@ export const AddFieldsFormPartial = ({
 
         const newField: TAddFieldsFormSchema['fields'][0] = {
           ...structuredClone(lastActiveField),
+          nativeId: undefined,
           formId: nanoid(12),
           signerEmail: selectedSigner?.email ?? lastActiveField.signerEmail,
           pageX: lastActiveField.pageX + 3,
@@ -451,6 +451,7 @@ export const AddFieldsFormPartial = ({
 
         append({
           ...copiedField,
+          nativeId: undefined,
           formId: nanoid(12),
           signerEmail: selectedSigner?.email ?? copiedField.signerEmail,
           pageX: copiedField.pageX + 3,
@@ -649,6 +650,8 @@ export const AddFieldsFormPartial = ({
                       passive={isFieldWithinBounds && !!selectedField}
                       onFocus={() => setLastActiveField(field)}
                       onBlur={() => setLastActiveField(null)}
+                      onMouseEnter={() => setLastActiveField(field)}
+                      onMouseLeave={() => setLastActiveField(null)}
                       onResize={(options) => onFieldResize(options, index)}
                       onMove={(options) => onFieldMove(options, index)}
                       onRemove={() => remove(index)}
