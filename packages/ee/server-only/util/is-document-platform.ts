@@ -6,7 +6,7 @@ import { prisma } from '@documenso/prisma';
 
 import { getPlatformPlanPriceIds } from '../stripe/get-platform-plan-prices';
 
-export type IsDocumentPlatformOptions = Pick<Document, 'id' | 'userId' | 'teamId'>;
+export type IsDocumentPlatformOptions = Pick<Document, 'userId' | 'teamId'>;
 
 /**
  * Whether the user is platform, or has permission to use platform features on
