@@ -145,6 +145,7 @@ export const ZFindDocumentsInternalResponseSchema = ZFindResultResponse.extend({
     [ExtendedDocumentStatus.PENDING]: z.number(),
     [ExtendedDocumentStatus.COMPLETED]: z.number(),
     [ExtendedDocumentStatus.REJECTED]: z.number(),
+    [ExtendedDocumentStatus.DELETED]: z.number(),
     [ExtendedDocumentStatus.INBOX]: z.number(),
     [ExtendedDocumentStatus.ALL]: z.number(),
   }),
@@ -347,6 +348,12 @@ export const ZDeleteDocumentMutationSchema = z.object({
 });
 
 export type TDeleteDocumentMutationSchema = z.infer<typeof ZDeleteDocumentMutationSchema>;
+
+export const ZRestoreDocumentMutationSchema = z.object({
+  documentId: z.number(),
+});
+
+export type TRestoreDocumentMutationSchema = z.infer<typeof ZRestoreDocumentMutationSchema>;
 
 export const ZSearchDocumentsMutationSchema = z.object({
   query: z.string(),

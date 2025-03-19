@@ -136,18 +136,26 @@ export const findDocuments = async ({
     };
   }
 
+  const deletedDateRange =
+    status === ExtendedDocumentStatus.DELETED
+      ? {
+          gte: DateTime.now().minus({ days: 30 }).toJSDate(),
+          lte: DateTime.now().toJSDate(),
+        }
+      : null;
+
   let deletedFilter: Prisma.DocumentWhereInput = {
     AND: {
       OR: [
         {
           userId: user.id,
-          deletedAt: null,
+          deletedAt: deletedDateRange,
         },
         {
           recipients: {
             some: {
               email: user.email,
-              documentDeletedAt: null,
+              documentDeletedAt: deletedDateRange,
             },
           },
         },
@@ -162,19 +170,19 @@ export const findDocuments = async ({
           ? [
               {
                 teamId: team.id,
-                deletedAt: null,
+                deletedAt: deletedDateRange,
               },
               {
                 user: {
                   email: team.teamEmail.email,
                 },
-                deletedAt: null,
+                deletedAt: deletedDateRange,
               },
               {
                 recipients: {
                   some: {
                     email: team.teamEmail.email,
-                    documentDeletedAt: null,
+                    documentDeletedAt: deletedDateRange,
                   },
                 },
               },
@@ -182,7 +190,7 @@ export const findDocuments = async ({
           : [
               {
                 teamId: team.id,
-                deletedAt: null,
+                deletedAt: deletedDateRange,
               },
             ],
       },
@@ -297,6 +305,14 @@ const findDocumentsFilter = (status: ExtendedDocumentStatus, user: User) => {
             },
           },
         },
+        {
+          status: ExtendedDocumentStatus.REJECTED,
+          recipients: {
+            some: {
+              email: user.email,
+            },
+          },
+        },
       ],
     }))
     .with(ExtendedDocumentStatus.INBOX, () => ({
@@ -368,7 +384,24 @@ const findDocumentsFilter = (status: ExtendedDocumentStatus, user: User) => {
           recipients: {
             some: {
               email: user.email,
-              signingStatus: SigningStatus.REJECTED,
+            },
+          },
+        },
+      ],
+    }))
+    .with(ExtendedDocumentStatus.DELETED, () => ({
+      OR: [
+        {
+          userId: user.id,
+          deletedAt: {
+            gte: DateTime.now().minus({ days: 30 }).toJSDate(),
+            not: null,
+          },
+        },
+        {
+          recipients: {
+            some: {
+              email: user.email,
             },
           },
         },
@@ -410,7 +443,7 @@ const findTeamDocumentsFilter = (
   status: ExtendedDocumentStatus,
   team: Team & { teamEmail: TeamEmail | null },
   visibilityFilters: Prisma.DocumentWhereInput[],
-) => {
+): Prisma.DocumentWhereInput | null => {
   const teamEmail = team.teamEmail?.email ?? null;
 
   return match<ExtendedDocumentStatus, Prisma.DocumentWhereInput | null>(status)
@@ -598,6 +631,33 @@ const findTeamDocumentsFilter = (
       }
 
       return filter;
+    })
+    .with(ExtendedDocumentStatus.DELETED, () => {
+      return {
+        OR: teamEmail
+          ? [
+              {
+                teamId: team.id,
+              },
+              {
+                user: {
+                  email: teamEmail,
+                },
+              },
+              {
+                recipients: {
+                  some: {
+                    email: teamEmail,
+                  },
+                },
+              },
+            ]
+          : [
+              {
+                teamId: team.id,
+              },
+            ],
+      };
     })
     .exhaustive();
 };

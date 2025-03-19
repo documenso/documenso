@@ -39,6 +39,7 @@ export const ZDocumentAuditLogTypeSchema = z.enum([
   'DOCUMENT_TITLE_UPDATED', // When the document title is updated.
   'DOCUMENT_EXTERNAL_ID_UPDATED', // When the document external ID is updated.
   'DOCUMENT_MOVED_TO_TEAM', // When the document is moved to a team.
+  'DOCUMENT_RESTORED', // When a deleted document is restored.
 ]);
 
 export const ZDocumentAuditLogEmailTypeSchema = z.enum([
@@ -551,6 +552,14 @@ export const ZDocumentAuditLogEventDocumentMovedToTeamSchema = z.object({
   }),
 });
 
+/**
+ * Event: Document restored.
+ */
+export const ZDocumentAuditLogEventDocumentRestoredSchema = z.object({
+  type: z.literal(DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_RESTORED),
+  data: z.object({}),
+});
+
 export const ZDocumentAuditLogBaseSchema = z.object({
   id: z.string(),
   createdAt: z.date(),
@@ -588,6 +597,7 @@ export const ZDocumentAuditLogSchema = ZDocumentAuditLogBaseSchema.and(
     ZDocumentAuditLogEventRecipientAddedSchema,
     ZDocumentAuditLogEventRecipientUpdatedSchema,
     ZDocumentAuditLogEventRecipientRemovedSchema,
+    ZDocumentAuditLogEventDocumentRestoredSchema,
   ]),
 );
 
