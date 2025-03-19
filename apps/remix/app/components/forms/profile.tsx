@@ -19,12 +19,15 @@ import {
 } from '@documenso/ui/primitives/form/form';
 import { Input } from '@documenso/ui/primitives/input';
 import { Label } from '@documenso/ui/primitives/label';
-import { SignaturePad } from '@documenso/ui/primitives/signature-pad';
+import { SignaturePadDialog } from '@documenso/ui/primitives/signature-pad/signature-pad-dialog';
 import { useToast } from '@documenso/ui/primitives/use-toast';
 
 export const ZProfileFormSchema = z.object({
-  name: z.string().trim().min(1, { message: 'Please enter a valid name.' }),
-  signature: z.string().min(1, 'Signature Pad cannot be empty'),
+  name: z
+    .string()
+    .trim()
+    .min(1, { message: msg`Please enter a valid name.`.id }),
+  signature: z.string().min(1, { message: msg`Signature Pad cannot be empty.`.id }),
 });
 
 export const ZTwoFactorAuthTokenSchema = z.object({
@@ -109,22 +112,20 @@ export const ProfileForm = ({ className }: ProfileFormProps) => {
             </Label>
             <Input id="email" type="email" className="bg-muted mt-2" value={user.email} disabled />
           </div>
+
           <FormField
             control={form.control}
             name="signature"
-            render={({ field: { onChange } }) => (
+            render={({ field: { onChange, value } }) => (
               <FormItem>
                 <FormLabel>
                   <Trans>Signature</Trans>
                 </FormLabel>
                 <FormControl>
-                  <SignaturePad
-                    className="h-44 w-full"
+                  <SignaturePadDialog
                     disabled={isSubmitting}
-                    containerClassName={cn('rounded-lg border bg-background')}
-                    defaultValue={user.signature ?? undefined}
+                    value={value}
                     onChange={(v) => onChange(v ?? '')}
-                    allowTypedSignature={true}
                   />
                 </FormControl>
                 <FormMessage />
@@ -134,7 +135,7 @@ export const ProfileForm = ({ className }: ProfileFormProps) => {
         </fieldset>
 
         <Button type="submit" loading={isSubmitting} className="self-end">
-          {isSubmitting ? <Trans>Updating profile...</Trans> : <Trans>Update profile</Trans>}
+          <Trans>Update profile</Trans>
         </Button>
       </form>
     </Form>

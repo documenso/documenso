@@ -47,9 +47,8 @@ import { cn } from '../../lib/utils';
 import { Alert, AlertDescription } from '../alert';
 import { Button } from '../button';
 import { Card, CardContent } from '../card';
-import { Checkbox } from '../checkbox';
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem } from '../command';
-import { Form, FormControl, FormField, FormItem, FormLabel } from '../form/form';
+import { Form } from '../form/form';
 import { Popover, PopoverContent, PopoverTrigger } from '../popover';
 import { useStep } from '../stepper';
 import { Tooltip, TooltipContent, TooltipTrigger } from '../tooltip';
@@ -94,7 +93,6 @@ export type AddFieldsFormProps = {
   onSubmit: (_data: TAddFieldsFormSchema) => void;
   canGoBack?: boolean;
   isDocumentPdfLoaded: boolean;
-  typedSignatureEnabled?: boolean;
   teamId?: number;
 };
 
@@ -106,7 +104,6 @@ export const AddFieldsFormPartial = ({
   onSubmit,
   canGoBack = false,
   isDocumentPdfLoaded,
-  typedSignatureEnabled,
   teamId,
 }: AddFieldsFormProps) => {
   const { toast } = useToast();
@@ -137,7 +134,6 @@ export const AddFieldsFormPartial = ({
           recipients.find((recipient) => recipient.id === field.recipientId)?.email ?? '',
         fieldMeta: field.fieldMeta ? ZFieldMetaSchema.parse(field.fieldMeta) : undefined,
       })),
-      typedSignatureEnabled: typedSignatureEnabled ?? false,
     },
   });
 
@@ -787,31 +783,6 @@ export const AddFieldsFormPartial = ({
               )}
 
               <Form {...form}>
-                <FormField
-                  control={form.control}
-                  name="typedSignatureEnabled"
-                  render={({ field: { value, ...field } }) => (
-                    <FormItem className="mb-6 flex flex-row items-center space-x-2 space-y-0">
-                      <FormControl>
-                        <Checkbox
-                          {...field}
-                          id="typedSignatureEnabled"
-                          checked={value}
-                          onCheckedChange={(checked) => field.onChange(checked)}
-                          disabled={form.formState.isSubmitting}
-                        />
-                      </FormControl>
-
-                      <FormLabel
-                        htmlFor="typedSignatureEnabled"
-                        className="text-sm leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-                      >
-                        <Trans>Enable Typed Signatures</Trans>
-                      </FormLabel>
-                    </FormItem>
-                  )}
-                />
-
                 <div className="-mx-2 flex-1 overflow-y-auto px-2">
                   <fieldset disabled={isFieldsDisabled} className="my-2 grid grid-cols-3 gap-4">
                     <button

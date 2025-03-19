@@ -246,7 +246,9 @@ test('[DOCUMENT_AUTH]: should allow field signing when required for recipient au
       });
     }
 
-    await signSignaturePad(page);
+    if (fields.some((field) => field.type === FieldType.SIGNATURE)) {
+      await signSignaturePad(page);
+    }
 
     for (const field of fields) {
       await page.locator(`#field-${field.id}`).getByRole('button').click();
@@ -349,7 +351,9 @@ test('[DOCUMENT_AUTH]: should allow field signing when required for recipient an
       });
     }
 
-    await signSignaturePad(page);
+    if (fields.some((field) => field.type === FieldType.SIGNATURE)) {
+      await signSignaturePad(page);
+    }
 
     for (const field of fields) {
       await page.locator(`#field-${field.id}`).getByRole('button').click();

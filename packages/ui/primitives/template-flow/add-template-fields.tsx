@@ -54,10 +54,9 @@ import { Popover, PopoverContent, PopoverTrigger } from '@documenso/ui/primitive
 import { useToast } from '@documenso/ui/primitives/use-toast';
 
 import { getSignerColorStyles, useSignerColors } from '../../lib/signer-colors';
-import { Checkbox } from '../checkbox';
 import type { FieldFormType } from '../document-flow/add-fields';
 import { FieldAdvancedSettings } from '../document-flow/field-item-advanced-settings';
-import { Form, FormControl, FormField, FormItem, FormLabel } from '../form/form';
+import { Form } from '../form/form';
 import { useStep } from '../stepper';
 import type { TAddTemplateFieldsFormSchema } from './add-template-fields.types';
 
@@ -74,7 +73,6 @@ export type AddTemplateFieldsFormProps = {
   fields: Field[];
   onSubmit: (_data: TAddTemplateFieldsFormSchema) => void;
   teamId?: number;
-  typedSignatureEnabled?: boolean;
 };
 
 export const AddTemplateFieldsFormPartial = ({
@@ -84,7 +82,6 @@ export const AddTemplateFieldsFormPartial = ({
   fields,
   onSubmit,
   teamId,
-  typedSignatureEnabled,
 }: AddTemplateFieldsFormProps) => {
   const { _ } = useLingui();
   const { toast } = useToast();
@@ -119,7 +116,6 @@ export const AddTemplateFieldsFormPartial = ({
           recipients.find((recipient) => recipient.id === field.recipientId)?.token ?? '',
         fieldMeta: field.fieldMeta ? ZFieldMetaSchema.parse(field.fieldMeta) : undefined,
       })),
-      typedSignatureEnabled: typedSignatureEnabled ?? false,
     },
   });
 
@@ -483,12 +479,6 @@ export const AddTemplateFieldsFormPartial = ({
     form.setValue('fields', updatedFields);
   };
 
-  const isTypedSignatureEnabled = form.watch('typedSignatureEnabled');
-
-  const handleTypedSignatureChange = (value: boolean) => {
-    form.setValue('typedSignatureEnabled', value, { shouldDirty: true });
-  };
-
   return (
     <>
       {showAdvancedSettings && currentField ? (
@@ -662,31 +652,6 @@ export const AddTemplateFieldsFormPartial = ({
               )}
 
               <Form {...form}>
-                <FormField
-                  control={form.control}
-                  name="typedSignatureEnabled"
-                  render={({ field: { value, ...field } }) => (
-                    <FormItem className="mb-6 flex flex-row items-center space-x-2 space-y-0">
-                      <FormControl>
-                        <Checkbox
-                          {...field}
-                          id="typedSignatureEnabled"
-                          checked={value}
-                          onCheckedChange={(checked) => field.onChange(checked)}
-                          disabled={form.formState.isSubmitting}
-                        />
-                      </FormControl>
-
-                      <FormLabel
-                        htmlFor="typedSignatureEnabled"
-                        className="text-sm leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-                      >
-                        <Trans>Enable Typed Signatures</Trans>
-                      </FormLabel>
-                    </FormItem>
-                  )}
-                />
-
                 <div className="-mx-2 flex-1 overflow-y-auto px-2">
                   <fieldset className="my-2 grid grid-cols-3 gap-4">
                     <button

@@ -9,8 +9,8 @@ import { isAdmin } from '@documenso/lib/utils/is-admin';
 
 import type { TrpcContext } from './context';
 
-// Can't import type from trpc-to-openapi because it breaks nextjs build, not sure why.
-type OpenApiMeta = {
+// Can't import type from trpc-to-openapi because it breaks build, not sure why.
+export type TrpcRouteMeta = {
   openapi?: {
     enabled?: boolean;
     method: 'GET' | 'POST' | 'PATCH' | 'PUT' | 'DELETE';
@@ -30,7 +30,7 @@ type OpenApiMeta = {
 } & Record<string, unknown>;
 
 const t = initTRPC
-  .meta<OpenApiMeta>()
+  .meta<TrpcRouteMeta>()
   .context<TrpcContext>()
   .create({
     transformer: SuperJSON,

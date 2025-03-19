@@ -4,6 +4,8 @@ import { prisma } from '@documenso/prisma';
 import { TemplateSchema } from '@documenso/prisma/generated/zod/modelSchema//TemplateSchema';
 import type { TCreateTemplateMutationSchema } from '@documenso/trpc/server/template-router/schema';
 
+import { AppError, AppErrorCode } from '../../errors/app-error';
+
 export type CreateTemplateOptions = TCreateTemplateMutationSchema & {
   userId: number;
   teamId?: number;
@@ -19,8 +21,10 @@ export const createTemplate = async ({
   teamId,
   templateDocumentDataId,
 }: CreateTemplateOptions) => {
+  let team = null;
+
   if (teamId) {
-    await prisma.team.findFirstOrThrow({
+    team = await prisma.team.findFirst({
       where: {
         id: teamId,
         members: {
@@ -29,7 +33,14 @@ export const createTemplate = async ({
           },
         },
       },
+      include: {
+        teamGlobalSettings: true,
+      },
     });
+
+    if (!team) {
+      throw new AppError(AppErrorCode.NOT_FOUND);
+    }
   }
 
   return await prisma.template.create({
@@ -38,6 +49,14 @@ export const createTemplate = async ({
       userId,
       templateDocumentDataId,
       teamId,
+      templateMeta: {
+        create: {
+          language: team?.teamGlobalSettings?.documentLanguage,
+          typedSignatureEnabled: team?.teamGlobalSettings?.typedSignatureEnabled ?? true,
+          uploadSignatureEnabled: team?.teamGlobalSettings?.uploadSignatureEnabled ?? true,
+          drawSignatureEnabled: team?.teamGlobalSettings?.drawSignatureEnabled ?? true,
+        },
+      },
     },
   });
 };

@@ -4,6 +4,7 @@ import { getUserByEmail } from '@documenso/lib/server-only/user/get-user-by-emai
 import { seedUser } from '@documenso/prisma/seed/users';
 
 import { apiSignin } from '../fixtures/authentication';
+import { signSignaturePad } from '../fixtures/signature';
 
 test('[USER] update full name', async ({ page }) => {
   const user = await seedUser();
@@ -12,7 +13,7 @@ test('[USER] update full name', async ({ page }) => {
 
   await page.getByLabel('Full Name').fill('John Doe');
 
-  await page.getByPlaceholder('Type your signature').fill('John Doe');
+  await signSignaturePad(page);
 
   await page.getByRole('button', { name: 'Update profile' }).click();
 

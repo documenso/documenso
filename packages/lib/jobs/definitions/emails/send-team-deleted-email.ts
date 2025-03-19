@@ -23,6 +23,8 @@ const SEND_TEAM_DELETED_EMAIL_JOB_DEFINITION_SCHEMA = z.object({
         brandingHidePoweredBy: z.boolean(),
         teamId: z.number(),
         typedSignatureEnabled: z.boolean(),
+        uploadSignatureEnabled: z.boolean(),
+        drawSignatureEnabled: z.boolean(),
       })
       .nullish(),
   }),

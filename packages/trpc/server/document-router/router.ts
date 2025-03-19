@@ -56,9 +56,12 @@ import {
   ZSearchDocumentsMutationSchema,
   ZSetSigningOrderForDocumentMutationSchema,
   ZSuccessResponseSchema,
+} from './schema';
+import { updateDocumentRoute } from './update-document';
+import {
   ZUpdateDocumentRequestSchema,
   ZUpdateDocumentResponseSchema,
-} from './schema';
+} from './update-document.types';
 
 export const documentRouter = router({
   /**
@@ -335,20 +338,12 @@ export const documentRouter = router({
       });
     }),
 
+  updateDocument: updateDocumentRoute,
+
   /**
-   * @public
-   *
-   * Todo: Refactor to updateDocument.
+   * @deprecated Delete this after updateDocument endpoint is deployed
    */
   setSettingsForDocument: authenticatedProcedure
-    .meta({
-      openapi: {
-        method: 'POST',
-        path: '/document/update',
-        summary: 'Update document',
-        tags: ['Document'],
-      },
-    })
     .input(ZUpdateDocumentRequestSchema)
     .output(ZUpdateDocumentResponseSchema)
     .mutation(async ({ input, ctx }) => {
@@ -368,6 +363,8 @@ export const documentRouter = router({
           dateFormat: meta.dateFormat,
           language: meta.language,
           typedSignatureEnabled: meta.typedSignatureEnabled,
+          uploadSignatureEnabled: meta.uploadSignatureEnabled,
+          drawSignatureEnabled: meta.drawSignatureEnabled,
           redirectUrl: meta.redirectUrl,
           distributionMethod: meta.distributionMethod,
           signingOrder: meta.signingOrder,

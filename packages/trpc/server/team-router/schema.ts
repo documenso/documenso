@@ -1,7 +1,6 @@
-import { DocumentVisibility, TeamMemberRole } from '@prisma/client';
+import { TeamMemberRole } from '@prisma/client';
 import { z } from 'zod';
 
-import { SUPPORTED_LANGUAGE_CODES } from '@documenso/lib/constants/i18n';
 import { PROTECTED_TEAM_URLS } from '@documenso/lib/constants/teams';
 import { ZFindSearchParamsSchema } from '@documenso/lib/types/search-params';
 
@@ -195,20 +194,6 @@ export const ZUpdateTeamBrandingSettingsMutationSchema = z.object({
   }),
 });
 
-export const ZUpdateTeamDocumentSettingsMutationSchema = z.object({
-  teamId: z.number(),
-  settings: z.object({
-    documentVisibility: z
-      .nativeEnum(DocumentVisibility)
-      .optional()
-      .default(DocumentVisibility.EVERYONE),
-    documentLanguage: z.enum(SUPPORTED_LANGUAGE_CODES).optional().default('en'),
-    includeSenderDetails: z.boolean().optional().default(false),
-    typedSignatureEnabled: z.boolean().optional().default(true),
-    includeSigningCertificate: z.boolean().optional().default(true),
-  }),
-});
-
 export type TCreateTeamMutationSchema = z.infer<typeof ZCreateTeamMutationSchema>;
 export type TCreateTeamEmailVerificationMutationSchema = z.infer<
   typeof ZCreateTeamEmailVerificationMutationSchema
@@ -246,7 +231,4 @@ export type TResendTeamMemberInvitationMutationSchema = z.infer<
 >;
 export type TUpdateTeamBrandingSettingsMutationSchema = z.infer<
   typeof ZUpdateTeamBrandingSettingsMutationSchema
->;
-export type TUpdateTeamDocumentSettingsMutationSchema = z.infer<
-  typeof ZUpdateTeamDocumentSettingsMutationSchema
 >;
