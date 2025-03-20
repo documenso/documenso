@@ -36,7 +36,7 @@ npm run build
 
 # ECR is in production only, so use prod credentials
 
-aws ecr get-login-password --region us-west-2 | docker login --username AWS --password-stdin 806620123734.dkr.ecr.us-west-2.amazonaws.com
+aws ecr get-login-password --region us-west-2 --profile production | docker login --username AWS --password-stdin 806620123734.dkr.ecr.us-west-2.amazonaws.com
 docker buildx build \
     -f "$SCRIPT_DIR/../docker/Dockerfile" \
     -t "sunrebel/documenso" \
