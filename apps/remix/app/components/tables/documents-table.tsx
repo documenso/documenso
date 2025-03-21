@@ -29,11 +29,17 @@ export type DocumentsTableProps = {
   data?: TFindDocumentsResponse;
   isLoading?: boolean;
   isLoadingError?: boolean;
+  onMoveDocument?: (documentId: number) => void;
 };
 
 type DocumentsTableRow = TFindDocumentsResponse['data'][number];
 
-export const DocumentsTable = ({ data, isLoading, isLoadingError }: DocumentsTableProps) => {
+export const DocumentsTable = ({
+  data,
+  isLoading,
+  isLoadingError,
+  onMoveDocument,
+}: DocumentsTableProps) => {
   const { _, i18n } = useLingui();
 
   const team = useOptionalCurrentTeam();
@@ -80,12 +86,15 @@ export const DocumentsTable = ({ data, isLoading, isLoadingError }: DocumentsTab
           (!row.original.deletedAt || isDocumentCompleted(row.original.status)) && (
             <div className="flex items-center gap-x-4">
               <DocumentsTableActionButton row={row.original} />
-              <DocumentsTableActionDropdown row={row.original} />
+              <DocumentsTableActionDropdown
+                row={row.original}
+                onMoveDocument={onMoveDocument ? () => onMoveDocument(row.original.id) : undefined}
+              />
             </div>
           ),
       },
     ] satisfies DataTableColumnDef<DocumentsTableRow>[];
-  }, [team]);
+  }, [team, onMoveDocument, _, i18n]);
 
   const onPaginationChange = (page: number, perPage: number) => {
     startTransition(() => {
