@@ -49,7 +49,6 @@ export type DocumentSigningFormProps = {
   isRecipientsTurn: boolean;
   allRecipients?: RecipientWithFields[];
   setSelectedSignerId?: (id: number | null) => void;
-  nextPendingRecipient?: Recipient | null;
 };
 
 export const DocumentSigningForm = ({
@@ -60,7 +59,6 @@ export const DocumentSigningForm = ({
   isRecipientsTurn,
   allRecipients = [],
   setSelectedSignerId,
-  nextPendingRecipient,
 }: DocumentSigningFormProps) => {
   const { sessionData } = useOptionalSession();
   const user = sessionData?.user;
@@ -467,10 +465,11 @@ export const DocumentSigningForm = ({
                   </Button>
 
                   <DocumentSigningCompleteDialog
-                    isSubmitting={isSubmitting}
+                    isSubmitting={isSubmitting || isAssistantSubmitting}
                     documentTitle={document.title}
                     fields={fields}
                     fieldsValidated={fieldsValidated}
+                    disabled={isRecipientsTurn}
                     onSignatureComplete={async (nextSigner) => {
                       await completeDocument(undefined, nextSigner);
                     }}
