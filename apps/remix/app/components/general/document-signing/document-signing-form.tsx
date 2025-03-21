@@ -374,7 +374,9 @@ export const DocumentSigningForm = ({
                   onClose={() => !isAssistantSubmitting && setIsConfirmationDialogOpen(false)}
                   onConfirm={handleAssistantConfirmDialogSubmit}
                   isSubmitting={isAssistantSubmitting}
-                  allowDictateNextSigner={document.documentMeta?.allowDictateNextSigner}
+                  allowDictateNextSigner={
+                    nextRecipient && document.documentMeta?.allowDictateNextSigner
+                  }
                   defaultNextSigner={
                     nextRecipient
                       ? { name: nextRecipient.name, email: nextRecipient.email }
@@ -474,7 +476,9 @@ export const DocumentSigningForm = ({
                       await completeDocument(undefined, nextSigner);
                     }}
                     role={recipient.role}
-                    allowDictateNextSigner={document.documentMeta?.allowDictateNextSigner}
+                    allowDictateNextSigner={
+                      nextRecipient && document.documentMeta?.allowDictateNextSigner
+                    }
                     defaultNextSigner={
                       nextRecipient
                         ? { name: nextRecipient.name, email: nextRecipient.email }
