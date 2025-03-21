@@ -71,7 +71,7 @@ export const DocumentEditForm = ({
 
   const { recipients, fields } = document;
 
-  const { mutateAsync: updateDocument } = trpc.document.setSettingsForDocument.useMutation({
+  const { mutateAsync: updateDocumentSettings } = trpc.document.setSettingsForDocument.useMutation({
     ...DO_NOT_INVALIDATE_QUERY_ON_MUTATION,
     onSuccess: (newData) => {
       utils.document.getDocumentWithDetailsById.setData(
@@ -176,7 +176,7 @@ export const DocumentEditForm = ({
     try {
       const { timezone, dateFormat, redirectUrl, language } = data.meta;
 
-      await updateDocument({
+      await updateDocumentSettings({
         documentId: document.id,
         data: {
           title: data.title,
@@ -213,6 +213,13 @@ export const DocumentEditForm = ({
           signingOrder: data.signingOrder,
         }),
 
+        updateDocumentSettings({
+          documentId: document.id,
+          meta: {
+            allowDictateNextSigner: data.allowDictateNextSigner,
+          },
+        }),
+
         setRecipients({
           documentId: document.id,
           recipients: data.signers.map((signer) => ({
@@ -242,7 +249,7 @@ export const DocumentEditForm = ({
         fields: data.fields,
       });
 
-      await updateDocument({
+      await updateDocumentSettings({
         documentId: document.id,
 
         meta: {
@@ -365,6 +372,7 @@ export const DocumentEditForm = ({
               documentFlow={documentFlow.signers}
               recipients={recipients}
               signingOrder={document.documentMeta?.signingOrder}
+              allowDictateNextSigner={document.documentMeta?.allowDictateNextSigner}
               fields={fields}
               isDocumentEnterprise={isDocumentEnterprise}
               onSubmit={onAddSignersFormSubmit}

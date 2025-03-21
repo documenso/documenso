@@ -1,5 +1,5 @@
 import { Trans } from '@lingui/react/macro';
-import { DocumentStatus, RecipientRole, SigningStatus } from '@prisma/client';
+import { DocumentSigningOrder, DocumentStatus, RecipientRole, SigningStatus } from '@prisma/client';
 import { Clock8 } from 'lucide-react';
 import { Link, redirect } from 'react-router';
 import { getOptionalLoaderContext } from 'server/utils/get-loader-session';
@@ -13,6 +13,7 @@ import { viewedDocument } from '@documenso/lib/server-only/document/viewed-docum
 import { getCompletedFieldsForToken } from '@documenso/lib/server-only/field/get-completed-fields-for-token';
 import { getFieldsForToken } from '@documenso/lib/server-only/field/get-fields-for-token';
 import { getIsRecipientsTurnToSign } from '@documenso/lib/server-only/recipient/get-is-recipient-turn';
+import { getNextPendingRecipient } from '@documenso/lib/server-only/recipient/get-next-pending-recipient';
 import { getRecipientByToken } from '@documenso/lib/server-only/recipient/get-recipient-by-token';
 import { getRecipientSignatures } from '@documenso/lib/server-only/recipient/get-recipient-signatures';
 import { getRecipientsForAssistant } from '@documenso/lib/server-only/recipient/get-recipients-for-assistant';
@@ -72,7 +73,24 @@ export async function loader({ params, request }: Route.LoaderArgs) {
       ? await getRecipientsForAssistant({
           token,
         })
-      : [];
+      : [recipient];
+
+  if (
+    document.documentMeta?.signingOrder === DocumentSigningOrder.SEQUENTIAL &&
+    recipient.role !== RecipientRole.ASSISTANT
+  ) {
+    const nextPendingRecipient = await getNextPendingRecipient({
+      documentId: document.id,
+      currentRecipientId: recipient.id,
+    });
+
+    if (nextPendingRecipient) {
+      allRecipients.push({
+        ...nextPendingRecipient,
+        fields: [],
+      });
+    }
+  }
 
   const { derivedRecipientAccessAuth } = extractDocumentAuthMethods({
     documentAuth: document.authOptions,

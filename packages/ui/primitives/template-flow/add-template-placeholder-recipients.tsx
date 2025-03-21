@@ -9,7 +9,7 @@ import { Trans } from '@lingui/react/macro';
 import type { TemplateDirectLink } from '@prisma/client';
 import { DocumentSigningOrder, type Field, type Recipient, RecipientRole } from '@prisma/client';
 import { motion } from 'framer-motion';
-import { GripVerticalIcon, Link2Icon, Plus, Trash } from 'lucide-react';
+import { GripVerticalIcon, HelpCircle, Link2Icon, Plus, Trash } from 'lucide-react';
 import { useFieldArray, useForm } from 'react-hook-form';
 
 import { useSession } from '@documenso/lib/client-only/providers/session';
@@ -47,10 +47,11 @@ export type AddTemplatePlaceholderRecipientsFormProps = {
   recipients: Recipient[];
   fields: Field[];
   signingOrder?: DocumentSigningOrder | null;
-  templateDirectLink: TemplateDirectLink | null;
+  allowDictateNextSigner?: boolean;
+  templateDirectLink?: TemplateDirectLink | null;
   isEnterprise: boolean;
-  isDocumentPdfLoaded: boolean;
   onSubmit: (_data: TAddTemplatePlacholderRecipientsFormSchema) => void;
+  isDocumentPdfLoaded: boolean;
 };
 
 export const AddTemplatePlaceholderRecipientsFormPartial = ({
@@ -60,6 +61,7 @@ export const AddTemplatePlaceholderRecipientsFormPartial = ({
   templateDirectLink,
   fields,
   signingOrder,
+  allowDictateNextSigner,
   isDocumentPdfLoaded,
   onSubmit,
 }: AddTemplatePlaceholderRecipientsFormProps) => {
@@ -112,6 +114,7 @@ export const AddTemplatePlaceholderRecipientsFormPartial = ({
     defaultValues: {
       signers: generateDefaultFormSigners(),
       signingOrder: signingOrder || DocumentSigningOrder.PARALLEL,
+      allowDictateNextSigner: allowDictateNextSigner ?? false,
     },
   });
 
@@ -119,6 +122,7 @@ export const AddTemplatePlaceholderRecipientsFormPartial = ({
     form.reset({
       signers: generateDefaultFormSigners(),
       signingOrder: signingOrder || DocumentSigningOrder.PARALLEL,
+      allowDictateNextSigner: allowDictateNextSigner ?? false,
     });
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -377,6 +381,7 @@ export const AddTemplatePlaceholderRecipientsFormPartial = ({
 
     form.setValue('signers', updatedSigners);
     form.setValue('signingOrder', DocumentSigningOrder.PARALLEL);
+    form.setValue('allowDictateNextSigner', false);
   }, [form]);
 
   return (
@@ -416,6 +421,11 @@ export const AddTemplatePlaceholderRecipientsFormPartial = ({
                         field.onChange(
                           checked ? DocumentSigningOrder.SEQUENTIAL : DocumentSigningOrder.PARALLEL,
                         );
+
+                        // If sequential signing is turned off, disable dictate next signer
+                        if (!checked) {
+                          form.setValue('allowDictateNextSigner', false);
+                        }
                       }}
                       disabled={isSubmitting}
                     />
@@ -427,6 +437,49 @@ export const AddTemplatePlaceholderRecipientsFormPartial = ({
                   >
                     <Trans>Enable signing order</Trans>
                   </FormLabel>
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="allowDictateNextSigner"
+              render={({ field: { value, ...field } }) => (
+                <FormItem className="mb-6 flex flex-row items-center space-x-2 space-y-0">
+                  <FormControl>
+                    <Checkbox
+                      {...field}
+                      id="allowDictateNextSigner"
+                      checked={value}
+                      onCheckedChange={field.onChange}
+                      disabled={isSubmitting || !isSigningOrderSequential}
+                    />
+                  </FormControl>
+
+                  <div className="flex items-center">
+                    <FormLabel
+                      htmlFor="allowDictateNextSigner"
+                      className="text-sm leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                    >
+                      <Trans>Allow signers to dictate next signer</Trans>
+                    </FormLabel>
+
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <span className="text-muted-foreground ml-1 cursor-help">
+                          <HelpCircle className="h-3.5 w-3.5" />
+                        </span>
+                      </TooltipTrigger>
+                      <TooltipContent className="max-w-80 p-4">
+                        <p>
+                          <Trans>
+                            When enabled, signers can choose who should sign next in the sequence
+                            instead of following the predefined order.
+                          </Trans>
+                        </p>
+                      </TooltipContent>
+                    </Tooltip>
+                  </div>
                 </FormItem>
               )}
             />

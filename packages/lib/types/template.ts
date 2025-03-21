@@ -45,6 +45,7 @@ export const ZTemplateSchema = TemplateSchema.pick({
     dateFormat: true,
     signingOrder: true,
     typedSignatureEnabled: true,
+    allowDictateNextSigner: true,
     distributionMethod: true,
     templateId: true,
     redirectUrl: true,

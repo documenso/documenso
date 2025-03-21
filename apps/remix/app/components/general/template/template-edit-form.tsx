@@ -161,6 +161,7 @@ export const TemplateEditForm = ({
           templateId: template.id,
           meta: {
             signingOrder: data.signingOrder,
+            allowDictateNextSigner: data.allowDictateNextSigner,
           },
         }),
 
@@ -271,6 +272,7 @@ export const TemplateEditForm = ({
               recipients={recipients}
               fields={fields}
               signingOrder={template.templateMeta?.signingOrder}
+              allowDictateNextSigner={template.templateMeta?.allowDictateNextSigner}
               templateDirectLink={template.directLink}
               onSubmit={onAddTemplatePlaceholderFormSubmit}
               isEnterprise={isEnterprise}

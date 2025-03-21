@@ -210,7 +210,7 @@ test('[DOCUMENT_AUTH]: should allow field signing when required for recipient au
         }),
       },
     ],
-    fields: [FieldType.DATE],
+    fields: [FieldType.DATE, FieldType.SIGNATURE],
   });
 
   for (const recipient of recipients) {
@@ -307,7 +307,7 @@ test('[DOCUMENT_AUTH]: should allow field signing when required for recipient an
         }),
       },
     ],
-    fields: [FieldType.DATE],
+    fields: [FieldType.DATE, FieldType.SIGNATURE],
     updateDocumentOptions: {
       authOptions: createDocumentAuthOptions({
         globalAccessAuth: null,

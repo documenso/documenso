@@ -51,6 +51,7 @@ export const ZDocumentSchema = DocumentSchema.pick({
     documentId: true,
     redirectUrl: true,
     typedSignatureEnabled: true,
+    allowDictateNextSigner: true,
     language: true,
     emailSettings: true,
   }).nullable(),

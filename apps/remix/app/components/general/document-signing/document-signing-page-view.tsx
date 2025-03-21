@@ -40,9 +40,9 @@ import { DocumentReadOnlyFields } from '~/components/general/document/document-r
 
 import { DocumentSigningRecipientProvider } from './document-signing-recipient-provider';
 
-export type SigningPageViewProps = {
-  document: DocumentAndSender;
+export type DocumentSigningPageViewProps = {
   recipient: RecipientWithFields;
+  document: DocumentAndSender;
   fields: Field[];
   completedFields: CompletedField[];
   isRecipientsTurn: boolean;
@@ -50,13 +50,13 @@ export type SigningPageViewProps = {
 };
 
 export const DocumentSigningPageView = ({
-  document,
   recipient,
+  document,
   fields,
   completedFields,
   isRecipientsTurn,
   allRecipients = [],
-}: SigningPageViewProps) => {
+}: DocumentSigningPageViewProps) => {
   const { documentData, documentMeta } = document;
 
   const [selectedSignerId, setSelectedSignerId] = useState<number | null>(allRecipients?.[0]?.id);

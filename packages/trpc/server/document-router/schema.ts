@@ -268,6 +268,7 @@ export const ZUpdateDocumentRequestSchema = z.object({
       dateFormat: ZDocumentMetaDateFormatSchema.optional(),
       distributionMethod: ZDocumentMetaDistributionMethodSchema.optional(),
       signingOrder: z.nativeEnum(DocumentSigningOrder).optional(),
+      allowDictateNextSigner: z.boolean().optional(),
       redirectUrl: ZDocumentMetaRedirectUrlSchema.optional(),
       language: ZDocumentMetaLanguageSchema.optional(),
       typedSignatureEnabled: ZDocumentMetaTypedSignatureEnabledSchema.optional(),
