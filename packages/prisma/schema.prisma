@@ -56,6 +56,7 @@ model User {
   accounts             Account[]
   sessions             Session[]
   documents            Document[]
+  folders              Folder[]
   subscriptions        Subscription[]
   passwordResetTokens  PasswordResetToken[]
   ownedTeams           Team[]
@@ -312,6 +313,25 @@ enum DocumentVisibility {
   ADMIN
 }
 
+model Folder {
+  id         Int        @id @default(autoincrement())
+  name       String
+  userId     Int
+  user       User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  teamId     Int?
+  team       Team?      @relation(fields: [teamId], references: [id], onDelete: Cascade)
+  parentId   Int?
+  parent     Folder?    @relation("FolderToFolder", fields: [parentId], references: [id], onDelete: Cascade)
+  subfolders Folder[]   @relation("FolderToFolder")
+  documents  Document[]
+  createdAt  DateTime   @default(now())
+  updatedAt  DateTime   @default(now()) @updatedAt
+
+  @@index([userId])
+  @@index([teamId])
+  @@index([parentId])
+}
+
 /// @zod.import(["import { ZDocumentAuthOptionsSchema } from '@documenso/lib/types/document-auth';", "import { ZDocumentFormValuesSchema } from '@documenso/lib/types/document-form-values';"])
 model Document {
   id             Int                 @id @default(autoincrement())
@@ -340,10 +360,13 @@ model Document {
   source         DocumentSource
 
   auditLogs DocumentAuditLog[]
+  Folder    Folder?            @relation(fields: [folderId], references: [id])
+  folderId  Int?
 
   @@unique([documentDataId])
   @@index([userId])
   @@index([status])
+  @@index([folderId])
 }
 
 model DocumentAuditLog {
@@ -579,6 +602,7 @@ model Team {
 
   documents Document[]
   templates Template[]
+  folders   Folder[]
   apiTokens ApiToken[]
   webhooks  Webhook[]
 }

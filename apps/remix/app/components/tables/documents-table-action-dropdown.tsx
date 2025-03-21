@@ -48,9 +48,13 @@ export type DocumentsTableActionDropdownProps = {
     recipients: Recipient[];
     team: Pick<Team, 'id' | 'url'> | null;
   };
+  onMoveDocument?: () => void;
 };
 
-export const DocumentsTableActionDropdown = ({ row }: DocumentsTableActionDropdownProps) => {
+export const DocumentsTableActionDropdown = ({
+  row,
+  onMoveDocument,
+}: DocumentsTableActionDropdownProps) => {
   const { user } = useSession();
   const team = useOptionalCurrentTeam();
 
@@ -162,6 +166,13 @@ export const DocumentsTableActionDropdown = ({ row }: DocumentsTableActionDropdo
           <DropdownMenuItem onClick={() => setMoveDialogOpen(true)}>
             <MoveRight className="mr-2 h-4 w-4" />
             <Trans>Move to Team</Trans>
+          </DropdownMenuItem>
+        )}
+
+        {onMoveDocument && (
+          <DropdownMenuItem onClick={onMoveDocument} onSelect={(e) => e.preventDefault()}>
+            <MoveRight className="mr-2 h-4 w-4" />
+            <Trans>Move to Folder</Trans>
           </DropdownMenuItem>
         )}
 
