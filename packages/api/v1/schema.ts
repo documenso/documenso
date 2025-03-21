@@ -155,6 +155,7 @@ export const ZCreateDocumentMutationSchema = z.object({
         }),
       redirectUrl: z.string(),
       signingOrder: z.nativeEnum(DocumentSigningOrder).optional(),
+      allowDictateNextSigner: z.boolean().optional(),
       language: z.enum(SUPPORTED_LANGUAGE_CODES).optional(),
       typedSignatureEnabled: z.boolean().optional().default(true),
       distributionMethod: z.nativeEnum(DocumentDistributionMethod).optional(),
@@ -218,6 +219,7 @@ export const ZCreateDocumentFromTemplateMutationSchema = z.object({
       dateFormat: z.string(),
       redirectUrl: z.string(),
       signingOrder: z.nativeEnum(DocumentSigningOrder).optional(),
+      allowDictateNextSigner: z.boolean().optional(),
       language: z.enum(SUPPORTED_LANGUAGE_CODES).optional(),
     })
     .partial()
@@ -285,6 +287,7 @@ export const ZGenerateDocumentFromTemplateMutationSchema = z.object({
       dateFormat: z.string(),
       redirectUrl: ZUrlSchema,
       signingOrder: z.nativeEnum(DocumentSigningOrder),
+      allowDictateNextSigner: z.boolean(),
       language: z.enum(SUPPORTED_LANGUAGE_CODES),
       distributionMethod: z.nativeEnum(DocumentDistributionMethod),
       typedSignatureEnabled: z.boolean(),

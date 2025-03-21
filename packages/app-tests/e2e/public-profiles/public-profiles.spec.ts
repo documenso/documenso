@@ -56,6 +56,7 @@ test('[PUBLIC_PROFILE]: create profile', async ({ page }) => {
   // Go back to public profile page.
   await page.goto(`${NEXT_PUBLIC_WEBAPP_URL()}/settings/public-profile`);
   await page.getByRole('switch').click();
+  await page.waitForTimeout(1000);
 
   // Assert values.
   await page.goto(`${NEXT_PUBLIC_WEBAPP_URL()}/p/${publicProfileUrl}`);
@@ -127,6 +128,7 @@ test('[PUBLIC_PROFILE]: create team profile', async ({ page }) => {
   // Go back to public profile page.
   await page.goto(`${NEXT_PUBLIC_WEBAPP_URL()}/t/${team.url}/settings/public-profile`);
   await page.getByRole('switch').click();
+  await page.waitForTimeout(1000);
 
   // Assert values.
   await page.goto(`${NEXT_PUBLIC_WEBAPP_URL()}/p/${publicProfileUrl}`);

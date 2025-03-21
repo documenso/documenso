@@ -371,6 +371,7 @@ export const documentRouter = router({
           redirectUrl: meta.redirectUrl,
           distributionMethod: meta.distributionMethod,
           signingOrder: meta.signingOrder,
+          allowDictateNextSigner: meta.allowDictateNextSigner,
           emailSettings: meta.emailSettings,
           requestMetadata: ctx.metadata,
         });

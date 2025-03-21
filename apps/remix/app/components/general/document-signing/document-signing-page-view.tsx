@@ -1,7 +1,7 @@
 import { useState } from 'react';
 
 import { Trans } from '@lingui/react/macro';
-import type { Field } from '@prisma/client';
+import type { Field, Recipient } from '@prisma/client';
 import { FieldType, RecipientRole } from '@prisma/client';
 import { match } from 'ts-pattern';
 
@@ -40,23 +40,25 @@ import { DocumentReadOnlyFields } from '~/components/general/document/document-r
 
 import { DocumentSigningRecipientProvider } from './document-signing-recipient-provider';
 
-export type SigningPageViewProps = {
-  document: DocumentAndSender;
+export type DocumentSigningPageViewProps = {
   recipient: RecipientWithFields;
+  document: DocumentAndSender;
   fields: Field[];
   completedFields: CompletedField[];
   isRecipientsTurn: boolean;
   allRecipients?: RecipientWithFields[];
+  nextPendingRecipient?: Recipient | null;
 };
 
 export const DocumentSigningPageView = ({
-  document,
   recipient,
+  document,
   fields,
   completedFields,
   isRecipientsTurn,
   allRecipients = [],
-}: SigningPageViewProps) => {
+  nextPendingRecipient,
+}: DocumentSigningPageViewProps) => {
   const { documentData, documentMeta } = document;
 
   const [selectedSignerId, setSelectedSignerId] = useState<number | null>(allRecipients?.[0]?.id);
@@ -152,6 +154,7 @@ export const DocumentSigningPageView = ({
               redirectUrl={documentMeta?.redirectUrl}
               isRecipientsTurn={isRecipientsTurn}
               allRecipients={allRecipients}
+              nextPendingRecipient={nextPendingRecipient}
               setSelectedSignerId={setSelectedSignerId}
             />
           </div>

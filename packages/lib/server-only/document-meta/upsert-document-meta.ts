@@ -24,6 +24,7 @@ export type CreateDocumentMetaOptions = {
   redirectUrl?: string;
   emailSettings?: TDocumentEmailSettings;
   signingOrder?: DocumentSigningOrder;
+  allowDictateNextSigner?: boolean;
   distributionMethod?: DocumentDistributionMethod;
   typedSignatureEnabled?: boolean;
   language?: SupportedLanguageCodes;
@@ -41,6 +42,7 @@ export const upsertDocumentMeta = async ({
   password,
   redirectUrl,
   signingOrder,
+  allowDictateNextSigner,
   emailSettings,
   distributionMethod,
   typedSignatureEnabled,
@@ -93,6 +95,7 @@ export const upsertDocumentMeta = async ({
         documentId,
         redirectUrl,
         signingOrder,
+        allowDictateNextSigner,
         emailSettings,
         distributionMethod,
         typedSignatureEnabled,
@@ -106,6 +109,7 @@ export const upsertDocumentMeta = async ({
         timezone,
         redirectUrl,
         signingOrder,
+        allowDictateNextSigner,
         emailSettings,
         distributionMethod,
         typedSignatureEnabled,

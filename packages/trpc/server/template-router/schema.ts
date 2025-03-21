@@ -165,6 +165,7 @@ export const ZUpdateTemplateRequestSchema = z.object({
       language: ZDocumentMetaLanguageSchema.optional(),
       typedSignatureEnabled: ZDocumentMetaTypedSignatureEnabledSchema.optional(),
       signingOrder: z.nativeEnum(DocumentSigningOrder).optional(),
+      allowDictateNextSigner: z.boolean().optional(),
     })
     .optional(),
 });

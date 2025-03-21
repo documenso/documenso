@@ -323,6 +323,7 @@ export const ApiContractV1Implementation = tsr.router(ApiContractV1, {
         dateFormat: dateFormat?.value,
         redirectUrl: body.meta.redirectUrl,
         signingOrder: body.meta.signingOrder,
+        allowDictateNextSigner: body.meta.allowDictateNextSigner,
         language: body.meta.language,
         typedSignatureEnabled: body.meta.typedSignatureEnabled,
         distributionMethod: body.meta.distributionMethod,

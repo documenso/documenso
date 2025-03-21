@@ -7,7 +7,10 @@ import {
   WebhookTriggerEvents,
 } from '@prisma/client';
 
-import { DOCUMENT_AUDIT_LOG_TYPE } from '@documenso/lib/types/document-audit-logs';
+import {
+  DOCUMENT_AUDIT_LOG_TYPE,
+  RECIPIENT_DIFF_TYPE,
+} from '@documenso/lib/types/document-audit-logs';
 import type { RequestMetadata } from '@documenso/lib/universal/extract-request-metadata';
 import { fieldsContainUnsignedRequiredField } from '@documenso/lib/utils/advanced-fields-helpers';
 import { createDocumentAuditLogData } from '@documenso/lib/utils/document-audit-logs';
@@ -30,6 +33,10 @@ export type CompleteDocumentWithTokenOptions = {
   userId?: number;
   authOptions?: TRecipientActionAuth;
   requestMetadata?: RequestMetadata;
+  nextSigner?: {
+    email: string;
+    name: string;
+  };
 };
 
 const getDocument = async ({ token, documentId }: CompleteDocumentWithTokenOptions) => {
@@ -57,6 +64,7 @@ export const completeDocumentWithToken = async ({
   token,
   documentId,
   requestMetadata,
+  nextSigner,
 }: CompleteDocumentWithTokenOptions) => {
   const document = await getDocument({ token, documentId });
 
@@ -146,7 +154,6 @@ export const completeDocumentWithToken = async ({
           recipientName: recipient.name,
           recipientId: recipient.id,
           recipientRole: recipient.role,
-          // actionAuth: derivedRecipientActionAuth || undefined,
         },
       }),
     });
@@ -164,6 +171,9 @@ export const completeDocumentWithToken = async ({
     select: {
       id: true,
       signingOrder: true,
+      name: true,
+      email: true,
+      role: true,
     },
     where: {
       documentId: document.id,
@@ -186,9 +196,49 @@ export const completeDocumentWithToken = async ({
       const [nextRecipient] = pendingRecipients;
 
       await prisma.$transaction(async (tx) => {
+        if (nextSigner && document.documentMeta?.allowDictateNextSigner) {
+          await tx.documentAuditLog.create({
+            data: createDocumentAuditLogData({
+              type: DOCUMENT_AUDIT_LOG_TYPE.RECIPIENT_UPDATED,
+              documentId: document.id,
+              user: {
+                name: recipient.name,
+                email: recipient.email,
+              },
+              requestMetadata,
+              data: {
+                recipientEmail: nextRecipient.email,
+                recipientName: nextRecipient.name,
+                recipientId: nextRecipient.id,
+                recipientRole: nextRecipient.role,
+                changes: [
+                  {
+                    type: RECIPIENT_DIFF_TYPE.NAME,
+                    from: nextRecipient.name,
+                    to: nextSigner.name,
+                  },
+                  {
+                    type: RECIPIENT_DIFF_TYPE.EMAIL,
+                    from: nextRecipient.email,
+                    to: nextSigner.email,
+                  },
+                ],
+              },
+            }),
+          });
+        }
+
         await tx.recipient.update({
           where: { id: nextRecipient.id },
-          data: { sendStatus: SendStatus.SENT },
+          data: {
+            sendStatus: SendStatus.SENT,
+            ...(nextSigner && document.documentMeta?.allowDictateNextSigner
+              ? {
+                  name: nextSigner.name,
+                  email: nextSigner.email,
+                }
+              : {}),
+          },
         });
 
         await jobs.triggerJob({
