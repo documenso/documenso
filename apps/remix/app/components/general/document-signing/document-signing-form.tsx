@@ -469,7 +469,7 @@ export const DocumentSigningForm = ({
                     documentTitle={document.title}
                     fields={fields}
                     fieldsValidated={fieldsValidated}
-                    disabled={isRecipientsTurn}
+                    disabled={!isRecipientsTurn}
                     onSignatureComplete={async (nextSigner) => {
                       await completeDocument(undefined, nextSigner);
                     }}
