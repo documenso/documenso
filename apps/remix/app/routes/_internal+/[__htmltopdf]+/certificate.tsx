@@ -6,6 +6,7 @@ import { redirect } from 'react-router';
 import { match } from 'ts-pattern';
 import { UAParser } from 'ua-parser-js';
 
+import { isDocumentPlatform } from '@documenso/ee/server-only/util/is-document-platform';
 import { APP_I18N_OPTIONS, ZSupportedLanguageCodeSchema } from '@documenso/lib/constants/i18n';
 import {
   RECIPIENT_ROLES_DESCRIPTION,
@@ -59,6 +60,8 @@ export async function loader({ request }: Route.LoaderArgs) {
     throw redirect('/');
   }
 
+  const isPlatformDocument = await isDocumentPlatform(document);
+
   const documentLanguage = ZSupportedLanguageCodeSchema.parse(document.documentMeta?.language);
 
   const auditLogs = await getDocumentCertificateAuditLogs({
@@ -70,6 +73,7 @@ export async function loader({ request }: Route.LoaderArgs) {
   return {
     document,
     documentLanguage,
+    isPlatformDocument,
     auditLogs,
     messages,
   };
@@ -85,7 +89,7 @@ export async function loader({ request }: Route.LoaderArgs) {
  * Update: Maybe <Trans> tags work now after RR7 migration.
  */
 export default function SigningCertificate({ loaderData }: Route.ComponentProps) {
-  const { document, documentLanguage, auditLogs, messages } = loaderData;
+  const { document, documentLanguage, isPlatformDocument, auditLogs, messages } = loaderData;
 
   const { i18n, _ } = useLingui();
 
@@ -337,15 +341,17 @@ export default function SigningCertificate({ loaderData }: Route.ComponentProps)
         </CardContent>
       </Card>
 
-      <div className="my-8 flex-row-reverse">
-        <div className="flex items-end justify-end gap-x-4">
-          <p className="flex-shrink-0 text-sm font-medium print:text-xs">
-            {_(msg`Signing certificate provided by`)}:
-          </p>
+      {isPlatformDocument && (
+        <div className="my-8 flex-row-reverse">
+          <div className="flex items-end justify-end gap-x-4">
+            <p className="flex-shrink-0 text-sm font-medium print:text-xs">
+              {_(msg`Signing certificate provided by`)}:
+            </p>
 
-          <BrandingLogo className="max-h-6 print:max-h-4" />
+            <BrandingLogo className="max-h-6 print:max-h-4" />
+          </div>
         </div>
-      </div>
+      )}
     </div>
   );
 }
