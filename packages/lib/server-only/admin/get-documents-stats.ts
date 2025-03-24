@@ -15,6 +15,7 @@ export const getDocumentStats = async () => {
     [ExtendedDocumentStatus.COMPLETED]: 0,
     [ExtendedDocumentStatus.REJECTED]: 0,
     [ExtendedDocumentStatus.ALL]: 0,
+    [ExtendedDocumentStatus.DELETED]: 0,
   };
 
   counts.forEach((stat) => {
