@@ -112,8 +112,17 @@ export const documentRouter = router({
     .query(async ({ input, ctx }) => {
       const { user, teamId } = ctx;
 
-      const { query, templateId, page, perPage, orderByDirection, orderByColumn, source, status } =
-        input;
+      const {
+        query,
+        templateId,
+        page,
+        perPage,
+        orderByDirection,
+        orderByColumn,
+        source,
+        status,
+        folderId,
+      } = input;
 
       const documents = await findDocuments({
         userId: user.id,
@@ -124,6 +133,7 @@ export const documentRouter = router({
         status,
         page,
         perPage,
+        folderId,
         orderBy: orderByColumn ? { column: orderByColumn, direction: orderByDirection } : undefined,
       });
 
@@ -152,6 +162,7 @@ export const documentRouter = router({
         status,
         period,
         senderIds,
+        folderId,
       } = input;
 
       const getStatOptions: GetStatsInput = {
@@ -186,6 +197,7 @@ export const documentRouter = router({
           status,
           period,
           senderIds,
+          folderId,
           orderBy: orderByColumn
             ? { column: orderByColumn, direction: orderByDirection }
             : undefined,

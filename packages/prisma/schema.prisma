@@ -314,18 +314,19 @@ enum DocumentVisibility {
 }
 
 model Folder {
-  id         Int        @id @default(autoincrement())
+  id         String     @id @default(cuid())
   name       String
   userId     Int
   user       User       @relation(fields: [userId], references: [id], onDelete: Cascade)
   teamId     Int?
   team       Team?      @relation(fields: [teamId], references: [id], onDelete: Cascade)
-  parentId   Int?
+  pinned     Boolean    @default(false)
+  parentId   String?
   parent     Folder?    @relation("FolderToFolder", fields: [parentId], references: [id], onDelete: Cascade)
-  subfolders Folder[]   @relation("FolderToFolder")
   documents  Document[]
   createdAt  DateTime   @default(now())
   updatedAt  DateTime   @default(now()) @updatedAt
+  subfolders Folder[]   @relation("FolderToFolder")
 
   @@index([userId])
   @@index([teamId])
@@ -361,7 +362,7 @@ model Document {
 
   auditLogs DocumentAuditLog[]
   Folder    Folder?            @relation(fields: [folderId], references: [id])
-  folderId  Int?
+  folderId  String?
 
   @@unique([documentDataId])
   @@index([userId])

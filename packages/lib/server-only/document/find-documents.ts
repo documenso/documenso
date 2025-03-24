@@ -27,6 +27,7 @@ export type FindDocumentsOptions = {
   period?: PeriodSelectorValue;
   senderIds?: number[];
   query?: string;
+  folderId?: string | null;
 };
 
 export const findDocuments = async ({
@@ -41,6 +42,7 @@ export const findDocuments = async ({
   period,
   senderIds,
   query = '',
+  folderId,
 }: FindDocumentsOptions) => {
   const user = await prisma.user.findFirstOrThrow({
     where: {
@@ -225,6 +227,10 @@ export const findDocuments = async ({
     whereClause.userId = {
       in: senderIds,
     };
+  }
+
+  if (folderId !== undefined) {
+    whereClause.folderId = folderId;
   }
 
   const [data, count] = await Promise.all([

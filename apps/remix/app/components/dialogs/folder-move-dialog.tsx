@@ -31,7 +31,7 @@ export const FolderMoveDialog = ({
 
   const { mutateAsync: moveFolder } = trpc.folder.moveFolder.useMutation();
 
-  const handleMoveFolder = async (targetFolderId: number | null) => {
+  const handleMoveFolder = async (targetFolderId: string | null) => {
     if (!folder) return;
 
     try {
