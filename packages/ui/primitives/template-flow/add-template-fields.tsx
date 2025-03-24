@@ -161,6 +161,7 @@ export const AddTemplateFieldsFormPartial = ({
         const newField: TAddTemplateFieldsFormSchema['fields'][0] = {
           ...structuredClone(lastActiveField),
           formId: nanoid(12),
+          nativeId: undefined,
           signerEmail: selectedSigner?.email ?? lastActiveField.signerEmail,
           signerId: selectedSigner?.id ?? lastActiveField.signerId,
           signerToken: selectedSigner?.token ?? lastActiveField.signerToken,
@@ -191,6 +192,7 @@ export const AddTemplateFieldsFormPartial = ({
         append({
           ...copiedField,
           formId: nanoid(12),
+          nativeId: undefined,
           signerEmail: selectedSigner?.email ?? copiedField.signerEmail,
           signerId: selectedSigner?.id ?? copiedField.signerId,
           signerToken: selectedSigner?.token ?? copiedField.signerToken,
