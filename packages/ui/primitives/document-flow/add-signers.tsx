@@ -9,7 +9,7 @@ import { Trans } from '@lingui/react/macro';
 import type { Field, Recipient } from '@prisma/client';
 import { DocumentSigningOrder, RecipientRole, SendStatus } from '@prisma/client';
 import { motion } from 'framer-motion';
-import { GripVerticalIcon, Plus, Trash } from 'lucide-react';
+import { GripVerticalIcon, HelpCircle, Plus, Trash } from 'lucide-react';
 import { useFieldArray, useForm } from 'react-hook-form';
 import { prop, sortBy } from 'remeda';
 
@@ -33,6 +33,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '
 import { FormErrorMessage } from '../form/form-error-message';
 import { Input } from '../input';
 import { useStep } from '../stepper';
+import { Tooltip, TooltipContent, TooltipTrigger } from '../tooltip';
 import { useToast } from '../use-toast';
 import type { TAddSignersFormSchema } from './add-signers.types';
 import { ZAddSignersFormSchema } from './add-signers.types';
@@ -51,6 +52,7 @@ export type AddSignersFormProps = {
   recipients: Recipient[];
   fields: Field[];
   signingOrder?: DocumentSigningOrder | null;
+  allowDictateNextSigner?: boolean;
   isDocumentEnterprise: boolean;
   onSubmit: (_data: TAddSignersFormSchema) => void;
   isDocumentPdfLoaded: boolean;
@@ -61,6 +63,7 @@ export const AddSignersFormPartial = ({
   recipients,
   fields,
   signingOrder,
+  allowDictateNextSigner,
   isDocumentEnterprise,
   onSubmit,
   isDocumentPdfLoaded,
@@ -107,6 +110,7 @@ export const AddSignersFormPartial = ({
             )
           : defaultRecipients,
       signingOrder: signingOrder || DocumentSigningOrder.PARALLEL,
+      allowDictateNextSigner: allowDictateNextSigner ?? false,
     },
   });
 
@@ -204,10 +208,12 @@ export const AddSignersFormPartial = ({
       return;
     }
 
-    removeSigner(index);
-
-    const updatedSigners = signers.filter((_, idx) => idx !== index);
-    form.setValue('signers', normalizeSigningOrders(updatedSigners));
+    const formStateIndex = form.getValues('signers').findIndex((s) => s.formId === signer.formId);
+    if (formStateIndex !== -1) {
+      removeSigner(formStateIndex);
+      const updatedSigners = form.getValues('signers').filter((s) => s.formId !== signer.formId);
+      form.setValue('signers', normalizeSigningOrders(updatedSigners));
+    }
   };
 
   const onAddSelfSigner = () => {
@@ -355,6 +361,7 @@ export const AddSignersFormPartial = ({
 
     form.setValue('signers', updatedSigners);
     form.setValue('signingOrder', DocumentSigningOrder.PARALLEL);
+    form.setValue('allowDictateNextSigner', false);
   }, [form]);
 
   return (
@@ -393,6 +400,11 @@ export const AddSignersFormPartial = ({
                         field.onChange(
                           checked ? DocumentSigningOrder.SEQUENTIAL : DocumentSigningOrder.PARALLEL,
                         );
+
+                        // If sequential signing is turned off, disable dictate next signer
+                        if (!checked) {
+                          form.setValue('allowDictateNextSigner', false);
+                        }
                       }}
                       disabled={isSubmitting || hasDocumentBeenSent}
                     />
@@ -407,6 +419,50 @@ export const AddSignersFormPartial = ({
                 </FormItem>
               )}
             />
+
+            <FormField
+              control={form.control}
+              name="allowDictateNextSigner"
+              render={({ field: { value, ...field } }) => (
+                <FormItem className="mb-6 flex flex-row items-center space-x-2 space-y-0">
+                  <FormControl>
+                    <Checkbox
+                      {...field}
+                      id="allowDictateNextSigner"
+                      checked={value}
+                      onCheckedChange={field.onChange}
+                      disabled={isSubmitting || hasDocumentBeenSent || !isSigningOrderSequential}
+                    />
+                  </FormControl>
+
+                  <div className="flex items-center">
+                    <FormLabel
+                      htmlFor="allowDictateNextSigner"
+                      className="text-sm leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                    >
+                      <Trans>Allow signers to dictate next signer</Trans>
+                    </FormLabel>
+
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <span className="text-muted-foreground ml-1 cursor-help">
+                          <HelpCircle className="h-3.5 w-3.5" />
+                        </span>
+                      </TooltipTrigger>
+                      <TooltipContent className="max-w-80 p-4">
+                        <p>
+                          <Trans>
+                            When enabled, signers can choose who should sign next in the sequence
+                            instead of following the predefined order.
+                          </Trans>
+                        </p>
+                      </TooltipContent>
+                    </Tooltip>
+                  </div>
+                </FormItem>
+              )}
+            />
+
             <DragDropContext
               onDragEnd={onDragEnd}
               sensors={[

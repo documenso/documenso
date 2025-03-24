@@ -414,6 +414,10 @@ msgstr "<0>{teamName}</0> has requested to use your email address for their team
 msgid "<0>Click to upload</0> or drag and drop"
 msgstr "<0>Click to upload</0> or drag and drop"
 
+#: packages/ui/components/document/document-signature-settings-tooltip.tsx
+msgid "<0>Drawn</0> - A signature that is drawn using a mouse or stylus."
+msgstr "<0>Drawn</0> - A signature that is drawn using a mouse or stylus."
+
 #: packages/ui/primitives/template-flow/add-template-settings.tsx
 msgid "<0>Email</0> - The recipient will be emailed the document to sign, approve, etc."
 msgstr "<0>Email</0> - The recipient will be emailed the document to sign, approve, etc."
@@ -459,6 +463,14 @@ msgstr "<0>Require passkey</0> - The recipient must have an account and passkey 
 #: apps/remix/app/components/tables/documents-table-sender-filter.tsx
 msgid "<0>Sender:</0> All"
 msgstr "<0>Sender:</0> All"
+
+#: packages/ui/components/document/document-signature-settings-tooltip.tsx
+msgid "<0>Typed</0> - A signature that is typed using a keyboard."
+msgstr "<0>Typed</0> - A signature that is typed using a keyboard."
+
+#: packages/ui/components/document/document-signature-settings-tooltip.tsx
+msgid "<0>Uploaded</0> - A signature that is uploaded from a file."
+msgstr "<0>Uploaded</0> - A signature that is uploaded from a file."
 
 #: apps/remix/app/components/general/document-signing/document-signing-complete-dialog.tsx
 msgid "<0>You are about to complete approving <1>\"{documentTitle}\"</1>.</0><2/> Are you sure?"
@@ -893,6 +905,16 @@ msgstr "All Time"
 msgid "Allow document recipients to reply directly to this email address"
 msgstr "Allow document recipients to reply directly to this email address"
 
+#: packages/ui/primitives/template-flow/add-template-placeholder-recipients.tsx
+#: packages/ui/primitives/document-flow/add-signers.tsx
+msgid "Allow signers to dictate next signer"
+msgstr "Allow signers to dictate next signer"
+
+#: packages/ui/primitives/template-flow/add-template-settings.tsx
+#: packages/ui/primitives/document-flow/add-settings.tsx
+msgid "Allowed Signature Types"
+msgstr "Allowed Signature Types"
+
 #: apps/remix/app/routes/_authenticated+/settings+/security._index.tsx
 msgid "Allows authenticating using biometrics, password managers, hardware keys, etc."
 msgstr "Allows authenticating using biometrics, password managers, hardware keys, etc."
@@ -1232,6 +1254,13 @@ msgstr "Assisted"
 msgid "Assisting"
 msgstr "Assisting"
 
+#: apps/remix/app/components/forms/team-document-preferences-form.tsx
+#: packages/ui/primitives/template-flow/add-template-settings.types.tsx
+#: packages/ui/primitives/document-flow/add-settings.types.ts
+#: packages/lib/types/document-meta.ts
+msgid "At least one signature type must be enabled"
+msgstr "At least one signature type must be enabled"
+
 #: apps/remix/app/routes/_authenticated+/admin+/documents.$id.tsx
 msgid "Attempts sealing the document again, useful for after a code change has occurred to resolve an erroneous document."
 msgstr "Attempts sealing the document again, useful for after a code change has occurred to resolve an erroneous document."
@@ -1304,11 +1333,11 @@ msgstr "Before you get started, please confirm your email address by clicking th
 msgid "Billing"
 msgstr "Billing"
 
-#: packages/ui/primitives/signature-pad/signature-pad.tsx
+#: packages/ui/primitives/signature-pad/signature-pad-color-picker.tsx
 msgid "Black"
 msgstr "Black"
 
-#: packages/ui/primitives/signature-pad/signature-pad.tsx
+#: packages/ui/primitives/signature-pad/signature-pad-color-picker.tsx
 msgid "Blue"
 msgstr "Blue"
 
@@ -1379,6 +1408,10 @@ msgstr "By proceeding to use the electronic signature service provided by Docume
 msgid "By proceeding with your electronic signature, you acknowledge and consent that it will be used to sign the given document and holds the same legal validity as a handwritten signature. By completing the electronic signing process, you affirm your understanding and acceptance of these conditions."
 msgstr "By proceeding with your electronic signature, you acknowledge and consent that it will be used to sign the given document and holds the same legal validity as a handwritten signature. By completing the electronic signing process, you affirm your understanding and acceptance of these conditions."
 
+#: apps/remix/app/components/forms/signup.tsx
+msgid "By proceeding, you agree to our <0>Terms of Service</0> and <1>Privacy Policy</1>."
+msgstr "By proceeding, you agree to our <0>Terms of Service</0> and <1>Privacy Policy</1>."
+
 #: apps/remix/app/routes/_unauthenticated+/articles.signature-disclosure.tsx
 msgid "By using the electronic signature feature, you are consenting to conduct transactions and receive disclosures electronically. You acknowledge that your electronic signature on documents is binding and that you accept the terms outlined in the documents you are signing."
 msgstr "By using the electronic signature feature, you are consenting to conduct transactions and receive disclosures electronically. You acknowledge that your electronic signature on documents is binding and that you accept the terms outlined in the documents you are signing."
@@ -1431,6 +1464,8 @@ msgstr "Can prepare"
 #: apps/remix/app/components/dialogs/document-move-dialog.tsx
 #: apps/remix/app/components/dialogs/document-duplicate-dialog.tsx
 #: apps/remix/app/components/dialogs/document-delete-dialog.tsx
+#: apps/remix/app/components/dialogs/assistant-confirmation-dialog.tsx
+#: packages/ui/primitives/signature-pad/signature-pad-dialog.tsx
 #: packages/ui/primitives/document-flow/send-document-action-dialog.tsx
 #: packages/ui/primitives/document-flow/field-item-advanced-settings.tsx
 msgid "Cancel"
@@ -1517,7 +1552,7 @@ msgstr "Clear file"
 msgid "Clear filters"
 msgstr "Clear filters"
 
-#: packages/ui/primitives/signature-pad/signature-pad.tsx
+#: packages/ui/primitives/signature-pad/signature-pad-draw.tsx
 msgid "Clear Signature"
 msgstr "Clear Signature"
 
@@ -1692,6 +1727,7 @@ msgstr "Content"
 #: apps/remix/app/components/general/document-signing/document-signing-form.tsx
 #: apps/remix/app/components/dialogs/public-profile-template-manage-dialog.tsx
 #: apps/remix/app/components/dialogs/passkey-create-dialog.tsx
+#: apps/remix/app/components/dialogs/assistant-confirmation-dialog.tsx
 #: packages/ui/primitives/document-flow/document-flow-root.tsx
 msgid "Continue"
 msgstr "Continue"
@@ -1732,13 +1768,17 @@ msgstr "Controls the default visibility of an uploaded document."
 msgid "Controls the formatting of the message that will be sent when inviting a recipient to sign a document. If a custom message has been provided while configuring the document, it will be used instead."
 msgstr "Controls the formatting of the message that will be sent when inviting a recipient to sign a document. If a custom message has been provided while configuring the document, it will be used instead."
 
-#: apps/remix/app/components/forms/team-document-preferences-form.tsx
-msgid "Controls whether the recipients can sign the documents using a typed signature. Enable or disable the typed signature globally."
-msgstr "Controls whether the recipients can sign the documents using a typed signature. Enable or disable the typed signature globally."
+#: packages/ui/primitives/document-flow/add-settings.tsx
+msgid "Controls the language for the document, including the language to be used for email notifications, and the final certificate that is generated and attached to the document."
+msgstr "Controls the language for the document, including the language to be used for email notifications, and the final certificate that is generated and attached to the document."
 
 #: apps/remix/app/components/forms/team-document-preferences-form.tsx
 msgid "Controls whether the signing certificate will be included in the document when it is downloaded. The signing certificate can still be downloaded from the logs page separately."
 msgstr "Controls whether the signing certificate will be included in the document when it is downloaded. The signing certificate can still be downloaded from the logs page separately."
+
+#: apps/remix/app/components/forms/team-document-preferences-form.tsx
+msgid "Controls which signatures are allowed to be used when signing a document."
+msgstr "Controls which signatures are allowed to be used when signing a document."
 
 #: apps/remix/app/components/general/document/document-recipient-link-copy-dialog.tsx
 #: packages/ui/primitives/document-flow/add-subject.tsx
@@ -1970,6 +2010,10 @@ msgstr "Default Document Language"
 msgid "Default Document Visibility"
 msgstr "Default Document Visibility"
 
+#: apps/remix/app/components/forms/team-document-preferences-form.tsx
+msgid "Default Signature Settings"
+msgstr "Default Signature Settings"
+
 #: apps/remix/app/components/dialogs/document-delete-dialog.tsx
 msgid "delete"
 msgstr "delete"
@@ -2196,6 +2240,11 @@ msgstr "Document \"{0}\" - Rejected by {1}"
 msgid "Document \"{0}\" - Rejection Confirmed"
 msgstr "Document \"{0}\" - Rejection Confirmed"
 
+#. placeholder {0}: document.title
+#: packages/lib/jobs/definitions/emails/send-document-cancelled-emails.handler.ts
+msgid "Document \"{0}\" Cancelled"
+msgstr "Document \"{0}\" Cancelled"
+
 #: packages/ui/primitives/template-flow/add-template-settings.tsx
 #: packages/ui/primitives/document-flow/add-settings.tsx
 #: packages/ui/components/document/document-global-auth-access-select.tsx
@@ -2344,6 +2393,10 @@ msgstr "Document preferences updated"
 msgid "Document re-sent"
 msgstr "Document re-sent"
 
+#: apps/remix/app/components/general/document/document-status.tsx
+msgid "Document rejected"
+msgstr "Document rejected"
+
 #: apps/remix/app/routes/_recipient+/sign.$token+/rejected.tsx
 #: apps/remix/app/components/embed/embed-document-rejected.tsx
 #: packages/email/template-components/template-document-rejected.tsx
@@ -2481,6 +2534,10 @@ msgstr "Drafted Documents"
 msgid "Drag & drop your PDF here."
 msgstr "Drag & drop your PDF here."
 
+#: packages/lib/constants/document.ts
+msgid "Draw"
+msgstr "Draw"
+
 #: packages/ui/primitives/template-flow/add-template-fields.tsx
 #: packages/ui/primitives/document-flow/add-fields.tsx
 msgid "Dropdown"
@@ -2538,6 +2595,7 @@ msgstr "Electronic Signature Disclosure"
 #: apps/remix/app/components/tables/admin-document-recipient-item-table.tsx
 #: apps/remix/app/components/tables/admin-dashboard-users-table.tsx
 #: apps/remix/app/components/general/document-signing/document-signing-email-field.tsx
+#: apps/remix/app/components/general/document-signing/document-signing-complete-dialog.tsx
 #: apps/remix/app/components/general/direct-template/direct-template-configure-form.tsx
 #: apps/remix/app/components/forms/signin.tsx
 #: apps/remix/app/components/forms/profile.tsx
@@ -2548,6 +2606,7 @@ msgstr "Electronic Signature Disclosure"
 #: apps/remix/app/components/dialogs/template-use-dialog.tsx
 #: apps/remix/app/components/dialogs/team-email-update-dialog.tsx
 #: apps/remix/app/components/dialogs/team-email-add-dialog.tsx
+#: apps/remix/app/components/dialogs/assistant-confirmation-dialog.tsx
 #: packages/ui/primitives/template-flow/add-template-placeholder-recipients.tsx
 #: packages/ui/primitives/template-flow/add-template-placeholder-recipients.tsx
 #: packages/ui/primitives/template-flow/add-template-fields.tsx
@@ -2640,15 +2699,6 @@ msgstr "Enable Direct Link Signing"
 #: packages/ui/primitives/document-flow/add-signers.tsx
 msgid "Enable signing order"
 msgstr "Enable signing order"
-
-#: apps/remix/app/components/forms/team-document-preferences-form.tsx
-msgid "Enable Typed Signature"
-msgstr "Enable Typed Signature"
-
-#: packages/ui/primitives/template-flow/add-template-fields.tsx
-#: packages/ui/primitives/document-flow/add-fields.tsx
-msgid "Enable Typed Signatures"
-msgstr "Enable Typed Signatures"
 
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/settings.webhooks._index.tsx
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/settings.webhooks.$id.tsx
@@ -2924,7 +2974,7 @@ msgstr "Go to owner"
 msgid "Go to your <0>public profile settings</0> to add documents."
 msgstr "Go to your <0>public profile settings</0> to add documents."
 
-#: packages/ui/primitives/signature-pad/signature-pad.tsx
+#: packages/ui/primitives/signature-pad/signature-pad-color-picker.tsx
 msgid "Green"
 msgstr "Green"
 
@@ -3478,10 +3528,12 @@ msgstr "My templates"
 #: apps/remix/app/components/tables/admin-dashboard-users-table.tsx
 #: apps/remix/app/components/general/claim-account.tsx
 #: apps/remix/app/components/general/document-signing/document-signing-name-field.tsx
+#: apps/remix/app/components/general/document-signing/document-signing-complete-dialog.tsx
 #: apps/remix/app/components/dialogs/template-use-dialog.tsx
 #: apps/remix/app/components/dialogs/template-use-dialog.tsx
 #: apps/remix/app/components/dialogs/team-email-update-dialog.tsx
 #: apps/remix/app/components/dialogs/team-email-add-dialog.tsx
+#: apps/remix/app/components/dialogs/assistant-confirmation-dialog.tsx
 #: packages/ui/primitives/template-flow/add-template-placeholder-recipients.tsx
 #: packages/ui/primitives/template-flow/add-template-placeholder-recipients.tsx
 #: packages/ui/primitives/template-flow/add-template-fields.tsx
@@ -3532,6 +3584,7 @@ msgstr "New Template"
 #: apps/remix/app/components/forms/signup.tsx
 #: apps/remix/app/components/embed/embed-document-signing-page.tsx
 #: apps/remix/app/components/embed/embed-direct-template-client-page.tsx
+#: packages/ui/primitives/signature-pad/signature-pad-dialog.tsx
 msgid "Next"
 msgstr "Next"
 
@@ -3949,6 +4002,7 @@ msgstr "Please enter a meaningful name for your token. This will help you identi
 
 #: apps/remix/app/components/general/claim-account.tsx
 #: apps/remix/app/components/forms/signup.tsx
+#: apps/remix/app/components/forms/profile.tsx
 msgid "Please enter a valid name."
 msgstr "Please enter a valid name."
 
@@ -3983,10 +4037,6 @@ msgstr "Please note that this action is irreversible. Once confirmed, your webho
 #: apps/remix/app/components/dialogs/team-delete-dialog.tsx
 msgid "Please note that you will lose access to all documents associated with this team & all the members will be removed and notified"
 msgstr "Please note that you will lose access to all documents associated with this team & all the members will be removed and notified"
-
-#: apps/remix/app/components/general/document-signing/document-signing-reject-dialog.tsx
-msgid "Please provide a reason"
-msgstr "Please provide a reason"
 
 #: apps/remix/app/components/forms/2fa/disable-authenticator-app-dialog.tsx
 msgid "Please provide a token from the authenticator, or a backup code. If you do not have a backup code available, please contact support."
@@ -4057,6 +4107,10 @@ msgstr "Private"
 #: apps/remix/app/components/tables/templates-table.tsx
 msgid "Private templates can only be modified and viewed by you."
 msgstr "Private templates can only be modified and viewed by you."
+
+#: apps/remix/app/components/dialogs/assistant-confirmation-dialog.tsx
+msgid "Proceed"
+msgstr "Proceed"
 
 #: apps/remix/app/routes/_authenticated+/settings+/profile.tsx
 #: apps/remix/app/components/general/settings-nav-mobile.tsx
@@ -4134,6 +4188,10 @@ msgstr "Ready"
 #: apps/remix/app/routes/_internal+/[__htmltopdf]+/certificate.tsx
 msgid "Reason"
 msgstr "Reason"
+
+#: packages/email/template-components/template-document-cancel.tsx
+msgid "Reason for cancellation: {cancellationReason}"
+msgstr "Reason for cancellation: {cancellationReason}"
 
 #: apps/remix/app/components/general/document/document-page-view-recipients.tsx
 msgid "Reason for rejection: "
@@ -4217,7 +4275,7 @@ msgstr "Recovery code copied"
 msgid "Recovery codes"
 msgstr "Recovery codes"
 
-#: packages/ui/primitives/signature-pad/signature-pad.tsx
+#: packages/ui/primitives/signature-pad/signature-pad-color-picker.tsx
 msgid "Red"
 msgstr "Red"
 
@@ -4238,8 +4296,11 @@ msgstr "Registration Successful"
 msgid "Reject Document"
 msgstr "Reject Document"
 
+#: apps/remix/app/routes/_internal+/[__htmltopdf]+/certificate.tsx
 #: apps/remix/app/components/general/stack-avatars-with-tooltip.tsx
+#: apps/remix/app/components/general/document/document-status.tsx
 #: apps/remix/app/components/general/document/document-page-view-recipients.tsx
+#: packages/lib/constants/document.ts
 msgid "Rejected"
 msgstr "Rejected"
 
@@ -4424,8 +4485,6 @@ msgstr "Rows per page"
 
 #: apps/remix/app/components/general/document-signing/document-signing-text-field.tsx
 #: apps/remix/app/components/general/document-signing/document-signing-number-field.tsx
-#: apps/remix/app/components/forms/team-document-preferences-form.tsx
-#: apps/remix/app/components/forms/team-branding-preferences-form.tsx
 #: apps/remix/app/components/dialogs/template-direct-link-dialog.tsx
 #: packages/ui/primitives/document-flow/field-item-advanced-settings.tsx
 msgid "Save"
@@ -4735,7 +4794,6 @@ msgstr "Sign Up with OIDC"
 #: apps/remix/app/routes/_internal+/[__htmltopdf]+/certificate.tsx
 #: apps/remix/app/components/tables/admin-document-recipient-item-table.tsx
 #: apps/remix/app/components/general/document-signing/document-signing-signature-field.tsx
-#: apps/remix/app/components/general/document-signing/document-signing-signature-field.tsx
 #: apps/remix/app/components/general/document-signing/document-signing-form.tsx
 #: apps/remix/app/components/general/direct-template/direct-template-signing-form.tsx
 #: apps/remix/app/components/forms/profile.tsx
@@ -4752,12 +4810,17 @@ msgstr "Signature"
 msgid "Signature ID"
 msgstr "Signature ID"
 
-#: apps/remix/app/components/general/document-signing/document-signing-signature-field.tsx
-#: apps/remix/app/components/general/document-signing/document-signing-form.tsx
-#: apps/remix/app/components/embed/embed-document-signing-page.tsx
-#: apps/remix/app/components/embed/embed-direct-template-client-page.tsx
-msgid "Signature is too small. Please provide a more complete signature."
-msgstr "Signature is too small. Please provide a more complete signature."
+#: packages/ui/primitives/signature-pad/signature-pad-draw.tsx
+msgid "Signature is too small"
+msgstr "Signature is too small"
+
+#: apps/remix/app/components/forms/profile.tsx
+msgid "Signature Pad cannot be empty."
+msgstr "Signature Pad cannot be empty."
+
+#: packages/ui/components/document/document-signature-settings-tooltip.tsx
+msgid "Signature types"
+msgstr "Signature types"
 
 #: apps/remix/app/routes/_authenticated+/admin+/stats.tsx
 msgid "Signatures Collected"
@@ -4982,6 +5045,7 @@ msgid "Subject <0>(Optional)</0>"
 msgstr "Subject <0>(Optional)</0>"
 
 #: apps/remix/app/components/general/document-signing/document-signing-form.tsx
+#: apps/remix/app/components/dialogs/assistant-confirmation-dialog.tsx
 msgid "Submitting..."
 msgstr "Submitting..."
 
@@ -5498,6 +5562,10 @@ msgstr "The token you have used to reset your password is either expired or it n
 msgid "The two-factor authentication code provided is incorrect"
 msgstr "The two-factor authentication code provided is incorrect"
 
+#: packages/ui/components/document/document-signature-settings-tooltip.tsx
+msgid "The types of signatures that recipients are allowed to use when signing the document."
+msgstr "The types of signatures that recipients are allowed to use when signing the document."
+
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/settings.webhooks.$id.tsx
 #: apps/remix/app/routes/_authenticated+/settings+/webhooks.$id.tsx
 #: apps/remix/app/components/dialogs/webhook-create-dialog.tsx
@@ -5578,6 +5646,10 @@ msgstr "This document has been cancelled by the owner and is no longer available
 #: apps/remix/app/routes/_recipient+/sign.$token+/_index.tsx
 msgid "This document has been cancelled by the owner."
 msgstr "This document has been cancelled by the owner."
+
+#: apps/remix/app/routes/_authenticated+/documents.$id._index.tsx
+msgid "This document has been rejected by a recipient"
+msgstr "This document has been rejected by a recipient"
 
 #: apps/remix/app/routes/_authenticated+/documents.$id._index.tsx
 msgid "This document has been signed by all recipients"
@@ -5726,6 +5798,10 @@ msgstr "Time Zone"
 #: packages/ui/primitives/document-flow/add-settings.tsx
 msgid "Title"
 msgstr "Title"
+
+#: packages/ui/primitives/document-flow/add-settings.types.ts
+msgid "Title cannot be empty"
+msgstr "Title cannot be empty"
 
 #: apps/remix/app/routes/_unauthenticated+/team.invite.$token.tsx
 msgid "To accept this invitation you must create an account."
@@ -5894,6 +5970,7 @@ msgstr "Two-Factor Re-Authentication"
 
 #: apps/remix/app/components/tables/templates-table.tsx
 #: apps/remix/app/components/tables/admin-document-recipient-item-table.tsx
+#: packages/lib/constants/document.ts
 msgid "Type"
 msgstr "Type"
 
@@ -6001,6 +6078,7 @@ msgstr "Uncompleted"
 #: apps/remix/app/routes/_internal+/[__htmltopdf]+/certificate.tsx
 #: apps/remix/app/routes/_internal+/[__htmltopdf]+/certificate.tsx
 #: apps/remix/app/routes/_internal+/[__htmltopdf]+/certificate.tsx
+#: apps/remix/app/routes/_internal+/[__htmltopdf]+/certificate.tsx
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/settings.billing.tsx
 msgid "Unknown"
 msgstr "Unknown"
@@ -6011,10 +6089,13 @@ msgstr "Unpaid"
 
 #: apps/remix/app/components/tables/settings-security-passkey-table-actions.tsx
 #: apps/remix/app/components/tables/settings-public-profile-templates-table.tsx
+#: apps/remix/app/components/forms/team-document-preferences-form.tsx
+#: apps/remix/app/components/forms/team-branding-preferences-form.tsx
 #: apps/remix/app/components/forms/public-profile-form.tsx
 #: apps/remix/app/components/dialogs/team-member-update-dialog.tsx
 #: apps/remix/app/components/dialogs/team-email-update-dialog.tsx
 #: apps/remix/app/components/dialogs/public-profile-template-manage-dialog.tsx
+#: packages/ui/primitives/document-flow/add-subject.tsx
 #: packages/ui/primitives/document-flow/add-subject.tsx
 msgid "Update"
 msgstr "Update"
@@ -6036,6 +6117,8 @@ msgid "Update profile"
 msgstr "Update profile"
 
 #: apps/remix/app/components/tables/admin-document-recipient-item-table.tsx
+#: apps/remix/app/components/general/document-signing/document-signing-complete-dialog.tsx
+#: apps/remix/app/components/dialogs/assistant-confirmation-dialog.tsx
 msgid "Update Recipient"
 msgstr "Update Recipient"
 
@@ -6074,10 +6157,6 @@ msgstr "Update webhook"
 msgid "Updating password..."
 msgstr "Updating password..."
 
-#: apps/remix/app/components/forms/profile.tsx
-msgid "Updating profile..."
-msgstr "Updating profile..."
-
 #: apps/remix/app/routes/_unauthenticated+/articles.signature-disclosure.tsx
 msgid "Updating Your Information"
 msgstr "Updating Your Information"
@@ -6085,6 +6164,10 @@ msgstr "Updating Your Information"
 #: packages/ui/primitives/document-dropzone.tsx
 msgid "Upgrade"
 msgstr "Upgrade"
+
+#: packages/lib/constants/document.ts
+msgid "Upload"
+msgstr "Upload"
 
 #: apps/remix/app/components/dialogs/template-bulk-send-dialog.tsx
 msgid "Upload a CSV file to create multiple documents from this template. Each row represents one document with its recipient details."
@@ -6110,7 +6193,7 @@ msgstr "Upload CSV"
 msgid "Upload custom document"
 msgstr "Upload custom document"
 
-#: packages/ui/primitives/signature-pad/signature-pad.tsx
+#: packages/ui/primitives/signature-pad/signature-pad-upload.tsx
 msgid "Upload Signature"
 msgstr "Upload Signature"
 
@@ -6282,6 +6365,7 @@ msgid "View document"
 msgstr "View document"
 
 #: apps/remix/app/components/general/document-signing/document-signing-form.tsx
+#: packages/ui/primitives/document-flow/add-subject.tsx
 #: packages/ui/primitives/document-flow/add-subject.tsx
 #: packages/ui/primitives/document-flow/add-subject.tsx
 #: packages/email/template-components/template-document-rejected.tsx
@@ -6649,6 +6733,11 @@ msgstr "Welcome to Documenso!"
 #: apps/remix/app/routes/_recipient+/sign.$token+/waiting.tsx
 msgid "Were you trying to edit this document instead?"
 msgstr "Were you trying to edit this document instead?"
+
+#: packages/ui/primitives/template-flow/add-template-placeholder-recipients.tsx
+#: packages/ui/primitives/document-flow/add-signers.tsx
+msgid "When enabled, signers can choose who should sign next in the sequence instead of following the predefined order."
+msgstr "When enabled, signers can choose who should sign next in the sequence instead of following the predefined order."
 
 #: apps/remix/app/components/dialogs/passkey-create-dialog.tsx
 msgid "When you click continue, you will be prompted to add the first available authenticator on your system."

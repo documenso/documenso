@@ -21,6 +21,7 @@ export const ZAddTemplatePlacholderRecipientsFormSchema = z
       }),
     ),
     signingOrder: z.nativeEnum(DocumentSigningOrder),
+    allowDictateNextSigner: z.boolean().default(false),
   })
   .refine(
     (schema) => {

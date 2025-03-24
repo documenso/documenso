@@ -2,6 +2,7 @@ import { useEffect } from 'react';
 
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Trans } from '@lingui/react/macro';
+import { useLingui } from '@lingui/react/macro';
 import { DocumentVisibility, TeamMemberRole } from '@prisma/client';
 import { DocumentStatus, type Field, type Recipient, SendStatus } from '@prisma/client';
 import { InfoIcon } from 'lucide-react';
@@ -9,10 +10,12 @@ import { useForm } from 'react-hook-form';
 import { match } from 'ts-pattern';
 
 import { DATE_FORMATS, DEFAULT_DOCUMENT_DATE_FORMAT } from '@documenso/lib/constants/date-formats';
+import { DOCUMENT_SIGNATURE_TYPES } from '@documenso/lib/constants/document';
 import { SUPPORTED_LANGUAGES } from '@documenso/lib/constants/i18n';
 import { DEFAULT_DOCUMENT_TIME_ZONE, TIME_ZONES } from '@documenso/lib/constants/time-zones';
 import type { TDocument } from '@documenso/lib/types/document';
 import { extractDocumentAuthMethods } from '@documenso/lib/utils/document-auth';
+import { extractTeamSignatureSettings } from '@documenso/lib/utils/teams';
 import {
   DocumentGlobalAuthAccessSelect,
   DocumentGlobalAuthAccessTooltip,
@@ -43,7 +46,9 @@ import {
   FormLabel,
   FormMessage,
 } from '@documenso/ui/primitives/form/form';
+import { MultiSelectCombobox } from '@documenso/ui/primitives/multi-select-combobox';
 
+import { DocumentSignatureSettingsTooltip } from '../../components/document/document-signature-settings-tooltip';
 import { Combobox } from '../combobox';
 import { Input } from '../input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../select';
@@ -81,6 +86,8 @@ export const AddSettingsFormPartial = ({
   currentTeamMemberRole,
   onSubmit,
 }: AddSettingsFormProps) => {
+  const { t } = useLingui();
+
   const { documentAuthOption } = extractDocumentAuthMethods({
     documentAuth: document.authOptions,
   });
@@ -93,6 +100,7 @@ export const AddSettingsFormPartial = ({
       visibility: document.visibility || '',
       globalAccessAuth: documentAuthOption?.globalAccessAuth || undefined,
       globalActionAuth: documentAuthOption?.globalActionAuth || undefined,
+
       meta: {
         timezone:
           TIME_ZONES.find((timezone) => timezone === document.documentMeta?.timezone) ??
@@ -102,6 +110,7 @@ export const AddSettingsFormPartial = ({
             ?.value ?? DEFAULT_DOCUMENT_DATE_FORMAT,
         redirectUrl: document.documentMeta?.redirectUrl ?? '',
         language: document.documentMeta?.language ?? 'en',
+        signatureTypes: extractTeamSignatureSettings(document.documentMeta),
       },
     },
   });
@@ -195,9 +204,11 @@ export const AddSettingsFormPartial = ({
                       </TooltipTrigger>
 
                       <TooltipContent className="text-foreground max-w-md space-y-2 p-4">
-                        Controls the language for the document, including the language to be used
-                        for email notifications, and the final certificate that is generated and
-                        attached to the document.
+                        <Trans>
+                          Controls the language for the document, including the language to be used
+                          for email notifications, and the final certificate that is generated and
+                          attached to the document.
+                        </Trans>
                       </TooltipContent>
                     </Tooltip>
                   </FormLabel>
@@ -313,6 +324,34 @@ export const AddSettingsFormPartial = ({
 
                           <FormControl>
                             <Input className="bg-background" {...field} />
+                          </FormControl>
+
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    <FormField
+                      control={form.control}
+                      name="meta.signatureTypes"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel className="flex flex-row items-center">
+                            <Trans>Allowed Signature Types</Trans>
+                            <DocumentSignatureSettingsTooltip />
+                          </FormLabel>
+
+                          <FormControl>
+                            <MultiSelectCombobox
+                              options={Object.values(DOCUMENT_SIGNATURE_TYPES).map((option) => ({
+                                label: t(option.label),
+                                value: option.value,
+                              }))}
+                              selectedValues={field.value}
+                              onChange={field.onChange}
+                              className="bg-background w-full"
+                              emptySelectionPlaceholder="Select signature types"
+                            />
                           </FormControl>
 
                           <FormMessage />

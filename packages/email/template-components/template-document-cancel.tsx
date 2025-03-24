@@ -8,12 +8,14 @@ export interface TemplateDocumentCancelProps {
   inviterEmail: string;
   documentName: string;
   assetBaseUrl: string;
+  cancellationReason?: string;
 }
 
 export const TemplateDocumentCancel = ({
   inviterName,
   documentName,
   assetBaseUrl,
+  cancellationReason,
 }: TemplateDocumentCancelProps) => {
   return (
     <>
@@ -34,6 +36,12 @@ export const TemplateDocumentCancel = ({
         <Text className="my-1 text-center text-base text-slate-400">
           <Trans>You don't need to sign it anymore.</Trans>
         </Text>
+
+        {cancellationReason && (
+          <Text className="mt-4 text-center text-base">
+            <Trans>Reason for cancellation: {cancellationReason}</Trans>
+          </Text>
+        )}
       </Section>
     </>
   );

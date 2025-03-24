@@ -1,9 +1,10 @@
 import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
 import { Trans } from '@lingui/react/macro';
-import { DocumentStatus } from '@prisma/client';
+import type { DocumentStatus } from '@prisma/client';
 import { DownloadIcon } from 'lucide-react';
 
+import { isDocumentCompleted } from '@documenso/lib/utils/document';
 import { trpc } from '@documenso/trpc/react';
 import { cn } from '@documenso/ui/lib/utils';
 import { Button } from '@documenso/ui/primitives/button';
@@ -76,7 +77,7 @@ export const DocumentCertificateDownloadButton = ({
       className={cn('w-full sm:w-auto', className)}
       loading={isPending}
       variant="outline"
-      disabled={documentStatus !== DocumentStatus.COMPLETED}
+      disabled={!isDocumentCompleted(documentStatus)}
       onClick={() => void onDownloadCertificatesClick()}
     >
       {!isPending && <DownloadIcon className="mr-1.5 h-4 w-4" />}

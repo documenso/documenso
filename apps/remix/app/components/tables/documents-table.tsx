@@ -9,8 +9,8 @@ import { match } from 'ts-pattern';
 
 import { useUpdateSearchParams } from '@documenso/lib/client-only/hooks/use-update-search-params';
 import { useSession } from '@documenso/lib/client-only/providers/session';
+import { isDocumentCompleted } from '@documenso/lib/utils/document';
 import { formatDocumentsPath } from '@documenso/lib/utils/teams';
-import { ExtendedDocumentStatus } from '@documenso/prisma/types/extended-document-status';
 import type { TFindDocumentsResponse } from '@documenso/trpc/server/document-router/schema';
 import type { DataTableColumnDef } from '@documenso/ui/primitives/data-table';
 import { DataTable } from '@documenso/ui/primitives/data-table';
@@ -77,7 +77,7 @@ export const DocumentsTable = ({ data, isLoading, isLoadingError }: DocumentsTab
       {
         header: _(msg`Actions`),
         cell: ({ row }) =>
-          (!row.original.deletedAt || row.original.status === ExtendedDocumentStatus.COMPLETED) && (
+          (!row.original.deletedAt || isDocumentCompleted(row.original.status)) && (
             <div className="flex items-center gap-x-4">
               <DocumentsTableActionButton row={row.original} />
               <DocumentsTableActionDropdown row={row.original} />

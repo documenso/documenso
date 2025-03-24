@@ -17,6 +17,7 @@ import { getFieldsForToken } from '@documenso/lib/server-only/field/get-fields-f
 import { getRecipientByToken } from '@documenso/lib/server-only/recipient/get-recipient-by-token';
 import { getRecipientSignatures } from '@documenso/lib/server-only/recipient/get-recipient-signatures';
 import { getUserByEmail } from '@documenso/lib/server-only/user/get-user-by-email';
+import { isDocumentCompleted } from '@documenso/lib/utils/document';
 import { env } from '@documenso/lib/utils/env';
 import DocumentDialog from '@documenso/ui/components/document/document-dialog';
 import { DocumentDownloadButton } from '@documenso/ui/components/document/document-download-button';
@@ -205,12 +206,12 @@ export default function CompletedSigningPage({ loaderData }: Route.ComponentProp
           <div className="mt-8 flex w-full max-w-sm items-center justify-center gap-4">
             <DocumentShareButton documentId={document.id} token={recipient.token} />
 
-            {document.status === DocumentStatus.COMPLETED ? (
+            {isDocumentCompleted(document.status) ? (
               <DocumentDownloadButton
                 className="flex-1"
                 fileName={document.title}
                 documentData={document.documentData}
-                disabled={document.status !== DocumentStatus.COMPLETED}
+                disabled={!isDocumentCompleted(document.status)}
               />
             ) : (
               <DocumentDialog
@@ -268,7 +269,7 @@ export const PollUntilDocumentCompleted = ({ document }: PollUntilDocumentComple
   const { revalidate } = useRevalidator();
 
   useEffect(() => {
-    if (document.status === DocumentStatus.COMPLETED) {
+    if (isDocumentCompleted(document.status)) {
       return;
     }
 

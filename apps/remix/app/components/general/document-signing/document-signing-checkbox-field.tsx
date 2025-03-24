@@ -97,8 +97,13 @@ export const DocumentSigningCheckboxField = ({
 
   const onSign = async (authOptions?: TRecipientActionAuth) => {
     try {
-      // Do nothing, since the user clicked on a non checkbox area.
+      // Do nothing, this should only happen when the user clicks the field, but
+      // misses the checkbox which triggers this callback.
       if (checkedValues.length === 0) {
+        return;
+      }
+
+      if (!isLengthConditionMet) {
         return;
       }
 
@@ -199,18 +204,30 @@ export const DocumentSigningCheckboxField = ({
 
       setCheckedValues(updatedValues);
 
-      await removeSignedFieldWithToken({
+      const removePayload: TRemovedSignedFieldWithTokenMutationSchema = {
         token: recipient.token,
         fieldId: field.id,
-      });
+      };
 
-      if (updatedValues.length > 0) {
-        await signFieldWithToken({
+      if (onUnsignField) {
+        await onUnsignField(removePayload);
+      } else {
+        await removeSignedFieldWithToken(removePayload);
+      }
+
+      if (updatedValues.length > 0 && shouldAutoSignField) {
+        const signPayload: TSignFieldWithTokenMutationSchema = {
           token: recipient.token,
           fieldId: field.id,
           value: toCheckboxValue(updatedValues),
           isBase64: true,
-        });
+        };
+
+        if (onSignField) {
+          await onSignField(signPayload);
+        } else {
+          await signFieldWithToken(signPayload);
+        }
       }
     } catch (err) {
       console.error(err);

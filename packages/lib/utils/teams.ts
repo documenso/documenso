@@ -1,4 +1,5 @@
 import { NEXT_PUBLIC_WEBAPP_URL } from '../constants/app';
+import { DocumentSignatureType } from '../constants/document';
 import type { TEAM_MEMBER_ROLE_MAP } from '../constants/teams';
 import { TEAM_MEMBER_ROLE_HIERARCHY, TEAM_MEMBER_ROLE_PERMISSIONS_MAP } from '../constants/teams';
 
@@ -43,4 +44,32 @@ export const isTeamRoleWithinUserHierarchy = (
   roleToCheck: keyof typeof TEAM_MEMBER_ROLE_MAP,
 ) => {
   return TEAM_MEMBER_ROLE_HIERARCHY[currentUserRole].some((i) => i === roleToCheck);
+};
+
+export const extractTeamSignatureSettings = (
+  settings?: {
+    typedSignatureEnabled: boolean;
+    drawSignatureEnabled: boolean;
+    uploadSignatureEnabled: boolean;
+  } | null,
+) => {
+  if (!settings) {
+    return [DocumentSignatureType.TYPE, DocumentSignatureType.UPLOAD, DocumentSignatureType.DRAW];
+  }
+
+  const signatureTypes: DocumentSignatureType[] = [];
+
+  if (settings.typedSignatureEnabled) {
+    signatureTypes.push(DocumentSignatureType.TYPE);
+  }
+
+  if (settings.drawSignatureEnabled) {
+    signatureTypes.push(DocumentSignatureType.DRAW);
+  }
+
+  if (settings.uploadSignatureEnabled) {
+    signatureTypes.push(DocumentSignatureType.UPLOAD);
+  }
+
+  return signatureTypes;
 };

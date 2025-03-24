@@ -21,13 +21,12 @@ import type { RecipientWithFields } from '@documenso/prisma/types/recipient-with
 import { trpc } from '@documenso/trpc/react';
 import { FieldToolTip } from '@documenso/ui/components/field/field-tooltip';
 import { Button } from '@documenso/ui/primitives/button';
-import { Card, CardContent } from '@documenso/ui/primitives/card';
 import { ElementVisible } from '@documenso/ui/primitives/element-visible';
 import { Input } from '@documenso/ui/primitives/input';
 import { Label } from '@documenso/ui/primitives/label';
 import { PDFViewer } from '@documenso/ui/primitives/pdf-viewer';
 import { RadioGroup, RadioGroupItem } from '@documenso/ui/primitives/radio-group';
-import { SignaturePad } from '@documenso/ui/primitives/signature-pad';
+import { SignaturePadDialog } from '@documenso/ui/primitives/signature-pad/signature-pad-dialog';
 import { useToast } from '@documenso/ui/primitives/use-toast';
 
 import { BrandingLogo } from '~/components/general/branding-logo';
@@ -70,15 +69,8 @@ export const EmbedSignDocumentClientPage = ({
   const { _ } = useLingui();
   const { toast } = useToast();
 
-  const {
-    fullName,
-    email,
-    signature,
-    signatureValid,
-    setFullName,
-    setSignature,
-    setSignatureValid,
-  } = useRequiredDocumentSigningContext();
+  const { fullName, email, signature, setFullName, setSignature } =
+    useRequiredDocumentSigningContext();
 
   const [hasFinishedInit, setHasFinishedInit] = useState(false);
   const [hasDocumentLoaded, setHasDocumentLoaded] = useState(false);
@@ -129,10 +121,6 @@ export const EmbedSignDocumentClientPage = ({
 
   const onCompleteClick = async () => {
     try {
-      if (hasSignatureField && !signatureValid) {
-        return;
-      }
-
       const valid = validateFieldsInserted(fieldsRequiringValidation);
 
       if (!valid) {
@@ -432,34 +420,16 @@ export const EmbedSignDocumentClientPage = ({
                             <Trans>Signature</Trans>
                           </Label>
 
-                          <Card className="mt-2" gradient degrees={-120}>
-                            <CardContent className="p-0">
-                              <SignaturePad
-                                className="h-44 w-full"
-                                disabled={isThrottled || isSubmitting}
-                                defaultValue={signature ?? undefined}
-                                onChange={(value) => {
-                                  setSignature(value);
-                                }}
-                                onValidityChange={(isValid) => {
-                                  setSignatureValid(isValid);
-                                }}
-                                allowTypedSignature={Boolean(
-                                  metadata &&
-                                    'typedSignatureEnabled' in metadata &&
-                                    metadata.typedSignatureEnabled,
-                                )}
-                              />
-                            </CardContent>
-                          </Card>
-
-                          {hasSignatureField && !signatureValid && (
-                            <div className="text-destructive mt-2 text-sm">
-                              <Trans>
-                                Signature is too small. Please provide a more complete signature.
-                              </Trans>
-                            </div>
-                          )}
+                          <SignaturePadDialog
+                            className="mt-2"
+                            disabled={isThrottled || isSubmitting}
+                            disableAnimation
+                            value={signature ?? ''}
+                            onChange={(v) => setSignature(v ?? '')}
+                            typedSignatureEnabled={metadata?.typedSignatureEnabled}
+                            uploadSignatureEnabled={metadata?.uploadSignatureEnabled}
+                            drawSignatureEnabled={metadata?.drawSignatureEnabled}
+                          />
                         </div>
                       )}
                     </>
@@ -477,9 +447,7 @@ export const EmbedSignDocumentClientPage = ({
                 ) : (
                   <Button
                     className={allowDocumentRejection ? 'col-start-2' : 'col-span-2'}
-                    disabled={
-                      isThrottled || (!isAssistantMode && hasSignatureField && !signatureValid)
-                    }
+                    disabled={isThrottled}
                     loading={isSubmitting}
                     onClick={() => throttledOnCompleteClick()}
                   >

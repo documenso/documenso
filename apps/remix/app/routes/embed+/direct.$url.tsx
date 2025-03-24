@@ -131,7 +131,14 @@ export default function EmbedDirectTemplatePage() {
   } = useSuperLoaderData<typeof loader>();
 
   return (
-    <DocumentSigningProvider email={user?.email} fullName={user?.name} signature={user?.signature}>
+    <DocumentSigningProvider
+      email={user?.email}
+      fullName={user?.name}
+      signature={user?.signature}
+      typedSignatureEnabled={template.templateMeta?.typedSignatureEnabled}
+      uploadSignatureEnabled={template.templateMeta?.uploadSignatureEnabled}
+      drawSignatureEnabled={template.templateMeta?.drawSignatureEnabled}
+    >
       <DocumentSigningAuthProvider
         documentAuthOptions={template.authOptions}
         recipient={recipient}

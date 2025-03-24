@@ -24,8 +24,11 @@ export type CreateDocumentMetaOptions = {
   redirectUrl?: string;
   emailSettings?: TDocumentEmailSettings;
   signingOrder?: DocumentSigningOrder;
+  allowDictateNextSigner?: boolean;
   distributionMethod?: DocumentDistributionMethod;
   typedSignatureEnabled?: boolean;
+  uploadSignatureEnabled?: boolean;
+  drawSignatureEnabled?: boolean;
   language?: SupportedLanguageCodes;
   requestMetadata: ApiRequestMetadata;
 };
@@ -41,9 +44,12 @@ export const upsertDocumentMeta = async ({
   password,
   redirectUrl,
   signingOrder,
+  allowDictateNextSigner,
   emailSettings,
   distributionMethod,
   typedSignatureEnabled,
+  uploadSignatureEnabled,
+  drawSignatureEnabled,
   language,
   requestMetadata,
 }: CreateDocumentMetaOptions) => {
@@ -93,9 +99,12 @@ export const upsertDocumentMeta = async ({
         documentId,
         redirectUrl,
         signingOrder,
+        allowDictateNextSigner,
         emailSettings,
         distributionMethod,
         typedSignatureEnabled,
+        uploadSignatureEnabled,
+        drawSignatureEnabled,
         language,
       },
       update: {
@@ -106,9 +115,12 @@ export const upsertDocumentMeta = async ({
         timezone,
         redirectUrl,
         signingOrder,
+        allowDictateNextSigner,
         emailSettings,
         distributionMethod,
         typedSignatureEnabled,
+        uploadSignatureEnabled,
+        drawSignatureEnabled,
         language,
       },
     });

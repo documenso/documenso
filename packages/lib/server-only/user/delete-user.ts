@@ -29,7 +29,7 @@ export const deleteUser = async ({ id }: DeleteUserOptions) => {
     where: {
       userId: user.id,
       status: {
-        in: [DocumentStatus.PENDING, DocumentStatus.COMPLETED],
+        in: [DocumentStatus.PENDING, DocumentStatus.REJECTED, DocumentStatus.COMPLETED],
       },
     },
     data: {
