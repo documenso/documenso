@@ -48,6 +48,8 @@ export const ZWebhookDocumentMetaSchema = z.object({
   signingOrder: z.nativeEnum(DocumentSigningOrder),
   allowDictateNextSigner: z.boolean(),
   typedSignatureEnabled: z.boolean(),
+  uploadSignatureEnabled: z.boolean(),
+  drawSignatureEnabled: z.boolean(),
   language: z.string(),
   distributionMethod: z.nativeEnum(DocumentDistributionMethod),
   emailSettings: z.any().nullable(),

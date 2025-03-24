@@ -326,6 +326,8 @@ export const ApiContractV1Implementation = tsr.router(ApiContractV1, {
         allowDictateNextSigner: body.meta.allowDictateNextSigner,
         language: body.meta.language,
         typedSignatureEnabled: body.meta.typedSignatureEnabled,
+        uploadSignatureEnabled: body.meta.uploadSignatureEnabled,
+        drawSignatureEnabled: body.meta.drawSignatureEnabled,
         distributionMethod: body.meta.distributionMethod,
         emailSettings: body.meta.emailSettings,
         requestMetadata: metadata,

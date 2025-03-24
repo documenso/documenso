@@ -82,9 +82,11 @@ export type CreateDocumentFromTemplateOptions = {
     signingOrder?: DocumentSigningOrder;
     language?: SupportedLanguageCodes;
     distributionMethod?: DocumentDistributionMethod;
-    typedSignatureEnabled?: boolean;
     allowDictateNextSigner?: boolean;
     emailSettings?: TDocumentEmailSettings;
+    typedSignatureEnabled?: boolean;
+    uploadSignatureEnabled?: boolean;
+    drawSignatureEnabled?: boolean;
   };
   requestMetadata: ApiRequestMetadata;
 };
@@ -405,6 +407,10 @@ export const createDocumentFromTemplate = async ({
               template.team?.teamGlobalSettings?.documentLanguage,
             typedSignatureEnabled:
               override?.typedSignatureEnabled ?? template.templateMeta?.typedSignatureEnabled,
+            uploadSignatureEnabled:
+              override?.uploadSignatureEnabled ?? template.templateMeta?.uploadSignatureEnabled,
+            drawSignatureEnabled:
+              override?.drawSignatureEnabled ?? template.templateMeta?.drawSignatureEnabled,
             allowDictateNextSigner:
               override?.allowDictateNextSigner ??
               template.templateMeta?.allowDictateNextSigner ??

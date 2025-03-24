@@ -11,7 +11,7 @@ import { prisma } from '@documenso/prisma';
 import { seedPendingDocumentWithFullFields } from '@documenso/prisma/seed/documents';
 import { seedUser } from '@documenso/prisma/seed/users';
 
-import { signSignaturePad } from '../fixtures/signature';
+import { signDirectSignaturePad, signSignaturePad } from '../fixtures/signature';
 
 test('[NEXT_RECIPIENT_DICTATION]: should allow updating next recipient when dictation is enabled', async ({
   page,
@@ -322,7 +322,7 @@ test('[NEXT_RECIPIENT_DICTATION]: should allow assistant to dictate next signer'
     await page.locator(`#field-${field.id}`).getByRole('button').click();
 
     if (field.type === FieldType.SIGNATURE) {
-      await signSignaturePad(page);
+      await signDirectSignaturePad(page);
       await page.getByRole('button', { name: 'Sign', exact: true }).click();
     }
 

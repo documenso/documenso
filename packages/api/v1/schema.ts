@@ -158,6 +158,8 @@ export const ZCreateDocumentMutationSchema = z.object({
       allowDictateNextSigner: z.boolean().optional(),
       language: z.enum(SUPPORTED_LANGUAGE_CODES).optional(),
       typedSignatureEnabled: z.boolean().optional().default(true),
+      uploadSignatureEnabled: z.boolean().optional().default(true),
+      drawSignatureEnabled: z.boolean().optional().default(true),
       distributionMethod: z.nativeEnum(DocumentDistributionMethod).optional(),
       emailSettings: ZDocumentEmailSettingsSchema.optional(),
     })
@@ -291,6 +293,8 @@ export const ZGenerateDocumentFromTemplateMutationSchema = z.object({
       language: z.enum(SUPPORTED_LANGUAGE_CODES),
       distributionMethod: z.nativeEnum(DocumentDistributionMethod),
       typedSignatureEnabled: z.boolean(),
+      uploadSignatureEnabled: z.boolean(),
+      drawSignatureEnabled: z.boolean(),
       emailSettings: ZDocumentEmailSettingsSchema,
     })
     .partial()

@@ -33,7 +33,6 @@ import { resendTeamEmailVerification } from '@documenso/lib/server-only/team/res
 import { resendTeamMemberInvitation } from '@documenso/lib/server-only/team/resend-team-member-invitation';
 import { updateTeam } from '@documenso/lib/server-only/team/update-team';
 import { updateTeamBrandingSettings } from '@documenso/lib/server-only/team/update-team-branding-settings';
-import { updateTeamDocumentSettings } from '@documenso/lib/server-only/team/update-team-document-settings';
 import { updateTeamEmail } from '@documenso/lib/server-only/team/update-team-email';
 import { updateTeamMember } from '@documenso/lib/server-only/team/update-team-member';
 import { updateTeamPublicProfile } from '@documenso/lib/server-only/team/update-team-public-profile';
@@ -66,12 +65,12 @@ import {
   ZResendTeamEmailVerificationMutationSchema,
   ZResendTeamMemberInvitationMutationSchema,
   ZUpdateTeamBrandingSettingsMutationSchema,
-  ZUpdateTeamDocumentSettingsMutationSchema,
   ZUpdateTeamEmailMutationSchema,
   ZUpdateTeamMemberMutationSchema,
   ZUpdateTeamMutationSchema,
   ZUpdateTeamPublicProfileMutationSchema,
 } from './schema';
+import { updateTeamDocumentSettingsRoute } from './update-team-document-settings';
 
 export const teamRouter = router({
   // Internal endpoint for now.
@@ -571,18 +570,7 @@ export const teamRouter = router({
     return await getTeamPrices();
   }),
 
-  // Internal endpoint. Use updateTeam instead.
-  updateTeamDocumentSettings: authenticatedProcedure
-    .input(ZUpdateTeamDocumentSettingsMutationSchema)
-    .mutation(async ({ ctx, input }) => {
-      const { teamId, settings } = input;
-
-      return await updateTeamDocumentSettings({
-        userId: ctx.user.id,
-        teamId,
-        settings,
-      });
-    }),
+  updateTeamDocumentSettings: updateTeamDocumentSettingsRoute,
 
   // Internal endpoint for now.
   acceptTeamInvitation: authenticatedProcedure

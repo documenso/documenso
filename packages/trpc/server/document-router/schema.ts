@@ -109,6 +109,14 @@ export const ZDocumentMetaTypedSignatureEnabledSchema = z
   .boolean()
   .describe('Whether to allow recipients to sign using a typed signature.');
 
+export const ZDocumentMetaDrawSignatureEnabledSchema = z
+  .boolean()
+  .describe('Whether to allow recipients to sign using a draw signature.');
+
+export const ZDocumentMetaUploadSignatureEnabledSchema = z
+  .boolean()
+  .describe('Whether to allow recipients to sign using an uploaded signature.');
+
 export const ZFindDocumentsRequestSchema = ZFindSearchParamsSchema.extend({
   templateId: z
     .number()
@@ -233,6 +241,8 @@ export const ZCreateDocumentV2RequestSchema = z.object({
       redirectUrl: ZDocumentMetaRedirectUrlSchema.optional(),
       language: ZDocumentMetaLanguageSchema.optional(),
       typedSignatureEnabled: ZDocumentMetaTypedSignatureEnabledSchema.optional(),
+      drawSignatureEnabled: ZDocumentMetaDrawSignatureEnabledSchema.optional(),
+      uploadSignatureEnabled: ZDocumentMetaUploadSignatureEnabledSchema.optional(),
       emailSettings: ZDocumentEmailSettingsSchema.optional(),
     })
     .optional(),
@@ -248,36 +258,6 @@ export const ZCreateDocumentV2ResponseSchema = z.object({
       'The URL to upload the document PDF to. Use a PUT request with the file via form-data',
     ),
 });
-
-export const ZUpdateDocumentRequestSchema = z.object({
-  documentId: z.number(),
-  data: z
-    .object({
-      title: ZDocumentTitleSchema.optional(),
-      externalId: ZDocumentExternalIdSchema.nullish(),
-      visibility: ZDocumentVisibilitySchema.optional(),
-      globalAccessAuth: ZDocumentAccessAuthTypesSchema.nullish(),
-      globalActionAuth: ZDocumentActionAuthTypesSchema.nullish(),
-    })
-    .optional(),
-  meta: z
-    .object({
-      subject: ZDocumentMetaSubjectSchema.optional(),
-      message: ZDocumentMetaMessageSchema.optional(),
-      timezone: ZDocumentMetaTimezoneSchema.optional(),
-      dateFormat: ZDocumentMetaDateFormatSchema.optional(),
-      distributionMethod: ZDocumentMetaDistributionMethodSchema.optional(),
-      signingOrder: z.nativeEnum(DocumentSigningOrder).optional(),
-      allowDictateNextSigner: z.boolean().optional(),
-      redirectUrl: ZDocumentMetaRedirectUrlSchema.optional(),
-      language: ZDocumentMetaLanguageSchema.optional(),
-      typedSignatureEnabled: ZDocumentMetaTypedSignatureEnabledSchema.optional(),
-      emailSettings: ZDocumentEmailSettingsSchema.optional(),
-    })
-    .optional(),
-});
-
-export const ZUpdateDocumentResponseSchema = ZDocumentLiteSchema;
 
 export const ZSetFieldsForDocumentMutationSchema = z.object({
   documentId: z.number(),

@@ -27,6 +27,8 @@ export type CreateDocumentMetaOptions = {
   allowDictateNextSigner?: boolean;
   distributionMethod?: DocumentDistributionMethod;
   typedSignatureEnabled?: boolean;
+  uploadSignatureEnabled?: boolean;
+  drawSignatureEnabled?: boolean;
   language?: SupportedLanguageCodes;
   requestMetadata: ApiRequestMetadata;
 };
@@ -46,6 +48,8 @@ export const upsertDocumentMeta = async ({
   emailSettings,
   distributionMethod,
   typedSignatureEnabled,
+  uploadSignatureEnabled,
+  drawSignatureEnabled,
   language,
   requestMetadata,
 }: CreateDocumentMetaOptions) => {
@@ -99,6 +103,8 @@ export const upsertDocumentMeta = async ({
         emailSettings,
         distributionMethod,
         typedSignatureEnabled,
+        uploadSignatureEnabled,
+        drawSignatureEnabled,
         language,
       },
       update: {
@@ -113,6 +119,8 @@ export const upsertDocumentMeta = async ({
         emailSettings,
         distributionMethod,
         typedSignatureEnabled,
+        uploadSignatureEnabled,
+        drawSignatureEnabled,
         language,
       },
     });

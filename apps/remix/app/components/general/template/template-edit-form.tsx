@@ -4,6 +4,7 @@ import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
 import { useNavigate } from 'react-router';
 
+import { DocumentSignatureType } from '@documenso/lib/constants/document';
 import { isValidLanguageCode } from '@documenso/lib/constants/i18n';
 import {
   DO_NOT_INVALIDATE_QUERY_ON_MUTATION,
@@ -124,6 +125,8 @@ export const TemplateEditForm = ({
   });
 
   const onAddSettingsFormSubmit = async (data: TAddTemplateSettingsFormSchema) => {
+    const { signatureTypes } = data.meta;
+
     try {
       await updateTemplateSettings({
         templateId: template.id,
@@ -136,6 +139,9 @@ export const TemplateEditForm = ({
         },
         meta: {
           ...data.meta,
+          typedSignatureEnabled: signatureTypes.includes(DocumentSignatureType.TYPE),
+          uploadSignatureEnabled: signatureTypes.includes(DocumentSignatureType.UPLOAD),
+          drawSignatureEnabled: signatureTypes.includes(DocumentSignatureType.DRAW),
           language: isValidLanguageCode(data.meta.language) ? data.meta.language : undefined,
         },
       });
@@ -186,13 +192,6 @@ export const TemplateEditForm = ({
       await addTemplateFields({
         templateId: template.id,
         fields: data.fields,
-      });
-
-      await updateTemplateSettings({
-        templateId: template.id,
-        meta: {
-          typedSignatureEnabled: data.typedSignatureEnabled,
-        },
       });
 
       // Clear all field data from localStorage
@@ -286,7 +285,6 @@ export const TemplateEditForm = ({
               fields={fields}
               onSubmit={onAddFieldsFormSubmit}
               teamId={team?.id}
-              typedSignatureEnabled={template.templateMeta?.typedSignatureEnabled}
             />
           </Stepper>
         </DocumentFlowFormContainer>

@@ -19,12 +19,14 @@ import { TemplateDirectLinkSchema } from '@documenso/prisma/generated/zod/modelS
 import {
   ZDocumentMetaDateFormatSchema,
   ZDocumentMetaDistributionMethodSchema,
+  ZDocumentMetaDrawSignatureEnabledSchema,
   ZDocumentMetaLanguageSchema,
   ZDocumentMetaMessageSchema,
   ZDocumentMetaRedirectUrlSchema,
   ZDocumentMetaSubjectSchema,
   ZDocumentMetaTimezoneSchema,
   ZDocumentMetaTypedSignatureEnabledSchema,
+  ZDocumentMetaUploadSignatureEnabledSchema,
 } from '../document-router/schema';
 import { ZSignFieldWithTokenMutationSchema } from '../field-router/schema';
 
@@ -164,6 +166,8 @@ export const ZUpdateTemplateRequestSchema = z.object({
       redirectUrl: ZDocumentMetaRedirectUrlSchema.optional(),
       language: ZDocumentMetaLanguageSchema.optional(),
       typedSignatureEnabled: ZDocumentMetaTypedSignatureEnabledSchema.optional(),
+      uploadSignatureEnabled: ZDocumentMetaUploadSignatureEnabledSchema.optional(),
+      drawSignatureEnabled: ZDocumentMetaDrawSignatureEnabledSchema.optional(),
       signingOrder: z.nativeEnum(DocumentSigningOrder).optional(),
       allowDictateNextSigner: z.boolean().optional(),
     })
