@@ -24,11 +24,14 @@ type ComboBoxOption<T = OptionValue> = {
 type MultiSelectComboboxProps<T = OptionValue> = {
   emptySelectionPlaceholder?: React.ReactElement | string;
   enableClearAllButton?: boolean;
+  enableSearch?: boolean;
+  className?: string;
   loading?: boolean;
   inputPlaceholder?: MessageDescriptor;
   onChange: (_values: T[]) => void;
   options: ComboBoxOption<T>[];
   selectedValues: T[];
+  testId?: string;
 };
 
 /**
@@ -41,11 +44,14 @@ type MultiSelectComboboxProps<T = OptionValue> = {
 export function MultiSelectCombobox<T = OptionValue>({
   emptySelectionPlaceholder = 'Select values...',
   enableClearAllButton,
+  enableSearch = true,
+  className,
   inputPlaceholder,
   loading,
   onChange,
   options,
   selectedValues,
+  testId,
 }: MultiSelectComboboxProps<T>) {
   const { _ } = useLingui();
 
@@ -59,8 +65,6 @@ export function MultiSelectCombobox<T = OptionValue>({
     }
 
     onChange(newSelectedOptions);
-
-    setOpen(false);
   };
 
   const selectedOptions = React.useMemo(() => {
@@ -107,7 +111,8 @@ export function MultiSelectCombobox<T = OptionValue>({
             role="combobox"
             disabled={loading}
             aria-expanded={open}
-            className="w-[200px] px-3"
+            className={cn('w-[200px] px-3', className)}
+            data-testid={testId}
           >
             <AnimatePresence>
               {loading ? (
@@ -146,7 +151,7 @@ export function MultiSelectCombobox<T = OptionValue>({
 
       <PopoverContent className="w-[200px] p-0">
         <Command>
-          <CommandInput placeholder={inputPlaceholder && _(inputPlaceholder)} />
+          {enableSearch && <CommandInput placeholder={inputPlaceholder && _(inputPlaceholder)} />}
           <CommandEmpty>
             <Trans>No value found.</Trans>
           </CommandEmpty>

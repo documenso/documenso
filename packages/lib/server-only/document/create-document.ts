@@ -128,8 +128,10 @@ export const createDocument = async ({
         documentMeta: {
           create: {
             language: team?.teamGlobalSettings?.documentLanguage,
-            typedSignatureEnabled: team?.teamGlobalSettings?.typedSignatureEnabled,
             timezone: timezone,
+            typedSignatureEnabled: team?.teamGlobalSettings?.typedSignatureEnabled ?? true,
+            uploadSignatureEnabled: team?.teamGlobalSettings?.uploadSignatureEnabled ?? true,
+            drawSignatureEnabled: team?.teamGlobalSettings?.drawSignatureEnabled ?? true,
           },
         },
       },

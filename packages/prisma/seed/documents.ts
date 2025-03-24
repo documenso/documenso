@@ -1,8 +1,11 @@
-import type { Document, User } from '@prisma/client';
+import type { Document, Team, User } from '@prisma/client';
 import { nanoid } from 'nanoid';
 import fs from 'node:fs';
 import path from 'node:path';
 import { match } from 'ts-pattern';
+
+import { createDocument } from '@documenso/lib/server-only/document/create-document';
+import { createTemplate } from '@documenso/lib/server-only/template/create-template';
 
 import { prisma } from '..';
 import {
@@ -83,6 +86,145 @@ export const unseedDocument = async (documentId: number) => {
   await prisma.document.delete({
     where: {
       id: documentId,
+    },
+  });
+};
+
+export const seedTeamDocumentWithMeta = async (team: Team) => {
+  const documentData = await prisma.documentData.create({
+    data: {
+      type: DocumentDataType.BYTES_64,
+      data: examplePdf,
+      initialData: examplePdf,
+    },
+  });
+
+  const document = await createDocument({
+    userId: team.ownerUserId,
+    teamId: team.id,
+    title: `[TEST] Document ${nanoid(8)} - Draft`,
+    documentDataId: documentData.id,
+    normalizePdf: true,
+    requestMetadata: {
+      auth: null,
+      requestMetadata: {},
+      source: 'app',
+    },
+  });
+
+  const owner = await prisma.user.findFirstOrThrow({
+    where: {
+      id: team.ownerUserId,
+    },
+  });
+
+  await prisma.document.update({
+    where: {
+      id: document.id,
+    },
+    data: {
+      status: DocumentStatus.PENDING,
+    },
+  });
+
+  await prisma.recipient.create({
+    data: {
+      email: owner.email,
+      name: owner.name ?? '',
+      token: nanoid(),
+      readStatus: ReadStatus.OPENED,
+      sendStatus: SendStatus.SENT,
+      signingStatus: SigningStatus.NOT_SIGNED,
+      signedAt: new Date(),
+      document: {
+        connect: {
+          id: document.id,
+        },
+      },
+      fields: {
+        create: {
+          page: 1,
+          type: FieldType.SIGNATURE,
+          inserted: false,
+          customText: '',
+          positionX: new Prisma.Decimal(1),
+          positionY: new Prisma.Decimal(1),
+          width: new Prisma.Decimal(5),
+          height: new Prisma.Decimal(5),
+          documentId: document.id,
+        },
+      },
+    },
+  });
+
+  return await prisma.document.findFirstOrThrow({
+    where: {
+      id: document.id,
+    },
+    include: {
+      recipients: true,
+    },
+  });
+};
+
+export const seedTeamTemplateWithMeta = async (team: Team) => {
+  const documentData = await prisma.documentData.create({
+    data: {
+      type: DocumentDataType.BYTES_64,
+      data: examplePdf,
+      initialData: examplePdf,
+    },
+  });
+
+  const template = await createTemplate({
+    title: `[TEST] Template ${nanoid(8)} - Draft`,
+    userId: team.ownerUserId,
+    teamId: team.id,
+    templateDocumentDataId: documentData.id,
+  });
+
+  const owner = await prisma.user.findFirstOrThrow({
+    where: {
+      id: team.ownerUserId,
+    },
+  });
+
+  await prisma.recipient.create({
+    data: {
+      email: owner.email,
+      name: owner.name ?? '',
+      token: nanoid(),
+      readStatus: ReadStatus.OPENED,
+      sendStatus: SendStatus.SENT,
+      signingStatus: SigningStatus.NOT_SIGNED,
+      signedAt: new Date(),
+      template: {
+        connect: {
+          id: template.id,
+        },
+      },
+      fields: {
+        create: {
+          page: 1,
+          type: FieldType.SIGNATURE,
+          inserted: false,
+          customText: '',
+          positionX: new Prisma.Decimal(1),
+          positionY: new Prisma.Decimal(1),
+          width: new Prisma.Decimal(5),
+          height: new Prisma.Decimal(5),
+          templateId: template.id,
+        },
+      },
+    },
+  });
+
+  return await prisma.document.findFirstOrThrow({
+    where: {
+      id: template.id,
+    },
+    include: {
+      recipients: true,
     },
   });
 };

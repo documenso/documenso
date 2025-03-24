@@ -177,6 +177,8 @@ export const DocumentSigningPageView = ({
                     key={field.id}
                     field={field}
                     typedSignatureEnabled={documentMeta?.typedSignatureEnabled}
+                    uploadSignatureEnabled={documentMeta?.uploadSignatureEnabled}
+                    drawSignatureEnabled={documentMeta?.drawSignatureEnabled}
                   />
                 ))
                 .with(FieldType.INITIALS, () => (
