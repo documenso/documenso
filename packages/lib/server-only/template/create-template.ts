@@ -65,6 +65,10 @@ export const createTemplate = async ({
             }),
       },
     });
+
+    if (!team) {
+      throw new AppError(AppErrorCode.NOT_FOUND);
+    }
   }
 
   return await prisma.template.create({
