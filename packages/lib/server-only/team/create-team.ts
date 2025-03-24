@@ -5,6 +5,7 @@ import { z } from 'zod';
 import { createTeamCustomer } from '@documenso/ee/server-only/stripe/create-team-customer';
 import { getTeamRelatedPrices } from '@documenso/ee/server-only/stripe/get-team-related-prices';
 import { mapStripeSubscriptionToPrismaUpsertAction } from '@documenso/ee/server-only/stripe/webhook/on-subscription-updated';
+import { isDocumentPlatform as isUserPlatformPlan } from '@documenso/ee/server-only/util/is-document-platform';
 import { IS_BILLING_ENABLED } from '@documenso/lib/constants/app';
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import { subscriptionsContainsActivePlan } from '@documenso/lib/utils/billing';
@@ -60,6 +61,11 @@ export const createTeam = async ({
     },
   });
 
+  const isPlatformPlan = await isUserPlatformPlan({
+    userId: user.id,
+    teamId: null,
+  });
+
   let isPaymentRequired = IS_BILLING_ENABLED();
   let customerId: string | null = null;
 
@@ -68,7 +74,25 @@ export const createTeam = async ({
       prices.map((price) => price.id),
     );
 
-    isPaymentRequired = !subscriptionsContainsActivePlan(user.subscriptions, teamRelatedPriceIds);
+    const hasTeamRelatedSubscription = subscriptionsContainsActivePlan(
+      user.subscriptions,
+      teamRelatedPriceIds,
+    );
+
+    if (isPlatformPlan) {
+      // For platform users, check if they already have any teams
+      const existingTeams = await prisma.team.findMany({
+        where: {
+          ownerUserId: userId,
+        },
+      });
+
+      // Payment is required if they already have any team
+      isPaymentRequired = existingTeams.length > 0;
+    } else {
+      // For non-platform users, payment is required if they don't have a team-related subscription
+      isPaymentRequired = !hasTeamRelatedSubscription;
+    }
 
     customerId = await createTeamCustomer({
       name: user.name ?? teamName,
