@@ -148,6 +148,10 @@ test('[TEAMS]: check signature modes work for templates', async ({ page }) => {
 
     await page.getByRole('button', { name: 'Update' }).first().click();
 
+    // Wait for finish
+    await page.getByText('Document preferences updated').waitFor({ state: 'visible' });
+    await page.getByTestId('toast-close').click();
+
     const template = await seedTeamTemplateWithMeta(team);
 
     await page.goto(`/t/${team.url}/templates/${template.id}`);

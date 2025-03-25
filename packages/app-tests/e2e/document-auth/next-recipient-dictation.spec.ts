@@ -341,9 +341,6 @@ test('[NEXT_RECIPIENT_DICTATION]: should allow assistant to dictate next signer'
   await expect(page.getByRole('dialog')).toBeVisible();
   await expect(page.getByText('The next recipient to sign this document will be')).toBeVisible();
 
-  // Update next recipient
-  await page.locator('button').filter({ hasText: 'Update Recipient' }).click();
-
   // Use dialog context to ensure we're targeting the correct form fields
   const dialog = page.getByRole('dialog');
   await dialog.getByLabel('Name').fill('New Signer');
