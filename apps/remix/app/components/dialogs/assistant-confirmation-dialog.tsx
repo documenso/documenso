@@ -1,5 +1,3 @@
-import { useState } from 'react';
-
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Trans } from '@lingui/react/macro';
 import { useForm } from 'react-hook-form';
@@ -57,8 +55,6 @@ export function AssistantConfirmationDialog({
   allowDictateNextSigner = false,
   defaultNextSigner,
 }: ConfirmationDialogProps) {
-  const [isEditingNextSigner, setIsEditingNextSigner] = useState(false);
-
   const form = useForm<TNextSignerFormSchema>({
     resolver: zodResolver(ZNextSignerFormSchema),
     defaultValues: {
@@ -68,7 +64,7 @@ export function AssistantConfirmationDialog({
   });
 
   const onOpenChange = () => {
-    if (form.formState.isSubmitting) {
+    if (isSubmitting) {
       return;
     }
 
@@ -77,32 +73,25 @@ export function AssistantConfirmationDialog({
       email: defaultNextSigner?.email ?? '',
     });
 
-    setIsEditingNextSigner(false);
     onClose();
   };
 
-  const onFormSubmit = async (data: TNextSignerFormSchema) => {
-    if (allowDictateNextSigner && data.name && data.email) {
-      await onConfirm({
-        name: data.name,
-        email: data.email,
-      });
-    } else {
-      await onConfirm();
+  const handleSubmit = () => {
+    // Validate the form and submit it if dictate signer is enabled.
+    if (allowDictateNextSigner) {
+      void form.handleSubmit(onConfirm)();
+      return;
     }
-  };
 
-  const isNextSignerValid = !allowDictateNextSigner || (form.watch('name') && form.watch('email'));
+    onConfirm();
+  };
 
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
       <DialogContent>
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onFormSubmit)}>
-            <fieldset
-              disabled={form.formState.isSubmitting || isSubmitting}
-              className="border-none p-0"
-            >
+          <form>
+            <fieldset disabled={isSubmitting} className="border-none p-0">
               <DialogHeader>
                 <DialogTitle>
                   <Trans>Complete Document</Trans>
@@ -118,71 +107,53 @@ export function AssistantConfirmationDialog({
 
               <div className="mt-4 flex flex-col gap-4">
                 {allowDictateNextSigner && (
-                  <div className="space-y-4">
-                    {!isEditingNextSigner && (
-                      <div>
-                        <p className="text-muted-foreground text-sm">
-                          The next recipient to sign this document will be{' '}
-                          <span className="font-semibold">{form.watch('name')}</span> (
-                          <span className="font-semibold">{form.watch('email')}</span>).
-                        </p>
+                  <div className="my-2">
+                    <p className="text-muted-foreground mb-1 text-sm font-semibold">
+                      The next recipient to sign this document will be{' '}
+                    </p>
 
-                        <Button
-                          type="button"
-                          className="mt-2"
-                          variant="outline"
-                          size="sm"
-                          onClick={() => setIsEditingNextSigner((prev) => !prev)}
-                        >
-                          <Trans>Update Recipient</Trans>
-                        </Button>
-                      </div>
-                    )}
+                    <div className="flex flex-col gap-4 rounded-xl border p-4 md:flex-row">
+                      <FormField
+                        control={form.control}
+                        name="name"
+                        render={({ field }) => (
+                          <FormItem className="flex-1">
+                            <FormLabel>
+                              <Trans>Name</Trans>
+                            </FormLabel>
+                            <FormControl>
+                              <Input
+                                {...field}
+                                className="mt-2"
+                                placeholder="Enter the next signer's name"
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
 
-                    {isEditingNextSigner && (
-                      <div className="flex flex-col gap-4 md:flex-row">
-                        <FormField
-                          control={form.control}
-                          name="name"
-                          render={({ field }) => (
-                            <FormItem className="flex-1">
-                              <FormLabel>
-                                <Trans>Name</Trans>
-                              </FormLabel>
-                              <FormControl>
-                                <Input
-                                  {...field}
-                                  className="mt-2"
-                                  placeholder="Enter the next signer's name"
-                                />
-                              </FormControl>
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
-
-                        <FormField
-                          control={form.control}
-                          name="email"
-                          render={({ field }) => (
-                            <FormItem className="flex-1">
-                              <FormLabel>
-                                <Trans>Email</Trans>
-                              </FormLabel>
-                              <FormControl>
-                                <Input
-                                  {...field}
-                                  type="email"
-                                  className="mt-2"
-                                  placeholder="Enter the next signer's email"
-                                />
-                              </FormControl>
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
-                      </div>
-                    )}
+                      <FormField
+                        control={form.control}
+                        name="email"
+                        render={({ field }) => (
+                          <FormItem className="flex-1">
+                            <FormLabel>
+                              <Trans>Email</Trans>
+                            </FormLabel>
+                            <FormControl>
+                              <Input
+                                {...field}
+                                type="email"
+                                className="mt-2"
+                                placeholder="Enter the next signer's email"
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    </div>
                   </div>
                 )}
 
@@ -190,27 +161,17 @@ export function AssistantConfirmationDialog({
               </div>
 
               <DialogFooter className="mt-4">
-                <Button
-                  type="button"
-                  variant="secondary"
-                  onClick={onClose}
-                  disabled={form.formState.isSubmitting}
-                >
+                <Button type="button" variant="secondary" onClick={onClose} disabled={isSubmitting}>
                   <Trans>Cancel</Trans>
                 </Button>
                 <Button
-                  type="submit"
+                  type="button"
                   variant={hasUninsertedFields ? 'destructive' : 'default'}
-                  disabled={form.formState.isSubmitting || !isNextSignerValid}
-                  loading={form.formState.isSubmitting}
+                  disabled={isSubmitting}
+                  onClick={handleSubmit}
+                  loading={isSubmitting}
                 >
-                  {form.formState.isSubmitting ? (
-                    <Trans>Submitting...</Trans>
-                  ) : hasUninsertedFields ? (
-                    <Trans>Proceed</Trans>
-                  ) : (
-                    <Trans>Continue</Trans>
-                  )}
+                  {hasUninsertedFields ? <Trans>Proceed</Trans> : <Trans>Continue</Trans>}
                 </Button>
               </DialogFooter>
             </fieldset>

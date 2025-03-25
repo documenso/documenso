@@ -1,13 +1,11 @@
 import { useId, useMemo, useState } from 'react';
 
-import { zodResolver } from '@hookform/resolvers/zod';
 import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
 import { Trans } from '@lingui/react/macro';
 import { type Field, FieldType, type Recipient, RecipientRole } from '@prisma/client';
 import { Controller, useForm } from 'react-hook-form';
 import { useNavigate } from 'react-router';
-import { z } from 'zod';
 
 import { useAnalytics } from '@documenso/lib/client-only/hooks/use-analytics';
 import { useOptionalSession } from '@documenso/lib/client-only/providers/session';
@@ -32,13 +30,6 @@ import {
 } from '../../dialogs/assistant-confirmation-dialog';
 import { DocumentSigningCompleteDialog } from './document-signing-complete-dialog';
 import { useRequiredDocumentSigningContext } from './document-signing-provider';
-
-export const ZSigningFormSchema = z.object({
-  name: z.string().min(1, 'Name is required').optional(),
-  email: z.string().email('Invalid email address').optional(),
-});
-
-export type TSigningFormSchema = z.infer<typeof ZSigningFormSchema>;
 
 export type DocumentSigningFormProps = {
   document: DocumentAndSender;
@@ -76,8 +67,11 @@ export const DocumentSigningForm = ({
   const [isConfirmationDialogOpen, setIsConfirmationDialogOpen] = useState(false);
   const [isAssistantSubmitting, setIsAssistantSubmitting] = useState(false);
 
-  const { mutateAsync: completeDocumentWithToken } =
-    trpc.recipient.completeDocumentWithToken.useMutation();
+  const {
+    mutateAsync: completeDocumentWithToken,
+    isPending,
+    isSuccess,
+  } = trpc.recipient.completeDocumentWithToken.useMutation();
 
   const assistantForm = useForm<{ selectedSignerId: number | undefined }>({
     defaultValues: {
@@ -85,12 +79,8 @@ export const DocumentSigningForm = ({
     },
   });
 
-  const { handleSubmit, formState } = useForm<TSigningFormSchema>({
-    resolver: zodResolver(ZSigningFormSchema),
-  });
-
   // Keep the loading state going if successful since the redirect may take some time.
-  const isSubmitting = formState.isSubmitting || formState.isSubmitSuccessful;
+  const isSubmitting = isPending || isSuccess;
 
   const fieldsRequiringValidation = useMemo(
     () => fields.filter(isFieldUnsignedAndRequired),
@@ -110,34 +100,6 @@ export const DocumentSigningForm = ({
   const fieldsValidated = () => {
     setValidateUninsertedFields(true);
     validateFieldsInserted(fieldsRequiringValidation);
-  };
-
-  const onFormSubmit = async (data: TSigningFormSchema) => {
-    try {
-      setValidateUninsertedFields(true);
-
-      const isFieldsValid = validateFieldsInserted(fieldsRequiringValidation);
-
-      if (!isFieldsValid) {
-        return;
-      }
-
-      const nextSigner =
-        data.email && data.name
-          ? {
-              email: data.email,
-              name: data.name,
-            }
-          : undefined;
-
-      await completeDocument(undefined, nextSigner);
-    } catch (error) {
-      toast({
-        title: 'Error',
-        description: error instanceof Error ? error.message : 'An error occurred while signing',
-        variant: 'destructive',
-      });
-    }
   };
 
   const onAssistantFormSubmit = () => {
@@ -213,8 +175,6 @@ export const DocumentSigningForm = ({
       ? sortedRecipients[currentIndex + 1]
       : undefined;
   }, [document.documentMeta?.signingOrder, allRecipients, recipient.id]);
-
-  console.log('nextRecipient', nextRecipient);
 
   return (
     <div
@@ -356,9 +316,8 @@ export const DocumentSigningForm = ({
                     className="w-full"
                     size="lg"
                     loading={isAssistantSubmitting}
-                    disabled={isAssistantSubmitting || uninsertedRecipientFields.length > 0}
                   >
-                    {isAssistantSubmitting ? <Trans>Submitting...</Trans> : <Trans>Continue</Trans>}
+                    <Trans>Continue</Trans>
                   </Button>
                 </div>
 
@@ -381,7 +340,7 @@ export const DocumentSigningForm = ({
             </>
           ) : (
             <>
-              <form onSubmit={handleSubmit(onFormSubmit)}>
+              <div>
                 <p className="text-muted-foreground mt-2 text-sm">
                   {recipient.role === RecipientRole.APPROVER && !hasSignatureField ? (
                     <Trans>Please review the document before approving.</Trans>
@@ -463,7 +422,7 @@ export const DocumentSigningForm = ({
                     }
                   />
                 </div>
-              </form>
+              </div>
             </>
           )}
         </div>

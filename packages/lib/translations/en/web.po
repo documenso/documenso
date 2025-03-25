@@ -5044,11 +5044,6 @@ msgstr "Step <0>{step} of {maxStep}</0>"
 msgid "Subject <0>(Optional)</0>"
 msgstr "Subject <0>(Optional)</0>"
 
-#: apps/remix/app/components/general/document-signing/document-signing-form.tsx
-#: apps/remix/app/components/dialogs/assistant-confirmation-dialog.tsx
-msgid "Submitting..."
-msgstr "Submitting..."
-
 #: apps/remix/app/components/general/billing-plans.tsx
 msgid "Subscribe"
 msgstr "Subscribe"
@@ -6118,7 +6113,6 @@ msgstr "Update profile"
 
 #: apps/remix/app/components/tables/admin-document-recipient-item-table.tsx
 #: apps/remix/app/components/general/document-signing/document-signing-complete-dialog.tsx
-#: apps/remix/app/components/dialogs/assistant-confirmation-dialog.tsx
 msgid "Update Recipient"
 msgstr "Update Recipient"
 
