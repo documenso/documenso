@@ -18,6 +18,7 @@ import {
 import { getDocumentStats } from '@documenso/lib/server-only/admin/get-documents-stats';
 import { getRecipientsStats } from '@documenso/lib/server-only/admin/get-recipients-stats';
 import {
+  getMonthlyActiveUsers,
   getUserWithSignedDocumentMonthlyGrowth,
   getUsersCount,
   getUsersWithSubscriptionsCount,
@@ -25,6 +26,7 @@ import {
 import { getSignerConversionMonthly } from '@documenso/lib/server-only/user/get-signer-conversion';
 import { env } from '@documenso/lib/utils/env';
 
+import { MonthlyActiveUsersChart } from '~/components/general/admin-monthly-active-user-charts';
 import { AdminStatsSignerConversionChart } from '~/components/general/admin-stats-signer-conversion-chart';
 import { AdminStatsUsersWithDocumentsChart } from '~/components/general/admin-stats-users-with-documents';
 import { CardMetric } from '~/components/general/metric-card';
@@ -41,6 +43,7 @@ export async function loader() {
     // userWithAtLeastOneDocumentPerMonth,
     // userWithAtLeastOneDocumentSignedPerMonth,
     MONTHLY_USERS_SIGNED,
+    MONTHLY_ACTIVE_USERS,
   ] = await Promise.all([
     getUsersCount(),
     getUsersWithSubscriptionsCount(),
@@ -50,6 +53,7 @@ export async function loader() {
     // getUserWithAtLeastOneDocumentPerMonth(),
     // getUserWithAtLeastOneDocumentSignedPerMonth(),
     getUserWithSignedDocumentMonthlyGrowth(),
+    getMonthlyActiveUsers(),
   ]);
 
   return {
@@ -59,6 +63,7 @@ export async function loader() {
     recipientStats,
     signerConversionMonthly,
     MONTHLY_USERS_SIGNED,
+    MONTHLY_ACTIVE_USERS,
   };
 }
 
@@ -72,6 +77,7 @@ export default function AdminStatsPage({ loaderData }: Route.ComponentProps) {
     recipientStats,
     signerConversionMonthly,
     MONTHLY_USERS_SIGNED,
+    MONTHLY_ACTIVE_USERS,
   } = loaderData;
 
   return (
@@ -148,6 +154,14 @@ export default function AdminStatsPage({ loaderData }: Route.ComponentProps) {
           <Trans>Charts</Trans>
         </h3>
         <div className="mt-5 grid grid-cols-2 gap-8">
+          <MonthlyActiveUsersChart title={_(msg`MAU (signed in)`)} data={MONTHLY_ACTIVE_USERS} />
+
+          <MonthlyActiveUsersChart
+            title={_(msg`Cumulative MAU (signed in)`)}
+            data={MONTHLY_ACTIVE_USERS}
+            cummulative
+          />
+
           <AdminStatsUsersWithDocumentsChart
             data={MONTHLY_USERS_SIGNED}
             title={_(msg`MAU (created document)`)}

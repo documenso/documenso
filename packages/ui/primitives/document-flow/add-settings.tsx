@@ -1,10 +1,15 @@
 import { useEffect } from 'react';
 
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Trans } from '@lingui/react/macro';
-import { useLingui } from '@lingui/react/macro';
-import { DocumentVisibility, TeamMemberRole } from '@prisma/client';
-import { DocumentStatus, type Field, type Recipient, SendStatus } from '@prisma/client';
+import { Trans, useLingui } from '@lingui/react/macro';
+import {
+  DocumentStatus,
+  DocumentVisibility,
+  type Field,
+  type Recipient,
+  SendStatus,
+  TeamMemberRole,
+} from '@prisma/client';
 import { InfoIcon } from 'lucide-react';
 import { useForm } from 'react-hook-form';
 import { match } from 'ts-pattern';
