@@ -143,12 +143,16 @@ export default function DocumentsPage() {
   return (
     <div className="mx-auto w-full max-w-screen-xl px-4 md:px-8">
       <DocumentUploadDropzone />
+      <CreateFolderDialog />
 
-      <div className="mt-6 flex items-center space-x-2">
+      <h2 className="text-4xl font-semibold">
+        <Trans>Folders</Trans>
+      </h2>
+      <div className="mt-6 flex items-center">
         <Button
           variant="ghost"
           size="sm"
-          className="flex items-center space-x-1"
+          className="flex items-center space-x-2 pl-0 hover:bg-transparent"
           onClick={() => navigateToFolder(null)}
         >
           <HomeIcon className="h-4 w-4" />
@@ -161,7 +165,7 @@ export default function DocumentsPage() {
             <Button
               variant="ghost"
               size="sm"
-              className="flex items-center space-x-1"
+              className="flex items-center space-x-2 pl-1 hover:bg-transparent"
               onClick={() => navigateToFolder(folder.id)}
             >
               <FolderIcon className="h-4 w-4" />
@@ -170,9 +174,6 @@ export default function DocumentsPage() {
           </div>
         ))}
       </div>
-
-      <CreateFolderDialog />
-
       {isFoldersLoading ? (
         <div className="mt-6 flex justify-center">
           <Loader2 className="h-8 w-8 animate-spin text-gray-400" />
@@ -251,9 +252,9 @@ export default function DocumentsPage() {
             </Avatar>
           )}
 
-          <h1 className="text-4xl font-semibold">
+          <h2 className="text-4xl font-semibold">
             <Trans>Documents</Trans>
-          </h1>
+          </h2>
         </div>
 
         <div className="-m-1 flex flex-wrap gap-x-4 gap-y-6 overflow-hidden p-1">

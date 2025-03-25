@@ -5,7 +5,7 @@ export interface CreateFolderOptions {
   userId: number;
   teamId?: number;
   name: string;
-  parentId?: number | null;
+  parentId?: string | null;
   requestMetadata?: ApiRequestMetadata;
 }
 

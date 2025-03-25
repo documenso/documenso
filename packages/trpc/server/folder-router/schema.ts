@@ -64,7 +64,7 @@ export type TFolderWithSubfolders = z.infer<typeof ZFolderWithSubfoldersSchema>;
 
 export const ZCreateFolderSchema = z.object({
   name: z.string().min(1).max(255),
-  parentId: z.number().nullable().optional(),
+  parentId: z.string().nullable().optional(),
 });
 
 export const ZUpdateFolderSchema = z.object({

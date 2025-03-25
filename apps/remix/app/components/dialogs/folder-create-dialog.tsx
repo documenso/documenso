@@ -30,10 +30,7 @@ const ZSearchParamsSchema = ZFindDocumentsInternalRequestSchema.pick({
   query: true,
 }).extend({
   senderIds: z.string().transform(parseToIntegerArray).optional().catch([]),
-  folderId: z
-    .string()
-    .transform((val) => parseInt(val, 10))
-    .optional(),
+  folderId: z.string().optional(),
 });
 
 export type CreateFolderDialogProps = {
