@@ -142,12 +142,11 @@ export default function DocumentsPage() {
 
   return (
     <div className="mx-auto w-full max-w-screen-xl px-4 md:px-8">
-      <DocumentUploadDropzone />
-      <CreateFolderDialog />
+      <div className="flex flex-col gap-y-4 pb-8 sm:flex-row sm:gap-x-4">
+        <DocumentUploadDropzone />
+        <CreateFolderDialog />
+      </div>
 
-      <h2 className="text-4xl font-semibold">
-        <Trans>Folders</Trans>
-      </h2>
       <div className="mt-6 flex items-center">
         <Button
           variant="ghost"
@@ -183,7 +182,7 @@ export default function DocumentsPage() {
           {foldersData?.folders.map((folder) => (
             <div
               key={folder.id}
-              className="group relative flex flex-col rounded-lg border border-gray-200 p-4 transition-all hover:border-gray-300 hover:shadow-sm"
+              className="border-border hover:border-muted-foreground/40 group relative flex flex-col rounded-lg border p-4 transition-all hover:shadow-sm"
             >
               <div className="flex items-start justify-between">
                 <button

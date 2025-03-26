@@ -198,6 +198,7 @@ export const ZCreateDocumentRequestSchema = z.object({
   title: ZDocumentTitleSchema,
   documentDataId: z.string().min(1),
   timezone: ZDocumentMetaTimezoneSchema.optional(),
+  folderId: z.string().optional(),
 });
 
 export const ZCreateDocumentV2RequestSchema = z.object({

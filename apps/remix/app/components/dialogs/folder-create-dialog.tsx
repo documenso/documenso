@@ -85,7 +85,7 @@ export const CreateFolderDialog = ({ trigger, ...props }: CreateFolderDialogProp
   };
 
   return (
-    <div className="mt-4 flex justify-end">
+    <div>
       <Dialog {...props} open={isCreateFolderOpen} onOpenChange={setIsCreateFolderOpen}>
         <DialogTrigger asChild>
           {trigger ?? (

@@ -28,6 +28,7 @@ export type CreateDocumentOptions = {
   normalizePdf?: boolean;
   timezone?: string;
   requestMetadata: ApiRequestMetadata;
+  folderId?: string;
 };
 
 export const createDocument = async ({
@@ -40,6 +41,7 @@ export const createDocument = async ({
   formValues,
   requestMetadata,
   timezone,
+  folderId,
 }: CreateDocumentOptions) => {
   const user = await prisma.user.findFirstOrThrow({
     where: {
@@ -119,6 +121,7 @@ export const createDocument = async ({
         documentDataId,
         userId,
         teamId,
+        folderId,
         visibility: determineDocumentVisibility(
           team?.teamGlobalSettings?.documentVisibility,
           userTeamRole ?? TeamMemberRole.MEMBER,

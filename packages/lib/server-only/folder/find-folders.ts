@@ -25,7 +25,7 @@ export const findFolders = async ({
       parentId,
     },
     orderBy: {
-      name: 'asc',
+      createdAt: 'desc',
     },
     skip,
     take: perPage,
@@ -42,7 +42,7 @@ export const findFolders = async ({
             teamId,
           },
           orderBy: {
-            name: 'asc',
+            createdAt: 'desc',
           },
         }),
         prisma.document.count({
