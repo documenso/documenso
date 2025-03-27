@@ -315,6 +315,8 @@ test('[NEXT_RECIPIENT_DICTATION]: should allow assistant to dictate next signer'
   await page.goto(signUrl);
   await expect(page.getByRole('heading', { name: 'Assist Document' })).toBeVisible();
 
+  await page.waitForTimeout(1000);
+
   await page.getByRole('radio', { name: assistantRecipient.name }).click();
 
   // Fill in all fields
@@ -343,6 +345,7 @@ test('[NEXT_RECIPIENT_DICTATION]: should allow assistant to dictate next signer'
 
   // Use dialog context to ensure we're targeting the correct form fields
   const dialog = page.getByRole('dialog');
+  await dialog.getByRole('button', { name: 'Update Recipient' }).click();
   await dialog.getByLabel('Name').fill('New Signer');
   await dialog.getByLabel('Email').fill('new.signer@example.com');
 
