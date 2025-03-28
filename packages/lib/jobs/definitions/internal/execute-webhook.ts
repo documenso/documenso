@@ -9,7 +9,7 @@ const EXECUTE_WEBHOOK_JOB_DEFINITION_ID = 'internal.execute-webhook';
 const EXECUTE_WEBHOOK_JOB_DEFINITION_SCHEMA = z.object({
   event: z.nativeEnum(WebhookTriggerEvents),
   webhookId: z.string(),
-  data: z.any(), // fix
+  data: z.unknown(),
   requestMetadata: ZRequestMetadataSchema.optional(),
 });
 
