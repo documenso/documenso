@@ -44,6 +44,7 @@ export const getStats = async ({ user, period, search = '', ...options }: GetSta
     [ExtendedDocumentStatus.DRAFT]: 0,
     [ExtendedDocumentStatus.PENDING]: 0,
     [ExtendedDocumentStatus.COMPLETED]: 0,
+    [ExtendedDocumentStatus.REJECTED]: 0,
     [ExtendedDocumentStatus.INBOX]: 0,
     [ExtendedDocumentStatus.ALL]: 0,
   };
@@ -63,6 +64,10 @@ export const getStats = async ({ user, period, search = '', ...options }: GetSta
 
     if (stat.status === ExtendedDocumentStatus.PENDING) {
       stats[ExtendedDocumentStatus.PENDING] += stat._count._all;
+    }
+
+    if (stat.status === ExtendedDocumentStatus.REJECTED) {
+      stats[ExtendedDocumentStatus.REJECTED] += stat._count._all;
     }
   });
 

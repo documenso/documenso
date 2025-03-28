@@ -298,6 +298,7 @@ test('[DIRECT_TEMPLATES]: use direct template link with 2 recipients', async ({ 
     await page.goto(formatDirectTemplatePath(template.directLink?.token || ''));
     await expect(page.getByRole('heading', { name: 'General' })).toBeVisible();
 
+    await page.waitForTimeout(1000);
     await page.getByPlaceholder('recipient@documenso.com').fill(seedTestEmail());
 
     await page.getByRole('button', { name: 'Continue' }).click();

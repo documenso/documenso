@@ -1,5 +1,5 @@
 import type { Prisma } from '@prisma/client';
-import { DocumentDataType, DocumentStatus, SigningStatus, TeamMemberRole } from '@prisma/client';
+import { DocumentDataType, SigningStatus, TeamMemberRole } from '@prisma/client';
 import { tsr } from '@ts-rest/serverless/fetch';
 import { match } from 'ts-pattern';
 
@@ -50,6 +50,7 @@ import {
   getPresignGetUrl,
   getPresignPostUrl,
 } from '@documenso/lib/universal/upload/server-actions';
+import { isDocumentCompleted } from '@documenso/lib/utils/document';
 import { createDocumentAuditLogData } from '@documenso/lib/utils/document-audit-logs';
 import { prisma } from '@documenso/prisma';
 
@@ -176,7 +177,7 @@ export const ApiContractV1Implementation = tsr.router(ApiContractV1, {
         };
       }
 
-      if (document.status !== DocumentStatus.COMPLETED) {
+      if (!isDocumentCompleted(document.status)) {
         return {
           status: 400,
           body: {
@@ -322,8 +323,11 @@ export const ApiContractV1Implementation = tsr.router(ApiContractV1, {
         dateFormat: dateFormat?.value,
         redirectUrl: body.meta.redirectUrl,
         signingOrder: body.meta.signingOrder,
+        allowDictateNextSigner: body.meta.allowDictateNextSigner,
         language: body.meta.language,
         typedSignatureEnabled: body.meta.typedSignatureEnabled,
+        uploadSignatureEnabled: body.meta.uploadSignatureEnabled,
+        drawSignatureEnabled: body.meta.drawSignatureEnabled,
         distributionMethod: body.meta.distributionMethod,
         emailSettings: body.meta.emailSettings,
         requestMetadata: metadata,
@@ -580,6 +584,7 @@ export const ApiContractV1Implementation = tsr.router(ApiContractV1, {
         userId: user.id,
         teamId: team?.id,
         recipients: body.recipients,
+        prefillFields: body.prefillFields,
         override: {
           title: body.title,
           ...body.meta,
@@ -668,7 +673,7 @@ export const ApiContractV1Implementation = tsr.router(ApiContractV1, {
         };
       }
 
-      if (document.status === DocumentStatus.COMPLETED) {
+      if (isDocumentCompleted(document.status)) {
         return {
           status: 400,
           body: {
@@ -771,7 +776,7 @@ export const ApiContractV1Implementation = tsr.router(ApiContractV1, {
       };
     }
 
-    if (document.status === DocumentStatus.COMPLETED) {
+    if (isDocumentCompleted(document.status)) {
       return {
         status: 400,
         body: {
@@ -862,7 +867,7 @@ export const ApiContractV1Implementation = tsr.router(ApiContractV1, {
       };
     }
 
-    if (document.status === DocumentStatus.COMPLETED) {
+    if (isDocumentCompleted(document.status)) {
       return {
         status: 400,
         body: {
@@ -921,7 +926,7 @@ export const ApiContractV1Implementation = tsr.router(ApiContractV1, {
       };
     }
 
-    if (document.status === DocumentStatus.COMPLETED) {
+    if (isDocumentCompleted(document.status)) {
       return {
         status: 400,
         body: {
@@ -986,7 +991,7 @@ export const ApiContractV1Implementation = tsr.router(ApiContractV1, {
       };
     }
 
-    if (document.status === DocumentStatus.COMPLETED) {
+    if (isDocumentCompleted(document.status)) {
       return {
         status: 400,
         body: { message: 'Document is already completed' },
@@ -1148,7 +1153,7 @@ export const ApiContractV1Implementation = tsr.router(ApiContractV1, {
       };
     }
 
-    if (document.status === DocumentStatus.COMPLETED) {
+    if (isDocumentCompleted(document.status)) {
       return {
         status: 400,
         body: {
@@ -1236,7 +1241,7 @@ export const ApiContractV1Implementation = tsr.router(ApiContractV1, {
       };
     }
 
-    if (document.status === DocumentStatus.COMPLETED) {
+    if (isDocumentCompleted(document.status)) {
       return {
         status: 400,
         body: {

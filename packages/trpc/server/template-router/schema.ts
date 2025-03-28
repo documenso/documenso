@@ -7,6 +7,7 @@ import {
   ZDocumentActionAuthTypesSchema,
 } from '@documenso/lib/types/document-auth';
 import { ZDocumentEmailSettingsSchema } from '@documenso/lib/types/document-email';
+import { ZFieldMetaPrefillFieldsSchema } from '@documenso/lib/types/field-meta';
 import { ZFindResultResponse, ZFindSearchParamsSchema } from '@documenso/lib/types/search-params';
 import {
   ZTemplateLiteSchema,
@@ -18,12 +19,14 @@ import { TemplateDirectLinkSchema } from '@documenso/prisma/generated/zod/modelS
 import {
   ZDocumentMetaDateFormatSchema,
   ZDocumentMetaDistributionMethodSchema,
+  ZDocumentMetaDrawSignatureEnabledSchema,
   ZDocumentMetaLanguageSchema,
   ZDocumentMetaMessageSchema,
   ZDocumentMetaRedirectUrlSchema,
   ZDocumentMetaSubjectSchema,
   ZDocumentMetaTimezoneSchema,
   ZDocumentMetaTypedSignatureEnabledSchema,
+  ZDocumentMetaUploadSignatureEnabledSchema,
 } from '../document-router/schema';
 import { ZSignFieldWithTokenMutationSchema } from '../field-router/schema';
 
@@ -65,6 +68,12 @@ export const ZCreateDocumentFromTemplateRequestSchema = z.object({
     .string()
     .describe(
       'The data ID of an alternative PDF to use when creating the document. If not provided, the PDF attached to the template will be used.',
+    )
+    .optional(),
+  prefillFields: z
+    .array(ZFieldMetaPrefillFieldsSchema)
+    .describe(
+      'The fields to prefill on the document before sending it out. Useful when you want to create a document from an existing template and pre-fill the fields with specific values.',
     )
     .optional(),
 });
@@ -157,7 +166,10 @@ export const ZUpdateTemplateRequestSchema = z.object({
       redirectUrl: ZDocumentMetaRedirectUrlSchema.optional(),
       language: ZDocumentMetaLanguageSchema.optional(),
       typedSignatureEnabled: ZDocumentMetaTypedSignatureEnabledSchema.optional(),
+      uploadSignatureEnabled: ZDocumentMetaUploadSignatureEnabledSchema.optional(),
+      drawSignatureEnabled: ZDocumentMetaDrawSignatureEnabledSchema.optional(),
       signingOrder: z.nativeEnum(DocumentSigningOrder).optional(),
+      allowDictateNextSigner: z.boolean().optional(),
     })
     .optional(),
 });

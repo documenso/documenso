@@ -356,6 +356,24 @@ const findDocumentsFilter = (status: ExtendedDocumentStatus, user: User) => {
         },
       ],
     }))
+    .with(ExtendedDocumentStatus.REJECTED, () => ({
+      OR: [
+        {
+          userId: user.id,
+          teamId: null,
+          status: ExtendedDocumentStatus.REJECTED,
+        },
+        {
+          status: ExtendedDocumentStatus.REJECTED,
+          recipients: {
+            some: {
+              email: user.email,
+              signingStatus: SigningStatus.REJECTED,
+            },
+          },
+        },
+      ],
+    }))
     .exhaustive();
 };
 
@@ -533,6 +551,39 @@ const findTeamDocumentsFilter = (
             recipients: {
               some: {
                 email: teamEmail,
+              },
+            },
+            OR: visibilityFilters,
+          },
+          {
+            user: {
+              email: teamEmail,
+            },
+            OR: visibilityFilters,
+          },
+        );
+      }
+
+      return filter;
+    })
+    .with(ExtendedDocumentStatus.REJECTED, () => {
+      const filter: Prisma.DocumentWhereInput = {
+        status: ExtendedDocumentStatus.REJECTED,
+        OR: [
+          {
+            teamId: team.id,
+            OR: visibilityFilters,
+          },
+        ],
+      };
+
+      if (teamEmail && filter.OR) {
+        filter.OR.push(
+          {
+            recipients: {
+              some: {
+                email: teamEmail,
+                signingStatus: SigningStatus.REJECTED,
               },
             },
             OR: visibilityFilters,

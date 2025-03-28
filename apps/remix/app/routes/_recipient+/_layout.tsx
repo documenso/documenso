@@ -1,12 +1,14 @@
 import { Trans } from '@lingui/react/macro';
 import { ChevronLeft } from 'lucide-react';
-import { Link, Outlet } from 'react-router';
+import { Link, Outlet, isRouteErrorResponse } from 'react-router';
 
 import { useOptionalSession } from '@documenso/lib/client-only/providers/session';
 import { Button } from '@documenso/ui/primitives/button';
 
 import { Header as AuthenticatedHeader } from '~/components/general/app-header';
 import { GenericErrorLayout } from '~/components/general/generic-error-layout';
+
+import type { Route } from './+types/_layout';
 
 /**
  * A layout to handle scenarios where the user is a recipient of a given resource
@@ -30,9 +32,12 @@ export default function RecipientLayout() {
   );
 }
 
-export function ErrorBoundary() {
+export function ErrorBoundary({ error }: Route.ErrorBoundaryProps) {
+  const errorCode = isRouteErrorResponse(error) ? error.status : 500;
+
   return (
     <GenericErrorLayout
+      errorCode={errorCode}
       secondaryButton={null}
       primaryButton={
         <Button asChild className="w-32">

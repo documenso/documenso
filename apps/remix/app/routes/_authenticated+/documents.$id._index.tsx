@@ -220,6 +220,9 @@ export default function DocumentPage() {
                   .with(DocumentStatus.COMPLETED, () => (
                     <Trans>This document has been signed by all recipients</Trans>
                   ))
+                  .with(DocumentStatus.REJECTED, () => (
+                    <Trans>This document has been rejected by a recipient</Trans>
+                  ))
                   .with(DocumentStatus.DRAFT, () => (
                     <Trans>This document is currently a draft and has not been sent</Trans>
                   ))

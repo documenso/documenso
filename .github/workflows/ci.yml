@@ -26,7 +26,8 @@ jobs:
       - name: Copy env
         run: cp .env.example .env
 
-      - uses: ./.github/actions/cache-build
+      - name: Build app
+        run: npm run build
 
   build_docker:
     name: Build Docker Image

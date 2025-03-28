@@ -23,7 +23,7 @@ import {
   ZRecipientActionAuthTypesSchema,
 } from '@documenso/lib/types/document-auth';
 import { ZDocumentEmailSettingsSchema } from '@documenso/lib/types/document-email';
-import { ZFieldMetaSchema } from '@documenso/lib/types/field-meta';
+import { ZFieldMetaPrefillFieldsSchema, ZFieldMetaSchema } from '@documenso/lib/types/field-meta';
 
 extendZodWithOpenApi(z);
 
@@ -96,7 +96,7 @@ export const ZSendDocumentForSigningMutationSchema = z
         'Whether to send completion emails when the document is fully signed. This will override the document email settings.',
     }),
   })
-  .or(z.literal('').transform(() => ({ sendEmail: true, sendCompletionEmails: undefined })));
+  .or(z.any().transform(() => ({ sendEmail: true, sendCompletionEmails: undefined })));
 
 export type TSendDocumentForSigningMutationSchema = typeof ZSendDocumentForSigningMutationSchema;
 
@@ -155,8 +155,11 @@ export const ZCreateDocumentMutationSchema = z.object({
         }),
       redirectUrl: z.string(),
       signingOrder: z.nativeEnum(DocumentSigningOrder).optional(),
+      allowDictateNextSigner: z.boolean().optional(),
       language: z.enum(SUPPORTED_LANGUAGE_CODES).optional(),
       typedSignatureEnabled: z.boolean().optional().default(true),
+      uploadSignatureEnabled: z.boolean().optional().default(true),
+      drawSignatureEnabled: z.boolean().optional().default(true),
       distributionMethod: z.nativeEnum(DocumentDistributionMethod).optional(),
       emailSettings: ZDocumentEmailSettingsSchema.optional(),
     })
@@ -218,6 +221,7 @@ export const ZCreateDocumentFromTemplateMutationSchema = z.object({
       dateFormat: z.string(),
       redirectUrl: z.string(),
       signingOrder: z.nativeEnum(DocumentSigningOrder).optional(),
+      allowDictateNextSigner: z.boolean().optional(),
       language: z.enum(SUPPORTED_LANGUAGE_CODES).optional(),
     })
     .partial()
@@ -285,9 +289,12 @@ export const ZGenerateDocumentFromTemplateMutationSchema = z.object({
       dateFormat: z.string(),
       redirectUrl: ZUrlSchema,
       signingOrder: z.nativeEnum(DocumentSigningOrder),
+      allowDictateNextSigner: z.boolean(),
       language: z.enum(SUPPORTED_LANGUAGE_CODES),
       distributionMethod: z.nativeEnum(DocumentDistributionMethod),
       typedSignatureEnabled: z.boolean(),
+      uploadSignatureEnabled: z.boolean(),
+      drawSignatureEnabled: z.boolean(),
       emailSettings: ZDocumentEmailSettingsSchema,
     })
     .partial()
@@ -299,6 +306,7 @@ export const ZGenerateDocumentFromTemplateMutationSchema = z.object({
     })
     .optional(),
   formValues: z.record(z.string(), z.union([z.string(), z.boolean(), z.number()])).optional(),
+  prefillFields: z.array(ZFieldMetaPrefillFieldsSchema).optional(),
 });
 
 export type TGenerateDocumentFromTemplateMutationSchema = z.infer<

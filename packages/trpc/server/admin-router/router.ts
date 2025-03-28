@@ -1,5 +1,3 @@
-import { DocumentStatus } from '@prisma/client';
-
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import { findDocuments } from '@documenso/lib/server-only/admin/get-all-documents';
 import { getEntireDocument } from '@documenso/lib/server-only/admin/get-entire-document';
@@ -13,6 +11,7 @@ import { deleteUser } from '@documenso/lib/server-only/user/delete-user';
 import { disableUser } from '@documenso/lib/server-only/user/disable-user';
 import { enableUser } from '@documenso/lib/server-only/user/enable-user';
 import { getUserById } from '@documenso/lib/server-only/user/get-user-by-id';
+import { isDocumentCompleted } from '@documenso/lib/utils/document';
 
 import { adminProcedure, router } from '../trpc';
 import {
@@ -70,7 +69,7 @@ export const adminRouter = router({
 
       const document = await getEntireDocument({ id });
 
-      const isResealing = document.status === DocumentStatus.COMPLETED;
+      const isResealing = isDocumentCompleted(document.status);
 
       return await sealDocument({ documentId: id, isResealing });
     }),

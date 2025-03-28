@@ -3,8 +3,8 @@ import { useEffect, useLayoutEffect, useState } from 'react';
 import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
 import { Trans } from '@lingui/react/macro';
-import { type DocumentData, type Field, FieldType } from '@prisma/client';
 import type { DocumentMeta, Recipient, Signature, TemplateMeta } from '@prisma/client';
+import { type DocumentData, type Field, FieldType } from '@prisma/client';
 import { LucideChevronDown, LucideChevronUp } from 'lucide-react';
 import { DateTime } from 'luxon';
 import { useSearchParams } from 'react-router';
@@ -13,6 +13,10 @@ import { useThrottleFn } from '@documenso/lib/client-only/hooks/use-throttle-fn'
 import { DEFAULT_DOCUMENT_DATE_FORMAT } from '@documenso/lib/constants/date-formats';
 import { PDF_VIEWER_PAGE_SELECTOR } from '@documenso/lib/constants/pdf-viewer';
 import { DEFAULT_DOCUMENT_TIME_ZONE } from '@documenso/lib/constants/time-zones';
+import {
+  isFieldUnsignedAndRequired,
+  isRequiredField,
+} from '@documenso/lib/utils/advanced-fields-helpers';
 import { validateFieldsInserted } from '@documenso/lib/utils/fields';
 import { trpc } from '@documenso/trpc/react';
 import type {
@@ -21,12 +25,11 @@ import type {
 } from '@documenso/trpc/server/field-router/schema';
 import { FieldToolTip } from '@documenso/ui/components/field/field-tooltip';
 import { Button } from '@documenso/ui/primitives/button';
-import { Card, CardContent } from '@documenso/ui/primitives/card';
 import { ElementVisible } from '@documenso/ui/primitives/element-visible';
 import { Input } from '@documenso/ui/primitives/input';
 import { Label } from '@documenso/ui/primitives/label';
 import { PDFViewer } from '@documenso/ui/primitives/pdf-viewer';
-import { SignaturePad } from '@documenso/ui/primitives/signature-pad';
+import { SignaturePadDialog } from '@documenso/ui/primitives/signature-pad/signature-pad-dialog';
 import { useToast } from '@documenso/ui/primitives/use-toast';
 
 import { BrandingLogo } from '~/components/general/branding-logo';
@@ -65,16 +68,8 @@ export const EmbedDirectTemplateClientPage = ({
 
   const [searchParams] = useSearchParams();
 
-  const {
-    fullName,
-    email,
-    signature,
-    signatureValid,
-    setFullName,
-    setEmail,
-    setSignature,
-    setSignatureValid,
-  } = useRequiredDocumentSigningContext();
+  const { fullName, email, signature, setFullName, setEmail, setSignature } =
+    useRequiredDocumentSigningContext();
 
   const [hasFinishedInit, setHasFinishedInit] = useState(false);
   const [hasDocumentLoaded, setHasDocumentLoaded] = useState(false);
@@ -92,7 +87,7 @@ export const EmbedDirectTemplateClientPage = ({
   const [localFields, setLocalFields] = useState<DirectTemplateLocalField[]>(() => fields);
 
   const [pendingFields, _completedFields] = [
-    localFields.filter((field) => !field.inserted),
+    localFields.filter((field) => isFieldUnsignedAndRequired(field)),
     localFields.filter((field) => field.inserted),
   ];
 
@@ -110,7 +105,7 @@ export const EmbedDirectTemplateClientPage = ({
 
         const newField: DirectTemplateLocalField = structuredClone({
           ...field,
-          customText: payload.value,
+          customText: payload.value ?? '',
           inserted: true,
           signedValue: payload,
         });
@@ -121,8 +116,10 @@ export const EmbedDirectTemplateClientPage = ({
             created: new Date(),
             recipientId: 1,
             fieldId: 1,
-            signatureImageAsBase64: payload.value.startsWith('data:') ? payload.value : null,
-            typedSignature: payload.value.startsWith('data:') ? null : payload.value,
+            signatureImageAsBase64:
+              payload.value && payload.value.startsWith('data:') ? payload.value : null,
+            typedSignature:
+              payload.value && !payload.value.startsWith('data:') ? payload.value : null,
           } satisfies Signature;
         }
 
@@ -180,7 +177,7 @@ export const EmbedDirectTemplateClientPage = ({
   };
 
   const onNextFieldClick = () => {
-    validateFieldsInserted(localFields);
+    validateFieldsInserted(pendingFields);
 
     setShowPendingFieldTooltip(true);
     setIsExpanded(false);
@@ -188,11 +185,7 @@ export const EmbedDirectTemplateClientPage = ({
 
   const onCompleteClick = async () => {
     try {
-      if (hasSignatureField && !signatureValid) {
-        return;
-      }
-
-      const valid = validateFieldsInserted(localFields);
+      const valid = validateFieldsInserted(pendingFields);
 
       if (!valid) {
         setShowPendingFieldTooltip(true);
@@ -205,12 +198,6 @@ export const EmbedDirectTemplateClientPage = ({
         directTemplateExternalId = decodeURIComponent(directTemplateExternalId);
       }
 
-      localFields.forEach((field) => {
-        if (!field.signedValue) {
-          throw new Error('Invalid configuration');
-        }
-      });
-
       const {
         documentId,
         token: documentToken,
@@ -221,13 +208,11 @@ export const EmbedDirectTemplateClientPage = ({
         directRecipientName: fullName,
         directRecipientEmail: email,
         templateUpdatedAt: updatedAt,
-        signedFieldValues: localFields.map((field) => {
-          if (!field.signedValue) {
-            throw new Error('Invalid configuration');
-          }
-
-          return field.signedValue;
-        }),
+        signedFieldValues: localFields
+          .filter((field) => {
+            return field.signedValue && (isRequiredField(field) || field.inserted);
+          })
+          .map((field) => field.signedValue!),
       });
 
       if (window.parent) {
@@ -415,40 +400,24 @@ export const EmbedDirectTemplateClientPage = ({
                   />
                 </div>
 
-                <div>
-                  <Label htmlFor="Signature">
-                    <Trans>Signature</Trans>
-                  </Label>
+                {hasSignatureField && (
+                  <div>
+                    <Label htmlFor="Signature">
+                      <Trans>Signature</Trans>
+                    </Label>
 
-                  <Card className="mt-2" gradient degrees={-120}>
-                    <CardContent className="p-0">
-                      <SignaturePad
-                        className="h-44 w-full"
-                        disabled={isThrottled || isSubmitting}
-                        defaultValue={signature ?? undefined}
-                        onChange={(value) => {
-                          setSignature(value);
-                        }}
-                        onValidityChange={(isValid) => {
-                          setSignatureValid(isValid);
-                        }}
-                        allowTypedSignature={Boolean(
-                          metadata &&
-                            'typedSignatureEnabled' in metadata &&
-                            metadata.typedSignatureEnabled,
-                        )}
-                      />
-                    </CardContent>
-                  </Card>
-
-                  {hasSignatureField && !signatureValid && (
-                    <div className="text-destructive mt-2 text-sm">
-                      <Trans>
-                        Signature is too small. Please provide a more complete signature.
-                      </Trans>
-                    </div>
-                  )}
-                </div>
+                    <SignaturePadDialog
+                      className="mt-2"
+                      disabled={isThrottled || isSubmitting}
+                      disableAnimation
+                      value={signature ?? ''}
+                      onChange={(v) => setSignature(v ?? '')}
+                      typedSignatureEnabled={metadata?.typedSignatureEnabled}
+                      uploadSignatureEnabled={metadata?.uploadSignatureEnabled}
+                      drawSignatureEnabled={metadata?.drawSignatureEnabled}
+                    />
+                  </div>
+                )}
               </div>
             </div>
 

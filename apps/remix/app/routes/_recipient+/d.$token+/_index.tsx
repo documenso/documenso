@@ -79,7 +79,14 @@ export default function DirectTemplatePage() {
   const { template, directTemplateRecipient } = data;
 
   return (
-    <DocumentSigningProvider email={user?.email} fullName={user?.name} signature={user?.signature}>
+    <DocumentSigningProvider
+      email={user?.email}
+      fullName={user?.name}
+      signature={user?.signature}
+      typedSignatureEnabled={template.templateMeta?.typedSignatureEnabled}
+      uploadSignatureEnabled={template.templateMeta?.uploadSignatureEnabled}
+      drawSignatureEnabled={template.templateMeta?.drawSignatureEnabled}
+    >
       <DocumentSigningAuthProvider
         documentAuthOptions={template.authOptions}
         recipient={directTemplateRecipient}
