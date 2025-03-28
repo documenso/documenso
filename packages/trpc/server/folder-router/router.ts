@@ -67,14 +67,12 @@ export const folderRouter = router({
     .output(ZFindFoldersResponseSchema)
     .query(async ({ input, ctx }) => {
       const { teamId, user } = ctx;
-      const { parentId, page = 1, perPage = 10 } = input;
+      const { parentId } = input;
 
       const folders = await findFolders({
         userId: user.id,
         teamId,
         parentId,
-        page,
-        perPage,
       });
 
       const breadcrumbs = parentId
@@ -88,10 +86,6 @@ export const folderRouter = router({
       return {
         data: folders,
         breadcrumbs,
-        currentPage: page,
-        perPage,
-        totalPages: 1, // We don't paginate folders for now
-        count: folders.length, // Add count property to satisfy the type
       };
     }),
 
@@ -104,7 +98,6 @@ export const folderRouter = router({
       const { teamId, user } = ctx;
       const { name, parentId } = input;
 
-      // Verify parent folder exists and belongs to the user/team if provided
       if (parentId) {
         try {
           await getFolderById({
@@ -125,7 +118,6 @@ export const folderRouter = router({
         teamId,
         name,
         parentId,
-        requestMetadata: ctx.metadata,
       });
     }),
 

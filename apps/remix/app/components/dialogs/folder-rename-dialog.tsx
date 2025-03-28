@@ -1,7 +1,14 @@
 import { useEffect, useState } from 'react';
 
+import { zodResolver } from '@hookform/resolvers/zod';
+import { msg } from '@lingui/core/macro';
+import { useLingui } from '@lingui/react';
 import type * as DialogPrimitive from '@radix-ui/react-dialog';
+import { useForm } from 'react-hook-form';
+import { z } from 'zod';
 
+import { AppErrorCode } from '@documenso/lib/errors/app-error';
+import { AppError } from '@documenso/lib/errors/app-error';
 import { trpc } from '@documenso/trpc/react';
 import type { TFolderWithSubfolders } from '@documenso/trpc/server/folder-router/schema';
 import { Button } from '@documenso/ui/primitives/button';
@@ -14,9 +21,22 @@ import {
   DialogTitle,
   DialogTrigger,
 } from '@documenso/ui/primitives/dialog';
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from '@documenso/ui/primitives/form/form';
 import { Input } from '@documenso/ui/primitives/input';
-import { Label } from '@documenso/ui/primitives/label';
 import { useToast } from '@documenso/ui/primitives/use-toast';
+
+const ZRenameFolderFormSchema = z.object({
+  name: z.string().min(1, { message: 'Folder name is required' }),
+});
+
+type TRenameFolderFormSchema = z.infer<typeof ZRenameFolderFormSchema>;
 
 export type FolderRenameDialogProps = {
   trigger?: React.ReactNode;
@@ -32,25 +52,32 @@ export const FolderRenameDialog = ({
   onOpenChange,
   ...props
 }: FolderRenameDialogProps) => {
+  const { _ } = useLingui();
   const { toast } = useToast();
   const [isRenameFolderOpen, setIsRenameFolderOpen] = useState(isOpen || false);
-  const [renameFolderName, setRenameFolderName] = useState('');
   const [folderToRename, setFolderToRename] = useState<TFolderWithSubfolders | null>(
     folder || null,
   );
 
   const { mutateAsync: updateFolder } = trpc.folder.updateFolder.useMutation();
 
+  const form = useForm<TRenameFolderFormSchema>({
+    resolver: zodResolver(ZRenameFolderFormSchema),
+    defaultValues: {
+      name: '',
+    },
+  });
+
   useEffect(() => {
-    if (isOpen !== undefined) {
+    if (isOpen) {
       setIsRenameFolderOpen(isOpen);
     }
 
     if (folder && isOpen) {
       setFolderToRename(folder);
-      setRenameFolderName(folder.name);
+      form.reset({ name: folder.name });
     }
-  }, [isOpen, folder]);
+  }, [isOpen, folder, form]);
 
   const handleOpenChange = (open: boolean) => {
     setIsRenameFolderOpen(open);
@@ -59,34 +86,38 @@ export const FolderRenameDialog = ({
     }
   };
 
-  const handleRenameFolder = async () => {
+  const onFormSubmit = async ({ name }: TRenameFolderFormSchema) => {
     if (!folderToRename) return;
-
-    if (!renameFolderName.trim()) {
-      toast({
-        title: 'Folder name is required',
-        variant: 'destructive',
-      });
-      return;
-    }
 
     try {
       await updateFolder({
         id: folderToRename.id,
-        name: renameFolderName,
+        name,
       });
 
       toast({
-        title: 'Folder renamed successfully',
+        title: _(msg`Folder renamed successfully`),
       });
 
       setFolderToRename(null);
-      setRenameFolderName('');
+      form.reset();
       handleOpenChange(false);
-    } catch (error) {
-      console.error('Error renaming folder:', error);
+    } catch (err) {
+      const error = AppError.parseError(err);
+
+      if (error.code === AppErrorCode.NOT_FOUND) {
+        toast({
+          title: _(msg`Folder not found`),
+          description: _(msg`The folder you are trying to rename does not exist.`),
+          variant: 'destructive',
+        });
+
+        return;
+      }
+
       toast({
-        title: 'Failed to rename folder',
+        title: _(msg`Failed to rename folder`),
+        description: _(msg`An unknown error occurred while renaming the folder.`),
         variant: 'destructive',
       });
     }
@@ -100,21 +131,29 @@ export const FolderRenameDialog = ({
           <DialogTitle>Rename Folder</DialogTitle>
           <DialogDescription>Enter a new name for your folder.</DialogDescription>
         </DialogHeader>
-        <div className="py-4">
-          <Label htmlFor="rename-folder-name">Folder Name</Label>
-          <Input
-            id="rename-folder-name"
-            value={renameFolderName}
-            onChange={(e) => setRenameFolderName(e.target.value)}
-            className="mt-2"
-          />
-        </div>
-        <DialogFooter>
-          <Button variant="secondary" onClick={() => handleOpenChange(false)}>
-            Cancel
-          </Button>
-          <Button onClick={handleRenameFolder}>Rename</Button>
-        </DialogFooter>
+        <Form {...form}>
+          <form onSubmit={form.handleSubmit(onFormSubmit)} className="space-y-4">
+            <FormField
+              control={form.control}
+              name="name"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Folder Name</FormLabel>
+                  <FormControl>
+                    <Input {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <DialogFooter>
+              <Button type="button" variant="secondary" onClick={() => handleOpenChange(false)}>
+                Cancel
+              </Button>
+              <Button type="submit">Rename</Button>
+            </DialogFooter>
+          </form>
+        </Form>
       </DialogContent>
     </Dialog>
   );

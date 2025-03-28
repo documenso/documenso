@@ -1,6 +1,6 @@
 import { z } from 'zod';
 
-import { ZFindResultResponse, ZFindSearchParamsSchema } from '@documenso/lib/types/search-params';
+import { ZFindSearchParamsSchema } from '@documenso/lib/types/search-params';
 
 /**
  * Required for empty responses since we currently can't 201 requests for our openapi setup.
@@ -113,7 +113,7 @@ export const ZFindFoldersRequestSchema = ZFindSearchParamsSchema.extend({
   parentId: z.string().nullable().optional(),
 });
 
-export const ZFindFoldersResponseSchema = ZFindResultResponse.extend({
+export const ZFindFoldersResponseSchema = z.object({
   data: ZFolderWithSubfoldersSchema.array(),
   breadcrumbs: ZFolderSchema.array(),
 });

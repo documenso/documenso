@@ -323,6 +323,7 @@ export default function DocumentsPage() {
           open={isMovingDocument}
           onOpenChange={(open) => {
             setIsMovingDocument(open);
+
             if (!open) {
               setDocumentToMove(null);
             }
