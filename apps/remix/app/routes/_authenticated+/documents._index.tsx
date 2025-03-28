@@ -30,7 +30,6 @@ import { DocumentMoveToFolderDialog } from '~/components/dialogs/document-move-t
 import { CreateFolderDialog } from '~/components/dialogs/folder-create-dialog';
 import { FolderDeleteDialog } from '~/components/dialogs/folder-delete-dialog';
 import { FolderMoveDialog } from '~/components/dialogs/folder-move-dialog';
-import { FolderRenameDialog } from '~/components/dialogs/folder-rename-dialog';
 import { FolderSettingsDialog } from '~/components/dialogs/folder-settings-dialog';
 import { DocumentSearch } from '~/components/general/document/document-search';
 import { DocumentStatus } from '~/components/general/document/document-status';
@@ -63,8 +62,6 @@ export default function DocumentsPage() {
   const [documentToMove, setDocumentToMove] = useState<number | null>(null);
   const [isMovingFolder, setIsMovingFolder] = useState(false);
   const [folderToMove, setFolderToMove] = useState<TFolderWithSubfolders | null>(null);
-  const [isRenameFolderOpen, setIsRenameFolderOpen] = useState(false);
-  const [folderToRename, setFolderToRename] = useState<TFolderWithSubfolders | null>(null);
   const [isDeletingFolder, setIsDeletingFolder] = useState(false);
   const [folderToDelete, setFolderToDelete] = useState<TFolderWithSubfolders | null>(null);
   const [isSettingsFolderOpen, setIsSettingsFolderOpen] = useState(false);
@@ -238,14 +235,6 @@ export default function DocumentsPage() {
                           <DropdownMenuContent align="end">
                             <DropdownMenuItem
                               onClick={() => {
-                                setFolderToRename(folder);
-                                setIsRenameFolderOpen(true);
-                              }}
-                            >
-                              Rename
-                            </DropdownMenuItem>
-                            <DropdownMenuItem
-                              onClick={() => {
                                 setFolderToMove(folder);
                                 setIsMovingFolder(true);
                               }}
@@ -324,14 +313,6 @@ export default function DocumentsPage() {
                           </Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end">
-                          <DropdownMenuItem
-                            onClick={() => {
-                              setFolderToRename(folder);
-                              setIsRenameFolderOpen(true);
-                            }}
-                          >
-                            Rename
-                          </DropdownMenuItem>
                           <DropdownMenuItem
                             onClick={() => {
                               setFolderToMove(folder);
@@ -457,18 +438,6 @@ export default function DocumentsPage() {
           currentFolderId={currentFolderId}
         />
       )}
-
-      <FolderRenameDialog
-        folder={folderToRename}
-        isOpen={isRenameFolderOpen}
-        onOpenChange={(open) => {
-          setIsRenameFolderOpen(open);
-
-          if (!open) {
-            setFolderToRename(null);
-          }
-        }}
-      />
 
       <FolderMoveDialog
         foldersData={foldersData?.folders}
