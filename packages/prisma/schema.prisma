@@ -314,19 +314,20 @@ enum DocumentVisibility {
 }
 
 model Folder {
-  id         String     @id @default(cuid())
+  id         String             @id @default(cuid())
   name       String
   userId     Int
-  user       User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user       User               @relation(fields: [userId], references: [id], onDelete: Cascade)
   teamId     Int?
-  team       Team?      @relation(fields: [teamId], references: [id], onDelete: Cascade)
-  pinned     Boolean    @default(false)
+  team       Team?              @relation(fields: [teamId], references: [id], onDelete: Cascade)
+  pinned     Boolean            @default(false)
   parentId   String?
-  parent     Folder?    @relation("FolderToFolder", fields: [parentId], references: [id], onDelete: Cascade)
+  parent     Folder?            @relation("FolderToFolder", fields: [parentId], references: [id], onDelete: Cascade)
   documents  Document[]
-  createdAt  DateTime   @default(now())
-  updatedAt  DateTime   @default(now()) @updatedAt
-  subfolders Folder[]   @relation("FolderToFolder")
+  createdAt  DateTime           @default(now())
+  updatedAt  DateTime           @default(now()) @updatedAt
+  subfolders Folder[]           @relation("FolderToFolder")
+  visibility DocumentVisibility @default(EVERYONE)
 
   @@index([userId])
   @@index([teamId])

@@ -1,5 +1,6 @@
 import { z } from 'zod';
 
+import { DocumentVisibility } from '@documenso/lib/types/document-visibility';
 import { ZFindSearchParamsSchema } from '@documenso/lib/types/search-params';
 
 /**
@@ -74,7 +75,10 @@ export const ZCreateFolderSchema = z.object({
 export const ZUpdateFolderSchema = z.object({
   id: z.string(),
   name: z.string().min(1).max(255),
+  visibility: z.nativeEnum(DocumentVisibility),
 });
+
+export type TUpdateFolderSchema = z.infer<typeof ZUpdateFolderSchema>;
 
 export const ZDeleteFolderSchema = z.object({
   id: z.string(),

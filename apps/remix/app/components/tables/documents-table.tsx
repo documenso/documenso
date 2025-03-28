@@ -94,7 +94,7 @@ export const DocumentsTable = ({
           ),
       },
     ] satisfies DataTableColumnDef<DocumentsTableRow>[];
-  }, [team, onMoveDocument, _, i18n]);
+  }, [team, onMoveDocument]);
 
   const onPaginationChange = (page: number, perPage: number) => {
     startTransition(() => {

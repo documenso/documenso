@@ -1,13 +1,13 @@
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
-import type { ApiRequestMetadata } from '@documenso/lib/universal/extract-request-metadata';
 import { prisma } from '@documenso/prisma';
+import type { DocumentVisibility } from '@documenso/prisma/generated/types';
 
 export interface UpdateFolderOptions {
   userId: number;
   teamId?: number;
   folderId: string;
   name: string;
-  requestMetadata?: ApiRequestMetadata;
+  visibility: DocumentVisibility;
 }
 
 export const updateFolder = async ({
@@ -15,7 +15,7 @@ export const updateFolder = async ({
   teamId,
   folderId,
   name,
-  requestMetadata,
+  visibility,
 }: UpdateFolderOptions) => {
   const folder = await prisma.folder.findFirst({
     where: {
@@ -37,6 +37,7 @@ export const updateFolder = async ({
     },
     data: {
       name,
+      visibility,
     },
   });
 };

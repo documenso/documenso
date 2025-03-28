@@ -128,14 +128,14 @@ export const folderRouter = router({
     .input(ZUpdateFolderSchema)
     .mutation(async ({ input, ctx }) => {
       const { teamId, user } = ctx;
-      const { id, name } = input;
+      const { id, name, visibility } = input;
 
       return await updateFolder({
         userId: user.id,
         teamId,
         folderId: id,
         name,
-        requestMetadata: ctx.metadata,
+        visibility,
       });
     }),
 

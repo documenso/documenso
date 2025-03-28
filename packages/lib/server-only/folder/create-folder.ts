@@ -1,4 +1,4 @@
-import type { ApiRequestMetadata } from '@documenso/lib/universal/extract-request-metadata';
+import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import { prisma } from '@documenso/prisma';
 
 export interface CreateFolderOptions {
@@ -6,7 +6,6 @@ export interface CreateFolderOptions {
   teamId?: number;
   name: string;
   parentId?: string | null;
-  requestMetadata?: ApiRequestMetadata;
 }
 
 export const createFolder = async ({
@@ -14,8 +13,37 @@ export const createFolder = async ({
   teamId,
   name,
   parentId = null,
-  requestMetadata,
 }: CreateFolderOptions) => {
+  const user = await prisma.user.findFirstOrThrow({
+    where: {
+      id: userId,
+    },
+    include: {
+      teamMembers: {
+        select: {
+          teamId: true,
+        },
+      },
+    },
+  });
+
+  if (
+    teamId !== undefined &&
+    !user.teamMembers.some((teamMember) => teamMember.teamId === teamId)
+  ) {
+    throw new AppError(AppErrorCode.NOT_FOUND, {
+      message: 'Team not found',
+    });
+  }
+
+  if (teamId) {
+    await prisma.team.findFirstOrThrow({
+      where: {
+        id: teamId,
+      },
+    });
+  }
+
   return await prisma.folder.create({
     data: {
       name,
