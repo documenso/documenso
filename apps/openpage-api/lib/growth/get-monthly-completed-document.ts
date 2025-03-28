@@ -3,6 +3,8 @@ import { DateTime } from 'luxon';
 
 import { kyselyPrisma, sql } from '@documenso/prisma';
 
+import { addZeroMonth } from '../add-zero-month';
+
 export const getCompletedDocumentsMonthly = async (type: 'count' | 'cumulative' = 'count') => {
   const qb = kyselyPrisma.$kysely
     .selectFrom('Document')
@@ -35,7 +37,7 @@ export const getCompletedDocumentsMonthly = async (type: 'count' | 'cumulative' 
     ],
   };
 
-  return transformedData;
+  return addZeroMonth(transformedData);
 };
 
 export type GetCompletedDocumentsMonthlyResult = Awaited<

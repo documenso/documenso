@@ -1,5 +1,7 @@
 import { DateTime } from 'luxon';
 
+import { addZeroMonth } from './add-zero-month';
+
 type MetricKeys = {
   stars: number;
   forks: number;
@@ -37,31 +39,77 @@ export function transformData({
   data: DataEntry;
   metric: MetricKey;
 }): TransformData {
-  const sortedEntries = Object.entries(data).sort(([dateA], [dateB]) => {
-    const [yearA, monthA] = dateA.split('-').map(Number);
-    const [yearB, monthB] = dateB.split('-').map(Number);
+  try {
+    if (!data || Object.keys(data).length === 0) {
+      return {
+        labels: [],
+        datasets: [{ label: `Total ${FRIENDLY_METRIC_NAMES[metric]}`, data: [] }],
+      };
+    }
 
-    return DateTime.local(yearA, monthA).toMillis() - DateTime.local(yearB, monthB).toMillis();
-  });
+    const sortedEntries = Object.entries(data).sort(([dateA], [dateB]) => {
+      try {
+        const [yearA, monthA] = dateA.split('-').map(Number);
+        const [yearB, monthB] = dateB.split('-').map(Number);
 
-  const labels = sortedEntries.map(([date]) => {
-    const [year, month] = date.split('-');
-    const dateTime = DateTime.fromObject({
-      year: Number(year),
-      month: Number(month),
+        if (isNaN(yearA) || isNaN(monthA) || isNaN(yearB) || isNaN(monthB)) {
+          console.warn(`Invalid date format: ${dateA} or ${dateB}`);
+          return 0;
+        }
+
+        return DateTime.local(yearA, monthA).toMillis() - DateTime.local(yearB, monthB).toMillis();
+      } catch (error) {
+        console.error('Error sorting entries:', error);
+        return 0;
+      }
     });
-    return dateTime.toFormat('MMM yyyy');
-  });
 
-  return {
-    labels,
-    datasets: [
-      {
-        label: `Total ${FRIENDLY_METRIC_NAMES[metric]}`,
-        data: sortedEntries.map(([_, stats]) => stats[metric]),
-      },
-    ],
-  };
+    const labels = sortedEntries.map(([date]) => {
+      try {
+        const [year, month] = date.split('-');
+
+        if (!year || !month || isNaN(Number(year)) || isNaN(Number(month))) {
+          console.warn(`Invalid date format: ${date}`);
+          return date;
+        }
+
+        const dateTime = DateTime.fromObject({
+          year: Number(year),
+          month: Number(month),
+        });
+
+        if (!dateTime.isValid) {
+          console.warn(`Invalid DateTime object for: ${date}`);
+          return date;
+        }
+
+        return dateTime.toFormat('MMM yyyy');
+      } catch (error) {
+        console.error('Error formatting date:', error, date);
+        return date;
+      }
+    });
+
+    const transformedData = {
+      labels,
+      datasets: [
+        {
+          label: `Total ${FRIENDLY_METRIC_NAMES[metric]}`,
+          data: sortedEntries.map(([_, stats]) => {
+            const value = stats[metric];
+            return typeof value === 'number' && !isNaN(value) ? value : 0;
+          }),
+        },
+      ],
+    };
+
+    return addZeroMonth(transformedData);
+  } catch (error) {
+    return {
+      labels: [],
+      datasets: [{ label: `Total ${FRIENDLY_METRIC_NAMES[metric]}`, data: [] }],
+    };
+  }
 }
 
 // To be on the safer side
