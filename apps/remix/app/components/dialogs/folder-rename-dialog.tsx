@@ -100,7 +100,6 @@ export const FolderRenameDialog = ({
       });
 
       setFolderToRename(null);
-      form.reset();
       handleOpenChange(false);
     } catch (err) {
       const error = AppError.parseError(err);
