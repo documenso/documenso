@@ -1,5 +1,6 @@
 import { z } from 'zod';
 
+import type { TDocumentVisibility } from '@documenso/lib/types/document-visibility';
 import { DocumentVisibility } from '@documenso/lib/types/document-visibility';
 import { ZFindSearchParamsSchema } from '@documenso/lib/types/search-params';
 
@@ -25,6 +26,7 @@ export const ZFolderSchema = z.object({
   pinned: z.boolean(),
   createdAt: z.date(),
   updatedAt: z.date(),
+  visibility: z.nativeEnum(DocumentVisibility),
 });
 
 // Using explicit type annotation to avoid circular reference issues
@@ -37,6 +39,7 @@ export const ZFolderWithSubfoldersSchema: z.ZodType<{
   pinned: boolean;
   createdAt: Date;
   updatedAt: Date;
+  visibility: TDocumentVisibility;
   subfolders: Array<{
     id: string;
     name: string;
@@ -46,7 +49,8 @@ export const ZFolderWithSubfoldersSchema: z.ZodType<{
     pinned: boolean;
     createdAt: Date;
     updatedAt: Date;
-    subfolders: unknown[]; // Using unknown instead of any to satisfy ESLint
+    visibility: TDocumentVisibility;
+    subfolders: unknown[];
     _count: {
       documents: number;
       subfolders: number;
@@ -63,6 +67,7 @@ export const ZFolderWithSubfoldersSchema: z.ZodType<{
     subfolders: z.number(),
   }),
   pinned: z.boolean(),
+  visibility: z.nativeEnum(DocumentVisibility),
 });
 
 export type TFolderWithSubfolders = z.infer<typeof ZFolderWithSubfoldersSchema>;
