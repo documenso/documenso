@@ -112,8 +112,17 @@ export const documentRouter = router({
     .query(async ({ input, ctx }) => {
       const { user, teamId } = ctx;
 
-      const { query, templateId, page, perPage, orderByDirection, orderByColumn, source, status } =
-        input;
+      const {
+        query,
+        templateId,
+        page,
+        perPage,
+        orderByDirection,
+        orderByColumn,
+        source,
+        status,
+        folderId,
+      } = input;
 
       const documents = await findDocuments({
         userId: user.id,
@@ -124,6 +133,7 @@ export const documentRouter = router({
         status,
         page,
         perPage,
+        folderId,
         orderBy: orderByColumn ? { column: orderByColumn, direction: orderByDirection } : undefined,
       });
 
@@ -152,12 +162,14 @@ export const documentRouter = router({
         status,
         period,
         senderIds,
+        folderId,
       } = input;
 
       const getStatOptions: GetStatsInput = {
         user,
         period,
         search: query,
+        folderId,
       };
 
       if (teamId) {
@@ -186,6 +198,7 @@ export const documentRouter = router({
           status,
           period,
           senderIds,
+          folderId,
           orderBy: orderByColumn
             ? { column: orderByColumn, direction: orderByDirection }
             : undefined,
@@ -316,7 +329,7 @@ export const documentRouter = router({
     .input(ZCreateDocumentRequestSchema)
     .mutation(async ({ input, ctx }) => {
       const { teamId } = ctx;
-      const { title, documentDataId, timezone } = input;
+      const { title, documentDataId, timezone, folderId } = input;
 
       const { remaining } = await getServerLimits({ email: ctx.user.email, teamId });
 
@@ -335,6 +348,7 @@ export const documentRouter = router({
         normalizePdf: true,
         timezone,
         requestMetadata: ctx.metadata,
+        folderId,
       });
     }),
 

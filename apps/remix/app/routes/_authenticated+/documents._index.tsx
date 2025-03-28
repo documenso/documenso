@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 
 import { Trans } from '@lingui/react/macro';
+import { FolderIcon, HomeIcon, Loader2, PinIcon } from 'lucide-react';
 import { useSearchParams } from 'react-router';
 import { Link } from 'react-router';
 import { z } from 'zod';
@@ -14,9 +15,22 @@ import {
   type TFindDocumentsInternalResponse,
   ZFindDocumentsInternalRequestSchema,
 } from '@documenso/trpc/server/document-router/schema';
+import { type TFolderWithSubfolders } from '@documenso/trpc/server/folder-router/schema';
 import { Avatar, AvatarFallback, AvatarImage } from '@documenso/ui/primitives/avatar';
+import { Button } from '@documenso/ui/primitives/button';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@documenso/ui/primitives/dropdown-menu';
 import { Tabs, TabsList, TabsTrigger } from '@documenso/ui/primitives/tabs';
 
+import { DocumentMoveToFolderDialog } from '~/components/dialogs/document-move-to-folder-dialog';
+import { CreateFolderDialog } from '~/components/dialogs/folder-create-dialog';
+import { FolderDeleteDialog } from '~/components/dialogs/folder-delete-dialog';
+import { FolderMoveDialog } from '~/components/dialogs/folder-move-dialog';
+import { FolderSettingsDialog } from '~/components/dialogs/folder-settings-dialog';
 import { DocumentSearch } from '~/components/general/document/document-search';
 import { DocumentStatus } from '~/components/general/document/document-status';
 import { DocumentUploadDropzone } from '~/components/general/document/document-upload';
@@ -39,12 +53,35 @@ const ZSearchParamsSchema = ZFindDocumentsInternalRequestSchema.pick({
   query: true,
 }).extend({
   senderIds: z.string().transform(parseToIntegerArray).optional().catch([]),
+  folderId: z.string().optional(),
 });
 
 export default function DocumentsPage() {
-  const [searchParams] = useSearchParams();
+  const [searchParams, setSearchParams] = useSearchParams();
+  const [isMovingDocument, setIsMovingDocument] = useState(false);
+  const [documentToMove, setDocumentToMove] = useState<number | null>(null);
+  const [isMovingFolder, setIsMovingFolder] = useState(false);
+  const [folderToMove, setFolderToMove] = useState<TFolderWithSubfolders | null>(null);
+  const [isDeletingFolder, setIsDeletingFolder] = useState(false);
+  const [folderToDelete, setFolderToDelete] = useState<TFolderWithSubfolders | null>(null);
+  const [isSettingsFolderOpen, setIsSettingsFolderOpen] = useState(false);
+  const [folderToSettings, setFolderToSettings] = useState<TFolderWithSubfolders | null>(null);
 
   const team = useOptionalCurrentTeam();
+
+  const utils = trpc.useUtils();
+
+  const pinFolder = trpc.folder.pinFolder.useMutation({
+    onSuccess: () => {
+      void utils.folder.getFolders.invalidate();
+    },
+  });
+
+  const unpinFolder = trpc.folder.unpinFolder.useMutation({
+    onSuccess: () => {
+      void utils.folder.getFolders.invalidate();
+    },
+  });
 
   const [stats, setStats] = useState<TFindDocumentsInternalResponse['stats']>({
     [ExtendedDocumentStatus.DRAFT]: 0,
@@ -60,16 +97,26 @@ export default function DocumentsPage() {
     [searchParams],
   );
 
+  const currentFolderId = findDocumentSearchParams.folderId;
+
   const { data, isLoading, isLoadingError, refetch } = trpc.document.findDocumentsInternal.useQuery(
     {
       ...findDocumentSearchParams,
     },
   );
 
-  // Refetch the documents when the team URL changes.
+  const {
+    data: foldersData,
+    isLoading: isFoldersLoading,
+    refetch: refetchFolders,
+  } = trpc.folder.getFolders.useQuery({
+    parentId: currentFolderId,
+  });
+
   useEffect(() => {
     void refetch();
-  }, [team?.url]);
+    void refetchFolders();
+  }, [team?.url, currentFolderId, refetch, refetchFolders]);
 
   const getTabHref = (value: keyof typeof ExtendedDocumentStatus) => {
     const params = new URLSearchParams(searchParams);
@@ -93,9 +140,212 @@ export default function DocumentsPage() {
     }
   }, [data?.stats]);
 
+  const navigateToFolder = (folderId?: string | null) => {
+    const params = new URLSearchParams(searchParams);
+
+    if (folderId) {
+      params.set('folderId', folderId.toString());
+    } else {
+      params.delete('folderId');
+    }
+
+    setSearchParams(params);
+  };
+
+  const breadcrumbs = foldersData?.breadcrumbs || [];
+
   return (
     <div className="mx-auto w-full max-w-screen-xl px-4 md:px-8">
-      <DocumentUploadDropzone />
+      <div className="flex flex-col gap-y-4 pb-8 sm:flex-row sm:gap-x-4">
+        <DocumentUploadDropzone />
+        <CreateFolderDialog />
+      </div>
+
+      <div className="mt-6 flex items-center">
+        <Button
+          variant="ghost"
+          size="sm"
+          className="flex items-center space-x-2 pl-0 hover:bg-transparent"
+          onClick={() => navigateToFolder(null)}
+        >
+          <HomeIcon className="h-4 w-4" />
+          <span>Home</span>
+        </Button>
+
+        {breadcrumbs.map((folder) => (
+          <div key={folder.id} className="flex items-center space-x-2">
+            <span>/</span>
+            <Button
+              variant="ghost"
+              size="sm"
+              className="flex items-center space-x-2 pl-1 hover:bg-transparent"
+              onClick={() => navigateToFolder(folder.id)}
+            >
+              <FolderIcon className="h-4 w-4" />
+              <span>{folder.name}</span>
+            </Button>
+          </div>
+        ))}
+      </div>
+      {isFoldersLoading ? (
+        <div className="mt-6 flex justify-center">
+          <Loader2 className="h-8 w-8 animate-spin text-gray-400" />
+        </div>
+      ) : (
+        <>
+          {foldersData?.folders && foldersData.folders.some((folder) => folder.pinned) && (
+            <div className="mt-6">
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
+                {foldersData.folders
+                  .filter((folder) => folder.pinned)
+                  .map((folder) => (
+                    <div
+                      key={folder.id}
+                      className="border-border hover:border-muted-foreground/40 group relative flex flex-col rounded-lg border p-4 transition-all hover:shadow-sm"
+                    >
+                      <div className="flex items-start justify-between">
+                        <button
+                          className="flex items-center space-x-2 text-left"
+                          onClick={() => navigateToFolder(folder.id)}
+                        >
+                          <FolderIcon className="text-documenso h-6 w-6" />
+                          <div>
+                            <div className="flex items-center gap-2">
+                              <h3 className="font-medium">{folder.name}</h3>
+                              <PinIcon className="text-documenso h-3 w-3" />
+                            </div>
+                            <div className="mt-1 flex space-x-2 text-xs text-gray-500">
+                              <span>{folder._count.documents} documents</span>
+                              <span>•</span>
+                              <span>{folder._count.subfolders} folders</span>
+                            </div>
+                          </div>
+                        </button>
+
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              className="opacity-0 group-hover:opacity-100"
+                            >
+                              •••
+                            </Button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent align="end">
+                            <DropdownMenuItem
+                              onClick={() => {
+                                setFolderToMove(folder);
+                                setIsMovingFolder(true);
+                              }}
+                            >
+                              Move
+                            </DropdownMenuItem>
+                            <DropdownMenuItem
+                              onClick={() => {
+                                void unpinFolder.mutateAsync({ folderId: folder.id });
+                              }}
+                            >
+                              Unpin
+                            </DropdownMenuItem>
+                            <DropdownMenuItem
+                              onClick={() => {
+                                setFolderToSettings(folder);
+                                setIsSettingsFolderOpen(true);
+                              }}
+                            >
+                              Settings
+                            </DropdownMenuItem>
+                            <DropdownMenuItem
+                              className="text-red-500"
+                              onClick={() => {
+                                setFolderToDelete(folder);
+                                setIsDeletingFolder(true);
+                              }}
+                            >
+                              Delete
+                            </DropdownMenuItem>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                      </div>
+                    </div>
+                  ))}
+              </div>
+            </div>
+          )}
+
+          <div className="mt-6">
+            <h3 className="text-muted-background/60 dark:text-muted-foreground/60 mb-4 text-sm font-medium">
+              Folders
+            </h3>
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
+              {foldersData?.folders
+                .filter((folder) => !folder.pinned)
+                .map((folder) => (
+                  <div
+                    key={folder.id}
+                    className="border-border hover:border-muted-foreground/40 group relative flex flex-col rounded-lg border p-4 transition-all hover:shadow-sm"
+                  >
+                    <div className="flex items-start justify-between">
+                      <button
+                        className="flex items-center space-x-2 text-left"
+                        onClick={() => navigateToFolder(folder.id)}
+                      >
+                        <FolderIcon className="text-documenso h-6 w-6" />
+                        <div>
+                          <h3 className="font-medium">{folder.name}</h3>
+                          <div className="mt-1 flex space-x-2 text-xs text-gray-500">
+                            <span>{folder._count.documents} documents</span>
+                            <span>•</span>
+                            <span>{folder._count.subfolders} folders</span>
+                          </div>
+                        </div>
+                      </button>
+
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            className="opacity-0 group-hover:opacity-100"
+                          >
+                            •••
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end">
+                          <DropdownMenuItem
+                            onClick={() => {
+                              setFolderToMove(folder);
+                              setIsMovingFolder(true);
+                            }}
+                          >
+                            Move
+                          </DropdownMenuItem>
+                          <DropdownMenuItem
+                            onClick={() => {
+                              void pinFolder.mutateAsync({ folderId: folder.id });
+                            }}
+                          >
+                            Pin
+                          </DropdownMenuItem>
+                          <DropdownMenuItem
+                            className="text-red-500"
+                            onClick={() => {
+                              setFolderToDelete(folder);
+                              setIsDeletingFolder(true);
+                            }}
+                          >
+                            Delete
+                          </DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    </div>
+                  </div>
+                ))}
+            </div>
+          </div>
+        </>
+      )}
 
       <div className="mt-12 flex flex-wrap items-center justify-between gap-x-4 gap-y-8">
         <div className="flex flex-row items-center">
@@ -108,9 +358,9 @@ export default function DocumentsPage() {
             </Avatar>
           )}
 
-          <h1 className="text-4xl font-semibold">
+          <h2 className="text-4xl font-semibold">
             <Trans>Documents</Trans>
-          </h1>
+          </h2>
         </div>
 
         <div className="-m-1 flex flex-wrap gap-x-4 gap-y-6 overflow-hidden p-1">
@@ -154,15 +404,77 @@ export default function DocumentsPage() {
 
       <div className="mt-8">
         <div>
-          {data && data.count === 0 ? (
+          {data &&
+          data.count === 0 &&
+          (!foldersData?.folders.length || foldersData.folders.length === 0) ? (
             <DocumentsTableEmptyState
               status={findDocumentSearchParams.status || ExtendedDocumentStatus.ALL}
             />
           ) : (
-            <DocumentsTable data={data} isLoading={isLoading} isLoadingError={isLoadingError} />
+            <DocumentsTable
+              data={data}
+              isLoading={isLoading}
+              isLoadingError={isLoadingError}
+              onMoveDocument={(documentId) => {
+                setDocumentToMove(documentId);
+                setIsMovingDocument(true);
+              }}
+            />
           )}
         </div>
       </div>
+
+      {documentToMove && (
+        <DocumentMoveToFolderDialog
+          documentId={documentToMove}
+          open={isMovingDocument}
+          onOpenChange={(open) => {
+            setIsMovingDocument(open);
+
+            if (!open) {
+              setDocumentToMove(null);
+            }
+          }}
+          currentFolderId={currentFolderId}
+        />
+      )}
+
+      <FolderMoveDialog
+        foldersData={foldersData?.folders}
+        folder={folderToMove}
+        isOpen={isMovingFolder}
+        onOpenChange={(open) => {
+          setIsMovingFolder(open);
+
+          if (!open) {
+            setFolderToMove(null);
+          }
+        }}
+      />
+
+      <FolderSettingsDialog
+        folder={folderToSettings}
+        isOpen={isSettingsFolderOpen}
+        onOpenChange={(open) => {
+          setIsSettingsFolderOpen(open);
+
+          if (!open) {
+            setFolderToSettings(null);
+          }
+        }}
+      />
+
+      <FolderDeleteDialog
+        folder={folderToDelete}
+        isOpen={isDeletingFolder}
+        onOpenChange={(open) => {
+          setIsDeletingFolder(open);
+
+          if (!open) {
+            setFolderToDelete(null);
+          }
+        }}
+      />
     </div>
   );
 }

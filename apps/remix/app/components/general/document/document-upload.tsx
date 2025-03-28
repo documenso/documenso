@@ -4,7 +4,7 @@ import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
 import { Trans } from '@lingui/react/macro';
 import { Loader } from 'lucide-react';
-import { useNavigate } from 'react-router';
+import { useNavigate, useSearchParams } from 'react-router';
 import { match } from 'ts-pattern';
 
 import { useLimits } from '@documenso/ee/server-only/limits/provider/client';
@@ -17,7 +17,7 @@ import { putPdfFile } from '@documenso/lib/universal/upload/put-file';
 import { formatDocumentsPath } from '@documenso/lib/utils/teams';
 import { trpc } from '@documenso/trpc/react';
 import { cn } from '@documenso/ui/lib/utils';
-import { DocumentDropzone } from '@documenso/ui/primitives/document-dropzone';
+import { DocumentDropzone } from '@documenso/ui/primitives/document-upload';
 import { useToast } from '@documenso/ui/primitives/use-toast';
 
 import { useOptionalCurrentTeam } from '~/providers/team';
@@ -30,6 +30,8 @@ export const DocumentUploadDropzone = ({ className }: DocumentUploadDropzoneProp
   const { _ } = useLingui();
   const { toast } = useToast();
   const { user } = useSession();
+  const [searchParams] = useSearchParams();
+  const folderId = searchParams.get('folderId');
 
   const team = useOptionalCurrentTeam();
 
@@ -69,6 +71,7 @@ export const DocumentUploadDropzone = ({ className }: DocumentUploadDropzoneProp
         title: file.name,
         documentDataId: response.id,
         timezone: userTimezone,
+        folderId: folderId ?? undefined,
       });
 
       void refreshLimits();
@@ -121,8 +124,15 @@ export const DocumentUploadDropzone = ({ className }: DocumentUploadDropzoneProp
 
   return (
     <div className={cn('relative', className)}>
-      <DocumentDropzone
+      {/* <DocumentDropzone
         className="h-[min(400px,50vh)]"
+        disabled={remaining.documents === 0 || !user.emailVerified}
+        disabledMessage={disabledMessage}
+        onDrop={onFileDrop}
+        onDropRejected={onFileDropRejected}
+      /> */}
+
+      <DocumentDropzone
         disabled={remaining.documents === 0 || !user.emailVerified}
         disabledMessage={disabledMessage}
         onDrop={onFileDrop}
