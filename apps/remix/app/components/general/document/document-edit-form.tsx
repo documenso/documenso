@@ -5,6 +5,7 @@ import { useLingui } from '@lingui/react';
 import { DocumentDistributionMethod, DocumentStatus } from '@prisma/client';
 import { useNavigate, useSearchParams } from 'react-router';
 
+import { DocumentSignatureType } from '@documenso/lib/constants/document';
 import { isValidLanguageCode } from '@documenso/lib/constants/i18n';
 import {
   DO_NOT_INVALIDATE_QUERY_ON_MUTATION,
@@ -71,7 +72,7 @@ export const DocumentEditForm = ({
 
   const { recipients, fields } = document;
 
-  const { mutateAsync: updateDocument } = trpc.document.setSettingsForDocument.useMutation({
+  const { mutateAsync: updateDocument } = trpc.document.updateDocument.useMutation({
     ...DO_NOT_INVALIDATE_QUERY_ON_MUTATION,
     onSuccess: (newData) => {
       utils.document.getDocumentWithDetailsById.setData(
@@ -174,7 +175,7 @@ export const DocumentEditForm = ({
 
   const onAddSettingsFormSubmit = async (data: TAddSettingsFormSchema) => {
     try {
-      const { timezone, dateFormat, redirectUrl, language } = data.meta;
+      const { timezone, dateFormat, redirectUrl, language, signatureTypes } = data.meta;
 
       await updateDocument({
         documentId: document.id,
@@ -190,6 +191,9 @@ export const DocumentEditForm = ({
           dateFormat,
           redirectUrl,
           language: isValidLanguageCode(language) ? language : undefined,
+          typedSignatureEnabled: signatureTypes.includes(DocumentSignatureType.TYPE),
+          uploadSignatureEnabled: signatureTypes.includes(DocumentSignatureType.UPLOAD),
+          drawSignatureEnabled: signatureTypes.includes(DocumentSignatureType.DRAW),
         },
       });
 
@@ -211,6 +215,13 @@ export const DocumentEditForm = ({
         setSigningOrderForDocument({
           documentId: document.id,
           signingOrder: data.signingOrder,
+        }),
+
+        updateDocument({
+          documentId: document.id,
+          meta: {
+            allowDictateNextSigner: data.allowDictateNextSigner,
+          },
         }),
 
         setRecipients({
@@ -240,14 +251,6 @@ export const DocumentEditForm = ({
       await addFields({
         documentId: document.id,
         fields: data.fields,
-      });
-
-      await updateDocument({
-        documentId: document.id,
-
-        meta: {
-          typedSignatureEnabled: data.typedSignatureEnabled,
-        },
       });
 
       // Clear all field data from localStorage
@@ -365,6 +368,7 @@ export const DocumentEditForm = ({
               documentFlow={documentFlow.signers}
               recipients={recipients}
               signingOrder={document.documentMeta?.signingOrder}
+              allowDictateNextSigner={document.documentMeta?.allowDictateNextSigner}
               fields={fields}
               isDocumentEnterprise={isDocumentEnterprise}
               onSubmit={onAddSignersFormSubmit}
@@ -378,7 +382,6 @@ export const DocumentEditForm = ({
               fields={fields}
               onSubmit={onAddFieldsFormSubmit}
               isDocumentPdfLoaded={isDocumentPdfLoaded}
-              typedSignatureEnabled={document.documentMeta?.typedSignatureEnabled}
               teamId={team?.id}
             />
 

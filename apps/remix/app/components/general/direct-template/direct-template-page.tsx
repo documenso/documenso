@@ -113,7 +113,11 @@ export const DirectTemplatePageView = ({
 
       const redirectUrl = template.templateMeta?.redirectUrl;
 
-      await (redirectUrl ? navigate(redirectUrl) : navigate(`/sign/${token}/complete`));
+      if (redirectUrl) {
+        window.location.href = redirectUrl;
+      } else {
+        await navigate(`/sign/${token}/complete`);
+      }
     } catch (err) {
       toast({
         title: _(msg`Something went wrong`),

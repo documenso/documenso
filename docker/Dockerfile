@@ -33,7 +33,7 @@ FROM base AS installer
 RUN apk add --no-cache libc6-compat
 RUN apk add --no-cache jq
 # Required for node_modules/aws-crt
-RUN apk add --no-cache make cmake g++ openssl
+RUN apk add --no-cache make cmake g++ openssl bash
 
 WORKDIR /app
 

@@ -1,4 +1,4 @@
-import { DocumentDataType, DocumentStatus } from '@prisma/client';
+import { DocumentDataType } from '@prisma/client';
 import { TRPCError } from '@trpc/server';
 import { DateTime } from 'luxon';
 
@@ -26,6 +26,7 @@ import { sendDocument } from '@documenso/lib/server-only/document/send-document'
 import { updateDocument } from '@documenso/lib/server-only/document/update-document';
 import { getTeamById } from '@documenso/lib/server-only/team/get-team';
 import { getPresignPostUrl } from '@documenso/lib/universal/upload/server-actions';
+import { isDocumentCompleted } from '@documenso/lib/utils/document';
 
 import { authenticatedProcedure, procedure, router } from '../trpc';
 import {
@@ -55,9 +56,12 @@ import {
   ZSearchDocumentsMutationSchema,
   ZSetSigningOrderForDocumentMutationSchema,
   ZSuccessResponseSchema,
+} from './schema';
+import { updateDocumentRoute } from './update-document';
+import {
   ZUpdateDocumentRequestSchema,
   ZUpdateDocumentResponseSchema,
-} from './schema';
+} from './update-document.types';
 
 export const documentRouter = router({
   /**
@@ -334,20 +338,12 @@ export const documentRouter = router({
       });
     }),
 
+  updateDocument: updateDocumentRoute,
+
   /**
-   * @public
-   *
-   * Todo: Refactor to updateDocument.
+   * @deprecated Delete this after updateDocument endpoint is deployed
    */
   setSettingsForDocument: authenticatedProcedure
-    .meta({
-      openapi: {
-        method: 'POST',
-        path: '/document/update',
-        summary: 'Update document',
-        tags: ['Document'],
-      },
-    })
     .input(ZUpdateDocumentRequestSchema)
     .output(ZUpdateDocumentResponseSchema)
     .mutation(async ({ input, ctx }) => {
@@ -367,9 +363,12 @@ export const documentRouter = router({
           dateFormat: meta.dateFormat,
           language: meta.language,
           typedSignatureEnabled: meta.typedSignatureEnabled,
+          uploadSignatureEnabled: meta.uploadSignatureEnabled,
+          drawSignatureEnabled: meta.drawSignatureEnabled,
           redirectUrl: meta.redirectUrl,
           distributionMethod: meta.distributionMethod,
           signingOrder: meta.signingOrder,
+          allowDictateNextSigner: meta.allowDictateNextSigner,
           emailSettings: meta.emailSettings,
           requestMetadata: ctx.metadata,
         });
@@ -659,7 +658,7 @@ export const documentRouter = router({
         teamId,
       });
 
-      if (document.status !== DocumentStatus.COMPLETED) {
+      if (!isDocumentCompleted(document.status)) {
         throw new AppError('DOCUMENT_NOT_COMPLETE');
       }
 

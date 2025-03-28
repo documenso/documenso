@@ -3,7 +3,7 @@ import type { HTMLAttributes } from 'react';
 import type { MessageDescriptor } from '@lingui/core';
 import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
-import { CheckCircle2, Clock, File } from 'lucide-react';
+import { CheckCircle2, Clock, File, XCircle } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react/dist/lucide-react';
 
 import type { ExtendedDocumentStatus } from '@documenso/prisma/types/extended-document-status';
@@ -35,6 +35,12 @@ export const FRIENDLY_STATUS_MAP: Record<ExtendedDocumentStatus, FriendlyStatus>
     labelExtended: msg`Document draft`,
     icon: File,
     color: 'text-yellow-500 dark:text-yellow-200',
+  },
+  REJECTED: {
+    label: msg`Rejected`,
+    labelExtended: msg`Document rejected`,
+    icon: XCircle,
+    color: 'text-red-500 dark:text-red-300',
   },
   INBOX: {
     label: msg`Inbox`,

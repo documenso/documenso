@@ -1,11 +1,12 @@
 import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
-import { FieldType } from '@prisma/client';
+import { FieldType, SigningStatus } from '@prisma/client';
 import { DateTime } from 'luxon';
 import { redirect } from 'react-router';
 import { match } from 'ts-pattern';
 import { UAParser } from 'ua-parser-js';
 
+import { isDocumentPlatform } from '@documenso/ee/server-only/util/is-document-platform';
 import { APP_I18N_OPTIONS, ZSupportedLanguageCodeSchema } from '@documenso/lib/constants/i18n';
 import {
   RECIPIENT_ROLES_DESCRIPTION,
@@ -59,6 +60,8 @@ export async function loader({ request }: Route.LoaderArgs) {
     throw redirect('/');
   }
 
+  const isPlatformDocument = await isDocumentPlatform(document);
+
   const documentLanguage = ZSupportedLanguageCodeSchema.parse(document.documentMeta?.language);
 
   const auditLogs = await getDocumentCertificateAuditLogs({
@@ -70,6 +73,7 @@ export async function loader({ request }: Route.LoaderArgs) {
   return {
     document,
     documentLanguage,
+    isPlatformDocument,
     auditLogs,
     messages,
   };
@@ -85,7 +89,7 @@ export async function loader({ request }: Route.LoaderArgs) {
  * Update: Maybe <Trans> tags work now after RR7 migration.
  */
 export default function SigningCertificate({ loaderData }: Route.ComponentProps) {
-  const { document, documentLanguage, auditLogs, messages } = loaderData;
+  const { document, documentLanguage, isPlatformDocument, auditLogs, messages } = loaderData;
 
   const { i18n, _ } = useLingui();
 
@@ -157,6 +161,13 @@ export default function SigningCertificate({ loaderData }: Route.ComponentProps)
       ].filter(
         (log) =>
           log.type === DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_RECIPIENT_COMPLETED &&
+          log.data.recipientId === recipientId,
+      ),
+      [DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_RECIPIENT_REJECTED]: auditLogs[
+        DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_RECIPIENT_REJECTED
+      ].filter(
+        (log) =>
+          log.type === DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_RECIPIENT_REJECTED &&
           log.data.recipientId === recipientId,
       ),
     };
@@ -282,25 +293,42 @@ export default function SigningCertificate({ loaderData }: Route.ComponentProps)
                           </span>
                         </p>
 
-                        <p className="text-muted-foreground text-sm print:text-xs">
-                          <span className="font-medium">{_(msg`Signed`)}:</span>{' '}
-                          <span className="inline-block">
-                            {logs.DOCUMENT_RECIPIENT_COMPLETED[0]
-                              ? DateTime.fromJSDate(logs.DOCUMENT_RECIPIENT_COMPLETED[0].createdAt)
-                                  .setLocale(APP_I18N_OPTIONS.defaultLocale)
-                                  .toFormat('yyyy-MM-dd hh:mm:ss a (ZZZZ)')
-                              : _(msg`Unknown`)}
-                          </span>
-                        </p>
+                        {logs.DOCUMENT_RECIPIENT_REJECTED[0] ? (
+                          <p className="text-muted-foreground text-sm print:text-xs">
+                            <span className="font-medium">{_(msg`Rejected`)}:</span>{' '}
+                            <span className="inline-block">
+                              {logs.DOCUMENT_RECIPIENT_REJECTED[0]
+                                ? DateTime.fromJSDate(logs.DOCUMENT_RECIPIENT_REJECTED[0].createdAt)
+                                    .setLocale(APP_I18N_OPTIONS.defaultLocale)
+                                    .toFormat('yyyy-MM-dd hh:mm:ss a (ZZZZ)')
+                                : _(msg`Unknown`)}
+                            </span>
+                          </p>
+                        ) : (
+                          <p className="text-muted-foreground text-sm print:text-xs">
+                            <span className="font-medium">{_(msg`Signed`)}:</span>{' '}
+                            <span className="inline-block">
+                              {logs.DOCUMENT_RECIPIENT_COMPLETED[0]
+                                ? DateTime.fromJSDate(
+                                    logs.DOCUMENT_RECIPIENT_COMPLETED[0].createdAt,
+                                  )
+                                    .setLocale(APP_I18N_OPTIONS.defaultLocale)
+                                    .toFormat('yyyy-MM-dd hh:mm:ss a (ZZZZ)')
+                                : _(msg`Unknown`)}
+                            </span>
+                          </p>
+                        )}
 
                         <p className="text-muted-foreground text-sm print:text-xs">
                           <span className="font-medium">{_(msg`Reason`)}:</span>{' '}
                           <span className="inline-block">
-                            {_(
-                              isOwner(recipient.email)
-                                ? FRIENDLY_SIGNING_REASONS['__OWNER__']
-                                : FRIENDLY_SIGNING_REASONS[recipient.role],
-                            )}
+                            {recipient.signingStatus === SigningStatus.REJECTED
+                              ? recipient.rejectionReason
+                              : _(
+                                  isOwner(recipient.email)
+                                    ? FRIENDLY_SIGNING_REASONS['__OWNER__']
+                                    : FRIENDLY_SIGNING_REASONS[recipient.role],
+                                )}
                           </span>
                         </p>
                       </div>
@@ -313,15 +341,17 @@ export default function SigningCertificate({ loaderData }: Route.ComponentProps)
         </CardContent>
       </Card>
 
-      <div className="my-8 flex-row-reverse">
-        <div className="flex items-end justify-end gap-x-4">
-          <p className="flex-shrink-0 text-sm font-medium print:text-xs">
-            {_(msg`Signing certificate provided by`)}:
-          </p>
+      {isPlatformDocument && (
+        <div className="my-8 flex-row-reverse">
+          <div className="flex items-end justify-end gap-x-4">
+            <p className="flex-shrink-0 text-sm font-medium print:text-xs">
+              {_(msg`Signing certificate provided by`)}:
+            </p>
 
-          <BrandingLogo className="max-h-6 print:max-h-4" />
+            <BrandingLogo className="max-h-6 print:max-h-4" />
+          </div>
         </div>
-      </div>
+      )}
     </div>
   );
 }

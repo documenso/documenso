@@ -9,6 +9,7 @@ import { match } from 'ts-pattern';
 
 import { downloadPDF } from '@documenso/lib/client-only/download-pdf';
 import { useSession } from '@documenso/lib/client-only/providers/session';
+import { isDocumentCompleted } from '@documenso/lib/utils/document';
 import { formatDocumentsPath } from '@documenso/lib/utils/teams';
 import { trpc as trpcClient } from '@documenso/trpc/client';
 import { Button } from '@documenso/ui/primitives/button';
@@ -37,7 +38,7 @@ export const DocumentsTableActionButton = ({ row }: DocumentsTableActionButtonPr
   const isRecipient = !!recipient;
   const isDraft = row.status === DocumentStatus.DRAFT;
   const isPending = row.status === DocumentStatus.PENDING;
-  const isComplete = row.status === DocumentStatus.COMPLETED;
+  const isComplete = isDocumentCompleted(row.status);
   const isSigned = recipient?.signingStatus === SigningStatus.SIGNED;
   const role = recipient?.role;
   const isCurrentTeamDocument = team && row.team?.url === team.url;

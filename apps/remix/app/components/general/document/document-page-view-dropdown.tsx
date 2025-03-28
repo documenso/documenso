@@ -20,6 +20,7 @@ import { useNavigate } from 'react-router';
 
 import { downloadPDF } from '@documenso/lib/client-only/download-pdf';
 import { useSession } from '@documenso/lib/client-only/providers/session';
+import { isDocumentCompleted } from '@documenso/lib/utils/document';
 import { formatDocumentsPath } from '@documenso/lib/utils/teams';
 import { trpc as trpcClient } from '@documenso/trpc/client';
 import { DocumentShareButton } from '@documenso/ui/components/document/document-share-button';
@@ -63,7 +64,7 @@ export const DocumentPageViewDropdown = ({ document }: DocumentPageViewDropdownP
   const isDraft = document.status === DocumentStatus.DRAFT;
   const isPending = document.status === DocumentStatus.PENDING;
   const isDeleted = document.deletedAt !== null;
-  const isComplete = document.status === DocumentStatus.COMPLETED;
+  const isComplete = isDocumentCompleted(document);
   const isCurrentTeamDocument = team && document.team?.url === team.url;
   const canManageDocument = Boolean(isOwner || isCurrentTeamDocument);
 
