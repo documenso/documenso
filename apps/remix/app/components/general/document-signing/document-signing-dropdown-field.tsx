@@ -177,15 +177,11 @@ export const DocumentSigningDropdownField = ({
         )}
 
         {!field.inserted && (
-          <p className="group-hover:text-primary text-muted-foreground flex flex-col items-center justify-center duration-200">
+          <p className="group-hover:text-primary text-foreground flex flex-col items-center justify-center duration-200">
             <Select value={localChoice} onValueChange={handleSelectItem}>
               <SelectTrigger
                 className={cn(
-                  'text-muted-foreground z-10 h-full w-full border-none ring-0 focus:ring-0',
-                  {
-                    'hover:text-red-300': parsedFieldMeta.required,
-                    'hover:text-yellow-300': !parsedFieldMeta.required,
-                  },
+                  'text-foreground z-10 h-full w-full border-none ring-0 focus:border-none focus:ring-0',
                 )}
               >
                 <SelectValue
@@ -205,7 +201,7 @@ export const DocumentSigningDropdownField = ({
         )}
 
         {field.inserted && (
-          <p className="text-muted-foreground dark:text-background/80 text-[clamp(0.425rem,25cqw,0.825rem)] duration-200">
+          <p className="text-foreground text-[clamp(0.425rem,25cqw,0.825rem)] duration-200">
             {field.customText}
           </p>
         )}

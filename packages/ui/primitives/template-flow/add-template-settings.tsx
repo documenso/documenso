@@ -50,6 +50,10 @@ import {
 } from '@documenso/ui/primitives/form/form';
 
 import { DocumentEmailCheckboxes } from '../../components/document/document-email-checkboxes';
+import {
+  DocumentReadOnlyFields,
+  mapFieldsWithRecipients,
+} from '../../components/document/document-read-only-fields';
 import { DocumentSignatureSettingsTooltip } from '../../components/document/document-signature-settings-tooltip';
 import { Combobox } from '../combobox';
 import {
@@ -59,7 +63,6 @@ import {
   DocumentFlowFormContainerHeader,
   DocumentFlowFormContainerStep,
 } from '../document-flow/document-flow-root';
-import { ShowFieldItem } from '../document-flow/show-field-item';
 import type { DocumentFlowStep } from '../document-flow/types';
 import { Input } from '../input';
 import { MultiSelectCombobox } from '../multi-select-combobox';
@@ -153,10 +156,13 @@ export const AddTemplateSettingsFormPartial = ({
       />
 
       <DocumentFlowFormContainerContent>
-        {isDocumentPdfLoaded &&
-          fields.map((field, index) => (
-            <ShowFieldItem key={index} field={field} recipients={recipients} />
-          ))}
+        {isDocumentPdfLoaded && (
+          <DocumentReadOnlyFields
+            showRecipientColors={true}
+            recipientIds={recipients.map((recipient) => recipient.id)}
+            fields={mapFieldsWithRecipients(fields, recipients)}
+          />
+        )}
 
         <Form {...form}>
           <fieldset

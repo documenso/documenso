@@ -25,6 +25,10 @@ import { FormErrorMessage } from '@documenso/ui/primitives/form/form-error-messa
 import { Input } from '@documenso/ui/primitives/input';
 import { toast } from '@documenso/ui/primitives/use-toast';
 
+import {
+  DocumentReadOnlyFields,
+  mapFieldsWithRecipients,
+} from '../../components/document/document-read-only-fields';
 import { Checkbox } from '../checkbox';
 import {
   DocumentFlowFormContainerActions,
@@ -33,7 +37,6 @@ import {
   DocumentFlowFormContainerHeader,
   DocumentFlowFormContainerStep,
 } from '../document-flow/document-flow-root';
-import { ShowFieldItem } from '../document-flow/show-field-item';
 import { SigningOrderConfirmation } from '../document-flow/signing-order-confirmation';
 import type { DocumentFlowStep } from '../document-flow/types';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '../form/form';
@@ -391,10 +394,13 @@ export const AddTemplatePlaceholderRecipientsFormPartial = ({
         description={documentFlow.description}
       />
       <DocumentFlowFormContainerContent>
-        {isDocumentPdfLoaded &&
-          fields.map((field, index) => (
-            <ShowFieldItem key={index} field={field} recipients={recipients} />
-          ))}
+        {isDocumentPdfLoaded && (
+          <DocumentReadOnlyFields
+            showRecipientColors={true}
+            recipientIds={recipients.map((recipient) => recipient.id)}
+            fields={mapFieldsWithRecipients(fields, recipients)}
+          />
+        )}
 
         <AnimateGenericFadeInOut motionKey={showAdvancedSettings ? 'Show' : 'Hide'}>
           <Form {...form}>
@@ -500,6 +506,7 @@ export const AddTemplatePlaceholderRecipientsFormPartial = ({
                     ref={provided.innerRef}
                     className="flex w-full flex-col gap-y-2"
                   >
+                    {/* todo */}
                     {signers.map((signer, index) => (
                       <Draggable
                         key={`${signer.id}-${signer.signingOrder}`}

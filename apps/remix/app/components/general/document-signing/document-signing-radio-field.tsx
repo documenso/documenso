@@ -2,7 +2,6 @@ import { useEffect, useState } from 'react';
 
 import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
-import { Loader } from 'lucide-react';
 import { useRevalidator } from 'react-router';
 
 import { DO_NOT_INVALIDATE_QUERY_ON_MUTATION } from '@documenso/lib/constants/trpc';
@@ -21,6 +20,7 @@ import { useToast } from '@documenso/ui/primitives/use-toast';
 
 import { useRequiredDocumentSigningAuthContext } from './document-signing-auth-provider';
 import { DocumentSigningFieldContainer } from './document-signing-field-container';
+import { DocumentSigningFieldsLoader } from './document-signing-fields';
 import { useDocumentSigningRecipientContext } from './document-signing-recipient-provider';
 
 export type DocumentSigningRadioFieldProps = {
@@ -150,44 +150,52 @@ export const DocumentSigningRadioField = ({
 
   return (
     <DocumentSigningFieldContainer field={field} onSign={onSign} onRemove={onRemove} type="Radio">
-      {isLoading && (
-        <div className="bg-background absolute inset-0 z-20 flex items-center justify-center rounded-md">
-          <Loader className="text-primary h-5 w-5 animate-spin md:h-8 md:w-8" />
-        </div>
-      )}
+      {isLoading && <DocumentSigningFieldsLoader />}
 
       {!field.inserted && (
-        <RadioGroup onValueChange={(value) => handleSelectItem(value)} className="z-10">
+        <RadioGroup
+          onValueChange={(value) => handleSelectItem(value)}
+          className="z-10 my-0.5 gap-y-1"
+        >
           {values?.map((item, index) => (
-            <div key={index} className="flex items-center gap-x-1.5">
+            <div key={index} className="flex items-center">
               <RadioGroupItem
-                className="h-4 w-4 shrink-0"
+                className="h-3 w-3 shrink-0"
                 value={item.value}
-                id={`option-${index}`}
+                id={`option-${field.id}-${item.id}`}
                 checked={item.checked}
               />
-
-              <Label htmlFor={`option-${index}`}>
-                {item.value.includes('empty-value-') ? '' : item.value}
-              </Label>
+              {!item.value.includes('empty-value-') && item.value && (
+                <Label
+                  htmlFor={`option-${field.id}-${item.id}`}
+                  className="text-foreground ml-1.5 text-xs font-normal"
+                >
+                  {item.value}
+                </Label>
+              )}
             </div>
           ))}
         </RadioGroup>
       )}
 
       {field.inserted && (
-        <RadioGroup className="gap-y-1">
+        <RadioGroup className="my-0.5 gap-y-1">
           {values?.map((item, index) => (
-            <div key={index} className="flex items-center gap-x-1.5">
+            <div key={index} className="flex items-center">
               <RadioGroupItem
                 className="h-3 w-3"
                 value={item.value}
-                id={`option-${index}`}
+                id={`option-${field.id}-${item.id}`}
                 checked={item.value === field.customText}
               />
-              <Label htmlFor={`option-${index}`} className="text-xs">
-                {item.value.includes('empty-value-') ? '' : item.value}
-              </Label>
+              {!item.value.includes('empty-value-') && item.value && (
+                <Label
+                  htmlFor={`option-${field.id}-${item.id}`}
+                  className="text-foreground ml-1.5 text-xs font-normal"
+                >
+                  {item.value}
+                </Label>
+              )}
             </div>
           ))}
         </RadioGroup>

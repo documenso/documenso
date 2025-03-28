@@ -12,7 +12,12 @@ export const ElementVisible = ({ target, children }: ElementVisibleProps) => {
     const observer = new MutationObserver((_mutations) => {
       const $el = document.querySelector(target);
 
-      setVisible(!!$el);
+      // Wait a fraction of a second to allow the scrollbar to load if it exists.
+      // If we don't wait, then the elements on the first page will be
+      // shifted across.
+      setTimeout(() => {
+        setVisible(!!$el);
+      }, 100);
     });
 
     observer.observe(document.body, {

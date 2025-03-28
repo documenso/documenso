@@ -242,7 +242,7 @@ export const DocumentSigningSignatureField = ({
       )}
 
       {state === 'empty' && (
-        <p className="group-hover:text-primary font-signature text-muted-foreground text-[clamp(0.575rem,25cqw,1.2rem)] text-xl duration-200 group-hover:text-yellow-300">
+        <p className="group-hover:text-primary font-signature text-muted-foreground group-hover:text-recipient-green text-[clamp(0.575rem,25cqw,1.2rem)] text-xl duration-200">
           <Trans>Signature</Trans>
         </p>
       )}
@@ -259,7 +259,7 @@ export const DocumentSigningSignatureField = ({
         <div ref={containerRef} className="flex h-full w-full items-center justify-center p-2">
           <p
             ref={signatureRef}
-            className="font-signature text-muted-foreground dark:text-background w-full overflow-hidden break-all text-center leading-tight duration-200"
+            className="font-signature text-muted-foreground w-full overflow-hidden break-all text-center leading-tight duration-200"
             style={{ fontSize: `${fontSize}rem` }}
           >
             {signature?.typedSignature}
@@ -291,7 +291,7 @@ export const DocumentSigningSignatureField = ({
             <div className="flex w-full flex-1 flex-nowrap gap-4">
               <Button
                 type="button"
-                className="dark:bg-muted dark:hover:bg-muted/80 flex-1 bg-black/5 hover:bg-black/10"
+                className="flex-1"
                 variant="secondary"
                 onClick={() => {
                   setShowSignatureModal(false);

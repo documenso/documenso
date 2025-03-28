@@ -97,6 +97,12 @@ export const DocumentSigningCheckboxField = ({
 
   const onSign = async (authOptions?: TRecipientActionAuth) => {
     try {
+      // Do nothing, this should only happen when the user clicks the field, but
+      // misses the checkbox which triggers this callback.
+      if (checkedValues.length === 0) {
+        return;
+      }
+
       if (!isLengthConditionMet) {
         return;
       }
@@ -270,21 +276,26 @@ export const DocumentSigningCheckboxField = ({
               {validationSign?.label} {checkboxValidationLength}
             </FieldToolTip>
           )}
-          <div className="z-50 flex flex-col gap-y-2">
+          <div className="z-50 my-0.5 flex flex-col gap-y-1">
             {values?.map((item: { id: number; value: string; checked: boolean }, index: number) => {
               const itemValue = item.value || `empty-value-${item.id}`;
 
               return (
-                <div key={index} className="flex items-center gap-x-1.5">
+                <div key={index} className="flex items-center">
                   <Checkbox
-                    className="h-4 w-4"
-                    id={`checkbox-${index}`}
+                    className="h-3 w-3"
+                    id={`checkbox-${field.id}-${item.id}`}
                     checked={checkedValues.includes(itemValue)}
                     onCheckedChange={() => handleCheckboxChange(item.value, item.id)}
                   />
-                  <Label htmlFor={`checkbox-${index}`}>
-                    {item.value.includes('empty-value-') ? '' : item.value}
-                  </Label>
+                  {!item.value.includes('empty-value-') && item.value && (
+                    <Label
+                      htmlFor={`checkbox-${field.id}-${item.id}`}
+                      className="text-foreground ml-1.5 text-xs font-normal"
+                    >
+                      {item.value}
+                    </Label>
+                  )}
                 </div>
               );
             })}
@@ -293,22 +304,27 @@ export const DocumentSigningCheckboxField = ({
       )}
 
       {field.inserted && (
-        <div className="flex flex-col gap-y-1">
+        <div className="my-0.5 flex flex-col gap-y-1">
           {values?.map((item: { id: number; value: string; checked: boolean }, index: number) => {
             const itemValue = item.value || `empty-value-${item.id}`;
 
             return (
-              <div key={index} className="flex items-center gap-x-1.5">
+              <div key={index} className="flex items-center">
                 <Checkbox
                   className="h-3 w-3"
-                  id={`checkbox-${index}`}
+                  id={`checkbox-${field.id}-${item.id}`}
                   checked={parsedCheckedValues.includes(itemValue)}
                   disabled={isLoading}
                   onCheckedChange={() => void handleCheckboxOptionClick(item)}
                 />
-                <Label htmlFor={`checkbox-${index}`} className="text-xs">
-                  {item.value.includes('empty-value-') ? '' : item.value}
-                </Label>
+                {!item.value.includes('empty-value-') && item.value && (
+                  <Label
+                    htmlFor={`checkbox-${field.id}-${item.id}`}
+                    className="text-foreground ml-1.5 text-xs font-normal"
+                  >
+                    {item.value}
+                  </Label>
+                )}
               </div>
             );
           })}

@@ -114,7 +114,7 @@ export const TemplateBulkSendDialog = ({
     <Dialog>
       <DialogTrigger asChild>
         {trigger ?? (
-          <Button>
+          <Button variant="outline">
             <Upload className="mr-2 h-4 w-4" />
             <Trans>Bulk Send via CSV</Trans>
           </Button>
