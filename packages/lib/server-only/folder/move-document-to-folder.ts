@@ -5,7 +5,7 @@ import { prisma } from '@documenso/prisma';
 export interface MoveDocumentToFolderOptions {
   userId: number;
   teamId?: number;
-  documentId: string;
+  documentId: number;
   folderId: string | null;
   requestMetadata?: ApiRequestMetadata;
 }
@@ -17,7 +17,6 @@ export const moveDocumentToFolder = async ({
   folderId,
   requestMetadata,
 }: MoveDocumentToFolderOptions) => {
-  // Check if the document exists and belongs to the user/team
   const document = await prisma.document.findFirst({
     where: {
       id: documentId,
@@ -32,7 +31,6 @@ export const moveDocumentToFolder = async ({
     });
   }
 
-  // If folderId is provided, check if the folder exists and belongs to the user/team
   if (folderId !== null) {
     const folder = await prisma.folder.findFirst({
       where: {
@@ -49,7 +47,6 @@ export const moveDocumentToFolder = async ({
     }
   }
 
-  // Move the document to the folder (or root if folderId is null)
   return await prisma.document.update({
     where: {
       id: documentId,

@@ -21,6 +21,7 @@ export const ZFolderSchema = z.object({
   userId: z.number(),
   teamId: z.number().nullable(),
   parentId: z.string().nullable(),
+  pinned: z.boolean(),
   createdAt: z.date(),
   updatedAt: z.date(),
 });
@@ -32,6 +33,7 @@ export const ZFolderWithSubfoldersSchema: z.ZodType<{
   userId: number;
   teamId: number | null;
   parentId: string | null;
+  pinned: boolean;
   createdAt: Date;
   updatedAt: Date;
   subfolders: Array<{
@@ -40,6 +42,7 @@ export const ZFolderWithSubfoldersSchema: z.ZodType<{
     userId: number;
     teamId: number | null;
     parentId: string | null;
+    pinned: boolean;
     createdAt: Date;
     updatedAt: Date;
     subfolders: unknown[]; // Using unknown instead of any to satisfy ESLint
@@ -58,6 +61,7 @@ export const ZFolderWithSubfoldersSchema: z.ZodType<{
     documents: z.number(),
     subfolders: z.number(),
   }),
+  pinned: z.boolean(),
 });
 
 export type TFolderWithSubfolders = z.infer<typeof ZFolderWithSubfoldersSchema>;
@@ -84,6 +88,14 @@ export const ZMoveFolderSchema = z.object({
 export const ZMoveDocumentToFolderSchema = z.object({
   documentId: z.number(),
   folderId: z.string().nullable(),
+});
+
+export const ZPinFolderSchema = z.object({
+  folderId: z.string(),
+});
+
+export const ZUnpinFolderSchema = z.object({
+  folderId: z.string(),
 });
 
 export const ZGetFoldersSchema = z.object({

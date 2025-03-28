@@ -33,31 +33,22 @@ export const deleteFolder = async ({
     });
   }
 
-  // Move documents to parent folder
   if (folder.documents.length > 0) {
-    await prisma.document.updateMany({
+    await prisma.document.deleteMany({
       where: {
         folderId,
       },
-      data: {
-        folderId: folder.parentId,
-      },
     });
   }
 
-  // Move subfolders to parent folder
   if (folder.subfolders.length > 0) {
-    await prisma.folder.updateMany({
+    await prisma.folder.deleteMany({
       where: {
         parentId: folderId,
       },
-      data: {
-        parentId: folder.parentId,
-      },
     });
   }
 
-  // Delete the folder
   return await prisma.folder.delete({
     where: {
       id: folderId,

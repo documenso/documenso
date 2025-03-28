@@ -7,6 +7,8 @@ import { getFolderBreadcrumbs } from '@documenso/lib/server-only/folder/get-fold
 import { getFolderById } from '@documenso/lib/server-only/folder/get-folder-by-id';
 import { moveDocumentToFolder } from '@documenso/lib/server-only/folder/move-document-to-folder';
 import { moveFolder } from '@documenso/lib/server-only/folder/move-folder';
+import { pinFolder } from '@documenso/lib/server-only/folder/pin-folder';
+import { unpinFolder } from '@documenso/lib/server-only/folder/unpin-folder';
 import { updateFolder } from '@documenso/lib/server-only/folder/update-folder';
 
 import { authenticatedProcedure, router } from '../trpc';
@@ -20,7 +22,9 @@ import {
   ZGetFoldersSchema,
   ZMoveDocumentToFolderSchema,
   ZMoveFolderSchema,
+  ZPinFolderSchema,
   ZSuccessResponseSchema,
+  ZUnpinFolderSchema,
   ZUpdateFolderSchema,
 } from './schema';
 
@@ -228,4 +232,26 @@ export const folderRouter = router({
         requestMetadata: ctx.metadata,
       });
     }),
+
+  /**
+   * @private
+   */
+  pinFolder: authenticatedProcedure.input(ZPinFolderSchema).mutation(async ({ ctx, input }) => {
+    return pinFolder({
+      userId: ctx.user.id,
+      teamId: ctx.teamId,
+      folderId: input.folderId,
+    });
+  }),
+
+  /**
+   * @private
+   */
+  unpinFolder: authenticatedProcedure.input(ZUnpinFolderSchema).mutation(async ({ ctx, input }) => {
+    return unpinFolder({
+      userId: ctx.user.id,
+      teamId: ctx.teamId,
+      folderId: input.folderId,
+    });
+  }),
 });

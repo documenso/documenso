@@ -54,14 +54,14 @@ export const FolderDeleteDialog = ({ folder, isOpen, onOpenChange }: FolderDelet
             Are you sure you want to delete this folder?
             {folder && folder._count.documents > 0 && (
               <span className="text-destructive mt-2 block">
-                Warning: This folder contains {folder._count.documents} document(s). Deleting it
-                will move all documents to the root.
+                This folder contains {folder._count.documents} document(s). Deleting it will also
+                delete all documents in the folder.
               </span>
             )}
             {folder && folder._count.subfolders > 0 && (
               <span className="text-destructive mt-2 block">
-                Warning: This folder contains {folder._count.subfolders} subfolder(s). Deleting it
-                will delete all subfolders and their contents.
+                This folder contains {folder._count.subfolders} subfolder(s). Deleting it will
+                delete all subfolders and their contents.
               </span>
             )}
           </DialogDescription>
