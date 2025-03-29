@@ -77,7 +77,7 @@ const getTransport = (): Transporter => {
       env('NEXT_PRIVATE_SES_ACCESS_KEY_ID') && env('NEXT_PRIVATE_SES_SECRET_ACCESS_KEY');
 
     const ses = new SESClient({
-      region: 'eu-west-1',
+      region: env('NEXT_PRIVATE_SES_REGION') || 'us-east-1',
       credentials: hasCredentials
         ? {
             accessKeyId: env('NEXT_PRIVATE_SES_ACCESS_KEY_ID')!,
