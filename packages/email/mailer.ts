@@ -1,3 +1,4 @@
+import * as sesSdk from '@aws-sdk/client-ses';
 import type { Transporter } from 'nodemailer';
 import { createTransport } from 'nodemailer';
 
@@ -5,6 +6,19 @@ import { env } from '@documenso/lib/utils/env';
 import { ResendTransport } from '@documenso/nodemailer-resend';
 
 import { MailChannelsTransport } from './transports/mailchannels';
+
+const hasSesCredentials =
+  env('NEXT_PRIVATE_SES_ACCESS_KEY_ID') && env('NEXT_PRIVATE_SES_SECRET_ACCESS_KEY');
+
+const ses = new sesSdk.SESClient({
+  region: 'eu-west-1',
+  credentials: hasSesCredentials
+    ? {
+        accessKeyId: env('NEXT_PRIVATE_SES_ACCESS_KEY_ID'),
+        secretAccessKey: env('NEXT_PRIVATE_SES_SECRET_ACCESS_KEY'),
+      }
+    : undefined,
+});
 
 /**
  * Creates a Nodemailer transport object for sending emails.
@@ -69,6 +83,15 @@ const getTransport = (): Transporter => {
         apiKey: env('NEXT_PRIVATE_RESEND_API_KEY') || '',
       }),
     );
+  }
+
+  if (transport === 'ses') {
+    return createTransport({
+      SES: {
+        ses,
+        aws: sesSdk,
+      },
+    });
   }
 
   if (transport === 'smtp-api') {

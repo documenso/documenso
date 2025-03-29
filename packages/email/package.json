@@ -38,7 +38,8 @@
     "@react-email/text": "0.0.6",
     "nodemailer": "6.9.9",
     "react-email": "1.9.5",
-    "resend": "2.0.0"
+    "resend": "2.0.0",
+    "@aws-sdk/client-ses": "^3.777.0"
   },
   "devDependencies": {
     "@documenso/tsconfig": "*",
