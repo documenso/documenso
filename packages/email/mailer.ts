@@ -7,19 +7,6 @@ import { ResendTransport } from '@documenso/nodemailer-resend';
 
 import { MailChannelsTransport } from './transports/mailchannels';
 
-const hasSesCredentials =
-  env('NEXT_PRIVATE_SES_ACCESS_KEY_ID') && env('NEXT_PRIVATE_SES_SECRET_ACCESS_KEY');
-
-const ses = new sesSdk.SESClient({
-  region: 'eu-west-1',
-  credentials: hasSesCredentials
-    ? {
-        accessKeyId: env('NEXT_PRIVATE_SES_ACCESS_KEY_ID'),
-        secretAccessKey: env('NEXT_PRIVATE_SES_SECRET_ACCESS_KEY'),
-      }
-    : undefined,
-});
-
 /**
  * Creates a Nodemailer transport object for sending emails.
  *
@@ -86,6 +73,19 @@ const getTransport = (): Transporter => {
   }
 
   if (transport === 'ses') {
+    const hasCredentials =
+      env('NEXT_PRIVATE_SES_ACCESS_KEY_ID') && env('NEXT_PRIVATE_SES_SECRET_ACCESS_KEY');
+
+    const ses = new sesSdk.SESClient({
+      region: 'eu-west-1',
+      credentials: hasCredentials
+        ? {
+            accessKeyId: env('NEXT_PRIVATE_SES_ACCESS_KEY_ID'),
+            secretAccessKey: env('NEXT_PRIVATE_SES_SECRET_ACCESS_KEY'),
+          }
+        : undefined,
+    });
+
     return createTransport({
       SES: {
         ses,
