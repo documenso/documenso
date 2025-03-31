@@ -38,6 +38,8 @@ import {
 } from '@documenso/ui/primitives/select';
 import { useToast } from '@documenso/ui/primitives/use-toast';
 
+import { useOptionalCurrentTeam } from '~/providers/team';
+
 export type FolderSettingsDialogProps = {
   folder: TFolderWithSubfolders | null;
   isOpen: boolean;
@@ -46,7 +48,7 @@ export type FolderSettingsDialogProps = {
 
 export const ZUpdateFolderFormSchema = z.object({
   name: z.string().min(1),
-  visibility: z.nativeEnum(DocumentVisibility),
+  visibility: z.nativeEnum(DocumentVisibility).optional(),
 });
 
 export type TUpdateFolderFormSchema = z.infer<typeof ZUpdateFolderFormSchema>;
@@ -57,9 +59,12 @@ export const FolderSettingsDialog = ({
   onOpenChange,
 }: FolderSettingsDialogProps) => {
   const { _ } = useLingui();
+  const team = useOptionalCurrentTeam();
 
   const { toast } = useToast();
   const { mutateAsync: updateFolder } = trpc.folder.updateFolder.useMutation();
+
+  const isTeamContext = !!team;
 
   const form = useForm<z.infer<typeof ZUpdateFolderFormSchema>>({
     resolver: zodResolver(ZUpdateFolderFormSchema),
@@ -85,7 +90,9 @@ export const FolderSettingsDialog = ({
       await updateFolder({
         id: folder.id,
         name: data.name,
-        visibility: data.visibility,
+        visibility: isTeamContext
+          ? (data.visibility ?? DocumentVisibility.EVERYONE)
+          : DocumentVisibility.EVERYONE,
       });
 
       toast({
@@ -128,30 +135,32 @@ export const FolderSettingsDialog = ({
               )}
             />
 
-            <FormField
-              control={form.control}
-              name="visibility"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Visibility</FormLabel>
-                  <Select onValueChange={field.onChange} defaultValue={field.value}>
-                    <FormControl>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select visibility" />
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent>
-                      <SelectItem value={DocumentVisibility.EVERYONE}>Everyone</SelectItem>
-                      <SelectItem value={DocumentVisibility.MANAGER_AND_ABOVE}>
-                        Managers and above
-                      </SelectItem>
-                      <SelectItem value={DocumentVisibility.ADMIN}>Admins only</SelectItem>
-                    </SelectContent>
-                  </Select>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+            {isTeamContext && (
+              <FormField
+                control={form.control}
+                name="visibility"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Visibility</FormLabel>
+                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select visibility" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        <SelectItem value={DocumentVisibility.EVERYONE}>Everyone</SelectItem>
+                        <SelectItem value={DocumentVisibility.MANAGER_AND_ABOVE}>
+                          Managers and above
+                        </SelectItem>
+                        <SelectItem value={DocumentVisibility.ADMIN}>Admins only</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            )}
 
             <DialogFooter>
               <Button type="submit">Save Changes</Button>
