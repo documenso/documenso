@@ -157,7 +157,7 @@ export const DocumentSigningPageView = ({
           </div>
         </div>
 
-        <DocumentReadOnlyFields fields={completedFields} />
+        <DocumentReadOnlyFields documentMeta={documentMeta || undefined} fields={completedFields} />
 
         {recipient.role !== RecipientRole.ASSISTANT && (
           <DocumentSigningAutoSign recipient={recipient} fields={fields} />
