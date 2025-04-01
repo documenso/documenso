@@ -329,6 +329,14 @@ export default function DocumentsPage() {
                             Pin
                           </DropdownMenuItem>
                           <DropdownMenuItem
+                            onClick={() => {
+                              setFolderToSettings(folder);
+                              setIsSettingsFolderOpen(true);
+                            }}
+                          >
+                            Settings
+                          </DropdownMenuItem>
+                          <DropdownMenuItem
                             className="text-red-500"
                             onClick={() => {
                               setFolderToDelete(folder);
