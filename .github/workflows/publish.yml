@@ -13,8 +13,8 @@ jobs:
       fail-fast: false
       matrix:
         os:
-          - warp-ubuntu-latest-x64-4x
-          - warp-ubuntu-latest-arm64-4x
+          - amd64
+          - arm64
 
     steps:
       - uses: actions/checkout@v4
@@ -30,7 +30,7 @@ jobs:
 
       - name: Build the docker image
         env:
-          BUILD_PLATFORM: ${{ matrix.os == 'warp-ubuntu-latest-arm64-4x' && 'arm64' || 'amd64' }}
+          BUILD_PLATFORM: ${{ matrix.os == 'arm64' && 'arm64' || 'amd64' }}
         run: |
           APP_VERSION="$(git name-rev --tags --name-only $(git rev-parse HEAD) | head -n 1 | sed 's/\^0//')"
           GIT_SHA="$(git rev-parse HEAD)"
