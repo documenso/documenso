@@ -52,7 +52,7 @@ jobs:
           labels: ${{ steps.meta.outputs.labels }}
           context: .
           file: ./docker/Dockerfile
-          platforms: linux/amd64,linux/arm64/v8
+          platforms: linux/amd64
           build-args: |
             RELEASE_VERSION=${{ github.sha }}
           secrets: |
