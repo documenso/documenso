@@ -3,6 +3,7 @@ name: Publish Docker
 on:
   push:
     branches: ['release']
+  workflow_dispatch:
 
 jobs:
   build_and_publish_platform_containers:
