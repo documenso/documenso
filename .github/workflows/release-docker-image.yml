@@ -33,14 +33,14 @@ jobs:
         uses: docker/metadata-action@v5
         with:
           images: |
-            ghcr.io/solomonaiengineering/document-signing-platform
+            ghcr.io/SolomonAIEngineering/document-signing-platform
           tags: |
             type=ref,event=branch
             type=ref,event=pr
             type=semver,pattern={{version}}
             type=semver,pattern={{major}}.{{minor}}
             type=sha
-            type=raw,value=latest,enable={{is_default_branch}}
+            type=raw,value=latest
 
       - uses: docker/build-push-action@v6
         id: push
