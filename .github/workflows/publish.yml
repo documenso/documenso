@@ -20,12 +20,6 @@ jobs:
         with:
           fetch-tags: true
 
-      - name: Login to DockerHub
-        uses: docker/login-action@v3
-        with:
-          username: ${{ secrets.DOCKERHUB_USERNAME }}
-          password: ${{ secrets.DOCKERHUB_TOKEN }}
-
       - name: Login to GitHub Container Registry
         uses: docker/login-action@v3
         with:
@@ -43,21 +37,13 @@ jobs:
           docker build \
             -f ./docker/Dockerfile \
             --progress=plain \
-            -t "documenso/documenso-$BUILD_PLATFORM:latest" \
-            -t "documenso/documenso-$BUILD_PLATFORM:$GIT_SHA" \
-            -t "documenso/documenso-$BUILD_PLATFORM:$APP_VERSION" \
-            -t "ghcr.io/documenso/documenso-$BUILD_PLATFORM:latest" \
-            -t "ghcr.io/documenso/documenso-$BUILD_PLATFORM:$GIT_SHA" \
-            -t "ghcr.io/documenso/documenso-$BUILD_PLATFORM:$APP_VERSION" \
+            -t "ghcr.io/solomonaiengineering/document-signing-platform-$BUILD_PLATFORM:latest" \
+            -t "ghcr.io/solomonaiengineering/document-signing-platform-$BUILD_PLATFORM:$GIT_SHA" \
+            -t "ghcr.io/solomonaiengineering/document-signing-platform-$BUILD_PLATFORM:$APP_VERSION" \
             .
 
-      - name: Push the docker image to DockerHub
-        run: docker push --all-tags "documenso/documenso-$BUILD_PLATFORM"
-        env:
-          BUILD_PLATFORM: ${{ matrix.os == 'warp-ubuntu-latest-arm64-4x' && 'arm64' || 'amd64' }}
-
       - name: Push the docker image to GitHub Container Registry
-        run: docker push --all-tags "ghcr.io/documenso/documenso-$BUILD_PLATFORM"
+        run: docker push --all-tags "ghcr.io/solomonaiengineering/document-signing-platform-$BUILD_PLATFORM"
         env:
           BUILD_PLATFORM: ${{ matrix.os == 'warp-ubuntu-latest-arm64-4x' && 'arm64' || 'amd64' }}
 
@@ -71,55 +57,12 @@ jobs:
         with:
           fetch-tags: true
 
-      - name: Login to DockerHub
-        uses: docker/login-action@v3
-        with:
-          username: ${{ secrets.DOCKERHUB_USERNAME }}
-          password: ${{ secrets.DOCKERHUB_TOKEN }}
-
       - name: Login to GitHub Container Registry
         uses: docker/login-action@v3
         with:
           registry: ghcr.io
           username: ${{ github.repository_owner }}
           password: ${{ secrets.GH_TOKEN }}
-
-      - name: Create and push DockerHub manifest
-        run: |
-          APP_VERSION="$(git name-rev --tags --name-only $(git rev-parse HEAD) | head -n 1 | sed 's/\^0//')"
-          GIT_SHA="$(git rev-parse HEAD)"
-
-          # Check if the version is stable (no rc or beta in the version)
-          if [[ "$APP_VERSION" =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
-            docker manifest create \
-              documenso/documenso:latest \
-              --amend documenso/documenso-amd64:latest \
-              --amend documenso/documenso-arm64:latest
-
-            docker manifest push documenso/documenso:latest
-          fi
-
-          if [[ "$APP_VERSION" =~ ^v[0-9]+\.[0-9]+\.[0-9]+-rc\.[0-9]+$ ]]; then
-            docker manifest create \
-              documenso/documenso:rc \
-              --amend documenso/documenso-amd64:rc \
-              --amend documenso/documenso-arm64:rc
-
-            docker manifest push documenso/documenso:rc
-          fi
-
-          docker manifest create \
-            documenso/documenso:$GIT_SHA \
-            --amend documenso/documenso-amd64:$GIT_SHA \
-            --amend documenso/documenso-arm64:$GIT_SHA
-
-          docker manifest create \
-            documenso/documenso:$APP_VERSION \
-            --amend documenso/documenso-amd64:$APP_VERSION \
-            --amend documenso/documenso-arm64:$APP_VERSION
-
-          docker manifest push documenso/documenso:$GIT_SHA
-          docker manifest push documenso/documenso:$APP_VERSION
 
       - name: Create and push Github Container Registry manifest
         run: |
@@ -129,31 +72,31 @@ jobs:
           # Check if the version is stable (no rc or beta in the version)
           if [[ "$APP_VERSION" =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
             docker manifest create \
-              ghcr.io/documenso/documenso:latest \
-              --amend ghcr.io/documenso/documenso-amd64:latest \
-              --amend ghcr.io/documenso/documenso-arm64:latest
+              ghcr.io/solomonaiengineering/document-signing-platform:latest \
+              --amend ghcr.io/solomonaiengineering/document-signing-platform-amd64:latest \
+              --amend ghcr.io/solomonaiengineering/document-signing-platform-arm64:latest
 
-            docker manifest push ghcr.io/documenso/documenso:latest
+            docker manifest push ghcr.io/solomonaiengineering/document-signing-platform:latest
           fi
 
           if [[ "$APP_VERSION" =~ ^v[0-9]+\.[0-9]+\.[0-9]+-rc\.[0-9]+$ ]]; then
             docker manifest create \
-              ghcr.io/documenso/documenso:rc \
-              --amend ghcr.io/documenso/documenso-amd64:rc \
-              --amend ghcr.io/documenso/documenso-arm64:rc
+              ghcr.io/solomonaiengineering/document-signing-platform:rc \
+              --amend ghcr.io/solomonaiengineering/document-signing-platform-amd64:rc \
+              --amend ghcr.io/solomonaiengineering/document-signing-platform-arm64:rc
 
-            docker manifest push ghcr.io/documenso/documenso:rc
+            docker manifest push ghcr.io/solomonaiengineering/document-signing-platform:rc
           fi
 
           docker manifest create \
-            ghcr.io/documenso/documenso:$GIT_SHA \
-            --amend ghcr.io/documenso/documenso-amd64:$GIT_SHA \
-            --amend ghcr.io/documenso/documenso-arm64:$GIT_SHA
+            ghcr.io/solomonaiengineering/document-signing-platform:$GIT_SHA \
+            --amend ghcr.io/solomonaiengineering/document-signing-platform-amd64:$GIT_SHA \
+            --amend ghcr.io/solomonaiengineering/document-signing-platform-arm64:$GIT_SHA
 
           docker manifest create \
-            ghcr.io/documenso/documenso:$APP_VERSION \
-            --amend ghcr.io/documenso/documenso-amd64:$APP_VERSION \
-            --amend ghcr.io/documenso/documenso-arm64:$APP_VERSION
+            ghcr.io/solomonaiengineering/document-signing-platform:$APP_VERSION \
+            --amend ghcr.io/solomonaiengineering/document-signing-platform-amd64:$APP_VERSION \
+            --amend ghcr.io/solomonaiengineering/document-signing-platform-arm64:$APP_VERSION
 
-          docker manifest push ghcr.io/documenso/documenso:$GIT_SHA
-          docker manifest push ghcr.io/documenso/documenso:$APP_VERSION
+          docker manifest push ghcr.io/solomonaiengineering/document-signing-platform:$GIT_SHA
+          docker manifest push ghcr.io/solomonaiengineering/document-signing-platform:$APP_VERSION
