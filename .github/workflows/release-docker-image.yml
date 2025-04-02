@@ -50,7 +50,7 @@ jobs:
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
-          context: ./server
+          context: ./docker
           platforms: linux/amd64,linux/arm64/v8
           build-args: |
             RELEASE_VERSION=${{ github.sha }}
