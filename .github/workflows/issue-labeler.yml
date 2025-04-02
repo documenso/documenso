@@ -11,7 +11,7 @@ jobs:
       - name: Label issue
         uses: actions/github-script@v6
         with:
-          github-token: ${{secrets.GITHUB_TOKEN}}
+          github-token: ${{secrets.GH_TOKEN}}
           script: |
             const issue = context.issue;
             // To run only on issues and not on PR

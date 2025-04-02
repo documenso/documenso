@@ -29,7 +29,7 @@ jobs:
         id: parse-comment
         uses: actions/github-script@v6
         with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
+          github-token: ${{ secrets.GH_TOKEN }}
           script: |
             const { Octokit } = require("@octokit/rest");
             const octokit = new Octokit({ auth: process.env.GITHUB_TOKEN });
@@ -57,7 +57,7 @@ jobs:
                 issue_number: context.issue.number,
                 body: issueCountMessage,
                 headers: {
-                  'Authorization': `token ${{ secrets.GITHUB_TOKEN }}`,
+                  'Authorization': `token ${{ secrets.GH_TOKEN }}`,
                 }
               });
             }

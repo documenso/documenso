@@ -29,7 +29,7 @@ jobs:
         id: parse-prs
         uses: actions/github-script@v5
         with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
+          github-token: ${{ secrets.GH_TOKEN }}
           script: |
             const { Octokit } = require("@octokit/rest");
             const octokit = new Octokit({ auth: process.env.GITHUB_TOKEN });
@@ -58,7 +58,7 @@ jobs:
                 issue_number: context.payload.pull_request.number,
                 body: prReminderMessage,
                 headers: {
-                  'Authorization': `token ${{ secrets.GITHUB_TOKEN }}`,
+                  'Authorization': `token ${{ secrets.GH_TOKEN }}`,
                 }
               });
             }
