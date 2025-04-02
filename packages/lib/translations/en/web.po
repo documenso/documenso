@@ -611,7 +611,7 @@ msgstr "Account Re-Authentication"
 msgid "Acknowledgment"
 msgstr "Acknowledgment"
 
-#: apps/web/src/app/(dashboard)/documents/[id]/document-page-view-dropdown.tsx:107
+#: apps/web/src/app/(dashboard)/documents/[id]/document-page-view-dropdown.tsx:114
 #: apps/web/src/app/(dashboard)/documents/[id]/logs/document-logs-data-table.tsx:97
 #: apps/web/src/app/(dashboard)/documents/data-table-action-dropdown.tsx:117
 #: apps/web/src/app/(dashboard)/settings/public-profile/public-templates-data-table.tsx:159
@@ -775,7 +775,7 @@ msgid "Advanced Options"
 msgstr "Advanced Options"
 
 #: packages/ui/primitives/document-flow/add-fields.tsx:585
-#: packages/ui/primitives/template-flow/add-template-fields.tsx:415
+#: packages/ui/primitives/template-flow/add-template-fields.tsx:490
 msgid "Advanced settings"
 msgstr "Advanced settings"
 
@@ -910,9 +910,9 @@ msgstr "An error occurred while disabling direct link signing."
 msgid "An error occurred while disabling the user."
 msgstr "An error occurred while disabling the user."
 
-#: apps/web/src/app/(dashboard)/documents/[id]/document-page-view-button.tsx:63
-#: apps/web/src/app/(dashboard)/documents/[id]/document-page-view-dropdown.tsx:91
-#: apps/web/src/app/(dashboard)/documents/data-table-action-button.tsx:70
+#: apps/web/src/app/(dashboard)/documents/[id]/document-page-view-button.tsx:70
+#: apps/web/src/app/(dashboard)/documents/[id]/document-page-view-dropdown.tsx:98
+#: apps/web/src/app/(dashboard)/documents/data-table-action-button.tsx:77
 #: apps/web/src/app/(dashboard)/documents/data-table-action-dropdown.tsx:101
 msgid "An error occurred while downloading your document."
 msgstr "An error occurred while downloading your document."
@@ -1067,8 +1067,8 @@ msgstr "API Tokens"
 msgid "App Version"
 msgstr "App Version"
 
-#: apps/web/src/app/(dashboard)/documents/[id]/document-page-view-button.tsx:88
-#: apps/web/src/app/(dashboard)/documents/data-table-action-button.tsx:114
+#: apps/web/src/app/(dashboard)/documents/[id]/document-page-view-button.tsx:95
+#: apps/web/src/app/(dashboard)/documents/data-table-action-button.tsx:121
 #: apps/web/src/app/(dashboard)/documents/data-table-action-dropdown.tsx:140
 #: apps/web/src/app/(signing)/sign/[token]/sign-dialog.tsx:143
 #: packages/lib/constants/recipient-roles.ts:8
@@ -1127,7 +1127,7 @@ msgstr "Are you sure?"
 msgid "Attempts sealing the document again, useful for after a code change has occurred to resolve an erroneous document."
 msgstr "Attempts sealing the document again, useful for after a code change has occurred to resolve an erroneous document."
 
-#: apps/web/src/app/(dashboard)/documents/[id]/document-page-view-dropdown.tsx:129
+#: apps/web/src/app/(dashboard)/documents/[id]/document-page-view-dropdown.tsx:136
 msgid "Audit Log"
 msgstr "Audit Log"
 
@@ -1494,7 +1494,7 @@ msgid "Configure template"
 msgstr "Configure template"
 
 #: packages/ui/primitives/document-flow/add-fields.tsx:586
-#: packages/ui/primitives/template-flow/add-template-fields.tsx:416
+#: packages/ui/primitives/template-flow/add-template-fields.tsx:491
 msgid "Configure the {0} field"
 msgstr "Configure the {0} field"
 
@@ -1783,7 +1783,7 @@ msgstr "Dark Mode"
 #: apps/web/src/app/(signing)/sign/[token]/date-field.tsx:148
 #: packages/ui/primitives/document-flow/add-fields.tsx:945
 #: packages/ui/primitives/document-flow/types.ts:53
-#: packages/ui/primitives/template-flow/add-template-fields.tsx:732
+#: packages/ui/primitives/template-flow/add-template-fields.tsx:810
 msgid "Date"
 msgstr "Date"
 
@@ -1817,7 +1817,7 @@ msgstr "Default Document Visibility"
 msgid "delete"
 msgstr "delete"
 
-#: apps/web/src/app/(dashboard)/documents/[id]/document-page-view-dropdown.tsx:143
+#: apps/web/src/app/(dashboard)/documents/[id]/document-page-view-dropdown.tsx:150
 #: apps/web/src/app/(dashboard)/documents/data-table-action-dropdown.tsx:183
 #: apps/web/src/app/(dashboard)/documents/delete-document-dialog.tsx:201
 #: apps/web/src/app/(dashboard)/settings/security/passkeys/user-passkeys-data-table-actions.tsx:177
@@ -2275,9 +2275,9 @@ msgstr "Documents Viewed"
 msgid "Don't have an account? <0>Sign up</0>"
 msgstr "Don't have an account? <0>Sign up</0>"
 
-#: apps/web/src/app/(dashboard)/documents/[id]/document-page-view-button.tsx:110
-#: apps/web/src/app/(dashboard)/documents/[id]/document-page-view-dropdown.tsx:122
-#: apps/web/src/app/(dashboard)/documents/data-table-action-button.tsx:135
+#: apps/web/src/app/(dashboard)/documents/[id]/document-page-view-button.tsx:117
+#: apps/web/src/app/(dashboard)/documents/[id]/document-page-view-dropdown.tsx:129
+#: apps/web/src/app/(dashboard)/documents/data-table-action-button.tsx:142
 #: apps/web/src/app/(dashboard)/documents/data-table-action-dropdown.tsx:156
 #: apps/web/src/components/(teams)/tables/team-billing-invoices-data-table.tsx:110
 #: apps/web/src/components/forms/2fa/enable-authenticator-app-dialog.tsx:185
@@ -2314,7 +2314,7 @@ msgid "Drag & drop your PDF here."
 msgstr "Drag & drop your PDF here."
 
 #: packages/ui/primitives/document-flow/add-fields.tsx:1076
-#: packages/ui/primitives/template-flow/add-template-fields.tsx:863
+#: packages/ui/primitives/template-flow/add-template-fields.tsx:941
 msgid "Dropdown"
 msgstr "Dropdown"
 
@@ -2326,7 +2326,7 @@ msgstr "Dropdown options"
 msgid "Due to an unpaid invoice, your team has been restricted. Please settle the payment to restore full access to your team."
 msgstr "Due to an unpaid invoice, your team has been restricted. Please settle the payment to restore full access to your team."
 
-#: apps/web/src/app/(dashboard)/documents/[id]/document-page-view-dropdown.tsx:135
+#: apps/web/src/app/(dashboard)/documents/[id]/document-page-view-dropdown.tsx:142
 #: apps/web/src/app/(dashboard)/documents/data-table-action-dropdown.tsx:161
 #: apps/web/src/app/(dashboard)/documents/duplicate-document-dialog.tsx:84
 #: apps/web/src/app/(dashboard)/documents/duplicate-document-dialog.tsx:117
@@ -2335,9 +2335,9 @@ msgstr "Due to an unpaid invoice, your team has been restricted. Please settle t
 msgid "Duplicate"
 msgstr "Duplicate"
 
-#: apps/web/src/app/(dashboard)/documents/[id]/document-page-view-button.tsx:103
-#: apps/web/src/app/(dashboard)/documents/[id]/document-page-view-dropdown.tsx:114
-#: apps/web/src/app/(dashboard)/documents/data-table-action-button.tsx:96
+#: apps/web/src/app/(dashboard)/documents/[id]/document-page-view-button.tsx:110
+#: apps/web/src/app/(dashboard)/documents/[id]/document-page-view-dropdown.tsx:121
+#: apps/web/src/app/(dashboard)/documents/data-table-action-button.tsx:103
 #: apps/web/src/app/(dashboard)/documents/data-table-action-dropdown.tsx:150
 #: apps/web/src/app/(dashboard)/settings/security/passkeys/user-passkeys-data-table-actions.tsx:111
 #: apps/web/src/app/(dashboard)/settings/webhooks/page.tsx:95
@@ -2386,7 +2386,7 @@ msgstr "Electronic Signature Disclosure"
 #: packages/ui/primitives/document-flow/add-signers.tsx:511
 #: packages/ui/primitives/document-flow/add-signers.tsx:518
 #: packages/ui/primitives/document-flow/types.ts:54
-#: packages/ui/primitives/template-flow/add-template-fields.tsx:680
+#: packages/ui/primitives/template-flow/add-template-fields.tsx:758
 #: packages/ui/primitives/template-flow/add-template-placeholder-recipients.tsx:470
 #: packages/ui/primitives/template-flow/add-template-placeholder-recipients.tsx:477
 msgid "Email"
@@ -2479,7 +2479,7 @@ msgid "Enable Typed Signature"
 msgstr "Enable Typed Signature"
 
 #: packages/ui/primitives/document-flow/add-fields.tsx:813
-#: packages/ui/primitives/template-flow/add-template-fields.tsx:600
+#: packages/ui/primitives/template-flow/add-template-fields.tsx:678
 msgid "Enable Typed Signatures"
 msgstr "Enable Typed Signatures"
 
@@ -3275,7 +3275,7 @@ msgstr "My templates"
 #: packages/ui/primitives/document-flow/add-signers.tsx:549
 #: packages/ui/primitives/document-flow/add-signers.tsx:555
 #: packages/ui/primitives/document-flow/types.ts:55
-#: packages/ui/primitives/template-flow/add-template-fields.tsx:706
+#: packages/ui/primitives/template-flow/add-template-fields.tsx:784
 #: packages/ui/primitives/template-flow/add-template-placeholder-recipients.tsx:505
 #: packages/ui/primitives/template-flow/add-template-placeholder-recipients.tsx:511
 msgid "Name"
@@ -3349,7 +3349,7 @@ msgid "No recent documents"
 msgstr "No recent documents"
 
 #: packages/ui/primitives/document-flow/add-fields.tsx:705
-#: packages/ui/primitives/template-flow/add-template-fields.tsx:520
+#: packages/ui/primitives/template-flow/add-template-fields.tsx:598
 msgid "No recipient matching this description was found."
 msgstr "No recipient matching this description was found."
 
@@ -3361,7 +3361,7 @@ msgid "No recipients"
 msgstr "No recipients"
 
 #: packages/ui/primitives/document-flow/add-fields.tsx:720
-#: packages/ui/primitives/template-flow/add-template-fields.tsx:535
+#: packages/ui/primitives/template-flow/add-template-fields.tsx:613
 msgid "No recipients with this role"
 msgstr "No recipients with this role"
 
@@ -3423,7 +3423,7 @@ msgstr "Nothing to do"
 #: apps/web/src/app/(signing)/sign/[token]/number-field.tsx:271
 #: packages/ui/primitives/document-flow/add-fields.tsx:997
 #: packages/ui/primitives/document-flow/types.ts:56
-#: packages/ui/primitives/template-flow/add-template-fields.tsx:784
+#: packages/ui/primitives/template-flow/add-template-fields.tsx:862
 msgid "Number"
 msgstr "Number"
 
@@ -4209,7 +4209,7 @@ msgstr "Rows per page"
 msgid "Save"
 msgstr "Save"
 
-#: packages/ui/primitives/template-flow/add-template-fields.tsx:896
+#: packages/ui/primitives/template-flow/add-template-fields.tsx:974
 msgid "Save Template"
 msgstr "Save Template"
 
@@ -4386,7 +4386,7 @@ msgstr "Settings"
 msgid "Setup"
 msgstr "Setup"
 
-#: apps/web/src/app/(dashboard)/documents/[id]/document-page-view-dropdown.tsx:147
+#: apps/web/src/app/(dashboard)/documents/[id]/document-page-view-dropdown.tsx:154
 #: apps/web/src/app/(dashboard)/documents/data-table-action-dropdown.tsx:187
 msgid "Share"
 msgstr "Share"
@@ -4395,7 +4395,7 @@ msgstr "Share"
 msgid "Share Signature Card"
 msgstr "Share Signature Card"
 
-#: apps/web/src/app/(dashboard)/documents/[id]/document-page-view-dropdown.tsx:178
+#: apps/web/src/app/(dashboard)/documents/[id]/document-page-view-dropdown.tsx:185
 #: apps/web/src/app/(dashboard)/documents/data-table-action-dropdown.tsx:213
 msgid "Share Signing Card"
 msgstr "Share Signing Card"
@@ -4429,8 +4429,8 @@ msgstr "Show templates in your public profile for your audience to sign and get 
 msgid "Show templates in your team public profile for your audience to sign and get started quickly"
 msgstr "Show templates in your team public profile for your audience to sign and get started quickly"
 
-#: apps/web/src/app/(dashboard)/documents/[id]/document-page-view-button.tsx:82
-#: apps/web/src/app/(dashboard)/documents/data-table-action-button.tsx:108
+#: apps/web/src/app/(dashboard)/documents/[id]/document-page-view-button.tsx:89
+#: apps/web/src/app/(dashboard)/documents/data-table-action-button.tsx:115
 #: apps/web/src/app/(dashboard)/documents/data-table-action-dropdown.tsx:133
 #: apps/web/src/app/(profile)/p/[url]/page.tsx:192
 #: apps/web/src/app/(signing)/sign/[token]/auto-sign.tsx:229
@@ -4522,7 +4522,7 @@ msgstr "Sign Up with OIDC"
 #: packages/ui/primitives/document-flow/add-fields.tsx:841
 #: packages/ui/primitives/document-flow/field-icon.tsx:52
 #: packages/ui/primitives/document-flow/types.ts:49
-#: packages/ui/primitives/template-flow/add-template-fields.tsx:628
+#: packages/ui/primitives/template-flow/add-template-fields.tsx:706
 msgid "Signature"
 msgstr "Signature"
 
@@ -4590,7 +4590,7 @@ msgstr "Signing Complete!"
 msgid "Signing in..."
 msgstr "Signing in..."
 
-#: apps/web/src/app/(dashboard)/documents/[id]/document-page-view-dropdown.tsx:159
+#: apps/web/src/app/(dashboard)/documents/[id]/document-page-view-dropdown.tsx:166
 #: apps/web/src/app/(dashboard)/documents/data-table-action-dropdown.tsx:197
 msgid "Signing Links"
 msgstr "Signing Links"
@@ -4630,11 +4630,11 @@ msgid "Some signers have not been assigned a signature field. Please assign at l
 msgstr "Some signers have not been assigned a signature field. Please assign at least 1 signature field to each signer before proceeding."
 
 #: apps/web/src/app/(dashboard)/documents/_action-items/resend-document.tsx:105
-#: apps/web/src/app/(dashboard)/documents/[id]/document-page-view-button.tsx:62
-#: apps/web/src/app/(dashboard)/documents/[id]/document-page-view-dropdown.tsx:90
+#: apps/web/src/app/(dashboard)/documents/[id]/document-page-view-button.tsx:69
+#: apps/web/src/app/(dashboard)/documents/[id]/document-page-view-dropdown.tsx:97
 #: apps/web/src/app/(dashboard)/documents/[id]/logs/download-audit-log-button.tsx:61
 #: apps/web/src/app/(dashboard)/documents/[id]/logs/download-certificate-button.tsx:68
-#: apps/web/src/app/(dashboard)/documents/data-table-action-button.tsx:69
+#: apps/web/src/app/(dashboard)/documents/data-table-action-button.tsx:76
 #: apps/web/src/app/(dashboard)/documents/data-table-action-dropdown.tsx:100
 #: apps/web/src/app/(dashboard)/documents/delete-document-dialog.tsx:81
 #: apps/web/src/app/(dashboard)/documents/duplicate-document-dialog.tsx:71
@@ -5009,7 +5009,7 @@ msgstr "Templates allow you to quickly generate documents with pre-filled recipi
 #: apps/web/src/app/(signing)/sign/[token]/text-field.tsx:274
 #: packages/ui/primitives/document-flow/add-fields.tsx:971
 #: packages/ui/primitives/document-flow/types.ts:52
-#: packages/ui/primitives/template-flow/add-template-fields.tsx:758
+#: packages/ui/primitives/template-flow/add-template-fields.tsx:836
 msgid "Text"
 msgstr "Text"
 
@@ -5492,7 +5492,7 @@ msgid "To mark this document as viewed, you need to be logged in as <0>{0}</0>"
 msgstr "To mark this document as viewed, you need to be logged in as <0>{0}</0>"
 
 #: packages/ui/primitives/document-flow/add-fields.tsx:1091
-#: packages/ui/primitives/template-flow/add-template-fields.tsx:876
+#: packages/ui/primitives/template-flow/add-template-fields.tsx:954
 msgid "To proceed further, please set at least one value for the {0} field."
 msgstr "To proceed further, please set at least one value for the {0} field."
 
@@ -5952,9 +5952,9 @@ msgstr "Verify your team email address"
 msgid "Version History"
 msgstr "Version History"
 
-#: apps/web/src/app/(dashboard)/documents/[id]/document-page-view-button.tsx:94
-#: apps/web/src/app/(dashboard)/documents/data-table-action-button.tsx:120
-#: apps/web/src/app/(dashboard)/documents/data-table-action-button.tsx:129
+#: apps/web/src/app/(dashboard)/documents/[id]/document-page-view-button.tsx:101
+#: apps/web/src/app/(dashboard)/documents/data-table-action-button.tsx:127
+#: apps/web/src/app/(dashboard)/documents/data-table-action-button.tsx:136
 #: apps/web/src/app/(dashboard)/documents/data-table-action-dropdown.tsx:126
 #: apps/web/src/components/(teams)/tables/team-billing-invoices-data-table.tsx:100
 #: apps/web/src/components/forms/2fa/view-recovery-codes-dialog.tsx:168

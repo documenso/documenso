@@ -616,7 +616,7 @@ msgstr "Re-autenticación de Cuenta"
 msgid "Acknowledgment"
 msgstr "Reconocimiento"
 
-#: apps/web/src/app/(dashboard)/documents/[id]/document-page-view-dropdown.tsx:107
+#: apps/web/src/app/(dashboard)/documents/[id]/document-page-view-dropdown.tsx:114
 #: apps/web/src/app/(dashboard)/documents/[id]/logs/document-logs-data-table.tsx:97
 #: apps/web/src/app/(dashboard)/documents/data-table-action-dropdown.tsx:117
 #: apps/web/src/app/(dashboard)/settings/public-profile/public-templates-data-table.tsx:159
@@ -780,7 +780,7 @@ msgid "Advanced Options"
 msgstr "Opciones avanzadas"
 
 #: packages/ui/primitives/document-flow/add-fields.tsx:585
-#: packages/ui/primitives/template-flow/add-template-fields.tsx:415
+#: packages/ui/primitives/template-flow/add-template-fields.tsx:490
 msgid "Advanced settings"
 msgstr "Configuraciones avanzadas"
 
@@ -915,9 +915,9 @@ msgstr "Ocurrió un error al desactivar la firma de enlace directo."
 msgid "An error occurred while disabling the user."
 msgstr "Se produjo un error al deshabilitar al usuario."
 
-#: apps/web/src/app/(dashboard)/documents/[id]/document-page-view-button.tsx:63
-#: apps/web/src/app/(dashboard)/documents/[id]/document-page-view-dropdown.tsx:91
-#: apps/web/src/app/(dashboard)/documents/data-table-action-button.tsx:70
+#: apps/web/src/app/(dashboard)/documents/[id]/document-page-view-button.tsx:70
+#: apps/web/src/app/(dashboard)/documents/[id]/document-page-view-dropdown.tsx:98
+#: apps/web/src/app/(dashboard)/documents/data-table-action-button.tsx:77
 #: apps/web/src/app/(dashboard)/documents/data-table-action-dropdown.tsx:101
 msgid "An error occurred while downloading your document."
 msgstr "Ocurrió un error al descargar tu documento."
@@ -1072,8 +1072,8 @@ msgstr "Tokens de API"
 msgid "App Version"
 msgstr "Versión de la Aplicación"
 
-#: apps/web/src/app/(dashboard)/documents/[id]/document-page-view-button.tsx:88
-#: apps/web/src/app/(dashboard)/documents/data-table-action-button.tsx:114
+#: apps/web/src/app/(dashboard)/documents/[id]/document-page-view-button.tsx:95
+#: apps/web/src/app/(dashboard)/documents/data-table-action-button.tsx:121
 #: apps/web/src/app/(dashboard)/documents/data-table-action-dropdown.tsx:140
 #: apps/web/src/app/(signing)/sign/[token]/sign-dialog.tsx:143
 #: packages/lib/constants/recipient-roles.ts:8
@@ -1132,7 +1132,7 @@ msgstr "¿Estás seguro?"
 msgid "Attempts sealing the document again, useful for after a code change has occurred to resolve an erroneous document."
 msgstr "Intenta sellar el documento de nuevo, útil después de que se haya producido un cambio de código para resolver un documento erróneo."
 
-#: apps/web/src/app/(dashboard)/documents/[id]/document-page-view-dropdown.tsx:129
+#: apps/web/src/app/(dashboard)/documents/[id]/document-page-view-dropdown.tsx:136
 msgid "Audit Log"
 msgstr "Registro de Auditoría"
 
@@ -1499,7 +1499,7 @@ msgid "Configure template"
 msgstr "Configurar plantilla"
 
 #: packages/ui/primitives/document-flow/add-fields.tsx:586
-#: packages/ui/primitives/template-flow/add-template-fields.tsx:416
+#: packages/ui/primitives/template-flow/add-template-fields.tsx:491
 msgid "Configure the {0} field"
 msgstr "Configurar el campo {0}"
 
@@ -1788,7 +1788,7 @@ msgstr "Modo Oscuro"
 #: apps/web/src/app/(signing)/sign/[token]/date-field.tsx:148
 #: packages/ui/primitives/document-flow/add-fields.tsx:945
 #: packages/ui/primitives/document-flow/types.ts:53
-#: packages/ui/primitives/template-flow/add-template-fields.tsx:732
+#: packages/ui/primitives/template-flow/add-template-fields.tsx:810
 msgid "Date"
 msgstr "Fecha"
 
@@ -1822,7 +1822,7 @@ msgstr "Visibilidad predeterminada del documento"
 msgid "delete"
 msgstr "eliminar"
 
-#: apps/web/src/app/(dashboard)/documents/[id]/document-page-view-dropdown.tsx:143
+#: apps/web/src/app/(dashboard)/documents/[id]/document-page-view-dropdown.tsx:150
 #: apps/web/src/app/(dashboard)/documents/data-table-action-dropdown.tsx:183
 #: apps/web/src/app/(dashboard)/documents/delete-document-dialog.tsx:201
 #: apps/web/src/app/(dashboard)/settings/security/passkeys/user-passkeys-data-table-actions.tsx:177
@@ -2280,9 +2280,9 @@ msgstr "Documentos vistos"
 msgid "Don't have an account? <0>Sign up</0>"
 msgstr "¿No tienes una cuenta? <0>Regístrate</0>"
 
-#: apps/web/src/app/(dashboard)/documents/[id]/document-page-view-button.tsx:110
-#: apps/web/src/app/(dashboard)/documents/[id]/document-page-view-dropdown.tsx:122
-#: apps/web/src/app/(dashboard)/documents/data-table-action-button.tsx:135
+#: apps/web/src/app/(dashboard)/documents/[id]/document-page-view-button.tsx:117
+#: apps/web/src/app/(dashboard)/documents/[id]/document-page-view-dropdown.tsx:129
+#: apps/web/src/app/(dashboard)/documents/data-table-action-button.tsx:142
 #: apps/web/src/app/(dashboard)/documents/data-table-action-dropdown.tsx:156
 #: apps/web/src/components/(teams)/tables/team-billing-invoices-data-table.tsx:110
 #: apps/web/src/components/forms/2fa/enable-authenticator-app-dialog.tsx:185
@@ -2319,7 +2319,7 @@ msgid "Drag & drop your PDF here."
 msgstr "Arrastre y suelte su PDF aquí."
 
 #: packages/ui/primitives/document-flow/add-fields.tsx:1076
-#: packages/ui/primitives/template-flow/add-template-fields.tsx:863
+#: packages/ui/primitives/template-flow/add-template-fields.tsx:941
 msgid "Dropdown"
 msgstr "Menú desplegable"
 
@@ -2331,7 +2331,7 @@ msgstr "Opciones de menú desplegable"
 msgid "Due to an unpaid invoice, your team has been restricted. Please settle the payment to restore full access to your team."
 msgstr "Debido a una factura impaga, tu equipo ha sido restringido. Realiza el pago para restaurar el acceso completo a tu equipo."
 
-#: apps/web/src/app/(dashboard)/documents/[id]/document-page-view-dropdown.tsx:135
+#: apps/web/src/app/(dashboard)/documents/[id]/document-page-view-dropdown.tsx:142
 #: apps/web/src/app/(dashboard)/documents/data-table-action-dropdown.tsx:161
 #: apps/web/src/app/(dashboard)/documents/duplicate-document-dialog.tsx:84
 #: apps/web/src/app/(dashboard)/documents/duplicate-document-dialog.tsx:117
@@ -2340,9 +2340,9 @@ msgstr "Debido a una factura impaga, tu equipo ha sido restringido. Realiza el p
 msgid "Duplicate"
 msgstr "Duplicar"
 
-#: apps/web/src/app/(dashboard)/documents/[id]/document-page-view-button.tsx:103
-#: apps/web/src/app/(dashboard)/documents/[id]/document-page-view-dropdown.tsx:114
-#: apps/web/src/app/(dashboard)/documents/data-table-action-button.tsx:96
+#: apps/web/src/app/(dashboard)/documents/[id]/document-page-view-button.tsx:110
+#: apps/web/src/app/(dashboard)/documents/[id]/document-page-view-dropdown.tsx:121
+#: apps/web/src/app/(dashboard)/documents/data-table-action-button.tsx:103
 #: apps/web/src/app/(dashboard)/documents/data-table-action-dropdown.tsx:150
 #: apps/web/src/app/(dashboard)/settings/security/passkeys/user-passkeys-data-table-actions.tsx:111
 #: apps/web/src/app/(dashboard)/settings/webhooks/page.tsx:95
@@ -2391,7 +2391,7 @@ msgstr "Divulgación de Firma Electrónica"
 #: packages/ui/primitives/document-flow/add-signers.tsx:511
 #: packages/ui/primitives/document-flow/add-signers.tsx:518
 #: packages/ui/primitives/document-flow/types.ts:54
-#: packages/ui/primitives/template-flow/add-template-fields.tsx:680
+#: packages/ui/primitives/template-flow/add-template-fields.tsx:758
 #: packages/ui/primitives/template-flow/add-template-placeholder-recipients.tsx:470
 #: packages/ui/primitives/template-flow/add-template-placeholder-recipients.tsx:477
 msgid "Email"
@@ -2484,7 +2484,7 @@ msgid "Enable Typed Signature"
 msgstr "Habilitar firma mecanografiada"
 
 #: packages/ui/primitives/document-flow/add-fields.tsx:813
-#: packages/ui/primitives/template-flow/add-template-fields.tsx:600
+#: packages/ui/primitives/template-flow/add-template-fields.tsx:678
 msgid "Enable Typed Signatures"
 msgstr "Habilitar firmas escritas"
 
@@ -3280,7 +3280,7 @@ msgstr "Mis plantillas"
 #: packages/ui/primitives/document-flow/add-signers.tsx:549
 #: packages/ui/primitives/document-flow/add-signers.tsx:555
 #: packages/ui/primitives/document-flow/types.ts:55
-#: packages/ui/primitives/template-flow/add-template-fields.tsx:706
+#: packages/ui/primitives/template-flow/add-template-fields.tsx:784
 #: packages/ui/primitives/template-flow/add-template-placeholder-recipients.tsx:505
 #: packages/ui/primitives/template-flow/add-template-placeholder-recipients.tsx:511
 msgid "Name"
@@ -3354,7 +3354,7 @@ msgid "No recent documents"
 msgstr "No hay documentos recientes"
 
 #: packages/ui/primitives/document-flow/add-fields.tsx:705
-#: packages/ui/primitives/template-flow/add-template-fields.tsx:520
+#: packages/ui/primitives/template-flow/add-template-fields.tsx:598
 msgid "No recipient matching this description was found."
 msgstr "No se encontró ningún destinatario que coincidiera con esta descripción."
 
@@ -3366,7 +3366,7 @@ msgid "No recipients"
 msgstr "Sin destinatarios"
 
 #: packages/ui/primitives/document-flow/add-fields.tsx:720
-#: packages/ui/primitives/template-flow/add-template-fields.tsx:535
+#: packages/ui/primitives/template-flow/add-template-fields.tsx:613
 msgid "No recipients with this role"
 msgstr "No hay destinatarios con este rol"
 
@@ -3428,7 +3428,7 @@ msgstr "Nada que hacer"
 #: apps/web/src/app/(signing)/sign/[token]/number-field.tsx:271
 #: packages/ui/primitives/document-flow/add-fields.tsx:997
 #: packages/ui/primitives/document-flow/types.ts:56
-#: packages/ui/primitives/template-flow/add-template-fields.tsx:784
+#: packages/ui/primitives/template-flow/add-template-fields.tsx:862
 msgid "Number"
 msgstr "Número"
 
@@ -4214,7 +4214,7 @@ msgstr "Filas por página"
 msgid "Save"
 msgstr "Guardar"
 
-#: packages/ui/primitives/template-flow/add-template-fields.tsx:896
+#: packages/ui/primitives/template-flow/add-template-fields.tsx:974
 msgid "Save Template"
 msgstr "Guardar plantilla"
 
@@ -4391,7 +4391,7 @@ msgstr "Configuraciones"
 msgid "Setup"
 msgstr "Configuración"
 
-#: apps/web/src/app/(dashboard)/documents/[id]/document-page-view-dropdown.tsx:147
+#: apps/web/src/app/(dashboard)/documents/[id]/document-page-view-dropdown.tsx:154
 #: apps/web/src/app/(dashboard)/documents/data-table-action-dropdown.tsx:187
 msgid "Share"
 msgstr "Compartir"
@@ -4400,7 +4400,7 @@ msgstr "Compartir"
 msgid "Share Signature Card"
 msgstr "Compartir tarjeta de firma"
 
-#: apps/web/src/app/(dashboard)/documents/[id]/document-page-view-dropdown.tsx:178
+#: apps/web/src/app/(dashboard)/documents/[id]/document-page-view-dropdown.tsx:185
 #: apps/web/src/app/(dashboard)/documents/data-table-action-dropdown.tsx:213
 msgid "Share Signing Card"
 msgstr "Compartir tarjeta de firma"
@@ -4434,8 +4434,8 @@ msgstr "Mostrar plantillas en tu perfil público para que tu audiencia firme y c
 msgid "Show templates in your team public profile for your audience to sign and get started quickly"
 msgstr "Mostrar plantillas en el perfil público de tu equipo para que tu audiencia firme y comience rápidamente"
 
-#: apps/web/src/app/(dashboard)/documents/[id]/document-page-view-button.tsx:82
-#: apps/web/src/app/(dashboard)/documents/data-table-action-button.tsx:108
+#: apps/web/src/app/(dashboard)/documents/[id]/document-page-view-button.tsx:89
+#: apps/web/src/app/(dashboard)/documents/data-table-action-button.tsx:115
 #: apps/web/src/app/(dashboard)/documents/data-table-action-dropdown.tsx:133
 #: apps/web/src/app/(profile)/p/[url]/page.tsx:192
 #: apps/web/src/app/(signing)/sign/[token]/auto-sign.tsx:229
@@ -4527,7 +4527,7 @@ msgstr "Regístrate con OIDC"
 #: packages/ui/primitives/document-flow/add-fields.tsx:841
 #: packages/ui/primitives/document-flow/field-icon.tsx:52
 #: packages/ui/primitives/document-flow/types.ts:49
-#: packages/ui/primitives/template-flow/add-template-fields.tsx:628
+#: packages/ui/primitives/template-flow/add-template-fields.tsx:706
 msgid "Signature"
 msgstr "Firma"
 
@@ -4595,7 +4595,7 @@ msgstr "¡Firma completa!"
 msgid "Signing in..."
 msgstr "Iniciando sesión..."
 
-#: apps/web/src/app/(dashboard)/documents/[id]/document-page-view-dropdown.tsx:159
+#: apps/web/src/app/(dashboard)/documents/[id]/document-page-view-dropdown.tsx:166
 #: apps/web/src/app/(dashboard)/documents/data-table-action-dropdown.tsx:197
 msgid "Signing Links"
 msgstr "Enlaces de firma"
@@ -4635,11 +4635,11 @@ msgid "Some signers have not been assigned a signature field. Please assign at l
 msgstr "Algunos firmantes no han sido asignados a un campo de firma. Asigne al menos 1 campo de firma a cada firmante antes de continuar."
 
 #: apps/web/src/app/(dashboard)/documents/_action-items/resend-document.tsx:105
-#: apps/web/src/app/(dashboard)/documents/[id]/document-page-view-button.tsx:62
-#: apps/web/src/app/(dashboard)/documents/[id]/document-page-view-dropdown.tsx:90
+#: apps/web/src/app/(dashboard)/documents/[id]/document-page-view-button.tsx:69
+#: apps/web/src/app/(dashboard)/documents/[id]/document-page-view-dropdown.tsx:97
 #: apps/web/src/app/(dashboard)/documents/[id]/logs/download-audit-log-button.tsx:61
 #: apps/web/src/app/(dashboard)/documents/[id]/logs/download-certificate-button.tsx:68
-#: apps/web/src/app/(dashboard)/documents/data-table-action-button.tsx:69
+#: apps/web/src/app/(dashboard)/documents/data-table-action-button.tsx:76
 #: apps/web/src/app/(dashboard)/documents/data-table-action-dropdown.tsx:100
 #: apps/web/src/app/(dashboard)/documents/delete-document-dialog.tsx:81
 #: apps/web/src/app/(dashboard)/documents/duplicate-document-dialog.tsx:71
@@ -5014,7 +5014,7 @@ msgstr "Las plantillas te permiten generar documentos rápidamente con destinata
 #: apps/web/src/app/(signing)/sign/[token]/text-field.tsx:274
 #: packages/ui/primitives/document-flow/add-fields.tsx:971
 #: packages/ui/primitives/document-flow/types.ts:52
-#: packages/ui/primitives/template-flow/add-template-fields.tsx:758
+#: packages/ui/primitives/template-flow/add-template-fields.tsx:836
 msgid "Text"
 msgstr "Texto"
 
@@ -5497,7 +5497,7 @@ msgid "To mark this document as viewed, you need to be logged in as <0>{0}</0>"
 msgstr "Para marcar este documento como visto, debes iniciar sesión como <0>{0}</0>"
 
 #: packages/ui/primitives/document-flow/add-fields.tsx:1091
-#: packages/ui/primitives/template-flow/add-template-fields.tsx:876
+#: packages/ui/primitives/template-flow/add-template-fields.tsx:954
 msgid "To proceed further, please set at least one value for the {0} field."
 msgstr "Para continuar, por favor establezca al menos un valor para el campo {0}."
 
@@ -5957,9 +5957,9 @@ msgstr "Verifica tu dirección de correo electrónico del equipo"
 msgid "Version History"
 msgstr "Historial de Versiones"
 
-#: apps/web/src/app/(dashboard)/documents/[id]/document-page-view-button.tsx:94
-#: apps/web/src/app/(dashboard)/documents/data-table-action-button.tsx:120
-#: apps/web/src/app/(dashboard)/documents/data-table-action-button.tsx:129
+#: apps/web/src/app/(dashboard)/documents/[id]/document-page-view-button.tsx:101
+#: apps/web/src/app/(dashboard)/documents/data-table-action-button.tsx:127
+#: apps/web/src/app/(dashboard)/documents/data-table-action-button.tsx:136
 #: apps/web/src/app/(dashboard)/documents/data-table-action-dropdown.tsx:126
 #: apps/web/src/components/(teams)/tables/team-billing-invoices-data-table.tsx:100
 #: apps/web/src/components/forms/2fa/view-recovery-codes-dialog.tsx:168
