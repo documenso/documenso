@@ -1,5 +1,10 @@
+import { TeamMemberRole } from '@prisma/client';
+import type { Team, TeamGlobalSettings } from '@prisma/client';
+
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import { prisma } from '@documenso/prisma';
+
+import { determineDocumentVisibility } from '../../utils/document-visibility';
 
 export interface CreateFolderOptions {
   userId: number;
@@ -36,12 +41,29 @@ export const createFolder = async ({
     });
   }
 
+  let team: (Team & { teamGlobalSettings: TeamGlobalSettings | null }) | null = null;
+  let userTeamRole: TeamMemberRole | undefined;
+
   if (teamId) {
-    await prisma.team.findFirstOrThrow({
+    const teamWithUserRole = await prisma.team.findFirstOrThrow({
       where: {
         id: teamId,
       },
+      include: {
+        teamGlobalSettings: true,
+        members: {
+          where: {
+            userId: userId,
+          },
+          select: {
+            role: true,
+          },
+        },
+      },
     });
+
+    team = teamWithUserRole;
+    userTeamRole = teamWithUserRole.members[0]?.role;
   }
 
   return await prisma.folder.create({
@@ -50,6 +72,10 @@ export const createFolder = async ({
       userId,
       teamId,
       parentId,
+      visibility: determineDocumentVisibility(
+        team?.teamGlobalSettings?.documentVisibility,
+        userTeamRole ?? TeamMemberRole.MEMBER,
+      ),
     },
   });
 };

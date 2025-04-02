@@ -1,5 +1,5 @@
 import { DocumentSource, WebhookTriggerEvents } from '@prisma/client';
-import type { Team, TeamGlobalSettings } from '@prisma/client';
+import type { DocumentVisibility, Team, TeamGlobalSettings } from '@prisma/client';
 import { TeamMemberRole } from '@prisma/client';
 
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
@@ -90,6 +90,29 @@ export const createDocument = async ({
     userTeamRole = teamWithUserRole.members[0]?.role;
   }
 
+  let folderVisibility: DocumentVisibility | undefined;
+
+  if (folderId) {
+    const folder = await prisma.folder.findFirst({
+      where: {
+        id: folderId,
+        userId,
+        teamId,
+      },
+      select: {
+        visibility: true,
+      },
+    });
+
+    if (!folder) {
+      throw new AppError(AppErrorCode.NOT_FOUND, {
+        message: 'Folder not found',
+      });
+    }
+
+    folderVisibility = folder.visibility;
+  }
+
   if (normalizePdf) {
     const documentData = await prisma.documentData.findFirst({
       where: {
@@ -122,10 +145,12 @@ export const createDocument = async ({
         userId,
         teamId,
         folderId,
-        visibility: determineDocumentVisibility(
-          team?.teamGlobalSettings?.documentVisibility,
-          userTeamRole ?? TeamMemberRole.MEMBER,
-        ),
+        visibility:
+          folderVisibility ??
+          determineDocumentVisibility(
+            team?.teamGlobalSettings?.documentVisibility,
+            userTeamRole ?? TeamMemberRole.MEMBER,
+          ),
         formValues,
         source: DocumentSource.DOCUMENT,
         documentMeta: {
