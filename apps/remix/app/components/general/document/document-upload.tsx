@@ -4,7 +4,7 @@ import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
 import { Trans } from '@lingui/react/macro';
 import { Loader } from 'lucide-react';
-import { useNavigate, useSearchParams } from 'react-router';
+import { useNavigate, useParams } from 'react-router';
 import { match } from 'ts-pattern';
 
 import { useLimits } from '@documenso/ee/server-only/limits/provider/client';
@@ -30,8 +30,7 @@ export const DocumentUploadDropzone = ({ className }: DocumentUploadDropzoneProp
   const { _ } = useLingui();
   const { toast } = useToast();
   const { user } = useSession();
-  const [searchParams] = useSearchParams();
-  const folderId = searchParams.get('folderId');
+  const { folderId } = useParams();
 
   const team = useOptionalCurrentTeam();
 

@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useState } from 'react';
 
 import { zodResolver } from '@hookform/resolvers/zod';
 import { msg } from '@lingui/core/macro';
@@ -6,13 +6,12 @@ import { useLingui } from '@lingui/react';
 import type * as DialogPrimitive from '@radix-ui/react-dialog';
 import { FolderPlusIcon } from 'lucide-react';
 import { useForm } from 'react-hook-form';
-import { useSearchParams } from 'react-router';
+import { useNavigate, useParams } from 'react-router';
 import { z } from 'zod';
 
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
-import { parseToIntegerArray } from '@documenso/lib/utils/params';
+import { formatDocumentsPath } from '@documenso/lib/utils/teams';
 import { trpc } from '@documenso/trpc/react';
-import { ZFindDocumentsInternalRequestSchema } from '@documenso/trpc/server/document-router/schema';
 import { Button } from '@documenso/ui/primitives/button';
 import {
   Dialog,
@@ -34,16 +33,7 @@ import {
 import { Input } from '@documenso/ui/primitives/input';
 import { useToast } from '@documenso/ui/primitives/use-toast';
 
-const ZSearchParamsSchema = ZFindDocumentsInternalRequestSchema.pick({
-  status: true,
-  period: true,
-  page: true,
-  perPage: true,
-  query: true,
-}).extend({
-  senderIds: z.string().transform(parseToIntegerArray).optional().catch([]),
-  folderId: z.string().optional(),
-});
+import { useOptionalCurrentTeam } from '~/providers/team';
 
 const ZCreateFolderFormSchema = z.object({
   name: z.string().min(1, { message: 'Folder name is required' }),
@@ -58,15 +48,10 @@ export type CreateFolderDialogProps = {
 export const CreateFolderDialog = ({ trigger, ...props }: CreateFolderDialogProps) => {
   const { toast } = useToast();
   const { _ } = useLingui();
-  const [searchParams] = useSearchParams();
+  const navigate = useNavigate();
+  const team = useOptionalCurrentTeam();
+  const { folderId } = useParams();
   const [isCreateFolderOpen, setIsCreateFolderOpen] = useState(false);
-
-  const findDocumentSearchParams = useMemo(
-    () => ZSearchParamsSchema.safeParse(Object.fromEntries(searchParams.entries())).data || {},
-    [searchParams],
-  );
-
-  const currentFolderId = findDocumentSearchParams.folderId;
 
   const { mutateAsync: createFolder } = trpc.folder.createFolder.useMutation();
 
@@ -79,9 +64,9 @@ export const CreateFolderDialog = ({ trigger, ...props }: CreateFolderDialogProp
 
   const onSubmit = async (data: TCreateFolderFormSchema) => {
     try {
-      await createFolder({
+      const newFolder = await createFolder({
         name: data.name,
-        parentId: currentFolderId,
+        parentId: folderId ?? null,
       });
 
       setIsCreateFolderOpen(false);
@@ -89,6 +74,9 @@ export const CreateFolderDialog = ({ trigger, ...props }: CreateFolderDialogProp
       toast({
         title: 'Folder created successfully',
       });
+
+      const documentsPath = formatDocumentsPath(team?.url);
+      void navigate(`${documentsPath}/f/${newFolder.id}`);
     } catch (err) {
       const error = AppError.parseError(err);
 

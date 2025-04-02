@@ -188,7 +188,11 @@ const DataTableTitle = ({ row, teamUrl }: DataTableTitleProps) => {
   })
     .with({ isOwner: true }, { isCurrentTeamDocument: true }, () => (
       <Link
-        to={`${documentsPath}/${row.id}`}
+        to={
+          row.folderId
+            ? `${documentsPath}/f/${row.folderId}/${row.id}`
+            : `${documentsPath}/${row.id}`
+        }
         title={row.title}
         className="block max-w-[10rem] truncate font-medium hover:underline md:max-w-[20rem]"
       >

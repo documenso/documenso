@@ -103,7 +103,7 @@ export const DocumentMoveToFolderDialog = ({
       const documentsPath = formatDocumentsPath(team?.url);
 
       if (data.folderId) {
-        void navigate(`${documentsPath}?folderId=${data.folderId}`);
+        void navigate(`${documentsPath}/f/${data.folderId}`);
       } else {
         void navigate(documentsPath);
       }

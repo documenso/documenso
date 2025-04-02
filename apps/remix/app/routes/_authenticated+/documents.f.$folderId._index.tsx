@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 
 import { Trans } from '@lingui/react/macro';
 import { FolderIcon, HomeIcon, Loader2, PinIcon } from 'lucide-react';
-import { useNavigate, useSearchParams } from 'react-router';
+import { useNavigate, useParams, useSearchParams } from 'react-router';
 import { Link } from 'react-router';
 import { z } from 'zod';
 
@@ -67,6 +67,8 @@ export default function DocumentsPage() {
   const [isSettingsFolderOpen, setIsSettingsFolderOpen] = useState(false);
   const [folderToSettings, setFolderToSettings] = useState<TFolderWithSubfolders | null>(null);
 
+  const { folderId } = useParams();
+
   const team = useOptionalCurrentTeam();
 
   const utils = trpc.useUtils();
@@ -100,6 +102,7 @@ export default function DocumentsPage() {
   const { data, isLoading, isLoadingError, refetch } = trpc.document.findDocumentsInternal.useQuery(
     {
       ...findDocumentSearchParams,
+      folderId,
     },
   );
 
@@ -108,7 +111,7 @@ export default function DocumentsPage() {
     isLoading: isFoldersLoading,
     refetch: refetchFolders,
   } = trpc.folder.getFolders.useQuery({
-    parentId: null,
+    parentId: folderId,
   });
 
   useEffect(() => {
@@ -129,7 +132,7 @@ export default function DocumentsPage() {
       params.delete('page');
     }
 
-    return `${formatDocumentsPath(team?.url)}?${params.toString()}`;
+    return `${formatDocumentsPath(team?.url)}/f/${folderId}?${params.toString()}`;
   };
 
   useEffect(() => {
@@ -438,7 +441,7 @@ export default function DocumentsPage() {
               setDocumentToMove(null);
             }
           }}
-          currentFolderId={null}
+          currentFolderId={folderId}
         />
       )}
 
