@@ -1,0 +1,39 @@
+Thank you for installing {{ .Chart.Name }}.
+
+Your release is named {{ .Release.Name }}.
+
+To get the application URL:
+{{- if contains "NodePort" .Values.documenso.service.type }}
+  export NODE_PORT=$(kubectl get --namespace {{ .Release.Namespace }} -o jsonpath="{.spec.ports[0].nodePort}" services {{ include "documenso.fullname" . }})
+  export NODE_IP=$(kubectl get nodes --namespace {{ .Release.Namespace }} -o jsonpath="{.items[0].status.addresses[0].address}")
+  echo http://$NODE_IP:$NODE_PORT
+{{- else if contains "LoadBalancer" .Values.documenso.service.type }}
+  NOTE: It may take a few minutes for the LoadBalancer IP to be available.
+        You can watch the status of by running 'kubectl get --namespace {{ .Release.Namespace }} svc -w {{ include "documenso.fullname" . }}'
+  export SERVICE_IP=$(kubectl get svc --namespace {{ .Release.Namespace }} {{ include "documenso.fullname" . }} --template "{{"{{ range (index .status.loadBalancer.ingress 0) }}{{.}}{{ end }}"}}")
+  echo http://$SERVICE_IP:{{ .Values.documenso.service.port }}
+{{- else if contains "ClusterIP" .Values.documenso.service.type }}
+  kubectl port-forward --namespace {{ .Release.Namespace }} svc/{{ include "documenso.fullname" . }} {{ .Values.documenso.service.port }}:{{ .Values.documenso.service.port }}
+  echo "Visit http://127.0.0.1:{{ .Values.documenso.service.port }} to use your application"
+{{- end }}
+
+{{- if or (not .Values.documenso.secret.NEXTAUTH_SECRET) (not .Values.documenso.secret.NEXT_PRIVATE_ENCRYPTION_KEY) (not .Values.documenso.secret.NEXT_PRIVATE_ENCRYPTION_SECONDARY_KEY) }}
+
+WARNING: You have not set some required secret values for Documenso to function properly.
+Please set the following values in your values.yaml:
+{{- if not .Values.documenso.secret.NEXTAUTH_SECRET }}
+  - documenso.secret.NEXTAUTH_SECRET
+{{- end }}
+{{- if not .Values.documenso.secret.NEXT_PRIVATE_ENCRYPTION_KEY }}
+  - documenso.secret.NEXT_PRIVATE_ENCRYPTION_KEY
+{{- end }}
+{{- if not .Values.documenso.secret.NEXT_PRIVATE_ENCRYPTION_SECONDARY_KEY }}
+  - documenso.secret.NEXT_PRIVATE_ENCRYPTION_SECONDARY_KEY
+{{- end }}
+{{- end }}
+
+{{- if and .Values.postgresql.enabled (not .Values.postgresql.auth.password) }}
+WARNING: You have not set a password for PostgreSQL. A random password has been generated.
+To retrieve it, run:
+  kubectl get secret --namespace {{ .Release.Namespace }} {{ include "postgresql.fullname" . }}-auth -o jsonpath="{.data.password}" | base64 --decode
+{{- end }}

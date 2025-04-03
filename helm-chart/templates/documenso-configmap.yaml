@@ -1,0 +1,21 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "documenso.fullname" . }}-config
+  labels:
+    {{- include "documenso.labels" . | nindent 4 }}
+data:
+  PORT: "{{ .Values.documenso.env.PORT }}"
+  NEXT_PUBLIC_WEBAPP_URL: "{{ .Values.documenso.env.NEXT_PUBLIC_WEBAPP_URL }}"
+  NEXT_PUBLIC_MARKETING_URL: "{{ .Values.documenso.env.NEXT_PUBLIC_MARKETING_URL }}"
+  NEXT_PUBLIC_UPLOAD_TRANSPORT: "{{ .Values.documenso.env.NEXT_PUBLIC_UPLOAD_TRANSPORT }}"
+  {{- if .Values.documenso.env.NEXT_PUBLIC_DOCUMENT_SIZE_UPLOAD_LIMIT }}
+  NEXT_PUBLIC_DOCUMENT_SIZE_UPLOAD_LIMIT: "{{ .Values.documenso.env.NEXT_PUBLIC_DOCUMENT_SIZE_UPLOAD_LIMIT }}"
+  {{- end }}
+  {{- if .Values.documenso.env.NEXT_PUBLIC_POSTHOG_KEY }}
+  NEXT_PUBLIC_POSTHOG_KEY: "{{ .Values.documenso.env.NEXT_PUBLIC_POSTHOG_KEY }}"
+  {{- end }}
+  {{- if .Values.documenso.env.NEXT_PUBLIC_DISABLE_SIGNUP }}
+  NEXT_PUBLIC_DISABLE_SIGNUP: "{{ .Values.documenso.env.NEXT_PUBLIC_DISABLE_SIGNUP }}"
+  {{- end }}
+  NEXT_PRIVATE_SIGNING_LOCAL_FILE_PATH: "{{ .Values.documenso.certificate.mountPath }}"

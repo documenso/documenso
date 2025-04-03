@@ -4,7 +4,7 @@
   "private": true,
   "license": "AGPL-3.0",
   "scripts": {
-    "dev": "next dev -p 3000",
+    "dev": "next dev --port 3000 --turbopack",
     "build": "npm run translate --prefix ../../ && next build",
     "start": "next start",
     "lint": "next lint",

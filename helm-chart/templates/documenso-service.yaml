@@ -1,0 +1,27 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "documenso.fullname" . }}
+  labels:
+{{- include "documenso.labels" . | nindent 4 }}
+{{- if .Values.global.commonAnnotations }}
+  annotations:
+{{- toYaml .Values.global.commonAnnotations | nindent 4 }}
+{{- end }}
+{{- if and (not .Values.global.commonAnnotations) .Values.documenso.service.annotations }}
+  annotations:
+{{- toYaml .Values.documenso.service.annotations | nindent 4 }}
+{{- else if .Values.documenso.service.annotations }}
+  annotations:
+{{- toYaml .Values.documenso.service.annotations | nindent 4 }}
+{{- end }}
+spec:
+  type: {{ .Values.documenso.service.type }}
+  ports:
+    - port: {{ .Values.documenso.service.port }}
+      targetPort: http
+      protocol: TCP
+      name: http
+  selector:
+{{- include "documenso.selectorLabels" . | nindent 4 }}
+    app.kubernetes.io/component: app
