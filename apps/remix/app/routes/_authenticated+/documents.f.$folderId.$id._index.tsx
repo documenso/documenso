@@ -33,7 +33,7 @@ import {
 import { StackAvatarsWithTooltip } from '~/components/general/stack-avatars-with-tooltip';
 import { superLoaderJson, useSuperLoaderData } from '~/utils/super-json-loader';
 
-import type { Route } from './+types/documents.$id._index';
+import type { Route } from './+types/documents.f.$folderId.$id._index';
 
 export async function loader({ params, request }: Route.LoaderArgs) {
   const { user } = await getSession(request);
@@ -44,28 +44,25 @@ export async function loader({ params, request }: Route.LoaderArgs) {
     team = await getTeamByUrl({ userId: user.id, teamUrl: params.teamUrl });
   }
 
-  const { id } = params;
+  const { id, folderId } = params;
 
   const documentId = Number(id);
 
   const documentRootPath = formatDocumentsPath(team?.url);
 
-  if (!documentId || Number.isNaN(documentId)) {
-    throw redirect(documentRootPath);
+  if (!documentId || !folderId) {
+    throw redirect(folderId ? `${documentRootPath}/f/${folderId}` : documentRootPath);
   }
 
   const document = await getDocumentById({
     documentId,
     userId: user.id,
     teamId: team?.id,
+    folderId,
   }).catch(() => null);
 
   if (document?.teamId && !team?.url) {
-    throw redirect(documentRootPath);
-  }
-
-  if (document?.folderId) {
-    throw redirect(documentRootPath);
+    throw redirect(folderId ? `${documentRootPath}/f/${folderId}` : documentRootPath);
   }
 
   const documentVisibility = document?.visibility;
@@ -85,11 +82,15 @@ export async function loader({ params, request }: Route.LoaderArgs) {
   }
 
   if (!document || !document.documentData || (team && !canAccessDocument)) {
-    throw redirect(documentRootPath);
+    throw redirect(folderId ? `${documentRootPath}/f/${folderId}` : documentRootPath);
   }
 
   if (team && !canAccessDocument) {
-    throw redirect(documentRootPath);
+    throw redirect(folderId ? `${documentRootPath}/f/${folderId}` : documentRootPath);
+  }
+
+  if (document.folderId !== folderId) {
+    throw redirect(folderId ? `${documentRootPath}/f/${folderId}` : documentRootPath);
   }
 
   // Todo: Get full document instead?
@@ -115,6 +116,7 @@ export async function loader({ params, request }: Route.LoaderArgs) {
     document: documentWithRecipients,
     documentRootPath,
     fields,
+    folderId,
   });
 }
 
@@ -124,7 +126,7 @@ export default function DocumentPage() {
   const { _ } = useLingui();
   const { user } = useSession();
 
-  const { document, documentRootPath, fields } = loaderData;
+  const { document, documentRootPath, fields, folderId } = loaderData;
 
   const { recipients, documentData, documentMeta } = document;
 
@@ -137,7 +139,10 @@ export default function DocumentPage() {
         <DocumentRecipientLinkCopyDialog recipients={recipients} />
       )}
 
-      <Link to={documentRootPath} className="flex items-center text-[#7AC455] hover:opacity-80">
+      <Link
+        to={folderId ? `${documentRootPath}/f/${folderId}` : documentRootPath}
+        className="flex items-center text-[#7AC455] hover:opacity-80"
+      >
         <ChevronLeft className="mr-2 inline-block h-5 w-5" />
         <Trans>Documents</Trans>
       </Link>

@@ -31,6 +31,7 @@ export const ZDocumentSchema = DocumentSchema.pick({
   deletedAt: true,
   teamId: true,
   templateId: true,
+  folderId: true,
 }).extend({
   // Todo: Maybe we want to alter this a bit since this returns a lot of data.
   documentData: DocumentDataSchema.pick({
@@ -82,6 +83,7 @@ export const ZDocumentLiteSchema = DocumentSchema.pick({
   deletedAt: true,
   teamId: true,
   templateId: true,
+  folderId: true,
 });
 
 /**
@@ -104,6 +106,7 @@ export const ZDocumentManySchema = DocumentSchema.pick({
   deletedAt: true,
   teamId: true,
   templateId: true,
+  folderId: true,
 }).extend({
   user: UserSchema.pick({
     id: true,

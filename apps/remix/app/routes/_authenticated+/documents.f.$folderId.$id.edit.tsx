@@ -28,7 +28,7 @@ export async function loader({ params, request }: Route.LoaderArgs) {
     team = await getTeamByUrl({ userId: user.id, teamUrl: params.teamUrl });
   }
 
-  const { id } = params;
+  const { id, folderId } = params;
 
   const documentId = Number(id);
 
@@ -38,17 +38,18 @@ export async function loader({ params, request }: Route.LoaderArgs) {
     throw redirect(documentRootPath);
   }
 
+  if (!folderId) {
+    throw redirect(documentRootPath);
+  }
+
   const document = await getDocumentWithDetailsById({
     documentId,
     userId: user.id,
     teamId: team?.id,
+    folderId,
   }).catch(() => null);
 
   if (document?.teamId && !team?.url) {
-    throw redirect(documentRootPath);
-  }
-
-  if (document?.folderId) {
     throw redirect(documentRootPath);
   }
 
@@ -76,6 +77,10 @@ export async function loader({ params, request }: Route.LoaderArgs) {
     throw redirect(documentRootPath);
   }
 
+  if (document.folderId !== folderId) {
+    throw redirect(folderId ? `${documentRootPath}/f/${folderId}` : documentRootPath);
+  }
+
   if (isDocumentCompleted(document.status)) {
     throw redirect(`${documentRootPath}/${documentId}`);
   }
@@ -89,17 +94,22 @@ export async function loader({ params, request }: Route.LoaderArgs) {
     document,
     documentRootPath,
     isDocumentEnterprise,
+    folderId,
   });
 }
 
 export default function DocumentEditPage() {
-  const { document, documentRootPath, isDocumentEnterprise } = useSuperLoaderData<typeof loader>();
+  const { document, documentRootPath, isDocumentEnterprise, folderId } =
+    useSuperLoaderData<typeof loader>();
 
   const { recipients } = document;
 
   return (
     <div className="mx-auto -mt-4 w-full max-w-screen-xl px-4 md:px-8">
-      <Link to={documentRootPath} className="flex items-center text-[#7AC455] hover:opacity-80">
+      <Link
+        to={`${documentRootPath}/f/${folderId}`}
+        className="flex items-center text-[#7AC455] hover:opacity-80"
+      >
         <ChevronLeft className="mr-2 inline-block h-5 w-5" />
         <Trans>Documents</Trans>
       </Link>

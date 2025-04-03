@@ -22,7 +22,7 @@ import {
 } from '~/components/general/document/document-status';
 import { DocumentLogsTable } from '~/components/tables/document-logs-table';
 
-import type { Route } from './+types/documents.$id.logs';
+import type { Route } from './+types/documents.f.$folderId.$id.logs';
 
 export async function loader({ params, request }: Route.LoaderArgs) {
   const { user } = await getSession(request);
@@ -33,45 +33,53 @@ export async function loader({ params, request }: Route.LoaderArgs) {
     team = await getTeamByUrl({ userId: user.id, teamUrl: params.teamUrl });
   }
 
-  const { id } = params;
+  const { id, folderId } = params;
 
   const documentId = Number(id);
 
   const documentRootPath = formatDocumentsPath(team?.url);
 
   if (!documentId || Number.isNaN(documentId)) {
+    throw redirect(folderId ? `${documentRootPath}/f/${folderId}` : documentRootPath);
+  }
+
+  if (!folderId) {
     throw redirect(documentRootPath);
   }
 
-  const document = await getDocumentById({
-    documentId,
-    userId: user.id,
-    teamId: team?.id,
-  }).catch(() => null);
+  // Todo: Get full document instead?
+  const [document, recipients] = await Promise.all([
+    getDocumentById({
+      documentId,
+      userId: user.id,
+      teamId: team?.id,
+      folderId,
+    }).catch(() => null),
+    getRecipientsForDocument({
+      documentId,
+      userId: user.id,
+      teamId: team?.id,
+    }),
+  ]);
 
   if (!document || !document.documentData) {
-    throw redirect(documentRootPath);
+    throw redirect(folderId ? `${documentRootPath}/f/${folderId}` : documentRootPath);
   }
 
-  if (document.folderId) {
+  if (document.folderId !== folderId) {
     throw redirect(documentRootPath);
   }
-
-  const recipients = await getRecipientsForDocument({
-    documentId,
-    userId: user.id,
-    teamId: team?.id,
-  });
 
   return {
     document,
     documentRootPath,
     recipients,
+    folderId,
   };
 }
 
 export default function DocumentsLogsPage({ loaderData }: Route.ComponentProps) {
-  const { document, documentRootPath, recipients } = loaderData;
+  const { document, documentRootPath, recipients, folderId } = loaderData;
 
   const { _, i18n } = useLingui();
 
@@ -121,10 +129,11 @@ export default function DocumentsLogsPage({ loaderData }: Route.ComponentProps) 
 
     return `[${recipient.role}] ${text}`;
   };
+
   return (
     <div className="mx-auto -mt-4 w-full max-w-screen-xl px-4 md:px-8">
       <Link
-        to={`${documentRootPath}/${document.id}`}
+        to={`${documentRootPath}/f/${folderId}/${document.id}`}
         className="flex items-center text-[#7AC455] hover:opacity-80"
       >
         <ChevronLeft className="mr-2 inline-block h-5 w-5" />
