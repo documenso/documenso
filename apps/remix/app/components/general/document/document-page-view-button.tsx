@@ -101,7 +101,13 @@ export const DocumentPageViewButton = ({ document }: DocumentPageViewButtonProps
     ))
     .with({ isComplete: false }, () => (
       <Button className="w-full" asChild>
-        <Link to={`${documentsPath}/${document.id}/edit`}>
+        <Link
+          to={
+            document.folderId
+              ? `${documentsPath}/f/${document.folderId}/${document.id}/edit`
+              : `${documentsPath}/${document.id}/edit`
+          }
+        >
           <Trans>Edit</Trans>
         </Link>
       </Button>

@@ -230,12 +230,13 @@ export const documentRouter = router({
     .output(ZGetDocumentWithDetailsByIdResponseSchema)
     .query(async ({ input, ctx }) => {
       const { teamId, user } = ctx;
-      const { documentId } = input;
+      const { documentId, folderId } = input;
 
       return await getDocumentWithDetailsById({
         userId: user.id,
         teamId,
         documentId,
+        folderId,
       });
     }),
 

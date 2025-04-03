@@ -51,17 +51,18 @@ export async function loader({ params, request }: Route.LoaderArgs) {
   const documentRootPath = formatDocumentsPath(team?.url);
 
   if (!documentId || !folderId) {
-    throw redirect(`${documentRootPath}/f/${folderId}`);
+    throw redirect(folderId ? `${documentRootPath}/f/${folderId}` : documentRootPath);
   }
 
   const document = await getDocumentById({
     documentId,
     userId: user.id,
     teamId: team?.id,
+    folderId,
   }).catch(() => null);
 
   if (document?.teamId && !team?.url) {
-    throw redirect(`${documentRootPath}/f/${folderId}`);
+    throw redirect(folderId ? `${documentRootPath}/f/${folderId}` : documentRootPath);
   }
 
   const documentVisibility = document?.visibility;
@@ -81,11 +82,15 @@ export async function loader({ params, request }: Route.LoaderArgs) {
   }
 
   if (!document || !document.documentData || (team && !canAccessDocument)) {
-    throw redirect(`${documentRootPath}/f/${folderId}`);
+    throw redirect(folderId ? `${documentRootPath}/f/${folderId}` : documentRootPath);
   }
 
   if (team && !canAccessDocument) {
-    throw redirect(`${documentRootPath}/f/${folderId}`);
+    throw redirect(folderId ? `${documentRootPath}/f/${folderId}` : documentRootPath);
+  }
+
+  if (document.folderId !== folderId) {
+    throw redirect(folderId ? `${documentRootPath}/f/${folderId}` : documentRootPath);
   }
 
   // Todo: Get full document instead?
@@ -135,7 +140,7 @@ export default function DocumentPage() {
       )}
 
       <Link
-        to={`${documentRootPath}/f/${folderId}`}
+        to={folderId ? `${documentRootPath}/f/${folderId}` : documentRootPath}
         className="flex items-center text-[#7AC455] hover:opacity-80"
       >
         <ChevronLeft className="mr-2 inline-block h-5 w-5" />

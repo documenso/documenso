@@ -47,6 +47,7 @@ export type DocumentsTableActionDropdownProps = {
     user: Pick<User, 'id' | 'name' | 'email'>;
     recipients: Recipient[];
     team: Pick<Team, 'id' | 'url'> | null;
+    folderId?: string | null;
   };
   onMoveDocument?: () => void;
 };
@@ -145,7 +146,13 @@ export const DocumentsTableActionDropdown = ({
         )}
 
         <DropdownMenuItem disabled={!canManageDocument || isComplete} asChild>
-          <Link to={`${documentsPath}/${row.id}/edit`}>
+          <Link
+            to={
+              row.folderId
+                ? `${documentsPath}/f/${row.folderId}/${row.id}/edit`
+                : `${documentsPath}/${row.id}/edit`
+            }
+          >
             <Edit className="mr-2 h-4 w-4" />
             <Trans>Edit</Trans>
           </Link>

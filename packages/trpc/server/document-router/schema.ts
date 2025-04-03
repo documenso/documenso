@@ -190,6 +190,7 @@ export type TGetDocumentByTokenQuerySchema = z.infer<typeof ZGetDocumentByTokenQ
 
 export const ZGetDocumentWithDetailsByIdRequestSchema = z.object({
   documentId: z.number(),
+  folderId: z.string().nullable().optional(),
 });
 
 export const ZGetDocumentWithDetailsByIdResponseSchema = ZDocumentSchema;
