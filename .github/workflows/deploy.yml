@@ -20,11 +20,31 @@ jobs:
           fetch-depth: 0
           token: ${{ secrets.GH_TOKEN }}
 
-      - name: Push to release branch
+      - name: Extract version for branch name
+        id: extract_branch_version
         run: |
-          git checkout release || git checkout -b release
+          # Get the exact tag that triggered this workflow
+          if [[ "$GITHUB_REF" == refs/tags/* ]]; then
+            # Extract the tag from the ref (refs/tags/v1.2.3 -> v1.2.3)
+            VERSION=${GITHUB_REF#refs/tags/}
+          else
+            # Fallback to the latest tag if triggered manually
+            VERSION=$(git describe --tags --abbrev=0)
+          fi
+
+          # Clean the version for use in branch name (remove any invalid chars)
+          BRANCH_VERSION=$(echo $VERSION | sed 's/[^a-zA-Z0-9._-]/-/g')
+          echo "branch_version=$BRANCH_VERSION" >> $GITHUB_OUTPUT
+
+      - name: Push to versioned release branch
+        run: |
+          # Create a release branch with the version in the name
+          RELEASE_BRANCH="release-${{ steps.extract_branch_version.outputs.branch_version }}"
+          echo "Creating/updating release branch: $RELEASE_BRANCH"
+
+          git checkout $RELEASE_BRANCH 2>/dev/null || git checkout -b $RELEASE_BRANCH
           git merge --ff-only main
-          git push origin release
+          git push origin $RELEASE_BRANCH
 
       - name: Extract version
         id: extract_version

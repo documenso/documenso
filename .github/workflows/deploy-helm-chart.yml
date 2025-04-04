@@ -1,26 +1,7 @@
 name: Deploy Helm Chart
 
 on:
-  push:
-    branches:
-      - main
-    paths:
-      - 'charts/**'
-  workflow_dispatch: # Allow manual triggering
-    inputs:
-      environment:
-        description: 'Environment to deploy to'
-        required: true
-        default: 'staging'
-        type: choice
-        options:
-          - staging
-          - production
-      version:
-        description: 'Version to deploy (leave empty for latest)'
-        required: false
-        type: string
-  workflow_call: # Allow calling from other workflows
+  workflow_call: # Only callable from other workflows
     inputs:
       environment:
         description: 'Environment to deploy to'

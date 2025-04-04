@@ -1,9 +1,6 @@
 name: Server Build and Release
 
 on:
-  push:
-    branches: ['main']
-  workflow_dispatch:
   workflow_call:
     inputs:
       image_tag:
