@@ -4,11 +4,30 @@ on:
   push:
     branches: ['main']
   workflow_dispatch:
+  workflow_call:
+    inputs:
+      image_tag:
+        description: 'Specific image tag to use (defaults to github.ref_name)'
+        required: false
+        type: string
+    outputs:
+      image_tag:
+        description: 'The tag of the built Docker image'
+        value: ${{ jobs.build.outputs.image_tag }}
+    secrets:
+      GH_TOKEN:
+        description: 'GitHub token with packages:write scope'
+        required: true
+      IPINFO_ACCESS_TOKEN:
+        description: 'IPINFO access token'
+        required: false
 jobs:
   build:
     name: 'Server: Build 🐳'
     timeout-minutes: 15
     runs-on: ubuntu-latest
+    outputs:
+      image_tag: ${{ steps.set_tag.outputs.image_tag }}
     permissions:
       contents: read
       packages: write
@@ -27,6 +46,20 @@ jobs:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.GH_TOKEN }}
+
+      - name: Set image tag
+        id: set_tag
+        run: |
+          if [ -n "${{ inputs.image_tag }}" ]; then
+            IMAGE_TAG="${{ inputs.image_tag }}"
+          else
+            IMAGE_TAG="${GITHUB_REF##*/}"
+            if [ "$IMAGE_TAG" = "main" ]; then
+              IMAGE_TAG="latest"
+            fi
+          fi
+          echo "Using image tag: $IMAGE_TAG"
+          echo "image_tag=$IMAGE_TAG" >> $GITHUB_OUTPUT
 
       - name: Docker meta
         id: meta

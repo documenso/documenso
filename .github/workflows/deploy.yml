@@ -4,10 +4,13 @@ on:
   push:
     tags:
       - '*'
+  workflow_dispatch: # Allow manual triggering
 
 jobs:
-  deploy:
+  deploy-app:
     runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.extract_version.outputs.version }}
 
     steps:
       - name: Checkout code
@@ -22,3 +25,39 @@ jobs:
           git checkout release || git checkout -b release
           git merge --ff-only main
           git push origin release
+
+      - name: Extract version
+        id: extract_version
+        run: |
+          # Get the exact tag that triggered this workflow
+          if [[ "$GITHUB_REF" == refs/tags/* ]]; then
+            # Extract the tag from the ref (refs/tags/v1.2.3 -> v1.2.3)
+            VERSION=${GITHUB_REF#refs/tags/}
+          else
+            # Fallback to the latest tag if triggered manually
+            VERSION=$(git describe --tags --abbrev=0)
+          fi
+
+          echo "Using version from tag: $VERSION"
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+
+  build-docker:
+    needs: deploy-app
+    uses: ./.github/workflows/release-docker-image.yml
+    with:
+      image_tag: ${{ needs.deploy-app.outputs.version }}
+    secrets:
+      GH_TOKEN: ${{ secrets.GH_TOKEN }}
+      IPINFO_ACCESS_TOKEN: ${{ secrets.IPINFO_ACCESS_TOKEN }}
+
+  deploy-helm:
+    needs: [deploy-app, build-docker]
+    uses: ./.github/workflows/deploy-helm-chart.yml
+    with:
+      environment: production
+      version: ${{ needs.deploy-app.outputs.version }}
+    secrets:
+      GH_TOKEN: ${{ secrets.GH_TOKEN }}
+      HETZNER_HOST: ${{ secrets.HETZNER_HOST }}
+      HETZNER_USER: ${{ secrets.HETZNER_USER }}
+      SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
