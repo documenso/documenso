@@ -3,8 +3,8 @@
 # This Makefile provides commands to validate and lint Helm charts,
 # ensuring they follow best practices and have no structural issues.
 
-CHART_DIR := charts
-CHART_NAME := documenso
+CHART_DIR := charts/document-management-platform
+CHART_NAME := document-management-platform
 KUBE_VERSION := 1.25.0  # Modify as needed for your target k8s version
 
 .PHONY: all clean lint template validate yamllint helm-docs chart-structure kubeval kubeconform quick-check

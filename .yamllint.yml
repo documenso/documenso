@@ -11,4 +11,7 @@ rules:
   empty-lines: disable
 
 ignore:
-  - charts/templates/
+  - charts/**/*.yaml
+  - charts/**/*.yml
+  - charts/document-management-platform/**/*.yaml
+  - charts/document-management-platform/**/*.yml
