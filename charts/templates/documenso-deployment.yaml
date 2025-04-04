@@ -1,0 +1,178 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{include "documenso.fullname" .}}
+  labels:
+    {{- include "documenso.labels" . | nindent 4}}
+  {{- if .Values.global.commonAnnotations}}
+  annotations:
+    {{- toYaml .Values.global.commonAnnotations | nindent 4}}
+  {{- end}}
+spec:
+  {{- if .Values.documenso.strategy}}
+  strategy:
+    {{- toYaml .Values.documenso.strategy | nindent 4}}
+  {{- end}}
+  replicas: {{.Values.documenso.replicaCount}}
+  selector:
+    matchLabels:
+      {{- include "documenso.selectorLabels" . | nindent 6}}
+      app.kubernetes.io/component: app
+  template:
+    metadata:
+      labels:
+        {{- include "documenso.selectorLabels" . | nindent 8}}
+        app.kubernetes.io/component: app
+      {{- if or .Values.documenso.podAnnotations .Values.global.commonAnnotations}}
+      annotations:
+        {{- if .Values.documenso.podAnnotations}}
+        {{- toYaml .Values.documenso.podAnnotations | nindent 8}}
+        {{- end}}
+        {{- if .Values.global.commonAnnotations}}
+        {{- toYaml .Values.global.commonAnnotations | nindent 8}}
+        {{- end}}
+      {{- end}}
+    spec:
+      {{- with .Values.global.imagePullSecrets}}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8}}
+      {{- end}}
+      {{- if .Values.global.podSecurityContext}}
+      securityContext:
+        {{- toYaml .Values.global.podSecurityContext | nindent 8}}
+      {{- end}}
+      {{- if .Values.documenso.livenessProbe.enabled}}
+      containers:
+        - name: {{.Chart.Name}}
+          image: "{{.Values.documenso.image.repository}}:{{.Values.documenso.image.tag}}"
+          imagePullPolicy: {{.Values.documenso.image.pullPolicy}}
+          {{- if .Values.documenso.securityContext}}
+          securityContext:
+            {{- toYaml .Values.documenso.securityContext | nindent 12}}
+          {{- end}}
+          ports:
+            - name: http
+              containerPort: {{.Values.documenso.env.PORT | default 3000}}
+              protocol: TCP
+          {{- if .Values.documenso.livenessProbe.enabled}}
+          livenessProbe:
+            httpGet:
+              path: {{.Values.documenso.livenessProbe.httpGet.path}}
+              port: {{.Values.documenso.livenessProbe.httpGet.port}}
+            initialDelaySeconds: {{.Values.documenso.livenessProbe.initialDelaySeconds}}
+            periodSeconds: {{.Values.documenso.livenessProbe.periodSeconds}}
+            timeoutSeconds: {{.Values.documenso.livenessProbe.timeoutSeconds}}
+            failureThreshold: {{.Values.documenso.livenessProbe.failureThreshold}}
+            successThreshold: {{.Values.documenso.livenessProbe.successThreshold}}
+          {{- end}}
+          {{- if .Values.documenso.readinessProbe.enabled}}
+          readinessProbe:
+            httpGet:
+              path: {{.Values.documenso.readinessProbe.httpGet.path}}
+              port: {{.Values.documenso.readinessProbe.httpGet.port}}
+            initialDelaySeconds: {{.Values.documenso.readinessProbe.initialDelaySeconds}}
+            periodSeconds: {{.Values.documenso.readinessProbe.periodSeconds}}
+            timeoutSeconds: {{.Values.documenso.readinessProbe.timeoutSeconds}}
+            failureThreshold: {{.Values.documenso.readinessProbe.failureThreshold}}
+            successThreshold: {{.Values.documenso.readinessProbe.successThreshold}}
+          {{- end}}
+          {{- if .Values.documenso.startupProbe.enabled}}
+          startupProbe:
+            httpGet:
+              path: {{.Values.documenso.startupProbe.httpGet.path}}
+              port: {{.Values.documenso.startupProbe.httpGet.port}}
+            initialDelaySeconds: {{.Values.documenso.startupProbe.initialDelaySeconds}}
+            periodSeconds: {{.Values.documenso.startupProbe.periodSeconds}}
+            timeoutSeconds: {{.Values.documenso.startupProbe.timeoutSeconds}}
+            failureThreshold: {{.Values.documenso.startupProbe.failureThreshold}}
+            successThreshold: {{.Values.documenso.startupProbe.successThreshold}}
+          {{- end}}
+          envFrom:
+            - configMapRef:
+                name: {{include "documenso.fullname" .}}-config
+            - secretRef:
+                name: {{include "documenso.fullname" .}}-secret
+          {{- if .Values.documenso.extraEnvVarsSecret}}
+            - secretRef:
+                name: {{.Values.documenso.extraEnvVarsSecret}}
+          {{- end}}
+          {{- if .Values.documenso.extraEnvVars}}
+          env:
+            {{- toYaml .Values.documenso.extraEnvVars | nindent 12}}
+          {{- end}}
+          {{- if or .Values.documenso.certificate.enabled .Values.documenso.extraVolumeMounts}}
+          volumeMounts:
+            {{- if .Values.documenso.certificate.enabled}}
+            - name: certificate
+              mountPath: {{.Values.documenso.certificate.mountPath}}
+              subPath: {{.Values.documenso.certificate.key}}
+            {{- end}}
+            {{- if .Values.documenso.extraVolumeMounts}}
+            {{- toYaml .Values.documenso.extraVolumeMounts | nindent 12}}
+            {{- end}}
+          {{- end}}
+          resources:
+            {{- toYaml .Values.documenso.resources | nindent 12}}
+      {{- else}}
+      containers:
+        - name: {{.Chart.Name}}
+          image: "{{.Values.documenso.image.repository}}:{{.Values.documenso.image.tag}}"
+          imagePullPolicy: {{.Values.documenso.image.pullPolicy}}
+          {{- if .Values.documenso.securityContext}}
+          securityContext:
+            {{- toYaml .Values.documenso.securityContext | nindent 12}}
+          {{- end}}
+          ports:
+            - name: http
+              containerPort: {{.Values.documenso.env.PORT | default 3000}}
+              protocol: TCP
+          envFrom:
+            - configMapRef:
+                name: {{include "documenso.fullname" .}}-config
+            - secretRef:
+                name: {{include "documenso.fullname" .}}-secret
+          {{- if .Values.documenso.extraEnvVarsSecret}}
+            - secretRef:
+                name: {{.Values.documenso.extraEnvVarsSecret}}
+          {{- end}}
+          {{- if .Values.documenso.extraEnvVars}}
+          env:
+            {{- toYaml .Values.documenso.extraEnvVars | nindent 12}}
+          {{- end}}
+          {{- if or .Values.documenso.certificate.enabled .Values.documenso.extraVolumeMounts}}
+          volumeMounts:
+            {{- if .Values.documenso.certificate.enabled}}
+            - name: certificate
+              mountPath: {{.Values.documenso.certificate.mountPath}}
+              subPath: {{.Values.documenso.certificate.key}}
+            {{- end}}
+            {{- if .Values.documenso.extraVolumeMounts}}
+            {{- toYaml .Values.documenso.extraVolumeMounts | nindent 12}}
+            {{- end}}
+          {{- end}}
+          resources:
+            {{- toYaml .Values.documenso.resources | nindent 12}}
+      {{- end}}
+      {{- if or .Values.documenso.certificate.enabled .Values.documenso.extraVolumes}}
+      volumes:
+        {{- if .Values.documenso.certificate.enabled}}
+        - name: certificate
+          secret:
+            secretName: {{.Values.documenso.certificate.existingSecret | default (printf "%s-cert" (include "documenso.fullname" .))}}
+        {{- end}}
+        {{- if .Values.documenso.extraVolumes}}
+        {{- toYaml .Values.documenso.extraVolumes | nindent 8}}
+        {{- end}}
+      {{- end}}
+      {{- with .Values.documenso.nodeSelector}}
+      nodeSelector:
+        {{- toYaml . | nindent 8}}
+      {{- end}}
+      {{- with .Values.documenso.affinity}}
+      affinity:
+        {{- toYaml . | nindent 8}}
+      {{- end}}
+      {{- with .Values.documenso.tolerations}}
+      tolerations:
+        {{- toYaml . | nindent 8}}
+      {{- end}}

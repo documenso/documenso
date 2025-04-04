@@ -1,0 +1,14 @@
+extends: relaxed
+
+rules:
+  line-length: disable
+  document-start: disable
+  trailing-spaces: disable
+  truthy: disable
+  comments-indentation: disable
+  indentation: disable
+  new-line-at-end-of-file: disable
+  empty-lines: disable
+
+ignore:
+  - charts/templates/

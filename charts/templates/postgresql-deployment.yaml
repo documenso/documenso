@@ -1,0 +1,116 @@
+{{- if .Values.postgresql.enabled}}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{include "postgresql.fullname" .}}
+  labels:
+    {{- include "documenso.labels" . | nindent 4}}
+    app.kubernetes.io/component: database
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      {{- include "documenso.selectorLabels" . | nindent 6}}
+      app.kubernetes.io/component: database
+  template:
+    metadata:
+      labels:
+        {{- include "documenso.selectorLabels" . | nindent 8}}
+        app.kubernetes.io/component: database
+      {{- with .Values.postgresql.podAnnotations}}
+      annotations:
+        {{- toYaml . | nindent 8}}
+      {{- end}}
+    spec:
+      {{- with .Values.postgresql.securityContext}}
+      securityContext:
+        {{- toYaml . | nindent 8}}
+      {{- end}}
+      containers:
+        - name: postgresql
+          image: "{{.Values.postgresql.image.repository}}:{{.Values.postgresql.image.tag}}"
+          imagePullPolicy: {{.Values.postgresql.image.pullPolicy}}
+          securityContext:
+            readOnlyRootFilesystem: true
+          ports:
+            - name: postgres
+              containerPort: 5432
+              protocol: TCP
+          env:
+            - name: POSTGRES_USER
+              valueFrom:
+                secretKeyRef:
+                  name: {{include "postgresql.fullname" .}}-auth
+                  key: username
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{include "postgresql.fullname" .}}-auth
+                  key: password
+            - name: POSTGRES_DB
+              valueFrom:
+                secretKeyRef:
+                  name: {{include "postgresql.fullname" .}}-auth
+                  key: database
+          livenessProbe:
+            exec:
+              command:
+                - pg_isready
+                - -U
+                - "$(POSTGRES_USER)"
+            initialDelaySeconds: 30
+            periodSeconds: 10
+            timeoutSeconds: 5
+            successThreshold: 1
+            failureThreshold: 5
+          readinessProbe:
+            exec:
+              command:
+                - pg_isready
+                - -U
+                - "$(POSTGRES_USER)"
+            initialDelaySeconds: 5
+            periodSeconds: 10
+            timeoutSeconds: 5
+            successThreshold: 1
+            failureThreshold: 3
+          resources:
+            {{- toYaml .Values.postgresql.resources | nindent 12}}
+          volumeMounts:
+            - name: data
+              mountPath: /var/lib/postgresql/data
+            - name: tmp
+              mountPath: /tmp
+            - name: var-run
+              mountPath: /var/run/postgresql
+            {{- if .Values.postgresql.extraVolumeMounts }}
+            {{- toYaml .Values.postgresql.extraVolumeMounts | nindent 12 }}
+            {{- end }}
+      {{- with .Values.postgresql.nodeSelector}}
+      nodeSelector:
+        {{- toYaml . | nindent 8}}
+      {{- end}}
+      {{- with .Values.postgresql.affinity}}
+      affinity:
+        {{- toYaml . | nindent 8}}
+      {{- end}}
+      {{- with .Values.postgresql.tolerations}}
+      tolerations:
+        {{- toYaml . | nindent 8}}
+      {{- end}}
+      volumes:
+        - name: data
+          {{- if .Values.postgresql.persistence.enabled}}
+          persistentVolumeClaim:
+            claimName: {{include "postgresql.fullname" .}}-pvc
+          {{- else}}
+          emptyDir: {}
+          {{- end}}
+        - name: tmp
+          emptyDir: {}
+        - name: var-run
+          emptyDir: {}
+        {{- if .Values.postgresql.extraVolumes }}
+        {{- toYaml .Values.postgresql.extraVolumes | nindent 8 }}
+        {{- end }}
+{{- end}}

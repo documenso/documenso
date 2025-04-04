@@ -231,6 +231,7 @@ postgresql:
     allowPrivilegeEscalation: false
     runAsNonRoot: true
     runAsUser: 999
+    readOnlyRootFilesystem: true
     
   service:
     port: 5432
@@ -268,6 +269,24 @@ postgresql:
     annotations: {}
     accessModes:
       - ReadWriteOnce
+      
+  # Additional volumes needed when using readOnlyRootFilesystem
+  extraVolumes:
+    - name: tmp
+      emptyDir: {}
+    - name: var-run
+      emptyDir: {}
+    - name: var-lib-postgresql
+      emptyDir: {}
+      
+  extraVolumeMounts:
+    - name: tmp
+      mountPath: /tmp
+    - name: var-run
+      mountPath: /var/run/postgresql
+    - name: var-lib-postgresql
+      mountPath: /var/lib/postgresql
+      readOnly: false
   
   # PostgreSQL credentials
   auth:
