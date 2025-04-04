@@ -7,7 +7,7 @@ CHART_DIR := charts/document-management-platform
 CHART_NAME := document-management-platform
 KUBE_VERSION := 1.25.0  # Modify as needed for your target k8s version
 
-.PHONY: all clean lint template validate yamllint helm-docs chart-structure kubeval kubeconform quick-check
+.PHONY: all clean lint template validate yamllint helm-docs chart-structure kubeval kubeconform quick-check quick-check-no-yaml
 
 # Default target runs all checks (only those that don't require extra plugins)
 all: lint template validate yamllint helm-docs kubeconform chart-structure
@@ -147,3 +147,6 @@ values-debug:
 
 # Simple check target that combines several fast checks for quick validation
 quick-check: lint yamllint chart-structure
+
+# Quick check without YAML linting for Helm templates
+quick-check-no-yaml: lint chart-structure
