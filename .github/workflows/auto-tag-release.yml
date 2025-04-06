@@ -1,0 +1,67 @@
+name: Auto Tag Release
+
+on:
+  push:
+    branches:
+      - main
+    paths-ignore:
+      - '**.md'
+      - '.gitignore'
+      - '.github/workflows/**' # Don't trigger tag creation on workflow file changes
+  workflow_dispatch:
+    inputs:
+      default_bump:
+        description: 'Default bump strategy if no conventional commits found'
+        required: true
+        default: 'patch'
+        type: choice
+        options:
+          - major
+          - minor
+          - patch
+
+jobs:
+  auto-tag:
+    runs-on: ubuntu-latest
+    outputs:
+      new_version: ${{ steps.tag_version.outputs.new_tag }}
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # Need full history for tag generation and conventional commits analysis
+          token: ${{ secrets.GH_TOKEN }}
+
+      # Use mathieudutour/github-tag-action to automatically bump and tag main
+      # This action analyzes commits since last release and determines version bump based on commit messages
+      # It follows the Conventional Commits specification: https://www.conventionalcommits.org
+      - name: Bump version and push tag
+        id: tag_version
+        uses: mathieudutour/github-tag-action@v6.2
+        with:
+          github_token: ${{ secrets.GH_TOKEN }}
+          # Default bump if no conventional commits are found
+          default_bump: ${{ github.event.inputs.default_bump || 'patch' }}
+          # Prefix for the git tag (vX.X.X)
+          tag_prefix: 'v'
+          # Create an annotated tag with release notes from conventional commits
+          create_annotated_tag: true
+          # Release title template
+          release_title: 'Release ${version}'
+          # Dry run (for testing)
+          dry_run: false
+
+  # Optional job to trigger deployment using the newly created tag
+  trigger-deployment:
+    needs: auto-tag
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger deployment workflow
+        uses: peter-evans/repository-dispatch@v2
+        with:
+          token: ${{ secrets.GH_TOKEN }}
+          event-type: deploy-helm-chart
+          client-payload: '{"environment": "production", "version": "${{ needs.auto-tag.outputs.new_version }}"}'

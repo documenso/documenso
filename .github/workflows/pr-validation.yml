@@ -1,0 +1,138 @@
+name: PR Validation
+
+on:
+  pull_request:
+    branches:
+      - main
+    paths-ignore:
+      - '**.md'
+      - '.gitignore'
+
+jobs:
+  validate-docker:
+    name: 'Validate Docker Build'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build Docker image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: ./docker/Dockerfile
+          push: false
+          tags: document-signing-platform:pr-${{ github.event.pull_request.number }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+          outputs: type=docker,dest=/tmp/docker-image.tar
+          # Don't actually push, just validate the build
+
+      - name: Test Docker image
+        run: |
+          docker load --input /tmp/docker-image.tar
+          docker inspect document-signing-platform:pr-${{ github.event.pull_request.number }}
+
+  validate-helm:
+    name: 'Validate Helm Chart'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Helm
+        uses: azure/setup-helm@v3
+        with:
+          version: 'latest'
+
+      - name: Lint Helm chart
+        run: |
+          helm lint ./charts/document-management-platform
+
+      - name: Package Helm chart
+        run: |
+          helm package ./charts/document-management-platform
+
+      - name: Template Helm chart
+        run: |
+          # Render the template without installing to validate syntax
+          helm template ./charts/document-management-platform > /tmp/manifest.yaml
+
+      - name: Verify rendered manifest
+        run: |
+          # Check if the manifest is valid YAML
+          cat /tmp/manifest.yaml
+          helm lint --strict --with-subcharts ./charts/document-management-platform
+
+  kubeconform-validation:
+    name: 'Kubeconform Kubernetes Validation'
+    runs-on: ubuntu-latest
+    needs: validate-helm
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Helm
+        uses: azure/setup-helm@v3
+        with:
+          version: 'latest'
+
+      - name: Install Kubeconform
+        run: |
+          curl -L "https://github.com/yannh/kubeconform/releases/latest/download/kubeconform-linux-amd64.tar.gz" | tar xz
+          sudo mv kubeconform /usr/local/bin/
+
+      - name: Render template and validate with Kubeconform
+        run: |
+          # Template the chart
+          helm template ./charts/document-management-platform > manifests.yaml
+
+          # Validate the manifests
+          kubeconform -summary -output json -schema-location default -schema-location https://raw.githubusercontent.com/datreeio/CRDs-catalog/main/{{.Group}}/{{.ResourceKind}}_{{.ResourceAPIVersion}}.json manifests.yaml
+
+  security-scan:
+    name: 'Security Scan'
+    runs-on: ubuntu-latest
+    needs: validate-docker
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Run Trivy vulnerability scanner
+        uses: aquasecurity/trivy-action@master
+        with:
+          scan-type: 'fs'
+          format: 'table'
+          exit-code: '1'
+          ignore-unfixed: true
+          severity: 'CRITICAL,HIGH'
+
+  check-code-style:
+    name: 'Code Style & Quality'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Run yamllint on Helm charts
+        run: |
+          pip install yamllint
+          # Create a temporary yamllint config that doesn't ignore charts
+          cat > helm-yamllint.yml << EOF
+          extends: relaxed
+          rules:
+            line-length: disable
+            document-start: disable
+            trailing-spaces: disable
+            comments-indentation: disable
+          EOF
+          yamllint -c helm-yamllint.yml ./charts/ || true

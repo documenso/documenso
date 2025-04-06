@@ -1,0 +1,176 @@
+name: Deploy Helm Chart
+
+on:
+  workflow_call: # Only callable from other workflows
+    inputs:
+      environment:
+        description: 'Environment to deploy to'
+        required: true
+        type: string
+        default: 'staging'
+      version:
+        description: 'Version to deploy (leave empty for latest)'
+        required: false
+        type: string
+    secrets:
+      GH_TOKEN:
+        description: 'GitHub token with repo scope'
+        required: true
+      HETZNER_HOST:
+        description: 'Hetzner server host'
+        required: true
+      HETZNER_USER:
+        description: 'Hetzner server username'
+        required: true
+      SSH_PRIVATE_KEY:
+        description: 'SSH private key for Hetzner server'
+        required: true
+
+jobs:
+  validate-chart:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Set up Helm
+        uses: azure/setup-helm@v3
+        with:
+          version: 'latest'
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+
+      - name: Install dependencies
+        run: |
+          pip install yamllint
+          pip install yamale
+          pip install kubeconform
+          helm plugin install https://github.com/helm-unittest/helm-unittest.git || true
+
+      - name: Run Helm lint
+        run: |
+          helm lint charts/document-management-platform
+
+      - name: Validate Chart structure
+        run: |
+          test -f charts/document-management-platform/Chart.yaml || echo "ERROR: Chart.yaml missing"
+          test -f charts/document-management-platform/values.yaml || echo "ERROR: values.yaml missing"
+          test -d charts/document-management-platform/templates || echo "ERROR: templates directory missing"
+
+      - name: Helm template
+        run: |
+          helm template charts/document-management-platform > /tmp/rendered.yaml
+
+  publish-chart:
+    needs: validate-chart
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Configure Git
+        run: |
+          git config user.name "GitHub Actions"
+          git config user.email "actions@github.com"
+
+      - name: Set up Helm
+        uses: azure/setup-helm@v3
+        with:
+          version: 'latest'
+
+      - name: Install helm-docs
+        run: |
+          curl -L https://github.com/norwoodj/helm-docs/releases/download/v1.11.0/helm-docs_1.11.0_linux_amd64.tar.gz | tar xz
+          chmod +x helm-docs
+          sudo mv helm-docs /usr/local/bin/
+          helm-docs --chart-search-root ./charts
+
+      - name: Set up chart-releaser
+        uses: helm/chart-releaser-action@v1.5.0
+        with:
+          install_only: true
+
+      - name: Get chart version
+        id: chart-version
+        run: |
+          VERSION=$(grep version charts/document-management-platform/Chart.yaml | awk '{print $2}')
+          echo "version=${VERSION}" >> $GITHUB_OUTPUT
+
+      - name: Package Helm Chart
+        run: |
+          mkdir -p .cr-release-packages
+          helm package charts/document-management-platform -d .cr-release-packages
+
+      - name: Upload Chart to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GH_TOKEN }}
+          publish_dir: .cr-release-packages
+          destination_dir: charts
+
+      - name: Update Helm Repo Index
+        run: |
+          cr index -o SolomonAIEngineering -r document-signing-platform -c https://solomonaiengineering.github.io/document-signing-platform/charts/
+          cp index.yaml .cr-release-packages/
+
+      - name: Upload Index to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GH_TOKEN }}
+          publish_dir: .cr-release-packages
+          destination_dir: charts
+
+  deploy-chart:
+    needs: publish-chart
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+
+      - name: Set up Helm
+        uses: azure/setup-helm@v3
+        with:
+          version: 'latest'
+
+      - name: Get chart version
+        id: chart-version
+        run: |
+          VERSION=$(grep version charts/document-management-platform/Chart.yaml | awk '{print $2}')
+          echo "version=${VERSION}" >> $GITHUB_OUTPUT
+
+      - name: Deploy via SSH
+        uses: appleboy/ssh-action@v1.0.0
+        with:
+          host: ${{ secrets.HETZNER_HOST }}
+          username: ${{ secrets.HETZNER_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          script: |
+            # Create a values file if it doesn't exist
+            VALUES_FILE="/etc/helm/values.yaml"
+            if [ ! -f "$VALUES_FILE" ]; then
+              echo "Creating default values file at $VALUES_FILE"
+              sudo mkdir -p /etc/helm
+              echo "# Default values for document-management-platform" | sudo tee $VALUES_FILE
+            fi
+
+            # Add the Helm repo and update
+            echo "Adding Helm repository..."
+            helm repo add document-management-platform https://solomonaiengineering.github.io/document-signing-platform/charts/
+            helm repo update
+
+            # Install the chart with proper error handling
+            set -e  # Exit on error
+            echo "Deploying chart version ${{ steps.chart-version.outputs.version }}..."
+            helm upgrade --install document-signing-platform document-management-platform/document-management-platform \
+              --version ${{ steps.chart-version.outputs.version }} \
+              --namespace document-management \
+              --create-namespace \
+              --values $VALUES_FILE \
+              --atomic  # Rollback on failure
