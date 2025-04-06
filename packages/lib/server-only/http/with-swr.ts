@@ -1,11 +1,11 @@
-import { NextApiResponse } from 'next';
-import { NextResponse } from 'next/server';
+import type { NextApiResponse } from 'next';
+import type { NextResponse } from 'next/server';
 
 type NarrowedResponse<T> = T extends NextResponse
   ? NextResponse
   : T extends NextApiResponse<infer U>
-  ? NextApiResponse<U>
-  : never;
+    ? NextApiResponse<U>
+    : never;
 
 export const withStaleWhileRevalidate = <T>(
   res: NarrowedResponse<T>,

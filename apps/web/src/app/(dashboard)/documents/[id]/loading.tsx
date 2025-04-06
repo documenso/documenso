@@ -35,7 +35,7 @@ export default async function Loading() {
           </div>
         </div>
 
-        <div className="bg-background border-border col-span-12 rounded-xl border-2  before:rounded-xl lg:col-span-6 xl:col-span-5" />
+        <div className="bg-background border-border col-span-12 rounded-xl border-2 before:rounded-xl lg:col-span-6 xl:col-span-5" />
       </div>
     </div>
   );

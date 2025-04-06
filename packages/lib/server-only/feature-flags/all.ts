@@ -5,7 +5,11 @@ import { getToken } from 'next-auth/jwt';
 import { LOCAL_FEATURE_FLAGS } from '@documenso/lib/constants/feature-flags';
 import PostHogServerClient from '@documenso/lib/server-only/feature-flags/get-post-hog-server-client';
 
-import { NEXT_PUBLIC_MARKETING_URL, NEXT_PUBLIC_WEBAPP_URL, NEXT_PRIVATE_INTERNAL_WEBAPP_URL } from '../../constants/app';
+import {
+  NEXT_PRIVATE_INTERNAL_WEBAPP_URL,
+  NEXT_PUBLIC_MARKETING_URL,
+  NEXT_PUBLIC_WEBAPP_URL,
+} from '../../constants/app';
 import { extractDistinctUserId, mapJwtToFlagProperties } from './get';
 
 /**

@@ -22,7 +22,7 @@ export const TextFieldAdvancedSettings = ({
   const { _ } = useLingui();
 
   const handleInput = (field: keyof TextFieldMeta, value: string | boolean) => {
-    const text = field === 'text' ? String(value) : fieldState.text ?? '';
+    const text = field === 'text' ? String(value) : (fieldState.text ?? '');
     const limit =
       field === 'characterLimit' ? Number(value) : Number(fieldState.characterLimit ?? 0);
     const fontSize = field === 'fontSize' ? Number(value) : Number(fieldState.fontSize ?? 14);

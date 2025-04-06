@@ -29,7 +29,7 @@ export default function NotFoundPartial({ children }: NotFoundPartialProps) {
           <Image
             src={backgroundPattern}
             alt="background pattern"
-            className="-mr-[50vw] -mt-[15vh] h-full scale-100 object-cover dark:contrast-[70%] dark:invert dark:sepia md:scale-100 lg:scale-[100%]"
+            className="-mr-[50vw] -mt-[15vh] h-full scale-100 object-cover md:scale-100 lg:scale-[100%] dark:contrast-[70%] dark:invert dark:sepia"
             style={{
               mask: 'radial-gradient(rgba(255, 255, 255, 1) 0%, transparent 80%)',
               WebkitMask: 'radial-gradient(rgba(255, 255, 255, 1) 0%, transparent 80%)',
