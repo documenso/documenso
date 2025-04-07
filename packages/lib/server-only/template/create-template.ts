@@ -20,6 +20,7 @@ export const createTemplate = async ({
   userId,
   teamId,
   templateDocumentDataId,
+  folderId,
 }: CreateTemplateOptions) => {
   let team = null;
 
@@ -43,6 +44,35 @@ export const createTemplate = async ({
     }
   }
 
+  if (folderId) {
+    const folder = await prisma.folder.findFirst({
+      where: {
+        id: folderId,
+        ...(teamId
+          ? {
+              team: {
+                id: teamId,
+                members: {
+                  some: {
+                    userId,
+                  },
+                },
+              },
+            }
+          : {
+              userId,
+              teamId: null,
+            }),
+      },
+    });
+
+    if (!folder) {
+      throw new AppError(AppErrorCode.NOT_FOUND, {
+        message: 'Folder not found',
+      });
+    }
+  }
+
   return await prisma.template.create({
     data: {
       title,
@@ -57,6 +87,7 @@ export const createTemplate = async ({
           drawSignatureEnabled: team?.teamGlobalSettings?.drawSignatureEnabled ?? true,
         },
       },
+      folderId,
     },
   });
 };

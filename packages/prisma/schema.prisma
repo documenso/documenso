@@ -313,6 +313,11 @@ enum DocumentVisibility {
   ADMIN
 }
 
+enum FolderType {
+  DOCUMENT
+  TEMPLATE
+}
+
 model Folder {
   id         String             @id @default(cuid())
   name       String
@@ -324,14 +329,17 @@ model Folder {
   parentId   String?
   parent     Folder?            @relation("FolderToFolder", fields: [parentId], references: [id], onDelete: Cascade)
   documents  Document[]
+  templates  Template[]
   createdAt  DateTime           @default(now())
   updatedAt  DateTime           @default(now()) @updatedAt
   subfolders Folder[]           @relation("FolderToFolder")
   visibility DocumentVisibility @default(EVERYONE)
+  type       FolderType
 
   @@index([userId])
   @@index([teamId])
   @@index([parentId])
+  @@index([type])
 }
 
 /// @zod.import(["import { ZDocumentAuthOptionsSchema } from '@documenso/lib/types/document-auth';", "import { ZDocumentFormValuesSchema } from '@documenso/lib/types/document-form-values';"])
@@ -739,6 +747,8 @@ model Template {
   fields               Field[]
   directLink           TemplateDirectLink?
   documents            Document[]
+  Folder               Folder?             @relation(fields: [folderId], references: [id])
+  folderId             String?
 
   @@unique([templateDocumentDataId])
 }

@@ -11,7 +11,7 @@ import { z } from 'zod';
 
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import { FolderType } from '@documenso/lib/types/folder-type';
-import { formatDocumentsPath } from '@documenso/lib/utils/teams';
+import { formatTemplatesPath } from '@documenso/lib/utils/teams';
 import { trpc } from '@documenso/trpc/react';
 import { Button } from '@documenso/ui/primitives/button';
 import {
@@ -42,16 +42,20 @@ const ZCreateFolderFormSchema = z.object({
 
 type TCreateFolderFormSchema = z.infer<typeof ZCreateFolderFormSchema>;
 
-export type CreateFolderDialogProps = {
+export type TemplateFolderCreateDialogProps = {
   trigger?: React.ReactNode;
 } & Omit<DialogPrimitive.DialogProps, 'children'>;
 
-export const CreateFolderDialog = ({ trigger, ...props }: CreateFolderDialogProps) => {
+export const TemplateFolderCreateDialog = ({
+  trigger,
+  ...props
+}: TemplateFolderCreateDialogProps) => {
   const { toast } = useToast();
   const { _ } = useLingui();
   const navigate = useNavigate();
   const team = useOptionalCurrentTeam();
   const { folderId } = useParams();
+
   const [isCreateFolderOpen, setIsCreateFolderOpen] = useState(false);
 
   const { mutateAsync: createFolder } = trpc.folder.createFolder.useMutation();
@@ -68,7 +72,7 @@ export const CreateFolderDialog = ({ trigger, ...props }: CreateFolderDialogProp
       const newFolder = await createFolder({
         name: data.name,
         parentId: folderId ?? null,
-        type: FolderType.DOCUMENT,
+        type: FolderType.TEMPLATE,
       });
 
       setIsCreateFolderOpen(false);
@@ -77,8 +81,8 @@ export const CreateFolderDialog = ({ trigger, ...props }: CreateFolderDialogProp
         title: 'Folder created successfully',
       });
 
-      const documentsPath = formatDocumentsPath(team?.url);
-      void navigate(`${documentsPath}/f/${newFolder.id}`);
+      const templatesPath = formatTemplatesPath(team?.url);
+      void navigate(`${templatesPath}/f/${newFolder.id}`);
     } catch (err) {
       const error = AppError.parseError(err);
 
@@ -120,7 +124,7 @@ export const CreateFolderDialog = ({ trigger, ...props }: CreateFolderDialogProp
         <DialogHeader>
           <DialogTitle>Create New Folder</DialogTitle>
           <DialogDescription>
-            Enter a name for your new folder. Folders help you organize your documents.
+            Enter a name for your new folder. Folders help you organize your templates.
           </DialogDescription>
         </DialogHeader>
         <Form {...form}>

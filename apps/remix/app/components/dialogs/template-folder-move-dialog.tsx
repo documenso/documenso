@@ -29,7 +29,7 @@ import {
 } from '@documenso/ui/primitives/form/form';
 import { useToast } from '@documenso/ui/primitives/use-toast';
 
-export type FolderMoveDialogProps = {
+export type TemplateFolderMoveDialogProps = {
   foldersData: TFolderWithSubfolders[] | undefined;
   folder: TFolderWithSubfolders | null;
   isOpen: boolean;
@@ -42,12 +42,12 @@ const ZMoveFolderFormSchema = z.object({
 
 type TMoveFolderFormSchema = z.infer<typeof ZMoveFolderFormSchema>;
 
-export const FolderMoveDialog = ({
+export const TemplateFolderMoveDialog = ({
   foldersData,
   folder,
   isOpen,
   onOpenChange,
-}: FolderMoveDialogProps) => {
+}: TemplateFolderMoveDialogProps) => {
   const { _ } = useLingui();
 
   const { toast } = useToast();
@@ -101,6 +101,7 @@ export const FolderMoveDialog = ({
     }
   }, [isOpen, form]);
 
+  // Filter out the current folder and only show folders of the same type
   const filteredFolders = foldersData?.filter(
     (f) => f.id !== folder?.id && f.type === folder?.type,
   );
