@@ -70,14 +70,12 @@ jobs:
       GH_TOKEN: ${{ secrets.GH_TOKEN }}
       IPINFO_ACCESS_TOKEN: ${{ secrets.IPINFO_ACCESS_TOKEN }}
 
-  deploy-helm:
-    needs: [deploy-app, build-docker]
-    uses: ./.github/workflows/deploy-helm-chart.yml
+  deploy:
+    needs: [build-docker]
+    uses: ./.github/workflows/deploy-helm-direct-template.yml
     with:
-      environment: production
-      version: ${{ needs.deploy-app.outputs.version }}
-    secrets:
-      GH_TOKEN: ${{ secrets.GH_TOKEN }}
-      HETZNER_HOST: ${{ secrets.HETZNER_HOST }}
-      HETZNER_USER: ${{ secrets.HETZNER_USER }}
-      SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+      service_name: document-management-platform
+      service_path: .
+      chart_path: charts/document-management-platform
+      namespace: document-management
+      create_namespace: true

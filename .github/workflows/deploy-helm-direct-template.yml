@@ -1,0 +1,133 @@
+name: Deploy Helm Chart Directly
+
+on:
+  workflow_call:
+    inputs:
+      service_name:
+        description: 'Name of the service to deploy (e.g., api-gateway, accounting-service)'
+        required: true
+        type: string
+      service_path:
+        description: 'Path to the service directory (e.g., backend-api-gateway, accounting-service)'
+        required: true
+        type: string
+      chart_path:
+        description: 'Path to the Helm chart within the service directory'
+        required: true
+        type: string
+      values_file:
+        description: 'Path to the values file for the Helm chart'
+        required: true
+        type: string
+      namespace:
+        description: 'Kubernetes namespace to deploy to'
+        required: true
+        type: string
+        default: 'platform'
+      create_namespace:
+        description: 'Whether to create the namespace if it does not exist'
+        required: false
+        type: boolean
+        default: true
+  workflow_dispatch:
+    inputs:
+      service_name:
+        description: 'Name of the service to deploy (e.g., api-gateway, accounting-service)'
+        required: true
+        type: string
+      service_path:
+        description: 'Path to the service directory (e.g., backend-api-gateway, accounting-service)'
+        required: true
+        type: string
+      chart_path:
+        description: 'Path to the Helm chart within the service directory'
+        required: true
+        type: string
+      values_file:
+        description: 'Path to the values file for the Helm chart'
+        required: true
+        type: string
+      namespace:
+        description: 'Kubernetes namespace to deploy to'
+        required: true
+        type: string
+        default: 'platform'
+      create_namespace:
+        description: 'Whether to create the namespace if it does not exist'
+        required: false
+        type: boolean
+        default: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Install Helm
+        run: |
+          curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
+
+      - name: Set up Kubectl
+        run: |
+          curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
+          chmod +x kubectl
+          sudo mv kubectl /usr/local/bin/
+
+      - name: Lint Helm Chart
+        run: |
+          # Always assume service_path includes src/services
+          CHART_DIR="./${{ inputs.service_path }}/${{ inputs.chart_path }}"
+
+          echo "Using chart directory: $CHART_DIR"
+          helm lint $CHART_DIR
+
+      - name: Create Kubeconfig
+        run: |
+          mkdir -p $HOME/.kube
+          cat > $HOME/.kube/config << 'EOL'
+          apiVersion: v1
+          clusters:
+          - cluster:
+              certificate-authority-data: LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSUJkekNDQVIyZ0F3SUJBZ0lCQURBS0JnZ3Foa2pPUFFRREFqQWpNU0V3SHdZRFZRUUREQmhyTTNNdGMyVnkKZG1WeUxXTmhRREUzTkRNNU5UQTROamN3SGhjTk1qVXdOREEyTVRRME56UTNXaGNOTXpVd05EQTBNVFEwTnpRMwpXakFqTVNFd0h3WURWUVFEREJock0zTXRjMlZ5ZG1WeUxXTmhRREUzTkRNNU5UQTROamN3V1RBVEJnY3Foa2pPClBRSUJCZ2dxaGtqT1BRTUJCd05DQUFRTVl2dEJxQTEyNm45RksvZUREdWdkSjI4RHJPdlFCQXRJeWordW5raTEKZzJhUFhYNWV6VUpWM09hQStSSmJueGRTRlJzQ1I4Z1RqWDJqeW5PcitDNnJvMEl3UURBT0JnTlZIUThCQWY4RQpCQU1DQXFRd0R3WURWUjBUQVFIL0JBVXdBd0VCL3pBZEJnTlZIUTRFRmdRVVNRS0QzY0tLTk56L1BvNjBheENNCjc3TDUxQjR3Q2dZSUtvWkl6ajBFQXdJRFNBQXdSUUloQUlZdmJ4ZXdzaTRIWFhsWWxsV0NaVlZXTXU5NnNFZTEKQVlRYUM2TUQydDJhQWlCSGZMbFdmbnhzZldmSjZUMFhqY0dpZFI1MjdnUDB1eUhIREt2TDZCUXZ5UT09Ci0tLS0tRU5EIENFUlRJRklDQVRFLS0tLS0K
+              server: https://5.161.160.255:6443
+            name: solomonai-infrastructure
+          contexts:
+          - context:
+              cluster: solomonai-infrastructure
+              user: solomonai-infrastructure
+            name: solomonai-infrastructure
+          current-context: solomonai-infrastructure
+          kind: Config
+          preferences: {}
+          users:
+          - name: solomonai-infrastructure
+            user:
+              client-certificate-data: LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSUJrVENDQVRlZ0F3SUJBZ0lJVmlyL0RBVDBFYkV3Q2dZSUtvWkl6ajBFQXdJd0l6RWhNQjhHQTFVRUF3d1kKYXpOekxXTnNhV1Z1ZEMxallVQXhOelF6T1RVd09EWTNNQjRYRFRJMU1EUXdOakUwTkRjME4xb1hEVEkyTURRdwpOakUwTkRjME4xb3dNREVYTUJVR0ExVUVDaE1PYzNsemRHVnRPbTFoYzNSbGNuTXhGVEFUQmdOVkJBTVRESE41CmMzUmxiVHBoWkcxcGJqQlpNQk1HQnlxR1NNNDlBZ0VHQ0NxR1NNNDlBd0VIQTBJQUJOeEZKK1RxekJwc1BrNlAKck9yT2YyOUhhKzI2dUVMaFY2UVpqSzNCQ29jVUNmbVpzT0FsZWNoT0pLN3QxODU2d091bnNkMUdnV3FBem5ZSQptN2hhNURtalNEQkdNQTRHQTFVZER3RUIvd1FFQXdJRm9EQVRCZ05WSFNVRUREQUtCZ2dyQmdFRkJRY0RBakFmCkJnTlZIU01FR0RBV2dCU1l5R1cyZ04wYU41enF4eFBzVS9WWGV5aUU5REFLQmdncWhrak9QUVFEQWdOSUFEQkYKQWlBRnR2czRoMU9mRGNCTm41dmxTVE1TdEVyY01KbzVmMEpXN05mSkpuaC9Dd0loQU9HRVg4ejdxamhaVlNSZgpwL0tGcHloeHZXWHJhODRDTzh4VXRJL1YzZUtzCi0tLS0tRU5EIENFUlRJRklDQVRFLS0tLS0KLS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSUJlRENDQVIyZ0F3SUJBZ0lCQURBS0JnZ3Foa2pPUFFRREFqQWpNU0V3SHdZRFZRUUREQmhyTTNNdFkyeHAKWlc1MExXTmhRREUzTkRNNU5UQTROamN3SGhjTk1qVXdOREEyTVRRME56UTNXaGNOTXpVd05EQTBNVFEwTnpRMwpXakFqTVNFd0h3WURWUVFEREJock0zTXRZMnhwWlc1MExXTmhRREUzTkRNNU5UQTROamN3V1RBVEJnY3Foa2pPClBRSUJCZ2dxaGtqT1BRTUJCd05DQUFST29OZHQ5WEFDU1NRd1hBTnlCMjhoQkZTWVYwcDg5aHduVzJib09JcVkKMTJuTWN3MVI5RWhYSHRHdW4wTCtlRkQzTnI1RGFuejFoU2ZQSWN1TEJmWW1vMEl3UURBT0JnTlZIUThCQWY4RQpCQU1DQXFRd0R3WURWUjBUQVFIL0JBVXdBd0VCL3pBZEJnTlZIUTRFRmdRVW1NaGx0b0RkR2plYzZzY1Q3RlAxClYzc29oUFF3Q2dZSUtvWkl6ajBFQXdJRFNRQXdSZ0loQU9JaDNua2YrbERNSjJSU0FzQXJGV3pFUWEzMnFsaHYKajlKd3R4QzJlVVg5QWlFQWt2Q0NMNUd2RmRFWXY4OGNjbEdKOFo0UHJpMjdEOUhnTGhJeVcrQ21CV1k9Ci0tLS0tRU5EIENFUlRJRklDQVRFLS0tLS0K
+              client-key-data: LS0tLS1CRUdJTiBFQyBQUklWQVRFIEtFWS0tLS0tCk1IY0NBUUVFSVBGWGxLL1FlamRIaWJCYW8wQ1BYYktEZ2Q0d3VTMTB3WjVQaDFCTGJFb0RvQW9HQ0NxR1NNNDkKQXdFSG9VUURRZ0FFM0VVbjVPck1HbXcrVG8rczZzNS9iMGRyN2JxNFF1RlhwQm1NcmNFS2h4UUorWm13NENWNQp5RTRrcnUzWHpuckE2NmV4M1VhQmFvRE9kZ2lidUZya09RPT0KLS0tLS1FTkQgRUMgUFJJVkFURSBLRVktLS0tLQo=
+          EOL
+          chmod 600 $HOME/.kube/config
+
+      - name: Verify Kubernetes Connection
+        run: kubectl get nodes
+
+      - name: Deploy Helm Chart
+        run: |
+          NAMESPACE_FLAG="-n ${{ inputs.namespace }}"
+          CREATE_NAMESPACE_FLAG=""
+
+          if [ "${{ inputs.create_namespace }}" = "true" ]; then
+            CREATE_NAMESPACE_FLAG="--create-namespace"
+          fi
+
+          # Always assume service_path includes src/services
+          CHART_DIR="./${{ inputs.service_path }}/${{ inputs.chart_path }}"
+          VALUES_FILE="./${{ inputs.service_path }}/${{ inputs.values_file }}"
+
+          echo "Using chart directory: $CHART_DIR"
+          echo "Using values file: $VALUES_FILE"
+
+          helm upgrade --install ${{ inputs.service_name }} $CHART_DIR \
+            --values $VALUES_FILE \
+            ${NAMESPACE_FLAG} ${CREATE_NAMESPACE_FLAG}
