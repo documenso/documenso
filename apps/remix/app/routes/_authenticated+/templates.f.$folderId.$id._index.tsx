@@ -35,27 +35,32 @@ export async function loader({ params, request }: Route.LoaderArgs) {
     team = await getTeamByUrl({ userId: user.id, teamUrl: params.teamUrl });
   }
 
-  const { id } = params;
+  const { id, folderId } = params;
 
   const templateId = Number(id);
   const templateRootPath = formatTemplatesPath(team?.url);
   const documentRootPath = formatDocumentsPath(team?.url);
 
   if (!templateId || Number.isNaN(templateId)) {
-    throw redirect(templateRootPath);
+    throw redirect(folderId ? `${documentRootPath}/f/${folderId}` : documentRootPath);
   }
 
   const template = await getTemplateById({
     id: templateId,
     userId: user.id,
     teamId: team?.id,
+    folderId,
   }).catch(() => null);
 
   if (!template || !template.templateDocumentData || (template?.teamId && !team?.url)) {
-    throw redirect(templateRootPath);
+    throw redirect(folderId ? `${templateRootPath}/f/${folderId}` : templateRootPath);
   }
 
-  if (template.folderId) {
+  if (!template.folderId) {
+    throw redirect(`${templateRootPath}/${templateId}`);
+  }
+
+  if (template.folderId !== folderId) {
     throw redirect(`${templateRootPath}/f/${template.folderId}/${templateId}`);
   }
 

@@ -71,6 +71,8 @@ export const findTemplates = async ({
 
   if (folderId) {
     whereFilter.push({ folderId });
+  } else {
+    whereFilter.push({ folderId: null });
   }
 
   const [data, count] = await Promise.all([

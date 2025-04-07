@@ -44,7 +44,11 @@ export async function loader({ params, request }: Route.LoaderArgs) {
     throw redirect(templateRootPath);
   }
 
-  if (template.folderId) {
+  if (!template.folderId) {
+    throw redirect(`${templateRootPath}/${templateId}/edit`);
+  }
+
+  if (template.folderId !== params.folderId) {
     throw redirect(`${templateRootPath}/f/${template.folderId}/${templateId}/edit`);
   }
 
