@@ -1,6 +1,5 @@
 import type { z } from 'zod';
 
-import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import { prisma } from '@documenso/prisma';
 import { TemplateSchema } from '@documenso/prisma/generated/zod/modelSchema//TemplateSchema';
 import type { TCreateTemplateMutationSchema } from '@documenso/trpc/server/template-router/schema';
@@ -35,7 +34,7 @@ export const createTemplate = async ({
   }
 
   if (folderId) {
-    const folder = await prisma.folder.findFirst({
+    await prisma.folder.findFirstOrThrow({
       where: {
         id: folderId,
         ...(teamId
@@ -55,12 +54,6 @@ export const createTemplate = async ({
             }),
       },
     });
-
-    if (!folder) {
-      throw new AppError(AppErrorCode.NOT_FOUND, {
-        message: 'Folder not found',
-      });
-    }
   }
 
   return await prisma.template.create({
