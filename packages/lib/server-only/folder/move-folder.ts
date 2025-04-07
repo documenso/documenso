@@ -10,13 +10,7 @@ export interface MoveFolderOptions {
   requestMetadata?: ApiRequestMetadata;
 }
 
-export const moveFolder = async ({
-  userId,
-  teamId,
-  folderId,
-  parentId,
-  requestMetadata,
-}: MoveFolderOptions) => {
+export const moveFolder = async ({ userId, teamId, folderId, parentId }: MoveFolderOptions) => {
   const folder = await prisma.folder.findFirst({
     where: {
       id: folderId,
@@ -39,6 +33,7 @@ export const moveFolder = async ({
         id: parentId,
         userId,
         teamId,
+        type: folder.type, // Ensure parent folder is of the same type
       },
     });
 

@@ -7,9 +7,11 @@ import { getFolderBreadcrumbs } from '@documenso/lib/server-only/folder/get-fold
 import { getFolderById } from '@documenso/lib/server-only/folder/get-folder-by-id';
 import { moveDocumentToFolder } from '@documenso/lib/server-only/folder/move-document-to-folder';
 import { moveFolder } from '@documenso/lib/server-only/folder/move-folder';
+import { moveTemplateToFolder } from '@documenso/lib/server-only/folder/move-template-to-folder';
 import { pinFolder } from '@documenso/lib/server-only/folder/pin-folder';
 import { unpinFolder } from '@documenso/lib/server-only/folder/unpin-folder';
 import { updateFolder } from '@documenso/lib/server-only/folder/update-folder';
+import { FolderType } from '@documenso/lib/types/folder-type';
 
 import { authenticatedProcedure, router } from '../trpc';
 import {
@@ -22,6 +24,7 @@ import {
   ZGetFoldersSchema,
   ZMoveDocumentToFolderSchema,
   ZMoveFolderSchema,
+  ZMoveTemplateToFolderSchema,
   ZPinFolderSchema,
   ZSuccessResponseSchema,
   ZUnpinFolderSchema,
@@ -37,12 +40,13 @@ export const folderRouter = router({
     .output(ZGetFoldersResponseSchema)
     .query(async ({ input, ctx }) => {
       const { teamId, user } = ctx;
-      const { parentId } = input;
+      const { parentId, type } = input;
 
       const folders = await findFolders({
         userId: user.id,
         teamId,
         parentId,
+        type,
       });
 
       const breadcrumbs = parentId
@@ -50,12 +54,14 @@ export const folderRouter = router({
             userId: user.id,
             teamId,
             folderId: parentId,
+            type,
           })
         : [];
 
       return {
         folders,
         breadcrumbs,
+        type,
       };
     }),
 
@@ -67,12 +73,13 @@ export const folderRouter = router({
     .output(ZFindFoldersResponseSchema)
     .query(async ({ input, ctx }) => {
       const { teamId, user } = ctx;
-      const { parentId } = input;
+      const { parentId, type } = input;
 
       const folders = await findFolders({
         userId: user.id,
         teamId,
         parentId,
+        type,
       });
 
       const breadcrumbs = parentId
@@ -80,12 +87,14 @@ export const folderRouter = router({
             userId: user.id,
             teamId,
             folderId: parentId,
+            type,
           })
         : [];
 
       return {
         data: folders,
         breadcrumbs,
+        type,
       };
     }),
 
@@ -96,7 +105,7 @@ export const folderRouter = router({
     .input(ZCreateFolderSchema)
     .mutation(async ({ input, ctx }) => {
       const { teamId, user } = ctx;
-      const { name, parentId } = input;
+      const { name, parentId, type } = input;
 
       if (parentId) {
         try {
@@ -104,6 +113,7 @@ export const folderRouter = router({
             userId: user.id,
             teamId,
             folderId: parentId,
+            type,
           });
         } catch (error) {
           throw new TRPCError({
@@ -113,12 +123,18 @@ export const folderRouter = router({
         }
       }
 
-      return await createFolder({
+      const result = await createFolder({
         userId: user.id,
         teamId,
         name,
         parentId,
+        type,
       });
+
+      return {
+        ...result,
+        type,
+      };
     }),
 
   /**
@@ -130,13 +146,25 @@ export const folderRouter = router({
       const { teamId, user } = ctx;
       const { id, name, visibility } = input;
 
-      return await updateFolder({
+      const currentFolder = await getFolderById({
+        userId: user.id,
+        teamId,
+        folderId: id,
+      });
+
+      const result = await updateFolder({
         userId: user.id,
         teamId,
         folderId: id,
         name,
         visibility,
+        type: currentFolder.type,
       });
+
+      return {
+        ...result,
+        type: currentFolder.type,
+      };
     }),
 
   /**
@@ -149,11 +177,18 @@ export const folderRouter = router({
       const { teamId, user } = ctx;
       const { id } = input;
 
+      const currentFolder = await getFolderById({
+        userId: user.id,
+        teamId,
+        folderId: id,
+      });
+
       await deleteFolder({
         userId: user.id,
         teamId,
         folderId: id,
         requestMetadata: ctx.metadata,
+        type: currentFolder.type,
       });
 
       return ZGenericSuccessResponse;
@@ -166,13 +201,19 @@ export const folderRouter = router({
     const { teamId, user } = ctx;
     const { id, parentId } = input;
 
-    // Verify parent folder exists and belongs to the user/team if provided
+    const currentFolder = await getFolderById({
+      userId: user.id,
+      teamId,
+      folderId: id,
+    });
+
     if (parentId !== null) {
       try {
         await getFolderById({
           userId: user.id,
           teamId,
           folderId: parentId,
+          type: currentFolder.type,
         });
       } catch (error) {
         throw new TRPCError({
@@ -182,13 +223,18 @@ export const folderRouter = router({
       }
     }
 
-    return await moveFolder({
+    const result = await moveFolder({
       userId: user.id,
       teamId,
       folderId: id,
       parentId,
       requestMetadata: ctx.metadata,
     });
+
+    return {
+      ...result,
+      type: currentFolder.type,
+    };
   }),
 
   /**
@@ -200,13 +246,13 @@ export const folderRouter = router({
       const { teamId, user } = ctx;
       const { documentId, folderId } = input;
 
-      // Verify folder exists and belongs to the user/team if provided
       if (folderId !== null) {
         try {
           await getFolderById({
             userId: user.id,
             teamId,
             folderId,
+            type: FolderType.DOCUMENT,
           });
         } catch (error) {
           throw new TRPCError({
@@ -216,34 +262,101 @@ export const folderRouter = router({
         }
       }
 
-      return await moveDocumentToFolder({
+      const result = await moveDocumentToFolder({
         userId: user.id,
         teamId,
         documentId,
         folderId,
         requestMetadata: ctx.metadata,
       });
+
+      return {
+        ...result,
+        type: FolderType.DOCUMENT,
+      };
+    }),
+
+  /**
+   * @private
+   */
+  moveTemplateToFolder: authenticatedProcedure
+    .input(ZMoveTemplateToFolderSchema)
+    .mutation(async ({ input, ctx }) => {
+      const { teamId, user } = ctx;
+      const { templateId, folderId } = input;
+
+      if (folderId !== null) {
+        try {
+          await getFolderById({
+            userId: user.id,
+            teamId,
+            folderId,
+            type: FolderType.TEMPLATE,
+          });
+        } catch (error) {
+          throw new TRPCError({
+            code: 'NOT_FOUND',
+            message: 'Folder not found',
+          });
+        }
+      }
+
+      const result = await moveTemplateToFolder({
+        userId: user.id,
+        teamId,
+        templateId,
+        folderId,
+      });
+
+      return {
+        ...result,
+        type: FolderType.TEMPLATE,
+      };
     }),
 
   /**
    * @private
    */
   pinFolder: authenticatedProcedure.input(ZPinFolderSchema).mutation(async ({ ctx, input }) => {
-    return pinFolder({
+    const currentFolder = await getFolderById({
       userId: ctx.user.id,
       teamId: ctx.teamId,
       folderId: input.folderId,
     });
+
+    const result = await pinFolder({
+      userId: ctx.user.id,
+      teamId: ctx.teamId,
+      folderId: input.folderId,
+      type: currentFolder.type,
+    });
+
+    return {
+      ...result,
+      type: currentFolder.type,
+    };
   }),
 
   /**
    * @private
    */
   unpinFolder: authenticatedProcedure.input(ZUnpinFolderSchema).mutation(async ({ ctx, input }) => {
-    return unpinFolder({
+    const currentFolder = await getFolderById({
       userId: ctx.user.id,
       teamId: ctx.teamId,
       folderId: input.folderId,
     });
+
+    const result = await unpinFolder({
+      userId: ctx.user.id,
+      teamId: ctx.teamId,
+      folderId: input.folderId,
+      type: currentFolder.type,
+    });
+
+    return {
+      ...result,
+      type: currentFolder.type,
+    };
   }),
 });

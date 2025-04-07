@@ -1,33 +1,31 @@
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import { FolderType } from '@documenso/lib/types/folder-type';
-import type { ApiRequestMetadata } from '@documenso/lib/universal/extract-request-metadata';
 import { prisma } from '@documenso/prisma';
 
-export interface MoveDocumentToFolderOptions {
+export interface MoveTemplateToFolderOptions {
   userId: number;
   teamId?: number;
-  documentId: number;
+  templateId: number;
   folderId: string | null;
-  requestMetadata?: ApiRequestMetadata;
 }
 
-export const moveDocumentToFolder = async ({
+export const moveTemplateToFolder = async ({
   userId,
   teamId,
-  documentId,
+  templateId,
   folderId,
-}: MoveDocumentToFolderOptions) => {
-  const document = await prisma.document.findFirst({
+}: MoveTemplateToFolderOptions) => {
+  const template = await prisma.template.findFirst({
     where: {
-      id: documentId,
+      id: templateId,
       userId,
       teamId,
     },
   });
 
-  if (!document) {
+  if (!template) {
     throw new AppError(AppErrorCode.NOT_FOUND, {
-      message: 'Document not found',
+      message: 'Template not found',
     });
   }
 
@@ -37,7 +35,7 @@ export const moveDocumentToFolder = async ({
         id: folderId,
         userId,
         teamId,
-        type: FolderType.DOCUMENT,
+        type: FolderType.TEMPLATE,
       },
     });
 
@@ -48,9 +46,9 @@ export const moveDocumentToFolder = async ({
     }
   }
 
-  return await prisma.document.update({
+  return await prisma.template.update({
     where: {
-      id: documentId,
+      id: templateId,
     },
     data: {
       folderId,

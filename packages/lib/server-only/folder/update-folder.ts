@@ -2,12 +2,15 @@ import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import { prisma } from '@documenso/prisma';
 import type { DocumentVisibility } from '@documenso/prisma/generated/types';
 
+import type { TFolderType } from '../../types/folder-type';
+
 export interface UpdateFolderOptions {
   userId: number;
   teamId?: number;
   folderId: string;
   name: string;
   visibility: DocumentVisibility;
+  type?: TFolderType;
 }
 
 export const updateFolder = async ({
@@ -16,12 +19,14 @@ export const updateFolder = async ({
   folderId,
   name,
   visibility,
+  type,
 }: UpdateFolderOptions) => {
   const folder = await prisma.folder.findFirst({
     where: {
       id: folderId,
       userId,
       teamId,
+      type,
     },
   });
 

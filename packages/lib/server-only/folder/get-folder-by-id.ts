@@ -1,18 +1,22 @@
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import { prisma } from '@documenso/prisma';
 
+import type { TFolderType } from '../../types/folder-type';
+
 export interface GetFolderByIdOptions {
   userId: number;
   teamId?: number;
   folderId: string;
+  type?: TFolderType;
 }
 
-export const getFolderById = async ({ userId, teamId, folderId }: GetFolderByIdOptions) => {
+export const getFolderById = async ({ userId, teamId, folderId, type }: GetFolderByIdOptions) => {
   const folder = await prisma.folder.findFirst({
     where: {
       id: folderId,
       userId,
       teamId,
+      type,
     },
   });
 

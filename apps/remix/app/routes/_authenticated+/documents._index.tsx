@@ -6,6 +6,7 @@ import { useNavigate, useSearchParams } from 'react-router';
 import { Link } from 'react-router';
 import { z } from 'zod';
 
+import { FolderType } from '@documenso/lib/types/folder-type';
 import { formatAvatarUrl } from '@documenso/lib/utils/avatars';
 import { parseToIntegerArray } from '@documenso/lib/utils/params';
 import { formatDocumentsPath } from '@documenso/lib/utils/teams';
@@ -109,6 +110,7 @@ export default function DocumentsPage() {
     refetch: refetchFolders,
   } = trpc.folder.getFolders.useQuery({
     parentId: null,
+    type: FolderType.DOCUMENT,
   });
 
   useEffect(() => {

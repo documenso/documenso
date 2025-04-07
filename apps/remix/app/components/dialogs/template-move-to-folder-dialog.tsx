@@ -12,7 +12,7 @@ import { z } from 'zod';
 
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import { FolderType } from '@documenso/lib/types/folder-type';
-import { formatDocumentsPath } from '@documenso/lib/utils/teams';
+import { formatTemplatesPath } from '@documenso/lib/utils/teams';
 import { trpc } from '@documenso/trpc/react';
 import { Button } from '@documenso/ui/primitives/button';
 import {
@@ -35,33 +35,35 @@ import { useToast } from '@documenso/ui/primitives/use-toast';
 
 import { useOptionalCurrentTeam } from '~/providers/team';
 
-export type DocumentMoveToFolderDialogProps = {
-  documentId: number;
-  open: boolean;
+export type TemplateMoveToFolderDialogProps = {
+  templateId: number;
+  templateTitle: string;
+  isOpen: boolean;
   onOpenChange: (open: boolean) => void;
   currentFolderId?: string | null;
 } & Omit<DialogPrimitive.DialogProps, 'children'>;
 
-const ZMoveDocumentFormSchema = z.object({
+const ZMoveTemplateFormSchema = z.object({
   folderId: z.string().nullable(),
 });
 
-type TMoveDocumentFormSchema = z.infer<typeof ZMoveDocumentFormSchema>;
+type TMoveTemplateFormSchema = z.infer<typeof ZMoveTemplateFormSchema>;
 
-export const DocumentMoveToFolderDialog = ({
-  documentId,
-  open,
+export function TemplateMoveToFolderDialog({
+  templateId,
+  templateTitle,
+  isOpen,
   onOpenChange,
   currentFolderId,
   ...props
-}: DocumentMoveToFolderDialogProps) => {
+}: TemplateMoveToFolderDialogProps) {
   const { _ } = useLingui();
   const { toast } = useToast();
   const navigate = useNavigate();
   const team = useOptionalCurrentTeam();
 
-  const form = useForm<TMoveDocumentFormSchema>({
-    resolver: zodResolver(ZMoveDocumentFormSchema),
+  const form = useForm<TMoveTemplateFormSchema>({
+    resolver: zodResolver(ZMoveTemplateFormSchema),
     defaultValues: {
       folderId: currentFolderId || null,
     },
@@ -70,44 +72,44 @@ export const DocumentMoveToFolderDialog = ({
   const { data: folders, isLoading: isFoldersLoading } = trpc.folder.findFolders.useQuery(
     {
       parentId: null,
-      type: FolderType.DOCUMENT,
+      type: FolderType.TEMPLATE,
     },
     {
-      enabled: open,
+      enabled: isOpen,
     },
   );
 
-  const { mutateAsync: moveDocumentToFolder } = trpc.folder.moveDocumentToFolder.useMutation();
+  const { mutateAsync: moveTemplateToFolder } = trpc.folder.moveTemplateToFolder.useMutation();
 
   useEffect(() => {
-    if (!open) {
+    if (!isOpen) {
       form.reset();
     } else {
       form.reset({ folderId: currentFolderId || null });
     }
-  }, [open, currentFolderId, form]);
+  }, [isOpen, currentFolderId, form]);
 
-  const onSubmit = async (data: TMoveDocumentFormSchema) => {
+  const onSubmit = async (data: TMoveTemplateFormSchema) => {
     try {
-      await moveDocumentToFolder({
-        documentId,
+      await moveTemplateToFolder({
+        templateId,
         folderId: data.folderId,
       });
 
       toast({
-        title: _(msg`Document moved`),
-        description: _(msg`The document has been moved successfully.`),
+        title: _(msg`Template moved`),
+        description: _(msg`The template has been moved successfully.`),
         variant: 'default',
       });
 
       onOpenChange(false);
 
-      const documentsPath = formatDocumentsPath(team?.url);
+      const templatesPath = formatTemplatesPath(team?.url);
 
       if (data.folderId) {
-        void navigate(`${documentsPath}/f/${data.folderId}`);
+        void navigate(`${templatesPath}/f/${data.folderId}`);
       } else {
-        void navigate(documentsPath);
+        void navigate(templatesPath);
       }
     } catch (err) {
       const error = AppError.parseError(err);
@@ -115,7 +117,7 @@ export const DocumentMoveToFolderDialog = ({
       if (error.code === AppErrorCode.NOT_FOUND) {
         toast({
           title: _(msg`Error`),
-          description: _(msg`The folder you are trying to move the document to does not exist.`),
+          description: _(msg`The folder you are trying to move the template to does not exist.`),
           variant: 'destructive',
         });
 
@@ -124,22 +126,22 @@ export const DocumentMoveToFolderDialog = ({
 
       toast({
         title: _(msg`Error`),
-        description: _(msg`An error occurred while moving the document.`),
+        description: _(msg`An error occurred while moving the template.`),
         variant: 'destructive',
       });
     }
   };
 
   return (
-    <Dialog {...props} open={open} onOpenChange={onOpenChange}>
+    <Dialog {...props} open={isOpen} onOpenChange={onOpenChange}>
       <DialogContent>
         <DialogHeader>
           <DialogTitle>
-            <Trans>Move Document to Folder</Trans>
+            <Trans>Move Template to Folder</Trans>
           </DialogTitle>
 
           <DialogDescription>
-            <Trans>Select a folder to move this document to.</Trans>
+            <Trans>Move &quot;{templateTitle}&quot; to a folder</Trans>
           </DialogDescription>
         </DialogHeader>
 
@@ -206,4 +208,4 @@ export const DocumentMoveToFolderDialog = ({
       </DialogContent>
     </Dialog>
   );
-};
+}

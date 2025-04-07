@@ -4,6 +4,8 @@ import type { Team, TeamGlobalSettings } from '@prisma/client';
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import { prisma } from '@documenso/prisma';
 
+import type { TFolderType } from '../../types/folder-type';
+import { FolderType } from '../../types/folder-type';
 import { determineDocumentVisibility } from '../../utils/document-visibility';
 
 export interface CreateFolderOptions {
@@ -11,6 +13,7 @@ export interface CreateFolderOptions {
   teamId?: number;
   name: string;
   parentId?: string | null;
+  type?: TFolderType;
 }
 
 export const createFolder = async ({
@@ -18,6 +21,7 @@ export const createFolder = async ({
   teamId,
   name,
   parentId = null,
+  type = FolderType.DOCUMENT,
 }: CreateFolderOptions) => {
   const user = await prisma.user.findFirstOrThrow({
     where: {
@@ -72,6 +76,7 @@ export const createFolder = async ({
       userId,
       teamId,
       parentId,
+      type,
       visibility: determineDocumentVisibility(
         team?.teamGlobalSettings?.documentVisibility,
         userTeamRole ?? TeamMemberRole.MEMBER,

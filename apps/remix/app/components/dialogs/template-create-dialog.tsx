@@ -26,9 +26,14 @@ import { useToast } from '@documenso/ui/primitives/use-toast';
 type TemplateCreateDialogProps = {
   teamId?: number;
   templateRootPath: string;
+  folderId?: string;
 };
 
-export const TemplateCreateDialog = ({ templateRootPath }: TemplateCreateDialogProps) => {
+export const TemplateCreateDialog = ({
+  templateRootPath,
+  teamId,
+  folderId,
+}: TemplateCreateDialogProps) => {
   const navigate = useNavigate();
 
   const { user } = useSession();
@@ -53,6 +58,7 @@ export const TemplateCreateDialog = ({ templateRootPath }: TemplateCreateDialogP
       const { id } = await createTemplate({
         title: file.name,
         templateDocumentDataId: response.id,
+        folderId: folderId,
       });
 
       toast({
