@@ -75,7 +75,13 @@ export const TemplatesTableActionDropdown = ({
         <DropdownMenuLabel>Action</DropdownMenuLabel>
 
         <DropdownMenuItem disabled={!isOwner && !isTeamTemplate} asChild>
-          <Link to={`${templateRootPath}/${row.id}/edit`}>
+          <Link
+            to={
+              row.folderId
+                ? `${templateRootPath}/f/${row.folderId}/${row.id}/edit`
+                : `${templateRootPath}/${row.id}/edit`
+            }
+          >
             <Edit className="mr-2 h-4 w-4" />
             <Trans>Edit</Trans>
           </Link>
