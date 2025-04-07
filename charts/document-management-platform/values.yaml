@@ -156,11 +156,15 @@ documenso:
 
   # Sensitive environment variables - will be stored in a Secret
   secret:
-    # Required secrets
-    NEXTAUTH_SECRET: ''
+    # Required secrets - YOU MUST SET THESE VALUES
+    # NEXTAUTH_SECRET: Generate a random string with at least 32 characters
+    # e.g.: Use command: openssl rand -base64 32
+    NEXTAUTH_SECRET: '' # REQUIRED: Generate a random string, e.g., 'CAFEBABE123456789ABCDEF0123456789'
     NEXTAUTH_URL: ''
-    NEXT_PRIVATE_ENCRYPTION_KEY: ''
-    NEXT_PRIVATE_ENCRYPTION_SECONDARY_KEY: ''
+    # NEXT_PRIVATE_ENCRYPTION_KEY: A random string with at least 32 characters for encrypting data
+    NEXT_PRIVATE_ENCRYPTION_KEY: '' # REQUIRED: Generate a random string, e.g., 'CAFEBABE123456789ABCDEF0123456789'
+    # NEXT_PRIVATE_ENCRYPTION_SECONDARY_KEY: A different random string with at least 32 characters
+    NEXT_PRIVATE_ENCRYPTION_SECONDARY_KEY: '' # REQUIRED: Generate a random string, e.g., 'DEADBEEF123456789ABCDEF0123456789'
 
     # Optional secrets
     NEXT_PRIVATE_GOOGLE_CLIENT_ID: ''
