@@ -177,18 +177,10 @@ export const folderRouter = router({
       const { teamId, user } = ctx;
       const { id } = input;
 
-      const currentFolder = await getFolderById({
-        userId: user.id,
-        teamId,
-        folderId: id,
-      });
-
       await deleteFolder({
         userId: user.id,
         teamId,
         folderId: id,
-        requestMetadata: ctx.metadata,
-        type: currentFolder.type,
       });
 
       return ZGenericSuccessResponse;

@@ -4,15 +4,17 @@ import { match } from 'ts-pattern';
 import { prisma } from '@documenso/prisma';
 
 import { DocumentVisibility } from '../../types/document-visibility';
+import type { TFolderType } from '../../types/folder-type';
 
 export interface FindFoldersOptions {
   userId: number;
   teamId?: number;
-  parentId?: string | null;
+  parentId: string | null;
+  type?: TFolderType;
 }
 
-export const findFolders = async ({ userId, teamId, parentId = null }: FindFoldersOptions) => {
-  console.log('findFolders called with:', { userId, teamId, parentId });
+export const findFolders = async ({ userId, teamId, parentId, type }: FindFoldersOptions) => {
+  console.log('findFolders called with:', { userId, teamId, parentId, type });
 
   let team = null;
   let teamMemberRole = null;
@@ -66,17 +68,28 @@ export const findFolders = async ({ userId, teamId, parentId = null }: FindFolde
     .otherwise(() => ({ visibility: DocumentVisibility.EVERYONE }));
 
   const whereClause = {
-    AND: [{ parentId }, teamId ? { teamId, ...visibilityFilters } : { userId, teamId: null }],
+    AND: [
+      { parentId },
+      teamId
+        ? {
+            OR: [
+              { teamId, ...visibilityFilters },
+              { userId, teamId }, // Include user's own folders in the team context
+            ],
+          }
+        : { userId, teamId: null },
+    ],
   };
 
   console.log('Where clause:', JSON.stringify(whereClause, null, 2));
 
   try {
     const folders = await prisma.folder.findMany({
-      where: whereClause,
-      orderBy: {
-        createdAt: 'desc',
+      where: {
+        ...whereClause,
+        ...(type ? { type } : {}),
       },
+      orderBy: [{ pinned: 'desc' }, { createdAt: 'desc' }],
     });
 
     console.log('Found folders:', folders.length);
@@ -84,7 +97,7 @@ export const findFolders = async ({ userId, teamId, parentId = null }: FindFolde
     const foldersWithDetails = await Promise.all(
       folders.map(async (folder) => {
         try {
-          const [subfolders, documentCount, subfolderCount] = await Promise.all([
+          const [subfolders, documentCount, templateCount, subfolderCount] = await Promise.all([
             prisma.folder.findMany({
               where: {
                 parentId: folder.id,
@@ -95,6 +108,11 @@ export const findFolders = async ({ userId, teamId, parentId = null }: FindFolde
               },
             }),
             prisma.document.count({
+              where: {
+                folderId: folder.id,
+              },
+            }),
+            prisma.template.count({
               where: {
                 folderId: folder.id,
               },
@@ -112,6 +130,7 @@ export const findFolders = async ({ userId, teamId, parentId = null }: FindFolde
             subfolders: [],
             _count: {
               documents: 0,
+              templates: 0,
               subfolders: 0,
             },
           }));
@@ -121,6 +140,7 @@ export const findFolders = async ({ userId, teamId, parentId = null }: FindFolde
             subfolders: subfoldersWithEmptySubfolders,
             _count: {
               documents: documentCount,
+              templates: templateCount,
               subfolders: subfolderCount,
             },
           };

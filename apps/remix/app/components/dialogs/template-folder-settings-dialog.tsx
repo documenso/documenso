@@ -9,6 +9,7 @@ import { z } from 'zod';
 
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import { DocumentVisibility } from '@documenso/lib/types/document-visibility';
+import { FolderType } from '@documenso/lib/types/folder-type';
 import { trpc } from '@documenso/trpc/react';
 import type { TFolderWithSubfolders } from '@documenso/trpc/server/folder-router/schema';
 import { Button } from '@documenso/ui/primitives/button';
@@ -65,6 +66,7 @@ export const TemplateFolderSettingsDialog = ({
   const { mutateAsync: updateFolder } = trpc.folder.updateFolder.useMutation();
 
   const isTeamContext = !!team;
+  const isTemplateFolder = folder?.type === FolderType.TEMPLATE;
 
   const form = useForm<z.infer<typeof ZUpdateFolderFormSchema>>({
     resolver: zodResolver(ZUpdateFolderFormSchema),
@@ -90,9 +92,10 @@ export const TemplateFolderSettingsDialog = ({
       await updateFolder({
         id: folder.id,
         name: data.name,
-        visibility: isTeamContext
-          ? (data.visibility ?? DocumentVisibility.EVERYONE)
-          : DocumentVisibility.EVERYONE,
+        visibility:
+          isTeamContext && !isTemplateFolder
+            ? (data.visibility ?? DocumentVisibility.EVERYONE)
+            : DocumentVisibility.EVERYONE,
       });
 
       toast({
@@ -135,7 +138,7 @@ export const TemplateFolderSettingsDialog = ({
               )}
             />
 
-            {isTeamContext && (
+            {isTeamContext && !isTemplateFolder && (
               <FormField
                 control={form.control}
                 name="visibility"

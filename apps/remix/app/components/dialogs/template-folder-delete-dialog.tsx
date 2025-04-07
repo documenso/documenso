@@ -99,7 +99,7 @@ export const TemplateFolderDeleteDialog = ({
   };
 
   useEffect(() => {
-    if (isOpen) {
+    if (!isOpen) {
       form.reset();
     }
   }, [isOpen]);

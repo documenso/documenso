@@ -82,6 +82,7 @@ export const TemplateFolderCreateDialog = ({
       });
 
       const templatesPath = formatTemplatesPath(team?.url);
+
       void navigate(`${templatesPath}/f/${newFolder.id}`);
     } catch (err) {
       const error = AppError.parseError(err);

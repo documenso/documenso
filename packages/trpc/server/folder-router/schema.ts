@@ -120,6 +120,7 @@ export const ZFindSearchParamsSchema = z.object({
 
 export const ZFindFoldersRequestSchema = ZFindSearchParamsSchema.extend({
   parentId: z.string().nullable().optional(),
+  type: ZFolderTypeSchema.optional(),
 });
 
 export const ZFindFoldersResponseSchema = z.object({

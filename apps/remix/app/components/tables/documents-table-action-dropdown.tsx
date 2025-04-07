@@ -78,6 +78,9 @@ export const DocumentsTableActionDropdown = ({
   const canManageDocument = Boolean(isOwner || isCurrentTeamDocument);
 
   const documentsPath = formatDocumentsPath(team?.url);
+  const formatPath = row.folderId
+    ? `${documentsPath}/f/${row.folderId}/${row.id}/edit`
+    : `${documentsPath}/${row.id}/edit`;
 
   const onDownloadClick = async () => {
     try {
@@ -146,13 +149,7 @@ export const DocumentsTableActionDropdown = ({
         )}
 
         <DropdownMenuItem disabled={!canManageDocument || isComplete} asChild>
-          <Link
-            to={
-              row.folderId
-                ? `${documentsPath}/f/${row.folderId}/${row.id}/edit`
-                : `${documentsPath}/${row.id}/edit`
-            }
-          >
+          <Link to={formatPath}>
             <Edit className="mr-2 h-4 w-4" />
             <Trans>Edit</Trans>
           </Link>

@@ -1,8 +1,9 @@
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import { prisma } from '@documenso/prisma';
-import type { DocumentVisibility } from '@documenso/prisma/generated/types';
+import { DocumentVisibility } from '@documenso/prisma/generated/types';
 
 import type { TFolderType } from '../../types/folder-type';
+import { FolderType } from '../../types/folder-type';
 
 export interface UpdateFolderOptions {
   userId: number;
@@ -36,13 +37,17 @@ export const updateFolder = async ({
     });
   }
 
+  const isTemplateFolder = folder.type === FolderType.TEMPLATE;
+  const effectiveVisibility =
+    isTemplateFolder && teamId !== null ? DocumentVisibility.EVERYONE : visibility;
+
   return await prisma.folder.update({
     where: {
       id: folderId,
     },
     data: {
       name,
-      visibility,
+      visibility: effectiveVisibility,
     },
   });
 };
