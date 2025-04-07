@@ -2,18 +2,18 @@
 # This is a YAML-formatted file.
 
 global:
-  nameOverride: ""
-  fullnameOverride: ""
+  nameOverride: ''
+  fullnameOverride: ''
   imagePullSecrets: []
   commonLabels: {}
   commonAnnotations: {}
-  
+
   # Pod Security Context
   podSecurityContext:
     runAsNonRoot: true
     runAsUser: 1000
     fsGroup: 1000
-    
+
   # Network policy settings
   networkPolicy:
     enabled: false
@@ -27,14 +27,14 @@ documenso:
     repository: documenso/documenso
     tag: latest
     pullPolicy: IfNotPresent
-  
+
   # Deployment strategy
   strategy:
     type: RollingUpdate
     rollingUpdate:
       maxSurge: 1
       maxUnavailable: 0
-  
+
   # Security contexts
   securityContext:
     allowPrivilegeEscalation: false
@@ -42,13 +42,13 @@ documenso:
       drop:
         - ALL
     readOnlyRootFilesystem: true
-  
-  # Service configuration  
+
+  # Service configuration
   service:
     type: ClusterIP
     port: 3000
     annotations: {}
-  
+
   # Resource limits and requests
   resources:
     limits:
@@ -57,13 +57,13 @@ documenso:
     requests:
       cpu: 500m
       memory: 512Mi
-  
+
   # Pod Disruption Budget
   podDisruptionBudget:
     enabled: true
     minAvailable: 1
     # maxUnavailable: 1
-  
+
   # Horizontal Pod Autoscaler
   autoscaling:
     enabled: false
@@ -71,7 +71,7 @@ documenso:
     maxReplicas: 5
     targetCPUUtilizationPercentage: 80
     targetMemoryUtilizationPercentage: 80
-  
+
   # Probes configuration
   livenessProbe:
     enabled: true
@@ -83,7 +83,7 @@ documenso:
     httpGet:
       path: /api/health
       port: http
-  
+
   readinessProbe:
     enabled: true
     initialDelaySeconds: 10
@@ -94,7 +94,7 @@ documenso:
     httpGet:
       path: /api/health
       port: http
-  
+
   startupProbe:
     enabled: true
     initialDelaySeconds: 10
@@ -105,27 +105,28 @@ documenso:
     httpGet:
       path: /api/health
       port: http
-      
+
   nodeSelector: {}
   tolerations: []
   affinity:
     podAntiAffinity:
       preferredDuringSchedulingIgnoredDuringExecution:
-      - weight: 100
-        podAffinityTerm:
-          labelSelector:
-            matchLabels:
-              app.kubernetes.io/name: documenso
-              app.kubernetes.io/instance: documenso
-          topologyKey: kubernetes.io/hostname
-  
+        - weight: 100
+          podAffinityTerm:
+            labelSelector:
+              matchLabels:
+                app.kubernetes.io/name: documenso
+                app.kubernetes.io/instance: documenso
+            topologyKey: kubernetes.io/hostname
+
   podAnnotations: {}
-  
+
   # Ingress configuration
   ingress:
     enabled: false
-    className: ""
-    annotations: {}
+    className: ''
+    annotations:
+      {}
       # kubernetes.io/ingress.class: nginx
       # kubernetes.io/tls-acme: "true"
     hosts:
@@ -137,106 +138,106 @@ documenso:
     #  - secretName: chart-example-tls
     #    hosts:
     #      - chart-example.local
-  
+
   # Application environment variables
   env:
-    PORT: "3000"
-    NEXT_PUBLIC_WEBAPP_URL: "https://example.com"
-    NEXT_PUBLIC_MARKETING_URL: "https://documenso.com"
-    NEXT_PUBLIC_UPLOAD_TRANSPORT: "database"
-    NEXT_PUBLIC_DOCUMENT_SIZE_UPLOAD_LIMIT: ""
-    NEXT_PUBLIC_POSTHOG_KEY: ""
-    NEXT_PUBLIC_DISABLE_SIGNUP: ""
-  
+    PORT: '3000'
+    NEXT_PUBLIC_WEBAPP_URL: 'https://example.com'
+    NEXT_PUBLIC_MARKETING_URL: 'https://documenso.com'
+    NEXT_PUBLIC_UPLOAD_TRANSPORT: 'database'
+    NEXT_PUBLIC_DOCUMENT_SIZE_UPLOAD_LIMIT: ''
+    NEXT_PUBLIC_POSTHOG_KEY: ''
+    NEXT_PUBLIC_DISABLE_SIGNUP: ''
+
   # Sensitive environment variables - will be stored in a Secret
   secret:
     # Required secrets
-    NEXTAUTH_SECRET: ""
-    NEXTAUTH_URL: ""
-    NEXT_PRIVATE_ENCRYPTION_KEY: ""
-    NEXT_PRIVATE_ENCRYPTION_SECONDARY_KEY: ""
-    
+    NEXTAUTH_SECRET: ''
+    NEXTAUTH_URL: ''
+    NEXT_PRIVATE_ENCRYPTION_KEY: ''
+    NEXT_PRIVATE_ENCRYPTION_SECONDARY_KEY: ''
+
     # Optional secrets
-    NEXT_PRIVATE_GOOGLE_CLIENT_ID: ""
-    NEXT_PRIVATE_GOOGLE_CLIENT_SECRET: ""
-    NEXT_PRIVATE_INTERNAL_WEBAPP_URL: ""
-    NEXT_PRIVATE_DATABASE_URL: ""
-    NEXT_PRIVATE_DIRECT_DATABASE_URL: ""
-    
+    NEXT_PRIVATE_GOOGLE_CLIENT_ID: ''
+    NEXT_PRIVATE_GOOGLE_CLIENT_SECRET: ''
+    NEXT_PRIVATE_INTERNAL_WEBAPP_URL: ''
+    NEXT_PRIVATE_DATABASE_URL: ''
+    NEXT_PRIVATE_DIRECT_DATABASE_URL: ''
+
     # Storage-related secrets
-    NEXT_PRIVATE_UPLOAD_ENDPOINT: ""
-    NEXT_PRIVATE_UPLOAD_FORCE_PATH_STYLE: ""
-    NEXT_PRIVATE_UPLOAD_REGION: ""
-    NEXT_PRIVATE_UPLOAD_BUCKET: ""
-    NEXT_PRIVATE_UPLOAD_ACCESS_KEY_ID: ""
-    NEXT_PRIVATE_UPLOAD_SECRET_ACCESS_KEY: ""
-    
+    NEXT_PRIVATE_UPLOAD_ENDPOINT: ''
+    NEXT_PRIVATE_UPLOAD_FORCE_PATH_STYLE: ''
+    NEXT_PRIVATE_UPLOAD_REGION: ''
+    NEXT_PRIVATE_UPLOAD_BUCKET: ''
+    NEXT_PRIVATE_UPLOAD_ACCESS_KEY_ID: ''
+    NEXT_PRIVATE_UPLOAD_SECRET_ACCESS_KEY: ''
+
     # Email-related secrets
-    NEXT_PRIVATE_SMTP_TRANSPORT: ""
-    NEXT_PRIVATE_SMTP_HOST: ""
-    NEXT_PRIVATE_SMTP_PORT: ""
-    NEXT_PRIVATE_SMTP_USERNAME: ""
-    NEXT_PRIVATE_SMTP_PASSWORD: ""
-    NEXT_PRIVATE_SMTP_APIKEY_USER: ""
-    NEXT_PRIVATE_SMTP_APIKEY: ""
-    NEXT_PRIVATE_SMTP_SECURE: ""
-    NEXT_PRIVATE_SMTP_FROM_NAME: ""
-    NEXT_PRIVATE_SMTP_FROM_ADDRESS: ""
-    NEXT_PRIVATE_SMTP_SERVICE: ""
-    NEXT_PRIVATE_RESEND_API_KEY: ""
-    
+    NEXT_PRIVATE_SMTP_TRANSPORT: ''
+    NEXT_PRIVATE_SMTP_HOST: ''
+    NEXT_PRIVATE_SMTP_PORT: ''
+    NEXT_PRIVATE_SMTP_USERNAME: ''
+    NEXT_PRIVATE_SMTP_PASSWORD: ''
+    NEXT_PRIVATE_SMTP_APIKEY_USER: ''
+    NEXT_PRIVATE_SMTP_APIKEY: ''
+    NEXT_PRIVATE_SMTP_SECURE: ''
+    NEXT_PRIVATE_SMTP_FROM_NAME: ''
+    NEXT_PRIVATE_SMTP_FROM_ADDRESS: ''
+    NEXT_PRIVATE_SMTP_SERVICE: ''
+    NEXT_PRIVATE_RESEND_API_KEY: ''
+
     # Mail Channels secrets
-    NEXT_PRIVATE_MAILCHANNELS_API_KEY: ""
-    NEXT_PRIVATE_MAILCHANNELS_ENDPOINT: ""
-    NEXT_PRIVATE_MAILCHANNELS_DKIM_DOMAIN: ""
-    NEXT_PRIVATE_MAILCHANNELS_DKIM_SELECTOR: ""
-    NEXT_PRIVATE_MAILCHANNELS_DKIM_PRIVATE_KEY: ""
-    
+    NEXT_PRIVATE_MAILCHANNELS_API_KEY: ''
+    NEXT_PRIVATE_MAILCHANNELS_ENDPOINT: ''
+    NEXT_PRIVATE_MAILCHANNELS_DKIM_DOMAIN: ''
+    NEXT_PRIVATE_MAILCHANNELS_DKIM_SELECTOR: ''
+    NEXT_PRIVATE_MAILCHANNELS_DKIM_PRIVATE_KEY: ''
+
     # Signing secrets
-    NEXT_PRIVATE_SIGNING_PASSPHRASE: ""
-  
+    NEXT_PRIVATE_SIGNING_PASSPHRASE: ''
+
   # Certificate mounting
   certificate:
     enabled: true
-    mountPath: "/opt/documenso/cert.p12"
-    existingSecret: ""
-    key: "cert.p12"
-    
+    mountPath: '/opt/documenso/cert.p12'
+    existingSecret: ''
+    key: 'cert.p12'
+
   # Volume for temporary storage
   extraVolumes: []
   extraVolumeMounts: []
-  
+
   # Optional extra environment variables
   extraEnvVars: []
   # - name: EXTRA_VAR
   #   value: "extra-var-value"
-  
+
   # Optional extra environment variables from secrets
-  extraEnvVarsSecret: ""
+  extraEnvVarsSecret: ''
 
 # PostgreSQL configuration
 postgresql:
-  enabled: true
+  enabled: false
   image:
     repository: postgres
-    tag: "15"
+    tag: '15'
     pullPolicy: IfNotPresent
-  
+
   # Deployment strategy for PostgreSQL
   strategy:
     type: Recreate
-  
+
   # Security context for PostgreSQL
   securityContext:
     allowPrivilegeEscalation: false
     runAsNonRoot: true
     runAsUser: 999
     readOnlyRootFilesystem: true
-    
+
   service:
     port: 5432
     annotations: {}
-  
+
   resources:
     limits:
       cpu: 1000m
@@ -244,7 +245,7 @@ postgresql:
     requests:
       cpu: 500m
       memory: 512Mi
-      
+
   # Probes configuration
   livenessProbe:
     enabled: true
@@ -253,7 +254,7 @@ postgresql:
     timeoutSeconds: 5
     failureThreshold: 3
     successThreshold: 1
-  
+
   readinessProbe:
     enabled: true
     initialDelaySeconds: 5
@@ -261,15 +262,15 @@ postgresql:
     timeoutSeconds: 5
     failureThreshold: 3
     successThreshold: 1
-  
+
   persistence:
     enabled: true
     size: 10Gi
-    storageClass: ""
+    storageClass: ''
     annotations: {}
     accessModes:
       - ReadWriteOnce
-      
+
   # Additional volumes needed when using readOnlyRootFilesystem
   extraVolumes:
     - name: tmp
@@ -278,7 +279,7 @@ postgresql:
       emptyDir: {}
     - name: var-lib-postgresql
       emptyDir: {}
-      
+
   extraVolumeMounts:
     - name: tmp
       mountPath: /tmp
@@ -287,27 +288,27 @@ postgresql:
     - name: var-lib-postgresql
       mountPath: /var/lib/postgresql
       readOnly: false
-  
+
   # PostgreSQL credentials
   auth:
     # Create a random password if not set
-    existingSecret: ""
-    username: "postgres"
-    password: ""
-    database: "documenso"
-    
+    existingSecret: ''
+    username: 'postgres'
+    password: ''
+    database: 'documenso'
+
   # PostgreSQL configuration
   configuration:
-    shared_buffers: "256MB"
-    max_connections: "100"
-    
+    shared_buffers: '256MB'
+    max_connections: '100'
+
   # High Availability PostgreSQL
   replication:
     enabled: false
     readReplicas: 1
-    synchronousCommit: "on"
+    synchronousCommit: 'on'
     numSynchronousReplicas: 1
-  
+
   # Postgres metrics monitoring with prometheus
   metrics:
     enabled: false
@@ -315,56 +316,56 @@ postgresql:
       enabled: false
       interval: 30s
       scrapeTimeout: 10s
-      namespace: ""
-  
+      namespace: ''
+
   podAnnotations: {}
   nodeSelector: {}
   tolerations: []
   affinity:
     podAntiAffinity:
       preferredDuringSchedulingIgnoredDuringExecution:
-      - weight: 100
-        podAffinityTerm:
-          labelSelector:
-            matchLabels:
-              app.kubernetes.io/name: postgresql
-              app.kubernetes.io/instance: postgresql
-          topologyKey: kubernetes.io/hostname
-  
+        - weight: 100
+          podAffinityTerm:
+            labelSelector:
+              matchLabels:
+                app.kubernetes.io/name: postgresql
+                app.kubernetes.io/instance: postgresql
+            topologyKey: kubernetes.io/hostname
+
   # Pod Disruption Budget for PostgreSQL
   podDisruptionBudget:
     enabled: true
     minAvailable: 1
     # maxUnavailable: 1
-    
+
   # Backup configuration
   backup:
     enabled: false
-    schedule: "0 0 * * *"  # Daily at midnight
+    schedule: '0 0 * * *' # Daily at midnight
     image:
       repository: bitnami/postgresql
       tag: latest
     persistence:
       enabled: true
-      storageClass: ""
+      storageClass: ''
       size: 5Gi
     s3:
       enabled: false
-      bucket: ""
-      region: ""
-      accessKeyId: ""
-      secretAccessKey: ""
+      bucket: ''
+      region: ''
+      accessKeyId: ''
+      secretAccessKey: ''
 
 # ServiceAccount configuration
 serviceAccount:
   create: true
   annotations: {}
-  name: ""
+  name: ''
 
 # Prometheus ServiceMonitor
 serviceMonitor:
   enabled: false
-  namespace: ""
+  namespace: ''
   interval: 30s
   scrapeTimeout: 10s
   labels: {}
@@ -386,4 +387,4 @@ istio:
   enabled: false
   gateway:
     enabled: false
-    name: ""
+    name: ''
