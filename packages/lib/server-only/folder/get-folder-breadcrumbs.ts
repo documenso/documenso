@@ -1,15 +1,19 @@
 import { prisma } from '@documenso/prisma';
 
+import type { TFolderType } from '../../types/folder-type';
+
 export interface GetFolderBreadcrumbsOptions {
   userId: number;
   teamId?: number;
   folderId: string;
+  type?: TFolderType;
 }
 
 export const getFolderBreadcrumbs = async ({
   userId,
   teamId,
   folderId,
+  type,
 }: GetFolderBreadcrumbsOptions) => {
   const breadcrumbs = [];
   let currentFolderId = folderId;
@@ -20,6 +24,7 @@ export const getFolderBreadcrumbs = async ({
       id: currentFolderId,
       userId,
       teamId,
+      ...(type ? { type } : {}),
     },
   });
 
@@ -36,6 +41,7 @@ export const getFolderBreadcrumbs = async ({
         id: currentFolder.parentId,
         userId,
         teamId,
+        ...(type ? { type } : {}),
       },
     });
 

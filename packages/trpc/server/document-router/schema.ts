@@ -190,7 +190,7 @@ export type TGetDocumentByTokenQuerySchema = z.infer<typeof ZGetDocumentByTokenQ
 
 export const ZGetDocumentWithDetailsByIdRequestSchema = z.object({
   documentId: z.number(),
-  folderId: z.string().nullable().optional(),
+  folderId: z.string().describe('Filter documents by folder ID').nullable().optional(),
 });
 
 export const ZGetDocumentWithDetailsByIdResponseSchema = ZDocumentSchema;
@@ -199,7 +199,11 @@ export const ZCreateDocumentRequestSchema = z.object({
   title: ZDocumentTitleSchema,
   documentDataId: z.string().min(1),
   timezone: ZDocumentMetaTimezoneSchema.optional(),
-  folderId: z.string().optional(),
+  folderId: z
+    .string()
+    .describe('The ID of the folder to create the document in')
+    .nullable()
+    .optional(),
 });
 
 export const ZCreateDocumentV2RequestSchema = z.object({

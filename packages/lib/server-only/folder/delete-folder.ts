@@ -1,20 +1,13 @@
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
-import type { ApiRequestMetadata } from '@documenso/lib/universal/extract-request-metadata';
 import { prisma } from '@documenso/prisma';
 
 export interface DeleteFolderOptions {
   userId: number;
   teamId?: number;
   folderId: string;
-  requestMetadata?: ApiRequestMetadata;
 }
 
-export const deleteFolder = async ({
-  userId,
-  teamId,
-  folderId,
-  requestMetadata,
-}: DeleteFolderOptions) => {
+export const deleteFolder = async ({ userId, teamId, folderId }: DeleteFolderOptions) => {
   const folder = await prisma.folder.findFirst({
     where: {
       id: folderId,
@@ -24,28 +17,13 @@ export const deleteFolder = async ({
     include: {
       documents: true,
       subfolders: true,
+      templates: true,
     },
   });
 
   if (!folder) {
     throw new AppError(AppErrorCode.NOT_FOUND, {
       message: 'Folder not found',
-    });
-  }
-
-  if (folder.documents.length > 0) {
-    await prisma.document.deleteMany({
-      where: {
-        folderId,
-      },
-    });
-  }
-
-  if (folder.subfolders.length > 0) {
-    await prisma.folder.deleteMany({
-      where: {
-        parentId: folderId,
-      },
     });
   }
 

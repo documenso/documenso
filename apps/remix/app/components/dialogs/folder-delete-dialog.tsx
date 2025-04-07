@@ -95,7 +95,7 @@ export const FolderDeleteDialog = ({ folder, isOpen, onOpenChange }: FolderDelet
   };
 
   useEffect(() => {
-    if (isOpen) {
+    if (!isOpen) {
       form.reset();
     }
   }, [isOpen]);

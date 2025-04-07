@@ -71,7 +71,7 @@ export function TemplateMoveToFolderDialog({
 
   const { data: folders, isLoading: isFoldersLoading } = trpc.folder.findFolders.useQuery(
     {
-      parentId: null,
+      parentId: currentFolderId || null,
       type: FolderType.TEMPLATE,
     },
     {
@@ -168,6 +168,7 @@ export function TemplateMoveToFolderDialog({
                             variant={field.value === null ? 'default' : 'outline'}
                             className="w-full justify-start"
                             onClick={() => field.onChange(null)}
+                            disabled={currentFolderId === null}
                           >
                             <HomeIcon className="mr-2 h-4 w-4" />
                             <Trans>Root (No Folder)</Trans>
@@ -180,6 +181,7 @@ export function TemplateMoveToFolderDialog({
                               variant={field.value === folder.id ? 'default' : 'outline'}
                               className="w-full justify-start"
                               onClick={() => field.onChange(folder.id)}
+                              disabled={currentFolderId === folder.id}
                             >
                               <FolderIcon className="mr-2 h-4 w-4" />
                               {folder.name}
@@ -199,7 +201,12 @@ export function TemplateMoveToFolderDialog({
                 <Trans>Cancel</Trans>
               </Button>
 
-              <Button type="submit" disabled={isFoldersLoading}>
+              <Button
+                type="submit"
+                disabled={
+                  isFoldersLoading || form.formState.isSubmitting || currentFolderId === null
+                }
+              >
                 <Trans>Move</Trans>
               </Button>
             </DialogFooter>

@@ -113,7 +113,7 @@ export default function TemplatesPage() {
 
         <div className="flex items-center space-x-2">
           <TemplateFolderCreateDialog />
-          <TemplateCreateDialog templateRootPath={templateRootPath} teamId={team?.id} />
+          <TemplateCreateDialog templateRootPath={templateRootPath} />
         </div>
       </div>
 

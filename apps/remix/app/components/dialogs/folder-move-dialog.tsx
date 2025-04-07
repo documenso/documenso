@@ -101,6 +101,7 @@ export const FolderMoveDialog = ({
     }
   }, [isOpen, form]);
 
+  // Filter out the current folder and only show folders of the same type
   const filteredFolders = foldersData?.filter(
     (f) => f.id !== folder?.id && f.type === folder?.type,
   );
@@ -156,13 +157,7 @@ export const FolderMoveDialog = ({
               <Button type="button" variant="secondary" onClick={() => onOpenChange(false)}>
                 Cancel
               </Button>
-              <Button
-                type="submit"
-                disabled={
-                  form.formState.isSubmitting ||
-                  form.getValues('targetFolderId') === folder?.parentId
-                }
-              >
+              <Button type="submit" disabled={form.formState.isSubmitting}>
                 Move Folder
               </Button>
             </DialogFooter>

@@ -65,6 +65,10 @@ export const TemplatesTableActionDropdown = ({
   const isOwner = row.userId === user.id;
   const isTeamTemplate = row.teamId === teamId;
 
+  const formatPath = row.folderId
+    ? `${templateRootPath}/f/${row.folderId}/${row.id}/edit`
+    : `${templateRootPath}/${row.id}/edit`;
+
   return (
     <DropdownMenu>
       <DropdownMenuTrigger>
@@ -75,13 +79,7 @@ export const TemplatesTableActionDropdown = ({
         <DropdownMenuLabel>Action</DropdownMenuLabel>
 
         <DropdownMenuItem disabled={!isOwner && !isTeamTemplate} asChild>
-          <Link
-            to={
-              row.folderId
-                ? `${templateRootPath}/f/${row.folderId}/${row.id}/edit`
-                : `${templateRootPath}/${row.id}/edit`
-            }
-          >
+          <Link to={formatPath}>
             <Edit className="mr-2 h-4 w-4" />
             <Trans>Edit</Trans>
           </Link>
