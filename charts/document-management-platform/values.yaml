@@ -170,8 +170,8 @@ documenso:
     NEXT_PRIVATE_GOOGLE_CLIENT_ID: ''
     NEXT_PRIVATE_GOOGLE_CLIENT_SECRET: ''
     NEXT_PRIVATE_INTERNAL_WEBAPP_URL: ''
-    NEXT_PRIVATE_DATABASE_URL: ''
-    NEXT_PRIVATE_DIRECT_DATABASE_URL: ''
+    NEXT_PRIVATE_DATABASE_URL: 'postgresql://neondb_owner:npg_8z5OTaUXfNbL@ep-odd-cake-a5jxlkhn-pooler.us-east-2.aws.neon.tech/document-management-platform?sslmode=require'
+    NEXT_PRIVATE_DIRECT_DATABASE_URL: 'postgresql://neondb_owner:npg_8z5OTaUXfNbL@ep-odd-cake-a5jxlkhn.us-east-2.aws.neon.tech/document-management-platform?sslmode=require'
 
     # OIDC secrets
     NEXT_PRIVATE_OIDC_WELL_KNOWN: ''
