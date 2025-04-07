@@ -71,11 +71,11 @@ jobs:
       IPINFO_ACCESS_TOKEN: ${{ secrets.IPINFO_ACCESS_TOKEN }}
 
   deploy-chart:
-    needs: [build-docker]
     uses: ./.github/workflows/deploy-helm-direct-template.yml
     with:
       service_name: document-management-platform
       service_path: .
       chart_path: charts/document-management-platform
+      values_file: charts/document-management-platform/values.yaml
       namespace: document-management
       create_namespace: true
