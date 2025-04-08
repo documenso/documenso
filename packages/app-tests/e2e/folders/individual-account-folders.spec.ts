@@ -5,13 +5,6 @@ import { FolderType } from '@documenso/prisma/client';
 import { seedBlankDocument } from '@documenso/prisma/seed/documents';
 import { seedBlankFolder } from '@documenso/prisma/seed/folders';
 import { seedBlankTemplate } from '@documenso/prisma/seed/templates';
-// import {
-//   seedBlankDocument,
-//   seedDraftDocument,
-//   seedPendingDocument,
-// } from '@documenso/prisma/seed/documents';
-// import { seedUserSubscription } from '@documenso/prisma/seed/subscriptions';
-// import { seedTeam } from '@documenso/prisma/seed/teams';
 import { seedUser } from '@documenso/prisma/seed/users';
 
 import { apiSignin } from '../fixtures/authentication';
