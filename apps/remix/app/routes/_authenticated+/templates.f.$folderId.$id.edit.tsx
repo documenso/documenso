@@ -58,7 +58,10 @@ export async function loader({ params, request }: Route.LoaderArgs) {
   });
 
   return superLoaderJson({
-    template,
+    template: {
+      ...template,
+      folder: null,
+    },
     isTemplateEnterprise,
     templateRootPath,
   });

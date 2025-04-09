@@ -48,6 +48,7 @@ export const getTemplateById = async ({
           email: true,
         },
       },
+      folder: true,
     },
   });
 

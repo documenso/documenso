@@ -20,7 +20,7 @@ export const createFolder = async ({
   userId,
   teamId,
   name,
-  parentId = null,
+  parentId,
   type = FolderType.DOCUMENT,
 }: CreateFolderOptions) => {
   const user = await prisma.user.findFirstOrThrow({

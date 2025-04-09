@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 
 import { Trans } from '@lingui/react/macro';
-import { Bird, FolderIcon, HomeIcon, Loader2, PinIcon } from 'lucide-react';
+import { Bird, FolderIcon, HomeIcon, Loader2 } from 'lucide-react';
 import { useNavigate, useSearchParams } from 'react-router';
 
 import { FolderType } from '@documenso/lib/types/folder-type';
@@ -11,18 +11,13 @@ import { trpc } from '@documenso/trpc/react';
 import type { TFolderWithSubfolders } from '@documenso/trpc/server/folder-router/schema';
 import { Avatar, AvatarFallback, AvatarImage } from '@documenso/ui/primitives/avatar';
 import { Button } from '@documenso/ui/primitives/button';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from '@documenso/ui/primitives/dropdown-menu';
 
 import { TemplateCreateDialog } from '~/components/dialogs/template-create-dialog';
 import { TemplateFolderCreateDialog } from '~/components/dialogs/template-folder-create-dialog';
 import { TemplateFolderDeleteDialog } from '~/components/dialogs/template-folder-delete-dialog';
 import { TemplateFolderMoveDialog } from '~/components/dialogs/template-folder-move-dialog';
 import { TemplateFolderSettingsDialog } from '~/components/dialogs/template-folder-settings-dialog';
+import { FolderCard } from '~/components/general/folder/folder-card';
 import { TemplatesTable } from '~/components/tables/templates-table';
 import { useOptionalCurrentTeam } from '~/providers/team';
 import { appMetaTags } from '~/utils/meta';
@@ -43,19 +38,8 @@ export default function TemplatesPage() {
 
   const team = useOptionalCurrentTeam();
 
-  const utils = trpc.useUtils();
-
-  const pinFolder = trpc.folder.pinFolder.useMutation({
-    onSuccess: () => {
-      void utils.folder.getFolders.invalidate();
-    },
-  });
-
-  const unpinFolder = trpc.folder.unpinFolder.useMutation({
-    onSuccess: () => {
-      void utils.folder.getFolders.invalidate();
-    },
-  });
+  const { mutateAsync: pinFolder } = trpc.folder.pinFolder.useMutation();
+  const { mutateAsync: unpinFolder } = trpc.folder.unpinFolder.useMutation();
 
   const page = Number(searchParams.get('page')) || 1;
   const perPage = Number(searchParams.get('perPage')) || 10;
@@ -73,17 +57,18 @@ export default function TemplatesPage() {
     isLoading: isFoldersLoading,
     refetch: refetchFolders,
   } = trpc.folder.getFolders.useQuery({
-    parentId: null,
     type: FolderType.TEMPLATE,
+    parentId: null,
   });
 
   useEffect(() => {
     void refetch();
     void refetchFolders();
-  }, [team?.url, refetch, refetchFolders]);
+  }, [team?.url]);
 
   const navigateToFolder = (folderId?: string | null) => {
     const templatesPath = formatTemplatesPath(team?.url);
+
     if (folderId) {
       void navigate(`${templatesPath}/f/${folderId}`);
     } else {
@@ -91,7 +76,32 @@ export default function TemplatesPage() {
     }
   };
 
-  const breadcrumbs = foldersData?.breadcrumbs || [];
+  const handleNavigate = (folderId: string) => {
+    navigateToFolder(folderId);
+  };
+
+  const handleMove = (folder: TFolderWithSubfolders) => {
+    setFolderToMove(folder);
+    setIsMovingFolder(true);
+  };
+
+  const handlePin = (folderId: string) => {
+    void pinFolder({ folderId });
+  };
+
+  const handleUnpin = (folderId: string) => {
+    void unpinFolder({ folderId });
+  };
+
+  const handleSettings = (folder: TFolderWithSubfolders) => {
+    setFolderToSettings(folder);
+    setIsSettingsFolderOpen(true);
+  };
+
+  const handleDelete = (folder: TFolderWithSubfolders) => {
+    setFolderToDelete(folder);
+    setIsDeletingFolder(true);
+  };
 
   return (
     <div className="mx-auto max-w-screen-xl px-4 md:px-8">
@@ -128,7 +138,7 @@ export default function TemplatesPage() {
           <span>Home</span>
         </Button>
 
-        {breadcrumbs.map((folder) => (
+        {foldersData?.breadcrumbs.map((folder) => (
           <div key={folder.id} className="flex items-center space-x-2">
             <span>/</span>
             <Button
@@ -156,76 +166,16 @@ export default function TemplatesPage() {
                 {foldersData.folders
                   .filter((folder) => folder.pinned)
                   .map((folder) => (
-                    <div
+                    <FolderCard
                       key={folder.id}
-                      className="border-border hover:border-muted-foreground/40 group relative flex flex-col rounded-lg border p-4 transition-all hover:shadow-sm"
-                    >
-                      <div className="flex items-start justify-between">
-                        <button
-                          className="flex items-center space-x-2 text-left"
-                          onClick={() => navigateToFolder(folder.id)}
-                        >
-                          <FolderIcon className="text-documenso h-6 w-6" />
-                          <div>
-                            <div className="flex items-center gap-2">
-                              <h3 className="font-medium">{folder.name}</h3>
-                              <PinIcon className="text-documenso h-3 w-3" />
-                            </div>
-                            <div className="mt-1 flex space-x-2 text-xs text-gray-500">
-                              <span>{folder._count.documents || 0} templates</span>
-                              <span>•</span>
-                              <span>{folder._count.subfolders || 0} folders</span>
-                            </div>
-                          </div>
-                        </button>
-
-                        <DropdownMenu>
-                          <DropdownMenuTrigger asChild>
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              className="opacity-0 group-hover:opacity-100"
-                            >
-                              •••
-                            </Button>
-                          </DropdownMenuTrigger>
-                          <DropdownMenuContent align="end">
-                            <DropdownMenuItem
-                              onClick={() => {
-                                setFolderToMove(folder);
-                                setIsMovingFolder(true);
-                              }}
-                            >
-                              Move
-                            </DropdownMenuItem>
-                            <DropdownMenuItem
-                              onClick={() => {
-                                void unpinFolder.mutateAsync({ folderId: folder.id });
-                              }}
-                            >
-                              Unpin
-                            </DropdownMenuItem>
-                            <DropdownMenuItem
-                              onClick={() => {
-                                setFolderToSettings(folder);
-                                setIsSettingsFolderOpen(true);
-                              }}
-                            >
-                              Settings
-                            </DropdownMenuItem>
-                            <DropdownMenuItem
-                              className="text-red-500"
-                              onClick={() => {
-                                setFolderToDelete(folder);
-                                setIsDeletingFolder(true);
-                              }}
-                            >
-                              Delete
-                            </DropdownMenuItem>
-                          </DropdownMenuContent>
-                        </DropdownMenu>
-                      </div>
-                    </div>
+                      folder={folder}
+                      onNavigate={handleNavigate}
+                      onMove={handleMove}
+                      onPin={handlePin}
+                      onUnpin={handleUnpin}
+                      onSettings={handleSettings}
+                      onDelete={handleDelete}
+                    />
                   ))}
               </div>
             </div>
@@ -239,73 +189,16 @@ export default function TemplatesPage() {
               {foldersData?.folders
                 .filter((folder) => !folder.pinned)
                 .map((folder) => (
-                  <div
+                  <FolderCard
                     key={folder.id}
-                    className="border-border hover:border-muted-foreground/40 group relative flex flex-col rounded-lg border p-4 transition-all hover:shadow-sm"
-                  >
-                    <div className="flex items-start justify-between">
-                      <button
-                        className="flex items-center space-x-2 text-left"
-                        onClick={() => navigateToFolder(folder.id)}
-                      >
-                        <FolderIcon className="text-documenso h-6 w-6" />
-                        <div>
-                          <h3 className="font-medium">{folder.name}</h3>
-                          <div className="mt-1 flex space-x-2 text-xs text-gray-500">
-                            <span>{folder._count.documents || 0} templates</span>
-                            <span>•</span>
-                            <span>{folder._count.subfolders || 0} folders</span>
-                          </div>
-                        </div>
-                      </button>
-
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            className="opacity-0 group-hover:opacity-100"
-                          >
-                            •••
-                          </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end">
-                          <DropdownMenuItem
-                            onClick={() => {
-                              setFolderToMove(folder);
-                              setIsMovingFolder(true);
-                            }}
-                          >
-                            Move
-                          </DropdownMenuItem>
-                          <DropdownMenuItem
-                            onClick={() => {
-                              void pinFolder.mutateAsync({ folderId: folder.id });
-                            }}
-                          >
-                            Pin
-                          </DropdownMenuItem>
-                          <DropdownMenuItem
-                            onClick={() => {
-                              setFolderToSettings(folder);
-                              setIsSettingsFolderOpen(true);
-                            }}
-                          >
-                            Settings
-                          </DropdownMenuItem>
-                          <DropdownMenuItem
-                            className="text-red-500"
-                            onClick={() => {
-                              setFolderToDelete(folder);
-                              setIsDeletingFolder(true);
-                            }}
-                          >
-                            Delete
-                          </DropdownMenuItem>
-                        </DropdownMenuContent>
-                      </DropdownMenu>
-                    </div>
-                  </div>
+                    folder={folder}
+                    onNavigate={handleNavigate}
+                    onMove={handleMove}
+                    onPin={handlePin}
+                    onUnpin={handleUnpin}
+                    onSettings={handleSettings}
+                    onDelete={handleDelete}
+                  />
                 ))}
             </div>
           </div>

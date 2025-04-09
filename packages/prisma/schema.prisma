@@ -370,7 +370,7 @@ model Document {
   source         DocumentSource
 
   auditLogs DocumentAuditLog[]
-  Folder    Folder?            @relation(fields: [folderId], references: [id], onDelete: Cascade)
+  folder    Folder?            @relation(fields: [folderId], references: [id], onDelete: Cascade)
   folderId  String?
 
   @@unique([documentDataId])
@@ -747,7 +747,7 @@ model Template {
   fields               Field[]
   directLink           TemplateDirectLink?
   documents            Document[]
-  Folder               Folder?             @relation(fields: [folderId], references: [id], onDelete: Cascade)
+  folder               Folder?             @relation(fields: [folderId], references: [id], onDelete: Cascade)
   folderId             String?
 
   @@unique([templateDocumentDataId])

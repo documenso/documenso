@@ -8,6 +8,7 @@ import { FolderType } from '@documenso/lib/types/folder-type';
 import { formatAvatarUrl } from '@documenso/lib/utils/avatars';
 import { formatDocumentsPath, formatTemplatesPath } from '@documenso/lib/utils/teams';
 import { trpc } from '@documenso/trpc/react';
+import type { TFolderWithSubfolders } from '@documenso/trpc/server/folder-router/schema';
 import { Avatar, AvatarFallback, AvatarImage } from '@documenso/ui/primitives/avatar';
 import { Button } from '@documenso/ui/primitives/button';
 import {
@@ -58,41 +59,30 @@ export default function TemplatesPage() {
     type: FolderType.TEMPLATE,
   });
 
-  const { mutateAsync: pinFolder } = trpc.folder.pinFolder.useMutation({
-    onSuccess: () => {
-      void refetchFolders();
-    },
-  });
+  const { mutateAsync: pinFolder } = trpc.folder.pinFolder.useMutation();
+  const { mutateAsync: unpinFolder } = trpc.folder.unpinFolder.useMutation();
 
-  const { mutateAsync: unpinFolder } = trpc.folder.unpinFolder.useMutation({
-    onSuccess: () => {
-      void refetchFolders();
-    },
-  });
-
-  const [folderToMove, setFolderToMove] = useState(null);
+  const [folderToMove, setFolderToMove] = useState<TFolderWithSubfolders | null>(null);
   const [isMovingFolder, setIsMovingFolder] = useState(false);
-  const [folderToSettings, setFolderToSettings] = useState(null);
+  const [folderToSettings, setFolderToSettings] = useState<TFolderWithSubfolders | null>(null);
   const [isSettingsFolderOpen, setIsSettingsFolderOpen] = useState(false);
-  const [folderToDelete, setFolderToDelete] = useState(null);
+  const [folderToDelete, setFolderToDelete] = useState<TFolderWithSubfolders | null>(null);
   const [isDeletingFolder, setIsDeletingFolder] = useState(false);
 
   useEffect(() => {
     void refetch();
     void refetchFolders();
-  }, [team?.url, refetch, refetchFolders]);
+  }, [team?.url]);
 
-  const navigateToFolder = (folderId?: string | null) => {
+  const navigateToFolder = (folderId?: string) => {
     const templatesPath = formatTemplatesPath(team?.url);
+
     if (folderId) {
       void navigate(`${templatesPath}/f/${folderId}`);
     } else {
       void navigate(templatesPath);
     }
   };
-
-  const breadcrumbs = foldersData?.breadcrumbs ?? [];
-  const folders = foldersData?.folders ?? [];
 
   return (
     <div className="mx-auto max-w-screen-xl px-4 md:px-8">
@@ -129,7 +119,7 @@ export default function TemplatesPage() {
           <Trans>Home</Trans>
         </Button>
 
-        {breadcrumbs.map((folder) => (
+        {foldersData?.breadcrumbs.map((folder) => (
           <div key={folder.id} className="flex items-center space-x-2">
             <span className="text-muted-foreground">/</span>
             <Button
@@ -151,10 +141,10 @@ export default function TemplatesPage() {
         </div>
       ) : (
         <>
-          {folders.some((folder) => folder.pinned) && (
+          {foldersData?.folders.some((folder) => folder.pinned) && (
             <div className="mt-6">
               <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
-                {folders
+                {foldersData?.folders
                   .filter((folder) => folder.pinned)
                   .map((folder) => (
                     <div
@@ -237,7 +227,7 @@ export default function TemplatesPage() {
               Folders
             </h3>
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
-              {folders
+              {foldersData?.folders
                 .filter((folder) => !folder.pinned)
                 .map((folder) => (
                   <div

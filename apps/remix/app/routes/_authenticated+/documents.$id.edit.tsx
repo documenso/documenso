@@ -86,7 +86,10 @@ export async function loader({ params, request }: Route.LoaderArgs) {
   });
 
   return superLoaderJson({
-    document,
+    document: {
+      ...document,
+      folder: null,
+    },
     documentRootPath,
     isDocumentEnterprise,
   });
