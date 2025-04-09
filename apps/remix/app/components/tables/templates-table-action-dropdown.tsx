@@ -161,7 +161,7 @@ export const TemplatesTableActionDropdown = ({
         templateTitle={row.title}
         isOpen={isMoveToFolderDialogOpen}
         onOpenChange={setMoveToFolderDialogOpen}
-        currentFolderId={row.folderId}
+        currentFolderId={row.folderId ?? ''}
       />
     </DropdownMenu>
   );

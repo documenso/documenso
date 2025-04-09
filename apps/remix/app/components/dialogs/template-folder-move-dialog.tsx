@@ -37,7 +37,7 @@ export type TemplateFolderMoveDialogProps = {
 } & Omit<DialogPrimitive.DialogProps, 'children'>;
 
 const ZMoveFolderFormSchema = z.object({
-  targetFolderId: z.string().nullable(),
+  targetFolderId: z.string().optional(),
 });
 
 type TMoveFolderFormSchema = z.infer<typeof ZMoveFolderFormSchema>;
@@ -56,7 +56,7 @@ export const TemplateFolderMoveDialog = ({
   const form = useForm<TMoveFolderFormSchema>({
     resolver: zodResolver(ZMoveFolderFormSchema),
     defaultValues: {
-      targetFolderId: null,
+      targetFolderId: folder?.parentId ?? '',
     },
   });
 
@@ -66,7 +66,7 @@ export const TemplateFolderMoveDialog = ({
     try {
       await moveFolder({
         id: folder.id,
-        parentId: targetFolderId,
+        parentId: targetFolderId ?? '',
       });
 
       onOpenChange(false);
@@ -124,10 +124,10 @@ export const TemplateFolderMoveDialog = ({
                     <div className="space-y-2">
                       <Button
                         type="button"
-                        variant={field.value === null ? 'default' : 'outline'}
+                        variant={!field.value ? 'default' : 'outline'}
                         className="w-full justify-start"
-                        disabled={folder?.parentId === null}
-                        onClick={() => field.onChange(null)}
+                        disabled={!folder?.parentId}
+                        onClick={() => field.onChange(undefined)}
                       >
                         <HomeIcon className="mr-2 h-4 w-4" />
                         Root

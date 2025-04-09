@@ -7,7 +7,7 @@ export interface MoveDocumentToFolderOptions {
   userId: number;
   teamId?: number;
   documentId: number;
-  folderId: string | null;
+  folderId?: string | null;
   requestMetadata?: ApiRequestMetadata;
 }
 

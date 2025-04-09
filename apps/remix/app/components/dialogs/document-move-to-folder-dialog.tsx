@@ -39,11 +39,11 @@ export type DocumentMoveToFolderDialogProps = {
   documentId: number;
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  currentFolderId?: string | null;
+  currentFolderId?: string;
 } & Omit<DialogPrimitive.DialogProps, 'children'>;
 
 const ZMoveDocumentFormSchema = z.object({
-  folderId: z.string().nullable(),
+  folderId: z.string().optional(),
 });
 
 type TMoveDocumentFormSchema = z.infer<typeof ZMoveDocumentFormSchema>;
@@ -63,13 +63,13 @@ export const DocumentMoveToFolderDialog = ({
   const form = useForm<TMoveDocumentFormSchema>({
     resolver: zodResolver(ZMoveDocumentFormSchema),
     defaultValues: {
-      folderId: currentFolderId || null,
+      folderId: currentFolderId,
     },
   });
 
   const { data: folders, isLoading: isFoldersLoading } = trpc.folder.findFolders.useQuery(
     {
-      parentId: currentFolderId || null,
+      parentId: currentFolderId,
       type: FolderType.DOCUMENT,
     },
     {
@@ -83,7 +83,7 @@ export const DocumentMoveToFolderDialog = ({
     if (!open) {
       form.reset();
     } else {
-      form.reset({ folderId: currentFolderId || null });
+      form.reset({ folderId: currentFolderId });
     }
   }, [open, currentFolderId, form]);
 
@@ -91,7 +91,7 @@ export const DocumentMoveToFolderDialog = ({
     try {
       await moveDocumentToFolder({
         documentId,
-        folderId: data.folderId,
+        folderId: data.folderId || '',
       });
 
       toast({

@@ -6,7 +6,7 @@ import type { TFolderType } from '../../types/folder-type';
 export interface GetFolderByIdOptions {
   userId: number;
   teamId?: number;
-  folderId: string;
+  folderId?: string;
   type?: TFolderType;
 }
 

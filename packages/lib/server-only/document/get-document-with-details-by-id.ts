@@ -7,14 +7,14 @@ export type GetDocumentWithDetailsByIdOptions = {
   documentId: number;
   userId: number;
   teamId?: number;
-  folderId?: string | null;
+  folderId?: string;
 };
 
 export const getDocumentWithDetailsById = async ({
   documentId,
   userId,
   teamId,
-  folderId = null,
+  folderId,
 }: GetDocumentWithDetailsByIdOptions) => {
   const documentWhereInput = await getDocumentWhereInput({
     documentId,
@@ -32,6 +32,7 @@ export const getDocumentWithDetailsById = async ({
       documentMeta: true,
       recipients: true,
       fields: true,
+      folder: true,
     },
   });
 

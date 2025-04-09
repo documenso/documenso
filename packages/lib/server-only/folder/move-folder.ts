@@ -5,8 +5,8 @@ import { prisma } from '@documenso/prisma';
 export interface MoveFolderOptions {
   userId: number;
   teamId?: number;
-  folderId: string;
-  parentId: string | null;
+  folderId?: string;
+  parentId?: string;
   requestMetadata?: ApiRequestMetadata;
 }
 

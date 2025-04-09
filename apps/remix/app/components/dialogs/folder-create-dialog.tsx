@@ -67,7 +67,7 @@ export const CreateFolderDialog = ({ trigger, ...props }: CreateFolderDialogProp
     try {
       const newFolder = await createFolder({
         name: data.name,
-        parentId: folderId ?? null,
+        parentId: folderId,
         type: FolderType.DOCUMENT,
       });
 

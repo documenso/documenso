@@ -12,14 +12,14 @@ export type GetDocumentByIdOptions = {
   documentId: number;
   userId: number;
   teamId?: number;
-  folderId?: string | null;
+  folderId?: string;
 };
 
 export const getDocumentById = async ({
   documentId,
   userId,
   teamId,
-  folderId = null,
+  folderId,
 }: GetDocumentByIdOptions) => {
   const documentWhereInput = await getDocumentWhereInput({
     documentId,

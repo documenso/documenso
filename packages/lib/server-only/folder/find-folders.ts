@@ -9,13 +9,11 @@ import type { TFolderType } from '../../types/folder-type';
 export interface FindFoldersOptions {
   userId: number;
   teamId?: number;
-  parentId: string | null;
+  parentId?: string | null;
   type?: TFolderType;
 }
 
 export const findFolders = async ({ userId, teamId, parentId, type }: FindFoldersOptions) => {
-  console.log('findFolders called with:', { userId, teamId, parentId, type });
-
   let team = null;
   let teamMemberRole = null;
 
@@ -43,7 +41,6 @@ export const findFolders = async ({ userId, teamId, parentId, type }: FindFolder
       });
 
       teamMemberRole = team.members[0].role;
-      console.log('Team found:', { teamId, teamMemberRole });
     } catch (error) {
       console.error('Error finding team:', error);
       throw error;
@@ -81,8 +78,6 @@ export const findFolders = async ({ userId, teamId, parentId, type }: FindFolder
     ],
   };
 
-  console.log('Where clause:', JSON.stringify(whereClause, null, 2));
-
   try {
     const folders = await prisma.folder.findMany({
       where: {
@@ -91,8 +86,6 @@ export const findFolders = async ({ userId, teamId, parentId, type }: FindFolder
       },
       orderBy: [{ pinned: 'desc' }, { createdAt: 'desc' }],
     });
-
-    console.log('Found folders:', folders.length);
 
     const foldersWithDetails = await Promise.all(
       folders.map(async (folder) => {

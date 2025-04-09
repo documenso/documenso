@@ -15,7 +15,7 @@ export type GetStatsInput = {
   team?: Omit<GetTeamCountsOption, 'createdAt'>;
   period?: PeriodSelectorValue;
   search?: string;
-  folderId?: string | null;
+  folderId?: string;
 };
 
 export const getStats = async ({

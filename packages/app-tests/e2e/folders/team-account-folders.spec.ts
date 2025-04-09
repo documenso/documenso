@@ -842,7 +842,6 @@ test('[TEAMS]: documents inherit folder visibility', async ({ page }) => {
 test('[TEAMS]: documents are properly organized within folders', async ({ page }) => {
   const { team } = await seedTeamDocuments();
 
-  // Create a folder
   const folder = await seedBlankFolder(team.owner, {
     createFolderOptions: {
       name: 'Team Folder',
@@ -850,27 +849,24 @@ test('[TEAMS]: documents are properly organized within folders', async ({ page }
     },
   });
 
-  // Create a document in the folder
-  const document = await seedBlankDocument(team.owner, {
+  await seedBlankDocument(team.owner, {
     createDocumentOptions: {
       title: 'Folder Document',
       folderId: folder.id,
+      teamId: team.id,
     },
   });
 
-  // Sign in as team owner
   await apiSignin({
     page,
     email: team.owner.email,
     redirectPath: `/t/${team.url}/documents`,
   });
 
-  // Document should not be visible in the root
   await expect(page.getByText('Folder Document')).not.toBeVisible();
 
-  // Navigate to the folder
   await page.getByText('Team Folder').click();
+  await page.waitForTimeout(1000);
 
-  // Document should be visible in the folder
   await expect(page.getByText('Folder Document')).toBeVisible();
 });

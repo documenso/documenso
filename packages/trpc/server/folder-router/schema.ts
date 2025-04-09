@@ -52,7 +52,7 @@ export type TFolderWithSubfolders = z.infer<typeof ZFolderWithSubfoldersSchema>;
 
 export const ZCreateFolderSchema = z.object({
   name: z.string(),
-  parentId: z.string().nullable().optional(),
+  parentId: z.string().optional(),
   type: ZFolderTypeSchema.optional(),
 });
 
@@ -72,19 +72,19 @@ export const ZDeleteFolderSchema = z.object({
 
 export const ZMoveFolderSchema = z.object({
   id: z.string(),
-  parentId: z.string().nullable(),
+  parentId: z.string().optional(),
   type: ZFolderTypeSchema.optional(),
 });
 
 export const ZMoveDocumentToFolderSchema = z.object({
   documentId: z.number(),
-  folderId: z.string().nullable(),
+  folderId: z.string().optional(),
   type: z.enum(['DOCUMENT']).optional(),
 });
 
 export const ZMoveTemplateToFolderSchema = z.object({
   templateId: z.number(),
-  folderId: z.string().nullable(),
+  folderId: z.string().optional(),
   type: z.enum(['TEMPLATE']).optional(),
 });
 
@@ -119,7 +119,7 @@ export const ZFindSearchParamsSchema = z.object({
 });
 
 export const ZFindFoldersRequestSchema = ZFindSearchParamsSchema.extend({
-  parentId: z.string().nullable().optional(),
+  parentId: z.string().optional(),
   type: ZFolderTypeSchema.optional(),
 });
 

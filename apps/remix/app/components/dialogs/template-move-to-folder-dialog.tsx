@@ -40,11 +40,11 @@ export type TemplateMoveToFolderDialogProps = {
   templateTitle: string;
   isOpen: boolean;
   onOpenChange: (open: boolean) => void;
-  currentFolderId?: string | null;
+  currentFolderId?: string;
 } & Omit<DialogPrimitive.DialogProps, 'children'>;
 
 const ZMoveTemplateFormSchema = z.object({
-  folderId: z.string().nullable(),
+  folderId: z.string().optional(),
 });
 
 type TMoveTemplateFormSchema = z.infer<typeof ZMoveTemplateFormSchema>;
@@ -65,13 +65,13 @@ export function TemplateMoveToFolderDialog({
   const form = useForm<TMoveTemplateFormSchema>({
     resolver: zodResolver(ZMoveTemplateFormSchema),
     defaultValues: {
-      folderId: currentFolderId || null,
+      folderId: currentFolderId,
     },
   });
 
   const { data: folders, isLoading: isFoldersLoading } = trpc.folder.findFolders.useQuery(
     {
-      parentId: currentFolderId || null,
+      parentId: currentFolderId,
       type: FolderType.TEMPLATE,
     },
     {
@@ -85,7 +85,7 @@ export function TemplateMoveToFolderDialog({
     if (!isOpen) {
       form.reset();
     } else {
-      form.reset({ folderId: currentFolderId || null });
+      form.reset({ folderId: currentFolderId });
     }
   }, [isOpen, currentFolderId, form]);
 
@@ -93,7 +93,7 @@ export function TemplateMoveToFolderDialog({
     try {
       await moveTemplateToFolder({
         templateId,
-        folderId: data.folderId,
+        folderId: data.folderId ?? '',
       });
 
       toast({

@@ -306,6 +306,7 @@ export const documentRouter = router({
 
       return {
         document: createdDocument,
+        folder: createdDocument.folder,
         uploadUrl: url,
       };
     }),

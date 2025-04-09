@@ -27,7 +27,7 @@ export type FindDocumentsOptions = {
   period?: PeriodSelectorValue;
   senderIds?: number[];
   query?: string;
-  folderId?: string | null;
+  folderId?: string;
 };
 
 export const findDocuments = async ({
@@ -431,7 +431,7 @@ const findTeamDocumentsFilter = (
   status: ExtendedDocumentStatus,
   team: Team & { teamEmail: TeamEmail | null },
   visibilityFilters: Prisma.DocumentWhereInput[],
-  folderId?: string | null,
+  folderId?: string,
 ) => {
   const teamEmail = team.teamEmail?.email ?? null;
 
