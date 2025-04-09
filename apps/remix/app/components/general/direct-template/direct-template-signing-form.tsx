@@ -24,7 +24,6 @@ import type {
 } from '@documenso/trpc/server/field-router/schema';
 import { FieldToolTip } from '@documenso/ui/components/field/field-tooltip';
 import { Button } from '@documenso/ui/primitives/button';
-import { Card, CardContent } from '@documenso/ui/primitives/card';
 import {
   DocumentFlowFormContainerContent,
   DocumentFlowFormContainerFooter,
@@ -35,7 +34,7 @@ import type { DocumentFlowStep } from '@documenso/ui/primitives/document-flow/ty
 import { ElementVisible } from '@documenso/ui/primitives/element-visible';
 import { Input } from '@documenso/ui/primitives/input';
 import { Label } from '@documenso/ui/primitives/label';
-import { SignaturePad } from '@documenso/ui/primitives/signature-pad';
+import { SignaturePadDialog } from '@documenso/ui/primitives/signature-pad/signature-pad-dialog';
 import { useStep } from '@documenso/ui/primitives/stepper';
 
 import { DocumentSigningCheckboxField } from '~/components/general/document-signing/document-signing-checkbox-field';
@@ -73,8 +72,7 @@ export const DirectTemplateSigningForm = ({
   template,
   onSubmit,
 }: DirectTemplateSigningFormProps) => {
-  const { fullName, signature, signatureValid, setFullName, setSignature } =
-    useRequiredDocumentSigningContext();
+  const { fullName, signature, setFullName, setSignature } = useRequiredDocumentSigningContext();
 
   const [localFields, setLocalFields] = useState<DirectTemplateLocalField[]>(directRecipientFields);
   const [validateUninsertedFields, setValidateUninsertedFields] = useState(false);
@@ -135,8 +133,6 @@ export const DirectTemplateSigningForm = ({
     );
   };
 
-  const hasSignatureField = localFields.some((field) => field.type === FieldType.SIGNATURE);
-
   const uninsertedFields = useMemo(() => {
     return sortFieldsByPosition(localFields.filter((field) => !field.inserted));
   }, [localFields]);
@@ -148,10 +144,6 @@ export const DirectTemplateSigningForm = ({
 
   const handleSubmit = async () => {
     setValidateUninsertedFields(true);
-
-    if (hasSignatureField && !signatureValid) {
-      return;
-    }
 
     const isFieldsValid = validateFieldsInserted(localFields);
 
@@ -240,6 +232,8 @@ export const DirectTemplateSigningForm = ({
                   onSignField={onSignField}
                   onUnsignField={onUnsignField}
                   typedSignatureEnabled={template.templateMeta?.typedSignatureEnabled}
+                  uploadSignatureEnabled={template.templateMeta?.uploadSignatureEnabled}
+                  drawSignatureEnabled={template.templateMeta?.drawSignatureEnabled}
                 />
               ))
               .with(FieldType.INITIALS, () => (
@@ -384,19 +378,15 @@ export const DirectTemplateSigningForm = ({
                 <Trans>Signature</Trans>
               </Label>
 
-              <Card className="mt-2" gradient degrees={-120}>
-                <CardContent className="p-0">
-                  <SignaturePad
-                    className="h-44 w-full"
-                    disabled={isSubmitting}
-                    defaultValue={signature ?? undefined}
-                    onChange={(value) => {
-                      setSignature(value);
-                    }}
-                    allowTypedSignature={template.templateMeta?.typedSignatureEnabled}
-                  />
-                </CardContent>
-              </Card>
+              <SignaturePadDialog
+                className="mt-2"
+                disabled={isSubmitting}
+                value={signature ?? ''}
+                onChange={(value) => setSignature(value)}
+                typedSignatureEnabled={template.templateMeta?.typedSignatureEnabled}
+                uploadSignatureEnabled={template.templateMeta?.uploadSignatureEnabled}
+                drawSignatureEnabled={template.templateMeta?.drawSignatureEnabled}
+              />
             </div>
           </div>
         </div>

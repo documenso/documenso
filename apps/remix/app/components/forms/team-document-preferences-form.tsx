@@ -8,12 +8,15 @@ import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 
 import { useSession } from '@documenso/lib/client-only/providers/session';
+import { DOCUMENT_SIGNATURE_TYPES, DocumentSignatureType } from '@documenso/lib/constants/document';
 import {
   SUPPORTED_LANGUAGES,
   SUPPORTED_LANGUAGE_CODES,
   isValidLanguageCode,
 } from '@documenso/lib/constants/i18n';
+import { extractTeamSignatureSettings } from '@documenso/lib/utils/teams';
 import { trpc } from '@documenso/trpc/react';
+import { DocumentSignatureSettingsTooltip } from '@documenso/ui/components/document/document-signature-settings-tooltip';
 import { Alert } from '@documenso/ui/primitives/alert';
 import { Button } from '@documenso/ui/primitives/button';
 import {
@@ -23,7 +26,9 @@ import {
   FormField,
   FormItem,
   FormLabel,
+  FormMessage,
 } from '@documenso/ui/primitives/form/form';
+import { MultiSelectCombobox } from '@documenso/ui/primitives/multi-select-combobox';
 import {
   Select,
   SelectContent,
@@ -38,8 +43,10 @@ const ZTeamDocumentPreferencesFormSchema = z.object({
   documentVisibility: z.nativeEnum(DocumentVisibility),
   documentLanguage: z.enum(SUPPORTED_LANGUAGE_CODES),
   includeSenderDetails: z.boolean(),
-  typedSignatureEnabled: z.boolean(),
   includeSigningCertificate: z.boolean(),
+  signatureTypes: z.array(z.nativeEnum(DocumentSignatureType)).min(1, {
+    message: msg`At least one signature type must be enabled`.id,
+  }),
 });
 
 type TTeamDocumentPreferencesFormSchema = z.infer<typeof ZTeamDocumentPreferencesFormSchema>;
@@ -69,8 +76,8 @@ export const TeamDocumentPreferencesForm = ({
         ? settings?.documentLanguage
         : 'en',
       includeSenderDetails: settings?.includeSenderDetails ?? false,
-      typedSignatureEnabled: settings?.typedSignatureEnabled ?? true,
       includeSigningCertificate: settings?.includeSigningCertificate ?? true,
+      signatureTypes: extractTeamSignatureSettings(settings),
     },
     resolver: zodResolver(ZTeamDocumentPreferencesFormSchema),
   });
@@ -84,7 +91,7 @@ export const TeamDocumentPreferencesForm = ({
         documentLanguage,
         includeSenderDetails,
         includeSigningCertificate,
-        typedSignatureEnabled,
+        signatureTypes,
       } = data;
 
       await updateTeamDocumentPreferences({
@@ -93,8 +100,10 @@ export const TeamDocumentPreferencesForm = ({
           documentVisibility,
           documentLanguage,
           includeSenderDetails,
-          typedSignatureEnabled,
           includeSigningCertificate,
+          typedSignatureEnabled: signatureTypes.includes(DocumentSignatureType.TYPE),
+          uploadSignatureEnabled: signatureTypes.includes(DocumentSignatureType.UPLOAD),
+          drawSignatureEnabled: signatureTypes.includes(DocumentSignatureType.DRAW),
         },
       });
 
@@ -192,6 +201,44 @@ export const TeamDocumentPreferencesForm = ({
 
           <FormField
             control={form.control}
+            name="signatureTypes"
+            render={({ field }) => (
+              <FormItem className="flex-1">
+                <FormLabel className="flex flex-row items-center">
+                  <Trans>Default Signature Settings</Trans>
+                  <DocumentSignatureSettingsTooltip />
+                </FormLabel>
+
+                <FormControl>
+                  <MultiSelectCombobox
+                    options={Object.values(DOCUMENT_SIGNATURE_TYPES).map((option) => ({
+                      label: _(option.label),
+                      value: option.value,
+                    }))}
+                    selectedValues={field.value}
+                    onChange={field.onChange}
+                    className="bg-background w-full"
+                    enableSearch={false}
+                    emptySelectionPlaceholder="Select signature types"
+                    testId="signature-types-combobox"
+                  />
+                </FormControl>
+
+                {form.formState.errors.signatureTypes ? (
+                  <FormMessage />
+                ) : (
+                  <FormDescription>
+                    <Trans>
+                      Controls which signatures are allowed to be used when signing a document.
+                    </Trans>
+                  </FormDescription>
+                )}
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={form.control}
             name="includeSenderDetails"
             render={({ field }) => (
               <FormItem className="flex-1">
@@ -240,36 +287,6 @@ export const TeamDocumentPreferencesForm = ({
 
           <FormField
             control={form.control}
-            name="typedSignatureEnabled"
-            render={({ field }) => (
-              <FormItem className="flex-1">
-                <FormLabel>
-                  <Trans>Enable Typed Signature</Trans>
-                </FormLabel>
-
-                <div>
-                  <FormControl className="block">
-                    <Switch
-                      ref={field.ref}
-                      name={field.name}
-                      checked={field.value}
-                      onCheckedChange={field.onChange}
-                    />
-                  </FormControl>
-                </div>
-
-                <FormDescription>
-                  <Trans>
-                    Controls whether the recipients can sign the documents using a typed signature.
-                    Enable or disable the typed signature globally.
-                  </Trans>
-                </FormDescription>
-              </FormItem>
-            )}
-          />
-
-          <FormField
-            control={form.control}
             name="includeSigningCertificate"
             render={({ field }) => (
               <FormItem className="flex-1">
@@ -301,7 +318,7 @@ export const TeamDocumentPreferencesForm = ({
 
           <div className="flex flex-row justify-end space-x-4">
             <Button type="submit" loading={form.formState.isSubmitting}>
-              <Trans>Save</Trans>
+              <Trans>Update</Trans>
             </Button>
           </div>
         </fieldset>

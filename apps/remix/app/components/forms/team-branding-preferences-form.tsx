@@ -308,7 +308,7 @@ export function TeamBrandingPreferencesForm({ team, settings }: TeamBrandingPref
 
           <div className="flex flex-row justify-end space-x-4">
             <Button type="submit" loading={form.formState.isSubmitting}>
-              <Trans>Save</Trans>
+              <Trans>Update</Trans>
             </Button>
           </div>
         </fieldset>

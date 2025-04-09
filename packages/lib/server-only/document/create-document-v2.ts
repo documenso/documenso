@@ -158,6 +158,10 @@ export const createDocumentV2 = async ({
             language: meta?.language || team?.teamGlobalSettings?.documentLanguage,
             typedSignatureEnabled:
               meta?.typedSignatureEnabled ?? team?.teamGlobalSettings?.typedSignatureEnabled,
+            uploadSignatureEnabled:
+              meta?.uploadSignatureEnabled ?? team?.teamGlobalSettings?.uploadSignatureEnabled,
+            drawSignatureEnabled:
+              meta?.drawSignatureEnabled ?? team?.teamGlobalSettings?.drawSignatureEnabled,
           },
         },
       },
