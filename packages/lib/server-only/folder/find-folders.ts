@@ -71,7 +71,7 @@ export const findFolders = async ({ userId, teamId, parentId, type }: FindFolder
         ? {
             OR: [
               { teamId, ...visibilityFilters },
-              { userId, teamId }, // Include user's own folders in the team context
+              { userId, teamId },
             ],
           }
         : { userId, teamId: null },

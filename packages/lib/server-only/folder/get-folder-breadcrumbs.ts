@@ -1,5 +1,9 @@
+import { TeamMemberRole } from '@prisma/client';
+import { match } from 'ts-pattern';
+
 import { prisma } from '@documenso/prisma';
 
+import { DocumentVisibility } from '../../types/document-visibility';
 import type { TFolderType } from '../../types/folder-type';
 
 export interface GetFolderBreadcrumbsOptions {
@@ -15,17 +19,74 @@ export const getFolderBreadcrumbs = async ({
   folderId,
   type,
 }: GetFolderBreadcrumbsOptions) => {
+  let teamMemberRole = null;
+
+  if (teamId !== undefined) {
+    try {
+      const team = await prisma.team.findFirstOrThrow({
+        where: {
+          id: teamId,
+          members: {
+            some: {
+              userId,
+            },
+          },
+        },
+        include: {
+          members: {
+            where: {
+              userId,
+            },
+            select: {
+              role: true,
+            },
+          },
+        },
+      });
+
+      teamMemberRole = team.members[0].role;
+    } catch (error) {
+      console.error('Error finding team:', error);
+      return [];
+    }
+  }
+
+  const visibilityFilters = match(teamMemberRole)
+    .with(TeamMemberRole.ADMIN, () => ({
+      visibility: {
+        in: [
+          DocumentVisibility.EVERYONE,
+          DocumentVisibility.MANAGER_AND_ABOVE,
+          DocumentVisibility.ADMIN,
+        ],
+      },
+    }))
+    .with(TeamMemberRole.MANAGER, () => ({
+      visibility: {
+        in: [DocumentVisibility.EVERYONE, DocumentVisibility.MANAGER_AND_ABOVE],
+      },
+    }))
+    .otherwise(() => ({ visibility: DocumentVisibility.EVERYONE }));
+
+  const whereClause = (folderId: string) => ({
+    id: folderId,
+    ...(type ? { type } : {}),
+    ...(teamId
+      ? {
+          OR: [
+            { teamId, ...visibilityFilters },
+            { userId, teamId },
+          ],
+        }
+      : { userId, teamId: null }),
+  });
+
   const breadcrumbs = [];
   let currentFolderId = folderId;
 
   // Fetch the current folder first
   const currentFolder = await prisma.folder.findFirst({
-    where: {
-      id: currentFolderId,
-      userId,
-      teamId,
-      ...(type ? { type } : {}),
-    },
+    where: whereClause(currentFolderId),
   });
 
   if (!currentFolder) {
@@ -37,12 +98,7 @@ export const getFolderBreadcrumbs = async ({
   // Fetch parent folders recursively
   while (currentFolder?.parentId) {
     const parentFolder = await prisma.folder.findFirst({
-      where: {
-        id: currentFolder.parentId,
-        userId,
-        teamId,
-        ...(type ? { type } : {}),
-      },
+      where: whereClause(currentFolder.parentId),
     });
 
     if (!parentFolder) {

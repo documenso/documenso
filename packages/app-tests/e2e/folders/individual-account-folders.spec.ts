@@ -32,7 +32,7 @@ test('user can create a document folder', async ({ page }) => {
     redirectPath: '/',
   });
 
-  await page.getByRole('button', { name: 'Create folder' }).click();
+  await page.getByRole('button', { name: 'Create Folder' }).click();
   await expect(page.getByRole('dialog', { name: 'Create New folder' })).toBeVisible();
 
   await page.getByLabel('Folder name').fill('My folder');

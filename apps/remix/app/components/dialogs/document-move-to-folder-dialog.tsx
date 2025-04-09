@@ -43,7 +43,7 @@ export type DocumentMoveToFolderDialogProps = {
 } & Omit<DialogPrimitive.DialogProps, 'children'>;
 
 const ZMoveDocumentFormSchema = z.object({
-  folderId: z.string().optional(),
+  folderId: z.string().nullable().optional(),
 });
 
 type TMoveDocumentFormSchema = z.infer<typeof ZMoveDocumentFormSchema>;
@@ -91,7 +91,7 @@ export const DocumentMoveToFolderDialog = ({
     try {
       await moveDocumentToFolder({
         documentId,
-        folderId: data.folderId || '',
+        folderId: data.folderId ?? null,
       });
 
       toast({
