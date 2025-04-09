@@ -78,7 +78,7 @@ export const ZMoveFolderSchema = z.object({
 
 export const ZMoveDocumentToFolderSchema = z.object({
   documentId: z.number(),
-  folderId: z.string().optional(),
+  folderId: z.string().nullable().optional(),
   type: z.enum(['DOCUMENT']).optional(),
 });
 
