@@ -18,7 +18,7 @@
     "dx": "npm i && npm run dx:up && npm run prisma:migrate-dev && npm run prisma:seed",
     "dx:up": "docker compose -f docker/development/compose.yml up -d",
     "dx:down": "docker compose -f docker/development/compose.yml down",
-    "ci": "turbo run test:e2e",
+    "ci": "turbo run build --filter=@documenso/remix && turbo run test:e2e",
     "prisma:generate": "npm run with:env -- npm run prisma:generate -w @documenso/prisma",
     "prisma:migrate-dev": "npm run with:env -- npm run prisma:migrate-dev -w @documenso/prisma",
     "prisma:migrate-deploy": "npm run with:env -- npm run prisma:migrate-deploy -w @documenso/prisma",
