@@ -40,9 +40,9 @@ import { DocumentReadOnlyFields } from '~/components/general/document/document-r
 
 import { DocumentSigningRecipientProvider } from './document-signing-recipient-provider';
 
-export type SigningPageViewProps = {
-  document: DocumentAndSender;
+export type DocumentSigningPageViewProps = {
   recipient: RecipientWithFields;
+  document: DocumentAndSender;
   fields: Field[];
   completedFields: CompletedField[];
   isRecipientsTurn: boolean;
@@ -50,13 +50,13 @@ export type SigningPageViewProps = {
 };
 
 export const DocumentSigningPageView = ({
-  document,
   recipient,
+  document,
   fields,
   completedFields,
   isRecipientsTurn,
   allRecipients = [],
-}: SigningPageViewProps) => {
+}: DocumentSigningPageViewProps) => {
   const { documentData, documentMeta } = document;
 
   const [selectedSignerId, setSelectedSignerId] = useState<number | null>(allRecipients?.[0]?.id);
@@ -157,7 +157,7 @@ export const DocumentSigningPageView = ({
           </div>
         </div>
 
-        <DocumentReadOnlyFields fields={completedFields} />
+        <DocumentReadOnlyFields documentMeta={documentMeta || undefined} fields={completedFields} />
 
         {recipient.role !== RecipientRole.ASSISTANT && (
           <DocumentSigningAutoSign recipient={recipient} fields={fields} />
@@ -177,6 +177,8 @@ export const DocumentSigningPageView = ({
                     key={field.id}
                     field={field}
                     typedSignatureEnabled={documentMeta?.typedSignatureEnabled}
+                    uploadSignatureEnabled={documentMeta?.uploadSignatureEnabled}
+                    drawSignatureEnabled={documentMeta?.drawSignatureEnabled}
                   />
                 ))
                 .with(FieldType.INITIALS, () => (

@@ -201,7 +201,7 @@ export const signFieldWithToken = async ({
     throw new Error('Signature field must have a signature');
   }
 
-  if (isSignatureField && !documentMeta?.typedSignatureEnabled && typedSignature) {
+  if (isSignatureField && documentMeta?.typedSignatureEnabled === false && typedSignature) {
     throw new Error('Typed signatures are not allowed. Please draw your signature');
   }
 

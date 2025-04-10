@@ -96,6 +96,9 @@ export const createDocumentFromTemplateLegacy = async ({
           signingOrder: template.templateMeta?.signingOrder ?? undefined,
           language:
             template.templateMeta?.language || template.team?.teamGlobalSettings?.documentLanguage,
+          typedSignatureEnabled: template.templateMeta?.typedSignatureEnabled,
+          uploadSignatureEnabled: template.templateMeta?.uploadSignatureEnabled,
+          drawSignatureEnabled: template.templateMeta?.drawSignatureEnabled,
         },
       },
     },

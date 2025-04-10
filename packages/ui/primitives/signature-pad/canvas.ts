@@ -1,3 +1,5 @@
+import { SIGNATURE_CANVAS_DPI } from '@documenso/lib/constants/signatures';
+
 import { Point } from './point';
 
 export class Canvas {
@@ -14,7 +16,7 @@ export class Canvas {
   private lastVelocity = 0;
 
   private readonly VELOCITY_FILTER_WEIGHT = 0.5;
-  private readonly DPI = 2;
+  private readonly DPI = SIGNATURE_CANVAS_DPI;
 
   constructor(canvas: HTMLCanvasElement) {
     this.$canvas = canvas;

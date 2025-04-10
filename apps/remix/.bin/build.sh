@@ -1,7 +1,7 @@
-#!/usr/bin/env sh
+#!/usr/bin/env bash
 
 # Exit on error.
-set -eo pipefail
+set -e
 
 SCRIPT_DIR="$(readlink -f "$(dirname "$0")")"
 WEB_APP_DIR="$SCRIPT_DIR/.."
