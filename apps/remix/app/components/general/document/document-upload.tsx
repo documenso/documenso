@@ -127,14 +127,6 @@ export const DocumentUploadDropzone = ({ className }: DocumentUploadDropzoneProp
 
   return (
     <div className={cn('relative', className)}>
-      {/* <DocumentDropzone
-        className="h-[min(400px,50vh)]"
-        disabled={remaining.documents === 0 || !user.emailVerified}
-        disabledMessage={disabledMessage}
-        onDrop={onFileDrop}
-        onDropRejected={onFileDropRejected}
-      /> */}
-
       <DocumentDropzone
         disabled={remaining.documents === 0 || !user.emailVerified}
         disabledMessage={disabledMessage}

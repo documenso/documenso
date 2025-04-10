@@ -89,7 +89,7 @@ test('user can create a document inside a document folder', async ({ page }) => 
     redirectPath: `/documents/f/${folder.id}`,
   });
 
-  const fileInput = page.locator('input[type="file"]');
+  const fileInput = page.locator('input[type="file"]').nth(1);
   await fileInput.waitFor({ state: 'attached' });
 
   await fileInput.setInputFiles(
