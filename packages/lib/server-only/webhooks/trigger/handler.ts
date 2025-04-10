@@ -1,6 +1,6 @@
+import { jobs } from '../../../jobs/client';
 import { verify } from '../../crypto/verify';
 import { getAllWebhooksByEventTrigger } from '../get-all-webhooks-by-event-trigger';
-import { executeWebhook } from './execute-webhook';
 import { ZTriggerWebhookBodySchema } from './schema';
 
 export type HandlerTriggerWebhooksResponse =
@@ -42,17 +42,20 @@ export const handlerTriggerWebhooks = async (req: Request) => {
   const allWebhooks = await getAllWebhooksByEventTrigger({ event, userId, teamId });
 
   await Promise.allSettled(
-    allWebhooks.map(async (webhook) =>
-      executeWebhook({
-        event,
-        webhook,
-        data,
-      }),
-    ),
+    allWebhooks.map(async (webhook) => {
+      await jobs.triggerJob({
+        name: 'internal.execute-webhook',
+        payload: {
+          event,
+          webhookId: webhook.id,
+          data,
+        },
+      });
+    }),
   );
 
   return Response.json(
-    { success: true, message: 'Webhooks executed successfully' },
+    { success: true, message: 'Webhooks queued for execution' },
     { status: 200 },
   );
 };
