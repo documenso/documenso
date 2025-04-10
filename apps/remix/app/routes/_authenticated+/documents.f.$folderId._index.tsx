@@ -25,6 +25,7 @@ import { CreateFolderDialog } from '~/components/dialogs/folder-create-dialog';
 import { FolderDeleteDialog } from '~/components/dialogs/folder-delete-dialog';
 import { FolderMoveDialog } from '~/components/dialogs/folder-move-dialog';
 import { FolderSettingsDialog } from '~/components/dialogs/folder-settings-dialog';
+import { DocumentDropZoneWrapper } from '~/components/general/document/document-drop-zone-wrapper';
 import { DocumentSearch } from '~/components/general/document/document-search';
 import { DocumentStatus } from '~/components/general/document/document-status';
 import { DocumentUploadDropzone } from '~/components/general/document/document-upload';
@@ -137,49 +138,82 @@ export default function DocumentsPage() {
   };
 
   return (
-    <div className="mx-auto w-full max-w-screen-xl px-4 md:px-8">
-      <div className="flex flex-col gap-y-4 pb-8 sm:flex-row sm:gap-x-4">
-        <DocumentUploadDropzone />
-        <CreateFolderDialog />
-      </div>
-
-      <div className="mt-6 flex items-center">
-        <Button
-          variant="ghost"
-          size="sm"
-          className="flex items-center space-x-2 pl-0 hover:bg-transparent"
-          onClick={() => navigateToFolder(null)}
-        >
-          <HomeIcon className="h-4 w-4" />
-          <span>Home</span>
-        </Button>
-
-        {foldersData?.breadcrumbs.map((folder) => (
-          <div key={folder.id} className="flex items-center space-x-2">
-            <span>/</span>
-            <Button
-              variant="ghost"
-              size="sm"
-              className="flex items-center space-x-2 pl-1 hover:bg-transparent"
-              onClick={() => navigateToFolder(folder.id)}
-            >
-              <FolderIcon className="h-4 w-4" />
-              <span>{folder.name}</span>
-            </Button>
-          </div>
-        ))}
-      </div>
-      {isFoldersLoading ? (
-        <div className="mt-6 flex justify-center">
-          <Loader2 className="h-8 w-8 animate-spin text-gray-400" />
+    <DocumentDropZoneWrapper>
+      <div className="mx-auto w-full max-w-screen-xl px-4 md:px-8">
+        <div className="flex flex-col gap-y-4 pb-8 sm:flex-row sm:gap-x-4">
+          <DocumentUploadDropzone />
+          <CreateFolderDialog />
         </div>
-      ) : (
-        <>
-          {foldersData?.folders && foldersData.folders.some((folder) => folder.pinned) && (
+
+        <div className="mt-6 flex items-center">
+          <Button
+            variant="ghost"
+            size="sm"
+            className="flex items-center space-x-2 pl-0 hover:bg-transparent"
+            onClick={() => navigateToFolder(null)}
+          >
+            <HomeIcon className="h-4 w-4" />
+            <span>Home</span>
+          </Button>
+
+          {foldersData?.breadcrumbs.map((folder) => (
+            <div key={folder.id} className="flex items-center space-x-2">
+              <span>/</span>
+              <Button
+                variant="ghost"
+                size="sm"
+                className="flex items-center space-x-2 pl-1 hover:bg-transparent"
+                onClick={() => navigateToFolder(folder.id)}
+              >
+                <FolderIcon className="h-4 w-4" />
+                <span>{folder.name}</span>
+              </Button>
+            </div>
+          ))}
+        </div>
+        {isFoldersLoading ? (
+          <div className="mt-6 flex justify-center">
+            <Loader2 className="h-8 w-8 animate-spin text-gray-400" />
+          </div>
+        ) : (
+          <>
+            {foldersData?.folders && foldersData.folders.some((folder) => folder.pinned) && (
+              <div className="mt-6">
+                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
+                  {foldersData.folders
+                    .filter((folder) => folder.pinned)
+                    .map((folder) => (
+                      <FolderCard
+                        key={folder.id}
+                        folder={folder}
+                        onNavigate={navigateToFolder}
+                        onMove={(folder) => {
+                          setFolderToMove(folder);
+                          setIsMovingFolder(true);
+                        }}
+                        onPin={(folderId) => void pinFolder({ folderId })}
+                        onUnpin={(folderId) => void unpinFolder({ folderId })}
+                        onSettings={(folder) => {
+                          setFolderToSettings(folder);
+                          setIsSettingsFolderOpen(true);
+                        }}
+                        onDelete={(folder) => {
+                          setFolderToDelete(folder);
+                          setIsDeletingFolder(true);
+                        }}
+                      />
+                    ))}
+                </div>
+              </div>
+            )}
+
             <div className="mt-6">
+              <h3 className="text-muted-background/60 dark:text-muted-foreground/60 mb-4 text-sm font-medium">
+                Folders
+              </h3>
               <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
-                {foldersData.folders
-                  .filter((folder) => folder.pinned)
+                {foldersData?.folders
+                  .filter((folder) => !folder.pinned)
                   .map((folder) => (
                     <FolderCard
                       key={folder.id}
@@ -203,169 +237,138 @@ export default function DocumentsPage() {
                   ))}
               </div>
             </div>
-          )}
+          </>
+        )}
 
-          <div className="mt-6">
-            <h3 className="text-muted-background/60 dark:text-muted-foreground/60 mb-4 text-sm font-medium">
-              Folders
-            </h3>
-            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
-              {foldersData?.folders
-                .filter((folder) => !folder.pinned)
-                .map((folder) => (
-                  <FolderCard
-                    key={folder.id}
-                    folder={folder}
-                    onNavigate={navigateToFolder}
-                    onMove={(folder) => {
-                      setFolderToMove(folder);
-                      setIsMovingFolder(true);
-                    }}
-                    onPin={(folderId) => void pinFolder({ folderId })}
-                    onUnpin={(folderId) => void unpinFolder({ folderId })}
-                    onSettings={(folder) => {
-                      setFolderToSettings(folder);
-                      setIsSettingsFolderOpen(true);
-                    }}
-                    onDelete={(folder) => {
-                      setFolderToDelete(folder);
-                      setIsDeletingFolder(true);
-                    }}
-                  />
+        <div className="mt-12 flex flex-wrap items-center justify-between gap-x-4 gap-y-8">
+          <div className="flex flex-row items-center">
+            {team && (
+              <Avatar className="dark:border-border mr-3 h-12 w-12 border-2 border-solid border-white">
+                {team.avatarImageId && <AvatarImage src={formatAvatarUrl(team.avatarImageId)} />}
+                <AvatarFallback className="text-xs text-gray-400">
+                  {team.name.slice(0, 1)}
+                </AvatarFallback>
+              </Avatar>
+            )}
+
+            <h2 className="text-4xl font-semibold">
+              <Trans>Documents</Trans>
+            </h2>
+          </div>
+
+          <div className="-m-1 flex flex-wrap gap-x-4 gap-y-6 overflow-hidden p-1">
+            <Tabs value={findDocumentSearchParams.status || 'ALL'} className="overflow-x-auto">
+              <TabsList>
+                {[
+                  ExtendedDocumentStatus.INBOX,
+                  ExtendedDocumentStatus.PENDING,
+                  ExtendedDocumentStatus.COMPLETED,
+                  ExtendedDocumentStatus.DRAFT,
+                  ExtendedDocumentStatus.ALL,
+                ].map((value) => (
+                  <TabsTrigger
+                    key={value}
+                    className="hover:text-foreground min-w-[60px]"
+                    value={value}
+                    asChild
+                  >
+                    <Link to={getTabHref(value)} preventScrollReset>
+                      <DocumentStatus status={value} />
+
+                      {value !== ExtendedDocumentStatus.ALL && (
+                        <span className="ml-1 inline-block opacity-50">{stats[value]}</span>
+                      )}
+                    </Link>
+                  </TabsTrigger>
                 ))}
+              </TabsList>
+            </Tabs>
+
+            {team && <DocumentsTableSenderFilter teamId={team.id} />}
+
+            <div className="flex w-48 flex-wrap items-center justify-between gap-x-2 gap-y-4">
+              <PeriodSelector />
+            </div>
+            <div className="flex w-48 flex-wrap items-center justify-between gap-x-2 gap-y-4">
+              <DocumentSearch initialValue={findDocumentSearchParams.query} />
             </div>
           </div>
-        </>
-      )}
-
-      <div className="mt-12 flex flex-wrap items-center justify-between gap-x-4 gap-y-8">
-        <div className="flex flex-row items-center">
-          {team && (
-            <Avatar className="dark:border-border mr-3 h-12 w-12 border-2 border-solid border-white">
-              {team.avatarImageId && <AvatarImage src={formatAvatarUrl(team.avatarImageId)} />}
-              <AvatarFallback className="text-xs text-gray-400">
-                {team.name.slice(0, 1)}
-              </AvatarFallback>
-            </Avatar>
-          )}
-
-          <h2 className="text-4xl font-semibold">
-            <Trans>Documents</Trans>
-          </h2>
         </div>
 
-        <div className="-m-1 flex flex-wrap gap-x-4 gap-y-6 overflow-hidden p-1">
-          <Tabs value={findDocumentSearchParams.status || 'ALL'} className="overflow-x-auto">
-            <TabsList>
-              {[
-                ExtendedDocumentStatus.INBOX,
-                ExtendedDocumentStatus.PENDING,
-                ExtendedDocumentStatus.COMPLETED,
-                ExtendedDocumentStatus.DRAFT,
-                ExtendedDocumentStatus.ALL,
-              ].map((value) => (
-                <TabsTrigger
-                  key={value}
-                  className="hover:text-foreground min-w-[60px]"
-                  value={value}
-                  asChild
-                >
-                  <Link to={getTabHref(value)} preventScrollReset>
-                    <DocumentStatus status={value} />
-
-                    {value !== ExtendedDocumentStatus.ALL && (
-                      <span className="ml-1 inline-block opacity-50">{stats[value]}</span>
-                    )}
-                  </Link>
-                </TabsTrigger>
-              ))}
-            </TabsList>
-          </Tabs>
-
-          {team && <DocumentsTableSenderFilter teamId={team.id} />}
-
-          <div className="flex w-48 flex-wrap items-center justify-between gap-x-2 gap-y-4">
-            <PeriodSelector />
-          </div>
-          <div className="flex w-48 flex-wrap items-center justify-between gap-x-2 gap-y-4">
-            <DocumentSearch initialValue={findDocumentSearchParams.query} />
+        <div className="mt-8">
+          <div>
+            {data &&
+            data.count === 0 &&
+            (!foldersData?.folders.length || foldersData.folders.length === 0) ? (
+              <DocumentsTableEmptyState
+                status={findDocumentSearchParams.status || ExtendedDocumentStatus.ALL}
+              />
+            ) : (
+              <DocumentsTable
+                data={data}
+                isLoading={isLoading}
+                isLoadingError={isLoadingError}
+                onMoveDocument={(documentId) => {
+                  setDocumentToMove(documentId);
+                  setIsMovingDocument(true);
+                }}
+              />
+            )}
           </div>
         </div>
-      </div>
 
-      <div className="mt-8">
-        <div>
-          {data &&
-          data.count === 0 &&
-          (!foldersData?.folders.length || foldersData.folders.length === 0) ? (
-            <DocumentsTableEmptyState
-              status={findDocumentSearchParams.status || ExtendedDocumentStatus.ALL}
-            />
-          ) : (
-            <DocumentsTable
-              data={data}
-              isLoading={isLoading}
-              isLoadingError={isLoadingError}
-              onMoveDocument={(documentId) => {
-                setDocumentToMove(documentId);
-                setIsMovingDocument(true);
-              }}
-            />
-          )}
-        </div>
-      </div>
+        {documentToMove && (
+          <DocumentMoveToFolderDialog
+            documentId={documentToMove}
+            open={isMovingDocument}
+            onOpenChange={(open) => {
+              setIsMovingDocument(open);
 
-      {documentToMove && (
-        <DocumentMoveToFolderDialog
-          documentId={documentToMove}
-          open={isMovingDocument}
+              if (!open) {
+                setDocumentToMove(null);
+              }
+            }}
+            currentFolderId={folderId}
+          />
+        )}
+
+        <FolderMoveDialog
+          foldersData={foldersData?.folders}
+          folder={folderToMove}
+          isOpen={isMovingFolder}
           onOpenChange={(open) => {
-            setIsMovingDocument(open);
+            setIsMovingFolder(open);
 
             if (!open) {
-              setDocumentToMove(null);
+              setFolderToMove(null);
             }
           }}
-          currentFolderId={folderId}
         />
-      )}
 
-      <FolderMoveDialog
-        foldersData={foldersData?.folders}
-        folder={folderToMove}
-        isOpen={isMovingFolder}
-        onOpenChange={(open) => {
-          setIsMovingFolder(open);
+        <FolderSettingsDialog
+          folder={folderToSettings}
+          isOpen={isSettingsFolderOpen}
+          onOpenChange={(open) => {
+            setIsSettingsFolderOpen(open);
 
-          if (!open) {
-            setFolderToMove(null);
-          }
-        }}
-      />
+            if (!open) {
+              setFolderToSettings(null);
+            }
+          }}
+        />
 
-      <FolderSettingsDialog
-        folder={folderToSettings}
-        isOpen={isSettingsFolderOpen}
-        onOpenChange={(open) => {
-          setIsSettingsFolderOpen(open);
+        <FolderDeleteDialog
+          folder={folderToDelete}
+          isOpen={isDeletingFolder}
+          onOpenChange={(open) => {
+            setIsDeletingFolder(open);
 
-          if (!open) {
-            setFolderToSettings(null);
-          }
-        }}
-      />
-
-      <FolderDeleteDialog
-        folder={folderToDelete}
-        isOpen={isDeletingFolder}
-        onOpenChange={(open) => {
-          setIsDeletingFolder(open);
-
-          if (!open) {
-            setFolderToDelete(null);
-          }
-        }}
-      />
-    </div>
+            if (!open) {
+              setFolderToDelete(null);
+            }
+          }}
+        />
+      </div>
+    </DocumentDropZoneWrapper>
   );
 }

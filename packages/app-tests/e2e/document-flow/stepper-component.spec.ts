@@ -45,11 +45,14 @@ test('[DOCUMENT_FLOW]: should be able to upload a PDF document', async ({ page }
   // Upload document.
   const [fileChooser] = await Promise.all([
     page.waitForEvent('filechooser'),
-    page.locator('input[type=file]').evaluate((e) => {
-      if (e instanceof HTMLInputElement) {
-        e.click();
-      }
-    }),
+    page
+      .locator('input[type=file]')
+      .nth(1)
+      .evaluate((e) => {
+        if (e instanceof HTMLInputElement) {
+          e.click();
+        }
+      }),
   ]);
 
   await fileChooser.setFiles(path.join(__dirname, '../../../../assets/example.pdf'));
