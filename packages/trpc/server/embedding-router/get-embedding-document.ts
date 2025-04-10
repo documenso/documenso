@@ -11,7 +11,7 @@ import {
 export const getEmbeddingDocumentRoute = procedure
   .input(ZGetEmbeddingDocumentRequestSchema)
   .output(ZGetEmbeddingDocumentResponseSchema)
-  .query(async ({ input, ctx: { req, metadata } }) => {
+  .query(async ({ input, ctx: { req } }) => {
     try {
       const authorizationHeader = req.headers.get('authorization');
 

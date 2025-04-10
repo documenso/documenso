@@ -12,7 +12,7 @@ import {
 export const createEmbeddingTemplateRoute = procedure
   .input(ZCreateEmbeddingTemplateRequestSchema)
   .output(ZCreateEmbeddingTemplateResponseSchema)
-  .mutation(async ({ input, ctx: { req, metadata } }) => {
+  .mutation(async ({ input, ctx: { req } }) => {
     try {
       const authorizationHeader = req.headers.get('authorization');
 
@@ -28,7 +28,7 @@ export const createEmbeddingTemplateRoute = procedure
 
       const apiToken = await verifyEmbeddingPresignToken({ token: presignToken });
 
-      const { title, documentDataId, externalId, recipients, meta } = input;
+      const { title, documentDataId, recipients, meta } = input;
 
       // First create the template
       const template = await createTemplate({
