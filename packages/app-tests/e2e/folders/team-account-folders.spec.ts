@@ -923,13 +923,22 @@ test('[TEAMS]: folder visibility is properly applied when navigating directly to
     redirectPath: `/t/${team.url}/documents/f/${adminFolder.id}`,
   });
 
-  await expect(page.getByText('Admin Only Folder')).toBeVisible();
+  await expect(page.getByRole('button', { name: 'Admin Only Folder' })).toBeVisible();
+  await expect(page.getByText('Admin Folder - Everyone Document')).toBeVisible();
+  await expect(page.getByText('Admin Folder - Manager Document')).toBeVisible();
+  await expect(page.getByText('Admin Folder - Admin Document')).toBeVisible();
 
   await page.goto(`/t/${team.url}/documents/f/${managerFolder.id}`);
   await expect(page.getByText('Manager Folder')).toBeVisible();
+  await expect(page.getByText('Manager Folder - Everyone Document')).toBeVisible();
+  await expect(page.getByText('Manager Folder - Manager Document')).toBeVisible();
+  await expect(page.getByText('Manager Folder - Admin Document')).toBeVisible();
 
   await page.goto(`/t/${team.url}/documents/f/${everyoneFolder.id}`);
   await expect(page.getByText('Everyone Folder')).toBeVisible();
+  await expect(page.getByText('Everyone Folder - Everyone Document')).toBeVisible();
+  await expect(page.getByText('Everyone Folder - Manager Document')).toBeVisible();
+  await expect(page.getByText('Everyone Folder - Admin Document')).toBeVisible();
 
   await apiSignin({
     page,
@@ -937,13 +946,22 @@ test('[TEAMS]: folder visibility is properly applied when navigating directly to
     redirectPath: `/t/${team.url}/documents/f/${adminFolder.id}`,
   });
 
-  await expect(page.getByText('Admin Only Folder')).not.toBeVisible();
+  await expect(page.getByRole('button', { name: 'Admin Only Folder' })).not.toBeVisible();
+  await expect(page.getByText('Admin Folder - Everyone Document')).not.toBeVisible();
+  await expect(page.getByText('Admin Folder - Manager Document')).not.toBeVisible();
+  await expect(page.getByText('Admin Folder - Admin Document')).not.toBeVisible();
 
   await page.goto(`/t/${team.url}/documents/f/${managerFolder.id}`);
   await expect(page.getByText('Manager Folder')).not.toBeVisible();
+  await expect(page.getByText('Manager Folder - Everyone Document')).not.toBeVisible();
+  await expect(page.getByText('Manager Folder - Manager Document')).not.toBeVisible();
+  await expect(page.getByText('Manager Folder - Admin Document')).not.toBeVisible();
 
   await page.goto(`/t/${team.url}/documents/f/${everyoneFolder.id}`);
-  await expect(page.getByText('Everyone Folder')).toBeVisible();
+  await expect(page.getByText('Everyone Folder')).not.toBeVisible();
+  await expect(page.getByText('Everyone Folder - Everyone Document')).not.toBeVisible();
+  await expect(page.getByText('Everyone Folder - Manager Document')).not.toBeVisible();
+  await expect(page.getByText('Everyone Folder - Admin Document')).not.toBeVisible();
 
   await apiSignin({
     page,
@@ -952,12 +970,21 @@ test('[TEAMS]: folder visibility is properly applied when navigating directly to
   });
 
   await expect(page.getByText('Admin Only Folder')).not.toBeVisible();
+  await expect(page.getByText('Admin Folder - Everyone Document')).not.toBeVisible();
+  await expect(page.getByText('Admin Folder - Manager Document')).not.toBeVisible();
+  await expect(page.getByText('Admin Folder - Admin Document')).not.toBeVisible();
 
   await page.goto(`/t/${team.url}/documents/f/${managerFolder.id}`);
-  await expect(page.getByText('Manager Folder')).toBeVisible();
+  await expect(page.getByText('Manager Folder')).not.toBeVisible();
+  await expect(page.getByText('Manager Folder - Everyone Document')).not.toBeVisible();
+  await expect(page.getByText('Manager Folder - Manager Document')).not.toBeVisible();
+  await expect(page.getByText('Manager Folder - Admin Document')).not.toBeVisible();
 
   await page.goto(`/t/${team.url}/documents/f/${everyoneFolder.id}`);
-  await expect(page.getByText('Everyone Folder')).toBeVisible();
+  await expect(page.getByText('Everyone Folder')).not.toBeVisible();
+  await expect(page.getByText('Everyone Folder - Everyone Document')).not.toBeVisible();
+  await expect(page.getByText('Everyone Folder - Manager Document')).not.toBeVisible();
+  await expect(page.getByText('Everyone Folder - Admin Document')).not.toBeVisible();
 
   await apiSignin({
     page,
@@ -965,13 +992,22 @@ test('[TEAMS]: folder visibility is properly applied when navigating directly to
     redirectPath: `/t/${team.url}/documents/f/${adminFolder.id}`,
   });
 
-  await expect(page.getByText('Admin Only Folder')).toBeVisible();
+  await expect(page.getByText('Admin Only Folder')).not.toBeVisible();
+  await expect(page.getByText('Admin Folder - Everyone Document')).not.toBeVisible();
+  await expect(page.getByText('Admin Folder - Manager Document')).not.toBeVisible();
+  await expect(page.getByText('Admin Folder - Admin Document')).not.toBeVisible();
 
   await page.goto(`/t/${team.url}/documents/f/${managerFolder.id}`);
-  await expect(page.getByText('Manager Folder')).toBeVisible();
+  await expect(page.getByText('Manager Folder')).not.toBeVisible();
+  await expect(page.getByText('Manager Folder - Everyone Document')).not.toBeVisible();
+  await expect(page.getByText('Manager Folder - Manager Document')).not.toBeVisible();
+  await expect(page.getByText('Manager Folder - Admin Document')).not.toBeVisible();
 
   await page.goto(`/t/${team.url}/documents/f/${everyoneFolder.id}`);
-  await expect(page.getByText('Everyone Folder')).toBeVisible();
+  await expect(page.getByText('Everyone Folder')).not.toBeVisible();
+  await expect(page.getByText('Everyone Folder - Everyone Document')).not.toBeVisible();
+  await expect(page.getByText('Everyone Folder - Manager Document')).not.toBeVisible();
+  await expect(page.getByText('Everyone Folder - Admin Document')).not.toBeVisible();
 });
 
 test('[TEAMS]: document visibility is properly applied within folders based on team member roles', async ({
@@ -1222,7 +1258,7 @@ test('[TEAMS]: document visibility is properly applied within folders based on t
   await expect(page.getByText('Everyone Folder - Admin Document')).toBeVisible();
 });
 
-test('[TEAMS]: team member can move documents to accessible folders', async ({ page }) => {
+test('[TEAMS]: team member can move documents to everyone folder', async ({ page }) => {
   const { team } = await seedTeamDocuments();
 
   const teamMember = await seedTeamMember({
@@ -1231,8 +1267,7 @@ test('[TEAMS]: team member can move documents to accessible folders', async ({ p
     role: TeamMemberRole.MEMBER,
   });
 
-  // Create folders with different visibility levels
-  const adminFolder = await seedBlankFolder(team.owner, {
+  await seedBlankFolder(team.owner, {
     createFolderOptions: {
       name: 'Admin Only Folder',
       teamId: team.id,
@@ -1241,7 +1276,7 @@ test('[TEAMS]: team member can move documents to accessible folders', async ({ p
     },
   });
 
-  const managerFolder = await seedBlankFolder(team.owner, {
+  await seedBlankFolder(team.owner, {
     createFolderOptions: {
       name: 'Manager Folder',
       teamId: team.id,
@@ -1250,7 +1285,7 @@ test('[TEAMS]: team member can move documents to accessible folders', async ({ p
     },
   });
 
-  const everyoneFolder = await seedBlankFolder(team.owner, {
+  await seedBlankFolder(team.owner, {
     createFolderOptions: {
       name: 'Everyone Folder',
       teamId: team.id,
@@ -1259,7 +1294,6 @@ test('[TEAMS]: team member can move documents to accessible folders', async ({ p
     },
   });
 
-  // Create documents with different visibility levels in the root folder
   await seedBlankDocument(team.owner, {
     createDocumentOptions: {
       title: '[TEST] Admin Document',
@@ -1290,7 +1324,6 @@ test('[TEAMS]: team member can move documents to accessible folders', async ({ p
     redirectPath: `/t/${team.url}/documents`,
   });
 
-  // Verify initial visibility
   await expect(page.getByText('Admin Only Folder')).not.toBeVisible();
   await expect(page.getByText('Manager Folder')).not.toBeVisible();
   await expect(page.getByText('Everyone Folder')).toBeVisible();
@@ -1298,7 +1331,6 @@ test('[TEAMS]: team member can move documents to accessible folders', async ({ p
   await expect(page.getByText('[TEST] Manager Document')).not.toBeVisible();
   await expect(page.getByText('[TEST] Everyone Document')).toBeVisible();
 
-  // Try to move everyone document to everyone folder
   const everyoneDocRow = page.getByRole('row', { name: /\[TEST\] Everyone Document/ });
   await everyoneDocRow.getByTestId('document-table-action-btn').click();
   await page.getByRole('menuitem', { name: 'Move' }).click();
@@ -1311,10 +1343,12 @@ test('[TEAMS]: team member can move documents to accessible folders', async ({ p
   await expect(page.getByText('[TEST] Everyone Document')).toBeVisible();
 
   await page.goto(`/t/${team.url}/documents`);
+  await page.waitForTimeout(3000);
+
   await expect(page.getByText('[TEST] Everyone Document')).not.toBeVisible();
 });
 
-test('[TEAMS]: team manager can move documents to accessible folders', async ({ page }) => {
+test('[TEAMS]: team manager can move manager document to manager folder', async ({ page }) => {
   const { team } = await seedTeamDocuments();
 
   const teamManager = await seedTeamMember({
@@ -1325,15 +1359,6 @@ test('[TEAMS]: team manager can move documents to accessible folders', async ({ 
 
   await seedBlankFolder(team.owner, {
     createFolderOptions: {
-      name: 'Admin Only Folder',
-      teamId: team.id,
-      visibility: DocumentVisibility.ADMIN,
-      type: FolderType.DOCUMENT,
-    },
-  });
-
-  const managerFolder = await seedBlankFolder(team.owner, {
-    createFolderOptions: {
       name: 'Manager Folder',
       teamId: team.id,
       visibility: DocumentVisibility.MANAGER_AND_ABOVE,
@@ -1341,7 +1366,51 @@ test('[TEAMS]: team manager can move documents to accessible folders', async ({ 
     },
   });
 
-  const everyoneFolder = await seedBlankFolder(team.owner, {
+  await seedBlankDocument(team.owner, {
+    createDocumentOptions: {
+      title: '[TEST] Manager Document',
+      teamId: team.id,
+      visibility: DocumentVisibility.MANAGER_AND_ABOVE,
+    },
+  });
+
+  await apiSignin({
+    page,
+    email: teamManager.email,
+    redirectPath: `/t/${team.url}/documents`,
+  });
+
+  await expect(page.getByText('Manager Folder')).toBeVisible();
+  await expect(page.getByText('[TEST] Manager Document')).toBeVisible();
+
+  const managerDocRow = page.getByRole('row', { name: /\[TEST\] Manager Document/ });
+  await managerDocRow.getByTestId('document-table-action-btn').click();
+  await page.getByRole('menuitem', { name: 'Move to Folder' }).click();
+
+  await expect(page.getByRole('button', { name: 'Manager Folder' })).toBeVisible();
+  await page.getByRole('button', { name: 'Manager Folder' }).click();
+  await page.getByRole('button', { name: 'Move' }).click();
+
+  await page.waitForTimeout(1000);
+
+  await expect(page.getByText('[TEST] Manager Document')).toBeVisible();
+
+  await page.goto(`/t/${team.url}/documents`);
+  await page.waitForTimeout(1000);
+
+  await expect(page.getByText('[TEST] Manager Document')).not.toBeVisible();
+});
+
+test('[TEAMS]: team manager can move manager document to everyone folder', async ({ page }) => {
+  const { team } = await seedTeamDocuments();
+
+  const teamManager = await seedTeamMember({
+    teamId: team.id,
+    name: 'Team Manager',
+    role: TeamMemberRole.MANAGER,
+  });
+
+  await seedBlankFolder(team.owner, {
     createFolderOptions: {
       name: 'Everyone Folder',
       teamId: team.id,
@@ -1352,17 +1421,54 @@ test('[TEAMS]: team manager can move documents to accessible folders', async ({ 
 
   await seedBlankDocument(team.owner, {
     createDocumentOptions: {
-      title: '[TEST] Admin Document',
-      teamId: team.id,
-      visibility: DocumentVisibility.ADMIN,
-    },
-  });
-
-  await seedBlankDocument(team.owner, {
-    createDocumentOptions: {
       title: '[TEST] Manager Document',
       teamId: team.id,
       visibility: DocumentVisibility.MANAGER_AND_ABOVE,
+    },
+  });
+
+  await apiSignin({
+    page,
+    email: teamManager.email,
+    redirectPath: `/t/${team.url}/documents`,
+  });
+
+  await expect(page.getByText('Everyone Folder')).toBeVisible();
+  await expect(page.getByText('[TEST] Manager Document')).toBeVisible();
+
+  const managerDocRow = page.getByRole('row', { name: /\[TEST\] Manager Document/ });
+  await managerDocRow.getByTestId('document-table-action-btn').click();
+  await page.getByRole('menuitem', { name: 'Move to Folder' }).click();
+
+  await expect(page.getByRole('button', { name: 'Everyone Folder' })).toBeVisible();
+  await page.getByRole('button', { name: 'Everyone Folder' }).click();
+  await page.getByRole('button', { name: 'Move' }).click();
+
+  await page.waitForTimeout(1000);
+
+  await expect(page.getByText('[TEST] Manager Document')).toBeVisible();
+
+  await page.goto(`/t/${team.url}/documents`);
+  await page.waitForTimeout(1000);
+
+  await expect(page.getByText('[TEST] Manager Document')).not.toBeVisible();
+});
+
+test('[TEAMS]: team manager can move everyone document to manager folder', async ({ page }) => {
+  const { team } = await seedTeamDocuments();
+
+  const teamManager = await seedTeamMember({
+    teamId: team.id,
+    name: 'Team Manager',
+    role: TeamMemberRole.MANAGER,
+  });
+
+  await seedBlankFolder(team.owner, {
+    createFolderOptions: {
+      name: 'Manager Folder',
+      teamId: team.id,
+      visibility: DocumentVisibility.MANAGER_AND_ABOVE,
+      type: FolderType.DOCUMENT,
     },
   });
 
@@ -1380,61 +1486,28 @@ test('[TEAMS]: team manager can move documents to accessible folders', async ({ 
     redirectPath: `/t/${team.url}/documents`,
   });
 
-  await expect(page.getByText('Admin Only Folder')).not.toBeVisible();
   await expect(page.getByText('Manager Folder')).toBeVisible();
-  await expect(page.getByText('Everyone Folder')).toBeVisible();
-  await expect(page.getByText('[TEST] Admin Document')).not.toBeVisible();
-  await expect(page.getByText('[TEST] Manager Document')).toBeVisible();
   await expect(page.getByText('[TEST] Everyone Document')).toBeVisible();
 
-  const managerDocRow = page.getByRole('row', { name: /\[TEST\] Manager Document/ });
-  await managerDocRow.getByTestId('document-table-action-btn').click();
-  await page.getByRole('menuitem', { name: 'Move' }).click();
-
-  await expect(page.getByRole('button', { name: 'Manager Folder' })).toBeVisible();
-  await page.getByRole('button', { name: 'Manager Folder' }).click();
-  await page.getByRole('button', { name: 'Move' }).click();
-
-  await page.waitForTimeout(3000);
-  await expect(page.getByText('[TEST] Manager Document')).toBeVisible();
-
-  await page.goto(`/t/${team.url}/documents`);
-  await expect(page.getByText('[TEST] Manager Document')).not.toBeVisible();
-
-  // Try to move manager document to everyone folder
-  await page.goto(`/t/${team.url}/documents/f/${managerFolder.id}`);
-  const managerDocRow2 = page.getByRole('row', { name: /\[TEST\] Manager Document/ });
-  await managerDocRow2.getByTestId('document-table-action-btn').click();
-  await page.getByRole('menuitem', { name: 'Move' }).click();
-
-  await expect(page.getByRole('button', { name: 'Everyone Folder' })).toBeVisible();
-  await page.getByRole('button', { name: 'Everyone Folder' }).click();
-  await page.getByRole('button', { name: 'Move' }).click();
-
-  await page.waitForTimeout(3000);
-  await expect(page.getByText('[TEST] Manager Document')).toBeVisible();
-
-  await page.goto(`/t/${team.url}/documents`);
-  await expect(page.getByText('[TEST] Manager Document')).not.toBeVisible();
-
-  // Try to move everyone document to manager folder
-  await page.goto(`/t/${team.url}/documents/f/${everyoneFolder.id}`);
   const everyoneDocRow = page.getByRole('row', { name: /\[TEST\] Everyone Document/ });
   await everyoneDocRow.getByTestId('document-table-action-btn').click();
-  await page.getByRole('menuitem', { name: 'Move' }).click();
+  await page.getByRole('menuitem', { name: 'Move to Folder' }).click();
 
   await expect(page.getByRole('button', { name: 'Manager Folder' })).toBeVisible();
   await page.getByRole('button', { name: 'Manager Folder' }).click();
   await page.getByRole('button', { name: 'Move' }).click();
 
-  await page.waitForTimeout(3000);
+  await page.waitForTimeout(1000);
+
   await expect(page.getByText('[TEST] Everyone Document')).toBeVisible();
 
   await page.goto(`/t/${team.url}/documents`);
+  await page.waitForTimeout(1000);
+
   await expect(page.getByText('[TEST] Everyone Document')).not.toBeVisible();
 });
 
-test('[TEAMS]: team admin can move documents to all folders', async ({ page }) => {
+test('[TEAMS]: team admin can move admin document to admin folder', async ({ page }) => {
   const { team } = await seedTeamDocuments();
 
   const teamAdmin = await seedTeamMember({
@@ -1443,35 +1516,15 @@ test('[TEAMS]: team admin can move documents to all folders', async ({ page }) =
     role: TeamMemberRole.ADMIN,
   });
 
-  // Create folders with different visibility levels
-  const adminFolder = await seedBlankFolder(team.owner, {
+  await seedBlankFolder(team.owner, {
     createFolderOptions: {
-      name: 'Admin Only Folder',
+      name: 'Admin Folder',
       teamId: team.id,
       visibility: DocumentVisibility.ADMIN,
       type: FolderType.DOCUMENT,
     },
   });
 
-  const managerFolder = await seedBlankFolder(team.owner, {
-    createFolderOptions: {
-      name: 'Manager Folder',
-      teamId: team.id,
-      visibility: DocumentVisibility.MANAGER_AND_ABOVE,
-      type: FolderType.DOCUMENT,
-    },
-  });
-
-  const everyoneFolder = await seedBlankFolder(team.owner, {
-    createFolderOptions: {
-      name: 'Everyone Folder',
-      teamId: team.id,
-      visibility: DocumentVisibility.EVERYONE,
-      type: FolderType.DOCUMENT,
-    },
-  });
-
-  // Create documents with different visibility levels in the root folder
   await seedBlankDocument(team.owner, {
     createDocumentOptions: {
       title: '[TEST] Admin Document',
@@ -1480,11 +1533,301 @@ test('[TEAMS]: team admin can move documents to all folders', async ({ page }) =
     },
   });
 
+  await apiSignin({
+    page,
+    email: teamAdmin.email,
+    redirectPath: `/t/${team.url}/documents`,
+  });
+
+  await expect(page.getByText('Admin Folder')).toBeVisible();
+  await expect(page.getByText('[TEST] Admin Document')).toBeVisible();
+
+  const adminDocRow = page.getByRole('row', { name: /\[TEST\] Admin Document/ });
+  await adminDocRow.getByTestId('document-table-action-btn').click();
+  await page.getByRole('menuitem', { name: 'Move to Folder' }).click();
+
+  await expect(page.getByRole('button', { name: 'Admin Folder' })).toBeVisible();
+  await page.getByRole('button', { name: 'Admin Folder' }).click();
+  await page.getByRole('button', { name: 'Move' }).click();
+
+  await page.waitForTimeout(1000);
+  await expect(page.getByText('[TEST] Admin Document')).toBeVisible();
+
+  await page.goto(`/t/${team.url}/documents`);
+  await page.waitForTimeout(1000);
+  await expect(page.getByText('[TEST] Admin Document')).not.toBeVisible();
+});
+
+test('[TEAMS]: team admin can move admin document to manager folder', async ({ page }) => {
+  const { team } = await seedTeamDocuments();
+
+  const teamAdmin = await seedTeamMember({
+    teamId: team.id,
+    name: 'Team Admin',
+    role: TeamMemberRole.ADMIN,
+  });
+
+  await seedBlankFolder(team.owner, {
+    createFolderOptions: {
+      name: 'Manager Folder',
+      teamId: team.id,
+      visibility: DocumentVisibility.MANAGER_AND_ABOVE,
+      type: FolderType.DOCUMENT,
+    },
+  });
+
+  await seedBlankDocument(team.owner, {
+    createDocumentOptions: {
+      title: '[TEST] Admin Document',
+      teamId: team.id,
+      visibility: DocumentVisibility.ADMIN,
+    },
+  });
+
+  await apiSignin({
+    page,
+    email: teamAdmin.email,
+    redirectPath: `/t/${team.url}/documents`,
+  });
+
+  await expect(page.getByText('Manager Folder')).toBeVisible();
+  await expect(page.getByText('[TEST] Admin Document')).toBeVisible();
+
+  const adminDocRow = page.getByRole('row', { name: /\[TEST\] Admin Document/ });
+  await adminDocRow.getByTestId('document-table-action-btn').click();
+  await page.getByRole('menuitem', { name: 'Move to Folder' }).click();
+
+  await expect(page.getByRole('button', { name: 'Manager Folder' })).toBeVisible();
+  await page.getByRole('button', { name: 'Manager Folder' }).click();
+  await page.getByRole('button', { name: 'Move' }).click();
+
+  await page.waitForTimeout(1000);
+  await expect(page.getByText('[TEST] Admin Document')).toBeVisible();
+
+  await page.goto(`/t/${team.url}/documents`);
+  await page.waitForTimeout(1000);
+  await expect(page.getByText('[TEST] Admin Document')).not.toBeVisible();
+});
+
+test('[TEAMS]: team admin can move admin document to everyone folder', async ({ page }) => {
+  const { team } = await seedTeamDocuments();
+
+  const teamAdmin = await seedTeamMember({
+    teamId: team.id,
+    name: 'Team Admin',
+    role: TeamMemberRole.ADMIN,
+  });
+
+  await seedBlankFolder(team.owner, {
+    createFolderOptions: {
+      name: 'Everyone Folder',
+      teamId: team.id,
+      visibility: DocumentVisibility.EVERYONE,
+      type: FolderType.DOCUMENT,
+    },
+  });
+
+  await seedBlankDocument(team.owner, {
+    createDocumentOptions: {
+      title: '[TEST] Admin Document',
+      teamId: team.id,
+      visibility: DocumentVisibility.ADMIN,
+    },
+  });
+
+  await apiSignin({
+    page,
+    email: teamAdmin.email,
+    redirectPath: `/t/${team.url}/documents`,
+  });
+
+  await expect(page.getByText('Everyone Folder')).toBeVisible();
+  await expect(page.getByText('[TEST] Admin Document')).toBeVisible();
+
+  const adminDocRow = page.getByRole('row', { name: /\[TEST\] Admin Document/ });
+  await adminDocRow.getByTestId('document-table-action-btn').click();
+  await page.getByRole('menuitem', { name: 'Move to Folder' }).click();
+
+  await expect(page.getByRole('button', { name: 'Everyone Folder' })).toBeVisible();
+  await page.getByRole('button', { name: 'Everyone Folder' }).click();
+  await page.getByRole('button', { name: 'Move' }).click();
+
+  await page.waitForTimeout(1000);
+  await expect(page.getByText('[TEST] Admin Document')).toBeVisible();
+
+  await page.goto(`/t/${team.url}/documents`);
+  await page.waitForTimeout(1000);
+  await expect(page.getByText('[TEST] Admin Document')).not.toBeVisible();
+});
+
+test('[TEAMS]: team admin can move manager document to admin folder', async ({ page }) => {
+  const { team } = await seedTeamDocuments();
+
+  const teamAdmin = await seedTeamMember({
+    teamId: team.id,
+    name: 'Team Admin',
+    role: TeamMemberRole.ADMIN,
+  });
+
+  await seedBlankFolder(team.owner, {
+    createFolderOptions: {
+      name: 'Admin Folder',
+      teamId: team.id,
+      visibility: DocumentVisibility.ADMIN,
+      type: FolderType.DOCUMENT,
+    },
+  });
+
   await seedBlankDocument(team.owner, {
     createDocumentOptions: {
       title: '[TEST] Manager Document',
       teamId: team.id,
       visibility: DocumentVisibility.MANAGER_AND_ABOVE,
+    },
+  });
+
+  await apiSignin({
+    page,
+    email: teamAdmin.email,
+    redirectPath: `/t/${team.url}/documents`,
+  });
+
+  await expect(page.getByText('Admin Folder')).toBeVisible();
+  await expect(page.getByText('[TEST] Manager Document')).toBeVisible();
+
+  const managerDocRow = page.getByRole('row', { name: /\[TEST\] Manager Document/ });
+  await managerDocRow.getByTestId('document-table-action-btn').click();
+  await page.getByRole('menuitem', { name: 'Move to Folder' }).click();
+
+  await expect(page.getByRole('button', { name: 'Admin Folder' })).toBeVisible();
+  await page.getByRole('button', { name: 'Admin Folder' }).click();
+  await page.getByRole('button', { name: 'Move' }).click();
+
+  await page.waitForTimeout(1000);
+  await expect(page.getByText('[TEST] Manager Document')).toBeVisible();
+
+  await page.goto(`/t/${team.url}/documents`);
+  await page.waitForTimeout(1000);
+  await expect(page.getByText('[TEST] Manager Document')).not.toBeVisible();
+});
+
+test('[TEAMS]: team admin can move manager document to manager folder', async ({ page }) => {
+  const { team } = await seedTeamDocuments();
+
+  const teamAdmin = await seedTeamMember({
+    teamId: team.id,
+    name: 'Team Admin',
+    role: TeamMemberRole.ADMIN,
+  });
+
+  await seedBlankFolder(team.owner, {
+    createFolderOptions: {
+      name: 'Manager Folder',
+      teamId: team.id,
+      visibility: DocumentVisibility.MANAGER_AND_ABOVE,
+      type: FolderType.DOCUMENT,
+    },
+  });
+
+  await seedBlankDocument(team.owner, {
+    createDocumentOptions: {
+      title: '[TEST] Manager Document',
+      teamId: team.id,
+      visibility: DocumentVisibility.MANAGER_AND_ABOVE,
+    },
+  });
+
+  await apiSignin({
+    page,
+    email: teamAdmin.email,
+    redirectPath: `/t/${team.url}/documents`,
+  });
+
+  await expect(page.getByText('Manager Folder')).toBeVisible();
+  await expect(page.getByText('[TEST] Manager Document')).toBeVisible();
+
+  const managerDocRow = page.getByRole('row', { name: /\[TEST\] Manager Document/ });
+  await managerDocRow.getByTestId('document-table-action-btn').click();
+  await page.getByRole('menuitem', { name: 'Move to Folder' }).click();
+
+  await expect(page.getByRole('button', { name: 'Manager Folder' })).toBeVisible();
+  await page.getByRole('button', { name: 'Manager Folder' }).click();
+  await page.getByRole('button', { name: 'Move' }).click();
+
+  await page.waitForTimeout(1000);
+  await expect(page.getByText('[TEST] Manager Document')).toBeVisible();
+
+  await page.goto(`/t/${team.url}/documents`);
+  await page.waitForTimeout(1000);
+  await expect(page.getByText('[TEST] Manager Document')).not.toBeVisible();
+});
+
+test('[TEAMS]: team admin can move manager document to everyone folder', async ({ page }) => {
+  const { team } = await seedTeamDocuments();
+
+  const teamAdmin = await seedTeamMember({
+    teamId: team.id,
+    name: 'Team Admin',
+    role: TeamMemberRole.ADMIN,
+  });
+
+  await seedBlankFolder(team.owner, {
+    createFolderOptions: {
+      name: 'Everyone Folder',
+      teamId: team.id,
+      visibility: DocumentVisibility.EVERYONE,
+      type: FolderType.DOCUMENT,
+    },
+  });
+
+  await seedBlankDocument(team.owner, {
+    createDocumentOptions: {
+      title: '[TEST] Manager Document',
+      teamId: team.id,
+      visibility: DocumentVisibility.MANAGER_AND_ABOVE,
+    },
+  });
+
+  await apiSignin({
+    page,
+    email: teamAdmin.email,
+    redirectPath: `/t/${team.url}/documents`,
+  });
+
+  await expect(page.getByText('Everyone Folder')).toBeVisible();
+  await expect(page.getByText('[TEST] Manager Document')).toBeVisible();
+
+  const managerDocRow = page.getByRole('row', { name: /\[TEST\] Manager Document/ });
+  await managerDocRow.getByTestId('document-table-action-btn').click();
+  await page.getByRole('menuitem', { name: 'Move to Folder' }).click();
+
+  await expect(page.getByRole('button', { name: 'Everyone Folder' })).toBeVisible();
+  await page.getByRole('button', { name: 'Everyone Folder' }).click();
+  await page.getByRole('button', { name: 'Move' }).click();
+
+  await page.waitForTimeout(1000);
+  await expect(page.getByText('[TEST] Manager Document')).toBeVisible();
+
+  await page.goto(`/t/${team.url}/documents`);
+  await page.waitForTimeout(1000);
+  await expect(page.getByText('[TEST] Manager Document')).not.toBeVisible();
+});
+
+test('[TEAMS]: team admin can move everyone document to admin folder', async ({ page }) => {
+  const { team } = await seedTeamDocuments();
+
+  const teamAdmin = await seedTeamMember({
+    teamId: team.id,
+    name: 'Team Admin',
+    role: TeamMemberRole.ADMIN,
+  });
+
+  await seedBlankFolder(team.owner, {
+    createFolderOptions: {
+      name: 'Admin Folder',
+      teamId: team.id,
+      visibility: DocumentVisibility.ADMIN,
+      type: FolderType.DOCUMENT,
     },
   });
 
@@ -1502,76 +1845,35 @@ test('[TEAMS]: team admin can move documents to all folders', async ({ page }) =
     redirectPath: `/t/${team.url}/documents`,
   });
 
-  // Verify initial visibility
-  await expect(page.getByText('Admin Only Folder')).toBeVisible();
-  await expect(page.getByText('Manager Folder')).toBeVisible();
-  await expect(page.getByText('Everyone Folder')).toBeVisible();
-  await expect(page.getByText('[TEST] Admin Document')).toBeVisible();
-  await expect(page.getByText('[TEST] Manager Document')).toBeVisible();
+  await expect(page.getByText('Admin Folder')).toBeVisible();
   await expect(page.getByText('[TEST] Everyone Document')).toBeVisible();
 
-  // Try to move admin document to admin folder
-  const adminDocRow = page.getByRole('row', { name: /\[TEST\] Admin Document/ });
-  await adminDocRow.getByTestId('document-table-action-btn').click();
-  await page.getByRole('menuitem', { name: 'Move' }).click();
+  const everyoneDocRow = page.getByRole('row', { name: /\[TEST\] Everyone Document/ });
+  await everyoneDocRow.getByTestId('document-table-action-btn').click();
+  await page.getByRole('menuitem', { name: 'Move to Folder' }).click();
 
-  await expect(page.getByRole('button', { name: 'Admin Only Folder' })).toBeVisible();
-  await page.getByRole('button', { name: 'Admin Only Folder' }).click();
+  await expect(page.getByRole('button', { name: 'Admin Folder' })).toBeVisible();
+  await page.getByRole('button', { name: 'Admin Folder' }).click();
   await page.getByRole('button', { name: 'Move' }).click();
 
-  await page.waitForTimeout(3000);
-  await expect(page.getByText('[TEST] Admin Document')).toBeVisible();
+  await page.waitForTimeout(1000);
+  await expect(page.getByText('[TEST] Everyone Document')).toBeVisible();
 
   await page.goto(`/t/${team.url}/documents`);
-  await expect(page.getByText('[TEST] Admin Document')).not.toBeVisible();
-
-  // Try to move admin document to manager folder
-  await page.goto(`/t/${team.url}/documents/f/${adminFolder.id}`);
-  const adminDocRow2 = page.getByRole('row', { name: /\[TEST\] Admin Document/ });
-  await adminDocRow2.getByTestId('document-table-action-btn').click();
-  await page.getByRole('menuitem', { name: 'Move' }).click();
-
-  await expect(page.getByRole('button', { name: 'Manager Folder' })).toBeVisible();
-  await page.getByRole('button', { name: 'Manager Folder' }).click();
-  await page.getByRole('button', { name: 'Move' }).click();
-
-  await page.waitForTimeout(3000);
-  await expect(page.getByText('[TEST] Admin Document')).toBeVisible();
-
-  await page.goto(`/t/${team.url}/documents`);
-  await expect(page.getByText('[TEST] Admin Document')).not.toBeVisible();
-
-  // Try to move admin document to everyone folder
-  await page.goto(`/t/${team.url}/documents/f/${managerFolder.id}`);
-  const adminDocRow3 = page.getByRole('row', { name: /\[TEST\] Admin Document/ });
-  await adminDocRow3.getByTestId('document-table-action-btn').click();
-  await page.getByRole('menuitem', { name: 'Move' }).click();
-
-  await expect(page.getByRole('button', { name: 'Everyone Folder' })).toBeVisible();
-  await page.getByRole('button', { name: 'Everyone Folder' }).click();
-  await page.getByRole('button', { name: 'Move' }).click();
-
-  await page.waitForTimeout(3000);
-  await expect(page.getByText('[TEST] Admin Document')).toBeVisible();
-
-  await page.goto(`/t/${team.url}/documents`);
-  await expect(page.getByText('[TEST] Admin Document')).not.toBeVisible();
+  await page.waitForTimeout(1000);
+  await expect(page.getByText('[TEST] Everyone Document')).not.toBeVisible();
 });
 
-test('[TEAMS]: team owner can move documents to all folders', async ({ page }) => {
+test('[TEAMS]: team admin can move everyone document to manager folder', async ({ page }) => {
   const { team } = await seedTeamDocuments();
 
-  // Create folders with different visibility levels
-  const adminFolder = await seedBlankFolder(team.owner, {
-    createFolderOptions: {
-      name: 'Admin Only Folder',
-      teamId: team.id,
-      visibility: DocumentVisibility.ADMIN,
-      type: FolderType.DOCUMENT,
-    },
+  const teamAdmin = await seedTeamMember({
+    teamId: team.id,
+    name: 'Team Admin',
+    role: TeamMemberRole.ADMIN,
   });
 
-  const managerFolder = await seedBlankFolder(team.owner, {
+  await seedBlankFolder(team.owner, {
     createFolderOptions: {
       name: 'Manager Folder',
       teamId: team.id,
@@ -1580,7 +1882,49 @@ test('[TEAMS]: team owner can move documents to all folders', async ({ page }) =
     },
   });
 
-  const everyoneFolder = await seedBlankFolder(team.owner, {
+  await seedBlankDocument(team.owner, {
+    createDocumentOptions: {
+      title: '[TEST] Everyone Document',
+      teamId: team.id,
+      visibility: DocumentVisibility.EVERYONE,
+    },
+  });
+
+  await apiSignin({
+    page,
+    email: teamAdmin.email,
+    redirectPath: `/t/${team.url}/documents`,
+  });
+
+  await expect(page.getByText('Manager Folder')).toBeVisible();
+  await expect(page.getByText('[TEST] Everyone Document')).toBeVisible();
+
+  const everyoneDocRow = page.getByRole('row', { name: /\[TEST\] Everyone Document/ });
+  await everyoneDocRow.getByTestId('document-table-action-btn').click();
+  await page.getByRole('menuitem', { name: 'Move to Folder' }).click();
+
+  await expect(page.getByRole('button', { name: 'Manager Folder' })).toBeVisible();
+  await page.getByRole('button', { name: 'Manager Folder' }).click();
+  await page.getByRole('button', { name: 'Move' }).click();
+
+  await page.waitForTimeout(1000);
+  await expect(page.getByText('[TEST] Everyone Document')).toBeVisible();
+
+  await page.goto(`/t/${team.url}/documents`);
+  await page.waitForTimeout(1000);
+  await expect(page.getByText('[TEST] Everyone Document')).not.toBeVisible();
+});
+
+test('[TEAMS]: team admin can move everyone document to everyone folder', async ({ page }) => {
+  const { team } = await seedTeamDocuments();
+
+  const teamAdmin = await seedTeamMember({
+    teamId: team.id,
+    name: 'Team Admin',
+    role: TeamMemberRole.ADMIN,
+  });
+
+  await seedBlankFolder(team.owner, {
     createFolderOptions: {
       name: 'Everyone Folder',
       teamId: team.id,
@@ -1589,7 +1933,51 @@ test('[TEAMS]: team owner can move documents to all folders', async ({ page }) =
     },
   });
 
-  // Create documents with different visibility levels in the root folder
+  await seedBlankDocument(team.owner, {
+    createDocumentOptions: {
+      title: '[TEST] Everyone Document',
+      teamId: team.id,
+      visibility: DocumentVisibility.EVERYONE,
+    },
+  });
+
+  await apiSignin({
+    page,
+    email: teamAdmin.email,
+    redirectPath: `/t/${team.url}/documents`,
+  });
+
+  await expect(page.getByText('Everyone Folder')).toBeVisible();
+  await expect(page.getByText('[TEST] Everyone Document')).toBeVisible();
+
+  const everyoneDocRow = page.getByRole('row', { name: /\[TEST\] Everyone Document/ });
+  await everyoneDocRow.getByTestId('document-table-action-btn').click();
+  await page.getByRole('menuitem', { name: 'Move to Folder' }).click();
+
+  await expect(page.getByRole('button', { name: 'Everyone Folder' })).toBeVisible();
+  await page.getByRole('button', { name: 'Everyone Folder' }).click();
+  await page.getByRole('button', { name: 'Move' }).click();
+
+  await page.waitForTimeout(1000);
+  await expect(page.getByText('[TEST] Everyone Document')).toBeVisible();
+
+  await page.goto(`/t/${team.url}/documents`);
+  await page.waitForTimeout(1000);
+  await expect(page.getByText('[TEST] Everyone Document')).not.toBeVisible();
+});
+
+test('[TEAMS]: team owner can move admin document to admin folder', async ({ page }) => {
+  const { team } = await seedTeamDocuments();
+
+  await seedBlankFolder(team.owner, {
+    createFolderOptions: {
+      name: 'Admin Folder',
+      teamId: team.id,
+      visibility: DocumentVisibility.ADMIN,
+      type: FolderType.DOCUMENT,
+    },
+  });
+
   await seedBlankDocument(team.owner, {
     createDocumentOptions: {
       title: '[TEST] Admin Document',
@@ -1598,11 +1986,265 @@ test('[TEAMS]: team owner can move documents to all folders', async ({ page }) =
     },
   });
 
+  await apiSignin({
+    page,
+    email: team.owner.email,
+    redirectPath: `/t/${team.url}/documents`,
+  });
+
+  await expect(page.getByText('Admin Folder')).toBeVisible();
+  await expect(page.getByText('[TEST] Admin Document')).toBeVisible();
+
+  const adminDocRow = page.getByRole('row', { name: /\[TEST\] Admin Document/ });
+  await adminDocRow.getByTestId('document-table-action-btn').click();
+  await page.getByRole('menuitem', { name: 'Move to Folder' }).click();
+
+  await expect(page.getByRole('button', { name: 'Admin Folder' })).toBeVisible();
+  await page.getByRole('button', { name: 'Admin Folder' }).click();
+  await page.getByRole('button', { name: 'Move' }).click();
+
+  await page.waitForTimeout(1000);
+  await expect(page.getByText('[TEST] Admin Document')).toBeVisible();
+
+  await page.goto(`/t/${team.url}/documents`);
+  await page.waitForTimeout(1000);
+  await expect(page.getByText('[TEST] Admin Document')).not.toBeVisible();
+});
+
+test('[TEAMS]: team owner can move admin document to manager folder', async ({ page }) => {
+  const { team } = await seedTeamDocuments();
+
+  await seedBlankFolder(team.owner, {
+    createFolderOptions: {
+      name: 'Manager Folder',
+      teamId: team.id,
+      visibility: DocumentVisibility.MANAGER_AND_ABOVE,
+      type: FolderType.DOCUMENT,
+    },
+  });
+
+  await seedBlankDocument(team.owner, {
+    createDocumentOptions: {
+      title: '[TEST] Admin Document',
+      teamId: team.id,
+      visibility: DocumentVisibility.ADMIN,
+    },
+  });
+
+  await apiSignin({
+    page,
+    email: team.owner.email,
+    redirectPath: `/t/${team.url}/documents`,
+  });
+
+  await expect(page.getByText('Manager Folder')).toBeVisible();
+  await expect(page.getByText('[TEST] Admin Document')).toBeVisible();
+
+  const adminDocRow = page.getByRole('row', { name: /\[TEST\] Admin Document/ });
+  await adminDocRow.getByTestId('document-table-action-btn').click();
+  await page.getByRole('menuitem', { name: 'Move to Folder' }).click();
+
+  await expect(page.getByRole('button', { name: 'Manager Folder' })).toBeVisible();
+  await page.getByRole('button', { name: 'Manager Folder' }).click();
+  await page.getByRole('button', { name: 'Move' }).click();
+
+  await page.waitForTimeout(1000);
+  await expect(page.getByText('[TEST] Admin Document')).toBeVisible();
+
+  await page.goto(`/t/${team.url}/documents`);
+  await page.waitForTimeout(1000);
+  await expect(page.getByText('[TEST] Admin Document')).not.toBeVisible();
+});
+
+test('[TEAMS]: team owner can move admin document to everyone folder', async ({ page }) => {
+  const { team } = await seedTeamDocuments();
+
+  await seedBlankFolder(team.owner, {
+    createFolderOptions: {
+      name: 'Everyone Folder',
+      teamId: team.id,
+      visibility: DocumentVisibility.EVERYONE,
+      type: FolderType.DOCUMENT,
+    },
+  });
+
+  await seedBlankDocument(team.owner, {
+    createDocumentOptions: {
+      title: '[TEST] Admin Document',
+      teamId: team.id,
+      visibility: DocumentVisibility.ADMIN,
+    },
+  });
+
+  await apiSignin({
+    page,
+    email: team.owner.email,
+    redirectPath: `/t/${team.url}/documents`,
+  });
+
+  await expect(page.getByText('Everyone Folder')).toBeVisible();
+  await expect(page.getByText('[TEST] Admin Document')).toBeVisible();
+
+  const adminDocRow = page.getByRole('row', { name: /\[TEST\] Admin Document/ });
+  await adminDocRow.getByTestId('document-table-action-btn').click();
+  await page.getByRole('menuitem', { name: 'Move to Folder' }).click();
+
+  await expect(page.getByRole('button', { name: 'Everyone Folder' })).toBeVisible();
+  await page.getByRole('button', { name: 'Everyone Folder' }).click();
+  await page.getByRole('button', { name: 'Move' }).click();
+
+  await page.waitForTimeout(1000);
+  await expect(page.getByText('[TEST] Admin Document')).toBeVisible();
+
+  await page.goto(`/t/${team.url}/documents`);
+  await page.waitForTimeout(1000);
+  await expect(page.getByText('[TEST] Admin Document')).not.toBeVisible();
+});
+
+test('[TEAMS]: team owner can move manager document to admin folder', async ({ page }) => {
+  const { team } = await seedTeamDocuments();
+
+  await seedBlankFolder(team.owner, {
+    createFolderOptions: {
+      name: 'Admin Folder',
+      teamId: team.id,
+      visibility: DocumentVisibility.ADMIN,
+      type: FolderType.DOCUMENT,
+    },
+  });
+
   await seedBlankDocument(team.owner, {
     createDocumentOptions: {
       title: '[TEST] Manager Document',
       teamId: team.id,
       visibility: DocumentVisibility.MANAGER_AND_ABOVE,
+    },
+  });
+
+  await apiSignin({
+    page,
+    email: team.owner.email,
+    redirectPath: `/t/${team.url}/documents`,
+  });
+
+  await expect(page.getByText('Admin Folder')).toBeVisible();
+  await expect(page.getByText('[TEST] Manager Document')).toBeVisible();
+
+  const managerDocRow = page.getByRole('row', { name: /\[TEST\] Manager Document/ });
+  await managerDocRow.getByTestId('document-table-action-btn').click();
+  await page.getByRole('menuitem', { name: 'Move to Folder' }).click();
+
+  await expect(page.getByRole('button', { name: 'Admin Folder' })).toBeVisible();
+  await page.getByRole('button', { name: 'Admin Folder' }).click();
+  await page.getByRole('button', { name: 'Move' }).click();
+
+  await page.waitForTimeout(1000);
+  await expect(page.getByText('[TEST] Manager Document')).toBeVisible();
+
+  await page.goto(`/t/${team.url}/documents`);
+  await page.waitForTimeout(1000);
+  await expect(page.getByText('[TEST] Manager Document')).not.toBeVisible();
+});
+
+test('[TEAMS]: team owner can move manager document to manager folder', async ({ page }) => {
+  const { team } = await seedTeamDocuments();
+
+  await seedBlankFolder(team.owner, {
+    createFolderOptions: {
+      name: 'Manager Folder',
+      teamId: team.id,
+      visibility: DocumentVisibility.MANAGER_AND_ABOVE,
+      type: FolderType.DOCUMENT,
+    },
+  });
+
+  await seedBlankDocument(team.owner, {
+    createDocumentOptions: {
+      title: '[TEST] Manager Document',
+      teamId: team.id,
+      visibility: DocumentVisibility.MANAGER_AND_ABOVE,
+    },
+  });
+
+  await apiSignin({
+    page,
+    email: team.owner.email,
+    redirectPath: `/t/${team.url}/documents`,
+  });
+
+  await expect(page.getByText('Manager Folder')).toBeVisible();
+  await expect(page.getByText('[TEST] Manager Document')).toBeVisible();
+
+  const managerDocRow = page.getByRole('row', { name: /\[TEST\] Manager Document/ });
+  await managerDocRow.getByTestId('document-table-action-btn').click();
+  await page.getByRole('menuitem', { name: 'Move to Folder' }).click();
+
+  await expect(page.getByRole('button', { name: 'Manager Folder' })).toBeVisible();
+  await page.getByRole('button', { name: 'Manager Folder' }).click();
+  await page.getByRole('button', { name: 'Move' }).click();
+
+  await page.waitForTimeout(1000);
+  await expect(page.getByText('[TEST] Manager Document')).toBeVisible();
+
+  await page.goto(`/t/${team.url}/documents`);
+  await page.waitForTimeout(1000);
+  await expect(page.getByText('[TEST] Manager Document')).not.toBeVisible();
+});
+
+test('[TEAMS]: team owner can move manager document to everyone folder', async ({ page }) => {
+  const { team } = await seedTeamDocuments();
+
+  await seedBlankFolder(team.owner, {
+    createFolderOptions: {
+      name: 'Everyone Folder',
+      teamId: team.id,
+      visibility: DocumentVisibility.EVERYONE,
+      type: FolderType.DOCUMENT,
+    },
+  });
+
+  await seedBlankDocument(team.owner, {
+    createDocumentOptions: {
+      title: '[TEST] Manager Document',
+      teamId: team.id,
+      visibility: DocumentVisibility.MANAGER_AND_ABOVE,
+    },
+  });
+
+  await apiSignin({
+    page,
+    email: team.owner.email,
+    redirectPath: `/t/${team.url}/documents`,
+  });
+
+  await expect(page.getByText('Everyone Folder')).toBeVisible();
+  await expect(page.getByText('[TEST] Manager Document')).toBeVisible();
+
+  const managerDocRow = page.getByRole('row', { name: /\[TEST\] Manager Document/ });
+  await managerDocRow.getByTestId('document-table-action-btn').click();
+  await page.getByRole('menuitem', { name: 'Move to Folder' }).click();
+
+  await expect(page.getByRole('button', { name: 'Everyone Folder' })).toBeVisible();
+  await page.getByRole('button', { name: 'Everyone Folder' }).click();
+  await page.getByRole('button', { name: 'Move' }).click();
+
+  await page.waitForTimeout(1000);
+  await expect(page.getByText('[TEST] Manager Document')).toBeVisible();
+
+  await page.goto(`/t/${team.url}/documents`);
+  await page.waitForTimeout(1000);
+  await expect(page.getByText('[TEST] Manager Document')).not.toBeVisible();
+});
+
+test('[TEAMS]: team owner can move everyone document to admin folder', async ({ page }) => {
+  const { team } = await seedTeamDocuments();
+
+  await seedBlankFolder(team.owner, {
+    createFolderOptions: {
+      name: 'Admin Folder',
+      teamId: team.id,
+      visibility: DocumentVisibility.ADMIN,
+      type: FolderType.DOCUMENT,
     },
   });
 
@@ -1620,59 +2262,1000 @@ test('[TEAMS]: team owner can move documents to all folders', async ({ page }) =
     redirectPath: `/t/${team.url}/documents`,
   });
 
-  // Verify initial visibility
+  await expect(page.getByText('Admin Folder')).toBeVisible();
+  await expect(page.getByText('[TEST] Everyone Document')).toBeVisible();
+
+  const everyoneDocRow = page.getByRole('row', { name: /\[TEST\] Everyone Document/ });
+  await everyoneDocRow.getByTestId('document-table-action-btn').click();
+  await page.getByRole('menuitem', { name: 'Move to Folder' }).click();
+
+  await expect(page.getByRole('button', { name: 'Admin Folder' })).toBeVisible();
+  await page.getByRole('button', { name: 'Admin Folder' }).click();
+  await page.getByRole('button', { name: 'Move' }).click();
+
+  await page.waitForTimeout(1000);
+  await expect(page.getByText('[TEST] Everyone Document')).toBeVisible();
+
+  await page.goto(`/t/${team.url}/documents`);
+  await page.waitForTimeout(1000);
+  await expect(page.getByText('[TEST] Everyone Document')).not.toBeVisible();
+});
+
+test('[TEAMS]: team owner can move everyone document to manager folder', async ({ page }) => {
+  const { team } = await seedTeamDocuments();
+
+  await seedBlankFolder(team.owner, {
+    createFolderOptions: {
+      name: 'Manager Folder',
+      teamId: team.id,
+      visibility: DocumentVisibility.MANAGER_AND_ABOVE,
+      type: FolderType.DOCUMENT,
+    },
+  });
+
+  await seedBlankDocument(team.owner, {
+    createDocumentOptions: {
+      title: '[TEST] Everyone Document',
+      teamId: team.id,
+      visibility: DocumentVisibility.EVERYONE,
+    },
+  });
+
+  await apiSignin({
+    page,
+    email: team.owner.email,
+    redirectPath: `/t/${team.url}/documents`,
+  });
+
+  await expect(page.getByText('Manager Folder')).toBeVisible();
+  await expect(page.getByText('[TEST] Everyone Document')).toBeVisible();
+
+  const everyoneDocRow = page.getByRole('row', { name: /\[TEST\] Everyone Document/ });
+  await everyoneDocRow.getByTestId('document-table-action-btn').click();
+  await page.getByRole('menuitem', { name: 'Move to Folder' }).click();
+
+  await expect(page.getByRole('button', { name: 'Manager Folder' })).toBeVisible();
+  await page.getByRole('button', { name: 'Manager Folder' }).click();
+  await page.getByRole('button', { name: 'Move' }).click();
+
+  await page.waitForTimeout(1000);
+  await expect(page.getByText('[TEST] Everyone Document')).toBeVisible();
+
+  await page.goto(`/t/${team.url}/documents`);
+  await page.waitForTimeout(1000);
+  await expect(page.getByText('[TEST] Everyone Document')).not.toBeVisible();
+});
+
+test('[TEAMS]: team owner can move everyone document to everyone folder', async ({ page }) => {
+  const { team } = await seedTeamDocuments();
+
+  await seedBlankFolder(team.owner, {
+    createFolderOptions: {
+      name: 'Everyone Folder',
+      teamId: team.id,
+      visibility: DocumentVisibility.EVERYONE,
+      type: FolderType.DOCUMENT,
+    },
+  });
+
+  await seedBlankDocument(team.owner, {
+    createDocumentOptions: {
+      title: '[TEST] Everyone Document',
+      teamId: team.id,
+      visibility: DocumentVisibility.EVERYONE,
+    },
+  });
+
+  await apiSignin({
+    page,
+    email: team.owner.email,
+    redirectPath: `/t/${team.url}/documents`,
+  });
+
+  await expect(page.getByText('Everyone Folder')).toBeVisible();
+  await expect(page.getByText('[TEST] Everyone Document')).toBeVisible();
+
+  const everyoneDocRow = page.getByRole('row', { name: /\[TEST\] Everyone Document/ });
+  await everyoneDocRow.getByTestId('document-table-action-btn').click();
+  await page.getByRole('menuitem', { name: 'Move to Folder' }).click();
+
+  await expect(page.getByRole('button', { name: 'Everyone Folder' })).toBeVisible();
+  await page.getByRole('button', { name: 'Everyone Folder' }).click();
+  await page.getByRole('button', { name: 'Move' }).click();
+
+  await page.waitForTimeout(1000);
+  await expect(page.getByText('[TEST] Everyone Document')).toBeVisible();
+
+  await page.goto(`/t/${team.url}/documents`);
+  await page.waitForTimeout(1000);
+  await expect(page.getByText('[TEST] Everyone Document')).not.toBeVisible();
+});
+
+test('[TEAMS]: team member cannot see admin folder in folder list', async ({ page }) => {
+  const { team } = await seedTeamDocuments();
+
+  const teamMember = await seedTeamMember({
+    teamId: team.id,
+    name: 'Team Member',
+    role: TeamMemberRole.MEMBER,
+  });
+
+  await seedBlankFolder(team.owner, {
+    createFolderOptions: {
+      name: 'Admin Only Folder',
+      teamId: team.id,
+      visibility: DocumentVisibility.ADMIN,
+    },
+  });
+
+  await apiSignin({
+    page,
+    email: teamMember.email,
+    redirectPath: `/t/${team.url}/documents`,
+  });
+
+  await expect(page.getByText('Admin Only Folder')).not.toBeVisible();
+});
+
+test('[TEAMS]: team member can access admin folder via URL and see everyone documents', async ({
+  page,
+}) => {
+  const { team } = await seedTeamDocuments();
+
+  const teamMember = await seedTeamMember({
+    teamId: team.id,
+    name: 'Team Member',
+    role: TeamMemberRole.MEMBER,
+  });
+
+  const adminFolder = await seedBlankFolder(team.owner, {
+    createFolderOptions: {
+      name: 'Admin Only Folder',
+      teamId: team.id,
+      visibility: DocumentVisibility.ADMIN,
+    },
+  });
+
+  await seedBlankDocument(team.owner, {
+    createDocumentOptions: {
+      title: 'Admin Folder - Everyone Document',
+      folderId: adminFolder.id,
+      teamId: team.id,
+      visibility: DocumentVisibility.EVERYONE,
+    },
+  });
+
+  await seedBlankDocument(team.owner, {
+    createDocumentOptions: {
+      title: 'Admin Folder - Manager Document',
+      folderId: adminFolder.id,
+      teamId: team.id,
+      visibility: DocumentVisibility.MANAGER_AND_ABOVE,
+    },
+  });
+
+  await seedBlankDocument(team.owner, {
+    createDocumentOptions: {
+      title: 'Admin Folder - Admin Document',
+      folderId: adminFolder.id,
+      teamId: team.id,
+      visibility: DocumentVisibility.ADMIN,
+    },
+  });
+
+  await apiSignin({
+    page,
+    email: teamMember.email,
+    redirectPath: `/t/${team.url}/documents/f/${adminFolder.id}`,
+  });
+
+  await expect(page.getByRole('button', { name: 'Admin Only Folder' })).not.toBeVisible();
+  await expect(page.getByText('Admin Folder - Everyone Document')).toBeVisible();
+  await expect(page.getByText('Admin Folder - Manager Document')).not.toBeVisible();
+  await expect(page.getByText('Admin Folder - Admin Document')).not.toBeVisible();
+});
+
+test('[TEAMS]: team member cannot see manager folder in folder list', async ({ page }) => {
+  const { team } = await seedTeamDocuments();
+
+  const teamMember = await seedTeamMember({
+    teamId: team.id,
+    name: 'Team Member',
+    role: TeamMemberRole.MEMBER,
+  });
+
+  await seedBlankFolder(team.owner, {
+    createFolderOptions: {
+      name: 'Manager Folder',
+      teamId: team.id,
+      visibility: DocumentVisibility.MANAGER_AND_ABOVE,
+    },
+  });
+
+  await apiSignin({
+    page,
+    email: teamMember.email,
+    redirectPath: `/t/${team.url}/documents`,
+  });
+
+  await expect(page.getByText('Manager Folder')).not.toBeVisible();
+});
+
+test('[TEAMS]: team member can access manager folder via URL and see everyone documents', async ({
+  page,
+}) => {
+  const { team } = await seedTeamDocuments();
+
+  const teamMember = await seedTeamMember({
+    teamId: team.id,
+    name: 'Team Member',
+    role: TeamMemberRole.MEMBER,
+  });
+
+  const managerFolder = await seedBlankFolder(team.owner, {
+    createFolderOptions: {
+      name: 'Manager Folder',
+      teamId: team.id,
+      visibility: DocumentVisibility.MANAGER_AND_ABOVE,
+    },
+  });
+
+  await seedBlankDocument(team.owner, {
+    createDocumentOptions: {
+      title: 'Manager Folder - Everyone Document',
+      folderId: managerFolder.id,
+      teamId: team.id,
+      visibility: DocumentVisibility.EVERYONE,
+    },
+  });
+
+  await seedBlankDocument(team.owner, {
+    createDocumentOptions: {
+      title: 'Manager Folder - Manager Document',
+      folderId: managerFolder.id,
+      teamId: team.id,
+      visibility: DocumentVisibility.MANAGER_AND_ABOVE,
+    },
+  });
+
+  await seedBlankDocument(team.owner, {
+    createDocumentOptions: {
+      title: 'Manager Folder - Admin Document',
+      folderId: managerFolder.id,
+      teamId: team.id,
+      visibility: DocumentVisibility.ADMIN,
+    },
+  });
+
+  await apiSignin({
+    page,
+    email: teamMember.email,
+    redirectPath: `/t/${team.url}/documents/f/${managerFolder.id}`,
+  });
+
+  await expect(page.getByRole('button', { name: 'Manager Folder' })).not.toBeVisible();
+  await expect(page.getByText('Manager Folder - Everyone Document')).toBeVisible();
+  await expect(page.getByText('Manager Folder - Manager Document')).not.toBeVisible();
+  await expect(page.getByText('Manager Folder - Admin Document')).not.toBeVisible();
+});
+
+test('[TEAMS]: team member can see everyone folders', async ({ page }) => {
+  const { team } = await seedTeamDocuments();
+
+  const teamMember = await seedTeamMember({
+    teamId: team.id,
+    name: 'Team Member',
+    role: TeamMemberRole.MEMBER,
+  });
+
+  await seedBlankFolder(team.owner, {
+    createFolderOptions: {
+      name: 'Admin Only Folder',
+      teamId: team.id,
+      visibility: DocumentVisibility.ADMIN,
+    },
+  });
+
+  await seedBlankFolder(team.owner, {
+    createFolderOptions: {
+      name: 'Manager Folder',
+      teamId: team.id,
+      visibility: DocumentVisibility.MANAGER_AND_ABOVE,
+    },
+  });
+
+  await seedBlankFolder(team.owner, {
+    createFolderOptions: {
+      name: 'Everyone Folder',
+      teamId: team.id,
+      visibility: DocumentVisibility.EVERYONE,
+    },
+  });
+
+  await apiSignin({
+    page,
+    email: teamMember.email,
+    redirectPath: `/t/${team.url}/documents`,
+  });
+
+  await expect(page.getByText('Admin Only Folder')).not.toBeVisible();
+  await expect(page.getByText('Manager Folder')).not.toBeVisible();
+  await expect(page.getByText('Everyone Folder')).toBeVisible();
+});
+
+test('[TEAMS]: team member can only see everyone documents in everyone folder', async ({
+  page,
+}) => {
+  const { team } = await seedTeamDocuments();
+
+  const teamMember = await seedTeamMember({
+    teamId: team.id,
+    name: 'Team Member',
+    role: TeamMemberRole.MEMBER,
+  });
+
+  const everyoneFolder = await seedBlankFolder(team.owner, {
+    createFolderOptions: {
+      name: 'Everyone Folder',
+      teamId: team.id,
+      visibility: DocumentVisibility.EVERYONE,
+    },
+  });
+
+  await seedBlankDocument(team.owner, {
+    createDocumentOptions: {
+      title: 'Everyone Document',
+      folderId: everyoneFolder.id,
+      teamId: team.id,
+      visibility: DocumentVisibility.EVERYONE,
+    },
+  });
+
+  await seedBlankDocument(team.owner, {
+    createDocumentOptions: {
+      title: 'Manager Document',
+      folderId: everyoneFolder.id,
+      teamId: team.id,
+      visibility: DocumentVisibility.MANAGER_AND_ABOVE,
+    },
+  });
+
+  await seedBlankDocument(team.owner, {
+    createDocumentOptions: {
+      title: 'Admin Document',
+      folderId: everyoneFolder.id,
+      teamId: team.id,
+      visibility: DocumentVisibility.ADMIN,
+    },
+  });
+
+  await apiSignin({
+    page,
+    email: teamMember.email,
+    redirectPath: `/t/${team.url}/documents/f/${everyoneFolder.id}`,
+  });
+
+  await expect(page.getByText('Everyone Document')).toBeVisible();
+  await expect(page.getByText('Manager Document')).not.toBeVisible();
+  await expect(page.getByText('Admin Document')).not.toBeVisible();
+});
+
+test('[TEAMS]: team manager can see manager and everyone folders in folder list', async ({
+  page,
+}) => {
+  const { team } = await seedTeamDocuments();
+
+  const teamManager = await seedTeamMember({
+    teamId: team.id,
+    name: 'Team Manager',
+    role: TeamMemberRole.MANAGER,
+  });
+
+  await seedBlankFolder(team.owner, {
+    createFolderOptions: {
+      name: 'Admin Only Folder',
+      teamId: team.id,
+      visibility: DocumentVisibility.ADMIN,
+    },
+  });
+
+  await seedBlankFolder(team.owner, {
+    createFolderOptions: {
+      name: 'Manager Folder',
+      teamId: team.id,
+      visibility: DocumentVisibility.MANAGER_AND_ABOVE,
+    },
+  });
+
+  await seedBlankFolder(team.owner, {
+    createFolderOptions: {
+      name: 'Everyone Folder',
+      teamId: team.id,
+      visibility: DocumentVisibility.EVERYONE,
+    },
+  });
+
+  await apiSignin({
+    page,
+    email: teamManager.email,
+    redirectPath: `/t/${team.url}/documents`,
+  });
+
+  await expect(page.getByText('Admin Only Folder')).not.toBeVisible();
+  await expect(page.getByText('Manager Folder')).toBeVisible();
+  await expect(page.getByText('Everyone Folder')).toBeVisible();
+});
+
+test('[TEAMS]: team manager can see manager and everyone documents in manager folder', async ({
+  page,
+}) => {
+  const { team } = await seedTeamDocuments();
+
+  const teamManager = await seedTeamMember({
+    teamId: team.id,
+    name: 'Team Manager',
+    role: TeamMemberRole.MANAGER,
+  });
+
+  const managerFolder = await seedBlankFolder(team.owner, {
+    createFolderOptions: {
+      name: 'Manager Folder',
+      teamId: team.id,
+      visibility: DocumentVisibility.MANAGER_AND_ABOVE,
+    },
+  });
+
+  await seedBlankDocument(team.owner, {
+    createDocumentOptions: {
+      title: 'Manager Folder - Everyone Document',
+      folderId: managerFolder.id,
+      teamId: team.id,
+      visibility: DocumentVisibility.EVERYONE,
+    },
+  });
+
+  await seedBlankDocument(team.owner, {
+    createDocumentOptions: {
+      title: 'Manager Folder - Manager Document',
+      folderId: managerFolder.id,
+      teamId: team.id,
+      visibility: DocumentVisibility.MANAGER_AND_ABOVE,
+    },
+  });
+
+  await seedBlankDocument(team.owner, {
+    createDocumentOptions: {
+      title: 'Manager Folder - Admin Document',
+      folderId: managerFolder.id,
+      teamId: team.id,
+      visibility: DocumentVisibility.ADMIN,
+    },
+  });
+
+  await apiSignin({
+    page,
+    email: teamManager.email,
+    redirectPath: `/t/${team.url}/documents/f/${managerFolder.id}`,
+  });
+
+  await expect(page.getByRole('button', { name: 'Manager Folder' })).toBeVisible();
+  await expect(page.getByText('Manager Folder - Everyone Document')).toBeVisible();
+  await expect(page.getByText('Manager Folder - Manager Document')).toBeVisible();
+  await expect(page.getByText('Manager Folder - Admin Document')).not.toBeVisible();
+});
+
+test('[TEAMS]: team manager can see manager and everyone documents in everyone folder', async ({
+  page,
+}) => {
+  const { team } = await seedTeamDocuments();
+
+  const teamManager = await seedTeamMember({
+    teamId: team.id,
+    name: 'Team Manager',
+    role: TeamMemberRole.MANAGER,
+  });
+
+  const everyoneFolder = await seedBlankFolder(team.owner, {
+    createFolderOptions: {
+      name: 'Everyone Folder',
+      teamId: team.id,
+      visibility: DocumentVisibility.EVERYONE,
+    },
+  });
+
+  await seedBlankDocument(team.owner, {
+    createDocumentOptions: {
+      title: 'Everyone Folder - Everyone Document',
+      folderId: everyoneFolder.id,
+      teamId: team.id,
+      visibility: DocumentVisibility.EVERYONE,
+    },
+  });
+
+  await seedBlankDocument(team.owner, {
+    createDocumentOptions: {
+      title: 'Everyone Folder - Manager Document',
+      folderId: everyoneFolder.id,
+      teamId: team.id,
+      visibility: DocumentVisibility.MANAGER_AND_ABOVE,
+    },
+  });
+
+  await seedBlankDocument(team.owner, {
+    createDocumentOptions: {
+      title: 'Everyone Folder - Admin Document',
+      folderId: everyoneFolder.id,
+      teamId: team.id,
+      visibility: DocumentVisibility.ADMIN,
+    },
+  });
+
+  await apiSignin({
+    page,
+    email: teamManager.email,
+    redirectPath: `/t/${team.url}/documents/f/${everyoneFolder.id}`,
+  });
+
+  await expect(page.getByRole('button', { name: 'Everyone Folder' })).toBeVisible();
+  await expect(page.getByText('Everyone Folder - Everyone Document')).toBeVisible();
+  await expect(page.getByText('Everyone Folder - Manager Document')).toBeVisible();
+  await expect(page.getByText('Everyone Folder - Admin Document')).not.toBeVisible();
+});
+
+test('[TEAMS]: team manager can access admin folder via URL and see manager and everyone documents', async ({
+  page,
+}) => {
+  const { team } = await seedTeamDocuments();
+
+  const teamManager = await seedTeamMember({
+    teamId: team.id,
+    name: 'Team Manager',
+    role: TeamMemberRole.MANAGER,
+  });
+
+  const adminFolder = await seedBlankFolder(team.owner, {
+    createFolderOptions: {
+      name: 'Admin Only Folder',
+      teamId: team.id,
+      visibility: DocumentVisibility.ADMIN,
+    },
+  });
+
+  await seedBlankDocument(team.owner, {
+    createDocumentOptions: {
+      title: 'Admin Folder - Everyone Document',
+      folderId: adminFolder.id,
+      teamId: team.id,
+      visibility: DocumentVisibility.EVERYONE,
+    },
+  });
+
+  await seedBlankDocument(team.owner, {
+    createDocumentOptions: {
+      title: 'Admin Folder - Manager Document',
+      folderId: adminFolder.id,
+      teamId: team.id,
+      visibility: DocumentVisibility.MANAGER_AND_ABOVE,
+    },
+  });
+
+  await seedBlankDocument(team.owner, {
+    createDocumentOptions: {
+      title: 'Admin Folder - Admin Document',
+      folderId: adminFolder.id,
+      teamId: team.id,
+      visibility: DocumentVisibility.ADMIN,
+    },
+  });
+
+  await apiSignin({
+    page,
+    email: teamManager.email,
+    redirectPath: `/t/${team.url}/documents/f/${adminFolder.id}`,
+  });
+
+  await expect(page.getByRole('button', { name: 'Admin Only Folder' })).not.toBeVisible();
+  await expect(page.getByText('Admin Folder - Everyone Document')).toBeVisible();
+  await expect(page.getByText('Admin Folder - Manager Document')).toBeVisible();
+  await expect(page.getByText('Admin Folder - Admin Document')).not.toBeVisible();
+});
+
+test('[TEAMS]: team owner can see all folders in folder list', async ({ page }) => {
+  const { team } = await seedTeamDocuments();
+
+  await seedBlankFolder(team.owner, {
+    createFolderOptions: {
+      name: 'Admin Only Folder',
+      teamId: team.id,
+      visibility: DocumentVisibility.ADMIN,
+    },
+  });
+
+  await seedBlankFolder(team.owner, {
+    createFolderOptions: {
+      name: 'Manager Folder',
+      teamId: team.id,
+      visibility: DocumentVisibility.MANAGER_AND_ABOVE,
+    },
+  });
+
+  await seedBlankFolder(team.owner, {
+    createFolderOptions: {
+      name: 'Everyone Folder',
+      teamId: team.id,
+      visibility: DocumentVisibility.EVERYONE,
+    },
+  });
+
+  await apiSignin({
+    page,
+    email: team.owner.email,
+    redirectPath: `/t/${team.url}/documents`,
+  });
+
   await expect(page.getByText('Admin Only Folder')).toBeVisible();
   await expect(page.getByText('Manager Folder')).toBeVisible();
   await expect(page.getByText('Everyone Folder')).toBeVisible();
-  await expect(page.getByText('[TEST] Admin Document')).toBeVisible();
-  await expect(page.getByText('[TEST] Manager Document')).toBeVisible();
-  await expect(page.getByText('[TEST] Everyone Document')).toBeVisible();
+});
 
-  // Try to move admin document to admin folder
-  await page.goto(`/t/${team.url}/documents/f/${everyoneFolder.id}`);
-  const adminDocRow = page.getByRole('row', { name: /\[TEST\] Admin Document/ });
-  await adminDocRow.getByTestId('document-table-action-btn').click();
-  await page.getByRole('menuitem', { name: 'Move' }).click();
+test('[TEAMS]: team owner can see all documents in admin folder', async ({ page }) => {
+  const { team } = await seedTeamDocuments();
+
+  const adminFolder = await seedBlankFolder(team.owner, {
+    createFolderOptions: {
+      name: 'Admin Only Folder',
+      teamId: team.id,
+      visibility: DocumentVisibility.ADMIN,
+    },
+  });
+
+  await seedBlankDocument(team.owner, {
+    createDocumentOptions: {
+      title: 'Admin Folder - Everyone Document',
+      folderId: adminFolder.id,
+      teamId: team.id,
+      visibility: DocumentVisibility.EVERYONE,
+    },
+  });
+
+  await seedBlankDocument(team.owner, {
+    createDocumentOptions: {
+      title: 'Admin Folder - Manager Document',
+      folderId: adminFolder.id,
+      teamId: team.id,
+      visibility: DocumentVisibility.MANAGER_AND_ABOVE,
+    },
+  });
+
+  await seedBlankDocument(team.owner, {
+    createDocumentOptions: {
+      title: 'Admin Folder - Admin Document',
+      folderId: adminFolder.id,
+      teamId: team.id,
+      visibility: DocumentVisibility.ADMIN,
+    },
+  });
+
+  await apiSignin({
+    page,
+    email: team.owner.email,
+    redirectPath: `/t/${team.url}/documents/f/${adminFolder.id}`,
+  });
 
   await expect(page.getByRole('button', { name: 'Admin Only Folder' })).toBeVisible();
-  await page.getByRole('button', { name: 'Admin Only Folder' }).click();
-  await page.getByRole('button', { name: 'Move' }).click();
+  await expect(page.getByText('Admin Folder - Everyone Document')).toBeVisible();
+  await expect(page.getByText('Admin Folder - Manager Document')).toBeVisible();
+  await expect(page.getByText('Admin Folder - Admin Document')).toBeVisible();
+});
 
-  await page.waitForTimeout(3000);
-  await expect(page.getByText('[TEST] Admin Document')).toBeVisible();
+test('[TEAMS]: team owner can see all documents in manager folder', async ({ page }) => {
+  const { team } = await seedTeamDocuments();
 
-  await page.goto(`/t/${team.url}/documents`);
-  await expect(page.getByText('[TEST] Admin Document')).not.toBeVisible();
+  const managerFolder = await seedBlankFolder(team.owner, {
+    createFolderOptions: {
+      name: 'Manager Folder',
+      teamId: team.id,
+      visibility: DocumentVisibility.MANAGER_AND_ABOVE,
+    },
+  });
 
-  // Try to move manager document to admin folder
-  await page.goto(`/t/${team.url}/documents/f/${adminFolder.id}`);
-  const managerDocRow = page.getByRole('row', { name: /\[TEST\] Manager Document/ });
-  await managerDocRow.getByTestId('document-table-action-btn').click();
-  await page.getByRole('menuitem', { name: 'Move' }).click();
+  await seedBlankDocument(team.owner, {
+    createDocumentOptions: {
+      title: 'Manager Folder - Everyone Document',
+      folderId: managerFolder.id,
+      teamId: team.id,
+      visibility: DocumentVisibility.EVERYONE,
+    },
+  });
+
+  await seedBlankDocument(team.owner, {
+    createDocumentOptions: {
+      title: 'Manager Folder - Manager Document',
+      folderId: managerFolder.id,
+      teamId: team.id,
+      visibility: DocumentVisibility.MANAGER_AND_ABOVE,
+    },
+  });
+
+  await seedBlankDocument(team.owner, {
+    createDocumentOptions: {
+      title: 'Manager Folder - Admin Document',
+      folderId: managerFolder.id,
+      teamId: team.id,
+      visibility: DocumentVisibility.ADMIN,
+    },
+  });
+
+  await apiSignin({
+    page,
+    email: team.owner.email,
+    redirectPath: `/t/${team.url}/documents/f/${managerFolder.id}`,
+  });
+
+  await expect(page.getByRole('button', { name: 'Manager Folder' })).toBeVisible();
+  await expect(page.getByText('Manager Folder - Everyone Document')).toBeVisible();
+  await expect(page.getByText('Manager Folder - Manager Document')).toBeVisible();
+  await expect(page.getByText('Manager Folder - Admin Document')).toBeVisible();
+});
+
+test('[TEAMS]: team owner can see all documents in everyone folder', async ({ page }) => {
+  const { team } = await seedTeamDocuments();
+
+  const everyoneFolder = await seedBlankFolder(team.owner, {
+    createFolderOptions: {
+      name: 'Everyone Folder',
+      teamId: team.id,
+      visibility: DocumentVisibility.EVERYONE,
+    },
+  });
+
+  await seedBlankDocument(team.owner, {
+    createDocumentOptions: {
+      title: 'Everyone Folder - Everyone Document',
+      folderId: everyoneFolder.id,
+      teamId: team.id,
+      visibility: DocumentVisibility.EVERYONE,
+    },
+  });
+
+  await seedBlankDocument(team.owner, {
+    createDocumentOptions: {
+      title: 'Everyone Folder - Manager Document',
+      folderId: everyoneFolder.id,
+      teamId: team.id,
+      visibility: DocumentVisibility.MANAGER_AND_ABOVE,
+    },
+  });
+
+  await seedBlankDocument(team.owner, {
+    createDocumentOptions: {
+      title: 'Everyone Folder - Admin Document',
+      folderId: everyoneFolder.id,
+      teamId: team.id,
+      visibility: DocumentVisibility.ADMIN,
+    },
+  });
+
+  await apiSignin({
+    page,
+    email: team.owner.email,
+    redirectPath: `/t/${team.url}/documents/f/${everyoneFolder.id}`,
+  });
+
+  await expect(page.getByRole('button', { name: 'Everyone Folder' })).toBeVisible();
+  await expect(page.getByText('Everyone Folder - Everyone Document')).toBeVisible();
+  await expect(page.getByText('Everyone Folder - Manager Document')).toBeVisible();
+  await expect(page.getByText('Everyone Folder - Admin Document')).toBeVisible();
+});
+
+test('[TEAMS]: team admin can see all folders in folder list', async ({ page }) => {
+  const { team } = await seedTeamDocuments();
+
+  const teamAdmin = await seedTeamMember({
+    teamId: team.id,
+    name: 'Team Admin',
+    role: TeamMemberRole.ADMIN,
+  });
+
+  await seedBlankFolder(team.owner, {
+    createFolderOptions: {
+      name: 'Admin Only Folder',
+      teamId: team.id,
+      visibility: DocumentVisibility.ADMIN,
+    },
+  });
+
+  await seedBlankFolder(team.owner, {
+    createFolderOptions: {
+      name: 'Manager Folder',
+      teamId: team.id,
+      visibility: DocumentVisibility.MANAGER_AND_ABOVE,
+    },
+  });
+
+  await seedBlankFolder(team.owner, {
+    createFolderOptions: {
+      name: 'Everyone Folder',
+      teamId: team.id,
+      visibility: DocumentVisibility.EVERYONE,
+    },
+  });
+
+  await apiSignin({
+    page,
+    email: teamAdmin.email,
+    redirectPath: `/t/${team.url}/documents`,
+  });
+
+  await expect(page.getByText('Admin Only Folder')).toBeVisible();
+  await expect(page.getByText('Manager Folder')).toBeVisible();
+  await expect(page.getByText('Everyone Folder')).toBeVisible();
+});
+
+test('[TEAMS]: team admin can see all documents in admin folder', async ({ page }) => {
+  const { team } = await seedTeamDocuments();
+
+  const teamAdmin = await seedTeamMember({
+    teamId: team.id,
+    name: 'Team Admin',
+    role: TeamMemberRole.ADMIN,
+  });
+
+  const adminFolder = await seedBlankFolder(team.owner, {
+    createFolderOptions: {
+      name: 'Admin Only Folder',
+      teamId: team.id,
+      visibility: DocumentVisibility.ADMIN,
+    },
+  });
+
+  await seedBlankDocument(team.owner, {
+    createDocumentOptions: {
+      title: 'Admin Folder - Everyone Document',
+      folderId: adminFolder.id,
+      teamId: team.id,
+      visibility: DocumentVisibility.EVERYONE,
+    },
+  });
+
+  await seedBlankDocument(team.owner, {
+    createDocumentOptions: {
+      title: 'Admin Folder - Manager Document',
+      folderId: adminFolder.id,
+      teamId: team.id,
+      visibility: DocumentVisibility.MANAGER_AND_ABOVE,
+    },
+  });
+
+  await seedBlankDocument(team.owner, {
+    createDocumentOptions: {
+      title: 'Admin Folder - Admin Document',
+      folderId: adminFolder.id,
+      teamId: team.id,
+      visibility: DocumentVisibility.ADMIN,
+    },
+  });
+
+  await apiSignin({
+    page,
+    email: teamAdmin.email,
+    redirectPath: `/t/${team.url}/documents/f/${adminFolder.id}`,
+  });
 
   await expect(page.getByRole('button', { name: 'Admin Only Folder' })).toBeVisible();
-  await page.getByRole('button', { name: 'Admin Only Folder' }).click();
-  await page.getByRole('button', { name: 'Move' }).click();
+  await expect(page.getByText('Admin Folder - Everyone Document')).toBeVisible();
+  await expect(page.getByText('Admin Folder - Manager Document')).toBeVisible();
+  await expect(page.getByText('Admin Folder - Admin Document')).toBeVisible();
+});
 
-  await page.waitForTimeout(3000);
-  await expect(page.getByText('[TEST] Manager Document')).toBeVisible();
+test('[TEAMS]: team admin can see all documents in manager folder', async ({ page }) => {
+  const { team } = await seedTeamDocuments();
 
-  await page.goto(`/t/${team.url}/documents`);
-  await expect(page.getByText('[TEST] Manager Document')).not.toBeVisible();
+  const teamAdmin = await seedTeamMember({
+    teamId: team.id,
+    name: 'Team Admin',
+    role: TeamMemberRole.ADMIN,
+  });
 
-  // Try to move everyone document to admin folder
-  await page.goto(`/t/${team.url}/documents/f/${adminFolder.id}`);
-  const everyoneDocRow = page.getByRole('row', { name: /\[TEST\] Everyone Document/ });
-  await everyoneDocRow.getByTestId('document-table-action-btn').click();
-  await page.getByRole('menuitem', { name: 'Move' }).click();
+  const managerFolder = await seedBlankFolder(team.owner, {
+    createFolderOptions: {
+      name: 'Manager Folder',
+      teamId: team.id,
+      visibility: DocumentVisibility.MANAGER_AND_ABOVE,
+    },
+  });
 
-  await expect(page.getByRole('button', { name: 'Admin Only Folder' })).toBeVisible();
-  await page.getByRole('button', { name: 'Admin Only Folder' }).click();
-  await page.getByRole('button', { name: 'Move' }).click();
+  await seedBlankDocument(team.owner, {
+    createDocumentOptions: {
+      title: 'Manager Folder - Everyone Document',
+      folderId: managerFolder.id,
+      teamId: team.id,
+      visibility: DocumentVisibility.EVERYONE,
+    },
+  });
 
-  await page.waitForTimeout(3000);
-  await expect(page.getByText('[TEST] Everyone Document')).toBeVisible();
+  await seedBlankDocument(team.owner, {
+    createDocumentOptions: {
+      title: 'Manager Folder - Manager Document',
+      folderId: managerFolder.id,
+      teamId: team.id,
+      visibility: DocumentVisibility.MANAGER_AND_ABOVE,
+    },
+  });
 
-  await page.goto(`/t/${team.url}/documents`);
-  await expect(page.getByText('[TEST] Everyone Document')).not.toBeVisible();
+  await seedBlankDocument(team.owner, {
+    createDocumentOptions: {
+      title: 'Manager Folder - Admin Document',
+      folderId: managerFolder.id,
+      teamId: team.id,
+      visibility: DocumentVisibility.ADMIN,
+    },
+  });
+
+  await apiSignin({
+    page,
+    email: teamAdmin.email,
+    redirectPath: `/t/${team.url}/documents/f/${managerFolder.id}`,
+  });
+
+  await expect(page.getByRole('button', { name: 'Manager Folder' })).toBeVisible();
+  await expect(page.getByText('Manager Folder - Everyone Document')).toBeVisible();
+  await expect(page.getByText('Manager Folder - Manager Document')).toBeVisible();
+  await expect(page.getByText('Manager Folder - Admin Document')).toBeVisible();
+});
+
+test('[TEAMS]: team admin can see all documents in everyone folder', async ({ page }) => {
+  const { team } = await seedTeamDocuments();
+
+  const teamAdmin = await seedTeamMember({
+    teamId: team.id,
+    name: 'Team Admin',
+    role: TeamMemberRole.ADMIN,
+  });
+
+  const everyoneFolder = await seedBlankFolder(team.owner, {
+    createFolderOptions: {
+      name: 'Everyone Folder',
+      teamId: team.id,
+      visibility: DocumentVisibility.EVERYONE,
+    },
+  });
+
+  await seedBlankDocument(team.owner, {
+    createDocumentOptions: {
+      title: 'Everyone Folder - Everyone Document',
+      folderId: everyoneFolder.id,
+      teamId: team.id,
+      visibility: DocumentVisibility.EVERYONE,
+    },
+  });
+
+  await seedBlankDocument(team.owner, {
+    createDocumentOptions: {
+      title: 'Everyone Folder - Manager Document',
+      folderId: everyoneFolder.id,
+      teamId: team.id,
+      visibility: DocumentVisibility.MANAGER_AND_ABOVE,
+    },
+  });
+
+  await seedBlankDocument(team.owner, {
+    createDocumentOptions: {
+      title: 'Everyone Folder - Admin Document',
+      folderId: everyoneFolder.id,
+      teamId: team.id,
+      visibility: DocumentVisibility.ADMIN,
+    },
+  });
+
+  await apiSignin({
+    page,
+    email: teamAdmin.email,
+    redirectPath: `/t/${team.url}/documents/f/${everyoneFolder.id}`,
+  });
+
+  await expect(page.getByRole('button', { name: 'Everyone Folder' })).toBeVisible();
+  await expect(page.getByText('Everyone Folder - Everyone Document')).toBeVisible();
+  await expect(page.getByText('Everyone Folder - Manager Document')).toBeVisible();
+  await expect(page.getByText('Everyone Folder - Admin Document')).toBeVisible();
 });
