@@ -8,14 +8,11 @@ import type { Field, Recipient } from '@prisma/client';
 import { FieldType, RecipientRole, SendStatus } from '@prisma/client';
 import {
   CalendarDays,
-  Check,
   CheckSquare,
   ChevronDown,
-  ChevronsUpDown,
   Contact,
   Disc,
   Hash,
-  Info,
   Mail,
   Type,
   User,
@@ -27,7 +24,6 @@ import { prop, sortBy } from 'remeda';
 import { getBoundingClientRect } from '@documenso/lib/client-only/get-bounding-client-rect';
 import { useDocumentElement } from '@documenso/lib/client-only/hooks/use-document-element';
 import { PDF_VIEWER_PAGE_SELECTOR } from '@documenso/lib/constants/pdf-viewer';
-import { RECIPIENT_ROLES_DESCRIPTION } from '@documenso/lib/constants/recipient-roles';
 import {
   type TFieldMetaSchema as FieldMeta,
   ZFieldMetaSchema,
@@ -42,16 +38,13 @@ import {
 } from '@documenso/lib/utils/recipients';
 
 import { FieldToolTip } from '../../components/field/field-tooltip';
-import { getSignerColorStyles, useSignerColors } from '../../lib/signer-colors';
+import { useSignerColors } from '../../lib/signer-colors';
 import { cn } from '../../lib/utils';
 import { Alert, AlertDescription } from '../alert';
-import { Button } from '../button';
 import { Card, CardContent } from '../card';
-import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem } from '../command';
 import { Form } from '../form/form';
-import { Popover, PopoverContent, PopoverTrigger } from '../popover';
+import { RecipientSelector } from '../recipient-selector';
 import { useStep } from '../stepper';
-import { Tooltip, TooltipContent, TooltipTrigger } from '../tooltip';
 import { useToast } from '../use-toast';
 import type { TAddFieldsFormSchema } from './add-fields.types';
 import {
@@ -663,123 +656,12 @@ export const AddFieldsFormPartial = ({
                 })}
 
               {!hideRecipients && (
-                <Popover open={showRecipientsSelector} onOpenChange={setShowRecipientsSelector}>
-                  <PopoverTrigger asChild>
-                    <Button
-                      type="button"
-                      variant="outline"
-                      role="combobox"
-                      className={cn(
-                        'bg-background text-muted-foreground hover:text-foreground mb-12 mt-2 justify-between font-normal',
-                        selectedSignerStyles.default.base,
-                      )}
-                    >
-                      {selectedSigner?.email && (
-                        <span className="flex-1 truncate text-left">
-                          {selectedSigner?.name} ({selectedSigner?.email})
-                        </span>
-                      )}
-
-                      {!selectedSigner?.email && (
-                        <span className="flex-1 truncate text-left">{selectedSigner?.email}</span>
-                      )}
-
-                      <ChevronsUpDown className="ml-2 h-4 w-4" />
-                    </Button>
-                  </PopoverTrigger>
-
-                  <PopoverContent className="p-0" align="start">
-                    <Command value={selectedSigner?.email}>
-                      <CommandInput />
-
-                      <CommandEmpty>
-                        <span className="text-muted-foreground inline-block px-4">
-                          <Trans>No recipient matching this description was found.</Trans>
-                        </span>
-                      </CommandEmpty>
-
-                      {recipientsByRoleToDisplay.map(([role, roleRecipients], roleIndex) => (
-                        <CommandGroup key={roleIndex}>
-                          <div className="text-muted-foreground mb-1 ml-2 mt-2 text-xs font-medium">
-                            {_(RECIPIENT_ROLES_DESCRIPTION[role].roleNamePlural)}
-                          </div>
-
-                          {roleRecipients.length === 0 && (
-                            <div
-                              key={`${role}-empty`}
-                              className="text-muted-foreground/80 px-4 pb-4 pt-2.5 text-center text-xs"
-                            >
-                              <Trans>No recipients with this role</Trans>
-                            </div>
-                          )}
-
-                          {roleRecipients.map((recipient) => (
-                            <CommandItem
-                              key={recipient.id}
-                              className={cn(
-                                'px-2 last:mb-1 [&:not(:first-child)]:mt-1',
-                                getSignerColorStyles(
-                                  Math.max(
-                                    recipients.findIndex((r) => r.id === recipient.id),
-                                    0,
-                                  ),
-                                ).default.comboxBoxItem,
-                                {
-                                  'text-muted-foreground': recipient.sendStatus === SendStatus.SENT,
-                                },
-                              )}
-                              onSelect={() => {
-                                setSelectedSigner(recipient);
-                                setShowRecipientsSelector(false);
-                              }}
-                            >
-                              <span
-                                className={cn('text-foreground/70 truncate', {
-                                  'text-foreground/80': recipient === selectedSigner,
-                                })}
-                              >
-                                {recipient.name && (
-                                  <span title={`${recipient.name} (${recipient.email})`}>
-                                    {recipient.name} ({recipient.email})
-                                  </span>
-                                )}
-
-                                {!recipient.name && (
-                                  <span title={recipient.email}>{recipient.email}</span>
-                                )}
-                              </span>
-
-                              <div className="ml-auto flex items-center justify-center">
-                                {recipient.sendStatus !== SendStatus.SENT ? (
-                                  <Check
-                                    aria-hidden={recipient !== selectedSigner}
-                                    className={cn('h-4 w-4 flex-shrink-0', {
-                                      'opacity-0': recipient !== selectedSigner,
-                                      'opacity-100': recipient === selectedSigner,
-                                    })}
-                                  />
-                                ) : (
-                                  <Tooltip>
-                                    <TooltipTrigger>
-                                      <Info className="ml-2 h-4 w-4" />
-                                    </TooltipTrigger>
-
-                                    <TooltipContent className="text-muted-foreground max-w-xs">
-                                      <Trans>
-                                        This document has already been sent to this recipient. You
-                                        can no longer edit this recipient.
-                                      </Trans>
-                                    </TooltipContent>
-                                  </Tooltip>
-                                )}
-                              </div>
-                            </CommandItem>
-                          ))}
-                        </CommandGroup>
-                      ))}
-                    </Command>
-                  </PopoverContent>
-                </Popover>
+                <RecipientSelector
+                  selectedRecipient={selectedSigner}
+                  onSelectedRecipientChange={setSelectedSigner}
+                  recipients={recipients}
+                  className="mb-12 mt-2"
+                />
               )}
 
               <Form {...form}>
