@@ -8,6 +8,7 @@ import { isUserEnterprise } from '@documenso/ee/server-only/util/is-document-ent
 import { isDocumentPlatform } from '@documenso/ee/server-only/util/is-document-platform';
 import { IS_BILLING_ENABLED } from '@documenso/lib/constants/app';
 import { getDocumentAndSenderByToken } from '@documenso/lib/server-only/document/get-document-by-token';
+import { getCompletedFieldsForToken } from '@documenso/lib/server-only/field/get-completed-fields-for-token';
 import { getFieldsForToken } from '@documenso/lib/server-only/field/get-fields-for-token';
 import { getIsRecipientsTurnToSign } from '@documenso/lib/server-only/recipient/get-is-recipient-turn';
 import { getRecipientByToken } from '@documenso/lib/server-only/recipient/get-recipient-by-token';
@@ -33,7 +34,7 @@ export async function loader({ params, request }: Route.LoaderArgs) {
 
   const { user } = await getOptionalSession(request);
 
-  const [document, fields, recipient] = await Promise.all([
+  const [document, fields, recipient, completedFields] = await Promise.all([
     getDocumentAndSenderByToken({
       token,
       userId: user?.id,
@@ -41,6 +42,7 @@ export async function loader({ params, request }: Route.LoaderArgs) {
     }).catch(() => null),
     getFieldsForToken({ token }),
     getRecipientByToken({ token }).catch(() => null),
+    getCompletedFieldsForToken({ token }).catch(() => []),
   ]);
 
   // `document.directLink` is always available but we're doing this to
@@ -130,6 +132,7 @@ export async function loader({ params, request }: Route.LoaderArgs) {
     allRecipients,
     recipient,
     fields,
+    completedFields,
     hidePoweredBy,
     isPlatformDocument,
     isEnterpriseDocument,
@@ -145,6 +148,7 @@ export default function EmbedSignDocumentPage() {
     allRecipients,
     recipient,
     fields,
+    completedFields,
     hidePoweredBy,
     isPlatformDocument,
     isEnterpriseDocument,
@@ -171,6 +175,7 @@ export default function EmbedSignDocumentPage() {
           documentData={document.documentData}
           recipient={recipient}
           fields={fields}
+          completedFields={completedFields}
           metadata={document.documentMeta}
           isCompleted={isDocumentCompleted(document.status)}
           hidePoweredBy={

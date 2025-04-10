@@ -2,7 +2,7 @@ import { useState } from 'react';
 
 import { useLingui } from '@lingui/react';
 import { Trans } from '@lingui/react/macro';
-import type { DocumentMeta } from '@prisma/client';
+import type { DocumentMeta, TemplateMeta } from '@prisma/client';
 import { FieldType, SigningStatus } from '@prisma/client';
 import { Clock, EyeOffIcon } from 'lucide-react';
 import { P, match } from 'ts-pattern';
@@ -27,7 +27,7 @@ import { PopoverHover } from '@documenso/ui/primitives/popover';
 
 export type DocumentReadOnlyFieldsProps = {
   fields: DocumentField[];
-  documentMeta?: DocumentMeta;
+  documentMeta?: DocumentMeta | TemplateMeta;
   showFieldStatus?: boolean;
 };
 
