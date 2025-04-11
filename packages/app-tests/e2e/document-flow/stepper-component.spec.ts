@@ -644,7 +644,7 @@ test('[DOCUMENT_FLOW]: should prevent out-of-order signing in sequential mode', 
 }) => {
   const user = await seedUser();
 
-  const { document, recipients } = await seedPendingDocumentWithFullFields({
+  const { recipients } = await seedPendingDocumentWithFullFields({
     owner: user,
     recipients: ['user1@example.com', 'user2@example.com', 'user3@example.com'],
     fields: [FieldType.SIGNATURE],

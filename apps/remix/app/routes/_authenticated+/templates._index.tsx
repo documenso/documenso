@@ -103,6 +103,10 @@ export default function TemplatesPage() {
     setIsDeletingFolder(true);
   };
 
+  const handleViewAllFolders = () => {
+    void navigate(`${formatTemplatesPath(team?.url)}/folders`);
+  };
+
   return (
     <div className="mx-auto max-w-screen-xl px-4 md:px-8">
       <div className="flex items-baseline justify-between">
@@ -182,12 +186,23 @@ export default function TemplatesPage() {
           )}
 
           <div className="mt-6">
-            <h3 className="text-muted-background/60 dark:text-muted-foreground/60 mb-4 text-sm font-medium">
-              Folders
-            </h3>
+            <div className="flex items-center justify-between">
+              <h3 className="text-muted-background/60 dark:text-muted-foreground/60 mb-4 text-sm font-medium">
+                Folders
+              </h3>
+              <Button
+                variant="ghost"
+                size="sm"
+                className="text-muted-foreground hover:text-foreground"
+                onClick={() => void handleViewAllFolders()}
+              >
+                View all folders
+              </Button>
+            </div>
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
               {foldersData?.folders
-                .filter((folder) => !folder.pinned)
+                ?.filter((folder) => !folder.pinned)
+                .slice(0, 12)
                 .map((folder) => (
                   <FolderCard
                     key={folder.id}
