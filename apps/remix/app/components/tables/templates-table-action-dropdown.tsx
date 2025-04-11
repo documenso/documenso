@@ -69,9 +69,11 @@ export const TemplatesTableActionDropdown = ({
     ? `${templateRootPath}/f/${row.folderId}/${row.id}/edit`
     : `${templateRootPath}/${row.id}/edit`;
 
+  console.log('row', row);
+
   return (
     <DropdownMenu>
-      <DropdownMenuTrigger>
+      <DropdownMenuTrigger data-testid="template-table-action-btn">
         <MoreHorizontal className="text-muted-foreground h-5 w-5" />
       </DropdownMenuTrigger>
 
@@ -100,7 +102,7 @@ export const TemplatesTableActionDropdown = ({
 
         <DropdownMenuItem onClick={() => setMoveToFolderDialogOpen(true)}>
           <FolderIcon className="mr-2 h-4 w-4" />
-          <Trans>Move to folder</Trans>
+          <Trans>Move to Folder</Trans>
         </DropdownMenuItem>
 
         {!teamId && !row.teamId && (

@@ -11,78 +11,75 @@ export interface MoveFolderOptions {
 }
 
 export const moveFolder = async ({ userId, teamId, folderId, parentId }: MoveFolderOptions) => {
-  const folder = await prisma.folder.findFirst({
-    where: {
-      id: folderId,
-      userId,
-      teamId,
-    },
-  });
-
-  if (!folder) {
-    throw new AppError(AppErrorCode.NOT_FOUND, {
-      message: 'Folder not found',
-    });
-  }
-
-  // Prevent moving a folder into itself or its descendants
-  if (parentId) {
-    // Check if the target parent folder exists and belongs to the user/team
-    const parentFolder = await prisma.folder.findFirst({
+  return await prisma.$transaction(async (tx) => {
+    const folder = await tx.folder.findFirst({
       where: {
-        id: parentId,
+        id: folderId,
         userId,
         teamId,
-        type: folder.type, // Ensure parent folder is of the same type
       },
     });
 
-    if (!parentFolder) {
+    if (!folder) {
       throw new AppError(AppErrorCode.NOT_FOUND, {
-        message: 'Parent folder not found',
+        message: 'Folder not found',
       });
     }
 
-    // Check if the target parent is the folder itself
-    if (parentId === folderId) {
-      throw new AppError(AppErrorCode.INVALID_REQUEST, {
-        message: 'Cannot move a folder into itself',
+    if (parentId) {
+      const parentFolder = await tx.folder.findFirst({
+        where: {
+          id: parentId,
+          userId,
+          teamId,
+          type: folder.type,
+        },
       });
-    }
 
-    // Check if the target parent is a descendant of the folder
-    let currentParentId = parentFolder.parentId;
-    while (currentParentId) {
-      if (currentParentId === folderId) {
-        throw new AppError(AppErrorCode.INVALID_REQUEST, {
-          message: 'Cannot move a folder into its descendant',
+      if (!parentFolder) {
+        throw new AppError(AppErrorCode.NOT_FOUND, {
+          message: 'Parent folder not found',
         });
       }
 
-      const currentParent = await prisma.folder.findUnique({
-        where: {
-          id: currentParentId,
-        },
-        select: {
-          parentId: true,
-        },
-      });
-
-      if (!currentParent) {
-        break;
+      if (parentId === folderId) {
+        throw new AppError(AppErrorCode.INVALID_REQUEST, {
+          message: 'Cannot move a folder into itself',
+        });
       }
 
-      currentParentId = currentParent.parentId;
-    }
-  }
+      let currentParentId = parentFolder.parentId;
+      while (currentParentId) {
+        if (currentParentId === folderId) {
+          throw new AppError(AppErrorCode.INVALID_REQUEST, {
+            message: 'Cannot move a folder into its descendant',
+          });
+        }
 
-  // Move the folder
-  return await prisma.folder.update({
-    where: {
-      id: folderId,
-    },
-    data: {
-      parentId,
-    },
+        const currentParent = await tx.folder.findUnique({
+          where: {
+            id: currentParentId,
+          },
+          select: {
+            parentId: true,
+          },
+        });
+
+        if (!currentParent) {
+          break;
+        }
+
+        currentParentId = currentParent.parentId;
+      }
+    }
+
+    return await tx.folder.update({
+      where: {
+        id: folderId,
+      },
+      data: {
+        parentId,
+      },
+    });
   });
 };

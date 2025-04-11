@@ -72,7 +72,7 @@ export const ZDeleteFolderSchema = z.object({
 
 export const ZMoveFolderSchema = z.object({
   id: z.string(),
-  parentId: z.string().optional(),
+  parentId: z.string().nullable(),
   type: ZFolderTypeSchema.optional(),
 });
 

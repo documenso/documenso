@@ -78,6 +78,7 @@ export const CreateFolderDialog = ({ trigger, ...props }: CreateFolderDialogProp
       });
 
       const documentsPath = formatDocumentsPath(team?.url);
+
       void navigate(`${documentsPath}/f/${newFolder.id}`);
     } catch (err) {
       const error = AppError.parseError(err);

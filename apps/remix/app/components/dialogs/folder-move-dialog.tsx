@@ -37,7 +37,7 @@ export type FolderMoveDialogProps = {
 } & Omit<DialogPrimitive.DialogProps, 'children'>;
 
 const ZMoveFolderFormSchema = z.object({
-  targetFolderId: z.string().optional(),
+  targetFolderId: z.string().nullable(),
 });
 
 type TMoveFolderFormSchema = z.infer<typeof ZMoveFolderFormSchema>;
@@ -56,7 +56,7 @@ export const FolderMoveDialog = ({
   const form = useForm<TMoveFolderFormSchema>({
     resolver: zodResolver(ZMoveFolderFormSchema),
     defaultValues: {
-      targetFolderId: folder?.parentId ?? '',
+      targetFolderId: folder?.parentId ?? null,
     },
   });
 
@@ -66,7 +66,7 @@ export const FolderMoveDialog = ({
     try {
       await moveFolder({
         id: folder.id,
-        parentId: targetFolderId ?? '',
+        parentId: targetFolderId || null,
       });
 
       onOpenChange(false);
@@ -127,7 +127,7 @@ export const FolderMoveDialog = ({
                         variant={!field.value ? 'default' : 'outline'}
                         className="w-full justify-start"
                         disabled={!folder?.parentId}
-                        onClick={() => field.onChange(undefined)}
+                        onClick={() => field.onChange(null)}
                       >
                         <HomeIcon className="mr-2 h-4 w-4" />
                         Root

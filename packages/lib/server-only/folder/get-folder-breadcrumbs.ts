@@ -84,7 +84,6 @@ export const getFolderBreadcrumbs = async ({
   const breadcrumbs = [];
   let currentFolderId = folderId;
 
-  // Fetch the current folder first
   const currentFolder = await prisma.folder.findFirst({
     where: whereClause(currentFolderId),
   });
@@ -95,7 +94,6 @@ export const getFolderBreadcrumbs = async ({
 
   breadcrumbs.push(currentFolder);
 
-  // Fetch parent folders recursively
   while (currentFolder?.parentId) {
     const parentFolder = await prisma.folder.findFirst({
       where: whereClause(currentFolder.parentId),

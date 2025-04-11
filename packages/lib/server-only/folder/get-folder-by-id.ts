@@ -42,7 +42,6 @@ export const getFolderById = async ({ userId, teamId, folderId, type }: GetFolde
 
       teamMemberRole = team.members[0].role;
     } catch (error) {
-      console.error('Error finding team:', error);
       throw new AppError(AppErrorCode.NOT_FOUND, {
         message: 'Team not found',
       });
