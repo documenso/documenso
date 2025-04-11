@@ -10,6 +10,7 @@ import { APP_DOCUMENT_UPLOAD_SIZE_LIMIT, IS_BILLING_ENABLED } from '@documenso/l
 import { megabytesToBytes } from '@documenso/lib/universal/unit-convertions';
 
 import { Button } from './button';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from './tooltip';
 
 export type DocumentDropzoneProps = {
   className?: string;
@@ -52,27 +53,35 @@ export const DocumentDropzone = ({
   });
 
   const heading = {
-    document: disabled ? msg`You have reached your document limit.` : msg`Add a document`,
+    document: msg`Add a document`,
     template: msg`Upload Template Document`,
   };
 
+  if (disabled && IS_BILLING_ENABLED()) {
+    return (
+      <TooltipProvider>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Button className="hover:bg-warning/80 bg-warning" asChild>
+              <Link to="/settings/billing">
+                <Trans>Upgrade</Trans>
+              </Link>
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent>
+            <p className="text-sm">{_(disabledMessage)}</p>
+          </TooltipContent>
+        </Tooltip>
+      </TooltipProvider>
+    );
+  }
+
   return (
     <Button aria-disabled={disabled} {...getRootProps()} {...props}>
-      <div className="text-muted-foreground/40 flex flex-col items-center justify-center">
+      <div className="flex items-center gap-2">
         <input {...getInputProps()} />
-
-        <p className="dark:text-background text-foreground flex items-center gap-2 font-medium">
-          <FileText className="h-4 w-4" />
-          {disabled ? _(disabledMessage) : _(heading[type])}
-        </p>
-
-        {disabled && IS_BILLING_ENABLED() && (
-          <Button className="hover:bg-warning/80 bg-warning mt-4 w-32" asChild>
-            <Link to="/settings/billing">
-              <Trans>Upgrade</Trans>
-            </Link>
-          </Button>
-        )}
+        <FileText className="h-4 w-4" />
+        {disabled ? _(disabledMessage) : _(heading[type])}
       </div>
     </Button>
   );

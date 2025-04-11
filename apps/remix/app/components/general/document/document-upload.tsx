@@ -18,6 +18,12 @@ import { formatDocumentsPath } from '@documenso/lib/utils/teams';
 import { trpc } from '@documenso/trpc/react';
 import { cn } from '@documenso/ui/lib/utils';
 import { DocumentDropzone } from '@documenso/ui/primitives/document-upload';
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from '@documenso/ui/primitives/tooltip';
 import { useToast } from '@documenso/ui/primitives/use-toast';
 
 import { useOptionalCurrentTeam } from '~/providers/team';
@@ -127,24 +133,31 @@ export const DocumentUploadDropzone = ({ className }: DocumentUploadDropzoneProp
 
   return (
     <div className={cn('relative', className)}>
-      <DocumentDropzone
-        disabled={remaining.documents === 0 || !user.emailVerified}
-        disabledMessage={disabledMessage}
-        onDrop={onFileDrop}
-        onDropRejected={onFileDropRejected}
-      />
-
-      <div className="absolute -bottom-6 right-0">
-        {team?.id === undefined &&
-          remaining.documents > 0 &&
-          Number.isFinite(remaining.documents) && (
-            <p className="text-muted-foreground/60 text-xs">
-              <Trans>
-                {remaining.documents} of {quota.documents} documents remaining this month.
-              </Trans>
-            </p>
-          )}
-      </div>
+      <TooltipProvider>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <div>
+              <DocumentDropzone
+                disabled={remaining.documents === 0 || !user.emailVerified}
+                disabledMessage={disabledMessage}
+                onDrop={onFileDrop}
+                onDropRejected={onFileDropRejected}
+              />
+            </div>
+          </TooltipTrigger>
+          {team?.id === undefined &&
+            remaining.documents > 0 &&
+            Number.isFinite(remaining.documents) && (
+              <TooltipContent>
+                <p className="text-sm">
+                  <Trans>
+                    {remaining.documents} of {quota.documents} documents remaining this month.
+                  </Trans>
+                </p>
+              </TooltipContent>
+            )}
+        </Tooltip>
+      </TooltipProvider>
 
       {isLoading && (
         <div className="bg-background/50 absolute inset-0 flex items-center justify-center rounded-lg">
