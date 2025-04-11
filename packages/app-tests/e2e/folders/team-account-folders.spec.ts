@@ -824,7 +824,7 @@ test('[TEAMS]: documents inherit folder visibility', async ({ page }) => {
 
   await page.getByText('Admin Only Folder').click();
 
-  const fileInput = page.locator('input[type="file"]');
+  const fileInput = page.locator('input[type="file"]').nth(1);
   await fileInput.waitFor({ state: 'attached' });
 
   await fileInput.setInputFiles(

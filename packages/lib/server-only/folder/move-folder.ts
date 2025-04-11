@@ -6,7 +6,7 @@ export interface MoveFolderOptions {
   userId: number;
   teamId?: number;
   folderId?: string;
-  parentId?: string;
+  parentId?: string | null;
   requestMetadata?: ApiRequestMetadata;
 }
 
