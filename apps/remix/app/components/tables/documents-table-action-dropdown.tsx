@@ -47,10 +47,15 @@ export type DocumentsTableActionDropdownProps = {
     user: Pick<User, 'id' | 'name' | 'email'>;
     recipients: Recipient[];
     team: Pick<Team, 'id' | 'url'> | null;
+    folderId?: string | null;
   };
+  onMoveDocument?: () => void;
 };
 
-export const DocumentsTableActionDropdown = ({ row }: DocumentsTableActionDropdownProps) => {
+export const DocumentsTableActionDropdown = ({
+  row,
+  onMoveDocument,
+}: DocumentsTableActionDropdownProps) => {
   const { user } = useSession();
   const team = useOptionalCurrentTeam();
 
@@ -73,6 +78,9 @@ export const DocumentsTableActionDropdown = ({ row }: DocumentsTableActionDropdo
   const canManageDocument = Boolean(isOwner || isCurrentTeamDocument);
 
   const documentsPath = formatDocumentsPath(team?.url);
+  const formatPath = row.folderId
+    ? `${documentsPath}/f/${row.folderId}/${row.id}/edit`
+    : `${documentsPath}/${row.id}/edit`;
 
   const onDownloadClick = async () => {
     try {
@@ -141,7 +149,7 @@ export const DocumentsTableActionDropdown = ({ row }: DocumentsTableActionDropdo
         )}
 
         <DropdownMenuItem disabled={!canManageDocument || isComplete} asChild>
-          <Link to={`${documentsPath}/${row.id}/edit`}>
+          <Link to={formatPath}>
             <Edit className="mr-2 h-4 w-4" />
             <Trans>Edit</Trans>
           </Link>
@@ -162,6 +170,13 @@ export const DocumentsTableActionDropdown = ({ row }: DocumentsTableActionDropdo
           <DropdownMenuItem onClick={() => setMoveDialogOpen(true)}>
             <MoveRight className="mr-2 h-4 w-4" />
             <Trans>Move to Team</Trans>
+          </DropdownMenuItem>
+        )}
+
+        {onMoveDocument && (
+          <DropdownMenuItem onClick={onMoveDocument} onSelect={(e) => e.preventDefault()}>
+            <MoveRight className="mr-2 h-4 w-4" />
+            <Trans>Move to Folder</Trans>
           </DropdownMenuItem>
         )}
 

@@ -7,12 +7,14 @@ export type GetDocumentWithDetailsByIdOptions = {
   documentId: number;
   userId: number;
   teamId?: number;
+  folderId?: string;
 };
 
 export const getDocumentWithDetailsById = async ({
   documentId,
   userId,
   teamId,
+  folderId,
 }: GetDocumentWithDetailsByIdOptions) => {
   const documentWhereInput = await getDocumentWhereInput({
     documentId,
@@ -21,12 +23,16 @@ export const getDocumentWithDetailsById = async ({
   });
 
   const document = await prisma.document.findFirst({
-    where: documentWhereInput,
+    where: {
+      ...documentWhereInput,
+      folderId,
+    },
     include: {
       documentData: true,
       documentMeta: true,
       recipients: true,
       fields: true,
+      folder: true,
     },
   });
 

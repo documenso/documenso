@@ -56,6 +56,7 @@ model User {
   accounts             Account[]
   sessions             Session[]
   documents            Document[]
+  folders              Folder[]
   subscriptions        Subscription[]
   passwordResetTokens  PasswordResetToken[]
   ownedTeams           Team[]
@@ -312,6 +313,35 @@ enum DocumentVisibility {
   ADMIN
 }
 
+enum FolderType {
+  DOCUMENT
+  TEMPLATE
+}
+
+model Folder {
+  id         String             @id @default(cuid())
+  name       String
+  userId     Int
+  user       User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+  teamId     Int?
+  team       Team?              @relation(fields: [teamId], references: [id], onDelete: Cascade)
+  pinned     Boolean            @default(false)
+  parentId   String?
+  parent     Folder?            @relation("FolderToFolder", fields: [parentId], references: [id], onDelete: Cascade)
+  documents  Document[]
+  templates  Template[]
+  createdAt  DateTime           @default(now())
+  updatedAt  DateTime           @default(now()) @updatedAt
+  subfolders Folder[]           @relation("FolderToFolder")
+  visibility DocumentVisibility @default(EVERYONE)
+  type       FolderType
+
+  @@index([userId])
+  @@index([teamId])
+  @@index([parentId])
+  @@index([type])
+}
+
 /// @zod.import(["import { ZDocumentAuthOptionsSchema } from '@documenso/lib/types/document-auth';", "import { ZDocumentFormValuesSchema } from '@documenso/lib/types/document-form-values';"])
 model Document {
   id             Int                 @id @default(autoincrement())
@@ -340,10 +370,13 @@ model Document {
   source         DocumentSource
 
   auditLogs DocumentAuditLog[]
+  folder    Folder?            @relation(fields: [folderId], references: [id], onDelete: Cascade)
+  folderId  String?
 
   @@unique([documentDataId])
   @@index([userId])
   @@index([status])
+  @@index([folderId])
 }
 
 model DocumentAuditLog {
@@ -587,6 +620,7 @@ model Team {
 
   documents Document[]
   templates Template[]
+  folders   Folder[]
   apiTokens ApiToken[]
   webhooks  Webhook[]
 }
@@ -712,6 +746,8 @@ model Template {
   fields               Field[]
   directLink           TemplateDirectLink?
   documents            Document[]
+  folder               Folder?             @relation(fields: [folderId], references: [id], onDelete: Cascade)
+  folderId             String?
 
   @@unique([templateDocumentDataId])
 }
