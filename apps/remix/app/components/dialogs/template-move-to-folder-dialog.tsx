@@ -79,8 +79,6 @@ export function TemplateMoveToFolderDialog({
     },
   );
 
-  console.log('folders', folders);
-
   const { mutateAsync: moveTemplateToFolder } = trpc.folder.moveTemplateToFolder.useMutation();
 
   useEffect(() => {

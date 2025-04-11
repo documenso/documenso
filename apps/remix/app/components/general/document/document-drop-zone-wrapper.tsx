@@ -6,13 +6,13 @@ import { Trans } from '@lingui/react/macro';
 import { motion } from 'framer-motion';
 import { Loader, Plus } from 'lucide-react';
 import { useDropzone } from 'react-dropzone';
-import { useNavigate, useParams } from 'react-router';
+import { Link, useNavigate, useParams } from 'react-router';
 import { match } from 'ts-pattern';
 
 import { useLimits } from '@documenso/ee/server-only/limits/provider/client';
 import { useAnalytics } from '@documenso/lib/client-only/hooks/use-analytics';
 import { useSession } from '@documenso/lib/client-only/providers/session';
-import { APP_DOCUMENT_UPLOAD_SIZE_LIMIT } from '@documenso/lib/constants/app';
+import { APP_DOCUMENT_UPLOAD_SIZE_LIMIT, IS_BILLING_ENABLED } from '@documenso/lib/constants/app';
 import { DEFAULT_DOCUMENT_TIME_ZONE, TIME_ZONES } from '@documenso/lib/constants/time-zones';
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import { megabytesToBytes } from '@documenso/lib/universal/unit-convertions';
@@ -59,6 +59,11 @@ export const DocumentDropZoneWrapper = ({ children, className }: DocumentDropZon
   const isUploadDisabled = remaining.documents === 0 || !user.emailVerified;
 
   const onFileDrop = async (file: File) => {
+    if (isUploadDisabled && IS_BILLING_ENABLED()) {
+      await navigate('/settings/billing');
+      return;
+    }
+
     try {
       setIsLoading(true);
 
@@ -127,7 +132,7 @@ export const DocumentDropZoneWrapper = ({ children, className }: DocumentDropZon
     accept: {
       'application/pdf': ['.pdf'],
     },
-    disabled: isUploadDisabled,
+    //disabled: isUploadDisabled,
     multiple: false,
     maxSize: megabytesToBytes(APP_DOCUMENT_UPLOAD_SIZE_LIMIT),
     onDrop: ([acceptedFile]) => {
@@ -179,11 +184,32 @@ export const DocumentDropZoneWrapper = ({ children, className }: DocumentDropZon
                   </div>
 
                   <p className="text-foreground mt-8 font-medium">
-                    <Trans>Drop your PDF file here</Trans>
+                    <Trans>Add a document</Trans>
                   </p>
-                  <p className="text-muted-foreground/80 mt-1 text-center text-sm">
-                    <Trans>Drag & drop your PDF here.</Trans>
+
+                  <p className="text-muted-foreground/60 mt-4 text-sm">
+                    <Trans>Drag and drop your PDF file here</Trans>
                   </p>
+
+                  {isUploadDisabled && IS_BILLING_ENABLED() && (
+                    <Link
+                      to="/settings/billing"
+                      className="mt-4 text-sm text-amber-500 hover:underline dark:text-amber-400"
+                    >
+                      <Trans>Upgrade your plan to upload more documents</Trans>
+                    </Link>
+                  )}
+
+                  {!isUploadDisabled &&
+                    team?.id === undefined &&
+                    remaining.documents > 0 &&
+                    Number.isFinite(remaining.documents) && (
+                      <p className="text-muted-foreground/60 mt-4 text-sm">
+                        <Trans>
+                          {remaining.documents} of {quota.documents} documents remaining this month.
+                        </Trans>
+                      </p>
+                    )}
                 </CardContent>
               </Card>
             </motion.div>
@@ -222,18 +248,6 @@ export const DocumentDropZoneWrapper = ({ children, className }: DocumentDropZon
           </div>
         </div>
       )}
-
-      {team?.id === undefined &&
-        remaining.documents > 0 &&
-        Number.isFinite(remaining.documents) && (
-          <div className="fixed bottom-4 right-4 z-50">
-            <p className="text-muted-foreground/60 text-xs">
-              <Trans>
-                {remaining.documents} of {quota.documents} documents remaining this month.
-              </Trans>
-            </p>
-          </div>
-        )}
     </div>
   );
 };
