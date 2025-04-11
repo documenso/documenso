@@ -6,7 +6,7 @@ export interface MoveTemplateToFolderOptions {
   userId: number;
   teamId?: number;
   templateId: number;
-  folderId?: string;
+  folderId?: string | null;
 }
 
 export const moveTemplateToFolder = async ({

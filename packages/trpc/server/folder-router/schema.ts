@@ -84,7 +84,7 @@ export const ZMoveDocumentToFolderSchema = z.object({
 
 export const ZMoveTemplateToFolderSchema = z.object({
   templateId: z.number(),
-  folderId: z.string().optional(),
+  folderId: z.string().nullable().optional(),
   type: z.enum(['TEMPLATE']).optional(),
 });
 
@@ -119,7 +119,7 @@ export const ZFindSearchParamsSchema = z.object({
 });
 
 export const ZFindFoldersRequestSchema = ZFindSearchParamsSchema.extend({
-  parentId: z.string().optional(),
+  parentId: z.string().nullable().optional(),
   type: ZFolderTypeSchema.optional(),
 });
 
