@@ -40,11 +40,11 @@ export type TemplateMoveToFolderDialogProps = {
   templateTitle: string;
   isOpen: boolean;
   onOpenChange: (open: boolean) => void;
-  currentFolderId?: string;
+  currentFolderId?: string | null;
 } & Omit<DialogPrimitive.DialogProps, 'children'>;
 
 const ZMoveTemplateFormSchema = z.object({
-  folderId: z.string().optional(),
+  folderId: z.string().nullable().optional(),
 });
 
 type TMoveTemplateFormSchema = z.infer<typeof ZMoveTemplateFormSchema>;
@@ -65,7 +65,7 @@ export function TemplateMoveToFolderDialog({
   const form = useForm<TMoveTemplateFormSchema>({
     resolver: zodResolver(ZMoveTemplateFormSchema),
     defaultValues: {
-      folderId: currentFolderId,
+      folderId: currentFolderId ?? null,
     },
   });
 
@@ -79,13 +79,15 @@ export function TemplateMoveToFolderDialog({
     },
   );
 
+  console.log('folders', folders);
+
   const { mutateAsync: moveTemplateToFolder } = trpc.folder.moveTemplateToFolder.useMutation();
 
   useEffect(() => {
     if (!isOpen) {
       form.reset();
     } else {
-      form.reset({ folderId: currentFolderId });
+      form.reset({ folderId: currentFolderId ?? null });
     }
   }, [isOpen, currentFolderId, form]);
 
@@ -93,7 +95,7 @@ export function TemplateMoveToFolderDialog({
     try {
       await moveTemplateToFolder({
         templateId,
-        folderId: data.folderId ?? '',
+        folderId: data.folderId ?? null,
       });
 
       toast({
@@ -201,12 +203,7 @@ export function TemplateMoveToFolderDialog({
                 <Trans>Cancel</Trans>
               </Button>
 
-              <Button
-                type="submit"
-                disabled={
-                  isFoldersLoading || form.formState.isSubmitting || currentFolderId === null
-                }
-              >
+              <Button type="submit" disabled={isFoldersLoading || form.formState.isSubmitting}>
                 <Trans>Move</Trans>
               </Button>
             </DialogFooter>

@@ -20,7 +20,7 @@ test('create folder button is visible on documents page', async ({ page }) => {
     redirectPath: '/',
   });
 
-  await expect(page.getByRole('button', { name: 'Create folder' })).toBeVisible();
+  await expect(page.getByRole('button', { name: 'Create Folder' })).toBeVisible();
 });
 
 test('user can create a document folder', async ({ page }) => {
@@ -63,7 +63,7 @@ test('user can create a document subfolder inside a document folder', async ({ p
 
   await expect(page.getByText('Client Contracts')).toBeVisible();
 
-  await page.getByRole('button', { name: 'Create folder' }).click();
+  await page.getByRole('button', { name: 'Create Folder' }).click();
   await expect(page.getByRole('dialog', { name: 'Create New folder' })).toBeVisible();
 
   await page.getByLabel('Folder name').fill('Invoices');
