@@ -231,6 +231,43 @@ test('document folder can be moved to another document folder', async ({ page })
   await expect(page.getByText('Contracts')).toBeVisible();
 });
 
+test('document folder can be moved to the root', async ({ page }) => {
+  const user = await seedUser();
+
+  const parentFolder = await seedBlankFolder(user, {
+    createFolderOptions: {
+      name: 'Clients',
+    },
+  });
+
+  await seedBlankFolder(user, {
+    createFolderOptions: {
+      name: 'Contracts',
+      parentId: parentFolder.id,
+    },
+  });
+
+  await apiSignin({
+    page,
+    email: user.email,
+    redirectPath: '/documents',
+  });
+
+  await page.getByText('Clients').click();
+
+  await page.getByRole('button', { name: '•••' }).nth(0).click();
+  await page.getByRole('menuitem', { name: 'Move' }).click();
+
+  await page.getByRole('button', { name: 'Root' }).click();
+  await page.getByRole('button', { name: 'Move Folder' }).click();
+
+  await page.waitForTimeout(1000);
+
+  await page.goto('/documents');
+
+  await expect(page.getByText('Clients')).toBeVisible();
+});
+
 test('document folder and its contents can be deleted', async ({ page }) => {
   const user = await seedUser();
 
@@ -282,6 +319,77 @@ test('document folder and its contents can be deleted', async ({ page }) => {
 
   await expect(page.getByText(report.title)).not.toBeVisible();
   await expect(page.locator('div').filter({ hasText: reportsFolder.name })).not.toBeVisible();
+});
+
+test('user can move a document to a document folder', async ({ page }) => {
+  const user = await seedUser();
+
+  const folder = await seedBlankFolder(user, {
+    createFolderOptions: {
+      name: 'Proposals',
+    },
+  });
+
+  await seedBlankDocument(user, {
+    createDocumentOptions: {
+      title: 'Proposal 1',
+    },
+  });
+
+  await apiSignin({
+    page,
+    email: user.email,
+    redirectPath: '/documents',
+  });
+
+  await page.getByTestId('document-table-action-btn').click();
+  await page.getByRole('menuitem', { name: 'Move to Folder' }).click();
+
+  await page.getByRole('button', { name: 'Proposals' }).click();
+  await page.getByRole('button', { name: 'Move' }).click();
+
+  await page.waitForTimeout(1000);
+
+  await page.goto(`/documents/f/${folder.id}`);
+
+  await expect(page.getByText('Proposal 1')).toBeVisible();
+});
+
+test('user can move a document from folder to the root', async ({ page }) => {
+  const user = await seedUser();
+
+  const folder = await seedBlankFolder(user, {
+    createFolderOptions: {
+      name: 'Proposals',
+    },
+  });
+
+  await seedBlankDocument(user, {
+    createDocumentOptions: {
+      title: 'Proposal 1',
+      folderId: folder.id,
+    },
+  });
+
+  await apiSignin({
+    page,
+    email: user.email,
+    redirectPath: '/documents',
+  });
+
+  await page.getByText('Proposals').click();
+
+  await page.getByTestId('document-table-action-btn').click();
+  await page.getByRole('menuitem', { name: 'Move to Folder' }).click();
+
+  await page.getByRole('button', { name: 'Root' }).click();
+  await page.getByRole('button', { name: 'Move' }).click();
+
+  await page.waitForTimeout(1000);
+
+  await page.goto('/documents');
+
+  await expect(page.getByText('Proposal 1')).toBeVisible();
 });
 
 test('create folder button is visible on templates page', async ({ page }) => {
@@ -524,6 +632,44 @@ test('template folder can be moved to another template folder', async ({ page })
   await expect(page.getByText('Contract Templates')).toBeVisible();
 });
 
+test('template folder can be moved to the root', async ({ page }) => {
+  const user = await seedUser();
+
+  const parentFolder = await seedBlankFolder(user, {
+    createFolderOptions: {
+      name: 'Client Templates',
+      type: FolderType.TEMPLATE,
+    },
+  });
+
+  await seedBlankFolder(user, {
+    createFolderOptions: {
+      name: 'Contract Templates',
+      parentId: parentFolder.id,
+      type: FolderType.TEMPLATE,
+    },
+  });
+
+  await apiSignin({
+    page,
+    email: user.email,
+    redirectPath: '/templates',
+  });
+
+  await page.getByText('Client Templates').click();
+  await page.getByRole('button', { name: '•••' }).nth(0).click();
+  await page.getByRole('menuitem', { name: 'Move' }).click();
+
+  await page.getByRole('button', { name: 'Root' }).click();
+  await page.getByRole('button', { name: 'Move Folder' }).click();
+
+  await page.waitForTimeout(1000);
+
+  await page.goto('/templates');
+
+  await expect(page.getByText('Contract Templates')).toBeVisible();
+});
+
 test('template folder and its contents can be deleted', async ({ page }) => {
   const user = await seedUser();
 
@@ -621,4 +767,76 @@ test('user can navigate between template folders', async ({ page }) => {
 
   await page.getByRole('button', { name: subfolder.name }).click();
   await expect(page.getByText('Contract Template 1')).toBeVisible();
+});
+
+test('user can move a template to a template folder', async ({ page }) => {
+  const user = await seedUser();
+
+  const folder = await seedBlankFolder(user, {
+    createFolderOptions: {
+      name: 'Client Templates',
+      type: FolderType.TEMPLATE,
+    },
+  });
+
+  await seedBlankTemplate(user, {
+    createTemplateOptions: {
+      title: 'Proposal Template 1',
+    },
+  });
+
+  await apiSignin({
+    page,
+    email: user.email,
+    redirectPath: '/templates',
+  });
+
+  await page.getByTestId('template-table-action-btn').click();
+  await page.getByRole('menuitem', { name: 'Move to Folder' }).click();
+
+  await page.getByRole('button', { name: 'Client Templates' }).click();
+  await page.getByRole('button', { name: 'Move' }).click();
+
+  await page.goto(`/templates/f/${folder.id}`);
+  await page.waitForTimeout(1000);
+
+  await expect(page.getByText('Proposal Template 1')).toBeVisible();
+});
+
+test('user can move a template from a folder to the root', async ({ page }) => {
+  const user = await seedUser();
+
+  const folder = await seedBlankFolder(user, {
+    createFolderOptions: {
+      name: 'Client Templates',
+      type: FolderType.TEMPLATE,
+    },
+  });
+
+  await seedBlankTemplate(user, {
+    createTemplateOptions: {
+      title: 'Proposal Template 1',
+      folderId: folder.id,
+    },
+  });
+
+  await apiSignin({
+    page,
+    email: user.email,
+    redirectPath: '/templates',
+  });
+
+  await page.getByText('Client Templates').click();
+
+  await page.getByTestId('template-table-action-btn').click();
+  await page.getByRole('menuitem', { name: 'Move to Folder' }).click();
+
+  await page.getByRole('button', { name: 'Root' }).click();
+  await page.getByRole('button', { name: 'Move' }).click();
+
+  await page.waitForTimeout(1000);
+
+  await page.goto('/templates');
+
+  await expect(page.getByText('Proposal Template 1')).toBeVisible();
 });

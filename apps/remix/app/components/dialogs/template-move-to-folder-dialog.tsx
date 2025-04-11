@@ -174,7 +174,7 @@ export function TemplateMoveToFolderDialog({
                             <Trans>Root (No Folder)</Trans>
                           </Button>
 
-                          {folders?.data.map((folder) => (
+                          {folders?.data?.map((folder) => (
                             <Button
                               key={folder.id}
                               type="button"

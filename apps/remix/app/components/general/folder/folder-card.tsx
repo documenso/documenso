@@ -1,5 +1,6 @@
 import { FolderIcon, PinIcon } from 'lucide-react';
 
+import { FolderType } from '@documenso/lib/types/folder-type';
 import { formatFolderCount } from '@documenso/lib/utils/format-folder-count';
 import { type TFolderWithSubfolders } from '@documenso/trpc/server/folder-router/schema';
 import { Button } from '@documenso/ui/primitives/button';
@@ -46,7 +47,15 @@ export const FolderCard = ({
               {folder.pinned && <PinIcon className="text-documenso h-3 w-3" />}
             </div>
             <div className="mt-1 flex space-x-2 text-xs text-gray-500">
-              <span>{formatFolderCount(folder._count.documents, 'document', 'documents')}</span>
+              <span>
+                {formatFolderCount(
+                  folder.type === FolderType.TEMPLATE
+                    ? folder._count.templates
+                    : folder._count.documents,
+                  folder.type === FolderType.TEMPLATE ? 'template' : 'document',
+                  folder.type === FolderType.TEMPLATE ? 'templates' : 'documents',
+                )}
+              </span>
               <span>•</span>
               <span>{formatFolderCount(folder._count.subfolders, 'folder', 'folders')}</span>
             </div>

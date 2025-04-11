@@ -44,31 +44,29 @@ export const createTemplate = async ({
     }
   }
 
-  if (folderId) {
-    await prisma.folder.findFirstOrThrow({
-      where: {
-        id: folderId,
-        ...(teamId
-          ? {
-              team: {
-                id: teamId,
-                members: {
-                  some: {
-                    userId,
-                  },
+  const folder = await prisma.folder.findFirstOrThrow({
+    where: {
+      id: folderId,
+      ...(teamId
+        ? {
+            team: {
+              id: teamId,
+              members: {
+                some: {
+                  userId,
                 },
               },
-            }
-          : {
-              userId,
-              teamId: null,
-            }),
-      },
-    });
+            },
+          }
+        : {
+            userId,
+            teamId: null,
+          }),
+    },
+  });
 
-    if (!team) {
-      throw new AppError(AppErrorCode.NOT_FOUND);
-    }
+  if (!team) {
+    throw new AppError(AppErrorCode.NOT_FOUND);
   }
 
   return await prisma.template.create({
@@ -77,6 +75,7 @@ export const createTemplate = async ({
       userId,
       templateDocumentDataId,
       teamId,
+      folderId: folder.id,
       templateMeta: {
         create: {
           language: team?.teamGlobalSettings?.documentLanguage,
@@ -85,7 +84,6 @@ export const createTemplate = async ({
           drawSignatureEnabled: team?.teamGlobalSettings?.drawSignatureEnabled ?? true,
         },
       },
-      folderId,
     },
   });
 };

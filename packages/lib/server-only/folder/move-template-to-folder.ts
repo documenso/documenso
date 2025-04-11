@@ -15,43 +15,45 @@ export const moveTemplateToFolder = async ({
   templateId,
   folderId,
 }: MoveTemplateToFolderOptions) => {
-  const template = await prisma.template.findFirst({
-    where: {
-      id: templateId,
-      userId,
-      teamId,
-    },
-  });
-
-  if (!template) {
-    throw new AppError(AppErrorCode.NOT_FOUND, {
-      message: 'Template not found',
-    });
-  }
-
-  if (folderId !== null) {
-    const folder = await prisma.folder.findFirst({
+  return await prisma.$transaction(async (tx) => {
+    const template = await tx.template.findFirst({
       where: {
-        id: folderId,
+        id: templateId,
         userId,
         teamId,
-        type: FolderType.TEMPLATE,
       },
     });
 
-    if (!folder) {
+    if (!template) {
       throw new AppError(AppErrorCode.NOT_FOUND, {
-        message: 'Folder not found',
+        message: 'Template not found',
       });
     }
-  }
 
-  return await prisma.template.update({
-    where: {
-      id: templateId,
-    },
-    data: {
-      folderId,
-    },
+    if (folderId !== null) {
+      const folder = await tx.folder.findFirst({
+        where: {
+          id: folderId,
+          userId,
+          teamId,
+          type: FolderType.TEMPLATE,
+        },
+      });
+
+      if (!folder) {
+        throw new AppError(AppErrorCode.NOT_FOUND, {
+          message: 'Folder not found',
+        });
+      }
+    }
+
+    return await tx.template.update({
+      where: {
+        id: templateId,
+      },
+      data: {
+        folderId,
+      },
+    });
   });
 };
