@@ -69,7 +69,7 @@ export const TemplatesTableActionDropdown = ({
     ? `${templateRootPath}/f/${row.folderId}/${row.id}/edit`
     : `${templateRootPath}/${row.id}/edit`;
 
-  console.log('row', row);
+  
 
   return (
     <DropdownMenu>
