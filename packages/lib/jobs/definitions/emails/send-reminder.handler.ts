@@ -3,7 +3,7 @@ import { createElement } from 'react';
 import { msg } from '@lingui/core/macro';
 
 import { mailer } from '@documenso/email/mailer';
-import DocumentInviteEmailTemplate from '@documenso/email/templates/document-invite';
+import DocumentReminderEmailTemplate from '@documenso/email/templates/document-reminder';
 import { prisma } from '@documenso/prisma';
 import type { DocumentReminderInterval } from '@documenso/prisma/client';
 import { DocumentStatus, RecipientRole, SendStatus, SigningStatus } from '@documenso/prisma/client';
@@ -118,15 +118,13 @@ export async function run({ io, intervals }: SendReminderHandlerOptions) {
         const signDocumentLink = `${NEXT_PUBLIC_WEBAPP_URL()}/sign/${recipient.token}`;
         const assetBaseUrl = NEXT_PUBLIC_WEBAPP_URL() || 'http://localhost:3000';
 
-        const template = createElement(DocumentInviteEmailTemplate, {
+        const template = createElement(DocumentReminderEmailTemplate, {
+          recipientName: recipient.name,
           documentName: document.title,
-          inviterName: document.user.name || undefined,
-          inviterEmail: document.user.email,
           assetBaseUrl,
           signDocumentLink,
           customBody: emailMessage,
           role: recipient.role,
-          selfSigner: recipient.email === document.user.email,
         });
 
         await io.runTask(`send-reminder-${recipient.id}`, async () => {
