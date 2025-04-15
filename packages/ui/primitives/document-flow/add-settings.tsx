@@ -1,10 +1,16 @@
 import { useEffect } from 'react';
 
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Trans } from '@lingui/react/macro';
-import { useLingui } from '@lingui/react/macro';
-import { DocumentVisibility, TeamMemberRole } from '@prisma/client';
-import { DocumentStatus, type Field, type Recipient, SendStatus } from '@prisma/client';
+import { Trans, useLingui } from '@lingui/react/macro';
+import {
+  DocumentReminderInterval,
+  DocumentStatus,
+  DocumentVisibility,
+  type Field,
+  type Recipient,
+  SendStatus,
+  TeamMemberRole,
+} from '@prisma/client';
 import { InfoIcon } from 'lucide-react';
 import { useForm } from 'react-hook-form';
 import { match } from 'ts-pattern';
@@ -108,6 +114,7 @@ export const AddSettingsFormPartial = ({
         redirectUrl: document.documentMeta?.redirectUrl ?? '',
         language: document.documentMeta?.language ?? 'en',
         signatureTypes: extractTeamSignatureSettings(document.documentMeta),
+        reminderInterval: document.documentMeta?.reminderInterval ?? DocumentReminderInterval.NONE,
       },
     },
   });
@@ -346,6 +353,67 @@ export const AddSettingsFormPartial = ({
                               className="bg-background w-full"
                               emptySelectionPlaceholder="Select signature types"
                             />
+                          </FormControl>
+
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    <FormField
+                      control={form.control}
+                      name="meta.reminderInterval"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel className="flex flex-row items-center">
+                            <Trans>Reminder Interval</Trans>{' '}
+                            <Tooltip>
+                              <TooltipTrigger>
+                                <InfoIcon className="mx-2 h-4 w-4" />
+                              </TooltipTrigger>
+
+                              <TooltipContent className="text-muted-foreground max-w-xs">
+                                <Trans>Set the interval between reminders for this document.</Trans>
+                              </TooltipContent>
+                            </Tooltip>
+                          </FormLabel>
+
+                          <FormControl>
+                            <Select {...field} onValueChange={field.onChange}>
+                              <SelectTrigger className="bg-background">
+                                <SelectValue />
+                              </SelectTrigger>
+
+                              <SelectContent>
+                                <SelectItem value={DocumentReminderInterval.NONE}>
+                                  No reminders
+                                </SelectItem>
+                                <SelectItem value={DocumentReminderInterval.EVERY_1_HOUR}>
+                                  Every hour
+                                </SelectItem>
+                                <SelectItem value={DocumentReminderInterval.EVERY_6_HOURS}>
+                                  Every 6 hours
+                                </SelectItem>
+                                <SelectItem value={DocumentReminderInterval.EVERY_12_HOURS}>
+                                  Every 12 hours
+                                </SelectItem>
+                                <SelectItem value={DocumentReminderInterval.DAILY}>
+                                  Daily
+                                </SelectItem>
+                                <SelectItem value={DocumentReminderInterval.EVERY_3_DAYS}>
+                                  Every 3 days
+                                </SelectItem>
+                                <SelectItem value={DocumentReminderInterval.WEEKLY}>
+                                  Weekly
+                                </SelectItem>
+                                <SelectItem value={DocumentReminderInterval.EVERY_2_WEEKS}>
+                                  Every 2 weeks
+                                </SelectItem>
+                                <SelectItem value={DocumentReminderInterval.MONTHLY}>
+                                  Monthly
+                                </SelectItem>
+                              </SelectContent>
+                            </Select>
                           </FormControl>
 
                           <FormMessage />

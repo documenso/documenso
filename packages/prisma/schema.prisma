@@ -388,6 +388,18 @@ enum DocumentDistributionMethod {
   NONE
 }
 
+enum DocumentReminderInterval {
+  NONE
+  EVERY_1_HOUR
+  EVERY_6_HOURS
+  EVERY_12_HOURS
+  DAILY
+  EVERY_3_DAYS
+  WEEKLY
+  EVERY_2_WEEKS
+  MONTHLY
+}
+
 /// @zod.import(["import { ZDocumentEmailSettingsSchema } from '@documenso/lib/types/document-email';"])
 model DocumentMeta {
   id                     String               @id @default(cuid())
@@ -409,6 +421,9 @@ model DocumentMeta {
   language           String                     @default("en")
   distributionMethod DocumentDistributionMethod @default(EMAIL)
   emailSettings      Json? /// [DocumentEmailSettings] @zod.custom.use(ZDocumentEmailSettingsSchema)
+
+  reminderInterval   DocumentReminderInterval @default(NONE)
+  lastReminderSentAt DateTime?
 }
 
 enum ReadStatus {

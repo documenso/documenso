@@ -56,6 +56,8 @@ export const ZDocumentSchema = DocumentSchema.pick({
     allowDictateNextSigner: true,
     language: true,
     emailSettings: true,
+    reminderInterval: true,
+    lastReminderSentAt: true,
   }).nullable(),
   recipients: ZRecipientLiteSchema.array(),
   fields: ZFieldSchema.array(),

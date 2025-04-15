@@ -1,4 +1,4 @@
-import { DocumentSigningOrder } from '@prisma/client';
+import { DocumentReminderInterval, DocumentSigningOrder } from '@prisma/client';
 // import type { OpenApiMeta } from 'trpc-to-openapi';
 import { z } from 'zod';
 
@@ -61,6 +61,7 @@ export const ZUpdateDocumentRequestSchema = z.object({
       uploadSignatureEnabled: ZDocumentMetaUploadSignatureEnabledSchema.optional(),
       drawSignatureEnabled: ZDocumentMetaDrawSignatureEnabledSchema.optional(),
       emailSettings: ZDocumentEmailSettingsSchema.optional(),
+      reminderInterval: z.nativeEnum(DocumentReminderInterval).optional(),
     })
     .optional(),
 });

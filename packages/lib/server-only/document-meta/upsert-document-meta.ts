@@ -1,4 +1,8 @@
-import type { DocumentDistributionMethod, DocumentSigningOrder } from '@prisma/client';
+import type {
+  DocumentDistributionMethod,
+  DocumentReminderInterval,
+  DocumentSigningOrder,
+} from '@prisma/client';
 
 import { DOCUMENT_AUDIT_LOG_TYPE } from '@documenso/lib/types/document-audit-logs';
 import type { ApiRequestMetadata } from '@documenso/lib/universal/extract-request-metadata';
@@ -30,6 +34,7 @@ export type CreateDocumentMetaOptions = {
   uploadSignatureEnabled?: boolean;
   drawSignatureEnabled?: boolean;
   language?: SupportedLanguageCodes;
+  reminderInterval?: DocumentReminderInterval;
   requestMetadata: ApiRequestMetadata;
 };
 
@@ -51,6 +56,7 @@ export const upsertDocumentMeta = async ({
   uploadSignatureEnabled,
   drawSignatureEnabled,
   language,
+  reminderInterval,
   requestMetadata,
 }: CreateDocumentMetaOptions) => {
   const document = await prisma.document.findFirst({
@@ -106,6 +112,7 @@ export const upsertDocumentMeta = async ({
         uploadSignatureEnabled,
         drawSignatureEnabled,
         language,
+        reminderInterval,
       },
       update: {
         subject,
@@ -122,6 +129,7 @@ export const upsertDocumentMeta = async ({
         uploadSignatureEnabled,
         drawSignatureEnabled,
         language,
+        reminderInterval,
       },
     });
 
