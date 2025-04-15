@@ -12,12 +12,11 @@ import { getI18nInstance } from '../../../client-only/providers/i18n-server';
 import { NEXT_PUBLIC_WEBAPP_URL } from '../../../constants/app';
 import { FROM_ADDRESS, FROM_NAME } from '../../../constants/email';
 import { RECIPIENT_ROLES_DESCRIPTION } from '../../../constants/recipient-roles';
+import { DOCUMENT_AUDIT_LOG_TYPE, DOCUMENT_EMAIL_TYPE } from '../../../types/document-audit-logs';
 import { extractDerivedDocumentEmailSettings } from '../../../types/document-email';
 import { renderEmailWithI18N } from '../../../utils/render-email-with-i18n';
 import { shouldSendReminder } from '../../../utils/should-send-reminder';
 import type { JobRunIO } from '../../client/_internal/job';
-
-// TODO: Add Audit Log import and usage
 
 export type SendReminderHandlerOptions = {
   io: JobRunIO;
@@ -150,17 +149,33 @@ export async function run({ io, intervals }: SendReminderHandlerOptions) {
             text,
           });
 
-          // Update recipient status (might be redundant if only tracking lastReminderSentAt on DocumentMeta)
           await prisma.recipient.update({
             where: { id: recipient.id },
             data: { sendStatus: SendStatus.SENT },
           });
         });
 
-        // TODO: Duncan == Audit log
-        // await io.runTask(`log-reminder-${recipient.id}`, async () => {
-        //   await prisma.documentAuditLog.create(...);
-        // });
+        await io.runTask(`log-reminder-${recipient.id}`, async () => {
+          await prisma.documentAuditLog.create({
+            data: {
+              type: DOCUMENT_AUDIT_LOG_TYPE.EMAIL_SENT,
+              documentId: document.id,
+              userId: document.userId,
+              data: {
+                type: DOCUMENT_AUDIT_LOG_TYPE.EMAIL_SENT,
+                data: {
+                  recipientEmail: recipient.email,
+                  recipientName: recipient.name,
+                  recipientId: recipient.id,
+                  recipientRole: recipient.role,
+                  emailType: DOCUMENT_EMAIL_TYPE.REMINDER,
+                  isResending: false,
+                },
+              },
+              ipAddress: undefined,
+            },
+          });
+        });
       } catch (error) {
         io.logger.error(`Error processing reminder for recipient ${recipient.id}`, error);
       }
