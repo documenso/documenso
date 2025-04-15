@@ -21,21 +21,22 @@ import type { JobRunIO } from '../../client/_internal/job';
 
 export type SendReminderHandlerOptions = {
   io: JobRunIO;
-  interval: DocumentReminderInterval;
+  intervals: DocumentReminderInterval[];
 };
 
-export async function run({ io, interval }: SendReminderHandlerOptions) {
+export async function run({ io, intervals }: SendReminderHandlerOptions) {
   const now = new Date();
+  const intervalsString = intervals.join(',').toLowerCase();
 
   const documentsToSendReminders = await io.runTask(
-    `find-documents-for-${interval.toLocaleUpperCase()}-reminder`,
+    `find-documents-for-${intervalsString}-reminder`,
     async () => {
       const documents = await prisma.document.findMany({
         where: {
           status: DocumentStatus.PENDING,
           documentMeta: {
             reminderInterval: {
-              equals: interval,
+              in: intervals,
             },
           },
           deletedAt: null,
@@ -72,7 +73,7 @@ export async function run({ io, interval }: SendReminderHandlerOptions) {
       });
 
       io.logger.info(
-        `Found ${filteredDocuments.length} documents after filtering for interval ${interval}.`,
+        `Found ${filteredDocuments.length} documents after filtering for interval ${intervalsString}.`,
         filteredDocuments.map((d) => ({ id: d.id })),
       );
 
@@ -81,12 +82,12 @@ export async function run({ io, interval }: SendReminderHandlerOptions) {
   );
 
   if (documentsToSendReminders.length === 0) {
-    io.logger.info(`No documents found needing ${interval.toLocaleUpperCase()} reminders.`);
+    io.logger.info(`No documents found needing ${intervalsString} reminders.`);
     return;
   }
 
   io.logger.info(
-    `Found ${documentsToSendReminders.length} documents needing ${interval.toLocaleUpperCase()} reminders.`,
+    `Found ${documentsToSendReminders.length} documents needing ${intervalsString} reminders.`,
   );
 
   for (const document of documentsToSendReminders) {

@@ -18,7 +18,13 @@ export const SEND_DAILY_REMINDER_EMAIL_JOB = {
 
     await handler.run({
       io,
-      interval: DocumentReminderInterval.DAILY,
+      intervals: [
+        DocumentReminderInterval.DAILY,
+        DocumentReminderInterval.EVERY_3_DAYS,
+        DocumentReminderInterval.WEEKLY,
+        DocumentReminderInterval.EVERY_2_WEEKS,
+        DocumentReminderInterval.MONTHLY,
+      ],
     });
   },
 } as const satisfies JobDefinition<typeof SEND_DAILY_REMINDER_EMAIL_JOB_ID>;

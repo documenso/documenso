@@ -10,8 +10,7 @@ export const SEND_HOURLY_REMINDER_EMAIL_JOB = {
   version: '1.0.0',
   trigger: {
     type: 'cron',
-    // schedule: '0 * * * *',
-    schedule: '*/2 * * * *',
+    schedule: '0 * * * *',
     name: SEND_HOURLY_REMINDER_EMAIL_JOB_ID,
   },
   handler: async ({ io }) => {
@@ -19,7 +18,11 @@ export const SEND_HOURLY_REMINDER_EMAIL_JOB = {
 
     await handler.run({
       io,
-      interval: DocumentReminderInterval.EVERY_1_HOUR,
+      intervals: [
+        DocumentReminderInterval.EVERY_1_HOUR,
+        DocumentReminderInterval.EVERY_6_HOURS,
+        DocumentReminderInterval.EVERY_12_HOURS,
+      ],
     });
   },
 } as const satisfies JobDefinition<typeof SEND_HOURLY_REMINDER_EMAIL_JOB_ID>;
