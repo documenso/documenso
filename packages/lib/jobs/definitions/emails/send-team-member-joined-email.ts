@@ -18,6 +18,7 @@ export const SEND_TEAM_MEMBER_JOINED_EMAIL_JOB_DEFINITION = {
   name: 'Send Team Member Joined Email',
   version: '1.0.0',
   trigger: {
+    type: 'event',
     name: SEND_TEAM_MEMBER_JOINED_EMAIL_JOB_DEFINITION_ID,
     schema: SEND_TEAM_MEMBER_JOINED_EMAIL_JOB_DEFINITION_SCHEMA,
   },

@@ -35,29 +35,53 @@ export class InngestJobProvider extends BaseJobProvider {
   }
 
   public defineJob<N extends string, T>(job: JobDefinition<N, T>): void {
-    console.log('defining job', job.id);
-    const fn = this._client.createFunction(
-      {
-        id: job.id,
-        name: job.name,
-      },
-      {
-        event: job.trigger.name,
-      },
-      async (ctx) => {
-        const io = this.convertInngestIoToJobRunIo(ctx);
+    let fn: InngestFunction.Any;
 
-        // We need to cast to any so we can deal with parsing later.
-        // eslint-disable-next-line @typescript-eslint/consistent-type-assertions, @typescript-eslint/no-explicit-any
-        let payload = ctx.event.data as any;
+    if (job.trigger.type === 'cron') {
+      fn = this._client.createFunction(
+        {
+          id: job.id,
+          name: job.name,
+        },
+        {
+          cron: job.trigger.schedule,
+        },
+        async (ctx) => {
+          const io = this.convertInngestIoToJobRunIo(ctx);
+          const payload: T | undefined = undefined;
 
-        if (job.trigger.schema) {
-          payload = job.trigger.schema.parse(payload);
-        }
+          if (job.trigger.schema) {
+            console.warn(
+              `Job "${job.id}" is cron-triggered but defines a schema. The schema will be ignored. `,
+            );
+          }
 
-        await job.handler({ payload, io });
-      },
-    );
+          await job.handler({ payload: payload as T, io });
+        },
+      );
+    } else {
+      fn = this._client.createFunction(
+        {
+          id: job.id,
+          name: job.name,
+        },
+        {
+          event: job.trigger.name,
+        },
+        async (ctx) => {
+          const io = this.convertInngestIoToJobRunIo(ctx);
+
+          // eslint-disable-next-line @typescript-eslint/consistent-type-assertions, @typescript-eslint/no-explicit-any
+          let payload = ctx.event.data as any;
+
+          if (job.trigger.schema) {
+            payload = job.trigger.schema.parse(payload);
+          }
+
+          await job.handler({ payload, io });
+        },
+      );
+    }
 
     this._functions.push(fn);
   }
