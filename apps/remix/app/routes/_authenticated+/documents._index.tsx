@@ -215,14 +215,16 @@ export default function DocumentsPage() {
                 <h3 className="text-muted-background/60 dark:text-muted-foreground/60 mb-4 text-sm font-medium">
                   Folders
                 </h3>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="text-muted-foreground hover:text-foreground"
-                  onClick={() => void handleViewAllFolders()}
-                >
-                  View all folders
-                </Button>
+                {foldersData && foldersData.folders?.length > 12 && (
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="text-muted-foreground hover:text-foreground"
+                    onClick={() => void handleViewAllFolders()}
+                  >
+                    View all folders
+                  </Button>
+                )}
               </div>
               <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
                 {foldersData?.folders
