@@ -8,6 +8,7 @@ import { useNavigate, useSearchParams } from 'react-router';
 
 import { RECIPIENT_ROLES_DESCRIPTION } from '@documenso/lib/constants/recipient-roles';
 import type { TTemplate } from '@documenso/lib/types/template';
+import { isRequiredField } from '@documenso/lib/utils/advanced-fields-helpers';
 import { trpc } from '@documenso/trpc/react';
 import { Card, CardContent } from '@documenso/ui/primitives/card';
 import { DocumentFlowFormContainer } from '@documenso/ui/primitives/document-flow/document-flow-root';
@@ -96,6 +97,8 @@ export const DirectTemplatePageView = ({
         directTemplateExternalId = decodeURIComponent(directTemplateExternalId);
       }
 
+      console.log({ fields });
+
       const { token } = await createDocumentFromDirectTemplate({
         directTemplateToken,
         directTemplateExternalId,
@@ -103,7 +106,7 @@ export const DirectTemplatePageView = ({
         directRecipientEmail: recipient.email,
         templateUpdatedAt: template.updatedAt,
         signedFieldValues: fields.map((field) => {
-          if (!field.signedValue) {
+          if (isRequiredField(field) && !field.signedValue) {
             throw new Error('Invalid configuration');
           }
 
@@ -119,6 +122,7 @@ export const DirectTemplatePageView = ({
         await navigate(`/sign/${token}/complete`);
       }
     } catch (err) {
+      console.error(err);
       toast({
         title: _(msg`Something went wrong`),
         description: _(
