@@ -110,7 +110,13 @@ export const DirectTemplatePageView = ({
             throw new Error('Invalid configuration');
           }
 
-          return field.signedValue;
+          return {
+            token: field.signedValue?.token ?? '',
+            fieldId: field.signedValue?.fieldId ?? 0,
+            value: field.signedValue?.value,
+            isBase64: field.signedValue?.isBase64,
+            authOptions: field.signedValue?.authOptions,
+          };
         }),
       });
 
