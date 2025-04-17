@@ -97,8 +97,6 @@ export const DirectTemplatePageView = ({
         directTemplateExternalId = decodeURIComponent(directTemplateExternalId);
       }
 
-      console.log({ fields });
-
       const { token } = await createDocumentFromDirectTemplate({
         directTemplateToken,
         directTemplateExternalId,
@@ -128,7 +126,6 @@ export const DirectTemplatePageView = ({
         await navigate(`/sign/${token}/complete`);
       }
     } catch (err) {
-      console.error(err);
       toast({
         title: _(msg`Something went wrong`),
         description: _(

@@ -58,7 +58,7 @@ export type CreateDocumentFromDirectTemplateOptions = {
   directRecipientEmail: string;
   directTemplateToken: string;
   directTemplateExternalId?: string;
-  signedFieldValues?: TSignFieldWithTokenMutationSchema[];
+  signedFieldValues: TSignFieldWithTokenMutationSchema[];
   templateUpdatedAt: Date;
   requestMetadata: ApiRequestMetadata;
   user?: {
