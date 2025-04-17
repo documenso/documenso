@@ -17,6 +17,7 @@ import {
   ZTextFieldMeta,
 } from '@documenso/lib/types/field-meta';
 import type { TTemplate } from '@documenso/lib/types/template';
+import { isFieldUnsignedAndRequired } from '@documenso/lib/utils/advanced-fields-helpers';
 import { sortFieldsByPosition, validateFieldsInserted } from '@documenso/lib/utils/fields';
 import type {
   TRemovedSignedFieldWithTokenMutationSchema,
@@ -78,6 +79,10 @@ export const DirectTemplateSigningForm = ({
   const [validateUninsertedFields, setValidateUninsertedFields] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  const fieldsRequiringValidation = useMemo(() => {
+    return localFields.filter((field) => isFieldUnsignedAndRequired(field));
+  }, [localFields]);
+
   const { currentStep, totalSteps, previousStep } = useStep();
 
   const onSignField = (value: TSignFieldWithTokenMutationSchema) => {
@@ -134,18 +139,18 @@ export const DirectTemplateSigningForm = ({
   };
 
   const uninsertedFields = useMemo(() => {
-    return sortFieldsByPosition(localFields.filter((field) => !field.inserted));
+    return sortFieldsByPosition(fieldsRequiringValidation);
   }, [localFields]);
 
   const fieldsValidated = () => {
     setValidateUninsertedFields(true);
-    validateFieldsInserted(localFields);
+    validateFieldsInserted(fieldsRequiringValidation);
   };
 
   const handleSubmit = async () => {
     setValidateUninsertedFields(true);
 
-    const isFieldsValid = validateFieldsInserted(localFields);
+    const isFieldsValid = validateFieldsInserted(fieldsRequiringValidation);
 
     if (!isFieldsValid) {
       return;
