@@ -43,23 +43,25 @@ export async function loader({ params, request }: Route.LoaderArgs) {
     throw redirect(documentRootPath);
   }
 
-  // Todo: Get full document instead?
-  const [document, recipients] = await Promise.all([
-    getDocumentById({
-      documentId,
-      userId: user.id,
-      teamId: team?.id,
-    }).catch(() => null),
-    getRecipientsForDocument({
-      documentId,
-      userId: user.id,
-      teamId: team?.id,
-    }),
-  ]);
+  const document = await getDocumentById({
+    documentId,
+    userId: user.id,
+    teamId: team?.id,
+  }).catch(() => null);
 
   if (!document || !document.documentData) {
     throw redirect(documentRootPath);
   }
+
+  if (document.folderId) {
+    throw redirect(documentRootPath);
+  }
+
+  const recipients = await getRecipientsForDocument({
+    documentId,
+    userId: user.id,
+    teamId: team?.id,
+  });
 
   return {
     document,

@@ -1,15 +1,23 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 
 import { Trans } from '@lingui/react/macro';
-import { Bird } from 'lucide-react';
-import { useSearchParams } from 'react-router';
+import { Bird, FolderIcon, HomeIcon, Loader2 } from 'lucide-react';
+import { useNavigate, useSearchParams } from 'react-router';
 
+import { FolderType } from '@documenso/lib/types/folder-type';
 import { formatAvatarUrl } from '@documenso/lib/utils/avatars';
 import { formatDocumentsPath, formatTemplatesPath } from '@documenso/lib/utils/teams';
 import { trpc } from '@documenso/trpc/react';
+import type { TFolderWithSubfolders } from '@documenso/trpc/server/folder-router/schema';
 import { Avatar, AvatarFallback, AvatarImage } from '@documenso/ui/primitives/avatar';
+import { Button } from '@documenso/ui/primitives/button';
 
 import { TemplateCreateDialog } from '~/components/dialogs/template-create-dialog';
+import { TemplateFolderCreateDialog } from '~/components/dialogs/template-folder-create-dialog';
+import { TemplateFolderDeleteDialog } from '~/components/dialogs/template-folder-delete-dialog';
+import { TemplateFolderMoveDialog } from '~/components/dialogs/template-folder-move-dialog';
+import { TemplateFolderSettingsDialog } from '~/components/dialogs/template-folder-settings-dialog';
+import { FolderCard } from '~/components/general/folder/folder-card';
 import { TemplatesTable } from '~/components/tables/templates-table';
 import { useOptionalCurrentTeam } from '~/providers/team';
 import { appMetaTags } from '~/utils/meta';
@@ -20,8 +28,18 @@ export function meta() {
 
 export default function TemplatesPage() {
   const [searchParams] = useSearchParams();
+  const navigate = useNavigate();
+  const [isMovingFolder, setIsMovingFolder] = useState(false);
+  const [folderToMove, setFolderToMove] = useState<TFolderWithSubfolders | null>(null);
+  const [isDeletingFolder, setIsDeletingFolder] = useState(false);
+  const [folderToDelete, setFolderToDelete] = useState<TFolderWithSubfolders | null>(null);
+  const [isSettingsFolderOpen, setIsSettingsFolderOpen] = useState(false);
+  const [folderToSettings, setFolderToSettings] = useState<TFolderWithSubfolders | null>(null);
 
   const team = useOptionalCurrentTeam();
+
+  const { mutateAsync: pinFolder } = trpc.folder.pinFolder.useMutation();
+  const { mutateAsync: unpinFolder } = trpc.folder.unpinFolder.useMutation();
 
   const page = Number(searchParams.get('page')) || 1;
   const perPage = Number(searchParams.get('perPage')) || 10;
@@ -34,10 +52,60 @@ export default function TemplatesPage() {
     perPage: perPage,
   });
 
-  // Refetch the templates when the team URL changes.
+  const {
+    data: foldersData,
+    isLoading: isFoldersLoading,
+    refetch: refetchFolders,
+  } = trpc.folder.getFolders.useQuery({
+    type: FolderType.TEMPLATE,
+    parentId: null,
+  });
+
   useEffect(() => {
     void refetch();
+    void refetchFolders();
   }, [team?.url]);
+
+  const navigateToFolder = (folderId?: string | null) => {
+    const templatesPath = formatTemplatesPath(team?.url);
+
+    if (folderId) {
+      void navigate(`${templatesPath}/f/${folderId}`);
+    } else {
+      void navigate(templatesPath);
+    }
+  };
+
+  const handleNavigate = (folderId: string) => {
+    navigateToFolder(folderId);
+  };
+
+  const handleMove = (folder: TFolderWithSubfolders) => {
+    setFolderToMove(folder);
+    setIsMovingFolder(true);
+  };
+
+  const handlePin = (folderId: string) => {
+    void pinFolder({ folderId });
+  };
+
+  const handleUnpin = (folderId: string) => {
+    void unpinFolder({ folderId });
+  };
+
+  const handleSettings = (folder: TFolderWithSubfolders) => {
+    setFolderToSettings(folder);
+    setIsSettingsFolderOpen(true);
+  };
+
+  const handleDelete = (folder: TFolderWithSubfolders) => {
+    setFolderToDelete(folder);
+    setIsDeletingFolder(true);
+  };
+
+  const handleViewAllFolders = () => {
+    void navigate(`${formatTemplatesPath(team?.url)}/folders`);
+  };
 
   return (
     <div className="mx-auto max-w-screen-xl px-4 md:px-8">
@@ -57,12 +125,104 @@ export default function TemplatesPage() {
           </h1>
         </div>
 
-        <div>
-          <TemplateCreateDialog templateRootPath={templateRootPath} teamId={team?.id} />
+        <div className="flex items-center space-x-2">
+          <TemplateFolderCreateDialog />
+          <TemplateCreateDialog templateRootPath={templateRootPath} />
         </div>
       </div>
 
-      <div className="relative mt-5">
+      <div className="mt-6 flex items-center">
+        <Button
+          variant="ghost"
+          size="sm"
+          className="flex items-center space-x-2 pl-0 hover:bg-transparent"
+          onClick={() => navigateToFolder(null)}
+        >
+          <HomeIcon className="h-4 w-4" />
+          <span>Home</span>
+        </Button>
+
+        {foldersData?.breadcrumbs.map((folder) => (
+          <div key={folder.id} className="flex items-center space-x-2">
+            <span>/</span>
+            <Button
+              variant="ghost"
+              size="sm"
+              className="flex items-center space-x-2 pl-1 hover:bg-transparent"
+              onClick={() => navigateToFolder(folder.id)}
+            >
+              <FolderIcon className="h-4 w-4" />
+              <span>{folder.name}</span>
+            </Button>
+          </div>
+        ))}
+      </div>
+
+      {isFoldersLoading ? (
+        <div className="mt-6 flex justify-center">
+          <Loader2 className="h-8 w-8 animate-spin text-gray-400" />
+        </div>
+      ) : (
+        <>
+          {foldersData?.folders && foldersData.folders.some((folder) => folder.pinned) && (
+            <div className="mt-6">
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
+                {foldersData.folders
+                  .filter((folder) => folder.pinned)
+                  .map((folder) => (
+                    <FolderCard
+                      key={folder.id}
+                      folder={folder}
+                      onNavigate={handleNavigate}
+                      onMove={handleMove}
+                      onPin={handlePin}
+                      onUnpin={handleUnpin}
+                      onSettings={handleSettings}
+                      onDelete={handleDelete}
+                    />
+                  ))}
+              </div>
+            </div>
+          )}
+
+          <div className="mt-6">
+            <div className="flex items-center justify-between">
+              <h3 className="text-muted-background/60 dark:text-muted-foreground/60 mb-4 text-sm font-medium">
+                Folders
+              </h3>
+              {foldersData && foldersData.folders?.length > 12 && (
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="text-muted-foreground hover:text-foreground"
+                  onClick={() => void handleViewAllFolders()}
+                >
+                  View all folders
+                </Button>
+              )}
+            </div>
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
+              {foldersData?.folders
+                ?.filter((folder) => !folder.pinned)
+                .slice(0, 12)
+                .map((folder) => (
+                  <FolderCard
+                    key={folder.id}
+                    folder={folder}
+                    onNavigate={handleNavigate}
+                    onMove={handleMove}
+                    onPin={handlePin}
+                    onUnpin={handleUnpin}
+                    onSettings={handleSettings}
+                    onDelete={handleDelete}
+                  />
+                ))}
+            </div>
+          </div>
+        </>
+      )}
+
+      <div className="mt-12">
         {data && data.count === 0 ? (
           <div className="text-muted-foreground/60 flex h-96 flex-col items-center justify-center gap-y-4">
             <Bird className="h-12 w-12" strokeWidth={1.5} />
@@ -89,6 +249,43 @@ export default function TemplatesPage() {
           />
         )}
       </div>
+
+      <TemplateFolderMoveDialog
+        foldersData={foldersData?.folders}
+        folder={folderToMove}
+        isOpen={isMovingFolder}
+        onOpenChange={(open) => {
+          setIsMovingFolder(open);
+
+          if (!open) {
+            setFolderToMove(null);
+          }
+        }}
+      />
+
+      <TemplateFolderSettingsDialog
+        folder={folderToSettings}
+        isOpen={isSettingsFolderOpen}
+        onOpenChange={(open) => {
+          setIsSettingsFolderOpen(open);
+
+          if (!open) {
+            setFolderToSettings(null);
+          }
+        }}
+      />
+
+      <TemplateFolderDeleteDialog
+        folder={folderToDelete}
+        isOpen={isDeletingFolder}
+        onOpenChange={(open) => {
+          setIsDeletingFolder(open);
+
+          if (!open) {
+            setFolderToDelete(null);
+          }
+        }}
+      />
     </div>
   );
 }

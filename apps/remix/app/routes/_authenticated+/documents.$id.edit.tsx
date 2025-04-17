@@ -48,6 +48,10 @@ export async function loader({ params, request }: Route.LoaderArgs) {
     throw redirect(documentRootPath);
   }
 
+  if (document?.folderId) {
+    throw redirect(documentRootPath);
+  }
+
   const documentVisibility = document?.visibility;
   const currentTeamMemberRole = team?.currentTeamMember?.role;
   const isRecipient = document?.recipients.find((recipient) => recipient.email === user.email);
@@ -82,7 +86,10 @@ export async function loader({ params, request }: Route.LoaderArgs) {
   });
 
   return superLoaderJson({
-    document,
+    document: {
+      ...document,
+      folder: null,
+    },
     documentRootPath,
     isDocumentEnterprise,
   });
