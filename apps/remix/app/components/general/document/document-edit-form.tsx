@@ -175,7 +175,8 @@ export const DocumentEditForm = ({
 
   const onAddSettingsFormSubmit = async (data: TAddSettingsFormSchema) => {
     try {
-      const { timezone, dateFormat, redirectUrl, language, signatureTypes } = data.meta;
+      const { timezone, dateFormat, redirectUrl, language, signatureTypes, reminderInterval } =
+        data.meta;
 
       await updateDocument({
         documentId: document.id,
@@ -194,6 +195,7 @@ export const DocumentEditForm = ({
           typedSignatureEnabled: signatureTypes.includes(DocumentSignatureType.TYPE),
           uploadSignatureEnabled: signatureTypes.includes(DocumentSignatureType.UPLOAD),
           drawSignatureEnabled: signatureTypes.includes(DocumentSignatureType.DRAW),
+          reminderInterval,
         },
       });
 
