@@ -1,9 +1,9 @@
-import { IS_BILLING_ENABLED } from '@documenso/lib/constants/app';
-import type Stripe from 'stripe';
 import { TeamMemberRole } from '@prisma/client';
-import { mapStripeSubscriptionToPrismaUpsertAction } from '@documenso/ee-stub/server-only/stripe/webhook/on-subscription-updated';
-import { prisma } from '@documenso/prisma';
+
 import { transferTeamSubscription } from '@documenso/ee-stub/server-only/stripe/transfer-team-subscription';
+import { mapStripeSubscriptionToPrismaUpsertAction } from '@documenso/ee-stub/server-only/stripe/webhook/on-subscription-updated';
+import { IS_BILLING_ENABLED } from '@documenso/lib/constants/app';
+import { prisma } from '@documenso/prisma';
 
 export type TransferTeamOwnershipOptions = {
   token: string;
@@ -60,7 +60,7 @@ export const transferTeamOwnership = async ({ token }: TransferTeamOwnershipOpti
         },
       });
 
-      let teamSubscription: any = null;
+      let teamSubscription: unknown = null;
 
       if (IS_BILLING_ENABLED()) {
         teamSubscription = await transferTeamSubscription({

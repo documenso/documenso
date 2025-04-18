@@ -1,16 +1,23 @@
-import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import { Prisma, TeamMemberRole } from '@prisma/client';
-
-import { IS_BILLING_ENABLED } from '@documenso/lib/constants/app';
 import type Stripe from 'stripe';
+import { z } from 'zod';
+
 import { createTeamCustomer } from '@documenso/ee-stub/server-only/stripe/create-team-customer';
 import { getTeamRelatedPrices } from '@documenso/ee-stub/server-only/stripe/get-team-related-prices';
-import { isDocumentPlatform as isUserPlatformPlan } from '@documenso/ee-stub/server-only/util/is-document-platform';
 import { mapStripeSubscriptionToPrismaUpsertAction } from '@documenso/ee-stub/server-only/stripe/webhook/on-subscription-updated';
-import { prisma } from '@documenso/prisma';
-import { stripe } from '../stripe';
+import { isDocumentPlatform as isUserPlatformPlan } from '@documenso/ee-stub/server-only/util/is-document-platform';
+import { IS_BILLING_ENABLED } from '@documenso/lib/constants/app';
+import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import { subscriptionsContainsActivePlan } from '@documenso/lib/utils/billing';
-import { z } from 'zod';
+import { prisma } from '@documenso/prisma';
+
+import { stripe } from '../stripe';
+
+// Define an interface for the price objects we expect to receive
+interface PriceObject {
+  id: string | number;
+  [key: string]: unknown;
+}
 
 export type CreateTeamOptions = {
   /**
@@ -69,9 +76,18 @@ export const createTeam = async ({
   let customerId: string | null = null;
 
   if (IS_BILLING_ENABLED()) {
-    const teamRelatedPriceIds = await getTeamRelatedPrices().then((prices) =>
-      prices.map((price) => (price as { id: string }).id),
-    );
+    // Get team-related price IDs using type assertion to avoid TypeScript errors
+    const teamRelatedPriceIds = await getTeamRelatedPrices().then((prices) => {
+      if (!Array.isArray(prices)) return [];
+
+      return prices
+        .filter((p) => p !== null && typeof p === 'object')
+        .map((price) => {
+          const p = price as { id?: string | number };
+          return typeof p.id === 'string' || typeof p.id === 'number' ? String(p.id) : '';
+        })
+        .filter(Boolean);
+    });
 
     const hasTeamRelatedSubscription = subscriptionsContainsActivePlan(
       user.subscriptions,

@@ -132,13 +132,18 @@ export const getPublicProfileByUrl = async ({
     }
 
     if (IS_BILLING_ENABLED()) {
-      const earlyAdopterPriceIds = (await getCommunityPlanPriceIds()) as string[];
+      const earlyAdopterPriceIds = await getCommunityPlanPriceIds();
 
-      const activeEarlyAdopterSub = user.subscriptions.find(
-        (subscription) =>
-          subscription.status === SubscriptionStatus.ACTIVE &&
-          earlyAdopterPriceIds.includes(subscription.priceId as string),
-      );
+      // We check for active subscriptions that match community plan IDs
+      const activeEarlyAdopterSub = user.subscriptions.find((subscription) => {
+        // First check if the subscription is active
+        if (subscription.status !== SubscriptionStatus.ACTIVE) {
+          return false;
+        }
+
+        // Then check if priceId exists in the community plans
+        return earlyAdopterPriceIds.some((id) => id === subscription.priceId);
+      });
 
       if (activeEarlyAdopterSub) {
         badge = {
