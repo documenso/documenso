@@ -146,6 +146,26 @@ bun run d
 
 4. **S3 Storage Dashboard** - http://localhost:9001
 
+### Authentication for Development
+
+When running Documenso locally using the seed data, the following accounts are available:
+
+| Email                 | Password | Role  |
+| --------------------- | -------- | ----- |
+| admin@documenso.com   | password | Admin |
+| example@documenso.com | password | User  |
+| test@documenso.com    | password | User  |
+| test2@documenso.com   | password | User  |
+| test3@documenso.com   | password | User  |
+| test4@documenso.com   | password | User  |
+
+For E2E testing, you can also use:
+
+- Email: testuser@mail.com
+- Password: test_Password123
+
+You can view these credentials anytime by running `make default-passwords` in the project root.
+
 ## Developer Setup
 
 ### Manual Setup

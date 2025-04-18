@@ -157,3 +157,25 @@ deploy: build
 replace-ee-imports:
 	@echo "Replacing @documenso/ee imports with @documenso/ee-stub..."
 	./scripts/replace-ee-imports.sh
+
+list-users:
+	docker exec database psql -U documenso -d documenso -c "SELECT id, name, email, SUBSTRING(password, 1, 20) as password_hash FROM \"User\" LIMIT 10;" | cat
+
+list-users-detailed:
+	docker exec database psql -U documenso -d documenso -c "SELECT id, name, email, roles, \"emailVerified\", \"lastSignedIn\" FROM \"User\" ORDER BY id LIMIT 10;" -t -A -F',' | column -t -s',' | cat
+
+list-users-with-passwords:
+	docker exec database psql -U documenso -d documenso -c "SELECT id, name, email, password FROM \"User\" ORDER BY id LIMIT 10;" -t -A -F',' | column -t -s',' | cat
+
+default-passwords:
+	@echo "Default passwords from the seed:"
+	@echo "  example@documenso.com:   password"
+	@echo "  admin@documenso.com:     password"
+	@echo "  test@documenso.com:      password"
+	@echo "  test2@documenso.com:     password"
+	@echo "  test3@documenso.com:     password"
+	@echo "  test4@documenso.com:     password"
+	@echo ""
+	@echo "E2E Test Account:"
+	@echo "  User:     $(shell grep E2E_TEST_AUTHENTICATE_USER_EMAIL .env | cut -d= -f2)"
+	@echo "  Password: $(shell grep E2E_TEST_AUTHENTICATE_USER_PASSWORD .env | cut -d= -f2)"
