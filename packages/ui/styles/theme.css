@@ -190,7 +190,9 @@
 
   body {
     @apply bg-background text-foreground;
-    font-feature-settings: 'rlig' 1, 'calt' 1;
+    font-feature-settings:
+      'rlig' 1,
+      'calt' 1;
   }
 }
 
@@ -210,8 +212,12 @@
 }
 
 .gradient-border-mask::before {
-  mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  mask:
+    linear-gradient(#fff 0 0) content-box,
+    linear-gradient(#fff 0 0);
+  -webkit-mask:
+    linear-gradient(#fff 0 0) content-box,
+    linear-gradient(#fff 0 0);
   mask-composite: exclude;
   -webkit-mask-composite: xor;
 }
@@ -223,7 +229,7 @@
   scrollbar-gutter: stable;
 }
 
-.custom-scrollbar::-webkit-scrollbar-track {
+/* .custom-scrollbar::-webkit-scrollbar-track {
   border-radius: 10px;
 }
 
@@ -235,7 +241,7 @@
 
 .custom-scrollbar::-webkit-scrollbar-thumb:hover {
   background: rgb(100 116 139 / 0.5);
-}
+} */
 
 /* Custom Swagger Dark Theme */
 .swagger-dark-theme .swagger-ui {
