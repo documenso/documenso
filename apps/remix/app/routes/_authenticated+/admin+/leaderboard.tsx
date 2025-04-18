@@ -2,7 +2,10 @@ import { Trans } from '@lingui/react/macro';
 
 import { getSigningVolume } from '@documenso/lib/server-only/admin/get-signing-volume';
 
-import { AdminLeaderboardTable } from '~/components/tables/admin-leaderboard-table';
+import {
+  AdminLeaderboardTable,
+  type SigningVolume,
+} from '~/components/tables/admin-leaderboard-table';
 
 import type { Route } from './+types/leaderboard';
 
@@ -25,7 +28,7 @@ export async function loader({ request }: Route.LoaderArgs) {
   const perPage = Number(url.searchParams.get('perPage')) || 10;
   const search = url.searchParams.get('search') || '';
 
-  const { leaderboard: signingVolume, totalPages } = await getSigningVolume({
+  const { leaderboard, totalPages } = await getSigningVolume({
     search,
     page,
     perPage,
@@ -33,8 +36,14 @@ export async function loader({ request }: Route.LoaderArgs) {
     sortOrder,
   });
 
+  const typedSigningVolume: SigningVolume[] = leaderboard.map((item) => ({
+    ...item,
+    name: item.name || '',
+    createdAt: item.createdAt || new Date(),
+  }));
+
   return {
-    signingVolume,
+    signingVolume: typedSigningVolume,
     totalPages,
     page,
     perPage,
@@ -48,9 +57,11 @@ export default function Leaderboard({ loaderData }: Route.ComponentProps) {
 
   return (
     <div>
-      <h2 className="text-4xl font-semibold">
-        <Trans>Signing Volume</Trans>
-      </h2>
+      <div className="flex items-center">
+        <h2 className="text-4xl font-semibold">
+          <Trans>Signing Volume</Trans>
+        </h2>
+      </div>
       <div className="mt-8">
         <AdminLeaderboardTable
           signingVolume={signingVolume}
