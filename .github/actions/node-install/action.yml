@@ -1,8 +1,14 @@
-name: 'Setup node and cache node_modules'
+name: 'Setup Bun and cache node_modules'
+description: 'Setup Bun and Node.js and cache the node_modules directory'
 inputs:
   node_version:
+    description: 'Node.js version to use'
     required: false
     default: v22.x
+  bun_version:
+    description: 'Bun version to use'
+    required: false
+    default: 1.2.9
 
 runs:
   using: 'composite'
@@ -12,12 +18,10 @@ runs:
       with:
         node-version: ${{ inputs.node_version }}
 
-    - name: Cache npm
-      uses: actions/cache@v3
+    - name: Setup Bun
+      uses: oven-sh/setup-bun@v1
       with:
-        path: ~/.npm
-        key: npm-${{ hashFiles('package-lock.json') }}
-        restore-keys: npm-
+        bun-version: ${{ inputs.bun_version }}
 
     - name: Cache node_modules
       uses: actions/cache@v3
@@ -27,13 +31,13 @@ runs:
           node_modules
           packages/*/node_modules
           apps/*/node_modules
-        key: modules-${{ hashFiles('package-lock.json') }}
+        key: modules-bun-${{ hashFiles('bun.lockb') }}
 
     - name: Install dependencies
       if: steps.cache-node-modules.outputs.cache-hit != 'true'
       shell: bash
       run: |
-        npm ci --no-audit
-        npm run prisma:generate
+        bun install
+        bun run prisma:generate
       env:
         HUSKY: '0'

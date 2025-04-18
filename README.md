@@ -102,12 +102,13 @@ Contact us if you are interested in our Enterprise plan for large organizations 
 To run Documenso locally, you will need
 
 - Node.js (v22 or above)
+- Bun (v1.2.9 or above)
 - Postgres SQL Database
 - Docker (optional)
 
 ### Developer Quickstart
 
-> **Note**: This is a quickstart for developers. It assumes that you have both [docker](https://docs.docker.com/get-docker/) and [docker-compose](https://docs.docker.com/compose/) installed on your machine.
+> **Note**: This is a quickstart for developers. It assumes that you have both [docker](https://docs.docker.com/get-docker/), [docker-compose](https://docs.docker.com/compose/), and [Bun](https://bun.sh) installed on your machine.
 
 Want to get up and running quickly? Follow these steps:
 
@@ -121,16 +122,16 @@ git clone https://github.com/<your-username>/documenso
 
 2. Set up your `.env` file using the recommendations in the `.env.example` file. Alternatively, just run `cp .env.example .env` to get started with our handpicked defaults.
 
-3. Run `npm run dx` in the root directory
+3. Run `bun run dx` in the root directory
 
    - This will spin up a postgres database and inbucket mailserver in a docker container.
 
-4. Run `npm run dev` in the root directory
+4. Run `bun run dev` in the root directory
 
 5. Want it even faster? Just use
 
 ```sh
-npm run d
+bun run d
 ```
 
 #### Access Points for Your Application
@@ -158,7 +159,7 @@ After forking the repository, clone it to your local device by using the followi
 git clone https://github.com/<your-username>/documenso
 ```
 
-2. Run `npm i` in the root directory
+2. Run `bun install` in the root directory
 
 3. Create your `.env` from the `.env.example`. You can use `cp .env.example .env` to get started with our handpicked defaults.
 
@@ -171,15 +172,15 @@ git clone https://github.com/<your-username>/documenso
    - NEXT_PRIVATE_SMTP_FROM_NAME
    - NEXT_PRIVATE_SMTP_FROM_ADDRESS
 
-5. Create the database schema by running `npm run prisma:migrate-dev`
+5. Create the database schema by running `bun run prisma:migrate-dev`
 
-6. Run `npm run dev` in the root directory to start
+6. Run `bun run dev` in the root directory to start
 
 7. Register a new user at http://localhost:3000/signup
 
 ---
 
-- Optional: Seed the database using `npm run prisma:seed -w @documenso/prisma` to create a test user and document.
+- Optional: Seed the database using `bun run prisma:seed -w @documenso/prisma` to create a test user and document.
 - Optional: Create your own signing certificate.
   - To generate your own using these steps and a Linux Terminal or Windows Subsystem for Linux (WSL), see **[Create your own signing certificate](./SIGNING.md)**.
 
@@ -246,16 +247,15 @@ The following environment variables must be set:
 Now you can install the dependencies and build it:
 
 ```
-npm i
-npm run build:web
-npm run prisma:migrate-deploy
+bun i
+bun run build:web
+bun run prisma:migrate-deploy
 ```
 
 Finally, you can start it with:
 
 ```
-cd apps/web
-npm run start
+bun run start
 ```
 
 This will start the server on `localhost:3000`. For now, any reverse proxy can then do the frontend and SSL termination.
@@ -315,7 +315,7 @@ If you are deploying to a cluster that uses only IPv6, You can use a custom comm
 For local docker run
 
 ```bash
-docker run -it documenso:latest npm run start -- -H ::
+docker run -it documenso:latest bun run start -- -H ::
 ```
 
 For k8s or docker-compose
@@ -326,7 +326,7 @@ containers:
     image: documenso:latest
     imagePullPolicy: IfNotPresent
     command:
-      - npm
+      - bun
     args:
       - run
       - start
@@ -340,13 +340,13 @@ containers:
 Wrap your package script with the `with:env` script like such:
 
 ```
-npm run with:env -- npm run myscript
+bun run with:env -- bun run myscript
 ```
 
-The same can be done when using `npx` for one of the bin scripts:
+The same can be done when using `bunx` for one of the bin scripts:
 
 ```
-npm run with:env -- npx myscript
+bun run with:env -- bunx myscript
 ```
 
 This will load environment variables from your `.env` and `.env.local` files.
@@ -354,3 +354,5 @@ This will load environment variables from your `.env` and `.env.local` files.
 ## Repo Activity
 
 ![Repository Activity](https://repobeats.axiom.co/api/embed/622a2e9aa709696f7226304b5b7178a5741b3868.svg)
+
+# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.

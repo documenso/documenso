@@ -1,7 +1,7 @@
 ###########################
 #     BASE CONTAINER      #
 ###########################
-FROM node:22-alpine3.20 AS base
+FROM oven/bun:1.2.9-alpine AS base
 
 RUN apk add --no-cache openssl
 
@@ -18,7 +18,7 @@ WORKDIR /app
 
 COPY . .
 
-RUN npm install -g "turbo@^1.9.3"
+RUN bun install -g "turbo@^1.9.3"
 
 # Outputs to the /out folder
 # source: https://turbo.build/repo/docs/reference/command-line-reference/prune#--docker
@@ -59,18 +59,18 @@ ENV NEXT_PRIVATE_ENCRYPTION_SECONDARY_KEY="$NEXT_PRIVATE_ENCRYPTION_SECONDARY_KE
 # First install the dependencies (as they change less often)
 COPY .gitignore .gitignore
 COPY --from=builder /app/out/json/ .
-COPY --from=builder /app/out/package-lock.json ./package-lock.json
+COPY --from=builder /app/out/bun.lockb ./bun.lockb
 
 COPY --from=builder /app/lingui.config.ts ./lingui.config.ts
 
-RUN npm ci
+RUN bun install
 
 # Then copy all the source code (as it changes more often)
 COPY --from=builder /app/out/full/ .
 # Finally copy the turbo.json file so that we can run turbo commands
 COPY turbo.json turbo.json
 
-RUN npm install -g "turbo@^1.9.3"
+RUN bun install -g "turbo@^1.9.3"
 
 RUN turbo run build --filter=@documenso/remix...
 
@@ -94,7 +94,7 @@ COPY --from=builder --chown=nodejs:nodejs /app/out/json/ .
 # Copy the tailwind config files across
 COPY --from=builder --chown=nodejs:nodejs /app/out/full/packages/tailwind-config ./packages/tailwind-config
 
-RUN npm ci --only=production
+RUN bun install --production
 
 # Automatically leverage output traces to reduce image size
 # https://nodejs.org/docs/advanced-features/output-file-tracing
@@ -106,7 +106,7 @@ COPY --from=installer --chown=nodejs:nodejs /app/packages/prisma/schema.prisma .
 COPY --from=installer --chown=nodejs:nodejs /app/packages/prisma/migrations ./packages/prisma/migrations
 
 # Generate the prisma client again
-RUN npx prisma generate --schema ./packages/prisma/schema.prisma
+RUN bunx prisma generate --schema ./packages/prisma/schema.prisma
 
 
 # Get the start script from docker/start.sh

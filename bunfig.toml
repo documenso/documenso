@@ -1,0 +1,10 @@
+[install]
+# Equivalent to auto-install-peers = true in .npmrc
+peer-dependencies = true
+
+# Respect Node.js version constraint from package.json
+node-version = ">=22.0.0"
+
+[install.cache]
+# Enable Bun's caching mechanism
+dir = "node_modules/.cache/bun"

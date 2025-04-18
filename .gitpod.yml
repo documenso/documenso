@@ -1,11 +1,11 @@
 tasks:
   - init: |
-      npm i &&
+      bun install &&
       npm run dx:up &&
       cp .env.example .env &&
       set -a; source .env &&
       export NEXT_PUBLIC_WEBAPP_URL="$(gp url 3000)" &&
-    command: npm run d
+    command: bun run d
 
 ports:
   - port: 3000
