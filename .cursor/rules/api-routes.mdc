@@ -1,0 +1,160 @@
+---
+description: Guidelines for implementing Next.js API routes
+globs:
+alwaysApply: false
+---
+# API Routes in Documenso
+
+## API Route Structure
+
+API routes should be placed in the appropriate location within `apps/remix/app/api`.
+
+```
+apps/remix/app/api/
+├── documents/
+│   ├── [id]/
+│   │   ├── sign/
+│   │   │   └── route.ts
+│   │   └── route.ts
+│   └── route.ts
+├── templates/
+│   ├── [id]/
+│   │   └── route.ts
+│   └── route.ts
+├── webhooks/
+│   └── stripe/
+│       └── route.ts
+└── auth/
+    └── [...nextauth]/
+        └── route.ts
+```
+
+## Route Handlers Implementation
+
+```typescript
+// apps/remix/app/api/documents/route.ts
+import { NextRequest, NextResponse } from 'next/server';
+import { z } from 'zod';
+
+import { getAPISession } from '@documenso/app-auth/get-session';
+import { prisma } from '@documenso/prisma';
+
+// GET handler for listing documents
+export async function GET(req: NextRequest) {
+  try {
+    const { session } = await getAPISession();
+
+    if (!session) {
+      return NextResponse.json(
+        { error: 'Unauthorized' },
+        { status: 401 }
+      );
+    }
+
+    // Parse query parameters
+    const { searchParams } = new URL(req.url);
+    const status = searchParams.get('status') || 'all';
+    const page = parseInt(searchParams.get('page') || '1');
+    const limit = parseInt(searchParams.get('limit') || '10');
+
+    // Build query
+    const where: any = {
+      userId: session.user.id,
+    };
+
+    if (status !== 'all') {
+      where.status = status;
+    }
+
+    // Fetch documents
+    const [documents, count] = await Promise.all([
+      prisma.document.findMany({
+        where,
+        orderBy: {
+          createdAt: 'desc',
+        },
+        take: limit,
+        skip: (page - 1) * limit,
+      }),
+      prisma.document.count({ where }),
+    ]);
+
+    return NextResponse.json({
+      documents,
+      totalPages: Math.ceil(count / limit),
+      currentPage: page,
+    });
+  } catch (error) {
+    console.error('Error fetching documents:', error);
+
+    return NextResponse.json(
+      { error: 'Internal server error' },
+      { status: 500 }
+    );
+  }
+}
+
+// POST handler for creating a document
+export async function POST(req: NextRequest) {
+  try {
+    const { session } = await getAPISession();
+
+    if (!session) {
+      return NextResponse.json(
+        { error: 'Unauthorized' },
+        { status: 401 }
+      );
+    }
+
+    // Parse and validate request body
+    const DocumentSchema = z.object({
+      title: z.string().min(1, 'Title is required'),
+      // Other fields
+    });
+
+    let body;
+
+    try {
+      body = DocumentSchema.parse(await req.json());
+    } catch (error) {
+      return NextResponse.json(
+        { error: 'Invalid request body' },
+        { status: 400 }
+      );
+    }
+
+    // Create document
+    const document = await prisma.document.create({
+      data: {
+        title: body.title,
+        userId: session.user.id,
+        status: 'DRAFT',
+        // Other fields
+      },
+    });
+
+    return NextResponse.json({
+      document,
+    }, { status: 201 });
+  } catch (error) {
+    console.error('Error creating document:', error);
+
+    return NextResponse.json(
+      { error: 'Internal server error' },
+      { status: 500 }
+    );
+  }
+}
+```
+
+## Best Practices
+
+1. Use appropriate HTTP methods (GET, POST, PUT, DELETE)
+2. Implement proper authentication and authorization
+3. Validate request parameters and body
+4. Use Zod for schema validation
+5. Return consistent response formats
+6. Include proper error handling
+7. Use appropriate status codes
+8. Log errors and important events
+9. Handle edge cases (pagination, sorting, filtering)

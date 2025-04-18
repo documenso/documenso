@@ -1,0 +1,209 @@
+---
+description: Form handling
+globs:
+alwaysApply: false
+---
+# Form Handling
+
+- Use React Hook Form with Zod for validation
+- The same validation should be done in the server action too
+
+## Form Example
+
+```tsx
+import { zodResolver } from "@hookform/resolvers/zod";
+import { Input } from "@/components/Input";
+import { Button } from "@/components/ui/button";
+import { toastSuccess, toastError } from "@/components/Toast";
+import { createExampleAction } from "@/utils/actions/example";
+import { type CreateExampleBody } from "@/utils/actions/example.validation";
+
+export const ExampleForm = () => {
+  const {
+    register,
+    handleSubmit,
+    formState: { errors, isSubmitting },
+  } = useForm<CreateExampleBody>({
+    resolver: zodResolver(processHistorySchema),
+  });
+
+  const onSubmit: SubmitHandler<CreateExampleBody> = useCallback(
+    async (data) => {
+      const result = await createExampleAction(data.email);
+
+      if (isActionError(result)) {
+        toastError({ title: "Error", description: result.error });
+      } else {
+        toastSuccess({ description: "Created example!" });
+      }
+    },
+    []
+  );
+
+  return (
+    <form className="max-w-sm space-y-4" onSubmit={handleSubmit(onSubmit)}>
+      <Input
+        type="email"
+        name="email"
+        label="Email"
+        registerProps={register("email", { required: true })}
+        error={errors.email}
+      />
+      <Button type="submit" loading={isSubmitting}>
+        Save
+      </Button>
+    </form>
+  );
+};
+```
+
+## Validation Guidelines
+
+- Define validation schemas using Zod
+- Apply the same validation in both client and server
+- Use descriptive error messages
+- Validate form inputs before submission
+- Show validation errors inline next to form fields
+
+# Form Handling in Documenso
+
+## Form Implementation with React Hook Form and Zod
+
+Documenso uses React Hook Form with Zod for form validation:
+
+```tsx
+import { z } from 'zod';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+
+import { Button } from '@documenso/ui/button';
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage
+} from '@documenso/ui/form';
+import { Input } from '@documenso/ui/input';
+import { Textarea } from '@documenso/ui/textarea';
+
+// Define form schema with Zod
+const formSchema = z.object({
+  title: z.string().min(1, 'Title is required'),
+  message: z.string().optional(),
+  recipients: z.array(
+    z.object({
+      email: z.string().email('Invalid email address'),
+      name: z.string().min(1, 'Name is required'),
+    })
+  ).min(1, 'At least one recipient is required'),
+});
+
+// Infer TypeScript type from the schema
+type FormValues = z.infer<typeof formSchema>;
+
+export function DocumentForm() {
+  // Initialize form with React Hook Form
+  const form = useForm<FormValues>({
+    resolver: zodResolver(formSchema),
+    defaultValues: {
+      title: '',
+      message: '',
+      recipients: [{ email: '', name: '' }],
+    },
+  });
+
+  // Handle form submission
+  const onSubmit = async (values: FormValues) => {
+    const formData = new FormData();
+
+    formData.append('title', values.title);
+
+    if (values.message) {
+      formData.append('message', values.message);
+    }
+
+    // Convert complex data to JSON strings for FormData
+    formData.append('recipients', JSON.stringify(values.recipients));
+
+    // Submit to server action
+    const result = await createDocument(formData);
+
+    if (result.success) {
+      // Handle success
+    } else {
+      // Handle error
+      form.setError('root', {
+        message: result.error || 'Something went wrong'
+      });
+    }
+  };
+
+  return (
+    <Form {...form}>
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+        <FormField
+          control={form.control}
+          name="title"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Document Title</FormLabel>
+              <FormControl>
+                <Input {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        <FormField
+          control={form.control}
+          name="message"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Message (Optional)</FormLabel>
+              <FormControl>
+                <Textarea {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        {/* Display any root form errors */}
+        {form.formState.errors.root && (
+          <div className="text-red-500">
+            {form.formState.errors.root.message}
+          </div>
+        )}
+
+        <Button type="submit" disabled={form.formState.isSubmitting}>
+          {form.formState.isSubmitting ? 'Saving...' : 'Save Document'}
+        </Button>
+      </form>
+    </Form>
+  );
+}
+
+## Best Practices
+
+1. **Validation**:
+   - Use Zod for schema validation
+   - Create type-safe form values using `z.infer<typeof schema>`
+   - Add meaningful validation messages
+
+2. **Form State**:
+   - Handle loading states during submission
+   - Display appropriate error messages
+   - Provide feedback for successful submissions
+
+3. **Accessibility**:
+   - Use proper form labels and ARIA attributes
+   - Ensure form controls have appropriate focus states
+   - Make error messages accessible to screen readers
+
+4. **UX Considerations**:
+   - Disable the submit button during submission
+   - Provide clear visual feedback for validation errors
+   - Use proper input types (email, number, etc.)

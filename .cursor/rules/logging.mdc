@@ -1,0 +1,63 @@
+---
+description: How to do backend logging
+globs:
+alwaysApply: false
+---
+# Logging in Documenso
+
+## Backend Logging
+
+### Basic Logging
+- Use console.log for development-only logs
+- Use structured logging for production environments
+
+### Error Logging with Honeybadger
+Documenso uses Honeybadger for error tracking in production.
+
+```ts
+import { honeybadger } from '@/lib/server/honeybadger';
+
+try {
+  // Code that might fail
+} catch (error) {
+  console.error('Error occurred:', error);
+
+  // Log to Honeybadger in production
+  honeybadger.notify(error, {
+    context: {
+      documentId: document.id,
+      userId: user.id,
+    },
+  });
+
+  throw error; // Re-throw or handle appropriately
+}
+```
+
+## Environment Variables
+The Honeybadger API key is configured via the environment variable:
+```
+NEXT_PRIVATE_LOGGER_HONEY_BADGER_API_KEY=
+```
+
+We use `createScopedLogger` to do logging:
+
+```typescript
+import { createScopedLogger } from "@/utils/logger";
+
+const logger = createScopedLogger("action/rules");
+
+logger.log("Created rule", { userId });
+```
+
+Typically this will be added at the top of a file.
+If we have a large function that reuses multiple variables we can do this within a function:
+
+```typescript
+const logger = createScopedLogger("action/rules").with({ userId: user.id });
+
+// Can now call without passing userId:
+logger.log("Created rule");
+```
+
+Don't use `.with()` for a global logger. Only use within a specific function.

@@ -1,0 +1,62 @@
+---
+description: 
+globs: 
+alwaysApply: false
+---
+# Document Signing Guidelines
+
+This rule provides guidelines for implementing document signing functionality in Documenso.
+
+## Core Concepts
+
+1. Documenso supports multiple signing transports:
+   - Local file-based (default)
+   - Google Cloud HSM
+
+2. Signing configuration is controlled through environment variables:
+   ```
+   # The transport to use for document signing. Available options: local (default) | gcloud-hsm
+   NEXT_PRIVATE_SIGNING_TRANSPORT="local"
+
+   # For local file-based signing:
+   NEXT_PRIVATE_SIGNING_PASSPHRASE=
+   NEXT_PRIVATE_SIGNING_LOCAL_FILE_PATH=
+   NEXT_PRIVATE_SIGNING_LOCAL_FILE_CONTENTS=
+
+   # For Google Cloud HSM:
+   NEXT_PRIVATE_SIGNING_GCLOUD_HSM_KEY_PATH=
+   NEXT_PRIVATE_SIGNING_GCLOUD_HSM_PUBLIC_CRT_FILE_PATH=
+   NEXT_PRIVATE_SIGNING_GCLOUD_HSM_PUBLIC_CRT_FILE_CONTENTS=
+   NEXT_PRIVATE_SIGNING_GCLOUD_APPLICATION_CREDENTIALS_CONTENTS=
+   ```
+
+## Implementation Guidelines
+
+1. Always use the signing package for all document signing operations:
+   ```typescript
+   import { signPdf } from '@documenso/signing';
+   ```
+
+2. Handle signing errors appropriately:
+   ```typescript
+   try {
+     const signedDocument = await signPdf({
+       // Signing parameters
+     });
+   } catch (error) {
+     // Handle signing errors
+     console.error('Document signing failed:', error);
+     throw new Error('Unable to sign document');
+   }
+   ```
+
+3. Support both signing modes and fall back gracefully:
+   ```typescript
+   const transport = process.env.NEXT_PRIVATE_SIGNING_TRANSPORT || 'local';
+   ```
+
+4. When implementing document signing, always:
+   - Verify the document integrity before signing
+   - Use the correct signing certificate for the intended purpose
+   - Implement proper error handling for all signing operations
+   - Log signing events for audit purposes

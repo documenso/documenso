@@ -1,0 +1,92 @@
+---
+description: 
+globs: 
+alwaysApply: false
+---
+# Knowledge Base
+
+This file explains the Knowledge Base feature and how it's implemented.
+
+The knowledge base helps users store and manage information that can be used to help draft responses to emails. It acts as a personal database of information that can be referenced when composing replies.
+
+## Overview
+
+Users can create, edit, and delete knowledge base entries. Each entry consists of:
+
+- A title for quick reference
+- Content that contains the actual information
+- Metadata like creation and update timestamps
+
+## Database Schema
+
+The `Knowledge` model in Prisma:
+
+```prisma
+model Knowledge {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  title     String
+  content   String
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+```
+
+Each knowledge entry belongs to a specific user and is automatically deleted if the user is deleted (cascade).
+
+## Main Files and Directories
+
+The knowledge base functionality is implemented in:
+
+- `apps/web/app/(app)/automation/knowledge/KnowledgeBase.tsx` - Main UI component
+- `apps/web/app/(app)/automation/knowledge/KnowledgeForm.tsx` - Form for creating/editing entries
+- `apps/web/utils/actions/knowledge.ts` - Server actions for CRUD operations
+- `apps/web/utils/actions/knowledge.validation.ts` - Zod validation schemas
+- `apps/web/app/api/knowledge/route.ts` - API route for fetching entries
+
+### AI Integration Files
+
+- `apps/web/utils/ai/knowledge/extract.ts` - Extract relevant knowledge from knowledge base entries
+- `apps/web/utils/ai/knowledge/extract-from-email-history.ts` - Extract context from previous emails
+- `apps/web/utils/ai/reply/draft-with-knowledge.ts` - Generate email drafts using extracted knowledge
+- `apps/web/utils/reply-tracker/generate-draft.ts` - Coordinates the extraction and drafting process
+- `apps/web/utils/llms/model-selector.ts` - Economy LLM selection for high-volume tasks
+
+## Features
+
+- **Create**: Users can add new knowledge entries with a title and content
+- **Read**: Entries are displayed in a table with title and last updated date
+- **Update**: Users can edit existing entries
+- **Delete**: Entries can be deleted with a confirmation dialog
+
+## Usage in Email Responses
+
+The knowledge base entries are used to help draft responses to emails. When composing a reply, the system can reference these entries to include relevant information, ensuring consistent and accurate responses.
+
+When drafting responses, we use two LLMs:
+
+1. A cheaper LLM that can process a lot of data (e.g. Google Gemini 2 Flash)
+2. A more expensive LLM to draft the response (e.g. Anthropic Sonnet 3.7)
+
+The cheaper LLM is an agent that extracts the key information needed for the drafter LLM.
+For example, the knowledge base may include 100 pages of content, and the LLM extracts half a page of knowledge to pass to the more expensive drafter LLM.
+
+## Dual LLM Architecture
+
+The dual LLM approach is implemented as follows:
+
+1. **Knowledge Extraction (Economy LLM)**:
+
+   - Uses a more cost-efficient model like Gemini Flash for processing large volumes of knowledge base content
+   - Analyzes all knowledge entries and extracts only relevant information based on the email content
+   - Configured via environment variables (`ECONOMY_LLM_PROVIDER` and `ECONOMY_LLM_MODEL`)
+   - If no specific economy model is configured, defaults to Gemini Flash when Google API key is available
+
+2. **Email Draft Generation (Core LLM)**:
+   - Uses the default model (e.g., Anthropic Claude 3.7 Sonnet) for high-quality content generation
+   - Receives the extracted relevant knowledge from the economy LLM
+   - Generates the final email draft based on the provided context
+
+This architecture optimizes for both cost efficiency (using cheaper models for high-volume tasks) and quality (using premium models for user-facing content).

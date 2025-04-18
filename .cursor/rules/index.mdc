@@ -1,0 +1,72 @@
+---
+description:
+globs:
+alwaysApply: true
+---
+# Documenso - Master Rule Index
+
+This document serves as the central index for all active Cursor rules within this repository, organized by category. These rules define processes, structures, and guidelines for development of the Documenso platform.
+
+## Core & General
+
+Fundamental project structure, setup, and general development guidelines.
+
+| Rule File                          | Description                                                 |
+| :--------------------------------- | :---------------------------------------------------------- |
+| @cursor-rules.mdc                  | How to add or edit Cursor rules in our project              |
+| @project-structure.mdc             | Project structure and file organization guidelines          |
+| @installing-packages.mdc           | How to install packages                                     |
+| @environment-variables.mdc         | Add environment variable                                    |
+| @logging.mdc                       | How to do backend logging                                   |
+| @utilities.mdc                     | Util functions                                              |
+
+## Frontend & UI
+
+Guidelines for building user interfaces and handling frontend logic.
+
+| Rule File                          | Description                                                 |
+| :--------------------------------- | :---------------------------------------------------------- |
+| @page-structure.mdc                | Page structure guidelines                                   |
+| @ui-components.mdc                 | UI component and styling guidelines (Shadcn, Radix, Tailwind) |
+| @form-handling.mdc                 | Form handling using React Hook Form and Zod                 |
+| @data-fetching.mdc                 | Fetching data from the API using SWR                        |
+| @accessibility.mdc                 | Accessibility guidelines for Documenso                      |
+| @internationalization.mdc          | Internationalization (i18n) guidelines with Lingui          |
+| @performance.mdc                   | Performance optimization guidelines                         |
+
+## Backend & API
+
+Guidelines for implementing backend logic, APIs, and data persistence.
+
+| Rule File                          | Description                                                 |
+| :--------------------------------- | :---------------------------------------------------------- |
+| @api-routes.mdc                    | Guidelines for implementing Next.js API routes (general)    |
+| @get-api-route.mdc                 | Guidelines for implementing GET API routes in Next.js       |
+| @server-actions.mdc                | Guidelines for implementing Next.js server actions          |
+| @prisma.mdc                        | How to use Prisma                                           |
+
+## Document Signing
+
+Guidelines specific to implementing document signing functionality.
+
+| Rule File                          | Description                                                 |
+| :--------------------------------- | :---------------------------------------------------------- |
+| @signing.mdc                       | Guidelines for implementing document signing functionality  |
+
+## Testing
+
+General guidelines for application testing.
+
+| Rule File                          | Description                                                 |
+| :--------------------------------- | :---------------------------------------------------------- |
+| @testing.mdc                       | Guidelines for testing the application with Vitest          |
+
+## Features
+
+Rules specific to major application features.
+
+| Rule File                          | Description                                                 |
+| :--------------------------------- | :---------------------------------------------------------- |
+| @features/documents.mdc            | Explains the document signing flow                          |
+| @features/templates.mdc            | Explains the document templates feature                     |
+| @features/teams.mdc                | Explains the teams collaboration feature                    |

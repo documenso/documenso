@@ -1,0 +1,96 @@
+---
+description: Project structure and file organization guidelines
+globs:
+alwaysApply: false
+---
+# Project Structure
+
+## Main Structure
+
+- We use Turborepo with bun workspaces
+- Main app is in `apps/remix` (a Next.js application using the App Router)
+- Additional apps include `apps/documentation` and `apps/openpage-api`
+- Packages are in the `packages` folder
+- Server actions are used for data mutations
+
+```tree
+.
+├── apps/
+│   ├── remix/             # Main Next.js application
+│   │   ├── app/           # Next.js App Router
+│   │   │   ├── (auth)/    # Authentication pages
+│   │   │   ├── (dashboard)/ # Dashboard pages
+│   │   │   │   ├── documents/  # Document management
+│   │   │   │   ├── templates/  # Template management
+│   │   │   │   ├── settings/   # User settings
+│   │   │   │   ├── teams/      # Team management
+│   │   │   │   └── ... (other dashboard routes)
+│   │   │   ├── api/       # API Routes
+│   │   │   │   ├── documents/   # Document API
+│   │   │   │   ├── templates/   # Templates API
+│   │   │   │   ├── auth/        # Authentication API
+│   │   │   │   ├── teams/       # Team management
+│   │   │   │   ├── webhooks/    # Webhook handlers
+│   │   │   │   ├── jobs/        # Background jobs
+│   │   │   │   └── ... (other APIs)
+│   │   │   ├── (marketing)/  # Marketing/landing pages
+│   │   │   ├── layout.tsx    # Root layout
+│   │   │   └── ... (other app files)
+│   │   ├── components/  # Shared components
+│   │   │   ├── ui/          # Shadcn UI components
+│   │   │   ├── forms/       # Form components
+│   │   │   ├── document/    # Document-related components
+│   │   │   ├── settings/    # Settings components
+│   │   │   └── ... (other components)
+│   │   ├── public/      # Static assets (images, fonts)
+│   │   ├── styles/      # Global CSS styles
+│   │   ├── lib/         # Utility functions and helpers
+│   │   │   ├── server/     # Server-only utilities
+│   │   │   ├── client/     # Client-only utilities
+│   │   │   ├── hooks/      # Custom React hooks
+│   │   │   └── ... (other utilities)
+│   │   ├── next.config.mjs
+│   │   ├── package.json
+│   │   └── ... (config files)
+│   ├── documentation/   # Documentation site
+│   └── openpage-api/    # OpenAPI specification and API docs
+├── packages/
+│   ├── prisma/        # Database schema and migrations
+│   ├── ui/            # Shared UI components
+│   ├── lib/           # Shared utilities
+│   ├── email/         # Email templates and sending
+│   ├── api/           # API client and utilities
+│   ├── signing/       # Document signing functionality
+│   ├── trpc/          # tRPC API definitions
+│   ├── auth/          # Authentication utilities
+│   ├── tsconfig/      # Shared TypeScript configuration
+│   ├── eslint-config/ # Shared ESLint configuration
+│   └── ... (other packages)
+```
+
+## File Naming and Organization
+
+- Use kebab case for route directories (e.g., `api/documents/route`)
+- Use PascalCase for components (e.g. `components/Button.tsx`)
+- Shadcn components are in `components/ui`
+- All other components are in `components/`
+- Colocate files in the folder where they're used unless they can be used across the app
+- If a component can be used in many places, place it in the global `components` folder
+
+## New Pages
+
+- Create new pages at: `apps/remix/app/(dashboard)/PAGE_NAME/page.tsx`
+- Components for the page are either in `page.tsx` or in a dedicated folder
+- Pages are Server components for direct data loading
+- Use React Server Components (RSC) by default to minimize client-side JavaScript
+- Components with interactivity must be client components with `use client` directive
+- Server action files must start with `use server`
+
+## Utility Functions
+
+- Create utility functions in `lib/` folder for reusable logic
+- Share common utilities across packages when appropriate
+- Use the correct package for domain-specific utilities:
+  - Document functionality: `@documenso/lib` or `@documenso/signing`
+  - Database operations: `@documenso/prisma`
+  - Authentication: `@documenso/auth`

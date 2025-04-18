@@ -1,0 +1,110 @@
+---
+description: UI component and styling guidelines using Shadcn UI, Radix UI, and Tailwind
+globs:
+alwaysApply: false
+---
+# UI Components and Styling for Documenso
+
+## UI Framework
+- Use Shadcn UI and Tailwind for components and styling
+- Implement responsive design with Tailwind CSS using a mobile-first approach
+- Use `next/image` for optimized image loading
+- Use Radix UI primitives for accessible components
+
+## Install new Shadcn components
+
+```sh
+bun shadcn-ui add COMPONENT
+```
+
+Example:
+
+```sh
+bun shadcn-ui add progress
+```
+
+## Data Fetching with SWR
+For client-side data fetching, use the `swr` package:
+
+```typescript
+import { useSWR } from 'swr';
+
+function DocumentList() {
+  const { data, isLoading, error } = useSWR<DocumentsResponse>(
+    `/api/documents?status=pending`
+  );
+
+  // Implementation
+}
+```
+
+## Loading Components
+Use Suspense and loading states for page transitions:
+
+```tsx
+import { Skeleton } from "@documenso/ui/skeleton";
+
+// For loading states
+{isLoading ? (
+  <div className="space-y-3">
+    <Skeleton className="h-8 w-full" />
+    <Skeleton className="h-8 w-full" />
+  </div>
+) : (
+  // Content
+)}
+```
+
+## Form Components
+
+### Using Form Components with React Hook Form and Zod
+
+```tsx
+import { z } from 'zod';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+
+import { Button } from '@documenso/ui/button';
+import { Input } from '@documenso/ui/input';
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@documenso/ui/form';
+
+const formSchema = z.object({
+  title: z.string().min(1, 'Title is required'),
+});
+
+type FormValues = z.infer<typeof formSchema>;
+
+export function DocumentForm() {
+  const form = useForm<FormValues>({
+    resolver: zodResolver(formSchema),
+    defaultValues: {
+      title: '',
+    },
+  });
+
+  const onSubmit = (values: FormValues) => {
+    // Form submission logic
+  };
+
+  return (
+    <Form {...form}>
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+        <FormField
+          control={form.control}
+          name="title"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Document Title</FormLabel>
+              <FormControl>
+                <Input {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <Button type="submit">Save</Button>
+      </form>
+    </Form>
+  );
+}
+```

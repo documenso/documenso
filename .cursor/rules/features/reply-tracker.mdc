@@ -1,0 +1,25 @@
+---
+description: 
+globs: 
+alwaysApply: false
+---
+# Reply Tracker
+
+Reply Tracker (also known as Reply Zero) lets the user which emails need a reply for them and those they're awaiting a reply on.
+It updates the labels for the thread automatically in Gmail.
+
+The database models and fields that are used for this feature:
+
+- ThreadTracker
+- User.outboundReplyTracking
+- ActionType.TRACK_THREAD
+
+The system uses rules. The AI can choose which rule to use each time an email comes in. Rules are for incoming emails only. Not ongoing.
+When enabling the reply tracker, we create a rule for the user that has the following actions associated with it:
+- LABEL: "To Reply"
+- TRACK_THREAD
+- DRAFT_EMAIL (optional)
+
+We'll draft a reply for the user automatically if DRAFT_EMAIL is set. The draft will be generated using the email history for this sender as well as the Knowledge base. See `.cursor/rules/features/knowledge.mdc` for more on the Knowledge Base feature.
+
+Enabling `User.outboundReplyTracking` means that when a user sends an email, we'll run an LLM over the email and check if it needs a reply. If it does we'll mark it as Awaiting Reply.

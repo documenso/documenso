@@ -1,0 +1,102 @@
+---
+description:
+globs:
+alwaysApply: false
+---
+# Document Templates
+
+This rule explains the document templates feature in Documenso.
+
+## Overview
+
+Document templates allow users to create reusable document layouts with predefined fields. This feature enables:
+1. Creating template documents with predefined fields
+2. Reusing templates to create new documents
+3. Sharing templates within teams
+4. Managing template versions
+
+## Implementation Guidelines
+
+1. Templates should support the following field types:
+   - Signature
+   - Text
+   - Date
+   - Checkbox
+   - Initial
+
+2. Template-related operations should be implemented as server actions:
+   ```typescript
+   // Example of a server action for creating a template
+   export async function createTemplate(data: CreateTemplateFormData) {
+     'use server';
+
+     try {
+       // Implementation
+     } catch (error) {
+       // Error handling
+     }
+   }
+   ```
+
+3. When implementing template-related features:
+   - Ensure templates can be easily shared within teams
+   - Implement proper versioning for templates
+   - Provide clear UI for template management
+   - Allow efficient creation of documents from templates
+
+4. Templates should store:
+   - Original document
+   - Field positions and types
+   - Recipient roles (not specific emails)
+   - Template name and description
+   - Created/updated timestamps
+   - Owner information
+
+## Template Creation Process
+
+1. Document upload:
+   - User uploads a PDF document
+   - The system processes the document similar to regular documents
+
+2. Field placement:
+   - User defines fields on the document
+   - Fields are associated with recipient roles rather than specific emails
+
+3. Template metadata:
+   - User provides template name, description, and other metadata
+   - Template is saved in the database
+
+## Creating Documents from Templates
+
+1. Template selection:
+   - User selects a template from their library or shared templates
+   - System loads the template with its predefined fields
+
+2. Recipient assignment:
+   - User assigns specific recipients to the roles defined in the template
+   - System maps fields to the assigned recipients
+
+3. Document customization:
+   - User can make final adjustments to the document before sending
+   - Custom messages or additional fields can be added
+
+## Team Sharing
+
+1. Sharing permissions:
+   - Templates can be shared with specific team members or entire teams
+   - Different access levels can be granted (view, use, edit)
+
+2. Usage tracking:
+   - The system tracks template usage statistics
+   - Users can see how many times a template has been used
+
+## Best Practices
+
+1. Template design:
+   - Create templates with clear, well-positioned fields
+   - Use consistent field naming conventions
+   - Include instructions for recipients when appropriate
+
+2. Performance considerations:
+   - Optimize template storage for quick loading
+   - Implement caching for frequently used templates

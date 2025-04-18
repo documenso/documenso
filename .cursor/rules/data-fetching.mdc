@@ -1,0 +1,161 @@
+---
+description: Fetching data from the API using SWR
+globs:
+alwaysApply: false
+---
+# Data Fetching in Documenso
+
+## Server Components
+
+For server components, fetch data directly using Prisma:
+
+```tsx
+// apps/remix/app/(dashboard)/documents/page.tsx
+import { getRequiredServerComponentSession } from '@documenso/app-auth/get-session';
+import { prisma } from '@documenso/prisma';
+
+export default async function DocumentsPage() {
+  const { session } = await getRequiredServerComponentSession();
+
+  // Fetch documents directly in server component
+  const documents = await prisma.document.findMany({
+    where: {
+      userId: session.user.id,
+    },
+    orderBy: {
+      createdAt: 'desc',
+    },
+    take: 10,
+  });
+
+  return (
+    <div className="space-y-4">
+      <h1 className="text-2xl font-bold">Your Documents</h1>
+
+      {/* Pass data to client or server components */}
+      <DocumentList documents={documents} />
+    </div>
+  );
+}
+```
+
+## Client Components with SWR
+
+For client components that need to fetch data, use SWR:
+
+```tsx
+'use client';
+
+import { useSearchParams } from 'next/navigation';
+import useSWR from 'swr';
+
+import { Button } from '@documenso/ui/button';
+import { Skeleton } from '@documenso/ui/skeleton';
+
+// Define the API response type
+interface DocumentsResponse {
+  documents: Array<{
+    id: string;
+    title: string;
+    status: string;
+    createdAt: string;
+  }>;
+  totalPages: number;
+}
+
+export function DocumentsDataTable() {
+  const searchParams = useSearchParams();
+  const page = Number(searchParams.get('page') || '1');
+
+  // Fetch data with SWR
+  const { data, error, isLoading, mutate } = useSWR<DocumentsResponse>(
+    `/api/documents?page=${page}&status=all`,
+    {
+      revalidateOnFocus: false,
+      revalidateIfStale: false,
+    }
+  );
+
+  // Handle loading state
+  if (isLoading) {
+    return (
+      <div className="space-y-3">
+        <Skeleton className="h-10 w-full" />
+        <Skeleton className="h-10 w-full" />
+        <Skeleton className="h-10 w-full" />
+      </div>
+    );
+  }
+
+  // Handle error state
+  if (error || !data) {
+    return (
+      <div className="rounded-md bg-red-50 p-4">
+        <p className="text-red-700">
+          Error loading documents. Please try again.
+        </p>
+        <Button
+          onClick={() => mutate()}
+          variant="outline"
+          className="mt-2"
+        >
+          Retry
+        </Button>
+      </div>
+    );
+  }
+
+  // Render data
+  return (
+    <div>
+      {/* Table implementation with data */}
+      {data.documents.map((document) => (
+        <div key={document.id} className="border-b py-2">
+          {document.title}
+        </div>
+      ))}
+    </div>
+  );
+}
+
+## Error Handling
+
+Handle API errors consistently:
+
+```tsx
+try {
+  // API call or data fetching
+} catch (error) {
+  console.error('Error fetching data:', error);
+
+  // For UI components
+  return (
+    <div className="rounded-md bg-red-50 p-4">
+      <p className="text-red-700">
+        An error occurred. Please try again.
+      </p>
+    </div>
+  );
+}
+```
+
+## Best Practices
+
+1. **Performance**:
+   - Use React Server Components for initial data fetching where possible
+   - Implement data caching with SWR for client components
+   - Optimize query parameters to fetch only necessary data
+
+2. **UX Considerations**:
+   - Always show loading states during data fetching
+   - Provide retry mechanisms for failed requests
+   - Implement pagination for large data sets
+
+3. **Error Handling**:
+   - Implement graceful error handling
+   - Display user-friendly error messages
+   - Log detailed errors for debugging
+
+4. **Data Revalidation**:
+   - Configure SWR revalidation settings based on data freshness requirements
+   - Consider manual revalidation for critical data updates

@@ -1,0 +1,30 @@
+---
+description: Util functions
+globs:
+alwaysApply: false
+---
+# Utility Functions in Documenso
+
+## Core Utilities
+- Utilities are organized in packages/lib or within each app's lib directory
+- Server-only utilities should be placed in the `lib/server` directory
+- Client utilities should be placed in the `lib/client` directory
+
+## Common Utilities
+- Use date-fns for date manipulation
+- Use nanoid for generating unique IDs
+- Use zod for data validation and parsing
+
+## Document Utilities
+- Use PDF manipulation utilities from `@documenso/pdf-sign` package
+- Use shared document processing utilities from `@documenso/lib` package
+
+# Utility Functions
+
+- Use lodash utilities for common operations (arrays, objects, strings)
+- Import specific lodash functions to minimize bundle size:
+  ```typescript
+  import groupBy from "lodash/groupBy";
+  ```
+- Create utility functions in `utils/` folder for reusable logic
+- The `utils` folder also contains core app logic such as Next.js Server Actions and Gmail API requests.

@@ -1,0 +1,56 @@
+---
+description: How to use Prisma
+globs:
+alwaysApply: false
+---
+# Prisma Usage
+
+We use PostgreSQL.
+
+This is how we import prisma in the project:
+
+```typescript
+import prisma from "@/utils/prisma";
+```
+
+The prisma file is located at: `apps/web/prisma/schema.prisma`.
+
+# Prisma in Documenso
+
+## Database Access
+- Use the Prisma client for all database operations
+- Import the client from `@documenso/prisma` package
+- Use the client in server components and server actions
+
+```typescript
+import { prisma } from '@documenso/prisma';
+
+// Example: Fetch documents for a user
+const documents = await prisma.document.findMany({
+  where: {
+    userId: user.id,
+  },
+  orderBy: {
+    createdAt: 'desc',
+  },
+});
+```
+
+## Running Prisma Commands
+
+- Generate Prisma client: `bun run prisma:generate`
+- Run migrations in development: `bun run prisma:migrate-dev`
+- Apply migrations in production: `bun run prisma:migrate-deploy`
+- Reset database: `bun run prisma:migrate-reset`
+- Seed database with sample data: `bun run prisma:seed`
+- Start Prisma Studio: `bun run prisma:studio`
+
+## Creating Migrations
+
+```bash
+bun run prisma:migrate-dev --name add_document_field
+```
+
+## Database Schema
+
+The Prisma schema is located at `packages/prisma/schema.prisma` and defines all database models for the application.

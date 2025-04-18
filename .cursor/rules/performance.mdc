@@ -1,0 +1,302 @@
+# Performance Optimization Guidelines for Documenso
+
+## Overview
+
+Performance is critical for Documenso to provide a smooth user experience, especially when handling document signing workflows. These guidelines help optimize application performance.
+
+## React Server Components
+
+Leverage React Server Components (RSC) for improved performance:
+
+```tsx
+// Server component (default in Next.js 13+ App Router)
+// No 'use client' directive means this is a server component
+export default async function DocumentsPage() {
+  // Data fetching happens on the server
+  const documents = await getDocuments();
+
+  return (
+    <div>
+      <h1>Your Documents</h1>
+      <DocumentList documents={documents} />
+    </div>
+  );
+}
+```
+
+Only use client components when necessary:
+
+```tsx
+'use client';
+
+// Use client components only when you need:
+// - Interactivity (event handlers)
+// - Browser APIs
+// - React hooks
+export function SignatureCanvas() {
+  const [signature, setSignature] = useState<string | null>(null);
+
+  // Component implementation with client-side functionality
+}
+```
+
+## Code Splitting
+
+Use dynamic imports for code splitting:
+
+```tsx
+// Dynamically import heavy components
+import dynamic from 'next/dynamic';
+
+// With loading fallback
+const PDFViewer = dynamic(
+  () => import('@/components/pdf-viewer'),
+  {
+    loading: () => <div className="h-96 w-full animate-pulse bg-gray-200" />,
+    ssr: false // Use this for components that use browser-only APIs
+  }
+);
+
+// For component libraries
+const Chart = dynamic(() => import('chart.js').then(mod => mod.Chart));
+```
+
+## Image Optimization
+
+Optimize images using Next.js Image component:
+
+```tsx
+import Image from 'next/image';
+
+// Optimized image with proper sizing
+<Image
+  src="/logo.png"
+  alt="Documenso Logo"
+  width={200}
+  height={50}
+  priority={isAboveTheFold}
+  quality={85}
+/>
+
+// For responsive images
+<Image
+  src="/hero-image.jpg"
+  alt="Document signing made easy"
+  fill
+  sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+  className="object-cover"
+/>
+```
+
+## Memoization
+
+Use memoization to prevent unnecessary rerenders:
+
+```tsx
+'use client';
+
+import { memo, useCallback, useMemo } from 'react';
+
+// Memoize complex components
+const MemoizedDocumentCard = memo(function DocumentCard({ document }) {
+  return (
+    <div className="p-4 border rounded-lg">
+      <h3>{document.title}</h3>
+      {/* Component content */}
+    </div>
+  );
+});
+
+// In parent component
+function DocumentList({ documents }) {
+  // Memoize expensive calculations
+  const sortedDocuments = useMemo(() => {
+    return [...documents].sort((a, b) =>
+      new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+    );
+  }, [documents]);
+
+  // Memoize event handlers
+  const handleSign = useCallback((documentId: string) => {
+    // Implementation
+  }, []);
+
+  return (
+    <div className="grid gap-4">
+      {sortedDocuments.map(document => (
+        <MemoizedDocumentCard
+          key={document.id}
+          document={document}
+          onSign={handleSign}
+        />
+      ))}
+    </div>
+  );
+}
+```
+
+## Data Fetching Optimization
+
+### Server Component Data Fetching
+
+Optimize server component data fetching with parallel requests:
+
+```tsx
+// Fetch data in parallel
+const [documents, templates, team] = await Promise.all([
+  prisma.document.findMany({ where: { userId } }),
+  prisma.template.findMany({ where: { userId } }),
+  prisma.team.findFirst({ where: { members: { some: { userId } } } }),
+]);
+```
+
+### Client Component Data Fetching
+
+Configure SWR for optimal data caching and revalidation:
+
+```tsx
+'use client';
+
+import useSWR from 'swr';
+
+// Global SWR configuration in a provider
+function SWRProvider({ children }) {
+  return (
+    <SWRConfig
+      value={{
+        revalidateOnFocus: false,
+        revalidateIfStale: true,
+        dedupingInterval: 60000,
+        errorRetryCount: 3,
+        fetcher: (url) => fetch(url).then(r => r.json())
+      }}
+    >
+      {children}
+    </SWRConfig>
+  );
+}
+
+// Efficient data fetching in components
+function DocumentsDataTable() {
+  const { data, error } = useSWR(`/api/documents?limit=10`, {
+    suspense: true,
+  });
+
+  // Component implementation
+}
+```
+
+## PDF Handling
+
+Optimize PDF rendering and manipulation:
+
+```tsx
+// Lazy load PDFs
+const PDFDocument = dynamic(() => import('@/components/pdf-document'), {
+  ssr: false,
+});
+
+// Progressive loading for large PDFs
+function DocumentViewer({ documentId }) {
+  return (
+    <Suspense fallback={<div>Loading document...</div>}>
+      <PDFDocument
+        documentId={documentId}
+        enablePagination={true}
+        initialPage={1}
+        lazyLoadPages={true}
+      />
+    </Suspense>
+  );
+}
+```
+
+## UI Performance
+
+### Virtual Lists
+
+Use virtualization for long lists:
+
+```tsx
+'use client';
+
+import { useVirtualizer } from '@tanstack/react-virtual';
+
+function VirtualDocumentList({ documents }) {
+  const parentRef = useRef<HTMLDivElement>(null);
+
+  const virtualizer = useVirtualizer({
+    count: documents.length,
+    getScrollElement: () => parentRef.current,
+    estimateSize: () => 72, // estimated row height
+  });
+
+  return (
+    <div
+      ref={parentRef}
+      className="h-[500px] overflow-auto"
+    >
+      <div
+        style={{
+          height: `${virtualizer.getTotalSize()}px`,
+          position: 'relative',
+        }}
+      >
+        {virtualizer.getVirtualItems().map(virtualRow => (
+          <div
+            key={virtualRow.index}
+            style={{
+              position: 'absolute',
+              top: 0,
+              left: 0,
+              width: '100%',
+              height: `${virtualRow.size}px`,
+              transform: `translateY(${virtualRow.start}px)`,
+            }}
+          >
+            <DocumentRow document={documents[virtualRow.index]} />
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+```
+
+### Reduce Bundle Size
+
+Optimize bundle size with effective imports:
+
+```tsx
+// Bad - imports entire lodash
+import _ from 'lodash';
+
+// Good - imports only what's needed
+import debounce from 'lodash/debounce';
+import throttle from 'lodash/throttle';
+```
+
+## Performance Monitoring
+
+Implement performance monitoring:
+
+```tsx
+// Web Vitals reporting
+export function reportWebVitals(metric) {
+  if (process.env.NODE_ENV !== 'production') {
+    console.log(metric);
+  } else {
+    // Send to analytics
+    fetch('/api/analytics/vitals', {
+      method: 'POST',
+      body: JSON.stringify(metric),
+    });
+  }
+}
+
+// Custom performance markers
+performance.mark('document-load-start');
+// Load document...
+performance.mark('document-load-end');
+performance.measure('document-load', 'document-load-start', 'document-load-end');
+```

@@ -1,0 +1,181 @@
+# Accessibility Guidelines for Documenso
+
+## Overview
+
+Accessibility is a critical aspect of Documenso, ensuring that all users, including those with disabilities, can effectively use the application. These guidelines help maintain WCAG 2.1 AA compliance.
+
+## Core Principles
+
+1. **Perceivable**: Information and UI components must be presentable to users in ways they can perceive.
+2. **Operable**: UI components and navigation must be operable.
+3. **Understandable**: Information and operation of the UI must be understandable.
+4. **Robust**: Content must be robust enough to be interpreted by a wide variety of user agents.
+
+## Implementation Guidelines
+
+### Keyboard Navigation
+
+All interactive elements must be accessible via keyboard:
+
+```tsx
+// Good example - accessible button
+<Button
+  onClick={handleAction}
+  aria-label="Sign document"
+>
+  Sign
+</Button>
+
+// Bad example - div with click handler not keyboard accessible
+<div
+  onClick={handleAction}
+  className="button-like"
+>
+  Sign
+</div>
+```
+
+### Focus Management
+
+Maintain visible focus indicators and logical tab order:
+
+```tsx
+// Using Radix's FocusScope for managing focus in modals
+import { FocusScope } from '@radix-ui/react-focus-scope';
+
+<FocusScope trapped autoFocus>
+  <Modal>
+    <h2 id="modal-title">Document Details</h2>
+    <input aria-labelledby="modal-title" />
+    <Button>Save</Button>
+  </Modal>
+</FocusScope>
+```
+
+### Semantic HTML
+
+Use correct HTML elements for their intended purpose:
+
+```tsx
+// Good example - using proper heading hierarchy
+<h1>Document Title</h1>
+<section>
+  <h2>Signers</h2>
+  <ul>
+    <li>John Doe</li>
+    <li>Jane Smith</li>
+  </ul>
+</section>
+
+// Bad example - using divs with styling
+<div className="heading1">Document Title</div>
+<div className="section">
+  <div className="heading2">Signers</div>
+  <div>John Doe</div>
+  <div>Jane Smith</div>
+</div>
+```
+
+### ARIA Attributes
+
+Use ARIA attributes correctly when HTML semantics aren't sufficient:
+
+```tsx
+// Dialog with proper ARIA labeling
+<div
+  role="dialog"
+  aria-labelledby="dialog-title"
+  aria-describedby="dialog-description"
+>
+  <h2 id="dialog-title">Sign Document</h2>
+  <p id="dialog-description">Please review and sign the document.</p>
+  <form>
+    <!-- Form content -->
+  </form>
+</div>
+```
+
+### Color Contrast
+
+Ensure sufficient color contrast between text and background:
+
+```tsx
+// Good contrast - Tailwind's text-gray-900 on white background
+<p className="text-gray-900 bg-white">This text has good contrast.</p>
+
+// Avoid low contrast
+<p className="text-gray-300 bg-white">This text has poor contrast.</p>
+```
+
+### Screen Reader Support
+
+Provide appropriate alternative text for images and hide decorative elements:
+
+```tsx
+// Image with descriptive alt text
+<Image
+  src="/signature.png"
+  alt="Electronic signature of John Doe"
+  width={200}
+  height={50}
+/>
+
+// Decorative image should have empty alt
+<Image
+  src="/decorative-line.png"
+  alt=""
+  role="presentation"
+  width={500}
+  height={2}
+/>
+```
+
+### Form Accessibility
+
+Always associate labels with form controls:
+
+```tsx
+// Good example - explicit label association
+<div className="form-field">
+  <label htmlFor="signer-email">Email address</label>
+  <input
+    id="signer-email"
+    type="email"
+    name="email"
+    aria-required="true"
+  />
+</div>
+
+// Good example - using FormItem from shadcn/ui with proper association
+<FormField
+  control={form.control}
+  name="email"
+  render={({ field }) => (
+    <FormItem>
+      <FormLabel>Email address</FormLabel>
+      <FormControl>
+        <Input type="email" {...field} />
+      </FormControl>
+      <FormMessage />
+    </FormItem>
+  )}
+/>
+```
+
+## Testing Accessibility
+
+1. **Automated Testing**:
+   - Use tools like `axe-core` for automated accessibility testing
+   - Include accessibility checks in CI/CD pipeline
+
+2. **Manual Testing**:
+   - Test with keyboard navigation
+   - Test with screen readers (NVDA, VoiceOver)
+   - Test with different zoom levels and text sizes
+
+3. **Common Issues to Check**:
+   - Missing form labels
+   - Insufficient color contrast
+   - Missing alternative text for images
+   - Inaccessible custom controls
+   - Missing page titles and landmarks

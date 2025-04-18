@@ -1,0 +1,30 @@
+---
+description: 
+globs: 
+alwaysApply: false
+---
+## Inbox Cleaner
+
+This file explains the Inbox Cleaner feature and how it's implemented.
+
+The inbox cleaner helps users do a deep clean of their inbox.
+It helps them get from 10,000 items in their inbox to only a few.
+It works by archiving/marking read low priority emails.
+It uses a combination of static and AI rules to do the clean up.
+It uses both Postgres (Prisma) and Redis.
+We store short term memory in Redis that expires after a few hours. This is data like email subject so we can quickly show it to the user, but this isn't data we want stored long term to enhance privacy for the user while balancing this with a faster experience.
+Once the cleaning process has started we show the emails streamed in with the action taken on the email (archive/keep).
+
+The main files and directories for this are:
+
+- apps/web/utils/actions/clean.ts
+- apps/web/app/api/clean/
+- apps/web/app/(app)/clean/page.tsx
+- apps/web/app/(app)/clean/
+- apps/web/prisma/schema.prisma
+- apps/web/utils/redis/clean.ts
+
+The database models to look at are:
+
+- CleanupThread
+- CleanupJob

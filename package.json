@@ -33,7 +33,8 @@
     "make:version": "bun --workspace @documenso/remix version --include-workspace-root --no-git-tag-version -m \"v%s\"",
     "translate": "bun run translate:extract && bun run translate:compile",
     "translate:extract": "lingui extract --clean",
-    "translate:compile": "lingui compile"
+    "translate:compile": "lingui compile",
+    "commit": "cz"
   },
   "packageManager": "bun@1.2.9",
   "engines": {
@@ -45,6 +46,8 @@
     "@commitlint/config-conventional": "^17.7.0",
     "@lingui/cli": "^5.2.0",
     "@trigger.dev/cli": "^2.3.18",
+    "commitizen": "^4.3.0",
+    "cz-conventional-changelog": "^3.3.0",
     "dotenv": "^16.3.1",
     "dotenv-cli": "^7.3.0",
     "eslint": "^8.40.0",
@@ -80,5 +83,10 @@
   },
   "trigger.dev": {
     "endpointId": "documenso-app"
+  },
+  "config": {
+    "commitizen": {
+      "path": "./node_modules/cz-conventional-changelog"
+    }
   }
 }

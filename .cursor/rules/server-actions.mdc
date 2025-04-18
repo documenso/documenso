@@ -1,0 +1,82 @@
+---
+description: Guidelines for implementing Next.js server actions
+globs:
+alwaysApply: false
+---
+# Server Actions in Documenso
+
+## Basic Structure
+
+Server actions are used for data mutations in Documenso, primarily for:
+- Document operations (creating, updating, sending, signing)
+- User management
+- Team operations
+- Template handling
+
+### Server Action Format
+
+```typescript
+// apps/remix/app/(dashboard)/documents/[id]/actions.ts
+'use server';
+
+import { z } from 'zod';
+
+import { getRequiredServerActionSession } from '@documenso/app-auth/get-session';
+import { prisma } from '@documenso/prisma';
+
+const UpdateDocumentSchema = z.object({
+  id: z.string(),
+  title: z.string().min(1, 'Title is required'),
+});
+
+export async function updateDocument(formData: FormData) {
+  const { session } = await getRequiredServerActionSession();
+
+  try {
+    const values = Object.fromEntries(formData.entries());
+
+    const { id, title } = UpdateDocumentSchema.parse(values);
+
+    // Check document ownership
+    const document = await prisma.document.findUnique({
+      where: {
+        id,
+        userId: session.user.id,
+      },
+    });
+
+    if (!document) {
+      throw new Error('Document not found');
+    }
+
+    // Update document
+    const updatedDocument = await prisma.document.update({
+      where: {
+        id,
+      },
+      data: {
+        title,
+      },
+    });
+
+    return { success: true, document: updatedDocument };
+  } catch (error) {
+    console.error('Error updating document:', error);
+
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : 'Unknown error',
+    };
+  }
+}
+```
+
+## Best Practices
+
+1. Always include proper error handling
+2. Use Zod for input validation
+3. Check permissions before performing operations
+4. Return structured responses with success/error status
+5. Log errors appropriately
+6. Use try/catch blocks to handle errors gracefully
+7. Place server actions in separate files for organization

@@ -1,0 +1,66 @@
+---
+description: Page structure
+globs:
+alwaysApply: false
+---
+# Page Structure Guidelines for Documenso
+
+## App Router Page Structure
+
+- Use the Next.js App Router for all new pages
+- Place dashboard pages in `apps/remix/app/(dashboard)`
+- Place auth pages in `apps/remix/app/(auth)`
+- Place marketing pages in `apps/remix/app/(marketing)`
+
+## Typical Page Structure
+
+```tsx
+// apps/remix/app/(dashboard)/documents/page.tsx
+import { getRequiredServerComponentSession } from '@documenso/app-auth/get-session';
+import { DocumentsList } from '@/components/documents/documents-list';
+
+export default async function DocumentsPage() {
+  // Get the user session
+  const { session } = await getRequiredServerComponentSession();
+
+  // You can fetch data here directly in the Server Component
+
+  return (
+    <div className="mx-auto w-full max-w-screen-xl px-4 md:px-8">
+      <h1 className="text-4xl font-semibold">Documents</h1>
+
+      <DocumentsList userId={session.user.id} />
+    </div>
+  );
+}
+```
+
+## Page Loading and Error Handling
+
+Use React Suspense for loading states and error boundaries for error handling:
+
+```tsx
+// apps/remix/app/(dashboard)/layout.tsx
+import { Suspense } from 'react';
+
+import { LoadingScreen } from '@/components/loading-screen';
+import { ErrorBoundary } from '@/components/error-boundary';
+
+export default function DashboardLayout({ children }: { children: React.ReactNode }) {
+  return (
+    <ErrorBoundary>
+      <Suspense fallback={<LoadingScreen />}>
+        {children}
+      </Suspense>
+    </ErrorBoundary>
+  );
+}
+```
+
+# Page Structure
+
+- Create new pages at: `apps/web/app/(app)/PAGE_NAME/page.tsx`
+- Components for the page are either put in `page.tsx`, or in the `apps/web/app/(app)/PAGE_NAME` folder
+- Pages are Server components so you can load data into them directly
+- If we're in a deeply nested component we will use `swr` to fetch via API
+- If you need to use `onClick` in a component, that component is a client component and file must start with `use client`

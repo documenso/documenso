@@ -1,0 +1,201 @@
+---
+description: 
+globs: 
+alwaysApply: false
+---
+# Internationalization (i18n) Guidelines for Documenso
+
+## Overview
+
+Documenso uses Lingui for internationalization, enabling the application to be used in multiple languages while maintaining a single codebase.
+
+## Setup and Configuration
+
+Lingui is configured in the root `lingui.config.ts` file:
+
+```typescript
+// lingui.config.ts
+import { defineConfig } from '@lingui/conf';
+
+export default defineConfig({
+  locales: ['en', 'fr', 'de', 'es'],
+  sourceLocale: 'en',
+  catalogs: [
+    {
+      path: '<rootDir>/packages/lib/locales/{locale}/messages',
+      include: ['apps/remix'],
+    },
+  ],
+  formatOptions: {
+    lineNumbers: true,
+  },
+});
+```
+
+## Basic Usage
+
+### Defining Messages
+
+Mark text for translation using the `t` macro:
+
+```tsx
+import { t } from '@lingui/macro';
+
+// Simple translation
+<Button>{t`Sign Document`}</Button>
+
+// With variables
+<p>{t`Hello ${userName}, please sign your document.`}</p>
+
+// Pluralization
+<p>
+  {t`${documentsCount} document${plural(documentsCount, {
+    one: '',
+    other: 's'
+  })} ready for signing`}
+</p>
+```
+
+### Using Translated Messages in Components
+
+For components, use the `Trans` component:
+
+```tsx
+import { Trans } from '@lingui/macro';
+
+// Simple text
+<Trans>Welcome to Documenso</Trans>
+
+// With variables
+<Trans>Hello {userName}, please sign your document.</Trans>
+
+// With HTML elements
+<Trans>
+  Click <a href="/documents">here</a> to view your documents.
+</Trans>
+
+// Pluralization
+<Trans>
+  {documentsCount} document{documentsCount !== 1 && 's'} ready for signing
+</Trans>
+```
+
+## Server Components
+
+For server components, use the i18n server utilities:
+
+```tsx
+// Server component
+import { getTranslator } from '@documenso/lib/server/i18n';
+
+export default async function DocumentsPage() {
+  // Get translator from request or use default locale
+  const { translate: t } = await getTranslator();
+
+  return (
+    <div>
+      <h1>{t('Your Documents')}</h1>
+      <p>{t('Please find your documents below.')}</p>
+    </div>
+  );
+}
+```
+
+## Client Components
+
+For client components, use the i18n provider and hooks:
+
+```tsx
+'use client';
+
+import { useTranslation } from '@documenso/lib/client/i18n';
+
+export function DocumentActions() {
+  const { t } = useTranslation();
+
+  return (
+    <div>
+      <Button>{t('Sign')}</Button>
+      <Button variant="outline">{t('Cancel')}</Button>
+    </div>
+  );
+}
+```
+
+## Translation Workflow
+
+1. **Extract messages**:
+   ```bash
+   bun run translate:extract
+   ```
+
+2. **Translate messages**:
+   Edit the generated JSON files in `packages/lib/locales/{locale}/messages`
+
+3. **Compile translations**:
+   ```bash
+   bun run translate:compile
+   ```
+
+## Date and Number Formatting
+
+Use the format utility for consistent date and number formatting:
+
+```tsx
+import { formatDate, formatNumber, formatCurrency } from '@documenso/lib/utils/format';
+
+// Format date according to user's locale
+<p>{formatDate(document.createdAt, { dateStyle: 'long' })}</p>
+
+// Format numbers
+<p>{formatNumber(amount)}</p>
+
+// Format currency
+<p>{formatCurrency(price, 'USD')}</p>
+```
+
+## Best Practices
+
+1. **Context for translators**:
+   Add context for translators using comments:
+
+   ```tsx
+   // Translators: This refers to a document status
+   <Trans>Pending</Trans>
+   ```
+
+2. **Dynamic content**:
+   Avoid concatenating strings; use placeholders instead:
+
+   ```tsx
+   // Bad - concatenating strings
+   <p>{t`Document`} {documentName} {t`is ready for signing`}</p>
+
+   // Good - using placeholders
+   <p>{t`Document ${documentName} is ready for signing`}</p>
+   ```
+
+3. **Pluralization**:
+   Always handle pluralization correctly:
+
+   ```tsx
+   <Trans>
+     {signerCount} {plural(signerCount, {
+       one: 'signer',
+       other: 'signers'
+     })} remaining
+   </Trans>
+   ```
+
+4. **RTL support**:
+   Ensure layouts work correctly for right-to-left languages:
+
+   ```tsx
+   // CSS modules or Tailwind classes should account for dir="rtl"
+   <div className={isRTL ? 'rtl-specific-class' : 'ltr-specific-class'}>
+     {content}
+   </div>
+   ```
+
+5. **Automated testing**:
+   Test the application in different languages to catch layout or functionality issues.

@@ -1,0 +1,62 @@
+---
+description: Guidelines for testing the application with Vitest
+globs:
+alwaysApply: false
+---
+# Testing Guidelines for Documenso
+
+## Testing Framework
+- `vitest` is used for unit and integration testing
+- Tests are colocated next to the tested file
+  - Example: `dir/format.ts` and `dir/format.test.ts`
+- End-to-end tests use Playwright and are located in `packages/app-tests`
+
+## Common Mocks
+
+### Server-Only Mock
+```ts
+vi.mock("server-only", () => ({}));
+```
+
+### Prisma Mock
+```ts
+import { beforeEach } from "vitest";
+import { prisma } from "@documenso/prisma";
+
+vi.mock("@documenso/prisma", () => ({
+  prisma: {
+    document: {
+      findUnique: vi.fn(),
+      findMany: vi.fn(),
+      // Add other methods as needed
+    },
+    // Add other models as needed
+  },
+}));
+
+describe("Example document test", () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
+  it("should fetch a document", async () => {
+    // Mock implementation
+    prisma.document.findUnique.mockResolvedValue({
+      id: 1,
+      title: "Test Document",
+      // Add other document properties
+    });
+
+    // Test implementation
+  });
+});
+```
+
+## Best Practices
+- Each test should be independent
+- Use descriptive test names
+- Mock external dependencies (Prisma, signing functionality, etc.)
+- Clean up mocks between tests
+- Avoid testing implementation details
+- Test server actions independently from UI components
+- For document signing tests, use test fixtures located in `packages/app-tests/fixtures`

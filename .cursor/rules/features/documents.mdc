@@ -1,0 +1,101 @@
+# Document Signing Flow
+
+This rule explains the document signing flow in Documenso.
+
+## Overview
+
+Documenso provides a complete document signing flow, allowing users to:
+1. Upload documents
+2. Add signers and fields
+3. Send documents for signature
+4. Track signature status
+5. Download completed documents
+
+## Implementation Guidelines
+
+1. Document states follow a specific workflow:
+   - DRAFT: Initial state when document is uploaded
+   - PENDING: Document has been sent to signers
+   - COMPLETED: All signers have signed
+   - CANCELLED: Document has been cancelled
+
+2. Document-related operations should be implemented in server actions:
+   ```typescript
+   // Example of a server action for sending a document
+   export async function sendDocument(documentId: string) {
+     'use server';
+
+     try {
+       // Implementation
+     } catch (error) {
+       // Error handling
+     }
+   }
+   ```
+
+3. When implementing document-related features:
+   - Always check document ownership and permissions
+   - Handle document versioning appropriately
+   - Implement proper error handling
+   - Use optimistic updates for better UX
+
+4. When displaying documents:
+   - Use appropriate viewer components
+   - Implement responsive design for different screen sizes
+   - Provide clear feedback on document status
+   - Ensure accessibility for all users
+
+## Document Upload Process
+
+1. File selection and validation:
+   ```typescript
+   // Maximum file size (5MB by default)
+   const MAX_FILE_SIZE = 5 * 1024 * 1024;
+
+   // Validate file type
+   if (!file.type.startsWith('application/pdf')) {
+     throw new Error('Only PDF files are supported');
+   }
+
+   // Validate file size
+   if (file.size > MAX_FILE_SIZE) {
+     throw new Error('File is too large (max 5MB)');
+   }
+   ```
+
+2. Document storage:
+   - The document is stored using the configured storage provider (database or S3)
+   - For S3 storage, upload using presigned URLs
+   - For database storage, use the Prisma client
+
+3. Document processing:
+   - Extract document metadata
+   - Generate document preview
+   - Prepare the document for field placement
+
+## Field Placement
+
+1. Field types:
+   - Signature
+   - Date
+   - Text
+   - Checkbox
+   - Initial
+
+2. Field storage:
+   - Fields are stored in the database with position information
+   - Each field is associated with a specific recipient
+
+## Security Considerations
+
+1. Document encryption:
+   - Documents should be encrypted at rest
+   - Access control should be strictly enforced
+
+2. Audit trail:
+   - All document actions should be logged
+   - Include timestamps and user information
+
+3. Authentication:
+   - Verify signer identity through email or other methods
+   - Implement IP address tracking for signing events

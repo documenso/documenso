@@ -1,0 +1,46 @@
+---
+description: How to install packages
+globs:
+alwaysApply: false
+---
+- Use `pnpm`.
+- Don't install in root. Install in `apps/web`:
+
+```sh
+cd apps/web
+pnpm add ...
+```
+
+# Installing Packages in Documenso
+
+## Adding Dependencies to the Monorepo
+Use bun to add packages to the monorepo:
+
+```bash
+# Add package to a specific workspace
+bun add <package-name> --workspace=@documenso/remix
+
+# Add package to the root workspace
+bun add <package-name> -w
+
+# Add dev dependency
+bun add <package-name> --dev --workspace=@documenso/remix
+```
+
+## Adding a New Workspace
+1. Create a new directory in `apps/` or `packages/`
+2. Add a `package.json` with the appropriate name
+3. Run `bun install` to update the monorepo
+4. Add the workspace to the `workspaces` field in the root `package.json` if necessary
+
+## Package Version Management
+- Use specific versions for dependencies to ensure consistency
+- Update package versions through the root workspace
+- Run `bun install` after updating dependencies to regenerate lock files
+
+## Recommended Packages
+For common functionality, prefer these packages:
+- Forms: `react-hook-form` with `@hookform/resolvers/zod`
+- Validation: `zod`
+- Date handling: `date-fns`
+- UI components: `@documenso/ui` (which uses shadcn/ui)

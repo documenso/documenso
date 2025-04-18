@@ -1,0 +1,104 @@
+---
+description:
+globs:
+alwaysApply: false
+---
+# Teams Collaboration
+
+This rule explains the teams collaboration feature in Documenso.
+
+## Overview
+
+Teams functionality allows organizations to collaborate on documents, providing:
+1. Team management (creating, editing, deleting teams)
+2. Member management (inviting, removing members)
+3. Role-based permissions (admin, member)
+4. Team document sharing and collaboration
+5. Team templates
+
+## Implementation Guidelines
+
+1. Teams should support the following roles:
+   - Owner: Full control over team, including deletion
+   - Admin: Can manage team members and settings
+   - Member: Can use team resources
+
+2. Team-related operations should be implemented as server actions:
+   ```typescript
+   // Example of a server action for creating a team
+   export async function createTeam(data: CreateTeamFormData) {
+     'use server';
+
+     try {
+       // Implementation
+     } catch (error) {
+       // Error handling
+     }
+   }
+   ```
+
+3. When implementing team-related features:
+   - Always check user permissions for team operations
+   - Implement proper error handling for team actions
+   - Provide clear UI for team management
+   - Ensure team resources are properly isolated
+
+4. Team data model should include:
+   - Team name and details
+   - Team members with roles
+   - Team billing information (if applicable)
+   - Team settings and preferences
+   - Audit logs for team actions
+
+## Team Creation and Management
+
+1. Team creation:
+   - The team creator automatically becomes the owner
+   - Basic team information (name, description) is required
+   - Team settings can be configured during or after creation
+
+2. Member invitation:
+   - Team members can be invited via email
+   - Invitations have an expiration period
+   - Users can accept or reject invitations
+
+3. Role management:
+   - Team owners can change member roles
+   - Role changes should be logged in the audit trail
+   - Only owners can appoint or remove admins
+
+## Team Resources
+
+1. Document sharing:
+   - Documents can be shared with the entire team or specific members
+   - Team members can collaborate on shared documents
+   - Document history tracks all team member actions
+
+2. Template sharing:
+   - Templates can be created and shared within teams
+   - Team templates are accessible to all team members
+   - Template usage can be tracked at the team level
+
+## Billing and Subscription
+
+1. Team subscription:
+   - Teams can have their own subscription plan
+   - Team resources are limited based on the subscription tier
+   - Usage metrics are tracked at the team level
+
+2. Billing management:
+   - Team owners can manage billing information
+   - Payment history is available to team owners and admins
+   - Subscription changes are logged in the admin audit trail
+
+## Security Considerations
+
+1. Access control:
+   - Implement strict permission checks for all team operations
+   - Validate user membership before allowing access to team resources
+   - Prevent cross-team data access
+
+2. Audit logging:
+   - Log all team administration actions
+   - Record member additions, removals, and role changes
+   - Document access and sharing activities should be traceable
