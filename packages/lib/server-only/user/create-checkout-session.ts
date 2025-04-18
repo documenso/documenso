@@ -1,10 +1,8 @@
-import type { User } from '@prisma/client';
-
-import { getCheckoutSession } from '@documenso/ee/server-only/stripe/get-checkout-session';
-import { getStripeCustomerByUser } from '@documenso/ee/server-only/stripe/get-customer';
-import { getPortalSession } from '@documenso/ee/server-only/stripe/get-portal-session';
 import { NEXT_PUBLIC_WEBAPP_URL } from '@documenso/lib/constants/app';
-
+import type { User } from '@prisma/client';
+import { getCheckoutSession } from '@documenso/ee-stub/server-only/stripe/get-checkout-session';
+import { getPortalSession } from '@documenso/ee-stub/server-only/stripe/get-portal-session';
+import { getStripeCustomerByUser } from '@documenso/ee-stub/server-only/stripe/get-customer';
 import { getSubscriptionsByUserId } from '../subscription/get-subscriptions-by-user-id';
 
 export type CreateCheckoutSession = {
@@ -13,7 +11,7 @@ export type CreateCheckoutSession = {
 };
 
 export const createCheckoutSession = async ({ user, priceId }: CreateCheckoutSession) => {
-  const { stripeCustomer } = await getStripeCustomerByUser(user);
+  const stripeCustomer = await getStripeCustomerByUser(user);
 
   const existingSubscriptions = await getSubscriptionsByUserId({ userId: user.id });
 

@@ -2,8 +2,8 @@ import { hash } from '@node-rs/bcrypt';
 import type { User } from '@prisma/client';
 import { TeamMemberInviteStatus } from '@prisma/client';
 
-import { getStripeCustomerByUser } from '@documenso/ee/server-only/stripe/get-customer';
-import { updateSubscriptionItemQuantity } from '@documenso/ee/server-only/stripe/update-subscription-item-quantity';
+import { getStripeCustomerByUser } from '@documenso/ee-stub/server-only/stripe/get-customer';
+import { updateSubscriptionItemQuantity } from '@documenso/ee-stub/server-only/stripe/update-subscription-item-quantity';
 import { prisma } from '@documenso/prisma';
 
 import { IS_BILLING_ENABLED } from '../../constants/app';

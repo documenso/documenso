@@ -1,4 +1,4 @@
-import { updateSubscriptionItemQuantity } from '@documenso/ee/server-only/stripe/update-subscription-item-quantity';
+import { updateSubscriptionItemQuantity } from '@documenso/ee-stub/server-only/stripe/update-subscription-item-quantity';
 import { IS_BILLING_ENABLED } from '@documenso/lib/constants/app';
 import { TEAM_MEMBER_ROLE_PERMISSIONS_MAP } from '@documenso/lib/constants/teams';
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';

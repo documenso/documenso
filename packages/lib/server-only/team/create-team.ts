@@ -1,17 +1,16 @@
-import { Prisma, TeamMemberRole } from '@prisma/client';
-import type Stripe from 'stripe';
-import { z } from 'zod';
-
-import { createTeamCustomer } from '@documenso/ee/server-only/stripe/create-team-customer';
-import { getTeamRelatedPrices } from '@documenso/ee/server-only/stripe/get-team-related-prices';
-import { mapStripeSubscriptionToPrismaUpsertAction } from '@documenso/ee/server-only/stripe/webhook/on-subscription-updated';
-import { isDocumentPlatform as isUserPlatformPlan } from '@documenso/ee/server-only/util/is-document-platform';
-import { IS_BILLING_ENABLED } from '@documenso/lib/constants/app';
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
-import { subscriptionsContainsActivePlan } from '@documenso/lib/utils/billing';
-import { prisma } from '@documenso/prisma';
+import { Prisma, TeamMemberRole } from '@prisma/client';
 
+import { IS_BILLING_ENABLED } from '@documenso/lib/constants/app';
+import type Stripe from 'stripe';
+import { createTeamCustomer } from '@documenso/ee-stub/server-only/stripe/create-team-customer';
+import { getTeamRelatedPrices } from '@documenso/ee-stub/server-only/stripe/get-team-related-prices';
+import { isDocumentPlatform as isUserPlatformPlan } from '@documenso/ee-stub/server-only/util/is-document-platform';
+import { mapStripeSubscriptionToPrismaUpsertAction } from '@documenso/ee-stub/server-only/stripe/webhook/on-subscription-updated';
+import { prisma } from '@documenso/prisma';
 import { stripe } from '../stripe';
+import { subscriptionsContainsActivePlan } from '@documenso/lib/utils/billing';
+import { z } from 'zod';
 
 export type CreateTeamOptions = {
   /**
@@ -71,7 +70,7 @@ export const createTeam = async ({
 
   if (IS_BILLING_ENABLED()) {
     const teamRelatedPriceIds = await getTeamRelatedPrices().then((prices) =>
-      prices.map((price) => price.id),
+      prices.map((price) => (price as { id: string }).id),
     );
 
     const hasTeamRelatedSubscription = subscriptionsContainsActivePlan(
@@ -269,9 +268,35 @@ export const createTeamFromPendingTeam = async ({
       },
     });
 
-    await tx.subscription.upsert(
-      mapStripeSubscriptionToPrismaUpsertAction(subscription, undefined, team.id),
+    // Cast the mapStripeSubscriptionToPrismaUpsertAction result to include necessary Prisma fields
+    const subscriptionData = mapStripeSubscriptionToPrismaUpsertAction(
+      subscription,
+      undefined,
+      team.id,
     );
+
+    await tx.subscription.upsert({
+      where: {
+        planId: 'team_plan', // Use unique planId as the identifier
+      },
+      create: {
+        planId: 'team_plan',
+        priceId: subscriptionData.priceId,
+        status: 'ACTIVE', // Use enum value directly
+        teamId: team.id,
+        cancelAtPeriodEnd: subscriptionData.cancelAtPeriodEnd,
+        createdAt: subscriptionData.created,
+        updatedAt: subscriptionData.updated,
+        periodEnd: subscriptionData.currentPeriodEnd,
+      },
+      update: {
+        priceId: subscriptionData.priceId,
+        status: 'ACTIVE',
+        cancelAtPeriodEnd: subscriptionData.cancelAtPeriodEnd,
+        updatedAt: subscriptionData.updated,
+        periodEnd: subscriptionData.currentPeriodEnd,
+      },
+    });
 
     return team;
   });

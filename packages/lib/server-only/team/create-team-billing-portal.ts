@@ -1,4 +1,4 @@
-import { getPortalSession } from '@documenso/ee/server-only/stripe/get-portal-session';
+import { getPortalSession } from '@documenso/ee-stub/server-only/stripe/get-portal-session';
 import { IS_BILLING_ENABLED } from '@documenso/lib/constants/app';
 import { TEAM_MEMBER_ROLE_PERMISSIONS_MAP } from '@documenso/lib/constants/teams';
 import { prisma } from '@documenso/prisma';

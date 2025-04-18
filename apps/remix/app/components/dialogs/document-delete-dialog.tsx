@@ -6,7 +6,7 @@ import { Trans } from '@lingui/react/macro';
 import { DocumentStatus } from '@prisma/client';
 import { P, match } from 'ts-pattern';
 
-import { useLimits } from '@documenso/ee/server-only/limits/provider/client';
+import { useLimits } from '@documenso/ee-stub/server-only/limits/provider/client';
 import { trpc as trpcReact } from '@documenso/trpc/react';
 import { Alert, AlertDescription } from '@documenso/ui/primitives/alert';
 import { Button } from '@documenso/ui/primitives/button';

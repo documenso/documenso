@@ -3,9 +3,9 @@ import { data } from 'react-router';
 import { match } from 'ts-pattern';
 
 import { getOptionalSession } from '@documenso/auth/server/lib/utils/get-session';
-import { isCommunityPlan as isUserCommunityPlan } from '@documenso/ee/server-only/util/is-community-plan';
-import { isUserEnterprise } from '@documenso/ee/server-only/util/is-document-enterprise';
-import { isDocumentPlatform } from '@documenso/ee/server-only/util/is-document-platform';
+import { isCommunityPlan as isUserCommunityPlan } from '@documenso/ee-stub/server-only/util/is-community-plan';
+import { isUserEnterprise } from '@documenso/ee-stub/server-only/util/is-document-enterprise';
+import { isDocumentPlatform } from '@documenso/ee-stub/server-only/util/is-document-platform';
 import { IS_BILLING_ENABLED } from '@documenso/lib/constants/app';
 import { getDocumentAndSenderByToken } from '@documenso/lib/server-only/document/get-document-by-token';
 import { getCompletedFieldsForToken } from '@documenso/lib/server-only/field/get-completed-fields-for-token';

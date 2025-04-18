@@ -1,0 +1,22 @@
+{
+  "name": "@documenso/ee-stub",
+  "version": "0.0.0",
+  "description": "Stub implementations of Enterprise Edition features",
+  "main": "./index.ts",
+  "types": "./index.ts",
+  "license": "AGPL-3.0",
+  "files": [
+    "client-only/",
+    "server-only/",
+    "universal/"
+  ],
+  "scripts": {
+    "clean": "rimraf node_modules"
+  },
+  "dependencies": {
+    "@documenso/lib": "*",
+    "@documenso/prisma": "*",
+    "react": "^18",
+    "zod": "3.24.1"
+  }
+}

@@ -1,7 +1,7 @@
 import { TRPCError } from '@trpc/server';
 import { z } from 'zod';
 
-import { getTeamPrices } from '@documenso/ee/server-only/stripe/get-team-prices';
+import { getTeamPrices } from '@documenso/ee-stub/server-only/stripe/get-team-prices';
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import { acceptTeamInvitation } from '@documenso/lib/server-only/team/accept-team-invitation';
 import { createTeam } from '@documenso/lib/server-only/team/create-team';

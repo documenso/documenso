@@ -1,17 +1,3 @@
-import { useState } from 'react';
-
-import { msg } from '@lingui/core/macro';
-import { useLingui } from '@lingui/react';
-import { Trans } from '@lingui/react/macro';
-import type { TeamMemberRole } from '@prisma/client';
-import { SubscriptionStatus } from '@prisma/client';
-import { AlertTriangle } from 'lucide-react';
-import { match } from 'ts-pattern';
-
-import { canExecuteTeamAction } from '@documenso/lib/utils/teams';
-import { trpc } from '@documenso/trpc/react';
-import { cn } from '@documenso/ui/lib/utils';
-import { Button } from '@documenso/ui/primitives/button';
 import {
   Dialog,
   DialogContent,
@@ -19,6 +5,19 @@ import {
   DialogFooter,
   DialogTitle,
 } from '@documenso/ui/primitives/dialog';
+
+import { AlertTriangle } from 'lucide-react';
+import { Button } from '@documenso/ui/primitives/button';
+import { SubscriptionStatus } from '@prisma/client';
+import type { TeamMemberRole } from '@prisma/client';
+import { Trans } from '@lingui/react/macro';
+import { canExecuteTeamAction } from '@documenso/lib/utils/teams';
+import { cn } from '@documenso/ui/lib/utils';
+import { match } from 'ts-pattern';
+import { msg } from '@lingui/core/macro';
+import { trpc } from '@documenso/trpc/react';
+import { useLingui } from '@lingui/react';
+import { useState } from 'react';
 import { useToast } from '@documenso/ui/primitives/use-toast';
 
 export type TeamLayoutBillingBannerProps = {
@@ -44,7 +43,7 @@ export const TeamLayoutBillingBanner = ({
     try {
       const sessionUrl = await createBillingPortal({ teamId });
 
-      window.open(sessionUrl, '_blank');
+      window.open(sessionUrl.url, '_blank');
 
       setIsOpen(false);
     } catch (err) {

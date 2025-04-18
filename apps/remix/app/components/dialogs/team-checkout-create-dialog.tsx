@@ -1,14 +1,6 @@
-import { useMemo, useState } from 'react';
-
-import { msg } from '@lingui/core/macro';
-import { useLingui } from '@lingui/react';
-import { Trans } from '@lingui/react/macro';
 import type * as DialogPrimitive from '@radix-ui/react-dialog';
-import { AnimatePresence, motion } from 'framer-motion';
-import { Loader, TagIcon } from 'lucide-react';
 
-import { trpc } from '@documenso/trpc/react';
-import { Button } from '@documenso/ui/primitives/button';
+import { AnimatePresence, motion } from 'framer-motion';
 import { Card, CardContent } from '@documenso/ui/primitives/card';
 import {
   Dialog,
@@ -18,7 +10,15 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@documenso/ui/primitives/dialog';
+import { Loader, TagIcon } from 'lucide-react';
 import { Tabs, TabsList, TabsTrigger } from '@documenso/ui/primitives/tabs';
+import { useMemo, useState } from 'react';
+
+import { Button } from '@documenso/ui/primitives/button';
+import { Trans } from '@lingui/react/macro';
+import { msg } from '@lingui/core/macro';
+import { trpc } from '@documenso/trpc/react';
+import { useLingui } from '@lingui/react';
 import { useToast } from '@documenso/ui/primitives/use-toast';
 
 export type TeamCheckoutCreateDialogProps = {
@@ -43,7 +43,7 @@ export const TeamCheckoutCreateDialog = ({
   const { mutateAsync: createCheckout, isPending: isCreatingCheckout } =
     trpc.team.createTeamPendingCheckout.useMutation({
       onSuccess: (checkoutUrl) => {
-        window.open(checkoutUrl, '_blank');
+        window.open(checkoutUrl.url, '_blank');
         onClose();
       },
       onError: () =>
@@ -61,7 +61,13 @@ export const TeamCheckoutCreateDialog = ({
       return null;
     }
 
-    return data[interval];
+    if (interval === 'monthly' && data.monthly) {
+      return data.monthly;
+    } else if (interval === 'yearly' && data.yearly) {
+      return data.yearly;
+    }
+
+    return null;
   }, [data, interval]);
 
   const handleOnOpenChange = (open: boolean) => {
@@ -112,11 +118,12 @@ export const TeamCheckoutCreateDialog = ({
               className="mb-4"
             >
               <TabsList className="w-full">
-                {[data.monthly, data.yearly].map((price) => (
-                  <TabsTrigger key={price.priceId} className="w-full" value={price.interval}>
-                    {price.friendlyInterval}
-                  </TabsTrigger>
-                ))}
+                <TabsTrigger className="w-full" value="monthly">
+                  Monthly
+                </TabsTrigger>
+                <TabsTrigger className="w-full" value="yearly">
+                  Yearly
+                </TabsTrigger>
               </TabsList>
             </Tabs>
 
@@ -130,12 +137,14 @@ export const TeamCheckoutCreateDialog = ({
                 <CardContent className="flex h-full flex-col p-6">
                   {selectedPrice.interval === 'monthly' ? (
                     <div className="text-muted-foreground text-lg font-medium">
-                      $50 USD <span className="text-xs">per month</span>
+                      ${selectedPrice.description}{' '}
+                      <span className="text-xs">per {selectedPrice.friendlyInterval}</span>
                     </div>
                   ) : (
                     <div className="text-muted-foreground flex items-center justify-between text-lg font-medium">
                       <span>
-                        $480 USD <span className="text-xs">per year</span>
+                        ${selectedPrice.description}{' '}
+                        <span className="text-xs">per {selectedPrice.friendlyInterval}</span>
                       </span>
                       <div className="bg-primary text-primary-foreground ml-2 inline-flex flex-row items-center justify-center rounded px-2 py-1 text-xs">
                         <TagIcon className="mr-1 h-4 w-4" />
@@ -172,7 +181,7 @@ export const TeamCheckoutCreateDialog = ({
                 loading={isCreatingCheckout}
                 onClick={async () =>
                   createCheckout({
-                    interval: selectedPrice.interval,
+                    interval: selectedPrice.interval as 'monthly' | 'yearly',
                     pendingTeamId,
                   })
                 }

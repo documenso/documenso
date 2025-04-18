@@ -1,22 +1,19 @@
-import { useMemo } from 'react';
-
-import { msg } from '@lingui/core/macro';
-import { Trans } from '@lingui/react/macro';
-import { SubscriptionStatus } from '@prisma/client';
 import { Link, Outlet } from 'react-router';
 
-import { TEAM_PLAN_LIMITS } from '@documenso/ee/server-only/limits/constants';
-import { LimitsProvider } from '@documenso/ee/server-only/limits/provider/client';
-import { useSession } from '@documenso/lib/client-only/providers/session';
-import { TrpcProvider } from '@documenso/trpc/react';
 import { Button } from '@documenso/ui/primitives/button';
-
 import { GenericErrorLayout } from '~/components/general/generic-error-layout';
+import { LimitsProvider } from '@documenso/ee-stub/server-only/limits/provider/client';
 import { PortalComponent } from '~/components/general/portal';
+import type { Route } from './+types/_layout';
+import { SubscriptionStatus } from '@prisma/client';
+import { TEAM_PLAN_LIMITS } from '@documenso/ee-stub/server-only/limits/constants';
 import { TeamLayoutBillingBanner } from '~/components/general/teams/team-layout-billing-banner';
 import { TeamProvider } from '~/providers/team';
-
-import type { Route } from './+types/_layout';
+import { Trans } from '@lingui/react/macro';
+import { TrpcProvider } from '@documenso/trpc/react';
+import { msg } from '@lingui/core/macro';
+import { useMemo } from 'react';
+import { useSession } from '@documenso/lib/client-only/providers/session';
 
 export default function Layout({ params }: Route.ComponentProps) {
   const { teams } = useSession();
@@ -81,7 +78,17 @@ export default function Layout({ params }: Route.ComponentProps) {
 
   return (
     <TeamProvider team={currentTeam}>
-      <LimitsProvider initialValue={limits} teamId={currentTeam.id}>
+      <LimitsProvider
+        initialValue={{
+          MAX_DOCUMENTS: 10,
+          MAX_TEMPLATES: 5,
+          MAX_TEAM_MEMBERS: 5,
+          MAX_SIGNERS: 5,
+          MAX_ADVANCED_FIELDS_COUNT: 5,
+          MAX_SIGNING_ORDER: true,
+        }}
+        teamId={currentTeam.id}
+      >
         <TrpcProvider headers={trpcHeaders}>
           {currentTeam?.subscription &&
             currentTeam.subscription.status !== SubscriptionStatus.ACTIVE && (

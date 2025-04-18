@@ -2,7 +2,7 @@ import { DocumentDataType } from '@prisma/client';
 import { TRPCError } from '@trpc/server';
 import { DateTime } from 'luxon';
 
-import { getServerLimits } from '@documenso/ee/server-only/limits/server';
+import { getServerLimits } from '@documenso/ee-stub/server-only/limits/server';
 import { NEXT_PUBLIC_WEBAPP_URL } from '@documenso/lib/constants/app';
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import { encryptSecondaryData } from '@documenso/lib/server-only/crypto/encrypt';

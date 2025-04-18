@@ -1102,10 +1102,6 @@ msgstr "Ocurrió un error al firmar como asistente."
 msgid "An error occurred while signing the document."
 msgstr "Ocurrió un error al firmar el documento."
 
-#: apps/remix/app/components/general/billing-plans.tsx
-msgid "An error occurred while trying to create a checkout session."
-msgstr "Ocurrió un error al intentar crear una sesión de pago."
-
 #: apps/remix/app/components/general/template/template-edit-form.tsx
 #: apps/remix/app/components/general/document/document-edit-form.tsx
 msgid "An error occurred while updating the document settings."
@@ -2034,10 +2030,6 @@ msgstr "La contraseña actual es incorrecta."
 msgid "Current recipients:"
 msgstr "Destinatarios actuales:"
 
-#: apps/remix/app/components/general/billing-plans.tsx
-msgid "Daily"
-msgstr "Diario"
-
 #: apps/remix/app/components/general/app-command-menu.tsx
 msgid "Dark Mode"
 msgstr "Modo Oscuro"
@@ -2933,6 +2925,11 @@ msgstr "Falló al actualizar el webhook"
 #: packages/email/templates/bulk-send-complete.tsx
 msgid "Failed: {failedCount}"
 msgstr "Fallidos: {failedCount}"
+
+#: apps/remix/app/components/general/billing-plans.tsx
+#: apps/remix/app/components/general/billing-plans.tsx
+msgid "Features"
+msgstr ""
 
 #: packages/ui/primitives/document-flow/field-items-advanced-settings/text-field.tsx
 msgid "Field character limit"
@@ -5046,7 +5043,6 @@ msgstr "Algunos firmantes no han sido asignados a un campo de firma. Asigne al m
 #: apps/remix/app/components/tables/documents-table-action-dropdown.tsx
 #: apps/remix/app/components/tables/documents-table-action-button.tsx
 #: apps/remix/app/components/general/billing-portal-button.tsx
-#: apps/remix/app/components/general/billing-plans.tsx
 #: apps/remix/app/components/general/teams/team-layout-billing-banner.tsx
 #: apps/remix/app/components/general/teams/team-invitations.tsx
 #: apps/remix/app/components/general/teams/team-invitations.tsx
@@ -5159,10 +5155,6 @@ msgstr "Paso <0>{step} de {maxStep}</0>"
 #: packages/ui/primitives/document-flow/add-subject.tsx
 msgid "Subject <0>(Optional)</0>"
 msgstr "Asunto <0>(Opcional)</0>"
-
-#: apps/remix/app/components/general/billing-plans.tsx
-msgid "Subscribe"
-msgstr "Suscribirse"
 
 #: apps/remix/app/components/tables/admin-dashboard-users-table.tsx
 msgid "Subscription"
@@ -6293,6 +6285,11 @@ msgstr "Actualizando Su Información"
 msgid "Upgrade"
 msgstr "Actualizar"
 
+#: apps/remix/app/components/general/billing-plans.tsx
+#: apps/remix/app/components/general/billing-plans.tsx
+msgid "Upgrade now"
+msgstr ""
+
 #: packages/lib/constants/document.ts
 msgid "Upload"
 msgstr "Subir"
@@ -6845,10 +6842,6 @@ msgstr "URL del Webhook"
 #: apps/remix/app/components/general/teams/team-settings-nav-desktop.tsx
 msgid "Webhooks"
 msgstr "Webhooks"
-
-#: apps/remix/app/components/general/billing-plans.tsx
-msgid "Weekly"
-msgstr "Semanal"
 
 #: apps/remix/app/routes/_unauthenticated+/articles.signature-disclosure.tsx
 msgid "Welcome"

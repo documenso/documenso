@@ -1,6 +1,6 @@
-import { isCommunityPlan } from '@documenso/ee/server-only/util/is-community-plan';
-import { isUserEnterprise } from '@documenso/ee/server-only/util/is-document-enterprise';
-import { isDocumentPlatform } from '@documenso/ee/server-only/util/is-document-platform';
+import { isCommunityPlan } from '@documenso/ee-stub/server-only/util/is-community-plan';
+import { isUserEnterprise } from '@documenso/ee-stub/server-only/util/is-document-enterprise';
+import { isDocumentPlatform } from '@documenso/ee-stub/server-only/util/is-document-platform';
 import { IS_BILLING_ENABLED } from '@documenso/lib/constants/app';
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import { createEmbeddingPresignToken } from '@documenso/lib/server-only/embedding-presign/create-embedding-presign-token';

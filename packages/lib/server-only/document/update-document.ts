@@ -2,7 +2,7 @@ import { DocumentVisibility } from '@prisma/client';
 import { DocumentStatus, TeamMemberRole } from '@prisma/client';
 import { match } from 'ts-pattern';
 
-import { isUserEnterprise } from '@documenso/ee/server-only/util/is-document-enterprise';
+import { isUserEnterprise } from '@documenso/ee-stub/server-only/util/is-document-enterprise';
 import { DOCUMENT_AUDIT_LOG_TYPE } from '@documenso/lib/types/document-audit-logs';
 import type { ApiRequestMetadata } from '@documenso/lib/universal/extract-request-metadata';
 import type { CreateDocumentAuditLogDataResponse } from '@documenso/lib/utils/document-audit-logs';

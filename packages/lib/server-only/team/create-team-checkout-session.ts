@@ -1,5 +1,5 @@
-import { getCheckoutSession } from '@documenso/ee/server-only/stripe/get-checkout-session';
-import { getTeamPrices } from '@documenso/ee/server-only/stripe/get-team-prices';
+import { getCheckoutSession } from '@documenso/ee-stub/server-only/stripe/get-checkout-session';
+import { getTeamPrices } from '@documenso/ee-stub/server-only/stripe/get-team-prices';
 import { NEXT_PUBLIC_WEBAPP_URL } from '@documenso/lib/constants/app';
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import { prisma } from '@documenso/prisma';

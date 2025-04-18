@@ -8,7 +8,7 @@ import {
 } from '@prisma/client';
 import { TeamMemberRole } from '@prisma/client';
 
-import { isUserEnterprise } from '@documenso/ee/server-only/util/is-document-enterprise';
+import { isUserEnterprise } from '@documenso/ee-stub/server-only/util/is-document-enterprise';
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import { normalizePdf as makeNormalizedPdf } from '@documenso/lib/server-only/pdf/normalize-pdf';
 import { DOCUMENT_AUDIT_LOG_TYPE } from '@documenso/lib/types/document-audit-logs';

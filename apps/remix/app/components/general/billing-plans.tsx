@@ -1,35 +1,43 @@
+import { Card, CardContent, CardFooter } from '@documenso/ui/primitives/card';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@documenso/ui/primitives/tabs';
+
+import { Button } from '@documenso/ui/primitives/button';
+import { Check } from 'lucide-react';
+import { Trans } from '@lingui/react/macro';
+import { cn } from '@documenso/ui/lib/utils';
+import { useLingui } from '@lingui/react';
 import { useState } from 'react';
 
-import type { MessageDescriptor } from '@lingui/core';
-import { msg } from '@lingui/core/macro';
-import { useLingui } from '@lingui/react';
-import { Trans } from '@lingui/react/macro';
-import { AnimatePresence, motion } from 'framer-motion';
+type Interval = 'month' | 'year';
 
-import type { PriceIntervals } from '@documenso/ee/server-only/stripe/get-prices-by-interval';
-import { useIsMounted } from '@documenso/lib/client-only/hooks/use-is-mounted';
-import { toHumanPrice } from '@documenso/lib/universal/stripe/to-human-price';
-import { trpc } from '@documenso/trpc/react';
-import { Button } from '@documenso/ui/primitives/button';
-import { Card, CardContent, CardTitle } from '@documenso/ui/primitives/card';
-import { Tabs, TabsList, TabsTrigger } from '@documenso/ui/primitives/tabs';
-import { useToast } from '@documenso/ui/primitives/use-toast';
-
-type Interval = keyof PriceIntervals;
-
-const INTERVALS: Interval[] = ['day', 'week', 'month', 'year'];
-
-// eslint-disable-next-line @typescript-eslint/consistent-type-assertions
-const isInterval = (value: unknown): value is Interval => INTERVALS.includes(value as Interval);
-
-const FRIENDLY_INTERVALS: Record<Interval, MessageDescriptor> = {
-  day: msg`Daily`,
-  week: msg`Weekly`,
-  month: msg`Monthly`,
-  year: msg`Yearly`,
+export type PriceIntervals = {
+  monthly: Array<{
+    id: string;
+    product: {
+      name: string;
+      description: string;
+      features: string[];
+    };
+    unit_amount: number;
+    interval: string;
+    currency: string;
+  }>;
+  yearly: Array<{
+    id: string;
+    product: {
+      name: string;
+      description: string;
+      features: string[];
+    };
+    unit_amount: number;
+    interval: string;
+    currency: string;
+  }>;
 };
 
-const MotionCard = motion(Card);
+const isInterval = (value: unknown): value is Interval => {
+  return value === 'month' || value === 'year';
+};
 
 export type BillingPlansProps = {
   prices: PriceIntervals;
@@ -37,102 +45,156 @@ export type BillingPlansProps = {
 
 export const BillingPlans = ({ prices }: BillingPlansProps) => {
   const { _ } = useLingui();
-  const { toast } = useToast();
-
-  const isMounted = useIsMounted();
-
   const [interval, setInterval] = useState<Interval>('month');
-  const [checkoutSessionPriceId, setCheckoutSessionPriceId] = useState<string | null>(null);
 
-  const { mutateAsync: createCheckoutSession } = trpc.profile.createCheckoutSession.useMutation();
+  const handleCheckoutClick = async (priceId: string) => {
+    const redirectUrl = `/?type=billing&priceId=${priceId}`;
 
-  const onSubscribeClick = async (priceId: string) => {
-    try {
-      setCheckoutSessionPriceId(priceId);
+    // Simulate a URL object for compatibility
+    const url = {
+      url: redirectUrl,
+    };
 
-      const url = await createCheckoutSession({ priceId });
-
-      if (!url) {
-        throw new Error('Unable to create session');
-      }
-
-      window.open(url);
-    } catch (_err) {
-      toast({
-        title: _(msg`Something went wrong`),
-        description: _(msg`An error occurred while trying to create a checkout session.`),
-        variant: 'destructive',
-      });
-    } finally {
-      setCheckoutSessionPriceId(null);
-    }
+    window.open(url.url);
   };
 
   return (
-    <div>
-      <Tabs value={interval} onValueChange={(value) => isInterval(value) && setInterval(value)}>
-        <TabsList>
-          {INTERVALS.map(
-            (interval) =>
-              prices[interval].length > 0 && (
-                <TabsTrigger key={interval} className="min-w-[150px]" value={interval}>
-                  {_(FRIENDLY_INTERVALS[interval])}
-                </TabsTrigger>
-              ),
+    <div className="my-8 flex flex-col gap-y-8">
+      <Tabs value={interval as string} onValueChange={(value) => isInterval(value) && setInterval(value)}>
+        <TabsList className="mx-auto">
+          {prices.monthly.length > 0 && (
+            <TabsTrigger key="month" className="min-w-[150px]" value="month">
+              <Trans>Monthly</Trans>
+            </TabsTrigger>
+          )}
+
+          {prices.yearly.length > 0 && (
+            <TabsTrigger key="year" className="min-w-[150px]" value="year">
+              <Trans>Yearly</Trans>
+            </TabsTrigger>
           )}
         </TabsList>
-      </Tabs>
 
-      <div className="mt-8 grid gap-8 lg:grid-cols-2 2xl:grid-cols-3">
-        <AnimatePresence mode="wait">
-          {prices[interval].map((price) => (
-            <MotionCard
-              key={price.id}
-              initial={{ opacity: isMounted ? 0 : 1, y: isMounted ? 20 : 0 }}
-              animate={{ opacity: 1, y: 0, transition: { duration: 0.3 } }}
-              exit={{ opacity: 0, transition: { duration: 0.3 } }}
-            >
-              <CardContent className="flex h-full flex-col p-6">
-                <CardTitle>{price.product.name}</CardTitle>
-
-                <div className="text-muted-foreground mt-2 text-lg font-medium">
-                  ${toHumanPrice(price.unit_amount ?? 0)} {price.currency.toUpperCase()}{' '}
-                  <span className="text-xs">per {interval}</span>
+        <TabsContent value="month">
+          {prices.monthly.map((price) => (
+            <Card key={price.id} className="relative mt-4 flex flex-col overflow-hidden">
+              <CardContent className="grid flex-1 gap-4 p-6">
+                <div className="flex flex-col gap-1">
+                  <h3 className="text-xl font-bold">{price.product.name}</h3>
+                  <p className="text-sm text-muted-foreground">{price.product.description}</p>
                 </div>
 
-                <div className="text-muted-foreground mt-1.5 text-sm">
-                  {price.product.description}
-                </div>
+                <div className="mt-4 flex flex-col gap-1">
+                  <div className="flex items-end gap-1">
+                    <span className="text-3xl font-bold">
+                      {(price.unit_amount / 100).toLocaleString('en-US', {
+                        style: 'currency',
+                        currency: price.currency,
+                        minimumFractionDigits: 0,
+                      })}
+                    </span>
 
-                {price.product.features && price.product.features.length > 0 && (
-                  <div className="text-muted-foreground mt-4">
-                    <div className="text-sm font-medium">Includes:</div>
-
-                    <ul className="mt-1 divide-y text-sm">
-                      {price.product.features.map((feature, index) => (
-                        <li key={index} className="py-2">
-                          {feature.name}
-                        </li>
-                      ))}
-                    </ul>
+                    <span className="text-xs">per {"month"}</span>
                   </div>
-                )}
+                </div>
 
-                <div className="flex-1" />
+                <div className="mt-6 flex flex-col gap-2">
+                  <p className="font-medium">
+                    <Trans>Features</Trans>
+                  </p>
 
-                <Button
-                  className="mt-4"
-                  disabled={checkoutSessionPriceId !== null}
-                  loading={checkoutSessionPriceId === price.id}
-                  onClick={() => void onSubscribeClick(price.id)}
-                >
-                  <Trans>Subscribe</Trans>
-                </Button>
+                  <ul className="flex flex-col gap-2">
+                    {price.product.features.map((feature, index) => (
+                      <li key={index} className="flex items-center gap-2 text-sm text-muted-foreground">
+                        <span className="flex h-5 w-5 items-center justify-center rounded-full bg-primary">
+                          <Check className="h-3 w-3 text-primary-foreground" />
+                        </span>
+
+                        <span>{feature}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
               </CardContent>
-            </MotionCard>
+
+              <CardFooter
+                className={cn('flex-col gap-2 border-t p-6', {
+                  'pb-10': true,
+                })}
+              >
+                <Button
+                  type="button"
+                  className="w-full"
+                  disabled={false}
+                  onClick={() => void handleCheckoutClick(price.id)}
+                >
+                  <Trans>Upgrade now</Trans>
+                </Button>
+              </CardFooter>
+            </Card>
           ))}
-        </AnimatePresence>
-      </div>
+        </TabsContent>
+
+        <TabsContent value="year">
+          {prices.yearly.map((price) => (
+            <Card key={price.id} className="relative mt-4 flex flex-col overflow-hidden">
+              <CardContent className="grid flex-1 gap-4 p-6">
+                <div className="flex flex-col gap-1">
+                  <h3 className="text-xl font-bold">{price.product.name}</h3>
+                  <p className="text-sm text-muted-foreground">{price.product.description}</p>
+                </div>
+
+                <div className="mt-4 flex flex-col gap-1">
+                  <div className="flex items-end gap-1">
+                    <span className="text-3xl font-bold">
+                      {(price.unit_amount / 100).toLocaleString('en-US', {
+                        style: 'currency',
+                        currency: price.currency,
+                        minimumFractionDigits: 0,
+                      })}
+                    </span>
+
+                    <span className="text-xs">per {"year"}</span>
+                  </div>
+                </div>
+
+                <div className="mt-6 flex flex-col gap-2">
+                  <p className="font-medium">
+                    <Trans>Features</Trans>
+                  </p>
+
+                  <ul className="flex flex-col gap-2">
+                    {price.product.features.map((feature, index) => (
+                      <li key={index} className="flex items-center gap-2 text-sm text-muted-foreground">
+                        <span className="flex h-5 w-5 items-center justify-center rounded-full bg-primary">
+                          <Check className="h-3 w-3 text-primary-foreground" />
+                        </span>
+
+                        <span>{feature}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              </CardContent>
+
+              <CardFooter
+                className={cn('flex-col gap-2 border-t p-6', {
+                  'pb-10': true,
+                })}
+              >
+                <Button
+                  type="button"
+                  className="w-full"
+                  disabled={false}
+                  onClick={() => void handleCheckoutClick(price.id)}
+                >
+                  <Trans>Upgrade now</Trans>
+                </Button>
+              </CardFooter>
+            </Card>
+          ))}
+        </TabsContent>
+      </Tabs>
     </div>
   );
 };

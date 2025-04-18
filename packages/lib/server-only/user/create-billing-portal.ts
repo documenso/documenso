@@ -1,8 +1,8 @@
-import type { User } from '@prisma/client';
-
-import { getStripeCustomerByUser } from '@documenso/ee/server-only/stripe/get-customer';
-import { getPortalSession } from '@documenso/ee/server-only/stripe/get-portal-session';
 import { IS_BILLING_ENABLED, NEXT_PUBLIC_WEBAPP_URL } from '@documenso/lib/constants/app';
+
+import type { User } from '@prisma/client';
+import { getPortalSession } from '@documenso/ee-stub/server-only/stripe/get-portal-session';
+import { getStripeCustomerByUser } from '@documenso/ee-stub/server-only/stripe/get-customer';
 
 export type CreateBillingPortalOptions = {
   user: Pick<User, 'id' | 'customerId' | 'email' | 'name'>;
@@ -13,10 +13,15 @@ export const createBillingPortal = async ({ user }: CreateBillingPortalOptions) 
     throw new Error('Billing is not enabled');
   }
 
-  const { stripeCustomer } = await getStripeCustomerByUser(user);
+  const customer = await getStripeCustomerByUser({
+    id: user.id,
+    name: user.name,
+    email: user.email,
+    customerId: user.customerId,
+  });
 
   return getPortalSession({
-    customerId: stripeCustomer.id,
+    customerId: customer.id,
     returnUrl: `${NEXT_PUBLIC_WEBAPP_URL()}/settings/billing`,
   });
 };

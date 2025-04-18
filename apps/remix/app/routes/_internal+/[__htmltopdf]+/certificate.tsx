@@ -6,7 +6,7 @@ import { redirect } from 'react-router';
 import { match } from 'ts-pattern';
 import { UAParser } from 'ua-parser-js';
 
-import { isDocumentPlatform } from '@documenso/ee/server-only/util/is-document-platform';
+import { isDocumentPlatform } from '@documenso/ee-stub/server-only/util/is-document-platform';
 import { APP_I18N_OPTIONS, ZSupportedLanguageCodeSchema } from '@documenso/lib/constants/i18n';
 import {
   RECIPIENT_ROLES_DESCRIPTION,

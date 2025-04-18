@@ -1,6 +1,6 @@
 import type { DocumentVisibility, Template, TemplateMeta } from '@prisma/client';
 
-import { isUserEnterprise } from '@documenso/ee/server-only/util/is-document-enterprise';
+import { isUserEnterprise } from '@documenso/ee-stub/server-only/util/is-document-enterprise';
 import { prisma } from '@documenso/prisma';
 
 import { AppError, AppErrorCode } from '../../errors/app-error';

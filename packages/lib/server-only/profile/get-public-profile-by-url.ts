@@ -6,7 +6,7 @@ import {
   type UserProfile,
 } from '@prisma/client';
 
-import { getCommunityPlanPriceIds } from '@documenso/ee/server-only/stripe/get-community-plan-prices';
+import { getCommunityPlanPriceIds } from '@documenso/ee-stub/server-only/stripe/get-community-plan-prices';
 import { prisma } from '@documenso/prisma';
 
 import { IS_BILLING_ENABLED } from '../../constants/app';
@@ -132,12 +132,12 @@ export const getPublicProfileByUrl = async ({
     }
 
     if (IS_BILLING_ENABLED()) {
-      const earlyAdopterPriceIds = await getCommunityPlanPriceIds();
+      const earlyAdopterPriceIds = (await getCommunityPlanPriceIds()) as string[];
 
       const activeEarlyAdopterSub = user.subscriptions.find(
         (subscription) =>
           subscription.status === SubscriptionStatus.ACTIVE &&
-          earlyAdopterPriceIds.includes(subscription.priceId),
+          earlyAdopterPriceIds.includes(subscription.priceId as string),
       );
 
       if (activeEarlyAdopterSub) {

@@ -1,6 +1,6 @@
 import { TeamMemberInviteStatus } from '@prisma/client';
 
-import { updateSubscriptionItemQuantity } from '@documenso/ee/server-only/stripe/update-subscription-item-quantity';
+import { updateSubscriptionItemQuantity } from '@documenso/ee-stub/server-only/stripe/update-subscription-item-quantity';
 import { IS_BILLING_ENABLED } from '@documenso/lib/constants/app';
 import { prisma } from '@documenso/prisma';
 

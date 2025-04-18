@@ -1,8 +1,8 @@
 import { Outlet, redirect } from 'react-router';
 
 import { getOptionalSession } from '@documenso/auth/server/lib/utils/get-session';
-import { getLimits } from '@documenso/ee/server-only/limits/client';
-import { LimitsProvider } from '@documenso/ee/server-only/limits/provider/client';
+import { getLimits } from '@documenso/ee-stub/server-only/limits/client';
+import { LimitsProvider } from '@documenso/ee-stub/server-only/limits/provider/client';
 import { useSession } from '@documenso/lib/client-only/providers/session';
 import { getSiteSettings } from '@documenso/lib/server-only/site-settings/get-site-settings';
 import { SITE_SETTINGS_BANNER_ID } from '@documenso/lib/server-only/site-settings/schemas/banner';
