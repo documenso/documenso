@@ -6,5 +6,6 @@
   "solid": "Solid Integration",
   "preact": "Preact Integration",
   "angular": "Angular Integration",
-  "css-variables": "CSS Variables"
+  "css-variables": "CSS Variables",
+  "authoring": "Authoring"
 }

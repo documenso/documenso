@@ -116,9 +116,6 @@ export const ConfigureDocumentUpload = ({ isSubmitting = false }: ConfigureDocum
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     accept: {
       'application/pdf': ['.pdf'],
-      'application/msword': ['.doc'],
-      'application/vnd.openxmlformats-officedocument.wordprocessingml.document': ['.docx'],
-      'text/plain': ['.txt'],
     },
     maxSize: APP_DOCUMENT_UPLOAD_SIZE_LIMIT * 1024 * 1024,
     multiple: false,
