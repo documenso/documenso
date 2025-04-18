@@ -31,10 +31,7 @@ import { Textarea } from '@documenso/ui/primitives/textarea';
 import { useToast } from '@documenso/ui/primitives/use-toast';
 
 const ZRejectDocumentFormSchema = z.object({
-  reason: z
-    .string()
-    .min(5, msg`Please provide a reason`)
-    .max(500, msg`Reason must be less than 500 characters`),
+  reason: z.string().max(500, msg`Reason must be less than 500 characters`),
 });
 
 type TRejectDocumentFormSchema = z.infer<typeof ZRejectDocumentFormSchema>;

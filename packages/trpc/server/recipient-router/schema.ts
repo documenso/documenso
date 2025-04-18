@@ -212,6 +212,12 @@ export const ZCompleteDocumentWithTokenMutationSchema = z.object({
   token: z.string(),
   documentId: z.number(),
   authOptions: ZRecipientActionAuthSchema.optional(),
+  nextSigner: z
+    .object({
+      email: z.string().email(),
+      name: z.string().min(1),
+    })
+    .optional(),
 });
 
 export type TCompleteDocumentWithTokenMutationSchema = z.infer<

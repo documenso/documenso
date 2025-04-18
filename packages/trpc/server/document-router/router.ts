@@ -24,7 +24,6 @@ import { resendDocument } from '@documenso/lib/server-only/document/resend-docum
 import { restoreDocument } from '@documenso/lib/server-only/document/restore-document';
 import { searchDocumentsWithKeyword } from '@documenso/lib/server-only/document/search-documents-with-keyword';
 import { sendDocument } from '@documenso/lib/server-only/document/send-document';
-import { updateDocument } from '@documenso/lib/server-only/document/update-document';
 import { getTeamById } from '@documenso/lib/server-only/team/get-team';
 import { getPresignPostUrl } from '@documenso/lib/universal/upload/server-actions';
 import { isDocumentCompleted } from '@documenso/lib/utils/document';
@@ -58,9 +57,8 @@ import {
   ZSearchDocumentsMutationSchema,
   ZSetSigningOrderForDocumentMutationSchema,
   ZSuccessResponseSchema,
-  ZUpdateDocumentRequestSchema,
-  ZUpdateDocumentResponseSchema,
 } from './schema';
+import { updateDocumentRoute } from './update-document';
 
 export const documentRouter = router({
   /**
@@ -337,55 +335,7 @@ export const documentRouter = router({
       });
     }),
 
-  /**
-   * @public
-   *
-   * Todo: Refactor to updateDocument.
-   */
-  setSettingsForDocument: authenticatedProcedure
-    .meta({
-      openapi: {
-        method: 'POST',
-        path: '/document/update',
-        summary: 'Update document',
-        tags: ['Document'],
-      },
-    })
-    .input(ZUpdateDocumentRequestSchema)
-    .output(ZUpdateDocumentResponseSchema)
-    .mutation(async ({ input, ctx }) => {
-      const { teamId } = ctx;
-      const { documentId, data, meta = {} } = input;
-
-      const userId = ctx.user.id;
-
-      if (Object.values(meta).length > 0) {
-        await upsertDocumentMeta({
-          userId: ctx.user.id,
-          teamId,
-          documentId,
-          subject: meta.subject,
-          message: meta.message,
-          timezone: meta.timezone,
-          dateFormat: meta.dateFormat,
-          language: meta.language,
-          typedSignatureEnabled: meta.typedSignatureEnabled,
-          redirectUrl: meta.redirectUrl,
-          distributionMethod: meta.distributionMethod,
-          signingOrder: meta.signingOrder,
-          emailSettings: meta.emailSettings,
-          requestMetadata: ctx.metadata,
-        });
-      }
-
-      return await updateDocument({
-        userId,
-        teamId,
-        documentId,
-        data,
-        requestMetadata: ctx.metadata,
-      });
-    }),
+  updateDocument: updateDocumentRoute,
 
   /**
    * @public

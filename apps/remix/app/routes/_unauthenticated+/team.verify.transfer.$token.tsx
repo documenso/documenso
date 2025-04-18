@@ -6,7 +6,7 @@ import { isTokenExpired } from '@documenso/lib/utils/token-verification';
 import { prisma } from '@documenso/prisma';
 import { Button } from '@documenso/ui/primitives/button';
 
-import type { Route } from './+types/team.verify.transfer.token';
+import type { Route } from './+types/team.verify.transfer.$token';
 
 export async function loader({ params }: Route.LoaderArgs) {
   const { token } = params;
