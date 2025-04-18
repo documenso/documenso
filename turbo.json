@@ -33,6 +33,25 @@
     "test:e2e": {
       "dependsOn": ["^build"],
       "cache": false
+    },
+    "prisma:generate": {
+      "cache": false
+    },
+    "prisma:migrate-dev": {
+      "cache": false
+    },
+    "prisma:migrate-deploy": {
+      "cache": false
+    },
+    "prisma:migrate-reset": {
+      "cache": false
+    },
+    "prisma:seed": {
+      "cache": false
+    },
+    "prisma:studio": {
+      "cache": false,
+      "persistent": true
     }
   },
   "globalDependencies": ["**/.env.*local"],
