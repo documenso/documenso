@@ -1,3 +1,4 @@
+import { SESClient, SendRawEmailCommand } from '@aws-sdk/client-ses';
 import type { Transporter } from 'nodemailer';
 import { createTransport } from 'nodemailer';
 
@@ -69,6 +70,30 @@ const getTransport = (): Transporter => {
         apiKey: env('NEXT_PRIVATE_RESEND_API_KEY') || '',
       }),
     );
+  }
+
+  if (transport === 'ses') {
+    const hasCredentials =
+      env('NEXT_PRIVATE_SES_ACCESS_KEY_ID') && env('NEXT_PRIVATE_SES_SECRET_ACCESS_KEY');
+
+    const ses = new SESClient({
+      region: env('NEXT_PRIVATE_SES_REGION') || 'us-east-1',
+      credentials: hasCredentials
+        ? {
+            accessKeyId: env('NEXT_PRIVATE_SES_ACCESS_KEY_ID')!,
+            secretAccessKey: env('NEXT_PRIVATE_SES_SECRET_ACCESS_KEY')!,
+          }
+        : undefined,
+    });
+
+    return createTransport({
+      SES: {
+        ses,
+        aws: {
+          SendRawEmailCommand,
+        },
+      },
+    });
   }
 
   if (transport === 'smtp-api') {
