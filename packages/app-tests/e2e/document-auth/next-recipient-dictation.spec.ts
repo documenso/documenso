@@ -377,8 +377,8 @@ test('[NEXT_RECIPIENT_DICTATION]: should allow assistant to dictate next signer'
 
     // Second recipient should be the new signer
     const updatedSigner = updatedDocument.recipients[1];
-    expect(updatedSigner.name).toBe('New Signer');
-    expect(updatedSigner.email).toBe('new.signer@example.com');
+    expect(updatedSigner.name).toBe('New Recipient');
+    expect(updatedSigner.email).toBe('new.recipient@example.com');
     expect(updatedSigner.signingOrder).toBe(2);
     expect(updatedSigner.signingStatus).toBe(SigningStatus.NOT_SIGNED);
     expect(updatedSigner.role).toBe(RecipientRole.SIGNER);
