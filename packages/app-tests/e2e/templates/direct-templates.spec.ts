@@ -23,8 +23,6 @@ const formatTemplatesPath = (teamUrl?: string) =>
 
 const nanoid = customAlphabet('1234567890abcdef', 10);
 
-test.describe.configure({ mode: 'parallel' });
-
 test('[DIRECT_TEMPLATES]: create direct link for template', async ({ page }) => {
   const team = await seedTeam({
     createTeamMembers: 1,

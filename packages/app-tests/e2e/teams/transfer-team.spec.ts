@@ -5,8 +5,6 @@ import { seedTeam, seedTeamTransfer } from '@documenso/prisma/seed/teams';
 
 import { apiSignin } from '../fixtures/authentication';
 
-test.describe.configure({ mode: 'parallel' });
-
 test('[TEAMS]: initiate and cancel team transfer', async ({ page }) => {
   const team = await seedTeam({
     createTeamMembers: 1,

@@ -6,9 +6,8 @@ import { seedUser } from '@documenso/prisma/seed/users';
 
 import { apiSignin } from '../fixtures/authentication';
 
-test.describe.configure({ mode: 'parallel' });
-
 test.describe('[EE_ONLY]', () => {
+  // eslint-disable-next-line turbo/no-undeclared-env-vars
   const enterprisePriceId = process.env.NEXT_PUBLIC_STRIPE_ENTERPRISE_PLAN_MONTHLY_PRICE_ID || '';
 
   test.beforeEach(() => {
