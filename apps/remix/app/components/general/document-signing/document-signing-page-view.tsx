@@ -157,7 +157,11 @@ export const DocumentSigningPageView = ({
           </div>
         </div>
 
-        <DocumentReadOnlyFields fields={completedFields} showRecipientTooltip={true} />
+        <DocumentReadOnlyFields
+          documentMeta={documentMeta || undefined}
+          fields={completedFields}
+          showRecipientTooltip={true}
+        />
 
         {recipient.role !== RecipientRole.ASSISTANT && (
           <DocumentSigningAutoSign recipient={recipient} fields={fields} />

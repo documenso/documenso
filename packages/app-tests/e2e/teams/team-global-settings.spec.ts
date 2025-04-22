@@ -4,8 +4,6 @@ import { seedTeam } from '@documenso/prisma/seed/teams';
 
 import { apiSignin } from '../fixtures/authentication';
 
-test.describe.configure({ mode: 'parallel' });
-
 test('[TEAMS]: update the default document visibility in the team global settings', async ({
   page,
 }) => {

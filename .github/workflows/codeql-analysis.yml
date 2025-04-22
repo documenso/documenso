@@ -10,7 +10,7 @@ on:
 jobs:
   analyze:
     name: Analyze
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest
     permissions:
       actions: read
       contents: read
@@ -30,7 +30,8 @@ jobs:
 
       - uses: ./.github/actions/node-install
 
-      - uses: ./.github/actions/cache-build
+      - name: Build app
+        run: npm run build
 
       - name: Initialize CodeQL
         uses: github/codeql-action/init@v3

@@ -249,24 +249,24 @@ export default function SigningCertificate({ loaderData }: Route.ComponentProps)
                               {signature.secondaryId}
                             </span>
                           </p>
-
-                          <p className="text-muted-foreground mt-2 text-sm print:text-xs">
-                            <span className="font-medium">{_(msg`IP Address`)}:</span>{' '}
-                            <span className="inline-block">
-                              {logs.DOCUMENT_RECIPIENT_COMPLETED[0]?.ipAddress ?? _(msg`Unknown`)}
-                            </span>
-                          </p>
-
-                          <p className="text-muted-foreground mt-1 text-sm print:text-xs">
-                            <span className="font-medium">{_(msg`Device`)}:</span>{' '}
-                            <span className="inline-block">
-                              {getDevice(logs.DOCUMENT_RECIPIENT_COMPLETED[0]?.userAgent)}
-                            </span>
-                          </p>
                         </>
                       ) : (
                         <p className="text-muted-foreground">N/A</p>
                       )}
+
+                      <p className="text-muted-foreground mt-2 text-sm print:text-xs">
+                        <span className="font-medium">{_(msg`IP Address`)}:</span>{' '}
+                        <span className="inline-block">
+                          {logs.DOCUMENT_RECIPIENT_COMPLETED[0]?.ipAddress ?? _(msg`Unknown`)}
+                        </span>
+                      </p>
+
+                      <p className="text-muted-foreground mt-1 text-sm print:text-xs">
+                        <span className="font-medium">{_(msg`Device`)}:</span>{' '}
+                        <span className="inline-block">
+                          {getDevice(logs.DOCUMENT_RECIPIENT_COMPLETED[0]?.userAgent)}
+                        </span>
+                      </p>
                     </TableCell>
 
                     <TableCell truncate={false} className="w-[min-content] align-top">

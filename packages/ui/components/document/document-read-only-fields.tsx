@@ -2,7 +2,7 @@ import { useState } from 'react';
 
 import { useLingui } from '@lingui/react';
 import { Trans } from '@lingui/react/macro';
-import type { DocumentMeta, Field, Recipient } from '@prisma/client';
+import type { DocumentMeta, Field, Recipient, TemplateMeta } from '@prisma/client';
 import { SigningStatus } from '@prisma/client';
 import { Clock, EyeOffIcon } from 'lucide-react';
 
@@ -23,7 +23,7 @@ import { FieldContent } from '../../primitives/document-flow/field-content';
 
 export type DocumentReadOnlyFieldsProps = {
   fields: DocumentField[];
-  documentMeta?: DocumentMeta;
+  documentMeta?: DocumentMeta | TemplateMeta;
 
   showFieldStatus?: boolean;
 

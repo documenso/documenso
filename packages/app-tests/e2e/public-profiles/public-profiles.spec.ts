@@ -7,8 +7,6 @@ import { seedUser } from '@documenso/prisma/seed/users';
 
 import { apiSignin } from '../fixtures/authentication';
 
-test.describe.configure({ mode: 'parallel' });
-
 test('[PUBLIC_PROFILE]: create profile', async ({ page }) => {
   const user = await seedUser();
 
