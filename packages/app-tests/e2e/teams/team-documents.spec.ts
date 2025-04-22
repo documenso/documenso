@@ -9,8 +9,6 @@ import { seedUser } from '@documenso/prisma/seed/users';
 import { apiSignin, apiSignout } from '../fixtures/authentication';
 import { checkDocumentTabCount } from '../fixtures/documents';
 
-test.describe.configure({ mode: 'parallel' });
-
 test('[TEAMS]: check team documents count', async ({ page }) => {
   const { team, teamMember2 } = await seedTeamDocuments();
 

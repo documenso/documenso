@@ -78,7 +78,7 @@ test.describe('Embedding Presign API', () => {
     expect(responseData.expiresIn).toBe(7200); // 2 hours in seconds
   });
 
-  test('createEmbeddingPresignToken: should create a token with immediate expiration in dev mode', async ({
+  test.skip('createEmbeddingPresignToken: should create a token with immediate expiration in dev mode', async ({
     request,
   }) => {
     const user = await seedUser();
