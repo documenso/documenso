@@ -18,6 +18,7 @@ export const SEND_RECIPIENT_SIGNED_EMAIL_JOB_DEFINITION = {
   name: 'Send Recipient Signed Email',
   version: '1.0.0',
   trigger: {
+    type: 'event',
     name: SEND_RECIPIENT_SIGNED_EMAIL_JOB_DEFINITION_ID,
     schema: SEND_RECIPIENT_SIGNED_EMAIL_JOB_DEFINITION_SCHEMA,
   },

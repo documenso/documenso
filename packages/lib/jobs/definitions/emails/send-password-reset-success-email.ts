@@ -17,6 +17,7 @@ export const SEND_PASSWORD_RESET_SUCCESS_EMAIL_JOB_DEFINITION = {
   name: 'Send Password Reset Email',
   version: '1.0.0',
   trigger: {
+    type: 'event',
     name: SEND_PASSWORD_RESET_SUCCESS_EMAIL_JOB_DEFINITION_ID,
     schema: SEND_PASSWORD_RESET_SUCCESS_EMAIL_JOB_DEFINITION_SCHEMA,
   },
