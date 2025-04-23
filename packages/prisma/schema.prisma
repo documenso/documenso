@@ -327,17 +327,20 @@ model Document {
   fields         Field[]
   shareLinks     DocumentShareLink[]
   documentDataId String
-  documentData   DocumentData        @relation(fields: [documentDataId], references: [id], onDelete: Cascade)
   documentMeta   DocumentMeta?
   createdAt      DateTime            @default(now())
   updatedAt      DateTime            @default(now()) @updatedAt
   completedAt    DateTime?
   deletedAt      DateTime?
   teamId         Int?
-  team           Team?               @relation(fields: [teamId], references: [id])
   templateId     Int?
-  template       Template?           @relation(fields: [templateId], references: [id], onDelete: SetNull)
   source         DocumentSource
+
+  useLegacyFieldInsertion Boolean @default(false)
+
+  documentData DocumentData @relation(fields: [documentDataId], references: [id], onDelete: Cascade)
+  team         Team?        @relation(fields: [teamId], references: [id])
+  template     Template?    @relation(fields: [templateId], references: [id], onDelete: SetNull)
 
   auditLogs DocumentAuditLog[]
 
@@ -705,6 +708,8 @@ model Template {
   updatedAt              DateTime           @default(now()) @updatedAt
   publicTitle            String             @default("")
   publicDescription      String             @default("")
+
+  useLegacyFieldInsertion Boolean @default(false)
 
   team                 Team?               @relation(fields: [teamId], references: [id], onDelete: Cascade)
   templateDocumentData DocumentData        @relation(fields: [templateDocumentDataId], references: [id], onDelete: Cascade)

@@ -19,6 +19,7 @@ import {
 import type { CompletedField } from '@documenso/lib/types/fields';
 import type { FieldWithSignatureAndFieldMeta } from '@documenso/prisma/types/field-with-signature-and-fieldmeta';
 import type { RecipientWithFields } from '@documenso/prisma/types/recipient-with-fields';
+import { DocumentReadOnlyFields } from '@documenso/ui/components/document/document-read-only-fields';
 import { Card, CardContent } from '@documenso/ui/primitives/card';
 import { ElementVisible } from '@documenso/ui/primitives/element-visible';
 import { PDFViewer } from '@documenso/ui/primitives/pdf-viewer';
@@ -36,7 +37,6 @@ import { DocumentSigningRadioField } from '~/components/general/document-signing
 import { DocumentSigningRejectDialog } from '~/components/general/document-signing/document-signing-reject-dialog';
 import { DocumentSigningSignatureField } from '~/components/general/document-signing/document-signing-signature-field';
 import { DocumentSigningTextField } from '~/components/general/document-signing/document-signing-text-field';
-import { DocumentReadOnlyFields } from '~/components/general/document/document-read-only-fields';
 
 import { DocumentSigningRecipientProvider } from './document-signing-recipient-provider';
 
@@ -157,7 +157,11 @@ export const DocumentSigningPageView = ({
           </div>
         </div>
 
-        <DocumentReadOnlyFields documentMeta={documentMeta || undefined} fields={completedFields} />
+        <DocumentReadOnlyFields
+          documentMeta={documentMeta || undefined}
+          fields={completedFields}
+          showRecipientTooltip={true}
+        />
 
         {recipient.role !== RecipientRole.ASSISTANT && (
           <DocumentSigningAutoSign recipient={recipient} fields={fields} />

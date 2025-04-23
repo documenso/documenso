@@ -25,6 +25,10 @@ import {
   DocumentGlobalAuthActionTooltip,
 } from '@documenso/ui/components/document/document-global-auth-action-select';
 import {
+  DocumentReadOnlyFields,
+  mapFieldsWithRecipients,
+} from '@documenso/ui/components/document/document-read-only-fields';
+import {
   DocumentVisibilitySelect,
   DocumentVisibilityTooltip,
 } from '@documenso/ui/components/document/document-visibility-select';
@@ -59,7 +63,6 @@ import {
   DocumentFlowFormContainerHeader,
   DocumentFlowFormContainerStep,
 } from './document-flow-root';
-import { ShowFieldItem } from './show-field-item';
 import type { DocumentFlowStep } from './types';
 
 export type AddSettingsFormProps = {
@@ -154,10 +157,13 @@ export const AddSettingsFormPartial = ({
       />
 
       <DocumentFlowFormContainerContent>
-        {isDocumentPdfLoaded &&
-          fields.map((field, index) => (
-            <ShowFieldItem key={index} field={field} recipients={recipients} />
-          ))}
+        {isDocumentPdfLoaded && (
+          <DocumentReadOnlyFields
+            showRecipientColors={true}
+            recipientIds={recipients.map((recipient) => recipient.id)}
+            fields={mapFieldsWithRecipients(fields, recipients)}
+          />
+        )}
 
         <Form {...form}>
           <fieldset
