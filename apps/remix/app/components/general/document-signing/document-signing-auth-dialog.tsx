@@ -27,7 +27,7 @@ export type DocumentSigningAuthDialogProps = {
   actionTarget: FieldType | 'DOCUMENT';
   open: boolean;
   onOpenChange: (value: boolean) => void;
-
+  isEnterprise: boolean;
   /**
    * The callback to run when the reauth form is filled out.
    */
@@ -41,6 +41,7 @@ export const DocumentSigningAuthDialog = ({
   open,
   onOpenChange,
   onReauthFormSubmit,
+  isEnterprise,
 }: DocumentSigningAuthDialogProps) => {
   const { recipient, user, isCurrentlyAuthenticating } = useRequiredDocumentSigningAuthContext();
 

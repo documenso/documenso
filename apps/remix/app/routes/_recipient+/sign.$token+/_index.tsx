@@ -6,6 +6,7 @@ import { getOptionalLoaderContext } from 'server/utils/get-loader-session';
 
 import signingCelebration from '@documenso/assets/images/signing-celebration.png';
 import { getOptionalSession } from '@documenso/auth/server/lib/utils/get-session';
+import { isUserEnterprise } from '@documenso/ee/server-only/util/is-document-enterprise';
 import { useOptionalSession } from '@documenso/lib/client-only/providers/session';
 import { getDocumentAndSenderByToken } from '@documenso/lib/server-only/document/get-document-by-token';
 import { isRecipientAuthorized } from '@documenso/lib/server-only/document/is-recipient-authorized';
@@ -59,6 +60,10 @@ export async function loader({ params, request }: Route.LoaderArgs) {
   ) {
     throw new Response('Not Found', { status: 404 });
   }
+
+  const isEnterprise = user?.id
+    ? await isUserEnterprise({ userId: user.id }).catch(() => false)
+    : false;
 
   const recipientWithFields = { ...recipient, fields };
 
@@ -115,6 +120,7 @@ export async function loader({ params, request }: Route.LoaderArgs) {
       isDocumentAccessValid: false,
       recipientEmail: recipient.email,
       recipientHasAccount,
+      isEnterprise,
     } as const);
   }
 
@@ -149,6 +155,7 @@ export async function loader({ params, request }: Route.LoaderArgs) {
     completedFields,
     recipientSignature,
     isRecipientsTurn,
+    isEnterprise,
   } as const);
 }
 
@@ -176,6 +183,7 @@ export default function SigningPage() {
     isRecipientsTurn,
     allRecipients,
     recipientWithFields,
+    isEnterprise,
   } = data;
 
   if (document.deletedAt || document.status === DocumentStatus.REJECTED) {
@@ -241,6 +249,7 @@ export default function SigningPage() {
         documentAuthOptions={document.authOptions}
         recipient={recipient}
         user={user}
+        isEnterprise={isEnterprise}
       >
         <DocumentSigningPageView
           recipient={recipientWithFields}

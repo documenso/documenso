@@ -28,6 +28,7 @@ import {
   AssistantConfirmationDialog,
   type NextSigner,
 } from '../../dialogs/assistant-confirmation-dialog';
+import { useRequiredDocumentSigningAuthContext } from './document-signing-auth-provider';
 import { DocumentSigningCompleteDialog } from './document-signing-complete-dialog';
 import { useRequiredDocumentSigningContext } from './document-signing-provider';
 
@@ -39,6 +40,7 @@ export type DocumentSigningFormProps = {
   isRecipientsTurn: boolean;
   allRecipients?: RecipientWithFields[];
   setSelectedSignerId?: (id: number | null) => void;
+  isEnterprise: boolean;
 };
 
 export const DocumentSigningForm = ({
@@ -49,6 +51,7 @@ export const DocumentSigningForm = ({
   isRecipientsTurn,
   allRecipients = [],
   setSelectedSignerId,
+  isEnterprise,
 }: DocumentSigningFormProps) => {
   const { sessionData } = useOptionalSession();
   const user = sessionData?.user;
@@ -62,6 +65,7 @@ export const DocumentSigningForm = ({
   const assistantSignersId = useId();
 
   const { fullName, signature, setFullName, setSignature } = useRequiredDocumentSigningContext();
+  const { executeActionAuthProcedure } = useRequiredDocumentSigningAuthContext();
 
   const [validateUninsertedFields, setValidateUninsertedFields] = useState(false);
   const [isConfirmationDialogOpen, setIsConfirmationDialogOpen] = useState(false);
@@ -114,11 +118,17 @@ export const DocumentSigningForm = ({
     setIsAssistantSubmitting(true);
 
     try {
-      await completeDocument(undefined, nextSigner);
+      await executeActionAuthProcedure({
+        actionTarget: 'DOCUMENT',
+        isEnterprise,
+        onReauthFormSubmit: async (authOptions) => {
+          await completeDocument(authOptions, nextSigner);
+        },
+      });
     } catch (err) {
       toast({
-        title: 'Error',
-        description: 'An error occurred while completing the document. Please try again.',
+        title: _(msg`Error`),
+        description: _(msg`An error occurred while completing the document. Please try again.`),
         variant: 'destructive',
       });
 
@@ -229,7 +239,13 @@ export const DocumentSigningForm = ({
                     fields={fields}
                     fieldsValidated={fieldsValidated}
                     onSignatureComplete={async (nextSigner) => {
-                      await completeDocument(undefined, nextSigner);
+                      await executeActionAuthProcedure({
+                        actionTarget: 'DOCUMENT',
+                        isEnterprise,
+                        onReauthFormSubmit: async (authOptions) => {
+                          await completeDocument(authOptions, nextSigner);
+                        },
+                      });
                     }}
                     role={recipient.role}
                     allowDictateNextSigner={document.documentMeta?.allowDictateNextSigner}
@@ -409,7 +425,13 @@ export const DocumentSigningForm = ({
                     fieldsValidated={fieldsValidated}
                     disabled={!isRecipientsTurn}
                     onSignatureComplete={async (nextSigner) => {
-                      await completeDocument(undefined, nextSigner);
+                      await executeActionAuthProcedure({
+                        actionTarget: 'DOCUMENT',
+                        isEnterprise,
+                        onReauthFormSubmit: async (authOptions) => {
+                          await completeDocument(authOptions, nextSigner);
+                        },
+                      });
                     }}
                     role={recipient.role}
                     allowDictateNextSigner={

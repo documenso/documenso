@@ -66,6 +66,7 @@ export interface DocumentSigningAuthProviderProps {
   recipient: Recipient;
   user?: SessionUser | null;
   children: React.ReactNode;
+  isEnterprise: boolean;
 }
 
 export const DocumentSigningAuthProvider = ({
@@ -73,6 +74,7 @@ export const DocumentSigningAuthProvider = ({
   recipient: initialRecipient,
   user,
   children,
+  isEnterprise,
 }: DocumentSigningAuthProviderProps) => {
   const [documentAuthOptions, setDocumentAuthOptions] = useState(initialDocumentAuthOptions);
   const [recipient, setRecipient] = useState(initialRecipient);
@@ -138,8 +140,13 @@ export const DocumentSigningAuthProvider = ({
     .exhaustive();
 
   const executeActionAuthProcedure = async (options: ExecuteActionAuthProcedureOptions) => {
-    // Directly run callback if no auth required.
-    if (!derivedRecipientActionAuth || options.actionTarget !== FieldType.SIGNATURE) {
+    // Determine if authentication is required based on enterprise status and action target.
+    const requiresAuthTrigger = isEnterprise
+      ? derivedRecipientActionAuth && options.actionTarget === FieldType.SIGNATURE
+      : derivedRecipientActionAuth && options.actionTarget === 'DOCUMENT';
+
+    // Directly run callback if no auth trigger is needed.
+    if (!requiresAuthTrigger) {
       await options.onReauthFormSubmit();
       return;
     }
@@ -209,6 +216,7 @@ export const DocumentSigningAuthProvider = ({
           onReauthFormSubmit={documentAuthDialogPayload.onReauthFormSubmit}
           actionTarget={documentAuthDialogPayload.actionTarget}
           documentAuthType={derivedRecipientActionAuth}
+          isEnterprise={isEnterprise}
         />
       )}
     </DocumentSigningAuthContext.Provider>
@@ -218,6 +226,8 @@ export const DocumentSigningAuthProvider = ({
 type ExecuteActionAuthProcedureOptions = Omit<
   DocumentSigningAuthDialogProps,
   'open' | 'onOpenChange' | 'documentAuthType' | 'recipientRole'
->;
+> & {
+  actionTarget: FieldType | 'DOCUMENT';
+};
 
 DocumentSigningAuthProvider.displayName = 'DocumentSigningAuthProvider';

@@ -1,10 +1,15 @@
 import { useEffect } from 'react';
 
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Trans } from '@lingui/react/macro';
-import { useLingui } from '@lingui/react/macro';
-import { DocumentVisibility, TeamMemberRole } from '@prisma/client';
-import { DocumentStatus, type Field, type Recipient, SendStatus } from '@prisma/client';
+import { Trans, useLingui } from '@lingui/react/macro';
+import {
+  DocumentStatus,
+  DocumentVisibility,
+  type Field,
+  type Recipient,
+  SendStatus,
+  TeamMemberRole,
+} from '@prisma/client';
 import { InfoIcon } from 'lucide-react';
 import { useForm } from 'react-hook-form';
 import { match } from 'ts-pattern';
@@ -268,24 +273,22 @@ export const AddSettingsFormPartial = ({
               />
             )}
 
-            {isDocumentEnterprise && (
-              <FormField
-                control={form.control}
-                name="globalActionAuth"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel className="flex flex-row items-center">
-                      <Trans>Recipient action authentication</Trans>
-                      <DocumentGlobalAuthActionTooltip />
-                    </FormLabel>
+            <FormField
+              control={form.control}
+              name="globalActionAuth"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="flex flex-row items-center">
+                    <Trans>Recipient action authentication</Trans>
+                    <DocumentGlobalAuthActionTooltip />
+                  </FormLabel>
 
-                    <FormControl>
-                      <DocumentGlobalAuthActionSelect {...field} onValueChange={field.onChange} />
-                    </FormControl>
-                  </FormItem>
-                )}
-              />
-            )}
+                  <FormControl>
+                    <DocumentGlobalAuthActionSelect {...field} onValueChange={field.onChange} />
+                  </FormControl>
+                </FormItem>
+              )}
+            />
 
             <Accordion type="multiple" className="mt-6">
               <AccordionItem value="advanced-options" className="border-none">

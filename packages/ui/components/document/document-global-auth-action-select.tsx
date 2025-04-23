@@ -7,7 +7,11 @@ import type { SelectProps } from '@radix-ui/react-select';
 import { InfoIcon } from 'lucide-react';
 
 import { DOCUMENT_AUTH_TYPES } from '@documenso/lib/constants/document-auth';
-import { DocumentActionAuth, DocumentAuth } from '@documenso/lib/types/document-auth';
+import {
+  DocumentActionAuth,
+  DocumentAuth,
+  NonEnterpriseDocumentActionAuth,
+} from '@documenso/lib/types/document-auth';
 import {
   Select,
   SelectContent,
@@ -17,38 +21,51 @@ import {
 } from '@documenso/ui/primitives/select';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@documenso/ui/primitives/tooltip';
 
-export const DocumentGlobalAuthActionSelect = forwardRef<HTMLButtonElement, SelectProps>(
-  (props, ref) => {
-    const { _ } = useLingui();
+interface DocumentGlobalAuthActionSelectProps extends SelectProps {
+  isDocumentEnterprise?: boolean;
+}
 
-    return (
-      <Select {...props}>
-        <SelectTrigger className="bg-background text-muted-foreground">
-          <SelectValue
-            ref={ref}
-            data-testid="documentActionSelectValue"
-            placeholder={_(msg`No restrictions`)}
-          />
-        </SelectTrigger>
+export const DocumentGlobalAuthActionSelect = forwardRef<
+  HTMLButtonElement,
+  DocumentGlobalAuthActionSelectProps
+>(({ isDocumentEnterprise, ...props }, ref) => {
+  const { _ } = useLingui();
 
-        <SelectContent position="popper">
-          {/* Note: -1 is remapped in the Zod schema to the required value. */}
-          <SelectItem value={'-1'}>
-            <Trans>No restrictions</Trans>
-          </SelectItem>
+  return (
+    <Select {...props}>
+      <SelectTrigger className="bg-background text-muted-foreground">
+        <SelectValue
+          ref={ref}
+          data-testid="documentActionSelectValue"
+          placeholder={_(msg`No restrictions`)}
+        />
+      </SelectTrigger>
 
-          {Object.values(DocumentActionAuth)
-            .filter((auth) => auth !== DocumentAuth.ACCOUNT)
-            .map((authType) => (
-              <SelectItem key={authType} value={authType}>
-                {DOCUMENT_AUTH_TYPES[authType].value}
-              </SelectItem>
-            ))}
-        </SelectContent>
-      </Select>
-    );
-  },
-);
+      <SelectContent position="popper">
+        {/* Note: -1 is remapped in the Zod schema to the required value. */}
+        <SelectItem value={'-1'}>
+          <Trans>No restrictions</Trans>
+        </SelectItem>
+
+        {isDocumentEnterprise
+          ? Object.values(DocumentActionAuth)
+              .filter((auth) => auth !== DocumentAuth.ACCOUNT)
+              .map((authType) => (
+                <SelectItem key={authType} value={authType}>
+                  {DOCUMENT_AUTH_TYPES[authType].value}
+                </SelectItem>
+              ))
+          : Object.values(NonEnterpriseDocumentActionAuth)
+              .filter((auth) => auth !== DocumentAuth.EXPLICIT_NONE)
+              .map((authType) => (
+                <SelectItem key={authType} value={authType}>
+                  {DOCUMENT_AUTH_TYPES[authType].value}
+                </SelectItem>
+              ))}
+      </SelectContent>
+    </Select>
+  );
+});
 
 DocumentGlobalAuthActionSelect.displayName = 'DocumentGlobalAuthActionSelect';
 

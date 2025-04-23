@@ -1,8 +1,6 @@
-import { DocumentVisibility } from '@prisma/client';
-import { DocumentStatus, TeamMemberRole } from '@prisma/client';
+import { DocumentStatus, DocumentVisibility, TeamMemberRole } from '@prisma/client';
 import { match } from 'ts-pattern';
 
-import { isUserEnterprise } from '@documenso/ee/server-only/util/is-document-enterprise';
 import { DOCUMENT_AUDIT_LOG_TYPE } from '@documenso/lib/types/document-audit-logs';
 import type { ApiRequestMetadata } from '@documenso/lib/universal/extract-request-metadata';
 import type { CreateDocumentAuditLogDataResponse } from '@documenso/lib/utils/document-audit-logs';
@@ -135,18 +133,18 @@ export const updateDocument = async ({
     data?.globalActionAuth === undefined ? documentGlobalActionAuth : data.globalActionAuth;
 
   // Check if user has permission to set the global action auth.
-  if (newGlobalActionAuth) {
-    const isDocumentEnterprise = await isUserEnterprise({
-      userId,
-      teamId,
-    });
+  // if (newGlobalActionAuth) {
+  //   const isDocumentEnterprise = await isUserEnterprise({
+  //     userId,
+  //     teamId,
+  //   });
 
-    if (!isDocumentEnterprise) {
-      throw new AppError(AppErrorCode.UNAUTHORIZED, {
-        message: 'You do not have permission to set the action auth',
-      });
-    }
-  }
+  //   if (!isDocumentEnterprise) {
+  //     throw new AppError(AppErrorCode.UNAUTHORIZED, {
+  //       message: 'You do not have permission to set the action auth',
+  //     });
+  //   }
+  // }
 
   const isTitleSame = data.title === undefined || data.title === document.title;
   const isExternalIdSame = data.externalId === undefined || data.externalId === document.externalId;

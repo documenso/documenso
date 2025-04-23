@@ -69,6 +69,16 @@ export const ZDocumentActionAuthTypesSchema = z
   );
 
 /**
+ * The non-enterprise document action auth methods.
+ *
+ * Only includes options available to non-enterprise users.
+ */
+export const ZNonEnterpriseDocumentActionAuthTypesSchema = z.enum([
+  DocumentAuth.TWO_FACTOR_AUTH,
+  DocumentAuth.EXPLICIT_NONE,
+]);
+
+/**
  * The recipient access auth methods.
  *
  * Must keep these two in sync.
@@ -102,6 +112,7 @@ export const ZRecipientActionAuthTypesSchema = z
 
 export const DocumentAccessAuth = ZDocumentAccessAuthTypesSchema.Enum;
 export const DocumentActionAuth = ZDocumentActionAuthTypesSchema.Enum;
+export const NonEnterpriseDocumentActionAuth = ZNonEnterpriseDocumentActionAuthTypesSchema.Enum;
 export const RecipientAccessAuth = ZRecipientAccessAuthTypesSchema.Enum;
 export const RecipientActionAuth = ZRecipientActionAuthTypesSchema.Enum;
 
@@ -152,6 +163,9 @@ export type TDocumentAccessAuth = z.infer<typeof ZDocumentAccessAuthSchema>;
 export type TDocumentAccessAuthTypes = z.infer<typeof ZDocumentAccessAuthTypesSchema>;
 export type TDocumentActionAuth = z.infer<typeof ZDocumentActionAuthSchema>;
 export type TDocumentActionAuthTypes = z.infer<typeof ZDocumentActionAuthTypesSchema>;
+export type TNonEnterpriseDocumentActionAuthTypes = z.infer<
+  typeof ZNonEnterpriseDocumentActionAuthTypesSchema
+>;
 export type TRecipientAccessAuth = z.infer<typeof ZRecipientAccessAuthSchema>;
 export type TRecipientAccessAuthTypes = z.infer<typeof ZRecipientAccessAuthTypesSchema>;
 export type TRecipientActionAuth = z.infer<typeof ZRecipientActionAuthSchema>;
