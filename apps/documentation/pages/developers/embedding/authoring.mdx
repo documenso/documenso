@@ -1,0 +1,167 @@
+---
+title: Authoring
+description: Learn how to use embedded authoring to create documents and templates in your application
+---
+
+# Embedded Authoring
+
+In addition to embedding signing experiences, Documenso now supports embedded authoring, allowing you to integrate document and template creation directly within your application.
+
+## How Embedded Authoring Works
+
+The embedded authoring feature enables your users to create new documents without leaving your application. This process works through secure presign tokens that authenticate the embedding session and manage permissions.
+
+## Creating Documents with Embedded Authoring
+
+To implement document creation in your application, use the `EmbedCreateDocument` component from our SDK:
+
+```jsx
+import { unstable_EmbedCreateDocument as EmbedCreateDocument } from '@documenso/embed-react';
+
+const DocumentCreator = () => {
+  // You'll need to obtain a presign token using your API key
+  const presignToken = 'YOUR_PRESIGN_TOKEN';
+
+  return (
+    <div style={{ height: '800px', width: '100%' }}>
+      <EmbedCreateDocument
+        presignToken={presignToken}
+        externalId="order-12345"
+        onDocumentCreated={(data) => {
+          console.log('Document created with ID:', data.documentId);
+          console.log('External reference ID:', data.externalId);
+        }}
+      />
+    </div>
+  );
+};
+```
+
+## Obtaining a Presign Token
+
+Before using the `EmbedCreateDocument` component, you'll need to obtain a presign token from your backend. This token authorizes the embedding session.
+
+You can create a presign token by making a request to:
+
+```
+POST /api/v2-beta/embedding/create-presign-token
+```
+
+This API endpoint requires authentication with your Documenso API key. The token has a default expiration of 1 hour, but you can customize this duration based on your security requirements.
+
+You can find more details on this request at our [API Documentation](https://openapi.documenso.com/reference#tag/embedding)
+
+## Configuration Options
+
+The `EmbedCreateDocument` component accepts several configuration options:
+
+| Option             | Type    | Description                                                        |
+| ------------------ | ------- | ------------------------------------------------------------------ |
+| `presignToken`     | string  | **Required**. The authentication token for the embedding session.  |
+| `externalId`       | string  | Optional reference ID from your system to link with the document.  |
+| `host`             | string  | Optional custom host URL. Defaults to `https://app.documenso.com`. |
+| `css`              | string  | Optional custom CSS to style the embedded component.               |
+| `cssVars`          | object  | Optional CSS variables for colors, spacing, and more.              |
+| `darkModeDisabled` | boolean | Optional flag to disable dark mode.                                |
+| `className`        | string  | Optional CSS class name for the iframe.                            |
+
+## Feature Toggles
+
+You can customize the authoring experience by enabling or disabling specific features:
+
+```jsx
+<EmbedCreateDocument
+  presignToken="YOUR_PRESIGN_TOKEN"
+  features={{
+    allowConfigureSignatureTypes: true,
+    allowConfigureLanguage: true,
+    allowConfigureDateFormat: true,
+    allowConfigureTimezone: true,
+    allowConfigureRedirectUrl: true,
+    allowConfigureCommunication: true,
+  }}
+/>
+```
+
+## Handling Document Creation Events
+
+The `onDocumentCreated` callback is triggered when a document is successfully created, providing both the document ID and your external reference ID:
+
+```jsx
+<EmbedCreateDocument
+  presignToken="YOUR_PRESIGN_TOKEN"
+  externalId="order-12345"
+  onDocumentCreated={(data) => {
+    // Navigate to a success page
+    navigate(`/documents/success?id=${data.documentId}`);
+
+    // Or update your database with the document ID
+    updateOrderDocument(data.externalId, data.documentId);
+  }}
+/>
+```
+
+## Styling the Embedded Component
+
+You can customize the appearance of the embedded component using standard CSS classes:
+
+```jsx
+<EmbedCreateDocument
+  className="h-screen w-full rounded-lg border-none shadow-md"
+  presignToken="YOUR_PRESIGN_TOKEN"
+  css={`
+    .documenso-embed {
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+  `}
+  cssVars={{
+    primary: '#0000FF',
+    background: '#F5F5F5',
+    radius: '8px',
+  }}
+/>
+```
+
+## Complete Integration Example
+
+Here's a complete example of integrating document creation in a React application:
+
+```tsx
+import { useState } from 'react';
+
+import { unstable_EmbedCreateDocument as EmbedCreateDocument } from '@documenso/embed-react';
+
+function DocumentCreator() {
+  // In a real application, you would fetch this token from your backend
+  // using your API key at /api/v2-beta/embedding/create-presign-token
+  const presignToken = 'YOUR_PRESIGN_TOKEN';
+  const [documentId, setDocumentId] = useState<number | null>(null);
+
+  if (documentId) {
+    return (
+      <div>
+        <h2>Document Created Successfully!</h2>
+        <p>Document ID: {documentId}</p>
+        <button onClick={() => setDocumentId(null)}>Create Another Document</button>
+      </div>
+    );
+  }
+
+  return (
+    <div style={{ height: '800px', width: '100%' }}>
+      <EmbedCreateDocument
+        presignToken={presignToken}
+        externalId="order-12345"
+        onDocumentCreated={(data) => {
+          setDocumentId(data.documentId);
+        }}
+      />
+    </div>
+  );
+}
+
+export default DocumentCreator;
+```
+
+With embedded authoring, your users can seamlessly create documents within your application, enhancing the overall user experience and streamlining document workflows.

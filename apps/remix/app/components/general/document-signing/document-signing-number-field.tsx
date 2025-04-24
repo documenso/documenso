@@ -3,7 +3,6 @@ import { useEffect, useState } from 'react';
 import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
 import { Trans } from '@lingui/react/macro';
-import { Hash, Loader } from 'lucide-react';
 import { useRevalidator } from 'react-router';
 
 import { validateNumberField } from '@documenso/lib/advanced-fields-validation/validate-number';
@@ -25,6 +24,11 @@ import { useToast } from '@documenso/ui/primitives/use-toast';
 
 import { useRequiredDocumentSigningAuthContext } from './document-signing-auth-provider';
 import { DocumentSigningFieldContainer } from './document-signing-field-container';
+import {
+  DocumentSigningFieldsInserted,
+  DocumentSigningFieldsLoader,
+  DocumentSigningFieldsUninserted,
+} from './document-signing-fields';
 import { useDocumentSigningRecipientContext } from './document-signing-recipient-provider';
 
 type ValidationErrors = {
@@ -245,45 +249,16 @@ export const DocumentSigningNumberField = ({
       onRemove={onRemove}
       type="Number"
     >
-      {isLoading && (
-        <div className="bg-background absolute inset-0 flex items-center justify-center rounded-md">
-          <Loader className="text-primary h-5 w-5 animate-spin md:h-8 md:w-8" />
-        </div>
-      )}
+      {isLoading && <DocumentSigningFieldsLoader />}
 
       {!field.inserted && (
-        <p
-          className={cn(
-            'group-hover:text-primary text-muted-foreground flex flex-col items-center justify-center duration-200',
-            {
-              'group-hover:text-yellow-300': !field.inserted && !parsedFieldMeta?.required,
-              'group-hover:text-red-300': !field.inserted && parsedFieldMeta?.required,
-            },
-          )}
-        >
-          <span className="flex items-center justify-center gap-x-1">
-            <Hash className="h-[clamp(0.625rem,20cqw,0.925rem)] w-[clamp(0.625rem,20cqw,0.925rem)]" />{' '}
-            <span className="text-[clamp(0.425rem,25cqw,0.825rem)]">{fieldDisplayName}</span>
-          </span>
-        </p>
+        <DocumentSigningFieldsUninserted>{fieldDisplayName}</DocumentSigningFieldsUninserted>
       )}
 
       {field.inserted && (
-        <div className="flex h-full w-full items-center">
-          <p
-            className={cn(
-              'text-muted-foreground dark:text-background/80 w-full text-[clamp(0.425rem,25cqw,0.825rem)] duration-200',
-              {
-                'text-left': parsedFieldMeta?.textAlign === 'left',
-                'text-center':
-                  !parsedFieldMeta?.textAlign || parsedFieldMeta?.textAlign === 'center',
-                'text-right': parsedFieldMeta?.textAlign === 'right',
-              },
-            )}
-          >
-            {field.customText}
-          </p>
-        </div>
+        <DocumentSigningFieldsInserted textAlign={parsedFieldMeta?.textAlign}>
+          {field.customText}
+        </DocumentSigningFieldsInserted>
       )}
 
       <Dialog open={showNumberModal} onOpenChange={setShowNumberModal}>
@@ -339,7 +314,7 @@ export const DocumentSigningNumberField = ({
             <div className="flex w-full flex-1 flex-nowrap gap-4">
               <Button
                 type="button"
-                className="dark:bg-muted dark:hover:bg-muted/80 flex-1 bg-black/5 hover:bg-black/10"
+                className="flex-1"
                 variant="secondary"
                 onClick={() => {
                   setShowNumberModal(false);

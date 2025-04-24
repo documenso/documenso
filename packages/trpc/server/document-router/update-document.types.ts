@@ -44,6 +44,7 @@ export const ZUpdateDocumentRequestSchema = z.object({
       visibility: ZDocumentVisibilitySchema.optional(),
       globalAccessAuth: ZDocumentAccessAuthTypesSchema.nullish(),
       globalActionAuth: ZDocumentActionAuthTypesSchema.nullish(),
+      useLegacyFieldInsertion: z.boolean().optional(),
     })
     .optional(),
   meta: z

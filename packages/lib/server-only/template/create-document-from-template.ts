@@ -384,6 +384,7 @@ export const createDocumentFromTemplate = async ({
           globalActionAuth: templateAuthOptions.globalActionAuth,
         }),
         visibility: template.visibility || template.team?.teamGlobalSettings?.documentVisibility,
+        useLegacyFieldInsertion: template.useLegacyFieldInsertion ?? false,
         documentMeta: {
           create: {
             subject: override?.subject || template.templateMeta?.subject,

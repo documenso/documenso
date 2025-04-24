@@ -83,6 +83,7 @@ export const ZTemplateLiteSchema = TemplateSchema.pick({
   updatedAt: true,
   publicTitle: true,
   publicDescription: true,
+  useLegacyFieldInsertion: true,
 });
 
 /**
@@ -102,6 +103,7 @@ export const ZTemplateManySchema = TemplateSchema.pick({
   updatedAt: true,
   publicTitle: true,
   publicDescription: true,
+  useLegacyFieldInsertion: true,
 }).extend({
   team: TeamSchema.pick({
     id: true,

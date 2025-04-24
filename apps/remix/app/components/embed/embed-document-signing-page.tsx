@@ -15,10 +15,12 @@ import { LucideChevronDown, LucideChevronUp } from 'lucide-react';
 
 import { useThrottleFn } from '@documenso/lib/client-only/hooks/use-throttle-fn';
 import { PDF_VIEWER_PAGE_SELECTOR } from '@documenso/lib/constants/pdf-viewer';
+import type { DocumentField } from '@documenso/lib/server-only/field/get-fields-for-document';
 import { isFieldUnsignedAndRequired } from '@documenso/lib/utils/advanced-fields-helpers';
 import { validateFieldsInserted } from '@documenso/lib/utils/fields';
 import type { RecipientWithFields } from '@documenso/prisma/types/recipient-with-fields';
 import { trpc } from '@documenso/trpc/react';
+import { DocumentReadOnlyFields } from '@documenso/ui/components/document/document-read-only-fields';
 import { FieldToolTip } from '@documenso/ui/components/field/field-tooltip';
 import { Button } from '@documenso/ui/primitives/button';
 import { ElementVisible } from '@documenso/ui/primitives/element-visible';
@@ -47,6 +49,7 @@ export type EmbedSignDocumentClientPageProps = {
   documentData: DocumentData;
   recipient: RecipientWithFields;
   fields: Field[];
+  completedFields: DocumentField[];
   metadata?: DocumentMeta | TemplateMeta | null;
   isCompleted?: boolean;
   hidePoweredBy?: boolean;
@@ -60,6 +63,7 @@ export const EmbedSignDocumentClientPage = ({
   documentData,
   recipient,
   fields,
+  completedFields,
   metadata,
   isCompleted,
   hidePoweredBy = false,
@@ -85,6 +89,8 @@ export const EmbedSignDocumentClientPage = ({
   const [isExpanded, setIsExpanded] = useState(false);
   const [isNameLocked, setIsNameLocked] = useState(false);
   const [showPendingFieldTooltip, setShowPendingFieldTooltip] = useState(false);
+  const [showOtherRecipientsCompletedFields, setShowOtherRecipientsCompletedFields] =
+    useState(false);
 
   const [allowDocumentRejection, setAllowDocumentRejection] = useState(false);
 
@@ -202,6 +208,7 @@ export const EmbedSignDocumentClientPage = ({
       // a to be provided by the parent application, unlike direct templates.
       setIsNameLocked(!!data.lockName);
       setAllowDocumentRejection(!!data.allowDocumentRejection);
+      setShowOtherRecipientsCompletedFields(!!data.showOtherRecipientsCompletedFields);
 
       if (data.darkModeDisabled) {
         document.documentElement.classList.add('dark-mode-disabled');
@@ -468,6 +475,9 @@ export const EmbedSignDocumentClientPage = ({
 
           {/* Fields */}
           <EmbedDocumentFields fields={fields} metadata={metadata} />
+
+          {/* Completed fields */}
+          <DocumentReadOnlyFields documentMeta={metadata || undefined} fields={completedFields} />
         </div>
 
         {!hidePoweredBy && (

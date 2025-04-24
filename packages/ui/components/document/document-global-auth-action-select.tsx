@@ -1,4 +1,4 @@
-import React, { forwardRef } from 'react';
+import { forwardRef } from 'react';
 
 import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
@@ -32,6 +32,11 @@ export const DocumentGlobalAuthActionSelect = forwardRef<HTMLButtonElement, Sele
         </SelectTrigger>
 
         <SelectContent position="popper">
+          {/* Note: -1 is remapped in the Zod schema to the required value. */}
+          <SelectItem value={'-1'}>
+            <Trans>No restrictions</Trans>
+          </SelectItem>
+
           {Object.values(DocumentActionAuth)
             .filter((auth) => auth !== DocumentAuth.ACCOUNT)
             .map((authType) => (
@@ -39,11 +44,6 @@ export const DocumentGlobalAuthActionSelect = forwardRef<HTMLButtonElement, Sele
                 {DOCUMENT_AUTH_TYPES[authType].value}
               </SelectItem>
             ))}
-
-          {/* Note: -1 is remapped in the Zod schema to the required value. */}
-          <SelectItem value={'-1'}>
-            <Trans>No restrictions</Trans>
-          </SelectItem>
         </SelectContent>
       </Select>
     );

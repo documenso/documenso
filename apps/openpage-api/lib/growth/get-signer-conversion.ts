@@ -2,6 +2,8 @@ import { DateTime } from 'luxon';
 
 import { kyselyPrisma, sql } from '@documenso/prisma';
 
+import { addZeroMonth } from '../add-zero-month';
+
 export const getSignerConversionMonthly = async (type: 'count' | 'cumulative' = 'count') => {
   const qb = kyselyPrisma.$kysely
     .selectFrom('Recipient')
@@ -34,7 +36,7 @@ export const getSignerConversionMonthly = async (type: 'count' | 'cumulative' = 
     ],
   };
 
-  return transformedData;
+  return addZeroMonth(transformedData);
 };
 
 export type GetSignerConversionMonthlyResult = Awaited<

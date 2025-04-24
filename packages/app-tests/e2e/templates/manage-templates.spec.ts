@@ -6,8 +6,6 @@ import { seedTemplate } from '@documenso/prisma/seed/templates';
 
 import { apiSignin } from '../fixtures/authentication';
 
-test.describe.configure({ mode: 'parallel' });
-
 test('[TEMPLATES]: view templates', async ({ page }) => {
   const team = await seedTeam({
     createTeamMembers: 1,

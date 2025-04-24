@@ -2,6 +2,8 @@ import { DateTime } from 'luxon';
 
 import { kyselyPrisma, sql } from '@documenso/prisma';
 
+import { addZeroMonth } from '../add-zero-month';
+
 export const getUserMonthlyGrowth = async (type: 'count' | 'cumulative' = 'count') => {
   const qb = kyselyPrisma.$kysely
     .selectFrom('User')
@@ -32,7 +34,7 @@ export const getUserMonthlyGrowth = async (type: 'count' | 'cumulative' = 'count
     ],
   };
 
-  return transformedData;
+  return addZeroMonth(transformedData);
 };
 
 export type GetUserMonthlyGrowthResult = Awaited<ReturnType<typeof getUserMonthlyGrowth>>;

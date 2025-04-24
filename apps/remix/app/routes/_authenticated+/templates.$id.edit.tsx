@@ -8,6 +8,7 @@ import { type TGetTeamByUrlResponse, getTeamByUrl } from '@documenso/lib/server-
 import { getTemplateById } from '@documenso/lib/server-only/template/get-template-by-id';
 import { formatTemplatesPath } from '@documenso/lib/utils/teams';
 
+import { LegacyFieldWarningPopover } from '~/components/general/legacy-field-warning-popover';
 import { TemplateDirectLinkBadge } from '~/components/general/template/template-direct-link-badge';
 import { TemplateEditForm } from '~/components/general/template/template-edit-form';
 import { TemplateType } from '~/components/general/template/template-type';
@@ -91,8 +92,14 @@ export default function TemplateEditPage() {
           </div>
         </div>
 
-        <div className="mt-2 sm:mt-0 sm:self-end">
+        <div className="mt-2 flex items-center gap-2 sm:mt-0 sm:self-end">
           <TemplateDirectLinkDialogWrapper template={template} />
+
+          {template.useLegacyFieldInsertion && (
+            <div>
+              <LegacyFieldWarningPopover type="template" templateId={template.id} />
+            </div>
+          )}
         </div>
       </div>
 

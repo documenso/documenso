@@ -14,6 +14,7 @@ import { addRejectionStampToPdf } from '../../../server-only/pdf/add-rejection-s
 import { flattenAnnotations } from '../../../server-only/pdf/flatten-annotations';
 import { flattenForm } from '../../../server-only/pdf/flatten-form';
 import { insertFieldInPDF } from '../../../server-only/pdf/insert-field-in-pdf';
+import { legacy_insertFieldInPDF } from '../../../server-only/pdf/legacy-insert-field-in-pdf';
 import { normalizeSignatureAppearances } from '../../../server-only/pdf/normalize-signature-appearances';
 import { triggerWebhook } from '../../../server-only/webhooks/trigger/trigger-webhook';
 import { DOCUMENT_AUDIT_LOG_TYPE } from '../../../types/document-audit-logs';
@@ -167,7 +168,9 @@ export const run = async ({
 
     for (const field of fields) {
       if (field.inserted) {
-        await insertFieldInPDF(pdfDoc, field);
+        document.useLegacyFieldInsertion
+          ? await legacy_insertFieldInPDF(pdfDoc, field)
+          : await insertFieldInPDF(pdfDoc, field);
       }
     }
 
