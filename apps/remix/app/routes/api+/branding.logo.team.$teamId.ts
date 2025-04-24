@@ -1,6 +1,6 @@
 import sharp from 'sharp';
 
-import { getFile } from '@documenso/lib/universal/upload/get-file';
+import { getFileServerSide } from '@documenso/lib/universal/upload/get-file.server';
 import { prisma } from '@documenso/prisma';
 
 import type { Route } from './+types/branding.logo.team.$teamId';
@@ -24,7 +24,14 @@ export async function loader({ params }: Route.LoaderArgs) {
     },
   });
 
+  console.log('########################');
+  console.log('########################');
+  console.log('########################');
+  console.log('########################');
+  console.log('########################');
+
   if (!settings || !settings.brandingEnabled) {
+    console.log('----------------------------');
     return Response.json(
       {
         status: 'error',
@@ -35,6 +42,7 @@ export async function loader({ params }: Route.LoaderArgs) {
   }
 
   if (!settings.brandingLogo) {
+    console.log('!!!!!!!!!!!!!!!!!!!!!!!!');
     return Response.json(
       {
         status: 'error',
@@ -44,7 +52,10 @@ export async function loader({ params }: Route.LoaderArgs) {
     );
   }
 
-  const file = await getFile(JSON.parse(settings.brandingLogo)).catch(() => null);
+  const file = await getFileServerSide(JSON.parse(settings.brandingLogo)).catch((e) => {
+    console.log('@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@');
+    console.error(e);
+  });
 
   if (!file) {
     return Response.json(
