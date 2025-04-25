@@ -5,8 +5,10 @@ import { DateTime } from 'luxon';
 import { redirect } from 'react-router';
 import { match } from 'ts-pattern';
 import { UAParser } from 'ua-parser-js';
+import { renderSVG } from 'uqr';
 
 import { isDocumentPlatform } from '@documenso/ee/server-only/util/is-document-platform';
+import { NEXT_PUBLIC_WEBAPP_URL } from '@documenso/lib/constants/app';
 import { APP_I18N_OPTIONS, ZSupportedLanguageCodeSchema } from '@documenso/lib/constants/i18n';
 import {
   RECIPIENT_ROLES_DESCRIPTION,
@@ -181,6 +183,10 @@ export default function SigningCertificate({ loaderData }: Route.ComponentProps)
       );
   };
 
+  const getDocumentAccessToken = () => {
+    return document.documentAccessToken?.token;
+  };
+
   return (
     <div className="print-provider pointer-events-none mx-auto max-w-screen-md">
       <div className="flex items-center">
@@ -342,7 +348,18 @@ export default function SigningCertificate({ loaderData }: Route.ComponentProps)
       </Card>
 
       {isPlatformDocument && (
-        <div className="my-8 flex-row-reverse">
+        <div className="my-8 flex-row-reverse space-y-4">
+          <div className="flex items-end justify-end gap-x-4">
+            <div
+              className="flex h-24 w-24 justify-center"
+              dangerouslySetInnerHTML={{
+                __html: renderSVG(`${NEXT_PUBLIC_WEBAPP_URL()}/q/${getDocumentAccessToken()}`, {
+                  ecc: 'Q',
+                }),
+              }}
+            />
+          </div>
+
           <div className="flex items-end justify-end gap-x-4">
             <p className="flex-shrink-0 text-sm font-medium print:text-xs">
               {_(msg`Signing certificate provided by`)}:
