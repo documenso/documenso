@@ -16,7 +16,7 @@ import { type TFieldMetaSchema, ZFieldMetaSchema } from '@documenso/lib/types/fi
 import { base64 } from '@documenso/lib/universal/base64';
 import { nanoid } from '@documenso/lib/universal/id';
 import { ADVANCED_FIELD_TYPES_WITH_OPTIONAL_SETTING } from '@documenso/lib/utils/advanced-fields-helpers';
-import { useSignerColors } from '@documenso/ui/lib/signer-colors';
+import { useRecipientColors } from '@documenso/ui/lib/recipient-colors';
 import { cn } from '@documenso/ui/lib/utils';
 import { Button } from '@documenso/ui/primitives/button';
 import { FieldItem } from '@documenso/ui/primitives/document-flow/field-item';
@@ -162,7 +162,7 @@ export const ConfigureFieldsView = ({
   });
 
   const selectedRecipientIndex = recipients.findIndex((r) => r.id === selectedRecipient?.id);
-  const selectedSignerStyles = useSignerColors(
+  const selectedRecipientStyles = useRecipientColors(
     selectedRecipientIndex === -1 ? 0 : selectedRecipientIndex,
   );
 
@@ -505,7 +505,7 @@ export const ConfigureFieldsView = ({
               <div
                 className={cn(
                   'text-muted-foreground dark:text-muted-background pointer-events-none fixed z-50 flex cursor-pointer flex-col items-center justify-center bg-white transition duration-200 [container-type:size]',
-                  selectedSignerStyles.default.base,
+                  selectedRecipientStyles.base,
                   {
                     '-rotate-6 scale-90 opacity-50 dark:bg-black/20': !isFieldWithinBounds,
                     'dark:text-black/60': isFieldWithinBounds,

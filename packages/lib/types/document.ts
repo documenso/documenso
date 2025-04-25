@@ -83,6 +83,7 @@ export const ZDocumentLiteSchema = DocumentSchema.pick({
   deletedAt: true,
   teamId: true,
   templateId: true,
+  useLegacyFieldInsertion: true,
 });
 
 /**
@@ -105,6 +106,7 @@ export const ZDocumentManySchema = DocumentSchema.pick({
   deletedAt: true,
   teamId: true,
   templateId: true,
+  useLegacyFieldInsertion: true,
 }).extend({
   user: UserSchema.pick({
     id: true,

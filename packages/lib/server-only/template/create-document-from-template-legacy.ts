@@ -77,6 +77,7 @@ export const createDocumentFromTemplateLegacy = async ({
       title: template.title,
       visibility: template.team?.teamGlobalSettings?.documentVisibility,
       documentDataId: documentData.id,
+      useLegacyFieldInsertion: template.useLegacyFieldInsertion ?? false,
       recipients: {
         create: template.recipients.map((recipient) => ({
           email: recipient.email,

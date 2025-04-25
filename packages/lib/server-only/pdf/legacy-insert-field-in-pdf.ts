@@ -1,8 +1,8 @@
 // https://github.com/Hopding/pdf-lib/issues/20#issuecomment-412852821
 import fontkit from '@pdf-lib/fontkit';
 import { FieldType } from '@prisma/client';
-import type { PDFDocument, PDFFont } from 'pdf-lib';
-import { RotationTypes, TextAlignment, degrees, radiansToDegrees, rgb } from 'pdf-lib';
+import type { PDFDocument } from 'pdf-lib';
+import { RotationTypes, degrees, radiansToDegrees, rgb } from 'pdf-lib';
 import { P, match } from 'ts-pattern';
 
 import {
@@ -27,20 +27,13 @@ import {
   ZTextFieldMeta,
 } from '../../types/field-meta';
 
-export const insertFieldInPDF = async (pdf: PDFDocument, field: FieldWithSignature) => {
+export const legacy_insertFieldInPDF = async (pdf: PDFDocument, field: FieldWithSignature) => {
   const [fontCaveat, fontNoto] = await Promise.all([
     fetch(`${NEXT_PUBLIC_WEBAPP_URL()}/fonts/caveat.ttf`).then(async (res) => res.arrayBuffer()),
     fetch(`${NEXT_PUBLIC_WEBAPP_URL()}/fonts/noto-sans.ttf`).then(async (res) => res.arrayBuffer()),
   ]);
 
   const isSignatureField = isSignatureFieldType(field.type);
-
-  /**
-   * Red box is the original field width, height and position.
-   *
-   * Blue box is the adjusted field width, height and position. It will represent
-   * where the text will overflow into.
-   */
   const isDebugMode =
     // eslint-disable-next-line turbo/no-undeclared-env-vars
     process.env.DEBUG_PDF_INSERT === '1' || process.env.DEBUG_PDF_INSERT === 'true';
@@ -234,13 +227,8 @@ export const insertFieldInPDF = async (pdf: PDFDocument, field: FieldWithSignatu
 
       const selected: string[] = fromCheckboxValue(field.customText);
 
-      const topPadding = 12;
-      const leftCheckboxPadding = 8;
-      const leftCheckboxLabelPadding = 12;
-      const checkboxSpaceY = 13;
-
       for (const [index, item] of (values ?? []).entries()) {
-        const offsetY = index * checkboxSpaceY + topPadding;
+        const offsetY = index * 16;
 
         const checkbox = pdf.getForm().createCheckBox(`checkbox.${field.secondaryId}.${index}`);
 
@@ -249,7 +237,7 @@ export const insertFieldInPDF = async (pdf: PDFDocument, field: FieldWithSignatu
         }
 
         page.drawText(item.value.includes('empty-value-') ? '' : item.value, {
-          x: fieldX + leftCheckboxPadding + leftCheckboxLabelPadding,
+          x: fieldX + 16,
           y: pageHeight - (fieldY + offsetY),
           size: 12,
           font,
@@ -257,7 +245,7 @@ export const insertFieldInPDF = async (pdf: PDFDocument, field: FieldWithSignatu
         });
 
         checkbox.addToPage(page, {
-          x: fieldX + leftCheckboxPadding,
+          x: fieldX,
           y: pageHeight - (fieldY + offsetY),
           height: 8,
           width: 8,
@@ -280,28 +268,21 @@ export const insertFieldInPDF = async (pdf: PDFDocument, field: FieldWithSignatu
 
       const selected = field.customText.split(',');
 
-      const topPadding = 12;
-      const leftRadioPadding = 8;
-      const leftRadioLabelPadding = 12;
-      const radioSpaceY = 13;
-
       for (const [index, item] of (values ?? []).entries()) {
-        const offsetY = index * radioSpaceY + topPadding;
+        const offsetY = index * 16;
 
         const radio = pdf.getForm().createRadioGroup(`radio.${field.secondaryId}.${index}`);
 
-        // Draw label.
         page.drawText(item.value.includes('empty-value-') ? '' : item.value, {
-          x: fieldX + leftRadioPadding + leftRadioLabelPadding,
+          x: fieldX + 16,
           y: pageHeight - (fieldY + offsetY),
           size: 12,
           font,
           rotate: degrees(pageRotationInDegrees),
         });
 
-        // Draw radio button.
         radio.addOptionToPage(item.value, page, {
-          x: fieldX + leftRadioPadding,
+          x: fieldX,
           y: pageHeight - (fieldY + offsetY),
           height: 8,
           width: 8,
@@ -323,144 +304,62 @@ export const insertFieldInPDF = async (pdf: PDFDocument, field: FieldWithSignatu
       } as const;
 
       // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
-      const fieldMetaParser = fieldMetaParsers[field.type as keyof typeof fieldMetaParsers];
-      const meta = fieldMetaParser ? fieldMetaParser.safeParse(field.fieldMeta) : null;
+      const Parser = fieldMetaParsers[field.type as keyof typeof fieldMetaParsers];
+      const meta = Parser ? Parser.safeParse(field.fieldMeta) : null;
 
       const customFontSize = meta?.success && meta.data.fontSize ? meta.data.fontSize : null;
-      const textAlign = meta?.success && meta.data.textAlign ? meta.data.textAlign : 'left';
+      const textAlign = meta?.success && meta.data.textAlign ? meta.data.textAlign : 'center';
+      const longestLineInTextForWidth = field.customText
+        .split('\n')
+        .sort((a, b) => b.length - a.length)[0];
 
       let fontSize = customFontSize || maxFontSize;
-      const textWidth = font.widthOfTextAtSize(field.customText, fontSize);
+      let textWidth = font.widthOfTextAtSize(longestLineInTextForWidth, fontSize);
       const textHeight = font.heightAtSize(fontSize);
 
-      // Scale font only if no custom font and height exceeds field height.
       if (!customFontSize) {
-        const scalingFactor = Math.min(fieldHeight / textHeight, 1);
+        const scalingFactor = Math.min(fieldWidth / textWidth, fieldHeight / textHeight, 1);
         fontSize = Math.max(Math.min(fontSize * scalingFactor, maxFontSize), minFontSize);
       }
 
-      /**
-       * Calculate whether the field should be multiline.
-       *
-       * - True = text will overflow downwards.
-       * - False = text will overflow sideways.
-       */
-      const isMultiline =
-        field.type === FieldType.TEXT &&
-        (textWidth > fieldWidth || field.customText.includes('\n'));
+      textWidth = font.widthOfTextAtSize(longestLineInTextForWidth, fontSize);
 
       // Add padding similar to web display (roughly 0.5rem equivalent in PDF units)
-      const padding = 8;
+      const padding = 8; // PDF points, roughly equivalent to 0.5rem
 
-      const textAlignmentOptions = getTextAlignmentOptions(textAlign, fieldX, isMultiline, padding);
+      // Calculate X position based on text alignment with padding
+      let textX = fieldX + padding; // Left alignment starts after padding
+      if (textAlign === 'center') {
+        textX = fieldX + (fieldWidth - textWidth) / 2; // Center alignment ignores padding
+      } else if (textAlign === 'right') {
+        textX = fieldX + fieldWidth - textWidth - padding; // Right alignment respects right padding
+      }
+
+      let textY = fieldY + (fieldHeight - textHeight) / 2;
 
       // Invert the Y axis since PDFs use a bottom-left coordinate system
-      let textFieldBoxY = pageHeight - fieldY - fieldHeight;
-      const textFieldBoxX = textAlignmentOptions.xPos;
-
-      const textField = pdf.getForm().createTextField(`text.${field.secondaryId}`);
-      textField.setAlignment(textAlignmentOptions.textAlignment);
-
-      /**
-       * From now on we will adjust the field size and position so the text
-       * overflows correctly in the X or Y axis depending on the field type.
-       */
-      let adjustedFieldWidth = fieldWidth - padding * 2; //
-      let adjustedFieldHeight = fieldHeight;
-      let adjustedFieldX = textFieldBoxX;
-      let adjustedFieldY = textFieldBoxY;
-
-      let textToInsert = field.customText;
-
-      // The padding to use when fields go off the page.
-      const pagePadding = 4;
-
-      // Handle multiline text, which will overflow on the Y axis.
-      if (isMultiline) {
-        textToInsert = breakLongString(textToInsert, adjustedFieldWidth, font, fontSize);
-
-        textField.enableMultiline();
-        textField.disableCombing();
-        textField.disableScrolling();
-
-        // Adjust the textFieldBox so it extends to the bottom of the page so text can wrap.
-        textFieldBoxY = pageHeight - fieldY - fieldHeight;
-
-        // Calculate how much PX from the current field to bottom of the page.
-        const fieldYOffset = pageHeight - (fieldY + fieldHeight) - pagePadding;
-
-        // Field height will be from current to bottom of page.
-        adjustedFieldHeight = fieldHeight + fieldYOffset;
-
-        // Need to move the field Y so it offsets the new field height.
-        adjustedFieldY = adjustedFieldY - fieldYOffset;
-      }
-
-      // Handle non-multiline text, which will overflow on the X axis.
-      if (!isMultiline) {
-        // Left align will extend all the way to the right of the page
-        if (textAlignmentOptions.textAlignment === TextAlignment.Left) {
-          adjustedFieldWidth = pageWidth - textFieldBoxX - pagePadding;
-        }
-
-        // Right align will extend all the way to the left of the page.
-        if (textAlignmentOptions.textAlignment === TextAlignment.Right) {
-          adjustedFieldWidth = textFieldBoxX + fieldWidth - pagePadding;
-          adjustedFieldX = adjustedFieldX - adjustedFieldWidth + fieldWidth;
-        }
-
-        // Center align will extend to the closest page edge, then use that * 2 as the width.
-        if (textAlignmentOptions.textAlignment === TextAlignment.Center) {
-          const fieldMidpoint = textFieldBoxX + fieldWidth / 2;
-
-          const isCloserToLeftEdge = fieldMidpoint < pageWidth / 2;
-
-          // If field is closer to left edge, the width must be based of the left.
-          if (isCloserToLeftEdge) {
-            adjustedFieldWidth = (textFieldBoxX - pagePadding) * 2 + fieldWidth;
-            adjustedFieldX = pagePadding;
-          }
-
-          // If field is closer to right edge, the width must be based of the right
-          if (!isCloserToLeftEdge) {
-            adjustedFieldWidth = (pageWidth - textFieldBoxX - pagePadding - fieldWidth / 2) * 2;
-            adjustedFieldX = pageWidth - adjustedFieldWidth - pagePadding;
-          }
-        }
-      }
+      textY = pageHeight - textY - textHeight;
 
       if (pageRotationInDegrees !== 0) {
         const adjustedPosition = adjustPositionForRotation(
           pageWidth,
           pageHeight,
-          adjustedFieldX,
-          adjustedFieldY,
+          textX,
+          textY,
           pageRotationInDegrees,
         );
 
-        adjustedFieldX = adjustedPosition.xPos;
-        adjustedFieldY = adjustedPosition.yPos;
+        textX = adjustedPosition.xPos;
+        textY = adjustedPosition.yPos;
       }
 
-      // Set the position and size of the text field
-      textField.addToPage(page, {
-        x: adjustedFieldX,
-        y: adjustedFieldY,
-        width: adjustedFieldWidth,
-        height: adjustedFieldHeight,
+      page.drawText(field.customText, {
+        x: textX,
+        y: textY,
+        size: fontSize,
+        font,
         rotate: degrees(pageRotationInDegrees),
-
-        // Hide borders.
-        borderWidth: 0,
-        borderColor: undefined,
-        backgroundColor: undefined,
-
-        ...(isDebugMode ? { borderWidth: 1, borderColor: rgb(0, 0, 1) } : {}),
       });
-
-      // Set properties for the text field
-      textField.setFontSize(fontSize);
-      textField.setText(textToInsert);
     });
 
   return pdf;
@@ -494,138 +393,3 @@ const adjustPositionForRotation = (
     yPos,
   };
 };
-
-const textAlignmentMap = {
-  left: TextAlignment.Left,
-  center: TextAlignment.Center,
-  right: TextAlignment.Right,
-} as const;
-
-/**
- * Get the PDF-lib alignment position, and the X position of the field with padding included.
- *
- * @param textAlign - The text alignment of the field.
- * @param fieldX - The X position of the field.
- * @param isMultiline - Whether the field is multiline.
- * @param padding - The padding of the field. Defaults to 8.
- *
- * @returns The X position and text alignment for the field.
- */
-const getTextAlignmentOptions = (
-  textAlign: 'left' | 'center' | 'right',
-  fieldX: number,
-  isMultiline: boolean,
-  padding: number = 8,
-) => {
-  const textAlignment = textAlignmentMap[textAlign];
-
-  // For multiline, it needs to be centered so we just basic left padding.
-  if (isMultiline) {
-    return {
-      xPos: fieldX + padding,
-      textAlignment,
-    };
-  }
-
-  return match(textAlign)
-    .with('left', () => ({
-      xPos: fieldX + padding,
-      textAlignment,
-    }))
-    .with('center', () => ({
-      xPos: fieldX,
-      textAlignment,
-    }))
-    .with('right', () => ({
-      xPos: fieldX - padding,
-      textAlignment,
-    }))
-    .exhaustive();
-};
-
-/**
- * Break a long string into multiple lines so it fits within a given width,
- * using natural word breaking similar to word processors.
- *
- * - Keeps words together when possible
- * - Only breaks words when they're too long to fit on a line
- * - Handles whitespace intelligently
- *
- * @param text - The text to break into lines
- * @param maxWidth - The maximum width of each line in PX
- * @param font - The PDF font object
- * @param fontSize - The font size in points
- * @returns Object containing the result string and line count
- */
-function breakLongString(text: string, maxWidth: number, font: PDFFont, fontSize: number): string {
-  // Handle empty text
-  if (!text) {
-    return '';
-  }
-
-  const lines: string[] = [];
-
-  // Process each original line separately to preserve newlines
-  for (const paragraph of text.split('\n')) {
-    // If paragraph fits on one line or is empty, add it as-is
-    if (paragraph === '' || font.widthOfTextAtSize(paragraph, fontSize) <= maxWidth) {
-      lines.push(paragraph);
-      continue;
-    }
-
-    // Split paragraph into words
-    const words = paragraph.split(' ');
-    let currentLine = '';
-
-    for (const word of words) {
-      // Check if adding word to current line would exceed max width
-      const lineWithWord = currentLine.length === 0 ? word : `${currentLine} ${word}`;
-
-      if (font.widthOfTextAtSize(lineWithWord, fontSize) <= maxWidth) {
-        // Word fits, add it to current line
-        currentLine = lineWithWord;
-      } else {
-        // Word doesn't fit on current line
-
-        // First, save current line if it's not empty
-        if (currentLine.length > 0) {
-          lines.push(currentLine);
-          currentLine = '';
-        }
-
-        // Check if word fits on a line by itself
-        if (font.widthOfTextAtSize(word, fontSize) <= maxWidth) {
-          // Word fits on its own line
-          currentLine = word;
-        } else {
-          // Word is too long, need to break it character by character
-          let charLine = '';
-
-          // Process each character in the word
-          for (const char of word) {
-            const nextCharLine = charLine + char;
-
-            if (font.widthOfTextAtSize(nextCharLine, fontSize) <= maxWidth) {
-              // Character fits, add it
-              charLine = nextCharLine;
-            } else {
-              // Character doesn't fit, push current charLine and start a new one
-              lines.push(charLine);
-              charLine = char;
-            }
-          }
-
-          // Add any remaining characters as the current line
-          currentLine = charLine;
-        }
-      }
-    }
-
-    // Add the last line if not empty
-    if (currentLine.length > 0) {
-      lines.push(currentLine);
-    }
-  }
-
-  return lines.join('\n');
-}

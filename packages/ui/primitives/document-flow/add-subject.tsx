@@ -16,6 +16,10 @@ import { Tabs, TabsList, TabsTrigger } from '@documenso/ui/primitives/tabs';
 
 import { CopyTextButton } from '../../components/common/copy-text-button';
 import { DocumentEmailCheckboxes } from '../../components/document/document-email-checkboxes';
+import {
+  DocumentReadOnlyFields,
+  mapFieldsWithRecipients,
+} from '../../components/document/document-read-only-fields';
 import { AvatarWithText } from '../avatar';
 import { FormErrorMessage } from '../form/form-error-message';
 import { Input } from '../input';
@@ -31,7 +35,6 @@ import {
   DocumentFlowFormContainerHeader,
   DocumentFlowFormContainerStep,
 } from './document-flow-root';
-import { ShowFieldItem } from './show-field-item';
 import type { DocumentFlowStep } from './types';
 
 export type AddSubjectFormProps = {
@@ -103,10 +106,13 @@ export const AddSubjectFormPartial = ({
       />
       <DocumentFlowFormContainerContent>
         <div className="flex flex-col">
-          {isDocumentPdfLoaded &&
-            fields.map((field, index) => (
-              <ShowFieldItem key={index} field={field} recipients={recipients} />
-            ))}
+          {isDocumentPdfLoaded && (
+            <DocumentReadOnlyFields
+              showRecipientColors={true}
+              recipientIds={recipients.map((recipient) => recipient.id)}
+              fields={mapFieldsWithRecipients(fields, recipients)}
+            />
+          )}
 
           <Tabs
             onValueChange={(value) =>

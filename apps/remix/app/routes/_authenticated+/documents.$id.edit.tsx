@@ -14,6 +14,7 @@ import { formatDocumentsPath } from '@documenso/lib/utils/teams';
 
 import { DocumentEditForm } from '~/components/general/document/document-edit-form';
 import { DocumentStatus } from '~/components/general/document/document-status';
+import { LegacyFieldWarningPopover } from '~/components/general/legacy-field-warning-popover';
 import { StackAvatarsWithTooltip } from '~/components/general/stack-avatars-with-tooltip';
 import { superLoaderJson, useSuperLoaderData } from '~/utils/super-json-loader';
 
@@ -100,29 +101,43 @@ export default function DocumentEditPage() {
         <Trans>Documents</Trans>
       </Link>
 
-      <h1
-        className="mt-4 block max-w-[20rem] truncate text-2xl font-semibold md:max-w-[30rem] md:text-3xl"
-        title={document.title}
-      >
-        {document.title}
-      </h1>
+      <div className="mt-4 flex w-full items-end justify-between">
+        <div className="flex-1">
+          <h1
+            className="block max-w-[20rem] truncate text-2xl font-semibold md:max-w-[30rem] md:text-3xl"
+            title={document.title}
+          >
+            {document.title}
+          </h1>
 
-      <div className="mt-2.5 flex items-center gap-x-6">
-        <DocumentStatus inheritColor status={document.status} className="text-muted-foreground" />
+          <div className="mt-2.5 flex items-center gap-x-6">
+            <DocumentStatus
+              inheritColor
+              status={document.status}
+              className="text-muted-foreground"
+            />
 
-        {recipients.length > 0 && (
-          <div className="text-muted-foreground flex items-center">
-            <Users2 className="mr-2 h-5 w-5" />
+            {recipients.length > 0 && (
+              <div className="text-muted-foreground flex items-center">
+                <Users2 className="mr-2 h-5 w-5" />
 
-            <StackAvatarsWithTooltip
-              recipients={recipients}
-              documentStatus={document.status}
-              position="bottom"
-            >
-              <span>
-                <Plural one="1 Recipient" other="# Recipients" value={recipients.length} />
-              </span>
-            </StackAvatarsWithTooltip>
+                <StackAvatarsWithTooltip
+                  recipients={recipients}
+                  documentStatus={document.status}
+                  position="bottom"
+                >
+                  <span>
+                    <Plural one="1 Recipient" other="# Recipients" value={recipients.length} />
+                  </span>
+                </StackAvatarsWithTooltip>
+              </div>
+            )}
+          </div>
+        </div>
+
+        {document.useLegacyFieldInsertion && (
+          <div>
+            <LegacyFieldWarningPopover type="document" documentId={document.id} />
           </div>
         )}
       </div>
