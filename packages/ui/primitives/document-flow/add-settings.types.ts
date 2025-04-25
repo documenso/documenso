@@ -58,6 +58,13 @@ export const ZAddSettingsFormSchema = z.object({
       message: msg`At least one signature type must be enabled`.id,
     }),
   }),
+  attachments: z.array(
+    z.object({
+      formId: z.string().min(1),
+      label: z.string(),
+      link: z.string(),
+    }),
+  ),
 });
 
 export type TAddSettingsFormSchema = z.infer<typeof ZAddSettingsFormSchema>;

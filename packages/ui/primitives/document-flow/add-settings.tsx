@@ -5,8 +5,8 @@ import { Trans } from '@lingui/react/macro';
 import { useLingui } from '@lingui/react/macro';
 import { DocumentVisibility, TeamMemberRole } from '@prisma/client';
 import { DocumentStatus, type Field, type Recipient, SendStatus } from '@prisma/client';
-import { InfoIcon } from 'lucide-react';
-import { useForm } from 'react-hook-form';
+import { InfoIcon, Plus, Trash } from 'lucide-react';
+import { useFieldArray, useForm } from 'react-hook-form';
 import { match } from 'ts-pattern';
 
 import { DATE_FORMATS, DEFAULT_DOCUMENT_DATE_FORMAT } from '@documenso/lib/constants/date-formats';
@@ -14,6 +14,7 @@ import { DOCUMENT_SIGNATURE_TYPES } from '@documenso/lib/constants/document';
 import { SUPPORTED_LANGUAGES } from '@documenso/lib/constants/i18n';
 import { DEFAULT_DOCUMENT_TIME_ZONE, TIME_ZONES } from '@documenso/lib/constants/time-zones';
 import type { TDocument } from '@documenso/lib/types/document';
+import { nanoid } from '@documenso/lib/universal/id';
 import { extractDocumentAuthMethods } from '@documenso/lib/utils/document-auth';
 import { extractTeamSignatureSettings } from '@documenso/lib/utils/teams';
 import {
@@ -34,6 +35,7 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from '@documenso/ui/primitives/accordion';
+import { Button } from '@documenso/ui/primitives/button';
 import {
   Form,
   FormControl,
@@ -112,11 +114,28 @@ export const AddSettingsFormPartial = ({
     },
   });
 
+  const {
+    fields: attachments,
+    append: appendAttachment,
+    remove: removeAttachment,
+  } = useFieldArray({
+    control: form.control,
+    name: 'attachments',
+  });
+
   const { stepIndex, currentStep, totalSteps, previousStep } = useStep();
 
   const documentHasBeenSent = recipients.some(
     (recipient) => recipient.sendStatus === SendStatus.SENT,
   );
+
+  const onAddAttachment = () => {
+    appendAttachment({
+      formId: nanoid(12),
+      label: '',
+      link: '',
+    });
+  };
 
   const canUpdateVisibility = match(currentTeamMemberRole)
     .with(TeamMemberRole.ADMIN, () => true)
@@ -439,6 +458,81 @@ export const AddSettingsFormPartial = ({
                         </FormItem>
                       )}
                     />
+                  </div>
+                </AccordionContent>
+              </AccordionItem>
+            </Accordion>
+
+            <Accordion type="multiple" className="mt-6">
+              <AccordionItem value="attachments" className="border-none">
+                <AccordionTrigger className="text-foreground mb-2 rounded border px-3 py-2 text-left hover:bg-neutral-200/30 hover:no-underline">
+                  <Trans>Attachments</Trans>
+                </AccordionTrigger>
+
+                <AccordionContent className="text-muted-foreground -mx-1 px-1 pt-2 text-sm leading-relaxed">
+                  <div className="flex flex-col space-y-6">
+                    {attachments.map((attachment, index) => (
+                      <div key={index} className="flex items-start gap-x-3">
+                        <div className="flex-1">
+                          <FormField
+                            control={form.control}
+                            name={`attachments.${index}.label`}
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel className="flex flex-row items-center">
+                                  <Trans>Label</Trans>
+                                </FormLabel>
+
+                                <FormControl>
+                                  <Input className="bg-background" {...field} />
+                                </FormControl>
+
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+                        </div>
+
+                        <div className="flex-1">
+                          <FormField
+                            control={form.control}
+                            name={`attachments.${index}.link`}
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel className="flex flex-row items-center">
+                                  <Trans>Location link</Trans>
+                                </FormLabel>
+
+                                <FormControl>
+                                  <Input className="bg-background" {...field} />
+                                </FormControl>
+
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+                        </div>
+
+                        <div className="flex-none pt-8">
+                          <button
+                            onClick={() => removeAttachment(index)}
+                            className="hover:bg-muted rounded-md"
+                          >
+                            <Trash className="h-4 w-4" />
+                          </button>
+                        </div>
+                      </div>
+                    ))}
+
+                    <Button
+                      type="button"
+                      variant="outline"
+                      className="w-full"
+                      onClick={onAddAttachment}
+                    >
+                      <Plus className="mr-2 h-4 w-4" />
+                      <Trans>Add Attachment</Trans>
+                    </Button>
                   </div>
                 </AccordionContent>
               </AccordionItem>

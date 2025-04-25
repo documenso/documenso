@@ -4,8 +4,9 @@ import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
 import { Trans } from '@lingui/react/macro';
 import { type Field, FieldType, type Recipient, RecipientRole } from '@prisma/client';
+import { Link as LinkIcon } from 'lucide-react';
 import { Controller, useForm } from 'react-hook-form';
-import { useNavigate } from 'react-router';
+import { Link, useNavigate } from 'react-router';
 
 import { useAnalytics } from '@documenso/lib/client-only/hooks/use-analytics';
 import { useOptionalSession } from '@documenso/lib/client-only/providers/session';
@@ -17,6 +18,12 @@ import type { RecipientWithFields } from '@documenso/prisma/types/recipient-with
 import { trpc } from '@documenso/trpc/react';
 import { FieldToolTip } from '@documenso/ui/components/field/field-tooltip';
 import { cn } from '@documenso/ui/lib/utils';
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from '@documenso/ui/primitives/accordion';
 import { Button } from '@documenso/ui/primitives/button';
 import { Input } from '@documenso/ui/primitives/input';
 import { Label } from '@documenso/ui/primitives/label';
@@ -369,6 +376,35 @@ export const DocumentSigningForm = ({
                         onChange={(e) => setFullName(e.target.value.trimStart())}
                       />
                     </div>
+
+                    {document.attachments && (
+                      <Accordion type="multiple" className="mt-2">
+                        <AccordionItem value="attachments" className="border-none">
+                          <AccordionTrigger className="text-foreground mb-2 rounded border px-3 py-2 text-left hover:bg-neutral-200/30 hover:no-underline">
+                            <Trans>Attachments</Trans>
+                          </AccordionTrigger>
+
+                          <AccordionContent className="-mx-1 px-1 pt-2 text-sm leading-relaxed">
+                            <div className="flex flex-col space-y-2">
+                              {document.attachments.map((attachment, index) => (
+                                <div key={index}>
+                                  <Button variant="outline" asChild>
+                                    <Link
+                                      to={attachment.url}
+                                      target="_blank"
+                                      rel="noopener noreferrer"
+                                    >
+                                      <LinkIcon className="mr-2 h-4 w-4" />
+                                      {attachment.label}
+                                    </Link>
+                                  </Button>
+                                </div>
+                              ))}
+                            </div>
+                          </AccordionContent>
+                        </AccordionItem>
+                      </Accordion>
+                    )}
 
                     {hasSignatureField && (
                       <div>

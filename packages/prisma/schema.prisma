@@ -312,6 +312,30 @@ enum DocumentVisibility {
   ADMIN
 }
 
+enum AttachmentType {
+  FILE
+  VIDEO
+  AUDIO
+  IMAGE
+  LINK
+  OTHER
+}
+
+model Attachment {
+  id        String         @id @default(uuid())
+  type      AttachmentType
+  label     String
+  url       String
+  createdAt DateTime       @default(now())
+  updatedAt DateTime       @default(now()) @updatedAt
+
+  documentId Int?
+  document   Document? @relation(fields: [documentId], references: [id], onDelete: Cascade)
+
+  templateId Int?
+  template   Template? @relation(fields: [templateId], references: [id], onDelete: Cascade)
+}
+
 /// @zod.import(["import { ZDocumentAuthOptionsSchema } from '@documenso/lib/types/document-auth';", "import { ZDocumentFormValuesSchema } from '@documenso/lib/types/document-form-values';"])
 model Document {
   id             Int                 @id @default(autoincrement())
@@ -339,7 +363,8 @@ model Document {
   template       Template?           @relation(fields: [templateId], references: [id], onDelete: SetNull)
   source         DocumentSource
 
-  auditLogs DocumentAuditLog[]
+  auditLogs   DocumentAuditLog[]
+  attachments Attachment[]
 
   @@unique([documentDataId])
   @@index([userId])
@@ -713,6 +738,7 @@ model Template {
   fields               Field[]
   directLink           TemplateDirectLink?
   documents            Document[]
+  attachments          Attachment[]
 
   @@unique([templateDocumentDataId])
 }
