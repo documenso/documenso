@@ -230,7 +230,7 @@
   scrollbar-gutter: stable;
 }
 
-.custom-scrollbar::-webkit-scrollbar-track {
+/* .custom-scrollbar::-webkit-scrollbar-track {
   border-radius: 10px;
 }
 
@@ -242,7 +242,7 @@
 
 .custom-scrollbar::-webkit-scrollbar-thumb:hover {
   background: rgb(100 116 139 / 0.5);
-}
+} */
 
 /* Custom Swagger Dark Theme */
 .swagger-dark-theme .swagger-ui {

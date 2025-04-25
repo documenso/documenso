@@ -100,6 +100,32 @@ export const DocumentsTableActionDropdown = ({ row }: DocumentsTableActionDropdo
     }
   };
 
+  const onDownloadOriginalClick = async () => {
+    try {
+      const document = !recipient
+        ? await trpcClient.document.getDocumentById.query({
+            documentId: row.id,
+          })
+        : await trpcClient.document.getDocumentByToken.query({
+            token: recipient.token,
+          });
+
+      const documentData = document?.documentData;
+
+      if (!documentData) {
+        return;
+      }
+
+      await downloadPDF({ documentData, fileName: row.title, version: 'original' });
+    } catch (err) {
+      toast({
+        title: _(msg`Something went wrong`),
+        description: _(msg`An error occurred while downloading your document.`),
+        variant: 'destructive',
+      });
+    }
+  };
+
   const nonSignedRecipients = row.recipients.filter((item) => item.signingStatus !== 'SIGNED');
 
   return (
@@ -150,6 +176,11 @@ export const DocumentsTableActionDropdown = ({ row }: DocumentsTableActionDropdo
         <DropdownMenuItem disabled={!isComplete} onClick={onDownloadClick}>
           <Download className="mr-2 h-4 w-4" />
           <Trans>Download</Trans>
+        </DropdownMenuItem>
+
+        <DropdownMenuItem onClick={onDownloadOriginalClick}>
+          <Download className="mr-2 h-4 w-4" />
+          <Trans>Download Original</Trans>
         </DropdownMenuItem>
 
         <DropdownMenuItem onClick={() => setDuplicateDialogOpen(true)}>
