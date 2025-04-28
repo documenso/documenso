@@ -315,6 +315,7 @@ enum DocumentVisibility {
 /// @zod.import(["import { ZDocumentAuthOptionsSchema } from '@documenso/lib/types/document-auth';", "import { ZDocumentFormValuesSchema } from '@documenso/lib/types/document-form-values';"])
 model Document {
   id             Int                 @id @default(autoincrement())
+  qrToken        String? /// @zod.string.describe("The token for viewing the document using the QR code on the certificate.")
   externalId     String? /// @zod.string.describe("A custom external ID you can use to identify the document.")
   userId         Int /// @zod.number.describe("The ID of the user that created this document.")
   user           User                @relation(fields: [userId], references: [id], onDelete: Cascade)

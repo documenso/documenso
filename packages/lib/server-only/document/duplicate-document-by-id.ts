@@ -3,6 +3,7 @@ import { DocumentSource, type Prisma } from '@prisma/client';
 import { prisma } from '@documenso/prisma';
 
 import { AppError, AppErrorCode } from '../../errors/app-error';
+import { prefixedId } from '../../universal/id';
 import { getDocumentWhereInput } from './get-document-by-id';
 
 export interface DuplicateDocumentOptions {
@@ -56,6 +57,7 @@ export const duplicateDocument = async ({
   const createDocumentArguments: Prisma.DocumentCreateArgs = {
     data: {
       title: document.title,
+      qrToken: prefixedId('qr'),
       user: {
         connect: {
           id: document.userId,

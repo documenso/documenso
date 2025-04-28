@@ -22,6 +22,7 @@ import {
   ZWebhookDocumentSchema,
   mapDocumentToWebhookDocumentPayload,
 } from '../../../types/webhook-payload';
+import { prefixedId } from '../../../universal/id';
 import { getFileServerSide } from '../../../universal/upload/get-file.server';
 import { putPdfFileServerSide } from '../../../universal/upload/put-file.server';
 import { fieldsContainUnsignedRequiredField } from '../../../utils/advanced-fields-helpers';
@@ -128,6 +129,17 @@ export const run = async ({
     // If we're resealing we want to use the initial data for the document
     // so we aren't placing fields on top of eachother.
     documentData.data = documentData.initialData;
+  }
+
+  if (!document.qrToken) {
+    await prisma.document.update({
+      where: {
+        id: document.id,
+      },
+      data: {
+        qrToken: prefixedId('qr'),
+      },
+    });
   }
 
   const pdfData = await getFileServerSide(documentData);
