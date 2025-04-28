@@ -3,7 +3,6 @@ import { useState } from 'react';
 import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
 import { Trans } from '@lingui/react/macro';
-import type { Document, Recipient, Team, User } from '@prisma/client';
 import { DocumentStatus, RecipientRole } from '@prisma/client';
 import {
   CheckCircle,
@@ -22,6 +21,7 @@ import { Link } from 'react-router';
 
 import { downloadPDF } from '@documenso/lib/client-only/download-pdf';
 import { useSession } from '@documenso/lib/client-only/providers/session';
+import type { TDocumentMany as TDocumentRow } from '@documenso/lib/types/document';
 import { isDocumentCompleted } from '@documenso/lib/utils/document';
 import { formatDocumentsPath } from '@documenso/lib/utils/teams';
 import { trpc as trpcClient } from '@documenso/trpc/client';
@@ -43,11 +43,7 @@ import { DocumentRecipientLinkCopyDialog } from '~/components/general/document/d
 import { useOptionalCurrentTeam } from '~/providers/team';
 
 export type DocumentsTableActionDropdownProps = {
-  row: Document & {
-    user: Pick<User, 'id' | 'name' | 'email'>;
-    recipients: Recipient[];
-    team: Pick<Team, 'id' | 'url'> | null;
-  };
+  row: TDocumentRow;
 };
 
 export const DocumentsTableActionDropdown = ({ row }: DocumentsTableActionDropdownProps) => {

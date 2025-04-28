@@ -1,6 +1,6 @@
 import { DocumentSource, type RecipientRole } from '@prisma/client';
 
-import { nanoid } from '@documenso/lib/universal/id';
+import { nanoid, prefixedId } from '@documenso/lib/universal/id';
 import { prisma } from '@documenso/prisma';
 
 export type CreateDocumentFromTemplateLegacyOptions = {
@@ -70,6 +70,7 @@ export const createDocumentFromTemplateLegacy = async ({
 
   const document = await prisma.document.create({
     data: {
+      qrToken: prefixedId('qr'),
       source: DocumentSource.TEMPLATE,
       templateId: template.id,
       userId,

@@ -22,6 +22,7 @@ import {
   ZWebhookDocumentSchema,
   mapDocumentToWebhookDocumentPayload,
 } from '../../../types/webhook-payload';
+import { prefixedId } from '../../../universal/id';
 import { getFileServerSide } from '../../../universal/upload/get-file.server';
 import { putPdfFileServerSide } from '../../../universal/upload/put-file.server';
 import { fieldsContainUnsignedRequiredField } from '../../../utils/advanced-fields-helpers';
@@ -130,17 +131,13 @@ export const run = async ({
     documentData.data = documentData.initialData;
   }
 
-  const existingDocumentAccessToken = await prisma.documentAccessToken.findUnique({
-    where: {
-      documentId: document.id,
-    },
-  });
-
-  if (!existingDocumentAccessToken) {
-    await prisma.documentAccessToken.create({
+  if (!document.qrToken) {
+    await prisma.document.update({
+      where: {
+        id: document.id,
+      },
       data: {
-        token: nanoid(),
-        documentId: document.id,
+        qrToken: prefixedId('qr'),
       },
     });
   }

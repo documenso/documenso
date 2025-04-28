@@ -9,29 +9,28 @@ export const getDocumentByAccessToken = async ({ token }: GetDocumentByAccessTok
     throw new Error('Missing token');
   }
 
-  const result = await prisma.documentAccessToken.findFirstOrThrow({
+  const result = await prisma.document.findFirstOrThrow({
     where: {
-      token,
+      qrToken: token,
     },
     select: {
-      document: {
+      id: true,
+      title: true,
+      completedAt: true,
+      documentData: {
         select: {
-          title: true,
-          documentData: {
-            select: {
-              id: true,
-              type: true,
-              data: true,
-              initialData: true,
-            },
-          },
-          documentMeta: {
-            select: {
-              password: true,
-            },
-          },
+          id: true,
+          type: true,
+          data: true,
+          initialData: true,
         },
       },
+      documentMeta: {
+        select: {
+          password: true,
+        },
+      },
+      recipients: true,
     },
   });
 

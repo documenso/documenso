@@ -183,10 +183,6 @@ export default function SigningCertificate({ loaderData }: Route.ComponentProps)
       );
   };
 
-  const getDocumentAccessToken = () => {
-    return document.documentAccessToken?.token;
-  };
-
   return (
     <div className="print-provider pointer-events-none mx-auto max-w-screen-md">
       <div className="flex items-center">
@@ -353,7 +349,7 @@ export default function SigningCertificate({ loaderData }: Route.ComponentProps)
             <div
               className="flex h-24 w-24 justify-center"
               dangerouslySetInnerHTML={{
-                __html: renderSVG(`${NEXT_PUBLIC_WEBAPP_URL()}/q/${getDocumentAccessToken()}`, {
+                __html: renderSVG(`${NEXT_PUBLIC_WEBAPP_URL()}/share/${document.qrToken}`, {
                   ecc: 'Q',
                 }),
               }}
