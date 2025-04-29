@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useId } from 'react';
 
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Trans } from '@lingui/react/macro';
@@ -89,10 +89,19 @@ export const AddSettingsFormPartial = ({
   onSubmit,
 }: AddSettingsFormProps) => {
   const { t } = useLingui();
+  const initialId = useId();
 
   const { documentAuthOption } = extractDocumentAuthMethods({
     documentAuth: document.authOptions,
   });
+
+  const defaultAttachments = [
+    {
+      formId: initialId,
+      label: '',
+      url: '',
+    },
+  ];
 
   const form = useForm<TAddSettingsFormSchema>({
     resolver: zodResolver(ZAddSettingsFormSchema),
@@ -114,6 +123,7 @@ export const AddSettingsFormPartial = ({
         language: document.documentMeta?.language ?? 'en',
         signatureTypes: extractTeamSignatureSettings(document.documentMeta),
       },
+      attachments: document.attachments ?? defaultAttachments,
     },
   });
 
@@ -136,7 +146,7 @@ export const AddSettingsFormPartial = ({
     appendAttachment({
       formId: nanoid(12),
       label: '',
-      link: '',
+      url: '',
     });
   };
 
@@ -502,7 +512,7 @@ export const AddSettingsFormPartial = ({
                         <div className="flex-1">
                           <FormField
                             control={form.control}
-                            name={`attachments.${index}.link`}
+                            name={`attachments.${index}.url`}
                             render={({ field }) => (
                               <FormItem>
                                 <FormLabel className="flex flex-row items-center">

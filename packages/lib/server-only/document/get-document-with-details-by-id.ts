@@ -27,6 +27,7 @@ export const getDocumentWithDetailsById = async ({
       documentMeta: true,
       recipients: true,
       fields: true,
+      attachments: true,
     },
   });
 

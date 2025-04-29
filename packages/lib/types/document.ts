@@ -1,5 +1,6 @@
 import type { z } from 'zod';
 
+import { AttachmentSchema } from '@documenso/prisma/generated/zod/modelSchema/AttachmentSchema';
 import { DocumentDataSchema } from '@documenso/prisma/generated/zod/modelSchema/DocumentDataSchema';
 import { DocumentMetaSchema } from '@documenso/prisma/generated/zod/modelSchema/DocumentMetaSchema';
 import { DocumentSchema } from '@documenso/prisma/generated/zod/modelSchema/DocumentSchema';
@@ -59,6 +60,7 @@ export const ZDocumentSchema = DocumentSchema.pick({
   }).nullable(),
   recipients: ZRecipientLiteSchema.array(),
   fields: ZFieldSchema.array(),
+  attachments: AttachmentSchema.array(),
 });
 
 export type TDocument = z.infer<typeof ZDocumentSchema>;
