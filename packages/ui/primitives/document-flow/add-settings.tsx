@@ -147,6 +147,8 @@ export const AddSettingsFormPartial = ({
       formId: nanoid(12),
       label: '',
       url: '',
+      // fix this
+      id: '',
     });
   };
 

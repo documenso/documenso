@@ -8,6 +8,7 @@ import type { ApiRequestMetadata } from '@documenso/lib/universal/extract-reques
 import type { CreateDocumentAuditLogDataResponse } from '@documenso/lib/utils/document-audit-logs';
 import { createDocumentAuditLogData } from '@documenso/lib/utils/document-audit-logs';
 import { prisma } from '@documenso/prisma';
+import type { Attachment } from '@documenso/prisma/generated/zod/modelSchema/AttachmentSchema';
 
 import { AppError, AppErrorCode } from '../../errors/app-error';
 import type { TDocumentAccessAuthTypes, TDocumentActionAuthTypes } from '../../types/document-auth';
@@ -24,6 +25,7 @@ export type UpdateDocumentOptions = {
     globalAccessAuth?: TDocumentAccessAuthTypes | null;
     globalActionAuth?: TDocumentActionAuthTypes | null;
     useLegacyFieldInsertion?: boolean;
+    attachments?: Pick<Attachment, 'id' | 'label' | 'url'>[];
   };
   requestMetadata: ApiRequestMetadata;
 };
@@ -258,6 +260,15 @@ export const updateDocument = async ({
         visibility: data.visibility as DocumentVisibility,
         useLegacyFieldInsertion: data.useLegacyFieldInsertion,
         authOptions,
+        attachments: {
+          deleteMany: {},
+          create:
+            data.attachments?.map((attachment) => ({
+              type: 'LINK',
+              label: attachment.label,
+              url: attachment.url,
+            })) || [],
+        },
       },
     });
 

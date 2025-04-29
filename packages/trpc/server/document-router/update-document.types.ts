@@ -8,6 +8,7 @@ import {
   ZDocumentActionAuthTypesSchema,
 } from '@documenso/lib/types/document-auth';
 import { ZDocumentEmailSettingsSchema } from '@documenso/lib/types/document-email';
+import AttachmentSchema from '@documenso/prisma/generated/zod/modelSchema/AttachmentSchema';
 
 import type { TrpcRouteMeta } from '../trpc';
 import {
@@ -45,6 +46,13 @@ export const ZUpdateDocumentRequestSchema = z.object({
       globalAccessAuth: ZDocumentAccessAuthTypesSchema.nullish(),
       globalActionAuth: ZDocumentActionAuthTypesSchema.nullish(),
       useLegacyFieldInsertion: z.boolean().optional(),
+      attachments: AttachmentSchema.pick({
+        id: true,
+        label: true,
+        url: true,
+      })
+        .array()
+        .optional(),
     })
     .optional(),
   meta: z

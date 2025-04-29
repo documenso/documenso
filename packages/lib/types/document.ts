@@ -60,7 +60,14 @@ export const ZDocumentSchema = DocumentSchema.pick({
   }).nullable(),
   recipients: ZRecipientLiteSchema.array(),
   fields: ZFieldSchema.array(),
-  attachments: AttachmentSchema.array(),
+  attachments: AttachmentSchema.pick({
+    id: true,
+    type: true,
+    label: true,
+    url: true,
+  })
+    .array()
+    .optional(),
 });
 
 export type TDocument = z.infer<typeof ZDocumentSchema>;
