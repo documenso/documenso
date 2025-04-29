@@ -48,7 +48,7 @@ export const DocumentSigningNameField = ({
 
   const { recipient, isAssistantMode } = useDocumentSigningRecipientContext();
 
-  const { executeActionAuthProcedure } = useRequiredDocumentSigningAuthContext();
+  const { executeActionAuthProcedure, isEnterprise } = useRequiredDocumentSigningAuthContext();
 
   const { mutateAsync: signFieldWithToken, isPending: isSignFieldWithTokenLoading } =
     trpc.field.signFieldWithToken.useMutation(DO_NOT_INVALIDATE_QUERY_ON_MUTATION);
@@ -85,6 +85,7 @@ export const DocumentSigningNameField = ({
     void executeActionAuthProcedure({
       onReauthFormSubmit: async (authOptions) => await onSign(authOptions, localFullName),
       actionTarget: field.type,
+      isEnterprise,
     });
   };
 

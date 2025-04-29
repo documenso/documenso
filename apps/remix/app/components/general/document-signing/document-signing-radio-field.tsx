@@ -50,7 +50,7 @@ export const DocumentSigningRadioField = ({
 
   const [selectedOption, setSelectedOption] = useState(defaultValue);
 
-  const { executeActionAuthProcedure } = useRequiredDocumentSigningAuthContext();
+  const { executeActionAuthProcedure, isEnterprise } = useRequiredDocumentSigningAuthContext();
 
   const { mutateAsync: signFieldWithToken, isPending: isSignFieldWithTokenLoading } =
     trpc.field.signFieldWithToken.useMutation(DO_NOT_INVALIDATE_QUERY_ON_MUTATION);
@@ -144,6 +144,7 @@ export const DocumentSigningRadioField = ({
       void executeActionAuthProcedure({
         onReauthFormSubmit: async (authOptions) => await onSign(authOptions),
         actionTarget: field.type,
+        isEnterprise,
       });
     }
   }, [selectedOption, field]);

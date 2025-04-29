@@ -62,7 +62,7 @@ export const DocumentSigningFieldContainer = ({
   type,
   tooltipText,
 }: DocumentSigningFieldContainerProps) => {
-  const { executeActionAuthProcedure, isAuthRedirectRequired } =
+  const { executeActionAuthProcedure, isAuthRedirectRequired, isEnterprise } =
     useRequiredDocumentSigningAuthContext();
 
   const parsedFieldMeta = field.fieldMeta ? ZFieldMetaSchema.parse(field.fieldMeta) : undefined;
@@ -91,6 +91,7 @@ export const DocumentSigningFieldContainer = ({
           // Do nothing since the user should be redirected.
         },
         actionTarget: field.type,
+        isEnterprise,
       });
 
       return;
@@ -108,6 +109,7 @@ export const DocumentSigningFieldContainer = ({
     await executeActionAuthProcedure({
       onReauthFormSubmit: onSign,
       actionTarget: field.type,
+      isEnterprise,
     });
   };
 

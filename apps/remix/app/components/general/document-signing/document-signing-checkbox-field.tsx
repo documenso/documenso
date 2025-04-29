@@ -43,7 +43,7 @@ export const DocumentSigningCheckboxField = ({
 
   const { recipient, isAssistantMode } = useDocumentSigningRecipientContext();
 
-  const { executeActionAuthProcedure } = useRequiredDocumentSigningAuthContext();
+  const { executeActionAuthProcedure, isEnterprise } = useRequiredDocumentSigningAuthContext();
 
   const parsedFieldMeta = ZCheckboxFieldMeta.parse(
     field.fieldMeta ?? {
@@ -241,6 +241,7 @@ export const DocumentSigningCheckboxField = ({
       void executeActionAuthProcedure({
         onReauthFormSubmit: async (authOptions) => await onSign(authOptions),
         actionTarget: field.type,
+        isEnterprise,
       });
     }
   }, [checkedValues, isLengthConditionMet, field.inserted]);

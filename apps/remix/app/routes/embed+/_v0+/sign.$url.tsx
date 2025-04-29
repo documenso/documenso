@@ -168,6 +168,7 @@ export default function EmbedSignDocumentPage() {
         documentAuthOptions={document.authOptions}
         recipient={recipient}
         user={user}
+        isEnterprise={isEnterpriseDocument}
       >
         <EmbedSignDocumentClientPage
           token={token}

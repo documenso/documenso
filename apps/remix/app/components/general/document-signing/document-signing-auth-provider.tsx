@@ -43,6 +43,7 @@ export type DocumentSigningAuthContextValue = {
   setPreferredPasskeyId: (_value: string | null) => void;
   user?: SessionUser | null;
   refetchPasskeys: () => Promise<void>;
+  isEnterprise: boolean;
 };
 
 const DocumentSigningAuthContext = createContext<DocumentSigningAuthContextValue | null>(null);
@@ -205,6 +206,7 @@ export const DocumentSigningAuthProvider = ({
         preferredPasskeyId,
         setPreferredPasskeyId,
         refetchPasskeys,
+        isEnterprise,
       }}
     >
       {children}

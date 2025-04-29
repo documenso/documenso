@@ -46,7 +46,7 @@ export const DocumentSigningDropdownField = ({
 
   const { recipient, isAssistantMode } = useDocumentSigningRecipientContext();
 
-  const { executeActionAuthProcedure } = useRequiredDocumentSigningAuthContext();
+  const { executeActionAuthProcedure, isEnterprise } = useRequiredDocumentSigningAuthContext();
 
   const parsedFieldMeta = ZDropdownFieldMeta.parse(field.fieldMeta);
   const isReadOnly = parsedFieldMeta?.readOnly;
@@ -148,6 +148,7 @@ export const DocumentSigningDropdownField = ({
       void executeActionAuthProcedure({
         onReauthFormSubmit: async (authOptions) => await onSign(authOptions),
         actionTarget: field.type,
+        isEnterprise,
       });
     }
   }, [localChoice]);
@@ -157,6 +158,7 @@ export const DocumentSigningDropdownField = ({
       void executeActionAuthProcedure({
         onReauthFormSubmit: async (authOptions) => await onSign(authOptions),
         actionTarget: field.type,
+        isEnterprise,
       });
     }
   }, []);

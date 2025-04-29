@@ -143,6 +143,7 @@ export default function EmbedDirectTemplatePage() {
         documentAuthOptions={template.authOptions}
         recipient={recipient}
         user={user}
+        isEnterprise={isEnterpriseDocument}
       >
         <DocumentSigningRecipientProvider recipient={recipient}>
           <EmbedDirectTemplateClientPage

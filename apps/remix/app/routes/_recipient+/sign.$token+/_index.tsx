@@ -258,6 +258,7 @@ export default function SigningPage() {
           completedFields={completedFields}
           isRecipientsTurn={isRecipientsTurn}
           allRecipients={allRecipients}
+          isEnterprise={isEnterprise}
         />
       </DocumentSigningAuthProvider>
     </DocumentSigningProvider>
