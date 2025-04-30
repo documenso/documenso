@@ -218,7 +218,6 @@ export const DocumentSigningAuthProvider = ({
           onReauthFormSubmit={documentAuthDialogPayload.onReauthFormSubmit}
           actionTarget={documentAuthDialogPayload.actionTarget}
           documentAuthType={derivedRecipientActionAuth}
-          isEnterprise={isEnterprise}
         />
       )}
     </DocumentSigningAuthContext.Provider>

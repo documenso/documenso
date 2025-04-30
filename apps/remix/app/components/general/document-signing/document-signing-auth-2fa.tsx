@@ -176,7 +176,7 @@ export const DocumentSigningAuth2FA = ({
               </Button>
 
               <Button type="submit" loading={isCurrentlyAuthenticating}>
-                <Trans>Sign</Trans>
+                <Trans>{actionTarget === 'DOCUMENT' ? 'Sign Document' : 'Sign Field'}</Trans>
               </Button>
             </DialogFooter>
           </div>
