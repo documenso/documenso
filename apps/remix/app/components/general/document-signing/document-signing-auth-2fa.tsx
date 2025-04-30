@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Trans } from '@lingui/react/macro';
@@ -6,10 +6,9 @@ import { RecipientRole } from '@prisma/client';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 
-import { AppError } from '@documenso/lib/errors/app-error';
 import { DocumentAuth, type TRecipientActionAuth } from '@documenso/lib/types/document-auth';
 import { trpc } from '@documenso/trpc/react';
-import { Alert, AlertDescription, AlertTitle } from '@documenso/ui/primitives/alert';
+import { Alert, AlertDescription } from '@documenso/ui/primitives/alert';
 import { Button } from '@documenso/ui/primitives/button';
 import { DialogFooter } from '@documenso/ui/primitives/dialog';
 import {
@@ -66,14 +65,33 @@ export const DocumentSigningAuth2FA = ({
   const [is2FASetupSuccessful, setIs2FASetupSuccessful] = useState(false);
   const [isEmailCodeSent, setIsEmailCodeSent] = useState(false);
   const [isEmailCodeSending, setIsEmailCodeSending] = useState(false);
-  const [formErrorCode, setFormErrorCode] = useState<string | null>(null);
+  const [canResendEmail, setCanResendEmail] = useState(true);
+  const [resendCountdown, setResendCountdown] = useState(0);
+  const countdownTimerRef = useRef<NodeJS.Timeout | null>(null);
   const [verificationMethod, setVerificationMethod] = useState<'app' | 'email'>(
     user?.twoFactorEnabled ? 'app' : 'email',
   );
+  const emailSendInitiatedRef = useRef(false);
 
   const sendVerificationMutation = trpc.auth.sendEmailVerification.useMutation({
     onSuccess: () => {
       setIsEmailCodeSent(true);
+      setCanResendEmail(false);
+      setResendCountdown(60);
+
+      countdownTimerRef.current = setInterval(() => {
+        setResendCountdown((prev) => {
+          if (prev <= 1) {
+            if (countdownTimerRef.current) {
+              clearInterval(countdownTimerRef.current);
+            }
+            setCanResendEmail(true);
+            return 0;
+          }
+          return prev - 1;
+        });
+      }, 1000);
+
       toast({
         title: 'Verification code sent',
         description: `A verification code has been sent to ${recipient.email}`,
@@ -101,16 +119,27 @@ export const DocumentSigningAuth2FA = ({
         recipientId: recipient.id,
       });
     } catch (error) {
-      // Error is handled in the mutation callbacks
+      toast({
+        title: 'Failed to send verification code',
+        description: 'Please try again.',
+        variant: 'destructive',
+      });
     }
   };
+
+  useEffect(() => {
+    return () => {
+      if (countdownTimerRef.current) {
+        clearInterval(countdownTimerRef.current);
+      }
+    };
+  }, []);
 
   const onFormSubmit = async ({ token }: T2FAAuthFormSchema) => {
     try {
       setIsCurrentlyAuthenticating(true);
 
       if (verificationMethod === 'email') {
-        // Verify the email code first
         await verifyCodeMutation.mutateAsync({
           code: token,
           recipientId: recipient.id,
@@ -127,8 +156,11 @@ export const DocumentSigningAuth2FA = ({
     } catch (err) {
       setIsCurrentlyAuthenticating(false);
 
-      const error = AppError.parseError(err);
-      setFormErrorCode(error.code);
+      toast({
+        title: 'Unauthorized',
+        description: 'We were unable to verify your details.',
+        variant: 'destructive',
+      });
     }
   };
 
@@ -138,19 +170,25 @@ export const DocumentSigningAuth2FA = ({
     });
 
     setIs2FASetupSuccessful(false);
-    setFormErrorCode(null);
     setIsEmailCodeSent(false);
 
     if (open && !user?.twoFactorEnabled) {
       setVerificationMethod('email');
     }
+  }, [open, user?.twoFactorEnabled, form]);
 
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [open, user?.twoFactorEnabled]);
+  useEffect(() => {
+    if (!open || verificationMethod !== 'email') {
+      emailSendInitiatedRef.current = false;
+    }
+  }, [open, verificationMethod]);
 
   useEffect(() => {
     if (open && verificationMethod === 'email' && !isEmailCodeSent && !isEmailCodeSending) {
-      void sendEmailVerificationCode();
+      if (!emailSendInitiatedRef.current) {
+        emailSendInitiatedRef.current = true;
+        void sendEmailVerificationCode();
+      }
     }
   }, [open, verificationMethod, isEmailCodeSent, isEmailCodeSending]);
 
@@ -270,25 +308,18 @@ export const DocumentSigningAuth2FA = ({
                   <Button
                     type="button"
                     variant="link"
-                    disabled={isEmailCodeSending}
+                    disabled={isEmailCodeSending || !canResendEmail}
                     onClick={() => void sendEmailVerificationCode()}
                   >
-                    {isEmailCodeSending ? <Trans>Sending...</Trans> : <Trans>Resend code</Trans>}
+                    {isEmailCodeSending ? (
+                      <Trans>Sending...</Trans>
+                    ) : !canResendEmail ? (
+                      <Trans>Resend code ({resendCountdown}s)</Trans>
+                    ) : (
+                      <Trans>Resend code</Trans>
+                    )}
                   </Button>
                 </div>
-              )}
-
-              {formErrorCode && (
-                <Alert variant="destructive">
-                  <AlertTitle>
-                    <Trans>Unauthorized</Trans>
-                  </AlertTitle>
-                  <AlertDescription>
-                    <Trans>
-                      We were unable to verify your details. Please try again or contact support
-                    </Trans>
-                  </AlertDescription>
-                </Alert>
               )}
 
               <DialogFooter>
