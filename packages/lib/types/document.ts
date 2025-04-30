@@ -62,7 +62,6 @@ export const ZDocumentSchema = DocumentSchema.pick({
   fields: ZFieldSchema.array(),
   attachments: AttachmentSchema.pick({
     id: true,
-    type: true,
     label: true,
     url: true,
   })

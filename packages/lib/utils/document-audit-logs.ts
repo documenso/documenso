@@ -388,6 +388,10 @@ export const formatDocumentAuditLogAction = (
       anonymous: msg`Document completed`,
       identified: msg`Document completed`,
     }))
+    .with({ type: DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_ATTACHMENTS_UPDATED }, ({ data }) => ({
+      anonymous: msg`Document attachments updated`,
+      identified: msg`${prefix} updated the document attachments ${data.to.map((a) => a.label).join(', ')}`,
+    }))
     .exhaustive();
 
   return {

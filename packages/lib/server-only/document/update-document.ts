@@ -69,6 +69,7 @@ export const updateDocument = async ({
           },
         },
       },
+      attachments: true,
     },
   });
 
@@ -160,6 +161,8 @@ export const updateDocument = async ({
     documentGlobalActionAuth === undefined || documentGlobalActionAuth === newGlobalActionAuth;
   const isDocumentVisibilitySame =
     data.visibility === undefined || data.visibility === document.visibility;
+  const isAttachmentsSame =
+    data.attachments === undefined || data.attachments === document.attachments;
 
   const auditLogs: CreateDocumentAuditLogDataResponse[] = [];
 
@@ -239,6 +242,20 @@ export const updateDocument = async ({
     );
   }
 
+  if (data.attachments) {
+    auditLogs.push(
+      createDocumentAuditLogData({
+        type: DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_ATTACHMENTS_UPDATED,
+        documentId,
+        metadata: requestMetadata,
+        data: {
+          from: document.attachments,
+          to: data.attachments,
+        },
+      }),
+    );
+  }
+
   // Early return if nothing is required.
   if (auditLogs.length === 0 && data.useLegacyFieldInsertion === undefined) {
     return document;
@@ -260,17 +277,41 @@ export const updateDocument = async ({
         visibility: data.visibility as DocumentVisibility,
         useLegacyFieldInsertion: data.useLegacyFieldInsertion,
         authOptions,
-        attachments: {
-          deleteMany: {},
-          create:
-            data.attachments?.map((attachment) => ({
-              type: 'LINK',
-              label: attachment.label,
-              url: attachment.url,
-            })) || [],
-        },
       },
     });
+
+    if (data.attachments) {
+      await tx.attachment.deleteMany({
+        where: {
+          documentId,
+          id: {
+            notIn: data.attachments.map((a) => a.id),
+          },
+        },
+      });
+
+      await Promise.all(
+        data.attachments.map(
+          async (attachment) =>
+            await tx.attachment.upsert({
+              where: {
+                id: attachment.id,
+                documentId,
+              },
+              update: {
+                label: attachment.label,
+                url: attachment.url,
+              },
+              create: {
+                id: attachment.id,
+                label: attachment.label,
+                url: attachment.url,
+                documentId,
+              },
+            }),
+        ),
+      );
+    }
 
     await tx.documentAuditLog.createMany({
       data: auditLogs,

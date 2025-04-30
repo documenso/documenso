@@ -323,7 +323,7 @@ enum AttachmentType {
 
 model Attachment {
   id        String         @id @default(uuid())
-  type      AttachmentType
+  type      AttachmentType @default(LINK)
   label     String
   url       String
   createdAt DateTime       @default(now())

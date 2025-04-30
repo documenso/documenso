@@ -97,9 +97,11 @@ export const AddSettingsFormPartial = ({
 
   const defaultAttachments = [
     {
+      id: '',
       formId: initialId,
       label: '',
       url: '',
+      type: 'LINK',
     },
   ];
 
@@ -123,7 +125,12 @@ export const AddSettingsFormPartial = ({
         language: document.documentMeta?.language ?? 'en',
         signatureTypes: extractTeamSignatureSettings(document.documentMeta),
       },
-      attachments: document.attachments ?? defaultAttachments,
+      attachments:
+        document.attachments?.map((attachment) => ({
+          ...attachment,
+          id: String(attachment.id),
+          formId: String(attachment.id),
+        })) ?? defaultAttachments,
     },
   });
 
@@ -136,6 +143,22 @@ export const AddSettingsFormPartial = ({
     name: 'attachments',
   });
 
+  const onRemoveAttachment = (index: number) => {
+    const attachment = attachments[index];
+
+    const formStateIndex =
+      form.getValues('attachments')?.findIndex((a) => a.formId === attachment.formId) ?? -1;
+
+    if (formStateIndex !== -1) {
+      removeAttachment(formStateIndex);
+
+      const updatedAttachments =
+        form.getValues('attachments')?.filter((a) => a.formId !== attachment.formId) ?? [];
+
+      form.setValue('attachments', updatedAttachments);
+    }
+  };
+
   const { stepIndex, currentStep, totalSteps, previousStep } = useStep();
 
   const documentHasBeenSent = recipients.some(
@@ -144,11 +167,11 @@ export const AddSettingsFormPartial = ({
 
   const onAddAttachment = () => {
     appendAttachment({
+      id: nanoid(12),
       formId: nanoid(12),
       label: '',
       url: '',
-      // fix this
-      id: '',
+      type: 'LINK',
     });
   };
 
@@ -533,7 +556,7 @@ export const AddSettingsFormPartial = ({
 
                         <div className="flex-none pt-8">
                           <button
-                            onClick={() => removeAttachment(index)}
+                            onClick={() => onRemoveAttachment(index)}
                             className="hover:bg-muted rounded-md"
                           >
                             <Trash className="h-4 w-4" />

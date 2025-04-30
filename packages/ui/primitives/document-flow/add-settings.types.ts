@@ -63,6 +63,7 @@ export const ZAddSettingsFormSchema = z.object({
     id: true,
     label: true,
     url: true,
+    type: true,
   })
     .extend({
       formId: z.string().min(1),
