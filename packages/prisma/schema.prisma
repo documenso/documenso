@@ -53,18 +53,19 @@ model User {
   avatarImageId    String?
   disabled         Boolean          @default(false)
 
-  accounts             Account[]
-  sessions             Session[]
-  documents            Document[]
-  subscriptions        Subscription[]
-  passwordResetTokens  PasswordResetToken[]
-  ownedTeams           Team[]
-  ownedPendingTeams    TeamPending[]
-  teamMembers          TeamMember[]
-  twoFactorSecret      String?
-  twoFactorEnabled     Boolean              @default(false)
-  twoFactorBackupCodes String?
-  url                  String?              @unique
+  accounts                   Account[]
+  sessions                   Session[]
+  documents                  Document[]
+  subscriptions              Subscription[]
+  passwordResetTokens        PasswordResetToken[]
+  ownedTeams                 Team[]
+  ownedPendingTeams          TeamPending[]
+  teamMembers                TeamMember[]
+  twoFactorSecret            String?
+  twoFactorEnabled           Boolean                         @default(false)
+  twoFactorBackupCodes       String?
+  url                        String?                         @unique
+  twoFactorEmailVerification UserTwoFactorEmailVerification?
 
   profile            UserProfile?
   verificationTokens VerificationToken[]
@@ -794,4 +795,13 @@ model AvatarImage {
 
   team Team[]
   user User[]
+}
+
+model UserTwoFactorEmailVerification {
+  userId           Int      @id
+  verificationCode String
+  expiresAt        DateTime
+  createdAt        DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 }

@@ -1,5 +1,10 @@
 import type { RegistrationResponseJSON } from '@simplewebauthn/types';
 
+import { AppError } from '@documenso/lib/errors/app-error';
+import {
+  sendEmailVerification,
+  verifyEmailCode,
+} from '@documenso/lib/server-only/2fa/send-email-verification';
 import { createPasskey } from '@documenso/lib/server-only/auth/create-passkey';
 import { createPasskeyAuthenticationOptions } from '@documenso/lib/server-only/auth/create-passkey-authentication-options';
 import { createPasskeyRegistrationOptions } from '@documenso/lib/server-only/auth/create-passkey-registration-options';
@@ -8,6 +13,7 @@ import { deletePasskey } from '@documenso/lib/server-only/auth/delete-passkey';
 import { findPasskeys } from '@documenso/lib/server-only/auth/find-passkeys';
 import { updatePasskey } from '@documenso/lib/server-only/auth/update-passkey';
 import { nanoid } from '@documenso/lib/universal/id';
+import { prisma } from '@documenso/prisma';
 
 import { authenticatedProcedure, procedure, router } from '../trpc';
 import {
@@ -15,7 +21,9 @@ import {
   ZCreatePasskeyMutationSchema,
   ZDeletePasskeyMutationSchema,
   ZFindPasskeysQuerySchema,
+  ZSendEmailVerificationMutationSchema,
   ZUpdatePasskeyMutationSchema,
+  ZVerifyEmailCodeMutationSchema,
 } from './schema';
 
 export const authRouter = router({
@@ -96,6 +104,70 @@ export const authRouter = router({
         passkeyId,
         name,
         requestMetadata: ctx.metadata.requestMetadata,
+      });
+    }),
+
+  // Email verification for document signing
+  sendEmailVerification: authenticatedProcedure
+    .input(ZSendEmailVerificationMutationSchema)
+    .mutation(async ({ ctx, input }) => {
+      const { recipientId } = input;
+      const userId = ctx.user.id;
+      let email = ctx.user.email;
+
+      // If recipientId is provided, fetch that recipient's details
+      if (recipientId) {
+        const recipient = await prisma.recipient.findUnique({
+          where: {
+            id: recipientId,
+          },
+          select: {
+            email: true,
+          },
+        });
+
+        if (!recipient) {
+          throw new AppError('NOT_FOUND', {
+            message: 'Recipient not found',
+          });
+        }
+
+        email = recipient.email;
+      }
+
+      return sendEmailVerification({
+        userId,
+        email,
+      });
+    }),
+
+  verifyEmailCode: authenticatedProcedure
+    .input(ZVerifyEmailCodeMutationSchema)
+    .mutation(async ({ ctx, input }) => {
+      const { code, recipientId } = input;
+      const userId = ctx.user.id;
+
+      // If recipientId is provided, check that the user has access to it
+      if (recipientId) {
+        const recipient = await prisma.recipient.findUnique({
+          where: {
+            id: recipientId,
+          },
+          select: {
+            email: true,
+          },
+        });
+
+        if (!recipient) {
+          throw new AppError('NOT_FOUND', {
+            message: 'Recipient not found',
+          });
+        }
+      }
+
+      return verifyEmailCode({
+        userId,
+        code,
       });
     }),
 });
