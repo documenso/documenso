@@ -112,7 +112,6 @@ export const DocumentSigningNumberField = ({
     void executeActionAuthProcedure({
       onReauthFormSubmit: async (authOptions) => await onSign(authOptions),
       actionTarget: field.type,
-      isEnterprise,
     });
   };
 
@@ -223,7 +222,6 @@ export const DocumentSigningNumberField = ({
       void executeActionAuthProcedure({
         onReauthFormSubmit: async (authOptions) => await onSign(authOptions),
         actionTarget: field.type,
-        isEnterprise,
       });
     }
   }, []);

@@ -120,7 +120,6 @@ export const DocumentSigningForm = ({
     try {
       await executeActionAuthProcedure({
         actionTarget: 'DOCUMENT',
-        isEnterprise,
         onReauthFormSubmit: async (authOptions) => {
           await completeDocument(authOptions, nextSigner);
         },
@@ -241,7 +240,6 @@ export const DocumentSigningForm = ({
                     onSignatureComplete={async (nextSigner) => {
                       await executeActionAuthProcedure({
                         actionTarget: 'DOCUMENT',
-                        isEnterprise,
                         onReauthFormSubmit: async (authOptions) => {
                           await completeDocument(authOptions, nextSigner);
                         },
@@ -427,7 +425,6 @@ export const DocumentSigningForm = ({
                     onSignatureComplete={async (nextSigner) => {
                       await executeActionAuthProcedure({
                         actionTarget: 'DOCUMENT',
-                        isEnterprise,
                         onReauthFormSubmit: async (authOptions) => {
                           await completeDocument(authOptions, nextSigner);
                         },

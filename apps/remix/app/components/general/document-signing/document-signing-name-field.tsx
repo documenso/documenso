@@ -85,7 +85,6 @@ export const DocumentSigningNameField = ({
     void executeActionAuthProcedure({
       onReauthFormSubmit: async (authOptions) => await onSign(authOptions, localFullName),
       actionTarget: field.type,
-      isEnterprise,
     });
   };
 

@@ -148,7 +148,6 @@ export const DocumentSigningDropdownField = ({
       void executeActionAuthProcedure({
         onReauthFormSubmit: async (authOptions) => await onSign(authOptions),
         actionTarget: field.type,
-        isEnterprise,
       });
     }
   }, [localChoice]);
@@ -158,7 +157,6 @@ export const DocumentSigningDropdownField = ({
       void executeActionAuthProcedure({
         onReauthFormSubmit: async (authOptions) => await onSign(authOptions),
         actionTarget: field.type,
-        isEnterprise,
       });
     }
   }, []);

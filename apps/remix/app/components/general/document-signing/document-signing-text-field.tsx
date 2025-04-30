@@ -124,7 +124,6 @@ export const DocumentSigningTextField = ({
     void executeActionAuthProcedure({
       onReauthFormSubmit: async (authOptions) => await onSign(authOptions),
       actionTarget: field.type,
-      isEnterprise,
     });
   };
 
@@ -218,7 +217,6 @@ export const DocumentSigningTextField = ({
       void executeActionAuthProcedure({
         onReauthFormSubmit: async (authOptions) => await onSign(authOptions),
         actionTarget: field.type,
-        isEnterprise,
       });
     }
   }, []);

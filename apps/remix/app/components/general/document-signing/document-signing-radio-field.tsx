@@ -144,7 +144,6 @@ export const DocumentSigningRadioField = ({
       void executeActionAuthProcedure({
         onReauthFormSubmit: async (authOptions) => await onSign(authOptions),
         actionTarget: field.type,
-        isEnterprise,
       });
     }
   }, [selectedOption, field]);

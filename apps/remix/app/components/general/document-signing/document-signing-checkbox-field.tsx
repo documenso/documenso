@@ -241,7 +241,6 @@ export const DocumentSigningCheckboxField = ({
       void executeActionAuthProcedure({
         onReauthFormSubmit: async (authOptions) => await onSign(authOptions),
         actionTarget: field.type,
-        isEnterprise,
       });
     }
   }, [checkedValues, isLengthConditionMet, field.inserted]);

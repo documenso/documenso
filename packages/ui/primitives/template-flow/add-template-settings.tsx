@@ -1,10 +1,14 @@
 import { useEffect } from 'react';
 
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useLingui } from '@lingui/react/macro';
-import { Trans } from '@lingui/react/macro';
-import { DocumentVisibility, TeamMemberRole } from '@prisma/client';
-import { DocumentDistributionMethod, type Field, type Recipient } from '@prisma/client';
+import { Trans, useLingui } from '@lingui/react/macro';
+import {
+  DocumentDistributionMethod,
+  DocumentVisibility,
+  type Field,
+  type Recipient,
+  TeamMemberRole,
+} from '@prisma/client';
 import { InfoIcon } from 'lucide-react';
 import { useForm } from 'react-hook-form';
 import { match } from 'ts-pattern';
@@ -360,24 +364,26 @@ export const AddTemplateSettingsFormPartial = ({
               )}
             />
 
-            {isEnterprise && (
-              <FormField
-                control={form.control}
-                name="globalActionAuth"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel className="flex flex-row items-center">
-                      <Trans>Recipient action authentication</Trans>
-                      <DocumentGlobalAuthActionTooltip />
-                    </FormLabel>
+            <FormField
+              control={form.control}
+              name="globalActionAuth"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="flex flex-row items-center">
+                    <Trans>Recipient action authentication</Trans>
+                    <DocumentGlobalAuthActionTooltip />
+                  </FormLabel>
 
-                    <FormControl>
-                      <DocumentGlobalAuthActionSelect {...field} onValueChange={field.onChange} />
-                    </FormControl>
-                  </FormItem>
-                )}
-              />
-            )}
+                  <FormControl>
+                    <DocumentGlobalAuthActionSelect
+                      {...field}
+                      onValueChange={field.onChange}
+                      isDocumentEnterprise={isEnterprise}
+                    />
+                  </FormControl>
+                </FormItem>
+              )}
+            />
 
             {distributionMethod === DocumentDistributionMethod.EMAIL && (
               <Accordion type="multiple">
