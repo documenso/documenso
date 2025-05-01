@@ -113,8 +113,8 @@ test.describe('[EE_ONLY]', () => {
       redirectPath: `/templates/${template.id}/edit`,
     });
 
-    // Global action auth should not be visible.
-    await expect(page.getByTestId('documentActionSelectValue')).not.toBeVisible();
+    // Global action auth should now be visible for all users
+    await expect(page.getByTestId('documentActionSelectValue')).toBeVisible();
 
     // Next step.
     await page.getByRole('button', { name: 'Continue' }).click();
@@ -143,8 +143,8 @@ test('[TEMPLATE_FLOW]: add settings', async ({ page }) => {
   await page.getByLabel('Require account').getByText('Require account').click();
   await expect(page.getByTestId('documentAccessSelectValue')).toContainText('Require account');
 
-  // Action auth should NOT be visible.
-  await expect(page.getByTestId('documentActionSelectValue')).not.toBeVisible();
+  // Action auth should now be visible for all users
+  await expect(page.getByTestId('documentActionSelectValue')).toBeVisible();
 
   // Save the settings by going to the next step.
   await page.getByRole('button', { name: 'Continue' }).click();
