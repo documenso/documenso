@@ -170,6 +170,7 @@ export const DocumentHistorySheet = ({
                     { type: DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_RECIPIENT_REJECTED },
                     { type: DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_SENT },
                     { type: DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_MOVED_TO_TEAM },
+                    { type: DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_RESTORED },
                     () => null,
                   )
                   .with(
