@@ -2,6 +2,7 @@ import { DocumentStatus, FieldType, RecipientRole, SigningStatus } from '@prisma
 import { DateTime } from 'luxon';
 import { match } from 'ts-pattern';
 
+import { isUserEnterprise } from '@documenso/ee/server-only/util/is-document-enterprise';
 import { validateCheckboxField } from '@documenso/lib/advanced-fields-validation/validate-checkbox';
 import { validateDropdownField } from '@documenso/lib/advanced-fields-validation/validate-dropdown';
 import { validateNumberField } from '@documenso/lib/advanced-fields-validation/validate-number';
@@ -13,7 +14,7 @@ import { prisma } from '@documenso/prisma';
 import { DEFAULT_DOCUMENT_DATE_FORMAT } from '../../constants/date-formats';
 import { DEFAULT_DOCUMENT_TIME_ZONE } from '../../constants/time-zones';
 import { DOCUMENT_AUDIT_LOG_TYPE } from '../../types/document-audit-logs';
-import type { TRecipientActionAuth } from '../../types/document-auth';
+import type { TRecipientActionAuth, TRecipientActionAuthTypes } from '../../types/document-auth';
 import {
   ZCheckboxFieldMeta,
   ZDropdownFieldMeta,
@@ -23,6 +24,7 @@ import {
 } from '../../types/field-meta';
 import type { RequestMetadata } from '../../universal/extract-request-metadata';
 import { createDocumentAuditLogData } from '../../utils/document-audit-logs';
+import { extractDocumentAuthMethods } from '../../utils/document-auth';
 import { validateFieldAuth } from '../document/validate-field-auth';
 
 export type SignFieldWithTokenOptions = {
@@ -169,13 +171,24 @@ export const signFieldWithToken = async ({
     }
   }
 
-  const derivedRecipientActionAuth = await validateFieldAuth({
-    documentAuthOptions: document.authOptions,
-    recipient,
-    field,
-    userId,
-    authOptions,
-  });
+  const isEnterprise = userId ? await isUserEnterprise({ userId }) : false;
+  let requiredAuthType: TRecipientActionAuthTypes | null = null;
+
+  if (isEnterprise) {
+    requiredAuthType = await validateFieldAuth({
+      documentAuthOptions: document.authOptions,
+      recipient,
+      field,
+      userId,
+      authOptions,
+    });
+  } else {
+    const { derivedRecipientActionAuth } = extractDocumentAuthMethods({
+      documentAuth: document.authOptions,
+      recipientAuth: recipient.authOptions,
+    });
+    requiredAuthType = derivedRecipientActionAuth;
+  }
 
   const documentMeta = await prisma.documentMeta.findFirst({
     where: {
@@ -286,9 +299,9 @@ export const signFieldWithToken = async ({
               }),
             )
             .exhaustive(),
-          fieldSecurity: derivedRecipientActionAuth
+          fieldSecurity: requiredAuthType
             ? {
-                type: derivedRecipientActionAuth,
+                type: requiredAuthType,
               }
             : undefined,
         },

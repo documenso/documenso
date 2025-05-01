@@ -64,7 +64,7 @@ export const DocumentSigningFieldContainer = ({
   type,
   tooltipText,
 }: DocumentSigningFieldContainerProps) => {
-  const { executeActionAuthProcedure, isAuthRedirectRequired } =
+  const { executeActionAuthProcedure, isAuthRedirectRequired, isEnterprise } =
     useRequiredDocumentSigningAuthContext();
 
   const parsedFieldMeta = field.fieldMeta ? ZFieldMetaSchema.parse(field.fieldMeta) : undefined;

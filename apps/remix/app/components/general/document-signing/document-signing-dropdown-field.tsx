@@ -46,7 +46,7 @@ export const DocumentSigningDropdownField = ({
 
   const { recipient, isAssistantMode } = useDocumentSigningRecipientContext();
 
-  const { executeActionAuthProcedure } = useRequiredDocumentSigningAuthContext();
+  const { executeActionAuthProcedure, isEnterprise } = useRequiredDocumentSigningAuthContext();
 
   const parsedFieldMeta = ZDropdownFieldMeta.parse(field.fieldMeta);
   const isReadOnly = parsedFieldMeta?.readOnly;
