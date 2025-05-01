@@ -33,6 +33,7 @@ import { ZSignFieldWithTokenMutationSchema } from '../field-router/schema';
 export const ZCreateTemplateMutationSchema = z.object({
   title: z.string().min(1).trim(),
   templateDocumentDataId: z.string().min(1),
+  folderId: z.string().optional(),
 });
 
 export const ZCreateDocumentFromDirectTemplateRequestSchema = z.object({
@@ -179,6 +180,7 @@ export const ZUpdateTemplateResponseSchema = ZTemplateLiteSchema;
 
 export const ZFindTemplatesRequestSchema = ZFindSearchParamsSchema.extend({
   type: z.nativeEnum(TemplateType).describe('Filter templates by type.').optional(),
+  folderId: z.string().describe('The ID of the folder to filter templates by.').optional(),
 });
 
 export const ZFindTemplatesResponseSchema = ZFindResultResponse.extend({

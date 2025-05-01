@@ -20,6 +20,7 @@ export const createTemplate = async ({
   userId,
   teamId,
   templateDocumentDataId,
+  folderId,
 }: CreateTemplateOptions) => {
   let team = null;
 
@@ -43,12 +44,38 @@ export const createTemplate = async ({
     }
   }
 
+  const folder = await prisma.folder.findFirstOrThrow({
+    where: {
+      id: folderId,
+      ...(teamId
+        ? {
+            team: {
+              id: teamId,
+              members: {
+                some: {
+                  userId,
+                },
+              },
+            },
+          }
+        : {
+            userId,
+            teamId: null,
+          }),
+    },
+  });
+
+  if (!team) {
+    throw new AppError(AppErrorCode.NOT_FOUND);
+  }
+
   return await prisma.template.create({
     data: {
       title,
       userId,
       templateDocumentDataId,
       teamId,
+      folderId: folder.id,
       templateMeta: {
         create: {
           language: team?.teamGlobalSettings?.documentLanguage,

@@ -233,6 +233,7 @@ export const createDocumentV2 = async ({
         documentMeta: true,
         recipients: true,
         fields: true,
+        folder: true,
       },
     });
 

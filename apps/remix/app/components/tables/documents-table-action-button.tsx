@@ -40,6 +40,9 @@ export const DocumentsTableActionButton = ({ row }: DocumentsTableActionButtonPr
   const isCurrentTeamDocument = team && row.team?.url === team.url;
 
   const documentsPath = formatDocumentsPath(team?.url);
+  const formatPath = row.folderId
+    ? `${documentsPath}/f/${row.folderId}/${row.id}/edit`
+    : `${documentsPath}/${row.id}/edit`;
 
   const onDownloadClick = async () => {
     try {
@@ -92,7 +95,7 @@ export const DocumentsTableActionButton = ({ row }: DocumentsTableActionButtonPr
       isOwner ? { isDraft: true, isOwner: true } : { isDraft: true, isCurrentTeamDocument: true },
       () => (
         <Button className="w-32" asChild>
-          <Link to={`${documentsPath}/${row.id}/edit`}>
+          <Link to={formatPath}>
             <Edit className="-ml-1 mr-2 h-4 w-4" />
             <Trans>Edit</Trans>
           </Link>

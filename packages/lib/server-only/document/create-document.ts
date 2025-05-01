@@ -1,5 +1,5 @@
 import { DocumentSource, WebhookTriggerEvents } from '@prisma/client';
-import type { Team, TeamGlobalSettings } from '@prisma/client';
+import type { DocumentVisibility, Team, TeamGlobalSettings } from '@prisma/client';
 import { TeamMemberRole } from '@prisma/client';
 
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
@@ -29,6 +29,7 @@ export type CreateDocumentOptions = {
   normalizePdf?: boolean;
   timezone?: string;
   requestMetadata: ApiRequestMetadata;
+  folderId?: string;
 };
 
 export const createDocument = async ({
@@ -41,6 +42,7 @@ export const createDocument = async ({
   formValues,
   requestMetadata,
   timezone,
+  folderId,
 }: CreateDocumentOptions) => {
   const user = await prisma.user.findFirstOrThrow({
     where: {
@@ -89,6 +91,29 @@ export const createDocument = async ({
     userTeamRole = teamWithUserRole.members[0]?.role;
   }
 
+  let folderVisibility: DocumentVisibility | undefined;
+
+  if (folderId) {
+    const folder = await prisma.folder.findFirst({
+      where: {
+        id: folderId,
+        userId,
+        teamId,
+      },
+      select: {
+        visibility: true,
+      },
+    });
+
+    if (!folder) {
+      throw new AppError(AppErrorCode.NOT_FOUND, {
+        message: 'Folder not found',
+      });
+    }
+
+    folderVisibility = folder.visibility;
+  }
+
   if (normalizePdf) {
     const documentData = await prisma.documentData.findFirst({
       where: {
@@ -121,10 +146,13 @@ export const createDocument = async ({
         documentDataId,
         userId,
         teamId,
-        visibility: determineDocumentVisibility(
-          team?.teamGlobalSettings?.documentVisibility,
-          userTeamRole ?? TeamMemberRole.MEMBER,
-        ),
+        folderId,
+        visibility:
+          folderVisibility ??
+          determineDocumentVisibility(
+            team?.teamGlobalSettings?.documentVisibility,
+            userTeamRole ?? TeamMemberRole.MEMBER,
+          ),
         formValues,
         source: DocumentSource.DOCUMENT,
         documentMeta: {

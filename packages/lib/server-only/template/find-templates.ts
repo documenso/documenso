@@ -12,6 +12,7 @@ export type FindTemplatesOptions = {
   type?: Template['type'];
   page?: number;
   perPage?: number;
+  folderId?: string;
 };
 
 export const findTemplates = async ({
@@ -20,6 +21,7 @@ export const findTemplates = async ({
   type,
   page = 1,
   perPage = 10,
+  folderId,
 }: FindTemplatesOptions) => {
   const whereFilter: Prisma.TemplateWhereInput[] = [];
 
@@ -65,6 +67,12 @@ export const findTemplates = async ({
         ],
       },
     );
+  }
+
+  if (folderId) {
+    whereFilter.push({ folderId });
+  } else {
+    whereFilter.push({ folderId: null });
   }
 
   const [data, count] = await Promise.all([
