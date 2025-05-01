@@ -68,6 +68,7 @@ export const FolderCard = ({
               •••
             </Button>
           </DropdownMenuTrigger>
+
           <DropdownMenuContent align="end">
             <DropdownMenuItem onClick={() => onMove(folder)}>Move</DropdownMenuItem>
             {folder.pinned ? (

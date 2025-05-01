@@ -2,7 +2,7 @@ import type { MessageDescriptor } from '@lingui/core';
 import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
 import { Trans } from '@lingui/react/macro';
-import { FileText } from 'lucide-react';
+import { Upload } from 'lucide-react';
 import { useDropzone } from 'react-dropzone';
 import { Link } from 'react-router';
 
@@ -53,7 +53,7 @@ export const DocumentDropzone = ({
   });
 
   const heading = {
-    document: msg`Add a document`,
+    document: msg`Upload Document`,
     template: msg`Upload Template Document`,
   };
 
@@ -80,7 +80,7 @@ export const DocumentDropzone = ({
     <Button aria-disabled={disabled} {...getRootProps()} {...props}>
       <div className="flex items-center gap-2">
         <input {...getInputProps()} />
-        <FileText className="h-4 w-4" />
+        <Upload className="h-4 w-4" />
         {disabled ? _(disabledMessage) : _(heading[type])}
       </div>
     </Button>

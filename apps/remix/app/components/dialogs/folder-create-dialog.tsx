@@ -47,11 +47,13 @@ export type CreateFolderDialogProps = {
 } & Omit<DialogPrimitive.DialogProps, 'children'>;
 
 export const CreateFolderDialog = ({ trigger, ...props }: CreateFolderDialogProps) => {
-  const { toast } = useToast();
   const { _ } = useLingui();
+  const { toast } = useToast();
+  const { folderId } = useParams();
+
   const navigate = useNavigate();
   const team = useOptionalCurrentTeam();
-  const { folderId } = useParams();
+
   const [isCreateFolderOpen, setIsCreateFolderOpen] = useState(false);
 
   const { mutateAsync: createFolder } = trpc.folder.createFolder.useMutation();
@@ -74,7 +76,7 @@ export const CreateFolderDialog = ({ trigger, ...props }: CreateFolderDialogProp
       setIsCreateFolderOpen(false);
 
       toast({
-        title: 'Folder created successfully',
+        description: 'Folder created successfully',
       });
 
       const documentsPath = formatDocumentsPath(team?.url);
@@ -117,6 +119,7 @@ export const CreateFolderDialog = ({ trigger, ...props }: CreateFolderDialogProp
           </Button>
         )}
       </DialogTrigger>
+
       <DialogContent>
         <DialogHeader>
           <DialogTitle>Create New Folder</DialogTitle>
@@ -124,6 +127,7 @@ export const CreateFolderDialog = ({ trigger, ...props }: CreateFolderDialogProp
             Enter a name for your new folder. Folders help you organize your documents.
           </DialogDescription>
         </DialogHeader>
+
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
             <FormField
@@ -139,10 +143,16 @@ export const CreateFolderDialog = ({ trigger, ...props }: CreateFolderDialogProp
                 </FormItem>
               )}
             />
+
             <DialogFooter>
-              <Button variant="secondary" onClick={() => setIsCreateFolderOpen(false)}>
+              <Button
+                type="button"
+                variant="secondary"
+                onClick={() => setIsCreateFolderOpen(false)}
+              >
                 Cancel
               </Button>
+
               <Button type="submit">Create</Button>
             </DialogFooter>
           </form>

@@ -1,5 +1,6 @@
 import { useState } from 'react';
 
+import { Trans } from '@lingui/react/macro';
 import { HomeIcon, Loader2 } from 'lucide-react';
 import { useNavigate } from 'react-router';
 
@@ -49,33 +50,69 @@ export default function TemplatesFoldersPage() {
 
   return (
     <div className="mx-auto w-full max-w-screen-xl px-4 md:px-8">
-      <div className="flex flex-col gap-y-4 pb-8 sm:flex-row sm:gap-x-4">
-        <TemplateFolderCreateDialog />
-      </div>
-
-      <div className="mt-6 flex items-center">
-        <Button
-          variant="ghost"
-          size="sm"
-          className="flex items-center space-x-2 pl-0 hover:bg-transparent"
-          onClick={() => navigateToFolder(null)}
-        >
-          <HomeIcon className="h-4 w-4" />
-          <span>Home</span>
-        </Button>
-      </div>
-
-      {isFoldersLoading ? (
-        <div className="mt-6 flex justify-center">
-          <Loader2 className="h-8 w-8 animate-spin text-gray-400" />
+      <div className="flex w-full items-center justify-between">
+        <div className="flex flex-1 items-center">
+          <Button
+            variant="ghost"
+            size="sm"
+            className="flex items-center space-x-2 pl-0 hover:bg-transparent"
+            onClick={() => navigateToFolder(null)}
+          >
+            <HomeIcon className="h-4 w-4" />
+            <span>Home</span>
+          </Button>
         </div>
-      ) : (
-        <>
-          {foldersData?.folders?.some((folder) => folder.pinned) && (
-            <div className="mt-6">
-              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
-                {foldersData.folders
-                  .filter((folder) => folder.pinned)
+
+        <div className="flex flex-col gap-y-4 sm:flex-row sm:justify-end sm:gap-x-4">
+          <TemplateFolderCreateDialog />
+        </div>
+      </div>
+
+      <div className="mt-6">
+        {isFoldersLoading ? (
+          <div className="mt- flex justify-center">
+            <Loader2 className="text-muted-foreground h-8 w-8 animate-spin" />
+          </div>
+        ) : (
+          <>
+            {foldersData?.folders?.some((folder) => folder.pinned) && (
+              <div className="mt-6">
+                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
+                  {foldersData.folders
+                    .filter((folder) => folder.pinned)
+                    .map((folder) => (
+                      <FolderCard
+                        key={folder.id}
+                        folder={folder}
+                        onNavigate={navigateToFolder}
+                        onMove={(folder) => {
+                          setFolderToMove(folder);
+                          setIsMovingFolder(true);
+                        }}
+                        onPin={(folderId) => void pinFolder({ folderId })}
+                        onUnpin={(folderId) => void unpinFolder({ folderId })}
+                        onSettings={(folder) => {
+                          setFolderToSettings(folder);
+                          setIsSettingsFolderOpen(true);
+                        }}
+                        onDelete={(folder) => {
+                          setFolderToDelete(folder);
+                          setIsDeletingFolder(true);
+                        }}
+                      />
+                    ))}
+                </div>
+              </div>
+            )}
+
+            <div className="mt-12">
+              <h1 className="truncate text-2xl font-semibold md:text-3xl">
+                <Trans>All Folders</Trans>
+              </h1>
+
+              <div className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
+                {foldersData?.folders
+                  .filter((folder) => !folder.pinned)
                   .map((folder) => (
                     <FolderCard
                       key={folder.id}
@@ -99,40 +136,9 @@ export default function TemplatesFoldersPage() {
                   ))}
               </div>
             </div>
-          )}
-
-          <div className="mt-6">
-            <h3 className="text-muted-background/60 dark:text-muted-foreground/60 mb-4 text-sm font-medium">
-              All Folders
-            </h3>
-            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
-              {foldersData?.folders
-                .filter((folder) => !folder.pinned)
-                .map((folder) => (
-                  <FolderCard
-                    key={folder.id}
-                    folder={folder}
-                    onNavigate={navigateToFolder}
-                    onMove={(folder) => {
-                      setFolderToMove(folder);
-                      setIsMovingFolder(true);
-                    }}
-                    onPin={(folderId) => void pinFolder({ folderId })}
-                    onUnpin={(folderId) => void unpinFolder({ folderId })}
-                    onSettings={(folder) => {
-                      setFolderToSettings(folder);
-                      setIsSettingsFolderOpen(true);
-                    }}
-                    onDelete={(folder) => {
-                      setFolderToDelete(folder);
-                      setIsDeletingFolder(true);
-                    }}
-                  />
-                ))}
-            </div>
-          </div>
-        </>
-      )}
+          </>
+        )}
+      </div>
 
       <TemplateFolderMoveDialog
         foldersData={foldersData?.folders}

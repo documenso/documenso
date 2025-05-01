@@ -78,7 +78,7 @@ export const TemplateFolderCreateDialog = ({
       setIsCreateFolderOpen(false);
 
       toast({
-        title: 'Folder created successfully',
+        description: _(msg`Folder created successfully`),
       });
 
       const templatesPath = formatTemplatesPath(team?.url);
@@ -89,7 +89,7 @@ export const TemplateFolderCreateDialog = ({
 
       if (error.code === AppErrorCode.ALREADY_EXISTS) {
         toast({
-          title: 'Failed to create folder',
+          title: _(msg`Failed to create folder`),
           description: _(msg`This folder name is already taken.`),
           variant: 'destructive',
         });
@@ -98,7 +98,7 @@ export const TemplateFolderCreateDialog = ({
       }
 
       toast({
-        title: 'Failed to create folder',
+        title: _(msg`Failed to create folder`),
         description: _(msg`An unknown error occurred while creating the folder.`),
         variant: 'destructive',
       });
@@ -121,6 +121,7 @@ export const TemplateFolderCreateDialog = ({
           </Button>
         )}
       </DialogTrigger>
+
       <DialogContent>
         <DialogHeader>
           <DialogTitle>Create New Folder</DialogTitle>
@@ -128,6 +129,7 @@ export const TemplateFolderCreateDialog = ({
             Enter a name for your new folder. Folders help you organize your templates.
           </DialogDescription>
         </DialogHeader>
+
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
             <FormField
@@ -143,8 +145,13 @@ export const TemplateFolderCreateDialog = ({
                 </FormItem>
               )}
             />
+
             <DialogFooter>
-              <Button variant="secondary" onClick={() => setIsCreateFolderOpen(false)}>
+              <Button
+                type="button"
+                variant="secondary"
+                onClick={() => setIsCreateFolderOpen(false)}
+              >
                 Cancel
               </Button>
               <Button type="submit">Create</Button>

@@ -86,58 +86,43 @@ export default function TemplatesPage() {
 
   return (
     <div className="mx-auto max-w-screen-xl px-4 md:px-8">
-      <div className="flex items-baseline justify-between">
-        <div className="flex flex-row items-center">
-          {team && (
-            <Avatar className="dark:border-border mr-3 h-12 w-12 border-2 border-solid border-white">
-              {team.avatarImageId && <AvatarImage src={formatAvatarUrl(team.avatarImageId)} />}
-              <AvatarFallback className="text-xs text-gray-400">
-                {team.name.slice(0, 1)}
-              </AvatarFallback>
-            </Avatar>
-          )}
+      <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+        <div className="flex flex-1 items-center">
+          <Button
+            variant="ghost"
+            size="sm"
+            className="flex items-center space-x-2 pl-0 hover:bg-transparent"
+            onClick={() => navigateToFolder()}
+          >
+            <HomeIcon className="h-4 w-4" />
+            <span>Home</span>
+          </Button>
 
-          <h1 className="truncate text-2xl font-semibold md:text-3xl">
-            <Trans>Templates</Trans>
-          </h1>
+          {foldersData?.breadcrumbs.map((folder) => (
+            <div key={folder.id} className="flex items-center space-x-2">
+              <span>/</span>
+              <Button
+                variant="ghost"
+                size="sm"
+                className="flex items-center space-x-2 pl-1 hover:bg-transparent"
+                onClick={() => navigateToFolder(folder.id)}
+              >
+                <FolderIcon className="h-4 w-4" />
+                <span>{folder.name}</span>
+              </Button>
+            </div>
+          ))}
         </div>
 
-        <div className="flex items-center gap-x-2">
+        <div className="flex gap-4 sm:flex-row sm:justify-end">
           <TemplateFolderCreateDialog />
           <TemplateCreateDialog templateRootPath={templateRootPath} folderId={folderId} />
         </div>
       </div>
 
-      <div className="mt-4 flex items-center space-x-2">
-        <Button
-          variant="ghost"
-          size="sm"
-          className="text-muted-foreground hover:text-foreground"
-          onClick={() => navigateToFolder()}
-        >
-          <HomeIcon className="mr-2 h-4 w-4" />
-          <Trans>Home</Trans>
-        </Button>
-
-        {foldersData?.breadcrumbs.map((folder) => (
-          <div key={folder.id} className="flex items-center space-x-2">
-            <span className="text-muted-foreground">/</span>
-            <Button
-              variant="ghost"
-              size="sm"
-              className="text-muted-foreground hover:text-foreground"
-              onClick={() => navigateToFolder(folder.id)}
-            >
-              <FolderIcon className="mr-2 h-4 w-4" />
-              {folder.name}
-            </Button>
-          </div>
-        ))}
-      </div>
-
       {isFoldersLoading ? (
         <div className="mt-6 flex justify-center">
-          <Loader2 className="h-8 w-8 animate-spin text-gray-400" />
+          <Loader2 className="text-muted-foreground h-8 w-8 animate-spin" />
         </div>
       ) : (
         <>
@@ -222,113 +207,125 @@ export default function TemplatesPage() {
             </div>
           )}
 
-          <div className="mt-6">
-            <h3 className="text-muted-background/60 dark:text-muted-foreground/60 mb-4 text-sm font-medium">
-              Folders
-            </h3>
-            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
-              {foldersData?.folders
-                .filter((folder) => !folder.pinned)
-                .map((folder) => (
-                  <div
-                    key={folder.id}
-                    className="border-border hover:border-muted-foreground/40 group relative flex flex-col rounded-lg border p-4 transition-all hover:shadow-sm"
-                  >
-                    <div className="flex items-start justify-between">
-                      <button
-                        className="flex items-center space-x-2 text-left"
-                        onClick={() => navigateToFolder(folder.id)}
-                      >
-                        <FolderIcon className="text-documenso h-6 w-6" />
-                        <div>
-                          <h3 className="font-medium">{folder.name}</h3>
-                          <div className="mt-1 flex space-x-2 text-xs text-gray-500">
-                            <span>{folder._count.templates || 0} templates</span>
-                            <span>•</span>
-                            <span>{folder._count.subfolders} folders</span>
-                          </div>
+          <div className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
+            {foldersData?.folders
+              .filter((folder) => !folder.pinned)
+              .map((folder) => (
+                <div
+                  key={folder.id}
+                  className="border-border hover:border-muted-foreground/40 group relative flex flex-col rounded-lg border p-4 transition-all hover:shadow-sm"
+                >
+                  <div className="flex items-start justify-between">
+                    <button
+                      className="flex items-center space-x-2 text-left"
+                      onClick={() => navigateToFolder(folder.id)}
+                    >
+                      <FolderIcon className="text-documenso h-6 w-6" />
+                      <div>
+                        <h3 className="font-medium">{folder.name}</h3>
+                        <div className="mt-1 flex space-x-2 text-xs text-gray-500">
+                          <span>{folder._count.templates || 0} templates</span>
+                          <span>•</span>
+                          <span>{folder._count.subfolders} folders</span>
                         </div>
-                      </button>
+                      </div>
+                    </button>
 
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            className="opacity-0 group-hover:opacity-100"
-                          >
-                            •••
-                          </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end">
-                          <DropdownMenuItem
-                            onClick={() => {
-                              setFolderToMove(folder);
-                              setIsMovingFolder(true);
-                            }}
-                          >
-                            Move
-                          </DropdownMenuItem>
-                          <DropdownMenuItem
-                            onClick={() => {
-                              void pinFolder({ folderId: folder.id });
-                            }}
-                          >
-                            Pin
-                          </DropdownMenuItem>
-                          <DropdownMenuItem
-                            onClick={() => {
-                              setFolderToSettings(folder);
-                              setIsSettingsFolderOpen(true);
-                            }}
-                          >
-                            Settings
-                          </DropdownMenuItem>
-                          <DropdownMenuItem
-                            className="text-red-500"
-                            onClick={() => {
-                              setFolderToDelete(folder);
-                              setIsDeletingFolder(true);
-                            }}
-                          >
-                            Delete
-                          </DropdownMenuItem>
-                        </DropdownMenuContent>
-                      </DropdownMenu>
-                    </div>
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="opacity-0 group-hover:opacity-100"
+                        >
+                          •••
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="end">
+                        <DropdownMenuItem
+                          onClick={() => {
+                            setFolderToMove(folder);
+                            setIsMovingFolder(true);
+                          }}
+                        >
+                          Move
+                        </DropdownMenuItem>
+                        <DropdownMenuItem
+                          onClick={() => {
+                            void pinFolder({ folderId: folder.id });
+                          }}
+                        >
+                          Pin
+                        </DropdownMenuItem>
+                        <DropdownMenuItem
+                          onClick={() => {
+                            setFolderToSettings(folder);
+                            setIsSettingsFolderOpen(true);
+                          }}
+                        >
+                          Settings
+                        </DropdownMenuItem>
+                        <DropdownMenuItem
+                          className="text-red-500"
+                          onClick={() => {
+                            setFolderToDelete(folder);
+                            setIsDeletingFolder(true);
+                          }}
+                        >
+                          Delete
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
                   </div>
-                ))}
-            </div>
+                </div>
+              ))}
           </div>
         </>
       )}
 
-      <div className="relative mt-5">
-        {data && data.count === 0 ? (
-          <div className="text-muted-foreground/60 flex h-96 flex-col items-center justify-center gap-y-4">
-            <Bird className="h-12 w-12" strokeWidth={1.5} />
+      <div className="relative mt-12">
+        <div className="flex flex-row items-center">
+          {team && (
+            <Avatar className="dark:border-border mr-3 h-12 w-12 border-2 border-solid border-white">
+              {team.avatarImageId && <AvatarImage src={formatAvatarUrl(team.avatarImageId)} />}
+              <AvatarFallback className="text-muted-foreground text-xs">
+                {team.name.slice(0, 1)}
+              </AvatarFallback>
+            </Avatar>
+          )}
 
-            <div className="text-center">
-              <h3 className="text-lg font-semibold">
-                <Trans>We're all empty</Trans>
-              </h3>
+          <h1 className="truncate text-2xl font-semibold md:text-3xl">
+            <Trans>Templates</Trans>
+          </h1>
+        </div>
 
-              <p className="mt-2 max-w-[50ch]">
-                <Trans>
-                  You have not yet created any templates. To create a template please upload one.
-                </Trans>
-              </p>
+        <div className="mt-8">
+          {data && data.count === 0 ? (
+            <div className="text-muted-foreground/60 flex h-96 flex-col items-center justify-center gap-y-4">
+              <Bird className="h-12 w-12" strokeWidth={1.5} />
+
+              <div className="text-center">
+                <h3 className="text-lg font-semibold">
+                  <Trans>We're all empty</Trans>
+                </h3>
+
+                <p className="mt-2 max-w-[50ch]">
+                  <Trans>
+                    You have not yet created any templates. To create a template please upload one.
+                  </Trans>
+                </p>
+              </div>
             </div>
-          </div>
-        ) : (
-          <TemplatesTable
-            data={data}
-            isLoading={isLoading}
-            isLoadingError={isLoadingError}
-            documentRootPath={documentRootPath}
-            templateRootPath={templateRootPath}
-          />
-        )}
+          ) : (
+            <TemplatesTable
+              data={data}
+              isLoading={isLoading}
+              isLoadingError={isLoadingError}
+              documentRootPath={documentRootPath}
+              templateRootPath={templateRootPath}
+            />
+          )}
+        </div>
       </div>
 
       <FolderMoveDialog

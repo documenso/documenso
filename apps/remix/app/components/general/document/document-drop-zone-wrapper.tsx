@@ -144,10 +144,10 @@ export const DocumentDropZoneWrapper = ({ children, className }: DocumentDropZon
       {children}
 
       {isDragActive && (
-        <div className="bg-muted/60 absolute inset-0 z-50 backdrop-blur-[4px]">
-          <div className="pointer-events-none flex h-1/2 w-full flex-col items-center justify-center">
+        <div className="bg-muted/60 fixed left-0 top-0 z-[9999] h-full w-full backdrop-blur-[4px]">
+          <div className="pointer-events-none flex h-full w-full flex-col items-center justify-center">
             <h2 className="text-foreground text-2xl font-semibold">
-              <Trans>Add a document</Trans>
+              <Trans>Upload Document</Trans>
             </h2>
 
             <p className="text-muted-foreground text-md mt-4">

@@ -143,40 +143,43 @@ export default function DocumentsPage() {
   return (
     <DocumentDropZoneWrapper>
       <div className="mx-auto w-full max-w-screen-xl px-4 md:px-8">
-        <div className="flex flex-col gap-y-4 pb-8 sm:flex-row sm:gap-x-4">
-          <DocumentUploadDropzone />
-          <CreateFolderDialog />
+        <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+          <div className="flex flex-1 items-center">
+            <Button
+              variant="ghost"
+              size="sm"
+              className="flex items-center space-x-2 pl-0 hover:bg-transparent"
+              onClick={() => navigateToFolder(null)}
+            >
+              <HomeIcon className="h-4 w-4" />
+              <span>Home</span>
+            </Button>
+
+            {foldersData?.breadcrumbs.map((folder) => (
+              <div key={folder.id} className="flex items-center space-x-2">
+                <span>/</span>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="flex items-center space-x-2 pl-1 hover:bg-transparent"
+                  onClick={() => navigateToFolder(folder.id)}
+                >
+                  <FolderIcon className="h-4 w-4" />
+                  <span>{folder.name}</span>
+                </Button>
+              </div>
+            ))}
+          </div>
+
+          <div className="flex gap-4 sm:flex-row sm:justify-end">
+            <DocumentUploadDropzone />
+            <CreateFolderDialog />
+          </div>
         </div>
 
-        <div className="mt-6 flex items-center">
-          <Button
-            variant="ghost"
-            size="sm"
-            className="flex items-center space-x-2 pl-0 hover:bg-transparent"
-            onClick={() => navigateToFolder(null)}
-          >
-            <HomeIcon className="h-4 w-4" />
-            <span>Home</span>
-          </Button>
-
-          {foldersData?.breadcrumbs.map((folder) => (
-            <div key={folder.id} className="flex items-center space-x-2">
-              <span>/</span>
-              <Button
-                variant="ghost"
-                size="sm"
-                className="flex items-center space-x-2 pl-1 hover:bg-transparent"
-                onClick={() => navigateToFolder(folder.id)}
-              >
-                <FolderIcon className="h-4 w-4" />
-                <span>{folder.name}</span>
-              </Button>
-            </div>
-          ))}
-        </div>
         {isFoldersLoading ? (
           <div className="mt-6 flex justify-center">
-            <Loader2 className="h-8 w-8 animate-spin text-gray-400" />
+            <Loader2 className="text-muted-foreground h-8 w-8 animate-spin" />
           </div>
         ) : (
           <>
@@ -211,21 +214,6 @@ export default function DocumentsPage() {
             )}
 
             <div className="mt-6">
-              <div className="flex items-center justify-between">
-                <h3 className="text-muted-background/60 dark:text-muted-foreground/60 mb-4 text-sm font-medium">
-                  Folders
-                </h3>
-                {foldersData && foldersData.folders?.length > 12 && (
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    className="text-muted-foreground hover:text-foreground"
-                    onClick={() => void handleViewAllFolders()}
-                  >
-                    View all folders
-                  </Button>
-                )}
-              </div>
               <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
                 {foldersData?.folders
                   ?.filter((folder) => !folder.pinned)
@@ -252,6 +240,19 @@ export default function DocumentsPage() {
                     />
                   ))}
               </div>
+
+              <div className="mt-6 flex items-center justify-center">
+                {foldersData && foldersData.folders?.length > 12 && (
+                  <Button
+                    variant="link"
+                    size="sm"
+                    className="text-muted-foreground hover:text-foreground"
+                    onClick={() => void handleViewAllFolders()}
+                  >
+                    View all folders
+                  </Button>
+                )}
+              </div>
             </div>
           </>
         )}
@@ -261,7 +262,7 @@ export default function DocumentsPage() {
             {team && (
               <Avatar className="dark:border-border mr-3 h-12 w-12 border-2 border-solid border-white">
                 {team.avatarImageId && <AvatarImage src={formatAvatarUrl(team.avatarImageId)} />}
-                <AvatarFallback className="text-xs text-gray-400">
+                <AvatarFallback className="text-muted-foreground text-xs">
                   {team.name.slice(0, 1)}
                 </AvatarFallback>
               </Avatar>

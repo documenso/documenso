@@ -27,8 +27,9 @@ export function meta() {
 }
 
 export default function TemplatesPage() {
-  const [searchParams] = useSearchParams();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+
   const [isMovingFolder, setIsMovingFolder] = useState(false);
   const [folderToMove, setFolderToMove] = useState<TFolderWithSubfolders | null>(null);
   const [isDeletingFolder, setIsDeletingFolder] = useState(false);
@@ -109,58 +110,43 @@ export default function TemplatesPage() {
 
   return (
     <div className="mx-auto max-w-screen-xl px-4 md:px-8">
-      <div className="flex items-baseline justify-between">
-        <div className="flex flex-row items-center">
-          {team && (
-            <Avatar className="dark:border-border mr-3 h-12 w-12 border-2 border-solid border-white">
-              {team.avatarImageId && <AvatarImage src={formatAvatarUrl(team.avatarImageId)} />}
-              <AvatarFallback className="text-xs text-gray-400">
-                {team.name.slice(0, 1)}
-              </AvatarFallback>
-            </Avatar>
-          )}
+      <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+        <div className="flex flex-1 items-center">
+          <Button
+            variant="ghost"
+            size="sm"
+            className="flex items-center space-x-2 pl-0 hover:bg-transparent"
+            onClick={() => navigateToFolder(null)}
+          >
+            <HomeIcon className="h-4 w-4" />
+            <span>Home</span>
+          </Button>
 
-          <h1 className="truncate text-2xl font-semibold md:text-3xl">
-            <Trans>Templates</Trans>
-          </h1>
+          {foldersData?.breadcrumbs.map((folder) => (
+            <div key={folder.id} className="flex items-center space-x-2">
+              <span>/</span>
+              <Button
+                variant="ghost"
+                size="sm"
+                className="flex items-center space-x-2 pl-1 hover:bg-transparent"
+                onClick={() => navigateToFolder(folder.id)}
+              >
+                <FolderIcon className="h-4 w-4" />
+                <span>{folder.name}</span>
+              </Button>
+            </div>
+          ))}
         </div>
 
-        <div className="flex items-center space-x-2">
-          <TemplateFolderCreateDialog />
+        <div className="flex gap-4 sm:flex-row sm:justify-end">
           <TemplateCreateDialog templateRootPath={templateRootPath} />
+          <TemplateFolderCreateDialog />
         </div>
-      </div>
-
-      <div className="mt-6 flex items-center">
-        <Button
-          variant="ghost"
-          size="sm"
-          className="flex items-center space-x-2 pl-0 hover:bg-transparent"
-          onClick={() => navigateToFolder(null)}
-        >
-          <HomeIcon className="h-4 w-4" />
-          <span>Home</span>
-        </Button>
-
-        {foldersData?.breadcrumbs.map((folder) => (
-          <div key={folder.id} className="flex items-center space-x-2">
-            <span>/</span>
-            <Button
-              variant="ghost"
-              size="sm"
-              className="flex items-center space-x-2 pl-1 hover:bg-transparent"
-              onClick={() => navigateToFolder(folder.id)}
-            >
-              <FolderIcon className="h-4 w-4" />
-              <span>{folder.name}</span>
-            </Button>
-          </div>
-        ))}
       </div>
 
       {isFoldersLoading ? (
         <div className="mt-6 flex justify-center">
-          <Loader2 className="h-8 w-8 animate-spin text-gray-400" />
+          <Loader2 className="text-muted-foreground h-8 w-8 animate-spin" />
         </div>
       ) : (
         <>
@@ -186,21 +172,6 @@ export default function TemplatesPage() {
           )}
 
           <div className="mt-6">
-            <div className="flex items-center justify-between">
-              <h3 className="text-muted-background/60 dark:text-muted-foreground/60 mb-4 text-sm font-medium">
-                Folders
-              </h3>
-              {foldersData && foldersData.folders?.length > 12 && (
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="text-muted-foreground hover:text-foreground"
-                  onClick={() => void handleViewAllFolders()}
-                >
-                  View all folders
-                </Button>
-              )}
-            </div>
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
               {foldersData?.folders
                 ?.filter((folder) => !folder.pinned)
@@ -218,36 +189,66 @@ export default function TemplatesPage() {
                   />
                 ))}
             </div>
+
+            <div className="mt-6 flex items-center justify-center">
+              {foldersData && foldersData.folders?.length > 12 && (
+                <Button
+                  variant="link"
+                  size="sm"
+                  className="text-muted-foreground hover:text-foreground"
+                  onClick={() => void handleViewAllFolders()}
+                >
+                  View all folders
+                </Button>
+              )}
+            </div>
           </div>
         </>
       )}
 
       <div className="mt-12">
-        {data && data.count === 0 ? (
-          <div className="text-muted-foreground/60 flex h-96 flex-col items-center justify-center gap-y-4">
-            <Bird className="h-12 w-12" strokeWidth={1.5} />
+        <div className="flex flex-row items-center">
+          {team && (
+            <Avatar className="dark:border-border mr-3 h-12 w-12 border-2 border-solid border-white">
+              {team.avatarImageId && <AvatarImage src={formatAvatarUrl(team.avatarImageId)} />}
+              <AvatarFallback className="text-muted-foreground text-xs">
+                {team.name.slice(0, 1)}
+              </AvatarFallback>
+            </Avatar>
+          )}
 
-            <div className="text-center">
-              <h3 className="text-lg font-semibold">
-                <Trans>We're all empty</Trans>
-              </h3>
+          <h1 className="truncate text-2xl font-semibold md:text-3xl">
+            <Trans>Templates</Trans>
+          </h1>
+        </div>
 
-              <p className="mt-2 max-w-[50ch]">
-                <Trans>
-                  You have not yet created any templates. To create a template please upload one.
-                </Trans>
-              </p>
+        <div className="mt-8">
+          {data && data.count === 0 ? (
+            <div className="text-muted-foreground/60 flex h-96 flex-col items-center justify-center gap-y-4">
+              <Bird className="h-12 w-12" strokeWidth={1.5} />
+
+              <div className="text-center">
+                <h3 className="text-lg font-semibold">
+                  <Trans>We're all empty</Trans>
+                </h3>
+
+                <p className="mt-2 max-w-[50ch]">
+                  <Trans>
+                    You have not yet created any templates. To create a template please upload one.
+                  </Trans>
+                </p>
+              </div>
             </div>
-          </div>
-        ) : (
-          <TemplatesTable
-            data={data}
-            isLoading={isLoading}
-            isLoadingError={isLoadingError}
-            documentRootPath={documentRootPath}
-            templateRootPath={templateRootPath}
-          />
-        )}
+          ) : (
+            <TemplatesTable
+              data={data}
+              isLoading={isLoading}
+              isLoadingError={isLoadingError}
+              documentRootPath={documentRootPath}
+              templateRootPath={templateRootPath}
+            />
+          )}
+        </div>
       </div>
 
       <TemplateFolderMoveDialog
