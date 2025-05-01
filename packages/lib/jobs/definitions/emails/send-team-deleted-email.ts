@@ -25,6 +25,7 @@ const SEND_TEAM_DELETED_EMAIL_JOB_DEFINITION_SCHEMA = z.object({
         typedSignatureEnabled: z.boolean(),
         uploadSignatureEnabled: z.boolean(),
         drawSignatureEnabled: z.boolean(),
+        allowEmbeddedAuthoring: z.boolean(),
       })
       .nullish(),
   }),

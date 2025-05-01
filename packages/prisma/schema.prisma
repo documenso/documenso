@@ -565,6 +565,8 @@ model TeamGlobalSettings {
   brandingCompanyDetails String  @default("")
   brandingHidePoweredBy  Boolean @default(false)
 
+  allowEmbeddedAuthoring Boolean @default(false)
+
   team Team @relation(fields: [teamId], references: [id], onDelete: Cascade)
 }
 
