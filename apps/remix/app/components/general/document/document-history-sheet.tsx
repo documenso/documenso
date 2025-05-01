@@ -361,6 +361,25 @@ export const DocumentHistorySheet = ({
                       ]}
                     />
                   ))
+                  .with(
+                    { type: DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_ATTACHMENTS_UPDATED },
+                    ({ data }) => (
+                      <DocumentHistorySheetChanges
+                        values={[
+                          {
+                            key: 'Old',
+                            value:
+                              data.from.map((attachment) => attachment.label).join(', ') || 'None',
+                          },
+                          {
+                            key: 'New',
+                            value:
+                              data.to.map((attachment) => attachment.label).join(', ') || 'None',
+                          },
+                        ]}
+                      />
+                    ),
+                  )
                   .exhaustive()}
 
                 {isUserDetailsVisible && (

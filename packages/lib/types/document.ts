@@ -64,6 +64,7 @@ export const ZDocumentSchema = DocumentSchema.pick({
     id: true,
     label: true,
     url: true,
+    type: true,
   })
     .array()
     .optional(),

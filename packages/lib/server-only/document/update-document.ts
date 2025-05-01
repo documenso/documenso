@@ -242,7 +242,7 @@ export const updateDocument = async ({
     );
   }
 
-  if (data.attachments) {
+  if (!isAttachmentsSame) {
     auditLogs.push(
       createDocumentAuditLogData({
         type: DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_ATTACHMENTS_UPDATED,
@@ -250,7 +250,7 @@ export const updateDocument = async ({
         metadata: requestMetadata,
         data: {
           from: document.attachments,
-          to: data.attachments,
+          to: data.attachments ?? [],
         },
       }),
     );
