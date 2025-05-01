@@ -98,6 +98,7 @@ export const ZTemplateLiteSchema = TemplateSchema.pick({
   publicTitle: true,
   publicDescription: true,
   folderId: true,
+  useLegacyFieldInsertion: true,
 });
 
 /**
@@ -118,6 +119,7 @@ export const ZTemplateManySchema = TemplateSchema.pick({
   publicTitle: true,
   publicDescription: true,
   folderId: true,
+  useLegacyFieldInsertion: true,
 }).extend({
   team: TeamSchema.pick({
     id: true,

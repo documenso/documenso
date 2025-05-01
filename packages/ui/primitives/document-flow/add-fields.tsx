@@ -3,9 +3,8 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
 import { Trans } from '@lingui/react/macro';
-import { Prisma } from '@prisma/client';
 import type { Field, Recipient } from '@prisma/client';
-import { FieldType, RecipientRole, SendStatus } from '@prisma/client';
+import { FieldType, Prisma, RecipientRole, SendStatus } from '@prisma/client';
 import {
   CalendarDays,
   CheckSquare,
@@ -38,7 +37,7 @@ import {
 } from '@documenso/lib/utils/recipients';
 
 import { FieldToolTip } from '../../components/field/field-tooltip';
-import { useSignerColors } from '../../lib/signer-colors';
+import { useRecipientColors } from '../../lib/recipient-colors';
 import { cn } from '../../lib/utils';
 import { Alert, AlertDescription } from '../alert';
 import { Card, CardContent } from '../card';
@@ -175,9 +174,10 @@ export const AddFieldsFormPartial = ({
     null,
   );
   const selectedSignerIndex = recipients.findIndex((r) => r.id === selectedSigner?.id);
-  const selectedSignerStyles = useSignerColors(
+  const selectedSignerStyles = useRecipientColors(
     selectedSignerIndex === -1 ? 0 : selectedSignerIndex,
   );
+
   const [validateUninsertedFields, setValidateUninsertedFields] = useState(false);
 
   const filterFieldsWithEmptyValues = (fields: typeof localFields, fieldType: string) =>
@@ -593,13 +593,12 @@ export const AddFieldsFormPartial = ({
               {selectedField && (
                 <div
                   className={cn(
-                    'text-muted-foreground dark:text-muted-background pointer-events-none fixed z-50 flex cursor-pointer flex-col items-center justify-center bg-white transition duration-200 [container-type:size]',
-                    selectedSignerStyles.default.base,
+                    'text-muted-foreground dark:text-muted-background pointer-events-none fixed z-50 flex cursor-pointer flex-col items-center justify-center rounded-[2px] bg-white ring-2 transition duration-200 [container-type:size]',
+                    selectedSignerStyles?.base,
                     {
                       '-rotate-6 scale-90 opacity-50 dark:bg-black/20': !isFieldWithinBounds,
                       'dark:text-black/60': isFieldWithinBounds,
                     },
-                    // selectedField === FieldType.SIGNATURE && fontCaveat.className,
                   )}
                   style={{
                     top: coords.y,
@@ -646,7 +645,6 @@ export const AddFieldsFormPartial = ({
                         setCurrentField(field);
                         handleAdvancedSettings();
                       }}
-                      hideRecipients={hideRecipients}
                       hasErrors={!!hasFieldError}
                       active={activeFieldId === field.formId}
                       onFieldActivate={() => setActiveFieldId(field.formId)}
@@ -677,7 +675,6 @@ export const AddFieldsFormPartial = ({
                       <Card
                         className={cn(
                           'flex h-full w-full cursor-pointer items-center justify-center group-disabled:opacity-50',
-                          // selectedSignerStyles.borderClass,
                         )}
                       >
                         <CardContent className="flex flex-col items-center justify-center px-6 py-4">
@@ -702,7 +699,6 @@ export const AddFieldsFormPartial = ({
                       <Card
                         className={cn(
                           'flex h-full w-full cursor-pointer items-center justify-center group-disabled:opacity-50',
-                          // selectedSignerStyles.borderClass,
                         )}
                       >
                         <CardContent className="flex flex-col items-center justify-center px-6 py-4">
@@ -728,7 +724,6 @@ export const AddFieldsFormPartial = ({
                       <Card
                         className={cn(
                           'flex h-full w-full cursor-pointer items-center justify-center group-disabled:opacity-50',
-                          // selectedSignerStyles.borderClass,
                         )}
                       >
                         <CardContent className="flex flex-col items-center justify-center px-6 py-4">
@@ -754,7 +749,6 @@ export const AddFieldsFormPartial = ({
                       <Card
                         className={cn(
                           'flex h-full w-full cursor-pointer items-center justify-center group-disabled:opacity-50',
-                          // selectedSignerStyles.borderClass,
                         )}
                       >
                         <CardContent className="p-4">
@@ -780,7 +774,6 @@ export const AddFieldsFormPartial = ({
                       <Card
                         className={cn(
                           'flex h-full w-full cursor-pointer items-center justify-center group-disabled:opacity-50',
-                          // selectedSignerStyles.borderClass,
                         )}
                       >
                         <CardContent className="p-4">
@@ -806,7 +799,6 @@ export const AddFieldsFormPartial = ({
                       <Card
                         className={cn(
                           'flex h-full w-full cursor-pointer items-center justify-center group-disabled:opacity-50',
-                          // selectedSignerStyles.borderClass,
                         )}
                       >
                         <CardContent className="p-4">
@@ -832,7 +824,6 @@ export const AddFieldsFormPartial = ({
                       <Card
                         className={cn(
                           'flex h-full w-full cursor-pointer items-center justify-center group-disabled:opacity-50',
-                          // selectedSignerStyles.borderClass,
                         )}
                       >
                         <CardContent className="p-4">
@@ -858,7 +849,6 @@ export const AddFieldsFormPartial = ({
                       <Card
                         className={cn(
                           'flex h-full w-full cursor-pointer items-center justify-center group-disabled:opacity-50',
-                          // selectedSignerStyles.borderClass,
                         )}
                       >
                         <CardContent className="p-4">
@@ -884,7 +874,6 @@ export const AddFieldsFormPartial = ({
                       <Card
                         className={cn(
                           'flex h-full w-full cursor-pointer items-center justify-center group-disabled:opacity-50',
-                          // selectedSignerStyles.borderClass,
                         )}
                       >
                         <CardContent className="p-4">
@@ -911,7 +900,6 @@ export const AddFieldsFormPartial = ({
                       <Card
                         className={cn(
                           'flex h-full w-full cursor-pointer items-center justify-center group-disabled:opacity-50',
-                          // selectedSignerStyles.borderClass,
                         )}
                       >
                         <CardContent className="p-4">

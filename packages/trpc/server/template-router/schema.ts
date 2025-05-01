@@ -154,6 +154,7 @@ export const ZUpdateTemplateRequestSchema = z.object({
         )
         .optional(),
       type: z.nativeEnum(TemplateType).optional(),
+      useLegacyFieldInsertion: z.boolean().optional(),
     })
     .optional(),
   meta: z

@@ -13,6 +13,7 @@ import {
   ZWebhookDocumentSchema,
   mapDocumentToWebhookDocumentPayload,
 } from '../../types/webhook-payload';
+import { prefixedId } from '../../universal/id';
 import { getFileServerSide } from '../../universal/upload/get-file.server';
 import { putPdfFileServerSide } from '../../universal/upload/put-file.server';
 import { determineDocumentVisibility } from '../../utils/document-visibility';
@@ -140,6 +141,7 @@ export const createDocument = async ({
     const document = await tx.document.create({
       data: {
         title,
+        qrToken: prefixedId('qr'),
         externalId,
         documentDataId,
         userId,

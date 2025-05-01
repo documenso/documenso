@@ -98,7 +98,10 @@ export const ZDocumentLiteSchema = DocumentSchema.pick({
   teamId: true,
   templateId: true,
   folderId: true,
+  useLegacyFieldInsertion: true,
 });
+
+export type TDocumentLite = z.infer<typeof ZDocumentLiteSchema>;
 
 /**
  * A version of the document response schema when returning multiple documents at once from a single API endpoint.
@@ -121,6 +124,7 @@ export const ZDocumentManySchema = DocumentSchema.pick({
   teamId: true,
   templateId: true,
   folderId: true,
+  useLegacyFieldInsertion: true,
 }).extend({
   user: UserSchema.pick({
     id: true,
@@ -133,3 +137,5 @@ export const ZDocumentManySchema = DocumentSchema.pick({
     url: true,
   }).nullable(),
 });
+
+export type TDocumentMany = z.infer<typeof ZDocumentManySchema>;

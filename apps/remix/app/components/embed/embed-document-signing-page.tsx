@@ -20,6 +20,7 @@ import { isFieldUnsignedAndRequired } from '@documenso/lib/utils/advanced-fields
 import { validateFieldsInserted } from '@documenso/lib/utils/fields';
 import type { RecipientWithFields } from '@documenso/prisma/types/recipient-with-fields';
 import { trpc } from '@documenso/trpc/react';
+import { DocumentReadOnlyFields } from '@documenso/ui/components/document/document-read-only-fields';
 import { FieldToolTip } from '@documenso/ui/components/field/field-tooltip';
 import { Button } from '@documenso/ui/primitives/button';
 import { ElementVisible } from '@documenso/ui/primitives/element-visible';
@@ -37,7 +38,6 @@ import { ZSignDocumentEmbedDataSchema } from '../../types/embed-document-sign-sc
 import { useRequiredDocumentSigningContext } from '../general/document-signing/document-signing-provider';
 import { DocumentSigningRecipientProvider } from '../general/document-signing/document-signing-recipient-provider';
 import { DocumentSigningRejectDialog } from '../general/document-signing/document-signing-reject-dialog';
-import { DocumentReadOnlyFields } from '../general/document/document-read-only-fields';
 import { EmbedClientLoading } from './embed-client-loading';
 import { EmbedDocumentCompleted } from './embed-document-completed';
 import { EmbedDocumentFields } from './embed-document-fields';

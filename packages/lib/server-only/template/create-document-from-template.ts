@@ -11,7 +11,7 @@ import {
 } from '@prisma/client';
 import { match } from 'ts-pattern';
 
-import { nanoid } from '@documenso/lib/universal/id';
+import { nanoid, prefixedId } from '@documenso/lib/universal/id';
 import { prisma } from '@documenso/prisma';
 
 import type { SupportedLanguageCodes } from '../../constants/i18n';
@@ -372,6 +372,7 @@ export const createDocumentFromTemplate = async ({
   return await prisma.$transaction(async (tx) => {
     const document = await tx.document.create({
       data: {
+        qrToken: prefixedId('qr'),
         source: DocumentSource.TEMPLATE,
         externalId: externalId || template.externalId,
         templateId: template.id,
@@ -384,6 +385,7 @@ export const createDocumentFromTemplate = async ({
           globalActionAuth: templateAuthOptions.globalActionAuth,
         }),
         visibility: template.visibility || template.team?.teamGlobalSettings?.documentVisibility,
+        useLegacyFieldInsertion: template.useLegacyFieldInsertion ?? false,
         documentMeta: {
           create: {
             subject: override?.subject || template.templateMeta?.subject,

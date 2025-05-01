@@ -20,6 +20,7 @@ export type UpdateTemplateOptions = {
     publicTitle?: string;
     publicDescription?: string;
     type?: Template['type'];
+    useLegacyFieldInsertion?: boolean;
   };
   meta?: Partial<Omit<TemplateMeta, 'id' | 'templateId'>>;
 };
@@ -102,6 +103,7 @@ export const updateTemplate = async ({
       visibility: data?.visibility,
       publicDescription: data?.publicDescription,
       publicTitle: data?.publicTitle,
+      useLegacyFieldInsertion: data?.useLegacyFieldInsertion,
       authOptions,
       templateMeta: {
         upsert: {
