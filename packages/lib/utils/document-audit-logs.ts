@@ -388,6 +388,10 @@ export const formatDocumentAuditLogAction = (
       anonymous: msg`Document completed`,
       identified: msg`Document completed`,
     }))
+    .with({ type: DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_RESTORED }, () => ({
+      anonymous: msg`Document restored`,
+      identified: msg`${prefix} restored the document`,
+    }))
     .exhaustive();
 
   return {
