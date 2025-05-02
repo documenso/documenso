@@ -44,26 +44,34 @@ export const createTemplate = async ({
     }
   }
 
-  const folder = await prisma.folder.findFirstOrThrow({
-    where: {
-      id: folderId,
-      ...(teamId
-        ? {
-            team: {
-              id: teamId,
-              members: {
-                some: {
-                  userId,
+  if (folderId) {
+    const folder = await prisma.folder.findFirst({
+      where: {
+        id: folderId,
+        ...(teamId
+          ? {
+              team: {
+                id: teamId,
+                members: {
+                  some: {
+                    userId,
+                  },
                 },
               },
-            },
-          }
-        : {
-            userId,
-            teamId: null,
-          }),
-    },
-  });
+            }
+          : {
+              userId,
+              teamId: null,
+            }),
+      },
+    });
+
+    if (!folder) {
+      throw new AppError(AppErrorCode.NOT_FOUND, {
+        message: 'Folder not found',
+      });
+    }
+  }
 
   if (!team) {
     throw new AppError(AppErrorCode.NOT_FOUND);
