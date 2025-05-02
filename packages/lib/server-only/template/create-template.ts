@@ -73,7 +73,7 @@ export const createTemplate = async ({
     }
   }
 
-  if (!team) {
+  if (teamId && !team) {
     throw new AppError(AppErrorCode.NOT_FOUND);
   }
 
