@@ -1,5 +1,6 @@
 import { useLayoutEffect, useMemo, useState } from 'react';
 
+import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
 import { DocumentDistributionMethod, DocumentSigningOrder, SigningStatus } from '@prisma/client';
 import { redirect, useLoaderData } from 'react-router';
@@ -187,8 +188,8 @@ export default function EmbeddingAuthoringTemplateEditPage() {
       if (!configuration) {
         toast({
           variant: 'destructive',
-          title: _('Error'),
-          description: _('Please configure the document first'),
+          title: _(msg`Error`),
+          description: _(msg`Please configure the document first`),
         });
 
         return;
@@ -240,8 +241,8 @@ export default function EmbeddingAuthoringTemplateEditPage() {
       });
 
       toast({
-        title: _('Success'),
-        description: _('Document updated successfully'),
+        title: _(msg`Success`),
+        description: _(msg`Template updated successfully`),
       });
 
       // Send a message to the parent window with the template details
@@ -249,8 +250,7 @@ export default function EmbeddingAuthoringTemplateEditPage() {
         window.parent.postMessage(
           {
             type: 'template-updated',
-            // templateId: updateResult.templateId,
-            templateId: 1,
+            templateId: updateResult.templateId,
             externalId: templateExternalId,
           },
           '*',
@@ -261,8 +261,8 @@ export default function EmbeddingAuthoringTemplateEditPage() {
 
       toast({
         variant: 'destructive',
-        title: _('Error'),
-        description: _('Failed to update template'),
+        title: _(msg`Error`),
+        description: _(msg`Failed to update template`),
       });
     }
   };
