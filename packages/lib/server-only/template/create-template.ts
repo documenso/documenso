@@ -47,7 +47,7 @@ export const createTemplate = async ({
   let folder = null;
 
   if (folderId) {
-    folder = await prisma.folder.findFirstOrThrow({
+    folder = await prisma.folder.findFirst({
       where: {
         id: folderId,
         type: 'TEMPLATE',
