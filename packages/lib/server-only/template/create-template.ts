@@ -83,7 +83,7 @@ export const createTemplate = async ({
       userId,
       templateDocumentDataId,
       teamId,
-      folderId: folder.id,
+      folderId: folderId,
       templateMeta: {
         create: {
           language: team?.teamGlobalSettings?.documentLanguage,
