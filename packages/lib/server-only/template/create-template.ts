@@ -1,6 +1,7 @@
 import type { z } from 'zod';
 
 import { prisma } from '@documenso/prisma';
+import { FolderType } from '@documenso/prisma/generated/types';
 import { TemplateSchema } from '@documenso/prisma/generated/zod/modelSchema//TemplateSchema';
 import type { TCreateTemplateMutationSchema } from '@documenso/trpc/server/template-router/schema';
 
@@ -50,7 +51,7 @@ export const createTemplate = async ({
     folder = await prisma.folder.findFirst({
       where: {
         id: folderId,
-        type: 'TEMPLATE',
+        type: FolderType.TEMPLATE,
         ...(teamId
           ? {
               team: {
