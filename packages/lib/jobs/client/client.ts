@@ -74,7 +74,8 @@ export class JobClient<T extends ReadonlyArray<JobDefinition> = []> {
         };
 
         try {
-          return await eligibleJob.handler({ payload, io });
+          const result = await eligibleJob.handler({ payload, io });
+          return result;
         } catch (error) {
           console.error(`Direct job execution failed for ${options.name}:`, error);
           throw error;
