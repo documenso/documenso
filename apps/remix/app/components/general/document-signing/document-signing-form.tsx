@@ -377,7 +377,7 @@ export const DocumentSigningForm = ({
                       />
                     </div>
 
-                    {document.attachments && (
+                    {document.attachments?.length > 0 && (
                       <Accordion type="multiple" className="mt-2">
                         <AccordionItem value="attachments" className="border-none">
                           <AccordionTrigger className="text-foreground mb-2 rounded border px-3 py-2 text-left hover:bg-neutral-200/30 hover:no-underline">
