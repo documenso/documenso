@@ -27,13 +27,13 @@ services:
       # Database
       - key: NEXT_PRIVATE_DATABASE_URL
         fromDatabase:
-          name: crm-latin
-          property: postgresql://neondb_owner:npg_BazNr17utLpb@ep-restless-hat-a4hwg5pe.us-east-1.aws.neon.tech/neondb?sslmode=require
+          name: db
+          property: connectionString
 
       - key: NEXT_PRIVATE_DIRECT_DATABASE_URL
         fromDatabase:
-          name: crm-latin
-          property: postgresql://neondb_owner:npg_BazNr17utLpb@ep-restless-hat-a4hwg5pe.us-east-1.aws.neon.tech/neondb?sslmode=require
+          name: db
+          property: connectionString
 
       # URLs
       - key: NEXT_PUBLIC_WEBAPP_URL
@@ -56,9 +56,9 @@ services:
       - key: NEXT_PRIVATE_SMTP_PASSWORD
         sync: false
       - key: NEXT_PRIVATE_SMTP_FROM_NAME
-        value: 'Latin'
+        sync: false
       - key: NEXT_PRIVATE_SMTP_FROM_ADDRESS
-        value: 'saenalytics@ojabiomesias.com'
+        sync: false
 
       # Stripe
       - key: NEXT_PRIVATE_STRIPE_API_KEY
