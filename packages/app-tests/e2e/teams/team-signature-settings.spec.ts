@@ -100,7 +100,7 @@ test('[TEAMS]: check signature modes can be disabled', async ({ page }) => {
         await expect(page.getByRole('tab', { name: tab })).toBeVisible();
       } else {
         // await expect(page.getByRole('tab', { name: tab })).not.toBeVisible();
-        expect((await page.getByRole('tab', { name: tab }).count()) > 0).toBe(false);
+        await expect(page.getByRole('tab', { name: tab })).toHaveCount(0);
       }
     }
   }
