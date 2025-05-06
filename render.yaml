@@ -57,16 +57,16 @@ services:
         sync: false
 
       # Stripe
-      - key: NEXT_PRIVATE_STRIPE_API_KEY
-        sync: false
-      - key: NEXT_PRIVATE_STRIPE_WEBHOOK_SECRET
-        sync: false
+      # - key: NEXT_PRIVATE_STRIPE_API_KEY
+      #   sync: false
+      # - key: NEXT_PRIVATE_STRIPE_WEBHOOK_SECRET
+      #   sync: false
 
       # Features
-      - key: NEXT_PUBLIC_POSTHOG_KEY
-        sync: false
-      - key: NEXT_PUBLIC_FEATURE_BILLING_ENABLED
-        sync: false
+      # - key: NEXT_PUBLIC_POSTHOG_KEY
+      #   sync: false
+      # - key: NEXT_PUBLIC_FEATURE_BILLING_ENABLED
+      #   sync: false
 
       # Storage
       - key: NEXT_PUBLIC_UPLOAD_TRANSPORT
@@ -91,10 +91,10 @@ services:
         generateValue: true
 
       # Auth Optional
-      - key: NEXT_PRIVATE_GOOGLE_CLIENT_ID
-        sync: false
-      - key: NEXT_PRIVATE_GOOGLE_CLIENT_SECRET
-        sync: false
+      # - key: NEXT_PRIVATE_GOOGLE_CLIENT_ID
+      #   sync: false
+      # - key: NEXT_PRIVATE_GOOGLE_CLIENT_SECRET
+      #   sync: false
 
       # Signing
       - key: NEXT_PRIVATE_SIGNING_TRANSPORT
@@ -103,16 +103,16 @@ services:
         sync: false
       - key: NEXT_PRIVATE_SIGNING_LOCAL_FILE_PATH
         value: './cert.p12'
-      - key: NEXT_PRIVATE_SIGNING_LOCAL_FILE_CONTENTS
-        sync: false
-      - key: NEXT_PRIVATE_SIGNING_GCLOUD_HSM_KEY_PATH
-        sync: false
-      - key: NEXT_PRIVATE_SIGNING_GCLOUD_HSM_PUBLIC_CRT_FILE_PATH
-        sync: false
-      - key: NEXT_PRIVATE_SIGNING_GCLOUD_HSM_PUBLIC_CRT_FILE_CONTENTS
-        sync: false
-      - key: NEXT_PRIVATE_SIGNING_GCLOUD_APPLICATION_CREDENTIALS_CONTENTS
-        sync: false
+      # - key: NEXT_PRIVATE_SIGNING_LOCAL_FILE_CONTENTS
+      #   sync: false
+      # - key: NEXT_PRIVATE_SIGNING_GCLOUD_HSM_KEY_PATH
+      #   sync: false
+      # - key: NEXT_PRIVATE_SIGNING_GCLOUD_HSM_PUBLIC_CRT_FILE_PATH
+      #   sync: false
+      # - key: NEXT_PRIVATE_SIGNING_GCLOUD_HSM_PUBLIC_CRT_FILE_CONTENTS
+      #   sync: false
+      # - key: NEXT_PRIVATE_SIGNING_GCLOUD_APPLICATION_CREDENTIALS_CONTENTS
+      #   sync: false
 
       # SMTP Optional
       - key: NEXT_PRIVATE_SMTP_APIKEY_USER
@@ -123,16 +123,16 @@ services:
         sync: false
       - key: NEXT_PRIVATE_RESEND_API_KEY
         value: 'pepe'
-      - key: NEXT_PRIVATE_MAILCHANNELS_API_KEY
-        sync: false
-      - key: NEXT_PRIVATE_MAILCHANNELS_ENDPOINT
-        sync: false
-      - key: NEXT_PRIVATE_MAILCHANNELS_DKIM_DOMAIN
-        sync: false
-      - key: NEXT_PRIVATE_MAILCHANNELS_DKIM_SELECTOR
-        sync: false
-      - key: NEXT_PRIVATE_MAILCHANNELS_DKIM_PRIVATE_KEY
-        sync: false
+      # - key: NEXT_PRIVATE_MAILCHANNELS_API_KEY
+      #   sync: false
+      # - key: NEXT_PRIVATE_MAILCHANNELS_ENDPOINT
+      #   sync: false
+      # - key: NEXT_PRIVATE_MAILCHANNELS_DKIM_DOMAIN
+      #   sync: false
+      # - key: NEXT_PRIVATE_MAILCHANNELS_DKIM_SELECTOR
+      #   sync: false
+      # - key: NEXT_PRIVATE_MAILCHANNELS_DKIM_PRIVATE_KEY
+      #   sync: false
       - key: NEXT_PUBLIC_DOCUMENT_SIZE_UPLOAD_LIMIT
         value: '20'
 
