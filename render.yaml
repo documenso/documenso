@@ -71,8 +71,8 @@ services:
       # Storage
       - key: NEXT_PUBLIC_UPLOAD_TRANSPORT
         value: 's3'
-      - key: NEXT_PRIVATE_UPLOAD_ENDPOINT
-        sync: false
+      # - key: NEXT_PRIVATE_UPLOAD_ENDPOINT
+      #   sync: false
       - key: NEXT_PRIVATE_UPLOAD_FORCE_PATH_STYLE
         sync: false
       - key: NEXT_PRIVATE_UPLOAD_REGION
@@ -99,8 +99,8 @@ services:
       # Signing
       - key: NEXT_PRIVATE_SIGNING_TRANSPORT
         sync: false
-      - key: NEXT_PRIVATE_SIGNING_PASSPHRASE
-        sync: false
+      # - key: NEXT_PRIVATE_SIGNING_PASSPHRASE
+      #   sync: false
       - key: NEXT_PRIVATE_SIGNING_LOCAL_FILE_PATH
         value: './cert.p12'
       # - key: NEXT_PRIVATE_SIGNING_LOCAL_FILE_CONTENTS
@@ -119,8 +119,8 @@ services:
         value: 'pepe'
       - key: NEXT_PRIVATE_SMTP_APIKEY
         sync: false
-      - key: NEXT_PRIVATE_SMTP_SECURE
-        sync: false
+      # - key: NEXT_PRIVATE_SMTP_SECURE
+      #   sync: false
       - key: NEXT_PRIVATE_RESEND_API_KEY
         value: 'pepe'
       # - key: NEXT_PRIVATE_MAILCHANNELS_API_KEY
