@@ -5,7 +5,7 @@
   "scripts": {
     "dev": "next dev -p 3003",
     "build": "next build",
-    "start": "next start",
+    "start": "next start -p 3003",
     "lint:fix": "next lint --fix",
     "clean": "rimraf .next && rimraf node_modules"
   },
