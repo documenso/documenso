@@ -29,10 +29,10 @@ export const signWithLocalCert = async ({ pdf }: SignWithLocalCertOptions) => {
   if (localFileContents) {
     cert = Buffer.from(localFileContents, 'base64');
   }
-
+  console.log('cert pepe', cert);
   if (!cert) {
     let certPath = env('NEXT_PRIVATE_SIGNING_LOCAL_FILE_PATH') || '/opt/documenso/cert.p12';
-
+    console.log('certPath', certPath);
     // We don't want to make the development server suddenly crash when using the `dx` script
     // so we retain this when NODE_ENV isn't set to production which it should be in most production
     // deployments.
