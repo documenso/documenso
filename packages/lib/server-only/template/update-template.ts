@@ -1,4 +1,4 @@
-import type { DocumentVisibility, Template, TemplateMeta } from '@prisma/client';
+import type { Attachment, DocumentVisibility, Template, TemplateMeta } from '@prisma/client';
 
 import { isUserEnterprise } from '@documenso/ee/server-only/util/is-document-enterprise';
 import { prisma } from '@documenso/prisma';
@@ -21,6 +21,7 @@ export type UpdateTemplateOptions = {
     publicDescription?: string;
     type?: Template['type'];
     useLegacyFieldInsertion?: boolean;
+    attachments?: Pick<Attachment, 'id' | 'label' | 'url'>[];
   };
   meta?: Partial<Omit<TemplateMeta, 'id' | 'templateId'>>;
 };
@@ -53,6 +54,7 @@ export const updateTemplate = async ({
     },
     include: {
       templateMeta: true,
+      attachments: true,
     },
   });
 
@@ -104,6 +106,29 @@ export const updateTemplate = async ({
       publicDescription: data?.publicDescription,
       publicTitle: data?.publicTitle,
       useLegacyFieldInsertion: data?.useLegacyFieldInsertion,
+      attachments: {
+        deleteMany: {
+          templateId,
+          id: {
+            notIn: data?.attachments?.map((attachment) => attachment.id),
+          },
+        },
+        upsert: data?.attachments?.map((attachment) => ({
+          where: {
+            id: attachment.id,
+            templateId,
+          },
+          update: {
+            label: attachment.label,
+            url: attachment.url,
+          },
+          create: {
+            id: attachment.id,
+            label: attachment.label,
+            url: attachment.url,
+          },
+        })),
+      },
       authOptions,
       templateMeta: {
         upsert: {

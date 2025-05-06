@@ -124,6 +124,11 @@ export const AddTemplateSettingsFormPartial = ({
         emailSettings: ZDocumentEmailSettingsSchema.parse(template?.templateMeta?.emailSettings),
         signatureTypes: extractTeamSignatureSettings(template?.templateMeta),
       },
+      attachments: template.attachments?.map((attachment) => ({
+        ...attachment,
+        id: String(attachment.id),
+        formId: String(attachment.id),
+      })),
     },
   });
 
@@ -138,10 +143,18 @@ export const AddTemplateSettingsFormPartial = ({
 
   const onAddAttachment = () => {
     appendAttachment({
+      id: nanoid(12),
       formId: nanoid(12),
       label: '',
-      link: '',
+      url: '',
     });
+  };
+
+  const onRemoveAttachment = (index: number) => {
+    removeAttachment(index);
+
+    const updatedAttachments = attachments.filter((_, idx) => idx !== index);
+    form.setValue('attachments', updatedAttachments);
   };
 
   const { stepIndex, currentStep, totalSteps, previousStep } = useStep();
@@ -622,7 +635,7 @@ export const AddTemplateSettingsFormPartial = ({
                         <div className="flex-1">
                           <FormField
                             control={form.control}
-                            name={`attachments.${index}.link`}
+                            name={`attachments.${index}.url`}
                             render={({ field }) => (
                               <FormItem>
                                 <FormLabel className="flex flex-row items-center">
@@ -641,7 +654,7 @@ export const AddTemplateSettingsFormPartial = ({
 
                         <div className="flex-none pt-8">
                           <button
-                            onClick={() => removeAttachment(index)}
+                            onClick={() => onRemoveAttachment(index)}
                             className="hover:bg-muted rounded-md"
                           >
                             <Trash className="h-4 w-4" />

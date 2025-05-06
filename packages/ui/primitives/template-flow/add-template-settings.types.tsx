@@ -13,6 +13,7 @@ import {
 } from '@documenso/lib/types/document-auth';
 import { ZDocumentEmailSettingsSchema } from '@documenso/lib/types/document-email';
 import { isValidRedirectUrl } from '@documenso/lib/utils/is-valid-redirect-url';
+import { AttachmentSchema } from '@documenso/prisma/generated/zod/modelSchema/AttachmentSchema';
 import {
   ZDocumentMetaDateFormatSchema,
   ZDocumentMetaTimezoneSchema,
@@ -55,13 +56,16 @@ export const ZAddTemplateSettingsFormSchema = z.object({
       message: msg`At least one signature type must be enabled`.id,
     }),
   }),
-  attachments: z.array(
-    z.object({
+  attachments: AttachmentSchema.pick({
+    id: true,
+    label: true,
+    url: true,
+  })
+    .extend({
       formId: z.string().min(1),
-      label: z.string(),
-      link: z.string(),
-    }),
-  ),
+    })
+    .array()
+    .optional(),
 });
 
 export type TAddTemplateSettingsFormSchema = z.infer<typeof ZAddTemplateSettingsFormSchema>;

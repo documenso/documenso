@@ -34,6 +34,7 @@ export const getTemplateById = async ({ id, userId, teamId }: GetTemplateByIdOpt
       templateMeta: true,
       recipients: true,
       fields: true,
+      attachments: true,
       user: {
         select: {
           id: true,
