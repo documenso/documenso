@@ -26,14 +26,10 @@ services:
 
       # Database
       - key: NEXT_PRIVATE_DATABASE_URL
-        fromDatabase:
-          name: db
-          property: connectionString
+        sync: false
 
       - key: NEXT_PRIVATE_DIRECT_DATABASE_URL
-        fromDatabase:
-          name: db
-          property: connectionString
+        sync: false
 
       # URLs
       - key: NEXT_PUBLIC_WEBAPP_URL
