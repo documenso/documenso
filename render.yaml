@@ -27,13 +27,13 @@ services:
       # Database
       - key: NEXT_PRIVATE_DATABASE_URL
         fromDatabase:
-          name: documenso-db
-          property: connectionString
+          name: crm-latin
+          property: postgresql://neondb_owner:npg_BazNr17utLpb@ep-restless-hat-a4hwg5pe.us-east-1.aws.neon.tech/neondb?sslmode=require
 
       - key: NEXT_PRIVATE_DIRECT_DATABASE_URL
         fromDatabase:
-          name: documenso-db
-          property: connectionString
+          name: crm-latin
+          property: postgresql://neondb_owner:npg_BazNr17utLpb@ep-restless-hat-a4hwg5pe.us-east-1.aws.neon.tech/neondb?sslmode=require
 
       # URLs
       - key: NEXT_PUBLIC_WEBAPP_URL
@@ -46,19 +46,19 @@ services:
 
       # SMTP
       - key: NEXT_PRIVATE_SMTP_TRANSPORT
-        value: 'smtp-auth'
+        value: 'resend'
       - key: NEXT_PRIVATE_SMTP_HOST
-        sync: false
+        value: 'smtp.resend.com'
       - key: NEXT_PRIVATE_SMTP_PORT
-        sync: false
+        value: '2587'
       - key: NEXT_PRIVATE_SMTP_USERNAME
-        sync: false
+        value: 'resend'
       - key: NEXT_PRIVATE_SMTP_PASSWORD
         sync: false
       - key: NEXT_PRIVATE_SMTP_FROM_NAME
-        sync: false
+        value: 'Latin'
       - key: NEXT_PRIVATE_SMTP_FROM_ADDRESS
-        sync: false
+        value: 'saenalytics@ojabiomesias.com'
 
       # Stripe
       - key: NEXT_PRIVATE_STRIPE_API_KEY
@@ -74,7 +74,7 @@ services:
 
       # Storage
       - key: NEXT_PUBLIC_UPLOAD_TRANSPORT
-        value: 'database'
+        value: 's3'
       - key: NEXT_PRIVATE_UPLOAD_ENDPOINT
         sync: false
       - key: NEXT_PRIVATE_UPLOAD_FORCE_PATH_STYLE
@@ -106,7 +106,7 @@ services:
       - key: NEXT_PRIVATE_SIGNING_PASSPHRASE
         sync: false
       - key: NEXT_PRIVATE_SIGNING_LOCAL_FILE_PATH
-        sync: false
+        value: './cert.p12'
       - key: NEXT_PRIVATE_SIGNING_LOCAL_FILE_CONTENTS
         sync: false
       - key: NEXT_PRIVATE_SIGNING_GCLOUD_HSM_KEY_PATH
@@ -120,13 +120,13 @@ services:
 
       # SMTP Optional
       - key: NEXT_PRIVATE_SMTP_APIKEY_USER
-        sync: false
+        value: 'pepe'
       - key: NEXT_PRIVATE_SMTP_APIKEY
         sync: false
       - key: NEXT_PRIVATE_SMTP_SECURE
         sync: false
       - key: NEXT_PRIVATE_RESEND_API_KEY
-        sync: false
+        value: 'pepe'
       - key: NEXT_PRIVATE_MAILCHANNELS_API_KEY
         sync: false
       - key: NEXT_PRIVATE_MAILCHANNELS_ENDPOINT
@@ -138,12 +138,12 @@ services:
       - key: NEXT_PRIVATE_MAILCHANNELS_DKIM_PRIVATE_KEY
         sync: false
       - key: NEXT_PUBLIC_DOCUMENT_SIZE_UPLOAD_LIMIT
-        sync: false
+        value: '20'
 
       # Features Optional
       - key: NEXT_PUBLIC_DISABLE_SIGNUP
         sync: false
 
 databases:
-  - name: documenso-db
+  - name: crm-latin-power
     plan: free
