@@ -1,7 +1,7 @@
 import type { HTMLAttributes } from 'react';
 
 import { Trans } from '@lingui/react/macro';
-import { Braces, CreditCard, Globe2Icon, Key, Settings2, User, Webhook } from 'lucide-react';
+import { CreditCard, Globe2Icon, Key, Settings2, User } from 'lucide-react';
 import { Link, useLocation, useParams } from 'react-router';
 
 import { IS_BILLING_ENABLED } from '@documenso/lib/constants/app';
@@ -85,7 +85,7 @@ export const TeamSettingsNavMobile = ({ className, ...props }: TeamSettingsNavMo
         </Button>
       </Link>
 
-      <Link to={tokensPath}>
+      {/* <Link to={tokensPath}>
         <Button
           variant="ghost"
           className={cn('w-full justify-start', pathname?.startsWith(tokensPath) && 'bg-secondary')}
@@ -106,7 +106,7 @@ export const TeamSettingsNavMobile = ({ className, ...props }: TeamSettingsNavMo
           <Webhook className="mr-2 h-5 w-5" />
           <Trans>Webhooks</Trans>
         </Button>
-      </Link>
+      </Link> */}
 
       {IS_BILLING_ENABLED() && (
         <Link to={billingPath}>

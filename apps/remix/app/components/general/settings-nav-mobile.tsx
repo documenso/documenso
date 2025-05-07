@@ -1,7 +1,7 @@
 import type { HTMLAttributes } from 'react';
 
 import { Trans } from '@lingui/react/macro';
-import { Braces, CreditCard, Globe2Icon, Lock, User, Users, Webhook } from 'lucide-react';
+import { CreditCard, Globe2Icon, Lock, User, Users } from 'lucide-react';
 import { Link, useLocation } from 'react-router';
 
 import { IS_BILLING_ENABLED } from '@documenso/lib/constants/app';
@@ -72,7 +72,7 @@ export const SettingsMobileNav = ({ className, ...props }: SettingsMobileNavProp
         </Button>
       </Link>
 
-      <Link to="/settings/tokens">
+      {/* <Link to="/settings/tokens">
         <Button
           variant="ghost"
           className={cn(
@@ -96,7 +96,7 @@ export const SettingsMobileNav = ({ className, ...props }: SettingsMobileNavProp
           <Webhook className="mr-2 h-5 w-5" />
           <Trans>Webhooks</Trans>
         </Button>
-      </Link>
+      </Link> */}
 
       {isBillingEnabled && (
         <Link to="/settings/billing">

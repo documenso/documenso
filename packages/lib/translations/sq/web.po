@@ -5338,8 +5338,8 @@ msgid "Text Color"
 msgstr "Ngjyra e tekstit"
 
 #: apps/remix/app/routes/_unauthenticated+/articles.signature-disclosure.tsx
-msgid "Thank you for using Documenso to perform your electronic document signing. The purpose of this disclosure is to inform you about the process, legality, and your rights regarding the use of electronic signatures on our platform. By opting to use an electronic signature, you are agreeing to the terms and conditions outlined below."
-msgstr "Faleminderit që përdorni Documenso për të kryer firmën tuaj elektronike të dokumenteve. Qëllimi i këtij zbulimi është t'ju informojë për procesin, ligjshmërinë dhe të drejtat tuaja në lidhje me përdorimin e firmave elektronike në platformën tonë. Duke zgjedhur të përdorni një firmë elektronike, ju po pranoni termat dhe kushtet e përcaktuara më poshtë."
+msgid "Thank you for using LPM to perform your electronic document signing. The purpose of this disclosure is to inform you about the process, legality, and your rights regarding the use of electronic signatures on our platform. By opting to use an electronic signature, you are agreeing to the terms and conditions outlined below."
+msgstr "Faleminderit që përdorni LPM për të kryer firmën tuaj elektronike të dokumenteve. Qëllimi i këtij zbulimi është t'ju informojë për procesin, ligjshmërinë dhe të drejtat tuaja në lidhje me përdorimin e firmave elektronike në platformën tonë. Duke zgjedhur të përdorni një firmë elektronike, ju po pranoni termat dhe kushtet e përcaktuara më poshtë."
 
 #: packages/email/template-components/template-forgot-password.tsx
 msgid "That's okay, it happens! Click the button below to reset your password."

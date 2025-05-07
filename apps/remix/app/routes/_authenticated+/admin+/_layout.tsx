@@ -1,5 +1,5 @@
 import { Trans } from '@lingui/react/macro';
-import { BarChart3, FileStack, Settings, Trophy, Users, Wallet2 } from 'lucide-react';
+import { BarChart3, FileStack, Settings, Users } from 'lucide-react';
 import { Link, Outlet, redirect, useLocation } from 'react-router';
 
 import { getSession } from '@documenso/auth/server/lib/utils/get-session';
@@ -70,7 +70,7 @@ export default function AdminLayout() {
             </Link>
           </Button>
 
-          <Button
+          {/* <Button
             variant="ghost"
             className={cn(
               'justify-start md:w-full',
@@ -96,7 +96,7 @@ export default function AdminLayout() {
               <Trophy className="mr-2 h-5 w-5" />
               <Trans>Leaderboard</Trans>
             </Link>
-          </Button>
+          </Button> */}
 
           <Button
             variant="ghost"

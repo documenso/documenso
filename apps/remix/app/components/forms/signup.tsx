@@ -278,8 +278,8 @@ export const SignUpForm = ({
 
             <p className="text-muted-foreground mt-2 text-xs md:text-sm">
               <Trans>
-                You will get notified & be able to set up your documenso public profile when we
-                launch the feature.
+                You will get notified & be able to set up your public profile when we launch the
+                feature.
               </Trans>
             </p>
           </div>

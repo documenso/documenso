@@ -29,7 +29,7 @@ export const TeamJoinEmailTemplate = ({
   const { _ } = useLingui();
   const branding = useBranding();
 
-  const previewText = msg`A team member has joined a team on Documenso`;
+  const previewText = msg`A team member has joined a team`;
 
   return (
     <Html>
@@ -60,7 +60,7 @@ export const TeamJoinEmailTemplate = ({
             <Section className="p-2 text-slate-500">
               <Text className="text-center text-lg font-medium text-black">
                 <Trans>
-                  {memberName || memberEmail} joined the team {teamName} on Documenso
+                  {memberName || memberEmail} joined the team {teamName}
                 </Trans>
               </Text>
 

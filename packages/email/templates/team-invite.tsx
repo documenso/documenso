@@ -40,7 +40,7 @@ export const TeamInviteEmailTemplate = ({
   const { _ } = useLingui();
   const branding = useBranding();
 
-  const previewText = msg`Accept invitation to join a team on Documenso`;
+  const previewText = msg`Accept invitation to join a team`;
 
   return (
     <Html>
@@ -70,7 +70,7 @@ export const TeamInviteEmailTemplate = ({
 
             <Section className="p-2 text-slate-500">
               <Text className="text-center text-lg font-medium text-black">
-                <Trans>Join {teamName} on Documenso</Trans>
+                <Trans>Join {teamName}</Trans>
               </Text>
 
               <Text className="my-1 text-center text-base">

@@ -183,7 +183,7 @@ export const sendTeamMemberInviteEmail = async ({
       name: FROM_NAME,
       address: FROM_ADDRESS,
     },
-    subject: i18n._(msg`You have been invited to join ${team.name} on Documenso`),
+    subject: i18n._(msg`You have been invited to join ${team.name}`),
     html,
     text,
   });

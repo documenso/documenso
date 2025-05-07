@@ -117,7 +117,7 @@ export default function WebhookPage() {
                     </FormControl>
 
                     <FormDescription>
-                      <Trans>The URL for Documenso to send webhook events to.</Trans>
+                      <Trans>The URL to send webhook events to.</Trans>
                     </FormDescription>
 
                     <FormMessage />
@@ -191,7 +191,7 @@ export default function WebhookPage() {
                   <FormDescription>
                     <Trans>
                       A secret that will be sent to your URL so you can verify that the request has
-                      been sent by Documenso.
+                      been sent
                     </Trans>
                   </FormDescription>
                   <FormMessage />
