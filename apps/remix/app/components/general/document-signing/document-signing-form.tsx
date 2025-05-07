@@ -388,16 +388,16 @@ export const DocumentSigningForm = ({
                             <div className="flex flex-col space-y-2">
                               {document.attachments.map((attachment, index) => (
                                 <div key={index}>
-                                  <Button variant="outline" asChild>
-                                    <Link
-                                      to={attachment.url}
-                                      target="_blank"
-                                      rel="noopener noreferrer"
-                                    >
-                                      <LinkIcon className="mr-2 h-4 w-4" />
+                                  <Link
+                                    to={attachment.url}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                  >
+                                    <div className="ml-2 flex flex-row items-center gap-2">
+                                      <LinkIcon className="h-4 w-4" />
                                       {attachment.label}
-                                    </Link>
-                                  </Button>
+                                    </div>
+                                  </Link>
                                 </div>
                               ))}
                             </div>
