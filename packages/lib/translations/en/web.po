@@ -5303,6 +5303,10 @@ msgstr "Subscribe"
 msgid "Subscription"
 msgstr "Subscription"
 
+#: apps/remix/app/routes/_authenticated+/admin+/_layout.tsx
+msgid "Subscriptions"
+msgstr "Subscriptions"
+
 #: apps/remix/app/routes/_authenticated+/admin+/documents.$id.tsx
 #: apps/remix/app/routes/embed+/v1+/authoring+/template.edit.$id.tsx
 #: apps/remix/app/routes/embed+/v1+/authoring+/document.edit.$id.tsx
