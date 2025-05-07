@@ -3240,10 +3240,6 @@ msgstr "Here you can set preferences and defaults for your team."
 msgid "Here's how it works:"
 msgstr "Here's how it works:"
 
-#: apps/remix/app/components/general/user-profile-timur.tsx
-msgid "Hey I’m Timur"
-msgstr "Hey I’m Timur"
-
 #: packages/email/templates/bulk-send-complete.tsx
 msgid "Hi {userName},"
 msgstr "Hi {userName},"
@@ -4171,10 +4167,6 @@ msgstr "Pick a number"
 #: apps/remix/app/components/general/claim-account.tsx
 msgid "Pick a password"
 msgstr "Pick a password"
-
-#: apps/remix/app/components/general/user-profile-timur.tsx
-msgid "Pick any of the following agreements below and start signing to get started"
-msgstr "Pick any of the following agreements below and start signing to get started"
 
 #: packages/ui/primitives/document-flow/field-items-advanced-settings/text-field.tsx
 #: packages/ui/primitives/document-flow/field-items-advanced-settings/number-field.tsx

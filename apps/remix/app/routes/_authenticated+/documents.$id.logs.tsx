@@ -38,8 +38,9 @@ export async function loader({ params, request }: Route.LoaderArgs) {
   const documentId = Number(id);
 
   const documentRootPath = formatDocumentsPath(team?.url);
-
+  console.log('documentId', documentId);
   if (!documentId || Number.isNaN(documentId)) {
+    console.log('Document ID is invalid or not provided');
     throw redirect(documentRootPath);
   }
 
@@ -48,14 +49,16 @@ export async function loader({ params, request }: Route.LoaderArgs) {
     userId: user.id,
     teamId: team?.id,
   }).catch(() => null);
-
+  console.log('document', document);
   if (!document || !document.documentData) {
+    console.log('Document not found or document data is null');
     throw redirect(documentRootPath);
   }
 
-  if (document.folderId) {
-    throw redirect(documentRootPath);
-  }
+  // if (document.folderId) {
+  //   console.log('Document has a folderId', document.folderId);
+  //   throw redirect(documentRootPath);
+  // }
 
   const recipients = await getRecipientsForDocument({
     documentId,
