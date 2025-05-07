@@ -22,7 +22,6 @@ export type SessionUser = Pick<
   | 'twoFactorEnabled'
   | 'roles'
   | 'signature'
-  | 'url'
   | 'customerId'
 >;
 
@@ -99,7 +98,6 @@ export const validateSessionToken = async (token: string): Promise<SessionValida
           twoFactorEnabled: true,
           roles: true,
           signature: true,
-          url: true,
           customerId: true,
         },
       },

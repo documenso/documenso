@@ -31,10 +31,12 @@ import { extractDerivedDocumentEmailSettings } from '../../types/document-email'
 import { canRecipientBeModified } from '../../utils/recipients';
 import { renderEmailWithI18N } from '../../utils/render-email-with-i18n';
 import { teamGlobalSettingsToBranding } from '../../utils/team-global-settings-to-branding';
+import { getDocumentWhereInput } from '../document/get-document-by-id';
+import { getTeamSettings } from '../team/get-team-settings';
 
 export interface SetDocumentRecipientsOptions {
   userId: number;
-  teamId?: number;
+  teamId: number;
   documentId: number;
   recipients: RecipientData[];
   requestMetadata: ApiRequestMetadata;
@@ -47,34 +49,23 @@ export const setDocumentRecipients = async ({
   recipients,
   requestMetadata,
 }: SetDocumentRecipientsOptions) => {
+  const { documentWhereInput } = await getDocumentWhereInput({
+    documentId,
+    userId,
+    teamId,
+  });
+
   const document = await prisma.document.findFirst({
-    where: {
-      id: documentId,
-      ...(teamId
-        ? {
-            team: {
-              id: teamId,
-              members: {
-                some: {
-                  userId,
-                },
-              },
-            },
-          }
-        : {
-            userId,
-            teamId: null,
-          }),
-    },
+    where: documentWhereInput,
     include: {
       fields: true,
       documentMeta: true,
-      team: {
-        include: {
-          teamGlobalSettings: true,
-        },
-      },
     },
+  });
+
+  const settings = await getTeamSettings({
+    userId,
+    teamId,
   });
 
   const user = await prisma.user.findFirstOrThrow({
@@ -303,16 +294,15 @@ export const setDocumentRecipients = async ({
           assetBaseUrl,
         });
 
-        const branding = document.team?.teamGlobalSettings
-          ? teamGlobalSettingsToBranding(document.team.teamGlobalSettings)
-          : undefined;
+        const branding = teamGlobalSettingsToBranding(settings, document.teamId);
+        const lang = document.documentMeta?.language ?? settings.documentLanguage;
 
         const [html, text] = await Promise.all([
-          renderEmailWithI18N(template, { lang: document.documentMeta?.language }),
-          renderEmailWithI18N(template, { lang: document.documentMeta?.language, plainText: true }),
+          renderEmailWithI18N(template, { lang, branding }),
+          renderEmailWithI18N(template, { lang, branding, plainText: true }),
         ]);
 
-        const i18n = await getI18nInstance(document.documentMeta?.language);
+        const i18n = await getI18nInstance(lang);
 
         await mailer.sendMail({
           to: {

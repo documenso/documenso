@@ -53,23 +53,25 @@ model User {
   avatarImageId    String?
   disabled         Boolean          @default(false)
 
-  accounts             Account[]
-  sessions             Session[]
-  documents            Document[]
-  subscriptions        Subscription[]
-  passwordResetTokens  PasswordResetToken[]
-  ownedTeams           Team[]
-  ownedPendingTeams    TeamPending[]
-  teamMembers          TeamMember[]
+  accounts            Account[]
+  sessions            Session[]
+  passwordResetTokens PasswordResetToken[]
+
+  ownedOrganisations Organisation[]
+  organisationMember OrganisationMember[]
+
+  ownedPendingTeams TeamPending[]
+
   twoFactorSecret      String?
-  twoFactorEnabled     Boolean              @default(false)
+  twoFactorEnabled     Boolean @default(false)
   twoFactorBackupCodes String?
-  url                  String?              @unique
+
+  documents Document[]
+  templates Template[]
 
   profile            UserProfile?
   verificationTokens VerificationToken[]
   apiTokens          ApiToken[]
-  templates          Template[]
   securityAuditLogs  UserSecurityAuditLog[]
   webhooks           Webhook[]
   siteSettings       SiteSettings[]
@@ -193,6 +195,9 @@ model Webhook {
   teamId        Int?
   team          Team?                  @relation(fields: [teamId], references: [id], onDelete: Cascade)
   webhookCalls  WebhookCall[]
+
+  organisationId String?
+  organisation   Organisation? @relation(fields: [organisationId], references: [id])
 }
 
 enum WebhookCallStatus {
@@ -229,6 +234,9 @@ model ApiToken {
   user      User?             @relation(fields: [userId], references: [id], onDelete: Cascade)
   teamId    Int?
   team      Team?             @relation(fields: [teamId], references: [id], onDelete: Cascade)
+
+  organisationId String?
+  organisation   Organisation? @relation(fields: [organisationId], references: [id])
 }
 
 enum SubscriptionStatus {
@@ -243,16 +251,14 @@ model Subscription {
   planId            String             @unique
   priceId           String
   periodEnd         DateTime?
-  userId            Int?
-  teamId            Int?               @unique
   createdAt         DateTime           @default(now())
   updatedAt         DateTime           @updatedAt
   cancelAtPeriodEnd Boolean            @default(false)
 
-  team Team? @relation(fields: [teamId], references: [id], onDelete: Cascade)
-  user User? @relation(fields: [userId], references: [id], onDelete: Cascade)
+  organisationId String
+  organisation   Organisation @relation(fields: [organisationId], references: [id])
 
-  @@index([userId])
+  @@index([organisationId])
 }
 
 model Account {
@@ -314,10 +320,15 @@ enum DocumentVisibility {
 
 /// @zod.import(["import { ZDocumentAuthOptionsSchema } from '@documenso/lib/types/document-auth';", "import { ZDocumentFormValuesSchema } from '@documenso/lib/types/document-form-values';"])
 model Document {
-  id             Int                 @id @default(autoincrement())
-  externalId     String? /// @zod.string.describe("A custom external ID you can use to identify the document.")
-  userId         Int /// @zod.number.describe("The ID of the user that created this document.")
-  user           User                @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id         Int     @id @default(autoincrement())
+  externalId String? /// @zod.string.describe("A custom external ID you can use to identify the document.")
+
+  userId Int /// @zod.number.describe("The ID of the user that created this document.")
+  user   User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  teamId Int
+  team   Team @relation(fields: [teamId], references: [id], onDelete: Cascade)
+
   authOptions    Json? /// [DocumentAuthOptions] @zod.custom.use(ZDocumentAuthOptionsSchema)
   formValues     Json? /// [DocumentFormValues] @zod.custom.use(ZDocumentFormValuesSchema)
   visibility     DocumentVisibility  @default(EVERYONE)
@@ -333,8 +344,6 @@ model Document {
   updatedAt      DateTime            @default(now()) @updatedAt
   completedAt    DateTime?
   deletedAt      DateTime?
-  teamId         Int?
-  team           Team?               @relation(fields: [teamId], references: [id])
   templateId     Int?
   template       Template?           @relation(fields: [templateId], references: [id], onDelete: SetNull)
   source         DocumentSource
@@ -532,20 +541,135 @@ model DocumentShareLink {
   @@unique([documentId, email])
 }
 
+model Organisation {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  name          String
+  url           String  @unique // todo: constrain
+  avatarImageId String?
+
+  customerId    String?        @unique
+  subscriptions Subscription[]
+
+  members OrganisationMember[]
+  invites OrganisationMemberInvite[]
+  groups  OrganisationGroup[]
+
+  teams Team[]
+
+  avatarImage AvatarImage? @relation(fields: [avatarImageId], references: [id], onDelete: SetNull)
+
+  ownerUserId Int
+  owner       User @relation(fields: [ownerUserId], references: [id], onDelete: Cascade)
+
+  apiTokens ApiToken[]
+  webhooks  Webhook[]
+
+  organisationGlobalSettingsId String                     @unique
+  organisationGlobalSettings   OrganisationGlobalSettings @relation(fields: [organisationGlobalSettingsId], references: [id], onDelete: Cascade)
+}
+
+model OrganisationMember {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  userId Int
+  user   User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  organisationId String
+  organisation   Organisation @relation(fields: [organisationId], references: [id], onDelete: Cascade)
+
+  organisationGroupMembers OrganisationGroupMember[]
+
+  @@unique([userId, organisationId])
+}
+
+model OrganisationMemberInvite {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+
+  email String
+  token String @unique
+
+  status OrganisationMemberInviteStatus @default(PENDING)
+
+  organisationId   String
+  organisation     Organisation           @relation(fields: [organisationId], references: [id], onDelete: Cascade)
+  organisationRole OrganisationMemberRole
+}
+
+model OrganisationGroup {
+  id   String  @id @default(cuid())
+  name String?
+
+  type             OrganisationGroupType
+  organisationRole OrganisationMemberRole
+
+  organisationId String
+  organisation   Organisation @relation(fields: [organisationId], references: [id], onDelete: Cascade)
+
+  organisationGroupMembers OrganisationGroupMember[]
+
+  teamGroups TeamGroup[]
+}
+
+model OrganisationGroupMember {
+  id String @id @default(cuid())
+
+  groupId String
+  group   OrganisationGroup @relation(fields: [groupId], references: [id], onDelete: Cascade)
+
+  organisationMember   OrganisationMember @relation(fields: [organisationMemberId], references: [id], onDelete: Cascade)
+  organisationMemberId String
+
+  @@unique([organisationMemberId, groupId])
+}
+
+model TeamGroup {
+  id String @id @default(cuid())
+
+  organisationGroupId String
+  organisationGroup   OrganisationGroup @relation(fields: [organisationGroupId], references: [id], onDelete: Cascade)
+
+  teamRole TeamMemberRole
+
+  teamId Int
+  team   Team @relation(fields: [teamId], references: [id], onDelete: Cascade)
+
+  @@unique([teamId, organisationGroupId])
+}
+
+enum OrganisationGroupType {
+  INTERNAL_ORGANISATION
+  INTERNAL_TEAM
+  CUSTOM
+}
+
+enum OrganisationMemberRole {
+  ADMIN
+  MANAGER
+  MEMBER
+}
+
 enum TeamMemberRole {
   ADMIN
   MANAGER
   MEMBER
 }
 
-enum TeamMemberInviteStatus {
+enum OrganisationMemberInviteStatus {
   ACCEPTED
   PENDING
   DECLINED
 }
 
-model TeamGlobalSettings {
-  teamId                    Int                @unique
+model OrganisationGlobalSettings {
+  id           String        @id @default(cuid())
+  organisation Organisation?
+
   documentVisibility        DocumentVisibility @default(EVERYONE)
   documentLanguage          String             @default("en")
   includeSenderDetails      Boolean            @default(true)
@@ -560,8 +684,26 @@ model TeamGlobalSettings {
   brandingUrl            String  @default("")
   brandingCompanyDetails String  @default("")
   brandingHidePoweredBy  Boolean @default(false)
+}
 
-  team Team @relation(fields: [teamId], references: [id], onDelete: Cascade)
+model TeamGlobalSettings {
+  id   String @id @default(cuid())
+  team Team?
+
+  documentVisibility        DocumentVisibility?
+  documentLanguage          String?
+  includeSenderDetails      Boolean?
+  includeSigningCertificate Boolean?
+
+  typedSignatureEnabled  Boolean?
+  uploadSignatureEnabled Boolean?
+  drawSignatureEnabled   Boolean?
+
+  brandingEnabled        Boolean?
+  brandingLogo           String?
+  brandingUrl            String?
+  brandingCompanyDetails String?
+  brandingHidePoweredBy  Boolean?
 }
 
 model Team {
@@ -570,25 +712,24 @@ model Team {
   url           String   @unique
   createdAt     DateTime @default(now())
   avatarImageId String?
-  customerId    String?  @unique
-  ownerUserId   Int
 
-  members              TeamMember[]
-  invites              TeamMemberInvite[]
-  teamEmail            TeamEmail?
-  emailVerification    TeamEmailVerification?
-  transferVerification TeamTransferVerification?
-  teamGlobalSettings   TeamGlobalSettings?
-  avatarImage          AvatarImage?              @relation(fields: [avatarImageId], references: [id], onDelete: SetNull)
+  teamEmail         TeamEmail?
+  emailVerification TeamEmailVerification?
+  avatarImage       AvatarImage?           @relation(fields: [avatarImageId], references: [id], onDelete: SetNull)
 
-  profile      TeamProfile?
-  owner        User          @relation(fields: [ownerUserId], references: [id], onDelete: Cascade)
-  subscription Subscription?
+  profile TeamProfile?
 
-  documents Document[]
-  templates Template[]
-  apiTokens ApiToken[]
-  webhooks  Webhook[]
+  organisationId String
+  organisation   Organisation @relation(fields: [organisationId], references: [id], onDelete: Cascade)
+
+  documents  Document[]
+  templates  Template[]
+  apiTokens  ApiToken[]
+  webhooks   Webhook[]
+  teamGroups TeamGroup[]
+
+  teamGlobalSettingsId String             @unique
+  teamGlobalSettings   TeamGlobalSettings @relation(fields: [teamGlobalSettingsId], references: [id], onDelete: Cascade)
 }
 
 model TeamPending {
@@ -600,18 +741,6 @@ model TeamPending {
   ownerUserId Int
 
   owner User @relation(fields: [ownerUserId], references: [id], onDelete: Cascade)
-}
-
-model TeamMember {
-  id        Int            @id @default(autoincrement())
-  teamId    Int
-  createdAt DateTime       @default(now())
-  role      TeamMemberRole
-  userId    Int
-  user      User           @relation(fields: [userId], references: [id], onDelete: Cascade)
-  team      Team           @relation(fields: [teamId], references: [id], onDelete: Cascade)
-
-  @@unique([userId, teamId])
 }
 
 model TeamEmail {
@@ -632,33 +761,6 @@ model TeamEmailVerification {
   createdAt DateTime @default(now())
 
   team Team @relation(fields: [teamId], references: [id], onDelete: Cascade)
-}
-
-model TeamTransferVerification {
-  teamId              Int      @id @unique
-  userId              Int
-  name                String
-  email               String
-  token               String   @unique
-  completed           Boolean  @default(false)
-  expiresAt           DateTime
-  createdAt           DateTime @default(now())
-  clearPaymentMethods Boolean  @default(false)
-
-  team Team @relation(fields: [teamId], references: [id], onDelete: Cascade)
-}
-
-model TeamMemberInvite {
-  id        Int                    @id @default(autoincrement())
-  teamId    Int
-  createdAt DateTime               @default(now())
-  email     String
-  status    TeamMemberInviteStatus @default(PENDING)
-  role      TeamMemberRole
-  token     String                 @unique
-  team      Team                   @relation(fields: [teamId], references: [id], onDelete: Cascade)
-
-  @@unique([teamId, email])
 }
 
 enum TemplateType {
@@ -695,8 +797,6 @@ model Template {
   externalId             String?
   type                   TemplateType       @default(PRIVATE)
   title                  String
-  userId                 Int
-  teamId                 Int?
   visibility             DocumentVisibility @default(EVERYONE)
   authOptions            Json? /// [DocumentAuthOptions] @zod.custom.use(ZDocumentAuthOptionsSchema)
   templateMeta           TemplateMeta?
@@ -706,15 +806,21 @@ model Template {
   publicTitle            String             @default("")
   publicDescription      String             @default("")
 
-  team                 Team?               @relation(fields: [teamId], references: [id], onDelete: Cascade)
-  templateDocumentData DocumentData        @relation(fields: [templateDocumentDataId], references: [id], onDelete: Cascade)
-  user                 User                @relation(fields: [userId], references: [id], onDelete: Cascade)
-  recipients           Recipient[]
-  fields               Field[]
-  directLink           TemplateDirectLink?
-  documents            Document[]
+  userId Int
+  user   User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  teamId Int
+  team   Team @relation(fields: [teamId], references: [id], onDelete: Cascade)
+
+  templateDocumentData DocumentData @relation(fields: [templateDocumentDataId], references: [id], onDelete: Cascade)
+
+  recipients Recipient[]
+  fields     Field[]
+  directLink TemplateDirectLink?
+  documents  Document[]
 
   @@unique([templateDocumentDataId])
+  @@index([userId])
 }
 
 model TemplateDirectLink {
@@ -792,6 +898,7 @@ model AvatarImage {
   id    String @id @default(cuid())
   bytes String
 
-  team Team[]
-  user User[]
+  team         Team[]
+  user         User[]
+  organisation Organisation[]
 }

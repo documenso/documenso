@@ -249,7 +249,7 @@ export default function CompletedSigningPage({ loaderData }: Route.ComponentProp
           )}
 
           {user && (
-            <Link to="/documents" className="text-documenso-700 hover:text-documenso-600 mt-2">
+            <Link to="/" className="text-documenso-700 hover:text-documenso-600 mt-2">
               <Trans>Go Back Home</Trans>
             </Link>
           )}

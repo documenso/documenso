@@ -17,6 +17,7 @@ import type { RequestMetadata } from '../../universal/extract-request-metadata';
 import { createDocumentAuditLogData } from '../../utils/document-audit-logs';
 import { renderEmailWithI18N } from '../../utils/render-email-with-i18n';
 import { teamGlobalSettingsToBranding } from '../../utils/team-global-settings-to-branding';
+import { getTeamSettings } from '../team/get-team-settings';
 
 export type SuperDeleteDocumentOptions = {
   id: number;
@@ -32,11 +33,6 @@ export const superDeleteDocument = async ({ id, requestMetadata }: SuperDeleteDo
       recipients: true,
       documentMeta: true,
       user: true,
-      team: {
-        include: {
-          teamGlobalSettings: true,
-        },
-      },
     },
   });
 
@@ -45,6 +41,11 @@ export const superDeleteDocument = async ({ id, requestMetadata }: SuperDeleteDo
       message: 'Document not found',
     });
   }
+
+  const settings = await getTeamSettings({
+    userId: document.userId,
+    teamId: document.teamId,
+  });
 
   const { status, user } = document;
 
@@ -72,20 +73,19 @@ export const superDeleteDocument = async ({ id, requestMetadata }: SuperDeleteDo
           assetBaseUrl,
         });
 
-        const branding = document.team?.teamGlobalSettings
-          ? teamGlobalSettingsToBranding(document.team.teamGlobalSettings)
-          : undefined;
+        const branding = teamGlobalSettingsToBranding(settings, document.teamId);
+        const lang = document.documentMeta?.language ?? settings.documentLanguage;
 
         const [html, text] = await Promise.all([
-          renderEmailWithI18N(template, { lang: document.documentMeta?.language, branding }),
+          renderEmailWithI18N(template, { lang, branding }),
           renderEmailWithI18N(template, {
-            lang: document.documentMeta?.language,
+            lang,
             branding,
             plainText: true,
           }),
         ]);
 
-        const i18n = await getI18nInstance(document.documentMeta?.language);
+        const i18n = await getI18nInstance(lang);
 
         await mailer.sendMail({
           to: {

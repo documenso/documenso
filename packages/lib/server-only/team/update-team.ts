@@ -5,6 +5,8 @@ import { TEAM_MEMBER_ROLE_PERMISSIONS_MAP } from '@documenso/lib/constants/teams
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import { prisma } from '@documenso/prisma';
 
+import { buildTeamWhereQuery } from '../../utils/teams';
+
 export type UpdateTeamOptions = {
   userId: number;
   teamId: number;
@@ -23,24 +25,20 @@ export const updateTeam = async ({ userId, teamId, data }: UpdateTeamOptions): P
         },
       });
 
-      if (foundPendingTeamWithUrl) {
+      const foundOrganisationWithUrl = await tx.organisation.findFirst({
+        where: {
+          url: data.url,
+        },
+      });
+
+      if (foundPendingTeamWithUrl || foundOrganisationWithUrl) {
         throw new AppError(AppErrorCode.ALREADY_EXISTS, {
           message: 'Team URL already exists.',
         });
       }
 
       const team = await tx.team.update({
-        where: {
-          id: teamId,
-          members: {
-            some: {
-              userId,
-              role: {
-                in: TEAM_MEMBER_ROLE_PERMISSIONS_MAP['MANAGE_TEAM'],
-              },
-            },
-          },
-        },
+        where: buildTeamWhereQuery(teamId, userId, TEAM_MEMBER_ROLE_PERMISSIONS_MAP['MANAGE_TEAM']),
         data: {
           url: data.url,
           name: data.name,

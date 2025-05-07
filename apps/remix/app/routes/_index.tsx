@@ -30,7 +30,7 @@ export async function loader({ request }: Route.LoaderArgs) {
 
     // Early return for no preferred team.
     if (!preferredTeamUrl || isReferrerFromTeamUrl) {
-      throw redirect('/documents');
+      throw redirect('/dashboard');
     }
 
     const teams = await getTeams({ userId: session.user.id });
@@ -38,7 +38,7 @@ export async function loader({ request }: Route.LoaderArgs) {
     const currentTeam = teams.find((team) => team.url === preferredTeamUrl);
 
     if (!currentTeam) {
-      throw redirect('/documents');
+      throw redirect('/dashboard');
     }
 
     throw redirect(formatDocumentsPath(currentTeam.url));

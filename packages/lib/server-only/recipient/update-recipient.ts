@@ -22,7 +22,7 @@ export type UpdateRecipientOptions = {
   signingOrder?: number | null;
   actionAuth?: TRecipientActionAuthTypes | null;
   userId: number;
-  teamId?: number;
+  teamId: number;
   requestMetadata?: RequestMetadata;
 };
 
@@ -43,21 +43,15 @@ export const updateRecipient = async ({
       id: recipientId,
       document: {
         id: documentId,
-        ...(teamId
-          ? {
-              team: {
-                id: teamId,
-                members: {
-                  some: {
-                    userId,
-                  },
-                },
-              },
-            }
-          : {
+        userId,
+        team: {
+          id: teamId,
+          members: {
+            some: {
               userId,
-              teamId: null,
-            }),
+            },
+          },
+        },
       },
     },
     include: {

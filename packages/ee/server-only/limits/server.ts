@@ -12,7 +12,7 @@ import { ZLimitsSchema } from './schema';
 
 export type GetServerLimitsOptions = {
   email: string;
-  teamId?: number | null;
+  teamId: number | null;
 };
 
 export const getServerLimits = async ({

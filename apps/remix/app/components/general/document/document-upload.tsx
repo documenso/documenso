@@ -20,7 +20,7 @@ import { cn } from '@documenso/ui/lib/utils';
 import { DocumentDropzone } from '@documenso/ui/primitives/document-dropzone';
 import { useToast } from '@documenso/ui/primitives/use-toast';
 
-import { useOptionalCurrentTeam } from '~/providers/team';
+import { useCurrentTeam } from '~/providers/team';
 
 export type DocumentUploadDropzoneProps = {
   className?: string;
@@ -31,7 +31,7 @@ export const DocumentUploadDropzone = ({ className }: DocumentUploadDropzoneProp
   const { toast } = useToast();
   const { user } = useSession();
 
-  const team = useOptionalCurrentTeam();
+  const team = useCurrentTeam();
 
   const navigate = useNavigate();
   const analytics = useAnalytics();

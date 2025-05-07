@@ -1,6 +1,6 @@
 export enum STRIPE_CUSTOMER_TYPE {
   INDIVIDUAL = 'individual',
-  TEAM = 'team',
+  ORGANISATION = 'organisation',
 }
 
 export enum STRIPE_PLAN_TYPE {

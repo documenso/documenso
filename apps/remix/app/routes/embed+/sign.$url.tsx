@@ -13,7 +13,7 @@ import { getFieldsForToken } from '@documenso/lib/server-only/field/get-fields-f
 import { getIsRecipientsTurnToSign } from '@documenso/lib/server-only/recipient/get-is-recipient-turn';
 import { getRecipientByToken } from '@documenso/lib/server-only/recipient/get-recipient-by-token';
 import { getRecipientsForAssistant } from '@documenso/lib/server-only/recipient/get-recipients-for-assistant';
-import { getTeamById } from '@documenso/lib/server-only/team/get-team';
+import { getTeamSettings } from '@documenso/lib/server-only/team/get-team-settings';
 import { DocumentAccessAuth } from '@documenso/lib/types/document-auth';
 import { isDocumentCompleted } from '@documenso/lib/utils/document';
 import { extractDocumentAuthMethods } from '@documenso/lib/utils/document-auth';
@@ -119,11 +119,11 @@ export async function loader({ params, request }: Route.LoaderArgs) {
         })
       : [];
 
-  const team = document.teamId
-    ? await getTeamById({ teamId: document.teamId, userId: document.userId }).catch(() => null)
-    : null;
+  const settings = await getTeamSettings({
+    teamId: document.teamId,
+  });
 
-  const hidePoweredBy = team?.teamGlobalSettings?.brandingHidePoweredBy ?? false;
+  const hidePoweredBy = settings.brandingHidePoweredBy;
 
   return superLoaderJson({
     token,

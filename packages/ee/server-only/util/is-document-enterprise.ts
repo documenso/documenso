@@ -8,7 +8,7 @@ import { getEnterprisePlanPriceIds } from '../stripe/get-enterprise-plan-prices'
 
 export type IsUserEnterpriseOptions = {
   userId: number;
-  teamId?: number;
+  teamId: number;
 };
 
 /**

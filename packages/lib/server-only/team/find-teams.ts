@@ -7,6 +7,7 @@ import type { FindResultResponse } from '../../types/search-params';
 
 export interface FindTeamsOptions {
   userId: number;
+  organisationId: string;
   query?: string;
   page?: number;
   perPage?: number;
@@ -18,6 +19,7 @@ export interface FindTeamsOptions {
 
 export const findTeams = async ({
   userId,
+  organisationId,
   query,
   page = 1,
   perPage = 10,
@@ -27,9 +29,20 @@ export const findTeams = async ({
   const orderByDirection = orderBy?.direction ?? 'desc';
 
   const whereClause: Prisma.TeamWhereInput = {
-    members: {
+    organisation: {
+      id: organisationId,
+    },
+    teamGroups: {
       some: {
-        userId,
+        organisationGroup: {
+          organisationGroupMembers: {
+            some: {
+              organisationMember: {
+                userId,
+              },
+            },
+          },
+        },
       },
     },
   };
@@ -50,9 +63,27 @@ export const findTeams = async ({
         [orderByColumn]: orderByDirection,
       },
       include: {
-        members: {
-          where: {
-            userId,
+        teamGroups: {
+          include: {
+            organisationGroup: {
+              include: {
+                organisationGroupMembers: {
+                  include: {
+                    organisationMember: {
+                      include: {
+                        user: {
+                          select: {
+                            id: true,
+                            email: true,
+                            name: true,
+                          },
+                        },
+                      },
+                    },
+                  },
+                },
+              },
+            },
           },
         },
       },
@@ -62,10 +93,9 @@ export const findTeams = async ({
     }),
   ]);
 
+  // Todo: Orgs nested group membesr thing
   const maskedData = data.map((team) => ({
     ...team,
-    currentTeamMember: team.members[0],
-    members: undefined,
   }));
 
   return {

@@ -21,6 +21,7 @@ import { getMostRecentVerificationTokenByUserId } from '@documenso/lib/server-on
 import { resetPassword } from '@documenso/lib/server-only/user/reset-password';
 import { updatePassword } from '@documenso/lib/server-only/user/update-password';
 import { verifyEmail } from '@documenso/lib/server-only/user/verify-email';
+import { alphaid } from '@documenso/lib/universal/id';
 import { env } from '@documenso/lib/utils/env';
 import { prisma } from '@documenso/prisma';
 
@@ -156,7 +157,12 @@ export const emailPasswordRoute = new Hono<HonoAuthContext>()
       });
     }
 
-    const user = await createUser({ name, email, password, signature, url });
+    const orgUrl = url || alphaid(12);
+
+    const user = await createUser({ name, email, password, signature, orgUrl }).catch((err) => {
+      console.error(err);
+      throw err;
+    });
 
     await jobsClient.triggerJob({
       name: 'send.signup.confirmation.email',

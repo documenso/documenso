@@ -2,17 +2,14 @@ import { useEffect, useState } from 'react';
 
 import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
-import { Trans } from '@lingui/react/macro';
-import { Link, useLocation, useSearchParams } from 'react-router';
+import { useLocation, useSearchParams } from 'react-router';
 
 import { useDebouncedValue } from '@documenso/lib/client-only/hooks/use-debounced-value';
 import { Input } from '@documenso/ui/primitives/input';
-import { Tabs, TabsList, TabsTrigger } from '@documenso/ui/primitives/tabs';
 
-import { TeamMemberInviteDialog } from '~/components/dialogs/team-member-invite-dialog';
+import { TeamMemberCreateDialog } from '~/components/dialogs/team-member-create-dialog';
 import { SettingsHeader } from '~/components/general/settings-header';
-import { TeamSettingsMemberInvitesTable } from '~/components/tables/team-settings-member-invites-table';
-import { TeamSettingsMembersDataTable } from '~/components/tables/team-settings-members-table';
+import { TeamMembersDataTable } from '~/components/tables/team-members-table';
 
 export default function TeamsSettingsMembersPage() {
   const { _ } = useLingui();
@@ -23,8 +20,6 @@ export default function TeamsSettingsMembersPage() {
   const [searchQuery, setSearchQuery] = useState(() => searchParams?.get('query') ?? '');
 
   const debouncedSearchQuery = useDebouncedValue(searchQuery, 500);
-
-  const currentTab = searchParams?.get('tab') === 'invites' ? 'invites' : 'members';
 
   /**
    * Handle debouncing the search query.
@@ -49,43 +44,20 @@ export default function TeamsSettingsMembersPage() {
   return (
     <div>
       <SettingsHeader
-        title={_(msg`Members`)}
-        subtitle={_(msg`Manage the members or invite new members.`)}
+        title={_(msg`Team Members`)}
+        subtitle={_(msg`Manage the members of your team.`)}
       >
-        <TeamMemberInviteDialog />
+        <TeamMemberCreateDialog />
       </SettingsHeader>
 
-      <div>
-        <div className="my-4 flex flex-row items-center justify-between space-x-4">
-          <Input
-            defaultValue={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder={_(msg`Search`)}
-          />
+      <Input
+        defaultValue={searchQuery}
+        onChange={(e) => setSearchQuery(e.target.value)}
+        placeholder={_(msg`Search`)}
+        className="mb-4"
+      />
 
-          <Tabs value={currentTab} className="flex-shrink-0 overflow-x-auto">
-            <TabsList>
-              <TabsTrigger className="min-w-[60px]" value="members" asChild>
-                <Link to={pathname ?? '/'}>
-                  <Trans>Active</Trans>
-                </Link>
-              </TabsTrigger>
-
-              <TabsTrigger className="min-w-[60px]" value="invites" asChild>
-                <Link to={`${pathname}?tab=invites`}>
-                  <Trans>Pending</Trans>
-                </Link>
-              </TabsTrigger>
-            </TabsList>
-          </Tabs>
-        </div>
-
-        {currentTab === 'invites' ? (
-          <TeamSettingsMemberInvitesTable key="invites" />
-        ) : (
-          <TeamSettingsMembersDataTable key="members" />
-        )}
-      </div>
+      <TeamMembersDataTable />
     </div>
   );
 }

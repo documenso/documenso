@@ -7,7 +7,7 @@ import { prisma } from '@documenso/prisma';
 
 export type OnSubscriptionUpdatedOptions = {
   userId?: number;
-  teamId?: number;
+  teamId: number;
   subscription: Stripe.Subscription;
 };
 

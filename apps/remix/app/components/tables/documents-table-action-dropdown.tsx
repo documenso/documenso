@@ -13,7 +13,6 @@ import {
   EyeIcon,
   Loader,
   MoreHorizontal,
-  MoveRight,
   Pencil,
   Share,
   Trash2,
@@ -37,10 +36,9 @@ import { useToast } from '@documenso/ui/primitives/use-toast';
 
 import { DocumentDeleteDialog } from '~/components/dialogs/document-delete-dialog';
 import { DocumentDuplicateDialog } from '~/components/dialogs/document-duplicate-dialog';
-import { DocumentMoveDialog } from '~/components/dialogs/document-move-dialog';
 import { DocumentResendDialog } from '~/components/dialogs/document-resend-dialog';
 import { DocumentRecipientLinkCopyDialog } from '~/components/general/document/document-recipient-link-copy-dialog';
-import { useOptionalCurrentTeam } from '~/providers/team';
+import { useCurrentTeam } from '~/providers/team';
 
 export type DocumentsTableActionDropdownProps = {
   row: Document & {
@@ -52,14 +50,13 @@ export type DocumentsTableActionDropdownProps = {
 
 export const DocumentsTableActionDropdown = ({ row }: DocumentsTableActionDropdownProps) => {
   const { user } = useSession();
-  const team = useOptionalCurrentTeam();
+  const team = useCurrentTeam();
 
   const { toast } = useToast();
   const { _ } = useLingui();
 
   const [isDeleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [isDuplicateDialogOpen, setDuplicateDialogOpen] = useState(false);
-  const [isMoveDialogOpen, setMoveDialogOpen] = useState(false);
 
   const recipient = row.recipients.find((recipient) => recipient.email === user.email);
 
@@ -157,14 +154,6 @@ export const DocumentsTableActionDropdown = ({ row }: DocumentsTableActionDropdo
           <Trans>Duplicate</Trans>
         </DropdownMenuItem>
 
-        {/* We don't want to allow teams moving documents across at the moment. */}
-        {!team && !row.teamId && (
-          <DropdownMenuItem onClick={() => setMoveDialogOpen(true)}>
-            <MoveRight className="mr-2 h-4 w-4" />
-            <Trans>Move to Team</Trans>
-          </DropdownMenuItem>
-        )}
-
         {/* No point displaying this if there's no functionality. */}
         {/* <DropdownMenuItem disabled>
           <XCircle className="mr-2 h-4 w-4" />
@@ -216,14 +205,7 @@ export const DocumentsTableActionDropdown = ({ row }: DocumentsTableActionDropdo
         documentTitle={row.title}
         open={isDeleteDialogOpen}
         onOpenChange={setDeleteDialogOpen}
-        teamId={team?.id}
         canManageDocument={canManageDocument}
-      />
-
-      <DocumentMoveDialog
-        documentId={row.id}
-        open={isMoveDialogOpen}
-        onOpenChange={setMoveDialogOpen}
       />
 
       <DocumentDuplicateDialog

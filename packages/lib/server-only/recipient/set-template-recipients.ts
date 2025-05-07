@@ -15,10 +15,11 @@ import {
 } from '../../types/document-auth';
 import { nanoid } from '../../universal/id';
 import { createRecipientAuthOptions } from '../../utils/document-auth';
+import { buildTeamWhereQuery } from '../../utils/teams';
 
 export type SetTemplateRecipientsOptions = {
   userId: number;
-  teamId?: number;
+  teamId: number;
   templateId: number;
   recipients: {
     id?: number;
@@ -39,21 +40,7 @@ export const setTemplateRecipients = async ({
   const template = await prisma.template.findFirst({
     where: {
       id: templateId,
-      ...(teamId
-        ? {
-            team: {
-              id: teamId,
-              members: {
-                some: {
-                  userId,
-                },
-              },
-            },
-          }
-        : {
-            userId,
-            teamId: null,
-          }),
+      team: buildTeamWhereQuery(teamId, userId),
     },
     include: {
       directLink: true,

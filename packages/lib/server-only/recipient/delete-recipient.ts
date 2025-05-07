@@ -10,7 +10,7 @@ export type DeleteRecipientOptions = {
   documentId: number;
   recipientId: number;
   userId: number;
-  teamId?: number;
+  teamId: number;
   requestMetadata?: RequestMetadata;
 };
 
@@ -26,21 +26,15 @@ export const deleteRecipient = async ({
       id: recipientId,
       document: {
         id: documentId,
-        ...(teamId
-          ? {
-              team: {
-                id: teamId,
-                members: {
-                  some: {
-                    userId,
-                  },
-                },
-              },
-            }
-          : {
+        userId,
+        team: {
+          id: teamId,
+          members: {
+            some: {
               userId,
-              teamId: null,
-            }),
+            },
+          },
+        },
       },
     },
   });

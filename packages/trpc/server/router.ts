@@ -3,6 +3,7 @@ import { apiTokenRouter } from './api-token-router/router';
 import { authRouter } from './auth-router/router';
 import { documentRouter } from './document-router/router';
 import { fieldRouter } from './field-router/router';
+import { organisationRouter } from './organisation-router/router';
 import { profileRouter } from './profile-router/router';
 import { recipientRouter } from './recipient-router/router';
 import { shareLinkRouter } from './share-link-router/router';
@@ -18,6 +19,7 @@ export const appRouter = router({
   field: fieldRouter,
   recipient: recipientRouter,
   admin: adminRouter,
+  organisation: organisationRouter,
   shareLink: shareLinkRouter,
   apiToken: apiTokenRouter,
   team: teamRouter,

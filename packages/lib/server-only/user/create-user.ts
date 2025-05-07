@@ -1,25 +1,29 @@
 import { hash } from '@node-rs/bcrypt';
 import type { User } from '@prisma/client';
-import { TeamMemberInviteStatus } from '@prisma/client';
+import { OrganisationGroupType, OrganisationMemberInviteStatus } from '@prisma/client';
 
-import { getStripeCustomerByUser } from '@documenso/ee/server-only/stripe/get-customer';
-import { updateSubscriptionItemQuantity } from '@documenso/ee/server-only/stripe/update-subscription-item-quantity';
 import { prisma } from '@documenso/prisma';
 
 import { IS_BILLING_ENABLED } from '../../constants/app';
 import { SALT_ROUNDS } from '../../constants/auth';
 import { AppError, AppErrorCode } from '../../errors/app-error';
-import { buildLogger } from '../../utils/logger';
+import { createPersonalOrganisation } from '../organisation/create-organisation';
 
 export interface CreateUserOptions {
   name: string;
   email: string;
   password: string;
   signature?: string | null;
-  url?: string;
+  orgUrl: string;
 }
 
-export const createUser = async ({ name, email, password, signature, url }: CreateUserOptions) => {
+export const createUser = async ({
+  name,
+  email,
+  password,
+  signature,
+  orgUrl,
+}: CreateUserOptions) => {
   const hashedPassword = await hash(password, SALT_ROUNDS);
 
   const userExists = await prisma.user.findFirst({
@@ -32,10 +36,11 @@ export const createUser = async ({ name, email, password, signature, url }: Crea
     throw new AppError(AppErrorCode.ALREADY_EXISTS);
   }
 
-  if (url) {
-    const urlExists = await prisma.user.findFirst({
+  // Todo: orgs handle htis
+  if (orgUrl) {
+    const urlExists = await prisma.team.findFirst({
       where: {
-        url,
+        url: orgUrl,
       },
     });
 
@@ -54,7 +59,6 @@ export const createUser = async ({ name, email, password, signature, url }: Crea
         email: email.toLowerCase(),
         password: hashedPassword, // Todo: (RR7) Drop password.
         signature,
-        url,
       },
     });
 
@@ -72,6 +76,8 @@ export const createUser = async ({ name, email, password, signature, url }: Crea
     return user;
   });
 
+  await createPersonalOrganisation({ userId: user.id, orgUrl });
+
   await onCreateUserHook(user).catch((err) => {
     // Todo: (RR7) Add logging.
     console.error(err);
@@ -88,32 +94,59 @@ export const createUser = async ({ name, email, password, signature, url }: Crea
 export const onCreateUserHook = async (user: User) => {
   const { email } = user;
 
-  const acceptedTeamInvites = await prisma.teamMemberInvite.findMany({
+  const acceptedOrganisationInvites = await prisma.organisationMemberInvite.findMany({
     where: {
-      status: TeamMemberInviteStatus.ACCEPTED,
+      status: OrganisationMemberInviteStatus.ACCEPTED,
       email: {
         equals: email,
         mode: 'insensitive',
       },
     },
+    include: {
+      organisation: {
+        include: {
+          groups: {
+            where: {
+              type: OrganisationGroupType.INTERNAL_ORGANISATION,
+            },
+          },
+        },
+      },
+    },
   });
 
-  // For each team invite, add the user to the team and delete the team invite.
+  // For each team invite, add the user to the organisation and team, then delete the team invite.
   // If an error occurs, reset the invitation to not accepted.
   await Promise.allSettled(
-    acceptedTeamInvites.map(async (invite) =>
+    acceptedOrganisationInvites.map(async (invite) =>
       prisma
         .$transaction(
           async (tx) => {
-            await tx.teamMember.create({
+            const organisationGroupToUse = invite.organisation.groups.find(
+              (group) =>
+                group.type === OrganisationGroupType.INTERNAL_ORGANISATION &&
+                group.organisationRole === invite.organisationRole,
+            );
+
+            if (!organisationGroupToUse) {
+              throw new AppError(AppErrorCode.UNKNOWN_ERROR, {
+                message: 'Organisation group not found',
+              });
+            }
+
+            await tx.organisationMember.create({
               data: {
-                teamId: invite.teamId,
+                organisationId: invite.organisationId,
                 userId: user.id,
-                role: invite.role,
+                organisationGroupMembers: {
+                  create: {
+                    groupId: organisationGroupToUse.id,
+                  },
+                },
               },
             });
 
-            await tx.teamMemberInvite.delete({
+            await tx.organisationMemberInvite.delete({
               where: {
                 id: invite.id,
               },
@@ -123,9 +156,9 @@ export const onCreateUserHook = async (user: User) => {
               return;
             }
 
-            const team = await tx.team.findFirstOrThrow({
+            const organisation = await tx.organisation.findFirstOrThrow({
               where: {
-                id: invite.teamId,
+                id: invite.organisationId,
               },
               include: {
                 members: {
@@ -133,53 +166,40 @@ export const onCreateUserHook = async (user: User) => {
                     id: true,
                   },
                 },
-                subscription: true,
+                subscriptions: {
+                  select: {
+                    id: true,
+                    priceId: true,
+                    planId: true,
+                  },
+                },
               },
             });
 
-            if (team.subscription) {
-              await updateSubscriptionItemQuantity({
-                priceId: team.subscription.priceId,
-                subscriptionId: team.subscription.planId,
-                quantity: team.members.length,
-              });
-            }
+            // const organisationSeatSubscription =  // TODO
+
+            // if (organisation.subscriptions) {
+            //   await updateSubscriptionItemQuantity({
+            //     priceId: team.subscription.priceId,
+            //     subscriptionId: team.subscription.planId,
+            //     quantity: team.members.length,
+            //   });
+            // }
           },
           { timeout: 30_000 },
         )
         .catch(async () => {
-          await prisma.teamMemberInvite.update({
+          await prisma.organisationMemberInvite.update({
             where: {
               id: invite.id,
             },
             data: {
-              status: TeamMemberInviteStatus.PENDING,
+              status: OrganisationMemberInviteStatus.PENDING,
             },
           });
         }),
     ),
   );
-
-  // Update the user record with a new or existing Stripe customer record.
-  if (IS_BILLING_ENABLED()) {
-    try {
-      return await getStripeCustomerByUser(user).then((session) => session.user);
-    } catch (err) {
-      console.error(err);
-
-      const error = AppError.parseError(err);
-
-      const logger = buildLogger();
-
-      logger.error(error, {
-        method: 'createUser',
-        context: {
-          appError: AppError.toJSON(error),
-          userId: user.id,
-        },
-      });
-    }
-  }
 
   return user;
 };

@@ -22,6 +22,7 @@ export type DeleteTeamMembersOptions = {
   teamMemberIds: number[];
 };
 
+// Todo: orgs (we curretnly have an implementation already, need to make it backwards compatible)
 export const deleteTeamMembers = async ({
   userId,
   teamId,
@@ -50,7 +51,6 @@ export const deleteTeamMembers = async ({
               role: true,
             },
           },
-          subscription: true,
         },
       });
 

@@ -10,6 +10,7 @@ import { prisma } from '@documenso/prisma';
 import { getI18nInstance } from '../../../client-only/providers/i18n-server';
 import { NEXT_PUBLIC_WEBAPP_URL } from '../../../constants/app';
 import { FROM_ADDRESS, FROM_NAME } from '../../../constants/email';
+import { getTeamSettings } from '../../../server-only/team/get-team-settings';
 import { renderEmailWithI18N } from '../../../utils/render-email-with-i18n';
 import { teamGlobalSettingsToBranding } from '../../../utils/team-global-settings-to-branding';
 import type { JobRunIO } from '../../client/_internal/job';
@@ -37,8 +38,11 @@ export const run = async ({
           user: true,
         },
       },
-      teamGlobalSettings: true,
     },
+  });
+
+  const settings = await getTeamSettings({
+    teamId: payload.teamId,
   });
 
   const oldMember = await prisma.user.findFirstOrThrow({
@@ -58,11 +62,8 @@ export const run = async ({
         teamUrl: team.url,
       });
 
-      const branding = team.teamGlobalSettings
-        ? teamGlobalSettingsToBranding(team.teamGlobalSettings)
-        : undefined;
-
-      const lang = team.teamGlobalSettings?.documentLanguage;
+      const branding = teamGlobalSettingsToBranding(settings, team.id);
+      const lang = settings.documentLanguage;
 
       const [html, text] = await Promise.all([
         renderEmailWithI18N(emailContent, {

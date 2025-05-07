@@ -4,9 +4,8 @@ import { msg } from '@lingui/core/macro';
 import type {
   Document,
   DocumentMeta,
+  OrganisationGlobalSettings,
   Recipient,
-  Team,
-  TeamGlobalSettings,
   User,
 } from '@prisma/client';
 import { DocumentStatus, SendStatus, WebhookTriggerEvents } from '@prisma/client';
@@ -30,12 +29,14 @@ import { isDocumentCompleted } from '../../utils/document';
 import { createDocumentAuditLogData } from '../../utils/document-audit-logs';
 import { renderEmailWithI18N } from '../../utils/render-email-with-i18n';
 import { teamGlobalSettingsToBranding } from '../../utils/team-global-settings-to-branding';
+import { getMemberRoles } from '../team/get-member-roles';
+import { getTeamSettings } from '../team/get-team-settings';
 import { triggerWebhook } from '../webhooks/trigger/trigger-webhook';
 
 export type DeleteDocumentOptions = {
   id: number;
   userId: number;
-  teamId?: number;
+  teamId: number;
   requestMetadata: ApiRequestMetadata;
 };
 
@@ -64,12 +65,6 @@ export const deleteDocument = async ({
     include: {
       recipients: true,
       documentMeta: true,
-      team: {
-        include: {
-          members: true,
-          teamGlobalSettings: true,
-        },
-      },
     },
   });
 
@@ -79,8 +74,22 @@ export const deleteDocument = async ({
     });
   }
 
+  const settings = await getTeamSettings({
+    userId: document.userId,
+    teamId: document.teamId,
+  });
+
+  const isUserTeamMember = await getMemberRoles({
+    teamId: document.teamId,
+    reference: {
+      type: 'User',
+      id: userId,
+    },
+  })
+    .then(() => true)
+    .catch(() => false);
+
   const isUserOwner = document.userId === userId;
-  const isUserTeamMember = document.team?.members.some((member) => member.userId === userId);
   const userRecipient = document.recipients.find((recipient) => recipient.email === user.email);
 
   if (!isUserOwner && !isUserTeamMember && !userRecipient) {
@@ -94,7 +103,7 @@ export const deleteDocument = async ({
     await handleDocumentOwnerDelete({
       document,
       user,
-      team: document.team,
+      settings,
       requestMetadata,
     });
   }
@@ -142,11 +151,7 @@ type HandleDocumentOwnerDeleteOptions = {
     recipients: Recipient[];
     documentMeta: DocumentMeta | null;
   };
-  team?:
-    | (Team & {
-        teamGlobalSettings?: TeamGlobalSettings | null;
-      })
-    | null;
+  settings: Omit<OrganisationGlobalSettings, 'id'>;
   user: User;
   requestMetadata: ApiRequestMetadata;
 };
@@ -154,7 +159,7 @@ type HandleDocumentOwnerDeleteOptions = {
 const handleDocumentOwnerDelete = async ({
   document,
   user,
-  team,
+  settings,
   requestMetadata,
 }: HandleDocumentOwnerDeleteOptions) => {
   if (document.deletedAt) {
@@ -235,20 +240,19 @@ const handleDocumentOwnerDelete = async ({
         assetBaseUrl,
       });
 
-      const branding = team?.teamGlobalSettings
-        ? teamGlobalSettingsToBranding(team.teamGlobalSettings)
-        : undefined;
+      const branding = teamGlobalSettingsToBranding(settings, document.teamId);
+      const lang = document.documentMeta?.language ?? settings.documentLanguage;
 
       const [html, text] = await Promise.all([
-        renderEmailWithI18N(template, { lang: document.documentMeta?.language, branding }),
+        renderEmailWithI18N(template, { lang, branding }),
         renderEmailWithI18N(template, {
-          lang: document.documentMeta?.language,
+          lang,
           branding,
           plainText: true,
         }),
       ]);
 
-      const i18n = await getI18nInstance(document.documentMeta?.language);
+      const i18n = await getI18nInstance(lang);
 
       await mailer.sendMail({
         to: {

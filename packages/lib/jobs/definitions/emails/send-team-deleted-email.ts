@@ -9,7 +9,6 @@ const SEND_TEAM_DELETED_EMAIL_JOB_DEFINITION_SCHEMA = z.object({
   team: z.object({
     name: z.string(),
     url: z.string(),
-    ownerUserId: z.number(),
     teamGlobalSettings: z
       .object({
         documentVisibility: z.nativeEnum(DocumentVisibility),

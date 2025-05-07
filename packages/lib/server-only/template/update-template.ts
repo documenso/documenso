@@ -6,10 +6,11 @@ import { prisma } from '@documenso/prisma';
 import { AppError, AppErrorCode } from '../../errors/app-error';
 import type { TDocumentAccessAuthTypes, TDocumentActionAuthTypes } from '../../types/document-auth';
 import { createDocumentAuthOptions, extractDocumentAuthMethods } from '../../utils/document-auth';
+import { buildTeamWhereQuery } from '../../utils/teams';
 
 export type UpdateTemplateOptions = {
   userId: number;
-  teamId?: number;
+  teamId: number;
   templateId: number;
   data?: {
     title?: string;
@@ -31,29 +32,21 @@ export const updateTemplate = async ({
   meta = {},
   data = {},
 }: UpdateTemplateOptions) => {
-  const template = await prisma.template.findFirstOrThrow({
+  const template = await prisma.template.findFirst({
     where: {
       id: templateId,
-      ...(teamId
-        ? {
-            team: {
-              id: teamId,
-              members: {
-                some: {
-                  userId,
-                },
-              },
-            },
-          }
-        : {
-            userId,
-            teamId: null,
-          }),
+      team: buildTeamWhereQuery(teamId, userId),
     },
     include: {
       templateMeta: true,
     },
   });
+
+  if (!template) {
+    throw new AppError(AppErrorCode.NOT_FOUND, {
+      message: 'Template not found',
+    });
+  }
 
   if (Object.values(data).length === 0 && Object.keys(meta).length === 0) {
     return template;

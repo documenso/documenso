@@ -15,7 +15,7 @@ import { trpc as trpcClient } from '@documenso/trpc/client';
 import { Button } from '@documenso/ui/primitives/button';
 import { useToast } from '@documenso/ui/primitives/use-toast';
 
-import { useOptionalCurrentTeam } from '~/providers/team';
+import { useCurrentTeam } from '~/providers/team';
 
 export type DocumentsTableActionButtonProps = {
   row: Document & {
@@ -30,7 +30,7 @@ export const DocumentsTableActionButton = ({ row }: DocumentsTableActionButtonPr
   const { toast } = useToast();
   const { _ } = useLingui();
 
-  const team = useOptionalCurrentTeam();
+  const team = useCurrentTeam();
 
   const recipient = row.recipients.find((recipient) => recipient.email === user.email);
 

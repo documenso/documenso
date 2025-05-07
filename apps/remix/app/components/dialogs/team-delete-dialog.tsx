@@ -35,10 +35,16 @@ import { useToast } from '@documenso/ui/primitives/use-toast';
 export type TeamDeleteDialogProps = {
   teamId: number;
   teamName: string;
+  redirectTo?: string;
   trigger?: React.ReactNode;
 };
 
-export const TeamDeleteDialog = ({ trigger, teamId, teamName }: TeamDeleteDialogProps) => {
+export const TeamDeleteDialog = ({
+  trigger,
+  teamId,
+  teamName,
+  redirectTo,
+}: TeamDeleteDialogProps) => {
   const navigate = useNavigate();
   const [open, setOpen] = useState(false);
 
@@ -60,7 +66,7 @@ export const TeamDeleteDialog = ({ trigger, teamId, teamName }: TeamDeleteDialog
     },
   });
 
-  const { mutateAsync: deleteTeam } = trpc.team.deleteTeam.useMutation();
+  const { mutateAsync: deleteTeam } = trpc.team.delete.useMutation();
 
   const onFormSubmit = async () => {
     try {
@@ -72,7 +78,9 @@ export const TeamDeleteDialog = ({ trigger, teamId, teamName }: TeamDeleteDialog
         duration: 5000,
       });
 
-      await navigate('/settings/teams');
+      if (redirectTo) {
+        await navigate(redirectTo);
+      }
 
       setOpen(false);
     } catch (err) {
@@ -113,7 +121,7 @@ export const TeamDeleteDialog = ({ trigger, teamId, teamName }: TeamDeleteDialog
       <DialogTrigger asChild>
         {trigger ?? (
           <Button variant="destructive">
-            <Trans>Delete team</Trans>
+            <Trans>Delete</Trans>
           </Button>
         )}
       </DialogTrigger>

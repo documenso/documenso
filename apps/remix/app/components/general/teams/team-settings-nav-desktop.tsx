@@ -1,7 +1,16 @@
 import type { HTMLAttributes } from 'react';
 
 import { Trans } from '@lingui/react/macro';
-import { Braces, CreditCard, Globe2Icon, Settings, Settings2, Users, Webhook } from 'lucide-react';
+import {
+  Braces,
+  CreditCard,
+  Globe2Icon,
+  GroupIcon,
+  Settings,
+  Settings2,
+  Users,
+  Webhook,
+} from 'lucide-react';
 import { Link, useLocation, useParams } from 'react-router';
 
 import { IS_BILLING_ENABLED } from '@documenso/lib/constants/app';
@@ -20,6 +29,7 @@ export const TeamSettingsNavDesktop = ({ className, ...props }: TeamSettingsNavD
   const preferencesPath = `/t/${teamUrl}/settings/preferences`;
   const publicProfilePath = `/t/${teamUrl}/settings/public-profile`;
   const membersPath = `/t/${teamUrl}/settings/members`;
+  const groupsPath = `/t/${teamUrl}/settings/groups`;
   const tokensPath = `/t/${teamUrl}/settings/tokens`;
   const webhooksPath = `/t/${teamUrl}/settings/webhooks`;
   const billingPath = `/t/${teamUrl}/settings/billing`;
@@ -73,6 +83,16 @@ export const TeamSettingsNavDesktop = ({ className, ...props }: TeamSettingsNavD
         >
           <Users className="mr-2 h-5 w-5" />
           <Trans>Members</Trans>
+        </Button>
+      </Link>
+
+      <Link to={groupsPath}>
+        <Button
+          variant="ghost"
+          className={cn('w-full justify-start', pathname?.startsWith(groupsPath) && 'bg-secondary')}
+        >
+          <GroupIcon className="mr-2 h-5 w-5" />
+          <Trans>Groups</Trans>
         </Button>
       </Link>
 

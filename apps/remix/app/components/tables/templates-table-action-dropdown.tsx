@@ -2,7 +2,7 @@ import { useState } from 'react';
 
 import { Trans } from '@lingui/react/macro';
 import type { Recipient, Template, TemplateDirectLink } from '@prisma/client';
-import { Copy, Edit, MoreHorizontal, MoveRight, Share2Icon, Trash2, Upload } from 'lucide-react';
+import { Copy, Edit, MoreHorizontal, Share2Icon, Trash2, Upload } from 'lucide-react';
 import { Link } from 'react-router';
 
 import { useSession } from '@documenso/lib/client-only/providers/session';
@@ -18,7 +18,6 @@ import { TemplateBulkSendDialog } from '../dialogs/template-bulk-send-dialog';
 import { TemplateDeleteDialog } from '../dialogs/template-delete-dialog';
 import { TemplateDirectLinkDialog } from '../dialogs/template-direct-link-dialog';
 import { TemplateDuplicateDialog } from '../dialogs/template-duplicate-dialog';
-import { TemplateMoveDialog } from '../dialogs/template-move-dialog';
 
 export type TemplatesTableActionDropdownProps = {
   row: Template & {
@@ -26,15 +25,8 @@ export type TemplatesTableActionDropdownProps = {
     recipients: Recipient[];
   };
   templateRootPath: string;
-  teamId?: number;
+  teamId: number;
   onDelete?: () => Promise<void> | void;
-  onMove?: ({
-    templateId,
-    teamUrl,
-  }: {
-    templateId: number;
-    teamUrl: string;
-  }) => Promise<void> | void;
 };
 
 export const TemplatesTableActionDropdown = ({
@@ -42,14 +34,12 @@ export const TemplatesTableActionDropdown = ({
   templateRootPath,
   teamId,
   onDelete,
-  onMove,
 }: TemplatesTableActionDropdownProps) => {
   const { user } = useSession();
 
   const [isDeleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [isTemplateDirectLinkDialogOpen, setTemplateDirectLinkDialogOpen] = useState(false);
   const [isDuplicateDialogOpen, setDuplicateDialogOpen] = useState(false);
-  const [isMoveDialogOpen, setMoveDialogOpen] = useState(false);
 
   const isOwner = row.userId === user.id;
   const isTeamTemplate = row.teamId === teamId;
@@ -83,13 +73,6 @@ export const TemplatesTableActionDropdown = ({
           <Trans>Direct link</Trans>
         </DropdownMenuItem>
 
-        {!teamId && !row.teamId && (
-          <DropdownMenuItem onClick={() => setMoveDialogOpen(true)}>
-            <MoveRight className="mr-2 h-4 w-4" />
-            <Trans>Move to Team</Trans>
-          </DropdownMenuItem>
-        )}
-
         <TemplateBulkSendDialog
           templateId={row.id}
           recipients={row.recipients}
@@ -120,13 +103,6 @@ export const TemplatesTableActionDropdown = ({
         template={row}
         open={isTemplateDirectLinkDialogOpen}
         onOpenChange={setTemplateDirectLinkDialogOpen}
-      />
-
-      <TemplateMoveDialog
-        templateId={row.id}
-        open={isMoveDialogOpen}
-        onOpenChange={setMoveDialogOpen}
-        onMove={onMove}
       />
 
       <TemplateDeleteDialog

@@ -9,6 +9,7 @@ import { prisma } from '@documenso/prisma';
 import { getI18nInstance } from '../../../client-only/providers/i18n-server';
 import { NEXT_PUBLIC_WEBAPP_URL } from '../../../constants/app';
 import { FROM_ADDRESS, FROM_NAME } from '../../../constants/email';
+import { getTeamSettings } from '../../../server-only/team/get-team-settings';
 import { extractDerivedDocumentEmailSettings } from '../../../types/document-email';
 import { renderEmailWithI18N } from '../../../utils/render-email-with-i18n';
 import { teamGlobalSettingsToBranding } from '../../../utils/team-global-settings-to-branding';
@@ -41,11 +42,6 @@ export const run = async ({
       },
       user: true,
       documentMeta: true,
-      team: {
-        include: {
-          teamGlobalSettings: true,
-        },
-      },
     },
   });
 
@@ -76,8 +72,16 @@ export const run = async ({
     return;
   }
 
+  const settings = await getTeamSettings({
+    userId: owner.id,
+    teamId: document.teamId,
+  });
+
   const assetBaseUrl = NEXT_PUBLIC_WEBAPP_URL() || 'http://localhost:3000';
-  const i18n = await getI18nInstance(document.documentMeta?.language);
+  const branding = teamGlobalSettingsToBranding(settings, document.teamId);
+
+  const lang = document.documentMeta?.language ?? settings.documentLanguage;
+  const i18n = await getI18nInstance(lang);
 
   const template = createElement(DocumentRecipientSignedEmailTemplate, {
     documentName: document.title,
@@ -87,14 +91,10 @@ export const run = async ({
   });
 
   await io.runTask('send-recipient-signed-email', async () => {
-    const branding = document.team?.teamGlobalSettings
-      ? teamGlobalSettingsToBranding(document.team.teamGlobalSettings)
-      : undefined;
-
     const [html, text] = await Promise.all([
-      renderEmailWithI18N(template, { lang: document.documentMeta?.language, branding }),
+      renderEmailWithI18N(template, { lang, branding }),
       renderEmailWithI18N(template, {
-        lang: document.documentMeta?.language,
+        lang,
         branding,
         plainText: true,
       }),

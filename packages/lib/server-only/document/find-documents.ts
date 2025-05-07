@@ -9,6 +9,7 @@ import { ExtendedDocumentStatus } from '@documenso/prisma/types/extended-documen
 import { DocumentVisibility } from '../../types/document-visibility';
 import { type FindResultResponse } from '../../types/search-params';
 import { maskRecipientTokensForDocument } from '../../utils/mask-recipient-tokens-for-document';
+import { getTeamById } from '../team/get-team';
 
 export type PeriodSelectorValue = '' | '7d' | '14d' | '30d';
 
@@ -51,32 +52,15 @@ export const findDocuments = async ({
   let team = null;
 
   if (teamId !== undefined) {
-    team = await prisma.team.findFirstOrThrow({
-      where: {
-        id: teamId,
-        members: {
-          some: {
-            userId,
-          },
-        },
-      },
-      include: {
-        teamEmail: true,
-        members: {
-          where: {
-            userId,
-          },
-          select: {
-            role: true,
-          },
-        },
-      },
+    team = await getTeamById({
+      userId,
+      teamId,
     });
   }
 
   const orderByColumn = orderBy?.column ?? 'createdAt';
   const orderByDirection = orderBy?.direction ?? 'desc';
-  const teamMemberRole = team?.members[0].role ?? null;
+  const teamMemberRole = team?.currentTeamRole ?? null;
 
   const searchFilter: Prisma.DocumentWhereInput = {
     OR: [
@@ -273,108 +257,29 @@ export const findDocuments = async ({
   } satisfies FindResultResponse<typeof data>;
 };
 
+/**
+ * For non team searches, only inbox documents are supported since user level documents no longer
+ * exist.
+ */
 const findDocumentsFilter = (status: ExtendedDocumentStatus, user: User) => {
-  return match<ExtendedDocumentStatus, Prisma.DocumentWhereInput>(status)
-    .with(ExtendedDocumentStatus.ALL, () => ({
-      OR: [
-        {
-          userId: user.id,
-          teamId: null,
-        },
-        {
-          status: ExtendedDocumentStatus.COMPLETED,
-          recipients: {
-            some: {
-              email: user.email,
-            },
-          },
-        },
-        {
-          status: ExtendedDocumentStatus.PENDING,
-          recipients: {
-            some: {
-              email: user.email,
-            },
-          },
-        },
-      ],
-    }))
-    .with(ExtendedDocumentStatus.INBOX, () => ({
-      status: {
-        not: ExtendedDocumentStatus.DRAFT,
-      },
-      recipients: {
-        some: {
-          email: user.email,
-          signingStatus: SigningStatus.NOT_SIGNED,
-          role: {
-            not: RecipientRole.CC,
-          },
+  if (status !== ExtendedDocumentStatus.INBOX) {
+    return null;
+  }
+
+  return {
+    status: {
+      not: ExtendedDocumentStatus.DRAFT,
+    },
+    recipients: {
+      some: {
+        email: user.email,
+        signingStatus: SigningStatus.NOT_SIGNED,
+        role: {
+          not: RecipientRole.CC,
         },
       },
-    }))
-    .with(ExtendedDocumentStatus.DRAFT, () => ({
-      userId: user.id,
-      teamId: null,
-      status: ExtendedDocumentStatus.DRAFT,
-    }))
-    .with(ExtendedDocumentStatus.PENDING, () => ({
-      OR: [
-        {
-          userId: user.id,
-          teamId: null,
-          status: ExtendedDocumentStatus.PENDING,
-        },
-        {
-          status: ExtendedDocumentStatus.PENDING,
-          recipients: {
-            some: {
-              email: user.email,
-              signingStatus: SigningStatus.SIGNED,
-              role: {
-                not: RecipientRole.CC,
-              },
-            },
-          },
-        },
-      ],
-    }))
-    .with(ExtendedDocumentStatus.COMPLETED, () => ({
-      OR: [
-        {
-          userId: user.id,
-          teamId: null,
-          status: ExtendedDocumentStatus.COMPLETED,
-        },
-        {
-          status: ExtendedDocumentStatus.COMPLETED,
-          recipients: {
-            some: {
-              email: user.email,
-            },
-          },
-        },
-      ],
-    }))
-    .with(ExtendedDocumentStatus.REJECTED, () => ({
-      OR: [
-        {
-          userId: user.id,
-          teamId: null,
-          status: ExtendedDocumentStatus.REJECTED,
-        },
-        {
-          status: ExtendedDocumentStatus.REJECTED,
-          recipients: {
-            some: {
-              email: user.email,
-              signingStatus: SigningStatus.REJECTED,
-            },
-          },
-        },
-      ],
-    }))
-    .exhaustive();
+    },
+  };
 };
 
 /**

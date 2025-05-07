@@ -1,8 +1,5 @@
 import { DocumentSource, WebhookTriggerEvents } from '@prisma/client';
-import type { Team, TeamGlobalSettings } from '@prisma/client';
-import { TeamMemberRole } from '@prisma/client';
 
-import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import { normalizePdf as makeNormalizedPdf } from '@documenso/lib/server-only/pdf/normalize-pdf';
 import { DOCUMENT_AUDIT_LOG_TYPE } from '@documenso/lib/types/document-audit-logs';
 import type { ApiRequestMetadata } from '@documenso/lib/universal/extract-request-metadata';
@@ -16,13 +13,15 @@ import {
 import { getFileServerSide } from '../../universal/upload/get-file.server';
 import { putPdfFileServerSide } from '../../universal/upload/put-file.server';
 import { determineDocumentVisibility } from '../../utils/document-visibility';
+import { getTeamById } from '../team/get-team';
+import { getTeamSettings } from '../team/get-team-settings';
 import { triggerWebhook } from '../webhooks/trigger/trigger-webhook';
 
 export type CreateDocumentOptions = {
   title: string;
   externalId?: string | null;
   userId: number;
-  teamId?: number;
+  teamId: number;
   documentDataId: string;
   formValues?: Record<string, string | number | boolean>;
   normalizePdf?: boolean;
@@ -41,52 +40,12 @@ export const createDocument = async ({
   requestMetadata,
   timezone,
 }: CreateDocumentOptions) => {
-  const user = await prisma.user.findFirstOrThrow({
-    where: {
-      id: userId,
-    },
-    include: {
-      teamMembers: {
-        select: {
-          teamId: true,
-        },
-      },
-    },
+  const team = await getTeamById({ userId, teamId });
+
+  const settings = await getTeamSettings({
+    userId,
+    teamId,
   });
-
-  if (
-    teamId !== undefined &&
-    !user.teamMembers.some((teamMember) => teamMember.teamId === teamId)
-  ) {
-    throw new AppError(AppErrorCode.NOT_FOUND, {
-      message: 'Team not found',
-    });
-  }
-
-  let team: (Team & { teamGlobalSettings: TeamGlobalSettings | null }) | null = null;
-  let userTeamRole: TeamMemberRole | undefined;
-
-  if (teamId) {
-    const teamWithUserRole = await prisma.team.findFirstOrThrow({
-      where: {
-        id: teamId,
-      },
-      include: {
-        teamGlobalSettings: true,
-        members: {
-          where: {
-            userId: userId,
-          },
-          select: {
-            role: true,
-          },
-        },
-      },
-    });
-
-    team = teamWithUserRole;
-    userTeamRole = teamWithUserRole.members[0]?.role;
-  }
 
   if (normalizePdf) {
     const documentData = await prisma.documentData.findFirst({
@@ -119,19 +78,16 @@ export const createDocument = async ({
         documentDataId,
         userId,
         teamId,
-        visibility: determineDocumentVisibility(
-          team?.teamGlobalSettings?.documentVisibility,
-          userTeamRole ?? TeamMemberRole.MEMBER,
-        ),
+        visibility: determineDocumentVisibility(settings.documentVisibility, team.currentTeamRole),
         formValues,
         source: DocumentSource.DOCUMENT,
         documentMeta: {
           create: {
-            language: team?.teamGlobalSettings?.documentLanguage,
+            language: settings.documentLanguage,
             timezone: timezone,
-            typedSignatureEnabled: team?.teamGlobalSettings?.typedSignatureEnabled ?? true,
-            uploadSignatureEnabled: team?.teamGlobalSettings?.uploadSignatureEnabled ?? true,
-            drawSignatureEnabled: team?.teamGlobalSettings?.drawSignatureEnabled ?? true,
+            typedSignatureEnabled: settings.typedSignatureEnabled,
+            uploadSignatureEnabled: settings.uploadSignatureEnabled,
+            drawSignatureEnabled: settings.drawSignatureEnabled,
           },
         },
       },

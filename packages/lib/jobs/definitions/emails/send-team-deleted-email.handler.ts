@@ -16,7 +16,6 @@ export const run = async ({
       await sendTeamDeleteEmail({
         email: member.email,
         team,
-        isOwner: member.id === team.ownerUserId,
       });
     });
   }

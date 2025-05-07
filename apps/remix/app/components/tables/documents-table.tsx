@@ -19,7 +19,7 @@ import { Skeleton } from '@documenso/ui/primitives/skeleton';
 import { TableCell } from '@documenso/ui/primitives/table';
 
 import { DocumentStatus } from '~/components/general/document/document-status';
-import { useOptionalCurrentTeam } from '~/providers/team';
+import { useCurrentTeam } from '~/providers/team';
 
 import { StackAvatarsWithTooltip } from '../general/stack-avatars-with-tooltip';
 import { DocumentsTableActionButton } from './documents-table-action-button';
@@ -36,7 +36,7 @@ type DocumentsTableRow = TFindDocumentsResponse['data'][number];
 export const DocumentsTable = ({ data, isLoading, isLoadingError }: DocumentsTableProps) => {
   const { _, i18n } = useLingui();
 
-  const team = useOptionalCurrentTeam();
+  const team = useCurrentTeam();
   const [isPending, startTransition] = useTransition();
 
   const updateSearchParams = useUpdateSearchParams();

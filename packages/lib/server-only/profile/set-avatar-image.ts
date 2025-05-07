@@ -2,12 +2,14 @@ import sharp from 'sharp';
 
 import { prisma } from '@documenso/prisma';
 
+import { TEAM_MEMBER_ROLE_PERMISSIONS_MAP } from '../../constants/teams';
 import { AppError, AppErrorCode } from '../../errors/app-error';
 import type { ApiRequestMetadata } from '../../universal/extract-request-metadata';
+import { buildTeamWhereQuery } from '../../utils/teams';
 
 export type SetAvatarImageOptions = {
   userId: number;
-  teamId?: number | null;
+  teamId: number | null;
   bytes?: string | null;
   requestMetadata: ApiRequestMetadata;
 };
@@ -39,14 +41,7 @@ export const setAvatarImage = async ({
 
   if (teamId) {
     const team = await prisma.team.findFirst({
-      where: {
-        id: teamId,
-        members: {
-          some: {
-            userId,
-          },
-        },
-      },
+      where: buildTeamWhereQuery(teamId, userId, TEAM_MEMBER_ROLE_PERMISSIONS_MAP['MANAGE_TEAM']),
     });
 
     if (!team) {

@@ -51,6 +51,7 @@ import { teamGlobalSettingsToBranding } from '../../utils/team-global-settings-t
 import { formatDocumentsPath } from '../../utils/teams';
 import { sendDocument } from '../document/send-document';
 import { validateFieldAuth } from '../document/validate-field-auth';
+import { getTeamSettings } from '../team/get-team-settings';
 import { triggerWebhook } from '../webhooks/trigger/trigger-webhook';
 
 export type CreateDocumentFromDirectTemplateOptions = {
@@ -109,17 +110,17 @@ export const createDocumentFromDirectTemplate = async ({
       templateDocumentData: true,
       templateMeta: true,
       user: true,
-      team: {
-        include: {
-          teamGlobalSettings: true,
-        },
-      },
     },
   });
 
   if (!template?.directLink?.enabled) {
     throw new AppError(AppErrorCode.INVALID_REQUEST, { message: 'Invalid or missing template' });
   }
+
+  const settings = await getTeamSettings({
+    userId: template.userId,
+    teamId: template.teamId,
+  });
 
   const { recipients, directLink, user: templateOwner } = template;
 
@@ -172,8 +173,7 @@ export const createDocumentFromDirectTemplate = async ({
   const metaDateFormat = template.templateMeta?.dateFormat || DEFAULT_DOCUMENT_DATE_FORMAT;
   const metaEmailMessage = template.templateMeta?.message || '';
   const metaEmailSubject = template.templateMeta?.subject || '';
-  const metaLanguage =
-    template.templateMeta?.language ?? template.team?.teamGlobalSettings?.documentLanguage;
+  const metaLanguage = template.templateMeta?.language ?? settings.documentLanguage;
   const metaSigningOrder = template.templateMeta?.signingOrder || DocumentSigningOrder.PARALLEL;
 
   // Associate, validate and map to a query every direct template recipient field with the provided fields.
@@ -284,7 +284,7 @@ export const createDocumentFromDirectTemplate = async ({
         createdAt: initialRequestTime,
         status: DocumentStatus.PENDING,
         externalId: directTemplateExternalId,
-        visibility: template.team?.teamGlobalSettings?.documentVisibility,
+        visibility: settings.documentVisibility,
         documentDataId: documentData.id,
         authOptions: createDocumentAuthOptions({
           globalAccessAuth: templateAuthOptions.globalAccessAuth,
@@ -585,9 +585,7 @@ export const createDocumentFromDirectTemplate = async ({
       assetBaseUrl: NEXT_PUBLIC_WEBAPP_URL() || 'http://localhost:3000',
     });
 
-    const branding = template.team?.teamGlobalSettings
-      ? teamGlobalSettingsToBranding(template.team.teamGlobalSettings)
-      : undefined;
+    const branding = teamGlobalSettingsToBranding(settings, template.teamId);
 
     const [html, text] = await Promise.all([
       renderEmailWithI18N(emailTemplate, { lang: metaLanguage, branding }),
@@ -624,7 +622,7 @@ export const createDocumentFromDirectTemplate = async ({
     await sendDocument({
       documentId,
       userId: template.userId,
-      teamId: template.teamId || undefined,
+      teamId: template.teamId,
       requestMetadata,
     });
 

@@ -105,7 +105,6 @@ const getCounts = async ({ user, createdAt, search }: GetCountsOption) => {
       where: {
         userId: user.id,
         createdAt,
-        teamId: null,
         deletedAt: null,
         AND: [searchFilter],
       },

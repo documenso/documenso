@@ -5,7 +5,7 @@ import { prisma } from '@documenso/prisma';
 export type DeleteTokenByIdOptions = {
   id: number;
   userId: number;
-  teamId?: number;
+  teamId: number;
 };
 
 export const deleteTokenById = async ({ id, userId, teamId }: DeleteTokenByIdOptions) => {

@@ -6,13 +6,13 @@ import { useLocation } from 'react-router';
 
 import { authClient } from '@documenso/auth/client';
 import type { SessionUser } from '@documenso/auth/server/lib/session/session';
-import { type TGetTeamsResponse } from '@documenso/lib/server-only/team/get-teams';
 import { trpc } from '@documenso/trpc/client';
+import type { TGetOrganisationSessionResponse } from '@documenso/trpc/server/organisation-router/get-organisation-session.types';
 
 export type AppSession = {
   session: Session;
   user: SessionUser;
-  teams: TGetTeamsResponse;
+  organisations: TGetOrganisationSessionResponse;
 };
 
 interface SessionProviderProps {
@@ -67,15 +67,17 @@ export const SessionProvider = ({ children, initialSession }: SessionProviderPro
       return;
     }
 
-    const teams = await trpc.team.getTeams.query().catch(() => {
-      // Todo: (RR7) Log
-      return [];
-    });
+    const organisations = await trpc.organisation.internal.getOrganisationSession
+      .query()
+      .catch(() => {
+        // Todo: (RR7) Log
+        return [];
+      });
 
     setSession({
       session: newSession.session,
       user: newSession.user,
-      teams,
+      organisations,
     });
   }, []);
 

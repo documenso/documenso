@@ -29,7 +29,7 @@ import { PDFViewer } from '@documenso/ui/primitives/pdf-viewer';
 import { Stepper } from '@documenso/ui/primitives/stepper';
 import { useToast } from '@documenso/ui/primitives/use-toast';
 
-import { useOptionalCurrentTeam } from '~/providers/team';
+import { useCurrentTeam } from '~/providers/team';
 
 export type DocumentEditFormProps = {
   className?: string;
@@ -53,7 +53,7 @@ export const DocumentEditForm = ({
   const navigate = useNavigate();
 
   const [searchParams] = useSearchParams();
-  const team = useOptionalCurrentTeam();
+  const team = useCurrentTeam();
 
   const [isDocumentPdfLoaded, setIsDocumentPdfLoaded] = useState(false);
 
@@ -355,7 +355,7 @@ export const DocumentEditForm = ({
               key={recipients.length}
               documentFlow={documentFlow.settings}
               document={document}
-              currentTeamMemberRole={team?.currentTeamMember?.role}
+              currentTeamMemberRole={team.currentTeamRole}
               recipients={recipients}
               fields={fields}
               isDocumentEnterprise={isDocumentEnterprise}
@@ -382,7 +382,7 @@ export const DocumentEditForm = ({
               fields={fields}
               onSubmit={onAddFieldsFormSubmit}
               isDocumentPdfLoaded={isDocumentPdfLoaded}
-              teamId={team?.id}
+              teamId={team.id}
             />
 
             <AddSubjectFormPartial

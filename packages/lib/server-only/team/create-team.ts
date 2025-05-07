@@ -1,8 +1,14 @@
-import { Prisma, TeamMemberRole } from '@prisma/client';
+import {
+  OrganisationGroupType,
+  OrganisationMemberRole,
+  Prisma,
+  TeamMemberRole,
+} from '@prisma/client';
 import type Stripe from 'stripe';
+import { match } from 'ts-pattern';
 import { z } from 'zod';
 
-import { createTeamCustomer } from '@documenso/ee/server-only/stripe/create-team-customer';
+import { createOrganisationCustomer } from '@documenso/ee/server-only/stripe/create-team-customer';
 import { getTeamRelatedPrices } from '@documenso/ee/server-only/stripe/get-team-related-prices';
 import { mapStripeSubscriptionToPrismaUpsertAction } from '@documenso/ee/server-only/stripe/webhook/on-subscription-updated';
 import { IS_BILLING_ENABLED } from '@documenso/lib/constants/app';
@@ -10,6 +16,13 @@ import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import { subscriptionsContainsActivePlan } from '@documenso/lib/utils/billing';
 import { prisma } from '@documenso/prisma';
 
+import {
+  LOWEST_ORGANISATION_ROLE,
+  ORGANISATION_MEMBER_ROLE_PERMISSIONS_MAP,
+} from '../../constants/organisations';
+import { TEAM_INTERNAL_GROUPS } from '../../constants/teams';
+import { buildOrganisationWhereQuery } from '../../utils/organisations';
+import { generateDefaultTeamSettings } from '../../utils/teams';
 import { stripe } from '../stripe';
 
 export type CreateTeamOptions = {
@@ -29,6 +42,24 @@ export type CreateTeamOptions = {
    * Used as the URL path, example: https://documenso.com/t/{teamUrl}/settings
    */
   teamUrl: string;
+
+  /**
+   * ID of the organisation the team belongs to.
+   */
+  organisationId: string;
+
+  /**
+   * Whether to inherit all members from the organisation.
+   */
+  inheritMembers: boolean;
+
+  /**
+   * List of additional groups to attach to the team.
+   */
+  groups?: {
+    id: string;
+    role: TeamMemberRole;
+  }[];
 };
 
 export const ZCreateTeamResponseSchema = z.union([
@@ -50,15 +81,122 @@ export const createTeam = async ({
   userId,
   teamName,
   teamUrl,
+  organisationId,
+  inheritMembers,
 }: CreateTeamOptions): Promise<TCreateTeamResponse> => {
-  const user = await prisma.user.findUniqueOrThrow({
-    where: {
-      id: userId,
-    },
+  const organisation = await prisma.organisation.findFirst({
+    where: buildOrganisationWhereQuery(
+      organisationId,
+      userId,
+      ORGANISATION_MEMBER_ROLE_PERMISSIONS_MAP['MANAGE_ORGANISATION'],
+    ),
     include: {
+      groups: true, // Todo: (orgs)
       subscriptions: true,
+      owner: {
+        select: {
+          id: true,
+          name: true,
+          email: true,
+        },
+      },
     },
   });
+
+  if (!organisation) {
+    throw new AppError(AppErrorCode.NOT_FOUND, {
+      message: 'Organisation not found.',
+    });
+  }
+
+  // Inherit internal organisation groups to the team.
+  // Organisation Admins/Mangers get assigned as team admins, members get assigned as team members.
+  const internalOrganisationGroups = organisation.groups
+    .filter((group) => {
+      if (group.type !== OrganisationGroupType.INTERNAL_ORGANISATION) {
+        return false;
+      }
+
+      // If we're inheriting members, allow all internal organisation groups.
+      if (inheritMembers) {
+        return true;
+      }
+
+      // Otherwise, only inherit organisation admins/managers.
+      return (
+        group.organisationRole === OrganisationMemberRole.ADMIN ||
+        group.organisationRole === OrganisationMemberRole.MANAGER
+      );
+    })
+    .map((group) =>
+      match(group.organisationRole)
+        .with(OrganisationMemberRole.ADMIN, OrganisationMemberRole.MANAGER, () => ({
+          organisationGroupId: group.id,
+          teamRole: TeamMemberRole.ADMIN,
+        }))
+        .with(OrganisationMemberRole.MEMBER, () => ({
+          organisationGroupId: group.id,
+          teamRole: TeamMemberRole.MEMBER,
+        }))
+        .exhaustive(),
+    );
+
+  console.log({
+    internalOrganisationGroups,
+  });
+
+  if (Date.now() > 0) {
+    await prisma.$transaction(async (tx) => {
+      const teamSettings = await tx.teamGlobalSettings.create({
+        data: generateDefaultTeamSettings(),
+      });
+
+      const team = await tx.team.create({
+        data: {
+          name: teamName,
+          url: teamUrl,
+          organisationId,
+          teamGlobalSettingsId: teamSettings.id,
+          teamGroups: {
+            createMany: {
+              // Attach the internal organisation groups to the team.
+              data: internalOrganisationGroups,
+            },
+          },
+        },
+        include: {
+          teamGroups: true,
+        },
+      });
+
+      // Create the internal team groups.
+      await Promise.all(
+        TEAM_INTERNAL_GROUPS.map(async (teamGroup) =>
+          tx.organisationGroup.create({
+            data: {
+              type: teamGroup.type,
+              organisationRole: LOWEST_ORGANISATION_ROLE,
+              organisationId,
+              teamGroups: {
+                create: {
+                  teamId: team.id,
+                  teamRole: teamGroup.teamRole,
+                },
+              },
+            },
+          }),
+        ),
+      );
+    });
+
+    return {
+      paymentRequired: false,
+    };
+  }
+
+  if (Date.now() > 0) {
+    throw new Error('Todo: Orgs');
+  }
 
   let isPaymentRequired = IS_BILLING_ENABLED();
   let customerId: string | null = null;
@@ -68,59 +206,46 @@ export const createTeam = async ({
       prices.map((price) => price.id),
     );
 
-    isPaymentRequired = !subscriptionsContainsActivePlan(user.subscriptions, teamRelatedPriceIds);
+    isPaymentRequired = !subscriptionsContainsActivePlan(
+      organisation.subscriptions,
+      teamRelatedPriceIds, // Todo: (orgs)
+    );
 
-    customerId = await createTeamCustomer({
-      name: user.name ?? teamName,
-      email: user.email,
+    customerId = await createOrganisationCustomer({
+      name: organisation.owner.name ?? teamName,
+      email: organisation.owner.email,
     }).then((customer) => customer.id);
+
+    await prisma.organisation.update({
+      where: {
+        id: organisationId,
+      },
+      data: {
+        customerId,
+      },
+    });
   }
 
   try {
     // Create the team directly if no payment is required.
     if (!isPaymentRequired) {
-      await prisma.$transaction(async (tx) => {
-        const existingUserProfileWithUrl = await tx.user.findUnique({
-          where: {
-            url: teamUrl,
+      await prisma.team.create({
+        data: {
+          name: teamName,
+          url: teamUrl,
+          organisationId,
+          members: {
+            create: [
+              {
+                userId,
+                role: TeamMemberRole.ADMIN, // Todo: (orgs)
+              },
+            ],
           },
-          select: {
-            id: true,
+          teamGlobalSettings: {
+            create: {},
           },
-        });
-
-        if (existingUserProfileWithUrl) {
-          throw new AppError(AppErrorCode.ALREADY_EXISTS, {
-            message: 'URL already taken.',
-          });
-        }
-
-        const team = await tx.team.create({
-          data: {
-            name: teamName,
-            url: teamUrl,
-            ownerUserId: user.id,
-            customerId,
-            members: {
-              create: [
-                {
-                  userId: user.id,
-                  role: TeamMemberRole.ADMIN,
-                },
-              ],
-            },
-          },
-        });
-
-        await tx.teamGlobalSettings.upsert({
-          where: {
-            teamId: team.id,
-          },
-          update: {},
-          create: {
-            teamId: team.id,
-          },
-        });
+        },
       });
 
       return {

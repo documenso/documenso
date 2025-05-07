@@ -16,7 +16,7 @@ type TimeConstants = typeof timeConstants & {
 
 type CreateApiTokenInput = {
   userId: number;
-  teamId?: number;
+  teamId: number;
   tokenName: string;
   expiresIn: string | null;
 };

@@ -6,7 +6,7 @@ import { isCommunityPlan as isUserCommunityPlan } from '@documenso/ee/server-onl
 import { isUserEnterprise } from '@documenso/ee/server-only/util/is-document-enterprise';
 import { isDocumentPlatform } from '@documenso/ee/server-only/util/is-document-platform';
 import { IS_BILLING_ENABLED } from '@documenso/lib/constants/app';
-import { getTeamById } from '@documenso/lib/server-only/team/get-team';
+import { getTeamSettings } from '@documenso/lib/server-only/team/get-team-settings';
 import { getTemplateByDirectLinkToken } from '@documenso/lib/server-only/template/get-template-by-direct-link-token';
 import { DocumentAccessAuth } from '@documenso/lib/types/document-auth';
 import { extractDocumentAuthMethods } from '@documenso/lib/utils/document-auth';
@@ -98,11 +98,11 @@ export async function loader({ params, request }: Route.LoaderArgs) {
 
   const fields = template.fields.filter((field) => field.recipientId === directTemplateRecipientId);
 
-  const team = template.teamId
-    ? await getTeamById({ teamId: template.teamId, userId: template.userId }).catch(() => null)
-    : null;
+  const settings = await getTeamSettings({
+    teamId: template.teamId,
+  });
 
-  const hidePoweredBy = team?.teamGlobalSettings?.brandingHidePoweredBy ?? false;
+  const hidePoweredBy = settings.brandingHidePoweredBy;
 
   return superLoaderJson({
     token,

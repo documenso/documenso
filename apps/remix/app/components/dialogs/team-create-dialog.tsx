@@ -14,8 +14,9 @@ import { useUpdateSearchParams } from '@documenso/lib/client-only/hooks/use-upda
 import { NEXT_PUBLIC_WEBAPP_URL } from '@documenso/lib/constants/app';
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import { trpc } from '@documenso/trpc/react';
-import { ZCreateTeamMutationSchema } from '@documenso/trpc/server/team-router/schema';
+import { ZCreateTeamRequestSchema } from '@documenso/trpc/server/team-router/create-team.types';
 import { Button } from '@documenso/ui/primitives/button';
+import { Checkbox } from '@documenso/ui/primitives/checkbox';
 import {
   Dialog,
   DialogContent,
@@ -36,24 +37,29 @@ import {
 import { Input } from '@documenso/ui/primitives/input';
 import { useToast } from '@documenso/ui/primitives/use-toast';
 
+import { useCurrentOrganisation } from '~/providers/organisation';
+
 export type TeamCreateDialogProps = {
   trigger?: React.ReactNode;
+  onCreated?: () => Promise<void>;
 } & Omit<DialogPrimitive.DialogProps, 'children'>;
 
-const ZCreateTeamFormSchema = ZCreateTeamMutationSchema.pick({
+const ZCreateTeamFormSchema = ZCreateTeamRequestSchema.pick({
   teamName: true,
   teamUrl: true,
+  inheritMembers: true,
 });
 
 type TCreateTeamFormSchema = z.infer<typeof ZCreateTeamFormSchema>;
 
-export const TeamCreateDialog = ({ trigger, ...props }: TeamCreateDialogProps) => {
+export const TeamCreateDialog = ({ trigger, onCreated, ...props }: TeamCreateDialogProps) => {
   const { _ } = useLingui();
   const { toast } = useToast();
 
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const updateSearchParams = useUpdateSearchParams();
+  const organisation = useCurrentOrganisation();
 
   const [open, setOpen] = useState(false);
 
@@ -64,16 +70,19 @@ export const TeamCreateDialog = ({ trigger, ...props }: TeamCreateDialogProps) =
     defaultValues: {
       teamName: '',
       teamUrl: '',
+      inheritMembers: true,
     },
   });
 
-  const { mutateAsync: createTeam } = trpc.team.createTeam.useMutation();
+  const { mutateAsync: createTeam } = trpc.team.create.useMutation();
 
-  const onFormSubmit = async ({ teamName, teamUrl }: TCreateTeamFormSchema) => {
+  const onFormSubmit = async ({ teamName, teamUrl, inheritMembers }: TCreateTeamFormSchema) => {
     try {
       const response = await createTeam({
+        organisationId: organisation.id,
         teamName,
         teamUrl,
+        inheritMembers,
       });
 
       setOpen(false);
@@ -82,6 +91,8 @@ export const TeamCreateDialog = ({ trigger, ...props }: TeamCreateDialogProps) =
         await navigate(`/settings/teams?tab=pending&checkout=${response.pendingTeamId}`);
         return;
       }
+
+      await onCreated?.();
 
       toast({
         title: _(msg`Success`),
@@ -145,7 +156,7 @@ export const TeamCreateDialog = ({ trigger, ...props }: TeamCreateDialogProps) =
             <Trans>Create team</Trans>
           </DialogTitle>
 
-          <DialogDescription className="mt-4">
+          <DialogDescription>
             <Trans>Create a team to collaborate with your team members.</Trans>
           </DialogDescription>
         </DialogHeader>
@@ -208,6 +219,31 @@ export const TeamCreateDialog = ({ trigger, ...props }: TeamCreateDialogProps) =
                     )}
 
                     <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="inheritMembers"
+                render={({ field }) => (
+                  <FormItem className="flex items-center space-x-2">
+                    <FormControl>
+                      <div className="flex items-center">
+                        <Checkbox
+                          id="inherit-members"
+                          checked={field.value}
+                          onCheckedChange={field.onChange}
+                        />
+
+                        <label
+                          className="text-muted-foreground ml-2 text-sm"
+                          htmlFor="inherit-members"
+                        >
+                          <Trans>Allow all organisation members to access this team</Trans>
+                        </label>
+                      </div>
+                    </FormControl>
                   </FormItem>
                 )}
               />

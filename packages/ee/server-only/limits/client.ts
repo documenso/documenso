@@ -6,7 +6,7 @@ import { ZLimitsResponseSchema } from './schema';
 
 export type GetLimitsOptions = {
   headers?: Record<string, string>;
-  teamId?: number | null;
+  teamId: number | null;
 };
 
 export const getLimits = async ({ headers, teamId }: GetLimitsOptions = {}) => {

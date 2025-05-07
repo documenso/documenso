@@ -6,7 +6,7 @@ import { getDocumentWhereInput } from './get-document-by-id';
 export type GetDocumentWithDetailsByIdOptions = {
   documentId: number;
   userId: number;
-  teamId?: number;
+  teamId: number;
 };
 
 export const getDocumentWithDetailsById = async ({
@@ -14,7 +14,7 @@ export const getDocumentWithDetailsById = async ({
   userId,
   teamId,
 }: GetDocumentWithDetailsByIdOptions) => {
-  const documentWhereInput = await getDocumentWhereInput({
+  const { documentWhereInput } = await getDocumentWhereInput({
     documentId,
     userId,
     teamId,
@@ -26,7 +26,31 @@ export const getDocumentWithDetailsById = async ({
       documentData: true,
       documentMeta: true,
       recipients: true,
-      fields: true,
+      fields: {
+        include: {
+          signature: true,
+          recipient: {
+            select: {
+              name: true,
+              email: true,
+              signingStatus: true,
+            },
+          },
+        },
+      },
+      team: {
+        select: {
+          id: true,
+          url: true,
+        },
+      },
+      user: {
+        select: {
+          id: true,
+          name: true,
+          email: true,
+        },
+      },
     },
   });
 

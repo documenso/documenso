@@ -24,7 +24,7 @@ import { DocumentDropzone } from '@documenso/ui/primitives/document-dropzone';
 import { useToast } from '@documenso/ui/primitives/use-toast';
 
 type TemplateCreateDialogProps = {
-  teamId?: number;
+  teamId: number;
   templateRootPath: string;
 };
 

@@ -1,10 +1,8 @@
 import { type HTMLAttributes, useEffect, useState } from 'react';
 
 import { MenuIcon, SearchIcon } from 'lucide-react';
-import { Link, useLocation, useParams } from 'react-router';
+import { Link, useParams } from 'react-router';
 
-import type { SessionUser } from '@documenso/auth/server/lib/session/session';
-import type { TGetTeamsResponse } from '@documenso/lib/server-only/team/get-teams';
 import { getRootHref } from '@documenso/lib/utils/params';
 import { cn } from '@documenso/ui/lib/utils';
 
@@ -15,14 +13,10 @@ import { AppNavDesktop } from './app-nav-desktop';
 import { AppNavMobile } from './app-nav-mobile';
 import { MenuSwitcher } from './menu-switcher';
 
-export type HeaderProps = HTMLAttributes<HTMLDivElement> & {
-  user: SessionUser;
-  teams: TGetTeamsResponse;
-};
+export type HeaderProps = HTMLAttributes<HTMLDivElement>;
 
-export const Header = ({ className, user, teams, ...props }: HeaderProps) => {
+export const Header = ({ className, ...props }: HeaderProps) => {
   const params = useParams();
-  const { pathname } = useLocation();
 
   const [isCommandMenuOpen, setIsCommandMenuOpen] = useState(false);
   const [isHamburgerMenuOpen, setIsHamburgerMenuOpen] = useState(false);
@@ -38,16 +32,6 @@ export const Header = ({ className, user, teams, ...props }: HeaderProps) => {
     return () => window.removeEventListener('scroll', onScroll);
   }, []);
 
-  const isPathTeamUrl = (teamUrl: string) => {
-    if (!pathname || !pathname.startsWith(`/t/`)) {
-      return false;
-    }
-
-    return pathname.split('/')[2] === teamUrl;
-  };
-
-  const selectedTeam = teams?.find((team) => isPathTeamUrl(team.url));
-
   return (
     <header
       className={cn(
@@ -59,7 +43,7 @@ export const Header = ({ className, user, teams, ...props }: HeaderProps) => {
     >
       <div className="mx-auto flex w-full max-w-screen-xl items-center justify-between gap-x-4 px-4 md:justify-normal md:px-8">
         <Link
-          to={`${getRootHref(params, { returnEmptyRootString: true })}/documents`}
+          to={`${getRootHref(params, { returnEmptyRootString: true })}`}
           className="focus-visible:ring-ring ring-offset-background hidden rounded-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 md:inline"
         >
           <BrandingLogo className="h-6 w-auto" />
@@ -67,11 +51,8 @@ export const Header = ({ className, user, teams, ...props }: HeaderProps) => {
 
         <AppNavDesktop setIsCommandMenuOpen={setIsCommandMenuOpen} />
 
-        <div
-          className="flex gap-x-4 md:ml-8"
-          title={selectedTeam ? selectedTeam.name : (user.name ?? '')}
-        >
-          <MenuSwitcher user={user} teams={teams} />
+        <div className="flex gap-x-4 md:ml-8">
+          <MenuSwitcher />
         </div>
 
         <div className="flex flex-row items-center space-x-4 md:hidden">

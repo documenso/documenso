@@ -19,7 +19,7 @@ import { TableCell } from '@documenso/ui/primitives/table';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@documenso/ui/primitives/tooltip';
 
 import { TemplateType } from '~/components/general/template/template-type';
-import { useOptionalCurrentTeam } from '~/providers/team';
+import { useCurrentTeam } from '~/providers/team';
 
 import { TemplateUseDialog } from '../dialogs/template-use-dialog';
 import { TemplateDirectLinkBadge } from '../general/template/template-direct-link-badge';
@@ -45,7 +45,7 @@ export const TemplatesTable = ({
   const { _, i18n } = useLingui();
   const { remaining } = useLimits();
 
-  const team = useOptionalCurrentTeam();
+  const team = useCurrentTeam();
 
   const [isPending, startTransition] = useTransition();
 

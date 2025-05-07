@@ -17,7 +17,7 @@ const examplePdf = fs
 type SeedTemplateOptions = {
   title?: string;
   userId: number;
-  teamId?: number;
+  teamId: number;
   createTemplateOptions?: Partial<Prisma.TemplateCreateInput>;
 };
 
@@ -82,15 +82,11 @@ export const seedTemplate = async (options: SeedTemplateOptions) => {
           role: RecipientRole.SIGNER,
         },
       },
-      ...(teamId
-        ? {
-            team: {
-              connect: {
-                id: teamId,
-              },
-            },
-          }
-        : {}),
+      team: {
+        connect: {
+          id: teamId,
+        },
+      },
     },
   });
 };
@@ -126,15 +122,11 @@ export const seedDirectTemplate = async (options: SeedTemplateOptions) => {
           token: Math.random().toString().slice(2, 7),
         },
       },
-      ...(teamId
-        ? {
-            team: {
-              connect: {
-                id: teamId,
-              },
-            },
-          }
-        : {}),
+      team: {
+        connect: {
+          id: teamId,
+        },
+      },
       ...options.createTemplateOptions,
     },
     include: {

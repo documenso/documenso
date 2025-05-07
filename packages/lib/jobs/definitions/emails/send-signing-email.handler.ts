@@ -14,6 +14,7 @@ import {
   RECIPIENT_ROLES_DESCRIPTION,
   RECIPIENT_ROLE_TO_EMAIL_TYPE,
 } from '../../../constants/recipient-roles';
+import { getTeamSettings } from '../../../server-only/team/get-team-settings';
 import { DOCUMENT_AUDIT_LOG_TYPE } from '../../../types/document-audit-logs';
 import { extractDerivedDocumentEmailSettings } from '../../../types/document-email';
 import { createDocumentAuditLogData } from '../../../utils/document-audit-logs';
@@ -49,7 +50,6 @@ export const run = async ({
           select: {
             teamEmail: true,
             name: true,
-            teamGlobalSettings: true,
           },
         },
       },
@@ -75,6 +75,11 @@ export const run = async ({
     return;
   }
 
+  const settings = await getTeamSettings({
+    userId,
+    teamId: document.teamId,
+  });
+
   const customEmail = document?.documentMeta;
   const isDirectTemplate = document.source === DocumentSource.TEMPLATE_DIRECT_LINK;
   const isTeamDocument = document.teamId !== null;
@@ -84,7 +89,10 @@ export const run = async ({
   const { email, name } = recipient;
   const selfSigner = email === user.email;
 
-  const i18n = await getI18nInstance(documentMeta?.language);
+  const branding = teamGlobalSettingsToBranding(settings, document.teamId);
+  const lang = documentMeta?.language ?? settings.documentLanguage;
+
+  const i18n = await getI18nInstance(lang);
 
   const recipientActionVerb = i18n
     ._(RECIPIENT_ROLES_DESCRIPTION[recipient.role].actionVerb)
@@ -117,7 +125,7 @@ export const run = async ({
       const inviterName = user.name || '';
 
       emailMessage = i18n._(
-        team.teamGlobalSettings?.includeSenderDetails
+        settings.includeSenderDetails
           ? msg`${inviterName} on behalf of "${team.name}" has invited you to ${recipientActionVerb} the document "${document.title}".`
           : msg`${team.name} has invited you to ${recipientActionVerb} the document "${document.title}".`,
       );
@@ -145,18 +153,14 @@ export const run = async ({
     isTeamInvite: isTeamDocument,
     teamName: team?.name,
     teamEmail: team?.teamEmail?.email,
-    includeSenderDetails: team?.teamGlobalSettings?.includeSenderDetails,
+    includeSenderDetails: settings.includeSenderDetails,
   });
 
   await io.runTask('send-signing-email', async () => {
-    const branding = document.team?.teamGlobalSettings
-      ? teamGlobalSettingsToBranding(document.team.teamGlobalSettings)
-      : undefined;
-
     const [html, text] = await Promise.all([
-      renderEmailWithI18N(template, { lang: documentMeta?.language, branding }),
+      renderEmailWithI18N(template, { lang, branding }),
       renderEmailWithI18N(template, {
-        lang: documentMeta?.language,
+        lang,
         branding,
         plainText: true,
       }),

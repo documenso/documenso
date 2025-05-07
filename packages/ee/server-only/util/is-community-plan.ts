@@ -7,7 +7,7 @@ import { getCommunityPlanPriceIds } from '../stripe/get-community-plan-prices';
 
 export type IsCommunityPlanOptions = {
   userId: number;
-  teamId?: number;
+  teamId: number;
 };
 
 /**

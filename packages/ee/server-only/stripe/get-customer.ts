@@ -27,6 +27,7 @@ export const getStripeCustomerById = async (stripeCustomerId: string) => {
   }
 };
 
+// Todo: (orgs)
 /**
  * Get a stripe customer by user.
  *

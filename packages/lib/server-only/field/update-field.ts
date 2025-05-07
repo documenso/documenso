@@ -11,7 +11,7 @@ export type UpdateFieldOptions = {
   fieldId: number;
   documentId: number;
   userId: number;
-  teamId?: number;
+  teamId: number;
   recipientId?: number;
   type?: FieldType;
   pageNumber?: number;
@@ -47,21 +47,15 @@ export const updateField = async ({
       id: fieldId,
       document: {
         id: documentId,
-        ...(teamId
-          ? {
-              team: {
-                id: teamId,
-                members: {
-                  some: {
-                    userId,
-                  },
-                },
-              },
-            }
-          : {
+        userId,
+        team: {
+          id: teamId,
+          members: {
+            some: {
               userId,
-              teamId: null,
-            }),
+            },
+          },
+        },
       },
     },
   });
