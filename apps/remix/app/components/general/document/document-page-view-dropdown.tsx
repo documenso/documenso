@@ -3,8 +3,8 @@ import { useState } from 'react';
 import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
 import { Trans } from '@lingui/react/macro';
-import { DocumentStatus } from '@prisma/client';
 import type { Document, Recipient, Team, User } from '@prisma/client';
+import { DocumentStatus } from '@prisma/client';
 import {
   Copy,
   Download,
@@ -15,8 +15,7 @@ import {
   Share,
   Trash2,
 } from 'lucide-react';
-import { Link } from 'react-router';
-import { useNavigate } from 'react-router';
+import { Link, useNavigate } from 'react-router';
 
 import { downloadPDF } from '@documenso/lib/client-only/download-pdf';
 import { useSession } from '@documenso/lib/client-only/providers/session';
@@ -99,6 +98,35 @@ export const DocumentPageViewDropdown = ({ document }: DocumentPageViewDropdownP
     }
   };
 
+  const onDownloadOriginalClick = async () => {
+    try {
+      const documentWithData = await trpcClient.document.getDocumentById.query(
+        {
+          documentId: document.id,
+        },
+        {
+          context: {
+            teamId: team?.id?.toString(),
+          },
+        },
+      );
+
+      const documentData = documentWithData?.documentData;
+
+      if (!documentData) {
+        return;
+      }
+
+      await downloadPDF({ documentData, fileName: document.title, version: 'original' });
+    } catch (err) {
+      toast({
+        title: _(msg`Something went wrong`),
+        description: _(msg`An error occurred while downloading your document.`),
+        variant: 'destructive',
+      });
+    }
+  };
+
   const nonSignedRecipients = document.recipients.filter((item) => item.signingStatus !== 'SIGNED');
 
   return (
@@ -127,6 +155,11 @@ export const DocumentPageViewDropdown = ({ document }: DocumentPageViewDropdownP
             <Trans>Download</Trans>
           </DropdownMenuItem>
         )}
+
+        <DropdownMenuItem onClick={onDownloadOriginalClick}>
+          <Download className="mr-2 h-4 w-4" />
+          <Trans>Download Original</Trans>
+        </DropdownMenuItem>
 
         <DropdownMenuItem asChild>
           <Link to={`${documentsPath}/${document.id}/logs`}>

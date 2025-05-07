@@ -11,10 +11,8 @@ import { useToast } from '@documenso/ui/primitives/use-toast';
 import { ConfigureDocumentProvider } from '~/components/embed/authoring/configure-document-context';
 import { ConfigureDocumentView } from '~/components/embed/authoring/configure-document-view';
 import type { TConfigureEmbedFormSchema } from '~/components/embed/authoring/configure-document-view.types';
-import {
-  ConfigureFieldsView,
-  type TConfigureFieldsFormSchema,
-} from '~/components/embed/authoring/configure-fields-view';
+import { ConfigureFieldsView } from '~/components/embed/authoring/configure-fields-view';
+import type { TConfigureFieldsFormSchema } from '~/components/embed/authoring/configure-fields-view.types';
 import {
   type TBaseEmbedAuthoringSchema,
   ZBaseEmbedAuthoringSchema,
@@ -48,8 +46,6 @@ export default function EmbeddingAuthoringTemplateCreatePage() {
 
   const handleConfigureFieldsSubmit = async (data: TConfigureFieldsFormSchema) => {
     try {
-      console.log('configuration', configuration);
-      console.log('data', data);
       if (!configuration || !configuration.documentData) {
         toast({
           variant: 'destructive',
@@ -117,7 +113,7 @@ export default function EmbeddingAuthoringTemplateCreatePage() {
 
       // Navigate to the completion page instead of the template details page
       await navigate(
-        `/embed/v1/authoring/create-completed?templateId=${createResult.templateId}&externalId=${metaWithExternalId.externalId}#${hash}`,
+        `/embed/v1/authoring/completed/create?templateId=${createResult.templateId}&externalId=${metaWithExternalId.externalId}#${hash}`,
       );
     } catch (err) {
       console.error('Error creating template:', err);

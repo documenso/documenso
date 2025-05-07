@@ -2,12 +2,11 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 import { useLingui } from '@lingui/react';
 import { Trans } from '@lingui/react/macro';
-import type { DocumentData } from '@prisma/client';
-import { FieldType, ReadStatus, type Recipient, SendStatus, SigningStatus } from '@prisma/client';
+import type { DocumentData, FieldType } from '@prisma/client';
+import { ReadStatus, type Recipient, SendStatus, SigningStatus } from '@prisma/client';
 import { ChevronsUpDown } from 'lucide-react';
 import { useFieldArray, useForm } from 'react-hook-form';
 import { useHotkeys } from 'react-hotkeys-hook';
-import { z } from 'zod';
 
 import { getBoundingClientRect } from '@documenso/lib/client-only/get-bounding-client-rect';
 import { useDocumentElement } from '@documenso/lib/client-only/hooks/use-document-element';
@@ -30,6 +29,7 @@ import { Sheet, SheetContent, SheetTrigger } from '@documenso/ui/primitives/shee
 import { useToast } from '@documenso/ui/primitives/use-toast';
 
 import type { TConfigureEmbedFormSchema } from './configure-document-view.types';
+import type { TConfigureFieldsFormSchema } from './configure-fields-view.types';
 import { FieldAdvancedSettingsDrawer } from './field-advanced-settings-drawer';
 
 const MIN_HEIGHT_PX = 12;
@@ -38,28 +38,9 @@ const MIN_WIDTH_PX = 36;
 const DEFAULT_HEIGHT_PX = MIN_HEIGHT_PX * 2.5;
 const DEFAULT_WIDTH_PX = MIN_WIDTH_PX * 2.5;
 
-export const ZConfigureFieldsFormSchema = z.object({
-  fields: z.array(
-    z.object({
-      formId: z.string().min(1),
-      id: z.string().min(1),
-      type: z.nativeEnum(FieldType),
-      signerEmail: z.string().min(1),
-      recipientId: z.number().min(0),
-      pageNumber: z.number().min(1),
-      pageX: z.number().min(0),
-      pageY: z.number().min(0),
-      pageWidth: z.number().min(0),
-      pageHeight: z.number().min(0),
-      fieldMeta: ZFieldMetaSchema.optional(),
-    }),
-  ),
-});
-
-export type TConfigureFieldsFormSchema = z.infer<typeof ZConfigureFieldsFormSchema>;
-
 export type ConfigureFieldsViewProps = {
   configData: TConfigureEmbedFormSchema;
+  documentData?: DocumentData;
   defaultValues?: Partial<TConfigureFieldsFormSchema>;
   onBack: (data: TConfigureFieldsFormSchema) => void;
   onSubmit: (data: TConfigureFieldsFormSchema) => void;
@@ -67,13 +48,14 @@ export type ConfigureFieldsViewProps = {
 
 export const ConfigureFieldsView = ({
   configData,
+  documentData,
   defaultValues,
   onBack,
   onSubmit,
 }: ConfigureFieldsViewProps) => {
+  const { _ } = useLingui();
   const { toast } = useToast();
   const { isWithinPageBounds, getFieldPosition, getPage } = useDocumentElement();
-  const { _ } = useLingui();
 
   // Track if we're on a mobile device
   const [isMobile, setIsMobile] = useState(false);
@@ -99,7 +81,11 @@ export const ConfigureFieldsView = ({
     };
   }, []);
 
-  const documentData = useMemo(() => {
+  const normalizedDocumentData = useMemo(() => {
+    if (documentData) {
+      return documentData;
+    }
+
     if (!configData.documentData) {
       return null;
     }
@@ -116,7 +102,7 @@ export const ConfigureFieldsView = ({
 
   const recipients = useMemo(() => {
     return configData.signers.map<Recipient>((signer, index) => ({
-      id: index,
+      id: signer.nativeId || index,
       name: signer.name || '',
       email: signer.email || '',
       role: signer.role,
@@ -129,14 +115,14 @@ export const ConfigureFieldsView = ({
       signedAt: null,
       authOptions: null,
       rejectionReason: null,
-      sendStatus: SendStatus.NOT_SENT,
-      readStatus: ReadStatus.NOT_OPENED,
-      signingStatus: SigningStatus.NOT_SIGNED,
+      sendStatus: signer.disabled ? SendStatus.SENT : SendStatus.NOT_SENT,
+      readStatus: signer.disabled ? ReadStatus.OPENED : ReadStatus.NOT_OPENED,
+      signingStatus: signer.disabled ? SigningStatus.SIGNED : SigningStatus.NOT_SIGNED,
     }));
   }, [configData.signers]);
 
   const [selectedRecipient, setSelectedRecipient] = useState<Recipient | null>(
-    () => recipients[0] || null,
+    () => recipients.find((r) => r.signingStatus === SigningStatus.NOT_SIGNED) || null,
   );
   const [selectedField, setSelectedField] = useState<FieldType | null>(null);
   const [isFieldWithinBounds, setIsFieldWithinBounds] = useState(false);
@@ -206,8 +192,8 @@ export const ConfigureFieldsView = ({
 
         const newField: TConfigureFieldsFormSchema['fields'][0] = {
           ...structuredClone(lastActiveField),
+          nativeId: undefined,
           formId: nanoid(12),
-          id: nanoid(12),
           signerEmail: selectedRecipient?.email ?? lastActiveField.signerEmail,
           recipientId: selectedRecipient?.id ?? lastActiveField.recipientId,
           pageX: lastActiveField.pageX + 3,
@@ -229,8 +215,8 @@ export const ConfigureFieldsView = ({
 
         append({
           ...copiedField,
+          nativeId: undefined,
           formId: nanoid(12),
-          id: nanoid(12),
           signerEmail: selectedRecipient?.email ?? copiedField.signerEmail,
           recipientId: selectedRecipient?.id ?? copiedField.recipientId,
           pageX: copiedField.pageX + 3,
@@ -303,7 +289,6 @@ export const ConfigureFieldsView = ({
       pageY -= fieldPageHeight / 2;
 
       const field = {
-        id: nanoid(12),
         formId: nanoid(12),
         type: selectedField,
         pageNumber,
@@ -526,9 +511,9 @@ export const ConfigureFieldsView = ({
             )}
 
             <Form {...form}>
-              {documentData && (
+              {normalizedDocumentData && (
                 <div>
-                  <PDFViewer documentData={documentData} />
+                  <PDFViewer documentData={normalizedDocumentData} />
 
                   <ElementVisible target={PDF_VIEWER_PAGE_SELECTOR}>
                     {localFields.map((field, index) => {

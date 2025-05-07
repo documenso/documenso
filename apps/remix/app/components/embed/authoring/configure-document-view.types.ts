@@ -15,11 +15,13 @@ export const ZConfigureEmbedFormSchema = z.object({
   signers: z
     .array(
       z.object({
+        nativeId: z.number().optional(),
         formId: z.string(),
         name: z.string().min(1, { message: 'Name is required' }),
         email: z.string().email('Invalid email address'),
         role: z.enum(['SIGNER', 'CC', 'APPROVER', 'VIEWER', 'ASSISTANT']),
         signingOrder: z.number().optional(),
+        disabled: z.boolean().optional(),
       }),
     )
     .min(1, { message: 'At least one signer is required' }),
@@ -34,7 +36,7 @@ export const ZConfigureEmbedFormSchema = z.object({
     language: ZDocumentMetaLanguageSchema.optional(),
     signatureTypes: z.array(z.string()).default([]),
     signingOrder: z.enum(['SEQUENTIAL', 'PARALLEL']),
-    allowDictateNextSigner: z.boolean().default(false),
+    allowDictateNextSigner: z.boolean().default(false).optional(),
     externalId: z.string().optional(),
   }),
   documentData: z

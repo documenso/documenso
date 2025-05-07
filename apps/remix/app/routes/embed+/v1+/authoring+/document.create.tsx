@@ -12,10 +12,8 @@ import { useToast } from '@documenso/ui/primitives/use-toast';
 import { ConfigureDocumentProvider } from '~/components/embed/authoring/configure-document-context';
 import { ConfigureDocumentView } from '~/components/embed/authoring/configure-document-view';
 import type { TConfigureEmbedFormSchema } from '~/components/embed/authoring/configure-document-view.types';
-import {
-  ConfigureFieldsView,
-  type TConfigureFieldsFormSchema,
-} from '~/components/embed/authoring/configure-fields-view';
+import { ConfigureFieldsView } from '~/components/embed/authoring/configure-fields-view';
+import type { TConfigureFieldsFormSchema } from '~/components/embed/authoring/configure-fields-view.types';
 import {
   type TBaseEmbedAuthoringSchema,
   ZBaseEmbedAuthoringSchema,
@@ -71,6 +69,8 @@ export default function EmbeddingAuthoringDocumentCreatePage() {
       // Use the externalId from the URL fragment if available
       const documentExternalId = externalId || configuration.meta.externalId;
 
+      const signatureTypes = configuration.meta.signatureTypes ?? [];
+
       const createResult = await createEmbeddingDocument({
         title: configuration.title,
         documentDataId: documentData.id,
@@ -78,14 +78,11 @@ export default function EmbeddingAuthoringDocumentCreatePage() {
         meta: {
           ...configuration.meta,
           drawSignatureEnabled:
-            configuration.meta.signatureTypes.length === 0 ||
-            configuration.meta.signatureTypes.includes(DocumentSignatureType.DRAW),
+            signatureTypes.length === 0 || signatureTypes.includes(DocumentSignatureType.DRAW),
           typedSignatureEnabled:
-            configuration.meta.signatureTypes.length === 0 ||
-            configuration.meta.signatureTypes.includes(DocumentSignatureType.TYPE),
+            signatureTypes.length === 0 || signatureTypes.includes(DocumentSignatureType.TYPE),
           uploadSignatureEnabled:
-            configuration.meta.signatureTypes.length === 0 ||
-            configuration.meta.signatureTypes.includes(DocumentSignatureType.UPLOAD),
+            signatureTypes.length === 0 || signatureTypes.includes(DocumentSignatureType.UPLOAD),
         },
         recipients: configuration.signers.map((signer) => ({
           name: signer.name,
@@ -126,7 +123,7 @@ export default function EmbeddingAuthoringDocumentCreatePage() {
 
       // Navigate to the completion page instead of the document details page
       await navigate(
-        `/embed/v1/authoring/create-completed?documentId=${createResult.documentId}&externalId=${documentExternalId}#${hash}`,
+        `/embed/v1/authoring/completed/create?documentId=${createResult.documentId}&externalId=${documentExternalId}#${hash}`,
       );
     } catch (err) {
       console.error('Error creating document:', err);

@@ -1,10 +1,17 @@
-import { redirect } from 'react-router';
+import { redirect, useLoaderData } from 'react-router';
 
 import { NEXT_PUBLIC_WEBAPP_URL } from '@documenso/lib/constants/app';
+import { getDocumentByAccessToken } from '@documenso/lib/server-only/document/get-document-by-access-token';
+
+import { DocumentCertificateQRView } from '~/components/general/document/document-certificate-qr-view';
 
 import type { Route } from './+types/share.$slug';
 
 export function meta({ params: { slug } }: Route.MetaArgs) {
+  if (slug.startsWith('qr_')) {
+    return undefined;
+  }
+
   return [
     { title: 'Documenso - Share' },
     { description: 'I just signed a document in style with Documenso!' },
@@ -43,11 +50,23 @@ export function meta({ params: { slug } }: Route.MetaArgs) {
   ];
 }
 
-export const loader = ({ request }: Route.LoaderArgs) => {
+export const loader = async ({ request, params: { slug } }: Route.LoaderArgs) => {
+  if (slug.startsWith('qr_')) {
+    const document = await getDocumentByAccessToken({ token: slug });
+
+    if (!document) {
+      throw redirect('/');
+    }
+
+    return {
+      document,
+    };
+  }
+
   const userAgent = request.headers.get('User-Agent') ?? '';
 
   if (/bot|facebookexternalhit|WhatsApp|google|bing|duckduckbot|MetaInspector/i.test(userAgent)) {
-    return null;
+    return {};
   }
 
   // Is hardcoded because this whole meta is hardcoded anyway for Documenso.
@@ -55,5 +74,20 @@ export const loader = ({ request }: Route.LoaderArgs) => {
 };
 
 export default function SharePage() {
+  const { document } = useLoaderData<typeof loader>();
+
+  if (document) {
+    return (
+      <DocumentCertificateQRView
+        documentId={document.id}
+        title={document.title}
+        documentData={document.documentData}
+        password={document.documentMeta?.password}
+        recipientCount={document.recipients?.length ?? 0}
+        completedDate={document.completedAt ?? undefined}
+      />
+    );
+  }
+
   return <div></div>;
 }

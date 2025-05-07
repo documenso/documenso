@@ -4,6 +4,7 @@ import { AttachmentSchema } from '@documenso/prisma/generated/zod/modelSchema/At
 import { DocumentDataSchema } from '@documenso/prisma/generated/zod/modelSchema/DocumentDataSchema';
 import { DocumentMetaSchema } from '@documenso/prisma/generated/zod/modelSchema/DocumentMetaSchema';
 import { DocumentSchema } from '@documenso/prisma/generated/zod/modelSchema/DocumentSchema';
+import { FolderSchema } from '@documenso/prisma/generated/zod/modelSchema/FolderSchema';
 import { TeamSchema } from '@documenso/prisma/generated/zod/modelSchema/TeamSchema';
 import { UserSchema } from '@documenso/prisma/generated/zod/modelSchema/UserSchema';
 
@@ -32,6 +33,7 @@ export const ZDocumentSchema = DocumentSchema.pick({
   deletedAt: true,
   teamId: true,
   templateId: true,
+  folderId: true,
 }).extend({
   // Todo: Maybe we want to alter this a bit since this returns a lot of data.
   documentData: DocumentDataSchema.pick({
@@ -57,6 +59,18 @@ export const ZDocumentSchema = DocumentSchema.pick({
     allowDictateNextSigner: true,
     language: true,
     emailSettings: true,
+  }).nullable(),
+  folder: FolderSchema.pick({
+    id: true,
+    name: true,
+    type: true,
+    visibility: true,
+    userId: true,
+    teamId: true,
+    pinned: true,
+    parentId: true,
+    createdAt: true,
+    updatedAt: true,
   }).nullable(),
   recipients: ZRecipientLiteSchema.array(),
   fields: ZFieldSchema.array(),
@@ -92,8 +106,11 @@ export const ZDocumentLiteSchema = DocumentSchema.pick({
   deletedAt: true,
   teamId: true,
   templateId: true,
+  folderId: true,
   useLegacyFieldInsertion: true,
 });
+
+export type TDocumentLite = z.infer<typeof ZDocumentLiteSchema>;
 
 /**
  * A version of the document response schema when returning multiple documents at once from a single API endpoint.
@@ -115,6 +132,7 @@ export const ZDocumentManySchema = DocumentSchema.pick({
   deletedAt: true,
   teamId: true,
   templateId: true,
+  folderId: true,
   useLegacyFieldInsertion: true,
 }).extend({
   user: UserSchema.pick({
@@ -128,3 +146,5 @@ export const ZDocumentManySchema = DocumentSchema.pick({
     url: true,
   }).nullable(),
 });
+
+export type TDocumentMany = z.infer<typeof ZDocumentManySchema>;

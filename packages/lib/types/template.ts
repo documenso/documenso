@@ -2,6 +2,7 @@ import type { z } from 'zod';
 
 import { AttachmentSchema } from '@documenso/prisma/generated/zod/modelSchema/AttachmentSchema';
 import { DocumentDataSchema } from '@documenso/prisma/generated/zod/modelSchema/DocumentDataSchema';
+import { FolderSchema } from '@documenso/prisma/generated/zod/modelSchema/FolderSchema';
 import TeamSchema from '@documenso/prisma/generated/zod/modelSchema/TeamSchema';
 import { TemplateDirectLinkSchema } from '@documenso/prisma/generated/zod/modelSchema/TemplateDirectLinkSchema';
 import { TemplateMetaSchema } from '@documenso/prisma/generated/zod/modelSchema/TemplateMetaSchema';
@@ -30,6 +31,7 @@ export const ZTemplateSchema = TemplateSchema.pick({
   updatedAt: true,
   publicTitle: true,
   publicDescription: true,
+  folderId: true,
 }).extend({
   // Todo: Maybe we want to alter this a bit since this returns a lot of data.
   templateDocumentData: DocumentDataSchema.pick({
@@ -71,6 +73,18 @@ export const ZTemplateSchema = TemplateSchema.pick({
   })
     .array()
     .optional(),
+  folder: FolderSchema.pick({
+    id: true,
+    name: true,
+    type: true,
+    visibility: true,
+    userId: true,
+    teamId: true,
+    pinned: true,
+    parentId: true,
+    createdAt: true,
+    updatedAt: true,
+  }).nullable(),
 });
 
 export type TTemplate = z.infer<typeof ZTemplateSchema>;
@@ -92,6 +106,7 @@ export const ZTemplateLiteSchema = TemplateSchema.pick({
   updatedAt: true,
   publicTitle: true,
   publicDescription: true,
+  folderId: true,
   useLegacyFieldInsertion: true,
 });
 
@@ -112,6 +127,7 @@ export const ZTemplateManySchema = TemplateSchema.pick({
   updatedAt: true,
   publicTitle: true,
   publicDescription: true,
+  folderId: true,
   useLegacyFieldInsertion: true,
 }).extend({
   team: TeamSchema.pick({

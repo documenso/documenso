@@ -3,7 +3,7 @@ import { useCallback, useState } from 'react';
 import { useLingui } from '@lingui/react';
 import { Trans } from '@lingui/react/macro';
 import type { Recipient } from '@prisma/client';
-import { RecipientRole, SendStatus } from '@prisma/client';
+import { RecipientRole, SendStatus, SigningStatus } from '@prisma/client';
 import { Check, ChevronsUpDown, Info } from 'lucide-react';
 import { sortBy } from 'remeda';
 
@@ -145,6 +145,7 @@ export const RecipientSelector = ({
                     onSelectedRecipientChange(recipient);
                     setShowRecipientsSelector(false);
                   }}
+                  disabled={recipient.signingStatus !== SigningStatus.NOT_SIGNED}
                 >
                   <span
                     className={cn('text-foreground/70 truncate', {
