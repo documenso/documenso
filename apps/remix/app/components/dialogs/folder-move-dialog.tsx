@@ -1,10 +1,10 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 
 import { zodResolver } from '@hookform/resolvers/zod';
 import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
 import type * as DialogPrimitive from '@radix-ui/react-dialog';
-import { FolderIcon, HomeIcon } from 'lucide-react';
+import { FolderIcon, HomeIcon, Search } from 'lucide-react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 
@@ -27,6 +27,7 @@ import {
   FormItem,
   FormMessage,
 } from '@documenso/ui/primitives/form/form';
+import { Input } from '@documenso/ui/primitives/input';
 import { useToast } from '@documenso/ui/primitives/use-toast';
 
 export type FolderMoveDialogProps = {
@@ -49,8 +50,9 @@ export const FolderMoveDialog = ({
   onOpenChange,
 }: FolderMoveDialogProps) => {
   const { _ } = useLingui();
-
   const { toast } = useToast();
+  const [searchTerm, setSearchTerm] = useState('');
+
   const { mutateAsync: moveFolder } = trpc.folder.moveFolder.useMutation();
 
   const form = useForm<TMoveFolderFormSchema>({
@@ -98,12 +100,16 @@ export const FolderMoveDialog = ({
   useEffect(() => {
     if (!isOpen) {
       form.reset();
+      setSearchTerm('');
     }
   }, [isOpen, form]);
 
-  // Filter out the current folder and only show folders of the same type
+  // Filter out the current folder, only show folders of the same type, and filter by search term
   const filteredFolders = foldersData?.filter(
-    (f) => f.id !== folder?.id && f.type === folder?.type,
+    (f) =>
+      f.id !== folder?.id &&
+      f.type === folder?.type &&
+      (searchTerm === '' || f.name.toLowerCase().includes(searchTerm.toLowerCase())),
   );
 
   return (
@@ -113,6 +119,15 @@ export const FolderMoveDialog = ({
           <DialogTitle>Move Folder</DialogTitle>
           <DialogDescription>Select a destination for this folder.</DialogDescription>
         </DialogHeader>
+        <div className="relative">
+          <Search className="text-muted-foreground absolute left-2 top-3 h-4 w-4" />
+          <Input
+            placeholder={_(msg`Search folders...`)}
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="pl-8"
+          />
+        </div>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onFormSubmit)} className="space-y-4 py-4">
             <FormField
@@ -121,7 +136,7 @@ export const FolderMoveDialog = ({
               render={({ field }) => (
                 <FormItem>
                   <FormControl>
-                    <div className="space-y-2">
+                    <div className="max-h-96 space-y-2 overflow-y-auto">
                       <Button
                         type="button"
                         variant={!field.value ? 'default' : 'outline'}
@@ -130,7 +145,7 @@ export const FolderMoveDialog = ({
                         onClick={() => field.onChange(null)}
                       >
                         <HomeIcon className="mr-2 h-4 w-4" />
-                        Root
+                        Home
                       </Button>
 
                       {filteredFolders &&
