@@ -185,6 +185,7 @@ export const DocumentEditForm = ({
           visibility: data.visibility,
           globalAccessAuth: data.globalAccessAuth ?? null,
           globalActionAuth: data.globalActionAuth ?? null,
+          attachments: data.attachments ?? [],
         },
         meta: {
           timezone,

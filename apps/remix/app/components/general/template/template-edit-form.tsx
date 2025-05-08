@@ -136,6 +136,7 @@ export const TemplateEditForm = ({
           visibility: data.visibility,
           globalAccessAuth: data.globalAccessAuth ?? null,
           globalActionAuth: data.globalActionAuth ?? null,
+          attachments: data.attachments ?? [],
         },
         meta: {
           ...data.meta,
@@ -165,6 +166,14 @@ export const TemplateEditForm = ({
       await Promise.all([
         updateTemplateSettings({
           templateId: template.id,
+          data: {
+            attachments: template.attachments?.map((attachment) => ({
+              id: attachment.id,
+              label: attachment.label,
+              url: attachment.url,
+              formId: attachment.id,
+            })),
+          },
           meta: {
             signingOrder: data.signingOrder,
             allowDictateNextSigner: data.allowDictateNextSigner,
