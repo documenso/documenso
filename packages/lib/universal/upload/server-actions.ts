@@ -109,7 +109,8 @@ export const uploadS3File = async (file: File) => {
       ContentType: file.type,
     }),
   );
-
+  console.log('S3 upload response:', response);
+  console.log('S3 upload key:', key);
   return { key, response };
 };
 

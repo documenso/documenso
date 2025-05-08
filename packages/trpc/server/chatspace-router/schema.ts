@@ -200,7 +200,6 @@ export const ZCreateDocumentRequestSchema = z.object({
   documentDataId: z.string().min(1),
   timezone: ZDocumentMetaTimezoneSchema.optional(),
   folderId: z.string().describe('The ID of the folder to create the document in').optional(),
-  useToChat: z.boolean().optional(),
 });
 
 export const ZCreateDocumentV2RequestSchema = z.object({

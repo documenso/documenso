@@ -168,9 +168,9 @@ export const DocumentDropZoneWrapper = ({ children, className }: DocumentDropZon
               remaining.documents > 0 &&
               Number.isFinite(remaining.documents) && (
                 <p className="text-muted-foreground/80 mt-4 text-sm">
-                  <Trans>
+                  {/* <Trans>
                     {remaining.documents} of {quota.documents} documents remaining this month.
-                  </Trans>
+                  </Trans> */}
                 </p>
               )}
           </div>

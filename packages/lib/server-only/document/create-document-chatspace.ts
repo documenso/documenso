@@ -30,7 +30,6 @@ export type CreateDocumentOptions = {
   timezone?: string;
   requestMetadata: ApiRequestMetadata;
   folderId?: string;
-  useToChat?: boolean;
 };
 
 export const createDocument = async ({
@@ -44,7 +43,6 @@ export const createDocument = async ({
   requestMetadata,
   timezone,
   folderId,
-  useToChat,
 }: CreateDocumentOptions) => {
   const user = await prisma.user.findFirstOrThrow({
     where: {
@@ -149,7 +147,6 @@ export const createDocument = async ({
         userId,
         teamId,
         folderId,
-        useToChat,
         visibility:
           folderVisibility ??
           determineDocumentVisibility(

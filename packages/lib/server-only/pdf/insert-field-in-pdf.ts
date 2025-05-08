@@ -123,10 +123,17 @@ export const insertFieldInPDF = async (pdf: PDFDocument, field: FieldWithSignatu
     });
   }
 
-  const font = await pdf.embedFont(
+  let font = await pdf.embedFont(
     isSignatureField ? fontCaveat : fontNoto,
     isSignatureField ? { features: { calt: false } } : undefined,
   );
+
+  if (field.type === FieldType.TEXT) {
+    const meta = field.fieldMeta;
+    console.log('meta', meta);
+    console.log('field', field);
+    font = await pdf.embedFont(fontNotoBold);
+  }
 
   if (field.type === FieldType.SIGNATURE || field.type === FieldType.FREE_SIGNATURE) {
     await pdf.embedFont(fontCaveat);
@@ -331,7 +338,8 @@ export const insertFieldInPDF = async (pdf: PDFDocument, field: FieldWithSignatu
 
       const customFontSize = meta?.success && meta.data.fontSize ? meta.data.fontSize : null;
       const textAlign = meta?.success && meta.data.textAlign ? meta.data.textAlign : 'left';
-
+      const bold = meta?.success && meta.data.bold ? meta.data.bold : true;
+      console.log('bold const ', bold);
       let fontSize = customFontSize || maxFontSize;
       const textWidth = font.widthOfTextAtSize(field.customText, fontSize);
       const textHeight = font.heightAtSize(fontSize);

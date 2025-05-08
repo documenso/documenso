@@ -36,6 +36,7 @@ export const TextFieldAdvancedSettings = ({
     const fontSize = field === 'fontSize' ? Number(value) : Number(fieldState.fontSize ?? 14);
     const readOnly = field === 'readOnly' ? Boolean(value) : Boolean(fieldState.readOnly);
     const required = field === 'required' ? Boolean(value) : Boolean(fieldState.required);
+    const bold = field === 'fontBold' ? Boolean(value) : Boolean(fieldState.required);
 
     const textErrors = validateTextField(text, {
       characterLimit: Number(limit),
@@ -158,6 +159,18 @@ export const TextFieldAdvancedSettings = ({
             <Trans>Required field</Trans>
           </Label>
         </div>
+
+        <div className="flex flex-row items-center gap-2">
+          <Switch
+            className="bg-background"
+            checked={fieldState.fontBold}
+            onCheckedChange={(checked) => handleInput('fontBold', checked)}
+          />
+          <Label>
+            <Trans>Bold Text</Trans>
+          </Label>
+        </div>
+
         <div className="flex flex-row items-center gap-2">
           <Switch
             className="bg-background"

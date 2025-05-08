@@ -75,7 +75,10 @@ model User {
   webhooks           Webhook[]
   siteSettings       SiteSettings[]
   passkeys           Passkey[]
+  Chat               Chat[]
   avatarImage        AvatarImage?           @relation(fields: [avatarImageId], references: [id], onDelete: SetNull)
+  ChatDocuments      ChatDocument[]
+  Suggestion         Suggestion[]
 
   @@index([email])
 }
@@ -369,9 +372,11 @@ model Document {
 
   useLegacyFieldInsertion Boolean @default(false)
 
-  documentData DocumentData @relation(fields: [documentDataId], references: [id], onDelete: Cascade)
-  team         Team?        @relation(fields: [teamId], references: [id])
-  template     Template?    @relation(fields: [templateId], references: [id], onDelete: SetNull)
+  useToChat             Boolean                @default(false)
+  documentBodyExtracted DocumentBodyExtracted?
+  documentData          DocumentData           @relation(fields: [documentDataId], references: [id], onDelete: Cascade)
+  team                  Team?                  @relation(fields: [teamId], references: [id])
+  template              Template?              @relation(fields: [templateId], references: [id], onDelete: SetNull)
 
   auditLogs DocumentAuditLog[]
   folder    Folder?            @relation(fields: [folderId], references: [id], onDelete: Cascade)
@@ -418,6 +423,21 @@ model DocumentData {
   initialData String
   document    Document?
   template    Template?
+}
+
+enum DocumentBodyExtractedStatus {
+  ERROR
+  PENDING
+  COMPLETED
+  PROCESSING
+}
+
+model DocumentBodyExtracted {
+  id         String   @id @default(cuid())
+  body       String
+  status     String
+  documentId Int      @unique
+  document   Document @relation(fields: [documentId], references: [id], onDelete: Cascade)
 }
 
 enum DocumentDistributionMethod {
@@ -624,11 +644,13 @@ model Team {
   owner        User          @relation(fields: [ownerUserId], references: [id], onDelete: Cascade)
   subscription Subscription?
 
-  documents Document[]
-  templates Template[]
-  folders   Folder[]
-  apiTokens ApiToken[]
-  webhooks  Webhook[]
+  documents         Document[]
+  templates         Template[]
+  folders           Folder[]
+  apiTokens         ApiToken[]
+  webhooks          Webhook[]
+  Chat              Chat[]
+  contractTemplates ContractTemplate[]
 }
 
 model TeamPending {
@@ -838,4 +860,128 @@ model AvatarImage {
 
   team Team[]
   user User[]
+}
+
+model ContractTemplate {
+  id        Int       @id @default(autoincrement())
+  name      String?   @db.VarChar(100)
+  body      String?
+  url       String?   @db.Text
+  type      String?
+  status    String?
+  teamId    Int?
+  team      Team?     @relation(fields: [teamId], references: [id])
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @default(now()) @updatedAt
+  deletedAt DateTime?
+  chats     Chat[]
+
+  @@map("ContractTemplates")
+}
+
+model Chat {
+  id         String   @id @default(cuid())
+  createdAt  DateTime
+  title      String   @db.Text
+  userId     Int
+  contractId Int?
+  teamId     Int?
+  visibility String   @default("private") @db.VarChar(255)
+
+  user       User                @relation(fields: [userId], references: [id])
+  contract   ContractTemplate?   @relation(fields: [contractId], references: [id])
+  team       Team?               @relation(fields: [teamId], references: [id])
+  messagesV1 MessageDeprecated[]
+  messagesV2 Message[]
+  votesV1    VoteDeprecated[]
+  votesV2    Vote[]
+
+  @@map("Chat")
+}
+
+// DEPRECATED: Will be removed in the future
+model MessageDeprecated {
+  id        String   @id @default(cuid())
+  chatId    String
+  role      String   @db.VarChar(255)
+  content   Json
+  createdAt DateTime
+
+  chat  Chat             @relation(fields: [chatId], references: [id])
+  votes VoteDeprecated[]
+
+  @@map("Message")
+}
+
+model Message {
+  id          String   @id @default(cuid())
+  chatId      String
+  role        String   @db.VarChar(255)
+  parts       Json
+  attachments Json
+  createdAt   DateTime
+
+  chat  Chat   @relation(fields: [chatId], references: [id])
+  votes Vote[]
+
+  @@map("MessageV2")
+}
+
+// DEPRECATED: Will be removed in the future
+model VoteDeprecated {
+  chatId    String
+  messageId String
+  isUpvoted Boolean
+
+  chat    Chat              @relation(fields: [chatId], references: [id])
+  message MessageDeprecated @relation(fields: [messageId], references: [id])
+
+  @@id([chatId, messageId])
+  @@map("Vote")
+}
+
+model Vote {
+  chatId    String
+  messageId String
+  isUpvoted Boolean
+
+  chat    Chat    @relation(fields: [chatId], references: [id])
+  message Message @relation(fields: [messageId], references: [id])
+
+  @@id([chatId, messageId])
+  @@map("Vote_v2")
+}
+
+model ChatDocument {
+  id        String   @default(cuid())
+  createdAt DateTime
+  title     String   @db.Text
+  content   String?  @db.Text
+  kind      String   @default("text") @db.VarChar(255)
+  userId    Int
+
+  user        User         @relation(fields: [userId], references: [id])
+  suggestions Suggestion[]
+
+  @@id([id, createdAt])
+  @@map("ChatDocument")
+}
+
+model Suggestion {
+  id                String   @id @default(cuid())
+  documentId        String
+  documentCreatedAt DateTime
+  originalText      String   @db.Text
+  suggestedText     String   @db.Text
+  description       String?  @db.Text
+  isResolved        Boolean  @default(false)
+  userId            Int
+  createdAt         DateTime
+
+  user     User         @relation(fields: [userId], references: [id])
+  // Note: The foreign key relation is commented out in your Drizzle schema
+  // You'll need to uncomment and fix this if needed
+  document ChatDocument @relation(fields: [documentId, documentCreatedAt], references: [id, createdAt])
+
+  @@map("Suggestion")
 }

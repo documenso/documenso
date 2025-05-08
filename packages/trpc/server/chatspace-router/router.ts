@@ -13,10 +13,7 @@ import { createDocumentV2 } from '@documenso/lib/server-only/document/create-doc
 import { deleteDocument } from '@documenso/lib/server-only/document/delete-document';
 import { duplicateDocument } from '@documenso/lib/server-only/document/duplicate-document-by-id';
 import { findDocumentAuditLogs } from '@documenso/lib/server-only/document/find-document-audit-logs';
-import {
-  findDocuments,
-  findDocumentsUseToChat,
-} from '@documenso/lib/server-only/document/find-documents';
+import { findDocuments } from '@documenso/lib/server-only/document/find-documents';
 import { getDocumentById } from '@documenso/lib/server-only/document/get-document-by-id';
 import { getDocumentAndSenderByToken } from '@documenso/lib/server-only/document/get-document-by-token';
 import { getDocumentWithDetailsById } from '@documenso/lib/server-only/document/get-document-with-details-by-id';
@@ -209,73 +206,6 @@ export const documentRouter = router({
       };
     }),
 
-  findDocumentsInternalUseToChat: authenticatedProcedure
-    .input(ZFindDocumentsInternalRequestSchema)
-    .output(ZFindDocumentsInternalResponseSchema)
-    .query(async ({ input, ctx }) => {
-      const { user, teamId } = ctx;
-
-      const {
-        query,
-        templateId,
-        page,
-        perPage,
-        orderByDirection,
-        orderByColumn,
-        source,
-        status,
-        period,
-        senderIds,
-        folderId,
-      } = input;
-
-      const getStatOptions: GetStatsInput = {
-        user,
-        period,
-        search: query,
-        folderId,
-      };
-
-      if (teamId) {
-        const team = await getTeamById({ userId: user.id, teamId });
-
-        getStatOptions.team = {
-          teamId: team.id,
-          teamEmail: team.teamEmail?.email,
-          senderIds,
-          currentTeamMemberRole: team.currentTeamMember?.role,
-          currentUserEmail: user.email,
-          userId: user.id,
-        };
-      }
-
-      const [stats, documents] = await Promise.all([
-        getStats(getStatOptions),
-        findDocumentsUseToChat({
-          userId: user.id,
-          teamId,
-          query,
-          templateId,
-          page,
-          perPage,
-          source,
-          status,
-          period,
-          useToChat: true,
-          senderIds,
-          folderId,
-          orderBy: orderByColumn
-            ? { column: orderByColumn, direction: orderByDirection }
-            : undefined,
-        }),
-      ]);
-
-      return {
-        ...documents,
-        stats,
-      };
-    }),
-
   /**
    * @public
    *
@@ -396,7 +326,7 @@ export const documentRouter = router({
     .input(ZCreateDocumentRequestSchema)
     .mutation(async ({ input, ctx }) => {
       const { teamId } = ctx;
-      const { title, documentDataId, timezone, folderId, useToChat } = input;
+      const { title, documentDataId, timezone, folderId } = input;
 
       const { remaining } = await getServerLimits({ email: ctx.user.email, teamId });
 
@@ -416,7 +346,6 @@ export const documentRouter = router({
         timezone,
         requestMetadata: ctx.metadata,
         folderId,
-        useToChat,
       });
     }),
 

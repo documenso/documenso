@@ -57,7 +57,7 @@ ENV NEXT_PRIVATE_ENCRYPTION_SECONDARY_KEY="$NEXT_PRIVATE_ENCRYPTION_SECONDARY_KE
 # ENV TURBO_TOKEN=$TURBO_TOKEN
 
 # First install the dependencies (as they change less often)
-COPY .gitignore ../.gitignore
+COPY .gitignore .gitignore
 COPY --from=builder /app/out/json/ .
 COPY --from=builder /app/out/package-lock.json ./package-lock.json
 
@@ -68,7 +68,7 @@ RUN npm ci
 # Then copy all the source code (as it changes more often)
 COPY --from=builder /app/out/full/ .
 # Finally copy the turbo.json file so that we can run turbo commands
-COPY turbo.json ../turbo.json
+COPY turbo.json .turbo.json
 
 RUN npm install -g "turbo@^1.9.3"
 

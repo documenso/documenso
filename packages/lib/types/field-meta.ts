@@ -6,6 +6,7 @@ export const ZBaseFieldMeta = z.object({
   placeholder: z.string().optional(),
   required: z.boolean().optional(),
   readOnly: z.boolean().optional(),
+  bold: z.boolean().optional(),
 });
 
 export type TBaseFieldMeta = z.infer<typeof ZBaseFieldMeta>;
@@ -25,6 +26,7 @@ export type TInitialsFieldMeta = z.infer<typeof ZInitialsFieldMeta>;
 export const ZNameFieldMeta = ZBaseFieldMeta.extend({
   type: z.literal('name'),
   fontSize: z.number().min(8).max(96).optional(),
+  fontBold: z.boolean().optional(),
   textAlign: ZFieldTextAlignSchema.optional(),
 });
 
@@ -51,6 +53,7 @@ export const ZTextFieldMeta = ZBaseFieldMeta.extend({
   text: z.string().optional(),
   characterLimit: z.number().optional(),
   fontSize: z.number().min(8).max(96).optional(),
+  fontBold: z.boolean().optional(),
   textAlign: ZFieldTextAlignSchema.optional(),
 });
 
