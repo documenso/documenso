@@ -12,6 +12,9 @@ export type TriggerWebhookOptions = {
 };
 
 export const triggerWebhook = async ({ event, data, userId, teamId }: TriggerWebhookOptions) => {
+  console.log(
+    `[DEBUG] triggerWebhook called with event: ${event}, userId: ${userId}, teamId: ${teamId}, data: ${JSON.stringify(data)}`,
+  );
   try {
     const body = {
       event,
