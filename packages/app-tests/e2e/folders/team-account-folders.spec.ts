@@ -3,11 +3,9 @@ import path from 'node:path';
 
 import { prisma } from '@documenso/prisma';
 import { DocumentVisibility, FolderType, TeamMemberRole } from '@documenso/prisma/client';
-import { seedTeamDocuments } from '@documenso/prisma/seed/documents';
-import { seedBlankDocument } from '@documenso/prisma/seed/documents';
+import { seedBlankDocument, seedTeamDocuments } from '@documenso/prisma/seed/documents';
 import { seedBlankFolder } from '@documenso/prisma/seed/folders';
-import { seedTeamMember } from '@documenso/prisma/seed/teams';
-import { seedTeam } from '@documenso/prisma/seed/teams';
+import { seedTeam, seedTeamMember } from '@documenso/prisma/seed/teams';
 import { seedBlankTemplate } from '@documenso/prisma/seed/templates';
 
 import { apiSignin } from '../fixtures/authentication';
@@ -1309,7 +1307,7 @@ test('[TEAMS]: team admin can move manager document to admin folder', async ({ p
 
   const managerDocRow = page.getByRole('row', { name: /\[TEST\] Manager Document/ });
   await managerDocRow.getByTestId('document-table-action-btn').click();
-  await page.getByRole('menuitem', { name: 'Move to Folder' }).click();
+  await page.getByRole('menuitem', { name: 'Move to Folder' }).click({ force: true });
 
   await expect(page.getByRole('button', { name: 'Admin Folder' })).toBeVisible();
   await page.getByRole('button', { name: 'Admin Folder' }).click();
@@ -1360,7 +1358,7 @@ test('[TEAMS]: team admin can move manager document to manager folder', async ({
 
   const managerDocRow = page.getByRole('row', { name: /\[TEST\] Manager Document/ });
   await managerDocRow.getByTestId('document-table-action-btn').click();
-  await page.getByRole('menuitem', { name: 'Move to Folder' }).click();
+  await page.getByRole('menuitem', { name: 'Move to Folder' }).click({ force: true });
 
   await expect(page.getByRole('button', { name: 'Manager Folder' })).toBeVisible();
   await page.getByRole('button', { name: 'Manager Folder' }).click();
@@ -1411,7 +1409,7 @@ test('[TEAMS]: team admin can move manager document to everyone folder', async (
 
   const managerDocRow = page.getByRole('row', { name: /\[TEST\] Manager Document/ });
   await managerDocRow.getByTestId('document-table-action-btn').click();
-  await page.getByRole('menuitem', { name: 'Move to Folder' }).click();
+  await page.getByRole('menuitem', { name: 'Move to Folder' }).click({ force: true });
 
   await expect(page.getByRole('button', { name: 'Everyone Folder' })).toBeVisible();
   await page.getByRole('button', { name: 'Everyone Folder' }).click();

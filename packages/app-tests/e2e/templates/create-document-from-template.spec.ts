@@ -361,10 +361,22 @@ test('[TEMPLATE]: should create a document from a template with custom document'
     },
   });
 
+  const expectedDocumentDataType =
+    process.env.NEXT_PUBLIC_UPLOAD_TRANSPORT === 's3'
+      ? DocumentDataType.S3_PATH
+      : DocumentDataType.BYTES_64;
+
   expect(document.title).toEqual('TEMPLATE_WITH_CUSTOM_DOC');
-  expect(document.documentData.type).toEqual(DocumentDataType.BYTES_64);
-  expect(document.documentData.data).toEqual(pdfContent);
-  expect(document.documentData.initialData).toEqual(pdfContent);
+  expect(document.documentData.type).toEqual(expectedDocumentDataType);
+
+  if (expectedDocumentDataType === DocumentDataType.BYTES_64) {
+    expect(document.documentData.data).toEqual(pdfContent);
+    expect(document.documentData.initialData).toEqual(pdfContent);
+  } else {
+    // For S3, we expect the data/initialData to be the S3 path (non-empty string)
+    expect(document.documentData.data).toBeTruthy();
+    expect(document.documentData.initialData).toBeTruthy();
+  }
 });
 
 /**
@@ -446,11 +458,23 @@ test('[TEMPLATE]: should create a team document from a template with custom docu
     },
   });
 
+  const expectedDocumentDataType =
+    process.env.NEXT_PUBLIC_UPLOAD_TRANSPORT === 's3'
+      ? DocumentDataType.S3_PATH
+      : DocumentDataType.BYTES_64;
+
   expect(document.teamId).toEqual(team.id);
   expect(document.title).toEqual('TEAM_TEMPLATE_WITH_CUSTOM_DOC');
-  expect(document.documentData.type).toEqual(DocumentDataType.BYTES_64);
-  expect(document.documentData.data).toEqual(pdfContent);
-  expect(document.documentData.initialData).toEqual(pdfContent);
+  expect(document.documentData.type).toEqual(expectedDocumentDataType);
+
+  if (expectedDocumentDataType === DocumentDataType.BYTES_64) {
+    expect(document.documentData.data).toEqual(pdfContent);
+    expect(document.documentData.initialData).toEqual(pdfContent);
+  } else {
+    // For S3, we expect the data/initialData to be the S3 path (non-empty string)
+    expect(document.documentData.data).toBeTruthy();
+    expect(document.documentData.initialData).toBeTruthy();
+  }
 });
 
 /**

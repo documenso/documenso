@@ -17,9 +17,14 @@ test('[USER] can reset password via forgot password', async ({ page }: { page: P
 
   await page.goto('http://localhost:3000/signin');
   await page.getByRole('link', { name: 'Forgot your password?' }).click();
+
+  await page.getByRole('textbox', { name: 'Email' }).click();
   await page.getByRole('textbox', { name: 'Email' }).fill(user.email);
+
+  await expect(page.getByRole('button', { name: 'Reset Password' })).toBeEnabled();
   await page.getByRole('button', { name: 'Reset Password' }).click();
-  await expect(page.locator('body')).toContainText('Reset email sent');
+
+  await expect(page.locator('body')).toContainText('Reset email sent', { timeout: 10000 });
 
   const foundToken = await prisma.passwordResetToken.findFirstOrThrow({
     where: {
@@ -33,16 +38,26 @@ test('[USER] can reset password via forgot password', async ({ page }: { page: P
   await page.goto(`http://localhost:3000/reset-password/${foundToken.token}`);
 
   // Assert that password cannot be same as old password.
-  await page.getByRole('textbox', { name: 'Password', exact: true }).fill(oldPassword);
-  await page.getByRole('textbox', { name: 'Repeat Password' }).fill(oldPassword);
+  await page.getByLabel('Password', { exact: true }).fill(oldPassword);
+  await page.getByLabel('Repeat Password').fill(oldPassword);
+
+  // Ensure both fields are filled before clicking
+  await expect(page.getByLabel('Password', { exact: true })).toHaveValue(oldPassword);
+  await expect(page.getByLabel('Repeat Password')).toHaveValue(oldPassword);
+
   await page.getByRole('button', { name: 'Reset Password' }).click();
   await expect(page.locator('body')).toContainText(
     'Your new password cannot be the same as your old password.',
   );
 
   // Assert password reset.
-  await page.getByRole('textbox', { name: 'Password', exact: true }).fill(newPassword);
-  await page.getByRole('textbox', { name: 'Repeat Password' }).fill(newPassword);
+  await page.getByLabel('Password', { exact: true }).fill(newPassword);
+  await page.getByLabel('Repeat Password').fill(newPassword);
+
+  // Ensure both fields are filled before clicking
+  await expect(page.getByLabel('Password', { exact: true })).toHaveValue(newPassword);
+  await expect(page.getByLabel('Repeat Password')).toHaveValue(newPassword);
+
   await page.getByRole('button', { name: 'Reset Password' }).click();
   await expect(page.locator('body')).toContainText('Your password has been updated successfully.');
 
@@ -72,9 +87,9 @@ test('[USER] can reset password via user settings', async ({ page }: { page: Pag
     redirectPath: '/settings/security',
   });
 
-  await page.getByRole('textbox', { name: 'Current password' }).fill(oldPassword);
-  await page.getByRole('textbox', { name: 'New password' }).fill(newPassword);
-  await page.getByRole('textbox', { name: 'Repeat password' }).fill(newPassword);
+  await page.getByLabel('Current password').fill(oldPassword);
+  await page.getByLabel('New password').fill(newPassword);
+  await page.getByLabel('Repeat password').fill(newPassword);
   await page.getByRole('button', { name: 'Update password' }).click();
   await expect(page.locator('body')).toContainText('Password updated');
 

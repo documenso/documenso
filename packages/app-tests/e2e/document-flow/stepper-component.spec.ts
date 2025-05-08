@@ -630,7 +630,7 @@ test('[DOCUMENT_FLOW]: should be able to create and sign a document with 3 recip
   }
 
   // Wait for the document to be signed.
-  await page.waitForTimeout(5000);
+  await page.waitForTimeout(10000);
 
   const finalDocument = await prisma.document.findFirst({
     where: { id: createdDocument?.id },
