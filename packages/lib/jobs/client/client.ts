@@ -67,9 +67,8 @@ export class JobClient<T extends ReadonlyArray<JobDefinition> = []> {
             _cacheKey: string,
             jobOptions: SimpleTriggerJobOptions,
           ): Promise<unknown> => {
-            // Type casting is necessary due to generic constraints
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            return await this.triggerJob(jobOptions as any);
+            // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
+            return await this.triggerJob(jobOptions as TriggerJobOptions<T>);
           },
         };
 
