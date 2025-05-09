@@ -3,6 +3,8 @@ import { env } from '@documenso/lib/utils/env';
 export const APP_DOCUMENT_UPLOAD_SIZE_LIMIT =
   Number(env('NEXT_PUBLIC_DOCUMENT_SIZE_UPLOAD_LIMIT')) || 50;
 
+export const NEXT_CHAT_URL = () => env('NEXT_CHAT_URL') ?? 'http://localhost:3001';
+
 export const NEXT_PUBLIC_WEBAPP_URL = () =>
   env('NEXT_PUBLIC_WEBAPP_URL') ?? 'http://localhost:3000';
 

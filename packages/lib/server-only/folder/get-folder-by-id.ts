@@ -16,7 +16,6 @@ export interface GetFolderByIdOptions {
 
 export const getFolderById = async ({ userId, teamId, folderId, type }: GetFolderByIdOptions) => {
   let teamMemberRole = null;
-
   if (teamId !== undefined) {
     try {
       const team = await prisma.team.findFirstOrThrow({
@@ -81,6 +80,8 @@ export const getFolderById = async ({ userId, teamId, folderId, type }: GetFolde
   const folder = await prisma.folder.findFirst({
     where: whereClause,
   });
+
+  console.log('folder', folder);
 
   if (!folder) {
     throw new AppError(AppErrorCode.NOT_FOUND, {

@@ -3,6 +3,7 @@ import { useMemo, useState } from 'react';
 import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
 import { Trans } from '@lingui/react/macro';
+import { DocumentSource } from '@prisma/client';
 import { Loader } from 'lucide-react';
 import { useNavigate, useParams } from 'react-router';
 import { match } from 'ts-pattern';
@@ -77,6 +78,7 @@ export const ChatspaceDocumentUploadDropzone = ({ className }: DocumentUploadDro
         timezone: userTimezone,
         folderId: folderId ?? undefined,
         useToChat: true,
+        source: DocumentSource.CHAT,
       });
 
       void refreshLimits();

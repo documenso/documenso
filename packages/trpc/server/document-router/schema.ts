@@ -155,6 +155,25 @@ export const ZFindDocumentsInternalResponseSchema = ZFindResultResponse.extend({
     [ExtendedDocumentStatus.PENDING]: z.number(),
     [ExtendedDocumentStatus.COMPLETED]: z.number(),
     [ExtendedDocumentStatus.REJECTED]: z.number(),
+    [ExtendedDocumentStatus.ERROR]: z.number(),
+    [ExtendedDocumentStatus.INBOX]: z.number(),
+    [ExtendedDocumentStatus.ALL]: z.number(),
+  }),
+});
+
+export type TFindDocumentsInternalResponseChat = z.infer<
+  typeof ZFindDocumentsInternalResponseChatSchema
+>;
+
+export const ZFindDocumentsInternalResponseChatSchema = ZFindResultResponse.extend({
+  data: ZDocumentManySchema.array(),
+  stats: z.object({
+    [ExtendedDocumentStatus.DRAFT]: z.number(),
+    [ExtendedDocumentStatus.PENDING]: z.number(),
+    [ExtendedDocumentStatus.COMPLETED]: z.number(),
+    [ExtendedDocumentStatus.REJECTED]: z.number(),
+    [ExtendedDocumentStatus.ERROR]: z.number(),
+
     [ExtendedDocumentStatus.INBOX]: z.number(),
     [ExtendedDocumentStatus.ALL]: z.number(),
   }),
@@ -201,6 +220,7 @@ export const ZCreateDocumentRequestSchema = z.object({
   timezone: ZDocumentMetaTimezoneSchema.optional(),
   folderId: z.string().describe('The ID of the folder to create the document in').optional(),
   useToChat: z.boolean().optional(),
+  source: z.nativeEnum(DocumentSource).optional(),
 });
 
 export const ZCreateDocumentV2RequestSchema = z.object({

@@ -302,12 +302,14 @@ enum DocumentStatus {
   PENDING
   COMPLETED
   REJECTED
+  ERROR
 }
 
 enum DocumentSource {
   DOCUMENT
   TEMPLATE
   TEMPLATE_DIRECT_LINK
+  CHAT
 }
 
 enum DocumentVisibility {
@@ -319,6 +321,7 @@ enum DocumentVisibility {
 enum FolderType {
   DOCUMENT
   TEMPLATE
+  CHAT
 }
 
 model Folder {
@@ -338,6 +341,7 @@ model Folder {
   subfolders Folder[]           @relation("FolderToFolder")
   visibility DocumentVisibility @default(EVERYONE)
   type       FolderType
+  useToChat  Boolean            @default(false)
 
   @@index([userId])
   @@index([teamId])
@@ -377,10 +381,10 @@ model Document {
   documentData          DocumentData           @relation(fields: [documentDataId], references: [id], onDelete: Cascade)
   team                  Team?                  @relation(fields: [teamId], references: [id])
   template              Template?              @relation(fields: [templateId], references: [id], onDelete: SetNull)
-
-  auditLogs DocumentAuditLog[]
-  folder    Folder?            @relation(fields: [folderId], references: [id], onDelete: Cascade)
-  folderId  String?
+  Chat                  Chat[]
+  auditLogs             DocumentAuditLog[]
+  folder                Folder?                @relation(fields: [folderId], references: [id], onDelete: Cascade)
+  folderId              String?
 
   @@unique([documentDataId])
   @@index([userId])
@@ -874,7 +878,6 @@ model ContractTemplate {
   createdAt DateTime  @default(now())
   updatedAt DateTime  @default(now()) @updatedAt
   deletedAt DateTime?
-  chats     Chat[]
 
   @@map("ContractTemplates")
 }
@@ -884,12 +887,12 @@ model Chat {
   createdAt  DateTime
   title      String   @db.Text
   userId     Int
-  contractId Int?
+  documentId Int?
   teamId     Int?
   visibility String   @default("private") @db.VarChar(255)
 
   user       User                @relation(fields: [userId], references: [id])
-  contract   ContractTemplate?   @relation(fields: [contractId], references: [id])
+  document   Document?           @relation(fields: [documentId], references: [id])
   team       Team?               @relation(fields: [teamId], references: [id])
   messagesV1 MessageDeprecated[]
   messagesV2 Message[]

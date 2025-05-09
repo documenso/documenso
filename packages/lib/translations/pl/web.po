@@ -710,6 +710,7 @@ msgstr "Potwierdzenie"
 #: apps/remix/app/components/tables/internal-audit-log-table.tsx
 #: apps/remix/app/components/tables/documents-table-action-dropdown.tsx
 #: apps/remix/app/components/tables/document-logs-table.tsx
+#: apps/remix/app/components/tables/chat-table-action-dropdown.tsx
 #: apps/remix/app/components/general/document/document-page-view-dropdown.tsx
 msgid "Action"
 msgstr "Akcja"
@@ -720,6 +721,7 @@ msgstr "Akcja"
 #: apps/remix/app/components/tables/team-settings-member-invites-table.tsx
 #: apps/remix/app/components/tables/team-settings-member-invites-table.tsx
 #: apps/remix/app/components/tables/documents-table.tsx
+#: apps/remix/app/components/tables/documents-chatspace-table.tsx
 #: apps/remix/app/components/general/template/template-page-view-documents-table.tsx
 msgid "Actions"
 msgstr "Akcje"
@@ -1035,6 +1037,9 @@ msgstr "Wystąpił błąd podczas wyłączania użytkownika."
 #: apps/remix/app/components/tables/documents-table-action-dropdown.tsx
 #: apps/remix/app/components/tables/documents-table-action-dropdown.tsx
 #: apps/remix/app/components/tables/documents-table-action-button.tsx
+#: apps/remix/app/components/tables/chatspace-table-action-button.tsx
+#: apps/remix/app/components/tables/chat-table-action-dropdown.tsx
+#: apps/remix/app/components/tables/chat-table-action-dropdown.tsx
 #: apps/remix/app/components/general/share-document-download-button.tsx
 #: apps/remix/app/components/general/document/document-page-view-dropdown.tsx
 #: apps/remix/app/components/general/document/document-page-view-dropdown.tsx
@@ -1064,6 +1069,7 @@ msgstr "Wystąpił błąd podczas ładowania dokumentu."
 
 #: apps/remix/app/components/dialogs/document-move-to-folder-dialog.tsx
 #: apps/remix/app/components/dialogs/document-move-dialog.tsx
+#: apps/remix/app/components/dialogs/chat-move-to-folder-dialog.tsx
 msgid "An error occurred while moving the document."
 msgstr "Wystąpił błąd podczas przenoszenia dokumentu."
 
@@ -1183,6 +1189,7 @@ msgstr "Wystąpił nieznany błąd"
 
 #: apps/remix/app/components/dialogs/template-folder-create-dialog.tsx
 #: apps/remix/app/components/dialogs/folder-create-dialog.tsx
+#: apps/remix/app/components/dialogs/folder-create-dialog-chat.tsx
 msgid "An unknown error occurred while creating the folder."
 msgstr ""
 
@@ -1218,6 +1225,8 @@ msgstr "Wersja aplikacji"
 
 #: apps/remix/app/components/tables/documents-table-action-dropdown.tsx
 #: apps/remix/app/components/tables/documents-table-action-button.tsx
+#: apps/remix/app/components/tables/chatspace-table-action-button.tsx
+#: apps/remix/app/components/tables/chat-table-action-dropdown.tsx
 #: apps/remix/app/components/general/document-signing/document-signing-complete-dialog.tsx
 #: apps/remix/app/components/general/document-signing/document-signing-complete-dialog.tsx
 #: apps/remix/app/components/general/document/document-page-view-button.tsx
@@ -1529,6 +1538,7 @@ msgstr "Może przygotować"
 #: apps/remix/app/components/dialogs/document-move-dialog.tsx
 #: apps/remix/app/components/dialogs/document-duplicate-dialog.tsx
 #: apps/remix/app/components/dialogs/document-delete-dialog.tsx
+#: apps/remix/app/components/dialogs/chat-move-to-folder-dialog.tsx
 #: apps/remix/app/components/dialogs/assistant-confirmation-dialog.tsx
 #: packages/ui/primitives/signature-pad/signature-pad-dialog.tsx
 #: packages/ui/primitives/document-flow/send-document-action-dialog.tsx
@@ -1572,6 +1582,16 @@ msgstr "Limit znaków"
 #: apps/remix/app/routes/_authenticated+/admin+/stats.tsx
 msgid "Charts"
 msgstr "Wykresy"
+
+#: apps/remix/app/components/tables/chatspace-table-action-button.tsx
+#: apps/remix/app/components/general/template/template-page-view-documents-table.tsx
+msgid "Chat"
+msgstr ""
+
+#: apps/remix/app/components/general/app-nav-mobile.tsx
+#: apps/remix/app/components/general/app-nav-desktop.tsx
+msgid "Chats"
+msgstr ""
 
 #: packages/ui/primitives/document-flow/types.ts
 msgid "Checkbox"
@@ -2035,6 +2055,7 @@ msgstr "Utwórz swoje konto i zacznij korzystać z nowoczesnego podpisywania dok
 #: apps/remix/app/components/tables/templates-table.tsx
 #: apps/remix/app/components/tables/settings-security-passkey-table.tsx
 #: apps/remix/app/components/tables/documents-table.tsx
+#: apps/remix/app/components/tables/documents-chatspace-table.tsx
 #: apps/remix/app/components/tables/admin-leaderboard-table.tsx
 #: apps/remix/app/components/general/template/template-page-view-information.tsx
 #: apps/remix/app/components/general/template/template-page-view-documents-table.tsx
@@ -2145,6 +2166,7 @@ msgstr "usuń"
 #: apps/remix/app/components/tables/settings-security-passkey-table-actions.tsx
 #: apps/remix/app/components/tables/settings-security-passkey-table-actions.tsx
 #: apps/remix/app/components/tables/documents-table-action-dropdown.tsx
+#: apps/remix/app/components/tables/chat-table-action-dropdown.tsx
 #: apps/remix/app/components/general/document/document-page-view-dropdown.tsx
 #: apps/remix/app/components/dialogs/webhook-delete-dialog.tsx
 #: apps/remix/app/components/dialogs/token-delete-dialog.tsx
@@ -2421,6 +2443,7 @@ msgstr ""
 
 #. placeholder {0}: document.user.name
 #: apps/remix/app/components/general/template/template-page-view-recent-activity.tsx
+#: apps/remix/app/components/general/template/template-page-view-recent-activity.tsx
 msgid "Document created by <0>{0}</0>"
 msgstr "Dokument utworzony przez <0>{0}</0>"
 
@@ -2468,6 +2491,10 @@ msgstr "Szkic dokumentu"
 msgid "Document Duplicated"
 msgstr "Dokument zduplikowany"
 
+#: apps/remix/app/components/general/document/document-status.tsx
+msgid "Document error"
+msgstr ""
+
 #: packages/lib/utils/document-audit-logs.ts
 msgid "Document external ID updated"
 msgstr "Zaktualizowane ID zewnętrzne dokumentu"
@@ -2514,6 +2541,7 @@ msgstr "Metryki dokumentów"
 
 #: apps/remix/app/components/dialogs/document-move-to-folder-dialog.tsx
 #: apps/remix/app/components/dialogs/document-move-dialog.tsx
+#: apps/remix/app/components/dialogs/chat-move-to-folder-dialog.tsx
 msgid "Document moved"
 msgstr "Dokument przeniesiony"
 
@@ -2670,6 +2698,7 @@ msgstr "Nie masz konta? <0>Zarejestruj się</0>"
 #: apps/remix/app/components/tables/team-settings-billing-invoices-table.tsx
 #: apps/remix/app/components/tables/documents-table-action-dropdown.tsx
 #: apps/remix/app/components/tables/documents-table-action-button.tsx
+#: apps/remix/app/components/tables/chat-table-action-dropdown.tsx
 #: apps/remix/app/components/general/share-document-download-button.tsx
 #: apps/remix/app/components/general/document/document-page-view-dropdown.tsx
 #: apps/remix/app/components/general/document/document-page-view-button.tsx
@@ -2759,6 +2788,7 @@ msgstr "Zduplikuj"
 #: apps/remix/app/components/tables/settings-security-passkey-table-actions.tsx
 #: apps/remix/app/components/tables/documents-table-action-dropdown.tsx
 #: apps/remix/app/components/tables/documents-table-action-button.tsx
+#: apps/remix/app/components/tables/chatspace-table-action-button.tsx
 #: apps/remix/app/components/general/teams/team-email-dropdown.tsx
 #: apps/remix/app/components/general/document/document-page-view-dropdown.tsx
 #: apps/remix/app/components/general/document/document-page-view-button.tsx
@@ -2973,6 +3003,7 @@ msgstr "Wprowadź swój tekst tutaj"
 #: apps/remix/app/components/general/document-signing/document-signing-checkbox-field.tsx
 #: apps/remix/app/components/general/document-signing/document-signing-auto-sign.tsx
 #: apps/remix/app/components/general/document/document-upload.tsx
+#: apps/remix/app/components/general/document/document-status.tsx
 #: apps/remix/app/components/general/document/document-edit-form.tsx
 #: apps/remix/app/components/general/document/document-edit-form.tsx
 #: apps/remix/app/components/general/document/document-edit-form.tsx
@@ -2988,11 +3019,14 @@ msgstr "Wprowadź swój tekst tutaj"
 #: apps/remix/app/components/dialogs/document-move-to-folder-dialog.tsx
 #: apps/remix/app/components/dialogs/document-move-to-folder-dialog.tsx
 #: apps/remix/app/components/dialogs/document-move-dialog.tsx
+#: apps/remix/app/components/dialogs/chat-move-to-folder-dialog.tsx
+#: apps/remix/app/components/dialogs/chat-move-to-folder-dialog.tsx
 #: apps/remix/app/components/dialogs/admin-user-enable-dialog.tsx
 #: apps/remix/app/components/dialogs/admin-user-disable-dialog.tsx
 #: apps/remix/app/components/dialogs/admin-user-delete-dialog.tsx
 #: packages/ui/primitives/pdf-viewer.tsx
 #: packages/ui/primitives/document-flow/field-item-advanced-settings.tsx
+#: packages/lib/constants/document.ts
 msgid "Error"
 msgstr "Błąd"
 
@@ -3124,6 +3158,7 @@ msgstr "Rozmiar pliku przekracza limit {APP_DOCUMENT_UPLOAD_SIZE_LIMIT} MB"
 
 #: apps/remix/app/components/dialogs/template-move-to-folder-dialog.tsx
 #: apps/remix/app/components/dialogs/document-move-to-folder-dialog.tsx
+#: apps/remix/app/components/dialogs/chat-move-to-folder-dialog.tsx
 msgid "Folder"
 msgstr ""
 
@@ -3293,6 +3328,7 @@ msgstr "Cześć, {userName} <0>({userEmail})</0>"
 
 #: apps/remix/app/routes/_authenticated+/settings+/public-profile.tsx
 #: apps/remix/app/components/tables/documents-table-action-dropdown.tsx
+#: apps/remix/app/components/tables/chat-table-action-dropdown.tsx
 #: apps/remix/app/components/dialogs/document-delete-dialog.tsx
 msgid "Hide"
 msgstr "Ukryj"
@@ -3751,6 +3787,7 @@ msgstr "Miesięczni aktywni użytkownicy: Użytkownicy, którzy mieli przynajmni
 #: apps/remix/app/components/dialogs/template-move-dialog.tsx
 #: apps/remix/app/components/dialogs/document-move-to-folder-dialog.tsx
 #: apps/remix/app/components/dialogs/document-move-dialog.tsx
+#: apps/remix/app/components/dialogs/chat-move-to-folder-dialog.tsx
 msgid "Move"
 msgstr "Przenieś"
 
@@ -3759,6 +3796,7 @@ msgid "Move \"{templateTitle}\" to a folder"
 msgstr ""
 
 #: apps/remix/app/components/dialogs/document-move-to-folder-dialog.tsx
+#: apps/remix/app/components/dialogs/chat-move-to-folder-dialog.tsx
 msgid "Move Document to Folder"
 msgstr ""
 
@@ -3776,11 +3814,13 @@ msgstr "Przenieś szablon do zespołu"
 
 #: apps/remix/app/components/tables/templates-table-action-dropdown.tsx
 #: apps/remix/app/components/tables/documents-table-action-dropdown.tsx
+#: apps/remix/app/components/tables/chat-table-action-dropdown.tsx
 msgid "Move to Folder"
 msgstr ""
 
 #: apps/remix/app/components/tables/templates-table-action-dropdown.tsx
 #: apps/remix/app/components/tables/documents-table-action-dropdown.tsx
+#: apps/remix/app/components/tables/chat-table-action-dropdown.tsx
 msgid "Move to Team"
 msgstr "Przenieś do zespołu"
 
@@ -4712,6 +4752,8 @@ msgid "Retention of Documents"
 msgstr "Przechowywanie dokumentów"
 
 #: apps/remix/app/components/general/document-signing/document-signing-auth-passkey.tsx
+#: packages/ui/primitives/document-flow/add-subject.tsx
+#: packages/ui/primitives/document-flow/add-subject.tsx
 msgid "Retry"
 msgstr "Spróbuj ponownie"
 
@@ -4760,6 +4802,7 @@ msgstr "Role"
 
 #: apps/remix/app/components/dialogs/template-move-to-folder-dialog.tsx
 #: apps/remix/app/components/dialogs/document-move-to-folder-dialog.tsx
+#: apps/remix/app/components/dialogs/chat-move-to-folder-dialog.tsx
 msgid "Root (No Folder)"
 msgstr ""
 
@@ -4826,6 +4869,7 @@ msgid "Select"
 msgstr "Wybierz"
 
 #: apps/remix/app/components/dialogs/document-move-to-folder-dialog.tsx
+#: apps/remix/app/components/dialogs/chat-move-to-folder-dialog.tsx
 msgid "Select a folder to move this document to."
 msgstr ""
 
@@ -5010,6 +5054,8 @@ msgstr "Pokaż szablony w profilu publicznym zespołu, aby szybko podpisać doku
 #: apps/remix/app/routes/_profile+/p.$url.tsx
 #: apps/remix/app/components/tables/documents-table-action-dropdown.tsx
 #: apps/remix/app/components/tables/documents-table-action-button.tsx
+#: apps/remix/app/components/tables/chatspace-table-action-button.tsx
+#: apps/remix/app/components/tables/chat-table-action-dropdown.tsx
 #: apps/remix/app/components/general/user-profile-timur.tsx
 #: apps/remix/app/components/general/user-profile-skeleton.tsx
 #: apps/remix/app/components/general/document-signing/document-signing-signature-field.tsx
@@ -5214,6 +5260,10 @@ msgstr "Niektórzy sygnatariusze nie zostali przypisani do pola podpisu. Przypis
 
 #: apps/remix/app/routes/_unauthenticated+/verify-email.$token.tsx
 #: apps/remix/app/routes/_unauthenticated+/verify-email.$token.tsx
+#: apps/remix/app/routes/_authenticated+/documents.f.$folderId.$id._index.tsx
+#: apps/remix/app/routes/_authenticated+/documents.$id._index.tsx
+#: apps/remix/app/routes/_authenticated+/chatspace.f.$folderId.$id._index.tsx
+#: apps/remix/app/routes/_authenticated+/chatspace.$id._index.tsx
 #: apps/remix/app/routes/_authenticated+/settings+/public-profile.tsx
 #: apps/remix/app/components/tables/user-settings-pending-teams-table-actions.tsx
 #: apps/remix/app/components/tables/team-settings-member-invites-table.tsx
@@ -5223,6 +5273,9 @@ msgstr "Niektórzy sygnatariusze nie zostali przypisani do pola podpisu. Przypis
 #: apps/remix/app/components/tables/documents-table-action-dropdown.tsx
 #: apps/remix/app/components/tables/documents-table-action-dropdown.tsx
 #: apps/remix/app/components/tables/documents-table-action-button.tsx
+#: apps/remix/app/components/tables/chatspace-table-action-button.tsx
+#: apps/remix/app/components/tables/chat-table-action-dropdown.tsx
+#: apps/remix/app/components/tables/chat-table-action-dropdown.tsx
 #: apps/remix/app/components/general/share-document-download-button.tsx
 #: apps/remix/app/components/general/billing-portal-button.tsx
 #: apps/remix/app/components/general/billing-plans.tsx
@@ -5326,6 +5379,7 @@ msgstr "Statystyki"
 #: apps/remix/app/routes/_authenticated+/admin+/documents._index.tsx
 #: apps/remix/app/components/tables/team-settings-billing-invoices-table.tsx
 #: apps/remix/app/components/tables/documents-table.tsx
+#: apps/remix/app/components/tables/documents-chatspace-table.tsx
 #: apps/remix/app/components/general/template/template-page-view-documents-table.tsx
 msgid "Status"
 msgstr "Stan"
@@ -5686,6 +5740,7 @@ msgid "The direct link has been copied to your clipboard"
 msgstr "Bezpośredni link został skopiowany do schowka"
 
 #: apps/remix/app/components/dialogs/document-move-to-folder-dialog.tsx
+#: apps/remix/app/components/dialogs/chat-move-to-folder-dialog.tsx
 msgid "The document has been moved successfully."
 msgstr ""
 
@@ -5750,6 +5805,7 @@ msgid "The folder you are trying to move does not exist."
 msgstr ""
 
 #: apps/remix/app/components/dialogs/document-move-to-folder-dialog.tsx
+#: apps/remix/app/components/dialogs/chat-move-to-folder-dialog.tsx
 msgid "The folder you are trying to move the document to does not exist."
 msgstr ""
 
@@ -5947,6 +6003,11 @@ msgstr "To konto zostało zablokowane. Skontaktuj się z pomocą techniczną."
 msgid "This account has not been verified. Please verify your account before signing in."
 msgstr "To konto nie zostało zweryfikowane. Proszę zweryfikuj konto przed zalogowaniem."
 
+#: apps/remix/app/components/dialogs/document-delete-dialog.tsx
+#: apps/remix/app/components/dialogs/document-delete-dialog.tsx
+msgid "This action is <0>irreversible</0>. Once confirmed, this document will be permanently deleted."
+msgstr ""
+
 #: apps/remix/app/components/dialogs/admin-user-delete-dialog.tsx
 #: apps/remix/app/components/dialogs/admin-document-delete-dialog.tsx
 #: apps/remix/app/components/dialogs/account-delete-dialog.tsx
@@ -6064,6 +6125,7 @@ msgstr "To pole nie może być modyfikowane ani usuwane. Po udostępnieniu bezpo
 
 #: apps/remix/app/components/dialogs/template-folder-create-dialog.tsx
 #: apps/remix/app/components/dialogs/folder-create-dialog.tsx
+#: apps/remix/app/components/dialogs/folder-create-dialog-chat.tsx
 msgid "This folder name is already taken."
 msgstr ""
 
@@ -6174,6 +6236,7 @@ msgstr "Strefa czasowa"
 #: apps/remix/app/routes/_authenticated+/admin+/documents._index.tsx
 #: apps/remix/app/components/tables/templates-table.tsx
 #: apps/remix/app/components/tables/documents-table.tsx
+#: apps/remix/app/components/tables/documents-chatspace-table.tsx
 #: apps/remix/app/components/general/template/template-page-view-documents-table.tsx
 #: apps/remix/app/components/embed/authoring/configure-document-view.tsx
 #: packages/ui/primitives/document-flow/add-settings.tsx
@@ -6619,6 +6682,10 @@ msgstr "Przesłany plik jest zbyt mały"
 msgid "Uploaded file not an allowed file type"
 msgstr "Przesłany plik nie jest dozwolonym typem pliku"
 
+#: apps/remix/app/components/tables/documents-chatspace-table.tsx
+msgid "uploader"
+msgstr ""
+
 #: apps/remix/app/components/general/document/document-drop-zone-wrapper.tsx
 msgid "Uploading document..."
 msgstr ""
@@ -6729,6 +6796,9 @@ msgstr "Historia wersji"
 #: apps/remix/app/components/tables/documents-table-action-dropdown.tsx
 #: apps/remix/app/components/tables/documents-table-action-button.tsx
 #: apps/remix/app/components/tables/documents-table-action-button.tsx
+#: apps/remix/app/components/tables/chatspace-table-action-button.tsx
+#: apps/remix/app/components/tables/chatspace-table-action-button.tsx
+#: apps/remix/app/components/tables/chat-table-action-dropdown.tsx
 #: apps/remix/app/components/general/document/document-page-view-button.tsx
 #: apps/remix/app/components/forms/2fa/view-recovery-codes-dialog.tsx
 #: packages/lib/constants/recipient-roles.ts

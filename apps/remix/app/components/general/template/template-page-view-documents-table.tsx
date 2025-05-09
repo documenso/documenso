@@ -36,6 +36,7 @@ const DOCUMENT_SOURCE_LABELS: { [key in DocumentSource]: MessageDescriptor } = {
   DOCUMENT: msg`Document`,
   TEMPLATE: msg`Template`,
   TEMPLATE_DIRECT_LINK: msg`Direct link`,
+  CHAT: msg`Chat`,
 };
 
 const ZDocumentSearchParamsSchema = ZUrlSearchParamsSchema.extend({

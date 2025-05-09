@@ -333,6 +333,11 @@ const findDocumentsFilter = (
       teamId: null,
       status: ExtendedDocumentStatus.DRAFT,
     }))
+    .with(ExtendedDocumentStatus.ERROR, () => ({
+      userId: user.id,
+      teamId: null,
+      status: ExtendedDocumentStatus.ERROR,
+    }))
     .with(ExtendedDocumentStatus.PENDING, () => ({
       OR: [
         {
@@ -513,6 +518,31 @@ const findTeamDocumentsFilter = (
       if (teamEmail && filter.OR) {
         filter.OR.push({
           status: ExtendedDocumentStatus.DRAFT,
+          user: {
+            email: teamEmail,
+          },
+          OR: visibilityFilters,
+          folderId: folderId,
+        });
+      }
+
+      return filter;
+    })
+    .with(ExtendedDocumentStatus.ERROR, () => {
+      const filter: Prisma.DocumentWhereInput = {
+        OR: [
+          {
+            teamId: team.id,
+            status: ExtendedDocumentStatus.ERROR,
+            OR: visibilityFilters,
+            folderId: folderId,
+          },
+        ],
+      };
+
+      if (teamEmail && filter.OR) {
+        filter.OR.push({
+          status: ExtendedDocumentStatus.ERROR,
           user: {
             email: teamEmail,
           },

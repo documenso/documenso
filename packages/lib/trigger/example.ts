@@ -1,26 +1,30 @@
+import { TeamMemberRole } from '@prisma/client';
 import { task } from '@trigger.dev/sdk/v3';
 import fs from 'fs/promises';
 // Usa la versión asíncrona
 import fetch from 'node-fetch';
 // Asegúrate de instalarlo con `pnpm add node-fetch`
 import * as path from 'node:path';
+import { match } from 'ts-pattern';
 
+import { DocumentVisibility } from '@documenso/lib/types/document-visibility';
+import { getPresignGetUrl } from '@documenso/lib/universal/upload/server-actions';
 import { prisma } from '@documenso/prisma';
 
 import { extractText } from '../services/textparser';
 
-const __dirname = path.dirname(__filename);
-const filename = __filename;
-const downloadsDir = path.join(__dirname, 'downloads');
+// const __dirname = path.dirname(__filename);
+// const filename = __filename;
+// const downloadsDir = path.join(__dirname, 'downloads');
 
-// 🔹 Crear la carpeta de descargas si no existe
-export async function ensureDownloadDir() {
-  try {
-    await fs.mkdir(downloadsDir, { recursive: true });
-  } catch (error) {
-    console.error('❌ Error creando la carpeta de descargas:', error);
-  }
-}
+// // 🔹 Crear la carpeta de descargas si no existe
+// export async function ensureDownloadDir() {
+//   try {
+//     await fs.mkdir(downloadsDir, { recursive: true });
+//   } catch (error) {
+//     console.error('❌ Error creando la carpeta de descargas:', error);
+//   }
+// }
 
 // export const getFileAndAnalyze = async (fileId: number, workspaceId:string) => {
 //   if (!fileId) {
@@ -44,74 +48,149 @@ export const extractBodyContractTask = task({
   id: 'extract-body-contract',
   // Set an optional maxDuration to prevent tasks from running indefinitely
   // Stop executing after 300 secs (5 mins) of compute
-  run: async (payload: { pdfUrls: string[]; id: number; workspace: number; name: string }) => {
-    const decryptedId = payload.workspace;
-    console.log(`🔹 Workspace ID: ${decryptedId} y ${payload.workspace}`);
-    if (!decryptedId) {
-      console.log(`⚠️ No se pudo desencriptar el ID: ${payload.workspace}`);
-      return null;
-    }
+  run: async (payload: {
+    teamId?: number;
+    urlDocument: string;
+    userId: number;
+    documentId: number;
+  }) => {
+    const documentId = payload.documentId;
+    try {
+      const decryptedId = payload.documentId;
+      const teamId = payload.teamId;
+      const userId = payload.userId;
+      console.log(`🔹 Workspace ID: ${decryptedId} y ${payload.documentId}`);
+      if (!decryptedId) {
+        console.log(`⚠️ No se pudo desencriptar el ID: ${payload.documentId}`);
+        return null;
+      }
+      let teamMemberRole = null;
 
-    console.log(`🔹 Procesando ${payload.pdfUrls.length} URLs de PDF`);
-
-    const results = [];
-
-    for (const pdfUrl of payload.pdfUrls) {
-      try {
-        console.log(`🔹 Descargando PDF desde: ${pdfUrl}`);
-
-        const response = await fetch(pdfUrl);
-
-        if (!response.ok) {
-          throw new Error(`Error al obtener ${pdfUrl}, código HTTP: ${response.status}`);
-        }
-
-        const buffer = Buffer.from(await response.arrayBuffer());
-        console.log(`✅ PDF descargado con éxito, tamaño: ${buffer.length} bytes`);
-
-        const fileName = payload.name;
-
-        const extractedText = await extractText(fileName ?? 'archivo_desconocido', buffer, pdfUrl);
-        if (!extractedText) {
-          console.log(`⚠️ No se pudo extraer el texto del PDF: ${fileName}`);
-          await prisma.contractTemplate.update({
-            where: { id: payload.id },
-            data: { status: 'Error' },
+      if (teamId !== undefined) {
+        try {
+          const team = await prisma.team.findFirstOrThrow({
+            where: {
+              id: teamId,
+              members: {
+                some: {
+                  userId,
+                },
+              },
+            },
+            include: {
+              members: {
+                where: {
+                  userId,
+                },
+                select: {
+                  role: true,
+                },
+              },
+            },
           });
-          return;
-        }
 
-        if (extractedText === 'Error al procesar el PDF.') {
-          console.log(`⚠️ No se pudo extraer el texto del PDF: ${fileName}`);
-          await prisma.contractTemplate.update({
-            where: { id: payload.id },
-            data: { status: 'Error' },
-          });
-          return;
+          teamMemberRole = team.members[0].role;
+        } catch (error) {
+          console.error('Error finding team:', error);
+          return null;
         }
+      }
 
-        console.log(`✅ texto extraido con éxito`);
-        console.log('extractedText', extractedText);
+      const visibilityFilters = match(teamMemberRole)
+        .with(TeamMemberRole.ADMIN, () => ({
+          visibility: {
+            in: [
+              DocumentVisibility.EVERYONE,
+              DocumentVisibility.MANAGER_AND_ABOVE,
+              DocumentVisibility.ADMIN,
+            ],
+          },
+        }))
+        .with(TeamMemberRole.MANAGER, () => ({
+          visibility: {
+            in: [DocumentVisibility.EVERYONE, DocumentVisibility.MANAGER_AND_ABOVE],
+          },
+        }))
+        .otherwise(() => ({ visibility: DocumentVisibility.EVERYONE }));
+      console.log('visibilityFilters', visibilityFilters);
+      const documentWhereClause = {
+        id: documentId,
+        ...(teamId
+          ? {
+              OR: [
+                { teamId, ...visibilityFilters },
+                { userId, teamId },
+              ],
+            }
+          : { userId, teamId: null }),
+      };
 
-        if (extractedText) {
-          await prisma.contractTemplate.update({
-            where: { id: payload.id },
-            data: { status: 'Completado', body: extractedText },
-          });
-        }
-      } catch (error) {
-        console.log(`⚠️ Error al procesar el PDF en ${pdfUrl}:`, error);
-        await prisma.contractTemplate.update({
-          where: { id: payload.id },
-          data: { status: 'Error' },
+      const documentBody = await prisma.documentBodyExtracted.create({
+        data: { body: 'En proceso', status: 'PENDING', documentId: documentId },
+      });
+
+      console.log('documentBody', documentBody);
+      console.log('documentWhereClause', documentWhereClause);
+
+      const document = await prisma.document.findFirst({
+        where: documentWhereClause,
+      });
+
+      console.log('document', document);
+
+      const results = [];
+      const pdfUrl = payload.urlDocument;
+      console.log(`🔹 Descargando PDF desde: ${pdfUrl}`);
+
+      const response = await fetch(pdfUrl);
+
+      if (!response.ok) {
+        console.log(`⚠️ Error al obtener ${pdfUrl}, código HTTP: ${response.status}`);
+        throw new Error(`Error al obtener ${pdfUrl}, código HTTP: ${response.status}`);
+      }
+
+      const buffer = Buffer.from(await response.arrayBuffer());
+      console.log(`✅ PDF descargado con éxito, tamaño: ${buffer.length} bytes`);
+
+      const fileName = document?.title;
+
+      const extractedText = await extractText(fileName ?? 'archivo_desconocido', buffer, pdfUrl);
+      if (!extractedText) {
+        console.log(`⚠️ No se pudo extraer el texto del PDF: ${fileName}`);
+        await prisma.document.update({
+          where: { id: documentId },
+          data: { status: 'ERROR' },
         });
-        // Agregar el error al array de resultados
-        results.push({
-          success: false,
-          url: pdfUrl,
-          error: error || `Error al procesar el PDF`,
+        return;
+      }
+
+      if (extractedText === 'Error al procesar el PDF.') {
+        console.log(`⚠️ No se pudo extraer el texto del PDF: ${fileName}`);
+        await prisma.document.update({
+          where: { id: documentId },
+          data: { status: 'ERROR' },
+        });
+        return;
+      }
+
+      console.log(`✅ texto extraido con éxito`);
+      console.log('extractedText', extractedText);
+
+      if (extractedText) {
+        await prisma.documentBodyExtracted.update({
+          where: { id: documentBody.id },
+          data: { status: 'COMPLETE', body: extractedText },
+        });
+        await prisma.document.update({
+          where: { id: documentId },
+          data: { status: 'COMPLETED' },
         });
       }
+    } catch (error) {
+      await prisma.document.update({
+        where: { id: documentId },
+        data: { status: 'ERROR' },
+      });
     }
   },
 });

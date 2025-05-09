@@ -1,0 +1,7 @@
+{
+  "version": 3,
+  "sources": ["../../../../../../../../../../trigger/index.ts"],
+  "sourcesContent": ["import { extractBodyContractTask } from './example';\n\ninterface Template {\n  id: string;\n  name: string;\n  description?: string;\n  content: string;\n  contentType: 'markdown' | 'pdf' | 'docx';\n  fields: TemplateField[];\n}\n\ninterface TemplateField {\n  id: string;\n  label: string;\n  type: 'text' | 'textarea' | 'date' | 'number' | 'currency';\n  placeholder?: string;\n  required: boolean;\n}\ntype ContractForm = {\n  id: number;\n  name: string | null;\n  url: string | null;\n  workspacesId: number | null;\n  status: string | null;\n  form_fields: TemplateField[] | null;\n};\n\nexport const getExtractBodyContractTask = async (\n  userId: number,\n  documentId: number,\n  urlDocument: string,\n  teamId?: number,\n) => {\n  const { id } = await extractBodyContractTask.trigger({\n    userId: userId,\n    documentId: documentId,\n    teamId: teamId,\n    urlDocument: urlDocument,\n  });\n  return id;\n};\n"],
+  "mappings": ";;;;;;;;;;AAAA;AA2BO,IAAM,6BAA6B,OACxC,QACA,YACA,aACA,WACG;AACH,QAAM,EAAE,GAAG,IAAI,MAAM,wBAAwB,QAAQ;AAAA,IACnD;AAAA,IACA;AAAA,IACA;AAAA,IACA;AAAA,EACF,CAAC;AACD,SAAO;AACT;",
+  "names": []
+}

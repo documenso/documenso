@@ -258,7 +258,7 @@ export const documentRouter = router({
           templateId,
           page,
           perPage,
-          source,
+          source: 'CHAT',
           status,
           period,
           useToChat: true,
@@ -396,7 +396,7 @@ export const documentRouter = router({
     .input(ZCreateDocumentRequestSchema)
     .mutation(async ({ input, ctx }) => {
       const { teamId } = ctx;
-      const { title, documentDataId, timezone, folderId, useToChat } = input;
+      const { title, documentDataId, timezone, folderId, useToChat, source } = input;
 
       const { remaining } = await getServerLimits({ email: ctx.user.email, teamId });
 
@@ -417,6 +417,7 @@ export const documentRouter = router({
         requestMetadata: ctx.metadata,
         folderId,
         useToChat,
+        source,
       });
     }),
 

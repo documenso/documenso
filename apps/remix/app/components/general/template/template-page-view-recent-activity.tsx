@@ -122,6 +122,11 @@ export const TemplatePageViewRecentActivity = ({
                         Document created by <span className="font-bold">{document.user.name}</span>
                       </Trans>
                     ))
+                    .with(DocumentSource.CHAT, () => (
+                      <Trans>
+                        Document created by <span className="font-bold">{document.user.name}</span>
+                      </Trans>
+                    ))
                     .with(DocumentSource.TEMPLATE_DIRECT_LINK, () => (
                       <Trans>
                         Document created using a <span className="font-bold">direct link</span>

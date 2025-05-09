@@ -76,6 +76,7 @@ export default function DocumentsPage() {
     [ExtendedDocumentStatus.PENDING]: 0,
     [ExtendedDocumentStatus.COMPLETED]: 0,
     [ExtendedDocumentStatus.REJECTED]: 0,
+    [ExtendedDocumentStatus.ERROR]: 0,
     [ExtendedDocumentStatus.INBOX]: 0,
     [ExtendedDocumentStatus.ALL]: 0,
   });

@@ -54,6 +54,7 @@ export const getStats = async ({
     [ExtendedDocumentStatus.COMPLETED]: 0,
     [ExtendedDocumentStatus.REJECTED]: 0,
     [ExtendedDocumentStatus.INBOX]: 0,
+    [ExtendedDocumentStatus.ERROR]: 0,
     [ExtendedDocumentStatus.ALL]: 0,
   };
 
@@ -63,6 +64,10 @@ export const getStats = async ({
 
   notSignedCounts.forEach((stat) => {
     stats[ExtendedDocumentStatus.INBOX] += stat._count._all;
+
+    if (stat.status === ExtendedDocumentStatus.ERROR) {
+      stats[ExtendedDocumentStatus.ERROR] += stat._count._all;
+    }
   });
 
   hasSignedCounts.forEach((stat) => {

@@ -12,7 +12,7 @@ import { getFieldsForDocument } from '@documenso/lib/server-only/field/get-field
 import { getRecipientsForDocument } from '@documenso/lib/server-only/recipient/get-recipients-for-document';
 import { type TGetTeamByUrlResponse, getTeamByUrl } from '@documenso/lib/server-only/team/get-team';
 import { DocumentVisibility } from '@documenso/lib/types/document-visibility';
-import { formatDocumentsPath } from '@documenso/lib/utils/teams';
+import { formatChatPath } from '@documenso/lib/utils/teams';
 import { DocumentReadOnlyFields } from '@documenso/ui/components/document/document-read-only-fields';
 import { Badge } from '@documenso/ui/primitives/badge';
 import { Button } from '@documenso/ui/primitives/button';
@@ -48,7 +48,7 @@ export async function loader({ params, request }: Route.LoaderArgs) {
 
   const documentId = Number(id);
 
-  const documentRootPath = formatDocumentsPath(team?.url);
+  const documentRootPath = formatChatPath(team?.url);
 
   if (!documentId || !folderId) {
     throw redirect(folderId ? `${documentRootPath}/f/${folderId}` : documentRootPath);
@@ -235,6 +235,7 @@ export default function DocumentPage() {
                   .with(DocumentStatus.DRAFT, () => (
                     <Trans>This document is currently a draft and has not been sent</Trans>
                   ))
+                  .with(DocumentStatus.ERROR, () => <Trans>Something went wrong</Trans>)
                   .with(DocumentStatus.PENDING, () => {
                     const pendingRecipients = recipients.filter(
                       (recipient) => recipient.signingStatus === 'NOT_SIGNED',

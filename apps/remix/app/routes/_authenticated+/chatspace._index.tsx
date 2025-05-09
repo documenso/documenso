@@ -9,11 +9,11 @@ import { z } from 'zod';
 import { FolderType } from '@documenso/lib/types/folder-type';
 import { formatAvatarUrl } from '@documenso/lib/utils/avatars';
 import { parseToIntegerArray } from '@documenso/lib/utils/params';
-import { formatDocumentsPath } from '@documenso/lib/utils/teams';
+import { formatChatPath } from '@documenso/lib/utils/teams';
 import { ExtendedDocumentStatus } from '@documenso/prisma/types/extended-document-status';
 import { trpc } from '@documenso/trpc/react';
 import {
-  type TFindDocumentsInternalResponse,
+  type TFindDocumentsInternalResponseChat,
   ZFindDocumentsInternalRequestSchema,
 } from '@documenso/trpc/server/document-router/schema';
 import { type TFolderWithSubfolders } from '@documenso/trpc/server/folder-router/schema';
@@ -21,8 +21,8 @@ import { Avatar, AvatarFallback, AvatarImage } from '@documenso/ui/primitives/av
 import { Button } from '@documenso/ui/primitives/button';
 import { Tabs, TabsList, TabsTrigger } from '@documenso/ui/primitives/tabs';
 
-import { DocumentMoveToFolderDialog } from '~/components/dialogs/document-move-to-folder-dialog';
-import { CreateFolderDialog } from '~/components/dialogs/folder-create-dialog';
+import { ChatMoveToFolderDialog } from '~/components/dialogs/chat-move-to-folder-dialog';
+import { CreateFolderDialogChat } from '~/components/dialogs/folder-create-dialog-chat';
 import { FolderDeleteDialog } from '~/components/dialogs/folder-delete-dialog';
 import { FolderMoveDialog } from '~/components/dialogs/folder-move-dialog';
 import { FolderSettingsDialog } from '~/components/dialogs/folder-settings-dialog';
@@ -32,6 +32,7 @@ import { DocumentSearch } from '~/components/general/document/document-search';
 import { DocumentStatus } from '~/components/general/document/document-status';
 import { FolderCard } from '~/components/general/folder/folder-card';
 import { PeriodSelector } from '~/components/general/period-selector';
+import { DocumentsChatSpaceTable } from '~/components/tables/documents-chatspace-table';
 import { DocumentsTable } from '~/components/tables/documents-table';
 import { DocumentsTableEmptyState } from '~/components/tables/documents-table-empty-state';
 import { DocumentsTableSenderFilter } from '~/components/tables/documents-table-sender-filter';
@@ -66,15 +67,15 @@ export default function DocumentsPage() {
   const [folderToSettings, setFolderToSettings] = useState<TFolderWithSubfolders | null>(null);
 
   const team = useOptionalCurrentTeam();
-
   const { mutateAsync: pinFolder } = trpc.folder.pinFolder.useMutation();
   const { mutateAsync: unpinFolder } = trpc.folder.unpinFolder.useMutation();
 
-  const [stats, setStats] = useState<TFindDocumentsInternalResponse['stats']>({
+  const [stats, setStats] = useState<TFindDocumentsInternalResponseChat['stats']>({
     [ExtendedDocumentStatus.DRAFT]: 0,
     [ExtendedDocumentStatus.PENDING]: 0,
     [ExtendedDocumentStatus.COMPLETED]: 0,
     [ExtendedDocumentStatus.REJECTED]: 0,
+    [ExtendedDocumentStatus.ERROR]: 0,
     [ExtendedDocumentStatus.INBOX]: 0,
     [ExtendedDocumentStatus.ALL]: 0,
   });
@@ -94,7 +95,7 @@ export default function DocumentsPage() {
     isLoading: isFoldersLoading,
     refetch: refetchFolders,
   } = trpc.folder.getFolders.useQuery({
-    type: FolderType.DOCUMENT,
+    type: FolderType.CHAT,
     parentId: null,
   });
 
@@ -116,7 +117,7 @@ export default function DocumentsPage() {
       params.delete('page');
     }
 
-    return `${formatDocumentsPath(team?.url)}?${params.toString()}`;
+    return `${formatChatPath(team?.url)}?${params.toString()}`;
   };
 
   useEffect(() => {
@@ -126,17 +127,17 @@ export default function DocumentsPage() {
   }, [data?.stats]);
 
   const navigateToFolder = (folderId?: string | null) => {
-    const documentsPath = formatDocumentsPath(team?.url);
+    const documentsPath = formatChatPath(team?.url);
 
     if (folderId) {
-      void navigate(`${documentsPath}/f/${folderId}`);
+      void navigate(`${formatChatPath(team?.url)}/f/${folderId}`);
     } else {
       void navigate(documentsPath);
     }
   };
 
   const handleViewAllFolders = () => {
-    void navigate(`${formatDocumentsPath(team?.url)}/folders`);
+    void navigate(`${formatChatPath(team?.url)}/folders`);
   };
 
   return (
@@ -172,7 +173,7 @@ export default function DocumentsPage() {
 
           <div className="flex gap-4 sm:flex-row sm:justify-end">
             <ChatspaceDocumentUploadDropzone />
-            <CreateFolderDialog />
+            <CreateFolderDialogChat />
           </div>
         </div>
 
@@ -279,7 +280,7 @@ export default function DocumentsPage() {
                   ExtendedDocumentStatus.INBOX,
                   ExtendedDocumentStatus.PENDING,
                   ExtendedDocumentStatus.COMPLETED,
-                  ExtendedDocumentStatus.DRAFT,
+                  ExtendedDocumentStatus.ERROR,
                   ExtendedDocumentStatus.ALL,
                 ].map((value) => (
                   <TabsTrigger
@@ -320,7 +321,7 @@ export default function DocumentsPage() {
                 status={findDocumentSearchParams.status || ExtendedDocumentStatus.ALL}
               />
             ) : (
-              <DocumentsTable
+              <DocumentsChatSpaceTable
                 data={data}
                 isLoading={isLoading}
                 isLoadingError={isLoadingError}
@@ -334,7 +335,7 @@ export default function DocumentsPage() {
         </div>
 
         {documentToMove && (
-          <DocumentMoveToFolderDialog
+          <ChatMoveToFolderDialog
             documentId={documentToMove}
             open={isMovingDocument}
             onOpenChange={(open) => {

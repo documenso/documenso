@@ -9,6 +9,7 @@ import type { ApiRequestMetadata } from '@documenso/lib/universal/extract-reques
 import { createDocumentAuditLogData } from '@documenso/lib/utils/document-audit-logs';
 import { prisma } from '@documenso/prisma';
 
+import { getExtractBodyContractTask } from '../../trigger';
 import {
   ZWebhookDocumentSchema,
   mapDocumentToWebhookDocumentPayload,
@@ -16,6 +17,7 @@ import {
 import { prefixedId } from '../../universal/id';
 import { getFileServerSide } from '../../universal/upload/get-file.server';
 import { putPdfFileServerSide } from '../../universal/upload/put-file.server';
+import { getPresignGetUrl } from '../../universal/upload/server-actions';
 import { determineDocumentVisibility } from '../../utils/document-visibility';
 import { triggerWebhook } from '../webhooks/trigger/trigger-webhook';
 
@@ -31,6 +33,7 @@ export type CreateDocumentOptions = {
   requestMetadata: ApiRequestMetadata;
   folderId?: string;
   useToChat?: boolean;
+  source?: DocumentSource;
 };
 
 export const createDocument = async ({
@@ -45,7 +48,9 @@ export const createDocument = async ({
   timezone,
   folderId,
   useToChat,
+  source,
 }: CreateDocumentOptions) => {
+  console.log('source of document', source);
   const user = await prisma.user.findFirstOrThrow({
     where: {
       id: userId,
@@ -138,7 +143,93 @@ export const createDocument = async ({
       documentDataId = newDocumentData.id;
     }
   }
+  if (useToChat) {
+    return await prisma.$transaction(async (tx) => {
+      const document = await tx.document.create({
+        data: {
+          title,
+          qrToken: prefixedId('qr'),
+          externalId,
+          documentDataId,
+          userId,
+          teamId,
+          folderId,
+          status: 'PENDING',
+          useToChat,
+          source: DocumentSource.CHAT,
+          visibility:
+            folderVisibility ??
+            determineDocumentVisibility(
+              team?.teamGlobalSettings?.documentVisibility,
+              userTeamRole ?? TeamMemberRole.MEMBER,
+            ),
+          formValues,
+          documentMeta: {
+            create: {
+              language: team?.teamGlobalSettings?.documentLanguage,
+              timezone: timezone,
+              typedSignatureEnabled: team?.teamGlobalSettings?.typedSignatureEnabled ?? true,
+              uploadSignatureEnabled: team?.teamGlobalSettings?.uploadSignatureEnabled ?? true,
+              drawSignatureEnabled: team?.teamGlobalSettings?.drawSignatureEnabled ?? true,
+            },
+          },
+        },
+      });
 
+      const documentData = await prisma.documentData.findFirst({
+        where: {
+          id: documentDataId,
+        },
+      });
+
+      if (!documentData) {
+        throw new AppError(AppErrorCode.NOT_FOUND, {
+          message: 'Document data not found',
+        });
+      }
+
+      const { url } = await getPresignGetUrl(documentData?.data);
+      console.log('url al crear documento', url);
+      await getExtractBodyContractTask(userId, document.id, url, teamId);
+
+      // await tx.documentAuditLog.create({
+      //   data: createDocumentAuditLogData({
+      //     type: DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_CREATED,
+      //     documentId: document.id,
+      //     metadata: requestMetadata,
+      //     data: {
+      //       title,
+      //       source: {
+      //         type: DocumentSource.DOCUMENT,
+      //       },
+      //     },
+      //   }),
+      // });
+
+      const createdDocument = await tx.document.findFirst({
+        where: {
+          id: document.id,
+        },
+        include: {
+          documentMeta: true,
+          recipients: true,
+        },
+      });
+
+      if (!createdDocument) {
+        throw new Error('Document not found');
+      }
+
+      await triggerWebhook({
+        event: WebhookTriggerEvents.DOCUMENT_CREATED,
+        data: ZWebhookDocumentSchema.parse(mapDocumentToWebhookDocumentPayload(createdDocument)),
+        userId,
+        teamId,
+      });
+
+      return createdDocument;
+    });
+  }
   return await prisma.$transaction(async (tx) => {
     const document = await tx.document.create({
       data: {

@@ -8,7 +8,7 @@ import { z } from 'zod';
 
 import { formatAvatarUrl } from '@documenso/lib/utils/avatars';
 import { parseToIntegerArray } from '@documenso/lib/utils/params';
-import { formatDocumentsPath } from '@documenso/lib/utils/teams';
+import { formatChatPath } from '@documenso/lib/utils/teams';
 import { ExtendedDocumentStatus } from '@documenso/prisma/types/extended-document-status';
 import { trpc } from '@documenso/trpc/react';
 import {
@@ -20,18 +20,18 @@ import { Avatar, AvatarFallback, AvatarImage } from '@documenso/ui/primitives/av
 import { Button } from '@documenso/ui/primitives/button';
 import { Tabs, TabsList, TabsTrigger } from '@documenso/ui/primitives/tabs';
 
-import { DocumentMoveToFolderDialog } from '~/components/dialogs/document-move-to-folder-dialog';
-import { CreateFolderDialog } from '~/components/dialogs/folder-create-dialog';
+import { ChatMoveToFolderDialog } from '~/components/dialogs/chat-move-to-folder-dialog';
+import { CreateFolderDialogChat } from '~/components/dialogs/folder-create-dialog-chat';
 import { FolderDeleteDialog } from '~/components/dialogs/folder-delete-dialog';
 import { FolderMoveDialog } from '~/components/dialogs/folder-move-dialog';
 import { FolderSettingsDialog } from '~/components/dialogs/folder-settings-dialog';
+import { ChatspaceDocumentUploadDropzone } from '~/components/general/chatspace/chatspace-document-upload';
 import { DocumentDropZoneWrapper } from '~/components/general/document/document-drop-zone-wrapper';
 import { DocumentSearch } from '~/components/general/document/document-search';
 import { DocumentStatus } from '~/components/general/document/document-status';
-import { DocumentUploadDropzone } from '~/components/general/document/document-upload';
 import { FolderCard } from '~/components/general/folder/folder-card';
 import { PeriodSelector } from '~/components/general/period-selector';
-import { DocumentsTable } from '~/components/tables/documents-table';
+import { DocumentsChatSpaceTable } from '~/components/tables/documents-chatspace-table';
 import { DocumentsTableEmptyState } from '~/components/tables/documents-table-empty-state';
 import { DocumentsTableSenderFilter } from '~/components/tables/documents-table-sender-filter';
 import { useOptionalCurrentTeam } from '~/providers/team';
@@ -76,6 +76,7 @@ export default function DocumentsPage() {
     [ExtendedDocumentStatus.PENDING]: 0,
     [ExtendedDocumentStatus.COMPLETED]: 0,
     [ExtendedDocumentStatus.REJECTED]: 0,
+    [ExtendedDocumentStatus.ERROR]: 0,
     [ExtendedDocumentStatus.INBOX]: 0,
     [ExtendedDocumentStatus.ALL]: 0,
   });
@@ -85,12 +86,11 @@ export default function DocumentsPage() {
     [searchParams],
   );
 
-  const { data, isLoading, isLoadingError, refetch } = trpc.document.findDocumentsInternal.useQuery(
-    {
+  const { data, isLoading, isLoadingError, refetch } =
+    trpc.document.findDocumentsInternalUseToChat.useQuery({
       ...findDocumentSearchParams,
       folderId,
-    },
-  );
+    });
 
   const {
     data: foldersData,
@@ -118,7 +118,7 @@ export default function DocumentsPage() {
       params.delete('page');
     }
 
-    return `${formatDocumentsPath(team?.url)}/f/${folderId}?${params.toString()}`;
+    return `${formatChatPath(team?.url)}/f/${folderId}?${params.toString()}`;
   };
 
   useEffect(() => {
@@ -128,7 +128,7 @@ export default function DocumentsPage() {
   }, [data?.stats]);
 
   const navigateToFolder = (folderId?: string | null) => {
-    const documentsPath = formatDocumentsPath(team?.url);
+    const documentsPath = formatChatPath(team?.url);
 
     if (folderId) {
       void navigate(`${documentsPath}/f/${folderId}`);
@@ -169,8 +169,8 @@ export default function DocumentsPage() {
           </div>
 
           <div className="flex gap-4 sm:flex-row sm:justify-end">
-            <DocumentUploadDropzone />
-            <CreateFolderDialog />
+            <ChatspaceDocumentUploadDropzone />
+            <CreateFolderDialogChat />
           </div>
         </div>
 
@@ -263,7 +263,8 @@ export default function DocumentsPage() {
                   ExtendedDocumentStatus.INBOX,
                   ExtendedDocumentStatus.PENDING,
                   ExtendedDocumentStatus.COMPLETED,
-                  ExtendedDocumentStatus.DRAFT,
+                  ExtendedDocumentStatus.ERROR,
+
                   ExtendedDocumentStatus.ALL,
                 ].map((value) => (
                   <TabsTrigger
@@ -304,7 +305,7 @@ export default function DocumentsPage() {
                 status={findDocumentSearchParams.status || ExtendedDocumentStatus.ALL}
               />
             ) : (
-              <DocumentsTable
+              <DocumentsChatSpaceTable
                 data={data}
                 isLoading={isLoading}
                 isLoadingError={isLoadingError}
@@ -318,7 +319,7 @@ export default function DocumentsPage() {
         </div>
 
         {documentToMove && (
-          <DocumentMoveToFolderDialog
+          <ChatMoveToFolderDialog
             documentId={documentToMove}
             open={isMovingDocument}
             onOpenChange={(open) => {

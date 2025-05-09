@@ -1,0 +1,7 @@
+{
+  "version": 3,
+  "sources": ["../../../../../../../../../trigger.config.ts"],
+  "sourcesContent": ["import { defineConfig } from '@trigger.dev/sdk/v3';\n\nexport default defineConfig({\n  project: 'proj_ybnmrcchantwjppvcnoi',\n  runtime: 'node',\n  logLevel: 'log',\n\n  // The max compute seconds a task is allowed to run. If the task run exceeds this duration, it will be stopped.\n  // You can override this on an individual task.\n  // See https://trigger.dev/docs/runs/max-duration\n  maxDuration: 3600,\n\n  retries: {\n    enabledInDev: true,\n    default: {\n      maxAttempts: 3,\n      minTimeoutInMs: 1000,\n      maxTimeoutInMs: 10000,\n      factor: 2,\n      randomize: true,\n    },\n  },\n\n  dirs: ['trigger'],\n  build: {},\n});\nexport const resolveEnvVars = undefined;"],
+  "mappings": ";;;;;;;;AAAA;AAEA,IAAO,yBAAQ,aAAa;AAAA,EAC1B,SAAS;AAAA,EACT,SAAS;AAAA,EACT,UAAU;AAAA;AAAA;AAAA;AAAA,EAKV,aAAa;AAAA,EAEb,SAAS;AAAA,IACP,cAAc;AAAA,IACd,SAAS;AAAA,MACP,aAAa;AAAA,MACb,gBAAgB;AAAA,MAChB,gBAAgB;AAAA,MAChB,QAAQ;AAAA,MACR,WAAW;AAAA,IACb;AAAA,EACF;AAAA,EAEA,MAAM,CAAC,SAAS;AAAA,EAChB,OAAO,CAAC;AACV,CAAC;AACM,IAAM,iBAAiB;",
+  "names": []
+}

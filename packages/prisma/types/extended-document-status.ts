@@ -3,6 +3,7 @@ import { DocumentStatus } from '@prisma/client';
 export const ExtendedDocumentStatus = {
   ...DocumentStatus,
   INBOX: 'INBOX',
+  ERROR: 'ERROR',
   ALL: 'ALL',
 } as const;
 

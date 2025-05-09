@@ -146,6 +146,7 @@ export const createDocument = async ({
         documentDataId,
         userId,
         teamId,
+        status: 'PENDING',
         folderId,
         visibility:
           folderVisibility ??
@@ -154,7 +155,7 @@ export const createDocument = async ({
             userTeamRole ?? TeamMemberRole.MEMBER,
           ),
         formValues,
-        source: DocumentSource.DOCUMENT,
+        source: DocumentSource.CHAT,
         documentMeta: {
           create: {
             language: team?.teamGlobalSettings?.documentLanguage,

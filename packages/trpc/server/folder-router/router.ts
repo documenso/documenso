@@ -5,6 +5,7 @@ import { deleteFolder } from '@documenso/lib/server-only/folder/delete-folder';
 import { findFolders } from '@documenso/lib/server-only/folder/find-folders';
 import { getFolderBreadcrumbs } from '@documenso/lib/server-only/folder/get-folder-breadcrumbs';
 import { getFolderById } from '@documenso/lib/server-only/folder/get-folder-by-id';
+import { moveChatToFolder } from '@documenso/lib/server-only/folder/move-chat-to-folder';
 import { moveDocumentToFolder } from '@documenso/lib/server-only/folder/move-document-to-folder';
 import { moveFolder } from '@documenso/lib/server-only/folder/move-folder';
 import { moveTemplateToFolder } from '@documenso/lib/server-only/folder/move-template-to-folder';
@@ -265,6 +266,40 @@ export const folderRouter = router({
       return {
         ...result,
         type: FolderType.DOCUMENT,
+      };
+    }),
+
+  moveChatToFolder: authenticatedProcedure
+    .input(ZMoveDocumentToFolderSchema)
+    .mutation(async ({ input, ctx }) => {
+      const { teamId, user } = ctx;
+      const { documentId, folderId } = input;
+      if (folderId !== null) {
+        try {
+          await getFolderById({
+            userId: user.id,
+            teamId,
+            folderId,
+            type: FolderType.CHAT,
+          });
+        } catch (error) {
+          throw new TRPCError({
+            code: 'NOT_FOUND',
+            message: 'Folder not found',
+          });
+        }
+      }
+
+      const result = await moveChatToFolder({
+        userId: user.id,
+        teamId,
+        documentId,
+        folderId,
+        requestMetadata: ctx.metadata,
+      });
+      return {
+        ...result,
+        type: FolderType.CHAT,
       };
     }),
 

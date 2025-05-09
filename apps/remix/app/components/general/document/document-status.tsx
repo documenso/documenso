@@ -36,6 +36,12 @@ export const FRIENDLY_STATUS_MAP: Record<ExtendedDocumentStatus, FriendlyStatus>
     icon: File,
     color: 'text-yellow-500 dark:text-yellow-200',
   },
+  ERROR: {
+    label: msg`Error`,
+    labelExtended: msg`Document error`,
+    icon: File,
+    color: 'text-red-500 dark:text-red-200',
+  },
   REJECTED: {
     label: msg`Rejected`,
     labelExtended: msg`Document rejected`,

@@ -235,6 +235,7 @@ export default function DocumentPage() {
                   .with(DocumentStatus.DRAFT, () => (
                     <Trans>This document is currently a draft and has not been sent</Trans>
                   ))
+                  .with(DocumentStatus.ERROR, () => <Trans>Something went wrong</Trans>)
                   .with(DocumentStatus.PENDING, () => {
                     const pendingRecipients = recipients.filter(
                       (recipient) => recipient.signingStatus === 'NOT_SIGNED',

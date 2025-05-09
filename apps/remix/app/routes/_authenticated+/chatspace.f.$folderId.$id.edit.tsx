@@ -10,7 +10,7 @@ import { getDocumentWithDetailsById } from '@documenso/lib/server-only/document/
 import { type TGetTeamByUrlResponse, getTeamByUrl } from '@documenso/lib/server-only/team/get-team';
 import { DocumentVisibility } from '@documenso/lib/types/document-visibility';
 import { isDocumentCompleted } from '@documenso/lib/utils/document';
-import { formatDocumentsPath } from '@documenso/lib/utils/teams';
+import { formatChatPath } from '@documenso/lib/utils/teams';
 
 import { DocumentEditForm } from '~/components/general/document/document-edit-form';
 import { DocumentStatus } from '~/components/general/document/document-status';
@@ -32,7 +32,7 @@ export async function loader({ params, request }: Route.LoaderArgs) {
 
   const documentId = Number(id);
 
-  const documentRootPath = formatDocumentsPath(team?.url);
+  const documentRootPath = formatChatPath(team?.url);
 
   if (!documentId || Number.isNaN(documentId)) {
     throw redirect(documentRootPath);

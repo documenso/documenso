@@ -26,16 +26,16 @@ type ContractForm = {
 };
 
 export const getExtractBodyContractTask = async (
-  pdfUrls: string[],
-  workspaceId: number,
-  fileId: number,
-  name: string,
+  userId: number,
+  documentId: number,
+  urlDocument: string,
+  teamId?: number,
 ) => {
   const { id } = await extractBodyContractTask.trigger({
-    id: fileId,
-    workspace: workspaceId,
-    pdfUrls: pdfUrls,
-    name: name,
+    userId: userId,
+    documentId: documentId,
+    teamId: teamId,
+    urlDocument: urlDocument,
   });
   return id;
 };

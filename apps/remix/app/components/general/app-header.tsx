@@ -64,12 +64,6 @@ export const Header = ({ className, user, teams, ...props }: HeaderProps) => {
         >
           <BrandingLogo className="h-6 w-auto" />
         </Link>
-        <Link
-          to={`${getRootHref(params, { returnEmptyRootString: true })}/chatspace`}
-          className="focus-visible:ring-ring ring-offset-background hidden rounded-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 md:inline"
-        >
-          Chat
-        </Link>
         <AppNavDesktop setIsCommandMenuOpen={setIsCommandMenuOpen} />
 
         <div
