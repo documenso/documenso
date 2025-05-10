@@ -8,7 +8,7 @@ import { getSiteSettings } from '@documenso/lib/server-only/site-settings/get-si
 import { SITE_SETTINGS_BANNER_ID } from '@documenso/lib/server-only/site-settings/schemas/banner';
 
 import { AppBanner } from '~/components/general/app-banner';
-import { Header } from '~/components/general/app-header';
+import { HeaderTeams } from '~/components/general/app-header-team';
 import { VerifyEmailBanner } from '~/components/general/verify-email-banner';
 
 import type { Route } from './+types/_layout';
@@ -55,7 +55,7 @@ export default function Layout({ loaderData }: Route.ComponentProps) {
 
       {banner && <AppBanner banner={banner} />}
 
-      <Header user={user} teams={teams} />
+      <HeaderTeams user={user} teams={teams} />
 
       <main className="mt-8 pb-8 md:mt-12 md:pb-12">
         <Outlet />

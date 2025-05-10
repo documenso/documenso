@@ -6,9 +6,7 @@ import { Trans } from '@lingui/react/macro';
 import { DocumentStatus, RecipientRole } from '@prisma/client';
 import {
   CheckCircle,
-  Copy,
   Download,
-  Edit,
   EyeIcon,
   MoreHorizontal,
   MoveRight,
@@ -35,8 +33,6 @@ import { useToast } from '@documenso/ui/primitives/use-toast';
 import { DocumentDeleteDialog } from '~/components/dialogs/document-delete-dialog';
 import { DocumentDuplicateDialog } from '~/components/dialogs/document-duplicate-dialog';
 import { DocumentMoveDialog } from '~/components/dialogs/document-move-dialog';
-import { DocumentResendDialog } from '~/components/dialogs/document-resend-dialog';
-import { DocumentRecipientLinkCopyDialog } from '~/components/general/document/document-recipient-link-copy-dialog';
 import { useOptionalCurrentTeam } from '~/providers/team';
 
 export type DocumentsTableActionDropdownProps = {
@@ -190,12 +186,12 @@ export const ChatTableActionDropdown = ({
         </DropdownMenuItem> */}
 
         {/* We don't want to allow teams moving documents across at the moment. */}
-        {!team && !row.teamId && (
+        {/*!team && !row.teamId && (
           <DropdownMenuItem disabled={isError} onClick={() => setMoveDialogOpen(true)}>
             <MoveRight className="mr-2 h-4 w-4" />
             <Trans>Move to Team</Trans>
           </DropdownMenuItem>
-        )}
+        ) */}
 
         {onMoveDocument && (
           <DropdownMenuItem

@@ -1583,6 +1583,10 @@ msgstr "Charts"
 msgid "Chat"
 msgstr "Chat"
 
+#: apps/remix/app/components/general/menu-switcher.tsx
+msgid "Chat documents"
+msgstr "Chat documents"
+
 #: apps/remix/app/components/general/app-nav-mobile.tsx
 #: apps/remix/app/components/general/app-nav-desktop.tsx
 msgid "Chats"
@@ -2666,7 +2670,9 @@ msgstr "Document will be permanently deleted"
 #: apps/remix/app/components/general/user-profile-timur.tsx
 #: apps/remix/app/components/general/generic-error-layout.tsx
 #: apps/remix/app/components/general/app-nav-mobile.tsx
+#: apps/remix/app/components/general/app-nav-mobile-team.tsx
 #: apps/remix/app/components/general/app-nav-desktop.tsx
+#: apps/remix/app/components/general/app-nav-desktop-team.tsx
 #: apps/remix/app/components/general/app-command-menu.tsx
 #: apps/remix/app/components/general/skeletons/document-edit-skeleton.tsx
 msgid "Documents"
@@ -3815,7 +3821,6 @@ msgstr "Move to Folder"
 
 #: apps/remix/app/components/tables/templates-table-action-dropdown.tsx
 #: apps/remix/app/components/tables/documents-table-action-dropdown.tsx
-#: apps/remix/app/components/tables/chat-table-action-dropdown.tsx
 msgid "Move to Team"
 msgstr "Move to Team"
 
@@ -4822,6 +4827,7 @@ msgstr "Save Template"
 #: apps/remix/app/components/tables/user-settings-teams-page-table.tsx
 #: apps/remix/app/components/tables/documents-table-sender-filter.tsx
 #: apps/remix/app/components/general/app-nav-desktop.tsx
+#: apps/remix/app/components/general/app-nav-desktop-team.tsx
 msgid "Search"
 msgstr "Search"
 
@@ -4999,6 +5005,7 @@ msgstr "Set up your template properties and recipient information"
 
 #: apps/remix/app/routes/_authenticated+/settings+/_layout.tsx
 #: apps/remix/app/components/general/app-nav-mobile.tsx
+#: apps/remix/app/components/general/app-nav-mobile-team.tsx
 #: apps/remix/app/components/general/app-command-menu.tsx
 #: apps/remix/app/components/general/app-command-menu.tsx
 msgid "Settings"
@@ -5105,6 +5112,7 @@ msgstr "Sign in to your account"
 
 #: apps/remix/app/components/general/menu-switcher.tsx
 #: apps/remix/app/components/general/app-nav-mobile.tsx
+#: apps/remix/app/components/general/app-nav-mobile-team.tsx
 msgid "Sign Out"
 msgstr "Sign Out"
 
@@ -5589,6 +5597,7 @@ msgstr "Team URL"
 #: apps/remix/app/components/general/settings-nav-desktop.tsx
 #: apps/remix/app/components/general/menu-switcher.tsx
 #: apps/remix/app/components/general/app-nav-mobile.tsx
+#: apps/remix/app/components/general/app-nav-mobile-team.tsx
 msgid "Teams"
 msgstr "Teams"
 
@@ -5662,7 +5671,9 @@ msgstr "Template updated successfully"
 #: apps/remix/app/routes/_authenticated+/templates.f.$folderId.$id._index.tsx
 #: apps/remix/app/routes/_authenticated+/templates.$id._index.tsx
 #: apps/remix/app/components/general/app-nav-mobile.tsx
+#: apps/remix/app/components/general/app-nav-mobile-team.tsx
 #: apps/remix/app/components/general/app-nav-desktop.tsx
+#: apps/remix/app/components/general/app-nav-desktop-team.tsx
 #: apps/remix/app/components/general/app-command-menu.tsx
 msgid "Templates"
 msgstr "Templates"

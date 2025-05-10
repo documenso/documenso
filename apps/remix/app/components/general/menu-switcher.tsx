@@ -254,6 +254,12 @@ export const MenuSwitcher = ({ user, teams: initialTeamsData }: MenuSwitcherProp
         )}
 
         <DropdownMenuItem className="text-muted-foreground px-4 py-2" asChild>
+          <Link to="/chatspace">
+            <Trans>Chat documents</Trans>
+          </Link>
+        </DropdownMenuItem>
+
+        <DropdownMenuItem className="text-muted-foreground px-4 py-2" asChild>
           <Link to="/settings/profile">
             <Trans>User settings</Trans>
           </Link>

@@ -1588,6 +1588,10 @@ msgstr "Diagramme"
 msgid "Chat"
 msgstr ""
 
+#: apps/remix/app/components/general/menu-switcher.tsx
+msgid "Chat documents"
+msgstr ""
+
 #: apps/remix/app/components/general/app-nav-mobile.tsx
 #: apps/remix/app/components/general/app-nav-desktop.tsx
 msgid "Chats"
@@ -2671,7 +2675,9 @@ msgstr "Dokument wird dauerhaft gelöscht"
 #: apps/remix/app/components/general/user-profile-timur.tsx
 #: apps/remix/app/components/general/generic-error-layout.tsx
 #: apps/remix/app/components/general/app-nav-mobile.tsx
+#: apps/remix/app/components/general/app-nav-mobile-team.tsx
 #: apps/remix/app/components/general/app-nav-desktop.tsx
+#: apps/remix/app/components/general/app-nav-desktop-team.tsx
 #: apps/remix/app/components/general/app-command-menu.tsx
 #: apps/remix/app/components/general/skeletons/document-edit-skeleton.tsx
 msgid "Documents"
@@ -3820,7 +3826,6 @@ msgstr ""
 
 #: apps/remix/app/components/tables/templates-table-action-dropdown.tsx
 #: apps/remix/app/components/tables/documents-table-action-dropdown.tsx
-#: apps/remix/app/components/tables/chat-table-action-dropdown.tsx
 msgid "Move to Team"
 msgstr "In Team verschieben"
 
@@ -4827,6 +4832,7 @@ msgstr "Vorlage speichern"
 #: apps/remix/app/components/tables/user-settings-teams-page-table.tsx
 #: apps/remix/app/components/tables/documents-table-sender-filter.tsx
 #: apps/remix/app/components/general/app-nav-desktop.tsx
+#: apps/remix/app/components/general/app-nav-desktop-team.tsx
 msgid "Search"
 msgstr "Suchen"
 
@@ -5004,6 +5010,7 @@ msgstr ""
 
 #: apps/remix/app/routes/_authenticated+/settings+/_layout.tsx
 #: apps/remix/app/components/general/app-nav-mobile.tsx
+#: apps/remix/app/components/general/app-nav-mobile-team.tsx
 #: apps/remix/app/components/general/app-command-menu.tsx
 #: apps/remix/app/components/general/app-command-menu.tsx
 msgid "Settings"
@@ -5110,6 +5117,7 @@ msgstr "Melden Sie sich bei Ihrem Konto an"
 
 #: apps/remix/app/components/general/menu-switcher.tsx
 #: apps/remix/app/components/general/app-nav-mobile.tsx
+#: apps/remix/app/components/general/app-nav-mobile-team.tsx
 msgid "Sign Out"
 msgstr "Ausloggen"
 
@@ -5594,6 +5602,7 @@ msgstr "Team-URL"
 #: apps/remix/app/components/general/settings-nav-desktop.tsx
 #: apps/remix/app/components/general/menu-switcher.tsx
 #: apps/remix/app/components/general/app-nav-mobile.tsx
+#: apps/remix/app/components/general/app-nav-mobile-team.tsx
 msgid "Teams"
 msgstr "Teams"
 
@@ -5667,7 +5676,9 @@ msgstr ""
 #: apps/remix/app/routes/_authenticated+/templates.f.$folderId.$id._index.tsx
 #: apps/remix/app/routes/_authenticated+/templates.$id._index.tsx
 #: apps/remix/app/components/general/app-nav-mobile.tsx
+#: apps/remix/app/components/general/app-nav-mobile-team.tsx
 #: apps/remix/app/components/general/app-nav-desktop.tsx
+#: apps/remix/app/components/general/app-nav-desktop-team.tsx
 #: apps/remix/app/components/general/app-command-menu.tsx
 msgid "Templates"
 msgstr "Vorlagen"
