@@ -1,6 +1,6 @@
 import { useLingui } from '@lingui/react';
 import { Plural, Trans } from '@lingui/react/macro';
-import { DocumentStatus, TeamMemberRole } from '@prisma/client';
+import { DocumentStatus, SigningStatus, TeamMemberRole } from '@prisma/client';
 import { ChevronLeft, Clock9, Users2 } from 'lucide-react';
 import { Link, redirect } from 'react-router';
 import { match } from 'ts-pattern';
@@ -111,10 +111,25 @@ export async function loader({ params, request }: Route.LoaderArgs) {
     recipients,
   };
 
+  let isSingleSignerDocument = false;
+  if (
+    documentWithRecipients.status === DocumentStatus.PENDING &&
+    documentWithRecipients.recipients.length === 1
+  ) {
+    const singleRecipient = documentWithRecipients.recipients[0];
+    if (
+      singleRecipient.email === user.email &&
+      singleRecipient.signingStatus === SigningStatus.SIGNED
+    ) {
+      isSingleSignerDocument = true;
+    }
+  }
+
   return superLoaderJson({
     document: documentWithRecipients,
     documentRootPath,
     fields,
+    isSingleSignerDocument,
   });
 }
 
@@ -124,7 +139,7 @@ export default function DocumentPage() {
   const { _ } = useLingui();
   const { user } = useSession();
 
-  const { document, documentRootPath, fields } = loaderData;
+  const { document, documentRootPath, fields, isSingleSignerDocument } = loaderData;
 
   const { recipients, documentData, documentMeta } = document;
 
@@ -237,6 +252,10 @@ export default function DocumentPage() {
                     <Trans>This document is currently a draft and has not been sent</Trans>
                   ))
                   .with(DocumentStatus.PENDING, () => {
+                    if (isSingleSignerDocument) {
+                      return <Trans>This document has been signed and is being finalized.</Trans>;
+                    }
+
                     const pendingRecipients = recipients.filter(
                       (recipient) => recipient.signingStatus === 'NOT_SIGNED',
                     );
