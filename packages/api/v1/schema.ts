@@ -121,7 +121,7 @@ export const ZUploadDocumentSuccessfulSchema = z.object({
 
 export const ZDownloadDocumentQuerySchema = z.object({
   downloadOriginalDocument: z
-    .preprocess((val) => val === 'true' || val === 1, z.boolean())
+    .preprocess((val) => String(val) === 'true' || String(val) === '1', z.boolean())
     .optional()
     .default(false),
 });
