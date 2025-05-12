@@ -10,6 +10,9 @@ import {
   Download,
   Edit,
   EyeIcon,
+  FileDown,
+  FolderInput,
+  Link as LinkIcon,
   Loader,
   MoreHorizontal,
   MoveRight,
@@ -182,7 +185,7 @@ export const DocumentsTableActionDropdown = ({
         </DropdownMenuItem>
 
         <DropdownMenuItem onClick={onDownloadOriginalClick}>
-          <Download className="mr-2 h-4 w-4" />
+          <FileDown className="mr-2 h-4 w-4" />
           <Trans>Download Original</Trans>
         </DropdownMenuItem>
 
@@ -201,7 +204,7 @@ export const DocumentsTableActionDropdown = ({
 
         {onMoveDocument && (
           <DropdownMenuItem onClick={onMoveDocument} onSelect={(e) => e.preventDefault()}>
-            <MoveRight className="mr-2 h-4 w-4" />
+            <FolderInput className="mr-2 h-4 w-4" />
             <Trans>Move to Folder</Trans>
           </DropdownMenuItem>
         )}
@@ -228,6 +231,7 @@ export const DocumentsTableActionDropdown = ({
               <DropdownMenuItem disabled={!isPending} asChild onSelect={(e) => e.preventDefault()}>
                 <div>
                   <Copy className="mr-2 h-4 w-4" />
+                  <LinkIcon className="mr-2 h-4 w-4" />
                   <Trans>Signing Links</Trans>
                 </div>
               </DropdownMenuItem>
