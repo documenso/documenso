@@ -48,9 +48,9 @@ export const TemplateDropZoneWrapper = ({ children, className }: TemplateDropZon
       });
 
       toast({
-        title: _(msg`Template document uploaded`),
+        title: _(msg`Template uploaded`),
         description: _(
-          msg`Your document has been uploaded successfully. You will be redirected to the template page.`,
+          msg`Your template has been uploaded successfully. You will be redirected to the template page.`,
         ),
         duration: 5000,
       });
@@ -73,7 +73,7 @@ export const TemplateDropZoneWrapper = ({ children, className }: TemplateDropZon
 
   const onFileDropRejected = () => {
     toast({
-      title: _(msg`Your document failed to upload.`),
+      title: _(msg`Your template failed to upload.`),
       description: _(msg`File cannot be larger than ${APP_DOCUMENT_UPLOAD_SIZE_LIMIT}MB`),
       duration: 5000,
       variant: 'destructive',
@@ -123,7 +123,7 @@ export const TemplateDropZoneWrapper = ({ children, className }: TemplateDropZon
           <div className="pointer-events-none flex h-1/2 w-full flex-col items-center justify-center">
             <Loader className="text-primary h-12 w-12 animate-spin" />
             <p className="text-foreground mt-8 font-medium">
-              <Trans>Uploading document...</Trans>
+              <Trans>Uploading template...</Trans>
             </p>
           </div>
         </div>
