@@ -12,7 +12,6 @@ import {
   EyeIcon,
   FileDown,
   FolderInput,
-  Link as LinkIcon,
   Loader,
   MoreHorizontal,
   MoveRight,
@@ -231,7 +230,6 @@ export const DocumentsTableActionDropdown = ({
               <DropdownMenuItem disabled={!isPending} asChild onSelect={(e) => e.preventDefault()}>
                 <div>
                   <Copy className="mr-2 h-4 w-4" />
-                  <LinkIcon className="mr-2 h-4 w-4" />
                   <Trans>Signing Links</Trans>
                 </div>
               </DropdownMenuItem>
