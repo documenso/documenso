@@ -252,7 +252,10 @@ export const setDocumentRecipients = async ({
           });
         }
 
-        return upsertedRecipient;
+        return {
+          ...upsertedRecipient,
+          clientId: recipient.clientId,
+        };
       }),
     );
   });
@@ -332,7 +335,7 @@ export const setDocumentRecipients = async ({
   }
 
   // Filter out recipients that have been removed or have been updated.
-  const filteredRecipients: Recipient[] = existingRecipients.filter((recipient) => {
+  const filteredRecipients: RecipientDataWithClientId[] = existingRecipients.filter((recipient) => {
     const isRemoved = removedRecipients.find(
       (removedRecipient) => removedRecipient.id === recipient.id,
     );
@@ -353,12 +356,17 @@ export const setDocumentRecipients = async ({
  */
 type RecipientData = {
   id?: number | null;
+  clientId?: string | null;
   email: string;
   name: string;
   role: RecipientRole;
   signingOrder?: number | null;
   accessAuth?: TRecipientAccessAuthTypes | null;
   actionAuth?: TRecipientActionAuthTypes | null;
+};
+
+type RecipientDataWithClientId = Recipient & {
+  clientId?: string | null;
 };
 
 const hasRecipientBeenChanged = (recipient: Recipient, newRecipientData: RecipientData) => {

@@ -6,8 +6,6 @@ import { seedUser } from '@documenso/prisma/seed/users';
 
 import { apiSignin } from '../fixtures/authentication';
 
-test.describe.configure({ mode: 'parallel' });
-
 test('[TEAMS]: send team email request', async ({ page }) => {
   const team = await seedTeam();
 

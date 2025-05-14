@@ -5,8 +5,10 @@ import { DateTime } from 'luxon';
 import { redirect } from 'react-router';
 import { match } from 'ts-pattern';
 import { UAParser } from 'ua-parser-js';
+import { renderSVG } from 'uqr';
 
 import { isDocumentPlatform } from '@documenso/ee/server-only/util/is-document-platform';
+import { NEXT_PUBLIC_WEBAPP_URL } from '@documenso/lib/constants/app';
 import { APP_I18N_OPTIONS, ZSupportedLanguageCodeSchema } from '@documenso/lib/constants/i18n';
 import {
   RECIPIENT_ROLES_DESCRIPTION,
@@ -249,24 +251,24 @@ export default function SigningCertificate({ loaderData }: Route.ComponentProps)
                               {signature.secondaryId}
                             </span>
                           </p>
-
-                          <p className="text-muted-foreground mt-2 text-sm print:text-xs">
-                            <span className="font-medium">{_(msg`IP Address`)}:</span>{' '}
-                            <span className="inline-block">
-                              {logs.DOCUMENT_RECIPIENT_COMPLETED[0]?.ipAddress ?? _(msg`Unknown`)}
-                            </span>
-                          </p>
-
-                          <p className="text-muted-foreground mt-1 text-sm print:text-xs">
-                            <span className="font-medium">{_(msg`Device`)}:</span>{' '}
-                            <span className="inline-block">
-                              {getDevice(logs.DOCUMENT_RECIPIENT_COMPLETED[0]?.userAgent)}
-                            </span>
-                          </p>
                         </>
                       ) : (
                         <p className="text-muted-foreground">N/A</p>
                       )}
+
+                      <p className="text-muted-foreground mt-2 text-sm print:text-xs">
+                        <span className="font-medium">{_(msg`IP Address`)}:</span>{' '}
+                        <span className="inline-block">
+                          {logs.DOCUMENT_RECIPIENT_COMPLETED[0]?.ipAddress ?? _(msg`Unknown`)}
+                        </span>
+                      </p>
+
+                      <p className="text-muted-foreground mt-1 text-sm print:text-xs">
+                        <span className="font-medium">{_(msg`Device`)}:</span>{' '}
+                        <span className="inline-block">
+                          {getDevice(logs.DOCUMENT_RECIPIENT_COMPLETED[0]?.userAgent)}
+                        </span>
+                      </p>
                     </TableCell>
 
                     <TableCell truncate={false} className="w-[min-content] align-top">
@@ -342,7 +344,18 @@ export default function SigningCertificate({ loaderData }: Route.ComponentProps)
       </Card>
 
       {isPlatformDocument && (
-        <div className="my-8 flex-row-reverse">
+        <div className="my-8 flex-row-reverse space-y-4">
+          <div className="flex items-end justify-end gap-x-4">
+            <div
+              className="flex h-24 w-24 justify-center"
+              dangerouslySetInnerHTML={{
+                __html: renderSVG(`${NEXT_PUBLIC_WEBAPP_URL()}/share/${document.qrToken}`, {
+                  ecc: 'Q',
+                }),
+              }}
+            />
+          </div>
+
           <div className="flex items-end justify-end gap-x-4">
             <p className="flex-shrink-0 text-sm font-medium print:text-xs">
               {_(msg`Signing certificate provided by`)}:

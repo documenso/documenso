@@ -57,6 +57,8 @@ test.describe('Signing Certificate Tests', () => {
       expect(status).toBe(DocumentStatus.COMPLETED);
     }).toPass();
 
+    await page.waitForTimeout(2500);
+
     // Get the completed document
     const completedDocument = await prisma.document.findFirstOrThrow({
       where: { id: document.id },
@@ -127,6 +129,8 @@ test.describe('Signing Certificate Tests', () => {
       expect(status).toBe(DocumentStatus.COMPLETED);
     }).toPass();
 
+    await page.waitForTimeout(2500);
+
     // Get the completed document
     const completedDocument = await prisma.document.findFirstOrThrow({
       where: { id: document.id },
@@ -196,6 +200,8 @@ test.describe('Signing Certificate Tests', () => {
 
       expect(status).toBe(DocumentStatus.COMPLETED);
     }).toPass();
+
+    await page.waitForTimeout(2500);
 
     // Get the completed document
     const completedDocument = await prisma.document.findFirstOrThrow({

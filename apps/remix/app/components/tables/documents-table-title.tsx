@@ -1,16 +1,12 @@
-import type { Document, Recipient, Team, User } from '@prisma/client';
 import { Link } from 'react-router';
 import { match } from 'ts-pattern';
 
 import { useSession } from '@documenso/lib/client-only/providers/session';
+import type { TDocumentMany as TDocumentRow } from '@documenso/lib/types/document';
 import { formatDocumentsPath } from '@documenso/lib/utils/teams';
 
 export type DataTableTitleProps = {
-  row: Document & {
-    user: Pick<User, 'id' | 'name' | 'email'>;
-    team: Pick<Team, 'url'> | null;
-    recipients: Recipient[];
-  };
+  row: TDocumentRow;
   teamUrl?: string;
 };
 

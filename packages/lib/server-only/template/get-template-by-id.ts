@@ -6,9 +6,15 @@ export type GetTemplateByIdOptions = {
   id: number;
   userId: number;
   teamId?: number;
+  folderId?: string | null;
 };
 
-export const getTemplateById = async ({ id, userId, teamId }: GetTemplateByIdOptions) => {
+export const getTemplateById = async ({
+  id,
+  userId,
+  teamId,
+  folderId = null,
+}: GetTemplateByIdOptions) => {
   const template = await prisma.template.findFirst({
     where: {
       id,
@@ -27,6 +33,7 @@ export const getTemplateById = async ({ id, userId, teamId }: GetTemplateByIdOpt
             userId,
             teamId: null,
           }),
+      ...(folderId ? { folderId } : {}),
     },
     include: {
       directLink: true,
@@ -41,6 +48,7 @@ export const getTemplateById = async ({ id, userId, teamId }: GetTemplateByIdOpt
           email: true,
         },
       },
+      folder: true,
     },
   });
 

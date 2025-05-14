@@ -9,8 +9,6 @@ import {
 
 import { apiSignin } from '../fixtures/authentication';
 
-test.describe.configure({ mode: 'parallel' });
-
 test('[TEAMS]: check that default team signature settings are all enabled', async ({ page }) => {
   const { team } = await seedTeamDocuments();
 
@@ -149,8 +147,9 @@ test('[TEAMS]: check signature modes work for templates', async ({ page }) => {
     await page.getByRole('button', { name: 'Update' }).first().click();
 
     // Wait for finish
-    await page.getByText('Document preferences updated').waitFor({ state: 'visible' });
-    await page.waitForTimeout(1000);
+    const toast = page.locator('li[role="status"][data-state="open"]').first();
+    await expect(toast).toBeVisible();
+    await expect(toast.getByText('Document preferences updated', { exact: true })).toBeVisible();
 
     const template = await seedTeamTemplateWithMeta(team);
 
