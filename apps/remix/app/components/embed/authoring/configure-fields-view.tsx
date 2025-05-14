@@ -173,34 +173,59 @@ export const ConfigureFieldsView = ({
   });
 
   const onFieldCopy = useCallback(
-    (event?: KeyboardEvent | null, options?: { duplicate?: boolean }) => {
-      const { duplicate = false } = options ?? {};
+    (event?: KeyboardEvent | null, options?: { duplicate?: boolean; duplicateAll?: boolean }) => {
+      const { duplicate = false, duplicateAll = false } = options ?? {};
 
       if (lastActiveField) {
         event?.preventDefault();
 
-        if (!duplicate) {
-          setFieldClipboard(lastActiveField);
+        if (duplicate) {
+          const newField: TConfigureFieldsFormSchema['fields'][0] = {
+            ...structuredClone(lastActiveField),
+            nativeId: undefined,
+            formId: nanoid(12),
+            signerEmail: selectedRecipient?.email ?? lastActiveField.signerEmail,
+            recipientId: selectedRecipient?.id ?? lastActiveField.recipientId,
+            pageX: lastActiveField.pageX + 3,
+            pageY: lastActiveField.pageY + 3,
+          };
 
-          toast({
-            title: 'Copied field',
-            description: 'Copied field to clipboard',
+          append(newField);
+
+          return;
+        }
+
+        if (duplicateAll) {
+          const pages = Array.from(document.querySelectorAll(PDF_VIEWER_PAGE_SELECTOR));
+
+          pages.forEach((_, index) => {
+            const pageNumber = index + 1;
+
+            if (pageNumber === lastActiveField.pageNumber) {
+              return;
+            }
+
+            const newField: TConfigureFieldsFormSchema['fields'][0] = {
+              ...structuredClone(lastActiveField),
+              nativeId: undefined,
+              formId: nanoid(12),
+              signerEmail: selectedRecipient?.email ?? lastActiveField.signerEmail,
+              recipientId: selectedRecipient?.id ?? lastActiveField.recipientId,
+              pageNumber,
+            };
+
+            append(newField);
           });
 
           return;
         }
 
-        const newField: TConfigureFieldsFormSchema['fields'][0] = {
-          ...structuredClone(lastActiveField),
-          nativeId: undefined,
-          formId: nanoid(12),
-          signerEmail: selectedRecipient?.email ?? lastActiveField.signerEmail,
-          recipientId: selectedRecipient?.id ?? lastActiveField.recipientId,
-          pageX: lastActiveField.pageX + 3,
-          pageY: lastActiveField.pageY + 3,
-        };
+        setFieldClipboard(lastActiveField);
 
-        append(newField);
+        toast({
+          title: 'Copied field',
+          description: 'Copied field to clipboard',
+        });
       }
     },
     [append, lastActiveField, selectedRecipient?.email, selectedRecipient?.id, toast],
@@ -533,6 +558,7 @@ export const ConfigureFieldsView = ({
                           onMove={(node) => onFieldMove(node, index)}
                           onRemove={() => remove(index)}
                           onDuplicate={() => onFieldCopy(null, { duplicate: true })}
+                          onDuplicateAllPages={() => onFieldCopy(null, { duplicateAll: true })}
                           onFocus={() => setLastActiveField(field)}
                           onBlur={() => setLastActiveField(null)}
                           onAdvancedSettings={() => {
