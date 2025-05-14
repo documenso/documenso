@@ -400,63 +400,60 @@ export const AddFieldsFormPartial = ({
   );
 
   const onFieldCopy = useCallback(
-    (
-      event?: KeyboardEvent | null,
-      options?: { duplicate?: boolean; duplicateAllPages?: boolean },
-    ) => {
-      const { duplicate = false, duplicateAllPages = false } = options ?? {};
+    (event?: KeyboardEvent | null, options?: { duplicate?: boolean; duplicateAll?: boolean }) => {
+      const { duplicate = false, duplicateAll = false } = options ?? {};
 
       if (lastActiveField) {
         event?.preventDefault();
 
-        if (!duplicate) {
-          setFieldClipboard(lastActiveField);
+        if (duplicate) {
+          const newField: TAddFieldsFormSchema['fields'][0] = {
+            ...structuredClone(lastActiveField),
+            nativeId: undefined,
+            formId: nanoid(12),
+            signerEmail: selectedSigner?.email ?? lastActiveField.signerEmail,
+            pageX: lastActiveField.pageX + 3,
+            pageY: lastActiveField.pageY + 3,
+          };
 
-          toast({
-            title: 'Copied field',
-            description: 'Copied field to clipboard',
-          });
+          append(newField);
 
           return;
         }
 
-        if (duplicateAllPages) {
+        if (duplicateAll) {
           const pages = Array.from(document.querySelectorAll(PDF_VIEWER_PAGE_SELECTOR));
-          const totalPages = pages.length;
 
-          for (let pageNumber = 1; pageNumber <= totalPages; pageNumber++) {
-            if (pageNumber !== lastActiveField.pageNumber) {
-              const newField: TAddFieldsFormSchema['fields'][0] = {
-                ...structuredClone(lastActiveField),
-                formId: nanoid(12),
-                signerEmail: selectedSigner?.email ?? lastActiveField.signerEmail,
-                pageNumber,
-              };
+          pages.forEach((_, index) => {
+            const pageNumber = index + 1;
 
-              append(newField);
+            if (pageNumber === lastActiveField.pageNumber) {
+              return;
             }
-          }
 
-          toast({
-            title: 'Field duplicated',
-            description: 'Field has been duplicated across all pages',
+            const newField: TAddFieldsFormSchema['fields'][0] = {
+              ...structuredClone(lastActiveField),
+              nativeId: undefined,
+              formId: nanoid(12),
+              signerEmail: selectedSigner?.email ?? lastActiveField.signerEmail,
+              pageNumber,
+            };
+
+            append(newField);
           });
 
           return;
         }
 
-        const newField: TAddFieldsFormSchema['fields'][0] = {
-          ...structuredClone(lastActiveField),
-          formId: nanoid(12),
-          signerEmail: selectedSigner?.email ?? lastActiveField.signerEmail,
-          pageX: lastActiveField.pageX + 3,
-          pageY: lastActiveField.pageY + 3,
-        };
+        setFieldClipboard(lastActiveField);
 
-        append(newField);
+        toast({
+          title: 'Copied field',
+          description: 'Copied field to clipboard',
+        });
       }
     },
-    [append, lastActiveField, selectedSigner?.email, toast],
+    [append, lastActiveField, selectedSigner?.email, selectedSigner?.id, toast],
   );
 
   const onFieldPaste = useCallback(
@@ -669,9 +666,7 @@ export const AddFieldsFormPartial = ({
                       onMove={(options) => onFieldMove(options, index)}
                       onRemove={() => remove(index)}
                       onDuplicate={() => onFieldCopy(null, { duplicate: true })}
-                      onDuplicateAllPages={() =>
-                        onFieldCopy(null, { duplicate: true, duplicateAllPages: true })
-                      }
+                      onDuplicateAllPages={() => onFieldCopy(null, { duplicateAll: true })}
                       onAdvancedSettings={() => {
                         setCurrentField(field);
                         handleAdvancedSettings();
