@@ -81,10 +81,6 @@ export const duplicateDocument = async ({
       },
       source: DocumentSource.DOCUMENT,
     },
-    include: {
-      recipients: true,
-      documentMeta: true,
-    },
   };
 
   if (teamId !== undefined) {
@@ -95,15 +91,13 @@ export const duplicateDocument = async ({
     };
   }
 
-  // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
-  const createdDocument = (await prisma.document.create(
-    createDocumentArguments,
-  )) as Prisma.DocumentGetPayload<{
+  const createdDocument = await prisma.document.create({
+    ...createDocumentArguments,
     include: {
-      recipients: true;
-      documentMeta: true;
-    };
-  }>;
+      recipients: true,
+      documentMeta: true,
+    },
+  });
 
   await triggerWebhook({
     event: WebhookTriggerEvents.DOCUMENT_CREATED,
