@@ -1,7 +1,9 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
+import { msg } from '@lingui/core/macro';
+import { useLingui } from '@lingui/react';
 import { FieldType } from '@prisma/client';
-import { Copy, CopyPlus, Settings2, Trash } from 'lucide-react';
+import { CopyPlus, Settings2, SquareStack, Trash } from 'lucide-react';
 import { createPortal } from 'react-dom';
 import { Rnd } from 'react-rnd';
 
@@ -66,6 +68,8 @@ export const FieldItem = ({
   onFieldActivate,
   onFieldDeactivate,
 }: FieldItemProps) => {
+  const { _ } = useLingui();
+
   const [coords, setCoords] = useState({
     pageX: 0,
     pageY: 0,
@@ -306,6 +310,7 @@ export const FieldItem = ({
           <div className="group flex items-center justify-evenly gap-x-1 rounded-md border bg-gray-900 p-0.5">
             {advancedField && (
               <button
+                title={_(msg`Advanced settings`)}
                 className="rounded-sm p-1.5 text-gray-400 transition-colors hover:bg-white/10 hover:text-gray-100"
                 onClick={onAdvancedSettings}
                 onTouchEnd={onAdvancedSettings}
@@ -315,6 +320,7 @@ export const FieldItem = ({
             )}
 
             <button
+              title={_(msg`Duplicate`)}
               className="rounded-sm p-1.5 text-gray-400 transition-colors hover:bg-white/10 hover:text-gray-100"
               onClick={onDuplicate}
               onTouchEnd={onDuplicate}
@@ -323,14 +329,16 @@ export const FieldItem = ({
             </button>
 
             <button
+              title={_(msg`Duplicate on all pages`)}
               className="rounded-sm p-1.5 text-gray-400 transition-colors hover:bg-white/10 hover:text-gray-100"
               onClick={onDuplicateAllPages}
               onTouchEnd={onDuplicateAllPages}
             >
-              <Copy className="h-3 w-3" />
+              <SquareStack className="h-3 w-3" />
             </button>
 
             <button
+              title={_(msg`Remove`)}
               className="rounded-sm p-1.5 text-gray-400 transition-colors hover:bg-white/10 hover:text-gray-100"
               onClick={onRemove}
               onTouchEnd={onRemove}
