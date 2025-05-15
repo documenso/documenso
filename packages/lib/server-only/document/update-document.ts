@@ -8,6 +8,7 @@ import type { ApiRequestMetadata } from '@documenso/lib/universal/extract-reques
 import type { CreateDocumentAuditLogDataResponse } from '@documenso/lib/utils/document-audit-logs';
 import { createDocumentAuditLogData } from '@documenso/lib/utils/document-audit-logs';
 import { prisma } from '@documenso/prisma';
+import type { Attachment } from '@documenso/prisma/generated/zod/modelSchema/AttachmentSchema';
 
 import { AppError, AppErrorCode } from '../../errors/app-error';
 import type { TDocumentAccessAuthTypes, TDocumentActionAuthTypes } from '../../types/document-auth';
@@ -24,6 +25,7 @@ export type UpdateDocumentOptions = {
     globalAccessAuth?: TDocumentAccessAuthTypes | null;
     globalActionAuth?: TDocumentActionAuthTypes | null;
     useLegacyFieldInsertion?: boolean;
+    attachments?: Pick<Attachment, 'id' | 'label' | 'url'>[];
   };
   requestMetadata: ApiRequestMetadata;
 };
@@ -67,6 +69,7 @@ export const updateDocument = async ({
           },
         },
       },
+      attachments: true,
     },
   });
 
@@ -158,6 +161,8 @@ export const updateDocument = async ({
     documentGlobalActionAuth === undefined || documentGlobalActionAuth === newGlobalActionAuth;
   const isDocumentVisibilitySame =
     data.visibility === undefined || data.visibility === document.visibility;
+  const isAttachmentsSame =
+    data.attachments === undefined || data.attachments === document.attachments;
 
   const auditLogs: CreateDocumentAuditLogDataResponse[] = [];
 
@@ -237,6 +242,20 @@ export const updateDocument = async ({
     );
   }
 
+  if (!isAttachmentsSame) {
+    auditLogs.push(
+      createDocumentAuditLogData({
+        type: DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_ATTACHMENTS_UPDATED,
+        documentId,
+        metadata: requestMetadata,
+        data: {
+          from: document.attachments,
+          to: data.attachments ?? [],
+        },
+      }),
+    );
+  }
+
   // Early return if nothing is required.
   if (auditLogs.length === 0 && data.useLegacyFieldInsertion === undefined) {
     return document;
@@ -260,6 +279,39 @@ export const updateDocument = async ({
         authOptions,
       },
     });
+
+    if (data.attachments) {
+      await tx.attachment.deleteMany({
+        where: {
+          documentId,
+          id: {
+            notIn: data.attachments.map((a) => a.id),
+          },
+        },
+      });
+
+      await Promise.all(
+        data.attachments.map(
+          async (attachment) =>
+            await tx.attachment.upsert({
+              where: {
+                id: attachment.id,
+                documentId,
+              },
+              update: {
+                label: attachment.label,
+                url: attachment.url,
+              },
+              create: {
+                id: attachment.id,
+                label: attachment.label,
+                url: attachment.url,
+                documentId,
+              },
+            }),
+        ),
+      );
+    }
 
     await tx.documentAuditLog.createMany({
       data: auditLogs,
